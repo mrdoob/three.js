@@ -5,21 +5,66 @@
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-THREE.Vector2 = function ( x, y ) {
+function Vector2( x, y ) {
 
 	this.x = x || 0;
 	this.y = y || 0;
 
-};
+}
 
-THREE.Vector2.prototype = {
+Object.defineProperties( Vector2.prototype, {
 
-	constructor: THREE.Vector2,
+	"width": {
+
+		get: function () {
+
+			return this.x;
+
+		},
+
+		set: function ( value ) {
+
+			this.x = value;
+
+		}
+
+	},
+
+	"height": {
+
+		get: function () {
+
+			return this.y;
+
+		},
+
+		set: function ( value ) {
+
+			this.y = value;
+
+		}
+
+	}
+
+} );
+
+Object.assign( Vector2.prototype, {
+
+	isVector2: true,
 
 	set: function ( x, y ) {
 
 		this.x = x;
 		this.y = y;
+
+		return this;
+
+	},
+
+	setScalar: function ( scalar ) {
+
+		this.x = scalar;
+		this.y = scalar;
 
 		return this;
 
@@ -51,6 +96,8 @@ THREE.Vector2.prototype = {
 
 		}
 
+		return this;
+
 	},
 
 	getComponent: function ( index ) {
@@ -62,6 +109,12 @@ THREE.Vector2.prototype = {
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
+
+	},
+
+	clone: function () {
+
+		return new this.constructor( this.x, this.y );
 
 	},
 
@@ -78,7 +131,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			THREE.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -108,11 +161,20 @@ THREE.Vector2.prototype = {
 
 	},
 
+	addScaledVector: function ( v, s ) {
+
+		this.x += v.x * s;
+		this.y += v.y * s;
+
+		return this;
+
+	},
+
 	sub: function ( v, w ) {
 
 		if ( w !== undefined ) {
 
-			THREE.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -151,10 +213,10 @@ THREE.Vector2.prototype = {
 
 	},
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar: function ( scalar ) {
 
-		this.x *= s;
-		this.y *= s;
+		this.x *= scalar;
+		this.y *= scalar;
 
 		return this;
 
@@ -171,19 +233,17 @@ THREE.Vector2.prototype = {
 
 	divideScalar: function ( scalar ) {
 
-		if ( scalar !== 0 ) {
+		return this.multiplyScalar( 1 / scalar );
 
-			var invScalar = 1 / scalar;
+	},
 
-			this.x *= invScalar;
-			this.y *= invScalar;
+	applyMatrix3: function ( m ) {
 
-		} else {
+		var x = this.x, y = this.y;
+		var e = m.elements;
 
-			this.x = 0;
-			this.y = 0;
-
-		}
+		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ];
+		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ];
 
 		return this;
 
@@ -191,17 +251,8 @@ THREE.Vector2.prototype = {
 
 	min: function ( v ) {
 
-		if ( this.x > v.x ) {
-
-			this.x = v.x;
-
-		}
-
-		if ( this.y > v.y ) {
-
-			this.y = v.y;
-
-		}
+		this.x = Math.min( this.x, v.x );
+		this.y = Math.min( this.y, v.y );
 
 		return this;
 
@@ -209,17 +260,8 @@ THREE.Vector2.prototype = {
 
 	max: function ( v ) {
 
-		if ( this.x < v.x ) {
-
-			this.x = v.x;
-
-		}
-
-		if ( this.y < v.y ) {
-
-			this.y = v.y;
-
-		}
+		this.x = Math.max( this.x, v.x );
+		this.y = Math.max( this.y, v.y );
 
 		return this;
 
@@ -227,43 +269,21 @@ THREE.Vector2.prototype = {
 
 	clamp: function ( min, max ) {
 
-		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+		// assumes min < max, componentwise
 
-		if ( this.x < min.x ) {
-
-			this.x = min.x;
-
-		} else if ( this.x > max.x ) {
-
-			this.x = max.x;
-
-		}
-
-		if ( this.y < min.y ) {
-
-			this.y = min.y;
-
-		} else if ( this.y > max.y ) {
-
-			this.y = max.y;
-
-		}
+		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
+		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
 
 		return this;
+
 	},
 
-	clampScalar: ( function () {
+	clampScalar: function () {
 
-		var min, max;
+		var min = new Vector2();
+		var max = new Vector2();
 
-		return function ( minVal, maxVal ) {
-
-			if ( min === undefined ) {
-
-				min = new THREE.Vector2();
-				max = new THREE.Vector2();
-
-			}
+		return function clampScalar( minVal, maxVal ) {
 
 			min.set( minVal, minVal );
 			max.set( maxVal, maxVal );
@@ -272,7 +292,15 @@ THREE.Vector2.prototype = {
 
 		};
 
-	} )(),
+	}(),
+
+	clampLength: function ( min, max ) {
+
+		var length = this.length();
+
+		return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
+
+	},
 
 	floor: function () {
 
@@ -337,9 +365,27 @@ THREE.Vector2.prototype = {
 
 	},
 
+	manhattanLength: function () {
+
+		return Math.abs( this.x ) + Math.abs( this.y );
+
+	},
+
 	normalize: function () {
 
-		return this.divideScalar( this.length() );
+		return this.divideScalar( this.length() || 1 );
+
+	},
+
+	angle: function () {
+
+		// computes the angle in radians with respect to the positive x-axis
+
+		var angle = Math.atan2( this.y, this.x );
+
+		if ( angle < 0 ) angle += 2 * Math.PI;
+
+		return angle;
 
 	},
 
@@ -356,16 +402,15 @@ THREE.Vector2.prototype = {
 
 	},
 
-	setLength: function ( l ) {
+	manhattanDistanceTo: function ( v ) {
 
-		var oldLength = this.length();
+		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y );
 
-		if ( oldLength !== 0 && l !== oldLength ) {
+	},
 
-			this.multiplyScalar( l / oldLength );
-		}
+	setLength: function ( length ) {
 
-		return this;
+		return this.normalize().multiplyScalar( length );
 
 	},
 
@@ -380,9 +425,7 @@ THREE.Vector2.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
-
-		return this;
+		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
 
 	},
 
@@ -415,23 +458,36 @@ THREE.Vector2.prototype = {
 
 	},
 
-	fromAttribute: function ( attribute, index, offset ) {
+	fromBufferAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset !== undefined ) {
 
-		index = index * attribute.itemSize + offset;
+			console.warn( 'THREE.Vector2: offset has been removed from .fromBufferAttribute().' );
 
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
+		}
+
+		this.x = attribute.getX( index );
+		this.y = attribute.getY( index );
 
 		return this;
 
 	},
 
-	clone: function () {
+	rotateAround: function ( center, angle ) {
 
-		return new THREE.Vector2( this.x, this.y );
+		var c = Math.cos( angle ), s = Math.sin( angle );
+
+		var x = this.x - center.x;
+		var y = this.y - center.y;
+
+		this.x = x * c - y * s + center.x;
+		this.y = x * s + y * c + center.y;
+
+		return this;
 
 	}
 
-};
+} );
+
+
+export { Vector2 };

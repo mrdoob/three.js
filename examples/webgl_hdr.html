@@ -33,11 +33,11 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl HDR texture example -
-			based on <a href="http://spidergl.org/example.php?id=13" target="_blank">SpiderGL</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl HDR texture example -
+			based on <a href="http://spidergl.org/example.php?id=13" target="_blank" rel="noopener">SpiderGL</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -126,16 +126,16 @@
 
 				scene = new THREE.Scene();
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
+				var texture = new THREE.TextureLoader().load( "textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.NearestFilter;
 
 				materialHDR = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						tDiffuse:  { type: "t", value: texture },
-						exposure:  { type: "f", value: 0.125 },
-						brightMax: { type: "f", value: 0.5 }
+						tDiffuse:  { value: texture },
+						exposure:  { value: 0.125 },
+						brightMax: { value: 0.5 }
 						},
 					vertexShader: getText( 'vs-hdr' ),
 					fragmentShader: getText( 'fs-hdr' )
@@ -154,9 +154,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -192,7 +190,7 @@
 
 			function render() {
 
-				delta = clock.getDelta() * 5;
+				var delta = clock.getDelta() * 5;
 
 				if ( materialHDR.uniforms.exposure.value > 0 || materialHDR.uniforms.exposure.value < 1 ) {
 

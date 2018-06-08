@@ -21,18 +21,23 @@
 				z-index: 100;
 				display:block;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			#info a, .button {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> -
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		vrml format loader test -
-		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank">VRML 2.0 Tutorial</a>,-->
+		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank" rel="noopener">VRML 2.0 Tutorial</a>,-->
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -49,8 +54,6 @@
 
 			var camera, controls, scene, renderer;
 
-			var cross;
-
 			init();
 			animate();
 
@@ -60,12 +63,6 @@
 				camera.position.z = 6;
 
 				controls = new THREE.OrbitControls( camera );
-
-				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
-
-				controls.noZoom = false;
-				controls.noPan = false;
 
 				scene = new THREE.Scene();
 				scene.add( camera );
@@ -79,16 +76,15 @@
 				camera.add( dirLight.target );
 
 				var loader = new THREE.VRMLLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				loader.load( 'models/vrml/house.wrl', function ( object ) {
 
-					scene.add(event.content);
+					scene.add( object );
 
 				} );
-				loader.load( "models/vrml/house.wrl" );
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -97,9 +93,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -114,15 +108,12 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
-
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				controls.update();
 				renderer.render( scene, camera );
 
 				stats.update();

@@ -28,15 +28,13 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="../build/three.min.js"></script>
-
-		<script src="fonts/helvetiker_bold.typeface.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -81,57 +79,35 @@
 
 		var renderer, scene, camera, stats;
 
-		var object, uniforms, attributes;
+		var object, uniforms;
 
-		var text = "three.js",
+		var loader = new THREE.FontLoader();
+		loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-			height = 15,
-			size = 50,
+			init( font );
+			animate();
 
-			curveSegments = 10,
-			steps = 40,
+		} );
 
-			bevelThickness = 5,
-			bevelSize = 1.5,
-			bevelSegments = 10,
-			bevelEnabled = true,
+		function init( font ) {
 
-			font = "helvetiker", 		// helvetiker, optimer, gentilis, droid sans, droid serif
-			weight = "bold",		// normal bold
-			style = "normal";		// normal italic
-
-		var WIDTH = window.innerWidth,
-			HEIGHT = window.innerHeight;
-
-		init();
-		animate();
-
-		function init() {
-
-			camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
+			camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.z = 400;
 
 			scene = new THREE.Scene();
-
-			attributes = {
-
-				displacement: {	type: 'v3', value: [] },
-				customColor: {	type: 'c', value: [] }
-
-			};
+			scene.background = new THREE.Color( 0x050505 );
 
 			uniforms = {
 
-				amplitude: { type: "f", value: 5.0 },
-				opacity:   { type: "f", value: 0.3 },
-				color:     { type: "c", value: new THREE.Color( 0xff0000 ) }
+				amplitude: { value: 5.0 },
+				opacity:   { value: 0.3 },
+				color:     { value: new THREE.Color( 0xff0000 ) }
 
 			};
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms:       uniforms,
-				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 				blending:       THREE.AdditiveBlending,
@@ -140,63 +116,61 @@
 
 			});
 
-			shaderMaterial.linewidth = 1;
 
-			geometry = new THREE.TextGeometry( text, {
-
-				size: size,
-				height: height,
-				curveSegments: curveSegments,
+			var geometry = new THREE.TextGeometry( 'three.js', {
 
 				font: font,
-				weight: weight,
-				style: style,
 
-				bevelThickness: bevelThickness,
-				bevelSize: bevelSize,
-				bevelEnabled: bevelEnabled,
-				bevelSegments: bevelSegments,
+				size: 50,
+				height: 15,
+				curveSegments: 10,
 
-				steps: steps
+				bevelThickness: 5,
+				bevelSize: 1.5,
+				bevelEnabled: true,
+				bevelSegments: 10,
 
-			});
+				steps: 40
 
-			geometry.dynamic = true;
+			} );
 
 			geometry.center();
 
-			object = new THREE.Line( geometry, shaderMaterial, THREE.LineStrip );
+			var vertices = geometry.vertices;
 
-			var vertices = object.geometry.vertices;
+			var buffergeometry = new THREE.BufferGeometry();
 
-			var displacement = attributes.displacement.value;
-			var color = attributes.customColor.value;
+			var position = new THREE.Float32BufferAttribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
+			buffergeometry.addAttribute( 'position', position );
 
-			for( var v = 0; v < vertices.length; v ++ ) {
+			var displacement = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
+			buffergeometry.addAttribute( 'displacement', displacement );
 
-				displacement[ v ] = new THREE.Vector3();
+			var customColor = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
+			buffergeometry.addAttribute( 'customColor', customColor );
 
-				color[ v ] = new THREE.Color( 0xffffff );
-				color[ v ].setHSL( v / vertices.length, 0.5, 0.5 );
+			var color = new THREE.Color( 0xffffff );
+
+			for( var i = 0, l = customColor.count; i < l; i ++ ) {
+
+				color.setHSL( i / l, 0.5, 0.5 );
+				color.toArray( customColor.array, i * customColor.itemSize );
 
 			}
 
+			object = new THREE.Line( buffergeometry, shaderMaterial );
 			object.rotation.x = 0.2;
-
 			scene.add( object );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( WIDTH, HEIGHT );
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			var container = document.getElementById( 'container' );
 			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			//
 
@@ -228,22 +202,17 @@
 
 			object.rotation.y = 0.25 * time;
 
-			uniforms.amplitude.value = 0.5 * Math.sin( 0.5 * time );
+			uniforms.amplitude.value = Math.sin( 0.5 * time );
 			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
-			var nx, ny, nz, value;
+			var attributes = object.geometry.attributes;
+			var array = attributes.displacement.array;
 
-			for( var i = 0, il = attributes.displacement.value.length; i < il; i ++ ) {
+			for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
-				nx = 0.3 * ( 0.5 - Math.random() );
-				ny = 0.3 * ( 0.5 - Math.random() );
-				nz = 0.3 * ( 0.5 - Math.random() );
-
-				value = attributes.displacement.value[ i ];
-
-				value.x += nx;
-				value.y += ny;
-				value.z += nz;
+				array[ i     ] += 0.3 * ( 0.5 - Math.random() );
+				array[ i + 1 ] += 0.3 * ( 0.5 - Math.random() );
+				array[ i + 2 ] += 0.3 * ( 0.5 - Math.random() );
 
 			}
 

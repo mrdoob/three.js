@@ -43,7 +43,7 @@
 
 		</script>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script>
 
@@ -72,14 +72,15 @@
 				camera.position.z = 2000;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				geometry = new THREE.SphereGeometry( 15, 64, 32 );
+				geometry = new THREE.SphereBufferGeometry( 15, 64, 32 );
 
 				for ( var i = 0; i < N; i ++ ) {
 
 					var material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
 
-					mesh = new THREE.Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = ( 0.5 - Math.random() ) * 1000;
 					mesh.position.y = ( 0.5 - Math.random() ) * 1000;
@@ -92,7 +93,6 @@
 				}
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -128,7 +128,7 @@
 
 				renderer.render( scene, camera );
 
-				console.log( "before", renderer.info.memory.programs );
+				console.log( "before", renderer.info.programs.length );
 
 				for ( var i = 0; i < N; i ++ ) {
 
@@ -137,7 +137,7 @@
 
 				}
 
-				console.log( "after", renderer.info.memory.programs );
+				console.log( "after", renderer.info.programs.length );
 
 			}
 

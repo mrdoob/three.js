@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - particles - dynamic - postprocessing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a {
+				color: #046;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl dynamic particles + postprocessing
+			- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank" rel="noopener">Reallusion</a>
+			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank" rel="noopener">iClone</a>,
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/loaders/OBJLoader.js"></script>
+
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/FocusShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/FilmPass.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, mesh;
+
+			var parent, meshes = [], clonemeshes = [];
+
+			var composer, effectFocus;
+
+			var clock = new THREE.Clock();
+
+			var stats;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 50000 );
+				camera.position.set( 0, 700, 7000 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000104 );
+				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
+
+				camera.lookAt( scene.position );
+
+				var loader = new THREE.OBJLoader();
+
+				loader.load( 'models/obj/male02/male02.obj', function ( object ) {
+
+					var positions = combineBuffer( object, 'position' );
+
+					createMesh( positions, scene, 4.05,  -500, -350,   600, 0xff7744 );
+					createMesh( positions, scene, 4.05,   500, -350,     0, 0xff5522 );
+					createMesh( positions, scene, 4.05,  -250, -350,  1500, 0xff9922 );
+					createMesh( positions, scene, 4.05,  -250, -350, -1500, 0xff99ff );
+
+				} );
+
+				loader.load( 'models/obj/female02/female02.obj', function ( object ) {
+
+					var positions = combineBuffer( object, 'position' );
+
+					createMesh( positions, scene, 4.05, -1000, -350,    0, 0xffdd44 );
+					createMesh( positions, scene, 4.05,     0, -350,    0, 0xffffff );
+					createMesh( positions, scene, 4.05,  1000, -350,  400, 0xff4422 );
+					createMesh( positions, scene, 4.05,   250, -350, 1500, 0xff9955 );
+					createMesh( positions, scene, 4.05,   250, -350, 2500, 0xff77dd );
+
+				} );
+
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth,window.innerHeight );
+				renderer.autoClear = false;
+				container.appendChild( renderer.domElement );
+
+				parent = new THREE.Object3D();
+				scene.add( parent );
+
+				var grid = new THREE.Points( new THREE.PlaneBufferGeometry( 15000, 15000, 64, 64 ), new THREE.PointsMaterial( { color: 0xff0000, size: 10 } ) );
+				grid.position.y = -400;
+				grid.rotation.x = - Math.PI / 2;
+				parent.add( grid );
+
+				// postprocessing
+
+				var renderModel = new THREE.RenderPass( scene, camera );
+				var effectBloom = new THREE.BloomPass( 0.75 );
+				var effectFilm = new THREE.FilmPass( 0.5, 0.5, 1448, false );
+
+				effectFocus = new THREE.ShaderPass( THREE.FocusShader );
+
+				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
+				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
+
+				effectFocus.renderToScreen = true;
+
+				composer = new THREE.EffectComposer( renderer );
+
+				composer.addPass( renderModel );
+				composer.addPass( effectBloom );
+				composer.addPass( effectFilm );
+				composer.addPass( effectFocus );
+
+				//stats
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+
+			function onWindowResize( event ) {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				camera.lookAt( scene.position );
+
+				composer.reset();
+
+				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
+				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
+
+			}
+
+			function combineBuffer( model, bufferName ) {
+
+				let count = 0;
+
+				model.traverse( function ( child ) {
+
+					if ( child.isMesh ) {
+
+						var buffer = child.geometry.attributes[ bufferName ];
+
+						count += buffer.array.length;
+
+					}
+
+				} );
+
+				var combined = new Float32Array(count);
+
+				let offset = 0;
+
+				model.traverse( function ( child ) {
+
+					if ( child.isMesh ) {
+
+						var buffer = child.geometry.attributes[ bufferName ];
+
+						combined.set( buffer.array, offset );
+						offset += buffer.array.length;
+
+					}
+
+				} );
+
+				return new THREE.BufferAttribute( combined, 3 );
+
+			}
+
+			function createMesh( positions, scene, scale, x, y, z, color ) {
+
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', positions.clone() );
+				geometry.addAttribute( 'initialPosition', positions.clone() );
+
+				geometry.attributes.position.setDynamic( true );
+
+				var clones = [
+
+					[  6000, 0, -4000 ],
+					[  5000, 0, 0 ],
+					[  1000, 0, 5000 ],
+					[  1000, 0, -5000 ],
+					[  4000, 0, 2000 ],
+					[ -4000, 0, 1000 ],
+					[ -5000, 0, -5000 ],
+
+					[ 0, 0, 0 ]
+
+				];
+
+				for ( var i = 0; i < clones.length; i ++ ) {
+
+					var c = ( i < clones.length -1 ) ? 0x252525 : color;
+
+					mesh = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 30, color: c } ) );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
+
+					mesh.position.x = x + clones[ i ][ 0 ];
+					mesh.position.y = y + clones[ i ][ 1 ];
+					mesh.position.z = z + clones[ i ][ 2 ];
+
+					parent.add( mesh );
+
+					clonemeshes.push( { mesh: mesh, speed: 0.5 + Math.random() } );
+
+				}
+
+				meshes.push( {
+					mesh: mesh, verticesDown: 0, verticesUp: 0, direction: 0, speed: 15, delay: Math.floor( 200 + 200 * Math.random() ),
+					start: Math.floor( 100 + 200 * Math.random() ),
+				} );
+
+			}
+
+			function animate () {
+
+				requestAnimationFrame( animate );
+				render();
+				stats.update();
+
+			}
+
+			function render () {
+
+				var delta = 10 * clock.getDelta();
+
+				delta = delta < 2 ? delta : 2;
+
+				parent.rotation.y += -0.02 * delta;
+
+				for( var j = 0; j < clonemeshes.length; j ++ ) {
+
+					var cm = clonemeshes[ j ];
+					cm.mesh.rotation.y += -0.1 * delta * cm.speed;
+
+				}
+
+				for( var j = 0; j < meshes.length; j ++ ) {
+
+					var data = meshes[ j ];
+					var positions = data.mesh.geometry.attributes.position;
+					var initialPositions = data.mesh.geometry.attributes.initialPosition;
+
+					var count = positions.count;
+
+					if ( data.start > 0 ) {
+
+						data.start -= 1;
+
+					} else {
+
+						if ( data.direction === 0 ) {
+
+							data.direction = -1;
+
+						}
+
+					}
+
+					for ( var i = 0; i < count; i ++ ) {
+
+						var px = positions.getX( i );
+						var py = positions.getY( i );
+						var pz = positions.getZ( i );
+
+						// falling down
+						if ( data.direction < 0 ) {
+
+							if ( py > 0 ) {
+
+								positions.setXYZ(
+									i,
+									px + 1.5 * ( 0.50 - Math.random() ) * data.speed * delta,
+									py + 3.0 * ( 0.25 - Math.random() ) * data.speed * delta,
+									pz + 1.5 * ( 0.50 - Math.random() ) * data.speed * delta
+								);
+
+							} else {
+
+								data.verticesDown += 1;
+
+							}
+
+						}
+
+						// rising up
+						if ( data.direction > 0 ) {
+
+							var ix = initialPositions.getX( i );
+							var iy = initialPositions.getY( i );
+							var iz = initialPositions.getZ( i );
+
+							var dx = Math.abs( px - ix );
+							var dy = Math.abs( py - iy );
+							var dz = Math.abs( pz - iz );
+
+							var d = dx + dy + dx;
+
+							if ( d > 1 ) {
+
+								positions.setXYZ(
+									i,
+									px - ( px - ix ) / dx * data.speed * delta * ( 0.85 - Math.random() ),
+									py - ( py - iy ) / dy * data.speed * delta * ( 1 + Math.random() ),
+									pz - ( pz - iz ) / dz * data.speed * delta * ( 0.85 - Math.random() ),
+								);
+
+							} else {
+
+								data.verticesUp += 1;
+
+							}
+
+						}
+
+					}
+
+					// all vertices down
+					if ( data.verticesDown >= count ) {
+
+						if ( data.delay <= 0 ) {
+
+							data.direction = 1;
+							data.speed = 5;
+							data.verticesDown = 0;
+							data.delay = 320;
+
+						} else {
+
+							data.delay -= 1;
+
+						}
+
+					}
+
+					// all vertices up
+					if ( data.verticesUp >= count ) {
+
+						if ( data.delay <= 0 ) {
+
+							data.direction = -1;
+							data.speed = 15;
+							data.verticesUp = 0;
+							data.delay = 120;
+
+						} else {
+
+							data.delay -= 1;
+
+						}
+
+					}
+
+					positions.needsUpdate = true;
+
+				}
+
+				composer.render( 0.01 );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

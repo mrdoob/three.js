@@ -14,37 +14,37 @@ THREE.BokehShader = {
 
 	uniforms: {
 
-		"textureWidth":  { type: "f", value: 1.0 },
-		"textureHeight":  { type: "f", value: 1.0 },
+		"textureWidth":  { value: 1.0 },
+		"textureHeight":  { value: 1.0 },
 
-		"focalDepth":   { type: "f", value: 1.0 },
-		"focalLength":   { type: "f", value: 24.0 },
-		"fstop": { type: "f", value: 0.9 },
+		"focalDepth":   { value: 1.0 },
+		"focalLength":   { value: 24.0 },
+		"fstop": { value: 0.9 },
 
-		"tColor":   { type: "t", value: null },
-		"tDepth":   { type: "t", value: null },
+		"tColor":   { value: null },
+		"tDepth":   { value: null },
 
-		"maxblur":  { type: "f", value: 1.0 },
+		"maxblur":  { value: 1.0 },
 
-		"showFocus":   { type: "i", value: 0 },
-		"manualdof":   { type: "i", value: 0 },
-		"vignetting":   { type: "i", value: 0 },
-		"depthblur":   { type: "i", value: 0 },
+		"showFocus":   { value: 0 },
+		"manualdof":   { value: 0 },
+		"vignetting":   { value: 0 },
+		"depthblur":   { value: 0 },
 
-		"threshold":  { type: "f", value: 0.5 },
-		"gain":  { type: "f", value: 2.0 },
-		"bias":  { type: "f", value: 0.5 },
-		"fringe":  { type: "f", value: 0.7 },
+		"threshold":  { value: 0.5 },
+		"gain":  { value: 2.0 },
+		"bias":  { value: 0.5 },
+		"fringe":  { value: 0.7 },
 
-		"znear":  { type: "f", value: 0.1 },
-		"zfar":  { type: "f", value: 100 },
+		"znear":  { value: 0.1 },
+		"zfar":  { value: 100 },
 
-		"noise":  { type: "i", value: 1 },
-		"dithering":  { type: "f", value: 0.0001 },
-		"pentagon": { type: "i", value: 0 },
+		"noise":  { value: 1 },
+		"dithering":  { value: 0.0001 },
+		"pentagon": { value: 0 },
 
-		"shaderFocus":  { type: "i", value: 1 },
-		"focusCoords":  { type: "v2", value: new THREE.Vector2() },
+		"shaderFocus":  { value: 1 },
+		"focusCoords":  { value: new THREE.Vector2() }
 
 
 	},
@@ -60,9 +60,12 @@ THREE.BokehShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
+
+		"#include <common>",
+		"#include <packing>",
 
 		"varying vec2 vUv;",
 
@@ -70,13 +73,6 @@ THREE.BokehShader = {
 		"uniform sampler2D tDepth;",
 		"uniform float textureWidth;",
 		"uniform float textureHeight;",
-
-		"const float PI = 3.14159265;",
-
-		"float width = textureWidth; //texture width",
-		"float height = textureHeight; //texture height",
-
-		"vec2 texel = vec2(1.0/width,1.0/height);",
 
 		"uniform float focalDepth;  //focal distance value in meters, but you may use autofocus option below",
 		"uniform float focalLength; //focal length in mm",
@@ -113,9 +109,6 @@ THREE.BokehShader = {
 		"float vignfade = 22.0; // f-stops till vignete fades",
 
 		"uniform bool shaderFocus;",
-
-		"bool autofocus = shaderFocus;",
-		"//use autofocus in shader - use with focusCoords",
 		"// disable if you use external focalDepth value",
 
 		"uniform vec2 focusCoords;",
@@ -134,7 +127,6 @@ THREE.BokehShader = {
 		"uniform bool noise; //use noise instead of pattern for sample dithering",
 
 		"uniform float dithering;",
-		"float namount = dithering; //dither amount",
 
 		"uniform bool depthblur; // blur the depth buffer",
 		"float dbsize = 1.25; // depth blur size",
@@ -191,7 +183,7 @@ THREE.BokehShader = {
 			"float kernel[9];",
 			"vec2 offset[9];",
 
-			"vec2 wh = vec2(texel.x, texel.y) * dbsize;",
+			"vec2 wh = vec2(1.0/textureWidth,1.0/textureHeight) * dbsize;",
 
 			"offset[0] = vec2(-wh.x,-wh.y);",
 			"offset[1] = vec2( 0.0, -wh.y);",
@@ -223,6 +215,7 @@ THREE.BokehShader = {
 			"//processing the sample",
 
 			"vec3 col = vec3(0.0);",
+			"vec2 texel = vec2(1.0/textureWidth,1.0/textureHeight);",
 
 			"col.r = texture2D(tColor,coords + vec2(0.0,1.0)*texel*fringe*blur).r;",
 			"col.g = texture2D(tColor,coords + vec2(-0.866,-0.5)*texel*fringe*blur).g;",
@@ -232,20 +225,6 @@ THREE.BokehShader = {
 			"float lum = dot(col.rgb, lumcoeff);",
 			"float thresh = max((lum-threshold)*gain, 0.0);",
 			"return col+mix(vec3(0.0),col,thresh*blur);",
-		"}",
-
-		"vec2 rand(vec2 coord) {",
-			"// generating noise / pattern texture for dithering",
-
-			"float noiseX = ((fract(1.0-coord.s*(width/2.0))*0.25)+(fract(coord.t*(height/2.0))*0.75))*2.0-1.0;",
-			"float noiseY = ((fract(1.0-coord.s*(width/2.0))*0.75)+(fract(coord.t*(height/2.0))*0.25))*2.0-1.0;",
-
-			"if (noise) {",
-				"noiseX = clamp(fract(sin(dot(coord ,vec2(12.9898,78.233))) * 43758.5453),0.0,1.0)*2.0-1.0;",
-				"noiseY = clamp(fract(sin(dot(coord ,vec2(12.9898,78.233)*2.0)) * 43758.5453),0.0,1.0)*2.0-1.0;",
-			"}",
-
-			"return vec2(noiseX,noiseY);",
 		"}",
 
 		"vec3 debugFocus(vec3 col, float blur, float depth) {",
@@ -289,7 +268,7 @@ THREE.BokehShader = {
 			"float depth = linearize(texture2D(tDepth,vUv.xy).x);",
 
 			"// Blur depth?",
-			"if (depthblur) {",
+			"if ( depthblur ) {",
 				"depth = linearize(bdepth(vUv.xy));",
 			"}",
 
@@ -297,7 +276,7 @@ THREE.BokehShader = {
 
 			"float fDepth = focalDepth;",
 
-			"if (autofocus) {",
+			"if (shaderFocus) {",
 
 				"fDepth = linearize(texture2D(tDepth,focusCoords).x);",
 
@@ -328,12 +307,12 @@ THREE.BokehShader = {
 
 			"// calculation of pattern for dithering",
 
-			"vec2 noise = rand(vUv.xy)*namount*blur;",
+			"vec2 noise = vec2(rand(vUv.xy), rand( vUv.xy + vec2( 0.4, 0.6 ) ) )*dithering*blur;",
 
 			"// getting blur x and y step factor",
 
-			"float w = (1.0/width)*blur*maxblur+noise.x;",
-			"float h = (1.0/height)*blur*maxblur+noise.y;",
+			"float w = (1.0/textureWidth)*blur*maxblur+noise.x;",
+			"float h = (1.0/textureHeight)*blur*maxblur+noise.y;",
 
 			"// calculation of final color",
 
@@ -373,6 +352,48 @@ THREE.BokehShader = {
 			"gl_FragColor.a = 1.0;",
 		"} "
 
-	].join("\n")
+	].join( "\n" )
+
+};
+
+THREE.BokehDepthShader = {
+
+	uniforms: {
+
+		"mNear": { value: 1.0 },
+		"mFar": { value: 1000.0 },
+
+	},
+
+	vertexShader: [
+
+		"varying float vViewZDepth;",
+
+		"void main() {",
+
+		"	#include <begin_vertex>",
+		"	#include <project_vertex>",
+
+		"	vViewZDepth = - mvPosition.z;",
+
+		"}"
+
+	].join( "\n" ),
+
+	fragmentShader: [
+
+		"uniform float mNear;",
+		"uniform float mFar;",
+
+		"varying float vViewZDepth;",
+
+		"void main() {",
+
+		"	float color = 1.0 - smoothstep( mNear, mFar, vViewZDepth );",
+		"	gl_FragColor = vec4( vec3( color ), 1.0 );",
+
+		"} "
+
+	].join( "\n" )
 
 };

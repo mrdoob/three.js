@@ -6,17 +6,15 @@
  * geometries UV mapping
  *
  * Sample usage:
- *	document.body.appendChild(
- *		THREE.UVsDebug(
- *			new THREE.SphereGeometry(10,10,10,10));
+ *	document.body.appendChild( THREE.UVsDebug( new THREE.SphereGeometry( 10, 10, 10, 10 ) );
  *
  */
  
 THREE.UVsDebug = function( geometry, size ) {
 
-    // handles wrapping of uv.x > 1 only
+	// handles wrapping of uv.x > 1 only
     
-	var abc = 'abcd';
+	var abc = 'abc';
 
 	var uv, u, ax, ay;
 	var i, il, j, jl;
@@ -25,8 +23,10 @@ THREE.UVsDebug = function( geometry, size ) {
 	var a = new THREE.Vector2();
 	var b = new THREE.Vector2();
 
-	var faces = geometry.faces;
-	var uvs = geometry.faceVertexUvs[ 0 ];
+	var geo = ( geometry instanceof THREE.BufferGeometry ) ? new THREE.Geometry().fromBufferGeometry( geometry ) : geometry;
+
+	var faces = geo.faces;
+	var uvs = geo.faceVertexUvs[ 0 ];
 
 	var canvas = document.createElement( 'canvas' );
 	var width = size || 1024;   // power of 2 required for wrapping
@@ -39,7 +39,7 @@ THREE.UVsDebug = function( geometry, size ) {
 	ctx.strokeStyle = 'rgba( 0, 0, 0, 1.0 )';
 	ctx.textAlign = 'center';
 
-    // paint background white
+	// paint background white
 
 	ctx.fillStyle = 'rgba( 255, 255, 255, 1.0 )';
 	ctx.fillRect( 0, 0, width, height );
@@ -48,7 +48,7 @@ THREE.UVsDebug = function( geometry, size ) {
 
 		uv = uvs[ i ];
 
-        // draw lines
+		// draw lines
 
 		ctx.beginPath();
 
@@ -78,13 +78,15 @@ THREE.UVsDebug = function( geometry, size ) {
 
 		a.divideScalar( jl );
 
-        // label the face number
+		// label the face number
 
 		ctx.font = "12pt Arial bold";
 		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
 		ctx.fillText( i, a.x * width, ( 1 - a.y ) * height );
 
-		if ( a.x > 0.95 ) { // wrap x // 0.95 is arbitrary
+		if ( a.x > 0.95 ) {
+
+			// wrap x // 0.95 is arbitrary
 
 			ctx.fillText( i, ( a.x % 1 ) * width, ( 1 - a.y ) * height );
 
@@ -93,7 +95,7 @@ THREE.UVsDebug = function( geometry, size ) {
 		ctx.font = "8pt Arial bold";
 		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
 
-        // label uv edge orders
+		// label uv edge orders
 
 		for ( j = 0, jl = uv.length; j < jl; j ++ ) {
 
@@ -103,7 +105,9 @@ THREE.UVsDebug = function( geometry, size ) {
 			vnum = faces[ i ][ abc[ j ] ];
 			ctx.fillText( abc[ j ] + vnum, b.x * width, ( 1 - b.y ) * height );
 
-			if ( b.x > 0.95 ) {  // wrap x
+			if ( b.x > 0.95 ) {
+
+				// wrap x
 
 				ctx.fillText( abc[ j ] + vnum, ( b.x % 1 ) * width, ( 1 - b.y ) * height );
 
@@ -115,5 +119,5 @@ THREE.UVsDebug = function( geometry, size ) {
 
 	return canvas;
 
-}
+};
 

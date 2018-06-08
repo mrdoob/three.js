@@ -20,14 +20,51 @@
 
 THREE.ShaderGodRays = {
 
+	'godrays_depthMask': {
+
+		uniforms: {
+
+			tInput: {
+				value: null
+			}
+
+		},
+
+		vertexShader: [
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+			" vUv = uv;",
+			" gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+			"}"
+
+		].join( "\n" ),
+
+		fragmentShader: [
+
+			"varying vec2 vUv;",
+
+			"uniform sampler2D tInput;",
+
+			"void main() {",
+
+			"	gl_FragColor = vec4( 1.0 ) - texture2D( tInput, vUv );",
+
+
+			"}"
+
+		].join( "\n" )
+
+	},
+
+
 	/**
 	 * The god-ray generation shader.
 	 *
 	 * First pass:
-	 *
-	 * The input is the depth map. I found that the output from the
-	 * THREE.MeshDepthMaterial material was directly suitable without
-	 * requiring any treatment whatsoever.
 	 *
 	 * The depth map is blurred along radial lines towards the "sun". The
 	 * output is written to a temporary render target (I used a 1/4 sized
@@ -44,17 +81,12 @@ THREE.ShaderGodRays = {
 		uniforms: {
 
 			tInput: {
-				type: "t",
 				value: null
 			},
-
 			fStepSize: {
-				type: "f",
 				value: 1.0
 			},
-
 			vSunPositionScreenSpace: {
-				type: "v2",
 				value: new THREE.Vector2( 0.5, 0.5 )
 			}
 
@@ -71,7 +103,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -114,7 +146,7 @@ THREE.ShaderGodRays = {
 					// Accumulate samples, making sure we dont walk past the light source.
 
 					// The check for uv.y < 1 would not be necessary with "border" UV wrap
-					// mode, with a black border colour. I don't think this is currently
+					// mode, with a black border color. I don't think this is currently
 					// exposed by three.js. As a result there might be artifacts when the
 					// sun is to the left, right or bottom of screen as these cases are
 					// not specifically handled.
@@ -157,7 +189,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -171,22 +203,18 @@ THREE.ShaderGodRays = {
 		uniforms: {
 
 			tColors: {
-				type: "t",
 				value: null
 			},
 
 			tGodRays: {
-				type: "t",
 				value: null
 			},
 
 			fGodRayIntensity: {
-				type: "f",
 				value: 0.69
 			},
 
 			vSunPositionScreenSpace: {
-				type: "v2",
 				value: new THREE.Vector2( 0.5, 0.5 )
 			}
 
@@ -203,7 +231,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-			].join("\n"),
+			].join( "\n" ),
 
 		fragmentShader: [
 
@@ -226,7 +254,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	},
 
@@ -241,22 +269,18 @@ THREE.ShaderGodRays = {
 		uniforms: {
 
 			vSunPositionScreenSpace: {
-				type: "v2",
 				value: new THREE.Vector2( 0.5, 0.5 )
 			},
 
 			fAspect: {
-				type: "f",
 				value: 1.0
 			},
 
 			sunColor: {
-				type: "c",
 				value: new THREE.Color( 0xffee00 )
 			},
 
 			bgColor: {
-				type: "c",
 				value: new THREE.Color( 0x000000 )
 			}
 
@@ -273,7 +297,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -301,7 +325,7 @@ THREE.ShaderGodRays = {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	}
 

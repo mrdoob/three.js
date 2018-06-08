@@ -2,29 +2,35 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.VideoTexture = function ( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+import { Texture } from './Texture.js';
 
-	THREE.Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.generateMipmaps = false;
 
-	var scope = this;
+}
 
-	var update = function () {
+VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
-		requestAnimationFrame( update );
+	constructor: VideoTexture,
 
-		if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+	isVideoTexture: true,
 
-			scope.needsUpdate = true;
+	update: function () {
+
+		var video = this.image;
+
+		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+			this.needsUpdate = true;
 
 		}
 
-	};
+	}
 
-	update();
+} );
 
-};
 
-THREE.VideoTexture.prototype = Object.create( THREE.Texture.prototype );
-THREE.VideoTexture.prototype.constructor = THREE.VideoTexture;
+export { VideoTexture };

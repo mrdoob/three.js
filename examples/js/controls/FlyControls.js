@@ -7,7 +7,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.object = object;
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
-	if ( domElement ) this.domElement.setAttribute( 'tabindex', -1 );
+	if ( domElement ) this.domElement.setAttribute( 'tabindex', - 1 );
 
 	// API
 
@@ -39,7 +39,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.keydown = function( event ) {
+	this.keydown = function ( event ) {
 
 		if ( event.altKey ) {
 
@@ -78,7 +78,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.keyup = function( event ) {
+	this.keyup = function ( event ) {
 
 		switch ( event.keyCode ) {
 
@@ -109,7 +109,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.mousedown = function( event ) {
+	this.mousedown = function ( event ) {
 
 		if ( this.domElement !== document ) {
 
@@ -139,16 +139,16 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.mousemove = function( event ) {
+	this.mousemove = function ( event ) {
 
-		if ( !this.dragToLook || this.mouseStatus > 0 ) {
+		if ( ! this.dragToLook || this.mouseStatus > 0 ) {
 
 			var container = this.getContainerDimensions();
-			var halfWidth  = container.size[ 0 ] / 2;
+			var halfWidth = container.size[ 0 ] / 2;
 			var halfHeight = container.size[ 1 ] / 2;
 
-			this.moveState.yawLeft   = - ( ( event.pageX - container.offset[ 0 ] ) - halfWidth  ) / halfWidth;
-			this.moveState.pitchDown =   ( ( event.pageY - container.offset[ 1 ] ) - halfHeight ) / halfHeight;
+			this.moveState.yawLeft = - ( ( event.pageX - container.offset[ 0 ] ) - halfWidth ) / halfWidth;
+			this.moveState.pitchDown = ( ( event.pageY - container.offset[ 1 ] ) - halfHeight ) / halfHeight;
 
 			this.updateRotationVector();
 
@@ -156,7 +156,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.mouseup = function( event ) {
+	this.mouseup = function ( event ) {
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -184,7 +184,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.update = function( delta ) {
+	this.update = function ( delta ) {
 
 		var moveMult = delta * this.movementSpeed;
 		var rotMult = delta * this.rollSpeed;
@@ -202,42 +202,42 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.updateMovementVector = function() {
+	this.updateMovementVector = function () {
 
-		var forward = ( this.moveState.forward || ( this.autoForward && !this.moveState.back ) ) ? 1 : 0;
+		var forward = ( this.moveState.forward || ( this.autoForward && ! this.moveState.back ) ) ? 1 : 0;
 
-		this.moveVector.x = ( -this.moveState.left    + this.moveState.right );
-		this.moveVector.y = ( -this.moveState.down    + this.moveState.up );
-		this.moveVector.z = ( -forward + this.moveState.back );
+		this.moveVector.x = ( - this.moveState.left + this.moveState.right );
+		this.moveVector.y = ( - this.moveState.down + this.moveState.up );
+		this.moveVector.z = ( - forward + this.moveState.back );
 
 		//console.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
 
 	};
 
-	this.updateRotationVector = function() {
+	this.updateRotationVector = function () {
 
-		this.rotationVector.x = ( -this.moveState.pitchDown + this.moveState.pitchUp );
-		this.rotationVector.y = ( -this.moveState.yawRight  + this.moveState.yawLeft );
-		this.rotationVector.z = ( -this.moveState.rollRight + this.moveState.rollLeft );
+		this.rotationVector.x = ( - this.moveState.pitchDown + this.moveState.pitchUp );
+		this.rotationVector.y = ( - this.moveState.yawRight + this.moveState.yawLeft );
+		this.rotationVector.z = ( - this.moveState.rollRight + this.moveState.rollLeft );
 
 		//console.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
 
 	};
 
-	this.getContainerDimensions = function() {
+	this.getContainerDimensions = function () {
 
 		if ( this.domElement != document ) {
 
 			return {
-				size	: [ this.domElement.offsetWidth, this.domElement.offsetHeight ],
-				offset	: [ this.domElement.offsetLeft,  this.domElement.offsetTop ]
+				size: [ this.domElement.offsetWidth, this.domElement.offsetHeight ],
+				offset: [ this.domElement.offsetLeft, this.domElement.offsetTop ]
 			};
 
 		} else {
 
 			return {
-				size	: [ window.innerWidth, window.innerHeight ],
-				offset	: [ 0, 0 ]
+				size: [ window.innerWidth, window.innerHeight ],
+				offset: [ 0, 0 ]
 			};
 
 		}
@@ -252,16 +252,40 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		};
 
+	}
+
+	function contextmenu( event ) {
+
+		event.preventDefault();
+
+	}
+
+	this.dispose = function () {
+
+		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
+		this.domElement.removeEventListener( 'mousedown', _mousedown, false );
+		this.domElement.removeEventListener( 'mousemove', _mousemove, false );
+		this.domElement.removeEventListener( 'mouseup', _mouseup, false );
+
+		window.removeEventListener( 'keydown', _keydown, false );
+		window.removeEventListener( 'keyup', _keyup, false );
+
 	};
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	var _mousemove = bind( this, this.mousemove );
+	var _mousedown = bind( this, this.mousedown );
+	var _mouseup = bind( this, this.mouseup );
+	var _keydown = bind( this, this.keydown );
+	var _keyup = bind( this, this.keyup );
 
-	this.domElement.addEventListener( 'mousemove', bind( this, this.mousemove ), false );
-	this.domElement.addEventListener( 'mousedown', bind( this, this.mousedown ), false );
-	this.domElement.addEventListener( 'mouseup',   bind( this, this.mouseup ), false );
+	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
-	window.addEventListener( 'keydown', bind( this, this.keydown ), false );
-	window.addEventListener( 'keyup',   bind( this, this.keyup ), false );
+	this.domElement.addEventListener( 'mousemove', _mousemove, false );
+	this.domElement.addEventListener( 'mousedown', _mousedown, false );
+	this.domElement.addEventListener( 'mouseup', _mouseup, false );
+
+	window.addEventListener( 'keydown', _keydown, false );
+	window.addEventListener( 'keyup', _keyup, false );
 
 	this.updateMovementVector();
 	this.updateRotationVector();

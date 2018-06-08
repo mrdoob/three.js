@@ -11,11 +11,14 @@ body {
 	font-family: 'inconsolata';
 	font-size: 15px;
 	line-height: 18px;
+	tab-size: 4;
 	overflow: auto;
 }
 
 a {
 	color: #1184CE;
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 h1 {
@@ -39,7 +42,13 @@ h3 {
 	font-size: 16px;
 	font-weight: normal;
 
-	margin-top: 30px;
+	margin-top: 40px;
+}
+
+p, ul, ol {
+	margin-top: 0;
+	margin-bottom: 20px;
+	max-width: 780px;
 }
 
 div {
@@ -47,7 +56,7 @@ div {
 	margin-bottom: 20px;
 }
 
-div.desc {
+.desc {
 	padding-left: 0px;
 }
 
@@ -55,6 +64,7 @@ pre, code {
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
+
 code {
 	display: block;
 	width: -webkit-calc( 100% - 40px );
@@ -76,6 +86,7 @@ th {
 	padding: 10px;
 	text-decoration: underline;
 }
+
 td {
 	text-align: center;
 }
@@ -101,12 +112,21 @@ strong {
 	opacity: 0.5;
 }
 
-	#button:hover {
-		cursor: pointer;
-		opacity: 1;
-	}
+#button:hover {
+	cursor: pointer;
+	opacity: 1;
+}
 
 a.permalink {
 	float: right;
 	margin-left: 5px;
+}
+
+a.param,
+span.param {
+	color: #999;
+}
+
+a.param:hover {
+	color: #777;
 }

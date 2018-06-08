@@ -14,8 +14,8 @@ THREE.VerticalBlurShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"v":        { type: "f", value: 1.0 / 512.0 }
+		"tDiffuse": { value: null },
+		"v":        { value: 1.0 / 512.0 }
 
 	},
 
@@ -30,7 +30,7 @@ THREE.VerticalBlurShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -57,6 +57,6 @@ THREE.VerticalBlurShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

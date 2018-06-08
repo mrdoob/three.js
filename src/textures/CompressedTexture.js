@@ -2,9 +2,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CompressedTexture = function ( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+import { Texture } from './Texture.js';
 
-	THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+
+	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
 	this.image = { width: width, height: height };
 	this.mipmaps = mipmaps;
@@ -19,17 +21,12 @@ THREE.CompressedTexture = function ( mipmaps, width, height, format, type, mappi
 
 	this.generateMipmaps = false;
 
-};
+}
 
-THREE.CompressedTexture.prototype = Object.create( THREE.Texture.prototype );
-THREE.CompressedTexture.prototype.constructor = THREE.CompressedTexture;
+CompressedTexture.prototype = Object.create( Texture.prototype );
+CompressedTexture.prototype.constructor = CompressedTexture;
 
-THREE.CompressedTexture.prototype.clone = function () {
+CompressedTexture.prototype.isCompressedTexture = true;
 
-	var texture = new THREE.CompressedTexture();
 
-	THREE.Texture.prototype.clone.call( this, texture );
-
-	return texture;
-
-};
+export { CompressedTexture };

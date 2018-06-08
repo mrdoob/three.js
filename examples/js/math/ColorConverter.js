@@ -8,23 +8,42 @@ THREE.ColorConverter = {
 	setHSV: function ( color, h, s, v ) {
 
 		// https://gist.github.com/xpansive/1337890#file-index-js
+
+		h = THREE.Math.euclideanModulo( h, 1 );
+		s = THREE.Math.clamp( s, 0, 1 );
+		v = THREE.Math.clamp( v, 0, 1 );
+
 		return color.setHSL( h, ( s * v ) / ( ( h = ( 2 - s ) * v ) < 1 ? h : ( 2 - h ) ), h * 0.5 );
 
 	},
 
-	getHSV: function( color ) {
+	getHSV: function() {
 
-		var hsl = color.getHSL();
+		var hsl = {};
 
-		// based on https://gist.github.com/xpansive/1337890#file-index-js
-		hsl.s *= ( hsl.l < 0.5 ) ? hsl.l : ( 1 - hsl.l );
+		return function getHSV( color, target ) {
 
-		return {
-			h: hsl.h,
-			s: 2 * hsl.s / ( hsl.l + hsl.s ),
-			v: hsl.l + hsl.s
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.ColorConverter: .getHSV() target is now required' );
+				target = { h: 0, s: 0, l: 0 };
+
+			}
+
+			color.getHSL( hsl );
+
+			// based on https://gist.github.com/xpansive/1337890#file-index-js
+			hsl.s *= ( hsl.l < 0.5 ) ? hsl.l : ( 1 - hsl.l );
+
+			target.h = hsl.h;
+			target.s = 2 * hsl.s / ( hsl.l + hsl.s );
+			target.v = hsl.l + hsl.s;
+
+			return target;
+
 		};
-	},
+
+	}(),
 
 	// where c, m, y, k is between 0 and 1
 	
@@ -38,19 +57,30 @@ THREE.ColorConverter = {
 
 	},
 
-	getCMYK: function ( color ) {
+	getCMYK: function ( color, target ) {
+
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.ColorConverter: .getCMYK() target is now required' );
+			target = { c: 0, m: 0, y: 0, k:0 };
+
+		}
 
 		var r = color.r;
 		var g = color.g;
 		var b = color.b;
-		var k = 1 - Math.max(r, g, b);
+
+		var k = 1 - Math.max( r, g, b );
 		var c = ( 1 - r - k ) / ( 1 - k );
 		var m = ( 1 - g - k ) / ( 1 - k );
 		var y = ( 1 - b - k ) / ( 1 - k );
 
-		return {
-			c: c, m: m, y: y, k: k
-		};
+		target.c = c;
+		target.m = m;
+		target.y = y;
+		target.k = k;
+
+		return target;
 
 	}
 

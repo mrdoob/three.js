@@ -31,12 +31,12 @@
 			<p><a href="http://threejs.org">Three.js</a> cube map refraction demo
 
 			<p>Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository</a>
-			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>
+			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/loaders/PLYLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -50,7 +50,6 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube, cubeTarget;
 
 			var mesh, zmesh, geometry;
 
@@ -72,12 +71,23 @@
 				document.body.appendChild(container);
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 2000;
+				camera.position.z =  - 4000;
 
-				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				//
+
+				var r = "textures/cube/Park3Med/";
+
+				var urls = [
+					r + "px.jpg", r + "nx.jpg",
+					r + "py.jpg", r + "ny.jpg",
+					r + "pz.jpg", r + "nz.jpg"
+				];
+
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
@@ -89,7 +99,7 @@
 
 				// light representation
 
-				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
+				var sphere = new THREE.SphereBufferGeometry( 100, 16, 8 );
 
 				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				mesh.scale.set( 0.05, 0.05, 0.05 );
@@ -97,53 +107,22 @@
 
 				// material samples
 
-				var r = "textures/cube/Park3Med/";
-
-				var urls = [ r + "px.jpg", r + "nx.jpg",
-							 r + "py.jpg", r + "ny.jpg",
-							 r + "pz.jpg", r + "nz.jpg" ];
-
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
-
-				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity:0.9 } );
-				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
-				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } )
-
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
-				sceneCube.add( mesh );
+				var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
+				var cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
+				var cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
-				loader = new THREE.BinaryLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
-				loader.load( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
+				loader = new THREE.PLYLoader();
+				loader.load( 'models/ply/binary/Lucy100k.ply', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 
@@ -155,14 +134,11 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
-				cameraCube.aspect = window.innerWidth / window.innerHeight;
-				cameraCube.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -170,26 +146,23 @@
 
 			function createScene( geometry, m1, m2, m3 ) {
 
-				var s = 1.5, z = - 1000;
+				geometry.computeVertexNormals();
+
+				var s = 1.5;
 
 				var mesh = new THREE.Mesh( geometry, m1 );
-				mesh.position.z = z;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( geometry, m2 );
-				mesh.position.x = - 900;
-				mesh.position.z = z;
+				mesh.position.x = - 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( geometry, m3 );
-				mesh.position.x = 900;
-				mesh.position.z = z;
+				mesh.position.x = 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
-
-				loader.statusDomElement.style.display = "none";
 
 			}
 
@@ -220,13 +193,9 @@
 
 				camera.lookAt( scene.position );
 
-				cameraCube.rotation.copy( camera.rotation );
-
 				pointLight.position.x = 1500 * Math.cos( timer );
 				pointLight.position.z = 1500 * Math.sin( timer );
 
-				renderer.clear();
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 			}

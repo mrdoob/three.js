@@ -2,141 +2,139 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A geometric triangle as defined by three vectors.</div>
+		<p class="desc">
+			A geometric triangle as defined by three [page:Vector3 Vector3s] representing its
+			three corners.
+		</p>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Vector3 a], [page:Vector3 b], [page:Vector3 c])</h3>
-		<div>
-		a -- [page:Vector3] <br />
-		b -- [page:Vector3] <br />
-		c -- [page:Vector3]
-		</div>
-		<div>
-		Sets the triangle's vectors to the passed vectors.
-		</div>
+		<h3>[name]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
+		<p>
+		[page:Vector3 a] - the first corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).<br />
+		[page:Vector3 b] - the second corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).<br />
+		[page:Vector3 c] - the final corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).<br /><br />
+
+		Creates a new [name].
+		</p>
 
 
 		<h2>Properties</h2>
 
-
-
 		<h3>[property:Vector3 a]</h3>
-		<div>
-		The first [page:Vector3] of the triangle.
-		</div>
-		
+		<p>
+			The first corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).
+		</p>
+
 		<h3>[property:Vector3 b]</h3>
-		<div>
-		The second [page:Vector3] of the triangle.
-		</div>
+		<p>
+			The second corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).
+		</p>
 
 		<h3>[property:Vector3 c]</h3>
-		<div>
-		The third [page:Vector3] of the triangle.
-		</div>
+		<p>
+		the final corner of the triangle. Default is a [page:Vector3] at (0, 0, 0)
+		</p>
 
 		<h2>Methods</h2>
 
-
-
-		<h3>[method:Triangle setFromPointsAndIndices]([page:Array points], [page:Integer i0], [page:Integer i1], [page:Integer i2]) [page:Triangle this]</h3>
-		<div>
-		points -- [page:Array] of [page:Vector3]s <br />
-		i0 -- [page:Integer] index <br />
-		i1 -- [page:Integer] index <br />
-		i2 -- [page:Integer] index
-		</div>
-		<div>
-		Sets the triangle's vectors to the vectors in the array.
-		</div>
-
-		<h3>[method:Triangle set]([page:Vector3 a], [page:Vector3 b], [page:Vector3 c]) [page:Triangle this]</h3>
-		<div>
-		a -- [page:Vector3] <br />
-		b -- [page:Vector3] <br />
-		c -- [page:Vector3]
-		</div>
-		<div>
-		Sets the triangle's vectors to the passed vectors.
-		</div>
-
-		<h3>[method:Vector3 normal]([page:Vector3 optionalTarget])</h3>
-		<div>
-		optionalTarget -- Optional [page:Vector3] target to set the result.
-		</div>
-		<div>
-		Return the calculated normal of the triangle.
-		</div>
-
-		<h3>[method:Vector3 barycoordFromPoint]([page:Vector3 point], [page:Vector3 optionalTarget])</h3>
-		<div>
-		point -- [page:Vector3] <br />
-		optionalTarget -- Optional [page:Vector3] target to set the result.
-		</div>
-		<div>
-		Return a barycentric coordinate from the given vector. <br/><br/>
-		[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png](Picture of barycentric coordinates)
-		</div>
-
 		<h3>[method:Triangle clone]()</h3>
-		<div>
-		Return a new copy of this triangle.
-		</div>
+		<p>
+			Returns a new triangle with the same [page:.a a], [page:.b b] and  [page:.c c] properties as this one.
+		</p>
 
-		<h3>[method:Float area]()</h3>
-		<div>
-		Return the area of the triangle.
-		</div>
+		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] <br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		<h3>[method:Vector3 midpoint]([page:Vector3 optionalTarget])</h3>
-		<div>
-		optionalTarget -- Optional [page:Vector3] target to set the result.
-		</div>
-		<div>
-		Return the midpoint of the triangle. Optionally sets a target vector.
-		</div>
+		Returns the closest point on the triangle to [page:Vector3 point].
+		</p>
 
-		<h3>[method:Boolean equals]([page:Triangle triangle])</h3>
-		<div>
-		triangle -- [page:Triangle]
-		</div>
-		<div>
-		Checks to see if two triangles are equal (share the same vectors).
-		</div>
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] to check.<br /><br />
 
-		<h3>[method:Plane plane]([page:Plane optionalTarget])</h3>
-		<div>
-		optionalTarget -- Optional [page:Plane] target to set the result.
-		</div>
-		<div>
-		Return a [page:Plane plane] based on the triangle. Optionally sets a target plane. 
-		</div>
+		Returns true if the passed point, when projected onto the plane of the triangle, lies within the triangle.
+		</p>
 
-		<h3>[method:Boolean containsPoint]([page:Vector3 point])</h3>
-		<div>
-		point -- [page:Vector3]
-		</div>
-		<div>
-		Checks to see if the passed vector is within the triangle.
-		</div>
+		<h3>[method:Triangle copy]( [param:Triangle triangle] )</h3>
+		<p>
+			Copies the values of the passed triangles's [page:.a a], [page:.b b] and [page:.c c]
+			properties to this triangle.
+		</p>
 
-		<h3>[method:Triangle copy]([page:Triangle triangle])</h3>
-		<div>
-		triangle -- [page:Triangle]
-		</div>
-		<div>
-		Copies the values of the vertices of the passed triangle to this triangle.
-		</div>
+		<h3>[method:Boolean equals]( [param:Triangle triangle] )</h3>
+		<p>
+		Returns true if the two triangles have identical [page:.a a], [page:.b b] and [page:.c c] properties.
+		</p>
+
+		<h3>[method:Float getArea]()</h3>
+		<p>Return the area of the triangle.</p>
+
+		<h3>[method:Vector3 getBarycoord]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] <br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+
+		Return a [link:https://en.wikipedia.org/wiki/Barycentric_coordinate_system barycentric coordinate]
+		 from the given vector. <br/><br/>
+
+		[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png Picture of barycentric coordinates]
+		</p>
+
+		<h3>[method:Vector3 getMidpoint]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+
+		Calculate the midpoint of the triangle.
+		</p>
+
+		<h3>[method:Vector3 getNormal]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+
+		Calculate the [link:https://en.wikipedia.org/wiki/Normal_(geometry) normal vector] of the triangle.
+		</p>
+
+		<h3>[method:Plane getPlane]( [param:Plane target] )</h3>
+		<p>
+		[page:Vector3 target] — the result will be copied into this Plane.<br /><br />
+
+		Calculate a [page:Plane plane] based on the triangle. .
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - Box to check for intersection against.<br /><br />
+
+		Determines whether or not this triangle intersects [page:Box3 box].
+		</p>
+
+		<h3>[method:Triangle set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
+		<p>
+		Sets the triangle's [page:.a a], [page:.b b] and [page:.c c] properties to the passed [page:vector3 vector3s].
+		</p>
+
+		<h3>[method:Triangle setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<p>
+		points - [page:Array] of [page:Vector3]s <br />
+		i0 - [page:Integer] index <br />
+		i1 - [page:Integer] index <br />
+		i2 - [page:Integer] index<br /><br />
+
+		Sets the triangle's vectors to the vectors in the array.
+		</p>
 
 		<h2>Source</h2>
 

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
-		<meta charset="utf-8">
 		<title>three.js - pointerlock controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			html, body {
 				width: 100%;
@@ -58,7 +59,7 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/PointerLockControls.js"></script>
 
 		<div id="blocker">
@@ -73,9 +74,7 @@
 
 		<script>
 
-			var camera, scene, renderer;
-			var geometry, material, mesh;
-			var controls;
+			var camera, scene, renderer, controls;
 
 			var objects = [];
 
@@ -105,21 +104,19 @@
 
 						controls.enabled = false;
 
-						blocker.style.display = '-webkit-box';
-						blocker.style.display = '-moz-box';
-						blocker.style.display = 'box';
+						blocker.style.display = 'block';
 
 						instructions.style.display = '';
 
 					}
 
-				}
+				};
 
 				var pointerlockerror = function ( event ) {
 
 					instructions.style.display = '';
 
-				}
+				};
 
 				// Hook pointer lock state change events
 				document.addEventListener( 'pointerlockchange', pointerlockchange, false );
@@ -136,33 +133,7 @@
 
 					// Ask the browser to lock the pointer
 					element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-
-					if ( /Firefox/i.test( navigator.userAgent ) ) {
-
-						var fullscreenchange = function ( event ) {
-
-							if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-
-								document.removeEventListener( 'fullscreenchange', fullscreenchange );
-								document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-
-								element.requestPointerLock();
-							}
-
-						}
-
-						document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-						document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-
-						element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-
-						element.requestFullscreen();
-
-					} else {
-
-						element.requestPointerLock();
-
-					}
+					element.requestPointerLock();
 
 				}, false );
 
@@ -172,24 +143,29 @@
 
 			}
 
-			init();
-			animate();
-
 			var controlsEnabled = false;
 
 			var moveForward = false;
 			var moveBackward = false;
 			var moveLeft = false;
 			var moveRight = false;
+			var canJump = false;
 
 			var prevTime = performance.now();
 			var velocity = new THREE.Vector3();
+			var direction = new THREE.Vector3();
+			var vertex = new THREE.Vector3();
+			var color = new THREE.Color();
+
+			init();
+			animate();
 
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
 
 				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
@@ -266,65 +242,79 @@
 
 				// floor
 
-				geometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				var floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
+				floorGeometry.rotateX( - Math.PI / 2 );
 
-				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+				// vertex displacement
 
-					var vertex = geometry.vertices[ i ];
+				var position = floorGeometry.attributes.position;
+
+				for ( var i = 0; i < position.count; i ++ ) {
+
+					vertex.fromBufferAttribute( position, i );
+
 					vertex.x += Math.random() * 20 - 10;
 					vertex.y += Math.random() * 2;
 					vertex.z += Math.random() * 20 - 10;
 
-				}
-
-				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-					var face = geometry.faces[ i ];
-					face.vertexColors[ 0 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					face.vertexColors[ 1 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					face.vertexColors[ 2 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					position.setXYZ( i, vertex.x, vertex.y, vertex.z );
 
 				}
 
-				material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				count = floorGeometry.attributes.position.count;
+				var colors = [];
+
+				for ( var i = 0; i < count; i ++ ) {
+
+					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					colors.push( color.r, color.g, color.b );
+
+				}
+
+				floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+				var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+
+				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				scene.add( floor );
 
 				// objects
 
-				geometry = new THREE.BoxGeometry( 20, 20, 20 );
+				var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
 
-				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+				count = boxGeometry.attributes.position.count;
+				colors = [];
 
-					var face = geometry.faces[ i ];
-					face.vertexColors[ 0 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					face.vertexColors[ 1 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					face.vertexColors[ 2 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+				for ( var i = 0; i < count; i ++ ) {
+
+					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					colors.push( color.r, color.g, color.b );
 
 				}
 
+				boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
 				for ( var i = 0; i < 500; i ++ ) {
 
-					material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
+					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-					mesh.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
-					mesh.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
-					scene.add( mesh );
+					var box = new THREE.Mesh( boxGeometry, boxMaterial );
+					box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+					box.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
+					box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
 
-					material.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-
-					objects.push( mesh );
+					scene.add( box );
+					objects.push( box );
 
 				}
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xffffff );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -348,13 +338,14 @@
 
 				requestAnimationFrame( animate );
 
-				if ( controlsEnabled ) {
+				if ( controlsEnabled === true ) {
+
 					raycaster.ray.origin.copy( controls.getObject().position );
 					raycaster.ray.origin.y -= 10;
 
 					var intersections = raycaster.intersectObjects( objects );
 
-					var isOnObject = intersections.length > 0;
+					var onObject = intersections.length > 0;
 
 					var time = performance.now();
 					var delta = ( time - prevTime ) / 1000;
@@ -364,16 +355,18 @@
 
 					velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
-					if ( moveForward ) velocity.z -= 400.0 * delta;
-					if ( moveBackward ) velocity.z += 400.0 * delta;
+					direction.z = Number( moveForward ) - Number( moveBackward );
+					direction.x = Number( moveLeft ) - Number( moveRight );
+					direction.normalize(); // this ensures consistent movements in all directions
 
-					if ( moveLeft ) velocity.x -= 400.0 * delta;
-					if ( moveRight ) velocity.x += 400.0 * delta;
+					if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
+					if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
 
-					if ( isOnObject === true ) {
+					if ( onObject === true ) {
+
 						velocity.y = Math.max( 0, velocity.y );
-
 						canJump = true;
+
 					}
 
 					controls.getObject().translateX( velocity.x * delta );

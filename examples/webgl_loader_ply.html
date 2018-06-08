@@ -38,11 +38,11 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			PLY loader test by <a href="https://github.com/menway">Wei Meng</a>. Image from <a href="http://people.sc.fsu.edu/~jburkardt/data/ply/ply.html">John Burkardt</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/PLYLoader.js"></script>
 
@@ -68,9 +68,10 @@
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
 				camera.position.set( 3, 0.15, 3 );
 
-				cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+				cameraTarget = new THREE.Vector3( 0, -0.1, 0 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x72645b );
 				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
 
@@ -90,15 +91,17 @@
 				// PLY file
 
 				var loader = new THREE.PLYLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
-					var geometry = event.content;
-					var material = new THREE.MeshPhongMaterial( { color: 0x0055ff, specular: 0x111111, shininess: 200 } );
+					geometry.computeVertexNormals();
+
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
 					var mesh = new THREE.Mesh( geometry, material );
 
-					mesh.position.set( 0, - 0.25, 0 );
-					mesh.rotation.set( 0, - Math.PI / 2, 0 );
-					mesh.scale.set( 0.001, 0.001, 0.001 );
+					mesh.position.y = - 0.2;
+					mesh.position.z =   0.3;
+					mesh.rotation.x = - Math.PI / 2;
+					mesh.scale.multiplyScalar( 0.001 );
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
@@ -106,11 +109,29 @@
 					scene.add( mesh );
 
 				} );
-				loader.load( './models/ply/ascii/dolphins.ply' );
+
+				loader.load( './models/ply/binary/Lucy100k.ply', function ( geometry ) {
+
+					geometry.computeVertexNormals();
+
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.x = - 0.2;
+					mesh.position.y = - 0.02;
+					mesh.position.z = - 0.2;
+					mesh.scale.multiplyScalar( 0.0006 );
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					scene.add( mesh );
+
+				} );
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x777777 ) );
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
 				addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
@@ -118,24 +139,20 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
 
 				container.appendChild( renderer.domElement );
 
 				// stats
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// resize
 
@@ -146,26 +163,24 @@
 			function addShadowedLight( x, y, z, color, intensity ) {
 
 				var directionalLight = new THREE.DirectionalLight( color, intensity );
-				directionalLight.position.set( x, y, z )
+				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
-				// directionalLight.shadowCameraVisible = true;
 
 				var d = 1;
-				directionalLight.shadowCameraLeft = -d;
-				directionalLight.shadowCameraRight = d;
-				directionalLight.shadowCameraTop = d;
-				directionalLight.shadowCameraBottom = -d;
+				directionalLight.shadow.camera.left = -d;
+				directionalLight.shadow.camera.right = d;
+				directionalLight.shadow.camera.top = d;
+				directionalLight.shadow.camera.bottom = -d;
 
-				directionalLight.shadowCameraNear = 1;
-				directionalLight.shadowCameraFar = 4;
+				directionalLight.shadow.camera.near = 1;
+				directionalLight.shadow.camera.far = 4;
 
-				directionalLight.shadowMapWidth = 1024;
-				directionalLight.shadowMapHeight = 1024;
+				directionalLight.shadow.mapSize.width = 1024;
+				directionalLight.shadow.mapSize.height = 1024;
 
-				directionalLight.shadowBias = -0.005;
-				directionalLight.shadowDarkness = 0.15;
+				directionalLight.shadow.bias = -0.001;
 
 			}
 
@@ -191,8 +206,8 @@
 
 				var timer = Date.now() * 0.0005;
 
-				camera.position.x = Math.sin( timer ) * 3;
-				camera.position.z = Math.cos( timer ) * 3;
+				camera.position.x = Math.sin( timer ) * 2.5;
+				camera.position.z = Math.cos( timer ) * 2.5;
 
 				camera.lookAt( cameraTarget );
 

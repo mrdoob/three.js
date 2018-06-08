@@ -6,17 +6,16 @@
 	#ifdef BONE_TEXTURE
 
 		uniform sampler2D boneTexture;
-		uniform int boneTextureWidth;
-		uniform int boneTextureHeight;
+		uniform int boneTextureSize;
 
 		mat4 getBoneMatrix( const in float i ) {
 
 			float j = i * 4.0;
-			float x = mod( j, float( boneTextureWidth ) );
-			float y = floor( j / float( boneTextureWidth ) );
+			float x = mod( j, float( boneTextureSize ) );
+			float y = floor( j / float( boneTextureSize ) );
 
-			float dx = 1.0 / float( boneTextureWidth );
-			float dy = 1.0 / float( boneTextureHeight );
+			float dx = 1.0 / float( boneTextureSize );
+			float dy = 1.0 / float( boneTextureSize );
 
 			y = dy * ( y + 0.5 );
 
@@ -33,11 +32,11 @@
 
 	#else
 
-		uniform mat4 boneGlobalMatrices[ MAX_BONES ];
+		uniform mat4 boneMatrices[ MAX_BONES ];
 
 		mat4 getBoneMatrix( const in float i ) {
 
-			mat4 bone = boneGlobalMatrices[ int(i) ];
+			mat4 bone = boneMatrices[ int(i) ];
 			return bone;
 
 		}

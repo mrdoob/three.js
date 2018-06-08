@@ -17,7 +17,7 @@
 
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script>
 
@@ -37,9 +37,9 @@
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -72,12 +72,11 @@
 
 			function render() {
 
-				var geometry = new THREE.SphereGeometry( 50, Math.random() * 64, Math.random() * 32 );
+				var geometry = new THREE.SphereBufferGeometry( 50, Math.random() * 64, Math.random() * 32 );
 
-				var texture = new THREE.Texture( createImage() );
-				texture.needsUpdate = true;
+				var texture = new THREE.CanvasTexture( createImage() );
 
-				var material = new THREE.MeshBasicMaterial( { map: texture, wireframe: true } )
+				var material = new THREE.MeshBasicMaterial( { map: texture, wireframe: true } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 

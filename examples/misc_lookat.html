@@ -29,17 +29,15 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Object3D::lookAt() demo</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Object3D::lookAt() demo</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var container, stats;
-
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			var mesh, geometry, sphere;
 
@@ -56,19 +54,17 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				sphere = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ) );
+				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
 				scene.add( sphere );
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 100, 3 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationFromEuler( new THREE.Euler( Math.PI / 2, Math.PI, 0 ) ) );
+				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
+				geometry.rotateX( Math.PI / 2 );
 
 				var material = new THREE.MeshNormalMaterial();
 
@@ -86,17 +82,12 @@
 				scene.matrixAutoUpdate = false;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				//
 

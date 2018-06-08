@@ -8,14 +8,21 @@
 
 THREE.BokehShader = {
 
+	defines: {
+		"DEPTH_PACKING": 1,
+		"PERSPECTIVE_CAMERA": 1,
+	},
+
 	uniforms: {
 
-		"tColor":   { type: "t", value: null },
-		"tDepth":   { type: "t", value: null },
-		"focus":    { type: "f", value: 1.0 },
-		"aspect":   { type: "f", value: 1.0 },
-		"aperture": { type: "f", value: 0.025 },
-		"maxblur":  { type: "f", value: 1.0 }
+		"tColor":   { value: null },
+		"tDepth":   { value: null },
+		"focus":    { value: 1.0 },
+		"aspect":   { value: 1.0 },
+		"aperture": { value: 0.025 },
+		"maxblur":  { value: 1.0 },
+		"nearClip":  { value: 1.0 },
+		"farClip":  { value: 1000.0 },
 
 	},
 
@@ -30,9 +37,10 @@ THREE.BokehShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
+		"#include <common>",
 
 		"varying vec2 vUv;",
 
@@ -42,16 +50,38 @@ THREE.BokehShader = {
 		"uniform float maxblur;",  // max blur amount
 		"uniform float aperture;", // aperture - bigger values for shallower depth of field
 
+		"uniform float nearClip;",
+		"uniform float farClip;",
+
 		"uniform float focus;",
 		"uniform float aspect;",
+
+		"#include <packing>",
+
+		"float getDepth( const in vec2 screenPosition ) {",
+		"	#if DEPTH_PACKING == 1",
+		"	return unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );",
+		"	#else",
+		"	return texture2D( tDepth, screenPosition ).x;",
+		"	#endif",
+		"}",
+
+		"float getViewZ( const in float depth ) {",
+		"	#if PERSPECTIVE_CAMERA == 1",
+		"	return perspectiveDepthToViewZ( depth, nearClip, farClip );",
+		"	#else",
+		"	return orthographicDepthToViewZ( depth, nearClip, farClip );",
+		"	#endif",
+		"}",
+		
 
 		"void main() {",
 
 			"vec2 aspectcorrect = vec2( 1.0, aspect );",
+	
+			"float viewZ = getViewZ( getDepth( vUv ) );",
 
-			"vec4 depth1 = texture2D( tDepth, vUv );",
-
-			"float factor = depth1.x - focus;",
+			"float factor = ( focus + viewZ );",  // viewZ is <= 0, so this is a difference equation
 
 			"vec2 dofblur = vec2 ( clamp( factor * aperture, -maxblur, maxblur ) );",
 
@@ -111,6 +141,6 @@ THREE.BokehShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

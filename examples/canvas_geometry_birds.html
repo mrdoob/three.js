@@ -26,22 +26,60 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - birds demo</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - birds demo</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="obj/Bird.js"></script>
-
 		<script>
 
-			// Based on http://www.openprocessing.org/visuals/?visualID=6910
+			var Bird = function () {
 
-			var Boid = function() {
+				var scope = this;
+
+				THREE.Geometry.call( this );
+
+				v(   5,   0,   0 );
+				v( - 5, - 2,   1 );
+				v( - 5,   0,   0 );
+				v( - 5, - 2, - 1 );
+
+				v(   0,   2, - 6 );
+				v(   0,   2,   6 );
+				v(   2,   0,   0 );
+				v( - 3,   0,   0 );
+
+				f3( 0, 2, 1 );
+
+				f3( 4, 7, 6 );
+				f3( 5, 6, 7 );
+
+				this.computeFaceNormals();
+
+				function v( x, y, z ) {
+
+					scope.vertices.push( new THREE.Vector3( x, y, z ) );
+
+				}
+
+				function f3( a, b, c ) {
+
+					scope.faces.push( new THREE.Face3( a, b, c ) );
+
+				}
+
+			}
+
+			Bird.prototype = Object.create( THREE.Geometry.prototype );
+			Bird.prototype.constructor = Bird;
+			
+			// Based on https://www.openprocessing.org/sketch/6910
+
+			var Boid = function () {
 
 				var vector = new THREE.Vector3(),
 				_acceleration, _width = 500, _height = 500, _depth = 200, _goal, _neighborhoodRadius = 100,
@@ -55,13 +93,13 @@
 
 					_goal = target;
 
-				}
+				};
 
 				this.setAvoidWalls = function ( value ) {
 
 					_avoidWalls = value;
 
-				}
+				};
 
 				this.setWorldSize = function ( width, height, depth ) {
 
@@ -69,7 +107,7 @@
 					_height = height;
 					_depth = depth;
 
-				}
+				};
 
 				this.run = function ( boids ) {
 
@@ -120,7 +158,7 @@
 
 					this.move();
 
-				}
+				};
 
 				this.flock = function ( boids ) {
 
@@ -134,7 +172,7 @@
 					_acceleration.add( this.cohesion( boids ) );
 					_acceleration.add( this.separation( boids ) );
 
-				}
+				};
 
 				this.move = function () {
 
@@ -151,7 +189,7 @@
 					this.position.add( this.velocity );
 					_acceleration.set( 0, 0, 0 );
 
-				}
+				};
 
 				this.checkBounds = function () {
 
@@ -162,7 +200,7 @@
 					if ( this.position.z >  _depth ) this.position.z = - _depth;
 					if ( this.position.z < - _depth ) this.position.z =  _depth;
 
-				}
+				};
 
 				//
 
@@ -177,7 +215,7 @@
 
 					return steer;
 
-				}
+				};
 
 				this.repulse = function ( target ) {
 
@@ -194,7 +232,7 @@
 
 					}
 
-				}
+				};
 
 				this.reach = function ( target, amount ) {
 
@@ -205,20 +243,19 @@
 
 					return steer;
 
-				}
+				};
 
 				this.alignment = function ( boids ) {
 
-					var boid, velSum = new THREE.Vector3(),
-					count = 0;
+					var count = 0;
+					var velSum = new THREE.Vector3();
 
 					for ( var i = 0, il = boids.length; i < il; i++ ) {
 
 						if ( Math.random() > 0.6 ) continue;
 
-						boid = boids[ i ];
-
-						distance = boid.position.distanceTo( this.position );
+						var boid = boids[ i ];
+						var distance = boid.position.distanceTo( this.position );
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
@@ -245,21 +282,20 @@
 
 					return velSum;
 
-				}
+				};
 
 				this.cohesion = function ( boids ) {
 
-					var boid, distance,
-					posSum = new THREE.Vector3(),
-					steer = new THREE.Vector3(),
-					count = 0;
+					var count = 0;
+					var posSum = new THREE.Vector3();
+					var steer = new THREE.Vector3();
 
 					for ( var i = 0, il = boids.length; i < il; i ++ ) {
 
 						if ( Math.random() > 0.6 ) continue;
 
-						boid = boids[ i ];
-						distance = boid.position.distanceTo( this.position );
+						var boid = boids[ i ];
+						var distance = boid.position.distanceTo( this.position );
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
@@ -288,20 +324,19 @@
 
 					return steer;
 
-				}
+				};
 
 				this.separation = function ( boids ) {
 
-					var boid, distance,
-					posSum = new THREE.Vector3(),
-					repulse = new THREE.Vector3();
+					var posSum = new THREE.Vector3();
+					var repulse = new THREE.Vector3();
 
 					for ( var i = 0, il = boids.length; i < il; i ++ ) {
 
 						if ( Math.random() > 0.6 ) continue;
 
-						boid = boids[ i ];
-						distance = boid.position.distanceTo( this.position );
+						var boid = boids[ i ];
+						var distance = boid.position.distanceTo( this.position );
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
@@ -345,6 +380,7 @@
 				camera.position.z = 450;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				birds = [];
 				boids = [];
@@ -369,7 +405,6 @@
 				}
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -377,11 +412,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.left = '0px';
-				stats.domElement.style.top = '0px';
-
-				document.getElementById( 'container' ).appendChild(stats.domElement);
+				document.getElementById( 'container' ).appendChild(stats.dom);
 
 				//
 
@@ -420,8 +451,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 
@@ -435,7 +467,7 @@
 					bird = birds[ i ];
 					bird.position.copy( boids[ i ].position );
 
-					color = bird.material.color;
+					var color = bird.material.color;
 					color.r = color.g = color.b = ( 500 - bird.position.z ) / 1000;
 
 					bird.rotation.y = Math.atan2( - boid.velocity.z, boid.velocity.x );

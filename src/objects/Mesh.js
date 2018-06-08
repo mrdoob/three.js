@@ -1,3 +1,15 @@
+import { Vector3 } from '../math/Vector3.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Sphere } from '../math/Sphere.js';
+import { Ray } from '../math/Ray.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Object3D } from '../core/Object3D.js';
+import { Triangle } from '../math/Triangle.js';
+import { Face3 } from '../core/Face3.js';
+import { DoubleSide, BackSide, TrianglesDrawMode } from '../constants.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -5,321 +17,386 @@
  * @author jonobr1 / http://jonobr1.com/
  */
 
-THREE.Mesh = function ( geometry, material ) {
+function Mesh( geometry, material ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.type = 'Mesh';
-	
-	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
-	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+
+	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
+	this.material = material !== undefined ? material : new MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+
+	this.drawMode = TrianglesDrawMode;
 
 	this.updateMorphTargets();
 
-};
+}
 
-THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Mesh.prototype.constructor = THREE.Mesh;
+Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-THREE.Mesh.prototype.updateMorphTargets = function () {
+	constructor: Mesh,
 
-	if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
+	isMesh: true,
 
-		this.morphTargetBase = - 1;
-		this.morphTargetForcedOrder = [];
-		this.morphTargetInfluences = [];
-		this.morphTargetDictionary = {};
+	setDrawMode: function ( value ) {
 
-		for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m ++ ) {
+		this.drawMode = value;
 
-			this.morphTargetInfluences.push( 0 );
-			this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
+	},
+
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		this.drawMode = source.drawMode;
+
+		if ( source.morphTargetInfluences !== undefined ) {
+
+			this.morphTargetInfluences = source.morphTargetInfluences.slice();
 
 		}
 
-	}
+		if ( source.morphTargetDictionary !== undefined ) {
 
-};
+			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
 
-THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
+		}
 
-	if ( this.morphTargetDictionary[ name ] !== undefined ) {
+		return this;
 
-		return this.morphTargetDictionary[ name ];
+	},
 
-	}
-
-	THREE.warn( 'THREE.Mesh.getMorphTargetIndexByName: morph target ' + name + ' does not exist. Returning 0.' );
-
-	return 0;
-
-};
-
-
-THREE.Mesh.prototype.raycast = ( function () {
-
-	var inverseMatrix = new THREE.Matrix4();
-	var ray = new THREE.Ray();
-	var sphere = new THREE.Sphere();
-
-	var vA = new THREE.Vector3();
-	var vB = new THREE.Vector3();
-	var vC = new THREE.Vector3();
-
-	return function ( raycaster, intersects ) {
+	updateMorphTargets: function () {
 
 		var geometry = this.geometry;
+		var m, ml, name;
 
-		// Checking boundingSphere distance to ray
+		if ( geometry.isBufferGeometry ) {
 
-		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+			var morphAttributes = geometry.morphAttributes;
+			var keys = Object.keys( morphAttributes );
 
-		sphere.copy( geometry.boundingSphere );
-		sphere.applyMatrix4( this.matrixWorld );
+			if ( keys.length > 0 ) {
 
-		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
+				var morphAttribute = morphAttributes[ keys[ 0 ] ];
 
-			return;
+				if ( morphAttribute !== undefined ) {
 
-		}
+					this.morphTargetInfluences = [];
+					this.morphTargetDictionary = {};
 
-		// Check boundingBox before continuing
+					for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
 
-		inverseMatrix.getInverse( this.matrixWorld );
-		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+						name = morphAttribute[ m ].name || String( m );
 
-		if ( geometry.boundingBox !== null ) {
+						this.morphTargetInfluences.push( 0 );
+						this.morphTargetDictionary[ name ] = m;
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) {
+					}
 
-				return;
+				}
+
+			}
+
+		} else {
+
+			var morphTargets = geometry.morphTargets;
+
+			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
+
+				this.morphTargetInfluences = [];
+				this.morphTargetDictionary = {};
+
+				for ( m = 0, ml = morphTargets.length; m < ml; m ++ ) {
+
+					name = morphTargets[ m ].name || String( m );
+
+					this.morphTargetInfluences.push( 0 );
+					this.morphTargetDictionary[ name ] = m;
+
+				}
 
 			}
 
 		}
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+	},
 
-			var material = this.material;
+	raycast: ( function () {
 
-			if ( material === undefined ) return;
+		var inverseMatrix = new Matrix4();
+		var ray = new Ray();
+		var sphere = new Sphere();
 
-			var attributes = geometry.attributes;
+		var vA = new Vector3();
+		var vB = new Vector3();
+		var vC = new Vector3();
 
-			var a, b, c;
-			var precision = raycaster.precision;
+		var tempA = new Vector3();
+		var tempB = new Vector3();
+		var tempC = new Vector3();
 
-			if ( attributes.index !== undefined ) {
+		var uvA = new Vector2();
+		var uvB = new Vector2();
+		var uvC = new Vector2();
 
-				var indices = attributes.index.array;
-				var positions = attributes.position.array;
-				var offsets = geometry.offsets;
+		var barycoord = new Vector3();
 
-				if ( offsets.length === 0 ) {
+		var intersectionPoint = new Vector3();
+		var intersectionPointWorld = new Vector3();
 
-					offsets = [ { start: 0, count: indices.length, index: 0 } ];
+		function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
 
-				}
+			Triangle.getBarycoord( point, p1, p2, p3, barycoord );
 
-				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
+			uv1.multiplyScalar( barycoord.x );
+			uv2.multiplyScalar( barycoord.y );
+			uv3.multiplyScalar( barycoord.z );
 
-					var start = offsets[ oi ].start;
-					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+			uv1.add( uv2 ).add( uv3 );
 
-					for ( var i = start, il = start + count; i < il; i += 3 ) {
+			return uv1.clone();
 
-						a = index + indices[ i ];
-						b = index + indices[ i + 1 ];
-						c = index + indices[ i + 2 ];
+		}
 
-						vA.fromArray( positions, a * 3 );
-						vB.fromArray( positions, b * 3 );
-						vC.fromArray( positions, c * 3 );
+		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
-						if ( material.side === THREE.BackSide ) {
+			var intersect;
 
-							var intersectionPoint = ray.intersectTriangle( vC, vB, vA, true );
+			if ( material.side === BackSide ) {
 
-						} else {
-
-							var intersectionPoint = ray.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
-
-						}
-
-						if ( intersectionPoint === null ) continue;
-
-						intersectionPoint.applyMatrix4( this.matrixWorld );
-
-						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
-
-						if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
-
-						intersects.push( {
-
-							distance: distance,
-							point: intersectionPoint,
-							face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-							faceIndex: null,
-							object: this
-
-						} );
-
-					}
-
-				}
+				intersect = ray.intersectTriangle( pC, pB, pA, true, point );
 
 			} else {
 
-				var positions = attributes.position.array;
-
-				for ( var i = 0, j = 0, il = positions.length; i < il; i += 3, j += 9 ) {
-
-					a = i;
-					b = i + 1;
-					c = i + 2;
-
-					vA.fromArray( positions, j );
-					vB.fromArray( positions, j + 3 );
-					vC.fromArray( positions, j + 6 );
-
-					if ( material.side === THREE.BackSide ) {
-
-						var intersectionPoint = ray.intersectTriangle( vC, vB, vA, true );
-
-					} else {
-
-						var intersectionPoint = ray.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
-
-					}
-
-					if ( intersectionPoint === null ) continue;
-
-					intersectionPoint.applyMatrix4( this.matrixWorld );
-
-					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
-
-					if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
-
-					intersects.push( {
-
-						distance: distance,
-						point: intersectionPoint,
-						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-						faceIndex: null,
-						object: this
-
-					} );
-
-				}
+				intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
 
 			}
 
-		} else if ( geometry instanceof THREE.Geometry ) {
+			if ( intersect === null ) return null;
 
-			var isFaceMaterial = this.material instanceof THREE.MeshFaceMaterial;
-			var objectMaterials = isFaceMaterial === true ? this.material.materials : null;
+			intersectionPointWorld.copy( point );
+			intersectionPointWorld.applyMatrix4( object.matrixWorld );
 
-			var a, b, c;
-			var precision = raycaster.precision;
+			var distance = raycaster.ray.origin.distanceTo( intersectionPointWorld );
 
-			var vertices = geometry.vertices;
+			if ( distance < raycaster.near || distance > raycaster.far ) return null;
 
-			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
-
-				var face = geometry.faces[ f ];
-
-				var material = isFaceMaterial === true ? objectMaterials[ face.materialIndex ] : this.material;
-
-				if ( material === undefined ) continue;
-
-				a = vertices[ face.a ];
-				b = vertices[ face.b ];
-				c = vertices[ face.c ];
-
-				if ( material.morphTargets === true ) {
-
-					var morphTargets = geometry.morphTargets;
-					var morphInfluences = this.morphTargetInfluences;
-
-					vA.set( 0, 0, 0 );
-					vB.set( 0, 0, 0 );
-					vC.set( 0, 0, 0 );
-
-					for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
-
-						var influence = morphInfluences[ t ];
-
-						if ( influence === 0 ) continue;
-
-						var targets = morphTargets[ t ].vertices;
-
-						vA.x += ( targets[ face.a ].x - a.x ) * influence;
-						vA.y += ( targets[ face.a ].y - a.y ) * influence;
-						vA.z += ( targets[ face.a ].z - a.z ) * influence;
-
-						vB.x += ( targets[ face.b ].x - b.x ) * influence;
-						vB.y += ( targets[ face.b ].y - b.y ) * influence;
-						vB.z += ( targets[ face.b ].z - b.z ) * influence;
-
-						vC.x += ( targets[ face.c ].x - c.x ) * influence;
-						vC.y += ( targets[ face.c ].y - c.y ) * influence;
-						vC.z += ( targets[ face.c ].z - c.z ) * influence;
-
-					}
-
-					vA.add( a );
-					vB.add( b );
-					vC.add( c );
-
-					a = vA;
-					b = vB;
-					c = vC;
-
-				}
-
-				if ( material.side === THREE.BackSide ) {
-
-					var intersectionPoint = ray.intersectTriangle( c, b, a, true );
-
-				} else {
-
-					var intersectionPoint = ray.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
-
-				}
-
-				if ( intersectionPoint === null ) continue;
-
-				intersectionPoint.applyMatrix4( this.matrixWorld );
-
-				var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
-
-				if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
-
-				intersects.push( {
-
-					distance: distance,
-					point: intersectionPoint,
-					face: face,
-					faceIndex: f,
-					object: this
-
-				} );
-
-			}
+			return {
+				distance: distance,
+				point: intersectionPointWorld.clone(),
+				object: object
+			};
 
 		}
 
-	};
+		function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
 
-}() );
+			vA.fromBufferAttribute( position, a );
+			vB.fromBufferAttribute( position, b );
+			vC.fromBufferAttribute( position, c );
 
-THREE.Mesh.prototype.clone = function ( object, recursive ) {
+			var intersection = checkIntersection( object, object.material, raycaster, ray, vA, vB, vC, intersectionPoint );
 
-	if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
+			if ( intersection ) {
 
-	THREE.Object3D.prototype.clone.call( this, object, recursive );
+				if ( uv ) {
 
-	return object;
+					uvA.fromBufferAttribute( uv, a );
+					uvB.fromBufferAttribute( uv, b );
+					uvC.fromBufferAttribute( uv, c );
 
-};
+					intersection.uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
+
+				}
+
+				var face = new Face3( a, b, c );
+				Triangle.getNormal( vA, vB, vC, face.normal );
+
+				intersection.face = face;
+
+			}
+
+			return intersection;
+
+		}
+
+		return function raycast( raycaster, intersects ) {
+
+			var geometry = this.geometry;
+			var material = this.material;
+			var matrixWorld = this.matrixWorld;
+
+			if ( material === undefined ) return;
+
+			// Checking boundingSphere distance to ray
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( matrixWorld );
+
+			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+
+			//
+
+			inverseMatrix.getInverse( matrixWorld );
+			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+			// Check boundingBox before continuing
+
+			if ( geometry.boundingBox !== null ) {
+
+				if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
+
+			}
+
+			var intersection;
+
+			if ( geometry.isBufferGeometry ) {
+
+				var a, b, c;
+				var index = geometry.index;
+				var position = geometry.attributes.position;
+				var uv = geometry.attributes.uv;
+				var i, l;
+
+				if ( index !== null ) {
+
+					// indexed buffer geometry
+
+					for ( i = 0, l = index.count; i < l; i += 3 ) {
+
+						a = index.getX( i );
+						b = index.getX( i + 1 );
+						c = index.getX( i + 2 );
+
+						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
+
+						if ( intersection ) {
+
+							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+							intersects.push( intersection );
+
+						}
+
+					}
+
+				} else if ( position !== undefined ) {
+
+					// non-indexed buffer geometry
+
+					for ( i = 0, l = position.count; i < l; i += 3 ) {
+
+						a = i;
+						b = i + 1;
+						c = i + 2;
+
+						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
+
+						if ( intersection ) {
+
+							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+							intersects.push( intersection );
+
+						}
+
+					}
+
+				}
+
+			} else if ( geometry.isGeometry ) {
+
+				var fvA, fvB, fvC;
+				var isMultiMaterial = Array.isArray( material );
+
+				var vertices = geometry.vertices;
+				var faces = geometry.faces;
+				var uvs;
+
+				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+				if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
+
+				for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
+
+					var face = faces[ f ];
+					var faceMaterial = isMultiMaterial ? material[ face.materialIndex ] : material;
+
+					if ( faceMaterial === undefined ) continue;
+
+					fvA = vertices[ face.a ];
+					fvB = vertices[ face.b ];
+					fvC = vertices[ face.c ];
+
+					if ( faceMaterial.morphTargets === true ) {
+
+						var morphTargets = geometry.morphTargets;
+						var morphInfluences = this.morphTargetInfluences;
+
+						vA.set( 0, 0, 0 );
+						vB.set( 0, 0, 0 );
+						vC.set( 0, 0, 0 );
+
+						for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+							var influence = morphInfluences[ t ];
+
+							if ( influence === 0 ) continue;
+
+							var targets = morphTargets[ t ].vertices;
+
+							vA.addScaledVector( tempA.subVectors( targets[ face.a ], fvA ), influence );
+							vB.addScaledVector( tempB.subVectors( targets[ face.b ], fvB ), influence );
+							vC.addScaledVector( tempC.subVectors( targets[ face.c ], fvC ), influence );
+
+						}
+
+						vA.add( fvA );
+						vB.add( fvB );
+						vC.add( fvC );
+
+						fvA = vA;
+						fvB = vB;
+						fvC = vC;
+
+					}
+
+					intersection = checkIntersection( this, faceMaterial, raycaster, ray, fvA, fvB, fvC, intersectionPoint );
+
+					if ( intersection ) {
+
+						if ( uvs && uvs[ f ] ) {
+
+							var uvs_f = uvs[ f ];
+							uvA.copy( uvs_f[ 0 ] );
+							uvB.copy( uvs_f[ 1 ] );
+							uvC.copy( uvs_f[ 2 ] );
+
+							intersection.uv = uvIntersection( intersectionPoint, fvA, fvB, fvC, uvA, uvB, uvC );
+
+						}
+
+						intersection.face = face;
+						intersection.faceIndex = f;
+						intersects.push( intersection );
+
+					}
+
+				}
+
+			}
+
+		};
+
+	}() ),
+
+	clone: function () {
+
+		return new this.constructor( this.geometry, this.material ).copy( this );
+
+	}
+
+} );
+
+
+export { Mesh };

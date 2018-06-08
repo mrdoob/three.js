@@ -9,10 +9,10 @@ THREE.NormalMapShader = {
 
 	uniforms: {
 
-		"heightMap":  { type: "t", value: null },
-		"resolution": { type: "v2", value: new THREE.Vector2( 512, 512 ) },
-		"scale":      { type: "v2", value: new THREE.Vector2( 1, 1 ) },
-		"height":     { type: "f", value: 0.05 }
+		"heightMap":  { value: null },
+		"resolution": { value: new THREE.Vector2( 512, 512 ) },
+		"scale":      { value: new THREE.Vector2( 1, 1 ) },
+		"height":     { value: 0.05 }
 
 	},
 
@@ -27,7 +27,7 @@ THREE.NormalMapShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -48,6 +48,6 @@ THREE.NormalMapShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

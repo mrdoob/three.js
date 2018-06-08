@@ -16,7 +16,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -47,11 +47,12 @@
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
+				var material = new THREE.MeshNormalMaterial();
 
-				var loader = new THREE.JSONLoader();
-				loader.load( 'obj/Suzanne.js', function ( geometry ) {
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
@@ -74,19 +75,15 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0xffffff );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				//renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

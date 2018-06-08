@@ -6,7 +6,7 @@ body {
 }
 
 hr {
-	border: 0px;
+	border: 0;
 	border-top: 1px solid #ccc;
 }
 
@@ -41,32 +41,6 @@ textarea, input { outline: none; } /* osx */
 	user-select: none;
 }
 
-	.Panel.Collapsible .Static {
-		margin: 0px;
-	}
-
-	.Panel.Collapsible .Static .Button {
-		float: left;
-		margin-right: 6px;
-		width: 0px;
-		height: 0px;
-		border: 6px solid transparent;
-	}
-
-	.Panel.Collapsible.collapsed .Static .Button {
-		margin-top: 2px;
-		border-left-color: #bbb;
-	}
-
-	.Panel.Collapsible:not(.collapsed) .Static .Button {
-		margin-top: 6px;
-		border-top-color: #bbb;
-	}
-
-	.Panel.Collapsible.collapsed .Content {
-		display: none;
-	}
-
 /* CodeMirror */
 
 .CodeMirror {
@@ -88,59 +62,102 @@ textarea, input { outline: none; } /* osx */
 
 		color: #f00;
 		text-align: right;
-		padding: 0px 20px;
+		padding: 0 20px;
 
 	}
 
-/* scene types */
+/* outliner */
 
-.type {
+#outliner .option {
+
+	border: 1px solid transparent;
+}
+
+#outliner .option.drag {
+
+	border: 1px dashed #999;
+
+}
+
+#outliner .option.dragTop {
+
+	border-top: 1px dashed #999;
+
+}
+
+#outliner .option.dragBottom {
+
+	border-bottom: 1px dashed #999;
+
+}
+
+#outliner .type {
 	position:relative;
 	top:-2px;
-	padding: 0px 2px;
+	padding: 0 2px;
 	color: #ddd;
 }
-.type:after {
+
+#outliner .type:after {
 	content: '■';
 }
 
-.Scene {
+#outliner .Scene {
 	color: #ccccff;
 }
 
-.Object3D {
+#outliner .Object3D {
 	color: #aaaaee;
 }
 
-.Mesh {
+#outliner .Mesh {
 	color: #8888ee;
+}
+
+#outliner .Line {
+	color: #88ee88;
+}
+
+#outliner .LineSegments {
+	color: #88ee88;
+}
+
+#outliner .Points {
+	color: #ee8888;
 }
 
 /* */
 
-.PointLight {
+#outliner .PointLight {
 	color: #dddd00;
 }
 
 /* */
 
-.Geometry {
+#outliner .Geometry {
 	color: #88ff88;
 }
 
-.BoxGeometry {
+#outliner .BoxGeometry {
 	color: #bbeebb;
 }
-.TorusGeometry {
+
+#outliner .TorusGeometry {
 	color: #aaeeaa;
 }
 
 /* */
 
-.Material {
+#outliner .Material {
 	color: #ff8888;
 }
 
-.MeshPhongMaterial {
+#outliner .MeshPhongMaterial {
 	color: #ffaa88;
+}
+
+/* */
+
+#outliner .Script:after {
+	content: '{...}' /* ❮/❯ */
 }

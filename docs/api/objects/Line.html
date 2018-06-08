@@ -2,20 +2,28 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A line or a series of lines.</div>
+		<p class="desc">
+			A continuous line.<br /><br />
+
+			This is nearly the same
+			as [page:LineSegments]; the only difference is that it is rendered using
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP]
+			instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]
+
+		</p>
 
 
 		<h2>Example</h2>
-
 
 		<code>var material = new THREE.LineBasicMaterial({
 			color: 0x0000ff
@@ -35,45 +43,53 @@
 
 		<h2>Constructor</h2>
 
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
 
-		<h3>[name]( [page:Geometry geometry], [page:Material material], [page:Integer type] )</h3>
+		<p>
+		[page:Geometry geometry] — vertices representing the line segment(s). Default is a new [page:new BufferGeometry].<br />
+		[page:Material material] — material for the line. Default is a new [page:LineBasicMaterial] with random color.<br />
+		</p>
 
-		<div>
-		geometry — Vertices representing the line segment(s).<br />
-		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].<br />
-		type — Connection type between vertices. Default is THREE.LineStrip.
-		</div>
+		<p>If no material is supplied, a randomized line material will be created and assigned to the object.</p>
 
-		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
-
-		<div>Also, if no type is supplied, the default (THREE.LineStrip) will be used).</div>
 
 		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:Boolean isLine]</h3>
+		<p>
+			Used to check whether this or derived classes are lines. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
 
 		<h3>[property:Geometry geometry]</h3>
-		<div>
-		Vertices representing the line segment(s).
-		</div>
+		<p>Vertices representing the line segment(s).</p>
 
 		<h3>[property:Material material]</h3>
-		<div>
-		Material for the line.
-		</div>
+		<p>Material for the line.</p>
 
-		<h3>[property:Integer type]</h3>
-		<div>
-		Possible values: THREE.LineStrip or THREE.LinePieces. THREE.LineStrip will draw a series of segments connecting each point (first connected to the second, the second connected to the third, and so on and so forth); and THREE.LinePieces will draw a series of pairs of segments (first connected to the second, the third connected to the fourth, and so on and so forth).</div>
-
-		<div>
-		In OpenGL terms, LineStrip is the classic GL_LINE_STRIP and LinePieces is the equivalent to GL_LINES.
-		</div>
 
 		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
 
-		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
-		<div>
-		Get intersections between a casted ray and this Line. [page:Raycaster.intersectObject] will call this method.
-		</div>
+		<h3>[method:Line computeLineDistances]()</h3>
+		<p>
+		Computes an array of distance values which are necessary for [page:LineDashedMaterial]. For each vertex in the geometry, the method calculates the cumulative length from the current point to the very beginning of the line.
+		</p>
+
+		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+		Get intersections between a casted [page:Ray] and this Line.
+		[page:Raycaster.intersectObject] will call this method.
+		</p>
+
+		<h3>[method:Line clone]()</h3>
+		<p>
+		Returns a clone of this Line object and its descendants.
+		</p>
+
 
 		<h2>Source</h2>
 

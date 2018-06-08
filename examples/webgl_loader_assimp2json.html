@@ -24,22 +24,17 @@
 			}
 
 			a { color: red }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			Jeep by Psionic, interior from
-			<a href="http://assimp.sf.net" target="_blank">Assimp</a>
+			<a href="http://assimp.sf.net" target="_blank" rel="noopener">Assimp</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/AssimpJSONLoader.js"></script>
 
@@ -73,42 +68,11 @@
 
 			*/
 
-			var container, stats;
-			var camera, scene, renderer, objects;
-			var clock = new THREE.Clock();
+			var container, stats, clock;
+			var camera, scene, renderer;
 
-			// init scene
 			init();
-
-			var onProgress = function ( xhr ) {
-				if ( xhr.lengthComputable ) {
-					var percentComplete = xhr.loaded / xhr.total * 100;
-					console.log( Math.round(percentComplete, 2) + '% downloaded' );
-				}
-			};
-
-			var onError = function ( xhr ) {
-			};
-
-			// Load jeep model using the AssimpJSONLoader
-			var loader1 = new THREE.AssimpJSONLoader();
-			loader1.load( 'models/assimp/jeep/jeep.assimp.json', function ( object ) {
-
-				object.scale.multiplyScalar( 0.2 );
-				scene.add( object );
-
-			}, onProgress, onError );
-
-			// load interior model
-			var loader2 = new THREE.AssimpJSONLoader();
-			loader2.load( 'models/assimp/interior/interior.assimp.json', function ( object ) {
-
-				scene.add( object );
-
-			}, onProgress, onError );
-
 			animate();
-
 
 			//
 
@@ -118,39 +82,61 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 2, 4, 5 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.035 );
 
-				// Lights
-				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+				clock = new THREE.Clock();
+
+				// load jeep model
+
+				var loader1 = new THREE.AssimpJSONLoader();
+				loader1.load( 'models/assimp/jeep/jeep.assimp.json', function ( object ) {
+
+					object.scale.multiplyScalar( 0.2 );
+					scene.add( object );
+
+				} );
+
+				// load interior model
+
+				var loader2 = new THREE.AssimpJSONLoader();
+				loader2.load( 'models/assimp/interior/interior.assimp.json', function ( object ) {
+
+					scene.add( object );
+
+				} );
+
+				//
+
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random();
-				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.set( 1, 1, - 1 );
 				directionalLight.position.normalize();
 				scene.add( directionalLight );
 
-				// Renderer
+				//
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				// Stats
-				stats = new Stats();
-				container.appendChild( stats.domElement );
+				//
 
-				// Events
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -161,7 +147,6 @@
 
 			//
 
-			var t = 0;
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -174,11 +159,11 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0005;
+				var elapsedTime = clock.getElapsedTime();
 
-				camera.position.x = Math.cos( timer ) * 10;
+				camera.position.x = Math.cos( elapsedTime * 0.5 ) * 10;
 				camera.position.y = 4;
-				camera.position.z = Math.sin( timer ) * 10;
+				camera.position.z = Math.sin( elapsedTime * 0.5 ) * 10;
 
 				camera.lookAt( scene.position );
 

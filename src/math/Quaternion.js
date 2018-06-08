@@ -1,76 +1,166 @@
+import { Vector3 } from './Vector3.js';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
-THREE.Quaternion = function ( x, y, z, w ) {
+function Quaternion( x, y, z, w ) {
 
 	this._x = x || 0;
 	this._y = y || 0;
 	this._z = z || 0;
 	this._w = ( w !== undefined ) ? w : 1;
 
-};
+}
 
-THREE.Quaternion.prototype = {
+Object.assign( Quaternion, {
 
-	constructor: THREE.Quaternion,
+	slerp: function ( qa, qb, qm, t ) {
 
-	_x: 0,_y: 0, _z: 0, _w: 0,
-
-	get x () {
-
-		return this._x;
+		return qm.copy( qa ).slerp( qb, t );
 
 	},
 
-	set x ( value ) {
+	slerpFlat: function ( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
-		this._x = value;
-		this.onChangeCallback();
+		// fuzz-free, array-based Quaternion SLERP operation
+
+		var x0 = src0[ srcOffset0 + 0 ],
+			y0 = src0[ srcOffset0 + 1 ],
+			z0 = src0[ srcOffset0 + 2 ],
+			w0 = src0[ srcOffset0 + 3 ],
+
+			x1 = src1[ srcOffset1 + 0 ],
+			y1 = src1[ srcOffset1 + 1 ],
+			z1 = src1[ srcOffset1 + 2 ],
+			w1 = src1[ srcOffset1 + 3 ];
+
+		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
+
+			var s = 1 - t,
+
+				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
+
+				dir = ( cos >= 0 ? 1 : - 1 ),
+				sqrSin = 1 - cos * cos;
+
+			// Skip the Slerp for tiny steps to avoid numeric problems:
+			if ( sqrSin > Number.EPSILON ) {
+
+				var sin = Math.sqrt( sqrSin ),
+					len = Math.atan2( sin, cos * dir );
+
+				s = Math.sin( s * len ) / sin;
+				t = Math.sin( t * len ) / sin;
+
+			}
+
+			var tDir = t * dir;
+
+			x0 = x0 * s + x1 * tDir;
+			y0 = y0 * s + y1 * tDir;
+			z0 = z0 * s + z1 * tDir;
+			w0 = w0 * s + w1 * tDir;
+
+			// Normalize in case we just did a lerp:
+			if ( s === 1 - t ) {
+
+				var f = 1 / Math.sqrt( x0 * x0 + y0 * y0 + z0 * z0 + w0 * w0 );
+
+				x0 *= f;
+				y0 *= f;
+				z0 *= f;
+				w0 *= f;
+
+			}
+
+		}
+
+		dst[ dstOffset ] = x0;
+		dst[ dstOffset + 1 ] = y0;
+		dst[ dstOffset + 2 ] = z0;
+		dst[ dstOffset + 3 ] = w0;
+
+	}
+
+} );
+
+Object.defineProperties( Quaternion.prototype, {
+
+	x: {
+
+		get: function () {
+
+			return this._x;
+
+		},
+
+		set: function ( value ) {
+
+			this._x = value;
+			this.onChangeCallback();
+
+		}
 
 	},
 
-	get y () {
+	y: {
 
-		return this._y;
+		get: function () {
 
-	},
+			return this._y;
 
-	set y ( value ) {
+		},
 
-		this._y = value;
-		this.onChangeCallback();
+		set: function ( value ) {
 
-	},
+			this._y = value;
+			this.onChangeCallback();
 
-	get z () {
-
-		return this._z;
+		}
 
 	},
 
-	set z ( value ) {
+	z: {
 
-		this._z = value;
-		this.onChangeCallback();
+		get: function () {
 
-	},
+			return this._z;
 
-	get w () {
+		},
 
-		return this._w;
+		set: function ( value ) {
 
-	},
+			this._z = value;
+			this.onChangeCallback();
 
-	set w ( value ) {
-
-		this._w = value;
-		this.onChangeCallback();
+		}
 
 	},
+
+	w: {
+
+		get: function () {
+
+			return this._w;
+
+		},
+
+		set: function ( value ) {
+
+			this._w = value;
+			this.onChangeCallback();
+
+		}
+
+	}
+
+} );
+
+Object.assign( Quaternion.prototype, {
 
 	set: function ( x, y, z, w ) {
 
@@ -82,6 +172,12 @@ THREE.Quaternion.prototype = {
 		this.onChangeCallback();
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor( this._x, this._y, this._z, this._w );
 
 	},
 
@@ -100,58 +196,65 @@ THREE.Quaternion.prototype = {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( euler instanceof THREE.Euler === false ) {
+		if ( ! ( euler && euler.isEuler ) ) {
 
-			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
+			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
+
 		}
+
+		var x = euler._x, y = euler._y, z = euler._z, order = euler.order;
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 
-		var c1 = Math.cos( euler._x / 2 );
-		var c2 = Math.cos( euler._y / 2 );
-		var c3 = Math.cos( euler._z / 2 );
-		var s1 = Math.sin( euler._x / 2 );
-		var s2 = Math.sin( euler._y / 2 );
-		var s3 = Math.sin( euler._z / 2 );
+		var cos = Math.cos;
+		var sin = Math.sin;
 
-		if ( euler.order === 'XYZ' ) {
+		var c1 = cos( x / 2 );
+		var c2 = cos( y / 2 );
+		var c3 = cos( z / 2 );
+
+		var s1 = sin( x / 2 );
+		var s2 = sin( y / 2 );
+		var s3 = sin( z / 2 );
+
+		if ( order === 'XYZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'YXZ' ) {
+		} else if ( order === 'YXZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( euler.order === 'ZXY' ) {
+		} else if ( order === 'ZXY' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 + s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'ZYX' ) {
+		} else if ( order === 'ZYX' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( euler.order === 'YZX' ) {
+		} else if ( order === 'YZX' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 + s1 * c2 * s3;
 			this._z = c1 * c2 * s3 - s1 * s2 * c3;
 			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( euler.order === 'XZY' ) {
+		} else if ( order === 'XZY' ) {
 
 			this._x = s1 * c2 * c3 - c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
@@ -246,17 +349,16 @@ THREE.Quaternion.prototype = {
 
 	setFromUnitVectors: function () {
 
-		// http://lolengine.net/blog/2014/02/24/quaternion-from-two-vectors-final
-
 		// assumes direction vectors vFrom and vTo are normalized
 
-		var v1, r;
+		var v1 = new Vector3();
+		var r;
 
 		var EPS = 0.000001;
 
-		return function ( vFrom, vTo ) {
+		return function setFromUnitVectors( vFrom, vTo ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			r = vFrom.dot( vTo ) + 1;
 
@@ -285,19 +387,17 @@ THREE.Quaternion.prototype = {
 			this._z = v1.z;
 			this._w = r;
 
-			this.normalize();
+			return this.normalize();
 
-			return this;
-
-		}
+		};
 
 	}(),
 
 	inverse: function () {
 
-		this.conjugate().normalize();
+		// quaternion is assumed to have unit length
 
-		return this;
+		return this.conjugate();
 
 	},
 
@@ -363,12 +463,18 @@ THREE.Quaternion.prototype = {
 
 		if ( p !== undefined ) {
 
-			THREE.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
+			console.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
 			return this.multiplyQuaternions( q, p );
 
 		}
 
 		return this.multiplyQuaternions( this, q );
+
+	},
+
+	premultiply: function ( q ) {
+
+		return this.multiplyQuaternions( q, this );
 
 	},
 
@@ -387,13 +493,6 @@ THREE.Quaternion.prototype = {
 		this.onChangeCallback();
 
 		return this;
-
-	},
-
-	multiplyVector3: function ( vector ) {
-
-		THREE.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
-		return vector.applyQuaternion( this );
 
 	},
 
@@ -434,7 +533,6 @@ THREE.Quaternion.prototype = {
 
 		}
 
-		var halfTheta = Math.acos( cosHalfTheta );
 		var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
 
 		if ( Math.abs( sinHalfTheta ) < 0.001 ) {
@@ -448,8 +546,9 @@ THREE.Quaternion.prototype = {
 
 		}
 
+		var halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
 		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
-		ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
+			ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
 		this._w = ( w * ratioA + this._w * ratioB );
 		this._x = ( x * ratioA + this._x * ratioB );
@@ -505,18 +604,9 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	onChangeCallback: function () {},
+	onChangeCallback: function () {}
 
-	clone: function () {
+} );
 
-		return new THREE.Quaternion( this._x, this._y, this._z, this._w );
 
-	}
-
-};
-
-THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
-
-	return qm.copy( qa ).slerp( qb, t );
-
-}
+export { Quaternion };

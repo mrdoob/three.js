@@ -1,0 +1,147 @@
+; FBX 7.2.0 project file
+; Copyright (C) 1997-2010 Autodesk Inc. and/or its licensors.
+; All rights reserved.
+; ----------------------------------------------------
+
+FBXHeaderExtension:  {
+	FBXHeaderVersion: 1003
+	FBXVersion: 7200
+}
+
+; Object properties
+;------------------------------------------------------------------
+
+Objects:  {
+	Geometry: 1000, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 3
+		Dimension: 3
+		Form: "Open"
+		Rational: 1
+		Points: *32 {
+			a: 10,20,0,1, 10,20,10,1, 0,20,10,1, -10,20,10,1, -10,20,0,1, -10,20,-10,1, 0,20,-10,1, 10,22,-10,1
+		}
+		KnotVector: *11 {
+			a: 0,0,0,0.17,0.33,0.5,0.67,0.83,1,1,1
+		}
+	}
+	Geometry: 1001, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 3
+		Dimension: 3
+		Form: "Closed"
+		Rational: 1
+		Points: *32 {
+			a: 10,15,0,1, 10,15,10,1, 0,15,10,1, -10,15,10,1, -10,15,0,1, -10,15,-10,1, 0,15,-10,1, 10,17,-10,1
+		}
+		KnotVector: *12 {
+			a: 0,0,0,0.14,0.29,0.43,0.57,0.71,0.86,1,1,1
+		}
+	}
+	Geometry: 1003, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 3
+		Dimension: 3
+		Form: "Open"
+		Rational: 0
+		Points: *28 {
+			a: -7.88491751885913,0,-6.3416140214512,1,-7.55614153653084,0,-2.14888095861657,1,-6.89858957187424,0,6.23658516705268,1,6.75015994493138,0,6.91307446273969,1,8.41087276805083,0,-7.08434013027703,1,4.56806678889053,0,-9.8832858634819,1,-2.6353540655343,1.51455220168221,-9.66990979123821,1
+		}
+		KnotVector: *10 {
+			a: 0,0,0,1,2,3,4,5,5,5
+		}
+	}
+	Geometry: 1004, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 3
+		Dimension: 3
+		Form: "Periodic"
+		Rational: 0
+		Points: *28 {
+			a: -7.98766001333675,-5.56797696184566e-17,-7.65184310358704,1,-7.55614153653083,9.29849790468227e-18,-2.14888095861657,1,-6.89858957187424,-5.31636952823902e-17,6.23658516705267,1,6.75015994493138,0,6.91307446273969,1,8.41087276805082,4.96506830649454e-16,-7.08434013027705,1,4.56806678889055,-2.91370319417538e-16,-9.8832858634819,1,-4.88642308254206,1.9878497647079,-9.60322976866206,1
+		}
+		KnotVector: *12 {
+			a: -0.625,-0.3125,0,1,2,3,4,5,5.3125,5.625,6.625,7.625
+		}
+	}
+	Geometry: 1005, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 4
+		Dimension: 3
+		Form: "Periodic"
+		Rational: 0
+		Points: *32 {
+			a: 0.783611624891225,4.79823734098847e-17,-0.783611624891224,1,-1.26431706078293e-16,6.78573232311091e-17,-1.10819418755439,1,-0.783611624891224,4.79823734098847e-17,-0.783611624891224,1,-1.10819418755439,1.96633546161879e-32,-3.21126950723723e-16,1,-0.783611624891224,-4.79823734098847e-17,0.783611624891224,1,-3.33920536359052e-16,-6.78573232311091e-17,1.10819418755439,1,0.783611624891224,-4.79823734098847e-17,0.783611624891224,1,1.10819418755439,-3.64463006790479e-32,5.95213259928059e-16,1
+		}
+		KnotVector: *15 {
+			a: -3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11
+		}
+	}
+	Model: 10, "Model::Layer 01", "Null" {
+	}
+	Model: 100, "Model::Object_1", "NurbsCurve" {
+	}
+	Model: 101, "Model::Object_2", "NurbsCurve" {
+	}
+	Model: 103, "Model::Object_4", "NurbsCurve" {
+	}
+	Model: 104, "Model::Object_5", "NurbsCurve" {
+		Properties70:  {
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,3.38368368081907,0
+		}
+	}
+	Model: 105, "Model::Object_6", "NurbsCurve" {
+		Properties70:  {
+			P: "Lcl Translation", "Lcl Translation", "", "A",0.000265865200637982,2.121861293983,0.0232605698569328
+			P: "Lcl Scaling", "Lcl Scaling", "", "A",9.95283433152597,1,9.95283433152597
+		}
+	}
+}
+
+; Object connections
+;------------------------------------------------------------------
+
+Connections:  {
+	;Model::Layer 01, Model::RootNode
+	C: "OO",10,0
+
+	;Model::Object_1, Model::Layer 01
+	C: "OO",100,10
+
+	;Geometry::, Model::Object_1
+	C: "OO",1000,100
+
+	;Model::Object_2, Model::Layer 01
+	C: "OO",101,10
+
+	;Geometry::, Model::Object_2
+	C: "OO",1001,101
+
+	;Model::Object_4, Model::Layer 01
+	C: "OO",103,10
+
+	;Geometry::, Model::Object_4
+	C: "OO",1003,103
+
+	;Model::Object_5, Model::Layer 01
+	C: "OO",104,10
+
+	;Geometry::, Model::Object_5
+	C: "OO",1004,104
+
+	;Model::Object_6, Model::Layer 01
+	C: "OO",105,10
+
+	;Geometry::, Model::Object_6
+	C: "OO",1005,105
+}

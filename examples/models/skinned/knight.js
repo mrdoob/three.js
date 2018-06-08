@@ -21,7 +21,6 @@
 	"DbgIndex" : 0,
 	"DbgName" : "WHITE",
 	"blending" : "NormalBlending",
-	"colorAmbient" : [0.0, 0.0, 0.0],
 	"colorDiffuse" : [0.6400000190734865, 0.6400000190734865, 0.6400000190734865],
 	"colorSpecular" : [0.1, 0.1, 0.1],
 	"depthTest" : true,

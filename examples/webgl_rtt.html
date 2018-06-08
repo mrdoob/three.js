@@ -31,9 +31,9 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> render-to-texture webgl example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> render-to-texture webgl example</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -131,7 +131,7 @@
 
 				material = new THREE.ShaderMaterial( {
 
-					uniforms: { time: { type: "f", value: 0.0 } },
+					uniforms: { time: { value: 0.0 } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_pass_1' ).textContent
 
@@ -139,7 +139,7 @@
 
 				var materialScreen = new THREE.ShaderMaterial( {
 
-					uniforms: { tDiffuse: { type: "t", value: rtTexture } },
+					uniforms: { tDiffuse: { value: rtTexture.texture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
 
@@ -153,7 +153,7 @@
 				quad.position.z = -100;
 				sceneRTT.add( quad );
 
-				var geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
+				var geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
 
 				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
 				var mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
@@ -173,14 +173,14 @@
 				sceneScreen.add( quad );
 
 				var n = 5,
-					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
-					material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: rtTexture } );
+					geometry = new THREE.SphereBufferGeometry( 10, 64, 32 ),
+					material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: rtTexture.texture } );
 
 				for( var j = 0; j < n; j ++ ) {
 
 					for( var i = 0; i < n; i ++ ) {
 
-						mesh = new THREE.Mesh( geometry, material2 );
+						var mesh = new THREE.Mesh( geometry, material2 );
 
 						mesh.position.x = ( i - ( n - 1 ) / 2 ) * 20;
 						mesh.position.y = ( j - ( n - 1 ) / 2 ) * 20;
@@ -202,9 +202,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 

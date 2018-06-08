@@ -33,9 +33,9 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -46,7 +46,6 @@
 			var container;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube;
 
 			var mesh, lightMesh, geometry;
 			var spheres = [];
@@ -71,23 +70,15 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
 
-				cameraCube = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-
 				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
+				scene.background = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
-				var path = "textures/cube/skybox/";
-				var format = '.jpg';
-				var urls = [
-					path + 'px' + format, path + 'nx' + format,
-					path + 'py' + format, path + 'ny' + format,
-					path + 'pz' + format, path + 'nz' + format
-				];
-
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: scene.background, refractionRatio: 0.95 } );
+				material.envMap.mapping = THREE.CubeRefractionMapping;
 
 				for ( var i = 0; i < 500; i ++ ) {
 
@@ -105,30 +96,11 @@
 
 				}
 
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
-				sceneCube.add( mesh );
-
 				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -139,14 +111,11 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
-				cameraCube.aspect = window.innerWidth / window.innerHeight;
-				cameraCube.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -186,9 +155,7 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				camera.lookAt( scene.position );
-				cameraCube.rotation.copy( camera.rotation );
 
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 			}

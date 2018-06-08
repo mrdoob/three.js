@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - standard</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			a {	color: #ffffff;	}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			#oldie {
+				background:rgb(200,100,0) !important;
+				color:#fff;
+			}
+
+			#vt { display:none }
+			#vt, #vt a { color:orange; }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based material - <a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var statsEnabled = true;
+
+			var container, stats, loader;
+
+			var camera, scene, renderer;
+
+			var controls;
+
+			var mesh;
+
+			var spotLight;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = 3;
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 1000 );
+				camera.position.z = 2;
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+				//
+
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
+
+				//
+
+				new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/pisa/' )
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( textureCube ) {
+
+						scene.background = textureCube;
+
+					} );
+
+				//
+
+				var material = new THREE.MeshStandardMaterial();
+
+				new THREE.OBJLoader()
+					.setPath( 'models/obj/cerberus/' )
+					.load( 'Cerberus.obj', function ( group ) {
+
+						var loader = new THREE.TextureLoader()
+							.setPath( 'models/obj/cerberus/' );
+
+						material.roughness = 1; // attenuates roughnessMap
+						material.metalness = 1; // attenuates metalnessMap
+
+						material.map = loader.load( 'Cerberus_A.jpg' );
+						// roughness is in G channel, metalness is in B channel
+						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
+						material.normalMap = loader.load( 'Cerberus_N.jpg' );
+
+						material.map.wrapS = THREE.RepeatWrapping;
+						material.roughnessMap.wrapS = THREE.RepeatWrapping;
+						material.metalnessMap.wrapS = THREE.RepeatWrapping;
+						material.normalMap.wrapS = THREE.RepeatWrapping;
+
+						group.traverse( function ( child ) {
+
+							if ( child instanceof THREE.Mesh ) {
+
+								child.material = material;
+
+							}
+
+						} );
+
+						group.position.x = - 0.45;
+						group.rotation.y = - Math.PI / 2;
+						scene.add( group );
+
+					} );
+
+				var genCubeUrls = function( prefix, postfix ) {
+					return [
+						prefix + 'px' + postfix, prefix + 'nx' + postfix,
+						prefix + 'py' + postfix, prefix + 'ny' + postfix,
+						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+					];
+				};
+
+				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
+				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+					material.envMap = hdrCubeRenderTarget.texture;
+					material.needsUpdate = true; // is this needed?
+
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
+				} );
+
+				//
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					container.appendChild( stats.dom );
+
+				}
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+				renderer.render( scene, camera );
+
+				if ( statsEnabled ) stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>

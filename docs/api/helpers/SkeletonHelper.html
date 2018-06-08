@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		A helper object to assist with visualizing a [page:Skeleton Skeleton].
+		The helper is renderered using a [page:LineBasicMaterial LineBasicMaterial].
+		</p>
+
+
+		<h2>Example</h2>
+
+		[example:webgl_animation_skinning_blending animation / skinning / blending]<br />
+		[example:webgl_animation_skinning_morph animation / skinning / morph]<br />
+		[example:webgl_loader_bvh loader / bvh ]
+
+		<code>
+var helper = new THREE.SkeletonHelper( mesh );
+helper.material.linewidth = 3;
+scene.add( helper );
+		</code>
+
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( object )</h3>
+		<p>
+		object -- can be any object that has an array of [page:Bone Bone]s as a sub object. <br />
+		For example, a [page:Skeleton Skeleton] or a [page:SkinnedMesh SkinnedMesh].
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array bones]</h3>
+		<p>
+		The list of bones that the helper renders as [page:Line Lines].
+		</p>
+
+		<h3>[property:Object root]</h3>
+		<p>
+		The object passed in the constructor.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

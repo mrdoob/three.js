@@ -32,9 +32,9 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain raycasting demo</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain raycasting demo</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -77,19 +77,20 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				controls = new THREE.OrbitControls(camera);
-				controls.center.set( 0.0, 100.0, 0.0 );
+				controls.target.set( 0.0, 100.0, 0.0 );
 				controls.userPanSpeed = 100;
 
-				data = generateHeight( worldWidth, worldDepth );
+				var data = generateHeight( worldWidth, worldDepth );
 
-				controls.center.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
-				camera.position.y =  controls.center.y + 2000;
+				controls.target.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
+				camera.position.y =  controls.target.y + 2000;
 				camera.position.x = 2000;
 
 				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				geometry.rotateX( - Math.PI / 2 );
 
 				var vertices = geometry.attributes.position.array;
 
@@ -101,20 +102,20 @@
 
 				geometry.computeFaceNormals();
 
-				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
-				texture.needsUpdate = true;
+				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
+				texture.wrapS = THREE.ClampToEdgeWrapping;
+				texture.wrapT = THREE.ClampToEdgeWrapping;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				var geometry = new THREE.CylinderGeometry( 0, 20, 100, 3 );
-				geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 50, 0 ) );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+				var geometry = new THREE.ConeBufferGeometry( 20, 100, 3 );
+				geometry.translate( 0, 50, 0 );
+				geometry.rotateX( Math.PI / 2 );
 				helper = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial() );
 				scene.add( helper );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xbfd1e5 );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -124,9 +125,7 @@
 				container.addEventListener( 'mousemove', onMouseMove, false );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -244,16 +243,15 @@
 
 			function render() {
 
-				controls.update( clock.getDelta() );
+				controls.update();
 				renderer.render( scene, camera );
 
 			}
 
 			function onMouseMove( event ) {
 
-				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-				mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
-
+				mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
 				raycaster.setFromCamera( mouse, camera );
 
 				// See if the ray from the camera into the world hits one of our meshes

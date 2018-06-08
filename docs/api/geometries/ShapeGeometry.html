@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Creates an one-sided polygonal geometry from one or more path shapes.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#ShapeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+
+		<h2>Example</h2>
+
+
+		<code>
+		var x = 0, y = 0;
+
+		var heartShape = new THREE.Shape();
+
+		heartShape.moveTo( x + 5, y + 5 );
+		heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+		heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+		heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
+		heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
+		heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
+		heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
+
+		var geometry = new THREE.ShapeGeometry( heartShape );
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var mesh = new THREE.Mesh( geometry, material ) ;
+		scene.add( mesh );
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([param:Array shapes], [param:Integer curveSegments])</h3>
+		<p>
+		shapes — [page:Array] of shapes or a single [page:Shape shape].<br />
+		curveSegments - [page:Integer] - Number of segments per shape. Default is 12.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - equirectangular panorama demo</title>
+		<title>three.js webgl - equirectangular panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -31,11 +31,11 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Jón Ragnarsson</a>.<br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>.<br />
 			drag equirectangular texture into the page.
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script>
 
@@ -61,15 +61,16 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
-				geometry.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
+				var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
+				// invert the geometry on the x-axis so that all of the faces point inward
+				geometry.scale( - 1, 1, 1 );
 
 				var material = new THREE.MeshBasicMaterial( {
-					map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
+					map: new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' )
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
-				
+
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
@@ -80,8 +81,7 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
-				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
+				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
 
 				//
 
@@ -142,11 +142,11 @@
 
 				isUserInteracting = true;
 
-				onPointerDownPointerX = event.clientX;
-				onPointerDownPointerY = event.clientY;
+				onMouseDownMouseX = event.clientX;
+				onMouseDownMouseY = event.clientY;
 
-				onPointerDownLon = lon;
-				onPointerDownLat = lat;
+				onMouseDownLon = lon;
+				onMouseDownLat = lat;
 
 			}
 
@@ -154,8 +154,8 @@
 
 				if ( isUserInteracting === true ) {
 
-					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
-					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+					lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
+					lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
 
 				}
 
@@ -169,25 +169,9 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				// WebKit
+				var fov = camera.fov + event.deltaY * 0.05;
 
-				if ( event.wheelDeltaY ) {
-
-					camera.fov -= event.wheelDeltaY * 0.05;
-
-				// Opera / Explorer 9
-
-				} else if ( event.wheelDelta ) {
-
-					camera.fov -= event.wheelDelta * 0.05;
-
-				// Firefox
-
-				} else if ( event.detail ) {
-
-					camera.fov += event.detail * 1.0;
-
-				}
+				camera.fov = THREE.Math.clamp( fov, 10, 75 );
 
 				camera.updateProjectionMatrix();
 

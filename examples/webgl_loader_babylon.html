@@ -27,46 +27,29 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - BabylonLoader test
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - BabylonLoader test
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/BabylonLoader.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
 
 		<script>
 
-			var container;
-
-			var camera, scene, renderer;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
+			var camera, controls, scene, renderer;
 
 			init();
-			animate();
-
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 100;
 
+				controls = new THREE.TrackballControls( camera );
+
 				// scene
 
 				scene = new THREE.Scene();
-
-				var ambient = new THREE.AmbientLight( 0x101030 );
-				scene.add( ambient );
-
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				scene.add( directionalLight );
 
 				// texture
 
@@ -96,7 +79,21 @@
 				var loader = new THREE.BabylonLoader( manager );
 				loader.load( 'models/babylon/skull.babylon', function ( babylonScene ) {
 
-					scene.add( babylonScene );
+					babylonScene.traverse( function ( object ) {
+
+						if ( object instanceof THREE.Mesh ) {
+
+							object.material = new THREE.MeshPhongMaterial( {
+								color: Math.random() * 0xffffff
+							} );
+
+						}
+
+					} );
+
+					scene = babylonScene;
+
+					animate();
 
 				}, onProgress, onError );
 
@@ -105,9 +102,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
@@ -117,20 +112,12 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
+				controls.handleResize();
 
 			}
 
@@ -145,11 +132,7 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
-
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

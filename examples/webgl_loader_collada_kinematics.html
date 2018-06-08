@@ -1,38 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - collada</title>
+		<title>three.js webgl - collada - kinematics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
+				background:#777;
+				padding:0;
+				margin:0;
+				overflow:hidden;
 			}
 
 			#info {
-				color: #fff;
 				position: absolute;
-				top: 10px;
+				top: 0px;
 				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
 			}
 
-			a { color: skyblue }
+			a {
+				color: #ffffff;
+			}
 		</style>
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> -
-			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank">collada robots</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - kinematics
+			 | robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/libs/tween.min.js"></script>
 		<script src="js/loaders/ColladaLoader.js"></script>
@@ -55,8 +57,8 @@
 			var tweenParameters = {};
 
 			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
-			loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
+			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
+			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
 				dae = collada.scene;
 
@@ -64,8 +66,8 @@
 
 					if ( child instanceof THREE.Mesh ) {
 
-						child.geometry.computeFaceNormals();
-						child.material.shading = THREE.FlatShading;
+						// model does not have normals
+						child.material.flatShading = true;
 
 					}
 
@@ -93,41 +95,22 @@
 
 				// Grid
 
-				var size = 14, step = 1;
-
-				var geometry = new THREE.Geometry();
-				var material = new THREE.LineBasicMaterial( { color: 0x303030 } );
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
-
-				}
-
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
-				scene.add( line );
+				var grid = new THREE.GridHelper( 20, 20 );
+				scene.add( grid );
 
 				// Add the COLLADA
 
 				scene.add( dae );
 
-				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
 
-				var directionalLight = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
-				scene.add( directionalLight );
+				var light = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
+				scene.add( light );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.5 );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.3 );
 				particleLight.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
@@ -136,10 +119,9 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
+				container.appendChild( stats.dom );
+
 				setupTween();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
 
 				//
 
@@ -149,35 +131,51 @@
 
 			function setupTween() {
 
-				var duration = getRandomInt(1000, 5000);
+				var duration = THREE.Math.randInt( 1000, 5000 );
 
-				var target = {}
+				var target = {};
 
-				for ( var i = 0; i < kinematics.joints.length; i++ ) {
+				for ( var prop in kinematics.joints ) {
 
-						var joint = kinematics.joints[ i ];
+					if ( kinematics.joints.hasOwnProperty( prop ) ) {
 
-						var old = tweenParameters[ i ];
+						if ( ! kinematics.joints[ prop ].static ) {
 
-						var position = old ? old : joint.zeroPosition
+							var joint = kinematics.joints[ prop ];
 
-						tweenParameters[ i ] = position
+							var old = tweenParameters[ prop ];
 
-						target[ i ] = getRandomInt(joint.limits.min, joint.limits.max)
+							var position = old ? old : joint.zeroPosition;
+
+							tweenParameters[ prop ] = position;
+
+							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max )
+
+						}
+
+					}
 
 				}
 
 				kinematicsTween = new TWEEN.Tween( tweenParameters ).to( target, duration ).easing( TWEEN.Easing.Quadratic.Out );
 
-				kinematicsTween.onUpdate(function() {
+				kinematicsTween.onUpdate( function() {
 
-					for ( var i = 0; i < kinematics.joints.length; i++ ) {
+					for ( var prop in kinematics.joints ) {
 
-						kinematics.setJointValue( i, this[ i ] );
+						if ( kinematics.joints.hasOwnProperty( prop ) ) {
+
+							if ( ! kinematics.joints[ prop ].static ) {
+
+								kinematics.setJointValue( prop, this[ prop ] );
+
+							}
+
+						}
 
 					}
 
-				} )
+				} );
 
 				kinematicsTween.start();
 
@@ -210,26 +208,17 @@
 
 				var timer = Date.now() * 0.0001;
 
-				camera.position.x = Math.cos( timer ) * 17;
+				camera.position.x = Math.cos( timer ) * 20;
 				camera.position.y = 10;
-				camera.position.z = Math.sin( timer ) * 17;
+				camera.position.z = Math.sin( timer ) * 20;
 
-				camera.lookAt( scene.position );
+				camera.lookAt( new THREE.Vector3( 0, 5, 0 ) );
 
 				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
 				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
 				renderer.render( scene, camera );
-
-			}
-
-			// Returns a random integer between min (inclusive) and max (inclusive)
-			// Using Math.round() will give you a non-uniform distribution!
-
-			function getRandomInt( min, max ) {
-
-					return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
 
 			}
 

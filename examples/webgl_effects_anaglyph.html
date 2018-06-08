@@ -33,9 +33,9 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - effects - anaglyph. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - anaglyph. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/effects/AnaglyphEffect.js"></script>
 
@@ -70,12 +70,9 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 3200;
-
-				scene = new THREE.Scene();
-
-				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.z = 3;
+				camera.focalLength = 3;
 
 				var path = "textures/cube/pisa/";
 				var format = '.png';
@@ -85,16 +82,21 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+
+				scene = new THREE.Scene();
+				scene.background = textureCube;
+
+				var geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 
-					mesh.position.x = Math.random() * 10000 - 5000;
-					mesh.position.y = Math.random() * 10000 - 5000;
-					mesh.position.z = Math.random() * 10000 - 5000;
+					mesh.position.x = Math.random() * 10 - 5;
+					mesh.position.y = Math.random() * 10 - 5;
+					mesh.position.z = Math.random() * 10 - 5;
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
 
@@ -103,23 +105,6 @@
 					spheres.push( mesh );
 
 				}
-
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
-				scene.add( mesh );
 
 				//
 
@@ -141,8 +126,8 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -153,8 +138,8 @@
 
 			function onDocumentMouseMove(event) {
 
-				mouseX = ( event.clientX - windowHalfX ) * 10;
-				mouseY = ( event.clientY - windowHalfY ) * 10;
+				mouseX = ( event.clientX - windowHalfX ) / 100;
+				mouseY = ( event.clientY - windowHalfY ) / 100;
 
 			}
 
@@ -181,8 +166,8 @@
 
 					var sphere = spheres[ i ];
 
-					sphere.position.x = 5000 * Math.cos( timer + i );
-					sphere.position.y = 5000 * Math.sin( timer + i * 1.1 );
+					sphere.position.x = 5 * Math.cos( timer + i );
+					sphere.position.y = 5 * Math.sin( timer + i * 1.1 );
 
 				}
 

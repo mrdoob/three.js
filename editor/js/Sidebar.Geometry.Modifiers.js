@@ -2,9 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.Modifiers = function ( signals, object ) {
+Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
-	var container = new UI.Panel().setPaddingLeft( '90px' );
+	var signals = editor.signals;
+
+	var container = new UI.Row().setPaddingLeft( '90px' );
 
 	var geometry = object.geometry;
 
@@ -31,42 +33,8 @@ Sidebar.Geometry.Modifiers = function ( signals, object ) {
 
 	container.add( button );
 
-	// Convert to Geometry/BufferGeometry
-
-	var isBufferGeometry = geometry instanceof THREE.BufferGeometry;
-
-	if ( geometry instanceof THREE.BufferGeometry ) {
-
-		var button = new UI.Button( 'Convert to Geometry' );
-		button.onClick( function () {
-
-			if ( confirm( 'Are you sure?' ) === false ) return;
-
-			object.geometry = new THREE.Geometry().fromBufferGeometry( object.geometry );
-
-			signals.geometryChanged.dispatch( object );
-
-		} );
-		container.add( button );
-
-	} else {
-
-		var button = new UI.Button( 'Convert to BufferGeometry' );
-		button.onClick( function () {
-
-			if ( confirm( 'Are you sure?' ) === false ) return;
-
-			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
-
-			signals.geometryChanged.dispatch( object );
-
-		} );
-		container.add( button );
-
-	}
-
 	//
 
 	return container;
 
-}
+};

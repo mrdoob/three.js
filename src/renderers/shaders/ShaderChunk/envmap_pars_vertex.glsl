@@ -1,7 +1,13 @@
-#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG )
+#ifdef USE_ENVMAP
 
-	varying vec3 vReflect;
+	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )
+		varying vec3 vWorldPosition;
 
-	uniform float refractionRatio;
+	#else
+
+		varying vec3 vReflect;
+		uniform float refractionRatio;
+
+	#endif
 
 #endif

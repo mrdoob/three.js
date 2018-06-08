@@ -13,9 +13,9 @@ THREE.VerticalTiltShiftShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"v":        { type: "f", value: 1.0 / 512.0 },
-		"r":        { type: "f", value: 0.35 }
+		"tDiffuse": { value: null },
+		"v":        { value: 1.0 / 512.0 },
+		"r":        { value: 0.35 }
 
 	},
 
@@ -30,7 +30,7 @@ THREE.VerticalTiltShiftShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -60,6 +60,6 @@ THREE.VerticalTiltShiftShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

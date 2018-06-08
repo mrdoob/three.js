@@ -2,59 +2,105 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Material] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A material for drawing wireframe-style geometries.</div>
+		<p class="desc">A material for drawing wireframe-style geometries.</p>
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_buffergeometry_drawcalls WebGL / buffergeometry / drawcalls]<br />
+			[example:webgl_buffergeometry_lines WebGL / buffergeometry / lines]<br />
+			[example:webgl_buffergeometry_lines_indexed WebGL / buffergeometry / lines / indexed]<br />
+			[example:webgl_decals WebGL / decals]<br />
+			[example:webgl_geometry_nurbs WebGL / geometry / nurbs]<br />
+			[example:webgl_geometry_shapes WebGL / geometry / shapes]<br />
+			[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor]<br />
+			[example:webgl_interactive_buffergeometry WebGL / interactive / buffergeometry]<br />
+			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter]<br />
+			[example:webgl_lines_colors WebGL / lines / colors]<br />
+			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
+			[example:webgl_lines_sphere WebGL / lines / sphere]<br />
+			[example:webgl_lines_splines WebGL / lines / splines]<br />
+			[example:webgl_materials WebGL / materials]<br />
+			[example:webgl_physics_rope WebGL / phyics / rope]
+		</p>
+
+		<code>
+var material = new THREE.LineBasicMaterial( {
+	color: 0xffffff,
+	linewidth: 1,
+	linecap: 'round', //ignored by WebGLRenderer
+	linejoin:  'round' //ignored by WebGLRenderer
+} );
+		</code>
 
 		<h2>Constructor</h2>
 
+		<h3>[name]( [param:Object parameters] )</h3>
 
-		<h3>[name]( [page:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
+		Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
 
-		<div>parameters is an object with one or more properties defining the material's appearance.</div>
-		<div>
-		color — Line color in hexadecimal. Default is 0xffffff.<br />
-		linewidth — Line thickness. Default is 1.<br />
-		linecap — Define appearance of line ends. Default is 'round'.<br />
-		linejoin — Define appearance of line joints. Default is 'round'.<br />
-		vertexColors — Define how the vertices gets colored. Default is THREE.NoColors.<br />
-		fog — Define whether the material color is affected by global fog settings. Default is false.
-		</div>
+		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
+		string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+		</p>
 
 		<h2>Properties</h2>
+		<p>See the base [page:Material] class for common properties.</p>
 
-		<h3>[property:Integer color]</h3>
-		<div>Sets the color of the line. Default is 0xffffff.</div>
+		<h3>[property:Color color]</h3>
+		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
+
+		<h3>[property:Boolean isLineBasicMaterial]</h3>
+		<p>
+			Used to check whether this or derived classes are line basic materials. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+		<h3>[property:Boolean lights]</h3>
+		<p>Whether the material is affected by lights. Default is *false*.</p>
 
 		<h3>[property:Float linewidth]</h3>
-		<div>Controls line thickness. Default is 1.</div>
-		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
+		<p>
+			Controls line thickness. Default is *1*.<br /><br />
+
+			Due to limitations in the [link:https://code.google.com/p/angleproject ANGLE layer],
+			with the [page:WebGLRenderer WebGL] renderer on Windows platforms linewidth will
+			always be 1 regardless of the set value.
+		</p>
 
 		<h3>[property:String linecap]</h3>
-		<div>Define appearance of line ends. Possible values are "butt", "round" and "square". Default is 'round'.</div>
-		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+		<p>
+			Define appearance of line ends. Possible values are 'butt', 'round' and 'square'.
+			Default is 'round'.<br /><br />
+
+			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
+		</p>
 
 		<h3>[property:String linejoin]</h3>
-		<div>Define appearance of line joints. Possible values are "round", "bevel" and "miter". Default is 'round'.</div>
-		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+		<p>
+			Define appearance of line joints. Possible values are 'round', 'bevel' and 'miter'. Default is 'round'. <br /><br />
 
-		<h3>[property:Integer vertexColors]</h3>
-		<div>Define how the vertices gets colored. Possible values are THREE.NoColors, THREE.FaceColors and THREE.VertexColors. Default is THREE.NoColors.</div>
-		<div>This setting might not have any effect when used with certain renderers.</div>
+			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
+		</p>
 
-		<h3>[property:Boolean fog]</h3>
-		<div>Define whether the material color is affected by global fog settings.</div>
-		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
 
-		
+		<h2>Methods</h2>
+		<p>See the base [page:Material] class for common methods.</p>
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

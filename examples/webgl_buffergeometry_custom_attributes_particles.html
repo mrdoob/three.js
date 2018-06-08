@@ -29,9 +29,9 @@
 
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry custom attributes - particles</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry custom attributes - particles</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -39,17 +39,16 @@
 		<script type="x-shader/x-vertex" id="vertexshader">
 
 			attribute float size;
-			attribute vec3 customColor;
 
 			varying vec3 vColor;
 
 			void main() {
 
-				vColor = customColor;
+				vColor = color;
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-				gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+				gl_PointSize = size * ( 300.0 / -mvPosition.z );
 
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -59,14 +58,13 @@
 
 		<script type="x-shader/x-fragment" id="fragmentshader">
 
-			uniform vec3 color;
 			uniform sampler2D texture;
 
 			varying vec3 vColor;
 
 			void main() {
 
-				gl_FragColor = vec4( color * vColor, 1.0 );
+				gl_FragColor = vec4( vColor, 1.0 );
 
 				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
 
@@ -85,43 +83,32 @@
 
 		var particles = 100000;
 
-		var WIDTH = window.innerWidth;
-		var HEIGHT = window.innerHeight;
-
 		init();
 		animate();
 
 		function init() {
 
-			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.z = 300;
 
 			scene = new THREE.Scene();
 
-			var attributes = {
-
-				size:        { type: 'f', value: null },
-				customColor: { type: 'c', value: null }
-
-			};
-
 			uniforms = {
 
-				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) }
+				texture:   { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 
 			};
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms:       uniforms,
-				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
 				blending:       THREE.AdditiveBlending,
 				depthTest:      false,
-				transparent:    true
+				transparent:    true,
+				vertexColors:   true
 
 			});
 
@@ -130,47 +117,43 @@
 
 			geometry = new THREE.BufferGeometry();
 
-			var positions = new Float32Array( particles * 3 );
-			var values_color = new Float32Array( particles * 3 );
-			var values_size = new Float32Array( particles );
+			var positions = [];
+			var colors = [];
+			var sizes = [];
 
 			var color = new THREE.Color();
 
-			for( var v = 0; v < particles; v++ ) {
+			for ( var i = 0; i < particles; i ++ ) {
 
-				values_size[ v ] = 20;
+				positions.push( ( Math.random() * 2 - 1 ) * radius );
+				positions.push( ( Math.random() * 2 - 1 ) * radius );
+				positions.push( ( Math.random() * 2 - 1 ) * radius );
 
-				positions[ v * 3 + 0 ] = ( Math.random() * 2 - 1 ) * radius;
-				positions[ v * 3 + 1 ] = ( Math.random() * 2 - 1 ) * radius;
-				positions[ v * 3 + 2 ] = ( Math.random() * 2 - 1 ) * radius;
+				color.setHSL( i / particles, 1.0, 0.5 );
 
-				color.setHSL( v / particles, 1.0, 0.5 );
+				colors.push( color.r, color.g, color.b );
 
-				values_color[ v * 3 + 0 ] = color.r;
-				values_color[ v * 3 + 1 ] = color.g;
-				values_color[ v * 3 + 2 ] = color.b;
+				sizes.push( 20 );;
 
 			}
 
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'customColor', new THREE.BufferAttribute( values_color, 3 ) );
-			geometry.addAttribute( 'size', new THREE.BufferAttribute( values_size, 1 ) );
+			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ).setDynamic( true ) );
 
-			particleSystem = new THREE.PointCloud( geometry, shaderMaterial );
+			particleSystem = new THREE.Points( geometry, shaderMaterial );
 
 			scene.add( particleSystem );
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( WIDTH, HEIGHT );
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			var container = document.getElementById( 'container' );
 			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			//
 
@@ -202,11 +185,11 @@
 
 			particleSystem.rotation.z = 0.01 * time;
 
-			var size = geometry.attributes.size.array;
+			var sizes = geometry.attributes.size.array;
 
-			for( var i = 0; i < particles; i++ ) {
+			for ( var i = 0; i < particles; i++ ) {
 
-				size[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
+				sizes[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
 
 			}
 
@@ -216,9 +199,7 @@
 
 		}
 
-
 	</script>
 
 </body>
-
 </html>

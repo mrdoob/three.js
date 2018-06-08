@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				background-color: #ffffff;
@@ -27,9 +28,9 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - css3d sandbox</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - css3d sandbox</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
@@ -54,6 +55,8 @@
 				controls = new THREE.TrackballControls( camera );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+
 				scene2 = new THREE.Scene();
 
 				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide } );
@@ -65,7 +68,7 @@
 					var element = document.createElement( 'div' );
 					element.style.width = '100px';
 					element.style.height = '100px';
-					element.style.opacity = 0.5;
+					element.style.opacity = ( i < 5 ) ? 0.5 : 1;
 					element.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
 
 					var object = new THREE.CSS3DObject( element );
@@ -79,7 +82,7 @@
 					object.scale.y = Math.random() + 0.5;
 					scene2.add( object );
 
-					var geometry = new THREE.PlaneGeometry( 100, 100 );
+					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.copy( object.position );
 					mesh.rotation.copy( object.rotation );
@@ -90,8 +93,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

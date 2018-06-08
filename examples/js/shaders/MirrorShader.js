@@ -11,8 +11,8 @@ THREE.MirrorShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"side":     { type: "i", value: 1 }
+		"tDiffuse": { value: null },
+		"side":     { value: 1 }
 
 	},
 
@@ -27,7 +27,7 @@ THREE.MirrorShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -53,6 +53,6 @@ THREE.MirrorShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

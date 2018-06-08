@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - scene animation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+				color: #0af;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - scene animation - <a href="https://clara.io/view/96106133-2e99-40cf-8abd-64defd153e61">Three Gears Scene</a> courtesy of David Sarno
+		<br><br>camera orbit/zoom/pan with left/middle/right mouse button</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var scene, camera, controls, stats;
+			var renderer, mixer;
+
+			var clock = new THREE.Clock();
+			var url = 'models/json/scene-animation.json';
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container = document.getElementById( 'container' );
+
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+			container.appendChild( renderer.domElement );
+
+
+			// Load a scene with objects, lights and camera from a JSON file
+
+			new THREE.ObjectLoader().load( url, function ( loadedScene ) {
+
+				scene = loadedScene;
+				scene.background = new THREE.Color( 0xffffff );
+
+				// If the loaded file contains a perspective camera, use it with adjusted aspect ratio...
+
+				scene.traverse( function ( sceneChild ) {
+
+					if ( sceneChild.type === 'PerspectiveCamera' ) {
+
+						camera = sceneChild;
+						camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+						camera.updateProjectionMatrix();
+
+					}
+
+				} );
+
+				// ... else create a new camera and use it in the loaded scene
+
+				if ( camera === undefined ) {
+
+					camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+					camera.position.set( - 200, 0, 200 );
+
+				}
+
+				controls = new THREE.OrbitControls( camera );
+
+				// Ground plane and fog: examples for applying additional children and new property values to the loaded scene
+
+				var geometry = new THREE.PlaneBufferGeometry( 20000, 20000 );
+				var material = new THREE.MeshPhongMaterial( { shininess: 0.1 } );
+				var ground = new THREE.Mesh( geometry, material );
+
+				ground.position.set( 0, - 250, 0 );
+				ground.rotation.x = - Math.PI / 2;
+
+				scene.add( ground );
+
+				scene.fog = new THREE.Fog( 0xffffff, 1000, 10000 );
+
+				// Initialization of the loaded animations
+
+				var animationClip = scene.animations[ 0 ];
+				mixer = new THREE.AnimationMixer( scene );
+				mixer.clipAction( animationClip ).play();
+
+				animate();
+
+			} );
+
+
+			window.onresize = function () {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			};
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+
+			function render() {
+
+				var delta = 0.75 * clock.getDelta();
+
+				mixer.update( delta );
+				stats.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+
+		</script>
+
+	</body>
+</html>

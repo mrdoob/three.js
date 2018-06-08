@@ -28,11 +28,11 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			simple AWD loader
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/AWDLoader.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -111,9 +111,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -139,7 +137,7 @@
 				var timer = Date.now() * 0.0005;
 
 				pointLight.position.x = Math.sin( timer * 4 ) * 3000;
-				pointLight.position.y = 600
+				pointLight.position.y = 600;
 				pointLight.position.z = Math.cos( timer * 4 ) * 3000;
 
 				renderer.render( scene, camera );

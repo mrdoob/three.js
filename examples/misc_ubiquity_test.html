@@ -14,7 +14,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -22,8 +22,6 @@
 		<script src="js/renderers/SoftwareRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
-
-		<script src="obj/Qrcode.js"></script>
 
 		<script>
 
@@ -49,12 +47,18 @@
 
 				scene = new THREE.Scene();
 				scene.autoUpdate = false;
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// QRCODE
 
-				mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshLambertMaterial( { /*emissive: 0xff0000,*/ vertexColors: THREE.FaceColors } ) );
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.add( mesh );
+				var loader = new THREE.JSONLoader();
+				loader.load( 'models/json/QRCode.json', function ( geometry) {
+
+					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { vertexColors: THREE.FaceColors } ) );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+					scene.add( mesh );
+
+				} );
 
 				// CUBES
 
@@ -145,19 +149,24 @@
 
 				// SPRITES
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/sprite.png' );
-				var material = new THREE.SpriteMaterial( { map: texture, transparent: true } );
+				var textureLoader = new THREE.TextureLoader();
 
-				for ( var i = 0; i < 50; i ++ ) {
+				textureLoader.load( 'textures/sprite.png', function ( texture ) {
 
-					var sprite = new THREE.Sprite( material );
-					sprite.position.x = Math.random() * 1000 - 500;
-					sprite.position.y = Math.random() * 1000 - 500;
-					sprite.position.z = Math.random() * 1000 - 500;
-					sprite.scale.set( 64, 64, 1 );
-					scene.add( sprite );
+					var material = new THREE.SpriteMaterial( { map: texture, transparent: true } );
 
-				}
+					for ( var i = 0; i < 50; i ++ ) {
+
+						var sprite = new THREE.Sprite( material );
+						sprite.position.x = Math.random() * 1000 - 500;
+						sprite.position.y = Math.random() * 1000 - 500;
+						sprite.position.z = Math.random() * 1000 - 500;
+						sprite.scale.set( 64, 64, 1 );
+						scene.add( sprite );
+
+					}
+
+				} );
 
 				for ( var i = 0; i < 50; i ++ ) {
 
@@ -181,32 +190,26 @@
 				scene.add( directional );
 
 				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setClearColor( 0xf0f0f0 );
 				canvasRenderer.setPixelRatio( window.devicePixelRatio );
 				canvasRenderer.setSize( width, height );
 				document.body.appendChild( canvasRenderer.domElement );
 
 				svgRenderer = new THREE.SVGRenderer();
-				svgRenderer.setClearColor( 0xf0f0f0 );
 				svgRenderer.setSize( width, height );
 				svgRenderer.setQuality( 'low' );
 				document.body.appendChild( svgRenderer.domElement );
 
 				softwareRenderer = new THREE.SoftwareRenderer();
-				softwareRenderer.setClearColor( 0xf0f0f0 );
 				softwareRenderer.setSize( width, height );
 				document.body.appendChild( softwareRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
-				webglRenderer.setClearColor( 0xf0f0f0 );
 				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( width, height );
 				document.body.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				//
 

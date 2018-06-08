@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - materials - wireframe</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -13,7 +14,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -30,8 +31,6 @@
 		</script>
 
 		<script type="x-shader/x-fragment" id="fragmentShader">
-
-			#extension GL_OES_standard_derivatives : enable
 
 			varying vec3 vCenter;
 
@@ -54,64 +53,67 @@
 		<script>
 
 			var camera, scene, renderer;
-			var meshTris, meshLines, meshMixed;
 
 			init();
 			animate();
 
 			function init() {
 
+				var geometry, material, mesh;
+
+				var size = 150;
+
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 800;
 
 				scene = new THREE.Scene();
 
-				var size = 150;
+				//
 
-				var geometryLines = new THREE.BoxGeometry( size, size, size );
-				var geometryTris = new THREE.BoxGeometry( size, size, size );
+				geometry = new THREE.BoxBufferGeometry( size, size, size );
+				material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
-				// wireframe using gl.LINES
-
-				var materialLines = new THREE.MeshBasicMaterial( { wireframe: true } );
-
-				meshLines = new THREE.Mesh( geometryLines, materialLines );
-				meshLines.position.x = -150;
-				scene.add( meshLines );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = -150;
+				scene.add( mesh );
 
 				//
 
-				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
-				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+				geometry = new THREE.BoxBufferGeometry( size, size, size );
+				geometry = geometry.toNonIndexed();
 
-				// wireframe using gl.TRIANGLES (interpreted as triangles)
+				setupAttributes( geometry );
 
-				var attributesTris = { center: { type: 'v3', boundTo: 'faceVertices', value: [] } };
-				var valuesTris = attributesTris.center.value;
+				material = new THREE.ShaderMaterial( {
+					uniforms: {},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+				} );
 
-				setupAttributes( geometryTris, valuesTris );
+				material.extensions.derivatives = true;
 
-				var materialTris = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesTris, vertexShader: vertexShader, fragmentShader: fragmentShader } );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = 150;
+				scene.add( mesh );
 
-				meshTris = new THREE.Mesh( geometryTris, materialTris );
-				meshTris.position.x = 150;
-				scene.add( meshTris );
+				//
 
-				// wireframe using gl.TRIANGLES (mixed triangles and quads)
+				geometry = new THREE.SphereBufferGeometry( size / 2, 32, 16 );
+				geometry = geometry.toNonIndexed();
 
-				var mixedGeometry = new THREE.SphereGeometry( size / 2, 32, 16 );
+				setupAttributes( geometry );
 
-				var attributesMixed = { center: { type: 'v3', boundTo: 'faceVertices', value: [] } };
-				var valuesMixed = attributesMixed.center.value;
+				material = new THREE.ShaderMaterial( {
+					uniforms: {},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+				} );
 
-				setupAttributes( mixedGeometry, valuesMixed );
+				material.extensions.derivatives = true;
 
-				var materialMixed = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesMixed, vertexShader: vertexShader, fragmentShader: fragmentShader } );
-
-				meshMixed = new THREE.Mesh( mixedGeometry, materialMixed );
-				meshMixed.position.x = -150;
-				scene.add( meshMixed );
-
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = -150;
+				scene.add( mesh );
 
 				// renderer
 
@@ -126,13 +128,26 @@
 
 			}
 
-			function setupAttributes( geometry, values ) {
+			function setupAttributes( geometry ) {
 
-				for( var f = 0; f < geometry.faces.length; f ++ ) {
+				// TODO: Bring back quads
 
-					values[ f ] = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+				var vectors = [
+					new THREE.Vector3( 1, 0, 0 ),
+					new THREE.Vector3( 0, 1, 0 ),
+					new THREE.Vector3( 0, 0, 1 )
+				];
+
+				var position = geometry.attributes.position;
+				var centers = new Float32Array( position.count * 3 );
+
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
+
+					vectors[ i % 3 ].toArray( centers, i * 3 );
 
 				}
+
+				geometry.addAttribute( 'center', new THREE.BufferAttribute( centers, 3 ) );
 
 			}
 
@@ -149,16 +164,11 @@
 
 				requestAnimationFrame( animate );
 
-				meshLines.rotation.x += 0.005;
-				meshLines.rotation.y += 0.01;
+				for ( var i = 0; i < scene.children.length; i ++ ) {
 
-				meshTris.rotation.x += 0.005;
-				meshTris.rotation.y += 0.01;
-
-				if ( meshMixed ) {
-
-					meshMixed.rotation.x += 0.005;
-					meshMixed.rotation.y += 0.01;
+					var object = scene.children[ i ];
+					object.rotation.x += 0.005;
+					object.rotation.y += 0.01;
 
 				}
 

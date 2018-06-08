@@ -1,11 +1,18 @@
-/**************************************************************
- *	Arc curve
- **************************************************************/
+import { EllipseCurve } from './EllipseCurve.js';
 
-THREE.ArcCurve = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
-	THREE.EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
-};
+function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
-THREE.ArcCurve.prototype = Object.create( THREE.EllipseCurve.prototype );
-THREE.ArcCurve.prototype.constructor = THREE.ArcCurve;
+	EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
+	this.type = 'ArcCurve';
+
+}
+
+ArcCurve.prototype = Object.create( EllipseCurve.prototype );
+ArcCurve.prototype.constructor = ArcCurve;
+
+ArcCurve.prototype.isArcCurve = true;
+
+
+export { ArcCurve };

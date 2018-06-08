@@ -34,10 +34,10 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - effects - stereo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - stereo. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/effects/StereoEffect.js"></script>
 
@@ -75,18 +75,17 @@
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
-				var path = "textures/cube/skybox/";
-				var format = '.jpg';
-				var urls = [
-					path + 'px' + format, path + 'nx' + format,
-					path + 'py' + format, path + 'ny' + format,
-					path + 'pz' + format, path + 'nz' + format
-				];
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+				textureCube.mapping = THREE.CubeRefractionMapping;
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
 
 				for ( var i = 0; i < 500; i ++ ) {
@@ -102,23 +101,6 @@
 
 				}
 
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
-				scene.add( mesh );
-
 				//
 
 				renderer = new THREE.WebGLRenderer();
@@ -126,7 +108,6 @@
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.StereoEffect( renderer );
-				effect.eyeSeparation = 10;
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//
@@ -137,8 +118,8 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

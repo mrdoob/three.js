@@ -11,11 +11,26 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			#info {
+				position: absolute;
+				color: #fff;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				text-align:center;
+			}
+			a {
+				color: #fff;
+			}
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - ConvexGeometry</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/QuickHull.js"></script>
 		<script src="js/geometries/ConvexGeometry.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -24,106 +39,103 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
-
-			var camera, scene, renderer;
+			var group, camera, scene, renderer;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.y = 400;
-
 				scene = new THREE.Scene();
-
-				var light, object, materials;
-
-				scene.add( new THREE.AmbientLight( 0x404040 ) );
-
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
-
-				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
-				map.wrapS = map.wrapT = THREE.RepeatWrapping;
-				map.anisotropy = 16;
-
-				materials = [
-					new THREE.MeshLambertMaterial( { map: map } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
-				];
-
-
-				// tetrahedron
-
-				var points = [
-					new THREE.Vector3( 100, 0, 0 ),
-					new THREE.Vector3( 0, 100, 0 ),
-					new THREE.Vector3( 0, 0, 100 ),
-					new THREE.Vector3( 0, 0, 0 )
-				];
-
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.ConvexGeometry( points ), materials );
-				object.position.set( 0, 0, 0 );
-				scene.add( object );
-
-				// cube
-
-				var points = [
-					new THREE.Vector3( 50, 50, 50 ),
-					new THREE.Vector3( 50, 50, -50 ),
-					new THREE.Vector3( -50, 50, -50 ),
-					new THREE.Vector3( -50, 50, 50 ),
-					new THREE.Vector3( 50, -50, 50 ),
-					new THREE.Vector3( 50, -50, -50 ),
-					new THREE.Vector3( -50, -50, -50 ),
-					new THREE.Vector3( -50, -50, 50 ),
-				];
-
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.ConvexGeometry( points ), materials );
-				object.position.set( -200, 0, -200 );
-				scene.add( object );
-
-				// random convex
-
-				points = [];
-				for ( var i = 0; i < 30; i ++ ) {
-
-					points.push( randomPointInSphere( 50 ) );
-
-				}
-
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.ConvexGeometry( points ), materials );
-				object.position.set( -200, 0, 200 );
-				scene.add( object );
-
-
-				object = new THREE.AxisHelper( 50 );
-				object.position.set( 200, 0, -200 );
-				scene.add( object );
-
-				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
-				object.position.set( 200, 0, 400 );
-				scene.add( object );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				// camera
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 15, 20, 30 );
+				scene.add( camera );
+
+				// controls
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 20;
+				controls.maxDistance = 50;
+				controls.maxPolarAngle = Math.PI / 2;
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				// light
+
+				var light = new THREE.PointLight( 0xffffff, 1 );
+				camera.add( light );
+
+				// helper
+
+				scene.add( new THREE.AxesHelper( 20 ) );
+
+				// textures
+
+				var loader = new THREE.TextureLoader();
+				var texture = loader.load( 'textures/sprites/disc.png' );
+
+				group = new THREE.Group();
+				scene.add( group );
+
+				// points
+
+				var pointsGeometry = new THREE.DodecahedronGeometry( 10 );
+
+				for ( var i = 0; i < pointsGeometry.vertices.length; i ++ ) {
+
+					//pointsGeometry.vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
+
+				}
+
+				var pointsMaterial = new THREE.PointsMaterial( {
+
+					color: 0x0080ff,
+					map: texture,
+					size: 1,
+					alphaTest: 0.5
+
+				} );
+
+				var points = new THREE.Points( pointsGeometry, pointsMaterial );
+				group.add( points );
+
+				// convex hull
+
+				var meshMaterial = new THREE.MeshLambertMaterial( {
+					color: 0xffffff,
+					opacity: 0.5,
+					transparent: true
+				} );
+
+				var meshGeometry = new THREE.ConvexBufferGeometry( pointsGeometry.vertices );
+
+				var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
+				mesh.material.side = THREE.BackSide; // back faces
+				mesh.renderOrder = 0;
+				group.add( mesh );
+
+				var mesh = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
+				mesh.material.side = THREE.FrontSide; // front faces
+				mesh.renderOrder = 1;
+				group.add( mesh );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function randomPoint() {
+
+				return new THREE.Vector3( THREE.Math.randFloat( - 1, 1 ), THREE.Math.randFloat( - 1, 1 ), THREE.Math.randFloat( - 1, 1 ) );
 
 			}
 
@@ -136,43 +148,17 @@
 
 			}
 
-
-			function randomPointInSphere( radius ) {
-
-				return new THREE.Vector3(
-					( Math.random() - 0.5 ) * 2 * radius,
-					( Math.random() - 0.5 ) * 2 * radius,
-					( Math.random() - 0.5 ) * 2 * radius
-				);
-
-			}
-
 			function animate() {
 
 				requestAnimationFrame( animate );
 
+				group.rotation.y += 0.005;
+
 				render();
-				stats.update();
 
 			}
 
 			function render() {
-
-				var timer = Date.now() * 0.0001;
-
-				camera.position.x = Math.cos( timer ) * 800;
-				camera.position.z = Math.sin( timer ) * 800;
-
-				camera.lookAt( scene.position );
-
-				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
-
-					var object = scene.children[ i ];
-
-					object.rotation.x = timer * 5;
-					object.rotation.y = timer * 2.5;
-
-				}
 
 				renderer.render( scene, camera );
 

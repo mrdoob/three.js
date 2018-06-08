@@ -34,9 +34,9 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank">TheGameMaker</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank" rel="noopener">TheGameMaker</a></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -50,12 +50,10 @@
 		<script src="js/postprocessing/FilmPass.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
 			uniform float time;
-			uniform vec2 resolution;
 
 			uniform float fogDensity;
 			uniform vec3 fogColor;
@@ -67,11 +65,11 @@
 
 			void main( void ) {
 
-				vec2 position = -1.0 + 2.0 * vUv;
+				vec2 position = - 1.0 + 2.0 * vUv;
 
 				vec4 noise = texture2D( texture1, vUv );
-				vec2 T1 = vUv + vec2( 1.5, -1.5 ) * time  *0.02;
-				vec2 T2 = vUv + vec2( -0.5, 2.0 ) * time * 0.01;
+				vec2 T1 = vUv + vec2( 1.5, - 1.5 ) * time * 0.02;
+				vec2 T2 = vUv + vec2( - 0.5, 2.0 ) * time * 0.01;
 
 				T1.x += noise.x * 2.0;
 				T1.y += noise.y * 2.0;
@@ -83,9 +81,9 @@
 				vec4 color = texture2D( texture2, T2 * 2.0 );
 				vec4 temp = color * ( vec4( p, p, p, p ) * 2.0 ) + ( color * color - 0.1 );
 
-				if( temp.r > 1.0 ){ temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
-				if( temp.g > 1.0 ){ temp.rb += temp.g - 1.0; }
-				if( temp.b > 1.0 ){ temp.rg += temp.b - 1.0; }
+				if( temp.r > 1.0 ) { temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
+				if( temp.g > 1.0 ) { temp.rb += temp.g - 1.0; }
+				if( temp.b > 1.0 ) { temp.rg += temp.b - 1.0; }
 
 				gl_FragColor = temp;
 
@@ -120,22 +118,11 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container;
 
-			var clock = new THREE.Clock();
+			var camera, scene, renderer, composer, clock;
 
-			var camera, scene, renderer, composer;
-
-			var uniforms, material, mesh;
-
-			var mouseX = 0, mouseY = 0,
-			lat = 0, lon = 0, phy = 0, theta = 0;
-
-			var width = window.innerWidth || 2;
-			var height = window.innerHeight || 2;
-
-			var windowHalfX = width / 2;
-			var windowHalfY = height / 2;
+			var uniforms, mesh;
 
 			init();
 			animate();
@@ -144,20 +131,23 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 35, windowHalfX / windowHalfY, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
 
+				clock = new THREE.Clock();
+
+				var textureLoader = new THREE.TextureLoader();
+
 				uniforms = {
 
-					fogDensity: { type: "f", value: 0.45 },
-					fogColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-					time: { type: "f", value: 1.0 },
-					resolution: { type: "v2", value: new THREE.Vector2() },
-					uvScale: { type: "v2", value: new THREE.Vector2( 3.0, 1.0 ) },
-					texture1: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
-					texture2: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
+					fogDensity: { value: 0.45 },
+					fogColor: { value: new THREE.Vector3( 0, 0, 0 ) },
+					time: { value: 1.0 },
+					uvScale: { value: new THREE.Vector2( 3.0, 1.0 ) },
+					texture1: { value: textureLoader.load( 'textures/lava/cloud.png' ) },
+					texture2: { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
 
 				};
 
@@ -166,7 +156,7 @@
 
 				var size = 0.65;
 
-				material = new THREE.ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -174,7 +164,7 @@
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), material );
+				mesh = new THREE.Mesh( new THREE.TorusBufferGeometry( size, 0.3, 30, 30 ), material );
 				mesh.rotation.x = 0.3;
 				scene.add( mesh );
 
@@ -185,12 +175,6 @@
 				container.appendChild( renderer.domElement );
 				renderer.autoClear = false;
 
-				//
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
 
 				//
 
@@ -216,9 +200,6 @@
 
 			function onWindowResize( event ) {
 
-				uniforms.resolution.value.x = window.innerWidth;
-				uniforms.resolution.value.y = window.innerHeight;
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -235,7 +216,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 

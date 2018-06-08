@@ -3,6 +3,7 @@
 <head>
 	<title>three.js webgl - marching cubes</title>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
 		body {
 		  color: #fff;
@@ -41,11 +42,6 @@
 
 		  display: none;
 		}
-
-		#stats { position: absolute; top:0; left: 0 }
-		#stats #fps { background: transparent !important }
-		#stats #fps #fpsText { color: #aaa !important }
-		#stats #fps #fpsGraph { display: none }
 	</style>
 </head>
 
@@ -53,12 +49,12 @@
 
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> -
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		marching cubes -
-		[based on greggman's <a href="http://webglsamples.googlecode.com/hg/blob/blob.html">blob</a>, original code by Henrik Rydgård]
+		[based on greggman's <a href="https://webglsamples.org/blob/blob.html">blob</a>, original code by Henrik Rydgård]
 	</div>
 
-	<script src="../build/three.min.js"></script>
+	<script src="../build/three.js"></script>
 
 	<script src="js/controls/OrbitControls.js"></script>
 
@@ -122,6 +118,7 @@
 			// SCENE
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x050505 );
 
 			// LIGHTS
 
@@ -158,7 +155,6 @@
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -180,14 +176,14 @@
 			// STATS
 
 			stats = new Stats();
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			// COMPOSER
 
 			renderer.autoClear = false;
 
 			var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-			renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+			var renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 			effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
@@ -202,8 +198,6 @@
 			hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5;
 
 			effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
-
-			composer = new THREE.EffectComposer( renderer, renderTarget );
 
 			var renderModel = new THREE.RenderPass( scene, camera );
 
@@ -261,11 +255,14 @@
 				path + 'pz' + format, path + 'nz' + format
 			];
 
-			var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+			var cubeTextureLoader = new THREE.CubeTextureLoader();
+
+			var reflectionCube = cubeTextureLoader.load( urls );
 			reflectionCube.format = THREE.RGBFormat;
 
-			var refractionCube = new THREE.Texture( reflectionCube.image, THREE.CubeRefractionMapping );
+			var refractionCube = cubeTextureLoader.load( urls );
 			reflectionCube.format = THREE.RGBFormat;
+			refractionCube.mapping = THREE.CubeRefractionMapping;
 
 			// toons
 
@@ -285,7 +282,7 @@
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
 			dottedMaterial2.uniforms.uLineColor1.value.setHSL( 0.05, 1.0, 0.5 );
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" );
+			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 			var materials = {
@@ -304,7 +301,7 @@
 
 			"shiny"  :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0x440000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3, metal: true } ),
+				m: new THREE.MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
 				h: 0, s: 0.8, l: 0.2
 			},
 
@@ -316,7 +313,7 @@
 
 			"flat" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, flatShading: true } ),
 				h: 0, s: 0, l: 1
 			},
 
@@ -422,25 +419,8 @@
 					m_s.setValue( mat.s );
 					m_l.setValue( mat.l );
 
-					if ( current_material === "textured" ) {
-
-						effect.enableUvs = true;
-
-					} else {
-
-						effect.enableUvs = false;
-
-					}
-
-					if ( current_material === "colors" ) {
-
-						effect.enableColors = true;
-
-					} else {
-
-						effect.enableColors = false;
-
-					}
+					effect.enableUvs = (current_material === "textured") ? true : false;
+					effect.enableColors = (current_material === "colors") ? true : false;
 
 				};
 
@@ -523,7 +503,7 @@
 
 			h.add( effectController, "speed", 0.1, 8.0, 0.05 );
 			h.add( effectController, "numBlobs", 1, 50, 1 );
-			h.add( effectController, "resolution", 14, 40, 1 );
+			h.add( effectController, "resolution", 14, 100, 1 );
 			h.add( effectController, "isolation", 10, 300, 1 );
 
 			h.add( effectController, "floor" );
@@ -584,14 +564,12 @@
 
 			time += delta * effectController.speed * 0.5;
 
-			controls.update( delta );
-
 			// marching cubes
 
 			if ( effectController.resolution !== resolution ) {
 
 				resolution = effectController.resolution;
-				effect.init( resolution );
+				effect.init( Math.floor( resolution ) );
 
 			}
 
@@ -613,7 +591,7 @@
 
 				} else if ( current_material === "hatching2" ) {
 
-					u = effect.material.uniforms;
+					var u = effect.material.uniforms;
 
 					u.uLineColor1.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 					u.uLineColor2.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );

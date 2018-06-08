@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing procedural effects</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				margin: 0px;
+				text-align:center;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Procedural Effects Example by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+		</div>
+
+		<script id="procedural-vert" type="x-shader/x-vertex">
+			varying vec2 vUv;
+
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+			}
+		</script>
+		<script id="noiseRandom1D-frag" type="x-shader/x-fragment">
+		#include <common>
+		#include <packing>
+
+			varying vec2 vUv;
+
+			void main() {
+				gl_FragColor.xyz = vec3( rand( vUv ) );
+				gl_FragColor.w = 1.0;
+			}
+		</script>
+		<script id="noiseRandom2D-frag" type="x-shader/x-fragment">
+			#include <common>
+			#include <packing>
+
+			varying vec2 vUv;
+
+			void main() {
+				vec2 rand2 = vec2( rand( vUv ), rand( vUv + vec2( 0.4, 0.6 ) ) );
+				gl_FragColor.xyz = mix( mix( vec3( 1.0, 1.0, 1.0 ), vec3( 0.0, 0.0, 1.0 ), rand2.x ), vec3( 0.0 ), rand2.y );
+				gl_FragColor.w = 1.0;
+			}
+		</script>
+		<script id="noiseRandom3D-frag" type="x-shader/x-fragment">
+			#include <common>
+			#include <packing>
+
+			varying vec2 vUv;
+
+			void main() {
+				vec3 rand3 = vec3( rand( vUv ), rand( vUv + vec2( 0.4, 0.6 ) ), rand( vUv + vec2( 0.6, 0.4 ) ) );
+				gl_FragColor.xyz = rand3;
+				gl_FragColor.w = 1.0;
+			}
+		</script>
+
+		<div id="container"></div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+
+		<script>
+
+			var camera, postScene, renderer, postMaterial, noiseRandom1DMaterial, noiseRandon2DMaterial, noiseRandom3DMaterial, postQuad;
+			var gui, stats, texture;
+
+			var params = { procedure: 'noiseRandom3D' };
+
+			init();
+			animate();
+			initGui();
+
+			// Init gui
+			function initGui() {
+
+				var gui = new dat.GUI();
+				gui.add( params, 'procedure', [ 'noiseRandom1D', 'noiseRandom2D', 'noiseRandom3D' ] );
+
+			}
+
+			function init() {
+
+				var container = document.getElementById( "container" );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				// Setup post processing stage
+				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				noiseRandom1DMaterial = new THREE.ShaderMaterial({
+					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
+					fragmentShader: document.querySelector( '#noiseRandom1D-frag' ).textContent.trim()
+				});
+				noiseRandom2DMaterial = new THREE.ShaderMaterial({
+					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
+					fragmentShader: document.querySelector( '#noiseRandom2D-frag' ).textContent.trim()
+				});
+				noiseRandom3DMaterial = new THREE.ShaderMaterial({
+					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
+					fragmentShader: document.querySelector( '#noiseRandom3D-frag' ).textContent.trim()
+				});
+				postMaterial = noiseRandom3DMaterial;
+				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
+				postQuad = new THREE.Mesh( postPlane, postMaterial );
+				postScene = new THREE.Scene();
+				postScene.add(postQuad);
+
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				postCamera.aspect = width / height;
+				postCamera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				this.index = this.index || 0;
+
+				requestAnimationFrame( animate );
+
+				this.index ++;
+
+				switch ( params.procedure ) {
+
+					case 'noiseRandom1D': postMaterial = noiseRandom1DMaterial; break;
+					case 'noiseRandom2D': postMaterial = noiseRandom2DMaterial; break;
+					case 'noiseRandom3D': postMaterial = noiseRandom3DMaterial; break;
+
+				}
+
+				postQuad.material = postMaterial;
+
+
+				// render post FX
+				renderer.render( postScene, postCamera );
+
+				stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -35,11 +35,11 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - normal material.<br />
-			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - normal material.<br />
+			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -62,7 +62,7 @@
 				scene = new THREE.Scene();
 
 				loader = new THREE.JSONLoader();
-				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+				loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial( { overdraw: 0.5 } ) );
 					scene.add( mesh );

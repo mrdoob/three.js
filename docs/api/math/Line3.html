@@ -2,132 +2,119 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A geometric line segment represented by a start and end point.</div>
+		<p class="desc">A geometric line segment represented by a start and end point.</p>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Vector3 start], [page:Vector3 end])</h3>
-		<div>
-		start -- [page:Vector3] Start of the line segment<br />
-		end -- [page:Vector3] End of the line segment
-		</div>
-		<div>
-		The start and end vectors default to origin vectors if none are set.
-		</div>
+		<h3>[name]( [param:Vector3 start], [param:Vector3 end] )</h3>
+		<p>
+		[page:Vector3 start] - Start of the line segment. Default is (0, 0, 0).<br />
+		[page:Vector3 end] - End of the line segment. Default is (0, 0, 0).<br /><br />
+
+		Creates a new [name].
+		</p>
 
 
 		<h2>Properties</h2>
 
-
-
 		<h3>[property:Vector3 start]</h3>
+		<p>[page:Vector3] representing the start point of the line.</p>
 
 		<h3>[property:Vector3 end]</h3>
+		<p>[page:Vector3] representing the end point of the line.</p>
+
+
+
+
 
 		<h2>Methods</h2>
 
+		<h3>[method:Line3 applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>Applies a matrix transform to the line segment.</p>
 
+		<h3>[method:Vector3 at]( [param:Float t], [param:Vector3 target] )</h3>
+		<p>
+		[page:Float t] - Use values 0-1 to return a position along the line segment. <br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		<h3>[method:Line3 set]([page:Vector3 start], [page:Vector3 end])</h3>
-		<div>
-		start -- [page:Vector3] <br />
-		end -- [page:Vector3]
-		</div>
-		<div>
-		Sets the start and end values by copying the provided vectors.
-		</div>
-
-		<h3>[method:Line3 copy]([page:Line3 line])</h3>
-		<div>
-		line -- [page:Line3]
-		</div>
-		<div>
-		Copies the passed line's start and end vectors to this line.
-		</div>
+		Returns a vector at a certain position along the line. When [page:Float t] = 0, it returns the start vector,
+		and when [page:Float t] = 1 it returns the end vector.<br />
+		</p>
 
 		<h3>[method:Line3 clone]()</h3>
-		<div>
-		Return a new copy of this [page:Line3].
-		</div>
+		<p>Returns a new [page:Line3] with the same [page:.start start] and [page:.end end] vectors as this one.</p>
 
-		<h3>[method:Boolean equals]([page:Line3 line])</h3>
-		<div>
-		line -- [page:Line3]
-		</div>
-		<div>
+		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Boolean clampToLine], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - return the closest point on the line to this point.<br />
+		[page:Boolean clampToLine] - whether to clamp the returned value to the line segment.<br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+
+		Returns the closets point on the line. If [page:Boolean clampToLine] is true, then the returned value will be
+		clamped to the line segment.
+		</p>
+
+		<h3>[method:Float closestPointToPointParameter]( [param:Vector3 point], [param:Boolean clampToLine] )</h3>
+		<p>
+		[page:Vector3 point] - the point for which to return a point parameter. <br />
+		[page:Boolean clampToLine] - Whether to clamp the result to the range [0, 1].<br /><br />
+
+		Returns a point parameter based on the closest point as projected on the line segement.
+		If [page:Boolean clampToLine] is true, then the returned value will be between 0 and 1.
+		</p>
+
+		<h3>[method:Line3 copy]( [param:Line3 line] )</h3>
+		<p>Copies the passed line's [page:.start start] and [page:.end end] vectors to this line.</p>
+
+		<h3>[method:Vector3 delta]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+
+			Returns the delta vector of the line segment ( [page:.end end] vector minus the [page:.start start] vector).
+		</p>
 
 		<h3>[method:Float distance]()</h3>
-		<div>
-		Returns the length of the line segment.
-		</div>
-		Returns true if both line's start and end points are equal.
-		</div>
-		
+		<p>Returns the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
+		(straight-line distance) between the line's [page:.start start] and [page:.end end] points.</p>
+
 		<h3>[method:Float distanceSq]()</h3>
-		<div>
-		Returns the line segment's length squared.
-		</div>
+		<p>
+			Returns the square of the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
+			(straight-line distance) between the line's [page:.start start]
+			and [page:.end end] vectors.
+		</p>
 
-		<h3>[method:Line3 applyMatrix4]([page:Matrix4 matrix]) [page:Line3 this]</h3>
-		<div>
-		matrix -- [page:Matrix4]
-		</div>
-		<div>
-		Apply a matrix transform to the line segment.
-		</div>
+		<h3>[method:Boolean equals]( [param:Line3 line] )</h3>
+		<p>
+		[page:Line3 line]  - [page:Line3] to compare with this one.<br /><br />
 
-		<h3>[method:Vector at]([page:Float t], [page:Vector3 optionalTarget])</h3>
-		<div>
-		t -- [page:Float] Use values 0-1 to return a result on the line segment. <br />
-		optionalTarget -- [page:Vector] Optional target to set the result.
-		</div>
-		<div>
-		Return a vector at a certain position along the line. When t = 0, it returns the start vector, and when t=1 it returns the end vector.
-		</div>
-		
-		<h3>[method:Vector3 center]([page:Vector3 optionalTarget])</h3>
-		<div>
-		optionalTarget -- [page:Vector3] Optional target to set the result.
-		</div>
-		<div>
-		Return the center of the line segment.
-		</div>
+		Returns true if both line's [page:.start start] and [page:.end en] points are equal.
+		</p>
 
-		<h3>[method:Vector3 delta]([page:Vector3 optionalTarget])</h3>
-		<div>
-		optionalTarget -- [page:Vector3] Optional target to set the result.
-		</div>
-		<div>
-		Returns the delta vector of the line segment, or the end vector minus the start vector.
-		</div>
+		<h3>[method:Vector3 getCenter]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		<h3>[method:Vector3 closestPointToPoint]([page:Vector3 point], [page:Boolean clampToLine], [page:Vector3 optionalTarget])</h3>
-		<div>
-		point -- [page:Vector3] <br />
-		clampToLine -- [page:Boolean] <br />
-		optionalTarget -- [page:Vector3] Optional target to set the result.
-		</div>
-		<div>
-		Returns the closets point on the line. If clamp to line is true, then the returned value will be clamped to the line segment.
-		</div>
+		Returns the center of the line segment.
+		</p>
 
-		<h3>[method:Float closestPointToPointParameter]([page:Vector3 point], [page:Boolean clampToLine])</h3>
-		<div>
-		point -- [page:Vector3] <br />
-		clampToLine -- [page:Boolean]
-		</div>
-		<div>
-		Returns a point parameter based on the closest point as projected on the line segement. If clamp to line is true, then the returned value will be between 0 and 1.
-		</div>
+		<h3>[method:Line3 set]( [param:Vector3 start], [param:Vector3 end] )</h3>
+		<p>
+		[page:Vector3 start] - set the [page:.start start point] of the line.<br />
+		[page:Vector3 end] - set the [page:.end end point] of the line.<br /><br />
+
+		Sets the start and end values by copying the provided vectors.
+		</p>
 
 		<h2>Source</h2>
 

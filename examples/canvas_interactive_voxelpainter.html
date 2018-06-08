@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -46,7 +46,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - voxel painter<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel, <a href="javascript:save()">save .png</a>';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - voxel painter<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel, <a href="javascript:save()">save .png</a>';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -54,27 +54,12 @@
 				camera.lookAt( new THREE.Vector3() );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// Grid
 
-				var size = 500, step = 50;
-
-				var geometry = new THREE.Geometry();
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
-
-				}
-
-				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
-
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
-				scene.add( line );
+				var gridHelper = new THREE.GridHelper( 1000, 20 );
+				scene.add( gridHelper );
 
 				//
 
@@ -82,10 +67,9 @@
 				mouse = new THREE.Vector2();
 
 				var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				geometry.rotateX( - Math.PI / 2 );
 
-				plane = new THREE.Mesh( geometry );
-				plane.visible = false;
+				plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
 				scene.add( plane );
 
 				objects.push( plane );
@@ -112,7 +96,6 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild(renderer.domElement);
@@ -142,8 +125,8 @@
 
 				event.preventDefault();
 
-				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
-				mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+				mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
 
 				raycaster.setFromCamera( mouse, camera );
 

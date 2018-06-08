@@ -6,36 +6,39 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
+				background:#777;
+				padding:0;
+				margin:0;
+				overflow:hidden;
 			}
 
 			#info {
-				color: #fff;
 				position: absolute;
-				top: 10px;
+				top: 0px;
 				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
 			}
 
-			a { color: skyblue }
+			a {
+				color: #ffffff;
+			}
 		</style>
 	</head>
 	<body>
+
+		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> -
-			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader
+			| Elf Girl by <a href="https://sketchfab.com/yellow09" target="_blank" rel="noopener">halloween</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/ColladaLoader.js"></script>
-
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -43,97 +46,61 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container, stats, clock;
+			var camera, scene, renderer, elf;
 
-			var camera, scene, renderer, objects;
-			var particleLight;
-			var dae;
-
-			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
-			loader.load( './models/collada/monster/monster.dae', function ( collada ) {
-
-				dae = collada.scene;
-
-				dae.traverse( function ( child ) {
-
-					if ( child instanceof THREE.SkinnedMesh ) {
-
-						var animation = new THREE.Animation( child, child.geometry.animation );
-						animation.play();
-
-					}
-
-				} );
-
-				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
-				dae.updateMatrix();
-
-				init();
-				animate();
-
-			} );
+			init();
+			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 2, 2, 3 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera.position.set( 8, 10, 8 );
+				camera.lookAt( new THREE.Vector3( 0, 3, 0 ) );
 
 				scene = new THREE.Scene();
 
-				// Grid
+				clock = new THREE.Clock();
 
-				var size = 14, step = 1;
+				// loading manager
 
-				var geometry = new THREE.Geometry();
-				var material = new THREE.LineBasicMaterial( { color: 0x303030 } );
+				var loadingManager = new THREE.LoadingManager( function() {
 
-				for ( var i = - size; i <= size; i += step ) {
+					scene.add( elf );
 
-					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
+				} );
 
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
+				// collada
 
-				}
+				var loader = new THREE.ColladaLoader( loadingManager );
+				loader.load( './models/collada/elf/elf.dae', function ( collada ) {
 
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
-				scene.add( line );
+					elf = collada.scene;
 
-				// Add the COLLADA
+				} );
 
-				scene.add( dae );
+				//
 
-				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-				scene.add( particleLight );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
-				// Lights
-
-				scene.add( new THREE.AmbientLight( 0xcccccc ) );
-
-				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				directionalLight.position.set( 1, 1, 0 ).normalize();
 				scene.add( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 4 );
-				particleLight.add( pointLight );
+				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				//
+
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -150,8 +117,6 @@
 
 			}
 
-			//
-
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -161,23 +126,15 @@
 
 			}
 
-			var clock = new THREE.Clock();
-
 			function render() {
 
-				var timer = Date.now() * 0.0005;
+				var delta = clock.getDelta();
 
-				camera.position.x = Math.cos( timer ) * 10;
-				camera.position.y = 2;
-				camera.position.z = Math.sin( timer ) * 10;
+				if ( elf !== undefined ) {
 
-				camera.lookAt( scene.position );
+					elf.rotation.z += delta * 0.5;
 
-				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
-				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
-				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
-
-				THREE.AnimationHandler.update( clock.getDelta() );
+				}
 
 				renderer.render( scene, camera );
 

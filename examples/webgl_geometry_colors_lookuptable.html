@@ -33,14 +33,13 @@
 
 	<body>
 
-
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - lookuptable - vertex color values from a range of data values.</br>
-		press A: change color map, press S: change numberOfColors, press D: toggle Legend on/off, press F: change Legend layout</br>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lookuptable - vertex color values from a range of data values.<br />
+		press A: change color map, press S: change numberOfColors, press D: toggle Legend on/off, press F: change Legend layout<br />
 		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/math/Lut.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -69,6 +68,7 @@
 
 				// SCENE
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				// CAMERA
 				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -76,10 +76,7 @@
 				scene.add( camera );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.bottom = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// LIGHT
 				var ambientLight = new THREE.AmbientLight( 0x444444 );
@@ -105,14 +102,13 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize(  window.innerWidth,  window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				window.addEventListener( "keypress", onKeyPress, true);
+				window.addEventListener( "keydown", onKeyDown, true);
 
 			}
 
@@ -158,6 +154,8 @@
 
 			}
 
+			var center = new THREE.Vector3();
+
 			function loadModel ( colorMap, numberOfColors, legendLayout ) {
 
 				var loader = new THREE.BufferGeometryLoader();
@@ -170,9 +168,7 @@
 					var material = new THREE.MeshLambertMaterial( {
 
 						side: THREE.DoubleSide,
-						specular: 0xF5F5F5,
 						color: 0xF5F5F5,
-						shininess: 5,
 						vertexColors: THREE.VertexColors
 
 					} );
@@ -188,7 +184,7 @@
 
 						var colorValue = geometry.attributes.pressure.array[ i ];
 
-						color = lut.getColor( colorValue );
+						var color = lut.getColor( colorValue );
 
 						if ( color == undefined ) {
 
@@ -210,7 +206,7 @@
 
 					geometry.computeBoundingBox();
 					var boundingBox = geometry.boundingBox;
-					var center = boundingBox.center();
+					boundingBox.getCenter( center );
 
 					if ( position === undefined ) {
 
@@ -222,13 +218,13 @@
 
 					if ( legendLayout ) {
 
+						var legend;
+
 						if ( legendLayout == 'horizontal' ) {
 
 							legend = lut.setLegendOn( { 'layout':'horizontal', 'position': { 'x': 21, 'y': 6, 'z': 5 } } );
 
-						}
-
-						else {
+						} else {
 
 							legend = lut.setLegendOn();
 
@@ -272,13 +268,13 @@
 			}
 
 
-			function onKeyPress ( e ) {
+			function onKeyDown ( e ) {
 
 				var maps = [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ];
 
 				var colorNumbers = ['16', '128', '256', '512' ];
 
-				if ( e.keyCode == 97 ) {
+				if ( e.keyCode == 65 ) {
 
 					cleanScene();
 
@@ -288,7 +284,7 @@
 
 					loadModel ( colorMap, numberOfColors, legendLayout );
 
-				} else if ( e.keyCode == 115 ) {
+				} else if ( e.keyCode == 83 ) {
 
 					cleanScene();
 
@@ -298,7 +294,7 @@
 
 					loadModel ( colorMap ,  numberOfColors, legendLayout );
 
-				} else if ( e.keyCode == 100 ) {
+				} else if ( e.keyCode == 68 ) {
 
 					if ( ! legendLayout ) {
 
@@ -318,7 +314,7 @@
 
 					}
 
-				} else if ( e.keyCode == 102 ) {
+				} else if ( e.keyCode == 70 ) {
 
 					cleanScene();
 

@@ -30,51 +30,49 @@
 	<body>
 
 		<div class="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> webgl scene transitions - by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions - by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
 		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/crossfade/scenes.js"></script>
 		<script src="js/crossfade/gui.js"></script>
 		<script src="js/crossfade/transition.js"></script>
-		
+		<script src="js/BufferGeometryUtils.js"></script>
+
 		<script>
 
 			var container, stats;
 			var renderer;
 			var transition;
-			
+
 			var clock = new THREE.Clock();
 
 			init();
 			animate();
-			
+
 			function init() {
 
 				initGUI();
-				
+
 				container = document.getElementById( "container" );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
-				sceneA = new Scene( "cube", 5000, 1200, 120, new THREE.Vector3(0,-0.4,0), 0xffffff );
-				sceneB = new Scene( "sphere", 500, 2000, 50, new THREE.Vector3(0,0.2,0.1), 0x000000 );
-				
+				var sceneA = new Scene( "cube", 5000, 1200, 120, new THREE.Vector3(0,-0.4,0), 0xffffff );
+				var sceneB = new Scene( "sphere", 500, 2000, 50, new THREE.Vector3(0,0.2,0.1), 0x000000 );
+
 				transition = new Transition(sceneA,sceneB);
-				
+
 			}
 
 			function animate() {
@@ -85,15 +83,15 @@
 				stats.update();
 
 			}
-			
+
 			function render() {
-				
+
 				transition.render( clock.getDelta() );
-				
+
 			}
 
 		</script>
 
 	</body>
-	
+
 </html>

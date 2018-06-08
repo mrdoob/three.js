@@ -29,31 +29,28 @@
 			}
 
 			b { color: lightgreen }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #777 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - cameras<br/>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras<br/>
 		<b>O</b> orthographic <b>P</b> perspective
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
+			var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
 			var container, stats;
 			var camera, scene, renderer, mesh;
 			var cameraRig, activeCamera, activeHelper;
 			var cameraPerspective, cameraOrtho;
 			var cameraPerspectiveHelper, cameraOrthoHelper;
+			var frustumSize = 600;
 
 			init();
 			animate();
@@ -67,17 +64,16 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 1, 10000 );
 				camera.position.z = 2500;
 
-				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 150, 1000 );
+				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 150, 1000 );
 
 				cameraPerspectiveHelper = new THREE.CameraHelper( cameraPerspective );
 				scene.add( cameraPerspectiveHelper );
 
 				//
-
-				cameraOrtho = new THREE.OrthographicCamera( 0.5 * SCREEN_WIDTH / - 2, 0.5 * SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, 150, 1000 );
+				cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000 );
 
 				cameraOrthoHelper = new THREE.CameraHelper( cameraOrtho );
 				scene.add( cameraOrthoHelper );
@@ -93,7 +89,7 @@
 				cameraOrtho.rotation.y = Math.PI;
 				cameraPerspective.rotation.y = Math.PI;
 
-				cameraRig = new THREE.Object3D();
+				cameraRig = new THREE.Group();
 
 				cameraRig.add( cameraPerspective );
 				cameraRig.add( cameraOrtho );
@@ -102,33 +98,42 @@
 
 				//
 
-				mesh = new THREE.Mesh( new THREE.SphereGeometry( 100, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } ) );
+				mesh = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 100, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
+				);
 				scene.add( mesh );
 
-				var mesh2 = new THREE.Mesh( new THREE.SphereGeometry( 50, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } ) );
+				var mesh2 = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 50, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
+				);
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
-				var mesh3 = new THREE.Mesh( new THREE.SphereGeometry( 5, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } ) );
+				var mesh3 = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 5, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
+				);
 				mesh3.position.z = 150;
 				cameraRig.add( mesh3 );
 
 				//
 
-				var geometry = new THREE.Geometry();
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					var vertex = new THREE.Vector3();
-					vertex.x = THREE.Math.randFloatSpread( 2000 );
-					vertex.y = THREE.Math.randFloatSpread( 2000 );
-					vertex.z = THREE.Math.randFloatSpread( 2000 );
-
-					geometry.vertices.push( vertex );
+					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // x
+					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // y
+					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // z
 
 				}
 
-				var particles = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { color: 0x888888 } ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
@@ -137,7 +142,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
 				renderer.autoClear = false;
@@ -145,7 +149,7 @@
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -176,7 +180,7 @@
 
 				}
 
-			};
+			}
 
 			//
 
@@ -184,19 +188,20 @@
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
+				aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				camera.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = 0.5 * aspect;
 				camera.updateProjectionMatrix();
 
-				cameraPerspective.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+				cameraPerspective.aspect = 0.5 * aspect;
 				cameraPerspective.updateProjectionMatrix();
 
-				cameraOrtho.left   = - 0.5 * SCREEN_WIDTH / 2;
-				cameraOrtho.right  =   0.5 * SCREEN_WIDTH / 2;
-				cameraOrtho.top    =   SCREEN_HEIGHT / 2;
-				cameraOrtho.bottom = - SCREEN_HEIGHT / 2;
+				cameraOrtho.left   = - 0.5 * frustumSize * aspect / 2;
+				cameraOrtho.right  =   0.5 * frustumSize * aspect / 2;
+				cameraOrtho.top    =   frustumSize / 2;
+				cameraOrtho.bottom = - frustumSize / 2;
 				cameraOrtho.updateProjectionMatrix();
 
 			}

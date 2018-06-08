@@ -35,11 +35,11 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - point lights demo.<br />
-			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - point lights demo.<br />
+			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -80,7 +80,7 @@
 					context.arc( 0, 0, 0.5, 0, PI2, true );
 					context.fill();
 
-				}
+				};
 
 				var sprite = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0xff0040, program: program } ) );
 				light1.add( sprite );
@@ -92,9 +92,9 @@
 				light3.add( sprite );
 
 				loader = new THREE.JSONLoader();
-				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+				loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ) );
 					scene.add( mesh );
 
 				} );

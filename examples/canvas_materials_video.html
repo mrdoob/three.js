@@ -15,14 +15,14 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
-		<video id="video" autoplay style="display:none">
+		<video id="video" autoplay loop crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 		</video>
@@ -60,13 +60,14 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - video demo. playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				video = document.getElementById( 'video' );
 
@@ -138,27 +139,24 @@
 
 					for ( var iy = 0; iy < amounty; iy++ ) {
 
-						particle = new THREE.Sprite( material );
-						particle.position.x = ix * separation - ( ( amountx * separation ) / 2 );
-						particle.position.y = -153
-						particle.position.z = iy * separation - ( ( amounty * separation ) / 2 );
-						particle.scale.x = particle.scale.y = 2;
-						scene.add( particle );
+						var sprite = new THREE.Sprite( material );
+						sprite.position.x = ix * separation - ( ( amountx * separation ) / 2 );
+						sprite.position.y = -153;
+						sprite.position.z = iy * separation - ( ( amounty * separation ) / 2 );
+						sprite.scale.setScalar( 2 );
+						scene.add( sprite );
 
 					}
 
 				}
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 

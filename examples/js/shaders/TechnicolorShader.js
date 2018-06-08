@@ -11,7 +11,7 @@ THREE.TechnicolorShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
+		"tDiffuse": { value: null }
 
 	},
 
@@ -26,7 +26,7 @@ THREE.TechnicolorShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -42,6 +42,6 @@ THREE.TechnicolorShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
 		<title>three.js / examples</title>
+		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 
@@ -13,7 +13,7 @@
 				font-style: normal;
 			}
 
-			*{
+			* {
 				box-sizing: border-box;
 			}
 
@@ -59,23 +59,24 @@
 				background: #fafafa;
 			}
 
-				#panel #content {
-					padding: 0px 20px;
-				}
+			#panel #content {
+				padding: 0px 20px 20px 20px;
+			}
 
-				#panel #content .link {
-					color: #2194CE;
-					text-decoration: none;
-					cursor: pointer;
-				}
+			#panel #content .link {
+				color: #2194CE;
+				text-decoration: none;
+				cursor: pointer;
+				display: block;
+			}
 
-				#panel #content .selected {
-					color: #ff0000;
-				}
+			#panel #content .selected {
+				color: #ff0000;
+			}
 
-					#panel #content .link:hover {
-						text-decoration: underline;
-					}
+			#panel #content .link:hover {
+				text-decoration: underline;
+			}
 
 			#viewer {
 				position: absolute;
@@ -86,9 +87,9 @@
 				overflow: auto;
 			}
 
-			#button {
+			#viewSrcButton {
 				position: fixed;
-				top: 20px;
+				bottom: 20px;
 				right: 20px;
 				padding: 8px;
 				color: #fff;
@@ -96,10 +97,59 @@
 				opacity: 0.7;
 			}
 
-				#button:hover {
-					cursor: pointer;
-					opacity: 1;
-				}
+			#viewSrcButton:hover {
+				cursor: pointer;
+				opacity: 1;
+			}
+
+			.filterBlock{
+				margin: 20px;
+				position: relative;
+			}
+
+			.filterBlock p {
+				margin: 0;
+			}
+
+			#filterInput {
+				width: 100%;
+				padding: 5px;
+				font-family: inherit;
+				font-size: 15px;
+				outline: none;
+				border: 1px solid #dedede;
+			}
+
+			#filterInput:focus{
+				border: 1px solid #2194CE;
+			}
+
+			#clearFilterButton {
+				position: absolute;
+				right: 6px;
+				top: 50%;
+				margin-top: -8px;
+				width: 16px;
+				height: 16px;
+				font-size: 14px;
+				color: grey;
+				text-align: center;
+				line-height: 0;
+				padding-top: 7px;
+				opacity: .5;
+			}
+
+			#clearFilterButton:hover {
+				opacity: 1;
+			}
+
+			.filtered {
+				display: none !important;
+			}
+
+			#panel li b {
+				font-weight: bold;
+			}
 
 			/* mobile */
 
@@ -112,22 +162,22 @@
 				height: 32px;
 			}
 
-				#expandButton span {
-					height: 2px;
-					background-color: #2194CE;
-					width: 16px;
-					position: absolute;
-					left: 8px;
-					top: 10px;
-				}
+			#expandButton span {
+				height: 2px;
+				background-color: #2194CE;
+				width: 16px;
+				position: absolute;
+				left: 8px;
+				top: 10px;
+			}
 
-				#expandButton span:nth-child(1) {
-					top: 16px;
-				}
+			#expandButton span:nth-child(1) {
+				top: 16px;
+			}
 
-				#expandButton span:nth-child(2) {
-					top: 22px;
-				}
+			#expandButton span:nth-child(2) {
+				top: 22px;
+			}
 
 			@media all and ( max-width: 640px ) {
 				h1{
@@ -148,7 +198,7 @@
 				#content{
 					position: absolute;
 					left: 0;
-					top: 60px;
+					top: 90px;
 					right: 0;
 					bottom: 0;
 					font-size: 17px;
@@ -174,385 +224,260 @@
 	</head>
 	<body>
 
-		<div id="panel" class="collapsed">
+		<div id="panel">
 			<h1><a href="http://threejs.org">three.js</a> / examples</h1>
 			<a id="expandButton" href="#">
 				<span></span>
 				<span></span>
 				<span></span>
 			</a>
+			<div class="filterBlock" >
+				<input type="text" id="filterInput" placeholder="Type to filter" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+				<a href="#" id="clearFilterButton" >x</a>
+			</div>
 			<div id="content"></div>
 		</div>
-		<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
+		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+
+		<script src="files.js"></script>
 
 		<script>
 
-		var files = {
-			"webgl": [
-				"webgl_animation_cloth",
-				"webgl_animation_skinning_blending",
-				"webgl_animation_skinning_morph",
-				"webgl_buffergeometry",
-				"webgl_buffergeometry_custom_attributes_particles",
-				"webgl_buffergeometry_lines",
-				"webgl_buffergeometry_lines_indexed",
-				"webgl_buffergeometry_particles",
-				"webgl_buffergeometry_drawcalls",
-				"webgl_buffergeometry_rawshader",
-				"webgl_buffergeometry_uint",
-				"webgl_camera",
-				"webgl_camera_logarithmicdepthbuffer",
-				"webgl_custom_attributes",
-				"webgl_custom_attributes_lines",
-				"webgl_custom_attributes_particles",
-				"webgl_custom_attributes_particles2",
-				"webgl_custom_attributes_particles3",
-				"webgl_decals",
-				"webgl_effects_anaglyph",
-				"webgl_effects_parallaxbarrier",
-				"webgl_effects_stereo",
-				"webgl_geometries",
-				"webgl_geometries2",
-				"webgl_geometry_colors",
-				"webgl_geometry_colors_blender",
-				"webgl_geometry_colors_lookuptable",
-				"webgl_geometry_convex",
-				"webgl_geometry_cube",
-				"webgl_geometry_dynamic",
-				"webgl_geometry_extrude_shapes",
-				"webgl_geometry_extrude_shapes2",
-				"webgl_geometry_extrude_splines",
-				"webgl_geometry_hierarchy",
-				"webgl_geometry_hierarchy2",
-				"webgl_geometry_large_mesh",
-				"webgl_geometry_minecraft",
-				"webgl_geometry_minecraft_ao",
-				"webgl_geometry_normals",
-				"webgl_geometry_nurbs",
-				"webgl_geometry_shapes",
-				"webgl_geometry_terrain",
-				"webgl_geometry_terrain_fog",
-				"webgl_geometry_terrain_raycast",
-				"webgl_geometry_text",
-				"webgl_geometry_text2",
-				"webgl_gpgpu_birds",
-				"webgl_hdr",
-				"webgl_helpers",
-				"webgl_interactive_buffergeometry",
-				"webgl_interactive_cubes",
-				"webgl_interactive_cubes_gpu",
-				"webgl_interactive_cubes_ortho",
-				"webgl_interactive_draggablecubes",
-				"webgl_interactive_lines",
-				"webgl_interactive_particles",
-				"webgl_interactive_raycasting_pointcloud",
-				"webgl_interactive_voxelpainter",
-				"webgl_kinect",
-				"webgl_lensflares",
-				"webgl_lights_hemisphere",
-				"webgl_lights_pointlights",
-				"webgl_lights_pointlights2",
-				"webgl_lines_colors",
-				"webgl_lines_cubes",
-				"webgl_lines_dashed",
-				"webgl_lines_sphere",
-				"webgl_lines_splines",
-				"webgl_loader_assimp2json",
-				"webgl_loader_awd",
-				"webgl_loader_babylon",
-				"webgl_loader_collada",
-				"webgl_loader_collada_keyframe",
-				"webgl_loader_collada_skinning",
-				"webgl_loader_collada_kinematics",
-				"webgl_loader_ctm",
-				"webgl_loader_ctm_materials",
-				"webgl_loader_gltf",
-				"webgl_loader_json_blender",
-				"webgl_loader_json_objconverter",
-				"webgl_loader_msgpack",
-				"webgl_loader_obj",
-				"webgl_loader_obj_mtl",
-				"webgl_loader_pdb",
-				"webgl_loader_ply",
-				"webgl_loader_scene",
-				"webgl_loader_stl",
-				"webgl_loader_utf8",
-				"webgl_loader_vrml",
-				"webgl_loader_vtk",
-				"webgl_lod",
-				"webgl_marchingcubes",
-				"webgl_materials",
-				"webgl_materials2",
-				"webgl_materials_blending",
-				"webgl_materials_blending_custom",
-				"webgl_materials_bumpmap",
-				"webgl_materials_bumpmap_skin",
-				"webgl_materials_cars",
-				"webgl_materials_cars_camaro",
-				"webgl_materials_cubemap",
-				"webgl_materials_cubemap_balls_reflection",
-				"webgl_materials_cubemap_balls_refraction",
-				"webgl_materials_cubemap_dynamic",
-				"webgl_materials_cubemap_dynamic2",
-				"webgl_materials_cubemap_escher",
-				"webgl_materials_cubemap_refraction",
-				"webgl_materials_envmaps",
-				"webgl_materials_grass",
-				"webgl_materials_lightmap",
-				"webgl_materials_normalmap",
-				"webgl_materials_normaldisplacementmap",
-				"webgl_materials_parallaxmap",
-				"webgl_materials_shaders_fresnel",
-				"webgl_materials_skin",
-				"webgl_materials_texture_anisotropy",
-				"webgl_materials_texture_compressed",
-				"webgl_materials_texture_filters",
-				"webgl_materials_texture_manualmipmap",
-				"webgl_materials_texture_pvrtc",
-				"webgl_materials_texture_tga",
-				"webgl_materials_video",
-				"webgl_materials_wireframe",
-				"webgl_mirror",
-				"webgl_modifier_subdivision",
-				"webgl_modifier_tessellation",
-				"webgl_morphnormals",
-				"webgl_morphtargets",
-				"webgl_morphtargets_horse",
-				"webgl_morphtargets_human",
-				"webgl_morphtargets_md2",
-				"webgl_morphtargets_md2_control",
-				"webgl_multiple_canvases_circle",
-				"webgl_multiple_canvases_complex",
-				"webgl_multiple_canvases_grid",
-				"webgl_multiple_views",
-				"webgl_nearestneighbour",
-				"webgl_octree",
-				"webgl_octree_raycasting",
-				"webgl_panorama_equirectangular",
-				"webgl_particles_billboards",
-				"webgl_particles_billboards_colors",
-				"webgl_particles_dynamic",
-				"webgl_particles_random",
-				"webgl_particles_shapes",
-				"webgl_particles_sprites",
-				"webgl_performance",
-				"webgl_performance_doublesided",
-				"webgl_performance_static",
-				"webgl_postprocessing",
-				"webgl_postprocessing_advanced",
-				"webgl_postprocessing_dof",
-				"webgl_postprocessing_dof2",
-				"webgl_postprocessing_godrays",
-				"webgl_postprocessing_crossfade",
-				"webgl_postprocessing_glitch",
-				"webgl_rtt",
-				"webgl_sandbox",
-				"webgl_shader",
-				"webgl_shader_lava",
-				"webgl_shader2",
-				"webgl_shaders_ocean",
-				"webgl_shading_physical",
-				"webgl_shaders_sky",
-				"webgl_shaders_tonemapping",
-				"webgl_shaders_vector",
-				"webgl_shadowmap",
-				"webgl_shadowmap_performance",
-				"webgl_shadowmap_viewer",
-				"webgl_shadowmesh",
-				"webgl_sprites",
-				"webgl_terrain_dynamic",
-				"webgl_test_memory",
-				"webgl_test_memory2",
-				"webgl_trails",
-				"webgl_video_panorama_equirectangular"
-			],
-			"webgldeferred": [
-				"webgldeferred_animation",
-				"webgldeferred_arealights",
-				"webgldeferred_pointlights"
-			],
-			"vr": [
-				"vr_cubes",
-				"vr_video"
-			],
-			"css3d": [
-				"css3d_molecules",
-				"css3d_panorama",
-				"css3d_periodictable",
-				"css3d_sandbox",
-				"css3d_sprites",
-				"css3d_youtube"
-			],
-			"css3d stereo": [
-				"css3dstereo_periodictable",
-			],
-			"misc": [
-				"misc_animation_keys",
-				"misc_controls_deviceorientation",
-				"misc_controls_fly",
-				"misc_controls_orbit",
-				"misc_controls_pointerlock",
-				"misc_controls_trackball",
-				"misc_controls_transform",
-				"misc_lights_test",
-				"misc_lookat",
-				"misc_fps",
-				"misc_sound",
-				"misc_ubiquity_test",
-				"misc_ubiquity_test2",
-				"misc_uv_tests"
-			],
-			"canvas": [
-				"canvas_ascii_effect",
-				"canvas_camera_orthographic",
-				"canvas_camera_orthographic2",
-				"canvas_effects_stereo",
-				"canvas_geometry_birds",
-				"canvas_geometry_cube",
-				"canvas_geometry_earth",
-				"canvas_geometry_hierarchy",
-				"canvas_geometry_nurbs",
-				"canvas_geometry_panorama",
-				"canvas_geometry_panorama_fisheye",
-				"canvas_geometry_shapes",
-				"canvas_geometry_terrain",
-				"canvas_geometry_text",
-				"canvas_interactive_cubes",
-				"canvas_interactive_cubes_tween",
-				"canvas_interactive_particles",
-				"canvas_interactive_voxelpainter",
-				"canvas_lights_pointlights",
-				"canvas_lines",
-				"canvas_lines_colors",
-				"canvas_lines_dashed",
-				"canvas_lines_sphere",
-				"canvas_materials",
-				"canvas_materials_depth",
-				"canvas_materials_normal",
-				"canvas_materials_reflection",
-				"canvas_materials_video",
-				"canvas_morphtargets_horse",
-				"canvas_particles_floor",
-				"canvas_particles_random",
-				"canvas_particles_shapes",
-				"canvas_particles_sprites",
-				"canvas_particles_waves",
-				"canvas_performance",
-				"canvas_sandbox"
-			],
-			"raytracing": [
-				"raytracing_sandbox"
-			],
-			"software": [
-				"software_geometry_earth",
-				"software_sandbox"
-			],
-			"svg": [
-				"svg_sandbox"
-			]
-		};
-
-		//
+		function extractQuery() {
+			var p = window.location.search.indexOf( '?q=' );
+			if( p !== -1 ) {
+				return window.location.search.substr( 3 );
+			}
+			return ''
+		}
 
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
 		var viewer = document.getElementById( 'viewer' );
 
+		var filterInput = document.getElementById( 'filterInput' );
+		var clearFilterButton = document.getElementById( 'clearFilterButton' );
+
 		var expandButton = document.getElementById( 'expandButton' );
 		expandButton.addEventListener( 'click', function ( event ) {
-			panel.classList.toggle( 'collapsed' );
 			event.preventDefault();
+			panel.classList.toggle( 'collapsed' );
 		} );
 
-		// iOS8 workaround
+		// iOS iframe auto-resize workaround
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			viewer.addEventListener( 'load', function ( event ) {
-
-				viewer.contentWindow.innerWidth -= 10;
-				viewer.contentWindow.innerHeight -= 2;
-
-			} );
+			viewer.style.width = getComputedStyle( viewer ).width;
+			viewer.style.height = getComputedStyle( viewer ).height;
+			viewer.setAttribute( 'scrolling', 'no' );
 
 		}
 
 		var container = document.createElement( 'div' );
 		content.appendChild( container );
 
-		var button = document.createElement( 'div' );
-		button.id = 'button';
-		button.textContent = 'View source';
-		button.addEventListener( 'click', function ( event ) {
+		var viewSrcButton = document.createElement( 'a' );
+		viewSrcButton.id = 'viewSrcButton';
+		viewSrcButton.target = '_blank';
+		viewSrcButton.textContent = 'View source';
+		viewSrcButton.style.display = 'none';
+		document.body.appendChild( viewSrcButton );
 
-			var array = location.href.split( '/' );
-			array.pop();
-
-			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
-
-		}, false );
-		button.style.display = 'none';
-		document.body.appendChild( button );
-
-		var divs = {};
+		var links = {};
 		var selected = null;
+
+		function createLink( file ) {
+
+			var link = document.createElement( 'a' );
+			link.className = 'link';
+			link.href = file + '.html';
+			link.textContent = getName( file );
+			link.setAttribute( 'target', 'viewer' );
+			link.addEventListener( 'click', function ( event ) {
+
+				if ( event.button === 0 ) {
+
+					selectFile( file );
+
+				}
+
+			} );
+
+			return link;
+
+		}
 
 		for ( var key in files ) {
 
 			var section = files[ key ];
 
-			var div = document.createElement( 'h2' );
-			div.textContent = key;
-			container.appendChild( div );
+			var header = document.createElement( 'h2' );
+			header.textContent = key;
+			header.setAttribute( 'data-category', key );
+			container.appendChild( header );
 
 			for ( var i = 0; i < section.length; i ++ ) {
 
-				( function ( file ) {
+				var file = section[ i ];
 
-					var name = file.split( '_' );
-					name.shift();
-					name = name.join( ' / ' );
+				var link = createLink( file );
+				container.appendChild( link );
 
-					var div = document.createElement( 'div' );
-					div.className = 'link';
-					div.textContent = name;
-					div.addEventListener( 'click', function () {
-
-						panel.classList.toggle( 'collapsed' );
-						load( file );
-
-					} );
-					container.appendChild( div );
-
-					divs[ file ] = div;
-
-				} )( section[ i ] );
+				links[ file ] = link;
 
 			}
 
 		}
 
-		var load = function ( file ) {
+		function loadFile( file ) {
 
-			if ( selected !== null ) divs[ selected ].className = 'link';
+			selectFile( file );
+			viewer.src = file + '.html';
 
-			divs[ file ].className = 'link selected';
+		}
+
+		function selectFile( file ) {
+
+			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
+
+			links[ file ].classList.add( 'selected' );
 
 			window.location.hash = file;
-			viewer.src = file + '.html';
 			viewer.focus();
 
-			button.style.display = '';
+			panel.classList.add( 'collapsed' );
 
 			selected = file;
 
-		};
+			// Reveal "View source" button and set attributes to this example
+			viewSrcButton.style.display = '';
+			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
+			viewSrcButton.title = 'View source code for ' + getName(selected) + ' on GitHub';
+
+		}
 
 		if ( window.location.hash !== '' ) {
 
-			load( window.location.hash.substring( 1 ) );
+			loadFile( window.location.hash.substring( 1 ) );
 
 		}
+
+		// filter
+
+		filterInput.addEventListener( 'input', function( e ) {
+
+			updateFilter();
+
+		} );
+
+		clearFilterButton.addEventListener( 'click', function( e ) {
+
+			filterInput.value = '';
+			updateFilter();
+			e.preventDefault();
+
+		} );
+
+		function updateFilter() {
+
+			var v = filterInput.value;
+			if( v !== '' ) {
+				window.history.replaceState( {} , '', '?q=' + v + window.location.hash );
+			} else {
+				window.history.replaceState( {} , '', window.location.pathname + window.location.hash );
+			}
+
+			var exp = new RegExp( v, 'gi' );
+
+			for ( var key in files ) {
+
+				var section = files[ key ];
+
+				for ( var i = 0; i < section.length; i ++ ) {
+
+					filterExample( section[ i ], exp );
+
+				}
+
+			}
+
+			layoutList();
+
+		}
+
+		function filterExample( file, exp ){
+
+			var link = links[ file ];
+			var name = getName( file );
+			var res = file.match( exp );
+			var text;
+
+			if ( res && res.length > 0 ) {
+
+				link.classList.remove( 'filtered' );
+
+				for( var i = 0; i < res.length; i++ ) {
+					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
+				}
+
+				link.innerHTML = text;
+
+			} else {
+
+				link.classList.add( 'filtered' );
+				link.innerHTML = name;
+
+			}
+		}
+
+		function getName( file ) {
+
+			var name = file.split( '_' );
+			name.shift();
+			return name.join( ' / ' );
+
+		}
+
+		function layoutList() {
+
+			for ( var key in files ) {
+
+				var collapsed = true;
+
+				var section = files[ key ];
+
+				for ( var i = 0; i < section.length; i ++ ) {
+
+					var file = section[ i ];
+
+					if( !links[ file ].classList.contains( 'filtered' ) ){
+
+						collapsed = false;
+						break;
+
+					}
+
+				}
+
+				var element = document.querySelector( 'h2[data-category="' + key + '"]' );
+
+				if( collapsed ){
+
+					element.classList.add( 'filtered' );
+
+				} else {
+
+					element.classList.remove( 'filtered' );
+
+				}
+
+			}
+
+		}
+
+		filterInput.value = extractQuery();
+		updateFilter();
 
 		</script>
 

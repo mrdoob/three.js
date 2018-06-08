@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - transform controls</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -26,10 +27,10 @@
 
 		<div id="info">
 		"W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size<br />
-		Press "Q" twice to toggle world/local space
+		Press "Q" to toggle world/local space, keep "Ctrl" down to snap to grid
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
 
 		<script>
@@ -44,7 +45,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -54,17 +54,17 @@
 				camera.lookAt( new THREE.Vector3( 0, 200, 0 ) );
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 500, 100 ) );
+				scene.add( new THREE.GridHelper( 1000, 10 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 2 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
+				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				texture.mapping = THREE.UVMapping;
+				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif', THREE.UVMapping, render );
-				texture.anisotropy = renderer.getMaxAnisotropy();
-
-				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
 				control = new THREE.TransformControls( camera, renderer.domElement );
@@ -79,30 +79,56 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				window.addEventListener( 'keydown', function ( event ) {
-		            //console.log(event.which);
-		            switch ( event.keyCode ) {
-		              case 81: // Q
-		                control.setSpace( control.space == "local" ? "world" : "local" );
-		                break;
-		              case 87: // W
-		                control.setMode( "translate" );
-		                break;
-		              case 69: // E
-		                control.setMode( "rotate" );
-		                break;
-		              case 82: // R
-		                control.setMode( "scale" );
-		                break;
-					case 187:
-					case 107: // +,=,num+
-						control.setSize( control.size + 0.1 );
-						break;
-					case 189:
-					case 109: // -,_,num-
-						control.setSize( Math.max(control.size - 0.1, 0.1 ) );
-						break;
-		            }
-        		});
+
+					switch ( event.keyCode ) {
+
+						case 81: // Q
+							control.setSpace( control.space === "local" ? "world" : "local" );
+							break;
+
+						case 17: // Ctrl
+							control.setTranslationSnap( 100 );
+							control.setRotationSnap( THREE.Math.degToRad( 15 ) );
+							break;
+
+						case 87: // W
+							control.setMode( "translate" );
+							break;
+
+						case 69: // E
+							control.setMode( "rotate" );
+							break;
+
+						case 82: // R
+							control.setMode( "scale" );
+							break;
+
+						case 187:
+						case 107: // +, =, num+
+							control.setSize( control.size + 0.1 );
+							break;
+
+						case 189:
+						case 109: // -, _, num-
+							control.setSize( Math.max( control.size - 0.1, 0.1 ) );
+							break;
+
+					}
+
+				});
+
+				window.addEventListener( 'keyup', function ( event ) {
+
+					switch ( event.keyCode ) {
+
+						case 17: // Ctrl
+							control.setTranslationSnap( null );
+							control.setRotationSnap( null );
+							break;
+
+					}
+
+				});
 
 			}
 

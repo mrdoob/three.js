@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - postprocessing</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -13,7 +14,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/DotScreenShader.js"></script>
@@ -21,7 +22,6 @@
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
 
@@ -51,8 +51,8 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				var geometry = new THREE.SphereGeometry( 1, 4, 4 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+				var geometry = new THREE.SphereBufferGeometry( 1, 4, 4 );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
@@ -97,6 +97,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

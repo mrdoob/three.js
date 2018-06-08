@@ -12,13 +12,13 @@
 			}
 
 			a {
-				color:#0078ff;
+				color: #0078ff;
 			}
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -47,9 +47,10 @@
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000040 );
 
 				var material = new THREE.SpriteMaterial( {
-					map: new THREE.Texture( generateSprite() ),
+					map: new THREE.CanvasTexture( generateSprite() ),
 					blending: THREE.AdditiveBlending
 				} );
 
@@ -63,15 +64,12 @@
 				}
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0x000040 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -120,7 +118,7 @@
 				var particle = this instanceof THREE.Sprite ? this : particle;
 				var delay = delay !== undefined ? delay : 0;
 
-				particle.position.set( 0, 0, 0 )
+				particle.position.set( 0, 0, 0 );
 				particle.scale.x = particle.scale.y = Math.random() * 32 + 16;
 
 				new TWEEN.Tween( particle )
@@ -136,7 +134,7 @@
 
 				new TWEEN.Tween( particle.scale )
 					.delay( delay )
-					.to( { x: 0, y: 0 }, 10000 )
+					.to( { x: 0.01, y: 0.01 }, 10000 )
 					.start();
 
 			}

@@ -4,6 +4,7 @@
 
 Sidebar.Project = function ( editor ) {
 
+	var config = editor.config;
 	var signals = editor.signals;
 
 	var rendererTypes = {
@@ -16,18 +17,53 @@ Sidebar.Project = function ( editor ) {
 
 	};
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/project/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
+	var container = new UI.Panel();
+	container.setBorderTop( '0' );
+	container.setPaddingTop( '20px' );
 
-		editor.config.setKey( 'ui/sidebar/project/collapsed', boolean );
+	// Title
+
+	var titleRow = new UI.Row();
+	var title = new UI.Input( config.getKey( 'project/title' ) ).setLeft( '100px' ).onChange( function () {
+
+		config.setKey( 'project/title', this.getValue() );
 
 	} );
 
-	container.addStatic( new UI.Text( 'PROJECT' ) );
-	container.add( new UI.Break() );
+	titleRow.add( new UI.Text( 'Title' ).setWidth( '90px' ) );
+	titleRow.add( title );
 
-	// class
+	container.add( titleRow );
+
+	// Editable
+
+	var editableRow = new UI.Row();
+	var editable = new UI.Checkbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
+
+		config.setKey( 'project/editable', this.getValue() );
+
+	} );
+
+	editableRow.add( new UI.Text( 'Editable' ).setWidth( '90px' ) );
+	editableRow.add( editable );
+
+	container.add( editableRow );
+
+	// VR
+
+	var vrRow = new UI.Row();
+	var vr = new UI.Checkbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
+
+		config.setKey( 'project/vr', this.getValue() );
+
+	} );
+
+	vrRow.add( new UI.Text( 'VR' ).setWidth( '90px' ) );
+	vrRow.add( vr );
+
+	container.add( vrRow );
+
+	// Renderer
 
 	var options = {};
 
@@ -39,10 +75,13 @@ Sidebar.Project = function ( editor ) {
 
 	}
 
-	var rendererTypeRow = new UI.Panel();
+	var rendererTypeRow = new UI.Row();
 	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).onChange( function () {
 
-		editor.config.setKey( 'project/renderer', this.getValue() );
+		var value = this.getValue();
+
+		config.setKey( 'project/renderer', value );
+
 		updateRenderer();
 
 	} );
@@ -52,50 +91,92 @@ Sidebar.Project = function ( editor ) {
 
 	container.add( rendererTypeRow );
 
-	if ( editor.config.getKey( 'project/renderer' ) !== undefined ) {
+	if ( config.getKey( 'project/renderer' ) !== undefined ) {
 
-		rendererType.setValue( editor.config.getKey( 'project/renderer' ) );
+		rendererType.setValue( config.getKey( 'project/renderer' ) );
 
 	}
 
-	// antialiasing
+	// Renderer / Antialias
 
-	var rendererAntialiasRow = new UI.Panel();
-	var rendererAntialias = new UI.Checkbox( editor.config.getKey( 'project/renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
+	var rendererPropertiesRow = new UI.Row().setMarginLeft( '90px' );
 
-		editor.config.setKey( 'project/renderer/antialias', this.getValue() );
-		// updateRenderer();
+	var rendererAntialias = new UI.THREE.Boolean( config.getKey( 'project/renderer/antialias' ), 'antialias' ).onChange( function () {
 
-	} );
-
-	rendererAntialiasRow.add( new UI.Text( 'Antialias' ).setWidth( '90px' ) );
-	rendererAntialiasRow.add( rendererAntialias );
-
-	container.add( rendererAntialiasRow );
-
-	// VR
-
-	var vrRow = new UI.Panel();
-	var vr = new UI.Checkbox( editor.config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
-
-		editor.config.setKey( 'project/vr', this.getValue() );
-		// updateRenderer();
+		config.setKey( 'project/renderer/antialias', this.getValue() );
+		updateRenderer();
 
 	} );
+	rendererPropertiesRow.add( rendererAntialias );
 
-	vrRow.add( new UI.Text( 'VR' ).setWidth( '90px' ) );
-	vrRow.add( vr );
+	// Renderer / Shadows
 
-	container.add( vrRow );
+	var rendererShadows = new UI.THREE.Boolean( config.getKey( 'project/renderer/shadows' ), 'shadows' ).onChange( function () {
+
+		config.setKey( 'project/renderer/shadows', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererShadows );
+
+	rendererPropertiesRow.add( new UI.Break() );
+
+	// Renderer / Gamma input
+
+	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), 'γ input' ).onChange( function () {
+
+		config.setKey( 'project/renderer/gammaInput', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererGammaInput );
+
+	// Renderer / Gamma output
+
+	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), 'γ output' ).onChange( function () {
+
+		config.setKey( 'project/renderer/gammaOutput', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererGammaOutput );
+
+	container.add( rendererPropertiesRow );
 
 	//
 
 	function updateRenderer() {
 
-		signals.rendererChanged.dispatch( rendererType.getValue(), rendererAntialias.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue(), rendererGammaInput.getValue(), rendererGammaOutput.getValue() );
 
 	}
 
+	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
+
+		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
+
+			type = 'CanvasRenderer';
+
+		}
+
+		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
+
+		var renderer = new rendererTypes[ type ]( { antialias: antialias} );
+		renderer.gammaInput = gammaIn;
+		renderer.gammaOutput = gammaOut;
+		if ( shadows && renderer.shadowMap ) {
+
+			renderer.shadowMap.enabled = true;
+			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+		}
+
+		signals.rendererChanged.dispatch( renderer );
+
+	}
+
+	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/gammaInput' ), config.getKey( 'project/renderer/gammaOutput' ) );
+
 	return container;
 
-}
+};

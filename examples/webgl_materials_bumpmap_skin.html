@@ -31,21 +31,16 @@
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl simple single-pass skin material with <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">tangent-less bump mapping</a> -
-			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl simple, single-pass, skin material with tangent-less bump mapping</a> -
+			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/ShaderSkin.js"></script>
 
@@ -71,7 +66,7 @@
 
 			var mesh, mesh2;
 
-			var directionalLight, directionalLight2, pointLight, ambientLight, spotLight;
+			var directionalLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -102,91 +97,49 @@
 				camera.position.z = 1200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x242a34 );
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x555555 );
-				scene.add( ambientLight );
+				scene.add( new THREE.AmbientLight( 0x333344 ) );
 
-				//
-
-				pointLight = new THREE.PointLight( 0xffffff, 1.5, 1000 );
-				pointLight.position.set( 0, 0, 600 );
-
-				scene.add( pointLight );
-
-				// shadow for PointLight
-
-				spotLight = new THREE.SpotLight( 0xffffff, 1 );
-				spotLight.position.set( 0.05, 0.05, 1 );
-				scene.add( spotLight );
-
-				spotLight.position.multiplyScalar( 700 );
-
-				spotLight.castShadow = true;
-				spotLight.onlyShadow = true;
-				//spotLight.shadowCameraVisible = true;
-
-				spotLight.shadowMapWidth = 2048;
-				spotLight.shadowMapHeight = 2048;
-
-				spotLight.shadowCameraNear = 200;
-				spotLight.shadowCameraFar = 1500;
-
-				spotLight.shadowCameraFov = 40;
-
-				spotLight.shadowBias = -0.005;
-				spotLight.shadowDarkness = 0.15;
-
-				//
-
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 0.85 );
-				directionalLight.position.set( 1, -0.5, 1 );
-				directionalLight.color.setHSL( 0.6, 1, 0.85 );
-				scene.add( directionalLight );
-
-				directionalLight.position.multiplyScalar( 500 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight.position.set( 500, 0, 500 );
 
 				directionalLight.castShadow = true;
-				//directionalLight.shadowCameraVisible = true;
 
-				directionalLight.shadowMapWidth = 2048;
-				directionalLight.shadowMapHeight = 2048;
+				directionalLight.shadow.mapSize.width = 2048;
+				directionalLight.shadow.mapSize.height = 2048;
 
-				directionalLight.shadowCameraNear = 200;
-				directionalLight.shadowCameraFar = 1500;
+				directionalLight.shadow.camera.near = 200;
+				directionalLight.shadow.camera.far = 1500;
 
-				directionalLight.shadowCameraLeft = -500;
-				directionalLight.shadowCameraRight = 500;
-				directionalLight.shadowCameraTop = 500;
-				directionalLight.shadowCameraBottom = -500;
+				directionalLight.shadow.camera.left = -500;
+				directionalLight.shadow.camera.right = 500;
+				directionalLight.shadow.camera.top = 500;
+				directionalLight.shadow.camera.bottom = -500;
 
-				directionalLight.shadowBias = -0.005;
-				directionalLight.shadowDarkness = 0.15;
+				directionalLight.shadow.bias = -0.005;
 
-				//
-
-				directionalLight2 = new THREE.DirectionalLight( 0xffffff, 0.85 );
-				directionalLight2.position.set( 1, -0.5, -1 );
-				scene.add( directionalLight2 );
+				scene.add( directionalLight );
 
 				//
 
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
+				loader = new THREE.JSONLoader();
+				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function ( geometry ) {
 
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100 ) } );
+					createScene( geometry, 100 )
+
+				} );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x444a54 );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
 
 				renderer.autoClear = false;
 
@@ -200,7 +153,7 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 
@@ -216,7 +169,7 @@
 
 				effectCopy.renderToScreen = true;
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				var rtwidth = 512, rtheight = 512;
 
 				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
@@ -232,27 +185,23 @@
 
 			function createScene( geometry, scale ) {
 
-				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var textureLoader = new THREE.TextureLoader();
+
+				var mapHeight = textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				mapHeight.anisotropy = 4;
-				mapHeight.repeat.set( 0.998, 0.998 );
-				mapHeight.offset.set( 0.001, 0.001 )
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
-				var mapSpecular = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
+				var mapSpecular = textureLoader.load( "models/json/leeperrysmith/Map-SPEC.jpg" );
 
 				mapSpecular.anisotropy = 4;
-				mapSpecular.repeat.set( 0.998, 0.998 );
-				mapSpecular.offset.set( 0.001, 0.001 )
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
 				mapSpecular.format = THREE.RGBFormat;
 
-				var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				var mapColor = textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" );
 
 				mapColor.anisotropy = 4;
-				mapColor.repeat.set( 0.998, 0.998 );
-				mapColor.offset.set( 0.001, 0.001 )
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
 				mapColor.format = THREE.RGBFormat;
 
@@ -266,7 +215,7 @@
 				uniforms[ "enableBump" ].value = true;
 				uniforms[ "enableSpecular" ].value = true;
 
-				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
 				uniforms[ "tDiffuse" ].value = mapColor;
 
 				uniforms[ "bumpMap" ].value = mapHeight;
@@ -275,14 +224,13 @@
 				uniforms[ "diffuse" ].value.setHex( 0xa0a0a0 );
 				uniforms[ "specular" ].value.setHex( 0xa0a0a0 );
 
-				uniforms[ "uRoughness" ].value = 0.145;
-				uniforms[ "uSpecularBrightness" ].value = 0.75;
+				uniforms[ "uRoughness" ].value = 0.2;
+				uniforms[ "uSpecularBrightness" ].value = 0.5;
 
-				uniforms[ "bumpScale" ].value = 16;
-
-				uniforms[ "offsetRepeat" ].value.set( 0.001, 0.001, 0.998, 0.998 );
+				uniforms[ "bumpScale" ].value = 8;
 
 				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true } );
+				material.extensions.derivatives = true;
 
 				mesh = new THREE.Mesh( geometry, material );
 
@@ -294,22 +242,16 @@
 
 				scene.add( mesh );
 
-				loader.statusDomElement.style.display = "none";
-
 			}
 
 			//
 
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
 
 			}
 

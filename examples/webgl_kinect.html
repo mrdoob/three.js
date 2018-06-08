@@ -1,8 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>three.js - kinect</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -35,7 +33,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -126,13 +124,11 @@
 
 				var info = document.createElement( 'div' );
 				info.id = 'info';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - kinect';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
 				document.body.appendChild( info );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				// container.appendChild( stats.domElement );
+				// container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 500 );
@@ -146,6 +142,7 @@
 
 					texture = new THREE.VideoTexture( video );
 					texture.minFilter = THREE.NearestFilter;
+					texture.format = THREE.RGBFormat;
 
 					var width = 640, height = 480;
 					var nearClipping = 850, farClipping = 4000;
@@ -167,14 +164,14 @@
 
 						uniforms: {
 
-							"map": { type: "t", value: texture },
-							"width": { type: "f", value: width },
-							"height": { type: "f", value: height },
-							"nearClipping": { type: "f", value: nearClipping },
-							"farClipping": { type: "f", value: farClipping },
+							"map":          { value: texture },
+							"width":        { value: width },
+							"height":       { value: height },
+							"nearClipping": { value: nearClipping },
+							"farClipping":  { value: farClipping },
 
-							"pointSize": { type: "f", value: 2 },
-							"zOffset": { type: "f", value: 1000 }
+							"pointSize":    { value: 2 },
+							"zOffset":      { value: 1000 }
 
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,
@@ -185,7 +182,7 @@
 
 					} );
 
-					mesh = new THREE.PointCloud( geometry, material );
+					mesh = new THREE.Points( geometry, material );
 					scene.add( mesh );
 
 					var gui = new dat.GUI();
@@ -197,8 +194,11 @@
 
 
 				}, false );
+				video.crossOrigin = 'anonymous';
 				video.loop = true;
+				video.muted = true;
 				video.src = 'textures/kinect.webm';
+				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
 				video.play();
 
 				renderer = new THREE.WebGLRenderer();

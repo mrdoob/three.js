@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>three.js css3d - molecules</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<title>three.js css3d - molecules</title>
 		<style>
 			html, body {
 				height: 100%;
@@ -11,14 +11,7 @@
 
 			body {
 				background-color: #050505;
-
-				background: rgb(43,45,48); /* Old browsers */
-				background: -moz-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%, rgba(0,0,0,1) 100%); /* FF3.6+ */
-				background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(43,45,48,1)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
-				background: -webkit-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
-				background: -o-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Opera 12+ */
-				background: -ms-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* IE10+ */
-				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* W3C */
+				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%);
 
 				margin: 0;
 				font-family: Arial;
@@ -86,13 +79,13 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
 		<script src="js/loaders/PDBLoader.js"></script>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - molecules</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - molecules</div>
 		<div id="topmenu">
 			<button id="b_a">Atoms</button>
 			<button id="b_b">Bonds</button>
@@ -110,6 +103,7 @@
 			var tmpVec2 = new THREE.Vector3();
 			var tmpVec3 = new THREE.Vector3();
 			var tmpVec4 = new THREE.Vector3();
+			var offset = new THREE.Vector3();
 
 			var visualizationType = 2;
 
@@ -286,27 +280,18 @@
 
 			//
 
-			function colorify( ctx, width, height, color, a ) {
+			function colorify( ctx, width, height, color ) {
 
-				var r = color.r;
-				var g = color.g;
-				var b = color.b;
+				var r = color.r, g = color.g, b = color.b;
 
 				var imageData = ctx.getImageData( 0, 0, width, height );
 				var data = imageData.data;
 
-				for ( var y = 0; y < height; y ++ ) {
+				for ( var i = 0, l = data.length; i < l; i += 4 ) {
 
-					for ( var x = 0; x < width; x ++ ) {
-
-						var index = ( y * width + x ) * 4;
-
-						data[ index ]     *= r;
-						data[ index + 1 ] *= g;
-						data[ index + 2 ] *= b;
-						data[ index + 3 ] *= a;
-
-					}
+					data[ i + 0 ] *= r;
+					data[ i + 1 ] *= g;
+					data[ i + 2 ] *= b;
 
 				}
 
@@ -344,23 +329,43 @@
 
 				objects = [];
 
-				loader.load( url, function ( geometry, geometryBonds ) {
+				loader.load( url, function ( pdb ) {
 
-					var offset = geometry.center();
-					geometryBonds.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+					var geometryAtoms = pdb.geometryAtoms;
+					var geometryBonds = pdb.geometryBonds;
+					var json = pdb.json;
 
-					for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+					geometryAtoms.computeBoundingBox();
+					geometryAtoms.boundingBox.getCenter( offset ).negate();
 
-						var position = geometry.vertices[ i ];
-						var color = geometry.colors[ i ];
-						var element = geometry.elements[ i ];
+					geometryAtoms.translate( offset.x, offset.y, offset.z );
+					geometryBonds.translate( offset.x, offset.y, offset.z );
+
+					var positions = geometryAtoms.getAttribute( 'position' );
+					var colors = geometryAtoms.getAttribute( 'color' );
+
+					var position = new THREE.Vector3();
+					var color = new THREE.Color();
+
+					for ( var i = 0; i < positions.count; i ++ ) {
+
+						position.x = positions.getX( i );
+						position.y = positions.getY( i );
+						position.z = positions.getZ( i );
+
+						color.r = colors.getX( i );
+						color.g = colors.getY( i );
+						color.b = colors.getZ( i );
+
+						var atom = json.atoms[ i ];
+						var element = atom[ 4 ];
 
 						if ( ! colorSpriteMap[ element ] ) {
 
 							var canvas = imageToCanvas( baseSprite );
 							var context = canvas.getContext( '2d' );
 
-							colorify( context, canvas.width, canvas.height, color, 1 );
+							colorify( context, canvas.width, canvas.height, color );
 
 							var dataUrl = canvas.toDataURL();
 
@@ -368,7 +373,7 @@
 
 						}
 
-						colorSprite = colorSpriteMap[ element ];
+						var colorSprite = colorSpriteMap[ element ];
 
 						var atom = document.createElement( 'img' );
 						atom.src = colorSprite;
@@ -386,17 +391,26 @@
 
 					}
 
-					for ( var i = 0; i < geometryBonds.vertices.length; i += 2 ) {
+					positions = geometryBonds.getAttribute( 'position' );
 
-						var start = geometryBonds.vertices[ i ];
-						var end = geometryBonds.vertices[ i + 1 ];
+					var start = new THREE.Vector3();
+					var end = new THREE.Vector3();
+
+					for ( var i = 0; i < positions.count; i += 2 ) {
+
+						start.x = positions.getX( i );
+						start.y = positions.getY( i );
+						start.z = positions.getZ( i );
+
+						end.x = positions.getX( i + 1 );
+						end.y = positions.getY( i + 1 );
+						end.z = positions.getZ( i + 1 );
 
 						start.multiplyScalar( 75 );
 						end.multiplyScalar( 75 );
 
 						tmpVec1.subVectors( end, start );
 						var bondLength = tmpVec1.length() - 50;
-
 
 						//
 

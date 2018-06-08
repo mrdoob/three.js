@@ -1,35 +1,55 @@
+import { Object3D } from '../core/Object3D.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Scene = function () {
+function Scene() {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.type = 'Scene';
 
+	this.background = null;
 	this.fog = null;
 	this.overrideMaterial = null;
 
 	this.autoUpdate = true; // checked by the renderer
 
-};
+}
 
-THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Scene.prototype.constructor = THREE.Scene;
+Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-THREE.Scene.prototype.clone = function ( object ) {
+	constructor: Scene,
 
-	if ( object === undefined ) object = new THREE.Scene();
+	copy: function ( source, recursive ) {
 
-	THREE.Object3D.prototype.clone.call( this, object );
+		Object3D.prototype.copy.call( this, source, recursive );
 
-	if ( this.fog !== null ) object.fog = this.fog.clone();
-	if ( this.overrideMaterial !== null ) object.overrideMaterial = this.overrideMaterial.clone();
+		if ( source.background !== null ) this.background = source.background.clone();
+		if ( source.fog !== null ) this.fog = source.fog.clone();
+		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-	object.autoUpdate = this.autoUpdate;
-	object.matrixAutoUpdate = this.matrixAutoUpdate;
+		this.autoUpdate = source.autoUpdate;
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
-	return object;
+		return this;
 
-};
+	},
+
+	toJSON: function ( meta ) {
+
+		var data = Object3D.prototype.toJSON.call( this, meta );
+
+		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
+		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
+
+		return data;
+
+	}
+
+} );
+
+
+
+export { Scene };

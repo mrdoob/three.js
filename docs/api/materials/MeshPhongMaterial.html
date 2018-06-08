@@ -2,183 +2,250 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Material] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A material for shiny surfaces, evaluated per pixel.</div>
+		<p class="desc">
+			A material for shiny surfaces with specular highlights.<br /><br />
 
-		<iframe src='../../scenes/material-browser.html#MeshPhongMaterial'></iframe>
+			The material uses a non-physically based [link:https://en.wikipedia.org/wiki/Blinn-Phong_shading_model Blinn-Phong]
+			model for calculating reflectance. Unlike the Lambertian model used in the [page:MeshLambertMaterial]
+			this can simulate shiny surfaces with specular highlights (such as varnished wood).<br /><br />
+
+			Shading is calculated using a [link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.
+			This calculates shading per pixel (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragment shader],
+			AKA pixel shader)	which gives more accurate results than the Gouraud model used by [page:MeshLambertMaterial],
+			at the cost of some performance. The [page:MeshStandardMaterial] and [page:MeshPhysicalMaterial]
+			also use this shading model.<br /><br />
+
+			Performance will generally be greater when using this material over the	[page:MeshStandardMaterial]
+			or [page:MeshPhysicalMaterial], at the cost of some graphical accuracy.
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshPhongMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
 
 		<h2>Constructor</h2>
 
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
+			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
 
-		<h3>[name]([page:Object parameters])</h3>
-		<div>
-		parameters -- an object with one or more of the material's properties defining the its appearance.
-		</div>
-		<div>
-		color — geometry color in hexadecimal. Default is 0xffffff.<br />
-		map — Sets the texture map. Default is null <br />
-		lightMap — Set light map. Default is null.<br />
-		specularMap — Set specular map. Default is null.<br />
-		alphaMap — Set alpha map. Default is null.<br />
-		envMap — Set env map. Default is null.<br />
-		fog — Define whether the material color is affected by global fog settings. Default is true.<br />
-		shading — Define shading type. Default is THREE.SmoothShading.<br />
-		wireframe — render geometry as wireframe. Default is false.<br />
-		wireframeLinewidth — Line thickness. Default is 1.<br />
-		wireframeLinecap — Define appearance of line ends. Default is 'round'.<br />
-		wireframeLinejoin — Define appearance of line joints. Default is 'round'.<br />
-		vertexColors — Define how the vertices gets colored. Default is THREE.NoColors.<br />
-		skinning — Define whether the material uses skinning. Default is false.<br />
-		morphTargets — Define whether the material uses morphTargets. Default is false.
-		</div>
-		<div>
-		Example:<br>
-		materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
-	
-		</div>
-
+			The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
+			string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+		</p>
 
 		<h2>Properties</h2>
-		<div>See the base [page:Material] class for common parameters.</div>
+		<p>See the base [page:Material] class for common properties.</p>
 
-		<h3>[property:Color color]</h3>
-		<div>
-		Diffuse color of the material. Default is white.<br />
-		</div>
+		<h3>[property:Texture alphaMap]</h3>
+		<p>The alpha map is a grayscale texture that controls the opacity across the surface
+			(black: fully transparent; white: fully opaque). Default is null.<br /><br />
 
-		<h3>[property:Color emissive]</h3>
-		<div>
-		Emissive (light) color of the material, essentially a solid color unaffected by other lighting. Default is black.<br />
-		</div>
+			Only the color of the texture is used, ignoring the alpha channel if one exists.
+			For RGB and RGBA textures, the [page:WebGLRenderer WebGL] renderer will use the
+			green channel when sampling this texture due to the extra bit of precision provided
+			for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
+			luminance/alpha textures will also still work as expected.
+		</p>
 
-		<h3>[property:Color specular]</h3>
-		<div>
-		Specular color of the material, i.e., how shiny the material is and the color of its shine. Setting this the same color as the diffuse value (times some intensity) makes the material more metallic-looking; setting this to some gray makes the material look more plastic. Default is dark gray.<br />
-		</div>
+		<h3>[property:Texture aoMap]</h3>
+		<p>The red channel of this texture is used as the ambient occlusion map. Default is null.
+		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
+		and [page:Texture offset] Texture properties.</p>
 
-		<h3>[property:Float shininess]</h3>
-		<div>How shiny the specular highlight is; a higher value gives a sharper highlight. Default is *30*. It should not be set to 0.</div>
-
-		<h3>[property:boolean metal]</h3>
-		<div>
-			If set to true the shader multiplies the specular highlight by the underlying color of the object, making
-			it appear to be more metal-like and darker. If set to false the specular highlight is added ontop of the
-			underlying colors.
-		</div> 
-
-		<h3>[property:boolean wrapAround]</h3>
-		<div>
-			Define whether the diffuse lighting wraps around the model or not. This option adds a little more (tintable) light
-			onto the side of the object in relation to a light.
-		</div>
-
-		<h3>[property:Vector3 wrapRGB]</h3>
-		<div>
-			Decide how much of the wrap around values get used if the wrapAround option is set. The x, y, z values correspond
-			to the r, g, b values respectively. The typical range is of each is from 0 to 1. For example setting all of the
-			vector values to 0.5 will add a moderate amount of light to the side of the model. Changing *b* to 1 will
-			tint the light on the side to be more blue. Defaults to (1,1,1).
-		</div>
-
-		<h3>[property:Texture map]</h3>
-		<div>Set color texture map. Default is null.</div>
-
-		<h3>[property:Texture lightMap]</h3>
-		<div>Set light map. Default is null.</div>
+		<h3>[property:Float aoMapIntensity]</h3>
+		<p>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</p>
 
 		<h3>[property:Texture bumpMap]</h3>
-		<div>
+		<p>
 			The texture to create a bump map. The black and white values map to the perceived depth in relation to the lights.
 			Bump doesn't actually affect the geometry of the object, only the lighting. If a normal map is defined this will
 			be ignored.
-		</div>
-		
+		</p>
+
 		<h3>[property:Float bumpScale]</h3>
-		<div>
-			How much the bump map affects the material. Typical ranges are 0-1. Default is 1.
-		</div>
+		<p>How much the bump map affects the material. Typical ranges are 0-1. Default is 1.</p>
 
-		<h3>[property:Texture normalMap]</h3>
-		<div>
-			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
-			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
-		</div>
-		
-		<h3>[property:Vector2 normalScale]</h3>
-		<div>
-			How much the normal map affects the material. Typical ranges are 0-1. Default is (1,1).
-		</div> 
 
-		<h3>[property:Texture specularMap]</h3>
-		<div>The specular map value affects both how much the specular surface highlight contributes and how much of the environment map affects the surface. Default is null.</div>
+		<h3>[property:Color color]</h3>
+		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
 
-		<h3>[property:Texture alphaMap]</h3>
-		<div>The alpha map is a grayscale texture that controls the opacity across the surface (black: fully transparent; white: fully opaque). Default is null.</div>
-		<div>Only the color of the texture is used, ignoring the alpha channel if one exists. For RGB and RGBA textures, the [page:WebGLRenderer WebGL] renderer will use the green channel when sampling this texture due to the extra bit of precision provided for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and luminance/alpha textures will also still work as expected.</div>
+		<h3>[property:Integer combine]</h3>
+		<p>
+			How to combine the result of the surface's color with the environment map, if any.<br /><br />
+
+			Options are [page:Materials THREE.Multiply] (default), [page:Materials THREE.MixOperation],
+			[page:Materials THREE.AddOperation]. If mix is chosen, the [page:.reflectivity] is used to
+			blend between the two colors.
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			The displacement map affects the position of the mesh's vertices. Unlike other maps
+			which only affect the light and shade of the material the displaced vertices can cast shadows,
+			block other objects, and otherwise act as real geometry. The displacement texture is
+			an image where the value of each pixel (white being the highest) is mapped against,
+			and repositions, the vertices of the mesh.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			How much the displacement map affects the mesh (where black is no displacement,
+			and white is maximum displacement). Without a displacement map set, this value is not applied.
+			 Default is 1.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			The offset of the displacement map's values on the mesh's vertices.
+			Without a displacement map set, this value is not applied. Default is 0.
+		</p>
+
+		<h3>[property:Color emissive]</h3>
+		<p>
+		Emissive (light) color of the material, essentially a solid color unaffected by other lighting.
+		Default is black.
+		</p>
+
+		<h3>[property:Texture emissiveMap]</h3>
+		<p>
+		Set emisssive (glow) map. Default is null. The emissive map color is modulated by
+		the emissive color and the emissive intensity. If you have an emissive map, be sure to
+		set the emissive color to something other than black.
+		</p>
+
+		<h3>[property:Float emissiveIntensity]</h3>
+		<p>Intensity of the emissive light. Modulates the emissive color. Default is 1.</p>
 
 		<h3>[property:TextureCube envMap]</h3>
-		<div>Set env map. Default is null.</div>
-		
-		<h3>[property:Integer combine]</h3>
-		<div>How to combine the result of the surface's color with the environment map, if any.</div> 
-		 
-		<div>Options are [page:Textures THREE.MultiplyOperation] (default), [page:Textures THREE.MixOperation], [page:Textures THREE.AddOperation]. If mix is chosen, the reflectivity is used to blend between the two colors.</div>
-		 
-		<h3>[property:Float reflectivity]</h3>
-		<div>How much the environment map affects the surface; also see "combine".</div> 
+		<p>The environment map. Default is null.</p>
 
-		<h3>[property:Float refractionRatio]</h3>
-		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
+		<h3>[property:Boolean isMeshPhongMaterial]</h3>
+		<p>
+			Used to check whether this or derived classes are mesh Phong materials. Default is *true*.<br /><br />
 
-		<h3>[property:Boolean fog]</h3>
-		<div>Define whether the material color is affected by global fog settings. Default is *true*.</div>
-		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
+			You should not change this, as it used internally for optimisation.
+		</p>
 
-		<h3>[property:Integer shading]</h3>
-		<div>How the triangles of a curved surface are rendered: as a smooth surface, as flat separate facets, or no shading at all.</div>
 
-		<div>Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading], [page:Materials THREE.NoShading].</div>
-		
-		<h3>[property:Boolean wireframe]</h3>
-		<div>Whether the triangles' edges are displayed instead of surfaces. Default is *false*.</div>
-		
-		<h3>[property:Float wireframeLinewidth]</h3>
-		<div>Line thickness for wireframe mode. Default is *1.0*.</div>
-		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
+		<h3>[property:Texture lightMap]</h3>
+		<p>The light map. Default is null. The lightMap requires a second set of UVs,
+		and consequently will ignore the [page:Texture repeat] and [page:Texture offset]
+		Texture properties.</p>
 
-		<h3>[property:String wireframeLinecap]</h3>
-		<div>Define appearance of line ends. Possible values are "butt", "round" and "square". Default is 'round'.</div>
-		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+		<h3>[property:Float lightMapIntensity]</h3>
+		<p>Intensity of the baked light. Default is 1.</p>
 
-		<h3>[property:String wireframeLinejoin]</h3>
-		<div>Define appearance of line joints. Possible values are "round", "bevel" and "miter". Default is 'round'.</div>
-		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
-
-		<h3>[property:Integer vertexColors]</h3>
-		<div>Define how the vertices gets colored. Possible values are THREE.NoColors, THREE.FaceColors and THREE.VertexColors. Default is THREE.NoColors.</div>
-		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
-
-		<h3>[property:Boolean skinning]</h3>
-		<div>Define whether the material uses skinning. Default is *false*.</div>
-	
-		<h3>[property:Boolean morphTargets]</h3>
-		<div>Define whether the material uses morphTargets. Default is *false*.</div>	
+		<h3>[property:Texture map]</h3>
+		<p>The color map. Default is null. The texture map color is modulated by the diffuse [page:.color].</p>
 
 		<h3>[property:boolean morphNormals]</h3>
-		<div>
-			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
-			to the shader. Default is *false*.
-		</div>
+		<p>
+			Defines whether the material uses morphNormals. Set as true to pass morphNormal
+			attributes from the [page:Geometry]	to the shader. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<p>Define whether the material uses morphTargets. Default is false.</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
+			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p>
+			How much the normal map affects the material. Typical ranges are 0-1.
+			Default is a [page:Vector2] set to (1,1).
+		</p>
+
+
+		<h3>[property:Float reflectivity]</h3>
+		<p>
+			How much the environment map affects the surface; also see [page:.combine].
+			The default value is 1 and the valid range is between 0 (no reflections) and 1 (full reflections).
+		</p>
+
+		<h3>[property:Float refractionRatio]</h3>
+		<p>
+			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
+			It is used with environment mapping modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
+			The refraction ratio should not exceed 1. Default is *0.98*.
+		</p>
+
+		<h3>[property:Float shininess]</h3>
+		<p>How shiny the [page:.specular] highlight is; a higher value gives a sharper highlight. Default is *30*.</p>
+
+
+		<h3>[property:Boolean skinning]</h3>
+		<p>Define whether the material uses skinning. Default is false.</p>
+
+		<h3>[property:Color specular]</h3>
+		<p>
+			Specular color of the material. Default is a [page:Color] set to *0x111111* (very dark grey).<br /><br />
+
+			This defines how shiny the material is and the color of its shine.
+		</p>
+
+		<h3>[property:Texture specularMap]</h3>
+		<p>
+			The specular map value affects both how much the specular surface highlight
+			contributes and how much of the environment map affects the surface. Default is null.
+		</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>Render geometry as wireframe. Default is *false* (i.e. render as flat polygons).</p>
+
+		<h3>[property:String wireframeLinecap]</h3>
+		<p>
+			Define appearance of line ends. Possible values are "butt", "round" and "square". Default is 'round'.<br /><br />
+
+			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
+		</p>
+
+		<h3>[property:String wireframeLinejoin]</h3>
+		<p>
+			Define appearance of line joints. Possible values are "round", "bevel" and "miter". Default is 'round'.<br /><br />
+
+			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>Controls wireframe thickness. Default is 1.<br /><br />
+
+		Due to limitations in the [link:https://code.google.com/p/angleproject ANGLE layer],
+		on Windows platforms linewidth will always be 1 regardless of the set value.
+		</p>
 
 		<h2>Methods</h2>
+		<p>See the base [page:Material] class for common methods.</p>
 
 		<h2>Source</h2>
 

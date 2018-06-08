@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -42,21 +42,23 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive lines';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var geometry = new THREE.SphereGeometry( 5 );
+				var geometry = new THREE.SphereBufferGeometry( 5 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
 				sphereInter = new THREE.Mesh( geometry, material );
 				sphereInter.visible = false;
 				scene.add( sphereInter );
 
-				var geometry = new THREE.Geometry();
+				var lineGeometry = new THREE.BufferGeometry();
+				var points = [];
 
 				var point = new THREE.Vector3();
 				var direction = new THREE.Vector3();
@@ -69,10 +71,11 @@
 					direction.normalize().multiplyScalar( 10 );
 
 					point.add( direction );
-
-					geometry.vertices.push( point.clone() );
+					points.push( point.x, point.y, point.z );
 
 				}
+
+				lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
 
 				parentTransform = new THREE.Object3D();
 				parentTransform.position.x = Math.random() * 40 - 20;
@@ -89,8 +92,17 @@
 
 				for ( var i = 0; i < 50; i ++ ) {
 
-					var type = Math.random() > 0.5 ? THREE.LineStrip : THREE.LinePieces;
-					var object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } ), type );
+					var object;
+
+					if ( Math.random() > 0.5 ) {
+
+						object = new THREE.Line( lineGeometry );
+
+					} else {
+
+						object = new THREE.LineSegments( lineGeometry );
+
+					}
 
 					object.position.x = Math.random() * 400 - 200;
 					object.position.y = Math.random() * 400 - 200;
@@ -114,15 +126,12 @@
 				raycaster.linePrecision = 3;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild(renderer.domElement);
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 

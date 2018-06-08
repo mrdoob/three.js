@@ -16,14 +16,12 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var container, stats;
-
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			var geometry, group;
 
@@ -32,23 +30,19 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
-				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial();
 
 				group = new THREE.Group();
@@ -72,23 +66,25 @@
 
 				scene.add( group );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xffffff );
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				document.body.appendChild( renderer.domElement );
 
-				container.appendChild( renderer.domElement );
+				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
-			//
+				//
 
-			window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -104,7 +100,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;
@@ -130,8 +126,8 @@
 					ry = Math.sin( time * 0.3 ) * 0.5,
 					rz = Math.sin( time * 0.2 ) * 0.5;
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
 

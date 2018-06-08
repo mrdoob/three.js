@@ -18,50 +18,31 @@
 			}
 
 			#info {
-				position: relative;
-				margin: 0 auto -2.1em;
-				top: 0px;
-				width: 550px;
+				position: absolute;
+				width: 100%;
+				text-align: center;
 				padding: 5px;
-				z-index:100;
 			}
 
 			a { color: skyblue; }
-
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #444 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based shading testbed
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/tween.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
-
-			var MARGIN = 0;
-
-			var WIDTH = window.innerWidth || 2;
-			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
-
-			var SCREEN_WIDTH = WIDTH;
-			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
-
-			var FAR = 10000;
-
-			var DAY = 0;
 
 			var container, stats;
 
@@ -69,29 +50,24 @@
 
 			var mesh, geometry;
 
+			var controls;
+
 			var cubeCamera;
 
 			var sunLight, pointLight, ambientLight;
 
-			var morph;
-
-			var parameters, tweenDirection, tweenDay, tweenNight;
+			var mixer;
 
 			var clock = new THREE.Clock();
 
-			var gui, shadowConfig = {
+			var gui, shadowCameraHelper, shadowConfig = {
 
 				shadowCameraVisible: false,
 				shadowCameraNear: 750,
 				shadowCameraFar: 4000,
 				shadowCameraFov: 30,
-				shadowBias: -0.0002,
-				shadowDarkness: 0.3
+				shadowBias: -0.0002
 
-			}, gamma = {
-				gammaFactor: 2.0,
-				gammaInput: true,
-				gammaOutput: true
 			};
 
 			init();
@@ -104,52 +80,33 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 2, 10000 );
 				camera.position.set( 500, 400, 1200 );
 
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
+				scene.fog = new THREE.Fog( 0, 1000, 10000 );
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, FAR, 128 );
-				scene.add( cubeCamera );
+				cubeCamera = new THREE.CubeCamera( 1, 10000, 128 );
 
 				// TEXTURES
+				var textureLoader = new THREE.TextureLoader();
 
-				var x = document.createElement( "canvas" );
-				var xc = x.getContext("2d");
-				x.width = x.height = 128;
-				xc.fillStyle = "#fff";
-				xc.fillRect(0, 0, 128, 128);
-				xc.fillStyle = "#000";
-				xc.fillRect(0, 0, 64, 64);
-				xc.fillStyle = "#999";
-				xc.fillRect(32, 32, 32, 32);
-				xc.fillStyle = "#000";
-				xc.fillRect(64, 64, 64, 64);
-				xc.fillStyle = "#555";
-				xc.fillRect(96, 96, 32, 32);
-
-				var texturePattern = new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
-				texturePattern.needsUpdate = true;
-				texturePattern.repeat.set( 1000, 1000 );
-				texturePattern.format = THREE.RGBFormat;
-
-				var textureSquares = THREE.ImageUtils.loadTexture( "textures/patterns/bright_squares256.png" );
+				var textureSquares = textureLoader.load( "textures/patterns/bright_squares256.png" );
 				textureSquares.repeat.set( 50, 50 );
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
 				textureSquares.format = THREE.RGBFormat;
 
-				var textureNoiseColor = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
+				var textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
 				textureNoiseColor.format = THREE.RGBFormat;
 
-				var textureLava = THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" );
+				var textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
 				textureLava.format = THREE.RGBFormat;
@@ -164,7 +121,7 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
 				// GROUND
 
@@ -181,38 +138,26 @@
 				ground.position.set( 0, 0, 0 );
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 1000, 1000, 1000 );
-
 				ground.receiveShadow = true;
-
 				scene.add( ground );
 
 				// MATERIALS
 
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = cubeCamera.renderTarget;
-				shader.uniforms[ "tFlip" ].value = 1;
-
-				var materialCube = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
-
-				} );
-
 				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
 				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget.texture } );
 
 				// OBJECTS
 
-				var sphereGeometry = new THREE.SphereGeometry( 100, 64, 32 );
-				var torusGeometry = new THREE.TorusGeometry( 240, 60, 32, 64 );
-				var cubeGeometry = new THREE.BoxGeometry( 150, 150, 150 );
+				var sphereGeometry = new THREE.SphereBufferGeometry( 100, 64, 32 );
+				var torusGeometry = new THREE.TorusBufferGeometry( 240, 60, 32, 64 );
+				var cubeGeometry = new THREE.BoxBufferGeometry( 150, 150, 150 );
 
 				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
 				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
+
 				mesh = addObject( sphereGeometry, materialPhongCube, 350, 100, -350, 0 );
+				mesh.add( cubeCamera );
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
@@ -241,9 +186,9 @@
 
 				}
 
-				var bigCube = new THREE.BoxGeometry( 50, 500, 50 );
-				var midCube = new THREE.BoxGeometry( 50, 200, 50 );
-				var smallCube = new THREE.BoxGeometry( 100, 100, 100 );
+				var bigCube = new THREE.BoxBufferGeometry( 50, 500, 50 );
+				var midCube = new THREE.BoxBufferGeometry( 50, 200, 50 );
+				var smallCube = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
 				addObjectColor( bigCube,   0xff0000, -500, 250, 0, 0 );
 				addObjectColor( smallCube, 0xff0000, -500, 50, -150, 0 );
@@ -257,10 +202,10 @@
 				addObjectColor( midCube,   0xff00ff, 0, 100, 500, 0 );
 				addObjectColor( smallCube, 0xff00ff, -150, 50, 500, 0 );
 
-				addObjectColor( new THREE.BoxGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI/4 );
-				addObjectColor( new THREE.BoxGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
+				addObjectColor( new THREE.BoxBufferGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI/4 );
+				addObjectColor( new THREE.BoxBufferGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
 
-				addObjectColor( new THREE.SphereGeometry( 100, 32, 26 ), 0xffffff, -300, 100, 300, 0 );
+				addObjectColor( new THREE.SphereBufferGeometry( 100, 32, 26 ), 0xffffff, -300, 100, 300, 0 );
 
 				// MORPHS
 
@@ -268,79 +213,62 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
-					morphMaterial.shading = THREE.FlatShading;
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, flatShading: true } );
 
-					geometry.computeMorphNormals();
-					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
+					var mesh = new THREE.Mesh( geometry, morphMaterial );
+
+					mixer = new THREE.AnimationMixer( mesh );
+
+					mixer.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
 
 					var s = 200;
-					morph.scale.set( s, s, s );
+					mesh.scale.set( s, s, s );
 
-					morph.duration = 8000;
-					morph.mirroredLoop = true;
+					//morph.duration = 8000;
+					//morph.mirroredLoop = true;
 
-					morph.castShadow = true;
-					morph.receiveShadow = true;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
 
-					scene.add( morph );
+					scene.add( mesh );
 
 				} );
 
 				// LIGHTS
 
-				var sunIntensity = 0.3,
-					pointIntensity = 1,
-					pointColor = 0xffaa00;
-
-				if ( DAY ) {
-
-					sunIntensity = 1;
-					pointIntensity = 0.5;
-					pointColor = 0xffffff;
-
-				}
-
 				ambientLight = new THREE.AmbientLight( 0x3f2806 );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffaa00, pointIntensity, 5000 );
-				pointLight.position.set( 0, 0, 0 );
+				pointLight = new THREE.PointLight( 0xffaa00, 1, 5000 );
 				scene.add( pointLight );
 
-				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI/2, 1 );
+				sunLight = new THREE.SpotLight( 0xffffff, 0.3, 0, Math.PI/2 );
 				sunLight.position.set( 1000, 2000, 1000 );
 
 				sunLight.castShadow = true;
 
-				sunLight.shadowDarkness = 0.3 * sunIntensity;
-				sunLight.shadowBias = -0.0002;
-
-				sunLight.shadowCameraNear = 750;
-				sunLight.shadowCameraFar = 4000;
-				sunLight.shadowCameraFov = 30;
-
-				sunLight.shadowCameraVisible = false;
+				sunLight.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( shadowConfig.shadowCameraFov, 1, shadowConfig.shadowCameraNear, shadowConfig.shadowCameraFar ) );
+				sunLight.shadow.bias = shadowConfig.shadowBias;
 
 				scene.add( sunLight );
+
+				// SHADOW CAMERA HELPER
+
+				shadowCameraHelper = new THREE.CameraHelper( sunLight.shadow.camera );
+				shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
+				scene.add( shadowCameraHelper );
 
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.top = MARGIN + "px";
-				renderer.domElement.style.left = "0px";
-
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapType = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 				//
 
@@ -368,137 +296,70 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'keydown', onKeyDown, false );
-
-				// TWEEN
-
-				parameters = { control: 0 };
-
-				tweenDirection = -1;
-
-				tweenDay = new TWEEN.Tween( parameters ).to( { control: 1 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
-				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 
 				// GUI
 
-				gui = new dat.GUI();
+				gui = new dat.GUI( { width: 400 } );
 
-				shadowGUI = gui.addFolder( "Shadow" );
-    	
-    			shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+				// SHADOW
 
-					sunLight.shadowCameraVisible = shadowConfig.shadowCameraVisible;
+				var shadowGUI = gui.addFolder( "Shadow" );
+
+    		shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+
+					shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
 
 				});
 
 				shadowGUI.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function() {
 
-					sunLight.shadowCamera.near = shadowConfig.shadowCameraNear;
-					sunLight.shadowCamera.updateProjectionMatrix();
+					sunLight.shadow.camera.near = shadowConfig.shadowCameraNear;
+					sunLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				});
 
 				shadowGUI.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function() {
 
-					sunLight.shadowCamera.far = shadowConfig.shadowCameraFar;
-					sunLight.shadowCamera.updateProjectionMatrix();
+					sunLight.shadow.camera.far = shadowConfig.shadowCameraFar;
+					sunLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				});
 
 				shadowGUI.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function() {
 
-					sunLight.shadowCamera.fov = shadowConfig.shadowCameraFov;
-					sunLight.shadowCamera.updateProjectionMatrix();
+					sunLight.shadow.camera.fov = shadowConfig.shadowCameraFov;
+					sunLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				});
 
 				shadowGUI.add( shadowConfig, 'shadowBias', -0.01, 0.01 ).onChange( function() {
 
-					sunLight.shadowBias = shadowConfig.shadowBias;
+					sunLight.shadow.bias = shadowConfig.shadowBias;
 
 				});
 
-				shadowGUI.add( shadowConfig, 'shadowDarkness', 0, 1 ).onChange( function() {
-
-				});
 				shadowGUI.open();
-
-				gammaGUI = gui.addFolder( "Gamma" );
-    
-				gammaGUI.add( gamma, 'gammaFactor', 0.1, 4.0 ).onChange( function() {
-
-					renderer.gammaFactor = gamma.gammaFactor;
-
-				});
-				gammaGUI.open();
-
-				/*
-
-				Not exposed because they are not easily dynamically updated - as all shaders need to be recompiled.  -bhouston
-
-				gammaGUI.add( gamma, 'gammaInput', true ).onChange( function() {
-
-					renderer.gammaInput = gamma.gammaInput;
-
-				});
-
-				gammaGUI.add( gamma, 'gammaOutput', true ).onChange( function() {
-
-					renderer.gammaOutput = gamma.gammaOutput;
-
-				});*/
 
 			}
 
 			//
-
 
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				controls.handleResize();
-
-			}
-
-			//
-
-			function onKeyDown ( event ) {
-
-				switch ( event.keyCode ) {
-
-					case 78: /*N*/
-
-						if ( tweenDirection == 1 ) {
-
-							tweenDay.stop();
-							tweenNight.start();
-
-							tweenDirection = -1;
-
-						} else {
-
-							tweenNight.stop();
-							tweenDay.start();
-
-							tweenDirection = 1;
-
-						}
-
-					break;
-
-				}
 
 			}
 
@@ -508,8 +369,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 
@@ -517,32 +379,20 @@
 
 				// update
 
-				var delta = 1000 * clock.getDelta();
+				var delta = clock.getDelta();
 
-				TWEEN.update();
 				controls.update();
 
-				if ( morph ) morph.updateAnimation( delta );
+				if ( mixer ) {
 
-				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
-				renderer.setClearColor( scene.fog.color );
+					mixer.update( delta );
 
-				sunLight.intensity = parameters.control * 0.7 + 0.3;
-				pointLight.intensity = - parameters.control * 0.5 + 1;
-
-				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
-
-				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
+				}
 
 				// render cube map
 
 				mesh.visible = false;
-
-				renderer.autoClear = true;
-				cubeCamera.position.copy( mesh.position );
-				cubeCamera.updateCubeMap( renderer, scene );
-				renderer.autoClear = false;
-
+				cubeCamera.update( renderer, scene );
 				mesh.visible = true;
 
 				// render scene

@@ -17,7 +17,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -48,7 +48,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - voxel painter - webgl<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - voxel painter - webgl<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -56,10 +56,11 @@
 				camera.lookAt( new THREE.Vector3() );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// roll-over helpers
 
-				rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
+				var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
 				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 				scene.add( rollOverMesh );
@@ -67,28 +68,12 @@
 				// cubes
 
 				cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
+				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( "textures/square-outline-textured.png" ) } );
 
 				// grid
 
-				var size = 500, step = 50;
-
-				var geometry = new THREE.Geometry();
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
-
-				}
-
-				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2, transparent: true } );
-
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
-				scene.add( line );
+				var gridHelper = new THREE.GridHelper( 1000, 20 );
+				scene.add( gridHelper );
 
 				//
 
@@ -96,10 +81,9 @@
 				mouse = new THREE.Vector2();
 
 				var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				geometry.rotateX( - Math.PI / 2 );
 
-				plane = new THREE.Mesh( geometry );
-				plane.visible = false;
+				plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
 				scene.add( plane );
 
 				objects.push( plane );
@@ -114,7 +98,6 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

@@ -10,20 +10,24 @@ var Config = function () {
 		'autosave': true,
 		'theme': 'css/light.css',
 
+		'project/title': '',
+		'project/editable': false,
+
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
+		'project/renderer/gammaInput': false,
+		'project/renderer/gammaOutput': false,
+		'project/renderer/shadows': true,
+
 		'project/vr': false,
 
-		'camera/position': [ 500, 250, 500 ],
-		'camera/target': [ 0, 0, 0 ],
+		'settings/history': false,
 
-		'ui/sidebar/animation/collapsed': true,
-		'ui/sidebar/geometry/collapsed': true,
-		'ui/sidebar/material/collapsed': true,
-		'ui/sidebar/object3d/collapsed': false,
-		'ui/sidebar/project/collapsed': true,
-		'ui/sidebar/scene/collapsed': false,
-		'ui/sidebar/script/collapsed': true
+		'settings/shortcuts/translate': 'w',
+		'settings/shortcuts/rotate': 'e',
+		'settings/shortcuts/scale': 'r',
+		'settings/shortcuts/undo': 'z',
+		'settings/shortcuts/focus': 'f'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
@@ -70,6 +74,6 @@ var Config = function () {
 
 		}
 
-	}
+	};
 
 };

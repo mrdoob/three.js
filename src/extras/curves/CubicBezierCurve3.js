@@ -1,28 +1,80 @@
-/**************************************************************
- *	Cubic Bezier 3D curve
- **************************************************************/
+import { Curve } from '../core/Curve.js';
+import { CubicBezier } from '../core/Interpolations.js';
+import { Vector3 } from '../../math/Vector3.js';
 
-THREE.CubicBezierCurve3 = THREE.Curve.create(
 
-	function ( v0, v1, v2, v3 ) {
+function CubicBezierCurve3( v0, v1, v2, v3 ) {
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
+	Curve.call( this );
 
-	},
+	this.type = 'CubicBezierCurve3';
 
-	function ( t ) {
+	this.v0 = v0 || new Vector3();
+	this.v1 = v1 || new Vector3();
+	this.v2 = v2 || new Vector3();
+	this.v3 = v3 || new Vector3();
 
-		var vector = new THREE.Vector3();
+}
 
-		vector.x = THREE.Shape.Utils.b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
-		vector.y = THREE.Shape.Utils.b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
-		vector.z = THREE.Shape.Utils.b3( t, this.v0.z, this.v1.z, this.v2.z, this.v3.z );
+CubicBezierCurve3.prototype = Object.create( Curve.prototype );
+CubicBezierCurve3.prototype.constructor = CubicBezierCurve3;
 
-		return vector;
+CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
 
-	}
+CubicBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
-);
+	var point = optionalTarget || new Vector3();
+
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+
+	point.set(
+		CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+		CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
+		CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
+	);
+
+	return point;
+
+};
+
+CubicBezierCurve3.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v0.copy( source.v0 );
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+	this.v3.copy( source.v3 );
+
+	return this;
+
+};
+
+CubicBezierCurve3.prototype.toJSON = function () {
+
+	var data = Curve.prototype.toJSON.call( this );
+
+	data.v0 = this.v0.toArray();
+	data.v1 = this.v1.toArray();
+	data.v2 = this.v2.toArray();
+	data.v3 = this.v3.toArray();
+
+	return data;
+
+};
+
+CubicBezierCurve3.prototype.fromJSON = function ( json ) {
+
+	Curve.prototype.fromJSON.call( this, json );
+
+	this.v0.fromArray( json.v0 );
+	this.v1.fromArray( json.v1 );
+	this.v2.fromArray( json.v2 );
+	this.v3.fromArray( json.v3 );
+
+	return this;
+
+};
+
+
+export { CubicBezierCurve3 };

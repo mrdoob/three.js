@@ -1,36 +1,52 @@
+import { Quaternion } from '../math/Quaternion.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { EventDispatcher } from './EventDispatcher.js';
+import { Euler } from '../math/Euler.js';
+import { Layers } from './Layers.js';
+import { Matrix3 } from '../math/Matrix3.js';
+import { _Math } from '../math/Math.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author elephantatwork / www.elephantatwork.ch
  */
 
-THREE.Object3D = function () {
+var object3DId = 0;
 
-	Object.defineProperty( this, 'id', { value: THREE.Object3DIdCount ++ } );
+function Object3D() {
 
-	this.uuid = THREE.Math.generateUUID();
+	Object.defineProperty( this, 'id', { value: object3DId ++ } );
+
+	this.uuid = _Math.generateUUID();
 
 	this.name = '';
 	this.type = 'Object3D';
 
-	this.parent = undefined;
+	this.parent = null;
 	this.children = [];
 
-	this.up = THREE.Object3D.DefaultUp.clone();
+	this.up = Object3D.DefaultUp.clone();
 
-	var position = new THREE.Vector3();
-	var rotation = new THREE.Euler();
-	var quaternion = new THREE.Quaternion();
-	var scale = new THREE.Vector3( 1, 1, 1 );
+	var position = new Vector3();
+	var rotation = new Euler();
+	var quaternion = new Quaternion();
+	var scale = new Vector3( 1, 1, 1 );
 
-	var onRotationChange = function () {
+	function onRotationChange() {
+
 		quaternion.setFromEuler( rotation, false );
-	};
 
-	var onQuaternionChange = function () {
+	}
+
+	function onQuaternionChange() {
+
 		rotation.setFromQuaternion( quaternion, undefined, false );
-	};
+
+	}
 
 	rotation.onChange( onRotationChange );
 	quaternion.onChange( onQuaternionChange );
@@ -51,17 +67,22 @@ THREE.Object3D = function () {
 		scale: {
 			enumerable: true,
 			value: scale
+		},
+		modelViewMatrix: {
+			value: new Matrix4()
+		},
+		normalMatrix: {
+			value: new Matrix3()
 		}
 	} );
 
-	this.rotationAutoUpdate = true;
+	this.matrix = new Matrix4();
+	this.matrixWorld = new Matrix4();
 
-	this.matrix = new THREE.Matrix4();
-	this.matrixWorld = new THREE.Matrix4();
-
-	this.matrixAutoUpdate = true;
+	this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
 	this.matrixWorldNeedsUpdate = false;
 
+	this.layers = new Layers();
 	this.visible = true;
 
 	this.castShadow = false;
@@ -72,47 +93,33 @@ THREE.Object3D = function () {
 
 	this.userData = {};
 
-};
+}
 
-THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
+Object3D.DefaultUp = new Vector3( 0, 1, 0 );
+Object3D.DefaultMatrixAutoUpdate = true;
 
-THREE.Object3D.prototype = {
+Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-	constructor: THREE.Object3D,
+	constructor: Object3D,
 
-	get eulerOrder () {
+	isObject3D: true,
 
-		THREE.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
-
-		return this.rotation.order;
-
-	},
-
-	set eulerOrder ( value ) {
-
-		THREE.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
-
-		this.rotation.order = value;
-
-	},
-
-	get useQuaternion () {
-
-		THREE.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
-
-	},
-
-	set useQuaternion ( value ) {
-
-		THREE.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
-
-	},
+	onBeforeRender: function () {},
+	onAfterRender: function () {},
 
 	applyMatrix: function ( matrix ) {
 
 		this.matrix.multiplyMatrices( matrix, this.matrix );
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
+
+	},
+
+	applyQuaternion: function ( q ) {
+
+		this.quaternion.premultiply( q );
+
+		return this;
 
 	},
 
@@ -151,9 +158,9 @@ THREE.Object3D.prototype = {
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
 
-		var q1 = new THREE.Quaternion();
+		var q1 = new Quaternion();
 
-		return function ( axis, angle ) {
+		return function rotateOnAxis( axis, angle ) {
 
 			q1.setFromAxisAngle( axis, angle );
 
@@ -161,15 +168,35 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		}
+		};
+
+	}(),
+
+	rotateOnWorldAxis: function () {
+
+		// rotate object on axis in world space
+		// axis is assumed to be normalized
+		// method assumes no rotated parent
+
+		var q1 = new Quaternion();
+
+		return function rotateOnWorldAxis( axis, angle ) {
+
+			q1.setFromAxisAngle( axis, angle );
+
+			this.quaternion.premultiply( q1 );
+
+			return this;
+
+		};
 
 	}(),
 
 	rotateX: function () {
 
-		var v1 = new THREE.Vector3( 1, 0, 0 );
+		var v1 = new Vector3( 1, 0, 0 );
 
-		return function ( angle ) {
+		return function rotateX( angle ) {
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -179,9 +206,9 @@ THREE.Object3D.prototype = {
 
 	rotateY: function () {
 
-		var v1 = new THREE.Vector3( 0, 1, 0 );
+		var v1 = new Vector3( 0, 1, 0 );
 
-		return function ( angle ) {
+		return function rotateY( angle ) {
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -191,9 +218,9 @@ THREE.Object3D.prototype = {
 
 	rotateZ: function () {
 
-		var v1 = new THREE.Vector3( 0, 0, 1 );
+		var v1 = new Vector3( 0, 0, 1 );
 
-		return function ( angle ) {
+		return function rotateZ( angle ) {
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -206,9 +233,9 @@ THREE.Object3D.prototype = {
 		// translate object by distance along axis in object space
 		// axis is assumed to be normalized
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
-		return function ( axis, distance ) {
+		return function translateOnAxis( axis, distance ) {
 
 			v1.copy( axis ).applyQuaternion( this.quaternion );
 
@@ -216,22 +243,15 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		}
+		};
 
 	}(),
 
-	translate: function ( distance, axis ) {
-
-		THREE.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
-		return this.translateOnAxis( axis, distance );
-
-	},
-
 	translateX: function () {
 
-		var v1 = new THREE.Vector3( 1, 0, 0 );
+		var v1 = new Vector3( 1, 0, 0 );
 
-		return function ( distance ) {
+		return function translateX( distance ) {
 
 			return this.translateOnAxis( v1, distance );
 
@@ -241,9 +261,9 @@ THREE.Object3D.prototype = {
 
 	translateY: function () {
 
-		var v1 = new THREE.Vector3( 0, 1, 0 );
+		var v1 = new Vector3( 0, 1, 0 );
 
-		return function ( distance ) {
+		return function translateY( distance ) {
 
 			return this.translateOnAxis( v1, distance );
 
@@ -253,9 +273,9 @@ THREE.Object3D.prototype = {
 
 	translateZ: function () {
 
-		var v1 = new THREE.Vector3( 0, 0, 1 );
+		var v1 = new Vector3( 0, 0, 1 );
 
-		return function ( distance ) {
+		return function translateZ( distance ) {
 
 			return this.translateOnAxis( v1, distance );
 
@@ -271,9 +291,9 @@ THREE.Object3D.prototype = {
 
 	worldToLocal: function () {
 
-		var m1 = new THREE.Matrix4();
+		var m1 = new Matrix4();
 
-		return function ( vector ) {
+		return function worldToLocal( vector ) {
 
 			return vector.applyMatrix4( m1.getInverse( this.matrixWorld ) );
 
@@ -283,13 +303,32 @@ THREE.Object3D.prototype = {
 
 	lookAt: function () {
 
-		// This routine does not support objects with rotated and/or translated parent(s)
+		// This method does not support objects with rotated and/or translated parent(s)
 
-		var m1 = new THREE.Matrix4();
+		var m1 = new Matrix4();
+		var vector = new Vector3();
 
-		return function ( vector ) {
+		return function lookAt( x, y, z ) {
 
-			m1.lookAt( vector, this.position, this.up );
+			if ( x.isVector3 ) {
+
+				vector.copy( x );
+
+			} else {
+
+				vector.set( x, y, z );
+
+			}
+
+			if ( this.isCamera ) {
+
+				m1.lookAt( this.position, vector, this.up );
+
+			} else {
+
+				m1.lookAt( vector, this.position, this.up );
+
+			}
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
@@ -309,18 +348,18 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		};
+		}
 
 		if ( object === this ) {
 
-			THREE.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
+			console.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
 			return this;
 
 		}
 
-		if ( object instanceof THREE.Object3D ) {
+		if ( ( object && object.isObject3D ) ) {
 
-			if ( object.parent !== undefined ) {
+			if ( object.parent !== null ) {
 
 				object.parent.remove( object );
 
@@ -333,7 +372,7 @@ THREE.Object3D.prototype = {
 
 		} else {
 
-			THREE.error( "THREE.Object3D.add: object not an instance of THREE.Object3D.", object );
+			console.error( "THREE.Object3D.add: object not an instance of THREE.Object3D.", object );
 
 		}
 
@@ -351,13 +390,15 @@ THREE.Object3D.prototype = {
 
 			}
 
-		};
+			return this;
+
+		}
 
 		var index = this.children.indexOf( object );
 
 		if ( index !== - 1 ) {
 
-			object.parent = undefined;
+			object.parent = null;
 
 			object.dispatchEvent( { type: 'removed' } );
 
@@ -365,12 +406,7 @@ THREE.Object3D.prototype = {
 
 		}
 
-	},
-
-	getChildByName: function ( name ) {
-
-		THREE.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
-		return this.getObjectByName( name );
+		return this;
 
 	},
 
@@ -407,83 +443,87 @@ THREE.Object3D.prototype = {
 
 	},
 
-	getWorldPosition: function ( optionalTarget ) {
+	getWorldPosition: function ( target ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Object3D: .getWorldPosition() target is now required' );
+			target = new Vector3();
+
+		}
 
 		this.updateMatrixWorld( true );
 
-		return result.setFromMatrixPosition( this.matrixWorld );
+		return target.setFromMatrixPosition( this.matrixWorld );
 
 	},
 
 	getWorldQuaternion: function () {
 
-		var position = new THREE.Vector3();
-		var scale = new THREE.Vector3();
+		var position = new Vector3();
+		var scale = new Vector3();
 
-		return function ( optionalTarget ) {
+		return function getWorldQuaternion( target ) {
 
-			var result = optionalTarget || new THREE.Quaternion();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldQuaternion() target is now required' );
+				target = new Quaternion();
+
+			}
 
 			this.updateMatrixWorld( true );
 
-			this.matrixWorld.decompose( position, result, scale );
+			this.matrixWorld.decompose( position, target, scale );
 
-			return result;
+			return target;
 
-		}
-
-	}(),
-
-	getWorldRotation: function () {
-
-		var quaternion = new THREE.Quaternion();
-
-		return function ( optionalTarget ) {
-
-			var result = optionalTarget || new THREE.Euler();
-
-			this.getWorldQuaternion( quaternion );
-
-			return result.setFromQuaternion( quaternion, this.rotation.order, false );
-
-		}
+		};
 
 	}(),
 
 	getWorldScale: function () {
 
-		var position = new THREE.Vector3();
-		var quaternion = new THREE.Quaternion();
+		var position = new Vector3();
+		var quaternion = new Quaternion();
 
-		return function ( optionalTarget ) {
+		return function getWorldScale( target ) {
 
-			var result = optionalTarget || new THREE.Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldScale() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.updateMatrixWorld( true );
 
-			this.matrixWorld.decompose( position, quaternion, result );
+			this.matrixWorld.decompose( position, quaternion, target );
 
-			return result;
+			return target;
 
-		}
+		};
 
 	}(),
 
 	getWorldDirection: function () {
 
-		var quaternion = new THREE.Quaternion();
+		var quaternion = new Quaternion();
 
-		return function ( optionalTarget ) {
+		return function getWorldDirection( target ) {
 
-			var result = optionalTarget || new THREE.Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.getWorldQuaternion( quaternion );
 
-			return result.set( 0, 0, 1 ).applyQuaternion( quaternion );
+			return target.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
-		}
+		};
 
 	}(),
 
@@ -493,9 +533,11 @@ THREE.Object3D.prototype = {
 
 		callback( this );
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+		var children = this.children;
 
-			this.children[ i ].traverse( callback );
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].traverse( callback );
 
 		}
 
@@ -507,9 +549,11 @@ THREE.Object3D.prototype = {
 
 		callback( this );
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+		var children = this.children;
 
-			this.children[ i ].traverseVisible( callback );
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].traverseVisible( callback );
 
 		}
 
@@ -517,11 +561,13 @@ THREE.Object3D.prototype = {
 
 	traverseAncestors: function ( callback ) {
 
-		if ( this.parent ) {
+		var parent = this.parent;
 
-			callback( this.parent );
+		if ( parent !== null ) {
 
-			this.parent.traverseAncestors( callback );
+			callback( parent );
+
+			parent.traverseAncestors( callback );
 
 		}
 
@@ -537,11 +583,11 @@ THREE.Object3D.prototype = {
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( this.parent === undefined ) {
+			if ( this.parent === null ) {
 
 				this.matrixWorld.copy( this.matrix );
 
@@ -559,223 +605,234 @@ THREE.Object3D.prototype = {
 
 		// update children
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+		var children = this.children;
 
-			this.children[ i ].updateMatrixWorld( force );
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].updateMatrixWorld( force );
 
 		}
 
 	},
 
-	toJSON: function () {
+	toJSON: function ( meta ) {
 
-		var output = {
-			metadata: {
-				version: 4.3,
+		// meta is a string when called from JSON.stringify
+		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+
+		var output = {};
+
+		// meta is a hash used to collect geometries, materials.
+		// not providing it implies that this is the root object
+		// being serialized.
+		if ( isRootObject ) {
+
+			// initialize meta obj
+			meta = {
+				geometries: {},
+				materials: {},
+				textures: {},
+				images: {},
+				shapes: {}
+			};
+
+			output.metadata = {
+				version: 4.5,
 				type: 'Object',
-				generator: 'ObjectExporter'
-			}
-		};
+				generator: 'Object3D.toJSON'
+			};
+
+		}
+
+		// standard Object3D serialization
+
+		var object = {};
+
+		object.uuid = this.uuid;
+		object.type = this.type;
+
+		if ( this.name !== '' ) object.name = this.name;
+		if ( this.castShadow === true ) object.castShadow = true;
+		if ( this.receiveShadow === true ) object.receiveShadow = true;
+		if ( this.visible === false ) object.visible = false;
+		if ( this.frustumCulled === false ) object.frustumCulled = false;
+		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
+		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
+
+		object.matrix = this.matrix.toArray();
+
+		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
 		//
 
-		var geometries = {};
+		function serialize( library, element ) {
 
-		var parseGeometry = function ( geometry ) {
+			if ( library[ element.uuid ] === undefined ) {
 
-			if ( output.geometries === undefined ) {
-
-				output.geometries = [];
+				library[ element.uuid ] = element.toJSON( meta );
 
 			}
 
-			if ( geometries[ geometry.uuid ] === undefined ) {
+			return element.uuid;
 
-				var json = geometry.toJSON();
+		}
 
-				delete json.metadata;
+		if ( this.geometry !== undefined ) {
 
-				geometries[ geometry.uuid ] = json;
+			object.geometry = serialize( meta.geometries, this.geometry );
 
-				output.geometries.push( json );
+			var parameters = this.geometry.parameters;
 
-			}
+			if ( parameters !== undefined && parameters.shapes !== undefined ) {
 
-			return geometry.uuid;
+				var shapes = parameters.shapes;
 
-		};
+				if ( Array.isArray( shapes ) ) {
 
-		//
+					for ( var i = 0, l = shapes.length; i < l; i ++ ) {
 
-		var materials = {};
+						var shape = shapes[ i ];
 
-		var parseMaterial = function ( material ) {
+						serialize( meta.shapes, shape );
 
-			if ( output.materials === undefined ) {
+					}
 
-				output.materials = [];
+				} else {
 
-			}
-
-			if ( materials[ material.uuid ] === undefined ) {
-
-				var json = material.toJSON();
-
-				delete json.metadata;
-
-				materials[ material.uuid ] = json;
-
-				output.materials.push( json );
-
-			}
-
-			return material.uuid;
-
-		};
-
-		//
-
-		var parseObject = function ( object ) {
-
-			var data = {};
-
-			data.uuid = object.uuid;
-			data.type = object.type;
-
-			if ( object.name !== '' ) data.name = object.name;
-			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
-			if ( object.visible !== true ) data.visible = object.visible;
-
-			if ( object instanceof THREE.PerspectiveCamera ) {
-
-				data.fov = object.fov;
-				data.aspect = object.aspect;
-				data.near = object.near;
-				data.far = object.far;
-
-			} else if ( object instanceof THREE.OrthographicCamera ) {
-
-				data.left = object.left;
-				data.right = object.right;
-				data.top = object.top;
-				data.bottom = object.bottom;
-				data.near = object.near;
-				data.far = object.far;
-
-			} else if ( object instanceof THREE.AmbientLight ) {
-
-				data.color = object.color.getHex();
-
-			} else if ( object instanceof THREE.DirectionalLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-
-			} else if ( object instanceof THREE.PointLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-				data.distance = object.distance;
-				data.decay = object.decay;
-
-			} else if ( object instanceof THREE.SpotLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-				data.distance = object.distance;
-				data.angle = object.angle;
-				data.exponent = object.exponent;
-				data.decay = object.decay;
-
-			} else if ( object instanceof THREE.HemisphereLight ) {
-
-				data.color = object.color.getHex();
-				data.groundColor = object.groundColor.getHex();
-
-			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
-
-				data.geometry = parseGeometry( object.geometry );
-				data.material = parseMaterial( object.material );
-
-				if ( object instanceof THREE.Line ) data.mode = object.mode;
-
-			} else if ( object instanceof THREE.Sprite ) {
-
-				data.material = parseMaterial( object.material );
-
-			}
-
-			data.matrix = object.matrix.toArray();
-
-			if ( object.children.length > 0 ) {
-
-				data.children = [];
-
-				for ( var i = 0; i < object.children.length; i ++ ) {
-
-					data.children.push( parseObject( object.children[ i ] ) );
+					serialize( meta.shapes, shapes );
 
 				}
 
 			}
 
-			return data;
-
 		}
 
-		output.object = parseObject( this );
+		if ( this.material !== undefined ) {
 
-		return output;
+			if ( Array.isArray( this.material ) ) {
 
-	},
+				var uuids = [];
 
-	clone: function ( object, recursive ) {
+				for ( var i = 0, l = this.material.length; i < l; i ++ ) {
 
-		if ( object === undefined ) object = new THREE.Object3D();
-		if ( recursive === undefined ) recursive = true;
+					uuids.push( serialize( meta.materials, this.material[ i ] ) );
 
-		object.name = this.name;
+				}
 
-		object.up.copy( this.up );
+				object.material = uuids;
 
-		object.position.copy( this.position );
-		object.quaternion.copy( this.quaternion );
-		object.scale.copy( this.scale );
+			} else {
 
-		object.rotationAutoUpdate = this.rotationAutoUpdate;
-
-		object.matrix.copy( this.matrix );
-		object.matrixWorld.copy( this.matrixWorld );
-
-		object.matrixAutoUpdate = this.matrixAutoUpdate;
-		object.matrixWorldNeedsUpdate = this.matrixWorldNeedsUpdate;
-
-		object.visible = this.visible;
-
-		object.castShadow = this.castShadow;
-		object.receiveShadow = this.receiveShadow;
-
-		object.frustumCulled = this.frustumCulled;
-
-		object.userData = JSON.parse( JSON.stringify( this.userData ) );
-
-		if ( recursive === true ) {
-
-			for ( var i = 0; i < this.children.length; i ++ ) {
-
-				var child = this.children[ i ];
-				object.add( child.clone() );
+				object.material = serialize( meta.materials, this.material );
 
 			}
 
 		}
 
-		return object;
+		//
+
+		if ( this.children.length > 0 ) {
+
+			object.children = [];
+
+			for ( var i = 0; i < this.children.length; i ++ ) {
+
+				object.children.push( this.children[ i ].toJSON( meta ).object );
+
+			}
+
+		}
+
+		if ( isRootObject ) {
+
+			var geometries = extractFromCache( meta.geometries );
+			var materials = extractFromCache( meta.materials );
+			var textures = extractFromCache( meta.textures );
+			var images = extractFromCache( meta.images );
+			var shapes = extractFromCache( meta.shapes );
+
+			if ( geometries.length > 0 ) output.geometries = geometries;
+			if ( materials.length > 0 ) output.materials = materials;
+			if ( textures.length > 0 ) output.textures = textures;
+			if ( images.length > 0 ) output.images = images;
+			if ( shapes.length > 0 ) output.shapes = shapes;
+
+		}
+
+		output.object = object;
+
+		return output;
+
+		// extract data from the cache hash
+		// remove metadata on each item
+		// and return as array
+		function extractFromCache( cache ) {
+
+			var values = [];
+			for ( var key in cache ) {
+
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+
+			}
+			return values;
+
+		}
+
+	},
+
+	clone: function ( recursive ) {
+
+		return new this.constructor().copy( this, recursive );
+
+	},
+
+	copy: function ( source, recursive ) {
+
+		if ( recursive === undefined ) recursive = true;
+
+		this.name = source.name;
+
+		this.up.copy( source.up );
+
+		this.position.copy( source.position );
+		this.quaternion.copy( source.quaternion );
+		this.scale.copy( source.scale );
+
+		this.matrix.copy( source.matrix );
+		this.matrixWorld.copy( source.matrixWorld );
+
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
+
+		this.layers.mask = source.layers.mask;
+		this.visible = source.visible;
+
+		this.castShadow = source.castShadow;
+		this.receiveShadow = source.receiveShadow;
+
+		this.frustumCulled = source.frustumCulled;
+		this.renderOrder = source.renderOrder;
+
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+
+		if ( recursive === true ) {
+
+			for ( var i = 0; i < source.children.length; i ++ ) {
+
+				var child = source.children[ i ];
+				this.add( child.clone() );
+
+			}
+
+		}
+
+		return this;
 
 	}
 
-};
+} );
 
-THREE.EventDispatcher.prototype.apply( THREE.Object3D.prototype );
 
-THREE.Object3DIdCount = 0;
+export { Object3D };

@@ -28,10 +28,10 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - dashed lines example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dashed lines example</div>
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -49,8 +49,7 @@
 			var objects = [];
 
 
-			var WIDTH = window.innerWidth,
-				HEIGHT = window.innerHeight;
+			var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
 
 			init();
 			animate();
@@ -61,45 +60,30 @@
 				camera.position.z = 150;
 
 				scene = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0x111111, 150, 200 );
-
-				root = new THREE.Object3D();
+				scene.background = new THREE.Color( 0x111111 );
 
 				var subdivisions = 6;
 				var recursion = 1;
 
 				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var spline = new THREE.CatmullRomCurve3( points );
 
-				var spline = new THREE.Spline( points );
-				var geometrySpline = new THREE.Geometry();
-
-				for ( var i = 0; i < points.length * subdivisions; i ++ ) {
-
-					var index = i / ( points.length * subdivisions );
-					var position = spline.getPoint( index );
-
-					geometrySpline.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
-
-				}
+				var samples = spline.getPoints( points.length * subdivisions );
+				var geometrySpline = new THREE.Geometry().setFromPoints( samples );
 
 				var geometryCube = cube( 50 );
 
-				geometryCube.computeLineDistances();
-				geometrySpline.computeLineDistances();
-
-				var object = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ), THREE.LineStrip );
+				var object = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
 
 				objects.push( object );
 				scene.add( object );
 
-				var object = new THREE.Line( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ), THREE.LinePieces );
+				var object = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 30, gapSize: 10, linewidth: 2 } ) );
 
 				objects.push( object );
 				scene.add( object );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0x111111 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
@@ -107,9 +91,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -192,7 +174,6 @@
 
 					var object = objects[ i ];
 
-					//object.rotation.x = 0.25 * time * ( i%2 == 1 ? 1 : -1);
 					object.rotation.x = 0.25 * time;
 					object.rotation.y = 0.25 * time;
 

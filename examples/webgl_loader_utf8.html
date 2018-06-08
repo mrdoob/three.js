@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - io - UTF8 loader</title>
+		<title>three.js webgl - loader - UTF8</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -27,12 +27,12 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> -
-		<a href="http://code.google.com/p/webgl-loader/" target="_blank">UTF8 format</a> loader test -
-		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		<a href="http://code.google.com/p/webgl-loader/" target="_blank" rel="noopener">UTF8 format</a> loader test -
+		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank" rel="noopener">The Utah 3D Animation Repository</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/UTF8Loader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
@@ -74,6 +74,7 @@
 				camera.position.z = 800;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 800, 2000 );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
@@ -84,7 +85,7 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
 				// LIGHTS
 
@@ -96,26 +97,24 @@
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
-				// directionalLight.shadowCameraVisible = true;
 
-				directionalLight.shadowMapWidth = 2048;
-				directionalLight.shadowMaHeight = 2048;
+				directionalLight.shadow.mapSize.width = 2048;
+				directionalLight.shadow.mapSize.height = 2048;
 
 				var d = 150;
 
-				directionalLight.shadowCameraLeft = -d * 1.2;
-				directionalLight.shadowCameraRight = d * 1.2;
-				directionalLight.shadowCameraTop = d;
-				directionalLight.shadowCameraBottom = -d;
+				directionalLight.shadow.camera.left = -d * 1.2;
+				directionalLight.shadow.camera.right = d * 1.2;
+				directionalLight.shadow.camera.top = d;
+				directionalLight.shadow.camera.bottom = -d;
 
-				directionalLight.shadowCameraNear = 200;
-				directionalLight.shadowCameraFar = 500;
+				directionalLight.shadow.camera.near = 200;
+				directionalLight.shadow.camera.far = 500;
 
 
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
@@ -126,16 +125,13 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapType = THREE.PCFShadowMap;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				var start = Date.now();
 
@@ -159,13 +155,6 @@
 						node.castShadow = true;
 						node.receiveShadow = true;
 
-						if ( node.material && node.material.name === "skin" ) {
-
-							node.material.wrapAround = true;
-							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
-
-						}
-
 					} );
 
 				}, { normalizeRGB: true } );
@@ -185,13 +174,6 @@
 
 						node.castShadow = true;
 						node.receiveShadow = true;
-
-						if ( node.material && ( node.material.name === "head" || node.material.name === "skinbody" ) ) {
-
-							node.material.wrapAround = true;
-							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
-
-						}
 
 					} );
 

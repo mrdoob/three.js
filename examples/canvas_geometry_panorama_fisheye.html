@@ -30,9 +30,9 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - panorama fisheye demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>. (mousewheel: change fov)</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - panorama fisheye demo. cubemap by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>. (mousewheel: change fov)</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -81,8 +81,10 @@
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 ), new THREE.MeshFaceMaterial( materials ) );
-				mesh.scale.x = - 1;
+				var geometry = new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 );
+				geometry.scale( - 1, 1, 1 );
+
+				mesh = new THREE.Mesh( geometry, materials );
 				scene.add( mesh );
 
 				for ( var i = 0, l = mesh.geometry.vertices.length; i < l; i ++ ) {
@@ -102,8 +104,7 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
-				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
+				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
 
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
@@ -173,25 +174,9 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				// WebKit
+				var fov = camera.fov + event.deltaY * 0.05;
 
-				if ( event.wheelDeltaY ) {
-
-					camera.fov -= event.wheelDeltaY * 0.05;
-
-				// Opera / Explorer 9
-
-				} else if ( event.wheelDelta ) {
-
-					camera.fov -= event.wheelDelta * 0.05;
-
-				// Firefox
-
-				} else if ( event.detail ) {
-
-					camera.fov -= event.detail * 0.05;
-
-				}
+				camera.fov = THREE.Math.clamp( fov, 10, 75 );
 
 				camera.updateProjectionMatrix();
 

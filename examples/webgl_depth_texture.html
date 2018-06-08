@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - Depth Texture</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			a {
+				color: #B2E9FF;
+				font-weight: bold;
+				pointer-events: auto;
+			}
+
+			canvas {
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+
+			#info {
+				pointer-events: none;
+				position: absolute;
+				left: 0;
+				top: 0px; width: 100%;
+				padding: 5px;
+				display: inline-block;
+			}
+
+			#error {
+				margin: auto;
+				margin-top: 40px;
+				display: block;
+				max-width: 400px;
+				padding: 20px;
+				background: #CE0808;
+			}
+		</style>
+
+		<script id="post-vert" type="x-shader/x-vertex">
+			varying vec2 vUv;
+
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+			}
+		</script>
+		<script id="post-frag" type="x-shader/x-fragment">
+			#include <packing>
+
+			varying vec2 vUv;
+			uniform sampler2D tDiffuse;
+			uniform sampler2D tDepth;
+			uniform float cameraNear;
+			uniform float cameraFar;
+
+
+			float readDepth( sampler2D depthSampler, vec2 coord ) {
+				float fragCoordZ = texture2D( depthSampler, coord ).x;
+				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
+				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
+			}
+
+			void main() {
+				//vec3 diffuse = texture2D( tDiffuse, vUv ).rgb;
+				float depth = readDepth( tDepth, vUv );
+
+				gl_FragColor.rgb = 1.0 - vec3( depth );
+				gl_FragColor.a = 1.0;
+			}
+		</script>
+
+	</head>
+	<body>
+		<canvas></canvas>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - WebGL - Depth Texture<br/>
+			Stores render target depth in a texture attachment.<br/>
+			Created by <a href="http://twitter.com/mattdesl" target="_blank" rel="noopener">@mattdesl</a>.
+
+			<div id="error" style="display: none;">
+			Your browser does not support <strong>WEBGL_depth_texture</strong>.<br/><br/>
+			This demo will not work.
+			</div>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/shaders/SSAOShader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var camera, scene, renderer, stats;
+			var target;
+			var postScene, postCamera;
+			var supportsExtension = true;
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { canvas: document.querySelector( 'canvas' ) } );
+
+				if ( !renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
+
+					supportsExtension = false;
+					document.querySelector( '#error' ).style.display = 'block';
+					return;
+
+				}
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
+				camera.position.z = 4;
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.25;
+				controls.rotateSpeed = 0.35;
+
+				// Create a multi render target with Float buffers
+				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				target.texture.format = THREE.RGBFormat;
+				target.texture.minFilter = THREE.NearestFilter;
+				target.texture.magFilter = THREE.NearestFilter;
+				target.texture.generateMipmaps = false;
+				target.stencilBuffer = false;
+				target.depthBuffer = true;
+				target.depthTexture = new THREE.DepthTexture();
+				target.depthTexture.type = THREE.UnsignedShortType;
+
+				// Our scene
+				scene = new THREE.Scene();
+				setupScene();
+
+				// Setup post-processing step
+				setupPost();
+
+				onWindowResize();
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function setupPost () {
+
+				// Setup post processing stage
+				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				var postMaterial = new THREE.ShaderMaterial( {
+					vertexShader: document.querySelector( '#post-vert' ).textContent.trim(),
+					fragmentShader: document.querySelector( '#post-frag' ).textContent.trim(),
+					uniforms: {
+						cameraNear: { value: camera.near },
+						cameraFar:  { value: camera.far },
+						tDiffuse:   { value: target.texture },
+						tDepth:     { value: target.depthTexture }
+					}
+				});
+				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
+				var postQuad = new THREE.Mesh( postPlane, postMaterial );
+				postScene = new THREE.Scene();
+				postScene.add( postQuad );
+
+			}
+
+			function setupScene () {
+
+				//var diffuse = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
+				//diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
+
+				// Setup some geometries
+				var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
+				var material = new THREE.MeshBasicMaterial( { color: 'blue' } );
+
+				var count = 50;
+				var scale = 5;
+
+				for ( var i = 0; i < count; i ++ ) {
+
+					var r = Math.random() * 2.0 * Math.PI;
+					var z = ( Math.random() * 2.0 ) - 1.0;
+					var zScale = Math.sqrt( 1.0 - z * z ) * scale;
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set(
+						Math.cos( r ) * zScale,
+						Math.sin( r ) * zScale,
+						z * scale
+					);
+					mesh.rotation.set( Math.random(), Math.random(), Math.random() );
+					scene.add( mesh );
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+				camera.aspect = aspect;
+				camera.updateProjectionMatrix();
+
+				var dpr = renderer.getPixelRatio();
+				target.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				if ( !supportsExtension ) return;
+
+				requestAnimationFrame( animate );
+
+				// render scene into target
+				renderer.render( scene, camera, target );
+
+				// render post FX
+				renderer.render( postScene, postCamera );
+
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>

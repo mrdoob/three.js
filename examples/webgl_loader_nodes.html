@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - node material</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				margin: 0px;
+				text-align:center;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
+			}
+
+			a { color: white }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material</br>
+			Serialized using <a href="webgl_materials_nodes.html">webgl_materials_nodes.html</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src='js/geometries/TeapotBufferGeometry.js'></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<!-- NodeLibrary -->
+		<script src="js/nodes/GLNode.js"></script>
+		<script src="js/nodes/RawNode.js"></script>
+		<script src="js/nodes/TempNode.js"></script>
+		<script src="js/nodes/InputNode.js"></script>
+		<script src="js/nodes/ConstNode.js"></script>
+		<script src="js/nodes/VarNode.js"></script>
+		<script src="js/nodes/FunctionNode.js"></script>
+		<script src="js/nodes/FunctionCallNode.js"></script>
+		<script src="js/nodes/AttributeNode.js"></script>
+		<script src="js/nodes/NodeUniform.js"></script>
+		<script src="js/nodes/NodeBuilder.js"></script>
+		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
+		<script src="js/nodes/NodeMaterial.js"></script>
+
+		<!-- Accessors -->
+		<script src="js/nodes/accessors/PositionNode.js"></script>
+		<script src="js/nodes/accessors/NormalNode.js"></script>
+		<script src="js/nodes/accessors/UVNode.js"></script>
+		<script src="js/nodes/accessors/ScreenUVNode.js"></script>
+		<script src="js/nodes/accessors/ColorsNode.js"></script>
+		<script src="js/nodes/accessors/CameraNode.js"></script>
+		<script src="js/nodes/accessors/ReflectNode.js"></script>
+		<script src="js/nodes/accessors/LightNode.js"></script>
+
+		<!-- Inputs -->
+		<script src="js/nodes/inputs/IntNode.js"></script>
+		<script src="js/nodes/inputs/FloatNode.js"></script>
+		<script src="js/nodes/inputs/ColorNode.js"></script>
+		<script src="js/nodes/inputs/Vector2Node.js"></script>
+		<script src="js/nodes/inputs/Vector3Node.js"></script>
+		<script src="js/nodes/inputs/Vector4Node.js"></script>
+		<script src="js/nodes/inputs/TextureNode.js"></script>
+		<script src="js/nodes/inputs/Matrix4Node.js"></script>
+		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
+
+		<!-- Math -->
+		<script src="js/nodes/math/Math1Node.js"></script>
+		<script src="js/nodes/math/Math2Node.js"></script>
+		<script src="js/nodes/math/Math3Node.js"></script>
+		<script src="js/nodes/math/OperatorNode.js"></script>
+
+		<!-- Utils -->
+		<script src="js/nodes/utils/SwitchNode.js"></script>
+		<script src="js/nodes/utils/JoinNode.js"></script>
+		<script src="js/nodes/utils/TimerNode.js"></script>
+		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
+		<script src="js/nodes/utils/VelocityNode.js"></script>
+		<script src="js/nodes/utils/LuminanceNode.js"></script>
+		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
+		<script src="js/nodes/utils/NoiseNode.js"></script>
+		<script src="js/nodes/utils/ResolutionNode.js"></script>
+		<script src="js/nodes/utils/BumpNode.js"></script>
+		<script src="js/nodes/utils/BlurNode.js"></script>
+		<script src="js/nodes/utils/UVTransformNode.js"></script>
+
+		<!-- Phong Material -->
+		<script src="js/nodes/materials/PhongNode.js"></script>
+		<script src="js/nodes/materials/PhongNodeMaterial.js"></script>
+
+		<!-- Standard Material -->
+		<script src="js/nodes/materials/StandardNode.js"></script>
+		<script src="js/nodes/materials/StandardNodeMaterial.js"></script>
+
+		<!-- NodeMaterial Loader -->
+		<script src="js/loaders/NodeMaterialLoader.js"></script>
+
+		<script>
+
+		var container = document.getElementById( 'container' );
+
+		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+		var frame = new THREE.NodeFrame();
+		var teapot, mesh, cloud;
+		var controls;
+		var gui;
+
+		var param = { load: 'caustic' };
+
+		window.addEventListener( 'load', init );
+
+		function init() {
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.x = 50;
+			camera.position.z = - 50;
+			camera.position.y = 30;
+			camera.target = new THREE.Vector3();
+
+			cloud = new THREE.TextureLoader().load( 'textures/lava/cloud.png' );
+			cloud.wrapS = cloud.wrapT = THREE.RepeatWrapping;
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 50;
+			controls.maxDistance = 200;
+
+			scene.add( new THREE.AmbientLight( 0x464646 ) );
+
+			var light = new THREE.DirectionalLight( 0xffddcc, 1 );
+			light.position.set( 1, 0.75, 0.5 );
+			scene.add( light );
+
+			var light = new THREE.DirectionalLight( 0xccccff, 1 );
+			light.position.set( - 1, 0.75, - 0.5 );
+			scene.add( light );
+
+			teapot = new THREE.TeapotBufferGeometry( 15, 18 );
+
+			mesh = new THREE.Mesh( teapot );
+			scene.add( mesh );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			updateMaterial();
+
+			onWindowResize();
+			animate();
+
+		}
+
+		function clearGui() {
+
+			if ( gui ) gui.destroy();
+
+			gui = new dat.GUI();
+
+			var example = gui.add( param, 'load', {
+				'caustic': 'caustic',
+				'displace': 'displace',
+				'wave': 'wave',
+				'xray': 'xray'
+			} ).onFinishChange( function () {
+
+				updateMaterial();
+
+			} );
+
+			gui.open();
+
+		}
+
+		function addGui( name, value, callback, isColor, min, max ) {
+
+			var node;
+
+			param[ name ] = value;
+
+			if ( isColor ) {
+
+				node = gui.addColor( param, name ).onChange( function () {
+
+					callback( param[ name ] );
+
+				} );
+
+			} else if ( typeof value == 'object' ) {
+
+				node = gui.add( param, name, value ).onChange( function () {
+
+					callback( param[ name ] );
+
+				} );
+
+			} else {
+
+				node = gui.add( param, name, min, max ).onChange( function () {
+
+					callback( param[ name ] );
+
+				} );
+
+			}
+
+			return node;
+
+		}
+
+
+		function updateMaterial() {
+
+			if ( mesh.material ) mesh.material.dispose();
+
+			clearGui();
+
+			var url = "nodes/" + param.load + ".json";
+
+			var library = {
+				"cloud": cloud
+			};
+
+			var loader = new THREE.NodeMaterialLoader( undefined, library ).load( url, function () {
+
+				var time = loader.getObjectByName( "time" );
+
+				if ( time ) {
+
+					// enable time scale
+
+					time.timeScale = true;
+
+					loader.material.build();
+
+					// gui
+
+					addGui( 'timeScale', time.scale, function ( val ) {
+
+						time.scale = val;
+
+					}, false, - 2, 2 );
+
+				}
+
+				// set material
+				mesh.material = loader.material;
+
+			} );
+
+		}
+
+		function onWindowResize() {
+
+			var width = window.innerWidth, height = window.innerHeight;
+
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( width, height );
+
+		}
+
+		function animate() {
+
+			var delta = clock.getDelta();
+
+			// update material animation and/or gpu calcs (pre-renderer)
+			if ( mesh.material instanceof THREE.NodeMaterial ) frame.update( delta ).updateNode( mesh.material );
+
+			renderer.render( scene, camera );
+
+			requestAnimationFrame( animate );
+
+		}
+
+		</script>
+	</body>
+</html>

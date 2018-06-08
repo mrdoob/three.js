@@ -2,52 +2,78 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Material] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A material that maps the normal vectors to RGB colors.</div>
+		<p class="desc">A material that maps the normal vectors to RGB colors.</p>
 
-		<iframe src='../../scenes/material-browser.html#MeshNormalMaterial'></iframe>
+		<iframe id="scene" src="scenes/material-browser.html#MeshNormalMaterial"></iframe>
 
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]([page:Object parameters])</h3>
-		<div>
-		parameters is an object with one or more properties defining the material's appearance.
-		</div>
-		<div>
-		wireframe -- Render geometry as wireframe. Default is false (i.e. render as smooth shaded).<br/>
-		wireframeLinewidth -- Controls wireframe thickness. Default is 1.<br/>
-		morphTargets -- Define whether the material uses morphTargets. Default is false.<br/>
-		</div>
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
+			Any property of the material (including any property inherited from [page:Material]) can be passed in here.
+		</p>
 
 
 		<h2>Properties</h2>
+		<p>See the base [page:Material] class for common properties.</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>Whether the material is affected by fog. Default is *false*.</p>
 
-		<h3>[property:boolean wireframe]</h3>
-		<div>
-			Render geometry as wireframe. Default is false (i.e. render as smooth shaded).
-		</div>
+		<h3>[property:Boolean isMeshNormalMaterial]</h3>
+		<p>
+			Used to check whether this or derived classes are mesh normal materials. Default is *true*.<br /><br />
 
-		<h3>[property:number wireframeLinewidth]</h3>
-		<div>
-			Controls wireframe thickness. Default is 1.<br/><br/>
-			Due to limitations in the ANGLE layer, on Windows platforms linewidth will always be 1 regardless of the set value.
-		</div>
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+		<h3>[property:Boolean lights]</h3>
+		<p>Whether the material is affected by lights. Default is *false*.</p>
 
 		<h3>[property:boolean morphTargets]</h3>
-		<div>Define whether the material uses morphTargets. Default is false.</div>
+		<p>Define whether the material uses morphTargets. Default is false.</p>
+
+		<h3>[property:boolean wireframe]</h3>
+		<p>
+			Render geometry as wireframe. Default is false (i.e. render as smooth shaded).
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>Controls wireframe thickness. Default is 1.<br /><br />
+
+		Due to limitations in the [link:https://code.google.com/p/angleproject ANGLE layer],
+		on Windows platforms linewidth will always be 1 regardless of the set value.
+		</p>
 
 		<h2>Methods</h2>
+		<p>See the base [page:Material] class for common methods.</p>
 
 
 

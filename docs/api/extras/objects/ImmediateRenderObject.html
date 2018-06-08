@@ -2,37 +2,38 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
-		
+
 		<h1>[name]</h1>
 
-		<div class="desc">base class for immediate rendering objects.</div>
+		<p class="desc">base class for immediate rendering objects.</p>
 
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]()</h3>
-		<div>
-		This creates a new [name]. 
-		</div>
+		<p>
+		This creates a new [name].
+		</p>
 
 
 		<h2>Methods</h2>
 
 
-		<h3>[method:null render]([page:Function renderCallback])</h3>
-		<div>
+		<h3>[method:null render]([param:Function renderCallback])</h3>
+		<p>
 		renderCallback -- A function to render the generated object.
-		</div>
-		<div>
+		</p>
+		<p>
 		This function needs to be overridden to start the creation of the object and should call renderCallback when finished.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

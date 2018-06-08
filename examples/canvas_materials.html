@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -44,39 +44,30 @@
 
 				// Grid
 
-				var size = 500, step = 100;
-
-				var geometry = new THREE.Geometry();
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, - 120, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, - 120, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, - 120, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, - 120,   size ) );
-
-				}
-
-				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
-
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
-				scene.add( line );
+				var gridHelper = new THREE.GridHelper( 1000, 10 );
+				gridHelper.position.y = - 120;
+				scene.add( gridHelper );
 
 				// Spheres
 
 				var geometry = new THREE.SphereGeometry( 100, 14, 7 );
 
+				var textureLoader = new THREE.TextureLoader();
+
+				var earthTexture = textureLoader.load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+
+				var envMap = textureLoader.load( 'textures/envmap.png' );
+				envMap.mapping = THREE.SphericalReflectionMapping;
+
 				var materials = [
 
 					new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
 					new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ),
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } ),
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: 0.5 } ),
-					new THREE.MeshDepthMaterial( { overdraw: 0.5 } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ),
 					new THREE.MeshNormalMaterial( { overdraw: 0.5 } ),
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', THREE.SphericalReflectionMapping ), overdraw: 0.5 } )
+					new THREE.MeshBasicMaterial( { map: earthTexture } ),
+					new THREE.MeshBasicMaterial( { envMap: envMap, overdraw: 0.5 } )
 
 				];
 
@@ -87,7 +78,7 @@
 
 				}
 
-				materials.push( new THREE.MeshFaceMaterial( materials ) );
+				materials.push( materials );
 
 				objects = [];
 
@@ -115,7 +106,7 @@
 					context.arc( 0, 0, 0.5, 0, PI2, true );
 					context.fill();
 
-				}
+				};
 
 				// Lights
 
@@ -140,23 +131,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var debugCanvas = document.createElement( 'canvas' );
-				debugCanvas.width = 512;
-				debugCanvas.height = 512;
-				debugCanvas.style.position = 'absolute';
-				debugCanvas.style.top = '0px';
-				debugCanvas.style.left = '0px';
-
-				container.appendChild( debugCanvas );
-
-				debugContext = debugCanvas.getContext( '2d' );
-				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
-				debugContext.strokeStyle = '#000000';
-
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild(stats.dom);
 
 				//
 
@@ -176,7 +152,7 @@
 			function loadImage( path ) {
 
 				var image = document.createElement( 'img' );
-				var texture = new THREE.Texture( image, THREE.UVMapping )
+				var texture = new THREE.Texture( image, THREE.UVMapping );
 
 				image.onload = function () { texture.needsUpdate = true; };
 				image.src = path;

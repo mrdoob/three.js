@@ -10,10 +10,10 @@ THREE.DOFMipMapShader = {
 
 	uniforms: {
 
-		"tColor":   { type: "t", value: null },
-		"tDepth":   { type: "t", value: null },
-		"focus":    { type: "f", value: 1.0 },
-		"maxblur":  { type: "f", value: 1.0 }
+		"tColor":   { value: null },
+		"tDepth":   { value: null },
+		"focus":    { value: 1.0 },
+		"maxblur":  { value: 1.0 }
 
 	},
 
@@ -28,7 +28,7 @@ THREE.DOFMipMapShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -53,6 +53,6 @@ THREE.DOFMipMapShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

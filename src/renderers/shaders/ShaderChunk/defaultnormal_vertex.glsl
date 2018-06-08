@@ -1,21 +1,7 @@
-#ifdef USE_SKINNING
-
-	vec3 objectNormal = skinnedNormal.xyz;
-
-#elif defined( USE_MORPHNORMALS )
-
-	vec3 objectNormal = morphedNormal;
-
-#else
-
-	vec3 objectNormal = normal;
-
-#endif
+vec3 transformedNormal = normalMatrix * objectNormal;
 
 #ifdef FLIP_SIDED
 
-	objectNormal = -objectNormal;
+	transformedNormal = - transformedNormal;
 
 #endif
-
-vec3 transformedNormal = normalMatrix * objectNormal;

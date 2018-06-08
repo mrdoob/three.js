@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - read float pixels</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> read float pixels webgl example</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script id="fragment_shader_screen" type="x-shader/x-fragment">
+
+			varying vec2 vUv;
+			uniform sampler2D tDiffuse;
+
+			void main() {
+
+				gl_FragColor = texture2D( tDiffuse, vUv );
+
+			}
+
+		</script>
+
+		<script id="fragment_shader_pass_1" type="x-shader/x-fragment">
+
+			varying vec2 vUv;
+			uniform float time;
+
+			void main() {
+
+				float r = vUv.x;
+				if( vUv.y < 0.5 ) r = 0.0;
+				float g = vUv.y;
+				if( vUv.x < 0.5 ) g = 0.0;
+
+				gl_FragColor = vec4( r, g, time, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var cameraRTT, sceneRTT, sceneScreen, renderer, zmesh1, zmesh2;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var rtTexture, material, quad;
+
+			var delta = 0.01;
+			var valueNode;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
+				cameraRTT.position.z = 100;
+
+				//
+
+				sceneRTT = new THREE.Scene();
+				sceneScreen = new THREE.Scene();
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 ).normalize();
+				sceneRTT.add( light );
+
+				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
+				light.position.set( 0, 0, - 1 ).normalize();
+				sceneRTT.add( light );
+
+				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, type: THREE.FloatType } );
+
+				material = new THREE.ShaderMaterial( {
+
+					uniforms: { time: { value: 0.0 } },
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragment_shader_pass_1' ).textContent
+
+				} );
+
+				var materialScreen = new THREE.ShaderMaterial( {
+
+					uniforms: { tDiffuse: { value: rtTexture.texture } },
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
+
+					depthWrite: false
+
+				} );
+
+				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+
+				quad = new THREE.Mesh( plane, material );
+				quad.position.z = - 100;
+				sceneRTT.add( quad );
+
+				var geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
+
+				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
+				var mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
+
+				zmesh1 = new THREE.Mesh( geometry, mat1 );
+				zmesh1.position.set( 0, 0, 100 );
+				zmesh1.scale.set( 1.5, 1.5, 1.5 );
+				sceneRTT.add( zmesh1 );
+
+				zmesh2 = new THREE.Mesh( geometry, mat2 );
+				zmesh2.position.set( 0, 150, 100 );
+				zmesh2.scale.set( 0.75, 0.75, 0.75 );
+				sceneRTT.add( zmesh2 );
+
+				quad = new THREE.Mesh( plane, materialScreen );
+				quad.position.z = - 100;
+				sceneScreen.add( quad );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				var valueDiv = document.createElement( 'div' );
+				valueDiv.style.position = 'absolute';
+				valueDiv.style.top = '0px';
+				valueDiv.style.right = '0px';
+				valueDiv.style.width = '500px';
+				valueDiv.style.height = '300px';
+				valueDiv.style.fontSize = '60px';
+				container.appendChild( valueDiv );
+				valueNode = document.createTextNode( '' );
+				valueDiv.appendChild( valueNode );
+
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.0015;
+
+				if ( zmesh1 && zmesh2 ) {
+
+					zmesh1.rotation.y = - time;
+					zmesh2.rotation.y = - time + Math.PI / 2;
+
+				}
+
+				if ( material.uniforms.time.value > 1 || material.uniforms.time.value < 0 ) {
+
+					delta *= - 1;
+
+				}
+
+				material.uniforms.time.value += delta;
+
+				renderer.clear();
+
+				// Render first scene into texture
+
+				renderer.render( sceneRTT, cameraRTT, rtTexture, true );
+
+				// Render full screen quad with generated texture
+
+				renderer.render( sceneScreen, cameraRTT );
+
+				var read = new Float32Array( 4 );
+				renderer.readRenderTargetPixels( rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read );
+
+				valueNode.nodeValue = 'r:' + read[ 0 ] + ' g:' + read[ 1 ] + ' b:' + read[ 2 ];
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -27,10 +27,10 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - OBJLoader test
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script>
@@ -55,18 +55,18 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 100;
+				camera.position.z = 250;
 
 				// scene
 
 				scene = new THREE.Scene();
 
-				var ambient = new THREE.AmbientLight( 0x101030 );
-				scene.add( ambient );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				scene.add( directionalLight );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
 
 				// texture
 
@@ -77,7 +77,10 @@
 
 				};
 
-				var texture = new THREE.Texture();
+				var textureLoader = new THREE.TextureLoader( manager );
+				var texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+
+				// model
 
 				var onProgress = function ( xhr ) {
 					if ( xhr.lengthComputable ) {
@@ -89,19 +92,8 @@
 				var onError = function ( xhr ) {
 				};
 
-
-				var loader = new THREE.ImageLoader( manager );
-				loader.load( 'textures/UV_Grid_Sm.jpg', function ( image ) {
-
-					texture.image = image;
-					texture.needsUpdate = true;
-
-				} );
-
-				// model
-
 				var loader = new THREE.OBJLoader( manager );
-				loader.load( 'obj/male02/male02.obj', function ( object ) {
+				loader.load( 'models/obj/male02/male02.obj', function ( object ) {
 
 					object.traverse( function ( child ) {
 
@@ -113,7 +105,7 @@
 
 					} );
 
-					object.position.y = - 80;
+					object.position.y = - 95;
 					scene.add( object );
 
 				}, onProgress, onError );

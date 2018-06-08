@@ -35,7 +35,7 @@
 			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255">iClone</a>.
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -84,6 +84,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				// GROUND
 
@@ -101,9 +102,12 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
-				xm.map.needsUpdate = true;
-				xm.map.repeat.set( 10, 10 );
+				var texture = new THREE.CanvasTexture( x );
+				texture.repeat.set( 10, 10 );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+
+				var xm = new THREE.MeshBasicMaterial( { map: texture } );
 
 				geometry = new THREE.PlaneBufferGeometry( 100, 100, 15, 10 );
 
@@ -112,26 +116,6 @@
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.set( 10, 10, 10 );
 				scene.add( mesh );
-
-				// SPHERES
-
-				var material_spheres = new THREE.MeshLambertMaterial( { color: 0xdddddd } ),
-					sphere = new THREE.SphereGeometry( 100, 16, 8 );
-
-				for ( var i = 0; i < 10; i ++ ) {
-
-					mesh = new THREE.Mesh( sphere, material_spheres );
-
-					mesh.position.x = 500 * ( Math.random() - 0.5 );
-					mesh.position.y = 300 * ( Math.random() - 0 ) + FLOOR;
-					mesh.position.z = 100 * ( Math.random() - 1 );
-
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
-
-					scene.add( mesh );
-
-				}
-
 
 				// LIGHTS
 
@@ -149,7 +133,6 @@
 					try {
 
 						webglRenderer = new THREE.WebGLRenderer();
-						webglRenderer.setClearColor( 0xffffff );
 						webglRenderer.setPixelRatio( window.devicePixelRatio );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
@@ -167,7 +150,6 @@
 				if ( render_canvas ) {
 
 					canvasRenderer = new THREE.CanvasRenderer();
-					canvasRenderer.setClearColor( 0xffffff );
 					canvasRenderer.setPixelRatio( window.devicePixelRatio );
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
@@ -177,10 +159,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -193,8 +172,8 @@
 				var callbackMale = function ( geometry, materials ) { createScene( geometry, materials, 90, FLOOR, 50, 105 ) };
 				var callbackFemale = function ( geometry, materials ) { createScene( geometry, materials, -80, FLOOR, 50, 0 ) };
 
-				loader.load( "obj/male02/Male02_dds.js", callbackMale );
-				loader.load( "obj/female02/Female02_slim.js", callbackFemale );
+				loader.load( "models/json/male02/Male02_dds.json", callbackMale );
+				loader.load( "models/json/female02/Female02_slim.json", callbackFemale );
 
 				//
 
@@ -217,7 +196,7 @@
 
 			function createScene( geometry, materials, x, y, z, b ) {
 
-				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				zmesh = new THREE.Mesh( geometry, materials );
 				zmesh.position.set( x, y, z );
 				zmesh.scale.set( 3, 3, 3 );
 				scene.add( zmesh );
@@ -249,8 +228,7 @@
 					xc.font = "50pt arial bold";
 					xc.fillText( i, 10, 64 );
 
-					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ), transparent: true } );
-					xm.map.needsUpdate = true;
+					var xm = new THREE.MeshBasicMaterial( { map: new THREE.CanvasTexture( x ), transparent: true } );
 
 					mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( size, size ), xm );
 					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 )* ( size + 5 )/2);

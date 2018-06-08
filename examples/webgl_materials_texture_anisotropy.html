@@ -32,17 +32,12 @@
 			.c { color:#fa0 }
 
 			a { color:red }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #777 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - anisotropic texture filtering example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - anisotropic texture filtering example
 		</div>
 
 		<div id="lbl_left" class="lbl">
@@ -53,7 +48,7 @@
 		anisotropy: <span class="c" id="val_right"></span><br/>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -91,10 +86,12 @@
 				camera.position.z = 1500;
 
 				scene1 = new THREE.Scene();
-				scene2 = new THREE.Scene();
-
+				scene1.background = new THREE.Color( 0xf2f7ff );
 				scene1.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
-				scene2.fog = scene1.fog;
+
+				scene2 = new THREE.Scene();
+				scene2.background = new THREE.Color( 0xf2f7ff );
+				scene2.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
 
 				scene1.add( new THREE.AmbientLight( 0xeef0ff ) );
 				scene2.add( new THREE.AmbientLight( 0xeef0ff ) );
@@ -109,16 +106,18 @@
 
 				// GROUND
 
-				var maxAnisotropy = renderer.getMaxAnisotropy();
+				var textureLoader = new THREE.TextureLoader();
 
-				var texture1 = THREE.ImageUtils.loadTexture( "textures/crate.gif" );
+				var maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+
+				var texture1 = textureLoader.load( "textures/crate.gif" );
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
 				texture1.anisotropy = maxAnisotropy;
 				texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
 				texture1.repeat.set( 512, 512 );
 
-				var texture2 = THREE.ImageUtils.loadTexture( "textures/crate.gif" );
+				var texture2 = textureLoader.load( "textures/crate.gif" );
 				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
 				texture2.anisotropy = 1;
@@ -154,7 +153,6 @@
 
 				// RENDERER
 
-				renderer.setClearColor( scene1.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
@@ -165,7 +163,7 @@
 				// STATS1
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -196,15 +194,16 @@
 
 				camera.lookAt( scene1.position );
 
-				renderer.enableScissorTest( false );
 				renderer.clear();
-				renderer.enableScissorTest( true );
+				renderer.setScissorTest( true );
 
 				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene1, camera );
 
 				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
 				renderer.render( scene2, camera );
+
+				renderer.setScissorTest( false );
 
 
 			}

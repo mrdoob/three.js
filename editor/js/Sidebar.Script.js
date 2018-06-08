@@ -6,28 +6,23 @@ Sidebar.Script = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/script/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
-
-		editor.config.setKey( 'ui/sidebar/script/collapsed', boolean );
-
-	} );
+	var container = new UI.Panel();
 	container.setDisplay( 'none' );
 
-	container.addStatic( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Break() );
 	container.add( new UI.Break() );
 
 	//
 
-	var scriptsContainer = new UI.Panel();
+	var scriptsContainer = new UI.Row();
 	container.add( scriptsContainer );
 
 	var newScript = new UI.Button( 'New' );
 	newScript.onClick( function () {
 
 		var script = { name: '', source: 'function update( event ) {}' };
-		editor.addScript( editor.selected, script );
+		editor.execute( new AddScriptCommand( editor.selected, script ) );
 
 	} );
 	container.add( newScript );
@@ -43,11 +38,21 @@ Sidebar.Script = function ( editor ) {
 	function update() {
 
 		scriptsContainer.clear();
+		scriptsContainer.setDisplay( 'none' );
 
 		var object = editor.selected;
+
+		if ( object === null ) {
+
+			return;
+
+		}
+
 		var scripts = editor.scripts[ object.uuid ];
 
 		if ( scripts !== undefined ) {
+
+			scriptsContainer.setDisplay( 'block' );
 
 			for ( var i = 0; i < scripts.length; i ++ ) {
 
@@ -56,9 +61,7 @@ Sidebar.Script = function ( editor ) {
 					var name = new UI.Input( script.name ).setWidth( '130px' ).setFontSize( '12px' );
 					name.onChange( function () {
 
-						script.name = this.getValue();
-
-						signals.scriptChanged.dispatch();
+						editor.execute( new SetScriptValueCommand( editor.selected, script, 'name', this.getValue() ) );
 
 					} );
 					scriptsContainer.add( name );
@@ -78,7 +81,7 @@ Sidebar.Script = function ( editor ) {
 
 						if ( confirm( 'Are you sure?' ) ) {
 
-							editor.removeScript( editor.selected, script );
+							editor.execute( new RemoveScriptCommand( editor.selected, script ) );
 
 						}
 
@@ -99,7 +102,7 @@ Sidebar.Script = function ( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		if ( object !== null ) {
+		if ( object !== null && editor.camera !== object ) {
 
 			container.setDisplay( 'block' );
 
@@ -115,6 +118,7 @@ Sidebar.Script = function ( editor ) {
 
 	signals.scriptAdded.add( update );
 	signals.scriptRemoved.add( update );
+	signals.scriptChanged.add( update );
 
 	return container;
 

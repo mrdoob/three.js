@@ -53,15 +53,15 @@ Viewport.Info = function ( editor ) {
 
 					} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-						vertices += geometry.attributes.position.array.length / 3;
+						vertices += geometry.attributes.position.count;
 
-						if ( geometry.attributes.index !== undefined ) {
+						if ( geometry.index !== null ) {
 
-							triangles += geometry.attributes.index.array.length / 3;
+							triangles += geometry.index.count / 3;
 
 						} else {
 
-							triangles += geometry.attributes.position.array.length / 9;
+							triangles += geometry.attributes.position.count / 3;
 
 						}
 
@@ -81,4 +81,4 @@ Viewport.Info = function ( editor ) {
 
 	return container;
 
-}
+};

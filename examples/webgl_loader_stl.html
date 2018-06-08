@@ -38,11 +38,11 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			STL loader test by <a href="https://github.com/aleeper">aleeper</a>. PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/STLLoader.js"></script>
 
@@ -71,6 +71,7 @@
 				cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x72645b );
 				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
 
@@ -165,32 +166,27 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x777777 ) );
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
 				addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
-
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
 
 				container.appendChild( renderer.domElement );
 
 				// stats
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -201,26 +197,24 @@
 			function addShadowedLight( x, y, z, color, intensity ) {
 
 				var directionalLight = new THREE.DirectionalLight( color, intensity );
-				directionalLight.position.set( x, y, z )
+				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
-				// directionalLight.shadowCameraVisible = true;
 
 				var d = 1;
-				directionalLight.shadowCameraLeft = -d;
-				directionalLight.shadowCameraRight = d;
-				directionalLight.shadowCameraTop = d;
-				directionalLight.shadowCameraBottom = -d;
+				directionalLight.shadow.camera.left = -d;
+				directionalLight.shadow.camera.right = d;
+				directionalLight.shadow.camera.top = d;
+				directionalLight.shadow.camera.bottom = -d;
 
-				directionalLight.shadowCameraNear = 1;
-				directionalLight.shadowCameraFar = 4;
+				directionalLight.shadow.camera.near = 1;
+				directionalLight.shadow.camera.far = 4;
 
-				directionalLight.shadowMapWidth = 1024;
-				directionalLight.shadowMapHeight = 1024;
+				directionalLight.shadow.mapSize.width = 1024;
+				directionalLight.shadow.mapSize.height = 1024;
 
-				directionalLight.shadowBias = -0.005;
-				directionalLight.shadowDarkness = 0.15;
+				directionalLight.shadow.bias = -0.002;
 
 			}
 

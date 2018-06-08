@@ -39,19 +39,16 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward)</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
+		<script src="js/BufferGeometryUtils.js"></script>
 		<script src="js/ImprovedNoise.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-
-		<script src="js/wip/TypedGeometry.js"></script>
-		<script src="js/wip/IndexedTypedGeometry.js"></script>
-		<script src="js/wip/PlaneTypedGeometry.js"></script>
 
 		<script>
 
@@ -91,43 +88,44 @@
 				controls.lookVertical = true;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				// sides
 
 				var matrix = new THREE.Matrix4();
 
-				var pxGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				pxGeometry.uvs[ 1 ] = 0.5;
-				pxGeometry.uvs[ 3 ] = 0.5;
-				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
-				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
+				var pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
+				pxGeometry.attributes.uv.array[ 3 ] = 0.5;
+				pxGeometry.rotateY( Math.PI / 2 );
+				pxGeometry.translate( 50, 0, 0 );
 
-				var nxGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				nxGeometry.uvs[ 1 ] = 0.5;
-				nxGeometry.uvs[ 3 ] = 0.5;
-				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
-				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
+				var nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
+				nxGeometry.attributes.uv.array[ 3 ] = 0.5;
+				nxGeometry.rotateY( - Math.PI / 2 );
+				nxGeometry.translate( - 50, 0, 0 );
 
-				var pyGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				pyGeometry.uvs[ 5 ] = 0.5;
-				pyGeometry.uvs[ 7 ] = 0.5;
-				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
-				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
+				var pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
+				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
+				pyGeometry.rotateX( - Math.PI / 2 );
+				pyGeometry.translate( 0, 50, 0 );
 
-				var pzGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				pzGeometry.uvs[ 1 ] = 0.5;
-				pzGeometry.uvs[ 3 ] = 0.5;
-				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
+				var pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
+				pzGeometry.attributes.uv.array[ 3 ] = 0.5;
+				pzGeometry.translate( 0, 0, 50 );
 
-				var nzGeometry = new THREE.PlaneTypedGeometry( 100, 100 );
-				nzGeometry.uvs[ 1 ] = 0.5;
-				nzGeometry.uvs[ 3 ] = 0.5;
-				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
-				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, -50 ) );
+				var nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
+				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
+				nzGeometry.rotateY( Math.PI );
+				nzGeometry.translate( 0, 0, -50 );
 
 				//
 
-				var geometry = new THREE.TypedGeometry( worldWidth * worldDepth * 2 * 5 ); // 2 triangles, 5 possible sides
+				var geometries = [];
 
 				for ( var z = 0; z < worldDepth; z ++ ) {
 
@@ -146,29 +144,29 @@
 						var pz = getY( x, z + 1 );
 						var nz = getY( x, z - 1 );
 
-						geometry.merge( pyGeometry, matrix );
+						geometries.push( pyGeometry.clone().applyMatrix( matrix ) );
 
-						if ( ( px != h && px != h + 1 ) || x == 0 ) {
+						if ( ( px !== h && px !== h + 1 ) || x === 0 ) {
 
-							geometry.merge( pxGeometry, matrix );
-
-						}
-
-						if ( ( nx != h && nx != h + 1 ) || x == worldWidth - 1 ) {
-
-							geometry.merge( nxGeometry, matrix );
+							geometries.push( pxGeometry.clone().applyMatrix( matrix ) );
 
 						}
 
-						if ( ( pz != h && pz != h + 1 ) || z == worldDepth - 1 ) {
+						if ( ( nx !== h && nx !== h + 1 ) || x === worldWidth - 1 ) {
 
-							geometry.merge( pzGeometry, matrix );
+							geometries.push( nxGeometry.clone().applyMatrix( matrix ) );
 
 						}
 
-						if ( ( nz != h && nz != h + 1 ) || z == 0 ) {
+						if ( ( pz !== h && pz !== h + 1 ) || z === worldDepth - 1 ) {
 
-							geometry.merge( nzGeometry, matrix );
+							geometries.push( pzGeometry.clone().applyMatrix( matrix ) );
+
+						}
+
+						if ( ( nz !== h && nz !== h + 1 ) || z === 0 ) {
+
+							geometries.push( nzGeometry.clone().applyMatrix( matrix ) );
 
 						}
 
@@ -176,11 +174,11 @@
 
 				}
 
+				var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries );
 				geometry.computeBoundingSphere();
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
+				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
-				texture.minFilter = THREE.LinearMipMapLinearFilter;
 
 				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture } ) );
 				scene.add( mesh );
@@ -192,8 +190,7 @@
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xbfd1e5 );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -202,9 +199,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -230,7 +225,7 @@
 
 				for ( var j = 0; j < 4; j ++ ) {
 
-					if ( j == 0 ) for ( var i = 0; i < size; i ++ ) data[ i ] = 0;
+					if ( j === 0 ) for ( var i = 0; i < size; i ++ ) data[ i ] = 0;
 
 					for ( var i = 0; i < size; i ++ ) {
 
@@ -240,7 +235,7 @@
 
 					}
 
-					quality *= 4
+					quality *= 4;
 
 				}
 

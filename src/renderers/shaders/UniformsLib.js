@@ -1,104 +1,189 @@
+import { Color } from '../../math/Color.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { Matrix3 } from '../../math/Matrix3.js';
+
 /**
  * Uniforms library for shared webgl shaders
  */
 
-THREE.UniformsLib = {
+var UniformsLib = {
 
 	common: {
 
-		"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity" : { type: "f", value: 1.0 },
+		diffuse: { value: new Color( 0xeeeeee ) },
+		opacity: { value: 1.0 },
 
-		"map" : { type: "t", value: null },
-		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		map: { value: null },
+		uvTransform: { value: new Matrix3() },
 
-		"lightMap" : { type: "t", value: null },
-		"specularMap" : { type: "t", value: null },
-		"alphaMap" : { type: "t", value: null },
-
-		"envMap" : { type: "t", value: null },
-		"flipEnvMap" : { type: "f", value: - 1 },
-		"reflectivity" : { type: "f", value: 1.0 },
-		"refractionRatio" : { type: "f", value: 0.98 },
-
-		"morphTargetInfluences" : { type: "f", value: 0 }
+		alphaMap: { value: null },
 
 	},
 
-	bump: {
+	specularmap: {
 
-		"bumpMap" : { type: "t", value: null },
-		"bumpScale" : { type: "f", value: 1 }
+		specularMap: { value: null },
+
+	},
+
+	envmap: {
+
+		envMap: { value: null },
+		flipEnvMap: { value: - 1 },
+		reflectivity: { value: 1.0 },
+		refractionRatio: { value: 0.98 },
+		maxMipLevel: { value: 0 }
+
+	},
+
+	aomap: {
+
+		aoMap: { value: null },
+		aoMapIntensity: { value: 1 }
+
+	},
+
+	lightmap: {
+
+		lightMap: { value: null },
+		lightMapIntensity: { value: 1 }
+
+	},
+
+	emissivemap: {
+
+		emissiveMap: { value: null }
+
+	},
+
+	bumpmap: {
+
+		bumpMap: { value: null },
+		bumpScale: { value: 1 }
 
 	},
 
 	normalmap: {
 
-		"normalMap" : { type: "t", value: null },
-		"normalScale" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+		normalMap: { value: null },
+		normalScale: { value: new Vector2( 1, 1 ) }
+
 	},
 
-	fog : {
+	displacementmap: {
 
-		"fogDensity" : { type: "f", value: 0.00025 },
-		"fogNear" : { type: "f", value: 1 },
-		"fogFar" : { type: "f", value: 2000 },
-		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) }
+		displacementMap: { value: null },
+		displacementScale: { value: 1 },
+		displacementBias: { value: 0 }
+
+	},
+
+	roughnessmap: {
+
+		roughnessMap: { value: null }
+
+	},
+
+	metalnessmap: {
+
+		metalnessMap: { value: null }
+
+	},
+
+	gradientmap: {
+
+		gradientMap: { value: null }
+
+	},
+
+	fog: {
+
+		fogDensity: { value: 0.00025 },
+		fogNear: { value: 1 },
+		fogFar: { value: 2000 },
+		fogColor: { value: new Color( 0xffffff ) }
 
 	},
 
 	lights: {
 
-		"ambientLightColor" : { type: "fv", value: [] },
+		ambientLightColor: { value: [] },
 
-		"directionalLightDirection" : { type: "fv", value: [] },
-		"directionalLightColor" : { type: "fv", value: [] },
+		directionalLights: { value: [], properties: {
+			direction: {},
+			color: {},
 
-		"hemisphereLightDirection" : { type: "fv", value: [] },
-		"hemisphereLightSkyColor" : { type: "fv", value: [] },
-		"hemisphereLightGroundColor" : { type: "fv", value: [] },
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
 
-		"pointLightColor" : { type: "fv", value: [] },
-		"pointLightPosition" : { type: "fv", value: [] },
-		"pointLightDistance" : { type: "fv1", value: [] },
-		"pointLightDecay" : { type: "fv1", value: [] },
+		directionalShadowMap: { value: [] },
+		directionalShadowMatrix: { value: [] },
 
-		"spotLightColor" : { type: "fv", value: [] },
-		"spotLightPosition" : { type: "fv", value: [] },
-		"spotLightDirection" : { type: "fv", value: [] },
-		"spotLightDistance" : { type: "fv1", value: [] },
-		"spotLightAngleCos" : { type: "fv1", value: [] },
-		"spotLightExponent" : { type: "fv1", value: [] },
-		"spotLightDecay" : { type: "fv1", value: [] }
+		spotLights: { value: [], properties: {
+			color: {},
+			position: {},
+			direction: {},
+			distance: {},
+			coneCos: {},
+			penumbraCos: {},
+			decay: {},
+
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
+
+		spotShadowMap: { value: [] },
+		spotShadowMatrix: { value: [] },
+
+		pointLights: { value: [], properties: {
+			color: {},
+			position: {},
+			decay: {},
+			distance: {},
+
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {},
+			shadowCameraNear: {},
+			shadowCameraFar: {}
+		} },
+
+		pointShadowMap: { value: [] },
+		pointShadowMatrix: { value: [] },
+
+		hemisphereLights: { value: [], properties: {
+			direction: {},
+			skyColor: {},
+			groundColor: {}
+		} },
+
+		// TODO (abelnation): RectAreaLight BRDF data needs to be moved from example to main src
+		rectAreaLights: { value: [], properties: {
+			color: {},
+			position: {},
+			width: {},
+			height: {}
+		} }
 
 	},
 
-	particle: {
+	points: {
 
-		"psColor" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity" : { type: "f", value: 1.0 },
-		"size" : { type: "f", value: 1.0 },
-		"scale" : { type: "f", value: 1.0 },
-		"map" : { type: "t", value: null },
-		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
-
-		"fogDensity" : { type: "f", value: 0.00025 },
-		"fogNear" : { type: "f", value: 1 },
-		"fogFar" : { type: "f", value: 2000 },
-		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) }
-
-	},
-
-	shadowmap: {
-
-		"shadowMap": { type: "tv", value: [] },
-		"shadowMapSize": { type: "v2v", value: [] },
-
-		"shadowBias" : { type: "fv1", value: [] },
-		"shadowDarkness": { type: "fv1", value: [] },
-
-		"shadowMatrix" : { type: "m4v", value: [] }
+		diffuse: { value: new Color( 0xeeeeee ) },
+		opacity: { value: 1.0 },
+		size: { value: 1.0 },
+		scale: { value: 1.0 },
+		map: { value: null },
+		uvTransform: { value: new Matrix3() }
 
 	}
 
 };
+
+export { UniformsLib };

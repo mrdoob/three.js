@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 	<head>
 		<title>three.js - ASCII Effect</title>
 		<meta charset="utf-8">
@@ -16,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/effects/AsciiEffect.js"></script>
@@ -31,6 +30,7 @@
 			var container, stats;
 
 			var camera, controls, scene, renderer;
+			var effect;
 
 			var sphere, plane;
 
@@ -62,6 +62,7 @@
 				controls = new THREE.TrackballControls( camera );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var light = new THREE.PointLight( 0xffffff );
 				light.position.set( 500, 500, 500 );
@@ -71,7 +72,7 @@
 				light.position.set( - 500, - 500, - 500 );
 				scene.add( light );
 
-				sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 10 ), new THREE.MeshLambertMaterial( { shading: THREE.FlatShading } ) );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 10 ), new THREE.MeshLambertMaterial() );
 				scene.add( sphere );
 
 				// Plane
@@ -82,7 +83,6 @@
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( width, height );
 				// container.appendChild( renderer.domElement );
 
@@ -91,9 +91,7 @@
 				container.appendChild( effect.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -117,8 +115,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 

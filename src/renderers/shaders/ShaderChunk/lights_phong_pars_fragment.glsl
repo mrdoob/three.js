@@ -1,54 +1,3 @@
-uniform vec3 ambientLightColor;
-
-#if MAX_DIR_LIGHTS > 0
-
-	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];
-	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];
-
-#endif
-
-#if MAX_HEMI_LIGHTS > 0
-
-	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];
-	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];
-	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];
-
-#endif
-
-#if MAX_POINT_LIGHTS > 0
-
-	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];
-
-	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];
-	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];
-	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];
-
-#endif
-
-#if MAX_SPOT_LIGHTS > 0
-
-	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];
-	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];
-	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];
-	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];
-	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];
-	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];
-	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];
-
-#endif
-
-#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )
-
-	varying vec3 vWorldPosition;
-
-#endif
-
-#ifdef WRAP_AROUND
-
-	uniform vec3 wrapRGB;
-
-#endif
-
 varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
@@ -56,3 +5,49 @@ varying vec3 vViewPosition;
 	varying vec3 vNormal;
 
 #endif
+
+
+struct BlinnPhongMaterial {
+
+	vec3	diffuseColor;
+	vec3	specularColor;
+	float	specularShininess;
+	float	specularStrength;
+
+};
+
+void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+
+	#ifdef TOON
+
+		vec3 irradiance = getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
+
+	#else
+
+		float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
+		vec3 irradiance = dotNL * directLight.color;
+
+	#endif
+
+	#ifndef PHYSICALLY_CORRECT_LIGHTS
+
+		irradiance *= PI; // punctual light
+
+	#endif
+
+	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+
+	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;
+
+}
+
+void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+
+}
+
+#define RE_Direct				RE_Direct_BlinnPhong
+#define RE_IndirectDiffuse		RE_IndirectDiffuse_BlinnPhong
+
+#define Material_LightProbeLOD( material )	(0)

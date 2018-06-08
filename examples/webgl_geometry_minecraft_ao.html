@@ -38,10 +38,10 @@
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo [ambient occlusion]. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward)
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo [ambient occlusion]. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
@@ -93,10 +93,11 @@
 				controls.verticalMax = 2.2;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
 
 				// sides
-				
+
 				var light = new THREE.Color( 0xffffff );
 				var shadow = new THREE.Color( 0x505050 );
 
@@ -108,8 +109,8 @@
 				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
 				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
 				pxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
-				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
-				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
+				pxGeometry.rotateY( Math.PI / 2 );
+				pxGeometry.translate( 50, 0, 0 );
 
 				var nxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nxGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
@@ -117,8 +118,8 @@
 				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
 				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
 				nxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
-				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
-				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
+				nxGeometry.rotateY( - Math.PI / 2 );
+				nxGeometry.translate( - 50, 0, 0 );
 
 				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pyGeometry.faces[ 0 ].vertexColors = [ light, light, light ];
@@ -126,8 +127,8 @@
 				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
 				pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
 				pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
-				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
-				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
+				pyGeometry.rotateX( - Math.PI / 2 );
+				pyGeometry.translate( 0, 50, 0 );
 
 				var py2Geometry = new THREE.PlaneGeometry( 100, 100 );
 				py2Geometry.faces[ 0 ].vertexColors = [ light, light, light ];
@@ -135,9 +136,9 @@
 				py2Geometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
 				py2Geometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
 				py2Geometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
-				py2Geometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
-				py2Geometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
-				py2Geometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
+				py2Geometry.rotateX( - Math.PI / 2 );
+				py2Geometry.rotateY( Math.PI / 2 );
+				py2Geometry.translate( 0, 50, 0 );
 
 				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pzGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
@@ -145,7 +146,7 @@
 				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
 				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
 				pzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
-				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
+				pzGeometry.translate( 0, 0, 50 );
 
 				var nzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nzGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
@@ -153,8 +154,8 @@
 				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
 				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
 				nzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
-				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
-				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, - 50 ) );
+				nzGeometry.rotateY( Math.PI );
+				nzGeometry.translate( 0, 0, - 50 );
 
 				//
 
@@ -199,7 +200,7 @@
 							colors[ 0 ] = c === 0 ? shadow : light;
 							colors[ 1 ] = d === 0 ? shadow : light;
 							colors[ 2 ] = a === 0 ? shadow : light;
-							
+
 							geometry.merge( py2Geometry, matrix );
 
 						} else {
@@ -213,7 +214,7 @@
 							colors[ 0 ] = b === 0 ? shadow : light;
 							colors[ 1 ] = c === 0 ? shadow : light;
 							colors[ 2 ] = d === 0 ? shadow : light;
-							
+
 							geometry.merge( pyGeometry, matrix );
 
 						}
@@ -274,7 +275,7 @@
 
 				}
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
+				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
 				texture.minFilter = THREE.LinearMipMapLinearFilter;
 
@@ -289,7 +290,6 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -298,9 +298,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

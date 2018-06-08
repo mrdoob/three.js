@@ -1,1 +1,0 @@
-var self = self || {};
