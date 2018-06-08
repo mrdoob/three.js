@@ -11,26 +11,26 @@
 		<h1>[name]</h1><br />
 
 		<div>
-			While importing three.js via script tags is a great way to get up and running fast, it has a few drawbacks for longer lived projects, for example:
+			虽然通过 script 标签导入 three.js 是快速起步和运行的好方法，但对于长期项目有一些缺点，例如：
 			<ul>
-				<li>You have to manually fetch and include a copy of the library as part of your project's source code</li>
-				<li>Updating the library's version is a manual process</li>
-				<li>When checking in a new version of the library your version control diffs are cluttered by the many lines of the build file</li>
+				<li>你必须手动获取并引入库的副本作为项目源代码的一部分</li>
+				<li>更新库的版本需要手动操作</li>
+				<li>在检入新版本的库时，你的版本控制对比会被构建文件的许多行混淆</li>
 			</ul>
 		</div>
 
-		<div>Using a dependency manager like npm avoids these caveats by allowing you to simply download and import your desired version of the library onto your machine.</div>
+		<div>使用像 npm 这样的依赖管理工具可以避免这些限制，你只需下载所需版本的库并将其导入到你的机器上即可。</div>
 
-		<h2>Installation via npm</h2>
+		<h2>通过 npm 安装</h2>
 
-		<div>Three.js is published as an npm module, see: <a href="https://www.npmjs.com/package/three" target="_blank">npm</a>. This means all you need to do to include three.js into your project is run "npm install three"</div>
+		<div>Three.js 已作为一个 npm 模块发布, 请参阅: <a href="https://www.npmjs.com/package/three" target="_blank">npm</a>。这意味着你只需运行“npm install three”就能将 three.js 导入到你的项目中</div>
 
-		<h2>Importing the module</h2>
+		<h2>导入模块</h2>
 
-		<div>Assuming that you're bundling your files with a tool such as <a href="https://webpack.github.io/" target="_blank">Webpack</a> or <a href="https://github.com/substack/node-browserify" target="_blank">Browserify</a>, which allow you to "require('modules') in the browser by bundling up all of your dependencies."</div>
+		<div>如果你使用 <a href="https://webpack.github.io/" target="_blank">Webpack</a> 或者 <a href="https://github.com/substack/node-browserify" target="_blank">Browserify</a> 等工具打包你的文件，你可以“打包所有依赖项并在浏览器中使用 require('modules') 。”</div>
 
 		<div>
-			You should now be able to import the module into your source files and continue to use it as per normal.
+			你现在应该能够将模块导入到你的源文件中，并继续照常使用它。
 		</div>
 
 		<code>
@@ -41,7 +41,7 @@
 		</code>
 
 		<div>
-			You're also able to leverage <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import" target="_blank">ES6 import syntax</a>:
+			你也可以利用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import" target="_blank">ES6 import 语法</a>:
 		</div>
 
 		<code>
@@ -52,7 +52,7 @@
 		</code>
 
 		<div>
-			or if you wish to import only select parts of three.js library, for example Scene:
+			或者你只想导入 three.js 库的选定部分，例如 Scene：
 		</div>
 
 		<code>
@@ -62,11 +62,11 @@
 		...
 		</code>
 
-		<h2>Caveats</h2>
-
+		<h2>注意事项</h2>
+	
 		<div>
-			Currently it's not possible to import the files within the "examples/js" directory in this way.
-			This is due to some of the files relying on global namespace pollution of THREE. For more information see <a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>.
+			目前无法通过这种方式导入“examples/js”目录中的文件。
+			因为部分文件依赖于全局命名空间污染 THREE。更多信息请参阅 <a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>.
 		</div>
 	</body>
 </html>
