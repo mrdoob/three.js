@@ -34,6 +34,7 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
@@ -91,12 +92,12 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0.0, 35, 35 * 3.5 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111111 );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.vr.enabled = true;
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
@@ -108,6 +109,7 @@
 				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
+				torusMesh1.position.z = -100.0;
 				torusMesh1.castShadow = true;
 				torusMesh1.receiveShadow = true;
 				scene.add( torusMesh1 );
@@ -154,7 +156,7 @@
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.1 ) );
 
 				var spotLight = new THREE.SpotLight( 0xffffff, 1 );
-				spotLight.position.set( 50, 100, 50 );
+				spotLight.position.set( 50, 100, 100 );
 				spotLight.angle = Math.PI / 7;
 				spotLight.penumbra = 0.8;
 				spotLight.castShadow = true;
@@ -235,7 +237,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				renderer.setAnimationLoop( animate );
 
 				stats.begin();
 				render();
@@ -280,6 +282,8 @@
 				composer.render();
 
 			}
+
+			document.body.appendChild( WEBVR.createButton( renderer ) );
 
 		</script>
 

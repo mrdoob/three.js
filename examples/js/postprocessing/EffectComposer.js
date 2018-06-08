@@ -6,6 +6,8 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.renderer = renderer;
 
+	window.addEventListener( 'vrdisplaypresentchange' , this.resize.bind(this) );
+
 	if ( renderTarget === undefined ) {
 
 		var parameters = {
@@ -29,6 +31,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 	this.readBuffer = this.renderTarget2;
 
 	this.passes = [];
+	this.maskActive = false;
 
 	// dependencies
 
@@ -50,11 +53,41 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 Object.assign( THREE.EffectComposer.prototype, {
 
-	swapBuffers: function () {
+	swapBuffers: function (pass) {
 
-		var tmp = this.readBuffer;
-		this.readBuffer = this.writeBuffer;
-		this.writeBuffer = tmp;
+		if ( pass.needsSwap ) {
+
+			if ( this.maskActive ) {
+
+				var context = this.renderer.context;
+
+				context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
+
+				this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
+
+				context.stencilFunc( context.EQUAL, 1, 0xffffffff );
+
+			}
+
+			var tmp = this.readBuffer;
+			this.readBuffer = this.writeBuffer;
+			this.writeBuffer = tmp;
+
+		}
+
+		if ( THREE.MaskPass !== undefined ) {
+
+			if ( pass instanceof THREE.MaskPass ) {
+
+				this.maskActive = true;
+
+			} else if ( pass instanceof THREE.ClearMaskPass ) {
+
+				this.maskActive = false;
+
+			}
+
+		}
 
 	},
 
@@ -73,51 +106,54 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	},
 
-	render: function ( delta ) {
+	render: function ( delta, starti ) {
 
-		var maskActive = false;
+		var maskActive = this.maskActive;
 
 		var pass, i, il = this.passes.length;
 
-		for ( i = 0; i < il; i ++ ) {
+		var scope = this;
+
+		var currentOnAfterRender;
+
+		for ( i = starti || 0; i < il; i ++ ) {
 
 			pass = this.passes[ i ];
 
 			if ( pass.enabled === false ) continue;
 
+			// If VR mode is enabled and rendering the whole scene is required.
+			// The pass renders the scene and and postprocessing is resumed before
+			// submitting the frame to the headset by using the onAfterRender callback.
+			if ( this.renderer.vr.enabled && pass.scene ) {
+
+				currentOnAfterRender = pass.scene.onAfterRender;
+
+				pass.scene.onAfterRender = function () {
+
+					// Disable stereo rendering when doing postprocessing
+					// on a render target.
+					scope.renderer.vr.enabled = false;
+
+					scope.render( delta, i + 1, maskActive );
+
+					// Renable vr mode.
+					scope.renderer.vr.enabled = true;
+				}
+
+				pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
+				
+				// Restore onAfterRender
+				pass.scene.onAfterRender = currentOnAfterRender;
+
+				this.swapBuffers( pass );
+
+				return;
+			}
+
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 
-			if ( pass.needsSwap ) {
-
-				if ( maskActive ) {
-
-					var context = this.renderer.context;
-
-					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
-
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
-
-					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
-
-				}
-
-				this.swapBuffers();
-
-			}
-
-			if ( THREE.MaskPass !== undefined ) {
-
-				if ( pass instanceof THREE.MaskPass ) {
-
-					maskActive = true;
-
-				} else if ( pass instanceof THREE.ClearMaskPass ) {
-
-					maskActive = false;
-
-				}
-
-			}
+			this.swapBuffers(pass);
 
 		}
 
@@ -154,6 +190,13 @@ Object.assign( THREE.EffectComposer.prototype, {
 			this.passes[ i ].setSize( width, height );
 
 		}
+
+	},
+
+	resize: function ( ) {
+
+		var rendererSize = renderer.getDrawingBufferSize();
+		this.setSize( rendererSize.width, rendererSize.height );
 
 	}
 
