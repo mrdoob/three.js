@@ -236,13 +236,8 @@ THREE.BufferGeometryUtils = {
 
 			// gather .userData
 
-			if ( geometry.userData !== undefined ) {
-
-				mergedGeometry.userData = mergedGeometry.userData || {};
-				mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
-				mergedGeometry.userData.mergedUserData.push( geometry.userData );
-
-			}
+			mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
+			mergedGeometry.userData.mergedUserData.push( geometry.userData );
 
 			if ( useGroups ) {
 

@@ -42,19 +42,19 @@ THREE.TimerNode.prototype.updateFrame = function ( frame ) {
 
 		case THREE.TimerNode.LOCAL:
 
-			this.number += frame.delta * scale;
+			this.value += frame.delta * scale;
 
 			break;
 
 		case THREE.TimerNode.DELTA:
 
-			this.number = frame.delta * scale;
+			this.value = frame.delta * scale;
 
 			break;
 
 		default:
 
-			this.number = frame.time * scale;
+			this.value = frame.time * scale;
 
 	}
 

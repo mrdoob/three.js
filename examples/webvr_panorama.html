@@ -43,7 +43,7 @@
 			renderer.vr.userHeight = 0; // TOFIX
 			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer ) );
+			document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'headModel' } ) );
 
 			//
 
@@ -95,9 +95,8 @@
 
 			}
 
-			var imageObj = new Image();
-
-			imageObj.onload = function() {
+			var loader = new THREE.ImageLoader();
+			loader.load( atlasImgUrl, function ( imageObj ) {
 
 				var canvas, context;
 				var tileWidth = imageObj.height;
@@ -114,9 +113,7 @@
 
 				}
 
-			};
-
-			imageObj.src = atlasImgUrl;
+			} );
 
 			return textures;
 
@@ -133,7 +130,7 @@
 
 		function animate() {
 
-			renderer.animate( render );
+			renderer.setAnimationLoop( render );
 
 		}
 

@@ -1,5 +1,7 @@
 /**
  * @author tschw
+ * @author Mugen87 / https://github.com/Mugen87
+ * @author mrdoob / http://mrdoob.com/
  *
  * Uniforms of a program.
  * Those form a tree structure with a special top-level container for the root,

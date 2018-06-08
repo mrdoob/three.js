@@ -12,9 +12,9 @@ THREE.MorphBlendMesh = function ( geometry, material ) {
 	// prepare default animation
 	// (all frames played together in 1 second)
 
-	var numFrames = this.geometry.morphTargets.length;
+	var numFrames = Object.keys( this.morphTargetDictionary ).length;
 
-	var name = "__default";
+	var name = '__default';
 
 	var startFrame = 0;
 	var endFrame = numFrames - 1;
@@ -24,7 +24,7 @@ THREE.MorphBlendMesh = function ( geometry, material ) {
 	this.createAnimation( name, startFrame, endFrame, fps );
 	this.setAnimationWeight( name, 1 );
 
-}
+};
 
 THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
 
@@ -61,18 +61,17 @@ THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.protot
 
 	},
 
-		autoCreateAnimations: function ( fps ) {
+	autoCreateAnimations: function ( fps ) {
 
 		var pattern = /([a-z]+)_?(\d+)/i;
 
 		var firstAnimation, frameRanges = {};
 
-		var geometry = this.geometry;
+		var i = 0;
 
-		for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
+		for ( var key in this.morphTargetDictionary ) {
 
-			var morph = geometry.morphTargets[ i ];
-			var chunks = morph.name.match( pattern );
+			var chunks = key.match( pattern );
 
 			if ( chunks && chunks.length > 1 ) {
 
@@ -88,6 +87,8 @@ THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.protot
 				if ( ! firstAnimation ) firstAnimation = name;
 
 			}
+
+			i ++;
 
 		}
 

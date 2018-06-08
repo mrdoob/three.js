@@ -2,22 +2,19 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { Vector3 } from '../../math/Vector3.js';
-import { Quaternion } from '../../math/Quaternion.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 
-function WebXRManager( gl ) {
+function WebXRManager( renderer ) {
 
-	var scope = this;
+	var gl = renderer.context;
 
 	var device = null;
 	var session = null;
 
 	var frameOfRef = null;
-	var isExclusive = false;
 
 	var pose = null;
 
@@ -59,17 +56,30 @@ function WebXRManager( gl ) {
 
 	};
 
-	this.setSession = function ( value ) {
+	//
+
+	this.setSession = function ( value, options ) {
 
 		session = value;
 
 		if ( session !== null ) {
 
+			session.addEventListener( 'end', function () {
+
+				renderer.setFramebuffer( null );
+				animation.stop();
+
+			} );
+
 			session.baseLayer = new XRWebGLLayer( session, gl );
-			session.requestFrameOfReference( 'stage' ).then( function ( value ) {
+			session.requestFrameOfReference( options.frameOfReferenceType ).then( function ( value ) {
 
 				frameOfRef = value;
-				isExclusive = session.exclusive;
+
+				renderer.setFramebuffer( session.baseLayer.framebuffer );
+
+				animation.setContext( session );
+				animation.start();
 
 			} );
 
@@ -77,56 +87,106 @@ function WebXRManager( gl ) {
 
 	};
 
+	function updateCamera( camera, parent ) {
+
+		if ( parent === null ) {
+
+			camera.matrixWorld.copy( camera.matrix );
+
+		} else {
+
+			camera.matrixWorld.multiplyMatrices( parent.matrixWorld, camera.matrix );
+
+		}
+
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
+	}
+
 	this.getCamera = function ( camera ) {
 
-		return isPresenting() ? cameraVR : camera;
+		if ( isPresenting() ) {
+
+			var parent = camera.parent;
+			var cameras = cameraVR.cameras;
+
+			// apply camera.parent to cameraVR
+
+			updateCamera( cameraVR, parent );
+
+			for ( var i = 0; i < cameras.length; i ++ ) {
+
+				updateCamera( cameras[ i ], parent );
+
+			}
+
+			// update camera and its children
+
+			camera.matrixWorld.copy( cameraVR.matrixWorld );
+
+			var children = camera.children;
+
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+				children[ i ].updateMatrixWorld( true );
+
+			}
+
+			return cameraVR;
+
+		}
+
+		return camera;
 
 	};
 
 	this.isPresenting = isPresenting;
 
-	this.requestAnimationFrame = function ( callback ) {
+	// Animation Loop
 
-		function onFrame( time, frame ) {
+	var onAnimationFrameCallback = null;
 
-			pose = frame.getDevicePose( frameOfRef );
+	function onAnimationFrame( time, frame ) {
 
-			var layer = session.baseLayer;
-			var views = frame.views;
+		pose = frame.getDevicePose( frameOfRef );
 
-			for ( var i = 0; i < views.length; i ++ ) {
+		var layer = session.baseLayer;
+		var views = frame.views;
 
-				var view = views[ i ];
-				var viewport = layer.getViewport( view );
-				var viewMatrix = pose.getViewMatrix( view );
+		for ( var i = 0; i < views.length; i ++ ) {
 
-				var camera = cameraVR.cameras[ i ];
-				camera.projectionMatrix.fromArray( view.projectionMatrix );
-				camera.matrixWorldInverse.fromArray( viewMatrix );
-				camera.matrixWorld.getInverse( camera.matrixWorldInverse );
-				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+			var view = views[ i ];
+			var viewport = layer.getViewport( view );
+			var viewMatrix = pose.getViewMatrix( view );
 
-				if ( i === 0 ) {
+			var camera = cameraVR.cameras[ i ];
+			camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
+			camera.projectionMatrix.fromArray( view.projectionMatrix );
+			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
-					cameraVR.matrixWorld.copy( camera.matrixWorld );
-					cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
+			if ( i === 0 ) {
 
-					// HACK (mrdoob)
-					// https://github.com/w3c/webvr/issues/203
+				cameraVR.matrix.copy( camera.matrix );
 
-					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
+				// HACK (mrdoob)
+				// https://github.com/w3c/webvr/issues/203
 
-				}
+				cameraVR.projectionMatrix.copy( camera.projectionMatrix );
 
 			}
 
-			gl.bindFramebuffer( gl.FRAMEBUFFER, session.baseLayer.framebuffer );
-
-			callback();
-
 		}
 
-		session.requestAnimationFrame( onFrame );
+		if ( onAnimationFrameCallback ) onAnimationFrameCallback();
+
+	}
+
+	var animation = new WebGLAnimation();
+	animation.setAnimationLoop( onAnimationFrame );
+
+	this.setAnimationLoop = function ( callback ) {
+
+		onAnimationFrameCallback = callback;
 
 	};
 

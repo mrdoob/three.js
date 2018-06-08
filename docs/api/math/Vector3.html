@@ -79,19 +79,19 @@ var d = a.distanceTo( b );
 
 		<h2>Methods</h2>
 
-		<h3>[method:Vector3 add]( [param:Vector3 v] )</h3>
+		<h3>[method:this add]( [param:Vector3 v] )</h3>
 		<p>Adds [page:Vector3 v] to this vector.</p>
 
-		<h3>[method:Vector3 addScalar]( [param:Float s] )</h3>
+		<h3>[method:this addScalar]( [param:Float s] )</h3>
 		<p>Adds the scalar value s to this vector's [page:.x x], [page:.y y] and [page:.z z] values.</p>
 
-		<h3>[method:Vector3 addScaledVector]( [param:Vector3 v], [param:Float s] )</h3>
+		<h3>[method:this addScaledVector]( [param:Vector3 v], [param:Float s] )</h3>
 		<p>Adds the multiple of [page:Vector3 v] and [page:Float s] to this vector.</p>
 
-		<h3>[method:Vector3 addVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
+		<h3>[method:this addVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
 		<p>Sets this vector to [page:Vector3 a] + [page:Vector3 b].</p>
 
-		<h3>[method:Vector3 applyAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<h3>[method:this applyAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
 		[page:Vector3 axis] - A normalized [page:Vector3].<br />
 		[page:Float angle] - An angle in radians.<br /><br />
@@ -99,21 +99,21 @@ var d = a.distanceTo( b );
 		Applies a rotation specified by an axis and an angle to this vector.
 		</p>
 
-		<h3>[method:Vector3 applyEuler]( [param:Euler euler] )</h3>
+		<h3>[method:this applyEuler]( [param:Euler euler] )</h3>
 		<p>
 		Applies euler transform to this vector by converting the [page:Euler] object to a
 		[page:Quaternion] and applying.
 		</p>
 
-		<h3>[method:Vector3 applyMatrix3]( [param:Matrix3 m] )</h3>
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
 		<p>Multiplies this vector by [page:Matrix3 m]</p>
 
-		<h3>[method:Vector3 applyMatrix4]( [param:Matrix4 m] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
 		<p>
 		Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective.
 		</p>
 
-		<h3>[method:Vector3 applyQuaternion]( [param:Quaternion quaternion] )</h3>
+		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>
 		Applies a [page:Quaternion] transform to this vector.
 		</p>
@@ -124,12 +124,12 @@ var d = a.distanceTo( b );
 		Returns the angle between this vector and vector [page:Vector3 v] in radians.
 		</p>
 
-		<h3>[method:Vector3 ceil]()</h3>
+		<h3>[method:this ceil]()</h3>
 		<p>
 		The [page:.x x], [page:.y y] and [page:.z z] components of the vector are rounded up to the nearest integer value.
 		</p>
 
-		<h3>[method:Vector3 clamp]( [param:Vector3 min], [param:Vector3 max] )</h3>
+		<h3>[method:this clamp]( [param:Vector3 min], [param:Vector3 max] )</h3>
 		<p>
 		[page:Vector3 min] - the minimum [page:.x x], [page:.y y] and [page:.z z] values.<br />
 		[page:Vector3 max] - the maximum [page:.x x], [page:.y y] and [page:.z z] values in the desired range<br /><br />
@@ -138,7 +138,7 @@ var d = a.distanceTo( b );
 		If this vector's x, y or z value is less than the min vector's x, y or z value, it is replaced by the corresponding value.
 		</p>
 
-		<h3>[method:Vector3 clampLength]( [param:Float min], [param:Float max] )</h3>
+		<h3>[method:this clampLength]( [param:Float min], [param:Float max] )</h3>
 		<p>
 		[page:Float min] - the minimum value the length will be clamped to <br />
 		[page:Float max] - the maximum value the length will be clamped to<br /><br />
@@ -147,7 +147,7 @@ var d = a.distanceTo( b );
 		If this vector's length is less than the min value, it is replaced by the min value.
 		</p>
 
-		<h3>[method:Vector3 clampScalar]( [param:Float min], [param:Float max] )</h3>
+		<h3>[method:this clampScalar]( [param:Float min], [param:Float max] )</h3>
 		<p>
 		[page:Float min] - the minimum value the components will be clamped to <br />
 		[page:Float max] - the maximum value the components will be clamped to<br /><br />
@@ -161,18 +161,18 @@ var d = a.distanceTo( b );
 		Returns a new vector3 with the same [page:.x x], [page:.y y] and [page:.z z] values as this one.
 		</p>
 
-		<h3>[method:Vector3 copy]( [param:Vector3 v] )</h3>
+		<h3>[method:this copy]( [param:Vector3 v] )</h3>
 		<p>
 			Copies the values of the passed vector3's [page:.x x], [page:.y y] and [page:.z z]
 			properties to this vector3.
 		</p>
 
-		<h3>[method:Vector3 cross]( [param:Vector3 v] )</h3>
+		<h3>[method:this cross]( [param:Vector3 v] )</h3>
 		<p>
 		Sets this vector to [link:https://en.wikipedia.org/wiki/Cross_product cross product] of itself and [page:Vector3 v].
 		</p>
 
-		<h3>[method:Vector3 crossVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
+		<h3>[method:this crossVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
 		<p>
 		Sets this vector to [link:https://en.wikipedia.org/wiki/Cross_product cross product] of [page:Vector3 a] and [page:Vector3 b].
 		</p>
@@ -192,10 +192,10 @@ var d = a.distanceTo( b );
 		as it is slightly more efficient to calculate.
 		</p>
 
-		<h3>[method:Vector3 divide]( [param:Vector3 v] )</h3>
+		<h3>[method:this divide]( [param:Vector3 v] )</h3>
 		<p>Divides this vector by [page:Vector3 v].</p>
 
-		<h3>[method:Vector3 divideScalar]( [param:Float s] )</h3>
+		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
 		Divides this vector by scalar [page:Float s].<br />
 		Sets vector to *( 0, 0, 0 )* if *[page:Float s] = 0*.
@@ -210,10 +210,10 @@ var d = a.distanceTo( b );
 		<h3>[method:Boolean equals]( [param:Vector3 v] )</h3>
 		<p>Checks for strict equality of this vector and [page:Vector3 v].</p>
 
-		<h3>[method:Vector3 floor]()</h3>
+		<h3>[method:this floor]()</h3>
 		<p>The components of the vector are rounded down to the nearest integer value.</p>
 
-		<h3>[method:Vector3 fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
 		[page:Array array] - the source array.<br />
 		[page:Integer offset] - ( optional) offset into the array. Default is 0.<br /><br />
@@ -222,7 +222,7 @@ var d = a.distanceTo( b );
 		and [page:.z z] value to be array[ offset + 2 ].
 		</p>
 
-		<h3>[method:Vector3 fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
+		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
 		<p>
 		[page:BufferAttribute attribute] - the source attribute.<br />
 		[page:Integer index] - index in the attribute.<br /><br />
@@ -255,7 +255,7 @@ var d = a.distanceTo( b );
 		vectors, you should compare the length squared instead as it is slightly more efficient to calculate.
 		</p>
 
-		<h3>[method:Vector3 lerp]( [param:Vector3 v], [param:Float alpha] )</h3>
+		<h3>[method:this lerp]( [param:Vector3 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector3 v] - [page:Vector3] to interpolate towards.<br />
 		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
@@ -264,7 +264,7 @@ var d = a.distanceTo( b );
 		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector3 v].
 		</p>
 
-		<h3>[method:Vector3 lerpVectors]( [param:Vector3 v1], [param:Vector3 v2], [param:Float alpha] )</h3>
+		<h3>[method:this lerpVectors]( [param:Vector3 v1], [param:Vector3 v2], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector3 v1] - the starting [page:Vector3].<br />
 		[page:Vector3 v2] - [page:Vector3] to interpolate towards.<br />
@@ -275,44 +275,44 @@ var d = a.distanceTo( b );
 		- alpha = 0 will be [page:Vector3 v1], and alpha = 1 will be [page:Vector3 v2].
 		</p>
 
-		<h3>[method:Vector3 max]( [param:Vector3 v] )</h3>
+		<h3>[method:this max]( [param:Vector3 v] )</h3>
 		<p>
 		If this vector's x, y or z value is less than [page:Vector3 v]'s x, y or z value, replace
 		that value with the corresponding max value.
 		</p>
 
-		<h3>[method:Vector3 min]( [param:Vector3 v] )</h3>
+		<h3>[method:this min]( [param:Vector3 v] )</h3>
 		<p>
 		If this vector's x, y or z value is greater than [page:Vector3 v]'s x, y or z value, replace
 		that value with the corresponding min value.
 		</p>
 
-		<h3>[method:Vector3 multiply]( [param:Vector3 v] )</h3>
+		<h3>[method:this multiply]( [param:Vector3 v] )</h3>
 		<p>Multiplies this vector by [page:Vector3 v].</p>
 
-		<h3>[method:Vector3 multiplyScalar]( [param:Float s] )</h3>
+		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>Multiplies this vector by scalar [page:Float s].</p>
 
-		<h3>[method:Vector3 multiplyVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
+		<h3>[method:this multiplyVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
 		<p>Sets this vector equal to [page:Vector3 a] * [page:Vector3 b], component-wise.</p>
 
-		<h3>[method:Vector3 negate]()</h3>
+		<h3>[method:this negate]()</h3>
 		<p>Inverts this vector - i.e. sets x = -x, y = -y and z = -z.</p>
 
-		<h3>[method:Vector3 normalize]()</h3>
+		<h3>[method:this normalize]()</h3>
 		<p>
 		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
 		as this one, but [page:.length length] 1.
 		</p>
 
-		<h3>[method:Vector3 project]( [param:Camera camera] )</h3>
+		<h3>[method:this project]( [param:Camera camera] )</h3>
 		<p>
 		[page:Camera camera] — camera to use in the projection.<br /><br />
 
 		[link:https://en.wikipedia.org/wiki/Vector_projection Projects] the vector with the camera.
 		</p>
 
-		<h3>[method:Vector3 projectOnPlane]( [param:Vector3 planeNormal] )</h3>
+		<h3>[method:this projectOnPlane]( [param:Vector3 planeNormal] )</h3>
 		<p>
 		[page:Vector3 planeNormal] - A vector representing a plane normal.<br /><br />
 
@@ -320,10 +320,10 @@ var d = a.distanceTo( b );
 		normal from this vector.
 		</p>
 
-		<h3>[method:Vector3 projectOnVector]( [param:Vector3] )</h3>
+		<h3>[method:this projectOnVector]( [param:Vector3] )</h3>
 		<p>[link:https://en.wikipedia.org/wiki/Vector_projection Projects] this vector onto another vector.</p>
 
-		<h3>[method:Vector3 reflect]( [param:Vector3 normal] )</h3>
+		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
 		<p>
 		[page:Vector3 normal] - the normal to the reflecting plane<br /><br />
 
@@ -331,15 +331,15 @@ var d = a.distanceTo( b );
 		have unit length.
 		</p>
 
-		<h3>[method:Vector3 round]()</h3>
+		<h3>[method:this round]()</h3>
 		<p>The components of the vector are rounded to the nearest integer value.</p>
 
-		<h3>[method:Vector3 roundToZero]()</h3>
+		<h3>[method:this roundToZero]()</h3>
 		<p>
 		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</p>
 
-		<h3>[method:Vector3 set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>Sets the [page:.x x], [page:.y y] and [page:.z z] components of this vector.</p>
 
 		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
@@ -352,61 +352,61 @@ var d = a.distanceTo( b );
 		If index equals 2 set [page:.z z] to [page:Float value]
 		</p>
 
-		<h3>[method:Vector3 setFromCylindrical]( [param:Cylindrical c] )</h3>
+		<h3>[method:this setFromCylindrical]( [param:Cylindrical c] )</h3>
 		<p>
 		Sets this vector from the cylindrical coordinates [page:Cylindrical c].
 		</p>
 
-		<h3>[method:Vector3 setFromMatrixColumn]( [param:Matrix4 matrix], [param:Integer index] )</h3>
+		<h3>[method:this setFromMatrixColumn]( [param:Matrix4 matrix], [param:Integer index] )</h3>
 		<p>
 		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] equal to the column of
 		the [page:Matrix4 matrix] specified by the [page:Integer index].
 		</p>
 
-		<h3>[method:Vector3 setFromMatrixPosition]( [param:Matrix4 m] )</h3>
+		<h3>[method:this setFromMatrixPosition]( [param:Matrix4 m] )</h3>
 		<p>
 		Sets this vector to the position elements of the
 		[link:https://en.wikipedia.org/wiki/Transformation_matrix transformation matrix] [page:Matrix4 m].
 		</p>
 
-		<h3>[method:Vector3 setFromMatrixScale]( [param:Matrix4 m] )</h3>
+		<h3>[method:this setFromMatrixScale]( [param:Matrix4 m] )</h3>
 		<p>
 		Sets this vector to the scale elements of the
 		[link:https://en.wikipedia.org/wiki/Transformation_matrix transformation matrix] [page:Matrix4 m].
 		</p>
 
-		<h3>[method:Vector3 setFromSpherical]( [param:Spherical s] )</h3>
+		<h3>[method:this setFromSpherical]( [param:Spherical s] )</h3>
 		<p>
 		Sets this vector from the spherical coordinates [page:Spherical s].
 		</p>
 
-		<h3>[method:Vector3 setLength]( [param:Float l] )</h3>
+		<h3>[method:this setLength]( [param:Float l] )</h3>
 		<p>
 		Set this vector to the vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</p>
 
-		<h3>[method:Vector3 setScalar]( [param:Float scalar] )</h3>
+		<h3>[method:this setScalar]( [param:Float scalar] )</h3>
 		<p>
 		Set the [page:.x x], [page:.y y] and [page:.z z] values of this vector both equal to [page:Float scalar].
 		</p>
 
-		<h3>[method:Vector3 setX]( [param:Float x] )</h3>
+		<h3>[method:this setX]( [param:Float x] )</h3>
 		<p>Replace this vector's [page:.x x] value with [page:Float x].</p>
 
-		<h3>[method:Vector3 setY]( [param:Float y] )</h3>
+		<h3>[method:this setY]( [param:Float y] )</h3>
 		<p>Replace this vector's [page:.y y] value with [page:Float y].</p>
 
-		<h3>[method:Vector3 setZ]( [param:Float z] )</h3>
+		<h3>[method:this setZ]( [param:Float z] )</h3>
 		<p>Replace this vector's [page:.z z] value with [page:Float z].</p>
 
-		<h3>[method:Vector3 sub]( [param:Vector3 v] )</h3>
+		<h3>[method:this sub]( [param:Vector3 v] )</h3>
 		<p>Subtracts [page:Vector3 v] from this vector.</p>
 
-		<h3>[method:Vector3 subScalar]( [param:Float s] )</h3>
+		<h3>[method:this subScalar]( [param:Float s] )</h3>
 		<p>Subtracts [page:Float s]  from this vector's [page:.x x], [page:.y y] and [page:.z z] compnents.</p>
 
-		<h3>[method:Vector3 subVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
+		<h3>[method:this subVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
 		<p>Sets this vector to [page:Vector3 a] - [page:Vector3 b].</p>
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
@@ -418,13 +418,13 @@ var d = a.distanceTo( b );
 		Returns an array [x, y, z], or copies x, y and z into the provided [page:Array array].
 		</p>
 
-		<h3>[method:Vector3 transformDirection]( [param:Matrix4 m] )</h3>
+		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
 		<p>
 		Transforms the direction of this vector by a matrix (the upper left 3 x 3 subset of a [page:Matrix4 m])
 		and then [page:.normalize normalizes] the result.
 		</p>
 
-		<h3>[method:Vector3 unproject]( [param:Camera camera] )</h3>
+		<h3>[method:this unproject]( [param:Camera camera] )</h3>
 		<p>
 		[page:Camera camera] — camera to use in the projection.<br /><br />
 

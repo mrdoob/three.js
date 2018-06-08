@@ -20,6 +20,7 @@ import { UniformsLib } from './shaders/UniformsLib.js';
 import { UniformsUtils } from './shaders/UniformsUtils.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
+import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
@@ -121,6 +122,8 @@ function WebGLRenderer( parameters ) {
 		_isContextLost = false,
 
 		// internal state cache
+
+		_framebuffer = null,
 
 		_currentRenderTarget = null,
 		_currentFramebuffer = null,
@@ -289,7 +292,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( 'xr' in navigator ) ? new WebXRManager( _gl ) : new WebVRManager( _this );
+	var vr = ( 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
@@ -504,7 +507,7 @@ function WebGLRenderer( parameters ) {
 
 		vr.dispose();
 
-		stopAnimation();
+		animation.stop();
 
 	};
 
@@ -1015,53 +1018,25 @@ function WebGLRenderer( parameters ) {
 
 	// Animation Loop
 
-	var isAnimating = false;
-	var onAnimationFrame = null;
+	var onAnimationFrameCallback = null;
 
-	function startAnimation() {
+	function onAnimationFrame() {
 
-		if ( isAnimating ) return;
-
-		requestAnimationLoopFrame();
-
-		isAnimating = true;
+		if ( vr.isPresenting() ) return;
+		if ( onAnimationFrameCallback ) onAnimationFrameCallback();
 
 	}
 
-	function stopAnimation() {
+	var animation = new WebGLAnimation();
+	animation.setAnimationLoop( onAnimationFrame );
+	animation.setContext( window );
 
-		isAnimating = false;
+	this.setAnimationLoop = function ( callback ) {
 
-	}
+		onAnimationFrameCallback = callback;
+		vr.setAnimationLoop( callback );
 
-	function requestAnimationLoopFrame() {
-
-		if ( vr.isPresenting() ) {
-
-			vr.requestAnimationFrame( animationLoop );
-
-		} else {
-
-			window.requestAnimationFrame( animationLoop );
-
-		}
-
-	}
-
-	function animationLoop( time ) {
-
-		if ( isAnimating === false ) return;
-
-		onAnimationFrame( time );
-
-		requestAnimationLoopFrame();
-
-	}
-
-	this.animate = function ( callback ) {
-
-		onAnimationFrame = callback;
-		onAnimationFrame !== null ? startAnimation() : stopAnimation();
+		animation.start();
 
 	};
 
@@ -2423,6 +2398,14 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
+	//
+
+	this.setFramebuffer = function ( value ) {
+
+		_framebuffer = value;
+
+	};
+
 	this.getRenderTarget = function () {
 
 		return _currentRenderTarget;
@@ -2439,7 +2422,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var framebuffer = null;
+		var framebuffer = _framebuffer;
 		var isCube = false;
 
 		if ( renderTarget ) {
