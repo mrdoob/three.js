@@ -133,7 +133,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	toJSON: function ( meta, onBeforeSerialize, onAfterSerialize ) {
+	toJSON: function ( meta, onBeforeSerialize ) {
 
 		var isRoot = ( meta === undefined || typeof meta === 'string' );
 
