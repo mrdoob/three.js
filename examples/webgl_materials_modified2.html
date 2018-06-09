@@ -39,8 +39,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified MeshStandardMaterial with specular/glossines lighting model, per map transforms and simple instancing. 
 			Author <a href="http://dusanbosnjak.com" target="_blank" rel="noopener">@pailhead.</a>
 		</div>
 
@@ -80,7 +79,7 @@
 				map: true,
 				currentMesh: meshOptions[0]
 			}
-			var _gui = new dat.GUI() //fix css later
+			var _gui = new dat.GUI({width: 300}) //fix css later
 			var guiArray = []
 
 			var gui = _gui.addFolder('global')
@@ -119,27 +118,27 @@
 				guiArray.push(
 					gui.add( material.specularMapRepeat,'x',0,10)
 					.onChange(material.specularMapUpdateMatrix)
-					.name('repeat.x')
+					.name('spec map repeat.x')
 				)
 				guiArray.push(
 					gui.add( material.specularMapRepeat,'y',0,10)
 					.onChange(material.specularMapUpdateMatrix)
-					.name('repeat.y')
+					.name('spec map repeat.y')
 				)
 				guiArray.push(
 					gui.add( material.specularMapOffset,'x',0,1)
 					.onChange(material.specularMapUpdateMatrix)
-					.name('offset.x')
+					.name('spec map offset.x')
 				)
 				guiArray.push(
 					gui.add( material.specularMapOffset,'x',0,1)
 					.onChange(material.specularMapUpdateMatrix)
-					.name('offset.y')
+					.name('spec map offset.y')
 				)
 				guiArray.push(
 					gui.add( material, 'specularMapRotation',0,1)
 					.onChange(material.specularMapUpdateMatrix)
-					.name('rotation')
+					.name('spec map rotation')
 				)
 				guiArray.push(gui.add( material, 'glossiness',0,1))
 				guiArray.push(
@@ -154,6 +153,7 @@
 							meshGLTF.material.needsUpdate = true
 						}
 					})
+					.name('albedo map on/off')
 				)
 			}
 
