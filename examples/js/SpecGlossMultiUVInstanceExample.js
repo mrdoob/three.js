@@ -16,7 +16,13 @@ function addOrMergeProp( material, propName, data ) {
 
 //serialize
 function toJSON(){
-	return THREE.Material.prototype.toJSON.call(this, undefined, this._serializationManager.serialize.bind(this._serializationManager))
+	var res = THREE.Material.prototype.toJSON.call(
+		this, 
+		undefined, 
+		this._serializationManager.serialize.bind(this._serializationManager)
+	)
+	this._serializationManager.afterSerialize.call(this._serializationManager,res)
+	return res
 }
 
 // from three's texture transform api, to be applied to a uniform matrix
@@ -349,6 +355,7 @@ function decorateMaterialWithSimpleInstancing( material ) {
 
 function SerializationManager(){
 	this.processFunctions = []
+	this.afterFunctions = []
 }
 
 SerializationManager.prototype = {
@@ -358,5 +365,11 @@ SerializationManager.prototype = {
 	serialize(data, meta){
 		this.processFunctions.forEach(f=>f(data))
 		return data
+	},
+	afterSerialize(data){
+		this.afterFunctions.forEach(f=>f(data))
+	},
+	addAfterFunction: function( func ){
+		this.afterFunctions.push(func)
 	}
 }
