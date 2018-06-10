@@ -123,7 +123,7 @@ function decorateMaterialWithSpecGloss( material ) {
 		data.metadata.extensions.isSpecGlossExtended = true
 		data.glossiness = this.glossiness
 		data.specular = this.specular.getHex()
-		if(this.glossinessMap && this.glossinessMap.isTexture) data.glossinessMap = this.glossinessMap.toJSON( meta ) 
+		if(this.glossinessMap && this.glossinessMap.isTexture) data.glossinessMap = this.glossinessMap.toJSON( meta ).uuid 
 	}.bind(material)
 
 	material._serializationManager.addFunction(f)
