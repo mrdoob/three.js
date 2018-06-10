@@ -73,11 +73,17 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var currentMesh
 			var meshOptions = ['sphere','gltf']
 			var guiData = { 
 				speed: 1, 
 				map: true,
-				currentMesh: meshOptions[0]
+				currentMesh: meshOptions[0],
+				serialize: function(){
+					console.log(
+						JSON.stringify( currentMesh.material.toJSON())
+					)
+				}
 			}
 			var _gui = new dat.GUI({width: 300}) //fix css later
 			var guiArray = []
@@ -86,6 +92,7 @@
 			gui.open()
 			gui.add( guiData, 'speed', 0, 5 )
 			gui.add( guiData, 'currentMesh', meshOptions ).onChange(function(value){
+				currentMesh = value === 'sphere' ? mesh : meshGLTF
 				mesh.visible = value === 'sphere'
 				if(meshGLTF) meshGLTF.visible = value === 'gltf'
 				onChangeGuiMaterial(value==='gltf'?materialGLTF:material)
@@ -154,6 +161,9 @@
 						}
 					})
 					.name('albedo map on/off')
+				)
+				guiArray.push(
+					gui.add(guiData, 'serialize')
 				)
 			}
 
@@ -310,6 +320,8 @@
 				applyInstancingToMesh(mesh)
 				applyIndecisToInstancedMesh(mesh)
 
+				currentMesh = mesh
+
 			}
 
 			//instancing
@@ -355,7 +367,7 @@
 			}
 
 			function applyIndecisToInstancedMesh(mesh){
-				console.log(mesh)
+
 				var indecis = new Float32Array( INSTANCES ); 
 
 				for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
@@ -394,9 +406,6 @@
 				mesh.customDepthMaterial.shaderIncludes.begin_vertex = mesh.material.shaderIncludes.begin_vertex //copy these
 				mesh.customDepthMaterial.shaderUniforms = { uTime: mesh.material.shaderUniforms.uTime }//wire this by reference, whenever prop updates material uniform this material updates too by referencing the same uniform
 
-				console.log(mesh)
-
-				console.log(mesh.material.toJSON())
 			}
 
 

@@ -277,13 +277,21 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 		return data
 
 	}).bind(material))
+
+
+	material._serializationManager.addAfterFunction(
+		function( data ){
+			delete data.roughnessMap
+			delete data.roughness
+			delete data.metalnessMap
+			delete data.metalness	
+		}
+	)
 	
 	material.toJSON = toJSON.bind(material)
 
 	return material
 }
-
-
 
 // simple instance stuff from lambert example  ---------------------------------------------------------
 
