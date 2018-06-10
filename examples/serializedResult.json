@@ -1,0 +1,190 @@
+{
+  "alphaMapCenter": [
+    0,
+    0
+  ],
+  "alphaMapOffset": [
+    0,
+    0
+  ],
+  "alphaMapRepeat": [
+    1,
+    1
+  ],
+  "alphaMapRotation": 0,
+  "color": 16758090,
+  "depthFunc": 3,
+  "depthTest": true,
+  "depthWrite": true,
+  "emissive": 0,
+  "emissiveMapCenter": [
+    0,
+    0
+  ],
+  "emissiveMapOffset": [
+    0,
+    0
+  ],
+  "emissiveMapRepeat": [
+    1,
+    1
+  ],
+  "emissiveMapRotation": 0,
+  "envMap": "A78E1632-2AD0-438A-9571-D983C8491B1B",
+  "glossiness": 1,
+  "glossinessMap": {
+    "anisotropy": 1,
+    "center": [
+      0,
+      0
+    ],
+    "flipY": true,
+    "format": 1022,
+    "image": "D440D3C6-6D2A-44C3-ACE4-BC97CE407957",
+    "magFilter": 1006,
+    "mapping": 300,
+    "metadata": {
+      "generator": "Texture.toJSON",
+      "type": "Texture",
+      "version": 4.5
+    },
+    "minFilter": 1008,
+    "name": "texture",
+    "offset": [
+      0,
+      0
+    ],
+    "repeat": [
+      1,
+      1
+    ],
+    "rotation": 0,
+    "uuid": "0E08FCFE-5FC4-4343-8137-97B8781A33B9",
+    "wrap": [
+      1000,
+      1000
+    ]
+  },
+  "glossinessMapCenter": [
+    0,
+    0
+  ],
+  "glossinessMapOffset": [
+    0,
+    0
+  ],
+  "glossinessMapRepeat": [
+    1,
+    1
+  ],
+  "glossinessMapRotation": 0,
+  "images": [
+    {
+      "url": "...",
+      "uuid": "D440D3C6-6D2A-44C3-ACE4-BC97CE407957"
+    },
+    {
+      "url": "...",
+       "uuid": "414A29DF-CA45-4364-902F-B2369E673083"
+    }
+  ],
+  "map": "0E08FCFE-5FC4-4343-8137-97B8781A33B9",
+  "mapCenter": [
+    0,
+    0
+  ],
+  "mapOffset": [
+    0,
+    0
+  ],
+  "mapRepeat": [
+    1,
+    1
+  ],
+  "mapRotation": 0,
+  "metadata": {
+    "extensions": {
+      "isPerMapTransformExtended": true,
+      "isSimpleInstanceExtended": true,
+      "isSpecGlossExtended": true
+    },
+    "generator": "Material.toJSON",
+    "type": "Material",
+    "version": 4.5
+  },
+  "specular": 16777215,
+  "specularMap": "0E08FCFE-5FC4-4343-8137-97B8781A33B9",
+  "specularMapCenter": [
+    0,
+    0
+  ],
+  "specularMapOffset": [
+    0,
+    0
+  ],
+  "specularMapRepeat": [
+    1,
+    1
+  ],
+  "specularMapRotation": 0,
+  "textures": [
+    {
+      "anisotropy": 1,
+      "center": [
+        0,
+        0
+      ],
+      "flipY": true,
+      "format": 1022,
+      "image": "D440D3C6-6D2A-44C3-ACE4-BC97CE407957",
+      "magFilter": 1006,
+      "mapping": 300,
+      "minFilter": 1008,
+      "name": "texture",
+      "offset": [
+        0,
+        0
+      ],
+      "repeat": [
+        1,
+        1
+      ],
+      "rotation": 0,
+      "uuid": "0E08FCFE-5FC4-4343-8137-97B8781A33B9",
+      "wrap": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "anisotropy": 1,
+      "center": [
+        0,
+        0
+      ],
+      "flipY": true,
+      "format": 1022,
+      "image": "414A29DF-CA45-4364-902F-B2369E673083",
+      "magFilter": 1006,
+      "mapping": 305,
+      "minFilter": 1008,
+      "name": "envMap",
+      "offset": [
+        0,
+        0
+      ],
+      "repeat": [
+        1,
+        1
+      ],
+      "rotation": 0,
+      "uuid": "A78E1632-2AD0-438A-9571-D983C8491B1B",
+      "wrap": [
+        1001,
+        1001
+      ]
+    }
+  ],
+  "type": "MeshStandardMaterial",
+  "uuid": "AC55A38A-DAD4-4BD7-861A-87ADB212871F"
+}
