@@ -11,7 +11,7 @@
   },
   "glossiness": 1,
   "specular": 16777215,
-  "glossinessMap": "4CBD81D6-6DEC-4B13-8B9A-3109D205B518",
+  "glossinessMap": "2B8CE6E5-7846-4D84-B4BE-3D4211AE2BBA",
   "alphaMapRepeat": [
     1,
     1
@@ -77,19 +77,19 @@
     0
   ],
   "glossinessMapRotation": 0,
-  "uuid": "55437FF3-5A86-463E-8C5E-9E8F5290F92F",
+  "uuid": "B1168031-2FEB-4362-BFF5-04D2B366BA17",
   "type": "MeshStandardMaterial",
   "color": 16758090,
   "emissive": 0,
-  "map": "4CBD81D6-6DEC-4B13-8B9A-3109D205B518",
-  "specularMap": "4CBD81D6-6DEC-4B13-8B9A-3109D205B518",
-  "envMap": "32AA12E2-017E-42CA-90C4-483B95D456A5",
+  "map": "2B8CE6E5-7846-4D84-B4BE-3D4211AE2BBA",
+  "specularMap": "2B8CE6E5-7846-4D84-B4BE-3D4211AE2BBA",
+  "envMap": "58FDD3E2-882B-4F66-B4E2-BAE2C367595C",
   "depthFunc": 3,
   "depthTest": true,
   "depthWrite": true,
   "textures": [
     {
-      "uuid": "4CBD81D6-6DEC-4B13-8B9A-3109D205B518",
+      "uuid": "2B8CE6E5-7846-4D84-B4BE-3D4211AE2BBA",
       "name": "texture",
       "mapping": 300,
       "repeat": [
@@ -114,10 +114,10 @@
       "magFilter": 1006,
       "anisotropy": 1,
       "flipY": true,
-      "image": "FB5A325A-5CAA-47E7-921D-2A56C672CFCE"
+      "image": "B440D9F5-D47E-40D1-B912-DBFF0AE719AE"
     },
     {
-      "uuid": "32AA12E2-017E-42CA-90C4-483B95D456A5",
+      "uuid": "58FDD3E2-882B-4F66-B4E2-BAE2C367595C",
       "name": "envMap",
       "mapping": 305,
       "repeat": [
@@ -142,15 +142,15 @@
       "magFilter": 1006,
       "anisotropy": 1,
       "flipY": true,
-      "image": "F9CB0870-83F8-4762-961E-191FF7685340"
+      "image": "14DDC238-F4C1-4D89-AED5-597BD2927B84"
     }
   ],
   "images": [
     {
-      "uuid": "FB5A325A-5CAA-47E7-921D-2A56C672CFCE",
+      "uuid": "B440D9F5-D47E-40D1-B912-DBFF0AE719AE",
     },
     {
-      "uuid": "F9CB0870-83F8-4762-961E-191FF7685340",
+      "uuid": "14DDC238-F4C1-4D89-AED5-597BD2927B84",
     }
   ]
 }

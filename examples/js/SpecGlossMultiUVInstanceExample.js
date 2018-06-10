@@ -371,7 +371,7 @@ SerializationManager.prototype = {
 		this.processFunctions.push(func)
 	},
 	serialize(data, meta){
-		this.processFunctions.forEach(f=>f(data))
+		this.processFunctions.forEach(f=>f(data,meta))
 		return data
 	},
 	afterSerialize(data){
