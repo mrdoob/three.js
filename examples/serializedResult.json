@@ -1,0 +1,156 @@
+{
+  "metadata": {
+    "version": 4.5,
+    "type": "Material",
+    "generator": "Material.toJSON",
+    "extensions": {
+      "isSpecGlossExtended": true,
+      "isPerMapTransformExtended": true,
+      "isSimpleInstanceExtended": true
+    }
+  },
+  "glossiness": 1,
+  "specular": 16777215,
+  "glossinessMap": "2B8CE6E5-7846-4D84-B4BE-3D4211AE2BBA",
+  "alphaMapRepeat": [
+    1,
+    1
+  ],
+  "alphaMapOffset": [
+    0,
+    0
+  ],
+  "alphaMapCenter": [
+    0,
+    0
+  ],
+  "alphaMapRotation": 0,
+  "specularMapRepeat": [
+    1,
+    1
+  ],
+  "specularMapOffset": [
+    0,
+    0
+  ],
+  "specularMapCenter": [
+    0,
+    0
+  ],
+  "specularMapRotation": 0,
+  "mapRepeat": [
+    1,
+    1
+  ],
+  "mapOffset": [
+    0,
+    0
+  ],
+  "mapCenter": [
+    0,
+    0
+  ],
+  "mapRotation": 0,
+  "emissiveMapRepeat": [
+    1,
+    1
+  ],
+  "emissiveMapOffset": [
+    0,
+    0
+  ],
+  "emissiveMapCenter": [
+    0,
+    0
+  ],
+  "emissiveMapRotation": 0,
+  "glossinessMapRepeat": [
+    1,
+    1
+  ],
+  "glossinessMapOffset": [
+    0,
+    0
+  ],
+  "glossinessMapCenter": [
+    0,
+    0
+  ],
+  "glossinessMapRotation": 0,
+  "uuid": "B1168031-2FEB-4362-BFF5-04D2B366BA17",
+  "type": "MeshStandardMaterial",
+  "color": 16758090,
+  "emissive": 0,
+  "map": "2B8CE6E5-7846-4D84-B4BE-3D4211AE2BBA",
+  "specularMap": "2B8CE6E5-7846-4D84-B4BE-3D4211AE2BBA",
+  "envMap": "58FDD3E2-882B-4F66-B4E2-BAE2C367595C",
+  "depthFunc": 3,
+  "depthTest": true,
+  "depthWrite": true,
+  "textures": [
+    {
+      "uuid": "2B8CE6E5-7846-4D84-B4BE-3D4211AE2BBA",
+      "name": "texture",
+      "mapping": 300,
+      "repeat": [
+        1,
+        1
+      ],
+      "offset": [
+        0,
+        0
+      ],
+      "center": [
+        0,
+        0
+      ],
+      "rotation": 0,
+      "wrap": [
+        1000,
+        1000
+      ],
+      "format": 1022,
+      "minFilter": 1008,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": true,
+      "image": "B440D9F5-D47E-40D1-B912-DBFF0AE719AE"
+    },
+    {
+      "uuid": "58FDD3E2-882B-4F66-B4E2-BAE2C367595C",
+      "name": "envMap",
+      "mapping": 305,
+      "repeat": [
+        1,
+        1
+      ],
+      "offset": [
+        0,
+        0
+      ],
+      "center": [
+        0,
+        0
+      ],
+      "rotation": 0,
+      "wrap": [
+        1001,
+        1001
+      ],
+      "format": 1022,
+      "minFilter": 1008,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": true,
+      "image": "14DDC238-F4C1-4D89-AED5-597BD2927B84"
+    }
+  ],
+  "images": [
+    {
+      "uuid": "B440D9F5-D47E-40D1-B912-DBFF0AE719AE",
+    },
+    {
+      "uuid": "14DDC238-F4C1-4D89-AED5-597BD2927B84",
+    }
+  ]
+}

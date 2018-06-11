@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - modified</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			#oldie {
+				background:rgb(200,100,0) !important;
+				color:#fff;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified MeshStandardMaterial with specular/glossines lighting model, per map transforms and simple instancing. 
+			Author <a href="http://dusanbosnjak.com" target="_blank" rel="noopener">@pailhead.</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/SpecGlossMultiUVInstanceExample.js"></script>
+
+		<script src="js/loaders/DRACOLoader.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/CurveExtras.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+/*eslint-disable*/
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, stats, clock;
+
+			var mesh, material, meshGLTF, materialGLTF;
+			var texture, envMap;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var targetX = 0;
+			var targetY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var currentMesh
+			var meshOptions = ['sphere','gltf']
+			var guiData = { 
+				speed: 1, 
+				map: true,
+				currentMesh: meshOptions[0],
+				serialize: function(){
+					console.log(
+						JSON.stringify( currentMesh.material.toJSON())
+					)
+				}
+			}
+			var _gui = new dat.GUI({width: 300}) //fix css later
+			var guiArray = []
+
+			var gui = _gui.addFolder('global')
+			gui.open()
+			gui.add( guiData, 'speed', 0, 5 )
+			gui.add( guiData, 'currentMesh', meshOptions ).onChange(function(value){
+				currentMesh = value === 'sphere' ? mesh : meshGLTF
+				mesh.visible = value === 'sphere'
+				if(meshGLTF) meshGLTF.visible = value === 'gltf'
+				onChangeGuiMaterial(value==='gltf'?materialGLTF:material)
+			})
+
+			// var guiMaterial = _gui.addFolder('material')
+			// guiMaterial.open()
+
+			// var guiTexture = _gui.addFolder('specular map')
+			// guiTexture.open()
+
+			const INSTANCES = 256;
+			var frequency = 32
+			var instanceOffsetAttribute, instanceScaleAttribute
+
+			initScene();
+			initInstanceAttributes();
+			initTexture();
+			initBall();
+			onChangeGuiMaterial(material);
+			loadGLTF();
+			animate();
+
+			var _gltfTextureMap
+
+			function onChangeGuiMaterial(material){
+				while(guiArray.length){
+					gui.remove(guiArray.pop())
+				}
+				guiArray.push(
+					gui.add( material.specularMapRepeat,'x',0,10)
+					.onChange(material.specularMapUpdateMatrix)
+					.name('spec map repeat.x')
+				)
+				guiArray.push(
+					gui.add( material.specularMapRepeat,'y',0,10)
+					.onChange(material.specularMapUpdateMatrix)
+					.name('spec map repeat.y')
+				)
+				guiArray.push(
+					gui.add( material.specularMapOffset,'x',0,1)
+					.onChange(material.specularMapUpdateMatrix)
+					.name('spec map offset.x')
+				)
+				guiArray.push(
+					gui.add( material.specularMapOffset,'x',0,1)
+					.onChange(material.specularMapUpdateMatrix)
+					.name('spec map offset.y')
+				)
+				guiArray.push(
+					gui.add( material, 'specularMapRotation',0,1)
+					.onChange(material.specularMapUpdateMatrix)
+					.name('spec map rotation')
+				)
+				guiArray.push(gui.add( material, 'glossiness',0,1))
+				guiArray.push(
+					gui.add(guiData, 'map').onChange(function(val){
+						if(!_gltfTextureMap && meshGLTF ) _gltfTextureMap = meshGLTF.material.map
+
+						mesh.material.map = val ? texture : null
+						mesh.material.needsUpdate = true
+
+						if(meshGLTF){
+							meshGLTF.material.map = val ? _gltfTextureMap : null
+							meshGLTF.material.needsUpdate = true
+						}
+					})
+					.name('albedo map on/off')
+				)
+				guiArray.push(
+					gui.add(guiData, 'serialize')
+				)
+			}
+
+			function initScene() {
+
+				clock = new THREE.Clock();
+
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1200;
+
+				scene = new THREE.Scene();
+
+				var light = new THREE.DirectionalLight( 0xffffff, 0.4 );
+				light.position.set( 100, 260, 160 );
+				
+				light.castShadow = true;
+				light.shadow.camera.left = - 240;
+				light.shadow.camera.right = 240;
+				light.shadow.camera.top = 240;
+				light.shadow.camera.bottom = - 240;
+				light.shadow.camera.near = 10;
+				light.shadow.camera.far = 1500;
+
+				light.shadow.bias = - 0.001;
+				light.shadow.mapSize.width = 512;
+				light.shadow.mapSize.height = 512;
+				scene.add(light)
+
+				var ambient = new THREE.AmbientLight( 0x222222 );
+				scene.add( ambient );
+
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 800, 800 ).rotateX( - Math.PI / 2 ),
+					new THREE.MeshPhongMaterial( { color: 0x888888 } )
+				);
+				ground.position.set( 0, - 200, 0 );
+				ground.receiveShadow = true;
+	
+				scene.add( ground );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				renderer.gammaOutput = true;
+				renderer.physicallyCorrectLights = true;
+
+				renderer.shadowMap.enabled = true;
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// EVENTS
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function loadGLTF(){
+
+				loader = new THREE.GLTFLoader();
+
+				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+				loader.setDRACOLoader( new THREE.DRACOLoader() );
+
+				var loadStartTime = performance.now();
+				loader.load( './models/gltf/BoomBox/glTF-pbrSpecularGlossiness/BoomBox.gltf', function( data ) {
+
+					gltf = data;
+
+					var object = gltf.scene;
+
+					console.info( 'Load time: ' + ( performance.now() - loadStartTime ).toFixed( 2 ) + ' ms.' );
+
+					object.traverse( function( node ) {
+
+						if ( node.material && ( node.material.isMeshStandardMaterial ||
+							 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {
+
+							node.material.envMap = envMap;
+							node.material.needsUpdate = true;
+						}
+
+					} );
+
+					object.traverse( function ( node ) {
+
+						if ( node.isMesh || node.isLight ) node.castShadow = true;
+
+					} );
+
+					scene.add( object );
+					object.rotation.y -= Math.PI;
+
+					var scale = 2000
+					meshGLTF = object.children[0]
+					meshGLTF.frustumCulled = false
+					meshGLTF.visible = guiData.currentMesh === 'gltf'
+					meshGLTF.geometry.scale(scale,scale,scale)
+
+					materialGLTF = meshGLTF.material
+					decorateMaterialWithPerMapTransforms(materialGLTF)
+					applyInstancingToMesh(meshGLTF)
+					applyIndecisToInstancedMesh(meshGLTF)
+
+				}, undefined, function ( error ) {
+
+					console.error( error );
+
+				} );
+
+			}
+
+			function initTexture(){
+
+				texture = new THREE.TextureLoader().load( `textures/roughness_map.jpg` )
+				texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+				texture.name = "texture"
+
+				envMap = new THREE.TextureLoader().load( `textures/metal.jpg`, function ( texture ) {
+	
+					texture.mapping = THREE.SphericalReflectionMapping;
+					texture.encoding = THREE.sRGBEncoding;
+					if ( mesh ) material.needsUpdate = true;
+					if ( meshGLTF ) materialGLTF.needsUpdate = true;
+	
+				} );
+
+				envMap.name = "envMap"
+			}
+
+			function initBall(){
+
+				material = decorateMaterialWithSpecGloss(
+					new THREE.MeshStandardMaterial({
+						color: 0xffb54a,
+						envMap: envMap,
+						map: texture,
+					})
+				)
+				decorateMaterialWithPerMapTransforms(material)
+
+				mesh = new THREE.Mesh(new THREE.SphereBufferGeometry(10), material)
+
+				scene.add(mesh)
+
+				mesh.castShadow = true
+				mesh.receiveShadow = true
+
+				material.glossinessMap = texture //needs .a so doesnt work with this texture
+				material.specularMap = texture
+
+				applyInstancingToMesh(mesh)
+				applyIndecisToInstancedMesh(mesh)
+
+				currentMesh = mesh
+
+			}
+
+			//instancing
+			function initInstanceAttributes(){
+				//create geometry attributes
+				var knot = new THREE.Curves.TorusKnot( 60 );
+				var positions = knot.getSpacedPoints( INSTANCES );
+
+				var offsets = new Float32Array( INSTANCES * 3 ); // xyz
+				var scales = new Float32Array( INSTANCES * 1 ); // s
+				for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
+
+					var index = 3 * i;
+
+					// per-instance position offset
+					offsets[ index ] = positions[ i ].x;
+					offsets[ index + 1 ] = positions[ i ].y;
+					offsets[ index + 2 ] = positions[ i ].z;
+
+					// per-instance scale variation
+					scales[ i ] = 1 + 0.5 * Math.sin( frequency * Math.PI * i / INSTANCES );
+
+				}
+
+				instanceOffsetAttribute = new THREE.InstancedBufferAttribute( offsets, 3 )
+				instanceScaleAttribute = new THREE.InstancedBufferAttribute( scales, 1 )
+			}
+
+			function applyInstancingToMesh(mesh){
+
+				decorateMaterialWithSimpleInstancing(mesh.material)
+
+				mesh.customDepthMaterial = decorateMaterialWithSimpleInstancing(
+					new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking })
+				)
+
+				mesh.geometry = new THREE.InstancedBufferGeometry().copy(mesh.geometry)
+				mesh.geometry.maxInstancedCount = INSTANCES
+
+				mesh.geometry.addAttribute( 'instanceOffset', instanceOffsetAttribute );
+				mesh.geometry.addAttribute( 'instanceScale', instanceScaleAttribute );
+
+			}
+
+			function applyIndecisToInstancedMesh(mesh){
+
+				var indecis = new Float32Array( INSTANCES ); 
+
+				for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
+					indecis[i] = i / INSTANCES
+				}
+
+				mesh.geometry.addAttribute('aIndex', new THREE.InstancedBufferAttribute( indecis, 1 ) )
+
+				//remove the old attibute (we could have overloaded it though)
+				delete mesh.geometry.attributes.instanceScale
+
+				//knowing we decorated with simpleInstancing we have a parsed/included "compiled" chunk to work with
+				mesh.material.shaderIncludes.begin_vertex = mesh.material.shaderIncludes.begin_vertex.replace(
+					'transformed *= instanceScale;', //we know how simpleInstancing works
+					`float _ind = aIndex + uTime;
+					transformed *= 1. + 0.5 * sin(${frequency}.0 * ${Math.PI} * _ind );` //we override a part of that extension with our custom logic
+				)
+
+				//we need a custom time uniform for the effect
+				var uTime = { value: 0, type: 'float', stage: 'vertex' }
+				mesh.material.shaderUniforms.uTime = uTime
+
+				//we expose it as a primitive
+				Object.defineProperty(mesh.material, 'time', {
+					get:()=>uTime.value,
+					set:v=>uTime.value = v
+				})
+		
+				mesh.material.shaderIncludes.uv_pars_vertex = `
+				${THREE.ShaderChunk.uv_pars_vertex}
+				attribute float aIndex;
+				`
+
+				//to make it work with shadows,
+				mesh.customDepthMaterial.shaderIncludes.uv_pars_vertex = mesh.material.shaderIncludes.uv_pars_vertex //copy these
+				mesh.customDepthMaterial.shaderIncludes.begin_vertex = mesh.material.shaderIncludes.begin_vertex //copy these
+				mesh.customDepthMaterial.shaderUniforms = { uTime: mesh.material.shaderUniforms.uTime }//wire this by reference, whenever prop updates material uniform this material updates too by referencing the same uniform
+
+			}
+
+
+			function onWindowResize( event ) {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				windowHalfX = width / 2;
+				windowHalfY = height / 2;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+			}
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+				stats.update();
+
+			}
+
+			function render() {
+
+				targetX = mouseX * .001;
+				targetY = mouseY * .001;
+
+				var delta = clock.getDelta() * 0.01 * guiData.speed
+				if ( mesh ) {
+
+					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
+					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
+
+					mesh.material.time += delta
+				}
+
+				if ( meshGLTF ) {
+
+					meshGLTF.rotation.y += 0.05 * ( targetX - meshGLTF.rotation.y );
+					meshGLTF.rotation.x += 0.05 * ( targetY - meshGLTF.rotation.x );
+
+					meshGLTF.material.time += delta
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -133,7 +133,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	toJSON: function ( meta ) {
+	toJSON: function ( meta, onWillSerialize ) {
 
 		var isRoot = ( meta === undefined || typeof meta === 'string' );
 
@@ -153,6 +153,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 				generator: 'Material.toJSON'
 			}
 		};
+
+		onWillSerialize( data, meta );
 
 		// standard Material serialization
 		data.uuid = this.uuid;

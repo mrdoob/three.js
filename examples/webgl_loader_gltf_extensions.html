@@ -49,12 +49,13 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/DRACOLoader.js"></script>
-		<script src="js/loaders/DDSLoader.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/three.min.js"></script>
+		<script src="js/dat.gui.min.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script src="js/SpecGlossMultiUVInstanceExample.js"></script>
+		<script src="js/DRACOLoader.js"></script>
+		<script src="js/DDSLoader.js"></script>
+		<script src="js/GLTFLoader.js"></script>
 
 		<script>
 			var orbitControls;
@@ -380,6 +381,40 @@
 					}
 
 					scene.add( object );
+
+					//---
+					//inline extension example, the material is already extended by GLTFLoader (or not if its not spec/gloss)
+					//but this extension will instance both regular and spec gloss
+					if(sceneInfo.name === 'BoomBox (PBR)'){
+
+						decorateMaterialWithSimpleInstancing(object.children[0].material) //only one line is needed to enable this on the material
+
+						//this is all geometry setup, since it is overlapping with SceneGraphs responsibilities
+						//this could be a higher level interface on a Mesh
+						const size = 64
+						const size_inv = 1/size
+						const instances = size * size
+						const scale = 1
+
+						const instancePositionArray = new Float32Array( instances * 3 )
+						const instanceScaleArray = new Float32Array( instances * 3 )
+						for ( var i = 0, ii = 0 ; i < instances ; i++ ){
+							instanceScaleArray[ii] = 1
+							instancePositionArray[ii++] = ((i % size) * size_inv-0.5) * scale
+							instanceScaleArray[ii] = 1
+							instancePositionArray[ii++] = 0
+							instanceScaleArray[ii] = 1
+							instancePositionArray[ii++] = (Math.floor(i*size_inv) * size_inv-0.5) * scale
+						}
+
+						object.children[0].geometry = new THREE.InstancedBufferGeometry().copy(object.children[0].geometry)
+						object.children[0].geometry.addAttribute( 'instanceOffset', new THREE.InstancedBufferAttribute(instancePositionArray, 3))
+						object.children[0].geometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute(instanceScaleArray, 1))
+						object.children[0].geometry.maxInstancedCount = instances
+						object.children[0].frustumCulled = false
+
+					}
+
 					onWindowResize();
 
 				}, undefined, function ( error ) {
