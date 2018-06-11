@@ -1182,7 +1182,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var extras = ( Object.keys( geometry.userData ).length > 0 ) ? serializeUserData( geometry ) : undefined;
+			var extras = ( geometry.userData && Object.keys( geometry.userData ).length > 0 ) ? serializeUserData( geometry ) : undefined;
 
 			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
