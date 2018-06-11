@@ -26,6 +26,32 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	var scope = this;
 
+	// Drag constrains (eg. move along x-axis only, y only, x and y, or default xyz)
+	var moveX, moveY, moveZ;
+
+	this.constrains = function(xyz) {
+
+		if (xyz === undefined)
+			xyz = 'xyz';
+
+		moveX = moveY = moveZ = false;
+
+		if (xyz.indexOf('x') > -1) {
+			moveX = true;
+		}
+
+		if (xyz.indexOf('y') > -1) {
+			moveY = true;
+		}
+
+		if (xyz.indexOf('z') > -1) {
+			moveZ = true;
+		}
+
+		return this;
+
+	};
+
 	function activate() {
 
 		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -71,7 +97,12 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_selected.position.copy( _intersection.sub( _offset ) );
+				_intersection.sub( _offset );
+				//_selected.position.copy( _intersection.sub( _offset ) );
+
+				if (moveX) _selected.position.x = _intersection.x;
+				if (moveY) _selected.position.y = _intersection.y;
+				if (moveZ) _selected.position.z = _intersection.z;
 
 			}
 
