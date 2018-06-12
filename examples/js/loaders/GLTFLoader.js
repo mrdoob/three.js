@@ -851,36 +851,13 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					var offset;
-					var repeat;
+					if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-					if ( uvScaleMap.matrix !== undefined ) {
-
-						// > r88.
-
-						if ( uvScaleMap.matrixAutoUpdate === true ) {
-
-							offset = uvScaleMap.offset;
-							repeat = uvScaleMap.repeat;
-							var rotation = uvScaleMap.rotation;
-							var center = uvScaleMap.center;
-
-							uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
-
-						}
-
-						uniforms.uvTransform.value.copy( uvScaleMap.matrix );
-
-					} else {
-
-						// <= r87. Remove when reasonable.
-
-						offset = uvScaleMap.offset;
-						repeat = uvScaleMap.repeat;
-
-						uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+						uvScaleMap.updateMatrix();
 
 					}
+
+					uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 				}
 
