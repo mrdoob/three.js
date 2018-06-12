@@ -10,16 +10,13 @@ THREE.LineSegmentsGeometry = function () {
 	this.type = 'LineSegmentsGeometry';
 
 	var plane = new THREE.BufferGeometry();
-	var epsilon = 0.000000;
-	var segUVStart = 0.5 + epsilon;
-	var segUVEnd = 0.5 - epsilon;
 
 	/*eslint-disable*/
 	var positions = [
 		- 1,   2, 0,
 		  1,   2, 0,
 		- 1,   1, 0,
-		  1,   1, 0,
+		  1,   1, 0, //duplicate here
 		- 1,   1, 0,
 		  1,   1, 0,
 		- 1,   0, 0,
@@ -33,21 +30,21 @@ THREE.LineSegmentsGeometry = function () {
 	var uvs = [
 		0, 1, 0,
 		1, 1, 0, 
-		0, segUVStart, 0,
-		1, segUVStart, 0,
+		0, 0.5, 0,
+		1, 0.5, 0,
+		1, 0.5, 1, //duplicate these so the value doesnt get interpolated
 		1, 0.5, 1,
 		1, 0.5, 1,
 		1, 0.5, 1,
-		1, 0.5, 1,
-		0, segUVEnd, 0, 
-		1, segUVEnd, 0,
+		0, 0.5, 0, 
+		1, 0.5, 0,
 		0, 0, 1, 
 		1, 0, 1,
 	];
 	var index = [ 
 		0, 2, 1, 
 		2, 3, 1, 
-		// 2, 4, 3, 
+		// 2, 4, 3, //weave with a split
 		// 4, 5, 3, 
 		4, 6, 5, 
 		6, 7, 5, 
@@ -58,7 +55,7 @@ THREE.LineSegmentsGeometry = function () {
 
 	this.setIndex( index );
 	this.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-	this.addAttribute( 'aUv', new THREE.Float32BufferAttribute( uvs, 3 ) );
+	this.addAttribute( 'aUv', new THREE.Float32BufferAttribute( uvs, 3 ) ); //rename so it doesnt conflict (add another attribute)
 
 };
 

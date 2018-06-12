@@ -200,10 +200,6 @@ THREE.ShaderLib[ 'line' ] = {
 
 		varying vec3 vUv;
 
-		const float _EPSILON = 0.000000;
-		const float SEG_START = 0.5 - EPSILON;
-		const float SEG_END = 0.5 + EPSILON;
-
 		void main() {
 
 			#include <clipping_planes_fragment>
