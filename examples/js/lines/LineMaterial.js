@@ -46,8 +46,9 @@ THREE.ShaderLib[ 'line' ] = {
 
 		attribute vec3 instanceColorStart;
 		attribute vec3 instanceColorEnd;
+		attribute vec3 aUv;
 
-		varying vec2 vUv;
+		varying vec3 vUv;
 
 		#ifdef USE_DASH
 
@@ -89,7 +90,7 @@ THREE.ShaderLib[ 'line' ] = {
 
 			float aspect = resolution.x / resolution.y;
 
-			vUv = uv;
+			vUv = aUv;
 
 			// camera space
 			vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );
@@ -197,7 +198,7 @@ THREE.ShaderLib[ 'line' ] = {
 		#include <logdepthbuf_pars_fragment>
 		#include <clipping_planes_pars_fragment>
 
-		varying vec2 vUv;
+		varying vec3 vUv;
 
 		const float _EPSILON = 0.000000;
 		const float SEG_START = 0.5 - EPSILON;
@@ -207,15 +208,17 @@ THREE.ShaderLib[ 'line' ] = {
 
 			#include <clipping_planes_fragment>
 
+			bool isCap = vUv.z < 0.5;
+
 			#ifdef USE_DASH
 
-				if ( vUv.y < SEG_START || vUv.y > SEG_END ) discard; // discard endcaps
+				if ( isCap ) discard; // discard endcaps
 
 				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
 
-			if ( vUv.y < SEG_START || vUv.y > SEG_END ) {
+			if ( isCap ) {
 
 				float a = vUv.x - 0.5;
 				float b = vUv.y - 0.5;
