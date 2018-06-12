@@ -249,7 +249,6 @@ THREE.SVGLoader.prototype = {
 							point.y += numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
-							console.log( point.x, point.y );
 							path.moveTo( point.x, point.y );
 						}
 						break;
@@ -375,8 +374,20 @@ THREE.SVGLoader.prototype = {
 					case 'z':
 						path.currentPath.autoClose = true;
 						// Reset point to beginning of Path
-						point.x = path.currentPath.curves[ 0 ].v0.x;
-						point.y = path.currentPath.curves[ 0 ].v0.y;
+						var curve = path.currentPath.curves[ 0 ];
+						if ( curve.isLineCurve ) {
+							point.x = curve.v1.x;
+							point.y = curve.v1.y;
+						} else if ( curve.isEllipseCurve || curve.isArcCurve ) {
+							point.x = curve.aX;
+							point.y = curve.aY;
+						} else if ( curve.isCubicBezierCurve || curve.isQuadraticBezierCurve ) {
+							point.x = curve.v0.x;
+							point.y = curve.v0.y;
+						} else if ( curve.isSplineCurve ) {
+							point.x = curve.points[ 0 ].x;
+							point.y = curve.points[ 0 ].y;
+						}
 						path.currentPath.currentPoint.copy( point );
 						break;
 
