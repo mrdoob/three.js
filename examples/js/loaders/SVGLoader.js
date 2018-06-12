@@ -176,48 +176,54 @@ THREE.SVGLoader.prototype = {
 
 					case 'S':
 						var numbers = parseFloats( data );
-						path.bezierCurveTo(
-							getReflection( point.x, control.x ),
-							getReflection( point.y, control.y ),
-							numbers[ 0 ],
-							numbers[ 1 ],
-							numbers[ 2 ],
-							numbers[ 3 ]
-						);
-						control.x = numbers[ 0 ];
-						control.y = numbers[ 1 ];
-						point.x = numbers[ 2 ];
-						point.y = numbers[ 3 ];
+						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
+							path.bezierCurveTo(
+								getReflection( point.x, control.x ),
+								getReflection( point.y, control.y ),
+								numbers[ j + 0 ],
+								numbers[ j + 1 ],
+								numbers[ j + 2 ],
+								numbers[ j + 3 ]
+							);
+							control.x = numbers[ j + 0 ];
+							control.y = numbers[ j + 1 ];
+							point.x = numbers[ j + 2 ];
+							point.y = numbers[ j + 3 ];
+						}
 						break;
 
 					case 'Q':
 						var numbers = parseFloats( data );
-						path.quadraticCurveTo(
-							numbers[ 0 ],
-							numbers[ 1 ],
-							numbers[ 2 ],
-							numbers[ 3 ]
-						);
-						control.x = numbers[ 0 ];
-						control.y = numbers[ 1 ];
-						point.x = numbers[ 2 ];
-						point.y = numbers[ 3 ];
+						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
+							path.quadraticCurveTo(
+								numbers[ j + 0 ],
+								numbers[ j + 1 ],
+								numbers[ j + 2 ],
+								numbers[ j + 3 ]
+							);
+							control.x = numbers[ j + 0 ];
+							control.y = numbers[ j + 1 ];
+							point.x = numbers[ j + 2 ];
+							point.y = numbers[ j + 3 ];
+						}
 						break;
 
 					case 'T':
 						var numbers = parseFloats( data );
-						var rx = getReflection( point.x, control.x );
-						var ry = getReflection( point.y, control.y );
-						path.quadraticCurveTo(
-							rx,
-							ry,
-							numbers[ 0 ],
-							numbers[ 1 ]
-						);
-						control.x = rx;
-						control.y = ry;
-						point.x = numbers[ 0 ];
-						point.y = numbers[ 1 ];
+						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+							var rx = getReflection( point.x, control.x );
+							var ry = getReflection( point.y, control.y );
+							path.quadraticCurveTo(
+								rx,
+								ry,
+								numbers[ j + 0 ],
+								numbers[ j + 1 ]
+							);
+							control.x = rx;
+							control.y = ry;
+							point.x = numbers[ j + 0 ];
+							point.y = numbers[ j + 1 ];
+						}
 						break;
 
 					case 'A':
@@ -298,48 +304,54 @@ THREE.SVGLoader.prototype = {
 
 					case 's':
 						var numbers = parseFloats( data );
-						path.bezierCurveTo(
-							getReflection( point.x, control.x ),
-							getReflection( point.y, control.y ),
-							point.x + numbers[ 0 ],
-							point.y + numbers[ 1 ],
-							point.x + numbers[ 2 ],
-							point.y + numbers[ 3 ]
-						);
-						control.x = point.x + numbers[ 0 ];
-						control.y = point.y + numbers[ 1 ];
-						point.x += numbers[ 2 ];
-						point.y += numbers[ 3 ];
+						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
+							path.bezierCurveTo(
+								getReflection( point.x, control.x ),
+								getReflection( point.y, control.y ),
+								point.x + numbers[ j + 0 ],
+								point.y + numbers[ j + 1 ],
+								point.x + numbers[ j + 2 ],
+								point.y + numbers[ j + 3 ]
+							);
+							control.x = point.x + numbers[ j + 0 ];
+							control.y = point.y + numbers[ j + 1 ];
+							point.x += numbers[ j + 2 ];
+							point.y += numbers[ j + 3 ];
+						}
 						break;
 
 					case 'q':
 						var numbers = parseFloats( data );
-						path.quadraticCurveTo(
-							point.x + numbers[ 0 ],
-							point.y + numbers[ 1 ],
-							point.x + numbers[ 2 ],
-							point.y + numbers[ 3 ]
-						);
-						control.x = point.x + numbers[ 0 ];
-						control.y = point.y + numbers[ 1 ];
-						point.x += numbers[ 2 ];
-						point.y += numbers[ 3 ];
+						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
+							path.quadraticCurveTo(
+								point.x + numbers[ j + 0 ],
+								point.y + numbers[ j + 1 ],
+								point.x + numbers[ j + 2 ],
+								point.y + numbers[ j + 3 ]
+							);
+							control.x = point.x + numbers[ j + 0 ];
+							control.y = point.y + numbers[ j + 1 ];
+							point.x += numbers[ j + 2 ];
+							point.y += numbers[ j + 3 ];
+						}
 						break;
 
 					case 't':
 						var numbers = parseFloats( data );
-						var rx = getReflection( point.x, control.x );
-						var ry = getReflection( point.y, control.y );
-						path.quadraticCurveTo(
-							rx,
-							ry,
-							point.x + numbers[ 0 ],
-							point.y + numbers[ 1 ]
-						);
-						control.x = rx;
-						control.y = ry;
-						point.x = point.x + numbers[ 0 ];
-						point.y = point.y + numbers[ 1 ];
+						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+							var rx = getReflection( point.x, control.x );
+							var ry = getReflection( point.y, control.y );
+							path.quadraticCurveTo(
+								rx,
+								ry,
+								point.x + numbers[ j + 0 ],
+								point.y + numbers[ j + 1 ]
+							);
+							control.x = rx;
+							control.y = ry;
+							point.x = point.x + numbers[ j + 0 ];
+							point.y = point.y + numbers[ j + 1 ];
+						}
 						break;
 
 					case 'a':
