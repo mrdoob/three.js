@@ -10,10 +10,50 @@ THREE.LineSegmentsGeometry = function () {
 	this.type = 'LineSegmentsGeometry';
 
 	var plane = new THREE.BufferGeometry();
+	var epsilon = 0.000000;
+	var segUVStart = 0.5 + epsilon;
+	var segUVEnd = 0.5 - epsilon;
 
-	var positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
-	var uvs = [ 0, 1, 1, 1, 0, .5, 1, .5, 0, .5, 1, .5, 0, 0, 1, 0 ];
-	var index = [ 0, 2, 1, 2, 3, 1, 2, 4, 3, 4, 5, 3, 4, 6, 5, 6, 7, 5 ];
+	var positions = [ 
+		- 1, 2, 0, 
+		1, 2, 0, 
+		- 1, 1, 0, 
+		1, 1, 0, 
+
+		- 1, 1, 0, 
+		1, 1, 0, 
+
+		- 1, 0, 0, 
+		1, 0, 0, 
+
+		- 1, 0, 0, 
+		1, 0, 0, 
+		- 1, - 1, 0, 
+		1, - 1, 0 ];
+	var uvs = [
+		0, 1,
+		1, 1,
+		0, segUVStart,
+		1, segUVStart,
+		1, 0.5,
+		1, 0.5,
+		1, 0.5,
+		1, 0.5,
+		0, segUVEnd,
+		1, segUVEnd,
+		0, 0,
+		1, 0
+	];
+	var index = [ 
+		0, 2, 1, 
+		2, 3, 1, 
+		// 2, 4, 3, 
+		// 4, 5, 3, 
+		4, 6, 5, 
+		6, 7, 5, 
+		8, 10, 9, 
+		10, 11, 9, 
+	];
 
 	this.setIndex( index );
 	this.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
