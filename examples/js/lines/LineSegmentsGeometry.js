@@ -14,22 +14,21 @@ THREE.LineSegmentsGeometry = function () {
 	var segUVStart = 0.5 + epsilon;
 	var segUVEnd = 0.5 - epsilon;
 
-	var positions = [ 
-		- 1, 2, 0, 
-		1, 2, 0, 
-		- 1, 1, 0, 
-		1, 1, 0, 
-
-		- 1, 1, 0, 
-		1, 1, 0, 
-
-		- 1, 0, 0, 
-		1, 0, 0, 
-
-		- 1, 0, 0, 
-		1, 0, 0, 
-		- 1, - 1, 0, 
-		1, - 1, 0 ];
+	/*eslint-disable*/
+	var positions = [
+		- 1,   2, 0,
+		  1,   2, 0,
+		- 1,   1, 0,
+		  1,   1, 0,
+		- 1,   1, 0,
+		  1,   1, 0,
+		- 1,   0, 0,
+	      1,   0, 0,
+		- 1,   0, 0,
+		  1,   0, 0,
+		- 1, - 1, 0,
+		  1, - 1, 0
+	];
 	var uvs = [
 		0, 1,
 		1, 1,
@@ -54,6 +53,7 @@ THREE.LineSegmentsGeometry = function () {
 		8, 10, 9, 
 		10, 11, 9, 
 	];
+	/*eslint-disable*/
 
 	this.setIndex( index );
 	this.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );

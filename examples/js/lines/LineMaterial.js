@@ -199,23 +199,19 @@ THREE.ShaderLib[ 'line' ] = {
 
 		varying vec2 vUv;
 
-		const float _EPSILON = 0.000000;
-		const float SEG_START = 0.5 - EPSILON;
-		const float SEG_END = 0.5 + EPSILON;
-
 		void main() {
 
 			#include <clipping_planes_fragment>
 
 			#ifdef USE_DASH
 
-				if ( vUv.y < SEG_START || vUv.y > SEG_END ) discard; // discard endcaps
+				if ( vUv.y < 0.5 || vUv.y > 0.5 ) discard; // discard endcaps
 
 				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
 
-			if ( vUv.y < SEG_START || vUv.y > SEG_END ) {
+			if ( vUv.y < 0.5 || vUv.y > 0.5 ) {
 
 				float a = vUv.x - 0.5;
 				float b = vUv.y - 0.5;
