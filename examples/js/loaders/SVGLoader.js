@@ -249,6 +249,7 @@ THREE.SVGLoader.prototype = {
 							point.y += numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
+							console.log( point.x, point.y );
 							path.moveTo( point.x, point.y );
 						}
 						break;
@@ -373,6 +374,10 @@ THREE.SVGLoader.prototype = {
 					case 'Z':
 					case 'z':
 						path.currentPath.autoClose = true;
+						// Reset point to beginning of Path
+						point.x = path.currentPath.curves[ 0 ].v0.x;
+						point.y = path.currentPath.curves[ 0 ].v0.y;
+						path.currentPath.currentPoint.copy( point );
 						break;
 
 					default:
