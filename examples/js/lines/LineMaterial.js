@@ -209,7 +209,7 @@ THREE.ShaderLib[ 'line' ] = {
 
 			#ifdef USE_DASH
 
-				if ( vUv.y <= SEG_START || vUv.y >= SEG_END ) discard; // discard endcaps
+				if ( vUv.y < SEG_START || vUv.y > SEG_END ) discard; // discard endcaps
 
 				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
