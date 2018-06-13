@@ -11,13 +11,51 @@ THREE.LineSegmentsGeometry = function () {
 
 	var plane = new THREE.BufferGeometry();
 
-	var positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
-	var uvs = [ 0, 1, 1, 1, 0, .5, 1, .5, 0, .5, 1, .5, 0, 0, 1, 0 ];
-	var index = [ 0, 2, 1, 2, 3, 1, 2, 4, 3, 4, 5, 3, 4, 6, 5, 6, 7, 5 ];
+	/*eslint-disable*/
+	var positions = [
+		- 1,   2, 0,
+		  1,   2, 0,
+		- 1,   1, 0,
+		  1,   1, 0, //duplicate here
+		- 1,   1, 0,
+		  1,   1, 0,
+		- 1,   0, 0,
+	      1,   0, 0,
+		- 1,   0, 0,
+		  1,   0, 0,
+		- 1, - 1, 0,
+		  1, - 1, 0
+	];
+
+	var uvs = [
+		0, 1, 0,
+		1, 1, 0, 
+		0, 0.5, 0,
+		1, 0.5, 0,
+		1, 0.5, 1, //duplicate these so the value doesnt get interpolated
+		1, 0.5, 1,
+		1, 0.5, 1,
+		1, 0.5, 1,
+		0, 0.5, 0, 
+		1, 0.5, 0,
+		0, 0, 1, 
+		1, 0, 1,
+	];
+	var index = [ 
+		0, 2, 1, 
+		2, 3, 1, 
+		// 2, 4, 3, //weave with a split
+		// 4, 5, 3, 
+		4, 6, 5, 
+		6, 7, 5, 
+		8, 10, 9, 
+		10, 11, 9, 
+	];
+	/*eslint-disable*/
 
 	this.setIndex( index );
 	this.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-	this.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+	this.addAttribute( 'aUv', new THREE.Float32BufferAttribute( uvs, 3 ) ); //rename so it doesnt conflict (add another attribute)
 
 };
 
