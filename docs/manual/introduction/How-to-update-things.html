@@ -117,12 +117,6 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 				<p>
 					If you change the position data values after the initial render, you should also call
 					`.computeBoundingSphere()` on the object to recalculate it's bounding sphere. 
-					The bounding sphere is used in calculations such as raycasting and frustrum culling.
-					If this method id not called after vertices are changed, you are likely to run into
-					strange side effects due to Three.js failing to properly identify the correct boundary
-				 	of your object. This may cause bugs succh as an object that doesn't properly
-					recieve raycasts on the entire object, or is frustrum culled too
-					early (such as when close to the edge of the screen).
 				</p>
 				<code>
 line.geometry.computeBoundingSphere(); // recommended after the first render
