@@ -106,7 +106,8 @@ THREE.GLTFExporter.prototype = {
 
 			attributes: new Map(),
 			materials: new Map(),
-			textures: new Map()
+			textures: new Map(),
+			images: new Map()
 
 		};
 
@@ -622,12 +623,28 @@ THREE.GLTFExporter.prototype = {
 
 		/**
 		 * Process image
-		 * @param  {Texture} map Texture to process
+		 * @param  {Image} image to process
+		 * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
+		 * @param  {Boolean} flipY before writing out the image
 		 * @return {Integer}     Index of the processed texture in the "images" array
 		 */
-		function processImage( map ) {
+		function processImage( image, format, flipY ) {
 
-			// @TODO Cache
+			if ( ! cachedData.images.has( image ) ) {
+
+				cachedData.images.set( image, {} );
+
+			}
+
+			var cachedImages = cachedData.images.get( image );
+			var mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+			var key = mimeType + ":flipY/" + flipY.toString();
+
+			if ( cachedImages[ key ] !== undefined ) {
+
+				return cachedImages[ key ];
+
+			}
 
 			if ( ! outputJSON.images ) {
 
@@ -635,19 +652,18 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var mimeType = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
 			var gltfImage = { mimeType: mimeType };
 
 			if ( options.embedImages ) {
 
 				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
 
-				canvas.width = map.image.width;
-				canvas.height = map.image.height;
+				canvas.width = image.width;
+				canvas.height = image.height;
 
-				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( map.image ) ) {
+				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( image ) ) {
 
-					console.warn( 'GLTFExporter: Resized non-power-of-two image.', map.image );
+					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
 					canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
 					canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
@@ -656,14 +672,14 @@ THREE.GLTFExporter.prototype = {
 
 				var ctx = canvas.getContext( '2d' );
 
-				if ( map.flipY === true ) {
+				if ( flipY === true ) {
 
 					ctx.translate( 0, canvas.height );
 					ctx.scale( 1, - 1 );
 
 				}
 
-				ctx.drawImage( map.image, 0, 0, canvas.width, canvas.height );
+				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
 
 				if ( options.binary === true ) {
 
@@ -691,13 +707,16 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				gltfImage.uri = map.image.src;
+				gltfImage.uri = image.src;
 
 			}
 
 			outputJSON.images.push( gltfImage );
 
-			return outputJSON.images.length - 1;
+			var index = outputJSON.images.length - 1;
+			cachedImages[ key ] = index;
+
+			return index;
 
 		}
 
@@ -751,7 +770,7 @@ THREE.GLTFExporter.prototype = {
 			var gltfTexture = {
 
 				sampler: processSampler( map ),
-				source: processImage( map )
+				source: processImage( map.image, map.format, map.flipY  )
 
 			};
 
