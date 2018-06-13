@@ -113,6 +113,17 @@ line.geometry.setDrawRange( 0, newValue );
 				<code>
 line.geometry.attributes.position.needsUpdate = true; // required after the first render
 				</code>
+					
+				<p>
+					You should also call `.computeBoundingSphere()` on the object to recalculate the
+					the bounding sphere of the ojbect in order for raycasting and occlusion culling
+					to properly identify the boundary of your object. Otherwise you may end up with
+					an object that doesn't recieve raycast on the entire object, or is culled too
+					early when partially off the screen.
+				</p>
+				<code>
+line.geometry.computeBoundingSphere();
+				</code>
 
 				<p>
 					[link:http://jsfiddle.net/w67tzfhx/ Here is a fiddle] showing an animated line which you can adapt to your use case.
