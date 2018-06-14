@@ -6,7 +6,7 @@ THREE.IntNode = function ( value ) {
 
 	THREE.InputNode.call( this, 'iv1' );
 
-	this.value = [ Math.floor( value || 0 ) ];
+	this.value = Math.floor( value || 0 );
 
 };
 
@@ -14,24 +14,9 @@ THREE.IntNode.prototype = Object.create( THREE.InputNode.prototype );
 THREE.IntNode.prototype.constructor = THREE.IntNode;
 THREE.IntNode.prototype.nodeType = "Int";
 
-Object.defineProperties( THREE.IntNode.prototype, {
-	number: {
-		get: function () {
-
-			return this.value[ 0 ];
-
-		},
-		set: function ( val ) {
-
-			this.value[ 0 ] = Math.floor( val );
-
-		}
-	}
-} );
-
 THREE.IntNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
-	return builder.format( this.number, type, output );
+	return builder.format( this.value, type, output );
 
 };
 
@@ -43,7 +28,7 @@ THREE.IntNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.number = this.number;
+		data.value = this.value;
 
 		if ( this.readonly === true ) data.readonly = true;
 

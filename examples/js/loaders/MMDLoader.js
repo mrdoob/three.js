@@ -841,13 +841,14 @@ THREE.MMDLoader = ( function () {
 			geometry.morphTargets = morphTargets;
 			geometry.morphAttributes.position = morphPositions;
 
-			geometry.iks = iks;
-			geometry.grants = grants;
-
-			geometry.rigidBodies = rigidBodies;
-			geometry.constraints = constraints;
-
-			geometry.mmdFormat = data.metadata.format;
+			geometry.userData.MMD = {
+				bones: bones,
+				iks: iks,
+				grants: grants,
+				rigidBodies: rigidBodies,
+				constraints: constraints,
+				format: data.metadata.format
+			};
 
 			geometry.computeBoundingSphere();
 

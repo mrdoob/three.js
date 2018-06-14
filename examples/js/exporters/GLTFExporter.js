@@ -66,6 +66,7 @@ THREE.GLTFExporter.prototype = {
 	parse: function ( input, onDone, options ) {
 
 		var DEFAULT_OPTIONS = {
+			binary: false,
 			trs: false,
 			onlyVisible: true,
 			truncateDrawRange: true,
@@ -105,7 +106,8 @@ THREE.GLTFExporter.prototype = {
 
 			attributes: new Map(),
 			materials: new Map(),
-			textures: new Map()
+			textures: new Map(),
+			images: new Map()
 
 		};
 
@@ -322,6 +324,29 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			return arrayBuffer;
+
+		}
+
+		/**
+		 * Serializes a userData.
+		 *
+		 * @param {THREE.Object3D|THREE.Material} object
+		 * @returns {Object}
+		 */
+		function serializeUserData( object ) {
+
+			try {
+
+				return JSON.parse( JSON.stringify( object.userData ) );
+
+			} catch ( error ) {
+
+				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
+					'won\'t be serialized because of JSON.stringify error - ' + error.message );
+
+				return {};
+
+			}
 
 		}
 
@@ -598,12 +623,28 @@ THREE.GLTFExporter.prototype = {
 
 		/**
 		 * Process image
-		 * @param  {Texture} map Texture to process
+		 * @param  {Image} image to process
+		 * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
+		 * @param  {Boolean} flipY before writing out the image
 		 * @return {Integer}     Index of the processed texture in the "images" array
 		 */
-		function processImage( map ) {
+		function processImage( image, format, flipY ) {
 
-			// @TODO Cache
+			if ( ! cachedData.images.has( image ) ) {
+
+				cachedData.images.set( image, {} );
+
+			}
+
+			var cachedImages = cachedData.images.get( image );
+			var mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+			var key = mimeType + ":flipY/" + flipY.toString();
+
+			if ( cachedImages[ key ] !== undefined ) {
+
+				return cachedImages[ key ];
+
+			}
 
 			if ( ! outputJSON.images ) {
 
@@ -611,19 +652,18 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var mimeType = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
 			var gltfImage = { mimeType: mimeType };
 
 			if ( options.embedImages ) {
 
 				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
 
-				canvas.width = map.image.width;
-				canvas.height = map.image.height;
+				canvas.width = image.width;
+				canvas.height = image.height;
 
-				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( map.image ) ) {
+				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( image ) ) {
 
-					console.warn( 'GLTFExporter: Resized non-power-of-two image.', map.image );
+					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
 					canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
 					canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
@@ -632,14 +672,14 @@ THREE.GLTFExporter.prototype = {
 
 				var ctx = canvas.getContext( '2d' );
 
-				if ( map.flipY === true ) {
+				if ( flipY === true ) {
 
 					ctx.translate( 0, canvas.height );
 					ctx.scale( 1, - 1 );
 
 				}
 
-				ctx.drawImage( map.image, 0, 0, canvas.width, canvas.height );
+				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
 
 				if ( options.binary === true ) {
 
@@ -667,13 +707,16 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				gltfImage.uri = map.image.src;
+				gltfImage.uri = image.src;
 
 			}
 
 			outputJSON.images.push( gltfImage );
 
-			return outputJSON.images.length - 1;
+			var index = outputJSON.images.length - 1;
+			cachedImages[ key ] = index;
+
+			return index;
 
 		}
 
@@ -727,7 +770,7 @@ THREE.GLTFExporter.prototype = {
 			var gltfTexture = {
 
 				sampler: processSampler( map ),
-				source: processImage( map )
+				source: processImage( map.image, map.format, map.flipY  )
 
 			};
 
@@ -933,6 +976,12 @@ THREE.GLTFExporter.prototype = {
 			if ( material.name !== '' ) {
 
 				gltfMaterial.name = material.name;
+
+			}
+
+			if ( Object.keys( material.userData ).length > 0 ) {
+
+				gltfMaterial.extras = serializeUserData( material );
 
 			}
 
@@ -1152,6 +1201,8 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			var extras = ( Object.keys( geometry.userData ).length > 0 ) ? serializeUserData( geometry ) : undefined;
+
 			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
 
@@ -1192,6 +1243,8 @@ THREE.GLTFExporter.prototype = {
 					mode: mode,
 					attributes: attributes,
 				};
+
+				if ( extras ) primitive.extras = extras;
 
 				if ( targets.length > 0 ) primitive.targets = targets;
 
@@ -1512,15 +1565,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.userData && Object.keys( object.userData ).length > 0 ) {
 
-				try {
-
-					gltfNode.extras = JSON.parse( JSON.stringify( object.userData ) );
-
-				} catch ( e ) {
-
-					throw new Error( 'THREE.GLTFExporter: userData can\'t be serialized' );
-
-				}
+				gltfNode.extras = serializeUserData( object );
 
 			}
 

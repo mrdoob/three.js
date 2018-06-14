@@ -140,6 +140,12 @@ Object.assign( DirectGeometry.prototype, {
 
 		//
 
+		if ( vertices.length > 0 && faces.length === 0 ) {
+
+			console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
+
+		}
+
 		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];

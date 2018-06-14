@@ -190,7 +190,7 @@ var APP = {
 
 			dispatch( events.start, arguments );
 
-			renderer.animate( animate );
+			renderer.setAnimationLoop( animate );
 
 		};
 
@@ -207,7 +207,7 @@ var APP = {
 
 			dispatch( events.stop, arguments );
 
-			renderer.animate( null );
+			renderer.setAnimationLoop( null );
 
 		};
 
