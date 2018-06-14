@@ -115,8 +115,8 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 				</code>
 					
 				<p>
-					If you change the position data values after the initial render, you should also call
-					`.computeBoundingSphere()` on the object to recalculate it's bounding sphere. 
+					If you change the position data values after the initial render, you may need to
+					call `.computeBoundingSphere()` in order to recalculate the geometry's bounding sphere. 
 				</p>
 				<code>
 line.geometry.computeBoundingSphere(); // recommended after the first render
