@@ -566,8 +566,8 @@ THREE.GLTFExporter.prototype = {
 
 				var end = start + count;
 				var end2 = geometry.drawRange.count === Infinity
-						? attribute.count
-						: geometry.drawRange.start + geometry.drawRange.count;
+					? attribute.count
+					: geometry.drawRange.start + geometry.drawRange.count;
 
 				start = Math.max( start, geometry.drawRange.start );
 				count = Math.min( end, end2 ) - start;
@@ -770,7 +770,7 @@ THREE.GLTFExporter.prototype = {
 			var gltfTexture = {
 
 				sampler: processSampler( map ),
-				source: processImage( map.image, map.format, map.flipY  )
+				source: processImage( map.image, map.format, map.flipY )
 
 			};
 
