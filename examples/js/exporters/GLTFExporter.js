@@ -566,8 +566,8 @@ THREE.GLTFExporter.prototype = {
 
 				var end = start + count;
 				var end2 = geometry.drawRange.count === Infinity
-						? attribute.count
-						: geometry.drawRange.start + geometry.drawRange.count;
+					? attribute.count
+					: geometry.drawRange.start + geometry.drawRange.count;
 
 				start = Math.max( start, geometry.drawRange.start );
 				count = Math.min( end, end2 ) - start;
@@ -770,7 +770,7 @@ THREE.GLTFExporter.prototype = {
 			var gltfTexture = {
 
 				sampler: processSampler( map ),
-				source: processImage( map.image, map.format, map.flipY  )
+				source: processImage( map.image, map.format, map.flipY )
 
 			};
 
@@ -1206,7 +1206,7 @@ THREE.GLTFExporter.prototype = {
 			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
 
-			if ( isMultiMaterial && mesh.geometry.groups.length === 0 ) return null;
+			if ( isMultiMaterial && geometry.groups.length === 0 ) return null;
 
 			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
 
@@ -1235,7 +1235,7 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var materials = isMultiMaterial ? mesh.material : [ mesh.material ];
-			var groups = isMultiMaterial ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
+			var groups = isMultiMaterial ? geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
 			for ( var i = 0, il = groups.length; i < il; i ++ ) {
 
