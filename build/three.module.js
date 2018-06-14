@@ -10924,7 +10924,7 @@ Object.assign( DirectGeometry.prototype, {
 
 		//
 
-		if ( faces.length === 0 ) {
+		if ( vertices.length > 0 && faces.length === 0 ) {
 
 			console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
 
@@ -22658,7 +22658,8 @@ function WebGLRenderer( parameters ) {
 
 	var animation = new WebGLAnimation();
 	animation.setAnimationLoop( onAnimationFrame );
-	animation.setContext( window );
+
+	if ( typeof window !== 'undefined' ) animation.setContext( window );
 
 	this.setAnimationLoop = function ( callback ) {
 
@@ -28951,7 +28952,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	}
 
-	var shapes = font.generateShapes( text, parameters.size, parameters.curveSegments );
+	var shapes = font.generateShapes( text, parameters.size );
 
 	// translate parameters to ExtrudeGeometry API
 
@@ -30233,7 +30234,7 @@ CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
 
 
 
-var Geometries = /*#__PURE__*/Object.freeze({
+var Geometries = Object.freeze({
 	WireframeGeometry: WireframeGeometry,
 	ParametricGeometry: ParametricGeometry,
 	ParametricBufferGeometry: ParametricBufferGeometry,
@@ -31003,7 +31004,7 @@ LineDashedMaterial.prototype.copy = function ( source ) {
 
 
 
-var Materials = /*#__PURE__*/Object.freeze({
+var Materials = Object.freeze({
 	ShadowMaterial: ShadowMaterial,
 	SpriteMaterial: SpriteMaterial,
 	RawShaderMaterial: RawShaderMaterial,
@@ -31682,7 +31683,6 @@ Object.assign( DataTextureLoader.prototype, {
  * @author mrdoob / http://mrdoob.com/
  */
 
-
 function ImageLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
@@ -31785,7 +31785,6 @@ Object.assign( ImageLoader.prototype, {
  * @author mrdoob / http://mrdoob.com/
  */
 
-
 function CubeTextureLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
@@ -31855,7 +31854,6 @@ Object.assign( CubeTextureLoader.prototype, {
 /**
  * @author mrdoob / http://mrdoob.com/
  */
-
 
 function TextureLoader( manager ) {
 
@@ -32577,7 +32575,9 @@ function CubicPoly() {
 //
 
 var tmp = new Vector3();
-var px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
+var px = new CubicPoly();
+var py = new CubicPoly();
+var pz = new CubicPoly();
 
 function CatmullRomCurve3( points, closed, curveType, tension ) {
 
@@ -33362,7 +33362,7 @@ SplineCurve.prototype.fromJSON = function ( json ) {
 
 
 
-var Curves = /*#__PURE__*/Object.freeze({
+var Curves = Object.freeze({
 	ArcCurve: ArcCurve,
 	CatmullRomCurve3: CatmullRomCurve3,
 	CubicBezierCurve: CubicBezierCurve,
@@ -38140,7 +38140,6 @@ var TEXTURE_FILTER = {
  * @author thespite / http://clicktorelease.com/
  */
 
-
 function ImageBitmapLoader( manager ) {
 
 	if ( typeof createImageBitmap === 'undefined' ) {
@@ -38526,7 +38525,6 @@ Object.assign( ShapePath.prototype, {
  * @author mrdoob / http://mrdoob.com/
  */
 
-
 function Font( data ) {
 
 	this.type = 'Font';
@@ -38539,13 +38537,12 @@ Object.assign( Font.prototype, {
 
 	isFont: true,
 
-	generateShapes: function ( text, size, divisions ) {
+	generateShapes: function ( text, size ) {
 
 		if ( size === undefined ) size = 100;
-		if ( divisions === undefined ) divisions = 4;
 
 		var shapes = [];
-		var paths = createPaths( text, size, divisions, this.data );
+		var paths = createPaths( text, size, this.data );
 
 		for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
 
@@ -38559,7 +38556,7 @@ Object.assign( Font.prototype, {
 
 } );
 
-function createPaths( text, size, divisions, data ) {
+function createPaths( text, size, data ) {
 
 	var chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // see #13988
 	var scale = size / data.resolution;
@@ -38580,7 +38577,7 @@ function createPaths( text, size, divisions, data ) {
 
 		} else {
 
-			var ret = createPath( char, divisions, scale, offsetX, offsetY, data );
+			var ret = createPath( char, scale, offsetX, offsetY, data );
 			offsetX += ret.offsetX;
 			paths.push( ret.path );
 
@@ -38592,7 +38589,7 @@ function createPaths( text, size, divisions, data ) {
 
 }
 
-function createPath( char, divisions, scale, offsetX, offsetY, data ) {
+function createPath( char, scale, offsetX, offsetY, data ) {
 
 	var glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
 
@@ -44568,7 +44565,8 @@ PlaneHelper.prototype.updateMatrixWorld = function ( force ) {
  *  headWidth - Number
  */
 
-var lineGeometry, coneGeometry;
+var lineGeometry;
+var coneGeometry;
 
 function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
