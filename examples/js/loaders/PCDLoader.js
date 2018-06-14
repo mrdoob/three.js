@@ -1,6 +1,7 @@
 /**
  * @author Filipe Caixeta / http://filipecaixeta.com.br
  * @author Mugen87 / https://github.com/Mugen87
+ * @author Kai Salmen / https://github.com/kaisalmen
  *
  * Description: A THREE loader for PCD ascii and binary files.
  *
@@ -14,7 +15,6 @@ THREE.PCDLoader = function ( manager ) {
 	this.littleEndian = true;
 
 };
-
 
 THREE.PCDLoader.prototype = {
 
@@ -31,26 +31,61 @@ THREE.PCDLoader.prototype = {
 			onLoad( scope.parse( data, url ) );
 
 		}, onProgress, onError );
-
 	},
 
 	parse: function ( data, url ) {
+		var scope = this;
+		var parser = new THREE.PCDLoader.Parser();
+		parser.setLittleEndian( this.littleEndian );
 
-		function parseHeader( data ) {
+		var mesh = parser.parse( data );
 
-			var PCDheader = {};
-			var result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
-			var result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
+		var name = url.split( '' ).reverse().join( '' );
+		name = /([^\/]*)/.exec( name );
+		name = name[ 1 ].split( '' ).reverse().join( '' );
+		mesh.name = name;
+
+		return mesh;
+	}
+};
+
+/**
+ * Isolated Parser. It allows an extended class to created the Parser inside a worker
+ * @constructor
+ */
+THREE.PCDLoader.Parser = function () {
+	this.littleEndian = true;
+};
+
+THREE.PCDLoader.Parser.prototype = {
+
+	constructor: THREE.PCDLoader.Parser,
+
+	setLittleEndian: function ( littleEndian ) {
+		this.littleEndian = littleEndian === true;
+	},
+
+	parse: function ( data ) {
+		var textData = THREE.LoaderUtils.decodeText( data );
+		var pcdHeader = this.parseHeader( textData );
+		return this.parseData( pcdHeader, textData, data );
+	},
+
+	parseHeader: function ( data ) {
+
+		var PCDheader = {};
+		var result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
+		var result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
 
 			PCDheader.data = result2[ 1 ];
 			PCDheader.headerLen = result2[ 0 ].length + result1;
 			PCDheader.str = data.substr( 0, PCDheader.headerLen );
 
-			// remove comments
+		// remove comments
 
 			PCDheader.str = PCDheader.str.replace( /\#.*/gi, '' );
 
-			// parse
+		// parse
 
 			PCDheader.version = /VERSION (.*)/i.exec( PCDheader.str );
 			PCDheader.fields = /FIELDS (.*)/i.exec( PCDheader.str );
@@ -62,7 +97,7 @@ THREE.PCDLoader.prototype = {
 			PCDheader.viewpoint = /VIEWPOINT (.*)/i.exec( PCDheader.str );
 			PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str );
 
-			// evaluate
+		// evaluate
 
 			if ( PCDheader.version !== null )
 				PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
@@ -92,21 +127,21 @@ THREE.PCDLoader.prototype = {
 
 				PCDheader.size = PCDheader.size[ 1 ].split( ' ' ).map( function ( x ) {
 
-					return parseInt( x, 10 );
+				return parseInt( x, 10 );
 
-				} );
+			} );
 
-			}
+		}
 
 			if ( PCDheader.count !== null ) {
 
 				PCDheader.count = PCDheader.count[ 1 ].split( ' ' ).map( function ( x ) {
 
-					return parseInt( x, 10 );
+				return parseInt( x, 10 );
 
-				} );
+			} );
 
-			} else {
+		} else {
 
 				PCDheader.count = [];
 
@@ -114,13 +149,13 @@ THREE.PCDLoader.prototype = {
 
 					PCDheader.count.push( 1 );
 
-				}
-
 			}
+
+		}
 
 			PCDheader.offset = {};
 
-			var sizeSum = 0;
+		var sizeSum = 0;
 
 			for ( var i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
 
@@ -128,31 +163,22 @@ THREE.PCDLoader.prototype = {
 
 					PCDheader.offset[ PCDheader.fields[ i ] ] = i;
 
-				} else {
+			} else {
 
 					PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
 					sizeSum += PCDheader.size[ i ];
 
-				}
-
 			}
-
-			// for binary only
-
-			PCDheader.rowSize = sizeSum;
-
-			return PCDheader;
 
 		}
 
-		var textData = THREE.LoaderUtils.decodeText( data );
+		// for binary only
+		PCDheader.rowSize = sizeSum;
 
-		// parse header (always ascii format)
+		return PCDheader;
+	},
 
-		var PCDheader = parseHeader( textData );
-
-		// parse data
-
+	parseData: function ( PCDheader, textData, data ) {
 		var position = [];
 		var normal = [];
 		var color = [];
@@ -245,6 +271,12 @@ THREE.PCDLoader.prototype = {
 
 		}
 
+		return this.buildMesh( position, normal, color );
+	},
+
+
+	buildMesh: function ( position, normal, color ) {
+
 		// build geometry
 
 		var geometry = new THREE.BufferGeometry();
@@ -269,16 +301,7 @@ THREE.PCDLoader.prototype = {
 
 		}
 
-		// build mesh
-
-		var mesh = new THREE.Points( geometry, material );
-		var name = url.split( '' ).reverse().join( '' );
-		name = /([^\/]*)/.exec( name );
-		name = name[ 1 ].split( '' ).reverse().join( '' );
-		mesh.name = name;
-
-		return mesh;
-
+		return new THREE.Points( geometry, material );
 	}
 
 };
