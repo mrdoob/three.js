@@ -171,8 +171,9 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 			var curve = curves[ i ];
 			var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
 				: ( curve && curve.isLineCurve ) ? 1
-					: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
-						: divisions;
+					: ( curve && curve.isLineCurve3 ) ? 1
+						: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
+							: divisions;
 
 			var pts = curve.getPoints( resolution );
 
