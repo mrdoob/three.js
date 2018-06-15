@@ -32,7 +32,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var intersectPoint = new Vector3();
 		var worldPosition = new Vector3();
 		var worldScale = new Vector3();
-		
+
 		var alignedPosition = new Vector2();
 		var rotatedPosition = new Vector2();
 		var matrixWorldInverse = new Matrix4();
@@ -42,19 +42,19 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			worldScale.setFromMatrixScale( this.matrixWorld );
 
 			// compute position in camera space
-			alignedPosition.set( ( 0.5 - this.center.x  ) * worldScale.x, ( 0.5 - this.center.y ) * worldScale.y );
-			
+			alignedPosition.set( ( 0.5 - this.center.x ) * worldScale.x, ( 0.5 - this.center.y ) * worldScale.y );
+
 			var rotation = this.material.rotation;
-			rotatedPosition.x = (Math.cos(rotation) * alignedPosition.x) - (Math.sin(rotation) * alignedPosition.y);
-			rotatedPosition.y = (Math.sin(rotation) * alignedPosition.x) + (Math.cos(rotation) * alignedPosition.y);
-			
+			rotatedPosition.x = ( Math.cos( rotation ) * alignedPosition.x ) - ( Math.sin( rotation ) * alignedPosition.y );
+			rotatedPosition.y = ( Math.sin( rotation ) * alignedPosition.x ) + ( Math.cos( rotation ) * alignedPosition.y );
+
 			worldPosition.setFromMatrixPosition( this.modelViewMatrix );
 			worldPosition.x += rotatedPosition.x;
 			worldPosition.y += rotatedPosition.y;
 
 			// transform to world space
 			worldPosition.applyMatrix4( matrixWorldInverse.getInverse( this.modelViewMatrix ) ).applyMatrix4( this.matrixWorld );
-			
+
 			raycaster.ray.closestPointToPoint( worldPosition, intersectPoint );
 
 			var guessSizeSq = worldScale.x * worldScale.y / 4;
