@@ -35,7 +35,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var alignedPosition = new Vector2();
 		var rotatedPosition = new Vector2();
-		var matrixWorldInverse = new Matrix4();
+		var modelViewInverseMatrix = new Matrix4();
 
 		return function raycast( raycaster, intersects ) {
 
@@ -62,7 +62,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			worldPosition.y += rotatedPosition.y;
 
 			// transform to world space
-			worldPosition.applyMatrix4( matrixWorldInverse.getInverse( this.modelViewMatrix ) ).applyMatrix4( this.matrixWorld );
+			worldPosition.applyMatrix4( modelViewInverseMatrix.getInverse( this.modelViewMatrix ) ).applyMatrix4( this.matrixWorld );
 
 			raycaster.ray.closestPointToPoint( worldPosition, intersectPoint );
 
