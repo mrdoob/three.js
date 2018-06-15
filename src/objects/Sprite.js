@@ -46,13 +46,17 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			var rotation = this.material.rotation;
 			if ( rotation !== 0 ) {
+
 				var cos = Math.cos( rotation ), sin = Math.sin( rotation );
 				rotatedPosition.x = ( cos * alignedPosition.x ) - ( sin * alignedPosition.y );
 				rotatedPosition.y = ( sin * alignedPosition.x ) + ( cos * alignedPosition.y );
+
 			} else {
+
 				rotatedPosition.copy( alignedPosition );
+
 			}
-			
+
 			worldPosition.setFromMatrixPosition( this.modelViewMatrix );
 			worldPosition.x += rotatedPosition.x;
 			worldPosition.y += rotatedPosition.y;
