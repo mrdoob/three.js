@@ -199,6 +199,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			normalMapType: this.normalMapType,
 
 			flipY: this.flipY
+
 		};
 
 		if ( this.image !== undefined ) {
