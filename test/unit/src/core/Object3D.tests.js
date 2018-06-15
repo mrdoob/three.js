@@ -109,6 +109,29 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+                QUnit.test( "applyMatrices", ( assert ) => {
+
+			var a = new Object3D();
+			var mr = new Matrix4();
+			var mt = new Matrix4();
+			var expectedPos = new Vector3( x, y, z );
+			var expectedQuat = new Quaternion( 0.5 * Math.sqrt( 2 ), 0, 0, 0.5 * Math.sqrt( 2 ) );
+
+			mr.makeRotationX( Math.PI / 2 );
+			mt.setPosition( new Vector3( x, y, z ) );
+
+			a.applyMatrices( mr, mt );
+
+			assert.deepEqual( a.position, expectedPos, "Position has the expected values" );
+			assert.ok(
+				Math.abs( a.quaternion.x - expectedQuat.x ) <= eps &&
+				Math.abs( a.quaternion.y - expectedQuat.y ) <= eps &&
+				Math.abs( a.quaternion.z - expectedQuat.z ) <= eps,
+				"Quaternion has the expected values"
+			);
+
+		} );
+
 		QUnit.test( "applyQuaternion", ( assert ) => {
 
 			var a = new Object3D();
