@@ -109,15 +109,15 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	applyMatrix: function ( matrix ) {
 
-		this.applyMatrices ( matrix );
+		this.applyMatrices( matrix );
 
 	},
 
 	applyMatrices: function ( /* matrices */ ) {
 
-		for ( var i = 0; i < arguments.length; i++ ) {
+		for ( var i = 0; i < arguments.length; i ++ ) {
 
-			this.matrix.multiplyMatrices( arguments[i], this.matrix );
+			this.matrix.multiplyMatrices( arguments[ i ], this.matrix );
 
 		}
 
