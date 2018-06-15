@@ -6,7 +6,7 @@
 
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { UVMapping } from '../constants.js';
-import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants.js';
+import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter, TangentSpaceNormalMap } from '../constants.js';
 import { _Math } from '../math/Math.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
@@ -49,6 +49,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.premultiplyAlpha = false;
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+	this.normalMapType = TangentSpaceNormalMap; //default normal map space if this texture is to be used as a normal map
 
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
@@ -115,6 +116,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
+		this.normalMapType = source.normalMapType;
 
 		return this;
 
@@ -195,8 +197,8 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			magFilter: this.magFilter,
 			anisotropy: this.anisotropy,
 
-			flipY: this.flipY
-
+			flipY: this.flipY,
+			normalMapType: this.normalMapType,
 		};
 
 		if ( this.image !== undefined ) {
