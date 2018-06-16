@@ -622,7 +622,7 @@
 						id: nodeID,
 					};
 
-					morphTarget.rawTargets = parseMorphTargets( relationships, deformerNode, DeformerNodes, connections, FBXTree );
+					morphTarget.rawTargets = parseMorphTargets( relationships, deformerNode, DeformerNodes, connections );
 					morphTarget.id = nodeID;
 
 					if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: morph target attached to more than one geometry is not supported.' );
