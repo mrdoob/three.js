@@ -45,12 +45,12 @@ Object.assign( VideoLoader.prototype, {
 
 		}
 
-		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'video' );
+		var video = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'video' );
 
-		function onImageLoad() {
+		function onVideoLoad() {
 
-			image.removeEventListener( 'loadeddata', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
+			video.removeEventListener( 'loadeddata', onVideoLoad, false );
+			video.removeEventListener( 'error', onVideoError, false );
 
 			Cache.add( url, this );
 
@@ -60,10 +60,10 @@ Object.assign( VideoLoader.prototype, {
 
 		}
 
-		function onImageError( event ) {
+		function onVideoError( event ) {
 
-			image.removeEventListener( 'loadeddata', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
+			video.removeEventListener( 'loadeddata', onVideoLoad, false );
+			video.removeEventListener( 'error', onVideoError, false );
 
 			if ( onError ) onError( event );
 
@@ -72,20 +72,20 @@ Object.assign( VideoLoader.prototype, {
 
 		}
 
-		image.addEventListener( 'loadeddata', onImageLoad, false );
-		image.addEventListener( 'error', onImageError, false );
+		video.addEventListener( 'loadeddata', onVideoLoad, false );
+		video.addEventListener( 'error', onVideoError, false );
 
 		if ( url.substr( 0, 5 ) !== 'data:' ) {
 
-			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+			if ( this.crossOrigin !== undefined ) video.crossOrigin = this.crossOrigin;
 
 		}
 
 		scope.manager.itemStart( url );
 
-		image.src = url;
+		video.src = url;
 
-		return image;
+		return video;
 
 	},
 
