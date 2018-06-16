@@ -659,16 +659,10 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 
+		object.layers = { mask: this.layers.mask };
 		object.matrix = this.matrix.toArray();
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
-
-		if ( this.layers.mask !== 1 ) {
-
-			object.layers = {};
-			object.layers.mask = this.layers.mask;
-
-		}
 
 		//
 
