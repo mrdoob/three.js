@@ -39,7 +39,6 @@ https://github.com/creationix/msgpack-js-browser
 		<script src='js/controls/OrbitControls.js'></script>
 		<script src='js/Detector.js'></script>
 		<script src='js/libs/msgpack-js.js'></script>
-		<script src='js/libs/stats.min.js'></script>
 	</head>
 	<body>
 		<div id='info'>
@@ -98,7 +97,7 @@ https://github.com/creationix/msgpack-js-browser
 
 				new THREE.FileLoader()
 					.setResponseType( 'arraybuffer' )
-					.load( 'scenes/robo_pigeon.pack', function ( data ) {
+					.load( 'models/msgpack/robo_pigeon.pack', function ( data ) {
 
 						var decoded = msgpack.decode( data );
 
@@ -112,7 +111,7 @@ https://github.com/creationix/msgpack-js-browser
 
 			function onWindowResize() {
 
-				camera.aspect = container.offsetWidth / container.offsetHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -124,15 +123,13 @@ https://github.com/creationix/msgpack-js-browser
 
 				container = document.getElementById( 'viewport' );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true	} );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setClearColor( 0x000000, 0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var aspect = container.offsetWidth / container.offsetHeight;
-
-				camera = new THREE.PerspectiveCamera( 60, aspect, 0.01, 50 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 50 );
 				camera.position.set( 5, 5, 5 );
 				camera.updateProjectionMatrix();
 
