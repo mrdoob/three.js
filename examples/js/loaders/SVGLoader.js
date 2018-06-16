@@ -660,12 +660,15 @@ THREE.SVGLoader.prototype = {
 
 				var number = array[ i ];
 
-				// Handle values like 48.6037.7
+				// Handle values like 48.6037.7.8
 				// TODO Find a regex for this
 
 				if ( number.indexOf( '.' ) !== number.lastIndexOf( '.' ) ) {
 
-					array.splice( i + 1, 0, '0.' + number.split( '.' )[ 2 ] );
+					var split = number.split('.');
+					for(var s = 2; s < split.length; s++) {
+						array.splice( i + s - 1, 0, '0.' + split[ s ] );
+					}
 
 				}
 
