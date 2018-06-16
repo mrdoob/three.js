@@ -663,6 +663,13 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
+		if ( this.layers.mask !== 1 ) {
+
+			object.layers = {};
+			object.layers.mask = this.layers.mask;
+
+		}
+
 		//
 
 		function serialize( library, element ) {
