@@ -190,6 +190,8 @@ function WebXRManager( renderer ) {
 
 	};
 
+	this.dispose = function () {};
+
 	// DEPRECATED
 
 	this.getStandingMatrix = function () {
