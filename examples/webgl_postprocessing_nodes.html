@@ -154,6 +154,8 @@
 
 				} else if ( typeof value == 'object' ) {
 
+					param.blend = value[ Object.keys( value )[ 0 ] ];
+
 					node = gui.add( param, name, value ).onChange( function () {
 
 						callback( param[ name ] );
@@ -317,7 +319,7 @@
 
 							multiply.op = val;
 
-							nodepass.build();
+							nodepass.needsUpdate = true;
 
 						} );
 
@@ -409,7 +411,7 @@
 
 							offsetNormal.a = val ? normalXYFlip : normalXY;
 
-							nodepass.build();
+							nodepass.needsUpdate = true;
 
 						} );
 
@@ -463,11 +465,11 @@
 
 						}, false, 0, 1 );
 
-						addGui( 'mask', true, function ( val ) {
+						addGui( 'mask', false, function ( val ) {
 
-							fadeCoord.c = val ? maskAlpha : fade;
+							fadeScreen.c = val ? new THREE.TextureNode( lensflare2 ) : fade;
 
-							nodepass.build();
+							nodepass.needsUpdate = true;
 
 						} );
 
@@ -502,7 +504,7 @@
 
 				}
 
-				nodepass.build();
+				nodepass.needsUpdate = true;
 
 				// test serialization
 /*
@@ -513,7 +515,6 @@
 				var json = nodepass.toJSON();
 
 				nodepass.value = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
-				nodepass.build();
 */
 			}
 
