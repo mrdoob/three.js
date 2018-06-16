@@ -89,7 +89,8 @@
 			]
 
 			var options = {
-				normalMap: 0
+				normalMap: 0,
+				normalMapActive: true,
 			};
 
 			var material = new THREE.MeshStandardMaterial( { 
@@ -157,8 +158,17 @@
 					
 					material.onBeforeCompile = normalMapOnBeforeCompiles[value] //remove this
 					material.needsUpdate = true //remove this
+					setNormalMapActive(options.normalMapActive)
 
-				} );
+				} ).name('normalmap space');
+
+				function setNormalMapActive(value){
+					material.normalMap = value ? normalMaps[options.normalMap] : null
+					material.onBeforeCompile = value ? normalMapOnBeforeCompiles[ options.normalMap ] : function(){}
+					material.needsUpdate = true
+				}
+
+				gui.add( options, 'normalMapActive' ).name('normalmap on/off').onChange(setNormalMapActive)
 
 				//
 
