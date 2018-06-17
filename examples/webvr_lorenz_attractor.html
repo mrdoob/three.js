@@ -27,14 +27,14 @@
 
 			var camera, scene, renderer, x, y, z, c, geometry;
 
-			var scale = 30;
+			var scale = .015; // for reducing overall displayed size
 			var multiplier = 5; // integer, increase for faster visualization
 
 			var steps = 100000;
 			var current = 1;
 			var shown = 10000;
 
-			var beta = 8/3;
+			var beta = 8 / 3;
 			var rho = 28;
 			var sigma = 10;
 
@@ -58,7 +58,7 @@
 					y += dy;
 					z += dz;
 
-					geometry.attributes.position.set( [ x, y, z ], 0 );
+					geometry.attributes.position.set( [ scale * x, scale * y, scale * z ], 0 );
 
 					c.setHSL( current / steps, 1, .5 );
 					geometry.attributes.color.set( [ c.r, c.g, c.b ], 0 );
@@ -80,16 +80,16 @@
 			function init() {
 
 				scene = new THREE.Scene();
-				scene.position.set( 0, 0, - 1.5 * scale );
+				scene.position.set( 0, 1.5, - 1 );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
-				camera.lookAt( 0, 0, - 1.5 * scale );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 2 );
+				camera.lookAt( 0, 1.5, - 1 );
 
 				//
 
-				x = scale / 2 * Math.random();
-				y = scale / 2 * Math.random();
-				z = scale / 2 * Math.random();
+				x = 15 * Math.random();
+				y = 15 * Math.random();
+				z = 15 * Math.random();
 
 				c = new THREE.Color();
 
@@ -98,7 +98,7 @@
 				var positions = new Float32Array( 3 * shown );
 				for ( var i = 0; i < positions.length; i += 3 ) {
 
-					positions.set( [ x, y, z ], i );
+					positions.set( [ scale * x, scale * y, scale * z ], i );
 
 				}
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
