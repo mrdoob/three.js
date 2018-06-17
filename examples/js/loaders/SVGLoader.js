@@ -665,9 +665,12 @@ THREE.SVGLoader.prototype = {
 
 				if ( number.indexOf( '.' ) !== number.lastIndexOf( '.' ) ) {
 
-					var split = number.split('.');
-					for(var s = 2; s < split.length; s++) {
+					var split = number.split( '.' );
+
+					for ( var s = 2; s < split.length; s ++ ) {
+
 						array.splice( i + s - 1, 0, '0.' + split[ s ] );
+
 					}
 
 				}
