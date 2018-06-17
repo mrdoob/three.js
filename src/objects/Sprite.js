@@ -86,8 +86,8 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			var center = this.center;
 
 			transformVertex( vA.set( - 0.5, - 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
-			transformVertex( vB.set( - 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
-			transformVertex( vC.set( 0.5, - 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
+			transformVertex( vB.set( 0.5, - 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
+			transformVertex( vC.set( 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
 
 			// check first triangle
 			var intersect = raycaster.ray.intersectTriangle( vA, vB, vC, false, intersectPoint );
@@ -95,8 +95,8 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			if ( intersect === null ) {
 
 				// check second triangle
-				transformVertex( vA.set( 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
-				intersect = raycaster.ray.intersectTriangle( vA, vB, vC, false, intersectPoint );
+				transformVertex( vB.set( - 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
+				intersect = raycaster.ray.intersectTriangle( vA, vC, vB, false, intersectPoint );
 				if ( intersect === null ) {
 
 					return;
