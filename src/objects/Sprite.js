@@ -44,8 +44,9 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
 
 			// compute position in camera space
-			alignedPosition.set( ( vertexPosition.x - center.x ) * scale.x, ( vertexPosition.y - center.y ) * scale.y );
+			alignedPosition.subVectors( vertexPosition, center ).addScalar( 0.5 ).multiply( scale );
 
+			// to check if rotation is not zero
 			if ( sin !== undefined ) {
 
 				rotatedPosition.x = ( cos * alignedPosition.x ) - ( sin * alignedPosition.y );
@@ -84,9 +85,9 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			var center = this.center;
 
-			transformVertex( vA.set( 0, 0, 1 ), mvPosition, center, worldScale, sin, cos );
-			transformVertex( vB.set( 0, 1, 1 ), mvPosition, center, worldScale, sin, cos );
-			transformVertex( vC.set( 1, 0, 1 ), mvPosition, center, worldScale, sin, cos );
+			transformVertex( vA.set( - 0.5, - 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
+			transformVertex( vB.set( - 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
+			transformVertex( vC.set( 0.5, - 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
 
 			// check first triangle
 			var intersect = raycaster.ray.intersectTriangle( vA, vB, vC, false, intersectPoint );
@@ -94,7 +95,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			if ( intersect === null ) {
 
 				// check second triangle
-				transformVertex( vA.set( 1, 1, 1 ), mvPosition, center, worldScale, sin, cos );
+				transformVertex( vA.set( 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
 				intersect = raycaster.ray.intersectTriangle( vA, vB, vC, false, intersectPoint );
 				if ( intersect === null ) {
 
