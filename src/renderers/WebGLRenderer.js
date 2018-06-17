@@ -1072,6 +1072,14 @@ function WebGLRenderer( parameters ) {
 
 			camera = vr.getCamera( camera );
 
+			// The camera may come back null if we don't have a VR pose,
+			// in which case we shouldn't render.
+			if ( camera === null ) {
+
+				return;
+
+			}
+
 		}
 
 		//
