@@ -78,7 +78,7 @@ var WEBVR = {
 
 				if ( currentSession === null ) {
 
-					device.requestSession( { exclusive: true } ).then( onSessionStarted );
+					device.requestSession( { immersive: true } ).then( onSessionStarted );
 
 				} else {
 
@@ -128,11 +128,7 @@ var WEBVR = {
 
 		}
 
-		var isWebXR = false;
-
 		if ( 'xr' in navigator ) {
-
-			isWebXR = true;
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
@@ -141,7 +137,7 @@ var WEBVR = {
 
 			navigator.xr.requestDevice().then( function ( device ) {
 
-				device.supportsSession( { exclusive: true } ).then( function () {
+				device.supportsSession( { immersive: true } ).then( function () {
 
 					showEnterXR( device );
 

@@ -120,7 +120,7 @@ Use WEBGL Depth buffer support?
 				var shader = THREE.ShaderLib[ 'cube' ];
 				shader.uniforms[ 'tCube' ].value = textureCube;
 
-				material = new THREE.ShaderMaterial( {
+				var skyMaterial = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
@@ -130,8 +130,8 @@ Use WEBGL Depth buffer support?
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), material );
-				scene.add( mesh );
+				var sky = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), skyMaterial );
+				scene.add( sky );
 
 				// plane particles
 

@@ -6,6 +6,8 @@ THREE.NodeMaterial = function ( vertex, fragment ) {
 
 	THREE.ShaderMaterial.call( this );
 
+	this.defines.UUID = this.uuid;
+
 	this.vertex = vertex || new THREE.RawNode( new THREE.PositionNode( THREE.PositionNode.PROJECTION ) );
 	this.fragment = fragment || new THREE.RawNode( new THREE.ColorNode( 0xFF0000 ) );
 
@@ -78,13 +80,30 @@ THREE.NodeMaterial.prototype.updateFrame = function ( frame ) {
 
 };
 
-THREE.NodeMaterial.prototype.build = function () {
+THREE.NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
+
+	if ( this.needsUpdate ) {
+
+		this.build( { dispose: false, renderer: renderer } );
+
+		shader.uniforms = this.uniforms;
+		shader.vertexShader = this.vertexShader;
+		shader.fragmentShader = this.fragmentShader;
+
+	}
+
+};
+
+THREE.NodeMaterial.prototype.build = function ( params ) {
+
+	params = params || {};
+	params.dispose = params.dispose !== undefined ? params.dispose : true;
 
 	var vertex, fragment;
 
 	this.nodes = [];
 
-	this.defines = {};
+	this.defines = { UUID: this.uuid };
 	this.uniforms = {};
 	this.attributes = {};
 
@@ -145,7 +164,7 @@ THREE.NodeMaterial.prototype.build = function () {
 
 	].join( "\n" );
 
-	var builder = new THREE.NodeBuilder( this );
+	var builder = new THREE.NodeBuilder( this, params.renderer );
 
 	vertex = this.vertex.build( builder.setShader( 'vertex' ), 'v4' );
 	fragment = this.fragment.build( builder.setShader( 'fragment' ), 'v4' );
@@ -253,8 +272,13 @@ THREE.NodeMaterial.prototype.build = function () {
 		'}'
 	].join( "\n" );
 
-	this.needsUpdate = true;
-	this.dispose(); // force update
+	if ( params.dispose ) {
+
+		// force update
+
+		this.dispose();
+
+	}
 
 	return this;
 
@@ -288,7 +312,7 @@ THREE.NodeMaterial.prototype.createUniform = function ( type, node, ns, needsUpd
 
 	var uniform = new THREE.NodeUniform( {
 		type: type,
-		name: ns ? ns : 'nVu' + index,
+		name: ns ? ns : 'nVu' + index + '_' + THREE.Math.generateUUID().substr(0, 8),
 		node: node,
 		needsUpdate: needsUpdate
 	} );

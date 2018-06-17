@@ -286,10 +286,6 @@
 		See [page:WebGLRenderer.capabilities capabilities.maxTextures].
 		</p>
 
-		<h3>[method:null animate]( [param:Function callback] )</h3>
-		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
-		<p>A build in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
-
 		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
 		<p>
 		Tells the renderer to clear its color, depth or stencil drawing buffer(s).
@@ -406,6 +402,10 @@
 
 		Render an immediate buffer. Gets called by renderImmediateObject.
 		</p>
+
+		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
+		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
+		<p>A build in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>Sets the clear alpha. Valid input is a float between *0.0* and *1.0*.</p>

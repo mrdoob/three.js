@@ -69,7 +69,7 @@
 
 					var message = "   Three.js\nSimple text.";
 
-					var shapes = font.generateShapes( message, 100, 2 );
+					var shapes = font.generateShapes( message, 100 );
 
 					var geometry = new THREE.ShapeGeometry( shapes );
 
@@ -118,7 +118,7 @@
 
 						var points = shape.getPoints();
 						var geometry = new THREE.BufferGeometry().setFromPoints( points );
-						
+
 						geometry.translate( xMid, 0, 0 );
 
 						var lineMesh = new THREE.Line( geometry, matDark );

@@ -85,7 +85,7 @@
 					points = hilbert2D( new THREE.Vector3( 0, 0, 0 ), 400, 4 ),
 					colors2 = [];
 
-				for ( i = 0; i < points.length; i ++ ) {
+				for ( var i = 0; i < points.length; i ++ ) {
 
 					geometry2.vertices.push( points[ i ] );
 
@@ -102,7 +102,7 @@
 					points = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200, 2, 0, 1, 2, 3, 4, 5, 6, 7 ),
 					colors3 = [];
 
-				for ( i = 0; i < points.length; i ++ ) {
+				for ( var i = 0; i < points.length; i ++ ) {
 
 					geometry3.vertices.push( points[ i ] );
 

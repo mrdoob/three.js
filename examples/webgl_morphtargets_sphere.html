@@ -104,7 +104,7 @@
 
 					} );
 
-					points = new THREE.Points( mesh.geometry, pointsMaterial );
+					var points = new THREE.Points( mesh.geometry, pointsMaterial );
 
 					points.morphTargetInfluences = mesh.morphTargetInfluences;
 					points.morphTargetDictionary = mesh.morphTargetDictionary;
@@ -122,7 +122,7 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 20;
 

@@ -32,9 +32,9 @@ function WebGLRenderState() {
 
 	}
 
-	function pushSprite( shadowLight ) {
+	function pushSprite( sprite ) {
 
-		spritesArray.push( shadowLight );
+		spritesArray.push( sprite );
 
 	}
 

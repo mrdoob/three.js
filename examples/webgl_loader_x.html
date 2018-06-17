@@ -23,22 +23,22 @@
         a {
             color: #ff0000
         }
-        
-        #info2 { 
-            color: #fff; 
-            background-color: #000; 
-            position: absolute; 
-            top: 3em; 
-            right : 0px; 
-            width: 10em; 
-            z-index: 200; 
-            display: block;  
+
+        #info2 {
+            color: #fff;
+            background-color: #000;
+            position: absolute;
+            top: 3em;
+            right : 0px;
+            width: 10em;
+            z-index: 200;
+            display: block;
         }
-    
-        td { 
+
+        td {
             padding: 0.5em;
         }
-        
+
     </style>
 </head>
 <body>
@@ -71,7 +71,7 @@
 	<script src='js/Detector.js'></script>
 	<script src='js/libs/stats.min.js'></script>
 	<script src='js/libs/dat.gui.min.js'></script>
-    
+
     <script>
 
         if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -81,7 +81,6 @@
         var clock = new THREE.Clock();
         var mixers = [];
         var manager = null;
-        var Texloader = null;
 
         var skeletonHelper = null;
         var animates = [];
@@ -156,8 +155,7 @@
 
             };
 
-            Texloader = new THREE.TextureLoader();
-            var loader = new THREE.XLoader( manager, Texloader );
+            var loader = new THREE.XLoader( manager );
 
             actions[ 0 ] = {};
 
@@ -244,7 +242,7 @@
 
             } else {
 
-                var loader2 = new THREE.XLoader( manager, Texloader );
+                var loader2 = new THREE.XLoader( manager );
                 loader2.load( [ 'models/xfile/' + animeName + '.x', { putPos: false, putScl: false } ], function () {
 
                     // !! important!
