@@ -42,7 +42,7 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script>
-/*eslint-disable*/
+
 			var container, stats, gui;
 			var camera, scene, renderer;
 			var mesh, geometry;
@@ -53,40 +53,10 @@
 				new THREE.TextureLoader().load('textures/sphere_baked_object_normal_map.png'),
 			];
 
-			console.log("normalMaps", normalMaps);
-			//a consideration could be made to couple these with the map
 			var normalMapSpaces = [
 				THREE.TangentSpaceNormalMap,
 				THREE.ObjectSpaceNormalMap,
-			]
-
-			//remove this
-			var objectSpaceNormalMapChunk = `
-				normal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0; // overrides both flatShading and attribute normals
-				#ifdef FLIP_SIDED
-					normal = - normal;
-				#endif
-				#ifdef DOUBLE_SIDED
-					normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-				#endif
-				normal = normalize( uNormalMatrix * normal );
-			`
-			
-			//remove this
-			var normalMapOnBeforeCompiles = [
-				function(){},
-				function(shader){
-					shader.uniforms.uNormalMatrix = { value: mesh.normalMatrix }
-
-					shader.fragmentShader = `
-						uniform mat3 uNormalMatrix;
-						${shader.fragmentShader.replace(
-							'#include <normal_fragment_maps>',
-							objectSpaceNormalMapChunk
-						)}
-					`
-				}
-			]
+			];
 
 			var options = {
 				normalMap: 0,
@@ -154,9 +124,8 @@
 				gui.add( options, 'normalMap', normalMapsMap ).onChange( function( value ) {
 
 					material.normalMap = normalMaps[value]
-					// material.normalMapType = normalMapSpaces[value] //uncomment this
+					material.normalMapType = normalMapSpaces[value] //uncomment this
 					
-					material.onBeforeCompile = normalMapOnBeforeCompiles[value] //remove this
 					material.needsUpdate = true //remove this
 					setNormalMapActive(options.normalMapActive)
 
@@ -164,7 +133,6 @@
 
 				function setNormalMapActive(value){
 					material.normalMap = value ? normalMaps[options.normalMap] : null
-					material.onBeforeCompile = value ? normalMapOnBeforeCompiles[ options.normalMap ] : function(){}
 					material.needsUpdate = true
 				}
 
