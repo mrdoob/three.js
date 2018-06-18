@@ -49,7 +49,7 @@ Object.assign( VideoLoader.prototype, {
 
 		function onVideoLoad() {
 
-			video.removeEventListener( 'loadeddata', onVideoLoad, false );
+			video.removeEventListener( 'canplay', onVideoLoad, false );
 			video.removeEventListener( 'error', onVideoError, false );
 
 			Cache.add( url, this );
@@ -62,7 +62,7 @@ Object.assign( VideoLoader.prototype, {
 
 		function onVideoError( event ) {
 
-			video.removeEventListener( 'loadeddata', onVideoLoad, false );
+			video.removeEventListener( 'canplay', onVideoLoad, false );
 			video.removeEventListener( 'error', onVideoError, false );
 
 			if ( onError ) onError( event );
@@ -72,7 +72,7 @@ Object.assign( VideoLoader.prototype, {
 
 		}
 
-		video.addEventListener( 'loadeddata', onVideoLoad, false );
+		video.addEventListener( 'canplay', onVideoLoad, false );
 		video.addEventListener( 'error', onVideoError, false );
 
 		if ( url.substr( 0, 5 ) !== 'data:' ) {
