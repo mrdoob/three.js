@@ -2,7 +2,7 @@
 * @author Richard M. / https://github.com/richardmonette
 */
 
-THREE.EquiangularToCubeGenerator = function ( sourceTexture, resolution ) {
+THREE.EquirectangularToCubeGenerator = function ( sourceTexture, resolution ) {
 
 	this.sourceTexture = sourceTexture;
 	this.resolution = resolution;
@@ -36,9 +36,9 @@ THREE.EquiangularToCubeGenerator = function ( sourceTexture, resolution ) {
 
 };
 
-THREE.EquiangularToCubeGenerator.prototype = {
+THREE.EquirectangularToCubeGenerator.prototype = {
 
-	constructor: THREE.EquiangularToCubeGenerator,
+	constructor: THREE.EquirectangularToCubeGenerator,
 
 	update: function ( renderer ) {
 
@@ -81,7 +81,7 @@ THREE.EquiangularToCubeGenerator.prototype = {
 				varying vec3 localPosition;\n\
 				uniform sampler2D equirectangularMap;\n\
 				\n\
-				vec2 EquiangularSampleUV(vec3 v) {\n\
+				vec2 EquirectangularSampleUV(vec3 v) {\n\
 			    vec2 uv = vec2(atan(v.z, v.x), asin(v.y));\n\
 			    uv *= vec2(0.1591, 0.3183); // inverse atan\n\
 			    uv += 0.5;\n\
@@ -89,7 +89,7 @@ THREE.EquiangularToCubeGenerator.prototype = {
 				}\n\
 				\n\
 				void main() {\n\
-					vec2 uv = EquiangularSampleUV(normalize(localPosition));\n\
+					vec2 uv = EquirectangularSampleUV(normalize(localPosition));\n\
     			vec3 color = texture2D(equirectangularMap, uv).rgb;\n\
     			\n\
 					gl_FragColor = vec4( color, 1.0 );\n\
@@ -99,7 +99,7 @@ THREE.EquiangularToCubeGenerator.prototype = {
 
 		} );
 
-		shaderMaterial.type = 'EquiangularToCubeGenerator';
+		shaderMaterial.type = 'EquirectangularToCubeGenerator';
 
 		return shaderMaterial;
 
