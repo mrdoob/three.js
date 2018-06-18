@@ -181,8 +181,14 @@ THREE.GLTFLoader = ( function () {
 					animations: animations,
 					asset: json.asset,
 					parser: parser,
-					userData: {}
+					userData: undefined
 				};
+
+				// Though glTF spec allows 'extras' to be anything, allowing primitives
+				// would break addUnknownExtensionsToUserData
+				glTF.userData = ( typeof json.extras === "object" )
+					? json.extras
+					: {};
 
 				addUnknownExtensionsToUserData( extensions, glTF, json );
 
