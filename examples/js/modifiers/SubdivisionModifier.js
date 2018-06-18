@@ -36,7 +36,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 };
 
-( function() {
+( function () {
 
 	// Some constants
 	var WARNINGS = ! true; // Set to true for development
@@ -98,7 +98,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	function generateLookups( vertices, faces, metaVertices, edges ) {
 
-		var i, il, face, edge;
+		var i, il, face;
 
 		for ( i = 0, il = vertices.length; i < il; i ++ ) {
 
@@ -146,7 +146,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var oldVertices, oldFaces, oldUvs;
 		var newVertices, newFaces, newUVs = [];
 
-		var n, l, i, il, j, k;
+		var n, i, il, j, k;
 		var metaVertices, sourceEdges;
 
 		// new stuff.
