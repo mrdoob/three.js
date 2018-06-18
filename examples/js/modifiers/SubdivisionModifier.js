@@ -118,9 +118,9 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	}
 
-	function newFace( newFaces, a, b, c ) {
+	function newFace( newFaces, a, b, c, materialIndex ) {
 
-		newFaces.push( new THREE.Face3( a, b, c ) );
+		newFaces.push( new THREE.Face3( a, b, c, undefined, undefined, materialIndex ) );
 
 	}
 
@@ -346,10 +346,10 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			// create 4 faces.
 
-			newFace( newFaces, edge1, edge2, edge3 );
-			newFace( newFaces, face.a, edge1, edge3 );
-			newFace( newFaces, face.b, edge2, edge1 );
-			newFace( newFaces, face.c, edge3, edge2 );
+			newFace( newFaces, edge1, edge2, edge3, face.materialIndex );
+			newFace( newFaces, face.a, edge1, edge3, face.materialIndex );
+			newFace( newFaces, face.b, edge2, edge1, face.materialIndex );
+			newFace( newFaces, face.c, edge3, edge2, face.materialIndex );
 
 			// create 4 new uv's
 
