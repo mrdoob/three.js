@@ -35,6 +35,7 @@ THREE.NodeMaterial.addShortcuts( THREE.MeshStandardNodeMaterial.prototype, 'prop
 	"metalness.value",
 	"map",
 	"normalMap",
+	"normalScale.value",
 	"metalnessMap",
 	"roughnessMap",
 	"envMap"
