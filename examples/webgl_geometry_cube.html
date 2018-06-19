@@ -15,10 +15,10 @@
 	<body>
 
 		<script src="../build/three.js"></script>
-
+		<script src="./js/controls/TrackballControls.js"></script>
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, controls;
 			var mesh;
 
 			init();
@@ -45,7 +45,13 @@
 				document.body.appendChild( renderer.domElement );
 
 				//
-
+				// ++	
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 5.0;
+				controls.zoomSpeed = 2.2;
+				controls.panSpeed = 1;
+				controls.dynamicDampingFactor = 0.3;
+				// ++
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -62,6 +68,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				
+				controls.update();
 
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
