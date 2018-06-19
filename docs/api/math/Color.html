@@ -124,13 +124,23 @@ var color = new THREE.Color( 1, 0, 0 );
 		<h3>[method:Color convertGammaToLinear]( [param:Float gammaFactor] ) </h3>
 		<p>
 		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-		Converts this color from gamma to linear space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
+		Converts this color from gamma space to linear space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
 		</p>
 		
 		<h3>[method:Color convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
 		<p>
 		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-		Converts this color from linear to gamma space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
+		Converts this color from linear space to gamma space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
+		</p>
+
+		<h3>[method:Color convertLinearToSRGB]() </h3>
+		<p>
+		Converts this color from linear space to sRGB space.
+		</p>
+
+		<h3>[method:Color convertSRGBToLinear]() </h3>
+		<p>
+		Converts this color from sRGB space to linear space.
 		</p>
 
 		<h3>[method:Color copyGammaToLinear]( [param:Color color], [param:Float gammaFactor] ) </h3>
@@ -138,7 +148,7 @@ var color = new THREE.Color( 1, 0, 0 );
 		[page:Color color] — Color to copy.<br />
 		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
 
-		Copies the given color into this color while converting it from gamma to linear space
+		Copies the given color into this color, and then converts this color from gamma space to linear space
 		by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
 		</p>
 
@@ -147,8 +157,22 @@ var color = new THREE.Color( 1, 0, 0 );
 		[page:Color color] — Color to copy.<br />
 		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
 
-		Copies the given color into this color while converting it from linear to gamma space
+		Copies the given color into this color, and then converts this color from linear space to gamma space
 		by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
+		</p>
+
+		<h3>[method:Color copyLinearToSRGB]( [param:Color color]] ) </h3>
+		<p>
+		[page:Color color] — Color to copy.<br />
+
+		Copies the given color into this color, and then converts this color from linear space to sRGB space.
+		</p>
+
+		<h3>[method:Color copySRGBToLinear]( [param:Color color] ) </h3>
+		<p>
+		[page:Color color] — Color to copy.<br />
+
+		Copies the given color into this color, and then converts this color from sRGB space to linear space.
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Color color] ) </h3>
