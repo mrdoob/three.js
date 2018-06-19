@@ -12709,7 +12709,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.normalMap && this.normalMap.isTexture ) {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
-			if ( this.normalMapType !== TangentSpaceNormalMap ) data.normalMapType = this.normalMapType;
+			data.normalMapType = this.normalMapType;
 			data.normalScale = this.normalScale.toArray();
 
 		}
@@ -36218,6 +36218,7 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
 		if ( json.normalMap !== undefined ) material.normalMap = getTexture( json.normalMap );
+		if ( json.normalMapType !== undefined ) material.normalMapType = json.normalMapType;
 		if ( json.normalScale !== undefined ) {
 
 			var normalScale = json.normalScale;
