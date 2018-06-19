@@ -13,7 +13,7 @@ THREE.ColladaLoader.prototype = {
 
 	constructor: THREE.ColladaLoader,
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -33,6 +33,7 @@ THREE.ColladaLoader.prototype = {
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
 
 	},
 
@@ -49,6 +50,7 @@ THREE.ColladaLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
