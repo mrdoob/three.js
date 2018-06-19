@@ -12,7 +12,7 @@ THREE.AssimpLoader.prototype = {
 
 	constructor: THREE.AssimpLoader,
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -34,6 +34,7 @@ THREE.AssimpLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
@@ -1129,7 +1130,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 			if ( ! key ) {
-				
+
 				return null;
 
 			} else if ( nextKey ) {
@@ -1150,7 +1151,7 @@ THREE.AssimpLoader.prototype = {
 				var l = T / dT;
 
 				return lerp( key.mValue.toTHREE(), nextKey.mValue.toTHREE(), l );
-				
+
 			}
 
 		}
