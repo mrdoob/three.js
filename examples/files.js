@@ -322,6 +322,7 @@ var files = {
 		"webvr_cubes",
 		"webvr_daydream",
 		"webvr_gearvr",
+		"webvr_lorenzattractor",
 		"webvr_oculusgo",
 		"webvr_panorama",
 		"webvr_rollercoaster",
