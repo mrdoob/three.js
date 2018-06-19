@@ -21661,7 +21661,7 @@
 
 			}
 
-			if ( onAnimationFrameCallback ) onAnimationFrameCallback();
+			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
 
 		}
 
@@ -22664,10 +22664,10 @@
 
 		var onAnimationFrameCallback = null;
 
-		function onAnimationFrame() {
+		function onAnimationFrame( time ) {
 
 			if ( vr.isPresenting() ) return;
-			if ( onAnimationFrameCallback ) onAnimationFrameCallback();
+			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
 
 		}
 
