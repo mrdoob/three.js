@@ -1020,10 +1020,10 @@ function WebGLRenderer( parameters ) {
 
 	var onAnimationFrameCallback = null;
 
-	function onAnimationFrame() {
+	function onAnimationFrame( time ) {
 
 		if ( vr.isPresenting() ) return;
-		if ( onAnimationFrameCallback ) onAnimationFrameCallback();
+		if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
 
 	}
 
