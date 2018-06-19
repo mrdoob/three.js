@@ -66,6 +66,8 @@ function ObjectLoader( manager ) {
 
 Object.assign( ObjectLoader.prototype, {
 
+	crossOrigin: 'anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		if ( this.texturePath === '' ) {
