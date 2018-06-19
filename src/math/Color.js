@@ -331,7 +331,11 @@ Object.assign( Color.prototype, {
 
 	copySRGBToLinear: function ( color ) {
 
-		function SRGBToLinear( c ) { return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 ) };
+		function SRGBToLinear( c ) {
+
+			return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+		}
 
 		this.r = SRGBToLinear( color.r );
 		this.g = SRGBToLinear( color.g );
@@ -343,7 +347,11 @@ Object.assign( Color.prototype, {
 
 	copyLinearToSRGB: function ( color ) {
 
-		function LinearToSRGB( c ) { return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055 };
+		function LinearToSRGB( c ) {
+
+			return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+
+		}
 
 		this.r = LinearToSRGB( color.r );
 		this.g = LinearToSRGB( color.g );
