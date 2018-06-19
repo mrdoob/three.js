@@ -75,7 +75,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
 	// Mouse buttons
-	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+	this.mouseButtons = { LEFT: THREE.MOUSE.LEFT, MIDDLE: THREE.MOUSE.MIDDLE, RIGHT: THREE.MOUSE.RIGHT };
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -85,18 +85,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	//
 	// public methods
 	//
-
-	this.getStateForMouseDown = function ( event ) {
-
-		if ( event.button === scope.mouseButtons.ORBIT && ! event.ctrlKey ) return STATE.ROTATE;
-
-		if ( event.button === scope.mouseButtons.ZOOM ) return STATE.DOLLY;
-
-		if ( event.button === scope.mouseButtons.PAN || ( event.button === scope.mouseButtons.ORBIT && event.ctrlKey ) ) return STATE.PAN;
-
-		return STATE.NONE;
-
-	};
 
 	this.getPolarAngle = function () {
 
@@ -687,46 +675,60 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		var newState = scope.getStateForMouseDown( event );
+		switch ( event.button ) {
 
-		switch ( newState ) {
+			case scope.mouseButtons.LEFT:
 
-			case STATE.ROTATE:
+				if ( event.ctrlKey || event.metaKey ) {
 
-				if ( scope.enableRotate === false ) return;
+					if ( scope.enablePan === false ) return;
 
-				handleMouseDownRotate( event );
+					handleMouseDownPan( event );
+
+					state = STATE.PAN;
+
+				} else {
+
+					if ( scope.enableRotate === false ) return;
+
+					handleMouseDownRotate( event );
+
+					state = STATE.ROTATE;
+
+				}
 
 				break;
 
-			case STATE.DOLLY:
+			case scope.mouseButtons.MIDDLE:
 
 				if ( scope.enableZoom === false ) return;
 
 				handleMouseDownDolly( event );
 
+				state = STATE.DOLLY;
+
 				break;
 
-			case STATE.PAN:
+			case scope.mouseButtons.RIGHT:
 
 				if ( scope.enablePan === false ) return;
 
 				handleMouseDownPan( event );
 
+				state = STATE.PAN;
+
 				break;
-
-			default: // STATE.NONE
-
-				return;
 
 		}
 
-		state = newState;
+		if ( state !== STATE.NONE ) {
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
+			document.addEventListener( 'mousemove', onMouseMove, false );
+			document.addEventListener( 'mouseup', onMouseUp, false );
 
-		scope.dispatchEvent( startEvent );
+			scope.dispatchEvent( startEvent );
+
+		}
 
 	}
 
