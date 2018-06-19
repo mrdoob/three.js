@@ -32,7 +32,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - geometry - normals</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - materials - normalmap space</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -45,7 +45,7 @@
 
 			var container, stats, gui;
 			var camera, scene, renderer;
-			var mesh, geometry;
+			var meshTangent, meshObject, geometry;
 			var directionalLight, pointLight, ambientLight;
 
 			var normalMaps = [
@@ -58,17 +58,21 @@
 				THREE.ObjectSpaceNormalMap,
 			];
 
-			var options = {
-				normalMap: 0,
-				normalMapActive: true,
-			};
-
-			var material = new THREE.MeshStandardMaterial( { 
-				color: 0xff0000, 
-				roughness: 0.2,
-				metalness: 0,
-				normalMap:  normalMaps[options.normalMap] 
-			} );
+			var materials = [
+				new THREE.MeshStandardMaterial( { 
+					color: 0xff0000, 
+					roughness: 0.2,
+					metalness: 0,
+					normalMap:  normalMaps[0] 
+				} ),
+				new THREE.MeshStandardMaterial( { 
+					color: 0xff0000, 
+					roughness: 0.2,
+					metalness: 0,
+					normalMap:  normalMaps[1], 
+					normalMapType: normalMapSpaces[1]
+				} ),
+			];
 
 			init();
 			animate();
@@ -86,9 +90,12 @@
 				new THREE.OBJLoader().load( 
 					"models/obj/sphere_normal_map.obj", 
 					function( object ) { 
-						mesh = new THREE.Mesh(object.children[0].geometry, material)
-						console.log(material)
-						scene.add(mesh)
+						meshTangent = new THREE.Mesh(object.children[0].geometry, materials[0])
+						meshTangent.position.x = -40
+						scene.add(meshTangent)
+						meshObject = new THREE.Mesh(object.children[0].geometry, materials[1])
+						meshObject.position.x = 40
+						scene.add(meshObject)
 					} 
 				);
 
@@ -112,31 +119,6 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
-
-				//
-
-				var normalMapsMap = {
-					tangentSpace: 0,
-					objectSpace: 1,
-				};
-
-				gui = new dat.GUI( { width: 350 } );
-				gui.add( options, 'normalMap', normalMapsMap ).onChange( function( value ) {
-
-					material.normalMap = normalMaps[value]
-					material.normalMapType = normalMapSpaces[value] //uncomment this
-					
-					material.needsUpdate = true //remove this
-					setNormalMapActive(options.normalMapActive)
-
-				} ).name('normalmap space');
-
-				function setNormalMapActive(value){
-					material.normalMap = value ? normalMaps[options.normalMap] : null
-					material.needsUpdate = true
-				}
-
-				gui.add( options, 'normalMapActive' ).name('normalmap on/off').onChange(setNormalMapActive)
 
 				//
 
