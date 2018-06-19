@@ -35,6 +35,14 @@ THREE.ScreenUVNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.ScreenUVNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.resolution = source.resolution;
+	
+};
+
 THREE.ScreenUVNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

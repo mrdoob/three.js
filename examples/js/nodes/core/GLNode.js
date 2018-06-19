@@ -7,7 +7,6 @@ THREE.GLNode = function ( type ) {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = "";
-	this.allows = {};
 
 	this.type = type;
 
@@ -71,12 +70,6 @@ THREE.GLNode.prototype.build = function ( builder, output, uuid ) {
 
 	if ( builder.parsing ) this.appendDepsNode( builder, data, output );
 
-	if ( this.allows[ builder.shader ] === false ) {
-
-		throw new Error( 'Shader ' + shader + ' is not compatible with this node.' );
-
-	}
-
 	if ( material.nodes.indexOf( this ) === - 1 ) {
 
 		material.nodes.push( this );
@@ -126,6 +119,14 @@ THREE.GLNode.prototype.getJSONNode = function ( meta ) {
 
 };
 
+THREE.GLNode.prototype.copy = function ( source ) {
+
+	if ( source.name !== undefined ) this.name = source.name;
+	
+	if ( source.userData !== undefined ) this.userData = JSON.parse( JSON.stringify( source.userData ) );
+
+};
+
 THREE.GLNode.prototype.createJSONNode = function ( meta ) {
 
 	var isRootObject = ( meta === undefined || typeof meta === 'string' );
@@ -135,7 +136,7 @@ THREE.GLNode.prototype.createJSONNode = function ( meta ) {
 	if ( typeof this.nodeType !== "string" ) throw new Error( "Node does not allow serialization." );
 
 	data.uuid = this.uuid;
-	data.type = this.nodeType + "Node";
+	data.nodeType = this.nodeType;
 
 	if ( this.name !== "" ) data.name = this.name;
 

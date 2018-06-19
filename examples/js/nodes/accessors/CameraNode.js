@@ -159,6 +159,31 @@ THREE.CameraNode.prototype.onUpdateFrame = function ( frame ) {
 
 };
 
+THREE.CameraNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.setScope( source.scope );
+
+	if ( source.camera ) {
+		
+		this.setCamera( source.camera );
+		
+	}
+
+	switch ( source.scope ) {
+
+		case THREE.CameraNode.DEPTH:
+
+			this.near.number = source.near;
+			this.far.number = source.far;
+
+			break;
+
+	}
+	
+};
+
 THREE.CameraNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

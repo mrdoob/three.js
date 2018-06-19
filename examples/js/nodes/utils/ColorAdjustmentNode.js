@@ -70,6 +70,16 @@ THREE.ColorAdjustmentNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.ColorAdjustmentNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.rgb = source.rgb;
+	this.adjustment = source.adjustment;
+	this.method = source.method;
+					
+};
+
 THREE.ColorAdjustmentNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

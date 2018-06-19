@@ -21,9 +21,7 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 	var material = builder.material;
 	var code;
 
-	material.define( 'PHYSICAL' );
-
-	if ( ! this.clearCoat && ! this.clearCoatRoughness ) material.define( 'STANDARD' );
+	material.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
 
 	material.define( 'ALPHATEST', '0.0' );
 
@@ -52,6 +50,7 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 			"#endif",
 
 			"#include <common>",
+			"#include <encodings_pars_fragment>", // encoding functions
 			"#include <fog_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
 			"#include <skinning_pars_vertex>",
@@ -83,7 +82,7 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 			output.push(
 				transform.code,
-				"transformed = " + transform.result + ";"
+				transform.result ? "transformed = " + transform.result + ";" : ''
 			);
 
 		}
@@ -107,17 +106,20 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 		// blur textures for PBR effect
 
-		var requires = {
-			bias: new THREE.RoughnessToBlinnExponentNode(),
-			offsetU: 0,
-			offsetV: 0
+		var requiresEnvironment = {
+			bias: THREE.RoughnessToBlinnExponentNode,
+			gamma: true
+		};
+
+		var requiresGamma = {
+			gamma: true
 		};
 
 		var useClearCoat = ! material.isDefined( 'STANDARD' );
 
 		// parse all nodes to reuse generate codes
 
-		this.color.parse( builder, { slot: 'color' } );
+		this.color.parse( builder, { slot: 'color', requires: requiresGamma } );
 		this.roughness.parse( builder );
 		this.metalness.parse( builder );
 
@@ -138,11 +140,11 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 		if ( this.shadow ) this.shadow.parse( builder );
 		if ( this.emissive ) this.emissive.parse( builder, { slot: 'emissive' } );
 
-		if ( this.environment ) this.environment.parse( builder, { cache: 'env', requires: requires, slot: 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+		if ( this.environment ) this.environment.parse( builder, { cache: 'env', requires: requiresEnvironment, slot: 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
+		var color = this.color.buildCode( builder, 'c', { slot: 'color', requires: requiresGamma } );
 		var roughness = this.roughness.buildCode( builder, 'fv1' );
 		var metalness = this.metalness.buildCode( builder, 'fv1' );
 
@@ -163,9 +165,9 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
 		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot: 'emissive' } ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache: 'env', requires: requires, slot: 'environment' } ) : undefined;
+		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache: 'env', requires: requiresEnvironment, slot: 'environment' } ) : undefined;
 
-		var clearCoatEnv = useClearCoat && environment ? this.environment.buildCode( builder, 'c', { cache: 'clearCoat', requires: requires, slot: 'environment' } ) : undefined;
+		var clearCoatEnv = useClearCoat && environment ? this.environment.buildCode( builder, 'c', { cache: 'clearCoat', requires: requiresEnvironment, slot: 'environment' } ) : undefined;
 
 		material.requires.transparent = alpha != undefined;
 
@@ -221,28 +223,18 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 		if ( normal ) {
 
-			builder.include( 'perturbNormal2Arb' );
-
-			output.push( normal.code );
-
-			if ( normalScale ) output.push( normalScale.code );
-
 			output.push(
-				'normal = perturbNormal2Arb(-vViewPosition,normal,' +
-				normal.result + ',' +
-				new THREE.UVNode().build( builder, 'v2' ) + ',' +
-				( normalScale ? normalScale.result : 'vec2( 1.0 )' ) + ');'
+				normal.code,
+				'normal = ' + normal.result + ';'
 			);
-
+		
 		}
 
 		// optimization for now
 
-		output.push( 'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor * (1.0 - metalnessFactor)' ) + ';' );
-
 		output.push(
-			// accumulation
-			'material.specularRoughness = clamp( roughnessFactor, DEFAULT_SPECULAR_COEFFICIENT, 1.0 );' // disney's remapping of [ 0, 1 ] roughness to [ 0.001, 1 ]
+			'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor * (1.0 - metalnessFactor)' ) + ';',
+			'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );'
 		);
 
 		if ( clearCoat ) {
@@ -262,7 +254,7 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 			output.push(
 				clearCoatRoughness.code,
-				'material.clearCoatRoughness = clamp( ' + clearCoatRoughness.result + ', DEFAULT_SPECULAR_COEFFICIENT, 1.0 );'
+				'material.clearCoatRoughness = clamp( ' + clearCoatRoughness.result + ', 0.04, 1.0 );'
 			);
 
 		} else if ( useClearCoat ) {
@@ -287,8 +279,7 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-			"#include <lights_fragment_begin>",
-			"#include <lights_fragment_end>"
+			"#include <lights_fragment_begin>"
 		);
 
 		if ( light ) {
@@ -361,9 +352,13 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 			}
 
-			output.push( "RE_IndirectSpecular(" + environment.result + ", clearCoatRadiance, geometry, material, reflectedLight );" );
+			output.push( "radiance += " + environment.result + ";" );
 
 		}
+		
+		output.push(
+			"#include <lights_fragment_end>"
+		);
 
 		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
 
@@ -381,7 +376,9 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 			"#include <premultiplied_alpha_fragment>",
 			"#include <tonemapping_fragment>",
 			"#include <encodings_fragment>",
-			"#include <fog_fragment>"
+			"#include <fog_fragment>",
+			"#include <premultiplied_alpha_fragment>",
+			"#include <dithering_fragment>"
 		);
 
 		code = output.join( "\n" );
@@ -389,6 +386,41 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 	}
 
 	return code;
+
+};
+
+THREE.StandardNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	// vertex
+
+	if ( source.transform ) this.transform = source.transform;
+
+	// fragment
+
+	this.color = source.color;
+	this.roughness = source.roughness;
+	this.metalness = source.metalness;
+
+	if ( source.alpha ) this.alpha = source.alpha;
+
+	if ( source.normal ) this.normal = source.normal;
+
+	if ( source.clearCoat ) this.clearCoat = source.clearCoat;
+	if ( source.clearCoatRoughness ) this.clearCoatRoughness = source.clearCoatRoughness;
+
+	if ( source.reflectivity ) this.reflectivity = source.reflectivity;
+
+	if ( source.light ) this.light = source.light;
+	if ( source.shadow ) this.shadow = source.shadow;
+
+	if ( source.ao ) this.ao = source.ao;
+	
+	if ( source.emissive ) this.emissive = source.emissive;
+	if ( source.ambient ) this.ambient = source.ambient;
+
+	if ( source.environment ) this.environment = source.environment;
 
 };
 
@@ -413,7 +445,6 @@ THREE.StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
 
 		if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
-		if ( this.normalScale ) data.normalScale = this.normalScale.toJSON( meta ).uuid;
 
 		if ( this.clearCoat ) data.clearCoat = this.clearCoat.toJSON( meta ).uuid;
 		if ( this.clearCoatRoughness ) data.clearCoatRoughness = this.clearCoatRoughness.toJSON( meta ).uuid;
@@ -421,11 +452,12 @@ THREE.StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.reflectivity ) data.reflectivity = this.reflectivity.toJSON( meta ).uuid;
 
 		if ( this.light ) data.light = this.light.toJSON( meta ).uuid;
+		if ( this.shadow ) data.shadow = this.shadow.toJSON( meta ).uuid;
 
 		if ( this.ao ) data.ao = this.ao.toJSON( meta ).uuid;
-		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
-		if ( this.shadow ) data.shadow = this.shadow.toJSON( meta ).uuid;
+		
 		if ( this.emissive ) data.emissive = this.emissive.toJSON( meta ).uuid;
+		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
 
 		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
 

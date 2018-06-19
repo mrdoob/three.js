@@ -2,14 +2,14 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.TimerNode = function ( scale, scope ) {
+THREE.TimerNode = function ( scale, scope, useTimeScale ) {
 
 	THREE.FloatNode.call( this );
 
 	this.scale = scale !== undefined ? scale : 1;
 	this.scope = scope || THREE.TimerNode.GLOBAL;
 
-	this.timeScale = this.scale !== 1;
+	this.useTimeScale = useTimeScale !== undefined ? useTimeScale : this.scale !== 1;
 
 };
 
@@ -60,6 +60,17 @@ THREE.TimerNode.prototype.updateFrame = function ( frame ) {
 
 };
 
+THREE.TimerNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.scope = source.scope;
+	this.scale = source.scale;
+	
+	this.useTimeScale = source.useTimeScale;
+	
+};
+
 THREE.TimerNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -70,7 +81,8 @@ THREE.TimerNode.prototype.toJSON = function ( meta ) {
 
 		data.scope = this.scope;
 		data.scale = this.scale;
-		data.timeScale = this.timeScale;
+		
+		data.useTimeScale = this.useTimeScale;
 
 	}
 

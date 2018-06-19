@@ -2,12 +2,12 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.UVTransformNode = function () {
+THREE.UVTransformNode = function ( uv, transform ) {
 
 	THREE.FunctionNode.call( this, "( uvTransform * vec3( uvNode, 1 ) ).xy", "vec2" );
 
-	this.uv = new THREE.UVNode();
-	this.transform = new THREE.Matrix3Node();
+	this.uv = uv || new THREE.UVNode();
+	this.transform = transform || new THREE.Matrix3Node();
 
 };
 
@@ -31,6 +31,15 @@ THREE.UVTransformNode.prototype.setUvTransform = function ( tx, ty, sx, sy, rota
 
 	this.transform.value.setUvTransform( tx, ty, sx, sy, rotation, cx, cy );
 
+};
+
+THREE.UVTransformNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.uv = source.uv;
+	this.transform = source.transform;
+					
 };
 
 THREE.UVTransformNode.prototype.toJSON = function ( meta ) {

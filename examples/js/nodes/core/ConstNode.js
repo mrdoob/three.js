@@ -17,6 +17,8 @@ THREE.ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
 THREE.ConstNode.LOG2 = 'LOG2';
 THREE.ConstNode.EPSILON = 'EPSILON';
 
+THREE.ConstNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
+
 THREE.ConstNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.ConstNode.prototype.constructor = THREE.ConstNode;
 THREE.ConstNode.prototype.nodeType = "Const";
@@ -29,14 +31,13 @@ THREE.ConstNode.prototype.getType = function ( builder ) {
 
 THREE.ConstNode.prototype.eval = function ( src, useDefine ) {
 
-	src = ( src || '' ).trim();
+	this.src = src || '';
 
 	var name, type, value = "";
 
-	var rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
-	var match = src.match( rDeclaration );
+	var match = this.src.match( THREE.ConstNode.rDeclaration );
 
-	this.useDefine = useDefine;
+	this.useDefine = useDefine || this.src.charAt(0) === '#';
 
 	if ( match && match.length > 1 ) {
 
@@ -46,7 +47,7 @@ THREE.ConstNode.prototype.eval = function ( src, useDefine ) {
 
 	} else {
 
-		name = src;
+		name = this.src;
 		type = 'fv1';
 
 	}
@@ -71,6 +72,10 @@ THREE.ConstNode.prototype.build = function ( builder, output ) {
 
 			return 'const ' + this.type + ' ' + this.name + ' = ' + this.value + ';';
 
+		} else if (this.useDefine) {
+		
+			return this.src;
+			
 		}
 
 	} else {
@@ -89,6 +94,14 @@ THREE.ConstNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.ConstNode.prototype.copy = function ( source ) {
+	
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.eval( source.src, source.useDefine );	
+	
+};
+
 THREE.ConstNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -97,10 +110,8 @@ THREE.ConstNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.name = this.name;
-		data.out = this.type;
+		data.src = this.src;
 
-		if ( this.value ) data.value = this.value;
 		if ( data.useDefine === true ) data.useDefine = true;
 
 	}

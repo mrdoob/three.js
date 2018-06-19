@@ -38,7 +38,8 @@ THREE.ReflectNode.prototype.generate = function ( builder, output ) {
 	switch ( this.scope ) {
 
 		case THREE.ReflectNode.VECTOR:
-
+//vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal )
+			//builder.material.addFragmentNode( 'vec3 reflectVec = inverseTransformDirection( reflect( -geometry.viewDir, geometry.normal ), viewMatrix );' );
 			builder.material.addFragmentNode( 'vec3 reflectVec = inverseTransformDirection( reflect( -normalize( vViewPosition ), normal ), viewMatrix );' );
 
 			result = 'reflectVec';
@@ -48,7 +49,7 @@ THREE.ReflectNode.prototype.generate = function ( builder, output ) {
 		case THREE.ReflectNode.CUBE:
 
 			var reflectVec = new THREE.ReflectNode( THREE.ReflectNode.VECTOR ).build( builder, 'v3' );
-
+//flipEnvMap
 			builder.material.addFragmentNode( 'vec3 reflectCubeVec = vec3( -1.0 * ' + reflectVec + '.x, ' + reflectVec + '.yz );' );
 
 			result = 'reflectCubeVec';

@@ -22,6 +22,14 @@ THREE.LuminanceNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.LuminanceNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.rgb = source.rgb;
+	
+};
+
 THREE.LuminanceNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

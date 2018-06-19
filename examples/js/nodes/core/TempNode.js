@@ -76,8 +76,8 @@ THREE.TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 			var code = this.generate( builder, type, uuid );
 
-			if ( builder.isShader( 'vertex' ) ) material.addVertexNode( name + '=' + code + ';' );
-			else material.addFragmentNode( name + '=' + code + ';' );
+			if ( builder.isShader( 'vertex' ) ) material.addVertexNode( name + ' = ' + code + ';' );
+			else material.addFragmentNode( name + ' = ' + code + ';' );
 
 			return builder.format( name, type, output );
 

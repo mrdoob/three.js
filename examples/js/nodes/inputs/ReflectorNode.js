@@ -52,6 +52,14 @@ THREE.ReflectorNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.ReflectorNode.prototype.copy = function ( source ) {
+			
+	THREE.InputNode.prototype.copy.call( this, source );
+	
+	this.scope.mirror = source.mirror;
+
+};
+
 THREE.ReflectorNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

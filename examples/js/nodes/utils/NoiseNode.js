@@ -22,6 +22,14 @@ THREE.NoiseNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.NoiseNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.coord = source.coord;
+	
+};
+
 THREE.NoiseNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

@@ -52,8 +52,18 @@ THREE.OperatorNode.prototype.generate = function ( builder, output ) {
 	var a = this.a.build( builder, type );
 	var b = this.b.build( builder, type );
 
-	return builder.format( '(' + a + this.op + b + ')', type, output );
+	return builder.format( '( ' + a + ' ' +  this.op + ' '+ b + ' )', type, output );
 
+};
+
+THREE.OperatorNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.a = source.a;
+	this.b = source.b;
+	this.op = source.op;
+	
 };
 
 THREE.OperatorNode.prototype.toJSON = function ( meta ) {

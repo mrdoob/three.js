@@ -91,6 +91,14 @@ THREE.PositionNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.PositionNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.scope = source.scope;
+	
+};
+
 THREE.PositionNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

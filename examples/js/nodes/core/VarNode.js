@@ -2,9 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.VarNode = function ( type ) {
+THREE.VarNode = function ( type, value ) {
 
 	THREE.GLNode.call( this, type );
+	
+	this.value = value;
 
 };
 
@@ -22,8 +24,23 @@ THREE.VarNode.prototype.generate = function ( builder, output ) {
 
 	var varying = builder.material.getVar( this.uuid, this.type );
 
+	if ( this.value && builder.isShader( 'vertex' ) ) {
+
+		builder.material.addVertexNode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
+
+	}
+	
 	return builder.format( varying.name, this.getType( builder ), output );
 
+};
+
+THREE.VarNode.prototype.copy = function ( source ) {
+	
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.type = source.type;
+	this.value = source.value;
+	
 };
 
 THREE.VarNode.prototype.toJSON = function ( meta ) {
@@ -34,7 +51,9 @@ THREE.VarNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.out = this.type;
+		data.type = this.type;
+
+		if ( this.value ) data.value = this.value.toJSON( meta ).uuid;
 
 	}
 

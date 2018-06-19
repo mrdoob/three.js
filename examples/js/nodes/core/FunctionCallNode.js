@@ -40,7 +40,7 @@ THREE.FunctionCallNode.prototype.generate = function ( builder, output ) {
 	var type = this.getType( builder );
 	var func = this.value;
 
-	var code = func.build( builder, output ) + '(';
+	var code = func.build( builder, output ) + '( ';
 	var params = [];
 
 	for ( var i = 0; i < func.inputs.length; i ++ ) {
@@ -52,10 +52,24 @@ THREE.FunctionCallNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	code += params.join( ',' ) + ')';
+	code += params.join( ', ' ) + ' )';
 
 	return builder.format( code, type, output );
 
+};
+
+THREE.FunctionCallNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	for ( var prop in source.inputs ) {
+
+		this.inputs[ prop ] = source.inputs[ prop ];
+
+	}
+
+	this.value = source.value;
+	
 };
 
 THREE.FunctionCallNode.prototype.toJSON = function ( meta ) {

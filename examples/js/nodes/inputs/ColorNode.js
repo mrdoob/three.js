@@ -2,11 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.ColorNode = function ( color ) {
+THREE.ColorNode = function ( color, g, b ) {
 
 	THREE.InputNode.call( this, 'c' );
 
-	this.value = new THREE.Color( color || 0 );
+	this.value = color instanceof THREE.Color ? color : new THREE.Color( color || 0, g, b );
 
 };
 
@@ -20,6 +20,14 @@ THREE.ColorNode.prototype.generateReadonly = function ( builder, output, uuid, t
 
 	return builder.format( "vec3( " + this.r + ", " + this.g + ", " + this.b + " )", type, output );
 
+};
+
+THREE.ColorNode.prototype.copy = function ( source ) {
+			
+	THREE.InputNode.prototype.copy.call( this, source );
+	
+	this.value.copy( source );
+	
 };
 
 THREE.ColorNode.prototype.toJSON = function ( meta ) {

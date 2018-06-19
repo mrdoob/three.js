@@ -41,21 +41,27 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<!-- NodeLibrary -->
-		<script src="js/nodes/GLNode.js"></script>
-		<script src="js/nodes/RawNode.js"></script>
-		<script src="js/nodes/TempNode.js"></script>
-		<script src="js/nodes/InputNode.js"></script>
-		<script src="js/nodes/ConstNode.js"></script>
-		<script src="js/nodes/VarNode.js"></script>
-		<script src="js/nodes/FunctionNode.js"></script>
-		<script src="js/nodes/FunctionCallNode.js"></script>
-		<script src="js/nodes/AttributeNode.js"></script>
-		<script src="js/nodes/NodeUniform.js"></script>
-		<script src="js/nodes/NodeBuilder.js"></script>
-		<script src="js/nodes/NodeLib.js"></script>
-		<script src="js/nodes/NodeFrame.js"></script>
-		<script src="js/nodes/NodeMaterial.js"></script>
+		<script src="js/nodes/core/GLNode.js"></script>
+		<script src="js/nodes/core/RawNode.js"></script>
+		<script src="js/nodes/core/BypassNode.js"></script>
+		<script src="js/nodes/core/TempNode.js"></script>
+		<script src="js/nodes/core/InputNode.js"></script>
+		<script src="js/nodes/core/ConstNode.js"></script>
+		<script src="js/nodes/core/VarNode.js"></script>
+		<script src="js/nodes/core/StructNode.js"></script>
+		<script src="js/nodes/core/FunctionNode.js"></script>
+		<script src="js/nodes/core/FunctionCallNode.js"></script>
+		<script src="js/nodes/core/AttributeNode.js"></script>
+		<script src="js/nodes/core/NodeUniform.js"></script>
+		<script src="js/nodes/core/NodeBuilder.js"></script>
+		<script src="js/nodes/core/NodeLib.js"></script>
+		<script src="js/nodes/core/NodeFrame.js"></script>
+		<script src="js/nodes/core/NodeMaterial.js"></script>
 
+		<!-- Library -->
+		<script src="js/nodes/libs/common.js"></script>
+		<script src="js/nodes/libs/keywords.js"></script>
+		
 		<!-- Accessors -->
 		<script src="js/nodes/accessors/PositionNode.js"></script>
 		<script src="js/nodes/accessors/NormalNode.js"></script>
@@ -77,7 +83,7 @@
 		<script src="js/nodes/inputs/Matrix3Node.js"></script>
 		<script src="js/nodes/inputs/Matrix4Node.js"></script>
 		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
-
+		
 		<!-- Math -->
 		<script src="js/nodes/math/Math1Node.js"></script>
 		<script src="js/nodes/math/Math2Node.js"></script>
@@ -89,14 +95,17 @@
 		<script src="js/nodes/utils/JoinNode.js"></script>
 		<script src="js/nodes/utils/TimerNode.js"></script>
 		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
+		<script src="js/nodes/utils/BlinnShininessExponentNode.js"></script>
 		<script src="js/nodes/utils/VelocityNode.js"></script>
 		<script src="js/nodes/utils/LuminanceNode.js"></script>
 		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
 		<script src="js/nodes/utils/NoiseNode.js"></script>
 		<script src="js/nodes/utils/ResolutionNode.js"></script>
-		<script src="js/nodes/utils/BumpNode.js"></script>
+		<script src="js/nodes/utils/BumpMapNode.js"></script>
 		<script src="js/nodes/utils/BlurNode.js"></script>
 		<script src="js/nodes/utils/UVTransformNode.js"></script>
+		<script src="js/nodes/utils/MaxMIPLevelNode.js"></script>
+		<script src="js/nodes/utils/NormalMapNode.js"></script>
 
 		<!-- Phong Material -->
 		<script src="js/nodes/materials/PhongNode.js"></script>
@@ -106,6 +115,10 @@
 		<script src="js/nodes/materials/StandardNode.js"></script>
 		<script src="js/nodes/materials/StandardNodeMaterial.js"></script>
 
+		<!-- Extended Materials -->
+		<script src="js/nodes/materials/MeshStandardNode.js"></script>
+		<script src="js/nodes/materials/MeshStandardNodeMaterial.js"></script>
+		
 		<!-- NodeMaterial Loader -->
 		<script src="js/loaders/NodeMaterialLoader.js"></script>
 
@@ -131,7 +144,7 @@
 			spherical: { url: 'textures/envmap.png' }
 		};
 
-		var param = { example: 'standard' };
+		var param = { example: 'mesh-standard' };
 
 		function getTexture( name ) {
 
@@ -228,6 +241,7 @@
 
 			var example = gui.add( param, 'example', {
 				'basic / standard': 'standard',
+				'basic / mesh-standard': 'mesh-standard',
 				'basic / physical': 'physical',
 				'basic / phong': 'phong',
 				'basic / layers': 'layers',
@@ -257,6 +271,7 @@
 				'misc / firefly': 'firefly',
 				'misc / reserved-keywords': 'reserved-keywords',
 				'misc / varying': 'varying',
+				'misc / void-function': 'void-function',
 				'misc / readonly': 'readonly',
 				'misc / custom-attribute': 'custom-attribute'
 			} ).onFinishChange( function () {
@@ -315,7 +330,7 @@
 
 			if ( rtTexture ) {
 
-				delete library[ rtTexture.uuid ];
+				delete library[ rtTexture.texture.uuid ];
 
 				rtTexture.dispose();
 				rtTexture = null;
@@ -346,8 +361,7 @@
 					//mtl.alpha = // opacity (float)
 					//mtl.specular = // specular color (vec3)
 					//mtl.shininess = // shininess (float)
-					//mtl.normal = // normalmap (vec3)
-					//mtl.normalScale = // normalmap scale (vec2)
+					//mtl.normal = // normal (vec3)
 					//mtl.emissive = // emissive color (vec3)
 					//mtl.ambient = // ambient color (vec3)
 					//mtl.shadow = // shadowmap (vec3)
@@ -365,8 +379,8 @@
 					mtl.shininess = new THREE.FloatNode( 15 );
 					mtl.environment = new THREE.CubeTextureNode( cubemap );
 					mtl.environmentAlpha = mask;
-					mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
-					mtl.normalScale = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
+					mtl.normal = new THREE.NormalMapNode( new THREE.TextureNode( getTexture( "grassNormal" ) ) );
+					mtl.normal.scale = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
 
 					break;
 
@@ -380,8 +394,7 @@
 					//mtl.alpha = // opacity (float)
 					//mtl.roughness = // roughness (float)
 					//mtl.metalness = // metalness (float)
-					//mtl.normal = // normalmap (vec3)
-					//mtl.normalScale = // normalmap scale (vec2)
+					//mtl.normal = // normal (vec3)
 					//mtl.emissive = // emissive color (vec3)
 					//mtl.ambient = // ambient color (vec3)
 					//mtl.shadow = // shadowmap (vec3)
@@ -424,8 +437,8 @@
 					mtl.roughness = roughness;
 					mtl.metalness = metalness;
 					mtl.environment = new THREE.CubeTextureNode( cubemap );
-					mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
-					mtl.normalScale = normalMask;
+					mtl.normal = new THREE.NormalMapNode( new THREE.TextureNode( getTexture( "grassNormal" ) ) );
+					mtl.normal.scale = normalMask;
 
 					// GUI
 
@@ -467,6 +480,85 @@
 
 					break;
 
+				case 'mesh-standard':
+
+					// MATERIAL
+					
+					var useNodeMaterial = true;
+					
+					var sataturation = new THREE.FloatNode( 1 );
+					
+					function updateMaterial() {
+					
+						var oldMaterial = mtl;
+					
+						mtl = useNodeMaterial ? new THREE.MeshStandardNodeMaterial() : new THREE.MeshStandardMaterial();
+					
+						// default syntax ( backward-compatible )
+					
+						mtl.map = getTexture( "brick" );
+						
+						mtl.normalMap = getTexture( "grassNormal" );
+						
+						mtl.envMap = cubemap;
+						
+						mtl.roughness = oldMaterial ? oldMaterial.roughness : .5;
+						mtl.metalness = oldMaterial ? oldMaterial.metalness : .5;
+						
+						// extended syntax ( only for NodeMaterial )
+						
+						if (useNodeMaterial) {
+						
+							mtl.map = new THREE.ColorAdjustmentNode( 
+								new THREE.TextureNode( mtl.map ), 
+								sataturation, 
+								THREE.ColorAdjustmentNode.SATURATION 
+							);
+							
+						}
+						
+						// apply material
+					
+						mtl.needsUpdate = true;
+					
+						mesh.material = mtl;
+
+					}
+
+					updateMaterial();
+					
+					// GUI
+					
+					addGui( 'use node material', true, function ( val ) {
+
+						useNodeMaterial = !useNodeMaterial;
+					
+						updateMaterial();
+
+					} );
+					
+					addGui( 'roughness', mtl.roughness, function ( val ) {
+
+						mtl.roughness = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'metalness', mtl.roughness, function ( val ) {
+
+						mtl.metalness = val;
+
+					}, false, 0, 1 );
+					
+					addGui( 'sat. (only node)', sataturation.value, function ( val ) {
+
+						sataturation.value = val;
+						
+						updateMaterial();
+
+					}, false, 0, 2 );
+					
+					break;
+					
 				case 'physical':
 
 					// MATERIAL
@@ -480,8 +572,7 @@
 					//mtl.reflectivity = // reflectivity (float)
 					//mtl.clearCoat = // clearCoat (float)
 					//mtl.clearCoatRoughness = // clearCoatRoughness (float)
-					//mtl.normal = // normalmap (vec3)
-					//mtl.normalScale = // normalmap scale (vec2)
+					//mtl.normal = // normal (vec3)
 					//mtl.emissive = // emissive color (vec3)
 					//mtl.ambient = // ambient color (vec3)
 					//mtl.shadow = // shadowmap (vec3)
@@ -531,8 +622,8 @@
 					mtl.clearCoat = clearCoat;
 					mtl.clearCoatRoughness = clearCoatRoughness;
 					mtl.environment = new THREE.CubeTextureNode( cubemap );
-					mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
-					mtl.normalScale = normalMask;
+					mtl.normal = new THREE.NormalMapNode( new THREE.TextureNode( getTexture( "grassNormal" ) ) );
+					mtl.normal.scale = normalMask;
 
 					// GUI
 
@@ -921,23 +1012,21 @@
 
 					var diffuse = new THREE.TextureNode( getTexture( "brick" ) );
 
-					var bump = new THREE.BumpNode( new THREE.TextureNode( getTexture( "brick" ) ) );
-					bump.scale = new THREE.Vector2Node( - 1.5, - 1.5 );
+					var bumpMap = new THREE.BumpMapNode( new THREE.TextureNode( getTexture( "brick" ) ) );
+					bumpMap.scale = new THREE.FloatNode( .5 );
 
 					mtl.color = diffuse;
-					mtl.normal = bump;
+					mtl.normal = bumpMap;
 
+					// convert BumpMap to NormalMap
+					//bumpMap.toNormalMap = true;
+					//mtl.normal = new THREE.NormalMapNode( bumpMap );
+					
 					// GUI
 
-					addGui( 'scaleX', bump.scale.x, function ( val ) {
+					addGui( 'scale', bumpMap.scale.value, function ( val ) {
 
-						bump.scale.x = val;
-
-					}, false, - 2, 2 );
-
-					addGui( 'scaleY', bump.scale.y, function ( val ) {
-
-						bump.scale.y = val;
+						bumpMap.scale.value = val;
 
 					}, false, - 2, 2 );
 
@@ -1667,8 +1756,8 @@
 					);
 
 					mtl.color = color;
-					mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
-					mtl.normalScale = furScale;
+					mtl.normal = new THREE.NormalMapNode( new THREE.TextureNode( getTexture( "grassNormal" ) ) );
+					mtl.normal.scale = furScale;
 					mtl.environment = mildnessColor;
 					mtl.environmentAlpha = new THREE.Math1Node( viewZ, THREE.Math1Node.INVERT );
 					mtl.shininess = new THREE.FloatNode( 0 );
@@ -1993,7 +2082,7 @@
 					mtl.color = new THREE.FunctionCallNode( keywordsexample, [ new THREE.TextureNode( getTexture( "brick" ) ) ] );
 
 					break;
-
+					
 				case 'varying':
 
 					// MATERIAL
@@ -2001,28 +2090,66 @@
 					mtl = new THREE.PhongNodeMaterial();
 
 					var varying = new THREE.VarNode( "vec3" );
+					varying.value = new THREE.NormalNode( THREE.NormalNode.VIEW );
+					
+					// using BypassNode the NormalNode not apply the value in .transform slot
+					// but set the NormalNode value in VarNode
+					// it can be useful to send values between vertex to fragment shader
+					mtl.transform = new THREE.BypassNode( varying );
+					mtl.color = varying;
+					
+					// you can also set a value in .transform slot, such this expression using FunctionNode
+					mtl.transform = new THREE.BypassNode( varying, new THREE.FunctionNode("position * ( .1 + abs( sin( time ) ) )", "vec3") );
 
+					break;
+					
+				case 'void-function':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var varying = new THREE.VarNode( "vec3" );
+
+					// VERTEX
+					
 					var setMyVar = new THREE.FunctionNode( [
-						"float setMyVar( vec3 pos ) {",
+						"void setMyVar( vec3 pos ) {",
 						// set "myVar" in vertex shader in this example,
 						// can be used in fragment shader too or in rest of the current shader
 						"	myVar = pos;",
-						// it is not accept "void" functions for now!
-						"	return 0.;",
+						
 						"}"
 					].join( "\n" ) );
 
 					// add keyword
 					setMyVar.keywords[ "myVar" ] = varying;
 
-					var transform = new THREE.FunctionNode( "setMyVar( position * .1 ) + position", "vec3", [ setMyVar ] );
+					var transform = new THREE.FunctionNode( "setMyVar( position * .1 )", "vec3" );
+					transform.includes = [ setMyVar ];
 					transform.keywords[ "tex" ] = new THREE.TextureNode( getTexture( "brick" ) );
 
-					mtl.transform = transform;
-					mtl.color = varying;
+					// use BypassNode to "void" functions
+					mtl.transform = new THREE.BypassNode( transform );
+					
+					// FRAGMENT
+					
+					var clipFromPos = new THREE.FunctionNode( [
+						"void clipFromPos( vec3 pos ) {",
+						
+						"	if ( pos.y < .0 ) discard;",
+						
+						"}"
+					].join( "\n" ) );
+					
+					var clipFromPosCall = new THREE.FunctionCallNode( clipFromPos, {
+						pos: varying
+					} );
+					
+					mtl.color = new THREE.BypassNode( clipFromPosCall, varying );
 
-					break;
-
+					break;	
+				
 				case 'readonly':
 
 					// MATERIAL
@@ -2191,7 +2318,7 @@
 
 					rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
 
-					library[ rtTexture.uuid ] = rtTexture;
+					library[ rtTexture.texture.uuid ] = rtTexture.texture;
 
 					var distanceMtl = new THREE.PhongNodeMaterial();
 					distanceMtl.environment = objectDepth;
@@ -2203,7 +2330,7 @@
 
 					mtl = new THREE.StandardNodeMaterial();
 
-					var backSideDepth = new THREE.TextureNode( rtTexture, new THREE.ScreenUVNode( new THREE.ResolutionNode( renderer ) ) );
+					var backSideDepth = new THREE.TextureNode( rtTexture.texture, new THREE.ScreenUVNode( new THREE.ResolutionNode( renderer ) ) );
 
 					var difference = new THREE.OperatorNode(
 						objectDepth,
@@ -2345,21 +2472,19 @@
 		function serialize() {
 
 			var json = mesh.material.toJSON(),
-				loader = new THREE.NodeMaterialLoader( null, library ),
-				material = loader.parse( json );
-
-			mesh.material = material;
-
+				jsonStr = JSON.stringify( json );
+				
 			// replace uuid to url (facilitates the load of textures using url otherside uuid)
 			// example:
 
-			THREE.NodeMaterialLoaderUtils.replaceUUID( json, getTexture( "cloud" ), "cloud" );
+			//THREE.NodeMaterialLoaderUtils.replaceUUID( json, getTexture( "cloud" ), "cloud" );
 
-			// get source
-
-			var jsonStr = JSON.stringify( json );
-
-			console.log( jsonStr );
+			var loader = new THREE.NodeMaterialLoader( null, library ),
+				material = loader.parse( json );
+			
+			mesh.material = material;
+			
+			//console.log( jsonStr );
 
 			// gui
 
@@ -2392,9 +2517,17 @@
 			//mesh.rotation.z += .01;
 
 			// update material animation and/or gpu calcs (pre-renderer)
-			frame.update( delta ).updateNode( mesh.material );
+			
+			frame.update( delta );
+			
+			if ( mesh.material instanceof THREE.NodeMaterial ) {
+			
+				frame.updateNode( mesh.material );
+				
+			}
 
 			// render to texture for sss/translucent material only
+			
 			if ( rtTexture ) {
 
 				scene.overrideMaterial = rtMaterial;

@@ -45,7 +45,7 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 
 			output.push(
 				transform.code,
-				"transformed = " + transform.result + ";"
+				transform.result ? "transformed = " + transform.result + ";" : ''
 			);
 
 		}
@@ -139,6 +139,24 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 
 };
 
+THREE.SpriteNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	// vertex
+	
+	if ( source.transform ) this.transform = source.transform;
+	
+	// fragment
+	
+	this.color = source.color;
+	
+	if ( source.spherical !== undefined ) this.spherical = source.transform;
+	
+	if ( source.alpha ) this.alpha = source.alpha;
+
+};
+
 THREE.SpriteNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -154,6 +172,7 @@ THREE.SpriteNode.prototype.toJSON = function ( meta ) {
 		// fragment
 
 		data.color = this.color.toJSON( meta ).uuid;
+		
 		if ( this.spherical === false ) data.spherical = false;
 
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;

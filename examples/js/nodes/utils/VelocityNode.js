@@ -140,6 +140,16 @@ THREE.VelocityNode.prototype.updateFrame = function ( frame ) {
 
 };
 
+THREE.VelocityNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	if ( source.target ) object.setTarget( source.target );
+	
+	object.setParams( source.params );
+	
+};
+
 THREE.VelocityNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

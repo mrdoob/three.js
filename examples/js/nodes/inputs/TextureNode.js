@@ -37,7 +37,7 @@ THREE.TextureNode.prototype.generate = function ( builder, output ) {
 
 	if ( bias == undefined && builder.requires.bias ) {
 
-		bias = builder.requires.bias.build( builder, 'fv1' );
+		bias = new builder.requires.bias( this ).build( builder, 'fv1' );
 
 	}
 
@@ -46,25 +46,26 @@ THREE.TextureNode.prototype.generate = function ( builder, output ) {
 	if ( this.project ) method = 'texture2DProj';
 	else method = bias ? 'tex2DBias' : 'tex2D';
 
-	if ( bias ) code = method + '(' + tex + ',' + coord + ',' + bias + ')';
-	else code = method + '(' + tex + ',' + coord + ')';
+	if ( bias ) code = method + '( ' + tex + ', ' + coord + ', ' + bias + ' )';
+	else code = method + '( ' + tex + ', ' + coord + ' )';
 
-	if ( builder.isSlot( 'color' ) ) {
-
-		code = 'mapTexelToLinear(' + code + ')';
-
-	} else if ( builder.isSlot( 'emissive' ) ) {
-
-		code = 'emissiveMapTexelToLinear(' + code + ')';
-
-	} else if ( builder.isSlot( 'environment' ) ) {
-
-		code = 'envMapTexelToLinear(' + code + ')';
-
-	}
+	code = builder.getTexelDecodingFunctionFromTexture( code, this.value );
 
 	return builder.format( code, this.type, output );
 
+};
+
+THREE.TextureNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	if ( source.value ) this.value = source.value;
+
+	this.coord = source.coord;
+
+	if ( source.bias ) this.bias = source.bias;
+	if ( source.project !== undefined ) this.project = source.project;
+	
 };
 
 THREE.TextureNode.prototype.toJSON = function ( meta ) {

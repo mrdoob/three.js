@@ -71,8 +71,19 @@ THREE.Math3Node.prototype.generate = function ( builder, output ) {
 
 	}
 
-	return builder.format( this.method + '(' + a + ',' + b + ',' + c + ')', type, output );
+	return builder.format( this.method + '( ' + a + ', ' + b + ', ' + c + ' )', type, output );
 
+};
+
+THREE.Math3Node.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.a = source.a;
+	this.b = source.b;
+	this.c = source.c;
+	this.method = source.method;
+	
 };
 
 THREE.Math3Node.prototype.toJSON = function ( meta ) {

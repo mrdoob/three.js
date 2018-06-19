@@ -31,6 +31,14 @@ THREE.UVNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.UVNode.prototype.copy = function ( source ) {
+		
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.index = source.index;
+	
+};
+
 THREE.UVNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

@@ -29,46 +29,75 @@ THREE.NodeMaterial.types = {
 	m4: 'mat4'
 };
 
-THREE.NodeMaterial.addShortcuts = function ( proto, prop, list ) {
+THREE.NodeMaterial.addShortcuts = function () {
 
-	function applyShortcut( prop, name ) {
+	function applyShortcut( proxy, property, subProperty ) {
 
-		return {
-			get: function () {
+		if ( subProperty ) {
 
-				return this[ prop ][ name ];
+			return {
+				
+				get: function () {
 
-			},
-			set: function ( val ) {
+					return this[ proxy ][ property ][ subProperty ];
 
-				this[ prop ][ name ] = val;
+				},
+				
+				set: function ( val ) {
 
-			}
-		};
+					this[ proxy ][ property ][ subProperty ] = val;
+
+				}
+				
+			};
+
+		} else {
+
+			return {
+				
+				get: function () {
+
+					return this[ proxy ][ property ];
+
+				},
+				
+				set: function ( val ) {
+
+					this[ proxy ][ property ] = val;
+
+				}
+				
+			};
+
+		}
 
 	}
 
-	return ( function () {
+	return function addShortcuts( proto, proxy, list ) {
 
 		var shortcuts = {};
 
 		for ( var i = 0; i < list.length; ++ i ) {
 
-			var name = list[ i ];
+			var data = list[ i ].split( "." ),
+				property = data[0],
+				subProperty = data[1];
 
-			shortcuts[ name ] = applyShortcut( prop, name );
+			shortcuts[ property ] = applyShortcut( proxy, property, subProperty );
 
 		}
 
 		Object.defineProperties( proto, shortcuts );
 
-	} )();
+	};
 
-};
+}();
 
 THREE.NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
 THREE.NodeMaterial.prototype.constructor = THREE.NodeMaterial;
 THREE.NodeMaterial.prototype.type = "NodeMaterial";
+
+THREE.NodeMaterial.prototype.isNodeMaterial = true;
 
 THREE.NodeMaterial.prototype.updateFrame = function ( frame ) {
 
@@ -122,6 +151,7 @@ THREE.NodeMaterial.prototype.build = function ( params ) {
 
 	this.consts = [];
 	this.functions = [];
+	this.structs = [];
 
 	this.updaters = [];
 
@@ -251,8 +281,9 @@ THREE.NodeMaterial.prototype.build = function ( params ) {
 		this.vertexPars,
 		this.getCodePars( this.vertexUniform, 'uniform' ),
 		this.getIncludes( this.consts[ 'vertex' ] ),
+		this.getIncludes( this.structs[ 'vertex' ] ),
 		this.getIncludes( this.functions[ 'vertex' ] ),
-		'void main(){',
+		'void main() {',
 		this.getCodePars( this.vertexTemps ),
 		vertex,
 		this.vertexCode,
@@ -264,14 +295,15 @@ THREE.NodeMaterial.prototype.build = function ( params ) {
 		this.fragmentPars,
 		this.getCodePars( this.fragmentUniform, 'uniform' ),
 		this.getIncludes( this.consts[ 'fragment' ] ),
+		this.getIncludes( this.structs[ 'fragment' ] ),
 		this.getIncludes( this.functions[ 'fragment' ] ),
-		'void main(){',
+		'void main() {',
 		this.getCodePars( this.fragmentTemps ),
 		this.fragmentCode,
 		fragment,
 		'}'
 	].join( "\n" );
-
+ 
 	if ( params.dispose ) {
 
 		// force update
@@ -497,11 +529,11 @@ THREE.NodeMaterial.prototype.getCodePars = function ( pars, prefix ) {
 		var parsName = pars[ i ].name;
 		var parsValue = pars[ i ].value;
 
-		if ( parsType == 't' && parsValue instanceof THREE.CubeTexture ) parsType = 'tc';
+		if ( parsType === 't' && parsValue instanceof THREE.CubeTexture ) parsType = 'tc';
 
-		var type = THREE.NodeMaterial.types[ parsType ];
+		var type = THREE.NodeMaterial.types[ parsType ] || parsType;
 
-		if ( type == undefined ) throw new Error( "Node pars " + parsType + " not found." );
+		if ( type === undefined ) throw new Error( "Node pars " + parsType + " not found." );
 
 		code += prefix + ' ' + type + ' ' + parsName + ';\n';
 
@@ -557,47 +589,79 @@ THREE.NodeMaterial.prototype.include = function ( builder, node, parent, source 
 
 		includes = this.consts[ builder.shader ] = this.consts[ builder.shader ] || [];
 
-	}
+	} else if ( node instanceof THREE.StructNode ) {
 
-	var included = includes[ node.name ];
-
-	if ( ! included ) {
-
-		included = includes[ node.name ] = {
-			node: node,
-			deps: []
-		};
-
-		includes.push( included );
-
-		included.src = node.build( builder, 'source' );
+		includes = this.structs[ builder.shader ] = this.structs[ builder.shader ] || [];
 
 	}
 
-	if ( node instanceof THREE.FunctionNode && parent && includes[ parent.name ] && includes[ parent.name ].deps.indexOf( node ) == - 1 ) {
+	if (node) {
+	
+		var included = includes[ node.name ];
 
-		includes[ parent.name ].deps.push( node );
+		if ( ! included ) {
 
-		if ( node.includes && node.includes.length ) {
+			included = includes[ node.name ] = {
+				node: node,
+				deps: []
+			};
 
-			var i = 0;
+			includes.push( included );
 
-			do {
-
-				this.include( builder, node.includes[ i ++ ], parent );
-
-			} while ( i < node.includes.length );
+			included.src = node.build( builder, 'source' );
 
 		}
 
+		if ( node instanceof THREE.FunctionNode && parent && includes[ parent.name ] && includes[ parent.name ].deps.indexOf( node ) == - 1 ) {
+
+			includes[ parent.name ].deps.push( node );
+
+			if ( node.includes && node.includes.length ) {
+
+				var i = 0;
+
+				do {
+
+					this.include( builder, node.includes[ i ++ ], parent );
+
+				} while ( i < node.includes.length );
+
+			}
+
+		}
+
+		if ( source ) {
+
+			included.src = source;
+
+		}
+		
+	} else {
+		
+		throw new Error("Include not found.");
+		
 	}
 
-	if ( source ) {
+};
 
-		included.src = source;
-
+THREE.NodeMaterial.prototype.copy = function ( source ) {
+	
+	var uuid = this.uuid;
+	
+	for (var name in source) {
+		
+		this[name] = source[name];
+		
 	}
-
+	
+	this.uuid = uuid;
+	
+	if ( source.userData !== undefined) {
+		
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		
+	}
+	
 };
 
 THREE.NodeMaterial.prototype.toJSON = function ( meta ) {
@@ -625,30 +689,42 @@ THREE.NodeMaterial.prototype.toJSON = function ( meta ) {
 
 		if ( this.name !== "" ) data.name = this.name;
 
+		if ( this.size !== undefined ) data.size = this.size;
+		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
+
 		if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
 		if ( this.flatShading === true ) data.flatShading = this.flatShading;
 		if ( this.side !== THREE.FrontSide ) data.side = this.side;
+		if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
 
-		if ( this.transparent === true ) data.transparent = this.transparent;
+		if ( this.depthFunc !== THREE.LessEqualDepth ) data.depthFunc = this.depthFunc;
+		if ( this.depthTest === false ) data.depthTest = this.depthTest;
+		if ( this.depthWrite === false ) data.depthWrite = this.depthWrite;
 
-		data.depthFunc = this.depthFunc;
-		data.depthTest = this.depthTest;
-		data.depthWrite = this.depthWrite;
+		if ( this.linewidth !== 1 ) data.linewidth = this.linewidth;
+		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
+		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
+		if ( this.scale !== undefined ) data.scale = this.scale;
 
+		if ( this.dithering === true ) data.dithering = true;
+		
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
+		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
+		
 		if ( this.morphTargets === true ) data.morphTargets = true;
 		if ( this.skinning === true ) data.skinning = true;
-
-		data.fog = this.fog;
-		data.lights = this.lights;
 
 		if ( this.visible === false ) data.visible = false;
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
+		data.fog = this.fog;
+		data.lights = this.lights;
+		
 		data.vertex = this.vertex.toJSON( meta ).uuid;
 		data.fragment = this.fragment.toJSON( meta ).uuid;
 

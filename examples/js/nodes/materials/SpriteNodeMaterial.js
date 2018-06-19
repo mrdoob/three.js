@@ -4,9 +4,9 @@
 
 THREE.SpriteNodeMaterial = function () {
 
-	this.node = new THREE.SpriteNode();
+	var node = new THREE.SpriteNode();
 
-	THREE.NodeMaterial.call( this, this.node, this.node );
+	THREE.NodeMaterial.call( this, node, node );
 
 	this.type = "SpriteNodeMaterial";
 
@@ -15,5 +15,9 @@ THREE.SpriteNodeMaterial = function () {
 THREE.SpriteNodeMaterial.prototype = Object.create( THREE.NodeMaterial.prototype );
 THREE.SpriteNodeMaterial.prototype.constructor = THREE.SpriteNodeMaterial;
 
-THREE.NodeMaterial.addShortcuts( THREE.SpriteNodeMaterial.prototype, 'node',
-	[ 'color', 'alpha', 'transform', 'spherical' ] );
+THREE.NodeMaterial.addShortcuts( THREE.SpriteNodeMaterial.prototype, 'fragment', [ 
+	'color', 
+	'alpha', 
+	'transform', 
+	'spherical' 
+] );

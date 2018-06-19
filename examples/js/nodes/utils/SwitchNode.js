@@ -72,6 +72,15 @@ THREE.SwitchNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.SwitchNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.node = source.node;
+	this.components = source.components;
+	
+};
+
 THREE.SwitchNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

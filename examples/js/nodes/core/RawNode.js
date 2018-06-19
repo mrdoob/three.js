@@ -22,7 +22,7 @@ THREE.RawNode.prototype.generate = function ( builder ) {
 
 	var code = data.code + '\n';
 
-	if ( builder.shader == 'vertex' ) {
+	if ( builder.isShader( 'vertex' ) ) {
 
 		code += 'gl_Position = ' + data.result + ';';
 
@@ -34,6 +34,14 @@ THREE.RawNode.prototype.generate = function ( builder ) {
 
 	return code;
 
+};
+
+THREE.RawNode.prototype.copy = function ( source ) {
+	
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.value = source.value;
+	
 };
 
 THREE.RawNode.prototype.toJSON = function ( meta ) {

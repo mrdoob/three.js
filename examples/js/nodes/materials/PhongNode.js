@@ -47,6 +47,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 			"#endif",
 
 			"#include <common>",
+			"#include <encodings_pars_fragment>", // encoding functions
 			"#include <fog_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
 			"#include <skinning_pars_vertex>",
@@ -74,7 +75,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 
 			output.push(
 				transform.code,
-				"transformed = " + transform.result + ";"
+				transform.result ? "transformed = " + transform.result + ";" : ''
 			);
 
 		}
@@ -167,7 +168,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 			"	vec3 specular = " + specular.result + ";",
 
 			shininess.code,
-			"	float shininess = max(0.0001," + shininess.result + ");",
+			"	float shininess = max( 0.0001, " + shininess.result + " );",
 
 			"	float specularStrength = 1.0;" // Ignored in MaterialNode ( replace to specular )
 		];
@@ -183,19 +184,11 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 
 		if ( normal ) {
 
-			builder.include( 'perturbNormal2Arb' );
-
-			output.push( normal.code );
-
-			if ( normalScale ) output.push( normalScale.code );
-
 			output.push(
-				'normal = perturbNormal2Arb(-vViewPosition,normal,' +
-				normal.result + ',' +
-				new THREE.UVNode().build( builder, 'v2' ) + ',' +
-				( normalScale ? normalScale.result : 'vec2( 1.0 )' ) + ');'
+				normal.code,
+				'normal = ' + normal.result + ';'
 			);
-
+		
 		}
 
 		// optimization for now
@@ -286,6 +279,18 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 
 		}
 
+		switch( builder.material.combine ) {
+
+			case THREE.ENVMAP_BLENDING_MULTIPLY:
+				
+				//output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
+				//outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
+				
+				break;
+			
+			
+		}
+		
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
@@ -311,6 +316,36 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 
 };
 
+THREE.PhongNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	// vertex
+
+	if ( source.transform ) this.transform = source.transform;
+
+	// fragment
+
+	this.color = source.color;
+	this.specular = source.specular;
+	this.shininess = source.shininess;
+
+	if ( source.alpha ) this.alpha = source.alpha;
+
+	if ( source.normal ) this.normal = source.normal;
+
+	if ( source.light ) this.light = source.light;
+	if ( source.shadow ) this.shadow = source.shadow;
+
+	if ( source.ao ) this.ao = source.ao;
+	
+	if ( source.emissive ) this.emissive = source.emissive;
+	if ( source.ambient ) this.ambient = source.ambient;
+
+	if ( source.environment ) this.environment = source.environment;
+	if ( source.environmentAlpha ) this.environmentAlpha = source.environmentAlpha;
+
+};
 
 THREE.PhongNode.prototype.toJSON = function ( meta ) {
 
@@ -333,7 +368,6 @@ THREE.PhongNode.prototype.toJSON = function ( meta ) {
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
 
 		if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
-		if ( this.normalScale ) data.normalScale = this.normalScale.toJSON( meta ).uuid;
 
 		if ( this.light ) data.light = this.light.toJSON( meta ).uuid;
 

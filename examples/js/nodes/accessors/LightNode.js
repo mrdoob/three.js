@@ -32,6 +32,14 @@ THREE.LightNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.LightNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.scope = source.scope;
+	
+};
+
 THREE.LightNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

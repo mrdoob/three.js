@@ -38,6 +38,14 @@ THREE.AttributeNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.AttributeNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.type = source.type;
+	
+};
+
 THREE.AttributeNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -46,7 +54,7 @@ THREE.AttributeNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.out = this.type;
+		data.type = this.type;
 
 	}
 

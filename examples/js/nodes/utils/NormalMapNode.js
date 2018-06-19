@@ -2,15 +2,12 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.NormalMapNode = function ( value, uv, scale, normal, position ) {
+THREE.NormalMapNode = function ( value, scale ) {
 
 	THREE.TempNode.call( this, 'v3' );
 
 	this.value = value;
-	this.scale = scale || new THREE.FloatNode( 1 );
-
-	this.normal = normal || new THREE.NormalNode( THREE.NormalNode.LOCAL );
-	this.position = position || new THREE.PositionNode( THREE.NormalNode.VIEW );
+	this.scale = scale || new THREE.Vector2Node( 1, 1 );
 
 };
 
@@ -22,15 +19,19 @@ THREE.NormalMapNode.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material;
 
-	builder.include( 'perturbNormal2Arb' );
-
 	if ( builder.isShader( 'fragment' ) ) {
 
-		return builder.format( 'perturbNormal2Arb(-' + this.position.build( builder, 'v3' ) + ',' +
-			this.normal.build( builder, 'v3' ) + ',' +
-			this.value.build( builder, 'v3' ) + ',' +
-			this.value.coord.build( builder, 'v2' ) + ',' +
-			this.scale.build( builder, 'v2' ) + ')', this.getType( builder ), output );
+		builder.include( 'perturbNormal2Arb' );
+
+		this.normal = this.normal || new THREE.NormalNode( THREE.NormalNode.VIEW );
+		this.position = this.position || new THREE.PositionNode( THREE.NormalNode.VIEW );
+		this.uv = this.uv || new THREE.UVNode();
+
+		return builder.format( 'perturbNormal2Arb( -' + this.position.build( builder, 'v3' ) + ', ' +
+			this.normal.build( builder, 'v3' ) + ', ' +
+			this.value.build( builder, 'v3' ) + ', ' +
+			this.uv.build( builder, 'v2' ) + ', ' +
+			this.scale.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
 
 	} else {
 
@@ -42,6 +43,15 @@ THREE.NormalMapNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.NormalMapNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.value = source.value;
+	this.scale = source.scale;
+	
+};
+
 THREE.NormalMapNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -50,11 +60,8 @@ THREE.NormalMapNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.value = this.value.uuid;
+		data.value = this.value.toJSON( meta ).uuid;
 		data.scale = this.scale.toJSON( meta ).uuid;
-
-		data.normal = this.normal.toJSON( meta ).uuid;
-		data.position = this.position.toJSON( meta ).uuid;
 
 	}
 

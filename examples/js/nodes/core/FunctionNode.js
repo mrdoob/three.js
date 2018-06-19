@@ -3,21 +3,26 @@
  * @thanks bhouston / https://clara.io/
  */
 
-THREE.FunctionNode = function ( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions ) {
-
-	src = src || '';
+THREE.FunctionNode = function ( src, includesOrType, extensionsOrKeywords, keywordsOrExtensions, includes ) {
 
 	this.isMethod = typeof includesOrType !== "string";
 	this.useKeywords = true;
 
 	THREE.TempNode.call( this, this.isMethod ? null : includesOrType );
 
-	if ( this.isMethod ) this.eval( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions );
-	else this.eval( src, extensionsOrIncludes, keywordsOrExtensions );
+	if ( this.isMethod ) {
+		
+		this.eval( src, includesOrType, extensionsOrKeywords, keywordsOrExtensions );
+		
+	} else {
+		
+		this.eval( src, includes, keywordsOrExtensions, extensionsOrKeywords );
+
+	}
 
 };
 
-THREE.FunctionNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\((.*?)\)/i;
+THREE.FunctionNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i;
 THREE.FunctionNode.rProperties = /[a-z_0-9]+/ig;
 
 THREE.FunctionNode.prototype = Object.create( THREE.TempNode.prototype );
@@ -64,7 +69,7 @@ THREE.FunctionNode.prototype.getIncludeByName = function ( name ) {
 
 THREE.FunctionNode.prototype.generate = function ( builder, output ) {
 
-	var match, offset = 0, src = this.value;
+	var match, offset = 0, src = this.src;
 
 	for ( var i = 0; i < this.includes.length; i ++ ) {
 
@@ -78,7 +83,7 @@ THREE.FunctionNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	while ( match = THREE.FunctionNode.rProperties.exec( this.value ) ) {
+	while ( match = THREE.FunctionNode.rProperties.exec( this.src ) ) {
 
 		var prop = match[ 0 ], isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true;
 		var reference = prop;
@@ -131,7 +136,7 @@ THREE.FunctionNode.prototype.generate = function ( builder, output ) {
 
 	} else {
 
-		return builder.format( "(" + src + ")", this.getType( builder ), output );
+		return builder.format( '( ' + src + ' )', this.getType( builder ), output );
 
 	}
 
@@ -139,7 +144,7 @@ THREE.FunctionNode.prototype.generate = function ( builder, output ) {
 
 THREE.FunctionNode.prototype.eval = function ( src, includes, extensions, keywords ) {
 
-	src = ( src || '' ).trim();
+	this.src = src || '';
 
 	this.includes = includes || [];
 	this.extensions = extensions || {};
@@ -147,7 +152,7 @@ THREE.FunctionNode.prototype.eval = function ( src, includes, extensions, keywor
 
 	if ( this.isMethod ) {
 
-		var match = src.match( THREE.FunctionNode.rDeclaration );
+		var match = this.src.match( THREE.FunctionNode.rDeclaration );
 
 		this.inputs = [];
 
@@ -199,8 +204,19 @@ THREE.FunctionNode.prototype.eval = function ( src, includes, extensions, keywor
 
 	}
 
-	this.value = src;
+};
 
+THREE.FunctionNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.isMethod = source.isMethod;
+	this.useKeywords = source.useKeywords;
+	
+	this.eval( source.src, source.includes, source.extensions, source.keywords );
+
+	if ( source.type !== undefined ) this.type = source.type;
+	
 };
 
 THREE.FunctionNode.prototype.toJSON = function ( meta ) {
@@ -211,11 +227,11 @@ THREE.FunctionNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.src = this.value;
+		data.src = this.src;
 		data.isMethod = this.isMethod;
 		data.useKeywords = this.useKeywords;
 
-		if ( ! this.isMethod ) data.out = this.type;
+		if ( ! this.isMethod ) data.type = this.type;
 
 		data.extensions = JSON.parse( JSON.stringify( this.extensions ) );
 		data.keywords = {};

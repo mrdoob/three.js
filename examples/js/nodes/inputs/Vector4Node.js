@@ -6,7 +6,7 @@ THREE.Vector4Node = function ( x, y, z, w ) {
 
 	THREE.InputNode.call( this, 'v4' );
 
-	this.value = new THREE.Vector4( x, y, z, w );
+	this.value = x instanceof THREE.Vector4 ? x : new THREE.Vector4( x, y, z, w );
 
 };
 
@@ -19,6 +19,14 @@ THREE.NodeMaterial.addShortcuts( THREE.Vector4Node.prototype, 'value', [ 'x', 'y
 THREE.Vector4Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
 	return builder.format( "vec4( " + this.x + ", " + this.y + ", " + this.z + ", " + this.w + " )", type, output );
+
+};
+
+THREE.Vector4Node.prototype.copy = function ( source ) {
+			
+	THREE.InputNode.prototype.copy.call( this, source );
+	
+	this.value.copy( source );
 
 };
 

@@ -16,10 +16,16 @@ THREE.FloatNode.prototype.nodeType = "Float";
 
 THREE.FloatNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
-	var val = this.value;
+	return builder.format( this.value + ( this.value % 1 ? '' : '.0' ), type, output );
 
-	return builder.format( Math.floor( val ) !== val ? val : val + ".0", type, output );
+};
 
+THREE.FloatNode.prototype.copy = function ( source ) {
+			
+	THREE.InputNode.prototype.copy.call( this, source );
+	
+	this.value = source.value;
+	
 };
 
 THREE.FloatNode.prototype.toJSON = function ( meta ) {

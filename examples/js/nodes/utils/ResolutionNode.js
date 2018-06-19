@@ -24,6 +24,14 @@ THREE.ResolutionNode.prototype.updateFrame = function ( frame ) {
 
 };
 
+THREE.ResolutionNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.renderer = source.renderer;
+	
+};
+
 THREE.ResolutionNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

@@ -69,6 +69,18 @@ THREE.JoinNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.JoinNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	for ( var prop in source.inputs ) {
+
+		this[ prop ] = source.inputs[ prop ];
+
+	}
+	
+};
+
 THREE.JoinNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

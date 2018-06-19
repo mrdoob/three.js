@@ -20,6 +20,14 @@ THREE.IntNode.prototype.generateReadonly = function ( builder, output, uuid, typ
 
 };
 
+THREE.IntNode.prototype.copy = function ( source ) {
+			
+	THREE.InputNode.prototype.copy.call( this, source );
+	
+	this.value = source.value;
+	
+};
+
 THREE.IntNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

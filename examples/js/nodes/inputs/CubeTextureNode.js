@@ -34,33 +34,33 @@ THREE.CubeTextureNode.prototype.generate = function ( builder, output ) {
 	var coord = this.coord.build( builder, 'v3' );
 	var bias = this.bias ? this.bias.build( builder, 'fv1' ) : undefined;
 
-	if ( bias == undefined && builder.requires.bias ) {
+	if ( bias === undefined && builder.requires.bias ) {
 
-		bias = builder.requires.bias.build( builder, 'fv1' );
+		bias = new builder.requires.bias( this ).build( builder, 'fv1' );
 
 	}
 
 	var code;
 
-	if ( bias ) code = 'texCubeBias(' + cubetex + ',' + coord + ',' + bias + ')';
-	else code = 'texCube(' + cubetex + ',' + coord + ')';
+	if ( bias ) code = 'texCubeBias( ' + cubetex + ', ' + coord + ', ' + bias + ' )';
+	else code = 'texCube( ' + cubetex + ', ' + coord + ' )';
 
-	if ( builder.isSlot( 'color' ) ) {
-
-		code = 'mapTexelToLinear(' + code + ')';
-
-	} else if ( builder.isSlot( 'emissive' ) ) {
-
-		code = 'emissiveMapTexelToLinear(' + code + ')';
-
-	} else if ( builder.isSlot( 'environment' ) ) {
-
-		code = 'envMapTexelToLinear(' + code + ')';
-
-	}
+	code = builder.getTexelDecodingFunctionFromTexture( code, this.value );
 
 	return builder.format( code, this.type, output );
 
+};
+
+THREE.CubeTextureNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	if ( source.value ) this.value = source.value;
+
+	this.coord = source.coord;
+
+	if ( source.bias ) this.bias = source.bias;
+	
 };
 
 THREE.CubeTextureNode.prototype.toJSON = function ( meta ) {

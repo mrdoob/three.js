@@ -65,21 +65,30 @@ THREE.Math1Node.prototype.generate = function ( builder, output ) {
 	switch ( this.method ) {
 
 		case THREE.Math1Node.NEGATE:
-			result = '(-' + result + ')';
+			result = '( -' + result + ' )';
 			break;
 
 		case THREE.Math1Node.INVERT:
-			result = '(1.0-' + result + ')';
+			result = '( 1.0 - ' + result + ' )';
 			break;
 
 		default:
-			result = this.method + '(' + result + ')';
+			result = this.method + '( ' + result + ' )';
 			break;
 
 	}
 
 	return builder.format( result, type, output );
 
+};
+
+THREE.Math1Node.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.a = source.a;
+	this.method = source.method;
+	
 };
 
 THREE.Math1Node.prototype.toJSON = function ( meta ) {

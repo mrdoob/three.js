@@ -15,5 +15,20 @@ THREE.StandardNodeMaterial = function () {
 THREE.StandardNodeMaterial.prototype = Object.create( THREE.NodeMaterial.prototype );
 THREE.StandardNodeMaterial.prototype.constructor = THREE.StandardNodeMaterial;
 
-THREE.NodeMaterial.addShortcuts( THREE.StandardNodeMaterial.prototype, 'node',
-	[ 'color', 'alpha', 'roughness', 'metalness', 'reflectivity', 'clearCoat', 'clearCoatRoughness', 'normal', 'normalScale', 'emissive', 'ambient', 'light', 'shadow', 'ao', 'environment', 'transform' ] );
+THREE.NodeMaterial.addShortcuts( THREE.StandardNodeMaterial.prototype, 'node', [ 
+	'color', 
+	'alpha', 
+	'roughness', 
+	'metalness', 
+	'reflectivity', 
+	'clearCoat', 
+	'clearCoatRoughness', 
+	'normal', 
+	'emissive', 
+	'ambient', 
+	'light', 
+	'shadow', 
+	'ao', 
+	'environment', 
+	'transform' 
+] );

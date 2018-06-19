@@ -22,6 +22,25 @@ THREE.InputNode.prototype.isReadonly = function ( builder ) {
 
 };
 
+
+THREE.InputNode.prototype.copy = function ( source ) {
+	
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	if ( source.readonly !== undefined ) this.readonly = source.readonly;
+	
+};
+
+THREE.InputNode.prototype.createJSONNode = function ( meta ) {
+
+	var data = THREE.GLNode.prototype.createJSONNode.call( this, meta );
+	
+	if ( this.readonly === true ) data.readonly = this.readonly;
+
+	return data;
+
+};
+
 THREE.InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
 	var material = builder.material;

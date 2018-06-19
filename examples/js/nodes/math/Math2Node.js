@@ -95,8 +95,18 @@ THREE.Math2Node.prototype.generate = function ( builder, output ) {
 
 	}
 
-	return builder.format( this.method + '(' + a + ',' + b + ')', this.getType( builder ), output );
+	return builder.format( this.method + '( ' + a + ', ' + b + ' )', this.getType( builder ), output );
 
+};
+
+THREE.Math2Node.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.a = source.a;
+	this.b = source.b;
+	this.method = source.method;
+	
 };
 
 THREE.Math2Node.prototype.toJSON = function ( meta ) {

@@ -30,6 +30,14 @@ THREE.ColorsNode.prototype.generate = function ( builder, output ) {
 
 };
 
+THREE.ColorsNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.index = source.index;
+	
+};
+
 THREE.ColorsNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );

@@ -6,7 +6,7 @@ THREE.Vector2Node = function ( x, y ) {
 
 	THREE.InputNode.call( this, 'v2' );
 
-	this.value = new THREE.Vector2( x, y );
+	this.value = x instanceof THREE.Vector2 ? x : new THREE.Vector2( x, y );
 
 };
 
@@ -19,6 +19,14 @@ THREE.NodeMaterial.addShortcuts( THREE.Vector2Node.prototype, 'value', [ 'x', 'y
 THREE.Vector2Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
 	return builder.format( "vec2( " + this.x + ", " + this.y + " )", type, output );
+
+};
+
+THREE.Vector2Node.prototype.copy = function ( source ) {
+			
+	THREE.InputNode.prototype.copy.call( this, source );
+	
+	this.value.copy( source );
 
 };
 

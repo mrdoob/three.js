@@ -9,6 +9,7 @@ THREE.BlurNode = function ( value, coord, radius, size ) {
 	this.value = value;
 	this.coord = coord || new THREE.UVNode();
 	this.radius = new THREE.Vector2Node( 1, 1 );
+
 	this.size = size;
 
 	this.blurX = true;
@@ -86,18 +87,18 @@ THREE.BlurNode.prototype.generate = function ( builder, output ) {
 
 		if ( this.blurX ) {
 
-			blurCode.push( blurX.name + '(' + this.value.build( builder, 'sampler2D' ) + ',' + this.coord.build( builder, 'v2' ) + ',' + this.horizontal.build( builder, 'fv1' ) + ')' );
+			blurCode.push( blurX.name + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.coord.build( builder, 'v2' ) + ', ' + this.horizontal.build( builder, 'fv1' ) + ' )' );
 
 		}
 
 		if ( this.blurY ) {
 
-			blurCode.push( blurY.name + '(' + this.value.build( builder, 'sampler2D' ) + ',' + this.coord.build( builder, 'v2' ) + ',' + this.vertical.build( builder, 'fv1' ) + ')' );
+			blurCode.push( blurY.name + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.coord.build( builder, 'v2' ) + ', ' + this.vertical.build( builder, 'fv1' ) + ' )' );
 
 		}
 
-		if ( blurCode.length == 2 ) code = '(' + blurCode.join( '+' ) + '/2.0)';
-		else if ( blurCode.length ) code = '(' + blurCode[ 0 ] + ')';
+		if ( blurCode.length == 2 ) code = '( ' + blurCode.join( ' + ' ) + '/ 2.0 )';
+		else if ( blurCode.length ) code = '( ' + blurCode[ 0 ] + ' )';
 		else code = 'vec4( 0.0 )';
 
 		return builder.format( code, this.getType( builder ), output );
@@ -110,6 +111,21 @@ THREE.BlurNode.prototype.generate = function ( builder, output ) {
 
 	}
 
+};
+
+THREE.BlurNode.prototype.copy = function ( source ) {
+			
+	THREE.GLNode.prototype.copy.call( this, source );
+	
+	this.value = source.value;
+	this.coord = source.coord;
+	this.radius = source.radius;
+
+	if ( source.size !== undefined ) this.size = new THREE.Vector2( source.size.x, source.size.y );
+
+	this.blurX = source.blurX;
+	this.blurY = source.blurY;
+					
 };
 
 THREE.BlurNode.prototype.toJSON = function ( meta ) {
