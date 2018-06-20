@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - instancing - lambert shader</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			color: #ffffff;
+			font-family: Monospace;
+			font-size: 13px;
+			text-align: center;
+			font-weight: bold;
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		#info {
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			padding: 5px;
+		}
+
+		a {
+			color: #ffffff;
+		}
+
+		#notSupported {
+			width: 50%;
+			margin: auto;
+			border: 2px red solid;
+			margin-top: 20px;
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="container"></div>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing - lambert shader
+		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+	</div>
+
+	<script src="../build/three.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/CurveExtras.js"></script>
+	<script src="js/libs/dat.gui.min.js"></script>
+
+
+	<script>
+		/*eslint-disable*/
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+
+		var renderer, scene, camera, controls, materials, mesh;
+		var stats, gui, guiProps, guiMap;
+		var guiData = { material: 'MeshStandard', map: 'map' }
+
+		initStuff()
+		initExtension()
+		animate();
+
+		var guis = []
+
+		function onMaterialChange( value ) {
+			
+			if(guiMap) gui.remove(guiMap)
+
+			guiData.map = 'map'
+
+			mesh.material = materials[value]
+
+			guiMap = gui.add( guiData, 'map', mesh.material.userData.extraProps ).onChange(onPropChange)
+
+			onPropChange('map')
+		}
+
+		function onPropChange(value){
+
+			while(guis.length){
+				gui.remove(guis.pop())
+			}
+
+			var u = function(){
+
+				let n = guiData.map
+
+				var texUpdate = mesh.material[`${n}UpdateMatrix`]
+
+				guis.push( gui.add(mesh.material[`${n}Offset`],'x', 0, 5).name(`${n}Offset U`).onChange(texUpdate))
+				guis.push( gui.add(mesh.material[`${n}Offset`],'y', 0, 5).name(`${n}Offset V`).onChange(texUpdate))
+				guis.push( gui.add(mesh.material[`${n}Scale`],'x', 0, 5).name(`${n}Scale U`).onChange(texUpdate))
+				guis.push( gui.add(mesh.material[`${n}Scale`],'y', 0, 5).name(`${n}Scale V`).onChange(texUpdate))
+				guis.push( gui.add(mesh.material, `${n}Rotation`, 0, Math.PI * 2).name(`${n}Rotation`).onChange(texUpdate))
+				
+				guis.push( gui.add(mesh.material,'transparent') )
+			}
+
+			if(!mesh.material.userData.extraProps){
+				setTimeout(u,100)
+			} else {
+				u()
+			}
+		} 
+
+
+		function initGUI(){
+
+			gui = new dat.GUI()
+
+			gui.add( 
+
+				guiData, 
+				'material', 
+				[
+					'MeshPhong',
+					'MeshStandard',
+				] 
+
+			).onChange(onMaterialChange)
+
+			onMaterialChange(guiData.material)
+
+		}
+
+
+		function initStuff() {
+
+			//share with other extended examples?
+			// -----------------------------------------------------------------------------
+			
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.enabled = true;
+			document.body.appendChild( renderer.domElement );
+
+			renderer.gammaOutput = true;
+
+			scene = new THREE.Scene();
+
+			scene.fog = new THREE.FogExp2( 0x000000, 0.004 );
+			renderer.setClearColor( scene.fog.color, 1 );
+
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.set( 80, 40, 80 );
+
+			scene.add( camera );
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.enableZoom = false;
+			controls.maxPolarAngle = Math.PI / 2;
+
+			scene.add( new THREE.AmbientLight( 0xffffff, 0.7 ) );
+
+			var light = new THREE.DirectionalLight( 0xffffff, 0.4 );
+			light.position.set( 50, 40, 0 );
+
+			light.castShadow = true;
+			light.shadow.camera.left = - 40;
+			light.shadow.camera.right = 40;
+			light.shadow.camera.top = 40;
+			light.shadow.camera.bottom = - 40;
+			light.shadow.camera.near = 10;
+			light.shadow.camera.far = 180;
+
+			light.shadow.bias = - 0.001;
+			light.shadow.mapSize.width = 512;
+			light.shadow.mapSize.height = 512;
+
+			scene.add( light );
+
+			var ground = new THREE.Mesh(
+				new THREE.PlaneBufferGeometry( 800, 800 ).rotateX( - Math.PI / 2 ),
+				new THREE.MeshPhongMaterial( { color: 0x888888 } )
+			);
+			ground.position.set( 0, - 40, 0 );
+			ground.receiveShadow = true;
+
+			scene.add( ground );
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			// -----------------------------------------------------------------------------
+		}
+
+		function initExtension() {
+
+			// some textures ----------------------------------------------------------------------
+			
+
+			var texture = new THREE.TextureLoader().load( `textures/roughness_map.jpg` )
+			texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+			//an environment map
+			var envMap = new THREE.TextureLoader().load( `textures/metal.jpg`, function ( texture ) {
+
+				texture.mapping = THREE.SphericalReflectionMapping;
+				texture.encoding = THREE.sRGBEncoding;
+
+				mesh = new THREE.Mesh( new THREE.SphereGeometry(10,32,16), materials[guiData.material] )
+
+				scene.add( mesh );
+
+			} );
+
+			// example ----------------------------------------------------------------------
+			var setUvTransform = function ( tx, ty, sx, sy, rotation, cx, cy ) {
+
+				var c = Math.cos( rotation );
+				var s = Math.sin( rotation );
+ 
+				this.set(
+					sx * c, sx * s, - sx * ( c * cx + s * cy ) + cx + tx,
+					- sy * s, sy * c, - sy * ( - s * cx + c * cy ) + cy + ty,
+					0, 0, 0
+				);
+
+			}
+			
+			//create an instance of various types of materials
+			materials = {
+
+				MeshPhong: new THREE.MeshPhongMaterial({ 
+					color: 0xffb54a,
+					envMap: envMap,
+					fog: true,
+					transparent: true
+				}),
+
+				MeshStandard: new THREE.MeshStandardMaterial({
+					color: 0xffb54a,
+					envMap: envMap,
+					metalness: 1,
+					roughness: 1,
+					fog: true,
+					transparent: true
+				}),
+
+			}
+
+			var validMaps = {
+				'map': true,
+				'roughnessMap': true,
+				'metalnessMap': true,
+				// 'normalMap': true,
+				'alphaMap': true,
+				'specularMap': true
+			}
+
+			/**
+			 * HACK:
+			 * this is actually "onBeforeParse" along with "onBeforeCompile"
+			 * for this effect to work, it would actually be beneficial to do it
+			 * in "onAfterParse" but before compilation, 
+			 * it is safe to pre parse the includes which we can do like so:
+			 */
+			var pattern = /#include <(.*)>/gm
+
+			function parseIncludes( string ){
+				function replace( match , include ){
+					var replace = THREE.ShaderChunk[ include ]
+					return parseIncludes( replace )
+				}
+				return string.replace( pattern, replace )
+			}
+
+			/**
+			 * Solution:
+			 *
+			 * we can look for where vUv is used and extend those maps with their own
+			 * transform uniform, for this simple example we are going to use a vec4 to store
+			 * a per channel offset and scale
+			 */
+			
+			//look for maps that are mapped with vUv
+			var mapRegex = /texture2D\( (.*Map|map), vUv \)/gm
+
+ 			//TODO: refactor this so props are created syncroncously (and props)
+			var onBeforeCompile = function ( shader ) {
+
+				var prependUniforms = ''
+				var _this = this
+
+				function replaceMaps( string ){
+
+					function replace( match, mapName ) {
+
+						if(!validMaps[mapName]) return match
+
+						let uniformName = `u_${mapName}Transform`
+
+						prependUniforms += `uniform mat3 ${uniformName};\n`
+						shader.uniforms[uniformName] = _this.userData.extraUniforms[uniformName]
+						shader.uniforms[uniformName].name = uniformName
+						var replace = `texture2D( ${mapName}, ( ${uniformName} * vec3( vUv, 1. ) ).xy )`
+
+
+						return replaceMaps( replace ) 
+					}
+
+					return string.replace( mapRegex, replace )
+				}
+
+				shader.fragmentShader = parseIncludes(shader.fragmentShader) //"unroll" the entire shader
+				shader.fragmentShader = replaceMaps(shader.fragmentShader) //patch in the mapping stuff
+
+				shader.fragmentShader = prependUniforms + shader.fragmentShader
+
+				//init here so it can take params
+				if(!gui) initGUI()
+			}
+
+			//extend these materials
+			for ( materialName in materials ) {
+
+				var material = materials[materialName]
+
+				const extraUniforms = {}
+				material.userData.extraUniforms = extraUniforms
+
+				const extraProps = []
+				material.userData.extraProps = extraProps
+
+				for ( var mapName in validMaps ){
+
+					if(material[mapName] === null) {
+
+						material[mapName] = texture
+						material[`${mapName}Scale`] = new THREE.Vector2(1,1)
+						material[`${mapName}Offset`] = new THREE.Vector2()
+						material[`${mapName}Rotation`] = 0
+
+						var uniformName = `u_${mapName}Transform`
+
+						var uniform = { value: new THREE.Matrix3() , name: mapName }
+						uniform.value.name = mapName
+						uniform.value.setUvTransform = setUvTransform.bind(uniform.value)
+
+						extraUniforms[uniformName] = uniform 
+						extraProps.push(mapName)
+
+						let _mapName = mapName
+						let _uniformName = uniformName
+
+						material[`${mapName}UpdateMatrix`] = function(){
+							this.userData.extraUniforms[_uniformName].value.setUvTransform( 
+								this[`${_mapName}Offset`].x,
+								this[`${_mapName}Offset`].y, 
+								this[`${_mapName}Scale`].x,
+								this[`${_mapName}Scale`].y, 
+								this[`${_mapName}Rotation`], 
+								0, 
+								0
+							)
+						}.bind(material)
+
+					}
+
+				}
+
+				material.onBeforeCompile = onBeforeCompile.bind( material )
+
+			}
+
+		}
+
+		function onWindowResize( event ) {
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			if(mesh) mesh.rotation.y += 0.005
+
+			stats.update();
+
+			renderer.render( scene, camera );
+
+		}
+
+
+	</script>
+
+</body>
+
+</html>
