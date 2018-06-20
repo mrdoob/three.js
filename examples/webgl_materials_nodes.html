@@ -492,6 +492,8 @@
 					
 						var oldMaterial = mtl;
 					
+						if (oldMaterial) oldMaterial.dispose();
+					
 						mtl = useNodeMaterial ? new THREE.MeshStandardNodeMaterial() : new THREE.MeshStandardMaterial();
 					
 						// default syntax ( backward-compatible )
@@ -553,8 +555,6 @@
 					addGui( 'sat. (only node)', sataturation.value, function ( val ) {
 
 						sataturation.value = val;
-						
-						updateMaterial();
 
 					}, false, 0, 2 );
 					
