@@ -17,7 +17,17 @@ THREE.BypassNode.prototype.nodeType = "Bypass";
 
 THREE.BypassNode.prototype.getType = function ( builder ) {
 
-	return this.value ? this.value.getType( builder ) : 'void';
+	if ( this.value ) {
+		
+		return this.value.getType( builder );
+		
+	} else if (builder.isShader( 'fragment' )) {
+		
+		return 'fv1';
+		
+	}
+	
+	return 'void';
 
 };
 
@@ -25,19 +35,21 @@ THREE.BypassNode.prototype.generate = function ( builder, output ) {
 
 	var code = this.code.build( builder, output ) + ';';
 
-	if ( builder.isShader( 'fragment' ) ) {
+	if ( builder.isShader( 'vertex' ) ) {
 		
-		builder.material.addFragmentNode( code );
+		builder.material.addVertexNode( code );
+		
+		if (this.value) {
+		
+			return this.value.build( builder, output );
+			
+		}
 		
 	} else {
 		
-		builder.material.addVertexNode( code );
-
-	}
-
-	if (this.value) {
+		builder.material.addFragmentNode( code );
 		
-		return this.value.build( builder, output );
+		return this.value ? this.value.build( builder, output ) : builder.format( '0.0', 'fv1', output );
 		
 	}
 
