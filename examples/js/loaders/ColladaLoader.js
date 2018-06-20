@@ -967,7 +967,15 @@ THREE.ColladaLoader.prototype = {
 
 			// setup bind matrix
 
-			build.bindMatrix = new THREE.Matrix4().fromArray( data.bindShapeMatrix ).transpose();
+      if ( data.bindShapeMatrix ) {
+
+        build.bindMatrix = new THREE.Matrix4().fromArray( data.bindShapeMatrix ).transpose(); 
+
+      } else {
+
+        build.bindMatrix = new THREE.Matrix4().transpose(); 
+
+      }
 
 			// process bones and inverse bind matrix data
 
