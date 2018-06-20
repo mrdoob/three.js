@@ -1,0 +1,44 @@
+body {
+  margin: 0;
+  width: 100vw;
+}
+.lesson-main>* {
+    margin: 1em 0;
+}
+.background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    top: 0;
+    z-index: -1000;
+}
+.container {
+    margin: 2em auto;
+    padding: 15px 50px;
+    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.9);
+    max-width: 700px;
+    width: 80%;
+}
+#language {
+    margin-top: -2em;
+    width: auto;
+    font-size: large;
+}
+.rss {
+   float:right;
+   width:46px;
+   height:46px;
+}
+.rss img {
+   width: 46px;
+   height: 46px;
+}
+
+
+@media (max-width: 600px) {
+    .container {
+        padding: 15px 20px;
+    }
+}

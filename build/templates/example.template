@@ -1,0 +1,5 @@
+<div class="threejs_example_container">
+  <iframe class="threejs_example" style="{{width}} {{height}}" src="/threejs/resources/editor.html?url={{{examplePath}}}{{{encodedUrl}}}"></iframe>
+  <a class="threejs_center" href="{{{examplePath}}}{{{url}}}" target="_blank">{{{caption}}}</a>
+</div>
+

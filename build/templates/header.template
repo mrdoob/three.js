@@ -1,0 +1,10 @@
+<div class="threejs_navbar">
+  <div>
+    {{{include "build/templates/languages.template"}}}
+    <a href="#toc">{{langInfo.toc}}</a>
+  </div>
+</div>
+<div class="threejs_header">
+  <h1><a href="{{langInfo.home}}">threejsfundamentals.org</a></h1>
+</div>
+

@@ -1,0 +1,6 @@
+<select class="language">
+  {{#each langs}}
+    <option value="{{url}}" {{{selected key="url" value="relUrl" re="index\.html" sub="" }}}>{{language}}</a>
+  {{/each}}
+</select>
+

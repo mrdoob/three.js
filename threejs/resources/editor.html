@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<style>
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+body {
+    margin: 0;
+    font-family: sans-serif;
+    overflow: hidden;
+    height: 100vh;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+}
+iframe {
+    display: block;
+    border: none;
+}
+.frame {
+    min-width: 100vw;
+    min-height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #444;
+    color: #AAA;
+}
+.tabs {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #666;
+}
+.panes {
+    display: flex;
+    flex: 1 1 auto;
+}
+.panes>div {
+    display: none;
+    flex: 1 1 50%;
+    position: relative;
+    overflow: hidden;
+    /*
+    this calc is to get things to work in safari.
+    but firefox and chrome will let chidren of
+    the panes go 100% size but not safarai
+    */
+    height: calc(100vh - 2.5em - 5px - 1px);
+}
+.panes>div.other {
+    display: block
+}
+.editor {
+    g-overflow: auto;
+}
+.result {
+    overflow: auto;
+}
+.result>iframe {
+    width: 100%;
+    height: 100%;
+    background: white;
+}
+.other>div,
+.other>div>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    font-size: xx-large;
+}
+.other>div {
+    height: 100%;
+    flex-direction: column;
+}
+
+.other .loading {
+    height: 2em;
+    width: 2em;
+    animation: rotate 0.8s infinite linear;
+    border: 0.4em solid #fff;
+    border-right-color: transparent;
+    border-radius: 50%;
+}
+@keyframes rotate {
+    0%    { transform: rotate(0deg); }
+    100%  { transform: rotate(360deg); }
+}
+
+.tabs>div {
+    padding: 0.125em;
+}
+.panebuttons>button {
+    padding: 0.5em;
+    border: none;
+    background: #AAA;
+    border-bottom: 5px solid black;
+    margin: 0.25em;
+    width: 5em;
+}
+.panebuttons>button:focus {
+    outline: none;
+}
+.panelogo {
+    font-size: medium;
+}
+.panelogo>*>* {
+    vertical-align: middle;
+    display: inline-block;
+    color: #CCC;
+}
+.show {
+    background: #FFF !important;
+    border-bottom: none !important;
+    border-top: 5px solid #666 !important;
+}
+.button-result {
+    margin-left: 2em !important;
+}
+.panebuttons>.button-fullscreen {
+    background-image: url(editor-fullscreen-icon.svg);
+    background-size: 80% 80%;
+    background-position: center center;
+    background-repeat: no-repeat no-repeat;
+}
+.fullscreen .panebuttons>.button-fullscreen {
+    background-image: url(editor-unfullscreen-icon.svg) !important;
+}
+
+@media ( max-width: 740px ) {
+    .panelogo>div>a:nth-child(1) {
+        display: none;
+    }
+}
+
+@media ( max-width: 590px ) {
+    .tabs {
+        display: none;
+    }
+    .panes>div {
+        display: none !important;
+        height: auto;
+    }
+    .panes>.result {
+        display: block !important;
+    }
+}
+</style>
+<body>
+<div class="frame">
+    <div class="tabs">
+        <div class="panebuttons">
+            <button class="button-js">JS</button>
+            <button class="button-html">HTML</button>
+            <button class="button-css">CSS</button>
+            <button class="button-codepen">Codepen</button>
+            <button class="button-jsfiddle">JSFiddle</button>
+            <button class="button-result">Result</button>
+            <button class="button-run">Run</button>
+            <button class="button-fullscreen">&nbsp;</button>
+        </div>
+        <div class="panelogo">
+          <div><a href="/">threejsfundamentals&nbsp;</a><a href="/"><img src="/threejs/lessons/resources/threejsfundamentals-icon-256.png" width="32" height="32"/></a></div>
+        </div>
+    </div>
+    <div class="panes">
+        <div class="js"></div>
+        <div class="html"></div>
+        <div class="css"></div>
+        <div class="result"><iframe></iframe></div>
+        <div class="other">
+          <div>
+            <div><a href="/">threejsfundamentals&nbsp;</a><a href="/"><img src="/threejs/lessons/resources/threejsfundamentals-icon-256.png" width="64" height="64"/></a></div>
+            <div class="loading">
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/monaco-editor/min/vs/loader.js"></script>
+<script src="editor.js"></script>
+

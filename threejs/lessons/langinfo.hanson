@@ -1,0 +1,13 @@
+{
+  language: 'English',
+  langCode: 'en',   // if not specified will use folder
+  defaultExampleCaption: "click here to open in a separate window",
+  title: 'three.js fundamentals',
+  description: 'Learn Three.js',
+  link: 'http://threejsfundamentals.org/',
+  commentSectionHeader: '<div>Questions? <a href="http://stackoverflow.com/questions/tagged/three.js">Ask on stackoverflow</a>.</div>\n        <div>Issue/Bug? <a href="http://github.com/greggman/threejsfundamentals/issues">Create an issue on github</a>.</div>',
+  missing: "Sorry this article has not been translated yet. [Translations Welcome](https://github.com/greggman/threejsfundamentals)! 😄\n\n[Here's the original English article for now]({{{origLink}}}).",
+  toc: 'Table of Contents',
+}
+
+

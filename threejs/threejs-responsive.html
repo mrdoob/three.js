@@ -1,0 +1,52 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Fundamentals</title>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script src="resources/threejs/r93/three.min.js"></script>
+<script src="resources/threejs-lessons-helper.js"></script> <!-- you can and should delete this script. it is only used on the site to help with errors -->
+<script>
+'use strict';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+
+  const fov = 75;
+  const aspect = 2;  // the canvas default
+  const zNear = 0.1;
+  const zFar = 1000;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
+  const scene = new THREE.Scene();
+
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  camera.position.z = 2;
+
+  function render(time) {
+    time *= 0.001;
+
+    cube.rotation.x = time;
+    cube.rotation.y = time;
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</script>
+</html>
+
