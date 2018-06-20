@@ -144,7 +144,7 @@
 			spherical: { url: 'textures/envmap.png' }
 		};
 
-		var param = { example: 'mesh-standard' };
+		var param = { example: new URL(window.location.href).searchParams.get('e') || 'mesh-standard' };
 
 		function getTexture( name ) {
 
