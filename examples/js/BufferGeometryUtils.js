@@ -270,7 +270,6 @@ THREE.BufferGeometryUtils = {
 		if ( isIndexed ) {
 
 			var indexOffset = 0;
-
 			var mergedIndex = [];
 
 			for ( var i = 0; i < geometries.length; ++ i ) {
