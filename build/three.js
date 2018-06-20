@@ -3827,9 +3827,31 @@
 
 				if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
+					var url;
+
+					if ( Array.isArray( image ) ) {
+
+						// process array of images e.g. CubeTexture
+
+						url = [];
+
+						for ( var i = 0, l = image.length; i < l; i ++ ) {
+
+							url.push( getDataURL( image[ i ] ) );
+
+						}
+
+					} else {
+
+						// process single image
+
+						url = getDataURL( image );
+
+					}
+
 					meta.images[ image.uuid ] = {
 						uuid: image.uuid,
-						url: getDataURL( image )
+						url: url
 					};
 
 				}
@@ -6641,6 +6663,62 @@
 		convertLinearToGamma: function ( gammaFactor ) {
 
 			this.copyLinearToGamma( this, gammaFactor );
+
+			return this;
+
+		},
+
+		copySRGBToLinear: function () {
+
+			function SRGBToLinear( c ) {
+
+				return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+			}
+
+			return function copySRGBToLinear( color ) {
+
+				this.r = SRGBToLinear( color.r );
+				this.g = SRGBToLinear( color.g );
+				this.b = SRGBToLinear( color.b );
+
+				return this;
+
+			};
+
+		}(),
+
+		copyLinearToSRGB: function () {
+
+			function LinearToSRGB( c ) {
+
+				return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+
+			}
+
+			return function copyLinearToSRGB( color ) {
+
+				this.r = LinearToSRGB( color.r );
+				this.g = LinearToSRGB( color.g );
+				this.b = LinearToSRGB( color.b );
+
+				return this;
+
+			};
+
+		}(),
+
+		convertSRGBToLinear: function () {
+
+			this.copySRGBToLinear( this );
+
+			return this;
+
+		},
+
+		convertLinearToSRGB: function () {
+
+			this.copyLinearToSRGB( this );
 
 			return this;
 
@@ -14291,13 +14369,13 @@
 
 			}
 
-			function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
+			function checkBufferGeometryIntersection( object, material, raycaster, ray, position, uv, a, b, c ) {
 
 				vA.fromBufferAttribute( position, a );
 				vB.fromBufferAttribute( position, b );
 				vC.fromBufferAttribute( position, c );
 
-				var intersection = checkIntersection( object, object.material, raycaster, ray, vA, vB, vC, intersectionPoint );
+				var intersection = checkIntersection( object, material, raycaster, ray, vA, vB, vC, intersectionPoint );
 
 				if ( intersection ) {
 
@@ -14360,24 +14438,64 @@
 					var index = geometry.index;
 					var position = geometry.attributes.position;
 					var uv = geometry.attributes.uv;
-					var i, l;
+					var groups = geometry.groups;
+					var drawRange = geometry.drawRange;
+					var i, j, il, jl;
+					var group, groupMaterial;
+					var start, end;
 
 					if ( index !== null ) {
 
 						// indexed buffer geometry
 
-						for ( i = 0, l = index.count; i < l; i += 3 ) {
+						if ( Array.isArray( material ) ) {
 
-							a = index.getX( i );
-							b = index.getX( i + 1 );
-							c = index.getX( i + 2 );
+							for ( i = 0, il = groups.length; i < il; i ++ ) {
 
-							intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
+								group = groups[ i ];
+								groupMaterial = material[ group.materialIndex ];
 
-							if ( intersection ) {
+								start = Math.max( group.start, drawRange.start );
+								end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
 
-								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
-								intersects.push( intersection );
+								for ( j = start, jl = end; j < jl; j += 3 ) {
+
+									a = index.getX( i );
+									b = index.getX( i + 1 );
+									c = index.getX( i + 2 );
+
+									intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
+
+									if ( intersection ) {
+
+										intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+										intersects.push( intersection );
+
+									}
+
+								}
+
+							}
+
+						} else {
+
+							start = Math.max( 0, drawRange.start );
+							end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
+
+							for ( i = start, il = end; i < il; i += 3 ) {
+
+								a = index.getX( i );
+								b = index.getX( i + 1 );
+								c = index.getX( i + 2 );
+
+								intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
+
+								if ( intersection ) {
+
+									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+									intersects.push( intersection );
+
+								}
 
 							}
 
@@ -14387,18 +14505,54 @@
 
 						// non-indexed buffer geometry
 
-						for ( i = 0, l = position.count; i < l; i += 3 ) {
+						if ( Array.isArray( material ) ) {
 
-							a = i;
-							b = i + 1;
-							c = i + 2;
+							for ( i = 0, il = groups.length; i < il; i ++ ) {
 
-							intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
+								group = groups[ i ];
+								groupMaterial = material[ group.materialIndex ];
 
-							if ( intersection ) {
+								start = Math.max( group.start, drawRange.start );
+								end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
 
-								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
-								intersects.push( intersection );
+								for ( j = start, jl = end; j < jl; j += 3 ) {
+
+									a = j;
+									b = j + 1;
+									c = j + 2;
+
+									intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
+
+									if ( intersection ) {
+
+										intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+										intersects.push( intersection );
+
+									}
+
+								}
+
+							}
+
+						} else {
+
+							start = Math.max( 0, drawRange.start );
+							end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
+
+							for ( i = start, il = end; i < il; i += 3 ) {
+
+								a = i;
+								b = i + 1;
+								c = i + 2;
+
+								intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
+
+								if ( intersection ) {
+
+									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+									intersects.push( intersection );
+
+								}
 
 							}
 
@@ -31716,7 +31870,7 @@
 
 	Object.assign( ImageLoader.prototype, {
 
-		crossOrigin: 'Anonymous',
+		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -31819,7 +31973,7 @@
 
 	Object.assign( CubeTextureLoader.prototype, {
 
-		crossOrigin: 'Anonymous',
+		crossOrigin: 'anonymous',
 
 		load: function ( urls, onLoad, onProgress, onError ) {
 
@@ -31890,7 +32044,7 @@
 
 	Object.assign( TextureLoader.prototype, {
 
-		crossOrigin: 'Anonymous',
+		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -36410,7 +36564,7 @@
 
 	Object.assign( Loader.prototype, {
 
-		crossOrigin: undefined,
+		crossOrigin: 'anonymous',
 
 		onLoadStart: function () {},
 
@@ -36753,6 +36907,8 @@
 
 	Object.assign( JSONLoader.prototype, {
 
+		crossOrigin: 'anonymous',
+
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
@@ -36790,9 +36946,17 @@
 
 		},
 
+		setCrossOrigin: function ( value ) {
+
+			this.crossOrigin = value;
+			return this;
+
+		},
+
 		setTexturePath: function ( value ) {
 
 			this.texturePath = value;
+			return this;
 
 		},
 
@@ -37299,6 +37463,8 @@
 
 	Object.assign( ObjectLoader.prototype, {
 
+		crossOrigin: 'anonymous',
+
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			if ( this.texturePath === '' ) {
@@ -37765,12 +37931,36 @@
 				var loader = new ImageLoader( manager );
 				loader.setCrossOrigin( this.crossOrigin );
 
-				for ( var i = 0, l = json.length; i < l; i ++ ) {
+				for ( var i = 0, il = json.length; i < il; i ++ ) {
 
 					var image = json[ i ];
-					var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
+					var url = image.url;
 
-					images[ image.uuid ] = loadImage( path );
+					if ( Array.isArray( url ) ) {
+
+						// load array of images e.g CubeTexture
+
+						images[ image.uuid ] = [];
+
+						for ( var j = 0, jl = url.length; j < jl; j ++ ) {
+
+							var currentUrl = url[ j ];
+
+							var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.texturePath + currentUrl;
+
+							images[ image.uuid ].push( loadImage( path ) );
+
+						}
+
+					} else {
+
+						// load single image
+
+						var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
+
+						images[ image.uuid ] = loadImage( path );
+
+					}
 
 				}
 
@@ -37812,7 +38002,18 @@
 
 					}
 
-					var texture = new Texture( images[ data.image ] );
+					var texture;
+
+					if ( Array.isArray( images[ data.image ] ) ) {
+
+						texture = new CubeTexture( images[ data.image ] );
+
+					} else {
+
+						texture = new Texture( images[ data.image ] );
+
+					}
+
 					texture.needsUpdate = true;
 
 					texture.uuid = data.uuid;
