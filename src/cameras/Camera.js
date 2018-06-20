@@ -41,13 +41,18 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var quaternion = new Quaternion();
 
-		return function getWorldDirection( optionalTarget ) {
+		return function getWorldDirection( target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.getWorldQuaternion( quaternion );
 
-			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+			return target.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 		};
 

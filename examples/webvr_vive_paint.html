@@ -1,11 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webvr - htc vive - paint</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-02-26 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-02-26" content="ApUnsKNm8cOce0NnJY05mJWYKGaTC2dw9o/+zbrmpEZk/ePiOfxjvcRnKlJUo6zYOrltLnYMcvdWjPTMCJzR1g4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxOTY0ODk5MX0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-07-25 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-07-25" content="AtW06hJFoVWUJTZf5gqymMIlrR60JJi5MsSe44qsHjrCmzDUNmvaTtAVg+K9O9jFpjJtn/W9jvG//hHHaq5HcQoAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzMjUyNjI5OH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-07-21 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-07-21" content="Anlf1R/bCOUxOEgGI/9TWuzHHNxBMfZSTUMDCN7cLwDj2gpLwgA1K0DPwOzO/O0Jwaur5bsHo7k9KXx+6g+82wIAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUzMjE2NjIyNX0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-07-21 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-07-21" content="ArDsXbwATKHPmvQiPlEIWNCt4DlEjB7bLj9vOgoNmL8r38U+wQNYZyUvjQIqqzgACciUUuAnxluTIL7nNkI89gcAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTMyMTY2MjI1fQ==">
 		<style>
 			body {
 				font-family: Monospace;
@@ -69,14 +73,9 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				var user = new THREE.Group();
-				user.position.set( 0, 1.6, 0 );
-				scene.add( user );
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
-				user.add( camera );
 
-				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
+				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
@@ -98,7 +97,7 @@
 				scene.add( table );
 				*/
 
-				var geometry = new THREE.PlaneGeometry( 4, 4 );
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
@@ -142,14 +141,16 @@
 				// controllers
 
 				controller1 = new THREE.PaintViveController( 0 );
+				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
-				user.add( controller1 );
+				scene.add( controller1 );
 
 				controller2 = new THREE.PaintViveController( 1 );
+				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
-				user.add( controller2 );
+				scene.add( controller2 );
 
 				var loader = new THREE.OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
@@ -165,8 +166,8 @@
 					controller.receiveShadow = true;
 
 					// var pivot = new THREE.Group();
-					// var pivot = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 2 ) );
+					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
 					pivot.name = 'pivot';
 					pivot.position.y = -0.016;
 					pivot.position.z = -0.043;
@@ -233,20 +234,22 @@
 				scene.add( line );
 
 				// Shapes
-				shapes[ 'tube' ] = getTubeShapes(1.0);
+				shapes[ 'tube' ] = getTubeShapes( 1.0 );
 			}
 
-			function getTubeShapes(size) {
+			function getTubeShapes( size ) {
 
 				var PI2 = Math.PI * 2;
 
 				var sides = 10;
 				var array = [];
 				var radius = 0.01 * size;
-				for( var i = 0; i < sides; i ++ ){
+
+				for( var i = 0; i < sides; i ++ ) {
 
 					var angle = ( i / sides ) * PI2;
 					array.push( new THREE.Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
+
 				}
 
 				return array;
@@ -414,7 +417,7 @@
 
 			function animate() {
 
-				renderer.animate( render );
+				renderer.setAnimationLoop( render );
 
 			}
 

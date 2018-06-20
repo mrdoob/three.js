@@ -70,6 +70,12 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	isTexture: true,
 
+	updateMatrix: function () {
+
+		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
+
+	},
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
@@ -165,6 +171,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 		}
 
 		var output = {
+
 			metadata: {
 				version: 4.5,
 				type: 'Texture',
@@ -183,11 +190,13 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			wrap: [ this.wrapS, this.wrapT ],
 
+			format: this.format,
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
 			anisotropy: this.anisotropy,
 
 			flipY: this.flipY
+
 		};
 
 		if ( this.image !== undefined ) {
@@ -204,9 +213,31 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
+				var url;
+
+				if ( Array.isArray( image ) ) {
+
+					// process array of images e.g. CubeTexture
+
+					url = [];
+
+					for ( var i = 0, l = image.length; i < l; i ++ ) {
+
+						url.push( getDataURL( image[ i ] ) );
+
+					}
+
+				} else {
+
+					// process single image
+
+					url = getDataURL( image );
+
+				}
+
 				meta.images[ image.uuid ] = {
 					uuid: image.uuid,
-					url: getDataURL( image )
+					url: url
 				};
 
 			}

@@ -11,7 +11,7 @@
  *	by this class.
  */
 
-THREE.PMREMGenerator = function( sourceTexture, samplesPerLevel, resolution ) {
+THREE.PMREMGenerator = function ( sourceTexture, samplesPerLevel, resolution ) {
 
 	this.sourceTexture = sourceTexture;
 	this.resolution = ( resolution !== undefined ) ? resolution : 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
@@ -38,7 +38,7 @@ THREE.PMREMGenerator = function( sourceTexture, samplesPerLevel, resolution ) {
 	 };
 
 	// how many LODs fit in the given CubeUV Texture.
-	this.numLods = Math.log( size ) / Math.log( 2 ) - 2;  // IE11 doesn't support Math.log2
+	this.numLods = Math.log( size ) / Math.log( 2 ) - 2; // IE11 doesn't support Math.log2
 
 	for ( var i = 0; i < this.numLods; i ++ ) {
 
@@ -52,8 +52,8 @@ THREE.PMREMGenerator = function( sourceTexture, samplesPerLevel, resolution ) {
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0.0, 1000 );
 
 	this.shader = this.getShader();
-	this.shader.defines['SAMPLES_PER_LEVEL'] = this.samplesPerLevel;
-	this.planeMesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2, 0 ), this.shader );
+	this.shader.defines[ 'SAMPLES_PER_LEVEL' ] = this.samplesPerLevel;
+	this.planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2, 0 ), this.shader );
 	this.planeMesh.material.side = THREE.DoubleSide;
 	this.scene = new THREE.Scene();
 	this.scene.add( this.planeMesh );
@@ -66,7 +66,7 @@ THREE.PMREMGenerator = function( sourceTexture, samplesPerLevel, resolution ) {
 
 THREE.PMREMGenerator.prototype = {
 
-	constructor : THREE.PMREMGenerator,
+	constructor: THREE.PMREMGenerator,
 
 	/*
 	 * Prashant Sharma / spidersharma03: More thought and work is needed here.
@@ -81,7 +81,7 @@ THREE.PMREMGenerator.prototype = {
 	 * This method requires the most amount of thinking I guess. Here is a paper which we could try to implement in future::
 	 * http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
 	 */
-	update: function( renderer ) {
+	update: function ( renderer ) {
 
 		this.shader.uniforms[ 'envMap' ].value = this.sourceTexture;
 		this.shader.envMap = this.sourceTexture;
@@ -101,7 +101,7 @@ THREE.PMREMGenerator.prototype = {
 
 			var r = i / ( this.numLods - 1 );
 			this.shader.uniforms[ 'roughness' ].value = r * 0.9; // see comment above, pragmatic choice
-			this.shader.uniforms[ 'queryScale' ].value.x = ( i == 0 ) ? -1 : 1;
+			this.shader.uniforms[ 'queryScale' ].value.x = ( i == 0 ) ? - 1 : 1;
 			var size = this.cubeLods[ i ].width;
 			this.shader.uniforms[ 'mapSize' ].value = size;
 			this.renderToCubeMapTarget( renderer, this.cubeLods[ i ] );
@@ -118,17 +118,17 @@ THREE.PMREMGenerator.prototype = {
 
 	},
 
-	renderToCubeMapTarget: function( renderer, renderTarget ) {
+	renderToCubeMapTarget: function ( renderer, renderTarget ) {
 
 		for ( var i = 0; i < 6; i ++ ) {
 
-			this.renderToCubeMapTargetFace( renderer, renderTarget, i )
+			this.renderToCubeMapTargetFace( renderer, renderTarget, i );
 
 		}
 
 	},
 
-	renderToCubeMapTargetFace: function( renderer, renderTarget, faceIndex ) {
+	renderToCubeMapTargetFace: function ( renderer, renderTarget, faceIndex ) {
 
 		renderTarget.activeCubeFace = faceIndex;
 		this.shader.uniforms[ 'faceIndex' ].value = faceIndex;
@@ -136,9 +136,9 @@ THREE.PMREMGenerator.prototype = {
 
 	},
 
-	getShader: function() {
+	getShader: function () {
 
-		return new THREE.ShaderMaterial( {
+		var shaderMaterial = new THREE.ShaderMaterial( {
 
 			defines: {
 				"SAMPLES_PER_LEVEL": 20,
@@ -258,13 +258,27 @@ THREE.PMREMGenerator.prototype = {
 					//rgbColor = testColorMap( roughness ).rgb;\n\
 					gl_FragColor = linearToOutputTexel( vec4( rgbColor, 1.0 ) );\n\
 				}",
-			blending: THREE.CustomBlending,
-			blendSrc: THREE.OneFactor,
-			blendDst: THREE.ZeroFactor,
-			blendSrcAlpha: THREE.OneFactor,
-			blendDstAlpha: THREE.ZeroFactor,
-			blendEquation: THREE.AddEquation
+
+			blending: THREE.NoBlending
+
 		} );
+
+		shaderMaterial.type = 'PMREMGenerator';
+
+		return shaderMaterial;
+
+	},
+
+	dispose: function () {
+
+		for ( var i = 0, l = this.cubeLods.length; i < l; i ++ ) {
+
+			this.cubeLods[ i ].dispose();
+
+		}
+
+		this.planeMesh.geometry.dispose();
+		this.planeMesh.material.dispose();
 
 	}
 

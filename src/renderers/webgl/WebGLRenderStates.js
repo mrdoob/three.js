@@ -4,13 +4,9 @@
 
 import { WebGLLights } from './WebGLLights.js';
 
-var count = 0;
-
 function WebGLRenderState() {
 
-	var id = count ++;
-
-	var lights = new WebGLLights( id );
+	var lights = new WebGLLights();
 
 	var lightsArray = [];
 	var shadowsArray = [];
@@ -36,9 +32,9 @@ function WebGLRenderState() {
 
 	}
 
-	function pushSprite( shadowLight ) {
+	function pushSprite( sprite ) {
 
-		spritesArray.push( shadowLight );
+		spritesArray.push( sprite );
 
 	}
 

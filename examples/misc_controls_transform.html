@@ -64,7 +64,7 @@
 				texture.mapping = THREE.UVMapping;
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
 				control = new THREE.TransformControls( camera, renderer.domElement );

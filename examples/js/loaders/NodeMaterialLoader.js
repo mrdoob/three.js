@@ -184,9 +184,10 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 			switch ( node.type ) {
 
+				case "IntNode":
 				case "FloatNode":
 
-					object.number = node.number;
+					object.value = node.value;
 
 					break;
 
@@ -564,8 +565,6 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 			}
 
-			object.build();
-
 			if ( node.fog !== undefined ) object.fog = node.fog;
 			if ( node.lights !== undefined ) object.lights = node.lights;
 
@@ -579,8 +578,6 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 			object = this.passes[ uuid ];
 
 			object.value = this.getNode( node.value );
-
-			object.build();
 
 		}
 

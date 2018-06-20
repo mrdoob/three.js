@@ -58,6 +58,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 			var localThresholdSq = localThreshold * localThreshold;
 			var position = new Vector3();
+			var intersectPoint = new Vector3();
 
 			function testPoint( point, index ) {
 
@@ -65,7 +66,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				if ( rayPointDistanceSq < localThresholdSq ) {
 
-					var intersectPoint = ray.closestPointToPoint( point );
+					ray.closestPointToPoint( point, intersectPoint );
 					intersectPoint.applyMatrix4( matrixWorld );
 
 					var distance = raycaster.ray.origin.distanceTo( intersectPoint );

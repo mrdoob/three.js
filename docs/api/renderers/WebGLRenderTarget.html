@@ -10,20 +10,20 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			A [link:https://msdn.microsoft.com/en-us/library/ff604997.aspx render target] is a buffer
 			where the video card draws pixels for a scene that	is being rendered in the background.
 			It is used in different effects, such as applying postprocessing to a rendered image
 			before displaying it on the screen.
-		</div>
+		</p>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Number width], [page:Number height], [page:Object options])</h3>
+		<h3>[name]([param:Number width], [param:Number height], [param:Object options])</h3>
 
-		<div>
+		<p>
 		[page:Float width] - The width of the renderTarget. <br />
 		[page:Float height] - The height of the renderTarget.<br />
 		options - (optional object that holds texture parameters for an auto-generated target
@@ -44,82 +44,77 @@
 		[page:Boolean stencilBuffer] - default is *true*. Set this to false if you don't need it.<br /><br />
 
 		Creates a new [name]
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
-		<h3>[property:number uuid]</h3>
-		<div>
-		A unique number for this render target instance.
-		</div>
-
 		<h3>[property:number width]</h3>
-		<div>
+		<p>
 		The width of the render target.
-		</div>
+		</p>
 
 		<h3>[property:number height]</h3>
-		<div>
+		<p>
 		The height of the render target.
-		</div>
+		</p>
 
 		<h3>[property:Vector4 scissor]</h3>
-		<div>
+		<p>
 		A rectangular area inside the render target's viewport. Fragments that are outside the area will be discarded.
-		</div>
+		</p>
 
 		<h3>[property:boolean scissorTest]</h3>
-		<div>
+		<p>
 		Indicates whether the scissor test is active or not.
-		</div>
+		</p>
 
 		<h3>[property:Vector4 viewport]</h3>
-		<div>
+		<p>
 		The viewport of this render target.
-		</div>
+		</p>
 
 		<h3>[property:Texture texture]</h3>
-		<div>
+		<p>
 		This texture instance holds the rendered pixels. Use it as input for further processing.
-		</div>
+		</p>
 
 		<h3>[property:boolean depthBuffer]</h3>
-		<div>
+		<p>
 		Renders to the depth buffer. Default is true.
-		</div>
+		</p>
 
 		<h3>[property:boolean stencilBuffer]</h3>
-		<div>
+		<p>
 		Renders to the stencil buffer. Default is true.
-		</div>
+		</p>
 
 		<h3>[property:DepthTexture depthTexture]</h3>
-		<div>
+		<p>
 		If set, the scene depth will be rendered to this texture. Default is null.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setSize]( [page:Number width], [page:Number height] )</h3>
-		<div>
+		<h3>[method:null setSize]( [param:Number width], [param:Number height] )</h3>
+		<p>
 		Sets the size of the render target.
-		</div>
+		</p>
 
 		<h3>[method:WebGLRenderTarget clone]()</h3>
-		<div>
+		<p>
 		Creates a copy of this render target.
-		</div>
+		</p>
 
-		<h3>[method:WebGLRenderTarget copy]( [page:WebGLRenderTarget source] )</h3>
-		<div>
+		<h3>[method:WebGLRenderTarget copy]( [param:WebGLRenderTarget source] )</h3>
+		<p>
 		Adopts the settings of the given render target.
-		</div>
+		</p>
 
 		<h3>[method:null dispose]()</h3>
-		<div>
+		<p>
 		Dispatches a dispose event.
-		</div>
+		</p>
 
 
 

@@ -2,6 +2,8 @@
  * @author TristanVALCKE / https://github.com/Itee
  */
 
+import './unit/qunit-utils.js';
+
 //src
 import './unit/src/constants.tests';
 import './unit/src/polyfills.tests';

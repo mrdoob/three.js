@@ -213,3 +213,5 @@ function SmartComparer() {
 	}
 
 }
+
+export { SmartComparer };

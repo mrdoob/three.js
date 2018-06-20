@@ -26,6 +26,7 @@
 			<button id="export_scene">Export Scene1</button>
 			<button id="export_scenes">Export Scene1 and Scene 2</button>
 			<button id="export_object">Export Sphere</button>
+			<button id="export_obj">Export WaltHead</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
 			<br/>
@@ -33,11 +34,14 @@
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
 			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
+			<label><input id="option_forceindices" name="visible" type="checkbox">Force indices</label>
+			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
 		</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/exporters/GLTFExporter.js"></script>
 
 		<script>
@@ -50,7 +54,9 @@
 					trs: document.getElementById('option_trs').checked,
 					onlyVisible: document.getElementById('option_visible').checked,
 					truncateDrawRange: document.getElementById('option_drawrange').checked,
-					binary: document.getElementById('option_binary').checked
+					binary: document.getElementById('option_binary').checked,
+					forceIndices: document.getElementById('option_forceindices').checked,
+					forcePowerOfTwoTextures: document.getElementById('option_forcepot').checked
 				};
 				gltfExporter.parse( input, function( result ) {
 
@@ -85,6 +91,12 @@
 			document.getElementById( 'export_object' ).addEventListener( 'click', function () {
 
 				exportGLTF( sphere );
+
+			} );
+
+			document.getElementById( 'export_obj' ).addEventListener( 'click', function () {
+
+				exportGLTF( waltHead );
 
 			} );
 
@@ -133,7 +145,7 @@
 			var container;
 
 			var camera, object, scene1, scene2, renderer;
-			var gridHelper, sphere;
+			var gridHelper, sphere, waltHead;
 
 			init();
 			animate();
@@ -270,7 +282,7 @@
 				object.name = "Cube";
 				scene1.add( object );
 
-				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40, 2, 2, 2 ), material );
+				var object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
 				object2.name = "SubCube";
@@ -289,7 +301,7 @@
 				group2.position.set( 0, 50, 0);
 				group1.add( group2 );
 
-				var object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
+				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 0, 400 );
 				group2.add( object2 );
@@ -428,7 +440,7 @@
 				// ---------------------------------------------------------------------
 				// Ortho camera
 				// ---------------------------------------------------------------------
-				var cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
+				var cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 0.1, 10 );
 				scene1.add( cameraOrtho );
 				cameraOrtho.name = 'OrthographicCamera';
 
@@ -473,6 +485,20 @@
 				object.name = "CubeHidden";
 				object.visible = false;
 				scene1.add( object );
+
+				// ---------------------------------------------------------------------
+				//
+				//
+				var loader = new THREE.OBJLoader();
+				loader.load( 'models/obj/walt/WaltHead.obj', function ( obj ) {
+
+					waltHead = obj;
+					waltHead.scale.multiplyScalar( 1.5 );
+					waltHead.position.set(400, 0, 0);
+					scene1.add( waltHead );
+
+				} );
+
 
 				// ---------------------------------------------------------------------
 				// 2nd Scene

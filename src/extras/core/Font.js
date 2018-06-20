@@ -18,13 +18,12 @@ Object.assign( Font.prototype, {
 
 	isFont: true,
 
-	generateShapes: function ( text, size, divisions ) {
+	generateShapes: function ( text, size ) {
 
 		if ( size === undefined ) size = 100;
-		if ( divisions === undefined ) divisions = 4;
 
 		var shapes = [];
-		var paths = createPaths( text, size, divisions, this.data );
+		var paths = createPaths( text, size, this.data );
 
 		for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
 
@@ -38,9 +37,9 @@ Object.assign( Font.prototype, {
 
 } );
 
-function createPaths( text, size, divisions, data ) {
+function createPaths( text, size, data ) {
 
-	var chars = String( text ).split( '' );
+	var chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // see #13988
 	var scale = size / data.resolution;
 	var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 
@@ -59,7 +58,7 @@ function createPaths( text, size, divisions, data ) {
 
 		} else {
 
-			var ret = createPath( char, divisions, scale, offsetX, offsetY, data );
+			var ret = createPath( char, scale, offsetX, offsetY, data );
 			offsetX += ret.offsetX;
 			paths.push( ret.path );
 
@@ -71,7 +70,7 @@ function createPaths( text, size, divisions, data ) {
 
 }
 
-function createPath( char, divisions, scale, offsetX, offsetY, data ) {
+function createPath( char, scale, offsetX, offsetY, data ) {
 
 	var glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
 

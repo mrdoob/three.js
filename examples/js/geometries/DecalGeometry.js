@@ -22,8 +22,6 @@
 
 		THREE.BufferGeometry.call( this );
 
-		this.type = 'DecalGeometry';
-
 		// buffers
 
 		var vertices = [];
@@ -150,7 +148,7 @@
 
 			// transform the vertex to world space, then to projector space
 
-			vertex.applyMatrix4( mesh.matrix );
+			vertex.applyMatrix4( mesh.matrixWorld );
 			vertex.applyMatrix4( projectorMatrixInverse );
 
 			decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );

@@ -26,7 +26,7 @@ THREE.VRMLLoader.prototype = {
 
 	recordingFieldname: null,
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -44,6 +44,7 @@ THREE.VRMLLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
@@ -53,12 +54,6 @@ THREE.VRMLLoader.prototype = {
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
 		textureLoader.setCrossOrigin( this.crossOrigin );
-
-		function parseV1() {
-
-			console.warn( 'THREE.VRMLLoader: V1.0 not supported yet.' );
-
-		}
 
 		function parseV2( lines, scene ) {
 
@@ -1103,7 +1098,7 @@ THREE.VRMLLoader.prototype = {
 
 		if ( /V1.0/.exec( header ) ) {
 
-			parseV1( lines, scene );
+			console.warn( 'THREE.VRMLLoader: V1.0 not supported yet.' );
 
 		} else if ( /V2.0/.exec( header ) ) {
 

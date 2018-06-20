@@ -3,6 +3,7 @@
  */
 
 import { Vector3 } from '../math/Vector3.js';
+import { Quaternion } from '../math/Quaternion.js';
 import { Audio } from './Audio.js';
 import { Object3D } from '../core/Object3D.js';
 
@@ -76,14 +77,22 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 	updateMatrixWorld: ( function () {
 
 		var position = new Vector3();
+		var quaternion = new Quaternion();
+		var scale = new Vector3();
+
+		var orientation = new Vector3();
 
 		return function updateMatrixWorld( force ) {
 
 			Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			position.setFromMatrixPosition( this.matrixWorld );
+			var panner = this.panner;
+			this.matrixWorld.decompose( position, quaternion, scale );
 
-			this.panner.setPosition( position.x, position.y, position.z );
+			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+
+			panner.setPosition( position.x, position.y, position.z );
+			panner.setOrientation( orientation.x, orientation.y, orientation.z );
 
 		};
 

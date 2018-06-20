@@ -39,10 +39,10 @@ THREE.BufferGeometryUtils = {
 
 		var tan1 = [], tan2 = [];
 
-		for ( var k = 0; k < nVertices; k ++ ) {
+		for ( var i = 0; i < nVertices; i ++ ) {
 
-			tan1[ k ] = new THREE.Vector3();
-			tan2[ k ] = new THREE.Vector3();
+			tan1[ i ] = new THREE.Vector3();
+			tan2[ i ] = new THREE.Vector3();
 
 		}
 
@@ -117,19 +117,19 @@ THREE.BufferGeometryUtils = {
 
 		}
 
-		for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
+		for ( var i = 0, il = groups.length; i < il; ++ i ) {
 
-			var group = groups[ j ];
+			var group = groups[ i ];
 
 			var start = group.start;
 			var count = group.count;
 
-			for ( var i = start, il = start + count; i < il; i += 3 ) {
+			for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
 				handleTriangle(
-					indices[ i + 0 ],
-					indices[ i + 1 ],
-					indices[ i + 2 ]
+					indices[ j + 0 ],
+					indices[ j + 1 ],
+					indices[ j + 2 ]
 				);
 
 			}
@@ -165,22 +165,231 @@ THREE.BufferGeometryUtils = {
 
 		}
 
-		for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
+		for ( var i = 0, il = groups.length; i < il; ++ i ) {
 
-			var group = groups[ j ];
+			var group = groups[ i ];
 
 			var start = group.start;
 			var count = group.count;
 
-			for ( var i = start, il = start + count; i < il; i += 3 ) {
+			for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-				handleVertex( indices[ i + 0 ] );
-				handleVertex( indices[ i + 1 ] );
-				handleVertex( indices[ i + 2 ] );
+				handleVertex( indices[ j + 0 ] );
+				handleVertex( indices[ j + 1 ] );
+				handleVertex( indices[ j + 2 ] );
 
 			}
 
 		}
+
+	},
+
+	/**
+	 * @param  {Array<THREE.BufferGeometry>} geometries
+	 * @return {THREE.BufferGeometry}
+	 */
+	mergeBufferGeometries: function ( geometries, useGroups ) {
+
+		var isIndexed = geometries[ 0 ].index !== null;
+
+		var attributesUsed = new Set( Object.keys( geometries[ 0 ].attributes ) );
+		var morphAttributesUsed = new Set( Object.keys( geometries[ 0 ].morphAttributes ) );
+
+		var attributes = {};
+		var morphAttributes = {};
+
+		var mergedGeometry = new THREE.BufferGeometry();
+
+		var offset = 0;
+
+		for ( var i = 0; i < geometries.length; ++ i ) {
+
+			var geometry = geometries[ i ];
+
+			// ensure that all geometries are indexed, or none
+
+			if ( isIndexed !== ( geometry.index !== null ) ) return null;
+
+			// gather attributes, exit early if they're different
+
+			for ( var name in geometry.attributes ) {
+
+				if ( !attributesUsed.has( name ) ) return null;
+
+				if ( attributes[ name ] === undefined ) attributes[ name ] = [];
+
+				attributes[ name ].push( geometry.attributes[ name ] );
+
+			}
+
+			// gather morph attributes, exit early if they're different
+
+			for ( var name in geometry.morphAttributes ) {
+
+				if ( !morphAttributesUsed.has( name ) ) return null;
+
+				if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
+
+				morphAttributes[ name ].push( geometry.morphAttributes[ name ] );
+
+			}
+
+			// gather .userData
+
+			mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
+			mergedGeometry.userData.mergedUserData.push( geometry.userData );
+
+			if ( useGroups ) {
+
+				var count;
+
+				if ( isIndexed ) {
+
+					count = geometry.index.count;
+
+				} else if ( geometry.attributes.position !== undefined ) {
+
+					count = geometry.attributes.position.count;
+
+				} else {
+
+					return null;
+
+				}
+
+				mergedGeometry.addGroup( offset, count, i );
+
+				offset += count;
+
+			}
+
+		}
+
+		// merge indices
+
+		if ( isIndexed ) {
+
+			var indexOffset = 0;
+			var indexList = [];
+
+			for ( var i = 0; i < geometries.length; ++ i ) {
+
+				var index = geometries[ i ].index;
+
+				if ( indexOffset > 0 ) {
+
+					index = index.clone();
+
+					for ( var j = 0; j < index.count; ++ j ) {
+
+						index.setX( j, index.getX( j ) + indexOffset );
+
+					}
+
+				}
+
+				indexList.push( index );
+				indexOffset += geometries[ i ].attributes.position.count;
+
+			}
+
+			var mergedIndex = this.mergeBufferAttributes( indexList );
+
+			if ( !mergedIndex ) return null;
+
+			mergedGeometry.index = mergedIndex;
+
+		}
+
+		// merge attributes
+
+		for ( var name in attributes ) {
+
+			var mergedAttribute = this.mergeBufferAttributes( attributes[ name ] );
+
+			if ( ! mergedAttribute ) return null;
+
+			mergedGeometry.addAttribute( name, mergedAttribute );
+
+		}
+
+		// merge morph attributes
+
+		for ( var name in morphAttributes ) {
+
+			var numMorphTargets = morphAttributes[ name ][ 0 ].length;
+
+			if ( numMorphTargets === 0 ) break;
+
+			mergedGeometry.morphAttributes = mergedGeometry.morphAttributes || {};
+			mergedGeometry.morphAttributes[ name ] = [];
+
+			for ( var i = 0; i < numMorphTargets; ++ i ) {
+
+				var morphAttributesToMerge = [];
+
+				for ( var j = 0; j < morphAttributes[ name ].length; ++ j ) {
+
+					morphAttributesToMerge.push( morphAttributes[ name ][ j ][ i ] );
+
+				}
+
+				var mergedMorphAttribute = this.mergeBufferAttributes( morphAttributesToMerge );
+
+				if ( !mergedMorphAttribute ) return null;
+
+				mergedGeometry.morphAttributes[ name ].push( mergedMorphAttribute );
+
+			}
+
+		}
+
+		return mergedGeometry;
+
+	},
+
+	/**
+	 * @param {Array<THREE.BufferAttribute>} attributes
+	 * @return {THREE.BufferAttribute}
+	 */
+	mergeBufferAttributes: function ( attributes ) {
+
+		var TypedArray;
+		var itemSize;
+		var normalized;
+		var arrayLength = 0;
+
+		for ( var i = 0; i < attributes.length; ++ i ) {
+
+			var attribute = attributes[ i ];
+
+			if ( attribute.isInterleavedBufferAttribute ) return null;
+
+			if ( TypedArray === undefined ) TypedArray = attribute.array.constructor;
+			if ( TypedArray !== attribute.array.constructor ) return null;
+
+			if ( itemSize === undefined ) itemSize = attribute.itemSize;
+			if ( itemSize !== attribute.itemSize ) return null;
+
+			if ( normalized === undefined ) normalized = attribute.normalized;
+			if ( normalized !== attribute.normalized ) return null;
+
+			arrayLength += attribute.array.length;
+
+		}
+
+		var array = new TypedArray( arrayLength );
+		var offset = 0;
+
+		for ( var i = 0; i < attributes.length; ++ i ) {
+
+			array.set( attributes[ i ].array, offset );
+
+			offset += attributes[ i ].array.length;
+
+		}
+
+		return new THREE.BufferAttribute( array, itemSize, normalized );
 
 	}
 

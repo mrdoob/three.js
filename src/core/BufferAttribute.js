@@ -2,7 +2,6 @@ import { Vector4 } from '../math/Vector4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
-import { _Math } from '../math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -16,7 +15,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	}
 
-	this.uuid = _Math.generateUUID();
 	this.name = '';
 
 	this.array = array;
@@ -26,8 +24,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
-
-	this.onUploadCallback = function () {};
 
 	this.version = 0;
 
@@ -47,6 +43,8 @@ Object.assign( BufferAttribute.prototype, {
 
 	isBufferAttribute: true,
 
+	onUploadCallback: function () {},
+
 	setArray: function ( array ) {
 
 		if ( Array.isArray( array ) ) {
@@ -57,6 +55,8 @@ Object.assign( BufferAttribute.prototype, {
 
 		this.count = array !== undefined ? array.length / this.itemSize : 0;
 		this.array = array;
+
+		return this;
 
 	},
 
@@ -70,6 +70,7 @@ Object.assign( BufferAttribute.prototype, {
 
 	copy: function ( source ) {
 
+		this.name = source.name;
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
 		this.count = source.count;
@@ -122,24 +123,6 @@ Object.assign( BufferAttribute.prototype, {
 			array[ offset ++ ] = color.r;
 			array[ offset ++ ] = color.g;
 			array[ offset ++ ] = color.b;
-
-		}
-
-		return this;
-
-	},
-
-	copyIndicesArray: function ( indices ) {
-
-		var array = this.array, offset = 0;
-
-		for ( var i = 0, l = indices.length; i < l; i ++ ) {
-
-			var index = indices[ i ];
-
-			array[ offset ++ ] = index.a;
-			array[ offset ++ ] = index.b;
-			array[ offset ++ ] = index.c;
 
 		}
 

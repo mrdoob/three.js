@@ -81,7 +81,7 @@
 
 				var material = new THREE.MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
 
-				var geometry = new THREE.SphereGeometry( 1, 32, 16, 0, Math.PI );
+				var geometry = new THREE.SphereBufferGeometry( 1, 32, 16, 0, Math.PI );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 

@@ -12,13 +12,13 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Creates 6 cameras that render to a [page:WebGLRenderTargetCube].</div>
+		<p class="desc">Creates 6 cameras that render to a [page:WebGLRenderTargetCube].</p>
 
 		<h2>Examples</h2>
 
-		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
-		<div>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</div>
-		<div>[example:webgl_shading_physical shading / physical ]</div>
+		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
+		<p>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</p>
+		<p>[example:webgl_shading_physical shading / physical ]</p>
 
 		<code>// Create cube camera
 		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
@@ -43,44 +43,44 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Number near], [page:Number far], [page:Number cubeResolution] )</h3>
-		<div>
+		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution] )</h3>
+		<p>
 		near -- The near clipping distance. <br />
 		far -- The far clipping distance <br />
 		cubeResolution -- Sets the length of the cube's edges.
-		</div>
-		<div>
+		</p>
+		<p>
 		Constructs a CubeCamera that contains 6 [page:PerspectiveCamera PerspectiveCameras] that
 		render to a [page:WebGLRenderTargetCube].
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
-		<div>See the base [page:Object3D] class for common properties.</div>
+		<p>See the base [page:Object3D] class for common properties.</p>
 
 		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
-		<div>
+		<p>
 		The cube texture that gets generated.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
-		<div>See the base [page:Object3D] class for common methods.</div>
+		<p>See the base [page:Object3D] class for common methods.</p>
 
 
-		<h3>[method:null update]( [page:WebGLRenderer renderer], [page:Scene scene] )</h3>
-		<div>
+		<h3>[method:null update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
+		<p>
 		renderer -- The current WebGL renderer <br />
 		scene -- The current scene
-		</div>
-		<div>
+		</p>
+		<p>
 		Call this to update the [page:CubeCamera.renderTarget renderTarget].
-		</div>
+		</p>
 
-		<h3>[method:null clear]( [page:WebGLRenderer renderer], [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
-		<div>
+		<h3>[method:null clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
+		<p>
 		Call this to clear the [page:CubeCamera.renderTarget renderTarget] color, depth, and/or stencil buffers.
 		The color buffer is set to the renderer's current clear color. Arguments default to *true*.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

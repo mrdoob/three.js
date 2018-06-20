@@ -69,8 +69,10 @@
 		<script src="js/nodes/FunctionNode.js"></script>
 		<script src="js/nodes/FunctionCallNode.js"></script>
 		<script src="js/nodes/AttributeNode.js"></script>
+		<script src="js/nodes/NodeUniform.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -123,6 +125,7 @@
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+		var frame = new THREE.NodeFrame();
 		var teapot;
 		var controls;
 		var move = false;
@@ -265,6 +268,7 @@
 			
 			var transformer = new THREE.FunctionNode( "position + 0.0 * " + Math.random(), "vec3", [ ]);
 			mtl.transform = transformer;
+
 			// build shader
 			mtl.build();
 
@@ -289,11 +293,15 @@
 		function animate() {
 
 			var delta = clock.getDelta();
+
+			frame.update( delta );
+
 			for (var i = 0; i < meshes.length; i++ ){
-				
-				var mesh = meshes[i]; 
-				mesh.material.updateFrame( delta );
-			
+
+				var mesh = meshes[i];
+
+				frame.updateNode( mesh.material );
+
 			}
 
 			renderer.render( scene, camera );

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLBufferRenderer( gl, extensions, infoRender ) {
+function WebGLBufferRenderer( gl, extensions, info ) {
 
 	var mode;
 
@@ -16,11 +16,7 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		gl.drawArrays( mode, start, count );
 
-		infoRender.calls ++;
-		infoRender.vertices += count;
-
-		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
-		else if ( mode === gl.POINTS ) infoRender.points += count;
+		info.update( count, mode );
 
 	}
 
@@ -35,25 +31,9 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		}
 
-		var position = geometry.attributes.position;
+		extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
-		if ( position.isInterleavedBufferAttribute ) {
-
-			count = position.data.count;
-
-			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
-
-		} else {
-
-			extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
-
-		}
-
-		infoRender.calls ++;
-		infoRender.vertices += count * geometry.maxInstancedCount;
-
-		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
-		else if ( mode === gl.POINTS ) infoRender.points += geometry.maxInstancedCount * count;
+		info.update( count, mode, geometry.maxInstancedCount );
 
 	}
 
