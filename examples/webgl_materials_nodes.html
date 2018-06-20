@@ -484,11 +484,9 @@
 
 					// MATERIAL
 					
-					var useNodeMaterial = true;
-					
 					var sataturation = new THREE.FloatNode( 1 );
 					
-					function updateMaterial() {
+					function updateMaterial( useNodeMaterial ) {
 					
 						var oldMaterial = mtl;
 					
@@ -528,15 +526,13 @@
 
 					}
 
-					updateMaterial();
+					updateMaterial( true );
 					
 					// GUI
 					
 					addGui( 'use node material', true, function ( val ) {
 
-						useNodeMaterial = !useNodeMaterial;
-					
-						updateMaterial();
+						updateMaterial( val );
 
 					} );
 					
