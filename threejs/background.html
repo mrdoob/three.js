@@ -90,7 +90,7 @@ function main() {
   dirLight.shadow.camera.bottom = -d;
   dirLight.shadow.camera.near = 100;
   dirLight.shadow.camera.far = 950;
-  dirLight.shadow.bias = -0.01;
+  dirLight.shadow.bias = -0.005;
 
   if (showHelpers) {
     const dirLightHeper = new THREE.DirectionalLightHelper(dirLight, 10);
