@@ -227,7 +227,9 @@
 
 				renderer.setSize( width, height );
 				composer.setSize( width, height );
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
+				var size = renderer.getDrawingBufferSize();
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / size.width, 1 / size.height );
 
 			}
 

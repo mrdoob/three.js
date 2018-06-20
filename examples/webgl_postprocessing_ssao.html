@@ -146,11 +146,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				// Resize renderTargets
 				ssaoPass.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
-				effectComposer.setSize( newWidth, newHeight );
+				effectComposer.setSize( width, height );
 
 			}
 

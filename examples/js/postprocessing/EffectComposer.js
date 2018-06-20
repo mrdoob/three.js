@@ -146,12 +146,17 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	setSize: function ( width, height ) {
 
-		this.renderTarget1.setSize( width, height );
-		this.renderTarget2.setSize( width, height );
+		var pixelRatio = this.renderer.getPixelRatio();
+
+		var w = width * pixelRatio;
+		var h = height * pixelRatio;
+
+		this.renderTarget1.setSize( w, h );
+		this.renderTarget2.setSize( w, h );
 
 		for ( var i = 0; i < this.passes.length; i ++ ) {
 
-			this.passes[ i ].setSize( width, height );
+			this.passes[ i ].setSize( w, h );
 
 		}
 

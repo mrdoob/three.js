@@ -76,7 +76,8 @@
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				pixelPass.uniforms.resolution.value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
+				var size = renderer.getDrawingBufferSize();
+				pixelPass.uniforms.resolution.value.set( size.width, size.height );
 
 			}
 
