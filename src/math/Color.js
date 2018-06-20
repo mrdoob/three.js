@@ -329,7 +329,7 @@ Object.assign( Color.prototype, {
 
 	},
 
-	copySRGBToLinear: function ( color ) {
+	copySRGBToLinear: function () {
 
 		function SRGBToLinear( c ) {
 
@@ -337,15 +337,19 @@ Object.assign( Color.prototype, {
 
 		}
 
-		this.r = SRGBToLinear( color.r );
-		this.g = SRGBToLinear( color.g );
-		this.b = SRGBToLinear( color.b );
+		return function copySRGBToLinear( color ) {
 
-		return this;
+			this.r = SRGBToLinear( color.r );
+			this.g = SRGBToLinear( color.g );
+			this.b = SRGBToLinear( color.b );
 
-	},
+			return this;
 
-	copyLinearToSRGB: function ( color ) {
+		};
+
+	}(),
+
+	copyLinearToSRGB: function () {
 
 		function LinearToSRGB( c ) {
 
@@ -353,13 +357,17 @@ Object.assign( Color.prototype, {
 
 		}
 
-		this.r = LinearToSRGB( color.r );
-		this.g = LinearToSRGB( color.g );
-		this.b = LinearToSRGB( color.b );
+		return function copyLinearToSRGB( color ) {
 
-		return this;
+			this.r = LinearToSRGB( color.r );
+			this.g = LinearToSRGB( color.g );
+			this.b = LinearToSRGB( color.b );
 
-	},
+			return this;
+
+		};
+
+	}(),
 
 	convertSRGBToLinear: function () {
 
