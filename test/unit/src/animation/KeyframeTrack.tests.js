@@ -4,6 +4,7 @@
 /* global QUnit */
 
 import { KeyframeTrack } from '../../../../src/animation/KeyframeTrack';
+import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
 
 export default QUnit.module( 'Animation', () => {
 
@@ -108,15 +109,35 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "validate", ( assert ) => {
+		QUnit.test( 'validate', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
+
+			track.isValidated = true;
+			assert.ok( track.validate() );
+			assert.ok( track.isValidated );
+
+			track.isValidated = false;
+			assert.notOk( track.validate() );
+			assert.notOk( track.isValidated );
 
 		} );
 
-		QUnit.todo( "optimize", ( assert ) => {
+		QUnit.test( 'optimize', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2, 3, 4 ], [ 0, 0, 0, 0, 1 ] );
+
+			assert.equal( track.values.length, 5 );
+
+			track.isOptimized = true;
+			track.optimize();
+
+			assert.equal( track.values.length, 5 );
+
+			track.isOptimized = false;
+			track.optimize();
+
+			assert.equal( track.values.length, 3 );
 
 		} );
 

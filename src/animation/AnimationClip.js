@@ -28,8 +28,6 @@ function AnimationClip( name, duration, tracks ) {
 
 	}
 
-	this.optimize();
-
 }
 
 Object.assign( AnimationClip, {
@@ -334,6 +332,18 @@ Object.assign( AnimationClip.prototype, {
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
 			this.tracks[ i ].trim( 0, this.duration );
+
+		}
+
+		return this;
+
+	},
+
+	validate: function () {
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			this.tracks[ i ].validate();
 
 		}
 

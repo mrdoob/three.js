@@ -69,7 +69,7 @@
 		<h3>[method:AnimationClip optimize]()</h3>
 		<p>
 			Optimizes each track by removing equivalent sequential keys (which are common in morph target
-			sequences).
+			sequences). Called automatically by [page:AnimationMixer]'s clipAction() method.
 		</p>
 
 		<h3>[method:null resetDuration]()</h3>
@@ -81,6 +81,12 @@
 		<h3>[method:AnimationClip trim]()</h3>
 		<p>
 			Trims all tracks to the clip's duration.
+		</p>
+
+		<h3>[method:AnimationClip validate]()</h3>
+		<p>
+			Performs minimal validation on each track in the clip. Called automatically by
+			[page:AnimationMixer]'s clipAction() method.
 		</p>
 
 

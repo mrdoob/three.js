@@ -34,10 +34,10 @@ function KeyframeTrack( name, times, values, interpolation ) {
 	this.times = AnimationUtils.convertArray( times, this.TimeBufferType );
 	this.values = AnimationUtils.convertArray( values, this.ValueBufferType );
 
-	this.setInterpolation( interpolation || this.DefaultInterpolation );
+	this.isValidated = false;
+	this.isOptimized = false;
 
-	this.validate();
-	this.optimize();
+	this.setInterpolation( interpolation || this.DefaultInterpolation );
 
 }
 
@@ -353,6 +353,8 @@ Object.assign( KeyframeTrack.prototype, {
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
 	validate: function () {
 
+		if ( this.isValidated ) return true;
+
 		var valid = true;
 
 		var valueSize = this.getValueSize();
@@ -423,6 +425,8 @@ Object.assign( KeyframeTrack.prototype, {
 
 		}
 
+		this.isValidated = valid;
+
 		return valid;
 
 	},
@@ -430,6 +434,8 @@ Object.assign( KeyframeTrack.prototype, {
 	// removes equivalent sequential keys as common in morph target sequences
 	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 	optimize: function () {
+
+		if ( this.isOptimized ) return this;
 
 		var times = this.times,
 			values = this.values,
@@ -528,6 +534,8 @@ Object.assign( KeyframeTrack.prototype, {
 			this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
 
 		}
+
+		this.isOptimized = true;
 
 		return this;
 

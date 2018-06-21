@@ -49,16 +49,18 @@
 		<h2>Methods</h2>
 
 
-		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot], [param:Boolean needsValidateAndOptimize])</h3>
 		<p>
 			Returns an [page:AnimationAction] for the passed clip, optionally using a root object different
 			from the mixer's default root. The first parameter can be either an [page:AnimationClip] object
 			or the name of an AnimationClip.<br /><br />
 
-			If an action fitting these parameters doesn't yet exist, it will be created by this method.<br /><br />
+			Automatically calls .validate() and .optimize() on the clip, unless 'needsValidateAndOptimize'
+			parameter is set to false.<br /><br />
 
-			Note: Calling this method several times with the same parameters returns always the same clip
-			instance.
+			If an action fitting the clip and root parameters doesn't yet exist, it will be created by
+			this method. Calling this method several times with the same clip and root parameters always
+			returns the same clip instance.
 		</p>
 
 		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>

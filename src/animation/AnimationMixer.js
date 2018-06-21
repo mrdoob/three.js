@@ -518,7 +518,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// return an action for a clip optionally using a custom root target
 	// object (this method allocates a lot of dynamic memory in case a
 	// previously unknown clip/root combination is specified)
-	clipAction: function ( clip, optionalRoot ) {
+	clipAction: function ( clip, optionalRoot, needsValidateAndOptimize ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
@@ -554,6 +554,13 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// clip must be known when specified via string
 		if ( clipObject === null ) return null;
+
+		if ( needsValidateAndOptimize !== false ) {
+
+			clipObject.validate();
+			clipObject.optimize();
+
+		}
 
 		// allocate all resources required to run it
 		var newAction = new AnimationAction( this, clipObject, optionalRoot );
