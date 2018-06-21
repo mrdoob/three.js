@@ -214,7 +214,7 @@ THREE.BufferGeometryUtils = {
 
 			for ( var name in geometry.attributes ) {
 
-				if ( !attributesUsed.has( name ) ) return null;
+				if ( ! attributesUsed.has( name ) ) return null;
 
 				if ( attributes[ name ] === undefined ) attributes[ name ] = [];
 
@@ -226,7 +226,7 @@ THREE.BufferGeometryUtils = {
 
 			for ( var name in geometry.morphAttributes ) {
 
-				if ( !morphAttributesUsed.has( name ) ) return null;
+				if ( ! morphAttributesUsed.has( name ) ) return null;
 
 				if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
 
@@ -270,34 +270,23 @@ THREE.BufferGeometryUtils = {
 		if ( isIndexed ) {
 
 			var indexOffset = 0;
-			var indexList = [];
+			var mergedIndex = [];
 
 			for ( var i = 0; i < geometries.length; ++ i ) {
 
 				var index = geometries[ i ].index;
 
-				if ( indexOffset > 0 ) {
+				for ( var j = 0; j < index.count; ++ j ) {
 
-					index = index.clone();
-
-					for ( var j = 0; j < index.count; ++ j ) {
-
-						index.setX( j, index.getX( j ) + indexOffset );
-
-					}
+					mergedIndex.push( index.getX( j ) + indexOffset );
 
 				}
 
-				indexList.push( index );
 				indexOffset += geometries[ i ].attributes.position.count;
 
 			}
 
-			var mergedIndex = this.mergeBufferAttributes( indexList );
-
-			if ( !mergedIndex ) return null;
-
-			mergedGeometry.index = mergedIndex;
+			mergedGeometry.setIndex( mergedIndex );
 
 		}
 
@@ -336,7 +325,7 @@ THREE.BufferGeometryUtils = {
 
 				var mergedMorphAttribute = this.mergeBufferAttributes( morphAttributesToMerge );
 
-				if ( !mergedMorphAttribute ) return null;
+				if ( ! mergedMorphAttribute ) return null;
 
 				mergedGeometry.morphAttributes[ name ].push( mergedMorphAttribute );
 
