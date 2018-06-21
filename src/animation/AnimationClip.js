@@ -344,7 +344,7 @@ Object.assign( AnimationClip.prototype, {
 
 	validate: function () {
 
-		if (this.isValidated) return this;
+		if ( this.isValidated ) return this;
 
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
@@ -352,19 +352,23 @@ Object.assign( AnimationClip.prototype, {
 
 		}
 
+		this.isValidated = true;
+
 		return this;
 
 	},
 
 	optimize: function () {
 
-		if (this.isOptimized) return this;
+		if ( this.isOptimized ) return this;
 
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
 			this.tracks[ i ].optimize();
 
 		}
+
+		this.isOptimized = true;
 
 		return this;
 
