@@ -204,8 +204,8 @@
 
 		<h3>[method:null optimize]()</h3>
 		<p>
-			Removes equivalent sequential keys, which are common in morph target sequences. Called
-			automatically by the constructor.
+			Removes equivalent sequential keys, which are common in morph target sequences. Calling this
+			method will set [page:.isOptimized isOptimized] to true, and additional calls will do nothing.
 		</p>
 
 		<h3>[method:null scale]()</h3>
@@ -236,7 +236,7 @@
 
 		<h3>[method:null validate]()</h3>
 		<p>
-			Performs minimal validation on the tracks. Called automatically by the constructor.<br /><br />
+			Performs minimal validation on the tracks.<br /><br />
 			This method logs errors to the console, if a track is empty, if the [page:.valueSize value size] is not valid, if an item
 			in the [page:.times times] or [page:.values values] array is not a valid number or if the items in the *times* array are out of order.
 		</p>

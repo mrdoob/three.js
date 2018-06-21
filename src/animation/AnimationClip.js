@@ -19,6 +19,9 @@ function AnimationClip( name, duration, tracks ) {
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : - 1;
 
+	this.isValidated = false;
+	this.isOptimized = false;
+
 	this.uuid = _Math.generateUUID();
 
 	// this means it should figure out its duration by scanning the tracks
@@ -27,8 +30,6 @@ function AnimationClip( name, duration, tracks ) {
 		this.resetDuration();
 
 	}
-
-	this.optimize();
 
 }
 
@@ -341,7 +342,23 @@ Object.assign( AnimationClip.prototype, {
 
 	},
 
+	validate: function () {
+
+		if (this.isValidated) return this;
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			this.tracks[ i ].validate();
+
+		}
+
+		return this;
+
+	},
+
 	optimize: function () {
+
+		if (this.isOptimized) return this;
 
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
