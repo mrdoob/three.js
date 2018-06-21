@@ -27,7 +27,7 @@ module.exports = function(grunt) {
           'threejs/resources/*.js',
         ],
         options: {
-          config: 'build/conf/eslint.json',
+          configFile: 'build/conf/eslint.json',
           //rulesdir: ['build/rules'],
         },
       },
