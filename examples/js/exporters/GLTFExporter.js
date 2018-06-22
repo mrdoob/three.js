@@ -244,7 +244,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( cachedData.attributes.has( normal ) ) {
 
-				return cachedData.textures.get( normal );
+				return cachedData.attributes.get( normal );
 
 			}
 
