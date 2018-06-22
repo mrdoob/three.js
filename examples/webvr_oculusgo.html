@@ -35,8 +35,6 @@
 
 		<script>
 
-			var clock = new THREE.Clock();
-
 			var container;
 			var camera, scene, renderer;
 			var controller;
@@ -143,7 +141,7 @@
 					OBJ.setPath( 'models/obj/oculus_go_controller/' );
 
 					OBJ.load( 'oculus_go_controller.obj', function ( obj ) {
-	
+
 						obj.translateZ( - 0.03 );
 						controller.add( obj );
 
@@ -171,8 +169,6 @@
 			}
 
 			function render() {
-
-				var delta = clock.getDelta() * 60;
 
 				controller.update();
 
