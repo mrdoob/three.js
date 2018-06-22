@@ -160,7 +160,7 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 function parseIncludes( string ) {
 
-	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
+	var pattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
 
 	function replace( match, include ) {
 
