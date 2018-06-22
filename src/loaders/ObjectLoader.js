@@ -187,6 +187,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			var geometryLoader = new JSONLoader();
 			var bufferGeometryLoader = new BufferGeometryLoader();
+			var helperGeometries = [];
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
@@ -410,6 +411,13 @@ Object.assign( ObjectLoader.prototype, {
 
 						break;
 
+					case 'EdgesGeometry':
+					case 'WireframeGeometry':
+
+						helperGeometries.push( data ); // process these later
+
+						break;
+
 					case 'BufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
@@ -436,6 +444,53 @@ Object.assign( ObjectLoader.prototype, {
 				if ( geometry.isBufferGeometry === true && data.userData !== undefined ) geometry.userData = data.userData;
 
 				geometries[ data.uuid ] = geometry;
+
+			}
+
+			//
+
+			for ( var i = 0, l = helperGeometries.length; i < l; i ++ ) {
+
+				var data = helperGeometries[ i ];
+				var baseGeometry = geometries[ data.geometry ];
+
+				if ( baseGeometry !== undefined ) {
+
+					switch ( data.type ) {
+
+						case 'EdgesGeometry':
+
+							geometry = new Geometries[ data.type ](
+								geometries[ data.geometry ],
+								data.thresholdAngle
+							);
+
+							break;
+
+						case 'WireframeGeometry':
+
+							geometry = new Geometries[ data.type ](
+								geometries[ data.geometry ]
+							);
+
+							break;
+
+					}
+
+					//
+
+					geometry.uuid = data.uuid;
+
+					if ( data.name !== undefined ) geometry.name = data.name;
+					if ( data.userData !== undefined ) geometry.userData = data.userData;
+
+					geometries[ data.uuid ] = geometry;
+
+				} else {
+
+					console.warn( 'THREE.ObjectLoader: No base geometry found with UUID %s for "%s"', data.geometry, data.type );
+
+				}
 
 			}
 

@@ -15,6 +15,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 	this.type = 'EdgesGeometry';
 
 	this.parameters = {
+		geometry: geometry,
 		thresholdAngle: thresholdAngle
 	};
 
@@ -108,6 +109,16 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
 EdgesGeometry.prototype.constructor = EdgesGeometry;
+
+EdgesGeometry.prototype.toJSON = function () {
+
+	var data = BufferGeometry.prototype.toJSON.call( this );
+
+	data.geometry = data.geometry.uuid;
+
+	return data;
+
+};
 
 
 export { EdgesGeometry };
