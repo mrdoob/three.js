@@ -462,17 +462,21 @@ THREE.BufferGeometryUtils = {
 	 * @param {Array<THREE.BufferGeometry>} geometry
 	 * @return {number}
 	 */
-	getMemoryUse: function ( geometry ) {
+	estimateBytesUsed: function ( geometry ) {
 
-		// Return the estimated memory used by this geometry
+		// Return the estimated memory used by this geometry in bytes
+		// Calculate using itemSize, count, and BYTES_PER_ELEMENT to account
+		// for InterleavedBufferAttributes.
 		var mem = 0;
 		for ( var name in geometry.attributes ) {
 
-			mem += geometry.getAttribute( name ).array.byteLength;
+			var attr = geometry.getAttribute( name );
+			mem += attr.count * attr.itemSize * attr.array.BYTES_PER_ELEMENT;
 
 		}
 
-		mem += geometry.getIndex() ? geometry.getIndex().array.byteLength : 0;
+		var indices = geometry.getIndex();
+		mem += indices ? indices.count * indices.itemSize * indices.array.BYTES_PER_ELEMENT : 0;
 		return mem;
 
 	}

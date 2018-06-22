@@ -915,7 +915,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	mergeVertices: function ( precision = 4 ) {
+	mergeVertices: function ( tolerance = 1e-4 ) {
+
+        tolerance = Math.max( tolerance, Number.EPSILON );
 
 		// Generate an index buffer if the geometry doesn't have one, or optimize it
 		// if it's already available.
@@ -933,7 +935,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		var newIndices = [];
 		var getters = [ 'getX', 'getY', 'getZ', 'getW' ];
 
-		var precisionMultiplier = Math.pow( 10, precision + 1 );
+		// convert the error tolerance to an amount of decimal places to truncate to
+		var decimalShift = Math.log10( 1 / tolerance );
+		var shiftMultiplier = Math.pow( 10, decimalShift );
 		for ( var i = 0; i < vertexCount; i ++ ) {
 
 			// Generate a hash for the vertex attributes at the current index 'i'
@@ -947,7 +951,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 				for ( var k = 0; k < itemSize; k ++ ) {
 
 					// double tilde truncates the decimal value
-					hash += `${ ~ ~ ( attribute[ getters[ k ] ]( i ) * precisionMultiplier ) },`;
+					hash += `${ ~ ~ ( attribute[ getters[ k ] ]( i ) * shiftMultiplier ) },`;
 
 				}
 
