@@ -21999,7 +21999,7 @@ function WebXRManager( renderer ) {
 
 					controller.matrix.elements = inputPose.pointerMatrix;
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
-					controller.visible = true;
+					controller.visible = inputPose.emulatedPosition === false;
 
 					continue;
 
