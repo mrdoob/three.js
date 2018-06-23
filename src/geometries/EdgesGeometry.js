@@ -117,7 +117,7 @@ EdgesGeometry.prototype.toJSON = function () {
 
 	if ( geometry.isGeometry ) {
 
-		geometry = geometry.toBufferGeometry();
+		geometry = new BufferGeometry().fromGeometry( geometry );
 
 	} else {
 
