@@ -26,15 +26,13 @@
 	<body>
 
 		<script src="../build/three.js"></script>
-
-		<script src="js/vr/DaydreamController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
 			var container;
 			var camera, scene, renderer;
-			var controller;
+			var controller, isSelecting = false;
 
 			var room;
 
@@ -109,14 +107,24 @@
 
 				//
 
-				controller = new THREE.DaydreamController();
-				controller.position.set( 0.3, 0.75, 0 );
+				controller = renderer.vr.getController( 0 );
+				controller.addEventListener( 'selectstart', function () {
+
+					isSelecting = true;
+
+				} );
+				controller.addEventListener( 'selectend', function () {
+
+					isSelecting = false;
+
+				} );
 				scene.add( controller );
 
 				//
 
-				var controllerHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { linewidth: 2 } ) );
-				controllerHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
+				var controllerHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { vertexColors: true, linewidth: 2, blending: THREE.AdditiveBlending } ) );
+				controllerHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
+				controllerHelper.geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
 				controller.add( controllerHelper );
 
 				//
@@ -144,9 +152,7 @@
 
 			function render() {
 
-				controller.update();
-
-				if ( controller.getTouchpadState() === true ) {
+				if ( isSelecting ) {
 
 					var cube = room.children[ 0 ];
 					room.remove( cube );

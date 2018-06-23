@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { Group } from '../../objects/Group.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
@@ -15,12 +16,15 @@ function WebXRManager( renderer ) {
 	var session = null;
 
 	var frameOfRef = null;
+	var inputSources = [];
 
 	var pose = null;
+	var controllers = {};
 
 	function isPresenting() {
 
 		return session !== null && frameOfRef !== null;
+
 
 	}
 
@@ -42,6 +46,23 @@ function WebXRManager( renderer ) {
 
 	this.enabled = false;
 
+	this.getController = function ( id ) {
+
+		var controller = controllers[ id ];
+
+		if ( controller === undefined ) {
+
+			controller = new Group();
+			controller.matrixAutoUpdate = false;
+
+			controllers[ id ] = controller;
+
+		}
+
+		return controller;
+
+	};
+
 	this.getDevice = function () {
 
 		return device;
@@ -58,18 +79,30 @@ function WebXRManager( renderer ) {
 
 	//
 
+	function onSessionEvent( event ) {
+
+		var controller = controllers[ inputSources.indexOf( event.inputSource ) ];
+		if ( controller ) controller.dispatchEvent( { type: event.type } );
+
+	}
+
+	function onSessionEnd () {
+
+		renderer.setFramebuffer( null );
+		animation.stop();
+
+	}
+
 	this.setSession = function ( value, options ) {
 
 		session = value;
 
 		if ( session !== null ) {
 
-			session.addEventListener( 'end', function () {
-
-				renderer.setFramebuffer( null );
-				animation.stop();
-
-			} );
+			session.addEventListener( 'select', onSessionEvent );
+			session.addEventListener( 'selectstart', onSessionEvent );
+			session.addEventListener( 'selectend', onSessionEvent );
+			session.addEventListener( 'end', onSessionEnd );
 
 			session.baseLayer = new XRWebGLLayer( session, gl );
 			session.requestFrameOfReference( options.frameOfReferenceType ).then( function ( value ) {
@@ -80,6 +113,17 @@ function WebXRManager( renderer ) {
 
 				animation.setContext( session );
 				animation.start();
+
+			} );
+
+			//
+
+			inputSources = session.getInputSources();
+
+			session.addEventListener( 'inputsourceschange', function () {
+
+				inputSources = session.getInputSources();
+				console.log( inputSources );
 
 			} );
 
@@ -176,6 +220,23 @@ function WebXRManager( renderer ) {
 					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
 
 				}
+
+			}
+
+		}
+
+		//
+
+		for ( var i = 0; i < inputSources.length; i ++ ) {
+
+			var inputSource = inputSources[ i ];
+			var inputPose = frame.getInputPose( inputSource, frameOfRef );
+
+			if ( inputPose !== null && controllers[ i ] ) {
+
+				var controller = controllers[ i ];
+				controller.matrix.elements = inputPose.gripMatrix;
+				controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 
 			}
 
