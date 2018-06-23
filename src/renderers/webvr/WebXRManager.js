@@ -150,28 +150,32 @@ function WebXRManager( renderer ) {
 
 		pose = frame.getDevicePose( frameOfRef );
 
-		var layer = session.baseLayer;
-		var views = frame.views;
+		if ( pose !== null ) {
 
-		for ( var i = 0; i < views.length; i ++ ) {
+			var layer = session.baseLayer;
+			var views = frame.views;
 
-			var view = views[ i ];
-			var viewport = layer.getViewport( view );
-			var viewMatrix = pose.getViewMatrix( view );
+			for ( var i = 0; i < views.length; i ++ ) {
 
-			var camera = cameraVR.cameras[ i ];
-			camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
-			camera.projectionMatrix.fromArray( view.projectionMatrix );
-			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+				var view = views[ i ];
+				var viewport = layer.getViewport( view );
+				var viewMatrix = pose.getViewMatrix( view );
 
-			if ( i === 0 ) {
+				var camera = cameraVR.cameras[ i ];
+				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
+				camera.projectionMatrix.fromArray( view.projectionMatrix );
+				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
-				cameraVR.matrix.copy( camera.matrix );
+				if ( i === 0 ) {
 
-				// HACK (mrdoob)
-				// https://github.com/w3c/webvr/issues/203
+					cameraVR.matrix.copy( camera.matrix );
 
-				cameraVR.projectionMatrix.copy( camera.projectionMatrix );
+					// HACK (mrdoob)
+					// https://github.com/w3c/webvr/issues/203
+
+					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
+
+				}
 
 			}
 
