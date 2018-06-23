@@ -113,8 +113,19 @@ EdgesGeometry.prototype.constructor = EdgesGeometry;
 EdgesGeometry.prototype.toJSON = function () {
 
 	var data = BufferGeometry.prototype.toJSON.call( this );
+	var geometry = data.geometry;
 
-	data.geometry = data.geometry.uuid;
+	if ( geometry.isGeometry ) {
+
+		geometry = geometry.toBufferGeometry();
+
+	} else {
+
+		geometry = geometry.clone();
+
+	}
+
+	data.geometry = geometry.toJSON();
 
 	return data;
 
