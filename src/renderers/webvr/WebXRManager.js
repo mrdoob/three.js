@@ -241,7 +241,7 @@ function WebXRManager( renderer ) {
 
 				if ( inputPose !== null ) {
 
-					controller.matrix.elements = inputPose.gripMatrix;
+					controller.matrix.elements = inputPose.pointerMatrix;
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 					controller.visible = true;
 
