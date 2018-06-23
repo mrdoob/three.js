@@ -13,6 +13,10 @@ function WireframeGeometry( geometry ) {
 
 	this.type = 'WireframeGeometry';
 
+	this.parameters = {
+		geometry: geometry
+	};
+
 	// buffer
 
 	var vertices = [];
@@ -174,6 +178,27 @@ function WireframeGeometry( geometry ) {
 
 WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
 WireframeGeometry.prototype.constructor = WireframeGeometry;
+
+WireframeGeometry.prototype.toJSON = function () {
+
+	var data = BufferGeometry.prototype.toJSON.call( this );
+	var geometry = data.geometry;
+
+	if ( geometry.isGeometry ) {
+
+		geometry = new BufferGeometry().fromGeometry( geometry );
+
+	} else {
+
+		geometry = geometry.clone();
+
+	}
+
+	data.geometry = geometry.toJSON();
+
+	return data;
+
+};
 
 
 export { WireframeGeometry };

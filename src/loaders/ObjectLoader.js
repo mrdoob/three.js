@@ -410,6 +410,23 @@ Object.assign( ObjectLoader.prototype, {
 
 						break;
 
+					case 'EdgesGeometry':
+
+						geometry = new Geometries[ data.type ](
+							bufferGeometryLoader.parse( data.geometry ),
+							data.thresholdAngle
+						);
+
+						break;
+
+					case 'WireframeGeometry':
+
+						geometry = new Geometries[ data.type ](
+							bufferGeometryLoader.parse( data.geometry )
+						);
+
+						break;
+
 					case 'BufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
