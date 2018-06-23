@@ -706,6 +706,14 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
+			// for EdgesGeometry and WireframeGeometry
+
+			if ( parameters !== undefined && parameters.geometry !== undefined ) {
+
+				serialize( meta.geometries, parameters.geometry );
+
+			}
+
 		}
 
 		if ( this.material !== undefined ) {

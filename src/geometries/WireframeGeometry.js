@@ -13,6 +13,10 @@ function WireframeGeometry( geometry ) {
 
 	this.type = 'WireframeGeometry';
 
+	this.parameters = {
+		geometry: geometry
+	};
+
 	// buffer
 
 	var vertices = [];
@@ -175,5 +179,14 @@ function WireframeGeometry( geometry ) {
 WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
 WireframeGeometry.prototype.constructor = WireframeGeometry;
 
+WireframeGeometry.prototype.toJSON = function () {
+
+	var data = BufferGeometry.prototype.toJSON.call( this );
+
+	data.geometry = data.geometry.uuid;
+
+	return data;
+
+};
 
 export { WireframeGeometry };
