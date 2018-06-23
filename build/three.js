@@ -21850,7 +21850,7 @@
 
 		}
 
-		function onSessionEnd () {
+		function onSessionEnd() {
 
 			renderer.setFramebuffer( null );
 			animation.stop();
