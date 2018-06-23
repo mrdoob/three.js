@@ -319,11 +319,9 @@ var files = {
 		"webaudio_visualizer"
 	],
 	"webvr": [
+		"webvr_ballshooter",
 		"webvr_cubes",
-		"webvr_daydream",
-		"webvr_gearvr",
 		"webvr_lorenzattractor",
-		"webvr_oculusgo",
 		"webvr_panorama",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
