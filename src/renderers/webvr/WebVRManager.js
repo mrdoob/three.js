@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -84,6 +85,13 @@ function WebVRManager( renderer ) {
 
 	this.enabled = false;
 	this.userHeight = 1.6;
+
+	this.getController = function ( id ) {
+
+		console.warn( 'WebVRManager: getController() not yet implemented.' );
+		return new Group();
+
+	};
 
 	this.getDevice = function () {
 
