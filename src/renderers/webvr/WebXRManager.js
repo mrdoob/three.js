@@ -16,10 +16,11 @@ function WebXRManager( renderer ) {
 	var session = null;
 
 	var frameOfRef = null;
-	var inputSources = [];
 
 	var pose = null;
-	var controllers = {};
+
+	var controllers = [];
+	var inputSources = [];
 
 	function isPresenting() {
 
@@ -54,6 +55,7 @@ function WebXRManager( renderer ) {
 
 			controller = new Group();
 			controller.matrixAutoUpdate = false;
+			controller.visible = false;
 
 			controllers[ id ] = controller;
 
@@ -227,18 +229,29 @@ function WebXRManager( renderer ) {
 
 		//
 
-		for ( var i = 0; i < inputSources.length; i ++ ) {
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			var controller = controllers[ i ];
 
 			var inputSource = inputSources[ i ];
-			var inputPose = frame.getInputPose( inputSource, frameOfRef );
 
-			if ( inputPose !== null && controllers[ i ] ) {
+			if ( inputSource ) {
 
-				var controller = controllers[ i ];
-				controller.matrix.elements = inputPose.gripMatrix;
-				controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
+				var inputPose = frame.getInputPose( inputSource, frameOfRef );
+
+				if ( inputPose !== null ) {
+
+					controller.matrix.elements = inputPose.gripMatrix;
+					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
+					controller.visible = true;
+
+					continue;
+
+				}
 
 			}
+
+			controller.visible = false;
 
 		}
 
