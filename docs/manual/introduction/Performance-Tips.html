@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This article describes some best practices and performances tips. The aim is to give you some possible actions
+            in order to improve your project using three.js.
+
+            By default three.js is configured for basic usage, but when you project grow it will require you to perform
+            some optimisations in order to keep good performances.
+		</p>
+
+		<h2>Metrics</h2>
+
+		<p>
+            Your application performance is affected by different factors:
+			Before starting, we need to define a some metrics, and how to monitor them. There are important factors
+			that will affect your performances, basically represented by the FPS (frames per seconds):
+
+			<ul>
+				<li>CPU usage</li>
+				<li>Memory usage</li>
+				<li>GPU computation</li>
+				<li>GPU memory</li>
+			</ul>
+		</p>
+
+		<p>
+			In order to monitor them you can use [mrdoob/stats.js](https://github.com/mrdoob/stats.js) repository.
+		</p>
+
+        <h2>Object3Ds</h2>
+
+            <h3>Geometries</h3>
+
+                <h4>BufferGeometries</h4>
+                    <p>
+                        BufferGeometries store information (such as vertex positions, face indices, normals, colors,
+                        UVs, and any custom attributes) in [page:BufferAttribute buffers] - that is,
+                        [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays].
+                    </p>
+
+                    <p>
+                        Geometries are very convenient but this has a cost. If you are dealing with huge scene, BufferGeometries
+                        are a must have.
+                    </p>
+
+                <h4>InstancedBufferGeometries</h4>
+
+
+                <h4>Shared Geometries</h4>
+
+                    <p>
+                        If you have multiple objects with the same geometry, you should try to share it between in order
+                        to save some memory usage.
+                    </p>
+
+<code>
+var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+
+for ( var i = 0; i < 1000; i++ ) {
+
+    var material = new THREE.MeshBasicMaterial();
+    material.color.setRGB( Math.random(), Math.random(), Math.random() );
+
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set( Math.random() * 100, Math.random() * 100, Math.random() * 100);
+
+    scene.add(mesh);
+}
+</code>
+
+                <h4>Low Polygons</h4>
+
+                    <p>
+                        Each geometry is composed by vertices, which are basically the points delimiting your geometry.
+                        The more complex your geometry is, the more it impact your performances. This is why it's
+                        recommended to use <a href="https://en.wikipedia.org/wiki/Low_poly">Low Poly</a> geometries.
+                    </p>
+
+                    <p>
+                        The technique used to simply your geometries is called "Geometry Decimation".
+                    </p>
+
+                    <p>
+                        You can achieve this using blender (<a href="https://blender.stackexchange.com/a/6255/58218">see forum answer</a>).
+                    </p>
+
+                    <p>
+                        You can also have a look at <a href="https://threejs.org/examples/?q=simp#webgl_modifier_simplifier">SimplyModifier</a>.
+                    </p>
+
+                <h4>Level of Details</h4>
+
+                    <p>
+                        When low poly are not acceptable, you can use [page:LOD] in order to use different detail geometry based on
+                        distance from the camera.
+                    </p>
+
+            <h3>Materials</h3>
+
+                <h4>Shared Materials</h4>
+
+                    <p>
+                        If you have multiple objects with the same material, you should try to share it between in order
+                        to save some memory usage. But keep it mind that any modification to one object material will affects
+                        all objects.
+                    </p>
+
+<code>
+var material = new THREE.MeshBasicMaterial();
+material.color.setHex( 0x333333 );
+
+for ( var i = 0; i < 1000; i++ ) {
+
+    var geometry = new THREE.BoxGeometry( Math.random(), Math.random(), Math.random() );
+
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set( Math.random() * 100, Math.random() * 100, Math.random() * 100);
+
+    scene.add(mesh);
+}
+</code>
+
+                <h4>Materials Performances</h4>
+
+                    <p>
+                        Three.js provide multiple materials, but some are more complex than others. Generally the more realistic is it
+                        the more performance impact it has.
+                    </p>
+
+                    <p>
+                        Here is the list of materials classified by performance efficiency:
+
+                        <ul>
+                            <li>[page:MeshBasicMaterial]: very basic, is not affected by lights.</li>
+                            <li>[page:MeshLambertMaterial]: This can simulate some surfaces (such as untreated wood or stone) well, but cannot simulate shiny surfaces with specular highlights (such as varnished wood).</li>
+                            <li>[page:MeshPhongMaterial]: Unlike the Lambertian model used in the MeshLambertMaterial this can simulate shiny surfaces with specular highlights (such as varnished wood).</li>
+                            <li>[page:MeshStandardMaterial]: A standard physically based material, using Metallic-Roughness workflow. This can simulate 'correctly' under all lighting scenarios.</li>
+                            <li>[page:MeshPhysicalMaterial]: An extension of the MeshStandardMaterial that allows for greater control over reflectivity.</li>
+                        </ul>
+                    </p>
+
+                <h4>Textures</h4>
+
+                    <p>
+                        The bigger your texture is the longer it will take to be sent in the GPU at the first render.
+                        This operation is synchronous and will freeze your rendering loop.
+                    </p>
+
+                    <p>
+                        You need to take care of the device capabilities and especially the max texture size given by
+                        [page:WebGLRenderer.capabilities.maxTextureSize]. If your texture is higher than that then three.js will
+                        resize it which consume quite a lot CPU.
+                    </p>
+
+            <h3>Merging</h3>
+
+                <p>
+                    To render your object, three.js send draw calls to the GPU asking to render a geometry with a certain material.
+                    Usually it is better to send one big draw call rather than several small ones.
+                </p>
+
+                <p>
+                    In order to limit draw calls, you can merge your geometries.
+                </p>
+
+<code>
+// geometry
+var geometry = new THREE.SphereGeometry( 5, 12, 8 );
+geometry.merge(new THREE.TorusGeometry(10, 3, 16, 100));
+
+// material
+var material = new THREE.MeshBasicgMaterial( { color: 0x00ffff } );
+
+var mesh = new THREE.Mesh( geometry, material );
+scene.add( mesh );
+</code>
+
+                <p>
+                    You can also merge BufferGeometries using [page:BufferGeometryUtils].
+                </p>
+
+                <p>
+                    It is possible to merge geometries with different materials, but in that case one draw call will be
+                    required by material. Also if you are using BufferGeometries, your vertices should be ordered by materials.
+                </p>
+
+            <h3>Matrices</h3>
+
+                <p>
+                    Matrices updates have a really bad impact on performances when you scene grow up. By default every
+                    matrix is updated at each frame saving you the pain to maintain them.
+                </p>
+
+                <h4>World Matrix</h4>
+
+                    <p>
+                        The world matrix represents the global position of an object. This is the one taken into account for rendering.
+                        By default Scene.autoUpdate is set true meaning the world matrix will be calculated at each frame which is
+                        most of the case not required.
+                    </p>
+
+                    <p>
+                        When Scene.autoUpdate is set false, you just need to ensure to call Object.updateMatrixWorld each time you
+                        modify position, scale or rotation. Keep in mind that this method will applied to each descendant.
+                    </p>
+
+                    <p>
+                        Please note that
+                    </p>
+
+                <h4>Local Matrix</h4>
+
+                    <p>
+                        The Object.matrix represents the local position of an object. By default Object.matrixAutoUpdate is
+                        Object3D.DefaultMatrixAutoUpdate (true). This might have a huge impact, each time you call updateMatrixWorld
+                        it will assume you local matrix has changed and force descendant world matrices recompute.
+                    </p>
+
+                    <p>
+                        When Object.matrixAutoUpdate is false you need to call Object.updateMatrix each time you
+                        modify position, scale or rotation.
+                    </p>
+
+        <h2>WebGLRenderer</h2>
+
+            <h3>Parameters</h3>
+            <h3>Precision</h3>
+            <h3>Antialias</h3>
+            <h3>powerReference</h3>
+
+                <p>
+                    On devices with 2 GPU, generally integrated and dedicated the browser will by default use the integrated one
+                    in order to boost battery performance. <br />
+                    If your scene requires a lot of performances, you can choose to use the dedicated GPU by using the
+                    **powerPreference** parameter of [page:WebGLRenderer].
+                </p>
+
+                <p>
+                    Keep in that it's a "hint to the useragent" and up to browsers to decide whether to implement this.
+                </p>
+            <h3>physicallyCorrectLights</h3>
+            <h3>compile</h3>
+            <h3>Shadows</h3>
+
+                <p>
+                    By default [page:WebGLRenderer.shadowMap.autoUpdate] is set true which will cause the shadow to update at
+                    each frame. If you know your scene is not intended to change at each frame, you can disable this and use
+                    [page:WebGLRenderer.shadowMap.needsUpdate] in order to trigger a recompute.
+                </p>
+
+            <h3>Animation Loop</h3>
+
+                <h4>16ms frame budget</h4>
+
+
+                <h4>Garbage collection</h4>
+                    <p>
+                        Javascript is featured with a garbage collector to manage the memory. In standard projects we don't really
+                        need to care about this. But in 3D you are rendering your scene multiple time by second. If you create a lot
+                        of new objects at each frame, you will force the garbage collector to run more often causing a performance
+                        drop.-
+                    </p>
+
+                <h4>Reduce the graph</h4>
+
+                    <p>
+                        The renderer will need to project each object in order to render it. This is a recursive function
+                        which will try to not project when your object is not visible. Here is how visibility affects the
+                        projection:
+
+                        <ul>
+                            <li>Setting Object.visible to false will skip the object and all its descendants.</li>
+                            <li>Setting Material.visible or Object.layers different from Camera.layers will skip the object but not its descendants.</li>
+                        </ul>
+                    </p>
+
+                <h4>Animate only when required</h4>
+
+        <h2>RayCaster</h2>
+
+            <ul>
+                <li>Octree</li>
+            </ul>
+
+        <h2>Lights</h2>
+
+	</body>
+</html>

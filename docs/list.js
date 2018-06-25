@@ -21,7 +21,7 @@ var list = {
 			"How to update things": "manual/introduction/How-to-update-things",
 			"Matrix transformations": "manual/introduction/Matrix-transformations",
 			"Animation System": "manual/introduction/Animation-system",
-			"Optimizations": "manual/introduction/Optimizations"
+			"Performances Tips": "manual/introduction/Performance-Tips"
 		},
 
 		"Build Tools": {
