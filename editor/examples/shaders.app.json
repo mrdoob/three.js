@@ -1,0 +1,87 @@
+{
+	"metadata": {
+		"type": "App"
+	},
+	"project": {
+		"gammaInput": true,
+		"gammaOutput": true,
+		"shadows": true,
+		"vr": false
+	},
+	"camera": {
+		"metadata": {
+			"version": 4.4,
+			"type": "Object",
+			"generator": "Object3D.toJSON"
+		},
+		"object": {
+			"uuid": "FC3E973B-5A4A-4177-BD9C-A58E61E0593B",
+			"type": "PerspectiveCamera",
+			"name": "Camera",
+			"matrix": [0.605503,0,-0.795843,0,-0.261526,0.944464,-0.198978,0,0.751645,0.328615,0.571876,0,2.571484,1.124239,1.956469,1],
+			"fov": 50,
+			"zoom": 1,
+			"near": 0.1,
+			"far": 10000,
+			"focus": 10,
+			"aspect": 1.368715,
+			"filmGauge": 35,
+			"filmOffset": 0
+		}
+	},
+	"scene": {
+		"metadata": {
+			"version": 4.4,
+			"type": "Object",
+			"generator": "Object3D.toJSON"
+		},
+		"geometries": [
+			{
+				"uuid": "EA781333-F3AE-470D-9110-A9724FCB42AA",
+				"type": "IcosahedronGeometry",
+				"radius": 1,
+				"detail": 4
+			}],
+		"materials": [
+			{
+				"uuid": "50ED51F1-DEA4-4B61-8082-BF41609E8C27",
+				"type": "ShaderMaterial",
+				"depthFunc": 3,
+				"depthTest": true,
+				"depthWrite": true,
+				"wireframe": true,
+				"skinning": false,
+				"morphTargets": false,
+				"uniforms": {
+					"time": {
+						"value": 0.0
+					}
+				},
+				"vertexShader": "uniform float time;\nvarying vec3 vPosition;\nvoid main() {\n\tvPosition = position;\n\tvPosition.x += sin( time + vPosition.z * 4.0 ) / 4.0;\n\tvPosition.y += cos( time + vPosition.z * 4.0 ) / 4.0;\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );\n}",
+				"fragmentShader": "varying vec3 vPosition;\nvoid main() {\n\tgl_FragColor = vec4( vPosition * 2.0, 1.0 );\n}"
+			}],
+		"object": {
+			"uuid": "5FC9ACA9-2A93-474D-AA32-FACC76551914",
+			"type": "Scene",
+			"name": "Scene",
+			"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+			"children": [
+				{
+					"uuid": "FC7B6CF2-6386-4F47-9CE6-8ADB9FCA6E1F",
+					"type": "Mesh",
+					"name": "Icosahedron 1",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+					"geometry": "EA781333-F3AE-470D-9110-A9724FCB42AA",
+					"material": "50ED51F1-DEA4-4B61-8082-BF41609E8C27"
+				}],
+			"background": 11184810
+		}
+	},
+	"scripts": {
+		"FC7B6CF2-6386-4F47-9CE6-8ADB9FCA6E1F": [
+			{
+				"name": "",
+				"source": "function update( event ) {\n\n\tthis.material.uniforms.time.value = event.time / 500.0;\n\n}"
+			}]
+	}
+}

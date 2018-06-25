@@ -29,7 +29,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without<br/>using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without<br/>using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -40,8 +40,6 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-		<script src="js/Half.js"></script>
-		<script src="js/Encodings.js"></script>
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
@@ -91,14 +89,13 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					bumpScale: - 0.05,
 					color: 0xffffff,
 					metalness: 0.9,
 					roughness: 0.8,
-					shading: THREE.SmoothShading,
 					premultipliedAlpha: true,
 					transparent: true
 				} );
@@ -132,7 +129,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
 				var mesh = new THREE.Mesh( geometry, standardMaterial );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
@@ -211,8 +208,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -1,23 +1,11 @@
-import { Geometry } from './Geometry';
-import { EventDispatcher } from './EventDispatcher';
-import { Vector2 } from '../math/Vector2';
-import { _Math } from '../math/Math';
-import { GeometryIdCount } from './Geometry';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { Vector2 } from '../math/Vector2.js';
+
 function DirectGeometry() {
 
-	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
-
-	this.uuid = _Math.generateUUID();
-
-	this.name = '';
-	this.type = 'DirectGeometry';
-
-	this.indices = [];
 	this.vertices = [];
 	this.normals = [];
 	this.colors = [];
@@ -46,28 +34,13 @@ function DirectGeometry() {
 
 }
 
-Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
-
-	computeBoundingBox: Geometry.prototype.computeBoundingBox,
-	computeBoundingSphere: Geometry.prototype.computeBoundingSphere,
-
-	computeFaceNormals: function () {
-
-		console.warn( 'THREE.DirectGeometry: computeFaceNormals() is not a method of this type of geometry.' );
-
-	},
-
-	computeVertexNormals: function () {
-
-		console.warn( 'THREE.DirectGeometry: computeVertexNormals() is not a method of this type of geometry.' );
-
-	},
+Object.assign( DirectGeometry.prototype, {
 
 	computeGroups: function ( geometry ) {
 
 		var group;
 		var groups = [];
-		var materialIndex;
+		var materialIndex = undefined;
 
 		var faces = geometry.faces;
 
@@ -166,6 +139,12 @@ Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 		var hasSkinWeights = skinWeights.length === vertices.length;
 
 		//
+
+		if ( faces.length === 0 ) {
+
+			console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
+
+		}
 
 		for ( var i = 0; i < faces.length; i ++ ) {
 
@@ -280,12 +259,6 @@ Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 		this.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
 		return this;
-
-	},
-
-	dispose: function () {
-
-		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

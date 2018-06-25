@@ -1,12 +1,25 @@
-(*** This section is for bug reports and feature requests only. This is NOT a help site. Do not ask help questions here. If you need help, please use stackoverflow. ***)
+##### Description of the problem
 
-##### Description of the problem 
+This form is for three.js bug reports and feature requests only.
 
+This is NOT a help site. Do not ask help questions here.
+If you need help, please use the [forum](https://discourse.threejs.org/) or [stackoverflow](http://stackoverflow.com/questions/tagged/three.js).
+
+Describe the bug or feature request in detail.
+
+Always include a code snippet, screenshots, and any relevant models or textures to help us understand your issue.
+
+Please also include a live example if possible. You can start from these templates:
+
+* [jsfiddle](https://jsfiddle.net/s3rjfcc3/) (latest release branch)
+* [jsfiddle](https://jsfiddle.net/ptgwhemb/) (dev branch)
+* [codepen](https://codepen.io/anon/pen/aEBKxR) (latest release branch)
+* [codepen](https://codepen.io/anon/pen/BJWzaN) (dev branch)
 
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r82
+- [ ] r93
 - [ ] ...
 
 ##### Browser
@@ -20,10 +33,9 @@
 
 - [x] All of them
 - [ ] Windows
+- [ ] macOS
 - [ ] Linux
 - [ ] Android
-- [ ] IOS
+- [ ] iOS
 
 ##### Hardware Requirements (graphics card, VR Device, ...)
-
-

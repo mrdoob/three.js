@@ -34,8 +34,8 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl postprocessing example -
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example -
+			<a href="http://g3d.cs.williams.edu/g3d/data10/index.html#mesh19" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
 		<div id="container"></div>
@@ -111,8 +111,12 @@
 				directionalLight.position.set( 0, -0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
-				loader = new THREE.JSONLoader();
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createMesh( geometry, sceneModel, 100 ) } );
+				var loader = new THREE.JSONLoader();
+				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) {
+
+					createMesh( geometry, sceneModel, 100 );
+
+				} );
 
 				//
 
@@ -137,8 +141,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x000000 );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.autoClear = false;
@@ -188,8 +191,8 @@
 
 				var effectColorify1 = new THREE.ShaderPass( THREE.ColorifyShader );
 				var effectColorify2 = new THREE.ShaderPass( THREE.ColorifyShader );
-				effectColorify1.uniforms[ 'color' ].value.setRGB( 1, 0.8, 0.8 );
-				effectColorify2.uniforms[ 'color' ].value.setRGB( 1, 0.75, 0.5 );
+				effectColorify1.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.8, 0.8 ) );
+				effectColorify2.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.75, 0.5 ) );
 
 				var clearMask = new THREE.ClearMaskPass();
 				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
@@ -337,8 +340,8 @@
 					color: 0x999999,
 					specular: 0x080808,
 					shininess: 20,
-					map: new THREE.TextureLoader().load( "obj/leeperrysmith/Map-COL.jpg" ),
-					normalMap: new THREE.TextureLoader().load("obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: new THREE.TextureLoader().load( "models/json/leeperrysmith/Map-COL.jpg" ),
+					normalMap: new THREE.TextureLoader().load("models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
 				} );

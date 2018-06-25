@@ -29,14 +29,13 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - modifier tessellation</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - modifier tessellation</div>
 		<div id="container"></div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/modifiers/ExplodeModifier.js"></script>
 		<script src="js/modifiers/TessellateModifier.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -112,6 +111,7 @@
 			controls = new THREE.TrackballControls( camera );
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x050505 );
 
 			//
 
@@ -139,14 +139,11 @@
 
 			}
 
-			var explodeModifier = new THREE.ExplodeModifier();
-			explodeModifier.modify( geometry );
-
-			var numFaces = geometry.faces.length;
-
 			//
 
 			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+			var numFaces = geometry.attributes.position.count / 3
 
 			var colors = new Float32Array( numFaces * 3 * 3 );
 			var displacement = new Float32Array( numFaces * 3 * 3 );
@@ -205,7 +202,6 @@
 			scene.add( mesh );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( WIDTH, HEIGHT );
 

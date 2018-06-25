@@ -1,8 +1,8 @@
-import { Texture } from './Texture';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { Texture } from './Texture.js';
 
 function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
@@ -14,6 +14,6 @@ function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, for
 
 CanvasTexture.prototype = Object.create( Texture.prototype );
 CanvasTexture.prototype.constructor = CanvasTexture;
-
+CanvasTexture.prototype.isCanvasTexture = true;
 
 export { CanvasTexture };

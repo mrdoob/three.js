@@ -28,7 +28,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - particles - billboards</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example - particles - billboards</div>
 		<div id="container"></div>
 
 		<script src="../build/three.js"></script>
@@ -226,7 +226,7 @@
 			for ( var i = 0; i < length; i ++ ) {
 
 				vector.fromArray( positions, i * 3 );
-				vector.applyProjection( matrix );
+				vector.applyMatrix4( matrix );
 
 				sortArray.push( [ vector.z, i ] );
 

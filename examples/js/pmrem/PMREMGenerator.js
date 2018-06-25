@@ -11,10 +11,11 @@
  *	by this class.
  */
 
-THREE.PMREMGenerator = function( sourceTexture ) {
+THREE.PMREMGenerator = function ( sourceTexture, samplesPerLevel, resolution ) {
 
 	this.sourceTexture = sourceTexture;
-	this.resolution = 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
+	this.resolution = ( resolution !== undefined ) ? resolution : 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
+	this.samplesPerLevel = ( samplesPerLevel !== undefined ) ? samplesPerLevel : 16;
 
 	var monotonicEncoding = ( sourceTexture.encoding === THREE.LinearEncoding ) ||
 		( sourceTexture.encoding === THREE.GammaEncoding ) || ( sourceTexture.encoding === THREE.sRGBEncoding );
@@ -37,11 +38,12 @@ THREE.PMREMGenerator = function( sourceTexture ) {
 	 };
 
 	// how many LODs fit in the given CubeUV Texture.
-	this.numLods = Math.log2( size ) - 2;
+	this.numLods = Math.log( size ) / Math.log( 2 ) - 2; // IE11 doesn't support Math.log2
 
 	for ( var i = 0; i < this.numLods; i ++ ) {
 
 		var renderTarget = new THREE.WebGLRenderTargetCube( size, size, params );
+		renderTarget.texture.name = "PMREMGenerator.cube" + i;
 		this.cubeLods.push( renderTarget );
 		size = Math.max( 16, size / 2 );
 
@@ -50,7 +52,8 @@ THREE.PMREMGenerator = function( sourceTexture ) {
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0.0, 1000 );
 
 	this.shader = this.getShader();
-	this.planeMesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2, 0 ), this.shader );
+	this.shader.defines[ 'SAMPLES_PER_LEVEL' ] = this.samplesPerLevel;
+	this.planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2, 0 ), this.shader );
 	this.planeMesh.material.side = THREE.DoubleSide;
 	this.scene = new THREE.Scene();
 	this.scene.add( this.planeMesh );
@@ -63,7 +66,7 @@ THREE.PMREMGenerator = function( sourceTexture ) {
 
 THREE.PMREMGenerator.prototype = {
 
-	constructor : THREE.PMREMGenerator,
+	constructor: THREE.PMREMGenerator,
 
 	/*
 	 * Prashant Sharma / spidersharma03: More thought and work is needed here.
@@ -78,7 +81,7 @@ THREE.PMREMGenerator.prototype = {
 	 * This method requires the most amount of thinking I guess. Here is a paper which we could try to implement in future::
 	 * http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
 	 */
-	update: function( renderer ) {
+	update: function ( renderer ) {
 
 		this.shader.uniforms[ 'envMap' ].value = this.sourceTexture;
 		this.shader.envMap = this.sourceTexture;
@@ -87,6 +90,7 @@ THREE.PMREMGenerator.prototype = {
 		var gammaOutput = renderer.gammaOutput;
 		var toneMapping = renderer.toneMapping;
 		var toneMappingExposure = renderer.toneMappingExposure;
+		var currentRenderTarget = renderer.getRenderTarget();
 
 		renderer.toneMapping = THREE.LinearToneMapping;
 		renderer.toneMappingExposure = 1.0;
@@ -97,6 +101,7 @@ THREE.PMREMGenerator.prototype = {
 
 			var r = i / ( this.numLods - 1 );
 			this.shader.uniforms[ 'roughness' ].value = r * 0.9; // see comment above, pragmatic choice
+			this.shader.uniforms[ 'queryScale' ].value.x = ( i == 0 ) ? - 1 : 1;
 			var size = this.cubeLods[ i ].width;
 			this.shader.uniforms[ 'mapSize' ].value = size;
 			this.renderToCubeMapTarget( renderer, this.cubeLods[ i ] );
@@ -105,6 +110,7 @@ THREE.PMREMGenerator.prototype = {
 
 		}
 
+		renderer.setRenderTarget( currentRenderTarget );
 		renderer.toneMapping = toneMapping;
 		renderer.toneMappingExposure = toneMappingExposure;
 		renderer.gammaInput = gammaInput;
@@ -112,17 +118,17 @@ THREE.PMREMGenerator.prototype = {
 
 	},
 
-	renderToCubeMapTarget: function( renderer, renderTarget ) {
+	renderToCubeMapTarget: function ( renderer, renderTarget ) {
 
 		for ( var i = 0; i < 6; i ++ ) {
 
-			this.renderToCubeMapTargetFace( renderer, renderTarget, i )
+			this.renderToCubeMapTargetFace( renderer, renderTarget, i );
 
 		}
 
 	},
 
-	renderToCubeMapTargetFace: function( renderer, renderTarget, faceIndex ) {
+	renderToCubeMapTargetFace: function ( renderer, renderTarget, faceIndex ) {
 
 		renderTarget.activeCubeFace = faceIndex;
 		this.shader.uniforms[ 'faceIndex' ].value = faceIndex;
@@ -130,16 +136,21 @@ THREE.PMREMGenerator.prototype = {
 
 	},
 
-	getShader: function() {
+	getShader: function () {
 
-		return new THREE.ShaderMaterial( {
+		var shaderMaterial = new THREE.ShaderMaterial( {
+
+			defines: {
+				"SAMPLES_PER_LEVEL": 20,
+			},
 
 			uniforms: {
 				"faceIndex": { value: 0 },
 				"roughness": { value: 0.5 },
 				"mapSize": { value: 0.5 },
 				"envMap": { value: null },
-				"testColor": { value: new THREE.Vector3( 1, 1, 1 ) }
+				"queryScale": { value: new THREE.Vector3( 1, 1, 1 ) },
+				"testColor": { value: new THREE.Vector3( 1, 1, 1 ) },
 			},
 
 			vertexShader:
@@ -157,6 +168,7 @@ THREE.PMREMGenerator.prototype = {
 				uniform samplerCube envMap;\n\
 				uniform float mapSize;\n\
 				uniform vec3 testColor;\n\
+				uniform vec3 queryScale;\n\
 				\n\
 				float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\
 					float a = ggxRoughness + 0.0001;\n\
@@ -227,12 +239,12 @@ THREE.PMREMGenerator.prototype = {
 					} else {\n\
 						sampleDirection = vec3(-uv.x, -uv.y, -1.0);\n\
 					}\n\
-					mat3 vecSpace = matrixFromVector(normalize(sampleDirection));\n\
+					mat3 vecSpace = matrixFromVector(normalize(sampleDirection * queryScale));\n\
 					vec3 rgbColor = vec3(0.0);\n\
-					const int NumSamples = 1024;\n\
+					const int NumSamples = SAMPLES_PER_LEVEL;\n\
 					vec3 vect;\n\
 					float weight = 0.0;\n\
-					for(int i=0; i<NumSamples; i++) {\n\
+					for( int i = 0; i < NumSamples; i ++ ) {\n\
 						float sini = sin(float(i));\n\
 						float cosi = cos(float(i));\n\
 						float r = rand(vec2(sini, cosi));\n\
@@ -246,13 +258,27 @@ THREE.PMREMGenerator.prototype = {
 					//rgbColor = testColorMap( roughness ).rgb;\n\
 					gl_FragColor = linearToOutputTexel( vec4( rgbColor, 1.0 ) );\n\
 				}",
-			blending: THREE.CustomBlending,
-			blendSrc: THREE.OneFactor,
-			blendDst: THREE.ZeroFactor,
-			blendSrcAlpha: THREE.OneFactor,
-			blendDstAlpha: THREE.ZeroFactor,
-			blendEquation: THREE.AddEquation
+
+			blending: THREE.NoBlending
+
 		} );
+
+		shaderMaterial.type = 'PMREMGenerator';
+
+		return shaderMaterial;
+
+	},
+
+	dispose: function () {
+
+		for ( var i = 0, l = this.cubeLods.length; i < l; i ++ ) {
+
+			this.cubeLods[ i ].dispose();
+
+		}
+
+		this.planeMesh.geometry.dispose();
+		this.planeMesh.material.dispose();
 
 	}
 

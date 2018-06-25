@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLBufferRenderer( gl, extensions, infoRender ) {
+function WebGLBufferRenderer( gl, extensions, info ) {
 
 	var mode;
 
@@ -16,14 +16,11 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		gl.drawArrays( mode, start, count );
 
-		infoRender.calls ++;
-		infoRender.vertices += count;
-
-		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
+		info.update( count, mode );
 
 	}
 
-	function renderInstances( geometry ) {
+	function renderInstances( geometry, start, count ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -34,36 +31,17 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		}
 
-		var position = geometry.attributes.position;
+		extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
-		var count = 0;
-
-		if ( position.isInterleavedBufferAttribute ) {
-
-			count = position.data.count;
-
-			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
-
-		} else {
-
-			count = position.count;
-
-			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
-
-		}
-
-		infoRender.calls ++;
-		infoRender.vertices += count * geometry.maxInstancedCount;
-
-		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
+		info.update( count, mode, geometry.maxInstancedCount );
 
 	}
 
-	return {
-		setMode: setMode,
-		render: render,
-		renderInstances: renderInstances
-	};
+	//
+
+	this.setMode = setMode;
+	this.render = render;
+	this.renderInstances = renderInstances;
 
 }
 

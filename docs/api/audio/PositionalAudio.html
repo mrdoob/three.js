@@ -12,111 +12,115 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Create a positional audio object.<br /><br />
 
 			This uses the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
-		</div>
+		</p>
 
 
 		<h2>Example</h2>
 
-		<div>[example:misc_sound misc / sound ]</div>
+		<p>
+			[example:webaudio_sandbox webaudio / sandbox ]</br>
+			[example:webaudio_timing webaudio / timing ]
+		</p>
+
 		<code>
-		//Create an AudioListener and add it to the camera
+		// create an AudioListener and add it to the camera
 		var listener = new THREE.AudioListener();
 		camera.add( listener );
 
-		//Create the PositionalAudio object (passing in the listener)
+		// create the PositionalAudio object (passing in the listener)
 		var sound = new THREE.PositionalAudio( listener );
 
-		//Load a sound and set it as the PositionalAudio object's buffer
+		// load a sound and set it as the PositionalAudio object's buffer
 		var audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
-			sound1.setBuffer( buffer );
-			sound1.setRefDistance( 20 );
-			sound1.play();
+			sound.setBuffer( buffer );
+			sound.setRefDistance( 20 );
+			sound.play();
 		});
 
-		//Create an object for the sound to play from
+		// create an object for the sound to play from
 		var sphere = new THREE.SphereGeometry( 20, 32, 16 );
 		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
 		var mesh = new THREE.Mesh( sphere, material );
 		scene.add( mesh );
 
-		//Finally add the sound to the mesh
+		// finally add the sound to the mesh
 		mesh.add( sound );
 		</code>
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:AudioListener listener] )</h3>
-		<div>
+		<h3>[name]( [param:AudioListener listener] )</h3>
+		<p>
 		listener — (required) [page:AudioListener AudioListener] instance.
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
-		<div>
+		<p>
 			See the [page:Audio Audio] class for inherited properties.
-		</div>
+		</p>
 
 		<h3>[property:PannerNode panner]</h3>
-		<div>The PositionalAudio's [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode PannerNode].</div>
+		<p>The PositionalAudio's [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode PannerNode].</p>
 
 
 		<h2>Methods</h2>
 
-		<div>
+		<p>
 			See the [page:Audio Audio] class for inherited methods.
-		</div>
+		</p>
 
 		<h3>[method:PannerNode getOutput]()</h3>
-		<div>
+		<p>
 		Returns the [page:PositionalAudio.panner panner].
-		</div>
+		</p>
 
 		<h3>[method:Number getRefDistance]()</h3>
-		<div>
+		<p>
 		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
-		</div>
+		</p>
 
-		<h3>[method:PannerNode setRefDistance]( [page:Number value] )</h3>
-		<div>
+		<h3>[method:PannerNode setRefDistance]( [param:Number value] )</h3>
+		<p>
 		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
-		</div>
+		</p>
 
 		<h3>[method:PannerNode getRolloffFactor]()</h3>
-		<div>
+		<p>
 		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
-		</div>
+		</p>
 
-		<h3>[method:PannerNode setRolloffFactor]( [page:Number value] )</h3>
-		<div>
+		<h3>[method:PannerNode setRolloffFactor]( [param:Number value] )</h3>
+		<p>
 		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
-		</div>
+		</p>
 
 		<h3>[method:String getDistanceModel]()</h3>
-		<div>
+		<p>
 		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
-		</div>
+		</p>
 
-		<h3>[method:String setDistanceModel]( [page:String value] )</h3>
-		<div>
+		<h3>[method:String setDistanceModel]( [param:String value] )</h3>
+		<p>
 		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
-		</div>
+		</p>
 
 		<h3>[method:PannerNode getMaxDistance]()</h3>
-		<div>
-		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.distanceModel].
-		</div>
+		<p>
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
+		</p>
 
-		<h3>[method:PannerNode setMaxDistance]( [page:Number value] )</h3>
-		<div>
-		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.distanceModel].
-		</div>
+		<h3>[method:PannerNode setMaxDistance]( [param:Number value] )</h3>
+		<p>
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
+		</p>
 
 		<h2>Source</h2>
 

@@ -15,8 +15,10 @@ THREE.ShaderTerrain = {
 
 	'terrain' : {
 
-		uniforms: Object.assign(
+		uniforms: THREE.UniformsUtils.merge( [
 
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "lights" ],
 
 			{
 
@@ -47,12 +49,9 @@ THREE.ShaderTerrain = {
 
 				"uOffset": { value: new THREE.Vector2( 0, 0 ) }
 
-			},
+			}
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
-
-		),
+		] ),
 
 		fragmentShader: [
 
@@ -88,7 +87,7 @@ THREE.ShaderTerrain = {
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "bsdfs" ],
-			THREE.ShaderChunk[ "lights_pars" ],
+			THREE.ShaderChunk[ "lights_pars_begin" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
@@ -237,9 +236,9 @@ THREE.ShaderTerrain = {
 
 				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor + totalSpecularLight );",
 
-				THREE.ShaderChunk[ "fog_fragment" ],
-
 				"gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+
+				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"}"
 
@@ -269,6 +268,7 @@ THREE.ShaderTerrain = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
+			THREE.ShaderChunk[ "fog_pars_vertex" ],
 
 			"void main() {",
 
@@ -313,6 +313,7 @@ THREE.ShaderTerrain = {
 				"vNormal = normalMatrix * normalTex;",
 
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
+				THREE.ShaderChunk[ "fog_vertex" ],
 
 			"}"
 

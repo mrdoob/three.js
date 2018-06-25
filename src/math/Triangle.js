@@ -1,6 +1,6 @@
-import { Vector3 } from './Vector3';
-import { Line3 } from './Line3';
-import { Plane } from './Plane';
+import { Vector3 } from './Vector3.js';
+import { Line3 } from './Line3.js';
+import { Plane } from './Plane.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -15,92 +15,104 @@ function Triangle( a, b, c ) {
 
 }
 
-Triangle.normal = function () {
+Object.assign( Triangle, {
 
-	var v0 = new Vector3();
+	getNormal: function () {
 
-	return function normal( a, b, c, optionalTarget ) {
+		var v0 = new Vector3();
 
-		var result = optionalTarget || new Vector3();
+		return function getNormal( a, b, c, target ) {
 
-		result.subVectors( c, b );
-		v0.subVectors( a, b );
-		result.cross( v0 );
+			if ( target === undefined ) {
 
-		var resultLengthSq = result.lengthSq();
-		if ( resultLengthSq > 0 ) {
+				console.warn( 'THREE.Triangle: .getNormal() target is now required' );
+				target = new Vector3();
 
-			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+			}
 
-		}
+			target.subVectors( c, b );
+			v0.subVectors( a, b );
+			target.cross( v0 );
 
-		return result.set( 0, 0, 0 );
+			var targetLengthSq = target.lengthSq();
+			if ( targetLengthSq > 0 ) {
 
-	};
+				return target.multiplyScalar( 1 / Math.sqrt( targetLengthSq ) );
 
-}();
+			}
 
-// static/instance method to calculate barycentric coordinates
-// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-Triangle.barycoordFromPoint = function () {
+			return target.set( 0, 0, 0 );
 
-	var v0 = new Vector3();
-	var v1 = new Vector3();
-	var v2 = new Vector3();
+		};
 
-	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
+	}(),
 
-		v0.subVectors( c, a );
-		v1.subVectors( b, a );
-		v2.subVectors( point, a );
+	// static/instance method to calculate barycentric coordinates
+	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
+	getBarycoord: function () {
 
-		var dot00 = v0.dot( v0 );
-		var dot01 = v0.dot( v1 );
-		var dot02 = v0.dot( v2 );
-		var dot11 = v1.dot( v1 );
-		var dot12 = v1.dot( v2 );
+		var v0 = new Vector3();
+		var v1 = new Vector3();
+		var v2 = new Vector3();
 
-		var denom = ( dot00 * dot11 - dot01 * dot01 );
+		return function getBarycoord( point, a, b, c, target ) {
 
-		var result = optionalTarget || new Vector3();
+			v0.subVectors( c, a );
+			v1.subVectors( b, a );
+			v2.subVectors( point, a );
 
-		// collinear or singular triangle
-		if ( denom === 0 ) {
+			var dot00 = v0.dot( v0 );
+			var dot01 = v0.dot( v1 );
+			var dot02 = v0.dot( v2 );
+			var dot11 = v1.dot( v1 );
+			var dot12 = v1.dot( v2 );
 
-			// arbitrary location outside of triangle?
-			// not sure if this is the best idea, maybe should be returning undefined
-			return result.set( - 2, - 1, - 1 );
+			var denom = ( dot00 * dot11 - dot01 * dot01 );
 
-		}
+			if ( target === undefined ) {
 
-		var invDenom = 1 / denom;
-		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+				console.warn( 'THREE.Triangle: .getBarycoord() target is now required' );
+				target = new Vector3();
 
-		// barycentric coordinates must always sum to 1
-		return result.set( 1 - u - v, v, u );
+			}
 
-	};
+			// collinear or singular triangle
+			if ( denom === 0 ) {
 
-}();
+				// arbitrary location outside of triangle?
+				// not sure if this is the best idea, maybe should be returning undefined
+				return target.set( - 2, - 1, - 1 );
 
-Triangle.containsPoint = function () {
+			}
 
-	var v1 = new Vector3();
+			var invDenom = 1 / denom;
+			var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+			var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-	return function containsPoint( point, a, b, c ) {
+			// barycentric coordinates must always sum to 1
+			return target.set( 1 - u - v, v, u );
 
-		var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
+		};
 
-		return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+	}(),
 
-	};
+	containsPoint: function () {
 
-}();
+		var v1 = new Vector3();
 
-Triangle.prototype = {
+		return function containsPoint( point, a, b, c ) {
 
-	constructor: Triangle,
+			Triangle.getBarycoord( point, a, b, c, v1 );
+
+			return ( v1.x >= 0 ) && ( v1.y >= 0 ) && ( ( v1.x + v1.y ) <= 1 );
+
+		};
+
+	}()
+
+} );
+
+Object.assign( Triangle.prototype, {
 
 	set: function ( a, b, c ) {
 
@@ -138,12 +150,12 @@ Triangle.prototype = {
 
 	},
 
-	area: function () {
+	getArea: function () {
 
 		var v0 = new Vector3();
 		var v1 = new Vector3();
 
-		return function area() {
+		return function getArea() {
 
 			v0.subVectors( this.c, this.b );
 			v1.subVectors( this.a, this.b );
@@ -154,30 +166,41 @@ Triangle.prototype = {
 
 	}(),
 
-	midpoint: function ( optionalTarget ) {
+	getMidpoint: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
-		return result.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
+		if ( target === undefined ) {
 
-	},
+			console.warn( 'THREE.Triangle: .getMidpoint() target is now required' );
+			target = new Vector3();
 
-	normal: function ( optionalTarget ) {
+		}
 
-		return Triangle.normal( this.a, this.b, this.c, optionalTarget );
-
-	},
-
-	plane: function ( optionalTarget ) {
-
-		var result = optionalTarget || new Plane();
-
-		return result.setFromCoplanarPoints( this.a, this.b, this.c );
+		return target.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
 
 	},
 
-	barycoordFromPoint: function ( point, optionalTarget ) {
+	getNormal: function ( target ) {
 
-		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
+		return Triangle.getNormal( this.a, this.b, this.c, target );
+
+	},
+
+	getPlane: function ( target ) {
+
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Triangle: .getPlane() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return target.setFromCoplanarPoints( this.a, this.b, this.c );
+
+	},
+
+	getBarycoord: function ( point, target ) {
+
+		return Triangle.getBarycoord( point, this.a, this.b, this.c, target );
 
 	},
 
@@ -187,22 +210,28 @@ Triangle.prototype = {
 
 	},
 
+	intersectsBox: function ( box ) {
+
+		return box.intersectsTriangle( this );
+
+	},
+
 	closestPointToPoint: function () {
 
-		var plane, edgeList, projectedPoint, closestPoint;
+		var plane = new Plane();
+		var edgeList = [ new Line3(), new Line3(), new Line3() ];
+		var projectedPoint = new Vector3();
+		var closestPoint = new Vector3();
 
-		return function closestPointToPoint( point, optionalTarget ) {
+		return function closestPointToPoint( point, target ) {
 
-			if ( plane === undefined ) {
+			if ( target === undefined ) {
 
-				plane = new Plane();
-				edgeList = [ new Line3(), new Line3(), new Line3() ];
-				projectedPoint = new Vector3();
-				closestPoint = new Vector3();
+				console.warn( 'THREE.Triangle: .closestPointToPoint() target is now required' );
+				target = new Vector3();
 
 			}
 
-			var result = optionalTarget || new Vector3();
 			var minDistance = Infinity;
 
 			// project the point onto the plane of the triangle
@@ -212,31 +241,31 @@ Triangle.prototype = {
 
 			// check if the projection lies within the triangle
 
-			if( this.containsPoint( projectedPoint ) === true ) {
+			if ( this.containsPoint( projectedPoint ) === true ) {
 
 				// if so, this is the closest point
 
-				result.copy( projectedPoint );
+				target.copy( projectedPoint );
 
 			} else {
 
-				// if not, the point falls outside the triangle. the result is the closest point to the triangle's edges or vertices
+				// if not, the point falls outside the triangle. the target is the closest point to the triangle's edges or vertices
 
 				edgeList[ 0 ].set( this.a, this.b );
 				edgeList[ 1 ].set( this.b, this.c );
 				edgeList[ 2 ].set( this.c, this.a );
 
-				for( var i = 0; i < edgeList.length; i ++ ) {
+				for ( var i = 0; i < edgeList.length; i ++ ) {
 
 					edgeList[ i ].closestPointToPoint( projectedPoint, true, closestPoint );
 
 					var distance = projectedPoint.distanceToSquared( closestPoint );
 
-					if( distance < minDistance ) {
+					if ( distance < minDistance ) {
 
 						minDistance = distance;
 
-						result.copy( closestPoint );
+						target.copy( closestPoint );
 
 					}
 
@@ -244,7 +273,7 @@ Triangle.prototype = {
 
 			}
 
-			return result;
+			return target;
 
 		};
 
@@ -256,7 +285,7 @@ Triangle.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Triangle };

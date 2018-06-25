@@ -44,24 +44,9 @@
 
 				// Grid
 
-				var size = 500, step = 100;
-
-				var geometry = new THREE.Geometry();
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, - 120, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, - 120, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, - 120, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, - 120,   size ) );
-
-				}
-
-				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
-
-				var line = new THREE.LineSegments( geometry, material );
-				scene.add( line );
+				var gridHelper = new THREE.GridHelper( 1000, 10 );
+				gridHelper.position.y = - 120;
+				scene.add( gridHelper );
 
 				// Spheres
 
@@ -93,7 +78,7 @@
 
 				}
 
-				materials.push( new THREE.MultiMaterial( materials ) );
+				materials.push( materials );
 
 				objects = [];
 
@@ -145,19 +130,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				var debugCanvas = document.createElement( 'canvas' );
-				debugCanvas.width = 512;
-				debugCanvas.height = 512;
-				debugCanvas.style.position = 'absolute';
-				debugCanvas.style.top = '0px';
-				debugCanvas.style.left = '0px';
-
-				container.appendChild( debugCanvas );
-
-				debugContext = debugCanvas.getContext( '2d' );
-				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
-				debugContext.strokeStyle = '#000000';
 
 				stats = new Stats();
 				container.appendChild(stats.dom);

@@ -35,7 +35,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - point lights WebGL demo
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - point lights WebGL demo
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -49,13 +49,12 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer, controls,
-			particle1, particle2, particle4, particle5, particle6,
-			light1, light2, light3, light4, light5, light6;
-
-			var FAR = 300;
+			var camera, scene, renderer, controls;
+			var light1, light2, light3, light4, light5, light6;
 
 			var clock = new THREE.Clock();
+
+			var stats;
 
 			init();
 			animate();
@@ -66,14 +65,15 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, FAR );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 300 );
 				camera.position.set( 0, 15, 150 );
 				camera.lookAt( new THREE.Vector3() );
 
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x040306, 10, FAR );
+				scene.background = new THREE.Color( 0x040306 );
+				scene.fog = new THREE.Fog( 0x040306, 10, 300 );
 
 				// CONTROLS
 
@@ -114,9 +114,7 @@
 
 				// OBJECTS
 
-				//var objectGeometry = new THREE.BoxGeometry( 0.5, 1, 1 );
-				//var objectGeometry = new THREE.SphereGeometry( 1.5, 16, 8 );
-				var objectGeometry = new THREE.TorusGeometry( 1.5, 0.4, 8, 16 );
+				var objectGeometry = new THREE.TorusBufferGeometry( 1.5, 0.4, 8, 16 );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
@@ -143,7 +141,7 @@
 
 				var c1 = 0xff0040, c2 = 0x0040ff, c3 = 0x80ff80, c4 = 0xffaa00, c5 = 0x00ffaa, c6 = 0xff1100;
 
-				var sphere = new THREE.SphereGeometry( 0.25, 16, 8 );
+				var sphere = new THREE.SphereBufferGeometry( 0.25, 16, 8 );
 
 				light1 = new THREE.PointLight( c1, intensity, distance, decay );
 				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c1 } ) ) );
@@ -175,8 +173,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

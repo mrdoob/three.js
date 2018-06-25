@@ -44,7 +44,7 @@ THREE.UCSCharacter = function() {
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();
 
-			mesh = new THREE.SkinnedMesh( geometry, new THREE.MultiMaterial() );
+			mesh = new THREE.SkinnedMesh( geometry, [] );
 			mesh.name = config.character;
 			scope.root.add( mesh );
 

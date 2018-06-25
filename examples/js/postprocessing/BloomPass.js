@@ -16,7 +16,9 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
 	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+	this.renderTargetX.texture.name = "BloomPass.x";
 	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+	this.renderTargetY.texture.name = "BloomPass.y";
 
 	// copy material
 
@@ -25,7 +27,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	var copyShader = THREE.CopyShader;
 
-	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 
 	this.copyUniforms[ "opacity" ].value = strength;
 
@@ -46,7 +48,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	var convolutionShader = THREE.ConvolutionShader;
 
-	this.convolutionUniforms = Object.assign( {}, convolutionShader.uniforms );
+	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
 
 	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 	this.convolutionUniforms[ "cKernel" ].value = THREE.ConvolutionShader.buildKernel( sigma );
@@ -69,6 +71,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };

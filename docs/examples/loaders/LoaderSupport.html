@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">Supporting classes for file loaders and web worker based loaders.</p>
+
+		<h2>Sub-Classes</h2>
+		[page:LoaderSupport.Builder]<br>
+		[page:LoaderSupport.LoadedMeshUserOverride]<br>
+		[page:LoaderSupport.WorkerSupport]<br>
+		[page:LoaderSupport.WorkerRunnerRefImpl]<br>
+		[page:LoaderSupport.WorkerDirector]<br>
+		[page:LoaderSupport.ResourceDescriptor]<br>
+		[page:LoaderSupport.PrepData]<br>
+		[page:LoaderSupport.Callbacks]<br>
+		[page:LoaderSupport.Validator]<br>
+
+
+		<h2>Example</h2>
+
+		[example:webgl_loader_obj2_meshspray] - Example using [page:LoaderSupport.LoaderWorkerDirector] and [page:LoaderSupport.LoaderWorkerSupport].<br>
+
+		<h2>Classes</h2>
+		<br>
+
+		<a name="Builder"></a><h1>Builder</h1>
+		<h2>Constructor</h2>
+
+		<h3>Builder()</h3>
+		<p>
+			Builds one or many [page:Mesh] from one raw set of Arraybuffers, materialGroup descriptions and further parameters.
+			Supports vertex, vertexColor, normal, uv and index buffers.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null setLogging] ( [param:Boolean enabled], [param:Boolean debug] )</h3>
+		<p>
+			[page:Boolean enabled] True or false.<br>
+			[page:Boolean debug] True or false.
+		</p>
+		<p>
+			Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
+		</p>
+
+
+		<h3>[method:null init] ()</h3>
+		<p>
+			Initializes the Builder (currently only default material initialisation).
+		</p>
+
+
+		<h3>[method:null setMaterials] ( Array of [param:Material materials] )</h3>
+		<p>
+			Array of [page:Material materials] - Array of [page:Material Materials]
+		</p>
+		<p>
+			Set materials loaded by any supplier of an Array of [page:Material Materials].
+		</p>
+
+
+		<h3>[method:Array processPayload] ( Object payload )</h3>
+		<p>
+			[page:Object payload] - Raw Mesh or Material descriptions.
+		</p>
+		<p>
+			Delegates processing of the payload (mesh building or material update) to the corresponding functions (BW-compatibility).
+		</p>
+
+
+		<h3>[method:Array buildMeshes] ( Object meshPayload )</h3>
+		<p>
+			[page:Object meshPayload] - Raw mesh description (buffers, params, materials) used to build one to many meshes.
+		</p>
+		<p>
+			Builds one or multiple meshes from the data described in the payload (buffers, params, material info).
+		</p>
+
+
+		<h3>[method:null updateMaterials] ( Object materialPayload )</h3>
+		<p>
+			[page:Object materialPayload] - Material update instructions
+		</p>
+		<p>
+			Updates the materials with contained material objects (sync) or from alteration instructions (async).
+		</p>
+
+
+		<h3>[method:Object getMaterialsJSON] ()</h3>
+		<p>
+			Returns the mapping object of material name and corresponding jsonified material.
+		</p>
+
+
+		<h3>[method:Object getMaterials] ()</h3>
+		<p>
+			Returns the mapping object of material name and corresponding material.
+		</p>
+		<br>
+		<br>
+
+
+		<a name="LoadedMeshUserOverride"></a><h1>LoadedMeshUserOverride</h1>
+		<h2>Constructor</h2>
+
+		<h3>LoadedMeshUserOverride( [param:Boolean disregardMesh], [param:BufferGeometry bufferGeometry] )</h3>
+		<p>
+			[page:Boolean disregardMesh] - Tell implementation to completely disregard this mesh<br>
+			[page:Boolean alteredMesh] - Tell implementation that mesh(es) have been altered or added
+		</p>
+		<p>
+			Object to return by callback onMeshAlter. Used to disregard a certain mesh or to return one to many meshes.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null addMesh] ( [param:Mesh mesh] )</h3>
+		<p>
+			[page:Mesh mesh] - Mesh
+		</p>
+		<p>
+			Add a mesh created within callback.
+		</p>
+
+
+		<h3>[method:boolean isDisregardMesh] ()</h3>
+		<p>
+			Answers if mesh shall be disregarded completely.
+		</p>
+
+
+		<h3>[method:boolean providesAlteredMeshes] ()</h3>
+		<p>
+			Answers if new mesh(es) were created.
+		</p>
+		<br>
+		<br>
+
+
+		<a name="WorkerSupport"></a><h1>WorkerSupport</h1>
+		<h2>Constructor</h2>
+
+		<h3>WorkerSupport()</h3>
+		<p>
+			This class provides means to transform existing parser code into a web worker.
+			It defines a simple communication protocol which allows to configure the worker and receive raw mesh data during execution.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null setLogging]( [param:Boolean enabled], [param:Boolean debug] )</h3>
+		<p>
+			[page:Boolean enabled] True or false.<br>
+			[page:Boolean debug] True or false.
+		</p>
+		<p>
+			Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
+		</p>
+
+
+		<h3>[method:null setForceWorkerDataCopy]( [param:Boolean forceWorkerDataCopy] )</h3>
+		<p>
+			[page:Boolean forceWorkerDataCopy] True or false.
+		</p>
+		<p>
+			Forces all ArrayBuffers to be transferred to worker to be copied.
+		</p>
+
+
+		<h3>[method:null validate] ( [param:Function functionCodeBuilder], Array of [param:String libLocations], [param:String libPath], [param:LoaderSupport.WorkerRunnerRefImpl runnerImpl] )</h3>
+		<p>
+			[page:Function functionCodeBuilder] - Function that is invoked with funcBuildObject and funcBuildSingleton that allows stringification of objects and singletons.<br>
+			Array of [page:String libLocations] - URL of libraries that shall be added to worker code relative to libPath.<br>
+			[page:String libPath] - Base path used for loading libraries.<br>
+			[page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] - The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
+		</p>
+		<p>
+			Validate the status of worker code and the derived worker.
+		</p>
+
+
+		<h3>[method:null setTerminateRequested] ( [param:Boolean terminateRequested] )</h3>
+		<p>
+			[page:Boolean terminateRequested] - True or false.
+		</p>
+		<p>
+			Request termination of worker once parser is finished.
+		</p>
+
+
+		<h3>[method:null setCallbacks] ( [param:Function builder], [param:Function onLoad] )</h3>
+		<p>
+			[page:Function builder] - The builder function. Default is [page:LoaderSupport.Builder].<br>
+			[page:Function onLoad] - The function that is called when parsing is complete.
+		</p>
+		<p>
+			Specify functions that should be build when new raw mesh data becomes available and when the parser is finished.
+		</p>
+
+
+		<h3>[method:null run] ( [param:Object payload] )</h3>
+		<p>
+			[page:Object payload] - Raw mesh description (buffers, params, materials) used to build one to many meshes.
+		</p>
+		<p>
+			Runs the parser with the provided configuration.
+		</p>
+		<br>
+		<br>
+
+
+		<a name="WorkerRunnerRefImpl"></a><h1>WorkerRunnerRefImpl</h1>
+		<h2>Constructor</h2>
+
+		<h3>WorkerRunnerRefImpl()</h3>
+		<p>
+			Default implementation of the WorkerRunner responsible for creation and configuration of the parser within the worker.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null applyProperties] ( [param:Object parser], [param:Object params] )</h3>
+		<p>
+			[page:Object parser] - The parser instance<br>
+			[page:Object params] - The parameter object
+		</p>
+		<p>
+			Applies values from parameter object via set functions or via direct assignment.
+		</p>
+
+
+		<h3>[method:null run] ( [param:Object payload] )</h3>
+		<p>
+			[page:Object payload] - Raw mesh description (buffers, params, materials) used to build one to many meshes.
+		</p>
+		<p>
+			Configures the Parser implementation according the supplied configuration object.
+		</p>
+		<br>
+		<br>
+
+
+		<a name="WorkerDirector"></a><h1>WorkerDirector</h1>
+		<h2>Constructor</h2>
+
+		<h3>WorkerDirector( [param:String classDef] )</h3>
+		<p>
+			[page:String classDef] - Class definition to be used for construction
+		</p>
+		<p>
+			Orchestrate loading of multiple OBJ files/data from an instruction queue with a configurable amount of workers (1-16).<br>
+			- Workflow:<br>
+			- prepareWorkers<br>
+			- enqueueForRun<br>
+			- processQueue<br>
+			- tearDown
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null setLogging]( [param:Boolean enabled], [param:Boolean debug] )</h3>
+		<p>
+			[page:Boolean enabled] True or false.<br>
+			[page:Boolean debug] True or false.
+		</p>
+		<p>
+			Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
+		</p>
+
+
+		<h3>[method:null setForceWorkerDataCopy]( [param:Boolean forceWorkerDataCopy] )</h3>
+		<p>
+			[page:Boolean forceWorkerDataCopy] True or false.
+		</p>
+		<p>
+			Forces all ArrayBuffers to be transferred to worker to be copied.
+		</p>
+
+
+		<h3>[method:null prepareWorkers]( [param:WWOBJLoader2.Callbacks globalCallbacks], [param:Number maxQueueSize], [param:Number maxWebWorkers] )</h3>
+		<p>
+			[page:LoaderSupport.Callbacks globalCallbacks] - Register global callbacks used by all web workers<br>
+			[page:Number maxQueueSize] - Set the maximum size of the instruction queue (1-1024)<br>
+			[page:Number maxWebWorkers] - Set the maximum amount of workers (1-16)
+		</p>
+		<p>
+			Create or destroy workers according limits. Set the name and register callbacks for dynamically created web workers.
+		</p>
+
+
+		<h3>[method:null enqueueForRun]( [param:LoaderSupport.PrepData runParams] )</h3>
+		<p>
+			[page:LoaderSupport.PrepData runParams]
+		</p>
+		<p>
+			Store run instructions in internal instructionQueue.
+		</p>
+
+
+		<h3>[method:null processQueue]()</h3>
+		<p>
+			Process the instructionQueue until it is depleted.
+		</p>
+
+
+		<h3>[method:null tearDown]( [param:Function callbackOnFinishedProcessing] )</h3>
+		<p>
+			[page:Function callbackOnFinishedProcessing] - Function called once all workers finished processing.
+		</p>
+		<p>
+			Terminate all workers.
+		</p>
+
+
+		<h3>[method:null getMaxQueueSize]()</h3>
+		<p>
+			Returns the maximum length of the instruction queue.
+		</p>
+
+
+		<h3>[method:null getMaxWebWorkers]()</h3>
+		<p>
+			Returns the maximum number of workers.
+		</p>
+
+		<h3>[method:Boolean isRunning]()</h3>
+		<p>
+			Returns if any workers are running.
+		</p>
+
+
+		<h3>[method:null setCrossOrigin]( [param:String crossOrigin] )</h3>
+		<p>
+			[page:String crossOrigin] - CORS value
+		</p>
+		<p>
+			Sets the CORS string to be used.
+		</p>
+		<br>
+		<br>
+
+
+		<a name="ResourceDescriptor"></a><h1>ResourceDescriptor</h1>
+		<h2>Constructor</h2>
+
+		<h3>ResourceDescriptor( [param:String url], [param:String extension] )</h3>
+		<p>
+			[page:String url] - URL to the file<br>
+			[page:String extension] - The file extension (type)
+		</p>
+		<p>
+			A resource description used by [page:LoaderSupport.PrepData] and others.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null setContent]( [param:Object content )</h3>
+		<p>
+			[page:Object content] - The file content as ArrayBuffer or text
+		</p>
+		<p>
+			Set the content of this resource
+		</p>
+		<br>
+		<br>
+
+
+		<a name="PrepData"></a><h1>PrepData</h1>
+		<h2>Constructor</h2>
+
+		<h3>PrepData( [param:String modelName] )</h3>
+		<p>
+			[page:String modelName] - Overall name of the model
+		</p>
+		<p>
+			Configuration instructions to be used by run method.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null setLogging]( [param:Boolean enabled], [param:Boolean debug] )</h3>
+		<p>
+			[page:Boolean enabled] True or false.<br>
+			[page:Boolean debug] True or false.
+		</p>
+		<p>
+			Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
+		</p>
+
+
+		<h3>[method:Callbacks getCallbacks]()</h3>
+		<p>
+			Returns all callbacks as [page:LoaderSupport.Callbacks].
+		</p>
+
+
+		<h3>[method:null addResource]( [param:LoaderSupport.ResourceDescriptor resource] )</h3>
+		<p>
+			[page:LoaderSupport.ResourceDescriptor resource] Adds a [page:LoaderSupport.ResourceDescriptor]
+		</p>
+		<p>
+			Add a resource description.
+		</p>
+
+
+		<h3>[method:null checkResourceDescriptorFiles] ( [param:LoaderSupport.ResourceDescriptor resources], [param:Object fileDesc] )</h3>
+		<p>
+			[page:LoaderSupport.ResourceDescriptor resources] - Array of [page:LoaderSupport.ResourceDescriptor]<br>
+			[page:Object fileDesc] - Object describing which resources are of interest (ext, type (string or UInt8Array) and ignore (boolean))
+		</p>
+		<p>
+			Identify files or content of interest from an Array of [page:LoaderSupport.ResourceDescriptor].
+			Returns Object with each "ext" and the corresponding [page:LoaderSupport.ResourceDescriptor]
+		</p>
+
+
+		<h3>[method:PrepData clone] ()</h3>
+		<p>
+			Clones this object and returns it afterwards. Callbacks and resources are not cloned deep (references!).
+		</p>
+		<br>
+		<br>
+
+
+		<a name="Callbacks"></a><h1>Callbacks</h1>
+		<h2>Constructor</h2>
+
+		<h3>Callbacks()</h3>
+		<p>
+			Callbacks utilized by loaders and builder.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null setCallbackOnProgress]( [param:Function callbackOnProgress] )</h3>
+		<p>
+			[page:Function callbackOnProgress] - Callback function for described functionality
+		</p>
+		<p>
+			Register callback function that is invoked by internal function "announceProgress" to print feedback.
+		</p>
+
+
+		<h3>[method:null setCallbackOnMeshAlter]( [param:Function callbackOnMeshAlter] )</h3>
+		<p>
+			[page:Function callbackOnMeshAlter] - Callback function for described functionality
+		</p>
+		<p>
+			Register callback function that is called every time a mesh was loaded.
+			Use [page:LoadedMeshUserOverride] for alteration instructions (geometry, material or disregard mesh).
+		</p>
+
+
+		<h3>[method:null setCallbackOnLoad]( [param:Function callbackOnLoad] )</h3>
+		<p>
+			[page:Function callbackOnLoad] - Callback function for described functionality
+		</p>
+		<p>
+			Register callback function that is called once loading of the complete OBJ file is completed.
+		</p>
+
+		<h3>[method:null setCallbackOnLoadMaterials]( [param:Function callbackOnLoadMaterials] )</h3>
+		<p>
+			[page:Function callbackOnLoadMaterials] - Callback function for described functionality
+		</p>
+		<p>
+			Register callback function that is called when materials have been loaded.
+		</p>
+		<br>
+		<br>
+
+
+		<a name="Validator"></a><h1>Validator</h1>
+		<h2>Constructor</h2>
+
+		<h3>Validator()</h3>
+		<p>
+			Validation functions.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Boolean isValid]( [param:Object input] )</h3>
+		<p>
+			[page:Object input] - Can be anything
+		</p>
+		<p>
+			If given input is null or undefined, false is returned otherwise true.
+		</p>
+
+
+		<h3>[method:null verifyInput]( [param:Object input], [param:Object defaultValue] )</h3>
+		<p>
+			[page:Object input] - Can be anything<br>
+			[page:Object defaultValue] - Can be anything
+		</p>
+		<p>
+			If given input is null or undefined, the defaultValue is returned otherwise the given input.
+		</p>
+		<br>
+		<br>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/LoaderSupport.js examples/js/loaders/LoaderSupport.js]
+
+	</body>
+</html>

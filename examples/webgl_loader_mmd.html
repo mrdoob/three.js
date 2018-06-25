@@ -26,11 +26,11 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - MMDLoader test<br />
-		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank">MMD Assets license</a><br />
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
 		Copyright
-		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank">Model Data</a>
-		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank">Dance Data</a>
+		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
+		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -43,6 +43,7 @@
 		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
+		<script src="js/animation/MMDAnimationHelper.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -54,7 +55,7 @@
 
 			var container, stats;
 
-			var mesh, camera, scene, renderer;
+			var mesh, camera, scene, renderer, effect;
 			var helper, ikHelper, physicsHelper;
 
 			var mouseX = 0, mouseY = 0;
@@ -78,8 +79,9 @@
 				// scene
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				var gridHelper = new THREE.GridHelper( 100, 100 );
+				var gridHelper = new THREE.PolarGridHelper( 30, 10 );
 				gridHelper.position.y = -10;
 				scene.add( gridHelper );
 
@@ -95,8 +97,9 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
+
+				effect = new THREE.OutlineEffect( renderer );
 
 				// STATS
 
@@ -118,45 +121,59 @@
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDAnimationHelper( {
+					afterglow: 2.0
+				} );
 
 				var loader = new THREE.MMDLoader();
 
-				loader.load( modelFile, vmdFiles, function ( object ) {
+				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
-					mesh = object;
+					mesh = mmd.mesh;
 					mesh.position.y = -10;
 					scene.add( mesh );
 
-					helper.add( mesh );
-					helper.setAnimation( mesh );
+					helper.add( mesh, {
+						animation: mmd.animation,
+						physics: true
+					} );
 
-					/*
-					 * Note: create CCDIKHelper after calling helper.setAnimation()
-					 */
-					ikHelper = new THREE.CCDIKHelper( mesh );
+					ikHelper = helper.objects.get( mesh ).ikSolver.createHelper();
 					ikHelper.visible = false;
 					scene.add( ikHelper );
 
-					/*
-					 * Note: You're recommended to call helper.setPhysics()
-					 *       after calling helper.setAnimation().
-			 		 */
-					helper.setPhysics( mesh );
-					physicsHelper = new THREE.MMDPhysicsHelper( mesh );
+					physicsHelper = helper.objects.get( mesh ).physics.createHelper();
 					physicsHelper.visible = false;
 					scene.add( physicsHelper );
-
-					helper.unifyAnimationDuration( { afterglow: 2.0 } );
 
 					initGui();
 
 				}, onProgress, onError );
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				var phongMaterials;
+				var originalMaterials;
+
+				function makePhongMaterials ( materials ) {
+
+					var array = [];
+
+					for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+						var m = new THREE.MeshPhongMaterial();
+						m.copy( materials[ i ] );
+						m.needsUpdate = true;
+
+						array.push( m );
+
+					}
+
+					phongMaterials = array;
+
+				}
 
 				function initGui () {
 
@@ -173,29 +190,36 @@
 					var gui = new dat.GUI();
 
 					gui.add( api, 'animation' ).onChange( function () {
-						helper.doAnimation = api[ 'animation' ];
+						helper.enable( 'animation', api[ 'animation' ] );
 					} );
 
 					gui.add( api, 'gradient mapping' ).onChange( function () {
 
-						for ( var i = 0, il = mesh.material.materials.length; i < il; i ++ ) {
+						if ( originalMaterials === undefined ) originalMaterials = mesh.material;
+						if ( phongMaterials === undefined ) makePhongMaterials( mesh.material );
 
-							var material = mesh.material.materials[ i ].uniforms.celShading.value = api[ 'gradient mapping' ] ? 1 : 0;
+						if ( api[ 'gradient mapping' ] ) {
+
+							mesh.material = originalMaterials;
+
+						} else {
+
+							mesh.material = phongMaterials;
 
 						}
 
 					} );
 
 					gui.add( api, 'ik' ).onChange( function () {
-						helper.doIk = api[ 'ik' ];
+						helper.enable( 'ik', api[ 'ik' ] );
 					} );
 
 					gui.add( api, 'outline' ).onChange( function () {
-						helper.doOutlineDrawing = api[ 'outline' ];
+						effect.enabled = api[ 'outline' ];
 					} );
 
 					gui.add( api, 'physics' ).onChange( function () {
-						helper.enablePhysics( api[ 'physics' ] );
+						helper.enable( 'physics', api[ 'physics' ] );
 					} );
 
 					gui.add( api, 'show IK bones' ).onChange( function () {
@@ -218,7 +242,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				helper.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -236,18 +260,8 @@
 
 			function render() {
 
-				if ( mesh ) {
-
-					helper.animate( clock.getDelta() );
-					if ( physicsHelper.visible ) physicsHelper.update();
-					if ( ikHelper.visible ) ikHelper.update();
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				helper.update( clock.getDelta() );
+				effect.render( scene, camera );
 
 			}
 

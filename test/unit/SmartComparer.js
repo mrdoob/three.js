@@ -4,6 +4,7 @@
 // Comparison stops after the first difference is found.
 // Provides an explanation for the failure.
 function SmartComparer() {
+
 	'use strict';
 
 	// Diagnostic message, when comparison fails.
@@ -13,7 +14,7 @@ function SmartComparer() {
 
 		areEqual: areEqual,
 
-		getDiagnostic: function() {
+		getDiagnostic: function () {
 
 			return message;
 
@@ -41,6 +42,7 @@ function SmartComparer() {
 
 			// Both null / undefined.
 			return true;
+
 		}
 
 		// Don't compare functions.
@@ -67,28 +69,29 @@ function SmartComparer() {
 
 		// Object differs (unknown reason).
 		return makeFail( 'Values differ', val1, val2 );
+
 	}
 
-	function isFunction(value) {
+	function isFunction( value ) {
 
 		// The use of `Object#toString` avoids issues with the `typeof` operator
 		// in Safari 8 which returns 'object' for typed array constructors, and
 		// PhantomJS 1.9 which returns 'function' for `NodeList` instances.
-		var tag = isObject(value) ? Object.prototype.toString.call(value) : '';
+		var tag = isObject( value ) ? Object.prototype.toString.call( value ) : '';
 
 		return tag == '[object Function]' || tag == '[object GeneratorFunction]';
 
-  }
+	}
 
-	function isObject(value) {
+	function isObject( value ) {
 
 		// Avoid a V8 JIT bug in Chrome 19-20.
 		// See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
 		var type = typeof value;
 
-		return !!value && (type == 'object' || type == 'function');
+		return !! value && ( type == 'object' || type == 'function' );
 
-  }
+	}
 
 	function compareArrays( val1, val2 ) {
 
@@ -99,7 +102,7 @@ function SmartComparer() {
 		if ( isArr1 !== isArr2 ) return makeFail( 'Values are not both arrays' );
 
 		// Not arrays. Continue.
-		if ( !isArr1 ) return undefined;
+		if ( ! isArr1 ) return undefined;
 
 		// Compare length.
 		var N1 = val1.length;
@@ -110,12 +113,13 @@ function SmartComparer() {
 		for ( var i = 0; i < N1; i ++ ) {
 
 			var cmp = areEqual( val1[ i ], val2[ i ] );
-			if ( !cmp )	return addContext( 'array index "' + i + '"' );
+			if ( ! cmp )	return addContext( 'array index "' + i + '"' );
 
 		}
 
 		// Arrays are equal.
 		return true;
+
 	}
 
 
@@ -128,15 +132,15 @@ function SmartComparer() {
 		if ( isObj1 !== isObj2 ) return makeFail( 'Values are not both objects' );
 
 		// Not objects. Continue.
-		if ( !isObj1 ) return undefined;
+		if ( ! isObj1 ) return undefined;
 
 		// Compare keys.
 		var keys1 = Object.keys( val1 );
 		var keys2 = Object.keys( val2 );
 
-		for ( var i = 0, l = keys1.length; i < l; i++ ) {
+		for ( var i = 0, l = keys1.length; i < l; i ++ ) {
 
-			if (keys2.indexOf(keys1[ i ]) < 0) {
+			if ( keys2.indexOf( keys1[ i ] ) < 0 ) {
 
 				return makeFail( 'Property "' + keys1[ i ] + '" is unexpected.' );
 
@@ -144,9 +148,9 @@ function SmartComparer() {
 
 		}
 
-		for ( var i = 0, l = keys2.length; i < l; i++ ) {
+		for ( var i = 0, l = keys2.length; i < l; i ++ ) {
 
-			if (keys1.indexOf(keys2[ i ]) < 0) {
+			if ( keys1.indexOf( keys2[ i ] ) < 0 ) {
 
 				return makeFail( 'Property "' + keys2[ i ] + '" is missing.' );
 
@@ -157,11 +161,11 @@ function SmartComparer() {
 		// Keys are the same. For each key, compare content until a difference is found.
 		var hadDifference = false;
 
-		for ( var i = 0, l = keys1.length; i < l; i++ ) {
+		for ( var i = 0, l = keys1.length; i < l; i ++ ) {
 
 			var key = keys1[ i ];
 
-			if (key === "uuid" || key === "id") {
+			if ( key === "uuid" || key === "id" ) {
 
 				continue;
 
@@ -175,12 +179,13 @@ function SmartComparer() {
 
 			// In case of failure, an message should already be set.
 			// Add context to low level message.
-			if ( !eq ) {
+			if ( ! eq ) {
 
 				addContext( 'property "' + key + '"' );
 				hadDifference = true;
 
 			}
+
 		}
 
 		return ! hadDifference;
@@ -191,7 +196,7 @@ function SmartComparer() {
 	function makeFail( msg, val1, val2 ) {
 
 		message = msg;
-		if ( arguments.length > 1) message += " (" + val1 + " vs " + val2 + ")";
+		if ( arguments.length > 1 ) message += " (" + val1 + " vs " + val2 + ")";
 
 		return false;
 
@@ -208,3 +213,5 @@ function SmartComparer() {
 	}
 
 }
+
+export { SmartComparer };

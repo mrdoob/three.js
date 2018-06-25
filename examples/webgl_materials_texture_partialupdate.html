@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - texture - partial update</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#777;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+
+		<script src="../build/three.js"></script>
+		<script src="js/Detector.js"></script>
+
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - partial texture update <br/>
+			replace parts of an existing texture with all data of another texture
+		</div>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, clock, dataTexture, diffuseMap;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.z = 2;
+
+				scene = new THREE.Scene();
+
+				clock = new THREE.Clock();
+
+				var loader = new THREE.TextureLoader();
+				diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', animate );
+				diffuseMap.minFilter = THREE.LinearFilter;
+				diffuseMap.generateMipmaps = false;
+
+				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+				var material = new THREE.MeshBasicMaterial( { map: diffuseMap } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
+
+				var width = 32;
+				var height = 32;
+
+				var data = new Uint8Array( width * height * 3 );
+				dataTexture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			var last = 0;
+			var position = new THREE.Vector2();
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var elapsedTime = clock.getElapsedTime();
+
+				if ( elapsedTime - last > 0.1 ) {
+
+					last = elapsedTime;
+
+					position.x = ( 32 * THREE.Math.randInt( 1, 16 ) ) - 32 ;
+					position.y = ( 32 * THREE.Math.randInt( 1, 16 ) ) - 32 ;
+
+					// generate new color data
+
+					updateDataTexture( dataTexture );
+
+					// perform copy from src to dest texture to a random position
+
+					renderer.copyTextureToTexture( position, dataTexture, diffuseMap );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			var color = new THREE.Color();
+
+			function updateDataTexture( texture ) {
+
+				var size = texture.image.width * texture.image.height;
+				var data = texture.image.data;
+
+				// generate a random color and update texture data
+
+				color.setHex( Math.random() * 0xffffff );
+
+				var r = Math.floor( color.r * 255 );
+				var g = Math.floor( color.g * 255 );
+				var b = Math.floor( color.b * 255 );
+
+				for ( var i = 0; i < size; i ++ ) {
+
+					var stride = i * 3;
+
+					data[ stride ] = r;
+					data[ stride + 1 ] = g;
+					data[ stride + 2 ] = b;
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>

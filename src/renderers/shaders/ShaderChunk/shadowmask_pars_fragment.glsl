@@ -8,6 +8,7 @@ float getShadowMask() {
 
 	DirectionalLight directionalLight;
 
+	#pragma unroll_loop
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
@@ -21,6 +22,7 @@ float getShadowMask() {
 
 	SpotLight spotLight;
 
+	#pragma unroll_loop
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
 		spotLight = spotLights[ i ];
@@ -34,20 +36,23 @@ float getShadowMask() {
 
 	PointLight pointLight;
 
+	#pragma unroll_loop
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
 		pointLight = pointLights[ i ];
-		shadow *= bool( pointLight.shadow ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] ) : 1.0;
+		shadow *= bool( pointLight.shadow ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;
 
 	}
 
 	#endif
 
+	/*
 	#if NUM_RECT_AREA_LIGHTS > 0
 
-	// TODO (abelnation): update shadow for Area light
+		// TODO (abelnation): update shadow for Area light
 
 	#endif
+	*/
 
 	#endif
 

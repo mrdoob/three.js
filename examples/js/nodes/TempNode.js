@@ -3,7 +3,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.TempNode = function( type, params ) {
+THREE.TempNode = function ( type, params ) {
 
 	THREE.GLNode.call( this, type );
 
@@ -17,7 +17,7 @@ THREE.TempNode = function( type, params ) {
 THREE.TempNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.TempNode.prototype.constructor = THREE.TempNode;
 
-THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
+THREE.TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 	output = output || this.getType( builder );
 
@@ -48,6 +48,12 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 			}
 
 			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
+
+		} else if ( isUnique ) {
+
+			data.name = data.name || THREE.GLNode.prototype.build.call( this, builder, output, uuid );
+
+			return data.name;
 
 		} else if ( ! builder.optimize || data.deps == 1 ) {
 
@@ -83,19 +89,19 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 };
 
-THREE.TempNode.prototype.isShared = function( builder, output ) {
+THREE.TempNode.prototype.isShared = function ( builder, output ) {
 
 	return output !== 'sampler2D' && output !== 'samplerCube' && this.shared;
 
 };
 
-THREE.TempNode.prototype.isUnique = function( builder, output ) {
+THREE.TempNode.prototype.isUnique = function ( builder, output ) {
 
 	return this.unique;
 
 };
 
-THREE.TempNode.prototype.getUuid = function( unique ) {
+THREE.TempNode.prototype.getUuid = function ( unique ) {
 
 	var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
 
@@ -105,7 +111,7 @@ THREE.TempNode.prototype.getUuid = function( unique ) {
 
 };
 
-THREE.TempNode.prototype.getTemp = function( builder, uuid ) {
+THREE.TempNode.prototype.getTemp = function ( builder, uuid ) {
 
 	uuid = uuid || this.uuid;
 
@@ -116,7 +122,7 @@ THREE.TempNode.prototype.getTemp = function( builder, uuid ) {
 
 };
 
-THREE.TempNode.prototype.generate = function( builder, output, uuid, type, ns ) {
+THREE.TempNode.prototype.generate = function ( builder, output, uuid, type, ns ) {
 
 	if ( ! this.isShared( builder, output ) ) console.error( "THREE.TempNode is not shared!" );
 

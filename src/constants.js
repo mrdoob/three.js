@@ -1,4 +1,4 @@
-export var REVISION = '83dev';
+export var REVISION = '93';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 export var CullFaceNone = 0;
 export var CullFaceBack = 1;
@@ -23,14 +23,6 @@ export var AdditiveBlending = 2;
 export var SubtractiveBlending = 3;
 export var MultiplyBlending = 4;
 export var CustomBlending = 5;
-export var BlendingMode = {
-	NoBlending: NoBlending,
-	NormalBlending: NormalBlending,
-	AdditiveBlending: AdditiveBlending,
-	SubtractiveBlending: SubtractiveBlending,
-	MultiplyBlending: MultiplyBlending,
-	CustomBlending: CustomBlending
-};
 export var AddEquation = 100;
 export var SubtractEquation = 101;
 export var ReverseSubtractEquation = 102;
@@ -71,38 +63,15 @@ export var EquirectangularRefractionMapping = 304;
 export var SphericalReflectionMapping = 305;
 export var CubeUVReflectionMapping = 306;
 export var CubeUVRefractionMapping = 307;
-export var TextureMapping = {
-	UVMapping: UVMapping,
-	CubeReflectionMapping: CubeReflectionMapping,
-	CubeRefractionMapping: CubeRefractionMapping,
-	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
-	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	SphericalReflectionMapping: SphericalReflectionMapping,
-	CubeUVReflectionMapping: CubeUVReflectionMapping,
-	CubeUVRefractionMapping: CubeUVRefractionMapping
-};
 export var RepeatWrapping = 1000;
 export var ClampToEdgeWrapping = 1001;
 export var MirroredRepeatWrapping = 1002;
-export var TextureWrapping = {
-	RepeatWrapping: RepeatWrapping,
-	ClampToEdgeWrapping: ClampToEdgeWrapping,
-	MirroredRepeatWrapping: MirroredRepeatWrapping
-};
 export var NearestFilter = 1003;
 export var NearestMipMapNearestFilter = 1004;
 export var NearestMipMapLinearFilter = 1005;
 export var LinearFilter = 1006;
 export var LinearMipMapNearestFilter = 1007;
 export var LinearMipMapLinearFilter = 1008;
-export var TextureFilter = {
-	NearestFilter: NearestFilter,
-	NearestMipMapNearestFilter: NearestMipMapNearestFilter,
-	NearestMipMapLinearFilter: NearestMipMapLinearFilter,
-	LinearFilter: LinearFilter,
-	LinearMipMapNearestFilter: LinearMipMapNearestFilter,
-	LinearMipMapLinearFilter: LinearMipMapLinearFilter
-};
 export var UnsignedByteType = 1009;
 export var ByteType = 1010;
 export var ShortType = 1011;
@@ -123,15 +92,29 @@ export var LuminanceAlphaFormat = 1025;
 export var RGBEFormat = RGBAFormat;
 export var DepthFormat = 1026;
 export var DepthStencilFormat = 1027;
-export var RGB_S3TC_DXT1_Format = 2001;
-export var RGBA_S3TC_DXT1_Format = 2002;
-export var RGBA_S3TC_DXT3_Format = 2003;
-export var RGBA_S3TC_DXT5_Format = 2004;
-export var RGB_PVRTC_4BPPV1_Format = 2100;
-export var RGB_PVRTC_2BPPV1_Format = 2101;
-export var RGBA_PVRTC_4BPPV1_Format = 2102;
-export var RGBA_PVRTC_2BPPV1_Format = 2103;
-export var RGB_ETC1_Format = 2151;
+export var RGB_S3TC_DXT1_Format = 33776;
+export var RGBA_S3TC_DXT1_Format = 33777;
+export var RGBA_S3TC_DXT3_Format = 33778;
+export var RGBA_S3TC_DXT5_Format = 33779;
+export var RGB_PVRTC_4BPPV1_Format = 35840;
+export var RGB_PVRTC_2BPPV1_Format = 35841;
+export var RGBA_PVRTC_4BPPV1_Format = 35842;
+export var RGBA_PVRTC_2BPPV1_Format = 35843;
+export var RGB_ETC1_Format = 36196;
+export var RGBA_ASTC_4x4_Format = 37808;
+export var RGBA_ASTC_5x4_Format = 37809;
+export var RGBA_ASTC_5x5_Format = 37810;
+export var RGBA_ASTC_6x5_Format = 37811;
+export var RGBA_ASTC_6x6_Format = 37812;
+export var RGBA_ASTC_8x5_Format = 37813;
+export var RGBA_ASTC_8x6_Format = 37814;
+export var RGBA_ASTC_8x8_Format = 37815;
+export var RGBA_ASTC_10x5_Format = 37816;
+export var RGBA_ASTC_10x6_Format = 37817;
+export var RGBA_ASTC_10x8_Format = 37818;
+export var RGBA_ASTC_10x10_Format = 37819;
+export var RGBA_ASTC_12x10_Format = 37820;
+export var RGBA_ASTC_12x12_Format = 37821;
 export var LoopOnce = 2200;
 export var LoopRepeat = 2201;
 export var LoopPingPong = 2202;

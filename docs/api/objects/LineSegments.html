@@ -8,51 +8,44 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Line] &rarr;
+		[page:Object3D] &rarr; [page:Line] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A series of lines drawn between pairs of vertices.</div>
+		<p class="desc">
+			A series of lines drawn between pairs of vertices.<br /><br />
+
+			This is nearly the same	as [page:Line]; the only difference is that it is rendered using
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]
+			instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP].
+		</p>
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
 
-		<div>
-		geometry — Pair(s) of vertices representing each line segment(s).<br />
-		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].
-		</div>
+		<p>
+		[page:Geometry geometry] — Pair(s) of vertices representing each line segment(s).<br />
+		[page:Material material] — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].
+		</p>
 
-		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
+		<p>If no material is supplied, a randomized line material will be created and assigned to the object.</p>
 
 
 		<h2>Properties</h2>
+		<p>See the base [page:Line] class for common properties.</p>
 
-		<h3>[property:Geometry geometry]</h3>
-		<div>
-		Pair(s) of vertices representing the line segment(s).
-		</div>
+		<h3>[property:Boolean isLineSegments]</h3>
+		<p>
+			Used to check whether this or derived classes are line segments. Default is *true*.<br /><br />
 
-		<h3>[property:Material material]</h3>
-		<div>
-		Material for the line.
-		</div>
+			You should not change this, as it used internally for optimisation.
+		</p>
 
 
 		<h2>Methods</h2>
-
-		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>
-		<div>
-		Get intersections between a casted ray and this Line. [page:Raycaster.intersectObject] will call this method.
-		</div>
-		
-		<h3>[method:LineSegments clone]()</h3>
-		<div>
-		Returns a clone of this LineSegments object and its descendants.
-		</div>
-
-
+		<p>See the base [page:Line] class for common methods.</p>
 
 		<h2>Source</h2>
 

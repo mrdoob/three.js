@@ -124,7 +124,7 @@
 
 				var info = document.createElement( 'div' );
 				info.id = 'info';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - kinect';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
 				document.body.appendChild( info );
 
 				stats = new Stats();
@@ -142,6 +142,7 @@
 
 					texture = new THREE.VideoTexture( video );
 					texture.minFilter = THREE.NearestFilter;
+					texture.format = THREE.RGBFormat;
 
 					var width = 640, height = 480;
 					var nearClipping = 850, farClipping = 4000;
@@ -193,6 +194,7 @@
 
 
 				}, false );
+				video.crossOrigin = 'anonymous';
 				video.loop = true;
 				video.muted = true;
 				video.src = 'textures/kinect.webm';

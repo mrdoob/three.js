@@ -84,7 +84,7 @@ var Script = function ( editor ) {
 
 				if ( value !== currentScript.source ) {
 
-					editor.execute( new SetScriptValueCommand( currentObject, currentScript, 'source', value, codemirror.getCursor() ) );
+					editor.execute( new SetScriptValueCommand( currentObject, currentScript, 'source', value ) );
 
 				}
 				return;
@@ -407,7 +407,8 @@ var Script = function ( editor ) {
 
 		container.setDisplay( '' );
 		codemirror.setValue( source );
-		if (mode === 'json' ) mode = { name: 'javascript', json: true };
+		codemirror.clearHistory();
+		if ( mode === 'json' ) mode = { name: 'javascript', json: true };
 		codemirror.setOption( 'mode', mode );
 
 	} );
@@ -419,25 +420,6 @@ var Script = function ( editor ) {
 			container.setDisplay( 'none' );
 
 		}
-
-	} );
-
-	signals.refreshScriptEditor.add( function ( object, script, cursorPosition ) {
-
-		if ( currentScript !== script ) return;
-
-		// copying the codemirror history because "codemirror.setValue(...)" alters its history
-
-		var history = codemirror.getHistory();
-		title.setValue( object.name + ' / ' + script.name );
-		codemirror.setValue( script.source );
-
-		if ( cursorPosition !== undefined ) {
-
-			codemirror.setCursor( cursorPosition );
-
-		}
-		codemirror.setHistory( history ); // setting the history to previous state
 
 	} );
 

@@ -65,8 +65,8 @@ Sidebar.Object = function ( editor ) {
 	// uuid
 
 	var objectUUIDRow = new UI.Row();
-	var objectUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
-	var objectUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
+	var objectUUID = new UI.Input().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
+	var objectUUIDRenew = new UI.Button( 'New' ).setMarginLeft( '7px' ).onClick( function () {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
 
@@ -259,6 +259,26 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectVisibleRow );
 
+	// frustumCulled
+
+	var objectFrustumCulledRow = new UI.Row();
+	var objectFrustumCulled = new UI.Checkbox().onChange( update );
+
+	objectFrustumCulledRow.add( new UI.Text( 'Frustum Culled' ).setWidth( '90px' ) );
+	objectFrustumCulledRow.add( objectFrustumCulled );
+
+	container.add( objectFrustumCulledRow );
+
+	// renderOrder
+
+	var objectRenderOrderRow = new UI.Row();
+	var objectRenderOrder = new UI.Integer().setWidth( '50px' ).onChange( update );
+
+	objectRenderOrderRow.add( new UI.Text( 'Render Order' ).setWidth( '90px' ) );
+	objectRenderOrderRow.add( objectRenderOrder );
+
+	container.add( objectRenderOrderRow );
+
 	// user data
 
 	var timeout;
@@ -433,6 +453,18 @@ Sidebar.Object = function ( editor ) {
 			if ( object.visible !== objectVisible.getValue() ) {
 
 				editor.execute( new SetValueCommand( object, 'visible', objectVisible.getValue() ) );
+
+			}
+
+			if ( object.frustumCulled !== objectFrustumCulled.getValue() ) {
+
+				editor.execute( new SetValueCommand( object, 'frustumCulled', objectFrustumCulled.getValue() ) );
+
+			}
+
+			if ( object.renderOrder !== objectRenderOrder.getValue() ) {
+
+				editor.execute( new SetValueCommand( object, 'renderOrder', objectRenderOrder.getValue() ) );
 
 			}
 
@@ -654,6 +686,8 @@ Sidebar.Object = function ( editor ) {
 		}
 
 		objectVisible.setValue( object.visible );
+		objectFrustumCulled.setValue( object.frustumCulled );
+		objectRenderOrder.setValue( object.renderOrder );
 
 		try {
 

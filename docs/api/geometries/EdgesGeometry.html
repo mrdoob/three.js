@@ -12,25 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">This can be used as a helper object to view the edges of a [page:Geometry Geometry] object.</div>
-
-		<!-- <iframe id="scene" src="scenes/geometry-browser.html#EdgeGeometry"></iframe>
-
-		<script>
-
-		// iOS iframe auto-resize workaround
-
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			var scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script> -->
+		<p class="desc">This can be used as a helper object to view the edges of a [page:Geometry Geometry] object.</p>
 
 		<h2>Example</h2>
 
@@ -39,16 +21,17 @@
 		<code>
 var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 var edges = new THREE.EdgesGeometry( geometry );
-var line = new THREE.LineSegments( edges );
+var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
 scene.add( line );
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Geometry geometry] )</h3>
-		<div>
-		geometry — any geometry object.
-		</div>
+		<h3>[name]( [param:Geometry geometry], [param:Integer thresholdAngle] )</h3>
+		<p>
+		geometry — Any geometry object.<br />
+		thresholdAngle — An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
+		</p>
 
 		<h2>Source</h2>
 

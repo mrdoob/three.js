@@ -1,13 +1,13 @@
-import { Matrix4 } from '../math/Matrix4';
-import { Quaternion } from '../math/Quaternion';
-import { Object3D } from '../core/Object3D';
-import { Vector3 } from '../math/Vector3';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author WestLangley / http://github.com/WestLangley
 */
+
+import { Matrix4 } from '../math/Matrix4.js';
+import { Quaternion } from '../math/Quaternion.js';
+import { Object3D } from '../core/Object3D.js';
+import { Vector3 } from '../math/Vector3.js';
 
 function Camera() {
 
@@ -20,59 +20,58 @@ function Camera() {
 
 }
 
-Camera.prototype = Object.create( Object3D.prototype );
-Camera.prototype.constructor = Camera;
+Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-Camera.prototype.isCamera = true;
+	constructor: Camera,
 
-Camera.prototype.getWorldDirection = function () {
+	isCamera: true,
 
-	var quaternion = new Quaternion();
+	copy: function ( source, recursive ) {
 
-	return function getWorldDirection( optionalTarget ) {
+		Object3D.prototype.copy.call( this, source, recursive );
 
-		var result = optionalTarget || new Vector3();
+		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+		this.projectionMatrix.copy( source.projectionMatrix );
 
-		this.getWorldQuaternion( quaternion );
+		return this;
 
-		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+	},
 
-	};
+	getWorldDirection: function () {
 
-}();
+		var quaternion = new Quaternion();
 
-Camera.prototype.lookAt = function () {
+		return function getWorldDirection( target ) {
 
-	// This routine does not support cameras with rotated and/or translated parent(s)
+			if ( target === undefined ) {
 
-	var m1 = new Matrix4();
+				console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+				target = new Vector3();
 
-	return function lookAt( vector ) {
+			}
 
-		m1.lookAt( this.position, vector, this.up );
+			this.getWorldQuaternion( quaternion );
 
-		this.quaternion.setFromRotationMatrix( m1 );
+			return target.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-	};
+		};
 
-}();
+	}(),
 
-Camera.prototype.clone = function () {
+	updateMatrixWorld: function ( force ) {
 
-	return new this.constructor().copy( this );
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-};
+		this.matrixWorldInverse.getInverse( this.matrixWorld );
 
-Camera.prototype.copy = function ( source ) {
+	},
 
-	Object3D.prototype.copy.call( this, source );
+	clone: function () {
 
-	this.matrixWorldInverse.copy( source.matrixWorldInverse );
-	this.projectionMatrix.copy( source.projectionMatrix );
+		return new this.constructor().copy( this );
 
-	return this;
+	}
 
-};
-
+} );
 
 export { Camera };

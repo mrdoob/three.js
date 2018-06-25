@@ -1,705 +1,564 @@
 {
-    "accessors": {
-        "accessor_100": {
-            "bufferView": "bufferView_105",
-            "byteOffset": 7032,
-            "byteStride": 12,
-            "componentType": 5126,
-            "count": 586,
-            "max": [
-                0.999039,
-                0.999038,
-                1
-            ],
-            "min": [
-                -0.999038,
-                -0.999038,
-                -1
-            ],
-            "type": "VEC3"
-        },
-        "accessor_102": {
-            "bufferView": "bufferView_105",
-            "byteOffset": 14064,
-            "byteStride": 8,
-            "componentType": 5126,
-            "count": 586,
-            "max": [
-                0.993657,
-                0.989576
-            ],
-            "min": [
-                0.605093,
-                0.00905001
-            ],
-            "type": "VEC2"
-        },
-        "accessor_63": {
-            "bufferView": "bufferView_104",
-            "byteOffset": 4608,
-            "byteStride": 0,
-            "componentType": 5123,
-            "count": 5232,
-            "type": "SCALAR"
-        },
-        "accessor_66": {
-            "bufferView": "bufferView_104",
-            "byteOffset": 15072,
-            "byteStride": 0,
-            "componentType": 5123,
-            "count": 168,
-            "type": "SCALAR"
-        },
-        "accessor_69": {
-            "bufferView": "bufferView_104",
-            "byteOffset": 15408,
-            "byteStride": 0,
-            "componentType": 5123,
-            "count": 864,
-            "type": "SCALAR"
-        },
-        "accessor_71": {
-            "bufferView": "bufferView_105",
-            "byteOffset": 18752,
-            "byteStride": 12,
-            "componentType": 5126,
-            "count": 2392,
-            "max": [
-                2.438,
-                2.58437,
-                1.396
-            ],
-            "min": [
-                -2.43091,
-                0.2668,
-                -1.396
-            ],
-            "type": "VEC3"
-        },
-        "accessor_73": {
-            "bufferView": "bufferView_105",
-            "byteOffset": 47456,
-            "byteStride": 12,
-            "componentType": 5126,
-            "count": 2392,
-            "max": [
-                1,
-                1,
-                1
-            ],
-            "min": [
-                -1,
-                -1,
-                -1
-            ],
-            "type": "VEC3"
-        },
-        "accessor_75": {
-            "bufferView": "bufferView_105",
-            "byteOffset": 76160,
-            "byteStride": 8,
-            "componentType": 5126,
-            "count": 2392,
-            "max": [
-                0.896458,
-                0.997245
-            ],
-            "min": [
-                0.00295639,
-                0.015672
-            ],
-            "type": "VEC2"
-        },
-        "accessor_96": {
-            "bufferView": "bufferView_104",
-            "byteOffset": 0,
-            "byteStride": 0,
-            "componentType": 5123,
-            "count": 2304,
-            "type": "SCALAR"
-        },
-        "accessor_98": {
-            "bufferView": "bufferView_105",
-            "byteOffset": 0,
-            "byteStride": 12,
-            "componentType": 5126,
-            "count": 586,
-            "max": [
-                0.4278,
-                0.4278,
-                1.058
-            ],
-            "min": [
-                -0.4278,
-                -0.4278,
-                -1.058
-            ],
-            "type": "VEC3"
-        },
-        "animAccessor_0": {
-            "bufferView": "bufferView_103",
-            "byteOffset": 0,
-            "componentType": 5126,
-            "count": 31,
-            "type": "SCALAR"
-        },
-        "animAccessor_1": {
-            "bufferView": "bufferView_103",
-            "byteOffset": 124,
-            "componentType": 5126,
-            "count": 31,
-            "type": "VEC4"
-        }
-    },
-    "animations": {
-        "animation_0": {
-            "channels": [
-                {
-                    "sampler": "animation_0_rotation_sampler",
-                    "target": {
-                        "id": "Geometry-mesh001Node",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_0",
-                "rotation": "animAccessor_1"
-            },
-            "samplers": {
-                "animation_0_rotation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "rotation"
-                }
-            }
-        },
-        "animation_1": {
-            "channels": [
-                {
-                    "sampler": "animation_1_rotation_sampler",
-                    "target": {
-                        "id": "meshInst962Node",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_0",
-                "rotation": "animAccessor_1"
-            },
-            "samplers": {
-                "animation_1_rotation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "rotation"
-                }
-            }
-        }
-    },
     "asset": {
-        "generator": "collada2gltf@ceec062e3d5793f2f249f53cbd843aee382ad40b",
-        "premultipliedAlpha": true,
-        "profile": {
-            "api": "WebGL",
-            "version": "1.0.2"
-        },
-        "version": 1
+        "generator": "COLLADA2GLTF",
+        "version": "2.0"
     },
-    "bufferViews": {
-        "bufferView_103": {
-            "buffer": "CesiumMilkTruck",
-            "byteLength": 620,
-            "byteOffset": 0
-        },
-        "bufferView_104": {
-            "buffer": "CesiumMilkTruck",
-            "byteLength": 17136,
-            "byteOffset": 620,
-            "target": 34963
-        },
-        "bufferView_105": {
-            "buffer": "CesiumMilkTruck",
-            "byteLength": 95296,
-            "byteOffset": 17756,
-            "target": 34962
-        }
-    },
-    "buffers": {
-        "CesiumMilkTruck": {
-            "byteLength": 113052,
-            "type": "arraybuffer",
-            "uri": "CesiumMilkTruck.bin"
-        }
-    },
-    "images": {
-        "Image0001": {
-            "name": "Image0001",
-            "uri": "CesiumMilkTruck.png"
-        }
-    },
-    "materials": {
-        "Effect-glass": {
-            "name": "glass",
-            "technique": "technique0",
-            "values": {
-                "diffuse": [
-                    0,
-                    0.0405063,
-                    0.0212407,
-                    1
-                ],
-                "shininess": 256,
-                "specular": [
-                    0.65,
-                    0.65,
-                    0.65,
-                    1
-                ]
-            }
-        },
-        "Effect-truck": {
-            "name": "truck",
-            "technique": "technique1",
-            "values": {
-                "diffuse": "texture_Image0001",
-                "shininess": 256,
-                "specular": [
-                    0.04,
-                    0.04,
-                    0.04,
-                    1
-                ]
-            }
-        },
-        "Effect-wheels": {
-            "name": "wheels",
-            "technique": "technique1",
-            "values": {
-                "diffuse": "texture_Image0001",
-                "shininess": 256,
-                "specular": [
-                    0.04,
-                    0.04,
-                    0.04,
-                    1
-                ]
-            }
-        },
-        "Effect-window_trim": {
-            "name": "window_trim",
-            "technique": "technique0",
-            "values": {
-                "diffuse": [
-                    0.064,
-                    0.064,
-                    0.064,
-                    1
-                ],
-                "shininess": 256,
-                "specular": [
-                    0.04,
-                    0.04,
-                    0.04,
-                    1
-                ]
-            }
-        }
-    },
-    "meshes": {
-        "Geometry-mesh001": {
-            "name": "Wheels",
-            "primitives": [
-                {
-                    "attributes": {
-                        "NORMAL": "accessor_100",
-                        "POSITION": "accessor_98",
-                        "TEXCOORD_0": "accessor_102"
-                    },
-                    "indices": "accessor_96",
-                    "material": "Effect-wheels",
-                    "mode": 4
-                }
-            ]
-        },
-        "Geometry-mesh002": {
-            "name": "Cesium_Milk_Truck",
-            "primitives": [
-                {
-                    "attributes": {
-                        "NORMAL": "accessor_73",
-                        "POSITION": "accessor_71",
-                        "TEXCOORD_0": "accessor_75"
-                    },
-                    "indices": "accessor_63",
-                    "material": "Effect-truck",
-                    "mode": 4
-                },
-                {
-                    "attributes": {
-                        "NORMAL": "accessor_73",
-                        "POSITION": "accessor_71",
-                        "TEXCOORD_0": "accessor_75"
-                    },
-                    "indices": "accessor_66",
-                    "material": "Effect-glass",
-                    "mode": 4
-                },
-                {
-                    "attributes": {
-                        "NORMAL": "accessor_73",
-                        "POSITION": "accessor_71",
-                        "TEXCOORD_0": "accessor_75"
-                    },
-                    "indices": "accessor_69",
-                    "material": "Effect-window_trim",
-                    "mode": 4
-                }
+    "scene": 0,
+    "scenes": [
+        {
+            "nodes": [
+                0
             ]
         }
-    },
-    "nodes": {
-        "Geometry-mesh001Node": {
-            "children": [],
-            "meshes": [
-                "Geometry-mesh001"
-            ],
-            "name": "Wheels",
-            "rotation": [
-                0,
-                0,
-                -0.0884856,
-                0.996077
-            ],
-            "scale": [
-                1,
-                1,
-                1
-            ],
-            "translation": [
-                1.43267,
-                0.427722,
-                -2.98023e-008
-            ]
-        },
-        "Geometry-mesh002Node": {
+    ],
+    "nodes": [
+        {
+            "mesh": 0,
             "children": [
-                "Geometry-mesh001Node",
-                "meshInst962Node"
+                3,
+                1
+            ]
+        },
+        {
+            "children": [
+                2
             ],
             "matrix": [
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                -1.352329969406128,
+                0.4277220070362091,
+                -2.98022992950564e-8,
+                1.0
+            ]
+        },
+        {
+            "mesh": 1,
+            "rotation": [
+                -0.0,
+                -0.0,
+                0.08848562091588974,
+                -0.9960774779319764
+            ]
+        },
+        {
+            "children": [
+                4
             ],
-            "meshes": [
-                "Geometry-mesh002"
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                1.432669997215271,
+                0.4277220070362091,
+                -2.98022992950564e-8,
+                1.0
+            ]
+        },
+        {
+            "mesh": 1,
+            "rotation": [
+                -0.0,
+                -0.0,
+                0.08848562091588974,
+                -0.9960774779319764
+            ]
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TEXCOORD_0": 3
+                    },
+                    "indices": 0,
+                    "mode": 4,
+                    "material": 0
+                },
+                {
+                    "attributes": {
+                        "NORMAL": 5,
+                        "POSITION": 6
+                    },
+                    "indices": 4,
+                    "mode": 4,
+                    "material": 1
+                },
+                {
+                    "attributes": {
+                        "NORMAL": 8,
+                        "POSITION": 9
+                    },
+                    "indices": 7,
+                    "mode": 4,
+                    "material": 2
+                }
             ],
             "name": "Cesium_Milk_Truck"
         },
-        "groupLocator006Node": {
-            "children": [
-                "txtrLocator003Node",
-                "txtrLocator013Node"
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 11,
+                        "POSITION": 12,
+                        "TEXCOORD_0": 13
+                    },
+                    "indices": 10,
+                    "mode": 4,
+                    "material": 3
+                }
             ],
-            "matrix": [
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1
+            "name": "Wheels"
+        }
+    ],
+    "animations": [
+        {
+            "channels": [
+                {
+                    "sampler": 0,
+                    "target": {
+                        "node": 4,
+                        "path": "rotation"
+                    }
+                }
             ],
-            "name": "Texture_Group"
-        },
-        "meshInst962Node": {
-            "children": [],
-            "meshes": [
-                "Geometry-mesh001"
-            ],
-            "name": "Wheels__2_",
-            "rotation": [
-                0,
-                0,
-                -0.0884856,
-                0.996077
-            ],
-            "scale": [
-                1,
-                1,
-                1
-            ],
-            "translation": [
-                -1.35233,
-                0.427722,
-                -2.98023e-008
+            "samplers": [
+                {
+                    "input": 14,
+                    "interpolation": "LINEAR",
+                    "output": 15
+                }
             ]
         },
-        "polyRender006": {
-            "children": [],
-            "matrix": [
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1
+        {
+            "channels": [
+                {
+                    "sampler": 0,
+                    "target": {
+                        "node": 2,
+                        "path": "rotation"
+                    }
+                }
             ],
-            "name": "Render"
-        },
-        "txtrLocator003Node": {
-            "children": [],
-            "matrix": [
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1
-            ],
-            "name": "Cesium_Milk_Truck__2___Image___Texture_"
-        },
-        "txtrLocator013Node": {
-            "children": [],
-            "matrix": [
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1
-            ],
-            "name": "Cesium_Milk_Truck__2___Image___2___Texture_"
+            "samplers": [
+                {
+                    "input": 16,
+                    "interpolation": "LINEAR",
+                    "output": 17
+                }
+            ]
         }
-    },
-    "programs": {
-        "program_0": {
-            "attributes": [
-                "a_normal",
-                "a_position"
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 5232,
+            "max": [
+                1855
             ],
-            "fragmentShader": "CesiumMilkTruck0FS",
-            "vertexShader": "CesiumMilkTruck0VS"
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
         },
-        "program_1": {
-            "attributes": [
-                "a_normal",
-                "a_position",
-                "a_texcoord0"
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 1856,
+            "max": [
+                1.0,
+                1.0,
+                1.0
             ],
-            "fragmentShader": "CesiumMilkTruck1FS",
-            "vertexShader": "CesiumMilkTruck1VS"
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 22272,
+            "componentType": 5126,
+            "count": 1856,
+            "max": [
+                2.438000202178955,
+                2.5843698978424078,
+                1.3960000276565552
+            ],
+            "min": [
+                -2.4309098720550539,
+                0.2667999863624573,
+                -1.3960000276565552
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 1856,
+            "max": [
+                0.8964579701423645,
+                0.997245192527771
+            ],
+            "min": [
+                0.002956389915198088,
+                0.015672028064727784
+            ],
+            "type": "VEC2"
+        },
+        {
+            "bufferView": 0,
+            "byteOffset": 10464,
+            "componentType": 5123,
+            "count": 168,
+            "max": [
+                71
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 44544,
+            "componentType": 5126,
+            "count": 72,
+            "max": [
+                0.9574799537658693,
+                0.28850099444389346,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                0.0,
+                -1.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 45408,
+            "componentType": 5126,
+            "count": 72,
+            "max": [
+                1.6011799573898316,
+                2.3545398712158205,
+                1.3960000276565552
+            ],
+            "min": [
+                0.2288499921560288,
+                1.631850004196167,
+                -1.3960000276565552
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 0,
+            "byteOffset": 10800,
+            "componentType": 5123,
+            "count": 864,
+            "max": [
+                463
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 46272,
+            "componentType": 5126,
+            "count": 464,
+            "max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 51840,
+            "componentType": 5126,
+            "count": 464,
+            "max": [
+                1.6226699352264405,
+                2.392000198364258,
+                1.100000023841858
+            ],
+            "min": [
+                0.1931999921798706,
+                1.5961999893188477,
+                -1.1100000143051148
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 0,
+            "byteOffset": 12528,
+            "componentType": 5123,
+            "count": 2304,
+            "max": [
+                585
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 57408,
+            "componentType": 5126,
+            "count": 586,
+            "max": [
+                0.9990389943122864,
+                0.9990379810333252,
+                1.0
+            ],
+            "min": [
+                -0.9990379810333252,
+                -0.9990379810333252,
+                -1.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 64440,
+            "componentType": 5126,
+            "count": 586,
+            "max": [
+                0.4277999997138977,
+                0.4277999997138977,
+                1.058000087738037
+            ],
+            "min": [
+                -0.4277999997138977,
+                -0.4277999997138977,
+                -1.058000087738037
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 14848,
+            "componentType": 5126,
+            "count": 586,
+            "max": [
+                0.9936569929122924,
+                0.9895756244659424
+            ],
+            "min": [
+                0.6050930023193359,
+                0.00905001163482666
+            ],
+            "type": "VEC2"
+        },
+        {
+            "bufferView": 3,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                1.25
+            ],
+            "min": [
+                0.0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 4,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                -0.0,
+                -0.0,
+                0.9990190863609314,
+                1.0
+            ],
+            "min": [
+                -0.0,
+                -0.0,
+                0.0,
+                -0.9960774779319764
+            ],
+            "type": "VEC4"
+        },
+        {
+            "bufferView": 3,
+            "byteOffset": 124,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                1.25
+            ],
+            "min": [
+                0.0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 4,
+            "byteOffset": 496,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                -0.0,
+                -0.0,
+                0.9990190863609314,
+                1.0
+            ],
+            "min": [
+                -0.0,
+                -0.0,
+                0.0,
+                -0.9960774779319764
+            ],
+            "type": "VEC4"
         }
-    },
-    "samplers": {
-        "sampler_0": {
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0
+                },
+                "metallicFactor": 0.0
+            },
+            "name": "truck"
+        },
+        {
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.0,
+                    0.04050629958510399,
+                    0.021240700036287309,
+                    1.0
+                ],
+                "metallicFactor": 0.0
+            },
+            "name": "glass"
+        },
+        {
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.06400000303983689,
+                    0.06400000303983689,
+                    0.06400000303983689,
+                    1.0
+                ],
+                "metallicFactor": 0.0
+            },
+            "name": "window_trim"
+        },
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 1
+                },
+                "metallicFactor": 0.0
+            },
+            "name": "wheels"
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        },
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "images": [
+        {
+            "uri": "CesiumMilkTruck.png"
+        }
+    ],
+    "samplers": [
+        {
             "magFilter": 9729,
-            "minFilter": 9987,
+            "minFilter": 9986,
             "wrapS": 10497,
             "wrapT": 10497
         }
-    },
-    "scene": "defaultScene",
-    "scenes": {
-        "defaultScene": {
-            "nodes": [
-                "polyRender006",
-                "Geometry-mesh002Node",
-                "groupLocator006Node"
-            ]
-        }
-    },
-    "shaders": {
-        "CesiumMilkTruck0FS": {
-            "type": 35632,
-            "uri": "CesiumMilkTruck0FS.glsl"
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 92248,
+            "byteLength": 17136,
+            "target": 34963
         },
-        "CesiumMilkTruck0VS": {
-            "type": 35633,
-            "uri": "CesiumMilkTruck0VS.glsl"
+        {
+            "buffer": 0,
+            "byteOffset": 992,
+            "byteLength": 71472,
+            "byteStride": 12,
+            "target": 34962
         },
-        "CesiumMilkTruck1FS": {
-            "type": 35632,
-            "uri": "CesiumMilkTruck1FS.glsl"
+        {
+            "buffer": 0,
+            "byteOffset": 72464,
+            "byteLength": 19536,
+            "byteStride": 8,
+            "target": 34962
         },
-        "CesiumMilkTruck1VS": {
-            "type": 35633,
-            "uri": "CesiumMilkTruck1VS.glsl"
-        }
-    },
-    "skins": {},
-    "techniques": {
-        "technique0": {
-            "attributes": {
-                "a_normal": "normal",
-                "a_position": "position"
-            },
-            "parameters": {
-                "diffuse": {
-                    "type": 35666
-                },
-                "modelViewMatrix": {
-                    "semantic": "MODELVIEW",
-                    "type": 35676
-                },
-                "normal": {
-                    "semantic": "NORMAL",
-                    "type": 35665
-                },
-                "normalMatrix": {
-                    "semantic": "MODELVIEWINVERSETRANSPOSE",
-                    "type": 35675
-                },
-                "position": {
-                    "semantic": "POSITION",
-                    "type": 35665
-                },
-                "projectionMatrix": {
-                    "semantic": "PROJECTION",
-                    "type": 35676
-                },
-                "shininess": {
-                    "type": 5126
-                },
-                "specular": {
-                    "type": 35666
-                }
-            },
-            "program": "program_0",
-            "states": {
-                "enable": [
-                    2929,
-                    2884
-                ]
-            },
-            "uniforms": {
-                "u_diffuse": "diffuse",
-                "u_modelViewMatrix": "modelViewMatrix",
-                "u_normalMatrix": "normalMatrix",
-                "u_projectionMatrix": "projectionMatrix",
-                "u_shininess": "shininess",
-                "u_specular": "specular"
-            }
+        {
+            "buffer": 0,
+            "byteOffset": 92000,
+            "byteLength": 248
         },
-        "technique1": {
-            "attributes": {
-                "a_normal": "normal",
-                "a_position": "position",
-                "a_texcoord0": "texcoord0"
-            },
-            "parameters": {
-                "diffuse": {
-                    "type": 35678
-                },
-                "modelViewMatrix": {
-                    "semantic": "MODELVIEW",
-                    "type": 35676
-                },
-                "normal": {
-                    "semantic": "NORMAL",
-                    "type": 35665
-                },
-                "normalMatrix": {
-                    "semantic": "MODELVIEWINVERSETRANSPOSE",
-                    "type": 35675
-                },
-                "position": {
-                    "semantic": "POSITION",
-                    "type": 35665
-                },
-                "projectionMatrix": {
-                    "semantic": "PROJECTION",
-                    "type": 35676
-                },
-                "shininess": {
-                    "type": 5126
-                },
-                "specular": {
-                    "type": 35666
-                },
-                "texcoord0": {
-                    "semantic": "TEXCOORD_0",
-                    "type": 35664
-                }
-            },
-            "program": "program_1",
-            "states": {
-                "enable": [
-                    2929,
-                    2884
-                ]
-            },
-            "uniforms": {
-                "u_diffuse": "diffuse",
-                "u_modelViewMatrix": "modelViewMatrix",
-                "u_normalMatrix": "normalMatrix",
-                "u_projectionMatrix": "projectionMatrix",
-                "u_shininess": "shininess",
-                "u_specular": "specular"
-            }
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 992
         }
-    },
-    "textures": {
-        "texture_Image0001": {
-            "format": 6408,
-            "internalFormat": 6408,
-            "sampler": "sampler_0",
-            "source": "Image0001",
-            "target": 3553,
-            "type": 5121
+    ],
+    "buffers": [
+        {
+            "byteLength": 109384,
+            "uri": "CesiumMilkTruck0.bin"
         }
-    }
+    ]
 }

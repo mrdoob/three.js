@@ -1,5 +1,5 @@
-import { Color } from '../math/Color';
-import { Vector3 } from '../math/Vector3';
+import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -12,19 +12,17 @@ function Face3( a, b, c, normal, color, materialIndex ) {
 	this.b = b;
 	this.c = c;
 
-	this.normal = (normal && normal.isVector3) ? normal : new Vector3();
+	this.normal = ( normal && normal.isVector3 ) ? normal : new Vector3();
 	this.vertexNormals = Array.isArray( normal ) ? normal : [];
 
-	this.color = (color && color.isColor) ? color : new Color();
+	this.color = ( color && color.isColor ) ? color : new Color();
 	this.vertexColors = Array.isArray( color ) ? color : [];
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 }
 
-Face3.prototype = {
-
-	constructor: Face3,
+Object.assign( Face3.prototype, {
 
 	clone: function () {
 
@@ -59,7 +57,7 @@ Face3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Face3 };

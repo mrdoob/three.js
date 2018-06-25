@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Vector3 } from '../math/Vector3';
-import { Audio } from './Audio';
-import { Object3D } from '../core/Object3D';
+import { Vector3 } from '../math/Vector3.js';
+import { Audio } from './Audio.js';
+import { Object3D } from '../core/Object3D.js';
 
 function PositionalAudio( listener ) {
 

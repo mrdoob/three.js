@@ -1,9 +1,9 @@
-import { Texture } from './Texture';
-import { NearestFilter } from '../constants';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */
+
+import { Texture } from './Texture.js';
+import { NearestFilter } from '../constants.js';
 
 function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
@@ -14,7 +14,7 @@ function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, 
 	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
-	this.generateMipmaps  = false;
+	this.generateMipmaps = false;
 	this.flipY = false;
 	this.unpackAlignment = 1;
 

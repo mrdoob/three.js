@@ -4,9 +4,9 @@
 
 var Editor = function () {
 
-	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.1, 10000 );
+	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 	this.DEFAULT_CAMERA.name = 'Camera';
-	this.DEFAULT_CAMERA.position.set( 20, 10, 20 );
+	this.DEFAULT_CAMERA.position.set( 0, 5, 10 );
 	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
 
 	var Signal = signals.Signal;
@@ -21,13 +21,6 @@ var Editor = function () {
 
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
-
-		// vr
-
-		enterVR: new Signal(),
-
-		enteredVR: new Signal(),
-		exitedVR: new Signal(),
 
 		// actions
 
@@ -75,12 +68,11 @@ var Editor = function () {
 
 		showGridChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		historyChanged: new Signal(),
-		refreshScriptEditor: new Signal()
+		historyChanged: new Signal()
 
 	};
 
-	this.config = new Config( 'threejs-editor' );
+	this.config = new Config();
 	this.history = new History( this );
 	this.storage = new Storage();
 	this.loader = new Loader( this );
@@ -348,6 +340,34 @@ Editor.prototype = {
 
 	},
 
+	getObjectMaterial: function ( object, slot ) {
+
+		var material = object.material;
+
+		if ( Array.isArray( material ) ) {
+
+			material = material[ slot ];
+
+		}
+
+		return material;
+
+	},
+
+	setObjectMaterial: function ( object, slot, newMaterial ) {
+
+		if ( Array.isArray( object.material ) ) {
+
+			object.material[ slot ] = newMaterial;
+
+		} else {
+
+			object.material = newMaterial;
+
+		}
+
+	},
+
 	//
 
 	select: function ( object ) {
@@ -500,7 +520,6 @@ Editor.prototype = {
 				gammaInput: this.config.getKey( 'project/renderer/gammaInput' ),
 				gammaOutput: this.config.getKey( 'project/renderer/gammaOutput' ),
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
-				editable: this.config.getKey( 'project/editable' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),

@@ -26,10 +26,11 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - ConvexGeometry</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - ConvexGeometry</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/QuickHull.js"></script>
 		<script src="js/geometries/ConvexGeometry.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -53,24 +54,30 @@
 				document.body.appendChild( renderer.domElement );
 
 				// camera
+
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 15, 20, 30 );
 				scene.add( camera );
 
 				// controls
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
+				// light
+
 				var light = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( light );
 
-				scene.add( new THREE.AxisHelper( 20 ) );
+				// helper
 
-				//
+				scene.add( new THREE.AxesHelper( 20 ) );
+
+				// textures
 
 				var loader = new THREE.TextureLoader();
 				var texture = loader.load( 'textures/sprites/disc.png' );
@@ -108,14 +115,14 @@
 					transparent: true
 				} );
 
-				var meshGeometry = new THREE.ConvexGeometry( pointsGeometry.vertices );
+				var meshGeometry = new THREE.ConvexBufferGeometry( pointsGeometry.vertices );
 
-				mesh = new THREE.Mesh( meshGeometry, meshMaterial );
+				var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
 				mesh.material.side = THREE.BackSide; // back faces
 				mesh.renderOrder = 0;
 				group.add( mesh );
 
-				mesh = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
+				var mesh = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
 				mesh.material.side = THREE.FrontSide; // front faces
 				mesh.renderOrder = 1;
 				group.add( mesh );

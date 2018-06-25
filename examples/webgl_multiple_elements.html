@@ -70,7 +70,7 @@
 		<canvas id="c"></canvas>
 
 		<div id="content">
-			<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple elements - webgl</div>
+			<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements - webgl</div>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -98,10 +98,10 @@
 				canvas = document.getElementById( "c" );
 
 				var geometries = [
-					new THREE.BoxGeometry( 1, 1, 1 ),
-					new THREE.SphereGeometry( 0.5, 12, 8 ),
-					new THREE.DodecahedronGeometry( 0.5 ),
-					new THREE.CylinderGeometry( 0.5, 0.5, 1, 12 )
+					new THREE.BoxBufferGeometry( 1, 1, 1 ),
+					new THREE.SphereBufferGeometry( 0.5, 12, 8 ),
+					new THREE.DodecahedronBufferGeometry( 0.5 ),
+					new THREE.CylinderBufferGeometry( 0.5, 0.5, 1, 12 )
 				];
 
 				var template = document.getElementById( "template" ).text;
@@ -140,7 +140,7 @@
 						color: new THREE.Color().setHSL( Math.random(), 1, 0.75 ),
 						roughness: 0.5,
 						metalness: 0,
-						shading: THREE.FlatShading
+						flatShading: true
 
 					} );
 
@@ -168,7 +168,7 @@
 				var width = canvas.clientWidth;
 				var height = canvas.clientHeight;
 
-				if ( canvas.width !== width || canvas.height != height ) {
+				if ( canvas.width !== width || canvas.height !== height ) {
 
 					renderer.setSize( width, height, false );
 
@@ -197,7 +197,7 @@
 				scenes.forEach( function( scene ) {
 
 					// so something moves
-					scene.children[0].rotation.y = Date.now() * 0.001;
+					scene.children[ 0 ].rotation.y = Date.now() * 0.001;
 
 					// get the element that is a place holder for where we want to
 					// draw the scene
@@ -218,10 +218,10 @@
 					var width  = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
 					var left   = rect.left;
-					var bottom = renderer.domElement.clientHeight - rect.bottom;
+					var top    = rect.top;
 
-					renderer.setViewport( left, bottom, width, height );
-					renderer.setScissor( left, bottom, width, height );
+					renderer.setViewport( left, top, width, height );
+					renderer.setScissor( left, top, width, height );
 
 					var camera = scene.userData.camera;
 
