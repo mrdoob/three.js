@@ -427,26 +427,6 @@ var Loader = function ( editor ) {
 
 				break;
 
-			/*
-			case 'utf8':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var contents = event.target.result;
-
-					var geometry = new THREE.UTF8Loader().parse( contents );
-					var material = new THREE.MeshLambertMaterial();
-
-					var mesh = new THREE.Mesh( geometry, material );
-
-					editor.execute( new AddObjectCommand( mesh ) );
-
-				}, false );
-				reader.readAsBinaryString( file );
-
-				break;
-			*/
-
 			case 'vtk':
 
 				reader.addEventListener( 'load', function ( event ) {
