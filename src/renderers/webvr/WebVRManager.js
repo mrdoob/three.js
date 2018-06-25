@@ -211,7 +211,12 @@ function WebVRManager( renderer ) {
 
 	this.getCamera = function ( camera ) {
 
-		if ( device === null ) return camera;
+		if ( device === null ) {
+
+			camera.position.set( 0, scope.userHeight, 0 );
+			return camera;
+
+		}
 
 		device.depthNear = camera.near;
 		device.depthFar = camera.far;
