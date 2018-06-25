@@ -543,7 +543,7 @@ Object.assign( Quaternion.prototype, {
 			this._y = s * y + t * this._y;
 			this._z = s * z + t * this._z;
 
-			return this;
+			return this.normalize();
 
 		}
 
