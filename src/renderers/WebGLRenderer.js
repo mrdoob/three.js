@@ -2214,10 +2214,12 @@ function WebGLRenderer( parameters ) {
 
 	function refreshUniformsPhysical( uniforms, material ) {
 
+		refreshUniformsStandard( uniforms, material );
+
+		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
+
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
-
-		refreshUniformsStandard( uniforms, material );
 
 	}
 
