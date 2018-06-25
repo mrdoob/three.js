@@ -721,8 +721,10 @@ function WebGLRenderer( parameters ) {
 			attribute = attributes.get( index );
 
 			if ( attribute !== undefined ) {
+				
 				renderer = indexedBufferRenderer;
 				renderer.setIndex( attribute );
+				
 			}
 
 		}
