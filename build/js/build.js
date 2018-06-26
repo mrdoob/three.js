@@ -475,7 +475,7 @@ var Builder = function(outBaseDir, options) {
       try {
         const outPath = path.join(g_outBaseDir, options.lessons, "atom.xml");
         console.log("write:", outPath);
-        writeFileIfChanged(outPath, feed.render('atom-1.0'));
+        writeFileIfChanged(outPath, feed.atom1());
       } catch (err) {
         return Promise.reject(err);
       }
