@@ -82,6 +82,16 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 	},
 
+	setDirectionalCone: function ( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
+
+		this.panner.coneInnerAngle = coneInnerAngle;
+		this.panner.coneOuterAngle = coneOuterAngle;
+		this.panner.coneOuterGain = coneOuterGain;
+
+		return this;
+
+	},
+
 	updateMatrixWorld: ( function () {
 
 		var position = new Vector3();
