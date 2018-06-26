@@ -27,13 +27,17 @@ function main() {
 
   const scene = new THREE.Scene();
 
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(-1, 2, 4);
+  scene.add(light);
+
   const boxWidth = 1;
   const boxHeight = 1;
   const boxDepth = 1;
   const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
   function makeInstance(geometry, color, x) {
-    const material = new THREE.MeshBasicMaterial({color});
+    const material = new THREE.MeshPhongMaterial({color});
 
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
