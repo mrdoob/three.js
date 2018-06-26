@@ -228,7 +228,9 @@ scene.add( mesh );
 
                     <p>
                         When Object.matrixAutoUpdate is false you need to call Object.updateMatrix each time you
-                        modify position, scale or rotation.
+                        modify position, scale or rotation <strong>before</strong> calling updateMatrixWorld. <br />
+                        For static object that doesn't change, the matrix will never need to be updated so you can
+                        disable auto updating safely for theses objects.
                     </p>
 
         <h2>WebGLRenderer</h2>
@@ -253,6 +255,15 @@ scene.add( mesh );
             <h3>Shadows</h3>
 
                 <p>
+                    Shadows can have a bad impact on performances which is affected by:
+
+                    <ul>
+                        <li>[page:WebGLRenderer.shadowMap.type]</li>
+                        <li>[page:LightShadow:mapSize]: Higher values give better quality shadows at the cost of computation time</li>
+                    </ul>
+                </p>
+
+                <p>
                     By default [page:WebGLRenderer.shadowMap.autoUpdate] is set true which will cause the shadow to update at
                     each frame. If you know your scene is not intended to change at each frame, you can disable this and use
                     [page:WebGLRenderer.shadowMap.needsUpdate] in order to trigger a recompute.
@@ -267,8 +278,8 @@ scene.add( mesh );
                     <p>
                         Javascript is featured with a garbage collector to manage the memory. In standard projects we don't really
                         need to care about this. But in 3D you are rendering your scene multiple time by second. If you create a lot
-                        of new objects at each frame, you will force the garbage collector to run more often causing a performance
-                        drop.-
+                        of <strong>new</strong> objects at each frame, you will force the garbage collector to run more often causing a performance
+                        drop.
                     </p>
 
                 <h4>Reduce the graph</h4>
