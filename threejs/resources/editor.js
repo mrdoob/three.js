@@ -212,7 +212,7 @@ function getSourceBlob(options) {
   source = source.replace('${html}', htmlParts.html.editor.getValue());
   source = source.replace('${css}', htmlParts.css.editor.getValue());
   source = source.replace('${js}', htmlParts.js.editor.getValue());
-  source = source.replace('<head>', '<head>\n<script match="false">webglLessonSettings = ' + JSON.stringify(options) + ";</script>");
+  source = source.replace('<head>', '<head>\n<script match="false">threejsLessonSettings = ' + JSON.stringify(options) + ";</script>");
 
   var scriptNdx = source.indexOf('<script>');
   g.numLinesBeforeScript = (source.substring(0, scriptNdx).match(/\n/g) || []).length;
@@ -246,7 +246,7 @@ function openInCodepen() {
   const pen = {
     title                 : g.title,
     description           : "from: " + g.url,
-    tags                  : ["webgl", "webglfundamentals.org"],
+    tags                  : ["three.js", "threejsfundamentals.org"],
     editors               : "101",
     html                  : htmlParts.html.editor.getValue(),
     css                   : htmlParts.css.editor.getValue(),
@@ -274,7 +274,7 @@ function openInJSFiddle() {
   // const pen = {
   //   title                 : g.title,
   //   description           : "from: " + g.url,
-  //   tags                  : ["webgl", "webglfundamentals.org"],
+  //   tags                  : ["three.js", "threejsfundamentals.org"],
   //   editors               : "101",
   //   html                  : htmlParts.html.editor.getValue(),
   //   css                   : htmlParts.css.editor.getValue(),
