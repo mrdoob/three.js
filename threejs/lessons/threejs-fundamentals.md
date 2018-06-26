@@ -33,7 +33,7 @@ The first thing we need is a `<canvas>` tag so
 </body>
 ```
 
-Three.js will draw into that canvas so we need to look it
+Three.js will draw into that canvas so we need to look it up
 and pass it to three.js.
 
 ```
@@ -48,19 +48,19 @@ function main() {
 ```
 
 Note there are some esoteric details here. If you don't pass a canvas
-into three.js it will create on for you but then you have to add it
+into three.js it will create one for you but then you have to add it
 to your document. Where to add it may change depending on your use case
 and you'll have to change your code so I find that passing a canvas
 to three.js feels a little more flexible. I can put the canvas anywhere
 and the code will find it where as if I had code to insert the canvas
-into do the document I'd likely have to change that code if my usecase
+into to the document I'd likely have to change that code if my use case
 changed.
 
 After we look up the canvas we create a `WebGLRenderer`. The renderer
 is the thing responsible for actually taking all the data you provide
-and to render it to the canvas. In the past there have been other renderers
-like `CSSRenderer`, a `CanvasRenderer` and in the future there may be
-`WebGL2Renderer` or `WebGPURenderer`. For now there's the `WebGLRednerer`
+and rendering it to the canvas. In the past there have been other renderers
+like `CSSRenderer`, a `CanvasRenderer` and in the future there may be a
+`WebGL2Renderer` or `WebGPURenderer`. For now there's the `WebGLRenderer`
 that uses WebGL to render 3D to the canvas.
 
 Next up we need a camera.
@@ -112,10 +112,10 @@ Here's what we're aiming for.
 
 In the diagram above we can see our camera is at `z = 2`. It's looking
 down the -Z axis. Our frustum starts 0.1 units from the front of the camera
-and goes to 5 units in front of the camera. Because we are looking down
+and goes to 5 units in front of the camera. Because in this diagram we are looking down,
 the field of view is affected by the aspect. Our canvas is twice as wide
 as it is tall so across view the field of view will be much wider than
-our specified 75 degrees.
+our specified 75 degrees which is the vertical field of view.
 
 Next we make a `Scene`. A `Scene` in three.js is a form of scene graph.
 Anything you want three.js to draw needs to be added to the scene. We'll
@@ -140,7 +140,7 @@ We then create a basic material and set its color. Colors can
 be specified using standard CSS style 6 digit hex color values.
 
 ```
-const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
+const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 ```
 
 We then create a `Mesh`. A `Mesh` in three represents the combination
@@ -170,14 +170,12 @@ Here's a working exmaple
 
 {{{example url="../threejs-fundamentals.html" }}}
 
-It's kind of hard to tell that is a 3D box since we're viewing
-it directly down the -Z axis and the box itself is axis aligned
+It's kind of hard to tell that is a 3D cube since we're viewing
+it directly down the -Z axis and the cube itself is axis aligned
 so we're only seeing a single face.
 
 Let's animate it spinning and hopefully that will make
-it clear it's being drawn in 3D.
-
-To animate it we'll render inside a render loop using
+it clear it's being drawn in 3D. To animate it we'll render inside a render loop using
 [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame).
 
 Here's our loop
@@ -204,7 +202,7 @@ page the browser will re-render the page. In our case we are calling three's
 
 `requestAnimationFrame` passes the time since the page started rendering to
 the our function. That time is passed in milliseconds. I find it's much
-easier to work with seconds here we're converting that to seconds.
+easier to work with seconds so here we're converting that to seconds.
 
 We then set the cube's X and Y rotation to the current time. These rotations
 are in [radians](https://en.wikipedia.org/wiki/Radian). There are 2 pi radians
@@ -218,7 +216,7 @@ Outside the loop we call `requestAnimationFrame` one time to start the loop.
 
 {{{example url="../threejs-fundamentals-with-animation.html" }}}
 
-It's still hard to see the 3d. What would help is to add some lighting
+It's a little better but it's still hard to see the 3d. What would help is to add some lighting
 so let's add a light. There are many kinds of lights in three.js which
 we'll go over in a future article. For now let's create a directional
 light.
@@ -230,8 +228,8 @@ scene.add(light);
 ```
 
 Directional lights have a position and a target. Both default to 0, 0, 0. In our
-case we're setting the light's position to -1, 2, 4 so it's slightly on the left
-above and behind our camera. The target is still 0, 0, 0 so it will shine
+case we're setting the light's position to -1, 2, 4 so it's slightly on the left,
+above, and behind our camera. The target is still 0, 0, 0 so it will shine
 toward the origin.
 
 We also need to change the material. The `MeshBasicMaterial` is not affected by
@@ -256,7 +254,7 @@ material so each cube can be a different color.
 First we'll make a function that creates a new material
 with the specified color. Then it creates a mesh using
 the specified geometry and adds it to the scene and
-sets it's X position.
+sets its X position.
 
 ```
 function makeInstance(geometry, color, x) {

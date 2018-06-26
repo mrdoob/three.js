@@ -24,7 +24,7 @@ no size
 
 That canvas defaults to 300x150 css pixels in size.
 
-In the web platform the recommend way to size set the size
+In the web platform the recommended way to set the size
 of something is to use CSS.
 
 Let's make the canvas fill the page by adding CSS
@@ -44,15 +44,15 @@ html, body {
 ```
 
 In HTML the body has a margin of 5px pixels by default so setting the
-margin to 0 removes margin. Setting the html and body height to 100%
+margin to 0 removes the margin. Setting the html and body height to 100%
 makes them fill the window. Otherwise they are only as large
 as the content that fills them.
 
 Next we tell the `id=c` element to be
-100% the size of it's container which in this case is the body of
+100% the size of its container which in this case is the body of
 the document.
 
-Finally we set it's `display` mode to `block`. The canvas's
+Finally we set its `display` mode to `block`. A canvas's
 default display mode is `inline`. Inline
 elements can end up adding whitespace to what is displayed. By
 setting the canvas to `block` that issue goes away.
@@ -64,7 +64,7 @@ Here's the result
 You can see the canvas is now filling the page but there are 2
 problems. One our cubes are stretched. They are not cubes they
 are more like boxes. Too tall or too wide. Open the
-example in it's own window and resize it. You'll see how
+example in its own window and resize it. You'll see how
 the cubes get stretched wide and tall.
 
 <img src="resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center">
@@ -93,7 +93,7 @@ function render(time) {
   ...
 ```
 
-Now the cubes should stop being stretched.
+Now the cubes should stop being distorted.
 
 {{{example url="../threejs-responsive-update-camera.html" }}}
 
@@ -105,17 +105,17 @@ They stay the correct aspect regardless of window size.
 
 Now let's fix the blockiness.
 
-Canvas's have 2 sizes. One size is the size the canvas is displayed
-in the page. That's what we set with CSS. The other size is the
+Canvas elements have 2 sizes. One size is the size the canvas is displayed
+on the page. That's what we set with CSS. The other size is the
 number of pixels in the canvas itself. This is no different than an image.
-For example we might have a 128x64 image and using
-css we might display as 400x200
+For example we might have a 128x64 pixel image and using
+css we might display as 400x200 pixels.
 
 ```
 <img src="some128x64image.jpg" style="width:400px; height:200px">
 ```
 
-A canvas's internal size, its resolution, is often called it's drawingbuffer size.
+A canvas's internal size, its resolution, is often called its drawingbuffer size.
 In three.js we can set the canvas's drawingbuffer size by calling `renderer.setSize`.
 What size should we pick? The most obvious answer is "the same size the canvas is displayed".
 Again, to do that we can look at the canvas's `clientWidth` and `clientHeight`
@@ -145,8 +145,8 @@ Once we know if we need to resize or not we then call `renderer.setSize` and
 pass in the new width and height. It's important to pass `false` at the end.
 `render.setSize` by default sets the canvas's CSS size but doing so is not
 what we want. We want the browser to continue to work how it does for all other
-elements which is to use CSS to determine the size of the element. We don't
-want canvases used by three to be different.
+elements which is to use CSS to determine the display size of the element. We don't
+want canvases used by three to be different than other elements.
 
 Note that our function returns true if the canvas was resized. We can use
 this to check if there are other things we should update. Let's modify
@@ -171,7 +171,7 @@ returns `true`.
 
 {{{example url="../threejs-responsive.html" }}}
 
-It should now render with the a resolution that matches the display
+It should now render with a resolution that matches the display
 size of the canvas.
 
 To make the point about letting CSS handle the resizing let's take
@@ -184,7 +184,7 @@ Let's put our cubes in the middle of a paragraph of text.
 {{{example url="../threejs-responsive-paragraph.html" startPane="html" }}}
 
 and here's our same code used in an editor style layout
-where the control area can be resized
+where the control area on the right can be resized.
 
 {{{example url="../threejs-responsive-editor.html" startPane="html" }}}
 
@@ -198,9 +198,9 @@ That's most Mac's now a days and many windows machines
 as well as pretty much all smartphones.
 
 The way this works in the browser is they use
-use CSS pixels to set the sizes which are suppose to be the same
+CSS pixels to set the sizes which are suppose to be the same
 regardless of how high res the display is. The browser
-will the just render everything with more detail but the
+will the just render text with more detail but the
 same physical size.
 
 There are various ways to handle HD-DPI with three.js.
@@ -212,7 +212,7 @@ less power than desktops, at least as of 2018, and yet
 mobile phones often have very high resolution displays.
 The current top of the line phones have a HD-DPI ratio
 of 3x meaning for every one pixel from a non-HD-DPI display
-those phones have 9 pixels. That means the have to do 9x
+those phones have 9 pixels. That means they have to do 9x
 the rendering.
 
 Computing 9x the pixels is a lot of work so if we just
@@ -223,7 +223,7 @@ For any heavy three.js app that's probably what you want
 otherwise you're likely to get a slow framerate.
 
 That said if you actually do want to render at the resolution
-of the device there are a couple of ways to do this in three.js
+of the device there are a couple of ways to do this in three.js.
 
 One is to tell three.js a resolution multiplier using `renderer.setPixelRatio`.
 You ask the browser what the multiplier is from CSS pixels to device pixels
@@ -255,7 +255,7 @@ I prefer this second way. Why? Because it means I get what I ask for.
 There are many cases when using three.js where we need to know the actual
 size of the canvas's drawingBuffer. For example when making a post processing filter,
 or if we are making a shader that accesses `gl_FragCoord`, etc...
-By doing it oursevles we always know the size uses is the size we requested.
+By doing it oursevles we always know the size being used is the size we requested.
 There is no special case where magic is happening behind the scenes.
 
 Here's an example using the code above.
