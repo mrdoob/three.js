@@ -118,6 +118,17 @@
   function setupConsole() {
     var parent = document.createElement("div");
     parent.className = "console";
+    Object.assign(parent.style, {
+      fontFamily: 'monospace',
+      fontSize: 'medium',
+      maxHeight: '50%',
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      width: '100%',
+      overflow: 'auto',
+      background: '#DDD',
+    });
     var numLinesRemaining = 100;
     var added = false;
 
