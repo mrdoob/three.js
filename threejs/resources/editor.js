@@ -234,31 +234,7 @@ function resize() {
 }
 
 function addCORSSupport(js) {
-  if (/requestCORS/.test(js)) {
-    return js;
-  }
-
-  let found = false;
-  js = js.replace(/^( +)(img|image)(\.src = )(.*?);.*?$/mg, function(match, indent, variable, code, url) {
-    found = true;
-    return indent + "requestCORSIfNotSameOrigin(" + variable + ", " + url + ")\n" +
-           indent + variable + code + url + ";";
-  });
-  if (found) {
-    js += `
-
-// This is needed if the images are not on the same domain
-// NOTE: The server providing the images must give CORS permissions
-// in order to be able to use the image with WebGL. Most sites
-// do NOT give permission.
-// See: http://webglfundamentals.org/webgl/lessons/webgl-cors-permission.html
-function requestCORSIfNotSameOrigin(img, url) {
-  if ((new URL(url)).origin !== window.location.origin) {
-    img.crossOrigin = "";
-  }
-}
-`;
-  }
+  // not yet needed for three.js
   return js;
 }
 
