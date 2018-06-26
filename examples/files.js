@@ -209,6 +209,7 @@ var files = {
 		"webgl_panorama_dualfisheye",
 		"webgl_panorama_equirectangular",
 		"webgl_performance",
+		"webgl_performance_ondemand_rendering",
 		"webgl_performance_doublesided",
 		"webgl_performance_static",
 		"webgl_physics_cloth",

@@ -236,22 +236,28 @@ scene.add( mesh );
         <h2>WebGLRenderer</h2>
 
             <h3>Parameters</h3>
-            <h3>Precision</h3>
-            <h3>Antialias</h3>
-            <h3>powerReference</h3>
 
-                <p>
-                    On devices with 2 GPU, generally integrated and dedicated the browser will by default use the integrated one
-                    in order to boost battery performance. <br />
-                    If your scene requires a lot of performances, you can choose to use the dedicated GPU by using the
-                    **powerPreference** parameter of [page:WebGLRenderer].
-                </p>
+                <h4>Precision</h4>
 
-                <p>
-                    Keep in that it's a "hint to the useragent" and up to browsers to decide whether to implement this.
-                </p>
-            <h3>physicallyCorrectLights</h3>
+                <h4>Antialias</h4>
+
+                <h4>powerReference</h4>
+
+                    <p>
+                        On devices with 2 GPU, generally integrated and dedicated the browser will by default use the integrated one
+                        in order to boost battery performance. <br />
+                        If your scene requires a lot of performances, you can choose to use the dedicated GPU by using the
+                        **powerPreference** parameter of [page:WebGLRenderer].
+                    </p>
+
+                    <p>
+                        Keep in that it's a "hint to the useragent" and up to browsers to decide whether to implement this.
+                    </p>
+
+                <h4>physicallyCorrectLights</h4>
+
             <h3>compile</h3>
+
             <h3>Shadows</h3>
 
                 <p>
@@ -259,7 +265,7 @@ scene.add( mesh );
 
                     <ul>
                         <li>[page:WebGLRenderer.shadowMap.type]</li>
-                        <li>[page:LightShadow:mapSize]: Higher values give better quality shadows at the cost of computation time</li>
+                        <li>[page:LightShadow.mapSize]: Higher values give better quality shadows at the cost of computation time</li>
                     </ul>
                 </p>
 
@@ -273,6 +279,13 @@ scene.add( mesh );
 
                 <h4>16ms frame budget</h4>
 
+                    <p>
+                        Most devices today refresh their screens 60 times a second. Each of those frames has a budget
+                        of just over 16ms (1 second / 60 = 16.66ms). In reality, however, the browser has housekeeping
+                        work to do, so all of your work needs to be completed inside 10ms. When you fail to meet this
+                        budget the frame rate drops, and the content judders on screen. This is often referred to as
+                        jank, and it negatively impacts the user's experience.
+                    </p>
 
                 <h4>Garbage collection</h4>
                     <p>
@@ -296,6 +309,19 @@ scene.add( mesh );
                     </p>
 
                 <h4>Animate only when required</h4>
+
+                    <p>
+                        By default you would use requestAnimationFrame in order to render each frame even if there is no
+                        changes. If you are targeting mobile devices you may not want to waste resources, i.e. drain
+                        battery, when the scene is idle.
+                    </p>
+
+                    <p>
+                        In order to achieve on demand rendering instead of continuous one, you need to call
+                        requestAnimationFrame <strong>only</strong> when your 3D scene change.
+                    </p>
+
+                    <p>See <a href="/examples#webgl_performance_ondemand_rendering" target="_blank">Example: on demand rendering</a></p>
 
         <h2>RayCaster</h2>
 
