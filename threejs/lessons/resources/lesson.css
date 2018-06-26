@@ -386,7 +386,10 @@ pre.prettyprint, code.prettyprint {
         font-size: 24px;
     }
     iframe {
-        max-width: 95% !important;
+        max-width: 95%;
+    }
+    iframe.background {
+        max-width: 100%;
     }
 }
 

@@ -5,7 +5,7 @@ body {
 .lesson-main>* {
     margin: 1em 0;
 }
-.background {
+iframe.background {
     position: fixed;
     width: 100vw;
     height: 100vh;
