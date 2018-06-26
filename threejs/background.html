@@ -41,7 +41,7 @@ function main() {
   scene.background = new THREE.Color().setHSL(0.6, 0, 1);
 
   const aspect = 2;  // the canvas default
-  const fov = 60;
+  const fov = 35;
   const zNear = 0.1;
   const zFar = 5000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
@@ -170,7 +170,6 @@ function main() {
 
     if (resizeRendererToDisplaySize(renderer)) {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.fov = fov / camera.aspect;
       camera.updateProjectionMatrix();
     }
 
