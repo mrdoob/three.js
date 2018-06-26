@@ -197,6 +197,10 @@ function main() {
     }
     parseHTML(query.url, html);
     setupEditor(query.url);
+    if (query.startPane) {
+      const button = document.querySelector(".button-" + query.startPane);
+      toggleSourcePane(button);
+    }
   });
 }
 
