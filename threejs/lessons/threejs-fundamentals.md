@@ -140,7 +140,7 @@ We then create a basic material and set its color. Colors can
 be specified using standard CSS style 6 digit hex color values.
 
 ```
-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
+const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
 ```
 
 We then create a `Mesh`. A `Mesh` in three represents the combination
@@ -218,7 +218,37 @@ Outside the loop we call `requestAnimationFrame` one time to start the loop.
 
 {{{example url="../threejs-fundamentals-with-animation.html" }}}
 
-Let's add 2 more cubes.
+It's still hard to see the 3d. What would help is to add some lighting
+so let's add a light. There are many kinds of lights in three.js which
+we'll go over in a future article. For now let's create a directional
+light.
+
+```
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(-1, 2, 4);
+scene.add(light);
+```
+
+Directional lights have a position and a target. Both default to 0, 0, 0. In our
+case we're setting the light's position to -1, 2, 4 so it's slightly on the left
+above and behind our camera. The target is still 0, 0, 0 so it will shine
+toward the origin.
+
+We also need to change the material. The `MeshBasicMaterial` is not affected by
+lights. Let's change it to a `MeshPhongMaterial` which is affected by lights.
+
+```
+-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
++const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
+```
+
+And here it is working.
+
+{{{example url="../threejs-fundamentals-with-light.html" }}}
+
+It should now be pretty clearly 3D.
+
+Just for the fun of it let's add 2 more cubes.
 
 We'll use the same geometry for each cube but make a different
 material so each cube can be a different color.
@@ -230,7 +260,7 @@ sets it's X position.
 
 ```
 function makeInstance(geometry, color, x) {
-  const material = new THREE.MeshBasicMaterial({color});
+  const material = new THREE.MeshPhongMaterial({color});
 
   const cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
@@ -280,5 +310,5 @@ somewhat exaggeratedly warped since the field of view
 across the canvas is so extreme.
 
 I hope this short intro helps to get things started. [Next up we'll cover
-making our code responsive so it is adaptable to multiple situations](three-responsive.html).
+making our code responsive so it is adaptable to multiple situations](threejs-responsive.html).
 

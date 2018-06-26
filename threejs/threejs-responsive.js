@@ -1,27 +1,3 @@
-<!-- Licensed under a BSD license. See license.html for license -->
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Three.js - Responsive</title>
-    <style>
-    body {
-        margin: 0;
-    }
-    #c {
-        width: 100vw;
-        height: 100vh;
-        display: block;
-    }
-    </style>
-  </head>
-  <body>
-    <canvas id="c"></canvas>
-  </body>
-<script src="resources/threejs/r93/three.min.js"></script>
-<script src="resources/threejs-lessons-helper.js"></script> <!-- you can and should delete this script. it is only used on the site to help with errors -->
-<script>
 'use strict';
 
 function main() {
@@ -99,6 +75,4 @@ function main() {
 }
 
 main();
-</script>
-</html>
 

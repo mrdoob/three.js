@@ -4,14 +4,15 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Three.js - Responsive</title>
+    <title>Three.js - Responsive HD-DPI</title>
     <style>
-    body {
+    html, body {
         margin: 0;
+        height: 100%;
     }
     #c {
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         display: block;
     }
     </style>
@@ -65,8 +66,9 @@ function main() {
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    const pixelRatio = window.devicePixelRatio;
+    const width = canvas.clientWidth * pixelRatio;
+    const height = canvas.clientHeight * pixelRatio;
     const needResize = canvas.width !== width || canvas.height !== height;
     if (needResize) {
       renderer.setSize(width, height, false);

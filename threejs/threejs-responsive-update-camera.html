@@ -4,14 +4,15 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Three.js - Responsive</title>
+    <title>Three.js - Responsive update camera</title>
     <style>
-    body {
+    html, body {
         margin: 0;
+        height: 100%;
     }
     #c {
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         display: block;
     }
     </style>
@@ -63,25 +64,12 @@ function main() {
     makeInstance(geometry, 0xaa8844,  2),
   ];
 
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
-
   function render(time) {
     time *= 0.001;
 
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
-    }
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
 
     cubes.forEach((cube, ndx) => {
       const speed = 1 + ndx * .1;
