@@ -70,6 +70,16 @@ function replaceParams(str, params) {
   return template(params);
 }
 
+function encodeParams(params) {
+  const values = Object.values(params).filter(v => v);
+  if (!values.length) {
+    return '';
+  }
+  return '&' + Object.entries(params).map((kv) => {
+    return `${encodeURIComponent(kv[0])}=${encodeURIComponent(kv[1])}`;
+  }).join('&');
+}
+
 function encodeQuery(query) {
   if (!query) {
     return '';
@@ -126,6 +136,9 @@ Handlebars.registerHelper('example', function(options) {
   options.hash.examplePath = options.data.root.examplePath;
   options.hash.encodedUrl = encodeURIComponent(encodeUrl(options.hash.url));
   options.hash.url = encodeUrl(options.hash.url);
+  options.hash.params = encodeParams({
+    startPane: options.hash.startPane,
+  });
   return templateManager.apply("build/templates/example.template", options.hash);
 });
 
