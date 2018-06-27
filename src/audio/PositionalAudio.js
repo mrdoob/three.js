@@ -36,6 +36,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		this.panner.refDistance = value;
 
+		return this;
+
 	},
 
 	getRolloffFactor: function () {
@@ -47,6 +49,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 	setRolloffFactor: function ( value ) {
 
 		this.panner.rolloffFactor = value;
+
+		return this;
 
 	},
 
@@ -60,6 +64,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		this.panner.distanceModel = value;
 
+		return this;
+
 	},
 
 	getMaxDistance: function () {
@@ -71,6 +77,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 	setMaxDistance: function ( value ) {
 
 		this.panner.maxDistance = value;
+
+		return this;
 
 	},
 

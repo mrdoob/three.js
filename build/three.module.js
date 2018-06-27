@@ -3821,9 +3821,31 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
+				var url;
+
+				if ( Array.isArray( image ) ) {
+
+					// process array of images e.g. CubeTexture
+
+					url = [];
+
+					for ( var i = 0, l = image.length; i < l; i ++ ) {
+
+						url.push( getDataURL( image[ i ] ) );
+
+					}
+
+				} else {
+
+					// process single image
+
+					url = getDataURL( image );
+
+				}
+
 				meta.images[ image.uuid ] = {
 					uuid: image.uuid,
-					url: getDataURL( image )
+					url: url
 				};
 
 			}
@@ -6635,6 +6657,62 @@ Object.assign( Color.prototype, {
 	convertLinearToGamma: function ( gammaFactor ) {
 
 		this.copyLinearToGamma( this, gammaFactor );
+
+		return this;
+
+	},
+
+	copySRGBToLinear: function () {
+
+		function SRGBToLinear( c ) {
+
+			return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+		}
+
+		return function copySRGBToLinear( color ) {
+
+			this.r = SRGBToLinear( color.r );
+			this.g = SRGBToLinear( color.g );
+			this.b = SRGBToLinear( color.b );
+
+			return this;
+
+		};
+
+	}(),
+
+	copyLinearToSRGB: function () {
+
+		function LinearToSRGB( c ) {
+
+			return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+
+		}
+
+		return function copyLinearToSRGB( color ) {
+
+			this.r = LinearToSRGB( color.r );
+			this.g = LinearToSRGB( color.g );
+			this.b = LinearToSRGB( color.b );
+
+			return this;
+
+		};
+
+	}(),
+
+	convertSRGBToLinear: function () {
+
+		this.copySRGBToLinear( this );
+
+		return this;
+
+	},
+
+	convertLinearToSRGB: function () {
+
+		this.copyLinearToSRGB( this );
 
 		return this;
 
@@ -14285,13 +14363,13 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
+		function checkBufferGeometryIntersection( object, material, raycaster, ray, position, uv, a, b, c ) {
 
 			vA.fromBufferAttribute( position, a );
 			vB.fromBufferAttribute( position, b );
 			vC.fromBufferAttribute( position, c );
 
-			var intersection = checkIntersection( object, object.material, raycaster, ray, vA, vB, vC, intersectionPoint );
+			var intersection = checkIntersection( object, material, raycaster, ray, vA, vB, vC, intersectionPoint );
 
 			if ( intersection ) {
 
@@ -14354,24 +14432,64 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				var index = geometry.index;
 				var position = geometry.attributes.position;
 				var uv = geometry.attributes.uv;
-				var i, l;
+				var groups = geometry.groups;
+				var drawRange = geometry.drawRange;
+				var i, j, il, jl;
+				var group, groupMaterial;
+				var start, end;
 
 				if ( index !== null ) {
 
 					// indexed buffer geometry
 
-					for ( i = 0, l = index.count; i < l; i += 3 ) {
+					if ( Array.isArray( material ) ) {
 
-						a = index.getX( i );
-						b = index.getX( i + 1 );
-						c = index.getX( i + 2 );
+						for ( i = 0, il = groups.length; i < il; i ++ ) {
 
-						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
+							group = groups[ i ];
+							groupMaterial = material[ group.materialIndex ];
 
-						if ( intersection ) {
+							start = Math.max( group.start, drawRange.start );
+							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
 
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
-							intersects.push( intersection );
+							for ( j = start, jl = end; j < jl; j += 3 ) {
+
+								a = index.getX( i );
+								b = index.getX( i + 1 );
+								c = index.getX( i + 2 );
+
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
+
+								if ( intersection ) {
+
+									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+									intersects.push( intersection );
+
+								}
+
+							}
+
+						}
+
+					} else {
+
+						start = Math.max( 0, drawRange.start );
+						end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
+
+						for ( i = start, il = end; i < il; i += 3 ) {
+
+							a = index.getX( i );
+							b = index.getX( i + 1 );
+							c = index.getX( i + 2 );
+
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
+
+							if ( intersection ) {
+
+								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+								intersects.push( intersection );
+
+							}
 
 						}
 
@@ -14381,18 +14499,54 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					// non-indexed buffer geometry
 
-					for ( i = 0, l = position.count; i < l; i += 3 ) {
+					if ( Array.isArray( material ) ) {
 
-						a = i;
-						b = i + 1;
-						c = i + 2;
+						for ( i = 0, il = groups.length; i < il; i ++ ) {
 
-						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
+							group = groups[ i ];
+							groupMaterial = material[ group.materialIndex ];
 
-						if ( intersection ) {
+							start = Math.max( group.start, drawRange.start );
+							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
 
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
-							intersects.push( intersection );
+							for ( j = start, jl = end; j < jl; j += 3 ) {
+
+								a = j;
+								b = j + 1;
+								c = j + 2;
+
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
+
+								if ( intersection ) {
+
+									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+									intersects.push( intersection );
+
+								}
+
+							}
+
+						}
+
+					} else {
+
+						start = Math.max( 0, drawRange.start );
+						end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
+
+						for ( i = start, il = end; i < il; i += 3 ) {
+
+							a = i;
+							b = i + 1;
+							c = i + 2;
+
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
+
+							if ( intersection ) {
+
+								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+								intersects.push( intersection );
+
+							}
 
 						}
 
@@ -20969,6 +21123,26 @@ function WebGLUtils( gl, extensions ) {
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ */
+
+function Group() {
+
+	Object3D.call( this );
+
+	this.type = 'Group';
+
+}
+
+Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
+
+	constructor: Group,
+
+	isGroup: true
+
+} );
+
+/**
+ * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author tschw
@@ -21237,6 +21411,7 @@ function WebVRManager( renderer ) {
 
 	var poseTarget = null;
 
+	var controllers = [];
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
 
@@ -21300,8 +21475,110 @@ function WebVRManager( renderer ) {
 
 	//
 
+	var isTriggerPressed = false;
+
+	function findGamepad( id ) {
+
+		var gamepads = navigator.getGamepads && navigator.getGamepads();
+
+		for ( var i = 0, j = 0, l = gamepads.length; i < l; i ++ ) {
+
+			var gamepad = gamepads[ i ];
+
+			if ( gamepad && ( gamepad.id === 'Daydream Controller' ||
+				gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ||
+				gamepad.id === 'OpenVR Gamepad' || gamepad.id.startsWith( 'Oculus Touch' ) ||
+				gamepad.id.startsWith( 'Spatial Controller' ) ) ) {
+
+				if ( j === id ) return gamepad;
+
+				j ++;
+
+			}
+
+		}
+
+	}
+
+	function updateControllers() {
+
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			var controller = controllers[ i ];
+
+			var gamepad = findGamepad( i );
+
+			if ( gamepad !== undefined && gamepad.pose !== undefined ) {
+
+				if ( gamepad.pose === null ) return;
+
+				//  Pose
+
+				var pose = gamepad.pose;
+
+				if ( pose.hasPosition === false ) controller.position.set( 0.2, - 0.6, - 0.05 );
+
+				if ( pose.position !== null ) controller.position.fromArray( pose.position );
+				if ( pose.orientation !== null ) controller.quaternion.fromArray( pose.orientation );
+				controller.matrix.compose( controller.position, controller.quaternion, controller.scale );
+				controller.matrix.premultiply( standingMatrix );
+				controller.matrix.decompose( controller.position, controller.quaternion, controller.scale );
+				controller.matrixWorldNeedsUpdate = true;
+				controller.visible = true;
+
+				//  Trigger
+
+				var buttonId = gamepad.id === 'Daydream Controller' ? 0 : 1;
+
+				if ( isTriggerPressed !== gamepad.buttons[ buttonId ].pressed ) {
+
+					isTriggerPressed = gamepad.buttons[ buttonId ].pressed;
+
+					if ( isTriggerPressed ) {
+
+						controller.dispatchEvent( { type: 'selectstart' } );
+
+					} else {
+
+						controller.dispatchEvent( { type: 'selectend' } );
+						controller.dispatchEvent( { type: 'select' } );
+
+					}
+
+				}
+
+			} else {
+
+				controller.visible = false;
+
+			}
+
+		}
+
+	}
+
+	//
+
 	this.enabled = false;
 	this.userHeight = 1.6;
+
+	this.getController = function ( id ) {
+
+		var controller = controllers[ id ];
+
+		if ( controller === undefined ) {
+
+			controller = new Group();
+			controller.matrixAutoUpdate = false;
+			controller.visible = false;
+
+			controllers[ id ] = controller;
+
+		}
+
+		return controller;
+
+	};
 
 	this.getDevice = function () {
 
@@ -21325,7 +21602,12 @@ function WebVRManager( renderer ) {
 
 	this.getCamera = function ( camera ) {
 
-		if ( device === null ) return camera;
+		if ( device === null ) {
+
+			camera.position.set( 0, scope.userHeight, 0 );
+			return camera;
+
+		}
 
 		device.depthNear = camera.near;
 		device.depthFar = camera.far;
@@ -21441,6 +21723,8 @@ function WebVRManager( renderer ) {
 
 		}
 
+		updateControllers();
+
 		return cameraVR;
 
 	};
@@ -21496,9 +21780,13 @@ function WebXRManager( renderer ) {
 
 	var pose = null;
 
+	var controllers = [];
+	var inputSources = [];
+
 	function isPresenting() {
 
 		return session !== null && frameOfRef !== null;
+
 
 	}
 
@@ -21520,6 +21808,24 @@ function WebXRManager( renderer ) {
 
 	this.enabled = false;
 
+	this.getController = function ( id ) {
+
+		var controller = controllers[ id ];
+
+		if ( controller === undefined ) {
+
+			controller = new Group();
+			controller.matrixAutoUpdate = false;
+			controller.visible = false;
+
+			controllers[ id ] = controller;
+
+		}
+
+		return controller;
+
+	};
+
 	this.getDevice = function () {
 
 		return device;
@@ -21536,18 +21842,30 @@ function WebXRManager( renderer ) {
 
 	//
 
+	function onSessionEvent( event ) {
+
+		var controller = controllers[ inputSources.indexOf( event.inputSource ) ];
+		if ( controller ) controller.dispatchEvent( { type: event.type } );
+
+	}
+
+	function onSessionEnd() {
+
+		renderer.setFramebuffer( null );
+		animation.stop();
+
+	}
+
 	this.setSession = function ( value, options ) {
 
 		session = value;
 
 		if ( session !== null ) {
 
-			session.addEventListener( 'end', function () {
-
-				renderer.setFramebuffer( null );
-				animation.stop();
-
-			} );
+			session.addEventListener( 'select', onSessionEvent );
+			session.addEventListener( 'selectstart', onSessionEvent );
+			session.addEventListener( 'selectend', onSessionEvent );
+			session.addEventListener( 'end', onSessionEnd );
 
 			session.baseLayer = new XRWebGLLayer( session, gl );
 			session.requestFrameOfReference( options.frameOfReferenceType ).then( function ( value ) {
@@ -21558,6 +21876,17 @@ function WebXRManager( renderer ) {
 
 				animation.setContext( session );
 				animation.start();
+
+			} );
+
+			//
+
+			inputSources = session.getInputSources();
+
+			session.addEventListener( 'inputsourceschange', function () {
+
+				inputSources = session.getInputSources();
+				console.log( inputSources );
 
 			} );
 
@@ -21628,30 +21957,62 @@ function WebXRManager( renderer ) {
 
 		pose = frame.getDevicePose( frameOfRef );
 
-		var layer = session.baseLayer;
-		var views = frame.views;
+		if ( pose !== null ) {
 
-		for ( var i = 0; i < views.length; i ++ ) {
+			var layer = session.baseLayer;
+			var views = frame.views;
 
-			var view = views[ i ];
-			var viewport = layer.getViewport( view );
-			var viewMatrix = pose.getViewMatrix( view );
+			for ( var i = 0; i < views.length; i ++ ) {
 
-			var camera = cameraVR.cameras[ i ];
-			camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
-			camera.projectionMatrix.fromArray( view.projectionMatrix );
-			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+				var view = views[ i ];
+				var viewport = layer.getViewport( view );
+				var viewMatrix = pose.getViewMatrix( view );
 
-			if ( i === 0 ) {
+				var camera = cameraVR.cameras[ i ];
+				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
+				camera.projectionMatrix.fromArray( view.projectionMatrix );
+				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
-				cameraVR.matrix.copy( camera.matrix );
+				if ( i === 0 ) {
 
-				// HACK (mrdoob)
-				// https://github.com/w3c/webvr/issues/203
+					cameraVR.matrix.copy( camera.matrix );
 
-				cameraVR.projectionMatrix.copy( camera.projectionMatrix );
+					// HACK (mrdoob)
+					// https://github.com/w3c/webvr/issues/203
+
+					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
+
+				}
 
 			}
+
+		}
+
+		//
+
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			var controller = controllers[ i ];
+
+			var inputSource = inputSources[ i ];
+
+			if ( inputSource ) {
+
+				var inputPose = frame.getInputPose( inputSource, frameOfRef );
+
+				if ( inputPose !== null ) {
+
+					controller.matrix.elements = inputPose.pointerMatrix;
+					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
+					controller.visible = true;
+
+					continue;
+
+				}
+
+			}
+
+			controller.visible = false;
 
 		}
 
@@ -23852,10 +24213,12 @@ function WebGLRenderer( parameters ) {
 
 	function refreshUniformsPhysical( uniforms, material ) {
 
+		refreshUniformsStandard( uniforms, material );
+
+		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
+
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
-
-		refreshUniformsStandard( uniforms, material );
 
 	}
 
@@ -25616,26 +25979,6 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
-
-} );
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-function Group() {
-
-	Object3D.call( this );
-
-	this.type = 'Group';
-
-}
-
-Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: Group,
-
-	isGroup: true
 
 } );
 
@@ -31710,7 +32053,7 @@ function ImageLoader( manager ) {
 
 Object.assign( ImageLoader.prototype, {
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -31813,7 +32156,7 @@ function CubeTextureLoader( manager ) {
 
 Object.assign( CubeTextureLoader.prototype, {
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( urls, onLoad, onProgress, onError ) {
 
@@ -31884,7 +32227,7 @@ function TextureLoader( manager ) {
 
 Object.assign( TextureLoader.prototype, {
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -36404,7 +36747,7 @@ Loader.Handlers = {
 
 Object.assign( Loader.prototype, {
 
-	crossOrigin: undefined,
+	crossOrigin: 'anonymous',
 
 	onLoadStart: function () {},
 
@@ -36747,6 +37090,8 @@ function JSONLoader( manager ) {
 
 Object.assign( JSONLoader.prototype, {
 
+	crossOrigin: 'anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
@@ -36784,9 +37129,17 @@ Object.assign( JSONLoader.prototype, {
 
 	},
 
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+		return this;
+
+	},
+
 	setTexturePath: function ( value ) {
 
 		this.texturePath = value;
+		return this;
 
 	},
 
@@ -37293,6 +37646,8 @@ function ObjectLoader( manager ) {
 
 Object.assign( ObjectLoader.prototype, {
 
+	crossOrigin: 'anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		if ( this.texturePath === '' ) {
@@ -37759,12 +38114,36 @@ Object.assign( ObjectLoader.prototype, {
 			var loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( var i = 0, il = json.length; i < il; i ++ ) {
 
 				var image = json[ i ];
-				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
+				var url = image.url;
 
-				images[ image.uuid ] = loadImage( path );
+				if ( Array.isArray( url ) ) {
+
+					// load array of images e.g CubeTexture
+
+					images[ image.uuid ] = [];
+
+					for ( var j = 0, jl = url.length; j < jl; j ++ ) {
+
+						var currentUrl = url[ j ];
+
+						var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.texturePath + currentUrl;
+
+						images[ image.uuid ].push( loadImage( path ) );
+
+					}
+
+				} else {
+
+					// load single image
+
+					var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
+
+					images[ image.uuid ] = loadImage( path );
+
+				}
 
 			}
 
@@ -37806,7 +38185,18 @@ Object.assign( ObjectLoader.prototype, {
 
 				}
 
-				var texture = new Texture( images[ data.image ] );
+				var texture;
+
+				if ( Array.isArray( images[ data.image ] ) ) {
+
+					texture = new CubeTexture( images[ data.image ] );
+
+				} else {
+
+					texture = new Texture( images[ data.image ] );
+
+				}
+
 				texture.needsUpdate = true;
 
 				texture.uuid = data.uuid;

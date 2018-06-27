@@ -123,7 +123,7 @@
 
 		//
 
-		light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+		var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 		light.position.set( 0, 200, 0 );
 		scene.add( light );
 
@@ -150,8 +150,6 @@
 
 		//
 
-		var audioLoader = new THREE.AudioLoader();
-
 		var listener = new THREE.AudioListener();
 		camera.add( listener );
 
@@ -172,7 +170,7 @@
 		var gltfLoader = new THREE.GLTFLoader();
 		gltfLoader.load( 'models/gltf/BoomBox/glTF-Binary/BoomBox.glb', function( gltf ) {
 
-			boomBox =  gltf.scene;
+			var boomBox =  gltf.scene;
 			boomBox.position.set( 0, 0.2, 0 );
 			boomBox.scale.set( 20, 20, 20 );
 
