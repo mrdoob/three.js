@@ -34,6 +34,9 @@ module.exports = function(grunt) {
       examples: {
         src: [
           'threejs/*.html',
+          'threejs/lessons/resources/*.js',
+          '!threejs/lessons/resources/prettify.js',
+          'threejs/lessons/resources/*.html',
         ],
         options: {
           configFile: 'build/conf/eslint-examples.json',
