@@ -555,6 +555,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		// clip must be known when specified via string
 		if ( clipObject === null ) return null;
 
+		clipObject.validate();
+		clipObject.optimize();
+
 		// allocate all resources required to run it
 		var newAction = new AnimationAction( this, clipObject, optionalRoot );
 
