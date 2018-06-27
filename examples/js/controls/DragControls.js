@@ -21,10 +21,16 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	var _intersection = new THREE.Vector3();
 
 	var _selected = null, _hovered = null;
-
+	var _planeNormal = null;
 	//
 
 	var scope = this;
+
+	this.setPlaneNormal = function ( normal ) {
+
+		_planeNormal = normal.clone();
+
+	};
 
 	function activate() {
 
@@ -89,7 +95,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			var object = intersects[ 0 ].object;
 
-			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), object.position );
+			_plane.setFromNormalAndCoplanarPoint( _planeNormal || _camera.getWorldDirection( _plane.normal ) , object.position );
 
 			if ( _hovered !== object ) {
 
@@ -204,7 +210,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			_selected = intersects[ 0 ].object;
 
-			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _selected.position );
+			_plane.setFromNormalAndCoplanarPoint( _planeNormal || _camera.getWorldDirection( _plane.normal ) , object.position );
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
