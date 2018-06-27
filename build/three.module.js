@@ -2430,21 +2430,19 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		var sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
+		var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
 
-		if ( sqrSinHalfTheta <= Number.EPSILON ) {
+		if ( Math.abs( sinHalfTheta ) < 0.001 ) {
 
-			var s = 1 - t;
-			this._w = s * w + t * this._w;
-			this._x = s * x + t * this._x;
-			this._y = s * y + t * this._y;
-			this._z = s * z + t * this._z;
+			this._w = 0.5 * ( w + this._w );
+			this._x = 0.5 * ( x + this._x );
+			this._y = 0.5 * ( y + this._y );
+			this._z = 0.5 * ( z + this._z );
 
-			return this.normalize();
+			return this;
 
 		}
 
-		var sinHalfTheta = Math.sqrt( sqrSinHalfTheta );
 		var halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
 		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
 			ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
@@ -22677,7 +22675,7 @@ function WebGLRenderer( parameters ) {
 
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
-		var frontFaceCW = ( object.isMesh && object.normalMatrix.determinant() < 0 );
+		var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
 		state.setMaterial( material, frontFaceCW );
 
@@ -23407,7 +23405,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isImmediateRenderObject ) {
 
-			var frontFaceCW = ( object.isMesh && object.normalMatrix.determinant() < 0 );
+			var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
 			state.setMaterial( material, frontFaceCW );
 
@@ -39432,8 +39430,6 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		return this;
-
 	},
 
 	getFilter: function () {
@@ -39459,8 +39455,6 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		this.gain.connect( this.filter );
 		this.filter.connect( this.context.destination );
 
-		return this;
-
 	},
 
 	getMasterVolume: function () {
@@ -39472,8 +39466,6 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	setMasterVolume: function ( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
-
-		return this;
 
 	},
 
@@ -39868,8 +39860,6 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		this.panner.refDistance = value;
 
-		return this;
-
 	},
 
 	getRolloffFactor: function () {
@@ -39881,8 +39871,6 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 	setRolloffFactor: function ( value ) {
 
 		this.panner.rolloffFactor = value;
-
-		return this;
 
 	},
 
@@ -39896,8 +39884,6 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		this.panner.distanceModel = value;
 
-		return this;
-
 	},
 
 	getMaxDistance: function () {
@@ -39909,8 +39895,6 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 	setMaxDistance: function ( value ) {
 
 		this.panner.maxDistance = value;
-
-		return this;
 
 	},
 
