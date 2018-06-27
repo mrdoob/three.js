@@ -149,12 +149,12 @@ Object.assign( Frustum.prototype, {
 			for ( var i = 0; i < 6; i ++ ) {
 
 				var plane = planes[ i ];
-				
+
 				//corner at max distance
 				p.x = plane.normal.x > 0 ? box.max.x : box.min.x;
 				p.y = plane.normal.y > 0 ? box.max.y : box.min.y;
 				p.z = plane.normal.z > 0 ? box.max.z : box.min.z;
-				
+
 				if ( plane.distanceToPoint( p ) < 0 ) {
 
 					return false;
