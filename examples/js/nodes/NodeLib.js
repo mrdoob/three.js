@@ -136,19 +136,19 @@ THREE.NodeLib.add( new THREE.ConstNode( "vec3 LUMA vec3(0.2125, 0.7154, 0.0721)"
 THREE.NodeLib.add( new THREE.FunctionNode( [
 // Per-Pixel Tangent Space Normal Mapping
 // http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
-	"vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 mUv, vec2 scale ) {",
+	"vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 mUv, vec2 normalScale ) {",
 	"	vec3 q0 = dFdx( eye_pos );",
 	"	vec3 q1 = dFdy( eye_pos );",
 	"	vec2 st0 = dFdx( mUv.st );",
 	"	vec2 st1 = dFdy( mUv.st );",
-	"	float factor = sign( st1.t * st0.s - st0.t * st1.s );",
-	"	factor *= float( gl_FrontFacing ) * 2.0 - 1.0;",
-	"	vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * factor );",
-	"	vec3 T = normalize( ( -q0 * st1.s + q1 * st0.s ) * factor );",
+	"	float scale = sign( st1.t * st0.s - st0.t * st1.s );",
+	"	vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );",
+	"	vec3 T = normalize( ( -q0 * st1.s + q1 * st0.s ) * scale );",
 	"	vec3 N = normalize( surf_norm );",
+	"	mat3 tsn = mat3(S, T, N);",
 	"	vec3 mapN = map * 2.0 - 1.0;",
-	"	mapN.xy = scale * mapN.xy;",
-	"	mat3 tsn = mat3( S, T, N );",
+	"	mapN.xy *= normalScale;",
+	"	mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );",
 	"	return normalize( tsn * mapN );",
 	"}"
 ].join( "\n" ), null, { derivatives: true } ) );
