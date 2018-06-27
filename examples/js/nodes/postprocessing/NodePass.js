@@ -18,7 +18,7 @@ THREE.NodePass = function () {
 	this.node = new THREE.NodeMaterial();
 	this.node.fragment = this.fragment;
 
-	this.build();
+	this.needsUpdate = true;
 
 };
 
@@ -27,12 +27,20 @@ THREE.NodePass.prototype.constructor = THREE.NodePass;
 
 THREE.NodeMaterial.addShortcuts( THREE.NodePass.prototype, 'fragment', [ 'value' ] );
 
-THREE.NodePass.prototype.build = function () {
+THREE.NodePass.prototype.render = function () {
 
-	this.node.build();
+	if ( this.needsUpdate ) {
+
+		this.node.dispose();
+
+		this.needsUpdate = false;
+
+	}
 
 	this.uniforms = this.node.uniforms;
 	this.material = this.node;
+
+	THREE.ShaderPass.prototype.render.apply( this, arguments );
 
 };
 

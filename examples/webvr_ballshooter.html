@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webvr - gear vr</title>
+		<title>three.js webvr - ball shooter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-06-19 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-06-19" content="Alxt96tYGgIr9l6EXU0eeI360zcmzOY6Kuo3kcTfBGIRDOQbgFIZKRQ1joExQ74WZr1einsE+cUMHgSclNHCQQ4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyOTM5NzgyOH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-07-25 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-07-25" content="AtW06hJFoVWUJTZf5gqymMIlrR60JJi5MsSe44qsHjrCmzDUNmvaTtAVg+K9O9jFpjJtn/W9jvG//hHHaq5HcQoAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzMjUyNjI5OH0=">
 		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-07-21 -->
 		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-07-21" content="Anlf1R/bCOUxOEgGI/9TWuzHHNxBMfZSTUMDCN7cLwDj2gpLwgA1K0DPwOzO/O0Jwaur5bsHo7k9KXx+6g+82wIAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUzMjE2NjIyNX0=">
 		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-07-21 -->
@@ -19,27 +19,20 @@
 				overflow: hidden;
 			}
 			a {
-				color: #f00;
+				color: #48f;
 			}
 		</style>
 	</head>
 	<body>
 
 		<script src="../build/three.js"></script>
-
-		<script src="js/loaders/MTLLoader.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
-
-		<script src="js/vr/GearVRController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			var clock = new THREE.Clock();
-
 			var container;
 			var camera, scene, renderer;
-			var controller;
+			var controller, isSelecting = false;
 
 			var room;
 
@@ -60,7 +53,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gear vr';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - ball shooter';
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
@@ -70,7 +63,7 @@
 
 				room = new THREE.Mesh(
 					new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
+					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
 				);
 				room.position.y = 3;
 				scene.add( room );
@@ -85,10 +78,7 @@
 
 				for ( var i = 0; i < 200; i ++ ) {
 
-					var object = new THREE.Mesh(
-						geometry,
-						new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } )
-					);
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 4 - 2;
 					object.position.y = Math.random() * 4 - 2;
@@ -103,52 +93,41 @@
 
 				}
 
+				//
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
+				//
+
 				document.body.appendChild( WEBVR.createButton( renderer ) );
 
-				controller = new THREE.GearVRController();
-				controller.position.set( 0.25, 0.75, 0 );
-				scene.add( controller );
+				//
 
-				var skyBox = {
-					front: 'textures/cube/Bridge2/posz.jpg',
-					back: 'textures/cube/Bridge2/negz.jpg',
-					left: 'textures/cube/Bridge2/posx.jpg',
-					right: 'textures/cube/Bridge2/negx.jpg',
-					up: 'textures/cube/Bridge2/posy.jpg',
-					down: 'textures/cube/Bridge2/negy.jpg'
-				};
+				controller = renderer.vr.getController( 0 );
+				controller.addEventListener( 'selectstart', function () {
 
-				if ( 'SamsungChangeSky' in window ) {
-
-					window.SamsungChangeSky( skyBox );
-
-				}
-
-				var MTL = new THREE.MTLLoader();
-
-				MTL.setPath( 'models/obj/gear_vr_controller/' );
-				MTL.load( 'gear_vr_controller.mtl', function ( materials ) {
-
-					materials.preload();
-
-					var OBJ = new THREE.OBJLoader();
-					OBJ.setMaterials( materials );
-					OBJ.setPath( 'models/obj/gear_vr_controller/' );
-
-					OBJ.load( 'gear_vr_controller.obj', function ( obj ) {
-
-						obj.translateZ( - 0.03 );
-						controller.add( obj );
-
-					} );
+					isSelecting = true;
 
 				} );
+				controller.addEventListener( 'selectend', function () {
+
+					isSelecting = false;
+
+				} );
+				scene.add( controller );
+
+				//
+
+				var controllerHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { vertexColors: true, linewidth: 2, blending: THREE.AdditiveBlending } ) );
+				controllerHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
+				controllerHelper.geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
+				controller.add( controllerHelper );
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -163,6 +142,8 @@
 
 			}
 
+			//
+
 			function animate() {
 
 				renderer.setAnimationLoop( render );
@@ -171,11 +152,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta() * 60;
-
-				controller.update();
-
-				if ( controller.getTouchpadState() === true ) {
+				if ( isSelecting ) {
 
 					var cube = room.children[ 0 ];
 					room.remove( cube );
@@ -229,18 +206,20 @@
 
 						normal.copy( cube.position ).sub( cube2.position );
 
-						if ( normal.length() < 2 * radius ) {
+						var distance = normal.length();
 
-							normal.multiplyScalar( 0.5 * normal.length() - radius );
+						if ( distance < 2 * radius ) {
+
+							normal.multiplyScalar( 0.5 * distance - radius );
+
 							cube.position.sub( normal );
 							cube2.position.add( normal );
 
 							normal.normalize();
 
 							relativeVelocity.copy( cube.userData.velocity ).sub( cube2.userData.velocity );
-							var dot = relativeVelocity.dot( normal );
 
-							normal = normal.multiplyScalar( dot );
+							normal = normal.multiplyScalar( relativeVelocity.dot( normal ) );
 
 							cube.userData.velocity.sub( normal );
 							cube2.userData.velocity.add( normal );

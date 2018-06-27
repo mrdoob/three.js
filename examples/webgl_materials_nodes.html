@@ -285,6 +285,8 @@
 
 			} else if ( typeof value == 'object' ) {
 
+				param.blend = value[ Object.keys( value )[ 0 ] ];
+
 				node = gui.add( param, name, value ).onChange( function () {
 
 					callback( param[ name ] );
@@ -698,7 +700,7 @@
 
 						blend.b = val ? displace : displaceY;
 
-						mtl.build();
+						mtl.needsUpdate = true;
 
 					} );
 
@@ -783,7 +785,7 @@
 
 						}
 
-						mtl.build();
+						mtl.needsUpdate = true;
 
 					} );
 
@@ -943,7 +945,7 @@
 
 						mtl.color = val ? diffuse : new THREE.ColorNode( 0xEEEEEE );
 
-						mtl.build();
+						mtl.needsUpdate = true;
 
 					} );
 
@@ -1900,7 +1902,7 @@
 
 						mtl.ao = val ? new THREE.FloatNode() : undefined;
 
-						mtl.build();
+						mtl.needsUpdate = true;
 
 					} );
 
@@ -2194,7 +2196,6 @@
 					var distanceMtl = new THREE.PhongNodeMaterial();
 					distanceMtl.environment = objectDepth;
 					distanceMtl.side = THREE.BackSide;
-					distanceMtl.build();
 
 					rtMaterial = distanceMtl;
 
@@ -2302,9 +2303,6 @@
 					break;
 
 			}
-
-			// build shader
-			mtl.build();
 
 			// set material
 			mesh.material = mtl;

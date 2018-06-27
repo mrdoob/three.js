@@ -203,7 +203,6 @@
 			sprite1.scale.y = spriteHeight;
 			sprite1.material.color = new THREE.TextureNode( walkingManTexture );
 			sprite1.material.color.coord = createHorizontalSpriteSheetNode( 8, 10 );
-			sprite1.material.build();
 
 			scene.add( sprite2 = new THREE.Mesh( plane, new THREE.SpriteNodeMaterial() ) );
 			sprite2.position.x = 30;
@@ -223,7 +222,6 @@
 				new THREE.PositionNode(),
 				THREE.OperatorNode.ADD
 			);
-			sprite2.material.build();
 
 			var sineWaveFunction = new THREE.FunctionNode( [
 				// https://stackoverflow.com/questions/36174431/how-to-make-a-wave-warp-effect-in-shader
@@ -245,7 +243,6 @@
 				"phase": new THREE.TimerNode()
 			} );
 			sprite3.material.fog = true;
-			sprite3.material.build();
 
 			//
 			//	Test serialization
@@ -276,11 +273,13 @@
 
 			THREE.NodeMaterialLoaderUtils.replaceUUID( json, walkingManTexture, walkingManTextureURL );
 
-			// unserialize
+			// deserialize
 
 			var material = new THREE.NodeMaterialLoader( null, library ).parse( json );
 
 			// replace material
+
+			sprite.material.dispose();
 
 			sprite.material = material;
 

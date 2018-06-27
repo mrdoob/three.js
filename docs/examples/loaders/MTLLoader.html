@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJLoader] and [page:UTF8Loader].<br />
+		<p class="desc">A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJLoader].<br />
 		The Material Template Library format (MTL) or .MTL File Format is a companion file format to .OBJ that describes surface shading
 		(material) properties of objects within one or more .OBJ files.
 		</p>
@@ -44,7 +44,7 @@
 		</p>
 
 
-		<h3>[method:null setPath]( [param:String path] )</h3>
+		<h3>[method:MTLLoader setPath]( [param:String path] )</h3>
 		<p>
 			[page:String path] — required<br />
 		</p>
@@ -53,7 +53,7 @@
 		</p>
 
 
-		<h3>[method:null setTexturePath]( [param:String path] )</h3>
+		<h3>[method:MTLLoader setTexturePath]( [param:String path] )</h3>
 		<p>
 			[page:String path] — required<br />
 		</p>
@@ -62,16 +62,17 @@
 		</p>
 
 
-		<h3>[method:null setCrossOrigin]( [param:boolean useCrossOrigin] )</h3>
+		<h3>[method:MTLLoader setCrossOrigin]( [param:String value] )</h3>
 		<p>
-			[page:boolean useCrossOrigin] — required<br />
+			[page:String value] — required<br />
 		</p>
 		<p>
-			Set to true if you need to load textures from a different origin.
+			If set, assigns the [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
+		 attribute of the image to the value of *crossOrigin*, prior to starting the load. Default is *"anonymous"*.
 		</p>
 
 
-		<h3>[method:null setMaterialOptions]( [param:Object options] )</h3>
+		<h3>[method:MTLLoader setMaterialOptions]( [param:Object options] )</h3>
 		<p>
 			[page:Object options] — required
 			<ul>

@@ -144,7 +144,6 @@
 				#include <envmap_pars_vertex>
 				#include <bsdfs>
 				#include <lights_pars_begin>
-				#include <lights_pars_maps>
 				#include <color_pars_vertex>
 				#include <fog_pars_vertex>
 				#include <morphtarget_pars_vertex>
@@ -268,8 +267,6 @@
 			var offsets = new Float32Array( INSTANCES * 3 ); // xyz
 			var colors = new Float32Array( INSTANCES * 3 ); // rgb
 			var scales = new Float32Array( INSTANCES * 1 ); // s
-
-			var color = new THREE.Color();
 
 			for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
 
