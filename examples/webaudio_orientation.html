@@ -158,12 +158,7 @@
 		var positionalAudio = new THREE.PositionalAudio( listener );
 		positionalAudio.setMediaElementSource( audioElement );
 		positionalAudio.setRefDistance( 1 );
-
-		// configure directionality cone, see https://developer.mozilla.org/en-US/docs/Web/API/PannerNode
-
-		positionalAudio.panner.coneInnerAngle = 210;
-		positionalAudio.panner.coneOuterAngle = 230;
-		positionalAudio.panner.coneOuterGain = 0.1;
+		positionalAudio.setDirectionalCone( 210, 230, 0.1 );
 
 		//
 
