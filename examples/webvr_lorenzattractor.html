@@ -25,7 +25,12 @@
 
 		<script>
 
-			var camera, scene, renderer, x, y, z, c;
+			var camera, scene, renderer;
+			var attractor, light;
+
+			var x = 15 * Math.random();
+			var y = 15 * Math.random();
+			var z = 15 * Math.random();
 
 			var scale = .02; // for reducing overall displayed size
 			var speed = 5; // integer, increase for faster visualization
@@ -62,8 +67,9 @@
 
 					geometry.attributes.position.set( [ scale * x, scale * y, scale * z ], 0 );
 
-					c.setHSL( current / steps, 1, .5 );
-					geometry.attributes.color.set( [ c.r, c.g, c.b ], 0 );
+					light.color.setHSL( current / steps, 1, .5 );
+
+					geometry.attributes.color.set( light.color.toArray(), 0 );
 
 				}
 
@@ -86,12 +92,6 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 
 				//
-
-				x = 15 * Math.random();
-				y = 15 * Math.random();
-				z = 15 * Math.random();
-
-				c = new THREE.Color();
 
 				var geometry = new THREE.BufferGeometry();
 
@@ -124,12 +124,9 @@
 
 				//
 
-				var light = new THREE.PointLight( 0xffffff, 1 );
-				light.color = c;
+				light = new THREE.PointLight( 0xffffff, 1 );
 				light.distance = 2;
 				attractor.add( light );
-
-				// scene.add( new THREE.PointLightHelper( light ))
 
 				var ground = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 10, 10 ),
