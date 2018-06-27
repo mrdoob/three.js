@@ -155,7 +155,7 @@ Object.assign( Frustum.prototype, {
 				p.y = plane.normal.y > 0 ? box.max.y : box.min.y;
 				p.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 				
-				if(plane.distanceToPoint( p ) < 0){
+				if ( plane.distanceToPoint( p ) < 0 ) {
 
 					return false;
 
