@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webvr - htc vive - dragging</title>
+		<title>three.js webvr - dragging</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-07-25 -->
@@ -26,11 +26,7 @@
 	<body>
 
 		<script src="../build/three.js"></script>
-
-		<script src="js/vr/ViveController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
-
-		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script>
 
@@ -56,7 +52,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - htc vive';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - dragging';
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
@@ -141,33 +137,15 @@
 
 				// controllers
 
-				controller1 = new THREE.ViveController( 0 );
-				controller1.standingMatrix = renderer.vr.getStandingMatrix();
-				controller1.addEventListener( 'triggerdown', onTriggerDown );
-				controller1.addEventListener( 'triggerup', onTriggerUp );
+				controller1 = renderer.vr.getController( 0 );
+				controller1.addEventListener( 'selectstart', onSelectStart );
+				controller1.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller1 );
 
-				controller2 = new THREE.ViveController( 1 );
-				controller2.standingMatrix = renderer.vr.getStandingMatrix();
-				controller2.addEventListener( 'triggerdown', onTriggerDown );
-				controller2.addEventListener( 'triggerup', onTriggerUp );
+				controller2 = renderer.vr.getController( 0 );
+				controller1.addEventListener( 'selectstart', onSelectStart );
+				controller1.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller2 );
-
-				var loader = new THREE.OBJLoader();
-				loader.setPath( 'models/obj/vive-controller/' );
-				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
-
-					var loader = new THREE.TextureLoader();
-					loader.setPath( 'models/obj/vive-controller/' );
-
-					var controller = object.children[ 0 ];
-					controller.material.map = loader.load( 'onepointfive_texture.png' );
-					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
-
-					controller1.add( object.clone() );
-					controller2.add( object.clone() );
-
-				} );
 
 				//
 
@@ -197,7 +175,7 @@
 
 			}
 
-			function onTriggerDown( event ) {
+			function onSelectStart( event ) {
 
 				var controller = event.target;
 
@@ -221,7 +199,7 @@
 
 			}
 
-			function onTriggerUp( event ) {
+			function onSelectEnd( event ) {
 
 				var controller = event.target;
 
@@ -298,9 +276,6 @@
 			}
 
 			function render() {
-
-				controller1.update();
-				controller2.update();
 
 				cleanIntersected();
 
