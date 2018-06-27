@@ -46,16 +46,6 @@
 			array via [page:.resetDuration resetDuration].
 		</p>
 
-		<h3>[property:Boolean isOptimized]</h3>
-		<p>
-			Whether the clip has been optimized with .optimize().
-		</p>
-
-		<h3>[property:Boolean isValidated]</h3>
-		<p>
-			Whether the clip has been validated with .validate().
-		</p>
-
 		<h3>[property:String name]</h3>
 		<p>
 			A name for this clip. A certain clip can be searched via [page:.findByName findByName].
@@ -79,8 +69,7 @@
 		<h3>[method:AnimationClip optimize]()</h3>
 		<p>
 			Optimizes each track by removing equivalent sequential keys (which are common in morph target
-			sequences). Called automatically by [page:AnimationMixer]'s clipAction() method. Calling this
-			method will set [page:.isValidated isValidated] to true, and additional calls will do nothing.
+			sequences).
 		</p>
 
 		<h3>[method:null resetDuration]()</h3>
@@ -92,13 +81,6 @@
 		<h3>[method:AnimationClip trim]()</h3>
 		<p>
 			Trims all tracks to the clip's duration.
-		</p>
-
-		<h3>[method:AnimationClip validate]()</h3>
-		<p>
-			Performs minimal validation on each track in the clip. Called automatically by
-			[page:AnimationMixer]'s clipAction() method. Calling this method will set
-			[page:.isValidated isValidated] to true, and additional calls will do nothing.
 		</p>
 
 
