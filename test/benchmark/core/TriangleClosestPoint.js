@@ -52,7 +52,7 @@
   s.add('9^3 points, 20 triangles', function() {
     var target = new THREE.Vector3();
     for (var tidx = 0; tidx < triangles.length; tidx++) {
-      triangle = triangles[tidx];
+      var triangle = triangles[tidx];
       for (var pidx = 0; pidx < testPoints.length; pidx++) {
         triangle.closestPointToPoint(testPoints[pidx], target);
       }
