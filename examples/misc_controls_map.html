@@ -84,7 +84,8 @@
 
 				// world
 
-				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
+				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				geometry.translate( 0, 0.5, 0 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 500; i ++ ) {
@@ -93,6 +94,9 @@
 					mesh.position.x = Math.random() * 1600 - 800;
 					mesh.position.y = 0;
 					mesh.position.z = Math.random() * 1600 - 800;
+					mesh.scale.x = 20;
+					mesh.scale.y = Math.random() * 80 + 10;
+					mesh.scale.z = 20;
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
 					scene.add( mesh );

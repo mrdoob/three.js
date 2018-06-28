@@ -320,13 +320,13 @@ var files = {
 	"webvr": [
 		"webvr_ballshooter",
 		"webvr_cubes",
+		"webvr_dragging",
 		"webvr_lorenzattractor",
 		"webvr_panorama",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
 		"webvr_video",
 		"webvr_vive",
-		"webvr_vive_dragging",
 		"webvr_vive_paint",
 		"webvr_vive_sculpt"
 	],
