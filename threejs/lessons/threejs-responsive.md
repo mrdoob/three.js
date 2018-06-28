@@ -267,5 +267,5 @@ display and you compare this sample to those above you should
 notice the edges are more crisp.
 
 This article covered a very basic but fundamental topic. Next up lets quickly
-go over the basic primitives that three.js provides.
+[go over the basic primitives that three.js provides](threejs-primitives.html).
 
