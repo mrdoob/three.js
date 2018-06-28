@@ -48,9 +48,7 @@ function fixSourceLinks(url, source) {
   var srcRE = /(src=)"(.*?)"/g;
   var linkRE = /(href=)"(.*?")/g;
   var imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
-  var loadImageRE = /(loadImageAndCreateTextureInfo)\(('|")(.*?)('|")/g;
-  var loadImagesRE = /loadImages(\s*)\((\s*)\[([^]*?)\](\s*),/g;
-  var quoteRE = /"(.*?)"/g;
+  var loaderLoadRE = /(loader\.load)\(('|")(.*?)('|")/g;
 
   var u = new URL(window.location.origin + url);
   var prefix = u.origin + dirname(u.pathname);
@@ -64,14 +62,8 @@ function fixSourceLinks(url, source) {
   source = source.replace(srcRE, makeLinkFQed);
   source = source.replace(linkRE, makeLinkFQed);
   source = source.replace(imageSrcRE, makeLinkFQed);
-  source = source.replace(loadImageRE, function(match, fn, q1, url, q2) {
+  source = source.replace(loaderLoadRE, function(match, fn, q1, url, q2) {
     return fn + '(' + q1 + addPrefix(url) + q2;
-  });
-  source = source.replace(loadImagesRE, function(match, p1, p2, p3, p4) {
-      p3 = p3.replace(quoteRE, function(match, p1) {
-          return '"' + addPrefix(p1) + '"';
-      });
-      return `loadImages${p1}(${p2}[${p3}]${p4},`;
   });
 
   return source;
