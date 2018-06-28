@@ -20,6 +20,7 @@
     "no-extend-native": 2,
     "no-extra-bind": 2,
     "no-implied-eval": 2,
+    "no-inner-declarations": 0,
     "no-iterator": 2,
     "no-label-var": 2,
     "no-labels": 2,
