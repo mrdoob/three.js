@@ -371,7 +371,7 @@
 
 		var texture;
 
-		if ( textureNode.FileName.slice( -3 ).toLowerCase() === 'tga' ) {
+		if ( textureNode.FileName.slice( - 3 ).toLowerCase() === 'tga' ) {
 
  			texture = THREE.Loader.Handlers.get( '.tga' ).load( fileName );
 
@@ -419,7 +419,7 @@
 		var name = materialNode.attrName;
 		var type = materialNode.ShadingModel;
 
-		//Case where FBX wraps shading model in property object.
+		// Case where FBX wraps shading model in property object.
 		if ( typeof type === 'object' ) {
 
 			type = type.value;
@@ -637,7 +637,6 @@
 					morphTarget.id = nodeID;
 
 					if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: morph target attached to more than one geometry is not supported.' );
-					morphTarget.parentGeoID = relationships.parents[ 0 ].ID;
 
 					morphTargets[ nodeID ] = morphTarget;
 
@@ -753,7 +752,7 @@
 
 						}
 
-					} )
+					} );
 
 					// assuming each morph target has a single animation curve for now
 					rawMorphTarget.animationCurveID = animConnections.children[ 0 ].ID;
@@ -1675,12 +1674,48 @@
 		} );
 
 		bindSkeleton( FBXTree, deformers.skeletons, geometryMap, modelMap, connections );
-
 		addAnimations( FBXTree, connections, sceneGraph );
-
 		createAmbientLight( FBXTree, sceneGraph );
 
+		setupMorphMaterials( sceneGraph );
+
 		return sceneGraph;
+
+	}
+
+	function setupMorphMaterials( sceneGraph ) {
+
+		sceneGraph.traverse( function ( child ) {
+
+			if ( child.isMesh ) {
+
+				if ( child.geometry.morphAttributes.position || child.geometry.morphAttributes.normal ) {
+
+					var uuid = child.uuid;
+					var matUuid = child.material.uuid;
+
+					// if a geometry has morph targets, it cannot share the material with other geometries
+					var sharedMat = false;
+
+					sceneGraph.traverse( function ( child ) {
+
+						if ( child.isMesh ) {
+
+							if ( child.material.uuid === matUuid && child.uuid !== uuid ) sharedMat = true;
+
+						}
+
+					} );
+
+					if ( sharedMat === true ) child.material = child.material.clone();
+
+					child.material.morphTargets = true;
+
+				}
+
+			}
+
+		} );
 
 	}
 
@@ -2337,6 +2372,13 @@
 
 		var rawCurves = FBXTree.Objects.AnimationCurve;
 
+		// TODO: Many values are identical up to roundoff error, but won't be optimised
+		// e.g. position times: [0, 0.4, 0. 8]
+		// position values: [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809, 7.23538335023477e-7, 93.67518615722656, -0.9982695579528809, 7.235384487103147e-7, 93.67520904541016, -0.9982695579528809]
+		// clearly, this should be optimised to
+		// times: [0], positions [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809]
+		// this shows up in nearly every FBX file, and generally time array is length > 100
+
 		for ( var nodeID in rawCurves ) {
 
 			var animationCurve = {
@@ -2387,6 +2429,8 @@
 
 		var layersMap = new Map();
 
+		// console.log( 'rawLayers', rawLayers );
+
 		for ( var nodeID in rawLayers ) {
 
 			var layerCurveNodes = [];
@@ -2405,18 +2449,17 @@
 						var curveNode = curveNodesMap.get( child.ID );
 
 						// check that the curves are defined for at least one axis, otherwise ignore the curveNode
-						if ( curveNode.curves.x !== undefined || curveNode.curves.y !== undefined || curveNode.curves.z !== undefined  ) {
+						if ( curveNode.curves.x !== undefined || curveNode.curves.y !== undefined || curveNode.curves.z !== undefined ) {
 
 							if ( layerCurveNodes[ i ] === undefined ) {
 
 								var modelID;
 
-								connections.get( curveNode.ID ).parents.forEach( function ( parent ) {
+								connections.get( child.ID ).parents.forEach( function ( parent ) {
 
 									if ( parent.relationship !== undefined ) modelID = parent.ID;
 
 								} );
-
 
 								var rawModel = FBXTree.Objects.Model[ modelID.toString() ];
 
@@ -2530,7 +2573,7 @@
 
 	}
 
-	// take raw animation data from parseAnimations and connect it up to the loaded models
+	// take raw animation clips and turn them into three.js animation clips
 	function addAnimations( FBXTree, connections, sceneGraph ) {
 
 		sceneGraph.animations = [];
@@ -2665,7 +2708,10 @@
 
 	}
 
+	var morphNum = 3;
 	function generateMorphTrack( modelName, curve ) {
+
+		if ( curve.times.length !== 4 ) return undefined; // HACK only add blink for now
 
 		var values = curve.values.map( function ( val ) {
 
@@ -2673,7 +2719,7 @@
 
 		} );
 
-		return new THREE.NumberKeyframeTrack( modelName + '.morphTargetInfluences[0]', curve.times, values );
+		return new THREE.NumberKeyframeTrack( modelName + '.morphTargetInfluences[3]', curve.times, values );
 
 	}
 
