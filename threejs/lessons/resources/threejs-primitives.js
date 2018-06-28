@@ -543,7 +543,14 @@ function main() {
       const left   = rect.left * pixelRatio;
       const top    = rect.top * pixelRatio;
 
-      camera.aspect = width / height;
+      const aspect = width / height;
+      const targetFov = THREE.Math.degToRad(60);
+      const fov = aspect >= 1
+        ? targetFov
+        : (2 * Math.atan(Math.tan(targetFov * .5) / aspect));
+
+      camera.fov = THREE.Math.radToDeg(fov);
+      camera.aspect = aspect;
       camera.updateProjectionMatrix();
 
       renderer.setViewport(left, top, width, height);
