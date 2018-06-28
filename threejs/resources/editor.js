@@ -1,6 +1,8 @@
 (function() {
 "use strict";
 
+const lessonHelperScriptRE = /<script src="[^"]+threejs-lessons-helper\.js"><\/script>/;
+
 function getQuery(s) {
   s = s === undefined ? window.location.search : s;
   if (s[0] === '?' ) {
@@ -244,7 +246,7 @@ function openInCodepen() {
     description           : "from: " + g.url,
     tags                  : ["three.js", "threejsfundamentals.org"],
     editors               : "101",
-    html                  : htmlParts.html.editor.getValue(),
+    html                  : htmlParts.html.editor.getValue().replace(lessonHelperScriptRE, ''),
     css                   : htmlParts.css.editor.getValue(),
     js                    : comment + addCORSSupport(htmlParts.js.editor.getValue()),
   };
@@ -288,7 +290,7 @@ function openInJSFiddle() {
       <input type="submit" />
     </form>
   `;
-  elem.querySelector("input[name=html]").value = htmlParts.html.editor.getValue();
+  elem.querySelector("input[name=html]").value = htmlParts.html.editor.getValue().replace(lessonHelperScriptRE, '');
   elem.querySelector("input[name=css]").value = htmlParts.css.editor.getValue();
   elem.querySelector("input[name=js]").value = comment + addCORSSupport(htmlParts.js.editor.getValue());
   elem.querySelector("input[name=title]").value = g.title;
