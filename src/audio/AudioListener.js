@@ -4,6 +4,7 @@
 
 import { Vector3 } from '../math/Vector3.js';
 import { Quaternion } from '../math/Quaternion.js';
+import { Clock } from '../core/Clock.js';
 import { Object3D } from '../core/Object3D.js';
 import { AudioContext } from './AudioContext.js';
 
@@ -95,6 +96,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var scale = new Vector3();
 
 		var orientation = new Vector3();
+		var clock = new Clock();
 
 		return function updateMatrixWorld( force ) {
 
@@ -109,15 +111,18 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( listener.positionX ) {
 
-				listener.positionX.setValueAtTime( position.x, this.context.currentTime );
-				listener.positionY.setValueAtTime( position.y, this.context.currentTime );
-				listener.positionZ.setValueAtTime( position.z, this.context.currentTime );
-				listener.forwardX.setValueAtTime( orientation.x, this.context.currentTime );
-				listener.forwardY.setValueAtTime( orientation.y, this.context.currentTime );
-				listener.forwardZ.setValueAtTime( orientation.z, this.context.currentTime );
-				listener.upX.setValueAtTime( up.x, this.context.currentTime );
-				listener.upY.setValueAtTime( up.y, this.context.currentTime );
-				listener.upZ.setValueAtTime( up.z, this.context.currentTime );
+				var delta = clock.getDelta();
+				var endTime = this.context.currentTime + delta;
+
+				listener.positionX.linearRampToValueAtTime( position.x, endTime );
+				listener.positionY.linearRampToValueAtTime( position.y, endTime );
+				listener.positionZ.linearRampToValueAtTime( position.z, endTime );
+				listener.forwardX.linearRampToValueAtTime( orientation.x, endTime );
+				listener.forwardY.linearRampToValueAtTime( orientation.y, endTime );
+				listener.forwardZ.linearRampToValueAtTime( orientation.z, endTime );
+				listener.upX.linearRampToValueAtTime( up.x, endTime );
+				listener.upY.linearRampToValueAtTime( up.y, endTime );
+				listener.upZ.linearRampToValueAtTime( up.z, endTime );
 
 			} else {
 
