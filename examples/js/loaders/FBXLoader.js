@@ -733,35 +733,7 @@
 
 			targetRelationships.children.forEach( function ( child ) {
 
-
-				if ( child.relationship === 'DeformPercent' ) { // animation info for morph target
-
-					var animConnections = connections.get( child.ID );
-					// parent relationship 'DeformPercent' === morphTargetNode /2605340465664
-					// parent relationship 'undefined' === AnimationLayer /2606600117184
-					// child relationship 'd|DeformPercent' === AnimationCurve /2606284032736
-
-					rawMorphTarget.weightCurveID = child.ID;
-
-					animConnections.parents.forEach( function ( parent ) {
-
-						if ( parent.relationship === undefined ) {
-
-							// assuming each morph target is in a single animation layer for now
-							rawMorphTarget.animationLayerID = parent.ID;
-
-						}
-
-					} );
-
-					// assuming each morph target has a single animation curve for now
-					rawMorphTarget.animationCurveID = animConnections.children[ 0 ].ID;
-
-				} else {
-
-					rawMorphTarget.geoID = child.ID;
-
-				}
+				if ( child.relationship === undefined ) rawMorphTarget.geoID = child.ID;
 
 			} );
 
