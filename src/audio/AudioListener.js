@@ -109,15 +109,15 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( listener.positionX ) {
 
-				listener.positionX.setValueAtTime( position.x, this.context.currentTime );
-				listener.positionY.setValueAtTime( position.y, this.context.currentTime );
-				listener.positionZ.setValueAtTime( position.z, this.context.currentTime );
-				listener.forwardX.setValueAtTime( orientation.x, this.context.currentTime );
-				listener.forwardY.setValueAtTime( orientation.y, this.context.currentTime );
-				listener.forwardZ.setValueAtTime( orientation.z, this.context.currentTime );
-				listener.upX.setValueAtTime( up.x, this.context.currentTime );
-				listener.upY.setValueAtTime( up.y, this.context.currentTime );
-				listener.upZ.setValueAtTime( up.z, this.context.currentTime );
+				listener.positionX.value = position.x;
+				listener.positionY.value = position.y;
+				listener.positionZ.value = position.z;
+				listener.forwardX.value = orientation.x;
+				listener.forwardY.value = orientation.y;
+				listener.forwardZ.value = orientation.z;
+				listener.upX.value = up.x;
+				listener.upY.value = up.y;
+				listener.upZ.value = up.z;
 
 			} else {
 
