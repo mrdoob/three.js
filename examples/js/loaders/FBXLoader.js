@@ -100,7 +100,7 @@
 
 			}
 
-			console.log( FBXTree.Objects );
+			// console.log( FBXTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
@@ -2429,8 +2429,6 @@
 
 		var layersMap = new Map();
 
-		// console.log( 'rawLayers', rawLayers );
-
 		for ( var nodeID in rawLayers ) {
 
 			var layerCurveNodes = [];
@@ -2500,7 +2498,6 @@
 
 								} );
 
-
 								var morpherID = connections.get( deformerID ).parents[ 0 ].ID;
 								var geoID = connections.get( morpherID ).parents[ 0 ].ID;
 
@@ -2512,6 +2509,7 @@
 								var node = {
 
 									modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+									morphName: FBXTree.Objects.Deformer[ deformerID ].attrName,
 
 								};
 
@@ -2586,7 +2584,7 @@
 
 			var rawClip = rawClips[ key ];
 
-			var clip = addClip( rawClip );
+			var clip = addClip( rawClip, sceneGraph );
 
 			sceneGraph.animations.push( clip );
 
@@ -2594,13 +2592,13 @@
 
 	}
 
-	function addClip( rawClip ) {
+	function addClip( rawClip, sceneGraph ) {
 
 		var tracks = [];
 
 		rawClip.layer.forEach( function ( rawTracks ) {
 
-			tracks = tracks.concat( generateTracks( rawTracks ) );
+			tracks = tracks.concat( generateTracks( rawTracks, sceneGraph ) );
 
 		} );
 
@@ -2608,7 +2606,7 @@
 
 	}
 
-	function generateTracks( rawTracks ) {
+	function generateTracks( rawTracks, sceneGraph ) {
 
 		var tracks = [];
 
@@ -2633,9 +2631,8 @@
 
 		}
 
-		if ( rawTracks.DeformPercent !== undefined && Object.keys( rawTracks.DeformPercent.curves ).length > 0 ) {
-
-			var morphTrack = generateMorphTrack( rawTracks.modelName, rawTracks.DeformPercent.curves.morph );
+		if ( rawTracks.DeformPercent !== undefined ) {
+			var morphTrack = generateMorphTrack( rawTracks, sceneGraph );
 			if ( morphTrack !== undefined ) tracks.push( morphTrack );
 
 		}
@@ -2708,18 +2705,18 @@
 
 	}
 
-	var morphNum = 3;
-	function generateMorphTrack( modelName, curve ) {
+	function generateMorphTrack( rawTracks, sceneGraph ) {
 
-		if ( curve.times.length !== 4 ) return undefined; // HACK only add blink for now
-
-		var values = curve.values.map( function ( val ) {
+		var curves = rawTracks.DeformPercent.curves.morph;
+		var values = curves.values.map( function ( val ) {
 
 			return val / 100;
 
 		} );
 
-		return new THREE.NumberKeyframeTrack( modelName + '.morphTargetInfluences[3]', curve.times, values );
+		var morphNum = sceneGraph.getObjectByName( rawTracks.modelName ).morphTargetDictionary[ rawTracks.morphName ];
+
+		return new THREE.NumberKeyframeTrack( rawTracks.modelName + '.morphTargetInfluences[' + morphNum + ']', curves.times, values );
 
 	}
 
