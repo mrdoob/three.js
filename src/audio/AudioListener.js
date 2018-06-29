@@ -111,6 +111,9 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( listener.positionX ) {
 
+				// code path for Chrome (see #14393)
+				// right now, it is the only browser that supports AudioParam in AudioListener
+
 				var delta = clock.getDelta();
 				var endTime = this.context.currentTime + delta;
 
