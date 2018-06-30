@@ -59,8 +59,8 @@ data they take what is often considered more complex
 programming to manipulate.
 
 `Geometry` based primitives are the more flexible, easier to manipulate
-type. They are built from JavaScript based classes like [`Vector3`](https://threejs.org/docs/api/math/Vector3.html) for
-3D points, [`Face3`](https://threejs.org/docs/index.html#api/core/Face3) for triangles.
+type. They are built from JavaScript based classes like `Vector3` for
+3D points, `Face3` for triangles.
 They take quite a bit of memory and before they can be rendered three.js will need to
 convert them to something similar to the corresponding `BufferGeometry` representation.
 
