@@ -1,5 +1,7 @@
-<!-- Licensed under a BSD license. See license.html for license -->
+// Licensed under a BSD license. See license.html for license
 'use strict';
+
+/* global jQuery */
 
 (function($){
 function getQueryParams() {

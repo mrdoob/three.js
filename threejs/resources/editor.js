@@ -1,6 +1,8 @@
 (function() {
 "use strict";
 
+/* global monaco, require */
+
 const lessonHelperScriptRE = /<script src="[^"]+threejs-lessons-helper\.js"><\/script>/;
 
 function getQuery(s) {
