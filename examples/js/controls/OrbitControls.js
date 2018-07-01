@@ -75,7 +75,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
 	// Mouse buttons
-	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+	this.mouseButtons = { LEFT: THREE.MOUSE.LEFT, MIDDLE: THREE.MOUSE.MIDDLE, RIGHT: THREE.MOUSE.RIGHT };
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -677,17 +677,29 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		switch ( event.button ) {
 
-			case scope.mouseButtons.ORBIT:
+			case scope.mouseButtons.LEFT:
 
-				if ( scope.enableRotate === false ) return;
+				if ( event.ctrlKey || event.metaKey ) {
 
-				handleMouseDownRotate( event );
+					if ( scope.enablePan === false ) return;
 
-				state = STATE.ROTATE;
+					handleMouseDownPan( event );
+
+					state = STATE.PAN;
+
+				} else {
+
+					if ( scope.enableRotate === false ) return;
+
+					handleMouseDownRotate( event );
+
+					state = STATE.ROTATE;
+
+				}
 
 				break;
 
-			case scope.mouseButtons.ZOOM:
+			case scope.mouseButtons.MIDDLE:
 
 				if ( scope.enableZoom === false ) return;
 
@@ -697,7 +709,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case scope.mouseButtons.PAN:
+			case scope.mouseButtons.RIGHT:
 
 				if ( scope.enablePan === false ) return;
 
