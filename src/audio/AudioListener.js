@@ -21,6 +21,8 @@ function AudioListener() {
 
 	this.filter = null;
 
+	this.timeDelta = 0;
+
 }
 
 AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
@@ -105,6 +107,8 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			var listener = this.context.listener;
 			var up = this.up;
 
+			this.timeDelta = clock.getDelta();
+
 			this.matrixWorld.decompose( position, quaternion, scale );
 
 			orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
@@ -112,10 +116,8 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			if ( listener.positionX ) {
 
 				// code path for Chrome (see #14393)
-				// right now, it is the only browser that supports AudioParam in AudioListener
 
-				var delta = clock.getDelta();
-				var endTime = this.context.currentTime + delta;
+				var endTime = this.context.currentTime + this.timeDelta;
 
 				listener.positionX.linearRampToValueAtTime( position.x, endTime );
 				listener.positionY.linearRampToValueAtTime( position.y, endTime );
