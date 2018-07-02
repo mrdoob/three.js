@@ -438,11 +438,6 @@ function main() {
     const root = new THREE.Object3D();
     scene.add(root);
 
-    scene.add(new THREE.HemisphereLight(0xaaaaaa, 0x444444));
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(-1, 2, 4);
-    scene.add(light);
-
     const fov = 60;
     const aspect = 1;
     const zNear = 0.1;
@@ -453,6 +448,17 @@ function main() {
     const controls = new THREE.TrackballControls(camera, elem);
     controls.noZoom = true;
     controls.noPan = true;
+
+    // add the lights as children of the camera.
+    // this is because TrackbacllControls move the camera.
+    // We really want to rotate the object itself but there's no
+    // controls for that so we fake it by putting all the lights
+    // on the camera so they move with it.
+    camera.add(new THREE.HemisphereLight(0xaaaaaa, 0x444444, .5));
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(-1, 2, 4 - 15);
+    camera.add(light);
+    scene.add(camera);
 
     promise.then((geometryInfo) => {
       if (geometryInfo instanceof THREE.BufferGeometry ||
