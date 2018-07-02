@@ -338,7 +338,7 @@ to use it](threejs-scenegraph.html).
 
 <canvas id="c"></canvas>
 <script src="../resources/threejs/r93/three.min.js"></script>
-<script src="../resources/threejs/r93/js/controls/OrbitControls.js"></script>
+<script src="../resources/threejs/r93/js/controls/TrackballControls.js"></script>
 <script src="resources/threejs-primitives.js"></script>
 <style>
 .spread {

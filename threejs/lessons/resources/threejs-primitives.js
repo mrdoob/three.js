@@ -393,8 +393,10 @@ function main() {
     return addElem(parent, 'div', className);
   }
 
-  document.querySelectorAll('[data-primitive]').forEach(createPrimitiveDOM);
-  document.querySelectorAll('[data-primitive-diagram]').forEach(createPrimitiveDiagram);
+  const renderFuncs = [
+    ...[...document.querySelectorAll('[data-primitive]')].map(createPrimitiveDOM),
+    ...[...document.querySelectorAll('[data-primitive-diagram]')].map(createPrimitiveDiagram),
+  ];
 
   function createPrimitiveDOM(base) {
     const name = base.dataset.primitive;
@@ -416,7 +418,7 @@ function main() {
     }
     addDiv(right, '.note').innerHTML = text;
 
-    createPrimitive(elem, info);
+    return createPrimitive(elem, info);
   }
 
   function createPrimitiveDiagram(base) {
@@ -425,7 +427,7 @@ function main() {
     if (!info) {
       throw new Error(`no primitive ${name}`);
     }
-    createPrimitive(base, info);
+    return createPrimitive(base, info);
   }
 
   function createPrimitive(elem, info) {
@@ -448,9 +450,9 @@ function main() {
     const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
     camera.position.z = 15;
 
-    const controls = new THREE.OrbitControls(camera, elem);
-    controls.enableZoom = false;
-    controls.enablePan = false;
+    const controls = new THREE.TrackballControls(camera, elem);
+    controls.noZoom = true;
+    controls.noPan = true;
 
     promise.then((geometryInfo) => {
       if (geometryInfo instanceof THREE.BufferGeometry ||
@@ -489,12 +491,45 @@ function main() {
       }
     });
 
-    Object.assign(info, {
-      scene,
-      root,
-      elem,
-      camera,
-    });
+    let oldWidth = -1;
+    let oldHeight = -1;
+
+    function render(renderer, time) {
+      root.rotation.x = time * .1;
+      root.rotation.y = time * .11;
+
+      const rect = elem.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
+          rect.right  < 0 || rect.left > renderer.domElement.clientWidth) {
+        return;
+      }
+
+      const width  = (rect.right - rect.left) * pixelRatio;
+      const height = (rect.bottom - rect.top) * pixelRatio;
+      const left   = rect.left * pixelRatio;
+      const top    = rect.top * pixelRatio;
+
+      if (width !== oldWidth || height !== oldHeight) {
+        controls.handleResize();
+      }
+      controls.update();
+
+      const aspect = width / height;
+      const targetFov = THREE.Math.degToRad(60);
+      const fov = aspect >= 1
+        ? targetFov
+        : (2 * Math.atan(Math.tan(targetFov * .5) / aspect));
+
+      camera.fov = THREE.Math.radToDeg(fov);
+      camera.aspect = aspect;
+      camera.updateProjectionMatrix();
+
+      renderer.setViewport(left, top, width, height);
+      renderer.setScissor(left, top, width, height);
+      renderer.render(scene, camera);
+    }
+
+    return render;
   }
 
   const pixelRatio = 2;  // even on low-res we want hi-res rendering
@@ -520,43 +555,15 @@ function main() {
     resizeRendererToDisplaySize(renderer);
 
     renderer.setScissorTest(false);
-    // renderer.clear();
 
     // Three r93 needs to render at least once for some reason.
     renderer.render(scene, camera);
 
     renderer.setScissorTest(true);
 
-    for (const info of Object.values(primitives)) {
-      const {root, scene, camera, elem} = info;
-      root.rotation.x = time * .1;
-      root.rotation.y = time * .11;
-
-      const rect = elem.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
-          rect.right  < 0 || rect.left > renderer.domElement.clientWidth) {
-        continue;
-      }
-
-      const width  = (rect.right - rect.left) * pixelRatio;
-      const height = (rect.bottom - rect.top) * pixelRatio;
-      const left   = rect.left * pixelRatio;
-      const top    = rect.top * pixelRatio;
-
-      const aspect = width / height;
-      const targetFov = THREE.Math.degToRad(60);
-      const fov = aspect >= 1
-        ? targetFov
-        : (2 * Math.atan(Math.tan(targetFov * .5) / aspect));
-
-      camera.fov = THREE.Math.radToDeg(fov);
-      camera.aspect = aspect;
-      camera.updateProjectionMatrix();
-
-      renderer.setViewport(left, top, width, height);
-      renderer.setScissor(left, top, width, height);
-      renderer.render(scene, camera);
-    }
+    renderFuncs.forEach((fn) => {
+      fn(renderer, time);
+    });
 
     requestAnimationFrame(render);
   }
