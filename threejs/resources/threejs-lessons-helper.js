@@ -42,7 +42,7 @@
     root.threejsLessonsHelper = factory.call(root);
   }
 }(this, function() {
-  "use strict";
+  'use strict';  // eslint-disable-line
 
   var topWindow = this;
 
@@ -59,12 +59,12 @@
   function updateCSSIfInIFrame() {
     if (isInIFrame()) {
       try {
-        document.getElementsByTagName("html")[0].className = "iframe";
+        document.getElementsByTagName('html')[0].className = 'iframe';
       } catch (e) {
         // eslint-disable-line
       }
       try {
-        document.body.className = "iframe";
+        document.body.className = 'iframe';
       } catch (e) {
         // eslint-disable-line
       }
@@ -72,7 +72,7 @@
   }
 
   function isInEditor() {
-    return window.location.href.substring(0, 4) === "blob";
+    return window.location.href.substring(0, 4) === 'blob';
   }
 
   /**
@@ -89,7 +89,7 @@
   function showNeedWebGL(canvas) {
     var doc = canvas.ownerDocument;
     if (doc) {
-      var div = doc.createElement("div");
+      var div = doc.createElement('div');
       div.innerHTML = `
         <div style="
            position: absolute;
@@ -110,7 +110,7 @@
           </div>
         </div>
       `;
-      div = div.querySelector("div");
+      div = div.querySelector('div');
       doc.body.appendChild(div);
     }
   }
@@ -118,8 +118,8 @@
   var origConsole = {};
 
   function setupConsole() {
-    var parent = document.createElement("div");
-    parent.className = "console";
+    var parent = document.createElement('div');
+    parent.className = 'console';
     Object.assign(parent.style, {
       fontFamily: 'monospace',
       fontSize: 'medium',
@@ -135,7 +135,7 @@
     var added = false;
 
     function addLine(type, str) {
-      var div = document.createElement("div");
+      var div = document.createElement('div');
       div.textContent = str;
       div.className = type;
       parent.appendChild(div);
@@ -181,8 +181,8 @@
           // the default is to do nothing. Preventing the default
           // means allowing context to be restored
           e.preventDefault();
-          var div = document.createElement("div");
-          div.className = "contextlost";
+          var div = document.createElement('div');
+          div.className = 'contextlost';
           div.innerHTML = '<div>Context Lost: Click To Reload</div>';
           div.addEventListener('click', function() {
               window.location.reload();
@@ -210,7 +210,7 @@
     if (!isInIFrame(window)) {
       return;
     }
-    var iframes = window.parent.document.getElementsByTagName("iframe");
+    var iframes = window.parent.document.getElementsByTagName('iframe');
     for (var ii = 0; ii < iframes.length; ++ii) {
       var iframe = iframes[ii];
       if (iframe.contentDocument === window.document) {
@@ -599,8 +599,8 @@
    */
   function glEnumToString(value) {
     var name = glEnums[value];
-    return (name !== undefined) ? ("gl." + name) :
-        ("/*UNKNOWN WebGL ENUM*/ 0x" + value.toString(16) + "");
+    return (name !== undefined) ? ('gl.' + name) :
+        ('/*UNKNOWN WebGL ENUM*/ 0x' + value.toString(16) + '');
   }
 
   /**
@@ -628,9 +628,9 @@
       }
     }
     if (value === null) {
-      return "null";
+      return 'null';
     } else if (value === undefined) {
-      return "undefined";
+      return 'undefined';
     } else {
       return value.toString();
     }
@@ -651,7 +651,7 @@
     for (var ii = 0; ii < numArgs; ++ii) {
       argStrs.push(glFunctionArgToString(functionName, numArgs, ii, args[ii]));
     }
-    return argStrs.join(", ");
+    return argStrs.join(', ');
   }
 
   function makePropertyWrapper(wrapper, original, propertyName) {
@@ -694,7 +694,7 @@
 
     var errorFunc = options.errorFunc || function(err, functionName, args) {
       console.error("WebGL error " + glEnumToString(err) + " in " + functionName +  // eslint-disable-line
-          "(" + glFunctionArgsToString(functionName, args) + ")");
+          '(' + glFunctionArgsToString(functionName, args) + ')');
     };
 
     // Holds booleans for each GL error so after we get the error ourselves
@@ -791,8 +791,8 @@
     }
 
     if (wrapper.bindBuffer) {
-      sharedState.wrappers["webgl"] = { wrapper: wrapper, orig: ctx };
-      addEnumsForContext(ctx, ctx.bindBufferBase ? "WebGL2" : "WebGL");
+      sharedState.wrappers['webgl'] = { wrapper: wrapper, orig: ctx };
+      addEnumsForContext(ctx, ctx.bindBufferBase ? 'WebGL2' : 'WebGL');
     }
 
     return wrapper;
@@ -885,7 +885,7 @@
                 var str = glFunctionArgToString(funcName, numArgs, ndx, arg);
                 // shorten because of long arrays
                 if (str.length > 200) {
-                  str = str.substring(0, 200) + "...";
+                  str = str.substring(0, 200) + '...';
                 }
                 return str;
               });
@@ -937,7 +937,7 @@
               if (matcher) {
                 try {
                   var error = new Error();
-                  var lines = error.stack.split("\n");
+                  var lines = error.stack.split('\n');
                   // window.fooLines = lines;
                   // lines.forEach(function(line, ndx) {
                   //   origConsole.log("#", ndx, line);
@@ -959,8 +959,8 @@
               }
 
               console.error(  // eslint-disable-line
-                  "WebGL error" + lineInfo, glEnumToString(err), "in",
-                  funcName, "(", enumedArgs.join(", "), ")");
+                  'WebGL error' + lineInfo, glEnumToString(err), 'in',
+                  funcName, '(', enumedArgs.join(', '), ')');
 
             },
           });

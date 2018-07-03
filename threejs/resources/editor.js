@@ -1,5 +1,5 @@
-(function() {
-"use strict";
+(function() {  // eslint-disable-line
+'use strict';  // eslint-disable-line
 
 /* global monaco, require */
 
@@ -25,7 +25,7 @@ function getSearch(url) {
 }
 
 const getFQUrl = (function() {
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   return function getFQUrl(url) {
     a.href = url;
     return a.href;
@@ -34,18 +34,18 @@ const getFQUrl = (function() {
 
 function getHTML(url, callback) {
   var req = new XMLHttpRequest();
-  req.open("GET", url, true);
+  req.open('GET', url, true);
   req.addEventListener('load', function() {
     var success = req.status === 200 || req.status === 0;
     callback(success ? null : 'could not load: ' + url, req.responseText);
   });
   req.addEventListener('timeout', function() {
-    callback("timeout get: " + url);
+    callback('timeout get: ' + url);
   });
   req.addEventListener('error', function() {
-    callback("error getting: " + url);
+    callback('error getting: ' + url);
   });
-  req.send("");
+  req.send('');
 }
 
 function fixSourceLinks(url, source) {
@@ -58,7 +58,7 @@ function fixSourceLinks(url, source) {
   var prefix = u.origin + dirname(u.pathname);
 
   function addPrefix(url) {
-    return url.indexOf("://") < 0 ? (prefix + url) : url;
+    return url.indexOf('://') < 0 ? (prefix + url) : url;
   }
   function makeLinkFQed(match, p1, url) {
     return p1 + '"' + addPrefix(url) + '"';
@@ -150,14 +150,14 @@ function parseHTML(url, html) {
   htmlParts.html.source += scripts + '\n';
 
   // add style section if there is non
-  if (html.indexOf("${css}") < 0) {
-    html = html.replace("</head>", "<style>\n${css}</style>\n</head>");
+  if (html.indexOf('${css}') < 0) {
+    html = html.replace('</head>', '<style>\n${css}</style>\n</head>');
   }
 
   // add hackedparams section.
   // We need a way to pass parameters to a blob. Normally they'd be passed as
   // query params but that only works in Firefox >:(
-  html = html.replace("</head>", '<script id="hackedparams">window.hackedParams = ${hackedParams}\n</script>\n</head>');
+  html = html.replace('</head>', '<script id="hackedparams">window.hackedParams = ${hackedParams}\n</script>\n</head>');
 
   var links = '';
   html = html.replace(cssLinkRE, function(p0, p1) {
@@ -194,7 +194,7 @@ function main() {
     parseHTML(query.url, html);
     setupEditor(query.url);
     if (query.startPane) {
-      const button = document.querySelector(".button-" + query.startPane);
+      const button = document.querySelector('.button-' + query.startPane);
       toggleSourcePane(button);
     }
   });
@@ -208,11 +208,11 @@ function getSourceBlob(options) {
     URL.revokeObjectURL(blobUrl);
   }
   var source = g.html;
-  source = source.replace("${hackedParams}", JSON.stringify(g.query));
+  source = source.replace('${hackedParams}', JSON.stringify(g.query));
   source = source.replace('${html}', htmlParts.html.editor.getValue());
   source = source.replace('${css}', htmlParts.css.editor.getValue());
   source = source.replace('${js}', htmlParts.js.editor.getValue());
-  source = source.replace('<head>', '<head>\n<script match="false">threejsLessonSettings = ' + JSON.stringify(options) + ";</script>");
+  source = source.replace('<head>', '<head>\n<script match="false">threejsLessonSettings = ' + JSON.stringify(options) + ';</script>');
 
   var scriptNdx = source.indexOf('<script>');
   g.numLinesBeforeScript = (source.substring(0, scriptNdx).match(/\n/g) || []).length;
@@ -223,7 +223,7 @@ function getSourceBlob(options) {
 }
 
 function dirname(path) {
-  var ndx = path.lastIndexOf("/");
+  var ndx = path.lastIndexOf('/');
   return path.substring(0, ndx + 1);
 }
 
@@ -245,24 +245,24 @@ function openInCodepen() {
   `;
   const pen = {
     title                 : g.title,
-    description           : "from: " + g.url,
-    tags                  : ["three.js", "threejsfundamentals.org"],
-    editors               : "101",
+    description           : 'from: ' + g.url,
+    tags                  : ['three.js', 'threejsfundamentals.org'],
+    editors               : '101',
     html                  : htmlParts.html.editor.getValue().replace(lessonHelperScriptRE, ''),
     css                   : htmlParts.css.editor.getValue(),
     js                    : comment + addCORSSupport(htmlParts.js.editor.getValue()),
   };
 
-  const elem = document.createElement("div");
+  const elem = document.createElement('div');
   elem.innerHTML = `
     <form method="POST" target="_blank" action="https://codepen.io/pen/define" class="hidden">'
       <input type="hidden" name="data">
       <input type="submit" />
     "</form>"
   `;
-  elem.querySelector("input[name=data]").value = JSON.stringify(pen);
+  elem.querySelector('input[name=data]').value = JSON.stringify(pen);
   window.frameElement.ownerDocument.body.appendChild(elem);
-  elem.querySelector("form").submit();
+  elem.querySelector('form').submit();
   window.frameElement.ownerDocument.body.removeChild(elem);
 }
 
@@ -281,7 +281,7 @@ function openInJSFiddle() {
   //   js                    : comment + htmlParts.js.editor.getValue(),
   // };
 
-  const elem = document.createElement("div");
+  const elem = document.createElement('div');
   elem.innerHTML = `
     <form method="POST" target="_black" action="https://jsfiddle.net/api/mdn/" class="hidden">
       <input type="hidden" name="html" />
@@ -292,46 +292,46 @@ function openInJSFiddle() {
       <input type="submit" />
     </form>
   `;
-  elem.querySelector("input[name=html]").value = htmlParts.html.editor.getValue().replace(lessonHelperScriptRE, '');
-  elem.querySelector("input[name=css]").value = htmlParts.css.editor.getValue();
-  elem.querySelector("input[name=js]").value = comment + addCORSSupport(htmlParts.js.editor.getValue());
-  elem.querySelector("input[name=title]").value = g.title;
+  elem.querySelector('input[name=html]').value = htmlParts.html.editor.getValue().replace(lessonHelperScriptRE, '');
+  elem.querySelector('input[name=css]').value = htmlParts.css.editor.getValue();
+  elem.querySelector('input[name=js]').value = comment + addCORSSupport(htmlParts.js.editor.getValue());
+  elem.querySelector('input[name=title]').value = g.title;
   window.frameElement.ownerDocument.body.appendChild(elem);
-  elem.querySelector("form").submit();
+  elem.querySelector('form').submit();
   window.frameElement.ownerDocument.body.removeChild(elem);
 }
 
 function setupEditor() {
 
   forEachHTMLPart(function(info, ndx, name) {
-    info.parent = document.querySelector(".panes>." + name);
+    info.parent = document.querySelector('.panes>.' + name);
     info.editor = runEditor(info.parent, info.source, info.language);
-    info.button = document.querySelector(".button-" + name);
+    info.button = document.querySelector('.button-' + name);
     info.button.addEventListener('click', function() {
       toggleSourcePane(info.button);
       run();
     });
   });
 
-  g.fullscreen = document.querySelector(".button-fullscreen");
+  g.fullscreen = document.querySelector('.button-fullscreen');
   g.fullscreen.addEventListener('click', toggleFullscreen);
 
-  g.run = document.querySelector(".button-run");
+  g.run = document.querySelector('.button-run');
   g.run.addEventListener('click', run);
 
-  g.iframe = document.querySelector(".result>iframe");
-  g.other = document.querySelector(".panes .other");
+  g.iframe = document.querySelector('.result>iframe');
+  g.other = document.querySelector('.panes .other');
 
-  document.querySelector(".button-codepen").addEventListener('click', openInCodepen);
-  document.querySelector(".button-jsfiddle").addEventListener('click', openInJSFiddle);
+  document.querySelector('.button-codepen').addEventListener('click', openInCodepen);
+  document.querySelector('.button-jsfiddle').addEventListener('click', openInJSFiddle);
 
-  g.result = document.querySelector(".panes .result");
-  g.resultButton = document.querySelector(".button-result");
+  g.result = document.querySelector('.panes .result');
+  g.resultButton = document.querySelector('.button-result');
   g.resultButton.addEventListener('click', function() {
      toggleResultPane();
      run();
   });
-  g.result.style.display = "none";
+  g.result.style.display = 'none';
   toggleResultPane();
 
   if (window.innerWidth > 1200) {
@@ -341,7 +341,7 @@ function setupEditor() {
   window.addEventListener('resize', resize);
 
   showOtherIfAllPanesOff();
-  document.querySelector(".other .loading").style.display = "none";
+  document.querySelector('.other .loading').style.display = 'none';
 
   resize();
   run({glDebug: false});
@@ -364,14 +364,14 @@ function run(options) {
 }
 
 function addClass(elem, className) {
-  var parts = elem.className.split(" ");
+  var parts = elem.className.split(' ');
   if (parts.indexOf(className) < 0) {
-    elem.className = elem.className + " " + className;
+    elem.className = elem.className + ' ' + className;
   }
 }
 
 function removeClass(elem, className) {
-  var parts = elem.className.split(" ");
+  var parts = elem.className.split(' ');
   var numParts = parts.length;
   for (;;) {
     var ndx = parts.indexOf(className);
@@ -381,7 +381,7 @@ function removeClass(elem, className) {
     parts.splice(ndx, 1);
   }
   if (parts.length !== numParts) {
-    elem.className = parts.join(" ");
+    elem.className = parts.join(' ');
     return true;
   }
   return false;
@@ -399,8 +399,8 @@ function toggleClass(elem, className) {
 function toggleIFrameFullscreen(childWindow) {
   const frame = childWindow.frameElement;
   if (frame) {
-    const isFullScreen = toggleClass(frame, "fullscreen");
-    frame.ownerDocument.body.style.overflow = isFullScreen ? "hidden" : "";
+    const isFullScreen = toggleClass(frame, 'fullscreen');
+    frame.ownerDocument.body.style.overflow = isFullScreen ? 'hidden' : '';
   }
 }
 
@@ -417,12 +417,12 @@ function toggleSourcePane(pressedButton) {
   forEachHTMLPart(function(info) {
     var pressed = pressedButton === info.button;
     if (pressed && !info.showing) {
-      addClass(info.button, "show");
-      info.parent.style.display = "block";
+      addClass(info.button, 'show');
+      info.parent.style.display = 'block';
       info.showing = true;
     } else {
-      removeClass(info.button, "show");
-      info.parent.style.display = "none";
+      removeClass(info.button, 'show');
+      info.parent.style.display = 'none';
       info.showing = false;
     }
   });
@@ -431,12 +431,12 @@ function toggleSourcePane(pressedButton) {
 }
 
 function showingResultPane() {
-  return g.result.style.display !== "none";
+  return g.result.style.display !== 'none';
 }
 function toggleResultPane() {
   var showing = showingResultPane();
-  g.result.style.display = showing ? "none" : "block";
-  addRemoveClass(g.resultButton, "show", !showing);
+  g.result.style.display = showing ? 'none' : 'block';
+  addRemoveClass(g.resultButton, 'show', !showing);
   showOtherIfAllPanesOff();
   resize();
 }
@@ -446,7 +446,7 @@ function showOtherIfAllPanesOff() {
   forEachHTMLPart(function(info) {
     paneOn = paneOn || info.showing;
   });
-  g.other.style.display = paneOn ? "none" : "block";
+  g.other.style.display = paneOn ? 'none' : 'block';
 }
 
 function getActualLineNumberAndMoveTo(lineNo, colNo) {

@@ -1,6 +1,7 @@
-"use strict";
+/*eslint-env node*/
 
-const path = require('path');
+'use strict';
+
 const fs = require('fs');
 
 module.exports = function(grunt) {
@@ -27,7 +28,7 @@ module.exports = function(grunt) {
           'threejs/resources/*.js',
         ],
         options: {
-          configFile: 'build/conf/eslint.json',
+          //configFile: 'build/conf/eslint.json',
           //rulesdir: ['build/rules'],
         },
       },
@@ -39,7 +40,7 @@ module.exports = function(grunt) {
           'threejs/lessons/resources/*.html',
         ],
         options: {
-          configFile: 'build/conf/eslint-examples.json',
+//          configFile: 'build/conf/eslint-examples.json',
         },
       },
     },
