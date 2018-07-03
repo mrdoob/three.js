@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webvr - flat torus</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-06-19 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-06-19" content="Alxt96tYGgIr9l6EXU0eeI360zcmzOY6Kuo3kcTfBGIRDOQbgFIZKRQ1joExQ74WZr1einsE+cUMHgSclNHCQQ4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyOTM5NzgyOH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-06-15 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-06-15" content="AtJH9g6nn0B87bnjJt+9m1joZXEYDmLSlRvtMr5qJD52hMcm3S86S7jg5I7y2I5cgQglE0rzsXzti5DECQLb8QkAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUyOTA4NDY2OH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-06-15 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-06-15" content="Aihhr0yXkVlCKF0DIpTbH8WX7ZmEexUhI/95+t8aoLfvBkePMiZ/iOoDPU3xefyfuczkDahH1L6eiPvRsuzITAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTI5MDg0NjY4fQ==">
+		<style>
+			body {
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/vr/WebVR.js"></script>
+
+		<script>
+
+			var camera, scene, renderer;
+			var torus;
+
+			var a = .5, b = .5, nMax = 10, n = 0;
+			var direction = 1, paused = true, count = pauseLength = 100;
+
+			var uSteps = 100, vSteps = 100, vec = new THREE.Vector3();
+			var scale = .15;
+
+			function f( u, v, target ) {
+
+				var U = 2 * Math.PI * u;
+				var V = Math.PI * v;
+
+				var gamma = a + b * Math.sin( 2 * n * V );
+
+				var x = Math.cos( gamma ) * Math.cos( U + V );
+				var y = Math.cos( gamma ) * Math.sin( U + V );
+				var z = Math.sin( gamma ) * Math.cos( U - V );
+				var w = Math.sin( gamma ) * Math.sin( U - V );
+
+				target.set( scale * x / ( 1 - w ), scale * y / ( 1 - w ), scale * z / ( 1 - w ) );
+
+			}
+
+			init();
+			animate();
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+
+				//
+
+				var geometry = new THREE.ParametricBufferGeometry( f, uSteps, vSteps );
+				var material = new THREE.MeshPhongMaterial( { wireframe: true } );
+
+				torus = new THREE.Mesh( geometry, material );
+				torus.position.set( 0, 1.5, - 1 );
+				scene.add( torus );
+
+				//
+
+				var light1 = new THREE.DirectionalLight( 0xffffff, 1 );
+				light1.position.set( 0, 3, - 1 );
+				light1.lookAt( 0, 1.5, - 1 );
+				scene.add( light1 );
+
+				var light2 = new THREE.DirectionalLight( 0xffffff, 1 );
+				light2.position.set( 0, - 1, - 1 );
+				light2.lookAt( 0, 1.5, - 1 );
+				scene.add( light2 );
+
+				var ambient = new THREE.AmbientLight( 0x666666 );
+				scene.add( ambient );
+
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 10, 10 ),
+					new THREE.MeshPhongMaterial( { color: 0x111111 } )
+				);
+				ground.geometry.rotateX( - 90 * Math.PI / 180 );
+				scene.add( ground );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				document.body.appendChild( WEBVR.createButton( renderer ) );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				if ( !paused ) n += .005 * direction;
+
+				if ( n < 0 || n > nMax ) direction = - direction;
+
+				if ( n <= 0 && !paused ) { n = 0; paused = true; count = pauseLength; }
+
+				if ( paused ) count--;
+
+				if ( count === 0 && paused ) paused = false;
+
+				for ( var j = 0 ; j <= vSteps ; j ++ ) {
+
+					for ( var i = 0 ; i <= uSteps ; i ++ ) {
+
+						f( i / uSteps, j / vSteps, vec );
+						torus.geometry.attributes.position.set( [ vec.x, vec.y, vec.z], 3 * ( i + j * ( vSteps + 1 ) ) );
+
+					}
+
+				}
+
+				torus.geometry.attributes.position.needsUpdate = true;
+
+				torus.material.color.setHSL( n / nMax, 1, .5 );
+
+				torus.rotation.x += .005;
+				torus.rotation.z += .01;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
