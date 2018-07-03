@@ -762,7 +762,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( object.isMesh || object.isSprite ) {
+		if ( object.isMesh ) {
 
 			if ( material.wireframe === true ) {
 
@@ -815,6 +815,10 @@ function WebGLRenderer( parameters ) {
 		} else if ( object.isPoints ) {
 
 			renderer.setMode( _gl.POINTS );
+
+		} else if ( object.isSprite ) {
+
+			renderer.setMode( _gl.TRIANGLES );
 
 		}
 

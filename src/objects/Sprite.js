@@ -24,8 +24,6 @@ function Sprite( material ) {
 
 	this.center = new Vector2( 0.5, 0.5 );
 
-	this.drawMode = TrianglesDrawMode;
-
 }
 
 Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
