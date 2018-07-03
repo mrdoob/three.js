@@ -112,6 +112,8 @@ import points_frag from './ShaderLib/points_frag.glsl';
 import points_vert from './ShaderLib/points_vert.glsl';
 import shadow_frag from './ShaderLib/shadow_frag.glsl';
 import shadow_vert from './ShaderLib/shadow_vert.glsl';
+import sprite_frag from './ShaderLib/sprite_frag.glsl';
+import sprite_vert from './ShaderLib/sprite_vert.glsl';
 
 export var ShaderChunk = {
 	alphamap_fragment: alphamap_fragment,
@@ -227,5 +229,7 @@ export var ShaderChunk = {
 	points_frag: points_frag,
 	points_vert: points_vert,
 	shadow_frag: shadow_frag,
-	shadow_vert: shadow_vert
+	shadow_vert: shadow_vert,
+	sprite_frag: sprite_frag,
+	sprite_vert: sprite_vert
 };
