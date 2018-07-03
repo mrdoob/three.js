@@ -416,10 +416,6 @@ var list = {
 			"WebGLProgram": "api/renderers/webgl/WebGLProgram",
 			"WebGLShader": "api/renderers/webgl/WebGLShader",
 			"WebGLState": "api/renderers/webgl/WebGLState"
-		},
-
-		"WebGLRenderer / Plugins": {
-			"SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
 		}
 
 	}
