@@ -5,7 +5,6 @@ import { Object3D } from '../core/Object3D.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
-import { TrianglesDrawMode } from '../constants.js';
 import { SpriteMaterial } from '../materials/SpriteMaterial.js';
 
 /**
