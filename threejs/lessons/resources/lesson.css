@@ -372,18 +372,15 @@ pre.prettyprint, code.prettyprint {
     }
 }
 
-@media (max-height: 700px) {
-    .threejs_example {
-        height: 400px;
-    }
-}
-
 @media (max-width: 720px) {
     body {
         font-size: 16px;
     }
     h1 {
         font-size: 24px;
+    }
+    .threejs_example {
+        max-height: 400px;
     }
     iframe {
         max-width: 95%;
