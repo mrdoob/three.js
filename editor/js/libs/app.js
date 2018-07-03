@@ -155,9 +155,11 @@ var APP = {
 
 		}
 
-		var prevTime;
+		var time, prevTime;
 
-		function animate( time ) {
+		function animate() {
+
+			time = performance.now();
 
 			try {
 
