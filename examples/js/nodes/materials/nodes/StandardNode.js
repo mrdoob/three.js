@@ -43,7 +43,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		] ) );
 
-		builder.addVertexParsCode( [
+		builder.addParsCode( [
 			"varying vec3 vViewPosition;",
 
 			"#ifndef FLAT_SHADED",
@@ -170,9 +170,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var clearCoatEnv = useClearCoat && environment ? this.environment.buildCode( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
 
-		builder.requires.transparent = alpha != undefined;
+		builder.requires.transparent = alpha !== undefined;
 
-		builder.addFragmentParsCode( [
+		builder.addParsCode( [
 
 			"varying vec3 vViewPosition;",
 

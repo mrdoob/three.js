@@ -20,23 +20,22 @@ SpriteNode.prototype.nodeType = "Sprite";
 
 SpriteNode.prototype.build = function ( builder ) {
 
-	var material = builder.material;
 	var output, code;
 
-	material.define( 'SPRITE' );
+	builder.define( 'SPRITE' );
 
-	material.requires.lights = false;
-	material.requires.transparent = this.alpha != undefined;
+	builder.requires.lights = false;
+	builder.requires.transparent = this.alpha != undefined;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
 		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
 
-		material.mergeUniform( THREE.UniformsUtils.merge( [
+		builder.mergeUniform( THREE.UniformsUtils.merge( [
 			THREE.UniformsLib[ "fog" ]
 		] ) );
 
-		material.addVertexPars( [
+		builder.addParsCode( [
 			"#include <fog_pars_vertex>"
 		].join( "\n" ) );
 
@@ -105,13 +104,14 @@ SpriteNode.prototype.build = function ( builder ) {
 
 	} else {
 
-		material.addFragmentPars( [
+		builder.addParsCode( [
 			"#include <fog_pars_fragment>",
 		].join( "\n" ) );
 
 		// parse all nodes to reuse generate codes
 
 		this.color.parse( builder, { slot: 'color' } );
+
 		if ( this.alpha ) this.alpha.parse( builder );
 
 		// build code

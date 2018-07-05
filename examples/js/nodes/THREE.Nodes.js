@@ -92,7 +92,7 @@ import {
 	StandardNode,
 	MeshStandardNode,
 	
-	// utils
+	// materials
 	
 	NodeMaterial,
 	SpriteNodeMaterial,

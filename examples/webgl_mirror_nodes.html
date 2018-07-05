@@ -40,68 +40,10 @@
 		<script src="js/objects/ReflectorRTT.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<!-- NodeLibrary -->
-		<script src="js/nodes/GLNode.js"></script>
-		<script src="js/nodes/RawNode.js"></script>
-		<script src="js/nodes/TempNode.js"></script>
-		<script src="js/nodes/InputNode.js"></script>
-		<script src="js/nodes/ConstNode.js"></script>
-		<script src="js/nodes/FunctionNode.js"></script>
-		<script src="js/nodes/FunctionCallNode.js"></script>
-		<script src="js/nodes/NodeUniform.js"></script>
-		<script src="js/nodes/NodeBuilder.js"></script>
-		<script src="js/nodes/NodeLib.js"></script>
-		<script src="js/nodes/NodeFrame.js"></script>
-		<script src="js/nodes/NodeMaterial.js"></script>
+		<script type="module">
 
-		<!-- Accessors -->
-		<script src="js/nodes/accessors/PositionNode.js"></script>
-		<script src="js/nodes/accessors/NormalNode.js"></script>
-		<script src="js/nodes/accessors/UVNode.js"></script>
-		<script src="js/nodes/accessors/ScreenUVNode.js"></script>
-		<script src="js/nodes/accessors/ColorsNode.js"></script>
-		<script src="js/nodes/accessors/CameraNode.js"></script>
-		<script src="js/nodes/accessors/ReflectNode.js"></script>
-		<script src="js/nodes/accessors/LightNode.js"></script>
-
-		<!-- Inputs -->
-		<script src="js/nodes/inputs/IntNode.js"></script>
-		<script src="js/nodes/inputs/FloatNode.js"></script>
-		<script src="js/nodes/inputs/ColorNode.js"></script>
-		<script src="js/nodes/inputs/Vector2Node.js"></script>
-		<script src="js/nodes/inputs/Vector3Node.js"></script>
-		<script src="js/nodes/inputs/Vector4Node.js"></script>
-		<script src="js/nodes/inputs/TextureNode.js"></script>
-		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
-		<script src="js/nodes/inputs/Matrix4Node.js"></script>
-		<script src="js/nodes/inputs/ReflectorNode.js"></script>
-
-		<!-- Math -->
-		<script src="js/nodes/math/Math1Node.js"></script>
-		<script src="js/nodes/math/Math2Node.js"></script>
-		<script src="js/nodes/math/Math3Node.js"></script>
-		<script src="js/nodes/math/OperatorNode.js"></script>
-
-		<!-- Utils -->
-		<script src="js/nodes/utils/SwitchNode.js"></script>
-		<script src="js/nodes/utils/JoinNode.js"></script>
-		<script src="js/nodes/utils/TimerNode.js"></script>
-		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
-		<script src="js/nodes/utils/VelocityNode.js"></script>
-		<script src="js/nodes/utils/LuminanceNode.js"></script>
-		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
-		<script src="js/nodes/utils/NoiseNode.js"></script>
-		<script src="js/nodes/utils/ResolutionNode.js"></script>
-		<script src="js/nodes/utils/BlurNode.js"></script>
-
-		<!-- Phong Material -->
-		<script src="js/nodes/materials/PhongNode.js"></script>
-		<script src="js/nodes/materials/PhongNodeMaterial.js"></script>
-
-		<!-- NodeMaterial Loader -->
-		<script src="js/loaders/NodeMaterialLoader.js"></script>
-
-		<script>
+		import './js/nodes/THREE.Nodes.js';
+		import './js/loaders/NodeMaterialLoader.js';
 
 		// scene size
 		var WIDTH = window.innerWidth;
@@ -168,8 +110,8 @@
 
 			var mirror = new THREE.ReflectorNode( groundMirror );
 
-			var normal = new THREE.TextureNode( decalNormal );
-			var normalXY = new THREE.SwitchNode( normal, 'xy' );
+			var normalMap = new THREE.TextureNode( decalNormal );
+			var normalXY = new THREE.SwitchNode( normalMap, 'xy' );
 			var normalXYFlip = new THREE.Math1Node(
 				normalXY,
 				THREE.Math1Node.INVERT
@@ -209,7 +151,7 @@
 			groundMirrorMaterial = new THREE.PhongNodeMaterial();
 			groundMirrorMaterial.environment = blurMirror; // or add "mirror" variable to disable blur
 			groundMirrorMaterial.environmentAlpha = mask;
-			groundMirrorMaterial.normal = normal;
+			groundMirrorMaterial.normal = new THREE.NormalMapNode( normalMap );
 			//groundMirrorMaterial.normalScale = new THREE.FloatNode( 1 );
 
 			// test serialization

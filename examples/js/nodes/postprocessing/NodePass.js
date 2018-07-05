@@ -2,6 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import { NodeUtils } from '../core/NodeUtils.js';
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { RawNode } from '../materials/nodes/RawNode.js';
 import { ScreenNode } from '../inputs/ScreenNode.js';
@@ -29,7 +30,7 @@ function NodePass() {
 NodePass.prototype = Object.create( THREE.ShaderPass.prototype );
 NodePass.prototype.constructor = NodePass;
 
-NodeMaterial.addShortcuts( NodePass.prototype, 'fragment', [ 'value' ] );
+NodeUtils.addShortcuts( NodePass.prototype, 'fragment', [ 'value' ] );
 
 NodePass.prototype.render = function () {
 

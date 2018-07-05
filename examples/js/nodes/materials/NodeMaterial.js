@@ -3,11 +3,6 @@
  */
 
 import { NodeBuilder } from '../core/NodeBuilder.js';
-import { NodeUniform } from '../core/NodeUniform.js';
-import { NodeLib } from '../core/NodeLib.js';
-import { FunctionNode } from '../core/FunctionNode.js';
-import { ConstNode } from '../core/ConstNode.js';
-import { StructNode } from '../core/StructNode.js';
 import { ColorNode } from '../inputs/ColorNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 import { RawNode } from './nodes/RawNode.js';

@@ -21,7 +21,7 @@ ColorsNode.prototype.constructor = ColorsNode;
 
 ColorsNode.prototype.generate = function ( builder, output ) {
 
-	builder.material.requires.color[ this.index ] = true;
+	builder.requires.color[ this.index ] = true;
 
 	var result = builder.isShader( 'vertex' ) ? vertexDict[ this.index ] : fragmentDict[ this.index ];
 
