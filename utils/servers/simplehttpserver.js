@@ -49,9 +49,15 @@ function handleRequest(request, response) {
 					return;
 				}
 
-				response.writeHead(200, {});
+				var fileType = filePath.split('.').pop().toLowerCase();
+
+				response.writeHead(200, { 
+					"Content-Type": mimeTypes[fileType] || mimeTypes['bin']
+				} );
+
 				response.write(data);
 				response.end();
+
 			});
 
 		} else if (stats.isDirectory()) {
