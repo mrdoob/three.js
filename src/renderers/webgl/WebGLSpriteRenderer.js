@@ -14,6 +14,8 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 	var texture;
 
+	var extensions, logarithmicDepthBuffer;
+
 	// decompose matrixWorld
 
 	var spritePosition = new Vector3();
@@ -74,6 +76,13 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 			alphaTest: gl.getUniformLocation( program, 'alphaTest' )
 		};
+
+		extensions = renderer.extensions;
+		logarithmicDepthBuffer = !!renderer.capabilities.logarithmicDepthBuffer;
+
+		if (logarithmicDepthBuffer) { 
+			uniforms.logDepthBufFC = gl.getUniformLocation( program, 'logDepthBufFC' );
+		}
 
 		var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 		canvas.width = 8;
@@ -155,6 +164,11 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 		}
 
+		if (logarithmicDepthBuffer) {
+				
+			gl.uniform1f( uniforms.logDepthBufFC, 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
+
+		}
 
 		// update positions and sort
 
@@ -234,7 +248,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			state.buffers.color.setMask( material.colorWrite );
 
 			textures.setTexture2D( material.map || texture, 0 );
-
+	
 			gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 			sprite.onAfterRender( renderer, scene, camera, undefined, material, undefined );
@@ -256,11 +270,17 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 		var vertexShader = gl.createShader( gl.VERTEX_SHADER );
 		var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
 
+		extensions = renderer.extensions;
+		logarithmicDepthBuffer = !!renderer.capabilities.logarithmicDepthBuffer;
+
 		gl.shaderSource( vertexShader, [
 
 			'precision ' + capabilities.precision + ' float;',
 
 			'#define SHADER_NAME ' + 'SpriteMaterial',
+
+			logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
+			logarithmicDepthBuffer && extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
@@ -275,6 +295,8 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 			'varying vec2 vUV;',
 			'varying float fogDepth;',
+
+			logarithmicDepthBuffer ? THREE.ShaderChunk['logdepthbuf_pars_vertex'] : '',
 
 			'void main() {',
 
@@ -295,6 +317,8 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 			'	fogDepth = - mvPosition.z;',
 
+			logarithmicDepthBuffer ? THREE.ShaderChunk['logdepthbuf_vertex'] : '',
+
 			'}'
 
 		].join( '\n' ) );
@@ -304,6 +328,10 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			'precision ' + capabilities.precision + ' float;',
 
 			'#define SHADER_NAME ' + 'SpriteMaterial',
+
+			logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
+			logarithmicDepthBuffer && extensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
+			logarithmicDepthBuffer && extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 			'uniform vec3 color;',
 			'uniform sampler2D map;',
@@ -319,7 +347,11 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			'varying vec2 vUV;',
 			'varying float fogDepth;',
 
+			logarithmicDepthBuffer ? THREE.ShaderChunk['logdepthbuf_pars_fragment'] : '',
+
 			'void main() {',
+
+			logarithmicDepthBuffer ? THREE.ShaderChunk['logdepthbuf_fragment'] : '',
 
 			'	vec4 texture = texture2D( map, vUV );',
 
