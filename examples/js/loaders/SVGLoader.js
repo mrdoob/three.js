@@ -981,18 +981,18 @@ THREE.SVGLoader.prototype = {
 
 							// Rotate around center (cx, cy)
 
-							var traslation = createIdTransform();
-							traslation[ 4 ] = -cx;
-							traslation[ 5 ] = -cy;
+							var translation = createIdTransform();
+							translation[ 4 ] = -cx;
+							translation[ 5 ] = -cy;
 
 							var rotation = createRotationTransform( angle );
 
-							var traslRot = createIdTransform();
-							multiplyTransforms( traslation, rotation, traslRot );
+							var translRot = createIdTransform();
+							multiplyTransforms( translation, rotation, translRot );
 
-							traslation[ 4 ] = cx;
-							traslation[ 5 ] = cy;
-							multiplyTransforms( traslRot, traslation, transform );
+							translation[ 4 ] = cx;
+							translation[ 5 ] = cy;
+							multiplyTransforms( translRot, translation, transform );
 
 						}
 
