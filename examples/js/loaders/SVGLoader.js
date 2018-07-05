@@ -1135,6 +1135,9 @@ THREE.SVGLoader.prototype = {
 
 		parseNode( xml.documentElement, { fill: '#000' } );
 
+		// console.log( paths );
+
+
 		console.timeEnd( 'THREE.SVGLoader: Parse' );
 
 		return paths;
