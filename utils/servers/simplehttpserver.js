@@ -17,8 +17,20 @@ var port = 8000,
 	urlParser = require('url'),
 	fs = require('fs'),
 	path = require('path'),
-	currentDir = process.cwd();
-
+	currentDir = process.cwd(),
+	mimeTypes = {
+		"html": "text/html",
+		"js": "text/javascript",
+		"css": "text/css",
+		"jpg": "text/jpeg",
+		"png": "text/png",
+		"gif": "text/gif",
+		"ogg": "text/ogg",
+		"mp3": "audio/mpeg",
+		"mp4": "text/mp4",
+		"txt": "text/plain",
+		"bin": "application/octet-stream"
+	};
 
 port = process.argv[2] ? parseInt(process.argv[2], 0) : port;
 
