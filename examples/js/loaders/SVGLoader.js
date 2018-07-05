@@ -771,15 +771,25 @@ THREE.SVGLoader.prototype = {
 			var scaleY = getTransformScaleY( currentTransform );
 
 			var subpath = new THREE.Path();
+			
+			console.warn( "AMEM: " + scaleX + ", " + scaleY );
 
 			if ( Math.abs( scaleX - scaleY ) > 0.00000001 ) {
 
-				// Circle sclaed differently in x and y becomes an ellipse
+				// Circle scaled differently in x and y becomes an ellipse
+
+				// Rotation
+				if ( isTransformRotated( currentTransform ) ) {
+					console.warn( "SVGLoader: Circle rotation in conjuction with non uniform scaling is not implemented." );
+				}
 
 				subpath.absellipse( x, y, r * scaleX, r * scaleY, 0, Math.PI * 2 );
+
 			}
 			else {
+
 				subpath.absarc( x, y, r, 0, Math.PI * 2 );
+
 			}
 
 			var path = new THREE.ShapePath();
@@ -856,7 +866,12 @@ THREE.SVGLoader.prototype = {
 			style = Object.assign( {}, style ); // clone style
 
 			if ( node.hasAttribute( 'fill' ) ) style.fill = node.getAttribute( 'fill' );
-			if ( node.style.fill !== '' ) style.fill = node.style.fill;
+			if ( node.style.fill !== '' && node.style.fill !== 'none' ) style.fill = node.style.fill;
+
+			if ( ! isVisible( style ) ) {
+				if ( node.hasAttribute( 'stroke' ) ) style.fill = node.getAttribute( 'stroke' );
+				if ( node.style.stroke !== '' && node.style.stroke !== 'none' ) style.fill = node.style.stroke;
+			}
 
 			return style;
 
@@ -864,7 +879,7 @@ THREE.SVGLoader.prototype = {
 
 		function isVisible( style ) {
 
-			return style.fill !== 'none' && style.fill !== 'transparent';
+			return ( style.fill !== 'none' && style.fill !== 'transparent' ) || ( style.stroke !== 'none' && style.stroke !== 'transparent' );
 
 		}
 
@@ -1119,8 +1134,6 @@ THREE.SVGLoader.prototype = {
 		console.time( 'THREE.SVGLoader: Parse' );
 
 		parseNode( xml.documentElement, { fill: '#000' } );
-
-		// console.log( paths );
 
 		console.timeEnd( 'THREE.SVGLoader: Parse' );
 
