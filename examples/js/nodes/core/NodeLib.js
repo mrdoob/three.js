@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.NodeLib = {
+var NodeLib = {
 
 	nodes: {},
 	keywords: {},
@@ -64,3 +64,5 @@ THREE.NodeLib = {
 	}
 
 };
+
+export { NodeLib };

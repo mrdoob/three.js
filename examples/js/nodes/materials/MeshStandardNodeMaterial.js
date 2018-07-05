@@ -2,34 +2,24 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.MeshStandardNodeMaterial = function () {
+import { MeshStandardNode } from './nodes/MeshStandardNode.js';
+import { NodeMaterial } from './NodeMaterial.js';
+import { NodeUtils } from '../core/NodeUtils.js';
 
-	var node = new THREE.MeshStandardNode();
+function MeshStandardNodeMaterial() {
 
-	THREE.NodeMaterial.call( this, node, node );
+	var node = new MeshStandardNode();
+
+	NodeMaterial.call( this, node, node );
 
 	this.type = "MeshStandardNodeMaterial";
 
 };
 
-THREE.MeshStandardNodeMaterial.prototype = Object.create( THREE.NodeMaterial.prototype );
-THREE.MeshStandardNodeMaterial.prototype.constructor = THREE.StandardNodeMaterial;
+MeshStandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
+MeshStandardNodeMaterial.prototype.constructor = MeshStandardNodeMaterial;
 
-Object.defineProperties( THREE.MeshStandardNodeMaterial.prototype, {
-
-	properties: {
-		
-		get: function () {
-
-			return this.fragment.properties;
-
-		}
-		
-	}
-
-} );
-
-THREE.NodeMaterial.addShortcuts( THREE.MeshStandardNodeMaterial.prototype, 'properties', [
+NodeUtils.addShortcuts( MeshStandardNodeMaterial.prototype, 'properties', [
 	"color.value",
 	"roughness.value",
 	"metalness.value",
@@ -40,3 +30,5 @@ THREE.NodeMaterial.addShortcuts( THREE.MeshStandardNodeMaterial.prototype, 'prop
 	"roughnessMap",
 	"envMap"
 ] );
+
+export { MeshStandardNodeMaterial };

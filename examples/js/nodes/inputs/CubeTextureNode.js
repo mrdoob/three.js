@@ -2,27 +2,30 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.CubeTextureNode = function ( value, coord, bias ) {
+import { InputNode } from '../core/InputNode.js';
+import { ReflectNode } from '../accessors/ReflectNode.js';
 
-	THREE.InputNode.call( this, 'v4', { shared: true } );
+function CubeTextureNode( value, coord, bias ) {
+
+	InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
-	this.coord = coord || new THREE.ReflectNode();
+	this.coord = coord || new ReflectNode();
 	this.bias = bias;
 
 };
 
-THREE.CubeTextureNode.prototype = Object.create( THREE.InputNode.prototype );
-THREE.CubeTextureNode.prototype.constructor = THREE.CubeTextureNode;
-THREE.CubeTextureNode.prototype.nodeType = "CubeTexture";
+CubeTextureNode.prototype = Object.create( InputNode.prototype );
+CubeTextureNode.prototype.constructor = CubeTextureNode;
+CubeTextureNode.prototype.nodeType = "CubeTexture";
 
-THREE.CubeTextureNode.prototype.getTexture = function ( builder, output ) {
+CubeTextureNode.prototype.getTexture = function ( builder, output ) {
 
-	return THREE.InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 't' );
+	return InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 'tc' );
 
 };
 
-THREE.CubeTextureNode.prototype.generate = function ( builder, output ) {
+CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	if ( output === 'samplerCube' ) {
 
@@ -34,9 +37,9 @@ THREE.CubeTextureNode.prototype.generate = function ( builder, output ) {
 	var coord = this.coord.build( builder, 'v3' );
 	var bias = this.bias ? this.bias.build( builder, 'fv1' ) : undefined;
 
-	if ( bias === undefined && builder.requires.bias ) {
+	if ( bias === undefined && builder.context.bias ) {
 
-		bias = new builder.requires.bias( this ).build( builder, 'fv1' );
+		bias = new builder.context.bias( this ).build( builder, 'fv1' );
 
 	}
 
@@ -51,9 +54,9 @@ THREE.CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.CubeTextureNode.prototype.copy = function ( source ) {
+CubeTextureNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	InputNode.prototype.copy.call( this, source );
 	
 	if ( source.value ) this.value = source.value;
 
@@ -63,7 +66,7 @@ THREE.CubeTextureNode.prototype.copy = function ( source ) {
 	
 };
 
-THREE.CubeTextureNode.prototype.toJSON = function ( meta ) {
+CubeTextureNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -81,3 +84,5 @@ THREE.CubeTextureNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { CubeTextureNode };

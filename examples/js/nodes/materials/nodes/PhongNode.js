@@ -2,42 +2,45 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.PhongNode = function () {
+import { GLNode } from '../../core/GLNode.js';
+import { ColorNode } from '../../inputs/ColorNode.js';
+import { FloatNode } from '../../inputs/FloatNode.js';
+ 
+function PhongNode() {
 
-	THREE.GLNode.call( this );
+	GLNode.call( this );
 
-	this.color = new THREE.ColorNode( 0xEEEEEE );
-	this.specular = new THREE.ColorNode( 0x111111 );
-	this.shininess = new THREE.FloatNode( 30 );
+	this.color = new ColorNode( 0xEEEEEE );
+	this.specular = new ColorNode( 0x111111 );
+	this.shininess = new FloatNode( 30 );
 
 };
 
-THREE.PhongNode.prototype = Object.create( THREE.GLNode.prototype );
-THREE.PhongNode.prototype.constructor = THREE.PhongNode;
-THREE.PhongNode.prototype.nodeType = "Phong";
+PhongNode.prototype = Object.create( GLNode.prototype );
+PhongNode.prototype.constructor = PhongNode;
+PhongNode.prototype.nodeType = "Phong";
 
-THREE.PhongNode.prototype.build = function ( builder ) {
+PhongNode.prototype.build = function ( builder ) {
 
-	var material = builder.material;
 	var code;
 
-	material.define( 'PHONG' );
-	material.define( 'ALPHATEST', '0.0' );
+	builder.define( 'PHONG' );
+	builder.define( 'ALPHATEST', '0.0' );
 
-	material.requires.lights = true;
+	builder.requires.lights = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
 		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
 
-		material.mergeUniform( THREE.UniformsUtils.merge( [
+		builder.mergeUniform( THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ]
 
 		] ) );
 
-		material.addVertexPars( [
+		builder.addParsCode( [
 			"varying vec3 vViewPosition;",
 
 			"#ifndef FLAT_SHADED",
@@ -139,9 +142,9 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 		var environment = this.environment ? this.environment.buildCode( builder, 'c', { slot: 'environment' } ) : undefined;
 		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.buildCode( builder, 'fv1' ) : undefined;
 
-		material.requires.transparent = alpha != undefined;
+		builder.requires.transparent = alpha != undefined;
 
-		material.addFragmentPars( [
+		builder.addParsCode( [
 			"#include <common>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
@@ -278,7 +281,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 			}
 
 		}
-
+/*
 		switch( builder.material.combine ) {
 
 			case THREE.ENVMAP_BLENDING_MULTIPLY:
@@ -290,7 +293,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 			
 			
 		}
-		
+	*/	
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
@@ -316,9 +319,9 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 
 };
 
-THREE.PhongNode.prototype.copy = function ( source ) {
+PhongNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	GLNode.prototype.copy.call( this, source );
 	
 	// vertex
 
@@ -347,7 +350,7 @@ THREE.PhongNode.prototype.copy = function ( source ) {
 
 };
 
-THREE.PhongNode.prototype.toJSON = function ( meta ) {
+PhongNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -384,3 +387,5 @@ THREE.PhongNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { PhongNode };

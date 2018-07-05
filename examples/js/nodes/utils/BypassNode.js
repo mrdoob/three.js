@@ -2,20 +2,22 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.BypassNode = function ( code, value ) {
+import { GLNode } from '../core/GLNode.js';
 
-	THREE.GLNode.call( this );
+function BypassNode( code, value ) {
+
+	GLNode.call( this );
 
 	this.code = code;
 	this.value = value;
 
 };
 
-THREE.BypassNode.prototype = Object.create( THREE.GLNode.prototype );
-THREE.BypassNode.prototype.constructor = THREE.BypassNode;
-THREE.BypassNode.prototype.nodeType = "Bypass";
+BypassNode.prototype = Object.create( GLNode.prototype );
+BypassNode.prototype.constructor = BypassNode;
+BypassNode.prototype.nodeType = "Bypass";
 
-THREE.BypassNode.prototype.getType = function ( builder ) {
+BypassNode.prototype.getType = function ( builder ) {
 
 	if ( this.value ) {
 		
@@ -31,13 +33,13 @@ THREE.BypassNode.prototype.getType = function ( builder ) {
 
 };
 
-THREE.BypassNode.prototype.generate = function ( builder, output ) {
+BypassNode.prototype.generate = function ( builder, output ) {
 
 	var code = this.code.build( builder, output ) + ';';
 
+	builder.addNodeCode( code );
+	
 	if ( builder.isShader( 'vertex' ) ) {
-		
-		builder.material.addVertexNode( code );
 		
 		if (this.value) {
 		
@@ -47,24 +49,22 @@ THREE.BypassNode.prototype.generate = function ( builder, output ) {
 		
 	} else {
 		
-		builder.material.addFragmentNode( code );
-		
 		return this.value ? this.value.build( builder, output ) : builder.format( '0.0', 'fv1', output );
 		
 	}
 
 };
 
-THREE.BypassNode.prototype.copy = function ( source ) {
+BypassNode.prototype.copy = function ( source ) {
 	
-	THREE.GLNode.prototype.copy.call( this, source );
+	GLNode.prototype.copy.call( this, source );
 	
 	this.code = source.code;
 	this.value = source.value;
 	
 };
 
-THREE.BypassNode.prototype.toJSON = function ( meta ) {
+BypassNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -81,3 +81,5 @@ THREE.BypassNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { BypassNode };

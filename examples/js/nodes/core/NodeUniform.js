@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.NodeUniform = function ( params ) {
+function NodeUniform( params ) {
 
 	params = params || {};
 
@@ -13,17 +13,24 @@ THREE.NodeUniform = function ( params ) {
 
 };
 
-Object.defineProperties( THREE.NodeUniform.prototype, {
+Object.defineProperties( NodeUniform.prototype, {
+	
 	value: {
+		
 		get: function () {
 
 			return this.node.value;
 
 		},
+		
 		set: function ( val ) {
 
 			this.node.value = val;
 
 		}
+		
 	}
+	
 } );
+
+export { NodeUniform };

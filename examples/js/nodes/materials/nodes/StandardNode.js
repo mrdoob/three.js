@@ -2,45 +2,48 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.StandardNode = function () {
+import { GLNode } from '../../core/GLNode.js';
+import { ColorNode } from '../../inputs/ColorNode.js';
+import { FloatNode } from '../../inputs/FloatNode.js';
+import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
+ 
+function StandardNode() {
 
-	THREE.GLNode.call( this );
+	GLNode.call( this );
 
-	this.color = new THREE.ColorNode( 0xEEEEEE );
-	this.roughness = new THREE.FloatNode( 0.5 );
-	this.metalness = new THREE.FloatNode( 0.5 );
+	this.color = new ColorNode( 0xEEEEEE );
+	this.roughness = new FloatNode( 0.5 );
+	this.metalness = new FloatNode( 0.5 );
 
 };
 
-THREE.StandardNode.prototype = Object.create( THREE.GLNode.prototype );
-THREE.StandardNode.prototype.constructor = THREE.StandardNode;
-THREE.StandardNode.prototype.nodeType = "Standard";
+StandardNode.prototype = Object.create( GLNode.prototype );
+StandardNode.prototype.constructor = StandardNode;
+StandardNode.prototype.nodeType = "Standard";
 
-THREE.StandardNode.prototype.build = function ( builder ) {
+StandardNode.prototype.build = function ( builder ) {
 
-	var material = builder.material;
 	var code;
 
-	material.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
+	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
+	builder.define( 'ALPHATEST', '0.0' );
 
-	material.define( 'ALPHATEST', '0.0' );
+	builder.requires.lights = true;
 
-	material.requires.lights = true;
-
-	material.extensions.shaderTextureLOD = true;
+	builder.extensions.shaderTextureLOD = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
 		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
 
-		material.mergeUniform( THREE.UniformsUtils.merge( [
+		builder.mergeUniform( THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ]
 
 		] ) );
 
-		material.addVertexPars( [
+		builder.addVertexParsCode( [
 			"varying vec3 vViewPosition;",
 
 			"#ifndef FLAT_SHADED",
@@ -104,22 +107,20 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 	} else {
 
-		// blur textures for PBR effect
-
-		var requiresEnvironment = {
-			bias: THREE.RoughnessToBlinnExponentNode,
+		var contextEnvironment = {
+			bias: RoughnessToBlinnExponentNode,
 			gamma: true
 		};
 
-		var requiresGamma = {
+		var contextGammaOnly = {
 			gamma: true
 		};
 
-		var useClearCoat = ! material.isDefined( 'STANDARD' );
+		var useClearCoat = ! builder.isDefined( 'STANDARD' );
 
 		// parse all nodes to reuse generate codes
 
-		this.color.parse( builder, { slot: 'color', requires: requiresGamma } );
+		this.color.parse( builder, { slot: 'color', context: contextGammaOnly } );
 		this.roughness.parse( builder );
 		this.metalness.parse( builder );
 
@@ -140,11 +141,11 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 		if ( this.shadow ) this.shadow.parse( builder );
 		if ( this.emissive ) this.emissive.parse( builder, { slot: 'emissive' } );
 
-		if ( this.environment ) this.environment.parse( builder, { cache: 'env', requires: requiresEnvironment, slot: 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+		if ( this.environment ) this.environment.parse( builder, { cache: 'env', context: contextEnvironment, slot: 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'c', { slot: 'color', requires: requiresGamma } );
+		var color = this.color.buildCode( builder, 'c', { slot: 'color', context: contextGammaOnly } );
 		var roughness = this.roughness.buildCode( builder, 'fv1' );
 		var metalness = this.metalness.buildCode( builder, 'fv1' );
 
@@ -165,13 +166,13 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
 		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot: 'emissive' } ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache: 'env', requires: requiresEnvironment, slot: 'environment' } ) : undefined;
+		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache: 'env', context: contextEnvironment, slot: 'environment' } ) : undefined;
 
-		var clearCoatEnv = useClearCoat && environment ? this.environment.buildCode( builder, 'c', { cache: 'clearCoat', requires: requiresEnvironment, slot: 'environment' } ) : undefined;
+		var clearCoatEnv = useClearCoat && environment ? this.environment.buildCode( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
 
-		material.requires.transparent = alpha != undefined;
+		builder.requires.transparent = alpha != undefined;
 
-		material.addFragmentPars( [
+		builder.addFragmentParsCode( [
 
 			"varying vec3 vViewPosition;",
 
@@ -389,9 +390,9 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 };
 
-THREE.StandardNode.prototype.copy = function ( source ) {
+StandardNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	GLNode.prototype.copy.call( this, source );
 	
 	// vertex
 
@@ -424,7 +425,7 @@ THREE.StandardNode.prototype.copy = function ( source ) {
 
 };
 
-THREE.StandardNode.prototype.toJSON = function ( meta ) {
+StandardNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -466,3 +467,5 @@ THREE.StandardNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { StandardNode };

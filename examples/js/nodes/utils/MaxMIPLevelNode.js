@@ -2,9 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.MaxMIPLevelNode = function ( texture ) {
+import { FloatNode } from '../inputs/FloatNode.js';
+ 
+function MaxMIPLevelNode( texture ) {
 
-	THREE.FloatNode.call( this );
+	FloatNode.call( this );
 
 	this.texture = texture;
 
@@ -12,13 +14,14 @@ THREE.MaxMIPLevelNode = function ( texture ) {
 
 };
 
-THREE.MaxMIPLevelNode.prototype = Object.create( THREE.FloatNode.prototype );
-THREE.MaxMIPLevelNode.prototype.constructor = THREE.MaxMIPLevelNode;
-THREE.MaxMIPLevelNode.prototype.nodeType = "MaxMIPLevel";
+MaxMIPLevelNode.prototype = Object.create( FloatNode.prototype );
+MaxMIPLevelNode.prototype.constructor = MaxMIPLevelNode;
+MaxMIPLevelNode.prototype.nodeType = "MaxMIPLevel";
 
-Object.defineProperties( THREE.MaxMIPLevelNode.prototype, {
+Object.defineProperties( MaxMIPLevelNode.prototype, {
 
 	value: {
+		
 		get: function () {
 
 			if ( this.maxMIPLevel === 0 ) {
@@ -31,12 +34,15 @@ Object.defineProperties( THREE.MaxMIPLevelNode.prototype, {
 
 			return this.maxMIPLevel;
 
-		}
+		},
+		
+		set: function () { }
+		
 	}
 
 } );
 
-THREE.MaxMIPLevelNode.prototype.toJSON = function ( meta ) {
+MaxMIPLevelNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -51,3 +57,5 @@ THREE.MaxMIPLevelNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { MaxMIPLevelNode };

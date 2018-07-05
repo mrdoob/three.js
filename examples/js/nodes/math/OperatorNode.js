@@ -2,29 +2,31 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.OperatorNode = function ( a, b, op ) {
+import { TempNode } from '../core/TempNode.js';
+ 
+function OperatorNode( a, b, op ) {
 
-	THREE.TempNode.call( this );
+	TempNode.call( this );
 
 	this.a = a;
 	this.b = b;
-	this.op = op || THREE.OperatorNode.ADD;
+	this.op = op || OperatorNode.ADD;
 
 };
 
-THREE.OperatorNode.ADD = '+';
-THREE.OperatorNode.SUB = '-';
-THREE.OperatorNode.MUL = '*';
-THREE.OperatorNode.DIV = '/';
+OperatorNode.ADD = '+';
+OperatorNode.SUB = '-';
+OperatorNode.MUL = '*';
+OperatorNode.DIV = '/';
 
-THREE.OperatorNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.OperatorNode.prototype.constructor = THREE.OperatorNode;
-THREE.OperatorNode.prototype.nodeType = "Operator";
+OperatorNode.prototype = Object.create( TempNode.prototype );
+OperatorNode.prototype.constructor = OperatorNode;
+OperatorNode.prototype.nodeType = "Operator";
 
-THREE.OperatorNode.prototype.getType = function ( builder ) {
+OperatorNode.prototype.getType = function ( builder ) {
 
-	var a = this.a.getType( builder );
-	var b = this.b.getType( builder );
+	var a = this.a.getType( builder ),
+		b = this.b.getType( builder );
 
 	if ( builder.isFormatMatrix( a ) ) {
 
@@ -42,23 +44,21 @@ THREE.OperatorNode.prototype.getType = function ( builder ) {
 
 };
 
-THREE.OperatorNode.prototype.generate = function ( builder, output ) {
+OperatorNode.prototype.generate = function ( builder, output ) {
 
-	var material = builder.material,
-		data = material.getDataNode( this.uuid );
+	var data = builder.getNodeData( this ),
+		type = this.getType( builder );
 
-	var type = this.getType( builder );
-
-	var a = this.a.build( builder, type );
-	var b = this.b.build( builder, type );
+	var a = this.a.build( builder, type ),
+		b = this.b.build( builder, type );
 
 	return builder.format( '( ' + a + ' ' +  this.op + ' '+ b + ' )', type, output );
 
 };
 
-THREE.OperatorNode.prototype.copy = function ( source ) {
+OperatorNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	TempNode.prototype.copy.call( this, source );
 	
 	this.a = source.a;
 	this.b = source.b;
@@ -66,7 +66,7 @@ THREE.OperatorNode.prototype.copy = function ( source ) {
 	
 };
 
-THREE.OperatorNode.prototype.toJSON = function ( meta ) {
+OperatorNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -83,3 +83,5 @@ THREE.OperatorNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { OperatorNode };

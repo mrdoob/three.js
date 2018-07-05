@@ -2,28 +2,32 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.TextureNode = function ( value, coord, bias, project ) {
+import { InputNode } from '../core/InputNode.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
+import { UVNode } from '../accessors/UVNode.js';
 
-	THREE.InputNode.call( this, 'v4', { shared: true } );
+function TextureNode( value, coord, bias, project ) {
+
+	InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
-	this.coord = coord || new THREE.UVNode();
+	this.coord = coord || new UVNode();
 	this.bias = bias;
 	this.project = project !== undefined ? project : false;
 
 };
 
-THREE.TextureNode.prototype = Object.create( THREE.InputNode.prototype );
-THREE.TextureNode.prototype.constructor = THREE.TextureNode;
-THREE.TextureNode.prototype.nodeType = "Texture";
+TextureNode.prototype = Object.create( InputNode.prototype );
+TextureNode.prototype.constructor = TextureNode;
+TextureNode.prototype.nodeType = "Texture";
 
-THREE.TextureNode.prototype.getTexture = function ( builder, output ) {
+TextureNode.prototype.getTexture = function ( builder, output ) {
 
-	return THREE.InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 't' );
+	return InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 't' );
 
 };
 
-THREE.TextureNode.prototype.generate = function ( builder, output ) {
+TextureNode.prototype.generate = function ( builder, output ) {
 
 	if ( output === 'sampler2D' ) {
 
@@ -35,9 +39,9 @@ THREE.TextureNode.prototype.generate = function ( builder, output ) {
 	var coord = this.coord.build( builder, this.project ? 'v4' : 'v2' );
 	var bias = this.bias ? this.bias.build( builder, 'fv1' ) : undefined;
 
-	if ( bias == undefined && builder.requires.bias ) {
+	if ( bias == undefined && builder.context.bias ) {
 
-		bias = new builder.requires.bias( this ).build( builder, 'fv1' );
+		bias = new builder.context.bias( this ).build( builder, 'fv1' );
 
 	}
 
@@ -55,9 +59,9 @@ THREE.TextureNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.TextureNode.prototype.copy = function ( source ) {
+TextureNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	InputNode.prototype.copy.call( this, source );
 	
 	if ( source.value ) this.value = source.value;
 
@@ -68,7 +72,7 @@ THREE.TextureNode.prototype.copy = function ( source ) {
 	
 };
 
-THREE.TextureNode.prototype.toJSON = function ( meta ) {
+TextureNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -88,3 +92,5 @@ THREE.TextureNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { TextureNode };

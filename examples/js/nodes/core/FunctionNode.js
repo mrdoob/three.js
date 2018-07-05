@@ -3,12 +3,15 @@
  * @thanks bhouston / https://clara.io/
  */
 
-THREE.FunctionNode = function ( src, includesOrType, extensionsOrKeywords, keywordsOrExtensions, includes ) {
+import { TempNode } from './TempNode.js';
+import { NodeLib } from './NodeLib.js';
+
+function FunctionNode( src, includesOrType, extensionsOrKeywords, keywordsOrExtensions, includes ) {
 
 	this.isMethod = typeof includesOrType !== "string";
 	this.useKeywords = true;
 
-	THREE.TempNode.call( this, this.isMethod ? null : includesOrType );
+	TempNode.call( this, this.isMethod ? null : includesOrType );
 
 	if ( this.isMethod ) {
 		
@@ -22,26 +25,26 @@ THREE.FunctionNode = function ( src, includesOrType, extensionsOrKeywords, keywo
 
 };
 
-THREE.FunctionNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i;
-THREE.FunctionNode.rProperties = /[a-z_0-9]+/ig;
+FunctionNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i;
+FunctionNode.rProperties = /[a-z_0-9]+/ig;
 
-THREE.FunctionNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.FunctionNode.prototype.constructor = THREE.FunctionNode;
-THREE.FunctionNode.prototype.nodeType = "Function";
+FunctionNode.prototype = Object.create( TempNode.prototype );
+FunctionNode.prototype.constructor = FunctionNode;
+FunctionNode.prototype.nodeType = "Function";
 
-THREE.FunctionNode.prototype.isShared = function ( builder, output ) {
+FunctionNode.prototype.isShared = function ( builder, output ) {
 
 	return ! this.isMethod;
 
 };
 
-THREE.FunctionNode.prototype.getType = function ( builder ) {
+FunctionNode.prototype.getType = function ( builder ) {
 
 	return builder.getTypeByFormat( this.type );
 
 };
 
-THREE.FunctionNode.prototype.getInputByName = function ( name ) {
+FunctionNode.prototype.getInputByName = function ( name ) {
 
 	var i = this.inputs.length;
 
@@ -54,7 +57,7 @@ THREE.FunctionNode.prototype.getInputByName = function ( name ) {
 
 };
 
-THREE.FunctionNode.prototype.getIncludeByName = function ( name ) {
+FunctionNode.prototype.getIncludeByName = function ( name ) {
 
 	var i = this.includes.length;
 
@@ -67,7 +70,7 @@ THREE.FunctionNode.prototype.getIncludeByName = function ( name ) {
 
 };
 
-THREE.FunctionNode.prototype.generate = function ( builder, output ) {
+FunctionNode.prototype.generate = function ( builder, output ) {
 
 	var match, offset = 0, src = this.src;
 
@@ -79,26 +82,27 @@ THREE.FunctionNode.prototype.generate = function ( builder, output ) {
 
 	for ( var ext in this.extensions ) {
 
-		builder.material.extensions[ ext ] = true;
+		builder.extensions[ ext ] = true;
 
 	}
 
-	while ( match = THREE.FunctionNode.rProperties.exec( this.src ) ) {
+	while ( match = FunctionNode.rProperties.exec( this.src ) ) {
 
-		var prop = match[ 0 ], isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true;
-		var reference = prop;
+		var prop = match[ 0 ], 
+			isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true,
+			reference = prop;
 
-		if ( this.keywords[ prop ] || ( this.useKeywords && isGlobal && THREE.NodeLib.containsKeyword( prop ) ) ) {
+		if ( this.keywords[ prop ] || ( this.useKeywords && isGlobal && NodeLib.containsKeyword( prop ) ) ) {
 
 			var node = this.keywords[ prop ];
 
 			if ( ! node ) {
 
-				var keyword = THREE.NodeLib.getKeywordData( prop );
+				var keyword = NodeLib.getKeywordData( prop );
 
 				if ( keyword.cache ) node = builder.keywords[ prop ];
 
-				node = node || THREE.NodeLib.getKeyword( prop, builder );
+				node = node || NodeLib.getKeyword( prop, builder );
 
 				if ( keyword.cache ) builder.keywords[ prop ] = node;
 
@@ -116,9 +120,9 @@ THREE.FunctionNode.prototype.generate = function ( builder, output ) {
 
 		}
 
-		if ( this.getIncludeByName( reference ) === undefined && THREE.NodeLib.contains( reference ) ) {
+		if ( this.getIncludeByName( reference ) === undefined && NodeLib.contains( reference ) ) {
 
-			builder.include( THREE.NodeLib.get( reference ) );
+			builder.include( NodeLib.get( reference ) );
 
 		}
 
@@ -142,7 +146,7 @@ THREE.FunctionNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.FunctionNode.prototype.eval = function ( src, includes, extensions, keywords ) {
+FunctionNode.prototype.eval = function ( src, includes, extensions, keywords ) {
 
 	this.src = src || '';
 
@@ -152,7 +156,7 @@ THREE.FunctionNode.prototype.eval = function ( src, includes, extensions, keywor
 
 	if ( this.isMethod ) {
 
-		var match = this.src.match( THREE.FunctionNode.rDeclaration );
+		var match = this.src.match( FunctionNode.rDeclaration );
 
 		this.inputs = [];
 
@@ -161,7 +165,7 @@ THREE.FunctionNode.prototype.eval = function ( src, includes, extensions, keywor
 			this.type = match[ 1 ];
 			this.name = match[ 2 ];
 
-			var inputs = match[ 3 ].match( THREE.FunctionNode.rProperties );
+			var inputs = match[ 3 ].match( FunctionNode.rProperties );
 
 			if ( inputs ) {
 
@@ -206,9 +210,9 @@ THREE.FunctionNode.prototype.eval = function ( src, includes, extensions, keywor
 
 };
 
-THREE.FunctionNode.prototype.copy = function ( source ) {
+FunctionNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	TempNode.prototype.copy.call( this, source );
 	
 	this.isMethod = source.isMethod;
 	this.useKeywords = source.useKeywords;
@@ -219,7 +223,7 @@ THREE.FunctionNode.prototype.copy = function ( source ) {
 	
 };
 
-THREE.FunctionNode.prototype.toJSON = function ( meta ) {
+FunctionNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -259,3 +263,5 @@ THREE.FunctionNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { FunctionNode };

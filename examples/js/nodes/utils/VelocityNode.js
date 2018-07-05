@@ -2,9 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.VelocityNode = function ( target, params ) {
+import { Vector3Node } from '../inputs/Vector3Node.js';
+ 
+function VelocityNode( target, params ) {
 
-	THREE.Vector3Node.call( this );
+	Vector3Node.call( this );
 
 	this.params = {};
 
@@ -15,17 +17,17 @@ THREE.VelocityNode = function ( target, params ) {
 
 };
 
-THREE.VelocityNode.prototype = Object.create( THREE.Vector3Node.prototype );
-THREE.VelocityNode.prototype.constructor = THREE.VelocityNode;
-THREE.VelocityNode.prototype.nodeType = "Velocity";
+VelocityNode.prototype = Object.create( Vector3Node.prototype );
+VelocityNode.prototype.constructor = VelocityNode;
+VelocityNode.prototype.nodeType = "Velocity";
 
-THREE.VelocityNode.prototype.isReadonly = function ( builder ) {
+VelocityNode.prototype.isReadonly = function ( builder ) {
 
 	return false;
 
 };
 
-THREE.VelocityNode.prototype.setParams = function ( params ) {
+VelocityNode.prototype.setParams = function ( params ) {
 
 	switch ( this.params.type ) {
 
@@ -61,7 +63,7 @@ THREE.VelocityNode.prototype.setParams = function ( params ) {
 
 };
 
-THREE.VelocityNode.prototype.setTarget = function ( target ) {
+VelocityNode.prototype.setTarget = function ( target ) {
 
 	if ( this.target ) {
 
@@ -81,7 +83,7 @@ THREE.VelocityNode.prototype.setTarget = function ( target ) {
 
 };
 
-THREE.VelocityNode.prototype.updateFrameVelocity = function ( frame ) {
+VelocityNode.prototype.updateFrameVelocity = function ( frame ) {
 
 	if ( this.target ) {
 
@@ -93,7 +95,7 @@ THREE.VelocityNode.prototype.updateFrameVelocity = function ( frame ) {
 
 };
 
-THREE.VelocityNode.prototype.updateFrame = function ( frame ) {
+VelocityNode.prototype.updateFrame = function ( frame ) {
 
 	this.updateFrameVelocity( frame );
 
@@ -140,9 +142,9 @@ THREE.VelocityNode.prototype.updateFrame = function ( frame ) {
 
 };
 
-THREE.VelocityNode.prototype.copy = function ( source ) {
+VelocityNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	Vector3Node.prototype.copy.call( this, source );
 	
 	if ( source.target ) object.setTarget( source.target );
 	
@@ -150,7 +152,7 @@ THREE.VelocityNode.prototype.copy = function ( source ) {
 	
 };
 
-THREE.VelocityNode.prototype.toJSON = function ( meta ) {
+VelocityNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -168,3 +170,5 @@ THREE.VelocityNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { VelocityNode };

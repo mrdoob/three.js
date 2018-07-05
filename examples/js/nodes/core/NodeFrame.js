@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.NodeFrame = function ( time ) {
+function NodeFrame( time ) {
 
 	this.time = time !== undefined ? time : 0;
 
@@ -10,25 +10,33 @@ THREE.NodeFrame = function ( time ) {
 
 };
 
-THREE.NodeFrame.prototype.update = function ( delta ) {
+NodeFrame.prototype = {
 
-	++this.frameId;
+	constructor: NodeFrame,
 
-	this.time += delta;
-	this.delta = delta;
+	update: function ( delta ) {
 
-	return this;
+		++this.frameId;
 
+		this.time += delta;
+		this.delta = delta;
+
+		return this;
+
+	},
+	
+	updateNode: function ( node ) {
+
+		if ( node.frameId === this.frameId ) return this;
+
+		node.updateFrame( this );
+
+		node.frameId = this.frameId;
+
+		return this;
+
+	}
+	
 };
 
-THREE.NodeFrame.prototype.updateNode = function ( node ) {
-
-	if ( node.frameId === this.frameId ) return this;
-
-	node.updateFrame( this );
-
-	node.frameId = this.frameId;
-
-	return this;
-
-};
+export { NodeFrame };

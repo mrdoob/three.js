@@ -2,40 +2,42 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.ConstNode = function ( src, useDefine ) {
+import { TempNode } from './TempNode.js';
 
-	THREE.TempNode.call( this );
+function ConstNode( src, useDefine ) {
 
-	this.eval( src || THREE.ConstNode.PI, useDefine );
+	TempNode.call( this );
+
+	this.eval( src || ConstNode.PI, useDefine );
 
 };
 
-THREE.ConstNode.PI = 'PI';
-THREE.ConstNode.PI2 = 'PI2';
-THREE.ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
-THREE.ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
-THREE.ConstNode.LOG2 = 'LOG2';
-THREE.ConstNode.EPSILON = 'EPSILON';
+ConstNode.PI = 'PI';
+ConstNode.PI2 = 'PI2';
+ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
+ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
+ConstNode.LOG2 = 'LOG2';
+ConstNode.EPSILON = 'EPSILON';
 
-THREE.ConstNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
+ConstNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
 
-THREE.ConstNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ConstNode.prototype.constructor = THREE.ConstNode;
-THREE.ConstNode.prototype.nodeType = "Const";
+ConstNode.prototype = Object.create( TempNode.prototype );
+ConstNode.prototype.constructor = ConstNode;
+ConstNode.prototype.nodeType = "Const";
 
-THREE.ConstNode.prototype.getType = function ( builder ) {
+ConstNode.prototype.getType = function ( builder ) {
 
 	return builder.getTypeByFormat( this.type );
 
 };
 
-THREE.ConstNode.prototype.eval = function ( src, useDefine ) {
+ConstNode.prototype.eval = function ( src, useDefine ) {
 
 	this.src = src || '';
 
 	var name, type, value = "";
 
-	var match = this.src.match( THREE.ConstNode.rDeclaration );
+	var match = this.src.match( ConstNode.rDeclaration );
 
 	this.useDefine = useDefine || this.src.charAt(0) === '#';
 
@@ -58,7 +60,7 @@ THREE.ConstNode.prototype.eval = function ( src, useDefine ) {
 
 };
 
-THREE.ConstNode.prototype.build = function ( builder, output ) {
+ConstNode.prototype.build = function ( builder, output ) {
 
 	if ( output === 'source' ) {
 
@@ -88,21 +90,21 @@ THREE.ConstNode.prototype.build = function ( builder, output ) {
 
 };
 
-THREE.ConstNode.prototype.generate = function ( builder, output ) {
+ConstNode.prototype.generate = function ( builder, output ) {
 
 	return builder.format( this.name, this.getType( builder ), output );
 
 };
 
-THREE.ConstNode.prototype.copy = function ( source ) {
+ConstNode.prototype.copy = function ( source ) {
 	
-	THREE.GLNode.prototype.copy.call( this, source );
+	TempNode.prototype.copy.call( this, source );
 	
 	this.eval( source.src, source.useDefine );	
 	
 };
 
-THREE.ConstNode.prototype.toJSON = function ( meta ) {
+ConstNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -119,3 +121,5 @@ THREE.ConstNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { ConstNode };

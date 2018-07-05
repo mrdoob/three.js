@@ -3,9 +3,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.TempNode = function ( type, params ) {
+import { GLNode } from './GLNode.js';
 
-	THREE.GLNode.call( this, type );
+function TempNode( type, params ) {
+
+	GLNode.call( this, type );
 
 	params = params || {};
 
@@ -14,14 +16,12 @@ THREE.TempNode = function ( type, params ) {
 
 };
 
-THREE.TempNode.prototype = Object.create( THREE.GLNode.prototype );
-THREE.TempNode.prototype.constructor = THREE.TempNode;
+TempNode.prototype = Object.create( GLNode.prototype );
+TempNode.prototype.constructor = TempNode;
 
-THREE.TempNode.prototype.build = function ( builder, output, uuid, ns ) {
+TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 	output = output || this.getType( builder );
-
-	var material = builder.material;
 
 	if ( this.isShared( builder, output ) ) {
 
@@ -35,7 +35,7 @@ THREE.TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 		uuid = builder.getUuid( uuid || this.getUuid(), ! isUnique );
 
-		var data = material.getDataNode( uuid );
+		var data = builder.getNodeData( uuid );
 
 		if ( builder.parsing ) {
 
@@ -47,24 +47,24 @@ THREE.TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 			}
 
-			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
+			return GLNode.prototype.build.call( this, builder, output, uuid );
 
 		} else if ( isUnique ) {
 
-			data.name = data.name || THREE.GLNode.prototype.build.call( this, builder, output, uuid );
+			data.name = data.name || GLNode.prototype.build.call( this, builder, output, uuid );
 
 			return data.name;
 
 		} else if ( ! builder.optimize || data.deps == 1 ) {
 
-			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
+			return GLNode.prototype.build.call( this, builder, output, uuid );
 
 		}
 
 		uuid = this.getUuid( false );
 
-		var name = this.getTemp( builder, uuid );
-		var type = data.output || this.getType( builder );
+		var name = this.getTemp( builder, uuid ),
+			type = data.output || this.getType( builder );
 
 		if ( name ) {
 
@@ -72,12 +72,11 @@ THREE.TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 		} else {
 
-			name = THREE.TempNode.prototype.generate.call( this, builder, output, uuid, data.output, ns );
+			name = TempNode.prototype.generate.call( this, builder, output, uuid, data.output, ns );
 
 			var code = this.generate( builder, type, uuid );
 
-			if ( builder.isShader( 'vertex' ) ) material.addVertexNode( name + ' = ' + code + ';' );
-			else material.addFragmentNode( name + ' = ' + code + ';' );
+			builder.addNodeCode( name + ' = ' + code + ';' );
 
 			return builder.format( name, type, output );
 
@@ -85,23 +84,23 @@ THREE.TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 	}
 
-	return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
+	return GLNode.prototype.build.call( this, builder, output, uuid );
 
 };
 
-THREE.TempNode.prototype.isShared = function ( builder, output ) {
+TempNode.prototype.isShared = function ( builder, output ) {
 
 	return output !== 'sampler2D' && output !== 'samplerCube' && this.shared;
 
 };
 
-THREE.TempNode.prototype.isUnique = function ( builder, output ) {
+TempNode.prototype.isUnique = function ( builder, output ) {
 
 	return this.unique;
 
 };
 
-THREE.TempNode.prototype.getUuid = function ( unique ) {
+TempNode.prototype.getUuid = function ( unique ) {
 
 	var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
 
@@ -111,24 +110,24 @@ THREE.TempNode.prototype.getUuid = function ( unique ) {
 
 };
 
-THREE.TempNode.prototype.getTemp = function ( builder, uuid ) {
+TempNode.prototype.getTemp = function ( builder, uuid ) {
 
 	uuid = uuid || this.uuid;
 
-	var material = builder.material;
-
-	if ( builder.isShader( 'vertex' ) && material.vertexTemps[ uuid ] ) return material.vertexTemps[ uuid ].name;
-	else if ( material.fragmentTemps[ uuid ] ) return material.fragmentTemps[ uuid ].name;
-
+	var tempVar = builder.getVars()[uuid]
+	
+	return tempVar ? tempVar.name : undefined;
+	
 };
 
-THREE.TempNode.prototype.generate = function ( builder, output, uuid, type, ns ) {
+TempNode.prototype.generate = function ( builder, output, uuid, type, ns ) {
 
 	if ( ! this.isShared( builder, output ) ) console.error( "THREE.TempNode is not shared!" );
 
 	uuid = uuid || this.uuid;
 
-	if ( builder.isShader( 'vertex' ) ) return builder.material.getVertexTemp( uuid, type || this.getType( builder ), ns ).name;
-	else return builder.material.getFragmentTemp( uuid, type || this.getType( builder ), ns ).name;
+	return builder.getTempVar( uuid, type || this.getType( builder ), ns ).name;
 
 };
+
+export { TempNode };

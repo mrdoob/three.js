@@ -2,28 +2,31 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.StructNode = function ( src ) {
+import { TempNode } from './TempNode.js';
+import { FunctionNode } from './FunctionNode.js';
 
-	THREE.TempNode.call( this);
+function StructNode( src ) {
+
+	TempNode.call( this);
 
 	this.eval( src );
 
 };
 
-THREE.StructNode.rDeclaration = /^struct\s*([a-z_0-9]+)\s*{\s*((.|\n)*?)}/img;
-THREE.StructNode.rProperties = /\s*(\w*?)\s*(\w*?)(\=|\;)/img;
+StructNode.rDeclaration = /^struct\s*([a-z_0-9]+)\s*{\s*((.|\n)*?)}/img;
+StructNode.rProperties = /\s*(\w*?)\s*(\w*?)(\=|\;)/img;
 
-THREE.StructNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.StructNode.prototype.constructor = THREE.StructNode;
-THREE.StructNode.prototype.nodeType = "Struct";
+StructNode.prototype = Object.create( TempNode.prototype );
+StructNode.prototype.constructor = StructNode;
+StructNode.prototype.nodeType = "Struct";
 
-THREE.StructNode.prototype.getType = function ( builder ) {
+StructNode.prototype.getType = function ( builder ) {
 
 	return builder.getTypeByFormat( this.name );
 
 };
 
-THREE.StructNode.prototype.getInputByName = function ( name ) {
+StructNode.prototype.getInputByName = function ( name ) {
 
 	var i = this.inputs.length;
 
@@ -36,7 +39,7 @@ THREE.StructNode.prototype.getInputByName = function ( name ) {
 
 };
 
-THREE.StructNode.prototype.generate = function ( builder, output ) {
+StructNode.prototype.generate = function ( builder, output ) {
 
 	if ( output === 'source' ) {
 
@@ -50,21 +53,21 @@ THREE.StructNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.StructNode.prototype.eval = function ( src ) {
+StructNode.prototype.eval = function ( src ) {
 
 	this.src = src || '';
 	
 	this.inputs = [];
 	
-	var declaration = THREE.StructNode.rDeclaration.exec( this.src );
+	var declaration = StructNode.rDeclaration.exec( this.src );
 	
 	if (declaration) {
 		
 		var properties = declaration[2], matchType, matchName;
 		
-		while ( matchType = THREE.FunctionNode.rProperties.exec( properties ) ) {
+		while ( matchType = FunctionNode.rProperties.exec( properties ) ) {
 			
-			matchName = THREE.FunctionNode.rProperties.exec( properties )[0];
+			matchName = FunctionNode.rProperties.exec( properties )[0];
 			
 			this.inputs.push( {
 				name: matchName,
@@ -85,7 +88,7 @@ THREE.StructNode.prototype.eval = function ( src ) {
 
 };
 
-THREE.StructNode.prototype.toJSON = function ( meta ) {
+StructNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -100,3 +103,5 @@ THREE.StructNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { StructNode };

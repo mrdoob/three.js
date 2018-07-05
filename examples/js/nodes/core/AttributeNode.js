@@ -2,25 +2,27 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.AttributeNode = function ( name, type ) {
+import { GLNode } from './GLNode.js';
 
-	THREE.GLNode.call( this, type );
+function AttributeNode( name, type ) {
+
+	GLNode.call( this, type );
 
 	this.name = name;
 
 };
 
-THREE.AttributeNode.prototype = Object.create( THREE.GLNode.prototype );
-THREE.AttributeNode.prototype.constructor = THREE.AttributeNode;
-THREE.AttributeNode.prototype.nodeType = "Attribute";
+AttributeNode.prototype = Object.create( GLNode.prototype );
+AttributeNode.prototype.constructor = AttributeNode;
+AttributeNode.prototype.nodeType = "Attribute";
 
-THREE.AttributeNode.prototype.getAttributeType = function ( builder ) {
+AttributeNode.prototype.getAttributeType = function ( builder ) {
 
 	return typeof this.type === 'number' ? builder.getConstructorFromLength( this.type ) : this.type;
 
 };
 
-THREE.AttributeNode.prototype.getType = function ( builder ) {
+AttributeNode.prototype.getType = function ( builder ) {
 
 	var type = this.getAttributeType( builder );
 
@@ -28,25 +30,28 @@ THREE.AttributeNode.prototype.getType = function ( builder ) {
 
 };
 
-THREE.AttributeNode.prototype.generate = function ( builder, output ) {
+AttributeNode.prototype.generate = function ( builder, output ) {
 
 	var type = this.getAttributeType( builder );
 
-	var attribute = builder.material.getAttribute( this.name, type );
+	var attribute = builder.getAttribute( this.name, type ),
+		name = builder.isShader( 'vertex' ) ? this.name : attribute.varying.name;
 
-	return builder.format( builder.isShader( 'vertex' ) ? this.name : attribute.varying.name, this.getType( builder ), output );
+	console.log( attribute );
+		
+	return builder.format( name, this.getType( builder ), output );
 
 };
 
-THREE.AttributeNode.prototype.copy = function ( source ) {
+AttributeNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	GLNode.prototype.copy.call( this, source );
 	
 	this.type = source.type;
 	
 };
 
-THREE.AttributeNode.prototype.toJSON = function ( meta ) {
+AttributeNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -61,3 +66,5 @@ THREE.AttributeNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { AttributeNode };

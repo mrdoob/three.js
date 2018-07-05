@@ -2,35 +2,38 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.ColorNode = function ( color, g, b ) {
+import { InputNode } from '../core/InputNode.js';
+import { NodeUtils } from '../core/NodeUtils.js';
 
-	THREE.InputNode.call( this, 'c' );
+function ColorNode( color, g, b ) {
+
+	InputNode.call( this, 'c' );
 
 	this.value = color instanceof THREE.Color ? color : new THREE.Color( color || 0, g, b );
 
 };
 
-THREE.ColorNode.prototype = Object.create( THREE.InputNode.prototype );
-THREE.ColorNode.prototype.constructor = THREE.ColorNode;
-THREE.ColorNode.prototype.nodeType = "Color";
+ColorNode.prototype = Object.create( InputNode.prototype );
+ColorNode.prototype.constructor = ColorNode;
+ColorNode.prototype.nodeType = "Color";
 
-THREE.NodeMaterial.addShortcuts( THREE.ColorNode.prototype, 'value', [ 'r', 'g', 'b' ] );
+NodeUtils.addShortcuts( ColorNode.prototype, 'value', [ 'r', 'g', 'b' ] );
 
-THREE.ColorNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+ColorNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
 	return builder.format( "vec3( " + this.r + ", " + this.g + ", " + this.b + " )", type, output );
 
 };
 
-THREE.ColorNode.prototype.copy = function ( source ) {
+ColorNode.prototype.copy = function ( source ) {
 			
-	THREE.InputNode.prototype.copy.call( this, source );
+	InputNode.prototype.copy.call( this, source );
 	
 	this.value.copy( source );
 	
 };
 
-THREE.ColorNode.prototype.toJSON = function ( meta ) {
+ColorNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -49,3 +52,5 @@ THREE.ColorNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { ColorNode };

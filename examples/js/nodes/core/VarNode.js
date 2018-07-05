@@ -2,31 +2,33 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.VarNode = function ( type, value ) {
+import { GLNode } from './GLNode.js';
 
-	THREE.GLNode.call( this, type );
+function VarNode( type, value ) {
+
+	GLNode.call( this, type );
 	
 	this.value = value;
 
 };
 
-THREE.VarNode.prototype = Object.create( THREE.GLNode.prototype );
-THREE.VarNode.prototype.constructor = THREE.VarNode;
-THREE.VarNode.prototype.nodeType = "Var";
+VarNode.prototype = Object.create( GLNode.prototype );
+VarNode.prototype.constructor = VarNode;
+VarNode.prototype.nodeType = "Var";
 
-THREE.VarNode.prototype.getType = function ( builder ) {
+VarNode.prototype.getType = function ( builder ) {
 
 	return builder.getTypeByFormat( this.type );
 
 };
 
-THREE.VarNode.prototype.generate = function ( builder, output ) {
+VarNode.prototype.generate = function ( builder, output ) {
 
-	var varying = builder.material.getVar( this.uuid, this.type );
+	var varying = builder.getVar( this.uuid, this.type );
 
 	if ( this.value && builder.isShader( 'vertex' ) ) {
 
-		builder.material.addVertexNode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
+		builder.addNodeCode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
 
 	}
 	
@@ -34,16 +36,16 @@ THREE.VarNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.VarNode.prototype.copy = function ( source ) {
+VarNode.prototype.copy = function ( source ) {
 	
-	THREE.GLNode.prototype.copy.call( this, source );
+	GLNode.prototype.copy.call( this, source );
 	
 	this.type = source.type;
 	this.value = source.value;
 	
 };
 
-THREE.VarNode.prototype.toJSON = function ( meta ) {
+VarNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -60,3 +62,5 @@ THREE.VarNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { VarNode };

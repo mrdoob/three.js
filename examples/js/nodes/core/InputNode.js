@@ -2,38 +2,39 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.InputNode = function ( type, params ) {
+import { TempNode } from './TempNode.js';
+
+function InputNode( type, params ) {
 
 	params = params || {};
 	params.shared = params.shared !== undefined ? params.shared : false;
 
-	THREE.TempNode.call( this, type, params );
+	TempNode.call( this, type, params );
 
 	this.readonly = false;
 
 };
 
-THREE.InputNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.InputNode.prototype.constructor = THREE.InputNode;
+InputNode.prototype = Object.create( TempNode.prototype );
+InputNode.prototype.constructor = InputNode;
 
-THREE.InputNode.prototype.isReadonly = function ( builder ) {
+InputNode.prototype.isReadonly = function ( builder ) {
 
 	return this.readonly;
 
 };
 
-
-THREE.InputNode.prototype.copy = function ( source ) {
+InputNode.prototype.copy = function ( source ) {
 	
-	THREE.GLNode.prototype.copy.call( this, source );
+	TempNode.prototype.copy.call( this, source );
 	
 	if ( source.readonly !== undefined ) this.readonly = source.readonly;
 	
 };
 
-THREE.InputNode.prototype.createJSONNode = function ( meta ) {
+InputNode.prototype.createJSONNode = function ( meta ) {
 
-	var data = THREE.GLNode.prototype.createJSONNode.call( this, meta );
+	var data = TempNode.prototype.createJSONNode.call( this, meta );
 	
 	if ( this.readonly === true ) data.readonly = this.readonly;
 
@@ -41,14 +42,12 @@ THREE.InputNode.prototype.createJSONNode = function ( meta ) {
 
 };
 
-THREE.InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needsUpdate ) {
-
-	var material = builder.material;
+InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
 	uuid = builder.getUuid( uuid || this.getUuid() );
 	type = type || this.getType( builder );
 
-	var data = material.getDataNode( uuid ),
+	var data = builder.getNodeData( uuid ),
 		readonly = this.isReadonly( builder ) && this.generateReadonly !== undefined;
 
 	if ( readonly ) {
@@ -61,7 +60,7 @@ THREE.InputNode.prototype.generate = function ( builder, output, uuid, type, ns,
 
 			if ( ! data.vertex ) {
 
-				data.vertex = material.createVertexUniform( type, this, ns, needsUpdate );
+				data.vertex = builder.createVertexUniform( type, this, ns, needsUpdate );
 
 			}
 
@@ -71,7 +70,7 @@ THREE.InputNode.prototype.generate = function ( builder, output, uuid, type, ns,
 
 			if ( ! data.fragment ) {
 
-				data.fragment = material.createFragmentUniform( type, this, ns, needsUpdate );
+				data.fragment = builder.createFragmentUniform( type, this, ns, needsUpdate );
 
 			}
 
@@ -82,3 +81,5 @@ THREE.InputNode.prototype.generate = function ( builder, output, uuid, type, ns,
 	}
 
 };
+
+export { InputNode };

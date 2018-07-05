@@ -2,20 +2,24 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.PhongNodeMaterial = function () {
+import { PhongNode } from './nodes/PhongNode.js';
+import { NodeMaterial } from './NodeMaterial.js';
+import { NodeUtils } from '../core/NodeUtils.js';
 
-	var node = new THREE.PhongNode();
+function PhongNodeMaterial() {
 
-	THREE.NodeMaterial.call( this, node, node );
+	var node = new PhongNode();
+
+	NodeMaterial.call( this, node, node );
 
 	this.type = "PhongNodeMaterial";
 
 };
 
-THREE.PhongNodeMaterial.prototype = Object.create( THREE.NodeMaterial.prototype );
-THREE.PhongNodeMaterial.prototype.constructor = THREE.PhongNodeMaterial;
+PhongNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
+PhongNodeMaterial.prototype.constructor = PhongNodeMaterial;
 
-THREE.NodeMaterial.addShortcuts( THREE.PhongNodeMaterial.prototype, 'fragment', [ 
+NodeUtils.addShortcuts( PhongNodeMaterial.prototype, 'fragment', [ 
 	'color', 
 	'alpha', 
 	'specular', 
@@ -30,3 +34,5 @@ THREE.NodeMaterial.addShortcuts( THREE.PhongNodeMaterial.prototype, 'fragment', 
 	'environmentAlpha',
 	'transform' 
 ] );
+
+export { PhongNodeMaterial };

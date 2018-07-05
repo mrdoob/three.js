@@ -2,27 +2,35 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.TextureCubeUVNode = function ( coord, textureSize, blinnExponentToRoughness ) {
+import { TempNode } from '../core/TempNode.js';
+import { ConstNode } from '../core/ConstNode.js';
+import { StructNode } from '../core/StructNode.js';
+import { FunctionNode } from '../core/FunctionNode.js';
+import { ReflectNode } from '../accessors/ReflectNode.js';
+import { FloatNode } from '../inputs/FloatNode.js';
+import { BlinnExponentToRoughnessNode } from '../bsdfs/BlinnExponentToRoughnessNode.js';
+ 
+function TextureCubeUVNode( coord, textureSize, blinnExponentToRoughness ) {
 
-	THREE.TempNode.call( this, THREE.TextureCubeUVNode.fTextureCubeUVOutput.type );
+	TempNode.call( this, 'TextureCubeUVData' ); // TextureCubeUVData is type as StructNode
 
-	this.coord = coord || new THREE.ReflectNode( THREE.ReflectNode.VECTOR );
-	this.textureSize = textureSize || new THREE.FloatNode( 1024 );
-	this.blinnExponentToRoughness = this.blinnExponentToRoughness || new THREE.BlinnExponentToRoughnessNode();
+	this.coord = coord || new ReflectNode( ReflectNode.VECTOR );
+	this.textureSize = textureSize || new FloatNode( 1024 );
+	this.blinnExponentToRoughness = this.blinnExponentToRoughness || new BlinnExponentToRoughnessNode();
 
 };
 
-THREE.TextureCubeUVNode.fTextureCubeUVOutput = new THREE.StructNode([
-"struct TextureCubeUVData {",
-"	vec2 uv_10;",
-"	vec2 uv_20;",
-"	float t;",
-"}"
-].join( "\n" ));
+TextureCubeUVNode.Nodes = (function() {
 
-THREE.TextureCubeUVNode.fTextureCubeUV = ( function () {
-
-	var getFaceFromDirection = new THREE.FunctionNode( [
+	var TextureCubeUVData = new StructNode([
+		"struct TextureCubeUVData {",
+		"	vec2 uv_10;",
+		"	vec2 uv_20;",
+		"	float t;",
+		"}"
+	].join( "\n" ));
+	
+	var getFaceFromDirection = new FunctionNode( [
 		"int getFaceFromDirection(vec3 direction) {",
 		"	vec3 absDirection = abs(direction);",
 		"	int face = -1;",
@@ -39,12 +47,13 @@ THREE.TextureCubeUVNode.fTextureCubeUV = ( function () {
 		"			face = direction.y > 0.0 ? 1 : 4;",
 		"	}",
 		"	return face;",
-		"}" ].join( "\n" ) );
-
-	var cubeUV_maxLods1 = new THREE.ConstNode( "#define cubeUV_maxLods1 ( log2( cubeUV_textureSize * 0.25 ) - 1.0 )" );
-	var cubeUV_rangeClamp = new THREE.ConstNode( "#define cubeUV_rangeClamp ( exp2( ( 6.0 - 1.0 ) * 2.0 ) )" );
-
-	var MipLevelInfo = new THREE.FunctionNode( [
+		"}"
+	].join( "\n" ) );
+	
+	var cubeUV_maxLods1 = new ConstNode( "#define cubeUV_maxLods1 ( log2( cubeUV_textureSize * 0.25 ) - 1.0 )" );
+	var cubeUV_rangeClamp = new ConstNode( "#define cubeUV_rangeClamp ( exp2( ( 6.0 - 1.0 ) * 2.0 ) )" );
+	
+	var MipLevelInfo = new FunctionNode( [
 		"vec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness, in float cubeUV_textureSize ) {",
 		"	float scale = exp2(cubeUV_maxLods1 - roughnessLevel);",
 		"	float dxRoughness = dFdx(roughness);",
@@ -56,12 +65,13 @@ THREE.TextureCubeUVNode.fTextureCubeUV = ( function () {
 		"	d = clamp(d, 1.0, cubeUV_rangeClamp);",
 		"	float mipLevel = 0.5 * log2(d);",
 		"	return vec2(floor(mipLevel), fract(mipLevel));",
-		"}" ].join( "\n" ), [ cubeUV_maxLods1, cubeUV_rangeClamp ], { derivatives: true } );
+		"}" 
+	].join( "\n" ), [ cubeUV_maxLods1, cubeUV_rangeClamp ], { derivatives: true } );
+	
+	var cubeUV_maxLods2 = new ConstNode( "#define cubeUV_maxLods2 ( log2( cubeUV_textureSize * 0.25 ) - 2.0 )" );
+	var cubeUV_rcpTextureSize = new ConstNode( "#define cubeUV_rcpTextureSize ( 1.0 / cubeUV_textureSize )" );
 
-	var cubeUV_maxLods2 = new THREE.ConstNode( "#define cubeUV_maxLods2 ( log2( cubeUV_textureSize * 0.25 ) - 2.0 )" );
-	var cubeUV_rcpTextureSize = new THREE.ConstNode( "#define cubeUV_rcpTextureSize ( 1.0 / cubeUV_textureSize )" );
-
-	var getCubeUV = new THREE.FunctionNode( [
+	var getCubeUV = new FunctionNode( [
 		"vec2 getCubeUV( vec3 direction, float roughnessLevel, float mipLevel, in float cubeUV_textureSize ) {",
 		"	mipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;",
 		"	float a = 16.0 * cubeUV_rcpTextureSize;",
@@ -119,11 +129,12 @@ THREE.TextureCubeUVNode.fTextureCubeUV = ( function () {
 		"	vec2 s = ( r.yz / abs( r.x ) + vec2( 1.0 ) ) * 0.5;",
 		"	vec2 base = offset + vec2( texelOffset );",
 		"	return base + s * ( scale - 2.0 * texelOffset );",
-		"}" ].join( "\n" ), [ cubeUV_maxLods2, cubeUV_rcpTextureSize, getFaceFromDirection ] );
-
-	var cubeUV_maxLods3 = new THREE.ConstNode( "#define cubeUV_maxLods3 ( log2( cubeUV_textureSize * 0.25 ) - 3.0 )" );
-
-	return new THREE.FunctionNode( [
+		"}" 
+	].join( "\n" ), [ cubeUV_maxLods2, cubeUV_rcpTextureSize, getFaceFromDirection ] );
+	
+	var cubeUV_maxLods3 = new ConstNode( "#define cubeUV_maxLods3 ( log2( cubeUV_textureSize * 0.25 ) - 3.0 )" );
+	
+	var textureCubeUV = new FunctionNode( [
 		"TextureCubeUVData textureCubeUV( vec3 reflectedDirection, float roughness, in float cubeUV_textureSize ) {",
 		"	float roughnessVal = roughness * cubeUV_maxLods3;",
 		"	float r1 = floor(roughnessVal);",
@@ -143,23 +154,27 @@ THREE.TextureCubeUVNode.fTextureCubeUV = ( function () {
 		"	vec2 uv_20 = getCubeUV(reflectedDirection, r2, level0, cubeUV_textureSize);",
 		"",
 		"	return TextureCubeUVData(uv_10, uv_20, t);",
-		"}" ].join( "\n" ), [ THREE.TextureCubeUVNode.fTextureCubeUVOutput, cubeUV_maxLods3, MipLevelInfo, getCubeUV ] );
+		"}" 
+	].join( "\n" ), [ TextureCubeUVData, cubeUV_maxLods3, MipLevelInfo, getCubeUV ] );
+	
+	return {
+		TextureCubeUVData: TextureCubeUVData,
+		textureCubeUV: textureCubeUV
+	};
+	
+})();
 
-} )();
+TextureCubeUVNode.prototype = Object.create( TempNode.prototype );
+TextureCubeUVNode.prototype.constructor = TextureCubeUVNode;
+TextureCubeUVNode.prototype.nodeType = "TextureCubeUV";
 
-THREE.TextureCubeUVNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.TextureCubeUVNode.prototype.constructor = THREE.TextureCubeUVNode;
-THREE.TextureCubeUVNode.prototype.nodeType = "TextureCubeUV";
-
-THREE.TextureCubeUVNode.prototype.generate = function ( builder, output ) {
-
-	var material = builder.material, func = THREE.TextureCubeUVNode.fTextureCubeUV;
-
-	builder.include( func );
+TextureCubeUVNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		return builder.format( func.name + '( ' + this.coord.build( builder, 'v3' ) + ', ' +
+		var textureCubeUV = builder.include( TextureCubeUVNode.Nodes.textureCubeUV );
+	
+		return builder.format( textureCubeUV + '( ' + this.coord.build( builder, 'v3' ) + ', ' +
 			this.blinnExponentToRoughness.build( builder, 'fv1' ) + ', ' +
 			this.textureSize.build( builder, 'fv1' ) + ' )', this.getType( builder ), output );
 			
@@ -173,7 +188,7 @@ THREE.TextureCubeUVNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.TextureCubeUVNode.prototype.toJSON = function ( meta ) {
+TextureCubeUVNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -190,3 +205,5 @@ THREE.TextureCubeUVNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { TextureCubeUVNode };

@@ -2,20 +2,24 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.StandardNodeMaterial = function () {
+import { StandardNode } from './nodes/StandardNode.js';
+import { NodeMaterial } from './NodeMaterial.js';
+import { NodeUtils } from '../core/NodeUtils.js';
 
-	this.node = new THREE.StandardNode();
+function StandardNodeMaterial() {
 
-	THREE.NodeMaterial.call( this, this.node, this.node );
+	var node = new StandardNode();
+
+	NodeMaterial.call( this, node, node );
 
 	this.type = "StandardNodeMaterial";
 
 };
 
-THREE.StandardNodeMaterial.prototype = Object.create( THREE.NodeMaterial.prototype );
-THREE.StandardNodeMaterial.prototype.constructor = THREE.StandardNodeMaterial;
+StandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
+StandardNodeMaterial.prototype.constructor = StandardNodeMaterial;
 
-THREE.NodeMaterial.addShortcuts( THREE.StandardNodeMaterial.prototype, 'node', [ 
+NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [ 
 	'color', 
 	'alpha', 
 	'roughness', 
@@ -32,3 +36,5 @@ THREE.NodeMaterial.addShortcuts( THREE.StandardNodeMaterial.prototype, 'node', [
 	'environment', 
 	'transform' 
 ] );
+
+export { StandardNodeMaterial };

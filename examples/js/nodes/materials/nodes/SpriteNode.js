@@ -2,20 +2,23 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.SpriteNode = function () {
+import { GLNode } from '../../core/GLNode.js';
+import { ColorNode } from '../../inputs/ColorNode.js';
 
-	THREE.GLNode.call( this );
+function SpriteNode() {
 
-	this.color = new THREE.ColorNode( 0xEEEEEE );
+	GLNode.call( this );
+
+	this.color = new ColorNode( 0xEEEEEE );
 	this.spherical = true;
 
 };
 
-THREE.SpriteNode.prototype = Object.create( THREE.GLNode.prototype );
-THREE.SpriteNode.prototype.constructor = THREE.SpriteNode;
-THREE.SpriteNode.prototype.nodeType = "Sprite";
+SpriteNode.prototype = Object.create( GLNode.prototype );
+SpriteNode.prototype.constructor = SpriteNode;
+SpriteNode.prototype.nodeType = "Sprite";
 
-THREE.SpriteNode.prototype.build = function ( builder ) {
+SpriteNode.prototype.build = function ( builder ) {
 
 	var material = builder.material;
 	var output, code;
@@ -139,9 +142,9 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 
 };
 
-THREE.SpriteNode.prototype.copy = function ( source ) {
+SpriteNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	GLNode.prototype.copy.call( this, source );
 	
 	// vertex
 	
@@ -157,7 +160,7 @@ THREE.SpriteNode.prototype.copy = function ( source ) {
 
 };
 
-THREE.SpriteNode.prototype.toJSON = function ( meta ) {
+SpriteNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -182,3 +185,5 @@ THREE.SpriteNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { SpriteNode };

@@ -39,91 +39,11 @@
 		<script src='js/geometries/TeapotBufferGeometry.js'></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-
-		<!-- NodeLibrary -->
-		<script src="js/nodes/core/GLNode.js"></script>
-		<script src="js/nodes/core/RawNode.js"></script>
-		<script src="js/nodes/core/BypassNode.js"></script>
-		<script src="js/nodes/core/TempNode.js"></script>
-		<script src="js/nodes/core/InputNode.js"></script>
-		<script src="js/nodes/core/ConstNode.js"></script>
-		<script src="js/nodes/core/VarNode.js"></script>
-		<script src="js/nodes/core/StructNode.js"></script>
-		<script src="js/nodes/core/FunctionNode.js"></script>
-		<script src="js/nodes/core/FunctionCallNode.js"></script>
-		<script src="js/nodes/core/AttributeNode.js"></script>
-		<script src="js/nodes/core/NodeUniform.js"></script>
-		<script src="js/nodes/core/NodeBuilder.js"></script>
-		<script src="js/nodes/core/NodeLib.js"></script>
-		<script src="js/nodes/core/NodeFrame.js"></script>
-		<script src="js/nodes/core/NodeMaterial.js"></script>
-
-		<!-- Library -->
-		<script src="js/nodes/libs/common.js"></script>
-		<script src="js/nodes/libs/keywords.js"></script>
 		
-		<!-- Accessors -->
-		<script src="js/nodes/accessors/PositionNode.js"></script>
-		<script src="js/nodes/accessors/NormalNode.js"></script>
-		<script src="js/nodes/accessors/UVNode.js"></script>
-		<script src="js/nodes/accessors/ScreenUVNode.js"></script>
-		<script src="js/nodes/accessors/ColorsNode.js"></script>
-		<script src="js/nodes/accessors/CameraNode.js"></script>
-		<script src="js/nodes/accessors/ReflectNode.js"></script>
-		<script src="js/nodes/accessors/LightNode.js"></script>
+		<script type="module">
 
-		<!-- Inputs -->
-		<script src="js/nodes/inputs/IntNode.js"></script>
-		<script src="js/nodes/inputs/FloatNode.js"></script>
-		<script src="js/nodes/inputs/ColorNode.js"></script>
-		<script src="js/nodes/inputs/Vector2Node.js"></script>
-		<script src="js/nodes/inputs/Vector3Node.js"></script>
-		<script src="js/nodes/inputs/Vector4Node.js"></script>
-		<script src="js/nodes/inputs/TextureNode.js"></script>
-		<script src="js/nodes/inputs/Matrix3Node.js"></script>
-		<script src="js/nodes/inputs/Matrix4Node.js"></script>
-		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
+		import './js/nodes/THREE.Nodes.js';
 		
-		<!-- Math -->
-		<script src="js/nodes/math/Math1Node.js"></script>
-		<script src="js/nodes/math/Math2Node.js"></script>
-		<script src="js/nodes/math/Math3Node.js"></script>
-		<script src="js/nodes/math/OperatorNode.js"></script>
-
-		<!-- Utils -->
-		<script src="js/nodes/utils/SwitchNode.js"></script>
-		<script src="js/nodes/utils/JoinNode.js"></script>
-		<script src="js/nodes/utils/TimerNode.js"></script>
-		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
-		<script src="js/nodes/utils/BlinnShininessExponentNode.js"></script>
-		<script src="js/nodes/utils/VelocityNode.js"></script>
-		<script src="js/nodes/utils/LuminanceNode.js"></script>
-		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
-		<script src="js/nodes/utils/NoiseNode.js"></script>
-		<script src="js/nodes/utils/ResolutionNode.js"></script>
-		<script src="js/nodes/utils/BumpMapNode.js"></script>
-		<script src="js/nodes/utils/BlurNode.js"></script>
-		<script src="js/nodes/utils/UVTransformNode.js"></script>
-		<script src="js/nodes/utils/MaxMIPLevelNode.js"></script>
-		<script src="js/nodes/utils/NormalMapNode.js"></script>
-
-		<!-- Phong Material -->
-		<script src="js/nodes/materials/PhongNode.js"></script>
-		<script src="js/nodes/materials/PhongNodeMaterial.js"></script>
-
-		<!-- Standard Material -->
-		<script src="js/nodes/materials/StandardNode.js"></script>
-		<script src="js/nodes/materials/StandardNodeMaterial.js"></script>
-
-		<!-- Extended Materials -->
-		<script src="js/nodes/materials/MeshStandardNode.js"></script>
-		<script src="js/nodes/materials/MeshStandardNodeMaterial.js"></script>
-		
-		<!-- NodeMaterial Loader -->
-		<script src="js/loaders/NodeMaterialLoader.js"></script>
-
-		<script>
-
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
@@ -548,7 +468,7 @@
 
 					}, false, 0, 1 );
 					
-					addGui( 'sat. (only node)', sataturation.value, function ( val ) {
+					addGui( 'sat. (node)', sataturation.value, function ( val ) {
 
 						sataturation.value = val;
 
@@ -1192,12 +1112,12 @@
 					var sat = new THREE.FloatNode( 0 );
 
 					var satrgb = new THREE.FunctionNode( [
-						"vec3 satrgb(vec3 rgb, float adjustment) {",
-						//"	const vec3 W = vec3(0.2125, 0.7154, 0.0721);", // LUMA
-						"	vec3 intensity = vec3(dot(rgb, LUMA));",
-						"	return mix(intensity, rgb, adjustment);",
+						"vec3 satrgb( vec3 rgb, float adjustment ) {",
+						// include luminance function from LuminanceNode
+						"	vec3 intensity = vec3( luminance( rgb ) );",
+						"	return mix( intensity, rgb, adjustment );",
 						"}"
-					].join( "\n" ) );
+					].join( "\n" ), [ THREE.LuminanceNode.Nodes.luminance ] );
 
 					var saturation = new THREE.FunctionCallNode( satrgb );
 					saturation.inputs.rgb = tex;
@@ -1946,7 +1866,7 @@
 					// APPLY
 
 					mtl.color = color;
-					mtl.light = posCelLight;
+					mtl.light = new THREE.LightNode();
 					mtl.shininess = new THREE.FloatNode( 0 );
 
 					mtl.environment = lineColor;
@@ -2092,11 +2012,13 @@
 					// using BypassNode the NormalNode not apply the value in .transform slot
 					// but set the NormalNode value in VarNode
 					// it can be useful to send values between vertex to fragment shader
+					// without affect vertex shader
 					mtl.transform = new THREE.BypassNode( varying );
 					mtl.color = varying;
 					
-					// you can also set a value in .transform slot, such this expression using FunctionNode
-					mtl.transform = new THREE.BypassNode( varying, new THREE.FunctionNode("position * ( .1 + abs( sin( time ) ) )", "vec3") );
+					// you can also set a independent value in .transform slot using BypassNode
+					// such this expression using FunctionNode
+					mtl.transform.value = new THREE.FunctionNode("position * ( .1 + abs( sin( time ) ) )", "vec3");
 
 					break;
 					

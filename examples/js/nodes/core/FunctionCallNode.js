@@ -2,38 +2,40 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.FunctionCallNode = function ( func, inputs ) {
+import { TempNode } from './TempNode.js';
+ 
+function FunctionCallNode( func, inputs ) {
 
-	THREE.TempNode.call( this );
+	TempNode.call( this );
 
 	this.setFunction( func, inputs );
 
 };
 
-THREE.FunctionCallNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.FunctionCallNode.prototype.constructor = THREE.FunctionCallNode;
-THREE.FunctionCallNode.prototype.nodeType = "FunctionCall";
+FunctionCallNode.prototype = Object.create( TempNode.prototype );
+FunctionCallNode.prototype.constructor = FunctionCallNode;
+FunctionCallNode.prototype.nodeType = "FunctionCall";
 
-THREE.FunctionCallNode.prototype.setFunction = function ( func, inputs ) {
+FunctionCallNode.prototype.setFunction = function ( func, inputs ) {
 
 	this.value = func;
 	this.inputs = inputs || [];
 
 };
 
-THREE.FunctionCallNode.prototype.getFunction = function () {
+FunctionCallNode.prototype.getFunction = function () {
 
 	return this.value;
 
 };
 
-THREE.FunctionCallNode.prototype.getType = function ( builder ) {
+FunctionCallNode.prototype.getType = function ( builder ) {
 
 	return this.value.getType( builder );
 
 };
 
-THREE.FunctionCallNode.prototype.generate = function ( builder, output ) {
+FunctionCallNode.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material;
 
@@ -58,9 +60,9 @@ THREE.FunctionCallNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.FunctionCallNode.prototype.copy = function ( source ) {
+FunctionCallNode.prototype.copy = function ( source ) {
 			
-	THREE.GLNode.prototype.copy.call( this, source );
+	TempNode.prototype.copy.call( this, source );
 	
 	for ( var prop in source.inputs ) {
 
@@ -72,7 +74,7 @@ THREE.FunctionCallNode.prototype.copy = function ( source ) {
 	
 };
 
-THREE.FunctionCallNode.prototype.toJSON = function ( meta ) {
+FunctionCallNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -104,3 +106,5 @@ THREE.FunctionCallNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { FunctionCallNode };
