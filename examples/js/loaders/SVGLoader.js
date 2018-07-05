@@ -1101,10 +1101,13 @@ THREE.SVGLoader.prototype = {
 
 			var rotation = createIdTransform();
 
-			rotation[ 0 ] = Math.cos( angle );
-			rotation[ 1 ] = Math.sin( angle );
-			rotation[ 2 ] = -Math.sin( angle );
-			rotation[ 3 ] = Math.cos( angle );
+			var c = Math.cos( angle );
+			var s = Math.sin( angle );
+
+			rotation[ 0 ] = c;
+			rotation[ 1 ] = s;
+			rotation[ 2 ] = - s;
+			rotation[ 3 ] = c;
 			
 			return rotation;
 
