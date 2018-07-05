@@ -771,8 +771,6 @@ THREE.SVGLoader.prototype = {
 			var scaleY = getTransformScaleY( currentTransform );
 
 			var subpath = new THREE.Path();
-			
-			console.warn( "AMEM: " + scaleX + ", " + scaleY );
 
 			if ( Math.abs( scaleX - scaleY ) > 0.00000001 ) {
 
