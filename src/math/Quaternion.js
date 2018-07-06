@@ -393,6 +393,22 @@ Object.assign( Quaternion.prototype, {
 
 	}(),
 
+	angleTo: function () {
+
+		var p = new Quaternion();
+
+		return function angleTo( q ) {
+
+			p.copy( q ).inverse();
+
+			p.premultiply( this );
+
+			return 2 * Math.acos( p.w );
+
+		};
+
+	}(),
+
 	inverse: function () {
 
 		// quaternion is assumed to have unit length
