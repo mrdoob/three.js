@@ -232,21 +232,22 @@ and call `addObject` to add it the scene.
 ```
 
 There's one other difference. We want to spin the text around its
-center but by default three.js creates the text off center. To
-work around this we can ask three.js to compute the bounding
+center but by default three.js creates the text such that its center of rotation
+is on the left edge. To work around this we can ask three.js to compute the bounding
 box of the geometry. We can then call the `getCenter` method
 of the bounding box and pass it our mesh's position object.
 `getCenter` copies the center of the box into the position.
 It also returns the position object so we can call `multiplyScaler(-1)`
-to position the entire object such that its
-effective center is um, ... at the center of the object.
+to position the entire object such that its center of rotation
+is at the center of the object.
 
 If we then just called `addSolidGeometry` like with previous
 examples it would set the position again which is
 no good. So, in this case we create an `Object3D` which
 is the standard node for the three.js scene graph. `Mesh`
-is inherited from `Object3D` as well. We'll cover how the scene graph
-works in another article. For now it's enough to know that
+is inherited from `Object3D` as well. We'll cover [how the scene graph
+works in another article](threejs-scenegraph.html).
+For now it's enough to know that
 like DOM nodes, children are drawn relative to their parent.
 By making an `Object3D` and making our mesh a child of that
 we can position the `Object3D` where ever we want and still
@@ -282,7 +283,7 @@ to take you directly to the docs for that shape.
 
 One other thing that's important to cover is that almost all shapes
 have various settings for how much to subdivde them. A good example
-might be the sphere geometries. Sphere's take parameters for
+might be the sphere geometries. Spheres take parameters for
 how many divisions to make around and how many top to bottom. For example
 
 <div class="spread">
@@ -296,7 +297,7 @@ or 30 triangles. The second sphere has 24 segments by 10. That's 240 segments
 or 480 triangles. The last one has 50 by 50 which is 2500 segments or 5000 triangles.
 
 It's up to you to decide how many subdivisions you need. It might
-look like you need the highest resolution but remove the lines
+look like you need a high number of segments but remove the lines
 and the flat shading and we get this
 
 <div class="spread">
@@ -330,8 +331,9 @@ if you expected to want to modify or warp it in some way. A box
 is similar.
 
 So, choose whatever is appropriate for your situation. The less
-subdivisions you choose the more likely things will run smoothly. You'll have
-to decide for yourself what the correct tradeoff is.
+subdivisions you choose the more likely things will run smoothly and the less
+memory they'll take. You'll have to decide for yourself what the correct
+tradeoff is for your particular siutation.
 
 Next up let's go over [how three's scene graph works and how
 to use it](threejs-scenegraph.html).
