@@ -106,7 +106,7 @@ BumpMapNode.prototype.generate = function ( builder, output ) {
 			var bumpToNormal = builder.include( BumpMapNode.Nodes.bumpToNormal );
 		
 			return builder.format( bumpToNormal + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' +
-				this.value.coord.build( builder, 'v2' ) + ', ' +
+				this.value.uv.build( builder, 'v2' ) + ', ' +
 				this.scale.build( builder, 'f' ) + ' )', this.getType( builder ), output );
 				
 		} else {
@@ -118,7 +118,7 @@ BumpMapNode.prototype.generate = function ( builder, output ) {
 			this.position = this.position || new PositionNode( PositionNode.VIEW );
 		
 			var derivativeHeightCode = derivativeHeight + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' +
-				this.value.coord.build( builder, 'v2' ) + ', ' +
+				this.value.uv.build( builder, 'v2' ) + ', ' +
 				this.scale.build( builder, 'f' ) + ' )';
 
 			return builder.format( perturbNormalArb + '( -' + this.position.build( builder, 'v3' ) + ', ' +

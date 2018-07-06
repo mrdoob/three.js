@@ -5,9 +5,9 @@
 import { InputNode } from '../core/InputNode.js';
 import { TextureNode } from './TextureNode.js';
 
-function ScreenNode( coord ) {
+function ScreenNode( uv ) {
 
-	TextureNode.call( this, undefined, coord );
+	TextureNode.call( this, undefined, uv );
 
 };
 

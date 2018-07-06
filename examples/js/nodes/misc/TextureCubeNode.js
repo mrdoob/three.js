@@ -5,12 +5,12 @@
 import { TempNode } from '../core/TempNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
  
-function TextureCubeNode( value, coord ) {
+function TextureCubeNode( value, uv ) {
 
 	TempNode.call( this, 'v4' );
 
 	this.value = value;
-	this.coord = coord || new TextureCubeUVNode();
+	this.uv = uv || new TextureCubeUVNode();
 
 };
 
@@ -22,9 +22,9 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		var uv_10 = this.coord.build( builder ) + '.uv_10',
-			uv_20 = this.coord.build( builder ) + '.uv_20',
-			t = this.coord.build( builder ) + '.t';
+		var uv_10 = this.uv.build( builder ) + '.uv_10',
+			uv_20 = this.uv.build( builder ) + '.uv_20',
+			t = this.uv.build( builder ) + '.t';
 		
 		var color10 = builder.getTexelDecodingFunctionFromTexture( 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )', this.value.value ),
 			color20 = builder.getTexelDecodingFunctionFromTexture( 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )', this.value.value );
@@ -49,7 +49,7 @@ TextureCubeNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.coord = this.coord.toJSON( meta ).uuid;
+		data.uv = this.uv.toJSON( meta ).uuid;
 		data.textureSize = this.textureSize.toJSON( meta ).uuid;
 		data.blinnExponentToRoughness = this.blinnExponentToRoughness.toJSON( meta ).uuid;
 

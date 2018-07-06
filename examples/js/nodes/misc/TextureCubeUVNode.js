@@ -10,11 +10,11 @@ import { ReflectNode } from '../accessors/ReflectNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
 import { BlinnExponentToRoughnessNode } from '../bsdfs/BlinnExponentToRoughnessNode.js';
  
-function TextureCubeUVNode( coord, textureSize, blinnExponentToRoughness ) {
+function TextureCubeUVNode( uv, textureSize, blinnExponentToRoughness ) {
 
 	TempNode.call( this, 'TextureCubeUVData' ); // TextureCubeUVData is type as StructNode
 
-	this.coord = coord || new ReflectNode( ReflectNode.VECTOR );
+	this.uv = uv || new ReflectNode( ReflectNode.VECTOR );
 	this.textureSize = textureSize || new FloatNode( 1024 );
 	this.blinnExponentToRoughness = this.blinnExponentToRoughness || new BlinnExponentToRoughnessNode();
 
@@ -174,7 +174,7 @@ TextureCubeUVNode.prototype.generate = function ( builder, output ) {
 
 		var textureCubeUV = builder.include( TextureCubeUVNode.Nodes.textureCubeUV );
 	
-		return builder.format( textureCubeUV + '( ' + this.coord.build( builder, 'v3' ) + ', ' +
+		return builder.format( textureCubeUV + '( ' + this.uv.build( builder, 'v3' ) + ', ' +
 			this.blinnExponentToRoughness.build( builder, 'f' ) + ', ' +
 			this.textureSize.build( builder, 'f' ) + ' )', this.getType( builder ), output );
 			
@@ -196,7 +196,7 @@ TextureCubeUVNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.coord = this.coord.toJSON( meta ).uuid;
+		data.uv = this.uv.toJSON( meta ).uuid;
 		data.textureSize = this.textureSize.toJSON( meta ).uuid;
 		data.blinnExponentToRoughness = this.blinnExponentToRoughness.toJSON( meta ).uuid;
 

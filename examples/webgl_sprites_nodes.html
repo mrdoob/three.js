@@ -141,14 +141,14 @@
 			sprite1.scale.x = spriteWidth;
 			sprite1.scale.y = spriteHeight;
 			sprite1.material.color = new THREE.TextureNode( walkingManTexture );
-			sprite1.material.color.coord = createHorizontalSpriteSheetNode( 8, 10 );
+			sprite1.material.color.uv = createHorizontalSpriteSheetNode( 8, 10 );
 
 			scene.add( sprite2 = new THREE.Mesh( plane, new THREE.SpriteNodeMaterial() ) );
 			sprite2.position.x = 30;
 			sprite2.scale.x = spriteWidth;
 			sprite2.scale.y = spriteHeight;
 			sprite2.material.color = new THREE.TextureNode( walkingManTexture );
-			sprite2.material.color.coord = createHorizontalSpriteSheetNode( 8, 30 );
+			sprite2.material.color.uv = createHorizontalSpriteSheetNode( 8, 30 );
 			sprite2.material.color = new THREE.Math1Node( sprite2.material.color, THREE.Math1Node.INVERT );
 			sprite2.material.spherical = false; // look at camera horizontally only, very used to vegetation
 			// horizontal zigzag sprite
@@ -177,7 +177,7 @@
 			sprite3.scale.x = spriteWidth;
 			sprite3.scale.y = spriteHeight;
 			sprite3.material.color = new THREE.TextureNode( walkingManTexture );
-			sprite3.material.color.coord = new THREE.FunctionCallNode( sineWaveFunction, {
+			sprite3.material.color.uv = new THREE.FunctionCallNode( sineWaveFunction, {
 				"uv": createHorizontalSpriteSheetNode( 8, 0 ),
 				"phase": new THREE.TimerNode()
 			} );

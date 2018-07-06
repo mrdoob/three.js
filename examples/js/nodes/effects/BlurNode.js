@@ -8,12 +8,12 @@ import { FloatNode } from '../inputs/FloatNode.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { UVNode } from '../accessors/UVNode.js';
 
-function BlurNode( value, coord, radius, size ) {
+function BlurNode( value, uv, radius, size ) {
 
 	TempNode.call( this, 'v4' );
 
 	this.value = value;
-	this.coord = coord || new UVNode();
+	this.uv = uv || new UVNode();
 	this.radius = new Vector2Node( 1, 1 );
 
 	this.size = size;
@@ -101,13 +101,13 @@ BlurNode.prototype.generate = function ( builder, output ) {
 		
 		if ( this.blurX ) {
 
-			blurCode.push( blurX + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.coord.build( builder, 'v2' ) + ', ' + this.horizontal.build( builder, 'f' ) + ' )' );
+			blurCode.push( blurX + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.uv.build( builder, 'v2' ) + ', ' + this.horizontal.build( builder, 'f' ) + ' )' );
 
 		}
 
 		if ( this.blurY ) {
 
-			blurCode.push( blurY + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.coord.build( builder, 'v2' ) + ', ' + this.vertical.build( builder, 'f' ) + ' )' );
+			blurCode.push( blurY + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.uv.build( builder, 'v2' ) + ', ' + this.vertical.build( builder, 'f' ) + ' )' );
 
 		}
 
@@ -132,7 +132,7 @@ BlurNode.prototype.copy = function ( source ) {
 	TempNode.prototype.copy.call( this, source );
 	
 	this.value = source.value;
-	this.coord = source.coord;
+	this.uv = source.uv;
 	this.radius = source.radius;
 
 	if ( source.size !== undefined ) this.size = new THREE.Vector2( source.size.x, source.size.y );
@@ -151,7 +151,7 @@ BlurNode.prototype.toJSON = function ( meta ) {
 		data = this.createJSONNode( meta );
 
 		data.value = this.value.toJSON( meta ).uuid;
-		data.coord = this.coord.toJSON( meta ).uuid;
+		data.uv = this.uv.toJSON( meta ).uuid;
 		data.radius = this.radius.toJSON( meta ).uuid;
 
 		if ( this.size ) data.size = { x: this.size.x, y: this.size.y };

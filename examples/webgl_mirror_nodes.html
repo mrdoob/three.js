@@ -138,8 +138,8 @@
 
 			var blurMirror = new THREE.BlurNode( mirror );
 			blurMirror.size = new THREE.Vector2( WIDTH, HEIGHT );
-			blurMirror.coord = new THREE.FunctionNode( "projCoord.xyz / projCoord.q", "vec3" );
-			blurMirror.coord.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.coord, THREE.OperatorNode.ADD );
+			blurMirror.uv = new THREE.FunctionNode( "projCoord.xyz / projCoord.q", "vec3" );
+			blurMirror.uv.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.uv, THREE.OperatorNode.ADD );
 			blurMirror.radius.x = blurMirror.radius.y = 0;
 
 			gui.add( { blur: blurMirror.radius.x }, "blur", 0, 25 ).onChange( function ( v ) {

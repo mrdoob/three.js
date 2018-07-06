@@ -390,7 +390,7 @@
 							THREE.Math1Node.FLOOR
 						);
 
-						var coord = new THREE.OperatorNode(
+						var mosaicUV = new THREE.OperatorNode(
 							blocksSize,
 							scale,
 							THREE.OperatorNode.DIV
@@ -398,7 +398,7 @@
 
 						var fadeScreen = new THREE.Math3Node(
 							uv,
-							coord,
+							mosaicUV,
 							fade,
 							THREE.Math3Node.MIX
 						);

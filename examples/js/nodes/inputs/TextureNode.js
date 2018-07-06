@@ -6,12 +6,12 @@ import { InputNode } from '../core/InputNode.js';
 import { NodeBuilder } from '../core/NodeBuilder.js';
 import { UVNode } from '../accessors/UVNode.js';
 
-function TextureNode( value, coord, bias, project ) {
+function TextureNode( value, uv, bias, project ) {
 
 	InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
-	this.coord = coord || new UVNode();
+	this.uv = uv || new UVNode();
 	this.bias = bias;
 	this.project = project !== undefined ? project : false;
 
@@ -36,7 +36,7 @@ TextureNode.prototype.generate = function ( builder, output ) {
 	}
 
 	var tex = this.getTexture( builder, output ),
-		coord = this.coord.build( builder, this.project ? 'v4' : 'v2' ),
+		uv = this.uv.build( builder, this.project ? 'v4' : 'v2' ),
 		bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
 
 	if ( bias == undefined && builder.context.bias ) {
@@ -50,8 +50,8 @@ TextureNode.prototype.generate = function ( builder, output ) {
 	if ( this.project ) method = 'texture2DProj';
 	else method = bias ? 'tex2DBias' : 'tex2D';
 
-	if ( bias ) code = method + '( ' + tex + ', ' + coord + ', ' + bias + ' )';
-	else code = method + '( ' + tex + ', ' + coord + ' )';
+	if ( bias ) code = method + '( ' + tex + ', ' + uv + ', ' + bias + ' )';
+	else code = method + '( ' + tex + ', ' + uv + ' )';
 
 	code = builder.getTexelDecodingFunctionFromTexture( code, this.value );
 
@@ -65,7 +65,7 @@ TextureNode.prototype.copy = function ( source ) {
 	
 	if ( source.value ) this.value = source.value;
 
-	this.coord = source.coord;
+	this.uv = source.uv;
 
 	if ( source.bias ) this.bias = source.bias;
 	if ( source.project !== undefined ) this.project = source.project;
@@ -82,7 +82,7 @@ TextureNode.prototype.toJSON = function ( meta ) {
 
 		if ( this.value ) data.value = this.value.uuid;
 
-		data.coord = this.coord.toJSON( meta ).uuid;
+		data.uv = this.uv.toJSON( meta ).uuid;
 		data.project = this.project;
 
 		if ( this.bias ) data.bias = this.bias.toJSON( meta ).uuid;

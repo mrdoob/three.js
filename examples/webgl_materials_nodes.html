@@ -867,8 +867,8 @@
 					var scale = new THREE.Vector2( 1, 1 );
 
 					var texture = new THREE.TextureNode( getTexture( "brick" ) );
-					texture.coord = new THREE.UVTransformNode();
-					//texture.coord.uv = new THREE.UVNode( 1 ); // uv2 for example
+					texture.uv = new THREE.UVTransformNode();
+					//texture.uv.uv = new THREE.UVNode( 1 ); // uv2 for example
 
 					mtl.color = texture;
 
@@ -876,7 +876,7 @@
 
 					function updateUVTransform() {
 
-						texture.coord.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotate ) );
+						texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotate ) );
 
 					}
 

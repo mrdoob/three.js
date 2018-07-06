@@ -5,12 +5,12 @@
 import { InputNode } from '../core/InputNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 
-function CubeTextureNode( value, coord, bias ) {
+function CubeTextureNode( value, uv, bias ) {
 
 	InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
-	this.coord = coord || new ReflectNode();
+	this.uv = uv || new ReflectNode();
 	this.bias = bias;
 
 };
@@ -34,7 +34,7 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	}
 
 	var cubetex = this.getTexture( builder, output );
-	var coord = this.coord.build( builder, 'v3' );
+	var uv = this.uv.build( builder, 'v3' );
 	var bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
 
 	if ( bias === undefined && builder.context.bias ) {
@@ -45,8 +45,8 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	var code;
 
-	if ( bias ) code = 'texCubeBias( ' + cubetex + ', ' + coord + ', ' + bias + ' )';
-	else code = 'texCube( ' + cubetex + ', ' + coord + ' )';
+	if ( bias ) code = 'texCubeBias( ' + cubetex + ', ' + uv + ', ' + bias + ' )';
+	else code = 'texCube( ' + cubetex + ', ' + uv + ' )';
 
 	code = builder.getTexelDecodingFunctionFromTexture( code, this.value );
 
@@ -60,7 +60,7 @@ CubeTextureNode.prototype.copy = function ( source ) {
 	
 	if ( source.value ) this.value = source.value;
 
-	this.coord = source.coord;
+	this.uv = source.uv;
 
 	if ( source.bias ) this.bias = source.bias;
 	
@@ -75,7 +75,7 @@ CubeTextureNode.prototype.toJSON = function ( meta ) {
 		data = this.createJSONNode( meta );
 
 		data.value = this.value.uuid;
-		data.coord = this.coord.toJSON( meta ).uuid;
+		data.uv = this.uv.toJSON( meta ).uuid;
 
 		if ( this.bias ) data.bias = this.bias.toJSON( meta ).uuid;
 

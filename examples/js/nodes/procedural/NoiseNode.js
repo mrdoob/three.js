@@ -6,11 +6,11 @@ import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { UVNode } from '../accessors/UVNode.js';
 
-function NoiseNode( coord ) {
+function NoiseNode( uv ) {
 
 	TempNode.call( this, 'f' );
 
-	this.coord = coord || new UVNode();
+	this.uv = uv || new UVNode();
 
 };
 
@@ -38,7 +38,7 @@ NoiseNode.prototype.generate = function ( builder, output ) {
 
 	var snoise = builder.include( NoiseNode.Nodes.snoise );
 
-	return builder.format( snoise + '( ' + this.coord.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
+	return builder.format( snoise + '( ' + this.uv.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
 
 };
 
@@ -46,7 +46,7 @@ NoiseNode.prototype.copy = function ( source ) {
 			
 	TempNode.prototype.copy.call( this, source );
 	
-	this.coord = source.coord;
+	this.uv = source.uv;
 	
 };
 
@@ -58,7 +58,7 @@ NoiseNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.coord = this.coord.toJSON( meta ).uuid;
+		data.uv = this.uv.toJSON( meta ).uuid;
 
 	}
 

@@ -28,10 +28,10 @@ ReflectorNode.prototype.setMirror = function ( mirror ) {
 
 	this.localPosition = new PositionNode( PositionNode.LOCAL );
 
-	this.coord = new OperatorNode( this.textureMatrix, this.localPosition, OperatorNode.MUL );
-	this.coordResult = new OperatorNode( null, this.coord, OperatorNode.ADD );
+	this.uv = new OperatorNode( this.textureMatrix, this.localPosition, OperatorNode.MUL );
+	this.uvResult = new OperatorNode( null, this.uv, OperatorNode.ADD );
 
-	this.texture = new TextureNode( this.mirror.material.uniforms.tDiffuse.value, this.coord, null, true );
+	this.texture = new TextureNode( this.mirror.material.uniforms.tDiffuse.value, this.uv, null, true );
 
 };
 
@@ -39,8 +39,8 @@ ReflectorNode.prototype.generate = function ( builder, output ) {
 	
 	if ( builder.isShader( 'fragment' ) ) {
 
-		this.coordResult.a = this.offset;
-		this.texture.coord = this.offset ? this.coordResult : this.coord;
+		this.uvResult.a = this.offset;
+		this.texture.uv = this.offset ? this.uvResult : this.uv;
 
 		if ( output === 'sampler2D' ) {
 
