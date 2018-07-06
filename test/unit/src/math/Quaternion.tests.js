@@ -398,8 +398,8 @@ export default QUnit.module( 'Maths', () => {
 			var c = new Quaternion().setFromEuler( new Euler( 0, Math.PI * 2, 0 ) );
 
 			assert.ok( a.angleTo( a ) <= eps, "Passed!" );
-			assert.ok( a.angleTo( b ) - Math.PI <= eps, "Passed!" );
-			assert.ok( a.angleTo( c ) - ( Math.PI * 2 ) <= eps, "Passed!" );
+			assert.ok( ( a.angleTo( b ) - Math.PI ) <= eps, "Passed!" );
+			assert.ok( ( a.angleTo( c ) - ( Math.PI * 2 ) ) <= eps, "Passed!" );
 
 		} );
 
