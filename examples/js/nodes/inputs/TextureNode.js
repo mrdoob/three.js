@@ -35,13 +35,13 @@ TextureNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	var tex = this.getTexture( builder, output );
-	var coord = this.coord.build( builder, this.project ? 'v4' : 'v2' );
-	var bias = this.bias ? this.bias.build( builder, 'fv1' ) : undefined;
+	var tex = this.getTexture( builder, output ),
+		coord = this.coord.build( builder, this.project ? 'v4' : 'v2' ),
+		bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
 
 	if ( bias == undefined && builder.context.bias ) {
 
-		bias = new builder.context.bias( this ).build( builder, 'fv1' );
+		bias = new builder.context.bias( this ).build( builder, 'f' );
 
 	}
 

@@ -89,7 +89,7 @@ GLNode.prototype = {
 
 		data.deps = ( data.deps || 0 ) + 1;
 
-		var outputLen = builder.getFormatLength( output );
+		var outputLen = builder.getTypeLength( output );
 
 		if ( outputLen > ( data.outputMax || 0 ) || this.getType( builder, output ) ) {
 
@@ -98,6 +98,20 @@ GLNode.prototype = {
 
 		}
 	
+	},
+	
+	setName: function( name ) {
+		
+		this.name = name;
+		
+		return this;
+		
+	},
+	
+	getName: function( builder ) {
+		
+		return this.name;
+		
 	},
 	
 	getType: function ( builder, output ) {
@@ -155,7 +169,7 @@ GLNode.prototype = {
 
 		return this.getJSONNode( meta ) || this.createJSONNode( meta );
 	
-	},
+	}
 	
 };
 

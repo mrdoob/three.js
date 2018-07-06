@@ -50,7 +50,7 @@ ConstNode.prototype.eval = function ( src, useDefine ) {
 	} else {
 
 		name = this.src;
-		type = 'fv1';
+		type = 'f';
 
 	}
 

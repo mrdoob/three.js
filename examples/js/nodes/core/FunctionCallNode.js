@@ -37,18 +37,16 @@ FunctionCallNode.prototype.getType = function ( builder ) {
 
 FunctionCallNode.prototype.generate = function ( builder, output ) {
 
-	var material = builder.material;
+	var type = this.getType( builder ),
+		func = this.value;
 
-	var type = this.getType( builder );
-	var func = this.value;
-
-	var code = func.build( builder, output ) + '( ';
-	var params = [];
+	var code = func.build( builder, output ) + '( ',
+		params = [];
 
 	for ( var i = 0; i < func.inputs.length; i ++ ) {
 
-		var inpt = func.inputs[ i ];
-		var param = this.inputs[ i ] || this.inputs[ inpt.name ];
+		var inpt = func.inputs[ i ],
+			param = this.inputs[ i ] || this.inputs[ inpt.name ];
 
 		params.push( param.build( builder, builder.getTypeByFormat( inpt.type ) ) );
 
@@ -92,8 +90,8 @@ FunctionCallNode.prototype.toJSON = function ( meta ) {
 
 			for ( var i = 0; i < func.inputs.length; i ++ ) {
 
-				var inpt = func.inputs[ i ];
-				var node = this.inputs[ i ] || this.inputs[ inpt.name ];
+				var inpt = func.inputs[ i ],
+					node = this.inputs[ i ] || this.inputs[ inpt.name ];
 
 				data.inputs[ inpt.name ] = node.toJSON( meta ).uuid;
 

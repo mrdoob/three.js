@@ -124,7 +124,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 			
 			case "string":
 			
-				if (/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/i.test(json)) {
+				if (/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/i.test(json) || this.library[ json ]) {
 					
 					return this.getNode( json );
 					

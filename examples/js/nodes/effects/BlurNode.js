@@ -101,13 +101,13 @@ BlurNode.prototype.generate = function ( builder, output ) {
 		
 		if ( this.blurX ) {
 
-			blurCode.push( blurX + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.coord.build( builder, 'v2' ) + ', ' + this.horizontal.build( builder, 'fv1' ) + ' )' );
+			blurCode.push( blurX + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.coord.build( builder, 'v2' ) + ', ' + this.horizontal.build( builder, 'f' ) + ' )' );
 
 		}
 
 		if ( this.blurY ) {
 
-			blurCode.push( blurY + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.coord.build( builder, 'v2' ) + ', ' + this.vertical.build( builder, 'fv1' ) + ' )' );
+			blurCode.push( blurY + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.coord.build( builder, 'v2' ) + ', ' + this.vertical.build( builder, 'f' ) + ' )' );
 
 		}
 

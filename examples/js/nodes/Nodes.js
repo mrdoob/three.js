@@ -31,6 +31,7 @@ export { TextureNode } from './inputs/TextureNode.js';
 export { CubeTextureNode } from './inputs/CubeTextureNode.js';
 export { ScreenNode } from './inputs/ScreenNode.js';
 export { ReflectorNode } from './inputs/ReflectorNode.js';
+export { PropertyNode } from './inputs/PropertyNode.js';
 
 // accessors
 

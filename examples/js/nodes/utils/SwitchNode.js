@@ -19,7 +19,7 @@ SwitchNode.prototype.nodeType = "Switch";
 
 SwitchNode.prototype.getType = function ( builder ) {
 
-	return builder.getFormatFromLength( this.components.length );
+	return builder.getTypeFromLength( this.components.length );
 
 };
 
@@ -27,14 +27,14 @@ SwitchNode.prototype.generate = function ( builder, output ) {
 
 	var type = this.node.getType( builder ),
 		node = this.node.build( builder, type ),
-		inputLength = builder.getFormatLength( type ) - 1;
+		inputLength = builder.getTypeLength( type ) - 1;
 
 	if ( inputLength > 0 ) {
 
 		// get max length
 
 		var outputLength = 0,
-			components = builder.colorToVector( this.components );
+			components = builder.colorToVectorProperties( this.components );
 
 		var i, len = components.length;
 

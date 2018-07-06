@@ -9,7 +9,7 @@ import { BlinnShininessExponentNode } from './BlinnShininessExponentNode.js';
  
 function RoughnessToBlinnExponentNode( texture ) {
 
-	TempNode.call( this, 'fv1' );
+	TempNode.call( this, 'f' );
 
 	this.texture = texture;
 
@@ -52,7 +52,7 @@ RoughnessToBlinnExponentNode.prototype.generate = function ( builder, output ) {
 	
 		var getSpecularMIPLevel = builder.include( RoughnessToBlinnExponentNode.Nodes.getSpecularMIPLevel );
 
-		return builder.format( getSpecularMIPLevel + '( ' + this.blinnShininessExponent.build( builder, 'fv1' ) + ', ' + this.maxMIPLevel.build( builder, 'fv1' ) + ' )', this.type, output );
+		return builder.format( getSpecularMIPLevel + '( ' + this.blinnShininessExponent.build( builder, 'f' ) + ', ' + this.maxMIPLevel.build( builder, 'f' ) + ' )', this.type, output );
 
 	} else {
 

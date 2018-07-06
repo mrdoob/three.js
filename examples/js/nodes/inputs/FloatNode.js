@@ -6,7 +6,7 @@ import { InputNode } from '../core/InputNode.js';
 
 function FloatNode( value ) {
 
-	InputNode.call( this, 'fv1' );
+	InputNode.call( this, 'f' );
 
 	this.value = value || 0;
 

@@ -9,7 +9,7 @@ var inputs = NodeUtils.elements;
  
 function JoinNode( x, y, z, w ) {
 
-	TempNode.call( this, 'fv1' );
+	TempNode.call( this, 'f' );
 
 	this.x = x;
 	this.y = y;
@@ -44,7 +44,7 @@ JoinNode.prototype.getNumElements = function () {
 
 JoinNode.prototype.getType = function ( builder ) {
 
-	return builder.getFormatFromLength( this.getNumElements() );
+	return builder.getTypeFromLength( this.getNumElements() );
 
 };
 
@@ -58,7 +58,7 @@ JoinNode.prototype.generate = function ( builder, output ) {
 
 		var elm = this[ inputs[ i ] ];
 
-		outputs.push( elm ? elm.build( builder, 'fv1' ) : '0.0' );
+		outputs.push( elm ? elm.build( builder, 'f' ) : '0.0' );
 
 	}
 
@@ -70,7 +70,7 @@ JoinNode.prototype.generate = function ( builder, output ) {
 
 JoinNode.prototype.copy = function ( source ) {
 			
-	GLNode.prototype.copy.call( this, source );
+	TempNode.prototype.copy.call( this, source );
 	
 	for ( var prop in source.inputs ) {
 

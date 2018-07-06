@@ -49,7 +49,7 @@ Math1Node.prototype.getType = function ( builder ) {
 
 		case Math1Node.LENGTH:
 		
-			return 'fv1';
+			return 'f';
 
 	}
 

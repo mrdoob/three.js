@@ -117,7 +117,7 @@ SpriteNode.prototype.build = function ( builder ) {
 		// build code
 
 		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
-		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
+		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
 
 		output = [ color.code ];
 

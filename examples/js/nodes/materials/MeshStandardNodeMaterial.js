@@ -20,12 +20,12 @@ MeshStandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
 MeshStandardNodeMaterial.prototype.constructor = MeshStandardNodeMaterial;
 
 NodeUtils.addShortcuts( MeshStandardNodeMaterial.prototype, 'properties', [
-	"color.value",
-	"roughness.value",
-	"metalness.value",
+	"color",
+	"roughness",
+	"metalness",
 	"map",
 	"normalMap",
-	"normalScale.value",
+	"normalScale",
 	"metalnessMap",
 	"roughnessMap",
 	"envMap"

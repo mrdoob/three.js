@@ -71,8 +71,9 @@ NodeMaterial.prototype.build = function ( params ) {
 	params = params || {};
 	params.dispose = params.dispose !== undefined ? params.dispose : true;
 
-	var builder = new NodeBuilder().setMaterial( this, params.renderer );
+	var builder = params.builder || new NodeBuilder();
 	
+	builder.setMaterial( this, params.renderer );
 	builder.build( this.vertex, this.fragment );
 	
 	this.vertexShader = builder.getCode('vertex');
@@ -81,7 +82,6 @@ NodeMaterial.prototype.build = function ( params ) {
 	this.defines = builder.defines;
 	this.uniforms = builder.uniforms;
 	this.extensions = builder.extensions;
-	this.nodes = builder.nodes;
 	this.updaters = builder.updaters;
 	
 	this.fog = builder.requires.fog;

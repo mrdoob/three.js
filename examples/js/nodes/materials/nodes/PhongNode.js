@@ -125,22 +125,22 @@ PhongNode.prototype.build = function ( builder ) {
 
 		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
 		var specular = this.specular.buildCode( builder, 'c' );
-		var shininess = this.shininess.buildCode( builder, 'fv1' );
+		var shininess = this.shininess.buildCode( builder, 'f' );
 
-		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
+		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
 		var light = this.light ? this.light.buildCode( builder, 'v3', { cache: 'light' } ) : undefined;
 
-		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
+		var ao = this.ao ? this.ao.buildCode( builder, 'f' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
 		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot: 'emissive' } ) : undefined;
 
 		var environment = this.environment ? this.environment.buildCode( builder, 'c', { slot: 'environment' } ) : undefined;
-		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.buildCode( builder, 'fv1' ) : undefined;
+		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.buildCode( builder, 'f' ) : undefined;
 
 		builder.requires.transparent = alpha != undefined;
 

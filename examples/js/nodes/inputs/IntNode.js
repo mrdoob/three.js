@@ -6,7 +6,7 @@ import { InputNode } from '../core/InputNode.js';
 
 function IntNode( value ) {
 
-	InputNode.call( this, 'iv1' );
+	InputNode.call( this, 'i' );
 
 	this.value = Math.floor( value || 0 );
 

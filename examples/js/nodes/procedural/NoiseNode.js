@@ -8,7 +8,7 @@ import { UVNode } from '../accessors/UVNode.js';
 
 function NoiseNode( coord ) {
 
-	TempNode.call( this, 'fv1' );
+	TempNode.call( this, 'f' );
 
 	this.coord = coord || new UVNode();
 

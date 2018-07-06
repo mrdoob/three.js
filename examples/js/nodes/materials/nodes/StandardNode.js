@@ -146,22 +146,22 @@ StandardNode.prototype.build = function ( builder ) {
 		// build code
 
 		var color = this.color.buildCode( builder, 'c', { slot: 'color', context: contextGammaOnly } );
-		var roughness = this.roughness.buildCode( builder, 'fv1' );
-		var metalness = this.metalness.buildCode( builder, 'fv1' );
+		var roughness = this.roughness.buildCode( builder, 'f' );
+		var metalness = this.metalness.buildCode( builder, 'f' );
 
-		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
+		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
-		var clearCoat = this.clearCoat ? this.clearCoat.buildCode( builder, 'fv1' ) : undefined;
-		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.buildCode( builder, 'fv1' ) : undefined;
+		var clearCoat = this.clearCoat ? this.clearCoat.buildCode( builder, 'f' ) : undefined;
+		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.buildCode( builder, 'f' ) : undefined;
 
-		var reflectivity = this.reflectivity ? this.reflectivity.buildCode( builder, 'fv1' ) : undefined;
+		var reflectivity = this.reflectivity ? this.reflectivity.buildCode( builder, 'f' ) : undefined;
 
 		var light = this.light ? this.light.buildCode( builder, 'v3', { cache: 'light' } ) : undefined;
 
-		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
+		var ao = this.ao ? this.ao.buildCode( builder, 'f' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
 		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot: 'emissive' } ) : undefined;

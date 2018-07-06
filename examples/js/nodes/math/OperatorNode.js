@@ -28,11 +28,11 @@ OperatorNode.prototype.getType = function ( builder ) {
 	var a = this.a.getType( builder ),
 		b = this.b.getType( builder );
 
-	if ( builder.isFormatMatrix( a ) ) {
+	if ( builder.isTypeMatrix( a ) ) {
 
 		return 'v4';
 
-	} else if ( builder.getFormatLength( b ) > builder.getFormatLength( a ) ) {
+	} else if ( builder.getTypeLength( b ) > builder.getTypeLength( a ) ) {
 
 		// use the greater length vector
 

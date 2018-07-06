@@ -25,7 +25,7 @@ BypassNode.prototype.getType = function ( builder ) {
 		
 	} else if (builder.isShader( 'fragment' )) {
 		
-		return 'fv1';
+		return 'f';
 		
 	}
 	
@@ -49,7 +49,7 @@ BypassNode.prototype.generate = function ( builder, output ) {
 		
 	} else {
 		
-		return this.value ? this.value.build( builder, output ) : builder.format( '0.0', 'fv1', output );
+		return this.value ? this.value.build( builder, output ) : builder.format( '0.0', 'f', output );
 		
 	}
 

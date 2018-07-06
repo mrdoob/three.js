@@ -31,7 +31,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material</br>
-			<a id="serialize" onclick="toggleSerialize()" href="javascript:void(0);">Serialize and apply</a>
+			<a id="serialize" href="javascript:void(0);">Serialize and apply</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -2369,14 +2369,14 @@
 
 		}
 
-		function toggleSerialize() {
+		document.getElementById( 'serialize' ).addEventListener('click', function () {
 
 			if ( serialized ) reset();
 			else serialize();
 
 			serialized = ! serialized;
 
-		}
+		});
 
 		function reset() {
 
@@ -2391,21 +2391,29 @@
 
 		function serialize() {
 
-			var json = mesh.material.toJSON(),
-				jsonStr = JSON.stringify( json );
+			var json = mesh.material.toJSON();
 				
-			// replace uuid to url (facilitates the load of textures using url otherside uuid)
-			// example:
+			// replace uuid to url (facilitates the load of textures using url otherside uuid) e.g:
 
-			//THREE.NodeMaterialLoaderUtils.replaceUUID( json, getTexture( "cloud" ), "cloud" );
+			var cloud = getTexture( "cloud" );
+			
+			THREE.NodeMaterialLoaderUtils.replaceUUID( json, cloud, "cloud" );
 
+			library[ "cloud" ] = cloud;
+			
+			// --
+			
+			var jsonStr = JSON.stringify( json );
+			
+			console.log( jsonStr );
+			
 			var loader = new THREE.NodeMaterialLoader( null, library ),
 				material = loader.parse( json );
 			
+			mesh.material.dispose();
+			
 			mesh.material = material;
 			
-			//console.log( jsonStr );
-
 			// gui
 
 			var div = document.getElementById( 'serialize' );

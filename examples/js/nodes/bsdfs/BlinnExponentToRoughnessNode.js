@@ -7,7 +7,7 @@ import { BlinnShininessExponentNode } from './BlinnShininessExponentNode.js';
 
 function BlinnExponentToRoughnessNode( blinnExponent ) {
 
-	TempNode.call( this, 'fv1' );
+	TempNode.call( this, 'f' );
 
 	this.blinnExponent = blinnExponent || new BlinnShininessExponentNode();
 
@@ -19,7 +19,7 @@ BlinnExponentToRoughnessNode.prototype.nodeType = "BlinnExponentToRoughness";
 
 BlinnExponentToRoughnessNode.prototype.generate = function ( builder, output ) {
 
-	return builder.format( 'BlinnExponentToGGXRoughness( ' + this.blinnExponent.build( builder, 'fv1' ) + ' )', this.type, output );
+	return builder.format( 'BlinnExponentToGGXRoughness( ' + this.blinnExponent.build( builder, 'f' ) + ' )', this.type, output );
 
 };
 

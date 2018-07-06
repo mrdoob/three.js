@@ -27,9 +27,9 @@ Math3Node.prototype.nodeType = "Math3";
 
 Math3Node.prototype.getType = function ( builder ) {
 
-	var a = builder.getFormatLength( this.a.getType( builder ) );
-	var b = builder.getFormatLength( this.b.getType( builder ) );
-	var c = builder.getFormatLength( this.c.getType( builder ) );
+	var a = builder.getTypeLength( this.a.getType( builder ) );
+	var b = builder.getTypeLength( this.b.getType( builder ) );
+	var c = builder.getTypeLength( this.c.getType( builder ) );
 
 	if ( a > b && a > c ) {
 		
@@ -48,9 +48,9 @@ Math3Node.prototype.getType = function ( builder ) {
 Math3Node.prototype.generate = function ( builder, output ) {
 
 	var a, b, c,
-		al = builder.getFormatLength( this.a.getType( builder ) ),
-		bl = builder.getFormatLength( this.b.getType( builder ) ),
-		cl = builder.getFormatLength( this.c.getType( builder ) ),
+		al = builder.getTypeLength( this.a.getType( builder ) ),
+		bl = builder.getTypeLength( this.b.getType( builder ) ),
+		cl = builder.getTypeLength( this.c.getType( builder ) ),
 		type = this.getType( builder );
 
 	// optimzer
@@ -61,7 +61,7 @@ Math3Node.prototype.generate = function ( builder, output ) {
 		
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
-			c = this.c.build( builder, 'fv1' );
+			c = this.c.build( builder, 'f' );
 			
 			break;
 
@@ -69,7 +69,7 @@ Math3Node.prototype.generate = function ( builder, output ) {
 		
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
-			c = this.c.build( builder, cl === 1 ? 'fv1' : type );
+			c = this.c.build( builder, cl === 1 ? 'f' : type );
 			
 			break;
 

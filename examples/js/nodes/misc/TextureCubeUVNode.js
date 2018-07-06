@@ -175,8 +175,8 @@ TextureCubeUVNode.prototype.generate = function ( builder, output ) {
 		var textureCubeUV = builder.include( TextureCubeUVNode.Nodes.textureCubeUV );
 	
 		return builder.format( textureCubeUV + '( ' + this.coord.build( builder, 'v3' ) + ', ' +
-			this.blinnExponentToRoughness.build( builder, 'fv1' ) + ', ' +
-			this.textureSize.build( builder, 'fv1' ) + ' )', this.getType( builder ), output );
+			this.blinnExponentToRoughness.build( builder, 'f' ) + ', ' +
+			this.textureSize.build( builder, 'f' ) + ' )', this.getType( builder ), output );
 			
 	} else {
 

@@ -35,11 +35,11 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	var cubetex = this.getTexture( builder, output );
 	var coord = this.coord.build( builder, 'v3' );
-	var bias = this.bias ? this.bias.build( builder, 'fv1' ) : undefined;
+	var bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
 
 	if ( bias === undefined && builder.context.bias ) {
 
-		bias = new builder.context.bias( this ).build( builder, 'fv1' );
+		bias = new builder.context.bias( this ).build( builder, 'f' );
 
 	}
 

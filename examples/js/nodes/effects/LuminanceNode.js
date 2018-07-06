@@ -8,7 +8,7 @@ import { FunctionNode } from '../core/FunctionNode.js';
 
 function LuminanceNode( rgb ) {
 
-	TempNode.call( this, 'fv1' );
+	TempNode.call( this, 'f' );
 
 	this.rgb = rgb;
 

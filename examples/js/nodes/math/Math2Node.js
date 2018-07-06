@@ -33,7 +33,7 @@ Math2Node.prototype.getInputType = function ( builder ) {
 
 	// use the greater length vector
 	
-	if ( builder.getFormatLength( this.b.getType( builder ) ) > builder.getFormatLength( this.a.getType( builder ) ) ) {
+	if ( builder.getTypeLength( this.b.getType( builder ) ) > builder.getTypeLength( this.a.getType( builder ) ) ) {
 
 		return this.b.getType( builder );
 
@@ -50,7 +50,7 @@ Math2Node.prototype.getType = function ( builder ) {
 		case Math2Node.DISTANCE:
 		case Math2Node.DOT:
 		
-			return 'fv1';
+			return 'f';
 
 		case Math2Node.CROSS:
 		
@@ -66,8 +66,8 @@ Math2Node.prototype.generate = function ( builder, output ) {
 
 	var a, b, 
 		type = this.getInputType( builder ),
-		al = builder.getFormatLength( this.a.getType( builder ) ),
-		bl = builder.getFormatLength( this.b.getType( builder ) );
+		al = builder.getTypeLength( this.a.getType( builder ) ),
+		bl = builder.getTypeLength( this.b.getType( builder ) );
 		
 	// optimzer
 
@@ -82,7 +82,7 @@ Math2Node.prototype.generate = function ( builder, output ) {
 
 		case Math2Node.STEP:
 		
-			a = this.a.build( builder, al === 1 ? 'fv1' : type );
+			a = this.a.build( builder, al === 1 ? 'f' : type );
 			b = this.b.build( builder, type );
 			
 			break;
@@ -92,7 +92,7 @@ Math2Node.prototype.generate = function ( builder, output ) {
 		case Math2Node.MOD:
 		
 			a = this.a.build( builder, type );
-			b = this.b.build( builder, bl === 1 ? 'fv1' : type );
+			b = this.b.build( builder, bl === 1 ? 'f' : type );
 			
 			break;
 

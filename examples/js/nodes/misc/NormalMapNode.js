@@ -64,8 +64,6 @@ NormalMapNode.prototype.nodeType = "NormalMap";
 
 NormalMapNode.prototype.generate = function ( builder, output ) {
 
-	var material = builder.material;
-
 	if ( builder.isShader( 'fragment' ) ) {
 
 		var perturbNormal2Arb = builder.include( NormalMapNode.Nodes.perturbNormal2Arb );

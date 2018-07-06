@@ -81,7 +81,7 @@ ColorAdjustmentNode.prototype.nodeType = "ColorAdjustment";
 ColorAdjustmentNode.prototype.generate = function ( builder, output ) {
 
 	var rgb = this.rgb.build( builder, 'v3' ),
-		adjustment = this.adjustment.build( builder, 'fv1' );
+		adjustment = this.adjustment.build( builder, 'f' );
 
 	switch ( this.method ) {
 

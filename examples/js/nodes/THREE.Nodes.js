@@ -31,6 +31,7 @@ import {
 	CubeTextureNode,
 	ScreenNode,
 	ReflectorNode,
+	PropertyNode,
 	
 	// accessors
 	
@@ -133,6 +134,7 @@ THREE.TextureNode = TextureNode;
 THREE.CubeTextureNode = CubeTextureNode;
 THREE.ScreenNode = ScreenNode;
 THREE.ReflectorNode = ReflectorNode;
+THREE.PropertyNode = PropertyNode;
 
 // accessors
 

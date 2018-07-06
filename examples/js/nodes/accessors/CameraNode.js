@@ -93,7 +93,7 @@ CameraNode.prototype.getType = function ( builder ) {
 
 		case CameraNode.DEPTH:
 		
-			return 'fv1';
+			return 'f';
 
 	}
 
@@ -146,7 +146,7 @@ CameraNode.prototype.generate = function ( builder, output ) {
 
 			var depthColor = builder.include( CameraNode.Nodes.depthColor );
 
-			result = depthColor + '( ' + this.near.build( builder, 'fv1' ) + ', ' + this.far.build( builder, 'fv1' ) + ' )';
+			result = depthColor + '( ' + this.near.build( builder, 'f' ) + ', ' + this.far.build( builder, 'f' ) + ' )';
 
 			break;
 

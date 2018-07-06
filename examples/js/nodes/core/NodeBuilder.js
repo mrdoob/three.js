@@ -14,23 +14,22 @@ import { Vector4Node } from '../inputs/Vector4Node.js';
 import { TextureNode } from '../inputs/TextureNode.js';
 import { CubeTextureNode } from '../inputs/CubeTextureNode.js';
 
- 
 var elements = NodeUtils.elements,
 	constructors = [ 'float', 'vec2', 'vec3', 'vec4' ],
-	formatToType = {
-		float: 'fv1',
+	convertFormatToType = {
+		float: 'f',
 		vec2: 'v2',
 		vec3: 'v3',
 		vec4: 'v4',
 		mat4: 'v4',
-		int: 'iv1'
+		int: 'i'
 	},
-	typeToFormat = {
+	convertTypeToFormat = {
 		t: 'sampler2D',
 		tc: 'samplerCube',
-		bv1: 'bool',
-		iv1: 'int',
-		fv1: 'float',
+		b: 'bool',
+		i: 'int',
+		f: 'float',
 		c: 'vec3',
 		v2: 'vec2',
 		v3: 'vec3',
@@ -132,9 +131,9 @@ function NodeBuilder() {
 	
 	this.extensions = {};
 	
-	this.nodes = [];
-	
 	this.updaters = [];
+	
+	this.nodes = [];
 	
 	// --
 	
@@ -657,9 +656,15 @@ NodeBuilder.prototype = {
 
 	},
 
-	colorToVector: function ( color ) {
+	colorToVectorProperties: function ( color ) {
 
 		return color.replace( 'r', 'x' ).replace( 'g', 'y' ).replace( 'b', 'z' ).replace( 'a', 'w' );
+
+	},
+	
+	colorToVector: function ( color ) {
+
+		return color.replace( /c/g, 'v3' );
 
 	},
 
@@ -704,30 +709,42 @@ NodeBuilder.prototype = {
 
 	},
 
-	getFormatName: function ( format ) {
-
-		return format.replace( /c/g, 'v3' ).replace( /fv1/g, 'v1' ).replace( /iv1/g, 'i' );
-
-	},
-
-	isFormatMatrix: function ( format ) {
+	isTypeMatrix: function ( format ) {
 
 		return /^m/.test( format );
 
 	},
 
-	getFormatLength: function ( format ) {
+	getTypeLength: function ( type ) {
 
-		return parseInt( this.getFormatName( format ).substr( 1 ) );
+		if ( type === 'f' ) return 1;
+	
+		return parseInt( this.colorToVector( type ).substr( 1 ) );
 
 	},
 
-	getFormatFromLength: function ( len ) {
+	getTypeFromLength: function ( len ) {
 
-		if ( len === 1 ) return 'fv1';
+		if ( len === 1 ) return 'f';
 
 		return 'v' + len;
 
+	},
+	
+	findNode: function() {
+		
+		for(var i = 0; i < arguments.length; i++) {
+			
+			var nodeCandidate = arguments[i];
+			
+			if (nodeCandidate !== undefined && nodeCandidate.isNode) {
+				
+				return nodeCandidate;
+				
+			}
+			
+		}
+		
 	},
 	
 	resolve: function() {
@@ -788,31 +805,31 @@ NodeBuilder.prototype = {
 
 	format: function ( code, from, to ) {
 
-		var format = this.getFormatName( to + ' = ' + from );
+		var typeToType = this.colorToVector( to + ' = ' + from );
 
-		switch ( format ) {
+		switch ( typeToType ) {
 
-			case 'v1 = v2': return code + '.x';
-			case 'v1 = v3': return code + '.x';
-			case 'v1 = v4': return code + '.x';
-			case 'v1 = i': return 'float( ' + code + ' )';
+			case 'f = v2': return code + '.x';
+			case 'f = v3': return code + '.x';
+			case 'f = v4': return code + '.x';
+			case 'f = i': return 'float( ' + code + ' )';
 
-			case 'v2 = v1': return 'vec2( ' + code + ' )';
+			case 'v2 = f': return 'vec2( ' + code + ' )';
 			case 'v2 = v3': return code + '.xy';
 			case 'v2 = v4': return code + '.xy';
 			case 'v2 = i': return 'vec2( float( ' + code + ' ) )';
 
-			case 'v3 = v1': return 'vec3( ' + code + ' )';
+			case 'v3 = f': return 'vec3( ' + code + ' )';
 			case 'v3 = v2': return 'vec3( ' + code + ', 0.0 )';
 			case 'v3 = v4': return code + '.xyz';
 			case 'v3 = i': return 'vec2( float( ' + code + ' ) )';
 
-			case 'v4 = v1': return 'vec4( ' + code + ' )';
+			case 'v4 = f': return 'vec4( ' + code + ' )';
 			case 'v4 = v2': return 'vec4( ' + code + ', 0.0, 1.0 )';
 			case 'v4 = v3': return 'vec4( ' + code + ', 1.0 )';
 			case 'v4 = i': return 'vec4( float( ' + code + ' ) )';
 
-			case 'i = v1': return 'int( ' + code + ' )';
+			case 'i = f': return 'int( ' + code + ' )';
 			case 'i = v2': return 'int( ' + code + '.x )';
 			case 'i = v3': return 'int( ' + code + '.x )';
 			case 'i = v4': return 'int( ' + code + '.x )';
@@ -825,13 +842,13 @@ NodeBuilder.prototype = {
 
 	getTypeByFormat: function ( format ) {
 
-		return formatToType[ format ] || format;
+		return convertFormatToType[ format ] || format;
 
 	},
 	
 	getFormatByType: function ( type ) {
 
-		return typeToFormat[ type ] || type;
+		return convertTypeToFormat[ type ] || type;
 
 	},
 
