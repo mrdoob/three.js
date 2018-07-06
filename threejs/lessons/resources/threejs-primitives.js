@@ -393,7 +393,7 @@ function main() {
     return addElem(parent, 'div', className);
   }
 
-  const renderFuncs = [
+  const primRenderFuncs = [
     ...[...document.querySelectorAll('[data-primitive]')].map(createPrimitiveDOM),
     ...[...document.querySelectorAll('[data-primitive-diagram]')].map(createPrimitiveDiagram),
   ];
@@ -567,8 +567,24 @@ function main() {
 
     renderer.setScissorTest(true);
 
-    renderFuncs.forEach((fn) => {
-      fn(renderer, time);
+    // maybe there is another way. Originally I used `position: fixed`
+    // but the problem is if we can't render as fast as the browser
+    // scrolls then our shapes lag. 1 or 2 frames of lag isn't too
+    // horrible but iOS would often been 1/2 a second or worse.
+    // By doing it this way the canvas will scroll which means the
+    // worse that happens is part of the shapes scrolling on don't
+    // get drawn for a few frames but the shapes that are on the screen
+    // scroll perfectly.
+    //
+    // I'm using `transform` on the voodoo that it doesn't affect
+    // layout as much as `top` since AFAIK setting `top` is in
+    // the flow but `transform` is not though thinking about it
+    // the given we're `position: absolute` maybe there's no difference?
+    const transform = `translateY(${window.scrollY}px)`;
+    renderer.domElement.style.transform = transform;
+
+    primRenderFuncs.forEach((fn) => {
+        fn(renderer, time);
     });
 
     requestAnimationFrame(render);

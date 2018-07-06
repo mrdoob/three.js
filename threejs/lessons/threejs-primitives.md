@@ -380,7 +380,7 @@ to use it](threejs-scenegraph.html).
   flex: 1 1 auto;
 }
 #c {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
