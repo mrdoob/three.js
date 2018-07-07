@@ -232,7 +232,7 @@ NodeBuilder.prototype = {
 	
 	setMaterial: function( material, renderer ) {
 		
-		//this.material = material;
+		this.material = material;
 		this.renderer = renderer;
 		
 		this.requires.lights = material.lights;

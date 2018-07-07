@@ -56,7 +56,7 @@ NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 
 	if ( this.needsUpdate ) {
 
-		this.build( { dispose: false, renderer: renderer } );
+		this.build( { renderer: renderer } );
 
 		shader.uniforms = this.uniforms;
 		shader.vertexShader = this.vertexShader;
@@ -69,7 +69,6 @@ NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 NodeMaterial.prototype.build = function ( params ) {
 
 	params = params || {};
-	params.dispose = params.dispose !== undefined ? params.dispose : true;
 
 	var builder = params.builder || new NodeBuilder();
 	
@@ -89,14 +88,8 @@ NodeMaterial.prototype.build = function ( params ) {
 
 	this.transparent = builder.requires.transparent || this.blending > THREE.NormalBlending;
 
-	if ( params.dispose ) {
-
-		// force update
-
-		this.dispose();
-
-	}
-
+	this.needsUpdate = false;
+	
 	return this;
 
 };
