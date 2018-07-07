@@ -10,13 +10,11 @@ function WebGLRenderState() {
 
 	var lightsArray = [];
 	var shadowsArray = [];
-	var spritesArray = [];
 
 	function init() {
 
 		lightsArray.length = 0;
 		shadowsArray.length = 0;
-		spritesArray.length = 0;
 
 	}
 
@@ -32,12 +30,6 @@ function WebGLRenderState() {
 
 	}
 
-	function pushSprite( sprite ) {
-
-		spritesArray.push( sprite );
-
-	}
-
 	function setupLights( camera ) {
 
 		lights.setup( lightsArray, shadowsArray, camera );
@@ -47,7 +39,6 @@ function WebGLRenderState() {
 	var state = {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
-		spritesArray: spritesArray,
 
 		lights: lights
 	};
@@ -58,8 +49,7 @@ function WebGLRenderState() {
 		setupLights: setupLights,
 
 		pushLight: pushLight,
-		pushShadow: pushShadow,
-		pushSprite: pushSprite
+		pushShadow: pushShadow
 	};
 
 }

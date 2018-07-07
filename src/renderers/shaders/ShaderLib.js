@@ -162,6 +162,18 @@ var ShaderLib = {
 
 	},
 
+	sprite: {
+
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.sprite,
+			UniformsLib.fog
+		] ),
+
+		vertexShader: ShaderChunk.sprite_vert,
+		fragmentShader: ShaderChunk.sprite_frag
+
+	},
+
 	/* -------------------------------------------------------------------------
 	//	Cube map shader
 	 ------------------------------------------------------------------------- */

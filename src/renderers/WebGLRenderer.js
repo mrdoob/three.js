@@ -37,7 +37,6 @@ import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
 import { WebGLRenderStates } from './webgl/WebGLRenderStates.js';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
-import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer.js';
 import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
@@ -234,7 +233,6 @@ function WebGLRenderer( parameters ) {
 	var programCache, renderLists, renderStates;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
-	var spriteRenderer;
 
 	var utils;
 
@@ -273,8 +271,6 @@ function WebGLRenderer( parameters ) {
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
-
-		spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, textures, capabilities );
 
 		info.programs = programCache.programs;
 
@@ -820,6 +816,10 @@ function WebGLRenderer( parameters ) {
 
 			renderer.setMode( _gl.POINTS );
 
+		} else if ( object.isSprite ) {
+
+			renderer.setMode( _gl.TRIANGLES );
+
 		}
 
 		if ( geometry && geometry.isInstancedBufferGeometry ) {
@@ -1130,6 +1130,7 @@ function WebGLRenderer( parameters ) {
 
 		var opaqueObjects = currentRenderList.opaque;
 		var transparentObjects = currentRenderList.transparent;
+		var spriteObjects = currentRenderList.sprites;
 
 		if ( scene.overrideMaterial ) {
 
@@ -1137,6 +1138,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
 			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
+			if ( spriteObjects.length ) renderObjects( spriteObjects, scene, camera, overrideMaterial );
 
 		} else {
 
@@ -1148,13 +1150,11 @@ function WebGLRenderer( parameters ) {
 
 			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
 
+			//
+
+			if ( spriteObjects.length ) renderObjects( spriteObjects, scene, camera );
+
 		}
-
-		// custom renderers
-
-		var spritesArray = currentRenderState.state.spritesArray;
-
-		spriteRenderer.render( spritesArray, scene, camera );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -1264,7 +1264,19 @@ function WebGLRenderer( parameters ) {
 
 				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
-					currentRenderState.pushSprite( object );
+					if ( sortObjects ) {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld )
+							.applyMatrix4( _projScreenMatrix );
+
+						var material = object.material;
+
+					}
+
+					var geometry = objects.update( object );
+					var material = object.material;
+
+					currentRenderList.push( object, geometry, material, _vector3.z, null );
 
 				}
 
@@ -1872,6 +1884,10 @@ function WebGLRenderer( parameters ) {
 
 				refreshUniformsPoints( m_uniforms, material );
 
+			} else if ( material.isSpriteMaterial ) {
+
+				refreshUniformsSprites( m_uniforms, material );
+
 			} else if ( material.isShadowMaterial ) {
 
 				m_uniforms.color.value = material.color;
@@ -1893,6 +1909,12 @@ function WebGLRenderer( parameters ) {
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, _this );
 			material.uniformsNeedUpdate = false;
+
+		}
+
+		if ( material.isSpriteMaterial ) {
+
+			p_uniforms.setValue( _gl, 'center', object.center );
 
 		}
 
@@ -2064,6 +2086,27 @@ function WebGLRenderer( parameters ) {
 		uniforms.size.value = material.size * _pixelRatio;
 		uniforms.scale.value = _height * 0.5;
 
+		uniforms.map.value = material.map;
+
+		if ( material.map !== null ) {
+
+			if ( material.map.matrixAutoUpdate === true ) {
+
+				material.map.updateMatrix();
+
+			}
+
+			uniforms.uvTransform.value.copy( material.map.matrix );
+
+		}
+
+	}
+
+	function refreshUniformsSprites( uniforms, material ) {
+
+		uniforms.diffuse.value = material.color;
+		uniforms.opacity.value = material.opacity;
+		uniforms.rotation.value = material.rotation;
 		uniforms.map.value = material.map;
 
 		if ( material.map !== null ) {
