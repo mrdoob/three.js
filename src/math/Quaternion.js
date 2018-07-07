@@ -393,21 +393,11 @@ Object.assign( Quaternion.prototype, {
 
 	}(),
 
-	angleTo: function () {
+	angleTo: function ( q ) {
 
-		var p = new Quaternion();
+		return 2 * Math.acos( Math.abs( this.dot( q ) ) );
 
-		return function angleTo( q ) {
-
-			p.copy( this ).inverse();
-
-			p.premultiply( q );
-
-			return 2 * Math.acos( p.w );
-
-		};
-
-	}(),
+	},
 
 	inverse: function () {
 
