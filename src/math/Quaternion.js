@@ -399,9 +399,9 @@ Object.assign( Quaternion.prototype, {
 
 		return function angleTo( q ) {
 
-			p.copy( q ).inverse();
+			p.copy( this ).inverse();
 
-			p.premultiply( this );
+			p.premultiply( q );
 
 			return 2 * Math.acos( p.w );
 
