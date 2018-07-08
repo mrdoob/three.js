@@ -6146,6 +6146,10 @@ var shadow_frag = "uniform vec3 color;\nuniform float opacity;\n#include <common
 
 var shadow_vert = "#include <fog_pars_vertex>\n#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}\n";
 
+var sprite_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
+
+var sprite_vert = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec2 scale;\n\tscale.x = length( vec3( modelMatrix[ 0 ].x, modelMatrix[ 0 ].y, modelMatrix[ 0 ].z ) );\n\tscale.y = length( vec3( modelMatrix[ 1 ].x, modelMatrix[ 1 ].y, modelMatrix[ 1 ].z ) );\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tvec4 mvPosition;\n\tmvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}\n";
+
 var ShaderChunk = {
 	alphamap_fragment: alphamap_fragment,
 	alphamap_pars_fragment: alphamap_pars_fragment,
@@ -6260,7 +6264,9 @@ var ShaderChunk = {
 	points_frag: points_frag,
 	points_vert: points_vert,
 	shadow_frag: shadow_frag,
-	shadow_vert: shadow_vert
+	shadow_vert: shadow_vert,
+	sprite_frag: sprite_frag,
+	sprite_vert: sprite_vert
 };
 
 /**
@@ -7088,6 +7094,17 @@ var UniformsLib = {
 		map: { value: null },
 		uvTransform: { value: new Matrix3() }
 
+	},
+
+	sprite: {
+
+		diffuse: { value: new Color( 0xeeeeee ) },
+		opacity: { value: 1.0 },
+		center: { value: new Vector2( 0.5, 0.5 ) },
+		rotation: { value: 0.0 },
+		map: { value: null },
+		uvTransform: { value: new Matrix3() }
+
 	}
 
 };
@@ -7247,6 +7264,18 @@ var ShaderLib = {
 
 		vertexShader: ShaderChunk.normal_vert,
 		fragmentShader: ShaderChunk.normal_frag
+
+	},
+
+	sprite: {
+
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.sprite,
+			UniformsLib.fog
+		] ),
+
+		vertexShader: ShaderChunk.sprite_vert,
+		fragmentShader: ShaderChunk.sprite_frag
 
 	},
 
@@ -17155,7 +17184,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points',
-		ShadowMaterial: 'shadow'
+		ShadowMaterial: 'shadow',
+		SpriteMaterial: 'sprite'
 	};
 
 	var parameterNames = [
@@ -17533,6 +17563,25 @@ function reversePainterSortStable( a, b ) {
 
 }
 
+
+function painterSortStableSprites( a, b ) {
+
+	if ( a.renderOrder !== b.renderOrder ) {
+
+	 return a.renderOrder - b.renderOrder;
+
+	} else if ( a.z !== b.z ) {
+
+	 return b.z - a.z;
+
+	} else {
+
+	 return b.id - a.id;
+
+	}
+
+}
+
 function WebGLRenderList() {
 
 	var renderItems = [];
@@ -17540,6 +17589,7 @@ function WebGLRenderList() {
 
 	var opaque = [];
 	var transparent = [];
+	var sprites = [];
 
 	function init() {
 
@@ -17547,6 +17597,7 @@ function WebGLRenderList() {
 
 		opaque.length = 0;
 		transparent.length = 0;
+		sprites.length = 0;
 
 	}
 
@@ -17582,7 +17633,15 @@ function WebGLRenderList() {
 
 		}
 
-		( material.transparent === true ? transparent : opaque ).push( renderItem );
+		if ( object.isSprite ) {
+
+			sprites.push( renderItem );
+
+		} else {
+
+			( material.transparent === true ? transparent : opaque ).push( renderItem );
+
+		}
 
 		renderItemsIndex ++;
 
@@ -17592,12 +17651,14 @@ function WebGLRenderList() {
 
 		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
+		if ( sprites.length > 1 ) sprites.sort( painterSortStableSprites );
 
 	}
 
 	return {
 		opaque: opaque,
 		transparent: transparent,
+		sprites: sprites,
 
 		init: init,
 		push: push,
@@ -17976,13 +18037,11 @@ function WebGLRenderState() {
 
 	var lightsArray = [];
 	var shadowsArray = [];
-	var spritesArray = [];
 
 	function init() {
 
 		lightsArray.length = 0;
 		shadowsArray.length = 0;
-		spritesArray.length = 0;
 
 	}
 
@@ -17998,12 +18057,6 @@ function WebGLRenderState() {
 
 	}
 
-	function pushSprite( sprite ) {
-
-		spritesArray.push( sprite );
-
-	}
-
 	function setupLights( camera ) {
 
 		lights.setup( lightsArray, shadowsArray, camera );
@@ -18013,7 +18066,6 @@ function WebGLRenderState() {
 	var state = {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
-		spritesArray: spritesArray,
 
 		lights: lights
 	};
@@ -18024,8 +18076,7 @@ function WebGLRenderState() {
 		setupLights: setupLights,
 
 		pushLight: pushLight,
-		pushShadow: pushShadow,
-		pushSprite: pushSprite
+		pushShadow: pushShadow
 	};
 
 }
@@ -18635,403 +18686,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
 			renderObject( children[ i ], camera, shadowCamera, isPointLight );
-
-		}
-
-	}
-
-}
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
-
-	Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
-
-	this.needsUpdate = true;
-
-}
-
-CanvasTexture.prototype = Object.create( Texture.prototype );
-CanvasTexture.prototype.constructor = CanvasTexture;
-CanvasTexture.prototype.isCanvasTexture = true;
-
-/**
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- */
-
-function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
-
-	var vertexBuffer, elementBuffer;
-	var program, attributes, uniforms;
-
-	var texture;
-
-	// decompose matrixWorld
-
-	var spritePosition = new Vector3();
-	var spriteRotation = new Quaternion();
-	var spriteScale = new Vector3();
-
-	function init() {
-
-		var vertices = new Float32Array( [
-			- 0.5, - 0.5, 0, 0,
-			  0.5, - 0.5, 1, 0,
-			  0.5, 0.5, 1, 1,
-			- 0.5, 0.5, 0, 1
-		] );
-
-		var faces = new Uint16Array( [
-			0, 1, 2,
-			0, 2, 3
-		] );
-
-		vertexBuffer = gl.createBuffer();
-		elementBuffer = gl.createBuffer();
-
-		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW );
-
-		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
-		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, faces, gl.STATIC_DRAW );
-
-		program = createProgram();
-
-		attributes = {
-			position: gl.getAttribLocation( program, 'position' ),
-			uv: gl.getAttribLocation( program, 'uv' )
-		};
-
-		uniforms = {
-			uvOffset: gl.getUniformLocation( program, 'uvOffset' ),
-			uvScale: gl.getUniformLocation( program, 'uvScale' ),
-
-			rotation: gl.getUniformLocation( program, 'rotation' ),
-			center: gl.getUniformLocation( program, 'center' ),
-			scale: gl.getUniformLocation( program, 'scale' ),
-
-			color: gl.getUniformLocation( program, 'color' ),
-			map: gl.getUniformLocation( program, 'map' ),
-			opacity: gl.getUniformLocation( program, 'opacity' ),
-
-			modelViewMatrix: gl.getUniformLocation( program, 'modelViewMatrix' ),
-			projectionMatrix: gl.getUniformLocation( program, 'projectionMatrix' ),
-
-			fogType: gl.getUniformLocation( program, 'fogType' ),
-			fogDensity: gl.getUniformLocation( program, 'fogDensity' ),
-			fogNear: gl.getUniformLocation( program, 'fogNear' ),
-			fogFar: gl.getUniformLocation( program, 'fogFar' ),
-			fogColor: gl.getUniformLocation( program, 'fogColor' ),
-			fogDepth: gl.getUniformLocation( program, 'fogDepth' ),
-
-			alphaTest: gl.getUniformLocation( program, 'alphaTest' )
-		};
-
-		var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-		canvas.width = 8;
-		canvas.height = 8;
-
-		var context = canvas.getContext( '2d' );
-		context.fillStyle = 'white';
-		context.fillRect( 0, 0, 8, 8 );
-
-		texture = new CanvasTexture( canvas );
-
-	}
-
-	this.render = function ( sprites, scene, camera ) {
-
-		if ( sprites.length === 0 ) return;
-
-		// setup gl
-
-		if ( program === undefined ) {
-
-			init();
-
-		}
-
-		state.useProgram( program );
-
-		state.initAttributes();
-		state.enableAttribute( attributes.position );
-		state.enableAttribute( attributes.uv );
-		state.disableUnusedAttributes();
-
-		state.disable( gl.CULL_FACE );
-		state.enable( gl.BLEND );
-
-		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
-		gl.vertexAttribPointer( attributes.position, 2, gl.FLOAT, false, 2 * 8, 0 );
-		gl.vertexAttribPointer( attributes.uv, 2, gl.FLOAT, false, 2 * 8, 8 );
-
-		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
-
-		gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
-
-		state.activeTexture( gl.TEXTURE0 );
-		gl.uniform1i( uniforms.map, 0 );
-
-		var oldFogType = 0;
-		var sceneFogType = 0;
-		var fog = scene.fog;
-
-		if ( fog ) {
-
-			gl.uniform3f( uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
-
-			if ( fog.isFog ) {
-
-				gl.uniform1f( uniforms.fogNear, fog.near );
-				gl.uniform1f( uniforms.fogFar, fog.far );
-
-				gl.uniform1i( uniforms.fogType, 1 );
-				oldFogType = 1;
-				sceneFogType = 1;
-
-			} else if ( fog.isFogExp2 ) {
-
-				gl.uniform1f( uniforms.fogDensity, fog.density );
-
-				gl.uniform1i( uniforms.fogType, 2 );
-				oldFogType = 2;
-				sceneFogType = 2;
-
-			}
-
-		} else {
-
-			gl.uniform1i( uniforms.fogType, 0 );
-			oldFogType = 0;
-			sceneFogType = 0;
-
-		}
-
-
-		// update positions and sort
-
-		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
-
-			var sprite = sprites[ i ];
-
-			sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-			sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
-
-		}
-
-		sprites.sort( painterSortStable );
-
-		// render all sprites
-
-		var scale = [];
-		var center = [];
-
-		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
-
-			var sprite = sprites[ i ];
-			var material = sprite.material;
-
-			if ( material.visible === false ) continue;
-
-			sprite.onBeforeRender( renderer, scene, camera, undefined, material, undefined );
-
-			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
-			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
-
-			sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
-
-			scale[ 0 ] = spriteScale.x;
-			scale[ 1 ] = spriteScale.y;
-
-			center[ 0 ] = sprite.center.x - 0.5;
-			center[ 1 ] = sprite.center.y - 0.5;
-
-			var fogType = 0;
-
-			if ( scene.fog && material.fog ) {
-
-				fogType = sceneFogType;
-
-			}
-
-			if ( oldFogType !== fogType ) {
-
-				gl.uniform1i( uniforms.fogType, fogType );
-				oldFogType = fogType;
-
-			}
-
-			if ( material.map !== null ) {
-
-				gl.uniform2f( uniforms.uvOffset, material.map.offset.x, material.map.offset.y );
-				gl.uniform2f( uniforms.uvScale, material.map.repeat.x, material.map.repeat.y );
-
-			} else {
-
-				gl.uniform2f( uniforms.uvOffset, 0, 0 );
-				gl.uniform2f( uniforms.uvScale, 1, 1 );
-
-			}
-
-			gl.uniform1f( uniforms.opacity, material.opacity );
-			gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
-
-			gl.uniform1f( uniforms.rotation, material.rotation );
-			gl.uniform2fv( uniforms.center, center );
-			gl.uniform2fv( uniforms.scale, scale );
-
-			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
-			state.buffers.depth.setTest( material.depthTest );
-			state.buffers.depth.setMask( material.depthWrite );
-			state.buffers.color.setMask( material.colorWrite );
-
-			textures.setTexture2D( material.map || texture, 0 );
-
-			gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
-
-			sprite.onAfterRender( renderer, scene, camera, undefined, material, undefined );
-
-		}
-
-		// restore gl
-
-		state.enable( gl.CULL_FACE );
-
-		state.reset();
-
-	};
-
-	function createProgram() {
-
-		var program = gl.createProgram();
-
-		var vertexShader = gl.createShader( gl.VERTEX_SHADER );
-		var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
-
-		gl.shaderSource( vertexShader, [
-
-			'precision ' + capabilities.precision + ' float;',
-
-			'#define SHADER_NAME ' + 'SpriteMaterial',
-
-			'uniform mat4 modelViewMatrix;',
-			'uniform mat4 projectionMatrix;',
-			'uniform float rotation;',
-			'uniform vec2 center;',
-			'uniform vec2 scale;',
-			'uniform vec2 uvOffset;',
-			'uniform vec2 uvScale;',
-
-			'attribute vec2 position;',
-			'attribute vec2 uv;',
-
-			'varying vec2 vUV;',
-			'varying float fogDepth;',
-
-			'void main() {',
-
-			'	vUV = uvOffset + uv * uvScale;',
-
-			'	vec2 alignedPosition = ( position - center ) * scale;',
-
-			'	vec2 rotatedPosition;',
-			'	rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
-			'	rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;',
-
-			'	vec4 mvPosition;',
-
-			'	mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
-			'	mvPosition.xy += rotatedPosition;',
-
-			'	gl_Position = projectionMatrix * mvPosition;',
-
-			'	fogDepth = - mvPosition.z;',
-
-			'}'
-
-		].join( '\n' ) );
-
-		gl.shaderSource( fragmentShader, [
-
-			'precision ' + capabilities.precision + ' float;',
-
-			'#define SHADER_NAME ' + 'SpriteMaterial',
-
-			'uniform vec3 color;',
-			'uniform sampler2D map;',
-			'uniform float opacity;',
-
-			'uniform int fogType;',
-			'uniform vec3 fogColor;',
-			'uniform float fogDensity;',
-			'uniform float fogNear;',
-			'uniform float fogFar;',
-			'uniform float alphaTest;',
-
-			'varying vec2 vUV;',
-			'varying float fogDepth;',
-
-			'void main() {',
-
-			'	vec4 texture = texture2D( map, vUV );',
-
-			'	gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );',
-
-			'	if ( gl_FragColor.a < alphaTest ) discard;',
-
-			'	if ( fogType > 0 ) {',
-
-			'		float fogFactor = 0.0;',
-
-			'		if ( fogType == 1 ) {',
-
-			'			fogFactor = smoothstep( fogNear, fogFar, fogDepth );',
-
-			'		} else {',
-
-			'			const float LOG2 = 1.442695;',
-			'			fogFactor = exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 );',
-			'			fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
-
-			'		}',
-
-			'		gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );',
-
-			'	}',
-
-			'}'
-
-		].join( '\n' ) );
-
-		gl.compileShader( vertexShader );
-		gl.compileShader( fragmentShader );
-
-		gl.attachShader( program, vertexShader );
-		gl.attachShader( program, fragmentShader );
-
-		gl.linkProgram( program );
-
-		return program;
-
-	}
-
-	function painterSortStable( a, b ) {
-
-		if ( a.renderOrder !== b.renderOrder ) {
-
-			return a.renderOrder - b.renderOrder;
-
-		} else if ( a.z !== b.z ) {
-
-			return b.z - a.z;
-
-		} else {
-
-			return b.id - a.id;
 
 		}
 
@@ -22115,7 +21769,6 @@ function WebGLRenderer( parameters ) {
 	var programCache, renderLists, renderStates;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
-	var spriteRenderer;
 
 	var utils;
 
@@ -22154,8 +21807,6 @@ function WebGLRenderer( parameters ) {
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
-
-		spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, textures, capabilities );
 
 		info.programs = programCache.programs;
 
@@ -22701,6 +22352,10 @@ function WebGLRenderer( parameters ) {
 
 			renderer.setMode( _gl.POINTS );
 
+		} else if ( object.isSprite ) {
+
+			renderer.setMode( _gl.TRIANGLES );
+
 		}
 
 		if ( geometry && geometry.isInstancedBufferGeometry ) {
@@ -23011,6 +22666,7 @@ function WebGLRenderer( parameters ) {
 
 		var opaqueObjects = currentRenderList.opaque;
 		var transparentObjects = currentRenderList.transparent;
+		var spriteObjects = currentRenderList.sprites;
 
 		if ( scene.overrideMaterial ) {
 
@@ -23018,6 +22674,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
 			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
+			if ( spriteObjects.length ) renderObjects( spriteObjects, scene, camera, overrideMaterial );
 
 		} else {
 
@@ -23029,13 +22686,11 @@ function WebGLRenderer( parameters ) {
 
 			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
 
+			//
+
+			if ( spriteObjects.length ) renderObjects( spriteObjects, scene, camera );
+
 		}
-
-		// custom renderers
-
-		var spritesArray = currentRenderState.state.spritesArray;
-
-		spriteRenderer.render( spritesArray, scene, camera );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -23145,7 +22800,19 @@ function WebGLRenderer( parameters ) {
 
 				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
-					currentRenderState.pushSprite( object );
+					if ( sortObjects ) {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld )
+							.applyMatrix4( _projScreenMatrix );
+
+						var material = object.material;
+
+					}
+
+					var geometry = objects.update( object );
+					var material = object.material;
+
+					currentRenderList.push( object, geometry, material, _vector3.z, null );
 
 				}
 
@@ -23753,6 +23420,10 @@ function WebGLRenderer( parameters ) {
 
 				refreshUniformsPoints( m_uniforms, material );
 
+			} else if ( material.isSpriteMaterial ) {
+
+				refreshUniformsSprites( m_uniforms, material );
+
 			} else if ( material.isShadowMaterial ) {
 
 				m_uniforms.color.value = material.color;
@@ -23774,6 +23445,12 @@ function WebGLRenderer( parameters ) {
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, _this );
 			material.uniformsNeedUpdate = false;
+
+		}
+
+		if ( material.isSpriteMaterial ) {
+
+			p_uniforms.setValue( _gl, 'center', object.center );
 
 		}
 
@@ -23945,6 +23622,27 @@ function WebGLRenderer( parameters ) {
 		uniforms.size.value = material.size * _pixelRatio;
 		uniforms.scale.value = _height * 0.5;
 
+		uniforms.map.value = material.map;
+
+		if ( material.map !== null ) {
+
+			if ( material.map.matrixAutoUpdate === true ) {
+
+				material.map.updateMatrix();
+
+			}
+
+			uniforms.uvTransform.value.copy( material.map.matrix );
+
+		}
+
+	}
+
+	function refreshUniformsSprites( uniforms, material ) {
+
+		uniforms.diffuse.value = material.color;
+		uniforms.opacity.value = material.opacity;
+		uniforms.rotation.value = material.rotation;
 		uniforms.map.value = material.map;
 
 		if ( material.map !== null ) {
@@ -24584,6 +24282,250 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 } );
 
 /**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ */
+
+function InterleavedBuffer( array, stride ) {
+
+	this.array = array;
+	this.stride = stride;
+	this.count = array !== undefined ? array.length / stride : 0;
+
+	this.dynamic = false;
+	this.updateRange = { offset: 0, count: - 1 };
+
+	this.version = 0;
+
+}
+
+Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+} );
+
+Object.assign( InterleavedBuffer.prototype, {
+
+	isInterleavedBuffer: true,
+
+	onUploadCallback: function () {},
+
+	setArray: function ( array ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.count = array !== undefined ? array.length / this.stride : 0;
+		this.array = array;
+
+		return this;
+
+	},
+
+	setDynamic: function ( value ) {
+
+		this.dynamic = value;
+
+		return this;
+
+	},
+
+	copy: function ( source ) {
+
+		this.array = new source.array.constructor( source.array );
+		this.count = source.count;
+		this.stride = source.stride;
+		this.dynamic = source.dynamic;
+
+		return this;
+
+	},
+
+	copyAt: function ( index1, attribute, index2 ) {
+
+		index1 *= this.stride;
+		index2 *= attribute.stride;
+
+		for ( var i = 0, l = this.stride; i < l; i ++ ) {
+
+			this.array[ index1 + i ] = attribute.array[ index2 + i ];
+
+		}
+
+		return this;
+
+	},
+
+	set: function ( value, offset ) {
+
+		if ( offset === undefined ) offset = 0;
+
+		this.array.set( value, offset );
+
+		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	onUpload: function ( callback ) {
+
+		this.onUploadCallback = callback;
+
+		return this;
+
+	}
+
+} );
+
+/**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ */
+
+function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
+
+	this.data = interleavedBuffer;
+	this.itemSize = itemSize;
+	this.offset = offset;
+
+	this.normalized = normalized === true;
+
+}
+
+Object.defineProperties( InterleavedBufferAttribute.prototype, {
+
+	count: {
+
+		get: function () {
+
+			return this.data.count;
+
+		}
+
+	},
+
+	array: {
+
+		get: function () {
+
+			return this.data.array;
+
+		}
+
+	}
+
+} );
+
+Object.assign( InterleavedBufferAttribute.prototype, {
+
+	isInterleavedBufferAttribute: true,
+
+	setX: function ( index, x ) {
+
+		this.data.array[ index * this.data.stride + this.offset ] = x;
+
+		return this;
+
+	},
+
+	setY: function ( index, y ) {
+
+		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
+
+		return this;
+
+	},
+
+	setZ: function ( index, z ) {
+
+		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
+
+		return this;
+
+	},
+
+	setW: function ( index, w ) {
+
+		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
+
+		return this;
+
+	},
+
+	getX: function ( index ) {
+
+		return this.data.array[ index * this.data.stride + this.offset ];
+
+	},
+
+	getY: function ( index ) {
+
+		return this.data.array[ index * this.data.stride + this.offset + 1 ];
+
+	},
+
+	getZ: function ( index ) {
+
+		return this.data.array[ index * this.data.stride + this.offset + 2 ];
+
+	},
+
+	getW: function ( index ) {
+
+		return this.data.array[ index * this.data.stride + this.offset + 3 ];
+
+	},
+
+	setXY: function ( index, x, y ) {
+
+		index = index * this.data.stride + this.offset;
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+
+		return this;
+
+	},
+
+	setXYZ: function ( index, x, y, z ) {
+
+		index = index * this.data.stride + this.offset;
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 2 ] = z;
+
+		return this;
+
+	},
+
+	setXYZW: function ( index, x, y, z, w ) {
+
+		index = index * this.data.stride + this.offset;
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 2 ] = z;
+		this.data.array[ index + 3 ] = w;
+
+		return this;
+
+	}
+
+} );
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -24607,8 +24549,8 @@ function SpriteMaterial( parameters ) {
 
 	this.rotation = 0;
 
-	this.fog = false;
 	this.lights = false;
+	this.transparent = true;
 
 	this.setValues( parameters );
 
@@ -24643,6 +24585,7 @@ function Sprite( material ) {
 	this.type = 'Sprite';
 
 	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
+	this.geometry = SpriteGeometry;
 
 	this.center = new Vector2( 0.5, 0.5 );
 
@@ -24767,6 +24710,29 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 
 } );
+
+//
+
+var SpriteGeometry = ( function () {
+
+	var geometry = new BufferGeometry();
+
+	var float32Array = new Float32Array( [
+		- 0.5, - 0.5, 0, 0, 0,
+		0.5, - 0.5, 0, 1, 0,
+		0.5, 0.5, 0, 1, 1,
+		- 0.5, 0.5, 0, 0, 1
+	] );
+
+	var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+
+	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+	geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+	geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+
+	return geometry;
+
+} )();
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -25984,6 +25950,22 @@ CompressedTexture.prototype = Object.create( Texture.prototype );
 CompressedTexture.prototype.constructor = CompressedTexture;
 
 CompressedTexture.prototype.isCompressedTexture = true;
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+	Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+	this.needsUpdate = true;
+
+}
+
+CanvasTexture.prototype = Object.create( Texture.prototype );
+CanvasTexture.prototype.constructor = CanvasTexture;
+CanvasTexture.prototype.isCanvasTexture = true;
 
 /**
  * @author Matt DesLauriers / @mattdesl
@@ -42710,250 +42692,6 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 	clone: function () {
 
 		return new this.constructor().copy( this );
-
-	}
-
-} );
-
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- */
-
-function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
-
-	this.data = interleavedBuffer;
-	this.itemSize = itemSize;
-	this.offset = offset;
-
-	this.normalized = normalized === true;
-
-}
-
-Object.defineProperties( InterleavedBufferAttribute.prototype, {
-
-	count: {
-
-		get: function () {
-
-			return this.data.count;
-
-		}
-
-	},
-
-	array: {
-
-		get: function () {
-
-			return this.data.array;
-
-		}
-
-	}
-
-} );
-
-Object.assign( InterleavedBufferAttribute.prototype, {
-
-	isInterleavedBufferAttribute: true,
-
-	setX: function ( index, x ) {
-
-		this.data.array[ index * this.data.stride + this.offset ] = x;
-
-		return this;
-
-	},
-
-	setY: function ( index, y ) {
-
-		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
-
-		return this;
-
-	},
-
-	setZ: function ( index, z ) {
-
-		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
-
-		return this;
-
-	},
-
-	setW: function ( index, w ) {
-
-		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
-
-		return this;
-
-	},
-
-	getX: function ( index ) {
-
-		return this.data.array[ index * this.data.stride + this.offset ];
-
-	},
-
-	getY: function ( index ) {
-
-		return this.data.array[ index * this.data.stride + this.offset + 1 ];
-
-	},
-
-	getZ: function ( index ) {
-
-		return this.data.array[ index * this.data.stride + this.offset + 2 ];
-
-	},
-
-	getW: function ( index ) {
-
-		return this.data.array[ index * this.data.stride + this.offset + 3 ];
-
-	},
-
-	setXY: function ( index, x, y ) {
-
-		index = index * this.data.stride + this.offset;
-
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-
-		return this;
-
-	},
-
-	setXYZ: function ( index, x, y, z ) {
-
-		index = index * this.data.stride + this.offset;
-
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
-
-		return this;
-
-	},
-
-	setXYZW: function ( index, x, y, z, w ) {
-
-		index = index * this.data.stride + this.offset;
-
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
-		this.data.array[ index + 3 ] = w;
-
-		return this;
-
-	}
-
-} );
-
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- */
-
-function InterleavedBuffer( array, stride ) {
-
-	this.array = array;
-	this.stride = stride;
-	this.count = array !== undefined ? array.length / stride : 0;
-
-	this.dynamic = false;
-	this.updateRange = { offset: 0, count: - 1 };
-
-	this.version = 0;
-
-}
-
-Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
-
-	set: function ( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-} );
-
-Object.assign( InterleavedBuffer.prototype, {
-
-	isInterleavedBuffer: true,
-
-	onUploadCallback: function () {},
-
-	setArray: function ( array ) {
-
-		if ( Array.isArray( array ) ) {
-
-			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-		}
-
-		this.count = array !== undefined ? array.length / this.stride : 0;
-		this.array = array;
-
-		return this;
-
-	},
-
-	setDynamic: function ( value ) {
-
-		this.dynamic = value;
-
-		return this;
-
-	},
-
-	copy: function ( source ) {
-
-		this.array = new source.array.constructor( source.array );
-		this.count = source.count;
-		this.stride = source.stride;
-		this.dynamic = source.dynamic;
-
-		return this;
-
-	},
-
-	copyAt: function ( index1, attribute, index2 ) {
-
-		index1 *= this.stride;
-		index2 *= attribute.stride;
-
-		for ( var i = 0, l = this.stride; i < l; i ++ ) {
-
-			this.array[ index1 + i ] = attribute.array[ index2 + i ];
-
-		}
-
-		return this;
-
-	},
-
-	set: function ( value, offset ) {
-
-		if ( offset === undefined ) offset = 0;
-
-		this.array.set( value, offset );
-
-		return this;
-
-	},
-
-	clone: function () {
-
-		return new this.constructor().copy( this );
-
-	},
-
-	onUpload: function ( callback ) {
-
-		this.onUploadCallback = callback;
-
-		return this;
 
 	}
 
