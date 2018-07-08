@@ -276,9 +276,9 @@ $(document).ready(function($){
     return a;
   });
 
-  var linkImgs = function(bigHref) {
+  const linkImgs = function(bigHref) {
     return function() {
-      var a = document.createElement('a');
+      const a = document.createElement('a');
       a.href = bigHref;
       a.title = this.alt;
       a.className = this.className;
@@ -289,14 +289,14 @@ $(document).ready(function($){
       return a;
     };
   };
-  var linkSmallImgs = function(ext) {
+  const linkSmallImgs = function(ext) {
     return function() {
-      var src = this.src;
+      const src = this.src;
       return linkImgs(src.substr(0, src.length - 7) + ext);
     };
   };
-  var linkBigImgs = function() {
-    var src = $(this).attr('big');
+  const linkBigImgs = function() {
+    const src = $(this).attr('big');
     return linkImgs(src);
   };
   $('img[big$=".jpg"]').wrap(linkBigImgs);
@@ -312,7 +312,7 @@ $(document).ready(function($){
     window.prettyPrint();
   }
 
-  var params = getQueryParams();
+  const params = getQueryParams();
   if (params.doubleSpace || params.doublespace) {
     document.body.className = document.body.className + ' doubleSpace';
   }

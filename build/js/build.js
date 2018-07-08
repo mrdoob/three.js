@@ -1,10 +1,11 @@
+/*eslint-env node*/
+/*eslint no-console: 0*/
 
-module.exports = function () { // wrapper in case we're in module_context mode
+'use strict';
 
-"use strict";
+module.exports = function() { // wrapper in case we're in module_context mode
 
-const args       = require('minimist')(process.argv.slice(2));
-const cache      = new (require('inmemfilecache'));
+const cache      = new (require('inmemfilecache'))();
 const Feed       = require('feed');
 const fs         = require('fs');
 const glob       = require('glob');
@@ -20,7 +21,7 @@ const url        = require('url');
 
 //process.title = "build";
 
-var executeP = Promise.denodeify(utils.execute);
+const executeP = Promise.denodeify(utils.execute);
 
 marked.setOptions({
   rawHtml: true,
@@ -35,7 +36,7 @@ function applyObject(src, dst) {
 }
 
 function mergeObjects() {
-  var merged = {};
+  const merged = {};
   Array.prototype.slice.call(arguments).forEach(function(src) {
     applyObject(src, merged);
   });
@@ -43,26 +44,26 @@ function mergeObjects() {
 }
 
 function readFile(fileName) {
-  return cache.readFileSync(fileName, "utf-8");
+  return cache.readFileSync(fileName, 'utf-8');
 }
 
 function writeFileIfChanged(fileName, content) {
   if (fs.existsSync(fileName)) {
-    var old = readFile(fileName);
-    if (content == old) {
+    const old = readFile(fileName);
+    if (content === old) {
       return;
     }
   }
   fs.writeFileSync(fileName, content);
-  console.log("Wrote: " + fileName);
-};
+  console.log('Wrote: ' + fileName);
+}
 
 function copyFile(src, dst) {
   writeFileIfChanged(dst, readFile(src));
 }
 
 function replaceParams(str, params) {
-  var template = Handlebars.compile(str);
+  const template = Handlebars.compile(str);
   if (Array.isArray(params)) {
     params = mergeObjects.apply(null, params.slice().reverse());
   }
@@ -84,8 +85,8 @@ function encodeQuery(query) {
   if (!query) {
     return '';
   }
-  return '?' + query.split("&").map(function(pair) {
-    return pair.split("=").map(function (kv) {
+  return '?' + query.split('&').map(function(pair) {
+    return pair.split('=').map(function(kv) {
       return encodeURIComponent(decodeURIComponent(kv));
     }).join('=');
   }).join('&');
@@ -98,12 +99,12 @@ function encodeUrl(src) {
 }
 
 function TemplateManager() {
-  var templates = {};
+  const templates = {};
 
   this.apply = function(filename, params) {
-    var template = templates[filename];
+    let template = templates[filename];
     if (!template) {
-      var template = Handlebars.compile(readFile(filename));
+      template = Handlebars.compile(readFile(filename));
       templates[filename] = template;
     }
 
@@ -115,12 +116,12 @@ function TemplateManager() {
   };
 }
 
-var templateManager = new TemplateManager();
+const templateManager = new TemplateManager();
 
 Handlebars.registerHelper('include', function(filename, options) {
-  var context;
+  let context;
   if (options && options.hash && options.hash.filename) {
-    var varName = options.hash.filename;
+    const varName = options.hash.filename;
     filename = options.data.root[varName];
     context = options.hash;
   } else {
@@ -130,8 +131,8 @@ Handlebars.registerHelper('include', function(filename, options) {
 });
 
 Handlebars.registerHelper('example', function(options) {
-  options.hash.width   = options.hash.width  ? "width:  " + options.hash.width  + "px;" : "";
-  options.hash.height  = options.hash.height ? "height: " + options.hash.height + "px;" : "";
+  options.hash.width   = options.hash.width  ? 'width:  ' + options.hash.width  + 'px;' : '';
+  options.hash.height  = options.hash.height ? 'height: ' + options.hash.height + 'px;' : '';
   options.hash.caption = options.hash.caption || options.data.root.defaultExampleCaption;
   options.hash.examplePath = options.data.root.examplePath;
   options.hash.encodedUrl = encodeURIComponent(encodeUrl(options.hash.url));
@@ -139,31 +140,31 @@ Handlebars.registerHelper('example', function(options) {
   options.hash.params = encodeParams({
     startPane: options.hash.startPane,
   });
-  return templateManager.apply("build/templates/example.template", options.hash);
+  return templateManager.apply('build/templates/example.template', options.hash);
 });
 
 Handlebars.registerHelper('diagram', function(options) {
 
-  options.hash.width  = options.hash.width || "400";
-  options.hash.height = options.hash.height || "300";
+  options.hash.width  = options.hash.width || '400';
+  options.hash.height = options.hash.height || '300';
   options.hash.examplePath = options.data.root.examplePath;
-  options.hash.className = options.hash.className || "";
+  options.hash.className = options.hash.className || '';
   options.hash.url = encodeUrl(options.hash.url);
 
-  return templateManager.apply("build/templates/diagram.template", options.hash);
+  return templateManager.apply('build/templates/diagram.template', options.hash);
 });
 
 Handlebars.registerHelper('image', function(options) {
 
   options.hash.examplePath = options.data.root.examplePath;
-  options.hash.className = options.hash.className || "";
-  options.hash.caption = options.hash.caption || "";
+  options.hash.className = options.hash.className || '';
+  options.hash.caption = options.hash.caption || '';
 
   if (options.hash.url.substring(0, 4) === 'http') {
-    options.hash.examplePath = "";
+    options.hash.examplePath = '';
   }
 
-  return templateManager.apply("build/templates/image.template", options.hash);
+  return templateManager.apply('build/templates/image.template', options.hash);
 });
 
 Handlebars.registerHelper('selected', function(options) {
@@ -172,7 +173,7 @@ Handlebars.registerHelper('selected', function(options) {
   const re = options.hash.re;
   const sub = options.hash.sub;
 
-  let a = this[key];
+  const a = this[key];
   let b = options.data.root[value];
 
   if (re) {
@@ -187,27 +188,27 @@ function slashify(s) {
   return s.replace(/\\/g, '/');
 }
 
-var Builder = function(outBaseDir, options) {
+const Builder = function(outBaseDir, options) {
 
-  var g_articlesByLang = {};
-  var g_articles = [];
-  var g_langInfo;
-  var g_langDB = {};
-  var g_outBaseDir = outBaseDir;
-  var g_origPath = options.origPath;
+  const g_articlesByLang = {};
+  let g_articles = [];
+  let g_langInfo;
+  const g_langDB = {};
+  const g_outBaseDir = outBaseDir;
+  const g_origPath = options.origPath;
 
   // This are the english articles.
-  var g_origArticles = glob.sync(path.join(g_origPath, "*.md")).map(a => path.basename(a)).filter(a => a !== 'index.md');
+  const g_origArticles = glob.sync(path.join(g_origPath, '*.md')).map(a => path.basename(a)).filter(a => a !== 'index.md');
 
-  var extractHeader = (function() {
-    var headerRE = /([A-Z0-9_-]+): (.*?)$/i;
+  const extractHeader = (function() {
+    const headerRE = /([A-Z0-9_-]+): (.*?)$/i;
 
     return function(content) {
-      var metaData = { };
-      var lines = content.split("\n");
-      while (true) {
-        var line = lines[0].trim();
-        var m = headerRE.exec(line);
+      const metaData = { };
+      const lines = content.split('\n');
+      for (;;) {
+        const line = lines[0].trim();
+        const m = headerRE.exec(line);
         if (!m) {
           break;
         }
@@ -215,31 +216,31 @@ var Builder = function(outBaseDir, options) {
         lines.shift();
       }
       return {
-        content: lines.join("\n"),
+        content: lines.join('\n'),
         headers: metaData,
       };
     };
   }());
 
-  var parseMD = function(content) {
+  const parseMD = function(content) {
     return extractHeader(content);
   };
 
-  var loadMD = function(contentFileName) {
-    var content = cache.readFileSync(contentFileName, "utf-8");
+  const loadMD = function(contentFileName) {
+    const content = cache.readFileSync(contentFileName, 'utf-8');
     return parseMD(content);
   };
 
   function extractHandlebars(content) {
-    var tripleRE = /\{\{\{.*?\}\}\}/g;
-    var doubleRE = /\{\{\{.*?\}\}\}/g;
+    const tripleRE = /\{\{\{.*?\}\}\}/g;
+    const doubleRE = /\{\{\{.*?\}\}\}/g;
 
-    var numExtractions = 0;
-    var extractions = {
+    let numExtractions = 0;
+    const extractions = {
     };
 
     function saveHandlebar(match) {
-      var id = "==HANDLEBARS_ID_" + (++numExtractions) + "==";
+      const id = '==HANDLEBARS_ID_' + (++numExtractions) + '==';
       extractions[id] = match;
       return id;
     }
@@ -254,12 +255,12 @@ var Builder = function(outBaseDir, options) {
   }
 
   function insertHandlebars(info, content) {
-    var handlebarRE = /==HANDLEBARS_ID_\d+==/g;
+    const handlebarRE = /==HANDLEBARS_ID_\d+==/g;
 
     function restoreHandlebar(match) {
-      var value = info.extractions[match];
+      const value = info.extractions[match];
       if (value === undefined) {
-        throw new Error("no match restoring handlebar for: " + match);
+        throw new Error('no match restoring handlebar for: ' + match);
       }
       return value;
     }
@@ -269,22 +270,22 @@ var Builder = function(outBaseDir, options) {
     return content;
   }
 
-  var applyTemplateToContent = function(templatePath, contentFileName, outFileName, opt_extra, data) {
+  const applyTemplateToContent = function(templatePath, contentFileName, outFileName, opt_extra, data) {
     // Call prep's Content which parses the HTML. This helps us find missing tags
     // should probably call something else.
     //Convert(md_content)
-    var metaData = data.headers;
-    var content = data.content;
+    const metaData = data.headers;
+    const content = data.content;
     //console.log(JSON.stringify(metaData, undefined, "  "));
-    var info = extractHandlebars(content);
-    var html = marked(info.content);
+    const info = extractHandlebars(content);
+    let html = marked(info.content);
     html = insertHandlebars(info, html);
     html = replaceParams(html, [opt_extra, g_langInfo]);
     const relativeOutName = slashify(outFileName).substring(g_outBaseDir.length);
     const langs = Object.keys(g_langDB).map((name) => {
       const lang = g_langDB[name];
       const url = slashify(path.join(lang.basePath, path.basename(outFileName)))
-         .replace("index.html", "")
+         .replace('index.html', '')
          .replace(/^\/threejs\/lessons\/$/, '/');
       return {
         lang: lang.lang,
@@ -296,49 +297,49 @@ var Builder = function(outBaseDir, options) {
     metaData['langs'] = langs;
     metaData['src_file_name'] = slashify(contentFileName);
     metaData['dst_file_name'] = relativeOutName;
-    metaData['basedir'] = "";
+    metaData['basedir'] = '';
     metaData['toc'] = opt_extra.toc;
     metaData['templateOptions'] = opt_extra.templateOptions;
     metaData['langInfo'] = g_langInfo;
-    metaData['url'] = "http://threejsfundamentals.org" + relativeOutName;
+    metaData['url'] = 'http://threejsfundamentals.org' + relativeOutName;
     metaData['relUrl'] = relativeOutName;
-    metaData['screenshot'] = "http://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg";
-    var basename = path.basename(contentFileName, ".md");
-    [".jpg", ".png"].forEach(function(ext) {
-      var filename = path.join("threejs", "lessons", "screenshots", basename + ext);
+    metaData['screenshot'] = 'http://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg';
+    const basename = path.basename(contentFileName, '.md');
+    ['.jpg', '.png'].forEach(function(ext) {
+      const filename = path.join('threejs', 'lessons', 'screenshots', basename + ext);
       if (fs.existsSync(filename)) {
-        metaData['screenshot'] = "http://threejsfundamentals.org/threejs/lessons/screenshots/" + basename + ext;
+        metaData['screenshot'] = 'http://threejsfundamentals.org/threejs/lessons/screenshots/' + basename + ext;
       }
     });
-    var output = templateManager.apply(templatePath, metaData);
+    const output = templateManager.apply(templatePath, metaData);
     writeFileIfChanged(outFileName, output);
 
     return metaData;
   };
 
-  var applyTemplateToFile = function(templatePath, contentFileName, outFileName, opt_extra) {
-    console.log("processing: ", contentFileName);
+  const applyTemplateToFile = function(templatePath, contentFileName, outFileName, opt_extra) {
+    console.log('processing: ', contentFileName);
     opt_extra = opt_extra || {};
-    var data = loadMD(contentFileName);
-    var metaData= applyTemplateToContent(templatePath, contentFileName, outFileName, opt_extra, data);
+    const data = loadMD(contentFileName);
+    const metaData = applyTemplateToContent(templatePath, contentFileName, outFileName, opt_extra, data);
     g_articles.push(metaData);
   };
 
-  var applyTemplateToFiles = function(templatePath, filesSpec, extra) {
-    var files = glob.sync(filesSpec).sort();
+  const applyTemplateToFiles = function(templatePath, filesSpec, extra) {
+    const files = glob.sync(filesSpec).sort();
     files.forEach(function(fileName) {
-      var ext = path.extname(fileName);
-      var baseName = fileName.substr(0, fileName.length - ext.length);
-      var outFileName = path.join(outBaseDir, baseName + ".html");
+      const ext = path.extname(fileName);
+      const baseName = fileName.substr(0, fileName.length - ext.length);
+      const outFileName = path.join(outBaseDir, baseName + '.html');
       applyTemplateToFile(templatePath, fileName, outFileName, extra);
     });
 
   };
 
-  var addArticleByLang = function(article, lang) {
-    var filename = path.basename(article.dst_file_name);
-    var articleInfo = g_articlesByLang[filename];
-    var url = "http://threejsfundamentals.org" + article.dst_file_name;
+  const addArticleByLang = function(article, lang) {
+    const filename = path.basename(article.dst_file_name);
+    let articleInfo = g_articlesByLang[filename];
+    const url = 'http://threejsfundamentals.org' + article.dst_file_name;
     if (!articleInfo) {
       articleInfo = {
         url: url,
@@ -353,9 +354,9 @@ var Builder = function(outBaseDir, options) {
     });
   };
 
-  var getLanguageSelection = function(lang) {
-    var lessons = lang.lessons || ("threejs/lessons/" + lang.lang);
-    var langInfo = hanson.parse(fs.readFileSync(path.join(lessons, "langinfo.hanson"), {encoding: "utf8"}));
+  const getLanguageSelection = function(lang) {
+    const lessons = lang.lessons || ('threejs/lessons/' + lang.lang);
+    const langInfo = hanson.parse(fs.readFileSync(path.join(lessons, 'langinfo.hanson'), {encoding: 'utf8'}));
     langInfo.langCode = langInfo.langCode || lang.lang;
     langInfo.home = lang.home || ('/' + lessons + '/');
     g_langDB[lang.lang] = {
@@ -371,50 +372,50 @@ var Builder = function(outBaseDir, options) {
   };
 
   this.process = function(options) {
-    console.log("Processing Lang: " + options.lang);
-    options.lessons     = options.lessons     || ("threejs/lessons/" + options.lang);
-    options.toc         = options.toc         || ("threejs/lessons/" + options.lang + "/toc.html");
-    options.template    = options.template    || "build/templates/lesson.template";
-    options.examplePath = options.examplePath === undefined ? "/threejs/lessons/" : options.examplePath;
+    console.log('Processing Lang: ' + options.lang);
+    options.lessons     = options.lessons     || ('threejs/lessons/' + options.lang);
+    options.toc         = options.toc         || ('threejs/lessons/' + options.lang + '/toc.html');
+    options.template    = options.template    || 'build/templates/lesson.template';
+    options.examplePath = options.examplePath === undefined ? '/threejs/lessons/' : options.examplePath;
 
     g_articles = [];
     g_langInfo = g_langDB[options.lang].langInfo;
 
-    applyTemplateToFiles(options.template, path.join(options.lessons, "threejs*.md"), options);
+    applyTemplateToFiles(options.template, path.join(options.lessons, 'threejs*.md'), options);
 
     // generate place holders for non-translated files
-    var articlesFilenames = g_articles.map(a => path.basename(a.src_file_name));
-    var missing = g_origArticles.filter(name => articlesFilenames.indexOf(name) < 0);
+    const articlesFilenames = g_articles.map(a => path.basename(a.src_file_name));
+    const missing = g_origArticles.filter(name => articlesFilenames.indexOf(name) < 0);
     missing.forEach(name => {
       const ext = path.extname(name);
       const baseName = name.substr(0, name.length - ext.length);
-      const outFileName = path.join(outBaseDir, options.lessons, baseName + ".html");
+      const outFileName = path.join(outBaseDir, options.lessons, baseName + '.html');
       const data = Object.assign({}, loadMD(path.join(g_origPath, name)));
       data.content = g_langInfo.missing;
       const extra = {
-        origLink: '/' + slashify(path.join(g_origPath, baseName + ".html")),
+        origLink: '/' + slashify(path.join(g_origPath, baseName + '.html')),
         toc: options.toc,
       };
-      console.log("  generating missing:", outFileName);
+      console.log('  generating missing:', outFileName);
       applyTemplateToContent(
-          "build/templates/missing.template",
-          path.join(options.lessons, "langinfo.hanson"),
+          'build/templates/missing.template',
+          path.join(options.lessons, 'langinfo.hanson'),
           outFileName,
           extra,
           data);
     });
 
     function utcMomentFromGitLog(result) {
-      const dateStr = result.stdout.split("\n")[0].trim();
-      let utcDateStr = dateStr
-        .replace(/"/g, "")   // WTF to these quotes come from!??!
-        .replace(" ", "T")
-        .replace(" ", "")
+      const dateStr = result.stdout.split('\n')[0].trim();
+      const utcDateStr = dateStr
+        .replace(/"/g, '')   // WTF to these quotes come from!??!
+        .replace(' ', 'T')
+        .replace(' ', '')
         .replace(/(\d\d)$/, ':$1');
       return moment.utc(utcDateStr);
     }
 
-    const tasks = g_articles.map((article, ndx) => {
+    const tasks = g_articles.map((article) => {
       return function() {
         return executeP('git', [
           'log',
@@ -426,7 +427,7 @@ var Builder = function(outBaseDir, options) {
           article.dateAdded = utcMomentFromGitLog(result);
         });
       };
-    }).concat(g_articles.map((article, ndx) => {
+    }).concat(g_articles.map((article) => {
        return function() {
          return executeP('git', [
            'log',
@@ -443,14 +444,14 @@ var Builder = function(outBaseDir, options) {
     return tasks.reduce(function(cur, next){
         return cur.then(next);
     }, Promise.resolve()).then(function() {
-      var articles = g_articles.filter(function(article) {
-        return article.dateAdded != undefined;
+      let articles = g_articles.filter(function(article) {
+        return article.dateAdded !== undefined;
       });
       articles = articles.sort(function(a, b) {
         return b.dateAdded - a.dateAdded;
       });
 
-      var feed = new Feed({
+      const feed = new Feed({
         title:          g_langInfo.title,
         description:    g_langInfo.description,
         link:           g_langInfo.link,
@@ -464,11 +465,11 @@ var Builder = function(outBaseDir, options) {
         },
       });
 
-      articles.forEach(function(article, ndx) {
+      articles.forEach(function(article) {
         feed.addItem({
           title:          article.title,
-          link:           "http://threejsfundamentals.org" + article.dst_file_name,
-          description:    "",
+          link:           'http://threejsfundamentals.org' + article.dst_file_name,
+          description:    '',
           author: [
             {
               name:       'threejsfundamenals contributors',
@@ -486,8 +487,8 @@ var Builder = function(outBaseDir, options) {
       });
 
       try {
-        const outPath = path.join(g_outBaseDir, options.lessons, "atom.xml");
-        console.log("write:", outPath);
+        const outPath = path.join(g_outBaseDir, options.lessons, 'atom.xml');
+        console.log('write:', outPath);
         writeFileIfChanged(outPath, feed.atom1());
       } catch (err) {
         return Promise.reject(err);
@@ -496,30 +497,30 @@ var Builder = function(outBaseDir, options) {
     }).then(function() {
       // this used to insert a table of contents
       // but it was useless being auto-generated
-      applyTemplateToFile("build/templates/index.template", path.join(options.lessons, "index.md"), path.join(g_outBaseDir, options.lessons, "index.html"), {
-        table_of_contents: "",
+      applyTemplateToFile('build/templates/index.template', path.join(options.lessons, 'index.md'), path.join(g_outBaseDir, options.lessons, 'index.html'), {
+        table_of_contents: '',
         templateOptions: g_langInfo,
       });
       return Promise.resolve();
     }, function(err) {
-      console.error("ERROR!:");
+      console.error('ERROR!:');
       console.error(err);
       if (err.stack) {
         console.error(err.stack);
       }
       throw new Error(err.toString());
     });
-  }
+  };
 
   this.writeGlobalFiles = function() {
-    var sm = sitemap.createSitemap ({
+    const sm = sitemap.createSitemap({
       hostname: 'http://threejsfundamentals.org',
       cacheTime: 600000,
     });
-    var articleLangs = { };
+    const articleLangs = { };
     Object.keys(g_articlesByLang).forEach(function(filename) {
-      var article = g_articlesByLang[filename];
-      var langs = {};
+      const article = g_articlesByLang[filename];
+      const langs = {};
       article.links.forEach(function(link) {
         langs[link.lang] = true;
       });
@@ -532,55 +533,55 @@ var Builder = function(outBaseDir, options) {
     // };
     // var langJS = "window.langDB = " + JSON.stringify(langInfo, null, 2);
     // writeFileIfChanged(path.join(g_outBaseDir, "langdb.js"), langJS);
-    writeFileIfChanged(path.join(g_outBaseDir, "sitemap.xml"), sm.toString());
-    copyFile(path.join(g_outBaseDir, "threejs/lessons/atom.xml"), path.join(g_outBaseDir, "atom.xml"));
-    copyFile(path.join(g_outBaseDir, "threejs/lessons/index.html"), path.join(g_outBaseDir, "index.html"));
+    writeFileIfChanged(path.join(g_outBaseDir, 'sitemap.xml'), sm.toString());
+    copyFile(path.join(g_outBaseDir, 'threejs/lessons/atom.xml'), path.join(g_outBaseDir, 'atom.xml'));
+    copyFile(path.join(g_outBaseDir, 'threejs/lessons/index.html'), path.join(g_outBaseDir, 'index.html'));
 
-    applyTemplateToFile("build/templates/index.template", "contributors.md", path.join(g_outBaseDir, "contributors.html"), {
-      table_of_contents: "",
-      templateOptions: "",
+    applyTemplateToFile('build/templates/index.template', 'contributors.md', path.join(g_outBaseDir, 'contributors.html'), {
+      table_of_contents: '',
+      templateOptions: '',
     });
   };
 
 
 };
 
-var b = new Builder("out", {
-  origPath: "threejs/lessons",  // english articles
+const b = new Builder('out', {
+  origPath: 'threejs/lessons',  // english articles
 });
 
-var readdirs = function(dirpath) {
-  var dirsOnly = function(filename) {
-    var stat = fs.statSync(filename);
+const readdirs = function(dirpath) {
+  const dirsOnly = function(filename) {
+    const stat = fs.statSync(filename);
     return stat.isDirectory();
   };
 
-  var addPath = function(filename) {
+  const addPath = function(filename) {
     return path.join(dirpath, filename);
   };
 
-  return fs.readdirSync("threejs/lessons")
+  return fs.readdirSync('threejs/lessons')
       .map(addPath)
       .filter(dirsOnly);
 };
 
-var isLangFolder = function(dirname) {
-  var filename = path.join(dirname, "langinfo.hanson");
+const isLangFolder = function(dirname) {
+  const filename = path.join(dirname, 'langinfo.hanson');
   return fs.existsSync(filename);
 };
 
 
-var pathToLang = function(filename) {
+const pathToLang = function(filename) {
   return {
     lang: path.basename(filename),
   };
 };
 
-var langs = [
+let langs = [
   // English is special (sorry it's where I started)
   {
-    template: "build/templates/lesson.template",
-    lessons: "threejs/lessons",
+    template: 'build/templates/lesson.template',
+    lessons: 'threejs/lessons',
     lang: 'en',
     toc: 'threejs/lessons/toc.html',
     examplePath: '/threejs/lessons/',
@@ -588,13 +589,13 @@ var langs = [
   },
 ];
 
-langs = langs.concat(readdirs("threejs/lessons")
+langs = langs.concat(readdirs('threejs/lessons')
     .filter(isLangFolder)
     .map(pathToLang));
 
 b.preProcess(langs);
 
-var tasks = langs.map(function(lang) {
+const tasks = langs.map(function(lang) {
   return function() {
     return b.process(lang);
   };

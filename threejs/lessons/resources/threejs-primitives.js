@@ -121,7 +121,6 @@ function main() {
           u = u * 2;
 
           let x;
-          let y;
           let z;
 
           if (u < Math.PI) {
@@ -132,7 +131,7 @@ function main() {
               z = -8 * Math.sin(u);
           }
 
-          y = -2 * (1 - Math.cos(u) / 2) * Math.sin(v);
+          const y = -2 * (1 - Math.cos(u) / 2) * Math.sin(v);
 
           target.set(x, y, z).multiplyScalar(0.75);
         }
@@ -516,6 +515,8 @@ function main() {
       const top    = rect.top * pixelRatio;
 
       if (width !== oldWidth || height !== oldHeight) {
+        oldWidth = width;
+        oldHeight = height;
         controls.handleResize();
       }
       controls.update();

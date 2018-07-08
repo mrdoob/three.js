@@ -27,10 +27,12 @@ module.exports = function(grunt) {
         src: [
           'threejs/resources/*.js',
         ],
-        options: {
-          //configFile: 'build/conf/eslint.json',
-          //rulesdir: ['build/rules'],
-        },
+      },
+      support: {
+        src: [
+          'Gruntfile.js',
+          'build/js/build.js',
+        ],
       },
       examples: {
         src: [
@@ -39,9 +41,6 @@ module.exports = function(grunt) {
           '!threejs/lessons/resources/prettify.js',
           'threejs/lessons/resources/*.html',
         ],
-        options: {
-//          configFile: 'build/conf/eslint-examples.json',
-        },
       },
     },
     copy: {
@@ -60,8 +59,8 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('buildlessons', function() {
-    var buildStuff = require('./build/js/build');
-    var finish = this.async();
+    const buildStuff = require('./build/js/build');
+    const finish = this.async();
     buildStuff().then(function() {
         finish();
     }).done();

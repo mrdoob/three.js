@@ -10,9 +10,9 @@ function getQuery(s) {
   if (s[0] === '?' ) {
     s = s.substring(1);
   }
-  var query = {};
+  const query = {};
   s.split('&').forEach(function(pair) {
-      var parts = pair.split('=').map(decodeURIComponent);
+      const parts = pair.split('=').map(decodeURIComponent);
       query[parts[0]] = parts[1];
   });
   return query;
@@ -20,7 +20,7 @@ function getQuery(s) {
 
 function getSearch(url) {
   // yea I know this is not perfect but whatever
-  var s = url.indexOf('?');
+  const s = url.indexOf('?');
   return s < 0 ? {} : getQuery(url.substring(s));
 }
 
@@ -33,10 +33,10 @@ const getFQUrl = (function() {
 }());
 
 function getHTML(url, callback) {
-  var req = new XMLHttpRequest();
+  const req = new XMLHttpRequest();
   req.open('GET', url, true);
   req.addEventListener('load', function() {
-    var success = req.status === 200 || req.status === 0;
+    const success = req.status === 200 || req.status === 0;
     callback(success ? null : 'could not load: ' + url, req.responseText);
   });
   req.addEventListener('timeout', function() {
@@ -49,13 +49,13 @@ function getHTML(url, callback) {
 }
 
 function fixSourceLinks(url, source) {
-  var srcRE = /(src=)"(.*?)"/g;
-  var linkRE = /(href=)"(.*?")/g;
-  var imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
-  var loaderLoadRE = /(loader\.load)\(('|")(.*?)('|")/g;
+  const srcRE = /(src=)"(.*?)"/g;
+  const linkRE = /(href=)"(.*?")/g;
+  const imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
+  const loaderLoadRE = /(loader\.load)\(('|")(.*?)('|")/g;
 
-  var u = new URL(window.location.origin + url);
-  var prefix = u.origin + dirname(u.pathname);
+  const u = new URL(window.location.origin + url);
+  const prefix = u.origin + dirname(u.pathname);
 
   function addPrefix(url) {
     return url.indexOf('://') < 0 ? (prefix + url) : url;
@@ -73,11 +73,11 @@ function fixSourceLinks(url, source) {
   return source;
 }
 
-var g = {
+const g = {
   html: '',
 };
 
-var htmlParts = {
+const htmlParts = {
   js: {
     language: 'javascript',
   },
@@ -91,14 +91,14 @@ var htmlParts = {
 
 function forEachHTMLPart(fn) {
   Object.keys(htmlParts).forEach(function(name, ndx) {
-    var info = htmlParts[name];
+    const info = htmlParts[name];
     fn(info, ndx, name);
   });
 }
 
 
 function getHTMLPart(re, obj, tag) {
-  var part = '';
+  let part = '';
   obj.html = obj.html.replace(re, function(p0, p1) {
     part = p1;
     return tag;
@@ -111,35 +111,35 @@ function parseHTML(url, html) {
 
   html = html.replace(/<div class="description">[^]*?<\/div>/, '');
 
-  var styleRE = /<style>([^]*?)<\/style>/i;
-  var titleRE = /<title>([^]*?)<\/title>/i;
-  var bodyRE = /<body>([^]*?)<\/body>/i;
-  var inlineScriptRE = /<script>([^]*?)<\/script>/i;
-  var externalScriptRE = /(<!--(?:(?!-->)[\s\S])*?-->\n){0,1}<script\s*src\s*=\s*"(.*?)"\s*>\s*<\/script>/ig;
-  var dataScriptRE = /(<!--(?:(?!-->)[\s\S])*?-->\n){0,1}<script (.*?)>([^]*?)<\/script>/ig;
-  var cssLinkRE = /<link ([^>]+?)>/g;
-  var isCSSLinkRE = /type="text\/css"|rel="stylesheet"/;
-  var hrefRE = /href="([^"]+)"/;
+  const styleRE = /<style>([^]*?)<\/style>/i;
+  const titleRE = /<title>([^]*?)<\/title>/i;
+  const bodyRE = /<body>([^]*?)<\/body>/i;
+  const inlineScriptRE = /<script>([^]*?)<\/script>/i;
+  const externalScriptRE = /(<!--(?:(?!-->)[\s\S])*?-->\n){0,1}<script\s*src\s*=\s*"(.*?)"\s*>\s*<\/script>/ig;
+  const dataScriptRE = /(<!--(?:(?!-->)[\s\S])*?-->\n){0,1}<script (.*?)>([^]*?)<\/script>/ig;
+  const cssLinkRE = /<link ([^>]+?)>/g;
+  const isCSSLinkRE = /type="text\/css"|rel="stylesheet"/;
+  const hrefRE = /href="([^"]+)"/;
 
-  var obj = { html: html };
+  const obj = { html: html };
   htmlParts.css.source = getHTMLPart(styleRE, obj, '<style>\n${css}</style>');
   htmlParts.html.source = getHTMLPart(bodyRE, obj, '<body>${html}</body>');
   htmlParts.js.source = getHTMLPart(inlineScriptRE, obj, '<script>${js}</script>');
   html = obj.html;
 
-  var tm = titleRE.exec(html);
+  const tm = titleRE.exec(html);
   if (tm) {
     g.title = tm[1];
   }
 
-  var scripts = '';
+  let scripts = '';
   html = html.replace(externalScriptRE, function(p0, p1, p2) {
     p1 = p1 || '';
     scripts += '\n' + p1 + '<script src="' + p2 + '"></script>';
     return '';
   });
 
-  var dataScripts = '';
+  let dataScripts = '';
   html = html.replace(dataScriptRE, function(p0, p1, p2, p3) {
     p1 = p1 || '';
     dataScripts += '\n' + p1 + '<script ' + p2 + '>' + p3 + '</script>';
@@ -159,10 +159,10 @@ function parseHTML(url, html) {
   // query params but that only works in Firefox >:(
   html = html.replace('</head>', '<script id="hackedparams">window.hackedParams = ${hackedParams}\n</script>\n</head>');
 
-  var links = '';
+  let links = '';
   html = html.replace(cssLinkRE, function(p0, p1) {
     if (isCSSLinkRE.test(p1)) {
-      var m = hrefRE.exec(p1);
+      const m = hrefRE.exec(p1);
       if (m) {
         links += `@import url("${m[1]}");\n`;
       }
@@ -183,7 +183,7 @@ function cantGetHTML(e) {  // eslint-disable-line
 }
 
 function main() {
-  var query = getQuery();
+  const query = getQuery();
   g.url = getFQUrl(query.url);
   g.query = getSearch(g.url);
   getHTML(query.url, function(err, html) {
@@ -201,29 +201,29 @@ function main() {
 }
 
 
-var blobUrl;
+let blobUrl;
 function getSourceBlob(options) {
   options = options || {};
   if (blobUrl) {
     URL.revokeObjectURL(blobUrl);
   }
-  var source = g.html;
+  let source = g.html;
   source = source.replace('${hackedParams}', JSON.stringify(g.query));
   source = source.replace('${html}', htmlParts.html.editor.getValue());
   source = source.replace('${css}', htmlParts.css.editor.getValue());
   source = source.replace('${js}', htmlParts.js.editor.getValue());
   source = source.replace('<head>', '<head>\n<script match="false">threejsLessonSettings = ' + JSON.stringify(options) + ';</script>');
 
-  var scriptNdx = source.indexOf('<script>');
+  const scriptNdx = source.indexOf('<script>');
   g.numLinesBeforeScript = (source.substring(0, scriptNdx).match(/\n/g) || []).length;
 
-  var blob = new Blob([source], {type: 'text/html'});
+  const blob = new Blob([source], {type: 'text/html'});
   blobUrl = URL.createObjectURL(blob);
   return blobUrl;
 }
 
 function dirname(path) {
-  var ndx = path.lastIndexOf('/');
+  const ndx = path.lastIndexOf('/');
   return path.substring(0, ndx + 1);
 }
 
@@ -359,22 +359,22 @@ function toggleFullscreen() {
 
 function run(options) {
   g.setPosition = false;
-  var url = getSourceBlob(options);
+  const url = getSourceBlob(options);
   g.iframe.src = url;
 }
 
 function addClass(elem, className) {
-  var parts = elem.className.split(' ');
+  const parts = elem.className.split(' ');
   if (parts.indexOf(className) < 0) {
     elem.className = elem.className + ' ' + className;
   }
 }
 
 function removeClass(elem, className) {
-  var parts = elem.className.split(' ');
-  var numParts = parts.length;
+  const parts = elem.className.split(' ');
+  const numParts = parts.length;
   for (;;) {
-    var ndx = parts.indexOf(className);
+    const ndx = parts.indexOf(className);
     if (ndx < 0) {
       break;
     }
@@ -415,7 +415,7 @@ function addRemoveClass(elem, className, add) {
 
 function toggleSourcePane(pressedButton) {
   forEachHTMLPart(function(info) {
-    var pressed = pressedButton === info.button;
+    const pressed = pressedButton === info.button;
     if (pressed && !info.showing) {
       addClass(info.button, 'show');
       info.parent.style.display = 'block';
@@ -434,7 +434,7 @@ function showingResultPane() {
   return g.result.style.display !== 'none';
 }
 function toggleResultPane() {
-  var showing = showingResultPane();
+  const showing = showingResultPane();
   g.result.style.display = showing ? 'none' : 'block';
   addRemoveClass(g.resultButton, 'show', !showing);
   showOtherIfAllPanesOff();
@@ -442,7 +442,7 @@ function toggleResultPane() {
 }
 
 function showOtherIfAllPanesOff() {
-  var paneOn = showingResultPane();
+  let paneOn = showingResultPane();
   forEachHTMLPart(function(info) {
     paneOn = paneOn || info.showing;
   });
@@ -450,7 +450,7 @@ function showOtherIfAllPanesOff() {
 }
 
 function getActualLineNumberAndMoveTo(lineNo, colNo) {
-  var actualLineNo = lineNo - g.numLinesBeforeScript;
+  const actualLineNo = lineNo - g.numLinesBeforeScript;
   if (!g.setPosition) {
     // Only set the first position
     g.setPosition = true;
@@ -480,12 +480,12 @@ function runEditor(parent, source, language) {
 }
 
 function start() {
-  var query = getQuery();
-  var parentQuery = getQuery(window.parent.location.search);
-  var isSmallish = window.navigator.userAgent.match(/Android|iPhone|iPod|Windows Phone/i);
-  var isEdge = window.navigator.userAgent.match(/Edge/i);
+  const query = getQuery();
+  const parentQuery = getQuery(window.parent.location.search);
+  const isSmallish = window.navigator.userAgent.match(/Android|iPhone|iPod|Windows Phone/i);
+  const isEdge = window.navigator.userAgent.match(/Edge/i);
   if (isEdge || isSmallish || parentQuery.editor === 'false') {
-    var url = query.url;
+    const url = query.url;
     window.location.href = url;
   } else {
     require.config({ paths: { 'vs': '/monaco-editor/min/vs' }});
