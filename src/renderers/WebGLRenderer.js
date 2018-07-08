@@ -86,6 +86,7 @@ function WebGLRenderer( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
+	this.sortGroups = false;
 
 	// user-defined clipping
 
@@ -127,6 +128,7 @@ function WebGLRenderer( parameters ) {
 		_currentFramebuffer = null,
 		_currentMaterialId = - 1,
 		_currentGeometryProgram = '',
+		_currentGroupOrder = 0,
 
 		_currentCamera = null,
 		_currentArrayCamera = null,
@@ -1056,7 +1058,7 @@ function WebGLRenderer( parameters ) {
 		currentRenderList = renderLists.get( scene, camera );
 		currentRenderList.init();
 
-		projectObject( scene, camera, _this.sortObjects );
+		projectObject( scene, camera, _this.sortObjects, _this.sortGroups );
 
 		if ( _this.sortObjects === true ) {
 
@@ -1208,7 +1210,7 @@ function WebGLRenderer( parameters ) {
 	}
 	*/
 
-	function projectObject( object, camera, sortObjects ) {
+	function projectObject( object, camera, sortObjects, sortGroups ) {
 
 		if ( object.visible === false ) return;
 
@@ -1216,7 +1218,11 @@ function WebGLRenderer( parameters ) {
 
 		if ( visible ) {
 
-			if ( object.isLight ) {
+			if ( object.isGroup ) {
+
+				if ( sortGroups === true ) _currentGroupOrder = ++ _currentGroupOrder;
+
+			}	else if ( object.isLight ) {
 
 				currentRenderState.pushLight( object );
 
@@ -1242,7 +1248,7 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
-					currentRenderList.push( object, geometry, material, _vector3.z, null );
+					currentRenderList.push( object, geometry, material, _vector3.z, null, _currentGroupOrder );
 
 				}
 
@@ -1255,7 +1261,7 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				currentRenderList.push( object, null, object.material, _vector3.z, null );
+				currentRenderList.push( object, null, object.material, _vector3.z, null, _currentGroupOrder );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -1288,7 +1294,7 @@ function WebGLRenderer( parameters ) {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
+								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group, _currentGroupOrder );
 
 							}
 
@@ -1296,7 +1302,7 @@ function WebGLRenderer( parameters ) {
 
 					} else if ( material.visible ) {
 
-						currentRenderList.push( object, geometry, material, _vector3.z, null );
+						currentRenderList.push( object, geometry, material, _vector3.z, null, _currentGroupOrder );
 
 					}
 
@@ -1310,7 +1316,7 @@ function WebGLRenderer( parameters ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ], camera, sortObjects );
+			projectObject( children[ i ], camera, sortObjects, sortGroups );
 
 		}
 
