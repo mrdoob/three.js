@@ -22921,9 +22921,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isImmediateRenderObject ) {
 
-			var frontFaceCW = ( object.isMesh && object.normalMatrix.determinant() < 0 );
-
-			state.setMaterial( material, frontFaceCW );
+			state.setMaterial( material );
 
 			var program = setProgram( camera, scene.fog, material, object );
 
@@ -24545,14 +24543,35 @@ SpriteMaterial.prototype.copy = function ( source ) {
  * @author alteredq / http://alteredqualia.com/
  */
 
+var geometry;
+
 function Sprite( material ) {
 
 	Object3D.call( this );
 
 	this.type = 'Sprite';
 
+	if ( geometry === undefined ) {
+
+		geometry = new BufferGeometry();
+
+		var float32Array = new Float32Array( [
+			- 0.5, - 0.5, 0, 0, 0,
+			0.5, - 0.5, 0, 1, 0,
+			0.5, 0.5, 0, 1, 1,
+			- 0.5, 0.5, 0, 0, 1
+		] );
+
+		var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+
+		geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+		geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+		geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+
+	}
+
+	this.geometry = geometry;
 	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
-	this.geometry = SpriteGeometry;
 
 	this.center = new Vector2( 0.5, 0.5 );
 
@@ -24677,29 +24696,6 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 
 } );
-
-//
-
-var SpriteGeometry = ( function () {
-
-	var geometry = new BufferGeometry();
-
-	var float32Array = new Float32Array( [
-		- 0.5, - 0.5, 0, 0, 0,
-		0.5, - 0.5, 0, 1, 0,
-		0.5, 0.5, 0, 1, 1,
-		- 0.5, 0.5, 0, 0, 1
-	] );
-
-	var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
-
-	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-	geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-	geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
-
-	return geometry;
-
-} )();
 
 /**
  * @author mikael emtinger / http://gomo.se/
