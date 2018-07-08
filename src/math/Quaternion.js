@@ -393,6 +393,12 @@ Object.assign( Quaternion.prototype, {
 
 	}(),
 
+	angleTo: function ( q ) {
+
+		return 2 * Math.acos( Math.abs( this.dot( q ) ) );
+
+	},
+
 	inverse: function () {
 
 		// quaternion is assumed to have unit length
