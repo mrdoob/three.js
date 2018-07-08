@@ -1,3 +1,4 @@
+import { _Math } from './Math.js';
 import { Vector3 } from './Vector3.js';
 
 /**
@@ -395,7 +396,7 @@ Object.assign( Quaternion.prototype, {
 
 	angleTo: function ( q ) {
 
-		return 2 * Math.acos( Math.abs( this.dot( q ) ) );
+		return 2 * Math.acos( Math.abs( _Math.clamp( this.dot( q ), - 1, 1 ) ) );
 
 	},
 
