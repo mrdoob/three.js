@@ -2563,7 +2563,10 @@ function WebGLRenderer( parameters ) {
 		var height = texture.image.height;
 		var glFormat = utils.convert( texture.format );
 
-		this.setTexture2D( texture, 0 );
+		var textureProperties = properties.get( texture );
+
+		state.activeTexture( _gl.TEXTURE0 );
+		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 
 		_gl.copyTexImage2D( _gl.TEXTURE_2D, level || 0, glFormat, position.x, position.y, width, height, 0 );
 
@@ -2576,7 +2579,10 @@ function WebGLRenderer( parameters ) {
 		var glFormat = utils.convert( dstTexture.format );
 		var glType = utils.convert( dstTexture.type );
 
-		this.setTexture2D( dstTexture, 0 );
+		var textureProperties = properties.get( dstTexture );
+
+		state.activeTexture( _gl.TEXTURE0 );
+		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 
 		if ( srcTexture.isDataTexture ) {
 
