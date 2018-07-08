@@ -575,7 +575,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	this.renderBufferImmediate = function ( object, program, material ) {
+	this.renderBufferImmediate = function ( object, program ) {
 
 		state.initAttributes();
 
