@@ -565,11 +565,11 @@ function WebGLRenderer( parameters ) {
 
 	// Buffer rendering
 
-	function renderObjectImmediate( object, program, material ) {
+	function renderObjectImmediate( object, program ) {
 
 		object.render( function ( object ) {
 
-			_this.renderBufferImmediate( object, program, material );
+			_this.renderBufferImmediate( object, program );
 
 		} );
 
@@ -1390,7 +1390,7 @@ function WebGLRenderer( parameters ) {
 
 			_currentGeometryProgram = '';
 
-			renderObjectImmediate( object, program, material );
+			renderObjectImmediate( object, program );
 
 		} else {
 
