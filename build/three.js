@@ -2296,6 +2296,12 @@
 
 		}(),
 
+		angleTo: function ( q ) {
+
+			return 2 * Math.acos( Math.abs( this.dot( q ) ) );
+
+		},
+
 		inverse: function () {
 
 			// quaternion is assumed to have unit length
@@ -22108,17 +22114,17 @@
 
 		// Buffer rendering
 
-		function renderObjectImmediate( object, program, material ) {
+		function renderObjectImmediate( object, program ) {
 
 			object.render( function ( object ) {
 
-				_this.renderBufferImmediate( object, program, material );
+				_this.renderBufferImmediate( object, program );
 
 			} );
 
 		}
 
-		this.renderBufferImmediate = function ( object, program, material ) {
+		this.renderBufferImmediate = function ( object, program ) {
 
 			state.initAttributes();
 
@@ -22933,7 +22939,7 @@
 
 				_currentGeometryProgram = '';
 
-				renderObjectImmediate( object, program, material );
+				renderObjectImmediate( object, program );
 
 			} else {
 
