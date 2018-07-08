@@ -131,8 +131,6 @@
       overflow: 'auto',
       background: 'rgba(221, 221, 221, 0.9)',
     });
-    var numLinesRemaining = 100;
-    var added = false;
     const toggle = document.createElement('div');
     let show = false;
     Object.assign(toggle.style, {
@@ -151,36 +149,52 @@
     }
     showHideConsole();
 
-    function addLine(type, str) {
-      var div = document.createElement('div');
-      div.textContent = str;
+    const maxLines = 100;
+    const lines = [];
+    let added = false;
+
+    function addLine(type, str, color, prefix) {
+      const div = document.createElement('div');
+      div.textContent = prefix + str;
       div.className = type;
+      div.style.color = color;
       parent.appendChild(div);
+      lines.push(div);
       if (!added) {
         added = true;
         document.body.appendChild(parent);
+        document.body.appendChild(toggle);
       }
+      // scrollIntoView only works in Chrome
+      // In Firefox and Safari scrollIntoView inside an iframe moves
+      // that element into the view. It should argably only move that
+      // element inside the iframe itself, otherwise that's giving
+      // any random iframe control to bring itself into view against
+      // the parent's wishes.
+      //
+      // div.scrollIntoView();
     }
 
-    function addLines(type, str) {
-      if (numLinesRemaining) {
-        --numLinesRemaining;
-        addLine(type, str);
+    function addLines(type, str, color, prefix) {
+      while (lines.length > maxLines) {
+        const div = lines.shift();
+        div.parentNode.removeChild(div);
       }
+      addLine(type, str, color, prefix);
     }
 
-    function wrapFunc(obj, funcName) {
-      var oldFn = obj[funcName];
+    function wrapFunc(obj, funcName, color, prefix) {
+      const oldFn = obj[funcName];
       origConsole[funcName] = oldFn.bind(obj);
-      return function() {
-        addLines(funcName, [].join.call(arguments, ' '));
+      return function(...args) {
+        addLines(funcName, [...args].join(' '), color, prefix);
         oldFn.apply(obj, arguments);
       };
     }
 
-    window.console.log = wrapFunc(window.console, 'log');
-    window.console.warn = wrapFunc(window.console, 'warn');
-    window.console.error = wrapFunc(window.console, 'error');
+    window.console.log = wrapFunc(window.console, 'log', 'black', '');
+    window.console.warn = wrapFunc(window.console, 'warn', 'black', '⚠');
+    window.console.error = wrapFunc(window.console, 'error', 'red', '❌');
   }
 
   /**
