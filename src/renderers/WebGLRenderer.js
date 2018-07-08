@@ -7,7 +7,6 @@ import {
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
-	NoColors,
 	LinearToneMapping,
 	BackSide
 } from '../constants.js';
@@ -1385,9 +1384,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isImmediateRenderObject ) {
 
-			var frontFaceCW = ( object.isMesh && object.normalMatrix.determinant() < 0 );
-
-			state.setMaterial( material, frontFaceCW );
+			state.setMaterial( material );
 
 			var program = setProgram( camera, scene.fog, material, object );
 
