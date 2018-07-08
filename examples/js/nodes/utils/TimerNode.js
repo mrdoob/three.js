@@ -26,6 +26,8 @@ TimerNode.prototype.nodeType = "Timer";
 
 TimerNode.prototype.isReadonly = function () {
 
+	// never use TimerNode as readonly but aways as "uniform"
+	
 	return false;
 
 };
@@ -33,6 +35,7 @@ TimerNode.prototype.isReadonly = function () {
 TimerNode.prototype.isUnique = function () {
 
 	// share TimerNode "uniform" input if is used on more time with others TimerNode
+
 	return this.timeScale && ( this.scope === TimerNode.GLOBAL || this.scope === TimerNode.DELTA );
 
 };

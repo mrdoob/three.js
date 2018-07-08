@@ -10,6 +10,7 @@ export { VarNode } from './core/VarNode.js';
 export { StructNode } from './core/StructNode.js';
 export { AttributeNode } from './core/AttributeNode.js';
 export { FunctionNode } from './core/FunctionNode.js';
+export { ExpressionNode } from './core/ExpressionNode.js';
 export { FunctionCallNode } from './core/FunctionCallNode.js';
 export { NodeLib } from './core/NodeLib.js';
 export { NodeUtils } from './core/NodeUtils.js';

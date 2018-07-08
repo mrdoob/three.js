@@ -1942,10 +1942,10 @@
 
 					var speed = new THREE.FloatNode( .5 );
 
-					mtl.color = new THREE.FunctionNode( "myCustomUv + (sin(time*speed)*.5) + (position * .05)", "vec3" );
+					mtl.color = new THREE.ExpressionNode( "myCustomUv + (sin(time*speed)*.5) + (position * .05)", "vec3" );
 					mtl.color.keywords[ "speed" ] = speed;
 
-					mtl.transform = new THREE.FunctionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
+					mtl.transform = new THREE.ExpressionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
 					mtl.transform.keywords[ "speed" ] = speed;
 
 					// add global keyword ( variable or const )
@@ -2018,8 +2018,8 @@
 					mtl.color = varying;
 					
 					// you can also set a independent value in .transform slot using BypassNode
-					// such this expression using FunctionNode
-					mtl.transform.value = new THREE.FunctionNode("position * ( .1 + abs( sin( time ) ) )", "vec3");
+					// such this expression using ExpressionNode
+					mtl.transform.value = new THREE.ExpressionNode("position * ( .1 + abs( sin( time ) ) )", "vec3");
 
 					break;
 					
@@ -2045,7 +2045,7 @@
 					// add keyword
 					setMyVar.keywords[ "myVar" ] = varying;
 
-					var transform = new THREE.FunctionNode( "setMyVar( position * .1 )", "vec3" );
+					var transform = new THREE.ExpressionNode( "setMyVar( position * .1 )", "vec3" );
 					transform.includes = [ setMyVar ];
 					transform.keywords[ "tex" ] = new THREE.TextureNode( getTexture( "brick" ) );
 

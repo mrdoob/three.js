@@ -6,31 +6,24 @@
 import { TempNode } from './TempNode.js';
 import { NodeLib } from './NodeLib.js';
 
-function FunctionNode( src, includesOrType, extensionsOrKeywords, keywordsOrExtensions, includes ) {
+var declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i,
+	propertiesRegexp = /[a-z_0-9]+/ig;
 
-	this.isMethod = typeof includesOrType !== "string";
-	this.useKeywords = true;
+function FunctionNode( src, includes, extensions, keywords, type ) {
 
-	TempNode.call( this, this.isMethod ? null : includesOrType );
+	this.isMethod = type === undefined;
 
-	if ( this.isMethod ) {
-		
-		this.eval( src, includesOrType, extensionsOrKeywords, keywordsOrExtensions );
-		
-	} else {
-		
-		this.eval( src, includes, keywordsOrExtensions, extensionsOrKeywords );
+	TempNode.call( this, type );
 
-	}
+	this.eval( src, includes, extensions, keywords );
 
 };
-
-FunctionNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i;
-FunctionNode.rProperties = /[a-z_0-9]+/ig;
 
 FunctionNode.prototype = Object.create( TempNode.prototype );
 FunctionNode.prototype.constructor = FunctionNode;
 FunctionNode.prototype.nodeType = "Function";
+
+FunctionNode.prototype.useKeywords = true;
 
 FunctionNode.prototype.isShared = function ( builder, output ) {
 
@@ -50,8 +43,11 @@ FunctionNode.prototype.getInputByName = function ( name ) {
 
 	while ( i -- ) {
 
-		if ( this.inputs[ i ].name === name )
+		if ( this.inputs[ i ].name === name ) {
+			
 			return this.inputs[ i ];
+			
+		}
 
 	}
 
@@ -63,8 +59,11 @@ FunctionNode.prototype.getIncludeByName = function ( name ) {
 
 	while ( i -- ) {
 
-		if ( this.includes[ i ].name === name )
+		if ( this.includes[ i ].name === name ) {
+			
 			return this.includes[ i ];
+			
+		}
 
 	}
 
@@ -86,7 +85,7 @@ FunctionNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	while ( match = FunctionNode.rProperties.exec( this.src ) ) {
+	while ( match = propertiesRegexp.exec( this.src ) ) {
 
 		var prop = match[ 0 ], 
 			isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true,
@@ -156,7 +155,7 @@ FunctionNode.prototype.eval = function ( src, includes, extensions, keywords ) {
 
 	if ( this.isMethod ) {
 
-		var match = this.src.match( FunctionNode.rDeclaration );
+		var match = this.src.match( declarationRegexp );
 
 		this.inputs = [];
 
@@ -165,7 +164,7 @@ FunctionNode.prototype.eval = function ( src, includes, extensions, keywords ) {
 			this.type = match[ 1 ];
 			this.name = match[ 2 ];
 
-			var inputs = match[ 3 ].match( FunctionNode.rProperties );
+			var inputs = match[ 3 ].match( propertiesRegexp );
 
 			if ( inputs ) {
 

@@ -10,6 +10,7 @@ import {
 	StructNode,
 	AttributeNode,
 	FunctionNode,
+	ExpressionNode,
 	FunctionCallNode,
 	NodeLib,
 	NodeUtils,
@@ -113,6 +114,7 @@ THREE.VarNode = VarNode;
 THREE.StructNode = StructNode;
 THREE.AttributeNode = AttributeNode;
 THREE.FunctionNode = FunctionNode;
+THREE.ExpressionNode = ExpressionNode;
 THREE.FunctionCallNode = FunctionCallNode;
 THREE.NodeLib = NodeLib;
 THREE.NodeUtils = NodeUtils;

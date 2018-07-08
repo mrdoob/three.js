@@ -4,6 +4,8 @@
 
 import { TempNode } from './TempNode.js';
 
+var declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
+
 function ConstNode( src, useDefine ) {
 
 	TempNode.call( this );
@@ -18,8 +20,6 @@ ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
 ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
 ConstNode.LOG2 = 'LOG2';
 ConstNode.EPSILON = 'EPSILON';
-
-ConstNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
 
 ConstNode.prototype = Object.create( TempNode.prototype );
 ConstNode.prototype.constructor = ConstNode;
@@ -37,7 +37,7 @@ ConstNode.prototype.eval = function ( src, useDefine ) {
 
 	var name, type, value = "";
 
-	var match = this.src.match( ConstNode.rDeclaration );
+	var match = this.src.match( declarationRegexp );
 
 	this.useDefine = useDefine || this.src.charAt(0) === '#';
 
