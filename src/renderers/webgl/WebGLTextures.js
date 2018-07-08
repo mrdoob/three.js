@@ -827,6 +827,24 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function updateTextureMipmap( texture ) {
+
+		var image = texture.image;
+		var isTargetPowerOfTwo = isPowerOfTwo( image );
+
+		if ( textureNeedsGenerateMipmaps( texture, isTargetPowerOfTwo ) ) {
+
+			var target = texture.isCubeTexture ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+			var webglTexture = properties.get( texture ).__webglTexture;
+
+			state.bindTexture( target, webglTexture );
+			generateMipmap( target, texture, image.width, image.height );
+			state.bindTexture( target, null );
+
+		}
+
+	}
+
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		var texture = renderTarget.texture;
@@ -866,6 +884,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	this.setTextureCubeDynamic = setTextureCubeDynamic;
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
+	this.updateTextureMipmap = updateTextureMipmap;
 
 }
 
