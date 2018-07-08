@@ -29,7 +29,7 @@ SpriteNode.prototype.build = function ( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
+		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
 			THREE.UniformsLib[ "fog" ]
@@ -43,11 +43,11 @@ SpriteNode.prototype.build = function ( builder ) {
 			"#include <begin_vertex>"
 		];
 
-		if ( transform ) {
+		if ( position ) {
 
 			output.push(
-				transform.code,
-				transform.result ? "transformed = " + transform.result + ";" : ''
+				position.code,
+				position.result ? "transformed = " + position.result + ";" : ''
 			);
 
 		}
@@ -148,13 +148,13 @@ SpriteNode.prototype.copy = function ( source ) {
 	
 	// vertex
 	
-	if ( source.transform ) this.transform = source.transform;
+	if ( source.position ) this.position = source.position;
 	
 	// fragment
 	
 	this.color = source.color;
 	
-	if ( source.spherical !== undefined ) this.spherical = source.transform;
+	if ( source.spherical !== undefined ) this.spherical = source.position;
 	
 	if ( source.alpha ) this.alpha = source.alpha;
 
@@ -170,7 +170,7 @@ SpriteNode.prototype.toJSON = function ( meta ) {
 
 		// vertex
 
-		if ( this.transform ) data.transform = this.transform.toJSON( meta ).uuid;
+		if ( this.position ) data.position = this.position.toJSON( meta ).uuid;
 
 		// fragment
 

@@ -32,7 +32,7 @@ NodeUtils.addShortcuts( PhongNodeMaterial.prototype, 'fragment', [
 	'ao', 
 	'environment', 
 	'environmentAlpha',
-	'transform' 
+	'position' 
 ] );
 
 export { PhongNodeMaterial };

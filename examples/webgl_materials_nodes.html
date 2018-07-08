@@ -291,7 +291,7 @@
 					//mtl.light = // input/output light (vec3)
 					//mtl.environment = // reflection/refraction (vec3)
 					//mtl.environmentAlpha = // environment alpha (float)
-					//mtl.transform = // vertex transformation (vec3)
+					//mtl.position = // vertex local position (vec3)
 
 					var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
@@ -322,7 +322,7 @@
 					//mtl.light = // custom-light (vec3)
 					//mtl.ao = // ambient occlusion (float)
 					//mtl.environment = // reflection/refraction (vec3)
-					//mtl.transform = // vertex transformation (vec3)
+					//mtl.position = // vertex local position (vec3)
 
 					var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
@@ -497,7 +497,7 @@
 					//mtl.light = // custom-light (vec3)
 					//mtl.ao = // ambient occlusion (float)
 					//mtl.environment = // reflection/refraction (vec3)
-					//mtl.transform = // vertex transformation (vec3)
+					//mtl.position = // vertex local position (vec3)
 
 					var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
@@ -671,7 +671,7 @@
 					);
 
 					mtl.color = color;
-					mtl.transform = blend;
+					mtl.position = blend;
 
 					// GUI
 
@@ -1250,7 +1250,7 @@
 
 					mtl.color = mtl.specular = new THREE.ColorNode( 0 );
 					mtl.emissive = color;
-					mtl.transform = blend;
+					mtl.position = blend;
 
 					// GUI
 
@@ -1605,7 +1605,7 @@
 					);
 
 					mtl.color = colors;
-					mtl.transform = softPosition;
+					mtl.position = softPosition;
 
 					// GUI
 
@@ -1945,8 +1945,8 @@
 					mtl.color = new THREE.ExpressionNode( "myCustomUv + (sin(time*speed)*.5) + (position * .05)", "vec3" );
 					mtl.color.keywords[ "speed" ] = speed;
 
-					mtl.transform = new THREE.ExpressionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
-					mtl.transform.keywords[ "speed" ] = speed;
+					mtl.position = new THREE.ExpressionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
+					mtl.position.keywords[ "speed" ] = speed;
 
 					// add global keyword ( variable or const )
 					THREE.NodeLib.addKeyword( 'myCustomUv', function ( builder ) {
@@ -2010,16 +2010,16 @@
 					var varying = new THREE.VarNode( "vec3" );
 					varying.value = new THREE.NormalNode( THREE.NormalNode.VIEW );
 					
-					// using BypassNode the NormalNode not apply the value in .transform slot
+					// using BypassNode the NormalNode not apply the value in .position slot
 					// but set the NormalNode value in VarNode
 					// it can be useful to send values between vertex to fragment shader
 					// without affect vertex shader
-					mtl.transform = new THREE.BypassNode( varying );
+					mtl.position = new THREE.BypassNode( varying );
 					mtl.color = varying;
 					
-					// you can also set a independent value in .transform slot using BypassNode
+					// you can also set a independent value in .position slot using BypassNode
 					// such this expression using ExpressionNode
-					mtl.transform.value = new THREE.ExpressionNode("position * ( .1 + abs( sin( time ) ) )", "vec3");
+					mtl.position.value = new THREE.ExpressionNode("position * ( .1 + abs( sin( time ) ) )", "vec3");
 
 					break;
 					
@@ -2045,12 +2045,12 @@
 					// add keyword
 					setMyVar.keywords[ "myVar" ] = varying;
 
-					var transform = new THREE.ExpressionNode( "setMyVar( position * .1 )", "vec3" );
-					transform.includes = [ setMyVar ];
-					transform.keywords[ "tex" ] = new THREE.TextureNode( getTexture( "brick" ) );
+					var position = new THREE.ExpressionNode( "setMyVar( position * .1 )", "vec3" );
+					position.includes = [ setMyVar ];
+					position.keywords[ "tex" ] = new THREE.TextureNode( getTexture( "brick" ) );
 
 					// use BypassNode to "void" functions
-					mtl.transform = new THREE.BypassNode( transform );
+					mtl.position = new THREE.BypassNode( position );
 					
 					// FRAGMENT
 					

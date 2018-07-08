@@ -34,7 +34,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
+		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
 
@@ -81,11 +81,11 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <begin_vertex>"
 		];
 
-		if ( transform ) {
+		if ( position ) {
 
 			output.push(
-				transform.code,
-				transform.result ? "transformed = " + transform.result + ";" : ''
+				position.code,
+				position.result ? "transformed = " + position.result + ";" : ''
 			);
 
 		}
@@ -396,7 +396,7 @@ StandardNode.prototype.copy = function ( source ) {
 	
 	// vertex
 
-	if ( source.transform ) this.transform = source.transform;
+	if ( source.position ) this.position = source.position;
 
 	// fragment
 
@@ -435,7 +435,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 
 		// vertex
 
-		if ( this.transform ) data.transform = this.transform.toJSON( meta ).uuid;
+		if ( this.position ) data.position = this.position.toJSON( meta ).uuid;
 
 		// fragment
 
