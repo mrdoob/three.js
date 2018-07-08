@@ -129,7 +129,7 @@
       left: 0,
       width: '100%',
       overflow: 'auto',
-      background: '#DDD',
+      background: 'rgba(221, 221, 221, 0.9)',
     });
     var numLinesRemaining = 100;
     var added = false;
