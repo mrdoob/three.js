@@ -172,6 +172,12 @@
       // any random iframe control to bring itself into view against
       // the parent's wishes.
       //
+      // note that even if we used a solution (which is to manually set
+      // scrollTop) there's a UI issue that if the user manaully scrolls
+      // we want to stop scrolling automatically and if they move back
+      // to the bottom we want to pick up scrolling automatically.
+      // Kind of a PITA so TBD
+      //
       // div.scrollIntoView();
     }
 
