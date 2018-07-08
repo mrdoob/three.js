@@ -133,6 +133,23 @@
     });
     var numLinesRemaining = 100;
     var added = false;
+    const toggle = document.createElement('div');
+    let show = false;
+    Object.assign(toggle.style, {
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+      background: '#EEE',
+      'max-height': '2ex',
+    });
+    toggle.addEventListener('click', showHideConsole);
+
+    function showHideConsole() {
+      show = !show;
+      toggle.textContent = show ? '☒' : '☐';
+      parent.style.display = show ? '' : 'none';
+    }
+    showHideConsole();
 
     function addLine(type, str) {
       var div = document.createElement('div');
