@@ -191,7 +191,7 @@ var WEBVR = {
 
 					}
 
-				} );
+				} ).catch( showVRNotFound );
 
 			return button;
 
