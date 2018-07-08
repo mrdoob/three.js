@@ -86,7 +86,6 @@ function WebGLRenderer( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
-	this.sortGroups = false;
 
 	// user-defined clipping
 
@@ -128,7 +127,6 @@ function WebGLRenderer( parameters ) {
 		_currentFramebuffer = null,
 		_currentMaterialId = - 1,
 		_currentGeometryProgram = '',
-		_currentGroupOrder = 0,
 
 		_currentCamera = null,
 		_currentArrayCamera = null,
@@ -140,6 +138,7 @@ function WebGLRenderer( parameters ) {
 		//
 
 		_usedTextureUnits = 0,
+		_nextGroupOrder = 1,
 
 		//
 
@@ -1058,7 +1057,7 @@ function WebGLRenderer( parameters ) {
 		currentRenderList = renderLists.get( scene, camera );
 		currentRenderList.init();
 
-		projectObject( scene, camera, _this.sortObjects, _this.sortGroups );
+		projectObject( scene, camera, _this.sortObjects, 0 );
 
 		if ( _this.sortObjects === true ) {
 
@@ -1210,7 +1209,7 @@ function WebGLRenderer( parameters ) {
 	}
 	*/
 
-	function projectObject( object, camera, sortObjects, sortGroups ) {
+	function projectObject( object, camera, sortObjects, groupOrder ) {
 
 		if ( object.visible === false ) return;
 
@@ -1218,9 +1217,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( visible ) {
 
-			if ( object.isGroup ) {
+			if ( object.isSortingGroup ) {
 
-				if ( sortGroups === true ) _currentGroupOrder = ++ _currentGroupOrder;
+				groupOrder = _nextGroupOrder ++;
 
 			}	else if ( object.isLight ) {
 
@@ -1248,7 +1247,7 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
-					currentRenderList.push( object, geometry, material, _vector3.z, null, _currentGroupOrder );
+					currentRenderList.push( object, geometry, material, _vector3.z, null, groupOrder );
 
 				}
 
@@ -1261,7 +1260,7 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				currentRenderList.push( object, null, object.material, _vector3.z, null, _currentGroupOrder );
+				currentRenderList.push( object, null, object.material, _vector3.z, null, groupOrder );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -1294,7 +1293,7 @@ function WebGLRenderer( parameters ) {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group, _currentGroupOrder );
+								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group, groupOrder );
 
 							}
 
@@ -1302,7 +1301,7 @@ function WebGLRenderer( parameters ) {
 
 					} else if ( material.visible ) {
 
-						currentRenderList.push( object, geometry, material, _vector3.z, null, _currentGroupOrder );
+						currentRenderList.push( object, geometry, material, _vector3.z, null, groupOrder );
 
 					}
 
@@ -1316,7 +1315,7 @@ function WebGLRenderer( parameters ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ], camera, sortObjects, sortGroups );
+			projectObject( children[ i ], camera, sortObjects, groupOrder );
 
 		}
 
