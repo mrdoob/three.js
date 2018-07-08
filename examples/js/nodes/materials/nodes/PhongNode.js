@@ -2,13 +2,13 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from '../../core/GLNode.js';
+import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
  
 function PhongNode() {
 
-	GLNode.call( this );
+	Node.call( this );
 
 	this.color = new ColorNode( 0xEEEEEE );
 	this.specular = new ColorNode( 0x111111 );
@@ -16,7 +16,7 @@ function PhongNode() {
 
 };
 
-PhongNode.prototype = Object.create( GLNode.prototype );
+PhongNode.prototype = Object.create( Node.prototype );
 PhongNode.prototype.constructor = PhongNode;
 PhongNode.prototype.nodeType = "Phong";
 
@@ -321,7 +321,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 PhongNode.prototype.copy = function ( source ) {
 			
-	GLNode.prototype.copy.call( this, source );
+	Node.prototype.copy.call( this, source );
 	
 	// vertex
 

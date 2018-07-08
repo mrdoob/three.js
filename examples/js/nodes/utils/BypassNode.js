@@ -2,18 +2,18 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from '../core/GLNode.js';
+import { Node } from '../core/Node.js';
 
 function BypassNode( code, value ) {
 
-	GLNode.call( this );
+	Node.call( this );
 
 	this.code = code;
 	this.value = value;
 
 };
 
-BypassNode.prototype = Object.create( GLNode.prototype );
+BypassNode.prototype = Object.create( Node.prototype );
 BypassNode.prototype.constructor = BypassNode;
 BypassNode.prototype.nodeType = "Bypass";
 
@@ -57,7 +57,7 @@ BypassNode.prototype.generate = function ( builder, output ) {
 
 BypassNode.prototype.copy = function ( source ) {
 	
-	GLNode.prototype.copy.call( this, source );
+	Node.prototype.copy.call( this, source );
 	
 	this.code = source.code;
 	this.value = source.value;

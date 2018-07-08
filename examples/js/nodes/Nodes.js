@@ -2,7 +2,7 @@
 
 // core
 
-export { GLNode } from './core/GLNode.js';
+export { Node } from './core/Node.js';
 export { TempNode } from './core/TempNode.js';
 export { InputNode } from './core/InputNode.js';
 export { ConstNode } from './core/ConstNode.js';

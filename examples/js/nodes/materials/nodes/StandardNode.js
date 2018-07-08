@@ -2,14 +2,14 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from '../../core/GLNode.js';
+import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
  
 function StandardNode() {
 
-	GLNode.call( this );
+	Node.call( this );
 
 	this.color = new ColorNode( 0xEEEEEE );
 	this.roughness = new FloatNode( 0.5 );
@@ -17,7 +17,7 @@ function StandardNode() {
 
 };
 
-StandardNode.prototype = Object.create( GLNode.prototype );
+StandardNode.prototype = Object.create( Node.prototype );
 StandardNode.prototype.constructor = StandardNode;
 StandardNode.prototype.nodeType = "Standard";
 
@@ -392,7 +392,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 StandardNode.prototype.copy = function ( source ) {
 			
-	GLNode.prototype.copy.call( this, source );
+	Node.prototype.copy.call( this, source );
 	
 	// vertex
 

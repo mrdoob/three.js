@@ -2,19 +2,19 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from '../../core/GLNode.js';
+import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 
 function SpriteNode() {
 
-	GLNode.call( this );
+	Node.call( this );
 
 	this.color = new ColorNode( 0xEEEEEE );
 	this.spherical = true;
 
 };
 
-SpriteNode.prototype = Object.create( GLNode.prototype );
+SpriteNode.prototype = Object.create( Node.prototype );
 SpriteNode.prototype.constructor = SpriteNode;
 SpriteNode.prototype.nodeType = "Sprite";
 
@@ -144,7 +144,7 @@ SpriteNode.prototype.build = function ( builder ) {
 
 SpriteNode.prototype.copy = function ( source ) {
 			
-	GLNode.prototype.copy.call( this, source );
+	Node.prototype.copy.call( this, source );
 	
 	// vertex
 	

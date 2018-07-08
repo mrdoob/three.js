@@ -2,7 +2,7 @@ import {
 
 	// core
 	
-	GLNode,
+	Node,
 	TempNode,
 	InputNode,
 	ConstNode,
@@ -106,7 +106,7 @@ import {
 
 // core
 
-THREE.GLNode = GLNode;
+THREE.Node = Node;
 THREE.TempNode = TempNode;
 THREE.InputNode = InputNode;
 THREE.ConstNode = ConstNode;

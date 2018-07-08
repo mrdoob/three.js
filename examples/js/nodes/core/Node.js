@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-function GLNode( type ) {
+function Node( type ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -14,9 +14,9 @@ function GLNode( type ) {
 
 };
 
-GLNode.prototype = {
+Node.prototype = {
 
-	constructor: GLNode,
+	constructor: Node,
 	
 	isNode: true,
 	
@@ -173,4 +173,4 @@ GLNode.prototype = {
 	
 };
 
-export { GLNode };
+export { Node };

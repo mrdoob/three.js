@@ -2,17 +2,17 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from '../../core/GLNode.js';
+import { Node } from '../../core/Node.js';
 
 function RawNode( value ) {
 
-	GLNode.call( this, 'v4' );
+	Node.call( this, 'v4' );
 
 	this.value = value;
 
 };
 
-RawNode.prototype = Object.create( GLNode.prototype );
+RawNode.prototype = Object.create( Node.prototype );
 RawNode.prototype.constructor = RawNode;
 RawNode.prototype.nodeType = "Raw";
 
@@ -37,7 +37,7 @@ RawNode.prototype.generate = function ( builder ) {
 
 RawNode.prototype.copy = function ( source ) {
 	
-	GLNode.prototype.copy.call( this, source );
+	Node.prototype.copy.call( this, source );
 	
 	this.value = source.value;
 	

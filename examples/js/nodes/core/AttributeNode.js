@@ -2,17 +2,17 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from './GLNode.js';
+import { Node } from './Node.js';
 
 function AttributeNode( name, type ) {
 
-	GLNode.call( this, type );
+	Node.call( this, type );
 
 	this.name = name;
 
 };
 
-AttributeNode.prototype = Object.create( GLNode.prototype );
+AttributeNode.prototype = Object.create( Node.prototype );
 AttributeNode.prototype.constructor = AttributeNode;
 AttributeNode.prototype.nodeType = "Attribute";
 
@@ -45,7 +45,7 @@ AttributeNode.prototype.generate = function ( builder, output ) {
 
 AttributeNode.prototype.copy = function ( source ) {
 			
-	GLNode.prototype.copy.call( this, source );
+	Node.prototype.copy.call( this, source );
 	
 	this.type = source.type;
 	
