@@ -36,6 +36,7 @@ import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
 import { WebGLRenderStates } from './webgl/WebGLRenderStates.js';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
+import { WebGLSortingGroups } from './webgl/WebGLSortingGroups.js';
 import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
@@ -86,6 +87,7 @@ function WebGLRenderer( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
+	this.sortGroups = false;
 
 	// user-defined clipping
 
@@ -138,7 +140,6 @@ function WebGLRenderer( parameters ) {
 		//
 
 		_usedTextureUnits = 0,
-		_nextGroupOrder = 1,
 
 		//
 
@@ -230,7 +231,7 @@ function WebGLRenderer( parameters ) {
 
 	var extensions, capabilities, state, info;
 	var properties, textures, attributes, geometries, objects;
-	var programCache, renderLists, renderStates;
+	var programCache, renderLists, renderStates, sortingGroups;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
@@ -266,6 +267,7 @@ function WebGLRenderer( parameters ) {
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
+		sortingGroups = new WebGLSortingGroups();
 
 		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
@@ -1057,6 +1059,12 @@ function WebGLRenderer( parameters ) {
 		currentRenderList = renderLists.get( scene, camera );
 		currentRenderList.init();
 
+		if ( _this.sortGroups === true ) {
+
+			sortingGroups.update( scene );
+
+		}
+
 		projectObject( scene, camera, _this.sortObjects, 0 );
 
 		if ( _this.sortObjects === true ) {
@@ -1219,7 +1227,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( object.isSortingGroup ) {
 
-				groupOrder = _nextGroupOrder ++;
+				groupOrder = object.__groupOrder;
 
 			}	else if ( object.isLight ) {
 
