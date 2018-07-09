@@ -534,7 +534,7 @@
 			switch ( type ) {
 
 				case 'Bump':
-					parameters.bumpMap = textureMap.get( child.ID );
+					parameters.bumpMap = getTexture( FBXTree, textureMap, child.ID, connections );
 					break;
 
 				case 'DiffuseColor':
