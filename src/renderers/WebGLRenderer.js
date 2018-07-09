@@ -87,7 +87,7 @@ function WebGLRenderer( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
-	this.sortGroups = false;
+	this.sortingGroupsEnabled = false;
 
 	// user-defined clipping
 
@@ -1059,7 +1059,7 @@ function WebGLRenderer( parameters ) {
 		currentRenderList = renderLists.get( scene, camera );
 		currentRenderList.init();
 
-		if ( _this.sortGroups === true ) {
+		if ( _this.sortingGroupsEnabled === true ) {
 
 			sortingGroups.update( scene );
 
