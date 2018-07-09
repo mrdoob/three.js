@@ -1,4 +1,4 @@
-import { Object3D } from '../core/Object3D.js';
+import { Group } from './Group.js';
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
@@ -6,13 +6,13 @@ import { Object3D } from '../core/Object3D.js';
 
 function SortingGroup() {
 
-	Object3D.call( this );
+	Group.call( this );
 
 	this.type = 'SortingGroup';
 
 }
 
-SortingGroup.prototype = Object.assign( Object.create( Object3D.prototype ), {
+SortingGroup.prototype = Object.assign( Object.create( Group.prototype ), {
 
 	constructor: SortingGroup,
 
