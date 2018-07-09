@@ -301,13 +301,9 @@
 
       return function(callback, element) {
         const handler = function() {
-          if (isOnScreen(element)) {
-            oldRAF(callback, element);
-          } else {
-            oldRAF(handler, element);
-          }
+          return oldRAF(isOnScreen(element) ? callback : handler, element);
         };
-        handler();
+        return handler();
       };
 
     }(topWindow.requestAnimationFrame));
