@@ -38,7 +38,7 @@ function WebGLSortingGroups() {
 
 			if ( child.isMesh || child.isLine || child.isPoints || child.isImmediateRenderObject || child.isSprite ) {
 
-				if ( child.parent.isSortingGroup ) {
+				if ( inSortingGroup( child ) === true ) {
 
 					child.__groupOrder = currentGroupOrder;
 
@@ -55,6 +55,24 @@ function WebGLSortingGroups() {
 			}
 
 			update( child, level + 1 );
+
+		}
+
+	}
+
+	function inSortingGroup( object ) {
+
+		var parent = object.parent;
+
+		if ( parent === null ) {
+
+			return false;
+
+		} else {
+
+			if ( parent.isSortingGroup ) return true;
+
+			return inSortingGroup( parent );
 
 		}
 
