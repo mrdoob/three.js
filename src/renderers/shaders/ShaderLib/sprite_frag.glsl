@@ -2,7 +2,6 @@ uniform vec3 diffuse;
 uniform float opacity;
 
 #include <common>
-#include <packing>
 #include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <fog_pars_fragment>
