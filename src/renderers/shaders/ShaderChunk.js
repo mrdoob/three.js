@@ -37,7 +37,7 @@ import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl';
 import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl';
 import lights_pars_begin from './ShaderChunk/lights_pars_begin.glsl';
-import lights_pars_maps from './ShaderChunk/lights_pars_maps.glsl';
+import envmap_physical_pars_fragment from './ShaderChunk/envmap_physical_pars_fragment.glsl';
 import lights_phong_fragment from './ShaderChunk/lights_phong_fragment.glsl';
 import lights_phong_pars_fragment from './ShaderChunk/lights_phong_pars_fragment.glsl';
 import lights_physical_fragment from './ShaderChunk/lights_physical_fragment.glsl';
@@ -145,6 +145,7 @@ export var ShaderChunk = {
 	envmap_fragment: envmap_fragment,
 	envmap_pars_fragment: envmap_pars_fragment,
 	envmap_pars_vertex: envmap_pars_vertex,
+	envmap_physical_pars_fragment: envmap_physical_pars_fragment,
 	envmap_vertex: envmap_vertex,
 	fog_vertex: fog_vertex,
 	fog_pars_vertex: fog_pars_vertex,
@@ -155,7 +156,6 @@ export var ShaderChunk = {
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_vertex: lights_lambert_vertex,
 	lights_pars_begin: lights_pars_begin,
-	lights_pars_maps: lights_pars_maps,
 	lights_phong_fragment: lights_phong_fragment,
 	lights_phong_pars_fragment: lights_phong_pars_fragment,
 	lights_physical_fragment: lights_physical_fragment,
