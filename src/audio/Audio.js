@@ -11,7 +11,6 @@ function Audio( listener ) {
 
 	this.type = 'Audio';
 
-	this.listener = listener;
 	this.context = listener.context;
 
 	this.gain = this.context.createGain();
