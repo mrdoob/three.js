@@ -32,24 +32,9 @@ THREE.SVGLoader.prototype = {
 
 			if ( node.nodeType !== 1 ) return;
 
-			var transform = null;
-			if ( node.hasAttribute( 'transform' ) ) {
+			var transform = getNodeTransform( node );
 
-				transform = parseTransformNode( node );
-
-				if ( transform ) {
-
-					if ( transformStack.length > 0 ) {
-						multiplyTransforms( transform, transformStack[ transformStack.length - 1 ], tempTransform );
-						copyTransform( tempTransform, transform );
-					}
-
-					copyTransform( transform, currentTransform );
-					transformStack.push( transform );
-
-				}
-	
-			}
+			var path = null;
 
 			switch ( node.nodeName ) {
 
@@ -62,41 +47,49 @@ THREE.SVGLoader.prototype = {
 
 				case 'path':
 					style = parseStyle( node, style );
-					if ( node.hasAttribute( 'd' ) && isVisible( style ) ) paths.push( parsePathNode( node, style ) );
+					if ( node.hasAttribute( 'd' ) && isVisible( style ) ) path = parsePathNode( node, style );
 					break;
 
 				case 'rect':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parseRectNode( node, style ) );
+					if ( isVisible( style ) ) path = parseRectNode( node, style );
 					break;
 
 				case 'polygon':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parsePolygonNode( node, style ) );
+					if ( isVisible( style ) ) path = parsePolygonNode( node, style );
 					break;
 
 				case 'polyline':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parsePolylineNode( node, style ) );
+					if ( isVisible( style ) ) path = parsePolylineNode( node, style );
 					break;
 
 				case 'circle':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parseCircleNode( node, style ) );
+					if ( isVisible( style ) ) path = parseCircleNode( node, style );
 					break;
 
 				case 'ellipse':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parseEllipseNode( node, style ) );
+					if ( isVisible( style ) ) path = parseEllipseNode( node, style );
 					break;
 
 				case 'line':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parseLineNode( node, style ) );
+					if ( isVisible( style ) ) path = parseLineNode( node, style );
 					break;
 
 				default:
 					console.log( node );
+
+			}
+
+			if ( path ) {
+
+				transformPath( path, currentTransform );
+
+				paths.push( path );
 
 			}
 
@@ -123,27 +116,10 @@ THREE.SVGLoader.prototype = {
 
 			var point = new THREE.Vector2();
 			var control = new THREE.Vector2();
-			var control2 = new THREE.Vector2();
 
-			var transfPoint = new THREE.Vector2();
-			var transfControl = new THREE.Vector2();
-			var transfControl2 = new THREE.Vector2();
-
-			var reflected = new THREE.Vector2();
 			var firstPoint = new THREE.Vector2();
 			var isFirstPoint = true;
-
-			function setFirstPoint() {
-
-				if ( isFirstPoint ) {
-
-					firstPoint.x = point.x;
-					firstPoint.y = point.y;
-					isFirstPoint = false;
-
-				}
-
-			}
+			var doSetFirstPoint = false;
 
 			var d = node.getAttribute( 'd' );
 
@@ -158,6 +134,11 @@ THREE.SVGLoader.prototype = {
 				var type = command.charAt( 0 );
 				var data = command.substr( 1 ).trim();
 
+				if ( isFirstPoint ) {
+					doSetFirstPoint = true;
+				}
+				isFirstPoint = false;
+
 				switch ( type ) {
 
 					case 'M':
@@ -167,14 +148,11 @@ THREE.SVGLoader.prototype = {
 							point.y = numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
 							if ( j === 0 ) {
-								path.moveTo( transfPoint.x, transfPoint.y );
+								path.moveTo( point.x, point.y );
 							}
 							else {
-								path.lineTo( transfPoint.x, transfPoint.y );
+								path.lineTo( point.x, point.y );
 							}
 						}
 						break;
@@ -185,10 +163,7 @@ THREE.SVGLoader.prototype = {
 							point.x = numbers[ j ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
-							path.lineTo( transfPoint.x, transfPoint.y );
+							path.lineTo( point.x, point.y );
 						}
 						break;
 
@@ -198,10 +173,7 @@ THREE.SVGLoader.prototype = {
 							point.y = numbers[ j ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
-							path.lineTo( transfPoint.x, transfPoint.y );
+							path.lineTo( point.x, point.y );
 						}
 						break;
 
@@ -212,117 +184,90 @@ THREE.SVGLoader.prototype = {
 							point.y = numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
-							path.lineTo( transfPoint.x, transfPoint.y );
+							path.lineTo( point.x, point.y );
 						}
 						break;
 
 					case 'C':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 6 ) {
-							control2.set( numbers[ j + 0 ], numbers[ j + 1 ] );
-							control.set( numbers[ j + 2 ], numbers[ j + 3 ] );
-							point.set( numbers[ j + 4 ], numbers[ j + 5 ] );
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							transfVec2( control2, currentTransform, transfControl2 );
-							setFirstPoint();
 							path.bezierCurveTo(
-								transfControl2.x,
-								transfControl2.y,
-								transfControl.x,
-								transfControl.y,
-								transfPoint.x,
-								transfPoint.y
+								numbers[ j + 0 ],
+								numbers[ j + 1 ],
+								numbers[ j + 2 ],
+								numbers[ j + 3 ],
+								numbers[ j + 4 ],
+								numbers[ j + 5 ]
 							);
+							control.x = numbers[ j + 2 ];
+							control.y = numbers[ j + 3 ];
+							point.x = numbers[ j + 4 ];
+							point.y = numbers[ j + 5 ];
 						}
 						break;
 
 					case 'S':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
-							reflected.set(
-								getReflection( transfPoint.x, transfControl.x ),
-								getReflection( transfPoint.y, transfControl.y )
-							);
-							control.set( numbers[ j + 0 ], numbers[ j + 1 ] );
-							point.set( numbers[ j + 2 ], numbers[ j + 3 ] );
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
 							path.bezierCurveTo(
-								reflected.x,
-								reflected.y,
-								transfControl.x,
-								transfControl.y,
-								transfPoint.x,
-								transfPoint.y
+								getReflection( point.x, control.x ),
+								getReflection( point.y, control.y ),
+								numbers[ j + 0 ],
+								numbers[ j + 1 ],
+								numbers[ j + 2 ],
+								numbers[ j + 3 ]
 							);
+							control.x = numbers[ j + 0 ];
+							control.y = numbers[ j + 1 ];
+							point.x = numbers[ j + 2 ];
+							point.y = numbers[ j + 3 ];
 						}
 						break;
 
 					case 'Q':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
-							control.set( numbers[ j + 0 ], numbers[ j + 1 ] );
-							point.set( numbers[ j + 2 ], numbers[ j + 3 ] );
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
 							path.quadraticCurveTo(
-								transfControl.x,
-								transfControl.y,
-								transfPoint.x,
-								transfPoint.y
+								numbers[ j + 0 ],
+								numbers[ j + 1 ],
+								numbers[ j + 2 ],
+								numbers[ j + 3 ]
 							);
+							control.x = numbers[ j + 0 ];
+							control.y = numbers[ j + 1 ];
+							point.x = numbers[ j + 2 ];
+							point.y = numbers[ j + 3 ];
 						}
 						break;
 
 					case 'T':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
-							reflected.set(
-								getReflection( transfPoint.x, transfControl.x ),
-								getReflection( transfPoint.y, transfControl.y )
-							);
-							control.set( reflected.x, reflected.y );
-							point.set( numbers[ j + 0 ], numbers[ j + 1 ] );
-							transfVec2( point, currentTransform, transfPoint );
-							setFirstPoint();
+							var rx = getReflection( point.x, control.x );
+							var ry = getReflection( point.y, control.y );
 							path.quadraticCurveTo(
-								reflected.x,
-								reflected.y,
-								transfPoint.x,
-								transfPoint.y
+								rx,
+								ry,
+								numbers[ j + 0 ],
+								numbers[ j + 1 ]
 							);
+							control.x = rx;
+							control.y = ry;
+							point.x = numbers[ j + 0 ];
+							point.y = numbers[ j + 1 ];
 						}
 						break;
 
 					case 'A':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
-							var transfStart = transfPoint.clone();
-							point.set( numbers[ j + 5 ], numbers[ j + 6 ] );
+							var start = point.clone();
+							point.x = numbers[ j + 5 ];
+							point.y = numbers[ j + 6 ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							setFirstPoint();
-							var rx = numbers[ j + 0 ] * getTransformScaleX( currentTransform );
-							var ry = numbers[ j + 1 ] * getTransformScaleX( currentTransform );
-							if ( isTransformRotated( currentTransform ) && rx !== ry ) {
-								console.warn( "SVGLoader: Elliptic arc rotation or skewing is not implemented." );
-							}
 							parseArcCommand(
-								path,
-								rx,
-								ry,
-								numbers[ j + 2 ],
-								numbers[ j + 3 ],
-								numbers[ j + 4 ],
-								transfStart,
-								transfPoint
+								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
 						}
 						break;
@@ -336,14 +281,11 @@ THREE.SVGLoader.prototype = {
 							point.y += numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
 							if ( j === 0 ) {
-								path.moveTo( transfPoint.x, transfPoint.y );
+								path.moveTo( point.x, point.y );
 							}
 							else {
-								path.lineTo( transfPoint.x, transfPoint.y );
+								path.lineTo( point.x, point.y );
 							}
 						}
 						break;
@@ -354,10 +296,7 @@ THREE.SVGLoader.prototype = {
 							point.x += numbers[ j ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
-							path.lineTo( transfPoint.x, transfPoint.y );
+							path.lineTo( point.x, point.y );
 						}
 						break;
 
@@ -367,10 +306,7 @@ THREE.SVGLoader.prototype = {
 							point.y += numbers[ j ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
-							path.lineTo( transfPoint.x, transfPoint.y );
+							path.lineTo( point.x, point.y );
 						}
 						break;
 
@@ -381,122 +317,90 @@ THREE.SVGLoader.prototype = {
 							point.y += numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
-							path.lineTo( transfPoint.x, transfPoint.y );
+							path.lineTo( point.x, point.y );
 						}
 						break;
 
 					case 'c':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 6 ) {
-							control2.set( point.x + numbers[ j + 0 ], point.y + numbers[ j + 1 ] );
-							control.set( point.x + numbers[ j + 2 ], point.y + numbers[ j + 3 ] );
+							path.bezierCurveTo(
+								point.x + numbers[ j + 0 ],
+								point.y + numbers[ j + 1 ],
+								point.x + numbers[ j + 2 ],
+								point.y + numbers[ j + 3 ],
+								point.x + numbers[ j + 4 ],
+								point.y + numbers[ j + 5 ]
+							);
+							control.x = point.x + numbers[ j + 2 ];
+							control.y = point.y + numbers[ j + 3 ];
 							point.x += numbers[ j + 4 ];
 							point.y += numbers[ j + 5 ];
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							transfVec2( control2, currentTransform, transfControl2 );
-							setFirstPoint();
-							path.bezierCurveTo(
-								transfControl2.x,
-								transfControl2.y,
-								transfControl.x,
-								transfControl.y,
-								transfPoint.x,
-								transfPoint.y
-							);
 						}
 						break;
 
 					case 's':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
-							reflected.set(
-								getReflection( transfPoint.x, transfControl.x ),
-								getReflection( transfPoint.y, transfControl.y )
+							path.bezierCurveTo(
+								getReflection( point.x, control.x ),
+								getReflection( point.y, control.y ),
+								point.x + numbers[ j + 0 ],
+								point.y + numbers[ j + 1 ],
+								point.x + numbers[ j + 2 ],
+								point.y + numbers[ j + 3 ]
 							);
-							control.set( point.x + numbers[ j + 0 ], point.y + numbers[ j + 1 ] );
+							control.x = point.x + numbers[ j + 0 ];
+							control.y = point.y + numbers[ j + 1 ];
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
-							path.bezierCurveTo(
-								reflected.x,
-								reflected.y,
-								transfControl.x,
-								transfControl.y,
-								transfPoint.x,
-								transfPoint.y
-							);
 						}
 						break;
 
 					case 'q':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
-							control.set( point.x + numbers[ j + 0 ], point.y + numbers[ j + 1 ] );
+							path.quadraticCurveTo(
+								point.x + numbers[ j + 0 ],
+								point.y + numbers[ j + 1 ],
+								point.x + numbers[ j + 2 ],
+								point.y + numbers[ j + 3 ]
+							);
+							control.x = point.x + numbers[ j + 0 ];
+							control.y = point.y + numbers[ j + 1 ];
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
-							transfVec2( point, currentTransform, transfPoint );
-							transfVec2( control, currentTransform, transfControl );
-							setFirstPoint();
-							path.quadraticCurveTo(
-								transfControl.x,
-								transfControl.y,
-								transfPoint.x,
-								transfPoint.y
-							);
 						}
 						break;
 
 					case 't':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
-							reflected.set(
-								getReflection( transfPoint.x, transfControl.x ),
-								getReflection( transfPoint.y, transfControl.y )
-							);
-							control.set( reflected.x, reflected.y );
-							point.x += numbers[ j + 0 ];
-							point.y += numbers[ j + 1 ];
-							transfVec2( point, currentTransform, transfPoint );
-							setFirstPoint();
+							var rx = getReflection( point.x, control.x );
+							var ry = getReflection( point.y, control.y );
 							path.quadraticCurveTo(
-								reflected.x,
-								reflected.y,
-								transfPoint.x,
-								transfPoint.y
+								rx,
+								ry,
+								point.x + numbers[ j + 0 ],
+								point.y + numbers[ j + 1 ]
 							);
+							control.x = rx;
+							control.y = ry;
+							point.x = point.x + numbers[ j + 0 ];
+							point.y = point.y + numbers[ j + 1 ];
 						}
 						break;
 
 					case 'a':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
-							var transfStart = transfPoint.clone();
+							var start = point.clone();
 							point.x += numbers[ j + 5 ];
 							point.y += numbers[ j + 6 ];
 							control.x = point.x;
 							control.y = point.y;
-							transfVec2( point, currentTransform, transfPoint );
-							setFirstPoint();
-							var rx = numbers[ j + 0 ] * getTransformScaleX( currentTransform );
-							var ry = numbers[ j + 1 ] * getTransformScaleX( currentTransform );
-							if ( isTransformRotated( currentTransform ) && rx !== ry ) {
-								console.warn( "SVGLoader: Elliptic arc rotation or skewing is not implemented." );
-							}
 							parseArcCommand(
-								path,
-								rx,
-								ry,
-								numbers[ j + 2 ],
-								numbers[ j + 3 ],
-								numbers[ j + 4 ],
-								transfStart,
-								transfPoint
+								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
 						}
 						break;
@@ -508,10 +412,8 @@ THREE.SVGLoader.prototype = {
 						path.currentPath.autoClose = true;
 						if ( path.currentPath.curves.length > 0 ) {
 							// Reset point to beginning of Path
-							point.x = firstPoint.x;
-							point.y = firstPoint.y;
-							transfVec2( point, currentTransform, transfPoint );
-							path.currentPath.currentPoint.copy( transfPoint );
+							point.copy( firstPoint );
+							path.currentPath.currentPoint.copy( point );
 							isFirstPoint = true;
 						}
 						break;
@@ -523,6 +425,13 @@ THREE.SVGLoader.prototype = {
 
 				// console.log( type, parseFloats( data ), parseFloats( data ).length  )
 
+				if ( doSetFirstPoint ) {
+
+					firstPoint.copy( point );
+
+					doSetFirstPoint = false;
+
+				}
 			}
 
 			return path;
@@ -616,63 +525,24 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			
-			tempVecA.set( x + 2 * rx, y );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			path.moveTo( tempVecB.x, tempVecB.y );
-
-			tempVecA.set( x + w - 2 * rx, y );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			path.lineTo( tempVecB.x, tempVecB.y );
+			path.moveTo( x + 2 * rx, y );
+			path.lineTo( x + w - 2 * rx, y );
+			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y, x + w, y, x + w, y + 2 * ry );
+			path.lineTo( x + w, y + h - 2 * ry );
+			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y + h, x + w, y + h, x + w - 2 * rx, y + h );
+			path.lineTo( x + 2 * rx, y + h );
 
 			if ( rx !== 0 || ry !== 0 ) {
-				tempVecA.set( x + w, y );
-				transfVec2( tempVecA, currentTransform, tempVecB );
-				tempVecA.set( x + w, y + 2 * ry );
-				transfVec2( tempVecA, currentTransform, tempVecC );
-				path.bezierCurveTo( tempVecB.x, tempVecB.y, tempVecB.x, tempVecB.y, tempVecC.x, tempVecC.y );
-			}
-			
-			tempVecA.set( x + w, y + h - 2 * ry );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			path.lineTo( tempVecB.x, tempVecB.y );
 
-			if ( rx !== 0 || ry !== 0 ) {
-				
-				tempVecA.set( x + w, y + h );
-				transfVec2( tempVecA, currentTransform, tempVecB );
-				tempVecA.set( x + w - 2 * rx, y + h );
-				transfVec2( tempVecA, currentTransform, tempVecC );
-				path.bezierCurveTo( tempVecB.x, tempVecB.y, tempVecB.x, tempVecB.y, tempVecC.x, tempVecC.y );
+				path.bezierCurveTo( x, y + h, x, y + h, x, y + h - 2 * ry );
 
 			}
 
-			tempVecA.set( x + 2 * rx, y + h );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			path.lineTo( tempVecB.x, tempVecB.y );
+			path.lineTo( x, y + 2 * ry );
 
 			if ( rx !== 0 || ry !== 0 ) {
 
-				tempVecA.set( x, y + h );
-				transfVec2( tempVecA, currentTransform, tempVecB );
-				tempVecA.set( x, y + h - 2 * ry );
-				transfVec2( tempVecA, currentTransform, tempVecC );
-				path.bezierCurveTo( tempVecB.x, tempVecB.y, tempVecB.x, tempVecB.y, tempVecC.x, tempVecC.y );
-
-			}
-
-
-			tempVecA.set( x, y + 2 * ry );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			path.lineTo( tempVecB.x, tempVecB.y );
-
-			if ( rx !== 0 || ry !== 0 ) {
-
-				tempVecA.set( x, y );
-				transfVec2( tempVecA, currentTransform, tempVecB );
-				tempVecA.set( x + 2 * rx, y );
-				transfVec2( tempVecA, currentTransform, tempVecC );
-				path.bezierCurveTo( tempVecB.x, tempVecB.y, tempVecB.x, tempVecB.y, tempVecC.x, tempVecC.y );
+				path.bezierCurveTo( x, y, x, y, x + 2 * rx, y );
 
 			}
 
@@ -686,11 +556,6 @@ THREE.SVGLoader.prototype = {
 
 				var x = parseFloat( a );
 				var y = parseFloat( b );
-
-				tempVecA.set( x, y );
-				transfVec2( tempVecA, currentTransform, tempVecB );
-				x = tempVecB.x;
-				y = tempVecB.y;
 
 				if ( index === 0 ) {
 					path.moveTo( x, y );
@@ -724,11 +589,6 @@ THREE.SVGLoader.prototype = {
 				var x = parseFloat( a );
 				var y = parseFloat( b );
 
-				tempVecA.set( x, y );
-				transfVec2( tempVecA, currentTransform, tempVecB );
-				x = tempVecB.x;
-				y = tempVecB.y;
-
 				if ( index === 0 ) {
 					path.moveTo( x, y );
 				} else {
@@ -760,35 +620,8 @@ THREE.SVGLoader.prototype = {
 			var y = parseFloat( node.getAttribute( 'cy' ) );
 			var r = parseFloat( node.getAttribute( 'r' ) );
 
-			// Transform of center
-			tempVecA.set( x, y );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			x = tempVecB.x;
-			y = tempVecB.y;
-
-			// Scale
-			var scaleX = getTransformScaleX( currentTransform );
-			var scaleY = getTransformScaleY( currentTransform );
-
 			var subpath = new THREE.Path();
-
-			if ( Math.abs( scaleX - scaleY ) > 0.00000001 ) {
-
-				// Circle scaled differently in x and y becomes an ellipse
-
-				// Rotation
-				if ( isTransformRotated( currentTransform ) ) {
-					console.warn( "SVGLoader: Circle rotation in conjuction with non uniform scaling is not implemented." );
-				}
-
-				subpath.absellipse( x, y, r * scaleX, r * scaleY, 0, Math.PI * 2 );
-
-			}
-			else {
-
-				subpath.absarc( x, y, r, 0, Math.PI * 2 );
-
-			}
+			subpath.absarc( x, y, r, 0, Math.PI * 2 );
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
@@ -804,21 +637,6 @@ THREE.SVGLoader.prototype = {
 			var y = parseFloat( node.getAttribute( 'cy' ) );
 			var rx = parseFloat( node.getAttribute( 'rx' ) );
 			var ry = parseFloat( node.getAttribute( 'ry' ) );
-
-			// Transform of center
-			tempVecA.set( x, y );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			x = tempVecB.x;
-			y = tempVecB.y;
-
-			// Rotation
-			if ( isTransformRotated( currentTransform ) ) {
-				console.warn( "SVGLoader: Ellipse rotation or skewing is not implemented." );
-			}
-
-			// Scale
-			rx *= getTransformScaleX( currentTransform );
-			ry *= getTransformScaleY( currentTransform );
 
 			var subpath = new THREE.Path();
 			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
@@ -837,16 +655,6 @@ THREE.SVGLoader.prototype = {
 			var y1 = parseFloat( node.getAttribute( 'y1' ) );
 			var x2 = parseFloat( node.getAttribute( 'x2' ) );
 			var y2 = parseFloat( node.getAttribute( 'y2' ) );
-			
-			tempVecA.set( x1, y1 );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			x1 = tempVecB.x;
-			y1 = tempVecB.y;
-
-			tempVecA.set( x2, y2 );
-			transfVec2( tempVecA, currentTransform, tempVecB );
-			x2 = tempVecB.x;
-			y2 = tempVecB.y;
 
 			var path = new THREE.ShapePath();
 			path.moveTo( x1, y1 );
@@ -919,6 +727,30 @@ THREE.SVGLoader.prototype = {
 			return array;
 
 
+		}
+
+		function getNodeTransform( node ) {
+
+			if ( ! node.hasAttribute( 'transform' ) ) {
+				return null;
+			}
+
+			var transform = parseTransformNode( node );
+
+			if ( transform ) {
+
+				if ( transformStack.length > 0 ) {
+					multiplyTransforms( transform, transformStack[ transformStack.length - 1 ], tempTransform );
+					copyTransform( tempTransform, transform );
+				}
+
+				copyTransform( transform, currentTransform );
+				transformStack.push( transform );
+
+			}
+
+			return transform;
+	
 		}
 
 		function parseTransformNode( node ) {
@@ -1016,13 +848,35 @@ THREE.SVGLoader.prototype = {
 
 						break;
 
+					case "skewX":
+
+						if ( array.length === 1 ) {
+
+							transform = createIdTransform();
+
+							transform[ 2 ] = Math.tan( array[ 0 ] * Math.PI / 180 );
+
+						}
+
+						break;
+
+					case "skewY":
+
+						if ( array.length === 1 ) {
+
+							transform = createIdTransform();
+
+							transform[ 1 ] = Math.tan( array[ 0 ] * Math.PI / 180 );
+
+						}
+
+						break;
+
 					case "matrix":
 
 						if ( array.length === 6 ) {
 
-							transform = createIdTransform();
-
-							copyTransform( array, transform );
+							transform = array;
 
 						}
 
@@ -1032,6 +886,68 @@ THREE.SVGLoader.prototype = {
 			}
 			
 			return transform;
+
+		}
+
+		function transformPath( path, m ) {
+
+			var isRotated = isTransformRotated( m );
+
+			function transfVec2( v ) {
+
+				var x = v.x * m[ 0 ] + v.y * m[ 2 ] + m[ 4 ];
+				var y = v.x * m[ 1 ] + v.y * m[ 3 ] + m[ 5 ];
+
+				v.set( x, y );
+
+			}
+
+			var subPaths = path.subPaths;
+
+			for ( var i = 0, n = subPaths.length; i < n; i++ ) {
+
+				var subPath = subPaths[ i ];
+				var curves = subPath.curves;
+
+				for ( var j = 0; j < curves.length; j++ ) {
+
+					var curve = curves[ j ];
+
+					if ( curve.isLineCurve ) {
+
+						transfVec2( curve.v1 );
+						transfVec2( curve.v2 );
+
+					}
+					else if ( curve.isCubicBezierCurve ) {
+
+						transfVec2( curve.v0 );
+						transfVec2( curve.v1 );
+						transfVec2( curve.v2 );
+						transfVec2( curve.v3 );
+
+					}
+					else if ( curve.isQuadraticBezierCurve ) {
+
+						transfVec2( curve.v0 );
+						transfVec2( curve.v1 );
+						transfVec2( curve.v2 );
+
+					}
+					else if ( curve.isEllipseCurve ) {
+
+						if ( isRotated ) {
+							console.warn( "SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented." );
+						}
+
+						curve.xRadius *= getTransformScaleX( m );
+						curve.yRadius *= getTransformScaleY( m );
+
+					}
+
+				}
+	
+			}
 
 		}
 
@@ -1062,13 +978,6 @@ THREE.SVGLoader.prototype = {
 			for ( var i = 0; i < 6; i++ ) {
 				dest[ i ] = orig[ i ]
 			}
-
-		}
-
-		function transfVec2( v, m, r ) {
-
-			r.x = v.x * m[ 0 ] + v.y * m[ 2 ] + m[ 4 ];
-			r.y = v.x * m[ 1 ] + v.y * m[ 3 ] + m[ 5 ];
 
 		}
 
@@ -1122,9 +1031,6 @@ THREE.SVGLoader.prototype = {
 		var currentTransform = createIdTransform();
 		
 		var tempTransform = createIdTransform();
-		var tempVecA = new THREE.Vector2();
-		var tempVecB = new THREE.Vector2();
-		var tempVecC = new THREE.Vector2();
 
 		console.time( 'THREE.SVGLoader: DOMParser' );
 
