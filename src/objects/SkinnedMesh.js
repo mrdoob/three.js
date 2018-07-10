@@ -189,6 +189,10 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			this.bindMatrixInverse.getInverse( this.bindMatrix );
 
+		} else if ( this.bindMode === 'local' ) {
+
+			// do nothing - leave bind matrix inverse at identity
+
 		} else {
 
 			console.warn( 'THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );

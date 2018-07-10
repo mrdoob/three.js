@@ -15,9 +15,12 @@ THREE.ColladaLoader.prototype = {
 
 	crossOrigin: 'anonymous',
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load: function ( url, onLoad, onProgress, onError, options ) {
 
 		var scope = this;
+		
+		// pass loading options to parser
+		scope.load_options = options;
 
 		var path = scope.path === undefined ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
@@ -55,6 +58,9 @@ THREE.ColladaLoader.prototype = {
 	},
 
 	parse: function ( text, path ) {
+		
+		// provide closure for load options to be seen from the various anonymous functions
+		var load_options = this.load_options;
 
 		function getElementsByTagName( xml, name ) {
 
@@ -3436,6 +3442,14 @@ THREE.ColladaLoader.prototype = {
 					if ( object.isSkinnedMesh ) {
 
 						object.bind( skeleton, controller.skin.bindMatrix );
+						
+						if (load_options && load_options.localSkinning) {
+							// to support this mode, the skeleton (THREE.Bone hierarchy) needs to be at scene root
+							object.bindMode = 'local';
+							// clear BMI (base bind matrix should be identity for local skinning)
+							object.bindMatrixInverse.identity();
+						}
+						
 						object.normalizeSkinWeights();
 
 					}
