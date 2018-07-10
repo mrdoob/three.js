@@ -4,7 +4,11 @@
 
 function painterSortStable( a, b ) {
 
-	if ( a.renderOrder !== b.renderOrder ) {
+	if ( a.groupOrder !== b.groupOrder ) {
+
+		return a.groupOrder - b.groupOrder;
+
+	} else	if ( a.renderOrder !== b.renderOrder ) {
 
 		return a.renderOrder - b.renderOrder;
 
@@ -30,7 +34,11 @@ function painterSortStable( a, b ) {
 
 function reversePainterSortStable( a, b ) {
 
-	if ( a.renderOrder !== b.renderOrder ) {
+	if ( a.groupOrder !== b.groupOrder ) {
+
+		return a.groupOrder - b.groupOrder;
+
+	} else	if ( a.renderOrder !== b.renderOrder ) {
 
 		return a.renderOrder - b.renderOrder;
 
@@ -49,7 +57,11 @@ function reversePainterSortStable( a, b ) {
 
 function painterSortStableSprites( a, b ) {
 
-	if ( a.renderOrder !== b.renderOrder ) {
+	if ( a.groupOrder !== b.groupOrder ) {
+
+		return a.groupOrder - b.groupOrder;
+
+	} else	if ( a.renderOrder !== b.renderOrder ) {
 
 	 return a.renderOrder - b.renderOrder;
 
@@ -97,6 +109,7 @@ function WebGLRenderList() {
 				material: material,
 				program: material.program,
 				renderOrder: object.renderOrder,
+				groupOrder: object.__groupOrder,
 				z: z,
 				group: group
 			};
@@ -111,6 +124,7 @@ function WebGLRenderList() {
 			renderItem.material = material;
 			renderItem.program = material.program;
 			renderItem.renderOrder = object.renderOrder;
+			renderItem.groupOrder = object.__groupOrder;
 			renderItem.z = z;
 			renderItem.group = group;
 
