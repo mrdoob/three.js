@@ -109,25 +109,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
-			if ( panner.positionX ) {
-
-				// code path for Chrome and Firefox (see #14393)
-
-				var endTime = this.context.currentTime + this.listener.timeDelta;
-
-				panner.positionX.linearRampToValueAtTime( position.x, endTime );
-				panner.positionY.linearRampToValueAtTime( position.y, endTime );
-				panner.positionZ.linearRampToValueAtTime( position.z, endTime );
-				panner.orientationX.linearRampToValueAtTime( orientation.x, endTime );
-				panner.orientationY.linearRampToValueAtTime( orientation.y, endTime );
-				panner.orientationZ.linearRampToValueAtTime( orientation.z, endTime );
-
-			} else {
-
-				panner.setPosition( position.x, position.y, position.z );
-				panner.setOrientation( orientation.x, orientation.y, orientation.z );
-
-			}
+			panner.setPosition( position.x, position.y, position.z );
+			panner.setOrientation( orientation.x, orientation.y, orientation.z );
 
 		};
 
