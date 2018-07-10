@@ -1471,6 +1471,8 @@ function WebGLRenderer( parameters ) {
 
 			material.onBeforeCompile( materialProperties.shader, _this );
 
+			code = programCache.getProgramCode( material, parameters );
+
 			program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
 
 			materialProperties.program = program;
