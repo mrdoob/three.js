@@ -96,7 +96,7 @@ function WebGLRenderList() {
 
 	}
 
-	function push( object, geometry, material, z, group, groupOrder ) {
+	function push( object, geometry, material, z, group ) {
 
 		var renderItem = renderItems[ renderItemsIndex ];
 
@@ -109,7 +109,7 @@ function WebGLRenderList() {
 				material: material,
 				program: material.program,
 				renderOrder: object.renderOrder,
-				groupOrder: groupOrder,
+				groupOrder: object.__groupOrder,
 				z: z,
 				group: group
 			};
@@ -124,7 +124,7 @@ function WebGLRenderList() {
 			renderItem.material = material;
 			renderItem.program = material.program;
 			renderItem.renderOrder = object.renderOrder;
-			renderItem.groupOrder = groupOrder;
+			renderItem.groupOrder = object.__groupOrder;
 			renderItem.z = z;
 			renderItem.group = group;
 

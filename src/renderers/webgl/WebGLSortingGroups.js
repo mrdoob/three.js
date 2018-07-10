@@ -4,47 +4,83 @@
 
 function WebGLSortingGroups() {
 
-	var sortingGroups = [];
+	var currentGroupOrder;
+	var arrays = {};
 
-	function update( scene ) {
+	function init() {
 
-		sortingGroups.length = 0;
+		currentGroupOrder = 0;
 
-		findSortingGroups( scene );
+	}
+
+	function update( object, level ) {
+
+		if ( object.children.length === 0 ) return;
+
+		level = level || 0;
+
+		if ( arrays[ level ] === undefined ) arrays[ level ] = [];
+
+		var children = arrays[ level ];
+		children.length = 0;
+
+		Array.prototype.push.apply( children, object.children );
 
 		//
 
-		if ( sortingGroups.length > 1 ) {
+		children.sort( groupSortStable );
 
-			sortingGroups.sort( groupSortStable );
+		//
 
-			for ( var i = 0, l = sortingGroups.length; i < l; i ++ ) {
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-				var sortingGroup = sortingGroups[ i ];
-				sortingGroup.__groupOrder = i;
+			var child = children[ i ];
+
+			if ( child.isMesh || child.isLine || child.isPoints || child.isImmediateRenderObject || child.isSprite ) {
+
+				if ( child.parent.isSortingGroup ) {
+
+					child.__groupOrder = currentGroupOrder;
+
+				} else {
+
+					child.__groupOrder = ++ currentGroupOrder;
+
+				}
+
+			} else if ( child.isSortingGroup ) {
+
+				currentGroupOrder = ++ currentGroupOrder;
 
 			}
+
+			update( child, level + 1 );
 
 		}
 
 	}
 
-	function findSortingGroups( object ) {
+	function finish() {
 
-		var children = object.children;
+		for ( var key in arrays ) {
 
-		if ( object.isSortingGroup ) sortingGroups.push( object );
-
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
-
-			findSortingGroups( children[ i ] );
+			arrays[ key ].length = 0;
 
 		}
+
+	}
+
+	function dispose() {
+
+		arrays = {};
 
 	}
 
 	return {
 
+		dispose: dispose,
+		finish: finish,
+		init: init,
 		update: update
 
 	};

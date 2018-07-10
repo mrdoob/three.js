@@ -502,6 +502,7 @@ function WebGLRenderer( parameters ) {
 		renderStates.dispose();
 		properties.dispose();
 		objects.dispose();
+		sortingGroups.dispose();
 
 		vr.dispose();
 
@@ -1061,11 +1062,13 @@ function WebGLRenderer( parameters ) {
 
 		if ( _this.sortingGroupsEnabled === true ) {
 
+			sortingGroups.init();
 			sortingGroups.update( scene );
+			sortingGroups.finish();
 
 		}
 
-		projectObject( scene, camera, _this.sortObjects, 0 );
+		projectObject( scene, camera, _this.sortObjects );
 
 		if ( _this.sortObjects === true ) {
 
@@ -1217,7 +1220,7 @@ function WebGLRenderer( parameters ) {
 	}
 	*/
 
-	function projectObject( object, camera, sortObjects, groupOrder ) {
+	function projectObject( object, camera, sortObjects ) {
 
 		if ( object.visible === false ) return;
 
@@ -1225,11 +1228,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( visible ) {
 
-			if ( object.isSortingGroup ) {
-
-				groupOrder = object.__groupOrder;
-
-			}	else if ( object.isLight ) {
+			if ( object.isLight ) {
 
 				currentRenderState.pushLight( object );
 
@@ -1255,7 +1254,7 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
-					currentRenderList.push( object, geometry, material, _vector3.z, null, groupOrder );
+					currentRenderList.push( object, geometry, material, _vector3.z, null );
 
 				}
 
@@ -1268,7 +1267,7 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				currentRenderList.push( object, null, object.material, _vector3.z, null, groupOrder );
+				currentRenderList.push( object, null, object.material, _vector3.z, null );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -1301,7 +1300,7 @@ function WebGLRenderer( parameters ) {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group, groupOrder );
+								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
 
 							}
 
@@ -1309,7 +1308,7 @@ function WebGLRenderer( parameters ) {
 
 					} else if ( material.visible ) {
 
-						currentRenderList.push( object, geometry, material, _vector3.z, null, groupOrder );
+						currentRenderList.push( object, geometry, material, _vector3.z, null );
 
 					}
 
@@ -1323,7 +1322,7 @@ function WebGLRenderer( parameters ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ], camera, sortObjects, groupOrder );
+			projectObject( children[ i ], camera, sortObjects );
 
 		}
 
