@@ -400,7 +400,7 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
-	transformTo: function	( q, step ) {
+	transformTo: function ( q, step ) {
 
 		var angle = this.angleTo( q );
 
