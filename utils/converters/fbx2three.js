@@ -52,7 +52,7 @@ THREE.ImageLoader.prototype.load = function ( url, onLoad ) {
 };
 
 // Convert image buffer to data URL.
-THREE.Texture.prototype._getDataURL = function ( image ) {
+THREE.ImageUtils.getDataURL = function ( image ) {
 
 	if ( !( image instanceof Buffer ) ) {
 
