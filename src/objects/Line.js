@@ -5,7 +5,7 @@ import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

@@ -23,23 +23,35 @@ function glsl() {
 
 }
 
-export default {
-	input: 'src/Three.js',
-	plugins: [
-		glsl()
-	],
-	// sourceMap: true,
-	output: [
-		{
-			format: 'umd',
-			name: 'THREE',
-			file: 'build/three.js',
-			indent: '\t'
-		},
-		{
-			format: 'es',
-			file: 'build/three.module.js',
-			indent: '\t'
-		}
-	]
-};
+export default [
+	{
+		input: 'src/renderers/shaders/ShaderChunkSrc.js',
+		plugins: [
+			glsl()
+		],
+		output: [
+			{
+				format: 'es',
+				file: 'src/renderers/shaders/ShaderChunk.js',
+				indent: '\t'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		// sourceMap: true,
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.js',
+				indent: '\t'
+			},
+			{
+				format: 'es',
+				file: 'build/three.module.js',
+				indent: '\t'
+			}
+		]
+	}
+];
