@@ -420,7 +420,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		} else if ( mode === 'rotate' ) {
 
-			var LINEAR_ROTATION_SPEED = 10 / worldPosition.distanceTo( _tempVector.setFromMatrixPosition( this.camera.matrixWorld ) );
+			var ROTATION_SPEED = 20 / worldPosition.distanceTo( _tempVector.setFromMatrixPosition( this.camera.matrixWorld ) );
 
 			var quaternion = this.space === "local" ? worldQuaternion : _identityQuaternion;
 
@@ -436,7 +436,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 				_tempVector.copy( pointEnd ).sub( pointStart ).cross( eye ).normalize();
 				rotationAxis.copy( _tempVector );
-				rotationAngle = pointEnd.sub( pointStart ).dot( _tempVector.cross( eye ) ) * LINEAR_ROTATION_SPEED;
+				rotationAngle = pointEnd.sub( pointStart ).dot( _tempVector.cross( eye ) ) * ROTATION_SPEED;
 
 			} else if ( axis === 'X' || axis === 'Y' || axis === 'Z' ) {
 
@@ -444,27 +444,13 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 				rotationAxis.copy( unit );
 
-				var normalToCamera = Math.abs( _alignVector.dot( eye ) ) > 0.3;
-
-				if ( normalToCamera ) {
-
-					_tempVector.copy( pointEnd ).cross( pointStart );
-
-					var flip = {
-						X: _tempVector.x > 0 ? -1 : 1,
-						Y: _tempVector.y > 0 ? -1 : 1,
-						Z: _tempVector.z > 0 ? -1 : 1
-					}
-
-					rotationAngle = pointEnd.angleTo( pointStart ) * flip[ axis ];
-
-				} else {
-
-					_tempVector = unit.clone().applyQuaternion( quaternion );
-					_tempVector2 = pointEnd.clone().sub( pointStart ).applyQuaternion( worldQuaternionStart );
-					rotationAngle = _tempVector2.dot( _tempVector.cross( eye ) ) * LINEAR_ROTATION_SPEED;
-
+				_tempVector = unit.clone();
+				_tempVector2 = pointEnd.clone().sub( pointStart );
+				if ( space === 'local' ) {
+					_tempVector.applyQuaternion( quaternion );
+					_tempVector2.applyQuaternion( worldQuaternionStart );
 				}
+				rotationAngle = _tempVector2.dot( _tempVector.cross( eye ).normalize() ) * ROTATION_SPEED;
 
 			}
 
@@ -835,18 +821,15 @@ THREE.TransformControlsGizmo = function () {
 	var gizmoRotate = {
 		X: [
 			[ new THREE.Line( CircleGeometry( 1, 0.5 ), matLineRed ) ],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matRed ), [ 0, 0, 0.99 ], null, [ 1, 3, 1 ], 'linear' ],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.03, 0 ), matRed ), [ 0, 0, 1 ], null, [ 4, 1, 4 ], 'radial' ],
+			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matRed ), [ 0, 0, 0.99 ], null, [ 1, 3, 1 ] ],
 		],
 		Y: [
 			[ new THREE.Line( CircleGeometry( 1, 0.5 ), matLineGreen ), null, [ 0, 0, -Math.PI / 2 ] ],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matGreen ), [ 0, 0, 0.99 ], null, [ 3, 1, 1 ], 'linear' ],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.03, 0 ), matGreen ), [ 0, 0, 1 ], null, [ 1, 4, 4 ], 'radial' ],
+			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matGreen ), [ 0, 0, 0.99 ], null, [ 3, 1, 1 ] ],
 		],
 		Z: [
 			[ new THREE.Line( CircleGeometry( 1, 0.5 ), matLineBlue ), null, [ 0, Math.PI / 2, 0 ] ],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matBlue ), [ 0.99, 0, 0 ], null, [ 1, 3, 1 ], 'linear' ],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.03, 0 ), matBlue ), [ 1, 0, 0 ], null, [ 4, 1, 4 ], 'radial' ],
+			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matBlue ), [ 0.99, 0, 0 ], null, [ 1, 3, 1 ] ],
 		],
 		E: [
 			[ new THREE.Line( CircleGeometry( 1.25, 1 ), matLineYellowTransparent ), null, [ 0, Math.PI / 2, 0 ] ],
@@ -1206,38 +1189,42 @@ THREE.TransformControlsGizmo = function () {
 
 				// Hide translate and scale axis facing the camera
 
+				var AXIS_HIDE_TRESHOLD = 0.99;
+				var PLANE_HIDE_TRESHOLD = 0.2;
+				var AXIS_FLIP_TRESHOLD = -0.4;
+
 				if ( handle.name === 'X' || handle.name === 'XYZX' ) {
-					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.99 ) {
+					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 					}
 				}
 				if ( handle.name === 'Y' || handle.name === 'XYZY' ) {
-					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.99 ) {
+					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 					}
 				}
 				if ( handle.name === 'Z' || handle.name === 'XYZZ' ) {
-					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.99 ) {
+					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 					}
 				}
 				if ( handle.name === 'XY' ) {
-					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < 0.2 ) {
+					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 					}
 				}
 				if ( handle.name === 'YZ' ) {
-					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < 0.2 ) {
+					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 					}
 				}
 				if ( handle.name === 'XZ' ) {
-					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < 0.2 ) {
+					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 					}
@@ -1246,7 +1233,7 @@ THREE.TransformControlsGizmo = function () {
 				// Flip translate and scale axis ocluded behind another axis
 
 				if ( handle.name.search( 'X' ) !== -1 ) {
-					if ( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) < -0.4 ) {
+					if ( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
 						if ( handle.tag === 'fwd' ) {
 							handle.visible = false;
 						} else {
@@ -1258,7 +1245,7 @@ THREE.TransformControlsGizmo = function () {
 				}
 
 				if ( handle.name.search( 'Y' ) !== -1 ) {
-					if ( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) < -0.4 ) {
+					if ( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
 						if ( handle.tag === 'fwd' ) {
 							handle.visible = false;
 						} else {
@@ -1270,7 +1257,7 @@ THREE.TransformControlsGizmo = function () {
 				}
 
 				if ( handle.name.search( 'Z' ) !== -1 ) {
-					if ( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) < -0.4 ) {
+					if ( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
 						if ( handle.tag === 'fwd' ) {
 							handle.visible = false;
 						} else {
@@ -1282,38 +1269,6 @@ THREE.TransformControlsGizmo = function () {
 				}
 
 			} else if ( this.mode === 'rotate' ) {
-
-				// switch between liner/radial quaternion handle affordances
-
-				if ( handle.name === 'X' ) {
-					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.3 ) {
-						if ( handle.tag === 'linear' ) {
-							handle.visible = false;
-						}
-					} else if ( handle.tag === 'radial' ) {
-						handle.visible = false;
-					}
-				}
-
-				if ( handle.name === 'Y' ) {
-					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.3 ) {
-						if ( handle.tag === 'linear' ) {
-							handle.visible = false;
-						}
-					} else if ( handle.tag === 'radial' ) {
-						handle.visible = false;
-					}
-				}
-
-				if ( handle.name === 'Z' ) {
-					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.3 ) {
-						if ( handle.tag === 'linear' ) {
-							handle.visible = false;
-						}
-					} else if ( handle.tag === 'radial' ) {
-						handle.visible = false;
-					}
-				}
 
 				// Align handles to current local or world rotation
 
@@ -1364,17 +1319,17 @@ THREE.TransformControlsGizmo = function () {
 
 				if ( handle.name === this.axis ) {
 
-					handle.material.opacity *= 2.0;
+					handle.material.opacity = 1.0;
 					handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
 
 				} else if ( this.axis.split('').some( function( a ) { return handle.name === a; } ) ) {
 
-					handle.material.opacity *= 2.0;
+					handle.material.opacity = 1.0;
 					handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
 
 				} else {
 
-					handle.material.opacity *= 0.15;
+					handle.material.opacity *= 0.05;
 
 				}
 
