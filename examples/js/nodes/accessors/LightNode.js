@@ -22,13 +22,13 @@ LightNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isCache( 'light' ) ) {
 
-		return builder.format( 'reflectedLight.directDiffuse', this.getType( builder ), output );
+		return builder.format( 'reflectedLight.directDiffuse', this.type, output );
 
 	} else {
 
 		console.warn( "THREE.LightNode is only compatible in \"light\" channel." );
 
-		return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
+		return builder.format( 'vec3( 0.0 )', this.type, output );
 
 	}
 
