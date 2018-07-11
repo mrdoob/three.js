@@ -43,6 +43,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
+				scope.manager.itemEnd( itemGroup );
 				scope.manager.itemError( itemGroup );
 
 			};
