@@ -52,10 +52,10 @@
 		</p>
 
 		<code>
-// White directional light at half intensity shining from the top.
-var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-scene.add( directionalLight );
-	</code>
+		// White directional light at half intensity shining from the top.
+		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		scene.add( directionalLight );
+		</code>
 
 
 		<h2>Constructor</h2>
@@ -104,24 +104,26 @@ scene.add( directionalLight );
 
 			*Note*: For the target's position to be changed to anything other than the default,
 			it must be added to the [page:Scene scene] using
-			<code>
-				scene.add( light.target );
-			</code>
-
+		</p>
+		<code>
+		scene.add( light.target );
+		</code>
+		<p>
 			This is so that the target's [page:Object3D.matrixWorld matrixWorld] gets automatically
 			updated each frame.<br /><br />
 
 			It is also possible to set the target to be another object in the scene (anything with a
 			[page:Object3D.position position] property), like so:
-			<code>
-	var targetObject = new THREE.Object3D();
-	scene.add(targetObject);
+		</p>
+		<code>
+		var targetObject = new THREE.Object3D();
+		scene.add(targetObject);
 
-	light.target = targetObject;
-			</code>
+		light.target = targetObject;
+		</code>
+		<p>
 			The directionalLight will now track the target object.
 		</p>
-
 
 
 		<h2>Methods</h2>
