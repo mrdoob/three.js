@@ -181,14 +181,14 @@
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
+			var toolbar = new Toolbar( editor );
+			document.body.appendChild( toolbar.dom );
+
 			var script = new Script( editor );
 			document.body.appendChild( script.dom );
 
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
-
-			var toolbar = new Toolbar( editor );
-			document.body.appendChild( toolbar.dom );
 
 			var menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );

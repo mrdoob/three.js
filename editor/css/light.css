@@ -49,7 +49,7 @@ select {
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 0px;
+	bottom: 0;
 }
 
 	#viewport #info {
@@ -62,7 +62,7 @@ select {
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0;
 	opacity: 0.9;
 }
 
@@ -71,7 +71,7 @@ select {
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0;
 }
 
 #menubar {
