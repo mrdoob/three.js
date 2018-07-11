@@ -23,26 +23,31 @@ SpriteNode.prototype.build = function ( builder ) {
 	var output, code;
 
 	builder.define( 'SPRITE' );
+	builder.define( 'ALPHATEST', '0.0' );
 
 	builder.requires.lights = false;
-	builder.requires.transparent = this.alpha != undefined;
+	builder.requires.transparent = this.alpha !== undefined;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
 		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
-			THREE.UniformsLib[ "fog" ]
+			THREE.UniformsLib.fog
 		] ) );
 
 		builder.addParsCode( [
-			"#include <fog_pars_vertex>"
+			"#include <common>",
+			"#include <fog_pars_vertex>",
+			"#include <logdepthbuf_pars_vertex>",
+			"#include <clipping_planes_pars_vertex>"
 		].join( "\n" ) );
 
 		output = [
+			"#include <clipping_planes_fragment>",
 			"#include <begin_vertex>"
 		];
-
+		
 		if ( position ) {
 
 			output.push(
@@ -51,7 +56,7 @@ SpriteNode.prototype.build = function ( builder ) {
 			);
 
 		}
-
+		
 		output.push(
 			"#include <project_vertex>",
 			"#include <fog_vertex>",
@@ -80,7 +85,7 @@ SpriteNode.prototype.build = function ( builder ) {
 			'modelViewMtx[0][1] = 0.0;',
 			'modelViewMtx[0][2] = 0.0;'
 		);
-
+		
 		if ( this.spherical ) {
 
 			output.push(
@@ -91,50 +96,68 @@ SpriteNode.prototype.build = function ( builder ) {
 			);
 
 		}
-
+		
 		output.push(
 			// Thrid colunm.
 			'modelViewMtx[2][0] = 0.0;',
 			'modelViewMtx[2][1] = 0.0;',
 			'modelViewMtx[2][2] = 1.0;',
 
-			// apply
-			'gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( transformed, 1.0 );'
+			"gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( transformed, 1.0 );",
+			
+			"#include <logdepthbuf_vertex>",
+			"#include <clipping_planes_vertex>",
+			"#include <fog_vertex>"
 		);
 
 	} else {
 
 		builder.addParsCode( [
+			"#include <common>",
 			"#include <fog_pars_fragment>",
+			"#include <logdepthbuf_pars_fragment>",
+			"#include <clipping_planes_pars_fragment>"
 		].join( "\n" ) );
 
+		builder.addCode( [
+			"#include <clipping_planes_fragment>",
+			"#include <logdepthbuf_fragment>"
+		].join( "\n" ) );
+		
 		// parse all nodes to reuse generate codes
 
-		this.color.parse( builder, { slot: 'color' } );
-
 		if ( this.alpha ) this.alpha.parse( builder );
+		
+		this.color.parse( builder, { slot: 'color' } );
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
-		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
-
-		output = [ color.code ];
+		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined,
+			color = this.color.buildCode( builder, 'c', { slot: 'color' } );
 
 		if ( alpha ) {
 
-			output.push(
+			output = [
 				alpha.code,
+				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+				color.code,
 				"gl_FragColor = vec4( " + color.result + ", " + alpha.result + " );"
-			);
+			];
 
 		} else {
 
-			output.push( "gl_FragColor = vec4( " + color.result + ", 1.0 );" );
+			output = [
+				color.code,
+				"gl_FragColor = vec4( " + color.result + ", 1.0 );"
+			];
 
 		}
 
-		output.push( "#include <fog_fragment>" );
+		output.push( 
+			"#include <tonemapping_fragment>",
+			"#include <encodings_fragment>",
+			"#include <fog_fragment>" 
+		);
 
 	}
 
@@ -154,7 +177,7 @@ SpriteNode.prototype.copy = function ( source ) {
 	
 	this.color = source.color;
 	
-	if ( source.spherical !== undefined ) this.spherical = source.position;
+	if ( source.spherical !== undefined ) this.spherical = source.spherical;
 	
 	if ( source.alpha ) this.alpha = source.alpha;
 

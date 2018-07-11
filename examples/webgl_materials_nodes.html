@@ -185,6 +185,8 @@
 				'adv / soft-body': 'soft-body',
 				'adv / wave': 'wave',
 				'adv / triangle-blur': 'triangle-blur',
+				'adv / render-to-texture': 'rtt',
+				'adv / conditional': 'conditional',
 				'adv / expression': 'expression',
 				'adv / sss': 'sss',
 				'adv / translucent': 'translucent',
@@ -221,7 +223,7 @@
 
 			} else if ( typeof value == 'object' ) {
 
-				param.blend = value[ Object.keys( value )[ 0 ] ];
+				param[ name ] = value[ Object.keys( value )[ 0 ] ];
 
 				node = gui.add( param, name, value ).onChange( function () {
 
@@ -2070,6 +2072,107 @@
 
 					break;	
 				
+				case 'conditional':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var a = new THREE.FloatNode( 0 ),
+						b = new THREE.FloatNode( 0 ),
+						ifNode = new THREE.ColorNode( 0x0000FF ),
+						elseNode = new THREE.ColorNode( 0xFF0000 );
+					
+					var cond = new THREE.CondNode( a, b, ifNode, elseNode, THREE.CondNode.EQUAL );
+					
+					mtl.color = cond;
+
+					// GUI
+					
+					addGui( 'a', a.value, function ( val ) {
+
+						a.value = val;
+
+					}, false, 0, 1 );
+					
+					addGui( 'b', b.value, function ( val ) {
+
+						b.value = val;
+
+					}, false, 0, 1 );
+					
+					addGui( 'a condition b', {
+						EQUAL: THREE.CondNode.EQUAL,
+						NOT_EQUAL: THREE.CondNode.NOT_EQUAL,
+						GREATER: THREE.CondNode.GREATER,
+						GREATER_EQUAL: THREE.CondNode.GREATER_EQUAL,
+						LESS: THREE.CondNode.LESS,
+						LESS_EQUAL: THREE.CondNode.LESS_EQUAL
+					}, function ( val ) {
+
+						cond.op = val;
+						
+						mtl.needsUpdate = true;
+
+					} );
+					
+					addGui( 'if color', ifNode.value.getHex(), function ( val ) {
+
+						ifNode.value.setHex( val );
+
+					}, true );
+
+					addGui( 'else color', elseNode.value.getHex(), function ( val ) {
+
+						elseNode.value.setHex( val );
+
+					}, true );
+					
+					break;
+				
+				case 'rtt':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var uvTransform = new THREE.UVTransformNode(),
+						checker = new THREE.CheckerNode( uvTransform );
+					
+					uvTransform.setUvTransform( 0, 0, 2, 2, 0 );
+					
+					var rtt = new THREE.RTTNode( 512, 512, checker ),
+						bumpMap = new THREE.BumpMapNode( rtt );
+					
+					bumpMap.scale.value = .1;
+					
+					mtl.color = checker;
+					mtl.normal = bumpMap;
+					
+					// GUI
+					
+					addGui( 'bump', bumpMap.scale.value, function ( val ) {
+
+						bumpMap.scale.value = val;
+
+					}, false, - .5, .5 );
+					
+					addGui( 'scale', 2, function ( val ) {
+
+						uvTransform.setUvTransform( 0, 0, val, val, 0 );
+
+					}, false, 0, 8 );
+					
+					addGui( 'ignoreColor', false, function ( val ) {
+
+						mtl.color = val ? new THREE.ColorNode( 0xFFFFFF ) : checker;
+
+						mtl.needsUpdate = true;
+
+					} );
+					
+					break;
+				
 				case 'readonly':
 
 					// MATERIAL
@@ -2447,6 +2550,7 @@
 			// update material animation and/or gpu calcs (pre-renderer)
 			
 			frame.update( delta );
+			frame.setRenderer( renderer );
 			
 			if ( mesh.material instanceof THREE.NodeMaterial ) {
 			

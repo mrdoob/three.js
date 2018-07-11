@@ -26,12 +26,12 @@ Node.prototype = {
 
 		builder.parsing = true;
 
-		this.build( builder.addCache( settings.cache, settings.requires ).addSlot( settings.slot ), 'v4' );
+		this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), 'v4' );
 
 		builder.clearVertexNodeCode()
 		builder.clearFragmentNodeCode();
 
-		builder.removeCache().removeSlot();
+		builder.removeFlow();
 
 		builder.parsing = false;
 
@@ -51,11 +51,11 @@ Node.prototype = {
 
 		settings = settings || {};
 
-		var data = { result: this.build( builder.addCache( settings.cache, settings.context ).addSlot( settings.slot ), output ) };
+		var data = { result: this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), output ) };
 
 		data.code = builder.clearNodeCode();
 
-		builder.removeCache().removeSlot();
+		builder.removeFlow();
 
 		return data;
 	
@@ -67,7 +67,11 @@ Node.prototype = {
 
 		var data = builder.getNodeData( uuid || this );
 
-		if ( builder.parsing ) this.appendDepsNode( builder, data, output );
+		if ( builder.parsing ) {
+			
+			this.appendDepsNode( builder, data, output );
+			
+		}
 
 		if ( builder.nodes.indexOf( this ) === - 1 ) {
 

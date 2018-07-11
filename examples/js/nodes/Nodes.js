@@ -33,6 +33,7 @@ export { CubeTextureNode } from './inputs/CubeTextureNode.js';
 export { ScreenNode } from './inputs/ScreenNode.js';
 export { ReflectorNode } from './inputs/ReflectorNode.js';
 export { PropertyNode } from './inputs/PropertyNode.js';
+export { RTTNode } from './inputs/RTTNode.js';
 
 // accessors
 
@@ -52,10 +53,12 @@ export { Math1Node } from './math/Math1Node.js';
 export { Math2Node } from './math/Math2Node.js';
 export { Math3Node } from './math/Math3Node.js';
 export { OperatorNode } from './math/OperatorNode.js';
+export { CondNode } from './math/CondNode.js';
 
 // procedural
 
 export { NoiseNode } from './procedural/NoiseNode.js';
+export { CheckerNode } from './procedural/CheckerNode.js';
 
 // bsdfs
 
@@ -79,6 +82,7 @@ export { TimerNode } from './utils/TimerNode.js';
 export { VelocityNode } from './utils/VelocityNode.js';
 export { UVTransformNode } from './utils/UVTransformNode.js';
 export { MaxMIPLevelNode } from './utils/MaxMIPLevelNode.js';
+export { ColorSpaceNode } from './utils/ColorSpaceNode.js';
 
 // effects
 

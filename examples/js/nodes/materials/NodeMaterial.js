@@ -11,10 +11,6 @@ function NodeMaterial( vertex, fragment ) {
 
 	THREE.ShaderMaterial.call( this );
 
-	// prevent code share conflict, remove in future
-	
-	this.defines.UUID = this.uuid;
-
 	this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
 	this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
 

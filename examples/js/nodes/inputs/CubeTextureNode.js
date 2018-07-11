@@ -4,6 +4,7 @@
 
 import { InputNode } from '../core/InputNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
+import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 
 function CubeTextureNode( value, uv, bias ) {
 
@@ -48,8 +49,15 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	if ( bias ) code = 'texCubeBias( ' + cubetex + ', ' + uv + ', ' + bias + ' )';
 	else code = 'texCube( ' + cubetex + ', ' + uv + ' )';
 
-	code = builder.getTexelDecodingFunctionFromTexture( code, this.value );
+	// add this context to replace ColorSpaceNode.input to code
+	
+	builder.addContext( { input: code, encoding: builder.getTextureEncodingFromMap( this.value ), include: builder.isShader('vertex') } )
 
+	this.colorSpace = this.colorSpace || new ColorSpaceNode( this );	
+	code = this.colorSpace.build( builder, this.type );
+	
+	builder.removeContext();
+	
 	return builder.format( code, this.type, output );
 
 };

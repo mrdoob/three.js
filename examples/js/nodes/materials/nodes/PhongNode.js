@@ -35,8 +35,8 @@ PhongNode.prototype.build = function ( builder ) {
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
+			THREE.UniformsLib.fog,
+			THREE.UniformsLib.lights
 
 		] ) );
 
@@ -50,12 +50,13 @@ PhongNode.prototype.build = function ( builder ) {
 			"#endif",
 
 			"#include <common>",
-			"#include <encodings_pars_fragment>", // encoding functions
+			//"#include <encodings_pars_fragment>", // encoding functions
 			"#include <fog_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
 			"#include <skinning_pars_vertex>",
 			"#include <shadowmap_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>"
+			"#include <logdepthbuf_pars_vertex>",
+			"#include <clipping_planes_pars_vertex>"
 		].join( "\n" ) );
 
 		var output = [
@@ -65,7 +66,7 @@ PhongNode.prototype.build = function ( builder ) {
 			"#include <skinnormal_vertex>",
 			"#include <defaultnormal_vertex>",
 
-			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
+			"#ifndef FLAT_SHADED", // normal computed with derivatives when FLAT_SHADED
 
 			"	vNormal = normalize( transformedNormal );",
 
@@ -89,11 +90,13 @@ PhongNode.prototype.build = function ( builder ) {
 			"	#include <project_vertex>",
 			"	#include <fog_vertex>",
 			"	#include <logdepthbuf_vertex>",
+			"	#include <clipping_planes_vertex>",
 
 			"	vViewPosition = - mvPosition.xyz;",
 
 			"	#include <worldpos_vertex>",
-			"	#include <shadowmap_vertex>"
+			"	#include <shadowmap_vertex>",
+			"	#include <fog_vertex>"
 		);
 
 		code = output.join( "\n" );

@@ -39,9 +39,10 @@ var elements = NodeUtils.elements,
 	};
  
 function NodeBuilder() {
-
-	this.caches = [];
+	
 	this.slots = [];
+	this.caches = [];
+	this.contexts = [];
 
 	this.keywords = {};
 	
@@ -238,44 +239,75 @@ NodeBuilder.prototype = {
 		this.requires.lights = material.lights;
 		this.requires.fog = material.fog;
 		
+		this.mergeDefines( material.defines );
+		
 		return this;
 		
 	},
 	
-	addCache: function ( name, context ) {
+	addFlow: function ( slot, cache, context ) {
+		
+		return this.addSlot( slot ).addCache( cache ).addContext( context );
+		
+	},
+	
+	removeFlow: function () {
+		
+		return this.removeSlot().removeCache().removeContext();
+		
+	},
+	
+	addCache: function ( name ) {
 
-		this.caches.push( {
-			name: name || '',
-			context: context || {}
-		} );
-
-		return this.update();
+		this.cache = name || '';
+		this.caches.push( this.cache );
+		
+		return this;
 
 	},
 
 	removeCache: function () {
 
 		this.caches.pop();
+		this.cache = this.caches[ this.caches.length - 1 ] || '';
 
-		return this.update();
+		return this;
 
 	},
 
+	addContext: function ( context ) {
+
+		this.context = context || {};
+		this.contexts.push( this.context );
+
+		return this;
+
+	},
+
+	removeContext: function () {
+
+		this.contexts.pop();
+		this.context = this.contexts[ this.contexts.length - 1 ] || {};
+
+		return this;
+
+	},
+	
 	addSlot: function ( name ) {
 
-		this.slots.push( {
-			name: name || ''
-		} );
+		this.slot = name || '';
+		this.slots.push( this.slot );
 
-		return this.update();
+		return this;
 
 	},
 
 	removeSlot: function () {
 
 		this.slots.pop();
+		this.slot = this.slots[ this.slots.length - 1 ] || {};
 
-		return this.update();
+		return this;
 
 	},
 
@@ -555,7 +587,7 @@ NodeBuilder.prototype = {
 
 		var uniform = new NodeUniform( {
 			type: type,
-			name: ns ? ns : 'nVu' + index + '_' + THREE.Math.generateUUID().substr(0, 8),
+			name: ns ? ns : 'nVu' + index,
 			node: node,
 			needsUpdate: needsUpdate
 		} );
@@ -589,6 +621,13 @@ NodeBuilder.prototype = {
 
 		node = typeof node === 'string' ? NodeLib.get( node ) : node;
 
+		if (this.context.include === false) {
+			
+			return node.name;
+			
+		} 
+		
+		
 		if ( node instanceof FunctionNode ) {
 
 			includesStruct = this.includes.functions;
@@ -805,34 +844,34 @@ NodeBuilder.prototype = {
 
 	format: function ( code, from, to ) {
 
-		var typeToType = this.colorToVector( to + ' = ' + from );
+		var typeToType = this.colorToVector( to + ' <- ' + from );
 
 		switch ( typeToType ) {
 
-			case 'f = v2': return code + '.x';
-			case 'f = v3': return code + '.x';
-			case 'f = v4': return code + '.x';
-			case 'f = i': return 'float( ' + code + ' )';
+			case 'f <- v2': return code + '.x';
+			case 'f <- v3': return code + '.x';
+			case 'f <- v4': return code + '.x';
+			case 'f <- i': return 'float( ' + code + ' )';
 
-			case 'v2 = f': return 'vec2( ' + code + ' )';
-			case 'v2 = v3': return code + '.xy';
-			case 'v2 = v4': return code + '.xy';
-			case 'v2 = i': return 'vec2( float( ' + code + ' ) )';
+			case 'v2 <- f': return 'vec2( ' + code + ' )';
+			case 'v2 <- v3': return code + '.xy';
+			case 'v2 <- v4': return code + '.xy';
+			case 'v2 <- i': return 'vec2( float( ' + code + ' ) )';
 
-			case 'v3 = f': return 'vec3( ' + code + ' )';
-			case 'v3 = v2': return 'vec3( ' + code + ', 0.0 )';
-			case 'v3 = v4': return code + '.xyz';
-			case 'v3 = i': return 'vec2( float( ' + code + ' ) )';
+			case 'v3 <- f': return 'vec3( ' + code + ' )';
+			case 'v3 <- v2': return 'vec3( ' + code + ', 0.0 )';
+			case 'v3 <- v4': return code + '.xyz';
+			case 'v3 <- i': return 'vec2( float( ' + code + ' ) )';
 
-			case 'v4 = f': return 'vec4( ' + code + ' )';
-			case 'v4 = v2': return 'vec4( ' + code + ', 0.0, 1.0 )';
-			case 'v4 = v3': return 'vec4( ' + code + ', 1.0 )';
-			case 'v4 = i': return 'vec4( float( ' + code + ' ) )';
+			case 'v4 <- f': return 'vec4( ' + code + ' )';
+			case 'v4 <- v2': return 'vec4( ' + code + ', 0.0, 1.0 )';
+			case 'v4 <- v3': return 'vec4( ' + code + ', 1.0 )';
+			case 'v4 <- i': return 'vec4( float( ' + code + ' ) )';
 
-			case 'i = f': return 'int( ' + code + ' )';
-			case 'i = v2': return 'int( ' + code + '.x )';
-			case 'i = v3': return 'int( ' + code + '.x )';
-			case 'i = v4': return 'int( ' + code + '.x )';
+			case 'i <- f': return 'int( ' + code + ' )';
+			case 'i <- v2': return 'int( ' + code + '.x )';
+			case 'i <- v3': return 'int( ' + code + '.x )';
+			case 'i <- v4': return 'int( ' + code + '.x )';
 
 		}
 
@@ -888,6 +927,18 @@ NodeBuilder.prototype = {
 
 	},
 	
+	mergeDefines: function ( defines ) {
+
+		for ( var name in defines ) {
+
+			this.defines[ name ] = defines[ name ];
+
+		}
+		
+		return this.defines;
+
+	},
+	
 	mergeUniform: function ( uniforms ) {
 
 		for ( var name in uniforms ) {
@@ -895,85 +946,15 @@ NodeBuilder.prototype = {
 			this.uniforms[ name ] = uniforms[ name ];
 
 		}
-
-	},
-
-	getTexelDecodingFunctionFromTexture: function( code, texture ) {
-
-		var gammaOverrideLinear = this.getTextureEncodingFromMap( texture, this.context.gamma && ( this.renderer ? this.renderer.gammaInput : false ) )
-
-		return this.getTexelDecodingFunction( code, gammaOverrideLinear );
-
-	},
-
-	getTexelDecodingFunction: function( value, encoding ) {
-
-		var components = this.getEncodingComponents( encoding );
-
-		return components[ 0 ] + 'ToLinear' + components[ 1 ].replace( 'value', value );
-
-	},
-
-	getTexelEncodingFunction: function( value, encoding ) {
-
-		var components = this.getEncodingComponents( encoding );
-
-		return 'LinearTo' + components[ 0 ] + components[ 1 ].replace( 'value', value );
-
-	},
-
-	getEncodingComponents: function( encoding ) {
-
-		switch ( encoding ) {
-
-			case THREE.LinearEncoding:
-				return [ 'Linear', '( value )' ];
-			case THREE.sRGBEncoding:
-				return [ 'sRGB', '( value )' ];
-			case THREE.RGBEEncoding:
-				return [ 'RGBE', '( value )' ];
-			case THREE.RGBM7Encoding:
-				return [ 'RGBM', '( value, 7.0 )' ];
-			case THREE.RGBM16Encoding:
-				return [ 'RGBM', '( value, 16.0 )' ];
-			case THREE.RGBDEncoding:
-				return [ 'RGBD', '( value, 256.0 )' ];
-			case THREE.GammaEncoding:
-				return [ 'Gamma', '( value, float( GAMMA_FACTOR ) )' ];
-			default:
-				throw new Error( 'unsupported encoding: ' + encoding );
-
-		}
-
-	},
-
-	getEncodingComponents: function( encoding ) {
-
-		switch ( encoding ) {
-
-			case THREE.LinearEncoding:
-				return [ 'Linear', '( value )' ];
-			case THREE.sRGBEncoding:
-				return [ 'sRGB', '( value )' ];
-			case THREE.RGBEEncoding:
-				return [ 'RGBE', '( value )' ];
-			case THREE.RGBM7Encoding:
-				return [ 'RGBM', '( value, 7.0 )' ];
-			case THREE.RGBM16Encoding:
-				return [ 'RGBM', '( value, 16.0 )' ];
-			case THREE.RGBDEncoding:
-				return [ 'RGBD', '( value, 256.0 )' ];
-			case THREE.GammaEncoding:
-				return [ 'Gamma', '( value, float( GAMMA_FACTOR ) )' ];
-			default:
-				throw new Error( 'unsupported encoding: ' + encoding );
-
-		}
+		
+		return this.uniforms;
 
 	},
 	
 	getTextureEncodingFromMap: function ( map, gammaOverrideLinear ) {
 
+		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.context.gamma && ( this.renderer ? this.renderer.gammaInput : false );
+	
 		var encoding;
 
 		if ( ! map ) {

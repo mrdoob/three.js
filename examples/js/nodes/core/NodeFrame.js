@@ -25,6 +25,14 @@ NodeFrame.prototype = {
 
 	},
 	
+	setRenderer: function( renderer ) {
+		
+		this.renderer = renderer;
+		
+		return this;
+		
+	},
+	
 	updateNode: function ( node ) {
 
 		if ( node.frameId === this.frameId ) return this;

@@ -81,9 +81,6 @@
 			// SpriteNode
 			//
 
-			// use scale to adjuste the real sprite size
-			plane = new THREE.PlaneBufferGeometry( 1, 1 );
-
 			// https://openclipart.org/detail/239883/walking-man-sprite-sheet
 			walkingManTextureURL = "textures/WalkingManSpriteSheet.png";
 
@@ -137,20 +134,20 @@
 			var spriteWidth = 20,
 				spriteHeight = 20;
 
-			scene.add( sprite1 = new THREE.Mesh( plane, new THREE.SpriteNodeMaterial() ) );
+			scene.add( sprite1 = new THREE.Sprite( new THREE.SpriteNodeMaterial() ) );
 			sprite1.scale.x = spriteWidth;
 			sprite1.scale.y = spriteHeight;
 			sprite1.material.color = new THREE.TextureNode( walkingManTexture );
 			sprite1.material.color.uv = createHorizontalSpriteSheetNode( 8, 10 );
 
-			scene.add( sprite2 = new THREE.Mesh( plane, new THREE.SpriteNodeMaterial() ) );
+			scene.add( sprite2 = new THREE.Sprite( new THREE.SpriteNodeMaterial() ) );
 			sprite2.position.x = 30;
 			sprite2.scale.x = spriteWidth;
 			sprite2.scale.y = spriteHeight;
 			sprite2.material.color = new THREE.TextureNode( walkingManTexture );
 			sprite2.material.color.uv = createHorizontalSpriteSheetNode( 8, 30 );
 			sprite2.material.color = new THREE.Math1Node( sprite2.material.color, THREE.Math1Node.INVERT );
-			sprite2.material.spherical = false; // look at camera horizontally only, very used to vegetation
+			sprite2.material.spherical = false; // look at camera horizontally only, very used in vegetation
 			// horizontal zigzag sprite
 			sprite2.material.position = new THREE.OperatorNode(
 				new THREE.OperatorNode(
@@ -172,13 +169,13 @@
 				"}"
 			].join( "\n" ) );
 
-			scene.add( sprite3 = new THREE.Mesh( plane, new THREE.SpriteNodeMaterial() ) );
+			scene.add( sprite3 = new THREE.Sprite( new THREE.SpriteNodeMaterial() ) );
 			sprite3.position.x = - 30;
 			sprite3.scale.x = spriteWidth;
 			sprite3.scale.y = spriteHeight;
 			sprite3.material.color = new THREE.TextureNode( walkingManTexture );
 			sprite3.material.color.uv = new THREE.FunctionCallNode( sineWaveFunction, {
-				"uv": createHorizontalSpriteSheetNode( 8, 0 ),
+				"uv": createHorizontalSpriteSheetNode( 8, 10 ),
 				"phase": new THREE.TimerNode()
 			} );
 			sprite3.material.fog = true;

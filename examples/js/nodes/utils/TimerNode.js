@@ -5,14 +5,14 @@
 import { FloatNode } from '../inputs/FloatNode.js';
 import { NodeLib } from '../core/NodeLib.js';
  
-function TimerNode( scale, scope, useTimeScale ) {
+function TimerNode( scale, scope, timeScale ) {
 
 	FloatNode.call( this );
 
 	this.scale = scale !== undefined ? scale : 1;
 	this.scope = scope || TimerNode.GLOBAL;
 
-	this.useTimeScale = useTimeScale !== undefined ? useTimeScale : this.scale !== 1;
+	this.timeScale = timeScale !== undefined ? timeScale : this.scale !== 1;
 
 };
 
@@ -73,7 +73,7 @@ TimerNode.prototype.copy = function ( source ) {
 	this.scope = source.scope;
 	this.scale = source.scale;
 	
-	this.useTimeScale = source.useTimeScale;
+	this.timeScale = source.timeScale;
 	
 };
 
@@ -88,7 +88,7 @@ TimerNode.prototype.toJSON = function ( meta ) {
 		data.scope = this.scope;
 		data.scale = this.scale;
 		
-		data.useTimeScale = this.useTimeScale;
+		data.timeScale = this.timeScale;
 
 	}
 

@@ -73,7 +73,7 @@ MeshStandardNode.prototype.build = function ( builder ) {
 		if ( props.normalMap ) {
 			
 			this.normal = new NormalMapNode( builder.resolve( props.normalMap ) );
-			this.normal.scale = builder.findNode( props.normalScale, inputs.normalScale )
+			this.normal.scale = builder.findNode( props.normalScale, inputs.normalScale );
 
 		}
 

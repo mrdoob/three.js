@@ -38,8 +38,8 @@ StandardNode.prototype.build = function ( builder ) {
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
+			THREE.UniformsLib.fog,
+			THREE.UniformsLib.lights
 
 		] ) );
 
@@ -53,12 +53,13 @@ StandardNode.prototype.build = function ( builder ) {
 			"#endif",
 
 			"#include <common>",
-			"#include <encodings_pars_fragment>", // encoding functions
+			//"#include <encodings_pars_fragment>", // encoding functions
 			"#include <fog_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
 			"#include <skinning_pars_vertex>",
 			"#include <shadowmap_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>"
+			"#include <logdepthbuf_pars_vertex>",
+			"#include <clipping_planes_pars_vertex>"
 
 		].join( "\n" ) );
 
@@ -68,9 +69,6 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <skinbase_vertex>",
 			"#include <skinnormal_vertex>",
 			"#include <defaultnormal_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
 
 			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
@@ -96,6 +94,7 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <project_vertex>",
 			"#include <fog_vertex>",
 			"#include <logdepthbuf_vertex>",
+			"#include <clipping_planes_vertex>",
 
 			"	vViewPosition = - mvPosition.xyz;",
 
@@ -183,6 +182,7 @@ StandardNode.prototype.build = function ( builder ) {
 			"#endif",
 
 			"#include <common>",
+			"#include <dithering_pars_fragment>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
 			"#include <lights_pars_begin>",
@@ -193,10 +193,12 @@ StandardNode.prototype.build = function ( builder ) {
 		].join( "\n" ) );
 
 		var output = [
-			// prevent undeclared normal
+			"#include <clipping_planes_fragment>",
+		
+			// add before: prevent undeclared normal
 			"	#include <normal_fragment_begin>",
 
-			// prevent undeclared material
+			// add before: prevent undeclared material
 			"	PhysicalMaterial material;",
 			"	material.diffuseColor = vec3( 1.0 );",
 
@@ -374,7 +376,6 @@ StandardNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-			"#include <premultiplied_alpha_fragment>",
 			"#include <tonemapping_fragment>",
 			"#include <encodings_fragment>",
 			"#include <fog_fragment>",

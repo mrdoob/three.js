@@ -33,6 +33,7 @@ import {
 	ScreenNode,
 	ReflectorNode,
 	PropertyNode,
+	RTTNode,
 	
 	// accessors
 	
@@ -52,10 +53,12 @@ import {
 	Math2Node,
 	Math3Node,
 	OperatorNode,
+	CondNode,
 	
 	// procedural
 	
 	NoiseNode,
+	CheckerNode,
 	
 	// bsdfs
 	
@@ -79,6 +82,7 @@ import {
 	VelocityNode,
 	UVTransformNode,
 	MaxMIPLevelNode,
+	ColorSpaceNode,
 	
 	// effects
 	
@@ -137,6 +141,7 @@ THREE.CubeTextureNode = CubeTextureNode;
 THREE.ScreenNode = ScreenNode;
 THREE.ReflectorNode = ReflectorNode;
 THREE.PropertyNode = PropertyNode;
+THREE.RTTNode = RTTNode;
 
 // accessors
 
@@ -156,10 +161,12 @@ THREE.Math1Node = Math1Node;
 THREE.Math2Node = Math2Node;
 THREE.Math3Node = Math3Node;
 THREE.OperatorNode = OperatorNode;
+THREE.CondNode = CondNode;
 
 // procedural
 
 THREE.NoiseNode = NoiseNode;
+THREE.CheckerNode = CheckerNode;
 
 // bsdfs
 
@@ -183,6 +190,7 @@ THREE.TimerNode = TimerNode;
 THREE.VelocityNode = VelocityNode;
 THREE.UVTransformNode = UVTransformNode;
 THREE.MaxMIPLevelNode = MaxMIPLevelNode;
+THREE.ColorSpaceNode = ColorSpaceNode;
 
 // effects
 

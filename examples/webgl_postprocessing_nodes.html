@@ -108,7 +108,7 @@
 
 				} else if ( typeof value == 'object' ) {
 
-					param.blend = value[ Object.keys( value )[ 0 ] ];
+					param[ name ] = value[ Object.keys( value )[ 0 ] ];
 
 					node = gui.add( param, name, value ).onChange( function () {
 
