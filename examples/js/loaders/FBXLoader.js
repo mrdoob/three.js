@@ -51,7 +51,7 @@
 
 				} catch ( error ) {
 
-					window.setTimeout( function () {
+					setTimeout( function () {
 
 						if ( onError ) onError( error );
 
@@ -3448,7 +3448,7 @@
 
 					}
 
-					if ( window.Zlib === undefined ) {
+					if ( typeof Zlib === 'undefined' ) {
 
 						console.error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
