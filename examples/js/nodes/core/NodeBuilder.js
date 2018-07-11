@@ -275,7 +275,7 @@ NodeBuilder.prototype = {
 
 	addContext: function ( context ) {
 
-		this.context = Object.assign( this.context || {}, context || {} );
+		this.context = Object.assign( {}, this.context || {}, context || {} );
 		this.contexts.push( this.context );
 
 		return this;
