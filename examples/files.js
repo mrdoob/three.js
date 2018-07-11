@@ -210,6 +210,7 @@ var files = {
 		"webgl_panorama_equirectangular",
 		"webgl_performance",
 		"webgl_performance_doublesided",
+		"webgl_performance_nodes",
 		"webgl_performance_static",
 		"webgl_physics_cloth",
 		"webgl_physics_convex_break",
