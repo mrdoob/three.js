@@ -6,9 +6,9 @@ import { InputNode } from '../core/InputNode.js';
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { TextureNode } from './TextureNode.js';
 
-function RTTNode( width, height, node, options ) {
+function RTTNode( width, height, input, options ) {
 
-	this.node = node;
+	this.input = input;
 	
 	this.clear = true;
 	
@@ -33,7 +33,7 @@ RTTNode.prototype.nodeType = "RTT";
 
 RTTNode.prototype.generate = function ( builder, output ) {
 	
-	this.material.fragment.value = this.node;
+	this.material.fragment.value = this.input;
 	
 	return TextureNode.prototype.generate.call( this, builder, output );
 };

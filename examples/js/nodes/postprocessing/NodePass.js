@@ -20,8 +20,8 @@ function NodePass() {
 
 	this.fragment = new RawNode( new ScreenNode() );
 
-	this.node = new NodeMaterial();
-	this.node.fragment = this.fragment;
+	this.material = new NodeMaterial();
+	this.material.fragment = this.fragment;
 
 	this.needsUpdate = true;
 
@@ -36,14 +36,13 @@ NodePass.prototype.render = function () {
 
 	if ( this.needsUpdate ) {
 
-		this.node.dispose();
+		this.material.dispose();
 
 		this.needsUpdate = false;
 
 	}
 
-	this.uniforms = this.node.uniforms;
-	this.material = this.node;
+	this.uniforms = this.material.uniforms;
 
 	THREE.ShaderPass.prototype.render.apply( this, arguments );
 
@@ -51,7 +50,7 @@ NodePass.prototype.render = function () {
 
 NodePass.prototype.copy = function ( source ) {
 	
-	this.value = source.value;
+	this.material = source.material;
 	
 };
 
@@ -82,7 +81,7 @@ NodePass.prototype.toJSON = function ( meta ) {
 
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
-		data.value = this.value.toJSON( meta ).uuid;
+		data.material = this.material.toJSON( meta ).uuid;
 
 	}
 
