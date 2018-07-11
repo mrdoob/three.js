@@ -141,8 +141,6 @@ function NodeBuilder() {
 	this.parsing = false;
 	this.optimize = true;
 
-	this.update();
-
 };
 
 NodeBuilder.prototype = {
@@ -277,7 +275,7 @@ NodeBuilder.prototype = {
 
 	addContext: function ( context ) {
 
-		this.context = context || {};
+		this.context = Object.assign( this.context || {}, context || {} );
 		this.contexts.push( this.context );
 
 		return this;
@@ -305,7 +303,7 @@ NodeBuilder.prototype = {
 	removeSlot: function () {
 
 		this.slots.pop();
-		this.slot = this.slots[ this.slots.length - 1 ] || {};
+		this.slot = this.slots[ this.slots.length - 1 ] || '';
 
 		return this;
 
@@ -421,42 +419,13 @@ NodeBuilder.prototype = {
 	
 	isCache: function ( name ) {
 
-		var i = this.caches.length;
-
-		while ( i -- ) {
-
-			if ( this.caches[ i ].name === name ) return true;
-
-		}
-
-		return false;
+		return this.caches.indexOf( name ) !== -1;
 
 	},
 
 	isSlot: function ( name ) {
 
-		var i = this.slots.length;
-
-		while ( i -- ) {
-
-			if ( this.slots[ i ].name === name ) return true;
-
-		}
-
-		return false;
-
-	},
-
-	update: function () {
-
-		var cache = this.caches[ this.caches.length - 1 ];
-		var slot = this.slots[ this.slots.length - 1 ];
-
-		this.slot = slot ? slot.name : '';
-		this.cache = cache ? cache.name : '';
-		this.context = cache ? cache.context : {};
-
-		return this;
+		return this.slots.indexOf( name ) !== -1;
 
 	},
 
