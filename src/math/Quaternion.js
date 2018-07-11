@@ -400,6 +400,20 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	transformTo: function	( q, step ) {
+
+		var angle = this.angleTo( q );
+
+		if ( angle === 0 ) return this;
+
+		var t = Math.min( 1, step / angle );
+
+		this.slerp( q, t );
+
+		return this;
+
+	},
+
 	inverse: function () {
 
 		// quaternion is assumed to have unit length
