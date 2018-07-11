@@ -186,6 +186,7 @@
 				'adv / wave': 'wave',
 				'adv / triangle-blur': 'triangle-blur',
 				'adv / render-to-texture': 'rtt',
+				'adv / temporal-blur': 'temporal-blur',
 				'adv / conditional': 'conditional',
 				'adv / expression': 'expression',
 				'adv / sss': 'sss',
@@ -2173,6 +2174,49 @@
 					
 					break;
 				
+				case 'temporal-blur':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var texture = new THREE.TextureNode( getTexture( "brick" ) );
+					
+					var rttStore = new THREE.RTTNode( 512, 512, texture );
+					var blur = new THREE.BlurNode( rttStore );
+					
+					var timer = new THREE.TimerNode( .01, THREE.TimerNode.LOCAL );
+					
+					var color = new THREE.Math3Node(
+						rttStore,
+						blur,
+						new THREE.FloatNode( .6 ),
+						THREE.Math3Node.MIX
+					);
+					
+					blur.horizontal = blur.vertical = timer;
+					
+					var rttSave = new THREE.RTTNode( 512, 512, color );
+					rttSave.saveToRTT = rttStore;
+					
+					mtl.color = rttSave;
+
+					// GUI
+					
+					addGui( 'click to reset', false, function ( val ) {
+
+						// render a single time
+						
+						rttStore.render = true;
+						
+						// reset time blur
+						
+						timer.value = 0;
+
+					} );
+					
+					break;
+				
 				case 'readonly':
 
 					// MATERIAL
@@ -2353,7 +2397,7 @@
 
 					mtl = new THREE.StandardNodeMaterial();
 
-					var backSideDepth = new THREE.TextureNode( rtTexture.texture, new THREE.ScreenUVNode( new THREE.ResolutionNode( renderer ) ) );
+					var backSideDepth = new THREE.TextureNode( rtTexture.texture, new THREE.ScreenUVNode() );
 
 					var difference = new THREE.OperatorNode(
 						objectDepth,

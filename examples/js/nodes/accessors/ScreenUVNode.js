@@ -3,12 +3,13 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { ResolutionNode } from './ResolutionNode.js';
  
 function ScreenUVNode( resolution ) {
 
 	TempNode.call( this, 'v2' );
 
-	this.resolution = resolution;
+	this.resolution = resolution || new ResolutionNode();
 
 };
 

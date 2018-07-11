@@ -35,15 +35,16 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 		uuid = builder.getUuid( uuid || this.getUuid(), ! isUnique );
 
-		var data = builder.getNodeData( uuid );
+		var data = builder.getNodeData( uuid ),
+			type = data.output || this.getType( builder );
 
 		if ( builder.parsing ) {
 
-			if ( data.deps || 0 > 0 ) {
+			if ( ( data.deps || 0 ) > 0 ) {
 
 				this.appendDepsNode( builder, data, output );
 
-				return this.generate( builder, type, uuid );
+				return this.generate( builder, output, uuid );
 
 			}
 
@@ -55,7 +56,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 			return data.name;
 
-		} else if ( ! builder.optimize || data.deps == 1 ) {
+		} else if ( !this.isShared( builder, type ) || ( ! builder.optimize || data.deps == 1 ) ) {
 
 			return Node.prototype.build.call( this, builder, output, uuid );
 
@@ -63,9 +64,8 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 		uuid = this.getUuid( false );
 
-		var name = this.getTemp( builder, uuid ),
-			type = data.output || this.getType( builder );
-
+		var name = this.getTemp( builder, uuid );
+		
 		if ( name ) {
 
 			return builder.format( name, type, output );

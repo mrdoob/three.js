@@ -40,7 +40,7 @@ BlurNode.Nodes = (function() {
 		"	sum += texture2D( texture, vec2( uv.x + 2.0 * s, uv.y ) ) * 0.12245;",
 		"	sum += texture2D( texture, vec2( uv.x + 3.0 * s, uv.y ) ) * 0.0918;",
 		"	sum += texture2D( texture, vec2( uv.x + 4.0 * s, uv.y ) ) * 0.051;",
-		"	return sum;",
+		"	return sum * .667;",
 		"}"
 	].join( "\n" ) );
 	
@@ -56,7 +56,7 @@ BlurNode.Nodes = (function() {
 		"	sum += texture2D( texture, vec2( uv.x, uv.y + 2.0 * s ) ) * 0.12245;",
 		"	sum += texture2D( texture, vec2( uv.x, uv.y + 3.0 * s ) ) * 0.0918;",
 		"	sum += texture2D( texture, vec2( uv.x, uv.y + 4.0 * s ) ) * 0.051;",
-		"	return sum;",
+		"	return sum * .667;",
 		"}"
 	].join( "\n" ) );
 	
@@ -111,7 +111,7 @@ BlurNode.prototype.generate = function ( builder, output ) {
 
 		}
 
-		if ( blurCode.length == 2 ) code = '( ' + blurCode.join( ' + ' ) + '/ 2.0 )';
+		if ( blurCode.length == 2 ) code = '( ' + blurCode.join( ' + ' ) + ' / 2.0 )';
 		else if ( blurCode.length ) code = '( ' + blurCode[ 0 ] + ' )';
 		else code = 'vec4( 0.0 )';
 

@@ -4,11 +4,9 @@
 
 import { Vector2Node } from '../inputs/Vector2Node.js';
  
-function ResolutionNode( renderer ) {
+function ResolutionNode() {
 
 	Vector2Node.call( this );
-
-	this.renderer = renderer;
 
 };
 
@@ -18,8 +16,8 @@ ResolutionNode.prototype.nodeType = "Resolution";
 
 ResolutionNode.prototype.updateFrame = function ( frame ) {
 
-	var size = this.renderer.getSize(),
-		pixelRatio = this.renderer.getPixelRatio();
+	var size = frame.renderer.getSize(),
+		pixelRatio = frame.renderer.getPixelRatio();
 
 	this.x = size.width * pixelRatio;
 	this.y = size.height * pixelRatio;

@@ -72,7 +72,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 		}
 
-		return builder.format( result, this.getType( this.type ), output );
+		return builder.format( result, this.getType( builder ), output );
 	
 	} else {
 		
