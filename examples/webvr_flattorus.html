@@ -72,12 +72,12 @@
 
 				var light1 = new THREE.DirectionalLight( 0xffffff, 1 );
 				light1.position.set( 0, 3, - 1 );
-				light1.lookAt( 0, 1.5, - 1 );
+				light1.target = torus;
 				scene.add( light1 );
 
 				var light2 = new THREE.DirectionalLight( 0xffffff, 1 );
 				light2.position.set( 0, - 1, - 1 );
-				light2.lookAt( 0, 1.5, - 1 );
+				light2.target = torus;
 				scene.add( light2 );
 
 				var ambient = new THREE.AmbientLight( 0x666666 );
@@ -138,7 +138,7 @@
 					for ( var i = 0 ; i <= uSteps ; i ++ ) {
 
 						f( i / uSteps, j / vSteps, vec );
-						torus.geometry.attributes.position.set( [ vec.x, vec.y, vec.z], 3 * ( i + j * ( vSteps + 1 ) ) );
+						torus.geometry.attributes.position.setXYZ( i + j * ( vSteps + 1 ), vec.x, vec.y, vec.z );
 
 					}
 
