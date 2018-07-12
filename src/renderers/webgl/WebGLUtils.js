@@ -36,6 +36,8 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === HalfFloatType ) {
 
+			if ( gl.isWebGL2 ) return gl.HALF_FLOAT;
+
 			extension = extensions.get( 'OES_texture_half_float' );
 
 			if ( extension !== null ) return extension.HALF_FLOAT_OES;
@@ -125,6 +127,13 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === MinEquation || p === MaxEquation ) {
 
+			if ( gl.isWebGL2 ) {
+
+				if ( p === MinEquation ) return gl.MIN;
+				if ( p === MaxEquation ) return gl.MAX;
+
+			}
+
 			extension = extensions.get( 'EXT_blend_minmax' );
 
 			if ( extension !== null ) {
@@ -137,6 +146,8 @@ function WebGLUtils( gl, extensions ) {
 		}
 
 		if ( p === UnsignedInt248Type ) {
+
+			if ( gl.isWebGL2 ) return gl.UNSIGNED_INT_24_8;
 
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
