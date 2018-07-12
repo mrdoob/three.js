@@ -2,9 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { NodeUtils } from '../core/NodeUtils.js';
 import { NodeMaterial } from '../materials/NodeMaterial.js';
-import { RawNode } from '../materials/nodes/RawNode.js';
 import { ScreenNode } from '../inputs/ScreenNode.js';
 
 function NodePass() {
@@ -18,10 +16,9 @@ function NodePass() {
 
 	this.textureID = 'renderTexture';
 
-	this.fragment = new RawNode( new ScreenNode() );
+	this.input = new ScreenNode();
 
 	this.material = new NodeMaterial();
-	this.material.fragment = this.fragment;
 
 	this.needsUpdate = true;
 
@@ -30,13 +27,13 @@ function NodePass() {
 NodePass.prototype = Object.create( THREE.ShaderPass.prototype );
 NodePass.prototype.constructor = NodePass;
 
-NodeUtils.addShortcuts( NodePass.prototype, 'fragment', [ 'value' ] );
-
 NodePass.prototype.render = function () {
 
 	if ( this.needsUpdate ) {
 
 		this.material.dispose();
+
+		this.material.fragment.value = this.input;
 
 		this.needsUpdate = false;
 

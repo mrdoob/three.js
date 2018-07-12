@@ -154,7 +154,7 @@
 						var brightnessNode = new THREE.ColorAdjustmentNode( vibranceNode, brightness, THREE.ColorAdjustmentNode.BRIGHTNESS );
 						var contrastNode = new THREE.ColorAdjustmentNode( brightnessNode, contrast, THREE.ColorAdjustmentNode.CONTRAST );
 
-						nodepass.value = contrastNode;
+						nodepass.input = contrastNode;
 
 						// GUI
 
@@ -204,7 +204,7 @@
 							THREE.Math3Node.MIX
 						);
 
-						nodepass.value = fade;
+						nodepass.input = fade;
 
 						// GUI
 
@@ -238,7 +238,7 @@
 							THREE.Math3Node.MIX
 						);
 
-						nodepass.value = fade;
+						nodepass.input = fade;
 
 						// GUI
 
@@ -260,7 +260,7 @@
 							THREE.OperatorNode.ADD
 						);
 
-						nodepass.value = multiply;
+						nodepass.input = multiply;
 
 						// GUI
 
@@ -298,7 +298,7 @@
 						saturation.inputs.rgb = screen;
 						saturation.inputs.adjustment = sat;
 
-						nodepass.value = saturation;
+						nodepass.input = saturation;
 
 						// GUI
 
@@ -351,7 +351,7 @@
 
 						var screen = new THREE.ScreenNode( offsetCoord );
 
-						nodepass.value = screen;
+						nodepass.input = screen;
 
 						// GUI
 
@@ -403,7 +403,7 @@
 							THREE.Math3Node.MIX
 						);
 
-						nodepass.value = new THREE.ScreenNode( fadeScreen );
+						nodepass.input = new THREE.ScreenNode( fadeScreen );
 
 						// GUI
 
@@ -438,7 +438,7 @@
 						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );
 
-						nodepass.value = blurScreen;
+						nodepass.input = blurScreen;
 
 						// GUI
 
@@ -468,7 +468,7 @@
 
 				var json = nodepass.toJSON();
 
-				nodepass.value = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
+				nodepass.input = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
 */
 			}
 
