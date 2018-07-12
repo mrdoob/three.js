@@ -288,6 +288,11 @@ THREE.GLTFLoader = ( function () {
 				color.fromArray( light.color )
 			}
 
+			var range = 0;
+			if ( light.range !== undefined ) {
+				range = light.range;
+			}
+
 			switch ( light.type ) {
 
 				case 'directional':
@@ -298,10 +303,12 @@ THREE.GLTFLoader = ( function () {
 
 				case 'point':
 					lightNode = new THREE.PointLight( color );
+					lightNode.distance = range;
 					break;
 
 				case 'spot':
 					lightNode = new THREE.SpotLight( color );
+					lightNode.distance = range;
 					// Handle spotlight properties.
 					light.spot = light.spot || {};
 					light.spot.innerConeAngle = light.spot.innerConeAngle !== undefined ? light.spot.innerConeAngle : 0;
