@@ -3183,7 +3183,11 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			library.nodes[ data.id ] = data;
+			if (hasNode(data.id)) {
+				console.warn("Duplicate id ", data.id, "ignoring")
+			} else {
+				library.nodes[ data.id ] = data;
+			}
 
 			return data;
 
