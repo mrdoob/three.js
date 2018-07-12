@@ -769,15 +769,16 @@ THREE.SVGLoader.prototype = {
 
 							transform = new THREE.Matrix3();
 
-							// Translation X
-							transform.elements[ 6 ] = array[ 0 ];
+							var tx = array[ 0 ];
+							var ty = tx;
 
-						}
+							if ( array.length >= 2 ) {
 
-						if ( array.length >= 2 ) {
+								ty = array[ 1 ];
 
-							// Translation Y
-							transform.elements[ 7 ] = array[ 1 ];
+							}
+
+							transform.translate( tx, ty );
 
 						}
 
@@ -828,8 +829,7 @@ THREE.SVGLoader.prototype = {
 								scaleY = array[ 1 ];
 							}
 
-							transform.elements[ 0 ] = scaleX;
-							transform.elements[ 4 ] = scaleY;
+							transform.scale( scaleX, scaleY );
 
 						}
 
@@ -841,7 +841,11 @@ THREE.SVGLoader.prototype = {
 
 							transform = new THREE.Matrix3();
 
-							transform.elements[ 3 ] = Math.tan( array[ 0 ] * Math.PI / 180 );
+							transform.set(
+								1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
+								0, 1, 0,
+								0, 0, 1
+							);							
 
 						}
 
@@ -853,7 +857,11 @@ THREE.SVGLoader.prototype = {
 
 							transform = new THREE.Matrix3();
 
-							transform.elements[ 1 ] = Math.tan( array[ 0 ] * Math.PI / 180 );
+							transform.set(
+								1, 0, 0,
+								Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
+								0, 0, 1
+							);
 
 						}
 
@@ -865,17 +873,11 @@ THREE.SVGLoader.prototype = {
 
 							transform = new THREE.Matrix3();
 
-							var e = transform.elements;
-
-							e[ 0 ] = array[ 0 ];
-							e[ 1 ] = array[ 1 ];
-							e[ 2 ] = 0;
-							e[ 3 ] = array[ 2 ];
-							e[ 4 ] = array[ 3 ];
-							e[ 5 ] = 0;
-							e[ 6 ] = array[ 4 ];
-							e[ 7 ] = array[ 5 ];
-							e[ 8 ] = 1;
+							transform.set(
+								array[ 0 ], array[ 2 ], array[ 4 ],
+								array[ 1 ], array[ 3 ], array[ 5 ],
+								0, 0, 1
+							);
 
 						}
 
