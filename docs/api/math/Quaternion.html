@@ -169,12 +169,12 @@
 		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
 		<p>Pre-multiplies this quaternion by [page:Quaternion q].</p>
 
-		<h3>[method:Quaternion transformTo]( [param:Quaternion q], [param:Float step] )</h3>
+		<h3>[method:Quaternion rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
 		<p>
 			[page:Quaternion q] - The target quaternion.<br />
 			[page:float step] - The angular step in radians.<br /><br />
 
-			Transforms this quaternion by a given angular step to the defined quaternion *q*.
+			Rotates this quaternion by a given angular step to the defined quaternion *q*.
 			The method ensures that the final quaternion will not overshoot *q*.
 		</p>
 

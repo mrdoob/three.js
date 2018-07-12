@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js transform orientation</title>
+		<title>three.js webgl - math - orientation transform</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -123,7 +123,7 @@
 			if ( ! mesh.quaternion.equals( targetRotation ) ) {
 
 				var step = speed * delta;
-				mesh.quaternion.transformTo( targetRotation, step );
+				mesh.quaternion.rotateTowards( targetRotation, step );
 
 			}
 

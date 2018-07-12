@@ -403,7 +403,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "transformTo", ( assert ) => {
+		QUnit.test( "rotateTowards", ( assert ) => {
 
 			var a = new Quaternion();
 			var b = new Quaternion().setFromEuler( new Euler( 0, Math.PI, 0 ) );
@@ -411,14 +411,14 @@ export default QUnit.module( 'Maths', () => {
 
 			var halfPI = Math.PI * 0.5;
 
-			a.transformTo( b, 0 );
+			a.rotateTowards( b, 0 );
 			assert.ok( a.equals( a ) === true, "Passed!" );
 
-			a.transformTo( b, Math.PI * 2 ); // test overshoot
+			a.rotateTowards( b, Math.PI * 2 ); // test overshoot
 			assert.ok( a.equals( b ) === true, "Passed!" );
 
 			a.set( 0, 0, 0, 1 );
-			a.transformTo( b, halfPI );
+			a.rotateTowards( b, halfPI );
 			assert.ok( a.angleTo( c ) - halfPI <= eps, "Passed!" );
 
 		} );
