@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author zz85 / http://joshuakoo.com/
+ * @author yomboprime / https://yombo.org
  */
 
 THREE.SVGLoader = function ( manager ) {
@@ -103,7 +104,7 @@ THREE.SVGLoader.prototype = {
 
 			if ( transform ) {
 
-				copyTransform( transformStack.pop(), currentTransform );
+				currentTransform.copy( transformStack.pop() );
 
 			}
 
@@ -672,12 +673,7 @@ THREE.SVGLoader.prototype = {
 			style = Object.assign( {}, style ); // clone style
 
 			if ( node.hasAttribute( 'fill' ) ) style.fill = node.getAttribute( 'fill' );
-			if ( node.style.fill !== '' && node.style.fill !== 'none' ) style.fill = node.style.fill;
-
-			if ( ! isVisible( style ) ) {
-				if ( node.hasAttribute( 'stroke' ) ) style.fill = node.getAttribute( 'stroke' );
-				if ( node.style.stroke !== '' && node.style.stroke !== 'none' ) style.fill = node.style.stroke;
-			}
+			if ( node.style.fill !== '' ) style.fill = node.style.fill;
 
 			return style;
 
@@ -685,7 +681,7 @@ THREE.SVGLoader.prototype = {
 
 		function isVisible( style ) {
 
-			return ( style.fill !== 'none' && style.fill !== 'transparent' ) || ( style.stroke !== 'none' && style.stroke !== 'transparent' );
+			return style.fill !== 'none' && style.fill !== 'transparent';
 
 		}
 
@@ -740,11 +736,10 @@ THREE.SVGLoader.prototype = {
 			if ( transform ) {
 
 				if ( transformStack.length > 0 ) {
-					multiplyTransforms( transform, transformStack[ transformStack.length - 1 ], tempTransform );
-					copyTransform( tempTransform, transform );
+					transform.premultiply( transformStack[ transformStack.length - 1 ] );
 				}
 
-				copyTransform( transform, currentTransform );
+				currentTransform.copy( transform );
 				transformStack.push( transform );
 
 			}
@@ -772,17 +767,17 @@ THREE.SVGLoader.prototype = {
 
 						if ( array.length >= 1 ) {
 
-							transform = createIdTransform();
+							transform = new THREE.Matrix3();
 
 							// Translation X
-							transform[ 4 ] = array[ 0 ];
+							transform.elements[ 6 ] = array[ 0 ];
 
 						}
 
 						if ( array.length >= 2 ) {
 
 							// Translation Y
-							transform[ 5 ] = array[ 1 ];
+							transform.elements[ 7 ] = array[ 1 ];
 
 						}
 
@@ -791,15 +786,15 @@ THREE.SVGLoader.prototype = {
 					case "rotate":
 
 						if ( array.length >= 1 ) {
-							
+
 							var angle = 0;
 							var cx = 0;
 							var cy = 0;
 
-							transform = createIdTransform();
+							transform = new THREE.Matrix3();
 
 							// Angle
-							angle = array[ 0 ] * Math.PI / 180;
+							angle = - array[ 0 ] * Math.PI / 180;
 
 							if ( array.length >= 3 ) {
 
@@ -810,19 +805,11 @@ THREE.SVGLoader.prototype = {
 							}
 
 							// Rotate around center (cx, cy)
-
-							var translation = createIdTransform();
-							translation[ 4 ] = -cx;
-							translation[ 5 ] = -cy;
-
-							var rotation = createRotationTransform( angle );
-
-							var translRot = createIdTransform();
-							multiplyTransforms( translation, rotation, translRot );
-
-							translation[ 4 ] = cx;
-							translation[ 5 ] = cy;
-							multiplyTransforms( translRot, translation, transform );
+							var translation = new THREE.Matrix3().translate( -cx, -cy );
+							var rotation = new THREE.Matrix3().rotate( angle );
+							var translRot = new THREE.Matrix3().multiplyMatrices( rotation, translation );
+							translation.identity().translate( cx, cy );
+							transform.multiplyMatrices( translation, translRot );
 
 						}
 
@@ -832,7 +819,7 @@ THREE.SVGLoader.prototype = {
 
 						if ( array.length >= 1 ) {
 
-							transform = createIdTransform();
+							transform = new THREE.Matrix3();
 
 							var scaleX = array[ 0 ];
 							var scaleY = scaleX;
@@ -841,8 +828,8 @@ THREE.SVGLoader.prototype = {
 								scaleY = array[ 1 ];
 							}
 
-							transform[ 0 ] = scaleX;
-							transform[ 3 ] = scaleY;
+							transform.elements[ 0 ] = scaleX;
+							transform.elements[ 4 ] = scaleY;
 
 						}
 
@@ -852,9 +839,9 @@ THREE.SVGLoader.prototype = {
 
 						if ( array.length === 1 ) {
 
-							transform = createIdTransform();
+							transform = new THREE.Matrix3();
 
-							transform[ 2 ] = Math.tan( array[ 0 ] * Math.PI / 180 );
+							transform.elements[ 3 ] = Math.tan( array[ 0 ] * Math.PI / 180 );
 
 						}
 
@@ -864,9 +851,9 @@ THREE.SVGLoader.prototype = {
 
 						if ( array.length === 1 ) {
 
-							transform = createIdTransform();
+							transform = new THREE.Matrix3();
 
-							transform[ 1 ] = Math.tan( array[ 0 ] * Math.PI / 180 );
+							transform.elements[ 1 ] = Math.tan( array[ 0 ] * Math.PI / 180 );
 
 						}
 
@@ -876,7 +863,19 @@ THREE.SVGLoader.prototype = {
 
 						if ( array.length === 6 ) {
 
-							transform = array;
+							transform = new THREE.Matrix3();
+
+							var e = transform.elements;
+
+							e[ 0 ] = array[ 0 ];
+							e[ 1 ] = array[ 1 ];
+							e[ 2 ] = 0;
+							e[ 3 ] = array[ 2 ];
+							e[ 4 ] = array[ 3 ];
+							e[ 5 ] = 0;
+							e[ 6 ] = array[ 4 ];
+							e[ 7 ] = array[ 5 ];
+							e[ 8 ] = 1;
 
 						}
 
@@ -891,16 +890,18 @@ THREE.SVGLoader.prototype = {
 
 		function transformPath( path, m ) {
 
-			var isRotated = isTransformRotated( m );
+			function transfVec2( v2 ) {
 
-			function transfVec2( v ) {
+				tempV3.set( v2.x, v2.y, 1 ).applyMatrix3( m );
 
-				var x = v.x * m[ 0 ] + v.y * m[ 2 ] + m[ 4 ];
-				var y = v.x * m[ 1 ] + v.y * m[ 3 ] + m[ 5 ];
-
-				v.set( x, y );
+				v2.set( tempV3.x, tempV3.y );
 
 			}
+
+			var isRotated = isTransformRotated( m );
+
+			var tempV2 = new THREE.Vector2();
+			var tempV3 = new THREE.Vector3();
 
 			var subPaths = path.subPaths;
 
@@ -940,6 +941,11 @@ THREE.SVGLoader.prototype = {
 							console.warn( "SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented." );
 						}
 
+						tempV2.set( curve.aX, curve.aY );
+						transfVec2( tempV2 );
+						curve.aX = tempV2.x;
+						curve.aY = tempV2.y;
+
 						curve.xRadius *= getTransformScaleX( m );
 						curve.yRadius *= getTransformScaleY( m );
 
@@ -951,73 +957,18 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function createIdTransform( m ) {
-
-			// 2 x 3 matrix:
-			// 1  0
-			// 0  1
-			// tx ty
-
-			if ( ! m ) {
-				m = [];
-			}
-
-			m[ 0 ] = 1;
-			m[ 1 ] = 0;
-			m[ 2 ] = 0;
-			m[ 3 ] = 1;
-			m[ 4 ] = 0;
-			m[ 5 ] = 0;
-
-			return m;
-
-		}
-
-		function copyTransform( orig, dest ) {
-
-			for ( var i = 0; i < 6; i++ ) {
-				dest[ i ] = orig[ i ]
-			}
-
-		}
-
-		function multiplyTransforms( a, b, r ) {
-
-			r[ 0 ] = a[ 0 ] * b[ 0 ] + a[ 1 ] * b[ 2 ];
-			r[ 1 ] = a[ 0 ] * b[ 1 ] + a[ 1 ] * b[ 3 ];
-			r[ 2 ] = a[ 2 ] * b[ 0 ] + a[ 3 ] * b[ 2 ];
-			r[ 3 ] = a[ 2 ] * b[ 1 ] + a[ 3 ] * b[ 3 ];
-			r[ 4 ] = a[ 4 ] * b[ 0 ] + a[ 5 ] * b[ 2 ] + b[ 4 ];
-			r[ 5 ] = a[ 4 ] * b[ 1 ] + a[ 5 ] * b[ 3 ] + b[ 5 ];
-
-		}
-
 		function isTransformRotated( m ) {
-			return m[ 1 ] !== 0 || m[ 2 ] !== 0;
+			return m.elements[ 1 ] !== 0 || m.elements[ 3 ] !== 0;
 		}
 
 		function getTransformScaleX( m ) {
-			return Math.sqrt( m[ 0 ] * m[ 0 ] + m[ 1 ] * m[ 1 ] )
+			var te = m.elements;
+			return Math.sqrt( te[ 0 ] * te[ 0 ] + te[ 1 ] * te[ 1 ] )
 		}
 
 		function getTransformScaleY( m ) {
-			return Math.sqrt( m[ 2 ] * m[ 2 ] + m[ 3 ] * m[ 3 ] )
-		}
-
-		function createRotationTransform( angle ) {
-
-			var rotation = createIdTransform();
-
-			var c = Math.cos( angle );
-			var s = Math.sin( angle );
-
-			rotation[ 0 ] = c;
-			rotation[ 1 ] = s;
-			rotation[ 2 ] = - s;
-			rotation[ 3 ] = c;
-			
-			return rotation;
-
+			var te = m.elements;
+			return Math.sqrt( te[ 3 ] * te[ 3 ] + te[ 4 ] * te[ 4 ] )
 		}
 
 		//
@@ -1028,9 +979,7 @@ THREE.SVGLoader.prototype = {
 
 		var transformStack = [];
 
-		var currentTransform = createIdTransform();
-		
-		var tempTransform = createIdTransform();
+		var currentTransform = new THREE.Matrix3();
 
 		console.time( 'THREE.SVGLoader: DOMParser' );
 
