@@ -375,12 +375,10 @@
 						var screen = new THREE.ScreenNode();
 						
 						var previousFrame = new THREE.RTTNode( size.width, size.height, screen );
-						var previous2Frame = new THREE.RTTNode( size.width, size.height, screen );
-						previous2Frame.saveTo = previousFrame;
 						
 						var motionBlur = new THREE.Math3Node(
 							previousFrame,
-							previous2Frame,
+							screen,
 							new THREE.FloatNode(.5),
 							THREE.Math3Node.MIX
 						);
