@@ -283,7 +283,7 @@ THREE.GLTFLoader = ( function () {
 			var lightNode;
 
 			// the color default value is [1, 1, 1]
-			var color = new THREE.Color(1, 1, 1);
+			var color = new THREE.Color( 0xffffff );
 			if ( light.color !== undefined ) {
 				color.fromArray( light.color )
 			}
@@ -3117,16 +3117,6 @@ THREE.GLTFLoader = ( function () {
 				for ( var i = 0, il = nodeIds.length; i < il; i ++ ) {
 
 					buildNodeHierachy( nodeIds[ i ], scene, json, dependencies.nodes, dependencies.skins );
-
-				}
-
-				// Ambient lighting, if present, is always attached to the scene root.
-				if ( sceneDef.extensions
-						 && sceneDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
-						 && sceneDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
-
-					var lights = extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].lights;
-					scene.add( lights[ sceneDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light ] );
 
 				}
 
