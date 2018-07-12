@@ -104,7 +104,11 @@ import {
 	SpriteNodeMaterial,
 	PhongNodeMaterial,
 	StandardNodeMaterial,
-	MeshStandardNodeMaterial
+	MeshStandardNodeMaterial,
+	
+	// post-processing
+	
+	NodePostProcessing
 	
 } from './Nodes.js';
 
@@ -213,3 +217,7 @@ THREE.SpriteNodeMaterial = SpriteNodeMaterial;
 THREE.PhongNodeMaterial = PhongNodeMaterial;
 THREE.StandardNodeMaterial = StandardNodeMaterial;
 THREE.MeshStandardNodeMaterial = MeshStandardNodeMaterial;
+
+// post-processing
+
+THREE.NodePostProcessing = NodePostProcessing;

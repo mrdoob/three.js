@@ -108,4 +108,5 @@ export { MeshStandardNodeMaterial } from './materials/MeshStandardNodeMaterial.j
 
 // postprocessing
 
+export { NodePostProcessing } from './postprocessing/NodePostProcessing.js';
 //export { NodePass } from './postprocessing/NodePass.js';

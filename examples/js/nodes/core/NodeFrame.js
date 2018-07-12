@@ -33,6 +33,14 @@ NodeFrame.prototype = {
 		
 	},
 	
+	setRenderTexture: function( renderTexture ) {
+		
+		this.renderTexture = renderTexture;
+		
+		return this;
+		
+	},
+	
 	updateNode: function ( node ) {
 
 		if ( node.frameId === this.id ) return this;

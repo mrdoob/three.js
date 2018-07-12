@@ -16,11 +16,19 @@ ResolutionNode.prototype.nodeType = "Resolution";
 
 ResolutionNode.prototype.updateFrame = function ( frame ) {
 
-	var size = frame.renderer.getSize(),
-		pixelRatio = frame.renderer.getPixelRatio();
+	if ( frame.renderer ) {
+		
+		var size = frame.renderer.getSize(),
+			pixelRatio = frame.renderer.getPixelRatio();
 
-	this.x = size.width * pixelRatio;
-	this.y = size.height * pixelRatio;
+		this.x = size.width * pixelRatio;
+		this.y = size.height * pixelRatio;
+		
+	} else {
+		
+		console.warn("ResolutionNode need a renderer in NodeFrame");
+		
+	}
 
 };
 

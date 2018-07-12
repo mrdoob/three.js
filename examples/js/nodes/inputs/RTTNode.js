@@ -43,52 +43,74 @@ RTTNode.prototype.build = function ( builder, output, uuid ) {
 	
 	this.material.fragment.value = this.input;
 	this.material.build( { builder: rttBuilder } );
-	
+
 	return TextureNode.prototype.build.call( this, builder, output, uuid );
+};
+
+RTTNode.prototype.updateFrameSaveToRTT = function ( frame ) {
+	
+	this.saveToRTT.render = false;
+			
+	if (this.saveToRTT !== this.saveToRTTCurrent) {
+		
+		if (this.saveToRTTMaterial) this.saveToRTTMaterial.dispose();
+		
+		var material = new THREE.NodeMaterial();
+		material.fragment.value = this;
+		material.build();
+		
+		var scene = new THREE.Scene();
+		
+		var quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), material );
+		quad.frustumCulled = false; // Avoid getting clipped
+		scene.add( quad );
+		
+		this.saveToRTTScene = scene;
+		this.saveToRTTMaterial = material;
+		
+	}
+	
+	this.saveToRTTCurrent = this.saveToRTT;
+
+	frame.renderer.render( this.saveToRTTScene, this.camera, this.saveToRTT.renderTarget, this.saveToRTT.clear );
+	
 };
 
 RTTNode.prototype.updateFrame = function ( frame ) {
 	
 	if ( frame.renderer ) {
 		
+		// from the second frame
+		
+		if (this.saveToRTT && this.saveToRTT.render === false) {
+			
+			this.updateFrameSaveToRTT( frame );
+			
+		}
+		
 		if (this.render) {
+			
+			if (this.material.uniforms.renderTexture) {
+			
+				this.material.uniforms.renderTexture.value = frame.renderTexture;
+				
+			}
 			
 			frame.renderer.render( this.scene, this.camera, this.renderTarget, this.clear );
 			
 		}
 		
-		if (this.saveToRTT) {
+		// first frame
+		
+		if (this.saveToRTT && this.saveToRTT.render === true) {
 			
-			this.saveToRTT.render = false;
-			
-			if (this.saveToRTT !== this.saveToRTTCurrent) {
-				
-				if (this.saveToRTTMaterial) this.saveToRTTMaterial.dispose();
-				
-				var material = new THREE.NodeMaterial();
-				material.fragment.value = this;
-				material.build();
-				
-				var scene = new THREE.Scene();
-				
-				var quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), material );
-				quad.frustumCulled = false; // Avoid getting clipped
-				scene.add( quad );
-				
-				this.saveToRTTScene = scene;
-				this.saveToRTTMaterial = material;
-				
-			}
-			
-			this.saveToRTTCurrent = this.saveToRTT;
-
-			frame.renderer.render( this.saveToRTTScene, this.camera, this.saveToRTT.renderTarget, this.saveToRTT.clear );
+			this.updateFrameSaveToRTT( frame );
 			
 		}
 		
 	} else {
 		
-		console.warn("RTTNode need a renderer in NodeFrame")
+		console.warn("RTTNode need a renderer in NodeFrame");
 		
 	}
 	
