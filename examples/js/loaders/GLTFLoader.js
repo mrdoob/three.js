@@ -282,7 +282,11 @@ THREE.GLTFLoader = ( function () {
 			var light = lights[ lightId ];
 			var lightNode;
 
-			var color = new THREE.Color().fromArray( light.color );
+			// the color default value is [1, 1, 1]
+			var color = new THREE.Color(1, 1, 1);
+			if ( light.color !== undefined ) {
+				color.fromArray( light.color )
+			}
 
 			switch ( light.type ) {
 
