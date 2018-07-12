@@ -805,11 +805,11 @@ THREE.SVGLoader.prototype = {
 							}
 
 							// Rotate around center (cx, cy)
-							var translation = new THREE.Matrix3().translate( -cx, -cy );
-							var rotation = new THREE.Matrix3().rotate( angle );
-							var translRot = new THREE.Matrix3().multiplyMatrices( rotation, translation );
-							translation.identity().translate( cx, cy );
-							transform.multiplyMatrices( translation, translRot );
+							tempTransform1.identity().translate( -cx, -cy );
+							tempTransform2.identity().rotate( angle );
+							tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
+							tempTransform1.identity().translate( cx, cy );
+							transform.multiplyMatrices( tempTransform1, tempTransform3 );
 
 						}
 
@@ -978,6 +978,10 @@ THREE.SVGLoader.prototype = {
 		var paths = [];
 
 		var transformStack = [];
+
+		var tempTransform1 = new THREE.Matrix3();
+		var tempTransform2 = new THREE.Matrix3();
+		var tempTransform3 = new THREE.Matrix3();
 
 		var currentTransform = new THREE.Matrix3();
 
