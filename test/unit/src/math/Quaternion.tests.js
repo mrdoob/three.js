@@ -391,6 +391,18 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "angleTo", ( assert ) => {
+
+			var a = new Quaternion();
+			var b = new Quaternion().setFromEuler( new Euler( 0, Math.PI, 0 ) );
+			var c = new Quaternion().setFromEuler( new Euler( 0, Math.PI * 2, 0 ) );
+
+			assert.ok( a.angleTo( a ) === 0, "Passed!" );
+			assert.ok( a.angleTo( b ) === Math.PI, "Passed!" );
+			assert.ok( a.angleTo( c ) === 0, "Passed!" );
+
+		} );
+
 		QUnit.test( "inverse/conjugate", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );

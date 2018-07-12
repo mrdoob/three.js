@@ -1,13 +1,18 @@
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Object3D } from '../core/Object3D.js';
-import { SpriteMaterial } from '../materials/SpriteMaterial.js';
-
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
+
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Object3D } from '../core/Object3D.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
+import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
+import { SpriteMaterial } from '../materials/SpriteMaterial.js';
+
+var geometry;
 
 function Sprite( material ) {
 
@@ -15,6 +20,26 @@ function Sprite( material ) {
 
 	this.type = 'Sprite';
 
+	if ( geometry === undefined ) {
+
+		geometry = new BufferGeometry();
+
+		var float32Array = new Float32Array( [
+			- 0.5, - 0.5, 0, 0, 0,
+			0.5, - 0.5, 0, 1, 0,
+			0.5, 0.5, 0, 1, 1,
+			- 0.5, 0.5, 0, 0, 1
+		] );
+
+		var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+
+		geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+		geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+		geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+
+	}
+
+	this.geometry = geometry;
 	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
 	this.center = new Vector2( 0.5, 0.5 );
@@ -140,6 +165,5 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 
 } );
-
 
 export { Sprite };

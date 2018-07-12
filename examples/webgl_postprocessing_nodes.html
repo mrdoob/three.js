@@ -41,57 +41,11 @@
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
-		<!-- NodeLibrary -->
-		<script src="js/nodes/GLNode.js"></script>
-		<script src="js/nodes/RawNode.js"></script>
-		<script src="js/nodes/TempNode.js"></script>
-		<script src="js/nodes/InputNode.js"></script>
-		<script src="js/nodes/ConstNode.js"></script>
-		<script src="js/nodes/FunctionNode.js"></script>
-		<script src="js/nodes/FunctionCallNode.js"></script>
-		<script src="js/nodes/NodeUniform.js"></script>
-		<script src="js/nodes/NodeBuilder.js"></script>
-		<script src="js/nodes/NodeLib.js"></script>
-		<script src="js/nodes/NodeFrame.js"></script>
-		<script src="js/nodes/NodeMaterial.js"></script>
+		<script type="module">
 
-		<!-- Accessors -->
-		<script src="js/nodes/accessors/PositionNode.js"></script>
-		<script src="js/nodes/accessors/NormalNode.js"></script>
-		<script src="js/nodes/accessors/UVNode.js"></script>
-		<script src="js/nodes/accessors/ColorsNode.js"></script>
-
-		<!-- Inputs -->
-		<script src="js/nodes/inputs/IntNode.js"></script>
-		<script src="js/nodes/inputs/FloatNode.js"></script>
-		<script src="js/nodes/inputs/ColorNode.js"></script>
-		<script src="js/nodes/inputs/Vector2Node.js"></script>
-		<script src="js/nodes/inputs/Vector3Node.js"></script>
-		<script src="js/nodes/inputs/Vector4Node.js"></script>
-		<script src="js/nodes/inputs/TextureNode.js"></script>
-		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
-		<script src="js/nodes/inputs/ScreenNode.js"></script>
-
-		<!-- Math -->
-		<script src="js/nodes/math/Math1Node.js"></script>
-		<script src="js/nodes/math/Math2Node.js"></script>
-		<script src="js/nodes/math/Math3Node.js"></script>
-		<script src="js/nodes/math/OperatorNode.js"></script>
-
-		<!-- Utils -->
-		<script src="js/nodes/utils/SwitchNode.js"></script>
-		<script src="js/nodes/utils/JoinNode.js"></script>
-		<script src="js/nodes/utils/TimerNode.js"></script>
-		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
-		<script src="js/nodes/utils/BlurNode.js"></script>
-
-		<!-- Post-Processing -->
-		<script src="js/nodes/postprocessing/NodePass.js"></script>
-
-		<!-- NodeMaterial Loader -->
-		<script src="js/loaders/NodeMaterialLoader.js"></script>
-
-		<script>
+			import './js/nodes/THREE.Nodes.js';
+			import { NodePass } from './js/nodes/postprocessing/NodePass.js';
+			import './js/loaders/NodeMaterialLoader.js';
 
 			var camera, scene, renderer, composer;
 			var object, light, nodepass;
@@ -333,12 +287,12 @@
 						var sat = new THREE.FloatNode( 0 );
 
 						var satrgb = new THREE.FunctionNode( [
-							"vec3 satrgb(vec3 rgb, float adjustment) {",
-							//"	const vec3 W = vec3(0.2125, 0.7154, 0.0721);", // LUMA
-							"	vec3 intensity = vec3(dot(rgb, LUMA));",
-							"	return mix(intensity, rgb, adjustment);",
+							"vec3 satrgb( vec3 rgb, float adjustment ) {",
+							// include luminance function from LuminanceNode
+							"	vec3 intensity = vec3( luminance( rgb ) );",
+							"	return mix( intensity, rgb, adjustment );",
 							"}"
-						].join( "\n" ) );
+						].join( "\n" ), [ THREE.LuminanceNode.Nodes.luminance ] );
 
 						var saturation = new THREE.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = screen;
@@ -436,7 +390,7 @@
 							THREE.Math1Node.FLOOR
 						);
 
-						var coord = new THREE.OperatorNode(
+						var mosaicUV = new THREE.OperatorNode(
 							blocksSize,
 							scale,
 							THREE.OperatorNode.DIV
@@ -444,7 +398,7 @@
 
 						var fadeScreen = new THREE.Math3Node(
 							uv,
-							coord,
+							mosaicUV,
 							fade,
 							THREE.Math3Node.MIX
 						);
@@ -561,7 +515,7 @@
 				composer = new THREE.EffectComposer( renderer );
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
-				nodepass = new THREE.NodePass();
+				nodepass = new NodePass();
 				nodepass.renderToScreen = true;
 
 				composer.addPass( nodepass );

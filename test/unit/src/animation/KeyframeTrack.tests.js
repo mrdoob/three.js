@@ -17,19 +17,7 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.todo( "parse", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 		QUnit.todo( "toJSON", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "_getTrackTypeForValueTypeName", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -123,4 +111,3 @@ export default QUnit.module( 'Animation', () => {
 	} );
 
 } );
-

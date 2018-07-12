@@ -44,7 +44,7 @@
 			import { Mesh } from '../src/objects/Mesh.js';
 			import { Fog } from '../src/scenes/Fog.js';
 			import { Scene } from '../src/scenes/Scene.js';
-			import { WebGL2Renderer } from '../src/renderers/WebGL2Renderer.js';
+			import { WebGLRenderer } from '../src/renderers/WebGLRenderer.js';
 
 			//
 
@@ -89,7 +89,10 @@
 
 				}
 
-				renderer = new WebGL2Renderer();
+				var canvas = document.createElement( 'canvas' );
+				var context = canvas.getContext( 'webgl2' );
+
+				renderer = new WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
