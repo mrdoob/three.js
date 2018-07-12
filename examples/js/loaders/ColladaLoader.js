@@ -3519,7 +3519,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		var fallbackMaterial = new THREE.MeshBasicMaterial( { color: 0xff00ff ) };
+		var fallbackMaterial = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
 
 		function resolveMaterialBinding( keys, instanceMaterials ) {
 
