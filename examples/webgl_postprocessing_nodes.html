@@ -376,7 +376,7 @@
 						
 						var previousFrame = new THREE.RTTNode( size.width, size.height, screen );
 						var previous2Frame = new THREE.RTTNode( size.width, size.height, screen );
-						previous2Frame.saveToRTT = previousFrame;
+						previous2Frame.saveTo = previousFrame;
 						
 						var motionBlur = new THREE.Math3Node(
 							previousFrame,
@@ -386,7 +386,7 @@
 						);
 						
 						var currentFrame = new THREE.RTTNode( size.width, size.height, motionBlur );
-						currentFrame.saveToRTT = previousFrame;
+						currentFrame.saveTo = previousFrame;
 						
 						nodepost.input = currentFrame;
 						

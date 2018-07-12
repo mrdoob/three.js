@@ -47,13 +47,13 @@ RTTNode.prototype.build = function ( builder, output, uuid ) {
 	return TextureNode.prototype.build.call( this, builder, output, uuid );
 };
 
-RTTNode.prototype.updateFrameSaveToRTT = function ( frame ) {
+RTTNode.prototype.updateFramesaveTo = function ( frame ) {
 	
-	this.saveToRTT.render = false;
+	this.saveTo.render = false;
 			
-	if (this.saveToRTT !== this.saveToRTTCurrent) {
+	if (this.saveTo !== this.saveToCurrent) {
 		
-		if (this.saveToRTTMaterial) this.saveToRTTMaterial.dispose();
+		if (this.saveToMaterial) this.saveToMaterial.dispose();
 		
 		var material = new THREE.NodeMaterial();
 		material.fragment.value = this;
@@ -65,14 +65,14 @@ RTTNode.prototype.updateFrameSaveToRTT = function ( frame ) {
 		quad.frustumCulled = false; // Avoid getting clipped
 		scene.add( quad );
 		
-		this.saveToRTTScene = scene;
-		this.saveToRTTMaterial = material;
+		this.saveToScene = scene;
+		this.saveToMaterial = material;
 		
 	}
 	
-	this.saveToRTTCurrent = this.saveToRTT;
+	this.saveToCurrent = this.saveTo;
 
-	frame.renderer.render( this.saveToRTTScene, this.camera, this.saveToRTT.renderTarget, this.saveToRTT.clear );
+	frame.renderer.render( this.saveToScene, this.camera, this.saveTo.renderTarget, this.saveTo.clear );
 	
 };
 
@@ -82,9 +82,9 @@ RTTNode.prototype.updateFrame = function ( frame ) {
 		
 		// from the second frame
 		
-		if (this.saveToRTT && this.saveToRTT.render === false) {
+		if (this.saveTo && this.saveTo.render === false) {
 			
-			this.updateFrameSaveToRTT( frame );
+			this.updateFramesaveTo( frame );
 			
 		}
 		
@@ -102,9 +102,9 @@ RTTNode.prototype.updateFrame = function ( frame ) {
 		
 		// first frame
 		
-		if (this.saveToRTT && this.saveToRTT.render === true) {
+		if (this.saveTo && this.saveTo.render === true) {
 			
-			this.updateFrameSaveToRTT( frame );
+			this.updateFramesaveTo( frame );
 			
 		}
 		
@@ -120,7 +120,7 @@ RTTNode.prototype.copy = function ( source ) {
 			
 	TextureNode.prototype.copy.call( this, source );
 	
-	this.saveToRTT = source.saveToRTT;
+	this.saveTo = source.saveTo;
 	
 };
 
@@ -132,7 +132,7 @@ RTTNode.prototype.toJSON = function ( meta ) {
 		
 		data = THREE.TextureNode.prototype.toJSON.call( this, meta );
 
-		if (this.saveToRTT) data.saveToRTT = this.saveToRTT.toJSON( meta ).uuid;
+		if (this.saveTo) data.saveTo = this.saveTo.toJSON( meta ).uuid;
 
 	}
 
