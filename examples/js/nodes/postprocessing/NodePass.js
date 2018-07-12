@@ -47,7 +47,7 @@ NodePass.prototype.render = function () {
 
 NodePass.prototype.copy = function ( source ) {
 	
-	this.material = source.material;
+	this.input = source.input;
 	
 };
 
@@ -78,7 +78,7 @@ NodePass.prototype.toJSON = function ( meta ) {
 
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
-		data.material = this.material.toJSON( meta ).uuid;
+		data.input = this.input.toJSON( meta ).uuid;
 
 	}
 

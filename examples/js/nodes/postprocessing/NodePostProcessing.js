@@ -82,7 +82,7 @@ NodePostProcessing.prototype = {
 	
 	copy: function ( source ) {
 		
-		this.material = source.material;
+		this.output = source.output;
 		
 	},
 	
@@ -113,7 +113,7 @@ NodePostProcessing.prototype = {
 
 			if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
-			data.material = this.material.toJSON( meta ).uuid;
+			data.output = this.output.toJSON( meta ).uuid;
 
 		}
 
