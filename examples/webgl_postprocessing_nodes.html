@@ -37,7 +37,6 @@
 		<script type="module">
 
 			import './js/nodes/THREE.Nodes.js';
-			import { NodePostProcessing } from './js/nodes/postprocessing/NodePostProcessing.js';
 			import './js/loaders/NodeMaterialLoader.js';
 
 			var camera, scene, renderer;
@@ -501,7 +500,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				nodepost = new NodePostProcessing( renderer );
+				nodepost = new THREE.NodePostProcessing( renderer );
 
 				//
 
