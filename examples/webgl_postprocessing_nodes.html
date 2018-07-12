@@ -149,7 +149,7 @@
 						var brightnessNode = new THREE.ColorAdjustmentNode( vibranceNode, brightness, THREE.ColorAdjustmentNode.BRIGHTNESS );
 						var contrastNode = new THREE.ColorAdjustmentNode( brightnessNode, contrast, THREE.ColorAdjustmentNode.CONTRAST );
 
-						nodepost.input = contrastNode;
+						nodepost.output = contrastNode;
 
 						// GUI
 
@@ -199,7 +199,7 @@
 							THREE.Math3Node.MIX
 						);
 
-						nodepost.input = fade;
+						nodepost.output = fade;
 
 						// GUI
 
@@ -233,7 +233,7 @@
 							THREE.Math3Node.MIX
 						);
 
-						nodepost.input = fade;
+						nodepost.output = fade;
 
 						// GUI
 
@@ -255,7 +255,7 @@
 							THREE.OperatorNode.ADD
 						);
 
-						nodepost.input = multiply;
+						nodepost.output = multiply;
 
 						// GUI
 
@@ -293,7 +293,7 @@
 						saturation.inputs.rgb = screen;
 						saturation.inputs.adjustment = sat;
 
-						nodepost.input = saturation;
+						nodepost.output = saturation;
 
 						// GUI
 
@@ -346,7 +346,7 @@
 
 						var screen = new THREE.ScreenNode( offsetCoord );
 
-						nodepost.input = screen;
+						nodepost.output = screen;
 
 						// GUI
 
@@ -386,7 +386,7 @@
 						var currentFrame = new THREE.RTTNode( size.width, size.height, motionBlur );
 						currentFrame.saveTo = previousFrame;
 						
-						nodepost.input = currentFrame;
+						nodepost.output = currentFrame;
 						
 						break;
 						
@@ -422,7 +422,7 @@
 							THREE.Math3Node.MIX
 						);
 
-						nodepost.input = new THREE.ScreenNode( fadeScreen );
+						nodepost.output = new THREE.ScreenNode( fadeScreen );
 
 						// GUI
 
@@ -457,7 +457,7 @@
 						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );
 
-						nodepost.input = blurScreen;
+						nodepost.output = blurScreen;
 
 						// GUI
 
@@ -487,7 +487,7 @@
 
 				var json = nodepost.toJSON();
 
-				nodepost.input = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
+				nodepost.output = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
 */
 			}
 

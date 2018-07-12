@@ -24,7 +24,7 @@ function NodePostProcessing( renderer, renderTarget ) {
 	this.renderer = renderer;
 	this.renderTarget = renderTarget;
 
-	this.input = new ScreenNode();
+	this.output = new ScreenNode();
 	this.material = new NodeMaterial();
 
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
@@ -48,7 +48,7 @@ NodePostProcessing.prototype = {
 
 			this.material.dispose();
 
-			this.material.fragment.value = this.input;
+			this.material.fragment.value = this.output;
 			this.material.build();
 
 			if (this.material.uniforms.renderTexture) {
@@ -98,16 +98,16 @@ NodePostProcessing.prototype = {
 
 		}
 
-		if ( meta && ! meta.postprocessing ) meta.postprocessing = {};
+		if ( meta && ! meta.post ) meta.post = {};
 
-		if ( ! meta.postprocessing[ this.uuid ] ) {
+		if ( ! meta.post[ this.uuid ] ) {
 
 			var data = {};
 
 			data.uuid = this.uuid;
 			data.type = "NodePostProcessing";
 
-			meta.postprocessing[ this.uuid ] = data;
+			meta.post[ this.uuid ] = data;
 
 			if ( this.name !== "" ) data.name = this.name;
 
@@ -117,7 +117,7 @@ NodePostProcessing.prototype = {
 
 		}
 
-		meta.postprocessing = this.uuid;
+		meta.post = this.uuid;
 
 		return meta;
 		
