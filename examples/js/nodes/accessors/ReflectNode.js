@@ -2,27 +2,30 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.ReflectNode = function ( scope ) {
+import { TempNode } from '../core/TempNode.js';
 
-	THREE.TempNode.call( this, 'v3', { unique: true } );
+function ReflectNode( scope ) {
 
-	this.scope = scope || THREE.ReflectNode.CUBE;
+	TempNode.call( this, 'v3', { unique: true } );
+
+	this.scope = scope || ReflectNode.CUBE;
 
 };
 
-THREE.ReflectNode.CUBE = 'cube';
-THREE.ReflectNode.SPHERE = 'sphere';
-THREE.ReflectNode.VECTOR = 'vector';
+ReflectNode.CUBE = 'cube';
+ReflectNode.SPHERE = 'sphere';
+ReflectNode.VECTOR = 'vector';
 
-THREE.ReflectNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ReflectNode.prototype.constructor = THREE.ReflectNode;
-THREE.ReflectNode.prototype.nodeType = "Reflect";
+ReflectNode.prototype = Object.create( TempNode.prototype );
+ReflectNode.prototype.constructor = ReflectNode;
+ReflectNode.prototype.nodeType = "Reflect";
 
-THREE.ReflectNode.prototype.getType = function ( builder ) {
+ReflectNode.prototype.getType = function ( builder ) {
 
 	switch ( this.scope ) {
 
-		case THREE.ReflectNode.SPHERE:
+		case ReflectNode.SPHERE:
+
 			return 'v2';
 
 	}
@@ -31,47 +34,57 @@ THREE.ReflectNode.prototype.getType = function ( builder ) {
 
 };
 
-THREE.ReflectNode.prototype.generate = function ( builder, output ) {
+ReflectNode.prototype.generate = function ( builder, output ) {
 
-	var result;
+	if ( builder.isShader( 'fragment' ) ) {
+		
+		var result;
 
-	switch ( this.scope ) {
+		switch ( this.scope ) {
 
-		case THREE.ReflectNode.VECTOR:
+			case ReflectNode.VECTOR:
 
-			builder.material.addFragmentNode( 'vec3 reflectVec = inverseTransformDirection( reflect( -normalize( vViewPosition ), normal ), viewMatrix );' );
+				builder.addNodeCode( 'vec3 reflectVec = inverseTransformDirection( reflect( -normalize( vViewPosition ), normal ), viewMatrix );' );
 
-			result = 'reflectVec';
+				result = 'reflectVec';
 
-			break;
+				break;
 
-		case THREE.ReflectNode.CUBE:
+			case ReflectNode.CUBE:
 
-			var reflectVec = new THREE.ReflectNode( THREE.ReflectNode.VECTOR ).build( builder, 'v3' );
+				var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
 
-			builder.material.addFragmentNode( 'vec3 reflectCubeVec = vec3( -1.0 * ' + reflectVec + '.x, ' + reflectVec + '.yz );' );
+				builder.addNodeCode( 'vec3 reflectCubeVec = vec3( -1.0 * ' + reflectVec + '.x, ' + reflectVec + '.yz );' );
 
-			result = 'reflectCubeVec';
+				result = 'reflectCubeVec';
 
-			break;
+				break;
 
-		case THREE.ReflectNode.SPHERE:
+			case ReflectNode.SPHERE:
 
-			var reflectVec = new THREE.ReflectNode( THREE.ReflectNode.VECTOR ).build( builder, 'v3' );
+				var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
 
-			builder.material.addFragmentNode( 'vec2 reflectSphereVec = normalize((viewMatrix * vec4(' + reflectVec + ', 0.0 )).xyz + vec3(0.0,0.0,1.0)).xy * 0.5 + 0.5;' );
+				builder.addNodeCode( 'vec2 reflectSphereVec = normalize( ( viewMatrix * vec4( ' + reflectVec + ', 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) ).xy * 0.5 + 0.5;' );
 
-			result = 'reflectSphereVec';
+				result = 'reflectSphereVec';
 
-			break;
+				break;
 
+		}
+
+		return builder.format( result, this.getType( this.type ), output );
+	
+	} else {
+		
+		console.warn( "THREE.ReflectNode is not compatible with " + builder.shader + " shader." );
+
+		return builder.format( 'vec3( 0.0 )', this.type, output );
+		
 	}
-
-	return builder.format( result, this.getType( this.type ), output );
 
 };
 
-THREE.ReflectNode.prototype.toJSON = function ( meta ) {
+ReflectNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -86,3 +99,5 @@ THREE.ReflectNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { ReflectNode };

@@ -46,6 +46,25 @@ function reversePainterSortStable( a, b ) {
 
 }
 
+
+function painterSortStableSprites( a, b ) {
+
+	if ( a.renderOrder !== b.renderOrder ) {
+
+	 return a.renderOrder - b.renderOrder;
+
+	} else if ( a.z !== b.z ) {
+
+	 return b.z - a.z;
+
+	} else {
+
+	 return b.id - a.id;
+
+	}
+
+}
+
 function WebGLRenderList() {
 
 	var renderItems = [];
@@ -53,6 +72,7 @@ function WebGLRenderList() {
 
 	var opaque = [];
 	var transparent = [];
+	var sprites = [];
 
 	function init() {
 
@@ -60,6 +80,7 @@ function WebGLRenderList() {
 
 		opaque.length = 0;
 		transparent.length = 0;
+		sprites.length = 0;
 
 	}
 
@@ -95,7 +116,15 @@ function WebGLRenderList() {
 
 		}
 
-		( material.transparent === true ? transparent : opaque ).push( renderItem );
+		if ( object.isSprite ) {
+
+			sprites.push( renderItem );
+
+		} else {
+
+			( material.transparent === true ? transparent : opaque ).push( renderItem );
+
+		}
 
 		renderItemsIndex ++;
 
@@ -105,12 +134,14 @@ function WebGLRenderList() {
 
 		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
+		if ( sprites.length > 1 ) sprites.sort( painterSortStableSprites );
 
 	}
 
 	return {
 		opaque: opaque,
 		transparent: transparent,
+		sprites: sprites,
 
 		init: init,
 		push: push,

@@ -10,6 +10,7 @@ import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEnco
 import { _Math } from '../math/Math.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
+import { ImageUtils } from '../extras/ImageUtils.js';
 
 var textureId = 0;
 
@@ -130,46 +131,6 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
-		function getDataURL( image ) {
-
-			var canvas;
-
-			if ( image instanceof HTMLCanvasElement ) {
-
-				canvas = image;
-
-			} else {
-
-				canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-				canvas.width = image.width;
-				canvas.height = image.height;
-
-				var context = canvas.getContext( '2d' );
-
-				if ( image instanceof ImageData ) {
-
-					context.putImageData( image, 0, 0 );
-
-				} else {
-
-					context.drawImage( image, 0, 0, image.width, image.height );
-
-				}
-
-			}
-
-			if ( canvas.width > 2048 || canvas.height > 2048 ) {
-
-				return canvas.toDataURL( 'image/jpeg', 0.6 );
-
-			} else {
-
-				return canvas.toDataURL( 'image/png' );
-
-			}
-
-		}
-
 		var output = {
 
 			metadata: {
@@ -223,7 +184,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					for ( var i = 0, l = image.length; i < l; i ++ ) {
 
-						url.push( getDataURL( image[ i ] ) );
+						url.push( ImageUtils.getDataURL( image[ i ] ) );
 
 					}
 
@@ -231,7 +192,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					// process single image
 
-					url = getDataURL( image );
+					url = ImageUtils.getDataURL( image );
 
 				}
 

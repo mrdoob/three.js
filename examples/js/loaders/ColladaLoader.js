@@ -3183,7 +3183,15 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			library.nodes[ data.id ] = data;
+			if ( hasNode( data.id ) ) {
+
+				console.warn( 'THREE.ColladaLoader: There is already a node with ID %s. Exclude current node from further processing.', data.id );
+
+			} else {
+
+				library.nodes[ data.id ] = data;
+
+			}
 
 			return data;
 
@@ -3519,6 +3527,8 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		var fallbackMaterial = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
+
 		function resolveMaterialBinding( keys, instanceMaterials ) {
 
 			var materials = [];
@@ -3526,7 +3536,17 @@ THREE.ColladaLoader.prototype = {
 			for ( var i = 0, l = keys.length; i < l; i ++ ) {
 
 				var id = instanceMaterials[ keys[ i ] ];
-				materials.push( getMaterial( id ) );
+
+				if ( id === undefined ) {
+
+					console.warn( 'THREE.ColladaLoader: Material with key %s not found. Apply fallback material.', keys[ i ] );
+					materials.push( fallbackMaterial );
+
+				} else {
+
+					materials.push( getMaterial( id ) );
+
+				}
 
 			}
 

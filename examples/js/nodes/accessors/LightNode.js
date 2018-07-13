@@ -2,21 +2,23 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.LightNode = function ( scope ) {
+import { TempNode } from '../core/TempNode.js';
 
-	THREE.TempNode.call( this, 'v3', { shared: false } );
+function LightNode( scope ) {
 
-	this.scope = scope || THREE.LightNode.TOTAL;
+	TempNode.call( this, 'v3', { shared: false } );
+
+	this.scope = scope || LightNode.TOTAL;
 
 };
 
-THREE.LightNode.TOTAL = 'total';
+LightNode.TOTAL = 'total';
 
-THREE.LightNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.LightNode.prototype.constructor = THREE.LightNode;
-THREE.LightNode.prototype.nodeType = "Light";
+LightNode.prototype = Object.create( TempNode.prototype );
+LightNode.prototype.constructor = LightNode;
+LightNode.prototype.nodeType = "Light";
 
-THREE.LightNode.prototype.generate = function ( builder, output ) {
+LightNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isCache( 'light' ) ) {
 
@@ -32,7 +34,15 @@ THREE.LightNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.LightNode.prototype.toJSON = function ( meta ) {
+LightNode.prototype.copy = function ( source ) {
+			
+	TempNode.prototype.copy.call( this, source );
+	
+	this.scope = source.scope;
+	
+};
+
+LightNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -47,3 +57,5 @@ THREE.LightNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { LightNode };

@@ -22,7 +22,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points',
-		ShadowMaterial: 'shadow'
+		ShadowMaterial: 'shadow',
+		SpriteMaterial: 'sprite'
 	};
 
 	var parameterNames = [

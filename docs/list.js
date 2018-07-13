@@ -8,11 +8,11 @@ var list = {
 			"Browser support": "manual/introduction/Browser-support",
 			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
 			"How to run things locally": "manual/introduction/How-to-run-things-locally",
-			"Drawing Lines": "manual/introduction/Drawing-lines",
-			"Creating Text": "manual/introduction/Creating-text",
-			"Loading 3D Models": "manual/introduction/Loading-3D-models",
-			"Migration Guide": "manual/introduction/Migration-guide",
-			"Code Style Guide": "manual/introduction/Code-style-guide",
+			"Drawing lines": "manual/introduction/Drawing-lines",
+			"Creating text": "manual/introduction/Creating-text",
+			"Loading 3D models": "manual/introduction/Loading-3D-models",
+			"Migration guide": "manual/introduction/Migration-guide",
+			"Code style guide": "manual/introduction/Code-style-guide",
 			"FAQ": "manual/introduction/FAQ",
 			"Useful links": "manual/introduction/Useful-links"
 		},
@@ -417,10 +417,6 @@ var list = {
 			"WebGLProgram": "api/renderers/webgl/WebGLProgram",
 			"WebGLShader": "api/renderers/webgl/WebGLShader",
 			"WebGLState": "api/renderers/webgl/WebGLState"
-		},
-
-		"WebGLRenderer / Plugins": {
-			"SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
 		}
 
 	}

@@ -79,7 +79,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	var maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
 	var vertexTextures = maxVertexTextures > 0;
-	var floatFragmentTextures = !! extensions.get( 'OES_texture_float' );
+	var floatFragmentTextures = gl.isWebGL2 || !! extensions.get( 'OES_texture_float' );
 	var floatVertexTextures = vertexTextures && floatFragmentTextures;
 
 	return {

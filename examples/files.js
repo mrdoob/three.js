@@ -132,7 +132,6 @@ var files = {
 		"webgl_loader_texture_pvrtc",
 		"webgl_loader_texture_tga",
 		"webgl_loader_ttf",
-		"webgl_loader_utf8",
 		"webgl_loader_vrm",
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
@@ -320,17 +319,15 @@ var files = {
 		"webaudio_visualizer"
 	],
 	"webvr": [
+		"webvr_ballshooter",
 		"webvr_cubes",
-		"webvr_daydream",
-		"webvr_gearvr",
+		"webvr_dragging",
 		"webvr_lorenzattractor",
-		"webvr_oculusgo",
 		"webvr_panorama",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
 		"webvr_video",
 		"webvr_vive",
-		"webvr_vive_dragging",
 		"webvr_vive_paint",
 		"webvr_vive_sculpt"
 	],
