@@ -4,6 +4,7 @@
  * @author Tony Parisi / http://www.tonyparisi.com/
  * @author Takahiro / https://github.com/takahirox
  * @author Don McCurdy / https://www.donmccurdy.com
+ * @author Robert Long / https://robertlong.me
  */
 
 THREE.GLTFLoader = ( function () {
@@ -12,6 +13,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.dracoLoader = null;
+		this.preferredTechnique = null;
 
 	}
 
@@ -72,6 +74,13 @@ THREE.GLTFLoader = ( function () {
 		setDRACOLoader: function ( dracoLoader ) {
 
 			this.dracoLoader = dracoLoader;
+			return this;
+
+		},
+
+		setPreferredTechnique: function ( preferredTechnique ) {
+
+			this.preferredTechnique = preferredTechnique;
 			return this;
 
 		},
@@ -148,6 +157,10 @@ THREE.GLTFLoader = ( function () {
 
 						case EXTENSIONS.MSFT_TEXTURE_DDS:
 							extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension();
+							break;
+
+						case EXTENSIONS.MOZ_ALT_MATERIALS:
+							extensions[ EXTENSIONS.MOZ_ALT_MATERIALS ] = new GLTFAltMaterialsExtension( this.preferredTechnique );
 							break;
 
 						default:
@@ -240,7 +253,8 @@ THREE.GLTFLoader = ( function () {
 		KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
-		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
+		MSFT_TEXTURE_DDS: 'MSFT_texture_dds',
+		MOZ_ALT_MATERIALS: 'MOZ_alt_materials'
 	};
 
 	/**
@@ -907,6 +921,37 @@ THREE.GLTFLoader = ( function () {
 		};
 
 	}
+
+	/**
+	 * Alternate Materials Extensions
+	 *
+	 * Specification (pending): https://github.com/KhronosGroup/glTF/pull/1350
+	 */
+	function GLTFAltMaterialsExtension( preferredTechnique ) {
+
+		this.name = EXTENSIONS.MOZ_ALT_MATERIALS;
+		this.preferredTechnique = preferredTechnique;
+
+	}
+
+	GLTFAltMaterialsExtension.prototype.getAltMaterial = function ( materialDef, materials ) {
+
+		if ( materialDef.extensions && materialDef.extensions[ EXTENSIONS.MOZ_ALT_MATERIALS ]) {
+
+			var extension = materialDef.extensions[ EXTENSIONS.MOZ_ALT_MATERIALS ];
+
+			if ( this.preferredTechnique && extension[ this.preferredTechnique ] !== undefined ) {
+
+				var altMaterialIndex = extension[ this.preferredTechnique ];
+				return materials[ altMaterialIndex ];
+
+			}
+
+			return materialDef;
+
+		}
+
+	};
 
 	/*********************************/
 	/********** INTERPOLATION ********/
@@ -2079,6 +2124,13 @@ THREE.GLTFLoader = ( function () {
 		var json = this.json;
 		var extensions = this.extensions;
 		var materialDef = this.json.materials[ materialIndex ];
+
+		if ( materialDef.extensions && materialDef.extensions[ EXTENSIONS.MOZ_ALT_MATERIALS ] ) {
+
+			var amExtension = extensions[ EXTENSIONS.MOZ_ALT_MATERIALS ];
+			materialDef = amExtension.getAltMaterial( materialDef, json.materials );
+
+		}
 
 		var materialType;
 		var materialParams = {};
