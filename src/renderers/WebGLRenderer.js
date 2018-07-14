@@ -1243,8 +1243,6 @@ function WebGLRenderer( parameters ) {
 						_vector3.setFromMatrixPosition( object.matrixWorld )
 							.applyMatrix4( _projScreenMatrix );
 
-						var material = object.material;
-
 					}
 
 					var geometry = objects.update( object );
