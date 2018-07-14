@@ -59,7 +59,7 @@
 		<script>
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
-			var gltf, envMap, mixer, gui, extensionControls;
+			var gltf, envMap, mixer, gui, extensionControls, preferredTechniqueControl;
 
 			var clock = new THREE.Clock();
 
@@ -72,7 +72,8 @@
 					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
 					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
 					addLights: true,
-					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
+					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds', 'glTF-altMaterials' ],
+					techniques: [ 'pbrMetallicRoughness', 'KHR_materials_unlit' ],
 					addEnvMap: true
 				},
 				'Bot Skinned': {
@@ -165,7 +166,8 @@
 			var state = {
 				scene: Object.keys( scenes )[ 0 ],
 				extension: scenes[ Object.keys( scenes )[ 0 ] ].extensions[ 0 ],
-				playAnimation: true
+				playAnimation: true,
+				preferredTechnique: "pbrMetallicRoughness"
 			};
 
 			function onload() {
@@ -271,6 +273,8 @@
 
 				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 				loader.setDRACOLoader( new THREE.DRACOLoader() );
+
+				loader.setPreferredTechnique( state.preferredTechnique );
 
 				var url = sceneInfo.url.replace( /%s/g, state.extension );
 
@@ -463,6 +467,15 @@
 
 				extensionControls = gui.add( state, 'extension', sceneInfo.extensions );
 				extensionControls.onChange( reload );
+
+				if ( preferredTechniqueControl ) preferredTechniqueControl.remove();
+
+				if ( state.extension === "glTF-altMaterials" ) {
+
+					preferredTechniqueControl = gui.add( state, 'preferredTechnique', sceneInfo.techniques );
+					preferredTechniqueControl.onChange( reload );
+
+				}
 
 			}
 
