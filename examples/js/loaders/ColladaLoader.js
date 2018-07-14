@@ -973,7 +973,7 @@ THREE.ColladaLoader.prototype = {
 
 			} else {
 
-				build.bindMatrix = new THREE.Matrix4().transpose();
+				build.bindMatrix = new THREE.Matrix4().identity();
 
 			}
 
