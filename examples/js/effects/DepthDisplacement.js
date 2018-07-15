@@ -6,7 +6,7 @@ THREE.DepthDisplacementEffect = function ( renderer, color, depth ) {
 
   var _aspectRatio = color.image.width / color.image.height;
 
-  var _displacementAmount = 0.01;
+  var _displacementAmount = 0.005;
 
   var _direction = -1.0;
 
