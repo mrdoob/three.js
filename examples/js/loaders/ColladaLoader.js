@@ -1453,8 +1453,7 @@ THREE.ColladaLoader.prototype = {
 
 			var loader;
 
-			var extension = image.slice( ( image.lastIndexOf( '.' ) - 1 >>> 0 ) + 2 ); // http://www.jstips.co/en/javascript/get-file-extension/
-			extension = extension.toLowerCase();
+			var extension = THREE.LoaderUtils.extractExtension( image ).toLowerCase();
 
 			switch ( extension ) {
 

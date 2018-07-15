@@ -1,5 +1,6 @@
 /**
  * @author Don McCurdy / https://www.donmccurdy.com
+ * @author Mugen87 / https://github.com/Mugen87
  */
 /* global QUnit */
 
@@ -9,7 +10,6 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module( 'LoaderUtils', () => {
 
-		// INSTANCING
 		QUnit.test( 'decodeText', ( assert ) => {
 
 			var jsonArray = new Uint8Array( [ 123, 34, 106, 115, 111, 110, 34, 58, 32, 116, 114, 117, 101, 125 ] );
@@ -17,6 +17,18 @@ export default QUnit.module( 'Loaders', () => {
 
 			var multibyteArray = new Uint8Array( [ 230, 151, 165, 230, 156, 172, 229, 155, 189 ] );
 			assert.equal( '日本国', LoaderUtils.decodeText( multibyteArray ) );
+
+		} );
+
+		QUnit.test( 'extractExtension', ( assert ) => {
+
+			assert.equal( 'tga', LoaderUtils.extractExtension( 'filename.tga' ) );
+			assert.equal( 'tga', LoaderUtils.extractExtension( '/filename.tga' ) );
+			assert.equal( 'tga', LoaderUtils.extractExtension( '/some/more/directories/filename.tga' ) );
+			assert.equal( 'tga', LoaderUtils.extractExtension( 'some/more/directories/filename.tga' ) );
+			assert.equal( 'tga', LoaderUtils.extractExtension( 'filename.with.many.dots.tga' ) );
+			assert.equal( '', LoaderUtils.extractExtension( 'filename' ) );
+			assert.equal( '', LoaderUtils.extractExtension( '.hiddenfile' ) );
 
 		} );
 
