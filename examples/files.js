@@ -15,6 +15,7 @@ var files = {
 		"webgl_decals",
 		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
+		"webgl_effects_displacement",
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",

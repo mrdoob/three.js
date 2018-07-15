@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - effects - displacement</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+    body {
+      background: #000;
+      color: #fff;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      font-family: georgia;
+      text-align: center;
+    }
+    a {
+      color: skyblue;
+      text-decoration: none
+    }
+    #info {
+      position: absolute;
+      width: 100%;
+    }
+		</style>
+	</head>
+
+	<body>
+    <div id="info">
+        <a href="http://depthkit.tv" target="_blank" rel="noopener">DepthKit.js</a> - Simple example using Three.js<br/> Written
+        by <a href="http://orfleisher.com">juniorxsound</a>
+    </div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/effects/DepthDisplacement.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, effect;
+
+      init();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+        camera.position.set(0,0,1);
+				scene = new THREE.Scene();
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild( renderer.domElement );
+
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+        var colorTexture, depthTexture;
+
+        var loadingManager = new THREE.LoadingManager();
+        var textureLoader = new THREE.TextureLoader(loadingManager);
+
+        textureLoader.load('./textures/depth_effect_depthmap.png', function( texture ){
+
+          depthTexture = texture;
+          depthTexture.minFilter = THREE.NearestFilter;
+          depthTexture.magFilter = THREE.LinearFilter;
+          depthTexture.format = THREE.RGBFormat;
+          depthTexture.generateMipmaps = false;
+
+        });
+
+        textureLoader.load('./textures/depth_effect_color.png', function( texture ){
+
+          colorTexture = texture;
+          colorTexture.minFilter = THREE.NearestFilter;
+          colorTexture.magFilter = THREE.LinearFilter;
+          colorTexture.format = THREE.RGBFormat;
+          colorTexture.generateMipmaps = false;
+
+        });
+
+        loadingManager.onLoad = function(){
+
+          effect = new THREE.DepthDisplacementEffect( renderer, colorTexture, depthTexture );
+          var size = renderer.getSize();
+          effect.setSize( size.width, size.height );
+
+          scene.add(effect.getObject3D());
+
+  				document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+  				window.addEventListener( 'resize', onWindowResize, false );
+
+          animate();
+        }
+
+
+			}
+
+      //
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+        effect.onMouseMove(event);
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+        renderer.render( scene, camera );
+
+				render();
+
+			}
+
+			function render() {
+
+        stats.update();
+
+			}
+
+
+		</script>
+
+	</body>
+</html>
