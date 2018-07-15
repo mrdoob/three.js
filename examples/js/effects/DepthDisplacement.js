@@ -8,7 +8,7 @@ THREE.DepthDisplacementEffect = function ( renderer, color, depth ) {
 
   var _displacementAmount = 0.01;
 
-  var _direction = 1.0;
+  var _direction = -1.0;
 
   var _material = new THREE.ShaderMaterial( {
 		uniforms: {
