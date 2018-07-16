@@ -29,8 +29,9 @@
 			<button id="export_obj">Export WaltHead</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
-			<br/><br/>
-			<label><input id="option_trs" name="trs" type="checkbox"/>TRS</label>
+			<button id="export_chunks">Export all Scene1 files</button>
+			<br/>
+			<label><input id="option_trs" name="trs" type="checkbox" checked="checked"/>TRS</label>
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
 			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
@@ -46,33 +47,92 @@
 
 		<script>
 
+			function getOptions () {
+
+				return {
+					trs: document.getElementById('option_trs').checked,
+					onlyVisible: document.getElementById('option_visible').checked,
+					truncateDrawRange: document.getElementById('option_drawrange').checked,
+					binary: document.getElementById('option_binary').checked,
+					forceIndices: document.getElementById('option_forceindices').checked,
+					forcePowerOfTwoTextures: document.getElementById('option_forcepot').checked
+				};
+
+			}
+
 			function exportGLTF( input ) {
 
 				var gltfExporter = new THREE.GLTFExporter();
 
-				var options = {
-					trs: document.getElementById( 'option_trs' ).checked,
-					onlyVisible: document.getElementById( 'option_visible' ).checked,
-					truncateDrawRange: document.getElementById( 'option_drawrange' ).checked,
-					binary: document.getElementById( 'option_binary' ).checked,
-					forceIndices: document.getElementById( 'option_forceindices' ).checked,
-					forcePowerOfTwoTextures: document.getElementById( 'option_forcepot' ).checked
-				};
-				gltfExporter.parse( input, function ( result ) {
+				var options = getOptions();
 
-					if ( result instanceof ArrayBuffer ) {
+				function onComplete ( result ) {
 
-						saveArrayBuffer( result, 'scene.glb' );
+						if ( result instanceof ArrayBuffer ) {
 
-					} else {
+							saveArrayBuffer( result, 'scene.glb' );
 
-						var output = JSON.stringify( result, null, 2 );
-						console.log( output );
+						} else {
+
+							var output = JSON.stringify( result, null, 2 );
+							console.log( output );
+							saveString( output, 'scene.gltf' );
+
+						}
+
+				}
+
+				function onError ( error ) {
+
+					console.error( error );
+
+				}
+
+				gltfExporter.parse( input, onComplete, onError, options );
+
+			}
+
+			function exportChunks ( input ) {
+
+				var gltfExporter = new THREE.GLTFExporter();
+
+				var options = getOptions();
+
+				function onComplete ( result ) {
+
+						console.log( result );
+
+						var output = JSON.stringify( result.json, null, 2 );
+
 						saveString( output, 'scene.gltf' );
 
-					}
+						if ( result.bin ) {
+							saveBlob( result.bin, result.binFileName );
+						}
 
-				}, options );
+						var imageUrls = result.externalImageUrls;
+						var imageFileNames = result.externalImageFileNames;
+
+						for ( var i = 0; i < imageUrls.length; i ++ ) {
+
+							var imageUrl = imageUrls[ i ];
+							var imageFileName = imageFileNames[ i ];
+
+							saveUrl( imageUrl, imageFileName );
+
+						}
+
+				}
+
+				function onError ( error ) {
+
+					console.error( error );
+
+				}
+
+				console.log( "exportChunks", input );
+
+				gltfExporter.parseChunks( input, onComplete, onError, options );
 
 			}
 
@@ -112,16 +172,30 @@
 
 			} );
 
+			document.getElementById( 'export_chunks' ).addEventListener( 'click', function () {
+
+				exportChunks( [ scene1 ] );
+
+			} );
+
 
 			var link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link ); // Firefox workaround, see #6594
 
-			function save( blob, filename ) {
+			function saveUrl( url, filename ) {
 
-				link.href = URL.createObjectURL( blob );
+				link.href = url;
 				link.download = filename;
 				link.click();
+
+			}
+
+			function saveBlob( blob, filename ) {
+
+				var url = URL.createObjectURL( blob );
+				
+				saveUrl( url, filename );
 
 				// URL.revokeObjectURL( url ); breaks Firefox...
 
@@ -129,14 +203,13 @@
 
 			function saveString( text, filename ) {
 
-				save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+				saveBlob( new Blob( [ text ], { type: 'text/plain' } ), filename );
 
 			}
 
-
 			function saveArrayBuffer( buffer, filename ) {
 
-				save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
+				saveBlob( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
 
 			}
 
