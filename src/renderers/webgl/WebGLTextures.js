@@ -64,7 +64,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			var context = _canvas.getContext( '2d' );
 			context.drawImage( image, 0, 0, _canvas.width, _canvas.height );
 
-			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + _canvas.width + 'x' + _canvas.height, image );
+			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + _canvas.width + 'x' + _canvas.height );
 
 			return _canvas;
 
