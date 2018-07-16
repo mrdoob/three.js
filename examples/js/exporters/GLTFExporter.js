@@ -58,19 +58,22 @@ THREE.GLTFExporter.prototype = {
 	constructor: THREE.GLTFExporter,
 
 	/**
-	 * Parse scenes and generate GLTF output
+	 * Parse scenes and generate an object containing the glTF JSON, bin blob, and image urls/file names.
 	 * @param  {THREE.Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
+	 * @param  {Function} onError Callback on error
 	 * @param  {Object} options options
 	 */
-	parse: function ( input, onDone, options ) {
+	parseChunks: function ( input, onDone, onError, options ) {
 
 		var DEFAULT_OPTIONS = {
 			binary: false,
-			trs: false,
+			binFileName: "scene.bin",
+			trs: true,
 			onlyVisible: true,
 			truncateDrawRange: true,
-			embedImages: true,
+			embedImages: false,
+			useImageFileNames: true,
 			animations: [],
 			forceIndices: false,
 			forcePowerOfTwoTextures: false
@@ -110,6 +113,8 @@ THREE.GLTFExporter.prototype = {
 			images: new Map()
 
 		};
+		var externalImageUrls = [];
+		var externalImageFilenames = [];
 
 		var cachedCanvas;
 
@@ -324,6 +329,12 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			return arrayBuffer;
+
+		}
+
+		function getFileNameFromUri( uri ) {
+
+			return uri.split( '#' ).shift().split( '?' ).shift().split( '/' ).pop();
 
 		}
 
@@ -683,7 +694,7 @@ THREE.GLTFExporter.prototype = {
 
 				if ( options.binary === true ) {
 
-					pending.push( new Promise( function ( resolve ) {
+					pending.push( new Promise( function ( resolve, reject ) {
 
 						canvas.toBlob( function ( blob ) {
 
@@ -693,7 +704,7 @@ THREE.GLTFExporter.prototype = {
 
 								resolve();
 
-							} );
+							} ).catch( reject );
 
 						}, mimeType );
 
@@ -704,6 +715,12 @@ THREE.GLTFExporter.prototype = {
 					gltfImage.uri = canvas.toDataURL( mimeType );
 
 				}
+
+			} else if ( options.useImageFileNames ) {
+
+				gltfImage.uri = getFileNameFromUri( image.src );
+				externalImageUrls.push( image.src );
+				externalImageFilenames.push( gltfImage.uri );
 
 			} else {
 
@@ -1751,8 +1768,7 @@ THREE.GLTFExporter.prototype = {
 
 		Promise.all( pending ).then( function () {
 
-			// Merge buffers.
-			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
+			var blob, binFileName;
 
 			// Declare extensions.
 			var extensionsUsedList = Object.keys( extensionsUsed );
@@ -1760,86 +1776,121 @@ THREE.GLTFExporter.prototype = {
 
 			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
+				// Merge buffers
+				blob = new Blob( buffers, { type: 'application/octet-stream' } );
+
 				// Update bytelength of the single buffer.
 				outputJSON.buffers[ 0 ].byteLength = blob.size;
 
-				var reader = new window.FileReader();
+				if ( ! options.binary ) {
 
-				if ( options.binary === true ) {
-
-					// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
-
-					var GLB_HEADER_BYTES = 12;
-					var GLB_HEADER_MAGIC = 0x46546C67;
-					var GLB_VERSION = 2;
-
-					var GLB_CHUNK_PREFIX_BYTES = 8;
-					var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
-					var GLB_CHUNK_TYPE_BIN = 0x004E4942;
-
-					reader.readAsArrayBuffer( blob );
-					reader.onloadend = function () {
-
-						// Binary chunk.
-						var binaryChunk = getPaddedArrayBuffer( reader.result );
-						var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-						binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
-						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
-
-						// JSON chunk.
-						var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
-						var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
-						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
-
-						// GLB header.
-						var header = new ArrayBuffer( GLB_HEADER_BYTES );
-						var headerView = new DataView( header );
-						headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
-						headerView.setUint32( 4, GLB_VERSION, true );
-						var totalByteLength = GLB_HEADER_BYTES
-							+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
-							+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
-						headerView.setUint32( 8, totalByteLength, true );
-
-						var glbBlob = new Blob( [
-							header,
-							jsonChunkPrefix,
-							jsonChunk,
-							binaryChunkPrefix,
-							binaryChunk
-						], { type: 'application/octet-stream' } );
-
-						var glbReader = new window.FileReader();
-						glbReader.readAsArrayBuffer( glbBlob );
-						glbReader.onloadend = function () {
-
-							onDone( glbReader.result );
-
-						};
-
-					};
-
-				} else {
-
-					reader.readAsDataURL( blob );
-					reader.onloadend = function () {
-
-						var base64data = reader.result;
-						outputJSON.buffers[ 0 ].uri = base64data;
-						onDone( outputJSON );
-
-					};
+					binFileName = options.binFileName;
+					outputJSON.buffers[ 0 ].uri = binFileName;
 
 				}
 
+			}
+
+			onDone( {
+				json: outputJSON,
+				bin: blob,
+				binFileName: binFileName,
+				externalImageUrls: externalImageUrls,
+				externalImageFileNames: externalImageFilenames
+			} );
+
+		} ).catch( onError );
+
+	},
+
+	/**
+	 * Parse scenes and generate GLTF output
+	 * @param  {THREE.Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
+	 * @param  {Function} onDone  Callback on completed
+	 * @param  {Function} onError  Callback on error
+	 * @param  {Object} options options
+	 */
+	parse: function ( input, onDone, onError, options ) {
+
+		this.parseChunks( input, function ( parts ) {
+
+			var outputJSON = parts.json;
+			var blob = parts.bin;
+
+			var reader = new window.FileReader();
+
+			if ( options.binary === true ) {
+
+				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+
+				var GLB_HEADER_BYTES = 12;
+				var GLB_HEADER_MAGIC = 0x46546C67;
+				var GLB_VERSION = 2;
+
+				var GLB_CHUNK_PREFIX_BYTES = 8;
+				var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
+				var GLB_CHUNK_TYPE_BIN = 0x004E4942;
+
+				reader.readAsArrayBuffer( blob );
+				reader.onloadend = function () {
+
+					// Binary chunk.
+					var binaryChunk = getPaddedArrayBuffer( reader.result );
+					var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
+
+					// JSON chunk.
+					var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
+					var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
+
+					// GLB header.
+					var header = new ArrayBuffer( GLB_HEADER_BYTES );
+					var headerView = new DataView( header );
+					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+					headerView.setUint32( 4, GLB_VERSION, true );
+					var totalByteLength = GLB_HEADER_BYTES
+						+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
+						+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+					headerView.setUint32( 8, totalByteLength, true );
+
+					var glbBlob = new Blob( [
+						header,
+						jsonChunkPrefix,
+						jsonChunk,
+						binaryChunkPrefix,
+						binaryChunk
+					], { type: 'application/octet-stream' } );
+
+					var glbReader = new window.FileReader();
+					glbReader.readAsArrayBuffer( glbBlob );
+					glbReader.onloadend = function () {
+
+						onDone( glbReader.result );
+
+					};
+					glbReader.onerror = onError;
+
+				};
+
 			} else {
 
-				onDone( outputJSON );
+				reader.readAsDataURL( blob );
+				reader.onloadend = function () {
+
+					var base64data = reader.result;
+					outputJSON.buffers[ 0 ].uri = base64data;
+					onDone( outputJSON );
+
+				};
 
 			}
 
-		} );
+			reader.onerror = onError;
+
+		}, onError, options );
 
 	}
 

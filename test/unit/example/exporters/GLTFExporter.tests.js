@@ -116,7 +116,7 @@ export default QUnit.module( 'Exporters', () => {
 
         done();
 
-      }, { animations: [ clip1, clip2 ] } );
+      }, undefined, { animations: [ clip1, clip2 ] } );
 
     } );
 

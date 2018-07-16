@@ -28,10 +28,17 @@
 		var exporter = new THREE.GLTFExporter();
 
 		// Parse the input and generate the glTF output
-		exporter.parse( scene, function ( gltf ) {
-			console.log( gltf );
-			downloadJSON( gltf );
-		}, options );
+		exporter.parse(
+			scene,
+			function ( gltf ) {
+				console.log( gltf );
+				downloadJSON( gltf );
+			},
+			function ( error ) {
+				console.error(error);
+			},
+			options
+		);
 		</code>
 
 		[example:misc_exporter_gltf]
@@ -47,7 +54,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null parse]( [param:Object3D input], [param:Function onCompleted], [param:Object options] )</h3>
+		<h3>[method:null parse]( [param:Object3D input], [param:Function onCompleted], [param:Function onError], [param:Object options] )</h3>
 		<p>
 		[page:Object input] — Scenes or objects to export. Valid options:<br />
 		<ul>
@@ -74,6 +81,7 @@
 		</ul>
 
 		[page:Function onCompleted] — Will be called when the export completes. The argument will be the generated glTF JSON or binary ArrayBuffer.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during exporting. The function receives error as an argument.<br />
 		[page:Options options] — Export options<br />
 		<ul>
 			<li>trs - bool. Export position, rotation and scale instead of matrix per node. Default is false</li>
@@ -88,6 +96,24 @@
 		</p>
 		<p>
 		Generates a .gltf (JSON) or .glb (binary) output from the input (Scenes or Objects)
+		</p>
+
+		<h3>[method:null parseChunks]( [param:Object3D input], [param:Function onCompleted], [param:Function onError], [param:Object options] )</h3>
+		<p>
+		[page:Object input] — Scenes or objects to export.<br />
+		[page:Function onCompleted] — Will be called when the export completes. The argument will be the generated glTF JSON or binary ArrayBuffer.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during exporting. The function receives error as an argument.<br />
+		[page:Options options] — Export options see <em>.parse</em><br />
+		</p>
+		<p>
+		Returns an object with the following properties: <br />
+		<ul>
+			<li>json — object. The glTF's JSON content.</li>
+			<li>bin — Blob. The glTF's .bin file content. Or <em>undefined</em> if <em>options.binary</em> is set.</li>
+			<li>binFileName — string. The glTF's .bin file name, saved in the glTF's JSON content. Or <em>undefined</em> if <em>options.binary</em> is set. This property can be set with <em>options.binFileName</em></li>
+			<li>externalImageUrls — Array<[page:String String]>. The urls of the externally referenced images in the glTF file.</li>
+			<li>externalImageFileNames — Array<[page:String String]>. The file names of the externally referenced images in the glTF file.</li>
+		</ul>
 		</p>
 
 		<h2>Source</h2>
