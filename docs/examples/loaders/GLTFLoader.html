@@ -156,6 +156,34 @@
 		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
 		</p>
 
+		<h3>[method:null setLazy]( [param:Boolean value] )</h3>
+		<p>
+		[page:String value] — When true, [page:Function parse] and [page:Function load] will return an object with the <em>parser</em> property set.
+		</p>
+		<p>
+			When lazy loading is enabled and the provided url points to a <em>.gltf</em> file [page:Function load] will only download the <em>.gltf</em> file. [page:Function parse] and [page:Function load] will not call <em>parser.parse()</em> or <em>parser.getDependency()</em>. Examples:
+		</p>
+		<code>
+		var loader = new THREE.GLTFLoader();
+
+		loader.setLazy(true);
+
+		loader.load('foo.gltf', function ( gltf ) {
+
+			var parser = gltf.parser;
+
+			// Modify the glTF before calling parse
+			parser.json.node[ 3 ].extensions = { EXT_foo: { bufferView: 3 } };
+
+			// Load part of the gltf 
+			parser.getDependency( "bufferView", 1 ).then( createNavMesh );
+
+			// Load the entire glTF
+			parser.parse( function ( scene, scenes, cameras, animations, json ) { } );
+
+		} );
+		</code>
+
 		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
 		<p>
 		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or <em>JSON</em> string.<br />

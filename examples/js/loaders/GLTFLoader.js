@@ -12,6 +12,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.dracoLoader = null;
+		this.lazy = false;
 
 	}
 
@@ -72,6 +73,13 @@ THREE.GLTFLoader = ( function () {
 		setDRACOLoader: function ( dracoLoader ) {
 
 			this.dracoLoader = dracoLoader;
+			return this;
+
+		},
+
+		setLazy: function ( lazy ) {
+
+			this.lazy = lazy;
 			return this;
 
 		},
@@ -171,6 +179,14 @@ THREE.GLTFLoader = ( function () {
 				manager: this.manager
 
 			} );
+
+			if ( this.lazy ) {
+
+				onLoad( { parser: parser } );
+
+				return;
+
+			}
 
 			parser.parse( function ( scene, scenes, cameras, animations, json ) {
 
