@@ -409,41 +409,13 @@ Object.assign( AnimationClip.prototype, {
 
 	},
 
-	trim: function ( startTime, endTime ) {
+	trim: function () {
 
-		if ( startTime === undefined ) startTime = 0;
-		if ( endTime === undefined ) endTime = this.duration;
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
-		var tracks = [];
-
-		for ( var i = 0; i < this.tracks.length; ++ i ) {
-
-			var track = this.tracks[ i ];
-
-			var hasKeyframe = false;
-
-			// omit tracks without frames between new start/end times
-			for ( var j = 0; j < track.times.length; ++ j ) {
-
-				if ( startTime <= track.times[ j ] && endTime > track.times [ j ] ) {
-
-					hasKeyframe = true;
-
-					break;
-
-				}
-
-			}
-
-			if ( ! hasKeyframe ) continue;
-
-			this.tracks[ i ].trim( startTime, endTime );
-
-			tracks.push( this.tracks[ i ] );
+			this.tracks[ i ].trim( 0, this.duration );
 
 		}
-
-		this.tracks = tracks;
 
 		return this;
 
