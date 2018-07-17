@@ -347,6 +347,9 @@ Object.assign( KeyframeTrack.prototype, {
 	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 	optimize: function () {
 
+		// TODO: Opt-out of optimization?
+		return this;
+
 		var times = this.times,
 			values = this.values,
 			stride = this.getValueSize(),

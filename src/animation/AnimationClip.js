@@ -409,13 +409,41 @@ Object.assign( AnimationClip.prototype, {
 
 	},
 
-	trim: function () {
+	trim: function ( startTime, endTime ) {
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
+		if ( startTime === undefined ) startTime = 0;
+		if ( endTime === undefined ) endTime = this.duration;
 
-			this.tracks[ i ].trim( 0, this.duration );
+		var tracks = [];
+
+		for ( var i = 0; i < this.tracks.length; ++ i ) {
+
+			var track = this.tracks[ i ];
+
+			var hasKeyframe = false;
+
+			// omit tracks without frames between new start/end times
+			for ( var j = 0; j < track.times.length; ++ j ) {
+
+				if ( startTime <= track.times[ j ] && endTime > track.times [ j ] ) {
+
+					hasKeyframe = true;
+
+					break;
+
+				}
+
+			}
+
+			if ( ! hasKeyframe ) continue;
+
+			this.tracks[ i ].trim( startTime, endTime );
+
+			tracks.push( this.tracks[ i ] );
 
 		}
+
+		this.tracks = tracks;
 
 		return this;
 
@@ -446,7 +474,6 @@ Object.assign( AnimationClip.prototype, {
 		return this;
 
 	},
-
 
 	clone: function () {
 
