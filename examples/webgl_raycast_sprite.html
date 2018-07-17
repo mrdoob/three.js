@@ -35,25 +35,7 @@
 
         function init() {
 
-            initRender();
-            initScene();
-            initCamera();
-            addSprite();
-
-            render();
-            window.addEventListener( "mousemove", onDocumentMouseMove, false );
-
-        }
-
-        function render() {
-
-            renderer.render( scene, camera );
-            requestAnimationFrame( render );
-
-        }
-
-        function initRender() {
-
+            // init renderer
             renderer = new THREE.WebGLRenderer( {
                 antialias: true
             } );
@@ -61,36 +43,20 @@
             document.body.appendChild( renderer.domElement );
             renderer.setClearColor( 0xFFFFFF, 1.0 );
 
-        }
-
-        function initScene() {
-
+            // init scene
             scene = new THREE.Scene();
             spriteGroup = new THREE.Object3D();
             scene.add( spriteGroup );
 
-        }
-
-        function initCamera() {
-
+            // init camera
             camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
-            camera.position.y = 15;
-            camera.position.z = 15;
-            camera.position.x = 15;
-            camera.lookAt( {
-                x: 0,
-                y: 0,
-                z: 0
-            } );
+            camera.position.set( 15, 15, 15 );
+            camera.lookAt( scene.position );
 
             controls = new THREE.OrbitControls( camera, renderer.domElement );
-            controls.target = new THREE.Vector3( 0, 0, 0 );
             controls.enableRotate = true;
 
-        }
-
-        function addSprite() {
-
+            // add sprites
             var sprite;
 
             sprite = makeSprite( '#69f', spriteGroup );
@@ -115,6 +81,10 @@
             sprite.center.set( - 0.1, 0 );
             sprite.material.rotation = Math.PI / 3;
 
+            window.addEventListener( 'resize', onWindowResize, false );
+            window.addEventListener( "mousemove", onDocumentMouseMove, false );
+
+            render();
         }
 
         function makeSprite( color, parent ) {
@@ -124,6 +94,22 @@
             } ) );
             parent.add( sprite );
             return sprite;
+
+        }
+
+        function render() {
+
+            renderer.render( scene, camera );
+            requestAnimationFrame( render );
+
+        }
+
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize( window.innerWidth, window.innerHeight );
 
         }
 
