@@ -29,12 +29,18 @@
 			<button id="export_obj">Export WaltHead</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
-			<button id="export_chunks">Export all Scene1 files</button>
 			<br/>
+			<label>
+				Mode:
+				<select id="option_mode" value="glb">
+					<option value="glb">glb (binary)</option>
+					<option value="gltf">gltf</option>
+					<option value="embedded">gltf embedded</option>
+				</select>
+			</label>
 			<label><input id="option_trs" name="trs" type="checkbox" checked="checked"/>TRS</label>
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
-			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
 			<label><input id="option_forceindices" name="visible" type="checkbox">Force indices</label>
 			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
 		</div>
@@ -50,10 +56,10 @@
 			function getOptions () {
 
 				return {
+					mode: document.getElementById('option_mode').value,
 					trs: document.getElementById('option_trs').checked,
 					onlyVisible: document.getElementById('option_visible').checked,
 					truncateDrawRange: document.getElementById('option_drawrange').checked,
-					binary: document.getElementById('option_binary').checked,
 					forceIndices: document.getElementById('option_forceindices').checked,
 					forcePowerOfTwoTextures: document.getElementById('option_forcepot').checked
 				};
@@ -66,61 +72,47 @@
 
 				var options = getOptions();
 
-				function onComplete ( result ) {
-
-						if ( result instanceof ArrayBuffer ) {
-
-							saveArrayBuffer( result, 'scene.glb' );
-
-						} else {
-
-							var output = JSON.stringify( result, null, 2 );
-							console.log( output );
-							saveString( output, 'scene.gltf' );
-
-						}
-
-				}
-
-				function onError ( error ) {
-
-					console.error( error );
-
-				}
-
-				gltfExporter.parse( input, onComplete, onError, options );
-
-			}
-
-			function exportChunks ( input ) {
-
-				var gltfExporter = new THREE.GLTFExporter();
-
-				var options = getOptions();
+				console.log( options );
 
 				function onComplete ( result ) {
 
-						console.log( result );
+					if ( options.mode === "glb" ) {
 
-						var output = JSON.stringify( result.json, null, 2 );
+						saveBlob( result, 'scene.glb' );
 
+					} else if ( options.mode === "gltf" ) {
+
+						var json = result.json;
+						var buffers = result.buffers;
+						var images = result.images;
+
+						var output = JSON.stringify( json, null, 2 );
+						console.log( output );
 						saveString( output, 'scene.gltf' );
 
-						if ( result.bin ) {
-							saveBlob( result.bin, result.binFileName );
-						}
+						for ( var i = 0; i < buffers.length; i++ ) {
 
-						var imageUrls = result.externalImageUrls;
-						var imageFileNames = result.externalImageFileNames;
-
-						for ( var i = 0; i < imageUrls.length; i ++ ) {
-
-							var imageUrl = imageUrls[ i ];
-							var imageFileName = imageFileNames[ i ];
-
-							saveUrl( imageUrl, imageFileName );
+							var buffer = buffers[ i ];
+							var bufferUri = json.buffers[ i ].uri;
+							saveBlob( buffer, bufferUri );
 
 						}
+
+						for ( var j = 0; j < images.length; j++ ) {
+
+							var image = images[ j ];
+							var imageUri = json.images[ j ].uri;
+							saveBlob( image, imageUri );
+
+						}
+
+					} else {
+
+						var output = JSON.stringify( result, null, 2 );
+						console.log( output );
+						saveString( output, 'scene.gltf' );
+
+					}
 
 				}
 
@@ -129,8 +121,8 @@
 					console.error( error );
 
 				}
-
-				gltfExporter.parseChunks( input, onComplete, onError, options );
+				
+				gltfExporter.parse( input, onComplete, onError, options );
 
 			}
 
@@ -170,30 +162,18 @@
 
 			} );
 
-			document.getElementById( 'export_chunks' ).addEventListener( 'click', function () {
-
-				exportChunks( [ scene1 ] );
-
-			} );
-
 
 			var link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link ); // Firefox workaround, see #6594
 
-			function saveUrl( url, filename ) {
-
-				link.href = url;
-				link.download = filename;
-				link.click();
-
-			}
-
 			function saveBlob( blob, filename ) {
 
 				var url = URL.createObjectURL( blob );
 				
-				saveUrl( url, filename );
+				link.href = url;
+				link.download = filename;
+				link.click();
 
 				// URL.revokeObjectURL( url ); breaks Firefox...
 
@@ -202,12 +182,6 @@
 			function saveString( text, filename ) {
 
 				saveBlob( new Blob( [ text ], { type: 'text/plain' } ), filename );
-
-			}
-
-			function saveArrayBuffer( buffer, filename ) {
-
-				saveBlob( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
 
 			}
 
