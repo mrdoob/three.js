@@ -39,6 +39,8 @@ function ShaderMaterial( parameters ) {
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
+	this.transformFeedbackVaryings = null;
+
 	this.fog = false; // set to use scene fog
 	this.lights = false; // set to use scene lights
 	this.clipping = false; // set to use user-defined clipping planes

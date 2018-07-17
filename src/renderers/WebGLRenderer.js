@@ -2596,6 +2596,123 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	/**
+	 * @param {BufferGeometry} source
+	 * @param {BufferGeometry} target
+	 * @param {ShaderMaterial} material
+	 */
+	this.processTransformFeedback = function ( source, target, material ) {
+
+		if ( _isContextLost ) return;
+
+		var materialProperties = properties.get( material );
+		var program = materialProperties.program;
+
+		if ( ! program ) {
+
+			// @todo Instead of compiling all the materials, compile just the needed one
+			this.compile( scene, camera );
+
+			initMaterial( material, scene.fog, null );
+
+			// Save transform fedback varyings
+			var varyingList = Object.keys( material.transformFeedbackVaryings );
+
+			varyings = {};
+
+			for ( var i = 0, il = varyingList.length; i < il; i ++ ) {
+
+				varyings[ material.transformFeedbackVaryings[ varyingList[ i ] ] ] = i;
+
+			}
+
+			materialProperties.varyings = varyings;
+
+		}
+
+		var webglProgram = materialProperties.program.program;
+		var transformFeedback = materialProperties.program.transformFeedback;
+		var programAttributes = materialProperties.program.getAttributes();
+		var programUniforms = materialProperties.program.getUniforms();
+		var varyings = materialProperties.varyings;
+
+		state.useProgram( webglProgram );
+
+		// Create/Update WebGL buffers
+
+		geometries.update( source );
+		geometries.update( target );
+
+		// Bind transform feedback
+
+		_gl.bindTransformFeedback( _gl.TRANSFORM_FEEDBACK, transformFeedback );
+
+		// Bind WebGL buffer, enable Vertex attributes
+
+		state.initAttributes();
+		for ( var attributeName in source.attributes ) {
+
+			if ( programAttributes[ attributeName ] === undefined ) continue;
+
+			var index = programAttributes[ attributeName ];
+
+			state.enableAttribute( index );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, attributes.get( source.attributes[ attributeName ] ).buffer );
+			_gl.vertexAttribPointer( index, source.attributes[ attributeName ].itemSize, _gl.FLOAT, false, 0, 0 );
+
+		}
+
+		state.disableUnusedAttributes();
+
+		// Bind Transform feedback buffers
+
+		for ( var attributeName in target.attributes ) {
+
+			if ( varyings[ attributeName ] === undefined ) continue;
+
+			var index = varyings[ attributeName ];
+
+			_gl.bindBufferBase( _gl.TRANSFORM_FEEDBACK_BUFFER, index, attributes.get( target.attributes[ attributeName ] ).buffer );
+
+		}
+
+		// Update uniforms
+
+		for ( var uniformName in material.uniforms ) {
+
+			var value = material.uniforms[ uniformName ].value;
+			programUniforms.setValue( _gl, uniformName, value );
+
+		}
+
+		// Run
+
+		_gl.enable( _gl.RASTERIZER_DISCARD );
+
+		// @todo It could be POINTS, LINES or TRIANGLES
+		_gl.beginTransformFeedback( _gl.POINTS );
+		_gl.drawArrays( _gl.POINTS, 0, source.attributes.position.count );
+		_gl.endTransformFeedback();
+
+		_gl.disable( _gl.RASTERIZER_DISCARD );
+
+		// Unbind Transform feedback
+
+		for ( var attributeName in target.attributes ) {
+
+			if ( varyings[ attributeName ] === undefined ) continue;
+
+			var index = varyings[ attributeName ];
+
+			_gl.bindBufferBase( _gl.TRANSFORM_FEEDBACK_BUFFER, index, null );
+
+		}
+
+		_gl.bindTransformFeedback( _gl.TRANSFORM_FEEDBACK, null );
+
+	};
+
+
 }
 
 

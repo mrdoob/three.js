@@ -585,7 +585,19 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	}
 
+	if ( material.transformFeedbackVaryings ) {
+
+		gl.transformFeedbackVaryings( program, Object.keys( material.transformFeedbackVaryings ), gl.SEPARATE_ATTRIBS );
+
+	}
+
 	gl.linkProgram( program );
+
+	if ( material.transformFeedbackVaryings ) {
+
+		this.transformFeedback = gl.createTransformFeedback();
+
+	}
 
 	var programLog = gl.getProgramInfoLog( program ).trim();
 	var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
