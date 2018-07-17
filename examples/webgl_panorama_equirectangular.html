@@ -144,8 +144,6 @@
 
 			function onPointerStart( event ) {
 
-				event.preventDefault();
-
 				isUserInteracting = true;
 
 				var clientX = event.clientX || event.touches[ 0 ].clientX;
@@ -213,6 +211,11 @@
 				camera.target.z = 500 * Math.sin( phi ) * Math.sin( theta );
 
 				camera.lookAt( camera.target );
+
+				/*
+				// distortion
+				camera.position.copy( camera.target ).negate();
+				*/
 
 				renderer.render( scene, camera );
 
