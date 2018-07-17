@@ -32,6 +32,7 @@
         var controls;
 
         init();
+        animate();
 
         function init() {
 
@@ -84,7 +85,6 @@
             window.addEventListener( 'resize', onWindowResize, false );
             window.addEventListener( "mousemove", onDocumentMouseMove, false );
 
-            render();
         }
 
         function makeSprite( color, parent ) {
@@ -97,10 +97,10 @@
 
         }
 
-        function render() {
+        function animate() {
 
             renderer.render( scene, camera );
-            requestAnimationFrame( render );
+            requestAnimationFrame( animate );
 
         }
 
