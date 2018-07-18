@@ -66,7 +66,7 @@
 				//vec3 gravityCenter = vec3(cos(time), sin(time), 0.0) * 10.25;
 				vec3 toCenter = - position;
 				float toCenterLength = length(toCenter);
-				vec3 accel = (toCenter/toCenterLength) * uKForce / toCenterLength;
+				vec3 accel = uKForce * toCenter/(toCenterLength * toCenterLength);
 
 				outPosition = position + velocity * deltaTime;
 				outVelocity = velocity * K_VEL_DECAY + accel * deltaTime;
@@ -98,11 +98,13 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
+			var positions, velocities, colors;
 
 			var camera, scene, renderer, clock;
+			var useCPU = false;
 
 			var mesh, transformFeedback;
-			var NUM_PARTICLES = 10000;
+			var NUM_PARTICLES = 300000;
 
 			init();
 			animate();
@@ -171,8 +173,7 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				var positions = [];
-
+				positions = [];
 				for ( var i = 0; i < NUM_PARTICLES; i ++ ) {
 
 					// random points on a sphere
@@ -185,9 +186,14 @@
 					);
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3, false ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( new Float32Array( NUM_PARTICLES * 3 ), 3 ) );
-				geometry.addAttribute( 'velocity', new THREE.Float32BufferAttribute( new Float32Array( NUM_PARTICLES * 3 ), 3, false ) );
+				colors = new Float32Array( NUM_PARTICLES * 3 );
+				velocities = new Float32Array( NUM_PARTICLES * 3 );
+
+
+				// note: setDynamic( true ) is not needed for transform feedback, but for the processing on the CPU
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3, false ).setDynamic( true ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ).setDynamic( true ) );
+				geometry.addAttribute( 'velocity', new THREE.Float32BufferAttribute( velocities, 3, false ).setDynamic( true ) );
 
 				points = new THREE.Points( geometry, new THREE.PointsMaterial( {
 					size: 0.3,
@@ -222,15 +228,89 @@
 
 				requestAnimationFrame( animate );
 
-				// Transform feedback update
 				var delta = clock.getDelta();
-				transformFeedback.material.uniforms.deltaTime.value = delta;
-				transformFeedback.material.uniforms.time.value += delta;
-				transformFeedback.tick();
+
+				if ( useCPU ) {
+					
+					processCPU( delta );
+				
+				} else {
+
+					processTransformFeedback( delta );
+
+				}
 
 				renderer.render( scene, camera );
 				stats.update();
 
+			}
+
+			//-----------------------------------------------------------------------
+			// Process using transform feedback
+			//-----------------------------------------------------------------------
+
+			function processTransformFeedback( delta ) {
+					
+					// Transform feedback update
+					transformFeedback.material.uniforms.deltaTime.value = delta;
+					transformFeedback.material.uniforms.time.value += delta;
+					transformFeedback.tick();
+
+			}
+
+			//-----------------------------------------------------------------------
+			// Process CPU
+			//-----------------------------------------------------------------------
+
+			// Auxiliary variables used in processCPU
+			var toCenter = new THREE.Vector3();
+			var colA = new THREE.Color( 1.0, 1.0, 1.0 );
+			var colB = new THREE.Color( 1.0, 0.0, 0.0 );
+			var auxPos = new THREE.Vector3();
+			var auxVelocity = new THREE.Vector3();
+			var K_VEL_DECAY = 0.99;
+
+			function processCPU ( delta ) {
+
+				var positions = points.geometry.attributes.position.array;
+				var colors = points.geometry.attributes.color.array;
+				var velocities = points.geometry.attributes.velocity.array;
+
+				for (var i = 0; i < NUM_PARTICLES; i++ ) {
+
+					auxPosition.set( positions[ 3 * i ], positions[ 3 * i + 1 ], positions[ 3 * i+ 2 ] );
+					auxVelocity.set( velocities[ 3 * i ], velocities[ 3 * i + 1 ], velocities[ 3 * i+ 2 ] );
+
+					toCenter.copy( auxPosition ).negate();
+					var toCenterLength = toCenter.length();
+					var uKForce = 150;
+					var accel = toCenter.multiplyScalar( uKForce ).divideScalar( toCenterLength * toCenterLength );
+
+					auxPosition.add( auxVelocity.clone().multiplyScalar( delta ) );
+					
+					auxVelocity.multiplyScalar( K_VEL_DECAY ).add( accel.multiplyScalar( delta ) );
+
+					positions[ 3 * i ] = auxPosition.x;
+					positions[ 3 * i + 1 ] = auxPosition.y;
+					positions[ 3 * i + 2 ] = auxPosition.z;
+
+					var l = auxPosition.length() * 0.01;
+					var color = colB.clone().lerp( colA, l );
+
+					colors[ 3 * i ] = color.r;
+					colors[ 3 * i + 1 ] = color.g;
+					colors[ 3 * i + 2 ] = color.b;
+
+					velocities[ 3 * i ] = auxVelocity.x;
+					velocities[ 3 * i + 1 ] = auxVelocity.y;
+					velocities[ 3 * i + 2 ] = auxVelocity.z;
+
+				}
+
+				points.geometry.attributes.position.needsUpdate = true;
+				points.geometry.attributes.color.needsUpdate = true;
+				points.geometry.attributes.velocity.needsUpdate = true;
+				
 			}
 
 		</script>
