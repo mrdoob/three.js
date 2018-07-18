@@ -222,9 +222,13 @@ we'll go over in a future article. For now let's create a directional
 light.
 
 ```
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(-1, 2, 4);
-scene.add(light);
+{
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(-1, 2, 4);
+  scene.add(light);
+}
 ```
 
 Directional lights have a position and a target. Both default to 0, 0, 0. In our
