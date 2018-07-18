@@ -138,7 +138,8 @@
       right: 0,
       bottom: 0,
       background: '#EEE',
-      'max-height': '2ex',
+      'font-size': 'smaller',
+      cursor: 'pointer',
     });
     toggle.addEventListener('click', showHideConsole);
 
