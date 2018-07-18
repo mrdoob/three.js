@@ -332,7 +332,9 @@ THREE.GLTFExporter.prototype = {
 
 		function getFileNameFromUri( uri ) {
 
-			return uri.split( '#' ).shift().split( '?' ).shift().split( '/' ).pop();
+			var parts = uri.split( '#' ).shift().split( '?' ).shift().split( '/' ).pop().split( '.' );
+			parts.pop();
+			return parts.join();
 
 		}
 
@@ -713,7 +715,8 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				gltfImage.uri = getFileNameFromUri( image.src );
+				var extension = mimeType === "image/png" ? ".png" : ".jpg";
+				gltfImage.uri = getFileNameFromUri( image.src ) + extension;
 
 				pending.push( new Promise( function ( resolve, reject ) {
 
