@@ -191,7 +191,9 @@ For example creating a box
 }
 ```
 
-Here's the result
+If you look in the code below you'll see a similar section for each type of geometry.
+
+Here's the result:
 
 {{{example url="../threejs-primitives.html" }}}
 
