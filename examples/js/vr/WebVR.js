@@ -78,10 +78,7 @@ var WEBVR = {
 
 				if ( currentSession === null ) {
 
-					// TODO Remove exclusive
-
-					device.requestSession( { exclusive: true } ).then( onSessionStarted );
-					device.requestSession( { immersive: true } ).then( onSessionStarted );
+					device.requestSession( { immersive: true, exclusive: true /* DEPRECATED */ } ).then( onSessionStarted );
 
 				} else {
 
@@ -140,13 +137,7 @@ var WEBVR = {
 
 			navigator.xr.requestDevice().then( function ( device ) {
 
-				// TODO Remove exclusive
-
-				device.supportsSession( { exclusive: true } )
-					.then( function () { showEnterXR( device ); } )
-					.catch( showVRNotFound );
-
-				device.supportsSession( { immersive: true } )
+				device.supportsSession( { immersive: true, exclusive: true /* DEPRECATED */ } )
 					.then( function () { showEnterXR( device ); } )
 					.catch( showVRNotFound );
 
