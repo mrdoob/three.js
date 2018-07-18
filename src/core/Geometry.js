@@ -6,6 +6,7 @@ import { Box3 } from '../math/Box3.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
+import { Vector4 } from '../math/Vector4.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from './Object3D.js';
 import { _Math } from '../math/Math.js';
@@ -225,6 +226,8 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+		var skinIndices = attributes.skinIndex !== undefined ? attributes.skinIndex.array : undefined;
+		var skinWeights = attributes.skinWeight !== undefined ? attributes.skinWeight.array : undefined;
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
@@ -232,7 +235,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var tempUVs = [];
 		var tempUVs2 = [];
 
-		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
+		for ( var i = 0, j = 0, k = 0; i < positions.length; i += 3, j += 2, k += 4 ) {
 
 			scope.vertices.push( new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
 
@@ -257,6 +260,65 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			if ( uvs2 !== undefined ) {
 
 				tempUVs2.push( new Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+
+			}
+
+		}
+		if ( skinIndices !== undefined ) {
+
+			scope.skinIndices.push( new Vector4( skinIndices[ k ], skinIndices[ k + 1 ], skinIndices[ k + 2 ], skinIndices[ k + 3 ] ) );
+
+		}
+
+		if ( skinWeights !== undefined ) {
+
+			scope.skinWeights.push( new Vector4( skinWeights[ k ], skinWeights[ k + 1 ], skinWeights[ k + 2 ], skinWeights[ k + 3 ] ) );
+
+		}
+
+		var morphAttributes = geometry.morphAttributes;
+
+		if ( morphAttributes.position ) {
+
+			for ( const morphTargetAttribute of morphAttributes.position ) {
+
+				const morphTarget = {
+					name: morphTargetAttribute.name,
+					vertices: []
+				};
+
+				const array = morphTargetAttribute.array;
+
+				for ( let index = 0; index < morphTargetAttribute.array.length; index += 3 ) {
+
+					morphTarget.vertices.push( new Vector3( array[ index ], array[ index + 1 ], array[ index + 2 ] ) );
+
+				}
+
+				scope.morphTargets.push( morphTarget );
+
+			}
+
+		}
+
+		if ( morphAttributes.normal ) {
+
+			for ( const morphNormalAttribute of morphAttributes.normal ) {
+
+				const morphNormal = {
+					name: morphNormalAttribute.name,
+					normals: []
+				};
+
+				const array = morphNormalAttribute.array;
+
+				for ( let index = 0; index < morphNormalAttribute.array.length; index += 3 ) {
+
+					morphNormal.normals.push( new Vector3( array[ index ], array[ index + 1 ], array[ index + 2 ] ) );
+
+				}
+
+				scope.morphNormals.push( morphNormal );
 
 			}
 
