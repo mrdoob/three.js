@@ -13,27 +13,21 @@ THREE.DepthDisplacementEffect = function ( renderer, color, depth ) {
 	var _material = new THREE.ShaderMaterial( {
 		uniforms: {
 			'colorMap': {
-				type: 't',
 				value: color
 			},
 			'depthMap': {
-				type: 't',
 				value: depth
 			},
 			'scale': {
-				type: 'vec2',
 				value: new THREE.Vector2( 0, 0 )
 			},
 			'filterArea': {
-				type: 'vec4',
 				value: new THREE.Vector4( 0, 0, 0, 0 )
 			},
 			'filterClamp': {
-				type: 'vec4',
 				value: new THREE.Vector4( 0, 0, 0, 0 )
 			},
 			'direction': {
-				type: 'f',
 				value: 1.0
 			}
 		},
@@ -103,9 +97,9 @@ THREE.DepthDisplacementEffect = function ( renderer, color, depth ) {
 		_windowWidth = windowWidth;
 		_windowHeight = windowHeight;
 
-		_material.uniforms.filterArea.value = new THREE.Vector4( rendererWidth, rendererHeight, _windowWidth, _windowHeight );
+		_material.uniforms.filterArea.value.set( rendererWidth, rendererHeight, _windowWidth, _windowHeight );
 
-		_material.uniforms.filterClamp.value = new THREE.Vector4( 0, 0, ( _windowWidth - 1 ) / rendererWidth, ( _windowHeight - 1 ) / rendererHeight );
+		_material.uniforms.filterClamp.value.set( 0, 0, ( _windowWidth - 1 ) / rendererWidth, ( _windowHeight - 1 ) / rendererHeight );
 
 	};
 
@@ -114,6 +108,12 @@ THREE.DepthDisplacementEffect = function ( renderer, color, depth ) {
 		_material.uniforms.scale.value.set( ( _windowWidth / 2 - e.clientX ) * _displacementAmount, ( _windowHeight / 2 - e.clientY ) * _displacementAmount );
 
 	};
+
+	this.render = function ( scene, camera ) {
+
+		renderer.render( scene, camera );
+
+	}
 
 	this.setDisplacement = function ( amount ) {
 

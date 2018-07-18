@@ -39,7 +39,6 @@
 		<script src="js/effects/DepthDisplacement.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -64,9 +63,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				var colorTexture, depthTexture;
 
@@ -104,7 +100,7 @@
 					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 					window.addEventListener( 'resize', onWindowResize, false );
 
-					animate();
+					renderer.render(scene, camera);
 
 				};
 
@@ -127,23 +123,7 @@
 
 				effect.updateMousePosition( event );
 
-			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
-
-				renderer.render( scene, camera );
-
-				stats.update();
+				effect.render( scene, camera );
 
 			}
 
