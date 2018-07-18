@@ -355,7 +355,7 @@ One thing to notice is we set the `renderOrder` of the `AxesHelper`
 to 2 and for the `GridHelper` to 1 so that the axes get drawn after the grid.
 Otherwise the grid might overwrite the axes.
 
-{{{example url="../threejs-scenegraph-sun-earth-moon-axes.html" }}}
+{{{example url="../threejs-scenegraph-sun-earth-moon-axes-grids.html" }}}
 
 Turn on the `solarSystem` and you'll see how the earth is exactly 10
 units out from the center just like we set above. You can see how the
