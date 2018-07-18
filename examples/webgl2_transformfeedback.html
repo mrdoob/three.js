@@ -38,6 +38,7 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+		<!-- Transform feedback vertex shader -->
 		<script id="transformVertex" type="x-shader/x-vertex">
 			#version 300 es
 
@@ -70,7 +71,7 @@
 				outPosition = position + velocity * deltaTime;
 				outVelocity = velocity * K_VEL_DECAY + accel * deltaTime;
 				
-				float l = length(position.xyz) * 0.01;
+				float l = length(position) * 0.01;
 				vec3 color = mix(colB, colA, l);
 				outColor = color;
 
@@ -78,6 +79,7 @@
 
 		</script>
 
+		<!-- Transform feedback fragment shader. It won't be executed as transform feedback will cancel the rasterizer step -->
 		<script id="fragmentNop" type="x-shader/x-fragment">
 			#version 300 es
 			precision highp float;
@@ -101,32 +103,6 @@
 
 			var mesh, transformFeedback;
 			var NUM_PARTICLES = 10000;
-
-			THREE.TransformFeedback = function ( material, mesh ) {
-
-				this.material = material;
-				this.mesh = mesh;
-
-				this.source = this.mesh.geometry;
-				this.target = this.source.clone();
-
-				}
-
-				THREE.TransformFeedback.prototype = {
-
-				tick: function () {
-
-					renderer.processTransformFeedback( this.source, this.target, this.material );
-					
-					this.mesh.geometry = this.target;
-
-					// Ping pong buffers
-					this.target = this.source;
-					this.source = this.mesh.geometry;
-
-				}
-
-			};
 
 			init();
 			animate();
@@ -199,8 +175,8 @@
 
 				for ( var i = 0; i < NUM_PARTICLES; i ++ ) {
 
-					// positions
-					var r = Math.random() * 100.0 + 2.0;
+					// random points on a sphere
+					var r = Math.random() * 100.0;
 					var angle = Math.random() * Math.PI * 2;
 					var angle2 = Math.random() * Math.PI * 2;
 					positions.push( r * Math.sin( angle ) * Math.cos( angle2 ),
@@ -214,7 +190,7 @@
 				geometry.addAttribute( 'velocity', new THREE.Float32BufferAttribute( new Float32Array( NUM_PARTICLES * 3 ), 3, false ) );
 
 				points = new THREE.Points( geometry, new THREE.PointsMaterial( {
-					size: 0.5,
+					size: 0.3,
 					vertexColors: THREE.VertexColors
 				} ) );
 
@@ -238,20 +214,19 @@
 					}
 				} );
 
-				transformFeedback = new THREE.TransformFeedback( material, points );
+				transformFeedback = new THREE.WebGLTransformFeedback( material, points, renderer );
 			}
 
-			//
 
 			function animate() {
 
 				requestAnimationFrame( animate );
 
 				// Transform feedback update
-				transformFeedback.material.uniforms.deltaTime.value = clock.getDelta();
-				transformFeedback.material.uniforms.time.value += transformFeedback.material.uniforms.deltaTime.value
+				var delta = clock.getDelta();
+				transformFeedback.material.uniforms.deltaTime.value = delta;
+				transformFeedback.material.uniforms.time.value += delta;
 				transformFeedback.tick();
-
 
 				renderer.render( scene, camera );
 				stats.update();
