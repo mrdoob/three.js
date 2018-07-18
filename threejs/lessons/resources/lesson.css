@@ -228,11 +228,13 @@ iframe {
 iframe.body {
   height: 100vh;
 }
-iframe.threejs_example {
+iframe.threejs_example, iframe.threejs_diagram {
   border: none;
   margin-left: auto;
   margin-right: auto;
   display: block;
+}
+iframe.threejs_example {
   border: 1px solid black;
 }
 iframe.noborder {
