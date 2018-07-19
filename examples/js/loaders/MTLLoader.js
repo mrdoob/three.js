@@ -553,6 +553,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		if ( mapping !== undefined ) texture.mapping = mapping;
 
+		texture.needsUpdate = true;
 		return texture;
 
 	}
