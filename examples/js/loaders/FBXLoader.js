@@ -2878,7 +2878,7 @@
 
 			var self = this;
 
-			var split = text.split( '\n' );
+			var split = text.split( /[\r\n]+/ );
 
 			split.forEach( function ( line, i ) {
 
