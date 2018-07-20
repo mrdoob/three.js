@@ -277,9 +277,9 @@ THREE.GLTFLoader = ( function () {
 		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] ) || {};
 		var lights = extension.lights || {};
 
-		for ( var lightId in lights ) {
+		for ( var lightIndex = 0; lightIndex < lights.length; ++ lightIndex ) {
 
-			var light = lights[ lightId ];
+			var light = lights[ lightIndex ];
 			var lightNode;
 
 			// the color default value is [1, 1, 1]
@@ -331,8 +331,8 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				lightNode.name = light.name || ( 'light_' + lightId );
-				this.lights[ lightId ] = lightNode;
+				lightNode.name = light.name || ( 'light_' + lightIndex );
+				this.lights[ lightIndex ] = lightNode;
 
 			}
 
