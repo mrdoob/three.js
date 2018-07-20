@@ -34,8 +34,11 @@ function KeyframeTrack( name, times, values, interpolation ) {
 	this.times = AnimationUtils.convertArray( times, this.TimeBufferType );
 	this.values = AnimationUtils.convertArray( values, this.ValueBufferType );
 
-	this.isValidated = false;
-	this.isOptimized = false;
+	// TODO: These flags are used to warn users of duplicate validate/optimize
+	// calls when multiple actions are created from a single clip, starting with
+	// r95. We will eventually remove these flags and the transitional warnings.
+	this._needsValidate = true;
+	this._needsOptimize = true;
 
 	this.setInterpolation( interpolation || this.DefaultInterpolation );
 
@@ -353,7 +356,13 @@ Object.assign( KeyframeTrack.prototype, {
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
 	validate: function () {
 
-		if ( this.isValidated ) return true;
+		if ( ! this._needsValidate ) {
+
+			console.warn( 'THREE.KeyframeTrack: Track has already been validated. '
+				+ 'Disable "needsValidateAndOptimize" argument to mixer.clipAction() '
+				+ 'to avoid redundant validation.' );
+
+		}
 
 		var valid = true;
 
@@ -425,7 +434,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 		}
 
-		this.isValidated = valid;
+		this._needsValidate = !valid;
 
 		return valid;
 
@@ -435,7 +444,13 @@ Object.assign( KeyframeTrack.prototype, {
 	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 	optimize: function () {
 
-		if ( this.isOptimized ) return this;
+		if ( ! this._needsOptimize ) {
+
+			console.warn( 'THREE.KeyframeTrack: Track has already been optimized. '
+				+ 'Disable "needsValidateAndOptimize" argument to mixer.clipAction() '
+				+ 'to avoid redundant optimization.' );
+
+		}
 
 		var times = this.times,
 			values = this.values,
@@ -535,7 +550,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 		}
 
-		this.isOptimized = true;
+		this._needsOptimize = false;
 
 		return this;
 

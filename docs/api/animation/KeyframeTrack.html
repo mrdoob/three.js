@@ -91,16 +91,6 @@
 		<h2>Properties</h2>
 
 
-		<h3>[property:Boolean isOptimized]</h3>
-		<p>
-			Whether the track has been optimized with .optimize().
-		</p>
-
-		<h3>[property:Boolean isValidated]</h3>
-		<p>
-			Whether the track has been successfully validated with .validate().
-		</p>
-
 		<h3>[property:String name]</h3>
 		<p>
 			The track's name can refer to [page:Geometry.morphTargets morph targets] or
@@ -214,8 +204,7 @@
 
 		<h3>[method:null optimize]()</h3>
 		<p>
-			Removes equivalent sequential keys, which are common in morph target sequences. Calling this
-			method will set [page:.isOptimized isOptimized] to true, and additional calls will do nothing.
+			Removes equivalent sequential keys, which are common in morph target sequences.
 		</p>
 
 		<h3>[method:null scale]()</h3>
@@ -246,9 +235,7 @@
 
 		<h3>[method:null validate]()</h3>
 		<p>
-			Performs minimal validation on the tracks.  Calling this method will set
-			[page:.isValidated isValidated] to true if validation succeeds, and additional calls will do
-			nothing.
+			Performs minimal validation on the tracks.
 		</p>
 
 		<p>
