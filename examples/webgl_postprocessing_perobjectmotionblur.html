@@ -105,15 +105,25 @@
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( 'https://rawgit.com/mrdoob/three.js/r94/examples/textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
+				textureLoader.load( './textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
-					map.repeat.set( 9, 2 );
+					map.repeat.set( 14, 2 );
 					standardMaterial.roughnessMap = map;
-					standardMaterial.bumpMap = map;
 					standardMaterial.map = map;
+					standardMaterial.needsUpdate = true;
+
+				} );
+
+				textureLoader.load( './textures/floors/FloorsCheckerboard_S_Normal.jpg', function ( map ) {
+
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 14, 2 );
+					standardMaterial.normalMap = map;
 					standardMaterial.needsUpdate = true;
 
 				} );

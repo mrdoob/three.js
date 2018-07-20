@@ -14,6 +14,7 @@ THREE.MotionBlurPass = function ( scene, camera, options = {} ) {
 			if ( val === false ) {
 
 				this._prevPosMap.clear();
+				this._cameraMatricesNeedInitializing = true;
 
 			}
 
@@ -50,6 +51,7 @@ THREE.MotionBlurPass = function ( scene, camera, options = {} ) {
 	this._prevPosMap = new Map();
 	this._frustum = new THREE.Frustum();
 	this._projScreenMatrix = new THREE.Matrix4();
+	this._cameraMatricesNeedInitializing = true;
 
 	// render targets
 	this._velocityBuffer =
@@ -144,6 +146,15 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		} else {
 
 			renderer.setRenderTarget( this.renderToScreen ? null : writeBuffer );
+
+		}
+
+		// reinitialize the camera matrices to the current pos becaues if
+		// the pass has been disabeled then the matrices will be out of date
+		if ( this._cameraMatricesNeedInitializing ) {
+
+			this._prevCamWorldInverse.copy( this.camera.matrixWorldInverse );
+			this._prevCamProjection.copy( this.camera.projectionMatrix );
 
 		}
 
