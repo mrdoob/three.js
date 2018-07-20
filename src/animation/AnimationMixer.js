@@ -557,8 +557,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( needsValidateAndOptimize !== false ) {
 
-			clipObject.validate();
-			clipObject.optimize();
+			if ( clipObject.validate() ) clipObject.optimize();
 
 		}
 

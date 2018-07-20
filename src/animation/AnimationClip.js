@@ -325,6 +325,8 @@ Object.assign( AnimationClip.prototype, {
 
 		this.duration = duration;
 
+		return this;
+
 	},
 
 	trim: function () {
@@ -341,13 +343,15 @@ Object.assign( AnimationClip.prototype, {
 
 	validate: function () {
 
+		var valid = true;
+
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
-			this.tracks[ i ].validate();
+			valid = valid && this.tracks[ i ].validate();
 
 		}
 
-		return this;
+		return valid;
 
 	},
 

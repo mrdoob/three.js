@@ -66,27 +66,27 @@
 		<h2>Methods</h2>
 
 
-		<h3>[method:AnimationClip optimize]()</h3>
+		<h3>[method:this optimize]()</h3>
 		<p>
 			Optimizes each track by removing equivalent sequential keys (which are common in morph target
-			sequences). Called automatically by [page:AnimationMixer]'s clipAction() method.
+			sequences). Called automatically by [page:AnimationMixer.clipAction mixer.clipAction]().
 		</p>
 
-		<h3>[method:null resetDuration]()</h3>
+		<h3>[method:this resetDuration]()</h3>
 		<p>
 			Sets the [page:.duration duration] of the clip to the duration of its longest
 			[page:KeyframeTrack].
 		</p>
 
-		<h3>[method:AnimationClip trim]()</h3>
+		<h3>[method:this trim]()</h3>
 		<p>
 			Trims all tracks to the clip's duration.
 		</p>
 
-		<h3>[method:AnimationClip validate]()</h3>
+		<h3>[method:Boolean validate]()</h3>
 		<p>
 			Performs minimal validation on each track in the clip. Called automatically by
-			[page:AnimationMixer]'s clipAction() method.
+			[page:AnimationMixer.clipAction mixer.clipAction](). Returns true if all tracks are valid.
 		</p>
 
 
