@@ -281,7 +281,6 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		if ( mat.uniforms.smearIntensity ) mat.uniforms.smearIntensity.value = smearIntensity;
 		if ( mat.uniforms.maxSmearFactor ) mat.uniforms.maxSmearFactor.value = maxSmearFactor * 2; // screen coordinates [-1, 1]
 
-		// TODO: if we render multiple instances of the mesh we may get a better blur that includes the background
 		var projMat = renderCameraBlur ? this._prevCamProjection : this.camera.projectionMatrix;
 		var invMat = renderCameraBlur ? this._prevCamWorldInverse : this.camera.matrixWorldInverse;
 		mat.uniforms.prevProjectionMatrix.value.copy( projMat );
