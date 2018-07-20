@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - postprocessing - per-object motion blur</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				color: #fff;
+			}
+
+			a {
+				color:#80CBC4;
+			}
+
+			#info {
+				position: absolute;
+				padding-top: 10px;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script type="text/javascript" src="../build/three.js"></script>
+		<script type="text/javascript" src="js/controls/OrbitControls.js"></script>
+
+		<script type="text/javascript" src="/js/Detector.js"></script>
+		<script type="text/javascript" src="/js/libs/stats.min.js"></script>
+		<script type="text/javascript" src="/js/libs/dat.gui.min.js"></script>
+
+		<script type="text/javascript" src="/js/shaders/CopyShader.js"></script>
+		<script type="text/javascript" src="/js/shaders/FXAAShader.js"></script>
+		<script type="text/javascript" src="/js/postprocessing/EffectComposer.js"></script>
+		<script type="text/javascript" src="/js/postprocessing/RenderPass.js"></script>
+		<script type="text/javascript" src="/js/postprocessing/ShaderPass.js"></script>
+		<script type="text/javascript" src="/js/libs/inflate.min.js"></script>
+		<script type="text/javascript" src="/js/loaders/FBXLoader.js"></script>
+
+		<script type="text/javascript" src="js/MotionBlurPass.js"></script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Per Object Motion Blur by <a href="http://gkjohnson.github.io" target="_blank" rel="noopener">Garrett Johnson</a>
+			</br>
+			Using a technique similar to the one described <a href="http://john-chapman-graphics.blogspot.com/2013/01/per-object-motion-blur.html">here</a>.
+			</br>
+			A velocity buffer is rendered using the previous and current frame positions for each object </br> which is then used to smear the final frame.
+		</div>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			// globals
+			var stats;
+			var params = {
+				enabled: true,
+				cameraBlur: true,
+				animate: true,
+				samples: 30,
+				intensity: 1,
+				maxSmearFactor: 5,
+				expand: 1,
+				speed: 20
+			};
+			var camera, scene, renderer, controls;
+			var composer;
+			var FXAAPass, motionPass, renderPass;
+			var torusMesh1, torusMesh2, torusMesh3;
+
+			var spheres = [];
+			var mixer, clock, animTime = 0;
+
+			init();
+			animate();
+
+			function init() {
+
+				// initialize renderer, scene, camera
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 5, 5 * 3.5 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xE91E63 );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				document.body.appendChild( renderer.domElement );
+
+				// geometry
+				var standardMaterial = new THREE.MeshStandardMaterial( {
+					map: null,
+					color: 0xffffff,
+					metalness: 0.5,
+				} );
+
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( 'https://rawgit.com/mrdoob/three.js/r94/examples/textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
+
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 4;
+					map.repeat.set( 9, 2 );
+					standardMaterial.roughnessMap = map;
+					standardMaterial.bumpMap = map;
+					standardMaterial.map = map;
+					standardMaterial.needsUpdate = true;
+
+				} );
+
+				var geometry = new THREE.TorusKnotBufferGeometry( 2.5, 1, 150, 40 );
+				torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+				torusMesh1.position.set( -6, 0, 6 );
+				torusMesh1.scale.multiplyScalar( 0.5 );
+				torusMesh1.castShadow = true;
+				torusMesh1.receiveShadow = true;
+				scene.add( torusMesh1 );
+
+				torusMesh2 = torusMesh1.clone();
+				torusMesh2.position.set( 6, 0, 6 );
+				scene.add(torusMesh2);
+
+				torusMesh3 = torusMesh1.clone();
+				torusMesh3.position.set( 0, 0, -7.5 );
+				scene.add(torusMesh3);
+
+				// background spheres
+				var sphere = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( .5, 32, 32 ),
+					new THREE.MeshStandardMaterial({ color: 'white', emissive: 'white', emissiveIntensity: .5 })
+				);
+				for ( var i = 0; i < 500; i ++ ) {
+
+					var o = new THREE.Object3D();
+					var s = sphere.clone();
+					o.add( s );
+
+					s.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
+					if ( s.position.length() === 0 ) s.position.set( 1, 1, 1 );
+					s.position.normalize().multiplyScalar( 30 + Math.random() * 20 );
+					s.scale.multiplyScalar( 0.5 + Math.random() );
+
+					o.rotationVector = new THREE.Vector3( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 )
+					o.rotationVector.normalize();
+
+					scene.add( o );
+					spheres.push( o );
+
+				}
+
+				// load samba dancer
+				var loader = new THREE.FBXLoader();
+				loader.load( 'https://rawgit.com/mrdoob/three.js/r94/examples/models/fbx/Samba%20Dancing.fbx', res => {
+
+					scene.add( res );
+					res.scale.multiplyScalar( 0.05 );
+					res.traverse( c => {
+
+						if ( c.type === 'SkinnedMesh' ) {
+
+							c.castShadow = true;
+							c.receiveShadow = true;
+							c.motionBlur = { expand: 0 }
+
+						}
+
+					});
+					res.position.y = -5;
+					mixer = new THREE.AnimationMixer( res );
+					mixer.clipAction( res.animations[ 0 ] ).play();
+
+				});
+
+				clock = new THREE.Clock();
+
+				// Lights
+				scene.add( new THREE.HemisphereLight( 0xE91E63, 0x552233, 0.5 ) );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight.position.set( 50, 100, 50 );
+				directionalLight.castShadow = true;
+
+				var shadowCam = directionalLight.shadow.camera;
+				shadowCam.left = shadowCam.bottom = -15;
+				shadowCam.right = shadowCam.top = 15;
+				directionalLight.shadow.mapSize.width = 1024;
+				directionalLight.shadow.mapSize.height = 1024;
+				scene.add( directionalLight );
+
+				// Shadow
+				var plane = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.ShadowMaterial({ side: THREE.DoubleSide, transparent: true, opacity: 0.5 }));
+				plane.receiveShadow = true;
+				plane.rotation.set( -Math.PI / 2, 0, 0 );
+				plane.scale.multiplyScalar( 30 );
+				plane.position.y = -5;
+				scene.add( plane );
+
+				// Render Pass Setup
+				renderPass = new THREE.RenderPass( scene, camera );
+
+				FXAAPass = new THREE.ShaderPass( THREE.FXAAShader );
+				FXAAPass.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
+				motionPass = new THREE.MotionBlurPass( scene, camera );
+
+				composer = new THREE.EffectComposer( renderer );
+				composer.setSize( window.innerWidth, window.innerHeight );
+				composer.addPass( renderPass );
+				composer.addPass( FXAAPass );
+				composer.addPass( motionPass );
+
+				// stats
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// camera controls
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 200;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// dat gui
+				var gui = new dat.GUI();
+				gui.width = 300;
+				gui.add( params, 'enabled' );
+				gui.add( params, 'cameraBlur' );
+				gui.add( params, 'animate' );
+				gui.add( params, 'samples', 0, 50 );
+				gui.add( params, 'intensity', 0, 4 );
+				gui.add( params, 'maxSmearFactor', 0, 100 );
+				gui.add( params, 'expand', 0, 10 );
+				gui.add( params, 'speed', 0, 50 );
+
+				gui.add( motionPass.debug, 'display', {
+					'Motion Blur': THREE.MotionBlurPass.DEFAULT,
+					'Velocity': THREE.MotionBlurPass.VELOCITY,
+					'Geometry': THREE.MotionBlurPass.GEOMETRY
+				} ).onChange( val => motionPass.debug.display = parseFloat(val) );
+
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
+				FXAAPass.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			// flag indicating that we've animated on frame past the
+			// point that we stopped animation
+			var animatedOneFramePast = false;
+			function render() {
+
+				// set the variables
+				motionPass.enabled = params.enabled;
+				motionPass.blurSamples = params.samples;
+				motionPass.smearIntensity = params.intensity;
+				motionPass.maxSmearFactor = params.maxSmearFactor / 100;
+				motionPass.expand = params.expand;
+				motionPass.renderCameraBlur = params.cameraBlur;
+				motionPass.renderToScreen = params.enabled;
+				FXAAPass.renderToScreen = !params.enabled;
+
+				camera.lookAt( scene.position );
+
+				const deltaTime = clock.getDelta();
+				motionPass.debug.dontUpdateState = !params.animate;
+
+				if ( params.animate || animatedOneFramePast === false) {
+
+					animTime += deltaTime * params.speed;
+					if ( mixer !== undefined ) {
+
+						mixer.update( deltaTime * params.speed / 20 );
+
+					}
+
+					torusMesh1.rotation.y += 0.01 * params.speed;
+					torusMesh2.position.y = Math.sin( animTime ) * 2;
+					torusMesh3.scale.set( 1, 1, 1 ).multiplyScalar( 0.25 + ( 1 + Math.sin( animTime ) ) * 0.4 );
+					for ( var i = 0, l = spheres.length; i < l; i ++ ) {
+
+						spheres[ i ].rotateOnAxis( spheres[ i ].rotationVector, .01 * params.speed / 5 );
+
+					}
+
+					animatedOneFramePast = !params.animate;
+
+				} else if ( params.animate ) {
+
+					animatedOneFramePast = false;
+
+				}
+
+				composer.render();
+
+			}
+
+		</script>
+
+	</body>
+
+</html>
