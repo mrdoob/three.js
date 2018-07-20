@@ -155,6 +155,7 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			this._prevCamWorldInverse.copy( this.camera.matrixWorldInverse );
 			this._prevCamProjection.copy( this.camera.projectionMatrix );
+			this._cameraMatricesNeedInitializing = false;
 
 		}
 
