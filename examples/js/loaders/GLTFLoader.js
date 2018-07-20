@@ -277,9 +277,9 @@ THREE.GLTFLoader = ( function () {
 		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] ) || {};
 		var lightDefs = extension.lights || [];
 
-		for ( var lightIndex = 0; lightIndex < lightDefs.length; ++ lightIndex ) {
+		for ( var i = 0; i < lightDefs.length; i ++ ) {
 
-			var lightDef = lightDefs[ lightIndex ];
+			var lightDef = lightDefs[ i ];
 			var lightNode;
 
 			var color = new THREE.Color( 0xffffff );
@@ -322,7 +322,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( lightDef.intensity !== undefined ) lightNode.intensity = lightDef.intensity;
 
-			lightNode.name = lightDef.name || ( 'light_' + lightIndex );
+			lightNode.name = lightDef.name || ( 'light_' + i );
 
 			this.lights.push( lightNode );
 
