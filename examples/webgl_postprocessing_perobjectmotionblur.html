@@ -75,7 +75,6 @@
 			var FXAAPass, motionPass, renderPass;
 			var torusMesh1, torusMesh2, torusMesh3;
 
-			var spheres = [];
 			var mixer, clock, animTime = 0;
 
 			init();
@@ -134,30 +133,6 @@
 				torusMesh3 = torusMesh1.clone();
 				torusMesh3.position.set( 0, 0, -7.5 );
 				scene.add(torusMesh3);
-
-				// background spheres
-				var sphere = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( .5, 32, 32 ),
-					new THREE.MeshStandardMaterial({ color: 'white', emissive: 'white', emissiveIntensity: .5 })
-				);
-				for ( var i = 0; i < 500; i ++ ) {
-
-					var o = new THREE.Object3D();
-					var s = sphere.clone();
-					o.add( s );
-
-					s.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
-					if ( s.position.length() === 0 ) s.position.set( 1, 1, 1 );
-					s.position.normalize().multiplyScalar( 30 + Math.random() * 20 );
-					s.scale.multiplyScalar( 0.5 + Math.random() );
-
-					o.rotationVector = new THREE.Vector3( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 )
-					o.rotationVector.normalize();
-
-					scene.add( o );
-					spheres.push( o );
-
-				}
 
 				// load samba dancer
 				var loader = new THREE.FBXLoader();
@@ -309,11 +284,6 @@
 					torusMesh1.rotation.y += 0.01 * params.speed;
 					torusMesh2.position.y = Math.sin( animTime ) * 2;
 					torusMesh3.scale.set( 1, 1, 1 ).multiplyScalar( 0.25 + ( 1 + Math.sin( animTime ) ) * 0.4 );
-					for ( var i = 0, l = spheres.length; i < l; i ++ ) {
-
-						spheres[ i ].rotateOnAxis( spheres[ i ].rotationVector, .01 * params.speed / 5 );
-
-					}
 
 					animatedOneFramePast = !params.animate;
 
