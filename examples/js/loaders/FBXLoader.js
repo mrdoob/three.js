@@ -102,7 +102,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
