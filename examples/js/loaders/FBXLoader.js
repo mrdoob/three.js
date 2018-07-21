@@ -28,7 +28,7 @@
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-		this.sRGBTextureEncoding = false;
+		this.textureColorSpace = null;
 
 	};
 
@@ -109,7 +109,7 @@
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
 			var textures = parseTextures( FBXTree, textureLoader, images, connections );
-			var materials = parseMaterials( FBXTree, textures, connections, this.sRGBTextureEncoding );
+			var materials = parseMaterials( FBXTree, textures, connections, this.textureColorSpace );
 			var deformers = parseDeformers( FBXTree, connections );
 			var geometryMap = parseGeometries( FBXTree, connections, deformers );
 			var sceneGraph = parseScene( FBXTree, connections, deformers, geometryMap, materials );
@@ -390,7 +390,7 @@
 	}
 
 	// Parse nodes in FBXTree.Objects.Material
-	function parseMaterials( FBXTree, textureMap, connections, sRGBTextureEncoding ) {
+	function parseMaterials( FBXTree, textureMap, connections, textureColorSpace ) {
 
 		var materialMap = new Map();
 
@@ -400,7 +400,7 @@
 
 			for ( var nodeID in materialNodes ) {
 
-				var material = parseMaterial( FBXTree, materialNodes[ nodeID ], textureMap, connections, sRGBTextureEncoding );
+				var material = parseMaterial( FBXTree, materialNodes[ nodeID ], textureMap, connections, textureColorSpace );
 
 				if ( material !== null ) materialMap.set( parseInt( nodeID ), material );
 
@@ -415,7 +415,7 @@
 	// Parse single node in FBXTree.Objects.Material
 	// Materials are connected to texture maps in FBXTree.Objects.Textures
 	// FBX format currently only supports Lambert and Phong shading models
-	function parseMaterial( FBXTree, materialNode, textureMap, connections, sRGBTextureEncoding ) {
+	function parseMaterial( FBXTree, materialNode, textureMap, connections, textureColorSpace ) {
 
 		var ID = materialNode.id;
 		var name = materialNode.attrName;
@@ -431,7 +431,7 @@
 		// Ignore unused materials which don't have any connections.
 		if ( ! connections.has( ID ) ) return null;
 
-		var parameters = parseParameters( FBXTree, materialNode, textureMap, ID, connections, sRGBTextureEncoding );
+		var parameters = parseParameters( FBXTree, materialNode, textureMap, ID, connections, textureColorSpace );
 
 		var material;
 
@@ -459,7 +459,7 @@
 
 	// Parse FBX material and return parameters suitable for a three.js material
 	// Also parse the texture map and return any textures associated with the material
-	function parseParameters( FBXTree, properties, textureMap, ID, connections, sRGBTextureEncoding ) {
+	function parseParameters( FBXTree, properties, textureMap, ID, connections, textureColorSpace ) {
 
 		var parameters = {};
 
@@ -542,7 +542,7 @@
 				case 'DiffuseColor':
 
 					parameters.map = getTexture( FBXTree, textureMap, child.ID, connections );
-					if ( sRGBTextureEncoding ) parameters.map.encoding = THREE.sRGBEncoding;
+					if ( textureColorSpace ) parameters.map.encoding = textureColorSpace;
 					break;
 
 				case 'DisplacementColor':
@@ -552,7 +552,7 @@
 
 				case 'EmissiveColor':
 					parameters.emissiveMap = getTexture( FBXTree, textureMap, child.ID, connections );
-					if ( sRGBTextureEncoding ) parameters.emissiveMap.encoding = THREE.sRGBEncoding;
+					if ( textureColorSpace ) parameters.emissiveMap.encoding = textureColorSpace;
 					break;
 
 				case 'NormalMap':
@@ -562,11 +562,12 @@
 				case 'ReflectionColor':
 					parameters.envMap = getTexture( FBXTree, textureMap, child.ID, connections );
 					parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
+					if ( textureColorSpace ) parameters.envMap.encoding = textureColorSpace;
 					break;
 
 				case 'SpecularColor':
 					parameters.specularMap = getTexture( FBXTree, textureMap, child.ID, connections );
-					if ( sRGBTextureEncoding ) parameters.specularMap.encoding = THREE.sRGBEncoding;
+					if ( textureColorSpace ) parameters.specularMap.encoding = textureColorSpace;
 					break;
 
 				case 'TransparentColor':
