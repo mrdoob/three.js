@@ -630,7 +630,7 @@ THREE.GLTFLoader = ( function () {
 	 * @pailhead
 	 */
 
-	function SpecularGlossinessPbrMaterial( params ) {
+	function MeshStandardSGMaterial( params ) {
 
 		THREE.MeshStandardMaterial.call( this );
 
@@ -677,8 +677,8 @@ THREE.GLTFLoader = ( function () {
 		].join( '\n' );
 
 		var uniforms = {
-			specular: { value: new THREE.Color().setHex( 0x111111 ) },
-			glossiness: { value: 0.5 },
+			specular: { value: new THREE.Color().setHex( 0xffffff ) },
+			glossiness: { value: 1 },
 			specularMap: { value: null },
 			glossinessMap: { value: null }
 		};
@@ -775,10 +775,10 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	SpecularGlossinessPbrMaterial.prototype = Object.create( THREE.MeshStandardMaterial.prototype );
-	SpecularGlossinessPbrMaterial.prototype.constructor = SpecularGlossinessPbrMaterial;
+	MeshStandardSGMaterial.prototype = Object.create( THREE.MeshStandardMaterial.prototype );
+	MeshStandardSGMaterial.prototype.constructor = MeshStandardSGMaterial;
 
-	SpecularGlossinessPbrMaterial.prototype.copy = function ( source ) {
+	MeshStandardSGMaterial.prototype.copy = function ( source ) {
 
 		THREE.MeshStandardMaterial.prototype.copy.call( this, source );
 		this.specularMap = source.specularMap;
@@ -823,7 +823,7 @@ THREE.GLTFLoader = ( function () {
 
 			getMaterialType: function () {
 
-				return SpecularGlossinessPbrMaterial;
+				return MeshStandardSGMaterial;
 
 			},
 
@@ -875,7 +875,7 @@ THREE.GLTFLoader = ( function () {
 
 			createMaterial: function ( params ) {
 
-				var material = new SpecularGlossinessPbrMaterial( params );
+				var material = new MeshStandardSGMaterial( params );
 				material.fog = true;
 
 				material.color = params.color;
@@ -2333,7 +2333,7 @@ THREE.GLTFLoader = ( function () {
 
 			var material;
 
-			if ( materialType === SpecularGlossinessPbrMaterial ) {
+			if ( materialType === MeshStandardSGMaterial ) {
 
 				material = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].createMaterial( materialParams );
 
