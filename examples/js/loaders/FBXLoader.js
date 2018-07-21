@@ -22,15 +22,17 @@
  */
 
 
-( function () {
+THREE.FBXLoader = ( function () {
 
-	THREE.FBXLoader = function ( manager ) {
+	function FBXLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-	};
+	}
 
-	Object.assign( THREE.FBXLoader.prototype, {
+	FBXLoader.prototype = {
+
+		constructor: FBXLoader,
 
 		crossOrigin: 'anonymous',
 
@@ -116,7 +118,7 @@
 
 		}
 
-	} );
+	};
 
 	// Parses FBXTree.Connections which holds parent-child connections between objects (e.g. material -> texture, model->geometry )
 	// and details the connection type
@@ -2827,7 +2829,9 @@
 	// parse an FBX file in ASCII format
 	function TextParser() {}
 
-	Object.assign( TextParser.prototype, {
+	TextParser.prototype = {
+
+		constructor: TextParser,
 
 		getPrevNode: function () {
 
@@ -3157,12 +3161,14 @@
 
 		},
 
-	} );
+	};
 
 	// Parse an FBX file in Binary format
 	function BinaryParser() {}
 
-	Object.assign( BinaryParser.prototype, {
+	BinaryParser.prototype = {
+
+		constructor: BinaryParser,
 
 		parse: function ( buffer ) {
 
@@ -3484,8 +3490,7 @@
 
 		}
 
-	} );
-
+	};
 
 	function BinaryReader( buffer, littleEndian ) {
 
@@ -3495,7 +3500,9 @@
 
 	}
 
-	Object.assign( BinaryReader.prototype, {
+	BinaryReader.prototype = {
+
+		constructor: BinaryReader,
 
 		getOffset: function () {
 
@@ -3727,13 +3734,15 @@
 
 		}
 
-	} );
+	};
 
 	// FBXTree holds a representation of the FBX data, returned by the TextParser ( FBX ASCII format)
 	// and BinaryParser( FBX Binary format)
 	function FBXTree() {}
 
-	Object.assign( FBXTree.prototype, {
+	FBXTree.prototype = {
+
+		constructor: FBXTree,
 
 		add: function ( key, val ) {
 
@@ -3741,7 +3750,7 @@
 
 		},
 
-	} );
+	};
 
 	function isFbxFormatBinary( buffer ) {
 
@@ -3854,5 +3863,7 @@
 		return a1.slice( 0, index ).concat( a2 ).concat( a1.slice( index ) );
 
 	}
+
+	return FBXLoader;
 
 } )();
