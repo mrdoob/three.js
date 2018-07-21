@@ -100,7 +100,7 @@
 					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 					window.addEventListener( 'resize', onWindowResize, false );
 
-					renderer.render(scene, camera);
+					effect.render( scene, camera );
 
 				};
 
@@ -116,6 +116,8 @@
 
 				var rendererSize = renderer.getSize();
 				effect.setSize( rendererSize.width, rendererSize.height, window.innerWidth, window.innerHeight );
+
+				effect.render( scene, camera );
 
 			}
 
