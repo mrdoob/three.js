@@ -61,7 +61,7 @@ THREE.MotionBlurPass = function ( scene, camera, options = {} ) {
 			format: THREE.RGBFormat,
 			type: THREE.HalfFloatType
 		} );
-	this._velocityBuffer.texture.name = "MotionBlurPass";
+	this._velocityBuffer.texture.name = "MotionBlurPass.VelocityBuffer";
 	this._velocityBuffer.texture.generateMipmaps = false;
 
 	this._prevCamProjection = new THREE.Matrix4();
