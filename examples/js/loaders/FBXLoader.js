@@ -3851,16 +3851,17 @@
 
 	}
 
+	// Returns the three.js intrinsic Euler order corresponding to FBX extrinsic Euler order
 	// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
 	function getEulerOrder( order ) {
 
 		var enums = [
-			'ZYX', // -> XYZ in FBX
-			'YXZ',
-			'ZXY',
-			'YZX',
-			'XZY',
-			'XYZ',
+			'ZYX', // -> XYZ extrinsic
+			'YZX', // -> XZY extrinsic
+			'XZY', // -> YZX extrinsic
+			'ZXY', // -> YXZ extrinsic
+			'YXZ', // -> ZXY extrinsic
+			'XYZ', // -> ZYX extrinsic
 			//'SphericXYZ', // not possible to support
 		];
 
