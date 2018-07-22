@@ -1651,6 +1651,7 @@
 
 		bindSkeleton( FBXTree, deformers.skeletons, geometryMap, modelMap, connections );
 		addAnimations( FBXTree, connections, sceneGraph );
+
 		createAmbientLight( FBXTree, sceneGraph );
 
 		setupMorphMaterials( sceneGraph );
@@ -1746,7 +1747,7 @@
 
 			}
 
-			setModelTransforms( FBXTree, model, node );
+			setModelTransforms( model, node );
 			modelMap.set( id, model );
 
 		}
@@ -2158,108 +2159,26 @@
 
 	}
 
-	var tempMat = new THREE.Matrix4();
-	var tempEuler = new THREE.Euler();
-	var tempVec = new THREE.Vector3();
 	// parse the model node for transform details and apply them to the model
-	function setModelTransforms( FBXTree, model, modelNode ) {
+	function setModelTransforms( model, modelNode ) {
 
-		var transform = new THREE.Matrix4();
+		var transformData = {};
 
-		var translation = new THREE.Vector3();
+		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
 
-		var rotation = new THREE.Matrix4();
+		if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
+		if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
 
-		// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
-		if ( 'RotationOrder' in modelNode ) {
+		if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
+		if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
 
-			model.rotation.order = getEulerOrder( parseInt( modelNode.RotationOrder.value ) );
+		if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
 
-		} else {
+		if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
 
-			model.rotation.order = getEulerOrder( 0 );
-
-		}
-
-		if ( 'Lcl_Translation' in modelNode ) {
-
-			translation.fromArray( modelNode.Lcl_Translation.value );
-
-		}
-
-		if ( 'RotationOffset' in modelNode ) {
-
-			translation.add( tempVec.fromArray( modelNode.RotationOffset.value ) );
-
-		}
-
-		if ( 'Lcl_Rotation' in modelNode ) {
-
-			var array = modelNode.Lcl_Rotation.value.map( THREE.Math.degToRad );
-
-			array.push( model.rotation.order );
-
-			rotation.makeRotationFromEuler( tempEuler.fromArray( array ) );
-
-		}
-
-		if ( 'PreRotation' in modelNode ) {
-
-			var array = modelNode.PreRotation.value.map( THREE.Math.degToRad );
-
-			array.push( model.rotation.order );
-			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
-
-			rotation.premultiply( tempMat );
-
-		}
-
-		if ( 'PostRotation' in modelNode ) {
-
-			var array = modelNode.PostRotation.value.map( THREE.Math.degToRad );
-
-			array.push( model.rotation.order );
-			array.push( model.rotation.order );
-
-			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
-
-			rotation.multiply( tempMat );
-
-		}
-
-		if ( 'Lcl_Scaling' in modelNode ) {
-
-			transform.scale( tempVec.fromArray( modelNode.Lcl_Scaling.value ) );
-
-		}
-
-		transform.setPosition( translation );
-		transform.multiply( rotation );
+		var transform = generateTransform( transformData );
 
 		model.applyMatrix( transform );
-
-	}
-
-	function getEulerOrder( order ) {
-
-		var enums = [
-			'ZYX', // -> XYZ in FBX
-			'YXZ',
-			'ZXY',
-			'YZX',
-			'XZY',
-			'XYZ',
-			//'SphericXYZ', // not possible to support
-		];
-
-		if ( order === 6 ) {
-
-			console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
-			return enums[ 0 ];
-
-		}
-
-		return enums[ order ];
 
 	}
 
@@ -3853,6 +3772,94 @@
 
 	}
 
+	var tempMat = new THREE.Matrix4();
+	var tempEuler = new THREE.Euler();
+	var tempVec = new THREE.Vector3();
+	var translation = new THREE.Vector3();
+	var rotation = new THREE.Matrix4();
+
+	// generate transformation from FBX transform data
+	// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
+	// transformData = {
+	//	 eulerOrder: int,
+	//	 translation: [],
+	//   rotationOffset: [],
+	//	 preRotation
+	//	 rotation
+	//	 postRotation
+	//   scale
+	// }
+	// all entries are optional
+	function generateTransform( transformData ) {
+
+		var transform = new THREE.Matrix4();
+		translation.set( 0, 0, 0 );
+		rotation.identity();
+
+		var order = ( transformData.eulerOrder ) ? getEulerOrder( transformData.eulerOrder ) : getEulerOrder( 0 );
+
+		if ( transformData.translation ) translation.fromArray( transformData.translation );
+		if ( transformData.rotationOffset ) translation.add( tempVec.fromArray( transformData.rotationOffset ) );
+
+		if ( transformData.rotation ) {
+
+			var array = transformData.rotation.map( THREE.Math.degToRad );
+			array.push( order );
+			rotation.makeRotationFromEuler( tempEuler.fromArray( array ) );
+
+		}
+
+		if ( transformData.preRotation ) {
+
+			var array = transformData.preRotation.map( THREE.Math.degToRad );
+			array.push( order );
+			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
+
+			rotation.premultiply( tempMat );
+
+		}
+
+		if ( transformData.postRotation ) {
+
+			var array = transformData.postRotation.map( THREE.Math.degToRad );
+			array.push( order );
+			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
+
+			rotation.multiply( tempMat );
+
+		}
+
+		if ( transformData.scale ) transform.scale( tempVec.fromArray( transformData.scale ) );
+
+		transform.setPosition( translation );
+		transform.multiply( rotation );
+
+		return transform;
+
+	}
+
+	function getEulerOrder( order ) {
+
+		var enums = [
+			'ZYX', // -> XYZ in FBX
+			'YXZ',
+			'ZXY',
+			'YZX',
+			'XZY',
+			'XYZ',
+			//'SphericXYZ', // not possible to support
+		];
+
+		if ( order === 6 ) {
+
+			console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
+			return enums[ 0 ];
+
+		}
+
+		return enums[ order ];
+
+	}
 
 	// Parses comma separated list of numbers and returns them an array.
 	// Used internally by the TextParser
