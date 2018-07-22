@@ -27,15 +27,16 @@ THREE.MotionBlurPass = function ( scene, camera, options = {} ) {
 	} );
 
 	this.enabled = true;
-	this.needsSwap = false;
+	this.needsSwap = true;
 
 	// settings
-	this.samples = options.samples || 30;
-	this.expand = options.expand || 1;
+	this.samples = options.samples || 15;
+	this.expandGeometry = options.expandGeometry || 0;
+	this.interpolateGeometry = options.interpolateGeometry || 1;
 	this.smearIntensity = options.smearIntensity || 1;
-	this.maxSmearFactor = options.maxSmearFactor || 0.05;
 	this.blurTransparent = options.blurTransparent || false;
 	this.renderCameraBlur = options.renderCameraBlur || true;
+	this.renderTargetScale = options.renderTargetScale || 1;
 
 	this.scene = scene;
 	this.camera = camera;
@@ -52,6 +53,8 @@ THREE.MotionBlurPass = function ( scene, camera, options = {} ) {
 	this._frustum = new THREE.Frustum();
 	this._projScreenMatrix = new THREE.Matrix4();
 	this._cameraMatricesNeedInitializing = true;
+	this._prevClearColor = new THREE.Color();
+	this._clearColor = new THREE.Color( 0, 0, 0 );
 
 	// render targets
 	this._velocityBuffer =
@@ -61,7 +64,7 @@ THREE.MotionBlurPass = function ( scene, camera, options = {} ) {
 			format: THREE.RGBFormat,
 			type: THREE.HalfFloatType
 		} );
-	this._velocityBuffer.texture.name = "MotionBlurPass.VelocityBuffer";
+	this._velocityBuffer.texture.name = "MotionBlurPass.Velocity";
 	this._velocityBuffer.texture.generateMipmaps = false;
 
 	this._prevCamProjection = new THREE.Matrix4();
@@ -93,18 +96,18 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 	setSize: function ( width, height ) {
 
-		this._velocityBuffer.setSize( width, height );
+		this._velocityBuffer.setSize( width * this.renderTargetScale, height * this.renderTargetScale );
 
 	},
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		// Set the clear state
-		var prevClearColor = renderer.getClearColor().clone();
+		this._prevClearColor.copy( renderer.getClearColor() );
 		var prevClearAlpha = renderer.getClearAlpha();
 		var prevAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
-		renderer.setClearColor( new THREE.Color( 0, 0, 0 ), 0 );
+		renderer.setClearColor( this._clearColor, 0 );
 
 		// Traversal function for iterating down and rendering the scene
 		var self = this;
@@ -172,26 +175,26 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		this._prevCamWorldInverse.copy( this.camera.matrixWorldInverse );
 		this._prevCamProjection.copy( this.camera.projectionMatrix );
 
-		var cmat = this._compositeMaterial;
-		cmat.uniforms.sourceBuffer.value = readBuffer.texture;
-		cmat.uniforms.velocityBuffer.value = this._velocityBuffer.texture;
-
-		if ( cmat.defines.SAMPLES !== this.samples ) {
-
-			cmat.defines.SAMPLES = Math.max( 0, Math.floor( this.samples ) );
-			cmat.needsUpdate = true;
-
-		}
-
 		// compose the final blurred frame
 		if ( this.debug.display === THREE.MotionBlurPass.DEFAULT ) {
+
+			var cmat = this._compositeMaterial;
+			cmat.uniforms.sourceBuffer.value = readBuffer.texture;
+			cmat.uniforms.velocityBuffer.value = this._velocityBuffer.texture;
+
+			if ( cmat.defines.SAMPLES !== this.samples ) {
+
+				cmat.defines.SAMPLES = Math.max( 0, Math.floor( this.samples ) );
+				cmat.needsUpdate = true;
+
+			}
 
 			renderer.render( this._compositeScene, this._compositeCamera, this.renderToScreen ? null : writeBuffer, true );
 
 		}
 
 		// Restore renderer settings
-		renderer.setClearColor( prevClearColor, prevClearAlpha );
+		renderer.setClearColor( this._prevClearColor, prevClearAlpha );
 		renderer.autoClear = prevAutoClear;
 
 	},
@@ -260,17 +263,17 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 		var blurTransparent = this.blurTransparent;
 		var renderCameraBlur = this.renderCameraBlur;
+		var expandGeometry = this.expandGeometry;
+		var interpolateGeometry = this.interpolateGeometry;
 		var smearIntensity = this.smearIntensity;
-		var expand = this.expand;
-		var maxSmearFactor = this.maxSmearFactor;
 		var overrides = obj.motionBlur;
 		if ( overrides ) {
 
 			if ( 'blurTransparent' in overrides ) blurTransparent = overrides.blurTransparent;
 			if ( 'renderCameraBlur' in overrides ) renderCameraBlur = overrides.renderCameraBlur;
+			if ( 'expandGeometry' in overrides ) expandGeometry = overrides.expandGeometry;
+			if ( 'interpolateGeometry' in overrides ) interpolateGeometry = overrides.interpolateGeometry;
 			if ( 'smearIntensity' in overrides ) smearIntensity = overrides.smearIntensity;
-			if ( 'maxSmearFactor' in overrides ) maxSmearFactor = overrides.maxSmearFactor;
-			if ( 'expand' in overrides ) expand = overrides.expand;
 
 		}
 
@@ -289,9 +292,9 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 		var data = this._getMaterialState( obj );
 		var mat = this.debug.display === THREE.MotionBlurPass.GEOMETRY ? data.geometryMaterial : data.velocityMaterial;
-		mat.uniforms.expand.value = expand * 0.1;
-		if ( mat.uniforms.smearIntensity ) mat.uniforms.smearIntensity.value = smearIntensity;
-		if ( mat.uniforms.maxSmearFactor ) mat.uniforms.maxSmearFactor.value = maxSmearFactor * 2; // screen coordinates [-1, 1]
+		mat.uniforms.expandGeometry.value = expandGeometry;
+		mat.uniforms.interpolateGeometry.value = Math.min( 1, Math.max( 0, interpolateGeometry ) );
+		mat.uniforms.smearIntensity.value = smearIntensity;
 
 		var projMat = renderCameraBlur ? this._prevCamProjection : this.camera.projectionMatrix;
 		var invMat = renderCameraBlur ? this._prevCamWorldInverse : this.camera.matrixWorldInverse;
@@ -349,7 +352,6 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		// outputs the position of the current and last frame positions
 		return `
 		vec3 transformed;
-		vec4 p1, p2;
 
 		// Get the normal
 		${ THREE.ShaderChunk.skinbase_vertex }
@@ -360,22 +362,30 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		// Get the current vertex position
 		transformed = vec3( position );
 		${ THREE.ShaderChunk.skinning_vertex }
-		p2 = modelViewMatrix * vec4(transformed, 1.0);
+		newPosition = modelViewMatrix * vec4(transformed, 1.0);
 
 		// Get the previous vertex position
 		transformed = vec3( position );
 		${ THREE.ShaderChunk.skinbase_vertex.replace( /mat4 /g, '' ).replace( /getBoneMatrix/g, 'getPrevBoneMatrix' ) }
 		${ THREE.ShaderChunk.skinning_vertex.replace( /vec4 /g, '' ) }
-		p1 = prevModelViewMatrix * vec4(transformed, 1.0);
+		prevPosition = prevModelViewMatrix * vec4(transformed, 1.0);
 
 		// The delta between frames
-		vec3 delta = p2.xyz - p1.xyz;
-		float dot = clamp(dot(delta, transformedNormal), -1.0, 1.0);
+		vec3 delta = newPosition.xyz - prevPosition.xyz;
+		vec3 direction = normalize(delta);
 
-		vec4 dir = vec4(normalize(delta), 0) * dot * expand;
-		prevPosition = prevProjectionMatrix * (p1 + dir);
-		newPosition = projectionMatrix * (p2 + dir);
-		gl_Position = newPosition;
+		// Stretch along the velocity axes
+		// TODO: Can we combine the stretch and expand
+		float stretchDot = dot(direction, transformedNormal);
+		vec4 expandDir = vec4(direction, 0.0) * stretchDot * expandGeometry * length(delta);
+		vec4 newPosition2 =  projectionMatrix * (newPosition + expandDir);
+		vec4 prevPosition2 = prevProjectionMatrix * (prevPosition + expandDir);
+
+		newPosition =  projectionMatrix * newPosition;
+		prevPosition = prevProjectionMatrix * prevPosition;
+
+		gl_Position = mix(newPosition2, prevPosition2, interpolateGeometry * (1.0 - step(0.0, stretchDot) ) );
+
 		`;
 
 	},
@@ -388,9 +398,9 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 				prevProjectionMatrix: { value: new THREE.Matrix4() },
 				prevModelViewMatrix: { value: new THREE.Matrix4() },
 				prevBoneTexture: { value: null },
-				expand: { value: 1 },
-				smearIntensity: { value: 1 },
-				maxSmearFactor: { value: 2 }
+				expandGeometry: { value: 0 },
+				interpolateGeometry: { value: 1 },
+				smearIntensity: { value: 1 }
 			},
 
 			vertexShader:
@@ -400,7 +410,8 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 				uniform mat4 prevProjectionMatrix;
 				uniform mat4 prevModelViewMatrix;
-				uniform float expand;
+				uniform float expandGeometry;
+				uniform float interpolateGeometry;
 				varying vec4 prevPosition;
 				varying vec4 newPosition;
 
@@ -413,19 +424,14 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 			fragmentShader:
 				`
 				uniform float smearIntensity;
-				uniform float maxSmearFactor;
 				varying vec4 prevPosition;
 				varying vec4 newPosition;
 
 				void main() {
-					vec4 vel;
-					vel.xyz = (newPosition.xyz / newPosition.w) - (prevPosition.xyz / prevPosition.w);
-					vel.w = 1.0;
+					vec3 vel;
+					vel = (newPosition.xyz / newPosition.w) - (prevPosition.xyz / prevPosition.w);
 
-					float length = min(length(vel.xyz) * smearIntensity, maxSmearFactor);
-					vel.xyz = normalize(vel.xyz) * length;
-
-					gl_FragColor = vel;
+					gl_FragColor = vec4(vel * smearIntensity, 1.0);
 				}`
 		} );
 
@@ -439,7 +445,9 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 				prevProjectionMatrix: { value: new THREE.Matrix4() },
 				prevModelViewMatrix: { value: new THREE.Matrix4() },
 				prevBoneTexture: { value: null },
-				expand: { value: 1 }
+				expandGeometry: { value: 0 },
+				interpolateGeometry: { value: 1 },
+				smearIntensity: { value: 1 }
 			},
 
 			vertexShader:
@@ -449,7 +457,8 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 				uniform mat4 prevProjectionMatrix;
 				uniform mat4 prevModelViewMatrix;
-				uniform float expand;
+				uniform float expandGeometry;
+				uniform float interpolateGeometry;
 				varying vec4 prevPosition;
 				varying vec4 newPosition;
 				varying vec3 color;

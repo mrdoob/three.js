@@ -64,11 +64,12 @@
 				enabled: true,
 				cameraBlur: true,
 				animate: true,
-				samples: 30,
-				intensity: 1,
-				maxSmearFactor: 5,
-				expand: 1,
-				speed: 20
+				samples: 15,
+				expandGeometry: 0,
+				interpolateGeometry: 1,
+				smearIntensity: 1,
+				speed: 20,
+				renderTargetScale: 1
 			};
 			var camera, scene, renderer, controls;
 			var composer;
@@ -105,7 +106,7 @@
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( './textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
+				textureLoader.load( 'https://rawgit.com/mrdoob/three.js/r94/examples/textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
@@ -117,7 +118,7 @@
 
 				} );
 
-				textureLoader.load( './textures/floors/FloorsCheckerboard_S_Normal.jpg', function ( map ) {
+				textureLoader.load( 'https://rawgit.com/mrdoob/three.js/r94/examples/textures/floors/FloorsCheckerboard_S_Normal.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
@@ -156,7 +157,7 @@
 
 							c.castShadow = true;
 							c.receiveShadow = true;
-							c.motionBlur = { expand: 0 }
+							c.motionBlur = { expandGeometry: 0, interpolateGeometry: 0 }
 
 						}
 
@@ -202,8 +203,9 @@
 				composer = new THREE.EffectComposer( renderer );
 				composer.setSize( window.innerWidth, window.innerHeight );
 				composer.addPass( renderPass );
-				composer.addPass( FXAAPass );
 				composer.addPass( motionPass );
+				composer.addPass( FXAAPass );
+				FXAAPass.renderToScreen = true;
 
 				// stats
 				stats = new Stats();
@@ -219,20 +221,32 @@
 				// dat gui
 				var gui = new dat.GUI();
 				gui.width = 300;
-				gui.add( params, 'enabled' );
-				gui.add( params, 'cameraBlur' );
-				gui.add( params, 'animate' );
-				gui.add( params, 'samples', 0, 50 );
-				gui.add( params, 'intensity', 0, 4 );
-				gui.add( params, 'maxSmearFactor', 0, 100 );
-				gui.add( params, 'expand', 0, 10 );
-				gui.add( params, 'speed', 0, 50 );
 
-				gui.add( motionPass.debug, 'display', {
+				var motionFolder = gui.addFolder( 'motion blur' );
+				motionFolder.add( params, 'enabled' );
+				motionFolder.add( params, 'cameraBlur' );
+				motionFolder.add( params, 'samples', 0, 50 );
+				motionFolder.add( params, 'smearIntensity', 0, 4 );
+				motionFolder.add( params, 'expandGeometry', 0, 1 );
+				motionFolder.add( params, 'interpolateGeometry', 0, 1 );
+				motionFolder.add( params, 'renderTargetScale', 0, 1 )
+					.onChange( v => {
+						motionPass.renderTargetScale = v;
+						onWindowResize();
+
+					} );
+
+				motionFolder.add( motionPass.debug, 'display', {
 					'Motion Blur': THREE.MotionBlurPass.DEFAULT,
 					'Velocity': THREE.MotionBlurPass.VELOCITY,
 					'Geometry': THREE.MotionBlurPass.GEOMETRY
 				} ).onChange( val => motionPass.debug.display = parseFloat(val) );
+				motionFolder.open();
+
+				var animFolder = gui.addFolder( 'animation' );
+				animFolder.add( params, 'animate' );
+				animFolder.add( params, 'speed', 0, 50 );
+				animFolder.open();
 
 				gui.open();
 
@@ -270,12 +284,10 @@
 				// set the variables
 				motionPass.enabled = params.enabled;
 				motionPass.samples = params.samples;
-				motionPass.smearIntensity = params.intensity;
-				motionPass.maxSmearFactor = params.maxSmearFactor / 100;
-				motionPass.expand = params.expand;
+				motionPass.expandGeometry = params.expandGeometry;
+				motionPass.interpolateGeometry = params.interpolateGeometry;
 				motionPass.renderCameraBlur = params.cameraBlur;
-				motionPass.renderToScreen = params.enabled;
-				FXAAPass.renderToScreen = !params.enabled;
+				motionPass.smearIntensity = params.smearIntensity;
 
 				camera.lookAt( scene.position );
 
