@@ -9,9 +9,6 @@
  *
  * Needs Support:
  *  Morph normals / blend shape normals
- *  Animation tracks for morph targets
- *
- *	Euler rotation order
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
@@ -100,7 +97,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
@@ -828,9 +825,16 @@
 
 		if ( 'GeometricRotation' in modelNode ) {
 
-			var array = modelNode.GeometricRotation.value.map( THREE.Math.degToRad );
-			array[ 3 ] = 'ZYX';
+			var eulerOrder = 'ZYX';
 
+			if ( 'RotationOrder' in modelNode ) {
+
+				eulerOrder = getEulerOrder( parseInt( modelNode.RotationOrder.value ) );
+
+			}
+
+			var array = modelNode.GeometricRotation.value.map( THREE.Math.degToRad );
+			array.push( eulerOrder );
 			preTransform.makeRotationFromEuler( new THREE.Euler().fromArray( array ) );
 
 		}
@@ -2146,70 +2150,108 @@
 
 	}
 
+	var tempMat = new THREE.Matrix4();
+	var tempEuler = new THREE.Euler();
+	var tempVec = new THREE.Vector3();
 	// parse the model node for transform details and apply them to the model
 	function setModelTransforms( FBXTree, model, modelNode ) {
+
+		var transform = new THREE.Matrix4();
+
+		var translation = new THREE.Vector3();
+
+		var rotation = new THREE.Matrix4();
 
 		// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
 		if ( 'RotationOrder' in modelNode ) {
 
-			var enums = [
-				'XYZ', // default
-				'XZY',
-				'YZX',
-				'ZXY',
-				'YXZ',
-				'ZYX',
-				'SphericXYZ',
-			];
+			model.rotation.order = getEulerOrder( parseInt( modelNode.RotationOrder.value ) );
 
-			var value = parseInt( modelNode.RotationOrder.value, 10 );
+		} else {
 
-			if ( value > 0 && value < 6 ) {
-
-				// model.rotation.order = enums[ value ];
-
-				// Note: Euler order other than XYZ is currently not supported, so just display a warning for now
-				console.warn( 'THREE.FBXLoader: unsupported Euler Order: %s. Currently only XYZ order is supported. Animations and rotations may be incorrect.', enums[ value ] );
-
-			} else if ( value === 6 ) {
-
-				console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
-
-			}
+			model.rotation.order = getEulerOrder( 0 );
 
 		}
 
 		if ( 'Lcl_Translation' in modelNode ) {
 
-			model.position.fromArray( modelNode.Lcl_Translation.value );
+			translation.fromArray( modelNode.Lcl_Translation.value );
+
+		}
+
+		if ( 'RotationOffset' in modelNode ) {
+
+			translation.add( tempVec.fromArray( modelNode.RotationOffset.value ) );
 
 		}
 
 		if ( 'Lcl_Rotation' in modelNode ) {
 
-			var rotation = modelNode.Lcl_Rotation.value.map( THREE.Math.degToRad );
-			rotation.push( 'ZYX' );
-			model.quaternion.setFromEuler( new THREE.Euler().fromArray( rotation ) );
+			var array = modelNode.Lcl_Rotation.value.map( THREE.Math.degToRad );
 
-		}
+			array.push( model.rotation.order );
 
-		if ( 'Lcl_Scaling' in modelNode ) {
-
-			model.scale.fromArray( modelNode.Lcl_Scaling.value );
+			rotation.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 		}
 
 		if ( 'PreRotation' in modelNode ) {
 
 			var array = modelNode.PreRotation.value.map( THREE.Math.degToRad );
-			array[ 3 ] = 'ZYX';
 
-			var preRotations = new THREE.Euler().fromArray( array );
+			array.push( model.rotation.order );
+			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
-			preRotations = new THREE.Quaternion().setFromEuler( preRotations );
-			model.quaternion.premultiply( preRotations );
+			rotation.premultiply( tempMat );
 
 		}
+
+		if ( 'PostRotation' in modelNode ) {
+
+			var array = modelNode.PostRotation.value.map( THREE.Math.degToRad );
+
+			array.push( model.rotation.order );
+			array.push( model.rotation.order );
+
+			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
+
+			rotation.multiply( tempMat );
+
+		}
+
+		if ( 'Lcl_Scaling' in modelNode ) {
+
+			transform.scale( tempVec.fromArray( modelNode.Lcl_Scaling.value ) );
+
+		}
+
+		transform.setPosition( translation );
+		transform.multiply( rotation );
+
+		model.applyMatrix( transform );
+
+	}
+
+	function getEulerOrder( order ) {
+
+		var enums = [
+			'ZYX', // -> XYZ in FBX
+			'YXZ',
+			'ZXY',
+			'YZX',
+			'XZY',
+			'XYZ',
+			//'SphericXYZ', // not possible to support
+		];
+
+		if ( order === 6 ) {
+
+			console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
+			return enums[ 0 ];
+
+		}
+
+		return enums[ order ];
 
 	}
 
@@ -2604,6 +2646,7 @@
 		}
 
 		if ( rawTracks.DeformPercent !== undefined ) {
+
 			var morphTrack = generateMorphTrack( rawTracks, sceneGraph );
 			if ( morphTrack !== undefined ) tracks.push( morphTrack );
 
