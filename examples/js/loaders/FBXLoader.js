@@ -97,7 +97,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
@@ -2246,6 +2246,7 @@
 		var curveNodesMap = parseAnimationCurveNodes( FBXTree );
 
 		parseAnimationCurves( FBXTree, connections, curveNodesMap );
+
 		var layersMap = parseAnimationLayers( FBXTree, connections, curveNodesMap );
 		var rawClips = parseAnimStacks( FBXTree, connections, layersMap );
 
@@ -2329,7 +2330,7 @@
 
 					curveNodesMap.get( animationCurveID ).curves[ 'z' ] = animationCurve;
 
-				} else if ( animationCurveRelationship.match( /d|DeformPercent/ ) ) {
+				} else if ( animationCurveRelationship.match( /d|DeformPercent/ ) && curveNodesMap.has( animationCurveID ) ) {
 
 					curveNodesMap.get( animationCurveID ).curves[ 'morph' ] = animationCurve;
 
