@@ -3843,6 +3843,8 @@
 			array.push( order );
 			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
+			tempMat.getInverse( tempMat );
+
 			rotation.multiply( tempMat );
 
 		}
