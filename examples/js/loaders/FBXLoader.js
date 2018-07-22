@@ -2408,18 +2408,16 @@
 									initialPosition: [ 0, 0, 0 ],
 									initialRotation: [ 0, 0, 0 ],
 									initialScale: [ 1, 1, 1 ],
+									transform: getModelAnimTransform( rawModel ),
 
 								};
 
-								if ( 'Lcl_Translation' in rawModel ) node.initialPosition = rawModel.Lcl_Translation.value;
+								node.transform = getModelAnimTransform( rawModel );
 
-								if ( 'Lcl_Rotation' in rawModel ) node.initialRotation = rawModel.Lcl_Rotation.value;
-
-								if ( 'Lcl_Scaling' in rawModel ) node.initialScale = rawModel.Lcl_Scaling.value;
-
-								// if the animated model is pre rotated, we'll have to apply the pre rotations to every
+								// if the animated model is pre or post rotated, we'll have to apply the pre rotations to every
 								// animation value as well
 								if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
+								if ( 'PostRotation' in rawModel ) node.postRotations = rawModel.PostRotation.value;
 
 								layerCurveNodes[ i ] = node;
 
@@ -2473,6 +2471,26 @@
 		}
 
 		return layersMap;
+
+	}
+
+	function getModelAnimTransform( modelNode ) {
+
+		var transformData = {};
+
+		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
+
+		if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
+		if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
+
+		if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
+		if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
+
+		if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
+
+		if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
+
+		return generateTransform( transformData );
 
 	}
 
@@ -2551,23 +2569,29 @@
 
 		var tracks = [];
 
+		var initialPosition = new THREE.Vector3();
+		var initialRotation = new THREE.Quaternion();
+		var initialScale = new THREE.Vector3();
+
+		if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
+
 		if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
 
-			var positionTrack = generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, rawTracks.initialPosition, 'position' );
+			var positionTrack = generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, initialPosition, 'position' );
 			if ( positionTrack !== undefined ) tracks.push( positionTrack );
 
 		}
 
 		if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
 
-			var rotationTrack = generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.initialRotation, rawTracks.preRotations );
+			var rotationTrack = generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotations, rawTracks.postRotations );
 			if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 		}
 
 		if ( rawTracks.S !== undefined && Object.keys( rawTracks.S.curves ).length > 0 ) {
 
-			var scaleTrack = generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, rawTracks.initialScale, 'scale' );
+			var scaleTrack = generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, initialScale, 'scale' );
 			if ( scaleTrack !== undefined ) tracks.push( scaleTrack );
 
 		}
@@ -2592,7 +2616,7 @@
 
 	}
 
-	function generateRotationTrack( modelName, curves, initialValue, preRotations ) {
+	function generateRotationTrack( modelName, curves, initialValue, preRotations, postRotations ) {
 
 		if ( curves.x !== undefined ) {
 
@@ -2623,6 +2647,16 @@
 
 			preRotations = new THREE.Euler().fromArray( preRotations );
 			preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+
+		}
+
+		if ( postRotations !== undefined ) {
+
+			postRotations = postRotations.map( THREE.Math.degToRad );
+			postRotations.push( 'ZYX' );
+
+			postRotations = new THREE.Euler().fromArray( postRotations );
+			postRotations = new THREE.Quaternion().setFromEuler( postRotations );
 
 		}
 
