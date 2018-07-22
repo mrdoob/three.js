@@ -814,8 +814,6 @@
 
 		}, null );
 
-		var preTransform = new THREE.Matrix4();
-
 		// TODO: if there is more than one model associated with the geometry, AND the models have
 		// different geometric transforms, then this will cause problems
 		// if ( modelNodes.length > 1 ) { }
@@ -823,35 +821,17 @@
 		// For now just assume one model and get the preRotations from that
 		var modelNode = modelNodes[ 0 ];
 
-		if ( 'GeometricRotation' in modelNode ) {
+		var transformData = {};
 
-			var eulerOrder = 'ZYX';
+		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = modelNode.RotationOrder.value;
 
-			if ( 'RotationOrder' in modelNode ) {
+		if ( 'GeometricTranslation' in modelNode ) transformData.translation = modelNode.GeometricTranslation.value;
+		if ( 'GeometricRotation' in modelNode ) transformData.rotation = modelNode.GeometricRotation.value;
+		if ( 'GeometricScaling' in modelNode ) transformData.scale = modelNode.GeometricScaling.value;
 
-				eulerOrder = getEulerOrder( parseInt( modelNode.RotationOrder.value ) );
+		var transform = generateTransform( transformData );
 
-			}
-
-			var array = modelNode.GeometricRotation.value.map( THREE.Math.degToRad );
-			array.push( eulerOrder );
-			preTransform.makeRotationFromEuler( new THREE.Euler().fromArray( array ) );
-
-		}
-
-		if ( 'GeometricTranslation' in modelNode ) {
-
-			preTransform.setPosition( new THREE.Vector3().fromArray( modelNode.GeometricTranslation.value ) );
-
-		}
-
-		if ( 'GeometricScaling' in modelNode ) {
-
-			preTransform.scale( new THREE.Vector3().fromArray( modelNode.GeometricScaling.value ) );
-
-		}
-
-		return genGeometry( FBXTree, geoNode, skeleton, morphTarget, preTransform );
+		return genGeometry( FBXTree, geoNode, skeleton, morphTarget, transform );
 
 	}
 
