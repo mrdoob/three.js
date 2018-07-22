@@ -2555,6 +2555,10 @@
 
 		if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
 
+		initialPosition = initialPosition.toArray();
+		initialRotation = new THREE.Euler().setFromQuaternion( initialRotation ).toArray(); // todo: euler order
+		initialScale = initialScale.toArray();
+
 		if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
 
 			var positionTrack = generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, initialPosition, 'position' );
