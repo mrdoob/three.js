@@ -3798,7 +3798,7 @@
 	var rotation = new THREE.Matrix4();
 
 	// generate transformation from FBX transform data
-	// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
+	// ref: https://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm
 	// transformData = {
 	//	 eulerOrder: int,
 	//	 translation: [],
@@ -3859,6 +3859,7 @@
 
 	}
 
+	// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
 	function getEulerOrder( order ) {
 
 		var enums = [
