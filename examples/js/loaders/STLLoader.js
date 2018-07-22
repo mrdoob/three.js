@@ -86,22 +86,36 @@ THREE.STLLoader.prototype = {
 			// However, ASCII STLs lacking the SPACE after the 'd' are known to be
 			// plentiful.  So, check the first 5 bytes for 'solid'.
 
+			// Several encodings, such as UTF-8, precede the text with up to 5 bytes:
+			// https://en.wikipedia.org/wiki/Byte_order_mark#Byte_order_marks_by_encoding
+			// Search for "solid" to start anywhere after those prefixes.
+
 			// US-ASCII ordinal values for 's', 'o', 'l', 'i', 'd'
 
 			var solid = [ 115, 111, 108, 105, 100 ];
 
-			for ( var i = 0; i < 5; i ++ ) {
+			for ( var off = 0; off < 5; off ++ ) {
 
-				// If solid[ i ] does not match the i-th byte, then it is not an
-				// ASCII STL; hence, it is binary and return true.
+				// Check if solid[ i ] matches the i-th byte at the current offset
 
-				if ( solid[ i ] != reader.getUint8( i, false ) ) return true;
+				var found = true;
+				for ( var i = 0; found && i < 5; i ++ ) {
 
- 			}
+					found = found && ( solid[ i ] == reader.getUint8( off + i, false ) );
 
-			// First 5 bytes read "solid"; declare it to be an ASCII STL
+				}
 
-			return false;
+				// Found "solid" text at the beginning; declare it to be an ASCII STL.
+
+				if ( found ) {
+					return false;
+				}
+
+			}
+
+			// Couldn't find "solid" text at the beginning; it is binary STL.
+
+			return true;
 
 		}
 
