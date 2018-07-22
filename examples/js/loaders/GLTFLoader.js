@@ -630,7 +630,7 @@ THREE.GLTFLoader = ( function () {
 	 * @pailhead
 	 */
 
-	function MeshStandardSGMaterial( params ) {
+	function GLTFMeshStandardSGMaterial( params ) {
 
 		THREE.MeshStandardMaterial.call( this );
 
@@ -704,51 +704,24 @@ THREE.GLTFLoader = ( function () {
 
 		};
 
+		/*eslint-disable*/
 		Object.defineProperties(
 			this,
 			{
 				specularMap: {
-					get: function () {
-
-						return uniforms.specularMap.value;
-
-					},
-					set: function ( v ) {
-
-						uniforms.specularMap.value = v;
-
-					}
+					get: function () { return uniforms.specularMap.value; },
+					set: function ( v ) { uniforms.specularMap.value = v; }
 				},
 				specular: {
-					get: function () {
-
-						return uniforms.specular.value;
-
-					},
-					set: function ( v ) {
-
-						uniforms.specular.value = v;
-
-					}
+					get: function () { return uniforms.specular.value; },
+					set: function ( v ) { uniforms.specular.value = v; }
 				},
 				glossiness: {
-					get: function () {
-
-						return uniforms.glossiness.value;
-
-					},
-					set: function ( v ) {
-
-						uniforms.glossiness.value = v;
-
-					}
+					get: function () { return uniforms.glossiness.value; },
+					set: function ( v ) { uniforms.glossiness.value = v; }
 				},
 				glossinessMap: {
-					get: function () {
-
-						return uniforms.glossinessMap.value;
-
-					},
+					get: function () { return uniforms.glossinessMap.value; },
 					set: function ( v ) {
 
 						uniforms.glossinessMap.value = v;
@@ -770,15 +743,16 @@ THREE.GLTFLoader = ( function () {
 				}
 			}
 		);
+		/*eslint-enable*/
 
 		this.setValues( params );
 
 	}
 
-	MeshStandardSGMaterial.prototype = Object.create( THREE.MeshStandardMaterial.prototype );
-	MeshStandardSGMaterial.prototype.constructor = MeshStandardSGMaterial;
+	GLTFMeshStandardSGMaterial.prototype = Object.create( THREE.MeshStandardMaterial.prototype );
+	GLTFMeshStandardSGMaterial.prototype.constructor = GLTFMeshStandardSGMaterial;
 
-	MeshStandardSGMaterial.prototype.copy = function ( source ) {
+	GLTFMeshStandardSGMaterial.prototype.copy = function ( source ) {
 
 		THREE.MeshStandardMaterial.prototype.copy.call( this, source );
 		this.specularMap = source.specularMap;
@@ -823,7 +797,7 @@ THREE.GLTFLoader = ( function () {
 
 			getMaterialType: function () {
 
-				return MeshStandardSGMaterial;
+				return GLTFMeshStandardSGMaterial;
 
 			},
 
@@ -875,7 +849,7 @@ THREE.GLTFLoader = ( function () {
 
 			createMaterial: function ( params ) {
 
-				var material = new MeshStandardSGMaterial( params );
+				var material = new GLTFMeshStandardSGMaterial( params );
 				material.fog = true;
 
 				material.color = params.color;
@@ -2303,7 +2277,7 @@ THREE.GLTFLoader = ( function () {
 
 			var material;
 
-			if ( materialType === MeshStandardSGMaterial ) {
+			if ( materialType === GLTFMeshStandardSGMaterial ) {
 
 				material = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].createMaterial( materialParams );
 
@@ -3061,6 +3035,10 @@ THREE.GLTFLoader = ( function () {
 
 						node = mesh.clone();
 						node.name += '_instance_' + instanceNum;
+
+					} else {
+
+						node = mesh;
 
 					}
 
