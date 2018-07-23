@@ -2357,6 +2357,7 @@ function WebGLRenderer( parameters ) {
 
 		// backwards compatibility: peel texture.texture
 		return function setTexture3D( texture, slot ) {
+
 			textures.setTexture3D( texture, slot );
 
 		};
