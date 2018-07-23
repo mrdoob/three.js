@@ -435,7 +435,7 @@
 
 							// extended syntax ( only for NodeMaterial )
 
-							if ( useNodeMaterial ) {
+							if ( useNodeMaterial && useMap ) {
 
 								mtl.map = new THREE.ColorAdjustmentNode(
 									new THREE.TextureNode( mtl.map ),
