@@ -30,9 +30,6 @@ function KeyframeTrack( name, times, values, interpolation ) {
 
 	this.setInterpolation( interpolation || this.DefaultInterpolation );
 
-	this.validate();
-	this.optimize();
-
 }
 
 // Static methods
