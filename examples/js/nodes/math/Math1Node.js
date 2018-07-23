@@ -12,7 +12,7 @@ function Math1Node( a, method ) {
 
 	this.method = method;
 
-};
+}
 
 Math1Node.RAD = 'radians';
 Math1Node.DEG = 'degrees';
@@ -48,7 +48,7 @@ Math1Node.prototype.getType = function ( builder ) {
 	switch ( this.method ) {
 
 		case Math1Node.LENGTH:
-		
+
 			return 'f';
 
 	}
@@ -65,21 +65,21 @@ Math1Node.prototype.generate = function ( builder, output ) {
 	switch ( this.method ) {
 
 		case Math1Node.NEGATE:
-		
+
 			result = '( -' + result + ' )';
-			
+
 			break;
 
 		case Math1Node.INVERT:
-		
+
 			result = '( 1.0 - ' + result + ' )';
-			
+
 			break;
 
 		default:
-		
+
 			result = this.method + '( ' + result + ' )';
-			
+
 			break;
 
 	}
@@ -89,12 +89,12 @@ Math1Node.prototype.generate = function ( builder, output ) {
 };
 
 Math1Node.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.a = source.a;
 	this.method = source.method;
-	
+
 };
 
 Math1Node.prototype.toJSON = function ( meta ) {

@@ -49,7 +49,7 @@
 
 			var camera, scene, renderer, composer;
 			var object, light, nodepass;
-			var gui, guiElements = [];
+			var gui;
 
 			var clock = new THREE.Clock();
 			var frame = new THREE.NodeFrame();
@@ -461,15 +461,16 @@
 				nodepass.needsUpdate = true;
 
 				// test serialization
-/*
-				var library = {};
-				library[ lensflare2.uuid ] = lensflare2;
-				library[ decalNormal.uuid ] = decalNormal;
+				/*
+							var library = {};
+							library[ lensflare2.uuid ] = lensflare2;
+							library[ decalNormal.uuid ] = decalNormal;
 
-				var json = nodepass.toJSON();
+							var json = nodepass.toJSON();
 
-				nodepass.input = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
-*/
+							nodepass.input = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
+						*/
+
 			}
 
 			function init() {

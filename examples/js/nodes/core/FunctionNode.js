@@ -17,7 +17,7 @@ function FunctionNode( src, includes, extensions, keywords, type ) {
 
 	this.eval( src, includes, extensions, keywords );
 
-};
+}
 
 FunctionNode.prototype = Object.create( TempNode.prototype );
 FunctionNode.prototype.constructor = FunctionNode;
@@ -44,9 +44,9 @@ FunctionNode.prototype.getInputByName = function ( name ) {
 	while ( i -- ) {
 
 		if ( this.inputs[ i ].name === name ) {
-			
+
 			return this.inputs[ i ];
-			
+
 		}
 
 	}
@@ -60,9 +60,9 @@ FunctionNode.prototype.getIncludeByName = function ( name ) {
 	while ( i -- ) {
 
 		if ( this.includes[ i ].name === name ) {
-			
+
 			return this.includes[ i ];
-			
+
 		}
 
 	}
@@ -87,7 +87,7 @@ FunctionNode.prototype.generate = function ( builder, output ) {
 
 	while ( match = propertiesRegexp.exec( this.src ) ) {
 
-		var prop = match[ 0 ], 
+		var prop = match[ 0 ],
 			isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true,
 			reference = prop;
 
@@ -210,16 +210,16 @@ FunctionNode.prototype.eval = function ( src, includes, extensions, keywords ) {
 };
 
 FunctionNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.isMethod = source.isMethod;
 	this.useKeywords = source.useKeywords;
-	
+
 	this.eval( source.src, source.includes, source.extensions, source.keywords );
 
 	if ( source.type !== undefined ) this.type = source.type;
-	
+
 };
 
 FunctionNode.prototype.toJSON = function ( meta ) {

@@ -68,7 +68,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var geometry;
 			var meshes = [];
 
 			var mouseX = 0, mouseY = 0;
@@ -82,29 +82,29 @@
 			animate();
 
 			function createScene( MaterialClass, count ) {
-			
+
 				count = count !== undefined ? count : 70;
-			
+
 				var i = 0;
-				
+
 				for ( i = 0; i < meshes.length; i ++ ) {
-				
-					meshes[i].material.dispose();
-					
-					scene.remove( meshes[i] );
-				
+
+					meshes[ i ].material.dispose();
+
+					scene.remove( meshes[ i ] );
+
 				}
-				
+
 				meshes = [];
-			
+
 				for ( i = 0; i < 70; i ++ ) {
 
 					var material = new MaterialClass(),
 						color = 0xFFFFFF * Math.random();
-					
-					if (material.color.isNode) material.color.value.setHex( color );
+
+					if ( material.color.isNode ) material.color.value.setHex( color );
 					else material.color.setHex( color );
-					
+
 					// prevent share code
 					material.defines.UUID = material.uuid;
 
@@ -120,71 +120,71 @@
 					mesh.updateMatrix();
 
 					scene.add( mesh );
-					
+
 					meshes.push( mesh );
 
 				}
-				
+
 			}
-			
+
 			function benchmark() {
-			
+
 				var time, benchmarkTime;
 
 				// Stabilizes CPU
-				
+
 				createScene( THREE.MeshStandardMaterial, 10 );
-				
+
 				render();
-				
+
 				// Standard *Node* Material
-				
+
 				time = performance.now();
-				
+
 				createScene( THREE.StandardNodeMaterial );
-				
-				render();
-				
-				benchmarkTime = (performance.now() - time) / 1000;
 
-				document.getElementById( 'node' ).textContent = benchmarkTime.toFixed(3) + " seconds";
-				
+				render();
+
+				benchmarkTime = ( performance.now() - time ) / 1000;
+
+				document.getElementById( 'node' ).textContent = benchmarkTime.toFixed( 3 ) + " seconds";
+
 				// Mesh Standard *Node* Material
-				
+
 				time = performance.now();
-				
+
 				createScene( THREE.MeshStandardNodeMaterial );
-				
-				render();
-				
-				benchmarkTime = (performance.now() - time) / 1000;
 
-				document.getElementById( 'nodeBased' ).textContent = benchmarkTime.toFixed(3) + " seconds";
-				
+				render();
+
+				benchmarkTime = ( performance.now() - time ) / 1000;
+
+				document.getElementById( 'nodeBased' ).textContent = benchmarkTime.toFixed( 3 ) + " seconds";
+
 				// Mesh Standard Material
-				
-				time = performance.now();
-					
-				createScene( THREE.MeshStandardMaterial );
-				
-				render();
-				
-				benchmarkTime = (performance.now() - time) / 1000;
-				
-				document.getElementById( 'default' ).textContent = benchmarkTime.toFixed(3) + " seconds";
-			
-			}
-			
-			document.getElementById( 'bench' ).addEventListener('click', function () {
 
-				if (geometry) {
-				
+				time = performance.now();
+
+				createScene( THREE.MeshStandardMaterial );
+
+				render();
+
+				benchmarkTime = ( performance.now() - time ) / 1000;
+
+				document.getElementById( 'default' ).textContent = benchmarkTime.toFixed( 3 ) + " seconds";
+
+			}
+
+			document.getElementById( 'bench' ).addEventListener( 'click', function () {
+
+				if ( geometry ) {
+
 					benchmark();
-					
+
 				}
-				
-			});
-			
+
+			} );
+
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -201,7 +201,7 @@
 				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geo ) {
 
 					geo.computeVertexNormals();
-					
+
 					geometry = geo;
 
 				} );
@@ -234,7 +234,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;

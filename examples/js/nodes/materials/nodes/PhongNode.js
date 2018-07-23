@@ -5,7 +5,7 @@
 import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
- 
+
 function PhongNode() {
 
 	Node.call( this );
@@ -14,7 +14,7 @@ function PhongNode() {
 	this.specular = new ColorNode( 0x111111 );
 	this.shininess = new FloatNode( 30 );
 
-};
+}
 
 PhongNode.prototype = Object.create( Node.prototype );
 PhongNode.prototype.constructor = PhongNode;
@@ -181,9 +181,9 @@ PhongNode.prototype.build = function ( builder ) {
 			output.push(
 				alpha.code,
 				'#ifdef ALPHATEST',
-				
-					'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
-					
+
+				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+
 				'#endif'
 			);
 
@@ -195,7 +195,7 @@ PhongNode.prototype.build = function ( builder ) {
 				normal.code,
 				'normal = ' + normal.result + ';'
 			);
-		
+
 		}
 
 		// optimization for now
@@ -285,19 +285,19 @@ PhongNode.prototype.build = function ( builder ) {
 			}
 
 		}
-/*
+		/*
 		switch( builder.material.combine ) {
 
 			case THREE.ENVMAP_BLENDING_MULTIPLY:
-				
+
 				//output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
 				//outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
-				
+
 				break;
-			
-			
+
+
 		}
-	*/	
+	*/
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
@@ -324,9 +324,9 @@ PhongNode.prototype.build = function ( builder ) {
 };
 
 PhongNode.prototype.copy = function ( source ) {
-			
+
 	Node.prototype.copy.call( this, source );
-	
+
 	// vertex
 
 	if ( source.position ) this.position = source.position;
@@ -345,7 +345,7 @@ PhongNode.prototype.copy = function ( source ) {
 	if ( source.shadow ) this.shadow = source.shadow;
 
 	if ( source.ao ) this.ao = source.ao;
-	
+
 	if ( source.emissive ) this.emissive = source.emissive;
 	if ( source.ambient ) this.ambient = source.ambient;
 

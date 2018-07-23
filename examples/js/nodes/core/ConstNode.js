@@ -12,7 +12,7 @@ function ConstNode( src, useDefine ) {
 
 	this.eval( src || ConstNode.PI, useDefine );
 
-};
+}
 
 ConstNode.PI = 'PI';
 ConstNode.PI2 = 'PI2';
@@ -39,7 +39,7 @@ ConstNode.prototype.eval = function ( src, useDefine ) {
 
 	var match = this.src.match( declarationRegexp );
 
-	this.useDefine = useDefine || this.src.charAt(0) === '#';
+	this.useDefine = useDefine || this.src.charAt( 0 ) === '#';
 
 	if ( match && match.length > 1 ) {
 
@@ -74,10 +74,10 @@ ConstNode.prototype.build = function ( builder, output ) {
 
 			return 'const ' + this.type + ' ' + this.name + ' = ' + this.value + ';';
 
-		} else if (this.useDefine) {
-		
+		} else if ( this.useDefine ) {
+
 			return this.src;
-			
+
 		}
 
 	} else {
@@ -97,11 +97,11 @@ ConstNode.prototype.generate = function ( builder, output ) {
 };
 
 ConstNode.prototype.copy = function ( source ) {
-	
+
 	TempNode.prototype.copy.call( this, source );
-	
-	this.eval( source.src, source.useDefine );	
-	
+
+	this.eval( source.src, source.useDefine );
+
 };
 
 ConstNode.prototype.toJSON = function ( meta ) {

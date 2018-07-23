@@ -3,7 +3,6 @@
  */
 
 import { InputNode } from '../core/InputNode.js';
-import { NodeBuilder } from '../core/NodeBuilder.js';
 import { UVNode } from '../accessors/UVNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 
@@ -16,7 +15,7 @@ function TextureNode( value, uv, bias, project ) {
 	this.bias = bias;
 	this.project = project !== undefined ? project : false;
 
-};
+}
 
 TextureNode.prototype = Object.create( InputNode.prototype );
 TextureNode.prototype.constructor = TextureNode;
@@ -55,12 +54,12 @@ TextureNode.prototype.generate = function ( builder, output ) {
 	else code = method + '( ' + tex + ', ' + uv + ' )';
 
 	// add this context to replace ColorSpaceNode.input to code
-	
-	builder.addContext( { input: code, encoding: builder.getTextureEncodingFromMap( this.value ), include: builder.isShader('vertex') } )
 
-	this.colorSpace = this.colorSpace || new ColorSpaceNode( this );	
+	builder.addContext( { input: code, encoding: builder.getTextureEncodingFromMap( this.value ), include: builder.isShader( 'vertex' ) } );
+
+	this.colorSpace = this.colorSpace || new ColorSpaceNode( this );
 	code = this.colorSpace.build( builder, this.type );
-	
+
 	builder.removeContext();
 
 	return builder.format( code, this.type, output );
@@ -68,16 +67,16 @@ TextureNode.prototype.generate = function ( builder, output ) {
 };
 
 TextureNode.prototype.copy = function ( source ) {
-			
+
 	InputNode.prototype.copy.call( this, source );
-	
+
 	if ( source.value ) this.value = source.value;
 
 	this.uv = source.uv;
 
 	if ( source.bias ) this.bias = source.bias;
 	if ( source.project !== undefined ) this.project = source.project;
-	
+
 };
 
 TextureNode.prototype.toJSON = function ( meta ) {

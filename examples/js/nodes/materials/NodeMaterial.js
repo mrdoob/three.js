@@ -6,7 +6,7 @@ import { NodeBuilder } from '../core/NodeBuilder.js';
 import { ColorNode } from '../inputs/ColorNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 import { RawNode } from './nodes/RawNode.js';
- 
+
 function NodeMaterial( vertex, fragment ) {
 
 	THREE.ShaderMaterial.call( this );
@@ -16,7 +16,7 @@ function NodeMaterial( vertex, fragment ) {
 
 	this.updaters = [];
 
-};
+}
 
 NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
 NodeMaterial.prototype.constructor = NodeMaterial;
@@ -27,13 +27,13 @@ NodeMaterial.prototype.isNodeMaterial = true;
 Object.defineProperties( NodeMaterial.prototype, {
 
 	properties: {
-		
+
 		get: function () {
 
 			return this.fragment.properties;
 
 		}
-		
+
 	}
 
 } );
@@ -67,47 +67,47 @@ NodeMaterial.prototype.build = function ( params ) {
 	params = params || {};
 
 	var builder = params.builder || new NodeBuilder();
-	
+
 	builder.setMaterial( this, params.renderer );
 	builder.build( this.vertex, this.fragment );
-	
-	this.vertexShader = builder.getCode('vertex');
-	this.fragmentShader = builder.getCode('fragment');
-	
+
+	this.vertexShader = builder.getCode( 'vertex' );
+	this.fragmentShader = builder.getCode( 'fragment' );
+
 	this.defines = builder.defines;
 	this.uniforms = builder.uniforms;
 	this.extensions = builder.extensions;
 	this.updaters = builder.updaters;
-	
+
 	this.fog = builder.requires.fog;
 	this.lights = builder.requires.lights;
 
 	this.transparent = builder.requires.transparent || this.blending > THREE.NormalBlending;
 
 	this.needsUpdate = false;
-	
+
 	return this;
 
 };
 
 NodeMaterial.prototype.copy = function ( source ) {
-	
+
 	var uuid = this.uuid;
-	
-	for (var name in source) {
-		
-		this[name] = source[name];
-		
+
+	for ( var name in source ) {
+
+		this[ name ] = source[ name ];
+
 	}
-	
+
 	this.uuid = uuid;
-	
-	if ( source.userData !== undefined) {
-		
+
+	if ( source.userData !== undefined ) {
+
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
-		
+
 	}
-	
+
 };
 
 NodeMaterial.prototype.toJSON = function ( meta ) {
@@ -153,7 +153,7 @@ NodeMaterial.prototype.toJSON = function ( meta ) {
 		if ( this.scale !== undefined ) data.scale = this.scale;
 
 		if ( this.dithering === true ) data.dithering = true;
-		
+
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
@@ -161,7 +161,7 @@ NodeMaterial.prototype.toJSON = function ( meta ) {
 
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
-		
+
 		if ( this.morphTargets === true ) data.morphTargets = true;
 		if ( this.skinning === true ) data.skinning = true;
 
@@ -170,7 +170,7 @@ NodeMaterial.prototype.toJSON = function ( meta ) {
 
 		data.fog = this.fog;
 		data.lights = this.lights;
-		
+
 		data.vertex = this.vertex.toJSON( meta ).uuid;
 		data.fragment = this.fragment.toJSON( meta ).uuid;
 

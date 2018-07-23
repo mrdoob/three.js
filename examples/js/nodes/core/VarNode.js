@@ -7,10 +7,10 @@ import { Node } from './Node.js';
 function VarNode( type, value ) {
 
 	Node.call( this, type );
-	
+
 	this.value = value;
 
-};
+}
 
 VarNode.prototype = Object.create( Node.prototype );
 VarNode.prototype.constructor = VarNode;
@@ -31,18 +31,18 @@ VarNode.prototype.generate = function ( builder, output ) {
 		builder.addNodeCode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
 
 	}
-	
+
 	return builder.format( varying.name, this.getType( builder ), output );
 
 };
 
 VarNode.prototype.copy = function ( source ) {
-	
+
 	Node.prototype.copy.call( this, source );
-	
+
 	this.type = source.type;
 	this.value = source.value;
-	
+
 };
 
 VarNode.prototype.toJSON = function ( meta ) {

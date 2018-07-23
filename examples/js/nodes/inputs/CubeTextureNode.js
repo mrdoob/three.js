@@ -14,7 +14,7 @@ function CubeTextureNode( value, uv, bias ) {
 	this.uv = uv || new ReflectNode();
 	this.bias = bias;
 
-};
+}
 
 CubeTextureNode.prototype = Object.create( InputNode.prototype );
 CubeTextureNode.prototype.constructor = CubeTextureNode;
@@ -50,28 +50,28 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	else code = 'texCube( ' + cubetex + ', ' + uv + ' )';
 
 	// add this context to replace ColorSpaceNode.input to code
-	
-	builder.addContext( { input: code, encoding: builder.getTextureEncodingFromMap( this.value ), include: builder.isShader('vertex') } )
 
-	this.colorSpace = this.colorSpace || new ColorSpaceNode( this );	
+	builder.addContext( { input: code, encoding: builder.getTextureEncodingFromMap( this.value ), include: builder.isShader( 'vertex' ) } );
+
+	this.colorSpace = this.colorSpace || new ColorSpaceNode( this );
 	code = this.colorSpace.build( builder, this.type );
-	
+
 	builder.removeContext();
-	
+
 	return builder.format( code, this.type, output );
 
 };
 
 CubeTextureNode.prototype.copy = function ( source ) {
-			
+
 	InputNode.prototype.copy.call( this, source );
-	
+
 	if ( source.value ) this.value = source.value;
 
 	this.uv = source.uv;
 
 	if ( source.bias ) this.bias = source.bias;
-	
+
 };
 
 CubeTextureNode.prototype.toJSON = function ( meta ) {

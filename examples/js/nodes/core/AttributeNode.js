@@ -10,7 +10,7 @@ function AttributeNode( name, type ) {
 
 	this.name = name;
 
-};
+}
 
 AttributeNode.prototype = Object.create( Node.prototype );
 AttributeNode.prototype.constructor = AttributeNode;
@@ -38,17 +38,17 @@ AttributeNode.prototype.generate = function ( builder, output ) {
 		name = builder.isShader( 'vertex' ) ? this.name : attribute.varying.name;
 
 	console.log( attribute );
-		
+
 	return builder.format( name, this.getType( builder ), output );
 
 };
 
 AttributeNode.prototype.copy = function ( source ) {
-			
+
 	Node.prototype.copy.call( this, source );
-	
+
 	this.type = source.type;
-	
+
 };
 
 AttributeNode.prototype.toJSON = function ( meta ) {

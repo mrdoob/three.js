@@ -12,7 +12,7 @@ function SpriteNode() {
 	this.color = new ColorNode( 0xEEEEEE );
 	this.spherical = true;
 
-};
+}
 
 SpriteNode.prototype = Object.create( Node.prototype );
 SpriteNode.prototype.constructor = SpriteNode;
@@ -45,7 +45,7 @@ SpriteNode.prototype.build = function ( builder ) {
 			"#include <clipping_planes_fragment>",
 			"#include <begin_vertex>"
 		];
-		
+
 		if ( position ) {
 
 			output.push(
@@ -54,7 +54,7 @@ SpriteNode.prototype.build = function ( builder ) {
 			);
 
 		}
-		
+
 		output.push(
 			"#include <project_vertex>",
 			"#include <fog_vertex>",
@@ -83,7 +83,7 @@ SpriteNode.prototype.build = function ( builder ) {
 			'modelViewMtx[0][1] = 0.0;',
 			'modelViewMtx[0][2] = 0.0;'
 		);
-		
+
 		if ( this.spherical ) {
 
 			output.push(
@@ -94,7 +94,7 @@ SpriteNode.prototype.build = function ( builder ) {
 			);
 
 		}
-		
+
 		output.push(
 			// Thrid colunm.
 			'modelViewMtx[2][0] = 0.0;',
@@ -102,7 +102,7 @@ SpriteNode.prototype.build = function ( builder ) {
 			'modelViewMtx[2][2] = 1.0;',
 
 			"gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( transformed, 1.0 );",
-			
+
 			"#include <logdepthbuf_vertex>",
 			"#include <clipping_planes_vertex>",
 			"#include <fog_vertex>"
@@ -120,11 +120,11 @@ SpriteNode.prototype.build = function ( builder ) {
 			"#include <clipping_planes_fragment>",
 			"#include <logdepthbuf_fragment>"
 		].join( "\n" ) );
-		
+
 		// parse all nodes to reuse generate codes
 
 		if ( this.alpha ) this.alpha.parse( builder );
-		
+
 		this.color.parse( builder, { slot: 'color' } );
 
 		// build code
@@ -137,9 +137,9 @@ SpriteNode.prototype.build = function ( builder ) {
 			output = [
 				alpha.code,
 				'#ifdef ALPHATEST',
-				
-					'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
-					
+
+				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+
 				'#endif',
 				color.code,
 				"gl_FragColor = vec4( " + color.result + ", " + alpha.result + " );"
@@ -154,10 +154,10 @@ SpriteNode.prototype.build = function ( builder ) {
 
 		}
 
-		output.push( 
+		output.push(
 			"#include <tonemapping_fragment>",
 			"#include <encodings_fragment>",
-			"#include <fog_fragment>" 
+			"#include <fog_fragment>"
 		);
 
 	}
@@ -167,19 +167,19 @@ SpriteNode.prototype.build = function ( builder ) {
 };
 
 SpriteNode.prototype.copy = function ( source ) {
-			
+
 	Node.prototype.copy.call( this, source );
-	
+
 	// vertex
-	
+
 	if ( source.position ) this.position = source.position;
-	
+
 	// fragment
-	
+
 	this.color = source.color;
-	
+
 	if ( source.spherical !== undefined ) this.spherical = source.spherical;
-	
+
 	if ( source.alpha ) this.alpha = source.alpha;
 
 };
@@ -199,7 +199,7 @@ SpriteNode.prototype.toJSON = function ( meta ) {
 		// fragment
 
 		data.color = this.color.toJSON( meta ).uuid;
-		
+
 		if ( this.spherical === false ) data.spherical = false;
 
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;

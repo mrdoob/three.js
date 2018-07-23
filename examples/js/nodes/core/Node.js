@@ -12,14 +12,14 @@ function Node( type ) {
 
 	this.userData = {};
 
-};
+}
 
 Node.prototype = {
 
 	constructor: Node,
-	
+
 	isNode: true,
-	
+
 	parse: function ( builder, settings ) {
 
 		settings = settings || {};
@@ -28,7 +28,7 @@ Node.prototype = {
 
 		this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), 'v4' );
 
-		builder.clearVertexNodeCode()
+		builder.clearVertexNodeCode();
 		builder.clearFragmentNodeCode();
 
 		builder.removeFlow();
@@ -36,7 +36,7 @@ Node.prototype = {
 		builder.parsing = false;
 
 	},
-	
+
 	parseAndBuildCode: function ( builder, output, settings ) {
 
 		settings = settings || {};
@@ -44,9 +44,9 @@ Node.prototype = {
 		this.parse( builder, settings );
 
 		return this.buildCode( builder, output, settings );
-	
+
 	},
-	
+
 	buildCode: function ( builder, output, settings ) {
 
 		settings = settings || {};
@@ -58,7 +58,7 @@ Node.prototype = {
 		builder.removeFlow();
 
 		return data;
-	
+
 	},
 
 	build: function ( builder, output, uuid ) {
@@ -68,9 +68,9 @@ Node.prototype = {
 		var data = builder.getNodeData( uuid || this );
 
 		if ( builder.parsing ) {
-			
+
 			this.appendDepsNode( builder, data, output );
-			
+
 		}
 
 		if ( builder.nodes.indexOf( this ) === - 1 ) {
@@ -86,9 +86,9 @@ Node.prototype = {
 		}
 
 		return this.generate( builder, output, uuid );
-	
+
 	},
-	
+
 	appendDepsNode: function ( builder, data, output ) {
 
 		data.deps = ( data.deps || 0 ) + 1;
@@ -101,29 +101,29 @@ Node.prototype = {
 			data.output = output;
 
 		}
-	
+
 	},
-	
-	setName: function( name ) {
-		
+
+	setName: function ( name ) {
+
 		this.name = name;
-		
+
 		return this;
-		
+
 	},
-	
-	getName: function( builder ) {
-		
+
+	getName: function ( builder ) {
+
 		return this.name;
-		
+
 	},
-	
+
 	getType: function ( builder, output ) {
 
 		return output === 'sampler2D' || output === 'samplerCube' ? output : this.type;
-	
+
 	},
-	
+
 	getJSONNode: function ( meta ) {
 
 		var isRootObject = ( meta === undefined || typeof meta === 'string' );
@@ -133,17 +133,17 @@ Node.prototype = {
 			return meta.nodes[ this.uuid ];
 
 		}
-	
+
 	},
-	
+
 	copy: function ( source ) {
 
 		if ( source.name !== undefined ) this.name = source.name;
-	
+
 		if ( source.userData !== undefined ) this.userData = JSON.parse( JSON.stringify( source.userData ) );
-	
+
 	},
-	
+
 	createJSONNode: function ( meta ) {
 
 		var isRootObject = ( meta === undefined || typeof meta === 'string' );
@@ -166,15 +166,15 @@ Node.prototype = {
 		}
 
 		return data;
-	
+
 	},
-	
+
 	toJSON: function ( meta ) {
 
 		return this.getJSONNode( meta ) || this.createJSONNode( meta );
-	
+
 	}
-	
+
 };
 
 export { Node };

@@ -24,10 +24,10 @@ function BlurNode( value, uv, radius, size ) {
 	this.horizontal = new FloatNode( 1 / 64 );
 	this.vertical = new FloatNode( 1 / 64 );
 
-};
+}
 
-BlurNode.Nodes = (function() {
-	
+BlurNode.Nodes = ( function () {
+
 	var blurX = new FunctionNode( [
 		"vec4 blurX( sampler2D texture, vec2 uv, float s ) {",
 		"	vec4 sum = vec4( 0.0 );",
@@ -43,7 +43,7 @@ BlurNode.Nodes = (function() {
 		"	return sum * .667;",
 		"}"
 	].join( "\n" ) );
-	
+
 	var blurY = new FunctionNode( [
 		"vec4 blurY( sampler2D texture, vec2 uv, float s ) {",
 		"	vec4 sum = vec4( 0.0 );",
@@ -59,13 +59,13 @@ BlurNode.Nodes = (function() {
 		"	return sum * .667;",
 		"}"
 	].join( "\n" ) );
-	
+
 	return {
 		blurX: blurX,
 		blurY: blurY
 	};
-	
-})();
+
+} )();
 
 
 BlurNode.prototype = Object.create( TempNode.prototype );
@@ -98,7 +98,7 @@ BlurNode.prototype.generate = function ( builder, output ) {
 
 		var blurX = builder.include( BlurNode.Nodes.blurX ),
 			blurY = builder.include( BlurNode.Nodes.blurY );
-		
+
 		if ( this.blurX ) {
 
 			blurCode.push( blurX + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' + this.uv.build( builder, 'v2' ) + ', ' + this.horizontal.build( builder, 'f' ) + ' )' );
@@ -128,9 +128,9 @@ BlurNode.prototype.generate = function ( builder, output ) {
 };
 
 BlurNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.value = source.value;
 	this.uv = source.uv;
 	this.radius = source.radius;
@@ -139,7 +139,7 @@ BlurNode.prototype.copy = function ( source ) {
 
 	this.blurX = source.blurX;
 	this.blurY = source.blurY;
-					
+
 };
 
 BlurNode.prototype.toJSON = function ( meta ) {

@@ -3,18 +3,17 @@
  */
 
 import { TempNode } from './TempNode.js';
-import { FunctionNode } from './FunctionNode.js';
 
 var declarationRegexp = /^struct\s*([a-z_0-9]+)\s*{\s*((.|\n)*?)}/img,
 	propertiesRegexp = /\s*(\w*?)\s*(\w*?)(\=|\;)/img;
 
 function StructNode( src ) {
 
-	TempNode.call( this);
+	TempNode.call( this );
 
 	this.eval( src );
 
-};
+}
 
 StructNode.prototype = Object.create( TempNode.prototype );
 StructNode.prototype.constructor = StructNode;
@@ -33,9 +32,9 @@ StructNode.prototype.getInputByName = function ( name ) {
 	while ( i -- ) {
 
 		if ( this.inputs[ i ].name === name ) {
-			
+
 			return this.inputs[ i ];
-			
+
 		}
 
 	}
@@ -59,32 +58,32 @@ StructNode.prototype.generate = function ( builder, output ) {
 StructNode.prototype.eval = function ( src ) {
 
 	this.src = src || '';
-	
+
 	this.inputs = [];
-	
+
 	var declaration = declarationRegexp.exec( this.src );
-	
-	if (declaration) {
-		
-		var properties = declaration[2], match;
-		
+
+	if ( declaration ) {
+
+		var properties = declaration[ 2 ], match;
+
 		while ( match = propertiesRegexp.exec( properties ) ) {
-			
+
 			this.inputs.push( {
-				type: match[1],
-				name: match[2]
+				type: match[ 1 ],
+				name: match[ 2 ]
 			} );
-			
+
 		}
-		
-		this.name = declaration[1];
+
+		this.name = declaration[ 1 ];
 
 	} else {
-		
+
 		this.name = '';
-		
+
 	}
-	
+
 	this.type = this.name;
 
 };

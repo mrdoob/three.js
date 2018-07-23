@@ -4,14 +4,14 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
- 
+
 function PositionNode( scope ) {
 
 	TempNode.call( this, 'v3' );
 
 	this.scope = scope || PositionNode.LOCAL;
 
-};
+}
 
 PositionNode.LOCAL = 'local';
 PositionNode.WORLD = 'world';
@@ -22,12 +22,12 @@ PositionNode.prototype = Object.create( TempNode.prototype );
 PositionNode.prototype.constructor = PositionNode;
 PositionNode.prototype.nodeType = "Position";
 
-PositionNode.prototype.getType = function ( builder ) {
+PositionNode.prototype.getType = function ( ) {
 
 	switch ( this.scope ) {
 
 		case PositionNode.PROJECTION:
-		
+
 			return 'v4';
 
 	}
@@ -42,7 +42,7 @@ PositionNode.prototype.isShared = function ( builder ) {
 
 		case PositionNode.LOCAL:
 		case PositionNode.WORLD:
-		
+
 			return false;
 
 	}
@@ -92,11 +92,11 @@ PositionNode.prototype.generate = function ( builder, output ) {
 };
 
 PositionNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.scope = source.scope;
-	
+
 };
 
 PositionNode.prototype.toJSON = function ( meta ) {

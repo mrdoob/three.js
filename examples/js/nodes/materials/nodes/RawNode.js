@@ -10,7 +10,7 @@ function RawNode( value ) {
 
 	this.value = value;
 
-};
+}
 
 RawNode.prototype = Object.create( Node.prototype );
 RawNode.prototype.constructor = RawNode;
@@ -36,11 +36,11 @@ RawNode.prototype.generate = function ( builder ) {
 };
 
 RawNode.prototype.copy = function ( source ) {
-	
+
 	Node.prototype.copy.call( this, source );
-	
+
 	this.value = source.value;
-	
+
 };
 
 RawNode.prototype.toJSON = function ( meta ) {

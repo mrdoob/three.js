@@ -10,7 +10,7 @@ function LightNode( scope ) {
 
 	this.scope = scope || LightNode.TOTAL;
 
-};
+}
 
 LightNode.TOTAL = 'total';
 
@@ -35,11 +35,11 @@ LightNode.prototype.generate = function ( builder, output ) {
 };
 
 LightNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.scope = source.scope;
-	
+
 };
 
 LightNode.prototype.toJSON = function ( meta ) {

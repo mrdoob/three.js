@@ -4,14 +4,14 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
- 
+
 function NormalNode( scope ) {
 
 	TempNode.call( this, 'v3' );
 
 	this.scope = scope || NormalNode.LOCAL;
 
-};
+}
 
 NormalNode.LOCAL = 'local';
 NormalNode.WORLD = 'world';
@@ -54,7 +54,7 @@ NormalNode.prototype.generate = function ( builder, output ) {
 			builder.requires.worldNormal = true;
 
 			result = builder.isShader( 'vertex' ) ? '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz' : 'vWNormal';
-			
+
 			break;
 
 		case NormalNode.VIEW:
@@ -70,11 +70,11 @@ NormalNode.prototype.generate = function ( builder, output ) {
 };
 
 NormalNode.prototype.copy = function ( source ) {
-	
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.scope = source.scope;
-	
+
 };
 
 NormalNode.prototype.toJSON = function ( meta ) {

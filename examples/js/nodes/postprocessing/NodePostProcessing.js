@@ -20,7 +20,7 @@ function NodePostProcessing( renderer, renderTarget ) {
 		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
 
 	}
-	
+
 	this.renderer = renderer;
 	this.renderTarget = renderTarget;
 
@@ -33,17 +33,17 @@ function NodePostProcessing( renderer, renderTarget ) {
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), this.material );
 	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
-	
+
 	this.needsUpdate = true;
 
-};
+}
 
 NodePostProcessing.prototype = {
 
 	constructor: NodePostProcessing,
 
 	render: function ( scene, camera, frame ) {
-		
+
 		if ( this.needsUpdate ) {
 
 			this.material.dispose();
@@ -51,10 +51,10 @@ NodePostProcessing.prototype = {
 			this.material.fragment.value = this.output;
 			this.material.build();
 
-			if (this.material.uniforms.renderTexture) {
-				
+			if ( this.material.uniforms.renderTexture ) {
+
 				this.material.uniforms.renderTexture.value = this.renderTarget.texture;
-				
+
 			}
 
 			this.needsUpdate = false;
@@ -63,31 +63,31 @@ NodePostProcessing.prototype = {
 
 		frame.setRenderer( this.renderer )
 			.setRenderTexture( this.renderTarget.texture );
-		
+
 		this.renderer.render( scene, camera, this.renderTarget );
 
 		frame.updateNode( this.material );
-		
+
 		this.renderer.render( this.scene, this.camera );
-		
+
 	},
-	
+
 	setSize: function ( width, height ) {
-		
+
 		this.renderTarget.setSize( width, height );
-	
+
 		this.renderer.setSize( width, height );
-		
+
 	},
-	
+
 	copy: function ( source ) {
-		
+
 		this.output = source.output;
-		
+
 	},
-	
+
 	toJSON: function ( meta ) {
-		
+
 		var isRootObject = ( meta === undefined || typeof meta === 'string' );
 
 		if ( isRootObject ) {
@@ -120,9 +120,9 @@ NodePostProcessing.prototype = {
 		meta.post = this.uuid;
 
 		return meta;
-		
+
 	}
-	
+
 };
 
 export { NodePostProcessing };

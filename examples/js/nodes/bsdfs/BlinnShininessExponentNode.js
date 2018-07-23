@@ -8,7 +8,7 @@ function BlinnShininessExponentNode() {
 
 	TempNode.call( this, 'f' );
 
-};
+}
 
 BlinnShininessExponentNode.prototype = Object.create( TempNode.prototype );
 BlinnShininessExponentNode.prototype.constructor = BlinnShininessExponentNode;

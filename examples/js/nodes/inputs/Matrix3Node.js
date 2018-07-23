@@ -10,7 +10,7 @@ function Matrix3Node( matrix ) {
 
 	this.value = matrix || new THREE.Matrix3();
 
-};
+}
 
 Matrix3Node.prototype = Object.create( InputNode.prototype );
 Matrix3Node.prototype.constructor = Matrix3Node;
@@ -19,19 +19,19 @@ Matrix3Node.prototype.nodeType = "Matrix3";
 Object.defineProperties( Matrix3Node.prototype, {
 
 	elements: {
-		
-		set: function (val) {
+
+		set: function ( val ) {
 
 			this.value.elements = val;
 
 		},
-		
+
 		get: function () {
 
 			return this.value.elements;
 
 		}
-		
+
 	}
 
 } );
@@ -44,11 +44,11 @@ Matrix3Node.prototype.generateReadonly = function ( builder, output, uuid, type,
 
 
 Matrix3Node.prototype.copy = function ( source ) {
-			
+
 	InputNode.prototype.copy.call( this, source );
-	
+
 	this.value.fromArray( source.elements );
-	
+
 };
 
 Matrix3Node.prototype.toJSON = function ( meta ) {

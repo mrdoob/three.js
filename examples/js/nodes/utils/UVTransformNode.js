@@ -5,7 +5,7 @@
 import { ExpressionNode } from '../core/ExpressionNode.js';
 import { Matrix3Node } from '../inputs/Matrix3Node.js';
 import { UVNode } from '../accessors/UVNode.js';
- 
+
 function UVTransformNode( uv, position ) {
 
 	ExpressionNode.call( this, "( uvTransform * vec3( uvNode, 1 ) ).xy", "vec2" );
@@ -13,7 +13,7 @@ function UVTransformNode( uv, position ) {
 	this.uv = uv || new UVNode();
 	this.position = position || new Matrix3Node();
 
-};
+}
 
 UVTransformNode.prototype = Object.create( ExpressionNode.prototype );
 UVTransformNode.prototype.constructor = UVTransformNode;
@@ -38,12 +38,12 @@ UVTransformNode.prototype.setUvTransform = function ( tx, ty, sx, sy, rotation, 
 };
 
 UVTransformNode.prototype.copy = function ( source ) {
-			
+
 	ExpressionNode.prototype.copy.call( this, source );
-	
+
 	this.uv = source.uv;
 	this.position = source.position;
-					
+
 };
 
 UVTransformNode.prototype.toJSON = function ( meta ) {

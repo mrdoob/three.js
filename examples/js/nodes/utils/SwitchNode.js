@@ -3,7 +3,7 @@
  */
 
 import { Node } from '../core/Node.js';
- 
+
 function SwitchNode( node, components ) {
 
 	Node.call( this );
@@ -11,7 +11,7 @@ function SwitchNode( node, components ) {
 	this.node = node;
 	this.components = components || 'x';
 
-};
+}
 
 SwitchNode.prototype = Object.create( Node.prototype );
 SwitchNode.prototype.constructor = SwitchNode;
@@ -74,12 +74,12 @@ SwitchNode.prototype.generate = function ( builder, output ) {
 };
 
 SwitchNode.prototype.copy = function ( source ) {
-			
+
 	Node.prototype.copy.call( this, source );
-	
+
 	this.node = source.node;
 	this.components = source.components;
-	
+
 };
 
 SwitchNode.prototype.toJSON = function ( meta ) {

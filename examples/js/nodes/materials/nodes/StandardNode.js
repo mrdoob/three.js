@@ -6,7 +6,7 @@ import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
- 
+
 function StandardNode() {
 
 	Node.call( this );
@@ -15,7 +15,7 @@ function StandardNode() {
 	this.roughness = new FloatNode( 0.5 );
 	this.metalness = new FloatNode( 0.5 );
 
-};
+}
 
 StandardNode.prototype = Object.create( Node.prototype );
 StandardNode.prototype.constructor = StandardNode;
@@ -191,7 +191,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var output = [
 			"#include <clipping_planes_fragment>",
-		
+
 			// add before: prevent undeclared normal
 			"	#include <normal_fragment_begin>",
 
@@ -217,9 +217,9 @@ StandardNode.prototype.build = function ( builder ) {
 			output.push(
 				alpha.code,
 				'#ifdef ALPHATEST',
-				
-					'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
-					
+
+				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+
 				'#endif'
 			);
 
@@ -231,7 +231,7 @@ StandardNode.prototype.build = function ( builder ) {
 				normal.code,
 				'normal = ' + normal.result + ';'
 			);
-		
+
 		}
 
 		// optimization for now
@@ -359,7 +359,7 @@ StandardNode.prototype.build = function ( builder ) {
 			output.push( "radiance += " + environment.result + ";" );
 
 		}
-		
+
 		output.push(
 			"#include <lights_fragment_end>"
 		);
@@ -393,9 +393,9 @@ StandardNode.prototype.build = function ( builder ) {
 };
 
 StandardNode.prototype.copy = function ( source ) {
-			
+
 	Node.prototype.copy.call( this, source );
-	
+
 	// vertex
 
 	if ( source.position ) this.position = source.position;
@@ -419,7 +419,7 @@ StandardNode.prototype.copy = function ( source ) {
 	if ( source.shadow ) this.shadow = source.shadow;
 
 	if ( source.ao ) this.ao = source.ao;
-	
+
 	if ( source.emissive ) this.emissive = source.emissive;
 	if ( source.ambient ) this.ambient = source.ambient;
 
@@ -458,7 +458,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.shadow ) data.shadow = this.shadow.toJSON( meta ).uuid;
 
 		if ( this.ao ) data.ao = this.ao.toJSON( meta ).uuid;
-		
+
 		if ( this.emissive ) data.emissive = this.emissive.toJSON( meta ).uuid;
 		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
 

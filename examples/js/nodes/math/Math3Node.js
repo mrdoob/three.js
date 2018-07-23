@@ -1,7 +1,7 @@
 /**
  * @author sunag / http://www.sunag.com.br/
  */
- 
+
 import { TempNode } from '../core/TempNode.js';
 
 function Math3Node( a, b, c, method ) {
@@ -14,7 +14,7 @@ function Math3Node( a, b, c, method ) {
 
 	this.method = method;
 
-};
+}
 
 Math3Node.MIX = 'mix';
 Math3Node.REFRACT = 'refract';
@@ -32,13 +32,13 @@ Math3Node.prototype.getType = function ( builder ) {
 	var c = builder.getTypeLength( this.c.getType( builder ) );
 
 	if ( a > b && a > c ) {
-		
+
 		return this.a.getType( builder );
-		
+
 	} else if ( b > c ) {
-		
+
 		return this.b.getType( builder );
-		
+
 	}
 
 	return this.c.getType( builder );
@@ -58,27 +58,27 @@ Math3Node.prototype.generate = function ( builder, output ) {
 	switch ( this.method ) {
 
 		case Math3Node.REFRACT:
-		
+
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
 			c = this.c.build( builder, 'f' );
-			
+
 			break;
 
 		case Math3Node.MIX:
-		
+
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
 			c = this.c.build( builder, cl === 1 ? 'f' : type );
-			
+
 			break;
 
 		default:
-		
+
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
 			c = this.c.build( builder, type );
-			
+
 			break;
 
 	}
@@ -88,14 +88,14 @@ Math3Node.prototype.generate = function ( builder, output ) {
 };
 
 Math3Node.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.a = source.a;
 	this.b = source.b;
 	this.c = source.c;
 	this.method = source.method;
-	
+
 };
 
 Math3Node.prototype.toJSON = function ( meta ) {

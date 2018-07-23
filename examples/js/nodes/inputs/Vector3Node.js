@@ -11,7 +11,7 @@ function Vector3Node( x, y, z ) {
 
 	this.value = x instanceof THREE.Vector3 ? x : new THREE.Vector3( x, y, z );
 
-};
+}
 
 Vector3Node.prototype = Object.create( InputNode.prototype );
 Vector3Node.prototype.constructor = Vector3Node;
@@ -26,11 +26,11 @@ Vector3Node.prototype.generateReadonly = function ( builder, output, uuid, type,
 };
 
 Vector3Node.prototype.copy = function ( source ) {
-			
+
 	InputNode.prototype.copy.call( this, source );
-	
+
 	this.value.copy( source );
-	
+
 };
 
 Vector3Node.prototype.toJSON = function ( meta ) {

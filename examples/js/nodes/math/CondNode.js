@@ -1,7 +1,7 @@
 /**
  * @author sunag / http://www.sunag.com.br/
  */
- 
+
 import { TempNode } from '../core/TempNode.js';
 
 function CondNode( a, b, ifNode, elseNode, op ) {
@@ -10,13 +10,13 @@ function CondNode( a, b, ifNode, elseNode, op ) {
 
 	this.a = a;
 	this.b = b;
-	
+
 	this.ifNode = ifNode;
 	this.elseNode = elseNode;
 
 	this.op = op;
 
-};
+}
 
 CondNode.EQUAL = '==';
 CondNode.NOT_EQUAL = '!=';
@@ -61,25 +61,25 @@ CondNode.prototype.generate = function ( builder, output ) {
 		b = this.b.build( builder, condType ),
 		ifNode = this.ifNode.build( builder, type ),
 		elseNode = this.elseNode.build( builder, type );
-	
-	var code = '( ' + [ a, this.op, b, '?', ifNode, ':', elseNode ].join(' ') + ' )';
+
+	var code = '( ' + [ a, this.op, b, '?', ifNode, ':', elseNode ].join( ' ' ) + ' )';
 
 	return builder.format( code, this.getType( builder ), output );
 
 };
 
 CondNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.a = source.a;
 	this.b = source.b;
-	
+
 	this.ifNode = source.ifNode;
 	this.elseNode = source.elseNode;
-	
+
 	this.op = source.op;
-	
+
 };
 
 CondNode.prototype.toJSON = function ( meta ) {
@@ -92,7 +92,7 @@ CondNode.prototype.toJSON = function ( meta ) {
 
 		data.a = this.a.toJSON( meta ).uuid;
 		data.b = this.b.toJSON( meta ).uuid;
-		
+
 		data.ifNode = this.ifNode.toJSON( meta ).uuid;
 		data.elseNode = this.elseNode.toJSON( meta ).uuid;
 

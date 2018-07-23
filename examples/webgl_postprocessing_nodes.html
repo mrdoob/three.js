@@ -41,12 +41,12 @@
 
 			var camera, scene, renderer;
 			var object, light, nodepost;
-			var gui, guiElements = [];
+			var gui;
 
 			var clock = new THREE.Clock();
 			var frame = new THREE.NodeFrame();
 
-			var param = { example: new URL(window.location.href).searchParams.get('e') || 'color-adjustment' };
+			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'color-adjustment' };
 
 			var textureLoader = new THREE.TextureLoader();
 
@@ -134,7 +134,7 @@
 					case 'color-adjustment':
 
 						// POST
-					
+
 						var screen = new THREE.ScreenNode();
 
 						var hue = new THREE.FloatNode();
@@ -369,27 +369,27 @@
 					case 'motion-blur':
 
 						// POST
-					
+
 						var size = renderer.getDrawingBufferSize();
-						
+
 						var screen = new THREE.ScreenNode();
-						
+
 						var previousFrame = new THREE.RTTNode( size.width, size.height, screen );
-						
+
 						var motionBlur = new THREE.Math3Node(
 							previousFrame,
 							screen,
-							new THREE.FloatNode(.5),
+							new THREE.FloatNode( .5 ),
 							THREE.Math3Node.MIX
 						);
-						
+
 						var currentFrame = new THREE.RTTNode( size.width, size.height, motionBlur );
 						currentFrame.saveTo = previousFrame;
-						
+
 						nodepost.output = currentFrame;
-						
+
 						break;
-						
+
 					case 'mosaic':
 
 						// POST
@@ -480,15 +480,16 @@
 				nodepost.needsUpdate = true;
 
 				// test serialization
-/*
-				var library = {};
-				library[ lensflare2.uuid ] = lensflare2;
-				library[ decalNormal.uuid ] = decalNormal;
+				/*
+							var library = {};
+							library[ lensflare2.uuid ] = lensflare2;
+							library[ decalNormal.uuid ] = decalNormal;
 
-				var json = nodepost.toJSON();
+							var json = nodepost.toJSON();
 
-				nodepost.output = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
-*/
+							nodepost.output = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
+						*/
+
 			}
 
 			function init() {
@@ -558,10 +559,11 @@
 				object.rotation.y += 0.01;
 
 				frame.update( delta );
-				
+
 				nodepost.render( scene, camera, frame );
 
 			}
+
 
 		</script>
 

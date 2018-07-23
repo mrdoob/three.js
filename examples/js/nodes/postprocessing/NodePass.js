@@ -22,7 +22,7 @@ function NodePass() {
 
 	this.needsUpdate = true;
 
-};
+}
 
 NodePass.prototype = Object.create( THREE.ShaderPass.prototype );
 NodePass.prototype.constructor = NodePass;
@@ -46,9 +46,9 @@ NodePass.prototype.render = function () {
 };
 
 NodePass.prototype.copy = function ( source ) {
-	
+
 	this.input = source.input;
-	
+
 };
 
 NodePass.prototype.toJSON = function ( meta ) {
