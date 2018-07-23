@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - camera center</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			color: #000;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			font-weight: bold;
+
+			background-color: #fff;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		#info {
+			color:#000;
+			position: absolute;
+			top: 0px; width: 100%;
+			padding: 5px;
+
+		}
+
+		a {
+			color: red;
+		}
+	</style>
+</head>
+
+<body>
+<div id="info">
+	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - camera center example
+</div>
+
+<script src="../build/three.js"></script>
+<script src="js/controls/MapControls.js"></script>
+<script src="js/math/CameraViewBox.js"></script>
+<script src="js/Detector.js"></script>
+
+<script src='js/libs/dat.gui.min.js'></script>
+
+<script>
+
+    if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+    var camera, controls, scene, renderer, cameraViewBox, selection, isDraging, meshes, material, selectedMaterial,
+		floorPlane, mouse, raycaster, settings;
+
+    init();
+    //render(); // remove when using next line for animation loop (requestAnimationFrame)
+    animate();
+
+    function init() {
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0xcccccc );
+        scene.fog = new THREE.FogExp2( 0xcccccc, 0.001 );
+
+        renderer = new THREE.WebGLRenderer( { antialias: true } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+
+        camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera.position.set( -400, 200, 0 );
+
+
+        // controls
+
+        controls = new THREE.MapControls( camera, renderer.domElement );
+
+        //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+
+        controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+        controls.dampingFactor = 0.25;
+
+        controls.screenSpacePanning = false;
+
+        controls.minDistance = 1;
+        controls.maxDistance = 5000;
+
+        controls.maxPolarAngle = Math.PI / 2;
+
+        // world
+
+        var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+        geometry.translate( 0, 0.5, 0 );
+        material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, opacity: 0.7, transparent: true } );
+        selectedMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, flatShading: true, wireframe: true } );
+
+        meshes = [];
+        for ( var i = 0; i < 500; i ++ ) {
+
+            var mesh = new THREE.Mesh( geometry, material );
+            mesh.position.x = Math.random() * 1600 - 800;
+            mesh.position.y = 0;
+            mesh.position.z = Math.random() * 1600 - 800;
+            mesh.scale.x = 20;
+            mesh.scale.y = Math.random() * 80 + 10;
+            mesh.scale.z = 20;
+            mesh.updateMatrix();
+            mesh.matrixAutoUpdate = false;
+            scene.add( mesh );
+
+            meshes.push(mesh);
+        }
+
+        // lights
+
+        var light = new THREE.DirectionalLight( 0xffffff );
+        light.position.set( 1, 1, 1 );
+        scene.add( light );
+
+        var light = new THREE.DirectionalLight( 0x002288 );
+        light.position.set( - 1, - 1, - 1 );
+        scene.add( light );
+
+        var light = new THREE.AmbientLight( 0x222222 );
+        scene.add( light );
+
+        //
+        floorPlane = new THREE.Plane(new THREE.Vector3(0, 1,0));
+        selection = new Set();
+        isDraging = false;
+        cameraViewBox = new THREE.CameraViewBox();
+        cameraViewBox.setViewFromCamera(camera);
+
+        raycaster = new THREE.Raycaster();
+        mouse = new THREE.Vector2();
+
+        window.addEventListener( 'resize', onWindowResize, false );
+        renderer.domElement.addEventListener('mousedown', onMouseDown, false );
+        window.addEventListener('mousemove', onMouseMove, false );
+        window.addEventListener('mouseup', onMouseUp, false );
+
+        var gui = new dat.GUI();
+
+        settings = {
+            fitRatio: 1,
+			useCameraViewBox: true,
+        };
+
+        gui.add(settings, 'fitRatio', 1, 5, 0.1).onFinishChange((value) => {
+            settings.fitRatio = value;
+
+            centerOnSelection();
+		});
+
+        gui.add(settings, 'useCameraViewBox').onFinishChange((value) => {
+            settings.useCameraViewBox = value;
+
+            centerOnSelection();
+		});
+    }
+
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+    }
+
+    function animate() {
+
+        requestAnimationFrame( animate );
+
+        controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+
+        render();
+
+    }
+
+    function render() {
+
+        renderer.render( scene, camera );
+
+    }
+    function onMouseDown() {
+        isDraging = false;
+    }
+
+    function onMouseMove() {
+        isDraging = true;
+    }
+
+    function onMouseUp(event) {
+        if (isDraging) {
+            isDraging = false;
+            return;
+        } else {
+            isDraging = false;
+        }
+
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        raycaster.setFromCamera( mouse, camera );
+
+        var intersects = raycaster.intersectObjects( meshes );
+        if (intersects.length > 0) {
+            var mesh = intersects[0].object;
+
+            if (selection.has(mesh)) {
+                mesh.material = material;
+                selection.delete(mesh);
+            } else {
+                mesh.material = selectedMaterial;
+                selection.add(mesh);
+            }
+
+            centerOnSelection();
+        }
+    }
+
+    function centerOnSelection() {
+		if (selection.size === 0) {
+		    return;
+		}
+
+		if (settings.useCameraViewBox) {
+            cameraViewBox.setViewFromCamera(camera);
+            cameraViewBox.setFitRatio(settings.fitRatio);
+            cameraViewBox.setFromObjects(Array.from(selection));
+            cameraViewBox.getCameraPositionAndTarget(camera.position, controls.target, floorPlane);
+            controls.update();
+		} else {
+            naiveCenterOnSelection();
+		}
+	}
+
+	function naiveCenterOnSelection( ) {
+
+        var boundingBox = new THREE.Box3();
+
+        // get bounding box of object - this will be used to setup controls and camera
+        Array.from(selection).forEach(function (object) {
+            boundingBox.expandByObject(object);
+        });
+
+        var currentDirection = controls.target.clone().sub(camera.position);
+
+        boundingBox.getCenter(controls.target);
+
+        var size = boundingBox.getSize(new THREE.Vector3());
+
+        var maxSize = Math.max(size.x, size.y, size.z);
+        var fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+        var fitWidthDistance = fitHeightDistance / camera.aspect;
+
+        var distance = settings.fitRatio * Math.max(fitHeightDistance, fitWidthDistance);
+
+        var direction = currentDirection.normalize().multiplyScalar(distance);
+
+        camera.position.copy(controls.target).sub(direction);
+
+        var ray = new THREE.Ray();
+        ray.origin.copy( position );
+        ray.direction.copy( this.viewBasis.z ).negate();
+        if ( ray.intersectPlane( plane, target ) === null ) {
+
+            ray.direction.negate();
+            ray.intersectPlane( plane, target );
+
+        }
+
+
+        controls.update();
+    }
+
+</script>
+
+</body>
+</html>

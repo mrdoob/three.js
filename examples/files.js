@@ -334,6 +334,7 @@ var files = {
 		"misc_animation_authoring",
 		"misc_animation_groups",
 		"misc_animation_keys",
+		"misc_camera_center",
 		"misc_controls_deviceorientation",
 		"misc_controls_fly",
 		"misc_controls_map",
