@@ -96,24 +96,27 @@ THREE.STLLoader.prototype = {
 
 			for ( var off = 0; off < 5; off ++ ) {
 
-				// Check if solid[ i ] matches the i-th byte at the current offset
+				// If "solid" text is matched to the current offset, declare it to be an ASCII STL.
 
-				var found = true;
-				for ( var i = 0; found && i < 5; i ++ ) {
-
-					found = found && ( solid[ i ] == reader.getUint8( off + i, false ) );
-
-				}
-
-				// Found "solid" text at the beginning; declare it to be an ASCII STL.
-
-				if ( found ) {
-					return false;
-				}
+				if ( matchDataViewAt ( solid, reader, off ) ) return false;
 
 			}
 
 			// Couldn't find "solid" text at the beginning; it is binary STL.
+
+			return true;
+
+		}
+
+		function matchDataViewAt( query, reader, offset ) {
+
+			// Check if each byte in query matches the corresponding byte from the current offset
+
+			for ( var i = 0, il = query.length; i < il; i ++ ) {
+
+				if ( query[ i ] !== reader.getUint8( offset + i, false ) ) return false;
+
+			}
 
 			return true;
 
