@@ -31,8 +31,6 @@ function AnimationClip( name, duration, tracks ) {
 
 	}
 
-	this.optimize();
-
 }
 
 function getTrackTypeForValueTypeName( typeName ) {
