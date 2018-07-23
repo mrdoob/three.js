@@ -245,11 +245,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			// Check boundingBox before continuing
 
-			if ( geometry.boundingBox !== null ) {
-
-				if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
-
-			}
+			if ( geometry.boundingBox === null ) geometry.computeBoundingBox();
+			
+			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 			var intersection;
 
