@@ -61,6 +61,7 @@
 			grass: { url: 'textures/terrain/grasslight-big.jpg' },
 			grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg' },
 			decalDiffuse: { url: 'textures/decal/decal-diffuse.png' },
+			decalNormal: { url: 'textures/decal/decal-normal.jpg' },
 			cloud: { url: 'textures/lava/cloud.png' },
 			spherical: { url: 'textures/envmap.png' }
 		};
@@ -420,10 +421,10 @@
 					
 						// default syntax ( backward-compatible )
 					
-						mtl.map = getTexture( "brick" );
+						mtl.map = oldMaterial ? oldMaterial.map : getTexture( "brick" );
 						
-						mtl.normalMap = getTexture( "grassNormal" );
-						mtl.normalScale = new THREE.Vector2( .3, -.3 );
+						mtl.normalMap = oldMaterial ? oldMaterial.normalMap : getTexture( "decalNormal" );
+						mtl.normalScale = new THREE.Vector2( .5, .5 );
 						
 						mtl.envMap = cubemap;
 						
@@ -472,11 +473,39 @@
 
 					}, false, 0, 1 );
 					
+					addGui( 'normalX', mtl.normalScale.x, function ( val ) {
+
+						mtl.normalScale.x = val;
+
+					}, false, -1, 1 );
+					
+					addGui( 'normalY', mtl.normalScale.y, function ( val ) {
+
+						mtl.normalScale.y = val;
+
+					}, false, -1, 1 );
+					
 					addGui( 'sat. (node)', sataturation.value, function ( val ) {
 
 						sataturation.value = val;
 
 					}, false, 0, 2 );
+					
+					addGui( 'colors', true, function ( val ) {
+
+						mtl.map = val ? getTexture( "brick" ) : undefined;
+						
+						mtl.needsUpdate = true;
+
+					}, false );
+					
+					addGui( 'normals', true, function ( val ) {
+
+						mtl.normalMap = val ? getTexture( "decalNormal" ) : undefined;
+						
+						mtl.needsUpdate = true;
+
+					}, false );
 					
 					break;
 					
@@ -2593,8 +2622,7 @@
 
 			// update material animation and/or gpu calcs (pre-renderer)
 			
-			frame.update( delta );
-			frame.setRenderer( renderer );
+			frame.update( delta ).setRenderer( renderer );
 			
 			if ( mesh.material instanceof THREE.NodeMaterial ) {
 			
