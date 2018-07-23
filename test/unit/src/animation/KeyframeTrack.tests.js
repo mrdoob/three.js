@@ -111,15 +111,11 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'validate', ( assert ) => {
 
-			var track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
+			var validTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 0.5 ] );
+			var invalidTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
 
-			track.isValidated = true;
-			assert.ok( track.validate() );
-			assert.ok( track.isValidated );
-
-			track.isValidated = false;
-			assert.notOk( track.validate() );
-			assert.notOk( track.isValidated );
+			assert.ok( validTrack.validate() );
+			assert.notOk( invalidTrack.validate() );
 
 		} );
 
@@ -129,15 +125,10 @@ export default QUnit.module( 'Animation', () => {
 
 			assert.equal( track.values.length, 5 );
 
-			track.isOptimized = true;
 			track.optimize();
 
-			assert.equal( track.values.length, 5 );
-
-			track.isOptimized = false;
-			track.optimize();
-
-			assert.equal( track.values.length, 3 );
+			assert.smartEqual( Array.from( track.times ), [ 0, 3, 4 ] );
+			assert.smartEqual( Array.from( track.values ), [ 0, 0, 1 ] );
 
 		} );
 
