@@ -92,6 +92,7 @@ export var LuminanceAlphaFormat = 1025;
 export var RGBEFormat = RGBAFormat;
 export var DepthFormat = 1026;
 export var DepthStencilFormat = 1027;
+export var RedFormat = 1028;
 export var RGB_S3TC_DXT1_Format = 33776;
 export var RGBA_S3TC_DXT1_Format = 33777;
 export var RGBA_S3TC_DXT3_Format = 33778;

@@ -844,6 +844,19 @@ function WebGLState( gl, extensions, utils ) {
 
 	}
 
+    function texImage3D() {
+
+        try {
+
+            gl.texImage3D.apply( gl, arguments );
+
+        } catch ( error ) {
+
+            console.error( 'THREE.WebGLState:', error );
+
+        }
+
+    }
 	//
 
 	function scissor( scissor ) {
@@ -936,6 +949,7 @@ function WebGLState( gl, extensions, utils ) {
 		bindTexture: bindTexture,
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
+        texImage3D: texImage3D,
 
 		scissor: scissor,
 		viewport: viewport,
