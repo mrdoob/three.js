@@ -409,7 +409,9 @@
 
 						// MATERIAL
 
-						var sataturation = new THREE.FloatNode( 1 );
+						var sataturation = new THREE.FloatNode( 1 ),
+							useMap = true,
+							useNormals = true;
 
 						function updateMaterial( useNodeMaterial ) {
 
@@ -421,9 +423,9 @@
 
 							// default syntax ( backward-compatible )
 
-							mtl.map = oldMaterial ? oldMaterial.map : getTexture( "brick" );
+							mtl.map = useMap ? getTexture( "brick" ) : undefined;
 
-							mtl.normalMap = oldMaterial ? oldMaterial.normalMap : getTexture( "decalNormal" );
+							mtl.normalMap = useNormals ? getTexture( "decalNormal" ) : undefined;
 							mtl.normalScale = new THREE.Vector2( .5, .5 );
 
 							mtl.envMap = cubemap;
@@ -491,17 +493,21 @@
 
 						}, false, 0, 2 );
 
-						addGui( 'colors', true, function ( val ) {
+						addGui( 'colors', useMap, function ( val ) {
 
-							mtl.map = val ? getTexture( "brick" ) : undefined;
+							useMap = val;
+
+							mtl.map = useMap ? getTexture( "brick" ) : undefined;
 
 							mtl.needsUpdate = true;
 
 						}, false );
 
-						addGui( 'normals', true, function ( val ) {
+						addGui( 'normals', useNormals, function ( val ) {
 
-							mtl.normalMap = val ? getTexture( "decalNormal" ) : undefined;
+							useNormals = val;
+
+							mtl.normalMap = useNormals ? getTexture( "decalNormal" ) : undefined;
 
 							mtl.needsUpdate = true;
 
