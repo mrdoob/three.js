@@ -72,13 +72,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		} else if ( geometry.isGeometry ) {
 
-			if ( geometry._bufferGeometry === undefined ) {
-
-				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
-
-			}
-
-			buffergeometry = geometry._bufferGeometry;
+			buffergeometry = new BufferGeometry().setFromObject( object );
 
 		}
 
