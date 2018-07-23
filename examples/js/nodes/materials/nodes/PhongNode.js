@@ -25,7 +25,6 @@ PhongNode.prototype.build = function ( builder ) {
 	var code;
 
 	builder.define( 'PHONG' );
-	builder.define( 'ALPHATEST', '0.0' );
 
 	builder.requires.lights = true;
 
@@ -49,7 +48,6 @@ PhongNode.prototype.build = function ( builder ) {
 
 			"#endif",
 
-			"#include <common>",
 			//"#include <encodings_pars_fragment>", // encoding functions
 			"#include <fog_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
@@ -148,7 +146,6 @@ PhongNode.prototype.build = function ( builder ) {
 		builder.requires.transparent = alpha != undefined;
 
 		builder.addParsCode( [
-			"#include <common>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
 			"#include <lights_pars_begin>",
@@ -183,7 +180,11 @@ PhongNode.prototype.build = function ( builder ) {
 
 			output.push(
 				alpha.code,
-				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;'
+				'#ifdef ALPHATEST',
+				
+					'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+					
+				'#endif'
 			);
 
 		}

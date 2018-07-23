@@ -26,7 +26,6 @@ StandardNode.prototype.build = function ( builder ) {
 	var code;
 
 	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
-	builder.define( 'ALPHATEST', '0.0' );
 
 	builder.requires.lights = true;
 
@@ -52,7 +51,6 @@ StandardNode.prototype.build = function ( builder ) {
 
 			"#endif",
 
-			"#include <common>",
 			//"#include <encodings_pars_fragment>", // encoding functions
 			"#include <fog_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
@@ -181,7 +179,6 @@ StandardNode.prototype.build = function ( builder ) {
 
 			"#endif",
 
-			"#include <common>",
 			"#include <dithering_pars_fragment>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
@@ -219,7 +216,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push(
 				alpha.code,
-				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;'
+				'#ifdef ALPHATEST',
+				
+					'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+					
+				'#endif'
 			);
 
 		}

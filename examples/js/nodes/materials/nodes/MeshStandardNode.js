@@ -75,6 +75,10 @@ MeshStandardNode.prototype.build = function ( builder ) {
 			this.normal = new NormalMapNode( builder.resolve( props.normalMap ) );
 			this.normal.scale = builder.findNode( props.normalScale, inputs.normalScale );
 
+		} else {
+			
+			this.normal = undefined;
+			
 		}
 
 		// slots

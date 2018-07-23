@@ -10,7 +10,7 @@ function Math1Node( a, method ) {
 
 	this.a = a;
 
-	this.method = method || Math1Node.SIN;
+	this.method = method;
 
 };
 

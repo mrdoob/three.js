@@ -12,7 +12,7 @@ function Math3Node( a, b, c, method ) {
 	this.b = b;
 	this.c = c;
 
-	this.method = method || Math3Node.MIX;
+	this.method = method;
 
 };
 

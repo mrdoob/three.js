@@ -64,7 +64,7 @@ function NodeBuilder() {
 	this.attributes = {};
 	
 	this.prefixCode = [
-		"#ifdef GL_EXT_shader_texture_lod",
+		"#ifdef TEXTURE_LOD_EXT",
 
 		"	#define texCube(a, b) textureCube(a, b)",
 		"	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)",
@@ -82,7 +82,8 @@ function NodeBuilder() {
 
 		"#endif",
 
-		"#include <packing>"
+		"#include <packing>",
+		"#include <common>"
 
 	].join( "\n" );
 	
@@ -817,30 +818,30 @@ NodeBuilder.prototype = {
 
 		switch ( typeToType ) {
 
-			case 'f <- v2': return code + '.x';
-			case 'f <- v3': return code + '.x';
-			case 'f <- v4': return code + '.x';
-			case 'f <- i': return 'float( ' + code + ' )';
+			case 'f <- v2' : return code + '.x';
+			case 'f <- v3' : return code + '.x';
+			case 'f <- v4' : return code + '.x';
+			case 'f <- i'  : return 'float( ' + code + ' )';
 
-			case 'v2 <- f': return 'vec2( ' + code + ' )';
+			case 'v2 <- f' : return 'vec2( ' + code + ' )';
 			case 'v2 <- v3': return code + '.xy';
 			case 'v2 <- v4': return code + '.xy';
-			case 'v2 <- i': return 'vec2( float( ' + code + ' ) )';
+			case 'v2 <- i' : return 'vec2( float( ' + code + ' ) )';
 
-			case 'v3 <- f': return 'vec3( ' + code + ' )';
+			case 'v3 <- f' : return 'vec3( ' + code + ' )';
 			case 'v3 <- v2': return 'vec3( ' + code + ', 0.0 )';
 			case 'v3 <- v4': return code + '.xyz';
-			case 'v3 <- i': return 'vec2( float( ' + code + ' ) )';
+			case 'v3 <- i' : return 'vec2( float( ' + code + ' ) )';
 
-			case 'v4 <- f': return 'vec4( ' + code + ' )';
+			case 'v4 <- f' : return 'vec4( ' + code + ' )';
 			case 'v4 <- v2': return 'vec4( ' + code + ', 0.0, 1.0 )';
 			case 'v4 <- v3': return 'vec4( ' + code + ', 1.0 )';
-			case 'v4 <- i': return 'vec4( float( ' + code + ' ) )';
+			case 'v4 <- i' : return 'vec4( float( ' + code + ' ) )';
 
-			case 'i <- f': return 'int( ' + code + ' )';
-			case 'i <- v2': return 'int( ' + code + '.x )';
-			case 'i <- v3': return 'int( ' + code + '.x )';
-			case 'i <- v4': return 'int( ' + code + '.x )';
+			case 'i <- f'  : return 'int( ' + code + ' )';
+			case 'i <- v2' : return 'int( ' + code + '.x )';
+			case 'i <- v3' : return 'int( ' + code + '.x )';
+			case 'i <- v4' : return 'int( ' + code + '.x )';
 
 		}
 

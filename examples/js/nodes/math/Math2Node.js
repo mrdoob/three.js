@@ -11,7 +11,7 @@ function Math2Node( a, b, method ) {
 	this.a = a;
 	this.b = b;
 
-	this.method = method || Math2Node.DISTANCE;
+	this.method = method;
 
 };
 

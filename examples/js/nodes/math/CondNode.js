@@ -14,7 +14,7 @@ function CondNode( a, b, ifNode, elseNode, op ) {
 	this.ifNode = ifNode;
 	this.elseNode = elseNode;
 
-	this.op = op || CondNode.EQUAL;
+	this.op = op;
 
 };
 

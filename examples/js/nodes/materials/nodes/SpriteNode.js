@@ -23,7 +23,6 @@ SpriteNode.prototype.build = function ( builder ) {
 	var output, code;
 
 	builder.define( 'SPRITE' );
-	builder.define( 'ALPHATEST', '0.0' );
 
 	builder.requires.lights = false;
 	builder.requires.transparent = this.alpha !== undefined;
@@ -37,7 +36,6 @@ SpriteNode.prototype.build = function ( builder ) {
 		] ) );
 
 		builder.addParsCode( [
-			"#include <common>",
 			"#include <fog_pars_vertex>",
 			"#include <logdepthbuf_pars_vertex>",
 			"#include <clipping_planes_pars_vertex>"
@@ -113,7 +111,6 @@ SpriteNode.prototype.build = function ( builder ) {
 	} else {
 
 		builder.addParsCode( [
-			"#include <common>",
 			"#include <fog_pars_fragment>",
 			"#include <logdepthbuf_pars_fragment>",
 			"#include <clipping_planes_pars_fragment>"
@@ -139,7 +136,11 @@ SpriteNode.prototype.build = function ( builder ) {
 
 			output = [
 				alpha.code,
-				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+				'#ifdef ALPHATEST',
+				
+					'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+					
+				'#endif',
 				color.code,
 				"gl_FragColor = vec4( " + color.result + ", " + alpha.result + " );"
 			];
