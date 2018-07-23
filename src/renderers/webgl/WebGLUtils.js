@@ -51,7 +51,7 @@ function WebGLUtils( gl, extensions ) {
 		if ( p === LuminanceAlphaFormat ) return gl.LUMINANCE_ALPHA;
 		if ( p === DepthFormat ) return gl.DEPTH_COMPONENT;
 		if ( p === DepthStencilFormat ) return gl.DEPTH_STENCIL;
-        if ( p === RedFormat ) return gl.RED;
+		if ( p === RedFormat ) return gl.RED;
 
 		if ( p === AddEquation ) return gl.FUNC_ADD;
 		if ( p === SubtractEquation ) return gl.FUNC_SUBTRACT;
