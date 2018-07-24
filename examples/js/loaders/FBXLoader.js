@@ -2643,8 +2643,9 @@
 
 		}
 
+        var initialValueInRad = initialValue.map( THREE.Math.degToRad )
 		var times = getTimesForAllAxes( curves );
-		var values = getKeyframeTrackValues( times, curves, initialValue );
+		var values = getKeyframeTrackValues( times, curves, initialValueInRad );
 
 		if ( preRotations !== undefined ) {
 
