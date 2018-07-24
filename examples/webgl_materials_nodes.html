@@ -410,10 +410,11 @@
 						// MATERIAL
 
 						var sataturation = new THREE.FloatNode( 1 ),
+							useNodeMaterial = true,
 							useMap = true,
 							useNormals = true;
 
-						function updateMaterial( useNodeMaterial ) {
+						function updateMaterial() {
 
 							var oldMaterial = mtl;
 
@@ -458,9 +459,11 @@
 
 						// GUI
 
-						addGui( 'use node material', true, function ( val ) {
+						addGui( 'use node material', useNodeMaterial, function ( val ) {
 
-							updateMaterial( val );
+							useNodeMaterial = val;
+
+							updateMaterial();
 
 						} );
 
@@ -498,9 +501,7 @@
 
 							useMap = val;
 
-							mtl.map = useMap ? getTexture( "brick" ) : undefined;
-
-							mtl.needsUpdate = true;
+							updateMaterial();
 
 						}, false );
 
@@ -508,9 +509,7 @@
 
 							useNormals = val;
 
-							mtl.normalMap = useNormals ? getTexture( "decalNormal" ) : undefined;
-
-							mtl.needsUpdate = true;
+							updateMaterial();
 
 						}, false );
 
