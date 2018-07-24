@@ -124,7 +124,6 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.alpha ) this.alpha.parse( builder );
 
 		if ( this.normal ) this.normal.parse( builder );
-		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
 		if ( this.clearCoat ) this.clearCoat.parse( builder );
 		if ( this.clearCoatRoughness ) this.clearCoatRoughness.parse( builder );
@@ -149,7 +148,6 @@ StandardNode.prototype.build = function ( builder ) {
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
-		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
 		var clearCoat = this.clearCoat ? this.clearCoat.buildCode( builder, 'f' ) : undefined;
 		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.buildCode( builder, 'f' ) : undefined;
