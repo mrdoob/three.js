@@ -59,7 +59,7 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.VIEW:
 
-			result = 'vNormal';
+			result = 'normal';
 
 			break;
 
