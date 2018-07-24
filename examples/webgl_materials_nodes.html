@@ -427,7 +427,7 @@
 							mtl.map = useMap ? getTexture( "brick" ) : undefined;
 
 							mtl.normalMap = useNormals ? getTexture( "decalNormal" ) : undefined;
-							mtl.normalScale = new THREE.Vector2( .5, .5 );
+							mtl.normalScale = oldMaterial ? oldMaterial.normalScale : new THREE.Vector2( .5, .5 );
 
 							mtl.envMap = cubemap;
 
