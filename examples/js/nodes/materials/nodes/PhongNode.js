@@ -110,7 +110,6 @@ PhongNode.prototype.build = function ( builder ) {
 		if ( this.alpha ) this.alpha.parse( builder );
 
 		if ( this.normal ) this.normal.parse( builder );
-		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
 		if ( this.light ) this.light.parse( builder, { cache: 'light' } );
 
@@ -131,7 +130,6 @@ PhongNode.prototype.build = function ( builder ) {
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
-		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
 		var light = this.light ? this.light.buildCode( builder, 'v3', { cache: 'light' } ) : undefined;
 
