@@ -263,16 +263,17 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-		}
-		if ( skinIndices !== undefined ) {
+			if ( skinIndices !== undefined ) {
 
-			scope.skinIndices.push( new Vector4( skinIndices[ k ], skinIndices[ k + 1 ], skinIndices[ k + 2 ], skinIndices[ k + 3 ] ) );
+				scope.skinIndices.push( new Vector4( skinIndices[ k ], skinIndices[ k + 1 ], skinIndices[ k + 2 ], skinIndices[ k + 3 ] ) );
 
-		}
+			}
 
-		if ( skinWeights !== undefined ) {
+			if ( skinWeights !== undefined ) {
 
-			scope.skinWeights.push( new Vector4( skinWeights[ k ], skinWeights[ k + 1 ], skinWeights[ k + 2 ], skinWeights[ k + 3 ] ) );
+				scope.skinWeights.push( new Vector4( skinWeights[ k ], skinWeights[ k + 1 ], skinWeights[ k + 2 ], skinWeights[ k + 3 ] ) );
+
+			}
 
 		}
 
@@ -280,18 +281,20 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( morphAttributes.position ) {
 
-			for ( const morphTargetAttribute of morphAttributes.position ) {
+			for ( var i = 0; i < morphAttributes.position.length; i ++ ) {
 
-				const morphTarget = {
+				var morphTargetAttribute = morphAttributes.position[ i ];
+
+				var morphTarget = {
 					name: morphTargetAttribute.name,
 					vertices: []
 				};
 
-				const array = morphTargetAttribute.array;
+				var array = morphTargetAttribute.array;
 
-				for ( let index = 0; index < morphTargetAttribute.array.length; index += 3 ) {
+				for ( var j = 0; j < array.length; j += 3 ) {
 
-					morphTarget.vertices.push( new Vector3( array[ index ], array[ index + 1 ], array[ index + 2 ] ) );
+					morphTarget.vertices.push( new Vector3( array[ j ], array[ j + 1 ], array[ j + 2 ] ) );
 
 				}
 
@@ -303,18 +306,20 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( morphAttributes.normal ) {
 
-			for ( const morphNormalAttribute of morphAttributes.normal ) {
+			for ( var i = 0; i < morphAttributes.normal.length; i ++ ) {
 
-				const morphNormal = {
+				var morphNormalAttribute = morphAttributes.normal[ i ];
+
+				var morphNormal = {
 					name: morphNormalAttribute.name,
 					normals: []
 				};
 
-				const array = morphNormalAttribute.array;
+				var array = morphNormalAttribute.array;
 
-				for ( let index = 0; index < morphNormalAttribute.array.length; index += 3 ) {
+				for ( var j = 0; j < array.length; j += 3 ) {
 
-					morphNormal.normals.push( new Vector3( array[ index ], array[ index + 1 ], array[ index + 2 ] ) );
+					morphNormal.normals.push( new Vector3( array[ j ], array[ j + 1 ], array[ j + 2 ] ) );
 
 				}
 
