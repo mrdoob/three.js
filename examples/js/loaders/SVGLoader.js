@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author zz85 / http://joshuakoo.com/
+ * @author yomboprime / https://yombo.org
  */
 
 THREE.SVGLoader = function ( manager ) {
@@ -32,6 +33,10 @@ THREE.SVGLoader.prototype = {
 
 			if ( node.nodeType !== 1 ) return;
 
+			var transform = getNodeTransform( node );
+
+			var path = null;
+
 			switch ( node.nodeName ) {
 
 				case 'svg':
@@ -43,41 +48,49 @@ THREE.SVGLoader.prototype = {
 
 				case 'path':
 					style = parseStyle( node, style );
-					if ( node.hasAttribute( 'd' ) && isVisible( style ) ) paths.push( parsePathNode( node, style ) );
+					if ( node.hasAttribute( 'd' ) && isVisible( style ) ) path = parsePathNode( node, style );
 					break;
 
 				case 'rect':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parseRectNode( node, style ) );
+					if ( isVisible( style ) ) path = parseRectNode( node, style );
 					break;
 
 				case 'polygon':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parsePolygonNode( node, style ) );
+					if ( isVisible( style ) ) path = parsePolygonNode( node, style );
 					break;
 
 				case 'polyline':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parsePolylineNode( node, style ) );
+					if ( isVisible( style ) ) path = parsePolylineNode( node, style );
 					break;
 
 				case 'circle':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parseCircleNode( node, style ) );
+					if ( isVisible( style ) ) path = parseCircleNode( node, style );
 					break;
 
 				case 'ellipse':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parseEllipseNode( node, style ) );
+					if ( isVisible( style ) ) path = parseEllipseNode( node, style );
 					break;
 
 				case 'line':
 					style = parseStyle( node, style );
-					if ( isVisible( style ) ) paths.push( parseLineNode( node, style ) );
+					if ( isVisible( style ) ) path = parseLineNode( node, style );
 					break;
 
 				default:
 					console.log( node );
+
+			}
+
+			if ( path ) {
+
+				transformPath( path, currentTransform );
+
+				paths.push( path );
 
 			}
 
@@ -86,6 +99,12 @@ THREE.SVGLoader.prototype = {
 			for ( var i = 0; i < nodes.length; i ++ ) {
 
 				parseNode( nodes[ i ], style );
+
+			}
+
+			if ( transform ) {
+
+				currentTransform.copy( transformStack.pop() );
 
 			}
 
@@ -98,6 +117,10 @@ THREE.SVGLoader.prototype = {
 
 			var point = new THREE.Vector2();
 			var control = new THREE.Vector2();
+
+			var firstPoint = new THREE.Vector2();
+			var isFirstPoint = true;
+			var doSetFirstPoint = false;
 
 			var d = node.getAttribute( 'd' );
 
@@ -112,6 +135,11 @@ THREE.SVGLoader.prototype = {
 				var type = command.charAt( 0 );
 				var data = command.substr( 1 ).trim();
 
+				if ( isFirstPoint ) {
+					doSetFirstPoint = true;
+				}
+				isFirstPoint = false;
+
 				switch ( type ) {
 
 					case 'M':
@@ -121,7 +149,12 @@ THREE.SVGLoader.prototype = {
 							point.y = numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
-							path.moveTo( point.x, point.y );
+							if ( j === 0 ) {
+								path.moveTo( point.x, point.y );
+							}
+							else {
+								path.lineTo( point.x, point.y );
+							}
 						}
 						break;
 
@@ -249,7 +282,12 @@ THREE.SVGLoader.prototype = {
 							point.y += numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
-							path.moveTo( point.x, point.y );
+							if ( j === 0 ) {
+								path.moveTo( point.x, point.y );
+							}
+							else {
+								path.lineTo( point.x, point.y );
+							}
 						}
 						break;
 
@@ -375,21 +413,9 @@ THREE.SVGLoader.prototype = {
 						path.currentPath.autoClose = true;
 						if ( path.currentPath.curves.length > 0 ) {
 							// Reset point to beginning of Path
-							var curve = path.currentPath.curves[ 0 ];
-							if ( curve.isLineCurve ) {
-								point.x = curve.v1.x;
-								point.y = curve.v1.y;
-							} else if ( curve.isEllipseCurve || curve.isArcCurve ) {
-								point.x = curve.aX;
-								point.y = curve.aY;
-							} else if ( curve.isCubicBezierCurve || curve.isQuadraticBezierCurve ) {
-								point.x = curve.v0.x;
-								point.y = curve.v0.y;
-							} else if ( curve.isSplineCurve ) {
-								point.x = curve.points[ 0 ].x;
-								point.y = curve.points[ 0 ].y;
-							}
+							point.copy( firstPoint );
 							path.currentPath.currentPoint.copy( point );
+							isFirstPoint = true;
 						}
 						break;
 
@@ -400,6 +426,13 @@ THREE.SVGLoader.prototype = {
 
 				// console.log( type, parseFloats( data ), parseFloats( data ).length  )
 
+				if ( doSetFirstPoint ) {
+
+					firstPoint.copy( point );
+
+					doSetFirstPoint = false;
+
+				}
 			}
 
 			return path;
@@ -503,7 +536,13 @@ THREE.SVGLoader.prototype = {
 			if ( rx !== 0 || ry !== 0 ) {
 
 				path.bezierCurveTo( x, y + h, x, y + h, x, y + h - 2 * ry );
-				path.lineTo( x, y + 2 * ry );
+
+			}
+
+			path.lineTo( x, y + 2 * ry );
+
+			if ( rx !== 0 || ry !== 0 ) {
+
 				path.bezierCurveTo( x, y, x, y, x + 2 * rx, y );
 
 			}
@@ -683,6 +722,255 @@ THREE.SVGLoader.prototype = {
 
 			return array;
 
+
+		}
+
+		function getNodeTransform( node ) {
+
+			if ( ! node.hasAttribute( 'transform' ) ) {
+				return null;
+			}
+
+			var transform = parseTransformNode( node );
+
+			if ( transform ) {
+
+				if ( transformStack.length > 0 ) {
+					transform.premultiply( transformStack[ transformStack.length - 1 ] );
+				}
+
+				currentTransform.copy( transform );
+				transformStack.push( transform );
+
+			}
+
+			return transform;
+	
+		}
+
+		function parseTransformNode( node ) {
+
+			var transformAttr = node.getAttribute( 'transform' );
+			var transform = null;
+			var openParPos = transformAttr.indexOf( "(" );
+			var closeParPos = transformAttr.indexOf( ")" );
+
+			if ( openParPos > 0 && openParPos < closeParPos ) {
+
+				var transformType = transformAttr.substr( 0, openParPos );
+				
+				var array = parseFloats( transformAttr.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
+
+				switch ( transformType ) {
+					
+					case "translate":
+
+						if ( array.length >= 1 ) {
+
+							transform = new THREE.Matrix3();
+
+							var tx = array[ 0 ];
+							var ty = tx;
+
+							if ( array.length >= 2 ) {
+
+								ty = array[ 1 ];
+
+							}
+
+							transform.translate( tx, ty );
+
+						}
+
+						break;
+
+					case "rotate":
+
+						if ( array.length >= 1 ) {
+
+							var angle = 0;
+							var cx = 0;
+							var cy = 0;
+
+							transform = new THREE.Matrix3();
+
+							// Angle
+							angle = - array[ 0 ] * Math.PI / 180;
+
+							if ( array.length >= 3 ) {
+
+								// Center x, y
+								cx = array[ 1 ];
+								cy = array[ 2 ];
+
+							}
+
+							// Rotate around center (cx, cy)
+							tempTransform1.identity().translate( -cx, -cy );
+							tempTransform2.identity().rotate( angle );
+							tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
+							tempTransform1.identity().translate( cx, cy );
+							transform.multiplyMatrices( tempTransform1, tempTransform3 );
+
+						}
+
+						break;
+
+					case "scale":
+
+						if ( array.length >= 1 ) {
+
+							transform = new THREE.Matrix3();
+
+							var scaleX = array[ 0 ];
+							var scaleY = scaleX;
+
+							if ( array.length >= 2 ) {
+								scaleY = array[ 1 ];
+							}
+
+							transform.scale( scaleX, scaleY );
+
+						}
+
+						break;
+
+					case "skewX":
+
+						if ( array.length === 1 ) {
+
+							transform = new THREE.Matrix3();
+
+							transform.set(
+								1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
+								0, 1, 0,
+								0, 0, 1
+							);							
+
+						}
+
+						break;
+
+					case "skewY":
+
+						if ( array.length === 1 ) {
+
+							transform = new THREE.Matrix3();
+
+							transform.set(
+								1, 0, 0,
+								Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
+								0, 0, 1
+							);
+
+						}
+
+						break;
+
+					case "matrix":
+
+						if ( array.length === 6 ) {
+
+							transform = new THREE.Matrix3();
+
+							transform.set(
+								array[ 0 ], array[ 2 ], array[ 4 ],
+								array[ 1 ], array[ 3 ], array[ 5 ],
+								0, 0, 1
+							);
+
+						}
+
+						break;
+				}
+
+			}
+			
+			return transform;
+
+		}
+
+		function transformPath( path, m ) {
+
+			function transfVec2( v2 ) {
+
+				tempV3.set( v2.x, v2.y, 1 ).applyMatrix3( m );
+
+				v2.set( tempV3.x, tempV3.y );
+
+			}
+
+			var isRotated = isTransformRotated( m );
+
+			var tempV2 = new THREE.Vector2();
+			var tempV3 = new THREE.Vector3();
+
+			var subPaths = path.subPaths;
+
+			for ( var i = 0, n = subPaths.length; i < n; i++ ) {
+
+				var subPath = subPaths[ i ];
+				var curves = subPath.curves;
+
+				for ( var j = 0; j < curves.length; j++ ) {
+
+					var curve = curves[ j ];
+
+					if ( curve.isLineCurve ) {
+
+						transfVec2( curve.v1 );
+						transfVec2( curve.v2 );
+
+					}
+					else if ( curve.isCubicBezierCurve ) {
+
+						transfVec2( curve.v0 );
+						transfVec2( curve.v1 );
+						transfVec2( curve.v2 );
+						transfVec2( curve.v3 );
+
+					}
+					else if ( curve.isQuadraticBezierCurve ) {
+
+						transfVec2( curve.v0 );
+						transfVec2( curve.v1 );
+						transfVec2( curve.v2 );
+
+					}
+					else if ( curve.isEllipseCurve ) {
+
+						if ( isRotated ) {
+							console.warn( "SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented." );
+						}
+
+						tempV2.set( curve.aX, curve.aY );
+						transfVec2( tempV2 );
+						curve.aX = tempV2.x;
+						curve.aY = tempV2.y;
+
+						curve.xRadius *= getTransformScaleX( m );
+						curve.yRadius *= getTransformScaleY( m );
+
+					}
+
+				}
+	
+			}
+
+		}
+
+		function isTransformRotated( m ) {
+			return m.elements[ 1 ] !== 0 || m.elements[ 3 ] !== 0;
+		}
+
+		function getTransformScaleX( m ) {
+			var te = m.elements;
+			return Math.sqrt( te[ 0 ] * te[ 0 ] + te[ 1 ] * te[ 1 ] )
+		}
+
+		function getTransformScaleY( m ) {
+			var te = m.elements;
+			return Math.sqrt( te[ 3 ] * te[ 3 ] + te[ 4 ] * te[ 4 ] )
 		}
 
 		//
@@ -690,6 +978,14 @@ THREE.SVGLoader.prototype = {
 		console.log( 'THREE.SVGLoader' );
 
 		var paths = [];
+
+		var transformStack = [];
+
+		var tempTransform1 = new THREE.Matrix3();
+		var tempTransform2 = new THREE.Matrix3();
+		var tempTransform3 = new THREE.Matrix3();
+
+		var currentTransform = new THREE.Matrix3();
 
 		console.time( 'THREE.SVGLoader: DOMParser' );
 
@@ -702,6 +998,7 @@ THREE.SVGLoader.prototype = {
 		parseNode( xml.documentElement, { fill: '#000' } );
 
 		// console.log( paths );
+
 
 		console.timeEnd( 'THREE.SVGLoader: Parse' );
 
