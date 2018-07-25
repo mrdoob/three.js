@@ -1186,6 +1186,28 @@ THREE.GLTFLoader = ( function () {
 	}
 
 	/**
+	 * @param {THREE.Object3D|THREE.Material|THREE.BufferGeometry} object
+	 * @param {GLTF.definition} def
+	 */
+	function assignExtrasToUserData( object, gltfDef ) {
+
+		if ( gltfDef.extras !== undefined ) {
+
+			if ( typeof gltfDef.extras === 'object' ) {
+
+				object.userData = gltfDef.extras;
+
+			} else {
+
+				console.warn( 'THREE.GLTFLoader: Ignoring primitive type .extras, ' + gltfDef.extras );
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#morph-targets
 	 *
 	 * @param {THREE.BufferGeometry} geometry
@@ -2219,7 +2241,7 @@ THREE.GLTFLoader = ( function () {
 			if ( material.emissiveMap ) material.emissiveMap.encoding = THREE.sRGBEncoding;
 			if ( material.specularMap ) material.specularMap.encoding = THREE.sRGBEncoding;
 
-			if ( materialDef.extras ) material.userData = materialDef.extras;
+			assignExtrasToUserData( material, materialDef );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -2263,11 +2285,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		if ( primitiveDef.extras !== undefined ) {
-
-			geometry.userData = primitiveDef.extras;
-
-		}
+		assignExtrasToUserData( geometry, primitiveDef );
 
 	}
 
@@ -2536,7 +2554,7 @@ THREE.GLTFLoader = ( function () {
 
 					if ( geometries.length > 1 ) mesh.name += '_' + i;
 
-					if ( meshDef.extras !== undefined ) mesh.userData = meshDef.extras;
+					assignExtrasToUserData( mesh, meshDef );
 
 					meshes.push( mesh );
 
@@ -2704,7 +2722,8 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		if ( cameraDef.name !== undefined ) camera.name = cameraDef.name;
-		if ( cameraDef.extras ) camera.userData = cameraDef.extras;
+
+		assignExtrasToUserData( camera, cameraDef );
 
 		return Promise.resolve( camera );
 
@@ -2971,7 +2990,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			if ( nodeDef.extras ) node.userData = nodeDef.extras;
+			assignExtrasToUserData( node, nodeDef );
 
 			if ( nodeDef.extensions ) addUnknownExtensionsToUserData( extensions, node, nodeDef );
 
@@ -3105,7 +3124,7 @@ THREE.GLTFLoader = ( function () {
 				var scene = new THREE.Scene();
 				if ( sceneDef.name !== undefined ) scene.name = sceneDef.name;
 
-				if ( sceneDef.extras ) scene.userData = sceneDef.extras;
+				assignExtrasToUserData( scene, sceneDef );
 
 				if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
 
