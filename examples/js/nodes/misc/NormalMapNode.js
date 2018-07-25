@@ -68,7 +68,7 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 
 		var perturbNormal2Arb = builder.include( NormalMapNode.Nodes.perturbNormal2Arb );
 
-		this.normal = this.normal || new NormalNode( NormalNode.VIEW );
+		this.normal = this.normal || new NormalNode();
 		this.position = this.position || new PositionNode( PositionNode.VIEW );
 		this.uv = this.uv || new UVNode();
 

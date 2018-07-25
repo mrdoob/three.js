@@ -764,7 +764,7 @@
 						var color = new THREE.ColorNode( 0xFFFFFF );
 
 						var viewZ = new THREE.Math2Node(
-							new THREE.NormalNode( THREE.NormalNode.VIEW ),
+							new THREE.NormalNode(),
 							new THREE.Vector3Node( 0, 0, - intensity ),
 							THREE.Math2Node.DOT
 						);
@@ -1045,7 +1045,7 @@
 						var color = new THREE.CubeTextureNode( cubemap );
 
 						var viewZ = new THREE.Math2Node(
-							new THREE.NormalNode( THREE.NormalNode.VIEW ),
+							new THREE.NormalNode(),
 							new THREE.Vector3Node( 0, 0, - 1 ),
 							THREE.Math2Node.DOT
 						);
@@ -1690,7 +1690,7 @@
 						var fur = new THREE.FloatNode( .5 );
 
 						var posDirection = new THREE.Math1Node( new THREE.PositionNode( THREE.PositionNode.VIEW ), THREE.Math1Node.NORMALIZE );
-						var norDirection = new THREE.Math1Node( new THREE.NormalNode( THREE.NormalNode.VIEW ), THREE.Math1Node.NORMALIZE );
+						var norDirection = new THREE.Math1Node( new THREE.NormalNode(), THREE.Math1Node.NORMALIZE );
 
 						var viewZ = new THREE.Math2Node(
 							posDirection,
@@ -1874,7 +1874,7 @@
 						// LINE
 
 						var posDirection = new THREE.Math1Node( new THREE.PositionNode( THREE.PositionNode.VIEW ), THREE.Math1Node.NORMALIZE );
-						var norDirection = new THREE.Math1Node( new THREE.NormalNode( THREE.NormalNode.VIEW ), THREE.Math1Node.NORMALIZE );
+						var norDirection = new THREE.Math1Node( new THREE.NormalNode(), THREE.Math1Node.NORMALIZE );
 
 						var viewZ = new THREE.Math2Node(
 							posDirection,
@@ -2534,6 +2534,9 @@
 				}
 
 				// set material
+
+				mtl.side = THREE.DoubleSide;
+
 				mesh.material = mtl;
 
 			}

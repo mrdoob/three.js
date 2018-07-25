@@ -114,7 +114,7 @@ BumpMapNode.prototype.generate = function ( builder, output ) {
 			var derivativeHeight = builder.include( BumpMapNode.Nodes.dHdxy_fwd ),
 				perturbNormalArb = builder.include( BumpMapNode.Nodes.perturbNormalArb );
 
-			this.normal = this.normal || new NormalNode( NormalNode.VIEW );
+			this.normal = this.normal || new NormalNode();
 			this.position = this.position || new PositionNode( PositionNode.VIEW );
 
 			var derivativeHeightCode = derivativeHeight + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' +

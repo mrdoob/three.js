@@ -45,7 +45,7 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 			builder.requires.normal = true;
 
-			result = builder.isShader( 'vertex' ) ? 'normal' : 'vObjectNormal';
+			result = 'normal';
 
 			break;
 
@@ -59,7 +59,7 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.VIEW:
 
-			result = 'normal';
+			result = 'vNormal';
 
 			break;
 
