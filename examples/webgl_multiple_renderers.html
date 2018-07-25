@@ -115,6 +115,7 @@
 
 				var positions1 = geometry1.attributes.position;
 				var positions2 = geometry2.attributes.position;
+				var positions3 = geometry3.attributes.position;
 				var colors1 = geometry1.attributes.color;
 				var colors2 = geometry2.attributes.color;
 				var colors3 = geometry3.attributes.color;
@@ -127,7 +128,7 @@
 					color.setHSL( 0, ( positions2.getY( i ) / radius + 1 ) / 2, 0.5 );
 					colors2.setXYZ( i, color.r, color.g, color.b );
 
-					color.setHSL( 0.125 * i / count, 1.0, 0.5 );
+					color.setRGB( 1, 1, ( positions3.getY( i ) / radius + 1 ) / 2 );
 					colors3.setXYZ( i, color.r, color.g, color.b );
 
 				}
@@ -182,21 +183,6 @@
 				mesh1.rotation.z += Math.PI / 500;
 				mesh2.rotation.z += Math.PI / 500;
 				mesh3.rotation.z += Math.PI / 500;
-
-				var geometry = mesh3.geometry;
-				var colors3 = geometry.attributes.color;
-				var count = colors3.count;
-
-				for ( var i = 0; i < colors3.count; i ++ ) {
-
-					vec.fromBufferAttribute( colors3, i );
-					color.setRGB( vec.x, vec.y, vec.z );
-					color.setHex( ( color.getHex() + 0xfdfdfd ) % 0xffffff );
-					colors3.setXYZ( i, color.r, color.g, color.b );
-
-				}
-
-				geometry.attributes.color.needsUpdate = true;
 
 				//
 
