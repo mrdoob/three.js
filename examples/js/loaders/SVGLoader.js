@@ -151,8 +151,7 @@ THREE.SVGLoader.prototype = {
 							control.y = point.y;
 							if ( j === 0 ) {
 								path.moveTo( point.x, point.y );
-							}
-							else {
+							} else {
 								path.lineTo( point.x, point.y );
 							}
 						}
@@ -284,8 +283,7 @@ THREE.SVGLoader.prototype = {
 							control.y = point.y;
 							if ( j === 0 ) {
 								path.moveTo( point.x, point.y );
-							}
-							else {
+							} else {
 								path.lineTo( point.x, point.y );
 							}
 						}
@@ -745,7 +743,7 @@ THREE.SVGLoader.prototype = {
 			}
 
 			return transform;
-	
+
 		}
 
 		function parseTransformNode( node ) {
@@ -758,11 +756,11 @@ THREE.SVGLoader.prototype = {
 			if ( openParPos > 0 && openParPos < closeParPos ) {
 
 				var transformType = transformAttr.substr( 0, openParPos );
-				
+
 				var array = parseFloats( transformAttr.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
 
 				switch ( transformType ) {
-					
+
 					case "translate":
 
 						if ( array.length >= 1 ) {
@@ -845,7 +843,7 @@ THREE.SVGLoader.prototype = {
 								1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
 								0, 1, 0,
 								0, 0, 1
-							);							
+							);
 
 						}
 
@@ -885,7 +883,7 @@ THREE.SVGLoader.prototype = {
 				}
 
 			}
-			
+
 			return transform;
 
 		}
@@ -921,23 +919,20 @@ THREE.SVGLoader.prototype = {
 						transfVec2( curve.v1 );
 						transfVec2( curve.v2 );
 
-					}
-					else if ( curve.isCubicBezierCurve ) {
+					} else if ( curve.isCubicBezierCurve ) {
 
 						transfVec2( curve.v0 );
 						transfVec2( curve.v1 );
 						transfVec2( curve.v2 );
 						transfVec2( curve.v3 );
 
-					}
-					else if ( curve.isQuadraticBezierCurve ) {
+					} else if ( curve.isQuadraticBezierCurve ) {
 
 						transfVec2( curve.v0 );
 						transfVec2( curve.v1 );
 						transfVec2( curve.v2 );
 
-					}
-					else if ( curve.isEllipseCurve ) {
+					} else if ( curve.isEllipseCurve ) {
 
 						if ( isRotated ) {
 							console.warn( "SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented." );
@@ -954,7 +949,7 @@ THREE.SVGLoader.prototype = {
 					}
 
 				}
-	
+
 			}
 
 		}
