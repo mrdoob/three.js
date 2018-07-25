@@ -940,6 +940,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		var shiftMultiplier = Math.pow( 10, decimalShift );
 		for ( var i = 0; i < vertexCount; i ++ ) {
 
+			var index = indices ? indices.getX( i ) : i;
+
 			// Generate a hash for the vertex attributes at the current index 'i'
 			var hash = '';
 			for ( var j = 0, l = attributeNames.length; j < l; j ++ ) {
@@ -951,7 +953,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 				for ( var k = 0; k < itemSize; k ++ ) {
 
 					// double tilde truncates the decimal value
-					hash += `${ ~ ~ ( attribute[ getters[ k ] ]( i ) * shiftMultiplier ) },`;
+					hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * shiftMultiplier ) },`;
 
 				}
 
@@ -976,7 +978,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 					var newarray = attrArrays[ name ];
 					for ( var k = 0; k < itemSize; k ++ ) {
 
-						newarray.push( attribute[ getters[ k ] ]( i ) );
+						newarray.push( attribute[ getters[ k ] ]( index ) );
 
 					}
 
