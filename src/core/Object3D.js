@@ -31,20 +31,24 @@ function Object3D() {
 
 	this.up = Object3D.DefaultUp.clone();
 
-	var position = new Vector3();
+	var position = new Vector3WithDirtyFlag();
 	var rotation = new Euler();
 	var quaternion = new Quaternion();
-	var scale = new Vector3( 1, 1, 1 );
+	var scale = new Vector3WithDirtyFlag( 1, 1, 1 );
+
+	quaternion._dirty = false;
 
 	function onRotationChange() {
 
 		quaternion.setFromEuler( rotation, false );
+		quaternion._dirty = true;
 
 	}
 
 	function onQuaternionChange() {
 
 		rotation.setFromQuaternion( quaternion, undefined, false );
+		quaternion._dirty = true;
 
 	}
 
@@ -575,9 +579,19 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	updateMatrix: function () {
 
-		this.matrix.compose( this.position, this.quaternion, this.scale );
+		if ( this.position._dirty === true ||
+			this.quaternion._dirty === true ||
+			this.scale._dirty === true ) {
 
-		this.matrixWorldNeedsUpdate = true;
+			this.matrix.compose( this.position, this.quaternion, this.scale );
+
+			this.matrixWorldNeedsUpdate = true;
+
+			this.position._dirty = false;
+			this.quaternion._dirty = false;
+			this.scale._dirty = false;
+
+		}
 
 	},
 
@@ -830,6 +844,80 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		}
 
 		return this;
+
+	}
+
+} );
+
+function Vector3WithDirtyFlag( x, y, z ) {
+
+	this._x = 0;
+	this._y = 0;
+	this._z = 0;
+
+	Vector3.call( this, x, y, z );
+
+	this._dirty = false;
+
+}
+
+Vector3WithDirtyFlag.prototype = Object.assign( Object.create( Vector3.prototype ), {
+
+	constructor: Vector3WithDirtyFlag,
+	isVector3WithDirtyFlag: true
+
+} );
+
+Object.defineProperties( Vector3WithDirtyFlag.prototype, {
+
+	x: {
+
+		get: function () {
+
+			return this._x;
+
+		},
+
+		set: function ( value ) {
+
+			this._x = value;
+			this._dirty = true;
+
+		}
+
+	},
+
+	y: {
+
+		get: function () {
+
+			return this._y;
+
+		},
+
+		set: function ( value ) {
+
+			this._y = value;
+			this._dirty = true;
+
+		}
+
+	},
+
+	z: {
+
+		get: function () {
+
+			return this._z;
+
+		},
+
+		set: function ( value ) {
+
+			this._z = value;
+			this._dirty = true;
+
+		}
 
 	}
 
