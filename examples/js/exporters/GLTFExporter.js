@@ -73,7 +73,8 @@ THREE.GLTFExporter.prototype = {
 			embedImages: true,
 			animations: [],
 			forceIndices: false,
-			forcePowerOfTwoTextures: false
+			forcePowerOfTwoTextures: false,
+			includeCustomExtensions: false
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -345,7 +346,7 @@ THREE.GLTFExporter.prototype = {
 
 				var json = JSON.parse( JSON.stringify( object.userData ) );
 
-				if ( json.gltfExtensions ) {
+				if ( options.includeCustomExtensions && json.gltfExtensions ) {
 
 					if ( gltfProperty.extensions === undefined ) {
 
@@ -360,9 +361,9 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					delete json.gltfExtensions;
-
 				}
+
+				delete json.gltfExtensions;
 
 				if ( Object.keys( json ).length > 0 ) {
 
