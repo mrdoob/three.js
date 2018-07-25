@@ -91,15 +91,15 @@
 			Set [page:InterleavedBuffer.dynamic dynamic] to value.
 		</p>
 
-		<h3>[method:InterleavedBuffer copy]( source ) </h3>
+		<h3>[method:InterleavedBuffer copy]( [param:InterleavedBuffer source] ) </h3>
 		<p>
 		 Copies another [name] to this [name].
 		</p>
 
-		<h3>[method:InterleavedBuffer copyAt]( index1, attribute, index2 ) </h3>
+		<h3>[method:InterleavedBuffer copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
 		<p>Copies data from attribute[index2] to [page:InterleavedBuffer.array array][index1].</p>
 
-		<h3>[method:InterleavedBuffer set]( value, offset ) </h3>
+		<h3>[method:InterleavedBuffer set]( [param:TypedArray value], [param:Integer offset] ) </h3>
 		<p>
 			value - The source (typed) array.<br/>
 			offset - The offset into the target array at which to begin writing values from the source array. Default is *0*.<br/><br />

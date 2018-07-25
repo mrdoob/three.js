@@ -234,12 +234,12 @@
 		[page:Texture.rotation .rotation], and [page:Texture.center .center].
 		</p>
 
-		<h3>[method:Texture clone]( [param:Texture texture] )</h3>
+		<h3>[method:Texture clone]()</h3>
 		<p>
 		Make copy of the texture. Note this is not a "deep copy", the image is shared.
 		</p>
 
-		<h3>[method:Texture toJSON]( meta )</h3>
+		<h3>[method:Texture toJSON]( [param:Object meta] )</h3>
 		<p>
 		meta -- optional object containing metadata.<br />
 		Convert the material to three.js JSON format.
@@ -250,7 +250,7 @@
 		Call [page:EventDispatcher EventDispatcher].dispatchEvent with a 'dispose' event type.
 		</p>
 
-		<h3>[method:null transformUv]( uv )</h3>
+		<h3>[method:null transformUv]( [param:Vector2 uv] )</h3>
 		<p>
 		Transform the uv based on the value of this texture's [page:Texture.offset .offset], [page:Texture.repeat .repeat],
 		[page:Texture.wrapS .wrapS], [page:Texture.wrapT .wrapT] and [page:Texture.flipY .flipY] properties.
