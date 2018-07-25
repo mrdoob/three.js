@@ -192,6 +192,8 @@
 					'adv / expression': 'expression',
 					'adv / sss': 'sss',
 					'adv / translucent': 'translucent',
+					'node / position': 'node-position',
+					'node / normal': 'node-normal',
 					'misc / smoke': 'smoke',
 					'misc / firefly': 'firefly',
 					'misc / reserved-keywords': 'reserved-keywords',
@@ -2036,6 +2038,56 @@
 						//blurtexture.useKeywords = false; // ( true is default )
 
 						mtl.color = new THREE.FunctionCallNode( keywordsexample, [ new THREE.TextureNode( getTexture( "brick" ) ) ] );
+
+						break;
+
+					case 'node-position':
+
+						// MATERIAL
+
+						var node = new THREE.PositionNode();
+
+						mtl = new THREE.PhongNodeMaterial();
+						mtl.color = node;
+
+						// GUI
+
+						addGui( 'scope', {
+							local: THREE.PositionNode.LOCAL,
+							world: THREE.PositionNode.WORLD,
+							view: THREE.PositionNode.VIEW
+						}, function ( val ) {
+
+							node.scope = val;
+
+							mtl.needsUpdate = true;
+
+						} );
+
+						break;
+
+					case 'node-normal':
+
+						// MATERIAL
+
+						var node = new THREE.NormalNode();
+
+						mtl = new THREE.PhongNodeMaterial();
+						mtl.color = node;
+
+						// GUI
+
+						addGui( 'scope', {
+							local: THREE.NormalNode.LOCAL,
+							world: THREE.NormalNode.WORLD,
+							view: THREE.NormalNode.VIEW
+						}, function ( val ) {
+
+							node.scope = val;
+
+							mtl.needsUpdate = true;
+
+						} );
 
 						break;
 
