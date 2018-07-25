@@ -244,11 +244,11 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
-			var vertexNormals = normals === undefined ? [] : [
+			var vertexNormals = normals !== undefined ? [
 				new Vector3().fromArray( normals, a * 3 ),
 				new Vector3().fromArray( normals, b * 3 ),
 				new Vector3().fromArray( normals, c * 3 )
-			];
+			] : [];
 
 			var face = new Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
