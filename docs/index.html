@@ -85,6 +85,17 @@
 
 			// Navigation Panel
 
+			function isRegularClick( event ) {
+
+				if ( event.button !== 0 ) {
+
+					return false;
+
+				}
+				return ! ( event.metaKey || event.altKey || event.ctrlKey || event.shiftKey );
+
+			}
+
 			function createLink( pageName, pageURL ) {
 
 				var link = document.createElement( 'a' );
@@ -93,15 +104,20 @@
 				link.setAttribute( 'target', 'viewer' );
 				link.addEventListener( 'click', function ( event ) {
 
-					window.location.hash = pageURL;
-					panel.classList.add( 'collapsed' );
+					if ( isRegularClick( event ) ) {
+
+						event.preventDefault();
+						window.location.hash = pageURL;
+						panel.classList.add( 'collapsed' );
+
+					}
 
 				} );
 
 				return link;
 
 			}
-
+			
 			function createNavigation() {
 
 				// Create the navigation panel using data from list.js
@@ -262,8 +278,29 @@
 
 
 			// Routing
+			
+			function getPageUrl( pageName ) {
 
-			function setUrlFragment( pageName ) {
+				var splitPageName = decomposePageName( pageName, '.', '#' );
+
+				var currentProperties = pageProperties[ splitPageName[ 0 ] ];
+
+				if ( currentProperties ) {
+
+					return currentProperties.pageURL + ".html" + splitPageName[ 1 ];
+
+				}
+
+			}
+
+			function setUrlFragment( pageName, event ) {
+
+				if ( ! isRegularClick( event ) ) {
+
+					return;
+
+				}
+				event.preventDefault();
 
 				// Handle navigation from the subpages (iframes):
 				// First separate the memeber (if existing) from the page name,
