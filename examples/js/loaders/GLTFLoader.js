@@ -182,6 +182,9 @@ THREE.GLTFLoader = ( function () {
 
 			if ( this.lazy ) {
 
+				// Mark the special nodes/meshes in json for efficient parse
+				this.markDefs();
+
 				onLoad( { parser: parser } );
 
 				return;
