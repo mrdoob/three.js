@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLCapabilities( gl, extensions, parameters ) {
+function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 	var maxAnisotropy;
 
@@ -79,7 +79,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	var maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
 	var vertexTextures = maxVertexTextures > 0;
-	var floatFragmentTextures = gl.isWebGL2 || !! extensions.get( 'OES_texture_float' );
+	var floatFragmentTextures = utils.isWebGL2( gl ) || !! extensions.get( 'OES_texture_float' );
 	var floatVertexTextures = vertexTextures && floatFragmentTextures;
 
 	return {

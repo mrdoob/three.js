@@ -36,7 +36,7 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === HalfFloatType ) {
 
-			if ( gl.isWebGL2 ) return gl.HALF_FLOAT;
+			if ( isWebGL2( gl ) ) return gl.HALF_FLOAT;
 
 			extension = extensions.get( 'OES_texture_half_float' );
 
@@ -127,7 +127,7 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === MinEquation || p === MaxEquation ) {
 
-			if ( gl.isWebGL2 ) {
+			if ( isWebGL2( gl ) ) {
 
 				if ( p === MinEquation ) return gl.MIN;
 				if ( p === MaxEquation ) return gl.MAX;
@@ -147,7 +147,7 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === UnsignedInt248Type ) {
 
-			if ( gl.isWebGL2 ) return gl.UNSIGNED_INT_24_8;
+			if ( isWebGL2( gl ) ) return gl.UNSIGNED_INT_24_8;
 
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
@@ -159,7 +159,18 @@ function WebGLUtils( gl, extensions ) {
 
 	}
 
-	return { convert: convert };
+	function isWebGL2( gl ) {
+
+		return typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+
+	}
+
+	return {
+
+		convert: convert,
+		isWebGL2: isWebGL2
+
+	};
 
 }
 

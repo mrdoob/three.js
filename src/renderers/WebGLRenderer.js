@@ -209,8 +209,6 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		_gl.isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext;
-
 		// Some experimental-webgl implementations do not have getShaderPrecisionFormat
 
 		if ( _gl.getShaderPrecisionFormat === undefined ) {
@@ -241,7 +239,9 @@ function WebGLRenderer( parameters ) {
 
 		extensions = new WebGLExtensions( _gl );
 
-		if ( ! _gl.isWebGL2 ) {
+		utils = new WebGLUtils( _gl, extensions );
+
+		if ( ! utils.isWebGL2( _gl ) ) {
 
 			extensions.get( 'WEBGL_depth_texture' );
 			extensions.get( 'OES_texture_float' );
@@ -255,9 +255,7 @@ function WebGLRenderer( parameters ) {
 
 		extensions.get( 'OES_texture_float_linear' );
 
-		utils = new WebGLUtils( _gl, extensions );
-
-		capabilities = new WebGLCapabilities( _gl, extensions, parameters );
+		capabilities = new WebGLCapabilities( _gl, extensions, parameters, utils );
 
 		state = new WebGLState( _gl, extensions, utils );
 		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
@@ -270,14 +268,14 @@ function WebGLRenderer( parameters ) {
 		geometries = new WebGLGeometries( _gl, attributes, info );
 		objects = new WebGLObjects( geometries, info );
 		morphtargets = new WebGLMorphtargets( _gl );
-		programCache = new WebGLPrograms( _this, extensions, capabilities );
+		programCache = new WebGLPrograms( _this, extensions, capabilities, utils );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
 
 		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
-		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
-		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
+		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, utils );
+		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, utils );
 
 		info.programs = programCache.programs;
 
@@ -814,7 +812,7 @@ function WebGLRenderer( parameters ) {
 
 	function setupVertexAttributes( material, program, geometry ) {
 
-		if ( geometry && geometry.isInstancedBufferGeometry & ! _gl.isWebGL2 ) {
+		if ( geometry && geometry.isInstancedBufferGeometry & ! utils.isWebGL2( _gl ) ) {
 
 			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
@@ -2525,8 +2523,8 @@ function WebGLRenderer( parameters ) {
 				}
 
 				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
-					! ( textureType === FloatType && ( _gl.isWebGL2 || extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
-					! ( textureType === HalfFloatType && ( _gl.isWebGL2 ? extensions.get( 'EXT_color_buffer_float' ) : extensions.get( 'EXT_color_buffer_half_float' ) ) ) ) {
+					! ( textureType === FloatType && ( utils.isWebGL2( _gl ) || extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
+					! ( textureType === HalfFloatType && ( utils.isWebGL2( _gl ) ? extensions.get( 'EXT_color_buffer_float' ) : extensions.get( 'EXT_color_buffer_half_float' ) ) ) ) {
 
 					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 					return;
