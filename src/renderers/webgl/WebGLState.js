@@ -434,9 +434,9 @@ function WebGLState( gl, extensions, utils ) {
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
 
-			var extension = gl.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
+			var extension = utils.isWebGL2( gl ) ? gl : extensions.get( 'ANGLE_instanced_arrays' );
 
-			extension[ gl.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
+			extension[ utils.isWebGL2( gl ) ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
 
 		}
