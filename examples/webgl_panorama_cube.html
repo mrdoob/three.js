@@ -76,7 +76,7 @@
 
 			}
 
-			var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), materials );
+			var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), materials );
 			skyBox.geometry.scale( 1, 1, - 1 );
 			scene.add( skyBox );
 

@@ -9,9 +9,6 @@
  *
  * Needs Support:
  *  Morph normals / blend shape normals
- *  Animation tracks for morph targets
- *
- *	Euler rotation order
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
@@ -817,8 +814,6 @@
 
 		}, null );
 
-		var preTransform = new THREE.Matrix4();
-
 		// TODO: if there is more than one model associated with the geometry, AND the models have
 		// different geometric transforms, then this will cause problems
 		// if ( modelNodes.length > 1 ) { }
@@ -826,28 +821,17 @@
 		// For now just assume one model and get the preRotations from that
 		var modelNode = modelNodes[ 0 ];
 
-		if ( 'GeometricRotation' in modelNode ) {
+		var transformData = {};
 
-			var array = modelNode.GeometricRotation.value.map( THREE.Math.degToRad );
-			array[ 3 ] = 'ZYX';
+		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = modelNode.RotationOrder.value;
 
-			preTransform.makeRotationFromEuler( new THREE.Euler().fromArray( array ) );
+		if ( 'GeometricTranslation' in modelNode ) transformData.translation = modelNode.GeometricTranslation.value;
+		if ( 'GeometricRotation' in modelNode ) transformData.rotation = modelNode.GeometricRotation.value;
+		if ( 'GeometricScaling' in modelNode ) transformData.scale = modelNode.GeometricScaling.value;
 
-		}
+		var transform = generateTransform( transformData );
 
-		if ( 'GeometricTranslation' in modelNode ) {
-
-			preTransform.setPosition( new THREE.Vector3().fromArray( modelNode.GeometricTranslation.value ) );
-
-		}
-
-		if ( 'GeometricScaling' in modelNode ) {
-
-			preTransform.scale( new THREE.Vector3().fromArray( modelNode.GeometricScaling.value ) );
-
-		}
-
-		return genGeometry( FBXTree, geoNode, skeleton, morphTarget, preTransform );
+		return genGeometry( FBXTree, geoNode, skeleton, morphTarget, transform );
 
 	}
 
@@ -1647,9 +1631,18 @@
 
 		bindSkeleton( FBXTree, deformers.skeletons, geometryMap, modelMap, connections );
 		addAnimations( FBXTree, connections, sceneGraph );
+
 		createAmbientLight( FBXTree, sceneGraph );
 
 		setupMorphMaterials( sceneGraph );
+
+		// if all the models where already combined in a single group, just return that
+		if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
+
+			sceneGraph.children[ 0 ].animations = sceneGraph.animations;
+			return sceneGraph.children[ 0 ];
+
+		}
 
 		return sceneGraph;
 
@@ -1734,7 +1727,7 @@
 
 			}
 
-			setModelTransforms( FBXTree, model, node );
+			setModelTransforms( model, node );
 			modelMap.set( id, model );
 
 		}
@@ -2147,69 +2140,25 @@
 	}
 
 	// parse the model node for transform details and apply them to the model
-	function setModelTransforms( FBXTree, model, modelNode ) {
+	function setModelTransforms( model, modelNode ) {
 
-		// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
-		if ( 'RotationOrder' in modelNode ) {
+		var transformData = {};
 
-			var enums = [
-				'XYZ', // default
-				'XZY',
-				'YZX',
-				'ZXY',
-				'YXZ',
-				'ZYX',
-				'SphericXYZ',
-			];
+		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
 
-			var value = parseInt( modelNode.RotationOrder.value, 10 );
+		if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
+		if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
 
-			if ( value > 0 && value < 6 ) {
+		if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
+		if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
 
-				// model.rotation.order = enums[ value ];
+		if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
 
-				// Note: Euler order other than XYZ is currently not supported, so just display a warning for now
-				console.warn( 'THREE.FBXLoader: unsupported Euler Order: %s. Currently only XYZ order is supported. Animations and rotations may be incorrect.', enums[ value ] );
+		if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
 
-			} else if ( value === 6 ) {
+		var transform = generateTransform( transformData );
 
-				console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
-
-			}
-
-		}
-
-		if ( 'Lcl_Translation' in modelNode ) {
-
-			model.position.fromArray( modelNode.Lcl_Translation.value );
-
-		}
-
-		if ( 'Lcl_Rotation' in modelNode ) {
-
-			var rotation = modelNode.Lcl_Rotation.value.map( THREE.Math.degToRad );
-			rotation.push( 'ZYX' );
-			model.quaternion.setFromEuler( new THREE.Euler().fromArray( rotation ) );
-
-		}
-
-		if ( 'Lcl_Scaling' in modelNode ) {
-
-			model.scale.fromArray( modelNode.Lcl_Scaling.value );
-
-		}
-
-		if ( 'PreRotation' in modelNode ) {
-
-			var array = modelNode.PreRotation.value.map( THREE.Math.degToRad );
-			array[ 3 ] = 'ZYX';
-
-			var preRotations = new THREE.Euler().fromArray( array );
-
-			preRotations = new THREE.Quaternion().setFromEuler( preRotations );
-			model.quaternion.premultiply( preRotations );
-
-		}
+		model.applyMatrix( transform );
 
 	}
 
@@ -2297,6 +2246,7 @@
 		var curveNodesMap = parseAnimationCurveNodes( FBXTree );
 
 		parseAnimationCurves( FBXTree, connections, curveNodesMap );
+
 		var layersMap = parseAnimationLayers( FBXTree, connections, curveNodesMap );
 		var rawClips = parseAnimStacks( FBXTree, connections, layersMap );
 
@@ -2380,7 +2330,7 @@
 
 					curveNodesMap.get( animationCurveID ).curves[ 'z' ] = animationCurve;
 
-				} else if ( animationCurveRelationship.match( /d|DeformPercent/ ) ) {
+				} else if ( animationCurveRelationship.match( /d|DeformPercent/ ) && curveNodesMap.has( animationCurveID ) ) {
 
 					curveNodesMap.get( animationCurveID ).curves[ 'morph' ] = animationCurve;
 
@@ -2439,18 +2389,16 @@
 									initialPosition: [ 0, 0, 0 ],
 									initialRotation: [ 0, 0, 0 ],
 									initialScale: [ 1, 1, 1 ],
+									transform: getModelAnimTransform( rawModel ),
 
 								};
 
-								if ( 'Lcl_Translation' in rawModel ) node.initialPosition = rawModel.Lcl_Translation.value;
+								node.transform = getModelAnimTransform( rawModel );
 
-								if ( 'Lcl_Rotation' in rawModel ) node.initialRotation = rawModel.Lcl_Rotation.value;
-
-								if ( 'Lcl_Scaling' in rawModel ) node.initialScale = rawModel.Lcl_Scaling.value;
-
-								// if the animated model is pre rotated, we'll have to apply the pre rotations to every
+								// if the animated model is pre or post rotated, we'll have to apply the pre rotations to every
 								// animation value as well
 								if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
+								if ( 'PostRotation' in rawModel ) node.postRotations = rawModel.PostRotation.value;
 
 								layerCurveNodes[ i ] = node;
 
@@ -2504,6 +2452,26 @@
 		}
 
 		return layersMap;
+
+	}
+
+	function getModelAnimTransform( modelNode ) {
+
+		var transformData = {};
+
+		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
+
+		if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
+		if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
+
+		if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
+		if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
+
+		if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
+
+		if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
+
+		return generateTransform( transformData );
 
 	}
 
@@ -2582,28 +2550,39 @@
 
 		var tracks = [];
 
+		var initialPosition = new THREE.Vector3();
+		var initialRotation = new THREE.Quaternion();
+		var initialScale = new THREE.Vector3();
+
+		if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
+
+		initialPosition = initialPosition.toArray();
+		initialRotation = new THREE.Euler().setFromQuaternion( initialRotation ).toArray(); // todo: euler order
+		initialScale = initialScale.toArray();
+
 		if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
 
-			var positionTrack = generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, rawTracks.initialPosition, 'position' );
+			var positionTrack = generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, initialPosition, 'position' );
 			if ( positionTrack !== undefined ) tracks.push( positionTrack );
 
 		}
 
 		if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
 
-			var rotationTrack = generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.initialRotation, rawTracks.preRotations );
+			var rotationTrack = generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotations, rawTracks.postRotations );
 			if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 		}
 
 		if ( rawTracks.S !== undefined && Object.keys( rawTracks.S.curves ).length > 0 ) {
 
-			var scaleTrack = generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, rawTracks.initialScale, 'scale' );
+			var scaleTrack = generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, initialScale, 'scale' );
 			if ( scaleTrack !== undefined ) tracks.push( scaleTrack );
 
 		}
 
 		if ( rawTracks.DeformPercent !== undefined ) {
+
 			var morphTrack = generateMorphTrack( rawTracks, sceneGraph );
 			if ( morphTrack !== undefined ) tracks.push( morphTrack );
 
@@ -2622,7 +2601,7 @@
 
 	}
 
-	function generateRotationTrack( modelName, curves, initialValue, preRotations ) {
+	function generateRotationTrack( modelName, curves, initialValue, preRotations, postRotations ) {
 
 		if ( curves.x !== undefined ) {
 
@@ -2653,6 +2632,16 @@
 
 			preRotations = new THREE.Euler().fromArray( preRotations );
 			preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+
+		}
+
+		if ( postRotations !== undefined ) {
+
+			postRotations = postRotations.map( THREE.Math.degToRad );
+			postRotations.push( 'ZYX' );
+
+			postRotations = new THREE.Euler().fromArray( postRotations );
+			postRotations = new THREE.Quaternion().setFromEuler( postRotations );
 
 		}
 
@@ -3802,6 +3791,98 @@
 
 	}
 
+	var tempMat = new THREE.Matrix4();
+	var tempEuler = new THREE.Euler();
+	var tempVec = new THREE.Vector3();
+	var translation = new THREE.Vector3();
+	var rotation = new THREE.Matrix4();
+
+	// generate transformation from FBX transform data
+	// ref: https://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm
+	// transformData = {
+	//	 eulerOrder: int,
+	//	 translation: [],
+	//   rotationOffset: [],
+	//	 preRotation
+	//	 rotation
+	//	 postRotation
+	//   scale
+	// }
+	// all entries are optional
+	function generateTransform( transformData ) {
+
+		var transform = new THREE.Matrix4();
+		translation.set( 0, 0, 0 );
+		rotation.identity();
+
+		var order = ( transformData.eulerOrder ) ? getEulerOrder( transformData.eulerOrder ) : getEulerOrder( 0 );
+
+		if ( transformData.translation ) translation.fromArray( transformData.translation );
+		if ( transformData.rotationOffset ) translation.add( tempVec.fromArray( transformData.rotationOffset ) );
+
+		if ( transformData.rotation ) {
+
+			var array = transformData.rotation.map( THREE.Math.degToRad );
+			array.push( order );
+			rotation.makeRotationFromEuler( tempEuler.fromArray( array ) );
+
+		}
+
+		if ( transformData.preRotation ) {
+
+			var array = transformData.preRotation.map( THREE.Math.degToRad );
+			array.push( order );
+			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
+
+			rotation.premultiply( tempMat );
+
+		}
+
+		if ( transformData.postRotation ) {
+
+			var array = transformData.postRotation.map( THREE.Math.degToRad );
+			array.push( order );
+			tempMat.makeRotationFromEuler( tempEuler.fromArray( array ) );
+
+			tempMat.getInverse( tempMat );
+
+			rotation.multiply( tempMat );
+
+		}
+
+		if ( transformData.scale ) transform.scale( tempVec.fromArray( transformData.scale ) );
+
+		transform.setPosition( translation );
+		transform.multiply( rotation );
+
+		return transform;
+
+	}
+
+	// Returns the three.js intrinsic Euler order corresponding to FBX extrinsic Euler order
+	// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
+	function getEulerOrder( order ) {
+
+		var enums = [
+			'ZYX', // -> XYZ extrinsic
+			'YZX', // -> XZY extrinsic
+			'XZY', // -> YZX extrinsic
+			'ZXY', // -> YXZ extrinsic
+			'YXZ', // -> ZXY extrinsic
+			'XYZ', // -> ZYX extrinsic
+			//'SphericXYZ', // not possible to support
+		];
+
+		if ( order === 6 ) {
+
+			console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
+			return enums[ 0 ];
+
+		}
+
+		return enums[ order ];
+
+	}
 
 	// Parses comma separated list of numbers and returns them an array.
 	// Used internally by the TextParser
