@@ -234,7 +234,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( colors !== undefined ) {
 
-				scope.colors.push( new Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
+				scope.colors.push( new Color().fromArray( colors, i ) );
 
 			}
 
