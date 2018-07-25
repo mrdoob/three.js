@@ -60,7 +60,7 @@ function onDocumentLoad( event ) {
 	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
 	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, "[$1:$2 $2]" ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\([^]*?\))?/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$2')\" target=\"_parent\" title=\"" + name + ".$2\" class=\"permalink\">#</a> .<a onclick=\"window.parent.setUrlFragment('" + name + ".$2')\" id=\"$2\">$2</a> $3 : <a class=\"param\" onclick=\"window.parent.setUrlFragment('$1')\">$1</a>" );
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$2')\" target=\"_parent\" title=\"" + name + ".$2\" class=\"permalink\">#</a> .<a onclick=\"window.parent.setUrlFragment('" + name + ".$2')\" id=\"$2\">$2</a> $3 : <a class=\"param\" onclick=\"window.parent.setUrlFragment('$1')\">$1</a>" );
 	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, "$2 : <a class=\"param\" onclick=\"window.parent.setUrlFragment('$1')\">$1</a>" ); // [param:name title]
 
 	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
