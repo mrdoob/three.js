@@ -1,7 +1,7 @@
 import { Light } from './Light.js';
 import { DirectionalLightShadow } from './DirectionalLightShadow.js';
 import { Object3D } from '../core/Object3D.js';
-import { _Math } from './Math.js';
+import { _Math } from '../Math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
