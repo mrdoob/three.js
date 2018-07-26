@@ -108,7 +108,7 @@ THREE.HDRCubeTextureLoader.prototype.load = function ( type, urls, onLoad, onPro
 
 	function loadHDRData( i, onLoad, onProgress, onError ) {
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( urls[ i ], function ( buffer ) {
 
@@ -177,7 +177,7 @@ THREE.HDRCubeTextureLoader.prototype.load = function ( type, urls, onLoad, onPro
 
 	for ( var i = 0; i < urls.length; i ++ ) {
 
-		loadHDRData.call( this, i, onLoad, onProgress, onError );
+		loadHDRData( i, onLoad, onProgress, onError );
 
 	}
 
