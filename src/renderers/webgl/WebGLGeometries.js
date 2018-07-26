@@ -32,7 +32,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		delete geometries[ geometry.id ];
 
-		attribute = wireframeAttributes[ buffergeometry.id ];
+		var attribute = wireframeAttributes[ buffergeometry.id ];
 
 		if ( attribute ) {
 
