@@ -74,22 +74,70 @@ function WebGLAttributes( gl ) {
 
 			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
 
-		} else if ( updateRange.count === - 1 ) {
+		} else if ( typeof updateRange.offset == "undefined" &&
+																	typeof updateRange.count == "undefined" ) {
 
-			// Not using update ranges
+			// updateRange is an array of {offset: x, count: y}
 
-			gl.bufferSubData( bufferType, 0, array );
+			for ( var i = 0; i < updateRange.length; i ++ ) {
 
-		} else if ( updateRange.count === 0 ) {
+				var curCount = updateRange[ i ].count;
+				var curOffset = updateRange[ i ].offset;
 
-			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
+				if ( curCount != 0 && curCount != - 1 ) {
+
+					if ( curOffset >= array.length || curCount > array.length ) {
+
+						console.error( 'THREE.WebGLObjects.updateBuffer: Buffer overflow.' );
+
+					} else {
+
+						gl.bufferSubData(
+							bufferType, curOffset * array.BYTES_PER_ELEMENT,
+							array.subarray( curOffset, curOffset + curCount )
+						);
+
+					}
+
+				} else if ( updateRange == 0 ) {
+
+					console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0 for index ' + i + ', ensure you are using set methods or updating manually.' );
+
+				}
+
+			}
+
+			if ( ! updateRange ) {
+
+				gl.bufferSubData( bufferType, 0, array );
+
+			}
+
+			// Reset update ranges
+			attribute.updateRange = [ ];
 
 		} else {
 
-			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-				array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+			// updateRange is {offset: x, count: y}
 
-			updateRange.count = - 1; // reset range
+			if ( updateRange.count === - 1 ) {
+
+				// Not using update ranges
+
+				gl.bufferSubData( bufferType, 0, array );
+
+			} else if ( updateRange.count === 0 ) {
+
+				console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
+
+			} else {
+
+				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+				     array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+
+				updateRange.count = - 1; // reset range
+
+			}
 
 		}
 
