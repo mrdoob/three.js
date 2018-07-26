@@ -3701,7 +3701,8 @@
 
 		getString: function ( size ) {
 
-			var a = new Uint8Array( size );
+			// note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
+			var a = [];
 
 			for ( var i = 0; i < size; i ++ ) {
 
@@ -3712,7 +3713,7 @@
 			var nullByte = a.indexOf( 0 );
 			if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
 
-			return THREE.LoaderUtils.decodeText( a );
+			return THREE.LoaderUtils.decodeText( new Uint8Array( a ) );
 
 		}
 
