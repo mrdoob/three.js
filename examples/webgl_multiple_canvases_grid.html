@@ -195,8 +195,8 @@
 				var count = geometry1.attributes.position.count;
 				geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
-				geometry2 = geometry1.clone();
-				geometry3 = geometry1.clone();
+				var geometry2 = geometry1.clone();
+				var geometry3 = geometry1.clone();
 
 				var color = new THREE.Color();
 				var positions1 = geometry1.attributes.position;
@@ -228,21 +228,21 @@
 
 				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
-				mesh = new THREE.Mesh( geometry1, material );
-				wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry1, material );
+				var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
 				mesh.add( wireframe );
 				mesh.position.x = - 400;
 				mesh.rotation.x = - 1.87;
 				scene.add( mesh );
 
-				mesh = new THREE.Mesh( geometry2, material );
-				wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry2, material );
+				var wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
 				mesh.add( wireframe );
 				mesh.position.x = 400;
 				scene.add( mesh );
 
-				mesh = new THREE.Mesh( geometry3, material );
-				wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry3, material );
+				var wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
 				mesh.add( wireframe );
 				scene.add( mesh );
 
