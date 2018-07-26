@@ -177,7 +177,7 @@ THREE.HDRCubeTextureLoader.prototype.load = function ( type, urls, onLoad, onPro
 
 	for ( var i = 0; i < urls.length; i ++ ) {
 
-		loadHDRData( i, onLoad, onProgress, onError );
+		loadHDRData.call( this, i, onLoad, onProgress, onError );
 
 	}
 
