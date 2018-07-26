@@ -99,7 +99,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			// console.log( FBXTree );
+			//console.log( FBXTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
@@ -2343,7 +2343,7 @@ THREE.FBXLoader = ( function () {
 										initialPosition: [ 0, 0, 0 ],
 										initialRotation: [ 0, 0, 0 ],
 										initialScale: [ 1, 1, 1 ],
-										transform: this.getModelAnimTransform( rawModel ),
+										transform: self.getModelAnimTransform( rawModel ),
 
 									};
 
