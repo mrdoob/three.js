@@ -128,7 +128,7 @@
 					color.setHSL( 0, ( positions2.getY( i ) / radius + 1 ) / 2, 0.5 );
 					colors2.setXYZ( i, color.r, color.g, color.b );
 
-					color.setRGB( 1, 1, ( positions3.getY( i ) / radius + 1 ) / 2 );
+					color.setRGB( 1, 0.8 - ( positions3.getY( i ) / radius + 1 ) / 2, 0 );
 					colors3.setXYZ( i, color.r, color.g, color.b );
 
 				}
@@ -183,6 +183,25 @@
 				mesh1.rotation.z += Math.PI / 500;
 				mesh2.rotation.z += Math.PI / 500;
 				mesh3.rotation.z += Math.PI / 500;
+
+				var position = new THREE.Vector3();
+				var color = new THREE.Color();
+
+				var time = performance.now() / 500;
+
+				var positions = mesh3.geometry.attributes.position;
+				var colors = mesh3.geometry.attributes.color;
+
+				for ( var i = 0, l = positions.count; i < l; i ++ ) {
+
+					position.fromArray( positions.array, i * 3 );
+
+					color.setRGB( 1, Math.sin( time + position.x ), Math.cos( time * 2.123 + position.x ) );
+					colors.setXYZ( i, color.r, color.g, color.b );
+
+				}
+
+				colors.needsUpdate = true;
 
 				//
 
