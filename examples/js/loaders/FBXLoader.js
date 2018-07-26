@@ -1641,6 +1641,14 @@ THREE.FBXLoader = ( function () {
 
 			this.setupMorphMaterials( sceneGraph );
 
+			// if all the models where already combined in a single group, just return that
+			if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
+
+				sceneGraph.children[ 0 ].animations = sceneGraph.animations;
+				return sceneGraph.children[ 0 ];
+
+			}
+
 			return sceneGraph;
 
 		},
