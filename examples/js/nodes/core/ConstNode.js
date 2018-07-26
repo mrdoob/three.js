@@ -4,13 +4,15 @@
 
 import { TempNode } from './TempNode.js';
 
+var declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
+
 function ConstNode( src, useDefine ) {
 
 	TempNode.call( this );
 
 	this.eval( src || ConstNode.PI, useDefine );
 
-};
+}
 
 ConstNode.PI = 'PI';
 ConstNode.PI2 = 'PI2';
@@ -18,8 +20,6 @@ ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
 ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
 ConstNode.LOG2 = 'LOG2';
 ConstNode.EPSILON = 'EPSILON';
-
-ConstNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
 
 ConstNode.prototype = Object.create( TempNode.prototype );
 ConstNode.prototype.constructor = ConstNode;
@@ -37,9 +37,9 @@ ConstNode.prototype.eval = function ( src, useDefine ) {
 
 	var name, type, value = "";
 
-	var match = this.src.match( ConstNode.rDeclaration );
+	var match = this.src.match( declarationRegexp );
 
-	this.useDefine = useDefine || this.src.charAt(0) === '#';
+	this.useDefine = useDefine || this.src.charAt( 0 ) === '#';
 
 	if ( match && match.length > 1 ) {
 
@@ -74,10 +74,10 @@ ConstNode.prototype.build = function ( builder, output ) {
 
 			return 'const ' + this.type + ' ' + this.name + ' = ' + this.value + ';';
 
-		} else if (this.useDefine) {
-		
+		} else if ( this.useDefine ) {
+
 			return this.src;
-			
+
 		}
 
 	} else {
@@ -97,11 +97,11 @@ ConstNode.prototype.generate = function ( builder, output ) {
 };
 
 ConstNode.prototype.copy = function ( source ) {
-	
+
 	TempNode.prototype.copy.call( this, source );
-	
-	this.eval( source.src, source.useDefine );	
-	
+
+	this.eval( source.src, source.useDefine );
+
 };
 
 ConstNode.prototype.toJSON = function ( meta ) {

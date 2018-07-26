@@ -42,187 +42,187 @@
 
 		<script type="module">
 
-		import './js/nodes/THREE.Nodes.js';
-		import './js/loaders/NodeMaterialLoader.js';
+			import './js/nodes/THREE.Nodes.js';
+			import './js/loaders/NodeMaterialLoader.js';
 
-		var container = document.getElementById( 'container' );
+			var container = document.getElementById( 'container' );
 
-		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-		var frame = new THREE.NodeFrame();
-		var teapot, mesh, cloud;
-		var controls;
-		var gui;
+			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+			var frame = new THREE.NodeFrame();
+			var teapot, mesh, cloud;
+			var controls;
+			var gui;
 
-		var param = { load: 'caustic' };
+			var param = { load: 'caustic' };
 
-		window.addEventListener( 'load', init );
+			window.addEventListener( 'load', init );
 
-		function init() {
+			function init() {
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			container.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-			scene = new THREE.Scene();
+				scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
-			camera.position.x = 50;
-			camera.position.z = - 50;
-			camera.position.y = 30;
-			camera.target = new THREE.Vector3();
+				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.x = 50;
+				camera.position.z = - 50;
+				camera.position.y = 30;
+				camera.target = new THREE.Vector3();
 
-			cloud = new THREE.TextureLoader().load( 'textures/lava/cloud.png' );
-			cloud.wrapS = cloud.wrapT = THREE.RepeatWrapping;
+				cloud = new THREE.TextureLoader().load( 'textures/lava/cloud.png' );
+				cloud.wrapS = cloud.wrapT = THREE.RepeatWrapping;
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
-			controls.minDistance = 50;
-			controls.maxDistance = 200;
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 200;
 
-			scene.add( new THREE.AmbientLight( 0x464646 ) );
+				scene.add( new THREE.AmbientLight( 0x464646 ) );
 
-			var light = new THREE.DirectionalLight( 0xffddcc, 1 );
-			light.position.set( 1, 0.75, 0.5 );
-			scene.add( light );
+				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
+				light.position.set( 1, 0.75, 0.5 );
+				scene.add( light );
 
-			var light = new THREE.DirectionalLight( 0xccccff, 1 );
-			light.position.set( - 1, 0.75, - 0.5 );
-			scene.add( light );
+				var light = new THREE.DirectionalLight( 0xccccff, 1 );
+				light.position.set( - 1, 0.75, - 0.5 );
+				scene.add( light );
 
-			teapot = new THREE.TeapotBufferGeometry( 15, 18 );
+				teapot = new THREE.TeapotBufferGeometry( 15, 18 );
 
-			mesh = new THREE.Mesh( teapot );
-			scene.add( mesh );
+				mesh = new THREE.Mesh( teapot );
+				scene.add( mesh );
 
-			window.addEventListener( 'resize', onWindowResize, false );
-
-			updateMaterial();
-
-			onWindowResize();
-			animate();
-
-		}
-
-		function clearGui() {
-
-			if ( gui ) gui.destroy();
-
-			gui = new dat.GUI();
-
-			var example = gui.add( param, 'load', {
-				'caustic': 'caustic',
-				'displace': 'displace',
-				'wave': 'wave',
-				'xray': 'xray'
-			} ).onFinishChange( function () {
+				window.addEventListener( 'resize', onWindowResize, false );
 
 				updateMaterial();
 
-			} );
+				onWindowResize();
+				animate();
 
-			gui.open();
+			}
 
-		}
+			function clearGui() {
 
-		function addGui( name, value, callback, isColor, min, max ) {
+				if ( gui ) gui.destroy();
 
-			var node;
+				gui = new dat.GUI();
 
-			param[ name ] = value;
+				var example = gui.add( param, 'load', {
+					'caustic': 'caustic',
+					'displace': 'displace',
+					'wave': 'wave',
+					'xray': 'xray'
+				} ).onFinishChange( function () {
 
-			if ( isColor ) {
-
-				node = gui.addColor( param, name ).onChange( function () {
-
-					callback( param[ name ] );
-
-				} );
-
-			} else if ( typeof value == 'object' ) {
-
-				node = gui.add( param, name, value ).onChange( function () {
-
-					callback( param[ name ] );
+					updateMaterial();
 
 				} );
 
-			} else {
+				gui.open();
 
-				node = gui.add( param, name, min, max ).onChange( function () {
+			}
 
-					callback( param[ name ] );
+			function addGui( name, value, callback, isColor, min, max ) {
+
+				var node;
+
+				param[ name ] = value;
+
+				if ( isColor ) {
+
+					node = gui.addColor( param, name ).onChange( function () {
+
+						callback( param[ name ] );
+
+					} );
+
+				} else if ( typeof value == 'object' ) {
+
+					node = gui.add( param, name, value ).onChange( function () {
+
+						callback( param[ name ] );
+
+					} );
+
+				} else {
+
+					node = gui.add( param, name, min, max ).onChange( function () {
+
+						callback( param[ name ] );
+
+					} );
+
+				}
+
+				return node;
+
+			}
+
+
+			function updateMaterial() {
+
+				if ( mesh.material ) mesh.material.dispose();
+
+				clearGui();
+
+				var url = "nodes/" + param.load + ".json";
+
+				var library = {
+					"cloud": cloud
+				};
+
+				var loader = new THREE.NodeMaterialLoader( undefined, library ).load( url, function () {
+
+					var time = loader.getObjectByName( "time" );
+
+					if ( time ) {
+
+						// enable time scale
+
+						time.timeScale = true;
+
+						// gui
+
+						addGui( 'timeScale', time.scale, function ( val ) {
+
+							time.scale = val;
+
+						}, false, - 2, 2 );
+
+					}
+
+					// set material
+					mesh.material = loader.material;
 
 				} );
 
 			}
 
-			return node;
+			function onWindowResize() {
 
-		}
+				var width = window.innerWidth, height = window.innerHeight;
 
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
 
-		function updateMaterial() {
+				renderer.setSize( width, height );
 
-			if ( mesh.material ) mesh.material.dispose();
+			}
 
-			clearGui();
+			function animate() {
 
-			var url = "nodes/" + param.load + ".json";
+				var delta = clock.getDelta();
 
-			var library = {
-				"cloud": cloud
-			};
+				// update material animation and/or gpu calcs (pre-renderer)
+				if ( mesh.material instanceof THREE.NodeMaterial ) frame.update( delta ).updateNode( mesh.material );
 
-			var loader = new THREE.NodeMaterialLoader( undefined, library ).load( url, function () {
+				renderer.render( scene, camera );
 
-				var time = loader.getObjectByName( "time" );
+				requestAnimationFrame( animate );
 
-				if ( time ) {
-
-					// enable time scale
-
-					time.timeScale = true;
-
-					// gui
-
-					addGui( 'timeScale', time.scale, function ( val ) {
-
-						time.scale = val;
-
-					}, false, - 2, 2 );
-
-				}
-
-				// set material
-				mesh.material = loader.material;
-
-			} );
-
-		}
-
-		function onWindowResize() {
-
-			var width = window.innerWidth, height = window.innerHeight;
-
-			camera.aspect = width / height;
-			camera.updateProjectionMatrix();
-
-			renderer.setSize( width, height );
-
-		}
-
-		function animate() {
-
-			var delta = clock.getDelta();
-
-			// update material animation and/or gpu calcs (pre-renderer)
-			if ( mesh.material instanceof THREE.NodeMaterial ) frame.update( delta ).updateNode( mesh.material );
-
-			renderer.render( scene, camera );
-
-			requestAnimationFrame( animate );
-
-		}
+			}
 
 		</script>
 	</body>

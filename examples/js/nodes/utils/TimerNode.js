@@ -4,17 +4,17 @@
 
 import { FloatNode } from '../inputs/FloatNode.js';
 import { NodeLib } from '../core/NodeLib.js';
- 
-function TimerNode( scale, scope, useTimeScale ) {
+
+function TimerNode( scale, scope, timeScale ) {
 
 	FloatNode.call( this );
 
 	this.scale = scale !== undefined ? scale : 1;
 	this.scope = scope || TimerNode.GLOBAL;
 
-	this.useTimeScale = useTimeScale !== undefined ? useTimeScale : this.scale !== 1;
+	this.timeScale = timeScale !== undefined ? timeScale : this.scale !== 1;
 
-};
+}
 
 TimerNode.GLOBAL = 'global';
 TimerNode.LOCAL = 'local';
@@ -26,6 +26,8 @@ TimerNode.prototype.nodeType = "Timer";
 
 TimerNode.prototype.isReadonly = function () {
 
+	// never use TimerNode as readonly but aways as "uniform"
+
 	return false;
 
 };
@@ -33,6 +35,7 @@ TimerNode.prototype.isReadonly = function () {
 TimerNode.prototype.isUnique = function () {
 
 	// share TimerNode "uniform" input if is used on more time with others TimerNode
+
 	return this.timeScale && ( this.scope === TimerNode.GLOBAL || this.scope === TimerNode.DELTA );
 
 };
@@ -41,7 +44,7 @@ TimerNode.prototype.updateFrame = function ( frame ) {
 
 	var scale = this.timeScale ? this.scale : 1;
 
-	switch( this.scope ) {
+	switch ( this.scope ) {
 
 		case TimerNode.LOCAL:
 
@@ -64,14 +67,14 @@ TimerNode.prototype.updateFrame = function ( frame ) {
 };
 
 TimerNode.prototype.copy = function ( source ) {
-			
+
 	FloatNode.prototype.copy.call( this, source );
-	
+
 	this.scope = source.scope;
 	this.scale = source.scale;
-	
-	this.useTimeScale = source.useTimeScale;
-	
+
+	this.timeScale = source.timeScale;
+
 };
 
 TimerNode.prototype.toJSON = function ( meta ) {
@@ -84,8 +87,8 @@ TimerNode.prototype.toJSON = function ( meta ) {
 
 		data.scope = this.scope;
 		data.scale = this.scale;
-		
-		data.useTimeScale = this.useTimeScale;
+
+		data.timeScale = this.timeScale;
 
 	}
 

@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-function GLNode( type ) {
+function Node( type ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -12,31 +12,31 @@ function GLNode( type ) {
 
 	this.userData = {};
 
-};
+}
 
-GLNode.prototype = {
+Node.prototype = {
 
-	constructor: GLNode,
-	
+	constructor: Node,
+
 	isNode: true,
-	
+
 	parse: function ( builder, settings ) {
 
 		settings = settings || {};
 
 		builder.parsing = true;
 
-		this.build( builder.addCache( settings.cache, settings.requires ).addSlot( settings.slot ), 'v4' );
+		this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), 'v4' );
 
-		builder.clearVertexNodeCode()
+		builder.clearVertexNodeCode();
 		builder.clearFragmentNodeCode();
 
-		builder.removeCache().removeSlot();
+		builder.removeFlow();
 
 		builder.parsing = false;
 
 	},
-	
+
 	parseAndBuildCode: function ( builder, output, settings ) {
 
 		settings = settings || {};
@@ -44,21 +44,21 @@ GLNode.prototype = {
 		this.parse( builder, settings );
 
 		return this.buildCode( builder, output, settings );
-	
+
 	},
-	
+
 	buildCode: function ( builder, output, settings ) {
 
 		settings = settings || {};
 
-		var data = { result: this.build( builder.addCache( settings.cache, settings.context ).addSlot( settings.slot ), output ) };
+		var data = { result: this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), output ) };
 
 		data.code = builder.clearNodeCode();
 
-		builder.removeCache().removeSlot();
+		builder.removeFlow();
 
 		return data;
-	
+
 	},
 
 	build: function ( builder, output, uuid ) {
@@ -67,7 +67,11 @@ GLNode.prototype = {
 
 		var data = builder.getNodeData( uuid || this );
 
-		if ( builder.parsing ) this.appendDepsNode( builder, data, output );
+		if ( builder.parsing ) {
+
+			this.appendDepsNode( builder, data, output );
+
+		}
 
 		if ( builder.nodes.indexOf( this ) === - 1 ) {
 
@@ -82,9 +86,9 @@ GLNode.prototype = {
 		}
 
 		return this.generate( builder, output, uuid );
-	
+
 	},
-	
+
 	appendDepsNode: function ( builder, data, output ) {
 
 		data.deps = ( data.deps || 0 ) + 1;
@@ -97,29 +101,29 @@ GLNode.prototype = {
 			data.output = output;
 
 		}
-	
+
 	},
-	
-	setName: function( name ) {
-		
+
+	setName: function ( name ) {
+
 		this.name = name;
-		
+
 		return this;
-		
+
 	},
-	
-	getName: function( builder ) {
-		
+
+	getName: function ( builder ) {
+
 		return this.name;
-		
+
 	},
-	
+
 	getType: function ( builder, output ) {
 
 		return output === 'sampler2D' || output === 'samplerCube' ? output : this.type;
-	
+
 	},
-	
+
 	getJSONNode: function ( meta ) {
 
 		var isRootObject = ( meta === undefined || typeof meta === 'string' );
@@ -129,17 +133,17 @@ GLNode.prototype = {
 			return meta.nodes[ this.uuid ];
 
 		}
-	
+
 	},
-	
+
 	copy: function ( source ) {
 
 		if ( source.name !== undefined ) this.name = source.name;
-	
+
 		if ( source.userData !== undefined ) this.userData = JSON.parse( JSON.stringify( source.userData ) );
-	
+
 	},
-	
+
 	createJSONNode: function ( meta ) {
 
 		var isRootObject = ( meta === undefined || typeof meta === 'string' );
@@ -162,15 +166,15 @@ GLNode.prototype = {
 		}
 
 		return data;
-	
+
 	},
-	
+
 	toJSON: function ( meta ) {
 
 		return this.getJSONNode( meta ) || this.createJSONNode( meta );
-	
+
 	}
-	
+
 };
 
-export { GLNode };
+export { Node };

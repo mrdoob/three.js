@@ -3,16 +3,16 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
- 
+
 function OperatorNode( a, b, op ) {
 
 	TempNode.call( this );
 
 	this.a = a;
 	this.b = b;
-	this.op = op || OperatorNode.ADD;
+	this.op = op;
 
-};
+}
 
 OperatorNode.ADD = '+';
 OperatorNode.SUB = '-';
@@ -52,18 +52,18 @@ OperatorNode.prototype.generate = function ( builder, output ) {
 	var a = this.a.build( builder, type ),
 		b = this.b.build( builder, type );
 
-	return builder.format( '( ' + a + ' ' +  this.op + ' '+ b + ' )', type, output );
+	return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', type, output );
 
 };
 
 OperatorNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.a = source.a;
 	this.b = source.b;
 	this.op = source.op;
-	
+
 };
 
 OperatorNode.prototype.toJSON = function ( meta ) {
