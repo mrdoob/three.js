@@ -14722,7 +14722,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLBufferRenderer( gl, extensions, info ) {
+	function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var mode;
 
@@ -14744,7 +14744,7 @@
 
 			var extension;
 
-			if ( gl.isWebGL2 ) {
+			if ( capabilities.isWebGL2 ) {
 
 				extension = gl;
 
@@ -14761,7 +14761,7 @@
 
 			}
 
-			extension[ gl.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
+			extension[ capabilities.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
 
 			info.update( count, mode, geometry.maxInstancedCount );
 
@@ -14833,6 +14833,8 @@
 
 		}
 
+		var isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+
 		var precision = parameters.precision !== undefined ? parameters.precision : 'highp';
 		var maxPrecision = getMaxPrecision( precision );
 
@@ -14856,10 +14858,12 @@
 		var maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
 		var vertexTextures = maxVertexTextures > 0;
-		var floatFragmentTextures = gl.isWebGL2 || !! extensions.get( 'OES_texture_float' );
+		var floatFragmentTextures = isWebGL2 || !! extensions.get( 'OES_texture_float' );
 		var floatVertexTextures = vertexTextures && floatFragmentTextures;
 
 		return {
+
+			isWebGL2: isWebGL2,
 
 			getMaxAnisotropy: getMaxAnisotropy,
 			getMaxPrecision: getMaxPrecision,
@@ -15296,7 +15300,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLIndexedBufferRenderer( gl, extensions, info ) {
+	function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var mode;
 
@@ -15327,7 +15331,7 @@
 
 			var extension;
 
-			if ( gl.isWebGL2 ) {
+			if ( capabilities.isWebGL2 ) {
 
 				extension = gl;
 
@@ -15344,7 +15348,7 @@
 
 			}
 
-			extension[ gl.isWebGL2 ? 'drawElementsInstanced' : 'drawElementsInstancedANGLE' ]( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
+			extension[ capabilities.isWebGL2 ? 'drawElementsInstanced' : 'drawElementsInstancedANGLE' ]( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
 
 			info.update( count, mode, geometry.maxInstancedCount );
 
@@ -16734,7 +16738,7 @@
 
 	}
 
-	function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
+	function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities ) {
 
 		var gl = renderer.context;
 
@@ -16817,7 +16821,7 @@
 
 		//
 
-		var customExtensions = gl.isWebGL2 ? '' : generateExtensions( material.extensions, parameters, extensions );
+		var customExtensions = capabilities.isWebGL2 ? '' : generateExtensions( material.extensions, parameters, extensions );
 
 		var customDefines = generateDefines( defines );
 
@@ -16905,7 +16909,7 @@
 				parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				parameters.logarithmicDepthBuffer && ( gl.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				parameters.logarithmicDepthBuffer && ( capabilities.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 				'uniform mat4 modelMatrix;',
 				'uniform mat4 modelViewMatrix;',
@@ -17010,9 +17014,9 @@
 				parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				parameters.logarithmicDepthBuffer && ( gl.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				parameters.logarithmicDepthBuffer && ( capabilities.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-				parameters.envMap && ( gl.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
+				parameters.envMap && ( capabilities.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
@@ -17048,7 +17052,7 @@
 		vertexShader = unrollLoops( vertexShader );
 		fragmentShader = unrollLoops( fragmentShader );
 
-		if ( gl.isWebGL2 && ! material.isRawShaderMaterial ) {
+		if ( capabilities.isWebGL2 && ! material.isRawShaderMaterial ) {
 
 			var isGLSL3ShaderMaterial = false;
 
@@ -17529,7 +17533,7 @@
 
 			if ( program === undefined ) {
 
-				program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
+				program = new WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities );
 				programs.push( program );
 
 			}
@@ -18791,7 +18795,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLState( gl, extensions, utils ) {
+	function WebGLState( gl, extensions, utils, capabilities ) {
 
 		function ColorBuffer() {
 
@@ -19103,7 +19107,7 @@
 		var enabledAttributes = new Uint8Array( maxVertexAttributes );
 		var attributeDivisors = new Uint8Array( maxVertexAttributes );
 
-		var capabilities = {};
+		var enabledCapabilities = {};
 
 		var compressedTextureFormats = null;
 
@@ -19220,9 +19224,9 @@
 
 			if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
 
-				var extension = gl.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
+				var extension = capabilities.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
 
-				extension[ gl.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
+				extension[ capabilities.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
 				attributeDivisors[ attribute ] = meshPerAttribute;
 
 			}
@@ -19246,10 +19250,10 @@
 
 		function enable( id ) {
 
-			if ( capabilities[ id ] !== true ) {
+			if ( enabledCapabilities[ id ] !== true ) {
 
 				gl.enable( id );
-				capabilities[ id ] = true;
+				enabledCapabilities[ id ] = true;
 
 			}
 
@@ -19257,10 +19261,10 @@
 
 		function disable( id ) {
 
-			if ( capabilities[ id ] !== false ) {
+			if ( enabledCapabilities[ id ] !== false ) {
 
 				gl.disable( id );
-				capabilities[ id ] = false;
+				enabledCapabilities[ id ] = false;
 
 			}
 
@@ -19669,7 +19673,7 @@
 
 			}
 
-			capabilities = {};
+			enabledCapabilities = {};
 
 			compressedTextureFormats = null;
 
@@ -19806,7 +19810,7 @@
 
 		function textureNeedsPowerOfTwo( texture ) {
 
-			if ( _gl.isWebGL2 ) return false;
+			if ( capabilities.isWebGL2 ) return false;
 
 			return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
 				( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
@@ -19833,7 +19837,7 @@
 
 		function getInternalFormat( glFormat, glType ) {
 
-			if ( ! _gl.isWebGL2 ) return glFormat;
+			if ( ! capabilities.isWebGL2 ) return glFormat;
 
 			if ( glFormat === _gl.RGB ) {
 
@@ -20178,7 +20182,7 @@
 			if ( extension ) {
 
 				if ( texture.type === FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
-				if ( texture.type === HalfFloatType && ( _gl.isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
+				if ( texture.type === HalfFloatType && ( capabilities.isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
 
 				if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
 
@@ -20237,10 +20241,10 @@
 
 				if ( texture.type === FloatType ) {
 
-					if ( ! _gl.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
+					if ( ! capabilities.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
 					glInternalFormat = _gl.DEPTH_COMPONENT32F;
 
-				} else if ( _gl.isWebGL2 ) {
+				} else if ( capabilities.isWebGL2 ) {
 
 					// WebGL 2.0 requires signed internalformat for glTexImage2D
 					glInternalFormat = _gl.DEPTH_COMPONENT16;
@@ -20632,7 +20636,7 @@
 	 * @author thespite / http://www.twitter.com/thespite
 	 */
 
-	function WebGLUtils( gl, extensions ) {
+	function WebGLUtils( gl, extensions, capabilities ) {
 
 		function convert( p ) {
 
@@ -20664,7 +20668,7 @@
 
 			if ( p === HalfFloatType ) {
 
-				if ( gl.isWebGL2 ) return gl.HALF_FLOAT;
+				if ( capabilities.isWebGL2 ) return gl.HALF_FLOAT;
 
 				extension = extensions.get( 'OES_texture_half_float' );
 
@@ -20755,7 +20759,7 @@
 
 			if ( p === MinEquation || p === MaxEquation ) {
 
-				if ( gl.isWebGL2 ) {
+				if ( capabilities.isWebGL2 ) {
 
 					if ( p === MinEquation ) return gl.MIN;
 					if ( p === MaxEquation ) return gl.MAX;
@@ -20775,7 +20779,7 @@
 
 			if ( p === UnsignedInt248Type ) {
 
-				if ( gl.isWebGL2 ) return gl.UNSIGNED_INT_24_8;
+				if ( capabilities.isWebGL2 ) return gl.UNSIGNED_INT_24_8;
 
 				extension = extensions.get( 'WEBGL_depth_texture' );
 
@@ -21879,8 +21883,6 @@
 
 			}
 
-			_gl.isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext;
-
 			// Some experimental-webgl implementations do not have getShaderPrecisionFormat
 
 			if ( _gl.getShaderPrecisionFormat === undefined ) {
@@ -21911,7 +21913,9 @@
 
 			extensions = new WebGLExtensions( _gl );
 
-			if ( ! _gl.isWebGL2 ) {
+			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
+
+			if ( ! capabilities.isWebGL2 ) {
 
 				extensions.get( 'WEBGL_depth_texture' );
 				extensions.get( 'OES_texture_float' );
@@ -21925,11 +21929,9 @@
 
 			extensions.get( 'OES_texture_float_linear' );
 
-			utils = new WebGLUtils( _gl, extensions );
+			utils = new WebGLUtils( _gl, extensions, capabilities );
 
-			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
-
-			state = new WebGLState( _gl, extensions, utils );
+			state = new WebGLState( _gl, extensions, utils, capabilities );
 			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
@@ -21946,8 +21948,8 @@
 
 			background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
-			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
-			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
+			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
+			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
 
 			info.programs = programCache.programs;
 
@@ -22484,7 +22486,7 @@
 
 		function setupVertexAttributes( material, program, geometry ) {
 
-			if ( geometry && geometry.isInstancedBufferGeometry & ! _gl.isWebGL2 ) {
+			if ( geometry && geometry.isInstancedBufferGeometry & ! capabilities.isWebGL2 ) {
 
 				if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
@@ -22913,8 +22915,6 @@
 							_vector3.setFromMatrixPosition( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
 
-							var material = object.material;
-
 						}
 
 						var geometry = objects.update( object );
@@ -23148,6 +23148,9 @@
 				}
 
 				material.onBeforeCompile( materialProperties.shader, _this );
+
+				// Computing code again as onBeforeCompile may have changed the shaders
+				code = programCache.getProgramCode( material, parameters );
 
 				program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
 
@@ -24197,8 +24200,8 @@
 					}
 
 					if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
-						! ( textureType === FloatType && ( _gl.isWebGL2 || extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
-						! ( textureType === HalfFloatType && ( _gl.isWebGL2 ? extensions.get( 'EXT_color_buffer_float' ) : extensions.get( 'EXT_color_buffer_half_float' ) ) ) ) {
+						! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
+						! ( textureType === HalfFloatType && ( capabilities.isWebGL2 ? extensions.get( 'EXT_color_buffer_float' ) : extensions.get( 'EXT_color_buffer_half_float' ) ) ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 						return;
