@@ -1,5 +1,6 @@
 /**
  * @author Don McCurdy / https://www.donmccurdy.com
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 var LoaderUtils = {
@@ -26,6 +27,14 @@ var LoaderUtils = {
 
 		// Merges multi-byte utf-8 characters.
 		return decodeURIComponent( escape( s ) );
+
+	},
+
+	extractExtension: function ( url ) {
+
+		// http://www.jstips.co/en/javascript/get-file-extension/
+
+		return url.slice( ( url.lastIndexOf( '.' ) - 1 >>> 0 ) + 2 );
 
 	},
 

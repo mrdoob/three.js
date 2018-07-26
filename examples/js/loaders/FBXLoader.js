@@ -221,7 +221,7 @@
 
 		var content = videoNode.Content;
 		var fileName = videoNode.RelativeFilename || videoNode.Filename;
-		var extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
+		var extension = THREE.LoaderUtils.extractExtension( fileName ).toLowerCase();
 
 		var type;
 

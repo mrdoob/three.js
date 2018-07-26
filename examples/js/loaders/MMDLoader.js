@@ -79,7 +79,7 @@ THREE.MMDLoader = ( function () {
 			var builder = this.meshBuilder.setCrossOrigin( this.crossOrigin );
 
 			var texturePath = THREE.LoaderUtils.extractUrlBase( url );
-			var modelExtension = this._extractExtension( url ).toLowerCase();
+			var modelExtension = THREE.LoaderUtils.extractExtension( url ).toLowerCase();
 
 			// Should I detect by seeing header?
 			if ( modelExtension !== 'pmd' && modelExtension !== 'pmx' ) {
@@ -260,15 +260,6 @@ THREE.MMDLoader = ( function () {
 					onLoad( parser.parseVpd( text, true ) );
 
 				}, onProgress, onError );
-
-		},
-
-		// private methods
-
-		_extractExtension: function ( url ) {
-
-			var index = url.lastIndexOf( '.' );
-			return index < 0 ? '' : url.slice( index + 1 );
 
 		},
 
