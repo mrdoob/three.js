@@ -97,7 +97,7 @@
 
 					// extruded shape
 
-					var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+					var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
 
 					var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
 					mesh.position.set( x, y, z - 75 );

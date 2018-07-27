@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLBufferRenderer( gl, extensions, info ) {
+function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 	var mode;
 
@@ -24,7 +24,7 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 		var extension;
 
-		if ( gl.isWebGL2 ) {
+		if ( capabilities.isWebGL2 ) {
 
 			extension = gl;
 
@@ -41,7 +41,7 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 		}
 
-		extension[ gl.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
+		extension[ capabilities.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
 
 		info.update( count, mode, geometry.maxInstancedCount );
 

@@ -1,8 +1,8 @@
-import { 
+import {
 
 	// core
-	
-	GLNode,
+
+	Node,
 	TempNode,
 	InputNode,
 	ConstNode,
@@ -10,15 +10,16 @@ import {
 	StructNode,
 	AttributeNode,
 	FunctionNode,
+	ExpressionNode,
 	FunctionCallNode,
 	NodeLib,
 	NodeUtils,
 	NodeFrame,
 	NodeUniform,
 	NodeBuilder,
-	
+
 	// inputs
-	
+
 	IntNode,
 	FloatNode,
 	Vector2Node,
@@ -32,9 +33,10 @@ import {
 	ScreenNode,
 	ReflectorNode,
 	PropertyNode,
-	
+	RTTNode,
+
 	// accessors
-	
+
 	UVNode,
 	ColorsNode,
 	PositionNode,
@@ -44,33 +46,35 @@ import {
 	ReflectNode,
 	ScreenUVNode,
 	ResolutionNode,
-	
+
 	// math
-	
+
 	Math1Node,
 	Math2Node,
 	Math3Node,
 	OperatorNode,
-	
+	CondNode,
+
 	// procedural
-	
+
 	NoiseNode,
-	
+	CheckerNode,
+
 	// bsdfs
-	
+
 	BlinnShininessExponentNode,
 	BlinnExponentToRoughnessNode,
 	RoughnessToBlinnExponentNode,
-	
+
 	// misc
-	
+
 	TextureCubeUVNode,
 	TextureCubeNode,
 	NormalMapNode,
 	BumpMapNode,
-	
+
 	// utils
-	
+
 	BypassNode,
 	JoinNode,
 	SwitchNode,
@@ -78,34 +82,39 @@ import {
 	VelocityNode,
 	UVTransformNode,
 	MaxMIPLevelNode,
-	
+	ColorSpaceNode,
+
 	// effects
-	
+
 	BlurNode,
 	ColorAdjustmentNode,
 	LuminanceNode,
 
 	// material nodes
-	
+
 	RawNode,
 	SpriteNode,
 	PhongNode,
 	StandardNode,
 	MeshStandardNode,
-	
+
 	// materials
-	
+
 	NodeMaterial,
 	SpriteNodeMaterial,
 	PhongNodeMaterial,
 	StandardNodeMaterial,
-	MeshStandardNodeMaterial
-	
+	MeshStandardNodeMaterial,
+
+	// post-processing
+
+	NodePostProcessing
+
 } from './Nodes.js';
 
 // core
 
-THREE.GLNode = GLNode;
+THREE.Node = Node;
 THREE.TempNode = TempNode;
 THREE.InputNode = InputNode;
 THREE.ConstNode = ConstNode;
@@ -113,6 +122,7 @@ THREE.VarNode = VarNode;
 THREE.StructNode = StructNode;
 THREE.AttributeNode = AttributeNode;
 THREE.FunctionNode = FunctionNode;
+THREE.ExpressionNode = ExpressionNode;
 THREE.FunctionCallNode = FunctionCallNode;
 THREE.NodeLib = NodeLib;
 THREE.NodeUtils = NodeUtils;
@@ -135,6 +145,7 @@ THREE.CubeTextureNode = CubeTextureNode;
 THREE.ScreenNode = ScreenNode;
 THREE.ReflectorNode = ReflectorNode;
 THREE.PropertyNode = PropertyNode;
+THREE.RTTNode = RTTNode;
 
 // accessors
 
@@ -154,10 +165,12 @@ THREE.Math1Node = Math1Node;
 THREE.Math2Node = Math2Node;
 THREE.Math3Node = Math3Node;
 THREE.OperatorNode = OperatorNode;
+THREE.CondNode = CondNode;
 
 // procedural
 
 THREE.NoiseNode = NoiseNode;
+THREE.CheckerNode = CheckerNode;
 
 // bsdfs
 
@@ -181,6 +194,7 @@ THREE.TimerNode = TimerNode;
 THREE.VelocityNode = VelocityNode;
 THREE.UVTransformNode = UVTransformNode;
 THREE.MaxMIPLevelNode = MaxMIPLevelNode;
+THREE.ColorSpaceNode = ColorSpaceNode;
 
 // effects
 
@@ -203,3 +217,7 @@ THREE.SpriteNodeMaterial = SpriteNodeMaterial;
 THREE.PhongNodeMaterial = PhongNodeMaterial;
 THREE.StandardNodeMaterial = StandardNodeMaterial;
 THREE.MeshStandardNodeMaterial = MeshStandardNodeMaterial;
+
+// post-processing
+
+THREE.NodePostProcessing = NodePostProcessing;

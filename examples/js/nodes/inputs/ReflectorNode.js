@@ -14,7 +14,7 @@ function ReflectorNode( mirror ) {
 
 	if ( mirror ) this.setMirror( mirror );
 
-};
+}
 
 ReflectorNode.prototype = Object.create( TempNode.prototype );
 ReflectorNode.prototype.constructor = ReflectorNode;
@@ -36,7 +36,7 @@ ReflectorNode.prototype.setMirror = function ( mirror ) {
 };
 
 ReflectorNode.prototype.generate = function ( builder, output ) {
-	
+
 	if ( builder.isShader( 'fragment' ) ) {
 
 		this.uvResult.a = this.offset;
@@ -61,9 +61,9 @@ ReflectorNode.prototype.generate = function ( builder, output ) {
 };
 
 ReflectorNode.prototype.copy = function ( source ) {
-			
+
 	InputNode.prototype.copy.call( this, source );
-	
+
 	this.scope.mirror = source.mirror;
 
 };

@@ -32,18 +32,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		delete geometries[ geometry.id ];
 
-		// TODO Remove duplicate code
-
-		var attribute = wireframeAttributes[ geometry.id ];
-
-		if ( attribute ) {
-
-			attributes.remove( attribute );
-			delete wireframeAttributes[ geometry.id ];
-
-		}
-
-		attribute = wireframeAttributes[ buffergeometry.id ];
+		var attribute = wireframeAttributes[ buffergeometry.id ];
 
 		if ( attribute ) {
 

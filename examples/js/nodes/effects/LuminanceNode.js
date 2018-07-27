@@ -12,18 +12,18 @@ function LuminanceNode( rgb ) {
 
 	this.rgb = rgb;
 
-};
+}
 
-LuminanceNode.Nodes = (function() {
-	
+LuminanceNode.Nodes = ( function () {
+
 	var LUMA = new ConstNode( "vec3 LUMA vec3( 0.2125, 0.7154, 0.0721 )" );
 
 	var luminance = new FunctionNode( [
 		// Algorithm from Chapter 10 of Graphics Shaders
 		"float luminance( vec3 rgb ) {",
-		
+
 		"	return dot( rgb, LUMA );",
-		
+
 		"}"
 	].join( "\n" ), [ LUMA ] );
 
@@ -31,8 +31,8 @@ LuminanceNode.Nodes = (function() {
 		LUMA: LUMA,
 		luminance: luminance
 	};
-	
-})();
+
+} )();
 
 LuminanceNode.prototype = Object.create( TempNode.prototype );
 LuminanceNode.prototype.constructor = LuminanceNode;
@@ -47,11 +47,11 @@ LuminanceNode.prototype.generate = function ( builder, output ) {
 };
 
 LuminanceNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.rgb = source.rgb;
-	
+
 };
 
 LuminanceNode.prototype.toJSON = function ( meta ) {

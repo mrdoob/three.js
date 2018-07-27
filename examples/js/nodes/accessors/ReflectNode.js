@@ -10,7 +10,7 @@ function ReflectNode( scope ) {
 
 	this.scope = scope || ReflectNode.CUBE;
 
-};
+}
 
 ReflectNode.CUBE = 'cube';
 ReflectNode.SPHERE = 'sphere';
@@ -37,7 +37,7 @@ ReflectNode.prototype.getType = function ( builder ) {
 ReflectNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
-		
+
 		var result;
 
 		switch ( this.scope ) {
@@ -72,14 +72,14 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 		}
 
-		return builder.format( result, this.getType( this.type ), output );
-	
+		return builder.format( result, this.getType( builder ), output );
+
 	} else {
-		
+
 		console.warn( "THREE.ReflectNode is not compatible with " + builder.shader + " shader." );
 
 		return builder.format( 'vec3( 0.0 )', this.type, output );
-		
+
 	}
 
 };

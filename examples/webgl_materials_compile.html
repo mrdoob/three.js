@@ -207,10 +207,10 @@
 			mtl.emissive = cos;
 			
 			
-			var transformer = new THREE.FunctionNode( "position + 0.0 * " + Math.random(), "vec3", [ ]);
+			var transformer = new THREE.ExpressionNode( "position + 0.0 * " + Math.random(), "vec3", [ ]);
 			mtl.transform = transformer;
 
-			// build shader
+			// build shader ( ignore auto build )
 			mtl.build();
 
 			// set material
