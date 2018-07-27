@@ -833,6 +833,12 @@
 
 		},
 
+		cross: function ( v ) {
+
+			return this.x * v.y - this.y * v.x;
+
+		},
+
 		lengthSq: function () {
 
 			return this.x * this.x + this.y * this.y;
@@ -2299,6 +2305,20 @@
 		angleTo: function ( q ) {
 
 			return 2 * Math.acos( Math.abs( _Math.clamp( this.dot( q ), - 1, 1 ) ) );
+
+		},
+
+		rotateTowards: function ( q, step ) {
+
+			var angle = this.angleTo( q );
+
+			if ( angle === 0 ) return this;
+
+			var t = Math.min( 1, step / angle );
+
+			this.slerp( q, t );
+
+			return this;
 
 		},
 
@@ -17651,24 +17671,6 @@
 	}
 
 
-	function painterSortStableSprites( a, b ) {
-
-		if ( a.renderOrder !== b.renderOrder ) {
-
-		 return a.renderOrder - b.renderOrder;
-
-		} else if ( a.z !== b.z ) {
-
-		 return b.z - a.z;
-
-		} else {
-
-		 return b.id - a.id;
-
-		}
-
-	}
-
 	function WebGLRenderList() {
 
 		var renderItems = [];
@@ -17676,7 +17678,6 @@
 
 		var opaque = [];
 		var transparent = [];
-		var sprites = [];
 
 		function init() {
 
@@ -17684,7 +17685,6 @@
 
 			opaque.length = 0;
 			transparent.length = 0;
-			sprites.length = 0;
 
 		}
 
@@ -17720,15 +17720,8 @@
 
 			}
 
-			if ( object.isSprite ) {
 
-				sprites.push( renderItem );
-
-			} else {
-
-				( material.transparent === true ? transparent : opaque ).push( renderItem );
-
-			}
+			( material.transparent === true ? transparent : opaque ).push( renderItem );
 
 			renderItemsIndex ++;
 
@@ -17738,14 +17731,12 @@
 
 			if ( opaque.length > 1 ) opaque.sort( painterSortStable );
 			if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
-			if ( sprites.length > 1 ) sprites.sort( painterSortStableSprites );
 
 		}
 
 		return {
 			opaque: opaque,
 			transparent: transparent,
-			sprites: sprites,
 
 			init: init,
 			push: push,
@@ -22765,7 +22756,6 @@
 
 			var opaqueObjects = currentRenderList.opaque;
 			var transparentObjects = currentRenderList.transparent;
-			var spriteObjects = currentRenderList.sprites;
 
 			if ( scene.overrideMaterial ) {
 
@@ -22773,7 +22763,6 @@
 
 				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
 				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
-				if ( spriteObjects.length ) renderObjects( spriteObjects, scene, camera, overrideMaterial );
 
 			} else {
 
@@ -22784,10 +22773,6 @@
 				// transparent pass (back-to-front order)
 
 				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
-
-				//
-
-				if ( spriteObjects.length ) renderObjects( spriteObjects, scene, camera );
 
 			}
 
