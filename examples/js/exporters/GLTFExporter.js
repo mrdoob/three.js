@@ -2028,11 +2028,21 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
+				resolve();
+
 			} );
 
 		}
 
-		processInput( input );
+		try {
+
+			processInput( input );
+
+		} catch ( e ) {
+
+			onError( e );
+
+		}
 
 		Promise.all( pending ).then( postProcessBuffers ).then( function () {
 
