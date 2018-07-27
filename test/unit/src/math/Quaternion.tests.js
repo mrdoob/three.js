@@ -423,6 +423,25 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "lookAt", ( assert ) => {
+
+			var a = new Quaternion();
+			var b = new Quaternion();
+			var m = new Matrix4();
+
+			var eye = new Vector3( 0, 0, 0 );
+			var target = new Vector3( 0, 1, - 1 );
+			var up = new Vector3( 0, 1, 0 );
+
+			a.lookAt( eye, target, up );
+			m.lookAt( eye, target, up );
+
+			b.setFromRotationMatrix( m );
+
+			assert.ok( a.equals( b ), "Passed!" );
+
+		} );
+
 		QUnit.test( "inverse/conjugate", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );

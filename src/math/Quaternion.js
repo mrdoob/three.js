@@ -1,5 +1,6 @@
 import { _Math } from './Math.js';
 import { Vector3 } from './Vector3.js';
+import { Matrix4 } from './Matrix4.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -413,6 +414,21 @@ Object.assign( Quaternion.prototype, {
 		return this;
 
 	},
+
+	lookAt: function () {
+
+		var rotationMatrix = new Matrix4();
+
+		return function lookAt( eye, target, up ) {
+
+			rotationMatrix.lookAt( eye, target, up );
+			this.setFromRotationMatrix( rotationMatrix );
+
+			return this;
+
+		};
+
+	}(),
 
 	inverse: function () {
 
