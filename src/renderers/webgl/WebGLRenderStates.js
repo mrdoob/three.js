@@ -73,22 +73,22 @@ function WebGLRenderStates() {
 
 		var hash;
 
-		if ( hashCache [ scene.id ] ) {
+		if ( hashCache[ scene.id ] ) {
 
-			hash = hashCache [ scene.id ] [ camera.id ];
+			hash = hashCache[ scene.id ][ camera.id ];
 
 			if ( hash === undefined ) {
 
 				hash = scene.id + ',' + camera.id;
-				hashCache [ scene.id ] [ camera.id ] = hash;
+				hashCache[ scene.id ][ camera.id ] = hash;
 
 			}
 
 		} else {
 
 			hash = scene.id + ',' + camera.id;
-			hashCache [ scene.id ] = {};
-			hashCache [ scene.id ][ camera.id ] = hash;
+			hashCache[ scene.id ] = {};
+			hashCache[ scene.id ][ camera.id ] = hash;
 
 		}
 
