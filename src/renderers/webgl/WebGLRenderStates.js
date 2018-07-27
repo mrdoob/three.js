@@ -67,10 +67,30 @@ function WebGLRenderState() {
 function WebGLRenderStates() {
 
 	var renderStates = {};
+	var hashCache = {};
 
 	function get( scene, camera ) {
 
-		var hash = scene.id + ',' + camera.id;
+		var hash;
+
+		if ( hashCache [ scene.id ] ) {
+
+			hash = hashCache [ scene.id ] [ camera.id ];
+
+			if ( hash === undefined ) {
+
+				hash = scene.id + ',' + camera.id;
+				hashCache [ scene.id ] [ camera.id ] = hash;
+
+			}
+
+		} else {
+
+			hash = scene.id + ',' + camera.id;
+			hashCache [ scene.id ] = {};
+			hashCache [ scene.id ][ camera.id ] = hash;
+
+		}
 
 		var renderState = renderStates[ hash ];
 
