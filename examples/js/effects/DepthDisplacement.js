@@ -2,7 +2,7 @@
  * @author juniorxsound / http://orfleisher.com/
  */
 
-THREE.DepthDisplacementEffect = function ( renderer, color, depth ) {
+THREE.DepthDisplacementEffect = function ( renderer, color, depth, domElement ) {
 
 	var _aspectRatio = color.image.width / color.image.height;
 
@@ -92,6 +92,16 @@ THREE.DepthDisplacementEffect = function ( renderer, color, depth ) {
 
 	} );
 
+	this.mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( _aspectRatio, 1 ), _material );
+
+	this.onMouseMove = function ( e ) {
+
+		_material.uniforms.scale.value.set( ( _windowWidth / 2 - e.clientX ) * _displacementAmount, ( _windowHeight / 2 - e.clientY ) * _displacementAmount );
+
+	}
+
+	renderer.domElement.addEventListener( 'mousemove', this.onMouseMove, false );
+
 	this.setSize = function ( rendererWidth, rendererHeight, windowWidth, windowHeight ) {
 
 		_windowWidth = windowWidth;
@@ -103,33 +113,9 @@ THREE.DepthDisplacementEffect = function ( renderer, color, depth ) {
 
 	};
 
-	this.updateMousePosition = function ( e ) {
-
-		_material.uniforms.scale.value.set( ( _windowWidth / 2 - e.clientX ) * _displacementAmount, ( _windowHeight / 2 - e.clientY ) * _displacementAmount );
-
-	};
-
 	this.render = function ( scene, camera ) {
 
 		renderer.render( scene, camera );
-
-	}
-
-	this.setDisplacement = function ( amount ) {
-
-		_displacementAmount = amount;
-
-	};
-
-	this.setDirection = function ( direction ) {
-
-		_direction = direction;
-
-	};
-
-	this.getObject3D = function () {
-
-		return mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( _aspectRatio, 1 ), _material );
 
 	};
 

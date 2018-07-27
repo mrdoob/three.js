@@ -95,7 +95,7 @@
 
 					effect = new THREE.DepthDisplacementEffect( renderer, colorTexture, depthTexture );
 					effect.setSize( rendererSize.width, rendererSize.height, window.innerWidth, window.innerHeight );
-					scene.add( effect.getObject3D() );
+					scene.add( effect.mesh );
 
 					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 					window.addEventListener( 'resize', onWindowResize, false );
@@ -122,8 +122,6 @@
 			}
 
 			function onDocumentMouseMove( event ) {
-
-				effect.updateMousePosition( event );
 
 				effect.render( scene, camera );
 
