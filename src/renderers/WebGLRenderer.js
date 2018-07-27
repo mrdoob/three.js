@@ -1102,7 +1102,6 @@ function WebGLRenderer( parameters ) {
 
 		var opaqueObjects = currentRenderList.opaque;
 		var transparentObjects = currentRenderList.transparent;
-		var spriteObjects = currentRenderList.sprites;
 
 		if ( scene.overrideMaterial ) {
 
@@ -1110,7 +1109,6 @@ function WebGLRenderer( parameters ) {
 
 			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
 			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
-			if ( spriteObjects.length ) renderObjects( spriteObjects, scene, camera, overrideMaterial );
 
 		} else {
 
@@ -1121,10 +1119,6 @@ function WebGLRenderer( parameters ) {
 			// transparent pass (back-to-front order)
 
 			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
-
-			//
-
-			if ( spriteObjects.length ) renderObjects( spriteObjects, scene, camera );
 
 		}
 
