@@ -67,37 +67,29 @@ function WebGLRenderState() {
 function WebGLRenderStates() {
 
 	var renderStates = {};
-	var hashCache = {};
 
 	function get( scene, camera ) {
 
-		var hash;
+		var renderState;
 
-		if ( hashCache[ scene.id ] ) {
+		if ( renderStates[ scene.id ] === undefined ) {
 
-			hash = hashCache[ scene.id ][ camera.id ];
-
-			if ( hash === undefined ) {
-
-				hash = scene.id + ',' + camera.id;
-				hashCache[ scene.id ][ camera.id ] = hash;
-
-			}
+			renderState = new WebGLRenderState();
+			renderStates[ scene.id ] = {};
+			renderStates[ scene.id ][ camera.id ] = renderState;
 
 		} else {
 
-			hash = scene.id + ',' + camera.id;
-			hashCache[ scene.id ] = {};
-			hashCache[ scene.id ][ camera.id ] = hash;
+			if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
 
-		}
+				renderState = new WebGLRenderState();
+				renderStates[ scene.id ][ camera.id ] = renderState;
 
-		var renderState = renderStates[ hash ];
+			} else {
 
-		if ( renderState === undefined ) {
+				renderState = renderStates[ scene.id ][ camera.id ];
 
-			renderState = new WebGLRenderState();
-			renderStates[ hash ] = renderState;
+			}
 
 		}
 
