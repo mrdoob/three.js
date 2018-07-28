@@ -43,7 +43,9 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+
+			import './js/nodes/THREE.Nodes.js';
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -74,7 +76,7 @@
 					path + 'posz' + format, path + 'negz' + format
 				] );
 
-				scene = new THREE.Scene();
+				scene = window.scene = new THREE.Scene();
 				scene.background = envMap;
 
 				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
@@ -83,6 +85,7 @@
 
 				// model
 				var loader = new THREE.GLTFLoader();
+				loader.setUseNodes( true );
 				loader.load( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', function ( gltf ) {
 
 					gltf.scene.traverse( function ( child ) {

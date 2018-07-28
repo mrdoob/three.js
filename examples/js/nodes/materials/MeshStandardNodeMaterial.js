@@ -14,6 +14,10 @@ function MeshStandardNodeMaterial() {
 
 	this.type = "MeshStandardNodeMaterial";
 
+	var options = arguments[ 0 ];
+
+	if ( typeof options === 'object' ) Object.assign( this, options );
+
 }
 
 MeshStandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );

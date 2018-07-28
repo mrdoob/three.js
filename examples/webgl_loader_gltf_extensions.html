@@ -56,7 +56,10 @@
 		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script>
+		<script type="module">
+
+			import './js/nodes/THREE.Nodes.js';
+
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
 			var gltf, envMap, mixer, gui, extensionControls;
@@ -268,6 +271,8 @@
 				}
 
 				loader = new THREE.GLTFLoader();
+
+				loader.setUseNodes( true );
 
 				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 				loader.setDRACOLoader( new THREE.DRACOLoader() );

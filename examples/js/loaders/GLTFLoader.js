@@ -12,6 +12,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.dracoLoader = null;
+		this.useNodes = false;
 
 	}
 
@@ -72,6 +73,13 @@ THREE.GLTFLoader = ( function () {
 		setDRACOLoader: function ( dracoLoader ) {
 
 			this.dracoLoader = dracoLoader;
+			return this;
+
+		},
+
+		setUseNodes: function ( useNodes ) {
+
+			this.useNodes = useNodes;
 			return this;
 
 		},
@@ -168,7 +176,8 @@ THREE.GLTFLoader = ( function () {
 
 				path: path || this.path || '',
 				crossOrigin: this.crossOrigin,
-				manager: this.manager
+				manager: this.manager,
+				useNodes: this.useNodes
 
 			} );
 
@@ -341,7 +350,9 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFMaterialsUnlitExtension.prototype.getMaterialType = function ( material ) {
+	GLTFMaterialsUnlitExtension.prototype.getMaterialType = function ( _, useNodes ) {
+
+		if ( useNodes ) throw new Error( 'THREE.GLTFLoader: Nodes not supported with unlit materials.' );
 
 		return THREE.MeshBasicMaterial;
 
@@ -560,7 +571,9 @@ THREE.GLTFLoader = ( function () {
 				'refractionRatio',
 			],
 
-			getMaterialType: function () {
+			getMaterialType: function ( _, useNodes ) {
+
+				if ( useNodes ) throw new Error( 'THREE.GLTFLoader: Nodes not supported with spec/gloss materials.' );
 
 				return THREE.ShaderMaterial;
 
@@ -2070,13 +2083,13 @@ THREE.GLTFLoader = ( function () {
 		if ( materialExtensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] ) {
 
 			var sgExtension = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ];
-			materialType = sgExtension.getMaterialType( materialDef );
+			materialType = sgExtension.getMaterialType( materialDef, this.options.useNodes );
 			pending.push( sgExtension.extendParams( materialParams, materialDef, parser ) );
 
 		} else if ( materialExtensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ] ) {
 
 			var kmuExtension = extensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ];
-			materialType = kmuExtension.getMaterialType( materialDef );
+			materialType = kmuExtension.getMaterialType( materialDef, this.options.useNodes );
 			pending.push( kmuExtension.extendParams( materialParams, materialDef, parser ) );
 
 		} else {
@@ -2084,7 +2097,7 @@ THREE.GLTFLoader = ( function () {
 			// Specification:
 			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#metallic-roughness-material
 
-			materialType = THREE.MeshStandardMaterial;
+			materialType = this.options.useNodes ? THREE.MeshStandardNodeMaterial : THREE.MeshStandardMaterial;
 
 			var metallicRoughness = materialDef.pbrMetallicRoughness || {};
 

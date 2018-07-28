@@ -108,6 +108,8 @@ NodeMaterial.prototype.copy = function ( source ) {
 
 	}
 
+	return this;
+
 };
 
 NodeMaterial.prototype.toJSON = function ( meta ) {

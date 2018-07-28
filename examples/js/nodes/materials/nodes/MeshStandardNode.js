@@ -49,6 +49,15 @@ MeshStandardNode.prototype.build = function ( builder ) {
 		this.color = map ? new OperatorNode( color, map, OperatorNode.MUL ) : color;
 
 		// slots
+		// * ao
+		// * aoMap
+
+		var ao = builder.findNode( props.ao, inputs.ao ),
+			aoMap = builder.resolve( props.aoMap );
+
+		this.ao = aoMap ? new OperatorNode( ao, new SwitchNode( aoMap, "r" ), OperatorNode.MUL ) : ao;
+
+		// slots
 		// * roughness
 		// * roughnessMap
 

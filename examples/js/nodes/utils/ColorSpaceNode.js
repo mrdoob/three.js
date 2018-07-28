@@ -12,7 +12,13 @@ function ColorSpaceNode( input, method ) {
 
 	this.input = input;
 
-	this.method = method || ColorSpaceNode.LINEAR;
+	this.method = method;
+
+	if ( this.method === undefined ) {
+
+		this.method = this.getEncodingMethod( this.input.value.encoding );
+
+	}
 
 }
 
@@ -203,7 +209,7 @@ ColorSpaceNode.LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
 
 ColorSpaceNode.prototype = Object.create( TempNode.prototype );
 ColorSpaceNode.prototype.constructor = ColorSpaceNode;
-ColorSpaceNode.prototype.nodeType = "ColorAdjustment";
+ColorSpaceNode.prototype.nodeType = "ColorSpaceNode";
 
 ColorSpaceNode.prototype.generate = function ( builder, output ) {
 
