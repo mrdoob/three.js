@@ -6,7 +6,7 @@ import { MeshStandardNode } from './nodes/MeshStandardNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-function MeshStandardNodeMaterial() {
+function MeshStandardNodeMaterial( parameters ) {
 
 	var node = new MeshStandardNode();
 
@@ -14,9 +14,7 @@ function MeshStandardNodeMaterial() {
 
 	this.type = "MeshStandardNodeMaterial";
 
-	var options = arguments[ 0 ];
-
-	if ( typeof options === 'object' ) Object.assign( this, options );
+	this.setValues( parameters );
 
 }
 
@@ -25,6 +23,12 @@ MeshStandardNodeMaterial.prototype.constructor = MeshStandardNodeMaterial;
 
 NodeUtils.addShortcuts( MeshStandardNodeMaterial.prototype, 'properties', [
 	"color",
+	"emissive",
+	"emissiveMap",
+	"emissiveIntensity",
+	"ao",
+	"aoMap",
+	"aoMapIntensity",
 	"roughness",
 	"metalness",
 	"map",

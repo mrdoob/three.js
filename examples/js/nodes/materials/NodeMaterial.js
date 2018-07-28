@@ -38,6 +38,30 @@ Object.defineProperties( NodeMaterial.prototype, {
 
 } );
 
+NodeMaterial.prototype.setValues = function( values ) {
+
+	if ( values === undefined ) return;
+
+	for ( var key in values ) {
+
+		var newValue = values[ key ];
+
+		if ( newValue === undefined ) {
+
+			console.warn( 'THREE.' + this.type + ': "' + key + '" parameter is undefined.' );
+			continue;
+
+		}
+
+		// TODO: The base Material class would warn about setting properties that do not have
+		// a current value, "...not a property of this material".
+
+		this[ key ] = newValue;
+
+	}
+
+};
+
 NodeMaterial.prototype.updateFrame = function ( frame ) {
 
 	for ( var i = 0; i < this.updaters.length; ++ i ) {

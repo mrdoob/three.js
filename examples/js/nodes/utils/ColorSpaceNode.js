@@ -12,13 +12,7 @@ function ColorSpaceNode( input, method ) {
 
 	this.input = input;
 
-	this.method = method;
-
-	if ( this.method === undefined ) {
-
-		this.method = this.getEncodingMethod( this.input.value.encoding );
-
-	}
+	this.method = method || ColorSpaceNode.LINEAR;
 
 }
 
@@ -209,15 +203,15 @@ ColorSpaceNode.LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
 
 ColorSpaceNode.prototype = Object.create( TempNode.prototype );
 ColorSpaceNode.prototype.constructor = ColorSpaceNode;
-ColorSpaceNode.prototype.nodeType = "ColorSpaceNode";
+ColorSpaceNode.prototype.nodeType = "ColorSpace";
 
 ColorSpaceNode.prototype.generate = function ( builder, output ) {
 
 	var input = builder.context.input || this.input.build( builder, 'v4' ),
-		encodingMethod = builder.context.encoding !== undefined ? this.getEncodingMethod( builder.context.encoding ) : [ this.method ],
-		factor = this.factor ? this.factor.build( builder, 'f' ) : encodingMethod[ 1 ];
+		decodingMethod = builder.context.encoding !== undefined ? this.getDecodingMethod( builder.context.encoding ) : [ this.method ],
+		factor = this.factor ? this.factor.build( builder, 'f' ) : decodingMethod[ 1 ];
 
-	var method = builder.include( ColorSpaceNode.Nodes[ encodingMethod[ 0 ] ] );
+	var method = builder.include( ColorSpaceNode.Nodes[ decodingMethod[ 0 ] ] );
 
 	if ( factor ) {
 
