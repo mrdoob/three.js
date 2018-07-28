@@ -12,7 +12,7 @@ function ColorSpaceNode( input, method ) {
 
 	this.input = input;
 
-	this.method = method || ColorSpaceNode.LINEAR;
+	this.method = method || ColorSpaceNode.LINEAR_TO_LINEAR;
 
 }
 
