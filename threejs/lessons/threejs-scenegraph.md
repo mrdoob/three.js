@@ -387,4 +387,4 @@ to make something move and rotate the way you want. For example without a scene 
 computing the motion of the moon or where to put the wheels of the car relative to its
 body would be very complicated but using a scene graph it becomes much easier.
 
-[Next up we'll go over materials and lights](threejs-materials-and-lights.html).
+[Next up we'll go over materials](threejs-materials.html).
