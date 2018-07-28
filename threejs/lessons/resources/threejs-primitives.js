@@ -2,6 +2,9 @@
 
 function main() {
 
+  // even on low-res we want hi-res rendering so the lines are small
+  const pixelRatio = 2;
+
   const primitives = {
     BoxBufferGeometry: {
       create() {
@@ -538,8 +541,6 @@ function main() {
 
     return render;
   }
-
-  const pixelRatio = 2;  // even on low-res we want hi-res rendering
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
