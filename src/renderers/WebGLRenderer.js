@@ -42,6 +42,7 @@ import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebVRManager } from './webvr/WebVRManager.js';
 import { WebXRManager } from './webvr/WebXRManager.js';
+import { Mesh } from '../objects/Mesh.js';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -646,6 +647,84 @@ function WebGLRenderer( parameters ) {
 		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
 
 		object.count = 0;
+
+	};
+
+	this.setRenderState = function ( scene, camera ) {
+
+		if ( vr.enabled ) {
+
+			camera = vr.getCamera( camera );
+
+		}
+
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+
+		currentRenderState = renderStates.get( scene, camera );
+		currentRenderState.init();
+
+		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		_frustum.setFromMatrix( _projScreenMatrix );
+
+		_localClippingEnabled = this.localClippingEnabled;
+		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
+
+		scene.traverse( function ( object ) {
+
+			if ( object.isLight ) {
+
+				currentRenderState.pushLight( object );
+
+				if ( object.castShadow ) {
+
+					currentRenderState.pushShadow( object );
+
+				}
+
+			}
+
+		} );
+
+		currentRenderState.setupLights( camera );
+
+	};
+
+	var uploadMesh = new Mesh();
+	this.uploadGeometry = function ( geometry ) {
+
+		if ( Array.isArray( geometry ) ) {
+
+			for ( var i = 0, l = geometry.length; i < l; i ++ ) {
+
+				this.uploadGeometry( geometry[ i ] );
+
+			}
+
+			return;
+
+		}
+
+		uploadMesh.geometry = geometry;
+		objects.update( uploadMesh );
+		uploadMesh.geometry = null;
+
+	};
+
+	this.drawGeometry = function ( camera, fog, geometry, material, object, group, forceUpdateMaterial ) {
+
+		// reset caching for this draw
+		if ( forceUpdateMaterial ) {
+
+			_currentMaterialId = - 1;
+			_currentCamera = null;
+
+		}
+
+
+		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+		this.renderBufferDirect( camera, fog, geometry, material, object, group );
+		state.setPolygonOffset( false );
 
 	};
 
