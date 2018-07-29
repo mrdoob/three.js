@@ -118,7 +118,7 @@
 					preservePosition: false,
 					useFirstFramePosition: true,
 					hip: "Base HumanPelvis",
-					// compensates the difference in skeletons ( T-Pose )
+					// left is SEA3D bone names and right BVH bone names
 					names: {
 						"Base HumanPelvis": "hip",
 						"Base HumanSpine3": "abdomen",
@@ -141,6 +141,7 @@
 						"Base HumanLCalf1": "lShin",
 						"Base HumanLFoot": "lFoot"
 					},
+					// compensates the difference in skeletons ( T-Pose )
 					offsets: {
 						"lShldr": new THREE.Matrix4().makeRotationFromEuler(
 							new THREE.Euler(
