@@ -215,7 +215,7 @@ THREE.SkeletonUtils = {
 		mixer.clipAction( clip ).play();
 		mixer.update( 0 );
 
-		//source.updateMatrixWorld();
+		source.updateMatrixWorld();
 
 		for ( i = 0; i < numFrames; ++ i ) {
 
@@ -268,7 +268,7 @@ THREE.SkeletonUtils = {
 
 			mixer.update( delta );
 
-			//source.updateMatrixWorld();
+			source.updateMatrixWorld();
 
 		}
 
