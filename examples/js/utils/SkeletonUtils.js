@@ -72,7 +72,7 @@ THREE.SkeletonUtils = {
 
 			}
 
-			if ( options.offset ) {
+			if ( options.offsets ) {
 
 				bindBones = [];
 
@@ -81,9 +81,9 @@ THREE.SkeletonUtils = {
 					bone = bones[ i ];
 					name = options.names[ bone.name ] || bone.name;
 
-					if ( options.offset[ name ] ) {
+					if ( options.offsets[ name ] ) {
 
-						bone.matrix.multiply( options.offset[ name ] );
+						bone.matrix.multiply( options.offsets[ name ] );
 
 						bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
 
@@ -192,6 +192,7 @@ THREE.SkeletonUtils = {
 	retargetClip: function ( target, source, clip, options ) {
 
 		options = options || {};
+		options.useFirstFramePosition = options.useFirstFramePosition !== undefined ? options.useFirstFramePosition : false;
 		options.fps = options.fps !== undefined ? options.fps : 30;
 		options.names = options.names || [];
 
@@ -210,6 +211,7 @@ THREE.SkeletonUtils = {
 			mixer = new THREE.AnimationMixer( source ),
 			bones = this.getBones( target.skeleton ),
 			boneDatas = [],
+			positionOffset,
 			bone, boneTo, boneData, i, j;
 
 		mixer.clipAction( clip ).play();
@@ -240,6 +242,18 @@ THREE.SkeletonUtils = {
 								times: new Float32Array( numFrames ),
 								values: new Float32Array( numFrames * 3 )
 							};
+
+						}
+
+						if ( options.useFirstFramePosition ) {
+
+							if ( i === 0 ) {
+
+								positionOffset = bone.position.clone();
+
+							}
+
+							bone.position.sub( positionOffset );
 
 						}
 

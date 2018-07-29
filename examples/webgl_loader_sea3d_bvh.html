@@ -115,7 +115,8 @@
 			function bvhToSEA3D( result ) {
 
 				var clip = THREE.SkeletonUtils.retargetClip( player, result.skeleton, result.clip, {
-					preservePosition: true,
+					preservePosition: false,
+					useFirstFramePosition: true,
 					hip: "Base HumanPelvis",
 					names: {
 						"Base HumanPelvis": "hip",
@@ -139,7 +140,7 @@
 						"Base HumanLCalf1": "lShin",
 						"Base HumanLFoot": "lFoot"
 					},
-					offset: {
+					offsets: {
 						"lShldr": new THREE.Matrix4().makeRotationFromEuler(
 							new THREE.Euler(
 								0,
