@@ -117,6 +117,7 @@ var files = {
 		"webgl_loader_ply",
 		"webgl_loader_prwm",
 		"webgl_loader_sea3d",
+		"webgl_loader_sea3d_bvh",
 		"webgl_loader_sea3d_hierarchy",
 		"webgl_loader_sea3d_keyframe",
 		"webgl_loader_sea3d_morph",
