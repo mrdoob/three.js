@@ -18159,14 +18159,26 @@ function WebGLRenderStates() {
 
 	function get( scene, camera ) {
 
-		var hash = scene.id + ',' + camera.id;
+		var renderState;
 
-		var renderState = renderStates[ hash ];
-
-		if ( renderState === undefined ) {
+		if ( renderStates[ scene.id ] === undefined ) {
 
 			renderState = new WebGLRenderState();
-			renderStates[ hash ] = renderState;
+			renderStates[ scene.id ] = {};
+			renderStates[ scene.id ][ camera.id ] = renderState;
+
+		} else {
+
+			if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
+
+				renderState = new WebGLRenderState();
+				renderStates[ scene.id ][ camera.id ] = renderState;
+
+			} else {
+
+				renderState = renderStates[ scene.id ][ camera.id ];
+
+			}
 
 		}
 
@@ -21774,7 +21786,14 @@ function WebGLRenderer( parameters ) {
 		_currentRenderTarget = null,
 		_currentFramebuffer = null,
 		_currentMaterialId = - 1,
-		_currentGeometryProgram = '',
+
+		// geometry and program caching
+
+		_currentGeometryProgram = {
+			geometry: null,
+			program: null,
+			wireframe: false
+		},
 
 		_currentCamera = null,
 		_currentArrayCamera = null,
@@ -22297,13 +22316,14 @@ function WebGLRenderer( parameters ) {
 		state.setMaterial( material, frontFaceCW );
 
 		var program = setProgram( camera, fog, material, object );
-		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
 
 		var updateBuffers = false;
 
-		if ( geometryProgram !== _currentGeometryProgram ) {
+		if ( geometry.id !== _currentGeometryProgram.geometry || program.id !== _currentGeometryProgram.program || material.wireframe !== _currentGeometryProgram.wireframe ) {
 
-			_currentGeometryProgram = geometryProgram;
+			_currentGeometryProgram.geometry = geometry.id;
+			_currentGeometryProgram.program = program.id;
+			_currentGeometryProgram.wireframe = material.wireframe;
 			updateBuffers = true;
 
 		}
@@ -22676,7 +22696,9 @@ function WebGLRenderer( parameters ) {
 
 		// reset caching for this frame
 
-		_currentGeometryProgram = '';
+		_currentGeometryProgram.geometry = null;
+		_currentGeometryProgram.program = null;
+		_currentGeometryProgram.wireframe = false;
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 
@@ -23034,7 +23056,9 @@ function WebGLRenderer( parameters ) {
 
 			var program = setProgram( camera, scene.fog, material, object );
 
-			_currentGeometryProgram = '';
+			_currentGeometryProgram.geometry = null;
+			_currentGeometryProgram.program = null;
+			_currentGeometryProgram.wireframe = false;
 
 			renderObjectImmediate( object, program );
 
