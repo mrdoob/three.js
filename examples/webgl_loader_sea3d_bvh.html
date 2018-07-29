@@ -115,6 +115,7 @@
 			function bvhToSEA3D( result ) {
 
 				var clip = THREE.SkeletonUtils.retargetClip( player, result.skeleton, result.clip, {
+					preservePosition: true,
 					hip: "Base HumanPelvis",
 					names: {
 						"Base HumanPelvis": "hip",
