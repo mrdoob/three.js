@@ -22,6 +22,7 @@
 THREE.FBXLoader = ( function () {
 
 	var FBXTree;
+	var connections;
 
 	function FBXLoader( manager ) {
 
@@ -122,13 +123,13 @@ THREE.FBXLoader = ( function () {
 
 		parse: function () {
 
-			this.connections = this.parseConnections();
+			connections = this.parseConnections();
 
 			var images = this.parseImages();
 			var textures = this.parseTextures( images );
 			var materials = this.parseMaterials( textures );
 			var deformers = this.parseDeformers();
-			var geometryMap = new GeometryParser( this.connections ).parse( deformers );
+			var geometryMap = new GeometryParser().parse( deformers );
 
 			return this.parseScene( deformers, geometryMap, materials );
 
@@ -371,7 +372,7 @@ THREE.FBXLoader = ( function () {
 
 			var currentPath = this.textureLoader.path;
 
-			var children = this.connections.get( textureNode.id ).children;
+			var children = connections.get( textureNode.id ).children;
 
 			if ( children !== undefined && children.length > 0 && images[ children[ 0 ].ID ] !== undefined ) {
 
@@ -443,7 +444,7 @@ THREE.FBXLoader = ( function () {
 			}
 
 			// Ignore unused materials which don't have any connections.
-			if ( ! this.connections.has( ID ) ) return null;
+			if ( ! connections.has( ID ) ) return null;
 
 			var parameters = this.parseParameters( materialNode, textureMap, ID );
 
@@ -544,7 +545,7 @@ THREE.FBXLoader = ( function () {
 			}
 
 			var self = this;
-			this.connections.get( ID ).children.forEach( function ( child ) {
+			connections.get( ID ).children.forEach( function ( child ) {
 
 				var type = child.relationship;
 
@@ -608,7 +609,7 @@ THREE.FBXLoader = ( function () {
 			if ( 'LayeredTexture' in FBXTree.Objects && id in FBXTree.Objects.LayeredTexture ) {
 
 				console.warn( 'THREE.FBXLoader: layered textures are not supported in three.js. Discarding all but first layer.' );
-				id = this.connections.get( id ).children[ 0 ].ID;
+				id = connections.get( id ).children[ 0 ].ID;
 
 			}
 
@@ -632,7 +633,7 @@ THREE.FBXLoader = ( function () {
 
 					var deformerNode = DeformerNodes[ nodeID ];
 
-					var relationships = this.connections.get( parseInt( nodeID ) );
+					var relationships = connections.get( parseInt( nodeID ) );
 
 					if ( deformerNode.attrType === 'Skin' ) {
 
@@ -746,7 +747,7 @@ THREE.FBXLoader = ( function () {
 
 				if ( morphTargetNode.attrType !== 'BlendShapeChannel' ) return;
 
-				var targetRelationships = this.connections.get( parseInt( child.ID ) );
+				var targetRelationships = connections.get( parseInt( child.ID ) );
 
 				targetRelationships.children.forEach( function ( child ) {
 
@@ -778,7 +779,7 @@ THREE.FBXLoader = ( function () {
 				var modelNode = modelNodes[ model.ID ];
 				self.setLookAtProperties( model, modelNode, sceneGraph );
 
-				var parentConnections = self.connections.get( model.ID ).parents;
+				var parentConnections = connections.get( model.ID ).parents;
 
 				parentConnections.forEach( function ( connection ) {
 
@@ -825,7 +826,7 @@ THREE.FBXLoader = ( function () {
 
 				var id = parseInt( nodeID );
 				var node = modelNodes[ nodeID ];
-				var relationships = this.connections.get( id );
+				var relationships = connections.get( id );
 
 				var model = this.buildSkeleton( relationships, skeletons, id, node.attrName );
 
@@ -1234,7 +1235,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( 'LookAtProperty' in modelNode ) {
 
-				var children = this.connections.get( model.ID ).children;
+				var children = connections.get( model.ID ).children;
 
 				children.forEach( function ( child ) {
 
@@ -1276,15 +1277,14 @@ THREE.FBXLoader = ( function () {
 
 				var skeleton = skeletons[ ID ];
 
-				var parents = this.connections.get( parseInt( skeleton.ID ) ).parents;
+				var parents = connections.get( parseInt( skeleton.ID ) ).parents;
 
-				var self = this;
 				parents.forEach( function ( parent ) {
 
 					if ( geometryMap.has( parent.ID ) ) {
 
 						var geoID = parent.ID;
-						var geoRelationships = self.connections.get( geoID );
+						var geoRelationships = connections.get( geoID );
 
 						geoRelationships.parents.forEach( function ( geoConnParent ) {
 
@@ -1349,7 +1349,7 @@ THREE.FBXLoader = ( function () {
 
 			sceneGraph.animations = [];
 
-			var rawClips = new AnimationParser( this.connections ).parse();
+			var rawClips = new AnimationParser( connections ).parse();
 
 			if ( rawClips === undefined ) return;
 
@@ -1708,11 +1708,7 @@ THREE.FBXLoader = ( function () {
 	};
 
 	// parse Geometry data from FBXTree and return map of BufferGeometries and nurbs curves
-	function GeometryParser( connections ) {
-
-		this.connections = connections;
-
-	}
+	function GeometryParser() {}
 
 	GeometryParser.prototype = {
 
@@ -1729,7 +1725,7 @@ THREE.FBXLoader = ( function () {
 
 				for ( var nodeID in geoNodes ) {
 
-					var relationships = this.connections.get( parseInt( nodeID ) );
+					var relationships = connections.get( parseInt( nodeID ) );
 					var geo = this.parseGeometry( relationships, geoNodes[ nodeID ], deformers );
 
 					geometryMap.set( parseInt( nodeID ), geo );
@@ -2542,11 +2538,7 @@ THREE.FBXLoader = ( function () {
 	};
 
 	// parse animation data from FBXTree
-	function AnimationParser( connections ) {
-
-		this.connections = connections;
-
-	}
+	function AnimationParser() {}
 
 	AnimationParser.prototype = {
 
@@ -2626,7 +2618,7 @@ THREE.FBXLoader = ( function () {
 
 				};
 
-				var relationships = this.connections.get( animationCurve.id );
+				var relationships = connections.get( animationCurve.id );
 
 				if ( relationships !== undefined ) {
 
@@ -2670,7 +2662,7 @@ THREE.FBXLoader = ( function () {
 
 				var layerCurveNodes = [];
 
-				var connection = this.connections.get( parseInt( nodeID ) );
+				var connection = connections.get( parseInt( nodeID ) );
 
 				if ( connection !== undefined ) {
 
@@ -2691,7 +2683,7 @@ THREE.FBXLoader = ( function () {
 
 									var modelID;
 
-									self.connections.get( child.ID ).parents.forEach( function ( parent ) {
+									connections.get( child.ID ).parents.forEach( function ( parent ) {
 
 										if ( parent.relationship !== undefined ) modelID = parent.ID;
 
@@ -2726,17 +2718,17 @@ THREE.FBXLoader = ( function () {
 
 									var deformerID;
 
-									self.connections.get( child.ID ).parents.forEach( function ( parent ) {
+									connections.get( child.ID ).parents.forEach( function ( parent ) {
 
 										if ( parent.relationship !== undefined ) deformerID = parent.ID;
 
 									} );
 
-									var morpherID = self.connections.get( deformerID ).parents[ 0 ].ID;
-									var geoID = self.connections.get( morpherID ).parents[ 0 ].ID;
+									var morpherID = connections.get( deformerID ).parents[ 0 ].ID;
+									var geoID = connections.get( morpherID ).parents[ 0 ].ID;
 
 									// assuming geometry is not used in more than one model
-									var modelID = self.connections.get( geoID ).parents[ 0 ].ID;
+									var modelID = connections.get( geoID ).parents[ 0 ].ID;
 
 									var rawModel = FBXTree.Objects.Model[ modelID ];
 
@@ -2800,7 +2792,7 @@ THREE.FBXLoader = ( function () {
 
 			for ( var nodeID in rawStacks ) {
 
-				var children = this.connections.get( parseInt( nodeID ) ).children;
+				var children = connections.get( parseInt( nodeID ) ).children;
 
 				if ( children.length > 1 ) {
 
