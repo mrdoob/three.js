@@ -540,6 +540,21 @@ Object.assign( Color.prototype, {
 		return this;
 
 	},
+	
+	lerpChromatic: function ( color, alpha  ) {
+
+		var hslA = this.getHSL();
+		var hslB = color.getHSL();
+
+		var h = _Math.lerp( hslA.h, hslB.h, alpha );
+		var s = _Math.lerp( hslA.s, hslB.s, alpha );
+		var l = _Math.lerp( hslA.l, hslB.l, alpha );
+
+		this.setHSL( h, s, l );
+
+		return this;
+
+	},
 
 	equals: function ( c ) {
 
