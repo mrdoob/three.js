@@ -124,7 +124,7 @@
 			function generateHeight( width, height ) {
 
 				var data = new Uint8Array( width * height ), perlin = new ImprovedNoise(),
-				size = width * height, quality = 2, z = Math.random() * 100;
+					size = width * height, quality = 2, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {
 
@@ -132,7 +132,7 @@
 
 					for ( var i = 0; i < size; i ++ ) {
 
-						var x = i % width, y = ~~ ( i / width );
+						var x = i % width, y = ~ ~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * 0.5 ) * quality + 10;
 
 					}
@@ -146,7 +146,7 @@
 			function generateTexture( data, width, height ) {
 
 				var canvas, context, image, imageData,
-				level, diff, vector3, sun, shade;
+					level, diff, vector3, sun, shade;
 
 				vector3 = new THREE.Vector3( 0, 0, 0 );
 
@@ -164,7 +164,7 @@
 				image = context.getImageData( 0, 0, width, height );
 				imageData = image.data;
 
-				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++  ) {
+				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
 
 					vector3.x = data[ j - 1 ] - data[ j + 1 ];
 					vector3.y = 2;
@@ -185,7 +185,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
@@ -212,7 +212,6 @@
 				renderer.render( scene, camera );
 
 			}
-
 
 		</script>
 
