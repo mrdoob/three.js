@@ -1,0 +1,191 @@
+{
+  "accessors": [
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "byteStride": 0,
+      "componentType": 5126,
+      "count": 11378,
+      "max": [
+        5.6986370086669922,
+        29.504100799560547,
+        7.6080727577209473
+      ],
+      "min": [
+        -6.0125927925109863,
+        0.11976776272058487,
+        -10.487000465393066
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 136536,
+      "byteStride": 0,
+      "componentType": 5126,
+      "count": 11378,
+      "max": [
+        0.76048284769058228,
+        0.99951171875
+      ],
+      "min": [
+        0.00048828125,
+        1.9942936191341687e-12
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 227560,
+      "byteStride": 0,
+      "componentType": 5126,
+      "count": 11378,
+      "max": [
+        0.99920654296875,
+        0.9923892617225647,
+        0.99845790863037109
+      ],
+      "min": [
+        -0.99988287687301636,
+        -0.95674973726272583,
+        -0.99919658899307251
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 364096,
+      "byteStride": 0,
+      "componentType": 5126,
+      "count": 11378,
+      "max": [
+        0.99995666742324829,
+        0.99990606307983398,
+        0.99975591897964478,
+        1
+      ],
+      "min": [
+        -0.99938887357711792,
+        -0.99999749660491943,
+        -0.99997586011886597,
+        1
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "byteStride": 0,
+      "componentType": 5123,
+      "count": 58446,
+      "max": [
+        11377
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "generator": "Created by MOPS CLI \/ instantUV v1.1.3",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 116892,
+      "byteOffset": 0,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 546144,
+      "byteOffset": 116892,
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 663036,
+      "type": "arraybuffer",
+      "uri": "scene.data.bin"
+    }
+  ],
+  "extensionsUsed": [],
+  "images": [
+    {
+      "uri": "material0_basecolor.jpg"
+    },
+    {
+      "uri": "material0_normal.jpg"
+    }
+  ],
+  "materials": [
+    {
+      "normalTexture": {
+        "index": 1
+      },
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.5
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "mainMesh",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 2,
+            "POSITION": 0,
+            "TANGENT": 3,
+            "TEXCOORD_0": 1
+          },
+          "indices": 4,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [],
+      "mesh": 0,
+      "name": "rootNode2"
+    }
+  ],
+  "samplers": [
+    {},
+    {}
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 1,
+      "source": 1
+    }
+  ]
+}

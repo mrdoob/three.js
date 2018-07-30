@@ -161,6 +161,7 @@ var files = {
 		"webgl_materials_lightmap",
 		"webgl_materials_nodes",
 		"webgl_materials_normalmap",
+		"webgl_materials_normalmap_object_space",
 		"webgl_materials_parallaxmap",
 		"webgl_materials_reflectivity",
 		"webgl_materials_shaders_fresnel",
