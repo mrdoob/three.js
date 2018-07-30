@@ -763,7 +763,6 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-
 		// create the main THREE.Group() to be returned by the loader
 		parseScene: function ( deformers, geometryMap, materialMap ) {
 
@@ -798,19 +797,22 @@ THREE.FBXLoader = ( function () {
 			} );
 
 			this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
-			this.addAnimations( sceneGraph );
 
 			this.createAmbientLight( sceneGraph );
 
 			this.setupMorphMaterials( sceneGraph );
 
+			var animations = new AnimationParser().parse( sceneGraph );
+
 			// if all the models where already combined in a single group, just return that
 			if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
 
-				sceneGraph.children[ 0 ].animations = sceneGraph.animations;
+				sceneGraph.children[ 0 ].animations = animations;
 				return sceneGraph.children[ 0 ];
 
 			}
+
+			sceneGraph.animations = animations;
 
 			return sceneGraph;
 
@@ -1344,310 +1346,6 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		// take raw animation clips and turn them into three.js animation clips
-		addAnimations: function ( sceneGraph ) {
-
-			sceneGraph.animations = [];
-
-			var rawClips = new AnimationParser( connections ).parse();
-
-			if ( rawClips === undefined ) return;
-
-			for ( var key in rawClips ) {
-
-				var rawClip = rawClips[ key ];
-
-				var clip = this.addClip( rawClip, sceneGraph );
-
-				sceneGraph.animations.push( clip );
-
-			}
-
-		},
-
-		addClip: function ( rawClip, sceneGraph ) {
-
-			var tracks = [];
-
-			var self = this;
-			rawClip.layer.forEach( function ( rawTracks ) {
-
-				tracks = tracks.concat( self.generateTracks( rawTracks, sceneGraph ) );
-
-			} );
-
-			return new THREE.AnimationClip( rawClip.name, - 1, tracks );
-
-		},
-
-		generateTracks: function ( rawTracks, sceneGraph ) {
-
-			var tracks = [];
-
-			var initialPosition = new THREE.Vector3();
-			var initialRotation = new THREE.Quaternion();
-			var initialScale = new THREE.Vector3();
-
-			if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
-
-			initialPosition = initialPosition.toArray();
-			initialRotation = new THREE.Euler().setFromQuaternion( initialRotation ).toArray(); // todo: euler order
-			initialScale = initialScale.toArray();
-
-			if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
-
-				var positionTrack = this.generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, initialPosition, 'position' );
-				if ( positionTrack !== undefined ) tracks.push( positionTrack );
-
-			}
-
-			if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
-
-				var rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotations, rawTracks.postRotations );
-				if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
-
-			}
-
-			if ( rawTracks.S !== undefined && Object.keys( rawTracks.S.curves ).length > 0 ) {
-
-				var scaleTrack = this.generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, initialScale, 'scale' );
-				if ( scaleTrack !== undefined ) tracks.push( scaleTrack );
-
-			}
-
-			if ( rawTracks.DeformPercent !== undefined ) {
-
-				var morphTrack = this.generateMorphTrack( rawTracks, sceneGraph );
-				if ( morphTrack !== undefined ) tracks.push( morphTrack );
-
-			}
-
-			return tracks;
-
-		},
-
-		generateVectorTrack: function ( modelName, curves, initialValue, type ) {
-
-			var times = this.getTimesForAllAxes( curves );
-			var values = this.getKeyframeTrackValues( times, curves, initialValue );
-
-			return new THREE.VectorKeyframeTrack( modelName + '.' + type, times, values );
-
-		},
-
-		generateRotationTrack: function ( modelName, curves, initialValue, preRotations, postRotations ) {
-
-			if ( curves.x !== undefined ) {
-
-				this.interpolateRotations( curves.x );
-				curves.x.values = curves.x.values.map( THREE.Math.degToRad );
-
-			}
-			if ( curves.y !== undefined ) {
-
-				this.interpolateRotations( curves.y );
-				curves.y.values = curves.y.values.map( THREE.Math.degToRad );
-
-			}
-			if ( curves.z !== undefined ) {
-
-				this.interpolateRotations( curves.z );
-				curves.z.values = curves.z.values.map( THREE.Math.degToRad );
-
-			}
-
-			var times = this.getTimesForAllAxes( curves );
-			var values = this.getKeyframeTrackValues( times, curves, initialValue );
-
-			if ( preRotations !== undefined ) {
-
-				preRotations = preRotations.map( THREE.Math.degToRad );
-				preRotations.push( 'ZYX' );
-
-				preRotations = new THREE.Euler().fromArray( preRotations );
-				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
-
-			}
-
-			if ( postRotations !== undefined ) {
-
-				postRotations = postRotations.map( THREE.Math.degToRad );
-				postRotations.push( 'ZYX' );
-
-				postRotations = new THREE.Euler().fromArray( postRotations );
-				postRotations = new THREE.Quaternion().setFromEuler( postRotations ).inverse();
-
-			}
-
-			var quaternion = new THREE.Quaternion();
-			var euler = new THREE.Euler();
-
-			var quaternionValues = [];
-
-			for ( var i = 0; i < values.length; i += 3 ) {
-
-				euler.set( values[ i ], values[ i + 1 ], values[ i + 2 ], 'ZYX' );
-
-				quaternion.setFromEuler( euler );
-
-				if ( preRotations !== undefined ) quaternion.premultiply( preRotations );
-				if ( postRotations !== undefined ) quaternion.multiply( postRotations );
-
-				quaternion.toArray( quaternionValues, ( i / 3 ) * 4 );
-
-			}
-
-			return new THREE.QuaternionKeyframeTrack( modelName + '.quaternion', times, quaternionValues );
-
-		},
-
-		generateMorphTrack: function ( rawTracks, sceneGraph ) {
-
-			var curves = rawTracks.DeformPercent.curves.morph;
-			var values = curves.values.map( function ( val ) {
-
-				return val / 100;
-
-			} );
-
-			var morphNum = sceneGraph.getObjectByName( rawTracks.modelName ).morphTargetDictionary[ rawTracks.morphName ];
-
-			return new THREE.NumberKeyframeTrack( rawTracks.modelName + '.morphTargetInfluences[' + morphNum + ']', curves.times, values );
-
-		},
-
-		// For all animated objects, times are defined separately for each axis
-		// Here we'll combine the times into one sorted array without duplicates
-		getTimesForAllAxes: function ( curves ) {
-
-			var times = [];
-
-			// first join together the times for each axis, if defined
-			if ( curves.x !== undefined ) times = times.concat( curves.x.times );
-			if ( curves.y !== undefined ) times = times.concat( curves.y.times );
-			if ( curves.z !== undefined ) times = times.concat( curves.z.times );
-
-			// then sort them and remove duplicates
-			times = times.sort( function ( a, b ) {
-
-				return a - b;
-
-			} ).filter( function ( elem, index, array ) {
-
-				return array.indexOf( elem ) == index;
-
-			} );
-
-			return times;
-
-		},
-
-		getKeyframeTrackValues: function ( times, curves, initialValue ) {
-
-			var prevValue = initialValue;
-
-			var values = [];
-
-			var xIndex = - 1;
-			var yIndex = - 1;
-			var zIndex = - 1;
-
-			times.forEach( function ( time ) {
-
-				if ( curves.x ) xIndex = curves.x.times.indexOf( time );
-				if ( curves.y ) yIndex = curves.y.times.indexOf( time );
-				if ( curves.z ) zIndex = curves.z.times.indexOf( time );
-
-				// if there is an x value defined for this frame, use that
-				if ( xIndex !== - 1 ) {
-
-					var xValue = curves.x.values[ xIndex ];
-					values.push( xValue );
-					prevValue[ 0 ] = xValue;
-
-				} else {
-
-					// otherwise use the x value from the previous frame
-					values.push( prevValue[ 0 ] );
-
-				}
-
-				if ( yIndex !== - 1 ) {
-
-					var yValue = curves.y.values[ yIndex ];
-					values.push( yValue );
-					prevValue[ 1 ] = yValue;
-
-				} else {
-
-					values.push( prevValue[ 1 ] );
-
-				}
-
-				if ( zIndex !== - 1 ) {
-
-					var zValue = curves.z.values[ zIndex ];
-					values.push( zValue );
-					prevValue[ 2 ] = zValue;
-
-				} else {
-
-					values.push( prevValue[ 2 ] );
-
-				}
-
-			} );
-
-			return values;
-
-		},
-
-		// Rotations are defined as Euler angles which can have values  of any size
-		// These will be converted to quaternions which don't support values greater than
-		// PI, so we'll interpolate large rotations
-		interpolateRotations: function ( curve ) {
-
-			for ( var i = 1; i < curve.values.length; i ++ ) {
-
-				var initialValue = curve.values[ i - 1 ];
-				var valuesSpan = curve.values[ i ] - initialValue;
-
-				var absoluteSpan = Math.abs( valuesSpan );
-
-				if ( absoluteSpan >= 180 ) {
-
-					var numSubIntervals = absoluteSpan / 180;
-
-					var step = valuesSpan / numSubIntervals;
-					var nextValue = initialValue + step;
-
-					var initialTime = curve.times[ i - 1 ];
-					var timeSpan = curve.times[ i ] - initialTime;
-					var interval = timeSpan / numSubIntervals;
-					var nextTime = initialTime + interval;
-
-					var interpolatedTimes = [];
-					var interpolatedValues = [];
-
-					while ( nextTime < curve.times[ i ] ) {
-
-						interpolatedTimes.push( nextTime );
-						nextTime += interval;
-
-						interpolatedValues.push( nextValue );
-						nextValue += step;
-
-					}
-
-					curve.times = inject( curve.times, i, interpolatedTimes );
-					curve.values = inject( curve.values, i, interpolatedValues );
-
-				}
-
-			}
-
-		},
-
 		// Parse ambient color in FBXTree.GlobalSettings - if it's not set to black (default), create an ambient light
 		createAmbientLight: function ( sceneGraph ) {
 
@@ -1707,7 +1405,7 @@ THREE.FBXLoader = ( function () {
 
 	};
 
-	// parse Geometry data from FBXTree and return map of BufferGeometries and nurbs curves
+	// parse Geometry data from FBXTree and return map of BufferGeometries
 	function GeometryParser() {}
 
 	GeometryParser.prototype = {
@@ -2544,7 +2242,31 @@ THREE.FBXLoader = ( function () {
 
 		constructor: AnimationParser,
 
-		parse: function () {
+		// take raw animation clips and turn them into three.js animation clips
+		parse: function ( sceneGraph ) {
+
+			var animationClips = [];
+
+
+			var rawClips = this.parseClips();
+
+			if ( rawClips === undefined ) return;
+
+			for ( var key in rawClips ) {
+
+				var rawClip = rawClips[ key ];
+
+				var clip = this.addClip( rawClip, sceneGraph );
+
+				animationClips.push( clip );
+
+			}
+
+			return animationClips;
+
+		},
+
+		parseClips: function () {
 
 			// since the actual transformation data is stored in FBXTree.Objects.AnimationCurve,
 			// if this is undefined we can safely assume there are no animations
@@ -2814,6 +2536,289 @@ THREE.FBXLoader = ( function () {
 			}
 
 			return rawClips;
+
+		},
+
+		addClip: function ( rawClip, sceneGraph ) {
+
+			var tracks = [];
+
+			var self = this;
+			rawClip.layer.forEach( function ( rawTracks ) {
+
+				tracks = tracks.concat( self.generateTracks( rawTracks, sceneGraph ) );
+
+			} );
+
+			return new THREE.AnimationClip( rawClip.name, - 1, tracks );
+
+		},
+
+		generateTracks: function ( rawTracks, sceneGraph ) {
+
+			var tracks = [];
+
+			var initialPosition = new THREE.Vector3();
+			var initialRotation = new THREE.Quaternion();
+			var initialScale = new THREE.Vector3();
+
+			if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
+
+			initialPosition = initialPosition.toArray();
+			initialRotation = new THREE.Euler().setFromQuaternion( initialRotation ).toArray(); // todo: euler order
+			initialScale = initialScale.toArray();
+
+			if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
+
+				var positionTrack = this.generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, initialPosition, 'position' );
+				if ( positionTrack !== undefined ) tracks.push( positionTrack );
+
+			}
+
+			if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
+
+				var rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotations, rawTracks.postRotations );
+				if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
+
+			}
+
+			if ( rawTracks.S !== undefined && Object.keys( rawTracks.S.curves ).length > 0 ) {
+
+				var scaleTrack = this.generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, initialScale, 'scale' );
+				if ( scaleTrack !== undefined ) tracks.push( scaleTrack );
+
+			}
+
+			if ( rawTracks.DeformPercent !== undefined ) {
+
+				var morphTrack = this.generateMorphTrack( rawTracks, sceneGraph );
+				if ( morphTrack !== undefined ) tracks.push( morphTrack );
+
+			}
+
+			return tracks;
+
+		},
+
+		generateVectorTrack: function ( modelName, curves, initialValue, type ) {
+
+			var times = this.getTimesForAllAxes( curves );
+			var values = this.getKeyframeTrackValues( times, curves, initialValue );
+
+			return new THREE.VectorKeyframeTrack( modelName + '.' + type, times, values );
+
+		},
+
+		generateRotationTrack: function ( modelName, curves, initialValue, preRotations, postRotations ) {
+
+			if ( curves.x !== undefined ) {
+
+				this.interpolateRotations( curves.x );
+				curves.x.values = curves.x.values.map( THREE.Math.degToRad );
+
+			}
+			if ( curves.y !== undefined ) {
+
+				this.interpolateRotations( curves.y );
+				curves.y.values = curves.y.values.map( THREE.Math.degToRad );
+
+			}
+			if ( curves.z !== undefined ) {
+
+				this.interpolateRotations( curves.z );
+				curves.z.values = curves.z.values.map( THREE.Math.degToRad );
+
+			}
+
+			var times = this.getTimesForAllAxes( curves );
+			var values = this.getKeyframeTrackValues( times, curves, initialValue );
+
+			if ( preRotations !== undefined ) {
+
+				preRotations = preRotations.map( THREE.Math.degToRad );
+				preRotations.push( 'ZYX' );
+
+				preRotations = new THREE.Euler().fromArray( preRotations );
+				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+
+			}
+
+			if ( postRotations !== undefined ) {
+
+				postRotations = postRotations.map( THREE.Math.degToRad );
+				postRotations.push( 'ZYX' );
+
+				postRotations = new THREE.Euler().fromArray( postRotations );
+				postRotations = new THREE.Quaternion().setFromEuler( postRotations ).inverse();
+
+			}
+
+			var quaternion = new THREE.Quaternion();
+			var euler = new THREE.Euler();
+
+			var quaternionValues = [];
+
+			for ( var i = 0; i < values.length; i += 3 ) {
+
+				euler.set( values[ i ], values[ i + 1 ], values[ i + 2 ], 'ZYX' );
+
+				quaternion.setFromEuler( euler );
+
+				if ( preRotations !== undefined ) quaternion.premultiply( preRotations );
+				if ( postRotations !== undefined ) quaternion.multiply( postRotations );
+
+				quaternion.toArray( quaternionValues, ( i / 3 ) * 4 );
+
+			}
+
+			return new THREE.QuaternionKeyframeTrack( modelName + '.quaternion', times, quaternionValues );
+
+		},
+
+		generateMorphTrack: function ( rawTracks, sceneGraph ) {
+
+			var curves = rawTracks.DeformPercent.curves.morph;
+			var values = curves.values.map( function ( val ) {
+
+				return val / 100;
+
+			} );
+
+			var morphNum = sceneGraph.getObjectByName( rawTracks.modelName ).morphTargetDictionary[ rawTracks.morphName ];
+
+			return new THREE.NumberKeyframeTrack( rawTracks.modelName + '.morphTargetInfluences[' + morphNum + ']', curves.times, values );
+
+		},
+
+		// For all animated objects, times are defined separately for each axis
+		// Here we'll combine the times into one sorted array without duplicates
+		getTimesForAllAxes: function ( curves ) {
+
+			var times = [];
+
+			// first join together the times for each axis, if defined
+			if ( curves.x !== undefined ) times = times.concat( curves.x.times );
+			if ( curves.y !== undefined ) times = times.concat( curves.y.times );
+			if ( curves.z !== undefined ) times = times.concat( curves.z.times );
+
+			// then sort them and remove duplicates
+			times = times.sort( function ( a, b ) {
+
+				return a - b;
+
+			} ).filter( function ( elem, index, array ) {
+
+				return array.indexOf( elem ) == index;
+
+			} );
+
+			return times;
+
+		},
+
+		getKeyframeTrackValues: function ( times, curves, initialValue ) {
+
+			var prevValue = initialValue;
+
+			var values = [];
+
+			var xIndex = - 1;
+			var yIndex = - 1;
+			var zIndex = - 1;
+
+			times.forEach( function ( time ) {
+
+				if ( curves.x ) xIndex = curves.x.times.indexOf( time );
+				if ( curves.y ) yIndex = curves.y.times.indexOf( time );
+				if ( curves.z ) zIndex = curves.z.times.indexOf( time );
+
+				// if there is an x value defined for this frame, use that
+				if ( xIndex !== - 1 ) {
+
+					var xValue = curves.x.values[ xIndex ];
+					values.push( xValue );
+					prevValue[ 0 ] = xValue;
+
+				} else {
+
+					// otherwise use the x value from the previous frame
+					values.push( prevValue[ 0 ] );
+
+				}
+
+				if ( yIndex !== - 1 ) {
+
+					var yValue = curves.y.values[ yIndex ];
+					values.push( yValue );
+					prevValue[ 1 ] = yValue;
+
+				} else {
+
+					values.push( prevValue[ 1 ] );
+
+				}
+
+				if ( zIndex !== - 1 ) {
+
+					var zValue = curves.z.values[ zIndex ];
+					values.push( zValue );
+					prevValue[ 2 ] = zValue;
+
+				} else {
+
+					values.push( prevValue[ 2 ] );
+
+				}
+
+			} );
+
+			return values;
+
+		},
+
+		// Rotations are defined as Euler angles which can have values  of any size
+		// These will be converted to quaternions which don't support values greater than
+		// PI, so we'll interpolate large rotations
+		interpolateRotations: function ( curve ) {
+
+			for ( var i = 1; i < curve.values.length; i ++ ) {
+
+				var initialValue = curve.values[ i - 1 ];
+				var valuesSpan = curve.values[ i ] - initialValue;
+
+				var absoluteSpan = Math.abs( valuesSpan );
+
+				if ( absoluteSpan >= 180 ) {
+
+					var numSubIntervals = absoluteSpan / 180;
+
+					var step = valuesSpan / numSubIntervals;
+					var nextValue = initialValue + step;
+
+					var initialTime = curve.times[ i - 1 ];
+					var timeSpan = curve.times[ i ] - initialTime;
+					var interval = timeSpan / numSubIntervals;
+					var nextTime = initialTime + interval;
+
+					var interpolatedTimes = [];
+					var interpolatedValues = [];
+
+					while ( nextTime < curve.times[ i ] ) {
+
+						interpolatedTimes.push( nextTime );
+						nextTime += interval;
+
+						interpolatedValues.push( nextValue );
+						nextValue += step;
+
+					}
+
+					curve.times = inject( curve.times, i, interpolatedTimes );
+					curve.values = inject( curve.values, i, interpolatedValues );
+
+				}
+
+			}
 
 		},
 
