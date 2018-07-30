@@ -83,8 +83,7 @@
 				context.fillStyle = gradient;
 				context.fillRect( 0, 0, canvas.width, canvas.height );
 
-				var shadowTexture = new THREE.Texture( canvas );
-				shadowTexture.needsUpdate = true;
+				var shadowTexture = new THREE.CanvasTexture( canvas );
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 				var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );

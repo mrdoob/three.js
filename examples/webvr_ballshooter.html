@@ -65,7 +65,7 @@
 					new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
 				);
-				room.position.y = 3;
+				room.geometry.translate( 0, 3, 0 );
 				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
@@ -81,7 +81,7 @@
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 4 - 2;
-					object.position.y = Math.random() * 4 - 2;
+					object.position.y = Math.random() * 4;
 					object.position.z = Math.random() * 4 - 2;
 
 					object.userData.velocity = new THREE.Vector3();
@@ -159,15 +159,16 @@
 
 				if ( controller.userData.isSelecting ) {
 
-					var cube = room.children[ 0 ];
-					room.remove( cube );
+					var object = room.children[ 0 ];
+					room.remove( object );
 
-					cube.position.copy( controller.position ).sub( room.position );
-					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
-					cube.userData.velocity.applyQuaternion( controller.quaternion );
-					room.add( cube );
+					object.position.copy( controller.position );
+					object.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
+					object.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
+					object.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
+					object.userData.velocity.applyQuaternion( controller.quaternion );
+
+					room.add( object );
 
 				}
 
@@ -203,13 +204,13 @@
 
 					}
 
-					if ( cube.position.y < - range || cube.position.y > range ) {
+					if ( cube.position.y < radius || cube.position.y > 6 ) {
 
-						cube.position.y = Math.max( cube.position.y, - range );
+						cube.position.y = Math.max( cube.position.y, radius );
 
-						cube.userData.velocity.x *= 0.9;
+						cube.userData.velocity.x *= 0.98;
 						cube.userData.velocity.y = - cube.userData.velocity.y * 0.8;
-						cube.userData.velocity.z *= 0.9;
+						cube.userData.velocity.z *= 0.98;
 
 					}
 

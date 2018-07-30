@@ -244,6 +244,7 @@ var files = {
 		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_taa",
 		"webgl_postprocessing_unreal_bloom",
+		"webgl_raycast_sprite",
 		"webgl_raycast_texture",
 		"webgl_read_float_buffer",
 		"webgl_refraction",
