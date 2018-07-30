@@ -23,7 +23,7 @@ THREE.FBXLoader = ( function () {
 
 	var FBXTree;
 	var connections;
-	var sceneGraph = new THREE.Group();
+	var sceneGraph;
 
 	function FBXLoader( manager ) {
 
@@ -768,6 +768,8 @@ THREE.FBXLoader = ( function () {
 
 		// create the main THREE.Group() to be returned by the loader
 		parseScene: function ( deformers, geometryMap, materialMap ) {
+
+			sceneGraph = new THREE.Group();
 
 			var modelMap = this.parseModels( deformers.skeletons, geometryMap, materialMap );
 
