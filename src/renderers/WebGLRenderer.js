@@ -1548,7 +1548,7 @@ function WebGLRenderer( parameters ) {
 		// store the light setup it was created for
 		if ( materialProperties.lightsHash === undefined ) {
 
-				materialProperties.lightsHash = {};
+			materialProperties.lightsHash = {};
 
 		}
 

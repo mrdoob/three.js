@@ -111,13 +111,13 @@ function WebGLLights() {
 		id: count ++,
 
 		hash: {
-			stateID: -1,
-			directionalLength: -1,
-			pointLength: -1,
-			spotLength: -1,
-			rectAreaLength: -1,
-			hemiLength: -1,
-			shadowsLength: -1
+			stateID: - 1,
+			directionalLength: - 1,
+			pointLength: - 1,
+			spotLength: - 1,
+			rectAreaLength: - 1,
+			hemiLength: - 1,
+			shadowsLength: - 1
 		},
 
 		ambient: [ 0, 0, 0 ],
