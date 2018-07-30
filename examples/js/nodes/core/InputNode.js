@@ -13,7 +13,7 @@ function InputNode( type, params ) {
 
 	this.readonly = false;
 
-};
+}
 
 InputNode.prototype = Object.create( TempNode.prototype );
 InputNode.prototype.constructor = InputNode;
@@ -25,17 +25,17 @@ InputNode.prototype.isReadonly = function ( builder ) {
 };
 
 InputNode.prototype.copy = function ( source ) {
-	
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	if ( source.readonly !== undefined ) this.readonly = source.readonly;
-	
+
 };
 
 InputNode.prototype.createJSONNode = function ( meta ) {
 
 	var data = TempNode.prototype.createJSONNode.call( this, meta );
-	
+
 	if ( this.readonly === true ) data.readonly = this.readonly;
 
 	return data;

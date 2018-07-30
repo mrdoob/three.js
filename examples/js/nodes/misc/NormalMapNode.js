@@ -16,10 +16,10 @@ function NormalMapNode( value, scale ) {
 	this.value = value;
 	this.scale = scale || new Vector2Node( 1, 1 );
 
-};
+}
 
-NormalMapNode.Nodes = (function() {
-	
+NormalMapNode.Nodes = ( function () {
+
 	var perturbNormal2Arb = new FunctionNode( [
 
 		// Per-Pixel Tangent Space Normal Mapping
@@ -28,24 +28,24 @@ NormalMapNode.Nodes = (function() {
 		"vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 mUv, vec2 normalScale ) {",
 
 		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
-		
+
 		"	vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );",
 		"	vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );",
 		"	vec2 st0 = dFdx( mUv.st );",
 		"	vec2 st1 = dFdy( mUv.st );",
-		
+
 		"	float scale = sign( st1.t * st0.s - st0.t * st1.s );", // we do not care about the magnitude
-		
+
 		"	vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );",
 		"	vec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );",
 		"	vec3 N = normalize( surf_norm );",
 		"	mat3 tsn = mat3( S, T, N );",
-		
+
 		"	vec3 mapN = map * 2.0 - 1.0;",
-		
+
 		"	mapN.xy *= normalScale;",
 		"	mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );",
-		
+
 		"	return normalize( tsn * mapN );",
 
 		"}"
@@ -55,8 +55,8 @@ NormalMapNode.Nodes = (function() {
 	return {
 		perturbNormal2Arb: perturbNormal2Arb
 	};
-	
-})();
+
+} )();
 
 NormalMapNode.prototype = Object.create( TempNode.prototype );
 NormalMapNode.prototype.constructor = NormalMapNode;
@@ -68,7 +68,7 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 
 		var perturbNormal2Arb = builder.include( NormalMapNode.Nodes.perturbNormal2Arb );
 
-		this.normal = this.normal || new NormalNode( NormalNode.VIEW );
+		this.normal = this.normal || new NormalNode();
 		this.position = this.position || new PositionNode( PositionNode.VIEW );
 		this.uv = this.uv || new UVNode();
 
@@ -89,12 +89,12 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 };
 
 NormalMapNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.value = source.value;
 	this.scale = source.scale;
-	
+
 };
 
 NormalMapNode.prototype.toJSON = function ( meta ) {
