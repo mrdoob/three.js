@@ -23,6 +23,7 @@ THREE.FBXLoader = ( function () {
 
 	var FBXTree;
 	var connections;
+	var sceneGraph = new THREE.Group();
 
 	function FBXLoader( manager ) {
 
@@ -131,7 +132,9 @@ THREE.FBXLoader = ( function () {
 			var deformers = this.parseDeformers();
 			var geometryMap = new GeometryParser().parse( deformers );
 
-			return this.parseScene( deformers, geometryMap, materials );
+			this.parseScene( deformers, geometryMap, materials );
+
+			return sceneGraph;
 
 		},
 
@@ -766,8 +769,6 @@ THREE.FBXLoader = ( function () {
 		// create the main THREE.Group() to be returned by the loader
 		parseScene: function ( deformers, geometryMap, materialMap ) {
 
-			var sceneGraph = new THREE.Group();
-
 			var modelMap = this.parseModels( deformers.skeletons, geometryMap, materialMap );
 
 			var modelNodes = FBXTree.Objects.Model;
@@ -776,7 +777,7 @@ THREE.FBXLoader = ( function () {
 			modelMap.forEach( function ( model ) {
 
 				var modelNode = modelNodes[ model.ID ];
-				self.setLookAtProperties( model, modelNode, sceneGraph );
+				self.setLookAtProperties( model, modelNode );
 
 				var parentConnections = connections.get( model.ID ).parents;
 
@@ -798,23 +799,21 @@ THREE.FBXLoader = ( function () {
 
 			this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
 
-			this.createAmbientLight( sceneGraph );
+			this.createAmbientLight();
 
-			this.setupMorphMaterials( sceneGraph );
+			this.setupMorphMaterials();
 
-			var animations = new AnimationParser().parse( sceneGraph );
+			var animations = new AnimationParser().parse();
 
 			// if all the models where already combined in a single group, just return that
 			if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
 
 				sceneGraph.children[ 0 ].animations = animations;
-				return sceneGraph.children[ 0 ];
+				sceneGraph = sceneGraph.children[ 0 ];
 
 			}
 
 			sceneGraph.animations = animations;
-
-			return sceneGraph;
 
 		},
 
@@ -1233,7 +1232,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		setLookAtProperties: function ( model, modelNode, sceneGraph ) {
+		setLookAtProperties: function ( model, modelNode ) {
 
 			if ( 'LookAtProperty' in modelNode ) {
 
@@ -1347,7 +1346,7 @@ THREE.FBXLoader = ( function () {
 		},
 
 		// Parse ambient color in FBXTree.GlobalSettings - if it's not set to black (default), create an ambient light
-		createAmbientLight: function ( sceneGraph ) {
+		createAmbientLight: function () {
 
 			if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings ) {
 
@@ -1367,7 +1366,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		setupMorphMaterials: function ( sceneGraph ) {
+		setupMorphMaterials: function () {
 
 			sceneGraph.traverse( function ( child ) {
 
@@ -2243,7 +2242,7 @@ THREE.FBXLoader = ( function () {
 		constructor: AnimationParser,
 
 		// take raw animation clips and turn them into three.js animation clips
-		parse: function ( sceneGraph ) {
+		parse: function () {
 
 			var animationClips = [];
 
@@ -2256,7 +2255,7 @@ THREE.FBXLoader = ( function () {
 
 				var rawClip = rawClips[ key ];
 
-				var clip = this.addClip( rawClip, sceneGraph );
+				var clip = this.addClip( rawClip );
 
 				animationClips.push( clip );
 
@@ -2539,14 +2538,14 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		addClip: function ( rawClip, sceneGraph ) {
+		addClip: function ( rawClip ) {
 
 			var tracks = [];
 
 			var self = this;
 			rawClip.layer.forEach( function ( rawTracks ) {
 
-				tracks = tracks.concat( self.generateTracks( rawTracks, sceneGraph ) );
+				tracks = tracks.concat( self.generateTracks( rawTracks ) );
 
 			} );
 
@@ -2554,7 +2553,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		generateTracks: function ( rawTracks, sceneGraph ) {
+		generateTracks: function ( rawTracks ) {
 
 			var tracks = [];
 
@@ -2591,7 +2590,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( rawTracks.DeformPercent !== undefined ) {
 
-				var morphTrack = this.generateMorphTrack( rawTracks, sceneGraph );
+				var morphTrack = this.generateMorphTrack( rawTracks );
 				if ( morphTrack !== undefined ) tracks.push( morphTrack );
 
 			}
@@ -2675,7 +2674,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		generateMorphTrack: function ( rawTracks, sceneGraph ) {
+		generateMorphTrack: function ( rawTracks ) {
 
 			var curves = rawTracks.DeformPercent.curves.morph;
 			var values = curves.values.map( function ( val ) {
