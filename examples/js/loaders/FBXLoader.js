@@ -2174,7 +2174,7 @@ THREE.FBXLoader = ( function () {
 
 			sceneGraph.animations = [];
 
-			var rawClips = this.parseAnimations();
+			var rawClips = new AnimationParser().parse( this.FBXTree, this.connections );
 
 			if ( rawClips === undefined ) return;
 
@@ -2187,279 +2187,6 @@ THREE.FBXLoader = ( function () {
 				sceneGraph.animations.push( clip );
 
 			}
-
-		},
-
-		parseAnimations: function () {
-
-			// since the actual transformation data is stored in FBXTree.Objects.AnimationCurve,
-			// if this is undefined we can safely assume there are no animations
-			if ( this.FBXTree.Objects.AnimationCurve === undefined ) return undefined;
-
-			var curveNodesMap = this.parseAnimationCurveNodes();
-
-			this.parseAnimationCurves( curveNodesMap );
-
-			var layersMap = this.parseAnimationLayers( curveNodesMap );
-			var rawClips = this.parseAnimStacks( layersMap );
-
-			return rawClips;
-
-		},
-
-		// parse nodes in FBXTree.Objects.AnimationCurveNode
-		// each AnimationCurveNode holds data for an animation transform for a model (e.g. left arm rotation )
-		// and is referenced by an AnimationLayer
-		parseAnimationCurveNodes: function () {
-
-			var rawCurveNodes = this.FBXTree.Objects.AnimationCurveNode;
-
-			var curveNodesMap = new Map();
-
-			for ( var nodeID in rawCurveNodes ) {
-
-				var rawCurveNode = rawCurveNodes[ nodeID ];
-
-				if ( rawCurveNode.attrName.match( /S|R|T|DeformPercent/ ) !== null ) {
-
-					var curveNode = {
-
-						id: rawCurveNode.id,
-						attr: rawCurveNode.attrName,
-						curves: {},
-
-					};
-
-					curveNodesMap.set( curveNode.id, curveNode );
-
-				}
-
-			}
-
-			return curveNodesMap;
-
-		},
-
-		// parse nodes in FBXTree.Objects.AnimationCurve and connect them up to
-		// previously parsed AnimationCurveNodes. Each AnimationCurve holds data for a single animated
-		// axis ( e.g. times and values of x rotation)
-		parseAnimationCurves: function ( curveNodesMap ) {
-
-			var rawCurves = this.FBXTree.Objects.AnimationCurve;
-
-			// TODO: Many values are identical up to roundoff error, but won't be optimised
-			// e.g. position times: [0, 0.4, 0. 8]
-			// position values: [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809, 7.23538335023477e-7, 93.67518615722656, -0.9982695579528809, 7.235384487103147e-7, 93.67520904541016, -0.9982695579528809]
-			// clearly, this should be optimised to
-			// times: [0], positions [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809]
-			// this shows up in nearly every FBX file, and generally time array is length > 100
-
-			for ( var nodeID in rawCurves ) {
-
-				var animationCurve = {
-
-					id: rawCurves[ nodeID ].id,
-					times: rawCurves[ nodeID ].KeyTime.a.map( convertFBXTimeToSeconds ),
-					values: rawCurves[ nodeID ].KeyValueFloat.a,
-
-				};
-
-				var relationships = this.connections.get( animationCurve.id );
-
-				if ( relationships !== undefined ) {
-
-					var animationCurveID = relationships.parents[ 0 ].ID;
-					var animationCurveRelationship = relationships.parents[ 0 ].relationship;
-
-					if ( animationCurveRelationship.match( /X/ ) ) {
-
-						curveNodesMap.get( animationCurveID ).curves[ 'x' ] = animationCurve;
-
-					} else if ( animationCurveRelationship.match( /Y/ ) ) {
-
-						curveNodesMap.get( animationCurveID ).curves[ 'y' ] = animationCurve;
-
-					} else if ( animationCurveRelationship.match( /Z/ ) ) {
-
-						curveNodesMap.get( animationCurveID ).curves[ 'z' ] = animationCurve;
-
-					} else if ( animationCurveRelationship.match( /d|DeformPercent/ ) && curveNodesMap.has( animationCurveID ) ) {
-
-						curveNodesMap.get( animationCurveID ).curves[ 'morph' ] = animationCurve;
-
-					}
-
-				}
-
-			}
-
-		},
-
-		// parse nodes in FBXTree.Objects.AnimationLayer. Each layers holds references
-		// to various AnimationCurveNodes and is referenced by an AnimationStack node
-		// note: theoretically a stack can have multiple layers, however in practice there always seems to be one per stack
-		parseAnimationLayers: function ( curveNodesMap ) {
-
-			var rawLayers = this.FBXTree.Objects.AnimationLayer;
-
-			var layersMap = new Map();
-
-			for ( var nodeID in rawLayers ) {
-
-				var layerCurveNodes = [];
-
-				var connection = this.connections.get( parseInt( nodeID ) );
-
-				if ( connection !== undefined ) {
-
-				// all the animationCurveNodes used in the layer
-					var children = connection.children;
-
-					var self = this;
-					children.forEach( function ( child, i ) {
-
-						if ( curveNodesMap.has( child.ID ) ) {
-
-							var curveNode = curveNodesMap.get( child.ID );
-
-							// check that the curves are defined for at least one axis, otherwise ignore the curveNode
-							if ( curveNode.curves.x !== undefined || curveNode.curves.y !== undefined || curveNode.curves.z !== undefined ) {
-
-								if ( layerCurveNodes[ i ] === undefined ) {
-
-									var modelID;
-
-									self.connections.get( child.ID ).parents.forEach( function ( parent ) {
-
-										if ( parent.relationship !== undefined ) modelID = parent.ID;
-
-									} );
-
-									var rawModel = self.FBXTree.Objects.Model[ modelID.toString() ];
-
-									var node = {
-
-										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
-										initialPosition: [ 0, 0, 0 ],
-										initialRotation: [ 0, 0, 0 ],
-										initialScale: [ 1, 1, 1 ],
-										transform: self.getModelAnimTransform( rawModel ),
-
-									};
-
-									// if the animated model is pre rotated, we'll have to apply the pre rotations to every
-									// animation value as well
-									if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
-									if ( 'PostRotation' in rawModel ) node.postRotations = rawModel.PostRotation.value;
-
-									layerCurveNodes[ i ] = node;
-
-								}
-
-								layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
-
-							} else if ( curveNode.curves.morph !== undefined ) {
-
-								if ( layerCurveNodes[ i ] === undefined ) {
-
-									var deformerID;
-
-									self.connections.get( child.ID ).parents.forEach( function ( parent ) {
-
-										if ( parent.relationship !== undefined ) deformerID = parent.ID;
-
-									} );
-
-									var morpherID = self.connections.get( deformerID ).parents[ 0 ].ID;
-									var geoID = self.connections.get( morpherID ).parents[ 0 ].ID;
-
-									// assuming geometry is not used in more than one model
-									var modelID = self.connections.get( geoID ).parents[ 0 ].ID;
-
-									var rawModel = self.FBXTree.Objects.Model[ modelID ];
-
-									var node = {
-
-										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
-										morphName: self.FBXTree.Objects.Deformer[ deformerID ].attrName,
-
-									};
-
-									layerCurveNodes[ i ] = node;
-
-								}
-
-								layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
-
-							}
-
-						}
-
-					} );
-
-					layersMap.set( parseInt( nodeID ), layerCurveNodes );
-
-				}
-
-			}
-
-			return layersMap;
-
-		},
-
-		getModelAnimTransform: function ( modelNode ) {
-
-			var transformData = {};
-
-			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
-
-			if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
-			if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
-
-			if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
-			if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
-
-			if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
-
-			if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
-
-			return generateTransform( transformData );
-
-		},
-
-		// parse nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
-		// hierarchy. Each Stack node will be used to create a THREE.AnimationClip
-		parseAnimStacks: function ( layersMap ) {
-
-			var rawStacks = this.FBXTree.Objects.AnimationStack;
-
-			// connect the stacks (clips) up to the layers
-			var rawClips = {};
-
-			for ( var nodeID in rawStacks ) {
-
-				var children = this.connections.get( parseInt( nodeID ) ).children;
-
-				if ( children.length > 1 ) {
-
-				// it seems like stacks will always be associated with a single layer. But just in case there are files
-				// where there are multiple layers per stack, we'll display a warning
-					console.warn( 'THREE.FBXLoader: Encountered an animation stack with multiple layers, this is currently not supported. Ignoring subsequent layers.' );
-
-				}
-
-				var layer = layersMap.get( children[ 0 ].ID );
-
-				rawClips[ nodeID ] = {
-
-					name: rawStacks[ nodeID ].attrName,
-					layer: layer,
-
-				};
-
-			}
-
-			return rawClips;
 
 		},
 
@@ -2800,6 +2527,291 @@ THREE.FBXLoader = ( function () {
 				}
 
 			} );
+
+		},
+
+	};
+
+	// parse animation data from FBXTree
+	function AnimationParser() {}
+
+	AnimationParser.prototype = {
+
+		constructor: AnimationParser,
+
+		parse: function ( FBXTree, connections ) {
+
+			this.FBXTree = FBXTree;
+			this.connections = connections;
+
+			// since the actual transformation data is stored in FBXTree.Objects.AnimationCurve,
+			// if this is undefined we can safely assume there are no animations
+			if ( this.FBXTree.Objects.AnimationCurve === undefined ) return undefined;
+
+			var curveNodesMap = this.parseAnimationCurveNodes();
+
+			this.parseAnimationCurves( curveNodesMap );
+
+			var layersMap = this.parseAnimationLayers( curveNodesMap );
+			var rawClips = this.parseAnimStacks( layersMap );
+
+			return rawClips;
+
+		},
+
+		// parse nodes in FBXTree.Objects.AnimationCurveNode
+		// each AnimationCurveNode holds data for an animation transform for a model (e.g. left arm rotation )
+		// and is referenced by an AnimationLayer
+		parseAnimationCurveNodes: function () {
+
+			var rawCurveNodes = this.FBXTree.Objects.AnimationCurveNode;
+
+			var curveNodesMap = new Map();
+
+			for ( var nodeID in rawCurveNodes ) {
+
+				var rawCurveNode = rawCurveNodes[ nodeID ];
+
+				if ( rawCurveNode.attrName.match( /S|R|T|DeformPercent/ ) !== null ) {
+
+					var curveNode = {
+
+						id: rawCurveNode.id,
+						attr: rawCurveNode.attrName,
+						curves: {},
+
+					};
+
+					curveNodesMap.set( curveNode.id, curveNode );
+
+				}
+
+			}
+
+			return curveNodesMap;
+
+		},
+
+		// parse nodes in FBXTree.Objects.AnimationCurve and connect them up to
+		// previously parsed AnimationCurveNodes. Each AnimationCurve holds data for a single animated
+		// axis ( e.g. times and values of x rotation)
+		parseAnimationCurves: function ( curveNodesMap ) {
+
+			var rawCurves = this.FBXTree.Objects.AnimationCurve;
+
+			// TODO: Many values are identical up to roundoff error, but won't be optimised
+			// e.g. position times: [0, 0.4, 0. 8]
+			// position values: [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809, 7.23538335023477e-7, 93.67518615722656, -0.9982695579528809, 7.235384487103147e-7, 93.67520904541016, -0.9982695579528809]
+			// clearly, this should be optimised to
+			// times: [0], positions [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809]
+			// this shows up in nearly every FBX file, and generally time array is length > 100
+
+			for ( var nodeID in rawCurves ) {
+
+				var animationCurve = {
+
+					id: rawCurves[ nodeID ].id,
+					times: rawCurves[ nodeID ].KeyTime.a.map( convertFBXTimeToSeconds ),
+					values: rawCurves[ nodeID ].KeyValueFloat.a,
+
+				};
+
+				var relationships = this.connections.get( animationCurve.id );
+
+				if ( relationships !== undefined ) {
+
+					var animationCurveID = relationships.parents[ 0 ].ID;
+					var animationCurveRelationship = relationships.parents[ 0 ].relationship;
+
+					if ( animationCurveRelationship.match( /X/ ) ) {
+
+						curveNodesMap.get( animationCurveID ).curves[ 'x' ] = animationCurve;
+
+					} else if ( animationCurveRelationship.match( /Y/ ) ) {
+
+						curveNodesMap.get( animationCurveID ).curves[ 'y' ] = animationCurve;
+
+					} else if ( animationCurveRelationship.match( /Z/ ) ) {
+
+						curveNodesMap.get( animationCurveID ).curves[ 'z' ] = animationCurve;
+
+					} else if ( animationCurveRelationship.match( /d|DeformPercent/ ) && curveNodesMap.has( animationCurveID ) ) {
+
+						curveNodesMap.get( animationCurveID ).curves[ 'morph' ] = animationCurve;
+
+					}
+
+				}
+
+			}
+
+		},
+
+		// parse nodes in FBXTree.Objects.AnimationLayer. Each layers holds references
+		// to various AnimationCurveNodes and is referenced by an AnimationStack node
+		// note: theoretically a stack can have multiple layers, however in practice there always seems to be one per stack
+		parseAnimationLayers: function ( curveNodesMap ) {
+
+			var rawLayers = this.FBXTree.Objects.AnimationLayer;
+
+			var layersMap = new Map();
+
+			for ( var nodeID in rawLayers ) {
+
+				var layerCurveNodes = [];
+
+				var connection = this.connections.get( parseInt( nodeID ) );
+
+				if ( connection !== undefined ) {
+
+					// all the animationCurveNodes used in the layer
+					var children = connection.children;
+
+					var self = this;
+					children.forEach( function ( child, i ) {
+
+						if ( curveNodesMap.has( child.ID ) ) {
+
+							var curveNode = curveNodesMap.get( child.ID );
+
+							// check that the curves are defined for at least one axis, otherwise ignore the curveNode
+							if ( curveNode.curves.x !== undefined || curveNode.curves.y !== undefined || curveNode.curves.z !== undefined ) {
+
+								if ( layerCurveNodes[ i ] === undefined ) {
+
+									var modelID;
+
+									self.connections.get( child.ID ).parents.forEach( function ( parent ) {
+
+										if ( parent.relationship !== undefined ) modelID = parent.ID;
+
+									} );
+
+									var rawModel = self.FBXTree.Objects.Model[ modelID.toString() ];
+
+									var node = {
+
+										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+										initialPosition: [ 0, 0, 0 ],
+										initialRotation: [ 0, 0, 0 ],
+										initialScale: [ 1, 1, 1 ],
+										transform: self.getModelAnimTransform( rawModel ),
+
+									};
+
+									// if the animated model is pre rotated, we'll have to apply the pre rotations to every
+									// animation value as well
+									if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
+									if ( 'PostRotation' in rawModel ) node.postRotations = rawModel.PostRotation.value;
+
+									layerCurveNodes[ i ] = node;
+
+								}
+
+								layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
+
+							} else if ( curveNode.curves.morph !== undefined ) {
+
+								if ( layerCurveNodes[ i ] === undefined ) {
+
+									var deformerID;
+
+									self.connections.get( child.ID ).parents.forEach( function ( parent ) {
+
+										if ( parent.relationship !== undefined ) deformerID = parent.ID;
+
+									} );
+
+									var morpherID = self.connections.get( deformerID ).parents[ 0 ].ID;
+									var geoID = self.connections.get( morpherID ).parents[ 0 ].ID;
+
+									// assuming geometry is not used in more than one model
+									var modelID = self.connections.get( geoID ).parents[ 0 ].ID;
+
+									var rawModel = self.FBXTree.Objects.Model[ modelID ];
+
+									var node = {
+
+										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+										morphName: self.FBXTree.Objects.Deformer[ deformerID ].attrName,
+
+									};
+
+									layerCurveNodes[ i ] = node;
+
+								}
+
+								layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
+
+							}
+
+						}
+
+					} );
+
+					layersMap.set( parseInt( nodeID ), layerCurveNodes );
+
+				}
+
+			}
+
+			return layersMap;
+
+		},
+
+		getModelAnimTransform: function ( modelNode ) {
+
+			var transformData = {};
+
+			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
+
+			if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
+			if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
+
+			if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
+			if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
+
+			if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
+
+			if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
+
+			return generateTransform( transformData );
+
+		},
+
+		// parse nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
+		// hierarchy. Each Stack node will be used to create a THREE.AnimationClip
+		parseAnimStacks: function ( layersMap ) {
+
+			var rawStacks = this.FBXTree.Objects.AnimationStack;
+
+			// connect the stacks (clips) up to the layers
+			var rawClips = {};
+
+			for ( var nodeID in rawStacks ) {
+
+				var children = this.connections.get( parseInt( nodeID ) ).children;
+
+				if ( children.length > 1 ) {
+
+					// it seems like stacks will always be associated with a single layer. But just in case there are files
+					// where there are multiple layers per stack, we'll display a warning
+					console.warn( 'THREE.FBXLoader: Encountered an animation stack with multiple layers, this is currently not supported. Ignoring subsequent layers.' );
+
+				}
+
+				var layer = layersMap.get( children[ 0 ].ID );
+
+				rawClips[ nodeID ] = {
+
+					name: rawStacks[ nodeID ].attrName,
+					layer: layer,
+
+				};
+
+			}
+
+			return rawClips;
 
 		},
 
