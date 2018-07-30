@@ -34,7 +34,7 @@ import { WebGLObjects } from './webgl/WebGLObjects.js';
 import { WebGLPrograms } from './webgl/WebGLPrograms.js';
 import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
-import { WebGLRenderStates } from './webgl/WebGLRenderStates.js';
+import { WebGLRenderStates, WebGLRenderState } from './webgl/WebGLRenderStates.js';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
 import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
@@ -650,24 +650,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.setRenderState = function ( scene, camera ) {
-
-		if ( vr.enabled ) {
-
-			camera = vr.getCamera( camera );
-
-		}
+	this.setLightingState = function ( scene, camera ) {
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		currentRenderState = renderStates.get( scene, camera );
 		currentRenderState.init();
-
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		_frustum.setFromMatrix( _projScreenMatrix );
-
-		_localClippingEnabled = this.localClippingEnabled;
-		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
 		scene.traverse( function ( object ) {
 
@@ -690,17 +678,32 @@ function WebGLRenderer( parameters ) {
 	};
 
 	var uploadMesh = new Mesh();
-	this.uploadGeometry = function ( geometry ) {
+	var emptyState = new WebGLRenderState();
+	emptyState.init();
+	this.drawGeometry = function ( camera, fog, geometry, material, object, group ) {
 
-		if ( Array.isArray( geometry ) ) {
+		if ( vr.enabled ) {
 
-			for ( var i = 0, l = geometry.length; i < l; i ++ ) {
+			camera = vr.getCamera( camera );
 
-				this.uploadGeometry( geometry[ i ] );
+		}
 
-			}
+		if ( currentRenderState === null ) {
 
-			return;
+			currentRenderState = emptyState;
+
+		}
+
+		_currentMaterialId = - 1;
+
+		if ( camera !== _currentCamera ) {
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			_frustum.setFromMatrix( _projScreenMatrix );
+
+			_localClippingEnabled = this.localClippingEnabled;
+			_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
+			_currentCamera = camera;
 
 		}
 
@@ -708,23 +711,16 @@ function WebGLRenderer( parameters ) {
 		objects.update( uploadMesh );
 		uploadMesh.geometry = null;
 
-	};
-
-	this.drawGeometry = function ( camera, fog, geometry, material, object, group, forceUpdateMaterial ) {
-
-		// reset caching for this draw
-		if ( forceUpdateMaterial ) {
-
-			_currentMaterialId = - 1;
-			_currentCamera = null;
-
-		}
-
-
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 		this.renderBufferDirect( camera, fog, geometry, material, object, group );
 		state.setPolygonOffset( false );
+
+		if ( currentRenderState === emptyState ) {
+
+			currentRenderState = null;
+
+		}
 
 	};
 

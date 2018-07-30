@@ -101,4 +101,4 @@ function WebGLRenderStates() {
 }
 
 
-export { WebGLRenderStates };
+export { WebGLRenderStates, WebGLRenderState };
