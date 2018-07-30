@@ -67,7 +67,7 @@
 
 			var loader, options;
 
-			var bvhSkeletonHelper, bvhMixer, bvhOffsets;
+			var bvhSkeletonHelper, bvhMixer;
 
 			// Initialize Three.JS
 
@@ -111,7 +111,7 @@
 			loader.load( './models/sea3d/skin.tjs.sea' );
 
 			//
-			
+
 			options = {
 				hip: "hip",
 				// left is SEA3D bone names and right BVH bone names
@@ -138,7 +138,7 @@
 					"Base HumanLFoot": "lFoot"
 				}
 			};
-			
+
 			//
 
 			function loadBVH() {
@@ -151,7 +151,7 @@
 
 					var boneContainer = new THREE.Group();
 					boneContainer.add( result.skeleton.bones[ 0 ] );
-					boneContainer.position.z = -100;
+					boneContainer.position.z = - 100;
 					boneContainer.position.y = - 100;
 
 					scene.add( bvhSkeletonHelper );
@@ -159,10 +159,10 @@
 
 					// play animation
 					bvhMixer = new THREE.AnimationMixer( bvhSkeletonHelper );
-					
+
 					// get offsets when it is in T-Pose
 					options.offsets = THREE.SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
-					
+
 					bvhMixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play();
 
 				} );
@@ -240,13 +240,13 @@
 				THREE.SEA3D.AnimationHandler.update( delta );
 
 				if ( bvhMixer ) {
-				
+
 					bvhMixer.update( delta );
-					
+
 					THREE.SkeletonUtils.retarget( player, bvhSkeletonHelper, options );
-					
+
 				}
-				
+
 				render( delta );
 
 				stats.update();
