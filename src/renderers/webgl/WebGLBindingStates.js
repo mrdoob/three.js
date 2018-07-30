@@ -379,7 +379,11 @@ function WebGLBindingStates( gl, extensions, state, attributes, capabilities ) {
 
 		setup: setup,
 		reset: reset,
-		dispose: dispose
+		dispose: dispose,
+
+		initAttributes: initAttributes,
+		enableAttribute: enableAttribute,
+		disableUnusedAttributes: disableUnusedAttributes
 
 	};
 
