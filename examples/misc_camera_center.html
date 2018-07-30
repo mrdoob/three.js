@@ -34,6 +34,8 @@
 <body>
 <div id="info">
 	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - camera center example
+	<br/>
+	Click on object to toggle selection
 </div>
 
 <script src="../build/three.js"></script>
@@ -47,10 +49,11 @@
 
     if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-    var camera, controls, scene, renderer, cameraViewBox, selection, isDraging, meshes, material, selectedMaterial,
+    var camera, controls, scene, renderer, cameraViewBox, selection, isDraging, meshes,
 		floorPlane, mouse, raycaster, settings;
 
     init();
+    centerOnSelection();
     //render(); // remove when using next line for animation loop (requestAnimationFrame)
     animate();
 
@@ -58,7 +61,7 @@
 
         scene = new THREE.Scene();
         scene.background = new THREE.Color( 0xcccccc );
-        scene.fog = new THREE.FogExp2( 0xcccccc, 0.001 );
+        scene.fog = new THREE.FogExp2( 0xcccccc, 0.0005 );
 
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
@@ -89,12 +92,12 @@
 
         var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
         geometry.translate( 0, 0.5, 0 );
-        material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, opacity: 0.7, transparent: true } );
-        selectedMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, flatShading: true, wireframe: true } );
 
         meshes = [];
+        selection = new Set();
         for ( var i = 0; i < 500; i ++ ) {
 
+            var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, opacity: 0.7, transparent: true } );
             var mesh = new THREE.Mesh( geometry, material );
             mesh.position.x = Math.random() * 1600 - 800;
             mesh.position.y = 0;
@@ -107,6 +110,10 @@
             scene.add( mesh );
 
             meshes.push(mesh);
+
+            if ( i < 5 ) {
+                addToSelection(mesh);
+            }
         }
 
         // lights
@@ -124,7 +131,6 @@
 
         //
         floorPlane = new THREE.Plane(new THREE.Vector3(0, 1,0));
-        selection = new Set();
         isDraging = false;
         cameraViewBox = new THREE.CameraViewBox();
         cameraViewBox.setViewFromCamera(camera);
@@ -140,8 +146,9 @@
         var gui = new dat.GUI();
 
         settings = {
-            fitRatio: 1,
+            fitRatio: 1.2,
 			useCameraViewBox: true,
+			update: centerOnSelection,
         };
 
         gui.add(settings, 'fitRatio', 1, 5, 0.1).onFinishChange((value) => {
@@ -155,6 +162,8 @@
 
             centerOnSelection();
 		});
+
+        gui.add(settings, 'update');
     }
 
     function onWindowResize() {
@@ -205,16 +214,28 @@
         if (intersects.length > 0) {
             var mesh = intersects[0].object;
 
-            if (selection.has(mesh)) {
-                mesh.material = material;
-                selection.delete(mesh);
+            if (isSelected(mesh)) {
+                removeFromSelection(mesh);
             } else {
-                mesh.material = selectedMaterial;
-                selection.add(mesh);
+                addToSelection(mesh);
             }
 
             centerOnSelection();
         }
+    }
+
+    function addToSelection(mesh) {
+        mesh.material.color.set(0xff0000);
+        selection.add(mesh);
+	}
+
+	function removeFromSelection(mesh) {
+        mesh.material.color.set(0xffffff);
+        selection.delete(mesh);
+	}
+
+	function isSelected(mesh) {
+		return selection.has(mesh);
     }
 
     function centerOnSelection() {
