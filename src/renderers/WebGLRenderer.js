@@ -650,7 +650,23 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+
+	var currentMaterial = null; // The current material to draw with
+	var uploadMesh = new Mesh(); // surrogate mesh to use for updating geometry because creatign geometry requires an object
+	var emptyState = new WebGLRenderState(); // default renderstate to use in the case that no render state is set
+	emptyState.init();
+
+	// Gathers up the lights in the given scene and initialize them for drawing
+	// with the provided camera. Passing null into either argument resets the
+	// render state
 	this.setLightingState = function ( scene, camera ) {
+
+		if ( ! scene || ! camera ) {
+
+			currentRenderState = null;
+			return;
+
+		}
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
@@ -677,10 +693,8 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	var currentMaterial = null;
-	var uploadMesh = new Mesh();
-	var emptyState = new WebGLRenderState();
-	emptyState.init();
+	// Sets the material to draw with and resets the currently cached material
+	// so all uniforms are set again on next draw
 	this.setMaterial = function ( material ) {
 
 		_currentMaterialId = - 1;
@@ -688,6 +702,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	// Draws geometry with the transform of the provided object
 	this.drawGeometry = function ( camera, fog, geometry, object, group ) {
 
 		if ( vr.enabled ) {
@@ -702,6 +717,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		// Recalculate the camera matrices if the camera changed
 		if ( camera !== _currentCamera ) {
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
@@ -713,10 +729,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		// Ensure the geometry is ready
 		uploadMesh.geometry = geometry;
 		objects.update( uploadMesh );
 		uploadMesh.geometry = null;
 
+		// Recalculate the model view and normal matrices and draw
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 		this.renderBufferDirect( camera, fog, geometry, currentMaterial, object, group );
@@ -1331,6 +1349,7 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
+					// Recalculate the model view and normal matrices and draw
 					currentRenderList.push( object, geometry, material, _vector3.z, null );
 
 				}
@@ -1366,6 +1385,7 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
+					// Recalculate the model view and normal matrices and draw
 					if ( Array.isArray( material ) ) {
 
 						var groups = geometry.groups;
