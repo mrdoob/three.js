@@ -1438,7 +1438,13 @@ function WebGLRenderer( parameters ) {
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
 
-		} else if ( materialProperties.lightsHash !== lights.state.hash ) {
+		} else if ( materialProperties.lightsHash.stateID !== lights.state.hash.stateID ||
+		 materialProperties.lightsHash.directionalLength !== lights.state.hash.directionalLength ||
+	   materialProperties.lightsHash.pointLength !== lights.state.hash.pointLength ||
+	   materialProperties.lightsHash.spotLength !== lights.state.hash.spotLength ||
+	   materialProperties.lightsHash.rectAreaLength !== lights.state.hash.rectAreaLength ||
+	   materialProperties.lightsHash.hemiLength !== lights.state.hash.hemiLength ||
+	   materialProperties.lightsHash.shadowsLength !== lights.state.hash.shadowsLength ) {
 
 			properties.update( material, 'lightsHash', lights.state.hash );
 			programChange = false;
@@ -1540,8 +1546,19 @@ function WebGLRenderer( parameters ) {
 		materialProperties.fog = fog;
 
 		// store the light setup it was created for
+		if ( materialProperties.lightsHash === undefined ) {
 
-		materialProperties.lightsHash = lights.state.hash;
+				materialProperties.lightsHash = {};
+
+		}
+
+		materialProperties.lightsHash.stateID = lights.state.hash.stateID;
+		materialProperties.lightsHash.directionalLength = lights.state.hash.directionalLength;
+		materialProperties.lightsHash.pointLength = lights.state.hash.pointLength;
+		materialProperties.lightsHash.spotLength = lights.state.hash.spotLength;
+		materialProperties.lightsHash.rectAreaLength = lights.state.hash.rectAreaLength;
+		materialProperties.lightsHash.hemiLength = lights.state.hash.hemiLength;
+		materialProperties.lightsHash.shadowsLength = lights.state.hash.shadowsLength;
 
 		if ( material.lights ) {
 
@@ -1608,7 +1625,13 @@ function WebGLRenderer( parameters ) {
 
 				material.needsUpdate = true;
 
-			} else if ( material.lights && materialProperties.lightsHash !== lights.state.hash ) {
+			} else if ( material.lights && ( materialProperties.lightsHash.stateID !== lights.state.hash.stateID ||
+			 materialProperties.lightsHash.directionalLength !== lights.state.hash.directionalLength ||
+		   materialProperties.lightsHash.pointLength !== lights.state.hash.pointLength ||
+		   materialProperties.lightsHash.spotLength !== lights.state.hash.spotLength ||
+		   materialProperties.lightsHash.rectAreaLength !== lights.state.hash.rectAreaLength ||
+		   materialProperties.lightsHash.hemiLength !== lights.state.hash.hemiLength ||
+		   materialProperties.lightsHash.shadowsLength !== lights.state.hash.shadowsLength ) ) {
 
 				material.needsUpdate = true;
 
