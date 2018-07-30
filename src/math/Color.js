@@ -541,20 +541,27 @@ Object.assign( Color.prototype, {
 
 	},
 
-	lerpChromatic: function ( color, alpha ) {
+	lerpHSL: function () {
 
-		var hslA = this.getHSL();
-		var hslB = color.getHSL();
+		var hslA = { h: 0, s: 0, l: 0 };
+		var hslB = { h: 0, s: 0, l: 0 };
 
-		var h = _Math.lerp( hslA.h, hslB.h, alpha );
-		var s = _Math.lerp( hslA.s, hslB.s, alpha );
-		var l = _Math.lerp( hslA.l, hslB.l, alpha );
+		return function lerpHSL( color, alpha ) {
 
-		this.setHSL( h, s, l );
+			this.getHSL( hslA );
+			color.getHSL( hslB );
 
-		return this;
+			var h = _Math.lerp( hslA.h, hslB.h, alpha );
+			var s = _Math.lerp( hslA.s, hslB.s, alpha );
+			var l = _Math.lerp( hslA.l, hslB.l, alpha );
 
-	},
+			this.setHSL( h, s, l );
+
+			return this;
+
+		};
+
+	}(),
 
 	equals: function ( c ) {
 
