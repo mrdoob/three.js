@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sea3d / bvh</title>
+		<title>three.js webgl - sea3d / bvh / retarget</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -30,7 +30,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a>. Asset by <a href="http://www.turbosquid.com/3d-models/soccer-player-max-free/307330" style="color:#FFFFFF" target="_blank" rel="noopener">Trivision</a>
 			<br/>
-			<br/>Runtime convertion of BVH Animation to SEA3D Skeleton Animation
+			<br/>Runtime retarget of BVH Animation to SEA3D Skeleton Animation
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -65,9 +65,9 @@
 
 			var camera, scene, renderer, composer, player, hat;
 
-			var loader;
+			var loader, options;
 
-			var bvhSkeletonHelper, bvhMixer;
+			var bvhSkeletonHelper, bvhMixer, bvhOffsets;
 
 			// Initialize Three.JS
 
@@ -79,7 +79,7 @@
 
 			loader = new THREE.SEA3D( {
 
-				autoPlay: true, // Auto play animations
+				autoPlay: false, // Auto play animations
 				container: scene, // Container to add models
 				multiplier: .6 // Light multiplier
 
@@ -111,88 +111,35 @@
 			loader.load( './models/sea3d/skin.tjs.sea' );
 
 			//
-
-			function bvhToSEA3D( result ) {
-
-				var options = {
-					useFirstFramePosition: true,
-					preserveHipPosition: false,
-					hip: "hip",
-					// left is SEA3D bone names and right BVH bone names
-					names: {
-						"Base HumanPelvis": "hip",
-						"Base HumanSpine3": "abdomen",
-						"Base HumanRibcage": "chest",
-						"Base HumanHead": "head",
-
-						"Base HumanRUpperarm": "rShldr",
-						"Base HumanRForearm1": "rForeArm",
-						"Base HumanRPalm": "rHand",
-
-						"Base HumanLUpperarm": "lShldr",
-						"Base HumanLForearm1": "lForeArm",
-						"Base HumanLPalm": "lHand",
-
-						"Base HumanRThigh": "rThigh",
-						"Base HumanRCalf1": "rShin",
-						"Base HumanRFoot": "rFoot",
-
-						"Base HumanLThigh": "lThigh",
-						"Base HumanLCalf1": "lShin",
-						"Base HumanLFoot": "lFoot"
-					},
-					
-				};
 			
-				// Automatic offset: get offsets when it is in T-Pose
-				options.offsets = THREE.SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
+			options = {
+				hip: "hip",
+				// left is SEA3D bone names and right BVH bone names
+				names: {
+					"Base HumanPelvis": "hip",
+					"Base HumanSpine3": "abdomen",
+					"Base HumanRibcage": "chest",
+					"Base HumanHead": "head",
+
+					"Base HumanRUpperarm": "rShldr",
+					"Base HumanRForearm1": "rForeArm",
+					"Base HumanRPalm": "rHand",
+
+					"Base HumanLUpperarm": "lShldr",
+					"Base HumanLForearm1": "lForeArm",
+					"Base HumanLPalm": "lHand",
+
+					"Base HumanRThigh": "rThigh",
+					"Base HumanRCalf1": "rShin",
+					"Base HumanRFoot": "rFoot",
+
+					"Base HumanLThigh": "lThigh",
+					"Base HumanLCalf1": "lShin",
+					"Base HumanLFoot": "lFoot"
+				}
+			};
 			
-				// Manual offsets: compensates the difference in skeletons ( T-Pose )
-				/*
-				options.offsets = {
-					"lShldr": new THREE.Matrix4().makeRotationFromEuler(
-						new THREE.Euler(
-							0,
-							THREE.Math.degToRad( - 45 ),
-							THREE.Math.degToRad( - 80 )
-						)
-					),
-					"rShldr": new THREE.Matrix4().makeRotationFromEuler(
-						new THREE.Euler(
-							0,
-							THREE.Math.degToRad( 45 ),
-							THREE.Math.degToRad( 80 )
-						)
-					),
-					"lFoot": new THREE.Matrix4().makeRotationFromEuler(
-						new THREE.Euler(
-							0,
-							THREE.Math.degToRad( 15 ),
-							0
-						)
-					),
-					"rFoot": new THREE.Matrix4().makeRotationFromEuler(
-						new THREE.Euler(
-							0,
-							THREE.Math.degToRad( 15 ),
-							0
-						)
-					)
-				};
-				*/
-			
-				var clip = THREE.SkeletonUtils.retargetClip( player, result.skeleton, result.clip, options );
-
-				clip.name = "dance";
-
-				clip = THREE.SEA3D.AnimationClip.fromClip( clip );
-
-				player.addAnimation( new THREE.SEA3D.Animation( clip ) );
-
-				player.play( "dance" );
-
-
-			}
+			//
 
 			function loadBVH() {
 
@@ -204,6 +151,7 @@
 
 					var boneContainer = new THREE.Group();
 					boneContainer.add( result.skeleton.bones[ 0 ] );
+					boneContainer.position.z = -100;
 					boneContainer.position.y = - 100;
 
 					scene.add( bvhSkeletonHelper );
@@ -211,9 +159,11 @@
 
 					// play animation
 					bvhMixer = new THREE.AnimationMixer( bvhSkeletonHelper );
+					
+					// get offsets when it is in T-Pose
+					options.offsets = THREE.SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
+					
 					bvhMixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play();
-
-					bvhToSEA3D( result );
 
 				} );
 
@@ -289,8 +239,14 @@
 				// Update SEA3D Animations
 				THREE.SEA3D.AnimationHandler.update( delta );
 
-				if ( bvhMixer ) bvhMixer.update( delta );
-
+				if ( bvhMixer ) {
+				
+					bvhMixer.update( delta );
+					
+					THREE.SkeletonUtils.retarget( player, bvhSkeletonHelper, options );
+					
+				}
+				
 				render( delta );
 
 				stats.update();

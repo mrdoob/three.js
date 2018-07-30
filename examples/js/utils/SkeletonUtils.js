@@ -8,8 +8,10 @@ THREE.SkeletonUtils = {
 
 	retarget: function () {
 
-		var quat = new THREE.Quaternion(),
+		var pos = new THREE.Vector3(),
+			quat = new THREE.Quaternion(),
 			scale = new THREE.Vector3(),
+			hipPosition = new THREE.Vector3(),
 			bindBoneMatrix = new THREE.Matrix4(),
 			relativeMatrix = new THREE.Matrix4(),
 			globalMatrix = new THREE.Matrix4();
@@ -19,6 +21,7 @@ THREE.SkeletonUtils = {
 			options = options || {};
 			options.preserveMatrix = options.preserveMatrix !== undefined ? options.preserveMatrix : true;
 			options.preservePosition = options.preservePosition !== undefined ? options.preservePosition : true;
+			options.preserveHipPosition = options.preserveHipPosition !== undefined ? options.preserveHipPosition : false;
 			options.useTargetMatrix = options.useTargetMatrix !== undefined ? options.useTargetMatrix : false;
 			options.hip = options.hip !== undefined ? options.hip : "hip";
 			options.names = options.names || {};
@@ -81,7 +84,7 @@ THREE.SkeletonUtils = {
 					bone = bones[ i ];
 					name = options.names[ bone.name ] || bone.name;
 
-					if ( options.offsets[ name ] ) {
+					if ( options.offsets && options.offsets[ name ] ) {
 
 						bone.matrix.multiply( options.offsets[ name ] );
 
@@ -90,7 +93,7 @@ THREE.SkeletonUtils = {
 						bone.updateMatrixWorld();
 
 					}
-
+					
 					bindBones.push( bone.matrixWorld.clone() );
 
 				}
@@ -102,14 +105,14 @@ THREE.SkeletonUtils = {
 				bone = bones[ i ];
 				name = options.names[ bone.name ] || bone.name;
 
-				boneTo = this.getBoneByName( sourceBones, name );
+				boneTo = this.getBoneByName( name, sourceBones );
 
 				globalMatrix.copy( bone.matrixWorld );
 
 				if ( boneTo ) {
 
 					boneTo.updateMatrixWorld();
-
+					
 					if ( options.useTargetMatrix ) {
 
 						relativeMatrix.copy( boneTo.matrixWorld );
@@ -154,6 +157,12 @@ THREE.SkeletonUtils = {
 
 				}
 
+				if ( options.preserveHipPosition && name === options.hip ) {
+					
+					bone.matrix.setPosition( pos.set( 0, bone.position.y, 0 ) );
+					
+				}
+				
 				bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
 
 				bone.updateMatrixWorld();
@@ -198,10 +207,7 @@ THREE.SkeletonUtils = {
 
 		if ( ! source.isObject3D ) {
 
-			var skeleton = source;
-
-			source = new THREE.SkeletonHelper( skeleton.bones[ 0 ] );
-			source.skeleton = skeleton;
+			source = this.getHelperFromSkeleton( source );
 
 		}
 
@@ -212,7 +218,8 @@ THREE.SkeletonUtils = {
 			bones = this.getBones( target.skeleton ),
 			boneDatas = [],
 			positionOffset,
-			bone, boneTo, boneData, i, j;
+			bone, boneTo, boneData, 
+			name, i, j;
 
 		mixer.clipAction( clip ).play();
 		mixer.update( 0 );
@@ -227,14 +234,16 @@ THREE.SkeletonUtils = {
 
 			for ( j = 0; j < bones.length; ++ j ) {
 
-				boneTo = this.getBoneByName( source.skeleton, options.names[ bones[ j ].name ] || bones[ j ].name );
+				name = options.names[ bones[ j ].name ] || bones[ j ].name;
+				
+				boneTo = this.getBoneByName( name, source.skeleton );
 
 				if ( boneTo ) {
 
 					bone = bones[ j ];
 					boneData = boneDatas[ j ] = boneDatas[ j ] || { bone: bone };
 
-					if ( options.hip === boneData.bone.name ) {
+					if ( options.hip === name ) {
 
 						if ( ! boneData.pos ) {
 
@@ -317,8 +326,107 @@ THREE.SkeletonUtils = {
 		return new THREE.AnimationClip( clip.name, - 1, convertedTracks );
 
 	},
+	
+	getHelperFromSkeleton: function( skeleton ) {
+		
+		var source = new THREE.SkeletonHelper( skeleton.bones[ 0 ] );
+		source.skeleton = skeleton;
+		
+		return source;
+		
+	},
+	
+	getSkeletonOffsets: function () {
 
-	rename: function ( skeleton, names ) {
+		var targetParentPos = new THREE.Vector3(),
+			targetPos = new THREE.Vector3(),
+			sourceParentPos = new THREE.Vector3(),
+			sourcePos = new THREE.Vector3(),
+			targetDir = new THREE.Vector2(),
+			sourceDir = new THREE.Vector2();
+
+		return function ( target, source, options ) {
+
+			options = options || {};
+			options.hip = options.hip !== undefined ? options.hip : "hip";
+			options.names = options.names || {};
+
+			if ( ! source.isObject3D ) {
+
+				source = this.getHelperFromSkeleton( source );
+
+			}
+			
+			var nameKeys = Object.keys( options.names ),
+				nameValues = Object.values( options.names ),
+				sourceBones = source.isObject3D ? source.skeleton.bones : this.getBones( source ),
+				bones = target.isObject3D ? target.skeleton.bones : this.getBones( target ),
+				offsets = [],
+				bone, boneTo, 
+				name, i;
+			
+			target.skeleton.pose();
+			
+			for ( i = 0; i < bones.length; ++ i ) {
+
+				bone = bones[ i ];
+				name = options.names[ bone.name ] || bone.name;
+
+				boneTo = this.getBoneByName( name, sourceBones );
+				
+				if ( boneTo && name !== options.hip ) {
+				
+					var boneParent = this.getNearestBone( bone.parent, nameKeys ),
+						boneToParent = this.getNearestBone( boneTo.parent, nameValues );
+				
+					boneParent.updateMatrixWorld();
+					boneToParent.updateMatrixWorld();
+				
+					targetParentPos.setFromMatrixPosition( boneParent.matrixWorld  );
+					targetPos.setFromMatrixPosition( bone.matrixWorld );
+					
+					sourceParentPos.setFromMatrixPosition( boneToParent.matrixWorld );
+					sourcePos.setFromMatrixPosition( boneTo.matrixWorld );
+					
+					targetDir.subVectors( 
+						new THREE.Vector2( targetPos.x, targetPos.y ),
+						new THREE.Vector2( targetParentPos.x, targetParentPos.y ), 
+					).normalize();
+					
+					sourceDir.subVectors( 
+						new THREE.Vector2( sourcePos.x, sourcePos.y ),
+						new THREE.Vector2( sourceParentPos.x, sourceParentPos.y ),
+					).normalize();
+					
+					var laterialAngle = targetDir.angle() - sourceDir.angle();
+					
+					var offset = new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							0,
+							laterialAngle
+						)
+					);
+					
+					bone.matrix.multiply( offset );
+
+					bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
+
+					bone.updateMatrixWorld();
+					
+					offsets[ name ] = offset;
+					
+				}
+				
+			}
+			
+			return offsets;
+			
+		}
+
+	}(),
+
+	renameBones: function ( skeleton, names ) {
 
 		var bones = this.getBones( skeleton );
 
@@ -344,13 +452,30 @@ THREE.SkeletonUtils = {
 
 	},
 
-	getBoneByName: function ( skeleton, name ) {
+	getBoneByName: function ( name, skeleton ) {
 
 		for ( var i = 0, bones = this.getBones( skeleton ); i < bones.length; i ++ ) {
 
 			if ( name === bones[ i ].name )
+				
 				return bones[ i ];
 
+		}
+
+	},
+	
+	getNearestBone: function ( bone, names ) {
+
+		while( bone.isBone ) {
+			
+			if ( names.indexOf( bone.name ) !== -1 ) {
+				
+				return bone;
+				
+			}
+			
+			bone = bone.parent;
+			
 		}
 
 	},
