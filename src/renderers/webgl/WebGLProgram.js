@@ -160,7 +160,7 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 function parseIncludes( string ) {
 
-	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
+	var pattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
 
 	function replace( match, include ) {
 
@@ -202,7 +202,7 @@ function unrollLoops( string ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
+function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities ) {
 
 	var gl = renderer.context;
 
@@ -285,7 +285,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	//
 
-	var customExtensions = generateExtensions( material.extensions, parameters, extensions );
+	var customExtensions = capabilities.isWebGL2 ? '' : generateExtensions( material.extensions, parameters, extensions );
 
 	var customDefines = generateDefines( defines );
 
@@ -373,7 +373,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.logarithmicDepthBuffer && extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+			parameters.logarithmicDepthBuffer && ( capabilities.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
@@ -478,9 +478,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.logarithmicDepthBuffer && extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+			parameters.logarithmicDepthBuffer && ( capabilities.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-			parameters.envMap && extensions.get( 'EXT_shader_texture_lod' ) ? '#define TEXTURE_LOD_EXT' : '',
+			parameters.envMap && ( capabilities.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
@@ -515,6 +515,50 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
+
+	if ( capabilities.isWebGL2 && ! material.isRawShaderMaterial ) {
+
+		var isGLSL3ShaderMaterial = false;
+
+		var versionRegex = /^\s*#version\s+300\s+es\s*\n/;
+
+		if ( material.isShaderMaterial &&
+			vertexShader.match( versionRegex ) !== null &&
+			fragmentShader.match( versionRegex ) !== null ) {
+
+			isGLSL3ShaderMaterial = true;
+
+			vertexShader = vertexShader.replace( versionRegex, '' );
+			fragmentShader = fragmentShader.replace( versionRegex, '' );
+
+		}
+
+		// GLSL 3.0 conversion
+		prefixVertex = [
+			'#version 300 es\n',
+			'#define attribute in',
+			'#define varying out',
+			'#define texture2D texture'
+		].join( '\n' ) + '\n' + prefixVertex;
+
+		prefixFragment = [
+			'#version 300 es\n',
+			'#define varying in',
+			isGLSL3ShaderMaterial ? '' : 'out highp vec4 pc_fragColor;',
+			isGLSL3ShaderMaterial ? '' : '#define gl_FragColor pc_fragColor',
+			'#define gl_FragDepthEXT gl_FragDepth',
+			'#define texture2D texture',
+			'#define textureCube texture',
+			'#define texture2DProj textureProj',
+			'#define texture2DLodEXT textureLod',
+			'#define texture2DProjLodEXT textureProjLod',
+			'#define textureCubeLodEXT textureLod',
+			'#define texture2DGradEXT textureGrad',
+			'#define texture2DProjGradEXT textureProjGrad',
+			'#define textureCubeGradEXT textureGrad'
+		].join( '\n' ) + '\n' + prefixFragment;
+
+	}
 
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;

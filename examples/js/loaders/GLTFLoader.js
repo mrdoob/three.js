@@ -130,7 +130,7 @@ THREE.GLTFLoader = ( function () {
 
 					switch ( extensionName ) {
 
-						case EXTENSIONS.KHR_LIGHTS:
+						case EXTENSIONS.KHR_LIGHTS_PUNCTUAL:
 							extensions[ extensionName ] = new GLTFLightsExtension( json );
 							break;
 
@@ -237,7 +237,7 @@ THREE.GLTFLoader = ( function () {
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
 		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
-		KHR_LIGHTS: 'KHR_lights',
+		KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
@@ -270,21 +270,24 @@ THREE.GLTFLoader = ( function () {
 	 */
 	function GLTFLightsExtension( json ) {
 
-		this.name = EXTENSIONS.KHR_LIGHTS;
+		this.name = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
 
-		this.lights = {};
+		this.lights = [];
 
-		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS ] ) || {};
-		var lights = extension.lights || {};
+		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] ) || {};
+		var lightDefs = extension.lights || [];
 
-		for ( var lightId in lights ) {
+		for ( var i = 0; i < lightDefs.length; i ++ ) {
 
-			var light = lights[ lightId ];
+			var lightDef = lightDefs[ i ];
 			var lightNode;
 
-			var color = new THREE.Color().fromArray( light.color );
+			var color = new THREE.Color( 0xffffff );
+			if ( lightDef.color !== undefined ) color.fromArray( lightDef.color );
 
-			switch ( light.type ) {
+			var range = lightDef.range !== undefined ? lightDef.range : 0;
+
+			switch ( lightDef.type ) {
 
 				case 'directional':
 					lightNode = new THREE.DirectionalLight( color );
@@ -294,40 +297,34 @@ THREE.GLTFLoader = ( function () {
 
 				case 'point':
 					lightNode = new THREE.PointLight( color );
+					lightNode.distance = range;
 					break;
 
 				case 'spot':
 					lightNode = new THREE.SpotLight( color );
+					lightNode.distance = range;
 					// Handle spotlight properties.
-					light.spot = light.spot || {};
-					light.spot.innerConeAngle = light.spot.innerConeAngle !== undefined ? light.spot.innerConeAngle : 0;
-					light.spot.outerConeAngle = light.spot.outerConeAngle !== undefined ? light.spot.outerConeAngle : Math.PI / 4.0;
-					lightNode.angle = light.spot.outerConeAngle;
-					lightNode.penumbra = 1.0 - light.spot.innerConeAngle / light.spot.outerConeAngle;
+					lightDef.spot = lightDef.spot || {};
+					lightDef.spot.innerConeAngle = lightDef.spot.innerConeAngle !== undefined ? lightDef.spot.innerConeAngle : 0;
+					lightDef.spot.outerConeAngle = lightDef.spot.outerConeAngle !== undefined ? lightDef.spot.outerConeAngle : Math.PI / 4.0;
+					lightNode.angle = lightDef.spot.outerConeAngle;
+					lightNode.penumbra = 1.0 - lightDef.spot.innerConeAngle / lightDef.spot.outerConeAngle;
 					lightNode.target.position.set( 0, 0, 1 );
 					lightNode.add( lightNode.target );
 					break;
 
-				case 'ambient':
-					lightNode = new THREE.AmbientLight( color );
-					break;
+				default:
+					throw new Error( 'THREE.GLTFLoader: Unexpected light type, "' + lightDef.type + '".' );
 
 			}
 
-			if ( lightNode ) {
+			lightNode.decay = 2;
 
-				lightNode.decay = 2;
+			if ( lightDef.intensity !== undefined ) lightNode.intensity = lightDef.intensity;
 
-				if ( light.intensity !== undefined ) {
+			lightNode.name = lightDef.name || ( 'light_' + i );
 
-					lightNode.intensity = light.intensity;
-
-				}
-
-				lightNode.name = light.name || ( 'light_' + lightId );
-				this.lights[ lightId ] = lightNode;
-
-			}
+			this.lights.push( lightNode );
 
 		}
 
@@ -1019,21 +1016,6 @@ THREE.GLTFLoader = ( function () {
 		10497: THREE.RepeatWrapping
 	};
 
-	var WEBGL_TEXTURE_FORMATS = {
-		6406: THREE.AlphaFormat,
-		6407: THREE.RGBFormat,
-		6408: THREE.RGBAFormat,
-		6409: THREE.LuminanceFormat,
-		6410: THREE.LuminanceAlphaFormat
-	};
-
-	var WEBGL_TEXTURE_DATATYPES = {
-		5121: THREE.UnsignedByteType,
-		32819: THREE.UnsignedShort4444Type,
-		32820: THREE.UnsignedShort5551Type,
-		33635: THREE.UnsignedShort565Type
-	};
-
 	var WEBGL_SIDES = {
 		1028: THREE.BackSide, // Culling front
 		1029: THREE.FrontSide // Culling back
@@ -1181,6 +1163,28 @@ THREE.GLTFLoader = ( function () {
 
 				object.userData.gltfExtensions = object.userData.gltfExtensions || {};
 				object.userData.gltfExtensions[ name ] = objectDef.extensions[ name ];
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * @param {THREE.Object3D|THREE.Material|THREE.BufferGeometry} object
+	 * @param {GLTF.definition} def
+	 */
+	function assignExtrasToUserData( object, gltfDef ) {
+
+		if ( gltfDef.extras !== undefined ) {
+
+			if ( typeof gltfDef.extras === 'object' ) {
+
+				object.userData = gltfDef.extras;
+
+			} else {
+
+				console.warn( 'THREE.GLTFLoader: Ignoring primitive type .extras, ' + gltfDef.extras );
 
 			}
 
@@ -2014,22 +2018,6 @@ THREE.GLTFLoader = ( function () {
 
 			if ( textureDef.name !== undefined ) texture.name = textureDef.name;
 
-			// .format of dds texture is set in DDSLoader
-			if ( ! textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
-
-				texture.format = textureDef.format !== undefined ? WEBGL_TEXTURE_FORMATS[ textureDef.format ] : THREE.RGBAFormat;
-
-			}
-
-			if ( textureDef.internalFormat !== undefined && texture.format !== WEBGL_TEXTURE_FORMATS[ textureDef.internalFormat ] ) {
-
-				console.warn( 'THREE.GLTFLoader: Three.js does not support texture internalFormat which is different from texture format. ' +
-											'internalFormat will be forced to be the same value as format.' );
-
-			}
-
-			texture.type = textureDef.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ textureDef.type ] : THREE.UnsignedByteType;
-
 			var samplers = json.samplers || {};
 			var sampler = samplers[ textureDef.sampler ] || {};
 
@@ -2222,7 +2210,7 @@ THREE.GLTFLoader = ( function () {
 			if ( material.emissiveMap ) material.emissiveMap.encoding = THREE.sRGBEncoding;
 			if ( material.specularMap ) material.specularMap.encoding = THREE.sRGBEncoding;
 
-			if ( materialDef.extras ) material.userData = materialDef.extras;
+			assignExtrasToUserData( material, materialDef );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -2266,11 +2254,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		if ( primitiveDef.extras !== undefined ) {
-
-			geometry.userData = primitiveDef.extras;
-
-		}
+		assignExtrasToUserData( geometry, primitiveDef );
 
 	}
 
@@ -2539,7 +2523,7 @@ THREE.GLTFLoader = ( function () {
 
 					if ( geometries.length > 1 ) mesh.name += '_' + i;
 
-					if ( meshDef.extras !== undefined ) mesh.userData = meshDef.extras;
+					assignExtrasToUserData( mesh, meshDef );
 
 					meshes.push( mesh );
 
@@ -2707,7 +2691,8 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		if ( cameraDef.name !== undefined ) camera.name = cameraDef.name;
-		if ( cameraDef.extras ) camera.userData = cameraDef.extras;
+
+		assignExtrasToUserData( camera, cameraDef );
 
 		return Promise.resolve( camera );
 
@@ -2956,11 +2941,11 @@ THREE.GLTFLoader = ( function () {
 				node = dependencies.cameras[ nodeDef.camera ];
 
 			} else if ( nodeDef.extensions
-					 && nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS ]
-					 && nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS ].light !== undefined ) {
+					 && nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
+					 && nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
 
-				var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
-				node = lights[ nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS ].light ];
+				var lights = extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].lights;
+				node = lights[ nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light ];
 
 			} else {
 
@@ -2974,7 +2959,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			if ( nodeDef.extras ) node.userData = nodeDef.extras;
+			assignExtrasToUserData( node, nodeDef );
 
 			if ( nodeDef.extensions ) addUnknownExtensionsToUserData( extensions, node, nodeDef );
 
@@ -3108,7 +3093,7 @@ THREE.GLTFLoader = ( function () {
 				var scene = new THREE.Scene();
 				if ( sceneDef.name !== undefined ) scene.name = sceneDef.name;
 
-				if ( sceneDef.extras ) scene.userData = sceneDef.extras;
+				assignExtrasToUserData( scene, sceneDef );
 
 				if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
 
@@ -3117,16 +3102,6 @@ THREE.GLTFLoader = ( function () {
 				for ( var i = 0, il = nodeIds.length; i < il; i ++ ) {
 
 					buildNodeHierachy( nodeIds[ i ], scene, json, dependencies.nodes, dependencies.skins );
-
-				}
-
-				// Ambient lighting, if present, is always attached to the scene root.
-				if ( sceneDef.extensions
-						 && sceneDef.extensions[ EXTENSIONS.KHR_LIGHTS ]
-						 && sceneDef.extensions[ EXTENSIONS.KHR_LIGHTS ].light !== undefined ) {
-
-					var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
-					scene.add( lights[ sceneDef.extensions[ EXTENSIONS.KHR_LIGHTS ].light ] );
 
 				}
 

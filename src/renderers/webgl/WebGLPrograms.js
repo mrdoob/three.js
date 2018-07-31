@@ -22,7 +22,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points',
-		ShadowMaterial: 'shadow'
+		ShadowMaterial: 'shadow',
+		SpriteMaterial: 'sprite'
 	};
 
 	var parameterNames = [
@@ -272,7 +273,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
+			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities );
 			programs.push( program );
 
 		}

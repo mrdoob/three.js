@@ -19,6 +19,19 @@ var Detector = {
 		}
 
 	} )(),
+	webgl2: ( function () {
+
+		try {
+
+			var canvas = document.createElement( 'canvas' ); return !! ( window.WebGL2RenderingContext && ( canvas.getContext( 'webgl2' ) ) );
+
+		} catch ( e ) {
+
+			return false;
+
+		}
+
+	} )(),
 	workers: !! window.Worker,
 	fileapi: window.File && window.FileReader && window.FileList && window.Blob,
 
