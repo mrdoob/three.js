@@ -40,6 +40,8 @@ function BufferGeometry() {
 
 	this.userData = {};
 
+	this.version = 0;
+
 }
 
 BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
@@ -66,6 +68,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+		this.version ++;
+
 	},
 
 	addAttribute: function ( name, attribute ) {
@@ -89,6 +93,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		this.attributes[ name ] = attribute;
 
+		this.version ++;
+
 		return this;
 
 	},
@@ -102,6 +108,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	removeAttribute: function ( name ) {
 
 		delete this.attributes[ name ];
+
+		this.version ++;
 
 		return this;
 
