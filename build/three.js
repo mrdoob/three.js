@@ -17885,7 +17885,15 @@
 
 			id: count ++,
 
-			hash: '',
+			hash: {
+				stateID: - 1,
+				directionalLength: - 1,
+				pointLength: - 1,
+				spotLength: - 1,
+				rectAreaLength: - 1,
+				hemiLength: - 1,
+				shadowsLength: - 1
+			},
 
 			ambient: [ 0, 0, 0 ],
 			directional: [],
@@ -18091,7 +18099,13 @@
 			state.point.length = pointLength;
 			state.hemi.length = hemiLength;
 
-			state.hash = state.id + ',' + directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
+			state.hash.stateID = state.id;
+			state.hash.directionalLength = directionalLength;
+			state.hash.pointLength = pointLength;
+			state.hash.spotLength = spotLength;
+			state.hash.rectAreaLength = rectAreaLength;
+			state.hash.hemiLength = hemiLength;
+			state.hash.shadowsLength = shadows.length;
 
 		}
 
@@ -22326,7 +22340,7 @@
 
 				_currentGeometryProgram.geometry = geometry.id;
 				_currentGeometryProgram.program = program.id;
-				_currentGeometryProgram.wireframe = material.wireframe;
+				_currentGeometryProgram.wireframe = material.wireframe === true;
 				updateBuffers = true;
 
 			}
@@ -23083,6 +23097,9 @@
 			var lights = currentRenderState.state.lights;
 			var shadowsArray = currentRenderState.state.shadowsArray;
 
+			var lightsHash = materialProperties.lightsHash;
+			var lightsStateHash = lights.state.hash;
+
 			var parameters = programCache.getParameters(
 				material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
@@ -23101,9 +23118,22 @@
 				// changed glsl or parameters
 				releaseMaterialProgramReference( material );
 
-			} else if ( materialProperties.lightsHash !== lights.state.hash ) {
+			} else if ( lightsHash.stateID !== lightsStateHash.stateID ||
+				lightsHash.directionalLength !== lightsStateHash.directionalLength ||
+				lightsHash.pointLength !== lightsStateHash.pointLength ||
+				lightsHash.spotLength !== lightsStateHash.spotLength ||
+				lightsHash.rectAreaLength !== lightsStateHash.rectAreaLength ||
+				lightsHash.hemiLength !== lightsStateHash.hemiLength ||
+				lightsHash.shadowsLength !== lightsStateHash.shadowsLength ) {
 
-				properties.update( material, 'lightsHash', lights.state.hash );
+				lightsHash.stateID = lightsStateHash.stateID;
+				lightsHash.directionalLength = lightsStateHash.directionalLength;
+				lightsHash.pointLength = lightsStateHash.pointLength;
+				lightsHash.spotLength = lightsStateHash.spotLength;
+				lightsHash.rectAreaLength = lightsStateHash.rectAreaLength;
+				lightsHash.hemiLength = lightsStateHash.hemiLength;
+				lightsHash.shadowsLength = lightsStateHash.shadowsLength;
+
 				programChange = false;
 
 			} else if ( parameters.shaderID !== undefined ) {
@@ -23203,8 +23233,19 @@
 			materialProperties.fog = fog;
 
 			// store the light setup it was created for
+			if ( lightsHash === undefined ) {
 
-			materialProperties.lightsHash = lights.state.hash;
+				materialProperties.lightsHash = lightsHash = {};
+
+			}
+
+			lightsHash.stateID = lightsStateHash.stateID;
+			lightsHash.directionalLength = lightsStateHash.directionalLength;
+			lightsHash.pointLength = lightsStateHash.pointLength;
+			lightsHash.spotLength = lightsStateHash.spotLength;
+			lightsHash.rectAreaLength = lightsStateHash.rectAreaLength;
+			lightsHash.hemiLength = lightsStateHash.hemiLength;
+			lightsHash.shadowsLength = lightsStateHash.shadowsLength;
 
 			if ( material.lights ) {
 
@@ -23242,6 +23283,9 @@
 			var materialProperties = properties.get( material );
 			var lights = currentRenderState.state.lights;
 
+			var lightsHash = materialProperties.lightsHash;
+			var lightsStateHash = lights.state.hash;
+
 			if ( _clippingEnabled ) {
 
 				if ( _localClippingEnabled || camera !== _currentCamera ) {
@@ -23271,7 +23315,13 @@
 
 					material.needsUpdate = true;
 
-				} else if ( material.lights && materialProperties.lightsHash !== lights.state.hash ) {
+				} else if ( material.lights && ( lightsHash.stateID !== lightsStateHash.stateID ||
+					lightsHash.directionalLength !== lightsStateHash.directionalLength ||
+					lightsHash.pointLength !== lightsStateHash.pointLength ||
+					lightsHash.spotLength !== lightsStateHash.spotLength ||
+					lightsHash.rectAreaLength !== lightsStateHash.rectAreaLength ||
+					lightsHash.hemiLength !== lightsStateHash.hemiLength ||
+					lightsHash.shadowsLength !== lightsStateHash.shadowsLength ) ) {
 
 					material.needsUpdate = true;
 
@@ -39665,6 +39715,7 @@
 			if ( this.isPlaying === true ) {
 
 				this.source.stop();
+				this.source.onended = null;
 				this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
 				this.isPlaying = false;
 
@@ -39684,6 +39735,7 @@
 			}
 
 			this.source.stop();
+			this.source.onended = null;
 			this.offset = 0;
 			this.isPlaying = false;
 
