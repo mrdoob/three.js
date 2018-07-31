@@ -211,7 +211,7 @@
 			Keep in mind that the standard materials only allow 4 MorphNormals.
 		</p>
 
-		<h3>[property:Integer physicallyCorrectLights]</h3>
+		<h3>[property:Boolean physicallyCorrectLights]</h3>
 		<p>
 		Whether to use physically correct lighting mode. Default is *false*.
 		See the [example:webgl_lights_physical lights / physical] example.
@@ -392,7 +392,7 @@
 			either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or [page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false.
 		</p>
 
-		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Array lights], [param:Fog fog], [param:Material material], [param:Object geometryGroup], [param:Object3D object] )</h3>
+		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>Render a buffer geometry group using the camera and with the specified material.</p>
 
 		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:shaderprogram program], [param:Material shading] )</h3>

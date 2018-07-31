@@ -78,7 +78,7 @@
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
 		[page:Vector3 direction] — The direction vector that gives direction to the ray. Should be normalized.<br />
 		[page:Float near] — All results returned are further away than near. Near can't be negative. Default value is 0.<br />
-		[page:Float far] — All results returned are closer then far. Far can't be lower then near . Default value is Infinity.
+		[page:Float far] — All results returned are closer than far. Far can't be lower than near. Default value is Infinity.
 		</p>
 		<p>
 		This creates a new raycaster object.<br />
@@ -144,7 +144,7 @@
 		Updates the ray with a new origin and direction.
 		</p>
 
-		<h3>[method:Array intersectObject]( [page:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
+		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] — The object to check for intersection with the ray.<br />
 		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersecton with the object. Default is false.<br />

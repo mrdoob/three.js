@@ -104,8 +104,7 @@
 
 				//
 
-				var geometry1 = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 );
-				var vertices = geometry1.vertices;
+				var vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
 
 				var positions = new Float32Array( vertices.length * 3 );
 				var colors = new Float32Array( vertices.length * 3 );
