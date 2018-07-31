@@ -157,12 +157,11 @@
 					scene.add( bvhSkeletonHelper );
 					scene.add( boneContainer );
 
-					// play animation
-					bvhMixer = new THREE.AnimationMixer( bvhSkeletonHelper );
-
 					// get offsets when it is in T-Pose
 					options.offsets = THREE.SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
 
+					// play animation
+					bvhMixer = new THREE.AnimationMixer( bvhSkeletonHelper );
 					bvhMixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play();
 
 				} );
