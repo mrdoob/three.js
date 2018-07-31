@@ -663,7 +663,7 @@ function WebGLRenderer( parameters ) {
 
 			_currentGeometryProgram.geometry = geometry.id;
 			_currentGeometryProgram.program = program.id;
-			_currentGeometryProgram.wireframe = material.wireframe;
+			_currentGeometryProgram.wireframe = material.wireframe === true;
 			updateBuffers = true;
 
 		}
