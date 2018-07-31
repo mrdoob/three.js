@@ -1,11 +1,9 @@
 'use strict';
 
-function main() {
+/* global threejsLessonUtils */
 
-  // even on low-res we want hi-res rendering so the lines are small
-  const pixelRatio = 2;
-
-  const primitives = {
+{
+  const diagrams = {
     BoxBufferGeometry: {
       create() {
         const width = 8;
@@ -368,9 +366,6 @@ function main() {
     },
   };
 
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true});
-
   function addLink(parent, name) {
     const a = document.createElement('a');
     a.href = `https://threejs.org/docs/#api/geometries/${name}`;
@@ -395,14 +390,12 @@ function main() {
     return addElem(parent, 'div', className);
   }
 
-  const primRenderFuncs = [
-    ...[...document.querySelectorAll('[data-primitive]')].map(createPrimitiveDOM),
-    ...[...document.querySelectorAll('[data-primitive-diagram]')].map(createPrimitiveDiagram),
-  ];
+  [...document.querySelectorAll('[data-diagram]')].forEach(createDiagram);
+  [...document.querySelectorAll('[data-primitive]')].forEach(createPrimitiveDOM);
 
   function createPrimitiveDOM(base) {
     const name = base.dataset.primitive;
-    const info = primitives[name];
+    const info = diagrams[name];
     if (!info) {
       throw new Error(`no primitive ${name}`);
     }
@@ -420,48 +413,21 @@ function main() {
     }
     addDiv(right, '.note').innerHTML = text;
 
-    return createPrimitive(elem, info);
+    return createLiveImage(elem, info);
   }
 
-  function createPrimitiveDiagram(base) {
-    const name = base.dataset.primitiveDiagram;
-    const info = primitives[name];
+  function createDiagram(base) {
+    const name = base.dataset.diagram;
+    const info = diagrams[name];
     if (!info) {
       throw new Error(`no primitive ${name}`);
     }
-    return createPrimitive(base, info);
+    return createLiveImage(base, info);
   }
 
-  function createPrimitive(elem, info) {
+  function createLiveImage(elem, info) {
     const geometry = info.create();
     const promise = (geometry instanceof Promise) ? geometry : Promise.resolve(geometry);
-    const scene = new THREE.Scene();
-
-    const root = new THREE.Object3D();
-    scene.add(root);
-
-    const fov = 60;
-    const aspect = 1;
-    const zNear = 0.1;
-    const zFar = 50;
-    const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
-    camera.position.z = 15;
-
-    const controls = new THREE.TrackballControls(camera, elem);
-    controls.noZoom = true;
-    controls.noPan = true;
-
-    // add the lights as children of the camera.
-    // this is because TrackbacllControls move the camera.
-    // We really want to rotate the object itself but there's no
-    // controls for that so we fake it by putting all the lights
-    // on the camera so they move with it.
-    camera.add(new THREE.HemisphereLight(0xaaaaaa, 0x444444, .5));
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(-1, 2, 4 - 15);
-    camera.add(light);
-    scene.add(camera);
-
     promise.then((geometryInfo) => {
       if (geometryInfo instanceof THREE.BufferGeometry ||
           geometryInfo instanceof THREE.Geometry) {
@@ -470,6 +436,8 @@ function main() {
           geometry,
         };
       }
+
+      const root = new THREE.Object3D();
 
       const boxGeometry = geometryInfo.geometry || geometryInfo.lineGeometry;
       boxGeometry.computeBoundingBox();
@@ -497,104 +465,8 @@ function main() {
         lineMesh.position.copy(centerOffset);
         root.add(lineMesh);
       }
+
+      threejsLessonUtils.addDiagram(elem, {create: () => root});
     });
-
-    let oldWidth = -1;
-    let oldHeight = -1;
-
-    function render(renderer, time) {
-      root.rotation.x = time * .1;
-      root.rotation.y = time * .11;
-
-      const rect = elem.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
-          rect.right  < 0 || rect.left > renderer.domElement.clientWidth) {
-        return;
-      }
-
-      const width  = (rect.right - rect.left) * pixelRatio;
-      const height = (rect.bottom - rect.top) * pixelRatio;
-      const left   = rect.left * pixelRatio;
-      const top    = rect.top * pixelRatio;
-
-      if (width !== oldWidth || height !== oldHeight) {
-        oldWidth = width;
-        oldHeight = height;
-        controls.handleResize();
-      }
-      controls.update();
-
-      const aspect = width / height;
-      const targetFov = THREE.Math.degToRad(60);
-      const fov = aspect >= 1
-        ? targetFov
-        : (2 * Math.atan(Math.tan(targetFov * .5) / aspect));
-
-      camera.fov = THREE.Math.radToDeg(fov);
-      camera.aspect = aspect;
-      camera.updateProjectionMatrix();
-
-      renderer.setViewport(left, top, width, height);
-      renderer.setScissor(left, top, width, height);
-      renderer.render(scene, camera);
-    }
-
-    return render;
   }
-
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth * pixelRatio;
-    const height = canvas.clientHeight * pixelRatio;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
-
-  // Three r93 needs to render at least once for some reason.
-  const scene = new THREE.Scene();
-  const camera = new THREE.Camera();
-
-  function render(time) {
-    time *= 0.001;
-
-    resizeRendererToDisplaySize(renderer);
-
-    renderer.setScissorTest(false);
-
-    // Three r93 needs to render at least once for some reason.
-    renderer.render(scene, camera);
-
-    renderer.setScissorTest(true);
-
-    // maybe there is another way. Originally I used `position: fixed`
-    // but the problem is if we can't render as fast as the browser
-    // scrolls then our shapes lag. 1 or 2 frames of lag isn't too
-    // horrible but iOS would often been 1/2 a second or worse.
-    // By doing it this way the canvas will scroll which means the
-    // worse that happens is part of the shapes scrolling on don't
-    // get drawn for a few frames but the shapes that are on the screen
-    // scroll perfectly.
-    //
-    // I'm using `transform` on the voodoo that it doesn't affect
-    // layout as much as `top` since AFAIK setting `top` is in
-    // the flow but `transform` is not though thinking about it
-    // the given we're `position: absolute` maybe there's no difference?
-    const transform = `translateY(${window.scrollY}px)`;
-    renderer.domElement.style.transform = transform;
-
-    primRenderFuncs.forEach((fn) => {
-        fn(renderer, time);
-    });
-
-    requestAnimationFrame(render);
-  }
-
-  requestAnimationFrame(render);
 }
-
-main();
-
-

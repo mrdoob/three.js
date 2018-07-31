@@ -24,6 +24,37 @@ pre.prettyprint li {
     white-space: pre;
 }
 
+
+div[data-diagram] {
+  height: 100%;
+}
+.spread {
+  display: flex;
+  text-align: center;
+  margin: 2em auto 3em;
+}
+.spread div[data-diagram] {
+    height: 150px;
+}
+.spread>div {
+  flex: 1 1 auto;
+}
+.spread .code {
+  font-family: monospace;
+}
+.spread .code>div {
+  text-align: left;
+}
+#c {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -100;
+}
+
+
 .threejs_navbar>div,
 .lesson-title,
 .lesson-comments,
@@ -94,7 +125,16 @@ pre.prettyprint li {
 .home-lang select {
     font-size: large;
 }
-
+.checkerboard {
+  background-color: #404040;
+  background-image: 
+     linear-gradient(45deg, #808080 25%, transparent 25%), 
+     linear-gradient(-45deg, #808080 25%, transparent 25%), 
+     linear-gradient(45deg, transparent 75%, #808080 75%), 
+     linear-gradient(-45deg, transparent 75%, #808080 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
 .fullscreen {
     position: fixed !important;
     left: 0;

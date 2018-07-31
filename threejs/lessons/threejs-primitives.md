@@ -1,7 +1,7 @@
 Title: Three.js Primitives
 Description: A tour of three.js primitives.
 
-This article one in a series of articles about three.js.
+This article is one in a series of articles about three.js.
 The first article was [about fundamentals](threejs-fundamentals.html).
 If you haven't read that yet you might want to start there.
 
@@ -289,9 +289,9 @@ might be the sphere geometries. Spheres take parameters for
 how many divisions to make around and how many top to bottom. For example
 
 <div class="spread">
-<div data-primitive-diagram="SphereBufferGeometryLow"></div>
-<div data-primitive-diagram="SphereBufferGeometryMedium"></div>
-<div data-primitive-diagram="SphereBufferGeometryHigh"></div>
+<div data-diagram="SphereBufferGeometryLow"></div>
+<div data-diagram="SphereBufferGeometryMedium"></div>
+<div data-diagram="SphereBufferGeometryHigh"></div>
 </div>
 
 The first sphere has 5 segments around and 3 high which is 15 segments
@@ -303,9 +303,9 @@ look like you need a high number of segments but remove the lines
 and the flat shading and we get this
 
 <div class="spread">
-<div data-primitive-diagram="SphereBufferGeometryLowSmooth"></div>
-<div data-primitive-diagram="SphereBufferGeometryMediumSmooth"></div>
-<div data-primitive-diagram="SphereBufferGeometryHighSmooth"></div>
+<div data-diagram="SphereBufferGeometryLowSmooth"></div>
+<div data-diagram="SphereBufferGeometryMediumSmooth"></div>
+<div data-diagram="SphereBufferGeometryHighSmooth"></div>
 </div>
 
 It's now not so clear that the one on the right with 5000 triangles
@@ -322,8 +322,8 @@ Sometimes it's easy to choose. For example you can also choose
 to subdivide a plane.
 
 <div class="spread">
-<div data-primitive-diagram="PlaneBufferGeometryLow"></div>
-<div data-primitive-diagram="PlaneBufferGeometryHigh"></div>
+<div data-diagram="PlaneBufferGeometryLow"></div>
+<div data-diagram="PlaneBufferGeometryHigh"></div>
 </div>
 
 The plane on the left is 2 triangles. The plane on the right
@@ -343,15 +343,9 @@ to use it](threejs-scenegraph.html).
 <canvas id="c"></canvas>
 <script src="../resources/threejs/r94/three.min.js"></script>
 <script src="../resources/threejs/r94/js/controls/TrackballControls.js"></script>
+<script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-primitives.js"></script>
 <style>
-.spread {
-  display: flex;
-}
-.spread>div {
-  flex: 1 1 auto;
-  height: 150px;
-}
 .primitives {
 }
 .primitives>div {
@@ -380,14 +374,6 @@ to use it](threejs-scenegraph.html).
 }
 .primitives .desc {
   flex: 1 1 auto;
-}
-#c {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -100;
 }
 </style>
 
