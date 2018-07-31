@@ -147,39 +147,39 @@
 				// Automatic offset: get offsets when it is in T-Pose
 				options.offsets = THREE.SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
 
-				// Manual offsets: compensates the difference in skeletons ( T-Pose )
 				/*
-							options.offsets = {
-								"lShldr": new THREE.Matrix4().makeRotationFromEuler(
-									new THREE.Euler(
-										0,
-										THREE.Math.degToRad( - 45 ),
-										THREE.Math.degToRad( - 80 )
-									)
-								),
-								"rShldr": new THREE.Matrix4().makeRotationFromEuler(
-									new THREE.Euler(
-										0,
-										THREE.Math.degToRad( 45 ),
-										THREE.Math.degToRad( 80 )
-									)
-								),
-								"lFoot": new THREE.Matrix4().makeRotationFromEuler(
-									new THREE.Euler(
-										0,
-										THREE.Math.degToRad( 15 ),
-										0
-									)
-								),
-								"rFoot": new THREE.Matrix4().makeRotationFromEuler(
-									new THREE.Euler(
-										0,
-										THREE.Math.degToRad( 15 ),
-										0
-									)
-								)
-							};
-							*/
+				// Manual offsets: compensates the difference in skeletons ( T-Pose )
+				options.offsets = {
+					"lShldr": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( - 45 ),
+							THREE.Math.degToRad( - 80 )
+						)
+					),
+					"rShldr": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 45 ),
+							THREE.Math.degToRad( 80 )
+						)
+					),
+					"lFoot": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 15 ),
+							0
+						)
+					),
+					"rFoot": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 15 ),
+							0
+						)
+					)
+				};
+				*/
 
 				var clip = THREE.SkeletonUtils.retargetClip( player, result.skeleton, result.clip, options );
 
