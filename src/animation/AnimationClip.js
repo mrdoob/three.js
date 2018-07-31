@@ -31,8 +31,6 @@ function AnimationClip( name, duration, tracks ) {
 
 	}
 
-	this.optimize();
-
 }
 
 function getTrackTypeForValueTypeName( typeName ) {
@@ -407,6 +405,8 @@ Object.assign( AnimationClip.prototype, {
 
 		this.duration = duration;
 
+		return this;
+
 	},
 
 	trim: function () {
@@ -418,6 +418,20 @@ Object.assign( AnimationClip.prototype, {
 		}
 
 		return this;
+
+	},
+
+	validate: function () {
+
+		var valid = true;
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			valid = valid && this.tracks[ i ].validate();
+
+		}
+
+		return valid;
 
 	},
 

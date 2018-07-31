@@ -202,13 +202,12 @@
 			created automatically.
 		</p>
 
-		<h3>[method:null optimize]()</h3>
+		<h3>[method:this optimize]()</h3>
 		<p>
-			Removes equivalent sequential keys, which are common in morph target sequences. Called
-			automatically by the constructor.
+			Removes equivalent sequential keys, which are common in morph target sequences.
 		</p>
 
-		<h3>[method:null scale]()</h3>
+		<h3>[method:this scale]()</h3>
 		<p>
 			Scales all keyframe times by a factor.<br /><br />
 
@@ -217,26 +216,29 @@
 			[page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]).
 		</p>
 
-		<h3>[method:null setInterpolation]( [param:Constant interpolationType] )</h3>
+		<h3>[method:this setInterpolation]( [param:Constant interpolationType] )</h3>
 		<p>
 			Sets the interpolation type. See [page:Animation Animation Constants] for choices.
 		</p>
 
-		<h3>[method:null shift]( [param:Number timeOffsetInSeconds] )</h3>
+		<h3>[method:this shift]( [param:Number timeOffsetInSeconds] )</h3>
 		<p>
 			Moves all keyframes either forward or backward in time.
 		</p>
 
 
-		<h3>[method:null trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
+		<h3>[method:this trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
 		<p>
 			Removes keyframes before *startTime* and after *endTime*,
 			without changing any values within the range [*startTime*, *endTime*].
 		</p>
 
-		<h3>[method:null validate]()</h3>
+		<h3>[method:Boolean validate]()</h3>
 		<p>
-			Performs minimal validation on the tracks. Called automatically by the constructor.<br /><br />
+			Performs minimal validation on the tracks. Returns true if valid.
+		</p>
+
+		<p>
 			This method logs errors to the console, if a track is empty, if the [page:.valueSize value size] is not valid, if an item
 			in the [page:.times times] or [page:.values values] array is not a valid number or if the items in the *times* array are out of order.
 		</p>
