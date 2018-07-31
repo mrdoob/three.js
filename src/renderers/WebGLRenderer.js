@@ -659,7 +659,9 @@ function WebGLRenderer( parameters ) {
 
 		var updateBuffers = false;
 
-		if ( geometry.id !== _currentGeometryProgram.geometry || program.id !== _currentGeometryProgram.program || material.wireframe !== _currentGeometryProgram.wireframe ) {
+		if ( _currentGeometryProgram.geometry !== geometry.id ||
+			_currentGeometryProgram.program !== program.id ||
+			_currentGeometryProgram.wireframe !== ( material.wireframe === true ) ) {
 
 			_currentGeometryProgram.geometry = geometry.id;
 			_currentGeometryProgram.program = program.id;
