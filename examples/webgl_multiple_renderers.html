@@ -142,23 +142,26 @@
 
 				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
-				var mesh1 = new THREE.Mesh( geometry1, material );
-				var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
-				mesh1.add( wireframe );
+				mesh1 = new THREE.Mesh( geometry1, material );
 				mesh1.position.x = - 400;
 				mesh1.rotation.x = - 1.87;
 				scene.add( mesh1 );
 
-				var mesh2 = new THREE.Mesh( geometry2, material );
-				var wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
-				mesh2.add( wireframe );
+				var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
+				mesh1.add( wireframe );
+
+				mesh2 = new THREE.Mesh( geometry2, material );
 				mesh2.position.x = 400;
 				scene.add( mesh2 );
 
-				var mesh3 = new THREE.Mesh( geometry3, material );
+				var wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
+				mesh2.add( wireframe );
+
+				mesh3 = new THREE.Mesh( geometry3, material );
+				scene.add( mesh3 );
+
 				var wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
 				mesh3.add( wireframe );
-				scene.add( mesh3 );
 
 				//
 
