@@ -327,10 +327,11 @@ var files = {
 		"webvr_dragging",
 		"webvr_lorenzattractor",
 		"webvr_panorama",
+		"webvr_paint",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
+		"webvr_sculpt",
 		"webvr_video",
-		"webvr_vive",
 		"webvr_vive_paint",
 		"webvr_vive_sculpt"
 	],
