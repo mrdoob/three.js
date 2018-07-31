@@ -555,7 +555,7 @@ THREE.FBXLoader = ( function () {
 				switch ( type ) {
 
 					case 'Bump':
-						parameters.bumpMap = self.getTexture( FBXTree, textureMap, child.ID, connections );
+						parameters.bumpMap = self.getTexture( textureMap, child.ID );
 						break;
 
 					case 'DiffuseColor':
