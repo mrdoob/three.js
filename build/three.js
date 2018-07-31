@@ -35444,9 +35444,6 @@
 
 		this.setInterpolation( interpolation || this.DefaultInterpolation );
 
-		this.validate();
-		this.optimize();
-
 	}
 
 	// Static methods
@@ -35571,11 +35568,13 @@
 				}
 
 				console.warn( 'THREE.KeyframeTrack:', message );
-				return;
+				return this;
 
 			}
 
 			this.createInterpolant = factoryMethod;
+
+			return this;
 
 		},
 
@@ -36113,8 +36112,6 @@
 
 		}
 
-		this.optimize();
-
 	}
 
 	function getTrackTypeForValueTypeName( typeName ) {
@@ -36489,6 +36486,8 @@
 
 			this.duration = duration;
 
+			return this;
+
 		},
 
 		trim: function () {
@@ -36500,6 +36499,20 @@
 			}
 
 			return this;
+
+		},
+
+		validate: function () {
+
+			var valid = true;
+
+			for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+				valid = valid && this.tracks[ i ].validate();
+
+			}
+
+			return valid;
 
 		},
 
@@ -41843,13 +41856,19 @@
 		_updateTime: function ( deltaTime ) {
 
 			var time = this.time + deltaTime;
+			var duration = this._clip.duration;
+			var loop = this.loop;
+			var loopCount = this._loopCount;
 
-			if ( deltaTime === 0 ) return time;
+			var pingPong = ( loop === LoopPingPong );
 
-			var duration = this._clip.duration,
+			if ( deltaTime === 0 ) {
 
-				loop = this.loop,
-				loopCount = this._loopCount;
+				if ( loopCount === - 1 ) return time;
+
+				return ( pingPong && ( loopCount & 1 ) === 1 ) ? duration - time : time;
+
+			}
 
 			if ( loop === LoopOnce ) {
 
@@ -41885,8 +41904,6 @@
 				}
 
 			} else { // repetitive Repeat or PingPong
-
-				var pingPong = ( loop === LoopPingPong );
 
 				if ( loopCount === - 1 ) {
 
