@@ -53,6 +53,9 @@ div[data-diagram] {
   height: 100vh;
   z-index: -100;
 }
+.border {
+  border: 1px solid black;
+}
 
 
 .threejs_navbar>div,

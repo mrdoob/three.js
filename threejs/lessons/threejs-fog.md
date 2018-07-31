@@ -73,11 +73,11 @@ scene.background = new THREE.Color('#F00');  // red
 
 <div class="spread">
   <div>
-    <div data-diagram="fogBlueBackgroundRed"></div>
+    <div data-diagram="fogBlueBackgroundRed" class="border"></div>
     <div class="code">fog blue, background red</div>
   </div>
   <div>
-    <div data-diagram="fogBlueBackgroundBlue"></div>
+    <div data-diagram="fogBlueBackgroundBlue" class="border"></div>
     <div class="code">fog blue, background blue</div>
   </div>
 </div>
@@ -242,10 +242,33 @@ for most materials. As an example of why you might want
 to turn the fog off, imagine you're making a 3D vehicle
 simulator with a view from the driver's seat or cockpit.
 You probably want the fog off for everything inside the vehicle when
-viewing from inside the vehicle.
+viewing from inside the vehicle. 
+
+A better example might be a house
+and thick fog outside house. Let's say the fog is set to start
+2 meters away (near = 2) and completely fogged out at 4 meters (far = 4).
+Rooms are longer than 2 meters and the house is probably longer
+than 4 meters so you need to set the materials for the inside
+of the house to not apply fog otherwise when standing inside the
+house looking outside the wall at the far end of the room will look 
+like it's in the fog.
+
+<div class="spread">
+  <div>
+    <div data-diagram="fogHouseAll" style="height: 300px;" class="border"></div>
+    <div class="code">fog: true, all</div>
+  </div>
+</div>
+<div class="spread">
+  <div>
+    <div data-diagram="fogHouseInsideNoFog" style="height: 300px;" class="border"></div>
+    <div class="code">fog: true, only outside materials</div>
+  </div>
+</div>
 
 <canvas id="c"></canvas>
 <script src="../resources/threejs/r94/three.min.js"></script>
 <script src="../resources/threejs/r94/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r94/js/loaders/GLTFLoader.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-fog.js"></script>
