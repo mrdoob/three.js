@@ -202,7 +202,6 @@ var files = {
 		"webgl_multiple_renderers",
 		"webgl_multiple_views",
 		"webgl_nearestneighbour",
-		"webgl_objects_update",
 		"webgl_octree",
 		"webgl_octree_raycasting",
 		"webgl_panorama_cube",
