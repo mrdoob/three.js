@@ -452,6 +452,12 @@ Object.assign( Color.prototype, {
 		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
 
 	},
+	
+	toString: function () {
+
+		return '#' + this.getHexString();
+
+	},
 
 	offsetHSL: function () {
 
