@@ -85,7 +85,7 @@
 
 				var ground = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 10, 10 ),
-					new THREE.MeshPhongMaterial( { color: 0x111111 } )
+					new THREE.MeshPhongMaterial( { color: 0x111111, shininess: 0 } )
 				);
 				ground.geometry.rotateX( - 90 * Math.PI / 180 );
 				scene.add( ground );
