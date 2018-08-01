@@ -231,7 +231,7 @@ Here are 6 planes drawn with `THREE.FrontSide` and `THREE.DoubleSide`.
 </div>
 
 There's really a lot to consider with materials and we actually still
-have a bunch more to go. In particlar we've mostly ignored textures
+have a bunch more to go. In particular we've mostly ignored textures
 which open up a whole slew of options. Before we cover textures though
 we need to take a break and cover 
 [setting up your development environment](threejs-setup.html)
