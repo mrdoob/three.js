@@ -41,7 +41,7 @@ material.color.setHSL(h, s, l)   // where h, s, and l are 0 to 1
 material.color.setRGB(r, g, b)   // where r, g, and b are 0 to 1                      
 ```
 
-And at creation time you and pass either a hex number or a CSS string
+And at creation time you can pass either a hex number or a CSS string
 
 ```
 const m1 = new THREE.MeshBasicMaterial({color: 0xFF0000});         // red
