@@ -21,7 +21,7 @@
 
 THREE.FBXLoader = ( function () {
 
-	var FBXTreeInstance;
+	var fbxTree;
 	var connections;
 	var sceneGraph;
 
@@ -77,7 +77,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( isFbxFormatBinary( FBXBuffer ) ) {
 
-				FBXTreeInstance = new BinaryParser().parse( FBXBuffer );
+				fbxTree = new BinaryParser().parse( FBXBuffer );
 
 			} else {
 
@@ -95,7 +95,7 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-				FBXTreeInstance = new TextParser().parse( FBXText );
+				fbxTree = new TextParser().parse( FBXText );
 
 			}
 
@@ -103,7 +103,7 @@ THREE.FBXLoader = ( function () {
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
-			return new FBXTreeParser( textureLoader ).parse( FBXTreeInstance );
+			return new FBXTreeParser( textureLoader ).parse( fbxTree );
 
 		}
 
@@ -142,9 +142,9 @@ THREE.FBXLoader = ( function () {
 
 			var connectionMap = new Map();
 
-			if ( 'Connections' in FBXTreeInstance ) {
+			if ( 'Connections' in fbxTree ) {
 
-				var rawConnections = FBXTreeInstance.Connections.connections;
+				var rawConnections = fbxTree.Connections.connections;
 
 				rawConnections.forEach( function ( rawConnection ) {
 
@@ -192,9 +192,9 @@ THREE.FBXLoader = ( function () {
 			var images = {};
 			var blobs = {};
 
-			if ( 'Video' in FBXTreeInstance.Objects ) {
+			if ( 'Video' in fbxTree.Objects ) {
 
-				var videoNodes = FBXTreeInstance.Objects.Video;
+				var videoNodes = fbxTree.Objects.Video;
 
 				for ( var nodeID in videoNodes ) {
 
@@ -316,9 +316,9 @@ THREE.FBXLoader = ( function () {
 
 			var textureMap = new Map();
 
-			if ( 'Texture' in FBXTreeInstance.Objects ) {
+			if ( 'Texture' in fbxTree.Objects ) {
 
-				var textureNodes = FBXTreeInstance.Objects.Texture;
+				var textureNodes = fbxTree.Objects.Texture;
 				for ( var nodeID in textureNodes ) {
 
 					var texture = this.parseTexture( textureNodes[ nodeID ], images );
@@ -410,9 +410,9 @@ THREE.FBXLoader = ( function () {
 
 			var materialMap = new Map();
 
-			if ( 'Material' in FBXTreeInstance.Objects ) {
+			if ( 'Material' in fbxTree.Objects ) {
 
-				var materialNodes = FBXTreeInstance.Objects.Material;
+				var materialNodes = fbxTree.Objects.Material;
 
 				for ( var nodeID in materialNodes ) {
 
@@ -607,7 +607,7 @@ THREE.FBXLoader = ( function () {
 		getTexture: function ( textureMap, id ) {
 
 			// if the texture is a layered texture, just use the first layer and issue a warning
-			if ( 'LayeredTexture' in FBXTreeInstance.Objects && id in FBXTreeInstance.Objects.LayeredTexture ) {
+			if ( 'LayeredTexture' in fbxTree.Objects && id in fbxTree.Objects.LayeredTexture ) {
 
 				console.warn( 'THREE.FBXLoader: layered textures are not supported in three.js. Discarding all but first layer.' );
 				id = connections.get( id ).children[ 0 ].ID;
@@ -626,9 +626,9 @@ THREE.FBXLoader = ( function () {
 			var skeletons = {};
 			var morphTargets = {};
 
-			if ( 'Deformer' in FBXTreeInstance.Objects ) {
+			if ( 'Deformer' in fbxTree.Objects ) {
 
-				var DeformerNodes = FBXTreeInstance.Objects.Deformer;
+				var DeformerNodes = fbxTree.Objects.Deformer;
 
 				for ( var nodeID in DeformerNodes ) {
 
@@ -771,7 +771,7 @@ THREE.FBXLoader = ( function () {
 
 			var modelMap = this.parseModels( deformers.skeletons, geometryMap, materialMap );
 
-			var modelNodes = FBXTreeInstance.Objects.Model;
+			var modelNodes = fbxTree.Objects.Model;
 
 			var self = this;
 			modelMap.forEach( function ( model ) {
@@ -821,7 +821,7 @@ THREE.FBXLoader = ( function () {
 		parseModels: function ( skeletons, geometryMap, materialMap ) {
 
 			var modelMap = new Map();
-			var modelNodes = FBXTreeInstance.Objects.Model;
+			var modelNodes = fbxTree.Objects.Model;
 
 			for ( var nodeID in modelNodes ) {
 
@@ -921,7 +921,7 @@ THREE.FBXLoader = ( function () {
 
 			relationships.children.forEach( function ( child ) {
 
-				var attr = FBXTreeInstance.Objects.NodeAttribute[ child.ID ];
+				var attr = fbxTree.Objects.NodeAttribute[ child.ID ];
 
 				if ( attr !== undefined ) {
 
@@ -1012,7 +1012,7 @@ THREE.FBXLoader = ( function () {
 
 			relationships.children.forEach( function ( child ) {
 
-				var attr = FBXTreeInstance.Objects.NodeAttribute[ child.ID ];
+				var attr = fbxTree.Objects.NodeAttribute[ child.ID ];
 
 				if ( attr !== undefined ) {
 
@@ -1242,7 +1242,7 @@ THREE.FBXLoader = ( function () {
 
 					if ( child.relationship === 'LookAtProperty' ) {
 
-						var lookAtTarget = FBXTreeInstance.Objects.Model[ child.ID ];
+						var lookAtTarget = fbxTree.Objects.Model[ child.ID ];
 
 						if ( 'Lcl_Translation' in lookAtTarget ) {
 
@@ -1311,9 +1311,9 @@ THREE.FBXLoader = ( function () {
 
 			var bindMatrices = {};
 
-			if ( 'Pose' in FBXTreeInstance.Objects ) {
+			if ( 'Pose' in fbxTree.Objects ) {
 
-				var BindPoseNode = FBXTreeInstance.Objects.Pose;
+				var BindPoseNode = fbxTree.Objects.Pose;
 
 				for ( var nodeID in BindPoseNode ) {
 
@@ -1348,9 +1348,9 @@ THREE.FBXLoader = ( function () {
 		// Parse ambient color in FBXTree.GlobalSettings - if it's not set to black (default), create an ambient light
 		createAmbientLight: function () {
 
-			if ( 'GlobalSettings' in FBXTreeInstance && 'AmbientColor' in FBXTreeInstance.GlobalSettings ) {
+			if ( 'GlobalSettings' in fbxTree && 'AmbientColor' in fbxTree.GlobalSettings ) {
 
-				var ambientColor = FBXTreeInstance.GlobalSettings.AmbientColor.value;
+				var ambientColor = fbxTree.GlobalSettings.AmbientColor.value;
 				var r = ambientColor[ 0 ];
 				var g = ambientColor[ 1 ];
 				var b = ambientColor[ 2 ];
@@ -1416,9 +1416,9 @@ THREE.FBXLoader = ( function () {
 
 			var geometryMap = new Map();
 
-			if ( 'Geometry' in FBXTreeInstance.Objects ) {
+			if ( 'Geometry' in fbxTree.Objects ) {
 
-				var geoNodes = FBXTreeInstance.Objects.Geometry;
+				var geoNodes = fbxTree.Objects.Geometry;
 
 				for ( var nodeID in geoNodes ) {
 
@@ -1460,7 +1460,7 @@ THREE.FBXLoader = ( function () {
 
 			var modelNodes = relationships.parents.map( function ( parent ) {
 
-				return FBXTreeInstance.Objects.Model[ parent.ID ];
+				return fbxTree.Objects.Model[ parent.ID ];
 
 			} );
 
@@ -1988,7 +1988,7 @@ THREE.FBXLoader = ( function () {
 			var self = this;
 			morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
-				var morphGeoNode = FBXTreeInstance.Objects.Geometry[ rawTarget.geoID ];
+				var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
 
 				if ( morphGeoNode !== undefined ) {
 
@@ -2269,7 +2269,7 @@ THREE.FBXLoader = ( function () {
 
 			// since the actual transformation data is stored in FBXTree.Objects.AnimationCurve,
 			// if this is undefined we can safely assume there are no animations
-			if ( FBXTreeInstance.Objects.AnimationCurve === undefined ) return undefined;
+			if ( fbxTree.Objects.AnimationCurve === undefined ) return undefined;
 
 			var curveNodesMap = this.parseAnimationCurveNodes();
 
@@ -2287,7 +2287,7 @@ THREE.FBXLoader = ( function () {
 		// and is referenced by an AnimationLayer
 		parseAnimationCurveNodes: function () {
 
-			var rawCurveNodes = FBXTreeInstance.Objects.AnimationCurveNode;
+			var rawCurveNodes = fbxTree.Objects.AnimationCurveNode;
 
 			var curveNodesMap = new Map();
 
@@ -2320,7 +2320,7 @@ THREE.FBXLoader = ( function () {
 		// axis ( e.g. times and values of x rotation)
 		parseAnimationCurves: function ( curveNodesMap ) {
 
-			var rawCurves = FBXTreeInstance.Objects.AnimationCurve;
+			var rawCurves = fbxTree.Objects.AnimationCurve;
 
 			// TODO: Many values are identical up to roundoff error, but won't be optimised
 			// e.g. position times: [0, 0.4, 0. 8]
@@ -2375,7 +2375,7 @@ THREE.FBXLoader = ( function () {
 		// note: theoretically a stack can have multiple layers, however in practice there always seems to be one per stack
 		parseAnimationLayers: function ( curveNodesMap ) {
 
-			var rawLayers = FBXTreeInstance.Objects.AnimationLayer;
+			var rawLayers = fbxTree.Objects.AnimationLayer;
 
 			var layersMap = new Map();
 
@@ -2410,7 +2410,7 @@ THREE.FBXLoader = ( function () {
 
 									} );
 
-									var rawModel = FBXTreeInstance.Objects.Model[ modelID.toString() ];
+									var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
 
 									var node = {
 
@@ -2451,12 +2451,12 @@ THREE.FBXLoader = ( function () {
 									// assuming geometry is not used in more than one model
 									var modelID = connections.get( geoID ).parents[ 0 ].ID;
 
-									var rawModel = FBXTreeInstance.Objects.Model[ modelID ];
+									var rawModel = fbxTree.Objects.Model[ modelID ];
 
 									var node = {
 
 										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
-										morphName: FBXTreeInstance.Objects.Deformer[ deformerID ].attrName,
+										morphName: fbxTree.Objects.Deformer[ deformerID ].attrName,
 
 									};
 
@@ -2506,7 +2506,7 @@ THREE.FBXLoader = ( function () {
 		// hierarchy. Each Stack node will be used to create a THREE.AnimationClip
 		parseAnimStacks: function ( layersMap ) {
 
-			var rawStacks = FBXTreeInstance.Objects.AnimationStack;
+			var rawStacks = fbxTree.Objects.AnimationStack;
 
 			// connect the stacks (clips) up to the layers
 			var rawClips = {};
