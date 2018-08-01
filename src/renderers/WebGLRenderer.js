@@ -686,7 +686,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		bindingStates.setup( material, program, geometry, hasMorphTarget );
+		bindingStates.setup( material, program, geometry, index, hasMorphTarget );
 
 		//
 

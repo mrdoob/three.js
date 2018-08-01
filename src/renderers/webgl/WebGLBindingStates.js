@@ -15,7 +15,7 @@ function WebGLBindingStates( gl, extensions, state, attributes, capabilities ) {
 	var defaultState = createBindingState( null );
 	var currentState = defaultState;
 
-	function setup( material, program, geometry, hasMorphTarget ) {
+	function setup( material, program, geometry, index, hasMorphTarget ) {
 
 		var state = getBindingState( geometry, program, material );
 
@@ -40,7 +40,7 @@ function WebGLBindingStates( gl, extensions, state, attributes, capabilities ) {
 
 		} else {
 
-			var wireframe = material.wireframe === true;
+			var wireframe = ( material.wireframe === true );
 
 			if ( currentState.geometry !== geometry.id ||
 				currentState.program !== program.id ||
@@ -60,9 +60,9 @@ function WebGLBindingStates( gl, extensions, state, attributes, capabilities ) {
 
 			setupVertexAttributes( material, program, geometry );
 
-			if ( geometry.index !== null ) {
+			if ( index !== null ) {
 
-				gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, attributes.get( geometry.index ).buffer );
+				gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, attributes.get( index ).buffer );
 
 			}
 
@@ -98,7 +98,7 @@ function WebGLBindingStates( gl, extensions, state, attributes, capabilities ) {
 
 		if ( ! vaoAvailable ) return defaultState;
 
-		var wireframe = material.wireframe === true;
+		var wireframe = ( material.wireframe === true );
 
 		if ( ! bindingStates.has( geometry ) ) {
 
