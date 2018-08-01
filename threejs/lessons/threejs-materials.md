@@ -184,7 +184,7 @@ system. `RawShaderMaterial` is for making entirely custom shaders with
 no help from three.js. Both of these topics are large and will be
 covered later.
 
-The last 2 materials we'll metion here are the `MeshStandardMaterial`
+The last 2 materials we'll mention here are the `MeshStandardMaterial`
 and the `MeshPhysicsMaterial`. Both implement what's called *physically
 based rendering* or often PBR for short. This is a way of computing
 material properties and lights that comes close to the way
