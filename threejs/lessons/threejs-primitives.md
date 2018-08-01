@@ -284,7 +284,7 @@ repeat them here. You can also click the links above next to each shape
 to take you directly to the docs for that shape.
 
 One other thing that's important to cover is that almost all shapes
-have various settings for how much to subdivde them. A good example
+have various settings for how much to subdivide them. A good example
 might be the sphere geometries. Spheres take parameters for
 how many divisions to make around and how many top to bottom. For example
 
