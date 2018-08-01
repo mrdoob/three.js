@@ -63,9 +63,6 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
 		if ( json.clearCoat !== undefined ) material.clearCoat = json.clearCoat;
 		if ( json.clearCoatRoughness !== undefined ) material.clearCoatRoughness = json.clearCoatRoughness;
-		if ( json.uniforms !== undefined ) material.uniforms = json.uniforms;
-		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
-		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 		if ( json.fog !== undefined ) material.fog = json.fog;
 		if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
@@ -99,6 +96,24 @@ Object.assign( MaterialLoader.prototype, {
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
 		if ( json.userData !== undefined ) material.userData = json.userData;
+
+		// Shader Material
+
+		if ( json.uniforms !== undefined ) {
+
+			for ( var name in json.uniforms ) {
+
+				var uniform = json.uniforms[ name ];
+
+				material.uniforms[ name ] = {};
+				material.uniforms[ name ].value = ( uniform.type === 't' ) ? getTexture( uniform.value ) : uniform.value;
+
+			}
+
+		}
+
+		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
+		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 
 		// Deprecated
 
