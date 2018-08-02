@@ -161,8 +161,6 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
-		attributes.update( attribute, gl.ELEMENT_ARRAY_BUFFER );
-
 		wireframeAttributes[ geometry.id ] = attribute;
 
 		return attribute;

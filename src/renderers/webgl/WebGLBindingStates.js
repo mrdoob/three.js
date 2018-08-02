@@ -62,6 +62,12 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 			if ( index !== null ) {
 
+				if ( material.wireframe === true ) {
+
+					attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
+
+				}
+
 				gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, attributes.get( index ).buffer );
 
 			}

@@ -665,6 +665,17 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		var hasMorphTarget = false;
+
+		if ( object.morphTargetInfluences ) {
+
+			morphtargets.update( object, geometry, material, program );
+			hasMorphTarget = true;
+
+		}
+
+		bindingStates.setup( material, program, geometry, index, hasMorphTarget );
+
 		var attribute;
 		var renderer = bufferRenderer;
 
@@ -676,17 +687,6 @@ function WebGLRenderer( parameters ) {
 			renderer.setIndex( attribute );
 
 		}
-
-		var hasMorphTarget = false;
-
-		if ( object.morphTargetInfluences ) {
-
-			morphtargets.update( object, geometry, material, program );
-			hasMorphTarget = true;
-
-		}
-
-		bindingStates.setup( material, program, geometry, index, hasMorphTarget );
 
 		//
 
