@@ -214,6 +214,7 @@ code {
 
 .threejs_image>img {
     width: 100%;
+    display: block;
 }
 .threejs_math {
   margin-left: auto;

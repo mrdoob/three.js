@@ -19,7 +19,7 @@ Next download one of these simple web servers
 If you'd prefer a web server with a user interface there's 
 [Servez](https://greggman.github.io/servez)
 
-{{{image url="resources/servez.gif" }}}
+{{{image url="resources/servez.gif" className="border" }}}
 
 Just point it at the folder where you unzipped the files, click "Start", then go to
 in your browser [`http://localhost:8080/`](http://localhost:8080/) or if you'd

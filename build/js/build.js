@@ -158,7 +158,7 @@ Handlebars.registerHelper('image', function(options) {
 
   options.hash.examplePath = options.data.root.examplePath;
   options.hash.className = options.hash.className || '';
-  options.hash.caption = options.hash.caption || '';
+  options.hash.caption = options.hash.caption || undefined;
 
   if (options.hash.url.substring(0, 4) === 'http') {
     options.hash.examplePath = '';
