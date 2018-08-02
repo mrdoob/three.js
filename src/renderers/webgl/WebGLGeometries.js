@@ -81,17 +81,9 @@ function WebGLGeometries( gl, attributes, info ) {
 
 	function update( geometry ) {
 
-		var index = geometry.index;
 		var geometryAttributes = geometry.attributes;
 
 		// Update Index in VAO now. See WebGLBindingStates.
-/*
-		if ( index !== null ) {
-
-			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
-
-		}
-*/
 
 		for ( var name in geometryAttributes ) {
 
