@@ -213,6 +213,7 @@ var files = {
 		"webgl_performance_static",
 		"webgl_physics_cloth",
 		"webgl_physics_convex_break",
+		"webgl_physics_convex_buffer_break",
 		"webgl_physics_rope",
 		"webgl_physics_terrain",
 		"webgl_physics_volume",
