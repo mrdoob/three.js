@@ -154,14 +154,16 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				
 				controls.update();
+				
+				stats.update();
 
 			}
 
 			function render() {
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 
