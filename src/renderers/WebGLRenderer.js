@@ -267,7 +267,7 @@ function WebGLRenderer( parameters ) {
 		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, info );
-		bindingStates = new WebGLBindingStates( _gl, extensions, state, attributes, capabilities );
+		bindingStates = new WebGLBindingStates( _gl, extensions, attributes, capabilities );
 		objects = new WebGLObjects( geometries, info );
 		morphtargets = new WebGLMorphtargets( _gl );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );

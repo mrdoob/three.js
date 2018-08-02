@@ -3,7 +3,7 @@
  * @author Takahiro / https://github.com/takahirox
  */
 
-function WebGLBindingStates( gl, extensions, state, attributes, capabilities ) {
+function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	var maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
 
