@@ -1,4 +1,4 @@
 
 #ifdef USE_FOG
-fogDepth = length(mvPosition);
+fogDepth = -mvPosition.z;
 #endif
