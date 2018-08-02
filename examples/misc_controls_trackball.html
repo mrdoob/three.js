@@ -3,8 +3,14 @@
 	<head>
 		<title>three.js webgl - trackball controls</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1">
 		<style>
+			html {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			
 			body {
 				color: #000;
 				font-family:Monospace;
@@ -14,7 +20,11 @@
 
 				background-color: #fff;
 				margin: 0px;
-				overflow: hidden;
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
 			}
 
 			#info {
