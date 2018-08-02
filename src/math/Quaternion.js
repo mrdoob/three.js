@@ -1,5 +1,4 @@
 import { _Math } from './Math.js';
-import { Vector3 } from './Vector3.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -348,51 +347,51 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
-	setFromUnitVectors: function () {
+	setFromUnitVectors: function ( vFrom, vTo ) {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		var v1 = new Vector3();
-		var r;
+		var x, y, z, w;
 
-		var EPS = 0.000001;
+		w = vFrom.dot( vTo ) + 1;
 
-		return function setFromUnitVectors( vFrom, vTo ) {
+		if ( w < 0.000001 ) {
 
-			if ( v1 === undefined ) v1 = new Vector3();
+			w = 0;
 
-			r = vFrom.dot( vTo ) + 1;
+			if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
 
-			if ( r < EPS ) {
-
-				r = 0;
-
-				if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
-
-					v1.set( - vFrom.y, vFrom.x, 0 );
-
-				} else {
-
-					v1.set( 0, - vFrom.z, vFrom.y );
-
-				}
+				x = - vFrom.y;
+				y = vFrom.x;
+				z = 0;
 
 			} else {
 
-				v1.crossVectors( vFrom, vTo );
+				x = 0;
+				y = - vFrom.z;
+				z = vFrom.y;
 
 			}
 
-			this._x = v1.x;
-			this._y = v1.y;
-			this._z = v1.z;
-			this._w = r;
+		} else {
 
-			return this.normalize();
+			var ax = vFrom.x, ay = vFrom.y, az = vFrom.z;
+			var bx = vTo.x, by = vTo.y, bz = vTo.z;
 
-		};
+			x = ay * bz - az * by;
+			y = az * bx - ax * bz;
+			z = ax * by - ay * bx;
 
-	}(),
+		}
+
+		this._x = x;
+		this._y = y;
+		this._z = z;
+		this._w = w;
+
+		return this.normalize();
+
+	},
 
 	angleTo: function ( q ) {
 
