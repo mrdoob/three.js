@@ -259,6 +259,10 @@ like it's in the fog.
     <div class="code">fog: true, all</div>
   </div>
 </div>
+
+Notice the walls and ceiling at the far end of the room are getting fog applied.
+By turing fog of on the materials for the house we can fix that issue.
+
 <div class="spread">
   <div>
     <div data-diagram="fogHouseInsideNoFog" style="height: 300px;" class="border"></div>
