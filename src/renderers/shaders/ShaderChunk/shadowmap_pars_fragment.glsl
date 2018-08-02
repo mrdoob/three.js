@@ -9,6 +9,7 @@
 
 	#if NUM_SPOT_LIGHTS > 0
 
+		uniform sampler2D spotColorMap[ NUM_SPOT_LIGHTS ];
 		uniform sampler2D spotShadowMap[ NUM_SPOT_LIGHTS ];
 		varying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];
 

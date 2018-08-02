@@ -125,6 +125,7 @@ function WebGLLights() {
 		directionalShadowMap: [],
 		directionalShadowMatrix: [],
 		spot: [],
+		spotColorMap: [],
 		spotShadowMap: [],
 		spotShadowMatrix: [],
 		rectArea: [],
@@ -159,6 +160,7 @@ function WebGLLights() {
 			var intensity = light.intensity;
 			var distance = light.distance;
 
+			var colorMap = light.colorMap || null;
 			var shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 			if ( light.isAmbientLight ) {
@@ -226,6 +228,7 @@ function WebGLLights() {
 
 				}
 
+				state.spotColorMap[ spotLength ] = colorMap;
 				state.spotShadowMap[ spotLength ] = shadowMap;
 				state.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 				state.spot[ spotLength ] = uniforms;

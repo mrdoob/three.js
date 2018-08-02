@@ -204,9 +204,13 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				faceCount = 1;
 
-				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-				shadowCamera.lookAt( _lookTarget );
-				shadowCamera.updateMatrixWorld();
+				if ( light.target ) {
+
+					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+					shadowCamera.lookAt( _lookTarget );
+					shadowCamera.updateMatrixWorld();
+
+				}
 
 				// compute shadow matrix
 

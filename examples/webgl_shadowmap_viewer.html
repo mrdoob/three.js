@@ -40,7 +40,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer, clock, stats;
-			var dirLight, spotLight;
+			var dirLight, spotLight, spotLight2;
 			var torusKnot, cube;
 			var dirLightShadowMapViewer, spotLightShadowMapViewer;
 
@@ -65,15 +65,17 @@
 				camera.position.set( 0, 15, 35 );
 
 				scene = new THREE.Scene();
+				var textureLoader = new THREE.TextureLoader();
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x404040 ) );
+				scene.add( new THREE.AmbientLight( 0x202020 ) );
 
 				spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.name = 'Spot Light';
+				spotLight.intensity = 0.3;
 				spotLight.angle = Math.PI / 5;
-				spotLight.penumbra = 0.3;
+				spotLight.penumbra = 0.2;
 				spotLight.position.set( 10, 10, 5 );
 				spotLight.castShadow = true;
 				spotLight.shadow.camera.near = 8;
@@ -84,8 +86,25 @@
 
 				scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
 
+				spotLight2 = new THREE.SpotLight( 0xffffff );
+				spotLight2.name = 'Textured Spot Light';
+				spotLight2.intensity = 0.3;
+				spotLight2.angle = Math.PI / 5;
+				spotLight2.penumbra = 0.3;
+				spotLight2.position.set( -10, 5, 0 );
+				spotLight2.castShadow = true;
+				spotLight2.shadow.camera.near = 8;
+				spotLight2.shadow.camera.far = 25;
+				spotLight2.shadow.mapSize.width = 1024;
+				spotLight2.shadow.mapSize.height = 1024;
+				spotLight2.colorMap = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+				scene.add( spotLight2 );
+
+				scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
+
 				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				dirLight.name = 'Dir. Light';
+				dirLight.intensity = 0.3;
 				dirLight.position.set( 0, 10, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
