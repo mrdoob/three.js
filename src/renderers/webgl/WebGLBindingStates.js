@@ -370,9 +370,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	function reset() {
 
-		defaultState.geometry = null;
-		defaultState.program = null;
-		defaultState.wireframe = false;
+		resetDefaultState();
 
 		if ( currentState === defaultState ) return;
 
@@ -381,10 +379,21 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	}
 
+	// for backward-compatilibity
+
+	function resetDefaultState() {
+
+		defaultState.geometry = null;
+		defaultState.program = null;
+		defaultState.wireframe = false;
+
+	}
+
 	return {
 
 		setup: setup,
 		reset: reset,
+		resetDefaultState: resetDefaultState,
 		dispose: dispose,
 
 		initAttributes: initAttributes,

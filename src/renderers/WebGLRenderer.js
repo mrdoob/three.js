@@ -882,6 +882,7 @@ function WebGLRenderer( parameters ) {
 
 		// reset caching for this frame
 
+		bindingStates.resetDefaultState();
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 
