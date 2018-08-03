@@ -61,7 +61,7 @@
 				background: false,
 				exposure: 1,
 				bloomStrength: 1.5,
-				bloomThreshold: 0.2,
+				bloomThreshold: 0,
 				bloomRadius: 0
 			};
 
@@ -74,7 +74,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.toneMapping = THREE.CineonToneMapping;
+			renderer.toneMapping = THREE.ReinhardToneMapping;
 			container.appendChild( renderer.domElement );
 
 			scene = new THREE.Scene();
