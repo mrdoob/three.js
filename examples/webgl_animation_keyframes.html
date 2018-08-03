@@ -53,10 +53,10 @@
 
 		<script>
 
-			let scene, camera, controls, pointLight, stats;
-			let composer, renderer, mixer;
+			var scene, camera, controls, pointLight, stats;
+			var composer, renderer, mixer;
 
-			const params = {
+			var params = {
 				projection: 'normal',
 				background: false,
 				exposure: 1,
@@ -65,8 +65,8 @@
 				bloomRadius: 0
 			};
 
-			const clock = new THREE.Clock();
-			const container = document.getElementById( 'container' );
+			var clock = new THREE.Clock();
+			var container = document.getElementById( 'container' );
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
@@ -95,9 +95,9 @@
 			pointLight.position.copy( camera.position );
 			scene.add( pointLight );
 
-			const renderScene = new THREE.RenderPass( scene, camera );
+			var renderScene = new THREE.RenderPass( scene, camera );
 
-			const bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 ); //1.0, 9, 0.5, 512);
+			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 ); //1.0, 9, 0.5, 512);
 			bloomPass.renderToScreen = true;
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
@@ -110,24 +110,24 @@
 
 			new THREE.GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
 
-				const model = gltf.scene;
+				var model = gltf.scene;
 
 				scene.add( model );
 
 				// Mesh contains self-intersecting semi-transparent faces, which display
 				// z-fighting unless depthWrite is disabled.
-				const core = model.getObjectByName( 'geo1_HoloFillDark_0' );
+				var core = model.getObjectByName( 'geo1_HoloFillDark_0' );
 				core.material.depthWrite = false;
 
 				mixer = new THREE.AnimationMixer( model );
-				const clip = gltf.animations[ 0 ];
+				var clip = gltf.animations[ 0 ];
 				mixer.clipAction( clip.optimize() ).play();
 
 				animate();
 
 			} );
 
-			const gui = new dat.GUI();
+			var gui = new dat.GUI();
 
 			gui.add( params, 'exposure', 0.1, 2 );
 
@@ -153,8 +153,8 @@
 
 			window.onresize = function () {
 
-				const width = window.innerWidth;
-				const height = window.innerHeight;
+				var width = window.innerWidth;
+				var height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
