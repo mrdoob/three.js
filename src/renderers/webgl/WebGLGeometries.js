@@ -83,7 +83,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		var geometryAttributes = geometry.attributes;
 
-		// Update Index in VAO now. See WebGLBindingStates.
+		// Updating index buffer in VAO now. See WebGLBindingStates.
 
 		for ( var name in geometryAttributes ) {
 
@@ -155,6 +155,8 @@ function WebGLGeometries( gl, attributes, info ) {
 		// console.timeEnd( 'wireframe' );
 
 		attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+
+		// Updating index buffer in VAO now. See WebGLBindingStates
 
 		wireframeAttributes[ geometry.id ] = attribute;
 
