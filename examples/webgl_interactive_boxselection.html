@@ -108,8 +108,6 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -192,9 +190,9 @@
 
 				var allSelected = selectionBox.select();
 
-				for ( var i=0; i < allSelected.length; i++ ) {
+				for ( var i = 0; i < allSelected.length; i++ ) {
 
-					item.material.emissive = new THREE.Color(0x0000ff);
+					allSelected[i].material.emissive = new THREE.Color(0x0000ff);
 
 				}
 
