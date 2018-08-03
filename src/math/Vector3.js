@@ -316,7 +316,7 @@ Object.assign( Vector3.prototype, {
 
 		return this.applyMatrix4( camera.matrixWorldInverse ).applyMatrix4( camera.projectionMatrix );
 
-	}(),
+	},
 
 	unproject: function () {
 
