@@ -1,6 +1,6 @@
 #ifdef USE_FOG
 
-	float fogDepth = length(fogPosition);
+	float fogDepth = length( fogPosition );
 
 	#ifdef FOG_EXP2
 
