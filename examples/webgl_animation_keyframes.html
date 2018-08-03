@@ -80,14 +80,13 @@
 			scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
-			camera.position.set( - 2.5, 1.5, 6 );
+			camera.position.set( - 5, 2.5, -3.5 );
 			camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.maxPolarAngle = Math.PI * 0.5;
-			controls.minDistance = 0.2;
+			controls.minDistance = 0.1;
 			controls.maxDistance = 20;
-			controls.autoRotate = true;
 
 			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
