@@ -162,7 +162,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
 			var intersect;
-
+			if(!material) return null;
 			if ( material.side === BackSide ) {
 
 				intersect = ray.intersectTriangle( pC, pB, pA, true, point );
@@ -245,11 +245,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			// Check boundingBox before continuing
 
-			if ( geometry.boundingBox !== null ) {
-
-				if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
-
-			}
+			if ( geometry.boundingBox === null ) return;
+			
+			if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 			var intersection;
 
