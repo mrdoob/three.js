@@ -97,7 +97,7 @@
 				spotLight2.shadow.camera.far = 25;
 				spotLight2.shadow.mapSize.width = 1024;
 				spotLight2.shadow.mapSize.height = 1024;
-				spotLight2.colorMap = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+				spotLight2.map = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
 				scene.add( spotLight2 );
 
 				scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );

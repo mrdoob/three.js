@@ -137,7 +137,7 @@ var UniformsLib = {
 			shadowMapSize: {}
 		} },
 
-		spotColorMap: { value: [] },
+		spotMap: { value: [] },
 		spotShadowMap: { value: [] },
 		spotShadowMatrix: { value: [] },
 
