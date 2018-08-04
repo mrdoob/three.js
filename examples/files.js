@@ -1,7 +1,7 @@
 var files = {
 	"webgl": [
 		"webgl_animation_cloth",
-		"webgl_animation_keyframes",
+		"webgl_animation_keyframes_json",
 		"webgl_animation_scene",
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_morph",
