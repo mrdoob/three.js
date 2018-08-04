@@ -211,39 +211,6 @@ SEA3D.GeometryDraco.prototype.readUint16Array = function ( module, decoder, mesh
 };
 
 //
-//	Geometry Update
-//
-
-SEA3D.GeometryUpdateDraco = function ( name, data, sea3d ) {
-
-	this.name = name;
-	this.data = data;
-	this.sea3d = sea3d;
-
-	this.index = data.readUInt();
-	this.bytes = data.concat( data.position, data.length - data.position );
-
-};
-
-SEA3D.GeometryUpdateDraco.prototype.type = "sDRC";
-
-//
-//	Updaters
-//
-
-THREE.SEA3D.prototype.readGeometryUpdateDraco = function ( sea ) {
-
-	var obj = this.file.objects[ sea.index ],
-		geo = obj.tag;
-
-	var seaUpdate = new SEA3D.GeometryDraco( "", sea.bytes, sea.sea3d );
-	seaUpdate.tag = geo;
-
-	this.readGeometryBuffer( seaUpdate );
-
-};
-
-//
 //	Extension
 //
 
@@ -252,10 +219,7 @@ THREE.SEA3D.EXTENSIONS_LOADER.push( {
 	setTypeRead: function () {
 
 		this.file.addClass( SEA3D.GeometryDraco, true );
-		this.file.addClass( SEA3D.GeometryUpdateDraco, true );
-
 		this.file.typeRead[ SEA3D.GeometryDraco.prototype.type ] = this.readGeometryBuffer;
-		this.file.typeRead[ SEA3D.GeometryUpdateDraco.prototype.type ] = this.readGeometryUpdateDraco;
 
 	}
 
