@@ -1,5 +1,5 @@
 #ifdef USE_FOG
 
-  varying vec3 fogPosition;
+	varying vec3 vFogPosition;
 
 #endif
