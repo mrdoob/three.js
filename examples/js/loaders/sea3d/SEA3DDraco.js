@@ -150,26 +150,6 @@ SEA3D.GeometryDraco.prototype.readIndices = function ( module, decoder, mesh ) {
 
 };
 
-SEA3D.GeometryDraco.prototype.readTriangleStripIndices = function ( module, decoder, mesh ) {
-
-	var dracoArray = new module.DracoInt32Array();
-	decoder.GetTriangleStripsFromMesh( mesh, dracoArray );
-
-	var size = mesh.num_faces() * 3,
-		output = new ( size >= 0xFFFE ? Uint32Array : Uint16Array )( size );
-
-	for ( var i = 0; i < size; ++ i ) {
-
-		output[ i ] = dracoArray.GetValue( i );
-
-	}
-
-	module.destroy( dracoArray );
-
-	return output;
-
-};
-
 SEA3D.GeometryDraco.prototype.readFloat32Array = function ( module, decoder, mesh, attrib, type ) {
 
 	var attribute = decoder.GetAttribute( mesh, attrib ),
