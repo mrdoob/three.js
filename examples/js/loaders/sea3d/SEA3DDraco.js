@@ -54,9 +54,6 @@ SEA3D.GeometryDraco = function ( name, data, sea3d ) {
 	var module = SEA3D.GeometryDraco.getModule(),
 		dracoData = new Int8Array( data.concat( data.position, data.bytesAvailable ).buffer );
 
-	//data.position += 5; // jump "DRACO" magic string
-	//var version = data.readUByte() + '.' + data.readUByte(); // draco version
-
 	var decoder = new module.Decoder();
 
 	var buffer = new module.DecoderBuffer();
@@ -68,7 +65,10 @@ SEA3D.GeometryDraco = function ( name, data, sea3d ) {
 
 	if ( ! decodingStatus.ok() ) {
 
-		console.error( "SEA3D Draco Decoding failed:", decodingStatus.error_msg() );
+		data.position += 5; // jump "DRACO" magic string
+		var version = data.readUByte() + '.' + data.readUByte(); // draco version
+
+		console.error( "SEA3D Draco", version, "decoding failed:", decodingStatus.error_msg(), "You may need update your file 'draco_decoder.js'." );
 
 		// use an empty geometry
 		this.vertex = new Float32Array();
