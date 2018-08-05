@@ -300,7 +300,6 @@
 			var shape = new Ammo.btConvexHullShape();
 
 			for ( var i = 0, il = coords.length; i < il; i+= 3 ) {
-				var p = coords[ i ];
 				this.tempBtVec3_1.setValue( coords[ i ], coords[ i + 1 ], coords[ i + 2 ] );
 				var lastOne = ( i >= ( il - 3 ) );
 				shape.addPoint( this.tempBtVec3_1, lastOne );

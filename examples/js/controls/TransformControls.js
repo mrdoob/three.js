@@ -1371,7 +1371,6 @@ THREE.TransformControlsPlane = function () {
 	var dirVector = new THREE.Vector3();
 	var alignVector = new THREE.Vector3();
 	var tempMatrix = new THREE.Matrix4();
-	var camRotation = new THREE.Euler();
 	var identityQuaternion = new THREE.Quaternion();
 
 	this.updateMatrixWorld = function() {

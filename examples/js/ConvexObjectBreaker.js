@@ -1,4 +1,4 @@
-0/**
+/**
  * @author yomboprime https://github.com/yomboprime
  *
  * @fileoverview This class can be used to subdivide a convex Geometry object into pieces.
@@ -14,7 +14,7 @@
  * Requisites for the object:
  *
  *  - Mesh object must have a BufferGeometry (not Geometry) and a Material
- * 
+ *
  *  - Vertex normals must be planar (not smoothed)
  *
  *  - The geometry must be convex (this is not checked in the library). You can create convex
@@ -27,7 +27,7 @@
  * @param {double} minSizeForBreak Min size a debris can have to break.
  * @param {double} smallDelta Max distance to consider that a point belongs to a plane.
  *
-  */
+*/
 
 THREE.ConvexObjectBreaker = function ( minSizeForBreak, smallDelta ) {
 
@@ -67,9 +67,11 @@ THREE.ConvexObjectBreaker.prototype = {
 		// object is a THREE.Object3d (normally a Mesh), must have a BufferGeometry, and it must be convex.
 		// Its material property is propagated to its children (sub-pieces)
 		// mass must be > 0
-		
+
 		if ( ! object.geometry.isBufferGeometry ) {
-			console.error( "THREE.ConvexObjectBreaker.prepareBreakableObject(): Parameter object must have a BufferGeometry." );
+
+			console.error( 'THREE.ConvexObjectBreaker.prepareBreakableObject(): Parameter object must have a BufferGeometry.' );
+
 		}
 
 		var userData = object.userData;
@@ -179,21 +181,24 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		var numPoints = coords.length / 3;
 		var numFaces = numPoints / 3;
-		
+
 		var indices = geometry.getIndex();
+
 		if ( indices ) {
+
 			indices = indices.array;
 			numFaces = indices.length / 3;
+
 		}
-		
-		function getVertexIndex ( faceIdx, vert ) {
-			
+
+		function getVertexIndex( faceIdx, vert ) {
+
 			// vert = 0, 1 or 2.
-			
+
 			var idx = faceIdx * 3 + vert;
 
 			return indices ? indices[ idx ] : idx;
-			
+
 		}
 
 		var points1 = [];
@@ -204,10 +209,9 @@ THREE.ConvexObjectBreaker.prototype = {
 		// Reset segments mark
 		var numPointPairs = numPoints * numPoints;
 		for ( var i = 0; i < numPointPairs; i ++ ) this.segments[ i ] = false;
-		
+
 		var p0 = this.tempVector3_P0;
 		var p1 = this.tempVector3_P1;
-		var p2 = this.tempVector3_P2;
 		var n0 = this.tempVector3_N0;
 		var n1 = this.tempVector3_N1;
 
@@ -219,16 +223,16 @@ THREE.ConvexObjectBreaker.prototype = {
 			var c1 = getVertexIndex( i, 2 );
 
 			// Assuming all 3 vertices have the same normal
-			n0.set( normals[ a1 ], normals[ a1 ] + 1, normals[ a1 ] + 2 ); 
+			n0.set( normals[ a1 ], normals[ a1 ] + 1, normals[ a1 ] + 2 );
 
 			for ( var j = i + 1; j < numFaces; j ++ ) {
 
 				var a2 = getVertexIndex( j, 0 );
 				var b2 = getVertexIndex( j, 1 );
 				var c2 = getVertexIndex( j, 2 );
-				
+
 				// Assuming all 3 vertices have the same normal
-				n1.set( normals[ a2 ], normals[ a2 ] + 1, normals[ a2 ] + 2 ); 
+				n1.set( normals[ a2 ], normals[ a2 ] + 1, normals[ a2 ] + 2 );
 
 				var coplanar = 1 - n0.dot( n1 ) < delta;
 
@@ -287,9 +291,9 @@ THREE.ConvexObjectBreaker.prototype = {
 				this.segments[ i1 * numPoints + i0 ] = true;
 
 				p0.set( coords[ 3 * i0 ], coords[ 3 * i0 + 1 ], coords[ 3 * i0 + 2 ] );
-				p1.set( coords[ 3 * i1 ], coords[ 3 * i1 + 1 ], coords[ 3 * i1 + 2 ] ); 
+				p1.set( coords[ 3 * i1 ], coords[ 3 * i1 + 1 ], coords[ 3 * i1 + 2 ] );
 
-				// mark: 1 for negative side, 2 for positive side, 3 for coplanar point				
+				// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
 				var mark0 = 0;
 
 				var d = localPlane.distanceToPoint( p0 );
