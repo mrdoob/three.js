@@ -84,6 +84,7 @@
 
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
+			controls.enablePan = false;
 
 			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
