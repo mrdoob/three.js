@@ -54,13 +54,14 @@ SEA3D.GeometryDraco = function ( name, data, sea3d ) {
 	var module = SEA3D.GeometryDraco.getModule(),
 		dracoData = new Int8Array( data.concat( data.position, data.bytesAvailable ).buffer );
 
+	//data.position += 5; // jump "DRACO" magic string
+	//var version = data.readUByte() + '.' + data.readUByte(); // draco version
+
 	var decoder = new module.Decoder();
 
 	var buffer = new module.DecoderBuffer();
 	buffer.Init( dracoData, dracoData.length );
-
-	var geometryType = decoder.GetEncodedGeometryType( buffer );
-
+	
 	var mesh = new module.Mesh();
 
 	var decodingStatus = decoder.DecodeBufferToMesh( buffer, mesh );
