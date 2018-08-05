@@ -70,6 +70,11 @@ SEA3D.GeometryDraco = function ( name, data, sea3d ) {
 
 		console.error( "SEA3D Draco Decoding failed:", decodingStatus.error_msg() );
 
+		// use an empty geometry
+		this.vertex = new Float32Array();
+
+		return;
+
 	}
 
 	var index = 0;
