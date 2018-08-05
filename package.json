@@ -52,13 +52,13 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "concurrently": "^3.5.1",
-    "electron": "^2.0.2",
-    "eslint": "^4.19.1",
+    "concurrently": "^3.6.1",
+    "electron": "^2.0.6",
+    "eslint": "^5.3.0",
     "eslint-config-mdcs": "^4.2.3",
-    "google-closure-compiler": "20180506.0.0",
+    "google-closure-compiler": "20180716.0.1",
     "qunit": "^2.6.1",
-    "rollup": "^0.59.4",
+    "rollup": "^0.63.5",
     "rollup-watch": "^4.3.1",
     "serve": "6.5.8",
     "uglify-js": "^3.3.28"
