@@ -68,7 +68,7 @@ SEA3D.GeometryDraco = function ( name, data, sea3d ) {
 		data.position += 5; // jump "DRACO" magic string
 		var version = data.readUByte() + '.' + data.readUByte(); // draco version
 
-		console.error( "SEA3D Draco", version, "decoding failed:", decodingStatus.error_msg(), "You may need update your file 'draco_decoder.js'." );
+		console.error( "SEA3D Draco", version, "decoding failed:", decodingStatus.error_msg(), "You may need update 'draco_decoder.js'." );
 
 		// use an empty geometry
 		this.vertex = new Float32Array();
