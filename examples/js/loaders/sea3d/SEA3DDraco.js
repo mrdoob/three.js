@@ -79,15 +79,15 @@ SEA3D.GeometryDraco = function ( name, data, sea3d ) {
 
 	var index = 0;
 
-	this.vertex = this.readFloat32Array( module, decoder, mesh, index ++, module.POSITION );
+	this.vertex = this.readFloat32Array( module, decoder, mesh, index ++ );
 
-	if ( attrib & 4 ) this.normal = this.readFloat32Array( module, decoder, mesh, index ++, module.NORMAL );
+	if ( attrib & 4 ) this.normal = this.readFloat32Array( module, decoder, mesh, index ++ );
 
 	if ( attrib & 32 ) {
 
 		for ( i = 0; i < this.uv.length; i ++ ) {
 
-			this.uv[ i ] = this.readFloat32Array( module, decoder, mesh, index ++, module.TEX_COORD );
+			this.uv[ i ] = this.readFloat32Array( module, decoder, mesh, index ++ );
 
 		}
 
@@ -150,7 +150,7 @@ SEA3D.GeometryDraco.prototype.readIndices = function ( module, decoder, mesh ) {
 
 };
 
-SEA3D.GeometryDraco.prototype.readFloat32Array = function ( module, decoder, mesh, attrib, type ) {
+SEA3D.GeometryDraco.prototype.readFloat32Array = function ( module, decoder, mesh, attrib ) {
 
 	var attribute = decoder.GetAttribute( mesh, attrib ),
 		numPoints = mesh.num_points();
