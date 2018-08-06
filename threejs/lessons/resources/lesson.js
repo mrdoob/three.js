@@ -276,6 +276,24 @@ $(document).ready(function($){
     return a;
   });
 
+  const methodPropertyRE = /^(\w+).(\w+)$/;
+  const classRE = /^(\w+)$/;
+  $('a').each(function() {
+    const href = this.getAttribute('href');
+    const m = methodPropertyRE.exec(href);
+    if (m) {
+      const codeKeywordLink = codeKeywordLinks[m[1]];
+      if (codeKeywordLink) {
+        this.setAttribute('href', `${codeKeywordLink}#${m[2]}`);
+      }
+    } else if (classRE.test(href)) {
+      const codeKeywordLink = codeKeywordLinks[href];
+      if (codeKeywordLink) {
+        this.setAttribute('href', codeKeywordLink);
+      }
+    }
+  });
+
   const linkImgs = function(bigHref) {
     return function() {
       const a = document.createElement('a');
