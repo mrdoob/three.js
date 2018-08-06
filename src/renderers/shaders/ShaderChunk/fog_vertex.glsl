@@ -1,4 +1,5 @@
-
 #ifdef USE_FOG
-fogPosition = mvPosition.xyz;
+
+	vFogPosition = mvPosition.xyz;
+
 #endif
