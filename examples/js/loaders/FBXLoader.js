@@ -389,13 +389,33 @@ THREE.FBXLoader = ( function () {
 
 			var texture;
 
-			if ( textureNode.FileName.slice( - 3 ).toLowerCase() === 'tga' ) {
+			var extension = textureNode.FileName.slice( - 3 ).toLowerCase();
 
-				texture = THREE.Loader.Handlers.get( '.tga' ).load( fileName );
+			function onError() {
+
+				console.warn( 'FBXLoader: Creating empty placeholder texture for', fileName );
+				texture = new THREE.Texture();
+
+			}
+
+			if ( extension === 'tga' ) {
+
+				var loader = THREE.Loader.Handlers.get( '.tga' );
+				if ( loader === null ) {
+
+					console.warn( 'FBXLoader: TGALoader not found, creating empty placeholder texture for', fileName );
+					texture = new THREE.Texture();
+
+				} else texture = loader.load( fileName, undefined, undefined, onError );
+
+			} else if ( extension === 'psd' ) {
+
+				console.warn( 'FBXLoader: PSD textures are not supported, creating empty placeholder texture for', fileName );
+				texture = new THREE.Texture();
 
 			} else {
 
-				texture = this.textureLoader.load( fileName );
+				texture = this.textureLoader.load( fileName, undefined, undefined, onError );
 
 			}
 
