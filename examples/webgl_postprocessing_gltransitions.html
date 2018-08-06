@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - scenes transition</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			.info {
+				position: absolute;
+				background-color: black;
+				opacity: 0.8;
+				color: white;
+				text-align: center;
+				top: 0px;
+				width: 100%;
+			}
+
+			.info a {
+				color: #00ffff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions - by <a href="https://www.threejs.org.cn/gallery">HypnosNova</a> - <a href="https://github.com/HypnosNova/Nova">github</a>
+		</div>
+
+		<div id="container"></div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		
+		<script src="js/crossfade/GLTransitioner.js"></script>
+		<script src="js/shaders/gltransitions/BasicTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/AngularTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/BounceTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/BowTileHorizontalTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/KaleidoscopeTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/DreamyTransitionShader.js"></script>
+
+		<script>
+
+			var container, stats;
+			var renderer;
+			var transitioner;
+
+			init();
+			animate();
+
+			function init() {
+				
+				var loader = new THREE.TextureLoader();
+				var texture1 = loader.load("textures/cube/Park2/negx.jpg");
+				var texture2 = loader.load("textures/cube/skybox/nx.jpg");
+				
+				transitioner = new THREE.GLTransitioner( 512, 512, THREE.DreamyTransitionShader, {
+
+					tDiffuse1: texture1,
+					tDiffuse2: texture2
+					
+				} );
+				
+				console.log(transitioner)
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.z = 1;
+
+				scene = new THREE.Scene();
+
+				geometry = new THREE.BoxGeometry( 0.4, 0.4, 0.4 );
+				material = new THREE.MeshBasicMaterial( { map: transitioner.fbo.texture } );
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				scene.add( directionalLight );
+				directionalLight.position.set( 1, 2, 3 );
+				
+				scene.add( new THREE.AmbientLight( 0x303030 ) );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				mesh.rotation.y += 0.02;
+				
+				transitioner.material.uniforms.progress.value = ( Math.sin( new Date().getTime() / 2000 ) + 1 ) / 2;
+                transitioner.update( renderer );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>
