@@ -394,12 +394,17 @@ THREE.FBXLoader = ( function () {
 			if ( extension === 'tga' ) {
 
 				var loader = THREE.Loader.Handlers.get( '.tga' );
+
 				if ( loader === null ) {
 
 					console.warn( 'FBXLoader: TGALoader not found, creating empty placeholder texture for', fileName );
 					texture = new THREE.Texture();
 
-				} else texture = loader.load( fileName );
+				} else {
+
+					texture = loader.load( fileName );
+
+				}
 
 			} else if ( extension === 'psd' ) {
 
