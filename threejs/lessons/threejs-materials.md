@@ -156,7 +156,7 @@ covered shadows yet. When we do we'll use this material
 to take a peak at what's happening behind the scenes.
 
 The `MeshDepthMaterial` renders the depth of each pixel where
-pixels at negative [`near`](https://threejs.org/docs/#api/cameras/PerspectiveCamera.near) of the camera are 0 and negative [`far`](https://threejs.org/docs/#api/cameras/PerspectiveCamera.far) are 1. Certain special effects can use this data which we'll
+pixels at negative [`near`](PerspectiveCamera.near) of the camera are 0 and negative [`far`](PerspectiveCamera.far) are 1. Certain special effects can use this data which we'll
 get into at another time.
 
 <div class="spread">
@@ -192,11 +192,11 @@ lights and materials work in the real word. We'll cover these in
 more detail in another article.
 
 Most materials share a bunch of settings all defined by `Material`.
-[See the docs](https://threejs.org/docs/#api/materials/Material)
+[See the docs](Material)
 for all of them but let's go over two of the most commonly used
 properties.
 
-[`flatShading`](https://threejs.org/docs/#api/materials/Material.flatShading): 
+[`flatShading`](Material.flatShading): 
 whether or not the object looks faceted or smooth. default = `false`.
 
 <div class="spread">
@@ -210,7 +210,7 @@ whether or not the object looks faceted or smooth. default = `false`.
   </div>
 </div>
 
-[`side`](https://threejs.org/docs/#api/materials/Material.side): which sides of triangles to show. The default is `THREE.FrontSide`.
+[`side`](Material.side): which sides of triangles to show. The default is `THREE.FrontSide`.
 Other options are `THREE.BackSide` and `THREE.DoubleSide` (both sides).
 Most 3D objects drawn in three are probably opaque solids so the back sides
 (the sides facing inside the solid) do not need to be drawn. The most common

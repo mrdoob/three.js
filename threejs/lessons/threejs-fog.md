@@ -10,7 +10,7 @@ want to start with [this article](threejs-cameras.html).
 Fog in a 3D engine is generally a way of fading to a specific color
 based on the distance from the camera. In three.js you add fog by
 creating `Fog` or `FogExp2` object and setting it on the scene's
-[`fog`](https://threejs.org/docs/#api/scenes/Scene.fog) property.
+[`fog`](Scene.fog) property.
 
 `Fog` lets you choose `near` and `far` settings which are distances
 from the camera. Anything closer than `near` is unaffected by fog.
@@ -64,7 +64,7 @@ It is part of the calculation of each pixel of the color of the object.
 What that means is if you want your scene to fade to a certain color you 
 need to set the fog **and** the background color to the same color. 
 The background color is set using the 
-[`scene.background`](https://threejs.org/docs/#api/scenes/Scene.background)
+[`scene.background`](Scene.background)
 property. To pick a background color you attach a `THREE.Color` to it. For example
 
 ```
@@ -173,7 +173,7 @@ As an RGB array (eg: `[255, 128, 64]`). Or, as an RGBA array (eg: `[127, 200, 75
 
 It's easiest for our purpose to use the hex string version since that way
 dat.GUI is only manipulating a single value. Fortunately `THREE.Color`
-as a [`getHexString`](https://threejs.org/docs/#api/math/Color.getHexString) method
+as a [`getHexString`](Color.getHexString) method
 we get use to easily get such a string, we just have to prepend a '#' to the front.
 
 ```
@@ -235,7 +235,7 @@ a very sharp transition between unfogged and completely fogged.
 where as `near` = 1.1 and `far` = 2.9 should just about be
 the smoothest given our cubes are spinning 2 units away from the camera.
 
-One last thing, there is a boolean [`fog`](https://threejs.org/docs/#api/materials/Material.fog)
+One last thing, there is a boolean [`fog`](Material.fog)
 property on a material for whether or not objects rendered
 with that material are affected by fog. It defaults to `true`
 for most materials. As an example of why you might want
