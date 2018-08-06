@@ -4,8 +4,10 @@
 
 		varying float vFragDepth;
 
-	#endif
-
-	uniform float logDepthBufFC;
+    #else
+	
+        uniform float logDepthBufFC;
+    
+    #endif
 
 #endif
