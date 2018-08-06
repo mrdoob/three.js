@@ -391,13 +391,6 @@ THREE.FBXLoader = ( function () {
 
 			var extension = textureNode.FileName.slice( - 3 ).toLowerCase();
 
-			function onError() {
-
-				console.warn( 'FBXLoader: Creating empty placeholder texture for', fileName );
-				texture = new THREE.Texture();
-
-			}
-
 			if ( extension === 'tga' ) {
 
 				var loader = THREE.Loader.Handlers.get( '.tga' );
@@ -406,7 +399,7 @@ THREE.FBXLoader = ( function () {
 					console.warn( 'FBXLoader: TGALoader not found, creating empty placeholder texture for', fileName );
 					texture = new THREE.Texture();
 
-				} else texture = loader.load( fileName, undefined, undefined, onError );
+				} else texture = loader.load( fileName );
 
 			} else if ( extension === 'psd' ) {
 
@@ -415,7 +408,7 @@ THREE.FBXLoader = ( function () {
 
 			} else {
 
-				texture = this.textureLoader.load( fileName, undefined, undefined, onError );
+				texture = this.textureLoader.load( fileName );
 
 			}
 
