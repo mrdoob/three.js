@@ -1,5 +1,34 @@
 THREE.GLTransitioner = function ( width, height, transitionShader, options ) {
 
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.scene = new THREE.Scene();
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ) );
+	this.scene.add( this.quad );
+	
+	this.setTransitionShader( transitionShader, options );
+
+	this.fbo = new THREE.WebGLRenderTarget( width || window.innerWidth, height || window.innerHeight, {
+
+		minFilter: THREE.LinearFilter,
+		magFilter: THREE.LinearFilter,
+		format: THREE.RGBFormat,
+		stencilBuffer: false
+
+	} );
+
+}
+
+THREE.GLTransitioner.prototype.update = function( renderer ) {
+
+	this.material.uniforms.progress.value = Math.min( this.material.uniforms.progress.value, 1 );
+	this.material.uniforms.progress.value = Math.max( this.material.uniforms.progress.value, 0 );
+
+	renderer.render( this.scene, this.camera, this.fbo, true );
+
+};
+
+THREE.GLTransitioner.prototype.setTransitionShader = function( transitionShader, options ) {
+
 	this.uniforms = {
 
 		tDiffuse1: { value: options.tDiffuse1 },
@@ -14,7 +43,7 @@ THREE.GLTransitioner = function ( width, height, transitionShader, options ) {
 		this.uniforms[ key ] = { value: options[ key ] || transitionShader.uniforms[ key ].value };
 
 	}
-
+	
 	this.material = new THREE.ShaderMaterial({
 
 		uniforms: this.uniforms,
@@ -63,28 +92,7 @@ THREE.GLTransitioner = function ( width, height, transitionShader, options ) {
 
 		].join( "\n" )
 	});
-
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-	this.scene = new THREE.Scene();
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), this.material );
-	this.scene.add( this.quad );
-
-	this.fbo = new THREE.WebGLRenderTarget( width || window.innerWidth, height || window.innerHeight, {
-
-		minFilter: THREE.LinearFilter,
-		magFilter: THREE.LinearFilter,
-		format: THREE.RGBFormat,
-		stencilBuffer: false
-
-	} );
-
-}
-
-THREE.GLTransitioner.prototype.update = function( renderer ) {
-
-	this.material.uniforms.progress.value = Math.min( this.material.uniforms.progress.value, 1 );
-	this.material.uniforms.progress.value = Math.max( this.material.uniforms.progress.value, 0 );
-
-	renderer.render( this.scene, this.camera, this.fbo, true );
+	
+	this.quad.material = this.material;
 
 };

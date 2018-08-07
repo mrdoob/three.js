@@ -50,26 +50,61 @@
 		<script>
 
 			var container, stats;
+			var mesh1, mesh2;
+			var texture1, texture2, texture3, texture4;
 			var renderer;
 			var transitioner;
+			var gui;
 
 			init();
+			createGUI();
 			animate();
+			
+			function createGUI(){
+				var params = { transition: "Basic" };
+				gui = new dat.GUI();
+				var controller = gui.add( params, "transition", [ "Basic", "Angular", "Bounce", "BowTileHorizontal", "Kaleidoscope", "Dreamy" ] );
+				controller.onChange((val)=>{
+
+					transitioner1.setTransitionShader( THREE[ val + "TransitionShader" ], {
+
+						tDiffuse1: texture1,
+						tDiffuse2: texture2
+					
+					} );
+
+					transitioner2.setTransitionShader( THREE[ val + "TransitionShader" ], {
+
+						tDiffuse1: texture3,
+						tDiffuse2: texture4
+					
+					} );
+
+				});
+			}
 
 			function init() {
 				
 				var loader = new THREE.TextureLoader();
-				var texture1 = loader.load("textures/cube/Park2/negx.jpg");
-				var texture2 = loader.load("textures/cube/skybox/nx.jpg");
+				texture1 = loader.load("textures/cube/Park2/negx.jpg");
+				texture2 = loader.load("textures/cube/skybox/nx.jpg");
 				
-				transitioner = new THREE.GLTransitioner( 512, 512, THREE.DreamyTransitionShader, {
+				texture3 = loader.load("textures/normal1.jpg");
+				texture4 = loader.load("textures/normal2.jpg");
+				
+				transitioner1 = new THREE.GLTransitioner( 512, 512, THREE.BasicTransitionShader, {
 
 					tDiffuse1: texture1,
 					tDiffuse2: texture2
 					
 				} );
 				
-				console.log(transitioner)
+				transitioner2 = new THREE.GLTransitioner( 512, 512, THREE.BasicTransitionShader, {
+
+					tDiffuse1: texture3,
+					tDiffuse2: texture4
+					
+				} );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
 				camera.position.z = 1;
@@ -77,10 +112,15 @@
 				scene = new THREE.Scene();
 
 				geometry = new THREE.BoxGeometry( 0.4, 0.4, 0.4 );
-				material = new THREE.MeshBasicMaterial( { map: transitioner.fbo.texture } );
-
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				material1 = new THREE.MeshBasicMaterial( { map: transitioner1.fbo.texture } );
+				material2 = new THREE.MeshPhongMaterial( { bumpMap: transitioner2.fbo.texture } );
+				mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh2 = new THREE.Mesh( geometry, material2 );
+				scene.add( mesh1 );
+				scene.add( mesh2 );
+				
+				mesh1.position.x = -0.45;
+				mesh2.position.x = 0.45;
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff );
 				scene.add( directionalLight );
@@ -98,10 +138,11 @@
 
 				requestAnimationFrame( animate );
 
-				mesh.rotation.y += 0.02;
+				mesh1.rotation.y = mesh2.rotation.y += 0.02;
 				
-				transitioner.material.uniforms.progress.value = ( Math.sin( new Date().getTime() / 2000 ) + 1 ) / 2;
-                transitioner.update( renderer );
+				transitioner1.material.uniforms.progress.value = transitioner2.material.uniforms.progress.value = ( Math.sin( new Date().getTime() / 1000 ) + 1 ) / 2;
+                transitioner1.update( renderer );
+                transitioner2.update( renderer );
 
 				renderer.render( scene, camera );
 
