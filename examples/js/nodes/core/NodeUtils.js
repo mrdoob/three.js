@@ -13,37 +13,37 @@ var NodeUtils = {
 			if ( subProperty ) {
 
 				return {
-					
+
 					get: function () {
 
 						return this[ proxy ][ property ][ subProperty ];
 
 					},
-					
+
 					set: function ( val ) {
 
 						this[ proxy ][ property ][ subProperty ] = val;
 
 					}
-					
+
 				};
 
 			} else {
 
 				return {
-					
+
 					get: function () {
 
 						return this[ proxy ][ property ];
 
 					},
-					
+
 					set: function ( val ) {
 
 						this[ proxy ][ property ] = val;
 
 					}
-					
+
 				};
 
 			}
@@ -57,8 +57,8 @@ var NodeUtils = {
 			for ( var i = 0; i < list.length; ++ i ) {
 
 				var data = list[ i ].split( "." ),
-					property = data[0],
-					subProperty = data[1];
+					property = data[ 0 ],
+					subProperty = data[ 1 ];
 
 				shortcuts[ property ] = applyShortcut( proxy, property, subProperty );
 
@@ -69,7 +69,7 @@ var NodeUtils = {
 		};
 
 	}()
-	
+
 };
 
 export { NodeUtils };

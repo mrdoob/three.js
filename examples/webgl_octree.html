@@ -23,7 +23,7 @@
 				scene,
 				renderer,
 				octree,
-				geometry,
+				geometry = new THREE.BoxBufferGeometry( 50, 50, 50 ),
 				material,
 				mesh,
 				meshes = [],
@@ -122,8 +122,6 @@
 
 			}
 
-			var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
-
 			function modifyOctree() {
 
 				// if is adding objects to octree
@@ -132,7 +130,7 @@
 
 					// create new object
 
-					mesh = new THREE.Line( geometry, new THREE.MeshBasicMaterial( { color: new THREE.Color( base ) } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: new THREE.Color( base ) } ) );
 
 					// give new object a random position in radius
 

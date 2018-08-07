@@ -4,9 +4,9 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
- 
+
 var inputs = NodeUtils.elements;
- 
+
 function JoinNode( x, y, z, w ) {
 
 	TempNode.call( this, 'f' );
@@ -16,7 +16,7 @@ function JoinNode( x, y, z, w ) {
 	this.z = z;
 	this.w = w;
 
-};
+}
 
 JoinNode.prototype = Object.create( TempNode.prototype );
 JoinNode.prototype.constructor = JoinNode;
@@ -31,7 +31,7 @@ JoinNode.prototype.getNumElements = function () {
 		if ( this[ inputs[ i ] ] !== undefined ) {
 
 			++ i;
-			
+
 			break;
 
 		}
@@ -69,15 +69,15 @@ JoinNode.prototype.generate = function ( builder, output ) {
 };
 
 JoinNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	for ( var prop in source.inputs ) {
 
 		this[ prop ] = source.inputs[ prop ];
 
 	}
-	
+
 };
 
 JoinNode.prototype.toJSON = function ( meta ) {

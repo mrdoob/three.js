@@ -3,14 +3,15 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
- 
+import { ResolutionNode } from './ResolutionNode.js';
+
 function ScreenUVNode( resolution ) {
 
 	TempNode.call( this, 'v2' );
 
-	this.resolution = resolution;
+	this.resolution = resolution || new ResolutionNode();
 
-};
+}
 
 ScreenUVNode.prototype = Object.create( TempNode.prototype );
 ScreenUVNode.prototype.constructor = ScreenUVNode;
@@ -37,11 +38,11 @@ ScreenUVNode.prototype.generate = function ( builder, output ) {
 };
 
 ScreenUVNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.resolution = source.resolution;
-	
+
 };
 
 ScreenUVNode.prototype.toJSON = function ( meta ) {

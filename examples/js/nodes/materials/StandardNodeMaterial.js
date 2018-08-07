@@ -14,27 +14,27 @@ function StandardNodeMaterial() {
 
 	this.type = "StandardNodeMaterial";
 
-};
+}
 
 StandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
 StandardNodeMaterial.prototype.constructor = StandardNodeMaterial;
 
-NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [ 
-	'color', 
-	'alpha', 
-	'roughness', 
-	'metalness', 
-	'reflectivity', 
-	'clearCoat', 
-	'clearCoatRoughness', 
-	'normal', 
-	'emissive', 
-	'ambient', 
-	'light', 
-	'shadow', 
-	'ao', 
-	'environment', 
-	'transform' 
+NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
+	'color',
+	'alpha',
+	'roughness',
+	'metalness',
+	'reflectivity',
+	'clearCoat',
+	'clearCoatRoughness',
+	'normal',
+	'emissive',
+	'ambient',
+	'light',
+	'shadow',
+	'ao',
+	'environment',
+	'position'
 ] );
 
 export { StandardNodeMaterial };

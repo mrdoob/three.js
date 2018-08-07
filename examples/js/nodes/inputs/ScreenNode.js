@@ -9,7 +9,7 @@ function ScreenNode( uv ) {
 
 	TextureNode.call( this, undefined, uv );
 
-};
+}
 
 ScreenNode.prototype = Object.create( TextureNode.prototype );
 ScreenNode.prototype.constructor = ScreenNode;

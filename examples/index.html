@@ -296,11 +296,9 @@
 			link.setAttribute( 'target', 'viewer' );
 			link.addEventListener( 'click', function ( event ) {
 
-				if ( event.button === 0 ) {
+				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
 
-					selectFile( file );
-
-				}
+				selectFile( file );
 
 			} );
 

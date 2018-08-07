@@ -35,7 +35,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			var context = canvas.getContext( '2d' );
 			context.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
 
-			console.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+			console.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height );
 
 			return canvas;
 
@@ -63,7 +63,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			var context = _canvas.getContext( '2d' );
 			context.drawImage( image, 0, 0, _canvas.width, _canvas.height );
 
-			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + _canvas.width + 'x' + _canvas.height, image );
+			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + _canvas.width + 'x' + _canvas.height );
 
 			return _canvas;
 
@@ -75,7 +75,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function textureNeedsPowerOfTwo( texture ) {
 
-		if ( _gl.isWebGL2 ) return false;
+		if ( capabilities.isWebGL2 ) return false;
 
 		return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
 			( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
@@ -102,7 +102,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getInternalFormat( glFormat, glType ) {
 
-		if ( ! _gl.isWebGL2 ) return glFormat;
+		if ( ! capabilities.isWebGL2 ) return glFormat;
 
 		if ( glFormat === _gl.RGB ) {
 
@@ -253,11 +253,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( image === undefined ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined' );
 
 			} else if ( image.complete === false ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete' );
 
 			} else {
 
@@ -427,7 +427,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping.', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping.' );
 
 			}
 
@@ -436,7 +436,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.' );
 
 			}
 
@@ -447,7 +447,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( extension ) {
 
 			if ( texture.type === FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
-			if ( texture.type === HalfFloatType && ( _gl.isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
+			if ( texture.type === HalfFloatType && ( capabilities.isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
 
 			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
 
@@ -506,10 +506,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.type === FloatType ) {
 
-				if ( ! _gl.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
+				if ( ! capabilities.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
 				glInternalFormat = _gl.DEPTH_COMPONENT32F;
 
-			} else if ( _gl.isWebGL2 ) {
+			} else if ( capabilities.isWebGL2 ) {
 
 				// WebGL 2.0 requires signed internalformat for glTexImage2D
 				glInternalFormat = _gl.DEPTH_COMPONENT16;

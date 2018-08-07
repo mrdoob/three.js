@@ -2,17 +2,17 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from './GLNode.js';
+import { Node } from './Node.js';
 
 function VarNode( type, value ) {
 
-	GLNode.call( this, type );
-	
+	Node.call( this, type );
+
 	this.value = value;
 
-};
+}
 
-VarNode.prototype = Object.create( GLNode.prototype );
+VarNode.prototype = Object.create( Node.prototype );
 VarNode.prototype.constructor = VarNode;
 VarNode.prototype.nodeType = "Var";
 
@@ -31,18 +31,18 @@ VarNode.prototype.generate = function ( builder, output ) {
 		builder.addNodeCode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
 
 	}
-	
+
 	return builder.format( varying.name, this.getType( builder ), output );
 
 };
 
 VarNode.prototype.copy = function ( source ) {
-	
-	GLNode.prototype.copy.call( this, source );
-	
+
+	Node.prototype.copy.call( this, source );
+
 	this.type = source.type;
 	this.value = source.value;
-	
+
 };
 
 VarNode.prototype.toJSON = function ( meta ) {

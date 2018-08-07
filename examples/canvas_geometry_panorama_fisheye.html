@@ -81,18 +81,20 @@
 
 				];
 
-				var geometry = new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 );
+				var geometry = new THREE.BoxBufferGeometry( 300, 300, 300, 7, 7, 7 );
 				geometry.scale( - 1, 1, 1 );
 
 				mesh = new THREE.Mesh( geometry, materials );
 				scene.add( mesh );
 
-				for ( var i = 0, l = mesh.geometry.vertices.length; i < l; i ++ ) {
+				var vec = new THREE.Vector3();
+				var positions = mesh.geometry.attributes.position;
 
-					var vertex = mesh.geometry.vertices[ i ];
+				for ( var i = 0, l = positions.count; i < l; i ++ ) {
 
-					vertex.normalize();
-					vertex.multiplyScalar( 550 );
+					vec.fromBufferAttribute( positions, i );
+					vec.setLength( 550 );
+					positions.setXYZ( i, vec.x, vec.y, vec.z );
 
 				}
 
