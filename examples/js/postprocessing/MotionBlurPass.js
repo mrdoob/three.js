@@ -7,6 +7,18 @@ THREE.MotionBlurPass = function ( scene, camera, options = {} ) {
 
 	THREE.Pass.call( this );
 
+	options = Object.assign( {
+
+		samples: 15,
+		expandGeometry: 0,
+		interpolateGeometry: 1,
+		smearIntensity: 1,
+		blurTransparent: false,
+		renderCameraBlur: true,
+		renderTargetScale: 1
+
+	}, options );
+
 	Object.defineProperty( this, 'enabled', {
 
 		set: val => {
@@ -30,13 +42,13 @@ THREE.MotionBlurPass = function ( scene, camera, options = {} ) {
 	this.needsSwap = true;
 
 	// settings
-	this.samples = options.samples || 15;
-	this.expandGeometry = options.expandGeometry || 0;
-	this.interpolateGeometry = options.interpolateGeometry || 1;
-	this.smearIntensity = options.smearIntensity || 1;
-	this.blurTransparent = options.blurTransparent || false;
-	this.renderCameraBlur = options.renderCameraBlur || true;
-	this.renderTargetScale = options.renderTargetScale || 1;
+	this.samples = options.samples;
+	this.expandGeometry = options.expandGeometry;
+	this.interpolateGeometry = options.interpolateGeometry;
+	this.smearIntensity = options.smearIntensity;
+	this.blurTransparent = options.blurTransparent;
+	this.renderCameraBlur = options.renderCameraBlur;
+	this.renderTargetScale = options.renderTargetScale;
 
 	this.scene = scene;
 	this.camera = camera;
@@ -138,6 +150,7 @@ THREE.MotionBlurPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 		}
 
+		// TODO: This is getting called just to set 'currentRenderState' in the renderer
 		renderer.compile( this.scene, this.camera );
 
 		// If we're rendering the blurred view, then we need to render
