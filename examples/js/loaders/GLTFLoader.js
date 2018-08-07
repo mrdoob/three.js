@@ -605,6 +605,12 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		if ( transform.texCoord !== undefined ) {
+
+			console.warn( 'THREE.GLTFLoader: Custom UV sets in "' + this.name + '" extension not yet supported.' );
+
+		}
+
 		texture.needsUpdate = true;
 
 		return texture;
