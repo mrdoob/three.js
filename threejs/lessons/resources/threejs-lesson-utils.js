@@ -78,11 +78,11 @@ window.threejsLessonUtils = {
     this.init();
 
     const scene = new THREE.Scene();
-    const fov = 60;
+    let targetFOVDeg = 60;
     const aspect = 1;
     const zNear = 0.1;
     const zFar = 50;
-    const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
+    const camera = new THREE.PerspectiveCamera(targetFOVDeg, aspect, zNear, zFar);
     camera.position.z = 15;
     scene.add(camera);
 
@@ -92,29 +92,42 @@ window.threejsLessonUtils = {
     const root = new THREE.Object3D();
     scene.add(root);
 
-    const controls = new THREE.TrackballControls(camera, elem);
-    controls.noZoom = true;
-    controls.noPan = true;
-
-    // add the lights as children of the camera.
-    // this is because TrackbacllControls move the camera.
-    // We really want to rotate the object itself but there's no
-    // controls for that so we fake it by putting all the lights
-    // on the camera so they move with it.
-    camera.add(new THREE.HemisphereLight(0xaaaaaa, 0x444444, .5));
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(-1, 2, 4 - 15);
-    camera.add(light);
-
-    let updateFunction;
+    const resizeFunctions = [];
+    const updateFunctions = [];
 
     promise.then((result) => {
       const info = result instanceof THREE.Object3D ? {
         obj3D: result,
       } : result;
-      const { obj3D, update } = info;
+      const { obj3D, update, trackball, lights } = info;
       root.add(obj3D);
-      updateFunction = update;
+
+      targetFOVDeg = camera.fov;
+
+      if (trackball !== false) {
+        const controls = new THREE.TrackballControls(camera, elem);
+        controls.noZoom = true;
+        controls.noPan = true;
+        resizeFunctions.push(controls.handleResize.bind(controls));
+        updateFunctions.push(controls.update.bind(controls));
+      }
+
+      if (update) {
+        updateFunctions.push(update);
+      }
+
+      // add the lights as children of the camera.
+      // this is because TrackbacllControls move the camera.
+      // We really want to rotate the object itself but there's no
+      // controls for that so we fake it by putting all the lights
+      // on the camera so they move with it.
+      if (lights !== false) {
+        camera.add(new THREE.HemisphereLight(0xaaaaaa, 0x444444, .5));
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(-1, 2, 4 - 15);
+        camera.add(light);
+      }
+
     });
 
     let oldWidth = -1;
@@ -138,21 +151,16 @@ window.threejsLessonUtils = {
       if (width !== oldWidth || height !== oldHeight) {
         oldWidth = width;
         oldHeight = height;
-        controls.handleResize();
+        resizeFunctions.forEach(fn => fn());
       }
-      controls.update();
-
-      if (updateFunction) {
-        updateFunction(time);
-      }
+      updateFunctions.forEach(fn => fn(time));
 
       const aspect = width / height;
-      const targetFov = THREE.Math.degToRad(60);
-      const fov = aspect >= 1
-        ? targetFov
-        : (2 * Math.atan(Math.tan(targetFov * .5) / aspect));
+      const fovDeg = aspect >= 1
+        ? targetFOVDeg
+        : THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(targetFOVDeg) * .5) / aspect));
 
-      camera.fov = THREE.Math.radToDeg(fov);
+      camera.fov = fovDeg;
       camera.aspect = aspect;
       camera.updateProjectionMatrix();
 
