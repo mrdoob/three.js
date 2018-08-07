@@ -113,7 +113,7 @@
 
 				geometry = new THREE.BoxGeometry( 0.4, 0.4, 0.4 );
 				material1 = new THREE.MeshBasicMaterial( { map: transitioner1.fbo.texture } );
-				material2 = new THREE.MeshPhongMaterial( { bumpMap: transitioner2.fbo.texture } );
+				material2 = new THREE.MeshPhongMaterial( { map: texture2, bumpMap: transitioner2.fbo.texture } );
 				mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh2 = new THREE.Mesh( geometry, material2 );
 				scene.add( mesh1 );
