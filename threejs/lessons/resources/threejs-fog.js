@@ -46,7 +46,7 @@
       scene.add(gltf.scene);
     });
 
-    camera.fov = 30;
+    camera.fov = 45;
     camera.position.set(0.4, 1, 1.7);
     camera.lookAt(1, 1, 0.7);
 
@@ -62,6 +62,7 @@
 
     const target = [1, 1, 0.7];
     return {
+      trackball: false,
       obj3D: new THREE.Object3D(),
       update: (time) => {
         camera.lookAt(target[0] + Math.sin(time * .25) * .5, target[1], target[2]);
