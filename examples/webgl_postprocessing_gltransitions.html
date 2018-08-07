@@ -36,7 +36,6 @@
 		<div id="container"></div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		
 		<script src="js/crossfade/GLTransitioner.js"></script>
@@ -44,26 +43,34 @@
 		<script src="js/shaders/gltransitions/AngularTransitionShader.js"></script>
 		<script src="js/shaders/gltransitions/BounceTransitionShader.js"></script>
 		<script src="js/shaders/gltransitions/BowTileHorizontalTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/InvertedPageCurlTransitionShader.js"></script>
 		<script src="js/shaders/gltransitions/KaleidoscopeTransitionShader.js"></script>
 		<script src="js/shaders/gltransitions/DreamyTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/SwirlTransitionShader.js"></script>
 
 		<script>
 
-			var container, stats;
+			var container;
 			var mesh1, mesh2;
 			var texture1, texture2, texture3, texture4;
 			var renderer;
 			var transitioner;
 			var gui;
+			var params = {
+				transition: "Basic",
+				speed: 1
+			};
 
 			init();
 			createGUI();
 			animate();
 			
 			function createGUI(){
-				var params = { transition: "Basic" };
+				
 				gui = new dat.GUI();
-				var controller = gui.add( params, "transition", [ "Basic", "Angular", "Bounce", "BowTileHorizontal", "Kaleidoscope", "Dreamy" ] );
+				var controller = gui.add( params, "transition", [ "Basic", "Angular", "Bounce", "BowTileHorizontal", "InvertedPageCurl", "Kaleidoscope", "Dreamy", "Swirl" ] );
+				gui.add( params, 'speed' ).min( 1 ).max( 10 ).step( 0.1 );
+				
 				controller.onChange((val)=>{
 
 					transitioner1.setTransitionShader( THREE[ val + "TransitionShader" ], {
@@ -140,7 +147,7 @@
 
 				mesh1.rotation.y = mesh2.rotation.y += 0.02;
 				
-				transitioner1.material.uniforms.progress.value = transitioner2.material.uniforms.progress.value = ( Math.sin( new Date().getTime() / 1000 ) + 1 ) / 2;
+				transitioner1.material.uniforms.progress.value = transitioner2.material.uniforms.progress.value = ( Math.sin( new Date().getTime() / 1000 / params.speed ) + 1 ) / 2;
                 transitioner1.update( renderer );
                 transitioner2.update( renderer );
 
