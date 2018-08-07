@@ -19,7 +19,9 @@ void main() {
 
 	#ifndef USE_SIZEATTENUATION
 
-		scale *= abs( mvPosition.z );
+		bool isPerspective = ( projectionMatrix[ 2 ][ 3 ] == - 1.0 );
+
+		if ( isPerspective ) scale *= - mvPosition.z;
 
 	#endif
 
