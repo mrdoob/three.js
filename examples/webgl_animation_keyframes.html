@@ -46,7 +46,6 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/DRACOLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
@@ -69,15 +68,8 @@
 			renderer.gammaFactor = 2.2;
 			container.appendChild( renderer.domElement );
 
-			var state = {color: 0xbfe3dd};
-
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xbfe3dd );
-
-			// TODO: Remove GUI when colors are set.
-			var gui = new dat.GUI();
-			gui.addColor( state, 'color' ).onChange( () => scene.background.setHex( state.color ) );
-			gui.close();
 
 			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 5, 2, 8 );
