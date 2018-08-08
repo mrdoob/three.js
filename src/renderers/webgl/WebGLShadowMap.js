@@ -179,7 +179,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			}
 
-			if ( shadow.isSpotLightShadow ) {
+			if ( shadow.isSpotLightShadow && shadow.cameraAutoUpdate ) {
 
 				shadow.update( light );
 

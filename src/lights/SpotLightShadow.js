@@ -21,8 +21,6 @@ SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype 
 
 	update: function ( light ) {
 
-		if ( ! this.cameraAutoUpdate ) return;
-
 		var camera = this.camera;
 
 		var fov = _Math.RAD2DEG * 2 * light.angle;
