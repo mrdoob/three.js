@@ -5325,30 +5325,41 @@
 
 		},
 
-		applyMatrix4: function ( matrix ) {
+		applyMatrix4: function () {
 
-			// transform of empty box is an empty box.
-			if ( this.isEmpty( ) ) return this;
+			var points = [
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3()
+			];
 
-			var m = matrix.elements;
+			return function applyMatrix4( matrix ) {
 
-			var xax = m[ 0 ] * this.min.x, xay = m[ 1 ] * this.min.x, xaz = m[ 2 ] * this.min.x;
-			var xbx = m[ 0 ] * this.max.x, xby = m[ 1 ] * this.max.x, xbz = m[ 2 ] * this.max.x;
-			var yax = m[ 4 ] * this.min.y, yay = m[ 5 ] * this.min.y, yaz = m[ 6 ] * this.min.y;
-			var ybx = m[ 4 ] * this.max.y, yby = m[ 5 ] * this.max.y, ybz = m[ 6 ] * this.max.y;
-			var zax = m[ 8 ] * this.min.z, zay = m[ 9 ] * this.min.z, zaz = m[ 10 ] * this.min.z;
-			var zbx = m[ 8 ] * this.max.z, zby = m[ 9 ] * this.max.z, zbz = m[ 10 ] * this.max.z;
+				// transform of empty box is an empty box.
+				if ( this.isEmpty() ) return this;
 
-			this.min.x = Math.min( xax, xbx ) + Math.min( yax, ybx ) + Math.min( zax, zbx ) + m[ 12 ];
-			this.min.y = Math.min( xay, xby ) + Math.min( yay, yby ) + Math.min( zay, zby ) + m[ 13 ];
-			this.min.z = Math.min( xaz, xbz ) + Math.min( yaz, ybz ) + Math.min( zaz, zbz ) + m[ 14 ];
-			this.max.x = Math.max( xax, xbx ) + Math.max( yax, ybx ) + Math.max( zax, zbx ) + m[ 12 ];
-			this.max.y = Math.max( xay, xby ) + Math.max( yay, yby ) + Math.max( zay, zby ) + m[ 13 ];
-			this.max.z = Math.max( xaz, xbz ) + Math.max( yaz, ybz ) + Math.max( zaz, zbz ) + m[ 14 ];
+				// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+				points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+				points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+				points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+				points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+				points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+				points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+				points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+				points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
 
-			return this;
+				this.setFromPoints( points );
 
-		},
+				return this;
+
+			};
+
+		}(),
 
 		translate: function ( offset ) {
 
@@ -6030,13 +6041,13 @@
 
 	var envmap_vertex = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\t\tvWorldPosition = worldPosition.xyz;\n\t#else\n\t\tvec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n\t\tvec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvReflect = reflect( cameraToVertex, worldNormal );\n\t\t#else\n\t\t\tvReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n\t\t#endif\n\t#endif\n#endif\n";
 
-	var fog_vertex = "\n#ifdef USE_FOG\nfogPosition = mvPosition.xyz;\n#endif";
+	var fog_vertex = "#ifdef USE_FOG\n\tvFogPosition = mvPosition.xyz;\n#endif\n";
 
-	var fog_pars_vertex = "#ifdef USE_FOG\n  varying vec3 fogPosition;\n#endif\n";
+	var fog_pars_vertex = "#ifdef USE_FOG\n\tvarying vec3 vFogPosition;\n#endif\n";
 
-	var fog_fragment = "#ifdef USE_FOG\n\tfloat fogDepth = length( fogPosition );\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );\n\t#else\n\t\tfloat fogFactor = smoothstep( fogNear, fogFar, fogDepth );\n\t#endif\n\tgl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\n#endif\n";
+	var fog_fragment = "#ifdef USE_FOG\n\tfloat fogDepth = length( vFogPosition );\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );\n\t#else\n\t\tfloat fogFactor = smoothstep( fogNear, fogFar, fogDepth );\n\t#endif\n\tgl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\n#endif\n";
 
-	var fog_pars_fragment = "#ifdef USE_FOG\n\tuniform vec3 fogColor;\n\tvarying vec3 fogPosition;\n\t#ifdef FOG_EXP2\n\t\tuniform float fogDensity;\n\t#else\n\t\tuniform float fogNear;\n\t\tuniform float fogFar;\n\t#endif\n#endif\n";
+	var fog_pars_fragment = "#ifdef USE_FOG\n\tuniform vec3 fogColor;\n\tvarying vec3 vFogPosition;\n\t#ifdef FOG_EXP2\n\t\tuniform float fogDensity;\n\t#else\n\t\tuniform float fogNear;\n\t\tuniform float fogFar;\n\t#endif\n#endif\n";
 
 	var gradientmap_pars_fragment = "#ifdef TOON\n\tuniform sampler2D gradientMap;\n\tvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\t\tfloat dotNL = dot( normal, lightDirection );\n\t\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t\t#ifdef USE_GRADIENTMAP\n\t\t\treturn texture2D( gradientMap, coord ).rgb;\n\t\t#else\n\t\t\treturn ( coord.x < 0.7 ) ? vec3( 0.7 ) : vec3( 1.0 );\n\t\t#endif\n\t}\n#endif\n";
 
@@ -6066,9 +6077,9 @@
 
 	var logdepthbuf_fragment = "#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )\n\tgl_FragDepthEXT = log2( vFragDepth ) * logDepthBufFC * 0.5;\n#endif";
 
-	var logdepthbuf_pars_fragment = "#ifdef USE_LOGDEPTHBUF\n\tuniform float logDepthBufFC;\n\t#ifdef USE_LOGDEPTHBUF_EXT\n\t\tvarying float vFragDepth;\n\t#endif\n#endif\n";
+	var logdepthbuf_pars_fragment = "#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )\n\tuniform float logDepthBufFC;\n\tvarying float vFragDepth;\n#endif\n";
 
-	var logdepthbuf_pars_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_EXT\n\t\tvarying float vFragDepth;\n\t#endif\n\tuniform float logDepthBufFC;\n#endif";
+	var logdepthbuf_pars_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_EXT\n\t\tvarying float vFragDepth;\n\t#else\n\t\tuniform float logDepthBufFC;\n\t#endif\n#endif\n";
 
 	var logdepthbuf_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_EXT\n\t\tvFragDepth = 1.0 + gl_Position.w;\n\t#else\n\t\tgl_Position.z = log2( max( EPSILON, gl_Position.w + 1.0 ) ) * logDepthBufFC - 1.0;\n\t\tgl_Position.z *= gl_Position.w;\n\t#endif\n#endif\n";
 
@@ -19116,6 +19127,7 @@
 
 		var currentProgram = null;
 
+		var currentBlendingEnabled = null;
 		var currentBlending = null;
 		var currentBlendEquation = null;
 		var currentBlendSrc = null;
@@ -19193,8 +19205,7 @@
 		setCullFace( CullFaceBack );
 		enable( gl.CULL_FACE );
 
-		enable( gl.BLEND );
-		setBlending( NormalBlending );
+		setBlending( NoBlending );
 
 		//
 
@@ -19318,13 +19329,23 @@
 
 		function setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
-			if ( blending !== NoBlending ) {
+			if ( blending === NoBlending ) {
+
+				if ( currentBlendingEnabled ) {
+
+					disable( gl.BLEND );
+					currentBlendingEnabled = false;
+
+				}
+
+				return;
+
+			}
+
+			if ( ! currentBlendingEnabled ) {
 
 				enable( gl.BLEND );
-
-			} else {
-
-				disable( gl.BLEND );
+				currentBlendingEnabled = true;
 
 			}
 
@@ -19332,108 +19353,111 @@
 
 				if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
 
-					switch ( blending ) {
+					if ( currentBlendEquation !== AddEquation || currentBlendEquationAlpha !== AddEquation ) {
 
-						case AdditiveBlending:
+						gl.blendEquation( gl.FUNC_ADD );
 
-							if ( premultipliedAlpha ) {
-
-								gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-								gl.blendFuncSeparate( gl.ONE, gl.ONE, gl.ONE, gl.ONE );
-
-							} else {
-
-								gl.blendEquation( gl.FUNC_ADD );
-								gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
-
-							}
-							break;
-
-						case SubtractiveBlending:
-
-							if ( premultipliedAlpha ) {
-
-								gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-								gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
-
-							} else {
-
-								gl.blendEquation( gl.FUNC_ADD );
-								gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
-
-							}
-							break;
-
-						case MultiplyBlending:
-
-							if ( premultipliedAlpha ) {
-
-								gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-								gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
-
-							} else {
-
-								gl.blendEquation( gl.FUNC_ADD );
-								gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
-
-							}
-							break;
-
-						default:
-
-							if ( premultipliedAlpha ) {
-
-								gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-								gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
-
-							} else {
-
-								gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-								gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
-
-							}
+						currentBlendEquation = AddEquation;
+						currentBlendEquationAlpha = AddEquation;
 
 					}
 
+					if ( premultipliedAlpha ) {
+
+						switch ( blending ) {
+
+							case NormalBlending:
+								gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+								break;
+
+							case AdditiveBlending:
+								gl.blendFunc( gl.ONE, gl.ONE );
+								break;
+
+							case SubtractiveBlending:
+								gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
+								break;
+
+							case MultiplyBlending:
+								gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
+								break;
+
+							default:
+								console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+								break;
+
+						}
+
+					} else {
+
+						switch ( blending ) {
+
+							case NormalBlending:
+								gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+								break;
+
+							case AdditiveBlending:
+								gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+								break;
+
+							case SubtractiveBlending:
+								gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+								break;
+
+							case MultiplyBlending:
+								gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+								break;
+
+							default:
+								console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+								break;
+
+						}
+
+					}
+
+					currentBlendSrc = null;
+					currentBlendDst = null;
+					currentBlendSrcAlpha = null;
+					currentBlendDstAlpha = null;
+
+					currentBlending = blending;
+					currentPremultipledAlpha = premultipliedAlpha;
+
 				}
 
-				currentBlendEquation = null;
-				currentBlendSrc = null;
-				currentBlendDst = null;
-				currentBlendEquationAlpha = null;
-				currentBlendSrcAlpha = null;
-				currentBlendDstAlpha = null;
+				return;
 
-			} else {
+			}
 
-				blendEquationAlpha = blendEquationAlpha || blendEquation;
-				blendSrcAlpha = blendSrcAlpha || blendSrc;
-				blendDstAlpha = blendDstAlpha || blendDst;
+			// custom blending
 
-				if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
+			blendEquationAlpha = blendEquationAlpha || blendEquation;
+			blendSrcAlpha = blendSrcAlpha || blendSrc;
+			blendDstAlpha = blendDstAlpha || blendDst;
 
-					gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
+			if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-					currentBlendEquation = blendEquation;
-					currentBlendEquationAlpha = blendEquationAlpha;
+				gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
 
-				}
+				currentBlendEquation = blendEquation;
+				currentBlendEquationAlpha = blendEquationAlpha;
 
-				if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
+			}
 
-					gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
+			if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-					currentBlendSrc = blendSrc;
-					currentBlendDst = blendDst;
-					currentBlendSrcAlpha = blendSrcAlpha;
-					currentBlendDstAlpha = blendDstAlpha;
+				gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
 
-				}
+				currentBlendSrc = blendSrc;
+				currentBlendDst = blendDst;
+				currentBlendSrcAlpha = blendSrcAlpha;
+				currentBlendDstAlpha = blendDstAlpha;
 
 			}
 
 			currentBlending = blending;
-			currentPremultipledAlpha = premultipliedAlpha;
+			currentPremultipledAlpha = null;
 
 		}
 
@@ -27772,7 +27796,7 @@
 					ear = cureLocalIntersections( ear, triangles, dim );
 					earcutLinked( ear, triangles, dim, minX, minY, invSize, 2 );
 
-				// as a last resort, try splitting the remaining polygon into two
+					// as a last resort, try splitting the remaining polygon into two
 
 				} else if ( pass === 2 ) {
 
