@@ -52,16 +52,12 @@
 
 			var camera, scene, renderer, lut, legendLayout;
 
-			var axis;
-
 			var mesh, material;
 
 			var colorMap;
 			var numberOfColors;
 
 			var loader = new THREE.BufferGeometryLoader();
-			var center = new THREE.Vector3();
-			var rotWorldMatrix = new THREE.Matrix4();
 
 			init();
 			animate();
@@ -75,7 +71,8 @@
 				scene.background = new THREE.Color( 0xffffff );
 
 				// CAMERA
-				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.set( 0, 0, 10 );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -96,8 +93,6 @@
 				} );
 
 				loadModel( colorMap, numberOfColors, legendLayout );
-
-				camera.position.set( 17, 9, 32 );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
 				directionalLight.position.set( 17, 9, 30 );
@@ -134,7 +129,7 @@
 
 			function render() {
 
-				if ( axis ) mesh.rotateOnAxis( axis, Math.PI / 180 );
+				if ( mesh !== undefined ) mesh.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
 
@@ -144,8 +139,8 @@
 
 				loader.load( 'models/json/pressure.json', function( geometry ) {
 
+					geometry.center();
 					geometry.computeVertexNormals();
-					geometry.normalizeNormals();
 
 					var lutColors = [];
 
@@ -179,17 +174,6 @@
 
 					mesh = new THREE.Mesh( geometry, material );
 
-					geometry.computeBoundingBox();
-					var boundingBox = geometry.boundingBox;
-					boundingBox.getCenter( center );
-
-					if ( axis === undefined ) {
-
-						axis = center.clone();
-						axis.normalize();
-
-					}
-
 					scene.add( mesh );
 
 					if ( legendLayout ) {
@@ -198,7 +182,7 @@
 
 						if ( legendLayout === 'horizontal' ) {
 
-							legend = lut.setLegendOn( { 'layout':'horizontal', 'position': { 'x': 21, 'y': 6, 'z': 5 } } );
+							legend = lut.setLegendOn( { 'layout':'horizontal', 'position': { 'x': 4, 'y': 0, 'z': 0 } } );
 
 						} else {
 
