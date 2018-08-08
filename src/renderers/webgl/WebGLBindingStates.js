@@ -10,7 +10,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 	var extension = capabilities.isWebGL2 ? null : extensions.get( 'OES_vertex_array_object' );
 	var vaoAvailable = capabilities.isWebGL2 || extension !== null;
 
-	var bindingStates = new Map();
+	var bindingStates = {};
 
 	var defaultState = createBindingState( null );
 	var currentState = defaultState;
@@ -106,29 +106,29 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		var wireframe = ( material.wireframe === true );
 
-		if ( ! bindingStates.has( geometry ) ) {
+		if ( bindingStates[ geometry.id ] === undefined ) {
 
-			bindingStates.set( geometry, new Map() );
-
-		}
-
-		var geometryMap = bindingStates.get( geometry );
-
-		if ( ! geometryMap.has( program ) ) {
-
-			geometryMap.set( program, new Map() );
+			bindingStates[ geometry.id ] = {};
 
 		}
 
-		var programMap = geometryMap.get( program );
+		var geometryMap = bindingStates[ geometry.id ];
 
-		if ( ! programMap.has( wireframe ) ) {
+		if ( geometryMap[ program.id ] === undefined ) {
 
-			programMap.set( wireframe, createBindingState( createVertexArrayObject() ) );
+			geometryMap[ program.id ] = {};
 
 		}
 
-		return programMap.get( wireframe );
+		var programMap = geometryMap[ program.id ];
+
+		if ( programMap[ wireframe ] === undefined ) {
+
+			programMap[ wireframe ] = createBindingState( createVertexArrayObject() );
+
+		}
+
+		return programMap[ wireframe ];
 
 	}
 
@@ -346,25 +346,29 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		reset();
 
-		bindingStates.forEach( function ( geometryMap ) {
+		for ( var geometryId in bindingStates ) {
 
-			geometryMap.forEach( function ( programMap ) {
+			var geometryMap = bindingStates[ geometryId ];
 
-				programMap.forEach( function ( state ) {
+			for ( var programId in geometryMap ) {
 
-					deleteVertexArrayObject( state.object );
+				var programMap = geometryMap[ programId ];
 
-				} );
+				for ( var wireframe in programMap ) {
 
-				programMap.clear();
+					deleteVertexArrayObject( programMap[ wireframe ].object );
 
-			} );
+					delete programMap[ wireframe ];
 
-			geometryMap.clear();
+				};
 
-		} );
+				delete geometryMap[ programId ];
 
-		bindingStates.clear();
+			};
+
+			delete bindingStates[ geometryId ];
+
+		};
 
 	}
 
