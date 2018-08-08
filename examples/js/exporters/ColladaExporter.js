@@ -492,7 +492,7 @@ THREE.ColladaExporter.prototype = {
 
 			if ( o instanceof THREE.Mesh && o.geometry != null ) {
 
-				var meshid = processGeometry( o.geometry, meshid );
+				var meshid = processGeometry( o.geometry );
 
 				// ids of the materials to bind to the geometry
 				var matids = null;
