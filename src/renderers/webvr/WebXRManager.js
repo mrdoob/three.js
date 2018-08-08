@@ -240,7 +240,16 @@ function WebXRManager( renderer ) {
 
 				if ( inputPose !== null ) {
 
-					controller.matrix.elements = inputPose.pointerMatrix;
+					if ('targetRay' in inputPose) {
+
+						controller.matrix.elements = inputPose.targetRay.transformMatrix;
+
+					} else if ('pointerMatrix' in inputPose) {
+
+						controller.matrix.elements = inputPose.pointerMatrix;
+
+					}
+
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 					controller.visible = true;
 
