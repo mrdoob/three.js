@@ -240,11 +240,13 @@ function WebXRManager( renderer ) {
 
 				if ( inputPose !== null ) {
 
-					if ('targetRay' in inputPose) {
+					if ( 'targetRay' in inputPose ) {
 
 						controller.matrix.elements = inputPose.targetRay.transformMatrix;
 
-					} else if ('pointerMatrix' in inputPose) {
+					} else if ( 'pointerMatrix' in inputPose ) {
+
+						// DEPRECATED
 
 						controller.matrix.elements = inputPose.pointerMatrix;
 
