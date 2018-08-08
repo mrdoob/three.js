@@ -247,7 +247,11 @@
 
 				sunLight.castShadow = true;
 
-				sunLight.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( shadowConfig.shadowCameraFov, 1, shadowConfig.shadowCameraNear, shadowConfig.shadowCameraFar ) );
+				sunLight.shadow.camera.fov = shadowConfig.shadowCameraFov;
+				sunLight.shadow.camera.aspect = 1;
+				sunLight.shadow.camera.near = shadowConfig.shadowCameraNear;
+				sunLight.shadow.camera.far = shadowConfig.shadowCameraFar;
+				sunLight.shadow.cameraAutoUpdate = false;
 				sunLight.shadow.bias = shadowConfig.shadowBias;
 
 				scene.add( sunLight );
