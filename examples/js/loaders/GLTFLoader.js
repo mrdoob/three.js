@@ -2083,7 +2083,7 @@ THREE.GLTFLoader = ( function () {
 		var parser = this;
 		var json = this.json;
 		var extensions = this.extensions;
-		var materialDef = this.json.materials[ materialIndex ];
+		var materialDef = json.materials[ materialIndex ];
 
 		var materialType;
 		var materialParams = {};
@@ -2458,7 +2458,7 @@ THREE.GLTFLoader = ( function () {
 		var json = this.json;
 		var extensions = this.extensions;
 
-		var meshDef = this.json.meshes[ meshIndex ];
+		var meshDef = json.meshes[ meshIndex ];
 
 		return this.getMultiDependencies( [
 
@@ -2758,7 +2758,7 @@ THREE.GLTFLoader = ( function () {
 
 		var json = this.json;
 
-		var animationDef = this.json.animations[ animationIndex ];
+		var animationDef = json.animations[ animationIndex ];
 
 		return this.getMultiDependencies( [
 
@@ -2902,10 +2902,10 @@ THREE.GLTFLoader = ( function () {
 		var json = this.json;
 		var extensions = this.extensions;
 
-		var meshReferences = this.json.meshReferences;
-		var meshUses = this.json.meshUses;
+		var meshReferences = json.meshReferences;
+		var meshUses = json.meshUses;
 
-		var nodeDef = this.json.nodes[ nodeIndex ];
+		var nodeDef = json.nodes[ nodeIndex ];
 
 		return this.getMultiDependencies( [
 

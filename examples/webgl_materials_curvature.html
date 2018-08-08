@@ -191,10 +191,6 @@
 								var posB_C = new THREE.Vector3().subVectors( posB, posC );
 								var posC_A = new THREE.Vector3().subVectors( posC, posA );
 
-								var normB_A = new THREE.Vector3().subVectors( normB, normA );
-								var normB_C = new THREE.Vector3().subVectors( normB, normC );
-								var normC_A = new THREE.Vector3().subVectors( normC, normA );
-
 								var b2a = normB.dot( posB_A.normalize() );
 								var b2c = normB.dot( posB_C.normalize() );
 								var c2a = normC.dot( posC_A.normalize() );
