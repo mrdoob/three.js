@@ -37,7 +37,7 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		
+		<script src="js/crossfade/scenes.js"></script>
 		<script src="js/crossfade/GLTransitioner.js"></script>
 		<script src="js/shaders/gltransitions/BasicTransitionShader.js"></script>
 		<script src="js/shaders/gltransitions/AngularTransitionShader.js"></script>
@@ -51,8 +51,7 @@
 		<script>
 
 			var container;
-			var mesh1, mesh2;
-			var texture1, texture2, texture3, texture4;
+			var scene1, scene2;
 			var renderer;
 			var transitioner;
 			var gui;
@@ -60,6 +59,7 @@
 				transition: "Basic",
 				speed: 1
 			};
+			var clock = new THREE.Clock();
 
 			init();
 			createGUI();
@@ -73,17 +73,10 @@
 				
 				controller.onChange((val)=>{
 
-					transitioner1.setTransitionShader( THREE[ val + "TransitionShader" ], {
+					transitioner.setTransitionShader( THREE[ val + "TransitionShader" ], {
 
-						tDiffuse1: texture1,
-						tDiffuse2: texture2
-					
-					} );
-
-					transitioner2.setTransitionShader( THREE[ val + "TransitionShader" ], {
-
-						tDiffuse1: texture3,
-						tDiffuse2: texture4
+						tDiffuse1: sceneA.fbo.texture,
+						tDiffuse2: sceneB.fbo.texture
 					
 					} );
 
@@ -91,49 +84,16 @@
 			}
 
 			function init() {
-				
-				var loader = new THREE.TextureLoader();
-				texture1 = loader.load("textures/cube/Park2/negx.jpg");
-				texture2 = loader.load("textures/cube/skybox/nx.jpg");
-				
-				texture3 = loader.load("textures/normal1.jpg");
-				texture4 = loader.load("textures/normal2.jpg");
-				
-				transitioner1 = new THREE.GLTransitioner( 512, 512, THREE.BasicTransitionShader, {
 
-					tDiffuse1: texture1,
-					tDiffuse2: texture2
+				sceneA = new Scene( "cube", 5000, 1200, 120, new THREE.Vector3(0,-0.4,0), 0xffffff );
+				sceneB = new Scene( "sphere", 500, 2000, 50, new THREE.Vector3(0,0.2,0.1), 0x000000 );
+
+				transitioner = new THREE.GLTransitioner( window.innerWidth, window.innerHeight, THREE.BasicTransitionShader, {
+
+					tDiffuse1: sceneA.fbo.texture,
+					tDiffuse2: sceneB.fbo.texture
 					
-				} );
-				
-				transitioner2 = new THREE.GLTransitioner( 512, 512, THREE.BasicTransitionShader, {
-
-					tDiffuse1: texture3,
-					tDiffuse2: texture4
-					
-				} );
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-				camera.position.z = 1;
-
-				scene = new THREE.Scene();
-
-				geometry = new THREE.BoxGeometry( 0.4, 0.4, 0.4 );
-				material1 = new THREE.MeshBasicMaterial( { map: transitioner1.fbo.texture } );
-				material2 = new THREE.MeshPhongMaterial( { map: texture2, bumpMap: transitioner2.fbo.texture } );
-				mesh1 = new THREE.Mesh( geometry, material1 );
-				mesh2 = new THREE.Mesh( geometry, material2 );
-				scene.add( mesh1 );
-				scene.add( mesh2 );
-				
-				mesh1.position.x = -0.45;
-				mesh2.position.x = 0.45;
-
-				var directionalLight = new THREE.DirectionalLight( 0xffffff );
-				scene.add( directionalLight );
-				directionalLight.position.set( 1, 2, 3 );
-				
-				scene.add( new THREE.AmbientLight( 0x303030 ) );
+				}, true);
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -144,14 +104,15 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				mesh1.rotation.y = mesh2.rotation.y += 0.02;
 				
-				transitioner1.material.uniforms.progress.value = transitioner2.material.uniforms.progress.value = ( Math.sin( new Date().getTime() / 1000 / params.speed ) + 1 ) / 2;
-                transitioner1.update( renderer );
-                transitioner2.update( renderer );
+				var delta = clock.getDelta();
 
-				renderer.render( scene, camera );
+				sceneA.render( delta, true );
+				sceneB.render( delta, true );
+				
+				transitioner.material.uniforms.progress.value = ( Math.sin( new Date().getTime() / 1000 / params.speed ) + 1 ) / 2;
+                
+				transitioner.update( renderer );
 
 			}
 

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - scenes transition</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			.info {
+				position: absolute;
+				background-color: black;
+				opacity: 0.8;
+				color: white;
+				text-align: center;
+				top: 0px;
+				width: 100%;
+			}
+
+			.info a {
+				color: #00ffff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl texture transitions - by <a href="https://www.threejs.org.cn/gallery">HypnosNova</a> - <a href="https://github.com/HypnosNova/Nova">github</a>
+		</div>
+
+		<div id="container"></div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		
+		<script src="js/crossfade/GLTransitioner.js"></script>
+		<script src="js/shaders/gltransitions/BasicTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/AngularTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/BounceTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/BowTileHorizontalTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/InvertedPageCurlTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/KaleidoscopeTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/DreamyTransitionShader.js"></script>
+		<script src="js/shaders/gltransitions/SwirlTransitionShader.js"></script>
+
+		<script>
+
+			var container;
+			var mesh1, mesh2;
+			var texture1, texture2, texture3, texture4;
+			var renderer;
+			var transitioner;
+			var gui;
+			var params = {
+				transition: "Basic",
+				speed: 1
+			};
+
+			init();
+			createGUI();
+			animate();
+			
+			function createGUI(){
+				
+				gui = new dat.GUI();
+				var controller = gui.add( params, "transition", [ "Basic", "Angular", "Bounce", "BowTileHorizontal", "InvertedPageCurl", "Kaleidoscope", "Dreamy", "Swirl" ] );
+				gui.add( params, 'speed' ).min( 1 ).max( 10 ).step( 0.1 );
+				
+				controller.onChange((val)=>{
+
+					transitioner1.setTransitionShader( THREE[ val + "TransitionShader" ], {
+
+						tDiffuse1: texture1,
+						tDiffuse2: texture2
+					
+					} );
+
+					transitioner2.setTransitionShader( THREE[ val + "TransitionShader" ], {
+
+						tDiffuse1: texture3,
+						tDiffuse2: texture4
+					
+					} );
+
+				});
+			}
+
+			function init() {
+				
+				var loader = new THREE.TextureLoader();
+				texture1 = loader.load("textures/cube/Park2/negx.jpg");
+				texture2 = loader.load("textures/cube/skybox/nx.jpg");
+				
+				texture3 = loader.load("textures/normal1.jpg");
+				texture4 = loader.load("textures/normal2.jpg");
+				
+				transitioner1 = new THREE.GLTransitioner( 512, 512, THREE.BasicTransitionShader, {
+
+					tDiffuse1: texture1,
+					tDiffuse2: texture2
+					
+				} );
+				
+				transitioner2 = new THREE.GLTransitioner( 512, 512, THREE.BasicTransitionShader, {
+
+					tDiffuse1: texture3,
+					tDiffuse2: texture4
+					
+				} );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.z = 1;
+
+				scene = new THREE.Scene();
+
+				geometry = new THREE.BoxGeometry( 0.4, 0.4, 0.4 );
+				material1 = new THREE.MeshBasicMaterial( { map: transitioner1.fbo.texture } );
+				material2 = new THREE.MeshPhongMaterial( { map: texture2, bumpMap: transitioner2.fbo.texture } );
+				mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh2 = new THREE.Mesh( geometry, material2 );
+				scene.add( mesh1 );
+				scene.add( mesh2 );
+				
+				mesh1.position.x = -0.45;
+				mesh2.position.x = 0.45;
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				scene.add( directionalLight );
+				directionalLight.position.set( 1, 2, 3 );
+				
+				scene.add( new THREE.AmbientLight( 0x303030 ) );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				mesh1.rotation.y = mesh2.rotation.y += 0.01;
+				
+				transitioner1.material.uniforms.progress.value = transitioner2.material.uniforms.progress.value = ( Math.sin( new Date().getTime() / 1000 / params.speed ) + 1 ) / 2;
+                
+				transitioner1.update( renderer );
+				transitioner2.update( renderer );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

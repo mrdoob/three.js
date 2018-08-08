@@ -1,11 +1,13 @@
-THREE.GLTransitioner = function ( width, height, transitionShader, options ) {
+THREE.GLTransitioner = function ( width, height, transitionShader, uniforms, isNotFBO ) {
 
 	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 	this.scene = new THREE.Scene();
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ) );
 	this.scene.add( this.quad );
+
+	this.isNotFBO = isNotFBO;
 	
-	this.setTransitionShader( transitionShader, options );
+	this.setTransitionShader( transitionShader, uniforms );
 
 	this.fbo = new THREE.WebGLRenderTarget( width || window.innerWidth, height || window.innerHeight, {
 
@@ -23,16 +25,25 @@ THREE.GLTransitioner.prototype.update = function( renderer ) {
 	this.material.uniforms.progress.value = Math.min( this.material.uniforms.progress.value, 1 );
 	this.material.uniforms.progress.value = Math.max( this.material.uniforms.progress.value, 0 );
 
-	renderer.render( this.scene, this.camera, this.fbo, true );
+	if(this.isNotFBO){
+
+		renderer.render( this.scene, this.camera, undefined, false );
+
+	} else {
+
+		renderer.render( this.scene, this.camera, this.fbo, true );
+
+	}
+	
 
 };
 
-THREE.GLTransitioner.prototype.setTransitionShader = function( transitionShader, options ) {
+THREE.GLTransitioner.prototype.setTransitionShader = function( transitionShader, uniforms ) {
 
 	this.uniforms = {
 
-		tDiffuse1: { value: options.tDiffuse1 },
-		tDiffuse2: { value: options.tDiffuse2 },
+		tDiffuse1: { value: uniforms.tDiffuse1 },
+		tDiffuse2: { value: uniforms.tDiffuse2 },
 		mixRatio: { value: 0.0 },
 		progress: { value: 0.0 }
 
@@ -40,7 +51,7 @@ THREE.GLTransitioner.prototype.setTransitionShader = function( transitionShader,
 
 	for ( var key in transitionShader.uniforms ) {
 
-		this.uniforms[ key ] = { value: options[ key ] || transitionShader.uniforms[ key ].value };
+		this.uniforms[ key ] = { value: uniforms[ key ] || transitionShader.uniforms[ key ].value };
 
 	}
 	
