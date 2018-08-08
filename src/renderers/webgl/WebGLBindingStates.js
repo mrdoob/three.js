@@ -106,29 +106,34 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		var wireframe = ( material.wireframe === true );
 
-		if ( bindingStates[ geometry.id ] === undefined ) {
-
-			bindingStates[ geometry.id ] = {};
-
-		}
-
 		var geometryMap = bindingStates[ geometry.id ];
 
-		if ( geometryMap[ program.id ] === undefined ) {
+		if ( geometryMap === undefined ) {
 
-			geometryMap[ program.id ] = {};
+			geometryMap = {};
+			bindingStates[ geometry.id ] = geometryMap;
 
 		}
 
 		var programMap = geometryMap[ program.id ];
 
-		if ( programMap[ wireframe ] === undefined ) {
+		if ( programMap === undefined ) {
 
-			programMap[ wireframe ] = createBindingState( createVertexArrayObject() );
+			programMap = {};
+			geometryMap[ program.id ] = programMap;
 
 		}
 
-		return programMap[ wireframe ];
+		var state = programMap[ wireframe ];
+
+		if ( state === undefined ) {
+
+			state = createBindingState( createVertexArrayObject() );
+			programMap[ wireframe ] = state;
+
+		}
+
+		return state;
 
 	}
 
