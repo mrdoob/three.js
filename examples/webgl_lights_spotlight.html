@@ -139,6 +139,8 @@
 
 			function render() {
 
+				spotLight.shadow.update(spotLight);
+
 				lightHelper.update();
 
 				shadowCameraHelper.update();
@@ -157,7 +159,8 @@
 					distance: spotLight.distance,
 					angle: spotLight.angle,
 					penumbra: spotLight.penumbra,
-					decay: spotLight.decay
+					decay: spotLight.decay,
+					cameraAutoUpdate: spotLight.shadow.cameraAutoUpdate
 				}
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
@@ -199,6 +202,13 @@
 				gui.add( params, 'decay', 1, 2 ).onChange( function ( val ) {
 
 					spotLight.decay = val;
+					render();
+
+				} );
+
+				gui.add( params, 'cameraAutoUpdate').onChange( function ( val ) {
+
+					spotLight.shadow.cameraAutoUpdate = val;
 					render();
 
 				} );

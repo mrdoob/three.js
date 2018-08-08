@@ -112,7 +112,12 @@
 
 				light.castShadow = true;
 
-				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
+				light.shadow.camera.fov = 50;
+				light.shadow.camera.aspect = 1;
+				light.shadow.camera.near = 1200;
+				light.shadow.camera.far = 2500;
+				light.shadow.cameraAutoUpdate = false;
+
 				light.shadow.bias = 0.0001;
 
 				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
