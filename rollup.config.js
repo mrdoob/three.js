@@ -1,7 +1,7 @@
+import buble from 'rollup-plugin-buble';
+
 function glsl() {
-
 	return {
-
 		transform( code, id ) {
 
 			if ( /\.glsl$/.test( id ) === false ) return;
@@ -16,17 +16,17 @@ function glsl() {
 				code: transformedCode,
 				map: { mappings: '' }
 			};
-
 		}
-
 	};
-
 }
 
 export default {
 	input: 'src/Three.js',
 	plugins: [
-		glsl()
+		glsl(),
+
+		// convert classes back to functions
+		buble()
 	],
 	// sourceMap: true,
 	output: [

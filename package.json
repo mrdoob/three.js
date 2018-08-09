@@ -58,6 +58,7 @@
     "google-closure-compiler": "20180716.0.1",
     "qunit": "^2.6.1",
     "rollup": "^0.63.5",
+    "rollup-plugin-buble": "^0.19.2",
     "rollup-watch": "^4.3.1",
     "serve": "6.5.8",
     "uglify-js": "^3.3.28"
