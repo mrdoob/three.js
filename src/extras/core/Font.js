@@ -6,19 +6,17 @@
 import { ShapePath } from './ShapePath.js';
 
 
-function Font( data ) {
+class Font {
 
-	this.type = 'Font';
+	constructor( data ) {
 
-	this.data = data;
+		this.type = 'Font';
 
-}
+		this.data = data;
 
-Object.assign( Font.prototype, {
+	}
 
-	isFont: true,
-
-	generateShapes: function ( text, size ) {
+	generateShapes( text, size ) {
 
 		if ( size === undefined ) size = 100;
 
@@ -35,7 +33,9 @@ Object.assign( Font.prototype, {
 
 	}
 
-} );
+}
+
+Font.prototype.isFont = true;
 
 function createPaths( text, size, data ) {
 

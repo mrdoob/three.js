@@ -26,44 +26,48 @@ import { Vector3 } from '../math/Vector3.js';
 
 var lineGeometry, coneGeometry;
 
-function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
+class ArrowHelper extends Object3D {
 
-	// dir is assumed to be normalized
+	constructor( dir, origin, length, color, headLength, headWidth ) {
 
-	Object3D.call( this );
+		// dir is assumed to be normalized
 
-	if ( color === undefined ) color = 0xffff00;
-	if ( length === undefined ) length = 1;
-	if ( headLength === undefined ) headLength = 0.2 * length;
-	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+		super();
 
-	if ( lineGeometry === undefined ) {
+		if ( color === undefined ) color = 0xffff00;
+		if ( length === undefined ) length = 1;
+		if ( headLength === undefined ) headLength = 0.2 * length;
+		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-		lineGeometry = new BufferGeometry();
-		lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+		if ( lineGeometry === undefined ) {
 
-		coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
-		coneGeometry.translate( 0, - 0.5, 0 );
+			lineGeometry = new BufferGeometry();
+			lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+
+			coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+			coneGeometry.translate( 0, - 0.5, 0 );
+
+		}
+
+		this.position.copy( origin );
+
+		this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
+		this.line.matrixAutoUpdate = false;
+		this.add( this.line );
+
+		this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
+		this.cone.matrixAutoUpdate = false;
+		this.add( this.cone );
+
+		this.setDirection( dir );
+		this.setLength( length, headLength, headWidth );
 
 	}
 
-	this.position.copy( origin );
-
-	this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
-	this.line.matrixAutoUpdate = false;
-	this.add( this.line );
-
-	this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
-	this.cone.matrixAutoUpdate = false;
-	this.add( this.cone );
-
-	this.setDirection( dir );
-	this.setLength( length, headLength, headWidth );
-
 }
 
-ArrowHelper.prototype = Object.create( Object3D.prototype );
-ArrowHelper.prototype.constructor = ArrowHelper;
+
+
 
 ArrowHelper.prototype.setDirection = ( function () {
 

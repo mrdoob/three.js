@@ -767,28 +767,32 @@ function removeNode( p ) {
 
 }
 
-function Node( i, x, y ) {
+class Node {
 
-	// vertice index in coordinates array
-	this.i = i;
+	constructor( i, x, y ) {
 
-	// vertex coordinates
-	this.x = x;
-	this.y = y;
+		// vertice index in coordinates array
+		this.i = i;
 
-	// previous and next vertice nodes in a polygon ring
-	this.prev = null;
-	this.next = null;
+		// vertex coordinates
+		this.x = x;
+		this.y = y;
 
-	// z-order curve value
-	this.z = null;
+		// previous and next vertice nodes in a polygon ring
+		this.prev = null;
+		this.next = null;
 
-	// previous and next nodes in z-order
-	this.prevZ = null;
-	this.nextZ = null;
+		// z-order curve value
+		this.z = null;
 
-	// indicates whether this is a steiner point
-	this.steiner = false;
+		// previous and next nodes in z-order
+		this.prevZ = null;
+		this.nextZ = null;
+
+		// indicates whether this is a steiner point
+		this.steiner = false;
+
+	}
 
 }
 

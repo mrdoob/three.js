@@ -58,18 +58,16 @@ import * as Curves from '../extras/curves/Curves.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ObjectLoader( manager ) {
+class ObjectLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-	this.texturePath = '';
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		this.texturePath = '';
 
-Object.assign( ObjectLoader.prototype, {
+	}
 
-	crossOrigin: 'anonymous',
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( this.texturePath === '' ) {
 
@@ -111,23 +109,23 @@ Object.assign( ObjectLoader.prototype, {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	setTexturePath: function ( value ) {
+	setTexturePath( value ) {
 
 		this.texturePath = value;
 		return this;
 
-	},
+	}
 
-	setCrossOrigin: function ( value ) {
+	setCrossOrigin( value ) {
 
 		this.crossOrigin = value;
 		return this;
 
-	},
+	}
 
-	parse: function ( json, onLoad ) {
+	parse( json, onLoad ) {
 
 		var shapes = this.parseShape( json.shapes );
 		var geometries = this.parseGeometries( json.geometries, shapes );
@@ -157,9 +155,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		return object;
 
-	},
+	}
 
-	parseShape: function ( json ) {
+	parseShape( json ) {
 
 		var shapes = {};
 
@@ -177,9 +175,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		return shapes;
 
-	},
+	}
 
-	parseGeometries: function ( json, shapes ) {
+	parseGeometries( json, shapes ) {
 
 		var geometries = {};
 
@@ -443,9 +441,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		return geometries;
 
-	},
+	}
 
-	parseMaterials: function ( json, textures ) {
+	parseMaterials( json, textures ) {
 
 		var materials = {};
 
@@ -484,9 +482,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		return materials;
 
-	},
+	}
 
-	parseAnimations: function ( json ) {
+	parseAnimations( json ) {
 
 		var animations = [];
 
@@ -504,9 +502,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		return animations;
 
-	},
+	}
 
-	parseImages: function ( json, onLoad ) {
+	parseImages( json, onLoad ) {
 
 		var scope = this;
 		var images = {};
@@ -572,9 +570,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		return images;
 
-	},
+	}
 
-	parseTextures: function ( json, images ) {
+	parseTextures( json, images ) {
 
 		function parseConstant( value, type ) {
 
@@ -654,9 +652,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		return textures;
 
-	},
+	}
 
-	parseObject: function ( data, geometries, materials ) {
+	parseObject( data, geometries, materials ) {
 
 		var object;
 
@@ -940,7 +938,9 @@ Object.assign( ObjectLoader.prototype, {
 
 	}
 
-} );
+}
+
+ObjectLoader.prototype.crossOrigin = 'anonymous';
 
 var TEXTURE_MAPPING = {
 	UVMapping: UVMapping,

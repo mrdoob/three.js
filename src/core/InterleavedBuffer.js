@@ -3,36 +3,24 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-function InterleavedBuffer( array, stride ) {
+class InterleavedBuffer {
 
-	this.array = array;
-	this.stride = stride;
-	this.count = array !== undefined ? array.length / stride : 0;
+	constructor( array, stride ) {
 
-	this.dynamic = false;
-	this.updateRange = { offset: 0, count: - 1 };
+		this.array = array;
+		this.stride = stride;
+		this.count = array !== undefined ? array.length / stride : 0;
 
-	this.version = 0;
+		this.dynamic = false;
+		this.updateRange = { offset: 0, count: - 1 };
 
-}
-
-Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
-
-	set: function ( value ) {
-
-		if ( value === true ) this.version ++;
+		this.version = 0;
 
 	}
 
-} );
+	onUploadCallback() {}
 
-Object.assign( InterleavedBuffer.prototype, {
-
-	isInterleavedBuffer: true,
-
-	onUploadCallback: function () {},
-
-	setArray: function ( array ) {
+	setArray( array ) {
 
 		if ( Array.isArray( array ) ) {
 
@@ -45,17 +33,17 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setDynamic: function ( value ) {
+	setDynamic( value ) {
 
 		this.dynamic = value;
 
 		return this;
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.array = new source.array.constructor( source.array );
 		this.count = source.count;
@@ -64,9 +52,9 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyAt: function ( index1, attribute, index2 ) {
+	copyAt( index1, attribute, index2 ) {
 
 		index1 *= this.stride;
 		index2 *= attribute.stride;
@@ -79,9 +67,9 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	set: function ( value, offset ) {
+	set( value, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -89,19 +77,31 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	onUpload: function ( callback ) {
+	onUpload( callback ) {
 
 		this.onUploadCallback = callback;
 
 		return this;
+
+	}
+
+}
+
+InterleavedBuffer.prototype.isInterleavedBuffer = true;
+
+Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 

@@ -11,38 +11,42 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Object3D } from '../core/Object3D.js';
 import { FrontSide, BackSide } from '../constants.js';
 
-function PlaneHelper( plane, size, hex ) {
+class PlaneHelper extends Line {
 
-	this.type = 'PlaneHelper';
+	constructor( plane, size, hex ) {
 
-	this.plane = plane;
+		var color = ( hex !== undefined ) ? hex : 0xffff00;
 
-	this.size = ( size === undefined ) ? 1 : size;
+		var positions = [ 1, - 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 ];
 
-	var color = ( hex !== undefined ) ? hex : 0xffff00;
+		var geometry = new BufferGeometry();
+		geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+		geometry.computeBoundingSphere();
 
-	var positions = [ 1, - 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 ];
+		super( geometry, new LineBasicMaterial( { color: color } ) );
 
-	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-	geometry.computeBoundingSphere();
+		this.type = 'PlaneHelper';
 
-	Line.call( this, geometry, new LineBasicMaterial( { color: color } ) );
+		this.plane = plane;
 
-	//
+		this.size = ( size === undefined ) ? 1 : size;
 
-	var positions2 = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, - 1, 1, 1, - 1, 1 ];
+		//
 
-	var geometry2 = new BufferGeometry();
-	geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
-	geometry2.computeBoundingSphere();
+		var positions2 = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, - 1, 1, 1, - 1, 1 ];
 
-	this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
+		var geometry2 = new BufferGeometry();
+		geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
+		geometry2.computeBoundingSphere();
+
+		this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
+
+	}
 
 }
 
-PlaneHelper.prototype = Object.create( Line.prototype );
-PlaneHelper.prototype.constructor = PlaneHelper;
+
+
 
 PlaneHelper.prototype.updateMatrixWorld = function ( force ) {
 

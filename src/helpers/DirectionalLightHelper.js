@@ -11,46 +11,50 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 
-function DirectionalLightHelper( light, size, color ) {
+class DirectionalLightHelper extends Object3D {
 
-	Object3D.call( this );
+	constructor( light, size, color ) {
 
-	this.light = light;
-	this.light.updateMatrixWorld();
+		super();
 
-	this.matrix = light.matrixWorld;
-	this.matrixAutoUpdate = false;
+		this.light = light;
+		this.light.updateMatrixWorld();
 
-	this.color = color;
+		this.matrix = light.matrixWorld;
+		this.matrixAutoUpdate = false;
 
-	if ( size === undefined ) size = 1;
+		this.color = color;
 
-	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( [
-		- size, size, 0,
-		size, size, 0,
-		size, - size, 0,
-		- size, - size, 0,
-		- size, size, 0
-	], 3 ) );
+		if ( size === undefined ) size = 1;
 
-	var material = new LineBasicMaterial( { fog: false } );
+		var geometry = new BufferGeometry();
+		geometry.addAttribute( 'position', new Float32BufferAttribute( [
+			- size, size, 0,
+			size, size, 0,
+			size, - size, 0,
+			- size, - size, 0,
+			- size, size, 0
+		], 3 ) );
 
-	this.lightPlane = new Line( geometry, material );
-	this.add( this.lightPlane );
+		var material = new LineBasicMaterial( { fog: false } );
 
-	geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
+		this.lightPlane = new Line( geometry, material );
+		this.add( this.lightPlane );
 
-	this.targetLine = new Line( geometry, material );
-	this.add( this.targetLine );
+		geometry = new BufferGeometry();
+		geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
-	this.update();
+		this.targetLine = new Line( geometry, material );
+		this.add( this.targetLine );
+
+		this.update();
+
+	}
 
 }
 
-DirectionalLightHelper.prototype = Object.create( Object3D.prototype );
-DirectionalLightHelper.prototype.constructor = DirectionalLightHelper;
+
+
 
 DirectionalLightHelper.prototype.dispose = function () {
 

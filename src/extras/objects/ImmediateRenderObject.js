@@ -4,17 +4,21 @@ import { Object3D } from '../../core/Object3D.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function ImmediateRenderObject( material ) {
+class ImmediateRenderObject extends Object3D {
 
-	Object3D.call( this );
+	constructor( material ) {
 
-	this.material = material;
-	this.render = function ( /* renderCallback */ ) {};
+		super();
+
+		this.material = material;
+		this.render = function ( /* renderCallback */ ) {};
+
+	}
 
 }
 
-ImmediateRenderObject.prototype = Object.create( Object3D.prototype );
-ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
+
+
 
 ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 

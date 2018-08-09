@@ -8,25 +8,29 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
  * }
  */
 
-function MeshPhysicalMaterial( parameters ) {
+class MeshPhysicalMaterial extends MeshStandardMaterial {
 
-	MeshStandardMaterial.call( this );
+	constructor( parameters ) {
 
-	this.defines = { 'PHYSICAL': '' };
+		super();
 
-	this.type = 'MeshPhysicalMaterial';
+		this.defines = { 'PHYSICAL': '' };
 
-	this.reflectivity = 0.5; // maps to F0 = 0.04
+		this.type = 'MeshPhysicalMaterial';
 
-	this.clearCoat = 0.0;
-	this.clearCoatRoughness = 0.0;
+		this.reflectivity = 0.5; // maps to F0 = 0.04
 
-	this.setValues( parameters );
+		this.clearCoat = 0.0;
+		this.clearCoatRoughness = 0.0;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
-MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
+
+
 
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 

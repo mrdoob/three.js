@@ -9,15 +9,15 @@ import { DefaultLoadingManager } from './LoadingManager.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function BufferGeometryLoader( manager ) {
+class BufferGeometryLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-Object.assign( BufferGeometryLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -28,9 +28,9 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		var geometry = new BufferGeometry();
 
@@ -88,7 +88,7 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 	}
 
-} );
+}
 
 var TYPED_ARRAYS = {
 	Int8Array: Int8Array,

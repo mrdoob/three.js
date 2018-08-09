@@ -2,49 +2,53 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLObjects( geometries, info ) {
+class WebGLObjects {
 
-	var updateList = {};
+	constructor( geometries, info ) {
 
-	function update( object ) {
+		var updateList = {};
 
-		var frame = info.render.frame;
+		function update( object ) {
 
-		var geometry = object.geometry;
-		var buffergeometry = geometries.get( object, geometry );
+			var frame = info.render.frame;
 
-		// Update once per frame
+			var geometry = object.geometry;
+			var buffergeometry = geometries.get( object, geometry );
 
-		if ( updateList[ buffergeometry.id ] !== frame ) {
+			// Update once per frame
 
-			if ( geometry.isGeometry ) {
+			if ( updateList[ buffergeometry.id ] !== frame ) {
 
-				buffergeometry.updateFromObject( object );
+				if ( geometry.isGeometry ) {
+
+					buffergeometry.updateFromObject( object );
+
+				}
+
+				geometries.update( buffergeometry );
+
+				updateList[ buffergeometry.id ] = frame;
 
 			}
 
-			geometries.update( buffergeometry );
-
-			updateList[ buffergeometry.id ] = frame;
+			return buffergeometry;
 
 		}
 
-		return buffergeometry;
+		function dispose() {
+
+			updateList = {};
+
+		}
+
+		return {
+
+			update: update,
+			dispose: dispose
+
+		};
 
 	}
-
-	function dispose() {
-
-		updateList = {};
-
-	}
-
-	return {
-
-		update: update,
-		dispose: dispose
-
-	};
 
 }
 

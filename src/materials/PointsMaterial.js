@@ -17,29 +17,33 @@ import { Color } from '../math/Color.js';
  * }
  */
 
-function PointsMaterial( parameters ) {
+class PointsMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'PointsMaterial';
+		super();
 
-	this.color = new Color( 0xffffff );
+		this.type = 'PointsMaterial';
 
-	this.map = null;
+		this.color = new Color( 0xffffff );
 
-	this.size = 1;
-	this.sizeAttenuation = true;
+		this.map = null;
 
-	this.morphTargets = false;
+		this.size = 1;
+		this.sizeAttenuation = true;
 
-	this.lights = false;
+		this.morphTargets = false;
 
-	this.setValues( parameters );
+		this.lights = false;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-PointsMaterial.prototype = Object.create( Material.prototype );
-PointsMaterial.prototype.constructor = PointsMaterial;
+
+
 
 PointsMaterial.prototype.isPointsMaterial = true;
 

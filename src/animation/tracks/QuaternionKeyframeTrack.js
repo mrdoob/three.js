@@ -11,30 +11,26 @@ import { QuaternionLinearInterpolant } from '../../math/interpolants/QuaternionL
  * @author tschw
  */
 
-function QuaternionKeyframeTrack( name, times, values, interpolation ) {
+class QuaternionKeyframeTrack extends KeyframeTrack {
 
-	KeyframeTrack.call( this, name, times, values, interpolation );
+	constructor( name, times, values, interpolation ) {
 
-}
+		super( name, times, values, interpolation );
 
-QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+	}
 
-	constructor: QuaternionKeyframeTrack,
-
-	ValueTypeName: 'quaternion',
-
-	// ValueBufferType is inherited
-
-	DefaultInterpolation: InterpolateLinear,
-
-	InterpolantFactoryMethodLinear: function ( result ) {
+	InterpolantFactoryMethodLinear( result ) {
 
 		return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
 
-	},
+	}
 
-	InterpolantFactoryMethodSmooth: undefined // not yet implemented
+}
 
-} );
+QuaternionKeyframeTrack.prototype.ValueTypeName = 'quaternion';
+
+QuaternionKeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
+
+QuaternionKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 
 export { QuaternionKeyframeTrack };

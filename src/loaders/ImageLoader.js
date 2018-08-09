@@ -6,17 +6,15 @@ import { Cache } from './Cache.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
 
-function ImageLoader( manager ) {
+class ImageLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-Object.assign( ImageLoader.prototype, {
+	}
 
-	crossOrigin: 'anonymous',
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
@@ -86,23 +84,25 @@ Object.assign( ImageLoader.prototype, {
 
 		return image;
 
-	},
+	}
 
-	setCrossOrigin: function ( value ) {
+	setCrossOrigin( value ) {
 
 		this.crossOrigin = value;
 		return this;
 
-	},
+	}
 
-	setPath: function ( value ) {
+	setPath( value ) {
 
 		this.path = value;
 		return this;
 
 	}
 
-} );
+}
+
+ImageLoader.prototype.crossOrigin = 'anonymous';
 
 
 export { ImageLoader };

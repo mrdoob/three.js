@@ -11,25 +11,24 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
  * @author tschw
  */
 
-function StringKeyframeTrack( name, times, values, interpolation ) {
+class StringKeyframeTrack extends KeyframeTrack {
 
-	KeyframeTrack.call( this, name, times, values, interpolation );
+	constructor( name, times, values, interpolation ) {
+
+		super( name, times, values, interpolation );
+
+	}
 
 }
 
-StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+StringKeyframeTrack.prototype.ValueTypeName = 'string';
 
-	constructor: StringKeyframeTrack,
+StringKeyframeTrack.prototype.ValueBufferType = Array;
 
-	ValueTypeName: 'string',
-	ValueBufferType: Array,
+StringKeyframeTrack.prototype.DefaultInterpolation = InterpolateDiscrete;
 
-	DefaultInterpolation: InterpolateDiscrete,
+StringKeyframeTrack.prototype.InterpolantFactoryMethodLinear = undefined;
 
-	InterpolantFactoryMethodLinear: undefined,
-
-	InterpolantFactoryMethodSmooth: undefined
-
-} );
+StringKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 
 export { StringKeyframeTrack };

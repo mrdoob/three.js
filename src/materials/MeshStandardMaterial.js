@@ -55,67 +55,71 @@ import { Color } from '../math/Color.js';
  * }
  */
 
-function MeshStandardMaterial( parameters ) {
+class MeshStandardMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.defines = { 'STANDARD': '' };
+		super();
 
-	this.type = 'MeshStandardMaterial';
+		this.defines = { 'STANDARD': '' };
 
-	this.color = new Color( 0xffffff ); // diffuse
-	this.roughness = 0.5;
-	this.metalness = 0.5;
+		this.type = 'MeshStandardMaterial';
 
-	this.map = null;
+		this.color = new Color( 0xffffff ); // diffuse
+		this.roughness = 0.5;
+		this.metalness = 0.5;
 
-	this.lightMap = null;
-	this.lightMapIntensity = 1.0;
+		this.map = null;
 
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
+		this.lightMap = null;
+		this.lightMapIntensity = 1.0;
 
-	this.emissive = new Color( 0x000000 );
-	this.emissiveIntensity = 1.0;
-	this.emissiveMap = null;
+		this.aoMap = null;
+		this.aoMapIntensity = 1.0;
 
-	this.bumpMap = null;
-	this.bumpScale = 1;
+		this.emissive = new Color( 0x000000 );
+		this.emissiveIntensity = 1.0;
+		this.emissiveMap = null;
 
-	this.normalMap = null;
-	this.normalMapType = TangentSpaceNormalMap;
-	this.normalScale = new Vector2( 1, 1 );
+		this.bumpMap = null;
+		this.bumpScale = 1;
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
 
-	this.roughnessMap = null;
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
 
-	this.metalnessMap = null;
+		this.roughnessMap = null;
 
-	this.alphaMap = null;
+		this.metalnessMap = null;
 
-	this.envMap = null;
-	this.envMapIntensity = 1.0;
+		this.alphaMap = null;
 
-	this.refractionRatio = 0.98;
+		this.envMap = null;
+		this.envMapIntensity = 1.0;
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
+		this.refractionRatio = 0.98;
 
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
+		this.wireframeLinecap = 'round';
+		this.wireframeLinejoin = 'round';
 
-	this.setValues( parameters );
+		this.skinning = false;
+		this.morphTargets = false;
+		this.morphNormals = false;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-MeshStandardMaterial.prototype = Object.create( Material.prototype );
-MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
+
+
 
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 

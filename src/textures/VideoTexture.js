@@ -4,21 +4,17 @@
 
 import { Texture } from './Texture.js';
 
-function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+class VideoTexture extends Texture {
 
-	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.generateMipmaps = false;
+		super( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-}
+		this.generateMipmaps = false;
 
-VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
+	}
 
-	constructor: VideoTexture,
-
-	isVideoTexture: true,
-
-	update: function () {
+	update() {
 
 		var video = this.image;
 
@@ -30,7 +26,9 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 	}
 
-} );
+}
+
+VideoTexture.prototype.isVideoTexture = true;
 
 
 export { VideoTexture };

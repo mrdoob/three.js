@@ -29,26 +29,22 @@ var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0
 	'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
 	'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
 
-function Color( r, g, b ) {
+class Color {
 
-	if ( g === undefined && b === undefined ) {
+	constructor( r, g, b ) {
 
-		// r is THREE.Color, hex or string
-		return this.set( r );
+		if ( g === undefined && b === undefined ) {
+
+			// r is THREE.Color, hex or string
+			return this.set( r );
+
+		}
+
+		return this.setRGB( r, g, b );
 
 	}
 
-	return this.setRGB( r, g, b );
-
-}
-
-Object.assign( Color.prototype, {
-
-	isColor: true,
-
-	r: 1, g: 1, b: 1,
-
-	set: function ( value ) {
+	set( value ) {
 
 		if ( value && value.isColor ) {
 
@@ -66,9 +62,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setScalar: function ( scalar ) {
+	setScalar( scalar ) {
 
 		this.r = scalar;
 		this.g = scalar;
@@ -76,9 +72,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setHex: function ( hex ) {
+	setHex( hex ) {
 
 		hex = Math.floor( hex );
 
@@ -88,9 +84,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setRGB: function ( r, g, b ) {
+	setRGB( r, g, b ) {
 
 		this.r = r;
 		this.g = g;
@@ -98,50 +94,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setHSL: function () {
-
-		function hue2rgb( p, q, t ) {
-
-			if ( t < 0 ) t += 1;
-			if ( t > 1 ) t -= 1;
-			if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
-			if ( t < 1 / 2 ) return q;
-			if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
-			return p;
-
-		}
-
-		return function setHSL( h, s, l ) {
-
-			// h,s,l ranges are in 0.0 - 1.0
-			h = _Math.euclideanModulo( h, 1 );
-			s = _Math.clamp( s, 0, 1 );
-			l = _Math.clamp( l, 0, 1 );
-
-			if ( s === 0 ) {
-
-				this.r = this.g = this.b = l;
-
-			} else {
-
-				var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
-				var q = ( 2 * l ) - p;
-
-				this.r = hue2rgb( q, p, h + 1 / 3 );
-				this.g = hue2rgb( q, p, h );
-				this.b = hue2rgb( q, p, h - 1 / 3 );
-
-			}
-
-			return this;
-
-		};
-
-	}(),
-
-	setStyle: function ( style ) {
+	setStyle( style ) {
 
 		function handleAlpha( string ) {
 
@@ -269,15 +224,15 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.r, this.g, this.b );
 
-	},
+	}
 
-	copy: function ( color ) {
+	copy( color ) {
 
 		this.r = color.r;
 		this.g = color.g;
@@ -285,9 +240,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyGammaToLinear: function ( color, gammaFactor ) {
+	copyGammaToLinear( color, gammaFactor ) {
 
 		if ( gammaFactor === undefined ) gammaFactor = 2.0;
 
@@ -297,9 +252,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyLinearToGamma: function ( color, gammaFactor ) {
+	copyLinearToGamma( color, gammaFactor ) {
 
 		if ( gammaFactor === undefined ) gammaFactor = 2.0;
 
@@ -311,93 +266,53 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	convertGammaToLinear: function ( gammaFactor ) {
+	convertGammaToLinear( gammaFactor ) {
 
 		this.copyGammaToLinear( this, gammaFactor );
 
 		return this;
 
-	},
+	}
 
-	convertLinearToGamma: function ( gammaFactor ) {
+	convertLinearToGamma( gammaFactor ) {
 
 		this.copyLinearToGamma( this, gammaFactor );
 
 		return this;
 
-	},
+	}
 
-	copySRGBToLinear: function () {
-
-		function SRGBToLinear( c ) {
-
-			return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
-
-		}
-
-		return function copySRGBToLinear( color ) {
-
-			this.r = SRGBToLinear( color.r );
-			this.g = SRGBToLinear( color.g );
-			this.b = SRGBToLinear( color.b );
-
-			return this;
-
-		};
-
-	}(),
-
-	copyLinearToSRGB: function () {
-
-		function LinearToSRGB( c ) {
-
-			return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
-
-		}
-
-		return function copyLinearToSRGB( color ) {
-
-			this.r = LinearToSRGB( color.r );
-			this.g = LinearToSRGB( color.g );
-			this.b = LinearToSRGB( color.b );
-
-			return this;
-
-		};
-
-	}(),
-
-	convertSRGBToLinear: function () {
+	convertSRGBToLinear() {
 
 		this.copySRGBToLinear( this );
 
 		return this;
 
-	},
+	}
 
-	convertLinearToSRGB: function () {
+	convertLinearToSRGB() {
 
 		this.copyLinearToSRGB( this );
 
 		return this;
 
-	},
+	}
 
-	getHex: function () {
+	getHex() {
 
 		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
 
-	},
+	}
 
-	getHexString: function () {
+	getHexString() {
 
 		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );
 
-	},
+	}
 
-	getHSL: function ( target ) {
+	getHSL( target ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
@@ -445,33 +360,15 @@ Object.assign( Color.prototype, {
 
 		return target;
 
-	},
+	}
 
-	getStyle: function () {
+	getStyle() {
 
 		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
 
-	},
+	}
 
-	offsetHSL: function () {
-
-		var hsl = {};
-
-		return function ( h, s, l ) {
-
-			this.getHSL( hsl );
-
-			hsl.h += h; hsl.s += s; hsl.l += l;
-
-			this.setHSL( hsl.h, hsl.s, hsl.l );
-
-			return this;
-
-		};
-
-	}(),
-
-	add: function ( color ) {
+	add( color ) {
 
 		this.r += color.r;
 		this.g += color.g;
@@ -479,9 +376,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addColors: function ( color1, color2 ) {
+	addColors( color1, color2 ) {
 
 		this.r = color1.r + color2.r;
 		this.g = color1.g + color2.g;
@@ -489,9 +386,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addScalar: function ( s ) {
+	addScalar( s ) {
 
 		this.r += s;
 		this.g += s;
@@ -499,9 +396,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	sub: function ( color ) {
+	sub( color ) {
 
 		this.r = Math.max( 0, this.r - color.r );
 		this.g = Math.max( 0, this.g - color.g );
@@ -509,9 +406,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiply: function ( color ) {
+	multiply( color ) {
 
 		this.r *= color.r;
 		this.g *= color.g;
@@ -519,9 +416,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar( s ) {
 
 		this.r *= s;
 		this.g *= s;
@@ -529,9 +426,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	lerp: function ( color, alpha ) {
+	lerp( color, alpha ) {
 
 		this.r += ( color.r - this.r ) * alpha;
 		this.g += ( color.g - this.g ) * alpha;
@@ -539,37 +436,15 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	lerpHSL: function () {
-
-		var hslA = { h: 0, s: 0, l: 0 };
-		var hslB = { h: 0, s: 0, l: 0 };
-
-		return function lerpHSL( color, alpha ) {
-
-			this.getHSL( hslA );
-			color.getHSL( hslB );
-
-			var h = _Math.lerp( hslA.h, hslB.h, alpha );
-			var s = _Math.lerp( hslA.s, hslB.s, alpha );
-			var l = _Math.lerp( hslA.l, hslB.l, alpha );
-
-			this.setHSL( h, s, l );
-
-			return this;
-
-		};
-
-	}(),
-
-	equals: function ( c ) {
+	equals( c ) {
 
 		return ( c.r === this.r ) && ( c.g === this.g ) && ( c.b === this.b );
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -579,9 +454,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -592,15 +467,144 @@ Object.assign( Color.prototype, {
 
 		return array;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		return this.getHex();
 
 	}
 
-} );
+}
+
+Color.prototype.isColor = true;
+
+Color.prototype.r = 1;
+
+Color.prototype.g = 1;
+
+Color.prototype.b = 1;
+
+Color.prototype.setHSL = function () {
+
+	function hue2rgb( p, q, t ) {
+
+		if ( t < 0 ) t += 1;
+		if ( t > 1 ) t -= 1;
+		if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+		if ( t < 1 / 2 ) return q;
+		if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+		return p;
+
+	}
+
+	return function setHSL( h, s, l ) {
+
+		// h,s,l ranges are in 0.0 - 1.0
+		h = _Math.euclideanModulo( h, 1 );
+		s = _Math.clamp( s, 0, 1 );
+		l = _Math.clamp( l, 0, 1 );
+
+		if ( s === 0 ) {
+
+			this.r = this.g = this.b = l;
+
+		} else {
+
+			var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
+			var q = ( 2 * l ) - p;
+
+			this.r = hue2rgb( q, p, h + 1 / 3 );
+			this.g = hue2rgb( q, p, h );
+			this.b = hue2rgb( q, p, h - 1 / 3 );
+
+		}
+
+		return this;
+
+	};
+
+}();
+
+Color.prototype.copySRGBToLinear = function () {
+
+	function SRGBToLinear( c ) {
+
+		return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+	}
+
+	return function copySRGBToLinear( color ) {
+
+		this.r = SRGBToLinear( color.r );
+		this.g = SRGBToLinear( color.g );
+		this.b = SRGBToLinear( color.b );
+
+		return this;
+
+	};
+
+}();
+
+Color.prototype.copyLinearToSRGB = function () {
+
+	function LinearToSRGB( c ) {
+
+		return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+
+	}
+
+	return function copyLinearToSRGB( color ) {
+
+		this.r = LinearToSRGB( color.r );
+		this.g = LinearToSRGB( color.g );
+		this.b = LinearToSRGB( color.b );
+
+		return this;
+
+	};
+
+}();
+
+Color.prototype.offsetHSL = function () {
+
+	var hsl = {};
+
+	return function ( h, s, l ) {
+
+		this.getHSL( hsl );
+
+		hsl.h += h; hsl.s += s; hsl.l += l;
+
+		this.setHSL( hsl.h, hsl.s, hsl.l );
+
+		return this;
+
+	};
+
+}();
+
+Color.prototype.lerpHSL = function () {
+
+	var hslA = { h: 0, s: 0, l: 0 };
+	var hslB = { h: 0, s: 0, l: 0 };
+
+	return function lerpHSL( color, alpha ) {
+
+		this.getHSL( hslA );
+		color.getHSL( hslB );
+
+		var h = _Math.lerp( hslA.h, hslB.h, alpha );
+		var s = _Math.lerp( hslA.s, hslB.s, alpha );
+		var l = _Math.lerp( hslA.l, hslB.l, alpha );
+
+		this.setHSL( h, s, l );
+
+		return this;
+
+	};
+
+}();
 
 
 export { Color };

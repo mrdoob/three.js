@@ -3,18 +3,22 @@ import { CatmullRom } from '../core/Interpolations.js';
 import { Vector2 } from '../../math/Vector2.js';
 
 
-function SplineCurve( points /* array of Vector2 */ ) {
+class SplineCurve extends Curve {
 
-	Curve.call( this );
+	constructor( points /* array of Vector2 */ ) {
 
-	this.type = 'SplineCurve';
+		super();
 
-	this.points = points || [];
+		this.type = 'SplineCurve';
+
+		this.points = points || [];
+
+	}
 
 }
 
-SplineCurve.prototype = Object.create( Curve.prototype );
-SplineCurve.prototype.constructor = SplineCurve;
+
+
 
 SplineCurve.prototype.isSplineCurve = true;
 

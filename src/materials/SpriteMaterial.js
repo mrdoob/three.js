@@ -14,26 +14,30 @@ import { Color } from '../math/Color.js';
  * }
  */
 
-function SpriteMaterial( parameters ) {
+class SpriteMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'SpriteMaterial';
+		super();
 
-	this.color = new Color( 0xffffff );
-	this.map = null;
+		this.type = 'SpriteMaterial';
 
-	this.rotation = 0;
+		this.color = new Color( 0xffffff );
+		this.map = null;
 
-	this.lights = false;
-	this.transparent = true;
+		this.rotation = 0;
 
-	this.setValues( parameters );
+		this.lights = false;
+		this.transparent = true;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-SpriteMaterial.prototype = Object.create( Material.prototype );
-SpriteMaterial.prototype.constructor = SpriteMaterial;
+
+
 SpriteMaterial.prototype.isSpriteMaterial = true;
 
 SpriteMaterial.prototype.copy = function ( source ) {

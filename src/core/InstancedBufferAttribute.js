@@ -4,21 +4,17 @@ import { BufferAttribute } from './BufferAttribute.js';
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-function InstancedBufferAttribute( array, itemSize, meshPerAttribute ) {
+class InstancedBufferAttribute extends BufferAttribute {
 
-	BufferAttribute.call( this, array, itemSize );
+	constructor( array, itemSize, meshPerAttribute ) {
 
-	this.meshPerAttribute = meshPerAttribute || 1;
+		super( array, itemSize );
 
-}
+		this.meshPerAttribute = meshPerAttribute || 1;
 
-InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribute.prototype ), {
+	}
 
-	constructor: InstancedBufferAttribute,
-
-	isInstancedBufferAttribute: true,
-
-	copy: function ( source ) {
+	copy( source ) {
 
 		BufferAttribute.prototype.copy.call( this, source );
 
@@ -28,7 +24,9 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 	}
 
-} );
+}
+
+InstancedBufferAttribute.prototype.isInstancedBufferAttribute = true;
 
 
 

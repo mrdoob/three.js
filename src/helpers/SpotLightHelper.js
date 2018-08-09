@@ -11,53 +11,57 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-function SpotLightHelper( light, color ) {
+class SpotLightHelper extends Object3D {
 
-	Object3D.call( this );
+	constructor( light, color ) {
 
-	this.light = light;
-	this.light.updateMatrixWorld();
+		super();
 
-	this.matrix = light.matrixWorld;
-	this.matrixAutoUpdate = false;
+		this.light = light;
+		this.light.updateMatrixWorld();
 
-	this.color = color;
+		this.matrix = light.matrixWorld;
+		this.matrixAutoUpdate = false;
 
-	var geometry = new BufferGeometry();
+		this.color = color;
 
-	var positions = [
-		0, 0, 0, 	0, 0, 1,
-		0, 0, 0, 	1, 0, 1,
-		0, 0, 0,	- 1, 0, 1,
-		0, 0, 0, 	0, 1, 1,
-		0, 0, 0, 	0, - 1, 1
-	];
+		var geometry = new BufferGeometry();
 
-	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
+		var positions = [
+			0, 0, 0, 	0, 0, 1,
+			0, 0, 0, 	1, 0, 1,
+			0, 0, 0,	- 1, 0, 1,
+			0, 0, 0, 	0, 1, 1,
+			0, 0, 0, 	0, - 1, 1
+		];
 
-		var p1 = ( i / l ) * Math.PI * 2;
-		var p2 = ( j / l ) * Math.PI * 2;
+		for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
 
-		positions.push(
-			Math.cos( p1 ), Math.sin( p1 ), 1,
-			Math.cos( p2 ), Math.sin( p2 ), 1
-		);
+			var p1 = ( i / l ) * Math.PI * 2;
+			var p2 = ( j / l ) * Math.PI * 2;
+
+			positions.push(
+				Math.cos( p1 ), Math.sin( p1 ), 1,
+				Math.cos( p2 ), Math.sin( p2 ), 1
+			);
+
+		}
+
+		geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+
+		var material = new LineBasicMaterial( { fog: false } );
+
+		this.cone = new LineSegments( geometry, material );
+		this.add( this.cone );
+
+		this.update();
 
 	}
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-
-	var material = new LineBasicMaterial( { fog: false } );
-
-	this.cone = new LineSegments( geometry, material );
-	this.add( this.cone );
-
-	this.update();
-
 }
 
-SpotLightHelper.prototype = Object.create( Object3D.prototype );
-SpotLightHelper.prototype.constructor = SpotLightHelper;
+
+
 
 SpotLightHelper.prototype.dispose = function () {
 

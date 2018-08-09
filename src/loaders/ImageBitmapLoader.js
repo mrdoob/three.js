@@ -6,38 +6,36 @@ import { Cache } from './Cache.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
 
-function ImageBitmapLoader( manager ) {
+class ImageBitmapLoader {
 
-	if ( typeof createImageBitmap === 'undefined' ) {
+	constructor( manager ) {
 
-		console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+		if ( typeof createImageBitmap === 'undefined' ) {
+
+			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+
+		}
+
+		if ( typeof fetch === 'undefined' ) {
+
+			console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
+
+		}
+
+		this.manager = manager !== undefined ? manager : DefaultLoadingManager;
+		this.options = undefined;
 
 	}
 
-	if ( typeof fetch === 'undefined' ) {
-
-		console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
-
-	}
-
-	this.manager = manager !== undefined ? manager : DefaultLoadingManager;
-	this.options = undefined;
-
-}
-
-ImageBitmapLoader.prototype = {
-
-	constructor: ImageBitmapLoader,
-
-	setOptions: function setOptions( options ) {
+	setOptions( options ) {
 
 		this.options = options;
 
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
@@ -90,21 +88,21 @@ ImageBitmapLoader.prototype = {
 
 		} );
 
-	},
+	}
 
-	setCrossOrigin: function ( /* value */ ) {
+	setCrossOrigin( /* value */ ) {
 
 		return this;
 
-	},
+	}
 
-	setPath: function ( value ) {
+	setPath( value ) {
 
 		this.path = value;
 		return this;
 
 	}
 
-};
+}
 
 export { ImageBitmapLoader };

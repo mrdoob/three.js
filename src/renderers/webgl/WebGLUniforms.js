@@ -57,10 +57,14 @@ var emptyCubeTexture = new CubeTexture();
 
 // --- Base for inner nodes (including the root) ---
 
-function UniformContainer() {
+class UniformContainer {
 
-	this.seq = [];
-	this.map = {};
+	constructor() {
+
+		this.seq = [];
+		this.map = {};
+
+	}
 
 }
 
@@ -651,26 +655,34 @@ function getPureArraySetter( type ) {
 
 // --- Uniform Classes ---
 
-function SingleUniform( id, activeInfo, addr ) {
+class SingleUniform {
 
-	this.id = id;
-	this.addr = addr;
-	this.cache = [];
-	this.setValue = getSingularSetter( activeInfo.type );
+	constructor( id, activeInfo, addr ) {
 
-	// this.path = activeInfo.name; // DEBUG
+		this.id = id;
+		this.addr = addr;
+		this.cache = [];
+		this.setValue = getSingularSetter( activeInfo.type );
+
+		// this.path = activeInfo.name; // DEBUG
+
+	}
 
 }
 
-function PureArrayUniform( id, activeInfo, addr ) {
+class PureArrayUniform {
 
-	this.id = id;
-	this.addr = addr;
-	this.cache = [];
-	this.size = activeInfo.size;
-	this.setValue = getPureArraySetter( activeInfo.type );
+	constructor( id, activeInfo, addr ) {
 
-	// this.path = activeInfo.name; // DEBUG
+		this.id = id;
+		this.addr = addr;
+		this.cache = [];
+		this.size = activeInfo.size;
+		this.setValue = getPureArraySetter( activeInfo.type );
+
+		// this.path = activeInfo.name; // DEBUG
+
+	}
 
 }
 
@@ -688,11 +700,15 @@ PureArrayUniform.prototype.updateCache = function ( data ) {
 
 };
 
-function StructuredUniform( id ) {
+class StructuredUniform extends UniformContainer {
 
-	this.id = id;
+	constructor( id ) {
 
-	UniformContainer.call( this ); // mix-in
+		super();
+
+		this.id = id; // mix-in
+
+	}
 
 }
 
@@ -783,20 +799,24 @@ function parseUniform( activeInfo, addr, container ) {
 
 // Root Container
 
-function WebGLUniforms( gl, program, renderer ) {
+class WebGLUniforms extends UniformContainer {
 
-	UniformContainer.call( this );
+	constructor( gl, program, renderer ) {
 
-	this.renderer = renderer;
+		super();
 
-	var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
+		this.renderer = renderer;
 
-	for ( var i = 0; i < n; ++ i ) {
+		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-		var info = gl.getActiveUniform( program, i ),
-			addr = gl.getUniformLocation( program, info.name );
+		for ( var i = 0; i < n; ++ i ) {
 
-		parseUniform( info, addr, this );
+			var info = gl.getActiveUniform( program, i ),
+				addr = gl.getUniformLocation( program, info.name );
+
+			parseUniform( info, addr, this );
+
+		}
 
 	}
 

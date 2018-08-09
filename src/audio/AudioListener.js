@@ -7,32 +7,30 @@ import { Quaternion } from '../math/Quaternion.js';
 import { Object3D } from '../core/Object3D.js';
 import { AudioContext } from './AudioContext.js';
 
-function AudioListener() {
+class AudioListener extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'AudioListener';
+		super();
 
-	this.context = AudioContext.getContext();
+		this.type = 'AudioListener';
 
-	this.gain = this.context.createGain();
-	this.gain.connect( this.context.destination );
+		this.context = AudioContext.getContext();
 
-	this.filter = null;
+		this.gain = this.context.createGain();
+		this.gain.connect( this.context.destination );
 
-}
+		this.filter = null;
 
-AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: AudioListener,
-
-	getInput: function () {
+	getInput() {
 
 		return this.gain;
 
-	},
+	}
 
-	removeFilter: function ( ) {
+	removeFilter( ) {
 
 		if ( this.filter !== null ) {
 
@@ -45,15 +43,15 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getFilter: function () {
+	getFilter() {
 
 		return this.filter;
 
-	},
+	}
 
-	setFilter: function ( value ) {
+	setFilter( value ) {
 
 		if ( this.filter !== null ) {
 
@@ -72,64 +70,64 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getMasterVolume: function () {
+	getMasterVolume() {
 
 		return this.gain.gain.value;
 
-	},
+	}
 
-	setMasterVolume: function ( value ) {
+	setMasterVolume( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
 		return this;
 
-	},
+	}
 
-	updateMatrixWorld: ( function () {
+}
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
-		var scale = new Vector3();
+AudioListener.prototype.updateMatrixWorld = ( function () {
 
-		var orientation = new Vector3();
+	var position = new Vector3();
+	var quaternion = new Quaternion();
+	var scale = new Vector3();
 
-		return function updateMatrixWorld( force ) {
+	var orientation = new Vector3();
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+	return function updateMatrixWorld( force ) {
 
-			var listener = this.context.listener;
-			var up = this.up;
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			this.matrixWorld.decompose( position, quaternion, scale );
+		var listener = this.context.listener;
+		var up = this.up;
 
-			orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+		this.matrixWorld.decompose( position, quaternion, scale );
 
-			if ( listener.positionX ) {
+		orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-				listener.positionX.setValueAtTime( position.x, this.context.currentTime );
-				listener.positionY.setValueAtTime( position.y, this.context.currentTime );
-				listener.positionZ.setValueAtTime( position.z, this.context.currentTime );
-				listener.forwardX.setValueAtTime( orientation.x, this.context.currentTime );
-				listener.forwardY.setValueAtTime( orientation.y, this.context.currentTime );
-				listener.forwardZ.setValueAtTime( orientation.z, this.context.currentTime );
-				listener.upX.setValueAtTime( up.x, this.context.currentTime );
-				listener.upY.setValueAtTime( up.y, this.context.currentTime );
-				listener.upZ.setValueAtTime( up.z, this.context.currentTime );
+		if ( listener.positionX ) {
 
-			} else {
+			listener.positionX.setValueAtTime( position.x, this.context.currentTime );
+			listener.positionY.setValueAtTime( position.y, this.context.currentTime );
+			listener.positionZ.setValueAtTime( position.z, this.context.currentTime );
+			listener.forwardX.setValueAtTime( orientation.x, this.context.currentTime );
+			listener.forwardY.setValueAtTime( orientation.y, this.context.currentTime );
+			listener.forwardZ.setValueAtTime( orientation.z, this.context.currentTime );
+			listener.upX.setValueAtTime( up.x, this.context.currentTime );
+			listener.upY.setValueAtTime( up.y, this.context.currentTime );
+			listener.upZ.setValueAtTime( up.z, this.context.currentTime );
 
-				listener.setPosition( position.x, position.y, position.z );
-				listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
+		} else {
 
-			}
+			listener.setPosition( position.x, position.y, position.z );
+			listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
 
-		};
+		}
 
-	} )()
+	};
 
-} );
+} )();
 
 export { AudioListener };

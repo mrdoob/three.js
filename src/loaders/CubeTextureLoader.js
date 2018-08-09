@@ -7,17 +7,15 @@ import { CubeTexture } from '../textures/CubeTexture.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
 
-function CubeTextureLoader( manager ) {
+class CubeTextureLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-Object.assign( CubeTextureLoader.prototype, {
+	}
 
-	crossOrigin: 'anonymous',
-
-	load: function ( urls, onLoad, onProgress, onError ) {
+	load( urls, onLoad, onProgress, onError ) {
 
 		var texture = new CubeTexture();
 
@@ -55,23 +53,25 @@ Object.assign( CubeTextureLoader.prototype, {
 
 		return texture;
 
-	},
+	}
 
-	setCrossOrigin: function ( value ) {
+	setCrossOrigin( value ) {
 
 		this.crossOrigin = value;
 		return this;
 
-	},
+	}
 
-	setPath: function ( value ) {
+	setPath( value ) {
 
 		this.path = value;
 		return this;
 
 	}
 
-} );
+}
+
+CubeTextureLoader.prototype.crossOrigin = 'anonymous';
 
 
 export { CubeTextureLoader };

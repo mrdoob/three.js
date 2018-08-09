@@ -2,54 +2,58 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLAnimation() {
+class WebGLAnimation {
 
-	var context = null;
-	var isAnimating = false;
-	var animationLoop = null;
+	constructor() {
 
-	function onAnimationFrame( time, frame ) {
+		var context = null;
+		var isAnimating = false;
+		var animationLoop = null;
 
-		if ( isAnimating === false ) return;
+		function onAnimationFrame( time, frame ) {
 
-		animationLoop( time, frame );
+			if ( isAnimating === false ) return;
 
-		context.requestAnimationFrame( onAnimationFrame );
-
-	}
-
-	return {
-
-		start: function () {
-
-			if ( isAnimating === true ) return;
-			if ( animationLoop === null ) return;
+			animationLoop( time, frame );
 
 			context.requestAnimationFrame( onAnimationFrame );
 
-			isAnimating = true;
-
-		},
-
-		stop: function () {
-
-			isAnimating = false;
-
-		},
-
-		setAnimationLoop: function ( callback ) {
-
-			animationLoop = callback;
-
-		},
-
-		setContext: function ( value ) {
-
-			context = value;
-
 		}
 
-	};
+		return {
+
+			start: function () {
+
+				if ( isAnimating === true ) return;
+				if ( animationLoop === null ) return;
+
+				context.requestAnimationFrame( onAnimationFrame );
+
+				isAnimating = true;
+
+			},
+
+			stop: function () {
+
+				isAnimating = false;
+
+			},
+
+			setAnimationLoop: function ( callback ) {
+
+				animationLoop = callback;
+
+			},
+
+			setContext: function ( value ) {
+
+				context = value;
+
+			}
+
+		};
+
+	}
 
 }
 

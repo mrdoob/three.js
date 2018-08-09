@@ -5,12 +5,16 @@ import { Color } from '../math/Color.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function FogExp2( color, density ) {
+class FogExp2 {
 
-	this.name = '';
+	constructor( color, density ) {
 
-	this.color = new Color( color );
-	this.density = ( density !== undefined ) ? density : 0.00025;
+		this.name = '';
+
+		this.color = new Color( color );
+		this.density = ( density !== undefined ) ? density : 0.00025;
+
+	}
 
 }
 

@@ -8,17 +8,15 @@ import { Texture } from '../textures/Texture.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
 
-function TextureLoader( manager ) {
+class TextureLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-Object.assign( TextureLoader.prototype, {
+	}
 
-	crossOrigin: 'anonymous',
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var texture = new Texture();
 
@@ -46,23 +44,25 @@ Object.assign( TextureLoader.prototype, {
 
 		return texture;
 
-	},
+	}
 
-	setCrossOrigin: function ( value ) {
+	setCrossOrigin( value ) {
 
 		this.crossOrigin = value;
 		return this;
 
-	},
+	}
 
-	setPath: function ( value ) {
+	setPath( value ) {
 
 		this.path = value;
 		return this;
 
 	}
 
-} );
+}
+
+TextureLoader.prototype.crossOrigin = 'anonymous';
 
 
 export { TextureLoader };

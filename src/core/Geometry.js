@@ -21,50 +21,48 @@ import { _Math } from '../math/Math.js';
 
 var geometryId = 0; // Geometry uses even numbers as Id
 
-function Geometry() {
+class Geometry extends EventDispatcher {
 
-	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
+	constructor() {
 
-	this.uuid = _Math.generateUUID();
+		super();
 
-	this.name = '';
-	this.type = 'Geometry';
+		Object.defineProperty( this, 'id', { value: geometryId += 2 } );
 
-	this.vertices = [];
-	this.colors = [];
-	this.faces = [];
-	this.faceVertexUvs = [[]];
+		this.uuid = _Math.generateUUID();
 
-	this.morphTargets = [];
-	this.morphNormals = [];
+		this.name = '';
+		this.type = 'Geometry';
 
-	this.skinWeights = [];
-	this.skinIndices = [];
+		this.vertices = [];
+		this.colors = [];
+		this.faces = [];
+		this.faceVertexUvs = [[]];
 
-	this.lineDistances = [];
+		this.morphTargets = [];
+		this.morphNormals = [];
 
-	this.boundingBox = null;
-	this.boundingSphere = null;
+		this.skinWeights = [];
+		this.skinIndices = [];
 
-	// update flags
+		this.lineDistances = [];
 
-	this.elementsNeedUpdate = false;
-	this.verticesNeedUpdate = false;
-	this.uvsNeedUpdate = false;
-	this.normalsNeedUpdate = false;
-	this.colorsNeedUpdate = false;
-	this.lineDistancesNeedUpdate = false;
-	this.groupsNeedUpdate = false;
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
-}
+		// update flags
 
-Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		this.elementsNeedUpdate = false;
+		this.verticesNeedUpdate = false;
+		this.uvsNeedUpdate = false;
+		this.normalsNeedUpdate = false;
+		this.colorsNeedUpdate = false;
+		this.lineDistancesNeedUpdate = false;
+		this.groupsNeedUpdate = false;
 
-	constructor: Geometry,
+	}
 
-	isGeometry: true,
-
-	applyMatrix: function ( matrix ) {
+	applyMatrix( matrix ) {
 
 		var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
@@ -105,115 +103,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	rotateX: function () {
-
-		// rotate geometry around world x-axis
-
-		var m1 = new Matrix4();
-
-		return function rotateX( angle ) {
-
-			m1.makeRotationX( angle );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	rotateY: function () {
-
-		// rotate geometry around world y-axis
-
-		var m1 = new Matrix4();
-
-		return function rotateY( angle ) {
-
-			m1.makeRotationY( angle );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	rotateZ: function () {
-
-		// rotate geometry around world z-axis
-
-		var m1 = new Matrix4();
-
-		return function rotateZ( angle ) {
-
-			m1.makeRotationZ( angle );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	translate: function () {
-
-		// translate geometry
-
-		var m1 = new Matrix4();
-
-		return function translate( x, y, z ) {
-
-			m1.makeTranslation( x, y, z );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	scale: function () {
-
-		// scale geometry
-
-		var m1 = new Matrix4();
-
-		return function scale( x, y, z ) {
-
-			m1.makeScale( x, y, z );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	lookAt: function () {
-
-		var obj = new Object3D();
-
-		return function lookAt( vector ) {
-
-			obj.lookAt( vector );
-
-			obj.updateMatrix();
-
-			this.applyMatrix( obj.matrix );
-
-		};
-
-	}(),
-
-	fromBufferGeometry: function ( geometry ) {
+	fromBufferGeometry( geometry ) {
 
 		var scope = this;
 
@@ -350,27 +242,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	center: function () {
-
-		var offset = new Vector3();
-
-		return function center() {
-
-			this.computeBoundingBox();
-
-			this.boundingBox.getCenter( offset ).negate();
-
-			this.translate( offset.x, offset.y, offset.z );
-
-			return this;
-
-		};
-
-	}(),
-
-	normalize: function () {
+	normalize() {
 
 		this.computeBoundingSphere();
 
@@ -391,9 +265,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	computeFaceNormals: function () {
+	computeFaceNormals() {
 
 		var cb = new Vector3(), ab = new Vector3();
 
@@ -415,9 +289,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	computeVertexNormals: function ( areaWeighted ) {
+	computeVertexNormals( areaWeighted ) {
 
 		if ( areaWeighted === undefined ) areaWeighted = true;
 
@@ -507,9 +381,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	computeFlatVertexNormals: function () {
+	computeFlatVertexNormals() {
 
 		var f, fl, face;
 
@@ -543,9 +417,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	computeMorphNormals: function () {
+	computeMorphNormals() {
 
 		var i, il, f, fl, face;
 
@@ -660,9 +534,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	computeBoundingBox: function () {
+	computeBoundingBox() {
 
 		if ( this.boundingBox === null ) {
 
@@ -672,9 +546,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.boundingBox.setFromPoints( this.vertices );
 
-	},
+	}
 
-	computeBoundingSphere: function () {
+	computeBoundingSphere() {
 
 		if ( this.boundingSphere === null ) {
 
@@ -684,9 +558,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.boundingSphere.setFromPoints( this.vertices );
 
-	},
+	}
 
-	merge: function ( geometry, matrix, materialIndexOffset ) {
+	merge( geometry, matrix, materialIndexOffset ) {
 
 		if ( ! ( geometry && geometry.isGeometry ) ) {
 
@@ -804,9 +678,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	mergeMesh: function ( mesh ) {
+	mergeMesh( mesh ) {
 
 		if ( ! ( mesh && mesh.isMesh ) ) {
 
@@ -819,7 +693,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.merge( mesh.geometry, mesh.matrix );
 
-	},
+	}
 
 	/*
 	 * Checks for duplicate vertices with hashmap.
@@ -827,7 +701,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	 * and faces' vertices are updated.
 	 */
 
-	mergeVertices: function () {
+	mergeVertices() {
 
 		var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
@@ -908,9 +782,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.vertices = unique;
 		return diff;
 
-	},
+	}
 
-	setFromPoints: function ( points ) {
+	setFromPoints( points ) {
 
 		this.vertices = [];
 
@@ -923,9 +797,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	sortFacesByMaterialIndex: function () {
+	sortFacesByMaterialIndex() {
 
 		var faces = this.faces;
 		var length = faces.length;
@@ -970,9 +844,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( newUvs1 ) this.faceVertexUvs[ 0 ] = newUvs1;
 		if ( newUvs2 ) this.faceVertexUvs[ 1 ] = newUvs2;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		var data = {
 			metadata: {
@@ -1163,9 +1037,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return data;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		/*
 		 // Handle primitives
@@ -1193,9 +1067,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return new Geometry().copy( this );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		var i, il, j, jl, k, kl;
 
@@ -1427,15 +1301,141 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
-} );
+}
+
+Geometry.prototype.isGeometry = true;
+
+Geometry.prototype.rotateX = function () {
+
+	// rotate geometry around world x-axis
+
+	var m1 = new Matrix4();
+
+	return function rotateX( angle ) {
+
+		m1.makeRotationX( angle );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+Geometry.prototype.rotateY = function () {
+
+	// rotate geometry around world y-axis
+
+	var m1 = new Matrix4();
+
+	return function rotateY( angle ) {
+
+		m1.makeRotationY( angle );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+Geometry.prototype.rotateZ = function () {
+
+	// rotate geometry around world z-axis
+
+	var m1 = new Matrix4();
+
+	return function rotateZ( angle ) {
+
+		m1.makeRotationZ( angle );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+Geometry.prototype.translate = function () {
+
+	// translate geometry
+
+	var m1 = new Matrix4();
+
+	return function translate( x, y, z ) {
+
+		m1.makeTranslation( x, y, z );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+Geometry.prototype.scale = function () {
+
+	// scale geometry
+
+	var m1 = new Matrix4();
+
+	return function scale( x, y, z ) {
+
+		m1.makeScale( x, y, z );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+Geometry.prototype.lookAt = function () {
+
+	var obj = new Object3D();
+
+	return function lookAt( vector ) {
+
+		obj.lookAt( vector );
+
+		obj.updateMatrix();
+
+		this.applyMatrix( obj.matrix );
+
+	};
+
+}();
+
+Geometry.prototype.center = function () {
+
+	var offset = new Vector3();
+
+	return function center() {
+
+		this.computeBoundingBox();
+
+		this.boundingBox.getCenter( offset ).negate();
+
+		this.translate( offset.x, offset.y, offset.z );
+
+		return this;
+
+	};
+
+}();
 
 
 export { Geometry };

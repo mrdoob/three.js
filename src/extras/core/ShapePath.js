@@ -8,52 +8,52 @@ import { Path } from './Path.js';
 import { Shape } from './Shape.js';
 import { ShapeUtils } from '../ShapeUtils.js';
 
-function ShapePath() {
+class ShapePath {
 
-	this.type = 'ShapePath';
+	constructor() {
 
-	this.color = new Color();
+		this.type = 'ShapePath';
 
-	this.subPaths = [];
-	this.currentPath = null;
+		this.color = new Color();
 
-}
+		this.subPaths = [];
+		this.currentPath = null;
 
-Object.assign( ShapePath.prototype, {
+	}
 
-	moveTo: function ( x, y ) {
+	moveTo( x, y ) {
 
 		this.currentPath = new Path();
 		this.subPaths.push( this.currentPath );
 		this.currentPath.moveTo( x, y );
 
-	},
+	}
 
-	lineTo: function ( x, y ) {
+	lineTo( x, y ) {
 
 		this.currentPath.lineTo( x, y );
 
-	},
+	}
 
-	quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
+	quadraticCurveTo( aCPx, aCPy, aX, aY ) {
 
 		this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
 
-	},
+	}
 
-	bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
+	bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
 		this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
 
-	},
+	}
 
-	splineThru: function ( pts ) {
+	splineThru( pts ) {
 
 		this.currentPath.splineThru( pts );
 
-	},
+	}
 
-	toShapes: function ( isCCW, noHoles ) {
+	toShapes( isCCW, noHoles ) {
 
 		function toShapesNoHoles( inSubpaths ) {
 
@@ -280,7 +280,7 @@ Object.assign( ShapePath.prototype, {
 
 	}
 
-} );
+}
 
 
 export { ShapePath };

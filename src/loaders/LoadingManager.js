@@ -2,90 +2,94 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function LoadingManager( onLoad, onProgress, onError ) {
+class LoadingManager {
 
-	var scope = this;
+	constructor( onLoad, onProgress, onError ) {
 
-	var isLoading = false;
-	var itemsLoaded = 0;
-	var itemsTotal = 0;
-	var urlModifier = undefined;
+		var scope = this;
 
-	this.onStart = undefined;
-	this.onLoad = onLoad;
-	this.onProgress = onProgress;
-	this.onError = onError;
+		var isLoading = false;
+		var itemsLoaded = 0;
+		var itemsTotal = 0;
+		var urlModifier = undefined;
 
-	this.itemStart = function ( url ) {
+		this.onStart = undefined;
+		this.onLoad = onLoad;
+		this.onProgress = onProgress;
+		this.onError = onError;
 
-		itemsTotal ++;
+		this.itemStart = function ( url ) {
 
-		if ( isLoading === false ) {
+			itemsTotal ++;
 
-			if ( scope.onStart !== undefined ) {
+			if ( isLoading === false ) {
 
-				scope.onStart( url, itemsLoaded, itemsTotal );
+				if ( scope.onStart !== undefined ) {
 
-			}
+					scope.onStart( url, itemsLoaded, itemsTotal );
 
-		}
-
-		isLoading = true;
-
-	};
-
-	this.itemEnd = function ( url ) {
-
-		itemsLoaded ++;
-
-		if ( scope.onProgress !== undefined ) {
-
-			scope.onProgress( url, itemsLoaded, itemsTotal );
-
-		}
-
-		if ( itemsLoaded === itemsTotal ) {
-
-			isLoading = false;
-
-			if ( scope.onLoad !== undefined ) {
-
-				scope.onLoad();
+				}
 
 			}
 
-		}
+			isLoading = true;
 
-	};
+		};
 
-	this.itemError = function ( url ) {
+		this.itemEnd = function ( url ) {
 
-		if ( scope.onError !== undefined ) {
+			itemsLoaded ++;
 
-			scope.onError( url );
+			if ( scope.onProgress !== undefined ) {
 
-		}
+				scope.onProgress( url, itemsLoaded, itemsTotal );
 
-	};
+			}
 
-	this.resolveURL = function ( url ) {
+			if ( itemsLoaded === itemsTotal ) {
 
-		if ( urlModifier ) {
+				isLoading = false;
 
-			return urlModifier( url );
+				if ( scope.onLoad !== undefined ) {
 
-		}
+					scope.onLoad();
 
-		return url;
+				}
 
-	};
+			}
 
-	this.setURLModifier = function ( transform ) {
+		};
 
-		urlModifier = transform;
-		return this;
+		this.itemError = function ( url ) {
 
-	};
+			if ( scope.onError !== undefined ) {
+
+				scope.onError( url );
+
+			}
+
+		};
+
+		this.resolveURL = function ( url ) {
+
+			if ( urlModifier ) {
+
+				return urlModifier( url );
+
+			}
+
+			return url;
+
+		};
+
+		this.setURLModifier = function ( transform ) {
+
+			urlModifier = transform;
+			return this;
+
+		};
+
+	}
 
 }
 

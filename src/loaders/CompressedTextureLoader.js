@@ -9,18 +9,18 @@ import { DefaultLoadingManager } from './LoadingManager.js';
  * Abstract Base class to block based textures loader (dds, pvr, ...)
  */
 
-function CompressedTextureLoader( manager ) {
+class CompressedTextureLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-	// override in sub classes
-	this._parser = null;
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-}
+		// override in sub classes
+		this._parser = null;
 
-Object.assign( CompressedTextureLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -126,16 +126,16 @@ Object.assign( CompressedTextureLoader.prototype, {
 
 		return texture;
 
-	},
+	}
 
-	setPath: function ( value ) {
+	setPath( value ) {
 
 		this.path = value;
 		return this;
 
 	}
 
-} );
+}
 
 
 export { CompressedTextureLoader };

@@ -4,25 +4,23 @@ import { Object3D } from '../core/Object3D.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Scene() {
+class Scene extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'Scene';
+		super();
 
-	this.background = null;
-	this.fog = null;
-	this.overrideMaterial = null;
+		this.type = 'Scene';
 
-	this.autoUpdate = true; // checked by the renderer
+		this.background = null;
+		this.fog = null;
+		this.overrideMaterial = null;
 
-}
+		this.autoUpdate = true; // checked by the renderer
 
-Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: Scene,
-
-	copy: function ( source, recursive ) {
+	copy( source, recursive ) {
 
 		Object3D.prototype.copy.call( this, source, recursive );
 
@@ -35,9 +33,9 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
 
@@ -48,7 +46,7 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 
 

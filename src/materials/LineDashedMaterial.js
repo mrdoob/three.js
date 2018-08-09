@@ -15,22 +15,26 @@
 
 import { LineBasicMaterial } from './LineBasicMaterial.js';
 
-function LineDashedMaterial( parameters ) {
+class LineDashedMaterial extends LineBasicMaterial {
 
-	LineBasicMaterial.call( this );
+	constructor( parameters ) {
 
-	this.type = 'LineDashedMaterial';
+		super();
 
-	this.scale = 1;
-	this.dashSize = 3;
-	this.gapSize = 1;
+		this.type = 'LineDashedMaterial';
 
-	this.setValues( parameters );
+		this.scale = 1;
+		this.dashSize = 3;
+		this.gapSize = 1;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-LineDashedMaterial.prototype = Object.create( LineBasicMaterial.prototype );
-LineDashedMaterial.prototype.constructor = LineDashedMaterial;
+
+
 
 LineDashedMaterial.prototype.isLineDashedMaterial = true;
 

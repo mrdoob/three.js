@@ -4,24 +4,20 @@ import { Light } from './Light.js';
  * @author abelnation / http://github.com/abelnation
  */
 
-function RectAreaLight( color, intensity, width, height ) {
+class RectAreaLight extends Light {
 
-	Light.call( this, color, intensity );
+	constructor( color, intensity, width, height ) {
 
-	this.type = 'RectAreaLight';
+		super( color, intensity );
 
-	this.width = ( width !== undefined ) ? width : 10;
-	this.height = ( height !== undefined ) ? height : 10;
+		this.type = 'RectAreaLight';
 
-}
+		this.width = ( width !== undefined ) ? width : 10;
+		this.height = ( height !== undefined ) ? height : 10;
 
-RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
+	}
 
-	constructor: RectAreaLight,
-
-	isRectAreaLight: true,
-
-	copy: function ( source ) {
+	copy( source ) {
 
 		Light.prototype.copy.call( this, source );
 
@@ -30,9 +26,9 @@ RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		var data = Light.prototype.toJSON.call( this, meta );
 
@@ -43,6 +39,8 @@ RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	}
 
-} );
+}
+
+RectAreaLight.prototype.isRectAreaLight = true;
 
 export { RectAreaLight };

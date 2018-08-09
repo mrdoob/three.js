@@ -10,34 +10,38 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
-function RectAreaLightHelper( light, color ) {
+class RectAreaLightHelper extends Object3D {
 
-	Object3D.call( this );
+	constructor( light, color ) {
 
-	this.light = light;
-	this.light.updateMatrixWorld();
+		super();
 
-	this.matrix = light.matrixWorld;
-	this.matrixAutoUpdate = false;
+		this.light = light;
+		this.light.updateMatrixWorld();
 
-	this.color = color;
+		this.matrix = light.matrixWorld;
+		this.matrixAutoUpdate = false;
 
-	var material = new LineBasicMaterial( { fog: false } );
+		this.color = color;
 
-	var geometry = new BufferGeometry();
+		var material = new LineBasicMaterial( { fog: false } );
 
-	geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 5 * 3 ), 3 ) );
+		var geometry = new BufferGeometry();
 
-	this.line = new Line( geometry, material );
-	this.add( this.line );
+		geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 5 * 3 ), 3 ) );
+
+		this.line = new Line( geometry, material );
+		this.add( this.line );
 
 
-	this.update();
+		this.update();
+
+	}
 
 }
 
-RectAreaLightHelper.prototype = Object.create( Object3D.prototype );
-RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
+
+
 
 RectAreaLightHelper.prototype.dispose = function () {
 

@@ -6,15 +6,15 @@ import { DefaultLoadingManager } from './LoadingManager.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function FontLoader( manager ) {
+class FontLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-Object.assign( FontLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -41,22 +41,22 @@ Object.assign( FontLoader.prototype, {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		return new Font( json );
 
-	},
+	}
 
-	setPath: function ( value ) {
+	setPath( value ) {
 
 		this.path = value;
 		return this;
 
 	}
 
-} );
+}
 
 
 export { FontLoader };

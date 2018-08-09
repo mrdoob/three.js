@@ -3,20 +3,24 @@ import { QuadraticBezier } from '../core/Interpolations.js';
 import { Vector2 } from '../../math/Vector2.js';
 
 
-function QuadraticBezierCurve( v0, v1, v2 ) {
+class QuadraticBezierCurve extends Curve {
 
-	Curve.call( this );
+	constructor( v0, v1, v2 ) {
 
-	this.type = 'QuadraticBezierCurve';
+		super();
 
-	this.v0 = v0 || new Vector2();
-	this.v1 = v1 || new Vector2();
-	this.v2 = v2 || new Vector2();
+		this.type = 'QuadraticBezierCurve';
+
+		this.v0 = v0 || new Vector2();
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
+
+	}
 
 }
 
-QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
-QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
+
+
 
 QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
 

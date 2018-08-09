@@ -10,53 +10,57 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-function FaceNormalsHelper( object, size, hex, linewidth ) {
+class FaceNormalsHelper extends LineSegments {
 
-	// FaceNormalsHelper only supports THREE.Geometry
+	constructor( object, size, hex, linewidth ) {
 
-	this.object = object;
+		var color = ( hex !== undefined ) ? hex : 0xffff00;
 
-	this.size = ( size !== undefined ) ? size : 1;
+		var width = ( linewidth !== undefined ) ? linewidth : 1;
 
-	var color = ( hex !== undefined ) ? hex : 0xffff00;
+		//
 
-	var width = ( linewidth !== undefined ) ? linewidth : 1;
+		var nNormals = 0;
 
-	//
+		if ( objGeometry && objGeometry.isGeometry ) {
 
-	var nNormals = 0;
+			nNormals = objGeometry.faces.length;
 
-	var objGeometry = this.object.geometry;
+		} else {
 
-	if ( objGeometry && objGeometry.isGeometry ) {
+			console.warn( 'THREE.FaceNormalsHelper: only THREE.Geometry is supported. Use THREE.VertexNormalsHelper, instead.' );
 
-		nNormals = objGeometry.faces.length;
+		}
 
-	} else {
+		//
 
-		console.warn( 'THREE.FaceNormalsHelper: only THREE.Geometry is supported. Use THREE.VertexNormalsHelper, instead.' );
+		var geometry = new BufferGeometry();
+
+		var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
+
+		geometry.addAttribute( 'position', positions );
+
+		super( geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
+
+		// FaceNormalsHelper only supports THREE.Geometry
+
+		this.object = object;
+
+		this.size = ( size !== undefined ) ? size : 1;
+
+		var objGeometry = this.object.geometry;
+
+		//
+
+		this.matrixAutoUpdate = false;
+		this.update();
 
 	}
 
-	//
-
-	var geometry = new BufferGeometry();
-
-	var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
-
-	geometry.addAttribute( 'position', positions );
-
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
-
-	//
-
-	this.matrixAutoUpdate = false;
-	this.update();
-
 }
 
-FaceNormalsHelper.prototype = Object.create( LineSegments.prototype );
-FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;
+
+
 
 FaceNormalsHelper.prototype.update = ( function () {
 

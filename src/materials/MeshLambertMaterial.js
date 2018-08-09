@@ -40,50 +40,54 @@ import { Color } from '../math/Color.js';
  * }
  */
 
-function MeshLambertMaterial( parameters ) {
+class MeshLambertMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'MeshLambertMaterial';
+		super();
 
-	this.color = new Color( 0xffffff ); // diffuse
+		this.type = 'MeshLambertMaterial';
 
-	this.map = null;
+		this.color = new Color( 0xffffff ); // diffuse
 
-	this.lightMap = null;
-	this.lightMapIntensity = 1.0;
+		this.map = null;
 
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
+		this.lightMap = null;
+		this.lightMapIntensity = 1.0;
 
-	this.emissive = new Color( 0x000000 );
-	this.emissiveIntensity = 1.0;
-	this.emissiveMap = null;
+		this.aoMap = null;
+		this.aoMapIntensity = 1.0;
 
-	this.specularMap = null;
+		this.emissive = new Color( 0x000000 );
+		this.emissiveIntensity = 1.0;
+		this.emissiveMap = null;
 
-	this.alphaMap = null;
+		this.specularMap = null;
 
-	this.envMap = null;
-	this.combine = MultiplyOperation;
-	this.reflectivity = 1;
-	this.refractionRatio = 0.98;
+		this.alphaMap = null;
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
+		this.envMap = null;
+		this.combine = MultiplyOperation;
+		this.reflectivity = 1;
+		this.refractionRatio = 0.98;
 
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
+		this.wireframeLinecap = 'round';
+		this.wireframeLinejoin = 'round';
 
-	this.setValues( parameters );
+		this.skinning = false;
+		this.morphTargets = false;
+		this.morphNormals = false;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-MeshLambertMaterial.prototype = Object.create( Material.prototype );
-MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;
+
+
 
 MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 

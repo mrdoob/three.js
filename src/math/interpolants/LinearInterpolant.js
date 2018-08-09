@@ -4,17 +4,15 @@ import { Interpolant } from '../Interpolant.js';
  * @author tschw
  */
 
-function LinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+class LinearInterpolant extends Interpolant {
 
-	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-}
+		super( parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-LinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
+	}
 
-	constructor: LinearInterpolant,
-
-	interpolate_: function ( i1, t0, t, t1 ) {
+	interpolate_( i1, t0, t, t1 ) {
 
 		var result = this.resultBuffer,
 			values = this.sampleValues,
@@ -38,7 +36,7 @@ LinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototyp
 
 	}
 
-} );
+}
 
 
 export { LinearInterpolant };

@@ -7,15 +7,15 @@ import { DefaultLoadingManager } from './LoadingManager.js';
 
 var loading = {};
 
-function FileLoader( manager ) {
+class FileLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-Object.assign( FileLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
@@ -258,44 +258,44 @@ Object.assign( FileLoader.prototype, {
 
 		return request;
 
-	},
+	}
 
-	setPath: function ( value ) {
+	setPath( value ) {
 
 		this.path = value;
 		return this;
 
-	},
+	}
 
-	setResponseType: function ( value ) {
+	setResponseType( value ) {
 
 		this.responseType = value;
 		return this;
 
-	},
+	}
 
-	setWithCredentials: function ( value ) {
+	setWithCredentials( value ) {
 
 		this.withCredentials = value;
 		return this;
 
-	},
+	}
 
-	setMimeType: function ( value ) {
+	setMimeType( value ) {
 
 		this.mimeType = value;
 		return this;
 
-	},
+	}
 
-	setRequestHeader: function ( value ) {
+	setRequestHeader( value ) {
 
 		this.requestHeader = value;
 		return this;
 
 	}
 
-} );
+}
 
 
 export { FileLoader };

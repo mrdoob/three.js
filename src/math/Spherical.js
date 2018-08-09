@@ -10,19 +10,19 @@ import { _Math } from './Math.js';
  * The equator starts at positive z.
  */
 
-function Spherical( radius, phi, theta ) {
+class Spherical {
 
-	this.radius = ( radius !== undefined ) ? radius : 1.0;
-	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
-	this.theta = ( theta !== undefined ) ? theta : 0; // around the equator of the sphere
+	constructor( radius, phi, theta ) {
 
-	return this;
+		this.radius = ( radius !== undefined ) ? radius : 1.0;
+		this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
+		this.theta = ( theta !== undefined ) ? theta : 0; // around the equator of the sphere
 
-}
+		return this;
 
-Object.assign( Spherical.prototype, {
+	}
 
-	set: function ( radius, phi, theta ) {
+	set( radius, phi, theta ) {
 
 		this.radius = radius;
 		this.phi = phi;
@@ -30,15 +30,15 @@ Object.assign( Spherical.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( other ) {
+	copy( other ) {
 
 		this.radius = other.radius;
 		this.phi = other.phi;
@@ -46,19 +46,19 @@ Object.assign( Spherical.prototype, {
 
 		return this;
 
-	},
+	}
 
 	// restrict phi to be betwee EPS and PI-EPS
-	makeSafe: function () {
+	makeSafe() {
 
 		var EPS = 0.000001;
 		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
 
 		return this;
 
-	},
+	}
 
-	setFromVector3: function ( vec3 ) {
+	setFromVector3( vec3 ) {
 
 		this.radius = vec3.length();
 
@@ -78,7 +78,7 @@ Object.assign( Spherical.prototype, {
 
 	}
 
-} );
+}
 
 
 export { Spherical };

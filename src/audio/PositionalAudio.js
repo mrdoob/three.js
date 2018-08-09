@@ -7,82 +7,80 @@ import { Quaternion } from '../math/Quaternion.js';
 import { Audio } from './Audio.js';
 import { Object3D } from '../core/Object3D.js';
 
-function PositionalAudio( listener ) {
+class PositionalAudio extends Audio {
 
-	Audio.call( this, listener );
+	constructor( listener ) {
 
-	this.panner = this.context.createPanner();
-	this.panner.connect( this.gain );
+		super( listener );
 
-}
+		this.panner = this.context.createPanner();
+		this.panner.connect( this.gain );
 
-PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
+	}
 
-	constructor: PositionalAudio,
-
-	getOutput: function () {
+	getOutput() {
 
 		return this.panner;
 
-	},
+	}
 
-	getRefDistance: function () {
+	getRefDistance() {
 
 		return this.panner.refDistance;
 
-	},
+	}
 
-	setRefDistance: function ( value ) {
+	setRefDistance( value ) {
 
 		this.panner.refDistance = value;
 
 		return this;
 
-	},
+	}
 
-	getRolloffFactor: function () {
+	getRolloffFactor() {
 
 		return this.panner.rolloffFactor;
 
-	},
+	}
 
-	setRolloffFactor: function ( value ) {
+	setRolloffFactor( value ) {
 
 		this.panner.rolloffFactor = value;
 
 		return this;
 
-	},
+	}
 
-	getDistanceModel: function () {
+	getDistanceModel() {
 
 		return this.panner.distanceModel;
 
-	},
+	}
 
-	setDistanceModel: function ( value ) {
+	setDistanceModel( value ) {
 
 		this.panner.distanceModel = value;
 
 		return this;
 
-	},
+	}
 
-	getMaxDistance: function () {
+	getMaxDistance() {
 
 		return this.panner.maxDistance;
 
-	},
+	}
 
-	setMaxDistance: function ( value ) {
+	setMaxDistance( value ) {
 
 		this.panner.maxDistance = value;
 
 		return this;
 
-	},
+	}
 
-	setDirectionalCone: function ( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
+	setDirectionalCone( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
 
 		this.panner.coneInnerAngle = coneInnerAngle;
 		this.panner.coneOuterAngle = coneOuterAngle;
@@ -90,33 +88,32 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	updateMatrixWorld: ( function () {
+}
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
-		var scale = new Vector3();
+PositionalAudio.prototype.updateMatrixWorld = ( function () {
 
-		var orientation = new Vector3();
+	var position = new Vector3();
+	var quaternion = new Quaternion();
+	var scale = new Vector3();
 
-		return function updateMatrixWorld( force ) {
+	var orientation = new Vector3();
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+	return function updateMatrixWorld( force ) {
 
-			var panner = this.panner;
-			this.matrixWorld.decompose( position, quaternion, scale );
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+		var panner = this.panner;
+		this.matrixWorld.decompose( position, quaternion, scale );
 
-			panner.setPosition( position.x, position.y, position.z );
-			panner.setOrientation( orientation.x, orientation.y, orientation.z );
+		orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
-		};
+		panner.setPosition( position.x, position.y, position.z );
+		panner.setOrientation( orientation.x, orientation.y, orientation.z );
 
-	} )()
+	};
 
-
-} );
+} )();
 
 export { PositionalAudio };

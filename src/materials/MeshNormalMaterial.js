@@ -29,39 +29,43 @@ import { Vector2 } from '../math/Vector2.js';
  * }
  */
 
-function MeshNormalMaterial( parameters ) {
+class MeshNormalMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'MeshNormalMaterial';
+		super();
 
-	this.bumpMap = null;
-	this.bumpScale = 1;
+		this.type = 'MeshNormalMaterial';
 
-	this.normalMap = null;
-	this.normalMapType = TangentSpaceNormalMap;
-	this.normalScale = new Vector2( 1, 1 );
+		this.bumpMap = null;
+		this.bumpScale = 1;
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
 
-	this.fog = false;
-	this.lights = false;
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
 
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
+		this.fog = false;
+		this.lights = false;
 
-	this.setValues( parameters );
+		this.skinning = false;
+		this.morphTargets = false;
+		this.morphNormals = false;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-MeshNormalMaterial.prototype = Object.create( Material.prototype );
-MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;
+
+
 
 MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
 

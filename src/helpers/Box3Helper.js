@@ -9,32 +9,36 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Object3D } from '../core/Object3D.js';
 
-function Box3Helper( box, hex ) {
+class Box3Helper extends LineSegments {
 
-	this.type = 'Box3Helper';
+	constructor( box, hex ) {
 
-	this.box = box;
+		var color = ( hex !== undefined ) ? hex : 0xffff00;
 
-	var color = ( hex !== undefined ) ? hex : 0xffff00;
+		var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 
-	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
+		var positions = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 1, - 1, 1, - 1, - 1 ];
 
-	var positions = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 1, - 1, 1, - 1, - 1 ];
+		var geometry = new BufferGeometry();
 
-	var geometry = new BufferGeometry();
+		geometry.setIndex( new BufferAttribute( indices, 1 ) );
 
-	geometry.setIndex( new BufferAttribute( indices, 1 ) );
+		geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+		super( geometry, new LineBasicMaterial( { color: color } ) );
 
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
+		this.type = 'Box3Helper';
 
-	this.geometry.computeBoundingSphere();
+		this.box = box;
+
+		this.geometry.computeBoundingSphere();
+
+	}
 
 }
 
-Box3Helper.prototype = Object.create( LineSegments.prototype );
-Box3Helper.prototype.constructor = Box3Helper;
+
+
 
 Box3Helper.prototype.updateMatrixWorld = function ( force ) {
 

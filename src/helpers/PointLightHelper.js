@@ -7,50 +7,54 @@ import { Mesh } from '../objects/Mesh.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { SphereBufferGeometry } from '../geometries/SphereGeometry.js';
 
-function PointLightHelper( light, sphereSize, color ) {
+class PointLightHelper extends Mesh {
 
-	this.light = light;
-	this.light.updateMatrixWorld();
+	constructor( light, sphereSize, color ) {
 
-	this.color = color;
+		var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
+		var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 
-	var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
-	var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
+		super( geometry, material );
 
-	Mesh.call( this, geometry, material );
+		this.light = light;
+		this.light.updateMatrixWorld();
 
-	this.matrix = this.light.matrixWorld;
-	this.matrixAutoUpdate = false;
+		this.color = color;
 
-	this.update();
+		this.matrix = this.light.matrixWorld;
+		this.matrixAutoUpdate = false;
+
+		this.update();
 
 
-	/*
-	var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
-	var distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
+		/*
+		var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
+		var distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 
-	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
-	this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
+		this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
+		this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
 
-	var d = light.distance;
+		var d = light.distance;
 
-	if ( d === 0.0 ) {
+		if ( d === 0.0 ) {
 
-		this.lightDistance.visible = false;
+			this.lightDistance.visible = false;
 
-	} else {
+		} else {
 
-		this.lightDistance.scale.set( d, d, d );
+			this.lightDistance.scale.set( d, d, d );
+
+		}
+
+		this.add( this.lightDistance );
+		*/
 
 	}
 
-	this.add( this.lightDistance );
-	*/
-
 }
 
-PointLightHelper.prototype = Object.create( Mesh.prototype );
-PointLightHelper.prototype.constructor = PointLightHelper;
+
+
 
 PointLightHelper.prototype.dispose = function () {
 

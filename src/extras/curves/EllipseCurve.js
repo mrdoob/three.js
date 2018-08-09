@@ -2,29 +2,33 @@ import { Curve } from '../core/Curve.js';
 import { Vector2 } from '../../math/Vector2.js';
 
 
-function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+class EllipseCurve extends Curve {
 
-	Curve.call( this );
+	constructor( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
-	this.type = 'EllipseCurve';
+		super();
 
-	this.aX = aX || 0;
-	this.aY = aY || 0;
+		this.type = 'EllipseCurve';
 
-	this.xRadius = xRadius || 1;
-	this.yRadius = yRadius || 1;
+		this.aX = aX || 0;
+		this.aY = aY || 0;
 
-	this.aStartAngle = aStartAngle || 0;
-	this.aEndAngle = aEndAngle || 2 * Math.PI;
+		this.xRadius = xRadius || 1;
+		this.yRadius = yRadius || 1;
 
-	this.aClockwise = aClockwise || false;
+		this.aStartAngle = aStartAngle || 0;
+		this.aEndAngle = aEndAngle || 2 * Math.PI;
 
-	this.aRotation = aRotation || 0;
+		this.aClockwise = aClockwise || false;
+
+		this.aRotation = aRotation || 0;
+
+	}
 
 }
 
-EllipseCurve.prototype = Object.create( Curve.prototype );
-EllipseCurve.prototype.constructor = EllipseCurve;
+
+
 
 EllipseCurve.prototype.isEllipseCurve = true;
 

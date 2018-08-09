@@ -10,32 +10,28 @@ import { Matrix4 } from '../math/Matrix4.js';
  * @author ikerr / http://verold.com
  */
 
-function SkinnedMesh( geometry, material ) {
+class SkinnedMesh extends Mesh {
 
-	Mesh.call( this, geometry, material );
+	constructor( geometry, material ) {
 
-	this.type = 'SkinnedMesh';
+		super( geometry, material );
 
-	this.bindMode = 'attached';
-	this.bindMatrix = new Matrix4();
-	this.bindMatrixInverse = new Matrix4();
+		this.type = 'SkinnedMesh';
 
-	var bones = this.initBones();
-	var skeleton = new Skeleton( bones );
+		this.bindMode = 'attached';
+		this.bindMatrix = new Matrix4();
+		this.bindMatrixInverse = new Matrix4();
 
-	this.bind( skeleton, this.matrixWorld );
+		var bones = this.initBones();
+		var skeleton = new Skeleton( bones );
 
-	this.normalizeSkinWeights();
+		this.bind( skeleton, this.matrixWorld );
 
-}
+		this.normalizeSkinWeights();
 
-SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
+	}
 
-	constructor: SkinnedMesh,
-
-	isSkinnedMesh: true,
-
-	initBones: function () {
+	initBones() {
 
 		var bones = [], bone, gbone;
 		var i, il;
@@ -93,9 +89,9 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		return bones;
 
-	},
+	}
 
-	bind: function ( skeleton, bindMatrix ) {
+	bind( skeleton, bindMatrix ) {
 
 		this.skeleton = skeleton;
 
@@ -112,15 +108,15 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		this.bindMatrix.copy( bindMatrix );
 		this.bindMatrixInverse.getInverse( bindMatrix );
 
-	},
+	}
 
-	pose: function () {
+	pose() {
 
 		this.skeleton.pose();
 
-	},
+	}
 
-	normalizeSkinWeights: function () {
+	normalizeSkinWeights() {
 
 		var scale, i;
 
@@ -175,9 +171,9 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		}
 
-	},
+	}
 
-	updateMatrixWorld: function ( force ) {
+	updateMatrixWorld( force ) {
 
 		Mesh.prototype.updateMatrixWorld.call( this, force );
 
@@ -195,15 +191,17 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		}
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 
-} );
+}
+
+SkinnedMesh.prototype.isSkinnedMesh = true;
 
 
 export { SkinnedMesh };

@@ -16,103 +16,82 @@ import { _Math } from '../math/Math.js';
  * @author David Sarno / http://lighthaus.us/
  */
 
-function AnimationClip( name, duration, tracks ) {
+class AnimationClip {
 
-	this.name = name;
-	this.tracks = tracks;
-	this.duration = ( duration !== undefined ) ? duration : - 1;
+	constructor( name, duration, tracks ) {
 
-	this.uuid = _Math.generateUUID();
+		this.name = name;
+		this.tracks = tracks;
+		this.duration = ( duration !== undefined ) ? duration : - 1;
 
-	// this means it should figure out its duration by scanning the tracks
-	if ( this.duration < 0 ) {
+		this.uuid = _Math.generateUUID();
 
-		this.resetDuration();
+		// this means it should figure out its duration by scanning the tracks
+		if ( this.duration < 0 ) {
 
-	}
+			this.resetDuration();
 
-}
-
-function getTrackTypeForValueTypeName( typeName ) {
-
-	switch ( typeName.toLowerCase() ) {
-
-		case 'scalar':
-		case 'double':
-		case 'float':
-		case 'number':
-		case 'integer':
-
-			return NumberKeyframeTrack;
-
-		case 'vector':
-		case 'vector2':
-		case 'vector3':
-		case 'vector4':
-
-			return VectorKeyframeTrack;
-
-		case 'color':
-
-			return ColorKeyframeTrack;
-
-		case 'quaternion':
-
-			return QuaternionKeyframeTrack;
-
-		case 'bool':
-		case 'boolean':
-
-			return BooleanKeyframeTrack;
-
-		case 'string':
-
-			return StringKeyframeTrack;
+		}
 
 	}
 
-	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+	resetDuration() {
 
-}
+		var tracks = this.tracks, duration = 0;
 
-function parseKeyframeTrack( json ) {
+		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
 
-	if ( json.type === undefined ) {
+			var track = this.tracks[ i ];
 
-		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+			duration = Math.max( duration, track.times[ track.times.length - 1 ] );
 
-	}
+		}
 
-	var trackType = getTrackTypeForValueTypeName( json.type );
+		this.duration = duration;
 
-	if ( json.times === undefined ) {
-
-		var times = [], values = [];
-
-		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
-
-		json.times = times;
-		json.values = values;
+		return this;
 
 	}
 
-	// derived classes can define a static parse method
-	if ( trackType.parse !== undefined ) {
+	trim() {
 
-		return trackType.parse( json );
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
-	} else {
+			this.tracks[ i ].trim( 0, this.duration );
 
-		// by default, we assume a constructor compatible with the base
-		return new trackType( json.name, json.times, json.values, json.interpolation );
+		}
+
+		return this;
 
 	}
 
-}
+	validate() {
 
-Object.assign( AnimationClip, {
+		var valid = true;
 
-	parse: function ( json ) {
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			valid = valid && this.tracks[ i ].validate();
+
+		}
+
+		return valid;
+
+	}
+
+	optimize() {
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			this.tracks[ i ].optimize();
+
+		}
+
+		return this;
+
+	}
+
+	static parse( json ) {
 
 		var tracks = [],
 			jsonTracks = json.tracks,
@@ -126,9 +105,9 @@ Object.assign( AnimationClip, {
 
 		return new AnimationClip( json.name, json.duration, tracks );
 
-	},
+	}
 
-	toJSON: function ( clip ) {
+	static toJSON( clip ) {
 
 		var tracks = [],
 			clipTracks = clip.tracks;
@@ -150,9 +129,9 @@ Object.assign( AnimationClip, {
 
 		return json;
 
-	},
+	}
 
-	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
+	static CreateFromMorphTargetSequence( name, morphTargetSequence, fps, noLoop ) {
 
 		var numMorphTargets = morphTargetSequence.length;
 		var tracks = [];
@@ -192,9 +171,9 @@ Object.assign( AnimationClip, {
 
 		return new AnimationClip( name, - 1, tracks );
 
-	},
+	}
 
-	findByName: function ( objectOrClipArray, name ) {
+	static findByName( objectOrClipArray, name ) {
 
 		var clipArray = objectOrClipArray;
 
@@ -217,9 +196,9 @@ Object.assign( AnimationClip, {
 
 		return null;
 
-	},
+	}
 
-	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
+	static CreateClipsFromMorphTargetSequences( morphTargets, fps, noLoop ) {
 
 		var animationToMorphTargets = {};
 
@@ -261,10 +240,10 @@ Object.assign( AnimationClip, {
 
 		return clips;
 
-	},
+	}
 
 	// parse the animation.hierarchy format
-	parseAnimation: function ( animation, bones ) {
+	static parseAnimation( animation, bones ) {
 
 		if ( ! animation ) {
 
@@ -387,67 +366,84 @@ Object.assign( AnimationClip, {
 
 	}
 
-} );
+}
 
-Object.assign( AnimationClip.prototype, {
+function getTrackTypeForValueTypeName( typeName ) {
 
-	resetDuration: function () {
+	switch ( typeName.toLowerCase() ) {
 
-		var tracks = this.tracks, duration = 0;
+		case 'scalar':
+		case 'double':
+		case 'float':
+		case 'number':
+		case 'integer':
 
-		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
+			return NumberKeyframeTrack;
 
-			var track = this.tracks[ i ];
+		case 'vector':
+		case 'vector2':
+		case 'vector3':
+		case 'vector4':
 
-			duration = Math.max( duration, track.times[ track.times.length - 1 ] );
+			return VectorKeyframeTrack;
 
-		}
+		case 'color':
 
-		this.duration = duration;
+			return ColorKeyframeTrack;
 
-		return this;
+		case 'quaternion':
 
-	},
+			return QuaternionKeyframeTrack;
 
-	trim: function () {
+		case 'bool':
+		case 'boolean':
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
+			return BooleanKeyframeTrack;
 
-			this.tracks[ i ].trim( 0, this.duration );
+		case 'string':
 
-		}
-
-		return this;
-
-	},
-
-	validate: function () {
-
-		var valid = true;
-
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			valid = valid && this.tracks[ i ].validate();
-
-		}
-
-		return valid;
-
-	},
-
-	optimize: function () {
-
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			this.tracks[ i ].optimize();
-
-		}
-
-		return this;
+			return StringKeyframeTrack;
 
 	}
 
-} );
+	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+
+}
+
+function parseKeyframeTrack( json ) {
+
+	if ( json.type === undefined ) {
+
+		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+
+	}
+
+	var trackType = getTrackTypeForValueTypeName( json.type );
+
+	if ( json.times === undefined ) {
+
+		var times = [], values = [];
+
+		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
+
+		json.times = times;
+		json.values = values;
+
+	}
+
+	// derived classes can define a static parse method
+	if ( trackType.parse !== undefined ) {
+
+		return trackType.parse( json );
+
+	} else {
+
+		// by default, we assume a constructor compatible with the base
+		return new trackType( json.name, json.times, json.values, json.interpolation );
+
+	}
+
+}
 
 
 export { AnimationClip };

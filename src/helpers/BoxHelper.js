@@ -9,29 +9,33 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-function BoxHelper( object, color ) {
+class BoxHelper extends LineSegments {
 
-	this.object = object;
+	constructor( object, color ) {
 
-	if ( color === undefined ) color = 0xffff00;
+		if ( color === undefined ) color = 0xffff00;
 
-	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
-	var positions = new Float32Array( 8 * 3 );
+		var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
+		var positions = new Float32Array( 8 * 3 );
 
-	var geometry = new BufferGeometry();
-	geometry.setIndex( new BufferAttribute( indices, 1 ) );
-	geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
+		var geometry = new BufferGeometry();
+		geometry.setIndex( new BufferAttribute( indices, 1 ) );
+		geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
+		super( geometry, new LineBasicMaterial( { color: color } ) );
 
-	this.matrixAutoUpdate = false;
+		this.object = object;
 
-	this.update();
+		this.matrixAutoUpdate = false;
+
+		this.update();
+
+	}
 
 }
 
-BoxHelper.prototype = Object.create( LineSegments.prototype );
-BoxHelper.prototype.constructor = BoxHelper;
+
+
 
 BoxHelper.prototype.update = ( function () {
 

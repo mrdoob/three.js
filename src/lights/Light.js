@@ -6,26 +6,22 @@ import { Color } from '../math/Color.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Light( color, intensity ) {
+class Light extends Object3D {
 
-	Object3D.call( this );
+	constructor( color, intensity ) {
 
-	this.type = 'Light';
+		super();
 
-	this.color = new Color( color );
-	this.intensity = intensity !== undefined ? intensity : 1;
+		this.type = 'Light';
 
-	this.receiveShadow = undefined;
+		this.color = new Color( color );
+		this.intensity = intensity !== undefined ? intensity : 1;
 
-}
+		this.receiveShadow = undefined;
 
-Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: Light,
-
-	isLight: true,
-
-	copy: function ( source ) {
+	copy( source ) {
 
 		Object3D.prototype.copy.call( this, source );
 
@@ -34,9 +30,9 @@ Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
 
@@ -56,7 +52,9 @@ Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
+
+Light.prototype.isLight = true;
 
 
 export { Light };

@@ -2,49 +2,53 @@
  * @author fordacious / fordacious.github.io
  */
 
-function WebGLProperties() {
+class WebGLProperties {
 
-	var properties = new WeakMap();
+	constructor() {
 
-	function get( object ) {
+		var properties = new WeakMap();
 
-		var map = properties.get( object );
+		function get( object ) {
 
-		if ( map === undefined ) {
+			var map = properties.get( object );
 
-			map = {};
-			properties.set( object, map );
+			if ( map === undefined ) {
+
+				map = {};
+				properties.set( object, map );
+
+			}
+
+			return map;
 
 		}
 
-		return map;
+		function remove( object ) {
+
+			properties.delete( object );
+
+		}
+
+		function update( object, key, value ) {
+
+			properties.get( object )[ key ] = value;
+
+		}
+
+		function dispose() {
+
+			properties = new WeakMap();
+
+		}
+
+		return {
+			get: get,
+			remove: remove,
+			update: update,
+			dispose: dispose
+		};
 
 	}
-
-	function remove( object ) {
-
-		properties.delete( object );
-
-	}
-
-	function update( object, key, value ) {
-
-		properties.get( object )[ key ] = value;
-
-	}
-
-	function dispose() {
-
-		properties = new WeakMap();
-
-	}
-
-	return {
-		get: get,
-		remove: remove,
-		update: update,
-		dispose: dispose
-	};
 
 }
 

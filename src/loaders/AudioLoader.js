@@ -6,15 +6,15 @@ import { DefaultLoadingManager } from './LoadingManager.js';
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
-function AudioLoader( manager ) {
+class AudioLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-Object.assign( AudioLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
@@ -35,7 +35,7 @@ Object.assign( AudioLoader.prototype, {
 
 	}
 
-} );
+}
 
 
 export { AudioLoader };

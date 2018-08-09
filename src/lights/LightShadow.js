@@ -5,23 +5,23 @@ import { Vector2 } from '../math/Vector2.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function LightShadow( camera ) {
+class LightShadow {
 
-	this.camera = camera;
+	constructor( camera ) {
 
-	this.bias = 0;
-	this.radius = 1;
+		this.camera = camera;
 
-	this.mapSize = new Vector2( 512, 512 );
+		this.bias = 0;
+		this.radius = 1;
 
-	this.map = null;
-	this.matrix = new Matrix4();
+		this.mapSize = new Vector2( 512, 512 );
 
-}
+		this.map = null;
+		this.matrix = new Matrix4();
 
-Object.assign( LightShadow.prototype, {
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.camera = source.camera.clone();
 
@@ -32,15 +32,15 @@ Object.assign( LightShadow.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		var object = {};
 
@@ -55,7 +55,7 @@ Object.assign( LightShadow.prototype, {
 
 	}
 
-} );
+}
 
 
 export { LightShadow };

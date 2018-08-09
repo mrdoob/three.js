@@ -5,14 +5,18 @@ import { Color } from '../math/Color.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Fog( color, near, far ) {
+class Fog {
 
-	this.name = '';
+	constructor( color, near, far ) {
 
-	this.color = new Color( color );
+		this.name = '';
 
-	this.near = ( near !== undefined ) ? near : 1;
-	this.far = ( far !== undefined ) ? far : 1000;
+		this.color = new Color( color );
+
+		this.near = ( near !== undefined ) ? near : 1;
+		this.far = ( far !== undefined ) ? far : 1000;
+
+	}
 
 }
 

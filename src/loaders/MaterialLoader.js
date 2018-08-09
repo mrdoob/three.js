@@ -7,16 +7,16 @@ import * as Materials from '../materials/Materials.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function MaterialLoader( manager ) {
+class MaterialLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-	this.textures = {};
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		this.textures = {};
 
-Object.assign( MaterialLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -27,15 +27,15 @@ Object.assign( MaterialLoader.prototype, {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	setTextures: function ( value ) {
+	setTextures( value ) {
 
 		this.textures = value;
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		var textures = this.textures;
 
@@ -169,7 +169,7 @@ Object.assign( MaterialLoader.prototype, {
 
 	}
 
-} );
+}
 
 
 export { MaterialLoader };

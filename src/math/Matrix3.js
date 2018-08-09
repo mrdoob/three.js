@@ -7,29 +7,27 @@ import { Vector3 } from './Vector3.js';
  * @author tschw
  */
 
-function Matrix3() {
+class Matrix3 {
 
-	this.elements = [
+	constructor() {
 
-		1, 0, 0,
-		0, 1, 0,
-		0, 0, 1
+		this.elements = [
 
-	];
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
 
-	if ( arguments.length > 0 ) {
+		];
 
-		console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
+		if ( arguments.length > 0 ) {
+
+			console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
+
+		}
 
 	}
 
-}
-
-Object.assign( Matrix3.prototype, {
-
-	isMatrix3: true,
-
-	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+	set( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 		var te = this.elements;
 
@@ -39,9 +37,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	identity: function () {
+	identity() {
 
 		this.set(
 
@@ -53,15 +51,15 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().fromArray( this.elements );
 
-	},
+	}
 
-	copy: function ( m ) {
+	copy( m ) {
 
 		var te = this.elements;
 		var me = m.elements;
@@ -72,9 +70,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromMatrix4: function ( m ) {
+	setFromMatrix4( m ) {
 
 		var me = m.elements;
 
@@ -88,45 +86,21 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyToBufferAttribute: function () {
-
-		var v1 = new Vector3();
-
-		return function applyToBufferAttribute( attribute ) {
-
-			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
-
-				v1.x = attribute.getX( i );
-				v1.y = attribute.getY( i );
-				v1.z = attribute.getZ( i );
-
-				v1.applyMatrix3( this );
-
-				attribute.setXYZ( i, v1.x, v1.y, v1.z );
-
-			}
-
-			return attribute;
-
-		};
-
-	}(),
-
-	multiply: function ( m ) {
+	multiply( m ) {
 
 		return this.multiplyMatrices( this, m );
 
-	},
+	}
 
-	premultiply: function ( m ) {
+	premultiply( m ) {
 
 		return this.multiplyMatrices( m, this );
 
-	},
+	}
 
-	multiplyMatrices: function ( a, b ) {
+	multiplyMatrices( a, b ) {
 
 		var ae = a.elements;
 		var be = b.elements;
@@ -154,9 +128,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar( s ) {
 
 		var te = this.elements;
 
@@ -166,9 +140,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	determinant: function () {
+	determinant() {
 
 		var te = this.elements;
 
@@ -178,9 +152,9 @@ Object.assign( Matrix3.prototype, {
 
 		return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
 
-	},
+	}
 
-	getInverse: function ( matrix, throwOnDegenerate ) {
+	getInverse( matrix, throwOnDegenerate ) {
 
 		if ( matrix && matrix.isMatrix4 ) {
 
@@ -235,9 +209,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	transpose: function () {
+	transpose() {
 
 		var tmp, m = this.elements;
 
@@ -247,15 +221,15 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getNormalMatrix: function ( matrix4 ) {
+	getNormalMatrix( matrix4 ) {
 
 		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
 
-	},
+	}
 
-	transposeIntoArray: function ( r ) {
+	transposeIntoArray( r ) {
 
 		var m = this.elements;
 
@@ -271,9 +245,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setUvTransform: function ( tx, ty, sx, sy, rotation, cx, cy ) {
+	setUvTransform( tx, ty, sx, sy, rotation, cx, cy ) {
 
 		var c = Math.cos( rotation );
 		var s = Math.sin( rotation );
@@ -284,9 +258,9 @@ Object.assign( Matrix3.prototype, {
 			0, 0, 1
 		);
 
-	},
+	}
 
-	scale: function ( sx, sy ) {
+	scale( sx, sy ) {
 
 		var te = this.elements;
 
@@ -295,9 +269,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	rotate: function ( theta ) {
+	rotate( theta ) {
 
 		var c = Math.cos( theta );
 		var s = Math.sin( theta );
@@ -317,9 +291,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	translate: function ( tx, ty ) {
+	translate( tx, ty ) {
 
 		var te = this.elements;
 
@@ -328,9 +302,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	equals: function ( matrix ) {
+	equals( matrix ) {
 
 		var te = this.elements;
 		var me = matrix.elements;
@@ -343,9 +317,9 @@ Object.assign( Matrix3.prototype, {
 
 		return true;
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -357,9 +331,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -382,7 +356,33 @@ Object.assign( Matrix3.prototype, {
 
 	}
 
-} );
+}
+
+Matrix3.prototype.isMatrix3 = true;
+
+Matrix3.prototype.applyToBufferAttribute = function () {
+
+	var v1 = new Vector3();
+
+	return function applyToBufferAttribute( attribute ) {
+
+		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+
+			v1.x = attribute.getX( i );
+			v1.y = attribute.getY( i );
+			v1.z = attribute.getZ( i );
+
+			v1.applyMatrix3( this );
+
+			attribute.setXYZ( i, v1.x, v1.y, v1.z );
+
+		}
+
+		return attribute;
+
+	};
+
+}();
 
 
 export { Matrix3 };

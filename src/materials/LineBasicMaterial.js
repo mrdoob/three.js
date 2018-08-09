@@ -15,26 +15,30 @@ import { Color } from '../math/Color.js';
  * }
  */
 
-function LineBasicMaterial( parameters ) {
+class LineBasicMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'LineBasicMaterial';
+		super();
 
-	this.color = new Color( 0xffffff );
+		this.type = 'LineBasicMaterial';
 
-	this.linewidth = 1;
-	this.linecap = 'round';
-	this.linejoin = 'round';
+		this.color = new Color( 0xffffff );
 
-	this.lights = false;
+		this.linewidth = 1;
+		this.linecap = 'round';
+		this.linejoin = 'round';
 
-	this.setValues( parameters );
+		this.lights = false;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-LineBasicMaterial.prototype = Object.create( Material.prototype );
-LineBasicMaterial.prototype.constructor = LineBasicMaterial;
+
+
 
 LineBasicMaterial.prototype.isLineBasicMaterial = true;
 

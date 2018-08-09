@@ -17,44 +17,42 @@ import { arrayMax } from '../utils.js';
 
 var bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
 
-function BufferGeometry() {
+class BufferGeometry extends EventDispatcher {
 
-	Object.defineProperty( this, 'id', { value: bufferGeometryId += 2 } );
+	constructor() {
 
-	this.uuid = _Math.generateUUID();
+		super();
 
-	this.name = '';
-	this.type = 'BufferGeometry';
+		Object.defineProperty( this, 'id', { value: bufferGeometryId += 2 } );
 
-	this.index = null;
-	this.attributes = {};
+		this.uuid = _Math.generateUUID();
 
-	this.morphAttributes = {};
+		this.name = '';
+		this.type = 'BufferGeometry';
 
-	this.groups = [];
+		this.index = null;
+		this.attributes = {};
 
-	this.boundingBox = null;
-	this.boundingSphere = null;
+		this.morphAttributes = {};
 
-	this.drawRange = { start: 0, count: Infinity };
+		this.groups = [];
 
-	this.userData = {};
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
-}
+		this.drawRange = { start: 0, count: Infinity };
 
-BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		this.userData = {};
 
-	constructor: BufferGeometry,
+	}
 
-	isBufferGeometry: true,
-
-	getIndex: function () {
+	getIndex() {
 
 		return this.index;
 
-	},
+	}
 
-	setIndex: function ( index ) {
+	setIndex( index ) {
 
 		if ( Array.isArray( index ) ) {
 
@@ -66,9 +64,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	addAttribute: function ( name, attribute ) {
+	addAttribute( name, attribute ) {
 
 		if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
 
@@ -91,23 +89,23 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	getAttribute: function ( name ) {
+	getAttribute( name ) {
 
 		return this.attributes[ name ];
 
-	},
+	}
 
-	removeAttribute: function ( name ) {
+	removeAttribute( name ) {
 
 		delete this.attributes[ name ];
 
 		return this;
 
-	},
+	}
 
-	addGroup: function ( start, count, materialIndex ) {
+	addGroup( start, count, materialIndex ) {
 
 		this.groups.push( {
 
@@ -117,22 +115,22 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		} );
 
-	},
+	}
 
-	clearGroups: function () {
+	clearGroups() {
 
 		this.groups = [];
 
-	},
+	}
 
-	setDrawRange: function ( start, count ) {
+	setDrawRange( start, count ) {
 
 		this.drawRange.start = start;
 		this.drawRange.count = count;
 
-	},
+	}
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix( matrix ) {
 
 		var position = this.attributes.position;
 
@@ -168,133 +166,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	rotateX: function () {
-
-		// rotate geometry around world x-axis
-
-		var m1 = new Matrix4();
-
-		return function rotateX( angle ) {
-
-			m1.makeRotationX( angle );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	rotateY: function () {
-
-		// rotate geometry around world y-axis
-
-		var m1 = new Matrix4();
-
-		return function rotateY( angle ) {
-
-			m1.makeRotationY( angle );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	rotateZ: function () {
-
-		// rotate geometry around world z-axis
-
-		var m1 = new Matrix4();
-
-		return function rotateZ( angle ) {
-
-			m1.makeRotationZ( angle );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	translate: function () {
-
-		// translate geometry
-
-		var m1 = new Matrix4();
-
-		return function translate( x, y, z ) {
-
-			m1.makeTranslation( x, y, z );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	scale: function () {
-
-		// scale geometry
-
-		var m1 = new Matrix4();
-
-		return function scale( x, y, z ) {
-
-			m1.makeScale( x, y, z );
-
-			this.applyMatrix( m1 );
-
-			return this;
-
-		};
-
-	}(),
-
-	lookAt: function () {
-
-		var obj = new Object3D();
-
-		return function lookAt( vector ) {
-
-			obj.lookAt( vector );
-
-			obj.updateMatrix();
-
-			this.applyMatrix( obj.matrix );
-
-		};
-
-	}(),
-
-	center: function () {
-
-		var offset = new Vector3();
-
-		return function center() {
-
-			this.computeBoundingBox();
-
-			this.boundingBox.getCenter( offset ).negate();
-
-			this.translate( offset.x, offset.y, offset.z );
-
-			return this;
-
-		};
-
-	}(),
-
-	setFromObject: function ( object ) {
+	setFromObject( object ) {
 
 		// console.log( 'THREE.BufferGeometry.setFromObject(). Converting', object, this );
 
@@ -340,9 +214,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	setFromPoints: function ( points ) {
+	setFromPoints( points ) {
 
 		var position = [];
 
@@ -357,9 +231,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	updateFromObject: function ( object ) {
+	updateFromObject( object ) {
 
 		var geometry = object.geometry;
 
@@ -484,17 +358,17 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	fromGeometry: function ( geometry ) {
+	fromGeometry( geometry ) {
 
 		geometry.__directGeometry = new DirectGeometry().fromGeometry( geometry );
 
 		return this.fromDirectGeometry( geometry.__directGeometry );
 
-	},
+	}
 
-	fromDirectGeometry: function ( geometry ) {
+	fromDirectGeometry( geometry ) {
 
 		var positions = new Float32Array( geometry.vertices.length * 3 );
 		this.addAttribute( 'position', new BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
@@ -584,9 +458,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	computeBoundingBox: function () {
+	computeBoundingBox() {
 
 		if ( this.boundingBox === null ) {
 
@@ -612,65 +486,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	computeBoundingSphere: function () {
-
-		var box = new Box3();
-		var vector = new Vector3();
-
-		return function computeBoundingSphere() {
-
-			if ( this.boundingSphere === null ) {
-
-				this.boundingSphere = new Sphere();
-
-			}
-
-			var position = this.attributes.position;
-
-			if ( position ) {
-
-				var center = this.boundingSphere.center;
-
-				box.setFromBufferAttribute( position );
-				box.getCenter( center );
-
-				// hoping to find a boundingSphere with a radius smaller than the
-				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
-
-				var maxRadiusSq = 0;
-
-				for ( var i = 0, il = position.count; i < il; i ++ ) {
-
-					vector.x = position.getX( i );
-					vector.y = position.getY( i );
-					vector.z = position.getZ( i );
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
-
-				}
-
-				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
-				if ( isNaN( this.boundingSphere.radius ) ) {
-
-					console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
-
-				}
-
-			}
-
-		};
-
-	}(),
-
-	computeFaceNormals: function () {
+	computeFaceNormals() {
 
 		// backwards compatibility
 
-	},
+	}
 
-	computeVertexNormals: function () {
+	computeVertexNormals() {
 
 		var index = this.index;
 		var attributes = this.attributes;
@@ -789,9 +613,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	merge: function ( geometry, offset ) {
+	merge( geometry, offset ) {
 
 		if ( ! ( geometry && geometry.isBufferGeometry ) ) {
 
@@ -835,33 +659,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	normalizeNormals: function () {
-
-		var vector = new Vector3();
-
-		return function normalizeNormals() {
-
-			var normals = this.attributes.normal;
-
-			for ( var i = 0, il = normals.count; i < il; i ++ ) {
-
-				vector.x = normals.getX( i );
-				vector.y = normals.getY( i );
-				vector.z = normals.getZ( i );
-
-				vector.normalize();
-
-				normals.setXYZ( i, vector.x, vector.y, vector.z );
-
-			}
-
-		};
-
-	}(),
-
-	toNonIndexed: function () {
+	toNonIndexed() {
 
 		if ( this.index === null ) {
 
@@ -913,9 +713,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return geometry2;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		var data = {
 			metadata: {
@@ -999,9 +799,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return data;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		/*
 		 // Handle primitives
@@ -1029,9 +829,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return new BufferGeometry().copy( this );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		var name, i, l;
 
@@ -1130,15 +930,215 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
-} );
+}
+
+BufferGeometry.prototype.isBufferGeometry = true;
+
+BufferGeometry.prototype.rotateX = function () {
+
+	// rotate geometry around world x-axis
+
+	var m1 = new Matrix4();
+
+	return function rotateX( angle ) {
+
+		m1.makeRotationX( angle );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+BufferGeometry.prototype.rotateY = function () {
+
+	// rotate geometry around world y-axis
+
+	var m1 = new Matrix4();
+
+	return function rotateY( angle ) {
+
+		m1.makeRotationY( angle );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+BufferGeometry.prototype.rotateZ = function () {
+
+	// rotate geometry around world z-axis
+
+	var m1 = new Matrix4();
+
+	return function rotateZ( angle ) {
+
+		m1.makeRotationZ( angle );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+BufferGeometry.prototype.translate = function () {
+
+	// translate geometry
+
+	var m1 = new Matrix4();
+
+	return function translate( x, y, z ) {
+
+		m1.makeTranslation( x, y, z );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+BufferGeometry.prototype.scale = function () {
+
+	// scale geometry
+
+	var m1 = new Matrix4();
+
+	return function scale( x, y, z ) {
+
+		m1.makeScale( x, y, z );
+
+		this.applyMatrix( m1 );
+
+		return this;
+
+	};
+
+}();
+
+BufferGeometry.prototype.lookAt = function () {
+
+	var obj = new Object3D();
+
+	return function lookAt( vector ) {
+
+		obj.lookAt( vector );
+
+		obj.updateMatrix();
+
+		this.applyMatrix( obj.matrix );
+
+	};
+
+}();
+
+BufferGeometry.prototype.center = function () {
+
+	var offset = new Vector3();
+
+	return function center() {
+
+		this.computeBoundingBox();
+
+		this.boundingBox.getCenter( offset ).negate();
+
+		this.translate( offset.x, offset.y, offset.z );
+
+		return this;
+
+	};
+
+}();
+
+BufferGeometry.prototype.computeBoundingSphere = function () {
+
+	var box = new Box3();
+	var vector = new Vector3();
+
+	return function computeBoundingSphere() {
+
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new Sphere();
+
+		}
+
+		var position = this.attributes.position;
+
+		if ( position ) {
+
+			var center = this.boundingSphere.center;
+
+			box.setFromBufferAttribute( position );
+			box.getCenter( center );
+
+			// hoping to find a boundingSphere with a radius smaller than the
+			// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
+
+			var maxRadiusSq = 0;
+
+			for ( var i = 0, il = position.count; i < il; i ++ ) {
+
+				vector.x = position.getX( i );
+				vector.y = position.getY( i );
+				vector.z = position.getZ( i );
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+			}
+
+			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+			if ( isNaN( this.boundingSphere.radius ) ) {
+
+				console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+
+			}
+
+		}
+
+	};
+
+}();
+
+BufferGeometry.prototype.normalizeNormals = function () {
+
+	var vector = new Vector3();
+
+	return function normalizeNormals() {
+
+		var normals = this.attributes.normal;
+
+		for ( var i = 0, il = normals.count; i < il; i ++ ) {
+
+			vector.x = normals.getX( i );
+			vector.y = normals.getY( i );
+			vector.z = normals.getZ( i );
+
+			vector.normalize();
+
+			normals.setXYZ( i, vector.x, vector.y, vector.z );
+
+		}
+
+	};
+
+}();
 
 
 export { BufferGeometry };

@@ -10,22 +10,16 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
  * @author tschw
  */
 
-function VectorKeyframeTrack( name, times, values, interpolation ) {
+class VectorKeyframeTrack extends KeyframeTrack {
 
-	KeyframeTrack.call( this, name, times, values, interpolation );
+	constructor( name, times, values, interpolation ) {
+
+		super( name, times, values, interpolation );
+
+	}
 
 }
 
-VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: VectorKeyframeTrack,
-
-	ValueTypeName: 'vector'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-} );
+VectorKeyframeTrack.prototype.ValueTypeName = 'vector';
 
 export { VectorKeyframeTrack };

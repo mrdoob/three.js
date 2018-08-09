@@ -11,28 +11,26 @@ import * as Curves from '../curves/Curves.js';
  *  curves, but retains the api of a curve
  **************************************************************/
 
-function CurvePath() {
+class CurvePath extends Curve {
 
-	Curve.call( this );
+	constructor() {
 
-	this.type = 'CurvePath';
+		super();
 
-	this.curves = [];
-	this.autoClose = false; // Automatically closes the path
+		this.type = 'CurvePath';
 
-}
+		this.curves = [];
+		this.autoClose = false; // Automatically closes the path
 
-CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
+	}
 
-	constructor: CurvePath,
-
-	add: function ( curve ) {
+	add( curve ) {
 
 		this.curves.push( curve );
 
-	},
+	}
 
-	closePath: function () {
+	closePath() {
 
 		// Add a line curve if start and end of lines are not connected
 		var startPoint = this.curves[ 0 ].getPoint( 0 );
@@ -44,7 +42,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		}
 
-	},
+	}
 
 	// To get accurate point with reference to
 	// entire path distance at time t,
@@ -55,7 +53,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 	// 3. Get t for the curve
 	// 4. Return curve.getPointAt(t')
 
-	getPoint: function ( t ) {
+	getPoint( t ) {
 
 		var d = t * this.getLength();
 		var curveLengths = this.getCurveLengths();
@@ -85,32 +83,32 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		// loop where sum != 0, sum > d , sum+1 <d
 
-	},
+	}
 
 	// We cannot use the default THREE.Curve getPoint() with getLength() because in
 	// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
 	// getPoint() depends on getLength
 
-	getLength: function () {
+	getLength() {
 
 		var lens = this.getCurveLengths();
 		return lens[ lens.length - 1 ];
 
-	},
+	}
 
 	// cacheLengths must be recalculated.
-	updateArcLengths: function () {
+	updateArcLengths() {
 
 		this.needsUpdate = true;
 		this.cacheLengths = null;
 		this.getCurveLengths();
 
-	},
+	}
 
 	// Compute lengths and cache them
 	// We cannot overwrite getLengths() because UtoT mapping uses it.
 
-	getCurveLengths: function () {
+	getCurveLengths() {
 
 		// We use cache values if curves and cache array are same length
 
@@ -136,9 +134,9 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		return lengths;
 
-	},
+	}
 
-	getSpacedPoints: function ( divisions ) {
+	getSpacedPoints( divisions ) {
 
 		if ( divisions === undefined ) divisions = 40;
 
@@ -158,9 +156,9 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		return points;
 
-	},
+	}
 
-	getPoints: function ( divisions ) {
+	getPoints( divisions ) {
 
 		divisions = divisions || 12;
 
@@ -197,9 +195,9 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		return points;
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		Curve.prototype.copy.call( this, source );
 
@@ -217,9 +215,9 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		var data = Curve.prototype.toJSON.call( this );
 
@@ -235,9 +233,9 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		return data;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
 		Curve.prototype.fromJSON.call( this, json );
 
@@ -255,7 +253,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	}
 
-} );
+}
 
 
 export { CurvePath };

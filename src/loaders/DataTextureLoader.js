@@ -9,18 +9,18 @@ import { DefaultLoadingManager } from './LoadingManager.js';
  * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
  */
 
-function DataTextureLoader( manager ) {
+class DataTextureLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-	// override in sub classes
-	this._parser = null;
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-}
+		// override in sub classes
+		this._parser = null;
 
-Object.assign( DataTextureLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -89,7 +89,7 @@ Object.assign( DataTextureLoader.prototype, {
 
 	}
 
-} );
+}
 
 
 export { DataTextureLoader };

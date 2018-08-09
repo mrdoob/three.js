@@ -24,36 +24,40 @@ import { Vector3 } from '../math/Vector3.js';
  * }
  */
 
-function MeshDistanceMaterial( parameters ) {
+class MeshDistanceMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'MeshDistanceMaterial';
+		super();
 
-	this.referencePosition = new Vector3();
-	this.nearDistance = 1;
-	this.farDistance = 1000;
+		this.type = 'MeshDistanceMaterial';
 
-	this.skinning = false;
-	this.morphTargets = false;
+		this.referencePosition = new Vector3();
+		this.nearDistance = 1;
+		this.farDistance = 1000;
 
-	this.map = null;
+		this.skinning = false;
+		this.morphTargets = false;
 
-	this.alphaMap = null;
+		this.map = null;
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+		this.alphaMap = null;
 
-	this.fog = false;
-	this.lights = false;
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
 
-	this.setValues( parameters );
+		this.fog = false;
+		this.lights = false;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-MeshDistanceMaterial.prototype = Object.create( Material.prototype );
-MeshDistanceMaterial.prototype.constructor = MeshDistanceMaterial;
+
+
 
 MeshDistanceMaterial.prototype.isMeshDistanceMaterial = true;
 

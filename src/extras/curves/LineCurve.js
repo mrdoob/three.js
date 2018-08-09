@@ -2,19 +2,23 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Curve } from '../core/Curve.js';
 
 
-function LineCurve( v1, v2 ) {
+class LineCurve extends Curve {
 
-	Curve.call( this );
+	constructor( v1, v2 ) {
 
-	this.type = 'LineCurve';
+		super();
 
-	this.v1 = v1 || new Vector2();
-	this.v2 = v2 || new Vector2();
+		this.type = 'LineCurve';
+
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
+
+	}
 
 }
 
-LineCurve.prototype = Object.create( Curve.prototype );
-LineCurve.prototype.constructor = LineCurve;
+
+
 
 LineCurve.prototype.isLineCurve = true;
 

@@ -3,21 +3,25 @@ import { CubicBezier } from '../core/Interpolations.js';
 import { Vector3 } from '../../math/Vector3.js';
 
 
-function CubicBezierCurve3( v0, v1, v2, v3 ) {
+class CubicBezierCurve3 extends Curve {
 
-	Curve.call( this );
+	constructor( v0, v1, v2, v3 ) {
 
-	this.type = 'CubicBezierCurve3';
+		super();
 
-	this.v0 = v0 || new Vector3();
-	this.v1 = v1 || new Vector3();
-	this.v2 = v2 || new Vector3();
-	this.v3 = v3 || new Vector3();
+		this.type = 'CubicBezierCurve3';
+
+		this.v0 = v0 || new Vector3();
+		this.v1 = v1 || new Vector3();
+		this.v2 = v2 || new Vector3();
+		this.v3 = v3 || new Vector3();
+
+	}
 
 }
 
-CubicBezierCurve3.prototype = Object.create( Curve.prototype );
-CubicBezierCurve3.prototype.constructor = CubicBezierCurve3;
+
+
 
 CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
 

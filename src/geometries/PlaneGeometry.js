@@ -9,118 +9,126 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 // PlaneGeometry
 
-function PlaneGeometry( width, height, widthSegments, heightSegments ) {
+class PlaneGeometry extends Geometry {
 
-	Geometry.call( this );
+	constructor( width, height, widthSegments, heightSegments ) {
 
-	this.type = 'PlaneGeometry';
+		super();
 
-	this.parameters = {
-		width: width,
-		height: height,
-		widthSegments: widthSegments,
-		heightSegments: heightSegments
-	};
+		this.type = 'PlaneGeometry';
 
-	this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
-	this.mergeVertices();
+		this.parameters = {
+			width: width,
+			height: height,
+			widthSegments: widthSegments,
+			heightSegments: heightSegments
+		};
+
+		this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+		this.mergeVertices();
+
+	}
 
 }
 
-PlaneGeometry.prototype = Object.create( Geometry.prototype );
-PlaneGeometry.prototype.constructor = PlaneGeometry;
+
+
 
 // PlaneBufferGeometry
 
-function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
+class PlaneBufferGeometry extends BufferGeometry {
 
-	BufferGeometry.call( this );
+	constructor( width, height, widthSegments, heightSegments ) {
 
-	this.type = 'PlaneBufferGeometry';
+		super();
 
-	this.parameters = {
-		width: width,
-		height: height,
-		widthSegments: widthSegments,
-		heightSegments: heightSegments
-	};
+		this.type = 'PlaneBufferGeometry';
 
-	width = width || 1;
-	height = height || 1;
+		this.parameters = {
+			width: width,
+			height: height,
+			widthSegments: widthSegments,
+			heightSegments: heightSegments
+		};
 
-	var width_half = width / 2;
-	var height_half = height / 2;
+		width = width || 1;
+		height = height || 1;
 
-	var gridX = Math.floor( widthSegments ) || 1;
-	var gridY = Math.floor( heightSegments ) || 1;
+		var width_half = width / 2;
+		var height_half = height / 2;
 
-	var gridX1 = gridX + 1;
-	var gridY1 = gridY + 1;
+		var gridX = Math.floor( widthSegments ) || 1;
+		var gridY = Math.floor( heightSegments ) || 1;
 
-	var segment_width = width / gridX;
-	var segment_height = height / gridY;
+		var gridX1 = gridX + 1;
+		var gridY1 = gridY + 1;
 
-	var ix, iy;
+		var segment_width = width / gridX;
+		var segment_height = height / gridY;
 
-	// buffers
+		var ix, iy;
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+		// buffers
 
-	// generate vertices, normals and uvs
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
 
-	for ( iy = 0; iy < gridY1; iy ++ ) {
+		// generate vertices, normals and uvs
 
-		var y = iy * segment_height - height_half;
+		for ( iy = 0; iy < gridY1; iy ++ ) {
 
-		for ( ix = 0; ix < gridX1; ix ++ ) {
+			var y = iy * segment_height - height_half;
 
-			var x = ix * segment_width - width_half;
+			for ( ix = 0; ix < gridX1; ix ++ ) {
 
-			vertices.push( x, - y, 0 );
+				var x = ix * segment_width - width_half;
 
-			normals.push( 0, 0, 1 );
+				vertices.push( x, - y, 0 );
 
-			uvs.push( ix / gridX );
-			uvs.push( 1 - ( iy / gridY ) );
+				normals.push( 0, 0, 1 );
 
-		}
+				uvs.push( ix / gridX );
+				uvs.push( 1 - ( iy / gridY ) );
 
-	}
-
-	// indices
-
-	for ( iy = 0; iy < gridY; iy ++ ) {
-
-		for ( ix = 0; ix < gridX; ix ++ ) {
-
-			var a = ix + gridX1 * iy;
-			var b = ix + gridX1 * ( iy + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-			var d = ( ix + 1 ) + gridX1 * iy;
-
-			// faces
-
-			indices.push( a, b, d );
-			indices.push( b, c, d );
+			}
 
 		}
 
+		// indices
+
+		for ( iy = 0; iy < gridY; iy ++ ) {
+
+			for ( ix = 0; ix < gridX; ix ++ ) {
+
+				var a = ix + gridX1 * iy;
+				var b = ix + gridX1 * ( iy + 1 );
+				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
+				var d = ( ix + 1 ) + gridX1 * iy;
+
+				// faces
+
+				indices.push( a, b, d );
+				indices.push( b, c, d );
+
+			}
+
+		}
+
+		// build geometry
+
+		this.setIndex( indices );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
 	}
-
-	// build geometry
-
-	this.setIndex( indices );
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 }
 
-PlaneBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-PlaneBufferGeometry.prototype.constructor = PlaneBufferGeometry;
+
+
 
 
 export { PlaneGeometry, PlaneBufferGeometry };

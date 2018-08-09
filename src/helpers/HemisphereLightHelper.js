@@ -13,37 +13,41 @@ import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
-function HemisphereLightHelper( light, size, color ) {
+class HemisphereLightHelper extends Object3D {
 
-	Object3D.call( this );
+	constructor( light, size, color ) {
 
-	this.light = light;
-	this.light.updateMatrixWorld();
+		super();
 
-	this.matrix = light.matrixWorld;
-	this.matrixAutoUpdate = false;
+		this.light = light;
+		this.light.updateMatrixWorld();
 
-	this.color = color;
+		this.matrix = light.matrixWorld;
+		this.matrixAutoUpdate = false;
 
-	var geometry = new OctahedronBufferGeometry( size );
-	geometry.rotateY( Math.PI * 0.5 );
+		this.color = color;
 
-	this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-	if ( this.color === undefined ) this.material.vertexColors = VertexColors;
+		var geometry = new OctahedronBufferGeometry( size );
+		geometry.rotateY( Math.PI * 0.5 );
 
-	var position = geometry.getAttribute( 'position' );
-	var colors = new Float32Array( position.count * 3 );
+		this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
+		if ( this.color === undefined ) this.material.vertexColors = VertexColors;
 
-	geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+		var position = geometry.getAttribute( 'position' );
+		var colors = new Float32Array( position.count * 3 );
 
-	this.add( new Mesh( geometry, this.material ) );
+		geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
-	this.update();
+		this.add( new Mesh( geometry, this.material ) );
+
+		this.update();
+
+	}
 
 }
 
-HemisphereLightHelper.prototype = Object.create( Object3D.prototype );
-HemisphereLightHelper.prototype.constructor = HemisphereLightHelper;
+
+
 
 HemisphereLightHelper.prototype.dispose = function () {
 

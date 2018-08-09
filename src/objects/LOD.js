@@ -7,26 +7,24 @@ import { Object3D } from '../core/Object3D.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function LOD() {
+class LOD extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'LOD';
+		super();
 
-	Object.defineProperties( this, {
-		levels: {
-			enumerable: true,
-			value: []
-		}
-	} );
+		this.type = 'LOD';
 
-}
+		Object.defineProperties( this, {
+			levels: {
+				enumerable: true,
+				value: []
+			}
+		} );
 
-LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: LOD,
-
-	copy: function ( source ) {
+	copy( source ) {
 
 		Object3D.prototype.copy.call( this, source, false );
 
@@ -42,9 +40,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	addLevel: function ( object, distance ) {
+	addLevel( object, distance ) {
 
 		if ( distance === undefined ) distance = 0;
 
@@ -66,9 +64,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		this.add( object );
 
-	},
+	}
 
-	getObjectForDistance: function ( distance ) {
+	getObjectForDistance( distance ) {
 
 		var levels = this.levels;
 
@@ -84,70 +82,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return levels[ i - 1 ].object;
 
-	},
+	}
 
-	raycast: ( function () {
-
-		var matrixPosition = new Vector3();
-
-		return function raycast( raycaster, intersects ) {
-
-			matrixPosition.setFromMatrixPosition( this.matrixWorld );
-
-			var distance = raycaster.ray.origin.distanceTo( matrixPosition );
-
-			this.getObjectForDistance( distance ).raycast( raycaster, intersects );
-
-		};
-
-	}() ),
-
-	update: function () {
-
-		var v1 = new Vector3();
-		var v2 = new Vector3();
-
-		return function update( camera ) {
-
-			var levels = this.levels;
-
-			if ( levels.length > 1 ) {
-
-				v1.setFromMatrixPosition( camera.matrixWorld );
-				v2.setFromMatrixPosition( this.matrixWorld );
-
-				var distance = v1.distanceTo( v2 );
-
-				levels[ 0 ].object.visible = true;
-
-				for ( var i = 1, l = levels.length; i < l; i ++ ) {
-
-					if ( distance >= levels[ i ].distance ) {
-
-						levels[ i - 1 ].object.visible = false;
-						levels[ i ].object.visible = true;
-
-					} else {
-
-						break;
-
-					}
-
-				}
-
-				for ( ; i < l; i ++ ) {
-
-					levels[ i ].object.visible = false;
-
-				}
-
-			}
-
-		};
-
-	}(),
-
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
 
@@ -170,7 +107,68 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
+
+LOD.prototype.raycast = function () {
+
+	var matrixPosition = new Vector3();
+
+	return function raycast( raycaster, intersects ) {
+
+		matrixPosition.setFromMatrixPosition( this.matrixWorld );
+
+		var distance = raycaster.ray.origin.distanceTo( matrixPosition );
+
+		this.getObjectForDistance( distance ).raycast( raycaster, intersects );
+
+	};
+
+}();
+
+LOD.prototype.update = function () {
+
+	var v1 = new Vector3();
+	var v2 = new Vector3();
+
+	return function update( camera ) {
+
+		var levels = this.levels;
+
+		if ( levels.length > 1 ) {
+
+			v1.setFromMatrixPosition( camera.matrixWorld );
+			v2.setFromMatrixPosition( this.matrixWorld );
+
+			var distance = v1.distanceTo( v2 );
+
+			levels[ 0 ].object.visible = true;
+
+			for ( var i = 1, l = levels.length; i < l; i ++ ) {
+
+				if ( distance >= levels[ i ].distance ) {
+
+					levels[ i - 1 ].object.visible = false;
+					levels[ i ].object.visible = true;
+
+				} else {
+
+					break;
+
+				}
+
+			}
+
+			for ( ; i < l; i ++ ) {
+
+				levels[ i ].object.visible = false;
+
+			}
+
+		}
+
+	};
+
+}();
 
 
 export { LOD };

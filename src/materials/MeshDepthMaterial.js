@@ -24,37 +24,41 @@ import { BasicDepthPacking } from '../constants.js';
  * }
  */
 
-function MeshDepthMaterial( parameters ) {
+class MeshDepthMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'MeshDepthMaterial';
+		super();
 
-	this.depthPacking = BasicDepthPacking;
+		this.type = 'MeshDepthMaterial';
 
-	this.skinning = false;
-	this.morphTargets = false;
+		this.depthPacking = BasicDepthPacking;
 
-	this.map = null;
+		this.skinning = false;
+		this.morphTargets = false;
 
-	this.alphaMap = null;
+		this.map = null;
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+		this.alphaMap = null;
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
 
-	this.fog = false;
-	this.lights = false;
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
 
-	this.setValues( parameters );
+		this.fog = false;
+		this.lights = false;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-MeshDepthMaterial.prototype = Object.create( Material.prototype );
-MeshDepthMaterial.prototype.constructor = MeshDepthMaterial;
+
+
 
 MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
 

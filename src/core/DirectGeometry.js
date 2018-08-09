@@ -4,39 +4,39 @@
 
 import { Vector2 } from '../math/Vector2.js';
 
-function DirectGeometry() {
+class DirectGeometry {
 
-	this.vertices = [];
-	this.normals = [];
-	this.colors = [];
-	this.uvs = [];
-	this.uvs2 = [];
+	constructor() {
 
-	this.groups = [];
+		this.vertices = [];
+		this.normals = [];
+		this.colors = [];
+		this.uvs = [];
+		this.uvs2 = [];
 
-	this.morphTargets = {};
+		this.groups = [];
 
-	this.skinWeights = [];
-	this.skinIndices = [];
+		this.morphTargets = {};
 
-	// this.lineDistances = [];
+		this.skinWeights = [];
+		this.skinIndices = [];
 
-	this.boundingBox = null;
-	this.boundingSphere = null;
+		// this.lineDistances = [];
 
-	// update flags
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
-	this.verticesNeedUpdate = false;
-	this.normalsNeedUpdate = false;
-	this.colorsNeedUpdate = false;
-	this.uvsNeedUpdate = false;
-	this.groupsNeedUpdate = false;
+		// update flags
 
-}
+		this.verticesNeedUpdate = false;
+		this.normalsNeedUpdate = false;
+		this.colorsNeedUpdate = false;
+		this.uvsNeedUpdate = false;
+		this.groupsNeedUpdate = false;
 
-Object.assign( DirectGeometry.prototype, {
+	}
 
-	computeGroups: function ( geometry ) {
+	computeGroups( geometry ) {
 
 		var group;
 		var groups = [];
@@ -79,9 +79,9 @@ Object.assign( DirectGeometry.prototype, {
 
 		this.groups = groups;
 
-	},
+	}
 
-	fromGeometry: function ( geometry ) {
+	fromGeometry( geometry ) {
 
 		var faces = geometry.faces;
 		var vertices = geometry.vertices;
@@ -262,7 +262,7 @@ Object.assign( DirectGeometry.prototype, {
 
 	}
 
-} );
+}
 
 
 export { DirectGeometry };

@@ -32,61 +32,59 @@ import { _Math } from '../math/Math.js';
  * @author tschw
  */
 
-function AnimationObjectGroup() {
+class AnimationObjectGroup {
 
-	this.uuid = _Math.generateUUID();
+	constructor() {
 
-	// cached objects followed by the active ones
-	this._objects = Array.prototype.slice.call( arguments );
+		this.uuid = _Math.generateUUID();
 
-	this.nCachedObjects_ = 0;			// threshold
-	// note: read by PropertyBinding.Composite
+		// cached objects followed by the active ones
+		this._objects = Array.prototype.slice.call( arguments );
 
-	var indices = {};
-	this._indicesByUUID = indices;		// for bookkeeping
+		this.nCachedObjects_ = 0;			// threshold
+		// note: read by PropertyBinding.Composite
 
-	for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+		var indices = {};
+		this._indicesByUUID = indices;		// for bookkeeping
 
-		indices[ arguments[ i ].uuid ] = i;
+		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
 
-	}
-
-	this._paths = [];					// inside: string
-	this._parsedPaths = [];				// inside: { we don't care, here }
-	this._bindings = []; 				// inside: Array< PropertyBinding >
-	this._bindingsIndicesByPath = {}; 	// inside: indices in these arrays
-
-	var scope = this;
-
-	this.stats = {
-
-		objects: {
-			get total() {
-
-				return scope._objects.length;
-
-			},
-			get inUse() {
-
-				return this.total - scope.nCachedObjects_;
-
-			}
-		},
-		get bindingsPerObject() {
-
-			return scope._bindings.length;
+			indices[ arguments[ i ].uuid ] = i;
 
 		}
 
-	};
+		this._paths = [];					// inside: string
+		this._parsedPaths = [];				// inside: { we don't care, here }
+		this._bindings = []; 				// inside: Array< PropertyBinding >
+		this._bindingsIndicesByPath = {}; 	// inside: indices in these arrays
 
-}
+		var scope = this;
 
-Object.assign( AnimationObjectGroup.prototype, {
+		this.stats = {
 
-	isAnimationObjectGroup: true,
+			objects: {
+				get total() {
 
-	add: function () {
+					return scope._objects.length;
+
+				},
+				get inUse() {
+
+					return this.total - scope.nCachedObjects_;
+
+				}
+			},
+			get bindingsPerObject() {
+
+				return scope._bindings.length;
+
+			}
+
+		};
+
+	}
+
+	add() {
 
 		var objects = this._objects,
 			nObjects = objects.length,
@@ -170,9 +168,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 		this.nCachedObjects_ = nCachedObjects;
 
-	},
+	}
 
-	remove: function () {
+	remove() {
 
 		var objects = this._objects,
 			nCachedObjects = this.nCachedObjects_,
@@ -218,10 +216,10 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 		this.nCachedObjects_ = nCachedObjects;
 
-	},
+	}
 
 	// remove & forget
-	uncache: function () {
+	uncache() {
 
 		var objects = this._objects,
 			nObjects = objects.length,
@@ -302,11 +300,11 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 		this.nCachedObjects_ = nCachedObjects;
 
-	},
+	}
 
 	// Internal interface used by befriended PropertyBinding.Composite:
 
-	subscribe_: function ( path, parsedPath ) {
+	subscribe_( path, parsedPath ) {
 
 		// returns an array of bindings for the given path that is changed
 		// according to the contained objects in the group
@@ -341,9 +339,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 		return bindingsForPath;
 
-	},
+	}
 
-	unsubscribe_: function ( path ) {
+	unsubscribe_( path ) {
 
 		// tells the group to forget about a property path and no longer
 		// update the array previously obtained with 'subscribe_'
@@ -375,7 +373,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	}
 
-} );
+}
+
+AnimationObjectGroup.prototype.isAnimationObjectGroup = true;
 
 
 export { AnimationObjectGroup };

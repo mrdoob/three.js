@@ -9,21 +9,25 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-function ShadowMaterial( parameters ) {
+class ShadowMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'ShadowMaterial';
+		super();
 
-	this.color = new Color( 0x000000 );
-	this.transparent = true;
+		this.type = 'ShadowMaterial';
 
-	this.setValues( parameters );
+		this.color = new Color( 0x000000 );
+		this.transparent = true;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-ShadowMaterial.prototype = Object.create( Material.prototype );
-ShadowMaterial.prototype.constructor = ShadowMaterial;
+
+
 
 ShadowMaterial.prototype.isShadowMaterial = true;
 

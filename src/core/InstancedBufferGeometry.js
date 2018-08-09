@@ -4,22 +4,18 @@ import { BufferGeometry } from './BufferGeometry.js';
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-function InstancedBufferGeometry() {
+class InstancedBufferGeometry extends BufferGeometry {
 
-	BufferGeometry.call( this );
+	constructor() {
 
-	this.type = 'InstancedBufferGeometry';
-	this.maxInstancedCount = undefined;
+		super();
 
-}
+		this.type = 'InstancedBufferGeometry';
+		this.maxInstancedCount = undefined;
 
-InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry.prototype ), {
+	}
 
-	constructor: InstancedBufferGeometry,
-
-	isInstancedBufferGeometry: true,
-
-	copy: function ( source ) {
+	copy( source ) {
 
 		BufferGeometry.prototype.copy.call( this, source );
 
@@ -27,14 +23,16 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
 	}
 
-} );
+}
+
+InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
 export { InstancedBufferGeometry };

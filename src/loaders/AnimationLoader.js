@@ -6,15 +6,15 @@ import { DefaultLoadingManager } from './LoadingManager.js';
  * @author bhouston / http://clara.io/
  */
 
-function AnimationLoader( manager ) {
+class AnimationLoader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-Object.assign( AnimationLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -25,9 +25,9 @@ Object.assign( AnimationLoader.prototype, {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json, onLoad ) {
+	parse( json, onLoad ) {
 
 		var animations = [];
 
@@ -43,7 +43,7 @@ Object.assign( AnimationLoader.prototype, {
 
 	}
 
-} );
+}
 
 
 export { AnimationLoader };

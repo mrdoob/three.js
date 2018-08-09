@@ -11,142 +11,150 @@ import { Vector3 } from '../math/Vector3.js';
 
 // RingGeometry
 
-function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+class RingGeometry extends Geometry {
 
-	Geometry.call( this );
+	constructor( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
-	this.type = 'RingGeometry';
+		super();
 
-	this.parameters = {
-		innerRadius: innerRadius,
-		outerRadius: outerRadius,
-		thetaSegments: thetaSegments,
-		phiSegments: phiSegments,
-		thetaStart: thetaStart,
-		thetaLength: thetaLength
-	};
+		this.type = 'RingGeometry';
 
-	this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
-	this.mergeVertices();
+		this.parameters = {
+			innerRadius: innerRadius,
+			outerRadius: outerRadius,
+			thetaSegments: thetaSegments,
+			phiSegments: phiSegments,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength
+		};
+
+		this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
+		this.mergeVertices();
+
+	}
 
 }
 
-RingGeometry.prototype = Object.create( Geometry.prototype );
-RingGeometry.prototype.constructor = RingGeometry;
+
+
 
 // RingBufferGeometry
 
-function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+class RingBufferGeometry extends BufferGeometry {
 
-	BufferGeometry.call( this );
+	constructor( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
-	this.type = 'RingBufferGeometry';
+		super();
 
-	this.parameters = {
-		innerRadius: innerRadius,
-		outerRadius: outerRadius,
-		thetaSegments: thetaSegments,
-		phiSegments: phiSegments,
-		thetaStart: thetaStart,
-		thetaLength: thetaLength
-	};
+		this.type = 'RingBufferGeometry';
 
-	innerRadius = innerRadius || 0.5;
-	outerRadius = outerRadius || 1;
+		this.parameters = {
+			innerRadius: innerRadius,
+			outerRadius: outerRadius,
+			thetaSegments: thetaSegments,
+			phiSegments: phiSegments,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength
+		};
 
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		innerRadius = innerRadius || 0.5;
+		outerRadius = outerRadius || 1;
 
-	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
-	phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
+		thetaStart = thetaStart !== undefined ? thetaStart : 0;
+		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
-	// buffers
+		thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
+		phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+		// buffers
 
-	// some helper variables
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
 
-	var segment;
-	var radius = innerRadius;
-	var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
-	var vertex = new Vector3();
-	var uv = new Vector2();
-	var j, i;
+		// some helper variables
 
-	// generate vertices, normals and uvs
+		var segment;
+		var radius = innerRadius;
+		var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
+		var vertex = new Vector3();
+		var uv = new Vector2();
+		var j, i;
 
-	for ( j = 0; j <= phiSegments; j ++ ) {
+		// generate vertices, normals and uvs
 
-		for ( i = 0; i <= thetaSegments; i ++ ) {
+		for ( j = 0; j <= phiSegments; j ++ ) {
 
-			// values are generate from the inside of the ring to the outside
+			for ( i = 0; i <= thetaSegments; i ++ ) {
 
-			segment = thetaStart + i / thetaSegments * thetaLength;
+				// values are generate from the inside of the ring to the outside
 
-			// vertex
+				segment = thetaStart + i / thetaSegments * thetaLength;
 
-			vertex.x = radius * Math.cos( segment );
-			vertex.y = radius * Math.sin( segment );
+				// vertex
 
-			vertices.push( vertex.x, vertex.y, vertex.z );
+				vertex.x = radius * Math.cos( segment );
+				vertex.y = radius * Math.sin( segment );
 
-			// normal
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
-			normals.push( 0, 0, 1 );
+				// normal
 
-			// uv
+				normals.push( 0, 0, 1 );
 
-			uv.x = ( vertex.x / outerRadius + 1 ) / 2;
-			uv.y = ( vertex.y / outerRadius + 1 ) / 2;
+				// uv
 
-			uvs.push( uv.x, uv.y );
+				uv.x = ( vertex.x / outerRadius + 1 ) / 2;
+				uv.y = ( vertex.y / outerRadius + 1 ) / 2;
 
-		}
+				uvs.push( uv.x, uv.y );
 
-		// increase the radius for next row of vertices
+			}
 
-		radius += radiusStep;
+			// increase the radius for next row of vertices
 
-	}
-
-	// indices
-
-	for ( j = 0; j < phiSegments; j ++ ) {
-
-		var thetaSegmentLevel = j * ( thetaSegments + 1 );
-
-		for ( i = 0; i < thetaSegments; i ++ ) {
-
-			segment = i + thetaSegmentLevel;
-
-			var a = segment;
-			var b = segment + thetaSegments + 1;
-			var c = segment + thetaSegments + 2;
-			var d = segment + 1;
-
-			// faces
-
-			indices.push( a, b, d );
-			indices.push( b, c, d );
+			radius += radiusStep;
 
 		}
 
+		// indices
+
+		for ( j = 0; j < phiSegments; j ++ ) {
+
+			var thetaSegmentLevel = j * ( thetaSegments + 1 );
+
+			for ( i = 0; i < thetaSegments; i ++ ) {
+
+				segment = i + thetaSegmentLevel;
+
+				var a = segment;
+				var b = segment + thetaSegments + 1;
+				var c = segment + thetaSegments + 2;
+				var d = segment + 1;
+
+				// faces
+
+				indices.push( a, b, d );
+				indices.push( b, c, d );
+
+			}
+
+		}
+
+		// build geometry
+
+		this.setIndex( indices );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
 	}
-
-	// build geometry
-
-	this.setIndex( indices );
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 }
 
-RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-RingBufferGeometry.prototype.constructor = RingBufferGeometry;
+
+
 
 
 export { RingGeometry, RingBufferGeometry };

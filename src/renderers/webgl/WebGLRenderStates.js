@@ -4,99 +4,107 @@
 
 import { WebGLLights } from './WebGLLights.js';
 
-function WebGLRenderState() {
+class WebGLRenderState {
 
-	var lights = new WebGLLights();
+	constructor() {
 
-	var lightsArray = [];
-	var shadowsArray = [];
+		var lights = new WebGLLights();
 
-	function init() {
+		var lightsArray = [];
+		var shadowsArray = [];
 
-		lightsArray.length = 0;
-		shadowsArray.length = 0;
+		function init() {
+
+			lightsArray.length = 0;
+			shadowsArray.length = 0;
+
+		}
+
+		function pushLight( light ) {
+
+			lightsArray.push( light );
+
+		}
+
+		function pushShadow( shadowLight ) {
+
+			shadowsArray.push( shadowLight );
+
+		}
+
+		function setupLights( camera ) {
+
+			lights.setup( lightsArray, shadowsArray, camera );
+
+		}
+
+		var state = {
+			lightsArray: lightsArray,
+			shadowsArray: shadowsArray,
+
+			lights: lights
+		};
+
+		return {
+			init: init,
+			state: state,
+			setupLights: setupLights,
+
+			pushLight: pushLight,
+			pushShadow: pushShadow
+		};
 
 	}
-
-	function pushLight( light ) {
-
-		lightsArray.push( light );
-
-	}
-
-	function pushShadow( shadowLight ) {
-
-		shadowsArray.push( shadowLight );
-
-	}
-
-	function setupLights( camera ) {
-
-		lights.setup( lightsArray, shadowsArray, camera );
-
-	}
-
-	var state = {
-		lightsArray: lightsArray,
-		shadowsArray: shadowsArray,
-
-		lights: lights
-	};
-
-	return {
-		init: init,
-		state: state,
-		setupLights: setupLights,
-
-		pushLight: pushLight,
-		pushShadow: pushShadow
-	};
 
 }
 
-function WebGLRenderStates() {
+class WebGLRenderStates {
 
-	var renderStates = {};
+	constructor() {
 
-	function get( scene, camera ) {
+		var renderStates = {};
 
-		var renderState;
+		function get( scene, camera ) {
 
-		if ( renderStates[ scene.id ] === undefined ) {
+			var renderState;
 
-			renderState = new WebGLRenderState();
-			renderStates[ scene.id ] = {};
-			renderStates[ scene.id ][ camera.id ] = renderState;
-
-		} else {
-
-			if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
+			if ( renderStates[ scene.id ] === undefined ) {
 
 				renderState = new WebGLRenderState();
+				renderStates[ scene.id ] = {};
 				renderStates[ scene.id ][ camera.id ] = renderState;
 
 			} else {
 
-				renderState = renderStates[ scene.id ][ camera.id ];
+				if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
+
+					renderState = new WebGLRenderState();
+					renderStates[ scene.id ][ camera.id ] = renderState;
+
+				} else {
+
+					renderState = renderStates[ scene.id ][ camera.id ];
+
+				}
 
 			}
 
+			return renderState;
+
 		}
 
-		return renderState;
+		function dispose() {
+
+			renderStates = {};
+
+		}
+
+		return {
+			get: get,
+			dispose: dispose
+		};
 
 	}
-
-	function dispose() {
-
-		renderStates = {};
-
-	}
-
-	return {
-		get: get,
-		dispose: dispose
-	};
 
 }
 

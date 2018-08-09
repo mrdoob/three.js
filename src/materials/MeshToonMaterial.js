@@ -8,22 +8,26 @@ import { MeshPhongMaterial } from './MeshPhongMaterial.js';
  * }
  */
 
-function MeshToonMaterial( parameters ) {
+class MeshToonMaterial extends MeshPhongMaterial {
 
-	MeshPhongMaterial.call( this );
+	constructor( parameters ) {
 
-	this.defines = { 'TOON': '' };
+		super();
 
-	this.type = 'MeshToonMaterial';
+		this.defines = { 'TOON': '' };
 
-	this.gradientMap = null;
+		this.type = 'MeshToonMaterial';
 
-	this.setValues( parameters );
+		this.gradientMap = null;
+
+		this.setValues( parameters );
+
+	}
 
 }
 
-MeshToonMaterial.prototype = Object.create( MeshPhongMaterial.prototype );
-MeshToonMaterial.prototype.constructor = MeshToonMaterial;
+
+
 
 MeshToonMaterial.prototype.isMeshToonMaterial = true;
 

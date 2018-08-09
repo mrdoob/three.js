@@ -47,113 +47,121 @@ function reversePainterSortStable( a, b ) {
 }
 
 
-function WebGLRenderList() {
+class WebGLRenderList {
 
-	var renderItems = [];
-	var renderItemsIndex = 0;
+	constructor() {
 
-	var opaque = [];
-	var transparent = [];
+		var renderItems = [];
+		var renderItemsIndex = 0;
 
-	function init() {
+		var opaque = [];
+		var transparent = [];
 
-		renderItemsIndex = 0;
+		function init() {
 
-		opaque.length = 0;
-		transparent.length = 0;
+			renderItemsIndex = 0;
 
-	}
-
-	function push( object, geometry, material, z, group ) {
-
-		var renderItem = renderItems[ renderItemsIndex ];
-
-		if ( renderItem === undefined ) {
-
-			renderItem = {
-				id: object.id,
-				object: object,
-				geometry: geometry,
-				material: material,
-				program: material.program,
-				renderOrder: object.renderOrder,
-				z: z,
-				group: group
-			};
-
-			renderItems[ renderItemsIndex ] = renderItem;
-
-		} else {
-
-			renderItem.id = object.id;
-			renderItem.object = object;
-			renderItem.geometry = geometry;
-			renderItem.material = material;
-			renderItem.program = material.program;
-			renderItem.renderOrder = object.renderOrder;
-			renderItem.z = z;
-			renderItem.group = group;
+			opaque.length = 0;
+			transparent.length = 0;
 
 		}
 
+		function push( object, geometry, material, z, group ) {
 
-		( material.transparent === true ? transparent : opaque ).push( renderItem );
+			var renderItem = renderItems[ renderItemsIndex ];
 
-		renderItemsIndex ++;
+			if ( renderItem === undefined ) {
+
+				renderItem = {
+					id: object.id,
+					object: object,
+					geometry: geometry,
+					material: material,
+					program: material.program,
+					renderOrder: object.renderOrder,
+					z: z,
+					group: group
+				};
+
+				renderItems[ renderItemsIndex ] = renderItem;
+
+			} else {
+
+				renderItem.id = object.id;
+				renderItem.object = object;
+				renderItem.geometry = geometry;
+				renderItem.material = material;
+				renderItem.program = material.program;
+				renderItem.renderOrder = object.renderOrder;
+				renderItem.z = z;
+				renderItem.group = group;
+
+			}
+
+
+			( material.transparent === true ? transparent : opaque ).push( renderItem );
+
+			renderItemsIndex ++;
+
+		}
+
+		function sort() {
+
+			if ( opaque.length > 1 ) opaque.sort( painterSortStable );
+			if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
+
+		}
+
+		return {
+			opaque: opaque,
+			transparent: transparent,
+
+			init: init,
+			push: push,
+
+			sort: sort
+		};
 
 	}
-
-	function sort() {
-
-		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
-		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
-
-	}
-
-	return {
-		opaque: opaque,
-		transparent: transparent,
-
-		init: init,
-		push: push,
-
-		sort: sort
-	};
 
 }
 
-function WebGLRenderLists() {
+class WebGLRenderLists {
 
-	var lists = {};
+	constructor() {
 
-	function get( scene, camera ) {
+		var lists = {};
 
-		var hash = scene.id + ',' + camera.id;
-		var list = lists[ hash ];
+		function get( scene, camera ) {
 
-		if ( list === undefined ) {
+			var hash = scene.id + ',' + camera.id;
+			var list = lists[ hash ];
 
-			// console.log( 'THREE.WebGLRenderLists:', hash );
+			if ( list === undefined ) {
 
-			list = new WebGLRenderList();
-			lists[ hash ] = list;
+				// console.log( 'THREE.WebGLRenderLists:', hash );
+
+				list = new WebGLRenderList();
+				lists[ hash ] = list;
+
+			}
+
+			return list;
 
 		}
 
-		return list;
+		function dispose() {
+
+			lists = {};
+
+		}
+
+		return {
+			get: get,
+			dispose: dispose
+		};
 
 	}
-
-	function dispose() {
-
-		lists = {};
-
-	}
-
-	return {
-		get: get,
-		dispose: dispose
-	};
 
 }
 

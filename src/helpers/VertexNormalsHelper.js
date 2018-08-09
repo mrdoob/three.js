@@ -10,52 +10,56 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-function VertexNormalsHelper( object, size, hex, linewidth ) {
+class VertexNormalsHelper extends LineSegments {
 
-	this.object = object;
+	constructor( object, size, hex, linewidth ) {
 
-	this.size = ( size !== undefined ) ? size : 1;
+		var color = ( hex !== undefined ) ? hex : 0xff0000;
 
-	var color = ( hex !== undefined ) ? hex : 0xff0000;
+		var width = ( linewidth !== undefined ) ? linewidth : 1;
 
-	var width = ( linewidth !== undefined ) ? linewidth : 1;
+		//
 
-	//
+		var nNormals = 0;
 
-	var nNormals = 0;
+		if ( objGeometry && objGeometry.isGeometry ) {
 
-	var objGeometry = this.object.geometry;
+			nNormals = objGeometry.faces.length * 3;
 
-	if ( objGeometry && objGeometry.isGeometry ) {
+		} else if ( objGeometry && objGeometry.isBufferGeometry ) {
 
-		nNormals = objGeometry.faces.length * 3;
+			nNormals = objGeometry.attributes.normal.count;
 
-	} else if ( objGeometry && objGeometry.isBufferGeometry ) {
+		}
 
-		nNormals = objGeometry.attributes.normal.count;
+		//
+
+		var geometry = new BufferGeometry();
+
+		var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
+
+		geometry.addAttribute( 'position', positions );
+
+		super( geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
+
+		this.object = object;
+
+		this.size = ( size !== undefined ) ? size : 1;
+
+		var objGeometry = this.object.geometry;
+
+		//
+
+		this.matrixAutoUpdate = false;
+
+		this.update();
 
 	}
 
-	//
-
-	var geometry = new BufferGeometry();
-
-	var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
-
-	geometry.addAttribute( 'position', positions );
-
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
-
-	//
-
-	this.matrixAutoUpdate = false;
-
-	this.update();
-
 }
 
-VertexNormalsHelper.prototype = Object.create( LineSegments.prototype );
-VertexNormalsHelper.prototype.constructor = VertexNormalsHelper;
+
+
 
 VertexNormalsHelper.prototype.update = ( function () {
 

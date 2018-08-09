@@ -11,18 +11,18 @@
 // Characters [].:/ are reserved for track binding syntax.
 var RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
 
-function Composite( targetGroup, path, optionalParsedPath ) {
+class Composite {
 
-	var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
+	constructor( targetGroup, path, optionalParsedPath ) {
 
-	this._targetGroup = targetGroup;
-	this._bindings = targetGroup.subscribe_( path, parsedPath );
+		var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
-}
+		this._targetGroup = targetGroup;
+		this._bindings = targetGroup.subscribe_( path, parsedPath );
 
-Object.assign( Composite.prototype, {
+	}
 
-	getValue: function ( array, offset ) {
+	getValue( array, offset ) {
 
 		this.bind(); // bind all binding
 
@@ -32,9 +32,9 @@ Object.assign( Composite.prototype, {
 		// and only call .getValue on the first
 		if ( binding !== undefined ) binding.getValue( array, offset );
 
-	},
+	}
 
-	setValue: function ( array, offset ) {
+	setValue( array, offset ) {
 
 		var bindings = this._bindings;
 
@@ -45,9 +45,9 @@ Object.assign( Composite.prototype, {
 
 		}
 
-	},
+	}
 
-	bind: function () {
+	bind() {
 
 		var bindings = this._bindings;
 
@@ -58,9 +58,9 @@ Object.assign( Composite.prototype, {
 
 		}
 
-	},
+	}
 
-	unbind: function () {
+	unbind() {
 
 		var bindings = this._bindings;
 
@@ -73,378 +73,30 @@ Object.assign( Composite.prototype, {
 
 	}
 
-} );
-
-
-function PropertyBinding( rootNode, path, parsedPath ) {
-
-	this.path = path;
-	this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
-
-	this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
-
-	this.rootNode = rootNode;
-
 }
 
-Object.assign( PropertyBinding, {
 
-	Composite: Composite,
+class PropertyBinding {
 
-	create: function ( root, path, parsedPath ) {
+	constructor( rootNode, path, parsedPath ) {
 
-		if ( ! ( root && root.isAnimationObjectGroup ) ) {
+		this.path = path;
+		this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
 
-			return new PropertyBinding( root, path, parsedPath );
+		this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
 
-		} else {
-
-			return new PropertyBinding.Composite( root, path, parsedPath );
-
-		}
-
-	},
-
-	/**
-	 * Replaces spaces with underscores and removes unsupported characters from
-	 * node names, to ensure compatibility with parseTrackName().
-	 *
-	 * @param  {string} name Node name to be sanitized.
-	 * @return {string}
-	 */
-	sanitizeNodeName: ( function () {
-
-		var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
-
-		return function sanitizeNodeName( name ) {
-
-			return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
-
-		};
-
-	}() ),
-
-	parseTrackName: function () {
-
-		// Attempts to allow node names from any language. ES5's `\w` regexp matches
-		// only latin characters, and the unicode \p{L} is not yet supported. So
-		// instead, we exclude reserved characters and match everything else.
-		var wordChar = '[^' + RESERVED_CHARS_RE + ']';
-		var wordCharOrDot = '[^' + RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
-
-		// Parent directories, delimited by '/' or ':'. Currently unused, but must
-		// be matched to parse the rest of the track name.
-		var directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', wordChar );
-
-		// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-		var nodeRe = /(WCOD+)?/.source.replace( 'WCOD', wordCharOrDot );
-
-		// Object on target node, and accessor. May not contain reserved
-		// characters. Accessor may contain any character except closing bracket.
-		var objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', wordChar );
-
-		// Property and accessor. May not contain reserved characters. Accessor may
-		// contain any non-bracket characters.
-		var propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', wordChar );
-
-		var trackRe = new RegExp( ''
-			+ '^'
-			+ directoryRe
-			+ nodeRe
-			+ objectRe
-			+ propertyRe
-			+ '$'
-		);
-
-		var supportedObjectNames = [ 'material', 'materials', 'bones' ];
-
-		return function parseTrackName( trackName ) {
-
-			var matches = trackRe.exec( trackName );
-
-			if ( ! matches ) {
-
-				throw new Error( 'PropertyBinding: Cannot parse trackName: ' + trackName );
-
-			}
-
-			var results = {
-				// directoryName: matches[ 1 ], // (tschw) currently unused
-				nodeName: matches[ 2 ],
-				objectName: matches[ 3 ],
-				objectIndex: matches[ 4 ],
-				propertyName: matches[ 5 ], // required
-				propertyIndex: matches[ 6 ]
-			};
-
-			var lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
-
-			if ( lastDot !== undefined && lastDot !== - 1 ) {
-
-				var objectName = results.nodeName.substring( lastDot + 1 );
-
-				// Object names must be checked against a whitelist. Otherwise, there
-				// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
-				// 'bar' could be the objectName, or part of a nodeName (which can
-				// include '.' characters).
-				if ( supportedObjectNames.indexOf( objectName ) !== - 1 ) {
-
-					results.nodeName = results.nodeName.substring( 0, lastDot );
-					results.objectName = objectName;
-
-				}
-
-			}
-
-			if ( results.propertyName === null || results.propertyName.length === 0 ) {
-
-				throw new Error( 'PropertyBinding: can not parse propertyName from trackName: ' + trackName );
-
-			}
-
-			return results;
-
-		};
-
-	}(),
-
-	findNode: function ( root, nodeName ) {
-
-		if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
-
-			return root;
-
-		}
-
-		// search into skeleton bones.
-		if ( root.skeleton ) {
-
-			var bone = root.skeleton.getBoneByName( nodeName );
-
-			if ( bone !== undefined ) {
-
-				return bone;
-
-			}
-
-		}
-
-		// search into node subtree.
-		if ( root.children ) {
-
-			var searchNodeSubtree = function ( children ) {
-
-				for ( var i = 0; i < children.length; i ++ ) {
-
-					var childNode = children[ i ];
-
-					if ( childNode.name === nodeName || childNode.uuid === nodeName ) {
-
-						return childNode;
-
-					}
-
-					var result = searchNodeSubtree( childNode.children );
-
-					if ( result ) return result;
-
-				}
-
-				return null;
-
-			};
-
-			var subTreeNode = searchNodeSubtree( root.children );
-
-			if ( subTreeNode ) {
-
-				return subTreeNode;
-
-			}
-
-		}
-
-		return null;
+		this.rootNode = rootNode;
 
 	}
 
-} );
-
-Object.assign( PropertyBinding.prototype, { // prototype, continued
+	// prototype, continued
 
 	// these are used to "bind" a nonexistent property
-	_getValue_unavailable: function () {},
-	_setValue_unavailable: function () {},
+	_getValue_unavailable() {}
 
-	BindingType: {
-		Direct: 0,
-		EntireArray: 1,
-		ArrayElement: 2,
-		HasFromToArray: 3
-	},
+	_setValue_unavailable() {}
 
-	Versioning: {
-		None: 0,
-		NeedsUpdate: 1,
-		MatrixWorldNeedsUpdate: 2
-	},
-
-	GetterByBindingType: [
-
-		function getValue_direct( buffer, offset ) {
-
-			buffer[ offset ] = this.node[ this.propertyName ];
-
-		},
-
-		function getValue_array( buffer, offset ) {
-
-			var source = this.resolvedProperty;
-
-			for ( var i = 0, n = source.length; i !== n; ++ i ) {
-
-				buffer[ offset ++ ] = source[ i ];
-
-			}
-
-		},
-
-		function getValue_arrayElement( buffer, offset ) {
-
-			buffer[ offset ] = this.resolvedProperty[ this.propertyIndex ];
-
-		},
-
-		function getValue_toArray( buffer, offset ) {
-
-			this.resolvedProperty.toArray( buffer, offset );
-
-		}
-
-	],
-
-	SetterByBindingTypeAndVersioning: [
-
-		[
-			// Direct
-
-			function setValue_direct( buffer, offset ) {
-
-				this.targetObject[ this.propertyName ] = buffer[ offset ];
-
-			},
-
-			function setValue_direct_setNeedsUpdate( buffer, offset ) {
-
-				this.targetObject[ this.propertyName ] = buffer[ offset ];
-				this.targetObject.needsUpdate = true;
-
-			},
-
-			function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
-
-				this.targetObject[ this.propertyName ] = buffer[ offset ];
-				this.targetObject.matrixWorldNeedsUpdate = true;
-
-			}
-
-		], [
-
-			// EntireArray
-
-			function setValue_array( buffer, offset ) {
-
-				var dest = this.resolvedProperty;
-
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
-
-					dest[ i ] = buffer[ offset ++ ];
-
-				}
-
-			},
-
-			function setValue_array_setNeedsUpdate( buffer, offset ) {
-
-				var dest = this.resolvedProperty;
-
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
-
-					dest[ i ] = buffer[ offset ++ ];
-
-				}
-
-				this.targetObject.needsUpdate = true;
-
-			},
-
-			function setValue_array_setMatrixWorldNeedsUpdate( buffer, offset ) {
-
-				var dest = this.resolvedProperty;
-
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
-
-					dest[ i ] = buffer[ offset ++ ];
-
-				}
-
-				this.targetObject.matrixWorldNeedsUpdate = true;
-
-			}
-
-		], [
-
-			// ArrayElement
-
-			function setValue_arrayElement( buffer, offset ) {
-
-				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
-
-			},
-
-			function setValue_arrayElement_setNeedsUpdate( buffer, offset ) {
-
-				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
-				this.targetObject.needsUpdate = true;
-
-			},
-
-			function setValue_arrayElement_setMatrixWorldNeedsUpdate( buffer, offset ) {
-
-				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
-				this.targetObject.matrixWorldNeedsUpdate = true;
-
-			}
-
-		], [
-
-			// HasToFromArray
-
-			function setValue_fromArray( buffer, offset ) {
-
-				this.resolvedProperty.fromArray( buffer, offset );
-
-			},
-
-			function setValue_fromArray_setNeedsUpdate( buffer, offset ) {
-
-				this.resolvedProperty.fromArray( buffer, offset );
-				this.targetObject.needsUpdate = true;
-
-			},
-
-			function setValue_fromArray_setMatrixWorldNeedsUpdate( buffer, offset ) {
-
-				this.resolvedProperty.fromArray( buffer, offset );
-				this.targetObject.matrixWorldNeedsUpdate = true;
-
-			}
-
-		]
-
-	],
-
-	getValue: function getValue_unbound( targetArray, offset ) {
+	getValue( targetArray, offset ) {
 
 		this.bind();
 		this.getValue( targetArray, offset );
@@ -455,17 +107,17 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		// the bound state. When the property is not found, the methods
 		// become no-ops.
 
-	},
+	}
 
-	setValue: function getValue_unbound( sourceArray, offset ) {
+	setValue( sourceArray, offset ) {
 
 		this.bind();
 		this.setValue( sourceArray, offset );
 
-	},
+	}
 
 	// create getter / setter pair for a property in the scene graph
-	bind: function () {
+	bind() {
 
 		var targetObject = this.node,
 			parsedPath = this.parsedPath,
@@ -699,9 +351,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		this.getValue = this.GetterByBindingType[ bindingType ];
 		this.setValue = this.SetterByBindingTypeAndVersioning[ bindingType ][ versioning ];
 
-	},
+	}
 
-	unbind: function () {
+	unbind() {
 
 		this.node = null;
 
@@ -712,15 +364,352 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 	}
 
-} );
+	static create( root, path, parsedPath ) {
+
+		if ( ! ( root && root.isAnimationObjectGroup ) ) {
+
+			return new PropertyBinding( root, path, parsedPath );
+
+		} else {
+
+			return new PropertyBinding.Composite( root, path, parsedPath );
+
+		}
+
+	}
+
+	static findNode( root, nodeName ) {
+
+		if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
+
+			return root;
+
+		}
+
+		// search into skeleton bones.
+		if ( root.skeleton ) {
+
+			var bone = root.skeleton.getBoneByName( nodeName );
+
+			if ( bone !== undefined ) {
+
+				return bone;
+
+			}
+
+		}
+
+		// search into node subtree.
+		if ( root.children ) {
+
+			var searchNodeSubtree = function ( children ) {
+
+				for ( var i = 0; i < children.length; i ++ ) {
+
+					var childNode = children[ i ];
+
+					if ( childNode.name === nodeName || childNode.uuid === nodeName ) {
+
+						return childNode;
+
+					}
+
+					var result = searchNodeSubtree( childNode.children );
+
+					if ( result ) return result;
+
+				}
+
+				return null;
+
+			};
+
+			var subTreeNode = searchNodeSubtree( root.children );
+
+			if ( subTreeNode ) {
+
+				return subTreeNode;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+}
+
+PropertyBinding.Composite = Composite;
+
+PropertyBinding.sanitizeNodeName = function () {
+
+	var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
+
+	return function sanitizeNodeName( name ) {
+
+		return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
+
+	};
+
+}();
+
+PropertyBinding.parseTrackName = function () {
+
+	// Attempts to allow node names from any language. ES5's `\w` regexp matches
+	// only latin characters, and the unicode \p{L} is not yet supported. So
+	// instead, we exclude reserved characters and match everything else.
+	var wordChar = '[^' + RESERVED_CHARS_RE + ']';
+	var wordCharOrDot = '[^' + RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
+
+	// Parent directories, delimited by '/' or ':'. Currently unused, but must
+	// be matched to parse the rest of the track name.
+	var directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', wordChar );
+
+	// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
+	var nodeRe = /(WCOD+)?/.source.replace( 'WCOD', wordCharOrDot );
+
+	// Object on target node, and accessor. May not contain reserved
+	// characters. Accessor may contain any character except closing bracket.
+	var objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', wordChar );
+
+	// Property and accessor. May not contain reserved characters. Accessor may
+	// contain any non-bracket characters.
+	var propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', wordChar );
+
+	var trackRe = new RegExp( ''
+		+ '^'
+		+ directoryRe
+		+ nodeRe
+		+ objectRe
+		+ propertyRe
+		+ '$'
+	);
+
+	var supportedObjectNames = [ 'material', 'materials', 'bones' ];
+
+	return function parseTrackName( trackName ) {
+
+		var matches = trackRe.exec( trackName );
+
+		if ( ! matches ) {
+
+			throw new Error( 'PropertyBinding: Cannot parse trackName: ' + trackName );
+
+		}
+
+		var results = {
+			// directoryName: matches[ 1 ], // (tschw) currently unused
+			nodeName: matches[ 2 ],
+			objectName: matches[ 3 ],
+			objectIndex: matches[ 4 ],
+			propertyName: matches[ 5 ], // required
+			propertyIndex: matches[ 6 ]
+		};
+
+		var lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
+
+		if ( lastDot !== undefined && lastDot !== - 1 ) {
+
+			var objectName = results.nodeName.substring( lastDot + 1 );
+
+			// Object names must be checked against a whitelist. Otherwise, there
+			// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
+			// 'bar' could be the objectName, or part of a nodeName (which can
+			// include '.' characters).
+			if ( supportedObjectNames.indexOf( objectName ) !== - 1 ) {
+
+				results.nodeName = results.nodeName.substring( 0, lastDot );
+				results.objectName = objectName;
+
+			}
+
+		}
+
+		if ( results.propertyName === null || results.propertyName.length === 0 ) {
+
+			throw new Error( 'PropertyBinding: can not parse propertyName from trackName: ' + trackName );
+
+		}
+
+		return results;
+
+	};
+
+}();
+
+PropertyBinding.prototype.BindingType = {
+	Direct: 0,
+	EntireArray: 1,
+	ArrayElement: 2,
+	HasFromToArray: 3
+};
+
+PropertyBinding.prototype.Versioning = {
+	None: 0,
+	NeedsUpdate: 1,
+	MatrixWorldNeedsUpdate: 2
+};
+
+PropertyBinding.prototype.GetterByBindingType = [
+
+	function getValue_direct( buffer, offset ) {
+
+		buffer[ offset ] = this.node[ this.propertyName ];
+
+	},
+
+	function getValue_array( buffer, offset ) {
+
+		var source = this.resolvedProperty;
+
+		for ( var i = 0, n = source.length; i !== n; ++ i ) {
+
+			buffer[ offset ++ ] = source[ i ];
+
+		}
+
+	},
+
+	function getValue_arrayElement( buffer, offset ) {
+
+		buffer[ offset ] = this.resolvedProperty[ this.propertyIndex ];
+
+	},
+
+	function getValue_toArray( buffer, offset ) {
+
+		this.resolvedProperty.toArray( buffer, offset );
+
+	}
+
+];
+
+PropertyBinding.prototype.SetterByBindingTypeAndVersioning = [
+
+	[
+		// Direct
+
+		function setValue_direct( buffer, offset ) {
+
+			this.targetObject[ this.propertyName ] = buffer[ offset ];
+
+		},
+
+		function setValue_direct_setNeedsUpdate( buffer, offset ) {
+
+			this.targetObject[ this.propertyName ] = buffer[ offset ];
+			this.targetObject.needsUpdate = true;
+
+		},
+
+		function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+			this.targetObject[ this.propertyName ] = buffer[ offset ];
+			this.targetObject.matrixWorldNeedsUpdate = true;
+
+		}
+
+	], [
+
+		// EntireArray
+
+		function setValue_array( buffer, offset ) {
+
+			var dest = this.resolvedProperty;
+
+			for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+				dest[ i ] = buffer[ offset ++ ];
+
+			}
+
+		},
+
+		function setValue_array_setNeedsUpdate( buffer, offset ) {
+
+			var dest = this.resolvedProperty;
+
+			for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+				dest[ i ] = buffer[ offset ++ ];
+
+			}
+
+			this.targetObject.needsUpdate = true;
+
+		},
+
+		function setValue_array_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+			var dest = this.resolvedProperty;
+
+			for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+				dest[ i ] = buffer[ offset ++ ];
+
+			}
+
+			this.targetObject.matrixWorldNeedsUpdate = true;
+
+		}
+
+	], [
+
+		// ArrayElement
+
+		function setValue_arrayElement( buffer, offset ) {
+
+			this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+
+		},
+
+		function setValue_arrayElement_setNeedsUpdate( buffer, offset ) {
+
+			this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+			this.targetObject.needsUpdate = true;
+
+		},
+
+		function setValue_arrayElement_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+			this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+			this.targetObject.matrixWorldNeedsUpdate = true;
+
+		}
+
+	], [
+
+		// HasToFromArray
+
+		function setValue_fromArray( buffer, offset ) {
+
+			this.resolvedProperty.fromArray( buffer, offset );
+
+		},
+
+		function setValue_fromArray_setNeedsUpdate( buffer, offset ) {
+
+			this.resolvedProperty.fromArray( buffer, offset );
+			this.targetObject.needsUpdate = true;
+
+		},
+
+		function setValue_fromArray_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+			this.resolvedProperty.fromArray( buffer, offset );
+			this.targetObject.matrixWorldNeedsUpdate = true;
+
+		}
+
+	]
+
+];
+
+PropertyBinding.prototype._getValue_unbound = PropertyBinding.prototype.getValue;
+
+PropertyBinding.prototype._setValue_unbound = PropertyBinding.prototype.setValue;
 
 //!\ DECLARE ALIAS AFTER assign prototype !
-Object.assign( PropertyBinding.prototype, {
-
-	// initial state of these methods that calls 'bind'
-	_getValue_unbound: PropertyBinding.prototype.getValue,
-	_setValue_unbound: PropertyBinding.prototype.setValue,
-
-} );
 
 export { PropertyBinding };

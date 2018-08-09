@@ -13,88 +13,80 @@ export default QUnit.module( 'Maths', () => {
 		// Since this is an abstract base class, we have to make it concrete in order
 		// to QUnit.test its functionality...
 
-		function Mock( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+		class Mock extends Interpolant {
+			intervalChanged_( i1, t0, t1 ) {
 
-			Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+				if ( Mock.calls !== null ) {
 
+					Mock.calls.push( {
+						func: 'intervalChanged',
+						args: [ i1, t0, t1 ]
+					} );
+
+				}
+
+			}
+
+			interpolate_( i1, t0, t, t1 ) {
+
+				if ( Mock.calls !== null ) {
+
+					Mock.calls.push( {
+						func: 'interpolate',
+						args: [ i1, t0, t, t1 ]
+					} );
+
+				}
+
+				return this.copySampleValue_( i1 - 1 );
+
+			}
+
+			beforeStart_( i, t, t0 ) {
+
+				if ( Mock.calls !== null ) {
+
+					Mock.calls.push( {
+						func: 'beforeStart',
+						args: [ i, t, t0 ]
+					} );
+
+				}
+
+				return this.copySampleValue_( i );
+
+			}
+
+			afterEnd_( i, tN, t ) {
+
+				if ( Mock.calls !== null ) {
+
+					Mock.calls.push( {
+						func: 'afterEnd',
+						args: [ i, tN, t ]
+					} );
+
+				}
+
+				return this.copySampleValue_( i );
+
+			}
+
+			static captureCall ( args ) {
+				if ( Mock.calls !== null ) {
+
+					Mock.calls.push( {
+						func: Mock.captureCall.caller.name,
+						args: Array.prototype.slice.call( args )
+					} );
+
+				}
+			}
 		}
-
-		Mock.prototype = Object.create( Interpolant.prototype );
-
-		Mock.prototype.intervalChanged_ = function intervalChanged( i1, t0, t1 ) {
-
-			if ( Mock.calls !== null ) {
-
-				Mock.calls.push( {
-					func: 'intervalChanged',
-					args: [ i1, t0, t1 ]
-				} );
-
-			}
-
-		};
-
-		Mock.prototype.interpolate_ = function interpolate( i1, t0, t, t1 ) {
-
-			if ( Mock.calls !== null ) {
-
-				Mock.calls.push( {
-					func: 'interpolate',
-					args: [ i1, t0, t, t1 ]
-				} );
-
-			}
-
-			return this.copySampleValue_( i1 - 1 );
-
-		};
-
-		Mock.prototype.beforeStart_ = function beforeStart( i, t, t0 ) {
-
-			if ( Mock.calls !== null ) {
-
-				Mock.calls.push( {
-					func: 'beforeStart',
-					args: [ i, t, t0 ]
-				} );
-
-			}
-
-			return this.copySampleValue_( i );
-
-		};
-
-		Mock.prototype.afterEnd_ = function afterEnd( i, tN, t ) {
-
-			if ( Mock.calls !== null ) {
-
-				Mock.calls.push( {
-					func: 'afterEnd',
-					args: [ i, tN, t ]
-				} );
-
-			}
-
-			return this.copySampleValue_( i );
-
-		};
 
 		// Call capturing facility
 
 		Mock.calls = null;
-
-		Mock.captureCall = function ( args ) {
-
-			if ( Mock.calls !== null ) {
-
-				Mock.calls.push( {
-					func: Mock.captureCall.caller.name,
-					args: Array.prototype.slice.call( args )
-				} );
-
-			}
-
-		};
 
 		// Tests
 
