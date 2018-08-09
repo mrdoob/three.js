@@ -53,7 +53,9 @@ Object.assign( LightShadow.prototype, {
 
 		return object;
 
-	}
+	},
+
+	update: function ( ) { }
 
 } );
 

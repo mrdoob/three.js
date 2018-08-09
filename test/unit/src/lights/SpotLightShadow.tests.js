@@ -27,12 +27,6 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isSpotLightShadow", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 		QUnit.todo( "update", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );

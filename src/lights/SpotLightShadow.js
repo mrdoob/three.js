@@ -9,15 +9,12 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 function SpotLightShadow() {
 
 	LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );
-	this.cameraAutoUpdate = true;
 
 }
 
 SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
 	constructor: SpotLightShadow,
-
-	isSpotLightShadow: true,
 
 	update: function ( light ) {
 
