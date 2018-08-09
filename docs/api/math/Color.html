@@ -218,6 +218,18 @@ var color = new THREE.Color( 1, 0, 0 );
 		this color and 1.0 is the first argument.
 		</p>
 
+		<h3>[method:Color lerpHSL]( [param:Color color], [param:Float alpha] ) </h3>
+		<p>
+		[page:Color color] - color to converge on.<br />
+		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+
+		Linearly interpolates this color's HSL values toward the HSL values of the passed argument.
+		It differs from the classic [page:.lerp] by not interpolating straight from one color to the other,
+		but instead going through all the hues in between those two colors.
+		The alpha argument can be thought of as the ratio between the two colors, where 0.0 is
+		this color and 1.0 is the first argument.
+		</p>
+
 		<h3>[method:Color multiply]( [param:Color color] ) </h3>
 		<p>Multiplies this color's RGB values by the given [page:Color color]'s RGB values.</p>
 
