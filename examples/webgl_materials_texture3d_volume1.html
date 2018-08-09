@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - vtk loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 5;
+				display:block;
+			}
+			.dg {
+				z-index: 10 !important;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			#inset  {
+				width: 150px;
+				height: 150px;
+				background-color: transparent; /* or transparent; will show through only if renderer alpha: true */
+				border: none; /* or none; */
+				margin: 0;
+				padding: 0px;
+				position: absolute;
+				left: 20px;
+				bottom: 20px;
+				z-index: 100;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			Float volume render test (mip / isosurface)
+		</div>
+		<div id="inset"></div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/Volume.js"></script>
+		<script src="js/VolumeSlice.js"></script>
+        <script src="js/loaders/NRRDLoader.js"></script>
+        <script src="js/shaders/VolumeShader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/gunzip.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container,
+				stats,
+				camera,
+				controls,
+				scene,
+				renderer,
+				gui,
+				container2,
+				renderer2,
+				camera2,
+				axes2,
+				scene2;
+
+			init();
+			animate();
+
+			function init() {
+
+                // The volume renderer does not work very well with perspective yet
+                //camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+                camera = new THREE.OrthographicCamera()
+				camera.position.z = 1000;
+                this.camera.right = window.innerWidth / 5.0;
+                this.camera.left = -this.camera.right;
+                this.camera.top = window.innerHeight / 5.0;
+                this.camera.bottom = -this.camera.top;
+                this.camera.near = 0.1;
+                this.camera.far = 5000;
+                this.camera.updateProjectionMatrix();
+
+				scene = new THREE.Scene();
+
+				scene.add( camera );
+
+				// light
+
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 200, 200, 1000 ).normalize();
+
+				camera.add( dirLight );
+				camera.add( dirLight.target );
+
+				var loader = new THREE.NRRDLoader();
+				loader.load( "models/nrrd/stent.nrrd", function ( volume ) {
+                    window.volume = volume;
+                    if (false) {
+                        // Box helper to see the extend of the volume
+                        var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
+                        geometry = geometry.translate(+volume.xLength / 2, -volume.yLength / 2, -volume.zLength / 2);
+                        var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+                        var cube = new THREE.Mesh( geometry, material );
+                        cube.visible = false;
+                        var box = new THREE.BoxHelper( cube );
+                        scene.add( box );
+                        box.applyMatrix(volume.matrix);
+                        scene.add( cube );
+                    }
+
+                    // Texture to hold the volume. We have scalars, so we put our data in the red channel.
+                    // THREEJS will select R32F (33326) based on the RedFormat and FloatType.
+                    // Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
+                    // TODO: look the dtype up in the volume metadata
+                    var texture = new THREE.Texture3D(volume.data, volume.xLength, volume.yLength, volume.zLength, THREE.RedFormat, THREE.FloatType);
+                    texture.minFilter = texture.magFilter = THREE.LinearFilter;
+                    texture.unpackAlignment = 1;
+                    texture.needsUpdate = true;
+
+                    // Colormap texture
+                    var cmtexture = new THREE.TextureLoader().load( 'textures/cm_viridis.png' );  // e.g. cm_gray or cm_viridis
+
+                    // Material (shaders) to render the volume using raycasting
+                    var volmaterial = new THREE.ShaderMaterial( THREE.ShaderLib['volumerender1'] );
+                    volmaterial.side = THREE.BackSide;  // The volume shader uses the backface as its "reference point"
+
+                    // Apply volume material uniform info
+                    volmaterial.uniforms.u_data = { type: 't', value: texture };
+                    volmaterial.uniforms.u_cmdata = { type: 't', value: cmtexture };
+                    volmaterial.uniforms.u_size = { type: 'v3', value: [volume.xLength, volume.yLength, volume.zLength] };
+                    volmaterial.uniforms.u_renderstyle = {type: 'int', value: 0}; // 0: MIP, 1: ISO
+                    volmaterial.uniforms.u_renderthreshold = {type: 'f', value: 0.3};  // For ISO renderstyle
+                    volmaterial.uniforms.u_clim = {type: 'v2', value: [0, 1]};
+                    volmaterial.needsUpdate = true;
+
+                    // Geometry for the volume
+                    var volgeometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
+                    volgeometry = volgeometry.translate(volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5);
+                    var volcube = new THREE.Mesh(volgeometry, volmaterial);
+                    scene.add( volcube );
+
+                    // TODO: the texture coordinates currently map directly to world coordinates. That's why we translate
+                    // the geometry above. But the extractSlice() below assume that the volume is centered at the origin.
+                    // We need to add a material attribute with texture coordinates to fix this.
+                    return;
+
+                    //z plane
+					var indexZ = 0;
+					var sliceZ = volume.extractSlice('z',Math.floor(volume.RASDimensions[2]/4));
+					scene.add( sliceZ.mesh );
+
+					//y plane
+					var indexY = 0;
+					var sliceY = volume.extractSlice('y',Math.floor(volume.RASDimensions[1]/2));
+					scene.add( sliceY.mesh );
+
+					//x plane
+					var indexX = 0;
+					var sliceX = volume.extractSlice('x',Math.floor(volume.RASDimensions[0]/2));
+					scene.add( sliceX.mesh );
+
+					gui.add( sliceX, "index", 0, volume.RASDimensions[0], 1 ).name( "indexX" ).onChange( function () {sliceX.repaint.call(sliceX);} );
+					gui.add( sliceY, "index", 0, volume.RASDimensions[1], 1 ).name( "indexY" ).onChange( function () {sliceY.repaint.call(sliceY);} );
+					gui.add( sliceZ, "index", 0, volume.RASDimensions[2], 1 ).name( "indexZ" ).onChange( function () {sliceZ.repaint.call(sliceZ);} );
+
+					gui.add( volume, "lowerThreshold", volume.min, volume.max, 1).name( "Lower Threshold").onChange( function () {
+						volume.repaintAllSlices();
+					});
+					gui.add( volume, "upperThreshold", volume.min, volume.max, 1).name( "Upper Threshold").onChange( function () {
+						volume.repaintAllSlices();
+					});
+					gui.add( volume, "windowLow", volume.min, volume.max, 1).name( "Window Low").onChange( function () {
+						volume.repaintAllSlices();
+					});
+					gui.add( volume, "windowHigh", volume.min, volume.max, 1).name( "Window High").onChange( function () {
+						volume.repaintAllSlices();
+					});
+
+				} );
+
+				// renderer
+                var canvas = document.createElement( 'canvas' );
+				var context = canvas.getContext( 'webgl2' );
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+                renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 5.0;
+				controls.zoomSpeed = 5;
+				controls.panSpeed = 2;
+				controls.noZoom = false;
+				controls.noPan = false;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				var gui = new dat.GUI();
+
+				setupInset();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				//copy position of the camera into inset
+				camera2.position.copy( camera.position );
+				camera2.position.sub( controls.target );
+				camera2.position.setLength( 300 );
+				camera2.lookAt( scene2.position );
+
+				renderer.render( scene, camera );
+				renderer2.render( scene2, camera2);
+
+				stats.update();
+
+			}
+
+			function rotateAroundWorldAxis(object, axis, radians) {
+				var rotWorldMatrix = new THREE.Matrix4();
+				rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+
+				object.applyMatrix(rotWorldMatrix);
+
+			}
+
+			function setupInset () {
+				var insetWidth = 150,
+					insetHeight = 150;
+				container2 = document.getElementById('inset');
+				container2.width = insetWidth;
+				container2.height = insetHeight;
+
+				// renderer
+				renderer2 = new THREE.WebGLRenderer({alpha : true});
+				renderer2.setClearColor( 0x000000, 0 );
+				renderer2.setSize( insetWidth, insetHeight );
+				container2.appendChild( renderer2.domElement );
+
+				// scene
+				scene2 = new THREE.Scene();
+
+				// camera
+				camera2 = new THREE.PerspectiveCamera( 50, insetWidth / insetHeight, 1, 1000 );
+				camera2.up = camera.up; // important!
+
+				// axes
+				axes2 = new THREE.AxesHelper( 100 );
+				scene2.add( axes2 );
+			}
+
+
+		</script>
+
+	</body>
+</html>
