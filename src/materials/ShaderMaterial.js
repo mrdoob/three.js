@@ -121,20 +121,54 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 	for ( var name in this.uniforms ) {
 
 		var uniform = this.uniforms[ name ];
+		var value = uniform.value;
 
-		if ( uniform.value.isTexture ) {
-
-			var texture = uniform.value;
+		if ( value.isTexture ) {
 
 			data.uniforms[ name ] = {
 				type: 't',
-				value: texture.toJSON( meta ).uuid
+				value: value.toJSON( meta ).uuid
+			};
+
+		} else if ( value.isColor ) {
+
+			data.uniforms[ name ] = {
+				type: 'c',
+				value: value.getHex()
+			};
+
+		} else if ( value.isVector2 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v2',
+				value: value.toArray()
+			};
+
+		} else if ( value.isVector3 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v3',
+				value: value.toArray()
+			};
+
+		} else if ( value.isVector4 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v4',
+				value: value.toArray()
+			};
+
+		} else if ( value.isMatrix4 ) {
+
+			data.uniforms[ name ] = {
+				type: 'm4',
+				value: value.toArray()
 			};
 
 		} else {
 
 			data.uniforms[ name ] = {
-				value: uniform.value
+				value: value
 			};
 
 		}
