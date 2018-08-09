@@ -114,7 +114,6 @@
 			var normals = [];
 			var colors = [];
 
-			var spherical = new THREE.Spherical();
 			var vector = new THREE.Vector3();
 
 			var color = new THREE.Color( 0xffffff );
@@ -126,8 +125,7 @@
 				var phi = Math.acos( - 1 + ( 2 * i ) / l );
 				var theta = Math.sqrt( l * Math.PI ) * phi;
 
-				spherical.set( radius, phi, theta );
-				vector.setFromSpherical( spherical );
+				vector.setFromSphericalCoords( radius, phi, theta );
 
 				geometry.copy( heartGeometry );
 				geometry.lookAt( vector );
