@@ -1240,6 +1240,10 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( object.isSprite ) {
 
+				// Sprite.raycast() needs modelViewMatrix, even when the sprite is not rendered
+
+				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+
 				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
 					if ( sortObjects ) {
@@ -1389,7 +1393,7 @@ function WebGLRenderer( parameters ) {
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
 		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
 
-		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+		if ( ! object.isSprite ) object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 		if ( object.isImmediateRenderObject ) {
