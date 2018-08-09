@@ -30,7 +30,6 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
 
 	</head>
@@ -63,7 +62,7 @@
 
 			scene = new THREE.Scene();
 
-			var geometry = new THREE.ConeBufferGeometry( 0.2, 1, 8 );
+			var geometry = new THREE.ConeBufferGeometry( 0.1, 0.5, 8 );
 			geometry.rotateX( Math.PI * 0.5 );
 			var material = new THREE.MeshNormalMaterial();
 
@@ -94,10 +93,6 @@
 			//
 
 			window.addEventListener( 'resize', onResize, false );
-
-			//
-
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			//
 
