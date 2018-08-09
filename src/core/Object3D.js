@@ -506,6 +506,99 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	}(),
 
+	setPosition: function ( position, world ) {
+
+		if ( !this.parent || world !== true ) {
+
+			this.position.copy( position );
+
+		} else {
+
+			this.setWorldPosition( position );
+
+		}
+
+	},
+
+	setRotation: function ( rotation, world ) {
+
+		if ( !this.parent || world !== true ) {
+
+			this.rotation.copy( rotation );
+
+		} else {
+
+			this.setWorldRotation( rotation );
+
+		}
+
+	},
+
+	setScale: function ( scale, world ) {
+
+		if ( !this.parent || world !== true ) {
+
+			this.scale.copy( scale );
+
+		} else {
+
+			this.setWorldScale( scale );
+
+		}
+
+	},
+
+	setWorldPosition: function (worldPosition) {
+
+		if ( this.parent ) {
+
+			this.parent.updateMatrixWorld( true );
+			this.parent.worldToLocal( worldPosition );
+			this.position.copy( worldPosition );
+
+		} else {
+
+			this.position.set( worldPosition );
+
+		}
+
+	},
+
+	setWorldScale: function ( worldScale ) {
+
+		if ( this.parent ) {
+
+			var scale = new THREE.Vector3();
+			this.parent.updateMatrixWorld( true );
+			this.parent.getWorldScale( scale );
+			worldScale.divide( scale );
+			this.scale.copy( worldScale );
+
+		} else {
+
+			this.scale.set( worldScale );
+
+		}
+
+	},
+
+	setWorldRotation: function ( worldRotation ) {
+
+		if ( this.parent ) {
+
+			var rotation = new THREE.Euler();
+			this.parent.updateMatrixWorld( true );
+			this.parent.getWorldRotation( rotation );
+			this.rotation.set( worldRotation.x - rotation.x, worldRotation.y - rotation.y, worldRotation.z - rotation.z );
+
+		} else {
+
+			this.rotation.set( worldRotation );
+
+		}
+
+	},
+
 	getWorldDirection: function () {
 
 		var quaternion = new Quaternion();

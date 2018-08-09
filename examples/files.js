@@ -248,6 +248,7 @@ var files = {
 		"webgl_read_float_buffer",
 		"webgl_refraction",
 		"webgl_rtt",
+		"webgl_setglobal",
 		"webgl_sandbox",
 		"webgl_shader",
 		"webgl_shader_lava",

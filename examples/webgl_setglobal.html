@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - global/local</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				background-color: #000;
+			}
+
+			a {
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> Set world/local values - by <a href="https://twitter.com/fernandojsg">fernandojsg</a>
+			<br/><br/><input id="world" type="checkbox" checked="checked"/> Set world values
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var setWorld = true;
+
+			var scene, renderer, camera;
+
+			var mesh2, mesh3, mesh;
+			var cubesA = [];
+			var cubesB = [];
+
+			var rotation = new THREE.Euler();
+			var scale = new THREE.Vector3();
+			var position1 = new THREE.Vector3();
+			var position2 = new THREE.Vector3();
+
+			var mouseX = 0, mouseY = 0;
+			var checkboxChecked;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				checkboxChecked = document.getElementById('world');
+
+				var container = document.getElementById('container');
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 8;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
+
+				scene.add( new THREE.AmbientLight( 0xAAAAAA ) );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight.position.set( 1, 2, 1 ).normalize();
+				scene.add( directionalLight );
+
+				var materialParent = new THREE.MeshStandardMaterial( { color: 0x00FF00, shading: THREE.FlatShading } );
+				var materialChild = new THREE.MeshStandardMaterial( { color: 0xff0000, shading: THREE.FlatShading } );
+
+				var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				cubesA.push(new THREE.Mesh( boxGeometry, materialParent ) );
+				cubesA.push(new THREE.Mesh( boxGeometry, materialChild ) );
+				cubesA.push(new THREE.Mesh( boxGeometry, materialChild ) );
+				cubesA[ 0 ].add( cubesA[ 1 ] );
+				cubesA[ 0 ].position.set( -3, 0, 0 );
+				scene.add(cubesA[0]);
+
+				cubesB.push(new THREE.Mesh( boxGeometry, materialParent ));
+				cubesB.push(new THREE.Mesh( boxGeometry, materialChild ));
+				cubesB[ 0 ].add(cubesB[1]);
+				cubesB[ 0 ].position.set( 2, 0, 0 );
+				scene.add(cubesB[0]);
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+
+				container.appendChild( renderer.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.001;
+
+				world = checkboxChecked.checked;
+
+				cubesB[0].scale.y = Math.sin( time * 3 ) * 0.5 + 1.5;
+				cubesA[0].rotation.y = ( Math.sin( time ) ) * Math.PI;
+
+				rotation.set( 0, 0, Math.sin( time ) * 2 * Math.PI );
+				position1.set( -1, Math.sin( time ), 0 );
+				cubesA[ 1 ].setRotation( rotation, world );
+				cubesA[ 1 ].setPosition( position1, world );
+
+				scale.set( Math.sin ( time ) * 0.5 + 1, 1, 1 );
+				position2.set( world ? 4 : 2, 0, 0 );
+				cubesB[ 1 ].setPosition( position2, world );
+				cubesB[ 1 ].setScale( scale, world );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
