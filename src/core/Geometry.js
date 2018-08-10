@@ -1015,6 +1015,14 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var normals = [];
 		var normalsHash = {};
 		var colors = [];
+
+		for ( var i = 0; i < this.colors.length; i ++ ) {
+
+			var color = this.colors[ i ];
+			colors.push( color.r, color.g, color.b );
+
+		}
+
 		var colorsHash = {};
 		var uvs = [];
 		var uvsHash = {};
