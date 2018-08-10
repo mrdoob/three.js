@@ -552,7 +552,7 @@ Object.assign( Vector4.prototype, {
 
 	setLength: function ( length ) {
 
-		return this.normalize().multiplyScalar( length );
+		return this.multiplyScalar( length / ( this.length() || 1 ) );
 
 	},
 
