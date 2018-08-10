@@ -637,6 +637,18 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	setFromMatrixDirection: function ( m ) {
+
+		var e = m.elements;
+
+		this.x = e[ 8 ];
+		this.y = e[ 9 ];
+		this.z = e[ 10 ];
+
+		return this.normalize();
+
+	},
+
 	setFromMatrixPosition: function ( m ) {
 
 		var e = m.elements;

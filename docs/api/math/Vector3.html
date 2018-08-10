@@ -363,6 +363,13 @@ var d = a.distanceTo( b );
 		the [page:Matrix4 matrix] specified by the [page:Integer index].
 		</p>
 
+		<h3>[method:this setFromMatrixDirection]( [param:Matrix4 m] )</h3>
+		<p>
+		Sets this vector to the normalized direction of the +Z axis transformed by the
+		[link:https://en.wikipedia.org/wiki/Transformation_matrix transformation matrix] [page:Matrix4 m].
+		*Note*: this is more efficient and explicit, but equivalent to <code>this.setFromMatrixColumn( m, 2 ).normalize();</code>
+		</p>
+
 		<h3>[method:this setFromMatrixPosition]( [param:Matrix4 m] )</h3>
 		<p>
 		Sets this vector to the position elements of the

@@ -6,7 +6,6 @@
 
 import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
-import { Vector3 } from '../math/Vector3.js';
 
 function Camera() {
 
@@ -38,18 +37,7 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	getWorldDirection: function ( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
-			target = new Vector3();
-
-		}
-
-		this.updateMatrixWorld( true );
-
-		var e = this.matrixWorld.elements;
-
-		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
+		return Object3D.prototype.getWorldDirection.call( this, target ).negate();
 
 	},
 
