@@ -6,7 +6,7 @@ three.js
 [![Dependencies][dependencies-badge]][dependencies-badge-url]
 [![Dev Dependencies][devDependencies-badge]][devDependencies-badge-url]
 [![Build Status](https://travis-ci.org/mrdoob/three.js.svg?branch=dev)](https://travis-ci.org/mrdoob/three.js)
-[![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mrdoob/three.js.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mrdoob/three.js/)
+[![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mrdoob/three.js.svg?logo=lgtm&logoWidth=18&label=LGTM%20code%20quality)](https://lgtm.com/projects/g/mrdoob/three.js/)
 
 #### JavaScript 3D library ####
 
