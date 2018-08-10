@@ -171,6 +171,8 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 				value: value
 			};
 
+			// note: the array variants v2v, v3v, v4v, m4v and tv are not supported so far
+
 		}
 
 	}
