@@ -27,9 +27,10 @@ THREE.GLTFLoader = ( function () {
 
 			var path = this.path !== undefined ? this.path : THREE.LoaderUtils.extractUrlBase( url );
 
-			var itemGroup = '[group: ' + url + ']';
-
-			scope.manager.itemStart( itemGroup );
+			// Tells the LoadingManager to track an extra item, which resolves after
+			// the model is fully loaded. This means the count of items loaded will
+			// be incorrect, but ensures manager.onLoad() does not fire early.
+			scope.manager.itemStart( url );
 
 			var _onError = function ( e ) {
 
@@ -43,8 +44,8 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				scope.manager.itemEnd( itemGroup );
-				scope.manager.itemError( itemGroup );
+				scope.manager.itemEnd( url );
+				scope.manager.itemError( url );
 
 			};
 
@@ -60,7 +61,7 @@ THREE.GLTFLoader = ( function () {
 
 						onLoad( gltf );
 
-						scope.manager.itemEnd( itemGroup );
+						scope.manager.itemEnd( url );
 
 					}, _onError );
 
