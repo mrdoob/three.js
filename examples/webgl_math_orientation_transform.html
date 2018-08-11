@@ -30,6 +30,7 @@
 		</style>
 
 		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
 
 	</head>
@@ -46,28 +47,39 @@
 
 		var camera, scene, renderer, mesh, target;
 
-		var spherical = new THREE.Spherical();
-		var rotationMatrix = new THREE.Matrix4();
-		var targetRotation = new THREE.Quaternion();
+		var tempObject = new THREE.Object3D();
+		var targetQuaternion = new THREE.Quaternion();
 		var clock = new THREE.Clock();
-		var speed = 2;
+		var speed = 2; // radians per second
 
 		init();
 		animate();
 
 		function init() {
 
-			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-			camera.position.z = 5;
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
 
 			scene = new THREE.Scene();
 
-			var geometry = new THREE.ConeBufferGeometry( 0.1, 0.5, 8 );
-			geometry.rotateX( Math.PI * 0.5 );
+			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+			camera.position.z = 5;
+
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.maxDistance = 8;
+			controls.minDistance = 2;
+			controls.enablePan = false;
+
+			var geometry = new THREE.BoxBufferGeometry( 1, 0.5, .1 );
 			var material = new THREE.MeshNormalMaterial();
 
 			mesh = new THREE.Mesh( geometry, material );
+			//mesh.position.y = 1;
 			scene.add( mesh );
+
+			mesh.add( new THREE.AxesHelper( 1 ) );
 
 			//
 
@@ -78,17 +90,10 @@
 
 			//
 
-			var sphereGeometry = new THREE.SphereBufferGeometry( 2, 32, 32 );
+			var sphereGeometry = new THREE.SphereBufferGeometry( 2, 32, 16 );
 			var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true, transparent: true, opacity: 0.3 } );
 			var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 			scene.add( sphere );
-
-			//
-
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
 
 			//
 
@@ -115,10 +120,10 @@
 
 			var delta = clock.getDelta();
 
-			if ( ! mesh.quaternion.equals( targetRotation ) ) {
+			if ( Math.abs( mesh.quaternion.dot( targetQuaternion ) ) < 0.99 ) {
 
-				var step = speed * delta;
-				mesh.quaternion.rotateTowards( targetRotation, step );
+				var radians = speed * delta;
+				mesh.quaternion.rotateTowards( targetQuaternion, radians );
 
 			}
 
@@ -130,18 +135,15 @@
 
 			// generate a random point on a sphere
 
-			spherical.theta = Math.random() * Math.PI * 2;
-			spherical.phi = Math.acos( ( 2 * Math.random() ) - 1 );
-			spherical.radius = 2;
+			target.position.set( Math.random(), Math.random(), Math.random() ).subScalar( 0.5 ).setLength( 2 );
 
-			target.position.setFromSpherical( spherical );
+			// compute target quaternion
 
-			// compute target rotation
+			tempObject.position.copy( mesh.position );
+			tempObject.lookAt( target.position );
+			targetQuaternion.copy( tempObject.quaternion );
 
-			rotationMatrix.lookAt( target.position, mesh.position, mesh.up );
-			targetRotation.setFromRotationMatrix( rotationMatrix );
-
-			setTimeout( generateTarget, 2000 );
+			setTimeout( generateTarget, 5000 );
 
 		}
 
