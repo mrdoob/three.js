@@ -7,6 +7,12 @@ import { Quaternion } from '../math/Quaternion.js';
 import { Audio } from './Audio.js';
 import { Object3D } from '../core/Object3D.js';
 
+var position;
+var quaternion;
+var scale;
+
+var orientation;
+
 function PositionalAudio( listener ) {
 
 	Audio.call( this, listener );
@@ -92,29 +98,29 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 	},
 
-	updateMatrixWorld: ( function () {
+	updateMatrixWorld: function ( force ) {
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
-		var scale = new Vector3();
+		if ( !position ) {
 
-		var orientation = new Vector3();
+			position = new Vector3();
+			quaternion = new Quaternion();
+			scale = new Vector3();
 
-		return function updateMatrixWorld( force ) {
+			orientation = new Vector3();
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+		}
 
-			var panner = this.panner;
-			this.matrixWorld.decompose( position, quaternion, scale );
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+		var panner = this.panner;
+		this.matrixWorld.decompose( position, quaternion, scale );
 
-			panner.setPosition( position.x, position.y, position.z );
-			panner.setOrientation( orientation.x, orientation.y, orientation.z );
+		orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
-		};
+		panner.setPosition( position.x, position.y, position.z );
+		panner.setOrientation( orientation.x, orientation.y, orientation.z );
 
-	} )()
+	}
 
 
 } );

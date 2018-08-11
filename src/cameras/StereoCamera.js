@@ -6,6 +6,11 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
+var instance, focus, fov, aspect, near, far, zoom, eyeSep;
+
+var eyeRight;
+var eyeLeft;
+
 function StereoCamera() {
 
 	this.type = 'StereoCamera';
@@ -26,71 +31,69 @@ function StereoCamera() {
 
 Object.assign( StereoCamera.prototype, {
 
-	update: ( function () {
+	update: function ( camera ) {
 
-		var instance, focus, fov, aspect, near, far, zoom, eyeSep;
+		if ( !eyeRight ) {
 
-		var eyeRight = new Matrix4();
-		var eyeLeft = new Matrix4();
+			eyeRight = new Matrix4();
+			eyeLeft = new Matrix4();
 
-		return function update( camera ) {
+		}
 
-			var needsUpdate = instance !== this || focus !== camera.focus || fov !== camera.fov ||
-												aspect !== camera.aspect * this.aspect || near !== camera.near ||
-												far !== camera.far || zoom !== camera.zoom || eyeSep !== this.eyeSep;
+		var needsUpdate = instance !== this || focus !== camera.focus || fov !== camera.fov ||
+											aspect !== camera.aspect * this.aspect || near !== camera.near ||
+											far !== camera.far || zoom !== camera.zoom || eyeSep !== this.eyeSep;
 
-			if ( needsUpdate ) {
+		if ( needsUpdate ) {
 
-				instance = this;
-				focus = camera.focus;
-				fov = camera.fov;
-				aspect = camera.aspect * this.aspect;
-				near = camera.near;
-				far = camera.far;
-				zoom = camera.zoom;
+			instance = this;
+			focus = camera.focus;
+			fov = camera.fov;
+			aspect = camera.aspect * this.aspect;
+			near = camera.near;
+			far = camera.far;
+			zoom = camera.zoom;
 
-				// Off-axis stereoscopic effect based on
-				// http://paulbourke.net/stereographics/stereorender/
+			// Off-axis stereoscopic effect based on
+			// http://paulbourke.net/stereographics/stereorender/
 
-				var projectionMatrix = camera.projectionMatrix.clone();
-				eyeSep = this.eyeSep / 2;
-				var eyeSepOnProjection = eyeSep * near / focus;
-				var ymax = ( near * Math.tan( _Math.DEG2RAD * fov * 0.5 ) ) / zoom;
-				var xmin, xmax;
+			var projectionMatrix = camera.projectionMatrix.clone();
+			eyeSep = this.eyeSep / 2;
+			var eyeSepOnProjection = eyeSep * near / focus;
+			var ymax = ( near * Math.tan( _Math.DEG2RAD * fov * 0.5 ) ) / zoom;
+			var xmin, xmax;
 
-				// translate xOffset
+			// translate xOffset
 
-				eyeLeft.elements[ 12 ] = - eyeSep;
-				eyeRight.elements[ 12 ] = eyeSep;
+			eyeLeft.elements[ 12 ] = - eyeSep;
+			eyeRight.elements[ 12 ] = eyeSep;
 
-				// for left eye
+			// for left eye
 
-				xmin = - ymax * aspect + eyeSepOnProjection;
-				xmax = ymax * aspect + eyeSepOnProjection;
+			xmin = - ymax * aspect + eyeSepOnProjection;
+			xmax = ymax * aspect + eyeSepOnProjection;
 
-				projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
-				projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
+			projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
+			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-				this.cameraL.projectionMatrix.copy( projectionMatrix );
+			this.cameraL.projectionMatrix.copy( projectionMatrix );
 
-				// for right eye
+			// for right eye
 
-				xmin = - ymax * aspect - eyeSepOnProjection;
-				xmax = ymax * aspect - eyeSepOnProjection;
+			xmin = - ymax * aspect - eyeSepOnProjection;
+			xmax = ymax * aspect - eyeSepOnProjection;
 
-				projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
-				projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
+			projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
+			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-				this.cameraR.projectionMatrix.copy( projectionMatrix );
+			this.cameraR.projectionMatrix.copy( projectionMatrix );
 
-			}
+		}
 
-			this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( eyeLeft );
-			this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( eyeRight );
+		this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( eyeLeft );
+		this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( eyeRight );
 
-		};
-
-	} )()
+	}
 
 } );
 

@@ -7,6 +7,12 @@ import { Quaternion } from '../math/Quaternion.js';
 import { Object3D } from '../core/Object3D.js';
 import { AudioContext } from './AudioContext.js';
 
+var position;
+var quaternion;
+var scale;
+
+var orientation;
+
 function AudioListener() {
 
 	Object3D.call( this );
@@ -88,47 +94,47 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	updateMatrixWorld: ( function () {
+	updateMatrixWorld: function ( force ) {
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
-		var scale = new Vector3();
+		if ( !position ) {
 
-		var orientation = new Vector3();
+			position = new Vector3();
+			quaternion = new Quaternion();
+			scale = new Vector3();
 
-		return function updateMatrixWorld( force ) {
+			orientation = new Vector3();
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+		}
 
-			var listener = this.context.listener;
-			var up = this.up;
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			this.matrixWorld.decompose( position, quaternion, scale );
+		var listener = this.context.listener;
+		var up = this.up;
 
-			orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+		this.matrixWorld.decompose( position, quaternion, scale );
 
-			if ( listener.positionX ) {
+		orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-				listener.positionX.setValueAtTime( position.x, this.context.currentTime );
-				listener.positionY.setValueAtTime( position.y, this.context.currentTime );
-				listener.positionZ.setValueAtTime( position.z, this.context.currentTime );
-				listener.forwardX.setValueAtTime( orientation.x, this.context.currentTime );
-				listener.forwardY.setValueAtTime( orientation.y, this.context.currentTime );
-				listener.forwardZ.setValueAtTime( orientation.z, this.context.currentTime );
-				listener.upX.setValueAtTime( up.x, this.context.currentTime );
-				listener.upY.setValueAtTime( up.y, this.context.currentTime );
-				listener.upZ.setValueAtTime( up.z, this.context.currentTime );
+		if ( listener.positionX ) {
 
-			} else {
+			listener.positionX.setValueAtTime( position.x, this.context.currentTime );
+			listener.positionY.setValueAtTime( position.y, this.context.currentTime );
+			listener.positionZ.setValueAtTime( position.z, this.context.currentTime );
+			listener.forwardX.setValueAtTime( orientation.x, this.context.currentTime );
+			listener.forwardY.setValueAtTime( orientation.y, this.context.currentTime );
+			listener.forwardZ.setValueAtTime( orientation.z, this.context.currentTime );
+			listener.upX.setValueAtTime( up.x, this.context.currentTime );
+			listener.upY.setValueAtTime( up.y, this.context.currentTime );
+			listener.upZ.setValueAtTime( up.z, this.context.currentTime );
 
-				listener.setPosition( position.x, position.y, position.z );
-				listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
+		} else {
 
-			}
+			listener.setPosition( position.x, position.y, position.z );
+			listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
 
-		};
+		}
 
-	} )()
+	}
 
 } );
 

@@ -4,6 +4,8 @@ import { Vector3 } from './Vector3.js';
  * @author bhouston / http://clara.io
  */
 
+var v;
+
 function Ray( origin, direction ) {
 
 	this.origin = ( origin !== undefined ) ? origin : new Vector3();
@@ -430,17 +432,17 @@ Object.assign( Ray.prototype, {
 
 	},
 
-	intersectsBox: ( function () {
+	intersectsBox: function ( box ) {
 
-		var v = new Vector3();
+		if ( !v ) {
 
-		return function intersectsBox( box ) {
+			v = new Vector3();
 
-			return this.intersectBox( box, v ) !== null;
+		}
 
-		};
+		return this.intersectBox( box, v ) !== null;
 
-	} )(),
+	},
 
 	intersectTriangle: function () {
 
