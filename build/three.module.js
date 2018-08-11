@@ -2839,18 +2839,11 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	project: function () {
+	project: function ( camera ) {
 
-		var matrix = new Matrix4();
+		return this.applyMatrix4( camera.matrixWorldInverse ).applyMatrix4( camera.projectionMatrix );
 
-		return function project( camera ) {
-
-			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
-			return this.applyMatrix4( matrix );
-
-		};
-
-	}(),
+	},
 
 	unproject: function () {
 
@@ -2858,8 +2851,7 @@ Object.assign( Vector3.prototype, {
 
 		return function unproject( camera ) {
 
-			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
-			return this.applyMatrix4( matrix );
+			return this.applyMatrix4( matrix.getInverse( camera.projectionMatrix ) ).applyMatrix4( camera.matrixWorld );
 
 		};
 
@@ -6957,7 +6949,33 @@ Color.prototype.copyLinearToSRGB = function () {
 
 	};
 
+<<<<<<< HEAD
 }();
+=======
+	lerpHSL: function () {
+
+		var hslA = { h: 0, s: 0, l: 0 };
+		var hslB = { h: 0, s: 0, l: 0 };
+
+		return function lerpHSL( color, alpha ) {
+
+			this.getHSL( hslA );
+			color.getHSL( hslB );
+
+			var h = _Math.lerp( hslA.h, hslB.h, alpha );
+			var s = _Math.lerp( hslA.s, hslB.s, alpha );
+			var l = _Math.lerp( hslA.l, hslB.l, alpha );
+
+			this.setHSL( h, s, l );
+
+			return this;
+
+		};
+
+	}(),
+
+	equals: function ( c ) {
+>>>>>>> dev
 
 Color.prototype.offsetHSL = function () {
 
@@ -8309,9 +8327,63 @@ var Object3D = (function (EventDispatcher$$1) {
 
 		return target.setFromMatrixPosition( this.matrixWorld );
 
+<<<<<<< HEAD
 	};
 
 	Object3D.prototype.getWorldDirection = function getWorldDirection ( target ) {
+=======
+	},
+
+	getWorldQuaternion: function () {
+
+		var position = new Vector3();
+		var scale = new Vector3();
+
+		return function getWorldQuaternion( target ) {
+
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldQuaternion() target is now required' );
+				target = new Quaternion();
+
+			}
+
+			this.updateMatrixWorld( true );
+
+			this.matrixWorld.decompose( position, target, scale );
+
+			return target;
+
+		};
+
+	}(),
+
+	getWorldScale: function () {
+
+		var position = new Vector3();
+		var quaternion = new Quaternion();
+
+		return function getWorldScale( target ) {
+
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldScale() target is now required' );
+				target = new Vector3();
+
+			}
+
+			this.updateMatrixWorld( true );
+
+			this.matrixWorld.decompose( position, quaternion, target );
+
+			return target;
+
+		};
+
+	}(),
+
+	getWorldDirection: function ( target ) {
+>>>>>>> dev
 
 		if ( target === undefined ) {
 
@@ -8326,7 +8398,11 @@ var Object3D = (function (EventDispatcher$$1) {
 
 		return target.set( e[ 8 ], e[ 9 ], e[ 10 ] ).normalize();
 
+<<<<<<< HEAD
 	};
+=======
+	},
+>>>>>>> dev
 
 	Object3D.prototype.raycast = function raycast () {};
 
@@ -8906,9 +8982,15 @@ var Camera = (function (Object3D$$1) {
 
 		return this;
 
+<<<<<<< HEAD
 	};
 
 	Camera.prototype.getWorldDirection = function getWorldDirection ( target ) {
+=======
+	},
+
+	getWorldDirection: function ( target ) {
+>>>>>>> dev
 
 		if ( target === undefined ) {
 
@@ -8923,7 +9005,11 @@ var Camera = (function (Object3D$$1) {
 
 		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
 
+<<<<<<< HEAD
 	};
+=======
+	},
+>>>>>>> dev
 
 	Camera.prototype.updateMatrixWorld = function updateMatrixWorld ( force ) {
 
@@ -32550,7 +32636,30 @@ FileLoader.prototype.load = function load ( url, onLoad, onProgress, onError ) {
 
 		request.addEventListener( 'abort', function ( event ) {
 
+<<<<<<< HEAD
 			var callbacks = loading[ url ];
+=======
+			request.addEventListener( 'abort', function ( event ) {
+
+				var callbacks = loading[ url ];
+
+				delete loading[ url ];
+
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					var callback = callbacks[ i ];
+					if ( callback.onError ) callback.onError( event );
+
+				}
+
+				scope.manager.itemEnd( url );
+				scope.manager.itemError( url );
+
+			}, false );
+
+			if ( this.responseType !== undefined ) request.responseType = this.responseType;
+			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
+>>>>>>> dev
 
 			delete loading[ url ];
 
@@ -33025,8 +33134,13 @@ TextureLoader.prototype.load = function load ( url, onLoad, onProgress, onError 
 
 		texture.image = image;
 
+<<<<<<< HEAD
 		// JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
 		var isJPEG = url.search( /\.jpe?g$/i ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
+=======
+			// JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
+			var isJPEG = url.search( /\.jpe?g$/i ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
+>>>>>>> dev
 
 		texture.format = isJPEG ? RGBFormat : RGBAFormat;
 		texture.needsUpdate = true;
