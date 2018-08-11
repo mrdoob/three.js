@@ -277,6 +277,23 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	getWorldDirection( target ) {
+
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
+			target = new Vector3();
+
+		}
+
+		this.updateMatrixWorld( true );
+
+		var e = this.matrixWorld.elements;
+
+		return target.set( e[ 8 ], e[ 9 ], e[ 10 ] ).normalize();
+
+	}
+
 	raycast() {}
 
 	traverse( callback ) {
@@ -807,27 +824,6 @@ Object3D.prototype.getWorldScale = function () {
 		this.matrixWorld.decompose( position, quaternion, target );
 
 		return target;
-
-	};
-
-}();
-
-Object3D.prototype.getWorldDirection = function () {
-
-	var quaternion = new Quaternion();
-
-	return function getWorldDirection( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
-			target = new Vector3();
-
-		}
-
-		this.getWorldQuaternion( quaternion );
-
-		return target.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
 	};
 

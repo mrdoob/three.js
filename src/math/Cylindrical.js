@@ -43,11 +43,17 @@ class Cylindrical {
 
 	}
 
-	setFromVector3( vec3 ) {
+	setFromVector3( v ) {
 
-		this.radius = Math.sqrt( vec3.x * vec3.x + vec3.z * vec3.z );
-		this.theta = Math.atan2( vec3.x, vec3.z );
-		this.y = vec3.y;
+		return this.setFromCartesianCoords( v.x, v.y, v.z );
+
+	}
+
+	setFromCartesianCoords( x, y, z ) {
+
+		this.radius = Math.sqrt( x * x + z * z );
+		this.theta = Math.atan2( x, z );
+		this.y = y;
 
 		return this;
 

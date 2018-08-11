@@ -8317,6 +8317,23 @@
 
 		};
 
+		Object3D.prototype.getWorldDirection = function getWorldDirection ( target ) {
+
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
+				target = new Vector3();
+
+			}
+
+			this.updateMatrixWorld( true );
+
+			var e = this.matrixWorld.elements;
+
+			return target.set( e[ 8 ], e[ 9 ], e[ 10 ] ).normalize();
+
+		};
+
 		Object3D.prototype.raycast = function raycast () {};
 
 		Object3D.prototype.traverse = function traverse ( callback ) {
@@ -8857,27 +8874,6 @@
 
 	}();
 
-	Object3D.prototype.getWorldDirection = function () {
-
-		var quaternion = new Quaternion();
-
-		return function getWorldDirection( target ) {
-
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
-				target = new Vector3();
-
-			}
-
-			this.getWorldQuaternion( quaternion );
-
-			return target.set( 0, 0, 1 ).applyQuaternion( quaternion );
-
-		};
-
-	}();
-
 	Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 	Object3D.DefaultMatrixAutoUpdate = true;
 
@@ -8895,7 +8891,9 @@
 			this.type = 'Camera';
 
 			this.matrixWorldInverse = new Matrix4();
+
 			this.projectionMatrix = new Matrix4();
+			this.projectionMatrixInverse = new Matrix4();
 
 		}
 
@@ -8908,9 +8906,28 @@
 			Object3D$$1.prototype.copy.call( this, source, recursive );
 
 			this.matrixWorldInverse.copy( source.matrixWorldInverse );
+
 			this.projectionMatrix.copy( source.projectionMatrix );
+			this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
 
 			return this;
+
+		};
+
+		Camera.prototype.getWorldDirection = function getWorldDirection ( target ) {
+
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+				target = new Vector3();
+
+			}
+
+			this.updateMatrixWorld( true );
+
+			var e = this.matrixWorld.elements;
+
+			return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
 
 		};
 
@@ -8932,27 +8949,6 @@
 	}(Object3D));
 
 	Camera.prototype.isCamera = true;
-
-	Camera.prototype.getWorldDirection = function () {
-
-		var quaternion = new Quaternion();
-
-		return function getWorldDirection( target ) {
-
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
-				target = new Vector3();
-
-			}
-
-			this.getWorldQuaternion( quaternion );
-
-			return target.set( 0, 0, - 1 ).applyQuaternion( quaternion );
-
-		};
-
-	}();
 
 	/**
 	 * @author alteredq / http://alteredqualia.com/
@@ -9070,6 +9066,8 @@
 			}
 
 			this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
+
+			this.projectionMatrixInverse.getInverse( this.projectionMatrix );
 
 		};
 
@@ -13466,10 +13464,72 @@
 	};
 
 	ShaderMaterial.prototype.toJSON = function ( meta ) {
+		var this$1 = this;
+
 
 		var data = Material.prototype.toJSON.call( this, meta );
 
-		data.uniforms = this.uniforms;
+		data.uniforms = {};
+
+		for ( var name in this$1.uniforms ) {
+
+			var uniform = this$1.uniforms[ name ];
+			var value = uniform.value;
+
+			if ( value.isTexture ) {
+
+				data.uniforms[ name ] = {
+					type: 't',
+					value: value.toJSON( meta ).uuid
+				};
+
+			} else if ( value.isColor ) {
+
+				data.uniforms[ name ] = {
+					type: 'c',
+					value: value.getHex()
+				};
+
+			} else if ( value.isVector2 ) {
+
+				data.uniforms[ name ] = {
+					type: 'v2',
+					value: value.toArray()
+				};
+
+			} else if ( value.isVector3 ) {
+
+				data.uniforms[ name ] = {
+					type: 'v3',
+					value: value.toArray()
+				};
+
+			} else if ( value.isVector4 ) {
+
+				data.uniforms[ name ] = {
+					type: 'v4',
+					value: value.toArray()
+				};
+
+			} else if ( value.isMatrix4 ) {
+
+				data.uniforms[ name ] = {
+					type: 'm4',
+					value: value.toArray()
+				};
+
+			} else {
+
+				data.uniforms[ name ] = {
+					value: value
+				};
+
+				// note: the array variants v2v, v3v, v4v, m4v and tv are not supported so far
+
+			}
+
+		}
+
 		data.vertexShader = this.vertexShader;
 		data.fragmentShader = this.fragmentShader;
 
@@ -21247,8 +21307,7 @@
 		PerspectiveCamera.prototype.updateProjectionMatrix = function updateProjectionMatrix () {
 
 			var near = this.near,
-				top = near * Math.tan(
-					_Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+				top = near * Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
 				height = 2 * top,
 				width = this.aspect * height,
 				left = - 0.5 * width,
@@ -21270,6 +21329,8 @@
 			if ( skew !== 0 ) { left += near * skew / this.getFilmWidth(); }
 
 			this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
+
+			this.projectionMatrixInverse.getInverse( this.projectionMatrix );
 
 		};
 
@@ -32493,6 +32554,24 @@
 
 			}, false );
 
+			request.addEventListener( 'abort', function ( event ) {
+
+				var callbacks = loading[ url ];
+
+				delete loading[ url ];
+
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					var callback = callbacks[ i ];
+					if ( callback.onError ) { callback.onError( event ); }
+
+				}
+
+				scope.manager.itemEnd( url );
+				scope.manager.itemError( url );
+
+			}, false );
+
 			if ( this.responseType !== undefined ) { request.responseType = this.responseType; }
 			if ( this.withCredentials !== undefined ) { request.withCredentials = this.withCredentials; }
 
@@ -32953,7 +33032,7 @@
 			texture.image = image;
 
 			// JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
-			var isJPEG = url.search( /\.(jpg|jpeg)$/ ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
+			var isJPEG = url.search( /\.jpe?g$/i ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
 
 			texture.format = isJPEG ? RGBFormat : RGBAFormat;
 			texture.needsUpdate = true;
@@ -37340,9 +37419,6 @@
 		if ( json.shininess !== undefined ) { material.shininess = json.shininess; }
 		if ( json.clearCoat !== undefined ) { material.clearCoat = json.clearCoat; }
 		if ( json.clearCoatRoughness !== undefined ) { material.clearCoatRoughness = json.clearCoatRoughness; }
-		if ( json.uniforms !== undefined ) { material.uniforms = json.uniforms; }
-		if ( json.vertexShader !== undefined ) { material.vertexShader = json.vertexShader; }
-		if ( json.fragmentShader !== undefined ) { material.fragmentShader = json.fragmentShader; }
 		if ( json.vertexColors !== undefined ) { material.vertexColors = json.vertexColors; }
 		if ( json.fog !== undefined ) { material.fog = json.fog; }
 		if ( json.flatShading !== undefined ) { material.flatShading = json.flatShading; }
@@ -37376,6 +37452,54 @@
 
 		if ( json.visible !== undefined ) { material.visible = json.visible; }
 		if ( json.userData !== undefined ) { material.userData = json.userData; }
+
+		// Shader Material
+
+		if ( json.uniforms !== undefined ) {
+
+			for ( var name in json.uniforms ) {
+
+				var uniform = json.uniforms[ name ];
+
+				material.uniforms[ name ] = {};
+
+				switch ( uniform.type ) {
+
+					case 't':
+						material.uniforms[ name ].value = getTexture( uniform.value );
+						break;
+
+					case 'c':
+						material.uniforms[ name ].value = new Color().setHex( uniform.value );
+						break;
+
+					case 'v2':
+						material.uniforms[ name ].value = new Vector2().fromArray( uniform.value );
+						break;
+
+					case 'v3':
+						material.uniforms[ name ].value = new Vector3().fromArray( uniform.value );
+						break;
+
+					case 'v4':
+						material.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
+						break;
+
+					case 'm4':
+						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
+						break;
+
+					default:
+						material.uniforms[ name ].value = uniform.value;
+
+				}
+
+			}
+
+		}
+
+		if ( json.vertexShader !== undefined ) { material.vertexShader = json.vertexShader; }
+		if ( json.fragmentShader !== undefined ) { material.fragmentShader = json.fragmentShader; }
 
 		// Deprecated
 
@@ -43817,15 +43941,15 @@
 	 *
 	 * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
 	 *
-	 * The poles (phi) are at the positive and negative y axis.
-	 * The equator starts at positive z.
+	 * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
+	 * The azimuthal angle (theta) is measured from the positive z-axiz.
 	 */
 
 	var Spherical = function Spherical( radius, phi, theta ) {
 
 		this.radius = ( radius !== undefined ) ? radius : 1.0;
-		this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
-		this.theta = ( theta !== undefined ) ? theta : 0; // around the equator of the sphere
+		this.phi = ( phi !== undefined ) ? phi : 0; // polar angle
+		this.theta = ( theta !== undefined ) ? theta : 0; // azimuthal angle
 
 		return this;
 
@@ -43867,9 +43991,15 @@
 
 	};
 
-	Spherical.prototype.setFromVector3 = function setFromVector3 ( vec3 ) {
+	Spherical.prototype.setFromVector3 = function setFromVector3 ( v ) {
 
-		this.radius = vec3.length();
+		return this.setFromCartesianCoords( v.x, v.y, v.z );
+
+	};
+
+	Spherical.prototype.setFromCartesianCoords = function setFromCartesianCoords ( x, y, z ) {
+
+		this.radius = Math.sqrt( x * x + y * y + z * z );
 
 		if ( this.radius === 0 ) {
 
@@ -43878,8 +44008,8 @@
 
 		} else {
 
-			this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
-			this.phi = Math.acos( _Math.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
+			this.theta = Math.atan2( x, z );
+			this.phi = Math.acos( _Math.clamp( y / this.radius, - 1, 1 ) );
 
 		}
 
@@ -43930,11 +44060,17 @@
 
 	};
 
-	Cylindrical.prototype.setFromVector3 = function setFromVector3 ( vec3 ) {
+	Cylindrical.prototype.setFromVector3 = function setFromVector3 ( v ) {
 
-		this.radius = Math.sqrt( vec3.x * vec3.x + vec3.z * vec3.z );
-		this.theta = Math.atan2( vec3.x, vec3.z );
-		this.y = vec3.y;
+		return this.setFromCartesianCoords( v.x, v.y, v.z );
+
+	};
+
+	Cylindrical.prototype.setFromCartesianCoords = function setFromCartesianCoords ( x, y, z ) {
+
+		this.radius = Math.sqrt( x * x + z * z );
+		this.theta = Math.atan2( x, z );
+		this.y = y;
 
 		return this;
 

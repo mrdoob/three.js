@@ -5,7 +5,6 @@
 */
 
 import { Matrix4 } from '../math/Matrix4.js';
-import { Quaternion } from '../math/Quaternion.js';
 import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 
@@ -18,7 +17,9 @@ class Camera extends Object3D {
 		this.type = 'Camera';
 
 		this.matrixWorldInverse = new Matrix4();
+
 		this.projectionMatrix = new Matrix4();
+		this.projectionMatrixInverse = new Matrix4();
 
 	}
 
@@ -27,9 +28,28 @@ class Camera extends Object3D {
 		Object3D.prototype.copy.call( this, source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+
 		this.projectionMatrix.copy( source.projectionMatrix );
+		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
 
 		return this;
+
+	}
+
+	getWorldDirection( target ) {
+
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+			target = new Vector3();
+
+		}
+
+		this.updateMatrixWorld( true );
+
+		var e = this.matrixWorld.elements;
+
+		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
 
 	}
 
@@ -50,26 +70,5 @@ class Camera extends Object3D {
 }
 
 Camera.prototype.isCamera = true;
-
-Camera.prototype.getWorldDirection = function () {
-
-	var quaternion = new Quaternion();
-
-	return function getWorldDirection( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
-			target = new Vector3();
-
-		}
-
-		this.getWorldQuaternion( quaternion );
-
-		return target.set( 0, 0, - 1 ).applyQuaternion( quaternion );
-
-	};
-
-}();
 
 export { Camera };
