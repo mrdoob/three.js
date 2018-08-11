@@ -348,7 +348,7 @@ Object.assign( Box3.prototype, {
 
 	intersectsSphere: function ( sphere ) {
 
-		if ( !closestPoint ) {
+		if ( ! closestPoint ) {
 
 			closestPoint = new Vector3();
 
@@ -417,7 +417,7 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		if ( !v0 ) {
+		if ( ! v0 ) {
 
 			// triangle centered vertices
 			v0 = new Vector3();
@@ -436,7 +436,7 @@ Object.assign( Box3.prototype, {
 
 			triangleNormal = new Vector3();
 
-			satForAxes = function( axes ) {
+			satForAxes = function ( axes ) {
 
 				var i, j;
 
@@ -462,7 +462,7 @@ Object.assign( Box3.prototype, {
 
 				return true;
 
-			}
+			};
 
 		}
 

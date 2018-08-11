@@ -434,7 +434,7 @@ Object.assign( Ray.prototype, {
 
 	intersectsBox: function ( box ) {
 
-		if ( !v ) {
+		if ( ! v ) {
 
 			v = new Vector3();
 

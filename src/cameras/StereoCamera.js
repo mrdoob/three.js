@@ -33,7 +33,7 @@ Object.assign( StereoCamera.prototype, {
 
 	update: function ( camera ) {
 
-		if ( !eyeRight ) {
+		if ( ! eyeRight ) {
 
 			eyeRight = new Matrix4();
 			eyeLeft = new Matrix4();

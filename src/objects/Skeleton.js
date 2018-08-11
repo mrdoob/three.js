@@ -118,7 +118,7 @@ Object.assign( Skeleton.prototype, {
 
 	update: function () {
 
-		if ( !offsetMatrix ) {
+		if ( ! offsetMatrix ) {
 
 			offsetMatrix = new Matrix4();
 			identityMatrix = new Matrix4();

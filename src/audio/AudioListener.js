@@ -96,7 +96,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( !position ) {
+		if ( ! position ) {
 
 			position = new Vector3();
 			quaternion = new Quaternion();

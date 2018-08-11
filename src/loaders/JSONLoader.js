@@ -85,7 +85,7 @@ Object.assign( JSONLoader.prototype, {
 
 	},
 
-	parse: function( json, texturePath ) {
+	parse: function ( json, texturePath ) {
 
 		if ( json.data !== undefined ) {
 

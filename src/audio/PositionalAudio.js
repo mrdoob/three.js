@@ -100,7 +100,7 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( !position ) {
+		if ( ! position ) {
 
 			position = new Vector3();
 			quaternion = new Quaternion();

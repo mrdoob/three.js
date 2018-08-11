@@ -14,7 +14,7 @@ var _Math = {
 
 		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 
-		if ( !lut ) {
+		if ( ! lut ) {
 
 			lut = [];
 

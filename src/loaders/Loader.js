@@ -98,7 +98,7 @@ Object.assign( Loader.prototype, {
 
 	createMaterial: function ( m, texturePath, crossOrigin ) {
 
-		if ( !color ) {
+		if ( ! color ) {
 
 			color = new Color();
 			textureLoader = new TextureLoader();

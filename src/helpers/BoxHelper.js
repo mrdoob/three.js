@@ -37,7 +37,7 @@ BoxHelper.prototype.constructor = BoxHelper;
 
 BoxHelper.prototype.update = function ( object ) {
 
-	if ( !box ) {
+	if ( ! box ) {
 
 		box = new Box3();
 
