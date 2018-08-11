@@ -31,6 +31,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 	defineProperty( "space", "world" );
 	defineProperty( "size", 1 );
 	defineProperty( "dragging", false );
+	defineProperty( "showX", true );
+	defineProperty( "showY", true );
+	defineProperty( "showZ", true );
 
 	var changeEvent = { type: "change" };
 	var mouseDownEvent = { type: "mouseDown" };
@@ -1193,6 +1196,7 @@ THREE.TransformControlsGizmo = function () {
 				var PLANE_HIDE_TRESHOLD = 0.2;
 				var AXIS_FLIP_TRESHOLD = -0.4;
 
+
 				if ( handle.name === 'X' || handle.name === 'XYZX' ) {
 					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
@@ -1305,6 +1309,14 @@ THREE.TransformControlsGizmo = function () {
 
 				}
 
+			}
+
+			// Hide disabled axes
+			for ( var a in handle.name ) {
+				handle.visible = handle.visible && ( handle.name.indexOf( "X" ) === -1 || this.showX );
+				handle.visible = handle.visible && ( handle.name.indexOf( "Y" ) === -1 || this.showY );
+				handle.visible = handle.visible && ( handle.name.indexOf( "Z" ) === -1 || this.showZ );
+				handle.visible = handle.visible && ( handle.name.indexOf( "E" ) === -1 || ( this.showX && this.showY && this.showZ ) );
 			}
 
 			// highlight selected axis
