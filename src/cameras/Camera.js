@@ -15,7 +15,9 @@ function Camera() {
 	this.type = 'Camera';
 
 	this.matrixWorldInverse = new Matrix4();
+
 	this.projectionMatrix = new Matrix4();
+	this.projectionMatrixInverse = new Matrix4();
 
 }
 
@@ -30,7 +32,9 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		Object3D.prototype.copy.call( this, source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+
 		this.projectionMatrix.copy( source.projectionMatrix );
+		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
 
 		return this;
 
