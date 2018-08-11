@@ -146,6 +146,7 @@ Object.assign( MaterialLoader.prototype, {
 
 		}
 
+		if ( json.defines !== undefined ) material.defines = json.defines;
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 

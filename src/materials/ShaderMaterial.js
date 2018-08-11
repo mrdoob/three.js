@@ -177,6 +177,8 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 
 	}
 
+	if ( Object.keys( this.defines ).length > 0 ) data.defines = this.defines;
+
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
 
