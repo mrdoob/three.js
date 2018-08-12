@@ -324,7 +324,10 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			} else {
 
-				for ( var i = 0; i < positions.length / 3; i += 3 ) {
+				for ( var i = 0; i < attributes.position.count - 2; i += 3 ) {
+
+					// there can be any number of points, but there are exactly 3 points to a face
+					// if there are n != 0 (mod 3) number of points, ignore the last 1 or 2
 
 					addFace( i, i + 1, i + 2 );
 
