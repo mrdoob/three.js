@@ -140,9 +140,13 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			// TODO1 - have a .isClosed in spline?
 			if ( options.frames === undefined ) {
+				
 				splineTube = extrudePath.computeFrenetFrames( steps, false );
+				
 			} else {
-			        splineTube = options.frames;
+				
+				splineTube = options.frames;
+				
 			}
 			
 			// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
