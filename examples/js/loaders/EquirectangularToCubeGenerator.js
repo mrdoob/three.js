@@ -8,12 +8,12 @@ THREE.EquirectangularToCubeGenerator = function ( sourceTexture, resolution ) {
 	this.resolution = resolution;
 
  	this.views = [
-		{ t: [ 1, 0, 0 ], u: [ 0, - 1, 0 ] },
-		{ t: [ - 1, 0, 0 ], u: [ 0, - 1, 0 ] },
-		{ t: [ 0, 1, 0 ], u: [ 0, 0, 1 ] },
-		{ t: [ 0, - 1, 0 ], u: [ 0, 0, - 1 ] },
-		{ t: [ 0, 0, 1 ], u: [ 0, - 1, 0 ] },
-		{ t: [ 0, 0, - 1 ], u: [ 0, - 1, 0 ] },
+		{ t: [ 1, 0, 0 ], u: [ 0, - 1, 0 ], f: [ 0, 0, - 1 ] },
+		{ t: [ - 1, 0, 0 ], u: [ 0, - 1, 0 ], f: [ 0, 0, - 1 ] },
+		{ t: [ 0, 0, - 1 ], u: [ 0, 0, - 1 ], f: [ 0, - 1, 0 ] },
+		{ t: [ 0, 0, 1 ], u: [ 0, 0, 1 ], f: [ 0, - 1, 0 ] },
+		{ t: [ 0, 0, 1 ], u: [ 0, - 1, 0 ], f: [ 0, 0, - 1 ] },
+		{ t: [ 0, 0, - 1 ], u: [ 0, - 1, 0 ], f: [ 0, 0, - 1 ] },
 	];
 
 	this.camera = new THREE.PerspectiveCamera( 90, 1, 0.1, 10 );
@@ -50,6 +50,7 @@ THREE.EquirectangularToCubeGenerator.prototype = {
 
 			this.camera.position.set( 0, 0, 0 );
 			this.camera.up.set( v.u[ 0 ], v.u[ 1 ], v.u[ 2 ] );
+			this.camera.forward.set( v.f[ 0 ], v.f[ 1 ], v.f[ 2 ] );
 			this.camera.lookAt( v.t[ 0 ], v.t[ 1 ], v.t[ 2 ] );
 
 			renderer.render( this.scene, this.camera, this.renderTarget, true );

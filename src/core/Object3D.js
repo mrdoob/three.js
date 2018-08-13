@@ -29,6 +29,7 @@ function Object3D() {
 	this.parent = null;
 	this.children = [];
 
+	this.forward = Object3D.DefaultForward.clone();
 	this.up = Object3D.DefaultUp.clone();
 
 	var position = new Vector3();
@@ -95,6 +96,7 @@ function Object3D() {
 
 }
 
+Object3D.DefaultForward = new Vector3( 0, 0, 1 );
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
@@ -305,7 +307,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// This method does not support objects with rotated and/or translated parent(s)
 
-		var m1 = new Matrix4();
+		var m1 = new Matrix3();
+		var targetDirection = new Vector3();
 		var vector = new Vector3();
 
 		return function lookAt( x, y, z ) {
@@ -320,15 +323,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-			if ( this.isCamera ) {
+			targetDirection.subVectors( vector, this.position ).normalize();
 
-				m1.lookAt( this.position, vector, this.up );
-
-			} else {
-
-				m1.lookAt( vector, this.position, this.up );
-
-			}
+			m1.lookAt( this.forward, targetDirection, this.up );
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
@@ -506,22 +503,26 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	}(),
 
-	getWorldDirection: function ( target ) {
+	getWorldDirection: function () {
 
-		if ( target === undefined ) {
+		var quaternion = new Quaternion();
 
-			console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
-			target = new Vector3();
+		return function getWorldDirection( target ) {
 
-		}
+			if ( target === undefined ) {
 
-		this.updateMatrixWorld( true );
+				console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+				target = new Vector3();
 
-		var e = this.matrixWorld.elements;
+			}
 
-		return target.set( e[ 8 ], e[ 9 ], e[ 10 ] ).normalize();
+			this.getWorldQuaternion( quaternion );
 
-	},
+			return target.copy( this.forward ).applyQuaternion( quaternion );
+
+		};
+
+	}(),
 
 	raycast: function () {},
 
@@ -654,6 +655,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
+
+		if ( this.forward.equals( Object3D.DefaultForward ) === false ) object.forward = this.forward.toArray();
+		if ( this.up.equals( Object3D.DefaultUp ) === false ) object.up = this.up.toArray();
 
 		object.layers = this.layers.mask;
 		object.matrix = this.matrix.toArray();
@@ -791,6 +795,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.name = source.name;
 
+		this.forward.copy( source.forward );
 		this.up.copy( source.up );
 
 		this.position.copy( source.position );
