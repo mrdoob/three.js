@@ -31,14 +31,14 @@ function CubeCamera( near, far, cubeResolution ) {
 
 	var cameraPY = new PerspectiveCamera( fov, aspect, near, far );
 	cameraPY.up.set( 0, 0, - 1 );
-	cameraPY.forward.set( 0, 1, 0 );
-	cameraPY.lookAt( new Vector3( 0, 0, 1 ) );
+	cameraPY.forward.set( 0, - 1, 0 );
+	cameraPY.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraPY );
 
 	var cameraNY = new PerspectiveCamera( fov, aspect, near, far );
 	cameraNY.up.set( 0, 0, 1 );
-	cameraNY.forward.set( 0, 1, 0 );
-	cameraNY.lookAt( new Vector3( 0, 0, - 1 ) );
+	cameraNY.forward.set( 0, - 1, 0 );
+	cameraNY.lookAt( new Vector3( 0, 0, 1 ) );
 	this.add( cameraNY );
 
 	var cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
