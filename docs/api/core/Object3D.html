@@ -36,6 +36,12 @@
 		<h3>[property:Object3D children]</h3>
 		<p>Array with object's children. See [page:Group] for info on manually grouping objects.</p>
 
+		<h3>[property:Vector3 forward]</h3>
+		<p>
+		Specifies the local forward direction of the object.<br />
+		Default is [page:Object3D.DefaultForward] - that is, ( 0, 0, 1 ).
+		</p>
+
 		<h3>[property:Boolean frustumCulled]</h3>
 		<p>
 		When this is set, it checks every frame if the object is in the frustum of the camera before rendering the object.
@@ -169,6 +175,12 @@
 			will change the values of [page:.up up] and [page:.matrixAutoUpdate matrixAutoUpdate] for
 			<em>every</em>	instance of Object3D (or derived classes)	created after the change has
 			been made (already created Object3Ds will not be affected).
+		</p>
+
+		<h3>[property:Vector3 DefaultForward]</h3>
+		<p>
+			The default local [page:.forward forward] direction for objects.<br />
+			Set to ( 0, 0, 1 ) by default.
 		</p>
 
 		<h3>[property:Vector3 DefaultUp]</h3>

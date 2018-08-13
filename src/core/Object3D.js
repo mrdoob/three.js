@@ -29,6 +29,7 @@ function Object3D() {
 	this.parent = null;
 	this.children = [];
 
+	this.forward = Object3D.DefaultForward.clone();
 	this.up = Object3D.DefaultUp.clone();
 
 	var position = new Vector3();
@@ -95,6 +96,7 @@ function Object3D() {
 
 }
 
+Object3D.DefaultForward = new Vector3( 0, 0, 1 );
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
@@ -506,22 +508,26 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	}(),
 
-	getWorldDirection: function ( target ) {
+	getWorldDirection: function () {
 
-		if ( target === undefined ) {
+		var quaternion = new Quaternion();
 
-			console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
-			target = new Vector3();
+		return function getWorldDirection( target ) {
 
-		}
+			if ( target === undefined ) {
 
-		this.updateMatrixWorld( true );
+				console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+				target = new Vector3();
 
-		var e = this.matrixWorld.elements;
+			}
 
-		return target.set( e[ 8 ], e[ 9 ], e[ 10 ] ).normalize();
+			this.getWorldQuaternion( quaternion );
 
-	},
+			return target.copy( this.forward ).applyQuaternion( quaternion );
+
+		};
+
+	}(),
 
 	raycast: function () {},
 
