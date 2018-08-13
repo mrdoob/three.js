@@ -295,14 +295,25 @@ Object.assign( Quaternion.prototype, {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
-		var te = m.elements,
+		var te = m.elements;
 
-			m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ],
-			m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
-			m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ],
+		var m11, m12, m13, m21, m22, m23, m31, m32, m33;
 
-			trace = m11 + m22 + m33,
-			s;
+		if ( m.isMatrix3 ) {
+
+			m11 = te[ 0 ]; m12 = te[ 3 ]; m13 = te[ 6 ];
+			m21 = te[ 1 ]; m22 = te[ 4 ]; m23 = te[ 7 ];
+			m31 = te[ 2 ]; m32 = te[ 5 ]; m33 = te[ 8 ];
+
+		} else {
+
+			m11 = te[ 0 ]; m12 = te[ 4 ]; m13 = te[ 8 ];
+			m21 = te[ 1 ]; m22 = te[ 5 ]; m23 = te[ 9 ];
+			m31 = te[ 2 ]; m32 = te[ 6 ]; m33 = te[ 10 ];
+
+		}
+
+		var trace = m11 + m22 + m33, s;
 
 		if ( trace > 0 ) {
 

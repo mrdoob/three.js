@@ -307,7 +307,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// This method does not support objects with rotated and/or translated parent(s)
 
-		var m1 = new Matrix4();
+		var m1 = new Matrix3();
+		var targetDirection = new Vector3();
 		var vector = new Vector3();
 
 		return function lookAt( x, y, z ) {
@@ -322,15 +323,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-			if ( this.isCamera ) {
+			targetDirection.subVectors( vector, this.position ).normalize();
 
-				m1.lookAt( this.position, vector, this.up );
-
-			} else {
-
-				m1.lookAt( vector, this.position, this.up );
-
-			}
+			m1.lookAt( this.forward, targetDirection, this.up );
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
