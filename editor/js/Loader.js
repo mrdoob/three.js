@@ -472,7 +472,7 @@ var Loader = function ( editor ) {
 
 					var zip = new JSZip( contents );
 
-					// BLOCKS
+					// Poly
 
 					if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
 
@@ -481,6 +481,52 @@ var Loader = function ( editor ) {
 						editor.execute( new AddObjectCommand( object ) );
 
 					}
+
+					//
+
+					zip.filter( function ( path, file ) {
+
+						// GLB
+
+						if ( file.name.search( /\.glb$/i ) > - 1 ) {
+
+							var loader = new THREE.GLTFLoader( manager );
+							loader.parse( file.asArrayBuffer(), '', function ( result ) {
+
+								editor.execute( new AddObjectCommand( result.scene ) );
+
+							} );
+
+						}
+
+						// GLTF
+
+						if ( file.name.search( /\.gltf$/i ) > - 1 ) {
+
+							var manager = new THREE.LoadingManager();
+							manager.setURLModifier( function ( url ) {
+
+								var file = zip.files[ url ];
+
+								if ( file ) {
+
+									var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
+									return URL.createObjectURL( blob );
+
+								}
+
+							} );
+
+							var loader = new THREE.GLTFLoader( manager );
+							loader.parse( file.asText(), '', function ( result ) {
+
+								editor.execute( new AddObjectCommand( result.scene ) );
+
+							} );
+
+						}
+
+					} );
 
 				}, false );
 				reader.readAsBinaryString( file );
