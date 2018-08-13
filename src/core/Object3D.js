@@ -661,6 +661,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 
+		if ( this.forward.equals( Object3D.DefaultForward ) === false ) object.forward = this.forward.toArray();
+		if ( this.up.equals( Object3D.DefaultUp ) === false ) object.up = this.up.toArray();
+
 		object.layers = this.layers.mask;
 		object.matrix = this.matrix.toArray();
 
@@ -797,6 +800,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.name = source.name;
 
+		this.forward.copy( source.forward );
 		this.up.copy( source.up );
 
 		this.position.copy( source.position );
