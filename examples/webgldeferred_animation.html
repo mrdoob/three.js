@@ -149,7 +149,7 @@
 				for ( var i = 0; i < numLights; i ++ ) {
 
 					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
-					c.set( Math.random(), Math.random(), Math.random() ).normalize();
+					c.set( Math.random(), Math.random(), Math.random() );
 					light.color.setRGB( c.x, c.y, c.z );
 					scene.add( light );
 					lights.push( light );
@@ -161,7 +161,7 @@
 				}
 
 				var directionalLight = new THREE.DirectionalLight( 0x101010 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( -1, 1, 1 );
 				scene.add( directionalLight );
 
 				var spotLight = new THREE.SpotLight( 0x404040 );

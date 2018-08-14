@@ -225,11 +225,11 @@ Use WEBGL Depth buffer support?
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-				directionalLight.position.set( 2, 1.2, 10 ).normalize();
+				directionalLight.position.set( 2, 1.2, 10 );
 				scene.add( directionalLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( - 2, 1.2, -10 ).normalize();
+				directionalLight.position.set( - 2, 1.2, -10 );
 				scene.add( directionalLight );
 
 				initPostprocessing();

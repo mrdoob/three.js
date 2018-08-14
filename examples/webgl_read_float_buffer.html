@@ -117,11 +117,11 @@
 				sceneScreen = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 ).normalize();
+				light.position.set( 0, 0, 1 );
 				sceneRTT.add( light );
 
 				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
-				light.position.set( 0, 0, - 1 ).normalize();
+				light.position.set( 0, 0, - 1 );
 				sceneRTT.add( light );
 
 				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, type: THREE.FloatType } );

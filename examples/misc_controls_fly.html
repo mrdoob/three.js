@@ -96,7 +96,7 @@
 				scene.fog = new THREE.FogExp2( 0x000000, 0.00000025 );
 
 				dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( -1, 0, 1 ).normalize();
+				dirLight.position.set( -1, 0, 1 );
 				scene.add( dirLight );
 
 				var materialNormalMap = new THREE.MeshPhongMaterial( {

@@ -117,7 +117,7 @@
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0025 );
 
 				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0.5, 1 ).normalize();
+				light.position.set( 0, 0.5, 1 );
 				scene.add( light );
 
 				var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
