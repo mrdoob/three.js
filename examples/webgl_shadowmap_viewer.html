@@ -43,6 +43,7 @@
 			var dirLight, spotLight;
 			var torusKnot, cube;
 			var dirLightShadowMapViewer, spotLightShadowMapViewer;
+			var helpers;
 
 			init();
 			animate();
@@ -65,6 +66,8 @@
 				camera.position.set( 0, 15, 35 );
 
 				scene = new THREE.Scene();
+				helpers = new THREE.Group();
+				scene.add( helpers );
 
 				// Lights
 
@@ -74,19 +77,22 @@
 				spotLight.name = 'Spot Light';
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
-				spotLight.position.set( 10, 10, 5 );
+				spotLight.position.set( 2, 2, 2 );
+				spotLight.lookAt( 0, 0, 0 );
 				spotLight.castShadow = true;
-				spotLight.shadow.camera.near = 8;
-				spotLight.shadow.camera.far = 30;
+				spotLight.shadow.camera.near = 0.5;
+				spotLight.shadow.camera.far = 40;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
-				scene.add( spotLight );
 
-				scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
+
+				helpers.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
+				helpers.add( new THREE.SpotLightHelper( spotLight ) );
 
 				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				dirLight.name = 'Dir. Light';
 				dirLight.position.set( 0, 10, 0 );
+				dirLight.lookAt( 0, 0, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
 				dirLight.shadow.camera.far = 10;
@@ -98,7 +104,8 @@
 				dirLight.shadow.mapSize.height = 1024;
 				scene.add( dirLight );
 
-				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+				helpers.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+				helpers.add( new THREE.DirectionalLightHelper( dirLight ) );
 
 				// Geometry
 				var geometry = new THREE.TorusKnotBufferGeometry( 25, 8, 75, 20 );
@@ -115,12 +122,24 @@
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
 
+
 				var geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
 				cube = new THREE.Mesh( geometry, material );
 				cube.position.set( 8, 3, 8 );
 				cube.castShadow = true;
 				cube.receiveShadow = true;
 				scene.add( cube );
+
+				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				target = new THREE.Mesh( geometry, material );
+				target.scale.multiplyScalar( 18 );
+				target.position.set( 30, 30, 30 );
+				target.castShadow = true;
+				target.receiveShadow = true;
+				torusKnot.add( target );
+
+				spotLight.target = target;
+				cube.add( spotLight );
 
 				var geometry = new THREE.BoxBufferGeometry( 10, 0.15, 10 );
 				var material = new THREE.MeshPhongMaterial( {
@@ -196,6 +215,7 @@
 
 			function renderScene() {
 
+				helpers.traverse( function( helper ) { if ( helper.update ) helper.update(); });
 				renderer.render( scene, camera );
 
 			}
@@ -215,8 +235,8 @@
 				renderShadowMapViewers();
 
 				torusKnot.rotation.x += 0.25 * delta;
-				torusKnot.rotation.y += 2 * delta;
-				torusKnot.rotation.z += 1 * delta;
+				torusKnot.rotation.y += 1 * delta;
+				torusKnot.rotation.z += 2 * delta;
 
 				cube.rotation.x += 0.25 * delta;
 				cube.rotation.y += 2 * delta;
