@@ -313,6 +313,7 @@ THREE.LegacyGLTFLoader = ( function () {
 				case "directional":
 					lightNode = new THREE.DirectionalLight( color );
 					lightNode.position.set( 0, 0, 1 );
+					lightNode.lookAt( 0, 0, 0 );
 					break;
 
 				case "point":
@@ -322,6 +323,7 @@ THREE.LegacyGLTFLoader = ( function () {
 				case "spot":
 					lightNode = new THREE.SpotLight( color );
 					lightNode.position.set( 0, 0, 1 );
+					lightNode.lookAt( 0, 0, 0 );
 					break;
 
 				case "ambient":

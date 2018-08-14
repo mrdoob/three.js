@@ -72,6 +72,7 @@
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( 0, 0, 1 );
+				dirLight.lookAt( 0, 0, 0 );
 				scene.add( dirLight );
 
 				var axesHelper = new THREE.AxesHelper( 5 );

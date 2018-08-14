@@ -74,6 +74,7 @@
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.set( 0, 1, 0 );
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				light = new THREE.PointLight( 0xff0000, 1, 500 );

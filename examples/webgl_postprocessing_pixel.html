@@ -102,14 +102,17 @@
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
 				dirLight.position.set( 150, 75, 150 );
+				dirLight.lookAt( 0, 0, 0 );
 				scene.add( dirLight );
 
 				var dirLight2 = new THREE.DirectionalLight( 0xffffff, .2 );
 				dirLight2.position.set( - 150, 75, - 150 );
+				dirLight2.lookAt( 0, 0, 0 );
 				scene.add( dirLight2 );
 
 				var dirLight3 = new THREE.DirectionalLight( 0xffffff, .1 );
 				dirLight3.position.set( 0, 125, 0 );
+				dirLight3.lookAt( 0, 0, 0 );
 				scene.add( dirLight3 );
 
 				var geometries = [

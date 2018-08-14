@@ -55,6 +55,7 @@
 
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
+				light.lookAt( 0, 0, 0 );
 				light.angle = Math.PI / 9;
 
 				light.castShadow = true;

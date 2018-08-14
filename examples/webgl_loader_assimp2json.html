@@ -114,6 +114,7 @@
 				var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
 				directionalLight.position.set( 1, 1, - 1 );
 				directionalLight.position.normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				//

@@ -182,6 +182,7 @@
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 1, 1, 1 ).normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );

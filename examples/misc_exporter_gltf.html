@@ -179,6 +179,7 @@
 				// ---------------------------------------------------------------------
 				light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 0 );
+				light.lookAt( 0, 0, 0 );
 				light.name = 'DirectionalLight';
 				scene1.add( light );
 

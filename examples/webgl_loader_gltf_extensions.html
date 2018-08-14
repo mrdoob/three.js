@@ -205,10 +205,12 @@
 
 					var directionalLight = new THREE.DirectionalLight( 0xdddddd, 4 );
 					directionalLight.position.set( 0, 0, 1 ).normalize();
+					directionalLight.lookAt( 0, 0, 0 );
 					scene.add( directionalLight );
 
 					spot1 = new THREE.SpotLight( 0xffffff, 1 );
 					spot1.position.set( 10, 20, 10 );
+					spot1.lookAt( 0, 0, 0 );
 					spot1.angle = 0.25;
 					spot1.penumbra = 0.75;
 

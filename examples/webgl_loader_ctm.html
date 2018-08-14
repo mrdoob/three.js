@@ -100,6 +100,7 @@
 
 				var light = new THREE.SpotLight( 0xffeedd, 1.2, 650, Math.PI / 6 );
 				light.position.set( 0, -100, 500 );
+				light.lookAt( 0, 0, 0 );
 
 				light.castShadow = true;
 				light.shadow.mapWidth = 1024;

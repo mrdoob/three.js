@@ -22,7 +22,7 @@
 				text-align: center;
 				display:block;
 			}
-			
+
 			#waitScreen {
 				color: #000;
 			    position: absolute;
@@ -33,7 +33,7 @@
 			    width: 100px;
 			    height: 100px;
 			}
-			
+
 			.hide {
 				display:none;
 			}
@@ -72,7 +72,7 @@
 		var move = false;
 		var rtTexture, rtMaterial;
 		var meshes = [];
-		
+
 		document.getElementById( "preload" ).addEventListener( 'click', function() {
 
 			var hash = document.location.hash.substr( 1 );
@@ -82,7 +82,7 @@
 			} else {
 				window.location.hash = ""
 			}
-			
+
 			location.reload(true);
 
 		}, false );
@@ -112,10 +112,12 @@
 
 			var light = new THREE.DirectionalLight( 0xffddcc, 1 );
 			light.position.set( 1, 0.75, 0.5 );
+			light.lookAt( 0, 0, 0 );
 			scene.add( light );
 
 			var light = new THREE.DirectionalLight( 0xccccff, 1 );
 			light.position.set( - 1, 0.75, - 0.5 );
+			light.lookAt( 0, 0, 0 );
 			scene.add( light );
 
 			teapot = new THREE.TeapotBufferGeometry( 15, 18 );
@@ -123,14 +125,14 @@
 			var itemsonrow = 10;
 
 			for (var i = 0 ; i<  itemsonrow * itemsonrow; i ++ ){
-				
+
 				var mesh = new THREE.Mesh( teapot );
-				
+
 				mesh.position.x = 50 *(i%itemsonrow) -50*itemsonrow/2;
-				mesh.position.z = 50*Math.floor(i/itemsonrow)-150; 
+				mesh.position.z = 50*Math.floor(i/itemsonrow)-150;
 				updateMaterial(mesh);
 				scene.add( mesh );
-				meshes.push(mesh); 
+				meshes.push(mesh);
 			}
 
 			window.addEventListener( 'resize', onWindowResize, false );
@@ -140,16 +142,16 @@
 			if ( hash.length === 0 ) {
 
 				renderer.compile(scene,camera);
-				
+
 			}
-			
+
 			document.getElementById("waitScreen").className = "hide";
-			
+
 			setTimeout(function() {
-				
+
 				onWindowResize();
 				animate();
-				
+
 			}, 1);
 
 		}
@@ -205,8 +207,8 @@
 
 			mtl.color = new THREE.ColorNode( 0 );
 			mtl.emissive = cos;
-			
-			
+
+
 			var transformer = new THREE.ExpressionNode( "position + 0.0 * " + Math.random(), "vec3", [ ]);
 			mtl.transform = transformer;
 

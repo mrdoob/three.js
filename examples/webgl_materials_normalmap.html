@@ -116,6 +116,7 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 1, -0.5, -1 );
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				var textureLoader = new THREE.TextureLoader();

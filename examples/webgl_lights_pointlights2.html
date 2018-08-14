@@ -169,6 +169,7 @@
 
 				var dlight = new THREE.DirectionalLight( 0xffffff, 0.05 );
 				dlight.position.set( 0.5, 1, 0 ).normalize();
+				dlight.lookAt( 0, 0, 0 );
 				scene.add( dlight );
 
 				// RENDERER

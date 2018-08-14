@@ -95,6 +95,7 @@
 
 				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
 				light.position.set( 200, 250, 500 );
+				light.lookAt( 0, 0, 0 );
 				light.angle = 0.5;
 				light.penumbra = 0.5;
 
@@ -107,6 +108,7 @@
 
 				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
 				light.position.set( -100, 350, 350 );
+				light.lookAt( 0, 0, 0 );
 				light.angle = 0.5;
 				light.penumbra = 0.5;
 

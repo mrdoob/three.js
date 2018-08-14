@@ -97,6 +97,7 @@
 
 				dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( -1, 0, 1 ).normalize();
+				dirLight.lookAt( 0, 0, 0 );
 				scene.add( dirLight );
 
 				var materialNormalMap = new THREE.MeshPhongMaterial( {

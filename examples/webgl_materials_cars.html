@@ -180,10 +180,12 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.set( 2, 1.2, 10 ).normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( -2, 1.2, -10 ).normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00, 2 );

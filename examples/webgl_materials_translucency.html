@@ -66,6 +66,7 @@
 
 			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.03 );
 			directionalLight.position.set( 0.0, 0.5, 0.5 ).normalize();
+			directionalLight.lookAt( 0, 0, 0 );
 			scene.add( directionalLight );
 
 			var pointLight1 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888888 } ) );

@@ -167,6 +167,7 @@
 
 				var light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
 				light.position.set( 2, 8, 4 );
+				light.lookAt( 0, 0, 0 );
 
 				light.castShadow = true;
 				light.shadow.mapSize.width = 1024;

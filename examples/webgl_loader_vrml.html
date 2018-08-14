@@ -73,6 +73,7 @@
 				dirLight.position.set( 200, 200, 1000 ).normalize();
 
 				camera.add( dirLight );
+				dirLight.target = new THREE.Object3D();
 				camera.add( dirLight.target );
 
 				var loader = new THREE.VRMLLoader();

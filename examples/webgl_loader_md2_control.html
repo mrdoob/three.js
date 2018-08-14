@@ -101,6 +101,7 @@
 
 				var light = new THREE.DirectionalLight( 0xffffff, 2.25 );
 				light.position.set( 200, 450, 500 );
+				light.lookAt( 0, 0, 0 );
 
 				light.castShadow = true;
 
@@ -241,6 +242,7 @@
 
 					var gyro = new THREE.Gyroscope();
 					gyro.add( camera );
+					light.target = new THREE.Object3D();
 					gyro.add( light, light.target );
 
 					characters[ Math.floor( nSkins / 2 ) ].root.add( gyro );

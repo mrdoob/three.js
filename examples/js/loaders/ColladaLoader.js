@@ -1936,6 +1936,7 @@ THREE.ColladaLoader.prototype = {
 
 				case 'directional':
 					light = new THREE.DirectionalLight();
+					light.target = new THREE.Object3D();
 					break;
 
 				case 'point':
@@ -1944,6 +1945,7 @@ THREE.ColladaLoader.prototype = {
 
 				case 'spot':
 					light = new THREE.SpotLight();
+					light.target = new THREE.Object3D();
 					break;
 
 				case 'ambient':

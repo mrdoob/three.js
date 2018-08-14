@@ -188,6 +188,7 @@
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );

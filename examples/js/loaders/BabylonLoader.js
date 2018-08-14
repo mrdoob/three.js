@@ -168,10 +168,12 @@ THREE.BabylonLoader.prototype = {
 
 					case 1:
 						light = new THREE.DirectionalLight();
+						light.target = new THREE.Object3D();
 						break;
 
 					case 2:
 						light = new THREE.SpotLight();
+						light.target = new THREE.Object3D();
 						break;
 
 					case 3:

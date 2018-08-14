@@ -82,6 +82,7 @@
 
 				spotLight = new THREE.SpotLight( 0xffffff, 1 );
 				spotLight.position.set( 15, 40, 35 );
+				spotLight.lookAt( 0, 0, 0 );
 				spotLight.angle = Math.PI / 4;
 				spotLight.penumbra = 0.05;
 				spotLight.decay = 2;

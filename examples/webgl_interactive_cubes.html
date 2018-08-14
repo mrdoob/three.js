@@ -50,6 +50,7 @@
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
+				light.lookAt( 0, 0, 0 );
 				scene.add( light );
 
 				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );

@@ -66,6 +66,7 @@
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 200, 100 );
+				directionalLight.lookAt( 0, 0, 0 );
 				directionalLight.castShadow = true;
 				directionalLight.shadow.camera.top = 180;
 				directionalLight.shadow.camera.bottom = - 100;

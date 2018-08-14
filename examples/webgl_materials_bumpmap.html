@@ -94,6 +94,7 @@
 				spotLight = new THREE.SpotLight( 0xffffbb, 2 );
 				spotLight.position.set( 0.5, 0, 1 );
 				spotLight.position.multiplyScalar( 700 );
+				spotLight.lookAt( 0, 0, 0 );
 				scene.add( spotLight );
 
 				spotLight.castShadow = true;

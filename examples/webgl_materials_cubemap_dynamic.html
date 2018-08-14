@@ -162,6 +162,7 @@
 
 				spotLight = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI/2 );
 				spotLight.position.set( 0, 1800, 1500 );
+				spotLight.target = new THREE.Object3D();
 				spotLight.target.position.set( 0, 0, 0 );
 				spotLight.castShadow = true;
 

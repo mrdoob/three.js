@@ -80,6 +80,7 @@
 
 			var light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( 0, 4, 4 ).normalize();
+			light.lookAt( 0, 0, 0 );
 			scene.add( light );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );

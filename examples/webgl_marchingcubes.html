@@ -124,6 +124,7 @@
 
 			light = new THREE.DirectionalLight( 0xffffff );
 			light.position.set( 0.5, 0.5, 1 );
+			light.lookAt( 0, 0, 0 );
 			scene.add( light );
 
 			pointLight = new THREE.PointLight( 0xff3300 );
