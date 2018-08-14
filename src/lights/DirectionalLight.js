@@ -17,7 +17,7 @@ function DirectionalLight( color, intensity ) {
 	this.lookAt( 0, 0, 0 );
 	this.updateMatrix();
 
-	this.target = new Object3D();
+	this.target = undefined;
 
 	this.shadow = new DirectionalLightShadow();
 
