@@ -149,7 +149,7 @@
 				for ( var i = 0; i < numLights; i ++ ) {
 
 					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
-					c.set( Math.random(), Math.random(), Math.random() );
+					c.set( Math.random(), Math.random(), Math.random() ).normalize();
 					light.color.setRGB( c.x, c.y, c.z );
 					scene.add( light );
 					lights.push( light );
