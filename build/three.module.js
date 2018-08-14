@@ -3148,11 +3148,17 @@ Object.assign( Vector3.prototype, {
 
 	setFromSpherical: function ( s ) {
 
-		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
+		return this.setFromSphericalCoords( s.radius, s.phi, s.theta );
 
-		this.x = sinPhiRadius * Math.sin( s.theta );
-		this.y = Math.cos( s.phi ) * s.radius;
-		this.z = sinPhiRadius * Math.cos( s.theta );
+	},
+
+	setFromSphericalCoords: function ( radius, phi, theta ) {
+
+		var sinPhiRadius = Math.sin( phi ) * radius;
+
+		this.x = sinPhiRadius * Math.sin( theta );
+		this.y = Math.cos( phi ) * radius;
+		this.z = sinPhiRadius * Math.cos( theta );
 
 		return this;
 
@@ -3160,9 +3166,15 @@ Object.assign( Vector3.prototype, {
 
 	setFromCylindrical: function ( c ) {
 
-		this.x = c.radius * Math.sin( c.theta );
-		this.y = c.y;
-		this.z = c.radius * Math.cos( c.theta );
+		return this.setFromCylindricalCoords( c.radius, c.theta, c.y );
+
+	},
+
+	setFromCylindricalCoords: function ( radius, theta, y ) {
+
+		this.x = radius * Math.sin( theta );
+		this.y = y;
+		this.z = radius * Math.cos( theta );
 
 		return this;
 
@@ -6195,7 +6207,7 @@ var shadow_vert = "#include <fog_pars_vertex>\n#include <shadowmap_pars_vertex>\
 
 var sprite_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
 
-var sprite_vert = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec2 scale;\n\tscale.x = length( vec3( modelMatrix[ 0 ].x, modelMatrix[ 0 ].y, modelMatrix[ 0 ].z ) );\n\tscale.y = length( vec3( modelMatrix[ 1 ].x, modelMatrix[ 1 ].y, modelMatrix[ 1 ].z ) );\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tvec4 mvPosition;\n\tmvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}\n";
+var sprite_vert = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );\n\tvec2 scale;\n\tscale.x = length( vec3( modelMatrix[ 0 ].x, modelMatrix[ 0 ].y, modelMatrix[ 0 ].z ) );\n\tscale.y = length( vec3( modelMatrix[ 1 ].x, modelMatrix[ 1 ].y, modelMatrix[ 1 ].z ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = ( projectionMatrix[ 2 ][ 3 ] == - 1.0 );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}\n";
 
 var ShaderChunk = {
 	alphamap_fragment: alphamap_fragment,
@@ -8860,7 +8872,9 @@ function Camera() {
 	this.type = 'Camera';
 
 	this.matrixWorldInverse = new Matrix4();
+
 	this.projectionMatrix = new Matrix4();
+	this.projectionMatrixInverse = new Matrix4();
 
 }
 
@@ -8875,7 +8889,9 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		Object3D.prototype.copy.call( this, source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+
 		this.projectionMatrix.copy( source.projectionMatrix );
+		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
 
 		return this;
 
@@ -9031,6 +9047,8 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 		}
 
 		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
+
+		this.projectionMatrixInverse.getInverse( this.projectionMatrix );
 
 	},
 
@@ -13286,7 +13304,67 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 
 	var data = Material.prototype.toJSON.call( this, meta );
 
-	data.uniforms = this.uniforms;
+	data.uniforms = {};
+
+	for ( var name in this.uniforms ) {
+
+		var uniform = this.uniforms[ name ];
+		var value = uniform.value;
+
+		if ( value.isTexture ) {
+
+			data.uniforms[ name ] = {
+				type: 't',
+				value: value.toJSON( meta ).uuid
+			};
+
+		} else if ( value.isColor ) {
+
+			data.uniforms[ name ] = {
+				type: 'c',
+				value: value.getHex()
+			};
+
+		} else if ( value.isVector2 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v2',
+				value: value.toArray()
+			};
+
+		} else if ( value.isVector3 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v3',
+				value: value.toArray()
+			};
+
+		} else if ( value.isVector4 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v4',
+				value: value.toArray()
+			};
+
+		} else if ( value.isMatrix4 ) {
+
+			data.uniforms[ name ] = {
+				type: 'm4',
+				value: value.toArray()
+			};
+
+		} else {
+
+			data.uniforms[ name ] = {
+				value: value
+			};
+
+			// note: the array variants v2v, v3v, v4v, m4v and tv are not supported so far
+
+		}
+
+	}
+
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
 
@@ -21029,8 +21107,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	updateProjectionMatrix: function () {
 
 		var near = this.near,
-			top = near * Math.tan(
-				_Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+			top = near * Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
 			height = 2 * top,
 			width = this.aspect * height,
 			left = - 0.5 * width,
@@ -21052,6 +21129,8 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
 		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
+
+		this.projectionMatrixInverse.getInverse( this.projectionMatrix );
 
 	},
 
@@ -24721,11 +24800,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
  *
  * parameters = {
  *  color: <hex>,
- *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
- *
- *	uvOffset: new THREE.Vector2(),
- *	uvScale: new THREE.Vector2()
+ *  rotation: <float>,
+ *  sizeAttenuation: <bool>
  * }
  */
 
@@ -24739,6 +24816,8 @@ function SpriteMaterial( parameters ) {
 	this.map = null;
 
 	this.rotation = 0;
+
+	this.sizeAttenuation = true;
 
 	this.lights = false;
 	this.transparent = true;
@@ -24759,6 +24838,8 @@ SpriteMaterial.prototype.copy = function ( source ) {
 	this.map = source.map;
 
 	this.rotation = source.rotation;
+
+	this.sizeAttenuation = source.sizeAttenuation;
 
 	return this;
 
@@ -31555,6 +31636,9 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	var itemsTotal = 0;
 	var urlModifier = undefined;
 
+	// Refer to #5689 for the reason why we don't set .onStart
+	// in the constructor
+
 	this.onStart = undefined;
 	this.onLoad = onLoad;
 	this.onProgress = onProgress;
@@ -36644,9 +36728,6 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
 		if ( json.clearCoat !== undefined ) material.clearCoat = json.clearCoat;
 		if ( json.clearCoatRoughness !== undefined ) material.clearCoatRoughness = json.clearCoatRoughness;
-		if ( json.uniforms !== undefined ) material.uniforms = json.uniforms;
-		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
-		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 		if ( json.fog !== undefined ) material.fog = json.fog;
 		if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
@@ -36680,6 +36761,54 @@ Object.assign( MaterialLoader.prototype, {
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
 		if ( json.userData !== undefined ) material.userData = json.userData;
+
+		// Shader Material
+
+		if ( json.uniforms !== undefined ) {
+
+			for ( var name in json.uniforms ) {
+
+				var uniform = json.uniforms[ name ];
+
+				material.uniforms[ name ] = {};
+
+				switch ( uniform.type ) {
+
+					case 't':
+						material.uniforms[ name ].value = getTexture( uniform.value );
+						break;
+
+					case 'c':
+						material.uniforms[ name ].value = new Color().setHex( uniform.value );
+						break;
+
+					case 'v2':
+						material.uniforms[ name ].value = new Vector2().fromArray( uniform.value );
+						break;
+
+					case 'v3':
+						material.uniforms[ name ].value = new Vector3().fromArray( uniform.value );
+						break;
+
+					case 'v4':
+						material.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
+						break;
+
+					case 'm4':
+						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
+						break;
+
+					default:
+						material.uniforms[ name ].value = uniform.value;
+
+				}
+
+			}
+
+		}
+
+		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
+		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 
 		// Deprecated
 
@@ -43189,15 +43318,15 @@ Object.assign( Clock.prototype, {
  *
  * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
  *
- * The poles (phi) are at the positive and negative y axis.
- * The equator starts at positive z.
+ * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
+ * The azimuthal angle (theta) is measured from the positive z-axiz.
  */
 
 function Spherical( radius, phi, theta ) {
 
 	this.radius = ( radius !== undefined ) ? radius : 1.0;
-	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
-	this.theta = ( theta !== undefined ) ? theta : 0; // around the equator of the sphere
+	this.phi = ( phi !== undefined ) ? phi : 0; // polar angle
+	this.theta = ( theta !== undefined ) ? theta : 0; // azimuthal angle
 
 	return this;
 
@@ -43241,9 +43370,15 @@ Object.assign( Spherical.prototype, {
 
 	},
 
-	setFromVector3: function ( vec3 ) {
+	setFromVector3: function ( v ) {
 
-		this.radius = vec3.length();
+		return this.setFromCartesianCoords( v.x, v.y, v.z );
+
+	},
+
+	setFromCartesianCoords: function ( x, y, z ) {
+
+		this.radius = Math.sqrt( x * x + y * y + z * z );
 
 		if ( this.radius === 0 ) {
 
@@ -43252,8 +43387,8 @@ Object.assign( Spherical.prototype, {
 
 		} else {
 
-			this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
-			this.phi = Math.acos( _Math.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
+			this.theta = Math.atan2( x, z );
+			this.phi = Math.acos( _Math.clamp( y / this.radius, - 1, 1 ) );
 
 		}
 
@@ -43308,11 +43443,17 @@ Object.assign( Cylindrical.prototype, {
 
 	},
 
-	setFromVector3: function ( vec3 ) {
+	setFromVector3: function ( v ) {
 
-		this.radius = Math.sqrt( vec3.x * vec3.x + vec3.z * vec3.z );
-		this.theta = Math.atan2( vec3.x, vec3.z );
-		this.y = vec3.y;
+		return this.setFromCartesianCoords( v.x, v.y, v.z );
+
+	},
+
+	setFromCartesianCoords: function ( x, y, z ) {
+
+		this.radius = Math.sqrt( x * x + z * z );
+		this.theta = Math.atan2( x, z );
+		this.y = y;
 
 		return this;
 
