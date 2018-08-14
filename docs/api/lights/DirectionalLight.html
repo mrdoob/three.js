@@ -21,23 +21,6 @@
 			This light can cast shadows - see the [page:DirectionalLightShadow] page for details.
 		</p>
 
-		<h2>A Note about Position, Target and rotation</h2>
-		<p>
-			A common point of confusion for directional lights is that setting the rotation has no effect.
-			This is because three.js's DirectionalLight is the equivalent to what is often called a 'Target
-			Direct Light' in other applications.<br /><br />
-
-			This means that its direction is calculated as pointing
-			from the light's [page:Object3D.position position] to	the [page:.target target]'s position
-			(as opposed to a 'Free Direct Light' that just has a rotation component).<br /><br />
-
-			The reason for this is to allow the light to cast shadows - the [page:.shadow shadow]
-			camera needs a position to calculate shadows from.<br /><br />
-
-			See the [page:.target target] property below for details on updating the target.
-		</p>
-
-
 		<h2>Example</h2>
 		<p>
 			[example:canvas_morphtargets_horse morphtargets / horse ]<br />
@@ -99,30 +82,40 @@
 
 		<h3>[property:Object3D target]</h3>
 		<p>
-			The DirectionalLight points from its [page:.position position] to target.position. The default
-			position of the target is *(0, 0, 0)*.<br />
+			The target is initialized with a newly created [page:Object3D].<br/>
+			When target is *undefined*, the DirectionalLight is directed along the positive Z axis of its local
+			frame ('Free Direct Light' mode). In this mode, the direction of the DirectionalLight is thus defined
+			by its [page:Object3D.quaternion quaternion] and the quaternions of its ancestors.
+<code>
+// overwrite the Object3D created by default
+light.target = undefined;
 
-			*Note*: For the target's position to be changed to anything other than the default,
-			it must be added to the [page:Scene scene] using
-		</p>
-		<code>
-		scene.add( light.target );
-		</code>
-		<p>
-			This is so that the target's [page:Object3D.matrixWorld matrixWorld] gets automatically
-			updated each frame.<br /><br />
+// set the [page:.quaternion quaternion] directly
+light.quaternion.set( 1, 0, 0, 0 );
+light.matrixWorldNeedsUpdate = true;
 
-			It is also possible to set the target to be another object in the scene (anything with a
-			[page:Object3D.position position] property), like so:
-		</p>
-		<code>
-		var targetObject = new THREE.Object3D();
-		scene.add(targetObject);
+// modify the [page:.quaternion quaternion] using [page:Object3D.lookAt] on world coordinates
+light.lookAt( 0, 0, 0 );
 
-		light.target = targetObject;
-		</code>
-		<p>
-			The directionalLight will now track the target object.
+// add the light to a possibly moving [page:Object3D]
+animatedGroup.add(light);
+</code>
+
+			When target is *defined*, the DirectionalLight points from its world [page:.position position]
+			to the world position of its target, extracted from [page:Object3D.matrixWorld target.matrixWorld].
+			This 'Target Direct Light' mode may be used to have the light track a moving object :
+			<code>
+var targetObject = new THREE.Object3D();
+scene.add(targetObject);
+light.target = targetObject;
+			</code>
+			*Note*: The target object mush be added to the [page:Scene scene] to get its
+			[page:Object3D.matrixWorld matrixWorld] automatically updated each frame.
+			Moreover, the [page:Object3D.quaternion quaternion] property is unused when the [page.target target]
+			property is defined.<br/>
+
+			*Note*: In both modes, the [page:.position position] is used by the [page:.shadow shadow] camera
+			to cast shadows.
 		</p>
 
 
