@@ -13,6 +13,7 @@ function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 	this.type = 'SpotLight';
 
 	this.position.copy( Object3D.DefaultUp );
+	this.lookAt( 0, 0, 0 );
 	this.updateMatrix();
 
 	this.target = new Object3D();
@@ -58,7 +59,7 @@ SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
 		this.penumbra = source.penumbra;
 		this.decay = source.decay;
 
-		this.target = source.target.clone();
+		this.target = source.target ? source.target.clone() : undefined;
 
 		this.shadow = source.shadow.clone();
 

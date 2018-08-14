@@ -4,7 +4,6 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
 import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
@@ -18,7 +17,6 @@ function SpotLightHelper( light, color ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	this.color = color;
@@ -26,11 +24,11 @@ function SpotLightHelper( light, color ) {
 	var geometry = new BufferGeometry();
 
 	var positions = [
-		0, 0, 0, 	0, 0, 1,
-		0, 0, 0, 	1, 0, 1,
-		0, 0, 0,	- 1, 0, 1,
-		0, 0, 0, 	0, 1, 1,
-		0, 0, 0, 	0, - 1, 1
+		0, 0, 1, 	0, 0, - 1,
+		1, 0, 1, 	1, 0, - 1,
+		- 1, 0, 1,	- 1, 0, - 1,
+		0, 1, 1, 	0, 1, - 1,
+		0, - 1, 1, 	0, - 1, - 1
 	];
 
 	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
@@ -39,6 +37,8 @@ function SpotLightHelper( light, color ) {
 		var p2 = ( j / l ) * Math.PI * 2;
 
 		positions.push(
+			Math.cos( p1 ), Math.sin( p1 ), - 1,
+			Math.cos( p2 ), Math.sin( p2 ), - 1,
 			Math.cos( p1 ), Math.sin( p1 ), 1,
 			Math.cos( p2 ), Math.sin( p2 ), 1
 		);
@@ -68,36 +68,20 @@ SpotLightHelper.prototype.dispose = function () {
 
 SpotLightHelper.prototype.update = function () {
 
-	var vector = new Vector3();
-	var vector2 = new Vector3();
+	this.matrix.copy( this.light.shadow.camera.matrixWorld );
+	this.matrix.multiply( this.light.shadow.camera.projectionMatrixInverse );
 
-	return function update() {
+	if ( this.color !== undefined ) {
 
-		this.light.updateMatrixWorld();
+		this.cone.material.color.set( this.color );
 
-		var coneLength = this.light.distance ? this.light.distance : 1000;
-		var coneWidth = coneLength * Math.tan( this.light.angle );
+	} else {
 
-		this.cone.scale.set( coneWidth, coneWidth, coneLength );
+		this.cone.material.color.copy( this.light.color );
 
-		vector.setFromMatrixPosition( this.light.matrixWorld );
-		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
+	}
 
-		this.cone.lookAt( vector2.sub( vector ) );
-
-		if ( this.color !== undefined ) {
-
-			this.cone.material.color.set( this.color );
-
-		} else {
-
-			this.cone.material.color.copy( this.light.color );
-
-		}
-
-	};
-
-}();
+};
 
 
 export { SpotLightHelper };

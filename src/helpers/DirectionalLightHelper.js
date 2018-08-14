@@ -4,7 +4,6 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
 import { Line } from '../objects/Line.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
@@ -18,7 +17,6 @@ function DirectionalLightHelper( light, size, color ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	this.color = color;
@@ -40,7 +38,7 @@ function DirectionalLightHelper( light, size, color ) {
 	this.add( this.lightPlane );
 
 	geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
+	geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
 
 	this.targetLine = new Line( geometry, material );
 	this.add( this.targetLine );
@@ -63,36 +61,22 @@ DirectionalLightHelper.prototype.dispose = function () {
 
 DirectionalLightHelper.prototype.update = function () {
 
-	var v1 = new Vector3();
-	var v2 = new Vector3();
-	var v3 = new Vector3();
+	this.matrix.copy( this.light.shadow.camera.matrixWorld );
+	this.matrix.multiply( this.light.shadow.camera.projectionMatrixInverse );
 
-	return function update() {
+	if ( this.color !== undefined ) {
 
-		v1.setFromMatrixPosition( this.light.matrixWorld );
-		v2.setFromMatrixPosition( this.light.target.matrixWorld );
-		v3.subVectors( v2, v1 );
+		this.lightPlane.material.color.set( this.color );
+		this.targetLine.material.color.set( this.color );
 
-		this.lightPlane.lookAt( v3 );
+	} else {
 
-		if ( this.color !== undefined ) {
+		this.lightPlane.material.color.copy( this.light.color );
+		this.targetLine.material.color.copy( this.light.color );
 
-			this.lightPlane.material.color.set( this.color );
-			this.targetLine.material.color.set( this.color );
+	}
 
-		} else {
-
-			this.lightPlane.material.color.copy( this.light.color );
-			this.targetLine.material.color.copy( this.light.color );
-
-		}
-
-		this.targetLine.lookAt( v3 );
-		this.targetLine.scale.z = v3.length();
-
-	};
-
-}();
+};
 
 
 export { DirectionalLightHelper };

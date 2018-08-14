@@ -35,6 +35,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	var shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide };
 
+	var cameraConvention = new Vector3( - 1, 1, - 1 );
+
 	var cubeDirections = [
 		new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
 		new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
@@ -202,9 +204,19 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				faceCount = 1;
 
-				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-				shadowCamera.lookAt( _lookTarget );
-				shadowCamera.updateMatrixWorld();
+				if ( light.target ) {
+
+					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+					shadowCamera.lookAt( _lookTarget );
+					shadowCamera.updateMatrixWorld();
+
+				} else if ( shadowCamera.matrixAutoUpdate ) {
+
+					shadowCamera.matrixWorld.copy( light.matrixWorld ).scale( cameraConvention );
+					shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
+					shadowCamera.matrixWorldNeedsUpdate = false;
+
+				}
 
 				// compute shadow matrix
 
