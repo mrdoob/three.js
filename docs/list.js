@@ -400,7 +400,7 @@ var list = {
 		},
 
 		"Utils": {
-			"BufferGeometryUtils": "examples/BufferGeometryUtils",
+			"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
 			"SceneUtils": "examples/utils/SceneUtils"
 		}
 
