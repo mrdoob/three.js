@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import * as BufferGeometryUtils from '../../../examples/js/utils/BufferGeometryUtils';
+import * as BufferGeometryUtils from '../../../../examples/js/utils/BufferGeometryUtils';
 
 export default QUnit.module( 'BufferGeometryUtils', () => {
 
