@@ -152,14 +152,10 @@
 
 		<h3>[property:Object3D target]</h3>
 		<p>
-			The target is initialized with a newly created [page:Object3D].<br/>
-			When target is *undefined*, the SpotLight is directed along the positive Z axis of its local frame.
+			When target is *undefined* (the default), the SpotLight	is directed along the positive Z axis of its local frame.
 			The direction of the SpotLight is thus defined by its [page:Object3D.quaternion quaternion] and
 			the quaternions of its ancestors.
 <code>
-// overwrite the Object3D created by default
-light.target = undefined;
-
 // set the [page:.quaternion quaternion] directly
 light.quaternion.set( 1, 0, 0, 0 );
 light.matrixWorldNeedsUpdate = true;
