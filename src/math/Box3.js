@@ -59,7 +59,7 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	setFromBufferAttribute: function ( attribute ) {
+	setFromBufferAttribute( attribute, indexAttribute, groups ) {
 
 		var minX = + Infinity;
 		var minY = + Infinity;
@@ -69,19 +69,63 @@ Object.assign( Box3.prototype, {
 		var maxY = - Infinity;
 		var maxZ = - Infinity;
 
-		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+		if ( indexAttribute ) {
 
-			var x = attribute.getX( i );
-			var y = attribute.getY( i );
-			var z = attribute.getZ( i );
+			var numGroups = ( groups && groups.length ) || 1;
+			var indices = indexAttribute.array;
 
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
+			for ( var i = 0; i < numGroups; i ++ ) {
 
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+				var start;
+				var end;
+				if ( groups[ i ] ) {
+
+					start = groups[ i ].start;
+					end = start + groups[ i ].count;
+
+				} else {
+
+					start = 0;
+					end = index.length;
+
+				}
+
+				for ( var j = start; j < end; j ++ ) {
+
+					var index = indices[ j ];
+					var x = attribute.getX( index );
+					var y = attribute.getY( index );
+					var z = attribute.getZ( index );
+
+					if ( x < minX ) minX = x;
+					if ( y < minY ) minY = y;
+					if ( z < minZ ) minZ = z;
+
+					if ( x > maxX ) maxX = x;
+					if ( y > maxY ) maxY = y;
+					if ( z > maxZ ) maxZ = z;
+
+				}
+
+			}
+
+		} else {
+
+			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+
+				var x = attribute.getX( i );
+				var y = attribute.getY( i );
+				var z = attribute.getZ( i );
+
+				if ( x < minX ) minX = x;
+				if ( y < minY ) minY = y;
+				if ( z < minZ ) minZ = z;
+
+				if ( x > maxX ) maxX = x;
+				if ( y > maxY ) maxY = y;
+				if ( z > maxZ ) maxZ = z;
+
+			}
 
 		}
 
@@ -250,11 +294,43 @@ Object.assign( Box3.prototype, {
 
 					if ( attribute !== undefined ) {
 
-						for ( i = 0, l = attribute.count; i < l; i ++ ) {
+						var index = geometry.index;
+						var groups = geometry.groups;
 
-							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+						if ( index ) {
 
-							scope.expandByPoint( v1 );
+							var indices = index.array;
+
+							if ( groups.length === 0 ) {
+
+								geometry.addGroup( 0, indices.length );
+
+							}
+
+							for ( i = 0; i < groups.length; i ++ ) {
+
+								var start = groups[ i ].start;
+								var end = start + groups[ i ].count;
+
+								for ( var j = start; j < end; j ++ ) {
+
+									v1.fromBufferAttribute( attribute, indices[ j ] ).applyMatrix4( node.matrixWorld );
+
+									scope.expandByPoint( v1 );
+
+								}
+
+							}
+
+						} else {
+
+							for ( i = 0, l = attribute.count; i < l; i ++ ) {
+
+								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+
+								scope.expandByPoint( v1 );
+
+							}
 
 						}
 

@@ -634,7 +634,13 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				var center = this.boundingSphere.center;
 
-				box.setFromBufferAttribute( position );
+				if ( this.index && this.groups && this.groups.length === 0 ) {
+
+					this.addGroup( 0, this.index.array.length );
+
+				}
+
+				box.setFromBufferAttribute( position, this.index || null, this.groups || null );
 				box.getCenter( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
@@ -642,12 +648,37 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = position.count; i < il; i ++ ) {
+				if ( this.index ) {
 
-					vector.x = position.getX( i );
-					vector.y = position.getY( i );
-					vector.z = position.getZ( i );
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+					var indices = this.index.array;
+
+					for ( var i = 0, il = this.groups.length; i < il; i ++ ) {
+
+						var start = this.groups[ i ].start;
+						var end = start + this.groups[ i ].count;
+
+						for ( var j = start; j < end; j ++ ) {
+
+							var ind = indices[ j ];
+							vector.x = position.getX( ind );
+							vector.y = position.getY( ind );
+							vector.z = position.getZ( ind );
+							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+						}
+
+					}
+
+				} else {
+
+					for ( var i = 0, il = position.count; i < il; i ++ ) {
+
+						vector.x = position.getX( i );
+						vector.y = position.getY( i );
+						vector.z = position.getZ( i );
+						maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+					}
 
 				}
 
