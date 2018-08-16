@@ -357,7 +357,13 @@ THREE.GLTFExporter.prototype = {
 		function getFileNameFromUri( uri ) {
 
 			var parts = uri.split( '#' ).shift().split( '?' ).shift().split( '/' ).pop().split( '.' );
-			parts.pop();
+
+			if ( parts.length > 1 ) {
+
+				parts.pop();
+
+			}
+
 			return parts.join();
 
 		}
