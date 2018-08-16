@@ -65,9 +65,13 @@ function animate() {
 	renderer.render( scene, camera );
 
 	if ( self.requestAnimationFrame ) {
+
 		self.requestAnimationFrame( animate );
+
 	} else if ( renderer.context.commit ) {
+
 		renderer.context.commit().then( animate );
+
 	}
 
 }
