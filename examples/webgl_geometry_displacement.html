@@ -35,6 +35,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - cpu displacement mapping</div>
 
 		<script src="../build/three.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -43,11 +44,14 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			var gui = new dat.GUI();
+			var guiParams = { displacement: true };
+
 			var container, stats;
 
 			var loader = new THREE.TextureLoader();
 
-			var camera, scene, light, screen, renderer;
+			var camera, scene, light, screenMesh, screenNonDisplaced, material, renderer;
 
 			var time = 0;
 			var emissiveMapped = false;
@@ -97,7 +101,34 @@
 				controls.maxPolarAngle = Math.PI * 2;
 				controls.update();
 
+				material = new THREE.MeshPhongMaterial();
+
+				// non displaced mesh
+
+				var nonDisplacedGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				screenNonDisplaced = new THREE.Mesh( nonDisplacedGeometry, material );
+				screenNonDisplaced.visible = false;
+				scene.add( screenNonDisplaced );
+
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				gui.add( guiParams, "displacement").name( "displacement" ).onChange( guiDisplacementChangeEvent );
+
+			}
+
+			function guiDisplacementChangeEvent( value ) {
+
+				if ( value ) {
+
+					screenMesh.visible = true;
+					screenNonDisplaced.visible = false;
+
+				} else {
+
+					screenMesh.visible = false;
+					screenNonDisplaced.visible = true;
+
+				}
 
 			}
 
@@ -107,9 +138,8 @@
 
 				applyDisplacementMap( geometry, textureData, 6, -2 );
 
-				var material = new THREE.MeshPhongMaterial();
-				screen = new THREE.Mesh( geometry, material );
-				scene.add(screen);
+				screenMesh = new THREE.Mesh( geometry, material );
+				scene.add(screenMesh);
 
 				// map diffuse texture
 
@@ -131,32 +161,32 @@
 
 			function mapDiffuse ( textureData ) {
 
-				screen.material.map = textureData;
-				screen.material.needsUpdate = true;
+				material.map = textureData;
+				material.needsUpdate = true;
 
 			}
 
 			function mapEmissive ( textureData ) {
 
-				screen.material.emissiveIntensity = 2;
-				screen.material.emissive = new THREE.Color( 0xffffff );
-				screen.material.emissiveMap = textureData;
-				screen.material.needsUpdate = true;
+				material.emissiveIntensity = 2;
+				material.emissive = new THREE.Color( 0xffffff );
+				material.emissiveMap = textureData;
+				material.needsUpdate = true;
 				emissiveMapped = true;
 
 			}
 
 			function mapSpecular ( textureData ) {
 
-				screen.material.specularMap = textureData;
-				screen.material.needsUpdate = true;
+				material.specularMap = textureData;
+				material.needsUpdate = true;
 
 			}
 
 			function mapNormal ( textureData ) {
 
-				screen.material.normalMap = textureData;
-				screen.material.needsUpdate = true;
+				material.normalMap = textureData;
+				material.needsUpdate = true;
 
 			}
 
@@ -246,7 +276,7 @@
 				if ( emissiveMapped ) {
 
 					time += 0.05;
-					screen.material.emissiveIntensity += Math.sin ( time ) / 10;
+					material.emissiveIntensity += Math.sin ( time ) / 10;
 
 				}
 
