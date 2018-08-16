@@ -14,10 +14,10 @@ function DirectionalLight( color, intensity ) {
 	this.type = 'DirectionalLight';
 
 	this.position.copy( Object3D.DefaultUp );
-	this.lookAt( 0, 0, 0 );
 	this.updateMatrix();
 
-	this.target = undefined;
+	this.target = new Object3D();
+	this.targeted = false;
 
 	this.shadow = new DirectionalLightShadow();
 
@@ -33,7 +33,7 @@ DirectionalLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 		Light.prototype.copy.call( this, source );
 
-		this.target = source.target ? source.target.clone() : undefined;
+		this.target = source.target.clone();
 
 		this.shadow = source.shadow.clone();
 

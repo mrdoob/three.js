@@ -242,7 +242,7 @@
 
 					var gyro = new THREE.Gyroscope();
 					gyro.add( camera );
-					light.target = new THREE.Object3D();
+					light.targeted = true;
 					gyro.add( light, light.target );
 
 					characters[ Math.floor( nSkins / 2 ) ].root.add( gyro );

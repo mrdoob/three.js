@@ -149,36 +149,32 @@
 			A [page:SpotLightShadow] used to calculate shadows for this light.
 		</p>
 
-
 		<h3>[property:Object3D target]</h3>
 		<p>
-			When target is *undefined* (the default), the SpotLight	is directed along the positive Z axis of its local frame.
-			The direction of the SpotLight is thus defined by its [page:Object3D.quaternion quaternion] and
-			the quaternions of its ancestors.
-<code>
-// set the [page:.quaternion quaternion] directly
-light.quaternion.set( 1, 0, 0, 0 );
-light.matrixWorldNeedsUpdate = true;
-
-// modify the [page:.quaternion quaternion] using [page:Object3D.lookAt] on world coordinates
-light.lookAt( 0, 0, 0 );
-
-// add the light to a possibly moving [page:Object3D]
-animatedGroup.add(light);
-</code>
-
-			When target is *defined*, the SpotLight points from its world [page:.position position]
-			to the world position of its target, extracted from [page:Object3D.matrixWorld target.matrixWorld].
-			This may be used to have the light track a moving object
+			If [page:.targeted targeted] is *true*, the SpotLight points from its world [page:.position position]
+			to the world position of its [page:.target target] object, extracted from [page:Object3D.matrixWorld target.matrixWorld].
+			This may be used to have the light track a moving object :
 			<code>
-var targetObject = new THREE.Object3D();
-scene.add(targetObject);
+// track an existing object, already added to the scene
+light.targeted = true;
 light.target = targetObject;
+
+// or use the default target object
+light.targeted = true;
+scene.add( light.target );
 			</code>
 			*Note*: The target object mush be added to the [page:Scene scene] to get its
-			[page:Object3D.matrixWorld matrixWorld] automatically updated each frame.
-			Moreover, the [page:Object3D.quaternion quaternion] property is unused when the [page.target target]
-			property is defined.
+			[page:Object3D.matrixWorld matrixWorld] automatically updated each frame.<br/>
+			*Note*: The light [page:Object3D.rotation rotation] and [page:Object3D.quaternion quaternion] are
+			unused when the [page:.targeted targeted] is true.<br/>
+		</p>
+
+		<h3>[property:Boolean targeted]</h3>
+		<p>
+			If set to *true*, the light direction will track the [page:.target target] world position, otherwise the SpotLight is directed along the positive Z axis of its local
+			frame and thus affected by its world rotation.<br/>
+
+			The default is *false*.
 		</p>
 
 		<h2>Methods</h2>

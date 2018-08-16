@@ -139,6 +139,7 @@
 				torusKnot.add( target );
 
 				spotLight.target = target;
+				spotLight.targeted = true;
 				cube.add( spotLight );
 
 				var geometry = new THREE.BoxBufferGeometry( 10, 0.15, 10 );
