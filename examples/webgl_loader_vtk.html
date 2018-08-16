@@ -80,9 +80,9 @@
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( 200, 200, 1000 ).normalize();
+				dirLight.targeted = true;
 
 				camera.add( dirLight );
-				dirLight.target = new THREE.Object3D();
 				camera.add( dirLight.target );
 
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
