@@ -19,7 +19,6 @@ cover making and loading data from several 3D modeling
 programs. For now let's go over some of the available
 primitives.
 
-<div class="primitives">
 <div data-primitive="BoxBufferGeometry">A Box</div>
 <div data-primitive="CircleBufferGeometry">A flat circle</div>
 <div data-primitive="ConeBufferGeometry">A Cone</div>
@@ -44,7 +43,6 @@ for <code>TextBufferGeometry</code> and <code>TextGeometry</code> respectively.<
 <div data-primitive="TubeBufferGeometry">A circle traced down a path</div>
 <div data-primitive="EdgesGeometry">A helper object that takes another geometry as input and generates edges only if the angle between faces is greater than some threshold. For example if you look at the box at the top it shows a line going through each face showing every triangle that makes the box. Using an EdgesGeometry instead the middle lines are removed.</div>
 <div data-primitive="WireframeGeometry">Generates geometry that contains one line segment (2 points) per edge in the given geometry. With out this you'd often be missing edges or get extra edges since WebGL generally requires 2 points per line segment. For example if all you had was a single triangle there would only be 3 points. If you tried to draw it using a material with <code>wireframe: true</code> you would only get a single line. Passing that triangle geometry to a <code>WireframeGeometry</code> will generate a new Geometry that has 3 lines segments using 6 points..</div>
-</div>
 
 You might notice of most of them come in pairs of `Geometry`
 or `BufferGeometry`. The difference between the 2 types is effectively flexibility
@@ -346,33 +344,36 @@ to use it](threejs-scenegraph.html).
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-primitives.js"></script>
 <style>
-.primitives {
+div[data-primitive] {
+    padding-bottom: 2em;
+    border-bottom: 1px solid #888;
+    margin-bottom: 2em;
 }
-.primitives>div {
+div[data-primitive] .pair {
   display: flex;
   align-items: center;
   margin-bottom: 1em;
 }
-.primitives .shape {
+div[data-primitive] .shape {
   flex: 0 0 auto;
   width: 200px;
   height: 200px;
 }
-.primitives .desc {
+div[data-primitive] .desc {
   word-wrap: break-word;
   padding: 1em;
   min-width: 0;
 }
-.primitives .desc code {
+div[data-primitive] .desc code {
   white-space: normal;
 }
 @media (max-width: 550px) {
-  .primitives .shape {
+  div[data-primitive] .shape {
       width: 120px;
       height: 120px;
   }
 }
-.primitives .desc {
+div[data-primitive] .desc {
   flex: 1 1 auto;
 }
 </style>
