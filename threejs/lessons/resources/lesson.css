@@ -360,6 +360,28 @@ pre.prettyprint, code.prettyprint {
     width: calc(100% - 80px);
 }
 
+pre.prettyprint.lighttheme, code.prettyprint.lighttheme {
+    color: #222;
+    background: #fff;
+    border: 1px solid #888;
+    box-shadow: none;
+}
+
+pre.prettyprint.lighttheme .str { color: #183691; }  /* string content */
+pre.prettyprint.lighttheme .kwd { color: #a71d5d; }  /* keyword */
+pre.prettyprint.lighttheme .com { color: #969896; }  /* comment */
+pre.prettyprint.lighttheme .typ { color: #0086b3; }  /* type name */
+pre.prettyprint.lighttheme .lit { color: #0086b3; }  /* literal value */
+pre.prettyprint.lighttheme .pun { color: #333; }  /* punctuation */
+pre.prettyprint.lighttheme .opn { color: #333; }  /* lisp open bracket */
+pre.prettyprint.lighttheme .clo { color: #333; }  /* lisp close bracket */
+pre.prettyprint.lighttheme .tag { color: #000080; }  /* markup tag name */
+pre.prettyprint.lighttheme .atn { color: #795da3; }  /* markup attribute name */
+pre.prettyprint.lighttheme .atv { color: #183691; }  /* markup attribute value */
+pre.prettyprint.lighttheme .dec { color: #333; }  /* declaration */
+pre.prettyprint.lighttheme .var { color: #008080; }  /* variable name */
+pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
+
 @media print {
     pre.prettyprint .str, code.prettyprint .str{color:#060}
     pre.prettyprint .kwd, code.prettyprint .kwd{color:#006;font-weight:bold}
