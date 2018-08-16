@@ -35,8 +35,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - cpu displacement mapping</div>
 
 		<script src="../build/three.js"></script>
-
-		<script src="js/loaders/TGALoader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -46,20 +45,25 @@
 
 			var container, stats;
 
-			var camera, scene, light, pipe, renderer;
+			var loader = new THREE.TextureLoader();
 
-			var mouseX = 0, mouseY = 0;
+			var camera, scene, light, screen, renderer;
 
 			var time = 0;
+			var emissiveMapped = false;
+
+			var controls;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var diffusePath = "textures/pipe/diffuse.tga";
-			var emissivePath = "textures/pipe/emissive.tga";
-			var heightPath = "textures/pipe/height.tga";
-			var normalPath = "textures/pipe/normal.tga";
-			var specularPath = "textures/pipe/specular.tga";
+			var diffusePath = "textures/screen/diffuse.png";
+			var emissivePath = "textures/screen/emissive.png";
+			var heightPath = "textures/screen/height.png";
+			var normalPath = "textures/screen/normal.png";
+			var specularPath = "textures/screen/specular.png";
+
+			var reusableVector = new THREE.Vector3();
 
 			init();
 			animate();
@@ -77,8 +81,7 @@
 				light = new THREE.AmbientLight( 0xffffff );
 				scene.add ( light );
 
-				var displacementLoader = new THREE.TGALoader();
-				displacementLoader.load( heightPath, displacementLoadEvent );
+				loader.load( heightPath, displacementLoadEvent );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -88,70 +91,72 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 250;
+				controls.maxDistance = 650;
+				controls.maxPolarAngle = Math.PI * 2;
+				controls.update();
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
 			function displacementLoadEvent( textureData ) {
 
-				var geometry = new THREE.BoxGeometry( 50, 50, 50, 50, 50, 50 );
+				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50, 50, 50, 50 );
 
-				applyDisplacementMap( geometry, textureData, 6, 0 );
+				applyDisplacementMap( geometry, textureData, 6, -2 );
 
 				var material = new THREE.MeshPhongMaterial();
-				pipe = new THREE.Mesh( geometry, material );
-				scene.add(pipe);
+				screen = new THREE.Mesh( geometry, material );
+				scene.add(screen);
 
 				// map diffuse texture
 
-				var diffuseLoader = new THREE.TGALoader();
-				diffuseLoader.load( diffusePath, mapDiffuse );
+				loader.load( diffusePath, mapDiffuse );
 
 				// map emissive texture
 
-				var emissiveLoader = new THREE.TGALoader();
-				emissiveLoader.load( emissivePath, mapEmissive );
+				loader.load( emissivePath, mapEmissive );
 
 				// map normal texture
 
-				var normalLoader = new THREE.TGALoader();
-				normalLoader.load( normalPath, mapNormal );
+				loader.load( normalPath, mapNormal );
 
 				// map specular texture
 
-				var specularLoader = new THREE.TGALoader();
-				specularLoader.load( specularPath, mapSpecular );
+				loader.load( specularPath, mapSpecular );
 
 			}
 
 			function mapDiffuse ( textureData ) {
 
-				pipe.material.map = textureData;
-				pipe.material.needsUpdate = true;
+				screen.material.map = textureData;
+				screen.material.needsUpdate = true;
 
 			}
 
 			function mapEmissive ( textureData ) {
 
-				pipe.material.emissiveIntensity = 2;
-				pipe.material.emissive = new THREE.Color( 0xffffff );
-				pipe.material.emissiveMap = textureData;
-				pipe.material.needsUpdate = true;
+				screen.material.emissiveIntensity = 2;
+				screen.material.emissive = new THREE.Color( 0xffffff );
+				screen.material.emissiveMap = textureData;
+				screen.material.needsUpdate = true;
+				emissiveMapped = true;
 
 			}
 
 			function mapSpecular ( textureData ) {
 
-				pipe.material.specularMap = textureData;
-				pipe.material.needsUpdate = true;
+				screen.material.specularMap = textureData;
+				screen.material.needsUpdate = true;
 
 			}
 
 			function mapNormal ( textureData ) {
 
-				pipe.material.normalMap = textureData;
-				pipe.material.needsUpdate = true;
+				screen.material.normalMap = textureData;
+				screen.material.needsUpdate = true;
 
 			}
 
@@ -174,68 +179,44 @@
 
 				// get geometry vertex info
 
-				var faces = geometry.faces;
-				var vertices = geometry.vertices;
-				var faceVertexUVs = geometry.faceVertexUvs;
-
-				var positions = [];
-				var normals = [];
-				var uvs = [];
-
-				for ( var i = 0; i < faces.length; i ++ ) {
-
-					var face = faces[ i ];
-					var vertex1 = vertices[ face.a ];
-					var vertex2 = vertices[ face.b ];
-					var vertex3 = vertices[ face.c ];
-
-					positions.push( vertex1 );
-					positions.push( vertex2 );
-					positions.push( vertex3 );
-					normals.push( face.normal );
-					normals.push( face.normal );
-					normals.push( face.normal );
-
-					var curFaceVertexUV = faceVertexUVs[ 0 ][ i ];
-					for ( var y = 0; y < 3; y ++ ) {
-
-						var vuv = curFaceVertexUV[ y ];
-						uvs.push( new THREE.Vector2( vuv.x, vuv.y ) );
-
-					}
-
-				}
+				var positions = geometry.attributes.position.array;
+				var normals = geometry.attributes.normal.array;
+				var uvs = geometry.attributes.uv.array;
 
 				// displacement mapping
 
-				var ctr = 0;
-				i = 0;
-				while ( ctr < vertices.length ) {
+				var iterate = true;
+				var i = 0, i2 = 0;
+				while ( iterate ) {
 
-					var position = positions[ i ];
-					var normal = normals[ i ];
-					var uv = uvs[ i ];
+					var normalX = normals[ i ];
+					var normalY = normals[ i + 1 ];
+					var normalZ = normals[ i + 2 ];
+					var uvX = uvs[ i2 ];
+					var uvY = uvs[ i2 + 1 ];
 
-					var u = ( ( Math.abs( uv.x ) * heightMapWidth ) % heightMapWidth ) | 0;
-					var v = ( ( Math.abs( uv.y ) * heightMapHeight ) % heightMapHeight ) | 0;
+					var u = ( ( Math.abs( uvX ) * heightMapWidth ) % heightMapWidth ) | 0;
+					var v = ( ( Math.abs( uvY ) * heightMapHeight ) % heightMapHeight ) | 0;
 					var pos = ( u + v * heightMapWidth ) * 4;
 					var r = displacementBuffer[ pos ] / 255.0;
-					var normalizedNormal = normal.normalize();
-					if ( ! position.isDisplaced ) {
+					var normalizedNormal = reusableVector.set( normalX, normalY, normalZ ).normalize();
 
-						position.x += normalizedNormal.x * ( r * scale + bias );
-						position.y += normalizedNormal.y * ( r * scale + bias );
-						position.z += normalizedNormal.z * ( r * scale + bias );
-						position.isDisplaced = true;
-						ctr ++;
+					positions[ i ] += normalizedNormal.x * ( r * scale + bias );
+					positions[ i + 1 ] += normalizedNormal.y * ( r * scale + bias );
+					positions[ i + 2 ] += normalizedNormal.z * ( r * scale + bias );
+
+					i += 3;
+					i2 += 2;
+
+					if ( i >= positions.length ) {
+
+						iterate = false;
 
 					}
 
-					i ++;
-
 				}
 
-				geometry.verticesNeedsUpdate = true;
+				geometry.attributes.position.needsUpdate = true;
 
 			}
 
@@ -251,13 +232,6 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
-
-			}
-
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -269,15 +243,10 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
-
-				camera.lookAt( scene.position );
-
-				if ( pipe ) {
+				if ( emissiveMapped ) {
 
 					time += 0.05;
-					pipe.material.emissiveIntensity += Math.sin ( time ) / 10;
+					screen.material.emissiveIntensity += Math.sin ( time ) / 10;
 
 				}
 
