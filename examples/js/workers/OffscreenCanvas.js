@@ -10,9 +10,11 @@ self.onmessage = function ( message ) {
 var camera, scene, renderer, mesh, clock;
 
 function createBoxMesh( size, material ) {
-	var material = new THREE.MeshBasicMaterial(material);
-	var geometry = new THREE.BoxBufferGeometry(size, size, size);
-	return new THREE.Mesh(geometry, material);
+
+	var material = new THREE.MeshBasicMaterial( material );
+	var geometry = new THREE.BoxBufferGeometry( size, size, size );
+	return new THREE.Mesh( geometry, material );
+
 }
 
 function init( offscreen, width, height, pixelRatio ) {
@@ -31,23 +33,26 @@ function init( offscreen, width, height, pixelRatio ) {
 	loader.load( '../../textures/crate.gif', function ( imageBitmap ) {
 
 		var texture = new THREE.CanvasTexture( imageBitmap );
-		mesh = createBoxMesh(200, { map: texture });
+		mesh = createBoxMesh( 200, { map: texture } );
 		scene.add( mesh );
 
 		animate();
 
-	}, null, function(e) {
+	}, null, function () {
+
 		// On error use color instead of texture.
-		mesh = createBoxMesh(200, { color: 0x00ff00 });
+
+		mesh = createBoxMesh( 200, { color: 0x00ff00 } );
 		scene.add( mesh );
 
 		animate();
 
 	} );
 
-	renderer = new THREE.WebGLRenderer({ antialias: true, canvas: offscreen });
-	renderer.setPixelRatio(pixelRatio);
-	renderer.setSize(width, height, false);
+	renderer = new THREE.WebGLRenderer( { antialias: true, canvas: offscreen } );
+	renderer.setPixelRatio( pixelRatio );
+	renderer.setSize( width, height, false );
+
 }
 
 function animate() {
@@ -58,10 +63,11 @@ function animate() {
 	mesh.rotation.y += delta * 0.5;
 
 	renderer.render( scene, camera );
-	if (self.requestAnimationFrame) {
-		self.requestAnimationFrame(animate);
-	} else if (renderer.context.commit) {
-		renderer.context.commit().then(animate);
+
+	if ( self.requestAnimationFrame ) {
+		self.requestAnimationFrame( animate );
+	} else if ( renderer.context.commit ) {
+		renderer.context.commit().then( animate );
 	}
 
 }
