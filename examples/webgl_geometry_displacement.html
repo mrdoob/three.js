@@ -106,6 +106,8 @@
 				screenNonDisplaced.visible = false;
 				scene.add( screenNonDisplaced );
 
+				window.addEventListener( 'resize', onWindowResize, false );
+
 				gui.add( guiParams, "displacement").name( "displacement" ).onChange( guiDisplacementChangeEvent );
 
 			}
@@ -241,6 +243,15 @@
 				}
 
 				geometry.attributes.position.needsUpdate = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
