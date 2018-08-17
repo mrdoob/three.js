@@ -58,9 +58,6 @@
 
 			var controls;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			var diffusePath = "textures/screen/diffuse.png";
 			var emissivePath = "textures/screen/emissive.png";
 			var heightPath = "textures/screen/height.png";
@@ -77,6 +74,7 @@
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 0, 300 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
@@ -107,8 +105,6 @@
 				screenNonDisplaced = new THREE.Mesh( nonDisplacedGeometry, material );
 				screenNonDisplaced.visible = false;
 				scene.add( screenNonDisplaced );
-
-				window.addEventListener( 'resize', onWindowResize, false );
 
 				gui.add( guiParams, "displacement").name( "displacement" ).onChange( guiDisplacementChangeEvent );
 
@@ -245,18 +241,6 @@
 				}
 
 				geometry.attributes.position.needsUpdate = true;
-
-			}
-
-			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
