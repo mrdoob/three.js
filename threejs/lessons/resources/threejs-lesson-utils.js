@@ -56,7 +56,7 @@ window.threejsLessonUtils = {
       renderer.domElement.style.transform = transform;
 
       this.renderFuncs.forEach((fn) => {
-          fn(renderer, time);
+        fn(renderer, time);
       });
 
       requestAnimationFrame(render);
@@ -86,25 +86,54 @@ window.threejsLessonUtils = {
     camera.position.z = 15;
     scene.add(camera);
 
-    const obj3D = info.create({scene, camera});
-    const promise = (obj3D instanceof Promise) ? obj3D : Promise.resolve(obj3D);
-
     const root = new THREE.Object3D();
     scene.add(root);
 
-    const resizeFunctions = [];
+    const renderInfo = {
+      pixelRatio: this.pixelRatio,
+      camera,
+      scene,
+      root,
+      renderer: this.renderer,
+      elem,
+    };
+
+    const obj3D = info.create({scene, camera, renderInfo});
+    const promise = (obj3D instanceof Promise) ? obj3D : Promise.resolve(obj3D);
+
     const updateFunctions = [];
+    const resizeFunctions = [];
+
+    const settings = {
+      lights: true,
+      trackball: true,
+      // resize(renderInfo) {
+      // },
+      // update(time, renderInfo) {
+      // },
+      render(renderInfo) {
+        renderInfo.renderer.render(renderInfo.scene, renderInfo.camera);
+      },
+    };
 
     promise.then((result) => {
       const info = result instanceof THREE.Object3D ? {
         obj3D: result,
       } : result;
-      const { obj3D, update, trackball, lights } = info;
-      root.add(obj3D);
+      if (info.obj3D) {
+        root.add(info.obj3D);
+      }
+      if (info.update) {
+        updateFunctions.push(info.update);
+      }
+      if (info.resize) {
+        resizeFunctions.push(info.resize);
+      }
 
+      Object.assign(settings, info);
       targetFOVDeg = camera.fov;
 
-      if (trackball !== false) {
+      if (settings.trackball !== false) {
         const controls = new THREE.TrackballControls(camera, elem);
         controls.noZoom = true;
         controls.noPan = true;
@@ -112,22 +141,17 @@ window.threejsLessonUtils = {
         updateFunctions.push(controls.update.bind(controls));
       }
 
-      if (update) {
-        updateFunctions.push(update);
-      }
-
       // add the lights as children of the camera.
       // this is because TrackbacllControls move the camera.
       // We really want to rotate the object itself but there's no
       // controls for that so we fake it by putting all the lights
       // on the camera so they move with it.
-      if (lights !== false) {
+      if (settings.lights !== false) {
         camera.add(new THREE.HemisphereLight(0xaaaaaa, 0x444444, .5));
         const light = new THREE.DirectionalLight(0xffffff, 1);
         light.position.set(-1, 2, 4 - 15);
         camera.add(light);
       }
-
     });
 
     let oldWidth = -1;
@@ -143,19 +167,20 @@ window.threejsLessonUtils = {
         return;
       }
 
-      const width  = (rect.right - rect.left) * this.pixelRatio;
-      const height = (rect.bottom - rect.top) * this.pixelRatio;
-      const left   = rect.left * this.pixelRatio;
-      const top    = rect.top * this.pixelRatio;
+      renderInfo.width = (rect.right - rect.left) * this.pixelRatio;
+      renderInfo.height = (rect.bottom - rect.top) * this.pixelRatio;
+      renderInfo.left = rect.left * this.pixelRatio;
+      renderInfo.top = rect.top * this.pixelRatio;
 
-      if (width !== oldWidth || height !== oldHeight) {
-        oldWidth = width;
-        oldHeight = height;
-        resizeFunctions.forEach(fn => fn());
+      if (renderInfo.width !== oldWidth || renderInfo.height !== oldHeight) {
+        oldWidth = renderInfo.width;
+        oldHeight = renderInfo.height;
+        resizeFunctions.forEach(fn => fn(renderInfo));
       }
-      updateFunctions.forEach(fn => fn(time));
 
-      const aspect = width / height;
+      updateFunctions.forEach(fn => fn(time, renderInfo));
+
+      const aspect = renderInfo.width / renderInfo.height;
       const fovDeg = aspect >= 1
         ? targetFOVDeg
         : THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(targetFOVDeg) * .5) / aspect));
@@ -164,9 +189,10 @@ window.threejsLessonUtils = {
       camera.aspect = aspect;
       camera.updateProjectionMatrix();
 
-      renderer.setViewport(left, top, width, height);
-      renderer.setScissor(left, top, width, height);
-      renderer.render(scene, camera);
+      renderer.setViewport(renderInfo.left, renderInfo.top, renderInfo.width, renderInfo.height);
+      renderer.setScissor(renderInfo.left, renderInfo.top, renderInfo.width, renderInfo.height);
+
+      settings.render(renderInfo);
     };
 
     this.renderFuncs.push(render);
