@@ -16,7 +16,6 @@ var ImageUtils = {
 
 		} else {
 
-			// do not use OffscreenCanvas here, see #14713
 			canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 			canvas.width = image.width;
 			canvas.height = image.height;
