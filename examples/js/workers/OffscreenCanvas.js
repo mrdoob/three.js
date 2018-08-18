@@ -9,14 +9,6 @@ self.onmessage = function ( message ) {
 
 var camera, scene, renderer, mesh, clock;
 
-function createBoxMesh( size, material ) {
-
-	var material = new THREE.MeshBasicMaterial( material );
-	var geometry = new THREE.BoxBufferGeometry( size, size, size );
-	return new THREE.Mesh( geometry, material );
-
-}
-
 function init( offscreen, width, height, pixelRatio ) {
 
 	camera = new THREE.PerspectiveCamera( 70, width / height, 1, 1000 );
@@ -33,16 +25,21 @@ function init( offscreen, width, height, pixelRatio ) {
 	loader.load( '../../textures/crate.gif', function ( imageBitmap ) {
 
 		var texture = new THREE.CanvasTexture( imageBitmap );
-		mesh = createBoxMesh( 200, { map: texture } );
+		var material = new THREE.MeshBasicMaterial( { map: texture } );
+		var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+		mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
 		animate();
 
 	}, null, function () {
 
-		// On error use color instead of texture.
+		// Workaround for Firefox
+		// https://bugzilla.mozilla.org/show_bug.cgi?id=1335594
 
-		mesh = createBoxMesh( 200, { color: 0x00ff00 } );
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+		mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
 		animate();
@@ -69,6 +66,8 @@ function animate() {
 		self.requestAnimationFrame( animate );
 
 	} else if ( renderer.context.commit ) {
+
+		// Deprecated
 
 		renderer.context.commit().then( animate );
 
