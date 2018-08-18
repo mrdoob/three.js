@@ -44,6 +44,11 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			var TOTAL_ASSET_COUNT = 5;
+			var loadedAssetCount = 0;
+
+			var materialParameters = {};
+
 			var gui = new dat.GUI();
 			var guiParams = { displacement: true };
 
@@ -51,7 +56,7 @@
 
 			var loader = new THREE.TextureLoader();
 
-			var camera, scene, light, screenMesh, screenNonDisplaced, material, renderer;
+			var camera, scene, light, screenMesh, screenNonDisplaced, material, geometry, renderer;
 
 			var time = 0;
 			var emissiveMapped = false;
@@ -97,15 +102,6 @@
 				controls.maxDistance = 650;
 				controls.update();
 
-				material = new THREE.MeshPhongMaterial();
-
-				// non displaced mesh
-
-				var nonDisplacedGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
-				screenNonDisplaced = new THREE.Mesh( nonDisplacedGeometry, material );
-				screenNonDisplaced.visible = false;
-				scene.add( screenNonDisplaced );
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				gui.add( guiParams, "displacement").name( "displacement" ).onChange( guiDisplacementChangeEvent );
@@ -130,59 +126,98 @@
 
 			function displacementLoadEvent( textureData ) {
 
-				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50, 50, 50, 50 );
+				loadedAssetCount ++;
+
+				geometry = new THREE.BoxBufferGeometry( 50, 50, 50, 50, 50, 50 );
 
 				applyDisplacementMap( geometry, textureData, 6, -2 );
 
+				// load diffuse texture
+
+				loader.load( diffusePath, onDiffuseLoaded );
+
+				// load emissive texture
+
+				loader.load( emissivePath, onEmissiveLoaded );
+
+				// load normal texture
+
+				loader.load( normalPath, onNormalLoaded );
+
+				// load specular texture
+
+				loader.load( specularPath, onSpecularLoaded );
+
+			}
+
+			function createMesh() {
+
+				material = new THREE.MeshPhongMaterial( materialParameters );
 				screenMesh = new THREE.Mesh( geometry, material );
-				scene.add(screenMesh);
+				scene.add( screenMesh );
 
-				// map diffuse texture
+				// non displaced mesh
 
-				loader.load( diffusePath, mapDiffuse );
-
-				// map emissive texture
-
-				loader.load( emissivePath, mapEmissive );
-
-				// map normal texture
-
-				loader.load( normalPath, mapNormal );
-
-				// map specular texture
-
-				loader.load( specularPath, mapSpecular );
+				var nonDisplacedGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				screenNonDisplaced = new THREE.Mesh( nonDisplacedGeometry, material );
+				screenNonDisplaced.visible = false;
+				scene.add( screenNonDisplaced );
 
 			}
 
-			function mapDiffuse ( textureData ) {
+			function onDiffuseLoaded( textureData ) {
 
-				material.map = textureData;
-				material.needsUpdate = true;
+				materialParameters.map = textureData;
+
+				loadedAssetCount ++;
+				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
+
+					createMesh();
+
+				}
 
 			}
 
-			function mapEmissive ( textureData ) {
+			function onEmissiveLoaded( textureData ) {
 
-				material.emissiveIntensity = 2;
-				material.emissive = new THREE.Color( 0xffffff );
-				material.emissiveMap = textureData;
-				material.needsUpdate = true;
+				materialParameters.emissiveIntensity = 2;
+				materialParameters.emissive = new THREE.Color( 0xffffff );
+				materialParameters.emissiveMap = textureData;
+
 				emissiveMapped = true;
 
+				loadedAssetCount ++;
+				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
+
+					createMesh();
+
+				}
+
 			}
 
-			function mapSpecular ( textureData ) {
+			function onSpecularLoaded( textureData ) {
 
-				material.specularMap = textureData;
-				material.needsUpdate = true;
+				materialParameters.specularMap = textureData;
+
+				loadedAssetCount ++;
+				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
+
+					createMesh();
+
+				}
 
 			}
 
-			function mapNormal ( textureData ) {
+			function onNormalLoaded( textureData ) {
 
-				material.normalMap = textureData;
-				material.needsUpdate = true;
+				materialParameters.normalMap = textureData;
+
+				loadedAssetCount ++;
+				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
+
+					createMesh();
+
+				}
 
 			}
 
