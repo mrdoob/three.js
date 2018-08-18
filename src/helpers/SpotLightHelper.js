@@ -49,7 +49,7 @@ function SpotLightHelper( light, color ) {
 	this.cone = new LineSegments( geometry, material );
 	this.add( this.cone );
 
-		this.update();
+	this.update();
 
 }
 
