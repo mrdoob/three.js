@@ -84,7 +84,7 @@
 
 				geometry.computeVertexNormals();
 
-				var material = new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
