@@ -18,9 +18,6 @@ function SpotLightHelper( light, color ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrix = light.matrixWorld;
-	this.matrixAutoUpdate = false;
-
 	this.color = color;
 
 	var geometry = new BufferGeometry();
@@ -52,7 +49,7 @@ function SpotLightHelper( light, color ) {
 	this.cone = new LineSegments( geometry, material );
 	this.add( this.cone );
 
-	this.update();
+		this.update();
 
 }
 
@@ -83,6 +80,7 @@ SpotLightHelper.prototype.update = function () {
 		vector.setFromMatrixPosition( this.light.matrixWorld );
 		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
 
+		this.position.setFromMatrixPosition( this.light.matrixWorld );
 		this.cone.lookAt( vector2.sub( vector ) );
 
 		if ( this.color !== undefined ) {
