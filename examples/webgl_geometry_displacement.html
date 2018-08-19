@@ -47,14 +47,15 @@
 			var TOTAL_ASSET_COUNT = 5;
 			var loadedAssetCount = 0;
 
-			var materialParameters = {};
+			var materialParameters = { emissiveIntensity: 2, emissive: new THREE.Color( 0xffffff ) };
 
 			var gui = new dat.GUI();
 			var guiParams = { displacement: true };
 
 			var container, stats;
 
-			var loader = new THREE.TextureLoader();
+			var loadingManager = new THREE.LoadingManager( createMesh );
+			var loader = new THREE.TextureLoader( loadingManager );
 
 			var camera, scene, light, screenMesh, screenNonDisplaced, material, geometry, renderer;
 
@@ -62,6 +63,8 @@
 			var meshCreated = false;
 
 			var controls;
+
+			var displacementTexture;
 
 			var diffusePath = "textures/screen/diffuse.png";
 			var emissivePath = "textures/screen/emissive.png";
@@ -87,7 +90,25 @@
 				light = new THREE.AmbientLight( 0xffffff );
 				scene.add ( light );
 
-				loader.load( heightPath, displacementLoadEvent );
+				// load displacement texture
+
+				displacementTexture = loader.load( heightPath );
+
+				// load diffuse texture
+
+				materialParameters.map = loader.load( diffusePath );
+
+				// load emissive texture
+
+				materialParameters.emissiveMap = loader.load( emissivePath );
+
+				// load normal texture
+
+				materialParameters.normalMap = loader.load( normalPath );
+
+				// load specular texture
+
+				materialParameters.specularMap = loader.load( specularPath );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -124,33 +145,11 @@
 
 			}
 
-			function displacementLoadEvent( textureData ) {
-
-				loadedAssetCount ++;
+			function createMesh() {
 
 				geometry = new THREE.BoxBufferGeometry( 50, 50, 50, 50, 50, 50 );
 
-				applyDisplacementMap( geometry, textureData, 6, -2 );
-
-				// load diffuse texture
-
-				loader.load( diffusePath, onDiffuseLoaded );
-
-				// load emissive texture
-
-				loader.load( emissivePath, onEmissiveLoaded );
-
-				// load normal texture
-
-				loader.load( normalPath, onNormalLoaded );
-
-				// load specular texture
-
-				loader.load( specularPath, onSpecularLoaded );
-
-			}
-
-			function createMesh() {
+				applyDisplacementMap( geometry, displacementTexture, 6, -2 );
 
 				material = new THREE.MeshPhongMaterial( materialParameters );
 				screenMesh = new THREE.Mesh( geometry, material );
@@ -164,60 +163,6 @@
 				scene.add( screenNonDisplaced );
 
 				meshCreated = true;
-
-			}
-
-			function onDiffuseLoaded( textureData ) {
-
-				materialParameters.map = textureData;
-
-				loadedAssetCount ++;
-				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
-
-					createMesh();
-
-				}
-
-			}
-
-			function onEmissiveLoaded( textureData ) {
-
-				materialParameters.emissiveIntensity = 2;
-				materialParameters.emissive = new THREE.Color( 0xffffff );
-				materialParameters.emissiveMap = textureData;
-
-				loadedAssetCount ++;
-				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
-
-					createMesh();
-
-				}
-
-			}
-
-			function onSpecularLoaded( textureData ) {
-
-				materialParameters.specularMap = textureData;
-
-				loadedAssetCount ++;
-				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
-
-					createMesh();
-
-				}
-
-			}
-
-			function onNormalLoaded( textureData ) {
-
-				materialParameters.normalMap = textureData;
-
-				loadedAssetCount ++;
-				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
-
-					createMesh();
-
-				}
 
 			}
 
