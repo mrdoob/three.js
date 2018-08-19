@@ -66,7 +66,6 @@
 			var diffusePath = "textures/screen/diffuse.png";
 			var emissivePath = "textures/screen/emissive.png";
 			var heightPath = "textures/screen/height.png";
-			var normalPath = "textures/screen/normal.png";
 			var specularPath = "textures/screen/specular.png";
 
 			var reusableVector = new THREE.Vector3();
@@ -99,10 +98,6 @@
 				// load emissive texture
 
 				materialParameters.emissiveMap = loader.load( emissivePath );
-
-				// load normal texture
-
-				materialParameters.normalMap = loader.load( normalPath );
 
 				// load specular texture
 
