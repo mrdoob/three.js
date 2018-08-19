@@ -356,9 +356,21 @@ function WebVRManager( renderer ) {
 
 	};
 
-	this.submitFrame = function () {
+	this.submitFrame = function ( scene, camera ) {
 
-		if ( isPresenting() ) device.submitFrame();
+		if ( isPresenting() ) {
+
+			device.submitFrame();
+
+			if ( device.capabilities.hasExternalDisplay ) {
+
+				scope.enabled = false;
+				renderer.render( scene, camera );
+				scope.enabled = true;
+
+			}
+
+		}
 
 	};
 
