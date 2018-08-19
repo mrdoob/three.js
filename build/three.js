@@ -21534,9 +21534,21 @@
 
 		};
 
-		this.submitFrame = function () {
+		this.submitFrame = function ( scene, camera ) {
 
-			if ( isPresenting() ) device.submitFrame();
+			if ( isPresenting() ) {
+
+				device.submitFrame();
+
+				if ( device.capabilities.hasExternalDisplay ) {
+
+					scope.enabled = false;
+					renderer.render( scene, camera );
+					scope.enabled = true;
+
+				}
+
+			}
 
 		};
 
@@ -21957,6 +21969,7 @@
 
 			// frustum
 
+			_camera = null,
 			_frustum = new Frustum(),
 
 			// clipping
@@ -22841,6 +22854,7 @@
 			_currentGeometryProgram.wireframe = false;
 			_currentMaterialId = - 1;
 			_currentCamera = null;
+			_camera = camera;
 
 			// update scene graph
 
@@ -22922,12 +22936,7 @@
 
 			} else {
 
-				// opaque pass (front-to-back order)
-
 				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
-
-				// transparent pass (back-to-front order)
-
 				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
 
 			}
@@ -22952,7 +22961,7 @@
 
 			if ( vr.enabled ) {
 
-				vr.submitFrame();
+				vr.submitFrame( scene, _camera );
 
 			}
 
