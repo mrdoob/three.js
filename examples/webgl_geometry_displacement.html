@@ -59,7 +59,7 @@
 			var camera, scene, light, screenMesh, screenNonDisplaced, material, geometry, renderer;
 
 			var time = 0;
-			var emissiveMapped = false;
+			var meshCreated = false;
 
 			var controls;
 
@@ -163,6 +163,8 @@
 				screenNonDisplaced.visible = false;
 				scene.add( screenNonDisplaced );
 
+				meshCreated = true;
+
 			}
 
 			function onDiffuseLoaded( textureData ) {
@@ -183,8 +185,6 @@
 				materialParameters.emissiveIntensity = 2;
 				materialParameters.emissive = new THREE.Color( 0xffffff );
 				materialParameters.emissiveMap = textureData;
-
-				emissiveMapped = true;
 
 				loadedAssetCount ++;
 				if ( loadedAssetCount == TOTAL_ASSET_COUNT ) {
@@ -277,8 +277,6 @@
 
 				}
 
-				geometry.attributes.position.needsUpdate = true;
-
 			}
 
 			function onWindowResize() {
@@ -301,7 +299,7 @@
 
 			function render() {
 
-				if ( emissiveMapped ) {
+				if ( meshCreated ) {
 
 					time += 0.05;
 					material.emissiveIntensity += Math.sin ( time ) / 10;
