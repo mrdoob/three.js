@@ -80,7 +80,7 @@ SpotLightHelper.prototype.update = function () {
 		vector.setFromMatrixPosition( this.light.matrixWorld );
 		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.position.setFromMatrixPosition( this.light.matrixWorld );
+		this.position.copy( vector );
 		this.cone.lookAt( vector2.sub( vector ) );
 
 		if ( this.color !== undefined ) {
