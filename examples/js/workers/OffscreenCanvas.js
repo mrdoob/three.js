@@ -32,7 +32,7 @@ function init( offscreen, width, height, pixelRatio ) {
 
 		scene.add( mesh );
 
-		animate();
+		self.requestAnimationFrame( animate );
 
 	} );
 
@@ -53,6 +53,6 @@ function animate() {
 
 	renderer.render( scene, camera );
 
-	renderer.context.commit().then( animate );
+	self.requestAnimationFrame( animate );
 
 }
