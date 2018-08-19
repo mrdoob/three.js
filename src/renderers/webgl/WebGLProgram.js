@@ -328,6 +328,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
+			'#define USE_PRECISION_' + parameters.precision.toUpperCase(),
 
 			'#define SHADER_NAME ' + shader.name,
 
@@ -434,6 +435,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
+			'#define USE_PRECISION_' + parameters.precision.toUpperCase(),
 
 			'#define SHADER_NAME ' + shader.name,
 

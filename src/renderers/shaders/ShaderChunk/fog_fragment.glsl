@@ -1,6 +1,14 @@
 #ifdef USE_FOG
 
-	float fogDepth = length( vFogPosition );
+	#ifdef USE_PRECISION_HIGHP
+
+		float fogDepth = length(vFogPosition);
+
+	#else
+
+		float fogDepth = vFogDepth;
+
+	#endif
 
 	#ifdef FOG_EXP2
 
