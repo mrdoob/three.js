@@ -44,10 +44,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var TOTAL_ASSET_COUNT = 5;
-			var loadedAssetCount = 0;
-
-			var materialParameters = { emissiveIntensity: 2, emissive: new THREE.Color( 0xffffff ) };
+			var materialParameters = { emissiveIntensity: 2, emissive: 0xffffff };
 
 			var gui = new dat.GUI();
 			var guiParams = { displacement: true };
