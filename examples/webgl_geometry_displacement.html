@@ -73,6 +73,7 @@
 			var specularPath = "textures/screen/specular.png";
 
 			var reusableVector = new THREE.Vector3();
+			var reusableVector2 = new THREE.Vector2();
 
 			init();
 			animate();
@@ -168,6 +169,8 @@
 
 			function applyDisplacementMap( geometry, texture, scale, bias ) {
 
+				texture.updateMatrix();
+
 				// draw the displacement map on a canvas
 
 				var tmpCanvas = document.createElement( "canvas" );
@@ -177,8 +180,6 @@
 				tmpCanvas.width = heightMapWidth;
 				tmpCanvas.height = heightMapHeight;
 
-				tmpContext.scale( 1, - 1 ); // flipY
-				tmpContext.translate( 0, - 1 * heightMapHeight );
 				tmpContext.drawImage( texture.image, 0, 0 );
 
 				var displacementBuffer = tmpContext.getImageData( 0, 0, heightMapWidth, heightMapHeight ).data;
@@ -200,6 +201,10 @@
 					var normalZ = normals[ i + 2 ];
 					var uvX = uvs[ i2 ];
 					var uvY = uvs[ i2 + 1 ];
+
+					texture.transformUv( reusableVector2.set( uvX, uvY ) );
+					uvX = reusableVector2.x;
+					uvY = reusableVector2.y;
 
 					var u = ( ( Math.abs( uvX ) * heightMapWidth ) % heightMapWidth ) | 0;
 					var v = ( ( Math.abs( uvY ) * heightMapHeight ) % heightMapHeight ) | 0;
