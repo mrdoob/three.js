@@ -17,10 +17,13 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/modifiers/BufferSubdivisionModifier.js"></script>
+		<script src="js/modifiers/SubdivisionModifier.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/Detector.js"></script>
 
 		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 
@@ -164,9 +167,9 @@
 				for ( var i = 0; i < geometriesParams.length; i ++ ) {
 					dropdown += '<option value="' + i + '"';
 
-					dropdown += (geometryIndex == i) ? ' selected' : '';
+					dropdown += ( geometryIndex == i ) ? ' selected' : '';
 
-					dropdown += '>' + geometriesParams[i].type + '</option>';
+					dropdown += '>' + geometriesParams[ i ].type + '</option>';
 				}
 
 				dropdown += '</select>';
@@ -176,8 +179,8 @@
 					'<br><br>Subdivisions: ' + subdivisions +
 					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
 					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + (smooth.attributes.position.array.length/3) +
-					'<br>Face count: before ' + geometry.faces.length + ' after ' + (smooth.attributes.position.array.length / 3)
+					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
 
 			}
 
@@ -193,9 +196,7 @@
 
 				}
 
-
-				var modifier = new THREE.BufferSubdivisionModifier( subdivisions );
-
+				var modifier = new THREE.SubdivisionModifier( subdivisions );
 
 				var params = geometriesParams[ geometryIndex ];
 
@@ -211,21 +212,27 @@
 
 				smooth = modifier.modify( geometry );
 
-				updateInfo();
+				var faceIndices = [ 'a', 'b', 'c' ];
 
-				// var TypedArrayHelper = function (size, registers, register_type, array_type, unit_size, accessors)
-				var colors = new TypedArrayHelper( 0, 1, THREE.Color, Float32Array, 3, [ 'r', 'g', 'b' ] );
+				for ( var i = 0; i < smooth.faces.length; i ++ ) {
 
-				for ( var i = 0; i < smooth.attributes.position.array.length / 3; i ++ ) {
+					var face  = smooth.faces[ i ];
 
-					var hue = ( smooth.attributes.position.array[ ( i * 3 ) + 1 ] / 200 ) + 0.5;
-					colors.register[ 0 ].setHSL( hue, 1, 0.5 );
-					colors.push_element( colors.register[ 0 ] );
+					for ( var j = 0; j < 3; j ++ ) {
+
+						var vertexIndex = face[ faceIndices[ j ] ];
+						var vertex = smooth.vertices[ vertexIndex ];
+
+						var hue = ( vertex.y / 200 ) + 0.5;
+						var color = new THREE.Color().setHSL( hue, 1, 0.5 );
+
+						face.vertexColors[ j ] = color;
+
+					}
 
 				}
 
-				colors.trim_size();
-				smooth.addAttribute( 'color', new THREE.BufferAttribute( colors.buffer, 3 ) );
+				updateInfo();
 
 				group = new THREE.Group();
 				scene.add( group );

@@ -59,12 +59,16 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:Float angleTo]( [param:Quaternion q] )</h3>
+		<p>
+			Returns the angle between this quaternion and quaternion [page:Quaternion q] in radians.
+		</p>
+
 		<h3>[method:Quaternion clone]()</h3>
 		<p>
 			Creates a new Quaternion with identical [page:.x x], [page:.y y],
 			[page:.z z] and [page:.w w] properties to this one.
 		</p>
-
 
 		<h3>[method:Quaternion conjugate]()</h3>
 		<p>
@@ -165,6 +169,15 @@
 		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
 		<p>Pre-multiplies this quaternion by [page:Quaternion q].</p>
 
+		<h3>[method:Quaternion rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
+		<p>
+			[page:Quaternion q] - The target quaternion.<br />
+			[page:float step] - The angular step in radians.<br /><br />
+
+			Rotates this quaternion by a given angular step to the defined quaternion *q*.
+			The method ensures that the final quaternion will not overshoot *q*.
+		</p>
+
 		<h3>[method:Quaternion slerp]( [param:Quaternion qb], [param:float t] )</h3>
 		<p>
 			[page:Quaternion qb] - The other quaternion rotation<br />
@@ -257,17 +270,7 @@ q.slerp( qb, t )
 		</p>
 
 
-		<h3>
-		[method:null slerpFlat](
-			[page:Array dst],
-			[page:Integer dstOffset],
-			[page:Array src0],
-			[page:Integer srcOffset0],
-			[page:Array src1],
-			[page:Integer srcOffset1],
-			[page:Float t]
-		)
-		</h3>
+		<h3>[method:null slerpFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1], [param:Float t] )</h3>
 		<p>
 		[page:Array dst] - The output array.<br />
 		[page:Integer dstOffset] - An offset into the output array.<br />

@@ -50,18 +50,20 @@
 			and [page:.y y] properties to this cylindrical.
 		</p>
 
-		<h3>[method:Cylindrical set]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>
+		<h3>[method:Cylindrical set]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
 		<p>Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
 		and [page:.y y] properties.</p>
 
 		<h3>[method:Cylindrical setFromVector3]( [param:Vector3 vec3] )</h3>
 		<p>
 			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
-			and [page:.y y] properties from the [page:Vector3 Vector3].<br /><br />
+			and [page:.y y] properties from the [page:Vector3 Vector3].
+		</p>
 
-			The [page:.radius radius] is set the vector's distance from the origin as measured along
-			the the x-z plane, while [page:.theta theta] is set from its direction on
-			the the x-z plane and [page:.y y] is set from the vector's y component.
+		<h3>[method:Cylindrical setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
+			and [page:.y y] properties from Cartesian coordinates.
 		</p>
 
 		<h2>Source</h2>

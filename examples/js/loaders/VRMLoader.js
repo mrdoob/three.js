@@ -26,7 +26,7 @@ THREE.VRMLoader = ( function () {
 
 		constructor: VRMLoader,
 
-		crossOrigin: 'Anonymous',
+		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 

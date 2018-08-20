@@ -29,16 +29,6 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.moveVector = new THREE.Vector3( 0, 0, 0 );
 	this.rotationVector = new THREE.Vector3( 0, 0, 0 );
 
-	this.handleEvent = function ( event ) {
-
-		if ( typeof this[ event.type ] == 'function' ) {
-
-			this[ event.type ]( event );
-
-		}
-
-	};
-
 	this.keydown = function ( event ) {
 
 		if ( event.altKey ) {

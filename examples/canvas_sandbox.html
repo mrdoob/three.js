@@ -56,7 +56,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.IcosahedronGeometry( 100, 1 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 100, 1 );
 
 				var envMap = new THREE.TextureLoader().load( 'textures/metal.jpg' );
 				envMap.mapping = THREE.SphericalReflectionMapping;

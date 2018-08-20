@@ -98,7 +98,7 @@
 
 				var shape = new THREE.Shape( pts );
 
-				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
 
 				var material = new THREE.MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
 
@@ -143,7 +143,7 @@
 
 				var shape = new THREE.Shape( pts );
 
-				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
 
 				var material2 = new THREE.MeshLambertMaterial( { color: 0xff8000, wireframe: false } );
 
@@ -165,7 +165,7 @@
 					bevelSegments: 1
 				};
 
-				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
 
 				var mesh = new THREE.Mesh( geometry, materials );
 

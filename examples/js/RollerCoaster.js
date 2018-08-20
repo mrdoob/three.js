@@ -19,7 +19,7 @@ function RollerCoasterGeometry( curve, divisions ) {
 
 	var quaternion = new THREE.Quaternion();
 	var prevQuaternion = new THREE.Quaternion();
-	prevQuaternion.setFromAxisAngle( up , Math.PI / 2 );
+	prevQuaternion.setFromAxisAngle( up, Math.PI / 2 );
 
 	var point = new THREE.Vector3();
 	var prevPoint = new THREE.Vector3();
@@ -28,13 +28,13 @@ function RollerCoasterGeometry( curve, divisions ) {
 	// shapes
 
 	var step = [
-		new THREE.Vector3( -0.225,  0, 0 ),
-		new THREE.Vector3(  0, -0.050, 0 ),
-		new THREE.Vector3(  0, -0.175, 0 ),
+		new THREE.Vector3( - 0.225, 0, 0 ),
+		new THREE.Vector3( 0, - 0.050, 0 ),
+		new THREE.Vector3( 0, - 0.175, 0 ),
 
-		new THREE.Vector3(  0, -0.050, 0 ),
-		new THREE.Vector3(  0.225,  0, 0 ),
-		new THREE.Vector3(  0, -0.175, 0 )
+		new THREE.Vector3( 0, - 0.050, 0 ),
+		new THREE.Vector3( 0.225, 0, 0 ),
+		new THREE.Vector3( 0, - 0.175, 0 )
 	];
 
 	var PI2 = Math.PI * 2;
@@ -64,7 +64,7 @@ function RollerCoasterGeometry( curve, divisions ) {
 
 	function drawShape( shape, color ) {
 
-		normal.set( 0, 0, -1 ).applyQuaternion( quaternion );
+		normal.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 		for ( var j = 0; j < shape.length; j ++ ) {
 
@@ -92,7 +92,7 @@ function RollerCoasterGeometry( curve, divisions ) {
 
 		}
 
-	};
+	}
 
 	var vector1 = new THREE.Vector3();
 	var vector2 = new THREE.Vector3();
@@ -171,7 +171,7 @@ function RollerCoasterGeometry( curve, divisions ) {
 
 		}
 
-	};
+	}
 
 	var offset = new THREE.Vector3();
 
@@ -195,9 +195,9 @@ function RollerCoasterGeometry( curve, divisions ) {
 
 		}
 
-		extrudeShape( tube1, offset.set(  0,  -0.125, 0 ), color2 );
-		extrudeShape( tube2, offset.set(  0.2, 0,     0 ), color1 );
-		extrudeShape( tube2, offset.set( -0.2, 0,     0 ), color1 );
+		extrudeShape( tube1, offset.set( 0, - 0.125, 0 ), color2 );
+		extrudeShape( tube2, offset.set( 0.2, 0, 0 ), color1 );
+		extrudeShape( tube2, offset.set( - 0.2, 0, 0 ), color1 );
 
 		prevPoint.copy( point );
 		prevQuaternion.copy( quaternion );
@@ -210,7 +210,7 @@ function RollerCoasterGeometry( curve, divisions ) {
 	this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 	this.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 
-};
+}
 
 RollerCoasterGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
@@ -231,21 +231,21 @@ function RollerCoasterLiftersGeometry( curve, divisions ) {
 	// shapes
 
 	var tube1 = [
-		new THREE.Vector3(  0,  0.05, -0.05 ),
-		new THREE.Vector3(  0,  0.05,  0.05 ),
-		new THREE.Vector3(  0, -0.05,  0 )
+		new THREE.Vector3( 0, 0.05, - 0.05 ),
+		new THREE.Vector3( 0, 0.05, 0.05 ),
+		new THREE.Vector3( 0, - 0.05, 0 )
 	];
 
 	var tube2 = [
-		new THREE.Vector3( -0.05, 0,  0.05 ),
-		new THREE.Vector3( -0.05, 0, -0.05 ),
-		new THREE.Vector3(  0.05, 0,  0 )
+		new THREE.Vector3( - 0.05, 0, 0.05 ),
+		new THREE.Vector3( - 0.05, 0, - 0.05 ),
+		new THREE.Vector3( 0.05, 0, 0 )
 	];
 
 	var tube3 = [
-		new THREE.Vector3(  0.05, 0, -0.05 ),
-		new THREE.Vector3(  0.05, 0,  0.05 ),
-		new THREE.Vector3( -0.05, 0,  0 )
+		new THREE.Vector3( 0.05, 0, - 0.05 ),
+		new THREE.Vector3( 0.05, 0, 0.05 ),
+		new THREE.Vector3( - 0.05, 0, 0 )
 	];
 
 	var vector1 = new THREE.Vector3();
@@ -317,7 +317,7 @@ function RollerCoasterLiftersGeometry( curve, divisions ) {
 
 		}
 
-	};
+	}
 
 	var fromPoint = new THREE.Vector3();
 	var toPoint = new THREE.Vector3();
@@ -335,31 +335,31 @@ function RollerCoasterLiftersGeometry( curve, divisions ) {
 
 		if ( point.y > 10 ) {
 
-			fromPoint.set( -0.75, -0.35, 0 );
+			fromPoint.set( - 0.75, - 0.35, 0 );
 			fromPoint.applyQuaternion( quaternion );
 			fromPoint.add( point );
 
-			toPoint.set( 0.75, -0.35, 0 );
+			toPoint.set( 0.75, - 0.35, 0 );
 			toPoint.applyQuaternion( quaternion );
 			toPoint.add( point );
 
 			extrudeShape( tube1, fromPoint, toPoint );
 
-			fromPoint.set( -0.7, -0.3, 0 );
+			fromPoint.set( - 0.7, - 0.3, 0 );
 			fromPoint.applyQuaternion( quaternion );
 			fromPoint.add( point );
 
-			toPoint.set( -0.7, -point.y, 0 );
+			toPoint.set( - 0.7, - point.y, 0 );
 			toPoint.applyQuaternion( quaternion );
 			toPoint.add( point );
 
 			extrudeShape( tube2, fromPoint, toPoint );
 
-			fromPoint.set( 0.7, -0.3, 0 );
+			fromPoint.set( 0.7, - 0.3, 0 );
 			fromPoint.applyQuaternion( quaternion );
 			fromPoint.add( point );
 
-			toPoint.set( 0.7, -point.y, 0 );
+			toPoint.set( 0.7, - point.y, 0 );
 			toPoint.applyQuaternion( quaternion );
 			toPoint.add( point );
 
@@ -367,11 +367,11 @@ function RollerCoasterLiftersGeometry( curve, divisions ) {
 
 		} else {
 
-			fromPoint.set( 0, -0.2, 0 );
+			fromPoint.set( 0, - 0.2, 0 );
 			fromPoint.applyQuaternion( quaternion );
 			fromPoint.add( point );
 
-			toPoint.set( 0, -point.y, 0 );
+			toPoint.set( 0, - point.y, 0 );
 			toPoint.applyQuaternion( quaternion );
 			toPoint.add( point );
 
@@ -384,7 +384,7 @@ function RollerCoasterLiftersGeometry( curve, divisions ) {
 	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 	this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 
-};
+}
 
 RollerCoasterLiftersGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
@@ -399,7 +399,7 @@ function RollerCoasterShadowGeometry( curve, divisions ) {
 
 	var quaternion = new THREE.Quaternion();
 	var prevQuaternion = new THREE.Quaternion();
-	prevQuaternion.setFromAxisAngle( up , Math.PI / 2 );
+	prevQuaternion.setFromAxisAngle( up, Math.PI / 2 );
 
 	var point = new THREE.Vector3();
 
@@ -423,19 +423,19 @@ function RollerCoasterShadowGeometry( curve, divisions ) {
 
 		quaternion.setFromAxisAngle( up, angle );
 
-		vector1.set( -0.3, 0, 0 );
+		vector1.set( - 0.3, 0, 0 );
 		vector1.applyQuaternion( quaternion );
 		vector1.add( point );
 
-		vector2.set(  0.3, 0, 0 );
+		vector2.set( 0.3, 0, 0 );
 		vector2.applyQuaternion( quaternion );
 		vector2.add( point );
 
-		vector3.set(  0.3, 0, 0 );
+		vector3.set( 0.3, 0, 0 );
 		vector3.applyQuaternion( prevQuaternion );
 		vector3.add( prevPoint );
 
-		vector4.set( -0.3, 0, 0 );
+		vector4.set( - 0.3, 0, 0 );
 		vector4.applyQuaternion( prevQuaternion );
 		vector4.add( prevPoint );
 
@@ -454,7 +454,7 @@ function RollerCoasterShadowGeometry( curve, divisions ) {
 
 	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
-};
+}
 
 RollerCoasterShadowGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
@@ -485,7 +485,7 @@ function SkyGeometry() {
 
 	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
-};
+}
 
 SkyGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
@@ -497,7 +497,7 @@ function TreesGeometry( landscape ) {
 	var colors = [];
 
 	var raycaster = new THREE.Raycaster();
-	raycaster.ray.direction.set( 0, -1, 0 );
+	raycaster.ray.direction.set( 0, - 1, 0 );
 
 	for ( var i = 0; i < 2000; i ++ ) {
 
@@ -539,6 +539,6 @@ function TreesGeometry( landscape ) {
 	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 	this.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 
-};
+}
 
 TreesGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );

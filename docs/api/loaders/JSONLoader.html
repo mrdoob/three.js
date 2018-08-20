@@ -62,6 +62,12 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:String crossOrigin]</h3>
+		<p>
+		If set, assigns the [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
+	 attribute of the image to the value of *crossOrigin*, prior to starting the load. Default is *"anonymous"*.
+		</p>
+
 		<h3>[property:LoadingManager manager]</h3>
 		<p>
 			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
@@ -87,7 +93,12 @@
 		Begin loading from url and pass the <em>JSON</em> to onLoad.
 		</p>
 
-		<h3>[method:null setTexturePath]( [param:String texturePath] )</h3>
+		<h3>[method:JSONLoader setCrossOrigin]( [param:String value] )</h3>
+		<p>
+			Set the [page:.crossOrigin] attribute.
+		</p>
+
+		<h3>[method:JSONLoader setTexturePath]( [param:String texturePath] )</h3>
 		<p>
 			Set the base path or URL from which to load files. This can be useful if
 			you are loading many files from the same directory.

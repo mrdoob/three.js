@@ -211,7 +211,7 @@
 			Keep in mind that the standard materials only allow 4 MorphNormals.
 		</p>
 
-		<h3>[property:Integer physicallyCorrectLights]</h3>
+		<h3>[property:Boolean physicallyCorrectLights]</h3>
 		<p>
 		Whether to use physically correct lighting mode. Default is *false*.
 		See the [example:webgl_lights_physical lights / physical] example.
@@ -285,10 +285,6 @@
 		more texture units than the GPU supports. This is mainly used internally.
 		See [page:WebGLRenderer.capabilities capabilities.maxTextures].
 		</p>
-
-		<h3>[method:null animate]( [param:Function callback] )</h3>
-		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
-		<p>A build in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
 
 		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
 		<p>
@@ -396,7 +392,7 @@
 			either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or [page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false.
 		</p>
 
-		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Array lights], [param:Fog fog], [param:Material material], [param:Object geometryGroup], [param:Object3D object] )</h3>
+		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>Render a buffer geometry group using the camera and with the specified material.</p>
 
 		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:shaderprogram program], [param:Material shading] )</h3>
@@ -406,6 +402,10 @@
 
 		Render an immediate buffer. Gets called by renderImmediateObject.
 		</p>
+
+		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
+		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
+		<p>A build in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>Sets the clear alpha. Valid input is a float between *0.0* and *1.0*.</p>

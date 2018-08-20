@@ -55,6 +55,9 @@
 		<h3>[property:Matrix4 projectionMatrix]</h3>
 		<p>This is the matrix which contains the projection.</p>
 
+		<h3>[property:Matrix4 projectionMatrixInverse]</h3>
+		<p>The inverse of projectionMatrix.</p>
+
 
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
@@ -64,7 +67,7 @@
 			Return a new camera with the same properties as this one.
 		</p>
 
-		<h3>[method:Camera copy]( [param:Camera source] )</h3>
+		<h3>[method:Camera copy]( [param:Camera source], [param:Boolean recursive] )</h3>
 		<p>
 		Copy the properties from the source camera into this one.
 		</p>

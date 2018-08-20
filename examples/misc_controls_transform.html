@@ -21,12 +21,19 @@
 				padding: 15px;
 				z-index:100;
 			}
+			a {
+				color: white;
+			}
 		</style>
 	</head>
 	<body>
 
 		<div id="info">
-		"W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size<br />
+		<a href="javascript:control.setMode( 'translate' );">"W" translate</a> |
+		<a href="javascript:control.setMode( 'rotate' );">"E" rotate</a> |
+		<a href="javascript:control.setMode( 'scale' );">"R" scale</a> |
+		<a href="javascript:control.setSize( control.size + 0.1 );">"+" increase size</a> |
+		<a href="javascript:control.setSize( Math.max( control.size - 0.1, 0.1 ) );">"-" decrease size</a><br />
 		Press "Q" to toggle world/local space, keep "Ctrl" down to snap to grid
 		</div>
 
@@ -49,9 +56,9 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.set( 1000, 500, 1000 );
-				camera.lookAt( new THREE.Vector3( 0, 200, 0 ) );
+				camera.lookAt( 0, 200, 0 );
 
 				scene = new THREE.Scene();
 				scene.add( new THREE.GridHelper( 1000, 10 ) );
@@ -61,7 +68,6 @@
 				scene.add( light );
 
 				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
-				texture.mapping = THREE.UVMapping;
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
@@ -144,8 +150,6 @@
 			}
 
 			function render() {
-
-				control.update();
 
 				renderer.render( scene, camera );
 

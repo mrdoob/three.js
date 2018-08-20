@@ -249,7 +249,7 @@
 
 				var position = floorGeometry.attributes.position;
 
-				for ( var i = 0; i < position.count; i ++ ) {
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
 
 					vertex.fromBufferAttribute( position, i );
 
@@ -263,10 +263,10 @@
 
 				floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
 
-				count = floorGeometry.attributes.position.count;
+				position = floorGeometry.attributes.position;
 				var colors = [];
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
 
 					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 					colors.push( color.r, color.g, color.b );
@@ -285,10 +285,10 @@
 				var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 				boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
 
-				count = boxGeometry.attributes.position.count;
+				position = boxGeometry.attributes.position;
 				colors = [];
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
 
 					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 					colors.push( color.r, color.g, color.b );
