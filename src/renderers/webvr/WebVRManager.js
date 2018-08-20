@@ -56,6 +56,7 @@ function WebVRManager( renderer ) {
 	}
 
 	var currentSize, currentPixelRatio;
+	var isAnimating;
 
 	function onVRDisplayPresentChange() {
 
@@ -72,11 +73,23 @@ function WebVRManager( renderer ) {
 
 			animation.start();
 
-		} else if ( scope.enabled ) {
+			isAnimating = true;
 
-			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+		} else {
 
-			animation.stop();
+			if ( scope.enabled ) {
+
+				renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+
+			}
+
+			if ( isAnimating ) {
+
+				animation.stop();
+
+				isAnimating = false;
+
+			}
 
 		}
 
