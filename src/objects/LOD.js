@@ -36,7 +36,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			var level = levels[ i ];
 
-			this.addLevel( level.object.clone(), level.distance );
+			this.addLevel( level.object.clone(), level.distance, level.hysteresis );
 
 		}
 
@@ -44,9 +44,10 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	addLevel: function ( object, distance ) {
+	addLevel: function ( object, distance, hysteresis ) {
 
 		if ( distance === undefined ) distance = 0;
+		if ( hysteresis === undefined ) hysteresis = 0.05;
 
 		distance = Math.abs( distance );
 
@@ -62,7 +63,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		levels.splice( l, 0, { distance: distance, object: object } );
+		levels.splice( l, 0, { distance: distance, hysteresis: hysteresis, object: object } );
 
 		this.add( object );
 
@@ -74,7 +75,15 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		for ( var i = 1, l = levels.length; i < l; i ++ ) {
 
-			if ( distance < levels[ i ].distance ) {
+			var levelDistance = levels[ i ].distance;
+
+			if ( levels[ i ].object.visible ) {
+
+				levelDistance -= levelDistance * levels[ i ].hysteresis;
+
+			}
+
+			if ( distance < levelDistance ) {
 
 				break;
 
@@ -122,7 +131,15 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				for ( var i = 1, l = levels.length; i < l; i ++ ) {
 
-					if ( distance >= levels[ i ].distance ) {
+					var levelDistance = levels[ i ].distance;
+
+					if ( levels[ i ].object.visible ) {
+
+						levelDistance -= levelDistance * levels[ i ].hysteresis;
+
+					}
+
+					if ( distance >= levelDistance ) {
 
 						levels[ i - 1 ].object.visible = false;
 						levels[ i ].object.visible = true;
@@ -161,7 +178,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			data.object.levels.push( {
 				object: level.object.uuid,
-				distance: level.distance
+				distance: level.distance,
+				hysteresis: level.hysteresis
 			} );
 
 		}
