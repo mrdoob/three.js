@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Creates 6 cameras that render to a [page:WebGLRenderTargetCube].</p>
+
+		<h2>Examples</h2>
+
+		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
+		<p>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</p>
+		<p>[example:webgl_shading_physical shading / physical ]</p>
+
+		<code>// Create cube camera
+		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
+		scene.add( cubeCamera );
+
+		// Create car
+		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget } );
+		var car = new Mesh( carGeometry, chromeMaterial );
+		scene.add( car );
+
+		// Update the render target cube
+		car.setVisible( false );
+		cubeCamera.position.copy( car.position );
+		cubeCamera.update( renderer, scene );
+
+		// Render the scene
+		car.setVisible( true );
+		renderer.render( scene, camera );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution] )</h3>
+		<p>
+		near -- The near clipping distance. <br />
+		far -- The far clipping distance <br />
+		cubeResolution -- Sets the length of the cube's edges.
+		</p>
+		<p>
+		Constructs a CubeCamera that contains 6 [page:PerspectiveCamera PerspectiveCameras] that
+		render to a [page:WebGLRenderTargetCube].
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
+		<p>
+		The cube texture that gets generated.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+
+		<h3>[method:null update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
+		<p>
+		renderer -- The current WebGL renderer <br />
+		scene -- The current scene
+		</p>
+		<p>
+		Call this to update the [page:CubeCamera.renderTarget renderTarget].
+		</p>
+
+		<h3>[method:null clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
+		<p>
+		Call this to clear the [page:CubeCamera.renderTarget renderTarget] color, depth, and/or stencil buffers.
+		The color buffer is set to the renderer's current clear color. Arguments default to *true*.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
