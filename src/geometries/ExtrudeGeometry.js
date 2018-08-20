@@ -139,9 +139,16 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			// SETUP TNB variables
 
 			// TODO1 - have a .isClosed in spline?
-
-			splineTube = extrudePath.computeFrenetFrames( steps, false );
-
+			if ( options.frames === undefined ) {
+				
+				splineTube = extrudePath.computeFrenetFrames( steps, false );
+				
+			} else {
+				
+				splineTube = options.frames;
+				
+			}
+			
 			// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
 			binormal = new Vector3();
