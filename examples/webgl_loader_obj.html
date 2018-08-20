@@ -71,24 +71,18 @@
 
 				// manager
 
-				var loadModel = function () {
+				function loadModel() {
 
 					object.traverse( function ( child ) {
 
-						if ( child instanceof THREE.Mesh ) {
-
-							child.material.map = texture;
-
-						}
+						if ( child.isMesh ) child.material.map = texture;
 
 					} );
 
 					object.position.y = - 95;
 					scene.add( object );
 
-					console.log( `added object to scene` );
-
-				};
+				}
 
 				var manager = new THREE.LoadingManager( loadModel );
 
@@ -106,7 +100,7 @@
 
 				// model
 
-				var onProgress = function ( xhr ) {
+				function onProgress( xhr ) {
 
 					if ( xhr.lengthComputable ) {
 
@@ -115,10 +109,9 @@
 
 					}
 
-				};
+				}
 
-				var onError = function ( xhr ) {
-				};
+				function onError( xhr ) {}
 
 				var loader = new THREE.OBJLoader( manager );
 
