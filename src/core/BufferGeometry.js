@@ -838,6 +838,123 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	mergeGroups: function () {
+
+		if ( this.isInstancedBufferGeometry ) {
+
+			console.warn( 'THREE.BufferGeometry.mergeGroups(): Geometry is instanced.' );
+			return this;
+
+		}
+
+		// sort by material
+
+		var groups = this.groups.sort( function ( a, b ) {
+
+			if ( a.materialIndex !== b.materialIndex ) return a.materialIndex - b.materialIndex;
+
+			return a.start - b.start;
+
+		} );
+
+		var index = this.index;
+		var i, group, attributes;
+
+		if ( index === null ) {
+
+			attributes = this.attributes;
+
+		} else {
+
+			// for indexed geometries only the index values need adjusting
+
+			attributes = [ index ];
+
+		}
+
+		// relay out buffers in material order
+
+		for ( var key in attributes ) {
+
+			var attribute = attributes[ key ];
+
+			if ( attribute.isInterleavedBufferAttribute ) {
+
+				console.warn( 'THREE.BufferGeometry.mergeGroups(): Geometry has an InterleavedBufferAttribute.' );
+				return this;
+
+			}
+
+			var itemSize = attribute.itemSize;
+			var srcArray = attribute.array;
+
+			var targetOffset = 0;
+
+			var targetArray = new srcArray.constructor( srcArray.length );
+
+			for ( i = 0; i < groups.length; i ++ ) {
+
+				group = groups[ i ];
+
+				var groupLength = group.count * itemSize;
+				var groupStart = group.start * itemSize;
+
+				var sub = srcArray.subarray( groupStart, groupStart + groupLength );
+
+				targetArray.set( sub, targetOffset );
+
+				targetOffset += groupLength;
+
+			}
+
+			srcArray.set( targetArray );
+
+			attribute.needsUpdate = true;
+
+		}
+
+		// adjust groups to new layout
+
+		var start = 0;
+
+		for ( i = 0; i < groups.length; i ++ ) {
+
+			group = groups[ i ];
+
+			group.start = start;
+			start += group.count;
+
+		}
+
+		var lastGroup = groups[ 0 ];
+
+		this.groups = [ lastGroup ];
+
+		// merge adjacent groups with same materialIndex
+
+		for ( i = 1; i < groups.length; i ++ ) {
+
+			group = groups[ i ];
+
+			if ( lastGroup.materialIndex === group.materialIndex ) {
+
+				lastGroup.count += group.count;
+
+			} else {
+
+				lastGroup = group;
+				this.groups.push( lastGroup );
+
+			}
+
+		}
+
+		// console.log( 'THREE.BufferGeometry: old count:', groups.length, 'new count:', this.groups.length );
+
+		return this;
+
+	},
+
 	normalizeNormals: function () {
 
 		var vector = new Vector3();
