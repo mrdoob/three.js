@@ -16,8 +16,6 @@ SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype 
 
 	constructor: SpotLightShadow,
 
-	isSpotLightShadow: true,
-
 	update: function ( light ) {
 
 		var camera = this.camera;

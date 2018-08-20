@@ -16,6 +16,7 @@ function Light( color, intensity ) {
 	this.intensity = intensity !== undefined ? intensity : 1;
 
 	this.receiveShadow = undefined;
+	this.shadowAutoUpdate = false;
 
 }
 
