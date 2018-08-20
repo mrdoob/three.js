@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - displacement</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #808080;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - cpu displacement mapping</div>
+
+		<script src="../build/three.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var materialParameters = { emissiveIntensity: 2, emissive: 0xffffff };
+
+			var gui = new dat.GUI();
+			var guiParams = { displacement: true };
+
+			var container, stats;
+
+			var loadingManager = new THREE.LoadingManager( createMesh );
+			var loader = new THREE.TextureLoader( loadingManager );
+
+			var camera, scene, light, screenMesh, screenNonDisplaced, material, geometry, renderer;
+
+			var time = 0;
+			var meshCreated = false;
+
+			var controls;
+
+			var displacementTexture;
+
+			var diffusePath = "textures/screen/diffuse.png";
+			var emissivePath = "textures/screen/emissive.png";
+			var heightPath = "textures/screen/height.png";
+			var specularPath = "textures/screen/specular.png";
+
+			var reusableVector = new THREE.Vector3();
+			var reusableVector2 = new THREE.Vector2();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 0, 300 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
+
+				light = new THREE.AmbientLight( 0xffffff );
+				scene.add ( light );
+
+				// load displacement texture
+
+				displacementTexture = loader.load( heightPath );
+
+				// load diffuse texture
+
+				materialParameters.map = loader.load( diffusePath );
+
+				// load emissive texture
+
+				materialParameters.emissiveMap = loader.load( emissivePath );
+
+				// load specular texture
+
+				materialParameters.specularMap = loader.load( specularPath );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 250;
+				controls.maxDistance = 650;
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				gui.add( guiParams, "displacement").name( "displacement" ).onChange( guiDisplacementChangeEvent );
+
+			}
+
+			function guiDisplacementChangeEvent( value ) {
+
+				if ( value ) {
+
+					screenMesh.visible = true;
+					screenNonDisplaced.visible = false;
+
+				} else {
+
+					screenMesh.visible = false;
+					screenNonDisplaced.visible = true;
+
+				}
+
+			}
+
+			function createMesh() {
+
+				geometry = new THREE.BoxBufferGeometry( 50, 50, 50, 50, 50, 50 );
+
+				applyDisplacementMap( geometry, displacementTexture, 6, -2 );
+
+				material = new THREE.MeshPhongMaterial( materialParameters );
+				screenMesh = new THREE.Mesh( geometry, material );
+				scene.add( screenMesh );
+
+				// non displaced mesh
+
+				var nonDisplacedGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				screenNonDisplaced = new THREE.Mesh( nonDisplacedGeometry, material );
+				screenNonDisplaced.visible = false;
+				scene.add( screenNonDisplaced );
+
+				meshCreated = true;
+
+			}
+
+			function applyDisplacementMap( geometry, texture, scale, bias ) {
+
+				texture.updateMatrix();
+
+				// draw the displacement map on a canvas
+
+				var tmpCanvas = document.createElement( "canvas" );
+				var tmpContext = tmpCanvas.getContext( "2d" );
+				var heightMapWidth = texture.image.width;
+				var heightMapHeight = texture.image.height;
+				tmpCanvas.width = heightMapWidth;
+				tmpCanvas.height = heightMapHeight;
+
+				tmpContext.drawImage( texture.image, 0, 0 );
+
+				var displacementBuffer = tmpContext.getImageData( 0, 0, heightMapWidth, heightMapHeight ).data;
+
+				// get geometry vertex info
+
+				var positions = geometry.attributes.position.array;
+				var normals = geometry.attributes.normal.array;
+				var uvs = geometry.attributes.uv.array;
+
+				// displacement mapping
+
+				var iterate = true;
+				var i = 0, i2 = 0;
+				while ( iterate ) {
+
+					var normalX = normals[ i ];
+					var normalY = normals[ i + 1 ];
+					var normalZ = normals[ i + 2 ];
+					var uvX = uvs[ i2 ];
+					var uvY = uvs[ i2 + 1 ];
+
+					texture.transformUv( reusableVector2.set( uvX, uvY ) );
+					uvX = reusableVector2.x;
+					uvY = reusableVector2.y;
+
+					var u = ( ( Math.abs( uvX ) * heightMapWidth ) % heightMapWidth ) | 0;
+					var v = ( ( Math.abs( uvY ) * heightMapHeight ) % heightMapHeight ) | 0;
+					var pos = ( u + v * heightMapWidth ) * 4;
+					var r = displacementBuffer[ pos ] / 255.0;
+					var normalizedNormal = reusableVector.set( normalX, normalY, normalZ ).normalize();
+
+					positions[ i ] += normalizedNormal.x * ( r * scale + bias );
+					positions[ i + 1 ] += normalizedNormal.y * ( r * scale + bias );
+					positions[ i + 2 ] += normalizedNormal.z * ( r * scale + bias );
+
+					i += 3;
+					i2 += 2;
+
+					if ( i >= positions.length ) {
+
+						iterate = false;
+
+					}
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				if ( meshCreated ) {
+
+					time += 0.05;
+					material.emissiveIntensity += Math.sin ( time ) / 10;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

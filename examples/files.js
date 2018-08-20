@@ -25,6 +25,7 @@ var files = {
 		"webgl_geometry_colors_lookuptable",
 		"webgl_geometry_convex",
 		"webgl_geometry_cube",
+		"webgl_geometry_displacement",
 		"webgl_geometry_dynamic",
 		"webgl_geometry_extrude_shapes",
 		"webgl_geometry_extrude_shapes2",
