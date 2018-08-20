@@ -738,7 +738,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				}
 
-
 			} else {
 
 				// non-indexed elements (unconnected triangle soup)
