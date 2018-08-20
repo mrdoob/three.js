@@ -79,12 +79,14 @@
 				light.position.set( 0, 140, 500 );
 				light.position.multiplyScalar( 1.1 );
 				light.color.setHSL( 0.6, 0.075, 1 );
+				light.lookAt( 0, 0, 0 );
 				scene.add( light );
 
 				//
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 0, - 1, 0 );
+				light.lookAt( 0, 0, 0 );
 				scene.add( light );
 
 				// RENDERER

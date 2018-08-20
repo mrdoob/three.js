@@ -98,6 +98,7 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, -70, 100 ).normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 
 				setTimeout( function () {
 

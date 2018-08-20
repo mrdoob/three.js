@@ -81,6 +81,7 @@
 
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
+				light.lookAt( 0, 0, 0 );
 				scene.add( light );
 
 				var pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );

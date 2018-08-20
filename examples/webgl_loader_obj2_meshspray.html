@@ -419,6 +419,9 @@
 					directionalLight1.position.set( -100, -50, 100 );
 					directionalLight2.position.set( 100, 50, -100 );
 
+					directionalLight1.lookAt( 0, 0, 0 );
+					directionalLight2.lookAt( 0, 0, 0 );
+
 					this.scene.add( directionalLight1 );
 					this.scene.add( directionalLight2 );
 					this.scene.add( ambientLight );

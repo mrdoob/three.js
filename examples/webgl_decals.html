@@ -118,10 +118,12 @@
 
 			var light = new THREE.DirectionalLight( 0xffddcc, 1 );
 			light.position.set( 1, 0.75, 0.5 );
+			light.lookAt( 0, 0, 0 );
 			scene.add( light );
 
 			var light = new THREE.DirectionalLight( 0xccccff, 1 );
 			light.position.set( -1, 0.75, -0.5 );
+			light.lookAt( 0, 0, 0 );
 			scene.add( light );
 
 			var geometry = new THREE.BufferGeometry();

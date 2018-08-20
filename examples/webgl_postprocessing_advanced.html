@@ -109,6 +109,7 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, -0.1, 1 ).normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				sceneModel.add( directionalLight );
 
 				var loader = new THREE.JSONLoader();

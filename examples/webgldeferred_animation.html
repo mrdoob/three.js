@@ -162,10 +162,12 @@
 
 				var directionalLight = new THREE.DirectionalLight( 0x101010 );
 				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				var spotLight = new THREE.SpotLight( 0x404040 );
 				spotLight.position.set( 0, 50, 0 );
+				spotLight.lookAt( 0, 0, 0 );
 				scene.add( spotLight );
 
 			}

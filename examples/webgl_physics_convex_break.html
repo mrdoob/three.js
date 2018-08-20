@@ -138,6 +138,7 @@
 
 			var light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( -10, 18, 5 );
+			light.lookAt( 0, 0, 0 );
 			light.castShadow = true;
 			var d = 14;
 			light.shadow.camera.left = -d;

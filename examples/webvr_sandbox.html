@@ -67,22 +67,20 @@
 
 				var light = new THREE.DirectionalLight( 0x8800ff );
 				light.position.set( - 1, 1.5, - 1.5 );
+				light.lookAt( 0, 0, - 2 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4;
 				scene.add( light );
-				light.target.position.set( 0, 0, - 2 );
-				scene.add( light.target );
 
 				var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				var light = new THREE.DirectionalLight( 0xff0000 );
 				light.position.set( 1, 1.5, - 2.5 );
+				light.lookAt( 0, 0, - 2 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4;
 				scene.add( light );
-				light.target.position.set( 0, 0, - 2 );
-				scene.add( light.target );
 
 				var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );

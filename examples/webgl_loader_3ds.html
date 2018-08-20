@@ -57,6 +57,7 @@
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 2 );
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				//3ds files dont store normal maps

@@ -198,6 +198,7 @@
 
 				var directionalLight = new THREE.DirectionalLight( color, intensity );
 				directionalLight.position.set( x, y, z );
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;

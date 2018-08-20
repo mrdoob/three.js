@@ -244,6 +244,7 @@
 
 				sunLight = new THREE.SpotLight( 0xffffff, 0.3, 0, Math.PI/2 );
 				sunLight.position.set( 1000, 2000, 1000 );
+				sunLight.lookAt( 0, 0, 0 );
 
 				sunLight.castShadow = true;
 

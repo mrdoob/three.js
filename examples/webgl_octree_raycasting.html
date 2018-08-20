@@ -97,6 +97,7 @@
 
 			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 			directionalLight.position.set( 1, 1, 2 ).normalize();
+			directionalLight.lookAt( 0, 0, 0 );
 			scene.add( directionalLight );
 
 			// create all objects

@@ -66,6 +66,7 @@
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0.5, 1.0, 0.5 ).normalize();
+				light.lookAt( 0, 0, 0 );
 
 				scene.add( light );
 

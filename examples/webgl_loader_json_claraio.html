@@ -69,6 +69,7 @@
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 1 ).normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				// BEGIN Clara.io JSON loader code

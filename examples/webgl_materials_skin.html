@@ -102,10 +102,12 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffeedd, 1.5 );
 				directionalLight.position.set( 1, 0.5, 1 );
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xddddff, 0.5 );
 				directionalLight.position.set( -1, 0.5, -1 );
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				// MATERIALS

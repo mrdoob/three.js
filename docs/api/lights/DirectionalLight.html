@@ -21,23 +21,6 @@
 			This light can cast shadows - see the [page:DirectionalLightShadow] page for details.
 		</p>
 
-		<h2>A Note about Position, Target and rotation</h2>
-		<p>
-			A common point of confusion for directional lights is that setting the rotation has no effect.
-			This is because three.js's DirectionalLight is the equivalent to what is often called a 'Target
-			Direct Light' in other applications.<br /><br />
-
-			This means that its direction is calculated as pointing
-			from the light's [page:Object3D.position position] to	the [page:.target target]'s position
-			(as opposed to a 'Free Direct Light' that just has a rotation component).<br /><br />
-
-			The reason for this is to allow the light to cast shadows - the [page:.shadow shadow]
-			camera needs a position to calculate shadows from.<br /><br />
-
-			See the [page:.target target] property below for details on updating the target.
-		</p>
-
-
 		<h2>Example</h2>
 		<p>
 			[example:canvas_morphtargets_horse morphtargets / horse ]<br />
@@ -99,30 +82,34 @@
 
 		<h3>[property:Object3D target]</h3>
 		<p>
-			The DirectionalLight points from its [page:.position position] to target.position. The default
-			position of the target is *(0, 0, 0)*.<br />
+			If [page:.targeted targeted] is *true*, the DirectionalLight points from its world [page:.position position]
+			to the world position of its [page:.target target] object, extracted from [page:Object3D.matrixWorld target.matrixWorld].
+			This 'Target Direct Light' mode may be used to have the light track a moving object :
+			<code>
+// track an existing object, already added to the scene
+light.targeted = true;
+light.target = targetObject;
 
-			*Note*: For the target's position to be changed to anything other than the default,
-			it must be added to the [page:Scene scene] using
+// or use the default target object
+light.targeted = true;
+scene.add( light.target );
+			</code>
+			*Note*: The target object mush be added to the [page:Scene scene] to get its
+			[page:Object3D.matrixWorld matrixWorld] automatically updated each frame.<br/>
+			*Note*: The light [page:Object3D.rotation rotation] and [page:Object3D.quaternion quaternion] are
+			unused when the [page:.targeted targeted] is true.<br/>
 		</p>
-		<code>
-		scene.add( light.target );
-		</code>
-		<p>
-			This is so that the target's [page:Object3D.matrixWorld matrixWorld] gets automatically
-			updated each frame.<br /><br />
 
-			It is also possible to set the target to be another object in the scene (anything with a
-			[page:Object3D.position position] property), like so:
-		</p>
-		<code>
-		var targetObject = new THREE.Object3D();
-		scene.add(targetObject);
 
-		light.target = targetObject;
-		</code>
+		<h3>[property:Boolean targeted]</h3>
 		<p>
-			The directionalLight will now track the target object.
+			If set to *true*, the light direction will track the [page:.target target] world position, otherwise the SpotLight is directed along the positive Z axis of its local
+			frame ('Free Direct Light' mode) and thus affected by its world rotation.<br/>
+
+			The default is *false*.<br/>
+
+			*Note*: In both modes, the [page:.position position] is used by the [page:.shadow shadow] camera
+			to cast shadows.
 		</p>
 
 

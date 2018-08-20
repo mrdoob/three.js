@@ -82,6 +82,7 @@ function Scene( type, numObjects, cameraZ, fov, rotationSpeed, clearColor ) {
 
 	var light = new THREE.SpotLight( 0xffffff, 1.5 );
 	light.position.set( 0, 500, 2000 );
+	light.lookAt( 0, 0, 0 );
 	this.scene.add( light );
 
 	this.rotationSpeed = rotationSpeed;

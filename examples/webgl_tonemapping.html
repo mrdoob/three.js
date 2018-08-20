@@ -179,6 +179,7 @@
 
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 50, 100, 50 );
+				spotLight.lookAt( 0, 0, 0 );
 				spotLight.angle = Math.PI / 7;
 				spotLight.decay = 2;
 				spotLight.distance = 300;

@@ -145,6 +145,7 @@
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
 				dirLight.position.set( 0, 0, 1 ).normalize();
+				dirLight.lookAt( 0, 0, 0 );
 				scene.add( dirLight );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );

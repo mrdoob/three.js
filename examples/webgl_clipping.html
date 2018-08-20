@@ -42,6 +42,7 @@
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.2;
 				spotLight.position.set( 2, 3, 3 );
+				spotLight.lookAt( 0, 0, 0 );
 				spotLight.castShadow = true;
 				spotLight.shadow.camera.near = 3;
 				spotLight.shadow.camera.far = 10;
@@ -51,6 +52,7 @@
 
 				var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
 				dirLight.position.set( 0, 3, 0 );
+				dirLight.lookAt( 0, 0, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
 				dirLight.shadow.camera.far = 10;

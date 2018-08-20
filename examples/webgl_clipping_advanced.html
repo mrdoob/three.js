@@ -177,6 +177,7 @@
 
 				var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
 				dirLight.position.set( 0, 2, 0 );
+				dirLight.lookAt( 0, 0, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
 				dirLight.shadow.camera.far = 10;

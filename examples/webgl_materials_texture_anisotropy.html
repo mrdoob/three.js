@@ -98,10 +98,12 @@
 
 				var light1 = new THREE.DirectionalLight( 0xffffff, 2 );
 				light1.position.set( 1, 1, 1 );
+				light1.lookAt( 0, 0, 0 );
 				scene1.add( light1 );
 
 				var light2 = new THREE.DirectionalLight( 0xffffff, 2 );
 				light2.position.set( 1, 1, 1 );
+				light2.lookAt( 0, 0, 0 );
 				scene2.add( light2 );
 
 				// GROUND

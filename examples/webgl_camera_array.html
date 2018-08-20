@@ -59,6 +59,7 @@
 
 				var light = new THREE.DirectionalLight();
 				light.position.set( 0.5, 0.5, 1 );
+				light.lookAt( 0, 0, 0 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4; // tighter shadow map
 				scene.add( light );

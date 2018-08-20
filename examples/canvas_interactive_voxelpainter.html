@@ -86,6 +86,7 @@
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0x808080 );
@@ -93,6 +94,7 @@
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
+				directionalLight.lookAt( 0, 0, 0 );
 				scene.add( directionalLight );
 
 				renderer = new THREE.CanvasRenderer();

@@ -147,6 +147,9 @@
 					var directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
 					var directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
 
+					directionalLight1.lookAt( 0, 0, 0 );
+					directionalLight2.lookAt( 0, 0, 0 );
+
 					directionalLight1.position.set( -100, -50, 100 );
 					directionalLight2.position.set( 100, 50, -100 );
 

@@ -149,32 +149,33 @@
 			A [page:SpotLightShadow] used to calculate shadows for this light.
 		</p>
 
-
 		<h3>[property:Object3D target]</h3>
 		<p>
-			The Spotlight points from its [page:.position position] to target.position. The default
-			position of the target is *(0, 0, 0)*.<br />
-
-			*Note*: For the target's position to be changed to anything other than the default,
-			it must be added to the [page:Scene scene] using
+			If [page:.targeted targeted] is *true*, the SpotLight points from its world [page:.position position]
+			to the world position of its [page:.target target] object, extracted from [page:Object3D.matrixWorld target.matrixWorld].
+			This may be used to have the light track a moving object :
 			<code>
-				scene.add( light.target );
-			</code>
-
-			This is so that the target's [page:Object3D.matrixWorld matrixWorld] gets automatically
-			updated each frame.<br /><br />
-
-			It is also possible to set the target to be another object in the scene (anything with a
-			[page:Object3D.position position] property), like so:
-			<code>
-var targetObject = new THREE.Object3D();
-scene.add(targetObject);
-
+// track an existing object, already added to the scene
+light.targeted = true;
 light.target = targetObject;
+
+// or use the default target object
+light.targeted = true;
+scene.add( light.target );
 			</code>
-			The spotlight will now track the target object.
+			*Note*: The target object mush be added to the [page:Scene scene] to get its
+			[page:Object3D.matrixWorld matrixWorld] automatically updated each frame.<br/>
+			*Note*: The light [page:Object3D.rotation rotation] and [page:Object3D.quaternion quaternion] are
+			unused when the [page:.targeted targeted] is true.<br/>
 		</p>
 
+		<h3>[property:Boolean targeted]</h3>
+		<p>
+			If set to *true*, the light direction will track the [page:.target target] world position, otherwise the SpotLight is directed along the positive Z axis of its local
+			frame and thus affected by its world rotation.<br/>
+
+			The default is *false*.
+		</p>
 
 		<h2>Methods</h2>
 

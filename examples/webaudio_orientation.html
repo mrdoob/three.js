@@ -129,6 +129,7 @@
 
 		light = new THREE.DirectionalLight( 0xffffff );
 		light.position.set( 0, 200, 100 );
+		light.lookAt( 0, 0, 0 );
 		light.castShadow = true;
 		light.shadow.camera.top = 180;
 		light.shadow.camera.bottom = -100;

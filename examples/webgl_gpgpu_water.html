@@ -263,10 +263,12 @@
 
 				var sun = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
 				sun.position.set( 300, 400, 175 );
+				sun.lookAt( 0, 0, 0 );
 				scene.add( sun );
 
 				var sun2 = new THREE.DirectionalLight( 0x40A040, 0.6 );
 				sun2.position.set( -100, 350, -200 );
+				sun2.lookAt( 0, 0, 0 );
 				scene.add( sun2 );
 
 				renderer = new THREE.WebGLRenderer();
@@ -461,7 +463,7 @@
 					gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
 
 				}
-				
+
 			}
 
 

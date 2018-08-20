@@ -120,12 +120,14 @@
 
 				var spotLight = new THREE.SpotLight( 0xff8888 );
 				spotLight.position.set( 100, 200, 100 );
+				spotLight.lookAt( 0, 0, 0 );
 				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 0.9;
 				scene.add( spotLight );
 
 				var spotLight = new THREE.SpotLight( 0x8888ff );
 				spotLight.position.set( - 100, - 200, - 100 );
+				spotLight.lookAt( 0, 0, 0 );
 				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 0.9;
 				scene.add( spotLight );

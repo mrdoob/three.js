@@ -16,6 +16,7 @@ function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 	this.updateMatrix();
 
 	this.target = new Object3D();
+	this.targeted = false;
 
 	Object.defineProperty( this, 'power', {
 		get: function () {

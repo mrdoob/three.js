@@ -187,6 +187,7 @@
 
 				var directional = new THREE.DirectionalLight( 0xffff00 );
 				directional.position.set( - 1, 0.5, 0 );
+				directional.lookAt( 0, 0, 0 );
 				scene.add( directional );
 
 				canvasRenderer = new THREE.CanvasRenderer();
