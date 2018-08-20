@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This light globally illuminates all objects in the scene equally.<br /><br />
+
+			This light cannot be used to cast shadows as it does not have a direction.
+		</p>
+
+
+		<h2>Example</h2>
+		<p>
+			[example:canvas_camera_orthographic camera / orthographic ]<br />
+		  [example:canvas_interactive_voxelpainter interactive / voxelpainter ]<br />
+		  [example:canvas_materials materials ]<br />
+		  [example:canvas_sandbox sandbox ]<br />
+		  [example:webgl_animation_cloth animation / cloth ]<br />
+		  [example:webgl_animation_skinning_blending animation / skinning / blending ]
+		</p>
+
+<code>var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( light );</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Integer color], [param:Float intensity] )</h3>
+		<p>
+		[page:Integer color] - (optional) Numeric value of the RGB component of the color. Default is 0xffffff.<br />
+		[page:Float intensity] - (optional) Numeric value of the light's strength/intensity. Default is 1.<br /><br />
+
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+		<p>
+				See the base [page:Light Light] class for common properties.
+		</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+			This is set to *undefined* in the constructor as ambient lights cannot cast shadows.
+		</p>
+
+
+		<h3>[property:Boolean isAmbientLight]</h3>
+		<p>
+			Used to check whether this or derived classes are ambient lights. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+
+
+		<h2>Methods</h2>
+		<p>
+				See the base [page:Light Light] class for common methods.
+		</p>
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
