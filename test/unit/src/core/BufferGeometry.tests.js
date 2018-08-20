@@ -161,9 +161,6 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( a.getIndex() instanceof Uint32BufferAttribute, "Index has the right type" );
 			assert.deepEqual( a.getIndex().array, new Uint32Array( uint32 ), "Large index gets stored correctly" );
 
-			a.setIndex( str );
-			assert.strictEqual( a.getIndex(), str, "Weird index gets stored correctly" );
-
 		} );
 
 		QUnit.todo( "getAttribute", ( assert ) => {

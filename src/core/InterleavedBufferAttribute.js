@@ -3,7 +3,11 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
+var interleavedBufferAttributeId = 2; // InterleavedBufferAttribute uses even numbers, BufferAttribute uses odd numbers.
+
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
+
+	Object.defineProperty( this, 'id', { value: interleavedBufferAttributeId += 2 } );
 
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;

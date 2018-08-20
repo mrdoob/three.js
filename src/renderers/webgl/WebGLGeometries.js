@@ -14,17 +14,34 @@ function WebGLGeometries( gl, attributes, info ) {
 	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
-		var buffergeometry = geometries[ geometry.id ];
+		var geometryData = geometries[ geometry.id ];
+		var lastSeenAttributeIds = geometryData.lastSeenAttributeIds;
+		var buffergeometry = geometryData.buffergeometry;
+		var index = buffergeometry.index;
+		var hasSeenThisAttribute;
 
-		if ( buffergeometry.index !== null ) {
+		if ( index !== null ) {
 
-			attributes.remove( buffergeometry.index );
+			hasSeenThisAttribute = index.id === geometryData.lastSeenIndexId;
+
+			if ( hasSeenThisAttribute ) {
+
+				attributes.unref( index );
+
+			}
 
 		}
 
 		for ( var name in buffergeometry.attributes ) {
 
-			attributes.remove( buffergeometry.attributes[ name ] );
+			var attribute = buffergeometry.attributes[ name ];
+			hasSeenThisAttribute = attribute.id === lastSeenAttributeIds[ name ];
+
+			if ( hasSeenThisAttribute ) {
+
+				attributes.unref( buffergeometry.attributes[ name ] );
+
+			}
 
 		}
 
@@ -36,7 +53,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		if ( attribute ) {
 
-			attributes.remove( attribute );
+			attributes.unref( wireframeAttributes[ buffergeometry.id ] );
 			delete wireframeAttributes[ buffergeometry.id ];
 
 		}
@@ -49,11 +66,13 @@ function WebGLGeometries( gl, attributes, info ) {
 
 	function get( object, geometry ) {
 
-		var buffergeometry = geometries[ geometry.id ];
+		var geometryData = geometries[ geometry.id ];
 
-		if ( buffergeometry ) return buffergeometry;
+		if ( geometryData ) return geometryData;
 
 		geometry.addEventListener( 'dispose', onGeometryDispose );
+
+		var buffergeometry;
 
 		if ( geometry.isBufferGeometry ) {
 
@@ -71,28 +90,43 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		}
 
-		geometries[ geometry.id ] = buffergeometry;
+		geometryData = {
+			buffergeometry: buffergeometry,
+			lastSeenAttributeIds: {},
+			lastSeenMorphAttributeIds: {},
+			lastSeenIndexId: undefined,
+		};
+		geometries[ geometry.id ] = geometryData;
 
 		info.memory.geometries ++;
 
-		return buffergeometry;
+		return geometryData;
 
 	}
 
-	function update( geometry ) {
+	function update( geometryData ) {
 
+		var geometry = geometryData.buffergeometry;
+		var lastSeenAttributeIds = geometryData.lastSeenAttributeIds;
+		var lastSeenMorphAttributeIds = geometryData.lastSeenMorphAttributeIds;
 		var index = geometry.index;
 		var geometryAttributes = geometry.attributes;
+		var hasSeenThisAttribute;
 
 		if ( index !== null ) {
 
-			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
+			hasSeenThisAttribute = index.id === geometryData.lastSeenIndexId;
+			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER, hasSeenThisAttribute );
+			geometryData.lastSeenIndexId = index.id;
 
 		}
 
 		for ( var name in geometryAttributes ) {
 
-			attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
+			var attribute = geometryAttributes[ name ];
+			hasSeenThisAttribute = attribute.id === lastSeenAttributeIds[ name ];
+			attributes.update( attribute, gl.ARRAY_BUFFER, hasSeenThisAttribute );
+			lastSeenAttributeIds[ name ] = attribute.id;
 
 		}
 
@@ -103,10 +137,20 @@ function WebGLGeometries( gl, attributes, info ) {
 		for ( var name in morphAttributes ) {
 
 			var array = morphAttributes[ name ];
+			var lastSeen = lastSeenMorphAttributeIds[ name ];
+			if ( ! lastSeen ) {
+
+				lastSeen = [];
+				lastSeenMorphAttributeIds[ name ] = lastSeen;
+
+			}
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				attributes.update( array[ i ], gl.ARRAY_BUFFER );
+				var attribute = array[ i ];
+				hasSeenThisAttribute = attribute.id === lastSeen[ i ];
+				attributes.update( attribute, gl.ARRAY_BUFFER, hasSeenThisAttribute );
+				lastSeen[ i ] = attribute.id;
 
 			}
 
@@ -161,7 +205,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
-		attributes.update( attribute, gl.ELEMENT_ARRAY_BUFFER );
+		attributes.update( geometry, attribute, gl.ELEMENT_ARRAY_BUFFER, true );
 
 		wireframeAttributes[ geometry.id ] = attribute;
 

@@ -58,7 +58,8 @@ function WebGLAttributes( gl ) {
 			buffer: buffer,
 			type: type,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version
+			version: attribute.version,
+			refcount: 0,
 		};
 
 	}
@@ -105,23 +106,7 @@ function WebGLAttributes( gl ) {
 
 	}
 
-	function remove( attribute ) {
-
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
-
-		var data = buffers.get( attribute );
-
-		if ( data ) {
-
-			gl.deleteBuffer( data.buffer );
-
-			buffers.delete( attribute );
-
-		}
-
-	}
-
-	function update( attribute, bufferType ) {
+	function update( attribute, bufferType, hasSeenAttributeBefore ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
@@ -129,7 +114,8 @@ function WebGLAttributes( gl ) {
 
 		if ( data === undefined ) {
 
-			buffers.set( attribute, createBuffer( attribute, bufferType ) );
+			data = createBuffer( attribute, bufferType );
+			buffers.set( attribute, data );
 
 		} else if ( data.version < attribute.version ) {
 
@@ -139,13 +125,41 @@ function WebGLAttributes( gl ) {
 
 		}
 
+		if ( ! hasSeenAttributeBefore ) {
+
+			data.refcount ++;
+
+		}
+
+	}
+
+	function unref( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		var data = buffers.get( attribute );
+
+		if ( data ) {
+
+			data.refcount --;
+
+			if ( data.refcount === 0 ) {
+
+				gl.deleteBuffer( data.buffer );
+
+				buffers.delete( attribute );
+
+			}
+
+		}
+
 	}
 
 	return {
 
 		get: get,
-		remove: remove,
-		update: update
+		update: update,
+		unref: unref
 
 	};
 

@@ -7,7 +7,11 @@ import { Color } from '../math/Color.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
+var bufferAttributeId = 1; // BufferAttribute uses odd numbers, InterleavedBufferAttribute uses even numbers.
+
 function BufferAttribute( array, itemSize, normalized ) {
+
+	Object.defineProperty( this, 'id', { value: bufferAttributeId += 2 } );
 
 	if ( Array.isArray( array ) ) {
 
