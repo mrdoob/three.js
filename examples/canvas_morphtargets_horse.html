@@ -70,6 +70,7 @@
 
 					var mesh = gltf.scene.children[ 0 ];
 					mesh.material.overdraw = 0.5;
+					mesh.material.vertexColors = THREE.FaceColors;
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
 

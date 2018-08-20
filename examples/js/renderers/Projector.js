@@ -322,6 +322,12 @@ THREE.Projector = function () {
 
 				_face.material = material;
 
+				if ( material.vertexColors === THREE.FaceColors ) {
+
+					_face.color.fromArray( colors, a * 3 );
+
+				}
+
 				_renderData.elements.push( _face );
 
 			}
@@ -468,6 +474,18 @@ THREE.Projector = function () {
 						for ( var i = 0, l = normals.length; i < l; i += 3 ) {
 
 							renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
+
+						}
+
+					}
+
+					if ( attributes.color !== undefined ) {
+
+						var colors = attributes.color.array;
+
+						for ( var i = 0, l = colors.length; i < l; i += 3 ) {
+
+							renderList.pushColor( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] );
 
 						}
 
