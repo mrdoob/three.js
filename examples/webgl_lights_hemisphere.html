@@ -49,6 +49,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -179,12 +180,11 @@
 
 				// MODEL
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.GLTFLoader();
 
-				loader.load( 'models/animated/flamingo.js', function( geometry ) {
+				loader.load( 'models/gltf/Flamingo.glb', function( gltf ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = gltf.scene.children[ 0 ];
 
 					var s = 0.35;
 					mesh.scale.set( s, s, s );
@@ -197,7 +197,7 @@
 					scene.add( mesh );
 
 					var mixer = new THREE.AnimationMixer( mesh );
-					mixer.clipAction( geometry.animations[ 0 ] ).setDuration( 1 ).play();
+					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
 					mixers.push( mixer );
 
 				} );
