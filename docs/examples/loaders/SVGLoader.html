@@ -12,7 +12,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">A loader for loading a <em>.svg</em> resource.<br >
-		<a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">Scalabe Vector Graphics</a> is an XML-based vector image format for two-dimensional graphics with support for interactivity and animation.
+		<a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">Scalable Vector Graphics</a> is an XML-based vector image format for two-dimensional graphics with support for interactivity and animation.
 		</p>
 
 		<h2>Example</h2>
@@ -26,9 +26,34 @@
 			// resource URL
 			'data/svgSample.svg',
 			// called when the resource is loaded
-			function ( doc ) {
+			function ( paths ) {
 
-				scene.add( new THREE.SVGObject(doc) );
+				var group = new THREE.Group();
+
+				for ( var i = 0; i < paths.length; i ++ ) {
+
+					var path = paths[ i ];
+
+					var material = new THREE.MeshBasicMaterial( {
+						color: path.color,
+						side: THREE.DoubleSide,
+						depthWrite: false
+					} );
+
+					var shapes = path.toShapes( true );
+
+					for ( var j = 0; j < shapes.length; j ++ ) {
+
+						var shape = shapes[ j ];
+						var geometry = new THREE.ShapeBufferGeometry( shape );
+						var mesh = new THREE.Mesh( geometry, material );
+						group.add( mesh );
+
+					}
+
+				}
+
+				scene.add( group );
 
 			},
 			// called when loading is in progresses

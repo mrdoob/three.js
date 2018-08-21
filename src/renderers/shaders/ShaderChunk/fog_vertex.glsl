@@ -1,4 +1,5 @@
-
 #ifdef USE_FOG
-fogDepth = -mvPosition.z;
+
+	vFogPosition = mvPosition.xyz;
+
 #endif

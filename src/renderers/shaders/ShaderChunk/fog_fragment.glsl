@@ -1,5 +1,7 @@
 #ifdef USE_FOG
 
+	float fogDepth = length( vFogPosition );
+
 	#ifdef FOG_EXP2
 
 		float fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );

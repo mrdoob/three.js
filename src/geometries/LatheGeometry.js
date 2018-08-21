@@ -1,5 +1,4 @@
 /**
- * @author astrodud / http://astrodud.isgreat.org/
  * @author zz85 / https://github.com/zz85
  * @author bhouston / http://clara.io
  * @author Mugen87 / https://github.com/Mugen87

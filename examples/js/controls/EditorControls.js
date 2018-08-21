@@ -14,13 +14,15 @@ THREE.EditorControls = function ( object, domElement ) {
 	this.enabled = true;
 	this.center = new THREE.Vector3();
 	this.panSpeed = 0.001;
-	this.zoomSpeed = 0.001;
+	this.zoomSpeed = 0.1;
 	this.rotationSpeed = 0.005;
 
 	// internals
 
 	var scope = this;
 	var vector = new THREE.Vector3();
+	var delta = new THREE.Vector3();
+	var box = new THREE.Box3();
 
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
@@ -37,9 +39,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.focus = function ( target ) {
 
-		var box = new THREE.Box3().setFromObject( target );
-
 		var distance;
+
+		box.setFromObject( target );
 
 		if ( box.isEmpty() === false ) {
 
@@ -55,7 +57,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		}
 
-		var delta = new THREE.Vector3( 0, 0, 1 );
+		delta.set( 0, 0, 1 );
 		delta.applyQuaternion( object.quaternion );
 		delta.multiplyScalar( distance * 4 );
 
@@ -156,15 +158,15 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( state === STATE.ROTATE ) {
 
-			scope.rotate( new THREE.Vector3( - movementX * scope.rotationSpeed, - movementY * scope.rotationSpeed, 0 ) );
+			scope.rotate( delta.set( - movementX * scope.rotationSpeed, - movementY * scope.rotationSpeed, 0 ) );
 
 		} else if ( state === STATE.ZOOM ) {
 
-			scope.zoom( new THREE.Vector3( 0, 0, movementY ) );
+			scope.zoom( delta.set( 0, 0, movementY ) );
 
 		} else if ( state === STATE.PAN ) {
 
-			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
+			scope.pan( delta.set( - movementX, movementY, 0 ) );
 
 		}
 
@@ -187,9 +189,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		// if ( scope.enabled === false ) return;
-
-		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY ) );
+		// Normalize deltaY due to https://bugzilla.mozilla.org/show_bug.cgi?id=1392460
+		scope.zoom( delta.set( 0, 0, event.deltaY > 0 ? 1 : - 1 ) );
 
 	}
 
@@ -284,7 +285,7 @@ THREE.EditorControls = function ( object, domElement ) {
 				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
 				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 );
 				var distance = touches[ 0 ].distanceTo( touches[ 1 ] );
-				scope.zoom( new THREE.Vector3( 0, 0, prevDistance - distance ) );
+				scope.zoom( delta.set( 0, 0, prevDistance - distance ) );
 				prevDistance = distance;
 
 

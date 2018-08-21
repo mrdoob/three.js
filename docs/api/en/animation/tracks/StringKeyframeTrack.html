@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		[page:KeyframeTrack] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A Track of string keyframe values.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
+		<p>
+			[page:String name] - (required) identifier for the KeyframeTrack.<br />
+			[page:Array times] - (required) array of keyframe times.<br />
+			[page:Array values] - values for the keyframes at the times specified.<br />
+			[page:Constant interpolation] - the type of interpolation to use. See
+			[page:Animation Animation Constants] for possible values. Default is
+			[page:Animation InterpolateDiscrete].
+		</p>
+
+
+		<h2>Properties</h2>
+
+
+		<p class="desc">
+			See [page:KeyframeTrack] for inherited properties.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			The default interpolation type to use, [page:Animation InterpolateDiscrete].
+		</p>
+
+		<h3>[property:Array ValueBufferType]</h3>
+		<p>
+			A normal Array (no Float32Array in this case, unlike *ValueBufferType* of [page:KeyframeTrack]).
+		</p>
+
+		<h3>[property:String ValueTypeName]</h3>
+		<p>
+			String 'string'.
+		</p>
+
+
+		<h2>Methods</h2>
+
+
+		<p class="desc">
+			See [page:KeyframeTrack] for inherited methods.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodLinear]()</h3>
+		<p>
+		  The value of this method here is 'undefined', as it does not make sense for discrete properties.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodSmooth]()</h3>
+		<p>
+		  The value of this method here is 'undefined', as it does not make sense for discrete properties.
+		</p>
+
+
+		<h2>Source</h2>
+
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

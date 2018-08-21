@@ -264,7 +264,7 @@ Sidebar.Object = function ( editor ) {
 	var objectFrustumCulledRow = new UI.Row();
 	var objectFrustumCulled = new UI.Checkbox().onChange( update );
 
-	objectFrustumCulledRow.add( new UI.Text( 'Frustum Culled' ).setWidth( '90px' ) );
+	objectFrustumCulledRow.add( new UI.Text( 'Frustum Cull' ).setWidth( '90px' ) );
 	objectFrustumCulledRow.add( objectFrustumCulled );
 
 	container.add( objectFrustumCulledRow );

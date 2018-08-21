@@ -696,17 +696,14 @@ function StructuredUniform( id ) {
 
 }
 
-StructuredUniform.prototype.setValue = function ( gl, value ) {
-
-	// Note: Don't need an extra 'renderer' parameter, since samplers
-	// are not allowed in structured uniforms.
+StructuredUniform.prototype.setValue = function ( gl, value, renderer ) {
 
 	var seq = this.seq;
 
 	for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
 		var u = seq[ i ];
-		u.setValue( gl, value[ u.id ] );
+		u.setValue( gl, value[ u.id ], renderer );
 
 	}
 
