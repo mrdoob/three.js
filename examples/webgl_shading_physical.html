@@ -36,6 +36,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -209,17 +210,15 @@
 
 				// MORPHS
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.GLTFLoader();
 
-				loader.load( "models/animated/sittingBox.js", function( geometry ) {
+				loader.load( "models/gltf/SittingBox.glb", function( gltf ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, flatShading: true } );
-
-					var mesh = new THREE.Mesh( geometry, morphMaterial );
+					var mesh = gltf.scene.children[ 0 ];
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					mixer.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
+					mixer.clipAction( gltf.animations[0] ).setDuration( 10 ).play();
 
 					var s = 200;
 					mesh.scale.set( s, s, s );

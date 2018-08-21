@@ -322,6 +322,12 @@ THREE.Projector = function () {
 
 				_face.material = material;
 
+				if ( material.vertexColors === THREE.FaceColors ) {
+
+					_face.color.fromArray( colors, a * 3 );
+
+				}
+
 				_renderData.elements.push( _face );
 
 			}
@@ -457,7 +463,32 @@ THREE.Projector = function () {
 
 					for ( var i = 0, l = positions.length; i < l; i += 3 ) {
 
-						renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+						var x = positions[ i ];
+						var y = positions[ i + 1 ];
+						var z = positions[ i + 2 ];
+
+						if ( material.morphTargets === true ) {
+
+							var morphTargets = geometry.morphAttributes.position;
+							var morphInfluences = object.morphTargetInfluences;
+
+							for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+								var influence = morphInfluences[ t ];
+
+								if ( influence === 0 ) continue;
+
+								var target = morphTargets[ t ];
+
+								x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
+								y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
+								z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
+
+							}
+
+						}
+
+						renderList.pushVertex( x, y, z );
 
 					}
 
@@ -468,6 +499,18 @@ THREE.Projector = function () {
 						for ( var i = 0, l = normals.length; i < l; i += 3 ) {
 
 							renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
+
+						}
+
+					}
+
+					if ( attributes.color !== undefined ) {
+
+						var colors = attributes.color.array;
+
+						for ( var i = 0, l = colors.length; i < l; i += 3 ) {
+
+							renderList.pushColor( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] );
 
 						}
 
