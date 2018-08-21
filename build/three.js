@@ -11921,7 +11921,6 @@
 
 			var index = this.index;
 			var attributes = this.attributes;
-			var groups = this.groups;
 
 			if ( attributes.position ) {
 
@@ -11957,46 +11956,31 @@
 
 					var indices = index.array;
 
-					if ( groups.length === 0 ) {
+					for ( var i = 0, il = index.count; i < il; i += 3 ) {
 
-						this.addGroup( 0, indices.length );
+						vA = indices[ i + 0 ] * 3;
+						vB = indices[ i + 1 ] * 3;
+						vC = indices[ i + 2 ] * 3;
 
-					}
+						pA.fromArray( positions, vA );
+						pB.fromArray( positions, vB );
+						pC.fromArray( positions, vC );
 
-					for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
+						cb.subVectors( pC, pB );
+						ab.subVectors( pA, pB );
+						cb.cross( ab );
 
-						var group = groups[ j ];
+						normals[ vA ] += cb.x;
+						normals[ vA + 1 ] += cb.y;
+						normals[ vA + 2 ] += cb.z;
 
-						var start = group.start;
-						var count = group.count;
+						normals[ vB ] += cb.x;
+						normals[ vB + 1 ] += cb.y;
+						normals[ vB + 2 ] += cb.z;
 
-						for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-							vA = indices[ i + 0 ] * 3;
-							vB = indices[ i + 1 ] * 3;
-							vC = indices[ i + 2 ] * 3;
-
-							pA.fromArray( positions, vA );
-							pB.fromArray( positions, vB );
-							pC.fromArray( positions, vC );
-
-							cb.subVectors( pC, pB );
-							ab.subVectors( pA, pB );
-							cb.cross( ab );
-
-							normals[ vA ] += cb.x;
-							normals[ vA + 1 ] += cb.y;
-							normals[ vA + 2 ] += cb.z;
-
-							normals[ vB ] += cb.x;
-							normals[ vB + 1 ] += cb.y;
-							normals[ vB + 2 ] += cb.z;
-
-							normals[ vC ] += cb.x;
-							normals[ vC + 1 ] += cb.y;
-							normals[ vC + 2 ] += cb.z;
-
-						}
+						normals[ vC ] += cb.x;
+						normals[ vC + 1 ] += cb.y;
+						normals[ vC + 2 ] += cb.z;
 
 					}
 
@@ -21534,21 +21518,9 @@
 
 		};
 
-		this.submitFrame = function ( scene, camera ) {
+		this.submitFrame = function () {
 
-			if ( isPresenting() ) {
-
-				device.submitFrame();
-
-				if ( device.capabilities.hasExternalDisplay ) {
-
-					scope.enabled = false;
-					renderer.render( scene, camera );
-					scope.enabled = true;
-
-				}
-
-			}
+			if ( isPresenting() ) device.submitFrame();
 
 		};
 
@@ -21969,7 +21941,6 @@
 
 			// frustum
 
-			_camera = null,
 			_frustum = new Frustum(),
 
 			// clipping
@@ -22854,7 +22825,6 @@
 			_currentGeometryProgram.wireframe = false;
 			_currentMaterialId = - 1;
 			_currentCamera = null;
-			_camera = camera;
 
 			// update scene graph
 
@@ -22936,7 +22906,12 @@
 
 			} else {
 
+				// opaque pass (front-to-back order)
+
 				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
+
+				// transparent pass (back-to-front order)
+
 				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
 
 			}
@@ -22961,7 +22936,7 @@
 
 			if ( vr.enabled ) {
 
-				vr.submitFrame( scene, _camera );
+				vr.submitFrame();
 
 			}
 
@@ -23172,6 +23147,8 @@
 								state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
 
 							}
+
+							currentRenderState.setupLights( camera2 );
 
 							renderObject( object, scene, camera2, geometry, material, group );
 
@@ -23498,7 +23475,7 @@
 
 			}
 
-			if ( refreshProgram || camera !== _currentCamera ) {
+			if ( refreshProgram || _currentCamera !== camera ) {
 
 				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
@@ -23509,11 +23486,9 @@
 
 				}
 
-				// Avoid unneeded uniform updates per ArrayCamera's sub-camera
+				if ( _currentCamera !== camera ) {
 
-				if ( _currentCamera !== ( _currentArrayCamera || camera ) ) {
-
-					_currentCamera = ( _currentArrayCamera || camera );
+					_currentCamera = camera;
 
 					// lighting uniforms depend on the camera so enforce an update
 					// now, in case this material supports lights - or later, when
