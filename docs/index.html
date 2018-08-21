@@ -36,9 +36,9 @@
 
 			// Route non-localised api links
 
-			if ( /^api/.test( hash ) && /^api\/(en|zh)\//.test( hash ) === false ) {
+			if ( /^(api|manual)/.test( hash ) && /^(api|manual)\/(en|zh)\//.test( hash ) === false ) {
 
-				window.location.hash = hash.replace( /^api/, 'api/en' );
+				window.location.hash = hash.replace( /^(api|manual)/, '$1/en' );
 
 			}
 
