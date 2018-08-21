@@ -3,28 +3,28 @@ var list = {
 	"Manual": {
 
 		"Getting Started": {
-			"Creating a scene": "manual/introduction/Creating-a-scene",
-			"Import via modules": "manual/introduction/Import-via-modules",
-			"Browser support": "manual/introduction/Browser-support",
-			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
-			"How to run things locally": "manual/introduction/How-to-run-things-locally",
-			"Drawing lines": "manual/introduction/Drawing-lines",
-			"Creating text": "manual/introduction/Creating-text",
-			"Loading 3D models": "manual/introduction/Loading-3D-models",
-			"Migration guide": "manual/introduction/Migration-guide",
-			"Code style guide": "manual/introduction/Code-style-guide",
-			"FAQ": "manual/introduction/FAQ",
-			"Useful links": "manual/introduction/Useful-links"
+			"Creating a scene": "manual/{lan}/introduction/Creating-a-scene",
+			"Import via modules": "manual/{lan}/introduction/Import-via-modules",
+			"Browser support": "manual/{lan}/introduction/Browser-support",
+			"WebGL compatibility check": "manual/{lan}/introduction/WebGL-compatibility-check",
+			"How to run things locally": "manual/{lan}/introduction/How-to-run-things-locally",
+			"Drawing lines": "manual/{lan}/introduction/Drawing-lines",
+			"Creating text": "manual/{lan}/introduction/Creating-text",
+			"Loading 3D models": "manual/{lan}/introduction/Loading-3D-models",
+			"Migration guide": "manual/{lan}/introduction/Migration-guide",
+			"Code style guide": "manual/{lan}/introduction/Code-style-guide",
+			"FAQ": "manual/{lan}/introduction/FAQ",
+			"Useful links": "manual/{lan}/introduction/Useful-links"
 		},
 
 		"Next Steps": {
-			"How to update things": "manual/introduction/How-to-update-things",
-			"Matrix transformations": "manual/introduction/Matrix-transformations",
-			"Animation system": "manual/introduction/Animation-system"
+			"How to update things": "manual/{lan}/introduction/How-to-update-things",
+			"Matrix transformations": "manual/{lan}/introduction/Matrix-transformations",
+			"Animation system": "manual/{lan}/introduction/Animation-system"
 		},
 
 		"Build Tools": {
-			"Testing with NPM": "manual/buildTools/Testing-with-NPM"
+			"Testing with NPM": "manual/{lan}/buildTools/Testing-with-NPM"
 		}
 
 	},
