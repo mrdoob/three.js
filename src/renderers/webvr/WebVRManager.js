@@ -72,8 +72,6 @@ function WebVRManager( renderer ) {
 
 			animation.start();
 
-			isAnimating = true;
-
 		} else {
 
 			if ( scope.enabled ) {
