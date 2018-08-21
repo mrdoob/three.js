@@ -1,5 +1,13 @@
 #ifdef USE_FOG
 
-	vFogPosition = mvPosition.xyz;
+	#ifdef USE_PRECISION_HIGHP
+
+		vFogPosition = mvPosition.xyz;
+
+	#else
+
+		vFogDepth = -mvPosition.z;
+
+	#endif
 
 #endif
