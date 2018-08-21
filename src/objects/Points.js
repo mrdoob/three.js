@@ -48,8 +48,10 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			sphere.applyMatrix4( matrixWorld );
 			sphere.radius += threshold;
 
-			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+			var radius = sphere.radius + threshold;
 
+			if ( raycaster.ray.distanceSqToPoint( sphere.center ) > ( radius * radius ) ) return;
+			
 			//
 
 			inverseMatrix.getInverse( matrixWorld );

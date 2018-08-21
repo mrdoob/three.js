@@ -289,8 +289,8 @@ Object.assign( Ray.prototype, {
 	}(),
 
 	intersectsSphere: function ( sphere ) {
-
-		return this.distanceToPoint( sphere.center ) <= sphere.radius;
+		
+		return this.distanceSqToPoint( sphere.center ) <= ( sphere.radius * sphere.radius );
 
 	},
 
