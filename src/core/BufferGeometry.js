@@ -933,8 +933,23 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		// attributes and new attribute arrays
 		var attributeNames = Object.keys( this.attributes );
 		var attrArrays = {};
+		var morphAttrsArrays = {};
 		var newIndices = [];
 		var getters = [ 'getX', 'getY', 'getZ', 'getW' ];
+
+		// initialize the arrays
+		for ( var name of attributeNames ) {
+
+			attrArrays[ name ] = [];
+
+			var morphAttr = this.morphAttributes[ name ];
+			if ( morphAttr ) {
+
+				morphAttrsArrays[ name ] = new Array( morphAttr.length ).fill().map( () => [] );
+
+			}
+
+		}
 
 		// convert the error tolerance to an amount of decimal places to truncate to
 		var decimalShift = Math.log10( 1 / tolerance );
@@ -973,13 +988,25 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 					var name = attributeNames[ j ];
 					var attribute = this.getAttribute( name );
+					var morphAttr = this.morphAttributes[ name ];
 					var itemSize = attribute.itemSize;
-
-					attrArrays[ name ] = attrArrays[ name ] || [];
 					var newarray = attrArrays[ name ];
+					var newMorphArrays = morphAttrsArrays[ name ];
+
 					for ( var k = 0; k < itemSize; k ++ ) {
 
-						newarray.push( attribute[ getters[ k ] ]( index ) );
+						var getterFunc = getters[ k ];
+						newarray.push( attribute[ getterFunc ]( index ) );
+
+						if ( morphAttr ) {
+
+							for ( var m = 0, ml = morphAttr.length; m < ml; m ++ ) {
+
+								newMorphArrays[ m ].push( morphAttr[ m ][ getterFunc ]( index ) );
+
+							}
+
+						}
 
 					}
 
@@ -1014,6 +1041,19 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			}
 
 			this.addAttribute( name, attribute );
+
+			// Update the attribute arrays
+			if ( name in morphAttrsArrays ) {
+
+				for ( var j = 0; j < morphAttrsArrays[ name ].length; j ++ ) {
+
+					var morphAttribute = this.morphAttributes[ name ][ j ].clone();
+					morphAttribute.setArray( new morphAttribute.array.constructor( morphAttrsArrays[ name ][ j ] ) );
+					this.morphAttributes[ name ][ j ] = morphAttribute;
+
+				}
+
+			}
 
 		}
 
