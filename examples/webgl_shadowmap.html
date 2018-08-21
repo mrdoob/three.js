@@ -273,7 +273,7 @@
 
 					if ( fudgeColor ) {
 
-						mesh.material.color.offsetHSL( 0, Math.random() * 0.5 - 0.25, Math.random() * 0.2 - 0.1 );
+						mesh.material.color.offsetHSL( 0, Math.random() * 0.5 - 0.25, Math.random() * 0.5 - 0.25 );
 
 					}
 
@@ -302,7 +302,6 @@
 				loader.load( "models/gltf/Horse.glb", function( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
-					mesh.material.color.setHex( 0xffaa55 );
 
 					var clip = gltf.animations[ 0 ];
 
