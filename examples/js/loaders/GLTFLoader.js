@@ -579,11 +579,7 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFTextureTransformExtension.prototype.extendTexture = function ( texture, mapDef ) {
-
-		var transform = mapDef.extensions !== undefined ? mapDef.extensions[ this.name ] : undefined;
-
-		if ( transform === undefined ) return texture;
+	GLTFTextureTransformExtension.prototype.extendTexture = function ( texture, transform ) {
 
 		texture = texture.clone();
 
@@ -2212,7 +2208,13 @@ THREE.GLTFLoader = ( function () {
 
 			if ( parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] ) {
 
-				texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, mapDef );
+				var transform = mapDef.extensions !== undefined ? mapDef.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] : undefined;
+
+				if ( transform ) {
+
+					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
+
+				}
 
 			}
 
