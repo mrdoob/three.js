@@ -56,7 +56,6 @@ function WebVRManager( renderer ) {
 	}
 
 	var currentSize, currentPixelRatio;
-	var isAnimating;
 
 	function onVRDisplayPresentChange() {
 
@@ -83,13 +82,7 @@ function WebVRManager( renderer ) {
 
 			}
 
-			if ( isAnimating ) {
-
-				animation.stop();
-
-				isAnimating = false;
-
-			}
+			animation.stop();
 
 		}
 
