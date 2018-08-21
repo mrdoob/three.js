@@ -110,6 +110,7 @@ strong {
 	color: #fff;
 	background-color: #555;
 	opacity: 0.5;
+	display: none; /* disabled until r96 release */
 }
 
 #button:hover {
