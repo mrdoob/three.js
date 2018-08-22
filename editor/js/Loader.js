@@ -614,25 +614,25 @@ var Loader = function ( editor ) {
 
 		zip.filter( function ( path, file ) {
 
+			var manager = new THREE.LoadingManager();
+			manager.setURLModifier( function ( url ) {
+
+				var file = zip.files[ url ];
+
+				if ( file ) {
+
+					var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
+					return URL.createObjectURL( blob );
+
+				}
+
+			} );
+
 			var extension = file.name.split( '.' ).pop().toLowerCase();
 
 			switch ( extension ) {
 
 				case 'fbx':
-
-					var manager = new THREE.LoadingManager();
-					manager.setURLModifier( function ( url ) {
-
-						var file = zip.files[ url ];
-
-						if ( file ) {
-
-							var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
-							return URL.createObjectURL( blob );
-
-						}
-
-					} );
 
 					var loader = new THREE.FBXLoader( manager );
 					var object = loader.parse( file.asArrayBuffer() );
@@ -653,20 +653,6 @@ var Loader = function ( editor ) {
 					break;
 
 				case 'gltf':
-
-					var manager = new THREE.LoadingManager();
-					manager.setURLModifier( function ( url ) {
-
-						var file = zip.files[ url ];
-
-						if ( file ) {
-
-							var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
-							return URL.createObjectURL( blob );
-
-						}
-
-					} );
 
 					var loader = new THREE.GLTFLoader( manager );
 					loader.parse( file.asText(), '', function ( result ) {
