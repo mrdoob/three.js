@@ -48,7 +48,7 @@ You might notice of most of them come in pairs of `Geometry`
 or `BufferGeometry`. The difference between the 2 types is effectively flexibility
 vs performance.
 
-`BufferGeometry` based primitves are the performance oriented
+`BufferGeometry` based primitives are the performance oriented
 types. The vertices for the geometry are generated directly
 into an efficient typed array format ready to be uploaded to the GPU
 for rendering. This means they are faster to start up
@@ -177,7 +177,7 @@ function addSolidGeometry(x, y, geometry) {
 }
 ```
 
-Now we can use this for the majority of the primitves we create.
+Now we can use this for the majority of the primitives we create.
 For example creating a box
 
 ```
