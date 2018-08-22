@@ -24,6 +24,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	defineProperty( "camera", camera );
 	defineProperty( "object", undefined );
+	defineProperty( "enabled", true );
 	defineProperty( "axis", null );
 	defineProperty( "mode", "translate" );
 	defineProperty( "translationSnap", null );
@@ -188,8 +189,16 @@ THREE.TransformControls = function ( camera, domElement ) {
 	// updateMatrixWorld  updates key transformation variables
 	this.updateMatrixWorld = function () {
 
+		if ( !scope.enabled ) {
+
+			this.visible = false;
+			return;
+
+		}
+
 		if ( this.object !== undefined ) {
 
+			this.visible = true;
 			this.object.updateMatrixWorld();
 			this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
@@ -527,13 +536,15 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerHover( event ) {
 
-		// event.preventDefault();
+		if ( !scope.enabled ) return;
 
 		scope.pointerHover( getPointer( event ) );
 
 	}
 
 	function onPointerDown( event ) {
+
+		if ( !scope.enabled ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -545,6 +556,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerMove( event ) {
 
+		if ( !scope.enabled ) return;
+
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -553,6 +566,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 	}
 
 	function onPointerUp( event ) {
+
+		if ( !scope.enabled ) return;
 
 		event.preventDefault(); // Prevent MouseEvent on mobile
 

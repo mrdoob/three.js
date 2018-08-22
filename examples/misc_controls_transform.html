@@ -37,7 +37,8 @@
 			<a href="javascript:control.setSpace( control.space === 'local' ? 'world' : 'local' );">"Q" toggle world/local space</a> | Hold "Ctrl" down to snap to grid<br />
 			<a href="javascript:control.showX = !control.showX">"X" toggle X</a> |
 			<a href="javascript:control.showY = !control.showY">"Y" toggle Y</a> |
-			<a href="javascript:control.showZ = !control.showZ">"Z" toggle Z</a><br />
+			<a href="javascript:control.showZ = !control.showZ">"Z" toggle Z</a> |
+			<a href="javascript:control.enabled = !control.enabled">"Spacebar" toggle enabled</a><br />
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -132,6 +133,10 @@
 
 						case 90: // Z
 							control.showZ = !control.showZ;
+							break;
+
+						case 32: // Spacebar
+							control.enabled = !control.enabled;
 							break;
 
 					}
