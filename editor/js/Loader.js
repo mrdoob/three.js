@@ -490,7 +490,7 @@ var Loader = function ( editor ) {
 
 						if ( file.name.search( /\.glb$/i ) > - 1 ) {
 
-							var loader = new THREE.GLTFLoader( manager );
+							var loader = new THREE.GLTFLoader();
 							loader.parse( file.asArrayBuffer(), '', function ( result ) {
 
 								editor.execute( new AddObjectCommand( result.scene ) );
