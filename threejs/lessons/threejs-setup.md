@@ -53,4 +53,4 @@ If you don't specify a path then http-server will serve the current folder.
 If either of those options are not to your liking 
 [there are many other simple servers to choose from](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-http-server-or-simplehttpserver).
 
-Note that you have a server setup we can move on to [textures](threejs-textures.html).
+Now that you have a server setup we can move on to [textures](threejs-textures.html).
