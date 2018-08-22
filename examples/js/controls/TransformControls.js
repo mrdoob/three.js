@@ -688,9 +688,6 @@ THREE.TransformControlsGizmo = function () {
 	var matLineMagenta = gizmoLineMaterial.clone();
 	matLineMagenta.color.set( 0xff00ff );
 
-	var matLineBlue = gizmoLineMaterial.clone();
-	matLineBlue.color.set( 0x0000ff );
-
 	var matLineYellow = gizmoLineMaterial.clone();
 	matLineYellow.color.set( 0xffff00 );
 
