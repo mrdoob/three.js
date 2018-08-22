@@ -486,6 +486,31 @@ var Loader = function ( editor ) {
 
 					zip.filter( function ( path, file ) {
 
+						// FBX
+
+						if ( file.name.search( /\.fbx$/i ) > - 1 ) {
+
+							var manager = new THREE.LoadingManager();
+							manager.setURLModifier( function ( url ) {
+
+								var file = zip.files[ url ];
+
+								if ( file ) {
+
+									var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
+									return URL.createObjectURL( blob );
+
+								}
+
+							} );
+
+							var loader = new THREE.FBXLoader( manager );
+							var object = loader.parse( file.asArrayBuffer() );
+
+							editor.execute( new AddObjectCommand( object ) );
+
+						}
+
 						// GLB
 
 						if ( file.name.search( /\.glb$/i ) > - 1 ) {
