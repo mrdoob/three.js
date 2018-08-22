@@ -468,90 +468,7 @@ var Loader = function ( editor ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
-					var contents = event.target.result;
-
-					var zip = new JSZip( contents );
-
-					// Poly
-
-					if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
-
-						var materials = new THREE.MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
-						var object = new THREE.OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
-						editor.execute( new AddObjectCommand( object ) );
-
-					}
-
-					//
-
-					zip.filter( function ( path, file ) {
-
-						// FBX
-
-						if ( /\.fbx$/i.test( file.name ) ) {
-
-							var manager = new THREE.LoadingManager();
-							manager.setURLModifier( function ( url ) {
-
-								var file = zip.files[ url ];
-
-								if ( file ) {
-
-									var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
-									return URL.createObjectURL( blob );
-
-								}
-
-							} );
-
-							var loader = new THREE.FBXLoader( manager );
-							var object = loader.parse( file.asArrayBuffer() );
-
-							editor.execute( new AddObjectCommand( object ) );
-
-						}
-
-						// GLB
-
-						if ( /\.glb$/i.test( file.name ) ) {
-
-							var loader = new THREE.GLTFLoader();
-							loader.parse( file.asArrayBuffer(), '', function ( result ) {
-
-								editor.execute( new AddObjectCommand( result.scene ) );
-
-							} );
-
-						}
-
-						// GLTF
-
-						if ( /\.gltf$/i.test( file.name ) ) {
-
-							var manager = new THREE.LoadingManager();
-							manager.setURLModifier( function ( url ) {
-
-								var file = zip.files[ url ];
-
-								if ( file ) {
-
-									var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
-									return URL.createObjectURL( blob );
-
-								}
-
-							} );
-
-							var loader = new THREE.GLTFLoader( manager );
-							loader.parse( file.asText(), '', function ( result ) {
-
-								editor.execute( new AddObjectCommand( result.scene ) );
-
-							} );
-
-						}
-
-					} );
+					handleZIP( event.target.result );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -676,6 +593,93 @@ var Loader = function ( editor ) {
 				break;
 
 		}
+
+	}
+
+	function handleZIP( contents ) {
+
+		var zip = new JSZip( contents );
+
+		// Poly
+
+		if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+
+			var materials = new THREE.MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
+			var object = new THREE.OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
+			editor.execute( new AddObjectCommand( object ) );
+
+		}
+
+		//
+
+		zip.filter( function ( path, file ) {
+
+			var extension = file.name.split( '.' ).pop().toLowerCase();
+
+			switch ( extension ) {
+
+				case 'fbx':
+
+					var manager = new THREE.LoadingManager();
+					manager.setURLModifier( function ( url ) {
+
+						var file = zip.files[ url ];
+
+						if ( file ) {
+
+							var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
+							return URL.createObjectURL( blob );
+
+						}
+
+					} );
+
+					var loader = new THREE.FBXLoader( manager );
+					var object = loader.parse( file.asArrayBuffer() );
+
+					editor.execute( new AddObjectCommand( object ) );
+
+					break;
+
+				case 'glb':
+
+					var loader = new THREE.GLTFLoader();
+					loader.parse( file.asArrayBuffer(), '', function ( result ) {
+
+						editor.execute( new AddObjectCommand( result.scene ) );
+
+					} );
+
+					break;
+
+				case 'gltf':
+
+					var manager = new THREE.LoadingManager();
+					manager.setURLModifier( function ( url ) {
+
+						var file = zip.files[ url ];
+
+						if ( file ) {
+
+							var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
+							return URL.createObjectURL( blob );
+
+						}
+
+					} );
+
+					var loader = new THREE.GLTFLoader( manager );
+					loader.parse( file.asText(), '', function ( result ) {
+
+						editor.execute( new AddObjectCommand( result.scene ) );
+
+					} );
+
+					break;
+
+			}
+
+		} );
 
 	}
 
