@@ -268,8 +268,9 @@ and I decide to put this wood texture on the top surface of the table
 
 <div class="threejs_center"><img class="border" src="resources/images/compressed-but-large-wood-texture.jpg" align="center" style="max-width: 300px"></div>
 
-That image is only 157k so it will download relatively quickly but it is actually 
-3024 x 3761 pixels in size. Following the equation above that's
+That image is only 157k so it will download relatively quickly but [it is actually 
+3024 x 3761 pixels in size](resources/images/compressed-but-large-wood-texture.jpg). 
+Following the equation above that's
 
     3024 * 3761 * 4 * 1.33 = 60505764.5
 
@@ -390,20 +391,33 @@ Here's an example showing all 6 settings
 
 <div class="spread">
   <div data-diagram="filterModes" style="
-    height: 450px; display: flex;
-    align-items: center;
-    justify-content: flex-start;"
-  >
+    height: 450px; 
+    position: relative;
+  ">
     <div style="
-      background: rgba(255,0,0,.8);
-      color: white;
-      padding: .5em;
-      margin: 1em;
-      font-size: small;
-      border-radius: .5em;
-      line-height: 1.2;
-      user-select: none;"
-    >click to<br/>change<br/>texture</div>
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    ">
+      <div style="
+        background: rgba(255,0,0,.8);
+        color: white;
+        padding: .5em;
+        margin: 1em;
+        font-size: small;
+        border-radius: .5em;
+        line-height: 1.2;
+        user-select: none;"
+      >click to<br/>change<br/>texture</div>
+    </div>
+    <div class="filter-caption" style="left: 0.5em; top: 0.5em;">nearest</div>
+    <div class="filter-caption" style="width: 100%; text-align: center; top: 0.5em;">linear</div>
+    <div class="filter-caption" style="right: 0.5em; text-align: right; top: 0.5em;">nearest<br/>mipmap<br/>nearest</div>
+    <div class="filter-caption" style="left: 0.5em; text-align: left; bottom: 0.5em;">nearest<br/>mipmap<br/>linear</div>
+    <div class="filter-caption" style="width: 100%; text-align: center; bottom: 0.5em;">linear<br/>mipmap<br/>nearest</div>
+    <div class="filter-caption" style="right: 0.5em; text-align: right; bottom: 0.5em;">linear<br/>mipmap<br/>linear</div>
   </div>
 </div>
 
@@ -607,7 +621,17 @@ roughness
 <script src="../resources/threejs/r94/js/controls/TrackballControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-textures.js"></script>
-
-
-
-
+<style>
+.filter-caption {
+  position: absolute;
+  color: white;
+  line-height: 1.1;
+  font-family: monospace;
+  font-size: small;
+  text-shadow:
+    -1px -1px 0 #000,  
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000;
+}
+</style>
