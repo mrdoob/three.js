@@ -488,7 +488,7 @@ var Loader = function ( editor ) {
 
 						// FBX
 
-						if ( file.name.search( /\.fbx$/i ) > - 1 ) {
+						if ( /\.fbx$/i.test( file.name ) ) {
 
 							var manager = new THREE.LoadingManager();
 							manager.setURLModifier( function ( url ) {
@@ -513,7 +513,7 @@ var Loader = function ( editor ) {
 
 						// GLB
 
-						if ( file.name.search( /\.glb$/i ) > - 1 ) {
+						if ( /\.glb$/i.test( file.name ) ) {
 
 							var loader = new THREE.GLTFLoader();
 							loader.parse( file.asArrayBuffer(), '', function ( result ) {
@@ -526,7 +526,7 @@ var Loader = function ( editor ) {
 
 						// GLTF
 
-						if ( file.name.search( /\.gltf$/i ) > - 1 ) {
+						if ( /\.gltf$/i.test( file.name ) ) {
 
 							var manager = new THREE.LoadingManager();
 							manager.setURLModifier( function ( url ) {
