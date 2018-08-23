@@ -9,7 +9,40 @@ var Loader = function ( editor ) {
 
 	this.texturePath = '';
 
-	this.loadFile = function ( file ) {
+	this.loadFiles = function ( files ) {
+
+		if ( files.length > 0 ) {
+
+			var filesMap = createFileMap( files );
+
+			var manager = new THREE.LoadingManager();
+			manager.setURLModifier( function ( url ) {
+
+				var file = filesMap[ url ];
+
+				if ( file ) {
+
+					console.log( 'Loading', url );
+
+					return URL.createObjectURL( file );
+
+				}
+
+				return url;
+
+			} );
+
+			for ( var i = 0; i < files.length; i ++ ) {
+
+				scope.loadFile( files[ i ], manager ) ;
+
+			}
+
+		}
+
+	};
+
+	this.loadFile = function ( file, manager ) {
 
 		var filename = file.name;
 		var extension = filename.split( '.' ).pop().toLowerCase();
@@ -19,6 +52,7 @@ var Loader = function ( editor ) {
 
 			var size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
 			var progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
+
 			console.log( 'Loading', filename, size, progress );
 
 		} );
@@ -141,7 +175,7 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var loader = new THREE.ColladaLoader();
+					var loader = new THREE.ColladaLoader( manager );
 					var collada = loader.parse( contents );
 
 					collada.scene.name = filename;
@@ -159,7 +193,7 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var loader = new THREE.FBXLoader();
+					var loader = new THREE.FBXLoader( manager );
 					var object = loader.parse( contents );
 
 					editor.execute( new AddObjectCommand( object ) );
@@ -183,7 +217,7 @@ var Loader = function ( editor ) {
 
 					} else {
 
-						loader = new THREE.GLTFLoader();
+						loader = new THREE.GLTFLoader( manager );
 
 					}
 
@@ -477,7 +511,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				alert( 'Unsupported file format (' + extension +  ').' );
+				// alert( 'Unsupported file format (' + extension +  ').' );
 
 				break;
 
@@ -596,6 +630,21 @@ var Loader = function ( editor ) {
 
 	}
 
+	function createFileMap( files ) {
+
+		var map = {};
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			map[ file.name ] = file;
+
+		}
+
+		return map;
+
+	}
+
 	function handleZIP( contents ) {
 
 		var zip = new JSZip( contents );
@@ -621,10 +670,14 @@ var Loader = function ( editor ) {
 
 				if ( file ) {
 
+					console.log( 'Loading', url );
+
 					var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
 					return URL.createObjectURL( blob );
 
 				}
+
+				return url;
 
 			} );
 
