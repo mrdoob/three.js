@@ -189,16 +189,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 	// updateMatrixWorld  updates key transformation variables
 	this.updateMatrixWorld = function () {
 
-		if ( !scope.enabled ) {
-
-			this.visible = false;
-			return;
-
-		}
-
 		if ( this.object !== undefined ) {
 
-			this.visible = true;
 			this.object.updateMatrixWorld();
 			this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
@@ -1339,7 +1331,12 @@ THREE.TransformControlsGizmo = function () {
 			handle.material.color.copy( handle.material._color );
 			handle.material.opacity = handle.material._opacity;
 
-			if ( this.axis ) {
+			if ( !this.enabled ) {
+
+				handle.material.opacity *= 0.5;
+				handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
+
+			} else if ( this.axis ) {
 
 				if ( handle.name === this.axis ) {
 
@@ -1353,7 +1350,8 @@ THREE.TransformControlsGizmo = function () {
 
 				} else {
 
-					handle.material.opacity *= 0.05;
+					handle.material.opacity *= 0.25;
+					handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
 
 				}
 
