@@ -1139,6 +1139,11 @@ THREE.GLTFLoader = ( function () {
 		BLEND: 'BLEND'
 	};
 
+	var MIME_TYPE_FORMATS = {
+		'image/png': THREE.RGBAFormat,
+		'image/jpeg': THREE.RGBFormat
+	};
+
 	/* UTILITY FUNCTIONS */
 
 	function resolveURL( url, path ) {
@@ -2041,6 +2046,13 @@ THREE.GLTFLoader = ( function () {
 			texture.flipY = false;
 
 			if ( textureDef.name !== undefined ) texture.name = textureDef.name;
+
+			// Ignore unknown mime types, like DDS files.
+			if ( source.mimeType in MIME_TYPE_FORMATS ) {
+
+				texture.format = MIME_TYPE_FORMATS[ source.mimeType ];
+
+			}
 
 			var samplers = json.samplers || {};
 			var sampler = samplers[ textureDef.sampler ] || {};
