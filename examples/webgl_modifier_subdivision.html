@@ -107,8 +107,10 @@
 
 			});
 
-			var loader2 = new THREE.JSONLoader();
-			loader2.load( 'models/json/suzanne_geometry.json', function ( geometry ) {
+			var loader2 = new THREE.BufferGeometryLoader();
+			loader2.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
+
+				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
 				geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
 
