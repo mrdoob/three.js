@@ -204,16 +204,35 @@ var Loader = function ( editor ) {
 				break;
 
 			case 'glb':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var loader = new THREE.GLTFLoader();
+					loader.parse( contents, '', function ( result ) {
+
+						result.scene.name = filename;
+						editor.execute( new AddObjectCommand( result.scene ) );
+
+					} );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'gltf':
 
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
+
 					var loader;
 
-					if ( isGltf1( contents ) ) {
+					if ( isGLTF1( contents ) ) {
 
-						loader = new THREE.LegacyGLTFLoader();
+						loader = new THREE.LegacyGLTFLoader( manager );
 
 					} else {
 
@@ -722,7 +741,7 @@ var Loader = function ( editor ) {
 
 	}
 
-	function isGltf1( contents ) {
+	function isGLTF1( contents ) {
 
 		var resultContent;
 
