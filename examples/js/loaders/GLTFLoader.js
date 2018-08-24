@@ -291,7 +291,7 @@ THREE.GLTFLoader = ( function () {
 
 				case 'directional':
 					lightNode = new THREE.DirectionalLight( color );
-					lightNode.target.position.set( 0, 0, 1 );
+					lightNode.target.position.set( 0, 0, -1 );
 					lightNode.add( lightNode.target );
 					break;
 
@@ -309,7 +309,7 @@ THREE.GLTFLoader = ( function () {
 					lightDef.spot.outerConeAngle = lightDef.spot.outerConeAngle !== undefined ? lightDef.spot.outerConeAngle : Math.PI / 4.0;
 					lightNode.angle = lightDef.spot.outerConeAngle;
 					lightNode.penumbra = 1.0 - lightDef.spot.innerConeAngle / lightDef.spot.outerConeAngle;
-					lightNode.target.position.set( 0, 0, 1 );
+					lightNode.target.position.set( 0, 0, -1 );
 					lightNode.add( lightNode.target );
 					break;
 
