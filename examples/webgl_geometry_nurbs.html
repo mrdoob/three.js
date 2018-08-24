@@ -68,7 +68,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
-				
+
 				scene.add( new THREE.AmbientLight( 0x808080 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
@@ -159,9 +159,9 @@
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				function getSurfacePoint( u, v ) {
+				function getSurfacePoint( u, v, target ) {
 
-					return nurbsSurface.getPoint( u, v );
+					return nurbsSurface.getPoint( u, v, target );
 
 				}
 

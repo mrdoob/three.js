@@ -1836,7 +1836,7 @@
           "!doc": "Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br>"
         }
       },
-      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].",
+      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJLoader].",
       "!type": "fn(baseUrl: string, options: object, crossOrigin: string)"
     },
     "MaterialLoader": {

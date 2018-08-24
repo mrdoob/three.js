@@ -49,13 +49,10 @@
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/geometries/hilbert3D.js"></script>
 		<script src="js/geometries/hilbert2D.js"></script>
 
 		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var mouseX = 0, mouseY = 0;
 
@@ -81,37 +78,61 @@
 
 				// 2d lines
 
-				var geometry2 = new THREE.Geometry(),
-					points = hilbert2D( new THREE.Vector3( 0, 0, 0 ), 400, 4 ),
-					colors2 = [];
+				var vertices = hilbert2D( new THREE.Vector3( 0, 0, 0 ), 400, 4 );
+				var numVertices = vertices.length;
 
-				for ( i = 0; i < points.length; i ++ ) {
+				var geometry2 = new THREE.BufferGeometry();
 
-					geometry2.vertices.push( points[ i ] );
+				var positions = new Float32Array( numVertices * 3 );
+				var colors = new Float32Array( numVertices * 3 );
 
-					colors2[ i ] = new THREE.Color( 0xffffff );
-					colors2[ i ].setHSL( i / points.length, 1, 0.5 );
+				geometry2.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry2.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+
+				var color = new THREE.Color();
+
+				for ( var i = 0, index = 0, l = numVertices; i < l; i ++, index += 3 ) {
+
+					positions[ index ] = vertices[ i ].x;
+					positions[ index + 1 ] = vertices[ i ].y;
+					positions[ index + 2 ] = vertices[ i ].z;
+
+					color.setHSL( i / l, 1.0, 0.5 );
+
+					colors[ index ] = color.r;
+					colors[ index + 1 ] = color.g;
+					colors[ index + 2 ] = color.b;
 
 				}
-
-				geometry2.colors = colors2;
 
 				// 3d lines
 
-				var geometry3 = new THREE.Geometry(),
-					points = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200, 2, 0, 1, 2, 3, 4, 5, 6, 7 ),
-					colors3 = [];
+				var vertices = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200, 2, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var numVertices = vertices.length;
 
-				for ( i = 0; i < points.length; i ++ ) {
+				var geometry3 = new THREE.BufferGeometry();
 
-					geometry3.vertices.push( points[ i ] );
+				var positions = new Float32Array( numVertices * 3 );
+				var colors = new Float32Array( numVertices * 3 );
 
-					colors3[ i ] = new THREE.Color( 0xffffff );
-					colors3[ i ].setHSL( i / points.length, 1, 0.5 );
+				geometry3.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry3.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+
+				var color = new THREE.Color();
+
+				for ( var i = 0, index = 0, l = numVertices; i < l; i ++, index += 3 ) {
+
+					positions[ index ] = vertices[ i ].x;
+					positions[ index + 1 ] = vertices[ i ].y;
+					positions[ index + 2 ] = vertices[ i ].z;
+
+					color.setHSL( i / l, 1.0, 0.5 );
+
+					colors[ index ] = color.r;
+					colors[ index + 1 ] = color.g;
+					colors[ index + 2 ] = color.b;
 
 				}
-
-				geometry3.colors = colors3;
 
 				// lines
 

@@ -424,6 +424,8 @@
 
 				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
+				textGeo = new THREE.BufferGeometry().fromGeometry( textGeo );
+
 				textMesh1 = new THREE.Mesh( textGeo, materials );
 
 				textMesh1.position.x = centerOffset;

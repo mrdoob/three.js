@@ -55,7 +55,7 @@ var starField = new THREE.Points( starsGeometry, starsMaterial );
 scene.add( starField );
 		</code>
 
-		<h3>[name]( [page:Object parameters] )</h3>
+		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
 			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
@@ -83,6 +83,9 @@ scene.add( starField );
 		<h3>[property:Texture map]</h3>
 
 		<p>Sets the color of the points using data from a [page:Texture].</p>
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<p>Define whether the material uses morphTargets. Default is false.</p>
 
 		<h3>[property:Number size]</h3>
 		<p>Sets the size of the points. Default is 1.0.</p>

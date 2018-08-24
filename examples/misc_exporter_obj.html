@@ -81,15 +81,15 @@
 
 			function addGeometry( type ) {
 
-				for( var i = 0; i < scene.children.length; i++ ) {
+				for( var i = 0; i < scene.children.length; i ++ ) {
 
-					var current = scene.children[ i ];
+					var child = scene.children[ i ];
 
-					if( current instanceof THREE.Mesh ) {
+					if( child.isMesh ) {
 
-						current.geometry.dispose();
-						scene.remove( current );
-						i--;
+						child.geometry.dispose();
+						scene.remove( child );
+						i --;
 
 					}
 
@@ -98,14 +98,7 @@
 				if ( type === 1 ) {
 
 					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
-
-					var geometry = new THREE.Geometry();
-					geometry.vertices.push( new THREE.Vector3( -50, -50, 0 ) );
-					geometry.vertices.push( new THREE.Vector3(  50, -50, 0 ) );
-					geometry.vertices.push( new THREE.Vector3(  50,  50, 0 ) );
-					var face = new THREE.Face3( 0, 1, 2 );
-					geometry.faces.push( face );
-					geometry.computeFaceNormals();
+					var geometry = generateTriangleGeometry();
 
 					scene.add( new THREE.Mesh( geometry, material ) );
 
@@ -125,14 +118,7 @@
 				} else if ( type === 4 || type === 5 ) {
 
 					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
-
-					var geometry = new THREE.Geometry();
-					geometry.vertices.push( new THREE.Vector3( -50, -50, 0 ) );
-					geometry.vertices.push( new THREE.Vector3(  50, -50, 0 ) );
-					geometry.vertices.push( new THREE.Vector3(  50,  50, 0 ) );
-					var face = new THREE.Face3( 0, 1, 2 );
-					geometry.faces.push( face );
-					geometry.computeFaceNormals();
+					var geometry = generateTriangleGeometry()
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = -200;
@@ -244,12 +230,28 @@
 
 				requestAnimationFrame( animate );
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( -mouseY - camera.position.y ) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 				camera.lookAt( scene.position );
 
 				light.position.set( camera.position.x, camera.position.y, camera.position.z ).normalize();
 				renderer.render( scene, camera );
+
+			}
+
+			function generateTriangleGeometry() {
+
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
+
+				vertices.push( - 50, - 50, 0 );
+				vertices.push( 50, - 50, 0 );
+				vertices.push( 50, 50, 0 );
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.computeVertexNormals();
+
+				return geometry;
 
 			}
 

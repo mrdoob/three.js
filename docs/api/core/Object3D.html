@@ -39,13 +39,13 @@
 		<h3>[property:Boolean frustumCulled]</h3>
 		<p>
 		When this is set, it checks every frame if the object is in the frustum of the camera before rendering the object.
-		Otherwise the object gets renderered every frame even if it isn't visible. Default is *true*.
+		Otherwise the object gets rendered every frame even if it isn't visible. Default is *true*.
 		</p>
 
 		<h3>[property:Integer id]</h3>
 		<p>readonly – Unique number for this object instance.</p>
 
-		<h3>[property:Boolean isObject]</h3>
+		<h3>[property:Boolean isObject3D]</h3>
 		<p>
 			Used to check whether this or derived classes are Object3Ds. Default is *true*.<br /><br />
 
@@ -109,7 +109,8 @@
 		</p>
 
 		<h3>[property:Object3D parent]</h3>
-		<p>Object's parent in the [link:https://en.wikipedia.org/wiki/Scene_graph scene graph].</p>
+		<p>Object's parent in the [link:https://en.wikipedia.org/wiki/Scene_graph scene graph]. An object can have at most
+		one parent.</p>
 
 		<h3>[property:Vector3 position]</h3>
 		<p>A [page:Vector3] representing the object's local position. Default is (0, 0, 0).</p>
@@ -190,7 +191,8 @@
 
 		<h3>[method:null add]( [param:Object3D object], ... )</h3>
 		<p>
-		Adds *object* as child of this object. An arbitrary number of objects may be added.<br /><br />
+		Adds *object* as child of this object. An arbitrary number of objects may be added. Any current parent on an
+		object passed in here will be removed, since an object can have at most one parent.<br /><br />
 
 		See [page:Group] for info on manually grouping objects.
 		</p>
@@ -208,7 +210,7 @@
 		Returns a clone of this object and optionally all descendants.
 		</p>
 
-		<h3>[method:Object3D copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
+		<h3>[method:this copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
 		<p>
 		recursive -- if true, descendants of the object are also copied. Default is true.<br /><br />
 
@@ -299,7 +301,7 @@
 		Removes *object* as child of this object. An arbitrary number of objects may be removed.
 		</p>
 
-		<h3>[method:Object3D rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
 		axis -- A normalized vector in object space. <br />
 		angle -- The angle in radians.<br /><br />
@@ -307,7 +309,7 @@
 		Rotate an object along an axis in object space. The axis is assumed to be normalized.
 		</p>
 
-		<h3>[method:Object3D rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<h3>[method:this rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
 		axis -- A normalized vector in world space. <br />
 		angle -- The angle in radians.<br /><br />
@@ -316,21 +318,21 @@
 		Method Assumes no rotated parent.
 		</p>
 
-		<h3>[method:null rotateX]( [param:Float rad] )</h3>
+		<h3>[method:this rotateX]( [param:Float rad] )</h3>
 		<p>
 		rad - the angle to rotate in radians.<br /><br />
 
 		Rotates the object around x axis in local space.
 		</p>
 
-		<h3>[method:null rotateY]( [param:Float rad] )</h3>
+		<h3>[method:this rotateY]( [param:Float rad] )</h3>
 		<p>
 		rad - the angle to rotate in radians.<br /><br />
 
 		Rotates the object around y axis in local space.
 		</p>
 
-		<h3>[method:null rotateZ]( [param:Float rad] )</h3>
+		<h3>[method:this rotateZ]( [param:Float rad] )</h3>
 		<p>
 		rad - the angle to rotate in radians.<br /><br />
 
@@ -376,7 +378,7 @@
 			Convert the object to JSON format.
 		</p>
 
-		<h3>[method:Object3D translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
+		<h3>[method:this translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
 		<p>
 		axis -- A normalized vector in object space.<br />
 		distance -- The distance to translate.<br /><br />
@@ -384,14 +386,14 @@
 		Translate an object by distance along an axis in object space. The axis is assumed to be normalized.
 		</p>
 
-		<h3>[method:null translateX]( [param:Float distance] )</h3>
-		<p>Translates object along x axis by *distance* units.</p>
+		<h3>[method:this translateX]( [param:Float distance] )</h3>
+		<p>Translates object along x axis in object space by *distance* units.</p>
 
-		<h3>[method:null translateY]( [param:Float distance] )</h3>
-		<p>Translates object along y axis by *distance* units.</p>
+		<h3>[method:this translateY]( [param:Float distance] )</h3>
+		<p>Translates object along y axis in object space by *distance* units.</p>
 
-		<h3>[method:null translateZ]( [param:Float distance] )</h3>
-		<p>Translates object along z axis by *distance* units.</p>
+		<h3>[method:this translateZ]( [param:Float distance] )</h3>
+		<p>Translates object along z axis in object space by *distance* units.</p>
 
 		<h3>[method:null traverse]( [param:Function callback] )</h3>
 		<p>

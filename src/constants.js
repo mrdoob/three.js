@@ -1,4 +1,4 @@
-export var REVISION = '92dev';
+export var REVISION = '95';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 export var CullFaceNone = 0;
 export var CullFaceBack = 1;
@@ -137,3 +137,5 @@ export var RGBM16Encoding = 3005;
 export var RGBDEncoding = 3006;
 export var BasicDepthPacking = 3200;
 export var RGBADepthPacking = 3201;
+export var TangentSpaceNormalMap = 0;
+export var ObjectSpaceNormalMap = 1;

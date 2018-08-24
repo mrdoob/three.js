@@ -5,7 +5,7 @@
 import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, DoubleSide, BackSide } from '../../constants.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-function WebGLState( gl, extensions, utils ) {
+function WebGLState( gl, extensions, utils, capabilities ) {
 
 	function ColorBuffer() {
 
@@ -317,7 +317,7 @@ function WebGLState( gl, extensions, utils ) {
 	var enabledAttributes = new Uint8Array( maxVertexAttributes );
 	var attributeDivisors = new Uint8Array( maxVertexAttributes );
 
-	var capabilities = {};
+	var enabledCapabilities = {};
 
 	var compressedTextureFormats = null;
 
@@ -417,23 +417,7 @@ function WebGLState( gl, extensions, utils ) {
 
 	function enableAttribute( attribute ) {
 
-		newAttributes[ attribute ] = 1;
-
-		if ( enabledAttributes[ attribute ] === 0 ) {
-
-			gl.enableVertexAttribArray( attribute );
-			enabledAttributes[ attribute ] = 1;
-
-		}
-
-		if ( attributeDivisors[ attribute ] !== 0 ) {
-
-			var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-			extension.vertexAttribDivisorANGLE( attribute, 0 );
-			attributeDivisors[ attribute ] = 0;
-
-		}
+		enableAttributeAndDivisor( attribute, 0 );
 
 	}
 
@@ -450,9 +434,9 @@ function WebGLState( gl, extensions, utils ) {
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
 
-			var extension = extensions.get( 'ANGLE_instanced_arrays' );
+			var extension = capabilities.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
 
-			extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
+			extension[ capabilities.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
 
 		}
@@ -476,10 +460,10 @@ function WebGLState( gl, extensions, utils ) {
 
 	function enable( id ) {
 
-		if ( capabilities[ id ] !== true ) {
+		if ( enabledCapabilities[ id ] !== true ) {
 
 			gl.enable( id );
-			capabilities[ id ] = true;
+			enabledCapabilities[ id ] = true;
 
 		}
 
@@ -487,10 +471,10 @@ function WebGLState( gl, extensions, utils ) {
 
 	function disable( id ) {
 
-		if ( capabilities[ id ] !== false ) {
+		if ( enabledCapabilities[ id ] !== false ) {
 
 			gl.disable( id );
-			capabilities[ id ] = false;
+			enabledCapabilities[ id ] = false;
 
 		}
 
@@ -671,9 +655,9 @@ function WebGLState( gl, extensions, utils ) {
 
 		setFlipSided( flipSided );
 
-		material.transparent === true
-			? setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
-			: setBlending( NoBlending );
+		( material.blending === NormalBlending && material.transparent === false )
+			? setBlending( NoBlending )
+			: setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 
 		depthBuffer.setFunc( material.depthFunc );
 		depthBuffer.setTest( material.depthTest );
@@ -899,7 +883,7 @@ function WebGLState( gl, extensions, utils ) {
 
 		}
 
-		capabilities = {};
+		enabledCapabilities = {};
 
 		compressedTextureFormats = null;
 

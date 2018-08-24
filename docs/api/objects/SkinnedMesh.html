@@ -12,7 +12,10 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.</p>
+		<p class="desc">
+			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.
+			The material must support skinning and have skinning enabled - see [page:MeshStandardMaterial.skinning].
+		</p>
 
 		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
 
@@ -35,7 +38,7 @@
 		<h2>Example</h2>
 
 		<code>
-		var geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 5, 15, 5, 30 );
+		var geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
 
 		//Create the skin indices and skin weights
 		for ( var i = 0; i < geometry.vertices.length; i ++ ) {

@@ -2,40 +2,35 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.IntNode = function ( value ) {
+import { InputNode } from '../core/InputNode.js';
 
-	THREE.InputNode.call( this, 'iv1' );
+function IntNode( value ) {
 
-	this.value = [ Math.floor( value || 0 ) ];
+	InputNode.call( this, 'i' );
 
-};
+	this.value = Math.floor( value || 0 );
 
-THREE.IntNode.prototype = Object.create( THREE.InputNode.prototype );
-THREE.IntNode.prototype.constructor = THREE.IntNode;
-THREE.IntNode.prototype.nodeType = "Int";
+}
 
-Object.defineProperties( THREE.IntNode.prototype, {
-	number: {
-		get: function () {
+IntNode.prototype = Object.create( InputNode.prototype );
+IntNode.prototype.constructor = IntNode;
+IntNode.prototype.nodeType = "Int";
 
-			return this.value[ 0 ];
+IntNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
-		},
-		set: function ( val ) {
-
-			this.value[ 0 ] = Math.floor( val );
-
-		}
-	}
-} );
-
-THREE.IntNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
-
-	return builder.format( this.number, type, output );
+	return builder.format( this.value, type, output );
 
 };
 
-THREE.IntNode.prototype.toJSON = function ( meta ) {
+IntNode.prototype.copy = function ( source ) {
+
+	InputNode.prototype.copy.call( this, source );
+
+	this.value = source.value;
+
+};
+
+IntNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -43,7 +38,7 @@ THREE.IntNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.number = this.number;
+		data.value = this.value;
 
 		if ( this.readonly === true ) data.readonly = true;
 
@@ -52,3 +47,5 @@ THREE.IntNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { IntNode };

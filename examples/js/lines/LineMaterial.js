@@ -168,9 +168,9 @@ THREE.ShaderLib[ 'line' ] = {
 
 			gl_Position = clip;
 
-			#include <logdepthbuf_vertex>
+			vec4 mvPosition = ( position.y < 0.5 ) ? start : end; // this is an approximation
 
-			#include <worldpos_vertex>
+			#include <logdepthbuf_vertex>
 			#include <clipping_planes_vertex>
 			#include <fog_vertex>
 
@@ -205,19 +205,19 @@ THREE.ShaderLib[ 'line' ] = {
 
 			#ifdef USE_DASH
 
-				if ( vUv.y < 0.5 || vUv.y > 0.5 ) discard; // discard endcaps
+				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
 
 				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
 
-			if ( vUv.y < 0.5 || vUv.y > 0.5 ) {
+			if ( abs( vUv.y ) > 1.0 ) {
 
-				float a = vUv.x - 0.5;
-				float b = vUv.y - 0.5;
+				float a = vUv.x;
+				float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
 				float len2 = a * a + b * b;
 
-				if ( len2 > 0.25 ) discard;
+				if ( len2 > 1.0 ) discard;
 
 			}
 

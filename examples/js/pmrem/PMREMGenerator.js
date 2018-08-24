@@ -53,7 +53,7 @@ THREE.PMREMGenerator = function ( sourceTexture, samplesPerLevel, resolution ) {
 
 	this.shader = this.getShader();
 	this.shader.defines[ 'SAMPLES_PER_LEVEL' ] = this.samplesPerLevel;
-	this.planeMesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2, 0 ), this.shader );
+	this.planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2, 0 ), this.shader );
 	this.planeMesh.material.side = THREE.DoubleSide;
 	this.scene = new THREE.Scene();
 	this.scene.add( this.planeMesh );
@@ -259,13 +259,7 @@ THREE.PMREMGenerator.prototype = {
 					gl_FragColor = linearToOutputTexel( vec4( rgbColor, 1.0 ) );\n\
 				}",
 
-			blending: THREE.CustomBlending,
-			premultipliedAlpha: false,
-			blendSrc: THREE.OneFactor,
-			blendDst: THREE.ZeroFactor,
-			blendSrcAlpha: THREE.OneFactor,
-			blendDstAlpha: THREE.ZeroFactor,
-			blendEquation: THREE.AddEquation
+			blending: THREE.NoBlending
 
 		} );
 
