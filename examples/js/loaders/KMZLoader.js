@@ -28,63 +28,75 @@ THREE.KMZLoader.prototype = {
 
 	parse: function ( data ) {
 
+		var manager = new THREE.LoadingManager();
+		manager.setURLModifier( function ( url ) {
+
+			var image;
+
+			zip.filter( function ( path, file ) {
+
+				if ( path.substr( - url.length ) === url ) {
+
+					image = file;
+
+				}
+
+			} );
+
+			if ( image ) {
+
+				console.log( 'Loading', url );
+
+				var blob = new Blob( [ image.asArrayBuffer() ], { type: 'application/octet-stream' } );
+				return URL.createObjectURL( blob );
+
+			}
+
+			return url;
+
+		} );
+
+		//
+
+		var collada;
+
 		var zip = new JSZip( data ); // eslint-disable-line no-undef
 
-		// console.log( zip );
+		zip.filter( function ( path, file ) {
 
-		// var xml = new DOMParser().parseFromString( zip.file( 'doc.kml' ).asText(), 'application/xml' );
+			var extension = file.name.split( '.' ).pop().toLowerCase();
 
-		function loadImage( image ) {
+			switch ( extension ) {
 
-			var path = decodeURI( image.init_from );
+				/*
+				case 'kml':
 
-			// Hack to support relative paths
-			path = path.replace( '../', '' );
+					var xml = new DOMParser().parseFromString( file.asText(), 'application/xml' );
 
-			var regex = new RegExp( path + '$' );
-			var files = zip.file( regex );
+					break;
+				*/
 
-			// console.log( image, files );
+				case 'dae':
 
-			if ( files.length ) {
+					var loader = new THREE.ColladaLoader( manager );
+					collada = loader.parse( file.asText() );
 
-				var file = files[ 0 ];
-				var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-binary' } );
-				image.build.src = URL.createObjectURL( blob );
-
-			}
-
-		}
-
-		// load collada
-
-		var files = zip.file( /dae$/i );
-
-		if ( files.length ) {
-
-			var file = files[ 0 ];
-
-			var collada = new THREE.ColladaLoader().parse( file.asText() );
-
-			// fix images
-
-			var images = collada.library.images;
-
-			for ( var name in images ) {
-
-				loadImage( images[ name ] );
+					break;
 
 			}
+
+		} );
+
+		if ( collada ) {
 
 			return collada;
 
+		} else {
+
+			console.error( 'KMZLoader: Couldn\'t find .dae file.' );
+			return { scene: new THREE.Group() };
+
 		}
-
-		console.error( 'KMZLoader: Couldn\'t find .dae file.' );
-
-		return {
-			scene: new THREE.Group()
-		};
 
 	}
 
