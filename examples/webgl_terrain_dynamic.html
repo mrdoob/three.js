@@ -466,8 +466,6 @@
 
 				if ( terrain.visible ) {
 
-					var time = Date.now() * 0.001;
-
 					var fLow = 0.1, fHigh = 0.8;
 
 					lightVal = THREE.Math.clamp( lightVal + 0.5 * delta * lightDir, fLow, fHigh );
