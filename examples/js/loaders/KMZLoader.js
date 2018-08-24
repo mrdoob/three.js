@@ -28,20 +28,24 @@ THREE.KMZLoader.prototype = {
 
 	parse: function ( data ) {
 
-		var manager = new THREE.LoadingManager();
-		manager.setURLModifier( function ( url ) {
+		function findFile( url ) {
 
-			var image;
-
-			zip.filter( function ( path, file ) {
+			for ( var path in zip.files ) {
 
 				if ( path.substr( - url.length ) === url ) {
 
-					image = file;
+					return zip.files[ path ];
 
 				}
 
-			} );
+			}
+
+		}
+
+		var manager = new THREE.LoadingManager();
+		manager.setURLModifier( function ( url ) {
+
+			var image = findFile( url );
 
 			if ( image ) {
 
@@ -58,45 +62,42 @@ THREE.KMZLoader.prototype = {
 
 		//
 
-		var collada;
-
 		var zip = new JSZip( data ); // eslint-disable-line no-undef
 
-		zip.filter( function ( path, file ) {
+		if ( zip.files[ 'doc.kml' ] ) {
 
-			var extension = file.name.split( '.' ).pop().toLowerCase();
+			var xml = new DOMParser().parseFromString( zip.files[ 'doc.kml' ].asText(), 'application/xml' );
 
-			switch ( extension ) {
+			var model = xml.querySelector( 'Placemark Model Link href' );
 
-				/*
-				case 'kml':
+			if ( model ) {
 
-					var xml = new DOMParser().parseFromString( file.asText(), 'application/xml' );
-
-					break;
-				*/
-
-				case 'dae':
-
-					var loader = new THREE.ColladaLoader( manager );
-					collada = loader.parse( file.asText() );
-
-					break;
+				var loader = new THREE.ColladaLoader( manager );
+				return loader.parse( zip.files[ model.textContent ].asText() );
 
 			}
 
-		} );
-
-		if ( collada ) {
-
-			return collada;
-
 		} else {
 
-			console.error( 'KMZLoader: Couldn\'t find .dae file.' );
-			return { scene: new THREE.Group() };
+			console.warn( 'KMZLoader: Missing doc.kml file.' );
+
+			for ( var path in zip.files ) {
+
+				var extension = path.split( '.' ).pop().toLowerCase();
+
+				if ( extension === 'dae' ) {
+
+					var loader = new THREE.ColladaLoader( manager );
+					return loader.parse( zip.files[ path ].asText() );
+
+				}
+
+			}
 
 		}
+
+		console.error( 'KMZLoader: Couldn\'t find .dae file.' );
+		return { scene: new THREE.Group() };
 
 	}
 
