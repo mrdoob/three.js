@@ -94,10 +94,12 @@
 
 			} );
 
-			var loader = new THREE.JSONLoader();
-			loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
+			var loader = new THREE.BufferGeometryLoader();
+			loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( geometry ) {
 
-				geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
+				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+
+				geometriesParams.push( {type: 'WaltHead', args: [ ], meshScale: 6 } );
 
 				THREE.WaltHead = function() {
 					return geometry.clone();
@@ -112,7 +114,7 @@
 
 				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
-				geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
+				geometriesParams.push( {type: 'Suzanne', args: [ ], scale: 100, meshScale:2 } );
 
 				THREE.Suzanne = function() {
 					return geometry.clone();

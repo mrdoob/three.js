@@ -62,10 +62,8 @@
 
 				scene = new THREE.Scene();
 
-				loader = new THREE.JSONLoader();
-				loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
-
-					geometry.computeVertexNormals();
+				loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( geometry ) {
 
 					var envMap = new THREE.TextureLoader().load( 'textures/metal.jpg' );
 					envMap.mapping = THREE.SphericalReflectionMapping;
