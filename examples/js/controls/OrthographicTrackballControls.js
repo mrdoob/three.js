@@ -109,16 +109,6 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.handleEvent = function ( event ) {
-
-		if ( typeof this[ event.type ] == 'function' ) {
-
-			this[ event.type ]( event );
-
-		}
-
-	};
-
 	var getMouseOnScreen = ( function () {
 
 		var vector = new THREE.Vector2();

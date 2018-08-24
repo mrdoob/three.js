@@ -411,6 +411,12 @@ var Viewport = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
+		if ( object === transformControls.object ) {
+
+			transformControls.detach();
+
+		}
+
 		object.traverse( function ( child ) {
 
 			objects.splice( objects.indexOf( child ), 1 );

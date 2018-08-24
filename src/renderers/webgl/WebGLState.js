@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, DoubleSide, BackSide } from '../../constants.js';
+import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, DoubleSide, BackSide } from '../../constants.js';
 import { Vector4 } from '../../math/Vector4.js';
 
 function WebGLState( gl, extensions, utils, capabilities ) {
@@ -323,6 +323,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	var currentProgram = null;
 
+	var currentBlendingEnabled = null;
 	var currentBlending = null;
 	var currentBlendEquation = null;
 	var currentBlendSrc = null;
@@ -400,8 +401,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	setCullFace( CullFaceBack );
 	enable( gl.CULL_FACE );
 
-	enable( gl.BLEND );
-	setBlending( NormalBlending );
+	setBlending( NoBlending );
 
 	//
 
@@ -525,13 +525,23 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	function setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
-		if ( blending !== NoBlending ) {
+		if ( blending === NoBlending ) {
+
+			if ( currentBlendingEnabled ) {
+
+				disable( gl.BLEND );
+				currentBlendingEnabled = false;
+
+			}
+
+			return;
+
+		}
+
+		if ( ! currentBlendingEnabled ) {
 
 			enable( gl.BLEND );
-
-		} else {
-
-			disable( gl.BLEND );
+			currentBlendingEnabled = true;
 
 		}
 
@@ -539,108 +549,111 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 			if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
 
-				switch ( blending ) {
+				if ( currentBlendEquation !== AddEquation || currentBlendEquationAlpha !== AddEquation ) {
 
-					case AdditiveBlending:
+					gl.blendEquation( gl.FUNC_ADD );
 
-						if ( premultipliedAlpha ) {
-
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.ONE, gl.ONE, gl.ONE, gl.ONE );
-
-						} else {
-
-							gl.blendEquation( gl.FUNC_ADD );
-							gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
-
-						}
-						break;
-
-					case SubtractiveBlending:
-
-						if ( premultipliedAlpha ) {
-
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
-
-						} else {
-
-							gl.blendEquation( gl.FUNC_ADD );
-							gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
-
-						}
-						break;
-
-					case MultiplyBlending:
-
-						if ( premultipliedAlpha ) {
-
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
-
-						} else {
-
-							gl.blendEquation( gl.FUNC_ADD );
-							gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
-
-						}
-						break;
-
-					default:
-
-						if ( premultipliedAlpha ) {
-
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
-
-						} else {
-
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
-
-						}
+					currentBlendEquation = AddEquation;
+					currentBlendEquationAlpha = AddEquation;
 
 				}
 
+				if ( premultipliedAlpha ) {
+
+					switch ( blending ) {
+
+						case NormalBlending:
+							gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+							break;
+
+						case AdditiveBlending:
+							gl.blendFunc( gl.ONE, gl.ONE );
+							break;
+
+						case SubtractiveBlending:
+							gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
+							break;
+
+						case MultiplyBlending:
+							gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
+							break;
+
+						default:
+							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							break;
+
+					}
+
+				} else {
+
+					switch ( blending ) {
+
+						case NormalBlending:
+							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+							break;
+
+						case AdditiveBlending:
+							gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+							break;
+
+						case SubtractiveBlending:
+							gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+							break;
+
+						case MultiplyBlending:
+							gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+							break;
+
+						default:
+							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							break;
+
+					}
+
+				}
+
+				currentBlendSrc = null;
+				currentBlendDst = null;
+				currentBlendSrcAlpha = null;
+				currentBlendDstAlpha = null;
+
+				currentBlending = blending;
+				currentPremultipledAlpha = premultipliedAlpha;
+
 			}
 
-			currentBlendEquation = null;
-			currentBlendSrc = null;
-			currentBlendDst = null;
-			currentBlendEquationAlpha = null;
-			currentBlendSrcAlpha = null;
-			currentBlendDstAlpha = null;
+			return;
 
-		} else {
+		}
 
-			blendEquationAlpha = blendEquationAlpha || blendEquation;
-			blendSrcAlpha = blendSrcAlpha || blendSrc;
-			blendDstAlpha = blendDstAlpha || blendDst;
+		// custom blending
 
-			if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
+		blendEquationAlpha = blendEquationAlpha || blendEquation;
+		blendSrcAlpha = blendSrcAlpha || blendSrc;
+		blendDstAlpha = blendDstAlpha || blendDst;
 
-				gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
+		if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-				currentBlendEquation = blendEquation;
-				currentBlendEquationAlpha = blendEquationAlpha;
+			gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
 
-			}
+			currentBlendEquation = blendEquation;
+			currentBlendEquationAlpha = blendEquationAlpha;
 
-			if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
+		}
 
-				gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
+		if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-				currentBlendSrc = blendSrc;
-				currentBlendDst = blendDst;
-				currentBlendSrcAlpha = blendSrcAlpha;
-				currentBlendDstAlpha = blendDstAlpha;
+			gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
 
-			}
+			currentBlendSrc = blendSrc;
+			currentBlendDst = blendDst;
+			currentBlendSrcAlpha = blendSrcAlpha;
+			currentBlendDstAlpha = blendDstAlpha;
 
 		}
 
 		currentBlending = blending;
-		currentPremultipledAlpha = premultipliedAlpha;
+		currentPremultipledAlpha = null;
 
 	}
 

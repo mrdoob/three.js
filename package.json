@@ -8,7 +8,6 @@
   "module": "build/three.module.js",
   "files": [
     "package.json",
-    "bower.json",
     "LICENSE",
     "README.md",
     "build/three.js",
@@ -31,8 +30,8 @@
     "build-test": "rollup -c test/rollup.unit.config.js",
     "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
     "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 8080\"",
-    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"serve --port 8080\"",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
+    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "start": "npm run dev",
     "lint": "eslint src",
     "test": "npm run build-test && qunit test/unit/three.source.unit.js",
@@ -52,15 +51,26 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "concurrently": "^3.5.1",
-    "electron": "^2.0.2",
-    "eslint": "^4.19.1",
+    "concurrently": "^3.6.1",
+    "electron": "^2.0.6",
+    "eslint": "^5.3.0",
     "eslint-config-mdcs": "^4.2.3",
-    "google-closure-compiler": "20180506.0.0",
+    "google-closure-compiler": "20180716.0.1",
+    "http-server": "^0.11.1",
     "qunit": "^2.6.1",
-    "rollup": "^0.59.4",
+    "rollup": "^0.63.5",
     "rollup-watch": "^4.3.1",
-    "serve": "6.5.8",
     "uglify-js": "^3.3.28"
+  },
+  "jspm": {
+    "files": [
+      "package.json",
+      "LICENSE",
+      "README.md",
+      "build/three.js",
+      "build/three.min.js",
+      "build/three.module.js"
+    ],
+    "directories": {}
   }
 }

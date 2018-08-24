@@ -24,6 +24,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	defineProperty( "camera", camera );
 	defineProperty( "object", undefined );
+	defineProperty( "enabled", true );
 	defineProperty( "axis", null );
 	defineProperty( "mode", "translate" );
 	defineProperty( "translationSnap", null );
@@ -31,6 +32,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 	defineProperty( "space", "world" );
 	defineProperty( "size", 1 );
 	defineProperty( "dragging", false );
+	defineProperty( "showX", true );
+	defineProperty( "showY", true );
+	defineProperty( "showZ", true );
 
 	var changeEvent = { type: "change" };
 	var mouseDownEvent = { type: "mouseDown" };
@@ -524,13 +528,15 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerHover( event ) {
 
-		// event.preventDefault();
+		if ( !scope.enabled ) return;
 
 		scope.pointerHover( getPointer( event ) );
 
 	}
 
 	function onPointerDown( event ) {
+
+		if ( !scope.enabled ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -542,6 +548,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerMove( event ) {
 
+		if ( !scope.enabled ) return;
+
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -550,6 +558,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 	}
 
 	function onPointerUp( event ) {
+
+		if ( !scope.enabled ) return;
 
 		event.preventDefault(); // Prevent MouseEvent on mobile
 
@@ -684,9 +694,6 @@ THREE.TransformControlsGizmo = function () {
 
 	var matLineMagenta = gizmoLineMaterial.clone();
 	matLineMagenta.color.set( 0xff00ff );
-
-	var matLineBlue = gizmoLineMaterial.clone();
-	matLineBlue.color.set( 0x0000ff );
 
 	var matLineYellow = gizmoLineMaterial.clone();
 	matLineYellow.color.set( 0xffff00 );
@@ -1193,6 +1200,7 @@ THREE.TransformControlsGizmo = function () {
 				var PLANE_HIDE_TRESHOLD = 0.2;
 				var AXIS_FLIP_TRESHOLD = -0.4;
 
+
 				if ( handle.name === 'X' || handle.name === 'XYZX' ) {
 					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
@@ -1307,6 +1315,12 @@ THREE.TransformControlsGizmo = function () {
 
 			}
 
+			// Hide disabled axes
+			handle.visible = handle.visible && ( handle.name.indexOf( "X" ) === -1 || this.showX );
+			handle.visible = handle.visible && ( handle.name.indexOf( "Y" ) === -1 || this.showY );
+			handle.visible = handle.visible && ( handle.name.indexOf( "Z" ) === -1 || this.showZ );
+			handle.visible = handle.visible && ( handle.name.indexOf( "E" ) === -1 || ( this.showX && this.showY && this.showZ ) );
+
 			// highlight selected axis
 
 			handle.material._opacity = handle.material._opacity || handle.material.opacity;
@@ -1315,7 +1329,12 @@ THREE.TransformControlsGizmo = function () {
 			handle.material.color.copy( handle.material._color );
 			handle.material.opacity = handle.material._opacity;
 
-			if ( this.axis ) {
+			if ( !this.enabled ) {
+
+				handle.material.opacity *= 0.5;
+				handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
+
+			} else if ( this.axis ) {
 
 				if ( handle.name === this.axis ) {
 
@@ -1329,7 +1348,8 @@ THREE.TransformControlsGizmo = function () {
 
 				} else {
 
-					handle.material.opacity *= 0.05;
+					handle.material.opacity *= 0.25;
+					handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
 
 				}
 
@@ -1371,7 +1391,6 @@ THREE.TransformControlsPlane = function () {
 	var dirVector = new THREE.Vector3();
 	var alignVector = new THREE.Vector3();
 	var tempMatrix = new THREE.Matrix4();
-	var camRotation = new THREE.Euler();
 	var identityQuaternion = new THREE.Quaternion();
 
 	this.updateMatrixWorld = function() {

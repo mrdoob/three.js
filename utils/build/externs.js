@@ -4,7 +4,6 @@ var module;
 var exports;
 var performance;
 var createImageBitmap;
-var OffscreenCanvas;
 var WebGL2RenderingContext;
 var XRWebGLLayer;
 var XRDevice;

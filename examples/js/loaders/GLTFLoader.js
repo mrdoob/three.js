@@ -913,6 +913,30 @@ THREE.GLTFLoader = ( function () {
 	GLTFCubicSplineInterpolant.prototype = Object.create( THREE.Interpolant.prototype );
 	GLTFCubicSplineInterpolant.prototype.constructor = GLTFCubicSplineInterpolant;
 
+	GLTFCubicSplineInterpolant.prototype.copySampleValue_ = function ( index ) {
+
+		// Copies a sample value to the result buffer. See description of glTF
+		// CUBICSPLINE values layout in interpolate_() function below.
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			valueSize = this.valueSize,
+			offset = index * valueSize * 3 + valueSize;
+
+		for ( var i = 0; i !== valueSize; i ++ ) {
+
+			result[ i ] = values[ offset + i ];
+
+		}
+
+		return result;
+
+	};
+
+	GLTFCubicSplineInterpolant.prototype.beforeStart_ = GLTFCubicSplineInterpolant.prototype.copySampleValue_;
+
+	GLTFCubicSplineInterpolant.prototype.afterEnd_ = GLTFCubicSplineInterpolant.prototype.copySampleValue_;
+
 	GLTFCubicSplineInterpolant.prototype.interpolate_ = function ( i1, t0, t, t1 ) {
 
 		var result = this.resultBuffer;
@@ -1113,6 +1137,11 @@ THREE.GLTFLoader = ( function () {
 		OPAQUE: 'OPAQUE',
 		MASK: 'MASK',
 		BLEND: 'BLEND'
+	};
+
+	var MIME_TYPE_FORMATS = {
+		'image/png': THREE.RGBAFormat,
+		'image/jpeg': THREE.RGBFormat
 	};
 
 	/* UTILITY FUNCTIONS */
@@ -1857,7 +1886,7 @@ THREE.GLTFLoader = ( function () {
 			var elementBytes = TypedArray.BYTES_PER_ELEMENT;
 			var itemBytes = elementBytes * itemSize;
 			var byteOffset = accessorDef.byteOffset || 0;
-			var byteStride = json.bufferViews[ accessorDef.bufferView ].byteStride;
+			var byteStride = accessorDef.bufferView !== undefined ? json.bufferViews[ accessorDef.bufferView ].byteStride : undefined;
 			var normalized = accessorDef.normalized === true;
 			var array, bufferAttribute;
 
@@ -2018,6 +2047,13 @@ THREE.GLTFLoader = ( function () {
 
 			if ( textureDef.name !== undefined ) texture.name = textureDef.name;
 
+			// Ignore unknown mime types, like DDS files.
+			if ( source.mimeType in MIME_TYPE_FORMATS ) {
+
+				texture.format = MIME_TYPE_FORMATS[ source.mimeType ];
+
+			}
+
 			var samplers = json.samplers || {};
 			var sampler = samplers[ textureDef.sampler ] || {};
 
@@ -2059,7 +2095,7 @@ THREE.GLTFLoader = ( function () {
 		var parser = this;
 		var json = this.json;
 		var extensions = this.extensions;
-		var materialDef = this.json.materials[ materialIndex ];
+		var materialDef = json.materials[ materialIndex ];
 
 		var materialType;
 		var materialParams = {};
@@ -2434,7 +2470,7 @@ THREE.GLTFLoader = ( function () {
 		var json = this.json;
 		var extensions = this.extensions;
 
-		var meshDef = this.json.meshes[ meshIndex ];
+		var meshDef = json.meshes[ meshIndex ];
 
 		return this.getMultiDependencies( [
 
@@ -2734,7 +2770,7 @@ THREE.GLTFLoader = ( function () {
 
 		var json = this.json;
 
-		var animationDef = this.json.animations[ animationIndex ];
+		var animationDef = json.animations[ animationIndex ];
 
 		return this.getMultiDependencies( [
 
@@ -2878,10 +2914,10 @@ THREE.GLTFLoader = ( function () {
 		var json = this.json;
 		var extensions = this.extensions;
 
-		var meshReferences = this.json.meshReferences;
-		var meshUses = this.json.meshUses;
+		var meshReferences = json.meshReferences;
+		var meshUses = json.meshUses;
 
-		var nodeDef = this.json.nodes[ nodeIndex ];
+		var nodeDef = json.nodes[ nodeIndex ];
 
 		return this.getMultiDependencies( [
 
