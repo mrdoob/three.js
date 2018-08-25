@@ -236,7 +236,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			sphere.copy( geometry.boundingSphere );
 			sphere.applyMatrix4( matrixWorld );
 
-			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+			if ( !sphere.containsPoint( raycaster.ray.origin ) && raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
 			//
 
@@ -247,7 +247,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( geometry.boundingBox !== null ) {
 
-				if ( ray.intersectsBox( geometry.boundingBox ) === false ) return;
+				if ( !geometry.boundingBox.containsPoint( ray.origin ) && ray.intersectsBox( geometry.boundingBox ) === false ) return;
 
 			}
 
