@@ -211,10 +211,12 @@ code {
   text-align: center;
   max-width: 95%;
 }
-
+.threejs_center>img {
+  max-width: 100%;
+}
 .threejs_image>img {
-    max-width: 100% !important;
-    display: block;
+  width: 100%;
+  display: block;
 }
 .threejs_math {
   margin-left: auto;

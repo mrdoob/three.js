@@ -34,7 +34,7 @@ in some 3rd party program like Photoshop or gIMP. For example let's
 put this image on cube.
 
 <div class="threejs_center">
-  <img src="../resources/images/wall.jpg" style="max-width: 600px;" class="border" >
+  <img src="../resources/images/wall.jpg" style="width: 600px;" class="border" >
 </div>
 
 We'll modify one of our first samples. All we need to do is create a `TextureLoader`. Call its
@@ -60,14 +60,14 @@ How about 6 textures, one on each face of a cube?
 
 <div class="threejs_center">
   <div>
-    <img src="../resources/images/flower-1.jpg" style="max-width: 100px;" class="border" >
-    <img src="../resources/images/flower-2.jpg" style="max-width: 100px;" class="border" >
-    <img src="../resources/images/flower-3.jpg" style="max-width: 100px;" class="border" >
+    <img src="../resources/images/flower-1.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-2.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-3.jpg" style="width: 100px;" class="border" >
   </div>
   <div>
-    <img src="../resources/images/flower-4.jpg" style="max-width: 100px;" class="border" >
-    <img src="../resources/images/flower-5.jpg" style="max-width: 100px;" class="border" >
-    <img src="../resources/images/flower-6.jpg" style="max-width: 100px;" class="border" >
+    <img src="../resources/images/flower-4.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-5.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-6.jpg" style="width: 100px;" class="border" >
   </div>
 </div>
 
@@ -266,7 +266,7 @@ Notice that says nothing about compression. I can make a .jpg image and set its 
 high. For example let's say I was making a scene of a house. Inside the house there is a table
 and I decide to put this wood texture on the top surface of the table
 
-<div class="threejs_center"><img class="border" src="resources/images/compressed-but-large-wood-texture.jpg" align="center" style="max-width: 300px"></div>
+<div class="threejs_center"><img class="border" src="resources/images/compressed-but-large-wood-texture.jpg" align="center" style="width: 300px"></div>
 
 That image is only 157k so it will download relatively quickly but [it is actually 
 3024 x 3761 pixels in size](resources/images/compressed-but-large-wood-texture.jpg). 
