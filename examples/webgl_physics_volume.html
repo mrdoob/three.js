@@ -204,7 +204,7 @@
 				var geometry = new THREE.Geometry().fromBufferGeometry( bufGeometry );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles
-				var vertsDiff = geometry.mergeVertices();
+				geometry.mergeVertices();
 
 				// Convert again to BufferGeometry, indexed
 				var indexedBufferGeom = createIndexedBufferGeometryFromGeometry( geometry );
