@@ -166,6 +166,10 @@
 					gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
 					gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
 
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
 				} );
 
 
