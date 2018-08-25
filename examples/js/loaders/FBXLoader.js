@@ -3292,7 +3292,7 @@ THREE.FBXLoader = ( function () {
 
 				var value = subNode.propertyList[ 0 ];
 
-				if ( Array.isArray( value ) ) {
+				if ( Array.isArray( value ) || ArrayBuffer.isView( value ) ) {
 
 					node[ subNode.name ] = subNode;
 
@@ -3587,6 +3587,19 @@ THREE.FBXLoader = ( function () {
 
 		getInt32Array: function ( size ) {
 
+			if ( this.littleEndian ) {
+
+				return this.getInt32ArrayLE( size );
+
+			} else {
+
+				return this.getInt32ArrayBE( size );
+
+			}
+		},
+
+		getInt32ArrayBE: function ( size ) {
+
 			var a = [];
 
 			for ( var i = 0; i < size; i ++ ) {
@@ -3594,6 +3607,17 @@ THREE.FBXLoader = ( function () {
 				a.push( this.getInt32() );
 
 			}
+
+			return a;
+
+		},
+
+		getInt32ArrayLE: function ( size ) {
+
+			var buffer = this.dv.buffer.slice( this.offset, this.offset + size * 4 );
+			var a = new Int32Array(buffer);
+
+			this.offset += 4 * size;
 
 			return a;
 
@@ -3691,6 +3715,33 @@ THREE.FBXLoader = ( function () {
 
 		getFloat32Array: function ( size ) {
 
+			if ( this.littleEndian ) {
+
+				return this.getFloat32ArrayLE( size );
+
+			} else {
+			
+				return this.getFloat32ArrayBE( size );
+
+			}
+
+		},
+
+		getFloat32ArrayLE: function ( size ) {
+
+			var buffer = this.dv.buffer.slice( this.offset, this.offset + size * 4 );
+
+			var a = new Float32Array( buffer );
+
+			this.offset += 4 * size;
+
+			return a;
+
+		},
+
+
+		getFloat32ArrayBE: function ( size ) {
+
 			var a = [];
 
 			for ( var i = 0; i < size; i ++ ) {
@@ -3712,6 +3763,33 @@ THREE.FBXLoader = ( function () {
 		},
 
 		getFloat64Array: function ( size ) {
+
+			if ( this.littleEndian ) {
+
+				return this.getFloat64ArrayLE( size );
+
+			} else {
+
+				return this.getFloat64ArrayBE( size );
+
+			}
+
+		},
+
+		getFloat64ArrayLE: function ( size ) {
+
+			var buffer = this.dv.buffer.slice( this.offset, this.offset + size * 8 );
+
+			var a = new Float64Array( buffer );
+
+			this.offset += 8 * size;
+
+			return a;
+
+		},
+
+
+		getFloat64ArrayBE: function ( size ) {
 
 			var a = [];
 
