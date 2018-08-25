@@ -213,7 +213,7 @@ code {
 }
 
 .threejs_image>img {
-    width: 100%;
+    max-width: 100% !important;
     display: block;
 }
 .threejs_math {
