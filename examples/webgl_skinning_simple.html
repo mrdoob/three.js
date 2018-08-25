@@ -95,17 +95,13 @@
 				//
 
 				var loader = new THREE.GLTFLoader();
-				loader.load( './models/gltf/SimpleSkinning.glb', function ( gltf ) {
+				loader.load( './models/gltf/SimpleSkinning.gltf', function ( gltf ) {
 
 					scene.add( gltf.scene );
 
 					gltf.scene.traverse( function ( child ) {
 
-						if ( child.isMesh ) {
-
-							child.castShadow = true;
-
-						}
+						if ( child.isSkinnedMesh ) child.castShadow = true;
 
 					} );
 
