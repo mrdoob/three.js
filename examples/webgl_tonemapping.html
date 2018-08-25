@@ -265,8 +265,6 @@
 				renderer.toneMappingExposure = params.exposure;
 				renderer.toneMappingWhitePoint = params.whitePoint;
 
-				var timer = Date.now() * 0.00025;
-
 				camera.lookAt( scene.position );
 
 				for ( var i = 0, l = group.children.length; i < l; i ++ ) {
