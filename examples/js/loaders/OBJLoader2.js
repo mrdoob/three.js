@@ -218,7 +218,7 @@ THREE.OBJLoader2 = (function () {
 		if ( ! Validator.isValid( onError ) ) {
 			onError = function ( event ) {
 				scope._onError( event );
-			}
+			};
 		}
 
 		// fast-fail
@@ -419,7 +419,7 @@ THREE.OBJLoader2 = (function () {
 		if ( ! Validator.isValid( content ) ) {
 
 			console.warn( 'Provided content is not a valid ArrayBuffer.' );
-			scopedOnLoad()
+			scopedOnLoad();
 
 		} else {
 
@@ -1427,7 +1427,7 @@ THREE.OBJLoader2 = (function () {
 				if ( ! Validator.isValid( onError ) ) {
 					onError = function ( event ) {
 						scope._onError( event );
-					}
+					};
 				}
 				if ( ! Validator.isValid( onProgress ) ) {
 					var numericalValueRef = 0;

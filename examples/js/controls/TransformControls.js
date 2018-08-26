@@ -52,7 +52,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		X: new THREE.Vector3( 1, 0, 0 ),
 		Y: new THREE.Vector3( 0, 1, 0 ),
 		Z: new THREE.Vector3( 0, 0, 1 )
-	}
+	};
 	var _identityQuaternion = new THREE.Quaternion();
 	var _alignVector = new THREE.Vector3();
 
@@ -232,7 +232,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-	}
+	};
 
 	this.pointerDown = function( pointer ) {
 
@@ -289,7 +289,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-	}
+	};
 
 	this.pointerMove = function( pointer ) {
 
@@ -483,7 +483,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		this.dispatchEvent( changeEvent );
 		this.dispatchEvent( objectChangeEvent );
 
-	}
+	};
 
 	this.pointerUp = function( pointer ) {
 
@@ -500,7 +500,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( pointer.button === undefined ) this.axis = null;
 
-	}
+	};
 
 	// normalize mouse / touch pointer and remap {x,y} to view space.
 
