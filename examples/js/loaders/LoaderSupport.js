@@ -5,7 +5,11 @@
 
 'use strict';
 
-if ( THREE.LoaderSupport === undefined ) { THREE.LoaderSupport = {} }
+if ( THREE.LoaderSupport === undefined ) {
+
+	THREE.LoaderSupport = {};
+
+}
 
 /**
  * Validation functions.
@@ -943,7 +947,7 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 				payload.logging = {
 					enabled: true,
 					debug: false
-				}
+				};
 
 			}
 			this._postMessage();
