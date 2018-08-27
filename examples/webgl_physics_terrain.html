@@ -204,7 +204,7 @@
 
 						// Create the terrain body
 
-						var groundShape = createTerrainShape( heightData );
+						var groundShape = createTerrainShape();
 						var groundTransform = new Ammo.btTransform();
 						groundTransform.setIdentity();
 						// Shifts the terrain, since bullet re-centers it on its bounding box.
