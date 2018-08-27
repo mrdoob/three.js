@@ -1,6 +1,7 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants.js';
 import { _Math } from '../math/Math.js';
+import { SetValues } from '../extras/SetValues.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -81,55 +82,26 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( values === undefined ) return;
 
-		for ( var key in values ) {
+		// copy to prevent if backward compatability values is used in others materials
+		values = Object.assign( {}, values );
 
-			var newValue = values[ key ];
+		// for backward compatability if shading is set in the constructor
+		if ( values.shading !== undefined ) {
 
-			if ( newValue === undefined ) {
-
-				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
-				continue;
-
-			}
-
-			// for backward compatability if shading is set in the constructor
-			if ( key === 'shading' ) {
-
-				console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
-				this.flatShading = ( newValue === FlatShading ) ? true : false;
-				continue;
-
-			}
-
-			var currentValue = this[ key ];
-
-			if ( currentValue === undefined ) {
-
-				console.warn( "THREE." + this.type + ": '" + key + "' is not a property of this material." );
-				continue;
-
-			}
-
-			if ( currentValue && currentValue.isColor ) {
-
-				currentValue.set( newValue );
-
-			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
-
-				currentValue.copy( newValue );
-
-			} else if ( key === 'overdraw' ) {
-
-				// ensure overdraw is backwards-compatible with legacy boolean type
-				this[ key ] = Number( newValue );
-
-			} else {
-
-				this[ key ] = newValue;
-
-			}
+			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
+			values.flatShading = ( values.shading === FlatShading ) ? true : false;
+			delete values.shading;
 
 		}
+
+		if ( values.overdraw !== undefined ) {
+
+			// ensure overdraw is backwards-compatible with legacy boolean type
+			values.overdraw = Number( values.overdraw );
+
+		}
+
+		SetValues( this, values );
 
 	},
 
