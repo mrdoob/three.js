@@ -142,13 +142,16 @@
 
 				geometry.addAttribute( 'color', new THREE.GLBufferAttribute( gl, rgb, gl.FLOAT, 3, particles ) );
 
-				geometry.computeBoundingSphere();
-
 				//
 
 				var material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
 
 				points = new THREE.Points( geometry, material );
+
+				// Choose one:
+				// geometry.boundingSphere = ( new THREE.Sphere() ).set( new THREE.Vector3(), Infinity );
+				points.frustumCulled = false;
+
 				scene.add( points );
 
 				//
