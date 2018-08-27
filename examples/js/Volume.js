@@ -357,7 +357,6 @@ THREE.Volume.prototype = {
 
 		} );
 		var argumentsWithInversion = [ 'volume.xLength-1-', 'volume.yLength-1-', 'volume.zLength-1-' ];
-		var arguments = [ 'i', 'j', 'k' ];
 		var argArray = [ iDirection, jDirection, kDirection ].map( function( direction, n ) {
 
 			return ( direction.dot( base[ n ] ) > 0 ? '' : argumentsWithInversion[ n ] ) + ( direction === axisInIJK ? 'IJKIndex' : direction.argVar )
