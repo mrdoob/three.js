@@ -1,0 +1,290 @@
+Title: Three.js Prerequisites
+Description: What you need to know to use this site.
+
+These articles are meant to help you learn how to use three.js.
+They assume you know how to program in JavaScript. They assume
+you know what the DOM is, how to write HTML as well as create DOM elements
+in JavaScript. They assume you know how to use `<script>` tags to
+include external JavaScript files as well as inline scripts.
+They assume you know some CSS and that you know what
+[CSS selectors are](https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors). 
+They also assume you know ES5, ES6 and maybe some ES7.
+They assume you know that the browser runs JavaScript only via events and callbacks.
+They assume you know what a closure is.
+
+Here's some brief refreshers and notes
+
+## `document.querySelector` and `document.querySelectorAll`
+
+You can use `document.querySelector` to select the first element
+that matches a CSS selector. `document.querySelectorAll` returns
+all elements that match a CSS selector.
+
+## You don't need `onbody`
+
+Lots of 20yr old pages use HTML like
+
+    <body onload="somefunction()">
+
+That style is deprecated. Put your scripts
+at the bottom of the page.
+
+```
+<html>
+  <head>
+    ...
+  </head>
+  <body>
+     ...
+  </body>
+  <script src="script1.js"></script>
+  <script>
+    // inline javascript
+  </script>
+</html>
+```
+
+or [use the `defer` property](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script).
+
+## You don't need `type="text/javascript"`
+
+modern
+
+    <script>...</script>
+
+outdated
+
+    <script type="text/javascript"></script>
+
+## Always use `strict` mode
+
+Put `'use strict';` at the top of every JavaScript file.
+
+## Know how closures work
+
+```
+function a(v) {
+  const foo = v;
+  return function() {
+     return foo;
+  };
+}
+
+const f = a(123);
+const g = a(456);
+console.log(f());  // prints 123
+console.log(g());  // prints 456
+```
+
+In the code above the function `a` creates a new function every time it's called. That
+funciton *closes* over the variable `foo`. Here's [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures).
+
+## Understand how `this` works
+
+`this` is not magic. It's effectively a variable that is automatically passed to functions just like
+an argument is passed to function. The simple explaintion is when you call a function directly
+like
+
+    somefunction(a, b, c);
+
+This will be `null` where as when you call a function via the dot operator `.` like this
+
+    someobject.somefunction(a, b, c);
+
+This will be set to `someobject`.
+
+The parts where people get confused is with callbacks.
+
+     const callback = someobject.somefunction;
+     loader.load(callback);
+
+doesn't work as someone inexperienced might expect because when
+`loader.load` calls the callback it's not calling it with the dot `.` operator
+so by default `this` will be null (unless the loader explicitly sets it to someting).
+If you want `this` to be `someobject` when the callback happens you need to 
+tell JavaScript that by binding it to the function.
+
+     const callback = someobject.somefunction.bind(someobject);
+     loader.load(callback);
+
+[*this* article might help](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this).
+
+## ES5/ES6/ES7 stuff
+
+### `var` is deprecated. Use `const` and/or `let`
+
+There is no reason to use `var` **EVER** and at this point it's considered bad practice
+to use it at all. Use `const` if the variable will never be reassigned which is most of
+the time. Use `let` in those cases where the value changes.
+
+### Use `for(elem of collection)` never `for(elem in collection)`
+
+`for of` is new, `for in` is old. `for in` had issues that are solved by `for of`
+
+As one example you can iterate over all the key/value pairs of an object with
+
+```
+for (const [key, value] of Object.entries(someObject)) {
+  console.log(key, value);
+}
+```
+
+### Use `forEach`, `map`, and `filter`  where useful
+
+Arrays added the functions [`forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach, 
+[`map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map), and 
+[`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) and
+are used fairly extensively in modern JavaScript.
+
+### Use destructuring
+
+Assume an object `const dims = {width: 300, height: 150}`
+
+old code
+
+     const width = dims.width;
+     const height = dims.height;
+
+new code
+
+     const {width, height} = dims;
+
+### Use object declaration short cuts
+
+old code
+
+```
+ const width = 300;
+ const height = 150;
+ const obj = {
+   width: width,
+   height: height,
+   area: function() {
+     return this.width * this.height
+   },
+ };
+```
+
+new code
+
+```
+ const width = 300;
+ const height = 150;
+ const obj = {
+   width,
+   height,
+   area() {
+     return this.width * this.height;
+   },
+ };
+```
+
+### Use the spread operator `...`
+
+The spread operator has a ton of uses. Example
+
+```
+ function log(className, ...args) {
+   const elem = document.createElement('div');
+   elem.className = className;
+   elem.textContent = [...args].join(' ');
+   document.body.appendChild(elem);
+ }
+```
+
+Another example
+
+```
+const position = [1, 2, 3];
+somemesh.position.set(...position);
+```
+
+### Use `class`
+
+The syntax for making class like objects pre ES5 was unfamilar to most programmers.
+As of ES5 you can now [use the `class` keyword](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
+
+### Use arrow functions where appropriate
+
+This is especially useful with callbacks and promises.
+
+```
+loader.load((texture) => {
+  // use textrue
+});
+```
+
+Arrow functions bind `this`. They are a shortcut for
+
+```
+(function(args) {/* code */}).bind(this))
+```
+
+### Promises as well as async/await
+
+Promises help with asynchronous code. Async/await help
+use promises.
+
+It's too big a topic to go into here but you can [read up
+on promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises)
+and [async/await here]().
+
+### Use Template Literals
+
+Template literals are strings using backticks instead of quotes.
+
+    const foo = `this is a template literal`;
+
+Template literals have basically 2 features. One is they can be multi-line
+
+```
+const foo = `this
+is
+a
+template
+literal`;
+const bar = "this\nis\na\ntemplate\nliteral";
+```
+
+`foo` and `bar` above are the same.
+
+The other is that you can pop out of string mode and insert snippets of
+JavaScript using `${javascript-expression}`. This is the template part. Example:
+
+```
+const r = 192;
+const g = 255;
+const b = 64;
+const rgbCSSColor = `rgb(${r},${g},${b})`;
+```
+
+or
+
+```
+const color = [192, 255, 64];
+const rgbCSSColor = `rgb(${color.join(',')})`;
+```
+
+or
+
+```
+const aWidth = 10;
+const bWidth = 20;
+someElement.style.width = `${aWidth + bWidth}px`;
+```
+
+# Consider using Visual Studio Code
+
+Of course use whatever editor you want but if you haven't tried it consider using [Visual Studio Code](https://code.visualstudio.com/)
+for JavaScript and after installing it [setup eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
+It might take a few minutes to setup but it will help you immensely with finding bugs in your JavaScript.
+
+As a simple example if you enable [the `no-undef` rule](https://eslint.org/docs/rules/no-undef) then VSCode via ESLint will
+warn you of many undefined variables. You'll get warnings using `THREE` so add `/* global THREE */` at the top of your JavaScript files.
+
+# If you really need to support legacy browsers use a transpiler
+
+Most modern browsers are auto-updated so using all these features will help you 
+be productive and avoid bugs. That said, if you're on a project that absolutely
+must support old browsers there are [tools that will take your ES5/ES6/ES7 code
+and transpile the code back to pre ES5 Javascript](https://babeljs.io).

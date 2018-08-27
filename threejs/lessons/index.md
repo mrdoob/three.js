@@ -1,6 +1,6 @@
 Title: Three.js Fundamentals
 
-Learn Three.js
+This is a set of article to help learn Three.js.
 
 {{{include "threejs/lessons/toc.html"}}}
 

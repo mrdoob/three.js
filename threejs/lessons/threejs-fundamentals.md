@@ -7,15 +7,15 @@ it as easy as possible to get 3D content on a webpage.
 
 Three.js is often confused with WebGL since more often than
 not, but not always, three.js uses WebGL to draw 3D.
-WebGL is a very low-level
-system that only draws points, lines, and triangles. To do
-anything useful with WebGL generally requires quite a bit of
+[WebGL is a very low-level system that only draws points, lines, and triangles](https://webglfundamentals.org). 
+To do anything useful with WebGL generally requires quite a bit of
 code and that is where three.js comes in. It handlings things
-like scenes, lights, shadows, materials, textures, all things that you'd
+like scenes, lights, shadows, materials, textures, 3d math, all things that you'd
 have to write yourself if you were to use WebGL directly.
 
 These tutorials assume you already know JavaScript and, for the
-most part they will use ES6 style JavaScript. Most browsers
+most part they will use ES6 style JavaScript. [See here for a
+terse list of prerequisites](threejs-prerequisites.html). Most browsers
 that support three.js are auto-updated so most users should
 be able to run this code. If you'd like to make this code run
 on older browsers look into a transpiler like [Babel](http://babel.io).
