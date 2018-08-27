@@ -2,6 +2,12 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
+if ( THREE.Pass === undefined ) {
+
+	console.warn( 'THREE.Pass has been moved into a separate file, "postprocessing/Pass.js". Include it, as well.' );
+
+}
+
 THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.renderer = renderer;
@@ -31,12 +37,6 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 	this.passes = [];
 
 	// dependencies
-
-	if ( THREE.Pass === undefined ) {
-
-		console.error( 'THREE.Pass has been moved into a separate file, "Pass.js". Include it, as well.' );
-
-	}
 
 	if ( THREE.CopyShader === undefined ) {
 
