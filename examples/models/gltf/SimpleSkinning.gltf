@@ -1,0 +1,513 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 64,
+      "max": [
+        4.482270240783691,
+        1.1916500329971313,
+        0.5620899796485901
+      ],
+      "min": [
+        -0.7385400533676147,
+        -0.8083500266075134,
+        -6.14601993560791
+      ],
+      "type": "VEC3",
+      "byteOffset": 0
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 768,
+      "componentType": 5126,
+      "count": 64,
+      "max": [
+        1,
+        1,
+        1
+      ],
+      "min": [
+        -1,
+        -1,
+        -1
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5125,
+      "count": 132,
+      "max": [
+        63
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR",
+      "byteOffset": 0
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 3,
+      "max": [
+        1,
+        0,
+        0,
+        0,
+        0.0007900000200606883,
+        1,
+        0,
+        0,
+        0.015599999576807022,
+        0,
+        1,
+        0,
+        3.7517900466918945,
+        0,
+        0.12797999382019043,
+        1
+      ],
+      "min": [
+        -0.9998800158500671,
+        -0.015599999576807022,
+        -0.0007900000200606883,
+        0,
+        0,
+        0.0006000000284984708,
+        -1,
+        0,
+        0,
+        -0.9998800158500671,
+        -0.000590000010561198,
+        0,
+        0,
+        -0.09928999841213226,
+        0,
+        1
+      ],
+      "type": "MAT4",
+      "byteOffset": 0
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5123,
+      "count": 64,
+      "max": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "min": [
+        1,
+        1,
+        2,
+        2
+      ],
+      "type": "VEC4",
+      "byteOffset": 0
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 64,
+      "max": [
+        1,
+        0.13106000423431396,
+        0,
+        0
+      ],
+      "min": [
+        0.868939995765686,
+        0,
+        0,
+        0
+      ],
+      "type": "VEC4",
+      "byteOffset": 0
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 10,
+      "max": [
+        0.4166699945926666
+      ],
+      "min": [
+        0.041669998317956924
+      ],
+      "type": "SCALAR",
+      "byteOffset": 0
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 10,
+      "max": [
+        -0.006437911186367273,
+        0.8523336052894592,
+        -0.5229341387748718,
+        -0.0009889232460409403
+      ],
+      "min": [
+        -0.009998129680752754,
+        0.4723302721977234,
+        -0.8813651204109192,
+        -0.0044136554934084415
+      ],
+      "type": "VEC4",
+      "byteOffset": 0
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 40,
+      "componentType": 5126,
+      "count": 10,
+      "max": [
+        0.4166699945926666
+      ],
+      "min": [
+        0.041669998317956924
+      ],
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 160,
+      "componentType": 5126,
+      "count": 10,
+      "max": [
+        -0.0010160086676478386,
+        0.8522936701774597,
+        -0.5229744911193848,
+        -0.0070647685788571835
+      ],
+      "min": [
+        -0.0033321231603622437,
+        0.47228026390075684,
+        -0.8814147114753723,
+        -0.00925880204886198
+      ],
+      "type": "VEC4"
+    }
+  ],
+  "animations": [
+    {
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 7,
+            "path": "rotation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 8,
+            "path": "rotation"
+          }
+        }
+      ],
+      "name": "Take 01",
+      "samplers": [
+        {
+          "input": 6,
+          "interpolation": "LINEAR",
+          "output": 7
+        },
+        {
+          "input": 8,
+          "interpolation": "LINEAR",
+          "output": 9
+        }
+      ]
+    }
+  ],
+  "asset": {
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 512,
+      "byteOffset": 0,
+      "byteStride": 8,
+      "name": "shortBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 528,
+      "byteOffset": 512,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1536,
+      "byteOffset": 1040,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1024,
+      "byteOffset": 2576,
+      "byteStride": 16,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 192,
+      "byteOffset": 3600,
+      "byteStride": 64,
+      "name": "floatBufferViews"
+    },
+    {
+      "buffer": 0,
+      "byteLength": 80,
+      "byteOffset": 3792,
+      "name": "floatBufferViews"
+    },
+    {
+      "buffer": 0,
+      "byteLength": 320,
+      "byteOffset": 3872,
+      "byteStride": 16,
+      "name": "floatBufferViews"
+    }
+  ],
+  "buffers": [
+    {
+      "name": "scene",
+      "byteLength": 4192,
+      "uri": "data:application/octet-stream;base64,AgABAAIAAgACAAEAAgACAAEAAgACAAIAAQACAAIAAgACAAEAAgACAAIAAQACAAIAAgACAAIAAgACAAIAAgACAAIAAQACAAIAAgABAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgACAAEAAgACAAIAAQACAAIAAQACAAIAAgABAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAQACAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgABAAIAAgACAAEAAgACAAIAAgACAAIAAgACAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgABAAIAAgACAAEAAgACAAIAAQACAAIAAgAAAAAAAQAAAAIAAAAAAAAAAgAAAAMAAAAEAAAABQAAAAYAAAAEAAAABgAAAAcAAAAIAAAACQAAAAoAAAAIAAAACgAAAAsAAAAMAAAADQAAAA4AAAAMAAAADgAAAA8AAAAQAAAAEQAAABIAAAAQAAAAEgAAABMAAAAUAAAAFQAAABYAAAAUAAAAFgAAABcAAAAJAAAACAAAABgAAAAJAAAAGAAAABkAAAARAAAAEAAAABoAAAARAAAAGgAAABsAAAARAAAAGwAAABwAAAARAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAeAAAAIAAAACEAAAATAAAAEgAAACIAAAATAAAAIgAAACMAAAALAAAACgAAACQAAAALAAAAJAAAACUAAAALAAAAJQAAACYAAAALAAAAJgAAACcAAAAoAAAAKQAAACoAAAAoAAAAKgAAACsAAAAYAAAACAAAACwAAAAYAAAALAAAAC0AAAAUAAAAFwAAAC4AAAAUAAAALgAAAC8AAAAwAAAA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"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ],
+      "name": "Material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.196225211,
+          0.2164051533,
+          0.8000000119,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 0.6
+      },
+      "alphaMode": "OPAQUE"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cube",
+      "primitives": [
+        {
+          "attributes": {
+            "JOINTS_0": 4,
+            "NORMAL": 1,
+            "POSITION": 0,
+            "WEIGHTS_0": 5
+          },
+          "indices": 2,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "name": "RootNode (gltf orientation matrix)",
+      "rotation": [
+        -0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "children": [
+        2
+      ],
+      "name": "RootNode (model correction matrix)"
+    },
+    {
+      "children": [
+        3,
+        5
+      ],
+      "name": "Root"
+    },
+    {
+      "children": [
+        4
+      ],
+      "matrix": [
+        -0.29086000000000006,
+        0.9551700000000001,
+        -0.05519000000000001,
+        0,
+        -0.7711,
+        -0.19988000000000003,
+        0.6045200000000001,
+        0,
+        0.5663900000000001,
+        0.21839000000000003,
+        0.7946700000000001,
+        0,
+        4.076250000000001,
+        1.00545,
+        5.903860000000001,
+        1
+      ],
+      "name": "Lamp"
+    },
+    {
+      "name": "Lamp"
+    },
+    {
+      "children": [
+        6,
+        10,
+        9
+      ],
+      "matrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -1.2499399999999998,
+        -0.19165000000000001,
+        0.4379100000000001,
+        1
+      ],
+      "name": "Armature"
+    },
+    {
+      "children": [
+        7,
+        8
+      ],
+      "name": "Armature_rootJoint"
+    },
+    {
+      "name": "leg.R_Armature",
+      "rotation": [
+        -0.0052362778224051,
+        0.7072955369949341,
+        -0.7068748474121094,
+        -0.005794902332127094
+      ],
+      "scale": [
+        1.000006079673767,
+        1.0000020265579224,
+        0.9999963641166687
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "leg.L_Armature",
+      "rotation": [
+        -0.0052362778224051,
+        0.7072955369949341,
+        -0.7068748474121094,
+        -0.005794902332127094
+      ],
+      "scale": [
+        1.000006079673767,
+        1.0000020265579224,
+        0.9999963641166687
+      ],
+      "translation": [
+        3.749890089035034,
+        0.1251000016927719,
+        -0.15771999955177307
+      ]
+    },
+    {
+      "matrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1.7602800000000003,
+        0.19165000000000001,
+        -0.4379100000000001,
+        1
+      ],
+      "name": "Cube"
+    },
+    {
+      "mesh": 0,
+      "name": "Cube_0",
+      "skin": 0
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "OSG_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 3,
+      "joints": [
+        6,
+        7,
+        8
+      ],
+      "skeleton": 6
+    }
+  ]
+}

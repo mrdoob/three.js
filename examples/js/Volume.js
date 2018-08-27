@@ -374,7 +374,7 @@ THREE.Volume.prototype = {
 			matrix : planeMatrix,
 			planeWidth : planeWidth,
 			planeHeight : planeHeight
-		}
+		};
 
 	},
 

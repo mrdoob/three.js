@@ -33,10 +33,6 @@
 				windowHalfX = window.innerWidth / 2,
 				windowHalfY = window.innerHeight / 2,
 
-				SEPARATION = 200,
-				AMOUNTX = 10,
-				AMOUNTY = 10,
-
 				camera, scene, renderer;
 
 			init();
@@ -44,7 +40,7 @@
 
 			function init() {
 
-				var container, separation = 100, amountX = 50, amountY = 50, particles, particle;
+				var container, particle;
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );

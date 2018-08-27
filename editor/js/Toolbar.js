@@ -40,7 +40,7 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( scale );
 
-	var local = new UI.THREE.Boolean( false, 'local' )
+	var local = new UI.THREE.Boolean( false, 'local' );
 	local.onChange( function () {
 
 		signals.spaceChanged.dispatch( this.getValue() === true ? 'local' : 'world' );
