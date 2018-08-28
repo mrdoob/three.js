@@ -97,7 +97,7 @@
 				this.instanceNo = 0;
 				this.baseObject3d = new THREE.Group();
 
-				this.meshBuilder = new THREE.LoaderSupport.MeshReceiver();
+				this.dataReceiver = new THREE.LoaderSupport.MeshReceiver();
 			};
 
 			MeshSpray.Loader.prototype = {
@@ -107,7 +107,7 @@
 				setLogging: function ( enabled, debug ) {
 					this.logging.enabled = enabled === true;
 					this.logging.debug = debug === true;
-					this.meshBuilder.setLogging( this.logging.enabled, this.logging.debug );
+					this.dataReceiver.setLogging( this.logging.enabled, this.logging.debug );
 				},
 
 				setBaseObject3d: function ( baseObject3d ) {
@@ -115,7 +115,7 @@
 				},
 
 				_setCallbacks: function ( onParseProgress, onMeshAlter, onLoadMaterials ) {
-					this.meshBuilder._setCallbacks( onParseProgress, onMeshAlter, onLoadMaterials );
+					this.dataReceiver._setCallbacks( onParseProgress, onMeshAlter, onLoadMaterials );
 				},
 
 				buildWorkerCode: function ( codeSerializer ) {
@@ -132,7 +132,8 @@
 						libs: {
 							locations: [ 'build/three.min.js' ],
 							path: '../'
-						}
+						},
+						provideThree: true
 					}
 				}
 			};
@@ -146,7 +147,7 @@
 					this.debug = false;
 					this.dimension = 200;
 					this.quantity = 1;
-					this.callbackMeshBuilder = null;
+					this.callbackDataReceiver = null;
 					this.serializedMaterials = [];
 					this.logging = {
 						enabled: true,
@@ -159,8 +160,8 @@
 					this.logging.debug = debug === true;
 				};
 
-				Parser.prototype.setCallbackMeshBuilder = function ( callbackMeshBuilder ) {
-					this.callbackMeshBuilder = callbackMeshBuilder;
+				Parser.prototype.setCallbackDataReceiver = function ( callbackDataReceiver ) {
+					this.callbackDataReceiver = callbackDataReceiver;
 				};
 
 				Parser.prototype.setSerializedMaterials = function ( serializedMaterials ) {
@@ -248,17 +249,19 @@
 					var newSerializedMaterials = {};
 					newSerializedMaterials[ materialName ] = defaultVertexColorMaterialDouble.toJSON();
 					var payload = {
-						cmd: 'materialData',
+						cmd: 'data',
+						type: 'material',
 						materials: {
 							serializedMaterials: newSerializedMaterials
 						}
 					};
-					this.callbackMeshBuilder( payload );
+					this.callbackDataReceiver( payload );
 
 					this.globalObjectCount++;
-					this.callbackMeshBuilder(
+					this.callbackDataReceiver(
 						{
-							cmd: 'meshData',
+							cmd: 'data',
+							type: 'mesh',
 							progress: {
 								numericalValue: 1.0
 							},
@@ -360,7 +363,7 @@
 					var maxQueueSize = 1024;
 					var maxWebWorkers = 4;
 					var radius = 640;
-					var workerLoaderDirector = new THREE.WorkerLoader.Director( maxQueueSize, maxWebWorkers )
+					var workerLoaderDirector = new THREE.WorkerLoader.Director()
 						.setLogging( false, false )
 						.setCrossOrigin( 'anonymous' );
 
@@ -382,6 +385,8 @@
 						return override;
 					};
 
+					workerLoaderDirector.createWorkerPool( 'meshspray', maxQueueSize );
+					workerLoaderDirector.updateWorkerPool( 'meshspray', maxWebWorkers );
 					var pivot;
 					var s, t, r, x, y, z;
 					var globalObjectCount = 0;
@@ -410,6 +415,7 @@
 								sendMaterialsJson: true
 							} )
 							.setLoaderConfig( MeshSpray.Loader )
+							.setExtension( 'meshspray' )
 							.addResourceDescriptor( rdMeshSpray )
 							.setCallbacksApp( callbackOnReport )
 							.setCallbacksParsing( callbackOnMesh )
@@ -418,7 +424,6 @@
 
 						workerLoaderDirector.enqueueForRun( loadingTaskConfig );
 					}
-					workerLoaderDirector.prepareWorkers();
 					workerLoaderDirector.processQueue();
 				};
 
