@@ -1,3 +1,4 @@
+import { Vector2 } from './Vector2.js';
 import { Vector3 } from './Vector3.js';
 
 /**
@@ -89,6 +90,29 @@ Object.assign( Triangle, {
 
 			// barycentric coordinates must always sum to 1
 			return target.set( 1 - u - v, v, u );
+
+		};
+
+	}(),
+
+	uvIntersection: function () {
+
+		var barycoord = new Vector3();
+		var v1 = new Vector2();
+		var v2 = new Vector2();
+		var v3 = new Vector2();
+
+		return function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3, result ) {
+
+			this.getBarycoord( point, p1, p2, p3, barycoord );
+
+			v1.copy( uv1 ).multiplyScalar( barycoord.x );
+			v2.copy( uv2 ).multiplyScalar( barycoord.y );
+			v3.copy( uv3 ).multiplyScalar( barycoord.z );
+
+			v1.add( v2 ).add( v3 );
+
+			return result.copy( v1 );
 
 		};
 
