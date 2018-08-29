@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\shaders\OceanShaders.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['../../../build/three.module.js'], factory) :
+	(factory(global.THREE));
+}(this, (function (THREE) { 'use strict';
+
 // Author: Aleksandr Albert
 // Website: www.routter.co.tt
 
@@ -363,3 +373,5 @@ THREE.ShaderLib[ 'ocean_main' ] = {
 		'}'
 	].join( '\n' )
 };
+
+})));

@@ -1,11 +1,22 @@
 /**
+ * Generated from 'examples\modules\shaders\UnpackDepthRGBAShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Unpack RGBA depth shader
  * - show RGBA encoded depth as monochrome color
  */
 
-THREE.UnpackDepthRGBAShader = {
+
+exports.UnpackDepthRGBAShader = {
 
 	uniforms: {
 
@@ -47,3 +58,7 @@ THREE.UnpackDepthRGBAShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

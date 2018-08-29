@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\ParametricGeometries.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  * @author zz85
  *
@@ -5,7 +15,9 @@
  *
  */
 
-THREE.ParametricGeometries = {
+
+
+exports.ParametricGeometries = {
 
 	klein: function ( v, u, target ) {
 
@@ -96,7 +108,7 @@ THREE.ParametricGeometries = {
  *
  *********************************************/
 
-THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, segmentsRadius, closed, debug ) {
+exports.ParametricGeometries.TubeGeometry = function ( path, segments, radius, segmentsRadius, closed, debug ) {
 
 	this.path = path;
 	this.segments = segments || 64;
@@ -154,8 +166,8 @@ THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, seg
 
 };
 
-THREE.ParametricGeometries.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ParametricGeometries.TubeGeometry.prototype.constructor = THREE.ParametricGeometries.TubeGeometry;
+exports.ParametricGeometries.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+exports.ParametricGeometries.TubeGeometry.prototype.constructor = exports.ParametricGeometries.TubeGeometry;
 
 
 /*********************************************
@@ -163,7 +175,7 @@ THREE.ParametricGeometries.TubeGeometry.prototype.constructor = THREE.Parametric
   * Parametric Replacement for TorusKnotGeometry
   *
   *********************************************/
-THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segmentsT, segmentsR, p, q ) {
+exports.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segmentsT, segmentsR, p, q ) {
 
 	this.radius = radius || 200;
 	this.tube = tube || 40;
@@ -201,12 +213,12 @@ THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segments
 	var radiusSegments = segmentsR;
 	var extrudePath = new TorusKnotCurve();
 
-	THREE.ParametricGeometries.TubeGeometry.call( this, extrudePath, segments, tube, radiusSegments, true, false );
+	exports.ParametricGeometries.TubeGeometry.call( this, extrudePath, segments, tube, radiusSegments, true, false );
 
 };
 
-THREE.ParametricGeometries.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ParametricGeometries.TorusKnotGeometry.prototype.constructor = THREE.ParametricGeometries.TorusKnotGeometry;
+exports.ParametricGeometries.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
+exports.ParametricGeometries.TorusKnotGeometry.prototype.constructor = exports.ParametricGeometries.TorusKnotGeometry;
 
 
 /*********************************************
@@ -214,7 +226,7 @@ THREE.ParametricGeometries.TorusKnotGeometry.prototype.constructor = THREE.Param
   * Parametric Replacement for SphereGeometry
   *
   *********************************************/
-THREE.ParametricGeometries.SphereGeometry = function ( size, u, v ) {
+exports.ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 
 	function sphere( u, v, target ) {
 
@@ -233,8 +245,8 @@ THREE.ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 
 };
 
-THREE.ParametricGeometries.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ParametricGeometries.SphereGeometry.prototype.constructor = THREE.ParametricGeometries.SphereGeometry;
+exports.ParametricGeometries.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
+exports.ParametricGeometries.SphereGeometry.prototype.constructor = exports.ParametricGeometries.SphereGeometry;
 
 
 /*********************************************
@@ -243,7 +255,7 @@ THREE.ParametricGeometries.SphereGeometry.prototype.constructor = THREE.Parametr
   *
   *********************************************/
 
-THREE.ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
+exports.ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
 
 	function plane( u, v, target ) {
 
@@ -259,5 +271,9 @@ THREE.ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidt
 
 };
 
-THREE.ParametricGeometries.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ParametricGeometries.PlaneGeometry.prototype.constructor = THREE.ParametricGeometries.PlaneGeometry;
+exports.ParametricGeometries.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
+exports.ParametricGeometries.PlaneGeometry.prototype.constructor = exports.ParametricGeometries.PlaneGeometry;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

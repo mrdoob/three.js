@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\DOFMipMapShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Depth-of-field shader using mipmaps
@@ -6,7 +16,8 @@
  * - requires power-of-2 sized render target with enabled mipmaps
  */
 
-THREE.DOFMipMapShader = {
+
+exports.DOFMipMapShader = {
 
 	uniforms: {
 
@@ -56,3 +67,7 @@ THREE.DOFMipMapShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

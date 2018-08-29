@@ -1,8 +1,19 @@
 /**
+ * Generated from 'examples\modules\MD2CharacterComplex.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js'), require('./loaders/MD2Loader.js'), require('./MorphBlendMesh.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js', './loaders/MD2Loader.js', './MorphBlendMesh.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,MD2Loader_js,MorphBlendMesh_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MD2CharacterComplex = function () {
+
+exports.MD2CharacterComplex = function () {
 
 	var scope = this;
 
@@ -152,7 +163,7 @@ THREE.MD2CharacterComplex = function () {
 
 		// BODY
 
-		var loader = new THREE.MD2Loader();
+		var loader = new MD2Loader_js.MD2Loader();
 
 		loader.load( config.baseUrl + config.body, function( geo ) {
 
@@ -528,7 +539,7 @@ THREE.MD2CharacterComplex = function () {
 
 		//
 
-		var mesh = new THREE.MorphBlendMesh( geometry, materialTexture );
+		var mesh = new MorphBlendMesh_js.MorphBlendMesh( geometry, materialTexture );
 		mesh.rotation.y = - Math.PI / 2;
 
 		//
@@ -558,3 +569,7 @@ THREE.MD2CharacterComplex = function () {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,11 +1,22 @@
 /**
+ * Generated from 'examples\modules\postprocessing\SAOPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/CopyShader.js'), require('../shaders/DepthLimitedBlurShader.js'), require('../shaders/SAOShader.js'), require('../shaders/UnpackDepthRGBAShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/CopyShader.js', '../shaders/DepthLimitedBlurShader.js', '../shaders/SAOShader.js', '../shaders/UnpackDepthRGBAShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE,global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,CopyShader_js,DepthLimitedBlurShader_js,SAOShader_js,UnpackDepthRGBAShader_js) { 'use strict';
+
+/**
  * @author ludobaka / ludobaka.github.io
  * SAO implementation inspired from bhouston previous SAO work
  */
 
-THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution ) {
 
-	THREE.Pass.call( this );
+exports.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution ) {
+
+	Pass_js.Pass.call( this );
 
 	this.scene = scene;
 	this.camera = camera;
@@ -68,17 +79,17 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.normalMaterial = new THREE.MeshNormalMaterial();
 	this.normalMaterial.blending = THREE.NoBlending;
 
-	if ( THREE.SAOShader === undefined ) {
+	if ( SAOShader_js.SAOShader === undefined ) {
 
-		console.error( 'THREE.SAOPass relies on THREE.SAOShader' );
+		console.error( '__SAOPass relies on SAOShader' );
 
 	}
 
 	this.saoMaterial = new THREE.ShaderMaterial( {
-		defines: Object.assign( {}, THREE.SAOShader.defines ),
-		fragmentShader: THREE.SAOShader.fragmentShader,
-		vertexShader: THREE.SAOShader.vertexShader,
-		uniforms: THREE.UniformsUtils.clone( THREE.SAOShader.uniforms )
+		defines: Object.assign( {}, SAOShader_js.SAOShader.defines ),
+		fragmentShader: SAOShader_js.SAOShader.fragmentShader,
+		vertexShader: SAOShader_js.SAOShader.vertexShader,
+		uniforms: THREE.UniformsUtils.clone( SAOShader_js.SAOShader.uniforms )
 	} );
 	this.saoMaterial.extensions.derivatives = true;
 	this.saoMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
@@ -91,17 +102,17 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 	this.saoMaterial.blending = THREE.NoBlending;
 
-	if ( THREE.DepthLimitedBlurShader === undefined ) {
+	if ( DepthLimitedBlurShader_js.DepthLimitedBlurShader === undefined ) {
 
-		console.error( 'THREE.SAOPass relies on THREE.DepthLimitedBlurShader' );
+		console.error( '__SAOPass relies on DepthLimitedBlurShader' );
 
 	}
 
 	this.vBlurMaterial = new THREE.ShaderMaterial( {
-		uniforms: THREE.UniformsUtils.clone( THREE.DepthLimitedBlurShader.uniforms ),
-		defines: Object.assign( {}, THREE.DepthLimitedBlurShader.defines ),
-		vertexShader: THREE.DepthLimitedBlurShader.vertexShader,
-		fragmentShader: THREE.DepthLimitedBlurShader.fragmentShader
+		uniforms: THREE.UniformsUtils.clone( DepthLimitedBlurShader_js.DepthLimitedBlurShader.uniforms ),
+		defines: Object.assign( {}, DepthLimitedBlurShader_js.DepthLimitedBlurShader.defines ),
+		vertexShader: DepthLimitedBlurShader_js.DepthLimitedBlurShader.vertexShader,
+		fragmentShader: DepthLimitedBlurShader_js.DepthLimitedBlurShader.fragmentShader
 	} );
 	this.vBlurMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 	this.vBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
@@ -111,10 +122,10 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.vBlurMaterial.blending = THREE.NoBlending;
 
 	this.hBlurMaterial = new THREE.ShaderMaterial( {
-		uniforms: THREE.UniformsUtils.clone( THREE.DepthLimitedBlurShader.uniforms ),
-		defines: Object.assign( {}, THREE.DepthLimitedBlurShader.defines ),
-		vertexShader: THREE.DepthLimitedBlurShader.vertexShader,
-		fragmentShader: THREE.DepthLimitedBlurShader.fragmentShader
+		uniforms: THREE.UniformsUtils.clone( DepthLimitedBlurShader_js.DepthLimitedBlurShader.uniforms ),
+		defines: Object.assign( {}, DepthLimitedBlurShader_js.DepthLimitedBlurShader.defines ),
+		vertexShader: DepthLimitedBlurShader_js.DepthLimitedBlurShader.vertexShader,
+		fragmentShader: DepthLimitedBlurShader_js.DepthLimitedBlurShader.fragmentShader
 	} );
 	this.hBlurMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 	this.hBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
@@ -123,16 +134,16 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.hBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 	this.hBlurMaterial.blending = THREE.NoBlending;
 
-	if ( THREE.CopyShader === undefined ) {
+	if ( CopyShader_js.CopyShader === undefined ) {
 
-		console.error( 'THREE.SAOPass relies on THREE.CopyShader' );
+		console.error( '__SAOPass relies on CopyShader' );
 
 	}
 
 	this.materialCopy = new THREE.ShaderMaterial( {
-		uniforms: THREE.UniformsUtils.clone( THREE.CopyShader.uniforms ),
-		vertexShader: THREE.CopyShader.vertexShader,
-		fragmentShader: THREE.CopyShader.fragmentShader,
+		uniforms: THREE.UniformsUtils.clone( CopyShader_js.CopyShader.uniforms ),
+		vertexShader: CopyShader_js.CopyShader.vertexShader,
+		fragmentShader: CopyShader_js.CopyShader.fragmentShader,
 		blending: THREE.NoBlending
 	} );
 	this.materialCopy.transparent = true;
@@ -146,16 +157,16 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.materialCopy.blendDstAlpha = THREE.ZeroFactor;
 	this.materialCopy.blendEquationAlpha = THREE.AddEquation;
 
-	if ( THREE.CopyShader === undefined ) {
+	if ( CopyShader_js.CopyShader === undefined ) {
 
-		console.error( 'THREE.SAOPass relies on THREE.UnpackDepthRGBAShader' );
+		console.error( '__SAOPass relies on UnpackDepthRGBAShader' );
 
 	}
 
 	this.depthCopy = new THREE.ShaderMaterial( {
-		uniforms: THREE.UniformsUtils.clone( THREE.UnpackDepthRGBAShader.uniforms ),
-		vertexShader: THREE.UnpackDepthRGBAShader.vertexShader,
-		fragmentShader: THREE.UnpackDepthRGBAShader.fragmentShader,
+		uniforms: THREE.UniformsUtils.clone( UnpackDepthRGBAShader_js.UnpackDepthRGBAShader.uniforms ),
+		vertexShader: UnpackDepthRGBAShader_js.UnpackDepthRGBAShader.vertexShader,
+		fragmentShader: UnpackDepthRGBAShader_js.UnpackDepthRGBAShader.fragmentShader,
 		blending: THREE.NoBlending
 	} );
 
@@ -166,7 +177,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 };
 
-THREE.SAOPass.OUTPUT = {
+exports.SAOPass.OUTPUT = {
 	'Beauty': 1,
 	'Default': 0,
 	'SAO': 2,
@@ -174,8 +185,8 @@ THREE.SAOPass.OUTPUT = {
 	'Normal': 4
 };
 
-THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-	constructor: THREE.SAOPass,
+exports.SAOPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
+	constructor: exports.SAOPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -223,8 +234,8 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		this.params.saoBlurRadius = Math.floor( this.params.saoBlurRadius );
 		if ( ( this.prevStdDev !== this.params.saoBlurStdDev ) || ( this.prevNumSamples !== this.params.saoBlurRadius ) ) {
 
-			THREE.BlurShaderUtils.configure( this.vBlurMaterial, this.params.saoBlurRadius, this.params.saoBlurStdDev, new THREE.Vector2( 0, 1 ) );
-			THREE.BlurShaderUtils.configure( this.hBlurMaterial, this.params.saoBlurRadius, this.params.saoBlurStdDev, new THREE.Vector2( 1, 0 ) );
+			DepthLimitedBlurShader_js.BlurShaderUtils.configure( this.vBlurMaterial, this.params.saoBlurRadius, this.params.saoBlurStdDev, new THREE.Vector2( 0, 1 ) );
+			DepthLimitedBlurShader_js.BlurShaderUtils.configure( this.hBlurMaterial, this.params.saoBlurRadius, this.params.saoBlurStdDev, new THREE.Vector2( 1, 0 ) );
 			this.prevStdDev = this.params.saoBlurStdDev;
 			this.prevNumSamples = this.params.saoBlurRadius;
 
@@ -386,3 +397,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,4 +1,14 @@
-THREE.Pass = function () {
+/**
+ * Generated from 'examples\modules\postprocessing\Pass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+exports.Pass = function () {
 
 	// if set to true, the pass is processed by the composer
 	this.enabled = true;
@@ -14,14 +24,18 @@ THREE.Pass = function () {
 
 };
 
-Object.assign( THREE.Pass.prototype, {
+Object.assign( exports.Pass.prototype, {
 
 	setSize: function ( width, height ) {},
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
+		console.error( '__Pass: .render() must be implemented in derived pass.' );
 
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

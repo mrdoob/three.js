@@ -1,15 +1,26 @@
 /**
+ * Generated from 'examples\modules\postprocessing\FilmPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/FilmShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/FilmShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,FilmShader_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
-	THREE.Pass.call( this );
+exports.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
-	if ( THREE.FilmShader === undefined )
-		console.error( "THREE.FilmPass relies on THREE.FilmShader" );
+	Pass_js.Pass.call( this );
 
-	var shader = THREE.FilmShader;
+	if ( FilmShader_js.FilmShader === undefined )
+		console.error( "__FilmPass relies on FilmShader" );
+
+	var shader = FilmShader_js.FilmShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -35,9 +46,9 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 };
 
-THREE.FilmPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.FilmPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.FilmPass,
+	constructor: exports.FilmPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -59,3 +70,7 @@ THREE.FilmPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

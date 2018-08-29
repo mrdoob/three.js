@@ -1,18 +1,30 @@
+/**
+ * Generated from 'examples\modules\loaders\TGALoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  * @author Daosheng Mu / https://github.com/DaoshengMu/
  * @author mrdoob / http://mrdoob.com/
  * @author takahirox / https://github.com/takahirox/
  */
 
-THREE.TGALoader = function ( manager ) {
+
+
+exports.TGALoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.TGALoader.prototype = {
+exports.TGALoader.prototype = {
 
-	constructor: THREE.TGALoader,
+	constructor: exports.TGALoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -55,7 +67,7 @@ THREE.TGALoader.prototype = {
 				case TGA_TYPE_RLE_INDEXED:
 					if ( header.colormap_length > 256 || header.colormap_size !== 24 || header.colormap_type !== 1 ) {
 
-						console.error( 'THREE.TGALoader: Invalid type colormap data for indexed type.' );
+						console.error( '__TGALoader: Invalid type colormap data for indexed type.' );
 
 					}
 					break;
@@ -68,7 +80,7 @@ THREE.TGALoader.prototype = {
 				case TGA_TYPE_RLE_GREY:
 					if ( header.colormap_type ) {
 
-						console.error( 'THREE.TGALoader: Invalid type colormap data for colormap type.' );
+						console.error( '__TGALoader: Invalid type colormap data for colormap type.' );
 
 					}
 					break;
@@ -76,12 +88,12 @@ THREE.TGALoader.prototype = {
 				// What the need of a file without data ?
 
 				case TGA_TYPE_NO_DATA:
-					console.error( 'THREE.TGALoader: No data.' );
+					console.error( '__TGALoader: No data.' );
 
 				// Invalid type ?
 
 				default:
-					console.error( 'THREE.TGALoader: Invalid type "%s".', header.image_type );
+					console.error( '__TGALoader: Invalid type "%s".', header.image_type );
 
 			}
 
@@ -89,7 +101,7 @@ THREE.TGALoader.prototype = {
 
 			if ( header.width <= 0 || header.height <= 0 ) {
 
-				console.error( 'THREE.TGALoader: Invalid image size.' );
+				console.error( '__TGALoader: Invalid image size.' );
 
 			}
 
@@ -98,7 +110,7 @@ THREE.TGALoader.prototype = {
 			if ( header.pixel_size !== 8 && header.pixel_size !== 16 &&
 				header.pixel_size !== 24 && header.pixel_size !== 32 ) {
 
-				console.error( 'THREE.TGALoader: Invalid pixel size "%s".', header.pixel_size );
+				console.error( '__TGALoader: Invalid pixel size "%s".', header.pixel_size );
 
 			}
 
@@ -393,7 +405,7 @@ THREE.TGALoader.prototype = {
 						break;
 
 					default:
-						console.error( 'THREE.TGALoader: Format not supported.' );
+						console.error( '__TGALoader: Format not supported.' );
 						break;
 
 				}
@@ -419,7 +431,7 @@ THREE.TGALoader.prototype = {
 						break;
 
 					default:
-						console.error( 'THREE.TGALoader: Format not supported.' );
+						console.error( '__TGALoader: Format not supported.' );
 						break;
 
 				}
@@ -450,7 +462,7 @@ THREE.TGALoader.prototype = {
 			TGA_ORIGIN_UL = 0x02,
 			TGA_ORIGIN_UR = 0x03;
 
-		if ( buffer.length < 19 ) console.error( 'THREE.TGALoader: Not enough data to contain header.' );
+		if ( buffer.length < 19 ) console.error( '__TGALoader: Not enough data to contain header.' );
 
 		var content = new Uint8Array( buffer ),
 			offset = 0,
@@ -477,7 +489,7 @@ THREE.TGALoader.prototype = {
 
 		if ( header.id_length + offset > buffer.length ) {
 
-			console.error( 'THREE.TGALoader: No data.' );
+			console.error( '__TGALoader: No data.' );
 
 		}
 
@@ -546,3 +558,7 @@ THREE.TGALoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

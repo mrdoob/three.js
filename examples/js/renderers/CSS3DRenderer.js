@@ -1,10 +1,24 @@
 /**
+ * Generated from 'examples\modules\renderers\CSS3DRenderer.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  * @author mrdoob / http://mrdoob.com/
  * @author yomotsu / https://yomotsu.net/
  */
 
-THREE.CSS3DObject = function ( element ) {
+
+
+
+
+exports.CSS3DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
@@ -23,23 +37,23 @@ THREE.CSS3DObject = function ( element ) {
 
 };
 
-THREE.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
-THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject;
+exports.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
+exports.CSS3DObject.prototype.constructor = exports.CSS3DObject;
 
-THREE.CSS3DSprite = function ( element ) {
+exports.CSS3DSprite = function ( element ) {
 
-	THREE.CSS3DObject.call( this, element );
+	exports.CSS3DObject.call( this, element );
 
 };
 
-THREE.CSS3DSprite.prototype = Object.create( THREE.CSS3DObject.prototype );
-THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
+exports.CSS3DSprite.prototype = Object.create( exports.CSS3DObject.prototype );
+exports.CSS3DSprite.prototype.constructor = exports.CSS3DSprite;
 
 //
 
-THREE.CSS3DRenderer = function () {
+exports.CSS3DRenderer = function () {
 
-	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
+	console.log( '__CSS3DRenderer', THREE.REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -157,11 +171,11 @@ THREE.CSS3DRenderer = function () {
 
 	function renderObject( object, camera, cameraCSSMatrix ) {
 
-		if ( object instanceof THREE.CSS3DObject ) {
+		if ( object instanceof exports.CSS3DObject ) {
 
 			var style;
 
-			if ( object instanceof THREE.CSS3DSprite ) {
+			if ( object instanceof exports.CSS3DSprite ) {
 
 				// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
 
@@ -241,7 +255,7 @@ THREE.CSS3DRenderer = function () {
 
 		scene.traverse( function ( object ) {
 
-			if ( object instanceof THREE.CSS3DObject ) result.push( object );
+			if ( object instanceof exports.CSS3DObject ) result.push( object );
 
 		} );
 
@@ -322,3 +336,7 @@ THREE.CSS3DRenderer = function () {
 	};
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\renderers\CanvasRenderer.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Projector.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Projector.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,Projector_js) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SpriteCanvasMaterial = function ( parameters ) {
+
+
+exports.SpriteCanvasMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -15,13 +27,13 @@ THREE.SpriteCanvasMaterial = function ( parameters ) {
 
 };
 
-THREE.SpriteCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.SpriteCanvasMaterial.prototype.constructor = THREE.SpriteCanvasMaterial;
-THREE.SpriteCanvasMaterial.prototype.isSpriteCanvasMaterial = true;
+exports.SpriteCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
+exports.SpriteCanvasMaterial.prototype.constructor = exports.SpriteCanvasMaterial;
+exports.SpriteCanvasMaterial.prototype.isSpriteCanvasMaterial = true;
 
-THREE.SpriteCanvasMaterial.prototype.clone = function () {
+exports.SpriteCanvasMaterial.prototype.clone = function () {
 
-	var material = new THREE.SpriteCanvasMaterial();
+	var material = new exports.SpriteCanvasMaterial();
 
 	material.copy( this );
 	material.color.copy( this.color );
@@ -33,15 +45,15 @@ THREE.SpriteCanvasMaterial.prototype.clone = function () {
 
 //
 
-THREE.CanvasRenderer = function ( parameters ) {
+exports.CanvasRenderer = function ( parameters ) {
 
-	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
+	console.log( '__CanvasRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 
 	var _this = this,
 		_renderData, _elements, _lights,
-		_projector = new THREE.Projector(),
+		_projector = new Projector_js.Projector(),
 
 		_canvas = parameters.canvas !== undefined
 				 ? parameters.canvas
@@ -223,7 +235,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setClearColorHex = function ( hex, alpha ) {
 
-		console.warn( 'THREE.CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
+		console.warn( '__CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
 		this.setClearColor( hex, alpha );
 
 	};
@@ -301,7 +313,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( camera.isCamera === undefined ) {
 
-			console.error( 'THREE.CanvasRenderer.render: camera is not an instance of THREE.Camera.' );
+			console.error( '__CanvasRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
 
 		}
@@ -351,14 +363,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_elemBox.makeEmpty();
 
-			if ( element instanceof THREE.RenderableSprite ) {
+			if ( element instanceof Projector_js.RenderableSprite ) {
 
 				_v1 = element;
 				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
 				renderSprite( _v1, element, material );
 
-			} else if ( element instanceof THREE.RenderableLine ) {
+			} else if ( element instanceof Projector_js.RenderableLine ) {
 
 				_v1 = element.v1; _v2 = element.v2;
 
@@ -376,7 +388,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableFace ) {
+			} else if ( element instanceof Projector_js.RenderableFace ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
@@ -1151,3 +1163,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

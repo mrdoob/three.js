@@ -1,11 +1,23 @@
 /**
+ * Generated from 'examples\modules\effects\AnaglyphEffect.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author marklundin / http://mark-lundin.com/
  * @author alteredq / http://alteredqualia.com/
  * @author tschw
  */
 
-THREE.AnaglyphEffect = function ( renderer, width, height ) {
+
+
+exports.AnaglyphEffect = function ( renderer, width, height ) {
 
 	// Matrices generated with angler.js https://github.com/tschw/angler.js/
 	// (in column-major element order, as accepted by WebGL)
@@ -150,3 +162,7 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 	};
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

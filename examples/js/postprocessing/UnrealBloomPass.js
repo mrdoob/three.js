@@ -1,12 +1,23 @@
 /**
+ * Generated from 'examples\modules\postprocessing\UnrealBloomPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./BloomPass.js'), require('./Pass.js'), require('../shaders/CopyShader.js'), require('../shaders/LuminosityHighPassShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './BloomPass.js', './Pass.js', '../shaders/CopyShader.js', '../shaders/LuminosityHighPassShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,BloomPass_js,Pass_js,CopyShader_js,LuminosityHighPassShader_js) { 'use strict';
+
+/**
  * @author spidersharma / http://eduperiment.com/
  *
  * Inspired from Unreal Engine
  * https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
  */
-THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
-	THREE.Pass.call( this );
+exports.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
+
+	Pass_js.Pass.call( this );
 
 	this.strength = ( strength !== undefined ) ? strength : 1;
 	this.radius = radius;
@@ -52,10 +63,10 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	// luminosity high pass material
 
-	if ( THREE.LuminosityHighPassShader === undefined )
-		console.error( "THREE.UnrealBloomPass relies on THREE.LuminosityHighPassShader" );
+	if ( LuminosityHighPassShader_js.LuminosityHighPassShader === undefined )
+		console.error( "__UnrealBloomPass relies on LuminosityHighPassShader" );
 
-	var highPassShader = THREE.LuminosityHighPassShader;
+	var highPassShader = LuminosityHighPassShader_js.LuminosityHighPassShader;
 	this.highPassUniforms = THREE.UniformsUtils.clone( highPassShader.uniforms );
 
 	this.highPassUniforms[ "luminosityThreshold" ].value = threshold;
@@ -104,13 +115,13 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 	this.compositeMaterial.uniforms[ "bloomTintColors" ].value = this.bloomTintColors;
 
 	// copy material
-	if ( THREE.CopyShader === undefined ) {
+	if ( CopyShader_js.CopyShader === undefined ) {
 
-		console.error( "THREE.BloomPass relies on THREE.CopyShader" );
+		console.error( "BloomPass relies on CopyShader" );
 
 	}
 
-	var copyShader = THREE.CopyShader;
+	var copyShader = CopyShader_js.CopyShader;
 
 	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 	this.copyUniforms[ "opacity" ].value = 1.0;
@@ -142,9 +153,9 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 };
 
-THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.UnrealBloomPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.UnrealBloomPass,
+	constructor: exports.UnrealBloomPass,
 
 	dispose: function () {
 
@@ -224,11 +235,11 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			this.quad.material = this.separableBlurMaterials[ i ];
 
 			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = inputRenderTarget.texture;
-			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionX;
+			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = exports.UnrealBloomPass.BlurDirectionX;
 			renderer.render( this.scene, this.camera, this.renderTargetsHorizontal[ i ], true );
 
 			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = this.renderTargetsHorizontal[ i ].texture;
-			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionY;
+			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = exports.UnrealBloomPass.BlurDirectionY;
 			renderer.render( this.scene, this.camera, this.renderTargetsVertical[ i ], true );
 
 			inputRenderTarget = this.renderTargetsVertical[ i ];
@@ -380,5 +391,9 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 } );
 
-THREE.UnrealBloomPass.BlurDirectionX = new THREE.Vector2( 1.0, 0.0 );
-THREE.UnrealBloomPass.BlurDirectionY = new THREE.Vector2( 0.0, 1.0 );
+exports.UnrealBloomPass.BlurDirectionX = new THREE.Vector2( 1.0, 0.0 );
+exports.UnrealBloomPass.BlurDirectionY = new THREE.Vector2( 0.0, 1.0 );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

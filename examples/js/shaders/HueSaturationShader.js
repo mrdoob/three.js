@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\HueSaturationShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author tapio / http://tapio.github.com/
  *
  * Hue and saturation adjustment
@@ -7,7 +17,8 @@
  * saturation: -1 to 1 (-1 is solid gray, 0 is no change, and 1 is maximum contrast)
  */
 
-THREE.HueSaturationShader = {
+
+exports.HueSaturationShader = {
 
 	uniforms: {
 
@@ -67,3 +78,7 @@ THREE.HueSaturationShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

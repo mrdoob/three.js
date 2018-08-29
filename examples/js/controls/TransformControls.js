@@ -1,8 +1,22 @@
 /**
+ * Generated from 'examples\modules\controls\TransformControls.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author arodic / https://github.com/arodic
  */
 
-THREE.TransformControls = function ( camera, domElement ) {
+
+
+
+
+exports.TransformControls = function ( camera, domElement ) {
 
 	THREE.Object3D.call( this );
 
@@ -10,10 +24,10 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	this.visible = false;
 
-	var _gizmo = new THREE.TransformControlsGizmo();
+	var _gizmo = new exports.TransformControlsGizmo();
 	this.add( _gizmo );
 
-	var _plane = new THREE.TransformControlsPlane();
+	var _plane = new exports.TransformControlsPlane();
 	this.add( _plane );
 
 	var scope = this;
@@ -602,22 +616,22 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	this.update = function () {
 
-		console.warn( 'THREE.TransformControls: update function has been depricated.' );
+		console.warn( '__TransformControls: update function has been depricated.' );
 
-	}
+	};
 
 };
 
-THREE.TransformControls.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+exports.TransformControls.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
 
-  constructor: THREE.TransformControls,
+  constructor: exports.TransformControls,
 
   isTransformControls: true
 
 } );
 
 
-THREE.TransformControlsGizmo = function () {
+exports.TransformControlsGizmo = function () {
 
 	'use strict';
 
@@ -729,7 +743,7 @@ THREE.TransformControlsGizmo = function () {
 
 	var TranslateHelperGeometry = function( radius, arc ) {
 
-		var geometry = new THREE.BufferGeometry()
+		var geometry = new THREE.BufferGeometry();
 
 		geometry.addAttribute('position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
 
@@ -1358,16 +1372,16 @@ THREE.TransformControlsGizmo = function () {
 
 };
 
-THREE.TransformControlsGizmo.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+exports.TransformControlsGizmo.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
 
-	constructor: THREE.TransformControlsGizmo,
+	constructor: exports.TransformControlsGizmo,
 
 	isTransformControlsGizmo: true
 
 } );
 
 
-THREE.TransformControlsPlane = function () {
+exports.TransformControlsPlane = function () {
 
 	'use strict';
 
@@ -1461,10 +1475,14 @@ THREE.TransformControlsPlane = function () {
 
 };
 
-THREE.TransformControlsPlane.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
+exports.TransformControlsPlane.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
 
-	constructor: THREE.TransformControlsPlane,
+	constructor: exports.TransformControlsPlane,
 
 	isTransformControlsPlane: true
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

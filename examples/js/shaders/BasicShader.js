@@ -1,10 +1,21 @@
 /**
+ * Generated from 'examples\modules\shaders\BasicShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author mrdoob / http://www.mrdoob.com
  *
  * Simple test shader
  */
 
-THREE.BasicShader = {
+
+exports.BasicShader = {
 
 	uniforms: {},
 
@@ -29,3 +40,7 @@ THREE.BasicShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\VignetteShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Vignette shader
@@ -6,7 +16,8 @@
  * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
  */
 
-THREE.VignetteShader = {
+
+exports.VignetteShader = {
 
 	uniforms: {
 
@@ -61,3 +72,7 @@ THREE.VignetteShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

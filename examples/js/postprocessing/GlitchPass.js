@@ -1,14 +1,25 @@
 /**
+ * Generated from 'examples\modules\postprocessing\GlitchPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/DigitalGlitch.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/DigitalGlitch.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,DigitalGlitch_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.GlitchPass = function ( dt_size ) {
 
-	THREE.Pass.call( this );
+exports.GlitchPass = function ( dt_size ) {
 
-	if ( THREE.DigitalGlitch === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
+	Pass_js.Pass.call( this );
 
-	var shader = THREE.DigitalGlitch;
+	if ( DigitalGlitch_js.DigitalGlitch === undefined ) console.error( "__GlitchPass relies on DigitalGlitch" );
+
+	var shader = DigitalGlitch_js.DigitalGlitch;
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	if ( dt_size == undefined ) dt_size = 64;
@@ -36,9 +47,9 @@ THREE.GlitchPass = function ( dt_size ) {
 
 };
 
-THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.GlitchPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.GlitchPass,
+	constructor: exports.GlitchPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -114,3 +125,7 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

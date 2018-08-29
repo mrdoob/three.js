@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\FocusShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Focus shader
@@ -6,7 +16,8 @@
  * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
  */
 
-THREE.FocusShader = {
+
+exports.FocusShader = {
 
 	uniforms : {
 
@@ -89,3 +100,7 @@ THREE.FocusShader = {
 
 	].join( "\n" )
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

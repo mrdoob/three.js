@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\ConvexObjectBreaker.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js'), require('./geometries/ConvexGeometry.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js', './geometries/ConvexGeometry.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,ConvexGeometry_js) { 'use strict';
+
+/**
  * @author yomboprime https://github.com/yomboprime
  *
  * @fileoverview This class can be used to subdivide a convex Geometry object into pieces.
@@ -18,7 +28,7 @@
  *  - Vertex normals must be planar (not smoothed)
  *
  *  - The geometry must be convex (this is not checked in the library). You can create convex
- *  geometries with THREE.ConvexBufferGeometry. The BoxBufferGeometry, SphereBufferGeometry and other convex primitives
+ *  geometries with ConvexBufferGeometry. The BoxBufferGeometry, SphereBufferGeometry and other convex primitives
  *  can also be used.
  *
  * Note: This lib adds member variables to object's userData member (see prepareBreakableObject function)
@@ -29,7 +39,8 @@
  *
 */
 
-THREE.ConvexObjectBreaker = function ( minSizeForBreak, smallDelta ) {
+
+exports.ConvexObjectBreaker = function ( minSizeForBreak, smallDelta ) {
 
 	this.minSizeForBreak = minSizeForBreak || 1.4;
 	this.smallDelta = smallDelta || 0.0001;
@@ -58,9 +69,9 @@ THREE.ConvexObjectBreaker = function ( minSizeForBreak, smallDelta ) {
 
 };
 
-THREE.ConvexObjectBreaker.prototype = {
+exports.ConvexObjectBreaker.prototype = {
 
-	constructor: THREE.ConvexObjectBreaker,
+	constructor: exports.ConvexObjectBreaker,
 
 	prepareBreakableObject: function ( object, mass, velocity, angularVelocity, breakable ) {
 
@@ -70,7 +81,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		if ( ! object.geometry.isBufferGeometry ) {
 
-			console.error( 'THREE.ConvexObjectBreaker.prepareBreakableObject(): Parameter object must have a BufferGeometry.' );
+			console.error( '__ConvexObjectBreaker.prepareBreakableObject(): Parameter object must have a BufferGeometry.' );
 
 		}
 
@@ -268,7 +279,7 @@ THREE.ConvexObjectBreaker.prototype = {
 		// Transform the plane to object local space
 		var localPlane = this.tempPlane_Cut;
 		object.updateMatrix();
-		THREE.ConvexObjectBreaker.transformPlaneToLocalSpace( plane, object.matrix, localPlane );
+		exports.ConvexObjectBreaker.transformPlaneToLocalSpace( plane, object.matrix, localPlane );
 
 		// Iterate through the faces adding points to both pieces
 		for ( var i = 0; i < numFaces; i ++ ) {
@@ -418,7 +429,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		if ( numPoints1 > 4 ) {
 
-			object1 = new THREE.Mesh( new THREE.ConvexBufferGeometry( points1 ), object.material );
+			object1 = new THREE.Mesh( new ConvexGeometry_js.ConvexBufferGeometry( points1 ), object.material );
 			object1.position.copy( this.tempCM1 );
 			object1.quaternion.copy( object.quaternion );
 
@@ -430,7 +441,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		if ( numPoints2 > 4 ) {
 
-			object2 = new THREE.Mesh( new THREE.ConvexBufferGeometry( points2 ), object.material );
+			object2 = new THREE.Mesh( new ConvexGeometry_js.ConvexBufferGeometry( points2 ), object.material );
 			object2.position.copy( this.tempCM2 );
 			object2.quaternion.copy( object.quaternion );
 
@@ -449,7 +460,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 };
 
-THREE.ConvexObjectBreaker.transformFreeVector = function ( v, m ) {
+exports.ConvexObjectBreaker.transformFreeVector = function ( v, m ) {
 
 	// input:
 	// vector interpreted as a free vector
@@ -466,7 +477,7 @@ THREE.ConvexObjectBreaker.transformFreeVector = function ( v, m ) {
 
 };
 
-THREE.ConvexObjectBreaker.transformFreeVectorInverse = function ( v, m ) {
+exports.ConvexObjectBreaker.transformFreeVectorInverse = function ( v, m ) {
 
 	// input:
 	// vector interpreted as a free vector
@@ -483,7 +494,7 @@ THREE.ConvexObjectBreaker.transformFreeVectorInverse = function ( v, m ) {
 
 };
 
-THREE.ConvexObjectBreaker.transformTiedVectorInverse = function ( v, m ) {
+exports.ConvexObjectBreaker.transformTiedVectorInverse = function ( v, m ) {
 
 	// input:
 	// vector interpreted as a tied (ordinary) vector
@@ -500,7 +511,7 @@ THREE.ConvexObjectBreaker.transformTiedVectorInverse = function ( v, m ) {
 
 };
 
-THREE.ConvexObjectBreaker.transformPlaneToLocalSpace = function () {
+exports.ConvexObjectBreaker.transformPlaneToLocalSpace = function () {
 
 	var v1 = new THREE.Vector3();
 
@@ -509,9 +520,9 @@ THREE.ConvexObjectBreaker.transformPlaneToLocalSpace = function () {
 		resultPlane.normal.copy( plane.normal );
 		resultPlane.constant = plane.constant;
 
-		var referencePoint = THREE.ConvexObjectBreaker.transformTiedVectorInverse( plane.coplanarPoint( v1 ), m );
+		var referencePoint = exports.ConvexObjectBreaker.transformTiedVectorInverse( plane.coplanarPoint( v1 ), m );
 
-		THREE.ConvexObjectBreaker.transformFreeVectorInverse( resultPlane.normal, m );
+		exports.ConvexObjectBreaker.transformFreeVectorInverse( resultPlane.normal, m );
 
 		// recalculate constant (like in setFromNormalAndCoplanarPoint)
 		resultPlane.constant = - referencePoint.dot( resultPlane.normal );
@@ -520,3 +531,7 @@ THREE.ConvexObjectBreaker.transformPlaneToLocalSpace = function () {
 	};
 
 }();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

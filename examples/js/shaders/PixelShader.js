@@ -1,10 +1,21 @@
 /**
+ * Generated from 'examples\modules\shaders\PixelShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author wongbryan / http://wongbryan.github.io
  *
  * Pixelation shader
  */
 
-THREE.PixelShader = {
+
+exports.PixelShader = {
 
 	uniforms: {
 
@@ -45,3 +56,7 @@ THREE.PixelShader = {
 
 	].join( "\n" )
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

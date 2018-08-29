@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\vr\deprecated\GearVRController.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author servinlp
  */
 
-THREE.GearVRController = function () {
+
+
+exports.GearVRController = function () {
 
 	THREE.Object3D.call( this );
 
@@ -115,18 +127,22 @@ THREE.GearVRController = function () {
 
 	this.getTouchPadState = function () {
 
-		console.warn( 'THREE.GearVRController: getTouchPadState() is now getTouchpadState()' );
+		console.warn( '__GearVRController: getTouchPadState() is now getTouchpadState()' );
 		return touchpadIsPressed;
 
 	};
 
 	this.setHand = function () {
 
-		console.warn( 'THREE.GearVRController: setHand() has been removed.' );
+		console.warn( '__GearVRController: setHand() has been removed.' );
 
 	};
 
 };
 
-THREE.GearVRController.prototype = Object.create( THREE.Object3D.prototype );
-THREE.GearVRController.prototype.constructor = THREE.GearVRController;
+exports.GearVRController.prototype = Object.create( THREE.Object3D.prototype );
+exports.GearVRController.prototype.constructor = exports.GearVRController;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

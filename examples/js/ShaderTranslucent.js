@@ -1,10 +1,22 @@
 /**
+ * Generated from 'examples\modules\ShaderTranslucent.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author daoshengmu / http://dsmu.me/
  *
  */
 
 
-THREE.TranslucentShader = function TranslucentShader() {
+
+
+exports.TranslucentShader = function TranslucentShader() {
 
 	/* ------------------------------------------------------------------------------------------
 	//	Subsurface Scattering shader
@@ -201,6 +213,10 @@ THREE.TranslucentShader = function TranslucentShader() {
 
 		"}",
 
-	].join( "\n" )
+	].join( "\n" );
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

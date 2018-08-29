@@ -1,5 +1,14 @@
+/**
+ * Generated from 'examples\modules\TypedArrayUtils.js'
+ **/
 
-THREE.TypedArrayUtils = {};
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+exports.TypedArrayUtils = {};
 
 /**
  * In-place quicksort for typed arrays (e.g. for Float32Array)
@@ -18,7 +27,7 @@ THREE.TypedArrayUtils = {};
  * orderElement: 0 //order according to x
  */
 
-THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
+exports.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 	var stack = [];
 	var sp = - 1;
@@ -179,10 +188,10 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
  * http://en.wikipedia.org/wiki/Binary_tree
  * http://en.wikipedia.org/wiki/K-d_tree
  *
- * If you want to further minimize memory usage, remove Node.depth and replace in search algorithm with a traversal to root node (see comments at THREE.TypedArrayUtils.Kdtree.prototype.Node)
+ * If you want to further minimize memory usage, remove Node.depth and replace in search algorithm with a traversal to root node (see comments at TypedArrayUtils.Kdtree.prototype.Node)
  */
 
- THREE.TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
+ exports.TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
 	var self = this;
 	
@@ -210,7 +219,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 		}
 
-		THREE.TypedArrayUtils.quicksortIP( points, eleSize, dim );
+		exports.TypedArrayUtils.quicksortIP( points, eleSize, dim );
 		
 		median = Math.floor( plength / 2 );
 		
@@ -242,7 +251,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 			result,
 			bestNodes;
 
-		bestNodes = new THREE.TypedArrayUtils.Kdtree.BinaryHeap(
+		bestNodes = new exports.TypedArrayUtils.Kdtree.BinaryHeap(
 
 			function ( e ) {
 
@@ -405,7 +414,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
  *
  * I experienced that for 200'000 nodes you can get rid of 4 MB memory each, leading to 8 MB memory saved.
  */
-THREE.TypedArrayUtils.Kdtree.prototype.Node = function ( obj, depth, parent, pos ) {
+exports.TypedArrayUtils.Kdtree.prototype.Node = function ( obj, depth, parent, pos ) {
 
 	this.obj = obj;
 	this.left = null;
@@ -421,14 +430,14 @@ THREE.TypedArrayUtils.Kdtree.prototype.Node = function ( obj, depth, parent, pos
  * @author http://eloquentjavascript.net/appendix2.htm
  */
 
-THREE.TypedArrayUtils.Kdtree.BinaryHeap = function ( scoreFunction ) {
+exports.TypedArrayUtils.Kdtree.BinaryHeap = function ( scoreFunction ) {
 
 	this.content = [];
 	this.scoreFunction = scoreFunction;
 
 };
 
-THREE.TypedArrayUtils.Kdtree.BinaryHeap.prototype = {
+exports.TypedArrayUtils.Kdtree.BinaryHeap.prototype = {
 
 	push: function ( element ) {
 
@@ -600,3 +609,7 @@ THREE.TypedArrayUtils.Kdtree.BinaryHeap.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

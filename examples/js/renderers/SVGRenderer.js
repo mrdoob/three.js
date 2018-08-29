@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\renderers\SVGRenderer.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Projector.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Projector.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,Projector_js) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SVGObject = function ( node ) {
+
+
+exports.SVGObject = function ( node ) {
 
 	THREE.Object3D.call( this );
 
@@ -10,16 +22,16 @@ THREE.SVGObject = function ( node ) {
 
 };
 
-THREE.SVGObject.prototype = Object.create( THREE.Object3D.prototype );
-THREE.SVGObject.prototype.constructor = THREE.SVGObject;
+exports.SVGObject.prototype = Object.create( THREE.Object3D.prototype );
+exports.SVGObject.prototype.constructor = exports.SVGObject;
 
-THREE.SVGRenderer = function () {
+exports.SVGRenderer = function () {
 
-	console.log( 'THREE.SVGRenderer', THREE.REVISION );
+	console.log( '__SVGRenderer', THREE.REVISION );
 
 	var _this = this,
 		_renderData, _elements, _lights,
-		_projector = new THREE.Projector(),
+		_projector = new Projector_js.Projector(),
 		_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ),
 		_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
 
@@ -147,7 +159,7 @@ THREE.SVGRenderer = function () {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
-			console.error( 'THREE.SVGRenderer.render: camera is not an instance of THREE.Camera.' );
+			console.error( '__SVGRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
 
 		}
@@ -193,14 +205,14 @@ THREE.SVGRenderer = function () {
 
 			_elemBox.makeEmpty();
 
-			if ( element instanceof THREE.RenderableSprite ) {
+			if ( element instanceof Projector_js.RenderableSprite ) {
 
 				_v1 = element;
 				_v1.x *= _svgWidthHalf; _v1.y *= - _svgHeightHalf;
 
 				renderSprite( _v1, element, material );
 
-			} else if ( element instanceof THREE.RenderableLine ) {
+			} else if ( element instanceof Projector_js.RenderableLine ) {
 
 				_v1 = element.v1; _v2 = element.v2;
 
@@ -215,7 +227,7 @@ THREE.SVGRenderer = function () {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableFace ) {
+			} else if ( element instanceof Projector_js.RenderableFace ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
@@ -247,7 +259,7 @@ THREE.SVGRenderer = function () {
 
 		scene.traverseVisible( function ( object ) {
 
-			 if ( object instanceof THREE.SVGObject ) {
+			 if ( object instanceof exports.SVGObject ) {
 
 				_vector3.setFromMatrixPosition( object.matrixWorld );
 				_vector3.applyMatrix4( _viewProjectionMatrix );
@@ -503,3 +515,7 @@ THREE.SVGRenderer = function () {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

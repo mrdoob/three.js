@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\GPUParticleSystem.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  * GPU Particle System
  * @author flimshaw - Charlie Hoey - http://charliehoey.com
@@ -15,7 +25,10 @@
  *
  */
 
-THREE.GPUParticleSystem = function ( options ) {
+
+
+
+exports.GPUParticleSystem = function ( options ) {
 
 	THREE.Object3D.apply( this, arguments );
 
@@ -209,7 +222,7 @@ THREE.GPUParticleSystem = function ( options ) {
 
 		for ( var i = 0; i < this.PARTICLE_CONTAINERS; i ++ ) {
 
-			var c = new THREE.GPUParticleContainer( this.PARTICLES_PER_CONTAINER, this );
+			var c = new exports.GPUParticleContainer( this.PARTICLES_PER_CONTAINER, this );
 			this.particleContainers.push( c );
 			this.add( c );
 
@@ -261,13 +274,13 @@ THREE.GPUParticleSystem = function ( options ) {
 
 };
 
-THREE.GPUParticleSystem.prototype = Object.create( THREE.Object3D.prototype );
-THREE.GPUParticleSystem.prototype.constructor = THREE.GPUParticleSystem;
+exports.GPUParticleSystem.prototype = Object.create( THREE.Object3D.prototype );
+exports.GPUParticleSystem.prototype.constructor = exports.GPUParticleSystem;
 
 
 // Subclass for particle containers, allows for very large arrays to be spread out
 
-THREE.GPUParticleContainer = function ( maxParticles, particleSystem ) {
+exports.GPUParticleContainer = function ( maxParticles, particleSystem ) {
 
 	THREE.Object3D.apply( this, arguments );
 
@@ -497,5 +510,9 @@ THREE.GPUParticleContainer = function ( maxParticles, particleSystem ) {
 
 };
 
-THREE.GPUParticleContainer.prototype = Object.create( THREE.Object3D.prototype );
-THREE.GPUParticleContainer.prototype.constructor = THREE.GPUParticleContainer;
+exports.GPUParticleContainer.prototype = Object.create( THREE.Object3D.prototype );
+exports.GPUParticleContainer.prototype.constructor = exports.GPUParticleContainer;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

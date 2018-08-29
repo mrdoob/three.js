@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\utils\SceneUtils.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SceneUtils = {
+
+
+exports.SceneUtils = {
 
 	createMultiMaterialObject: function ( geometry, materials ) {
 
@@ -36,3 +48,7 @@ THREE.SceneUtils = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

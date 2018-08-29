@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\BokehShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Depth-of-field shader with bokeh
@@ -6,7 +16,8 @@
  * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
  */
 
-THREE.BokehShader = {
+
+exports.BokehShader = {
 
 	defines: {
 		"DEPTH_PACKING": 1,
@@ -144,3 +155,7 @@ THREE.BokehShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

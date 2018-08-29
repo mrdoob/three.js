@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\postprocessing\SSAOPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./ShaderPass.js'), require('../shaders/SSAOShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './ShaderPass.js', '../shaders/SSAOShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,ShaderPass_js,SSAOShader_js) { 'use strict';
+
 'use strict';
 
 /**
@@ -19,16 +29,16 @@
  * @author tentone
  * @class SSAOPass
  */
-THREE.SSAOPass = function ( scene, camera, width, height ) {
+exports.SSAOPass = function ( scene, camera, width, height ) {
 
-	if ( THREE.SSAOShader === undefined ) {
+	if ( SSAOShader_js.SSAOShader === undefined ) {
 
-		console.warn( 'THREE.SSAOPass depends on THREE.SSAOShader' );
-		return new THREE.ShaderPass();
+		console.warn( '__SSAOPass depends on SSAOShader' );
+		return new ShaderPass_js.ShaderPass();
 
 	}
 
-	THREE.ShaderPass.call( this, THREE.SSAOShader );
+	ShaderPass_js.ShaderPass.call( this, SSAOShader_js.SSAOShader );
 
 	this.width = ( width !== undefined ) ? width : 512;
 	this.height = ( height !== undefined ) ? height : 256;
@@ -118,7 +128,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 };
 
-THREE.SSAOPass.prototype = Object.create( THREE.ShaderPass.prototype );
+exports.SSAOPass.prototype = Object.create( ShaderPass_js.ShaderPass.prototype );
 
 /**
  * Render using this pass.
@@ -130,7 +140,7 @@ THREE.SSAOPass.prototype = Object.create( THREE.ShaderPass.prototype );
  * @param {Number} delta Delta time in milliseconds.
  * @param {Boolean} maskActive Not used in this pass.
  */
-THREE.SSAOPass.prototype.render = function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+exports.SSAOPass.prototype.render = function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 	//Render depth into depthRenderTarget
 	this.scene2.overrideMaterial = this.depthMaterial;
@@ -141,7 +151,7 @@ THREE.SSAOPass.prototype.render = function ( renderer, writeBuffer, readBuffer, 
 
 
 	//SSAO shaderPass
-	THREE.ShaderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta, maskActive );
+	ShaderPass_js.ShaderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta, maskActive );
 
 };
 
@@ -151,7 +161,7 @@ THREE.SSAOPass.prototype.render = function ( renderer, writeBuffer, readBuffer, 
  * @method setScene
  * @param {Scene} scene
  */
-THREE.SSAOPass.prototype.setScene = function ( scene ) {
+exports.SSAOPass.prototype.setScene = function ( scene ) {
 
 	this.scene2 = scene;
 
@@ -163,7 +173,7 @@ THREE.SSAOPass.prototype.setScene = function ( scene ) {
  * @method setCamera
  * @param {Camera} camera
  */
-THREE.SSAOPass.prototype.setCamera = function ( camera ) {
+exports.SSAOPass.prototype.setCamera = function ( camera ) {
 
 	this.camera2 = camera;
 
@@ -179,7 +189,7 @@ THREE.SSAOPass.prototype.setCamera = function ( camera ) {
  * @param {Number} width
  * @param {Number} height
  */
-THREE.SSAOPass.prototype.setSize = function ( width, height ) {
+exports.SSAOPass.prototype.setSize = function ( width, height ) {
 
 	this.width = width;
 	this.height = height;
@@ -188,3 +198,7 @@ THREE.SSAOPass.prototype.setSize = function ( width, height ) {
 	this.depthRenderTarget.setSize( this.width, this.height );
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

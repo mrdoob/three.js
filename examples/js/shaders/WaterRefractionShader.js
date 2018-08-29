@@ -1,9 +1,20 @@
 /**
+ * Generated from 'examples\modules\shaders\WaterRefractionShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author Mugen87 / https://github.com/Mugen87
  *
  */
 
-THREE.WaterRefractionShader = {
+
+exports.WaterRefractionShader = {
 
 	uniforms: {
 
@@ -99,3 +110,7 @@ THREE.WaterRefractionShader = {
 
 	].join( '\n' )
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

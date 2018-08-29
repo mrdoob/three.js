@@ -1,11 +1,22 @@
 /**
+ * Generated from 'examples\modules\cameras\CinematicCamera.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('../shaders/BokehShader2.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', '../shaders/BokehShader2.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,BokehShader2_js) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author kaypiKun
  */
 
-THREE.CinematicCamera = function ( fov, aspect, near, far ) {
+
+exports.CinematicCamera = function ( fov, aspect, near, far ) {
 
 	THREE.PerspectiveCamera.call( this, fov, aspect, near, far );
 
@@ -17,7 +28,7 @@ THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 		samples: 4
 	};
 
-	var depthShader = THREE.BokehDepthShader;
+	var depthShader = BokehShader2_js.BokehDepthShader;
 
 	this.materialDepth = new THREE.ShaderMaterial( {
 		uniforms: depthShader.uniforms,
@@ -35,12 +46,12 @@ THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 
 };
 
-THREE.CinematicCamera.prototype = Object.create( THREE.PerspectiveCamera.prototype );
-THREE.CinematicCamera.prototype.constructor = THREE.CinematicCamera;
+exports.CinematicCamera.prototype = Object.create( THREE.PerspectiveCamera.prototype );
+exports.CinematicCamera.prototype.constructor = exports.CinematicCamera;
 
 
 // providing fnumber and coc(Circle of Confusion) as extra arguments
-THREE.CinematicCamera.prototype.setLens = function ( focalLength, filmGauge, fNumber, coc ) {
+exports.CinematicCamera.prototype.setLens = function ( focalLength, filmGauge, fNumber, coc ) {
 
 	// In case of cinematicCamera, having a default lens set is important
 	if ( focalLength === undefined ) focalLength = 35;
@@ -63,7 +74,7 @@ THREE.CinematicCamera.prototype.setLens = function ( focalLength, filmGauge, fNu
 
 };
 
-THREE.CinematicCamera.prototype.linearize = function ( depth ) {
+exports.CinematicCamera.prototype.linearize = function ( depth ) {
 
 	var zfar = this.far;
 	var znear = this.near;
@@ -71,21 +82,21 @@ THREE.CinematicCamera.prototype.linearize = function ( depth ) {
 
 };
 
-THREE.CinematicCamera.prototype.smoothstep = function ( near, far, depth ) {
+exports.CinematicCamera.prototype.smoothstep = function ( near, far, depth ) {
 
 	var x = this.saturate( ( depth - near ) / ( far - near ) );
 	return x * x * ( 3 - 2 * x );
 
 };
 
-THREE.CinematicCamera.prototype.saturate = function ( x ) {
+exports.CinematicCamera.prototype.saturate = function ( x ) {
 
 	return Math.max( 0, Math.min( 1, x ) );
 
 };
 
 // function for focusing at a distance from the camera
-THREE.CinematicCamera.prototype.focusAt = function ( focusDistance ) {
+exports.CinematicCamera.prototype.focusAt = function ( focusDistance ) {
 
 	if ( focusDistance === undefined ) focusDistance = 20;
 
@@ -114,7 +125,7 @@ THREE.CinematicCamera.prototype.focusAt = function ( focusDistance ) {
 
 };
 
-THREE.CinematicCamera.prototype.initPostProcessing = function () {
+exports.CinematicCamera.prototype.initPostProcessing = function () {
 
 	if ( this.postprocessing.enabled ) {
 
@@ -128,7 +139,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 		this.postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 		this.postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
-		var bokeh_shader = THREE.BokehShader;
+		var bokeh_shader = BokehShader2_js.BokehShader;
 
 		this.postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
@@ -173,7 +184,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 };
 
-THREE.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
+exports.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
 
 	if ( this.postprocessing.enabled ) {
 
@@ -196,3 +207,7 @@ THREE.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

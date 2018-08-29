@@ -1,9 +1,21 @@
 /**
+ * Generated from 'examples\modules\lines\LineSegmentsGeometry.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author WestLangley / http://github.com/WestLangley
  *
  */
 
-THREE.LineSegmentsGeometry = function () {
+
+
+exports.LineSegmentsGeometry = function () {
 
 	THREE.InstancedBufferGeometry.call( this );
 
@@ -21,9 +33,9 @@ THREE.LineSegmentsGeometry = function () {
 
 };
 
-THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.InstancedBufferGeometry.prototype ), {
+exports.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.InstancedBufferGeometry.prototype ), {
 
-	constructor: THREE.LineSegmentsGeometry,
+	constructor: exports.LineSegmentsGeometry,
 
 	isLineSegmentsGeometry: true,
 
@@ -227,7 +239,7 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 				if ( isNaN( this.boundingSphere.radius ) ) {
 
-					console.error( 'THREE.LineSegmentsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
+					console.error( '__LineSegmentsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
 
 				}
 
@@ -258,3 +270,7 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

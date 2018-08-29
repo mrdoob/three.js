@@ -1,9 +1,21 @@
 /**
+ * Generated from 'examples\modules\math\ColorConverter.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author bhouston / http://exocortex.com/
  * @author zz85 / http://github.com/zz85
  */
 
-THREE.ColorConverter = {
+
+
+exports.ColorConverter = {
 
 	setHSV: function ( color, h, s, v ) {
 
@@ -25,7 +37,7 @@ THREE.ColorConverter = {
 
 			if ( target === undefined ) {
 
-				console.warn( 'THREE.ColorConverter: .getHSV() target is now required' );
+				console.warn( '__ColorConverter: .getHSV() target is now required' );
 				target = { h: 0, s: 0, l: 0 };
 
 			}
@@ -61,7 +73,7 @@ THREE.ColorConverter = {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.ColorConverter: .getCMYK() target is now required' );
+			console.warn( '__ColorConverter: .getCMYK() target is now required' );
 			target = { c: 0, m: 0, y: 0, k:0 };
 
 		}
@@ -86,3 +98,7 @@ THREE.ColorConverter = {
 
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

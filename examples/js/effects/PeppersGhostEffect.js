@@ -1,10 +1,22 @@
 /**
+ * Generated from 'examples\modules\effects\PeppersGhostEffect.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * Created by tpowellmeto on 29/10/2015.
  *
  * peppers ghost effect based on http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS
  */
 
-THREE.PeppersGhostEffect = function ( renderer ) {
+
+
+exports.PeppersGhostEffect = function ( renderer ) {
 
 	var scope = this;
 
@@ -141,3 +153,7 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

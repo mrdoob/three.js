@@ -1,10 +1,22 @@
 /**
+ * Generated from 'examples\modules\effects\ParallaxBarrierEffect.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author marklundin / http://mark-lundin.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ParallaxBarrierEffect = function ( renderer ) {
+
+
+exports.ParallaxBarrierEffect = function ( renderer ) {
 
 	var _camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
@@ -94,3 +106,7 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 	};
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

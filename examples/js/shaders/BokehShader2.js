@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\BokehShader2.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author zz85 / https://github.com/zz85 | twitter.com/blurspline
  *
  * Depth-of-field shader with bokeh
@@ -10,7 +20,10 @@
 
 
 
-THREE.BokehShader = {
+
+
+
+exports.BokehShader = {
 
 	uniforms: {
 
@@ -355,7 +368,7 @@ THREE.BokehShader = {
 
 };
 
-THREE.BokehDepthShader = {
+exports.BokehDepthShader = {
 
 	uniforms: {
 
@@ -396,3 +409,7 @@ THREE.BokehDepthShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

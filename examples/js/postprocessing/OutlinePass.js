@@ -1,8 +1,19 @@
 /**
+ * Generated from 'examples\modules\postprocessing\OutlinePass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/CopyShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/CopyShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,CopyShader_js) { 'use strict';
+
+/**
  * @author spidersharma / http://eduperiment.com/
  */
 
-THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
+
+exports.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 
 	this.renderScene = scene;
 	this.renderCamera = camera;
@@ -16,7 +27,7 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.downSampleRatio = 2;
 	this.pulsePeriod = 0;
 
-	THREE.Pass.call( this );
+	Pass_js.Pass.call( this );
 
 	this.resolution = ( resolution !== undefined ) ? new THREE.Vector2( resolution.x, resolution.y ) : new THREE.Vector2( 256, 256 );
 
@@ -77,10 +88,10 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.overlayMaterial = this.getOverlayMaterial();
 
 	// copy material
-	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.OutlinePass relies on THREE.CopyShader" );
+	if ( CopyShader_js.CopyShader === undefined )
+		console.error( "__OutlinePass relies on CopyShader" );
 
-	var copyShader = THREE.CopyShader;
+	var copyShader = CopyShader_js.CopyShader;
 
 	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 	this.copyUniforms[ "opacity" ].value = 1.0;
@@ -122,9 +133,9 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 
 };
 
-THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.OutlinePass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.OutlinePass,
+	constructor: exports.OutlinePass,
 
 	dispose: function () {
 
@@ -324,20 +335,20 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 			// 4. Apply Blur on Half res
 			this.quad.material = this.separableBlurMaterial1;
 			this.separableBlurMaterial1.uniforms[ "colorTexture" ].value = this.renderTargetEdgeBuffer1.texture;
-			this.separableBlurMaterial1.uniforms[ "direction" ].value = THREE.OutlinePass.BlurDirectionX;
+			this.separableBlurMaterial1.uniforms[ "direction" ].value = exports.OutlinePass.BlurDirectionX;
 			this.separableBlurMaterial1.uniforms[ "kernelRadius" ].value = this.edgeThickness;
 			renderer.render( this.scene, this.camera, this.renderTargetBlurBuffer1, true );
 			this.separableBlurMaterial1.uniforms[ "colorTexture" ].value = this.renderTargetBlurBuffer1.texture;
-			this.separableBlurMaterial1.uniforms[ "direction" ].value = THREE.OutlinePass.BlurDirectionY;
+			this.separableBlurMaterial1.uniforms[ "direction" ].value = exports.OutlinePass.BlurDirectionY;
 			renderer.render( this.scene, this.camera, this.renderTargetEdgeBuffer1, true );
 
 			// Apply Blur on quarter res
 			this.quad.material = this.separableBlurMaterial2;
 			this.separableBlurMaterial2.uniforms[ "colorTexture" ].value = this.renderTargetEdgeBuffer1.texture;
-			this.separableBlurMaterial2.uniforms[ "direction" ].value = THREE.OutlinePass.BlurDirectionX;
+			this.separableBlurMaterial2.uniforms[ "direction" ].value = exports.OutlinePass.BlurDirectionX;
 			renderer.render( this.scene, this.camera, this.renderTargetBlurBuffer2, true );
 			this.separableBlurMaterial2.uniforms[ "colorTexture" ].value = this.renderTargetBlurBuffer2.texture;
-			this.separableBlurMaterial2.uniforms[ "direction" ].value = THREE.OutlinePass.BlurDirectionY;
+			this.separableBlurMaterial2.uniforms[ "direction" ].value = exports.OutlinePass.BlurDirectionY;
 			renderer.render( this.scene, this.camera, this.renderTargetEdgeBuffer2, true );
 
 			// Blend it additively over the input texture
@@ -567,5 +578,9 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 } );
 
-THREE.OutlinePass.BlurDirectionX = new THREE.Vector2( 1.0, 0.0 );
-THREE.OutlinePass.BlurDirectionY = new THREE.Vector2( 0.0, 1.0 );
+exports.OutlinePass.BlurDirectionX = new THREE.Vector2( 1.0, 0.0 );
+exports.OutlinePass.BlurDirectionY = new THREE.Vector2( 0.0, 1.0 );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

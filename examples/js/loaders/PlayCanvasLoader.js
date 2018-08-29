@@ -1,17 +1,29 @@
 /**
+ * Generated from 'examples\modules\loaders\PlayCanvasLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.PlayCanvasLoader = function ( manager ) {
+
+
+exports.PlayCanvasLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.PlayCanvasLoader.prototype = {
+exports.PlayCanvasLoader.prototype = {
 
-	constructor: THREE.PlayCanvasLoader,
+	constructor: exports.PlayCanvasLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -58,7 +70,7 @@ THREE.PlayCanvasLoader.prototype = {
 						break;
 
 					default:
-						console.log( 'THREE.PlayCanvasLoader: Array type "%s" not yet supported.', type );
+						console.log( '__PlayCanvasLoader: Array type "%s" not yet supported.', type );
 
 				}
 
@@ -193,3 +205,7 @@ THREE.PlayCanvasLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\pmrem\PMREMGenerator.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Prashant Sharma / spidersharma03
  * @author Ben Houston / bhouston, https://clara.io
  *
@@ -11,7 +21,9 @@
  *	by this class.
  */
 
-THREE.PMREMGenerator = function ( sourceTexture, samplesPerLevel, resolution ) {
+
+
+exports.PMREMGenerator = function ( sourceTexture, samplesPerLevel, resolution ) {
 
 	this.sourceTexture = sourceTexture;
 	this.resolution = ( resolution !== undefined ) ? resolution : 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
@@ -64,9 +76,9 @@ THREE.PMREMGenerator = function ( sourceTexture, samplesPerLevel, resolution ) {
 
 };
 
-THREE.PMREMGenerator.prototype = {
+exports.PMREMGenerator.prototype = {
 
-	constructor: THREE.PMREMGenerator,
+	constructor: exports.PMREMGenerator,
 
 	/*
 	 * Prashant Sharma / spidersharma03: More thought and work is needed here.
@@ -283,3 +295,7 @@ THREE.PMREMGenerator.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

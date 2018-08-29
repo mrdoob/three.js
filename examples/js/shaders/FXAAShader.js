@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\FXAAShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  * @author davidedc / http://www.sketchpatch.net/
  *
@@ -8,7 +18,9 @@
  * http://www.glge.org/demos/fxaa/
  */
 
-THREE.FXAAShader = {
+
+
+exports.FXAAShader = {
 
 	uniforms: {
 
@@ -1113,3 +1125,7 @@ THREE.FXAAShader = {
 	].join("\n")
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

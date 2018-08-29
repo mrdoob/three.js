@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\curves\NURBSCurve.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./NURBSUtils.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './NURBSUtils.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,NURBSUtils_js) { 'use strict';
+
+/**
  * @author renej
  * NURBS curve object
  *
@@ -9,11 +19,12 @@
  **/
 
 
+
 /**************************************************************
  *	NURBS curve
  **************************************************************/
 
-THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */, startKnot /* index in knots */, endKnot /* index in knots */ ) {
+exports.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */, startKnot /* index in knots */, endKnot /* index in knots */ ) {
 
 	THREE.Curve.call( this );
 
@@ -34,16 +45,16 @@ THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints 
 };
 
 
-THREE.NURBSCurve.prototype = Object.create( THREE.Curve.prototype );
-THREE.NURBSCurve.prototype.constructor = THREE.NURBSCurve;
+exports.NURBSCurve.prototype = Object.create( THREE.Curve.prototype );
+exports.NURBSCurve.prototype.constructor = exports.NURBSCurve;
 
 
-THREE.NURBSCurve.prototype.getPoint = function ( t ) {
+exports.NURBSCurve.prototype.getPoint = function ( t ) {
 
 	var u = this.knots[ this.startKnot ] + t * ( this.knots[ this.endKnot ] - this.knots[ this.startKnot ] ); // linear mapping t->u
 
 	// following results in (wx, wy, wz, w) homogeneous point
-	var hpoint = THREE.NURBSUtils.calcBSplinePoint( this.degree, this.knots, this.controlPoints, u );
+	var hpoint = NURBSUtils_js.NURBSUtils.calcBSplinePoint( this.degree, this.knots, this.controlPoints, u );
 
 	if ( hpoint.w != 1.0 ) {
 
@@ -57,13 +68,17 @@ THREE.NURBSCurve.prototype.getPoint = function ( t ) {
 };
 
 
-THREE.NURBSCurve.prototype.getTangent = function ( t ) {
+exports.NURBSCurve.prototype.getTangent = function ( t ) {
 
 	var u = this.knots[ 0 ] + t * ( this.knots[ this.knots.length - 1 ] - this.knots[ 0 ] );
-	var ders = THREE.NURBSUtils.calcNURBSDerivatives( this.degree, this.knots, this.controlPoints, u, 1 );
+	var ders = NURBSUtils_js.NURBSUtils.calcNURBSDerivatives( this.degree, this.knots, this.controlPoints, u, 1 );
 	var tangent = ders[ 1 ].clone();
 	tangent.normalize();
 
 	return tangent;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

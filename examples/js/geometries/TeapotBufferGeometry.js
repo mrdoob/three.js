@@ -1,9 +1,19 @@
 /**
+ * Generated from 'examples\modules\geometries\TeapotBufferGeometry.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Eric Haines / http://erichaines.com/
  *
  * Tessellates the famous Utah teapot database by Martin Newell into triangles.
  *
- * THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
+ * TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
  *
  * defaults: size = 50, segments = 10, bottom = true, lid = true, body = true,
  *   fitLid = false, blinn = true
@@ -50,9 +60,11 @@
  * See https://en.wikipedia.org/wiki/Utah_teapot for the history of the teapot
  *
  */
+
+
 /*global THREE */
 
-THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
+exports.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
 
 	// 32 * 4 * 4 Bezier spline patches
 	var teapotPatches = [
@@ -714,5 +726,9 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 };
 
 
-THREE.TeapotBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.TeapotBufferGeometry.prototype.constructor = THREE.TeapotBufferGeometry;
+exports.TeapotBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+exports.TeapotBufferGeometry.prototype.constructor = exports.TeapotBufferGeometry;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

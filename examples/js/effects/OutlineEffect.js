@@ -1,10 +1,20 @@
 /**
+ * Generated from 'examples\modules\effects\OutlineEffect.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author takahirox / http://github.com/takahirox/
  *
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
  * // How to set default outline parameters
- * new THREE.OutlineEffect( renderer, {
+ * new OutlineEffect( renderer, {
  * 	defaultThickNess: 0.01,
  * 	defaultColor: [ 0, 0, 0 ],
  * 	defaultAlpha: 0.8,
@@ -24,7 +34,9 @@
  *  - support shader material without objectNormal in its vertexShader
  */
 
-THREE.OutlineEffect = function ( renderer, parameters ) {
+
+
+exports.OutlineEffect = function ( renderer, parameters ) {
 
 	parameters = parameters || {};
 
@@ -156,7 +168,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 			if ( ! /attribute\s+vec3\s+position\s*;/.test( originalVertexShader ) ||
 			     ! /attribute\s+vec3\s+normal\s*;/.test( originalVertexShader ) ) {
 
-				console.warn( 'THREE.OutlineEffect requires both vec3 position and normal attributes in vertex shader, ' +
+				console.warn( '__OutlineEffect requires both vec3 position and normal attributes in vertex shader, ' +
 				              'does not draw outline for ' + originalMaterial.name + '(uuid:' + originalMaterial.uuid + ') material.' );
 
 				return createInvisibleMaterial();
@@ -446,9 +458,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	 * See #9918
 	 *
 	 * The following property copies and wrapper methods enable
-	 * THREE.OutlineEffect to be called from other *Effect, like
+	 * OutlineEffect to be called from other *Effect, like
 	 *
-	 * effect = new THREE.StereoEffect( new THREE.OutlineEffect( renderer ) );
+	 * effect = new THREE.StereoEffect( new OutlineEffect( renderer ) );
 	 *
 	 * function render () {
 	 *
@@ -515,3 +527,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	};
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

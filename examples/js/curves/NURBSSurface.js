@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\curves\NURBSSurface.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./NURBSUtils.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './NURBSUtils.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,NURBSUtils_js) { 'use strict';
+
+/**
  * @author renej
  * NURBS surface object
  *
@@ -7,11 +17,12 @@
  **/
 
 
+
 /**************************************************************
  *	NURBS surface
  **************************************************************/
 
-THREE.NURBSSurface = function ( degree1, degree2, knots1, knots2 /* arrays of reals */, controlPoints /* array^2 of Vector(2|3|4) */ ) {
+exports.NURBSSurface = function ( degree1, degree2, knots1, knots2 /* arrays of reals */, controlPoints /* array^2 of Vector(2|3|4) */ ) {
 
 	this.degree1 = degree1;
 	this.degree2 = degree2;
@@ -38,16 +49,20 @@ THREE.NURBSSurface = function ( degree1, degree2, knots1, knots2 /* arrays of re
 };
 
 
-THREE.NURBSSurface.prototype = {
+exports.NURBSSurface.prototype = {
 
-	constructor: THREE.NURBSSurface,
+	constructor: exports.NURBSSurface,
 
 	getPoint: function ( t1, t2, target ) {
 
 		var u = this.knots1[ 0 ] + t1 * ( this.knots1[ this.knots1.length - 1 ] - this.knots1[ 0 ] ); // linear mapping t1->u
 		var v = this.knots2[ 0 ] + t2 * ( this.knots2[ this.knots2.length - 1 ] - this.knots2[ 0 ] ); // linear mapping t2->u
 
-		THREE.NURBSUtils.calcSurfacePoint( this.degree1, this.degree2, this.knots1, this.knots2, this.controlPoints, u, v, target );
+		NURBSUtils_js.NURBSUtils.calcSurfacePoint( this.degree1, this.degree2, this.knots1, this.knots2, this.controlPoints, u, v, target );
 
 	}
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

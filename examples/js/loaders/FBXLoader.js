@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\FBXLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('../curves/NURBSCurve.js'), require('./TGALoader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', '../curves/NURBSCurve.js', './TGALoader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,NURBSCurve_js,TGALoader_js) { 'use strict';
+
+/**
  * @author Kyle-Larson https://github.com/Kyle-Larson
  * @author Takahiro https://github.com/takahirox
  * @author Lewy Blue https://github.com/looeee
@@ -19,7 +29,8 @@
  */
 
 
-THREE.FBXLoader = ( function () {
+
+exports.FBXLoader = ( function () {
 
 	var fbxTree;
 	var connections;
@@ -85,13 +96,13 @@ THREE.FBXLoader = ( function () {
 
 				if ( ! isFbxFormatASCII( FBXText ) ) {
 
-					throw new Error( 'THREE.FBXLoader: Unknown format.' );
+					throw new Error( '__FBXLoader: Unknown format.' );
 
 				}
 
 				if ( getFbxVersion( FBXText ) < 7000 ) {
 
-					throw new Error( 'THREE.FBXLoader: FBX version not supported, FileVersion: ' + getFbxVersion( FBXText ) );
+					throw new Error( '__FBXLoader: FBX version not supported, FileVersion: ' + getFbxVersion( FBXText ) );
 
 				}
 
@@ -271,16 +282,16 @@ THREE.FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( typeof THREE.TGALoader !== 'function' ) {
+					if ( typeof TGALoader_js.TGALoader !== 'function' ) {
 
-						console.warn( 'FBXLoader: THREE.TGALoader is required to load TGA textures' );
+						console.warn( 'FBXLoader: TGALoader is required to load TGA textures' );
 						return;
 
 					} else {
 
 						if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
 
-							THREE.Loader.Handlers.add( /\.tga$/i, new THREE.TGALoader() );
+							THREE.Loader.Handlers.add( /\.tga$/i, new TGALoader_js.TGALoader() );
 
 						}
 
@@ -478,7 +489,7 @@ THREE.FBXLoader = ( function () {
 					material = new THREE.MeshLambertMaterial();
 					break;
 				default:
-					console.warn( 'THREE.FBXLoader: unknown material type "%s". Defaulting to MeshPhongMaterial.', type );
+					console.warn( '__FBXLoader: unknown material type "%s". Defaulting to MeshPhongMaterial.', type );
 					material = new THREE.MeshPhongMaterial( { color: 0x3300ff } );
 					break;
 
@@ -610,7 +621,7 @@ THREE.FBXLoader = ( function () {
 					case 'SpecularFactor': // AKA specularLevel
 					case 'VectorDisplacementColor': // NOTE: Seems to be a copy of DisplacementColor
 					default:
-						console.warn( 'THREE.FBXLoader: %s map is not supported in three.js, skipping texture.', type );
+						console.warn( '__FBXLoader: %s map is not supported in three.js, skipping texture.', type );
 						break;
 
 				}
@@ -627,7 +638,7 @@ THREE.FBXLoader = ( function () {
 			// if the texture is a layered texture, just use the first layer and issue a warning
 			if ( 'LayeredTexture' in fbxTree.Objects && id in fbxTree.Objects.LayeredTexture ) {
 
-				console.warn( 'THREE.FBXLoader: layered textures are not supported in three.js. Discarding all but first layer.' );
+				console.warn( '__FBXLoader: layered textures are not supported in three.js. Discarding all but first layer.' );
 				id = connections.get( id ).children[ 0 ].ID;
 
 			}
@@ -659,7 +670,7 @@ THREE.FBXLoader = ( function () {
 						var skeleton = this.parseSkeleton( relationships, DeformerNodes );
 						skeleton.ID = nodeID;
 
-						if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: skeleton attached to more than one geometry is not supported.' );
+						if ( relationships.parents.length > 1 ) console.warn( '__FBXLoader: skeleton attached to more than one geometry is not supported.' );
 						skeleton.geometryID = relationships.parents[ 0 ].ID;
 
 						skeletons[ nodeID ] = skeleton;
@@ -673,7 +684,7 @@ THREE.FBXLoader = ( function () {
 						morphTarget.rawTargets = this.parseMorphTargets( relationships, DeformerNodes );
 						morphTarget.id = nodeID;
 
-						if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: morph target attached to more than one geometry is not supported.' );
+						if ( relationships.parents.length > 1 ) console.warn( '__FBXLoader: morph target attached to more than one geometry is not supported.' );
 
 						morphTargets[ nodeID ] = morphTarget;
 
@@ -1010,7 +1021,7 @@ THREE.FBXLoader = ( function () {
 						break;
 
 					default:
-						console.warn( 'THREE.FBXLoader: Unknown camera type ' + type + '.' );
+						console.warn( '__FBXLoader: Unknown camera type ' + type + '.' );
 						model = new THREE.Object3D();
 						break;
 
@@ -1128,7 +1139,7 @@ THREE.FBXLoader = ( function () {
 						break;
 
 					default:
-						console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
+						console.warn( '__FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
 						model = new THREE.PointLight( color, intensity );
 						break;
 
@@ -1772,7 +1783,7 @@ THREE.FBXLoader = ( function () {
 
 						if ( ! displayedWeightsWarning ) {
 
-							console.warn( 'THREE.FBXLoader: Vertex has more than 4 skinning weights assigned to vertex. Deleting additional weights.' );
+							console.warn( '__FBXLoader: Vertex has more than 4 skinning weights assigned to vertex. Deleting additional weights.' );
 							displayedWeightsWarning = true;
 
 						}
@@ -2185,9 +2196,9 @@ THREE.FBXLoader = ( function () {
 		// Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
 		parseNurbsGeometry: function ( geoNode ) {
 
-			if ( THREE.NURBSCurve === undefined ) {
+			if ( NURBSCurve_js.NURBSCurve === undefined ) {
 
-				console.error( 'THREE.FBXLoader: The loader relies on THREE.NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
+				console.error( '__FBXLoader: The loader relies on NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
 				return new THREE.BufferGeometry();
 
 			}
@@ -2196,7 +2207,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( isNaN( order ) ) {
 
-				console.error( 'THREE.FBXLoader: Invalid Order %s given for geometry ID: %s', geoNode.Order, geoNode.id );
+				console.error( '__FBXLoader: Invalid Order %s given for geometry ID: %s', geoNode.Order, geoNode.id );
 				return new THREE.BufferGeometry();
 
 			}
@@ -2232,7 +2243,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
+			var curve = new NURBSCurve_js.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
 			var vertices = curve.getPoints( controlPoints.length * 7 );
 
 			var positions = new Float32Array( vertices.length * 3 );
@@ -2537,7 +2548,7 @@ THREE.FBXLoader = ( function () {
 
 					// it seems like stacks will always be associated with a single layer. But just in case there are files
 					// where there are multiple layers per stack, we'll display a warning
-					console.warn( 'THREE.FBXLoader: Encountered an animation stack with multiple layers, this is currently not supported. Ignoring subsequent layers.' );
+					console.warn( '__FBXLoader: Encountered an animation stack with multiple layers, this is currently not supported. Ignoring subsequent layers.' );
 
 				}
 
@@ -3193,7 +3204,7 @@ THREE.FBXLoader = ( function () {
 
 			var version = reader.getUint32();
 
-			console.log( 'THREE.FBXLoader: FBX binary version: ' + version );
+			console.log( '__FBXLoader: FBX binary version: ' + version );
 
 			var allNodes = new FBXTree();
 
@@ -3472,7 +3483,7 @@ THREE.FBXLoader = ( function () {
 
 					if ( typeof Zlib === 'undefined' ) {
 
-						console.error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+						console.error( '__FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 					}
 
@@ -3500,7 +3511,7 @@ THREE.FBXLoader = ( function () {
 					}
 
 				default:
-					throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );
+					throw new Error( '__FBXLoader: Unknown property type ' + type );
 
 			}
 
@@ -3819,7 +3830,7 @@ THREE.FBXLoader = ( function () {
 			return version;
 
 		}
-		throw new Error( 'THREE.FBXLoader: Cannot find the version number for the file given.' );
+		throw new Error( '__FBXLoader: Cannot find the version number for the file given.' );
 
 	}
 
@@ -3852,7 +3863,7 @@ THREE.FBXLoader = ( function () {
 				index = infoObject.indices[ 0 ];
 				break;
 			default :
-				console.warn( 'THREE.FBXLoader: unknown attribute mapping type ' + infoObject.mappingType );
+				console.warn( '__FBXLoader: unknown attribute mapping type ' + infoObject.mappingType );
 
 		}
 
@@ -3949,7 +3960,7 @@ THREE.FBXLoader = ( function () {
 
 		if ( order === 6 ) {
 
-			console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
+			console.warn( '__FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
 			return enums[ 0 ];
 
 		}
@@ -4013,3 +4024,7 @@ THREE.FBXLoader = ( function () {
 	return FBXLoader;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

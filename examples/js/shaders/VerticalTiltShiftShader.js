@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\VerticalTiltShiftShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position
@@ -9,7 +19,8 @@
  * - "r" parameter control where "focused" horizontal line lies
  */
 
-THREE.VerticalTiltShiftShader = {
+
+exports.VerticalTiltShiftShader = {
 
 	uniforms: {
 
@@ -63,3 +74,7 @@ THREE.VerticalTiltShiftShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

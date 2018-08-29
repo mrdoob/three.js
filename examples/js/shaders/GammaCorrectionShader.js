@@ -1,11 +1,22 @@
 /**
+ * Generated from 'examples\modules\shaders\GammaCorrectionShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author WestLangley / http://github.com/WestLangley
  *
  * Gamma Correction Shader
  * http://en.wikipedia.org/wiki/gamma_correction
  */
 
-THREE.GammaCorrectionShader = {
+
+exports.GammaCorrectionShader = {
 
 	uniforms: {
 
@@ -43,3 +54,7 @@ THREE.GammaCorrectionShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

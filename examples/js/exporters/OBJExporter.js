@@ -1,12 +1,24 @@
 /**
+ * Generated from 'examples\modules\exporters\OBJExporter.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJExporter = function () {};
 
-THREE.OBJExporter.prototype = {
 
-	constructor: THREE.OBJExporter,
+exports.OBJExporter = function () {};
+
+exports.OBJExporter.prototype = {
+
+	constructor: exports.OBJExporter,
 
 	parse: function ( object ) {
 
@@ -154,7 +166,7 @@ THREE.OBJExporter.prototype = {
 
 			} else {
 
-				console.warn( 'THREE.OBJExporter.parseMesh(): geometry type unsupported', geometry );
+				console.warn( '__OBJExporter.parseMesh(): geometry type unsupported', geometry );
 
 			}
 
@@ -230,7 +242,7 @@ THREE.OBJExporter.prototype = {
 
 			} else {
 
-				console.warn( 'THREE.OBJExporter.parseLine(): geometry type unsupported', geometry );
+				console.warn( '__OBJExporter.parseLine(): geometry type unsupported', geometry );
 
 			}
 
@@ -260,3 +272,7 @@ THREE.OBJExporter.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

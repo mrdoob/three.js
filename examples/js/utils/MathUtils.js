@@ -1,9 +1,20 @@
 /**
+ * Generated from 'examples\modules\utils\MathUtils.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author WestLangley / http://github.com/WestLangley
  * @author thezwap / http://github.com/thezwap
  */
 
-THREE.MathUtils = {
+
+exports.MathUtils = {
 
     setQuaternionFromProperEuler: function ( q, a, b, c, order ) {
 
@@ -54,10 +65,14 @@ THREE.MathUtils = {
 
         } else {
 
-            console.warn( 'THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order.' );
+            console.warn( '__MathUtils: .setQuaternionFromProperEuler() encountered an unknown order.' );
 
         }
 
     }
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

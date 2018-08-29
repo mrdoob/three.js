@@ -1,6 +1,18 @@
 /**
+ * Generated from 'examples\modules\geometries\ConvexGeometry.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('../QuickHull.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', '../QuickHull.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,QuickHull_js) { 'use strict';
+
+/**
  * @author Mugen87 / https://github.com/Mugen87
  */
+
+
 
 ( function () {
 
@@ -31,13 +43,13 @@
 
 		// execute QuickHull
 
-		if ( THREE.QuickHull === undefined ) {
+		if ( QuickHull_js.QuickHull === undefined ) {
 
-			console.error( 'THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on THREE.QuickHull' );
+			console.error( '__ConvexBufferGeometry: ConvexBufferGeometry relies on QuickHull' );
 
 		}
 
-		var quickHull = new THREE.QuickHull().setFromPoints( points );
+		var quickHull = new QuickHull_js.QuickHull().setFromPoints( points );
 
 		// generate vertices and normals
 
@@ -75,7 +87,11 @@
 
 	// export
 
-	THREE.ConvexGeometry = ConvexGeometry;
-	THREE.ConvexBufferGeometry = ConvexBufferGeometry;
+	exports.ConvexGeometry = ConvexGeometry;
+	exports.ConvexBufferGeometry = ConvexBufferGeometry;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

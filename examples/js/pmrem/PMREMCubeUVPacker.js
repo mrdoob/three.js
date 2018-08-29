@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\pmrem\PMREMCubeUVPacker.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Prashant Sharma / spidersharma03
  * @author Ben Houston / bhouston, https://clara.io
  *
@@ -13,7 +23,9 @@
  * The arrangement of the faces is fixed, as assuming this arrangement, the sampling function has been written.
  */
 
-THREE.PMREMCubeUVPacker = function ( cubeTextureLods ) {
+
+
+exports.PMREMCubeUVPacker = function ( cubeTextureLods ) {
 
 	this.cubeLods = cubeTextureLods;
 	var size = cubeTextureLods[ 0 ].width * 4;
@@ -103,9 +115,9 @@ THREE.PMREMCubeUVPacker = function ( cubeTextureLods ) {
 
 };
 
-THREE.PMREMCubeUVPacker.prototype = {
+exports.PMREMCubeUVPacker.prototype = {
 
-	constructor: THREE.PMREMCubeUVPacker,
+	constructor: exports.PMREMCubeUVPacker,
 
 	update: function ( renderer ) {
 
@@ -201,3 +213,7 @@ THREE.PMREMCubeUVPacker.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

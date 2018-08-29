@@ -1,9 +1,19 @@
 /**
+ * Generated from 'examples\modules\exporters\PLYExporter.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Garrett Johnson / http://gkjohnson.github.io/
  * https://github.com/gkjohnson/ply-exporter-js
  *
  * Usage:
- *  var exporter = new THREE.PLYExporter();
+ *  var exporter = new PLYExporter();
  *
  *  // second argument is a list of options
  *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ] });
@@ -12,17 +22,19 @@
  * http://paulbourke.net/dataformats/ply/
  */
 
-THREE.PLYExporter = function () {};
 
-THREE.PLYExporter.prototype = {
 
-	constructor: THREE.PLYExporter,
+exports.PLYExporter = function () {};
+
+exports.PLYExporter.prototype = {
+
+	constructor: exports.PLYExporter,
 
 	parse: function ( object, onDone, options ) {
 
 		if ( onDone && typeof onDone === 'object' ) {
 
-			console.warn( 'THREE.PLYExporter: The options parameter is now the third argument to the "parse" function. See the documentation for the new API.' );
+			console.warn( '__PLYExporter: The options parameter is now the third argument to the "parse" function. See the documentation for the new API.' );
 			options = onDone;
 			onDone = undefined;
 
@@ -547,3 +559,7 @@ THREE.PLYExporter.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

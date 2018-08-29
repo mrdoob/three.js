@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\BVHLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author herzig / http://github.com/herzig
  * @author Mugen87 / https://github.com/Mugen87
  *
@@ -8,7 +18,9 @@
  *
  */
 
-THREE.BVHLoader = function ( manager ) {
+
+
+exports.BVHLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -17,9 +29,9 @@ THREE.BVHLoader = function ( manager ) {
 
 };
 
-THREE.BVHLoader.prototype = {
+exports.BVHLoader.prototype = {
 
-	constructor: THREE.BVHLoader,
+	constructor: exports.BVHLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -49,7 +61,7 @@ THREE.BVHLoader.prototype = {
 
 			if ( nextLine( lines ) !== 'HIERARCHY' ) {
 
-				console.error( 'THREE.BVHLoader: HIERARCHY expected.' );
+				console.error( '__BVHLoader: HIERARCHY expected.' );
 
 			}
 
@@ -60,7 +72,7 @@ THREE.BVHLoader.prototype = {
 
 			if ( nextLine( lines ) !== 'MOTION' ) {
 
-				console.error( 'THREE.BVHLoader: MOTION expected.' );
+				console.error( '__BVHLoader: MOTION expected.' );
 
 			}
 
@@ -71,7 +83,7 @@ THREE.BVHLoader.prototype = {
 
 			if ( isNaN( numFrames ) ) {
 
-				console.error( 'THREE.BVHLoader: Failed to read number of frames.' );
+				console.error( '__BVHLoader: Failed to read number of frames.' );
 
 			}
 
@@ -82,7 +94,7 @@ THREE.BVHLoader.prototype = {
 
 			if ( isNaN( frameTime ) ) {
 
-				console.error( 'THREE.BVHLoader: Failed to read frame time.' );
+				console.error( '__BVHLoader: Failed to read frame time.' );
 
 			}
 
@@ -159,7 +171,7 @@ THREE.BVHLoader.prototype = {
 						keyframe.rotation.multiply( quat );
 						break;
 					default:
-						console.warn( 'THREE.BVHLoader: Invalid channel type.' );
+						console.warn( '__BVHLoader: Invalid channel type.' );
 
 				}
 
@@ -207,7 +219,7 @@ THREE.BVHLoader.prototype = {
 
 			if ( nextLine( lines ) !== '{' ) {
 
-				console.error( 'THREE.BVHLoader: Expected opening { after type & name' );
+				console.error( '__BVHLoader: Expected opening { after type & name' );
 
 			}
 
@@ -217,13 +229,13 @@ THREE.BVHLoader.prototype = {
 
 			if ( tokens[ 0 ] !== 'OFFSET' ) {
 
-				console.error( 'THREE.BVHLoader: Expected OFFSET but got: ' + tokens[ 0 ] );
+				console.error( '__BVHLoader: Expected OFFSET but got: ' + tokens[ 0 ] );
 
 			}
 
 			if ( tokens.length !== 4 ) {
 
-				console.error( 'THREE.BVHLoader: Invalid number of values for OFFSET.' );
+				console.error( '__BVHLoader: Invalid number of values for OFFSET.' );
 
 			}
 
@@ -235,7 +247,7 @@ THREE.BVHLoader.prototype = {
 
 			if ( isNaN( offset.x ) || isNaN( offset.y ) || isNaN( offset.z ) ) {
 
-				console.error( 'THREE.BVHLoader: Invalid values of OFFSET.' );
+				console.error( '__BVHLoader: Invalid values of OFFSET.' );
 
 			}
 
@@ -249,7 +261,7 @@ THREE.BVHLoader.prototype = {
 
 				if ( tokens[ 0 ] !== 'CHANNELS' ) {
 
-					console.error( 'THREE.BVHLoader: Expected CHANNELS definition.' );
+					console.error( '__BVHLoader: Expected CHANNELS definition.' );
 
 				}
 
@@ -404,3 +416,7 @@ THREE.BVHLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

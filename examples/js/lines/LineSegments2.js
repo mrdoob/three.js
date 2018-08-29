@@ -1,22 +1,33 @@
 /**
+ * Generated from 'examples\modules\lines\LineSegments2.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./LineMaterial.js'), require('./LineSegmentsGeometry.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './LineMaterial.js', './LineSegmentsGeometry.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,LineMaterial_js,LineSegmentsGeometry_js) { 'use strict';
+
+/**
  * @author WestLangley / http://github.com/WestLangley
  *
  */
 
-THREE.LineSegments2 = function ( geometry, material ) {
+
+exports.LineSegments2 = function ( geometry, material ) {
 
 	THREE.Mesh.call( this );
 
 	this.type = 'LineSegments2';
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.LineSegmentsGeometry();
-	this.material = material !== undefined ? material : new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
+	this.geometry = geometry !== undefined ? geometry : new LineSegmentsGeometry_js.LineSegmentsGeometry();
+	this.material = material !== undefined ? material : new LineMaterial_js.LineMaterial( { color: Math.random() * 0xffffff } );
 
 };
 
-THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
+exports.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
 
-	constructor: THREE.LineSegments2,
+	constructor: exports.LineSegments2,
 
 	isLineSegments2: true,
 
@@ -63,3 +74,7 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

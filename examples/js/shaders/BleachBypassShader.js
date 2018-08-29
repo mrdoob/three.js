@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\BleachBypassShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Bleach bypass shader [http://en.wikipedia.org/wiki/Bleach_bypass]
@@ -6,7 +16,8 @@
  * http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass
  */
 
-THREE.BleachBypassShader = {
+
+exports.BleachBypassShader = {
 
 	uniforms: {
 
@@ -62,3 +73,7 @@ THREE.BleachBypassShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

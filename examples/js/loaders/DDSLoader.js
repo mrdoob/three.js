@@ -1,19 +1,31 @@
+/**
+ * Generated from 'examples\modules\loaders\DDSLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DDSLoader = function ( manager ) {
+
+
+exports.DDSLoader = function ( manager ) {
 
 	THREE.CompressedTextureLoader.call( this, manager );
 
-	this._parser = THREE.DDSLoader.parse;
+	this._parser = exports.DDSLoader.parse;
 
 };
 
-THREE.DDSLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
-THREE.DDSLoader.prototype.constructor = THREE.DDSLoader;
+exports.DDSLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
+exports.DDSLoader.prototype.constructor = exports.DDSLoader;
 
-THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
+exports.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 
 	var dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };
 
@@ -138,14 +150,14 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 
 	if ( header[ off_magic ] !== DDS_MAGIC ) {
 
-		console.error( 'THREE.DDSLoader.parse: Invalid magic number in DDS header.' );
+		console.error( '__DDSLoader.parse: Invalid magic number in DDS header.' );
 		return dds;
 
 	}
 
 	if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
 
-		console.error( 'THREE.DDSLoader.parse: Unsupported format, must contain a FourCC code.' );
+		console.error( '__DDSLoader.parse: Unsupported format, must contain a FourCC code.' );
 		return dds;
 
 	}
@@ -196,7 +208,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 
 			} else {
 
-				console.error( 'THREE.DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
+				console.error( '__DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
 				return dds;
 
 			}
@@ -222,7 +234,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 		! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEZ )
 	) ) {
 
-		console.error( 'THREE.DDSLoader.parse: Incomplete cubemap faces' );
+		console.error( '__DDSLoader.parse: Incomplete cubemap faces' );
 		return dds;
 
 	}
@@ -270,3 +282,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 	return dds;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

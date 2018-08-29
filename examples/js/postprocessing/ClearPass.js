@@ -1,10 +1,21 @@
 /**
+ * Generated from 'examples\modules\postprocessing\ClearPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,three_module_js,Pass_js) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ClearPass = function ( clearColor, clearAlpha ) {
 
-	THREE.Pass.call( this );
+exports.ClearPass = function ( clearColor, clearAlpha ) {
+
+	Pass_js.Pass.call( this );
 
 	this.needsSwap = false;
 
@@ -13,9 +24,9 @@ THREE.ClearPass = function ( clearColor, clearAlpha ) {
 
 };
 
-THREE.ClearPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.ClearPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.ClearPass,
+	constructor: exports.ClearPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -42,3 +53,7 @@ THREE.ClearPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

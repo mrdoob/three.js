@@ -1,13 +1,25 @@
 /**
+ * Generated from 'examples\modules\loaders\LoaderSupport.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
   * @author Kai Salmen / https://kaisalmen.de
   * Development repository: https://github.com/kaisalmen/WWOBJLoader
   */
 
+
+
 'use strict';
 
-if ( THREE.LoaderSupport === undefined ) {
+if ( exports.LoaderSupport === undefined ) {
 
-	THREE.LoaderSupport = {};
+	exports.LoaderSupport = {};
 
 }
 
@@ -15,7 +27,7 @@ if ( THREE.LoaderSupport === undefined ) {
  * Validation functions.
  * @class
  */
-THREE.LoaderSupport.Validator = {
+exports.LoaderSupport.Validator = {
 	/**
 	 * If given input is null or undefined, false is returned otherwise true.
 	 *
@@ -42,9 +54,9 @@ THREE.LoaderSupport.Validator = {
  * Callbacks utilized by loaders and builders.
  * @class
  */
-THREE.LoaderSupport.Callbacks = (function () {
+exports.LoaderSupport.Callbacks = (function () {
 
-	var Validator = THREE.LoaderSupport.Validator;
+	var Validator = exports.LoaderSupport.Validator;
 
 	function Callbacks() {
 		this.onProgress = null;
@@ -56,7 +68,7 @@ THREE.LoaderSupport.Callbacks = (function () {
 
 	/**
 	 * Register callback function that is invoked by internal function "announceProgress" to print feedback.
-	 * @memberOf THREE.LoaderSupport.Callbacks
+	 * @memberOf LoaderSupport.Callbacks
 	 *
 	 * @param {callback} callbackOnProgress Callback function for described functionality
 	 */
@@ -66,7 +78,7 @@ THREE.LoaderSupport.Callbacks = (function () {
 
 	/**
 	 * Register callback function that is invoked when an error is reported.
-	 * @memberOf THREE.LoaderSupport.Callbacks
+	 * @memberOf LoaderSupport.Callbacks
 	 *
 	 * @param {callback} callbackOnReportError Callback function for described functionality
 	 */
@@ -76,8 +88,8 @@ THREE.LoaderSupport.Callbacks = (function () {
 
 	/**
 	 * Register callback function that is called every time a mesh was loaded.
-	 * Use {@link THREE.LoaderSupport.LoadedMeshUserOverride} for alteration instructions (geometry, material or disregard mesh).
-	 * @memberOf THREE.LoaderSupport.Callbacks
+	 * Use {@link LoaderSupport.LoadedMeshUserOverride} for alteration instructions (geometry, material or disregard mesh).
+	 * @memberOf LoaderSupport.Callbacks
 	 *
 	 * @param {callback} callbackOnMeshAlter Callback function for described functionality
 	 */
@@ -87,7 +99,7 @@ THREE.LoaderSupport.Callbacks = (function () {
 
 	/**
 	 * Register callback function that is called once loading of the complete OBJ file is completed.
-	 * @memberOf THREE.LoaderSupport.Callbacks
+	 * @memberOf LoaderSupport.Callbacks
 	 *
 	 * @param {callback} callbackOnLoad Callback function for described functionality
 	 */
@@ -97,7 +109,7 @@ THREE.LoaderSupport.Callbacks = (function () {
 
 	/**
 	 * Register callback function that is called when materials have been loaded.
-	 * @memberOf THREE.LoaderSupport.Callbacks
+	 * @memberOf LoaderSupport.Callbacks
 	 *
 	 * @param {callback} callbackOnLoadMaterials Callback function for described functionality
 	 */
@@ -116,7 +128,7 @@ THREE.LoaderSupport.Callbacks = (function () {
  * @param {boolean} disregardMesh=false Tell implementation to completely disregard this mesh
  * @param {boolean} disregardMesh=false Tell implementation that mesh(es) have been altered or added
  */
-THREE.LoaderSupport.LoadedMeshUserOverride = (function () {
+exports.LoaderSupport.LoadedMeshUserOverride = (function () {
 
 	function LoadedMeshUserOverride( disregardMesh, alteredMesh ) {
 		this.disregardMesh = disregardMesh === true;
@@ -159,15 +171,15 @@ THREE.LoaderSupport.LoadedMeshUserOverride = (function () {
 
 
 /**
- * A resource description used by {@link THREE.LoaderSupport.PrepData} and others.
+ * A resource description used by {@link LoaderSupport.PrepData} and others.
  * @class
  *
  * @param {string} url URL to the file
  * @param {string} extension The file extension (type)
  */
-THREE.LoaderSupport.ResourceDescriptor = (function () {
+exports.LoaderSupport.ResourceDescriptor = (function () {
 
-	var Validator = THREE.LoaderSupport.Validator;
+	var Validator = exports.LoaderSupport.Validator;
 
 	function ResourceDescriptor( url, extension ) {
 		var urlParts = url.split( '/' );
@@ -193,7 +205,7 @@ THREE.LoaderSupport.ResourceDescriptor = (function () {
 
 	/**
 	 * Set the content of this resource
-	 * @memberOf THREE.LoaderSupport.ResourceDescriptor
+	 * @memberOf LoaderSupport.ResourceDescriptor
 	 *
 	 * @param {Object} content The file content as arraybuffer or text
 	 */
@@ -209,9 +221,9 @@ THREE.LoaderSupport.ResourceDescriptor = (function () {
  * Configuration instructions to be used by run method.
  * @class
  */
-THREE.LoaderSupport.PrepData = (function () {
+exports.LoaderSupport.PrepData = (function () {
 
-	var Validator = THREE.LoaderSupport.Validator;
+	var Validator = exports.LoaderSupport.Validator;
 
 	function PrepData( modelName ) {
 		this.logging = {
@@ -220,12 +232,12 @@ THREE.LoaderSupport.PrepData = (function () {
 		};
 		this.modelName = Validator.verifyInput( modelName, '' );
 		this.resources = [];
-		this.callbacks = new THREE.LoaderSupport.Callbacks();
+		this.callbacks = new exports.LoaderSupport.Callbacks();
 	}
 
 	/**
 	 * Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
-	 * @memberOf THREE.LoaderSupport.PrepData
+	 * @memberOf LoaderSupport.PrepData
 	 *
 	 * @param {boolean} enabled True or false.
 	 * @param {boolean} debug True or false.
@@ -236,10 +248,10 @@ THREE.LoaderSupport.PrepData = (function () {
 	};
 
 	/**
-	 * Returns all callbacks as {@link THREE.LoaderSupport.Callbacks}
-	 * @memberOf THREE.LoaderSupport.PrepData
+	 * Returns all callbacks as {@link LoaderSupport.Callbacks}
+	 * @memberOf LoaderSupport.PrepData
 	 *
-	 * @returns {THREE.LoaderSupport.Callbacks}
+	 * @returns {LoaderSupport.Callbacks}
 	 */
 	PrepData.prototype.getCallbacks = function () {
 		return this.callbacks;
@@ -247,9 +259,9 @@ THREE.LoaderSupport.PrepData = (function () {
 
 	/**
 	 * Add a resource description.
-	 * @memberOf THREE.LoaderSupport.PrepData
+	 * @memberOf LoaderSupport.PrepData
 	 *
-	 * @param {THREE.LoaderSupport.ResourceDescriptor} Adds a {@link THREE.LoaderSupport.ResourceDescriptor}
+	 * @param {LoaderSupport.ResourceDescriptor} Adds a {@link LoaderSupport.ResourceDescriptor}
 	 */
 	PrepData.prototype.addResource = function ( resource ) {
 		this.resources.push( resource );
@@ -257,12 +269,12 @@ THREE.LoaderSupport.PrepData = (function () {
 
 	/**
 	 * Clones this object and returns it afterwards. Callbacks and resources are not cloned deep (references!).
-	 * @memberOf THREE.LoaderSupport.PrepData
+	 * @memberOf LoaderSupport.PrepData
 	 *
-	 * @returns {@link THREE.LoaderSupport.PrepData}
+	 * @returns {@link LoaderSupport.PrepData}
 	 */
 	PrepData.prototype.clone = function () {
-		var clone = new THREE.LoaderSupport.PrepData( this.modelName );
+		var clone = new exports.LoaderSupport.PrepData( this.modelName );
 		clone.logging.enabled = this.logging.enabled;
 		clone.logging.debug = this.logging.debug;
 		clone.resources = this.resources;
@@ -284,12 +296,12 @@ THREE.LoaderSupport.PrepData = (function () {
 
 
 	/**
-	 * Identify files or content of interest from an Array of {@link THREE.LoaderSupport.ResourceDescriptor}.
-	 * @memberOf THREE.LoaderSupport.PrepData
+	 * Identify files or content of interest from an Array of {@link LoaderSupport.ResourceDescriptor}.
+	 * @memberOf LoaderSupport.PrepData
 	 *
-	 * @param {THREE.LoaderSupport.ResourceDescriptor[]} resources Array of {@link THREE.LoaderSupport.ResourceDescriptor}
+	 * @param {LoaderSupport.ResourceDescriptor[]} resources Array of {@link LoaderSupport.ResourceDescriptor}
 	 * @param Object fileDesc Object describing which resources are of interest (ext, type (string or UInt8Array) and ignore (boolean))
-	 * @returns {{}} Object with each "ext" and the corresponding {@link THREE.LoaderSupport.ResourceDescriptor}
+	 * @returns {{}} Object with each "ext" and the corresponding {@link LoaderSupport.ResourceDescriptor}
 	 */
 	PrepData.prototype.checkResourceDescriptorFiles = function ( resources, fileDesc ) {
 		var resource, triple, i, found;
@@ -362,26 +374,26 @@ THREE.LoaderSupport.PrepData = (function () {
  * Supports vertex, vertexColor, normal, uv and index buffers.
  * @class
  */
-THREE.LoaderSupport.MeshBuilder = (function () {
+exports.LoaderSupport.MeshBuilder = (function () {
 
 	var LOADER_MESH_BUILDER_VERSION = '1.2.2';
 
-	var Validator = THREE.LoaderSupport.Validator;
+	var Validator = exports.LoaderSupport.Validator;
 
 	function MeshBuilder() {
-		console.info( 'Using THREE.LoaderSupport.MeshBuilder version: ' + LOADER_MESH_BUILDER_VERSION );
+		console.info( 'Using __LoaderSupport.MeshBuilder version: ' + LOADER_MESH_BUILDER_VERSION );
 		this.logging = {
 			enabled: true,
 			debug: false
 		};
 
-		this.callbacks = new THREE.LoaderSupport.Callbacks();
+		this.callbacks = new exports.LoaderSupport.Callbacks();
 		this.materials = [];
 	}
 
 	/**
 	 * Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
-	 * @memberOf THREE.LoaderSupport.MeshBuilder
+	 * @memberOf LoaderSupport.MeshBuilder
 	 *
 	 * @param {boolean} enabled True or false.
 	 * @param {boolean} debug True or false.
@@ -393,7 +405,7 @@ THREE.LoaderSupport.MeshBuilder = (function () {
 
 	/**
 	 * Initializes the MeshBuilder (currently only default material initialisation).
-	 * @memberOf THREE.LoaderSupport.MeshBuilder
+	 * @memberOf LoaderSupport.MeshBuilder
 	 *
 	 */
 	MeshBuilder.prototype.init = function () {
@@ -430,7 +442,7 @@ THREE.LoaderSupport.MeshBuilder = (function () {
 
 	/**
 	 * Set materials loaded by any supplier of an Array of {@link THREE.Material}.
-	 * @memberOf THREE.LoaderSupport.MeshBuilder
+	 * @memberOf LoaderSupport.MeshBuilder
 	 *
 	 * @param {THREE.Material[]} materials Array of {@link THREE.Material}
 	 */
@@ -456,7 +468,7 @@ THREE.LoaderSupport.MeshBuilder = (function () {
 
 	/**
 	 * Delegates processing of the payload (mesh building or material update) to the corresponding functions (BW-compatibility).
-	 * @memberOf THREE.LoaderSupport.MeshBuilder
+	 * @memberOf LoaderSupport.MeshBuilder
 	 *
 	 * @param {Object} payload Raw Mesh or Material descriptions.
 	 * @returns {THREE.Mesh[]} mesh Array of {@link THREE.Mesh} or null in case of material update
@@ -476,7 +488,7 @@ THREE.LoaderSupport.MeshBuilder = (function () {
 
 	/**
 	 * Builds one or multiple meshes from the data described in the payload (buffers, params, material info).
-	 * @memberOf THREE.LoaderSupport.MeshBuilder
+	 * @memberOf LoaderSupport.MeshBuilder
 	 *
 	 * @param {Object} meshPayload Raw mesh description (buffers, params, materials) used to build one to many meshes.
 	 * @returns {THREE.Mesh[]} mesh Array of {@link THREE.Mesh}
@@ -635,7 +647,7 @@ THREE.LoaderSupport.MeshBuilder = (function () {
 
 	/**
 	 * Updates the materials with contained material objects (sync) or from alteration instructions (async).
-	 * @memberOf THREE.LoaderSupport.MeshBuilder
+	 * @memberOf LoaderSupport.MeshBuilder
 	 *
 	 * @param {Object} materialPayload Material update instructions
 	 */
@@ -736,7 +748,7 @@ THREE.LoaderSupport.MeshBuilder = (function () {
  *
  * @class
  */
-THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
+exports.LoaderSupport.WorkerRunnerRefImpl = (function () {
 
 	function WorkerRunnerRefImpl() {
 		var scope = this;
@@ -748,7 +760,7 @@ THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
 
 	/**
 	 * Applies values from parameter object via set functions or via direct assignment.
-	 * @memberOf THREE.LoaderSupport.WorkerRunnerRefImpl
+	 * @memberOf LoaderSupport.WorkerRunnerRefImpl
 	 *
 	 * @param {Object} parser The parser instance
 	 * @param {Object} params The parameter object
@@ -773,7 +785,7 @@ THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
 
 	/**
 	 * Configures the Parser implementation according the supplied configuration object.
-	 * @memberOf THREE.LoaderSupport.WorkerRunnerRefImpl
+	 * @memberOf LoaderSupport.WorkerRunnerRefImpl
 	 *
 	 * @param {Object} payload Raw mesh description (buffers, params, materials) used to build one to many meshes.
 	 */
@@ -820,11 +832,11 @@ THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
  * which allows to configure the worker and receive raw mesh data during execution.
  * @class
  */
-THREE.LoaderSupport.WorkerSupport = (function () {
+exports.LoaderSupport.WorkerSupport = (function () {
 
 	var WORKER_SUPPORT_VERSION = '2.2.1';
 
-	var Validator = THREE.LoaderSupport.Validator;
+	var Validator = exports.LoaderSupport.Validator;
 
 	var LoaderWorker = (function () {
 
@@ -999,7 +1011,7 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 	})();
 
 	function WorkerSupport() {
-		console.info( 'Using THREE.LoaderSupport.WorkerSupport version: ' + WORKER_SUPPORT_VERSION );
+		console.info( 'Using __LoaderSupport.WorkerSupport version: ' + WORKER_SUPPORT_VERSION );
 		this.logging = {
 			enabled: true,
 			debug: false
@@ -1015,7 +1027,7 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 	/**
 	 * Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
-	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 * @memberOf LoaderSupport.WorkerSupport
 	 *
 	 * @param {boolean} enabled True or false.
 	 * @param {boolean} debug True or false.
@@ -1028,7 +1040,7 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 	/**
 	 * Forces all ArrayBuffers to be transferred to worker to be copied.
-	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 * @memberOf LoaderSupport.WorkerSupport
 	 *
 	 * @param {boolean} forceWorkerDataCopy True or false.
 	 */
@@ -1038,13 +1050,13 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 	/**
 	 * Validate the status of worker code and the derived worker.
-	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 * @memberOf LoaderSupport.WorkerSupport
 	 *
 	 * @param {Function} functionCodeBuilder Function that is invoked with funcBuildObject and funcBuildSingleton that allows stringification of objects and singletons.
 	 * @param {String} parserName Name of the Parser object
 	 * @param {String[]} libLocations URL of libraries that shall be added to worker code relative to libPath
 	 * @param {String} libPath Base path used for loading libraries
-	 * @param {THREE.LoaderSupport.WorkerRunnerRefImpl} runnerImpl The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
+	 * @param {LoaderSupport.WorkerRunnerRefImpl} runnerImpl The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
 	 */
 	WorkerSupport.prototype.validate = function ( functionCodeBuilder, parserName, libLocations, libPath, runnerImpl ) {
 		if ( Validator.isValid( this.loaderWorker.worker ) ) return;
@@ -1061,8 +1073,8 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 		} else {
 
-			runnerImpl = THREE.LoaderSupport.WorkerRunnerRefImpl;
-			if ( this.logging.enabled ) console.info( 'WorkerSupport: Using DEFAULT "THREE.LoaderSupport.WorkerRunnerRefImpl" as Runner class for worker.' );
+			runnerImpl = exports.LoaderSupport.WorkerRunnerRefImpl;
+			if ( this.logging.enabled ) console.info( 'WorkerSupport: Using DEFAULT "__LoaderSupport.WorkerRunnerRefImpl" as Runner class for worker.' );
 
 		}
 
@@ -1108,9 +1120,9 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 	/**
 	 * Specify functions that should be build when new raw mesh data becomes available and when the parser is finished.
-	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 * @memberOf LoaderSupport.WorkerSupport
 	 *
-	 * @param {Function} meshBuilder The mesh builder function. Default is {@link THREE.LoaderSupport.MeshBuilder}.
+	 * @param {Function} meshBuilder The mesh builder function. Default is {@link LoaderSupport.MeshBuilder}.
 	 * @param {Function} onLoad The function that is called when parsing is complete.
 	 */
 	WorkerSupport.prototype.setCallbacks = function ( meshBuilder, onLoad ) {
@@ -1119,7 +1131,7 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 	/**
 	 * Runs the parser with the provided configuration.
-	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 * @memberOf LoaderSupport.WorkerSupport
 	 *
 	 * @param {Object} payload Raw mesh description (buffers, params, materials) used to build one to many meshes.
 	 */
@@ -1129,7 +1141,7 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 	/**
 	 * Request termination of worker once parser is finished.
-	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 * @memberOf LoaderSupport.WorkerSupport
 	 *
 	 * @param {boolean} terminateRequested True or false.
 	 */
@@ -1238,17 +1250,17 @@ THREE.LoaderSupport.WorkerSupport = (function () {
  *
  * @param {string} classDef Class definition to be used for construction
  */
-THREE.LoaderSupport.WorkerDirector = (function () {
+exports.LoaderSupport.WorkerDirector = (function () {
 
 	var LOADER_WORKER_DIRECTOR_VERSION = '2.2.2';
 
-	var Validator = THREE.LoaderSupport.Validator;
+	var Validator = exports.LoaderSupport.Validator;
 
 	var MAX_WEB_WORKER = 16;
 	var MAX_QUEUE_SIZE = 8192;
 
 	function WorkerDirector( classDef ) {
-		console.info( 'Using THREE.LoaderSupport.WorkerDirector version: ' + LOADER_WORKER_DIRECTOR_VERSION );
+		console.info( 'Using __LoaderSupport.WorkerDirector version: ' + LOADER_WORKER_DIRECTOR_VERSION );
 		this.logging = {
 			enabled: true,
 			debug: false
@@ -1275,7 +1287,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 *
 	 * @param {boolean} enabled True or false.
 	 * @param {boolean} debug True or false.
@@ -1287,7 +1299,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Returns the maximum length of the instruction queue.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 *
 	 * @returns {number}
 	 */
@@ -1297,7 +1309,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Returns the maximum number of workers.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 *
 	 * @returns {number}
 	 */
@@ -1307,7 +1319,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Sets the CORS string to be used.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 *
 	 * @param {string} crossOrigin CORS value
 	 */
@@ -1317,7 +1329,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Forces all ArrayBuffers to be transferred to worker to be copied.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 *
 	 * @param {boolean} forceWorkerDataCopy True or false.
 	 */
@@ -1327,7 +1339,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Create or destroy workers according limits. Set the name and register callbacks for dynamically created web workers.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 *
 	 * @param {THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks} globalCallbacks  Register global callbacks used by all web workers
 	 * @param {number} maxQueueSize Set the maximum size of the instruction queue (1-1024)
@@ -1344,7 +1356,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 		for ( var instanceNo = 0; instanceNo < this.maxWebWorkers; instanceNo++ ) {
 
-			var workerSupport = new THREE.LoaderSupport.WorkerSupport();
+			var workerSupport = new exports.LoaderSupport.WorkerSupport();
 			workerSupport.setLogging( this.logging.enabled, this.logging.debug );
 			workerSupport.setForceWorkerDataCopy( this.workerDescription.forceWorkerDataCopy );
 			this.workerDescription.workerSupports[ instanceNo ] = {
@@ -1360,9 +1372,9 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Store run instructions in internal instructionQueue.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 *
-	 * @param {THREE.LoaderSupport.PrepData} prepData
+	 * @param {LoaderSupport.PrepData} prepData
 	 */
 	WorkerDirector.prototype.enqueueForRun = function ( prepData ) {
 		if ( this.instructionQueue.length < this.maxQueueSize ) {
@@ -1373,7 +1385,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 	/**
 	 * Returns if any workers are running.
 	 *
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 * @returns {boolean}
 	 */
 	WorkerDirector.prototype.isRunning = function () {
@@ -1383,7 +1395,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Process the instructionQueue until it is depleted.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 */
 	WorkerDirector.prototype.processQueue = function () {
 		var prepData, supportDesc;
@@ -1472,7 +1484,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 		supportDesc.loader = this._buildLoader( supportDesc.instanceNo );
 
-		var updatedCallbacks = new THREE.LoaderSupport.Callbacks();
+		var updatedCallbacks = new exports.LoaderSupport.Callbacks();
 		updatedCallbacks.setCallbackOnLoad( wrapperOnLoad );
 		updatedCallbacks.setCallbackOnProgress( wrapperOnProgress );
 		updatedCallbacks.setCallbackOnReportError( wrapperOnReportError );
@@ -1500,8 +1512,8 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 		if ( typeof loader.run !== 'function'  ) throw classDef.name + ' has no function "run".';
 		if ( ! loader.hasOwnProperty( 'callbacks' ) || ! Validator.isValid( loader.callbacks ) ) {
 
-			console.warn( classDef.name + ' has an invalid property "callbacks". Will change to "THREE.LoaderSupport.Callbacks"' );
-			loader.callbacks = new THREE.LoaderSupport.Callbacks();
+			console.warn( classDef.name + ' has an invalid property "callbacks". Will change to "__LoaderSupport.Callbacks"' );
+			loader.callbacks = new exports.LoaderSupport.Callbacks();
 
 		}
 
@@ -1523,7 +1535,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 
 	/**
 	 * Terminate all workers.
-	 * @memberOf THREE.LoaderSupport.WorkerDirector
+	 * @memberOf LoaderSupport.WorkerDirector
 	 *
 	 * @param {callback} callbackOnFinishedProcessing Function called once all workers finished processing.
 	 */
@@ -1543,3 +1555,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 	return WorkerDirector;
 
 })();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

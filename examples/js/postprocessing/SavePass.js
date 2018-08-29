@@ -1,15 +1,26 @@
 /**
+ * Generated from 'examples\modules\postprocessing\SavePass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/CopyShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/CopyShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,CopyShader_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SavePass = function ( renderTarget ) {
 
-	THREE.Pass.call( this );
+exports.SavePass = function ( renderTarget ) {
 
-	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.SavePass relies on THREE.CopyShader" );
+	Pass_js.Pass.call( this );
 
-	var shader = THREE.CopyShader;
+	if ( CopyShader_js.CopyShader === undefined )
+		console.error( "__SavePass relies on CopyShader" );
+
+	var shader = CopyShader_js.CopyShader;
 
 	this.textureID = "tDiffuse";
 
@@ -43,9 +54,9 @@ THREE.SavePass = function ( renderTarget ) {
 
 };
 
-THREE.SavePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.SavePass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.SavePass,
+	constructor: exports.SavePass,
 
 	render: function ( renderer, writeBuffer, readBuffer ) {
 
@@ -62,3 +73,7 @@ THREE.SavePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

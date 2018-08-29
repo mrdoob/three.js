@@ -1,9 +1,19 @@
+/**
+ * Generated from 'examples\modules\shaders\ParallaxShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
 // Parallax Occlusion shaders from
 //    http://sunandblackcat.com/tipFullView.php?topicid=28
 // No tangent-space transforms logic based on
 //   http://mmikkelsen3d.blogspot.sk/2012/02/parallaxpoc-mapping-and-no-tangent.html
 
-THREE.ParallaxShader = {
+exports.ParallaxShader = {
 	// Ordered from fastest to best quality.
 	modes: {
 		none:  'NO_PARALLAX',
@@ -182,3 +192,7 @@ THREE.ParallaxShader = {
   ].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

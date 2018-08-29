@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\exporters\GLTFExporter.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author fernandojsg / http://fernandojsg.com
  * @author Don McCurdy / https://www.donmccurdy.com
  * @author Takahiro / https://github.com/takahirox
  */
+
+
 
 //------------------------------------------------------------------------------
 // Constants
@@ -51,11 +63,11 @@ var PATH_PROPERTIES = {
 //------------------------------------------------------------------------------
 // GLTF Exporter
 //------------------------------------------------------------------------------
-THREE.GLTFExporter = function () {};
+exports.GLTFExporter = function () {};
 
-THREE.GLTFExporter.prototype = {
+exports.GLTFExporter.prototype = {
 
-	constructor: THREE.GLTFExporter,
+	constructor: exports.GLTFExporter,
 
 	/**
 	 * Parse scenes and generate GLTF output
@@ -90,7 +102,7 @@ THREE.GLTFExporter.prototype = {
 			asset: {
 
 				version: "2.0",
-				generator: "THREE.GLTFExporter"
+				generator: "__GLTFExporter"
 
 			}
 
@@ -341,7 +353,7 @@ THREE.GLTFExporter.prototype = {
 
 			} catch ( error ) {
 
-				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
+				console.warn( '__GLTFExporter: userData of \'' + object.name + '\' ' +
 					'won\'t be serialized because of JSON.stringify error - ' + error.message );
 
 				return {};
@@ -554,7 +566,7 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type.' );
+				throw new Error( '__GLTFExporter: Unsupported bufferAttribute component type.' );
 
 			}
 
@@ -867,7 +879,7 @@ THREE.GLTFExporter.prototype = {
 
 				} else {
 
-					console.warn( 'THREE.GLTFExporter: Ignoring metalnessMap and roughnessMap because they are not the same Texture.' );
+					console.warn( '__GLTFExporter: Ignoring metalnessMap and roughnessMap because they are not the same Texture.' );
 
 				}
 
@@ -925,7 +937,7 @@ THREE.GLTFExporter.prototype = {
 
 					if ( material.normalScale.x !== material.normalScale.y ) {
 
-						console.warn( 'THREE.GLTFExporter: Normal scale components are different, ignoring Y and exporting X.' );
+						console.warn( '__GLTFExporter: Normal scale components are different, ignoring Y and exporting X.' );
 
 					}
 
@@ -1070,7 +1082,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( originalNormal !== undefined && ! isNormalizedNormalAttribute( originalNormal ) ) {
 
-				console.warn( 'THREE.GLTFExporter: Creating normalized normal attribute from the non-normalized one.' );
+				console.warn( '__GLTFExporter: Creating normalized normal attribute from the non-normalized one.' );
 
 				geometry.addAttribute( 'normal', createNormalizedNormalAttribute( originalNormal ) );
 
@@ -1211,7 +1223,7 @@ THREE.GLTFExporter.prototype = {
 			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
 
 				// temporal workaround.
-				console.warn( 'THREE.GLTFExporter: Creating index for non-indexed multi-material mesh.' );
+				console.warn( '__GLTFExporter: Creating index for non-indexed multi-material mesh.' );
 				forceIndices = true;
 
 			}
@@ -1387,7 +1399,7 @@ THREE.GLTFExporter.prototype = {
 
 				if ( ! trackNode || ! trackProperty ) {
 
-					console.warn( 'THREE.GLTFExporter: Could not export animation track "%s".', track.name );
+					console.warn( '__GLTFExporter: Could not export animation track "%s".', track.name );
 					return null;
 
 				}
@@ -1400,7 +1412,7 @@ THREE.GLTFExporter.prototype = {
 					if ( trackNode.morphTargetInfluences.length !== 1 &&
 						trackBinding.propertyIndex !== undefined ) {
 
-						console.warn( 'THREE.GLTFExporter: Skipping animation track "%s". ' +
+						console.warn( '__GLTFExporter: Skipping animation track "%s". ' +
 							'Morph target keyframe tracks must target all available morph targets ' +
 							'for the given mesh.', track.name );
 						continue;
@@ -1854,3 +1866,7 @@ THREE.GLTFExporter.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

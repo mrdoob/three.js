@@ -1,9 +1,19 @@
 /**
+ * Generated from 'examples\modules\loaders\MMDLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./TGALoader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './TGALoader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,TGALoader_js) { 'use strict';
+
+/**
  * @author takahiro / https://github.com/takahirox
  *
  * Dependencies
  *  - mmd-parser https://github.com/takahirox/mmd-parser
- *  - THREE.TGALoader
+ *  - TGALoader
  *  - THREE.OutlineEffect
  *
  * MMDLoader creates Three.js Objects from MMD resources as
@@ -29,7 +39,8 @@
  *  - shadow support.
  */
 
-THREE.MMDLoader = ( function () {
+
+exports.MMDLoader = ( function () {
 
 	/**
 	 * @param {THREE.LoadingManager} manager
@@ -54,7 +65,7 @@ THREE.MMDLoader = ( function () {
 
 		/**
 		 * @param {string} value
-		 * @return {THREE.MMDLoader}
+		 * @return {MMDLoader}
 		 */
 		setCrossOrigin: function ( crossOrigin ) {
 
@@ -83,7 +94,7 @@ THREE.MMDLoader = ( function () {
 			// Should I detect by seeing header?
 			if ( modelExtension !== 'pmd' && modelExtension !== 'pmx' ) {
 
-				if ( onError ) onError( new Error( 'THREE.MMDLoader: Unknown model file extension .' + modelExtension + '.' ) );
+				if ( onError ) onError( new Error( '__MMDLoader: Unknown model file extension .' + modelExtension + '.' ) );
 
 				return;
 
@@ -274,7 +285,7 @@ THREE.MMDLoader = ( function () {
 
 				if ( typeof MMDParser === 'undefined' ) {
 
-					throw new Error( 'THREE.MMDLoader: Import MMDParser https://github.com/takahirox/mmd-parser' );
+					throw new Error( '__MMDLoader: Import MMDParser https://github.com/takahirox/mmd-parser' );
 
 				}
 
@@ -1162,13 +1173,13 @@ THREE.MMDLoader = ( function () {
 
 			if ( this.tgaLoader === null ) {
 
-				if ( THREE.TGALoader === undefined ) {
+				if ( TGALoader_js.TGALoader === undefined ) {
 
-					throw new Error( 'THREE.MMDLoader: Import THREE.TGALoader' );
+					throw new Error( '__MMDLoader: Import TGALoader' );
 
 				}
 
-				this.tgaLoader = new THREE.TGALoader( this.manager );
+				this.tgaLoader = new TGALoader_js.TGALoader( this.manager );
 
 			}
 
@@ -1202,7 +1213,7 @@ THREE.MMDLoader = ( function () {
 
 				} catch ( e ) {
 
-					console.warn( 'THREE.MMDLoader: ' + filePath + ' seems like a '
+					console.warn( '__MMDLoader: ' + filePath + ' seems like a '
 						+ 'not right default texture path. Using toon00.bmp instead.' );
 
 					index = 0;
@@ -1897,3 +1908,7 @@ THREE.MMDLoader = ( function () {
 	return MMDLoader;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

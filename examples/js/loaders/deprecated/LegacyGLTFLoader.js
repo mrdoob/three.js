@@ -1,11 +1,23 @@
 /**
+ * Generated from 'examples\modules\loaders\deprecated\LegacyGLTFLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Rich Tibbett / https://github.com/richtr
  * @author mrdoob / http://mrdoob.com/
  * @author Tony Parisi / http://www.tonyparisi.com/
  * @author Takahiro / https://github.com/takahirox
  */
 
-THREE.LegacyGLTFLoader = ( function () {
+
+
+exports.LegacyGLTFLoader = ( function () {
 
 	function LegacyGLTFLoader( manager ) {
 
@@ -159,7 +171,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		update: function () {
 
-			console.warn( 'THREE.LegacyGLTFLoader.Shaders has been deprecated, and now updates automatically.' );
+			console.warn( '__LegacyGLTFLoader.Shaders has been deprecated, and now updates automatically.' );
 
 		}
 
@@ -275,7 +287,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		update: function () {
 
-			console.warn( 'THREE.LegacyGLTFLoader.Animation has been deprecated. Use THREE.AnimationMixer instead.' );
+			console.warn( '__LegacyGLTFLoader.Animation has been deprecated. Use THREE.AnimationMixer instead.' );
 
 		}
 
@@ -969,7 +981,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			} else {
 
-				console.warn( 'THREE.LegacyGLTFLoader: ' + buffer.type + ' buffer type is not supported' );
+				console.warn( '__LegacyGLTFLoader: ' + buffer.type + ' buffer type is not supported' );
 
 			}
 
@@ -1100,7 +1112,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
-								console.warn( 'THREE.LegacyGLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
+								console.warn( '__LegacyGLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
 															'internalFormat will be forced to be the same value as format.' );
 
 							}
@@ -2214,3 +2226,7 @@ THREE.LegacyGLTFLoader = ( function () {
 	return LegacyGLTFLoader;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\renderers\RaytracingRenderer.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * RaytracingRenderer renders by raytracing it's scene. However, it does not
  * compute the pixels itself but it hands off and coordinates the tasks for workers.
  * The workers compute the pixel values and this renderer simply paints it to the Canvas.
@@ -6,9 +16,11 @@
  * @author zz85 / http://github.com/zz85
  */
 
-THREE.RaytracingRenderer = function ( parameters ) {
 
-	console.log( 'THREE.RaytracingRenderer', THREE.REVISION );
+
+exports.RaytracingRenderer = function ( parameters ) {
+
+	console.log( '__RaytracingRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 
@@ -284,4 +296,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 };
 
-Object.assign( THREE.RaytracingRenderer.prototype, THREE.EventDispatcher.prototype );
+Object.assign( exports.RaytracingRenderer.prototype, THREE.EventDispatcher.prototype );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

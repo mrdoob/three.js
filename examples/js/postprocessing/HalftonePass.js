@@ -1,25 +1,36 @@
 /**
+ * Generated from 'examples\modules\postprocessing\HalftonePass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/HalftoneShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/HalftoneShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,HalftoneShader_js) { 'use strict';
+
+/**
  * @author meatbags / xavierburrow.com, github/meatbags
  *
- * RGB Halftone pass for three.js effects composer. Requires THREE.HalftoneShader.
+ * RGB Halftone pass for three.js effects composer. Requires HalftoneShader.
  *
  */
 
-THREE.HalftonePass = function ( width, height, params ) {
 
-	THREE.Pass.call( this );
+exports.HalftonePass = function ( width, height, params ) {
 
- 	if ( THREE.HalftoneShader === undefined ) {
+	Pass_js.Pass.call( this );
 
- 		console.error( 'THREE.HalftonePass requires THREE.HalftoneShader' );
+ 	if ( HalftoneShader_js.HalftoneShader === undefined ) {
+
+ 		console.error( '__HalftonePass requires HalftoneShader' );
 
  	}
 
- 	this.uniforms = THREE.UniformsUtils.clone( THREE.HalftoneShader.uniforms );
+ 	this.uniforms = THREE.UniformsUtils.clone( HalftoneShader_js.HalftoneShader.uniforms );
  	this.material = new THREE.ShaderMaterial( {
  		uniforms: this.uniforms,
- 		fragmentShader: THREE.HalftoneShader.fragmentShader,
- 		vertexShader: THREE.HalftoneShader.vertexShader
+ 		fragmentShader: HalftoneShader_js.HalftoneShader.fragmentShader,
+ 		vertexShader: HalftoneShader_js.HalftoneShader.vertexShader
  	} );
 
 	// set params
@@ -44,9 +55,9 @@ THREE.HalftonePass = function ( width, height, params ) {
 
  };
 
- THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+ exports.HalftonePass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.HalftonePass,
+	constructor: exports.HalftonePass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -72,3 +83,7 @@ THREE.HalftonePass = function ( width, height, params ) {
 
  	}
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

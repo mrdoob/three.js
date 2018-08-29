@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\Volume.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js'), require('./VolumeSlice.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js', './VolumeSlice.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,VolumeSlice_js) { 'use strict';
+
+/**
  * This class had been written to handle the output of the NRRD loader.
  * It contains a volume of data and informations about it.
  * For now it only handles 3 dimensional data.
@@ -11,7 +21,8 @@
  * @param   {string}        type            The type of data (uint8, uint16, ...)
  * @param   {ArrayBuffer}   arrayBuffer     The buffer with volume data
  */
-THREE.Volume = function( xLength, yLength, zLength, type, arrayBuffer ) {
+
+exports.Volume = function( xLength, yLength, zLength, type, arrayBuffer ) {
 
 	if ( arguments.length > 0 ) {
 
@@ -90,7 +101,7 @@ THREE.Volume = function( xLength, yLength, zLength, type, arrayBuffer ) {
 			case 'unsigned long long int' :
 			case 'uint64' :
 			case 'uint64_t' :
-				throw 'Error in THREE.Volume constructor : this type is not supported in JavaScript';
+				throw 'Error in __Volume constructor : this type is not supported in JavaScript';
 				break;
 			case 'Float32' :
 			case 'float32' :
@@ -109,7 +120,7 @@ THREE.Volume = function( xLength, yLength, zLength, type, arrayBuffer ) {
 
 		if ( this.data.length !== this.xLength * this.yLength * this.zLength ) {
 
-			throw 'Error in THREE.Volume constructor, lengths are not matching arrayBuffer size';
+			throw 'Error in __Volume constructor, lengths are not matching arrayBuffer size';
 
 		}
 
@@ -147,7 +158,7 @@ THREE.Volume = function( xLength, yLength, zLength, type, arrayBuffer ) {
 			lowerThreshold = value;
 			this.sliceList.forEach( function( slice ) {
 
-				slice.geometryNeedsUpdate = true
+				slice.geometryNeedsUpdate = true;
 
 			} );
 
@@ -189,13 +200,13 @@ THREE.Volume = function( xLength, yLength, zLength, type, arrayBuffer ) {
 
 };
 
-THREE.Volume.prototype = {
+exports.Volume.prototype = {
 
-	constructor : THREE.Volume,
+	constructor : exports.Volume,
 
 	/**
 	 * @member {Function} getData Shortcut for data[access(i,j,k)]
-	 * @memberof THREE.Volume
+	 * @memberof Volume
 	 * @param {number} i    First coordinate
 	 * @param {number} j    Second coordinate
 	 * @param {number} k    Third coordinate
@@ -209,7 +220,7 @@ THREE.Volume.prototype = {
 
 	/**
 	 * @member {Function} access compute the index in the data array corresponding to the given coordinates in IJK system
-	 * @memberof THREE.Volume
+	 * @memberof Volume
 	 * @param {number} i    First coordinate
 	 * @param {number} j    Second coordinate
 	 * @param {number} k    Third coordinate
@@ -223,7 +234,7 @@ THREE.Volume.prototype = {
 
 	/**
 	 * @member {Function} reverseAccess Retrieve the IJK coordinates of the voxel corresponding of the given index in the data
-	 * @memberof THREE.Volume
+	 * @memberof Volume
 	 * @param {number} index index of the voxel
 	 * @returns {Array}  [x,y,z]
 	 */
@@ -238,13 +249,13 @@ THREE.Volume.prototype = {
 
 	/**
 	 * @member {Function} map Apply a function to all the voxels, be careful, the value will be replaced
-	 * @memberof THREE.Volume
+	 * @memberof Volume
 	 * @param {Function} functionToMap A function to apply to every voxel, will be called with the following parameters :
 	 *                                 value of the voxel
 	 *                                 index of the voxel
 	 *                                 the data (TypedArray)
 	 * @param {Object}   context    You can specify a context in which call the function, default if this Volume
-	 * @returns {THREE.Volume}   this
+	 * @returns {Volume}   this
 	 */
 	map : function( functionToMap, context ) {
 
@@ -263,7 +274,7 @@ THREE.Volume.prototype = {
 
 	/**
 	 * @member {Function} extractPerpendicularPlane Compute the orientation of the slice and returns all the information relative to the geometry such as sliceAccess, the plane matrix (orientation and position in RAS coordinate) and the dimensions of the plane in both coordinate system.
-	 * @memberof THREE.Volume
+	 * @memberof Volume
 	 * @param {string}            axis  the normal axis to the slice 'x' 'y' or 'z'
 	 * @param {number}            index the index of the slice
 	 * @returns {Object} an object containing all the usefull information on the geometry of the slice
@@ -380,14 +391,14 @@ THREE.Volume.prototype = {
 	/**
 	 * @member {Function} extractSlice Returns a slice corresponding to the given axis and index
 	 *                        The coordinate are given in the Right Anterior Superior coordinate format
-	 * @memberof THREE.Volume
+	 * @memberof Volume
 	 * @param {string}            axis  the normal axis to the slice 'x' 'y' or 'z'
 	 * @param {number}            index the index of the slice
-	 * @returns {THREE.VolumeSlice} the extracted slice
+	 * @returns {VolumeSlice} the extracted slice
 	 */
 	extractSlice : function( axis, index ) {
 
-		var slice = new THREE.VolumeSlice( this, index, axis );
+		var slice = new VolumeSlice_js.VolumeSlice( this, index, axis );
 		this.sliceList.push( slice );
 		return slice;
 
@@ -395,9 +406,9 @@ THREE.Volume.prototype = {
 
 	/**
 	 * @member {Function} repaintAllSlices Call repaint on all the slices extracted from this volume
-	 * @see THREE.VolumeSlice.repaint
-	 * @memberof THREE.Volume
-	 * @returns {THREE.Volume} this
+	 * @see VolumeSlice.repaint
+	 * @memberof Volume
+	 * @returns {Volume} this
 	 */
 	repaintAllSlices : function() {
 
@@ -413,7 +424,7 @@ THREE.Volume.prototype = {
 
 	/**
 	 * @member {Function} computeMinMax Compute the minimum and the maximum of the data in the volume
-	 * @memberof THREE.Volume
+	 * @memberof Volume
 	 * @returns {Array} [min,max]
 	 */
 	computeMinMax : function() {
@@ -444,3 +455,7 @@ THREE.Volume.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

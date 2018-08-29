@@ -1,11 +1,22 @@
 /**
+ * Generated from 'examples\modules\shaders\LuminosityShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Luminosity
  * http://en.wikipedia.org/wiki/Luminosity
  */
 
-THREE.LuminosityShader = {
+
+exports.LuminosityShader = {
 
 	uniforms: {
 
@@ -48,3 +59,7 @@ THREE.LuminosityShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,10 +1,21 @@
 /**
+ * Generated from 'examples\modules\shaders\BlendShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Blend two textures
  */
 
-THREE.BlendShader = {
+
+exports.BlendShader = {
 
 	uniforms: {
 
@@ -49,3 +60,7 @@ THREE.BlendShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

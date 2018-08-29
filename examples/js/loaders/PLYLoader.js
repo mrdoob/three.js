@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\PLYLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Wei Meng / http://about.me/menway
  *
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
@@ -7,7 +17,7 @@
  * Limitations: ASCII decoding assumes file is UTF-8.
  *
  * Usage:
- *	var loader = new THREE.PLYLoader();
+ *	var loader = new PLYLoader();
  *	loader.load('./models/ply/ascii/dolphins.ply', function (geometry) {
  *
  *		scene.add( new THREE.Mesh( geometry ) );
@@ -27,7 +37,9 @@
  */
 
 
-THREE.PLYLoader = function ( manager ) {
+
+
+exports.PLYLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -35,9 +47,9 @@ THREE.PLYLoader = function ( manager ) {
 
 };
 
-THREE.PLYLoader.prototype = {
+exports.PLYLoader.prototype = {
 
-	constructor: THREE.PLYLoader,
+	constructor: exports.PLYLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -477,3 +489,7 @@ THREE.PLYLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

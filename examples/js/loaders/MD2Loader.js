@@ -1,16 +1,28 @@
 /**
+ * Generated from 'examples\modules\loaders\MD2Loader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MD2Loader = function ( manager ) {
+
+
+exports.MD2Loader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.MD2Loader.prototype = {
+exports.MD2Loader.prototype = {
 
-	constructor: THREE.MD2Loader,
+	constructor: exports.MD2Loader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -377,3 +389,7 @@ THREE.MD2Loader.prototype = {
 	} )()
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

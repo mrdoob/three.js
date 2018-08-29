@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\PCDLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Filipe Caixeta / http://filipecaixeta.com.br
  * @author Mugen87 / https://github.com/Mugen87
  *
@@ -8,7 +18,9 @@
  *
  */
 
-THREE.PCDLoader = function ( manager ) {
+
+
+exports.PCDLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.littleEndian = true;
@@ -16,9 +28,9 @@ THREE.PCDLoader = function ( manager ) {
 };
 
 
-THREE.PCDLoader.prototype = {
+exports.PCDLoader.prototype = {
 
-	constructor: THREE.PCDLoader,
+	constructor: exports.PCDLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -221,7 +233,7 @@ THREE.PCDLoader.prototype = {
 
 		if ( PCDheader.data === 'binary_compressed' ) {
 
-			console.error( 'THREE.PCDLoader: binary_compressed files are not supported' );
+			console.error( '__PCDLoader: binary_compressed files are not supported' );
 			return;
 
 		}
@@ -298,3 +310,7 @@ THREE.PCDLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

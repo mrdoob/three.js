@@ -1,11 +1,24 @@
 /**
+ * Generated from 'examples\modules\math\Lut.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author daron1337 / http://daron1337.github.io/
  */
 
-THREE.Lut = function ( colormap, numberofcolors ) {
+
+
+
+exports.Lut = function ( colormap, numberofcolors ) {
 
 	this.lut = [];
-	this.map = THREE.ColorMapKeywords[ colormap ];
+	this.map = exports.ColorMapKeywords[ colormap ];
 	this.n = numberofcolors;
 	this.mapname = colormap;
 
@@ -37,15 +50,15 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 };
 
-THREE.Lut.prototype = {
+exports.Lut.prototype = {
 
-	constructor: THREE.Lut,
+	constructor: exports.Lut,
 
 	lut: [], map: [], mapname: 'rainbow', n: 256, minV: 0, maxV: 1, legend: null,
 
 	set: function ( value ) {
 
-		if ( value instanceof THREE.Lut ) {
+		if ( value instanceof exports.Lut ) {
 
 			this.copy( value );
 
@@ -75,7 +88,7 @@ THREE.Lut.prototype = {
 
 		this.n = numberofcolors;
 
-		return new THREE.Lut( this.mapname, this.n );
+		return new exports.Lut( this.mapname, this.n );
 
 	},
 
@@ -83,7 +96,7 @@ THREE.Lut.prototype = {
 
 		this.mapname = colormap;
 
-		return new THREE.Lut( this.mapname, this.n );
+		return new exports.Lut( this.mapname, this.n );
 
 	},
 
@@ -123,7 +136,7 @@ THREE.Lut.prototype = {
 
 	addColorMap: function ( colormapName, arrayOfColors ) {
 
-		THREE.ColorMapKeywords[ colormapName ] = arrayOfColors;
+		exports.ColorMapKeywords[ colormapName ] = arrayOfColors;
 
 	},
 
@@ -161,7 +174,7 @@ THREE.Lut.prototype = {
 
 		var data = imageData.data;
 
-		this.map = THREE.ColorMapKeywords[ this.mapname ];
+		this.map = exports.ColorMapKeywords[ this.mapname ];
 
 		var k = 0;
 
@@ -486,7 +499,7 @@ THREE.Lut.prototype = {
 };
 
 
-THREE.ColorMapKeywords = {
+exports.ColorMapKeywords = {
 
 	"rainbow": [[ 0.0, '0x0000FF' ], [ 0.2, '0x00FFFF' ], [ 0.5, '0x00FF00' ], [ 0.8, '0xFFFF00' ], [ 1.0, '0xFF0000' ]],
 	"cooltowarm": [[ 0.0, '0x3C4EC2' ], [ 0.2, '0x9BBCFF' ], [ 0.5, '0xDCDCDC' ], [ 0.8, '0xF6A385' ], [ 1.0, '0xB40426' ]],
@@ -494,3 +507,7 @@ THREE.ColorMapKeywords = {
 	"grayscale": [[ 0.0, '0x000000' ], [ 0.2, '0x404040' ], [ 0.5, '0x7F7F80' ], [ 0.8, '0xBFBFBF' ], [ 1.0, '0xFFFFFF' ]]
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\RGBShiftShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author felixturner / http://airtight.cc/
  *
  * RGB Shift Shader
@@ -10,7 +20,8 @@
  * angle: shift angle in radians
  */
 
-THREE.RGBShiftShader = {
+
+exports.RGBShiftShader = {
 
 	uniforms: {
 
@@ -54,3 +65,7 @@ THREE.RGBShiftShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

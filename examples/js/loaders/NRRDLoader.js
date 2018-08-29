@@ -1,13 +1,23 @@
-THREE.NRRDLoader = function ( manager ) {
+/**
+ * Generated from 'examples\modules\loaders\NRRDLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('../Volume.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', '../Volume.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,Volume_js) { 'use strict';
+
+exports.NRRDLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 
 };
 
-THREE.NRRDLoader.prototype = {
+exports.NRRDLoader.prototype = {
 
-	constructor: THREE.NRRDLoader,
+	constructor: exports.NRRDLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -151,7 +161,7 @@ THREE.NRRDLoader.prototype = {
 
 					field = m[ 1 ].trim();
 					data = m[ 2 ].trim();
-					fn = THREE.NRRDLoader.prototype.fieldFunctions[ field ];
+					fn = exports.NRRDLoader.prototype.fieldFunctions[ field ];
 					if ( fn ) {
 
 						fn.call( headerObject, data );
@@ -309,7 +319,7 @@ THREE.NRRDLoader.prototype = {
 		// .. let's use the underlying array buffer
 		_data = _data.buffer;
 
-		var volume = new THREE.Volume();
+		var volume = new Volume_js.Volume();
 		volume.header = headerObject;
 		//
 		// parse the (unzipped) data to a datastream of the correct type
@@ -589,3 +599,7 @@ THREE.NRRDLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

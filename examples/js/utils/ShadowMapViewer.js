@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\utils\ShadowMapViewer.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('../shaders/UnpackDepthRGBAShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', '../shaders/UnpackDepthRGBAShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,UnpackDepthRGBAShader_js) { 'use strict';
+
+/**
  * @author arya-s / https://github.com/arya-s
  *
  * This is a helper for visualising a given light's shadow map.
@@ -14,7 +24,7 @@
  *		light.name = 'Sun';
  *
  *	3) Create a shadow map viewer for that light and set its size and position optionally:
- *		var shadowMapViewer = new THREE.ShadowMapViewer( light );
+ *		var shadowMapViewer = new ShadowMapViewer( light );
  *		shadowMapViewer.size.set( 128, 128 );	//width, height  default: 256, 256
  *		shadowMapViewer.position.set( 10, 10 );	//x, y in pixel	 default: 0, 0 (top left corner)
  *
@@ -27,7 +37,8 @@
  *	6) If you set the position or size members directly, you need to call shadowMapViewer.update();
  */
 
-THREE.ShadowMapViewer = function ( light ) {
+
+exports.ShadowMapViewer = function ( light ) {
 
 	//- Internals
 	var scope = this;
@@ -47,7 +58,7 @@ THREE.ShadowMapViewer = function ( light ) {
 	var scene = new THREE.Scene();
 
 	//HUD for shadow map
-	var shader = THREE.UnpackDepthRGBAShader;
+	var shader = UnpackDepthRGBAShader_js.UnpackDepthRGBAShader;
 
 	var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 	var material = new THREE.ShaderMaterial( {
@@ -189,4 +200,8 @@ THREE.ShadowMapViewer = function ( light ) {
 
 };
 
-THREE.ShadowMapViewer.prototype.constructor = THREE.ShadowMapViewer;
+exports.ShadowMapViewer.prototype.constructor = exports.ShadowMapViewer;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

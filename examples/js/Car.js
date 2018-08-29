@@ -1,8 +1,19 @@
 /**
+ * Generated from 'examples\modules\Car.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js'), require('./loaders/BinaryLoader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js', './loaders/BinaryLoader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,BinaryLoader_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Car = function () {
+
+exports.Car = function () {
 
 	var scope = this;
 
@@ -109,12 +120,12 @@ THREE.Car = function () {
 
 		loader.load( bodyURL, function( geometry, materials ) {
 
-			createBody( geometry, materials )
+			createBody( geometry, materials );
 
 		} );
 		loader.load( wheelURL, function( geometry, materials ) {
 
-			createWheels( geometry, materials )
+			createWheels( geometry, materials );
 
 		} );
 
@@ -122,16 +133,16 @@ THREE.Car = function () {
 
 	this.loadPartsBinary = function ( bodyURL, wheelURL ) {
 
-		var loader = new THREE.BinaryLoader();
+		var loader = new BinaryLoader_js.BinaryLoader();
 
 		loader.load( bodyURL, function( geometry, materials ) {
 
-			createBody( geometry, materials )
+			createBody( geometry, materials );
 
 		} );
 		loader.load( wheelURL, function( geometry, materials ) {
 
-			createWheels( geometry, materials )
+			createWheels( geometry, materials );
 
 		} );
 
@@ -405,3 +416,7 @@ THREE.Car = function () {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

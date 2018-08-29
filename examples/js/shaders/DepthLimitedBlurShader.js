@@ -1,4 +1,14 @@
-THREE.DepthLimitedBlurShader = {
+/**
+ * Generated from 'examples\modules\shaders\DepthLimitedBlurShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+exports.DepthLimitedBlurShader = {
 	defines: {
 		'KERNEL_RADIUS': 4,
 		'DEPTH_PACKING': 1,
@@ -107,7 +117,7 @@ THREE.DepthLimitedBlurShader = {
 	].join( "\n" )
 };
 
-THREE.BlurShaderUtils = {
+exports.BlurShaderUtils = {
 
 	createSampleWeights: function ( kernelRadius, stdDev ) {
 
@@ -146,10 +156,14 @@ THREE.BlurShaderUtils = {
 	configure: function ( material, kernelRadius, stdDev, uvIncrement ) {
 
 		material.defines[ 'KERNEL_RADIUS' ] = kernelRadius;
-		material.uniforms[ 'sampleUvOffsets' ].value = THREE.BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
-		material.uniforms[ 'sampleWeights' ].value = THREE.BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
+		material.uniforms[ 'sampleUvOffsets' ].value = exports.BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
+		material.uniforms[ 'sampleWeights' ].value = exports.BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
 		material.needsUpdate = true;
 
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

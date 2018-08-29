@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\SSAOShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Screen-space ambient occlusion shader
@@ -11,7 +21,9 @@
  * - refactoring and optimizations
  */
 
-THREE.SSAOShader = {
+
+
+exports.SSAOShader = {
 
 	uniforms: {
 
@@ -231,3 +243,7 @@ THREE.SSAOShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

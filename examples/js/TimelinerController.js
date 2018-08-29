@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\TimelinerController.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * Controller class for the Timeliner GUI.
  *
  * Timeliner GUI library (required to use this class):
@@ -14,7 +24,9 @@
  *
  */
 
-THREE.TimelinerController = function TimelinerController( scene, trackInfo, onUpdate ) {
+
+
+exports.TimelinerController = function TimelinerController( scene, trackInfo, onUpdate ) {
 
 	this._scene = scene;
 	this._trackInfo = trackInfo;
@@ -31,9 +43,9 @@ THREE.TimelinerController = function TimelinerController( scene, trackInfo, onUp
 
 };
 
-THREE.TimelinerController.prototype = {
+exports.TimelinerController.prototype = {
 
-	constructor: THREE.TimelinerController,
+	constructor: exports.TimelinerController,
 
 	init: function( timeliner ) {
 
@@ -278,3 +290,7 @@ THREE.TimelinerController.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

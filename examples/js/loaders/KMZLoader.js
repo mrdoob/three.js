@@ -1,16 +1,27 @@
 /**
+ * Generated from 'examples\modules\loaders\KMZLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./ColladaLoader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './ColladaLoader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,ColladaLoader_js) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.KMZLoader = function ( manager ) {
+
+exports.KMZLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.KMZLoader.prototype = {
+exports.KMZLoader.prototype = {
 
-	constructor: THREE.KMZLoader,
+	constructor: exports.KMZLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -72,7 +83,7 @@ THREE.KMZLoader.prototype = {
 
 			if ( model ) {
 
-				var loader = new THREE.ColladaLoader( manager );
+				var loader = new ColladaLoader_js.ColladaLoader( manager );
 				return loader.parse( zip.files[ model.textContent ].asText() );
 
 			}
@@ -87,7 +98,7 @@ THREE.KMZLoader.prototype = {
 
 				if ( extension === 'dae' ) {
 
-					var loader = new THREE.ColladaLoader( manager );
+					var loader = new ColladaLoader_js.ColladaLoader( manager );
 					return loader.parse( zip.files[ path ].asText() );
 
 				}
@@ -102,3 +113,7 @@ THREE.KMZLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

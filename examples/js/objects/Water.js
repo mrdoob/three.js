@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\objects\Water.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author jbouny / https://github.com/jbouny
  *
  * Work based on :
@@ -7,7 +17,9 @@
  * @author Jonas Wagner / http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
  */
 
-THREE.Water = function ( geometry, options ) {
+
+
+exports.Water = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
 
@@ -304,5 +316,9 @@ THREE.Water = function ( geometry, options ) {
 
 };
 
-THREE.Water.prototype = Object.create( THREE.Mesh.prototype );
-THREE.Water.prototype.constructor = THREE.Water;
+exports.Water.prototype = Object.create( THREE.Mesh.prototype );
+exports.Water.prototype.constructor = exports.Water;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\TechnicolorShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author flimshaw / http://charliehoey.com
  *
  * Technicolor Shader
@@ -7,7 +17,8 @@
  * Demo here: http://charliehoey.com/technicolor_shader/shader_test.html
  */
 
-THREE.TechnicolorShader = {
+
+exports.TechnicolorShader = {
 
 	uniforms: {
 
@@ -45,3 +56,7 @@ THREE.TechnicolorShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

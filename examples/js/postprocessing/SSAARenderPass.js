@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\postprocessing\SSAARenderPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/CopyShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/CopyShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,CopyShader_js) { 'use strict';
+
+/**
 *
 * Supersample Anti-Aliasing Render Pass
 *
@@ -10,9 +20,10 @@
 *
 */
 
-THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
-	THREE.Pass.call( this );
+exports.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
+
+	Pass_js.Pass.call( this );
 
 	this.scene = scene;
 	this.camera = camera;
@@ -24,9 +35,9 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
 	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 
-	if ( THREE.CopyShader === undefined ) console.error( "THREE.SSAARenderPass relies on THREE.CopyShader" );
+	if ( CopyShader_js.CopyShader === undefined ) console.error( "__SSAARenderPass relies on CopyShader" );
 
-	var copyShader = THREE.CopyShader;
+	var copyShader = CopyShader_js.CopyShader;
 	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 
 	this.copyMaterial = new THREE.ShaderMaterial(	{
@@ -48,9 +59,9 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 };
 
-THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.SSAARenderPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.SSAARenderPass,
+	constructor: exports.SSAARenderPass,
 
 	dispose: function () {
 
@@ -78,7 +89,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 		}
 
-		var jitterOffsets = THREE.SSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
+		var jitterOffsets = exports.SSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
 
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
@@ -147,7 +158,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 // before being used, thus these integers need to be scaled by 1/16.
 //
 // Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
-THREE.SSAARenderPass.JitterVectors = [
+exports.SSAARenderPass.JitterVectors = [
 	[
 		[ 0, 0 ]
 	],
@@ -178,3 +189,7 @@ THREE.SSAARenderPass.JitterVectors = [
 		[ 2, 5 ], [ 7, 5 ], [ 5, 6 ], [ 3, 7 ]
 	]
 ];
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,11 +1,23 @@
 /**
+ * Generated from 'examples\modules\shaders\LuminosityHighPassShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author bhouston / http://clara.io/
  *
  * Luminosity
  * http://en.wikipedia.org/wiki/Luminosity
  */
 
-THREE.LuminosityHighPassShader = {
+
+
+exports.LuminosityHighPassShader = {
 
   shaderID: "luminosityHighPass",
 
@@ -62,3 +74,7 @@ THREE.LuminosityHighPassShader = {
 	].join("\n")
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

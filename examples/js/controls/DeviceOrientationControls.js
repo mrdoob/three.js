@@ -1,11 +1,23 @@
 /**
+ * Generated from 'examples\modules\controls\DeviceOrientationControls.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author richt / http://richt.me
  * @author WestLangley / http://github.com/WestLangley
  *
  * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
  */
 
-THREE.DeviceOrientationControls = function ( object ) {
+
+
+exports.DeviceOrientationControls = function ( object ) {
 
 	var scope = this;
 
@@ -109,3 +121,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 	this.connect();
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,21 +1,34 @@
 /**
+ * Generated from 'examples\modules\loaders\RGBELoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Nikos M. / https://github.com/foo123/
  */
+
+
+
 
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
-THREE.HDRLoader = THREE.RGBELoader = function ( manager ) {
+exports.HDRLoader = exports.RGBELoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
 // extend THREE.DataTextureLoader
-THREE.RGBELoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
+exports.RGBELoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
 
 // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
-THREE.RGBELoader.prototype._parser = function ( buffer ) {
+exports.RGBELoader.prototype._parser = function ( buffer ) {
 
 	var
 		/* return codes for rgbe routines */
@@ -31,14 +44,14 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 
 			switch ( rgbe_error_code ) {
 
-				case rgbe_read_error: console.error( "THREE.RGBELoader Read Error: " + ( msg || '' ) );
+				case rgbe_read_error: console.error( "__RGBELoader Read Error: " + ( msg || '' ) );
 					break;
-				case rgbe_write_error: console.error( "THREE.RGBELoader Write Error: " + ( msg || '' ) );
+				case rgbe_write_error: console.error( "__RGBELoader Write Error: " + ( msg || '' ) );
 					break;
-				case rgbe_format_error: console.error( "THREE.RGBELoader Bad File Format: " + ( msg || '' ) );
+				case rgbe_format_error: console.error( "__RGBELoader Bad File Format: " + ( msg || '' ) );
 					break;
 				default:
-				case rgbe_memory_error: console.error( "THREE.RGBELoader: Error: " + ( msg || '' ) );
+				case rgbe_memory_error: console.error( "__RGBELoader: Error: " + ( msg || '' ) );
 
 			}
 			return RGBE_RETURN_FAILURE;
@@ -344,3 +357,7 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 	return null;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\animation\MMDPhysics.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author takahiro / https://github.com/takahirox
  *
  * Dependencies
@@ -11,7 +21,9 @@
  *  - Physics in Worker
  */
 
-THREE.MMDPhysics = ( function () {
+
+
+exports.MMDPhysics = ( function () {
 
 	/**
 	 * @param {THREE.SkinnedMesh} mesh
@@ -26,7 +38,7 @@ THREE.MMDPhysics = ( function () {
 
 		if ( typeof Ammo === 'undefined' ) {
 
-			throw new Error( 'THREE.MMDPhysics: Import ammo.js https://github.com/kripken/ammo.js' );
+			throw new Error( '__MMDPhysics: Import ammo.js https://github.com/kripken/ammo.js' );
 
 		}
 
@@ -66,7 +78,7 @@ THREE.MMDPhysics = ( function () {
 		 * Advances Physics calculation and updates bones.
 		 *
 		 * @param {Number} delta - time in second
-		 * @return {THREE.MMDPhysics}
+		 * @return {MMDPhysics}
 		 */
 		update: function ( delta ) {
 
@@ -133,7 +145,7 @@ THREE.MMDPhysics = ( function () {
 		/**
 		 * Resets rigid bodies transorm to current bone's.
 		 *
-		 * @return {THREE.MMDPhysics}
+		 * @return {MMDPhysics}
 		 */
 		reset: function () {
 
@@ -151,7 +163,7 @@ THREE.MMDPhysics = ( function () {
 		 * Warm ups Rigid bodies. Calculates cycles steps.
 		 *
 		 * @param {Integer} cycles
-		 * @return {THREE.MMDPhysics}
+		 * @return {MMDPhysics}
 		 */
 		warmup: function ( cycles ) {
 
@@ -1404,3 +1416,7 @@ THREE.MMDPhysics = ( function () {
 	return MMDPhysics;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

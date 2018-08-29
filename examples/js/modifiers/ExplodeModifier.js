@@ -1,15 +1,26 @@
 /**
+ * Generated from 'examples\modules\modifiers\ExplodeModifier.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * Make all faces use unique vertices
  * so that each face can be separated from others
  *
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ExplodeModifier = function () {
+
+exports.ExplodeModifier = function () {
 
 };
 
-THREE.ExplodeModifier.prototype.modify = function ( geometry ) {
+exports.ExplodeModifier.prototype.modify = function ( geometry ) {
 
 	var vertices = [];
 
@@ -40,3 +51,7 @@ THREE.ExplodeModifier.prototype.modify = function ( geometry ) {
 	geometry.vertices = vertices;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

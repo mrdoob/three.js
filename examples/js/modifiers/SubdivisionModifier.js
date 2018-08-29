@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\modifiers\SubdivisionModifier.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *	@author centerionware / http://www.centerionware.com
@@ -14,14 +24,16 @@
  *		- currently doesn't handle "Sharp Edges"
  */
 
-THREE.SubdivisionModifier = function ( subdivisions ) {
+
+
+exports.SubdivisionModifier = function ( subdivisions ) {
 
 	this.subdivisions = ( subdivisions === undefined ) ? 1 : subdivisions;
 
 };
 
 // Applies the "modify" pattern
-THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
+exports.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	if ( geometry.isBufferGeometry ) {
 
@@ -153,7 +165,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	/////////////////////////////
 
 	// Performs one iteration of Subdivision
-	THREE.SubdivisionModifier.prototype.smooth = function ( geometry ) {
+	exports.SubdivisionModifier.prototype.smooth = function ( geometry ) {
 
 		var tmp = new THREE.Vector3();
 
@@ -399,3 +411,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	};
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

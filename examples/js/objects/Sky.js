@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\objects\Sky.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author zz85 / https://github.com/zz85
  *
  * Based on "A Practical Analytic Model for Daylight"
@@ -14,9 +24,11 @@
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-THREE.Sky = function () {
 
-	var shader = THREE.Sky.SkyShader;
+
+exports.Sky = function () {
+
+	var shader = exports.Sky.SkyShader;
 
 	var material = new THREE.ShaderMaterial( {
 		fragmentShader: shader.fragmentShader,
@@ -29,9 +41,9 @@ THREE.Sky = function () {
 
 };
 
-THREE.Sky.prototype = Object.create( THREE.Mesh.prototype );
+exports.Sky.prototype = Object.create( THREE.Mesh.prototype );
 
-THREE.Sky.SkyShader = {
+exports.Sky.SkyShader = {
 
 	uniforms: {
 		luminance: { value: 1 },
@@ -220,3 +232,7 @@ THREE.Sky.SkyShader = {
 	].join( '\n' )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

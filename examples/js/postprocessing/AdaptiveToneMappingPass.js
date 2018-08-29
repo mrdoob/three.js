@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\postprocessing\AdaptiveToneMappingPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/CopyShader.js'), require('../shaders/LuminosityShader.js'), require('../shaders/ToneMapShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/CopyShader.js', '../shaders/LuminosityShader.js', '../shaders/ToneMapShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,CopyShader_js,LuminosityShader_js,ToneMapShader_js) { 'use strict';
+
+/**
  * @author miibond
  * Generate a texture that represents the luminosity of the current scene, adapted over time
  * to simulate the optic nerve responding to the amount of light it is receiving.
@@ -7,9 +17,10 @@
  * Full-screen tone-mapping shader based on http://www.graphics.cornell.edu/~jaf/publications/sig02_paper.pdf
  */
 
-THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
-	THREE.Pass.call( this );
+exports.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
+
+	Pass_js.Pass.call( this );
 
 	this.resolution = ( resolution !== undefined ) ? resolution : 256;
 	this.needsInit = true;
@@ -19,10 +30,10 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.previousLuminanceRT = null;
 	this.currentLuminanceRT = null;
 
-	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
+	if ( CopyShader_js.CopyShader === undefined )
+		console.error( "__AdaptiveToneMappingPass relies on CopyShader" );
 
-	var copyShader = THREE.CopyShader;
+	var copyShader = CopyShader_js.CopyShader;
 
 	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 
@@ -36,14 +47,14 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	} );
 
-	if ( THREE.LuminosityShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.LuminosityShader" );
+	if ( LuminosityShader_js.LuminosityShader === undefined )
+		console.error( "__AdaptiveToneMappingPass relies on LuminosityShader" );
 
 	this.materialLuminance = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
-		vertexShader: THREE.LuminosityShader.vertexShader,
-		fragmentShader: THREE.LuminosityShader.fragmentShader,
+		uniforms: THREE.UniformsUtils.clone( LuminosityShader_js.LuminosityShader.uniforms ),
+		vertexShader: LuminosityShader_js.LuminosityShader.vertexShader,
+		fragmentShader: LuminosityShader_js.LuminosityShader.fragmentShader,
 		blending: THREE.NoBlending
 	} );
 
@@ -106,14 +117,14 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		blending: THREE.NoBlending
 	} );
 
-	if ( THREE.ToneMapShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.ToneMapShader" );
+	if ( ToneMapShader_js.ToneMapShader === undefined )
+		console.error( "__AdaptiveToneMappingPass relies on ToneMapShader" );
 
 	this.materialToneMap = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.UniformsUtils.clone( THREE.ToneMapShader.uniforms ),
-		vertexShader: THREE.ToneMapShader.vertexShader,
-		fragmentShader: THREE.ToneMapShader.fragmentShader,
+		uniforms: THREE.UniformsUtils.clone( ToneMapShader_js.ToneMapShader.uniforms ),
+		vertexShader: ToneMapShader_js.ToneMapShader.vertexShader,
+		fragmentShader: ToneMapShader_js.ToneMapShader.fragmentShader,
 		blending: THREE.NoBlending
 	} );
 
@@ -126,9 +137,9 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 };
 
-THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.AdaptiveToneMappingPass,
+	constructor: exports.AdaptiveToneMappingPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -342,3 +353,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

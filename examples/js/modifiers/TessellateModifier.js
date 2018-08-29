@@ -1,17 +1,29 @@
 /**
+ * Generated from 'examples\modules\modifiers\TessellateModifier.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * Break faces with edges longer than maxEdgeLength
  * - not recursive
  *
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.TessellateModifier = function ( maxEdgeLength ) {
+
+
+exports.TessellateModifier = function ( maxEdgeLength ) {
 
 	this.maxEdgeLength = maxEdgeLength;
 
 };
 
-THREE.TessellateModifier.prototype.modify = function ( geometry ) {
+exports.TessellateModifier.prototype.modify = function ( geometry ) {
 
 	var edge;
 
@@ -234,3 +246,7 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 	geometry.faceVertexUvs = faceVertexUvs;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\controls\PointerLockControls.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointerLockControls = function ( camera ) {
+
+
+exports.PointerLockControls = function ( camera ) {
 
 	var scope = this;
 
@@ -67,3 +79,7 @@ THREE.PointerLockControls = function ( camera ) {
 	}();
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

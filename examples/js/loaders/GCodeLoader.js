@@ -1,16 +1,26 @@
+/**
+ * Generated from 'examples\modules\loaders\GCodeLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 'use strict';
 
 /**
- * THREE.GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
+ * GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
  *
  * Gcode files are composed by commands used by machines to create objects.
  *
- * @class THREE.GCodeLoader
+ * @class GCodeLoader
  * @param {Manager} manager Loading manager.
  * @author tentone
  * @author joewalnes
  */
-THREE.GCodeLoader = function ( manager ) {
+exports.GCodeLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -18,7 +28,7 @@ THREE.GCodeLoader = function ( manager ) {
 
 };
 
-THREE.GCodeLoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
+exports.GCodeLoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
 
 	var self = this;
 
@@ -31,7 +41,7 @@ THREE.GCodeLoader.prototype.load = function ( url, onLoad, onProgress, onError )
 
 };
 
-THREE.GCodeLoader.prototype.parse = function ( data ) {
+exports.GCodeLoader.prototype.parse = function ( data ) {
 
 	var state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
 	var layers = [];
@@ -138,7 +148,7 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 		} else if ( cmd === 'G2' || cmd === 'G3' ) {
 
 			//G2/G3 - Arc Movement ( G2 clock wise and G3 counter clock wise )
-			console.warn( 'THREE.GCodeLoader: Arc command not supported' );
+			console.warn( '__GCodeLoader: Arc command not supported' );
 
 		} else if ( cmd === 'G90' ) {
 
@@ -162,7 +172,7 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 		} else {
 
-			console.warn( 'THREE.GCodeLoader: Command not supported:' + cmd );
+			console.warn( '__GCodeLoader: Command not supported:' + cmd );
 
 		}
 
@@ -215,3 +225,7 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 	return object;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

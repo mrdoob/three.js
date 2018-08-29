@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\geometries\DecalGeometry.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Mugen87 / https://github.com/Mugen87
  * @author spite / https://github.com/spite
  *
@@ -15,6 +25,8 @@
  * reference: http://blog.wolfire.com/2009/06/how-to-project-decals/
  *
  */
+
+
 
 ( function () {
 
@@ -352,6 +364,10 @@
 
 	// export
 
-	THREE.DecalGeometry = DecalGeometry;
+	exports.DecalGeometry = DecalGeometry;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

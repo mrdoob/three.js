@@ -1,14 +1,26 @@
 /**
+ * Generated from 'examples\modules\MarchingCubes.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com
  * Port of http://webglsamples.org/blob/blob.html
  */
 
-( function ( THREE ) {
 
-	THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
-		THREE.ImmediateRenderObject.call( this, material );
+( function ( THREE$$1 ) {
+
+	exports.MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
+
+		THREE$$1.ImmediateRenderObject.call( this, material );
 
 		var scope = this;
 
@@ -470,7 +482,7 @@
 
 			}
 
-			if ( scope.enableColors && scope.material.vertexColors !== THREE.NoColors ) {
+			if ( scope.enableColors && scope.material.vertexColors !== THREE$$1.NoColors ) {
 
 				scope.hasColors = true;
 
@@ -705,7 +717,7 @@
 
 		this.generateGeometry = function () {
 
-			console.warn( 'THREE.MarchingCubes: generateGeometry() now returns THREE.BufferGeometry' );
+			console.warn( '__MarchingCubes: generateGeometry() now returns THREE.BufferGeometry' );
 			return this.generateBufferGeometry();
 
 		};
@@ -721,7 +733,7 @@
 
 		this.generateBufferGeometry = function () {
 
-			var geo = new THREE.BufferGeometry();
+			var geo = new THREE$$1.BufferGeometry();
 			var posArray = new Float32Array();
 			var normArray = new Float32Array();
 			var colorArray = new Float32Array();
@@ -741,10 +753,10 @@
 
 			this.render( geo_callback );
 
-			if ( this.hasPositions ) geo.addAttribute( 'position', new THREE.BufferAttribute( posArray, 3 ) );
-			if ( this.hasNormals ) geo.addAttribute( 'normal', new THREE.BufferAttribute( normArray, 3 ) );
-			if ( this.hasColors ) geo.addAttribute( 'color', new THREE.BufferAttribute( colorArray, 3 ) );
-			if ( this.hasUvs ) geo.addAttribute( 'uv', new THREE.BufferAttribute( uvArray, 2 ) );
+			if ( this.hasPositions ) geo.addAttribute( 'position', new THREE$$1.BufferAttribute( posArray, 3 ) );
+			if ( this.hasNormals ) geo.addAttribute( 'normal', new THREE$$1.BufferAttribute( normArray, 3 ) );
+			if ( this.hasColors ) geo.addAttribute( 'color', new THREE$$1.BufferAttribute( colorArray, 3 ) );
+			if ( this.hasUvs ) geo.addAttribute( 'uv', new THREE$$1.BufferAttribute( uvArray, 2 ) );
 
 			return geo;
 
@@ -754,8 +766,8 @@
 
 	};
 
-	THREE.MarchingCubes.prototype = Object.create( THREE.ImmediateRenderObject.prototype );
-	THREE.MarchingCubes.prototype.constructor = THREE.MarchingCubes;
+	exports.MarchingCubes.prototype = Object.create( THREE$$1.ImmediateRenderObject.prototype );
+	exports.MarchingCubes.prototype.constructor = exports.MarchingCubes;
 
 
 	/////////////////////////////////////
@@ -1058,4 +1070,8 @@
 		0, 3, 8, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
 		- 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1 ] );
 
-} )( THREE )
+} )( THREE );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

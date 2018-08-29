@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\MirrorShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author felixturner / http://airtight.cc/
  *
  * Mirror Shader
@@ -7,7 +17,8 @@
  * side: side of input to mirror (0 = left, 1 = right, 2 = top, 3 = bottom)
  */
 
-THREE.MirrorShader = {
+
+exports.MirrorShader = {
 
 	uniforms: {
 
@@ -56,3 +67,7 @@ THREE.MirrorShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

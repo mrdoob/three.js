@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\VolumeSlice.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * This class has been made to hold a slice of a volume data
  * @class
  * @author Valentin Demeusy / https://github.com/stity
@@ -7,7 +17,9 @@
  * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
  * @see THREE.Volume
  */
-THREE.VolumeSlice = function ( volume, index, axis ) {
+
+
+exports.VolumeSlice = function ( volume, index, axis ) {
 
 	var slice = this;
 	/**
@@ -87,13 +99,13 @@ THREE.VolumeSlice = function ( volume, index, axis ) {
 
 };
 
-THREE.VolumeSlice.prototype = {
+exports.VolumeSlice.prototype = {
 
-	constructor: THREE.VolumeSlice,
+	constructor: exports.VolumeSlice,
 
 	/**
 	 * @member {Function} repaint Refresh the texture and the geometry if geometryNeedsUpdate is set to true
-	 * @memberof THREE.VolumeSlice
+	 * @memberof VolumeSlice
 	 */
 	repaint: function () {
 
@@ -179,7 +191,7 @@ THREE.VolumeSlice.prototype = {
 	/**
 	 * @member {Function} Refresh the geometry according to axis and index
 	 * @see THREE.Volume.extractPerpendicularPlane
-	 * @memberof THREE.VolumeSlice
+	 * @memberof VolumeSlice
 	 */
 	updateGeometry: function () {
 
@@ -212,3 +224,7 @@ THREE.VolumeSlice.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

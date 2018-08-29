@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\STLLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author aleeper / http://adamleeper.com/
  * @author mrdoob / http://mrdoob.com/
  * @author gero3 / https://github.com/gero3
@@ -16,7 +26,7 @@
  *  ASCII decoding assumes file is UTF-8.
  *
  * Usage:
- *  var loader = new THREE.STLLoader();
+ *  var loader = new STLLoader();
  *  loader.load( './models/stl/slotted_disk.stl', function ( geometry ) {
  *    scene.add( new THREE.Mesh( geometry ) );
  *  });
@@ -30,15 +40,17 @@
  */
 
 
-THREE.STLLoader = function ( manager ) {
+
+
+exports.STLLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.STLLoader.prototype = {
+exports.STLLoader.prototype = {
 
-	constructor: THREE.STLLoader,
+	constructor: exports.STLLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -268,7 +280,7 @@ THREE.STLLoader.prototype = {
 
 				if ( normalCountPerFace !== 1 ) {
 
-					console.error( 'THREE.STLLoader: Something isn\'t right with the normal of face number ' + faceCounter );
+					console.error( '__STLLoader: Something isn\'t right with the normal of face number ' + faceCounter );
 
 				}
 
@@ -276,7 +288,7 @@ THREE.STLLoader.prototype = {
 
 				if ( vertexCountPerFace !== 3 ) {
 
-					console.error( 'THREE.STLLoader: Something isn\'t right with the vertices of face number ' + faceCounter );
+					console.error( '__STLLoader: Something isn\'t right with the vertices of face number ' + faceCounter );
 
 				}
 
@@ -332,3 +344,7 @@ THREE.STLLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

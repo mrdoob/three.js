@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\loaders\OBJLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJLoader = ( function () {
+
+
+exports.OBJLoader = ( function () {
 
 	// o object_name | g group_name
 	var object_pattern = /^[og]\s*(.+)?/;
@@ -621,7 +633,7 @@ THREE.OBJLoader = ( function () {
 					// Handle null terminated files without exception
 					if ( line === '\0' ) continue;
 
-					throw new Error( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
+					throw new Error( '__OBJLoader: Unexpected line: "' + line + '"' );
 
 				}
 
@@ -791,3 +803,7 @@ THREE.OBJLoader = ( function () {
 	return OBJLoader;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

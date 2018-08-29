@@ -1,14 +1,25 @@
 /**
+ * Generated from 'examples\modules\postprocessing\EffectComposer.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./MaskPass.js'), require('./Pass.js'), require('./ShaderPass.js'), require('../shaders/CopyShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './MaskPass.js', './Pass.js', './ShaderPass.js', '../shaders/CopyShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,MaskPass_js,Pass_js,ShaderPass_js,CopyShader_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-if ( THREE.Pass === undefined ) {
 
-	console.warn( 'THREE.Pass has been moved into a separate file, "postprocessing/Pass.js". Include it, as well.' );
+if ( Pass_js.Pass === undefined ) {
+
+	console.warn( 'Pass has been moved into a separate file, "postprocessing/Pass.js". Include it, as well.' );
 
 }
 
-THREE.EffectComposer = function ( renderer, renderTarget ) {
+exports.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.renderer = renderer;
 
@@ -38,23 +49,23 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	// dependencies
 
-	if ( THREE.CopyShader === undefined ) {
+	if ( CopyShader_js.CopyShader === undefined ) {
 
-		console.error( 'THREE.EffectComposer relies on THREE.CopyShader' );
-
-	}
-
-	if ( THREE.ShaderPass === undefined ) {
-
-		console.error( 'THREE.EffectComposer relies on THREE.ShaderPass' );
+		console.error( '__EffectComposer relies on CopyShader' );
 
 	}
 
-	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
+	if ( ShaderPass_js.ShaderPass === undefined ) {
+
+		console.error( '__EffectComposer relies on ShaderPass' );
+
+	}
+
+	this.copyPass = new ShaderPass_js.ShaderPass( CopyShader_js.CopyShader );
 
 };
 
-Object.assign( THREE.EffectComposer.prototype, {
+Object.assign( exports.EffectComposer.prototype, {
 
 	swapBuffers: function () {
 
@@ -111,13 +122,13 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			}
 
-			if ( THREE.MaskPass !== undefined ) {
+			if ( MaskPass_js.MaskPass !== undefined ) {
 
-				if ( pass instanceof THREE.MaskPass ) {
+				if ( pass instanceof MaskPass_js.MaskPass ) {
 
 					maskActive = true;
 
-				} else if ( pass instanceof THREE.ClearMaskPass ) {
+				} else if ( pass instanceof MaskPass_js.ClearMaskPass ) {
 
 					maskActive = false;
 
@@ -164,3 +175,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

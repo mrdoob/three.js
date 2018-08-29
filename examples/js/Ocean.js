@@ -1,4 +1,14 @@
-THREE.Ocean = function ( renderer, camera, scene, options ) {
+/**
+ * Generated from 'examples\modules\Ocean.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+exports.Ocean = function ( renderer, camera, scene, options ) {
 
 	// flag used to trigger parameter changes
 	this.changed = true;
@@ -200,7 +210,7 @@ THREE.Ocean = function ( renderer, camera, scene, options ) {
 
 };
 
-THREE.Ocean.prototype.generateMesh = function () {
+exports.Ocean.prototype.generateMesh = function () {
 
 	var geometry = new THREE.PlaneBufferGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );
 
@@ -210,7 +220,7 @@ THREE.Ocean.prototype.generateMesh = function () {
 
 };
 
-THREE.Ocean.prototype.render = function () {
+exports.Ocean.prototype.render = function () {
 
 	this.scene.overrideMaterial = null;
 
@@ -225,7 +235,7 @@ THREE.Ocean.prototype.render = function () {
 
 };
 
-THREE.Ocean.prototype.generateSeedPhaseTexture = function() {
+exports.Ocean.prototype.generateSeedPhaseTexture = function() {
 
 	// Setup the seed texture
 	this.pingPhase = true;
@@ -251,7 +261,7 @@ THREE.Ocean.prototype.generateSeedPhaseTexture = function() {
 
 };
 
-THREE.Ocean.prototype.renderInitialSpectrum = function () {
+exports.Ocean.prototype.renderInitialSpectrum = function () {
 
 	this.scene.overrideMaterial = this.materialInitialSpectrum;
 	this.materialInitialSpectrum.uniforms.u_wind.value.set( this.windX, this.windY );
@@ -260,7 +270,7 @@ THREE.Ocean.prototype.renderInitialSpectrum = function () {
 
 };
 
-THREE.Ocean.prototype.renderWavePhase = function () {
+exports.Ocean.prototype.renderWavePhase = function () {
 
 	this.scene.overrideMaterial = this.materialPhase;
 	this.screenQuad.material = this.materialPhase;
@@ -281,7 +291,7 @@ THREE.Ocean.prototype.renderWavePhase = function () {
 
 };
 
-THREE.Ocean.prototype.renderSpectrum = function () {
+exports.Ocean.prototype.renderSpectrum = function () {
 
 	this.scene.overrideMaterial = this.materialSpectrum;
 	this.materialSpectrum.uniforms.u_initialSpectrum.value = this.initialSpectrumFramebuffer.texture;
@@ -292,7 +302,7 @@ THREE.Ocean.prototype.renderSpectrum = function () {
 
 };
 
-THREE.Ocean.prototype.renderSpectrumFFT = function() {
+exports.Ocean.prototype.renderSpectrumFFT = function() {
 
 	// GPU FFT using Stockham formulation
 	var iterations = Math.log( this.resolution ) / Math.log( 2 ); // log2
@@ -349,7 +359,7 @@ THREE.Ocean.prototype.renderSpectrumFFT = function() {
 
 };
 
-THREE.Ocean.prototype.renderNormalMap = function () {
+exports.Ocean.prototype.renderNormalMap = function () {
 
 	this.scene.overrideMaterial = this.materialNormal;
 	if ( this.changed ) this.materialNormal.uniforms.u_size.value = this.size;
@@ -357,3 +367,7 @@ THREE.Ocean.prototype.renderNormalMap = function () {
 	this.renderer.render( this.scene, this.oceanCamera, this.normalMapFramebuffer, true );
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

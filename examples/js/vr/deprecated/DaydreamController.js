@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\vr\deprecated\DaydreamController.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.DaydreamController = function () {
+
+
+exports.DaydreamController = function () {
 
 	THREE.Object3D.call( this );
 
@@ -107,12 +119,16 @@ THREE.DaydreamController = function () {
 
 	this.getTouchPadState = function () {
 
-		console.warn( 'THREE.DaydreamController: getTouchPadState() is now getTouchpadState()' );
+		console.warn( '__DaydreamController: getTouchPadState() is now getTouchpadState()' );
 		return touchpadIsPressed;
 
 	};
 
 };
 
-THREE.DaydreamController.prototype = Object.create( THREE.Object3D.prototype );
-THREE.DaydreamController.prototype.constructor = THREE.DaydreamController;
+exports.DaydreamController.prototype = Object.create( THREE.Object3D.prototype );
+exports.DaydreamController.prototype.constructor = exports.DaydreamController;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

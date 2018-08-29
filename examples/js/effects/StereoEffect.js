@@ -1,11 +1,23 @@
 /**
+ * Generated from 'examples\modules\effects\StereoEffect.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  * @authod mrdoob / http://mrdoob.com/
  * @authod arodic / http://aleksandarrodic.com/
  * @authod fonserbc / http://fonserbc.github.io/
 */
 
-THREE.StereoEffect = function ( renderer ) {
+
+
+exports.StereoEffect = function ( renderer ) {
 
 	var _stereo = new THREE.StereoCamera();
 	_stereo.aspect = 0.5;
@@ -48,3 +60,7 @@ THREE.StereoEffect = function ( renderer ) {
 	};
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

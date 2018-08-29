@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\AnimationClipCreator.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  *
  * Creator of typical test AnimationClips / KeyframeTracks
  *
@@ -6,9 +16,11 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationClipCreator = function () {};
 
-THREE.AnimationClipCreator.CreateRotationAnimation = function ( period, axis ) {
+
+exports.AnimationClipCreator = function () {};
+
+exports.AnimationClipCreator.CreateRotationAnimation = function ( period, axis ) {
 
 	var times = [ 0, period ], values = [ 0, 360 ];
 
@@ -21,7 +33,7 @@ THREE.AnimationClipCreator.CreateRotationAnimation = function ( period, axis ) {
 
 };
 
-THREE.AnimationClipCreator.CreateScaleAxisAnimation = function ( period, axis ) {
+exports.AnimationClipCreator.CreateScaleAxisAnimation = function ( period, axis ) {
 
 	var times = [ 0, period ], values = [ 0, 1 ];
 
@@ -34,7 +46,7 @@ THREE.AnimationClipCreator.CreateScaleAxisAnimation = function ( period, axis ) 
 
 };
 
-THREE.AnimationClipCreator.CreateShakeAnimation = function ( duration, shakeScale ) {
+exports.AnimationClipCreator.CreateShakeAnimation = function ( duration, shakeScale ) {
 
 	var times = [], values = [], tmp = new THREE.Vector3();
 
@@ -57,7 +69,7 @@ THREE.AnimationClipCreator.CreateShakeAnimation = function ( duration, shakeScal
 };
 
 
-THREE.AnimationClipCreator.CreatePulsationAnimation = function ( duration, pulseScale ) {
+exports.AnimationClipCreator.CreatePulsationAnimation = function ( duration, pulseScale ) {
 
 	var times = [], values = [], tmp = new THREE.Vector3();
 
@@ -80,7 +92,7 @@ THREE.AnimationClipCreator.CreatePulsationAnimation = function ( duration, pulse
 };
 
 
-THREE.AnimationClipCreator.CreateVisibilityAnimation = function ( duration ) {
+exports.AnimationClipCreator.CreateVisibilityAnimation = function ( duration ) {
 
 	var times = [ 0, duration / 2, duration ], values = [ true, false, true ];
 
@@ -93,7 +105,7 @@ THREE.AnimationClipCreator.CreateVisibilityAnimation = function ( duration ) {
 };
 
 
-THREE.AnimationClipCreator.CreateMaterialColorAnimation = function ( duration, colors ) {
+exports.AnimationClipCreator.CreateMaterialColorAnimation = function ( duration, colors ) {
 
 	var times = [], values = [],
 		timeStep = duration / colors.length;
@@ -112,3 +124,7 @@ THREE.AnimationClipCreator.CreateMaterialColorAnimation = function ( duration, c
 	return new THREE.AnimationClip( null, duration, [ track ] );
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

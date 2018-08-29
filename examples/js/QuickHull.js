@@ -1,9 +1,21 @@
 /**
+ * Generated from 'examples\modules\QuickHull.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Mugen87 / https://github.com/Mugen87
  *
  * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)
  *
  */
+
+
 
 ( function () {
 
@@ -40,13 +52,13 @@
 
 			if ( Array.isArray( points ) !== true ) {
 
-				console.error( 'THREE.QuickHull: Points parameter is not an array.' );
+				console.error( '__QuickHull: Points parameter is not an array.' );
 
 			}
 
 			if ( points.length < 4 ) {
 
-				console.error( 'THREE.QuickHull: The algorithm needs at least four points.' );
+				console.error( '__QuickHull: The algorithm needs at least four points.' );
 
 			}
 
@@ -1211,7 +1223,11 @@
 
 	// export
 
-	THREE.QuickHull = QuickHull;
+	exports.QuickHull = QuickHull;
 
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

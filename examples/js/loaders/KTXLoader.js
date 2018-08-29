@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\KTXLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author amakaseev / https://github.com/amakaseev
  *
  * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
@@ -8,18 +18,20 @@
  */
 
 
-THREE.KTXLoader = function ( manager ) {
+
+
+exports.KTXLoader = function ( manager ) {
 
 	THREE.CompressedTextureLoader.call( this, manager );
 
-	this._parser = THREE.KTXLoader.parse;
+	this._parser = exports.KTXLoader.parse;
 
 };
 
-THREE.KTXLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
-THREE.KTXLoader.prototype.constructor = THREE.KTXLoader;
+exports.KTXLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
+exports.KTXLoader.prototype.constructor = exports.KTXLoader;
 
-THREE.KTXLoader.parse = function ( buffer, loadMipmaps ) {
+exports.KTXLoader.parse = function ( buffer, loadMipmaps ) {
 
 	var ktx = new KhronosTextureContainer( buffer, 1 );
 
@@ -172,3 +184,7 @@ var KhronosTextureContainer = ( function () {
 	return KhronosTextureContainer;
 
 }() );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

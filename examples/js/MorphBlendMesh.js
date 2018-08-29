@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\MorphBlendMesh.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MorphBlendMesh = function ( geometry, material ) {
+
+
+exports.MorphBlendMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
@@ -26,9 +38,9 @@ THREE.MorphBlendMesh = function ( geometry, material ) {
 
 };
 
-THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
+exports.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
 
-	constructor: THREE.MorphBlendMesh,
+	constructor: exports.MorphBlendMesh,
 
 	createAnimation: function ( name, start, end, fps ) {
 
@@ -222,7 +234,7 @@ THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.protot
 
 		} else {
 
-			console.warn( "THREE.MorphBlendMesh: animation[" + name + "] undefined in .playAnimation()" );
+			console.warn( "__MorphBlendMesh: animation[" + name + "] undefined in .playAnimation()" );
 
 		}
 
@@ -317,3 +329,7 @@ THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.protot
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

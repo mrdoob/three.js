@@ -1,11 +1,24 @@
 /**
+ * Generated from 'examples\modules\objects\Lensflare.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Mugen87 / https://github.com/Mugen87
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Lensflare = function () {
 
-	THREE.Mesh.call( this, THREE.Lensflare.Geometry, new THREE.MeshBasicMaterial( { opacity: 0, transparent: true } ) );
+
+
+exports.Lensflare = function () {
+
+	THREE.Mesh.call( this, exports.Lensflare.Geometry, new THREE.MeshBasicMaterial( { opacity: 0, transparent: true } ) );
 
 	this.type = 'Lensflare';
 	this.frustumCulled = false;
@@ -33,7 +46,7 @@ THREE.Lensflare = function () {
 
 	// material
 
-	var geometry = THREE.Lensflare.Geometry;
+	var geometry = exports.Lensflare.Geometry;
 
 	var material1a = new THREE.RawShaderMaterial( {
 		uniforms: {
@@ -127,7 +140,7 @@ THREE.Lensflare = function () {
 
 	var elements = [];
 
-	var shader = THREE.LensflareElement.Shader;
+	var shader = exports.LensflareElement.Shader;
 
 	var material2 = new THREE.RawShaderMaterial( {
 		uniforms: {
@@ -263,13 +276,13 @@ THREE.Lensflare = function () {
 
 };
 
-THREE.Lensflare.prototype = Object.create( THREE.Mesh.prototype );
-THREE.Lensflare.prototype.constructor = THREE.Lensflare;
-THREE.Lensflare.prototype.isLensflare = true;
+exports.Lensflare.prototype = Object.create( THREE.Mesh.prototype );
+exports.Lensflare.prototype.constructor = exports.Lensflare;
+exports.Lensflare.prototype.isLensflare = true;
 
 //
 
-THREE.LensflareElement = function ( texture, size, distance, color ) {
+exports.LensflareElement = function ( texture, size, distance, color ) {
 
 	this.texture = texture;
 	this.size = size || 1;
@@ -278,7 +291,7 @@ THREE.LensflareElement = function ( texture, size, distance, color ) {
 
 };
 
-THREE.LensflareElement.Shader = {
+exports.LensflareElement.Shader = {
 
 	uniforms: {
 
@@ -354,7 +367,7 @@ THREE.LensflareElement.Shader = {
 
 };
 
-THREE.Lensflare.Geometry = ( function () {
+exports.Lensflare.Geometry = ( function () {
 
 	var geometry = new THREE.BufferGeometry();
 
@@ -374,3 +387,7 @@ THREE.Lensflare.Geometry = ( function () {
 	return geometry;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

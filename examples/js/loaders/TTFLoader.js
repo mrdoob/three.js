@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\TTFLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author gero3 / https://github.com/gero3
  * @author tentone / https://github.com/tentone
  *
@@ -7,16 +17,18 @@
  * to create THREE.Font objects.
  */
 
-THREE.TTFLoader = function ( manager ) {
+
+
+exports.TTFLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.reversed = false;
 
 };
 
-THREE.TTFLoader.prototype = {
+exports.TTFLoader.prototype = {
 
-	constructor: THREE.TTFLoader,
+	constructor: exports.TTFLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -180,7 +192,7 @@ THREE.TTFLoader.prototype = {
 
 		if ( typeof opentype === 'undefined' ) {
 
-			console.warn( 'THREE.TTFLoader: The loader requires opentype.js. Make sure it\'s included before using the loader.' );
+			console.warn( '__TTFLoader: The loader requires opentype.js. Make sure it\'s included before using the loader.' );
 			return null;
 
 		}
@@ -190,3 +202,7 @@ THREE.TTFLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

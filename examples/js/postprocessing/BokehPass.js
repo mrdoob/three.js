@@ -1,11 +1,22 @@
 /**
+ * Generated from 'examples\modules\postprocessing\BokehPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/BokehShader2.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/BokehShader2.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,BokehShader2_js) { 'use strict';
+
+/**
  * Depth-of-field post-process with bokeh shader
  */
 
 
-THREE.BokehPass = function ( scene, camera, params ) {
 
-	THREE.Pass.call( this );
+exports.BokehPass = function ( scene, camera, params ) {
+
+	Pass_js.Pass.call( this );
 
 	this.scene = scene;
 	this.camera = camera;
@@ -38,13 +49,13 @@ THREE.BokehPass = function ( scene, camera, params ) {
 
 	// bokeh material
 
-	if ( THREE.BokehShader === undefined ) {
+	if ( BokehShader2_js.BokehShader === undefined ) {
 
-		console.error( "THREE.BokehPass relies on THREE.BokehShader" );
+		console.error( "__BokehPass relies on BokehShader" );
 
 	}
 
-	var bokehShader = THREE.BokehShader;
+	var bokehShader = BokehShader2_js.BokehShader;
 	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
 	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth.texture;
@@ -78,9 +89,9 @@ THREE.BokehPass = function ( scene, camera, params ) {
 
 };
 
-THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.BokehPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.BokehPass,
+	constructor: exports.BokehPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -123,3 +134,7 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

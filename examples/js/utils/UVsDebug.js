@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\utils\UVsDebug.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  * @author zz85 / http://github.com/zz85
  * @author WestLangley / http://github.com/WestLangley
@@ -6,11 +16,13 @@
  * tool for "unwrapping" and debugging three.js geometries UV mapping
  *
  * Sample usage:
- *	document.body.appendChild( THREE.UVsDebug( new THREE.SphereBufferGeometry( 10, 10, 10, 10 ) );
+ *	document.body.appendChild( UVsDebug( new THREE.SphereBufferGeometry( 10, 10, 10, 10 ) );
  *
  */
 
-THREE.UVsDebug = function ( geometry, size ) {
+
+
+exports.UVsDebug = function ( geometry, size ) {
 
 	// handles wrapping of uv.x > 1 only
 
@@ -187,3 +199,7 @@ THREE.UVsDebug = function ( geometry, size ) {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

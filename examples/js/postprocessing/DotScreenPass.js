@@ -1,15 +1,26 @@
 /**
+ * Generated from 'examples\modules\postprocessing\DotScreenPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/DotScreenShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/DotScreenShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,DotScreenShader_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DotScreenPass = function ( center, angle, scale ) {
 
-	THREE.Pass.call( this );
+exports.DotScreenPass = function ( center, angle, scale ) {
 
-	if ( THREE.DotScreenShader === undefined )
-		console.error( "THREE.DotScreenPass relies on THREE.DotScreenShader" );
+	Pass_js.Pass.call( this );
 
-	var shader = THREE.DotScreenShader;
+	if ( DotScreenShader_js.DotScreenShader === undefined )
+		console.error( "__DotScreenPass relies on DotScreenShader" );
+
+	var shader = DotScreenShader_js.DotScreenShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -34,9 +45,9 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 
 };
 
-THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.DotScreenPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.DotScreenPass,
+	constructor: exports.DotScreenPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -58,3 +69,7 @@ THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototy
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

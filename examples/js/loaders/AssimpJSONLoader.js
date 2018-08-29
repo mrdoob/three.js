@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\AssimpJSONLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Alexander Gessler / http://www.greentoken.de/
  * https://github.com/acgessler
  *
@@ -11,15 +21,17 @@
  * See webgl_loader_assimp2json example.
  */
 
-THREE.AssimpJSONLoader = function ( manager ) {
+
+
+exports.AssimpJSONLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.AssimpJSONLoader.prototype = {
+exports.AssimpJSONLoader.prototype = {
 
-	constructor: THREE.AssimpJSONLoader,
+	constructor: exports.AssimpJSONLoader,
 
 	crossOrigin: 'anonymous',
 
@@ -44,14 +56,14 @@ THREE.AssimpJSONLoader.prototype = {
 
 				if ( metadata.format !== 'assimp2json' ) {
 
-					onError( 'THREE.AssimpJSONLoader: Not an assimp2json scene.' );
+					onError( '__AssimpJSONLoader: Not an assimp2json scene.' );
 					return;
 
 				// check major format version
 
 				} else if ( metadata.version < 100 && metadata.version >= 200 ) {
 
-					onError( 'THREE.AssimpJSONLoader: Unsupported assimp2json file format version.' );
+					onError( '__AssimpJSONLoader: Unsupported assimp2json file format version.' );
 					return;
 
 				}
@@ -272,3 +284,7 @@ THREE.AssimpJSONLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

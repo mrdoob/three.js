@@ -1,17 +1,29 @@
 /**
+ * Generated from 'examples\modules\loaders\PDBLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.PDBLoader = function ( manager ) {
+
+
+exports.PDBLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.PDBLoader.prototype = {
+exports.PDBLoader.prototype = {
 
-	constructor: THREE.PDBLoader,
+	constructor: exports.PDBLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -207,3 +219,7 @@ THREE.PDBLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

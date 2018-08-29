@@ -1,10 +1,22 @@
 /**
+ * Generated from 'examples\modules\postprocessing\MaskPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,three_module_js,Pass_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MaskPass = function ( scene, camera ) {
 
-	THREE.Pass.call( this );
+
+exports.MaskPass = function ( scene, camera ) {
+
+	Pass_js.Pass.call( this );
 
 	this.scene = scene;
 	this.camera = camera;
@@ -16,9 +28,9 @@ THREE.MaskPass = function ( scene, camera ) {
 
 };
 
-THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.MaskPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.MaskPass,
+	constructor: exports.MaskPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -76,17 +88,17 @@ THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 } );
 
 
-THREE.ClearMaskPass = function () {
+exports.ClearMaskPass = function () {
 
-	THREE.Pass.call( this );
+	Pass_js.Pass.call( this );
 
 	this.needsSwap = false;
 
 };
 
-THREE.ClearMaskPass.prototype = Object.create( THREE.Pass.prototype );
+exports.ClearMaskPass.prototype = Object.create( Pass_js.Pass.prototype );
 
-Object.assign( THREE.ClearMaskPass.prototype, {
+Object.assign( exports.ClearMaskPass.prototype, {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -95,3 +107,7 @@ Object.assign( THREE.ClearMaskPass.prototype, {
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

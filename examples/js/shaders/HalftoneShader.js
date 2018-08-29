@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\HalftoneShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author meatbags / xavierburrow.com, github/meatbags
  *
  * RGB Halftone shader for three.js.
@@ -7,7 +17,8 @@
  *		Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
  */
 
-THREE.HalftoneShader = {
+
+exports.HalftoneShader = {
 
 	uniforms: {
 		"tDiffuse": { value: null },
@@ -312,3 +323,7 @@ THREE.HalftoneShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

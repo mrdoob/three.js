@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\objects\Reflector.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Slayvin / http://slayvin.net
  */
 
-THREE.Reflector = function ( geometry, options ) {
+
+
+exports.Reflector = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
 
@@ -16,7 +28,7 @@ THREE.Reflector = function ( geometry, options ) {
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var shader = options.shader || THREE.Reflector.ReflectorShader;
+	var shader = options.shader || exports.Reflector.ReflectorShader;
 	var recursion = options.recursion !== undefined ? options.recursion : 0;
 
 	//
@@ -198,10 +210,10 @@ THREE.Reflector = function ( geometry, options ) {
 
 };
 
-THREE.Reflector.prototype = Object.create( THREE.Mesh.prototype );
-THREE.Reflector.prototype.constructor = THREE.Reflector;
+exports.Reflector.prototype = Object.create( THREE.Mesh.prototype );
+exports.Reflector.prototype.constructor = exports.Reflector;
 
-THREE.Reflector.ReflectorShader = {
+exports.Reflector.ReflectorShader = {
 
 	uniforms: {
 
@@ -260,3 +272,7 @@ THREE.Reflector.ReflectorShader = {
 		'}'
 	].join( '\n' )
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,11 +1,23 @@
 /**
+ * Generated from 'examples\modules\exporters\MMDExporter.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author takahiro / http://github.com/takahirox
  *
  * Dependencies
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  */
 
-THREE.MMDExporter = function () {
+
+
+exports.MMDExporter = function () {
 
 	// Unicode to Shift_JIS table
 	var u2sTable;
@@ -93,7 +105,7 @@ THREE.MMDExporter = function () {
 
 		if ( skin.isSkinnedMesh !== true ) {
 
-			console.warn( 'THREE.MMDExporter: parseVpd() requires SkinnedMesh instance.' );
+			console.warn( '__MMDExporter: parseVpd() requires SkinnedMesh instance.' );
 			return null;
 
 		}
@@ -208,3 +220,7 @@ THREE.MMDExporter = function () {
 	*/
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

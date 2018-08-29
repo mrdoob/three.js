@@ -1,15 +1,26 @@
 /**
+ * Generated from 'examples\modules\postprocessing\AfterimagePass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js'), require('../shaders/AfterimageShader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js', '../shaders/AfterimageShader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js,AfterimageShader_js) { 'use strict';
+
+/**
  * @author HypnosNova / https://www.threejs.org.cn/gallery/
  */
 
-THREE.AfterimagePass = function ( damp ) {
 
-	THREE.Pass.call( this );
+exports.AfterimagePass = function ( damp ) {
 
-	if ( THREE.AfterimageShader === undefined )
-		console.error( "THREE.AfterimagePass relies on THREE.AfterimageShader" );
+	Pass_js.Pass.call( this );
 
-	this.shader = THREE.AfterimageShader;
+	if ( AfterimageShader_js.AfterimageShader === undefined )
+		console.error( "__AfterimagePass relies on AfterimageShader" );
+
+	this.shader = AfterimageShader_js.AfterimageShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( this.shader.uniforms );
 
@@ -59,9 +70,9 @@ THREE.AfterimagePass = function ( damp ) {
 
 };
 
-THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.AfterimagePass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.AfterimagePass,
+	constructor: exports.AfterimagePass,
 
 	render: function ( renderer, writeBuffer, readBuffer ) {
 
@@ -86,3 +97,7 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

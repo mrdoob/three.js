@@ -1,9 +1,19 @@
 /**
+ * Generated from 'examples\modules\exporters\ColladaExporter.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Garrett Johnson / http://gkjohnson.github.io/
  * https://github.com/gkjohnson/collada-exporter-js
  *
  * Usage:
- *  var exporter = new THREE.ColladaExporter();
+ *  var exporter = new ColladaExporter();
  *
  *  var data = exporter.parse(mesh);
  *
@@ -11,11 +21,13 @@
  *  https://www.khronos.org/collada/
  */
 
-THREE.ColladaExporter = function () {};
 
-THREE.ColladaExporter.prototype = {
 
-	constructor: THREE.ColladaExporter,
+exports.ColladaExporter = function () {};
+
+exports.ColladaExporter.prototype = {
+
+	constructor: exports.ColladaExporter,
 
 	parse: function ( object, onDone, options = {} ) {
 
@@ -600,3 +612,7 @@ THREE.ColladaExporter.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,17 +1,28 @@
 /**
+ * Generated from 'examples\modules\loaders\HDRCubeTextureLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./RGBELoader.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './RGBELoader.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,RGBELoader_js) { 'use strict';
+
+/**
 * @author Prashant Sharma / spidersharma03
 * @author Ben Houston / http://clara.io / bhouston
 */
 
-THREE.HDRCubeTextureLoader = function ( manager ) {
+
+exports.HDRCubeTextureLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	// override in sub classes
-	this.hdrLoader = new THREE.RGBELoader();
+	this.hdrLoader = new RGBELoader_js.RGBELoader();
 
 };
 
-THREE.HDRCubeTextureLoader.prototype.load = function ( type, urls, onLoad, onProgress, onError ) {
+exports.HDRCubeTextureLoader.prototype.load = function ( type, urls, onLoad, onProgress, onError ) {
 
 	var RGBEByteToRGBFloat = function ( sourceArray, sourceOffset, destArray, destOffset ) {
 
@@ -184,3 +195,7 @@ THREE.HDRCubeTextureLoader.prototype.load = function ( type, urls, onLoad, onPro
 	return texture;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

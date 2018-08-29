@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\objects\Water2.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Reflector.js'), require('./Refractor.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Reflector.js', './Refractor.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,Reflector_js,Refractor_js) { 'use strict';
+
+/**
  * @author Mugen87 / https://github.com/Mugen87
  *
  * References:
@@ -7,7 +17,8 @@
  *
  */
 
-THREE.Water = function ( geometry, options ) {
+
+exports.Water = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
 
@@ -25,7 +36,7 @@ THREE.Water = function ( geometry, options ) {
 	var flowSpeed = options.flowSpeed || 0.03;
 	var reflectivity = options.reflectivity || 0.02;
 	var scale = options.scale || 1;
-	var shader = options.shader || THREE.Water.WaterShader;
+	var shader = options.shader || exports.Water.WaterShader;
 
 	var textureLoader = new THREE.TextureLoader();
 
@@ -40,27 +51,27 @@ THREE.Water = function ( geometry, options ) {
 
 	// internal components
 
-	if ( THREE.Reflector === undefined ) {
+	if ( Reflector_js.Reflector === undefined ) {
 
-		console.error( 'THREE.Water: Required component THREE.Reflector not found.' );
+		console.error( '__Water: Required component Reflector not found.' );
 		return;
 
 	}
 
-	if ( THREE.Refractor === undefined ) {
+	if ( Refractor_js.Refractor === undefined ) {
 
-		console.error( 'THREE.Water: Required component THREE.Refractor not found.' );
+		console.error( '__Water: Required component Refractor not found.' );
 		return;
 
 	}
 
-	var reflector = new THREE.Reflector( geometry, {
+	var reflector = new Reflector_js.Reflector( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
 		clipBias: clipBias
 	} );
 
-	var refractor = new THREE.Refractor( geometry, {
+	var refractor = new Refractor_js.Refractor( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
 		clipBias: clipBias
@@ -185,10 +196,10 @@ THREE.Water = function ( geometry, options ) {
 
 };
 
-THREE.Water.prototype = Object.create( THREE.Mesh.prototype );
-THREE.Water.prototype.constructor = THREE.Water;
+exports.Water.prototype = Object.create( THREE.Mesh.prototype );
+exports.Water.prototype.constructor = exports.Water;
 
-THREE.Water.WaterShader = {
+exports.Water.WaterShader = {
 
 	uniforms: {
 
@@ -336,3 +347,7 @@ THREE.Water.WaterShader = {
 
 	].join( '\n' )
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

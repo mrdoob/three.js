@@ -1,11 +1,23 @@
 /**
+ * Generated from 'examples\modules\controls\EditorControls.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.EditorControls = function ( object, domElement ) {
+
+
+exports.EditorControls = function ( object, domElement ) {
 
 	domElement = ( domElement !== undefined ) ? domElement : document;
 
@@ -310,5 +322,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 };
 
-THREE.EditorControls.prototype = Object.create( THREE.EventDispatcher.prototype );
-THREE.EditorControls.prototype.constructor = THREE.EditorControls;
+exports.EditorControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+exports.EditorControls.prototype.constructor = exports.EditorControls;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

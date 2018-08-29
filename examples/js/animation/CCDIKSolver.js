@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\animation\CCDIKSolver.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author takahiro / https://github.com/takahirox
  *
  * CCD Algorithm
@@ -20,7 +30,9 @@
  * } ];
  */
 
-THREE.CCDIKSolver = ( function () {
+
+
+exports.CCDIKSolver = ( function () {
 
 	/**
 	 * @param {THREE.SkinnedMesh} mesh
@@ -42,7 +54,7 @@ THREE.CCDIKSolver = ( function () {
 		/**
 		 * Update IK bones.
 		 *
-		 * @return {THREE.CCDIKSolver}
+		 * @return {CCDIKSolver}
 		 */
 		update: function () {
 
@@ -229,7 +241,7 @@ THREE.CCDIKSolver = ( function () {
 
 					if ( link0.parent !== link1 ) {
 
-						console.warn( 'THREE.CCDIKSolver: bone ' + link0.name + ' is not the child of bone ' + link1.name );
+						console.warn( '__CCDIKSolver: bone ' + link0.name + ' is not the child of bone ' + link1.name );
 
 					}
 
@@ -453,3 +465,7 @@ THREE.CCDIKSolver = ( function () {
 	return CCDIKSolver;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

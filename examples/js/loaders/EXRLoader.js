@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\EXRLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Richard M. / https://github.com/richardmonette
  *
  * OpenEXR loader which, currently, supports reading 16 bit half data, in either
@@ -7,6 +17,8 @@
  * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
  * implementation, so I have preserved their copyright notices.
  */
+
+
 
 // /*
 // Copyright (c) 2014 - 2017, Syoyo Fujita
@@ -73,15 +85,15 @@
 
 // // End of OpenEXR license -------------------------------------------------
 
-THREE.EXRLoader = function ( manager ) {
+exports.EXRLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.EXRLoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
+exports.EXRLoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
 
-THREE.EXRLoader.prototype._parser = function ( buffer ) {
+exports.EXRLoader.prototype._parser = function ( buffer ) {
 
 	const USHORT_RANGE = (1 << 16);
 	const BITMAP_SIZE = (USHORT_RANGE >> 3);
@@ -1177,3 +1189,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 	};
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

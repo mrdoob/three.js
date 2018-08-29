@@ -1,9 +1,21 @@
 /**
+ * Generated from 'examples\modules\vr\ViveController.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com
  * @author stewdio / http://stewd.io
  */
 
-THREE.ViveController = function ( id ) {
+
+
+exports.ViveController = function ( id ) {
 
 	THREE.Object3D.call( this );
 
@@ -124,5 +136,9 @@ THREE.ViveController = function ( id ) {
 
 };
 
-THREE.ViveController.prototype = Object.create( THREE.Object3D.prototype );
-THREE.ViveController.prototype.constructor = THREE.ViveController;
+exports.ViveController.prototype = Object.create( THREE.Object3D.prototype );
+exports.ViveController.prototype.constructor = exports.ViveController;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

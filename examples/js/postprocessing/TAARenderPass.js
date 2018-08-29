@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\postprocessing\TAARenderPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./SSAARenderPass.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './SSAARenderPass.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,SSAARenderPass_js) { 'use strict';
+
+/**
  *
  * Temporal Anti-Aliasing Render Pass
  *
@@ -12,39 +22,40 @@
  *
  */
 
-THREE.TAARenderPass = function ( scene, camera, params ) {
 
-	if ( THREE.SSAARenderPass === undefined ) {
+exports.TAARenderPass = function ( scene, camera, params ) {
 
-		console.error( "THREE.TAARenderPass relies on THREE.SSAARenderPass" );
+	if ( SSAARenderPass_js.SSAARenderPass === undefined ) {
+
+		console.error( "__TAARenderPass relies on SSAARenderPass" );
 
 	}
 
-	THREE.SSAARenderPass.call( this, scene, camera, params );
+	SSAARenderPass_js.SSAARenderPass.call( this, scene, camera, params );
 
 	this.sampleLevel = 0;
 	this.accumulate = false;
 
 };
 
-THREE.TAARenderPass.JitterVectors = THREE.SSAARenderPass.JitterVectors;
+exports.TAARenderPass.JitterVectors = SSAARenderPass_js.SSAARenderPass.JitterVectors;
 
-THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPass.prototype ), {
+exports.TAARenderPass.prototype = Object.assign( Object.create( SSAARenderPass_js.SSAARenderPass.prototype ), {
 
-	constructor: THREE.TAARenderPass,
+	constructor: exports.TAARenderPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
 		if ( ! this.accumulate ) {
 
-			THREE.SSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta );
+			SSAARenderPass_js.SSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta );
 
 			this.accumulateIndex = - 1;
 			return;
 
 		}
 
-		var jitterOffsets = THREE.TAARenderPass.JitterVectors[ 5 ];
+		var jitterOffsets = exports.TAARenderPass.JitterVectors[ 5 ];
 
 		if ( ! this.sampleRenderTarget ) {
 
@@ -62,7 +73,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 
 		if ( this.accumulate && this.accumulateIndex === - 1 ) {
 
-			THREE.SSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
+			SSAARenderPass_js.SSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
 
 			this.accumulateIndex = 0;
 
@@ -129,3 +140,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

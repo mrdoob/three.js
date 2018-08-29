@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\AfterimageShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author HypnosNova / https://www.threejs.org.cn/gallery/
  *
  * Afterimage shader
@@ -6,7 +16,8 @@
  * https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&
  */
 
-THREE.AfterimageShader = {
+
+exports.AfterimageShader = {
 
 	uniforms: {
 
@@ -58,3 +69,7 @@ THREE.AfterimageShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,16 +1,28 @@
 /**
+ * Generated from 'examples\modules\loaders\VRMLLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.VRMLLoader = function ( manager ) {
+
+
+exports.VRMLLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.VRMLLoader.prototype = {
+exports.VRMLLoader.prototype = {
 
-	constructor: THREE.VRMLLoader,
+	constructor: exports.VRMLLoader,
 
 	// for IndexedFaceSet support
 	isRecordingPoints: false,
@@ -387,7 +399,7 @@ THREE.VRMLLoader.prototype = {
 
 							if ( parts.length !== 4 ) {
 
-								console.warn( 'THREE.VRMLLoader: Invalid color format detected for %s.', fieldName );
+								console.warn( '__VRMLLoader: Invalid color format detected for %s.', fieldName );
 								break;
 
 							}
@@ -407,7 +419,7 @@ THREE.VRMLLoader.prototype = {
 						case 'size':
 							if ( parts.length !== 4 ) {
 
-								console.warn( 'THREE.VRMLLoader: Invalid vector format detected for %s.', fieldName );
+								console.warn( '__VRMLLoader: Invalid vector format detected for %s.', fieldName );
 								break;
 
 							}
@@ -431,7 +443,7 @@ THREE.VRMLLoader.prototype = {
 						case 'ambientIntensity':
 							if ( parts.length !== 2 ) {
 
-								console.warn( 'THREE.VRMLLoader: Invalid single float value specification detected for %s.', fieldName );
+								console.warn( '__VRMLLoader: Invalid single float value specification detected for %s.', fieldName );
 								break;
 
 							}
@@ -443,7 +455,7 @@ THREE.VRMLLoader.prototype = {
 						case 'rotation':
 							if ( parts.length !== 5 ) {
 
-								console.warn( 'THREE.VRMLLoader: Invalid quaternion format detected for %s.', fieldName );
+								console.warn( '__VRMLLoader: Invalid quaternion format detected for %s.', fieldName );
 								break;
 
 							}
@@ -464,7 +476,7 @@ THREE.VRMLLoader.prototype = {
 						case 'convex':
 							if ( parts.length !== 2 ) {
 
-								console.warn( 'THREE.VRMLLoader: Invalid format detected for %s.', fieldName );
+								console.warn( '__VRMLLoader: Invalid format detected for %s.', fieldName );
 								break;
 
 							}
@@ -576,7 +588,7 @@ THREE.VRMLLoader.prototype = {
 
 						if ( undefined == defines[ defineKey ] ) {
 
-							console.warn( 'THREE.VRMLLoader: %s is not defined.', defineKey );
+							console.warn( '__VRMLLoader: %s is not defined.', defineKey );
 
 						} else {
 
@@ -1099,7 +1111,7 @@ THREE.VRMLLoader.prototype = {
 
 		if ( /V1.0/.exec( header ) ) {
 
-			console.warn( 'THREE.VRMLLoader: V1.0 not supported yet.' );
+			console.warn( '__VRMLLoader: V1.0 not supported yet.' );
 
 		} else if ( /V2.0/.exec( header ) ) {
 
@@ -1112,3 +1124,7 @@ THREE.VRMLLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

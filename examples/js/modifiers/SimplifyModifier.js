@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\modifiers\SimplifyModifier.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *
@@ -8,7 +18,9 @@
  *    - http://www.melax.com/polychop/
  */
 
-THREE.SimplifyModifier = function () {};
+
+
+exports.SimplifyModifier = function () {};
 
 ( function () {
 
@@ -379,7 +391,7 @@ THREE.SimplifyModifier = function () {};
 
 	};
 
-	THREE.SimplifyModifier.prototype.modify = function ( geometry, count ) {
+	exports.SimplifyModifier.prototype.modify = function ( geometry, count ) {
 
 		if ( geometry.isBufferGeometry ) {
 
@@ -444,7 +456,7 @@ THREE.SimplifyModifier = function () {};
 
 			if ( ! nextVertex ) {
 
-				console.log( 'THREE.SimplifyModifier: No next vertex' );
+				console.log( '__SimplifyModifier: No next vertex' );
 				break;
 
 			}
@@ -492,3 +504,7 @@ THREE.SimplifyModifier = function () {};
 	};
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

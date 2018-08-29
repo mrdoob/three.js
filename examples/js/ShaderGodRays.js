@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\ShaderGodRays.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author huwb / http://huwbowles.com/
  *
  * God-rays (crepuscular rays)
@@ -18,7 +28,9 @@
  * Sousa2008 - Crysis Next Gen Effects, GDC2008, http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt
  */
 
-THREE.ShaderGodRays = {
+
+
+exports.ShaderGodRays = {
 
 	'godrays_depthMask': {
 
@@ -330,3 +342,7 @@ THREE.ShaderGodRays = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

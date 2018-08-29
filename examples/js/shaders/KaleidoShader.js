@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\KaleidoShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author felixturner / http://airtight.cc/
  *
  * Kaleidoscope Shader
@@ -10,7 +20,8 @@
  * angle: initial angle in radians
  */
 
-THREE.KaleidoShader = {
+
+exports.KaleidoShader = {
 
 	uniforms: {
 
@@ -58,3 +69,7 @@ THREE.KaleidoShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

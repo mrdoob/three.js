@@ -1,10 +1,22 @@
 /**
+ * Generated from 'examples\modules\objects\ShadowMesh.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author erichlof /  http://github.com/erichlof
  *
  * A shadow Mesh that follows a shadow-casting Mesh in the scene, but is confined to a single plane.
  */
 
-THREE.ShadowMesh = function ( mesh ) {
+
+
+exports.ShadowMesh = function ( mesh ) {
 
 	var shadowMaterial = new THREE.MeshBasicMaterial( {
 
@@ -24,10 +36,10 @@ THREE.ShadowMesh = function ( mesh ) {
 
 };
 
-THREE.ShadowMesh.prototype = Object.create( THREE.Mesh.prototype );
-THREE.ShadowMesh.prototype.constructor = THREE.ShadowMesh;
+exports.ShadowMesh.prototype = Object.create( THREE.Mesh.prototype );
+exports.ShadowMesh.prototype.constructor = exports.ShadowMesh;
 
-THREE.ShadowMesh.prototype.update = function () {
+exports.ShadowMesh.prototype.update = function () {
 
 	var shadowMatrix = new THREE.Matrix4();
 
@@ -67,3 +79,7 @@ THREE.ShadowMesh.prototype.update = function () {
 	};
 
 }();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

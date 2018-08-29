@@ -1,19 +1,30 @@
 /**
+ * Generated from 'examples\modules\lines\LineGeometry.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./LineSegmentsGeometry.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './LineSegmentsGeometry.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,three_module_js,LineSegmentsGeometry_js) { 'use strict';
+
+/**
  * @author WestLangley / http://github.com/WestLangley
  *
  */
 
-THREE.LineGeometry = function () {
 
-	THREE.LineSegmentsGeometry.call( this );
+exports.LineGeometry = function () {
+
+	LineSegmentsGeometry_js.LineSegmentsGeometry.call( this );
 
 	this.type = 'LineGeometry';
 
 };
 
-THREE.LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsGeometry.prototype ), {
+exports.LineGeometry.prototype = Object.assign( Object.create( LineSegmentsGeometry_js.LineSegmentsGeometry.prototype ), {
 
-	constructor: THREE.LineGeometry,
+	constructor: exports.LineGeometry,
 
 	isLineGeometry: true,
 
@@ -36,7 +47,7 @@ THREE.LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsG
 
 		}
 
-		THREE.LineSegmentsGeometry.prototype.setPositions.call( this, points );
+		LineSegmentsGeometry_js.LineSegmentsGeometry.prototype.setPositions.call( this, points );
 
 		return this;
 
@@ -61,7 +72,7 @@ THREE.LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsG
 
 		}
 
-		THREE.LineSegmentsGeometry.prototype.setColors.call( this, colors );
+		LineSegmentsGeometry_js.LineSegmentsGeometry.prototype.setColors.call( this, colors );
 
 		return this;
 
@@ -96,3 +107,7 @@ THREE.LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsG
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

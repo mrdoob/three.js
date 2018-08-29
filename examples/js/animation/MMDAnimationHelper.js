@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\animation\MMDAnimationHelper.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./CCDIKSolver.js'), require('./MMDPhysics.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './CCDIKSolver.js', './MMDPhysics.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE,global.THREE));
+}(this, (function (exports,THREE,CCDIKSolver_js,MMDPhysics_js) { 'use strict';
+
+/**
  * @author takahiro / https://github.com/takahirox
  *
  * MMDAnimationHelper handles animation of MMD assets loaded by MMDLoader
@@ -6,14 +16,15 @@
  *
  * Dependencies
  *  - ammo.js https://github.com/kripken/ammo.js
- *  - THREE.MMDPhysics
- *  - THREE.CCDIKSolver
+ *  - MMDPhysics
+ *  - CCDIKSolver
  *
  * TODO
  *  - more precise grant skinning support.
  */
 
-THREE.MMDAnimationHelper = ( function () {
+
+exports.MMDAnimationHelper = ( function () {
 
 	/**
 	 * @param {Object} params - (optional)
@@ -79,7 +90,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 * @param {Integer} params.maxStepNum - Only for THREE.SkinnedMesh and physics is true. Default is 3.
 		 * @param {THREE.Vector3} params.gravity - Only for THREE.SkinnedMesh and physics is true. Default ( 0, - 9.8 * 10, 0 ).
 		 * @param {Number} params.delayTime - Only for THREE.Audio. Default is 0.0.
-		 * @return {THREE.MMDAnimationHelper}
+		 * @return {MMDAnimationHelper}
 		 */
 		add: function ( object, params ) {
 
@@ -99,7 +110,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			} else {
 
-				throw new Error( 'THREE.MMDAnimationHelper.add: '
+				throw new Error( '__MMDAnimationHelper.add: '
 					+ 'accepts only '
 					+ 'THREE.SkinnedMesh or '
 					+ 'THREE.Camera or '
@@ -117,7 +128,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 * Removes an Three.js Object from helper.
 		 *
 		 * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
-		 * @return {THREE.MMDAnimationHelper}
+		 * @return {MMDAnimationHelper}
 		 */
 		remove: function ( object ) {
 
@@ -135,7 +146,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			} else {
 
-				throw new Error( 'THREE.MMDAnimationHelper.remove: '
+				throw new Error( '__MMDAnimationHelper.remove: '
 					+ 'accepts only '
 					+ 'THREE.SkinnedMesh or '
 					+ 'THREE.Camera or '
@@ -153,7 +164,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 * Updates the animation.
 		 *
 		 * @param {Number} delta
-		 * @return {THREE.MMDAnimationHelper}
+		 * @return {MMDAnimationHelper}
 		 */
 		update: function ( delta ) {
 
@@ -182,7 +193,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 * @param {boolean} params.resetPose - Default is true.
 		 * @param {boolean} params.ik - Default is true.
 		 * @param {boolean} params.grant - Default is true.
-		 * @return {THREE.MMDAnimationHelper}
+		 * @return {MMDAnimationHelper}
 		 */
 		pose: function ( mesh, vpd, params ) {
 
@@ -240,13 +251,13 @@ THREE.MMDAnimationHelper = ( function () {
 		 *
 		 * @param {string} key
 		 * @param {boolean} enebled
-		 * @return {THREE.MMDAnimationHelper}
+		 * @return {MMDAnimationHelper}
 		 */
 		enable: function ( key, enabled ) {
 
 			if ( this.enabled[ key ] === undefined ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper.enable: '
+				throw new Error( '__MMDAnimationHelper.enable: '
 					+ 'unknown key ' + key );
 
 			}
@@ -285,7 +296,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( this.meshes.indexOf( mesh ) >= 0 ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._addMesh: '
+				throw new Error( '__MMDAnimationHelper._addMesh: '
 					+ 'SkinnedMesh \'' + mesh.name + '\' has already been added.' );
 
 			}
@@ -309,7 +320,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( this.camera === camera ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._setupCamera: '
+				throw new Error( '__MMDAnimationHelper._setupCamera: '
 					+ 'Camera \'' + camera.name + '\' has already been set.' );
 
 			}
@@ -336,7 +347,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( this.audio === audio ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._setupAudio: '
+				throw new Error( '__MMDAnimationHelper._setupAudio: '
 					+ 'Audio \'' + audio.name + '\' has already been set.' );
 
 			}
@@ -376,7 +387,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( ! found ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._removeMesh: '
+				throw new Error( '__MMDAnimationHelper._removeMesh: '
 					+ 'SkinnedMesh \'' + mesh.name + '\' has not been added yet.' );
 
 			}
@@ -391,7 +402,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( camera !== this.camera ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._clearCamera: '
+				throw new Error( '__MMDAnimationHelper._clearCamera: '
 					+ 'Camera \'' + camera.name + '\' has not been set yet.' );
 
 			}
@@ -409,7 +420,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( audio !== this.audio ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._clearAudio: '
+				throw new Error( '__MMDAnimationHelper._clearAudio: '
 					+ 'Audio \'' + audio.name + '\' has not been set yet.' );
 
 			}
@@ -613,25 +624,25 @@ THREE.MMDAnimationHelper = ( function () {
 
 		_createCCDIKSolver: function ( mesh ) {
 
-			if ( THREE.CCDIKSolver === undefined ) {
+			if ( CCDIKSolver_js.CCDIKSolver === undefined ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper: Import THREE.CCDIKSolver.' );
+				throw new Error( '__MMDAnimationHelper: Import CCDIKSolver.' );
 
 			}
 
-			return new THREE.CCDIKSolver( mesh, mesh.geometry.userData.MMD.iks );
+			return new CCDIKSolver_js.CCDIKSolver( mesh, mesh.geometry.userData.MMD.iks );
 
 		},
 
 		_createMMDPhysics: function ( mesh, params ) {
 
-			if ( THREE.MMDPhysics === undefined ) {
+			if ( MMDPhysics_js.MMDPhysics === undefined ) {
 
-				throw new Error( 'THREE.MMDPhysics: Import THREE.MMDPhysics.' );
+				throw new Error( 'MMDPhysics: Import MMDPhysics.' );
 
 			}
 
-			return new THREE.MMDPhysics(
+			return new MMDPhysics_js.MMDPhysics(
 				mesh,
 				mesh.geometry.userData.MMD.rigidBodies,
 				mesh.geometry.userData.MMD.constraints,
@@ -1036,3 +1047,7 @@ THREE.MMDAnimationHelper = ( function () {
 	return MMDAnimationHelper;
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

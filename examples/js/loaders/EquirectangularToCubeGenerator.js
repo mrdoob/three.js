@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\loaders\EquirectangularToCubeGenerator.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
 * @author Richard M. / https://github.com/richardmonette
 */
 
-THREE.EquirectangularToCubeGenerator = function ( sourceTexture, resolution ) {
+
+
+exports.EquirectangularToCubeGenerator = function ( sourceTexture, resolution ) {
 
 	this.sourceTexture = sourceTexture;
 	this.resolution = resolution;
@@ -36,9 +48,9 @@ THREE.EquirectangularToCubeGenerator = function ( sourceTexture, resolution ) {
 
 };
 
-THREE.EquirectangularToCubeGenerator.prototype = {
+exports.EquirectangularToCubeGenerator.prototype = {
 
-	constructor: THREE.EquirectangularToCubeGenerator,
+	constructor: exports.EquirectangularToCubeGenerator,
 
 	update: function ( renderer ) {
 
@@ -114,3 +126,7 @@ THREE.EquirectangularToCubeGenerator.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

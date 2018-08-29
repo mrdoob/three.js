@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\loaders\TDSLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  * Autodesk 3DS three.js file loader, based on lib3ds.
  *
@@ -9,9 +19,11 @@
  * @constructor
  */
 
+
+
 'use strict';
 
-THREE.TDSLoader = function ( manager ) {
+exports.TDSLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.debug = false;
@@ -24,9 +36,9 @@ THREE.TDSLoader = function ( manager ) {
 
 };
 
-THREE.TDSLoader.prototype = {
+exports.TDSLoader.prototype = {
 
-	constructor: THREE.TDSLoader,
+	constructor: exports.TDSLoader,
 
 	/**
 	 * Load 3ds file from url.
@@ -1092,3 +1104,7 @@ var VIEWPORT_DATA = 0x7011;
 var VIEWPORT_DATA_3 = 0x7012;
 var VIEWPORT_SIZE = 0x7020;
 var NETWORK_VIEW = 0x7030;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

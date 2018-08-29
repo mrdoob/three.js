@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\CurveExtras.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  * A bunch of parametric curves
  * @author zz85
@@ -10,6 +20,8 @@
  * http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
  * http://prideout.net/blog/?p=44
  */
+
+
 
 ( function ( Curves ) {
 
@@ -422,4 +434,8 @@
 	Curves.DecoratedTorusKnot5a = DecoratedTorusKnot5a;
 	Curves.DecoratedTorusKnot5c = DecoratedTorusKnot5c;
 
-} )( THREE.Curves = THREE.Curves || {} );
+} )( exports.Curves = exports.Curves || {} );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

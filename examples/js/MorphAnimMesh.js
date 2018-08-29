@@ -1,8 +1,20 @@
 /**
+ * Generated from 'examples\modules\MorphAnimMesh.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MorphAnimMesh = function ( geometry, material ) {
+
+
+exports.MorphAnimMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
@@ -12,22 +24,22 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 	this.activeAction = null;
 };
 
-THREE.MorphAnimMesh.prototype = Object.create( THREE.Mesh.prototype );
-THREE.MorphAnimMesh.prototype.constructor = THREE.MorphAnimMesh;
+exports.MorphAnimMesh.prototype = Object.create( THREE.Mesh.prototype );
+exports.MorphAnimMesh.prototype.constructor = exports.MorphAnimMesh;
 
-THREE.MorphAnimMesh.prototype.setDirectionForward = function () {
+exports.MorphAnimMesh.prototype.setDirectionForward = function () {
 
 	this.mixer.timeScale = 1.0;
 
 };
 
-THREE.MorphAnimMesh.prototype.setDirectionBackward = function () {
+exports.MorphAnimMesh.prototype.setDirectionBackward = function () {
 
 	this.mixer.timeScale = -1.0;
 
 };
 
-THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
+exports.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	if( this.activeAction ) {
 
@@ -46,19 +58,19 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	} else {
 
-		throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
+		throw new Error( '__MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
 
 	}
 
 };
 
-THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
+exports.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	this.mixer.update( delta );
 
 };
 
-THREE.MorphAnimMesh.prototype.copy = function ( source ) {
+exports.MorphAnimMesh.prototype.copy = function ( source ) {
 
 	THREE.Mesh.prototype.copy.call( this, source );
 
@@ -67,3 +79,7 @@ THREE.MorphAnimMesh.prototype.copy = function ( source ) {
 	return this;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\loaders\DRACOLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 // Copyright 2016 The Draco Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +27,7 @@
 /**
  * @param {THREE.LoadingManager} manager
  */
-THREE.DRACOLoader = function(manager) {
+exports.DRACOLoader = function(manager) {
     this.timeLoaded = 0;
     this.manager = manager || THREE.DefaultLoadingManager;
     this.materials = null;
@@ -33,9 +43,9 @@ THREE.DRACOLoader = function(manager) {
     };
 };
 
-THREE.DRACOLoader.prototype = {
+exports.DRACOLoader.prototype = {
 
-    constructor: THREE.DRACOLoader,
+    constructor: exports.DRACOLoader,
 
     load: function(url, onLoad, onProgress, onError) {
         var scope = this;
@@ -100,7 +110,7 @@ THREE.DRACOLoader.prototype = {
     decodeDracoFile: function(rawBuffer, callback, attributeUniqueIdMap,
                               attributeTypeMap) {
       var scope = this;
-      THREE.DRACOLoader.getDecoderModule()
+      exports.DRACOLoader.getDecoderModule()
           .then( function ( module ) {
             scope.decodeDracoFileInternal( rawBuffer, module.decoder, callback,
               attributeUniqueIdMap || {}, attributeTypeMap || {});
@@ -129,7 +139,7 @@ THREE.DRACOLoader.prototype = {
           console.log('Loaded a point cloud.');
         }
       } else {
-        var errorMsg = 'THREE.DRACOLoader: Unknown geometry type.';
+        var errorMsg = '__DRACOLoader: Unknown geometry type.';
         console.error(errorMsg);
         throw new Error(errorMsg);
       }
@@ -141,7 +151,7 @@ THREE.DRACOLoader.prototype = {
                                      attributeName, attributeType, attribute,
                                      geometry, geometryBuffer) {
       if (attribute.ptr === 0) {
-        var errorMsg = 'THREE.DRACOLoader: No attribute ' + attributeName;
+        var errorMsg = '__DRACOLoader: No attribute ' + attributeName;
         console.error(errorMsg);
         throw new Error(errorMsg);
       }
@@ -211,7 +221,7 @@ THREE.DRACOLoader.prototype = {
           break;
 
         default:
-          var errorMsg = 'THREE.DRACOLoader: Unexpected attribute type.';
+          var errorMsg = '__DRACOLoader: Unexpected attribute type.';
           console.error( errorMsg );
           throw new Error( errorMsg );
 
@@ -246,7 +256,7 @@ THREE.DRACOLoader.prototype = {
               decoder.DecodeBufferToPointCloud(buffer, dracoGeometry);
         }
         if (!decodingStatus.ok() || dracoGeometry.ptr == 0) {
-          var errorMsg = 'THREE.DRACOLoader: Decoding failed: ';
+          var errorMsg = '__DRACOLoader: Decoding failed: ';
           errorMsg += decodingStatus.error_msg();
           console.error(errorMsg);
           dracoDecoder.destroy(decoder);
@@ -281,7 +291,7 @@ THREE.DRACOLoader.prototype = {
         var posAttId = decoder.GetAttributeId(dracoGeometry,
                                               dracoDecoder.POSITION);
         if (posAttId == -1) {
-          var errorMsg = 'THREE.DRACOLoader: No position attribute found.';
+          var errorMsg = '__DRACOLoader: No position attribute found.';
           console.error(errorMsg);
           dracoDecoder.destroy(decoder);
           dracoDecoder.destroy(dracoGeometry);
@@ -383,7 +393,7 @@ THREE.DRACOLoader.prototype = {
     },
 
     isVersionSupported: function(version, callback) {
-        THREE.DRACOLoader.getDecoderModule()
+        exports.DRACOLoader.getDecoderModule()
             .then( function ( module ) {
               callback( module.decoder.isVersionSupported( version ) );
             });
@@ -396,16 +406,16 @@ THREE.DRACOLoader.prototype = {
     }
 };
 
-THREE.DRACOLoader.decoderPath = './';
-THREE.DRACOLoader.decoderConfig = {};
-THREE.DRACOLoader.decoderModulePromise = null;
+exports.DRACOLoader.decoderPath = './';
+exports.DRACOLoader.decoderConfig = {};
+exports.DRACOLoader.decoderModulePromise = null;
 
 /**
  * Sets the base path for decoder source files.
  * @param {string} path
  */
-THREE.DRACOLoader.setDecoderPath = function ( path ) {
-  THREE.DRACOLoader.decoderPath = path;
+exports.DRACOLoader.setDecoderPath = function ( path ) {
+  exports.DRACOLoader.decoderPath = path;
 };
 
 /**
@@ -413,21 +423,21 @@ THREE.DRACOLoader.setDecoderPath = function ( path ) {
  * will be recreated with the next decoding call.
  * @param {Object} config
  */
-THREE.DRACOLoader.setDecoderConfig = function ( config ) {
-  var wasmBinary = THREE.DRACOLoader.decoderConfig.wasmBinary;
-  THREE.DRACOLoader.decoderConfig = config || {};
-  THREE.DRACOLoader.releaseDecoderModule();
+exports.DRACOLoader.setDecoderConfig = function ( config ) {
+  var wasmBinary = exports.DRACOLoader.decoderConfig.wasmBinary;
+  exports.DRACOLoader.decoderConfig = config || {};
+  exports.DRACOLoader.releaseDecoderModule();
 
   // Reuse WASM binary.
-  if ( wasmBinary ) THREE.DRACOLoader.decoderConfig.wasmBinary = wasmBinary;
+  if ( wasmBinary ) exports.DRACOLoader.decoderConfig.wasmBinary = wasmBinary;
 };
 
 /**
  * Releases the singleton DracoDecoderModule instance. Module will be recreated
  * with the next decoding call.
  */
-THREE.DRACOLoader.releaseDecoderModule = function () {
-  THREE.DRACOLoader.decoderModulePromise = null;
+exports.DRACOLoader.releaseDecoderModule = function () {
+  exports.DRACOLoader.decoderModulePromise = null;
 };
 
 /**
@@ -436,11 +446,11 @@ THREE.DRACOLoader.releaseDecoderModule = function () {
  * module is available.
  * @return {Promise<{decoder: DracoDecoderModule}>}
  */
-THREE.DRACOLoader.getDecoderModule = function () {
+exports.DRACOLoader.getDecoderModule = function () {
   var scope = this;
-  var path = THREE.DRACOLoader.decoderPath;
-  var config = THREE.DRACOLoader.decoderConfig;
-  var promise = THREE.DRACOLoader.decoderModulePromise;
+  var path = exports.DRACOLoader.decoderPath;
+  var config = exports.DRACOLoader.decoderConfig;
+  var promise = exports.DRACOLoader.decoderModulePromise;
 
   if ( promise ) return promise;
 
@@ -450,13 +460,13 @@ THREE.DRACOLoader.getDecoderModule = function () {
     promise = Promise.resolve();
   } else if ( typeof WebAssembly !== 'object' || config.type === 'js' ) {
     // Load with asm.js.
-    promise = THREE.DRACOLoader._loadScript( path + 'draco_decoder.js' );
+    promise = exports.DRACOLoader._loadScript( path + 'draco_decoder.js' );
   } else {
     // Load with WebAssembly.
     config.wasmBinaryFile = path + 'draco_decoder.wasm';
-    promise = THREE.DRACOLoader._loadScript( path + 'draco_wasm_wrapper.js' )
+    promise = exports.DRACOLoader._loadScript( path + 'draco_wasm_wrapper.js' )
         .then( function () {
-          return THREE.DRACOLoader._loadArrayBuffer( config.wasmBinaryFile );
+          return exports.DRACOLoader._loadArrayBuffer( config.wasmBinaryFile );
         } )
         .then( function ( wasmBinary ) {
           config.wasmBinary = wasmBinary;
@@ -475,7 +485,7 @@ THREE.DRACOLoader.getDecoderModule = function () {
     } );
   } );
 
-  THREE.DRACOLoader.decoderModulePromise = promise;
+  exports.DRACOLoader.decoderModulePromise = promise;
   return promise;
 };
 
@@ -483,7 +493,7 @@ THREE.DRACOLoader.getDecoderModule = function () {
  * @param {string} src
  * @return {Promise}
  */
-THREE.DRACOLoader._loadScript = function ( src ) {
+exports.DRACOLoader._loadScript = function ( src ) {
   var prevScript = document.getElementById( 'decoder_script' );
   if ( prevScript !== null ) {
     prevScript.parentNode.removeChild( prevScript );
@@ -503,10 +513,14 @@ THREE.DRACOLoader._loadScript = function ( src ) {
  * @param {string} src
  * @return {Promise}
  */
-THREE.DRACOLoader._loadArrayBuffer = function ( src ) {
+exports.DRACOLoader._loadArrayBuffer = function ( src ) {
   var loader = new THREE.FileLoader();
   loader.setResponseType( 'arraybuffer' );
   return new Promise( function( resolve, reject ) {
     loader.load( src, resolve, undefined, reject );
   });
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

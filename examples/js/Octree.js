@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\Octree.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*!
  *
  * threeoctree.js (r60) / https://github.com/collinhover/threeoctree
@@ -7,7 +17,11 @@
  * based on Dynamic Octree by Piko3D @ http://www.piko3d.com/ and Octree by Marek Pawlowski @ pawlowski.it
  *
  */
-( function ( THREE ) {
+
+
+
+
+( function ( THREE$$1 ) {
 
 	"use strict";
 
@@ -73,7 +87,7 @@
 
 	=====================================================*/
 
-	THREE.Octree = function ( parameters ) {
+	exports.Octree = function ( parameters ) {
 
 		// handle parameters
 
@@ -110,8 +124,8 @@
 		this.FLAG_POS_Z = 1 << ( this.INDEX_OUTSIDE_POS_Z + 1 );
 		this.FLAG_NEG_Z = 1 << ( this.INDEX_OUTSIDE_NEG_Z + 1 );
 
-		this.utilVec31Search = new THREE.Vector3();
-		this.utilVec32Search = new THREE.Vector3();
+		this.utilVec31Search = new THREE$$1.Vector3();
+		this.utilVec32Search = new THREE$$1.Vector3();
 
 		// pass scene to see octree structure
 
@@ -119,7 +133,7 @@
 
 		if ( this.scene ) {
 
-			var helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ) ), 0xff0066 );
+			var helper = new THREE$$1.BoxHelper( new THREE$$1.Mesh( new THREE$$1.BoxBufferGeometry( 1, 1, 1 ) ), 0xff0066 );
 			this.visualGeometry = helper.geometry;
 			this.visualMaterial = helper.material;
 
@@ -137,11 +151,11 @@
 		this.overlapPct = isNumber( parameters.overlapPct ) ? parameters.overlapPct : 0.15;
 		this.undeferred = parameters.undeferred || false;
 
-		this.root = parameters.root instanceof THREE.OctreeNode ? parameters.root : new THREE.OctreeNode( parameters );
+		this.root = parameters.root instanceof exports.OctreeNode ? parameters.root : new exports.OctreeNode( parameters );
 
 	};
 
-	THREE.Octree.prototype = {
+	exports.Octree.prototype = {
 
 		update: function () {
 
@@ -195,7 +209,7 @@
 
 			// ensure object is not object data
 
-			if ( object instanceof THREE.OctreeObjectData ) {
+			if ( object instanceof exports.OctreeObjectData ) {
 
 				object = object.object;
 
@@ -205,7 +219,7 @@
 
 			if ( ! object.uuid ) {
 
-				object.uuid = THREE.Math.generateUUID();
+				object.uuid = THREE$$1.Math.generateUUID();
 
 			}
 
@@ -259,7 +273,7 @@
 
 		addObjectData: function ( object, part ) {
 
-			var objectData = new THREE.OctreeObjectData( object, part );
+			var objectData = new exports.OctreeObjectData( object, part );
 
 			// add to tree objects data list
 
@@ -280,7 +294,7 @@
 
 			// ensure object is not object data for index search
 
-			if ( object instanceof THREE.OctreeObjectData ) {
+			if ( object instanceof exports.OctreeObjectData ) {
 
 				object = object.object;
 
@@ -344,7 +358,7 @@
 				objectsData,
 				objectData;
 
-			if ( octree instanceof THREE.Octree ) {
+			if ( octree instanceof exports.Octree ) {
 
 				// for each object data
 
@@ -387,7 +401,7 @@
 
 				// if position has changed since last organization of object in tree
 
-				if ( node instanceof THREE.OctreeNode && ! objectData.positionLast.equals( objectData.position ) ) {
+				if ( node instanceof exports.OctreeNode && ! objectData.positionLast.equals( objectData.position ) ) {
 
 					// get octant index of object within current node
 
@@ -494,7 +508,7 @@
 
 			// if direction passed, normalize and find pct
 
-			if ( direction instanceof THREE.Vector3 ) {
+			if ( direction instanceof THREE$$1.Vector3 ) {
 
 				direction = this.utilVec31Search.copy( direction ).normalize();
 				directionPct = this.utilVec32Search.set( 1, 1, 1 ).divide( direction );
@@ -573,7 +587,7 @@
 
 		setRoot: function ( root ) {
 
-			if ( root instanceof THREE.OctreeNode ) {
+			if ( root instanceof exports.OctreeNode ) {
 
 				// store new root
 
@@ -619,7 +633,7 @@
 
 	=====================================================*/
 
-	THREE.OctreeObjectData = function ( object, part ) {
+	exports.OctreeObjectData = function ( object, part ) {
 
 		// properties
 
@@ -627,24 +641,24 @@
 
 		// handle part by type
 
-		if ( part instanceof THREE.Face3 ) {
+		if ( part instanceof THREE$$1.Face3 ) {
 
 			this.faces = part;
 			this.face3 = true;
-			this.utilVec31FaceBounds = new THREE.Vector3();
+			this.utilVec31FaceBounds = new THREE$$1.Vector3();
 
-		} else if ( part instanceof THREE.Vector3 ) {
+		} else if ( part instanceof THREE$$1.Vector3 ) {
 
 			this.vertices = part;
 
 		}
 
 		this.radius = 0;
-		this.position = new THREE.Vector3();
+		this.position = new THREE$$1.Vector3();
 
 		// initial update
 
-		if ( this.object instanceof THREE.Object3D ) {
+		if ( this.object instanceof THREE$$1.Object3D ) {
 
 			this.update();
 
@@ -654,7 +668,7 @@
 
 	};
 
-	THREE.OctreeObjectData.prototype = {
+	exports.OctreeObjectData.prototype = {
 
 		update: function () {
 
@@ -696,7 +710,7 @@
 
 		getFace3BoundingRadius: function ( object, face ) {
 
-			if ( face.centroid === undefined ) face.centroid = new THREE.Vector3();
+			if ( face.centroid === undefined ) face.centroid = new THREE$$1.Vector3();
 
 			var geometry = object.geometry || object,
 				vertices = geometry.vertices,
@@ -720,13 +734,13 @@
 
 	=====================================================*/
 
-	THREE.OctreeNode = function ( parameters ) {
+	exports.OctreeNode = function ( parameters ) {
 
 		// utility
 
-		this.utilVec31Branch = new THREE.Vector3();
-		this.utilVec31Expand = new THREE.Vector3();
-		this.utilVec31Ray = new THREE.Vector3();
+		this.utilVec31Branch = new THREE$$1.Vector3();
+		this.utilVec31Expand = new THREE$$1.Vector3();
+		this.utilVec31Ray = new THREE$$1.Vector3();
 
 		// handle parameters
 
@@ -734,22 +748,22 @@
 
 		// store or create tree
 
-		if ( parameters.tree instanceof THREE.Octree ) {
+		if ( parameters.tree instanceof exports.Octree ) {
 
 			this.tree = parameters.tree;
 
-		} else if ( parameters.parent instanceof THREE.OctreeNode !== true ) {
+		} else if ( parameters.parent instanceof exports.OctreeNode !== true ) {
 
 			parameters.root = this;
 
-			this.tree = new THREE.Octree( parameters );
+			this.tree = new exports.Octree( parameters );
 
 		}
 
 		// basic properties
 
 		this.id = this.tree.nodeCount ++;
-		this.position = parameters.position instanceof THREE.Vector3 ? parameters.position : new THREE.Vector3();
+		this.position = parameters.position instanceof THREE$$1.Vector3 ? parameters.position : new THREE$$1.Vector3();
 		this.radius = parameters.radius > 0 ? parameters.radius : 1;
 		this.indexOctant = parameters.indexOctant;
 		this.depth = 0;
@@ -774,7 +788,7 @@
 
 		if ( this.tree.scene ) {
 
-			this.visual = new THREE.LineSegments( this.tree.visualGeometry, this.tree.visualMaterial );
+			this.visual = new THREE$$1.LineSegments( this.tree.visualGeometry, this.tree.visualMaterial );
 			this.visual.scale.set( this.radiusOverlap * 2, this.radiusOverlap * 2, this.radiusOverlap * 2 );
 			this.visual.position.copy( this.position );
 			this.tree.scene.add( this.visual );
@@ -783,7 +797,7 @@
 
 	};
 
-	THREE.OctreeNode.prototype = {
+	exports.OctreeNode.prototype = {
 
 		setParent: function ( parent ) {
 
@@ -807,7 +821,7 @@
 
 			// properties
 
-			if ( this.parent instanceof THREE.OctreeNode ) {
+			if ( this.parent instanceof exports.OctreeNode ) {
 
 				this.tree = this.parent.tree;
 				this.depth = this.parent.depth + 1;
@@ -923,7 +937,7 @@
 
 				node.addObject( object );
 
-			} else if ( indexOctant < - 1 && this.parent instanceof THREE.OctreeNode ) {
+			} else if ( indexOctant < - 1 && this.parent instanceof exports.OctreeNode ) {
 
 				// if object lies outside bounds, add to parent node
 
@@ -1009,7 +1023,7 @@
 			// find index of object in objects list
 
 			// search and remove object data (fast)
-			if ( object instanceof THREE.OctreeObjectData ) {
+			if ( object instanceof exports.OctreeObjectData ) {
 
 				// remove from this objects list
 
@@ -1245,7 +1259,7 @@
 
 			// node exists
 
-			if ( this.nodesByIndex[ indexOctant ] instanceof THREE.OctreeNode ) {
+			if ( this.nodesByIndex[ indexOctant ] instanceof exports.OctreeNode ) {
 
 				node = this.nodesByIndex[ indexOctant ];
 
@@ -1257,11 +1271,11 @@
 				overlap = radius * this.tree.overlapPct;
 				radiusOffset = radius - overlap;
 				offset = this.utilVec31Branch.set( indexOctant & 1 ? radiusOffset : - radiusOffset, indexOctant & 2 ? radiusOffset : - radiusOffset, indexOctant & 4 ? radiusOffset : - radiusOffset );
-				position = new THREE.Vector3().addVectors( this.position, offset );
+				position = new THREE$$1.Vector3().addVectors( this.position, offset );
 
 				// node
 
-				node = new THREE.OctreeNode( {
+				node = new exports.OctreeNode( {
 					tree: this.tree,
 					parent: this,
 					position: position,
@@ -1463,11 +1477,11 @@
 
 					radiusOffset = ( radiusParent + overlapParent ) - ( radius + overlap );
 					offset.set( indexOctant & 1 ? radiusOffset : - radiusOffset, indexOctant & 2 ? radiusOffset : - radiusOffset, indexOctant & 4 ? radiusOffset : - radiusOffset );
-					position = new THREE.Vector3().addVectors( this.position, offset );
+					position = new THREE$$1.Vector3().addVectors( this.position, offset );
 
 					// parent
 
-					parent = new THREE.OctreeNode( {
+					parent = new exports.OctreeNode( {
 						tree: this.tree,
 						position: position,
 						radius: radiusParent
@@ -1528,7 +1542,7 @@
 
 			// traverse up tree as long as node + entire subtree's object count is under minimum
 
-			while ( nodeParent.parent instanceof THREE.OctreeNode && nodeParent.getObjectCountEnd() < this.tree.objectsThreshold ) {
+			while ( nodeParent.parent instanceof exports.OctreeNode && nodeParent.getObjectCountEnd() < this.tree.objectsThreshold ) {
 
 				nodeMerge = nodeParent;
 				nodeParent = nodeParent.parent;
@@ -1602,7 +1616,7 @@
 					nodeObjectsCount = node.getObjectCountEnd();
 					outsideHeaviestObjectsCount += nodeObjectsCount;
 
-					if ( nodeHeaviest instanceof THREE.OctreeNode === false || nodeObjectsCount > nodeHeaviestObjectsCount ) {
+					if ( nodeHeaviest instanceof exports.OctreeNode === false || nodeObjectsCount > nodeHeaviestObjectsCount ) {
 
 						nodeHeaviest = node;
 						nodeHeaviestObjectsCount = nodeObjectsCount;
@@ -1617,7 +1631,7 @@
 
 				// if should contract
 
-				if ( outsideHeaviestObjectsCount < this.tree.objectsThreshold && nodeHeaviest instanceof THREE.OctreeNode ) {
+				if ( outsideHeaviestObjectsCount < this.tree.objectsThreshold && nodeHeaviest instanceof exports.OctreeNode ) {
 
 					this.contract( nodeHeaviest );
 
@@ -1687,7 +1701,7 @@
 
 			// handle type
 
-			if ( objectData instanceof THREE.OctreeObjectData ) {
+			if ( objectData instanceof exports.OctreeObjectData ) {
 
 				radiusObj = objectData.radius;
 
@@ -1697,7 +1711,7 @@
 
 				objectData.positionLast.copy( positionObj );
 
-			} else if ( objectData instanceof THREE.OctreeNode ) {
+			} else if ( objectData instanceof exports.OctreeNode ) {
 
 				positionObj = objectData.position;
 
@@ -2034,7 +2048,7 @@
 			var count = this.objects.length,
 				parent = this.parent;
 
-			while ( parent instanceof THREE.OctreeNode ) {
+			while ( parent instanceof exports.OctreeNode ) {
 
 				count += parent.objects.length;
 				parent = parent.parent;
@@ -2075,14 +2089,14 @@
 
 	=====================================================*/
 
-	THREE.Raycaster.prototype.intersectOctreeObject = function ( object, recursive ) {
+	THREE$$1.Raycaster.prototype.intersectOctreeObject = function ( object, recursive ) {
 
 		var intersects,
 			octreeObject,
 			facesAll,
 			facesSearch;
 
-		if ( object.object instanceof THREE.Object3D ) {
+		if ( object.object instanceof THREE$$1.Object3D ) {
 
 			octreeObject = object;
 			object = octreeObject.object;
@@ -2120,7 +2134,7 @@
 
 	};
 
-	THREE.Raycaster.prototype.intersectOctreeObjects = function ( objects, recursive ) {
+	THREE$$1.Raycaster.prototype.intersectOctreeObjects = function ( objects, recursive ) {
 
 		var i, il,
 			intersects = [];
@@ -2136,3 +2150,7 @@
 	};
 
 }( THREE ) );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

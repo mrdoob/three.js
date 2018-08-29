@@ -1,13 +1,24 @@
 /**
+ * Generated from 'examples\modules\renderers\SoftwareRenderer.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Projector.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Projector.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,Projector_js) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author ryg / http://farbrausch.de/~fg
  * @author mraleph / http://mrale.ph/
  * @author daoshengmu / http://dsmu.me/
  */
 
-THREE.SoftwareRenderer = function ( parameters ) {
 
-	console.log( 'THREE.SoftwareRenderer', THREE.REVISION );
+exports.SoftwareRenderer = function ( parameters ) {
+
+	console.log( '__SoftwareRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 
@@ -51,7 +62,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var prevrectx1 = Infinity, prevrecty1 = Infinity;
 	var prevrectx2 = 0, prevrecty2 = 0;
 
-	var projector = new THREE.Projector();
+	var projector = new Projector_js.Projector();
 
 	var spriteV1 = new THREE.Vector4();
 	var spriteV2 = new THREE.Vector4();
@@ -173,7 +184,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 			if ( ! shader ) continue;
 
-			if ( element instanceof THREE.RenderableFace ) {
+			if ( element instanceof Projector_js.RenderableFace ) {
 
 				if ( ! element.uvs ) {
 
@@ -198,7 +209,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				}
 
 
-			} else if ( element instanceof THREE.RenderableSprite ) {
+			} else if ( element instanceof Projector_js.RenderableSprite ) {
 
 				var scaleX = element.scale.x * 0.5;
 				var scaleY = element.scale.y * 0.5;
@@ -271,7 +282,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableLine ) {
+			} else if ( element instanceof Projector_js.RenderableLine ) {
 
 				var shader = getMaterialShader( material );
 
@@ -519,7 +530,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 				if ( material.map ) {
 
-					var texture = new THREE.SoftwareRenderer.Texture();
+					var texture = new exports.SoftwareRenderer.Texture();
 					texture.fromImage( material.map.image );
 
 					if ( ! texture.data ) return;
@@ -662,7 +673,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			Math.sqrt( ( x3 - x1 ) * ( x3 - x1 ) + ( y3 - y1 ) * ( y3 - y1 ) )
 		);
 
-		if ( ! ( face instanceof THREE.RenderableSprite ) && ( longestSide > 100 * fixscale ) ) {
+		if ( ! ( face instanceof Projector_js.RenderableSprite ) && ( longestSide > 100 * fixscale ) ) {
 
 			// 1
 			// |\
@@ -1515,7 +1526,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 };
 
-THREE.SoftwareRenderer.Texture = function () {
+exports.SoftwareRenderer.Texture = function () {
 
 	var canvas;
 
@@ -1554,3 +1565,7 @@ THREE.SoftwareRenderer.Texture = function () {
 	};
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

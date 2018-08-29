@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\FreiChenShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author zz85 / https://github.com/zz85 | https://www.lab4games.net/zz85/blog
  *
  * Edge Detection Shader using Frei-Chen filter
@@ -7,7 +17,9 @@
  * aspect: vec2 of (1/width, 1/height)
  */
 
-THREE.FreiChenShader = {
+
+
+exports.FreiChenShader = {
 
 	uniforms: {
 
@@ -91,3 +103,7 @@ THREE.FreiChenShader = {
 
 	].join( "\n" )
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

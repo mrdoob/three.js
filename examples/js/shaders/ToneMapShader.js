@@ -1,10 +1,21 @@
 /**
+ * Generated from 'examples\modules\shaders\ToneMapShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author miibond
  *
  * Full-screen tone-mapping shader based on http://www.cis.rit.edu/people/faculty/ferwerda/publications/sig02_paper.pdf
  */
 
-THREE.ToneMapShader = {
+
+exports.ToneMapShader = {
 
 	uniforms: {
 
@@ -75,3 +86,7 @@ THREE.ToneMapShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

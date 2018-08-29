@@ -1,17 +1,29 @@
 /**
+ * Generated from 'examples\modules\loaders\BabylonLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.BabylonLoader = function ( manager ) {
+
+
+exports.BabylonLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.BabylonLoader.prototype = {
+exports.BabylonLoader.prototype = {
 
-	constructor: THREE.BabylonLoader,
+	constructor: exports.BabylonLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -54,7 +66,7 @@ THREE.BabylonLoader.prototype = {
 
 					var data = json.multiMaterials[ i ];
 
-					console.warn( 'THREE.BabylonLoader: Multi materials not yet supported.' );
+					console.warn( '__BabylonLoader: Multi materials not yet supported.' );
 
 					materials[ data.id ] = new THREE.MeshPhongMaterial();
 
@@ -245,3 +257,7 @@ THREE.BabylonLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

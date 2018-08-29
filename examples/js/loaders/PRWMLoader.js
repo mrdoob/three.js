@@ -1,9 +1,21 @@
 /**
+ * Generated from 'examples\modules\loaders\PRWMLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Kevin Chapelier / https://github.com/kchapelier
  * See https://github.com/kchapelier/PRWM for more informations about this file format
  */
 
-( function ( THREE ) {
+
+
+( function ( THREE$$1 ) {
 
 	'use strict';
 
@@ -224,21 +236,21 @@
 
 	// Define the public interface
 
-	THREE.PRWMLoader = function PRWMLoader( manager ) {
+	exports.PRWMLoader = function PRWMLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		this.manager = ( manager !== undefined ) ? manager : THREE$$1.DefaultLoadingManager;
 
 	};
 
-	THREE.PRWMLoader.prototype = {
+	exports.PRWMLoader.prototype = {
 
-		constructor: THREE.PRWMLoader,
+		constructor: exports.PRWMLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var loader = new THREE.FileLoader( scope.manager );
+			var loader = new THREE$$1.FileLoader( scope.manager );
 			loader.setResponseType( 'arraybuffer' );
 
 			url = url.replace( /\*/g, isBigEndianPlatform() ? 'be' : 'le' );
@@ -257,20 +269,20 @@
 
 			var data = decodePrwm( arrayBuffer ),
 				attributesKey = Object.keys( data.attributes ),
-				bufferGeometry = new THREE.BufferGeometry(),
+				bufferGeometry = new THREE$$1.BufferGeometry(),
 				attribute,
 				i;
 
 			for ( i = 0; i < attributesKey.length; i ++ ) {
 
 				attribute = data.attributes[ attributesKey[ i ] ];
-				bufferGeometry.addAttribute( attributesKey[ i ], new THREE.BufferAttribute( attribute.values, attribute.cardinality, attribute.normalized ) );
+				bufferGeometry.addAttribute( attributesKey[ i ], new THREE$$1.BufferAttribute( attribute.values, attribute.cardinality, attribute.normalized ) );
 
 			}
 
 			if ( data.indices !== null ) {
 
-				bufferGeometry.setIndex( new THREE.BufferAttribute( data.indices, 1 ) );
+				bufferGeometry.setIndex( new THREE$$1.BufferAttribute( data.indices, 1 ) );
 
 			}
 
@@ -282,10 +294,14 @@
 
 	};
 
-	THREE.PRWMLoader.isBigEndianPlatform = function () {
+	exports.PRWMLoader.isBigEndianPlatform = function () {
 
 		return isBigEndianPlatform();
 
 	};
 
 } )( THREE );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

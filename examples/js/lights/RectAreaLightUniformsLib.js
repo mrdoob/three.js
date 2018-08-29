@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\lights\RectAreaLightUniformsLib.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['../../../build/three.module.js'], factory) :
+	(factory(global.THREE));
+}(this, (function (THREE) { 'use strict';
+
+/**
  * Uniforms library for RectAreaLight shared webgl shaders
  * @author abelnation
  * @author WestLangley / http://github.com/WestLangley
@@ -12,6 +22,8 @@
  *
  * TODO: figure out a way to compress the LTC BRDF data
  */
+
+
 
 // Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
 // by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
@@ -44,4 +56,6 @@
 	Object.assign( THREE.ShaderLib.standard.uniforms, ltc );
 	Object.assign( THREE.ShaderLib.physical.uniforms, ltc );
 
-} )()
+} )();
+
+})));

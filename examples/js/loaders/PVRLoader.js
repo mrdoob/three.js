@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\loaders\PVRLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  *	 PVRLoader
  *   Author: pierre lepers
@@ -8,19 +18,21 @@
  *   TODO : implement loadMipmaps option
  */
 
-THREE.PVRLoader = function ( manager ) {
+
+
+exports.PVRLoader = function ( manager ) {
 
 	THREE.CompressedTextureLoader.call( this, manager );
 
-	this._parser = THREE.PVRLoader.parse;
+	this._parser = exports.PVRLoader.parse;
 
 };
 
-THREE.PVRLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
-THREE.PVRLoader.prototype.constructor = THREE.PVRLoader;
+exports.PVRLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
+exports.PVRLoader.prototype.constructor = exports.PVRLoader;
 
 
-THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
+exports.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 
 	var headerLengthInt = 13;
 	var header = new Uint32Array( buffer, 0, headerLengthInt );
@@ -35,23 +47,23 @@ THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 
 		// PVR v3
 
-		return THREE.PVRLoader._parseV3( pvrDatas );
+		return exports.PVRLoader._parseV3( pvrDatas );
 
 	} else if ( header[ 11 ] === 0x21525650 ) {
 
 		// PVR v2
 
-		return THREE.PVRLoader._parseV2( pvrDatas );
+		return exports.PVRLoader._parseV2( pvrDatas );
 
 	} else {
 
-		console.error( 'THREE.PVRLoader: Unknown PVR format.' );
+		console.error( '__PVRLoader: Unknown PVR format.' );
 
 	}
 
 };
 
-THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
+exports.PVRLoader._parseV3 = function ( pvrDatas ) {
 
 	var header = pvrDatas.header;
 	var bpp, format;
@@ -88,7 +100,7 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 			break;
 
 		default :
-			console.error( 'THREE.PVRLoader: Unsupported PVR format:', pixelFormat );
+			console.error( '__PVRLoader: Unsupported PVR format:', pixelFormat );
 
 	}
 
@@ -101,11 +113,11 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 	pvrDatas.numMipmaps = numMipmaps;
 	pvrDatas.isCubemap 	= ( numFaces === 6 );
 
-	return THREE.PVRLoader._extract( pvrDatas );
+	return exports.PVRLoader._extract( pvrDatas );
 
 };
 
-THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
+exports.PVRLoader._parseV2 = function ( pvrDatas ) {
 
 	var header = pvrDatas.header;
 
@@ -145,7 +157,7 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 
 	} else {
 
-		console.error( 'THREE.PVRLoader: Unknown PVR format:', formatFlags );
+		console.error( '__PVRLoader: Unknown PVR format:', formatFlags );
 
 	}
 
@@ -161,12 +173,12 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 	// it juste a pvr containing 6 surface (no explicit cubemap type)
 	pvrDatas.isCubemap 	= ( numSurfs === 6 );
 
-	return THREE.PVRLoader._extract( pvrDatas );
+	return exports.PVRLoader._extract( pvrDatas );
 
 };
 
 
-THREE.PVRLoader._extract = function ( pvrDatas ) {
+exports.PVRLoader._extract = function ( pvrDatas ) {
 
 	var pvr = {
 		mipmaps: [],
@@ -244,3 +256,7 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 	return pvr;
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

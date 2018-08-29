@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\SMAAShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mpk / http://polko.me/
  *
  * WebGL port of Subpixel Morphological Antialiasing (SMAA) v2.8
@@ -6,7 +16,9 @@
  * https://github.com/iryoku/smaa/releases/tag/v2.8
  */
 
-THREE.SMAAShader = [ {
+
+
+exports.SMAAShader = [ {
 
 	defines: {
 
@@ -460,3 +472,7 @@ THREE.SMAAShader = [ {
 	].join("\n")
 
 } ];
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

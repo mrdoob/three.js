@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\DotScreenShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Dot screen shader
@@ -6,7 +16,9 @@
  * https://github.com/evanw/glfx.js
  */
 
-THREE.DotScreenShader = {
+
+
+exports.DotScreenShader = {
 
 	uniforms: {
 
@@ -66,3 +78,7 @@ THREE.DotScreenShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

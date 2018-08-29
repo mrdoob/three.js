@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\HorizontalBlurShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
  * Two pass Gaussian blur filter (horizontal and vertical blur shaders)
@@ -10,7 +20,8 @@
  * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
  */
 
-THREE.HorizontalBlurShader = {
+
+exports.HorizontalBlurShader = {
 
 	uniforms: {
 
@@ -60,3 +71,7 @@ THREE.HorizontalBlurShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

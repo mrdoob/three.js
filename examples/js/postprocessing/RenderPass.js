@@ -1,10 +1,21 @@
 /**
+ * Generated from 'examples\modules\postprocessing\RenderPass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,three_module_js,Pass_js) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
-	THREE.Pass.call( this );
+exports.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
+
+	Pass_js.Pass.call( this );
 
 	this.scene = scene;
 	this.camera = camera;
@@ -20,9 +31,9 @@ THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clear
 
 };
 
-THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.RenderPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.RenderPass,
+	constructor: exports.RenderPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -61,3 +72,7 @@ THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

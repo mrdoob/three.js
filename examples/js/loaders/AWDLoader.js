@@ -1,7 +1,19 @@
 /**
+ * Generated from 'examples\modules\loaders\AWDLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * Author: Pierre Lepers
  * Date: 09/12/2013 17:21
  */
+
+
 
 ( function () {
 
@@ -76,7 +88,7 @@
 		}
 	};
 
-	THREE.AWDLoader = function ( manager ) {
+	exports.AWDLoader = function ( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -104,9 +116,9 @@
 
 	};
 
-	THREE.AWDLoader.prototype = {
+	exports.AWDLoader.prototype = {
 
-		constructor: THREE.AWDLoader,
+		constructor: exports.AWDLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -1229,3 +1241,7 @@
 	};
 
 } )();
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,17 +1,29 @@
 /**
+ * Generated from 'examples\modules\Gyroscope.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Gyroscope = function () {
+
+
+exports.Gyroscope = function () {
 
 	THREE.Object3D.call( this );
 
 };
 
-THREE.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Gyroscope.prototype.constructor = THREE.Gyroscope;
+exports.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );
+exports.Gyroscope.prototype.constructor = exports.Gyroscope;
 
-THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
+exports.Gyroscope.prototype.updateMatrixWorld = ( function () {
 
 	var translationObject = new THREE.Vector3();
 	var quaternionObject = new THREE.Quaternion();
@@ -63,3 +75,7 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	};
 
 }() );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

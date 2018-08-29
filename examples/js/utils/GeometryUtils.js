@@ -1,15 +1,27 @@
 /**
+ * Generated from 'examples\modules\utils\GeometryUtils.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.GeometryUtils = {
+
+
+exports.GeometryUtils = {
 
 	// Merge two geometries or geometry and geometry from object (using object's transform)
 
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
-		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
+		console.warn( '__GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
 
 		var matrix;
 
@@ -80,7 +92,7 @@ THREE.GeometryUtils = {
 		vB = geometry.vertices[ face.b ];
 		vC = geometry.vertices[ face.c ];
 
-		return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
+		return exports.GeometryUtils.randomPointInTriangle( vA, vB, vC );
 
 	},
 
@@ -110,7 +122,7 @@ THREE.GeometryUtils = {
 			vB = vertices[ face.b ];
 			vC = vertices[ face.c ];
 
-			face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
+			face._area = exports.GeometryUtils.triangleArea( vA, vB, vC );
 
 			totalArea += face._area;
 
@@ -166,7 +178,7 @@ THREE.GeometryUtils = {
 
 			index = binarySearchIndices( r );
 
-			result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry );
+			result[ i ] = exports.GeometryUtils.randomPointInFace( faces[ index ], geometry );
 
 			if ( ! stats[ index ] ) {
 
@@ -206,7 +218,7 @@ THREE.GeometryUtils = {
 			vB.set( vertices[ i * 9 + 3 ], vertices[ i * 9 + 4 ], vertices[ i * 9 + 5 ] );
 			vC.set( vertices[ i * 9 + 6 ], vertices[ i * 9 + 7 ], vertices[ i * 9 + 8 ] );
 
-			totalArea += THREE.GeometryUtils.triangleArea( vA, vB, vC );
+			totalArea += exports.GeometryUtils.triangleArea( vA, vB, vC );
 
 			cumulativeAreas.push( totalArea );
 
@@ -258,11 +270,11 @@ THREE.GeometryUtils = {
 
 			index = binarySearchIndices( r );
 
-			// result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry, true );
+			// result[ i ] = GeometryUtils.randomPointInFace( faces[ index ], geometry, true );
 			vA.set( vertices[ index * 9 + 0 ], vertices[ index * 9 + 1 ], vertices[ index * 9 + 2 ] );
 			vB.set( vertices[ index * 9 + 3 ], vertices[ index * 9 + 4 ], vertices[ index * 9 + 5 ] );
 			vC.set( vertices[ index * 9 + 6 ], vertices[ index * 9 + 7 ], vertices[ index * 9 + 8 ] );
-			result[ i ] = THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
+			result[ i ] = exports.GeometryUtils.randomPointInTriangle( vA, vB, vC );
 
 		}
 
@@ -292,9 +304,13 @@ THREE.GeometryUtils = {
 
 	center: function ( geometry ) {
 
-		console.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
+		console.warn( '__GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
 		return geometry.center();
 
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -1,12 +1,24 @@
 /**
+ * Generated from 'examples\modules\loaders\BinaryLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.BinaryLoader = function ( manager ) {
+
+
+exports.BinaryLoader = function ( manager ) {
 
 	if ( typeof manager === 'boolean' ) {
 
-		console.warn( 'THREE.BinaryLoader: showStatus parameter has been removed from constructor.' );
+		console.warn( '__BinaryLoader: showStatus parameter has been removed from constructor.' );
 		manager = undefined;
 
 	}
@@ -15,9 +27,9 @@ THREE.BinaryLoader = function ( manager ) {
 
 };
 
-THREE.BinaryLoader.prototype = {
+exports.BinaryLoader.prototype = {
 
-	constructor: THREE.BinaryLoader,
+	constructor: exports.BinaryLoader,
 
 	crossOrigin: 'anonymous',
 
@@ -690,3 +702,7 @@ THREE.BinaryLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

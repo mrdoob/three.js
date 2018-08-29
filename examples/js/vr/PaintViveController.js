@@ -1,10 +1,21 @@
 /**
+ * Generated from 'examples\modules\vr\PaintViveController.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./ViveController.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './ViveController.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,ViveController_js) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com
  */
 
-THREE.PaintViveController = function ( id ) {
 
-	THREE.ViveController.call( this, id );
+exports.PaintViveController = function ( id ) {
+
+	ViveController_js.ViveController.call( this, id );
 
 	var PI2 = Math.PI * 2;
 
@@ -180,5 +191,9 @@ THREE.PaintViveController = function ( id ) {
 
 };
 
-THREE.PaintViveController.prototype = Object.create( THREE.ViveController.prototype );
-THREE.PaintViveController.prototype.constructor = THREE.PaintViveController;
+exports.PaintViveController.prototype = Object.create( ViveController_js.ViveController.prototype );
+exports.PaintViveController.prototype.constructor = exports.PaintViveController;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

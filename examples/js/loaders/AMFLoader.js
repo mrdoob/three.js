@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\loaders\AMFLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
 /*
  * @author tamarintech / https://tamarintech.com
  *
@@ -18,15 +28,17 @@
  *
  */
 
-THREE.AMFLoader = function ( manager ) {
+
+
+exports.AMFLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.AMFLoader.prototype = {
+exports.AMFLoader.prototype = {
 
-	constructor: THREE.AMFLoader,
+	constructor: exports.AMFLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -54,7 +66,7 @@ THREE.AMFLoader.prototype = {
 				var zip = null;
 				var file = null;
 
-				console.log( 'THREE.AMFLoader: Loading Zip' );
+				console.log( '__AMFLoader: Loading Zip' );
 
 				try {
 
@@ -64,7 +76,7 @@ THREE.AMFLoader.prototype = {
 
 					if ( e instanceof ReferenceError ) {
 
-						console.log( 'THREE.AMFLoader: jszip missing and file is compressed.' );
+						console.log( '__AMFLoader: jszip missing and file is compressed.' );
 						return null;
 
 					}
@@ -81,7 +93,7 @@ THREE.AMFLoader.prototype = {
 
 				}
 
-				console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
+				console.log( '__AMFLoader: Trying to load file asset: ' + file );
 				view = new DataView( zip.file( file ).asArrayBuffer() );
 
 			}
@@ -91,7 +103,7 @@ THREE.AMFLoader.prototype = {
 
 			if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
 
-				console.log( 'THREE.AMFLoader: Error loading AMF - no AMF document found.' );
+				console.log( '__AMFLoader: Error loading AMF - no AMF document found.' );
 				return null;
 
 			}
@@ -125,7 +137,7 @@ THREE.AMFLoader.prototype = {
 
 			}
 
-			console.log( 'THREE.AMFLoader: Unit scale: ' + scale );
+			console.log( '__AMFLoader: Unit scale: ' + scale );
 			return scale;
 
 		}
@@ -485,3 +497,7 @@ THREE.AMFLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

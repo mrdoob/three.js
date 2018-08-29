@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\lines\LineMaterial.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author WestLangley / http://github.com/WestLangley
  *
  * parameters = {
@@ -11,6 +21,8 @@
  *  resolution: <Vector2>, // to be set by renderer
  * }
  */
+
+
 
 THREE.UniformsLib.line = {
 
@@ -237,7 +249,7 @@ THREE.ShaderLib[ 'line' ] = {
 		`
 };
 
-THREE.LineMaterial = function ( parameters ) {
+exports.LineMaterial = function ( parameters ) {
 
 	THREE.ShaderMaterial.call( this, {
 
@@ -368,12 +380,12 @@ THREE.LineMaterial = function ( parameters ) {
 
 };
 
-THREE.LineMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.LineMaterial.prototype.constructor = THREE.LineMaterial;
+exports.LineMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
+exports.LineMaterial.prototype.constructor = exports.LineMaterial;
 
-THREE.LineMaterial.prototype.isLineMaterial = true;
+exports.LineMaterial.prototype.isLineMaterial = true;
 
-THREE.LineMaterial.prototype.copy = function ( source ) {
+exports.LineMaterial.prototype.copy = function ( source ) {
 
 	THREE.ShaderMaterial.prototype.copy.call( this, source );
 
@@ -389,3 +401,6 @@ THREE.LineMaterial.prototype.copy = function ( source ) {
 
 };
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

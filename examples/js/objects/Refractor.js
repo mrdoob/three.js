@@ -1,9 +1,21 @@
 /**
+ * Generated from 'examples\modules\objects\Refractor.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Mugen87 / https://github.com/Mugen87
  *
  */
 
-THREE.Refractor = function ( geometry, options ) {
+
+
+exports.Refractor = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
 
@@ -17,7 +29,7 @@ THREE.Refractor = function ( geometry, options ) {
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var shader = options.shader || THREE.Refractor.RefractorShader;
+	var shader = options.shader || exports.Refractor.RefractorShader;
 
 	//
 
@@ -261,10 +273,10 @@ THREE.Refractor = function ( geometry, options ) {
 
 };
 
-THREE.Refractor.prototype = Object.create( THREE.Mesh.prototype );
-THREE.Refractor.prototype.constructor = THREE.Refractor;
+exports.Refractor.prototype = Object.create( THREE.Mesh.prototype );
+exports.Refractor.prototype.constructor = exports.Refractor;
 
-THREE.Refractor.RefractorShader = {
+exports.Refractor.RefractorShader = {
 
 	uniforms: {
 
@@ -330,3 +342,7 @@ THREE.Refractor.RefractorShader = {
 
 	].join( '\n' )
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

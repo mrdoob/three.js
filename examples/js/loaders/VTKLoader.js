@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\loaders\VTKLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author Alex Pletzer
  *
@@ -9,13 +19,15 @@
  * @author Sriram Somasundharam https://github.com/raamssundar
  */
 
-THREE.VTKLoader = function ( manager ) {
+
+
+exports.VTKLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
+Object.assign( exports.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -1179,3 +1191,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

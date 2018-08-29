@@ -1,16 +1,28 @@
 /**
+ * Generated from 'examples\modules\loaders\AssimpLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author Virtulous / https://virtulo.us/
  */
 
-THREE.AssimpLoader = function ( manager ) {
+
+
+exports.AssimpLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.AssimpLoader.prototype = {
+exports.AssimpLoader.prototype = {
 
-	constructor: THREE.AssimpLoader,
+	constructor: exports.AssimpLoader,
 
 	crossOrigin: 'anonymous',
 
@@ -2357,3 +2369,7 @@ THREE.AssimpLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

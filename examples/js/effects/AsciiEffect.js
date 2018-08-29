@@ -1,3 +1,13 @@
+/**
+ * Generated from 'examples\modules\effects\AsciiEffect.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
 /*
  * @author zz85 / https://github.com/zz85
  *
@@ -7,7 +17,8 @@
  * 16 April 2012 - @blurspline
  */
 
-THREE.AsciiEffect = function ( renderer, charSet, options ) {
+
+exports.AsciiEffect = function ( renderer, charSet, options ) {
 
 	// its fun to create one your own!
 
@@ -281,3 +292,7 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 	// end modified asciifyImage block
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

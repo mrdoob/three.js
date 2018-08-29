@@ -1,17 +1,29 @@
 /**
+ * Generated from 'examples\modules\loaders\3MFLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author technohippy / https://github.com/technohippy
  */
 
-THREE.ThreeMFLoader = function ( manager ) {
+
+
+exports.ThreeMFLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.availableExtensions = [];
 
 };
 
-THREE.ThreeMFLoader.prototype = {
+exports.ThreeMFLoader.prototype = {
 
-	constructor: THREE.ThreeMFLoader,
+	constructor: exports.ThreeMFLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -55,7 +67,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				if ( e instanceof ReferenceError ) {
 
-					console.error( 'THREE.ThreeMFLoader: jszip missing and file is compressed.' );
+					console.error( '__ThreeMFLoader: jszip missing and file is compressed.' );
 					return null;
 
 				}
@@ -102,7 +114,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
 
-					console.error( 'THREE.ThreeMFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
+					console.error( '__ThreeMFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
 
 				}
 
@@ -604,3 +616,7 @@ THREE.ThreeMFLoader.prototype = {
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

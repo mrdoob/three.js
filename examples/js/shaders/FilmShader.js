@@ -1,4 +1,14 @@
 /**
+ * Generated from 'examples\modules\shaders\FilmShader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
+}(this, (function (exports) { 'use strict';
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Film grain & scanlines shader
@@ -20,7 +30,8 @@
  * http://creativecommons.org/licenses/by/3.0/
  */
 
-THREE.FilmShader = {
+
+exports.FilmShader = {
 
 	uniforms: {
 
@@ -102,3 +113,7 @@ THREE.FilmShader = {
 	].join( "\n" )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

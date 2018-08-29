@@ -1,18 +1,30 @@
 /**
+ * Generated from 'examples\modules\loaders\SVGLoader.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author zz85 / http://joshuakoo.com/
  * @author yomboprime / https://yombo.org
  */
 
-THREE.SVGLoader = function ( manager ) {
+
+
+exports.SVGLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.SVGLoader.prototype = {
+exports.SVGLoader.prototype = {
 
-	constructor: THREE.SVGLoader,
+	constructor: exports.SVGLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -970,7 +982,7 @@ THREE.SVGLoader.prototype = {
 
 		//
 
-		console.log( 'THREE.SVGLoader' );
+		console.log( '__SVGLoader' );
 
 		var paths = [];
 
@@ -982,23 +994,27 @@ THREE.SVGLoader.prototype = {
 
 		var currentTransform = new THREE.Matrix3();
 
-		console.time( 'THREE.SVGLoader: DOMParser' );
+		console.time( '__SVGLoader: DOMParser' );
 
 		var xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
 
-		console.timeEnd( 'THREE.SVGLoader: DOMParser' );
+		console.timeEnd( '__SVGLoader: DOMParser' );
 
-		console.time( 'THREE.SVGLoader: Parse' );
+		console.time( '__SVGLoader: Parse' );
 
 		parseNode( xml.documentElement, { fill: '#000' } );
 
 		// console.log( paths );
 
 
-		console.timeEnd( 'THREE.SVGLoader: Parse' );
+		console.timeEnd( '__SVGLoader: Parse' );
 
 		return paths;
 
 	}
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

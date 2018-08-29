@@ -1,10 +1,21 @@
 /**
+ * Generated from 'examples\modules\postprocessing\CubeTexturePass.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js'), require('./Pass.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js', './Pass.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE,global.THREE));
+}(this, (function (exports,THREE,Pass_js) { 'use strict';
+
+/**
  * @author bhouston / http://clara.io/
  */
 
-THREE.CubeTexturePass = function ( camera, envMap, opacity ) {
 
-	THREE.Pass.call( this );
+exports.CubeTexturePass = function ( camera, envMap, opacity ) {
+
+	Pass_js.Pass.call( this );
 
 	this.camera = camera;
 
@@ -32,9 +43,9 @@ THREE.CubeTexturePass = function ( camera, envMap, opacity ) {
 
 };
 
-THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+exports.CubeTexturePass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
 
-	constructor: THREE.CubeTexturePass,
+	constructor: exports.CubeTexturePass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
@@ -55,3 +66,7 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 	}
 
 } );
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

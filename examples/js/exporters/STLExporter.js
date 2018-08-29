@@ -1,22 +1,34 @@
 /**
+ * Generated from 'examples\modules\exporters\STLExporter.js'
+ **/
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('../../../build/three.module.js')) :
+	typeof define === 'function' && define.amd ? define(['exports', '../../../build/three.module.js'], factory) :
+	(factory((global.THREE = global.THREE || {}),global.THREE));
+}(this, (function (exports,THREE) { 'use strict';
+
+/**
  * @author kovacsv / http://kovacsv.hu/
  * @author mrdoob / http://mrdoob.com/
  * @author mudcube / http://mudcu.be/
  * @author Mugen87 / https://github.com/Mugen87
  *
  * Usage:
- *  var exporter = new THREE.STLExporter();
+ *  var exporter = new STLExporter();
  *
  *  // second argument is a list of options
  *  var data = exporter.parse( mesh, { binary: true } );
  *
  */
 
-THREE.STLExporter = function () {};
 
-THREE.STLExporter.prototype = {
 
-	constructor: THREE.STLExporter,
+exports.STLExporter = function () {};
+
+exports.STLExporter.prototype = {
+
+	constructor: exports.STLExporter,
 
 	parse: ( function () {
 
@@ -164,3 +176,7 @@ THREE.STLExporter.prototype = {
 	}() )
 
 };
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
