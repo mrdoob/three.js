@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing smaa</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		
+		<script src="js/libs/stats.min.js"></script>
+
+		
+		
+
+		
+		
+		
+		
+		
+		
+
+
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			import { EffectComposer } from './modules/postprocessing/EffectComposer.js';
+			import { SMAAPass } from './modules/postprocessing/SMAAPass.js';
+			import { RenderPass } from './modules/postprocessing/RenderPass.js';
+
+
+			var camera, scene, renderer, composer, pass, stats;
+
+			init();
+			animate();
+
+			function init( meshTexture ) {
+
+				var container = document.getElementById( "container" );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				stats = new window.Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 300;
+
+				scene = new THREE.Scene();
+
+				var geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = - 100;
+				scene.add( mesh );
+
+				var texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
+				texture.anisotropy = 4;
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = 100;
+				scene.add( mesh );
+
+				// postprocessing
+
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
+
+				pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
+				pass.renderToScreen = true;
+				composer.addPass( pass );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+				var pixelRatio = renderer.getPixelRatio();
+				var newWidth  = Math.floor( width * pixelRatio ) || 1;
+				var newHeight = Math.floor( height * pixelRatio ) || 1;
+				composer.setSize( newWidth, newHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+
+				for ( var i = 0; i < scene.children.length; i ++ ) {
+
+					var child = scene.children[ i ];
+
+					child.rotation.x += 0.005;
+					child.rotation.y += 0.01;
+
+				}
+
+				composer.render();
+
+				stats.end();
+
+			}
+
+		</script>
+
+	</body>
+</html>
