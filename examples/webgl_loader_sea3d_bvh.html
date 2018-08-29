@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sea3d / morph</title>
+		<title>three.js webgl - sea3d / bvh</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -28,9 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a>. Asset by <a href="http://www.turbosquid.com/3d-models/soccer-player-max-free/307330" style="color:#FFFFFF" target="_blank" rel="noopener">Trivision</a>
 			<br/>
-			<br/><div id="description">Flag is Vertex Animation / Teapot is Morpher</div>
+			<br/>Runtime convertion of BVH Animation to SEA3D Skeleton Animation
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -49,6 +49,9 @@
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
 
+		<script src="js/loaders/BVHLoader.js"></script>
+		<script src="js/utils/SkeletonUtils.js"></script>
+		
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -60,9 +63,11 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, teapot;
+			var camera, scene, renderer, composer, player, hat;
 
 			var loader;
+
+			var bvhSkeletonHelper, bvhMixer;
 
 			// Initialize Three.JS
 
@@ -75,12 +80,12 @@
 			loader = new THREE.SEA3D( {
 
 				autoPlay: true, // Auto play animations
-				scripts: false, // Disable embed scripts
-				container: scene // Container to add models
+				container: scene, // Container to add models
+				multiplier: .6 // Light multiplier
 
 			} );
 
-			loader.onComplete = function ( e ) {
+			loader.onComplete = function ( ) {
 
 				// Get the first camera from SEA3D Studio
 				// use loader.get... to get others objects
@@ -91,21 +96,128 @@
 
 				new THREE.OrbitControls( camera );
 
-				// get mesh
+				// get meshes
+				player = loader.getMesh( "Player" );
+				hat = loader.getMesh( "Hat" );
 
-				teapot = loader.getMesh( "Teapot01" );
+				hat.visible = false;
 
-				// events
-
-				window.addEventListener( 'mousemove', onMouseMove, false );
+				loadBVH();
 
 				animate();
 
 			};
 
-			loader.load( './models/sea3d/morph.tjs.sea' );
+			loader.load( './models/sea3d/skin.tjs.sea' );
 
 			//
+
+			function bvhToSEA3D( result ) {
+
+				var options = {
+					useFirstFramePosition: true,
+					preserveHipPosition: false,
+					hip: "hip",
+					// left is SEA3D bone names and right BVH bone names
+					names: {
+						"Base HumanPelvis": "hip",
+						"Base HumanSpine3": "abdomen",
+						"Base HumanRibcage": "chest",
+						"Base HumanHead": "head",
+
+						"Base HumanRUpperarm": "rShldr",
+						"Base HumanRForearm1": "rForeArm",
+						"Base HumanRPalm": "rHand",
+
+						"Base HumanLUpperarm": "lShldr",
+						"Base HumanLForearm1": "lForeArm",
+						"Base HumanLPalm": "lHand",
+
+						"Base HumanRThigh": "rThigh",
+						"Base HumanRCalf1": "rShin",
+						"Base HumanRFoot": "rFoot",
+
+						"Base HumanLThigh": "lThigh",
+						"Base HumanLCalf1": "lShin",
+						"Base HumanLFoot": "lFoot"
+					},
+
+				};
+
+				// Automatic offset: get offsets when it is in T-Pose
+				options.offsets = THREE.SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
+
+				/*
+				// Manual offsets: compensates the difference in skeletons ( T-Pose )
+				options.offsets = {
+					"lShldr": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( - 45 ),
+							THREE.Math.degToRad( - 80 )
+						)
+					),
+					"rShldr": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 45 ),
+							THREE.Math.degToRad( 80 )
+						)
+					),
+					"lFoot": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 15 ),
+							0
+						)
+					),
+					"rFoot": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 15 ),
+							0
+						)
+					)
+				};
+				*/
+
+				var clip = THREE.SkeletonUtils.retargetClip( player, result.skeleton, result.clip, options );
+
+				clip.name = "dance";
+
+				clip = THREE.SEA3D.AnimationClip.fromClip( clip );
+
+				player.addAnimation( new THREE.SEA3D.Animation( clip ) );
+
+				player.play( "dance" );
+
+
+			}
+
+			function loadBVH() {
+
+				var loader = new THREE.BVHLoader();
+				loader.load( "models/bvh/pirouette.bvh", function ( result ) {
+
+					bvhSkeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
+					bvhSkeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly
+
+					var boneContainer = new THREE.Group();
+					boneContainer.add( result.skeleton.bones[ 0 ] );
+					boneContainer.position.y = - 100;
+
+					scene.add( bvhSkeletonHelper );
+					scene.add( boneContainer );
+
+					// play animation
+					bvhMixer = new THREE.AnimationMixer( bvhSkeletonHelper );
+					bvhMixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play();
+
+					bvhToSEA3D( result );
+
+				} );
+
+			}
 
 			function init() {
 
@@ -115,7 +227,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set( 1000, - 300, 1000 );
 
 				renderer = new THREE.WebGLRenderer();
@@ -154,18 +266,6 @@
 
 			}
 
-			function onMouseMove( e ) {
-
-				var mouseX = e.clientX,
-					mouseY = e.clientY;
-
-				// change morph weight: 0 at 1
-				// names from modifier Morph of 3ds Max
-				teapot.setWeight( "OldTeapot", mouseX / window.innerWidth );
-				teapot.setWeight( "Sphere", mouseY / window.innerHeight );
-
-			}
-
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -189,6 +289,8 @@
 				// Update SEA3D Animations
 				THREE.SEA3D.AnimationHandler.update( delta );
 
+				if ( bvhMixer ) bvhMixer.update( delta );
+
 				render( delta );
 
 				stats.update();
@@ -203,5 +305,6 @@
 			}
 
 		</script>
+
 	</body>
 </html>
