@@ -9,6 +9,9 @@ var WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
+		if ( options === undefined ) options = {};
+		if ( options.frameOfReferenceType === undefined ) options.frameOfReferenceType = 'stage';
+
 		function showEnterVR( device ) {
 
 			button.style.display = '';
@@ -28,7 +31,7 @@ var WEBVR = {
 
 			};
 
-			renderer.vr.setDevice( device );
+			renderer.vr.setDevice( device, options );
 
 		}
 
@@ -37,9 +40,6 @@ var WEBVR = {
 			var currentSession = null;
 
 			function onSessionStarted( session ) {
-
-				if ( options === undefined ) options = {};
-				if ( options.frameOfReferenceType === undefined ) options.frameOfReferenceType = 'stage';
 
 				session.addEventListener( 'end', onSessionEnded );
 

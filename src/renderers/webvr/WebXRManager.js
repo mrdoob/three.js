@@ -71,10 +71,10 @@ function WebXRManager( renderer ) {
 
 	};
 
-	this.setDevice = function ( value ) {
+	this.setDevice = function ( _device ) {
 
-		if ( value !== undefined ) device = value;
-		if ( value instanceof XRDevice ) gl.setCompatibleXRDevice( value );
+		if ( _device !== undefined ) device = _device;
+		if ( _device instanceof XRDevice ) gl.setCompatibleXRDevice( _device );
 
 	};
 
@@ -94,9 +94,9 @@ function WebXRManager( renderer ) {
 
 	}
 
-	this.setSession = function ( value, options ) {
+	this.setSession = function ( _session, _options ) {
 
-		session = value;
+		session = _session;
 
 		if ( session !== null ) {
 
@@ -106,9 +106,9 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'end', onSessionEnd );
 
 			session.baseLayer = new XRWebGLLayer( session, gl );
-			session.requestFrameOfReference( options.frameOfReferenceType ).then( function ( value ) {
+			session.requestFrameOfReference( _options.frameOfReferenceType ).then( function ( _frameOfRef ) {
 
-				frameOfRef = value;
+				frameOfRef = _frameOfRef;
 
 				renderer.setFramebuffer( session.baseLayer.framebuffer );
 
