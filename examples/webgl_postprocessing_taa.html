@@ -56,6 +56,7 @@
 
 			var camera, scene, renderer, composer, copyPass, taaRenderPass, renderPass;
 			var gui, stats, texture;
+			var index = 0;
 
 			var param = { TAAEnabled: "1", TAASampleLevel: 0 };
 
@@ -180,13 +181,11 @@
 
 			function animate() {
 
-				this.index = this.index || 0;
-
 				requestAnimationFrame( animate );
 
-				this.index ++;
+				index ++;
 
-				if( Math.round( this.index / 200 ) % 2 === 0 ) {
+				if( Math.round( index / 200 ) % 2 === 0 ) {
 					for ( var i = 0; i < scene.children.length; i ++ ) {
 
 						var child = scene.children[ i ];
