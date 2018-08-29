@@ -95,6 +95,20 @@ Object.assign( Triangle, {
 
 	}(),
 
+	containsPoint: function () {
+
+		var v1 = new Vector3();
+
+		return function containsPoint( point, a, b, c ) {
+
+			Triangle.getBarycoord( point, a, b, c, v1 );
+
+			return ( v1.x >= 0 ) && ( v1.y >= 0 ) && ( ( v1.x + v1.y ) <= 1 );
+
+		};
+
+	}(),
+
 	uvIntersection: function () {
 
 		var barycoord = new Vector3();
@@ -113,20 +127,6 @@ Object.assign( Triangle, {
 			v1.add( v2 ).add( v3 );
 
 			return result.copy( v1 );
-
-		};
-
-	}(),
-
-	containsPoint: function () {
-
-		var v1 = new Vector3();
-
-		return function containsPoint( point, a, b, c ) {
-
-			Triangle.getBarycoord( point, a, b, c, v1 );
-
-			return ( v1.x >= 0 ) && ( v1.y >= 0 ) && ( ( v1.x + v1.y ) <= 1 );
 
 		};
 
@@ -229,6 +229,12 @@ Object.assign( Triangle.prototype, {
 	containsPoint: function ( point ) {
 
 		return Triangle.containsPoint( point, this.a, this.b, this.c );
+
+	},
+
+	uvIntersection: function ( point, uv1, uv2, uv3, result ) {
+
+		return Triangle.uvIntersection( point, this.a, this.b, this.c, uv1, uv2, uv3, result );
 
 	},
 
