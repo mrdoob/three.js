@@ -26,7 +26,8 @@
     "extends": "mdcs"
   },
   "scripts": {
-    "build": "rollup -c",
+		"build": "rollup -c",
+		"build-examples": "rollup -c rollup.example-imports-to-umd.config.js",
     "build-test": "rollup -c test/rollup.unit.config.js",
     "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
     "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
