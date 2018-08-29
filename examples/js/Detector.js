@@ -3,10 +3,12 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-var Detector = {
 
-	canvas: !! window.CanvasRenderingContext2D,
-	webgl: ( function () {
+
+
+var Detector = (function() {
+
+	var isWebGLAvailable = ( function () {
 
 		try {
 
@@ -18,8 +20,9 @@ var Detector = {
 
 		}
 
-	} )(),
-	webgl2: ( function () {
+	} )();
+
+	var isWebGL2Available = ( function () {
 
 		try {
 
@@ -31,11 +34,9 @@ var Detector = {
 
 		}
 
-	} )(),
-	workers: !! window.Worker,
-	fileapi: window.File && window.FileReader && window.FileList && window.Blob,
+	} )();
 
-	getWebGLErrorMessage: function ( version ) {
+	function getWebGLErrorMessage( version ) {
 
 		var webgl2 = version === 'webgl2';
 
@@ -50,6 +51,10 @@ var Detector = {
 		element.style.padding = '1.5em';
 		element.style.width = '400px';
 		element.style.margin = '5em auto 0';
+		element.style.position = 'fixed';
+		element.style.left = 0;
+		element.style.right = 0;
+		element.style.top = 0;
 
 		if ( webgl2 && !this.webgl2 || !webgl2 && !this.webgl ) {
 
@@ -62,9 +67,9 @@ var Detector = {
 
 		return element;
 
-	},
+	}
 
-	addGetWebGLMessage: function ( parameters ) {
+	function addGetWebGLMessageByVersion( parameters, version ) {
 
 		var parent, id, element;
 
@@ -73,14 +78,37 @@ var Detector = {
 		parent = parameters.parent !== undefined ? parameters.parent : document.body;
 		id = parameters.id !== undefined ? parameters.id : 'oldie';
 
-		element = Detector.getWebGLErrorMessage( parameters.version );
+		element = getWebGLErrorMessage( version );
 		element.id = id;
 
 		parent.appendChild( element );
 
 	}
 
-};
+	return {
+		canvas: !! window.CanvasRenderingContext2D,
+		webgl: isWebGLAvailable,
+		webgl2: isWebGL2Available,
+		workers: !! window.Worker,
+		fileapi: window.File && window.FileReader && window.FileList && window.Blob,
+
+		addGetWebGL2Message: function ( parameters ) {
+
+			addGetWebGLMessageByVersion( parameters, 'webgl2' );
+
+		},
+
+		addGetWebGLMessage: function ( parameters ) {
+
+			addGetWebGLMessageByVersion( parameters, 'webgl' );
+
+		},
+
+		getWebGLErrorMessage: getWebGLErrorMessage
+
+	};
+
+} )();
 
 // browserify support
 if ( typeof module === 'object' ) {
