@@ -174,6 +174,7 @@ function WebVRManager( renderer ) {
 
 	this.enabled = false;
 	this.userHeight = 1.6;
+	this.standing = false
 
 	this.getController = function ( id ) {
 
@@ -229,15 +230,19 @@ function WebVRManager( renderer ) {
 
 		//
 
-		var stageParameters = device.stageParameters;
+		if ( this.standing ) {
 
-		if ( stageParameters ) {
+			var stageParameters = device.stageParameters;
 
-			standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
+			if ( stageParameters ) {
 
-		} else {
+				standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
 
-			standingMatrix.makeTranslation( 0, scope.userHeight, 0 );
+			} else {
+
+				standingMatrix.makeTranslation( 0, scope.userHeight, 0 );
+
+			}
 
 		}
 
@@ -287,8 +292,12 @@ function WebVRManager( renderer ) {
 
 		standingMatrixInverse.getInverse( standingMatrix );
 
-		cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
-		cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
+		if ( this.standing) {
+
+			cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
+			cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
+
+		}
 
 		var parent = poseObject.parent;
 
