@@ -72,9 +72,13 @@ function WebVRManager( renderer ) {
 
 			animation.start();
 
-		} else if ( scope.enabled ) {
+		} else {
 
-			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+			if ( scope.enabled ) {
+
+				renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+
+			}
 
 			animation.stop();
 
