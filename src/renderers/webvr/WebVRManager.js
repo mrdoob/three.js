@@ -24,6 +24,8 @@ function WebVRManager( renderer ) {
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
 
+	var options = { frameOfReferenceType: 'stage' };
+
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
 		frameData = new window.VRFrameData();
@@ -173,8 +175,6 @@ function WebVRManager( renderer ) {
 	//
 
 	this.enabled = false;
-	this.userHeight = 1.6;
-	this.standing = false;
 
 	this.getController = function ( id ) {
 
@@ -200,11 +200,12 @@ function WebVRManager( renderer ) {
 
 	};
 
-	this.setDevice = function ( value ) {
+	this.setDevice = function ( _device, _options ) {
 
-		if ( value !== undefined ) device = value;
+		if ( _device !== undefined ) device = _device;
+		if ( _options !== undefined ) options = _options;
 
-		animation.setContext( value );
+		animation.setContext( _device );
 
 	};
 
@@ -218,7 +219,7 @@ function WebVRManager( renderer ) {
 
 		if ( device === null ) {
 
-			camera.position.set( 0, scope.userHeight, 0 );
+			camera.position.set( 0, 1.6, 0 );
 			return camera;
 
 		}
@@ -230,7 +231,7 @@ function WebVRManager( renderer ) {
 
 		//
 
-		if ( this.standing ) {
+		if ( options.frameOfReferenceType === 'stage' ) {
 
 			var stageParameters = device.stageParameters;
 
@@ -240,7 +241,7 @@ function WebVRManager( renderer ) {
 
 			} else {
 
-				standingMatrix.makeTranslation( 0, scope.userHeight, 0 );
+				standingMatrix.makeTranslation( 0, 1.6, 0 );
 
 			}
 
@@ -292,7 +293,7 @@ function WebVRManager( renderer ) {
 
 		standingMatrixInverse.getInverse( standingMatrix );
 
-		if ( this.standing ) {
+		if ( options.frameOfReferenceType === 'stage' ) {
 
 			cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
 			cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
