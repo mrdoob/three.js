@@ -15,7 +15,7 @@ function WebXRManager( renderer ) {
 	var device = null;
 	var session = null;
 
-	var frameOfRef = null;
+	var frameOfReference = null;
 	var frameOfReferenceType = 'stage';
 
 	var pose = null;
@@ -25,8 +25,7 @@ function WebXRManager( renderer ) {
 
 	function isPresenting() {
 
-		return session !== null && frameOfRef !== null;
-
+		return session !== null && frameOfReference !== null;
 
 	}
 
@@ -72,10 +71,10 @@ function WebXRManager( renderer ) {
 
 	};
 
-	this.setDevice = function ( _device ) {
+	this.setDevice = function ( value ) {
 
-		if ( _device !== undefined ) device = _device;
-		if ( _device instanceof XRDevice ) gl.setCompatibleXRDevice( _device );
+		if ( value !== undefined ) device = value;
+		if ( value instanceof XRDevice ) gl.setCompatibleXRDevice( value );
 
 	};
 
@@ -101,9 +100,9 @@ function WebXRManager( renderer ) {
 
 	};
 
-	this.setSession = function ( _session ) {
+	this.setSession = function ( value ) {
 
-		session = _session;
+		session = value;
 
 		if ( session !== null ) {
 
@@ -113,9 +112,9 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'end', onSessionEnd );
 
 			session.baseLayer = new XRWebGLLayer( session, gl );
-			session.requestFrameOfReference( frameOfReferenceType ).then( function ( _frameOfRef ) {
+			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
 
-				frameOfRef = _frameOfRef;
+				frameOfReference = value;
 
 				renderer.setFramebuffer( session.baseLayer.framebuffer );
 
@@ -200,7 +199,7 @@ function WebXRManager( renderer ) {
 
 	function onAnimationFrame( time, frame ) {
 
-		pose = frame.getDevicePose( frameOfRef );
+		pose = frame.getDevicePose( frameOfReference );
 
 		if ( pose !== null ) {
 
@@ -243,7 +242,7 @@ function WebXRManager( renderer ) {
 
 			if ( inputSource ) {
 
-				var inputPose = frame.getInputPose( inputSource, frameOfRef );
+				var inputPose = frame.getInputPose( inputSource, frameOfReference );
 
 				if ( inputPose !== null ) {
 

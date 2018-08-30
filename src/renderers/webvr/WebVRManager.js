@@ -200,12 +200,13 @@ function WebVRManager( renderer ) {
 
 	};
 
-	this.setDevice = function ( _device, _options ) {
+	this.setDevice = function ( value ) {
 
-		if ( _device !== undefined ) device = _device;
-		if ( _options !== undefined ) options = _options;
+		if ( value !== undefined ) device = value;
 
-		animation.setContext( _device );
+		animation.setContext( value );
+
+	};
 
 	this.setFrameOfReferenceType = function ( value ) {
 
