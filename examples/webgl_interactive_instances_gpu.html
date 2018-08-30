@@ -354,7 +354,7 @@
 		var mouse = new THREE.Vector2();
 		var scale = 1.03;
 
-		var loader = new THREE.JSONLoader();
+		var loader = new THREE.BufferGeometryLoader();
 
 		//create buffer for reading a single pixel
 		var pixelBuffer = new Uint8Array( 4 );
@@ -500,8 +500,9 @@
 			clean();
 
 			// make instances
-			loader.load( 'models/json/suzanne_geometry.json', function ( geo ) {
+			loader.load( 'models/json/suzanne_buffergeometry.json', function ( geo ) {
 
+				geo = geo.toNonIndexed();
 				geo.computeBoundingBox();
 				geo.boundingBox.getSize( geometrySize );
 				geometryList.push( geo );
@@ -740,14 +741,11 @@
 
 			// geometry
 
-			var bgeo = new THREE.BufferGeometry().fromGeometry( geo );
-			geometryList.push( bgeo );
-
 			var mgeo = new THREE.BufferGeometry();
 			geometryList.push( mgeo );
 
-			var pos = bgeo.attributes.position;
-			var posLen = bgeo.attributes.position.count * 3;
+			var pos = geo.attributes.position;
+			var posLen = geo.attributes.position.count * 3;
 			var vertices = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * posLen ), 3
 			);
@@ -846,13 +844,10 @@
 
 			// geometry
 
-			var bgeo = new THREE.BufferGeometry().fromGeometry( geo );
-			geometryList.push( bgeo );
-
 			var igeo = new THREE.InstancedBufferGeometry();
 			geometryList.push( igeo );
 
-			var vertices = bgeo.attributes.position.clone();
+			var vertices = geo.attributes.position.clone();
 			igeo.addAttribute( 'position', vertices );
 
 			// var matrices = new THREE.InstancedBufferAttribute(

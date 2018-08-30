@@ -71,17 +71,13 @@
 				var count = 128;
 				var radius = 32;
 
-				var spherical = new THREE.Spherical();
-
 				for ( var i = 1, l = count; i <= l; i ++ ) {
 
 					var phi = Math.acos( - 1 + ( 2 * i ) / l );
 					var theta = Math.sqrt( l * Math.PI ) * phi;
 
-					spherical.set( radius, phi, theta );
-
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.setFromSpherical( spherical );
+					mesh.position.setFromSphericalCoords( radius, phi, theta );
 					mesh.lookAt( camera.position );
 					scene.add( mesh );
 

@@ -143,7 +143,12 @@
 						index ++;
 
 					}
-				});
+
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
+				} );
 
 				function addLabel( name, location ) {
 

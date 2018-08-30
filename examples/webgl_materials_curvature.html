@@ -79,6 +79,8 @@
 
 			var camera, scene, renderer;
 
+			var controls;
+
 			var ninjaMeshRaw, curvatureAttribute, bufferGeo;
 
 			init();
@@ -190,10 +192,6 @@
 								var posB_A = new THREE.Vector3().subVectors( posB, posA );
 								var posB_C = new THREE.Vector3().subVectors( posB, posC );
 								var posC_A = new THREE.Vector3().subVectors( posC, posA );
-
-								var normB_A = new THREE.Vector3().subVectors( normB, normA );
-								var normB_C = new THREE.Vector3().subVectors( normB, normC );
-								var normC_A = new THREE.Vector3().subVectors( normC, normA );
 
 								var b2a = normB.dot( posB_A.normalize() );
 								var b2c = normB.dot( posB_C.normalize() );
@@ -342,7 +340,7 @@
 				topologyFolder.add( params, 'filterConvex' );
 				topologyFolder.add( params, 'filterConcave' );
 				topologyFolder.add( params, 'filterBoth' );
-				topologyFolder.open()
+				topologyFolder.open();
 
 				onWindowResize();
 

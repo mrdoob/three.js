@@ -36,6 +36,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -110,18 +111,6 @@
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
 				textureLava.format = THREE.RGBFormat;
-
-				//
-
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
 				// GROUND
 
@@ -209,17 +198,15 @@
 
 				// MORPHS
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.GLTFLoader();
 
-				loader.load( "models/animated/sittingBox.js", function( geometry ) {
+				loader.load( "models/gltf/SittingBox.glb", function( gltf ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, flatShading: true } );
-
-					var mesh = new THREE.Mesh( geometry, morphMaterial );
+					var mesh = gltf.scene.children[ 0 ];
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					mixer.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
+					mixer.clipAction( gltf.animations[0] ).setDuration( 10 ).play();
 
 					var s = 200;
 					mesh.scale.set( s, s, s );

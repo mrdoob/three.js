@@ -40,7 +40,6 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.vr.enabled = true;
-			renderer.vr.userHeight = 0; // TOFIX
 			document.body.appendChild( renderer.domElement );
 
 			document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'head-model' } ) );

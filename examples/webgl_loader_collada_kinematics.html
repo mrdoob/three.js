@@ -149,7 +149,7 @@
 
 							tweenParameters[ prop ] = position;
 
-							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max )
+							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max );
 
 						}
 
@@ -212,7 +212,7 @@
 				camera.position.y = 10;
 				camera.position.z = Math.sin( timer ) * 20;
 
-				camera.lookAt( new THREE.Vector3( 0, 5, 0 ) );
+				camera.lookAt( 0, 5, 0 );
 
 				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;

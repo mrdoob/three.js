@@ -181,18 +181,8 @@
 
 			function createScene( geometry, materials, x, y, z, s ) {
 
-				//ensureLoop( geometry.animation );
-
 				geometry.computeBoundingBox();
 				var bb = geometry.boundingBox;
-
-				var path = "textures/cube/Park2/";
-				var format = '.jpg';
-				var urls = [
-						path + 'posx' + format, path + 'negx' + format,
-						path + 'posy' + format, path + 'negy' + format,
-						path + 'posz' + format, path + 'negz' + format
-					];
 
 				for ( var i = 0; i < materials.length; i ++ ) {
 
@@ -201,16 +191,7 @@
 					m.morphTargets = true;
 
 					m.specular.setHSL( 0, 0, 0.1 );
-
 					m.color.setHSL( 0.6, 0, 0.6 );
-
-					//m.map = map;
-					//m.envMap = envMap;
-					//m.bumpMap = bumpMap;
-					//m.bumpScale = 2;
-
-					//m.combine = THREE.MixOperation;
-					//m.reflectivity = 0.75;
 
 				}
 

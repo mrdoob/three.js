@@ -90,6 +90,8 @@
 
 		var renderer, scene, camera, stats;
 
+		var controls;
+
 		var mesh, uniforms;
 
 		var WIDTH = window.innerWidth,
@@ -143,7 +145,7 @@
 
 			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
 
-			var numFaces = geometry.attributes.position.count / 3
+			var numFaces = geometry.attributes.position.count / 3;
 
 			var colors = new Float32Array( numFaces * 3 * 3 );
 			var displacement = new Float32Array( numFaces * 3 * 3 );

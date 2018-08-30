@@ -56,11 +56,11 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
+			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls, teapot;
+			var camera, scene, renderer, composer, teapot;
 
 			var loader;
 
@@ -74,25 +74,26 @@
 
 			loader = new THREE.SEA3D( {
 
-				autoPlay : true, // Auto play animations
-				container : scene // Container to add models
+				autoPlay: true, // Auto play animations
+				scripts: false, // Disable embed scripts
+				container: scene // Container to add models
 
 			} );
 
-			loader.onComplete = function( e ) {
+			loader.onComplete = function ( e ) {
 
 				// Get the first camera from SEA3D Studio
 				// use loader.get... to get others objects
 
-				var cam = loader.cameras[0];
+				var cam = loader.cameras[ 0 ];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
-				controls = new THREE.OrbitControls( camera );
+				new THREE.OrbitControls( camera );
 
 				// get mesh
 
-				teapot = loader.getMesh("Teapot01");
+				teapot = loader.getMesh( "Teapot01" );
 
 				// events
 
@@ -160,8 +161,8 @@
 
 				// change morph weight: 0 at 1
 				// names from modifier Morph of 3ds Max
-				teapot.setWeight("OldTeapot", mouseX / window.innerWidth);
-				teapot.setWeight("Sphere", mouseY / window.innerHeight);
+				teapot.setWeight( "OldTeapot", mouseX / window.innerWidth );
+				teapot.setWeight( "Sphere", mouseY / window.innerHeight );
 
 			}
 

@@ -73,7 +73,7 @@
 				saoBlurRadius: 12,
 				saoBlurStdDev: 6,
 				saoBlurDepthCutoff: 0.01
-			}
+			};
 			var supportsDepthTextureExtension = false;
 			var isWebGL2 = false;
 
@@ -183,7 +183,6 @@
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
-				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();

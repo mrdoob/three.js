@@ -53,7 +53,7 @@
 			};
 
 			var container, stats;
-			var camera, scene, renderer;
+			var camera, scene, renderer, spotlight;
 			var splineHelperObjects = [], splineOutline;
 			var splinePointsLength = 4;
 			var positions = [];
@@ -163,6 +163,9 @@
 
 				transformControl = new THREE.TransformControls( camera, renderer.domElement );
 				transformControl.addEventListener( 'change', render );
+				transformControl.addEventListener( 'dragging-changed', function ( event ) {
+					controls.enabled = !event.value
+				} );
 				scene.add( transformControl );
 
 				// Hiding transform situation is a little in a mess :()
