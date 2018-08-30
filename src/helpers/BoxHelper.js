@@ -8,6 +8,7 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Object3D } from '../core/Object3D.js';
 
 function BoxHelper( object, color ) {
 
@@ -111,9 +112,11 @@ BoxHelper.prototype.copy = function ( source ) {
 
 };
 
-BoxHelper.prototype.clone = function () {
+BoxHelper.prototype.clone = function ( recursive ) {
 
-	return new this.constructor( this.object ).copy( this );
+	const cloned = new this.constructor( this.object );
+	Object3D.prototype.copy.call( cloned, this, recursive );
+	return cloned;
 
 };
 
