@@ -44,6 +44,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -110,7 +111,7 @@
 
 				//
 
-				var mapHeight = new THREE.TextureLoader().load( "models/json/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0x552811,
@@ -120,8 +121,8 @@
 					bumpScale: 12
 				} );
 
-				loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function( gltf ) { createScene( gltf.scene.children[ 0 ].geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
