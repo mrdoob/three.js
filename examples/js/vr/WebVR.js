@@ -11,7 +11,7 @@ var WEBVR = {
 
 		if ( options && options.frameOfReferenceType ) {
 
-			renderer.vr.setFrameOfReferenceType( options.frameOfReference );
+			renderer.vr.setFrameOfReferenceType( options.frameOfReferenceType );
 
 		}
 

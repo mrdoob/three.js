@@ -222,9 +222,11 @@ function WebVRManager( renderer ) {
 
 	this.getCamera = function ( camera ) {
 
+		var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
+
 		if ( device === null ) {
 
-			camera.position.set( 0, 1.6, 0 );
+			camera.position.set( 0, userHeight, 0 );
 			return camera;
 
 		}
@@ -246,7 +248,7 @@ function WebVRManager( renderer ) {
 
 			} else {
 
-				standingMatrix.makeTranslation( 0, 1.6, 0 );
+				standingMatrix.makeTranslation( 0, userHeight, 0 );
 
 			}
 
