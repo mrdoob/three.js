@@ -24,7 +24,7 @@ function WebVRManager( renderer ) {
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
 
-	var options = { frameOfReferenceType: 'stage' };
+	var frameOfReferenceType = 'stage';
 
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
@@ -207,6 +207,10 @@ function WebVRManager( renderer ) {
 
 		animation.setContext( _device );
 
+	this.setFrameOfReferenceType = function ( value ) {
+
+		frameOfReferenceType = value;
+
 	};
 
 	this.setPoseTarget = function ( object ) {
@@ -231,7 +235,7 @@ function WebVRManager( renderer ) {
 
 		//
 
-		if ( options.frameOfReferenceType === 'stage' ) {
+		if ( frameOfReferenceType === 'stage' ) {
 
 			var stageParameters = device.stageParameters;
 
@@ -293,7 +297,7 @@ function WebVRManager( renderer ) {
 
 		standingMatrixInverse.getInverse( standingMatrix );
 
-		if ( options.frameOfReferenceType === 'stage' ) {
+		if ( frameOfReferenceType === 'stage' ) {
 
 			cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
 			cameraR.matrixWorldInverse.multiply( standingMatrixInverse );

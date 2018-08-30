@@ -16,6 +16,7 @@ function WebXRManager( renderer ) {
 	var session = null;
 
 	var frameOfRef = null;
+	var frameOfReferenceType = 'stage';
 
 	var pose = null;
 
@@ -94,7 +95,13 @@ function WebXRManager( renderer ) {
 
 	}
 
-	this.setSession = function ( _session, _options ) {
+	this.setFrameOfReferenceType = function ( value ) {
+
+		frameOfReferenceType = value;
+
+	};
+
+	this.setSession = function ( _session ) {
 
 		session = _session;
 
@@ -106,7 +113,7 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'end', onSessionEnd );
 
 			session.baseLayer = new XRWebGLLayer( session, gl );
-			session.requestFrameOfReference( _options.frameOfReferenceType ).then( function ( _frameOfRef ) {
+			session.requestFrameOfReference( frameOfReferenceType ).then( function ( _frameOfRef ) {
 
 				frameOfRef = _frameOfRef;
 
