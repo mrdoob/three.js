@@ -45,7 +45,7 @@
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
-		<script src="js/BufferGeometryUtils.js"></script>
+		<script src="js/utils/BufferGeometryUtils.js"></script>
 		<script src="js/ImprovedNoise.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -180,7 +180,7 @@
 				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture } ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
 				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );

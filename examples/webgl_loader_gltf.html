@@ -97,6 +97,10 @@
 
 					scene.add( gltf.scene );
 
+				}, undefined, function ( e ) {
+
+					console.error( e );
+
 				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );

@@ -1,6 +1,6 @@
 {
     "asset": {
-        "generator": "COLLADA2GLTF with manual modifications for KHR_lights",
+        "generator": "COLLADA2GLTF with manual modifications for KHR_lights_punctual",
         "version": "2.0"
     },
     "scene": 0,
@@ -727,7 +727,7 @@
         },
         {
             "extensions": {
-                "KHR_lights": {
+                "KHR_lights_punctual": {
                     "light": 0
                 }
             },
@@ -735,7 +735,7 @@
         },
         {
             "extensions": {
-                "KHR_lights": {
+                "KHR_lights_punctual": {
                     "light": 1
                 }
             },
@@ -761,7 +761,7 @@
         },
         {
             "extensions": {
-                "KHR_lights": {
+                "KHR_lights_punctual": {
                     "light": 2
                 }
             },
@@ -4523,10 +4523,10 @@
         }
     ],
     "extensionsUsed": [
-        "KHR_lights"
+        "KHR_lights_punctual"
     ],
     "extensions": {
-        "KHR_lights": {
+        "KHR_lights_punctual": {
             "lights": [
                 {
                     "type": "point",

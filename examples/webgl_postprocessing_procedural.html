@@ -40,8 +40,7 @@
 			}
 		</script>
 		<script id="noiseRandom1D-frag" type="x-shader/x-fragment">
-		#include <common>
-		#include <packing>
+			#include <common>
 
 			varying vec2 vUv;
 
@@ -52,7 +51,6 @@
 		</script>
 		<script id="noiseRandom2D-frag" type="x-shader/x-fragment">
 			#include <common>
-			#include <packing>
 
 			varying vec2 vUv;
 
@@ -64,7 +62,6 @@
 		</script>
 		<script id="noiseRandom3D-frag" type="x-shader/x-fragment">
 			#include <common>
-			#include <packing>
 
 			varying vec2 vUv;
 
@@ -84,8 +81,10 @@
 
 		<script>
 
-			var camera, postScene, renderer, postMaterial, noiseRandom1DMaterial, noiseRandon2DMaterial, noiseRandom3DMaterial, postQuad;
+			var camera, postCamera, postScene, renderer;
+			var postMaterial, noiseRandom1DMaterial, noiseRandom2DMaterial, noiseRandom3DMaterial, postQuad;
 			var gui, stats, texture;
+			var index = 0;
 
 			var params = { procedure: 'noiseRandom3D' };
 
@@ -152,11 +151,9 @@
 
 			function animate() {
 
-				this.index = this.index || 0;
-
 				requestAnimationFrame( animate );
 
-				this.index ++;
+				index ++;
 
 				switch ( params.procedure ) {
 

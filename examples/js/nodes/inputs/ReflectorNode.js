@@ -1,38 +1,46 @@
-THREE.ReflectorNode = function ( mirror ) {
+/**
+ * @author sunag / http://www.sunag.com.br/
+ */
 
-	THREE.TempNode.call( this, 'v4' );
+import { TempNode } from '../core/TempNode.js';
+import { PositionNode } from '../accessors/PositionNode.js';
+import { OperatorNode } from '../math/OperatorNode.js';
+import { TextureNode } from './TextureNode.js';
+import { Matrix4Node } from './Matrix4Node.js';
+
+function ReflectorNode( mirror ) {
+
+	TempNode.call( this, 'v4' );
 
 	if ( mirror ) this.setMirror( mirror );
 
-};
+}
 
-THREE.ReflectorNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ReflectorNode.prototype.constructor = THREE.ReflectorNode;
-THREE.ReflectorNode.prototype.nodeType = "Reflector";
+ReflectorNode.prototype = Object.create( TempNode.prototype );
+ReflectorNode.prototype.constructor = ReflectorNode;
+ReflectorNode.prototype.nodeType = "Reflector";
 
-THREE.ReflectorNode.prototype.setMirror = function ( mirror ) {
+ReflectorNode.prototype.setMirror = function ( mirror ) {
 
 	this.mirror = mirror;
 
-	this.textureMatrix = new THREE.Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
+	this.textureMatrix = new Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
 
-	this.localPosition = new THREE.PositionNode( THREE.PositionNode.LOCAL );
+	this.localPosition = new PositionNode( PositionNode.LOCAL );
 
-	this.coord = new THREE.OperatorNode( this.textureMatrix, this.localPosition, THREE.OperatorNode.MUL );
-	this.coordResult = new THREE.OperatorNode( null, this.coord, THREE.OperatorNode.ADD );
+	this.uv = new OperatorNode( this.textureMatrix, this.localPosition, OperatorNode.MUL );
+	this.uvResult = new OperatorNode( null, this.uv, OperatorNode.ADD );
 
-	this.texture = new THREE.TextureNode( this.mirror.material.uniforms.tDiffuse.value, this.coord, null, true );
+	this.texture = new TextureNode( this.mirror.material.uniforms.tDiffuse.value, this.uv, null, true );
 
 };
 
-THREE.ReflectorNode.prototype.generate = function ( builder, output ) {
-
-	var material = builder.material;
+ReflectorNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		this.coordResult.a = this.offset;
-		this.texture.coord = this.offset ? this.coordResult : this.coord;
+		this.uvResult.a = this.offset;
+		this.texture.uv = this.offset ? this.uvResult : this.uv;
 
 		if ( output === 'sampler2D' ) {
 
@@ -46,13 +54,21 @@ THREE.ReflectorNode.prototype.generate = function ( builder, output ) {
 
 		console.warn( "THREE.ReflectorNode is not compatible with " + builder.shader + " shader." );
 
-		return builder.format( 'vec4(0.0)', this.type, output );
+		return builder.format( 'vec4( 0.0 )', this.type, output );
 
 	}
 
 };
 
-THREE.ReflectorNode.prototype.toJSON = function ( meta ) {
+ReflectorNode.prototype.copy = function ( source ) {
+
+	InputNode.prototype.copy.call( this, source );
+
+	this.scope.mirror = source.mirror;
+
+};
+
+ReflectorNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -69,3 +85,5 @@ THREE.ReflectorNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { ReflectorNode };

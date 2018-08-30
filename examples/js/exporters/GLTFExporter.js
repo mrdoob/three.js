@@ -244,7 +244,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( cachedData.attributes.has( normal ) ) {
 
-				return cachedData.textures.get( normal );
+				return cachedData.attributes.get( normal );
 
 			}
 
@@ -1396,6 +1396,16 @@ THREE.GLTFExporter.prototype = {
 				var outputItemSize = track.values.length / track.times.length;
 
 				if ( trackProperty === PATH_PROPERTIES.morphTargetInfluences ) {
+
+					if ( trackNode.morphTargetInfluences.length !== 1 &&
+						trackBinding.propertyIndex !== undefined ) {
+
+						console.warn( 'THREE.GLTFExporter: Skipping animation track "%s". ' +
+							'Morph target keyframe tracks must target all available morph targets ' +
+							'for the given mesh.', track.name );
+						continue;
+
+					}
 
 					outputItemSize /= trackNode.morphTargetInfluences.length;
 

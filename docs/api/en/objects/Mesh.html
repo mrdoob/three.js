@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Class representing triangular [link:https://en.wikipedia.org/wiki/Polygon_mesh polygon mesh] based objects.
+		  Also serves as a base for other classes such as [page:SkinnedMesh].
+		</p>
+
+
+		<h2>Example</h2>
+
+		<code>
+		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<p>
+		[page:Geometry geometry] — (optional) an instance of [page:Geometry] or [page:BufferGeometry].
+		  Default is a new [page:BufferGeometry].<br />
+		[page:Material material] — (optional) a single or an array of [page:Material]. Default is a new [page:MeshBasicMaterial]
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:Integer drawMode]</h3>
+		<p>
+		Determines how the mesh triangles are constructed from the vertices.
+		See the draw mode [page:DrawModes constants] for all possible values.
+		Default is [page:DrawModes TrianglesDrawMode].
+		</p>
+
+
+		<h3>[property:Boolean isMesh]</h3>
+		<p>
+			Used to check whether this or derived classes are meshes. Default is *true*.<br /><br />
+
+			You should not change this, as it is used internally for optimisation.
+		</p>
+
+		<h3>[property:Geometry geometry]</h3>
+		<p>
+			An instance of [page:Geometry] or [page:BufferGeometry] (or derived classes),
+			defining the object's structure.<br /><br />
+
+			It's recommended to always use a [page:BufferGeometry] if possible for best performance.
+		</p>
+
+		<h3>[property:Material material]</h3>
+		<p>
+			An instance of material derived from the [page:Material] base class or an array of materials, defining the
+			object's appearance. Default is a [page:MeshBasicMaterial] with a random color.
+		</p>
+
+		<h3>[property:Array morphTargetInfluences]</h3>
+		<p>
+		An array of weights typically from 0-1 that specify how much of the morph is applied.
+		Undefined by default, but reset to a blank array by [page:Mesh.updateMorphTargets updateMorphTargets].
+		</p>
+
+		<h3>[property:Object morphTargetDictionary]</h3>
+		<p>
+		A dictionary of morphTargets based on the morphTarget.name property.
+		Undefined by default, but rebuilt [page:Mesh.updateMorphTargets updateMorphTargets].
+		</p>
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h3>[method:null setDrawMode]( [param:Integer value] )</h3>
+		<p>Set the value of [page:.drawMode drawMode].</p>
+
+		<h3>[method:Mesh clone]()</h3>
+		<p>Returns a clone of this [name] object and its descendants.</p>
+
+		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+		Get intersections between a casted ray and this mesh.
+		[page:Raycaster.intersectObject] will call this method.
+		</p>
+
+		<h3>[method:null updateMorphTargets]()</h3>
+		<p>
+		Updates the morphTargets to have no influence on the object. Resets the
+		[page:Mesh.morphTargetInfluences morphTargetInfluences] and
+		[page:Mesh.morphTargetDictionary morphTargetDictionary] properties.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

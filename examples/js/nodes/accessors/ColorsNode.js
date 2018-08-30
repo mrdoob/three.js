@@ -2,35 +2,41 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.ColorsNode = function ( index ) {
+import { TempNode } from '../core/TempNode.js';
 
-	THREE.TempNode.call( this, 'v4', { shared: false } );
+var vertexDict = [ 'color', 'color2' ],
+	fragmentDict = [ 'vColor', 'vColor2' ];
+
+function ColorsNode( index ) {
+
+	TempNode.call( this, 'v4', { shared: false } );
 
 	this.index = index || 0;
 
-};
+}
 
-THREE.ColorsNode.vertexDict = [ 'color', 'color2' ];
-THREE.ColorsNode.fragmentDict = [ 'vColor', 'vColor2' ];
+ColorsNode.prototype = Object.create( TempNode.prototype );
+ColorsNode.prototype.constructor = ColorsNode;
 
-THREE.ColorsNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ColorsNode.prototype.constructor = THREE.ColorsNode;
+ColorsNode.prototype.generate = function ( builder, output ) {
 
-THREE.ColorsNode.prototype.generate = function ( builder, output ) {
+	builder.requires.color[ this.index ] = true;
 
-	var material = builder.material;
-	var result;
-
-	material.requires.color[ this.index ] = true;
-
-	if ( builder.isShader( 'vertex' ) ) result = THREE.ColorsNode.vertexDict[ this.index ];
-	else result = THREE.ColorsNode.fragmentDict[ this.index ];
+	var result = builder.isShader( 'vertex' ) ? vertexDict[ this.index ] : fragmentDict[ this.index ];
 
 	return builder.format( result, this.getType( builder ), output );
 
 };
 
-THREE.ColorsNode.prototype.toJSON = function ( meta ) {
+ColorsNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.index = source.index;
+
+};
+
+ColorsNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -45,3 +51,5 @@ THREE.ColorsNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { ColorsNode };

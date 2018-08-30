@@ -101,7 +101,7 @@
 
 				amplitude: { value: 5.0 },
 				opacity:   { value: 0.3 },
-				color:     { value: new THREE.Color( 0xff0000 ) }
+				color:     { value: new THREE.Color( 0xffffff ) }
 
 			};
 
@@ -117,7 +117,7 @@
 			});
 
 
-			var geometry = new THREE.TextGeometry( 'three.js', {
+			var geometry = new THREE.TextBufferGeometry( 'three.js', {
 
 				font: font,
 
@@ -130,24 +130,17 @@
 				bevelEnabled: true,
 				bevelSegments: 10,
 
-				steps: 40
-
 			} );
 
 			geometry.center();
 
-			var vertices = geometry.vertices;
+			var count = geometry.attributes.position.count;
 
-			var buffergeometry = new THREE.BufferGeometry();
+			var displacement = new THREE.Float32BufferAttribute( count * 3, 3 );
+			geometry.addAttribute( 'displacement', displacement );
 
-			var position = new THREE.Float32BufferAttribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
-			buffergeometry.addAttribute( 'position', position );
-
-			var displacement = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
-			buffergeometry.addAttribute( 'displacement', displacement );
-
-			var customColor = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
-			buffergeometry.addAttribute( 'customColor', customColor );
+			var customColor = new THREE.Float32BufferAttribute( count * 3, 3 );
+			geometry.addAttribute( 'customColor', customColor );
 
 			var color = new THREE.Color( 0xffffff );
 
@@ -158,7 +151,7 @@
 
 			}
 
-			object = new THREE.Line( buffergeometry, shaderMaterial );
+			object = new THREE.Line( geometry, shaderMaterial );
 			object.rotation.x = 0.2;
 			scene.add( object );
 

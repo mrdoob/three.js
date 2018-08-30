@@ -50,6 +50,7 @@ THREE.VRMLLoader.prototype = {
 
 	parse: function ( data ) {
 
+		var scope = this;
 		var texturePath = this.texturePath || '';
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
@@ -204,34 +205,34 @@ THREE.VRMLLoader.prototype = {
 
 					case 'skyAngle':
 					case 'groundAngle':
-						this.recordingFieldname = fieldName;
-						this.isRecordingAngles = true;
-						this.angles = [];
+						scope.recordingFieldname = fieldName;
+						scope.isRecordingAngles = true;
+						scope.angles = [];
 						break;
 
 					case 'skyColor':
 					case 'groundColor':
-						this.recordingFieldname = fieldName;
-						this.isRecordingColors = true;
-						this.colors = [];
+						scope.recordingFieldname = fieldName;
+						scope.isRecordingColors = true;
+						scope.colors = [];
 						break;
 
 					case 'point':
-						this.recordingFieldname = fieldName;
-						this.isRecordingPoints = true;
-						this.points = [];
+						scope.recordingFieldname = fieldName;
+						scope.isRecordingPoints = true;
+						scope.points = [];
 						break;
 
 					case 'coordIndex':
 					case 'texCoordIndex':
-						this.recordingFieldname = fieldName;
-						this.isRecordingFaces = true;
-						this.indexes = [];
+						scope.recordingFieldname = fieldName;
+						scope.isRecordingFaces = true;
+						scope.indexes = [];
 						break;
 
 				}
 
-				if ( this.isRecordingFaces ) {
+				if ( scope.isRecordingFaces ) {
 
 					// the parts hold the indexes as strings
 					if ( parts.length > 0 ) {
@@ -250,7 +251,7 @@ THREE.VRMLLoader.prototype = {
 
 								if ( index.length > 0 ) {
 
-									this.indexes.push( index );
+									scope.indexes.push( index );
 
 								}
 
@@ -272,19 +273,19 @@ THREE.VRMLLoader.prototype = {
 
 						if ( index.length > 0 ) {
 
-							this.indexes.push( index );
+							scope.indexes.push( index );
 
 						}
 
 						// start new one
 						index = [];
 
-						this.isRecordingFaces = false;
-						node[ this.recordingFieldname ] = this.indexes;
+						scope.isRecordingFaces = false;
+						node[ scope.recordingFieldname ] = scope.indexes;
 
 					}
 
-				} else if ( this.isRecordingPoints ) {
+				} else if ( scope.isRecordingPoints ) {
 
 					if ( node.nodeType == 'Coordinate' ) {
 
@@ -296,7 +297,7 @@ THREE.VRMLLoader.prototype = {
 								z: parseFloat( parts[ 3 ] )
 							};
 
-							this.points.push( point );
+							scope.points.push( point );
 
 						}
 
@@ -311,7 +312,7 @@ THREE.VRMLLoader.prototype = {
 								y: parseFloat( parts[ 2 ] )
 							};
 
-							this.points.push( point );
+							scope.points.push( point );
 
 						}
 
@@ -320,12 +321,12 @@ THREE.VRMLLoader.prototype = {
 					// end
 					if ( /]/.exec( line ) ) {
 
-						this.isRecordingPoints = false;
-						node.points = this.points;
+						scope.isRecordingPoints = false;
+						node.points = scope.points;
 
 					}
 
-				} else if ( this.isRecordingAngles ) {
+				} else if ( scope.isRecordingAngles ) {
 
 					// the parts hold the angles as strings
 					if ( parts.length > 0 ) {
@@ -339,7 +340,7 @@ THREE.VRMLLoader.prototype = {
 
 							}
 
-							this.angles.push( parseFloat( parts[ ind ] ) );
+							scope.angles.push( parseFloat( parts[ ind ] ) );
 
 						}
 
@@ -348,12 +349,12 @@ THREE.VRMLLoader.prototype = {
 					// end
 					if ( /]/.exec( line ) ) {
 
-						this.isRecordingAngles = false;
-						node[ this.recordingFieldname ] = this.angles;
+						scope.isRecordingAngles = false;
+						node[ scope.recordingFieldname ] = scope.angles;
 
 					}
 
-				} else if ( this.isRecordingColors ) {
+				} else if ( scope.isRecordingColors ) {
 
 					while ( null !== ( parts = float3_pattern.exec( line ) ) ) {
 
@@ -363,15 +364,15 @@ THREE.VRMLLoader.prototype = {
 							b: parseFloat( parts[ 3 ] )
 						};
 
-						this.colors.push( color );
+						scope.colors.push( color );
 
 					}
 
 					// end
 					if ( /]/.exec( line ) ) {
 
-						this.isRecordingColors = false;
-						node[ this.recordingFieldname ] = this.colors;
+						scope.isRecordingColors = false;
+						node[ scope.recordingFieldname ] = scope.colors;
 
 					}
 

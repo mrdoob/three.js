@@ -91,8 +91,8 @@
 				var sprite = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x80ff80, program: program } ) );
 				light3.add( sprite );
 
-				loader = new THREE.JSONLoader();
-				loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
+				loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ) );
 					scene.add( mesh );

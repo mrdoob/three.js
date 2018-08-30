@@ -171,6 +171,10 @@
 					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 					standardMaterial.needsUpdate = true;
 
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
 				} );
 
 				// Lights
@@ -264,8 +268,6 @@
 				}
 				renderer.toneMappingExposure = params.exposure;
 				renderer.toneMappingWhitePoint = params.whitePoint;
-
-				var timer = Date.now() * 0.00025;
 
 				camera.lookAt( scene.position );
 

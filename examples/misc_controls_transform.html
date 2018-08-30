@@ -21,21 +21,33 @@
 				padding: 15px;
 				z-index:100;
 			}
+			a {
+				color: white;
+			}
 		</style>
 	</head>
 	<body>
 
 		<div id="info">
-		"W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size<br />
-		Press "Q" to toggle world/local space, keep "Ctrl" down to snap to grid
+			<a href="javascript:control.setMode( 'translate' );">"W" translate</a> |
+			<a href="javascript:control.setMode( 'rotate' );">"E" rotate</a> |
+			<a href="javascript:control.setMode( 'scale' );">"R" scale</a> |
+			<a href="javascript:control.setSize( control.size + 0.1 );">"+" increase size</a> |
+			<a href="javascript:control.setSize( Math.max( control.size - 0.1, 0.1 ) );">"-" decrease size</a><br />
+			<a href="javascript:control.setSpace( control.space === 'local' ? 'world' : 'local' );">"Q" toggle world/local space</a> | Hold "Ctrl" down to snap to grid<br />
+			<a href="javascript:control.showX = !control.showX">"X" toggle X</a> |
+			<a href="javascript:control.showY = !control.showY">"Y" toggle Y</a> |
+			<a href="javascript:control.showZ = !control.showZ">"Z" toggle Z</a> |
+			<a href="javascript:control.enabled = !control.enabled">"Spacebar" toggle enabled</a><br />
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
 
 		<script>
 
-			var camera, scene, renderer, control;
+			var camera, scene, renderer, control, orbit;
 
 			init();
 			render();
@@ -49,9 +61,9 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.set( 1000, 500, 1000 );
-				camera.lookAt( new THREE.Vector3( 0, 200, 0 ) );
+				camera.lookAt( 0, 200, 0 );
 
 				scene = new THREE.Scene();
 				scene.add( new THREE.GridHelper( 1000, 10 ) );
@@ -61,14 +73,21 @@
 				scene.add( light );
 
 				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
-				texture.mapping = THREE.UVMapping;
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
+				orbit = new THREE.OrbitControls(camera, renderer.domElement);
+				orbit.update();
+				orbit.addEventListener( 'change', render );
+
 				control = new THREE.TransformControls( camera, renderer.domElement );
 				control.addEventListener( 'change', render );
+
+				control.addEventListener( 'dragging-changed', function ( event ) {
+					orbit.enabled = !event.value;
+				} );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -113,6 +132,22 @@
 							control.setSize( Math.max( control.size - 0.1, 0.1 ) );
 							break;
 
+						case 88: // X
+							control.showX = !control.showX;
+							break;
+
+						case 89: // Y
+							control.showY = !control.showY;
+							break;
+
+						case 90: // Z
+							control.showZ = !control.showZ;
+							break;
+
+						case 32: // Spacebar
+							control.enabled = !control.enabled;
+							break;
+
 					}
 
 				});
@@ -144,8 +179,6 @@
 			}
 
 			function render() {
-
-				control.update();
 
 				renderer.render( scene, camera );
 

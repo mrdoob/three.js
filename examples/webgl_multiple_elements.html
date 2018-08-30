@@ -16,19 +16,19 @@
 				font-size:13px;
 
 				background-color: #fff;
-				margin: 0px;
+				margin: 0;
 			}
 
 			#info {
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0; width: 100%;
 				padding: 5px;
 				text-align:center;
 			}
 
 			#content {
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0; width: 100%;
 				z-index: 1;
 				padding: 3em 0 0 0;
 			}
@@ -38,8 +38,8 @@
 			}
 
 			#c {
-				position: fixed;
-				left: 0px;
+				position: absolute;
+				left: 0;
 				width: 100%;
 				height: 100%;
 			}
@@ -186,6 +186,8 @@
 			function render() {
 
 				updateSize();
+
+				canvas.style.transform = `translateY(${window.scrollY}px)`;
 
 				renderer.setClearColor( 0xffffff );
 				renderer.setScissorTest( false );

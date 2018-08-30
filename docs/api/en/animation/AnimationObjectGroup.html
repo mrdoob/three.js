@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">A group of objects that receives a shared animation state.<br /><br />
+
+			For an overview of the different elements of the three.js animation system see the
+			"Animation System" article in the "Next Steps" section of the manual.
+		</p>
+
+		<h2>Usage:</h2>
+
+		<p class="desc">
+			Add objects you would otherwise pass as 'root' to the constructor or the [page:AnimationMixer.clipAction clipAction]
+			method of [page:AnimationMixer AnimationMixer] and instead pass this object as 'root'.<br /><br />
+
+			Note that objects of this class appear as one object to the mixer,
+			so cache control of the individual objects must be done	on the group.
+		</p>
+
+
+		<h2>Limitations</h2>
+		<p class="desc">
+			The animated properties must be compatible among all objects in the group.<br /><br />
+
+			A single property can either be controlled through a target group or directly, but not both.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:object obj1], [param:object obj2], [param:object obj3], ... )</h3>
+		[page:object obj] - an abitrary number of meshes that share the same animation state.<br />
+
+
+		<h2>Properties</h2>
+
+
+		<h3>[property:object stats]</h3>
+		<p>
+			An object that contains some informations of this *AnimationObjectGroup* (total number, number
+			in use, number of bindings per object)
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+			The [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this
+			*AnimationObjectGroup*. It gets automatically assigned and shouldn't be edited.
+		</p>
+
+
+		<h2>Methods</h2>
+
+
+		<h3>[method:null add]( [param:object obj1], [param:object obj2], [param:object obj3], ... )</h3>
+		<p>
+			Adds an arbitrary number of objects to this *AnimationObjectGroup*.
+		</p>
+
+		<h3>[method:null remove]( [param:object obj1], [param:object obj2], [param:object obj3], ... )</h3>
+		<p>
+			Removes an arbitrary number of objects from this *AnimationObjectGroup*.
+		</p>
+
+		<h3>[method:null uncache]( [param:object obj1], [param:object obj2], [param:object obj3], ... )</h3>
+		<p>
+			Deallocates all memory resources for the passed objects of this *AnimationObjectGroup*.
+		</p>
+
+
+		<h2>Source</h2>
+
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
