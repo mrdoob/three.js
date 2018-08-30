@@ -113,7 +113,7 @@ BoxHelper.prototype.copy = function ( source ) {
 
 BoxHelper.prototype.clone = function () {
 
-	return new this.constructor().copy( this );
+	return new this.constructor( this.object ).copy( this );
 
 };
 
