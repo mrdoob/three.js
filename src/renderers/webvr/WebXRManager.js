@@ -46,6 +46,7 @@ function WebXRManager( renderer ) {
 	//
 
 	this.enabled = false;
+	this.framebufferScaleFactor = 1.0;
 
 	this.getController = function ( id ) {
 
@@ -111,7 +112,7 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			session.baseLayer = new XRWebGLLayer( session, gl );
+			session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: this.framebufferScaleFactor } );
 			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
 
 				frameOfReference = value;

@@ -64,8 +64,8 @@ function WebVRManager( renderer ) {
 		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
-			var renderWidth = eyeParameters.renderWidth;
-			var renderHeight = eyeParameters.renderHeight;
+			var renderWidth = eyeParameters.renderWidth * scope.framebufferScaleFactor;
+			var renderHeight = eyeParameters.renderHeight * scope.framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			currentSize = renderer.getSize();
@@ -193,6 +193,7 @@ function WebVRManager( renderer ) {
 		return controller;
 
 	};
+	this.framebufferScaleFactor = 1.0;
 
 	this.getDevice = function () {
 
