@@ -21246,7 +21246,7 @@
 		var standingMatrix = new Matrix4();
 		var standingMatrixInverse = new Matrix4();
 
-		var options = { frameOfReferenceType: 'stage' };
+		var frameOfReferenceType = 'stage';
 
 		if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
@@ -21422,12 +21422,17 @@
 
 		};
 
-		this.setDevice = function ( _device, _options ) {
+		this.setDevice = function ( value ) {
 
-			if ( _device !== undefined ) device = _device;
-			if ( _options !== undefined ) options = _options;
+			if ( value !== undefined ) device = value;
 
-			animation.setContext( _device );
+			animation.setContext( value );
+
+		};
+
+		this.setFrameOfReferenceType = function ( value ) {
+
+			frameOfReferenceType = value;
 
 		};
 
@@ -21439,9 +21444,11 @@
 
 		this.getCamera = function ( camera ) {
 
+			var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
+
 			if ( device === null ) {
 
-				camera.position.set( 0, 1.6, 0 );
+				camera.position.set( 0, userHeight, 0 );
 				return camera;
 
 			}
@@ -21453,7 +21460,7 @@
 
 			//
 
-			if ( options.frameOfReferenceType === 'stage' ) {
+			if ( frameOfReferenceType === 'stage' ) {
 
 				var stageParameters = device.stageParameters;
 
@@ -21463,7 +21470,7 @@
 
 				} else {
 
-					standingMatrix.makeTranslation( 0, 1.6, 0 );
+					standingMatrix.makeTranslation( 0, userHeight, 0 );
 
 				}
 
@@ -21515,7 +21522,7 @@
 
 			standingMatrixInverse.getInverse( standingMatrix );
 
-			if ( options.frameOfReferenceType === 'stage' ) {
+			if ( frameOfReferenceType === 'stage' ) {
 
 				cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
 				cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
@@ -21621,7 +21628,8 @@
 		var device = null;
 		var session = null;
 
-		var frameOfRef = null;
+		var frameOfReference = null;
+		var frameOfReferenceType = 'stage';
 
 		var pose = null;
 
@@ -21630,8 +21638,7 @@
 
 		function isPresenting() {
 
-			return session !== null && frameOfRef !== null;
-
+			return session !== null && frameOfReference !== null;
 
 		}
 
@@ -21677,10 +21684,10 @@
 
 		};
 
-		this.setDevice = function ( _device ) {
+		this.setDevice = function ( value ) {
 
-			if ( _device !== undefined ) device = _device;
-			if ( _device instanceof XRDevice ) gl.setCompatibleXRDevice( _device );
+			if ( value !== undefined ) device = value;
+			if ( value instanceof XRDevice ) gl.setCompatibleXRDevice( value );
 
 		};
 
@@ -21700,9 +21707,15 @@
 
 		}
 
-		this.setSession = function ( _session, _options ) {
+		this.setFrameOfReferenceType = function ( value ) {
 
-			session = _session;
+			frameOfReferenceType = value;
+
+		};
+
+		this.setSession = function ( value ) {
+
+			session = value;
 
 			if ( session !== null ) {
 
@@ -21712,9 +21725,9 @@
 				session.addEventListener( 'end', onSessionEnd );
 
 				session.baseLayer = new XRWebGLLayer( session, gl );
-				session.requestFrameOfReference( _options.frameOfReferenceType ).then( function ( _frameOfRef ) {
+				session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
 
-					frameOfRef = _frameOfRef;
+					frameOfReference = value;
 
 					renderer.setFramebuffer( session.baseLayer.framebuffer );
 
@@ -21799,7 +21812,7 @@
 
 		function onAnimationFrame( time, frame ) {
 
-			pose = frame.getDevicePose( frameOfRef );
+			pose = frame.getDevicePose( frameOfReference );
 
 			if ( pose !== null ) {
 
@@ -21842,7 +21855,7 @@
 
 				if ( inputSource ) {
 
-					var inputPose = frame.getInputPose( inputSource, frameOfRef );
+					var inputPose = frame.getInputPose( inputSource, frameOfReference );
 
 					if ( inputPose !== null ) {
 
