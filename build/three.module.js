@@ -6033,13 +6033,13 @@ var envmap_pars_vertex = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || def
 
 var envmap_vertex = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\t\tvWorldPosition = worldPosition.xyz;\n\t#else\n\t\tvec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n\t\tvec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvReflect = reflect( cameraToVertex, worldNormal );\n\t\t#else\n\t\t\tvReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n\t\t#endif\n\t#endif\n#endif\n";
 
-var fog_vertex = "#ifdef USE_FOG\n\tvFogPosition = mvPosition.xyz;\n#endif\n";
+var fog_vertex = "#ifdef USE_FOG\n\tfogDepth = -mvPosition.z;\n#endif\n";
 
-var fog_pars_vertex = "#ifdef USE_FOG\n\tvarying vec3 vFogPosition;\n#endif\n";
+var fog_pars_vertex = "#ifdef USE_FOG\n\tvarying float fogDepth;\n#endif\n";
 
-var fog_fragment = "#ifdef USE_FOG\n\tvec3 fogPositionAbs = abs( vFogPosition );\n\tfloat fogMaxComponent = max( fogPositionAbs.x, max( fogPositionAbs.y, fogPositionAbs.z ) );\n\tfloat fogDepth = length( vFogPosition / fogMaxComponent ) * fogMaxComponent;\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );\n\t#else\n\t\tfloat fogFactor = smoothstep( fogNear, fogFar, fogDepth );\n\t#endif\n\tgl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\n#endif\n";
+var fog_fragment = "#ifdef USE_FOG\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );\n\t#else\n\t\tfloat fogFactor = smoothstep( fogNear, fogFar, fogDepth );\n\t#endif\n\tgl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\n#endif\n";
 
-var fog_pars_fragment = "#ifdef USE_FOG\n\tuniform vec3 fogColor;\n\tvarying vec3 vFogPosition;\n\t#ifdef FOG_EXP2\n\t\tuniform float fogDensity;\n\t#else\n\t\tuniform float fogNear;\n\t\tuniform float fogFar;\n\t#endif\n#endif\n";
+var fog_pars_fragment = "#ifdef USE_FOG\n\tuniform vec3 fogColor;\n\tvarying float fogDepth;\n\t#ifdef FOG_EXP2\n\t\tuniform float fogDensity;\n\t#else\n\t\tuniform float fogNear;\n\t\tuniform float fogFar;\n\t#endif\n#endif\n";
 
 var gradientmap_pars_fragment = "#ifdef TOON\n\tuniform sampler2D gradientMap;\n\tvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\t\tfloat dotNL = dot( normal, lightDirection );\n\t\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t\t#ifdef USE_GRADIENTMAP\n\t\t\treturn texture2D( gradientMap, coord ).rgb;\n\t\t#else\n\t\t\treturn ( coord.x < 0.7 ) ? vec3( 0.7 ) : vec3( 1.0 );\n\t\t#endif\n\t}\n#endif\n";
 
@@ -14065,6 +14065,25 @@ Object.assign( Triangle, {
 
 		};
 
+	}(),
+
+	getUV: function () {
+
+		var barycoord = new Vector3();
+
+		return function getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
+
+			this.getBarycoord( point, p1, p2, p3, barycoord );
+
+			target.set( 0, 0 );
+			target.addScaledVector( uv1, barycoord.x );
+			target.addScaledVector( uv2, barycoord.y );
+			target.addScaledVector( uv3, barycoord.z );
+
+			return target;
+
+		};
+
 	}()
 
 } );
@@ -14164,6 +14183,12 @@ Object.assign( Triangle.prototype, {
 	containsPoint: function ( point ) {
 
 		return Triangle.containsPoint( point, this.a, this.b, this.c );
+
+	},
+
+	getUV: function ( point, uv1, uv2, uv3, result ) {
+
+		return Triangle.getUV( point, this.a, this.b, this.c, uv1, uv2, uv3, result );
 
 	},
 
@@ -14409,24 +14434,8 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var uvB = new Vector2();
 		var uvC = new Vector2();
 
-		var barycoord = new Vector3();
-
 		var intersectionPoint = new Vector3();
 		var intersectionPointWorld = new Vector3();
-
-		function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
-
-			Triangle.getBarycoord( point, p1, p2, p3, barycoord );
-
-			uv1.multiplyScalar( barycoord.x );
-			uv2.multiplyScalar( barycoord.y );
-			uv3.multiplyScalar( barycoord.z );
-
-			uv1.add( uv2 ).add( uv3 );
-
-			return uv1.clone();
-
-		}
 
 		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
@@ -14475,7 +14484,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					uvB.fromBufferAttribute( uv, b );
 					uvC.fromBufferAttribute( uv, c );
 
-					intersection.uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
+					intersection.uv = Triangle.getUV( intersectionPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() );
 
 				}
 
@@ -14717,7 +14726,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							uvB.copy( uvs_f[ 1 ] );
 							uvC.copy( uvs_f[ 2 ] );
 
-							intersection.uv = uvIntersection( intersectionPoint, fvA, fvB, fvC, uvA, uvB, uvC );
+							intersection.uv = Triangle.getUV( intersectionPoint, fvA, fvB, fvC, uvA, uvB, uvC, new Vector2() );
 
 						}
 
@@ -24976,6 +24985,10 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var vB = new Vector3();
 		var vC = new Vector3();
 
+		var uvA = new Vector2();
+		var uvB = new Vector2();
+		var uvC = new Vector2();
+
 		function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
 
 			// compute position in camera space
@@ -25024,6 +25037,10 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			transformVertex( vB.set( 0.5, - 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
 			transformVertex( vC.set( 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
 
+			uvA.set( 0, 0 );
+			uvB.set( 1, 0 );
+			uvC.set( 1, 1 );
+
 			// check first triangle
 			var intersect = raycaster.ray.intersectTriangle( vA, vB, vC, false, intersectPoint );
 
@@ -25031,6 +25048,8 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				// check second triangle
 				transformVertex( vB.set( - 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
+				uvB.set( 0, 1 );
+
 				intersect = raycaster.ray.intersectTriangle( vA, vC, vB, false, intersectPoint );
 				if ( intersect === null ) {
 
@@ -25048,6 +25067,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				distance: distance,
 				point: intersectPoint.clone(),
+				uv: Triangle.getUV( intersectPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() ),
 				face: null,
 				object: this
 
@@ -41142,15 +41162,15 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		// determine versioning scheme
 		var versioning = this.Versioning.None;
 
+		this.targetObject = targetObject;
+
 		if ( targetObject.needsUpdate !== undefined ) { // material
 
 			versioning = this.Versioning.NeedsUpdate;
-			this.targetObject = targetObject;
 
 		} else if ( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
 
 			versioning = this.Versioning.MatrixWorldNeedsUpdate;
-			this.targetObject = targetObject;
 
 		}
 
