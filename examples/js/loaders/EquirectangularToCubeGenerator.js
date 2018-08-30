@@ -2,10 +2,10 @@
 * @author Richard M. / https://github.com/richardmonette
 */
 
-THREE.EquirectangularToCubeGenerator = function ( sourceTexture, resolution ) {
+THREE.EquirectangularToCubeGenerator = function ( sourceTexture, options ) {
 
 	this.sourceTexture = sourceTexture;
-	this.resolution = resolution;
+	this.resolution = options.resolution || 512;
 
  	this.views = [
 		{ t: [ 1, 0, 0 ], u: [ 0, - 1, 0 ] },
@@ -23,10 +23,10 @@ THREE.EquirectangularToCubeGenerator = function ( sourceTexture, resolution ) {
 	this.scene.add( this.boxMesh );
 
 	var params = {
-		format: THREE.RGBAFormat,
+		format: options.format || this.sourceTexture.format,
 		magFilter: this.sourceTexture.magFilter,
 		minFilter: this.sourceTexture.minFilter,
-		type: this.sourceTexture.type,
+		type: options.type || this.sourceTexture.type,
 		generateMipmaps: this.sourceTexture.generateMipmaps,
 		anisotropy: this.sourceTexture.anisotropy,
 		encoding: this.sourceTexture.encoding
