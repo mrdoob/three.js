@@ -546,7 +546,8 @@ var files = {
 		"webgl_video_panorama_equirectangular_module",
 		"webgl_water",
 		"webgl_water_module",
-		"webgl_water_flowmap"
+		"webgl_water_flowmap",
+		"webgl_water_flowmap_module"
 	],
 	"webgl / advanced": [
 		"webgl_buffergeometry",
@@ -605,10 +606,12 @@ var files = {
 		"webgl_simple_gi_module",
 		"webgl_tiled_forward",
 		"webgl_tiled_forward_module",
-		"webgl_worker_offscreencanvas"
+		"webgl_worker_offscreencanvas",
+		"webgl_worker_offscreencanvas_module"
 	],
 	"webgl deferred": [
-		"webgldeferred_animation"
+		"webgldeferred_animation",
+		"webgldeferred_animation_module"
 	],
 	/*
 	"webgl2": [
@@ -622,7 +625,8 @@ var files = {
 		"webaudio_sandbox_module",
 		"webaudio_timing",
 		"webaudio_timing_module",
-		"webaudio_visualizer"
+		"webaudio_visualizer",
+		"webaudio_visualizer_module"
 	],
 	"webvr": [
 		"webvr_ballshooter",
@@ -647,7 +651,8 @@ var files = {
 		"webvr_video_module",
 		"webvr_vive_paint",
 		"webvr_vive_paint_module",
-		"webvr_vive_sculpt"
+		"webvr_vive_sculpt",
+		"webvr_vive_sculpt_module"
 	],
 	"misc": [
 		"misc_animation_authoring",
@@ -686,7 +691,8 @@ var files = {
 		"misc_ubiquity_test_module",
 		"misc_ubiquity_test2",
 		"misc_ubiquity_test2_module",
-		"misc_uv_tests"
+		"misc_uv_tests",
+		"misc_uv_tests_module"
 	],
 	"css3d": [
 		"css3d_molecules",
@@ -703,10 +709,12 @@ var files = {
 		"css3d_sandbox_module",
 		"css3d_sprites",
 		"css3d_sprites_module",
-		"css3d_youtube"
+		"css3d_youtube",
+		"css3d_youtube_module"
 	],
 	"css2d": [
-		"css2d_label"
+		"css2d_label",
+		"css2d_label_module"
 	],
 	"canvas": [
 		"canvas_ascii_effect",
@@ -771,21 +779,25 @@ var files = {
 		"canvas_particles_waves_module",
 		"canvas_performance",
 		"canvas_performance_module",
-		"canvas_sandbox"
+		"canvas_sandbox",
+		"canvas_sandbox_module"
 	],
 	"raytracing": [
-		"raytracing_sandbox"
+		"raytracing_sandbox",
+		"raytracing_sandbox_module"
 	],
 	"software": [
 		"software_geometry_earth",
 		"software_geometry_earth_module",
 		"software_lines_splines",
 		"software_lines_splines_module",
-		"software_sandbox"
+		"software_sandbox",
+		"software_sandbox_module"
 	],
 	"svg": [
 		"svg_lines",
 		"svg_lines_module",
-		"svg_sandbox"
+		"svg_sandbox",
+		"svg_sandbox_module"
 	]
 };
