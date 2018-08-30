@@ -149,7 +149,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				distance: distance,
 				point: intersectPoint.clone(),
-				uv: Triangle.uvIntersection( intersectPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() ),
+				uv: Triangle.getUV( intersectPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() ),
 				face: null,
 				object: this
 
