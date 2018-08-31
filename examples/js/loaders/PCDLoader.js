@@ -296,19 +296,9 @@ THREE.PCDLoader.prototype = {
 		// build mesh
 
 		var mesh = new THREE.Points( geometry, material );
-
-		var name;
-		if ( url !== undefined && url !== null ) {
-
-			name = url.split( '' ).reverse().join( '' );
-			name = /([^\/]*)/.exec( name );
-			name = name[ 1 ].split( '' ).reverse().join( '' );
-
-		} else {
-
-			name = 'No_Name';
-
-		}
+		var name = url.split( '' ).reverse().join( '' );
+		name = /([^\/]*)/.exec( name );
+		name = name[ 1 ].split( '' ).reverse().join( '' );
 		mesh.name = name;
 
 		return mesh;

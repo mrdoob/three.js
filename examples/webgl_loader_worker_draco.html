@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - WorkerLoader: Mutli-Loader Example</title>
+		<title>three.js webgl - WorkerLoader: DRACOLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -67,16 +67,15 @@
 
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WorkerLoader: Multi-Loader Example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WorkerLoader: DRACOLoader
 			<div id="feedback"></div>
 		</div>
 
 		<script src="js/Detector.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/loaders/MTLLoader.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/loaders/PCDLoader.js"></script>
+		<script src="js/loaders/DRACOLoader.js"></script>
 
 		<script src="js/loaders/LoaderSupport.js"></script>
 		<script src="js/loaders/WorkerLoader.js"></script>
@@ -84,7 +83,7 @@
 
 			'use strict';
 
-			var WWLoaderAdapter = function ( elementToBindTo ) {
+			var WLDraco = function ( elementToBindTo ) {
 				this.renderer = null;
 				this.canvas = elementToBindTo;
 				this.aspectRatio = 1;
@@ -104,9 +103,9 @@
 				this.controls = null;
 			};
 
-			WWLoaderAdapter.prototype = {
+			WLDraco.prototype = {
 
-				constructor: WWLoaderAdapter,
+				constructor: WLDraco,
 
 				initGL: function () {
 					this.renderer = new THREE.WebGLRenderer( {
@@ -148,34 +147,92 @@
 						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
 					};
 					var buildWorkerCode = function ( codeSerializer ) {
-						THREE.PCDLoader.prototype._parse = THREE.PCDLoader.prototype.parse;
 
-						THREE.PCDLoader.prototype.parse = function ( data ) {
-							return this._parse( data, 'models/pcd/binary/Zaghetto.pcd' )
+						THREE.DRACOLoader.prototype.decodeDracoFile = function(rawBuffer, callback, attributeUniqueIdMap, attributeTypeMap) {
+							var scope = this;
+							var oldFashioned = function ( module ) {
+								scope.decodeDracoFileInternal( rawBuffer, module.decoder, callback,
+									attributeUniqueIdMap || {}, attributeTypeMap || {});
+							};
+							THREE.DRACOLoader.getDecoderModule( oldFashioned );
 						};
 
-						var workerCode = codeSerializer.serializeClass( 'THREE.PCDLoader', THREE.PCDLoader );
+						THREE.DRACOLoader.getDecoderModule = function ( callback ) {
+							var scope = this;
+							var config = THREE.DRACOLoader.decoderConfig;
+
+							config.onModuleLoaded = function ( decoder ) {
+								scope.timeLoaded = performance.now();
+
+								console.log( "Decoder module loaded in: " + scope.timeLoaded );
+								// Module is Promise-like. Wrap before resolving to avoid loop.
+								callback( { decoder: decoder } );
+							};
+							DracoDecoderModule( config );
+						};
+
+						var WLDracoWrapper = function ( manager ) {
+							this.callbackDataReceiver = null;
+							this.url = 'js/libs/draco/';
+						};
+
+						WLDracoWrapper.prototype.constructor = WLDracoWrapper;
+
+						WLDracoWrapper.prototype.setCallbackDataReceiver = function ( callbackDataReceiver ) {
+							this.callbackDataReceiver = callbackDataReceiver;
+						};
+
+						WLDracoWrapper.prototype.setUrl = function ( url ) {
+							this.url = url;
+						};
+
+						WLDracoWrapper.prototype.parse = function ( arrayBuffer, options ) {
+							THREE.DRACOLoader.setDecoderPath( this.url );
+							THREE.DRACOLoader.setDecoderConfig( { type: 'js' } );
+
+							var dracoLoader = new THREE.DRACOLoader();
+							var scope = this;
+							var scopedOnLoad = function ( bufferGeometry ) {
+								var meshTransmitter = new THREE.LoaderSupport.MeshTransmitter();
+
+								meshTransmitter.setCallbackDataReceiver( scope.callbackDataReceiver );
+								meshTransmitter.setDefaultGeometryType( 0 );
+								meshTransmitter.handleBufferGeometry( bufferGeometry, 'bunny.drc' );
+
+								// Release decoder resources.
+								THREE.DRACOLoader.releaseDecoderModule();
+							};
+
+							dracoLoader.decodeDracoFile( arrayBuffer, scopedOnLoad );
+						};
+
+						var workerCode = codeSerializer.serializeClass( 'THREE.DRACOLoader', THREE.DRACOLoader );
+						workerCode += codeSerializer.serializeClass( 'WLDracoWrapper', WLDracoWrapper );
 						return {
 							code: workerCode,
-							parserName: 'THREE.PCDLoader',
-							usesMeshDisassembler: true,
-							defaultGeometryType: 2,
+							parserName: 'WLDracoWrapper',
+							containsMeshDisassembler: true,
+							usesMeshDisassembler: false,
 							libs: {
 								locations: [
 									'build/three.min.js',
-									'examples/js/loaders/PCDLoader.js'
+									'examples/js/libs/draco/draco_decoder.js'
 								],
 								path: '../'
 							},
 							provideThree: true
 						}
 					};
-					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'Zaghetto.pcd', 'models/pcd/binary/Zaghetto.pcd' );
+
+					var url = new URL( 'js/libs/draco', window.location.href ).href;
+					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'bunny.drc', 'models/draco/bunny.drc' );
+					var parserConfiguration = {	url: url };
+					rd.setParserConfiguration( parserConfiguration );
 
 					var loadingTaskConfig = new THREE.WorkerLoader.LoadingTaskConfig( {
 						baseObject3d: local
 					} )
-						.setLoaderConfig( THREE.PCDLoader )
+						.setLoaderConfig( THREE.DRACOLoader )
 						.setBuildWorkerCodeFunction( buildWorkerCode )
 						.addResourceDescriptor( rd )
 						.setCallbacksPipeline( callbackOnLoad );
@@ -224,7 +281,7 @@
 			};
 
 
-			var app = new WWLoaderAdapter( document.getElementById( 'example' ) );
+			var app = new WLDraco( document.getElementById( 'example' ) );
 
 			var resizeWindow = function () {
 				app.resizeDisplayGL();

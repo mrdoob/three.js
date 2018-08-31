@@ -133,6 +133,7 @@ var files = {
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
 		"webgl_loader_worker_multi",
+		"webgl_loader_worker_draco",
 		"webgl_loader_x",
 		"webgl_lod",
 		"webgl_marchingcubes",

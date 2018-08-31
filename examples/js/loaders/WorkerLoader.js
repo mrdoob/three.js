@@ -798,7 +798,7 @@ THREE.WorkerLoader.FileLoadingExecutor.prototype = {
  */
 THREE.WorkerLoader.LoadingTaskConfig = function ( loadingTaskConfig ) {
 	this.loader = {
-		classDef: '',
+		classDef: null,
 		config: {},
 		buildWorkerCode: null
 	};
@@ -960,7 +960,7 @@ THREE.WorkerLoader.ResourceDescriptor.prototype = {
 		if ( this.resourceType === 'URL' ) {
 
 			this.url = ( this.input !== null ) ? this.input : this.name;
-			this.url = new URL( this.url, window.location.href).href;
+			this.url = new URL( this.url, window.location.href ).href;
 			this.filename = this.url;
 			var urlParts = this.url.split( '/' );
 			if ( urlParts.length > 2 ) {
@@ -1024,7 +1024,7 @@ THREE.WorkerLoader.ResourceDescriptor.prototype = {
 
 	configureAsync: function ( loadAsync, parseAsync ) {
 		this.async.parse = parseAsync === true;
-		// Loading in Worker is curretnly only allowed when async parse is performed!!!!
+		// Loading in Worker is currently only allowed when async parse is performed!!!!
 		this.async.load = loadAsync === true && this.async.parse;
 
 		return this;
@@ -1101,7 +1101,11 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 			workerRunner: {
 				haveUserImpl: false,
 				name: 'THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl',
-				impl: THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl
+				impl: THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl,
+				parserName: null,
+				parseFunction: null,
+				usesMeshDisassembler: null,
+				defaultGeometryType: null
 			},
 			terminateWorkerOnLoad: false,
 			forceWorkerDataCopy: false,
@@ -1204,7 +1208,6 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 
 		}
 		var codeBuilderInstructions = buildWorkerCode( THREE.WorkerLoader.WorkerSupport.CodeSerializer );
-		var userWorkerCode = codeBuilderInstructions.code;
 
 		// Enforce codeBuilderInstructions flag for availability of three code
 		if ( THREE.LoaderSupport.Validator.isValid( codeBuilderInstructions.provideThree ) ) {
@@ -1216,16 +1219,12 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 			throw '"buildWorkerCode" did not define boolean "provideThree" which tells "WorkerSupport" whether three.js is already contained in worker code.'
 
 		}
+		var userWorkerCode = codeBuilderInstructions.code;
 		userWorkerCode += 'THREE.LoaderSupport = {};\n\n';
 		userWorkerCode += 'THREE.WorkerLoader = {\n\tWorkerSupport: {},\n\tParser: ' + codeBuilderInstructions.parserName + '\n};\n\n';
-		if ( codeBuilderInstructions.useMeshDisassembler ) {
+		if ( codeBuilderInstructions.containsMeshDisassembler === true || codeBuilderInstructions.usesMeshDisassembler === true ) {
 
-			userWorkerCode += 'THREE.WorkerLoader.WorkerSupport.useMeshDisassembler = true;\n\n';
 			userWorkerCode += THREE.WorkerLoader.WorkerSupport.CodeSerializer.serializeClass( 'THREE.LoaderSupport.MeshTransmitter', THREE.LoaderSupport.MeshTransmitter );
-
-		} else {
-
-			userWorkerCode += 'THREE.WorkerLoader.WorkerSupport.useMeshDisassembler = false;\n\n';
 
 		}
 		userWorkerCode += THREE.WorkerLoader.WorkerSupport.CodeSerializer.serializeObject( 'THREE.LoaderSupport.Validator', THREE.LoaderSupport.Validator );
@@ -1256,6 +1255,9 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 			var blob = new Blob( [ stringifiedCode ], { type: 'application/javascript' } );
 			scope.worker.native = new Worker( window.URL.createObjectURL( blob ) );
 			scope.worker.native.onmessage = scopedReceiveWorkerMessage;
+			scope.worker.workerRunner.parseFunction = THREE.LoaderSupport.Validator.verifyInput( codeBuilderInstructions.parseFunction, 'parse' );
+			scope.worker.workerRunner.usesMeshDisassembler = codeBuilderInstructions.usesMeshDisassembler;
+			scope.worker.workerRunner.defaultGeometryType = THREE.LoaderSupport.Validator.verifyInput( codeBuilderInstructions.defaultGeometryType, 0 );
 
 			// process stored queuedMessage
 			scope._postMessage();
@@ -1391,6 +1393,9 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 	 */
 	runAsyncParse: function( payload ) {
 		payload.cmd = 'parse';
+		payload.parseFunction = this.worker.workerRunner.parseFunction;
+		payload.usesMeshDisassembler = this.worker.workerRunner.usesMeshDisassembler;
+		payload.defaultGeometryType = this.worker.workerRunner.defaultGeometryType;
 		if ( ! this._verifyWorkerIsAvailable( payload ) ) return;
 
 		this._postMessage();
@@ -1496,27 +1501,70 @@ THREE.WorkerLoader.WorkerSupport.CodeSerializer = {
 	 * @returns {string}
 	 */
 	serializeClass: function ( fullName, object, basePrototypeName, ignoreFunctions, constructorName ) {
-		var funcString, objectPart, constructorString;
-		var prototypeFunctions = '';
+		var valueString, objectPart, constructorString, i;
+		var prototypeFunctions = [];
+		var objectProperties = [];
+		var objectFunctions = [];
+		var isExtended = ( basePrototypeName !== null && basePrototypeName !== undefined );
 
 		if ( ! Array.isArray( ignoreFunctions ) ) ignoreFunctions = [];
 
 		for ( var name in object.prototype ) {
 
 			objectPart = object.prototype[ name ];
+			valueString = objectPart.toString();
 			if ( name === 'constructor' ) {
 
-				funcString = objectPart.toString();
-				constructorString = fullName + ' = ' + funcString + ';\n\n';
+				constructorString = fullName + ' = ' + valueString + ';\n\n';
 
 			} else if ( typeof objectPart === 'function' ) {
 
 				if ( ignoreFunctions.indexOf( name ) < 0 ) {
 
-					funcString = objectPart.toString();
-					prototypeFunctions += '\t' + name + ': ' + funcString + ',\n\n';
+					if ( isExtended ) {
+
+						prototypeFunctions.push( fullName + '.prototype.' + name + ' = ' + valueString + ';\n\n' );
+
+					} else {
+
+						prototypeFunctions.push( '\t' + name + ': ' + valueString + ',\n\n' );
+
+					}
+				}
+
+			}
+
+		}
+		for ( var name in object ) {
+
+			objectPart = object[ name ];
+
+			if ( typeof objectPart === 'function' ) {
+
+				if ( ignoreFunctions.indexOf( name ) < 0 ) {
+
+					valueString = objectPart.toString();
+					objectFunctions.push( fullName + '.' + name + ' = ' + objectPart + ';\n\n' );
 
 				}
+
+			} else {
+
+				if ( typeof( objectPart ) === 'string' || objectPart instanceof String) {
+
+					valueString = '\"' + objectPart.toString() + '\"';
+
+				} else if ( typeof objectPart === 'object' ) {
+
+					// TODO: Short-cut for now. Recursion required?
+					valueString = "{}";
+
+				} else {
+
+					valueString = objectPart;
+
+				}
+				objectProperties.push( fullName + '.' + name + ' = ' + valueString + ';\n' );
 
 			}
 
@@ -1527,18 +1575,32 @@ THREE.WorkerLoader.WorkerSupport.CodeSerializer = {
 
 		}
 		var objectString = constructorString + '\n\n';
-		objectString += fullName + '.prototype = {\n\n';
-		objectString += '\tconstructor: ' + fullName + ',\n\n';
-		objectString += prototypeFunctions;
-		objectString += '\n};\n\n';
+		if ( isExtended ) {
 
-		if ( basePrototypeName !== null && basePrototypeName !== undefined ) {
-
-			objectString += '\n';
 			objectString += fullName + '.prototype = Object.create( ' + basePrototypeName + '.prototype );\n';
-			objectString += fullName + '.constructor = ' + fullName + ';\n';
-			objectString += '\n';
+
 		}
+		objectString += fullName + '.prototype.constructor = ' + fullName + ';\n';
+		objectString += '\n\n';
+
+		for ( i = 0; i < objectProperties.length; i ++ ) objectString += objectProperties[ i ];
+		objectString += '\n\n';
+
+		for ( i = 0; i < objectFunctions.length; i ++ ) objectString += objectFunctions[ i ];
+		objectString += '\n\n';
+
+		if ( isExtended ) {
+
+			for ( i = 0; i < prototypeFunctions.length; i ++ ) objectString += prototypeFunctions[ i ];
+
+		} else {
+
+			objectString += fullName + '.prototype = {\n\n';
+			for ( i = 0; i < prototypeFunctions.length; i ++ ) objectString += prototypeFunctions[ i ];
+			objectString += '\n};';
+
+		}
+		objectString += '\n\n';
 
 		return objectString;
 	},
@@ -1576,8 +1638,6 @@ THREE.WorkerLoader.WorkerSupport.CodeSerializer = {
 		return objectString;
 	}
 };
-
-THREE.WorkerLoader.WorkerSupport.useMeshDisassembler = false;
 
 
 /**
@@ -1707,18 +1767,18 @@ THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype = {
 				arraybuffer = payload.data.input;
 
 			}
-			if ( THREE.WorkerLoader.WorkerSupport.useMeshDisassembler ) {
+			if ( payload.usesMeshDisassembler ) {
 
-				var object3d = parser.parse( arraybuffer, payload.data.options );
-				var workerExchangeTools = new THREE.LoaderSupport.MeshTransmitter();
+				var object3d = parser[ payload.parseFunction ] ( arraybuffer, payload.data.options );
+				var meshTransmitter = new THREE.LoaderSupport.MeshTransmitter();
 
-				workerExchangeTools.setCallbackDataReceiver( callbacks.callbackDataReceiver );
-				workerExchangeTools.walkMesh( object3d );
-
+				meshTransmitter.setDefaultGeometryType( payload.defaultGeometryType );
+				meshTransmitter.setCallbackDataReceiver( callbacks.callbackDataReceiver );
+				meshTransmitter.walkMesh( object3d );
 
 			} else {
 
-				parser.parse( arraybuffer, payload.data.options );
+				parser[ payload.parseFunction ] ( arraybuffer, payload.data.options );
 
 			}
 			if ( this.logging.enabled ) console.log( 'WorkerRunner: Run complete!' );
