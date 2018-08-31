@@ -63,7 +63,7 @@ THREE.GLTFLoader = ( function () {
 
 						scope.manager.itemEnd( url );
 
-					}, _onError );
+					}, onProgress, _onError );
 
 				} catch ( e ) {
 
@@ -96,7 +96,7 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
-		parse: function ( data, path, onLoad, onError ) {
+		parse: function ( data, path, onLoad, onProgress, onError ) {
 
 			var content;
 			var extensions = {};
@@ -188,7 +188,8 @@ THREE.GLTFLoader = ( function () {
 
 				path: path || this.path || '',
 				crossOrigin: this.crossOrigin,
-				manager: this.manager
+				manager: this.manager,
+				onProgress: onProgress
 
 			} );
 
@@ -1826,7 +1827,7 @@ THREE.GLTFLoader = ( function () {
 
 		return new Promise( function ( resolve, reject ) {
 
-			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
+			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, options.onProgress, function () {
 
 				reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
 
