@@ -2398,6 +2398,17 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
+	this.setTexture3D = ( function () {
+
+		// backwards compatibility: peel texture.texture
+		return function setTexture3D( texture, slot ) {
+
+			textures.setTexture3D( texture, slot );
+
+		};
+
+	}() );
+
 	this.setTexture = ( function () {
 
 		var warned = false;
