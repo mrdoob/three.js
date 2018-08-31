@@ -1,4 +1,4 @@
-THREE.UCSCharacter = function() {
+THREE.UCSCharacter = function () {
 
 	var scope = this;
 
@@ -39,7 +39,7 @@ THREE.UCSCharacter = function() {
 		// CHARACTER
 		var loader = new THREE.JSONLoader();
 		console.log( config.baseUrl + config.character );
-		loader.load( config.baseUrl + config.character, function( geometry ) {
+		loader.load( config.baseUrl + config.character, function ( geometry ) {
 
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();
@@ -55,7 +55,7 @@ THREE.UCSCharacter = function() {
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
 
-			scope.mixer.clipAction( geometry.animations[0], mesh ).play();
+			scope.mixer.clipAction( geometry.animations[ 0 ], mesh ).play();
 
 			scope.setSkin( 0 );
 
@@ -65,7 +65,7 @@ THREE.UCSCharacter = function() {
 
 	};
 
-	this.setSkin = function( index ) {
+	this.setSkin = function ( index ) {
 
 		if ( mesh && scope.materials ) {
 
@@ -75,7 +75,7 @@ THREE.UCSCharacter = function() {
 
 	};
 
-	this.updateMorphs = function( influences ) {
+	this.updateMorphs = function ( influences ) {
 
 		if ( mesh ) {
 
@@ -136,6 +136,6 @@ THREE.UCSCharacter = function() {
 
 		}
 
-	}
+	};
 
 };

@@ -313,23 +313,73 @@ Object.assign( Color.prototype, {
 
 	},
 
-	convertGammaToLinear: function () {
+	convertGammaToLinear: function ( gammaFactor ) {
 
-		var r = this.r, g = this.g, b = this.b;
-
-		this.r = r * r;
-		this.g = g * g;
-		this.b = b * b;
+		this.copyGammaToLinear( this, gammaFactor );
 
 		return this;
 
 	},
 
-	convertLinearToGamma: function () {
+	convertLinearToGamma: function ( gammaFactor ) {
 
-		this.r = Math.sqrt( this.r );
-		this.g = Math.sqrt( this.g );
-		this.b = Math.sqrt( this.b );
+		this.copyLinearToGamma( this, gammaFactor );
+
+		return this;
+
+	},
+
+	copySRGBToLinear: function () {
+
+		function SRGBToLinear( c ) {
+
+			return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+		}
+
+		return function copySRGBToLinear( color ) {
+
+			this.r = SRGBToLinear( color.r );
+			this.g = SRGBToLinear( color.g );
+			this.b = SRGBToLinear( color.b );
+
+			return this;
+
+		};
+
+	}(),
+
+	copyLinearToSRGB: function () {
+
+		function LinearToSRGB( c ) {
+
+			return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+
+		}
+
+		return function copyLinearToSRGB( color ) {
+
+			this.r = LinearToSRGB( color.r );
+			this.g = LinearToSRGB( color.g );
+			this.b = LinearToSRGB( color.b );
+
+			return this;
+
+		};
+
+	}(),
+
+	convertSRGBToLinear: function () {
+
+		this.copySRGBToLinear( this );
+
+		return this;
+
+	},
+
+	convertLinearToSRGB: function () {
+
+		this.copyLinearToSRGB( this );
 
 		return this;
 
@@ -490,6 +540,28 @@ Object.assign( Color.prototype, {
 		return this;
 
 	},
+
+	lerpHSL: function () {
+
+		var hslA = { h: 0, s: 0, l: 0 };
+		var hslB = { h: 0, s: 0, l: 0 };
+
+		return function lerpHSL( color, alpha ) {
+
+			this.getHSL( hslA );
+			color.getHSL( hslB );
+
+			var h = _Math.lerp( hslA.h, hslB.h, alpha );
+			var s = _Math.lerp( hslA.s, hslB.s, alpha );
+			var l = _Math.lerp( hslA.l, hslB.l, alpha );
+
+			this.setHSL( h, s, l );
+
+			return this;
+
+		};
+
+	}(),
 
 	equals: function ( c ) {
 

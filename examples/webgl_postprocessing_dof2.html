@@ -96,9 +96,16 @@ Use WEBGL Depth buffer support?
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
-				materialDepth = new THREE.MeshDepthMaterial();
-				materialDepth.depthPacking = THREE.RGBADepthPacking;
-				materialDepth.blending = THREE.NoBlending;
+				var depthShader = THREE.BokehDepthShader;
+
+				materialDepth = new THREE.ShaderMaterial( {
+					uniforms: depthShader.uniforms,
+					vertexShader: depthShader.vertexShader,
+					fragmentShader: depthShader.fragmentShader
+				} );
+
+				materialDepth.uniforms[ 'mNear' ].value = camera.near;
+				materialDepth.uniforms[ 'mFar' ].value = camera.far;
 
 				// skybox
 
@@ -110,7 +117,21 @@ Use WEBGL Depth buffer support?
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 
-				scene.background = textureCube;
+				var shader = THREE.ShaderLib[ 'cube' ];
+				shader.uniforms[ 'tCube' ].value = textureCube;
+
+				var skyMaterial = new THREE.ShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms,
+					depthWrite: false,
+					side: THREE.BackSide
+
+				} );
+
+				var sky = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), skyMaterial );
+				scene.add( sky );
 
 				// plane particles
 
@@ -150,12 +171,11 @@ Use WEBGL Depth buffer support?
 					geometry.computeVertexNormals();
 
 					var material = new THREE.MeshPhongMaterial( {
-						color: 0xffffff,
-						specular:0xffffff,
+						specular: 0xffffff,
 						envMap: textureCube,
-						combine: THREE.MultiplyOperation,
 						shininess: 50,
-						reflectivity: 1.0
+						reflectivity: 1.0,
+						flatShading: true
 					});
 
 					var monkeys = 20;
@@ -163,14 +183,14 @@ Use WEBGL Depth buffer support?
 					for ( var i = 0; i < monkeys; i ++ ) {
 
 						var mesh = new THREE.Mesh( geometry, material );
-						mesh.scale.multiplyScalar(30);
 
 						mesh.position.z = Math.cos( i / monkeys * Math.PI * 2 ) * 200;
 						mesh.position.y = Math.sin( i / monkeys * Math.PI * 3 ) * 20;
 						mesh.position.x = Math.sin( i / monkeys * Math.PI * 2 ) * 200;
 
-						mesh.rotation.y = - Math.PI / 2;
-						mesh.rotation.z = - i / monkeys * Math.PI * 2;
+						mesh.rotation.y = i / monkeys * Math.PI * 2;
+
+						mesh.scale.setScalar( 30 );
 
 						scene.add( mesh );
 
@@ -378,8 +398,7 @@ Use WEBGL Depth buffer support?
 					fragmentShader: bokeh_shader.fragmentShader,
 					defines: {
 						RINGS: shaderSettings.rings,
-						SAMPLES: shaderSettings.samples,
-						DEPTH_PACKING: 1 // RGBADepth
+						SAMPLES: shaderSettings.samples
 					}
 
 				} );

@@ -1,8 +1,11 @@
-import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
-import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
-import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
 import { AnimationUtils } from './AnimationUtils.js';
 import { KeyframeTrack } from './KeyframeTrack.js';
+import { BooleanKeyframeTrack } from './tracks/BooleanKeyframeTrack.js';
+import { ColorKeyframeTrack } from './tracks/ColorKeyframeTrack.js';
+import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
+import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
+import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
+import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
 import { _Math } from '../math/Math.js';
 
 /**
@@ -28,7 +31,82 @@ function AnimationClip( name, duration, tracks ) {
 
 	}
 
-	this.optimize();
+}
+
+function getTrackTypeForValueTypeName( typeName ) {
+
+	switch ( typeName.toLowerCase() ) {
+
+		case 'scalar':
+		case 'double':
+		case 'float':
+		case 'number':
+		case 'integer':
+
+			return NumberKeyframeTrack;
+
+		case 'vector':
+		case 'vector2':
+		case 'vector3':
+		case 'vector4':
+
+			return VectorKeyframeTrack;
+
+		case 'color':
+
+			return ColorKeyframeTrack;
+
+		case 'quaternion':
+
+			return QuaternionKeyframeTrack;
+
+		case 'bool':
+		case 'boolean':
+
+			return BooleanKeyframeTrack;
+
+		case 'string':
+
+			return StringKeyframeTrack;
+
+	}
+
+	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+
+}
+
+function parseKeyframeTrack( json ) {
+
+	if ( json.type === undefined ) {
+
+		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+
+	}
+
+	var trackType = getTrackTypeForValueTypeName( json.type );
+
+	if ( json.times === undefined ) {
+
+		var times = [], values = [];
+
+		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
+
+		json.times = times;
+		json.values = values;
+
+	}
+
+	// derived classes can define a static parse method
+	if ( trackType.parse !== undefined ) {
+
+		return trackType.parse( json );
+
+	} else {
+
+		// by default, we assume a constructor compatible with the base
+		return new trackType( json.name, json.times, json.values, json.interpolation );
+
+	}
 
 }
 
@@ -42,7 +120,7 @@ Object.assign( AnimationClip, {
 
 		for ( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
 
-			tracks.push( KeyframeTrack.parse( jsonTracks[ i ] ).scale( frameTime ) );
+			tracks.push( parseKeyframeTrack( jsonTracks[ i ] ).scale( frameTime ) );
 
 		}
 
@@ -59,7 +137,8 @@ Object.assign( AnimationClip, {
 
 			'name': clip.name,
 			'duration': clip.duration,
-			'tracks': tracks
+			'tracks': tracks,
+			'uuid': clip.uuid
 
 		};
 
@@ -326,6 +405,8 @@ Object.assign( AnimationClip.prototype, {
 
 		this.duration = duration;
 
+		return this;
+
 	},
 
 	trim: function () {
@@ -337,6 +418,20 @@ Object.assign( AnimationClip.prototype, {
 		}
 
 		return this;
+
+	},
+
+	validate: function () {
+
+		var valid = true;
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			valid = valid && this.tracks[ i ].validate();
+
+		}
+
+		return valid;
 
 	},
 

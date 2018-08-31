@@ -80,7 +80,7 @@
 
 					this.ms_Camera = new THREE.PerspectiveCamera(55.0, window.innerWidth / window.innerHeight, 0.5, 300000);
 					this.ms_Camera.position.set(450, 350, 450);
-					this.ms_Camera.lookAt(new THREE.Vector3());
+					this.ms_Camera.lookAt( 0, 0, 0 );
 
 					// Initialize Orbit control
 					this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);

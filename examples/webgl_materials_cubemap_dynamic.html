@@ -507,45 +507,47 @@
 				var sy1 = -500 + 38;
 				var sy2 = -88;
 
-				addObject( cylinderGeometry, 0xff0000, 1500, 250, 0, sy1 );
-				addObject( cylinderGeometry, 0xffaa00, -1500, 250, 0, sy1 );
-				addObject( cylinderGeometry, 0x00ff00, 0, 250, 1500, sy1 );
-				addObject( cylinderGeometry, 0x00ffaa, 0, 250, -1500, sy1 );
+				//
 
-				addObject( sphereGeometry, 0xff0000, 1500, -125, 200, sy2 );
-				addObject( sphereGeometry, 0xffaa00, -1500, -125, 200, sy2 );
-				addObject( sphereGeometry, 0x00ff00, 200, -125, 1500, sy2 );
-				addObject( sphereGeometry, 0x00ffaa, 200, -125, -1500, sy2 );
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(0,0,0,1)' );
+				gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				//
+
+				var shadowTexture = new THREE.CanvasTexture( canvas );
+
+				var shadowPlane = new THREE.PlaneBufferGeometry( 400, 400 );
+				var shadowMaterial = new THREE.MeshBasicMaterial( {
+
+					opacity: 0.35, transparent: true, map: shadowTexture,
+					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
+
+				} );
+
+				//
+
+				addObject( cylinderGeometry, 0xff0000, 1500, 250, 0, sy1, shadowPlane, shadowMaterial );
+				addObject( cylinderGeometry, 0xffaa00, -1500, 250, 0, sy1, shadowPlane, shadowMaterial );
+				addObject( cylinderGeometry, 0x00ff00, 0, 250, 1500, sy1, shadowPlane, shadowMaterial );
+				addObject( cylinderGeometry, 0x00ffaa, 0, 250, -1500, sy1, shadowPlane, shadowMaterial );
+
+				addObject( sphereGeometry, 0xff0000, 1500, -125, 200, sy2, shadowPlane, shadowMaterial );
+				addObject( sphereGeometry, 0xffaa00, -1500, -125, 200, sy2, shadowPlane, shadowMaterial );
+				addObject( sphereGeometry, 0x00ff00, 200, -125, 1500, sy2, shadowPlane, shadowMaterial );
+				addObject( sphereGeometry, 0x00ffaa, 200, -125, -1500, sy2, shadowPlane, shadowMaterial );
 
 			}
 
-			//
-
-			var canvas = document.createElement( 'canvas' );
-			canvas.width = 128;
-			canvas.height = 128;
-
-			var context = canvas.getContext( '2d' );
-			var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
-			gradient.addColorStop( 0.1, 'rgba(0,0,0,1)' );
-			gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
-
-			context.fillStyle = gradient;
-			context.fillRect( 0, 0, canvas.width, canvas.height );
-
-			//
-
-			var shadowTexture = new THREE.CanvasTexture( canvas );
-
-			var shadowPlane = new THREE.PlaneBufferGeometry( 400, 400 );
-			var shadowMaterial = new THREE.MeshBasicMaterial( {
-
-				opacity: 0.35, transparent: true, map: shadowTexture,
-				polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
-
-			} );
-
-			function addObject( geometry, color, x, y, z, sy ) {
+			function addObject( geometry, color, x, y, z, sy, shadowPlane, shadowMaterial ) {
 
 				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color } ) );
 				object.position.set( x, y, z );

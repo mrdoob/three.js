@@ -92,7 +92,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				group = new THREE.Object3D();
 				scene.add( group );
 
-				var geometry = new THREE.BoxGeometry( 10, 10, 10 );
+				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var material = new THREE.MeshBasicMaterial();
@@ -124,13 +124,9 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				gui.add( postprocessing, 'enabled' );
 
 				gui.add( postprocessing, 'onlyAO', false ).onChange( function( value ) { ssaoPass.onlyAO = value; } );
-
 				gui.add( postprocessing, 'radius' ).min( 0 ).max( 64 ).onChange( function( value ) { ssaoPass.radius = value; } );
-				
 				gui.add( postprocessing, 'aoClamp' ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.aoClamp = value; } );
-				
 				gui.add( postprocessing, 'lumInfluence' ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.lumInfluence = value; } );
-				
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -155,6 +151,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				effectComposer.setSize( newWidth, newHeight );
+
 			}
 
 			function initPostprocessing() {

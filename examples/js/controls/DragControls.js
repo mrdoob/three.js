@@ -154,7 +154,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		}
 
-		_domElement.style.cursor = 'auto';
+		_domElement.style.cursor = _hovered ? 'pointer' : 'auto';
 
 	}
 

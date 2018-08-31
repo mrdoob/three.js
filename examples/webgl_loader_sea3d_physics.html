@@ -61,21 +61,21 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
+			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls, demoAt = -1;
+			var camera, scene, renderer, composer;
 
 			var loader;
 
 			// Initialize Three.JS
 
 			init();
-			
+
 			// Initialize Physics Engine
-			
-			SEA3D.AMMO.init(); 
+
+			SEA3D.AMMO.init();
 
 			//
 			// SEA3D Loader
@@ -83,23 +83,27 @@
 
 			loader = new THREE.SEA3D( {
 
-				container : scene // Container to add models
+				container: scene // Container to add models
 
 			} );
 
-			loader.onComplete = function( e ) {
+			loader.onComplete = function ( e ) {
 
-				controls = new THREE.OrbitControls( camera );
+				new THREE.OrbitControls( camera );
 
 				// events
 
-				window.addEventListener( 'contextmenu', function(e) { 
+				window.addEventListener( 'contextmenu', function ( e ) {
 
-					e.preventDefault(); 
+					e.preventDefault();
 
-					cloneAsset(); 
+					cloneAsset();
 
 				} );
+
+				// prevent material compilation in render loop
+
+				renderer.compile( scene, camera );
 
 				animate();
 
@@ -107,13 +111,13 @@
 
 			loader.load( './models/sea3d/car.tjs.sea' );
 
-			var cloneAsset = function() {
+			var cloneAsset = function () {
 
 				var offset = 0;
 
-				return function() {
+				return function () {
 
-					var domain = this.loader.clone( { lights : false, runScripts : false, autoPlay: false, enabledPhysics : false } );
+					var domain = this.loader.clone( { lights: false, runScripts: false, autoPlay: false, enabledPhysics: false } );
 
 					offset -= 180;
 
@@ -124,7 +128,7 @@
 
 					this.scene.add( domain.container );
 
-				}
+				};
 
 			}();
 
@@ -139,7 +143,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
-				camera.position.set( 300, 200, -300 );
+				camera.position.set( 300, 200, - 300 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -197,9 +201,9 @@
 
 				requestAnimationFrame( animate );
 
-				// Update Physics Engine
+				// Update Physics Engine ( fix delta-time in 60fps for more stability )
 
-				SEA3D.AMMO.update( delta );
+				SEA3D.AMMO.update( 1 / 60 );
 
 				// Update SEA3D Animations
 
