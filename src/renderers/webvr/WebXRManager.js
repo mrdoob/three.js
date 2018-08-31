@@ -132,6 +132,13 @@ function WebXRManager( renderer ) {
 				inputSources = session.getInputSources();
 				console.log( inputSources );
 
+				for ( var i = 0; i < controllers.length; i ++ ) {
+
+					var controller = controllers[ i ];
+					controller.userData.inputSource = inputSources[ i ];
+
+				}
+
 			} );
 
 		}
