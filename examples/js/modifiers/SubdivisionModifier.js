@@ -100,13 +100,12 @@ export const SubdivisionModifier = function ( subdivisions ) {
 
 			map[ key ] = edge;
 
+			metaVertices[ a ].edges.push( edge );
+			metaVertices[ b ].edges.push( edge );
+
 		}
 
 		edge.faces.push( face );
-
-		metaVertices[ a ].edges.push( edge );
-		metaVertices[ b ].edges.push( edge );
-
 
 	}
 
