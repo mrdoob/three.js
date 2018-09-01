@@ -27,6 +27,7 @@ if ( !window.frameElement && window.location.protocol !== 'file:' ) {
 function onDocumentLoad( event ) {
 
 	var path;
+	var nonLocalizedPath;
 	var pathname = window.location.pathname;
 	var section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
 	var name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
@@ -35,10 +36,12 @@ function onDocumentLoad( event ) {
 
 		case 'api':
 			path = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+			nonLocalizedPath = path.substr( 3 ); // remove 'en/'
 			break;
 
 		case 'examples':
 			path = /\/examples\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
+			nonLocalizedPath = path;
 			break;
 
 		case 'manual':
@@ -46,6 +49,7 @@ function onDocumentLoad( event ) {
 
 			path = pathname.replace( /\ /g, '-' );
 			path = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
+			nonLocalizedPath = path;
 			break;
 
 	}
@@ -54,6 +58,7 @@ function onDocumentLoad( event ) {
 
 	text = text.replace( /\[name\]/gi, name );
 	text = text.replace( /\[path\]/gi, path );
+	text = text.replace( /\[nonLocalizedPath\]/gi, nonLocalizedPath );
 	text = text.replace( /\[page:([\w\.]+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
 	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, "[page:" + name + ".$1 $2]" ); // [page:.member title] to [page:name.member title]
 	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
