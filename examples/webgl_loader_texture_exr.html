@@ -111,7 +111,8 @@
 
 				var loader = new THREE.EXRLoader();
 
-				var texture = loader.load( "textures/piz_compressed.exr", function( texture, textureData ){
+				loader.load( "textures/piz_compressed.exr", function( texture, textureData ) {
+
 					console.log( textureData.header ); // exr header
 
 					texture.minFilter = THREE.NearestFilter;
@@ -133,6 +134,7 @@
 					quad.position.z = -100;
 					scene.add( quad );
 					animate();
+
 				} );
 
 				renderer = new THREE.WebGLRenderer();
