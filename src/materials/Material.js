@@ -1,5 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants.js';
+import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, RendererToneMapping } from '../constants.js';
 import { _Math } from '../math/Math.js';
 
 /**
@@ -36,6 +36,7 @@ function Material() {
 	this.blendDstAlpha = null;
 	this.blendEquationAlpha = null;
 
+	this.toneMapping = RendererToneMapping;
 	this.depthFunc = LessEqualDepth;
 	this.depthTest = true;
 	this.depthWrite = true;
