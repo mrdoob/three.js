@@ -37,7 +37,7 @@ div[data-diagram] {
     height: 150px;
 }
 .spread>div {
-  flex: 1 1 auto;
+  flex: 1 1 100%;
 }
 .spread .code {
   font-family: monospace;
