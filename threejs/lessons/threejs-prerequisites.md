@@ -202,7 +202,15 @@ somemesh.position.set(...position);
 ### Use `class`
 
 The syntax for making class like objects pre ES5 was unfamilar to most programmers.
-As of ES5 you can now [use the `class` keyword](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
+As of ES5 you can now [use the `class` keyword](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes) which
+is closer to the style of C++/C#/Java.
+
+### Understand getters and setters
+
+[Getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) and
+[setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) are
+common in most modern languages. The `class` syntax
+of ES5 makes them much easier than pre ES5.
 
 ### Use arrow functions where appropriate
 
