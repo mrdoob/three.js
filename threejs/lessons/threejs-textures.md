@@ -604,6 +604,8 @@ This is only one step into the topic of textures. At some point we'll go over
 texture coordinates as well as 9 other types of textures that can be applied
 to materials.
 
+For now let's move on to [lights](threejs-lights.html).
+
 <!--
 alpha 
 ao
