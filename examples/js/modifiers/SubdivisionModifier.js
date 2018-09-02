@@ -53,7 +53,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 	}
 
 
-	function processEdge( a, b, vertices, map, face, metaVertices ) {
+	function processEdge( a, b, vertices, map, face, connectingEdges ) {
 
 		var vertexIndexA = Math.min( a, b );
 		var vertexIndexB = Math.max( a, b );
@@ -84,8 +84,8 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 
 			map[ key ] = edge;
 
-			metaVertices[ a ].edges.push( edge );
-			metaVertices[ b ].edges.push( edge );
+			connectingEdges[ a ].push( edge );
+			connectingEdges[ b ].push( edge );
 
 		}
 
@@ -93,13 +93,13 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 
 	}
 
-	function generateLookups( vertices, faces, metaVertices, edges ) {
+	function generateLookups( vertices, faces, connectingEdges, edges ) {
 
 		var i, il, face;
 
 		for ( i = 0, il = vertices.length; i < il; i ++ ) {
 
-			metaVertices[ i ] = { edges: [] };
+			connectingEdges[ i ] = [];
 
 		}
 
@@ -107,9 +107,9 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 
 			face = faces[ i ];
 
-			processEdge( face.a, face.b, vertices, edges, face, metaVertices );
-			processEdge( face.b, face.c, vertices, edges, face, metaVertices );
-			processEdge( face.c, face.a, vertices, edges, face, metaVertices );
+			processEdge( face.a, face.b, vertices, edges, face, connectingEdges );
+			processEdge( face.b, face.c, vertices, edges, face, connectingEdges );
+			processEdge( face.c, face.a, vertices, edges, face, connectingEdges );
 
 		}
 
@@ -258,7 +258,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 		var newUVs = [];
 
 		var n, i, il, j, k;
-		var metaVertices, sourceEdges;
+		var connectingEdges, sourceEdges;
 
 		var oldVertices = this.geometry.vertices; // { x, y, z}
 		var oldFaces = this.geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
@@ -272,10 +272,10 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 		 *
 		 *******************************************************/
 
-		metaVertices = new Array( oldVertices.length );
+		connectingEdges = new Array( oldVertices.length );
 		sourceEdges = {}; // Edge => { oldVertex1, oldVertex2, faces[]  }
 
-		generateLookups( oldVertices, oldFaces, metaVertices, sourceEdges );
+		generateLookups( oldVertices, oldFaces, connectingEdges, sourceEdges );
 
 
 		/******************************************************
@@ -378,7 +378,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 		 *******************************************************/
 
 		var beta, sourceVertexWeight, connectingVertexWeight;
-		var connectingEdge, connectingEdges, oldVertex, newSourceVertex, vertexWeight, otherEnd;
+		var connectingEdge, oldVertex, newSourceVertex, vertexWeight, otherEnd;
 		var newSourceVertices = [];
 
 		for ( i = 0, il = oldVertices.length; i < il; i ++ ) {
@@ -386,9 +386,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 			oldVertex = oldVertices[ i ];
 			vertexWeight = this.vertexWeights[ i ];
 
-			// find all connecting edges (using lookupTable)
-			connectingEdges = metaVertices[ i ].edges;
-			n = connectingEdges.length;
+			n = connectingEdges[ i ].length;
 
 			if ( n > 2 ) {
 
@@ -415,7 +413,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 
 				if ( n === 2 ) {
 
-					if ( WARNINGS ) console.warn( '2 connecting edges', connectingEdges );
+					if ( WARNINGS ) console.warn( '2 connecting edges', connectingEdges[ i ] );
 					sourceVertexWeight = 3 / 4;
 					connectingVertexWeight = 1 / 8;
 
@@ -445,7 +443,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 			for ( j = 0; j < n; j ++ ) {
 
 				// Get connected vertex.
-				connectingEdge = connectingEdges[ j ];
+				connectingEdge = connectingEdges[ i ][ j ];
 				otherEnd = connectingEdge.a !== oldVertex;
 				other = otherEnd ? connectingEdge.a : connectingEdge.b;
 
