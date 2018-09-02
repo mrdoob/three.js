@@ -150,6 +150,48 @@ own gradient map. This ends up giving a 2 tone look that looks like a cartoon.
   <div data-diagram="MeshToonMaterial"></div>
 </div>
 
+Next up there are 2 *physically based rendering* materials. Physically Based
+Rendering is often abbreviated PBR.
+
+The materials above use simple math to make materials that look 3D but they
+aren't what actually happens in real world. The 2 PBR materials use much more
+complex math to come close to what actually happens in the real world.
+
+The first one is `MeshStandardMaterial`. The biggest difference between
+`MeshPhongMaterial` and `MeshStandardMaterial` is it uses different parameters.
+`MeshPhongMaterial` had a `shininess` setting. `MeshStandardMaterial` has 2
+settings `roughness` and `metalness`.
+
+At a basic level [`roughness`](MeshStandardMaterial.roughness) is the opposite
+of `shininess`. Something that has a high roughness, like a baseball doesn't 
+have hard reflections where as something that's not rough, like a billiard ball
+is very shiny. Roughness goes from 0 to 1.
+
+The other setting, [`metalness`](MeshStandardMaterial.metalness), says
+how metal the material is. Metals behave differently than non-metals
+and so this setting goes from 0, not metal at all, to 1, 100% metal.
+
+Here's a quick sample of `MeshStandardMaterial` with `roughness` from 0 to 1
+across and `metalness` from 0 to 1 down.
+
+<div data-diagram="MeshStandardMaterial" style="min-height: 400px"></div>
+
+The `MeshPhysicalMaterial` is same as the `MeshStandardMaterial` but it
+adds a `clearCoat` parameter that goes from 0 to 1 for how much to 
+apply a clearcoat gloss layer and a `clearCoatRoughness` parameter
+that specifies how rough the gloss layer is.
+
+Here's the same grid of `roughness` by `metalness` as above but with
+`clearCoat` and `clearCoatRoughness` settings.
+
+<div data-diagram="MeshPhysicalMaterial" style="min-height: 400px"></div>
+
+The various standard materials progress from fastest to slowest
+`MeshBasicMaterial` ➡ `MeshLambertMaterial` ➡ `MeshPhongMaterial` ➡ 
+`MeshStandardMaterial` ➡ `MeshPhysicalMaterial`. The slower materials
+can make more realistic looking scenes but you might need to design
+your code to use the faster materials on low powered or mobile machines.
+
 There are 3 materials that have special uses. `ShadowMaterial`
 is used to get the data created from shadows. We haven't
 covered shadows yet. When we do we'll use this material
@@ -183,13 +225,6 @@ to the right will be red, up will be green, and toward the screen will be blue.
 system. `RawShaderMaterial` is for making entirely custom shaders with
 no help from three.js. Both of these topics are large and will be
 covered later.
-
-The last 2 materials we'll mention here are the `MeshStandardMaterial`
-and the `MeshPhysicsMaterial`. Both implement what's called *physically
-based rendering* or often PBR for short. This is a way of computing
-material properties and lights that comes close to the way
-lights and materials work in the real word. We'll cover these in
-more detail in another article.
 
 Most materials share a bunch of settings all defined by `Material`.
 [See the docs](Material)
