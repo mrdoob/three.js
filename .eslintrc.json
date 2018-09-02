@@ -57,7 +57,7 @@
     "curly": [2, "all"],
     "no-extra-parens": [2, "functions"],
     "eqeqeq": 2,
-    "new-cap": 0,
+    "new-cap": 2,
     "new-parens": 2,
     "semi-spacing": [2, {"before": false, "after": true}],
     "space-infix-ops": 2,
