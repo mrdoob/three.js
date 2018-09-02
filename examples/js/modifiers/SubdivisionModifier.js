@@ -17,52 +17,36 @@
  *		- currently doesn't handle "Sharp Edges"
  */
 
-export const SubdivisionModifier = function ( subdivisions ) {
-
-	this.subdivisions = ( subdivisions === undefined ) ? 1 : subdivisions;
-
-
-	// Applies the "modify" pattern
-	this.modify = function ( geometry ) {
-
-		if ( geometry.isBufferGeometry ) {
-
-			geometry = new THREE.Geometry().fromBufferGeometry( geometry );
-
-		} else {
-
-			geometry = geometry.clone();
-
-		}
-
-		geometry.mergeVertices();
-
-		var repeats = this.subdivisions;
-
-		while ( repeats -- > 0 ) {
-
-			this.smooth( geometry );
-
-		}
-
-		geometry.computeFaceNormals();
-		geometry.computeVertexNormals();
-
-		return geometry;
-
-	};
+export const SubdivisionModifier = function ( geometry, subdivisions ) {
 
 	// Some constants
-	var WARNINGS = ! true; // Set to true for development
+	var WARNINGS = true; // Set to true for development
 	var ABC = [ 'a', 'b', 'c' ];
 
+	// Number of subdivision levels default: 1.
+	this.subdivisions = ( subdivisions === undefined ) ? 1 : subdivisions;
+
+	// Create this.baseGeometry as cleaned-up copy of input geometry.
+	if ( geometry.isBufferGeometry ) {
+
+		this.baseGeometry = new THREE.Geometry().fromBufferGeometry( geometry );
+
+	} else {
+
+		this.baseGeometry = geometry;
+
+	}
+
+	this.baseGeometry.mergeVertices();
+
+	/////////////////////////////
 
 	function getEdge( a, b, map ) {
 
 		var vertexIndexA = Math.min( a, b );
 		var vertexIndexB = Math.max( a, b );
 
-		var key = vertexIndexA + "_" + vertexIndexB;
+		var key = vertexIndexA + '_' + vertexIndexB;
 
 		return map[ key ];
 
@@ -74,7 +58,7 @@ export const SubdivisionModifier = function ( subdivisions ) {
 		var vertexIndexA = Math.min( a, b );
 		var vertexIndexB = Math.max( a, b );
 
-		var key = vertexIndexA + "_" + vertexIndexB;
+		var key = vertexIndexA + '_' + vertexIndexB;
 
 		var edge;
 
@@ -92,8 +76,8 @@ export const SubdivisionModifier = function ( subdivisions ) {
 				a: vertexA, // pointer reference
 				b: vertexB,
 				newEdge: null,
-				// aIndex: a, // numbered reference
-				// bIndex: b,
+				aIndex: vertexIndexA, // numbered reference
+				bIndex: vertexIndexB,
 				faces: [] // pointers to face
 
 			};
@@ -149,25 +133,133 @@ export const SubdivisionModifier = function ( subdivisions ) {
 
 	}
 
+	function addArray( baseArray, newArray, newArrayWeight ) {
+
+		newArray.forEach( function( el, i ) {
+
+			baseArray[ i ] = ( baseArray[ i ] || 0 ) + ( el * newArrayWeight );
+
+		} );
+
+	}
+
+	function scaleArray( array, arrayWeight ) {
+		if ( arrayWeight !== 1 ) {
+
+			array.forEach( function( el, i ) {
+
+				array[ i ] = el * arrayWeight;
+
+			} );
+
+		}
+	}
+
 	/////////////////////////////
 
-	// Performs one iteration of Subdivision
-	this.smooth = function ( geometry ) {
+	/**
+	 * Subdivide base surface.
+	 */
+	this.modify = function() {
+
+		var repeats = this.subdivisions;
+
+		this.geometry = this.baseGeometry.clone();
+
+		// Initialize vertex weights, for quick updating. Initially, each vertex is solely dependent on itself.
+		this.vertexWeights = [];
+
+		// Initialize base vertex influences, also for quick updating.
+		this.vertexInfluences = [];
+
+		// Initialize weight and influence arrays to un-subdivided status.
+		for ( var i = 0, il = this.geometry.vertices.length; i < il; i ++ ) {
+
+			this.vertexWeights[ i ] = [];
+			this.vertexWeights[ i ][ i ] = 1;
+
+			this.vertexInfluences[ i ] = new Set( [ i ] );
+
+		}
+
+		while ( repeats -- > 0 ) {
+
+			this.smooth();
+
+		}
+
+		this.geometry.computeFaceNormals();
+		this.geometry.computeVertexNormals();
+	};
+
+	/**
+	 * Update the subdivided geometry to match changes in the base geometry.
+	 * Does not handle changes in topology (added/deleted vertices, modified faces).
+	 */
+	this.update = function (baseGeoVertexIds) {
+
+		var vertexIdsToMove;
+
+		var i, il;
+
+		if (baseGeoVertexIds !== undefined) {
+
+			vertexIdsToMove = new Set();
+
+			// For each base geometry vertex to update, get all related subdivided geometry vertices.
+			for ( i = 0, il = baseGeoVertexIds.length; i < il; i ++ ) {
+
+				this.vertexInfluences[ baseGeoVertexIds[ i ] ].forEach( vertexIdsToMove.add, vertexIdsToMove );
+
+			}
+
+		} else {
+
+			// Update position of all vertices.
+			vertexIdsToMove = new Set( this.geometry.vertices.keys() );
+
+		}
+
+		var baseVertices = this.baseGeometry.vertices;
+		var vertices = this.geometry.vertices;
+		var vertexWeights = this.vertexWeights;
+		var tmp = new THREE.Vector3();
+
+		for ( var vertexId of vertexIdsToMove ) {
+
+			tmp.setScalar( 0 );
+
+			vertexWeights[ vertexId ].forEach( function( el, i ) {
+
+				tmp.addScaledVector( baseVertices[ i ], el );
+
+			} );
+
+			vertices[ vertexId ].copy( tmp );
+
+		}
+
+		this.geometry.verticesNeedUpdate = true;
+		this.geometry.computeFaceNormals();
+		this.geometry.computeVertexNormals();
+
+	};
+
+	/**
+	 * Performs one iteration of subdivision.
+	 */
+	this.smooth = function () {
 
 		var tmp = new THREE.Vector3();
 
-		var oldVertices, oldFaces, oldUvs;
-		var newVertices, newFaces, newUVs = [];
+		var newUVs = [];
 
 		var n, i, il, j, k;
 		var metaVertices, sourceEdges;
 
-		// new stuff.
-		var sourceEdges, newEdgeVertices, newSourceVertices;
-
-		oldVertices = geometry.vertices; // { x, y, z}
-		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
-		oldUvs = geometry.faceVertexUvs[ 0 ];
+		var oldVertices = this.geometry.vertices; // { x, y, z}
+		var oldFaces = this.geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
+		var oldUvs = this.geometry.faceVertexUvs[ 0 ];
 
 		var hasUvs = oldUvs !== undefined && oldUvs.length > 0;
 
@@ -191,28 +283,31 @@ export const SubdivisionModifier = function ( subdivisions ) {
 		 *
 		 *******************************************************/
 
-		newEdgeVertices = [];
+		var newEdgeVertices = [], newVertexWeights = [];
 		var other, currentEdge, newEdge, face;
-		var edgeVertexWeight, adjacentVertexWeight, connectedFaces;
+		var edgeVertexWeight, adjacentVertexWeight, connectedFaces, newVertexWeight;
 
 		for ( i in sourceEdges ) {
 
 			currentEdge = sourceEdges[ i ];
 			newEdge = new THREE.Vector3();
-
-			edgeVertexWeight = 3 / 8;
-			adjacentVertexWeight = 1 / 8;
+			newVertexWeight = [];
 
 			connectedFaces = currentEdge.faces.length;
 
 			// check how many linked faces. 2 should be correct.
-			if ( connectedFaces != 2 ) {
+			if ( connectedFaces === 2 ) {
+
+				edgeVertexWeight = 3 / 8;
+				adjacentVertexWeight = 1 / 8;
+
+			} else {
 
 				// if length is not 2, handle condition
 				edgeVertexWeight = 0.5;
 				adjacentVertexWeight = 0;
 
-				if ( connectedFaces != 1 ) {
+				if ( connectedFaces !== 1 ) {
 
 					if ( WARNINGS ) console.warn( 'Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge );
 
@@ -220,7 +315,27 @@ export const SubdivisionModifier = function ( subdivisions ) {
 
 			}
 
+			// Add influence of edge endpoints to edge's new vertex.
 			newEdge.addVectors( currentEdge.a, currentEdge.b ).multiplyScalar( edgeVertexWeight );
+
+			// Merge weights for edge vertices into weights for edge's new vertex.
+			addArray( newVertexWeight, this.vertexWeights[ currentEdge.aIndex ], edgeVertexWeight );
+			addArray( newVertexWeight, this.vertexWeights[ currentEdge.bIndex ], edgeVertexWeight );
+
+			// Record that the ends of this edge influence the position of the new vertex.
+			var newVertexId = this.vertexWeights.length + newEdgeVertices.length;
+
+			this.vertexWeights[ currentEdge.aIndex ].forEach( ( el, j ) => {
+
+				this.vertexInfluences[ j ].add( newVertexId );
+
+			} );
+
+			this.vertexWeights[ currentEdge.bIndex ].forEach( ( el, j ) => {
+
+				this.vertexInfluences[ j ].add( newVertexId );
+
+			} );
 
 			tmp.set( 0, 0, 0 );
 
@@ -235,6 +350,8 @@ export const SubdivisionModifier = function ( subdivisions ) {
 
 				}
 
+				addArray( newVertexWeight, this.vertexWeights[ face[ ABC[ k ] ] ], adjacentVertexWeight );
+
 				tmp.add( other );
 
 			}
@@ -242,8 +359,9 @@ export const SubdivisionModifier = function ( subdivisions ) {
 			tmp.multiplyScalar( adjacentVertexWeight );
 			newEdge.add( tmp );
 
-			currentEdge.newEdge = newEdgeVertices.length;
+			currentEdge.newEdge = newVertexId;
 			newEdgeVertices.push( newEdge );
+			newVertexWeights.push( newVertexWeight );
 
 			// console.log(currentEdge, newEdge);
 
@@ -252,44 +370,47 @@ export const SubdivisionModifier = function ( subdivisions ) {
 		/******************************************************
 		 *
 		 *	Step 2.
-		 *	Reposition each source vertices.
+		 *	Reposition each source vertex.
 		 *
 		 *******************************************************/
 
 		var beta, sourceVertexWeight, connectingVertexWeight;
-		var connectingEdge, connectingEdges, oldVertex, newSourceVertex;
-		newSourceVertices = [];
+		var connectingEdge, connectingEdges, oldVertex, newSourceVertex, vertexWeight, otherEnd;
+		var newSourceVertices = [];
 
 		for ( i = 0, il = oldVertices.length; i < il; i ++ ) {
 
 			oldVertex = oldVertices[ i ];
+			vertexWeight = this.vertexWeights[ i ];
 
 			// find all connecting edges (using lookupTable)
 			connectingEdges = metaVertices[ i ].edges;
 			n = connectingEdges.length;
 
-			if ( n == 3 ) {
+			if ( n > 2 ) {
 
-				beta = 3 / 16;
+				if ( n === 3 ) {
 
-			} else if ( n > 3 ) {
+					beta = 3 / 16;
 
-				beta = 3 / ( 8 * n ); // Warren's modified formula
+				} else {
 
-			}
+					beta = 3 / ( 8 * n ); // Warren's modified formula
 
-			// Loop's original beta formula
-			// beta = 1 / n * ( 5/8 - Math.pow( 3/8 + 1/4 * Math.cos( 2 * Math. PI / n ), 2) );
+				}
 
-			sourceVertexWeight = 1 - n * beta;
-			connectingVertexWeight = beta;
+				// Loop's original beta formula
+				// beta = 1 / n * ( 5/8 - Math.pow( 3/8 + 1/4 * Math.cos( 2 * Math. PI / n ), 2) );
 
-			if ( n <= 2 ) {
+				sourceVertexWeight = 1 - n * beta;
+				connectingVertexWeight = beta;
+
+			} else {
 
 				// crease and boundary rules
 				// console.warn('crease and boundary rules');
 
-				if ( n == 2 ) {
+				if ( n === 2 ) {
 
 					if ( WARNINGS ) console.warn( '2 connecting edges', connectingEdges );
 					sourceVertexWeight = 3 / 4;
@@ -298,11 +419,13 @@ export const SubdivisionModifier = function ( subdivisions ) {
 					// sourceVertexWeight = 1;
 					// connectingVertexWeight = 0;
 
-				} else if ( n == 1 ) {
+				} else if ( n === 1 ) {
 
 					if ( WARNINGS ) console.warn( 'only 1 connecting edge' );
+					sourceVertexWeight = 3 / 4;
+					connectingVertexWeight = 1 / 4;
 
-				} else if ( n == 0 ) {
+				} else if ( n === 0 ) {
 
 					if ( WARNINGS ) console.warn( '0 connecting edges' );
 
@@ -314,11 +437,25 @@ export const SubdivisionModifier = function ( subdivisions ) {
 
 			tmp.set( 0, 0, 0 );
 
+			scaleArray( vertexWeight, sourceVertexWeight );
+
 			for ( j = 0; j < n; j ++ ) {
 
+				// Get connected vertex.
 				connectingEdge = connectingEdges[ j ];
-				other = connectingEdge.a !== oldVertex ? connectingEdge.a : connectingEdge.b;
+				otherEnd = connectingEdge.a !== oldVertex;
+				other = otherEnd ? connectingEdge.a : connectingEdge.b;
+
+				// Add influence of connected vertex.
 				tmp.add( other );
+				addArray( vertexWeight, this.vertexWeights[ otherEnd ? connectingEdge.aIndex : connectingEdge.bIndex ], connectingVertexWeight );
+
+				// Merge influences on connected vertex into influences on this vertex.
+				this.vertexWeights[ otherEnd ? connectingEdge.aIndex : connectingEdge.bIndex ].forEach( ( el, k ) => {
+
+					this.vertexInfluences[ k ].add( i );
+
+				} );
 
 			}
 
@@ -338,9 +475,9 @@ export const SubdivisionModifier = function ( subdivisions ) {
 		 *
 		 *******************************************************/
 
-		newVertices = newSourceVertices.concat( newEdgeVertices );
-		var sl = newSourceVertices.length, edge1, edge2, edge3;
-		newFaces = [];
+		var newVertices = newSourceVertices.concat( newEdgeVertices );
+		var edge1, edge2, edge3;
+		var newFaces = [];
 
 		var uv, x0, x1, x2;
 		var x3 = new THREE.Vector2();
@@ -353,9 +490,9 @@ export const SubdivisionModifier = function ( subdivisions ) {
 
 			// find the 3 new edges vertex of each old face
 
-			edge1 = getEdge( face.a, face.b, sourceEdges ).newEdge + sl;
-			edge2 = getEdge( face.b, face.c, sourceEdges ).newEdge + sl;
-			edge3 = getEdge( face.c, face.a, sourceEdges ).newEdge + sl;
+			edge1 = getEdge( face.a, face.b, sourceEdges ).newEdge;
+			edge2 = getEdge( face.b, face.c, sourceEdges ).newEdge;
+			edge3 = getEdge( face.c, face.a, sourceEdges ).newEdge;
 
 			// create 4 faces.
 
@@ -389,9 +526,10 @@ export const SubdivisionModifier = function ( subdivisions ) {
 		}
 
 		// Overwrite old arrays
-		geometry.vertices = newVertices;
-		geometry.faces = newFaces;
-		if ( hasUvs ) geometry.faceVertexUvs[ 0 ] = newUVs;
+		this.geometry.vertices = newVertices;
+		this.geometry.faces = newFaces;
+		if ( hasUvs ) this.geometry.faceVertexUvs[ 0 ] = newUVs;
+		this.vertexWeights = this.vertexWeights.concat( newVertexWeights );
 
 		// console.log('done');
 
