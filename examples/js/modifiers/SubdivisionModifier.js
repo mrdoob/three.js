@@ -135,7 +135,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 
 	function addArray( baseArray, newArray, newArrayWeight ) {
 
-		newArray.forEach( function( el, i ) {
+		newArray.forEach( function ( el, i ) {
 
 			baseArray[ i ] = ( baseArray[ i ] || 0 ) + ( el * newArrayWeight );
 
@@ -144,15 +144,17 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 	}
 
 	function scaleArray( array, arrayWeight ) {
+
 		if ( arrayWeight !== 1 ) {
 
-			array.forEach( function( el, i ) {
+			array.forEach( function ( el, i ) {
 
 				array[ i ] = el * arrayWeight;
 
 			} );
 
 		}
+
 	}
 
 	/////////////////////////////
@@ -160,7 +162,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 	/**
 	 * Subdivide base surface.
 	 */
-	this.modify = function() {
+	this.modify = function () {
 
 		var repeats = this.subdivisions;
 
@@ -190,19 +192,20 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 
 		this.geometry.computeFaceNormals();
 		this.geometry.computeVertexNormals();
+
 	};
 
 	/**
 	 * Update the subdivided geometry to match changes in the base geometry.
 	 * Does not handle changes in topology (added/deleted vertices, modified faces).
 	 */
-	this.update = function (baseGeoVertexIds) {
+	this.update = function ( baseGeoVertexIds ) {
 
 		var vertexIdsToMove;
 
 		var i, il;
 
-		if (baseGeoVertexIds !== undefined) {
+		if ( baseGeoVertexIds !== undefined ) {
 
 			vertexIdsToMove = new Set();
 
@@ -229,7 +232,7 @@ export const SubdivisionModifier = function ( geometry, subdivisions ) {
 
 			tmp.setScalar( 0 );
 
-			vertexWeights[ vertexId ].forEach( function( el, i ) {
+			vertexWeights[ vertexId ].forEach( function ( el, i ) {
 
 				tmp.addScaledVector( baseVertices[ i ], el );
 
