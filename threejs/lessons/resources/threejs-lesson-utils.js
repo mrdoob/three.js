@@ -82,7 +82,7 @@ window.threejsLessonUtils = {
     const aspect = 1;
     const zNear = 0.1;
     const zFar = 50;
-    const camera = new THREE.PerspectiveCamera(targetFOVDeg, aspect, zNear, zFar);
+    let camera = new THREE.PerspectiveCamera(targetFOVDeg, aspect, zNear, zFar);
     camera.position.z = 15;
     scene.add(camera);
 
@@ -128,6 +128,10 @@ window.threejsLessonUtils = {
       }
       if (info.resize) {
         resizeFunctions.push(info.resize);
+      }
+      if (info.camera) {
+        camera = info.camera;
+        renderInfo.camera = camera;
       }
 
       Object.assign(settings, info);
