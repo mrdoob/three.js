@@ -9,16 +9,18 @@ Three.js is often confused with WebGL since more often than
 not, but not always, three.js uses WebGL to draw 3D.
 [WebGL is a very low-level system that only draws points, lines, and triangles](https://webglfundamentals.org). 
 To do anything useful with WebGL generally requires quite a bit of
-code and that is where three.js comes in. It handlings things
+code and that is where three.js comes in. It handles stuff
 like scenes, lights, shadows, materials, textures, 3d math, all things that you'd
 have to write yourself if you were to use WebGL directly.
 
 These tutorials assume you already know JavaScript and, for the
-most part they will use ES6 style JavaScript. [See here for a
-terse list of prerequisites](threejs-prerequisites.html). Most browsers
-that support three.js are auto-updated so most users should
+most part they will use ES6 style. [See here for a
+terse list of things you're expected to already know](threejs-prerequisites.html). 
+Most browsers that support three.js are auto-updated so most users should
 be able to run this code. If you'd like to make this code run
-on older browsers look into a transpiler like [Babel](http://babel.io).
+on really old browsers look into a transpiler like [Babel](http://babel.io).
+Of course users running really old browsers probably have machines
+that can't run three.js.
 
 When learning most programming languages the first thing people
 do is make the computer print `"Hello World!"`. For 3D one
@@ -117,9 +119,9 @@ the field of view is affected by the aspect. Our canvas is twice as wide
 as it is tall so across view the field of view will be much wider than
 our specified 75 degrees which is the vertical field of view.
 
-Next we make a `Scene`. A `Scene` in three.js is a form of scene graph.
+Next we make a `Scene`. A `Scene` in three.js is the root of a form of scene graph.
 Anything you want three.js to draw needs to be added to the scene. We'll
-cover more details of how scenes work in a future article.
+cover more details of [how scenes work in a future article](threejs-scenegraph.html).
 
 ```
 const scene = new THREE.Scene();
@@ -200,8 +202,8 @@ will call your function and if you update anything related to the display of the
 page the browser will re-render the page. In our case we are calling three's
 `renderer.render` function which will draw our scene.
 
-`requestAnimationFrame` passes the time since the page started rendering to
-the our function. That time is passed in milliseconds. I find it's much
+`requestAnimationFrame` passes the time since the page loaded to
+our function. That time is passed in milliseconds. I find it's much
 easier to work with seconds so here we're converting that to seconds.
 
 We then set the cube's X and Y rotation to the current time. These rotations
