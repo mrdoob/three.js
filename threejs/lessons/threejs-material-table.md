@@ -114,8 +114,8 @@ const materials = [
     ],
   },
   {
-    name: 'MeshPhysicsMaterial',
-    shortName: 'Physics',
+    name: 'MeshPhysicalMaterial',
+    shortName: 'Physical',
     properties: [
       'alphaMap',
       'aoMap',
