@@ -221,7 +221,7 @@
 				gui.add( params, 'exposure', 0, 10 );
 				gui.add( params, 'whitePoint', 0, 10 );
 				gui.add( params, 'opacity', 0, 1 );
-				gui.add( params, 'renderMode', [ 'Renderer', 'Composer'] );
+				gui.add( params, 'renderMode', [ 'Renderer', 'Composer' ] );
 				gui.open();
 
 			}
@@ -253,19 +253,18 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				standardMaterial.roughness = params.roughness;
+				standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+				standardMaterial.opacity = params.opacity;
 
-
-					standardMaterial.roughness = params.roughness;
-					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
-					standardMaterial.opacity = params.opacity;
-
-				}
 				if( renderer.toneMapping !== toneMappingOptions[ params.toneMapping ] ) {
+
 					renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-					if( standardMaterial ) standardMaterial.needsUpdate = true;
-					if( floorMaterial ) floorMaterial.needsUpdate = true;
+					standardMaterial.needsUpdate = true;
+					floorMaterial.needsUpdate = true;
+
 				}
+
 				renderer.toneMappingExposure = params.exposure;
 				renderer.toneMappingWhitePoint = params.whitePoint;
 
@@ -279,10 +278,13 @@
 				}
 
 				if( params.renderMode === "Composer" ) {
+
 					composer.render();
-				}
-				else {
+
+				} else {
+
 					renderer.render( scene, camera );
+
 				}
 
 			}
