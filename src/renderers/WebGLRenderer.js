@@ -1723,7 +1723,6 @@ function WebGLRenderer( parameters ) {
 			if ( material.isShaderMaterial ||
 				material.isMeshPhongMaterial ||
 				material.isMeshStandardMaterial ||
-//				material.isMeshMatcapMaterial ||
 				material.envMap ) {
 
 				var uCamPos = p_uniforms.map.cameraPosition;
@@ -1741,7 +1740,6 @@ function WebGLRenderer( parameters ) {
 				material.isMeshLambertMaterial ||
 				material.isMeshBasicMaterial ||
 				material.isMeshStandardMaterial ||
-//				material.isMeshMatcapMaterial ||
 				material.isShaderMaterial ||
 				material.skinning ) {
 
