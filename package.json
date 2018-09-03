@@ -52,7 +52,7 @@
   "homepage": "https://threejs.org/",
   "devDependencies": {
     "concurrently": "^4.0.1",
-    "electron": "^2.0.6",
+    "electron": "^2.0.8",
     "eslint": "^5.5.0",
     "eslint-config-mdcs": "^4.2.3",
     "google-closure-compiler": "20180805.0.0",
