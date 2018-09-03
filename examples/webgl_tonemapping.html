@@ -253,18 +253,14 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				standardMaterial.roughness = params.roughness;
+				standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+				standardMaterial.opacity = params.opacity;
 
-
-					standardMaterial.roughness = params.roughness;
-					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
-					standardMaterial.opacity = params.opacity;
-
-				}
 				if( renderer.toneMapping !== toneMappingOptions[ params.toneMapping ] ) {
 					renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-					if( standardMaterial ) standardMaterial.needsUpdate = true;
-					if( floorMaterial ) floorMaterial.needsUpdate = true;
+					standardMaterial.needsUpdate = true;
+					floorMaterial.needsUpdate = true;
 				}
 				renderer.toneMappingExposure = params.exposure;
 				renderer.toneMappingWhitePoint = params.whitePoint;
