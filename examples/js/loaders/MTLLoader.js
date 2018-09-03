@@ -148,7 +148,7 @@ THREE.MTLLoader.prototype = {
 				info = { name: value };
 				materialsInfo[ value ] = info;
 
-			} else if ( info ) {
+			} else {
 
 				if ( key === 'ka' || key === 'kd' || key === 'ks' ) {
 

@@ -250,7 +250,8 @@
 				h.add( effectController, "nonblinn" ).name( "original scale" ).onChange( render );
 
 				// shading
-				h = gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
+
+				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
 
 			}
 
