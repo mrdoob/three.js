@@ -1329,7 +1329,7 @@
         "!proto": "THREE.Line.prototype",
         "update": {
           "!type": "fn(object: +THREE.Object3D)",
-          "!doc": "Updates the helper's geometry to match the dimensions of the [page:Geometry.boundingBox bounding box] of the passed object's geometry.\n\n\t\t<h2>Source</h2>\n\n\t\t[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]"
+          "!doc": "Updates the helper's geometry to match the dimensions of the [page:Geometry.boundingBox bounding box] of the passed object's geometry.\n\n\t\t<h2>Source</h2>\n\n\t\t[link:https://github.com/mrdoob/three.js/blob/master/src/[nonLocalizedPath].js src/[nonLocalizedPath].js]"
         }
       },
       "!doc": "Helper object to show a wireframe box (with no face diagonals) around an object",
