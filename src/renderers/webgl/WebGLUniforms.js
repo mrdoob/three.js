@@ -51,6 +51,7 @@
 
 import { CubeTexture } from '../../textures/CubeTexture.js';
 import { Texture } from '../../textures/Texture.js';
+import { Texture3D } from '../../textures/Texture3D.js';
 
 var emptyTexture = new Texture();
 var emptyTexture3d = new Texture3D();
