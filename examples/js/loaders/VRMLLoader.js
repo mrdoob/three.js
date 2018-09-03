@@ -1050,6 +1050,10 @@ THREE.VRMLLoader.prototype = {
 
 			var line = lines[ i ];
 
+			// The # symbol indicates that all subsequent text, until the end of the line is a comment,
+			// and should be ignored. (see http://www.agocg.ac.uk/train/vrml2rep/part1/guide3.htm)
+			line = line.replace( /(#.*)/, '' );
+
 			// split lines with {..{ or {..[ - some have both
 			if ( /{.*[{\[]/.test( line ) ) {
 
