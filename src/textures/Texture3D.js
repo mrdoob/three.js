@@ -5,11 +5,11 @@
 import { Texture } from './Texture.js';
 import { NearestFilter } from '../constants.js';
 
-function Texture3D( data, width, height, length, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+function Texture3D( data, width, height, depth, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
 	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-	this.image = { data: data, width: width, height: height, length: length };
+	this.image = { data: data, width: width, height: height, depth: depth };
 
 	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
