@@ -410,11 +410,11 @@ export default QUnit.module( 'Maths', () => {
 			var c = new Plane( new Vector3( 0, 1, 0 ), 1.25 );
 			var d = new Plane( new Vector3( 0, - 1, 0 ), 1.25 );
 			var e = new Plane( new Vector3( 0, 1, 0 ), 0.25 );
-			var f = new Plane( new Vector3( 0, 1, 0 ), -0.25 );
-			var g = new Plane( new Vector3( 0, 1, 0 ), -0.75 );
-			var h = new Plane( new Vector3( 0, 1, 0 ), -1 );
-			var i = new Plane( new Vector3( 1, 1, 1 ).normalize(), -1.732 );
-			var j = new Plane( new Vector3( 1, 1, 1 ).normalize(), -1.733 );
+			var f = new Plane( new Vector3( 0, 1, 0 ), - 0.25 );
+			var g = new Plane( new Vector3( 0, 1, 0 ), - 0.75 );
+			var h = new Plane( new Vector3( 0, 1, 0 ), - 1 );
+			var i = new Plane( new Vector3( 1, 1, 1 ).normalize(), - 1.732 );
+			var j = new Plane( new Vector3( 1, 1, 1 ).normalize(), - 1.733 );
 
 			assert.ok( ! a.intersectsPlane( b ), "Passed!" );
 			assert.ok( ! a.intersectsPlane( c ), "Passed!" );
