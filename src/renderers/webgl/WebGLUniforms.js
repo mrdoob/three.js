@@ -53,7 +53,7 @@ import { CubeTexture } from '../../textures/CubeTexture.js';
 import { Texture } from '../../textures/Texture.js';
 
 var emptyTexture = new Texture();
-var emptyTexture3d = new Texture();
+var emptyTexture3d = new Texture3D();
 var emptyCubeTexture = new CubeTexture();
 
 // --- Base for inner nodes (including the root) ---
