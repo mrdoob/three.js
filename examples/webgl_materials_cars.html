@@ -305,10 +305,6 @@
 			// set materials to the current values of the selection menus
 			function updateMaterials() {
 
-				var bodyMatName = bodyMatSelect.options[ bodyMatSelect.selectedIndex ].value;
-				var rimMatName = rimMatSelect.options[ rimMatSelect.selectedIndex ].value;
-				var glassMatName = glassMatSelect.options[ glassMatSelect.selectedIndex ].value;
-
 				var bodyMat = materialsLib.main[ bodyMatSelect.selectedIndex ];
 				var rimMat = materialsLib.main[ rimMatSelect.selectedIndex ];
 				var glassMat = materialsLib.glass[ glassMatSelect.selectedIndex ];
@@ -367,10 +363,10 @@
 
 				carModel.getWorldPosition( cameraTarget );
 				cameraTarget.y = 2.5;
-        cameraTarget.z += distance;
+				cameraTarget.z += distance;
 
 				camera.position.lerp( cameraTarget, delta * damping );
-        camera.lookAt( carModel.position );
+				camera.lookAt( carModel.position );
 
       }
 
