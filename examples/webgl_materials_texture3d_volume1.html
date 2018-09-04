@@ -119,27 +119,35 @@
 				texture.unpackAlignment = 1;
 				texture.needsUpdate = true;
 
-				// Colormap texture
-				var cmtexture = new THREE.TextureLoader().load( 'textures/cm_viridis.png' );  // e.g. cm_gray or cm_viridis
+				// Colormap textures
+				this.cmtextures = { viridis: new THREE.TextureLoader().load( 'textures/cm_viridis.png' ),
+									gray: new THREE.TextureLoader().load( 'textures/cm_gray.png' )
+								  }
 
 				// Material (shaders) to render the volume using raycasting
 				var volmaterial = new THREE.ShaderMaterial( THREE.ShaderLib['volumerender1'] );
 				volmaterial.side = THREE.BackSide;  // The volume shader uses the backface as its "reference point"
 
-				// Apply volume material uniform info
+				// Apply standard volume material uniform info
 				volmaterial.uniforms.u_data = { type: 't', value: texture };
-				volmaterial.uniforms.u_cmdata = { type: 't', value: cmtexture };
 				volmaterial.uniforms.u_size = { type: 'v3', value: [volume.xLength, volume.yLength, volume.zLength] };
-				volmaterial.uniforms.u_renderstyle = {type: 'int', value: 0}; // 0: MIP, 1: ISO
-				volmaterial.uniforms.u_renderthreshold = {type: 'f', value: 0.3};  // For ISO renderstyle
-				volmaterial.uniforms.u_clim = {type: 'v2', value: [0, 1]};
-				volmaterial.needsUpdate = true;
 
 				// Geometry for the volume
 				var volgeometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
 				volgeometry = volgeometry.translate(volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5);
 				var volcube = new THREE.Mesh(volgeometry, volmaterial);
 				scene.add( volcube );
+
+				// Support modifying volume rendering settings at runtime
+				this.volmaterial = volmaterial;
+				this.volumeConfig = {clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'viridis'};
+				this.updateUniforms();
+
+				gui.add(volumeConfig, 'clim1', 0, 1, 0.01).onChange(this.updateUniforms.bind(this));
+				gui.add(volumeConfig, 'clim2', 0, 1, 0.01).onChange(this.updateUniforms.bind(this));
+				gui.add(volumeConfig, 'colormap', {gray: 'gray', viridis: 'viridis'}).onChange(this.updateUniforms.bind(this));
+				gui.add(volumeConfig, 'renderstyle', {mip: 'mip', iso: 'iso'}).onChange(this.updateUniforms.bind(this));
+				gui.add(volumeConfig, 'isothreshold', 0, 1, 0.01).onChange(this.updateUniforms.bind(this));
 
 				// TODO: the texture coordinates currently map directly to world coordinates. That's why we translate
 				// the geometry above. But the extractSlice() below assume that the volume is centered at the origin.
@@ -208,6 +216,19 @@
 			setupInset();
 
 			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function updateUniforms() {
+
+			config = this.volumeConfig;
+
+			this.volmaterial.uniforms.u_clim = {type: 'v2', value: [config.clim1, config.clim2]};
+			this.volmaterial.uniforms.u_renderstyle = {type: 'int', value: config.renderstyle == 'mip' ? 0 : 1}; // 0: MIP, 1: ISO
+			this.volmaterial.uniforms.u_renderthreshold = {type: 'f', value: config.isothreshold};  // For ISO renderstyle
+			this.volmaterial.uniforms.u_cmdata = { type: 't', value: this.cmtextures[config.colormap] };
+
+			this.volmaterial.needsUpdate = true;
 
 		}
 
