@@ -300,7 +300,8 @@
 
 					// Clear colors and depths, will clear to sky color
 
-					renderer.clearTarget( postprocessing.rtTextureColors, true, true, false );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
+					renderer.clear( true, true, false );
 
 					// Sun render. Runs a shader that gives a brightness based on the screen
 					// space distance to the sun. Not very efficient, so i make a scissor
