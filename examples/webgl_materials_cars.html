@@ -8,25 +8,20 @@
 			body {
 				font-family: Monospace;
 				background-color: #000;
-				color: #fff;
+				color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
 			#info {
-				color: #000;
 				position: absolute;
 				top: 10px;
 				width: 100%;
 				text-align: center;
 				z-index: 100;
-				display:block;
 			}
 			#info a {
 				color: red;
 				font-weight: bold;
-			}
-			span {
-				white-space: nowrap;
 			}
 		</style>
 	</head>
@@ -54,6 +49,11 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -61,7 +61,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer, controls, stats;
+			var camera, scene, renderer, controls, stats, carModel, materialsLib, envMap;
 
 			var bodyMatSelect = document.getElementById( 'body-mat' );
 			var rimMatSelect = document.getElementById( 'rim-mat' );
@@ -71,10 +71,9 @@
 			driveModeToggle.addEventListener( 'change', onDriveModeToggle );
 
 			var lightHolder = new THREE.Group();
-
+			var clock = new THREE.Clock();
 			var car = new THREE.Car();
 			car.enabled = false;
-			var clock = new THREE.Clock();
 
 			var carParts = {
 				body: [],
@@ -82,11 +81,9 @@
 				glass: [],
 			};
 
-			var carModel, materialsLib;
 
-			var drivingMode = false;
 			var damping = 5.0;
-			var distance = -5;
+			var distance = 5;
 			var cameraTarget = new THREE.Vector3();
 			var origin = new THREE.Vector3();
 
@@ -95,27 +92,32 @@
 				var container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-				camera.position.set( 5, 2.5, -5 );
+				camera.position.set( 3.25, 1.25, -5 );
 
 				controls = new THREE.OrbitControls( camera, container );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
+				controls.target.set( 0, 0.75, 0 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 60 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 80 );
 
-				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 600, 600 ), new THREE.MeshStandardMaterial( { color: 0xffffff, metalness: 0, roughness: 1 } ) );
+				scene.background = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/skybox/')
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+
+				ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2400, 2400 ), new THREE.MeshStandardMaterial( { color: 0xffffff, metalness: 0, roughness: 1 } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 600, 60, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 2400, 120, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
 
 				var hemiLight = new THREE.HemisphereLight( 0xfefeb4, 0x99ccff, 0.3 );
-				hemiLight.position.set( -3, 3, 3 );
+				hemiLight.position.set( -1.5, 1.5, 1.5 );
 				scene.add( hemiLight );
 
 				shadowLight  = new THREE.DirectionalLight( 0xffffff, 0.3 );
@@ -144,23 +146,48 @@
 				container.appendChild( stats.dom );
 
 				initCar();
-				initMaterials();
-				initMaterialSelection();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				renderer.setAnimationLoop( function() {
 
-					render();
 					update();
+
+					renderer.render( scene, camera );
 
 				} );
 
 			}
 
-			var envMap = new THREE.CubeTextureLoader()
-				.setPath( 'textures/cube/skybox/')
-				.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+			var genCubeUrls = function( prefix, postfix ) {
+				return [
+					prefix + 'px' + postfix, prefix + 'nx' + postfix,
+					prefix + 'py' + postfix, prefix + 'ny' + postfix,
+					prefix + 'pz' + postfix, prefix + 'nz' + postfix
+				];
+			};
+
+			var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
+			new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+
+				var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+				pmremGenerator.update( renderer );
+
+				var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+				pmremCubeUVPacker.update( renderer );
+
+				var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+				envMap = hdrCubeRenderTarget.texture;
+
+				initMaterials();
+				initMaterialSelectionMenus();
+
+				hdrCubeMap.dispose();
+				pmremGenerator.dispose();
+				pmremCubeUVPacker.dispose();
+
+			} );
 
 
 			function initCar() {
@@ -173,20 +200,11 @@
 				loader.load( 'models/fbx/ferrari.glb', function( gltf ) {
 
 					carModel = gltf.scene.children[ 0 ];
+
+					// add lightHolder to car so that the shadow will track the car as it moves
 					carModel.add( lightHolder );
 
-					// carModel.scale.z = -1;
-
-					car.setModel( carModel, {
-							flWheel: 'wheel_fl',
-							frWheel: 'wheel_fr',
-							rlWheel: 'wheel_rl',
-							rrWheel: 'wheel_rr',
-							steeringWheel: 'steering_wheel',
-						}
-					);
-
-					car.steeringWheelTurnAxis = 'y';
+					car.setModel( carModel );
 
 					carModel.traverse( function ( child ) {
 
@@ -202,6 +220,7 @@
 
 					scene.add( carModel );
 
+					// car parts for material selection
 					carParts.body.push( carModel.getObjectByName( 'body' ) );
 
 					carParts.rims.push(
@@ -218,18 +237,11 @@
 
 					updateMaterials();
 
-				}, null, function( error ) { console.log( error ); } );
+				});
 
 			}
 
 			function initMaterials() {
-
-
-				scene.background = envMap;
-
-				envMapRefraction = envMap.clone();
-				envMapRefraction.mapping = THREE.CubeRefractionMapping;
-				envMapRefraction.needsUpdate = true;
 
 				materialsLib = {
 
@@ -246,9 +258,9 @@
 
 					glass: [
 
-						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMapRefraction, metalness: 0.0, roughness: 0.25, opacity: 0.5, transparent: true, refractionRatio: 0.25, name: 'clear'} ),
-						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMapRefraction, metalness: 0, roughness: 0.25, opacity: 0.75, transparent: true, refractionRatio: 0.75, name: 'smoked' } ),
-						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMapRefraction, metalness: 0, roughness: 0.25, opacity: 0.5, transparent: true, refractionRatio: 0.75, name: 'blue' } ),
+						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.0, roughness: 0.25, opacity: 0.5, transparent: true, refractionRatio: 0.25, name: 'clear'} ),
+						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0, roughness: 0.25, opacity: 0.75, transparent: true, refractionRatio: 0.75, name: 'smoked' } ),
+						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0, roughness: 0.25, opacity: 0.5, transparent: true, refractionRatio: 0.75, name: 'blue' } ),
 
 					],
 
@@ -256,7 +268,7 @@
 
 			}
 
-			function initMaterialSelection() {
+			function initMaterialSelectionMenus() {
 
 				function addOption( name, menu ) {
 
@@ -281,7 +293,7 @@
 				} );
 
 				bodyMatSelect.selectedIndex = 2;
-				rimMatSelect.selectedIndex = 5;
+				rimMatSelect.selectedIndex = 4;
 				glassMatSelect.selectedIndex = 0;
 
 				bodyMatSelect.addEventListener( 'change', updateMaterials );
@@ -318,18 +330,11 @@
 
 			function onDriveModeToggle() {
 
-				drivingMode = !drivingMode;
-				controls.enabled = !drivingMode;
-				car.enabled = drivingMode;
+				car.enabled = !car.enabled;
+				controls.enabled = !car.enabled;
 
 				controls.reset();
 				carModel.position.copy( origin );
-
-			}
-
-			function render() {
-
-				renderer.render( scene, camera );
 
 			}
 
@@ -337,7 +342,7 @@
 
 				var delta = clock.getDelta();
 
-				if ( carModel && drivingMode ) {
+				if ( carModel && !controls.enabled ) {
 
 					car.update( delta );
 
@@ -361,9 +366,8 @@
 			function updateCamera( delta ) {
 
 				carModel.getWorldPosition( cameraTarget );
-				cameraTarget.y = camera.position.y;
+				cameraTarget.y = 2.5;
         cameraTarget.z += distance;
-				cameraTarget.x += distance;
 
 				camera.position.lerp( cameraTarget, delta * damping );
         camera.lookAt( carModel.position );
@@ -372,9 +376,9 @@
 
       function resetPosition() {
 
-				if( carModel.position.distanceTo( origin ) > 300 ) {
+				if( carModel.position.distanceTo( origin ) > 1200 ) {
 
-					carModel.position.set( 0, 0, 0 );
+					carModel.position.copy( origin );
 					car.speed = 0;
 					car.enabled = false;
 
