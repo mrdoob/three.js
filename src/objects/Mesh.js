@@ -38,6 +38,51 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isMesh: true,
 
+  containsPoint:function( vec3 ){
+    this.geometry.computeBoundingBox()
+    var result;
+
+    if(!this.geometry.boundingBox.containsPoint(vec3)){
+      result = false;
+    }
+    else{
+      var raycaster = new THREE.Raycaster();
+      raycaster.set( vec3 , new THREE.Vector3(0, 0, -1) );
+      var side_bak=this.material.side;
+      this.material.side=THREE.DoubleSide;
+      var intersects = window.intersects = raycaster.intersectObject( this );
+
+      if(intersects.length>1){
+        var intersects_unique=[intersects[0]]
+        for(var i=0;i<intersects.length;i++){
+          var is_same=false;
+          for(var j=0;j<intersects_unique.length;j++){
+            if(
+              intersects[i].point.x===intersects_unique[j].point.x
+              &&intersects[i].point.y===intersects_unique[j].point.y
+              &&intersects[i].point.z===intersects_unique[j].point.z
+            ){
+              is_same=true;
+              break;
+            }
+          }
+          if(!is_same){
+            intersects_unique.push(intersects[i]);
+          }
+        }
+        intersects=intersects_unique;
+      }
+
+      if(intersects.length%2===1){
+        result=true;
+      }else{
+        result=false;
+      }
+      this.material.side=side_bak;
+    }
+    return result;
+  },
+
 	setDrawMode: function ( value ) {
 
 		this.drawMode = value;
