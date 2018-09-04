@@ -986,7 +986,7 @@ THREE.VRMLLoader.prototype = {
 
 						}
 
-						if (normals.length > 0) {
+						if ( normals.length > 0 ) {
 
 							geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
