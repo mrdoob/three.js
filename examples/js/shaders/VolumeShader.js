@@ -6,8 +6,8 @@
 
 THREE.ShaderLib[ 'volumerender1' ] = {
 	uniforms: {
-		"u_size": { value: [1, 1, 1] },
-		"u_renderstyle": { value: 0 },
+        "u_size": { value: [1, 1, 1] },
+        "u_renderstyle": { value: 0 },
         "u_renderthreshold": { value: 0.5 },
         "u_clim": { value: [0.0, 1.0] }
     },
