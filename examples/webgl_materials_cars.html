@@ -368,9 +368,9 @@
 				camera.position.lerp( cameraTarget, delta * damping );
 				camera.lookAt( carModel.position );
 
-      }
+			}
 
-      function resetPosition() {
+			function resetPosition() {
 
 				if( carModel.position.distanceTo( origin ) > 1200 ) {
 
@@ -386,7 +386,7 @@
 
 				}
 
-      }
+			}
 
 			init();
 
