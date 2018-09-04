@@ -125,7 +125,7 @@
 								  }
 
 				// Material (shaders) to render the volume using raycasting
-				var volmaterial = new THREE.ShaderMaterial( THREE.ShaderLib['volumerender1'] );
+				var volmaterial = new THREE.ShaderMaterial( THREE.VolumeRenderShader1 );
 				volmaterial.side = THREE.BackSide;  // The volume shader uses the backface as its "reference point"
 
 				// Apply standard volume material uniform info

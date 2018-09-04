@@ -1,10 +1,12 @@
-// Author: Almar Klein
-// Description: Shaders to render 3D volumes using raycasting.
-// The applied techniques are based on similar implementations in the Visvis and Vispy projects.
-// This is not the only approach, therefore it's marked 1.
+/**
+ * @author Almar Klein / http://almarklein.org
+ *
+ * Shaders to render 3D volumes using raycasting.
+ * The applied techniques are based on similar implementations in the Visvis and Vispy projects.
+ * This is not the only approach, therefore it's marked 1.
+ */
 
-
-THREE.ShaderLib[ 'volumerender1' ] = {
+THREE.VolumeRenderShader1 = {
 	uniforms: {
         "u_size": { value: [1, 1, 1] },
         "u_renderstyle": { value: 0 },
