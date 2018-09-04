@@ -20,6 +20,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 	var planeCamera, planeMesh;
 	var boxMesh;
 
+	var tonemapping;
+
 	function render( renderList, scene, camera, forceClear ) {
 
 		var background = scene.background;
@@ -86,6 +88,19 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
 				);
 
+				planeMesh.onBeforeRender = function ( renderer ) {
+
+					tonemapping = renderer.toneMapping;
+					renderer.toneMapping = THREE.NoToneMapping;
+
+				};
+
+				planeMesh.onAfterRender = function ( renderer ) {
+
+					renderer.toneMapping = tonemapping;
+
+				};
+
 				objects.update( planeMesh );
 
 			}
@@ -94,7 +109,9 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			// TODO Push this to renderList
 
+			planeMesh.onBeforeRender( renderer );
 			renderer.renderBufferDirect( planeCamera, null, planeMesh.geometry, planeMesh.material, planeMesh, null );
+			planeMesh.onAfterRender( renderer );
 
 		}
 
