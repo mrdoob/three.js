@@ -3,9 +3,9 @@
  * @author Lewy Blue https://github.com/looeee
  *
  * The model is expected to follow real world car proportions. You can try unusual car types
- * but your results may be unexpected. Scaled models are also not supported
+ * but your results may be unexpected. Scaled models are also not supported.
  *
- * Defaults below are for a Ferrari F50, taken from https://en.wikipedia.org/wiki/Ferrari_F50
+ * Defaults are rough estimates for a real world scale car model
  *
  */
 
@@ -56,11 +56,11 @@ THREE.Car = ( function ( ) {
 		this.enabled = true;
 
 		this.elemNames = {
-			flWheel: 'wheelFrontLeft',
-			frWheel: 'wheelFrontRight',
-			rlWheel: 'wheelBackLeft',
-			rrWheel: 'wheelBackRight',
-			steeringWheel: null, // disabled by default
+			flWheel: 'wheel_fl',
+			frWheel: 'wheel_fr',
+			rlWheel: 'wheel_rl',
+			rrWheel: 'wheel_rr',
+			steeringWheel: 'steering_wheel', // set to null to disable
 		};
 
 		// km/hr
@@ -68,11 +68,11 @@ THREE.Car = ( function ( ) {
 		maxSpeedReverse = - this.maxSpeed * 0.25;
 
 		// m/s
-		this.acceleration = acceleration || 12;
+		this.acceleration = acceleration || 10;
 		accelerationReverse = this.acceleration * 0.5;
 
 		// metres
-		this.turningRadius = turningRadius || 24;
+		this.turningRadius = turningRadius || 6;
 
 		// m/s
 		deceleration = this.acceleration * 2;
@@ -81,16 +81,15 @@ THREE.Car = ( function ( ) {
 		this.brakePower = brakePower || 10;
 
 		// exposed so that a user can use this for various effect, e.g blur
-		// km / hr
 		this.speed = 0;
 
 		// keys used to control car - by default the arrow keys and space to brake
 		controlKeys = keys || controlKeys;
 
-		// local axes of rotation
+		// local axes of rotation - these are likely to vary between models
 		this.wheelRotationAxis = 'x';
 		this.wheelTurnAxis = 'z';
-		this.steeringWheelTurnAxis = 'z';
+		this.steeringWheelTurnAxis = 'y';
 
 		document.addEventListener( 'keydown', this.onKeyDown, false );
 		document.addEventListener( 'keyup', this.onKeyUp, false );
