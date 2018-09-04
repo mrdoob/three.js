@@ -218,6 +218,7 @@ THREE.VRMLLoader.prototype = {
 						break;
 
 					case 'point':
+					case 'vector':
 						scope.recordingFieldname = fieldName;
 						scope.isRecordingPoints = true;
 						scope.points = [];
@@ -290,6 +291,22 @@ THREE.VRMLLoader.prototype = {
 					if ( node.nodeType == 'Coordinate' ) {
 
 						while ( null !== ( parts = float3_pattern.exec( line ) ) ) {
+
+							point = {
+								x: parseFloat( parts[ 1 ] ),
+								y: parseFloat( parts[ 2 ] ),
+								z: parseFloat( parts[ 3 ] )
+							};
+
+							scope.points.push( point );
+
+						}
+
+					}
+
+					if ( node.nodeType == 'Normal' ) {
+
+  						while ( null !== ( parts = float3_pattern.exec( line ) ) ) {
 
 							point = {
 								x: parseFloat( parts[ 1 ] ),
@@ -793,9 +810,10 @@ THREE.VRMLLoader.prototype = {
 						var geometry = new THREE.BufferGeometry();
 
 						var positions = [];
+						var normals = [];
 						var uvs = [];
 
-						var position, uv;
+						var position, normal, uv;
 
 						var i, il, j, jl;
 
@@ -813,6 +831,23 @@ THREE.VRMLLoader.prototype = {
 
 										uv = child.points[ j ];
 										uvs.push( uv.x, uv.y );
+
+									}
+
+								}
+
+							}
+
+							// normals
+
+							if ( child.nodeType === 'Normal' ) {
+
+								if ( child.points ) {
+
+									for ( j = 0, jl = child.points.length; j < jl; j ++ ) {
+
+										normal = child.points[ j ];
+										normals.push( normal.x, normal.y, normal.z );
 
 									}
 
@@ -862,9 +897,11 @@ THREE.VRMLLoader.prototype = {
 						if ( data.coordIndex ) {
 
 							var newPositions = [];
+							var newNormals = [];
 							var newUvs = [];
 
 							position = new THREE.Vector3();
+							normal = new THREE.Vector3();
 							uv = new THREE.Vector2();
 
 							for ( i = 0, il = data.coordIndex.length; i < il; i ++ ) {
@@ -886,19 +923,33 @@ THREE.VRMLLoader.prototype = {
 									// create non indexed geometry, necessary for face normal generation
 
 									position.fromArray( positions, i1 * 3 );
-									uv.fromArray( uvs, i1 * 2 );
 									newPositions.push( position.x, position.y, position.z );
-									newUvs.push( uv.x, uv.y );
-
 									position.fromArray( positions, i2 * 3 );
-									uv.fromArray( uvs, i2 * 2 );
 									newPositions.push( position.x, position.y, position.z );
-									newUvs.push( uv.x, uv.y );
-
 									position.fromArray( positions, i3 * 3 );
-									uv.fromArray( uvs, i3 * 2 );
 									newPositions.push( position.x, position.y, position.z );
-									newUvs.push( uv.x, uv.y );
+
+									if ( uvs.length > 0 ) {
+
+										uv.fromArray( uvs, i1 * 2 );
+										newUvs.push( uv.x, uv.y );
+										uv.fromArray( uvs, i2 * 2 );
+										newUvs.push( uv.x, uv.y );
+										uv.fromArray( uvs, i3 * 2 );
+										newUvs.push( uv.x, uv.y );
+
+									}
+
+									if ( normals.length > 0 ) {
+
+										normal.fromArray( normals, i1 * 3 );
+										newNormals.push( normal.x, normal.y, normal.z );
+										normal.fromArray( normals, i2 * 3 );
+										newNormals.push( normal.x, normal.y, normal.z );
+										normal.fromArray( normals, i3 * 3 );
+										newNormals.push( normal.x, normal.y, normal.z );
+
+									}
 
 									skip ++;
 
@@ -907,6 +958,7 @@ THREE.VRMLLoader.prototype = {
 							}
 
 							positions = newPositions;
+							normals = newNormals;
 							uvs = newUvs;
 
 						} else {
@@ -934,7 +986,16 @@ THREE.VRMLLoader.prototype = {
 
 						}
 
-						geometry.computeVertexNormals();
+						if ( normals.length > 0 ) {
+
+							geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+
+						} else {
+
+							geometry.computeVertexNormals();
+
+						}
+
 						geometry.computeBoundingSphere();
 
 						// see if it's a define
