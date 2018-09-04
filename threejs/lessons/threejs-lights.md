@@ -255,7 +255,7 @@ of helper objects we can add to our scene to help visualize
 invisible parts of a scene. In this case we'll use the
 `DirectionalLightHelper` which will draw a plane, to represent
 the light, and a line from the light to the target. We just
-pass it the light and add it to the scene.
+pass it the light and add itd add it to the scene.
 
 ```javascript
 const helper = new THREE.DirectionalLightHelper(light);
@@ -286,7 +286,11 @@ Then we can use that for both the light's position
 and the target's position like this
 
 ```javascript
-+const onChange = helper.update.bind(helper);
++const onChange = () => {
++  light.target.updateMatrixWorld();
++  helper.update();
++};
++onChange();
 
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
@@ -328,7 +332,17 @@ Let's also switch to a `PointLightHelper`
 -const helper = new THREE.DirectionalLightHelper(light);
 +const helper = new THREE.PointLightHelper(light);
 scene.add(helper);
-helper.update();
+```
+
+and as there is no target the `onChange` function can be simpler.
+
+```javascript
+-const onChange = () => {
+-  light.target.updateMatrixWorld();
+-  helper.update();
+-};
+-onChange();
++const onChange = helper.update.bind(helper);
 ```
 
 Note that at some level a `PointLightHelper` has no um, point.
@@ -384,7 +398,6 @@ scene.add(light.target);
 -const helper = new THREE.DirectionalLightHelper(light);
 +const helper = new THREE.SpotLightHelper(light);
 scene.add(helper);
-helper.update();
 ```
 
 The spotlight's cone's angle is set with the [`angle`](Spotlight.angle)

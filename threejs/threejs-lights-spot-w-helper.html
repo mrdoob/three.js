@@ -65,7 +65,8 @@ function main() {
     const mesh = new THREE.Mesh(planeGeo, planeMat);
     mesh.rotation.x = Math.PI * -.5;
     scene.add(mesh);
-  }  {
+  }
+  {
     const cubeSize = 4;
     const cubeGeo = new THREE.BoxBufferGeometry(cubeSize, cubeSize, cubeSize);
     const cubeMat = new THREE.MeshPhongMaterial({color: '#8AC'});
@@ -130,8 +131,11 @@ function main() {
     const helper = new THREE.SpotLightHelper(light);
     scene.add(helper);
 
-    const onChange = helper.update.bind(helper);
-    setTimeout(onChange);
+    const onChange = () => {
+      light.target.updateMatrixWorld();
+      helper.update();
+    };
+    onChange();
 
     const gui = new dat.GUI();
     gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
