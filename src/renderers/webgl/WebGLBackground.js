@@ -2,11 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BackSide } from '../../constants.js';
-import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
+import { BackSide, FrontSide } from '../../constants.js';
 import { BoxBufferGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
-import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
@@ -17,7 +15,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 	var clearColor = new Color( 0x000000 );
 	var clearAlpha = 0;
 
-	var planeCamera, planeMesh;
+	var planeMesh;
 	var boxMesh;
 
 	function render( renderList, scene, camera, forceClear ) {
@@ -77,24 +75,30 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		} else if ( background && background.isTexture ) {
 
-			if ( planeCamera === undefined ) {
-
-				planeCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+			if ( planeMesh === undefined ) {
 
 				planeMesh = new Mesh(
 					new PlaneBufferGeometry( 2, 2 ),
-					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
+					new ShaderMaterial( {
+						uniforms: ShaderLib.background.uniforms,
+						vertexShader: ShaderLib.background.vertexShader,
+						fragmentShader: ShaderLib.background.fragmentShader,
+						side: FrontSide,
+						depthTest: true,
+						depthWrite: false,
+						fog: false
+					} )
 				);
+
+				planeMesh.geometry.removeAttribute( 'normal' );
 
 				objects.update( planeMesh );
 
 			}
 
-			planeMesh.material.map = background;
+			planeMesh.material.uniforms.t2D.value = background;
 
-			// TODO Push this to renderList
-
-			renderer.renderBufferDirect( planeCamera, null, planeMesh.geometry, planeMesh.material, planeMesh, null );
+			renderList.push( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
 
 		}
 

@@ -88,6 +88,8 @@ import uv2_pars_vertex from './ShaderChunk/uv2_pars_vertex.glsl';
 import uv2_vertex from './ShaderChunk/uv2_vertex.glsl';
 import worldpos_vertex from './ShaderChunk/worldpos_vertex.glsl';
 
+import background_frag from './ShaderLib/background_frag.glsl';
+import background_vert from './ShaderLib/background_vert.glsl';
 import cube_frag from './ShaderLib/cube_frag.glsl';
 import cube_vert from './ShaderLib/cube_vert.glsl';
 import depth_frag from './ShaderLib/depth_frag.glsl';
@@ -208,6 +210,8 @@ export var ShaderChunk = {
 	uv2_vertex: uv2_vertex,
 	worldpos_vertex: worldpos_vertex,
 
+	background_frag: background_frag,
+	background_vert: background_vert,
 	cube_frag: cube_frag,
 	cube_vert: cube_vert,
 	depth_frag: depth_frag,
