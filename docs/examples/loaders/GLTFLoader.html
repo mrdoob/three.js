@@ -156,11 +156,12 @@
 		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
 		</p>
 
-		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
+		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or <em>JSON</em> string.<br />
 		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />
 		[page:Function onLoad] — A function to be called when parse completes.<br />
+		[page:Function onProgress] — A function to be called while loading is in progress, and new bytes are loaded.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</p>
 		<p>

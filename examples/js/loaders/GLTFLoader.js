@@ -101,6 +101,15 @@ THREE.GLTFLoader = ( function () {
 			var content;
 			var extensions = {};
 
+			if ( onProgress && onError === undefined ) {
+
+				console.warn( 'THREE.GLTFLoader: .parse() parameters have changed, callback order is now "onLoad, onProgress, onError".' );
+
+				onError = onProgress;
+				onProgress = undefined;
+
+			}
+
 			if ( typeof data === 'string' ) {
 
 				content = data;
@@ -184,16 +193,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			var parser = new GLTFParser( json, extensions, {
-
-				path: path || this.path || '',
-				crossOrigin: this.crossOrigin,
-				manager: this.manager,
-				onProgress: onProgress
-
-			} );
-
-			parser.parse( function ( scene, scenes, cameras, animations, json ) {
+			var parserOnLoad = function ( scene, scenes, cameras, animations, json ) {
 
 				var glTF = {
 					scene: scene,
@@ -209,7 +209,20 @@ THREE.GLTFLoader = ( function () {
 
 				onLoad( glTF );
 
-			}, onError );
+			};
+
+			var parser = new GLTFParser( json, extensions, {
+
+				path: path || this.path || '',
+				crossOrigin: this.crossOrigin,
+				manager: this.manager,
+				onLoad: parserOnLoad,
+				onProgress: onProgress,
+				onError: onError
+
+			} );
+
+			parser.parse();
 
 		}
 
@@ -1574,9 +1587,11 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFParser.prototype.parse = function ( onLoad, onError ) {
+	GLTFParser.prototype.parse = function () {
 
 		var json = this.json;
+
+		var onLoad = ( this.options.onLoad !== undefined ) ? this.options.onLoad : function(){};
 
 		// Clear the loader cache
 		this.cache.removeAll();
@@ -1600,7 +1615,7 @@ THREE.GLTFLoader = ( function () {
 
 			onLoad( scene, scenes, cameras, animations, json );
 
-		} ).catch( onError );
+		} ).catch( this.options.onError );
 
 	};
 
