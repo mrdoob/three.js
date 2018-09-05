@@ -11,15 +11,15 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Create a AudioAnalyser object, which uses an [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]
-			to analyse audio data.<br /><br />
+			创建AudioAnalyser对象, 使用[link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]
+			去分析音频数据.<br /><br />
 
-			This uses the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+			使用了 [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
 
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<p>
 			[example:webaudio_sandbox webaudio / sandbox ]</br>
@@ -51,48 +51,48 @@
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( audio, [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize fftSize] )</h3>
 		<p>
-		Create a new [page:AudioAnalyser AudioAnalyser].
+		创建[page:AudioAnalyser AudioAnalyser].
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:AnalyserNode analyser]</h3>
-		<p>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode] used to analyze audio.</p>
+		<p>[link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]用来分析音频数据.</p>
 
 		<h3>[property:Integer fftSize]</h3>
 		<p>
-		A non-zero power of two up to 2048, representing the size of the FFT (Fast Fourier Transform) to be used to determine the frequency domain.
-		See [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize this page] for details.
+		2的幂次方最高为2048, 用来表示确定频域的FFT (傅立叶变换)大小.
+		这个[link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize page]有详细信息.
 		</p>
 
 		<h3>[property:Uint8Array data]</h3>
 		<p>
-		A Uint8Array with size determined by [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/frequencyBinCount analyser.frequencyBinCount]
-		used to hold analysis data.
+		用来分析数据的Uint8Array的大小由[link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/frequencyBinCount analyser.frequencyBinCount]
+		确定.
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:Uint8Array getFrequencyData]()</h3>
 		<p>
-		Uses the Web Audio's [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getByteFrequencyData getByteFrequencyData] method.
-		See that page.
+		使用网络音频的[link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getByteFrequencyData getByteFrequencyData] 方法.
+		看这个页面.
 		</p>
 
 		<h3>[method:Number getAverageFrequency]()</h3>
 		<p>
-		Get the average of the frequencies returned by the [page:AudioAnalyser.getFrequencyData getFrequencyData] method.
+		通过方法[page:AudioAnalyser.getFrequencyData getFrequencyData]获取平均频率.
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
