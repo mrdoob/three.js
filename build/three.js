@@ -22505,13 +22505,6 @@
 
 		};
 
-		this.clearTarget = function ( renderTarget, color, depth, stencil ) {
-
-			this.setRenderTarget( renderTarget );
-			this.clear( color, depth, stencil );
-
-		};
-
 		//
 
 		this.dispose = function () {
@@ -47007,6 +47000,14 @@
 	//
 
 	Object.assign( WebGLRenderer.prototype, {
+
+		clearTarget: function ( renderTarget, color, depth, stencil ) {
+
+			console.warn( 'THREE.WebGLRenderer: .clearTarget() has been deprecated. Use .setRenderTarget() and .clear() instead.' );
+			this.setRenderTarget( renderTarget );
+			this.clear( color, depth, stencil );
+
+		},
 
 		animate: function ( callback ) {
 
