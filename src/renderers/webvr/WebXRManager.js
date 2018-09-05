@@ -158,6 +158,9 @@ function WebXRManager( renderer ) {
 
 		if ( isPresenting() ) {
 
+			session.depthNear = camera.near;
+			session.depthFar = camera.far;
+
 			var parent = camera.parent;
 			var cameras = cameraVR.cameras;
 
