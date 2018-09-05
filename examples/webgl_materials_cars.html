@@ -49,11 +49,6 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -91,7 +86,7 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 200 );
 				camera.position.set( 3.25, 1.25, -5 );
 
 				controls = new THREE.OrbitControls( camera, container );
@@ -127,8 +122,8 @@
 				hemiLight.position.set( 0, 1, 0 );
 				scene.add( hemiLight );
 
-				shadowLight  = new THREE.DirectionalLight( 0xffffff, 0.1 );
-				shadowLight.position.set( -1.5, 1.5, 1.5 );
+				shadowLight  = new THREE.DirectionalLight( 0xffffee, 0.1 );
+				shadowLight.position.set( -1.5, 1.25, -1.5 );
 				shadowLight.castShadow = true;
 				shadowLight.shadow.width = 512;
 				shadowLight.shadow.height = 512;
@@ -192,8 +187,6 @@
 							child.receiveShadow = true;
 							child.material.envMap = envMap;
 
-							console.log( child.material );
-
 						}
 
 					} );
@@ -237,19 +230,19 @@
 					main: [
 
 						new THREE.MeshStandardMaterial( { color: 0xff4400, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'orange' } ),
-						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'blue' } ),
-						new THREE.MeshStandardMaterial( { color: 0x880000, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'red' } ),
+						new THREE.MeshStandardMaterial( { color: 0x001166, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'blue' } ),
+						new THREE.MeshStandardMaterial( { color: 0x990000, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'red' } ),
 						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.9, roughness: 0.5, name: 'black' } ),
 						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.9, roughness: 0.5, name: 'white' } ),
-						new THREE.MeshStandardMaterial( { color: 0x666666, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'metallic' } ),
+						new THREE.MeshStandardMaterial( { color: 0x555555, envMap: envMap, envMapIntensity: 2.0, metalness: 1.0, roughness: 0.2, name: 'metallic' } ),
 
 					],
 
 					glass: [
 
-						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.1, transparent: true, name: 'clear', premultipliedAlpha: true } ),
-						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.1, transparent: true, name: 'smoked', premultipliedAlpha: true } ),
-						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.1, transparent: true, name: 'blue', premultipliedAlpha: true } ),
+						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.15, transparent: true, premultipliedAlpha: true, name: 'clear' } ),
+						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.15, transparent: true, premultipliedAlpha: true, name: 'smoked' } ),
+						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.15, transparent: true, premultipliedAlpha: true, name: 'blue' } ),
 
 					],
 
