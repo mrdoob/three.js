@@ -95,10 +95,10 @@ objects.
 -const fov = 75;
 +const fov = 40;
 const aspect = 2;  // the canvas default
-const zNear = 0.1;
--const zFar = 5;
-+const zFar = 1000;
-const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
+const near = 0.1;
+-const far = 5;
++const far = 1000;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 -camera.position.z = 2;
 +camera.position.z = 120;
 ```

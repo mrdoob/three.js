@@ -70,9 +70,9 @@ Next up we need a camera.
 ```
 const fov = 75;
 const aspect = 2;  // the canvas default
-const zNear = 0.1;
-const zFar = 5;
-const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
+const near = 0.1;
+const far = 5;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 ```
 
 `fov` is short for `field of view`. In this case 75 degrees in the vertical
@@ -83,7 +83,7 @@ reason the perspective camera takes degrees.
 in another article but by default a canvas is 300x150 pixels which makes
 the aspect 300/150 or 2.
 
-`zNear` and `zFar` represent the space in front of the camera
+`near` and `far` represent the space in front of the camera
 that will be rendered. Anything before that range or after that range
 will be clipped (not drawn).
 
@@ -94,7 +94,7 @@ cube, prism, frustum.
 
 <img src="resources/frustum-3d.svg" width="500" class="threejs_center"/>
 
-The height of the zNear and zFar planes are determined by the field of view.
+The height of the near and far planes are determined by the field of view.
 The width of both planes is determined by the field of view and the aspect.
 
 Anything inside the defined frustum will be be drawn. Anything outside

@@ -57,11 +57,11 @@
             <path d="M268.458,558.348C288.79,525.842 354.8,502 433,502C511.2,502 577.21,525.842 597.542,558.348C552.951,545.022 495.572,537 433,537C370.428,537 313.049,545.022 268.458,558.348Z" style="stroke:rgb(146,146,146);stroke-width:3.56px;"/>
         </g>
     </g>
-    <g transform="matrix(0.451826,0.00669686,-0.00669686,0.451826,-756.233,-852.788)">
-        <text x="1932.37px" y="2074.34px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:101.279px;fill:rgb(0,59,255);">zFar</text>
+    <g transform="matrix(0.451826,0.00669686,-0.00669686,0.451826,-703.233,-850.788)">
+        <text x="1932.37px" y="2074.34px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:101.279px;fill:rgb(0,59,255);">far</text>
     </g>
-    <g transform="matrix(0.451826,0.00669686,-0.00669686,0.451826,-831.517,-741.628)">
-        <text x="1932.37px" y="2074.34px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:101.279px;fill:rgb(42,170,74);">zNear</text>
+    <g transform="matrix(0.451826,0.00669686,-0.00669686,0.451826,-803.517,-741.628)">
+        <text x="1932.37px" y="2074.34px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:101.279px;fill:rgb(42,170,74);">near</text>
     </g>
     <g transform="matrix(0.451826,0.00669686,-0.00669686,0.451826,-585.526,-533.656)">
         <text x="1932.37px" y="2074.34px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:101.279px;fill:rgb(255,0,48);">fov</text>

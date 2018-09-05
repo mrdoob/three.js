@@ -150,12 +150,12 @@ We can then add it like this
   scene.background = new THREE.Color(color);
 +
 +  const fogGUIHelper = new FogGUIHelper(scene.fog);
-+  gui.add(fogGUIHelper, 'near', zNear, zFar).listen();
-+  gui.add(fogGUIHelper, 'far', zNear, zFar).listen();
++  gui.add(fogGUIHelper, 'near', near, far).listen();
++  gui.add(fogGUIHelper, 'far', near, far).listen();
 }
 ```
 
-The `zNear` and `zFar` parameter set the minimum and maximum values
+The `near` and `far` parameter set the minimum and maximum values
 for adjusting the fog. They are set when we setup the camera.
 
 The `.listen()` at the end of the last 2 lines tells dat.GUI to *listen*
@@ -222,8 +222,8 @@ We then call `gui.addColor` to add a color UI for our helper's virutal property.
   scene.background = new THREE.Color(color);
 
 *  const fogGUIHelper = new FogGUIHelper(scene.fog, scene.background);
-  gui.add(fogGUIHelper, 'near', zNear, zFar).listen();
-  gui.add(fogGUIHelper, 'far', zNear, zFar).listen();
+  gui.add(fogGUIHelper, 'near', near, far).listen();
+  gui.add(fogGUIHelper, 'far', near, far).listen();
 +  gui.addColor(fogGUIHelper, 'color');
 }
 ```

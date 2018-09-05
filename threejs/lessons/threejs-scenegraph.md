@@ -94,7 +94,7 @@ camera. For most situations positive Y being up is good enough but since
 we are looking straight down we need to tell the camera that positive Z is up.
 
 ```
-const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.set(0, 50, 0);
 camera.up.set(0, 0, 1);
 camera.lookAt(0, 0, 0);

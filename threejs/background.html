@@ -42,9 +42,9 @@ function main() {
 
   const aspect = 2;  // the canvas default
   const fov = 35;
-  const zNear = 0.1;
-  const zFar = 5000;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
+  const near = 0.1;
+  const far = 5000;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.x = -0.;
   camera.position.y = 350;
   camera.position.z = 40.;

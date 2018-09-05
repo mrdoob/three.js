@@ -33,9 +33,9 @@ function main() {
 
   const fov = 75;
   const aspect = 2;  // the canvas default
-  const zNear = 0.1;
-  const zFar = 5;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
+  const near = 0.1;
+  const far = 5;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.z = 2;
 
   const scene = new THREE.Scene();
@@ -81,8 +81,8 @@ function main() {
     scene.background = new THREE.Color(color);
 
     const fogGUIHelper = new FogGUIHelper(scene.fog, scene.background);
-    gui.add(fogGUIHelper, 'near', zNear, zFar).listen();
-    gui.add(fogGUIHelper, 'far', zNear, zFar).listen();
+    gui.add(fogGUIHelper, 'near', near, far).listen();
+    gui.add(fogGUIHelper, 'far', near, far).listen();
     gui.addColor(fogGUIHelper, 'color');
   }
 

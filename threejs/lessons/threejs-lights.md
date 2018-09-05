@@ -16,9 +16,9 @@ and we'll move the camera 10 units up and 20 units back from the origin
 ```javascript
 *const fov = 45;
 const aspect = 2;  // the canvas default
-const zNear = 0.1;
-*const zFar = 100;
-const camera = new THREE.PerspectiveCamera(fov, aspect, zNear, zFar);
+const near = 0.1;
+*const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 ```
 
