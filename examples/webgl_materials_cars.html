@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - cube reflection [cars]</title>
+		<title>three.js webgl - materials - car</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -20,7 +20,7 @@
 				z-index: 100;
 			}
 			#info a {
-				color: red;
+				color: blue;
 				font-weight: bold;
 			}
 		</style>
@@ -100,31 +100,38 @@
 				controls.target.set( 0, 0.75, 0 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 80 );
+				scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
 
-				scene.background = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/skybox/')
+				envMap = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/skyboxsun25deg/')
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2400, 2400 ), new THREE.MeshStandardMaterial( { color: 0xffffff, metalness: 0, roughness: 1 } ) );
+				scene.background = envMap;
+
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 2400, 2400 ),
+					new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.15, depthWrite: false }
+				) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
+				ground.renderOrder = 1;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 2400, 120, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 2400, 240, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
+				grid.material.depthWrite = false;
 				grid.material.transparent = true;
 				scene.add( grid );
 
-				var hemiLight = new THREE.HemisphereLight( 0xfefeb4, 0x99ccff, 0.3 );
-				hemiLight.position.set( -1.5, 1.5, 1.5 );
+				var hemiLight = new THREE.HemisphereLight( 0x7c849b, 0xd7cbb1, 0.1 );
+				hemiLight.position.set( 0, 1, 0 );
 				scene.add( hemiLight );
 
-				shadowLight  = new THREE.DirectionalLight( 0xffffff, 0.3 );
+				shadowLight  = new THREE.DirectionalLight( 0xffffff, 0.1 );
 				shadowLight.position.set( -1.5, 1.5, 1.5 );
 				shadowLight.castShadow = true;
-				shadowLight.shadow.width = 1024;
-				shadowLight.shadow.height = 1024;
+				shadowLight.shadow.width = 512;
+				shadowLight.shadow.height = 512;
 				shadowLight.shadow.camera.top = 2;
 				shadowLight.shadow.camera.bottom = -2;
 				shadowLight.shadow.camera.left = -2.5;
@@ -146,6 +153,8 @@
 				container.appendChild( stats.dom );
 
 				initCar();
+				initMaterials();
+				initMaterialSelectionMenus();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -159,37 +168,6 @@
 
 			}
 
-			var genCubeUrls = function( prefix, postfix ) {
-				return [
-					prefix + 'px' + postfix, prefix + 'nx' + postfix,
-					prefix + 'py' + postfix, prefix + 'ny' + postfix,
-					prefix + 'pz' + postfix, prefix + 'nz' + postfix
-				];
-			};
-
-			var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
-			new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
-
-				var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-				pmremGenerator.update( renderer );
-
-				var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-				pmremCubeUVPacker.update( renderer );
-
-				var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-				envMap = hdrCubeRenderTarget.texture;
-
-				initMaterials();
-				initMaterialSelectionMenus();
-
-				hdrCubeMap.dispose();
-				pmremGenerator.dispose();
-				pmremCubeUVPacker.dispose();
-
-			} );
-
-
 			function initCar() {
 
 				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
@@ -197,7 +175,7 @@
 				var loader = new THREE.GLTFLoader();
 				loader.setDRACOLoader( new THREE.DRACOLoader() );
 
-				loader.load( 'models/fbx/ferrari.glb', function( gltf ) {
+				loader.load( 'models/gltf/ferrari.glb', function( gltf ) {
 
 					carModel = gltf.scene.children[ 0 ];
 
@@ -208,15 +186,26 @@
 
 					carModel.traverse( function ( child ) {
 
-						if ( child.isMesh ) {
+						if ( child.isMesh  ) {
 
 							child.castShadow = true;
 							child.receiveShadow = true;
 							child.material.envMap = envMap;
 
+							console.log( child.material );
+
 						}
 
 					} );
+
+					// shadow
+					var texture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
+					var shadow = new THREE.Mesh(
+						new THREE.PlaneBufferGeometry( 0.655 * 4, 1.3 * 4 ).rotateX( - Math.PI / 2 ),
+						new THREE.MeshBasicMaterial( { map: texture, opacity: 0.8, transparent: true } )
+					);
+					shadow.renderOrder = 2;
+					carModel.add( shadow );
 
 					scene.add( carModel );
 
@@ -247,20 +236,20 @@
 
 					main: [
 
-						new THREE.MeshStandardMaterial( { color: 0xff6600, envMap: envMap, metalness: 0.25, roughness: 0.15, name: 'orange' } ),
-						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.25, roughness: 0.15, name: 'blue' } ),
-						new THREE.MeshStandardMaterial( { color: 0x660000, envMap: envMap, metalness: 0.25, roughness: 0.15, name: 'red' } ),
-						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 1, roughness: 0, name: 'black' } ),
-						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.25, roughness: 0.15, name: 'white' } ),
-						new THREE.MeshStandardMaterial( { color: 0xcccccc, envMap: envMap, metalness: 1, roughness: 0, name: 'metallic' } ),
+						new THREE.MeshStandardMaterial( { color: 0xff4400, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'orange' } ),
+						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'blue' } ),
+						new THREE.MeshStandardMaterial( { color: 0x880000, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'red' } ),
+						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.9, roughness: 0.5, name: 'black' } ),
+						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.9, roughness: 0.5, name: 'white' } ),
+						new THREE.MeshStandardMaterial( { color: 0x666666, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'metallic' } ),
 
 					],
 
 					glass: [
 
-						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.0, roughness: 0.25, opacity: 0.5, transparent: true, refractionRatio: 0.25, name: 'clear'} ),
-						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0, roughness: 0.25, opacity: 0.75, transparent: true, refractionRatio: 0.75, name: 'smoked' } ),
-						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0, roughness: 0.25, opacity: 0.5, transparent: true, refractionRatio: 0.75, name: 'blue' } ),
+						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.1, transparent: true, name: 'clear', premultipliedAlpha: true } ),
+						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.1, transparent: true, name: 'smoked', premultipliedAlpha: true } ),
+						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.1, transparent: true, name: 'blue', premultipliedAlpha: true } ),
 
 					],
 
