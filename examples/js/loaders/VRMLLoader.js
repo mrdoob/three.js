@@ -210,6 +210,7 @@ THREE.VRMLLoader.prototype = {
 						scope.angles = [];
 						break;
 
+					case 'color':
 					case 'skyColor':
 					case 'groundColor':
 						scope.recordingFieldname = fieldName;
@@ -224,7 +225,9 @@ THREE.VRMLLoader.prototype = {
 						scope.points = [];
 						break;
 
+					case 'colorIndex':
 					case 'coordIndex':
+					case 'normalIndex':
 					case 'texCoordIndex':
 						scope.recordingFieldname = fieldName;
 						scope.isRecordingFaces = true;
@@ -446,6 +449,7 @@ THREE.VRMLLoader.prototype = {
 						case 'transparency':
 						case 'shininess':
 						case 'ambientIntensity':
+						case 'creaseAngle':
 							if ( parts.length !== 2 ) {
 
 								console.warn( 'THREE.VRMLLoader: Invalid single float value specification detected for %s.', fieldName );
@@ -810,10 +814,11 @@ THREE.VRMLLoader.prototype = {
 						var geometry = new THREE.BufferGeometry();
 
 						var positions = [];
+						var colors = [];
 						var normals = [];
 						var uvs = [];
 
-						var position, normal, uv;
+						var position, color, normal, uv;
 
 						var i, il, j, jl;
 
@@ -848,6 +853,23 @@ THREE.VRMLLoader.prototype = {
 
 										normal = child.points[ j ];
 										normals.push( normal.x, normal.y, normal.z );
+
+									}
+
+								}
+
+							}
+
+							// colors
+
+							if ( child.nodeType === 'Color' ) {
+
+								if ( child.color ) {
+
+									for ( j = 0, jl = child.color.length; j < jl; j ++ ) {
+
+										color = child.color[ j ];
+										colors.push( color.r, color.g, color.b );
 
 									}
 
@@ -897,10 +919,12 @@ THREE.VRMLLoader.prototype = {
 						if ( data.coordIndex ) {
 
 							var newPositions = [];
+							var newColors = [];
 							var newNormals = [];
 							var newUvs = [];
 
 							position = new THREE.Vector3();
+							color = new THREE.Color();
 							normal = new THREE.Vector3();
 							uv = new THREE.Vector2();
 
@@ -928,6 +952,17 @@ THREE.VRMLLoader.prototype = {
 									newPositions.push( position.x, position.y, position.z );
 									position.fromArray( positions, i3 * 3 );
 									newPositions.push( position.x, position.y, position.z );
+
+									if ( colors.length > 0 ) {
+
+										color.fromArray( colors, i1 * 3 );
+										newColors.push( color.r, color.g, color.b );
+										color.fromArray( colors, i2 * 3 );
+										newColors.push( color.r, color.g, color.b );
+										color.fromArray( colors, i3 * 3 );
+										newColors.push( color.r, color.g, color.b );
+
+									}
 
 									if ( uvs.length > 0 ) {
 
@@ -958,6 +993,7 @@ THREE.VRMLLoader.prototype = {
 							}
 
 							positions = newPositions;
+							colors = newColors;
 							normals = newNormals;
 							uvs = newUvs;
 
@@ -979,6 +1015,12 @@ THREE.VRMLLoader.prototype = {
 						geometry.solid = data.solid;
 
 						geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+
+						if ( colors.length > 0 ) {
+
+							geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+						}
 
 						if ( uvs.length > 0 ) {
 
