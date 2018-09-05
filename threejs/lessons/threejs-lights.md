@@ -569,7 +569,7 @@ It's important to note each light you add to scene slows down how fast
 three.js renders the scene so you should always try to use as few as
 possible to achieve your goals. 
 
-Next up let's go over [how to render shadows](threejs-shadows.html).
+Next up let's go over [dealing with cameras](threejs-cameras.html).
 
 <canvas id="c"></canvas>
 <script src="../resources/threejs/r94/three.min.js"></script>
