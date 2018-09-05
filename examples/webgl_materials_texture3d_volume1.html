@@ -49,7 +49,7 @@
 
 	<script src="../build/three.js"></script>
 
-	<script src="js/controls/TrackballControls.js"></script>
+	<script src="js/controls/OrthographicTrackballControls.js"></script>
 
 	<script src="js/Volume.js"></script>
 	<script src="js/VolumeSlice.js"></script>
@@ -93,6 +93,7 @@
 			this.camera.bottom = -this.camera.top;
 			this.camera.near = 0.1;
 			this.camera.far = 5000;
+
 			this.camera.updateProjectionMatrix();
 
 			scene = new THREE.Scene();
@@ -199,7 +200,7 @@
 			document.body.appendChild( container );
 			container.appendChild( renderer.domElement );
 
-			controls = new THREE.TrackballControls( camera, renderer.domElement );
+			controls = new THREE.OrthographicTrackballControls( camera, renderer.domElement );
 			controls.rotateSpeed = 5.0;
 			controls.zoomSpeed = 5;
 			controls.panSpeed = 2;
