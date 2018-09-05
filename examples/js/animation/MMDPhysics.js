@@ -116,7 +116,7 @@ THREE.MMDPhysics = ( function () {
 
 			if ( isNonDefaultScale ) {
 
-				if ( parent !== null ) parent.parent = parent;
+				if ( parent !== null ) mesh.parent = parent;
 
 				mesh.scale.copy( scale );
 
