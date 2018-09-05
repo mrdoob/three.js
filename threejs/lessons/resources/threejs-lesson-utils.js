@@ -6,7 +6,11 @@ window.threejsLessonUtils = {
       return;
     }
     const canvas = document.querySelector('#c');
-    const renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true});
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      alpha: true,
+      powerPreference: 'low-power',
+    });
     this.pixelRatio = Math.max(2, window.devicePixelRatio);
 
     this.renderer = renderer;

@@ -894,7 +894,11 @@
         if (isWebGL) {
           setupLesson(this);
         }
-        const ctx = oldFn.apply(this, arguments);
+        const args = [].slice.apply(arguments);
+        args[1] = Object.assign({
+          powerPreference: 'low-power',
+        }, args[1]);
+        const ctx = oldFn.apply(this, args);
         if (!ctx && isWebGL) {
           showNeedWebGL(this);
         }
