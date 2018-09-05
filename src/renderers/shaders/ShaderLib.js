@@ -192,6 +192,16 @@ var ShaderLib = {
 
 	},
 
+	background: {
+
+		uniforms: {
+			t2D: { value: null },
+		},
+
+		vertexShader: ShaderChunk.background_vert,
+		fragmentShader: ShaderChunk.background_frag
+
+	},
 	/* -------------------------------------------------------------------------
 	//	Cube map shader
 	 ------------------------------------------------------------------------- */
