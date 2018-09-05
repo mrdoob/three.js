@@ -13,9 +13,6 @@
     "eslint-plugin-require-trailing-comma"
   ],
   "extends": "eslint:recommended",
-  "globals": {
-        "THREE": true
-  },
   "rules": {
     "no-alert": 2,
     "no-array-constructor": 2,

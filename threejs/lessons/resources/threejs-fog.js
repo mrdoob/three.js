@@ -1,6 +1,6 @@
 'use strict';
 
-/* global threejsLessonUtils */
+/* global THREE, threejsLessonUtils */
 
 {
   function fogExample(scene, fog) {

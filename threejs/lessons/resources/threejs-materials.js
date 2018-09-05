@@ -1,6 +1,6 @@
 'use strict';
 
-/* global threejsLessonUtils */
+/* global THREE, threejsLessonUtils */
 
 {
   function makeSphere(widthDivisions, heightDivisions) {

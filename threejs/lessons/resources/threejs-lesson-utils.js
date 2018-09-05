@@ -1,5 +1,7 @@
 'use strict';
 
+/* global THREE */
+
 window.threejsLessonUtils = {
   init() {
     if (this.renderer) {

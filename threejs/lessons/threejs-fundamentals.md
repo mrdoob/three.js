@@ -42,6 +42,8 @@ and pass it to three.js.
 <script>
 'use strict';
 
+/* global THREE */
+
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas: canvas});
