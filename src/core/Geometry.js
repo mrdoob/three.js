@@ -545,6 +545,58 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	computeAngleVertexNormals: function ( angle ) {
+
+		function weightedNormal( normals, vector ) {
+
+		  var normal = new THREE.Vector3();
+
+			for ( var i = 0; i < normals.length; i ++ ) {
+
+				if ( normals[ i ].angleTo( vector ) < angle ) {
+
+			  		normal.add( normals[ i ] );
+
+				}
+
+			}
+
+		  return normal.normalize();
+
+		}
+
+		this.computeFaceNormals();
+
+		var vertexNormals = this.vertices.map( () => [] );
+
+		for ( var i = 0; i < this.faces.length; i ++ ) {
+
+			var face = this.faces[ i ];
+
+			vertexNormals[ face.a ].push( face.normal );
+			vertexNormals[ face.b ].push( face.normal );
+			vertexNormals[ face.c ].push( face.normal );
+
+		}
+
+		for ( var i = 0; i < this.faces.length; i ++ ) {
+
+			var face = this.faces[ i ];
+
+			face.vertexNormals[ 0 ] = weightedNormal( vertexNormals[ face.a ], face.normal );
+			face.vertexNormals[ 1 ] = weightedNormal( vertexNormals[ face.b ], face.normal );
+			face.vertexNormals[ 2 ] = weightedNormal( vertexNormals[ face.c ], face.normal );
+
+		}
+
+		if ( this.faces.length > 0 ) {
+
+			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
 	computeMorphNormals: function () {
 
 		var i, il, f, fl, face;
