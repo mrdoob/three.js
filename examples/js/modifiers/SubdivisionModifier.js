@@ -19,29 +19,43 @@
 
 class MeshStructure {
 
-	constructor( geometry ) {
+	get geometry() {
 
-		this.geometry = geometry;
+		return this._geometry;
+
+	}
+
+	set geometry( geometry ) {
+
+		this._geometry = geometry;
 
 		this.connectingEdges = new Array( geometry.vertices.length );
 
-		this.edges = {};
-
-		var i, il, face;
-
-		for ( i = 0, il = geometry.vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = geometry.vertices.length; i < il; i ++ ) {
 
 			this.connectingEdges[ i ] = [];
 
 		}
 
-		for ( i = 0, il = geometry.faces.length; i < il; i ++ ) {
+	}
 
-			face = geometry.faces[ i ];
+	constructor( geometry ) {
 
-			this._processEdge( face.a, face.b, face );
-			this._processEdge( face.b, face.c, face );
-			this._processEdge( face.c, face.a, face );
+		this.edges = {};
+
+		if ( geometry !== undefined ) {
+
+			this.geometry = geometry;
+
+			for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
+
+				this.addFace( geometry.faces[ i ] );
+
+			}
+
+		} else {
+
+			this.connectingEdges = [];
 
 		}
 
@@ -50,7 +64,24 @@ class MeshStructure {
 	/////////////////////////////
 	// Private methods
 
-	_processEdge( a, b, face ) {
+	/////////////////////////////
+	// Public methods
+
+	getEdge( a, b ) {
+
+		return this.edges[ a + '_' + b ] || this.edges[ b + '_' + a ];
+
+	}
+
+	addFace( face ) {
+
+		this.addEdge( face.a, face.b, face );
+		this.addEdge( face.b, face.c, face );
+		this.addEdge( face.c, face.a, face );
+
+	}
+
+	addEdge( a, b, face ) {
 
 		var vertexIndexA = Math.min( a, b );
 		var vertexIndexB = Math.max( a, b );
@@ -67,9 +98,9 @@ class MeshStructure {
 
 			edge = {
 
-				a: this.geometry.vertices[ vertexIndexA ], // pointer reference
-				b: this.geometry.vertices[ vertexIndexB ],
-				newEdge: null,
+				a: this._geometry.vertices[ vertexIndexA ], // pointer reference
+				b: this._geometry.vertices[ vertexIndexB ],
+				newEdgeVertexId: null,
 				aIndex: vertexIndexA, // numbered reference
 				bIndex: vertexIndexB,
 				faces: [], // pointers to face
@@ -79,26 +110,24 @@ class MeshStructure {
 
 			this.edges[ key ] = edge;
 
+			if ( ! this.connectingEdges[ a ] ) {
+
+				this.connectingEdges[ a ] = [];
+
+			}
+
+			if ( ! this.connectingEdges[ b ] ) {
+
+				this.connectingEdges[ b ] = [];
+
+			}
+
 			this.connectingEdges[ a ].push( edge );
 			this.connectingEdges[ b ].push( edge );
 
 		}
 
 		edge.faces.push( face );
-
-	}
-
-	/////////////////////////////
-	// Public methods
-
-	getEdge( a, b ) {
-
-		var vertexIndexA = Math.min( a, b );
-		var vertexIndexB = Math.max( a, b );
-
-		var key = vertexIndexA + '_' + vertexIndexB;
-
-		return this.edges[ key ];
 
 	}
 
@@ -111,23 +140,36 @@ export class SubdivisionModifier {
 	WARNINGS = true; // Set to true for development
 	ABC = [ 'a', 'b', 'c' ];
 
-	constructor ( geometry, subdivisions ) {
+	get baseGeometry() {
 
-		// Number of subdivision levels default: 1.
-		this.subdivisions = ( subdivisions === undefined ) ? 1 : subdivisions;
+		return this._baseGeometry;
+
+	}
+
+	set baseGeometry( geometry ) {
 
 		// Create this.baseGeometry as cleaned-up copy of input geometry.
 		if ( geometry.isBufferGeometry ) {
 
-			this.baseGeometry = new THREE.Geometry().fromBufferGeometry( geometry );
+			this._baseGeometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
 		} else {
 
-			this.baseGeometry = geometry;
+			this._baseGeometry = geometry;
 
 		}
 
-		this.baseGeometry.mergeVertices();
+		this._baseGeometry.mergeVertices();
+
+		this.reset();
+
+	}
+
+	constructor ( geometry, subdivisions = 1 ) {
+
+		this.subdivisions = subdivisions;
+
+		this.baseGeometry = geometry;
 
 	}
 
@@ -182,7 +224,11 @@ export class SubdivisionModifier {
 	/**
 	 * Subdivide base surface.
 	 */
-	modify() {
+	reset() {
+
+		this.baseStructure = new MeshStructure( this._baseGeometry );
+
+		this.subdivStructure = this.baseStructure;
 
 		var repeats = this.subdivisions;
 
@@ -217,7 +263,7 @@ export class SubdivisionModifier {
 
 	/**
 	 * Update the subdivided geometry to match changes in the base geometry.
-	 * Does not handle changes in topology (added/deleted vertices, modified faces).
+	 * Does not handle changes in topology (added/deleted vertices, modified faces) or edge sharpness.
 	 */
 	update( baseGeoVertexIds ) {
 
@@ -291,7 +337,7 @@ export class SubdivisionModifier {
 		 *
 		 *******************************************************/
 
-		var structure = new MeshStructure( this.geometry );
+		var oldStructure = this.subdivStructure;
 
 		/******************************************************
 		 *
@@ -302,14 +348,16 @@ export class SubdivisionModifier {
 		 *******************************************************/
 
 		var newEdgeVertices = [], newVertexWeights = [];
-		var other, currentEdge, newEdge, face;
-		var edgeVertexWeight, adjacentVertexWeight, connectedFaces, newVertexWeight;
+		var otherId, currentEdge, newEdgeVertex, face;
+		var edgeVertexWeight, adjacentVertexWeight, connectedFaces, newEdgeVertexWeight, newEdgeVertexId;
 
-		for ( i in structure.edges ) {
+		for ( i in oldStructure.edges ) {
 
-			currentEdge = structure.edges[ i ];
-			newEdge = new THREE.Vector3();
-			newVertexWeight = [];
+			currentEdge = oldStructure.edges[ i ];
+
+			newEdgeVertex = new THREE.Vector3();
+			newEdgeVertexWeight = [];
+			newEdgeVertexId = this.vertexWeights.length + newEdgeVertices.length;
 
 			connectedFaces = currentEdge.faces.length;
 
@@ -334,26 +382,24 @@ export class SubdivisionModifier {
 			}
 
 			// Add influence of edge endpoints to edge's new vertex.
-			newEdge.addVectors( currentEdge.a, currentEdge.b ).multiplyScalar( edgeVertexWeight );
+			newEdgeVertex.addVectors( currentEdge.a, currentEdge.b ).multiplyScalar( edgeVertexWeight );
 
 			// Merge weights for edge vertices into weights for edge's new vertex.
-			this._addArray( newVertexWeight, this.vertexWeights[ currentEdge.aIndex ], edgeVertexWeight );
-			this._addArray( newVertexWeight, this.vertexWeights[ currentEdge.bIndex ], edgeVertexWeight );
+			this._addArray( newEdgeVertexWeight, this.vertexWeights[ currentEdge.aIndex ], edgeVertexWeight );
+			this._addArray( newEdgeVertexWeight, this.vertexWeights[ currentEdge.bIndex ], edgeVertexWeight );
 
 			// Record that the ends of this edge influence the position of the new vertex.
-			var newVertexId = this.vertexWeights.length + newEdgeVertices.length;
-
 			this.vertexWeights[ currentEdge.aIndex ].forEach( ( el, j ) => {
 
-				this.vertexInfluences[ j ].add( newVertexId );
+				this.vertexInfluences[ j ].add( newEdgeVertexId );
 
-			} );
+			}, this );
 
 			this.vertexWeights[ currentEdge.bIndex ].forEach( ( el, j ) => {
 
-				this.vertexInfluences[ j ].add( newVertexId );
+				this.vertexInfluences[ j ].add( newEdgeVertexId );
 
-			} );
+			}, this );
 
 			tmp.set( 0, 0, 0 );
 
@@ -363,25 +409,23 @@ export class SubdivisionModifier {
 
 				for ( k = 0; k < 3; k ++ ) {
 
-					other = oldVertices[ face[ this.ABC[ k ] ] ];
-					if ( other !== currentEdge.a && other !== currentEdge.b ) break;
+					otherId = face[ this.ABC[ k ] ];
+					if ( ! ( otherId === currentEdge.aIndex ) && ! ( otherId === currentEdge.bIndex ) ) break;
 
 				}
 
-				this._addArray( newVertexWeight, this.vertexWeights[ face[ this.ABC[ k ] ] ], adjacentVertexWeight );
+				this._addArray( newEdgeVertexWeight, this.vertexWeights[ otherId ], adjacentVertexWeight );
 
-				tmp.add( other );
+				tmp.add( oldVertices[ otherId ] );
 
 			}
 
 			tmp.multiplyScalar( adjacentVertexWeight );
-			newEdge.add( tmp );
+			newEdgeVertex.add( tmp );
 
-			currentEdge.newEdge = newVertexId;
-			newEdgeVertices.push( newEdge );
-			newVertexWeights.push( newVertexWeight );
-
-			// console.log(currentEdge, newEdge);
+			currentEdge.newEdgeVertexId = newEdgeVertexId;
+			newEdgeVertices.push( newEdgeVertex );
+			newVertexWeights.push( newEdgeVertexWeight );
 
 		}
 
@@ -401,7 +445,7 @@ export class SubdivisionModifier {
 			oldVertex = oldVertices[ i ];
 			vertexWeight = this.vertexWeights[ i ];
 
-			n = structure.connectingEdges[ i ].length;
+			n = oldStructure.connectingEdges[ i ].length;
 
 			if ( n > 2 ) {
 
@@ -428,7 +472,7 @@ export class SubdivisionModifier {
 
 				if ( n === 2 ) {
 
-					if ( this.WARNINGS ) console.warn( '2 connecting edges', structure.connectingEdges[ i ] );
+					if ( this.WARNINGS ) console.warn( '2 connecting edges', oldStructure.connectingEdges[ i ] );
 					sourceVertexWeight = 3 / 4;
 					connectingVertexWeight = 1 / 8;
 
@@ -458,12 +502,12 @@ export class SubdivisionModifier {
 			for ( j = 0; j < n; j ++ ) {
 
 				// Get connected vertex.
-				connectingEdge = structure.connectingEdges[ i ][ j ];
-				otherEnd = connectingEdge.a !== oldVertex;
-				other = otherEnd ? connectingEdge.a : connectingEdge.b;
+				connectingEdge = oldStructure.connectingEdges[ i ][ j ];
+				otherEnd = connectingEdge.aIndex !== i;
+				otherId = otherEnd ? connectingEdge.a : connectingEdge.b;
 
 				// Add influence of connected vertex.
-				tmp.add( other );
+				tmp.add( otherId );
 				this._addArray( vertexWeight, this.vertexWeights[ otherEnd ? connectingEdge.aIndex : connectingEdge.bIndex ], connectingVertexWeight );
 
 				// Merge influences on connected vertex into influences on this vertex.
@@ -471,7 +515,7 @@ export class SubdivisionModifier {
 
 					this.vertexInfluences[ k ].add( i );
 
-				} );
+				}, this );
 
 			}
 
@@ -491,8 +535,12 @@ export class SubdivisionModifier {
 		 *
 		 *******************************************************/
 
-		var newVertices = newSourceVertices.concat( newEdgeVertices );
-		var edge1, edge2, edge3;
+		this.geometry.vertices = newSourceVertices.concat( newEdgeVertices );
+
+		var newStructure = new MeshStructure();
+		newStructure.geometry = this.geometry;
+
+		var newEdgeVertexId1, newEdgeVertexId2, newEdgeVertexId3, newFace;
 		var newFaces = [];
 
 		var uv, x0, x1, x2;
@@ -504,18 +552,29 @@ export class SubdivisionModifier {
 
 			face = oldFaces[ i ];
 
-			// find the 3 new edges vertex of each old face
+			// find the 3 new edge vertices of each old face
 
-			edge1 = structure.getEdge( face.a, face.b ).newEdge;
-			edge2 = structure.getEdge( face.b, face.c ).newEdge;
-			edge3 = structure.getEdge( face.c, face.a ).newEdge;
+			newEdgeVertexId1 = oldStructure.getEdge( face.a, face.b ).newEdgeVertexId;
+			newEdgeVertexId2 = oldStructure.getEdge( face.b, face.c ).newEdgeVertexId;
+			newEdgeVertexId3 = oldStructure.getEdge( face.c, face.a ).newEdgeVertexId;
 
 			// create 4 faces.
 
-			newFaces.push( this._newFace( edge1, edge2, edge3, face.materialIndex ) );
-			newFaces.push( this._newFace( face.a, edge1, edge3, face.materialIndex ) );
-			newFaces.push( this._newFace( face.b, edge2, edge1, face.materialIndex ) );
-			newFaces.push( this._newFace( face.c, edge3, edge2, face.materialIndex ) );
+			newFace = this._newFace( newEdgeVertexId1, newEdgeVertexId2, newEdgeVertexId3, face.materialIndex );
+			newStructure.addFace( newFace );
+			newFaces.push( newFace );
+
+			newFace = this._newFace( face.a, newEdgeVertexId1, newEdgeVertexId3, face.materialIndex );
+			newStructure.addFace( newFace );
+			newFaces.push( newFace );
+
+			newFace = this._newFace( face.b, newEdgeVertexId2, newEdgeVertexId1, face.materialIndex );
+			newStructure.addFace( newFace );
+			newFaces.push( newFace );
+
+			newFace = this._newFace( face.c, newEdgeVertexId3, newEdgeVertexId2, face.materialIndex );
+			newStructure.addFace( newFace );
+			newFaces.push( newFace );
 
 			// create 4 new uv's
 
@@ -541,8 +600,8 @@ export class SubdivisionModifier {
 
 		}
 
-		// Overwrite old arrays
-		this.geometry.vertices = newVertices;
+		// Overwrite old objects
+		this.subdivStructure = newStructure;
 		this.geometry.faces = newFaces;
 		if ( hasUvs ) this.geometry.faceVertexUvs[ 0 ] = newUVs;
 		this.vertexWeights = this.vertexWeights.concat( newVertexWeights );
