@@ -11,9 +11,22 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 0; // to not conflict with dat.gui
+				display:block;
+			}
 		</style>
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl layers
+		</div>
 
 		<script src="../build/three.js"></script>
 
@@ -35,24 +48,13 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - layers';
-				container.appendChild( info );
-
-				var bgTexture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
-				var bgColor = new THREE.Color( 0xf0f0f0 );
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.layers.enable( 0 );
+				camera.layers.enable( 0 ); // enabled by default
 				camera.layers.enable( 1 );
 				camera.layers.enable( 2 );
 
 				scene = new THREE.Scene();
-				scene.background = bgColor;
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -100,7 +102,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var layers = { red: true, green: true, blue: true, background: false };
+				var layers = { red: true, green: true, blue: true };
 
 				//
 				// Init gui
@@ -108,8 +110,6 @@
 				gui.add( layers, 'red' ).onChange( function () { camera.layers.toggle( 0 ); } );
 				gui.add( layers, 'green' ).onChange( function () { camera.layers.toggle( 1 ); } );
 				gui.add( layers, 'blue' ).onChange( function () { camera.layers.toggle( 2 ); } );
-
-				gui.add( layers, 'background' ).onChange( function ( value ) { scene.background = value ? bgTexture : bgColor; } );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
