@@ -26,7 +26,7 @@ THREE.BoxLineGeometry = function ( width, height, depth, widthSegments, heightSe
 
 	var x = - widthHalf, y = - heightHalf, z = - depthHalf;
 
-	for ( var i = 0; i < widthSegments; i ++ ) {
+	for ( var i = 0; i <= widthSegments; i ++ ) {
 
 		vertices.push( x, - heightHalf, - depthHalf, x,   heightHalf, - depthHalf );
 		vertices.push( x,   heightHalf, - depthHalf, x,   heightHalf,   depthHalf );
@@ -37,7 +37,7 @@ THREE.BoxLineGeometry = function ( width, height, depth, widthSegments, heightSe
 
 	}
 
-	for ( var i = 0; i < heightSegments; i ++ ) {
+	for ( var i = 0; i <= heightSegments; i ++ ) {
 
 		vertices.push( - widthHalf, y, - depthHalf,   widthHalf, y, - depthHalf );
 		vertices.push(   widthHalf, y, - depthHalf,   widthHalf, y,   depthHalf );
@@ -48,7 +48,7 @@ THREE.BoxLineGeometry = function ( width, height, depth, widthSegments, heightSe
 
 	}
 
-	for ( var i = 0; i < depthSegments; i ++ ) {
+	for ( var i = 0; i <= depthSegments; i ++ ) {
 
 		vertices.push( - widthHalf, - heightHalf, z, - widthHalf,   heightHalf, z );
 		vertices.push( - widthHalf,   heightHalf, z,   widthHalf,   heightHalf, z );
