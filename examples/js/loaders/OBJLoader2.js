@@ -442,8 +442,8 @@ THREE.OBJLoader2 = (function () {
 			workerCode += '/**\n';
 			workerCode += '  * This code was constructed by OBJLoader2 buildCode.\n';
 			workerCode += '  */\n\n';
-			workerCode += 'THREE = { LoaderSupport: {} };\n\n';
-			workerCode += funcBuildObject( 'THREE.LoaderSupport.Validator', Validator );
+			workerCode += 'THREE = { ' + LoaderSupport.constructor.name + ': {} };\n\n';
+			workerCode += funcBuildObject( 'THREE.' + LoaderSupport.constructor.name + '.' + LoaderSupport.Validator.constructor.name, Validator );
 			workerCode += funcBuildSingleton( 'Parser', Parser );
 
 			return workerCode;
