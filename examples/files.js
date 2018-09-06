@@ -59,6 +59,7 @@ var files = {
 		"webgl_interactive_raycasting_points",
 		"webgl_interactive_voxelpainter",
 		"webgl_kinect",
+		"webgl_layers",
 		"webgl_lensflares",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
