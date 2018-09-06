@@ -5,14 +5,22 @@
 import { Texture } from './Texture.js';
 import { NearestFilter } from '../constants.js';
 
-function Texture3D( data, width, height, depth, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+function Texture3D( data, width, height, depth ) {
 
-	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+	// We're going to add .setXXX() methods for setting properties later.
+	// Users can still set in Texture3D directly.
+	//
+	//	var texture = new THREE.Texture3D( data, width, height, depth );
+	// 	texture.anisotropy = 16;
+	//
+	// See #14839
+
+	Texture.call( this, null );
 
 	this.image = { data: data, width: width, height: height, depth: depth };
 
-	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+	this.magFilter = NearestFilter;
+	this.minFilter = NearestFilter;
 
 	this.generateMipmaps = false;
 	this.flipY = false;

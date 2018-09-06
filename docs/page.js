@@ -35,6 +35,10 @@ function onDocumentLoad( event ) {
 
 		case 'api':
 			path = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+
+			// Remove localized part of the path (e.g. 'en/' or 'es-MX/'):
+			path = path.replace( /^[A-z0-9-]+\//, '' );
+
 			break;
 
 		case 'examples':
