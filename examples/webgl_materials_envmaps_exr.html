@@ -128,7 +128,7 @@
 
 					texture.encoding = THREE.sRGBEncoding;
 
-					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, 512 );
+					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512 } );
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
