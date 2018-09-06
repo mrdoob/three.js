@@ -51,6 +51,8 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
+		<script src="js/loaders/GLTFLoader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -125,10 +127,10 @@
 
 				//
 
-				loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function ( geometry ) {
+				loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
-					createScene( geometry, 100 )
+					createScene( gltf.scene.children[ 0 ].geometry, 100 )
 
 				} );
 
@@ -187,19 +189,19 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var mapHeight = textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				mapHeight.anisotropy = 4;
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
-				var mapSpecular = textureLoader.load( "models/json/leeperrysmith/Map-SPEC.jpg" );
+				var mapSpecular = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
 
 				mapSpecular.anisotropy = 4;
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
 				mapSpecular.format = THREE.RGBFormat;
 
-				var mapColor = textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" );
+				var mapColor = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
 
 				mapColor.anisotropy = 4;
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;

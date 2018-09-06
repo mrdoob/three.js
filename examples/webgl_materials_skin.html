@@ -56,7 +56,7 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-
+		<script src="js/loaders/GLTFLoader.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -118,10 +118,10 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				uniformsUV[ "tNormal" ].value = textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniformsUV[ "tNormal" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniformsUV[ "uNormalScale" ].value = -1.5;
 
-				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 
@@ -149,10 +149,10 @@
 
 				// LOADER
 
-				loader = new THREE.JSONLoader();
-				loader.load(  "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) {
+				loader = new THREE.GLTFLoader();
+				loader.load(  "models/gltf/LeePerrySmith/LeePerrySmith.glb", function( gltf ) {
 
-					createScene( geometry, 100, material );
+					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
 
 				} );
 
