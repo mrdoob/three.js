@@ -1,11 +1,11 @@
 Title: Three.js Cameras
-Description: How to use Cameras in Three.ks
+Description: How to use Cameras in Three.js
 
 This article is one in a series of articles about three.js.
 The first article was [about fundamentals](threejs-fundamentals.html).
 If you haven't read that yet you might want to start there.
 
-Let's talk about Cameras in three.js. We covered some of this in the [first article](htreejs-fundamentals.html) but we'll cover it in more detail here.
+Let's talk about Cameras in three.js. We covered some of this in the [first article](threejs-fundamentals.html) but we'll cover it in more detail here.
 
 The most common camera in three.js and the one we've been using up to this point is
 the `PerspectiveCamera`. It gives a 3d view where things in the distance appear 
@@ -83,7 +83,8 @@ gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera
 gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
 ```
 
-Anytime the camera's settings change we need to call the camera's `updateProjectionMatrix` function
+Anytime the camera's settings change we need to call the camera's 
+[`updateProjectionMatrix`](PerspectiveCamera.updateProjectionMatrix) function
 so we made a function called `updateCamera` add passed it to dat.GUI to call it when things change.
 
 {{{example url="../threejs-cameras-perspective.html" }}}
@@ -99,7 +100,7 @@ scene the first camera is drawing and showing that camera's frustum.
 To do this we can use the scissor function of three.js.
 Let's change it to draw 2 scenes with 2 cameras side by side using the scissor function
 
-First off let use some HTML and CSS to define 2 side by side elements. This will also
+First off let's use some HTML and CSS to define 2 side by side elements. This will also
 help us with events so both cameras can easily have their own `OrbitControls`.
 
 ```html
@@ -495,7 +496,7 @@ Let's try it! First let's set the camera up
 const left = 0;
 const right = 300;  // default canvas size
 const top = 0;
-const bottom = 150;  // defautl canvas size
+const bottom = 150;  // default canvas size
 const near = -1;
 const far = 1;
 const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
