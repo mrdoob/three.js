@@ -2,11 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { RGBAFormat, RGBFormat } from '../constants.js';
+import {
+	RGBAFormat,
+	RGBFormat
+} from '../constants.js';
 import { ImageLoader } from './ImageLoader.js';
 import { Texture } from '../textures/Texture.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
-
 
 function TextureLoader( manager ) {
 
@@ -51,7 +53,7 @@ Object.assign( TextureLoader.prototype, {
 
 			const defaultImageTexture = Texture.DEFAULT_IMAGE;
 
-			if( defaultImageTexture !== undefined ) {
+			if ( defaultImageTexture !== undefined ) {
 
 				// JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
 				var isJPEG = defaultImageTexture.src.search( /\.jpe?g$/i ) > 0 || defaultImageTexture.src.search( /^data\:image\/jpeg/ ) === 0;
@@ -87,6 +89,5 @@ Object.assign( TextureLoader.prototype, {
 	}
 
 } );
-
 
 export { TextureLoader };
