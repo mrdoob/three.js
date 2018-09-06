@@ -1591,7 +1591,7 @@ THREE.GLTFLoader = ( function () {
 
 		var json = this.json;
 
-		var onLoad = ( this.options.onLoad !== undefined ) ? this.options.onLoad : function(){};
+		var onLoad = this.options.onLoad;
 
 		// Clear the loader cache
 		this.cache.removeAll();
