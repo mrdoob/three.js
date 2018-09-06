@@ -49,8 +49,6 @@ Object.assign( TextureLoader.prototype, {
 
 		function _onError( event ) {
 
-			texture.image = image;
-
 			const defaultImageTexture = Texture.DEFAULT_IMAGE;
 
 			if ( defaultImageTexture !== undefined ) {
