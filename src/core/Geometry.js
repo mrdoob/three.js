@@ -549,27 +549,33 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		function weightedNormal( normals, vector ) {
 
-		  var normal = new THREE.Vector3();
+			var normal = new THREE.Vector3();
 
-			for ( var i = 0; i < normals.length; i ++ ) {
+			for ( var i = 0, l = normals.length; i < l; i ++ ) {
 
 				if ( normals[ i ].angleTo( vector ) < angle ) {
 
-			  		normal.add( normals[ i ] );
+					normal.add( normals[ i ] );
 
 				}
 
 			}
 
-		  return normal.normalize();
+			return normal.normalize();
 
 		}
 
 		this.computeFaceNormals();
 
-		var vertexNormals = this.vertices.map( () => [] );
+		var vertexNormals = [];
 
-		for ( var i = 0; i < this.faces.length; i ++ ) {
+		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
+
+			vertexNormals[ i ] = [];
+
+		}
+
+		for ( var i = 0, fl = this.faces.length; i < fl; i ++ ) {
 
 			var face = this.faces[ i ];
 
@@ -579,7 +585,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		for ( var i = 0; i < this.faces.length; i ++ ) {
+		for ( var i = 0, fl = this.faces.length; i < fl; i ++ ) {
 
 			var face = this.faces[ i ];
 
