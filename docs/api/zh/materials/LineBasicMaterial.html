@@ -10,11 +10,11 @@
 	<body>
 		[page:Material] &rarr;
 
-		<h1>[name]</h1>
+		<h1>基础线条材质（[name]）</h1>
 
-		<p class="desc">A material for drawing wireframe-style geometries.</p>
+			<p class="desc">一种用于绘制线框样式几何体的材质。</p>
 
-		<h2>Examples</h2>
+		<h2>例子(Examples)</h2>
 
 		<p>
 			[example:webgl_buffergeometry_drawcalls WebGL / buffergeometry / drawcalls]<br />
@@ -43,65 +43,52 @@ var material = new THREE.LineBasicMaterial( {
 } );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数(Constructor)</h2>
 
 		<h3>[name]( [param:Object parameters] )</h3>
 
 		<p>
-		[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
-		Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
-
-		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-		string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+		[page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。<br /><br />
+		属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:Material] class for common properties.</p>
+		<h2>属性(Properties)</h2>
+		<p>常用属性请参见基类[page:Material]。</p>
 
 		<h3>[property:Color color]</h3>
-		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
+		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
 
 		<h3>[property:Boolean isLineBasicMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are line basic materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
+		<p>用于检查此类或派生类是否为基础线条材质。默认值为 *true*。<br /><br />
+			因为其通常用在内部优化，所以不应该更改该属性值。
 		</p>
 
 		<h3>[property:Boolean lights]</h3>
-		<p>Whether the material is affected by lights. Default is *false*.</p>
+		<p>材质是否受到光照的影响。默认值为 *false*。</p>
 
 		<h3>[property:Float linewidth]</h3>
-		<p>
-			Controls line thickness. Default is *1*.<br /><br />
-
-			Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
-			with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will
-			always be 1 regardless of the set value.
+		<p> 控制线宽。默认值为 *1*。<br /><br />
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与
+			大多数平台上的[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
 		</p>
 
 		<h3>[property:String linecap]</h3>
-		<p>
-			Define appearance of line ends. Possible values are 'butt', 'round' and 'square'.
-			Default is 'round'.<br /><br />
-
-			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
-			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
+		<p> 定义线两端的样式。可用值为 'butt', 'round' 和 'square'。默认值为 'round'。<br /><br />
+			该属性对应于[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]属性，
+			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
 		</p>
 
 		<h3>[property:String linejoin]</h3>
-		<p>
-			Define appearance of line joints. Possible values are 'round', 'bevel' and 'miter'. Default is 'round'. <br /><br />
-
-			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
-			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
+		<p> 定义线连接节点的样式。可用值为 'round', 'bevel' 和 'miter'。默认值为 'round'。<br /><br />
+			该属性对应于[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
+			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
 		</p>
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:Material] class for common methods.</p>
+		<h2>方法(Methods)</h2>
+		<p>常用方法请参见基类[page:Material]。</p>
 
-		<h2>Source</h2>
+		<h2>源码(Source)</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
