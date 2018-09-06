@@ -286,18 +286,18 @@ Then we can use that for both the light's position
 and the target's position like this
 
 ```javascript
-+const onChange = () => {
++function updateLight{
 +  light.target.updateMatrixWorld();
 +  helper.update();
-+};
-+onChange();
++}
++updateLight();
 
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2);
 
-+makeXYZGUI(gui, light.position, 'position', onChange);
-+makeXYZGUI(gui, light.target.position, 'target', onChange);
++makeXYZGUI(gui, light.position, 'position', updateLight);
++makeXYZGUI(gui, light.target.position, 'target', updateLight);
 ```
 
 Now we can move the light, and its target
@@ -337,12 +337,11 @@ scene.add(helper);
 and as there is no target the `onChange` function can be simpler.
 
 ```javascript
--const onChange = () => {
+function updateLight{
 -  light.target.updateMatrixWorld();
--  helper.update();
--};
--onChange();
-+const onChange = helper.update.bind(helper);
+  helper.update();
+}
+-updateLight();
 ```
 
 Note that at some level a `PointLightHelper` has no um, point.
@@ -361,10 +360,10 @@ Let's setup the GUI so we can adjust the distance.
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2);
-+gui.add(light, 'distance', 0, 40).onChange(onChange);
++gui.add(light, 'distance', 0, 40).onChange(updateLight);
 
-makeXYZGUI(gui, light.position, 'position', onChange);
--makeXYZGUI(gui, light.target.position, 'target', onChange);
+makeXYZGUI(gui, light.position, 'position', updateLight);
+-makeXYZGUI(gui, light.target.position, 'target', updateLight);
 ```
 
 And now try it out.
@@ -406,7 +405,7 @@ property in radians. We'll use our `DegRadHelper` from the
 degrees.
 
 ```javascript
-gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(onChange);
+gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(updateLight);
 ```
 
 The inner cone is defined by setting the [`penumbra`](SpotLight.penumbra) property
@@ -509,13 +508,13 @@ its `width` and `height`
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 10);
-gui.add(light, 'width', 0, 20).onChange(onChange);
-gui.add(light, 'height', 0, 20).onChange(onChange);
-gui.add(new DegRadHelper(light.rotation, 'x'), 'value', -180, 180).name('x rotation').onChange(onChange);
-gui.add(new DegRadHelper(light.rotation, 'y'), 'value', -180, 180).name('y rotation').onChange(onChange);
-gui.add(new DegRadHelper(light.rotation, 'z'), 'value', -180, 180).name('z rotation').onChange(onChange);
+gui.add(light, 'width', 0, 20).onChange(updateLight);
+gui.add(light, 'height', 0, 20).onChange(updateLight);
+gui.add(new DegRadHelper(light.rotation, 'x'), 'value', -180, 180).name('x rotation').onChange(updateLight);
+gui.add(new DegRadHelper(light.rotation, 'y'), 'value', -180, 180).name('y rotation').onChange(updateLight);
+gui.add(new DegRadHelper(light.rotation, 'z'), 'value', -180, 180).name('z rotation').onChange(updateLight);
 
-makeXYZGUI(gui, light.position, 'position', onChange);
+makeXYZGUI(gui, light.position, 'position', updateLight);
 ```
 
 And here is that.

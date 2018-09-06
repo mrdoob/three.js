@@ -131,21 +131,21 @@ function main() {
     const helper = new THREE.SpotLightHelper(light);
     scene.add(helper);
 
-    const onChange = () => {
+    function updateLight() {
       light.target.updateMatrixWorld();
       helper.update();
-    };
-    onChange();
+    }
+    updateLight();
 
     const gui = new dat.GUI();
     gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
     gui.add(light, 'intensity', 0, 2);
-    gui.add(light, 'distance', 0, 40).onChange(onChange);
-    gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(onChange);
+    gui.add(light, 'distance', 0, 40).onChange(updateLight);
+    gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(updateLight);
     gui.add(light, 'penumbra', 0, 1);
 
-    makeXYZGUI(gui, light.position, 'position', onChange);
-    makeXYZGUI(gui, light.target.position, 'target', onChange);
+    makeXYZGUI(gui, light.position, 'position', updateLight);
+    makeXYZGUI(gui, light.target.position, 'target', updateLight);
   }
 
   function resizeRendererToDisplaySize(renderer) {
