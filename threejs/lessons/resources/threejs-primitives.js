@@ -415,7 +415,7 @@
     }
     addDiv(right, '.note').innerHTML = text;
 
-    const rawLines = info.create.toString().replace('return new', 'const geometry =').split(/\n/);
+    const rawLines = info.create.toString().replace('return new', 'const geometry = new').split(/\n/);
     const createRE = /^( *create\()/;
     const m = createRE.exec(rawLines[0]);
     const prefixLen = m[1].length + 1;
