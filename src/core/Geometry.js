@@ -335,7 +335,8 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		}
 
 		this.computeFaceNormals();
-
+		this.mergeVertices();
+		
 		if ( geometry.boundingBox !== null ) {
 
 			this.boundingBox = geometry.boundingBox.clone();
