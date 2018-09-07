@@ -34,6 +34,7 @@
 
 			var room;
 
+			var count = 0;
 			var radius = 0.08;
 			var normal = new THREE.Vector3();
 			var relativeVelocity = new THREE.Vector3();
@@ -66,10 +67,8 @@
 				room.geometry.translate( 0, 3, 0 );
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
-
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 1, 1, 1 ).normalize();
+				var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
 				var geometry = new THREE.IcosahedronBufferGeometry( radius, 2 );
@@ -157,8 +156,7 @@
 
 				if ( controller.userData.isSelecting ) {
 
-					var object = room.children[ 0 ];
-					room.remove( object );
+					var object = room.children[ count ++ ];
 
 					object.position.copy( controller.position );
 					object.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
@@ -166,7 +164,7 @@
 					object.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
 					object.userData.velocity.applyQuaternion( controller.quaternion );
 
-					room.add( object );
+					if ( count === room.children.length ) count = 0;
 
 				}
 
@@ -185,45 +183,47 @@
 				handleController( controller1 );
 				handleController( controller2 );
 
-				// keep cubes inside room
+				//
 
 				var range = 3 - radius;
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
-					var cube = room.children[ i ];
+					var object = room.children[ i ];
 
-					cube.position.add( cube.userData.velocity );
+					object.position.add( object.userData.velocity );
 
-					if ( cube.position.x < - range || cube.position.x > range ) {
+					// keep objects inside room
 
-						cube.position.x = THREE.Math.clamp( cube.position.x, - range, range );
-						cube.userData.velocity.x = - cube.userData.velocity.x;
+					if ( object.position.x < - range || object.position.x > range ) {
 
-					}
-
-					if ( cube.position.y < radius || cube.position.y > 6 ) {
-
-						cube.position.y = Math.max( cube.position.y, radius );
-
-						cube.userData.velocity.x *= 0.98;
-						cube.userData.velocity.y = - cube.userData.velocity.y * 0.8;
-						cube.userData.velocity.z *= 0.98;
+						object.position.x = THREE.Math.clamp( object.position.x, - range, range );
+						object.userData.velocity.x = - object.userData.velocity.x;
 
 					}
 
-					if ( cube.position.z < - range || cube.position.z > range ) {
+					if ( object.position.y < radius || object.position.y > 6 ) {
 
-						cube.position.z = THREE.Math.clamp( cube.position.z, - range, range );
-						cube.userData.velocity.z = - cube.userData.velocity.z;
+						object.position.y = Math.max( object.position.y, radius );
+
+						object.userData.velocity.x *= 0.98;
+						object.userData.velocity.y = - object.userData.velocity.y * 0.8;
+						object.userData.velocity.z *= 0.98;
+
+					}
+
+					if ( object.position.z < - range || object.position.z > range ) {
+
+						object.position.z = THREE.Math.clamp( object.position.z, - range, range );
+						object.userData.velocity.z = - object.userData.velocity.z;
 
 					}
 
 					for ( var j = i + 1; j < room.children.length; j ++ ) {
 
-						var cube2 = room.children[ j ];
+						var object2 = room.children[ j ];
 
-						normal.copy( cube.position ).sub( cube2.position );
+						normal.copy( object.position ).sub( object2.position );
 
 						var distance = normal.length();
 
@@ -231,23 +231,23 @@
 
 							normal.multiplyScalar( 0.5 * distance - radius );
 
-							cube.position.sub( normal );
-							cube2.position.add( normal );
+							object.position.sub( normal );
+							object2.position.add( normal );
 
 							normal.normalize();
 
-							relativeVelocity.copy( cube.userData.velocity ).sub( cube2.userData.velocity );
+							relativeVelocity.copy( object.userData.velocity ).sub( object2.userData.velocity );
 
 							normal = normal.multiplyScalar( relativeVelocity.dot( normal ) );
 
-							cube.userData.velocity.sub( normal );
-							cube2.userData.velocity.add( normal );
+							object.userData.velocity.sub( normal );
+							object2.userData.velocity.add( normal );
 
 						}
 
 					}
 
-					cube.userData.velocity.y -= 0.00098;
+					object.userData.velocity.y -= 0.00098;
 
 				}
 
