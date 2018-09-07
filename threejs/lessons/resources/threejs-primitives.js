@@ -116,7 +116,7 @@
 
       */
       create() {
-         // from: https://github.com/mrdoob/three.js/blob/b8d8a8625465bd634aa68e5846354d69f34d2ff5/examples/js/ParametricGeometries.js
+        // from: https://github.com/mrdoob/three.js/blob/b8d8a8625465bd634aa68e5846354d69f34d2ff5/examples/js/ParametricGeometries.js
         function klein(v, u, target) {
           u *= Math.PI;
           v *= 2 * Math.PI;
@@ -416,9 +416,9 @@
     addDiv(right, '.note').innerHTML = text;
 
     const rawLines = info.create.toString().replace('return new', 'const geometry = new').split(/\n/);
-    const createRE = /^( *create\()/;
-    const m = createRE.exec(rawLines[0]);
-    const prefixLen = m[1].length + 1;
+    const createRE = /^( *)[^ ]/;
+    const m = createRE.exec(rawLines[1]);
+    const prefixLen = m[1].length;
     const trimmedLines = rawLines.slice(1, rawLines.length - 1).map(line => line.substring(prefixLen));
 
     addElem(base, 'pre', 'prettyprint showmods', trimmedLines.join('\n'));
