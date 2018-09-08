@@ -99,7 +99,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			//console.log( FBXTree );
+			console.log( fbxTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
@@ -773,6 +773,8 @@ THREE.FBXLoader = ( function () {
 					if ( child.relationship === undefined ) rawMorphTarget.geoID = child.ID;
 
 				} );
+
+				console.log('rawMorphTarget', rawMorphTarget);
 
 				rawMorphTargets.push( rawMorphTarget );
 
@@ -2001,7 +2003,9 @@ THREE.FBXLoader = ( function () {
 			if ( morphTarget === null ) return;
 
 			parentGeo.morphAttributes.position = [];
-			parentGeo.morphAttributes.normal = [];
+			// parentGeo.morphAttributes.normal = []; // not implemented
+
+
 
 			var self = this;
 			morphTarget.rawTargets.forEach( function ( rawTarget ) {
@@ -2010,7 +2014,7 @@ THREE.FBXLoader = ( function () {
 
 				if ( morphGeoNode !== undefined ) {
 
-					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform );
+					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
 
 				}
 
@@ -2022,7 +2026,7 @@ THREE.FBXLoader = ( function () {
 		// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
 		// and a special attribute Index defining which vertices of the original geometry are affected
 		// Normal and position attributes only have data for the vertices that are affected by the morph
-		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform ) {
+		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
 			var morphGeo = new THREE.BufferGeometry();
 			if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
@@ -2056,7 +2060,7 @@ THREE.FBXLoader = ( function () {
 			var morphBuffers = this.genBuffers( morphGeoInfo );
 
 			var positionAttribute = new THREE.Float32BufferAttribute( morphBuffers.vertex, 3 );
-			positionAttribute.name = morphGeoNode.attrName;
+			positionAttribute.name = name || morphGeoNode.attrName;
 
 			preTransform.applyToBufferAttribute( positionAttribute );
 
@@ -2700,6 +2704,8 @@ THREE.FBXLoader = ( function () {
 				return val / 100;
 
 			} );
+
+			console.log('rawTracks', rawTracks.morphName);
 
 			var morphNum = sceneGraph.getObjectByName( rawTracks.modelName ).morphTargetDictionary[ rawTracks.morphName ];
 
