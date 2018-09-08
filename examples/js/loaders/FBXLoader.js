@@ -1995,8 +1995,6 @@ THREE.FBXLoader = ( function () {
 			parentGeo.morphAttributes.position = [];
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
-
-
 			var self = this;
 			morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
