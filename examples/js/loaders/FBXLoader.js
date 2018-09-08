@@ -99,7 +99,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			console.log( fbxTree );
+			// console.log( fbxTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
@@ -743,14 +743,6 @@ THREE.FBXLoader = ( function () {
 
 			for ( var i = 0; i < relationships.children.length; i ++ ) {
 
-				if ( i === 8 ) {
-
-					console.warn( 'FBXLoader: maximum of 8 morph targets supported. Ignoring additional targets.' );
-
-					break;
-
-				}
-
 				var child = relationships.children[ i ];
 
 				var morphTargetNode = deformerNodes[ child.ID ];
@@ -773,8 +765,6 @@ THREE.FBXLoader = ( function () {
 					if ( child.relationship === undefined ) rawMorphTarget.geoID = child.ID;
 
 				} );
-
-				console.log('rawMorphTarget', rawMorphTarget);
 
 				rawMorphTargets.push( rawMorphTarget );
 
@@ -2705,8 +2695,6 @@ THREE.FBXLoader = ( function () {
 
 			} );
 
-			console.log('rawTracks', rawTracks.morphName);
-
 			var morphNum = sceneGraph.getObjectByName( rawTracks.modelName ).morphTargetDictionary[ rawTracks.morphName ];
 
 			return new THREE.NumberKeyframeTrack( rawTracks.modelName + '.morphTargetInfluences[' + morphNum + ']', curves.times, values );
@@ -2896,7 +2884,7 @@ THREE.FBXLoader = ( function () {
 		parse: function ( text ) {
 
 			this.currentIndent = 0;
-			console.log("FBXTree: ", FBXTree);
+
 			this.allNodes = new FBXTree();
 			this.nodeStack = [];
 			this.currentProp = [];
