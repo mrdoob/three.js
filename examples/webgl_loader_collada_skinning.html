@@ -49,6 +49,9 @@
 			var container, stats, clock, controls;
 			var camera, scene, renderer, mixer;
 
+			// make this number large to test local skin rendering on mobile
+			var avatarDistance = 2000;
+
 			init();
 			animate();
 
@@ -57,7 +60,7 @@
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 15, 10, - 15 );
+				camera.position.set( avatarDistance + 15, avatarDistance + 10, avatarDistance - 15 );
 
 				scene = new THREE.Scene();
 
@@ -74,13 +77,25 @@
 					mixer = new THREE.AnimationMixer( avatar );
 					var action = mixer.clipAction( animations[ 0 ] ).play();
 
+					// remove bone root from dae scene and add to root of this scene manually
+				    // how you do this for your model will depend on how it's loaded
+				   	// in this case, we know that the first child is the bone hierarchy
+					var boneRoot = avatar.children[0];
+					avatar.remove(boneRoot);
+					scene.add(boneRoot);
+
+				   	// now that the bone hierarchy has been removed and placed in the 3d scene root,
+					// move SkinnedMesh to position in world space
+				   	avatar.position.set(avatarDistance, avatarDistance, avatarDistance);
+
 					scene.add( avatar );
 
-				} );
+				}, null, null, { localSkinning: true } );
 
 				//
 
 				var gridHelper = new THREE.GridHelper( 10, 20 );
+				gridHelper.position.set(avatarDistance, avatarDistance, avatarDistance);
 				scene.add( gridHelper );
 
 				//
@@ -102,7 +117,7 @@
 				//
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 2, 0 );
+				controls.target.set( avatarDistance, avatarDistance + 2, avatarDistance );
 				controls.update();
 
 				//
