@@ -100,7 +100,7 @@ MeshMatcapMaterial.prototype.copy = function ( source ) {
 
 	this.color.copy( source.color );
 
-	this.matcap = source.map;
+	this.matcap = source.matcap;
 
 	this.map = source.map;
 
