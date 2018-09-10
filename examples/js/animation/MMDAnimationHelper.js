@@ -946,7 +946,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( this.currentTime < this.delayTime ) return false;
 			
-			if ((this.currentTime - this.delayTime) > this.audioDuration) return false;
+			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
 
 			this.audio.startTime = this.currentTime - this.delayTime;
 
