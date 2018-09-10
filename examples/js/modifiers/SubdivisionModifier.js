@@ -229,12 +229,6 @@ export class SubdivisionModifier {
 
 	}
 
-	_midpoint( a, b ) {
-
-		return ( Math.abs( b - a ) / 2 ) + Math.min( a, b );
-
-	}
-
 	_newUv( newUvs, a, b, c ) {
 
 		newUvs.push( [ a.clone(), b.clone(), c.clone() ] );
@@ -727,13 +721,12 @@ export class SubdivisionModifier {
 				x1 = uv[ 1 ];
 				x2 = uv[ 2 ];
 
-				x3.set( this._midpoint( x0.x, x1.x ), this._midpoint( x0.y, x1.y ) );
-				x4.set( this._midpoint( x1.x, x2.x ), this._midpoint( x1.y, x2.y ) );
-				x5.set( this._midpoint( x0.x, x2.x ), this._midpoint( x0.y, x2.y ) );
+				x3.addVectors( x0, x1 ).multiplyScalar( 0.5 );
+				x4.addVectors( x1, x2 ).multiplyScalar( 0.5 );
+				x5.addVectors( x0, x2 ).multiplyScalar( 0.5 );
 
 				this._newUv( newUVs, x3, x4, x5 );
 				this._newUv( newUVs, x0, x3, x5 );
-
 				this._newUv( newUVs, x1, x4, x3 );
 				this._newUv( newUVs, x2, x5, x4 );
 
