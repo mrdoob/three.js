@@ -383,7 +383,7 @@ var files = {
 		"canvas_geometry_text",
 		"canvas_interactive_cubes",
 		"canvas_interactive_cubes_tween",
-		"canvas_interactive_particles",
+		"canvas_interactive_sprites",
 		"canvas_interactive_voxelpainter",
 		"canvas_lights_pointlights",
 		"canvas_lines",

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js canvas - interactive particles</title>
+		<title>three.js canvas - interactive sprites</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -32,22 +32,37 @@
 
 			var PI2 = Math.PI * 2;
 
-			var programFill = function ( context ) {
+			/*
+			function programFill( context ) {
+
+				context.fillRect( - 0.5, - 0.5, 1, 1 );
+
+			}
+
+			function programStroke( context ) {
+
+				context.lineWidth = 0.025;
+				context.strokeRect( - 0.5, - 0.5, 1, 1 );
+
+			}
+			*/
+
+			function programFill( context ) {
 
 				context.beginPath();
 				context.arc( 0, 0, 0.5, 0, PI2, true );
 				context.fill();
 
-			};
+			}
 
-			var programStroke = function ( context ) {
+			function programStroke( context ) {
 
 				context.lineWidth = 0.025;
 				context.beginPath();
 				context.arc( 0, 0, 0.5, 0, PI2, true );
 				context.stroke();
 
-			};
+			}
 
 			var INTERSECTED;
 
@@ -64,7 +79,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> canvas - interactive particles';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> canvas - interactive sprites';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -75,17 +90,22 @@
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var particle = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: Math.random() * 0x808080 + 0x808080, program: programStroke } ) );
-					particle.position.x = Math.random() * 800 - 400;
-					particle.position.y = Math.random() * 800 - 400;
-					particle.position.z = Math.random() * 800 - 400;
-					particle.scale.x = particle.scale.y = Math.random() * 20 + 20;
-					scene.add( particle );
+					var material = new THREE.SpriteCanvasMaterial( {
+						color: Math.random() * 0x808080 + 0x808080,
+						program: programStroke
+					} );
+
+					var sprite = new THREE.Sprite( material );
+					sprite.position.x = Math.random() * 800 - 400;
+					sprite.position.y = Math.random() * 800 - 400;
+					sprite.position.z = Math.random() * 800 - 400;
+					sprite.scale.setScalar( Math.random() * 20 + 20 );
+					scene.add( sprite );
 
 				}
-				
+
 				//
-				
+
 				raycaster = new THREE.Raycaster();
 				mouse = new THREE.Vector2();
 
@@ -158,19 +178,20 @@
 
 				if ( intersects.length > 0 ) {
 
-					if ( INTERSECTED != intersects[ 0 ].object ) {
+					var object = intersects[ 0 ].object;
+
+					if ( INTERSECTED !== object ) {
 
 						if ( INTERSECTED ) INTERSECTED.material.program = programStroke;
 
-						INTERSECTED = intersects[ 0 ].object;
+						INTERSECTED = object;
 						INTERSECTED.material.program = programFill;
 
 					}
 
-				} else {
+				} else if ( INTERSECTED ) {
 
-					if ( INTERSECTED ) INTERSECTED.material.program = programStroke;
-
+					INTERSECTED.material.program = programStroke;
 					INTERSECTED = null;
 
 				}
