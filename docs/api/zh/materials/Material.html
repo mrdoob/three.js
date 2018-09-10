@@ -1,333 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="list.js"></script>
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
-		<h1>[name]</h1>
-
-		<p class="desc">
-		Abstract base class for materials.<br /><br />
-
-		Materials describe the appearance of [page:Object objects].
-		They are defined in a (mostly) renderer-independent way, so you don't have to
-		rewrite materials if you decide to use a different renderer.<br /><br />
-
-		The following properties and methods are inherited by all other material types
-		(although they may have different defaults).
-		</p>
-
-		<h2>Constructor</h2>
-
-
-		<h3>[name]()</h3>
-		<p>This creates a generic material.</p>
-
-
-		<h2>Properties</h2>
-
-		<h3>[property:Float alphaTest]</h3>
-		<p>
-		Sets the alpha value to be used when running an alpha test.
-		The material will not be renderered if the opacity is lower than this value.
-		Default is *0*.
-		</p>
-
-		<h3>[property:Integer blendDst]</h3>
-		<p>
-		Blending destination. Default is [page:CustomBlendingEquation OneMinusSrcAlphaFactor].
-		See the destination factors [page:CustomBlendingEquation constants] for all possible values.<br />
-		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
-		</p>
-
-		<h3>[property:Integer blendDstAlpha]</h3>
-		<p>The transparency of the [page:.blendDst]. Default is *null*.</p>
-
-		<h3>[property:Integer blendEquation]</h3>
-		<p>
-		Blending equation to use when applying blending. Default is [page:CustomBlendingEquation AddEquation].
-		See the blending equation [page:CustomBlendingEquation constants] for all possible values.<br />
-		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
-		</p>
-
-		<h3>[property:Integer blendEquationAlpha]</h3>
-		<p>The tranparency of the [page:.blendEquation]. Default is *null*.</p>
-
-		<h3>[property:Blending blending]</h3>
-		<p>
-		Which blending to use when displaying objects with this material. <br />
-		This must be set to [page:Materials CustomBlending] to use custom [page:Constant blendSrc], [page:Constant blendDst] or [page:Constant blendEquation].<br />
-		See the blending mode [page:Materials constants] for all possible values. Default is [page:Materials NormalBlending].
-		</p>
-
-		<h3>[property:Integer blendSrc]</h3>
-		<p>
-		Blending source. Default is [page:CustomBlendingEquation SrcAlphaFactor].
-		See the source factors [page:CustomBlendingEquation constants] for all possible values.<br />
-		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
-		</p>
-
-		<h3>[property:Integer blendSrcAlpha]</h3>
-		<p>The tranparency of the [page:.blendSrc]. Default is *null*.</p>
-
-		<h3>[property:Boolean clipIntersection]</h3>
-		<p>
-		Changes the behavior of clipping planes so that only their intersection is clipped, rather than their union.
-		Default is *false*.
-		</p>
-
-		<h3>[property:Array clippingPlanes]</h3>
-		<p>
-		User-defined clipping planes specified as THREE.Plane objects in world space.
-		These planes apply to the objects this material is attached to.
-		Points in space whose signed distance to the plane is negative are clipped (not rendered).
-		This requires [page:WebGLRenderer.localClippingEnabled] to be *true*.
-		See the [example:webgl_clipping_intersection WebGL / clipping /intersection] example.
-		Default is *null*.
-		</p>
-
-		<h3>[property:Boolean clipShadows]</h3>
-		<p>
-		Defines whether to clip shadows according to the clipping planes specified on this material. Default is *false*.
-		</p>
-
-		<h3>[property:Boolean colorWrite]</h3>
-		<p>
-		Whether to render the material's color.
-		This can be used in conjunction with a mesh's [page:Integer renderOrder] property to create invisible objects that occlude other objects. Default is *true*.
-		</p>
-
-		<h3>[property:Material customDepthMaterial]</h3>
-		<p>
-		Custom depth material to be used by this material when rendering to the depth map.
-		When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are (a) modifying vertex positions in the vertex shader,
-		(b) using a displacement map, (c) using an alpha map with alphaTest, or (d) using a transparent texture with alphaTest,
-		you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
-		</p>
-
-		<h3>[property:Material customDistanceMaterial]</h3>
-		<p>
-		Same as customDepthMaterial, but used with [page:PointLight]. Default is *undefined*.
-		</p>
-
-		<h3>[property:Object defines]</h3>
-		<p>
-		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. The pairs are defined in both vertex and fragment shaders.  Default is *undefined*.
-		</p>
-
-		<h3>[property:Integer depthFunc]</h3>
-		<p>
-		Which depth function to use. Default is [page:Materials LessEqualDepth]. See the depth mode [page:Materials constants] for all possible values.
-		</p>
-
-		<h3>[property:Boolean depthTest]</h3>
-		<p>
-		Whether to have depth test enabled when rendering this material. Default is *true*.
-		</p>
-
-		<h3>[property:Boolean depthWrite]</h3>
-		<p>
-		Whether rendering this material has any effect on the depth buffer. Default is *true*.<br /><br />
-
-		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
-		</p>
-
-		<h3>[property:Boolean flatShading]</h3>
-		<p>
-		Define whether the material is rendered with flat shading. Default is false.
-		</p>
-
-		<h3>[property:Boolean fog]</h3>
-		<p>Whether the material is affected by fog. Default is *true*.</p>
-
-		<h3>[property:Integer id]</h3>
-		<p>Unique number for this material instance.</p>
-
-		<h3>[property:Boolean isMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
-		<h3>[property:Boolean lights]</h3>
-		<p>Whether the material is affected by lights. Default is *true*.</p>
-
-		<h3>[property:String name]</h3>
-		<p>Optional name of the object (doesn't need to be unique). Default is an empty string.</p>
-
-		<h3>[property:Boolean needsUpdate]</h3>
-		<p>
-		Specifies that the material needs to be recompiled.<br />
-		This property is automatically set to *true* when instancing a new material.
-		</p>
-
-		<h3>[property:Float opacity]</h3>
-		<p>
-		Float in the range of *0.0* - *1.0* indicating how transparent the material is.
-		A value of *0.0* indicates fully transparent, *1.0* is fully opaque.<br />
-		If the material's [page:Boolean transparent] property is not set to *true*, the material will remain
-		fully opaque and this value will only affect its color. <br />
-		Default is *1.0*.
-		</p>
-
-		<h3>[property:Float overdraw]</h3>
-		<p>
-		Amount of triangle expansion at draw time.
-		This is a workaround for cases when gaps appear between triangles when using [page:CanvasRenderer].
-		*0.5* tends to give good results across browsers. Default is *0*.
-		</p>
-
-		<h3>[property:Boolean polygonOffset]</h3>
-		<p>
-		Whether to use polygon offset. Default is *false*. This corresponds to the *GL_POLYGON_OFFSET_FILL* WebGL feature.
-		</p>
-
-		<h3>[property:Integer polygonOffsetFactor]</h3>
-		<p>Sets the polygon offset factor. Default is *0*.</p>
-
-		<h3>[property:Integer polygonOffsetUnits]</h3>
-		<p>Sets the polygon offset units. Default is *0*.</p>
-
-		<h3>[property:String precision]</h3>
-		<p>
-		Override the renderer's default precision for this material. Can be "*highp*", "*mediump*" or "*lowp*".
-		Default is *null*.
-		</p>
-
-		<h3>[property:Boolean premultipliedAlpha]</h3>
-		<p>
-		Whether to premultiply the alpha (transparency) value.
-		See [Example:webgl_materials_transparency WebGL / Materials / Transparency] for an example of the difference.
-		Default is *false*.
-		</p>
-
-		<h3>[property:Boolean dithering]</h3>
-		<p>
-		Whether to apply dithering to the color to remove the appearance of banding.
-		Default is *false*.
-		</p>
-
-		<h3>[property:Integer shadowSide]</h3>
-		<p>
-		Defines which side of faces cast shadows.
-		When set, can be [page:Materials THREE.FrontSide], [page:Materials THREE.BackSide], or [page:Materials THREE.DoubleSide]. Default is *null*. <br />
-		If *null*, the side casting shadows is determined as follows: <br />
-
-		<table>
-			<thead>
-				<tr>
-					<th>[page:Material.side]</th>
-					<th>Side casting shadows</th>
-				</tr>
-			</thead>
-			<tbody>
-
-				<tr>
-					<td>THREE.FrontSide</td>
-					<td>back side</td>
-				</tr>
-				<tr>
-					<td>THREE.BackSide</td>
-					<td>front side</td>
-				</tr>
-				<tr>
-					<td>THREE.DoubleSide</td>
-					<td>both sides</td>
-				</tr>
-			</tbody>
-		</table>
-
-
-		</p>
-
-		<h3>[property:Integer side]</h3>
-		<p>
-		Defines which side of faces will be rendered - front, back or both.
-		Default is [page:Materials THREE.FrontSide].
-		Other options are [page:Materials THREE.BackSide] and [page:Materials THREE.DoubleSide].
-		</p>
-
-		<h3>[property:Boolean transparent]</h3>
-		<p>
-		Defines whether this material is transparent. This has an effect on rendering
-		as transparent objects need special treatment and are rendered after
-		non-transparent objects. <br />
-		When set to true, the extent to which the material is transparent is
-		controlled by setting it's [page:Float opacity] property. <br />
-		Default is *false*.
-		</p>
-
-		<h3>[property:String type]</h3>
-		<p>
-		Value is the string 'Material'. This shouldn't be changed, and can be used to
-		find all objects of this type in a scene.
-		</p>
-
-		<h3>[property:String uuid]</h3>
-		<p>
-		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this material instance.
-		This gets automatically assigned, so this shouldn't be edited.
-		</p>
-
-		<h3>[property:Integer vertexColors]</h3>
-		<p>
-		Defines whether vertex coloring is used.
-		Default is [page:Materials THREE.NoColors].
-		Other options are [page:Materials THREE.VertexColors] and [page:Materials THREE.FaceColors].
-		</p>
-
-		<h3>[property:Boolean visible]</h3>
-		<p>
-		Defines whether this material is visible. Default is *true*.
-		</p>
-
-		<h3>[property:object userData]</h3>
-		<p>
-		An object that can be used to store custom data about the Material. It should not hold
-		references to functions as these will not be cloned.
-		</p>
-
-		<h2>Methods</h2>
-
-		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
-
-		<h3>[method:Material clone]( )</h3>
-		<p>Return a new material with the same parameters as this material.</p>
-
-		<h3>[method:Material copy]( [param:material material] )</h3>
-		<p>Copy the parameters from the passed material into this material.</p>
-
-		<h3>[method:null dispose]()</h3>
-		<p>
-		This disposes the material. Textures of a material don't get disposed.
-		These needs to be disposed by [page:Texture Texture].
-		</p>
-
-		<h3>[method:null onBeforeCompile]( [param:Object shader], [param:WebGLRenderer renderer] )</h3>
-		<p>
-		An optional callback that is executed immediately before the shader program is compiled.
-		This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
-		</p>
-
-		<h3>[method:null setValues]( [param:object values] )</h3>
-		<p>
-		values -- a container with parameters.<br />
-		Sets the properties based on the *values*.
-		</p>
-
-		<h3>[method:null toJSON]( [param:object meta] )</h3>
-		<p>
-		meta -- object containing metadata such as textures or images for the material.<br />
-		Convert the material to three.js JSON format.
-		</p>
-
-		<h2>Source</h2>
-
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
-	</body>
+<head>
+    <meta charset="utf-8"/>
+    <base href="../../../"/>
+    <script src="list.js"></script>
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css"/>
+</head>
+<body>
+<h1>材质[name]</h1>
+
+<p class="desc">材质的抽象基类。<br/><br/>
+    材质描述了对象[page:Object objects]的外观。它们的定义方式与渲染器无关，
+    因此，如果您决定使用不同的渲染器，不必重写材质。<br/><br/>
+    所有其他材质类型都继承了以下属性和方法（尽管它们可能具有不同的默认值）。
+</p>
+
+<h2>构造函数(Constructor)</h2>
+
+
+<h3>[name]()</h3>
+<p>该方法创建一个通用材料。</p>
+
+
+<h2>属性(Properties)</h2>
+
+<h3>[property:Float alphaTest]</h3>
+<p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
+</p>
+
+<h3>[property:Integer blendDst]</h3>
+<p> 混合目标。默认值为[page:CustomBlendingEquation OneMinusSrcAlphaFactor]。
+    目标因子所有可能的取值请参阅[page:CustomBlendingEquation constants]。
+    必须将材质的[page:Constant blending]设置为[page:Materials CustomBlending]才能生效。<br/>
+</p>
+
+<h3>[property:Integer blendDstAlpha]</h3>
+<p> [page:.blendDst]的透明度。 默认值为 *null*.</p>
+
+<h3>[property:Integer blendEquation]</h3>
+<p> 使用混合时所采用的混合方程式。默认值为[page:CustomBlendingEquation AddEquation]。
+    混合方程式所有可能的取值请参阅[page:CustomBlendingEquation constants]。
+    必须将材质的[page:Constant blending]设置为[page:Materials CustomBlending]才能生效。<br/>
+</p>
+
+<h3>[property:Integer blendEquationAlpha]</h3>
+<p>[page:.blendEquation] 的透明度. 默认值为 *null*.</p>
+
+<h3>[property:Blending blending]</h3>
+<p> 在使用此材质显示对象时要使用何种混合。<br/>
+    必须将其设置为[page:Materials CustomBlending]才能使用自定义[page:Constant blendSrc], [page:Constant blendDst] 或者 [page:Constant
+    blendEquation]。
+    混合模式所有可能的取值请参阅[page:Materials constants]。默认值为[page:Materials NormalBlending]。
+</p>
+
+<h3>[property:Integer blendSrc]</h3>
+<p> 混合源。默认值为[page:CustomBlendingEquation SrcAlphaFactor]。
+    源因子所有可能的取值请参阅[page:CustomBlendingEquation constants]。<br/>
+    必须将材质的[page:Constant blending]设置为[page:Materials CustomBlending]才能生效。
+</p>
+
+<h3>[property:Integer blendSrcAlpha]</h3>
+<p> [page:.blendSrc]的透明度。 默认值为 *null*.</p>
+
+<h3>[property:Boolean clipIntersection]</h3>
+<p>更改剪裁平面的行为，以便仅剪切其交叉点，而不是它们的并集。默认值为 *false*。
+</p>
+
+<h3>[property:Array clippingPlanes]</h3>
+<p>
+    用户定义的剪裁平面，在世界空间中指定为THREE.Plane对象。这些平面适用于所有使用此材质的对象。空间中与平面的有符号距离为负的点被剪裁（未渲染）。
+    这需要[page:WebGLRenderer.localClippingEnabled]为*true*。
+    示例请参阅[example:webgl_clipping_intersection WebGL / clipping /intersection]。默认值为 *null*。
+</p>
+
+<h3>[property:Boolean clipShadows]</h3>
+<p>定义是否根据此材质上指定的剪裁平面剪切阴影。默认值为 *false*。
+    Defines whether to clip shadows according to the clipping planes specified on this material. Default is *false*.
+</p>
+
+<h3>[property:Boolean colorWrite]</h3>
+<p> 是否渲染材质的颜色。
+    这可以与网格的[page:Integer renderOrder]属性结合使用，以创建遮挡其他对象的不可见对象。默认值为*true*。
+</p>
+
+<h3>[property:Material customDepthMaterial]</h3>
+<p>渲染到深度贴图时此材质要使用的自定义深度材质。
+    当使用[page:DirectionalLight]或page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
+    （b）使用置换贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
+    您必须为合适的阴影指定customDepthMaterial。默认值*undefined*。
+</p>
+
+<h3>[property:Material customDistanceMaterial]</h3>
+<p>与customDepthMaterial相同，但与[page:PointLight]一起使用。默认值为*undefined*。
+</p>
+
+<h3>[property:Object defines]</h3>
+<p> 自定义的注入着色器的defines。 以键值对的对象传递，{ MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }。
+    这些对在顶点和片段着色器中定义。默认值为*undefined*。
+</p>
+
+<h3>[property:Integer depthFunc]</h3>
+<p> 使用何种深度函数。默认为[page:Materials LessEqualDepth]。
+    深度模式所有可能的取值请查阅[page:Materials constants]。
+</p>
+
+<h3>[property:Boolean depthTest]</h3>
+<p>是否在渲染此材质时启用深度测试。默认为 *true*。
+</p>
+
+<h3>[property:Boolean depthWrite]</h3>
+<p>渲染此材质是否对深度缓冲区有任何影响。默认为*true*。<br/><br/>
+    在绘制2D叠加时，将多个事物分层在一起而不创建z-index时，禁用深度写入会很有用。
+</p>
+
+<h3>[property:Boolean flatShading]</h3>
+<p> 定义材质是否使用平面着色进行渲染。默认值为false。
+</p>
+
+<h3>[property:Boolean fog]</h3>
+<p>材料是否受雾影响。默认为*true*。</p>
+
+<h3>[property:Integer id]</h3>
+<p>此材质实例的唯一编号。e.</p>
+
+<h3>[property:Boolean isMaterial]</h3>
+<p>用于检查此类或派生类是否为材质。默认值为 *true*。<br/><br/>
+
+    因为其通常用在内部优化，所以不应该更改该属性值。
+</p>
+
+<h3>[property:Boolean lights]</h3>
+<p>材质是否受到光照的影响。默认为*true*。</p>
+
+<h3>[property:String name]</h3>
+<p>对象的可选名称（不必是唯一的）。默认值为空字符串。</p>
+
+<h3>[property:Boolean needsUpdate]</h3>
+<p>指定需要重新编译材质。<br/>
+    实例化新材料时，此属性自动设置为true。
+</p>
+
+<h3>[property:Float opacity]</h3>
+<p> 在0.0 - 1.0的范围内的浮点数，表明材质的透明度。值*0.0*表示完全透明，*1.0*表示完全不透明。<br/>
+    如果材质的[page:Boolean transparent]属性未设置为*true*，则材质将保持完全不透明，此值仅影响其颜色。
+    默认值为*1.0*。 <br/>
+
+</p>
+
+<h3>[property:Float overdraw]</h3>
+<p>绘制时的三角形扩展量。对于使用[page:CanvasRenderer]时三角形之间出现间隙的情况，这是一种解决方法。
+    *0.5*往往会在浏览器中有良好的结果。默认值为*0*。
+</p>
+
+<h3>[property:Boolean polygonOffset]</h3>
+<p> 是否使用多边形偏移。默认值为*false*。这对应于*GL_POLYGON_OFFSET_FILL*WebGL功能。
+</p>
+
+<h3>[property:Integer polygonOffsetFactor]</h3>
+<p>设置多边形偏移系数。默认值为*0*。</p>
+
+<h3>[property:Integer polygonOffsetUnits]</h3>
+<p>设置多边形偏移单位。默认值为*0*。</p>
+
+<h3>[property:String precision]</h3>
+<p> 重写此材质的渲染器的默认精度。可以是"*highp*", "*mediump*" 或 "*lowp*"。默认值为*null*。
+</p>
+
+<h3>[property:Boolean premultipliedAlpha]</h3>
+<p> 是否预乘alpha（透明度）值。有关差异的示例，请参阅[Example:webgl_materials_transparency WebGL / Materials / Transparency]。
+    默认值为*false*。
+</p>
+
+<h3>[property:Boolean dithering]</h3>
+<p> 是否对颜色应用抖动以消除条带的外观。默认值为 *false*。
+</p>
+
+<h3>[property:Integer shadowSide]</h3>
+<p> 定义投影的侧面。设置时，可以是[page:Materials THREE.FrontSide], [page:Materials THREE.BackSide], 或[page:Materials。默认值为 *null*。
+     <br/>
+    如果为*null*， 则侧面投射阴影确定如下： <br/>
+
+<table>
+    <thead>
+    <tr>
+        <th>[page:Material.side]</th>
+        <th>Side casting shadows</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr>
+        <td>THREE.FrontSide</td>
+        <td>背面</td>
+    </tr>
+    <tr>
+        <td>THREE.BackSide</td>
+        <td>前面</td>
+    </tr>
+    <tr>
+        <td>THREE.DoubleSide</td>
+        <td>双面</td>
+    </tr>
+    </tbody>
+</table>
+
+
+</p>
+
+<h3>[property:Integer side]</h3>
+<p> 定义将要渲染哪一面 - 正面，背面或两者。
+    默认为[page:Materials THREE.FrontSide]。其他选项有[page:Materials THREE.BackSide]和[page:Materials THREE.DoubleSide]。
+</p>
+
+<h3>[property:Boolean transparent]</h3>
+<p>
+    定义此材质是否透明。这对渲染有影响，因为透明对象需要特殊处理，并在非透明对象之后渲染。
+    <br/>
+    设置为true时，通过设置材质的[page:Float opacity]属性来控制材质透明的程度。<br/>
+    默认值为*false*。
+</p>
+
+<h3>[property:String type]</h3>
+<p> 值是字符串'Material'。不应该被更改，并且可以用于在场景中查找此类型的所有对象。
+</p>
+
+<h3>[property:String uuid]</h3>
+<p> 此材质实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]，会自动分配，不应该被更改。
+</p>
+
+<h3>[property:Integer vertexColors]</h3>
+<p> 是否使用顶点着色。默认值为[page:Materials THREE.NoColors]。
+    其他选项有[page:Materials THREE.VertexColors] 和 [page:Materials THREE.FaceColors]。
+</p>
+
+<h3>[property:Boolean visible]</h3>
+<p> 此材质是否可见。默认为*true*。
+</p>
+
+<h3>[property:object userData]</h3>
+<p> 一个对象，可用于存储有关Material的自定义数据。它不应该包含对函数的引用，因为这些函数不会被克隆。
+</p>
+
+<h2>方法(Methods)</h2>
+
+<h3>[page:EventDispatcher EventDispatcher] 方法在此类中可用。</h3>
+
+<h3>[method:Material clone]( )</h3>
+<p> 返回与此材质具有相同参数的新材质。</p>
+
+<h3>[method:Material copy]( [param:material material] )</h3>
+<p> 将传递材质中的参数复制到此材质中。</p>
+
+<h3>[method:null dispose]()</h3>
+<p> 处理材料。材料的纹理不会被处理。需要通过[page:Texture Texture]处理。
+</p>
+
+<h3>[method:null onBeforeCompile]( [param:Object shader], [param:WebGLRenderer renderer] )</h3>
+<p> 在编译着色器程序之前立即执行的可选回调。此函数使用着色器源代码作为参数。用于修改内置材料。
+    An optional callback that is executed immediately before the shader program is compiled.
+    This function is called with the shader source code as a parameter. Useful for the modification of built-in
+    materials.
+</p>
+
+<h3>[method:null setValues]( [param:object values] )</h3>
+<p> values -- 具有参数的容器。
+    根据*values*设置属性。<br/>
+</p>
+
+<h3>[method:null toJSON]( [param:object meta] )</h3>
+<p> meta -- 包含元素，例如材质的纹理或图像。
+    将材质转换为three.js JSON格式。<br/>
+</p>
+
+<h2>源码(Source)</h2>
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+</body>
 </html>
