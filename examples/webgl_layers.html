@@ -56,7 +56,6 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-//				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				var light = new THREE.PointLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
 				light.layers.enable( 0 );
@@ -65,7 +64,6 @@
 
 				scene.add( camera );
 				camera.add( light );
-//				scene.add( light );
 
 				var colors = [ 0xff0000, 0x00ff00, 0x0000ff ];
 				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
