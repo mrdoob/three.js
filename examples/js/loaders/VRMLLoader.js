@@ -916,15 +916,21 @@ THREE.VRMLLoader.prototype = {
 
 						if ( data.coordIndex ) {
 
-							function triangulateIndexArray( indexArray ) {
+							function triangulateIndexArray( indexArray, ccw ) {
+
+								if ( ccw === undefined ) {
+
+									// ccw is true by default
+									ccw = true;
+
+								}
 
 								var triangulatedIndexArray = [];
-								var ccw = data.ccw === undefined ? true : data.ccw; // ccw is true by default
 								var skip = 0;
 
 								for ( i = 0, il = indexArray.length; i < il; i ++ ) {
 
-									var indexedFace = data.coordIndex[ i ];
+									var indexedFace = indexArray[ i ];
 	
 									// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
 	
@@ -948,10 +954,10 @@ THREE.VRMLLoader.prototype = {
 
 							}
 
-							var positionIndexes = data.coordIndex ? triangulateIndexArray( data.coordIndex ) : [];
-							var normalIndexes = data.normalIndex ? triangulateIndexArray( data.normalIndex ) : positionIndexes;
-							var colorIndexes = data.colorIndex ? triangulateIndexArray( data.colorIndex ) : positionIndexes;
-							var uvIndexes = data.texCoordIndex ? triangulateIndexArray( data.texCoordIndex ) : positionIndexes;
+							var positionIndexes = data.coordIndex ? triangulateIndexArray( data.coordIndex, data.ccw ) : [];
+							var normalIndexes = data.normalIndex ? triangulateIndexArray( data.normalIndex, data.ccw ) : positionIndexes;
+							var colorIndexes = data.colorIndex ? triangulateIndexArray( data.colorIndex, data.ccw ) : positionIndexes;
+							var uvIndexes = data.texCoordIndex ? triangulateIndexArray( data.texCoordIndex, data.ccw ) : positionIndexes;
 
 							var newIndexes = [];
 							var newPositions = [];
