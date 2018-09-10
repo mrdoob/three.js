@@ -1928,6 +1928,8 @@
 
 	Object.assign( Quaternion, {
 
+		isQuaternion: true,
+
 		slerp: function ( qa, qb, qm, t ) {
 
 			return qm.copy( qa ).slerp( qb, t );
@@ -12787,6 +12789,9 @@
 				data.envMap = this.envMap.toJSON( meta ).uuid;
 				data.reflectivity = this.reflectivity; // Scale behind envMap
 
+				if ( this.combine !== undefined ) data.combine = this.combine;
+				if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
+
 			}
 
 			if ( this.gradientMap && this.gradientMap.isTexture ) {
@@ -15635,14 +15640,22 @@
 	 * @author Artur Trzesiok
 	 */
 
-	function Texture3D( data, width, height, depth, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+	function Texture3D( data, width, height, depth ) {
 
-		Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+		// We're going to add .setXXX() methods for setting properties later.
+		// Users can still set in Texture3D directly.
+		//
+		//	var texture = new THREE.Texture3D( data, width, height, depth );
+		// 	texture.anisotropy = 16;
+		//
+		// See #14839
+
+		Texture.call( this, null );
 
 		this.image = { data: data, width: width, height: height, depth: depth };
 
-		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+		this.magFilter = NearestFilter;
+		this.minFilter = NearestFilter;
 
 		this.generateMipmaps = false;
 		this.flipY = false;
@@ -37155,6 +37168,7 @@
 			if ( json.fog !== undefined ) material.fog = json.fog;
 			if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
 			if ( json.blending !== undefined ) material.blending = json.blending;
+			if ( json.combine !== undefined ) material.combine = json.combine;
 			if ( json.side !== undefined ) material.side = json.side;
 			if ( json.opacity !== undefined ) material.opacity = json.opacity;
 			if ( json.transparent !== undefined ) material.transparent = json.transparent;
@@ -37288,6 +37302,7 @@
 			if ( json.specularMap !== undefined ) material.specularMap = getTexture( json.specularMap );
 
 			if ( json.envMap !== undefined ) material.envMap = getTexture( json.envMap );
+			if ( json.envMapIntensity !== undefined ) material.envMapIntensity = json.envMapIntensity;
 
 			if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
 

@@ -99,7 +99,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			//console.log( FBXTree );
+			// console.log( fbxTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
@@ -742,14 +742,6 @@ THREE.FBXLoader = ( function () {
 			var rawMorphTargets = [];
 
 			for ( var i = 0; i < relationships.children.length; i ++ ) {
-
-				if ( i === 8 ) {
-
-					console.warn( 'FBXLoader: maximum of 8 morph targets supported. Ignoring additional targets.' );
-
-					break;
-
-				}
 
 				var child = relationships.children[ i ];
 
@@ -2001,7 +1993,7 @@ THREE.FBXLoader = ( function () {
 			if ( morphTarget === null ) return;
 
 			parentGeo.morphAttributes.position = [];
-			parentGeo.morphAttributes.normal = [];
+			// parentGeo.morphAttributes.normal = []; // not implemented
 
 			var self = this;
 			morphTarget.rawTargets.forEach( function ( rawTarget ) {
@@ -2010,7 +2002,7 @@ THREE.FBXLoader = ( function () {
 
 				if ( morphGeoNode !== undefined ) {
 
-					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform );
+					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
 
 				}
 
@@ -2022,7 +2014,7 @@ THREE.FBXLoader = ( function () {
 		// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
 		// and a special attribute Index defining which vertices of the original geometry are affected
 		// Normal and position attributes only have data for the vertices that are affected by the morph
-		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform ) {
+		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
 			var morphGeo = new THREE.BufferGeometry();
 			if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
@@ -2056,7 +2048,7 @@ THREE.FBXLoader = ( function () {
 			var morphBuffers = this.genBuffers( morphGeoInfo );
 
 			var positionAttribute = new THREE.Float32BufferAttribute( morphBuffers.vertex, 3 );
-			positionAttribute.name = morphGeoNode.attrName;
+			positionAttribute.name = name || morphGeoNode.attrName;
 
 			preTransform.applyToBufferAttribute( positionAttribute );
 
@@ -2890,7 +2882,7 @@ THREE.FBXLoader = ( function () {
 		parse: function ( text ) {
 
 			this.currentIndent = 0;
-			console.log("FBXTree: ", FBXTree);
+
 			this.allNodes = new FBXTree();
 			this.nodeStack = [];
 			this.currentProp = [];

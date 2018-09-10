@@ -31,11 +31,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo :
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 			<br><br>
-			<strong>MATERIALS:</strong>
 			<span>Body: <select id="body-mat"></select></span>
 			<span>Rims / Trim: <select id="rim-mat"></select></span>
-			<span>Glass: <select id="glass-mat"></select></span><br>
-			<span><strong>Driving Mode</strong>(arrow keys and space)<input type="checkbox" id="drive-toggle"></span>
+			<span>Glass: <select id="glass-mat"></select></span>
+			<br><br>
+			<span>Follow camera: <input type="checkbox" id="camera-toggle"></span>
 		</div>
 
 		<div id="container"></div>
@@ -47,8 +47,6 @@
 
 		<script src="js/Car.js"></script>
 
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -56,26 +54,25 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer, controls, stats, carModel, materialsLib, envMap;
+			var camera, scene, renderer, stats, carModel, materialsLib, envMap;
 
 			var bodyMatSelect = document.getElementById( 'body-mat' );
 			var rimMatSelect = document.getElementById( 'rim-mat' );
 			var glassMatSelect = document.getElementById( 'glass-mat' );
 
-			var driveModeToggle = document.getElementById( 'drive-toggle' );
-			driveModeToggle.addEventListener( 'change', onDriveModeToggle );
+			var followCamera = document.getElementById( 'camera-toggle' );
+			followCamera.addEventListener( 'change', onFollowCameraToggle );
 
 			var lightHolder = new THREE.Group();
 			var clock = new THREE.Clock();
 			var car = new THREE.Car();
-			car.enabled = false;
+			car.turningRadius = 75;
 
 			var carParts = {
 				body: [],
 				rims:[],
 				glass: [],
 			};
-
 
 			var damping = 5.0;
 			var distance = 5;
@@ -86,13 +83,8 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 200 );
-				camera.position.set( 3.25, 1.25, -5 );
-
-				controls = new THREE.OrbitControls( camera, container );
-				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
-				controls.target.set( 0, 0.75, 0 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 200 );
+				camera.position.set( 3.25, 2.0, -5 );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
@@ -112,7 +104,7 @@
 				ground.renderOrder = 1;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 2400, 240, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 400, 40, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.depthWrite = false;
 				grid.material.transparent = true;
@@ -306,12 +298,8 @@
 
 			}
 
-			function onDriveModeToggle() {
+			function onFollowCameraToggle() {
 
-				car.enabled = !car.enabled;
-				controls.enabled = !car.enabled;
-
-				controls.reset();
 				carModel.position.copy( origin );
 
 			}
@@ -320,20 +308,26 @@
 
 				var delta = clock.getDelta();
 
-				if ( carModel && !controls.enabled ) {
+				if ( carModel ) {
 
-					car.update( delta );
-
-					updateCamera( delta );
+					car.update( delta / 3 );
 
 					resetPosition();
 
 					// keep the light (and shadow) pointing in the same direction as the car rotates
 					lightHolder.rotation.y = -carModel.rotation.y;
 
-				} else {
+					if ( followCamera.checked ) {
 
-					controls.update();
+						carModel.getWorldPosition( cameraTarget );
+						cameraTarget.y = 2.5;
+						cameraTarget.z += distance;
+
+						camera.position.lerp( cameraTarget, delta * damping );
+
+					}
+
+					camera.lookAt( carModel.position );
 
 				}
 
@@ -341,30 +335,12 @@
 
 			}
 
-			function updateCamera( delta ) {
-
-				carModel.getWorldPosition( cameraTarget );
-				cameraTarget.y = 2.5;
-				cameraTarget.z += distance;
-
-				camera.position.lerp( cameraTarget, delta * damping );
-				camera.lookAt( carModel.position );
-
-			}
-
 			function resetPosition() {
 
-				if( carModel.position.distanceTo( origin ) > 1200 ) {
+				if ( carModel.position.distanceTo( origin ) > 200 ) {
 
 					carModel.position.copy( origin );
 					car.speed = 0;
-					car.enabled = false;
-
-					setTimeout( function() {
-
-						car.enabled = true;
-
-					}, 1500 )
 
 				}
 
