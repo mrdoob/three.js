@@ -59,7 +59,6 @@
     "http-server": "^0.11.1",
     "qunit": "^2.6.2",
     "rollup": "^0.65.0",
-    "rollup-watch": "^4.3.1",
     "uglify-js": "^3.4.9"
   },
   "jspm": {
