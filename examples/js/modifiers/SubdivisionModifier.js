@@ -4,6 +4,7 @@
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *	@author centerionware / http://www.centerionware.com
+ *  @author twastvedt / http://www.trygvewastvedt.com
  *
  *	Subdivision Geometry Modifier
  *		using Loop Subdivision Scheme
@@ -12,11 +13,18 @@
  *		http://graphics.stanford.edu/~mdfisher/subdivision.html
  *		http://www.holmes3d.net/graphics/subdivision/
  *		http://www.cs.rutgers.edu/~decarlo/readings/subdiv-sg00c.pdf
+ *		https://github.com/PixarAnimationStudios/OpenSubdiv
+ *		http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.94.6876&rep=rep1&type=pdf
  *
- *	Known Issues:
- *		- currently doesn't handle "Sharp Edges"
+ *	Todo:
+ *		Use Chaikin's algorithm to smooth out differences in edge sharpness along creases.
+ *
  */
 
+/**
+ * A class to hold information about the structure of a mesh.
+ * Like a half-edge data structure, but with only the info we need for subdivision.
+ */
 class MeshStructure {
 
 	constructor( geometry, oldStructure ) {
@@ -193,6 +201,9 @@ export class SubdivisionModifier {
 
 	}
 
+	/**
+	 * When the base geometry changes, convert it from a buffer geometry if necessary, clean it up, and initialize the subdivision modifier.
+	 */
 	set baseGeometry( geometry ) {
 
 		// Create this.baseGeometry as cleaned-up copy of input geometry.
@@ -216,6 +227,7 @@ export class SubdivisionModifier {
 
 		this.subdivisions = subdivisions;
 
+		// Store the base geometry and initialize.
 		this.baseGeometry = geometry;
 
 	}
@@ -235,7 +247,15 @@ export class SubdivisionModifier {
 
 	}
 
+	/**
+	 * Weighted addition of (sparse) arrays.
+	 * @param {number[]} baseArray Array to modify.
+	 * @param {number[]} newArray Array of numbers to add to baseArray.
+	 * @param {number} newArrayWeight Multiplier to newArray before adding to baseArray.
+	 */
 	_addArray( baseArray, newArray, newArrayWeight ) {
+
+		// Use forEach to loop through only defined elements in newArray.
 
 		newArray.forEach( function ( el, i ) {
 
@@ -245,9 +265,16 @@ export class SubdivisionModifier {
 
 	}
 
+	/**
+	 * Scale each element in a (sparse) array.
+	 * @param {number[]} array Array to scale.
+	 * @param {number} arrayWeight Array multiplier.
+	 */
 	_scaleArray( array, arrayWeight ) {
 
 		if ( arrayWeight !== 1 ) {
+
+			// Use forEach to loop through only defined elements in array.
 
 			array.forEach( function ( el, i ) {
 
@@ -263,7 +290,21 @@ export class SubdivisionModifier {
 	// Public methods
 
 	/**
-	 * Subdivide base surface.
+	 * Set the sharpness of an edge described by two vertex ids. Must call this.reset() to apply changes.
+	 * @param {number} a Index of first edge vertex.
+	 * @param {number} b Index of second edge vertex.
+	 * @param {number} sharpness Sharpness of edge [0-1].
+	 * @returns {boolean} False if successful.
+	 */
+	setSharpness( a, b, sharpness ) {
+
+		return this._baseStructure.setSharpness( a, b, sharpness );
+
+	}
+
+	/**
+	 * Recalculate mesh structure.
+	 * @param {boolean} keepEdgeSharpness Retain edge sharpeness from current edge structure? Otherwise set all edges to smooth.
 	 */
 	init(keepEdgeSharpness) {
 
@@ -320,6 +361,7 @@ export class SubdivisionModifier {
 	/**
 	 * Update the subdivided geometry to match changes in the base geometry.
 	 * Does not handle changes in topology (added/deleted vertices, modified faces) or edge sharpness.
+	 * @param {number[]} baseGeoVertexIds Vertex ids in base geometry that have changed. If unspecified, check all.
 	 */
 	update( baseGeoVertexIds ) {
 
@@ -376,7 +418,7 @@ export class SubdivisionModifier {
 	}
 
 	/**
-	 * Performs one iteration of subdivision.
+	 * Perform one iteration of subdivision.
 	 */
 	smooth() {
 
@@ -391,12 +433,6 @@ export class SubdivisionModifier {
 		var oldUvs = this.geometry.faceVertexUvs[ 0 ];
 
 		var hasUvs = oldUvs !== undefined && oldUvs.length > 0;
-
-		/******************************************************
-		 *
-		 * Step 0: Preprocess Geometry to Generate edges Lookup
-		 *
-		 *******************************************************/
 
 		var oldStructure = this._subdivStructure;
 
@@ -557,7 +593,9 @@ export class SubdivisionModifier {
 
 				} else {
 
-					beta = 3 / ( 8 * n ); // Warren's modified formula
+					// Warren's modified formula
+
+					beta = 3 / ( 8 * n );
 
 				}
 
