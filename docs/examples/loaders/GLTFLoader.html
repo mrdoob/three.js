@@ -93,8 +93,8 @@
 		colorspace is needed, always configure [page:WebGLRenderer] as follows when using glTF:</p>
 			
 		<code>
-			renderer.gammaOutput = true;
-			renderer.gammaFactor = 2.2;
+		renderer.gammaOutput = true;
+		renderer.gammaFactor = 2.2;
 		</code>
 		
 		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
@@ -102,10 +102,10 @@
 		[page:TextureLoader]) and applying them to a glTF model, colorspace and orientation must be given:</p>
 		
 		<code>
-			// If texture is used for color information, set colorspace.
-			texture.encoding = THREE.sRGBEncoding;
-			// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
-			texture.flipY = false;
+		// If texture is used for color information, set colorspace.
+		texture.encoding = THREE.sRGBEncoding;
+		// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+		texture.flipY = false;
 		</code>		
 		
 		<h2>Custom extensions</h2>
