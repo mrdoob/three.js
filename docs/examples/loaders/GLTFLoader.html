@@ -86,16 +86,27 @@
 
 		<h2>Textures</h2>
 		
-		<p>Textures containing color information (.map, .emissiveMap, .specularMap) always use the sRGB colorspace
-		in glTF. Additionally, UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
-		Both differ from the current three.js default, so keep in mind:
+		<p>Textures containing color information material.{map,emissiveMap,specularMap} always use the sRGB colorspace
+		in glTF, while vertex colors and material.{color,emissive,specular} values use linear colorspace. In a
+		typical rendering workflow, textures are converted to linear colorspace by the renderer, lighting calculations
+		are made, then final output is converted back to sRGB and displayed on screen. Unless post-processing in linear
+		colorspace is needed, always configure [page:WebGLRenderer] as follows when using glTF:</p>
 			
-		<ol>
-			<li>Use <code>renderer.gammaOutput = true; renderer.gammaFactor = 2.2;</code> when using glTF.</li>
-			<li>When loading textures externally (e.g., using [page:TextureLoader]) and applying them to a glTF
-			model, set <code>texture.flipY = false;</code>. If that texture contains color information (see above)
-			then also set <code>texture.encoding = THREE.sRGBEncoding</code>.</li>
-		</ol>
+		<code>
+			renderer.gammaOutput = true;
+			renderer.gammaFactor = 2.2;
+		</code>
+		
+		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
+		assumption that the renderer is set up as shown above. When loading textures externally (e.g., using
+		[page:TextureLoader]) and applying them to a glTF model, colorspace and orientation must be given:</p>
+		
+		<code>
+			// If texture is used for color information, set colorspace.
+			texture.encoding = THREE.sRGBEncoding;
+			// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+			texture.flipY = false;
+		</code>		
 		
 		<h2>Custom extensions</h2>
 
