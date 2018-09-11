@@ -11,7 +11,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 	this.enabled = false;
 
 	this.onLock = null;
-	this.onExit = null;
+	this.onUnlock = null;
 
 	camera.rotation.set( 0, 0, 0 );
 
@@ -48,7 +48,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 		} else {
 
-			if ( scope.onExit !== null ) scope.onExit();
+			if ( scope.onUnlock !== null ) scope.onUnlock();
 
 			scope.enabled = false;
 
@@ -115,7 +115,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	};
 
-	this.exit = function () {
+	this.unlock = function () {
 
 		document.exitPointerLock();
 
