@@ -84,6 +84,19 @@
 		[link:https://github.com/stefanpenner/es6-promise include a polyfill]
 		providing a Promise replacement.</p>
 
+		<h2>Textures</h2>
+		
+		<p>Textures containing color information (.map, .emissiveMap, .specularMap) always use the sRGB colorspace
+		in glTF. Additionally, UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+		Both differ from the current three.js default, so keep in mind:
+			
+		<ol>
+			<li>Use <code>renderer.gammaOutput = true; renderer.gammaFactor = 2.2;</code> when using glTF.</li>
+			<li>When loading textures externally (e.g., using [page:TextureLoader]) and applying them to a glTF
+			model, set <code>texture.flipY = false;</code>. If that texture contains color information (see above)
+			then also set <code>texture.encoding = THREE.sRGBEncoding</code>.</li>
+		</ol>
+		
 		<h2>Custom extensions</h2>
 
 		<p>
