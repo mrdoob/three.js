@@ -18,7 +18,7 @@
 
 
 			使用[link:https://en.wikipedia.org/wiki/Gouraud_shading Gouraud]着色模型计算着色。
-			这将计算每个顶点的着色（如在[link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertex shader]中）并在多边形的面上插入结果。<br /><br />
+			这将计算每个顶点的着色（即在[link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertex shader]中）并在多边形的面上插入结果。<br /><br />
 			由于反射率和光照模型的简单性，[page:MeshPhongMaterial]，[page:MeshStandardMaterial]或者[page:MeshPhysicalMaterial]
 			上使用这种材质时会以一些图形精度为代价，得到更高的性能。
 		</p>
@@ -53,13 +53,13 @@
 		<p>常用属性请参见基类[page:Material]。</p>
 
 		<h3>[property:Texture alphaMap]</h3>
-		<p>alpha贴图是一种灰度纹理，用于控制整个表面的不透明度（黑色：完全透明;白色：完全不透明）。默认值为null。.<br /><br />
+		<p>alpha贴图是一种灰度纹理，用于控制整个表面的不透明度（黑色：完全透明;白色：完全不透明）。默认值为null。<br /><br />
 
 			仅使用纹理的颜色，忽略alpha通道（如果存在）。对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
 			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。单亮度以及亮度/alpha纹理也仍然有效。
 		</p>
 
-		<h3>[property:Texture aoMap]</h3> 设置环境遮挡贴图。默认为空。aoMap需要第二套UV。
+		<h3>[property:Texture aoMap]</h3>
 		<p> 该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]纹理属性。</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
