@@ -33,8 +33,6 @@ function MeshNormalMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.type = 'MeshNormalMaterial';
-
 	this.bumpMap = null;
 	this.bumpScale = 1;
 
