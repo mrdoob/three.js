@@ -10,8 +10,6 @@ function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 
 	Light.call( this, color, intensity );
 
-	this.type = 'SpotLight';
-
 	this.position.copy( Object3D.DefaultUp );
 	this.updateMatrix();
 
