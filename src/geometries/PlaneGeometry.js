@@ -13,8 +13,6 @@ function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 
 	Geometry.call( this );
 
-	this.type = 'PlaneGeometry';
-
 	this.parameters = {
 		width: width,
 		height: height,
@@ -35,8 +33,6 @@ PlaneGeometry.prototype.constructor = PlaneGeometry;
 function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'PlaneBufferGeometry';
 
 	this.parameters = {
 		width: width,
