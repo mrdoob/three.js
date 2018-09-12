@@ -17,8 +17,6 @@ function ParametricGeometry( func, slices, stacks ) {
 
 	Geometry.call( this );
 
-	this.type = 'ParametricGeometry';
-
 	this.parameters = {
 		func: func,
 		slices: slices,
@@ -38,8 +36,6 @@ ParametricGeometry.prototype.constructor = ParametricGeometry;
 function ParametricBufferGeometry( func, slices, stacks ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'ParametricBufferGeometry';
 
 	this.parameters = {
 		func: func,
