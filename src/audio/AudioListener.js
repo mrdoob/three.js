@@ -11,8 +11,6 @@ function AudioListener() {
 
 	Object3D.call( this );
 
-	this.type = 'AudioListener';
-
 	this.context = AudioContext.getContext();
 
 	this.gain = this.context.createGain();
