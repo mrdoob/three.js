@@ -26,8 +26,6 @@ function ShaderMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.type = 'ShaderMaterial';
-
 	this.defines = {};
 	this.uniforms = {};
 
