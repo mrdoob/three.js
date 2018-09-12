@@ -26,8 +26,6 @@ function TextGeometry( text, parameters ) {
 
 	Geometry.call( this );
 
-	this.type = 'TextGeometry';
-
 	this.parameters = {
 		text: text,
 		parameters: parameters
@@ -69,8 +67,6 @@ function TextBufferGeometry( text, parameters ) {
 	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
 
 	ExtrudeBufferGeometry.call( this, shapes, parameters );
-
-	this.type = 'TextBufferGeometry';
 
 }
 
