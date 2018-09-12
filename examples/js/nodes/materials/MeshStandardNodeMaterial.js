@@ -12,8 +12,6 @@ function MeshStandardNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "MeshStandardNodeMaterial";
-
 }
 
 MeshStandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
