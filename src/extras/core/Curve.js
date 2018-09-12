@@ -39,7 +39,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 
 function Curve() {
 
-	this.type = 'Curve';
+	Object.defineProperty( this, 'type', { value: this.constructor.name } );
 
 	this.arcLengthDivisions = 200;
 
