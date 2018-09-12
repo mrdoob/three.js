@@ -20,11 +20,11 @@ var object3DId = 0;
 function Object3D() {
 
 	Object.defineProperty( this, 'id', { value: object3DId ++ } );
+	Object.defineProperty( this, 'type', { value: this.constructor.name } );
 
 	this.uuid = _Math.generateUUID();
 
 	this.name = '';
-	this.type = 'Object3D';
 
 	this.parent = null;
 	this.children = [];
