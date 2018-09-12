@@ -16,8 +16,6 @@ function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q,
 
 	Geometry.call( this );
 
-	this.type = 'TorusKnotGeometry';
-
 	this.parameters = {
 		radius: radius,
 		tube: tube,
@@ -42,8 +40,6 @@ TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
 function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'TorusKnotBufferGeometry';
 
 	this.parameters = {
 		radius: radius,
