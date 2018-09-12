@@ -15,8 +15,6 @@ function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, the
 
 	Geometry.call( this );
 
-	this.type = 'RingGeometry';
-
 	this.parameters = {
 		innerRadius: innerRadius,
 		outerRadius: outerRadius,
@@ -39,8 +37,6 @@ RingGeometry.prototype.constructor = RingGeometry;
 function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'RingBufferGeometry';
 
 	this.parameters = {
 		innerRadius: innerRadius,
