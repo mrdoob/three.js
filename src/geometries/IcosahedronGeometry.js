@@ -12,8 +12,6 @@ function IcosahedronGeometry( radius, detail ) {
 
 	Geometry.call( this );
 
-	this.type = 'IcosahedronGeometry';
-
 	this.parameters = {
 		radius: radius,
 		detail: detail
@@ -47,8 +45,6 @@ function IcosahedronBufferGeometry( radius, detail ) {
 	];
 
 	PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
-
-	this.type = 'IcosahedronBufferGeometry';
 
 	this.parameters = {
 		radius: radius,
