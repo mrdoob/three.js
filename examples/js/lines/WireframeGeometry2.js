@@ -7,8 +7,6 @@ THREE.WireframeGeometry2 = function ( geometry ) {
 
 	THREE.LineSegmentsGeometry.call( this );
 
-	this.type = 'WireframeGeometry2';
-
 	this.fromWireframeGeometry( new THREE.WireframeGeometry( geometry ) );
 
 	// set colors, maybe
