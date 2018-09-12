@@ -14,8 +14,6 @@ function BoxGeometry( width, height, depth, widthSegments, heightSegments, depth
 
 	Geometry.call( this );
 
-	this.type = 'BoxGeometry';
-
 	this.parameters = {
 		width: width,
 		height: height,
@@ -38,8 +36,6 @@ BoxGeometry.prototype.constructor = BoxGeometry;
 function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'BoxBufferGeometry';
 
 	this.parameters = {
 		width: width,
