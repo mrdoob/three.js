@@ -58,8 +58,6 @@ function MeshPhongMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.type = 'MeshPhongMaterial';
-
 	this.color = new Color( 0xffffff ); // diffuse
 	this.specular = new Color( 0x111111 );
 	this.shininess = 30;
