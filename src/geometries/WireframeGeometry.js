@@ -11,8 +11,6 @@ function WireframeGeometry( geometry ) {
 
 	BufferGeometry.call( this );
 
-	this.type = 'WireframeGeometry';
-
 	// buffer
 
 	var vertices = [];
