@@ -28,8 +28,6 @@ function MeshDistanceMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.type = 'MeshDistanceMaterial';
-
 	this.referencePosition = new Vector3();
 	this.nearDistance = 1;
 	this.farDistance = 1000;
