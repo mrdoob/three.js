@@ -15,8 +15,6 @@ function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heig
 
 	Geometry.call( this );
 
-	this.type = 'CylinderGeometry';
-
 	this.parameters = {
 		radiusTop: radiusTop,
 		radiusBottom: radiusBottom,
@@ -41,8 +39,6 @@ CylinderGeometry.prototype.constructor = CylinderGeometry;
 function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'CylinderBufferGeometry';
 
 	this.parameters = {
 		radiusTop: radiusTop,
