@@ -1344,8 +1344,6 @@ THREE.SEA3D.VertexAnimationMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
-	this.type = 'MorphAnimMesh';
-
 	this.updateAnimations( geometry.animations, new THREE.AnimationMixer( this ) );
 
 };
