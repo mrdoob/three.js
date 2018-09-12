@@ -12,11 +12,11 @@ var materialId = 0;
 function Material() {
 
 	Object.defineProperty( this, 'id', { value: materialId ++ } );
+	Object.defineProperty( this, 'type', { value: this.constructor.name } );
 
 	this.uuid = _Math.generateUUID();
 
 	this.name = '';
-	this.type = 'Material';
 
 	this.fog = true;
 	this.lights = true;
