@@ -12,10 +12,7 @@ function Camera() {
 
 	Object3D.call( this );
 
-	this.type = 'Camera';
-
 	this.matrixWorldInverse = new Matrix4();
-
 	this.projectionMatrix = new Matrix4();
 	this.projectionMatrixInverse = new Matrix4();
 
