@@ -12,8 +12,6 @@ function TetrahedronGeometry( radius, detail ) {
 
 	Geometry.call( this );
 
-	this.type = 'TetrahedronGeometry';
-
 	this.parameters = {
 		radius: radius,
 		detail: detail
@@ -40,8 +38,6 @@ function TetrahedronBufferGeometry( radius, detail ) {
 	];
 
 	PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
-
-	this.type = 'TetrahedronBufferGeometry';
 
 	this.parameters = {
 		radius: radius,
