@@ -10,7 +10,7 @@ import { ShapeUtils } from '../ShapeUtils.js';
 
 function ShapePath() {
 
-	this.type = 'ShapePath';
+	Object.defineProperty( this, 'type', { value: this.constructor.name } );
 
 	this.color = new Color();
 
