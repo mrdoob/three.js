@@ -21,8 +21,6 @@ function Line( geometry, material, mode ) {
 
 	Object3D.call( this );
 
-	this.type = 'Line';
-
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
