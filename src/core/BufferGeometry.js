@@ -20,11 +20,11 @@ var bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
 function BufferGeometry() {
 
 	Object.defineProperty( this, 'id', { value: bufferGeometryId += 2 } );
+	Object.defineProperty( this, 'type', { value: this.constructor.name } );
 
 	this.uuid = _Math.generateUUID();
 
 	this.name = '';
-	this.type = 'BufferGeometry';
 
 	this.index = null;
 	this.attributes = {};
