@@ -12,8 +12,6 @@ function DodecahedronGeometry( radius, detail ) {
 
 	Geometry.call( this );
 
-	this.type = 'DodecahedronGeometry';
-
 	this.parameters = {
 		radius: radius,
 		detail: detail
@@ -71,8 +69,6 @@ function DodecahedronBufferGeometry( radius, detail ) {
 	];
 
 	PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
-
-	this.type = 'DodecahedronBufferGeometry';
 
 	this.parameters = {
 		radius: radius,
