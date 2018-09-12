@@ -14,8 +14,6 @@ function MeshToonMaterial( parameters ) {
 
 	this.defines = { 'TOON': '' };
 
-	this.type = 'MeshToonMaterial';
-
 	this.gradientMap = null;
 
 	this.setValues( parameters );
