@@ -12,8 +12,6 @@ function OctahedronGeometry( radius, detail ) {
 
 	Geometry.call( this );
 
-	this.type = 'OctahedronGeometry';
-
 	this.parameters = {
 		radius: radius,
 		detail: detail
@@ -43,8 +41,6 @@ function OctahedronBufferGeometry( radius, detail ) {
 	];
 
 	PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
-
-	this.type = 'OctahedronBufferGeometry';
 
 	this.parameters = {
 		radius: radius,
