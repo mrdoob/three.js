@@ -39,8 +39,6 @@ function MeshMatcapMaterial( parameters ) {
 
 	this.defines = { 'MATCAP': '' };
 
-	this.type = 'MeshMatcapMaterial';
-
 	this.color = new Color( 0xffffff ); // diffuse
 
 	this.matcap = null;
