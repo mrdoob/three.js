@@ -15,8 +15,6 @@ function CubeCamera( near, far, cubeResolution ) {
 
 	Object3D.call( this );
 
-	this.type = 'CubeCamera';
-
 	var fov = 90, aspect = 1;
 
 	var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
