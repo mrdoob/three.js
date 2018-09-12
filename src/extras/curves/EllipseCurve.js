@@ -5,9 +5,7 @@ import { Vector2 } from '../../math/Vector2.js';
 function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	Curve.call( this );
-
-	this.type = 'EllipseCurve';
-
+	
 	this.aX = aX || 0;
 	this.aY = aY || 0;
 
