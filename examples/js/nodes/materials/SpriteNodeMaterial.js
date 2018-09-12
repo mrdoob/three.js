@@ -12,8 +12,6 @@ function SpriteNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "SpriteNodeMaterial";
-
 }
 
 SpriteNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
