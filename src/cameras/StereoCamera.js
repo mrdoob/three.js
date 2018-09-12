@@ -8,7 +8,7 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
 
 function StereoCamera() {
 
-	this.type = 'StereoCamera';
+	Object.defineProperty( this, 'type', { value: this.constructor.name } );
 
 	this.aspect = 1;
 
