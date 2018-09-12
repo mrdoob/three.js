@@ -7,8 +7,6 @@ THREE.LineSegmentsGeometry = function () {
 
 	THREE.InstancedBufferGeometry.call( this );
 
-	this.type = 'LineSegmentsGeometry';
-
 	var plane = new THREE.BufferGeometry();
 
 	var positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
