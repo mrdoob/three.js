@@ -19,8 +19,6 @@ function LineBasicMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.type = 'LineBasicMaterial';
-
 	this.color = new Color( 0xffffff );
 
 	this.linewidth = 1;
