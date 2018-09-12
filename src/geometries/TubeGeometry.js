@@ -20,8 +20,6 @@ function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, ta
 
 	Geometry.call( this );
 
-	this.type = 'TubeGeometry';
-
 	this.parameters = {
 		path: path,
 		tubularSegments: tubularSegments,
@@ -55,8 +53,6 @@ TubeGeometry.prototype.constructor = TubeGeometry;
 function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'TubeBufferGeometry';
 
 	this.parameters = {
 		path: path,
