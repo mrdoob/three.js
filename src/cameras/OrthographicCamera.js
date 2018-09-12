@@ -10,8 +10,6 @@ function OrthographicCamera( left, right, top, bottom, near, far ) {
 
 	Camera.call( this );
 
-	this.type = 'OrthographicCamera';
-
 	this.zoom = 1;
 	this.view = null;
 
