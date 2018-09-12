@@ -24,11 +24,11 @@ var geometryId = 0; // Geometry uses even numbers as Id
 function Geometry() {
 
 	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
+	Object.defineProperty( this, 'type', { value: this.constructor.name } );
 
 	this.uuid = _Math.generateUUID();
 
 	this.name = '';
-	this.type = 'Geometry';
 
 	this.vertices = [];
 	this.colors = [];
