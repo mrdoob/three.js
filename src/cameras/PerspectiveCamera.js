@@ -13,8 +13,6 @@ function PerspectiveCamera( fov, aspect, near, far ) {
 
 	Camera.call( this );
 
-	this.type = 'PerspectiveCamera';
-
 	this.fov = fov !== undefined ? fov : 50;
 	this.zoom = 1;
 
