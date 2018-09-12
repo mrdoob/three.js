@@ -7,6 +7,8 @@ import { Vector2 } from '../math/Vector2.js';
 
 function LightShadow( camera ) {
 
+	this.type = 'LightShadow';
+
 	this.camera = camera;
 
 	this.bias = 0;

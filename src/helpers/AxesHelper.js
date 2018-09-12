@@ -33,6 +33,8 @@ function AxesHelper( size ) {
 
 	LineSegments.call( this, geometry, material );
 
+	this.type = 'AxesHelper';
+
 }
 
 AxesHelper.prototype = Object.create( LineSegments.prototype );

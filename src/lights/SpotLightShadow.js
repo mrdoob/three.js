@@ -10,6 +10,8 @@ function SpotLightShadow() {
 
 	LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
+	this.type = 'SpotLightShadow';
+
 }
 
 SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
