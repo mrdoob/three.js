@@ -11,8 +11,6 @@ function PointLight( color, intensity, distance, decay ) {
 
 	Light.call( this, color, intensity );
 
-	this.type = 'PointLight';
-
 	Object.defineProperty( this, 'power', {
 		get: function () {
 
