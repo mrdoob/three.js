@@ -9,8 +9,6 @@ THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 
 	THREE.PerspectiveCamera.call( this, fov, aspect, near, far );
 
-	this.type = 'CinematicCamera';
-
 	this.postprocessing = { enabled: true };
 	this.shaderSettings = {
 		rings: 3,
