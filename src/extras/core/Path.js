@@ -15,8 +15,6 @@ function Path( points ) {
 
 	CurvePath.call( this );
 
-	this.type = 'Path';
-
 	this.currentPoint = new Vector2();
 
 	if ( points ) {
