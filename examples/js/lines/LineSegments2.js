@@ -7,8 +7,6 @@ THREE.LineSegments2 = function ( geometry, material ) {
 
 	THREE.Mesh.call( this );
 
-	this.type = 'LineSegments2';
-
 	this.geometry = geometry !== undefined ? geometry : new THREE.LineSegmentsGeometry();
 	this.material = material !== undefined ? material : new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
 
