@@ -10,8 +10,6 @@ function Light( color, intensity ) {
 
 	Object3D.call( this );
 
-	this.type = 'Light';
-
 	this.color = new Color( color );
 	this.intensity = intensity !== undefined ? intensity : 1;
 
