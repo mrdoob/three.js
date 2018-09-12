@@ -34,8 +34,6 @@ function ExtrudeGeometry( shapes, options ) {
 
 	Geometry.call( this );
 
-	this.type = 'ExtrudeGeometry';
-
 	this.parameters = {
 		shapes: shapes,
 		options: options
@@ -65,8 +63,6 @@ ExtrudeGeometry.prototype.toJSON = function () {
 function ExtrudeBufferGeometry( shapes, options ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'ExtrudeBufferGeometry';
 
 	this.parameters = {
 		shapes: shapes,
