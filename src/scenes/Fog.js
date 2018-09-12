@@ -7,6 +7,7 @@ import { Color } from '../math/Color.js';
 
 function Fog( color, near, far ) {
 
+	this.type = 'Fog';
 	this.name = '';
 
 	this.color = new Color( color );
@@ -27,7 +28,7 @@ Fog.prototype.clone = function () {
 Fog.prototype.toJSON = function ( /* meta */ ) {
 
 	return {
-		type: 'Fog',
+		type: this.type,
 		color: this.color.getHex(),
 		near: this.near,
 		far: this.far

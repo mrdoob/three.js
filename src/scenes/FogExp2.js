@@ -7,6 +7,7 @@ import { Color } from '../math/Color.js';
 
 function FogExp2( color, density ) {
 
+	this.type = 'FogExp2';
 	this.name = '';
 
 	this.color = new Color( color );
@@ -25,7 +26,7 @@ FogExp2.prototype.clone = function () {
 FogExp2.prototype.toJSON = function ( /* meta */ ) {
 
 	return {
-		type: 'FogExp2',
+		type: this.type,
 		color: this.color.getHex(),
 		density: this.density
 	};
