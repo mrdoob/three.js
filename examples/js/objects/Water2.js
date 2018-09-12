@@ -11,8 +11,6 @@ THREE.Water = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
 
-	this.type = 'Water';
-
 	var scope = this;
 
 	options = options || {};
