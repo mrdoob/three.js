@@ -21,8 +21,6 @@ function Mesh( geometry, material ) {
 
 	Object3D.call( this );
 
-	this.type = 'Mesh';
-
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
