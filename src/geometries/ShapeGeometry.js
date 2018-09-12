@@ -14,8 +14,6 @@ function ShapeGeometry( shapes, curveSegments ) {
 
 	Geometry.call( this );
 
-	this.type = 'ShapeGeometry';
-
 	if ( typeof curveSegments === 'object' ) {
 
 		console.warn( 'THREE.ShapeGeometry: Options parameter has been removed.' );
@@ -52,8 +50,6 @@ ShapeGeometry.prototype.toJSON = function () {
 function ShapeBufferGeometry( shapes, curveSegments ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'ShapeBufferGeometry';
 
 	this.parameters = {
 		shapes: shapes,
