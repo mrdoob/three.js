@@ -8,7 +8,7 @@ import { ShapePath } from './ShapePath.js';
 
 function Font( data ) {
 
-	this.type = 'Font';
+	Object.defineProperty( this, 'type', { value: this.constructor.name } );
 
 	this.data = data;
 
