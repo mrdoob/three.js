@@ -6,8 +6,6 @@ THREE.Reflector = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
 
-	this.type = 'Reflector';
-
 	var scope = this;
 
 	options = options || {};
