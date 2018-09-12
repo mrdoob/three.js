@@ -10,8 +10,6 @@ function Bone() {
 
 	Object3D.call( this );
 
-	this.type = 'Bone';
-
 }
 
 Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
