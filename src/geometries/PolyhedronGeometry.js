@@ -17,8 +17,6 @@ function PolyhedronGeometry( vertices, indices, radius, detail ) {
 
 	Geometry.call( this );
 
-	this.type = 'PolyhedronGeometry';
-
 	this.parameters = {
 		vertices: vertices,
 		indices: indices,
@@ -39,8 +37,6 @@ PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
 function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'PolyhedronBufferGeometry';
 
 	this.parameters = {
 		vertices: vertices,
