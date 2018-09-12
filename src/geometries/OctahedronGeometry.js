@@ -55,6 +55,7 @@ function OctahedronBufferGeometry( radius, detail ) {
 }
 
 OctahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
+OctahedronBufferGeometry.prototype.constructor = OctahedronBufferGeometry;
 OctahedronBufferGeometry.prototype.isOctahedronBufferGeometry = true;
 
 
