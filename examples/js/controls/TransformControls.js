@@ -623,8 +623,6 @@ THREE.TransformControlsGizmo = function () {
 
 	THREE.Object3D.call( this );
 
-	this.type = 'TransformControlsGizmo';
-
 	// shared materials
 
 	var gizmoMaterial = new THREE.MeshBasicMaterial({
@@ -1375,8 +1373,6 @@ THREE.TransformControlsPlane = function () {
 		new THREE.PlaneBufferGeometry( 100000, 100000, 2, 2 ),
 		new THREE.MeshBasicMaterial( { visible: false, wireframe: true, side: THREE.DoubleSide, transparent: true, opacity: 0.1 } )
 	);
-
-	this.type = 'TransformControlsPlane';
 
 	var unitX = new THREE.Vector3( 1, 0, 0 );
 	var unitY = new THREE.Vector3( 0, 1, 0 );
