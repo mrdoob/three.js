@@ -16,8 +16,6 @@ function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	Geometry.call( this );
 
-	this.type = 'CircleGeometry';
-
 	this.parameters = {
 		radius: radius,
 		segments: segments,
@@ -38,8 +36,6 @@ CircleGeometry.prototype.constructor = CircleGeometry;
 function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'CircleBufferGeometry';
 
 	this.parameters = {
 		radius: radius,
