@@ -12,8 +12,6 @@ function PhongNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "PhongNodeMaterial";
-
 }
 
 PhongNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
