@@ -11,8 +11,6 @@ import { Object3D } from '../core/Object3D.js';
 
 function Box3Helper( box, hex ) {
 
-	this.type = 'Box3Helper';
-
 	this.box = box;
 
 	var color = ( hex !== undefined ) ? hex : 0xffff00;
