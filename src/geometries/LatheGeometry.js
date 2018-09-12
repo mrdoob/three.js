@@ -17,8 +17,6 @@ function LatheGeometry( points, segments, phiStart, phiLength ) {
 
 	Geometry.call( this );
 
-	this.type = 'LatheGeometry';
-
 	this.parameters = {
 		points: points,
 		segments: segments,
@@ -39,8 +37,6 @@ LatheGeometry.prototype.constructor = LatheGeometry;
 function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'LatheBufferGeometry';
 
 	this.parameters = {
 		points: points,
