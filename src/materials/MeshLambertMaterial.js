@@ -44,8 +44,6 @@ function MeshLambertMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.type = 'MeshLambertMaterial';
-
 	this.color = new Color( 0xffffff ); // diffuse
 
 	this.map = null;
