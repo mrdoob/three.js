@@ -263,6 +263,7 @@ THREE.GPUParticleSystem = function ( options ) {
 
 THREE.GPUParticleSystem.prototype = Object.create( THREE.Object3D.prototype );
 THREE.GPUParticleSystem.prototype.constructor = THREE.GPUParticleSystem;
+THREE.GPUParticleSystem.prototype.isGPUParticleSystem = true;
 
 
 // Subclass for particle containers, allows for very large arrays to be spread out
@@ -498,4 +499,4 @@ THREE.GPUParticleContainer = function ( maxParticles, particleSystem ) {
 };
 
 THREE.GPUParticleContainer.prototype = Object.create( THREE.Object3D.prototype );
-THREE.GPUParticleContainer.prototype.constructor = THREE.GPUParticleContainer;
+THREE.GPUParticleContainer.prototype.isGPUParticleContainer = true;

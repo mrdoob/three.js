@@ -7,3 +7,5 @@ THREE.ReflectorRTT = function ( geometry, options ) {
 };
 
 THREE.ReflectorRTT.prototype = Object.create( THREE.Reflector.prototype );
+THREE.ReflectorRTT.prototype.constructor = THREE.ReflectorRTT;
+THREE.ReflectorRTT.prototype.isReflectorRTT = true;

@@ -30,6 +30,8 @@ THREE.Sky = function () {
 };
 
 THREE.Sky.prototype = Object.create( THREE.Mesh.prototype );
+THREE.Sky.prototype.constructor = THREE.Sky;
+THREE.Sky.prototype.isSky = true;
 
 THREE.Sky.SkyShader = {
 

@@ -200,6 +200,8 @@ THREE.Ocean = function ( renderer, camera, scene, options ) {
 
 };
 
+THREE.Ocean.prototype.isOcean = true;
+
 THREE.Ocean.prototype.generateMesh = function () {
 
 	var geometry = new THREE.PlaneBufferGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );

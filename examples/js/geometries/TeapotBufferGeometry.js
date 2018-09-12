@@ -716,3 +716,4 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 
 THREE.TeapotBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.TeapotBufferGeometry.prototype.constructor = THREE.TeapotBufferGeometry;
+THREE.TeapotBufferGeometry.prototype.isTeapotBufferGeometry = true;

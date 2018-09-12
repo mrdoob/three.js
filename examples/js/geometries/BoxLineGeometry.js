@@ -65,3 +65,4 @@ THREE.BoxLineGeometry = function ( width, height, depth, widthSegments, heightSe
 
 THREE.BoxLineGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.BoxLineGeometry.prototype.constructor = THREE.BoxLineGeometry;
+THREE.BoxLineGeometry.prototype.isBoxLineGeometry = true;

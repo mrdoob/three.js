@@ -200,6 +200,7 @@ THREE.Reflector = function ( geometry, options ) {
 
 THREE.Reflector.prototype = Object.create( THREE.Mesh.prototype );
 THREE.Reflector.prototype.constructor = THREE.Reflector;
+THREE.Reflector.prototype.isReflector = true;
 
 THREE.Reflector.ReflectorShader = {
 

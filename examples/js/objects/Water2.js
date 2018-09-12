@@ -187,6 +187,7 @@ THREE.Water = function ( geometry, options ) {
 
 THREE.Water.prototype = Object.create( THREE.Mesh.prototype );
 THREE.Water.prototype.constructor = THREE.Water;
+THREE.Water.prototype.isWater = true;
 
 THREE.Water.WaterShader = {
 

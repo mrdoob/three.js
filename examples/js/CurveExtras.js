@@ -23,6 +23,7 @@
 
 	GrannyKnot.prototype = Object.create( THREE.Curve.prototype );
 	GrannyKnot.prototype.constructor = GrannyKnot;
+	GrannyKnot.prototype.isGrannyKnot = true;
 
 	GrannyKnot.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -50,6 +51,7 @@
 
 	HeartCurve.prototype = Object.create( THREE.Curve.prototype );
 	HeartCurve.prototype.constructor = HeartCurve;
+	HeartCurve.prototype.isHeartCurve = true;
 
 	HeartCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -77,6 +79,7 @@
 
 	VivianiCurve.prototype = Object.create( THREE.Curve.prototype );
 	VivianiCurve.prototype.constructor = VivianiCurve;
+	VivianiCurve.prototype.isVivianiCurve = true;
 
 	VivianiCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -103,6 +106,7 @@
 
 	KnotCurve.prototype = Object.create( THREE.Curve.prototype );
 	KnotCurve.prototype.constructor = KnotCurve;
+	KnotCurve.prototype.isKnotCurve = true;
 
 	KnotCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -131,6 +135,7 @@
 
 	HelixCurve.prototype = Object.create( THREE.Curve.prototype );
 	HelixCurve.prototype.constructor = HelixCurve;
+	HelixCurve.prototype.isHelixCurve = true;
 
 	HelixCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -161,6 +166,7 @@
 
 	TrefoilKnot.prototype = Object.create( THREE.Curve.prototype );
 	TrefoilKnot.prototype.constructor = TrefoilKnot;
+	TrefoilKnot.prototype.isTrefoilKnot = true;
 
 	TrefoilKnot.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -188,6 +194,7 @@
 
 	TorusKnot.prototype = Object.create( THREE.Curve.prototype );
 	TorusKnot.prototype.constructor = TorusKnot;
+	TorusKnot.prototype.isTorusKnot = true;
 
 	TorusKnot.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -218,6 +225,7 @@
 
 	CinquefoilKnot.prototype = Object.create( THREE.Curve.prototype );
 	CinquefoilKnot.prototype.constructor = CinquefoilKnot;
+	CinquefoilKnot.prototype.isCinquefoilKnot = true;
 
 	CinquefoilKnot.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -248,6 +256,7 @@
 
 	TrefoilPolynomialKnot.prototype = Object.create( THREE.Curve.prototype );
 	TrefoilPolynomialKnot.prototype.constructor = TrefoilPolynomialKnot;
+	TrefoilPolynomialKnot.prototype.isTrefoilPolynomialKnot = true;
 
 	TrefoilPolynomialKnot.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -282,6 +291,7 @@
 
 	FigureEightPolynomialKnot.prototype = Object.create( THREE.Curve.prototype );
 	FigureEightPolynomialKnot.prototype.constructor = FigureEightPolynomialKnot;
+	FigureEightPolynomialKnot.prototype.isFigureEightPolynomialKnot = true;
 
 	FigureEightPolynomialKnot.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -309,6 +319,7 @@
 
 	DecoratedTorusKnot4a.prototype = Object.create( THREE.Curve.prototype );
 	DecoratedTorusKnot4a.prototype.constructor = DecoratedTorusKnot4a;
+	DecoratedTorusKnot4a.prototype.isDecoratedTorusKnot4a = true;
 
 	DecoratedTorusKnot4a.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -336,6 +347,7 @@
 
 	DecoratedTorusKnot4b.prototype = Object.create( THREE.Curve.prototype );
 	DecoratedTorusKnot4b.prototype.constructor = DecoratedTorusKnot4b;
+	DecoratedTorusKnot4b.prototype.isDecoratedTorusKnot4b = true;
 
 	DecoratedTorusKnot4b.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -363,6 +375,7 @@
 
 	DecoratedTorusKnot5a.prototype = Object.create( THREE.Curve.prototype );
 	DecoratedTorusKnot5a.prototype.constructor = DecoratedTorusKnot5a;
+	DecoratedTorusKnot5a.prototype.isDecoratedTorusKnot5a = true;
 
 	DecoratedTorusKnot5a.prototype.getPoint = function ( t, optionalTarget ) {
 
@@ -390,6 +403,7 @@
 
 	DecoratedTorusKnot5c.prototype = Object.create( THREE.Curve.prototype );
 	DecoratedTorusKnot5c.prototype.constructor = DecoratedTorusKnot5c;
+	DecoratedTorusKnot5c.prototype.isDecoratedTorusKnot5c = true;
 
 	DecoratedTorusKnot5c.prototype.getPoint = function ( t, optionalTarget ) {
 

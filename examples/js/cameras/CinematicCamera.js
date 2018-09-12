@@ -37,6 +37,7 @@ THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 
 THREE.CinematicCamera.prototype = Object.create( THREE.PerspectiveCamera.prototype );
 THREE.CinematicCamera.prototype.constructor = THREE.CinematicCamera;
+THREE.CinematicCamera.prototype.isCinematicCamera = true;
 
 
 // providing fnumber and coc(Circle of Confusion) as extra arguments

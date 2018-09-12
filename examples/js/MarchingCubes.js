@@ -764,6 +764,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 THREE.MarchingCubes.prototype = Object.create( THREE.ImmediateRenderObject.prototype );
 THREE.MarchingCubes.prototype.constructor = THREE.MarchingCubes;
+THREE.MarchingCubes.prototype.isMarchingCubes = true;
 
 
 /////////////////////////////////////

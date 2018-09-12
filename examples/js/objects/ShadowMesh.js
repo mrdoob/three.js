@@ -26,6 +26,7 @@ THREE.ShadowMesh = function ( mesh ) {
 
 THREE.ShadowMesh.prototype = Object.create( THREE.Mesh.prototype );
 THREE.ShadowMesh.prototype.constructor = THREE.ShadowMesh;
+THREE.ShadowMesh.prototype.isShadowMesh = true;
 
 THREE.ShadowMesh.prototype.update = function () {
 

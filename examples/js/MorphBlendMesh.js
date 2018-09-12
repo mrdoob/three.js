@@ -30,6 +30,8 @@ THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.protot
 
 	constructor: THREE.MorphBlendMesh,
 
+	isMorphBlendMesh: true,
+
 	createAnimation: function ( name, start, end, fps ) {
 
 		var animation = {

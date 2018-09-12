@@ -334,6 +334,7 @@
 
 	DecalGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 	DecalGeometry.prototype.constructor = DecalGeometry;
+	DecalGeometry.prototype.isDecalGeometry = true;
 
 	// helper
 

@@ -10,6 +10,7 @@ THREE.Gyroscope = function () {
 
 THREE.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Gyroscope.prototype.constructor = THREE.Gyroscope;
+THREE.Gyroscope.prototype.isGyroscope = true;
 
 THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 

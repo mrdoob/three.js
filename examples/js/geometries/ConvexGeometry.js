@@ -17,6 +17,7 @@
 
 	ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
 	ConvexGeometry.prototype.constructor = ConvexGeometry;
+	ConvexGeometry.prototype.isConvexGeometry = true;
 
 	// ConvexBufferGeometry
 
@@ -72,6 +73,7 @@
 
 	ConvexBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 	ConvexBufferGeometry.prototype.constructor = ConvexBufferGeometry;
+	ConvexBufferGeometry.prototype.isConvexBufferGeometry = true;
 
 	// export
 

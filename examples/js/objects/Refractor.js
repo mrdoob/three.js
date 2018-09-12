@@ -263,6 +263,7 @@ THREE.Refractor = function ( geometry, options ) {
 
 THREE.Refractor.prototype = Object.create( THREE.Mesh.prototype );
 THREE.Refractor.prototype.constructor = THREE.Refractor;
+THREE.Refractor.prototype.isRefractor = true;
 
 THREE.Refractor.RefractorShader = {
 
