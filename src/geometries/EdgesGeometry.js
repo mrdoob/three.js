@@ -12,8 +12,6 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	BufferGeometry.call( this );
 
-	this.type = 'EdgesGeometry';
-
 	this.parameters = {
 		thresholdAngle: thresholdAngle
 	};
