@@ -7,7 +7,6 @@ THREE.Lensflare = function () {
 
 	THREE.Mesh.call( this, THREE.Lensflare.Geometry, new THREE.MeshBasicMaterial( { opacity: 0, transparent: true } ) );
 
-	this.type = 'Lensflare';
 	this.frustumCulled = false;
 	this.renderOrder = Infinity;
 
