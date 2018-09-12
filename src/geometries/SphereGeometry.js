@@ -15,8 +15,6 @@ function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLen
 
 	Geometry.call( this );
 
-	this.type = 'SphereGeometry';
-
 	this.parameters = {
 		radius: radius,
 		widthSegments: widthSegments,
@@ -40,8 +38,6 @@ SphereGeometry.prototype.constructor = SphereGeometry;
 function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'SphereBufferGeometry';
 
 	this.parameters = {
 		radius: radius,
