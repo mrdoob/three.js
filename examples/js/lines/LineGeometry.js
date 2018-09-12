@@ -7,8 +7,6 @@ THREE.LineGeometry = function () {
 
 	THREE.LineSegmentsGeometry.call( this );
 
-	this.type = 'LineGeometry';
-
 };
 
 THREE.LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsGeometry.prototype ), {
