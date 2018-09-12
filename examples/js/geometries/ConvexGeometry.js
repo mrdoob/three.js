@@ -10,6 +10,8 @@
 
 		THREE.Geometry.call( this );
 
+		this.type = 'ConvexGeometry';
+
 		this.fromBufferGeometry( new ConvexBufferGeometry( points ) );
 		this.mergeVertices();
 
@@ -23,6 +25,8 @@
 	function ConvexBufferGeometry( points ) {
 
 		THREE.BufferGeometry.call( this );
+
+		this.type = 'ConvexBufferGeometry';
 
 		// buffers
 

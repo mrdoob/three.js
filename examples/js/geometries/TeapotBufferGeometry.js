@@ -391,6 +391,8 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 
 	THREE.BufferGeometry.call( this );
 
+	this.type = 'TeapotBufferGeometry';
+
 	size = size || 50;
 
 	// number of segments per patch

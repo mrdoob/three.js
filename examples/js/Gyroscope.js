@@ -6,6 +6,8 @@ THREE.Gyroscope = function () {
 
 	THREE.Object3D.call( this );
 
+	this.type = 'Gyroscope';
+
 };
 
 THREE.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );

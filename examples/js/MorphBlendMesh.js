@@ -6,6 +6,8 @@ THREE.MorphBlendMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
+	this.type = 'MorphBlendMesh';
+
 	this.animationsMap = {};
 	this.animationsList = [];
 

@@ -152,6 +152,8 @@ THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, seg
 
 	THREE.ParametricGeometry.call( this, ParametricTube, segments, segmentsRadius );
 
+	this.type = 'ParametricTubeGeometry';
+
 };
 
 THREE.ParametricGeometries.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
@@ -175,6 +177,8 @@ THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segments
 	function TorusKnotCurve() {
 
 		THREE.Curve.call( this );
+
+		this.type = 'ParametricTorusKnotGeometry';
 
 	}
 
@@ -231,6 +235,8 @@ THREE.ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 
 	THREE.ParametricGeometry.call( this, sphere, u, v );
 
+	this.type = 'ParametricSphereGeometry';
+
 };
 
 THREE.ParametricGeometries.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
@@ -256,6 +262,8 @@ THREE.ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidt
 	}
 
 	THREE.ParametricGeometry.call( this, plane, segmentsWidth, segmentsDepth );
+
+	this.type = 'ParametricPlaneGeometry';
 
 };
 

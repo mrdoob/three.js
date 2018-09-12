@@ -17,6 +17,8 @@ THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints 
 
 	THREE.Curve.call( this );
 
+	this.type = 'NURBSCurve';
+
 	this.degree = degree;
 	this.knots = knots;
 	this.controlPoints = [];

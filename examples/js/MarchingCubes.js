@@ -8,6 +8,8 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 	THREE.ImmediateRenderObject.call( this, material );
 
+	this.type = 'MarchingCubes';
+
 	var scope = this;
 
 	// temp buffers used in polygonize
