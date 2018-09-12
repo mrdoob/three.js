@@ -28,8 +28,6 @@ function MeshDepthMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.type = 'MeshDepthMaterial';
-
 	this.depthPacking = BasicDepthPacking;
 
 	this.skinning = false;
