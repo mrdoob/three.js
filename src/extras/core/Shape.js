@@ -18,8 +18,6 @@ function Shape( points ) {
 
 	this.uuid = _Math.generateUUID();
 
-	this.type = 'Shape';
-
 	this.holes = [];
 
 }
