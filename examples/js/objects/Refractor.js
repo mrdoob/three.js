@@ -7,8 +7,6 @@ THREE.Refractor = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
 
-	this.type = 'Refractor';
-
 	var scope = this;
 
 	options = options || {};
