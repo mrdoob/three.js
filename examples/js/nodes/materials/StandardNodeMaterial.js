@@ -12,8 +12,6 @@ function StandardNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "StandardNodeMaterial";
-
 }
 
 StandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
