@@ -272,6 +272,8 @@ Object.assign( PropertyBinding, {
 
 Object.assign( PropertyBinding.prototype, { // prototype, continued
 
+	isPropertyBinding: true,
+
 	// these are used to "bind" a nonexistent property
 	_getValue_unavailable: function () {},
 	_setValue_unavailable: function () {},

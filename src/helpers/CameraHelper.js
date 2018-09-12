@@ -123,6 +123,7 @@ function CameraHelper( camera ) {
 
 CameraHelper.prototype = Object.create( LineSegments.prototype );
 CameraHelper.prototype.constructor = CameraHelper;
+CameraHelper.prototype.isCameraHelper = true;
 
 CameraHelper.prototype.update = function () {
 

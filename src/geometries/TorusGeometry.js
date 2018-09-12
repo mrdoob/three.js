@@ -32,6 +32,7 @@ function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
 TorusGeometry.prototype = Object.create( Geometry.prototype );
 TorusGeometry.prototype.constructor = TorusGeometry;
+TorusGeometry.prototype.isTorusGeometry = true;
 
 // TorusBufferGeometry
 
@@ -137,6 +138,7 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
+TorusBufferGeometry.prototype.isTorusBufferGeometry = true;
 
 
 export { TorusGeometry, TorusBufferGeometry };

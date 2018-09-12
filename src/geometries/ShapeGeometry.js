@@ -36,6 +36,7 @@ function ShapeGeometry( shapes, curveSegments ) {
 
 ShapeGeometry.prototype = Object.create( Geometry.prototype );
 ShapeGeometry.prototype.constructor = ShapeGeometry;
+ShapeGeometry.prototype.isShapeGeometry = true;
 
 ShapeGeometry.prototype.toJSON = function () {
 
@@ -181,6 +182,7 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 ShapeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 ShapeBufferGeometry.prototype.constructor = ShapeBufferGeometry;
+ShapeBufferGeometry.prototype.isShapeBufferGeometry = true;
 
 ShapeBufferGeometry.prototype.toJSON = function () {
 

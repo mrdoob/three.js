@@ -20,6 +20,8 @@ ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.proto
 
 	constructor: ColorKeyframeTrack,
 
+	isColorKeyframeTrack: true,
+
 	ValueTypeName: 'color'
 
 	// ValueBufferType is inherited

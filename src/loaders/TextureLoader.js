@@ -16,6 +16,8 @@ function TextureLoader( manager ) {
 
 Object.assign( TextureLoader.prototype, {
 
+	isTextureLoader: true,
+
 	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {

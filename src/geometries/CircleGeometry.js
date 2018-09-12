@@ -32,6 +32,7 @@ function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 
 CircleGeometry.prototype = Object.create( Geometry.prototype );
 CircleGeometry.prototype.constructor = CircleGeometry;
+CircleGeometry.prototype.isCircleGeometry = true;
 
 // CircleBufferGeometry
 
@@ -116,6 +117,7 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
+CircleBufferGeometry.prototype.isCircleBufferGeometry = true;
 
 
 export { CircleGeometry, CircleBufferGeometry };

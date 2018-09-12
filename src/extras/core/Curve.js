@@ -47,6 +47,8 @@ function Curve() {
 
 Object.assign( Curve.prototype, {
 
+	isCurve: true,
+
 	// Virtual base class method to overwrite and implement in subclasses
 	//	- t [0 .. 1]
 

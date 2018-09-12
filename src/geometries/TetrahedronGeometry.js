@@ -26,6 +26,7 @@ function TetrahedronGeometry( radius, detail ) {
 
 TetrahedronGeometry.prototype = Object.create( Geometry.prototype );
 TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
+TetrahedronGeometry.prototype.isTetrahedronGeometry = true;
 
 // TetrahedronBufferGeometry
 
@@ -52,6 +53,7 @@ function TetrahedronBufferGeometry( radius, detail ) {
 
 TetrahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 TetrahedronBufferGeometry.prototype.constructor = TetrahedronBufferGeometry;
+TetrahedronBufferGeometry.prototype.isTetrahedronBufferGeometry = true;
 
 
 export { TetrahedronGeometry, TetrahedronBufferGeometry };

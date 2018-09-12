@@ -49,6 +49,7 @@ function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, ta
 
 TubeGeometry.prototype = Object.create( Geometry.prototype );
 TubeGeometry.prototype.constructor = TubeGeometry;
+TubeGeometry.prototype.isTubeGeometry = true;
 
 // TubeBufferGeometry
 
@@ -218,6 +219,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 TubeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
+TubeBufferGeometry.prototype.isTubeBufferGeometry = true;
 
 
 export { TubeGeometry, TubeBufferGeometry };

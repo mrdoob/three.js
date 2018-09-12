@@ -14,6 +14,8 @@ function ImageLoader( manager ) {
 
 Object.assign( ImageLoader.prototype, {
 
+	isImageLoader: true,
+
 	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {

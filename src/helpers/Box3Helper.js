@@ -35,6 +35,7 @@ function Box3Helper( box, hex ) {
 
 Box3Helper.prototype = Object.create( LineSegments.prototype );
 Box3Helper.prototype.constructor = Box3Helper;
+Box3Helper.prototype.isBox3Helper = true;
 
 Box3Helper.prototype.updateMatrixWorld = function ( force ) {
 

@@ -13,6 +13,8 @@ function Box2( min, max ) {
 
 Object.assign( Box2.prototype, {
 
+	isBox2: true,
+
 	set: function ( min, max ) {
 
 		this.min.copy( min );

@@ -26,6 +26,7 @@ function OctahedronGeometry( radius, detail ) {
 
 OctahedronGeometry.prototype = Object.create( Geometry.prototype );
 OctahedronGeometry.prototype.constructor = OctahedronGeometry;
+OctahedronGeometry.prototype.isOctahedronGeometry = true;
 
 // OctahedronBufferGeometry
 
@@ -54,7 +55,7 @@ function OctahedronBufferGeometry( radius, detail ) {
 }
 
 OctahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
-OctahedronBufferGeometry.prototype.constructor = OctahedronBufferGeometry;
+OctahedronBufferGeometry.prototype.isOctahedronBufferGeometry = true;
 
 
 export { OctahedronGeometry, OctahedronBufferGeometry };

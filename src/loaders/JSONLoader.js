@@ -32,6 +32,8 @@ function JSONLoader( manager ) {
 
 Object.assign( JSONLoader.prototype, {
 
+	isJSONLoader: true,
+
 	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {

@@ -48,6 +48,8 @@ function Skeleton( bones, boneInverses ) {
 
 Object.assign( Skeleton.prototype, {
 
+	isSkeleton: true,
+
 	calculateInverses: function () {
 
 		this.boneInverses = [];

@@ -20,6 +20,8 @@ function MaterialLoader( manager ) {
 
 Object.assign( MaterialLoader.prototype, {
 
+	isMaterialLoader: true,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;

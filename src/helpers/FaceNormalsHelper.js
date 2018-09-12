@@ -57,6 +57,7 @@ function FaceNormalsHelper( object, size, hex, linewidth ) {
 
 FaceNormalsHelper.prototype = Object.create( LineSegments.prototype );
 FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;
+FaceNormalsHelper.prototype.isFaceNormalsHelper = true;
 
 FaceNormalsHelper.prototype.update = ( function () {
 

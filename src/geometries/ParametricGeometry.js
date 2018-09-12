@@ -32,6 +32,7 @@ function ParametricGeometry( func, slices, stacks ) {
 
 ParametricGeometry.prototype = Object.create( Geometry.prototype );
 ParametricGeometry.prototype.constructor = ParametricGeometry;
+ParametricGeometry.prototype.isParametricGeometry = true;
 
 // ParametricBufferGeometry
 
@@ -158,6 +159,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
+ParametricBufferGeometry.prototype.isParametricBufferGeometry = true;
 
 
 export { ParametricGeometry, ParametricBufferGeometry };

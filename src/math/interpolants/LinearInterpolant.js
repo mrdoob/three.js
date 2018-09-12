@@ -14,6 +14,8 @@ LinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototyp
 
 	constructor: LinearInterpolant,
 
+	isLinearInterpolant: true,
+
 	interpolate_: function ( i1, t0, t, t1 ) {
 
 		var result = this.resultBuffer,

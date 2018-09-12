@@ -13,7 +13,9 @@ function DirectionalLightShadow( ) {
 
 DirectionalLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
-	constructor: DirectionalLightShadow
+	constructor: DirectionalLightShadow,
+
+	isDirectionalLightShadow: true
 
 } );
 

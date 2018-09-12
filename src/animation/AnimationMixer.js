@@ -31,6 +31,8 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	constructor: AnimationMixer,
 
+	isAnimationMixer: true,
+
 	_bindAction: function ( action, prototypeAction ) {
 
 		var root = action._localRoot || this._root,

@@ -6,6 +6,8 @@ function EventDispatcher() {}
 
 Object.assign( EventDispatcher.prototype, {
 
+	isEventDispatcher: true,
+
 	addEventListener: function ( type, listener ) {
 
 		if ( this._listeners === undefined ) this._listeners = {};

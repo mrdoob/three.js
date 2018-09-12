@@ -26,6 +26,7 @@ function DodecahedronGeometry( radius, detail ) {
 
 DodecahedronGeometry.prototype = Object.create( Geometry.prototype );
 DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
+DodecahedronGeometry.prototype.isDodecahedronGeometry = true;
 
 // DodecahedronBufferGeometry
 
@@ -83,6 +84,7 @@ function DodecahedronBufferGeometry( radius, detail ) {
 
 DodecahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 DodecahedronBufferGeometry.prototype.constructor = DodecahedronBufferGeometry;
+DodecahedronBufferGeometry.prototype.isDodecahedronBufferGeometry = true;
 
 
 export { DodecahedronGeometry, DodecahedronBufferGeometry };

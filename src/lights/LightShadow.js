@@ -21,6 +21,8 @@ function LightShadow( camera ) {
 
 Object.assign( LightShadow.prototype, {
 
+	isLightShadow: true,
+
 	copy: function ( source ) {
 
 		this.camera = source.camera.clone();

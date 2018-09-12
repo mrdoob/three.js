@@ -51,6 +51,7 @@ function PointLightHelper( light, sphereSize, color ) {
 
 PointLightHelper.prototype = Object.create( Mesh.prototype );
 PointLightHelper.prototype.constructor = PointLightHelper;
+PointLightHelper.prototype.isPointLightHelper = true;
 
 PointLightHelper.prototype.dispose = function () {
 

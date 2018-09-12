@@ -15,6 +15,8 @@ function Sphere( center, radius ) {
 
 Object.assign( Sphere.prototype, {
 
+	isSphere: true,
+
 	set: function ( center, radius ) {
 
 		this.center.copy( center );

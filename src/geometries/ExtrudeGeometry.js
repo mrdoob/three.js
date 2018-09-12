@@ -48,6 +48,7 @@ function ExtrudeGeometry( shapes, options ) {
 
 ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
 ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+ExtrudeGeometry.prototype.isExtrudeGeometry = true;
 
 ExtrudeGeometry.prototype.toJSON = function () {
 
@@ -727,6 +728,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 ExtrudeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
+ExtrudeBufferGeometry.prototype.isExtrudeBufferGeometry = true;
 
 ExtrudeBufferGeometry.prototype.toJSON = function () {
 

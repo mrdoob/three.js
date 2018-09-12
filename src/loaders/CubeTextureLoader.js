@@ -15,6 +15,8 @@ function CubeTextureLoader( manager ) {
 
 Object.assign( CubeTextureLoader.prototype, {
 
+	isCubeTextureLoader: true,
+
 	crossOrigin: 'anonymous',
 
 	load: function ( urls, onLoad, onProgress, onError ) {

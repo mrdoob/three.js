@@ -17,6 +17,8 @@ function BufferGeometryLoader( manager ) {
 
 Object.assign( BufferGeometryLoader.prototype, {
 
+	isBufferGeometryLoader: true,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;

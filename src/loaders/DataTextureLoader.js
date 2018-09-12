@@ -20,6 +20,8 @@ function DataTextureLoader( manager ) {
 
 Object.assign( DataTextureLoader.prototype, {
 
+	isDataTextureLoader: true,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;

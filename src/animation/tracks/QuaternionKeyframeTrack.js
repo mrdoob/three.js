@@ -21,6 +21,8 @@ QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.
 
 	constructor: QuaternionKeyframeTrack,
 
+	isQuaternionKeyframeTrack: true,
+
 	ValueTypeName: 'quaternion',
 
 	// ValueBufferType is inherited

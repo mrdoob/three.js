@@ -29,6 +29,7 @@ function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 
 PlaneGeometry.prototype = Object.create( Geometry.prototype );
 PlaneGeometry.prototype.constructor = PlaneGeometry;
+PlaneGeometry.prototype.isPlaneGeometry = true;
 
 // PlaneBufferGeometry
 
@@ -121,6 +122,7 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
 PlaneBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 PlaneBufferGeometry.prototype.constructor = PlaneBufferGeometry;
+PlaneBufferGeometry.prototype.isPlaneBufferGeometry = true;
 
 
 export { PlaneGeometry, PlaneBufferGeometry };

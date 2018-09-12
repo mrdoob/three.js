@@ -27,6 +27,7 @@ function ConeGeometry( radius, height, radialSegments, heightSegments, openEnded
 
 ConeGeometry.prototype = Object.create( CylinderGeometry.prototype );
 ConeGeometry.prototype.constructor = ConeGeometry;
+ConeGeometry.prototype.isConeGeometry = true;
 
 // ConeBufferGeometry
 
@@ -50,6 +51,7 @@ function ConeBufferGeometry( radius, height, radialSegments, heightSegments, ope
 
 ConeBufferGeometry.prototype = Object.create( CylinderBufferGeometry.prototype );
 ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
+ConeBufferGeometry.prototype.isConeBufferGeometry = true;
 
 
 export { ConeGeometry, ConeBufferGeometry };

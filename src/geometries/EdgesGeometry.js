@@ -108,6 +108,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
 EdgesGeometry.prototype.constructor = EdgesGeometry;
+EdgesGeometry.prototype.isEdgesGeometry = true;
 
 
 export { EdgesGeometry };

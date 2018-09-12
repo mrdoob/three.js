@@ -16,6 +16,8 @@ function Clock( autoStart ) {
 
 Object.assign( Clock.prototype, {
 
+	isClock: true,
+
 	start: function () {
 
 		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732

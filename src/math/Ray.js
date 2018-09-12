@@ -13,6 +13,8 @@ function Ray( origin, direction ) {
 
 Object.assign( Ray.prototype, {
 
+	isRay: true,
+
 	set: function ( origin, direction ) {
 
 		this.origin.copy( origin );

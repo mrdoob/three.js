@@ -333,6 +333,7 @@ function Int8BufferAttribute( array, itemSize, normalized ) {
 
 Int8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Int8BufferAttribute.prototype.constructor = Int8BufferAttribute;
+Int8BufferAttribute.prototype.isInt8BufferAttribute = true;
 
 
 function Uint8BufferAttribute( array, itemSize, normalized ) {
@@ -343,6 +344,7 @@ function Uint8BufferAttribute( array, itemSize, normalized ) {
 
 Uint8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Uint8BufferAttribute.prototype.constructor = Uint8BufferAttribute;
+Uint8BufferAttribute.prototype.isUint8BufferAttribute = true;
 
 
 function Uint8ClampedBufferAttribute( array, itemSize, normalized ) {
@@ -353,6 +355,7 @@ function Uint8ClampedBufferAttribute( array, itemSize, normalized ) {
 
 Uint8ClampedBufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Uint8ClampedBufferAttribute.prototype.constructor = Uint8ClampedBufferAttribute;
+Uint8ClampedBufferAttribute.prototype.isUint8ClampedBufferAttribute = true;
 
 
 function Int16BufferAttribute( array, itemSize, normalized ) {
@@ -363,6 +366,7 @@ function Int16BufferAttribute( array, itemSize, normalized ) {
 
 Int16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Int16BufferAttribute.prototype.constructor = Int16BufferAttribute;
+Int16BufferAttribute.prototype.isInt16BufferAttribute = true;
 
 
 function Uint16BufferAttribute( array, itemSize, normalized ) {
@@ -373,6 +377,7 @@ function Uint16BufferAttribute( array, itemSize, normalized ) {
 
 Uint16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Uint16BufferAttribute.prototype.constructor = Uint16BufferAttribute;
+Uint16BufferAttribute.prototype.isUint16BufferAttribute = true;
 
 
 function Int32BufferAttribute( array, itemSize, normalized ) {
@@ -383,6 +388,7 @@ function Int32BufferAttribute( array, itemSize, normalized ) {
 
 Int32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Int32BufferAttribute.prototype.constructor = Int32BufferAttribute;
+Int32BufferAttribute.prototype.isInt32BufferAttribute = true;
 
 
 function Uint32BufferAttribute( array, itemSize, normalized ) {
@@ -393,6 +399,7 @@ function Uint32BufferAttribute( array, itemSize, normalized ) {
 
 Uint32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Uint32BufferAttribute.prototype.constructor = Uint32BufferAttribute;
+Uint32BufferAttribute.prototype.isUint32BufferAttribute = true;
 
 
 function Float32BufferAttribute( array, itemSize, normalized ) {
@@ -403,6 +410,7 @@ function Float32BufferAttribute( array, itemSize, normalized ) {
 
 Float32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Float32BufferAttribute.prototype.constructor = Float32BufferAttribute;
+Float32BufferAttribute.prototype.isFloat32BufferAttribute = true;
 
 
 function Float64BufferAttribute( array, itemSize, normalized ) {
@@ -413,6 +421,7 @@ function Float64BufferAttribute( array, itemSize, normalized ) {
 
 Float64BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Float64BufferAttribute.prototype.constructor = Float64BufferAttribute;
+Float64BufferAttribute.prototype.isFloat64BufferAttribute = true;
 
 //
 

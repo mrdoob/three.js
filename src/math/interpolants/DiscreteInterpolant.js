@@ -18,6 +18,8 @@ DiscreteInterpolant.prototype = Object.assign( Object.create( Interpolant.protot
 
 	constructor: DiscreteInterpolant,
 
+	isDiscreteInterpolant: true,
+
 	interpolate_: function ( i1 /*, t0, t, t1 */ ) {
 
 		return this.copySampleValue_( i1 - 1 );

@@ -26,6 +26,8 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: AudioListener,
 
+	isAudioListener: true,
+
 	getInput: function () {
 
 		return this.gain;

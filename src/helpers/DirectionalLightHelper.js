@@ -51,6 +51,7 @@ function DirectionalLightHelper( light, size, color ) {
 
 DirectionalLightHelper.prototype = Object.create( Object3D.prototype );
 DirectionalLightHelper.prototype.constructor = DirectionalLightHelper;
+DirectionalLightHelper.prototype.isDirectionalLightHelper = true;
 
 DirectionalLightHelper.prototype.dispose = function () {
 

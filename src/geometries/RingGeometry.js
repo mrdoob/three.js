@@ -33,6 +33,7 @@ function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, the
 
 RingGeometry.prototype = Object.create( Geometry.prototype );
 RingGeometry.prototype.constructor = RingGeometry;
+RingGeometry.prototype.isRingGeometry = true;
 
 // RingBufferGeometry
 
@@ -147,6 +148,7 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 
 RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 RingBufferGeometry.prototype.constructor = RingBufferGeometry;
+RingBufferGeometry.prototype.isRingBufferGeometry = true;
 
 
 export { RingGeometry, RingBufferGeometry };

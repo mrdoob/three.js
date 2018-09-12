@@ -44,6 +44,7 @@ function HemisphereLightHelper( light, size, color ) {
 
 HemisphereLightHelper.prototype = Object.create( Object3D.prototype );
 HemisphereLightHelper.prototype.constructor = HemisphereLightHelper;
+HemisphereLightHelper.prototype.isHemisphereLightHelper = true;
 
 HemisphereLightHelper.prototype.dispose = function () {
 

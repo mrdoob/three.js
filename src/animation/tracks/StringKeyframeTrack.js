@@ -21,6 +21,8 @@ StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prot
 
 	constructor: StringKeyframeTrack,
 
+	isStringKeyframeTrack: true,
+
 	ValueTypeName: 'string',
 	ValueBufferType: Array,
 

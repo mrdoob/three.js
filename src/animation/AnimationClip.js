@@ -391,6 +391,8 @@ Object.assign( AnimationClip, {
 
 Object.assign( AnimationClip.prototype, {
 
+	isAnimationClip: true,
+
 	resetDuration: function () {
 
 		var tracks = this.tracks, duration = 0;

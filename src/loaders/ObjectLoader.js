@@ -67,6 +67,8 @@ function ObjectLoader( manager ) {
 
 Object.assign( ObjectLoader.prototype, {
 
+	isObjectLoader: true,
+
 	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {

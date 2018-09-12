@@ -19,6 +19,8 @@ NumberKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prot
 
 	constructor: NumberKeyframeTrack,
 
+	isNumberKeyframeTrack: true,
+
 	ValueTypeName: 'number'
 
 	// ValueBufferType is inherited

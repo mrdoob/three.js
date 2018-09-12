@@ -58,6 +58,7 @@ function SpotLightHelper( light, color ) {
 
 SpotLightHelper.prototype = Object.create( Object3D.prototype );
 SpotLightHelper.prototype.constructor = SpotLightHelper;
+SpotLightHelper.prototype.isSpotLightHelper = true;
 
 SpotLightHelper.prototype.dispose = function () {
 

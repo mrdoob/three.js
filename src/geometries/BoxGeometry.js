@@ -32,6 +32,7 @@ function BoxGeometry( width, height, depth, widthSegments, heightSegments, depth
 
 BoxGeometry.prototype = Object.create( Geometry.prototype );
 BoxGeometry.prototype.constructor = BoxGeometry;
+BoxGeometry.prototype.isBoxGeometry = true;
 
 // BoxBufferGeometry
 
@@ -198,6 +199,7 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
+BoxBufferGeometry.prototype.isBoxBufferGeometry = true;
 
 
 export { BoxGeometry, BoxBufferGeometry };

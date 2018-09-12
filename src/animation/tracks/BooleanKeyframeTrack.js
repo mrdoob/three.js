@@ -21,6 +21,8 @@ BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.pro
 
 	constructor: BooleanKeyframeTrack,
 
+	isBooleanKeyframeTrack: true,
+
 	ValueTypeName: 'bool',
 	ValueBufferType: Array,
 

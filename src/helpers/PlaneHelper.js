@@ -43,6 +43,7 @@ function PlaneHelper( plane, size, hex ) {
 
 PlaneHelper.prototype = Object.create( Line.prototype );
 PlaneHelper.prototype.constructor = PlaneHelper;
+PlaneHelper.prototype.isPlaneHelper = true;
 
 PlaneHelper.prototype.updateMatrixWorld = function ( force ) {
 

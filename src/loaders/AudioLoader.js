@@ -14,6 +14,8 @@ function AudioLoader( manager ) {
 
 Object.assign( AudioLoader.prototype, {
 
+	isAudioLoader: true,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var loader = new FileLoader( this.manager );

@@ -33,6 +33,7 @@ function PolyhedronGeometry( vertices, indices, radius, detail ) {
 
 PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
 PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
+PolyhedronGeometry.prototype.isPolyhedronGeometry = true;
 
 // PolyhedronBufferGeometry
 
@@ -336,6 +337,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 PolyhedronBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 PolyhedronBufferGeometry.prototype.constructor = PolyhedronBufferGeometry;
+PolyhedronBufferGeometry.prototype.isPolyhedronBufferGeometry = true;
 
 
 export { PolyhedronGeometry, PolyhedronBufferGeometry };

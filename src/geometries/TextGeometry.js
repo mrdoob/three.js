@@ -40,6 +40,7 @@ function TextGeometry( text, parameters ) {
 
 TextGeometry.prototype = Object.create( Geometry.prototype );
 TextGeometry.prototype.constructor = TextGeometry;
+TextGeometry.prototype.isTextGeometry = true;
 
 // TextBufferGeometry
 
@@ -76,6 +77,7 @@ function TextBufferGeometry( text, parameters ) {
 
 TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );
 TextBufferGeometry.prototype.constructor = TextBufferGeometry;
+TextBufferGeometry.prototype.isTextBufferGeometry = true;
 
 
 export { TextGeometry, TextBufferGeometry };

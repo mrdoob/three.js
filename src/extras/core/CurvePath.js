@@ -26,6 +26,8 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	constructor: CurvePath,
 
+	isCurvePath: true,
+
 	add: function ( curve ) {
 
 		this.curves.push( curve );

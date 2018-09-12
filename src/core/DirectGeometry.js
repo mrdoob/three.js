@@ -36,6 +36,8 @@ function DirectGeometry() {
 
 Object.assign( DirectGeometry.prototype, {
 
+	isDirectGeometry: true,
+
 	computeGroups: function ( geometry ) {
 
 		var group;

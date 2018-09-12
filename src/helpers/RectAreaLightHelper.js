@@ -38,6 +38,7 @@ function RectAreaLightHelper( light, color ) {
 
 RectAreaLightHelper.prototype = Object.create( Object3D.prototype );
 RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
+RectAreaLightHelper.prototype.isRectAreaLightHelper = true;
 
 RectAreaLightHelper.prototype.dispose = function () {
 

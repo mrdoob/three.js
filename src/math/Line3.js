@@ -14,6 +14,8 @@ function Line3( start, end ) {
 
 Object.assign( Line3.prototype, {
 
+	isLine3: true,
+
 	set: function ( start, end ) {
 
 		this.start.copy( start );

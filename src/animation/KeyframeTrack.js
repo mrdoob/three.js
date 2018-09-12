@@ -83,6 +83,8 @@ Object.assign( KeyframeTrack.prototype, {
 
 	constructor: KeyframeTrack,
 
+	isKeyframeTrack: true,
+
 	TimeBufferType: Float32Array,
 
 	ValueBufferType: Float32Array,

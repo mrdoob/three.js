@@ -63,6 +63,8 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 
 Object.assign( Raycaster.prototype, {
 
+	isRaycaster: true,
+
 	linePrecision: 1,
 
 	set: function ( origin, direction ) {

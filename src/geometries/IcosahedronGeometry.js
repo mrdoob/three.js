@@ -26,6 +26,7 @@ function IcosahedronGeometry( radius, detail ) {
 
 IcosahedronGeometry.prototype = Object.create( Geometry.prototype );
 IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
+IcosahedronGeometry.prototype.isIcosahedronGeometry = true;
 
 // IcosahedronBufferGeometry
 
@@ -59,6 +60,7 @@ function IcosahedronBufferGeometry( radius, detail ) {
 
 IcosahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 IcosahedronBufferGeometry.prototype.constructor = IcosahedronBufferGeometry;
+IcosahedronBufferGeometry.prototype.isIcosahedronBufferGeometry = true;
 
 
 export { IcosahedronGeometry, IcosahedronBufferGeometry };

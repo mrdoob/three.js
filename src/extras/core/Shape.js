@@ -28,6 +28,8 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 	constructor: Shape,
 
+	isShape: true,
+
 	getPointsHoles: function ( divisions ) {
 
 		var holesPts = [];

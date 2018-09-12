@@ -20,6 +20,8 @@ function CompressedTextureLoader( manager ) {
 
 Object.assign( CompressedTextureLoader.prototype, {
 
+	isCompressedTextureLoader: true,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;

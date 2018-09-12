@@ -15,6 +15,8 @@ function AudioAnalyser( audio, fftSize ) {
 
 Object.assign( AudioAnalyser.prototype, {
 
+	isAudioAnalyser: true,
+
 	getFrequencyData: function () {
 
 		this.analyser.getByteFrequencyData( this.data );

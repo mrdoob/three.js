@@ -14,6 +14,8 @@ function FontLoader( manager ) {
 
 Object.assign( FontLoader.prototype, {
 
+	isFontLoader: true,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;

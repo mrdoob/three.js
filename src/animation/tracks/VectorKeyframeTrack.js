@@ -20,6 +20,8 @@ VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prot
 
 	constructor: VectorKeyframeTrack,
 
+	isVectorKeyframeTrack: true,
+
 	ValueTypeName: 'vector'
 
 	// ValueBufferType is inherited

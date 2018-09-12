@@ -35,6 +35,8 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Audio,
 
+	isAudio: true,
+
 	getOutput: function () {
 
 		return this.gain;

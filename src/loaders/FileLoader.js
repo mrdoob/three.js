@@ -15,6 +15,8 @@ function FileLoader( manager ) {
 
 Object.assign( FileLoader.prototype, {
 
+	isFileLoader: true,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';

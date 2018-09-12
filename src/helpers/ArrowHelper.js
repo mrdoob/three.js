@@ -64,6 +64,7 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 ArrowHelper.prototype = Object.create( Object3D.prototype );
 ArrowHelper.prototype.constructor = ArrowHelper;
+ArrowHelper.prototype.isArrowHelper = true;
 
 ArrowHelper.prototype.setDirection = ( function () {
 

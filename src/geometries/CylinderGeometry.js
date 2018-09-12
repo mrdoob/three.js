@@ -35,6 +35,7 @@ function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heig
 
 CylinderGeometry.prototype = Object.create( Geometry.prototype );
 CylinderGeometry.prototype.constructor = CylinderGeometry;
+CylinderGeometry.prototype.isCylinderGeometry = true;
 
 // CylinderBufferGeometry
 
@@ -311,6 +312,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 CylinderBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;
+CylinderBufferGeometry.prototype.isCylinderBufferGeometry = true;
 
 
 export { CylinderGeometry, CylinderBufferGeometry };

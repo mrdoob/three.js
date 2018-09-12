@@ -34,6 +34,7 @@ function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLen
 
 SphereGeometry.prototype = Object.create( Geometry.prototype );
 SphereGeometry.prototype.constructor = SphereGeometry;
+SphereGeometry.prototype.isSphereGeometry = true;
 
 // SphereBufferGeometry
 
@@ -147,6 +148,7 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
+SphereBufferGeometry.prototype.isSphereBufferGeometry = true;
 
 
 export { SphereGeometry, SphereBufferGeometry };

@@ -61,6 +61,8 @@ Loader.Handlers = {
 
 Object.assign( Loader.prototype, {
 
+	isLoader: true,
+
 	crossOrigin: 'anonymous',
 
 	onLoadStart: function () {},

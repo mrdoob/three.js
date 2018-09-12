@@ -48,5 +48,6 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 GridHelper.prototype = Object.create( LineSegments.prototype );
 GridHelper.prototype.constructor = GridHelper;
+GridHelper.prototype.isGridHelper = true;
 
 export { GridHelper };

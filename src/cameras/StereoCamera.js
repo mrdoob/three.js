@@ -26,6 +26,8 @@ function StereoCamera() {
 
 Object.assign( StereoCamera.prototype, {
 
+	isStereoCamera: true,
+
 	update: ( function () {
 
 		var instance, focus, fov, aspect, near, far, zoom, eyeSep;

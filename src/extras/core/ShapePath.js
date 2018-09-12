@@ -21,6 +21,8 @@ function ShapePath() {
 
 Object.assign( ShapePath.prototype, {
 
+	isShapePath: true,
+
 	moveTo: function ( x, y ) {
 
 		this.currentPath = new Path();

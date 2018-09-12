@@ -33,6 +33,7 @@ function LatheGeometry( points, segments, phiStart, phiLength ) {
 
 LatheGeometry.prototype = Object.create( Geometry.prototype );
 LatheGeometry.prototype.constructor = LatheGeometry;
+LatheGeometry.prototype.isLatheGeometry = true;
 
 // LatheBufferGeometry
 
@@ -180,7 +181,7 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 }
 
 LatheBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;
+LatheBufferGeometry.prototype.isLatheBufferGeometry = true;
 
 
 export { LatheGeometry, LatheBufferGeometry };

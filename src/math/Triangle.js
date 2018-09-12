@@ -131,6 +131,8 @@ Object.assign( Triangle, {
 
 Object.assign( Triangle.prototype, {
 
+	isTriangle: true,
+
 	set: function ( a, b, c ) {
 
 		this.a.copy( a );

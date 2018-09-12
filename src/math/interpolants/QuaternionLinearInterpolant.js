@@ -17,6 +17,8 @@ QuaternionLinearInterpolant.prototype = Object.assign( Object.create( Interpolan
 
 	constructor: QuaternionLinearInterpolant,
 
+	isQuaternionLinearInterpolant: true,
+
 	interpolate_: function ( i1, t0, t, t1 ) {
 
 		var result = this.resultBuffer,

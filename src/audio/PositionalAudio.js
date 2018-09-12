@@ -20,6 +20,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 	constructor: PositionalAudio,
 
+	isPositionalAudio: true,
+
 	getOutput: function () {
 
 		return this.panner;

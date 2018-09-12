@@ -27,6 +27,8 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 	constructor: CubicInterpolant,
 
+	isCubicInterpolant: true,
+
 	DefaultSettings_: {
 
 		endingStart: ZeroCurvatureEnding,

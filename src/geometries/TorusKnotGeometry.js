@@ -36,6 +36,7 @@ function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q,
 
 TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
 TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
+TorusKnotGeometry.prototype.isTorusKnotGeometry = true;
 
 // TorusKnotBufferGeometry
 
@@ -189,6 +190,7 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
+TorusKnotBufferGeometry.prototype.isTorusKnotBufferGeometry = true;
 
 
 export { TorusKnotGeometry, TorusKnotBufferGeometry };

@@ -37,6 +37,7 @@ function AxesHelper( size ) {
 
 AxesHelper.prototype = Object.create( LineSegments.prototype );
 AxesHelper.prototype.constructor = AxesHelper;
+AxesHelper.prototype.isAxesHelper = true;
 
 
 export { AxesHelper };
