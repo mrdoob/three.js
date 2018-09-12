@@ -19,8 +19,6 @@ function Sprite( material ) {
 
 	Object3D.call( this );
 
-	this.type = 'Sprite';
-
 	if ( geometry === undefined ) {
 
 		geometry = new BufferGeometry();
