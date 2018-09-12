@@ -15,8 +15,6 @@ function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
 	Geometry.call( this );
 
-	this.type = 'TorusGeometry';
-
 	this.parameters = {
 		radius: radius,
 		tube: tube,
@@ -38,8 +36,6 @@ TorusGeometry.prototype.constructor = TorusGeometry;
 function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
 	BufferGeometry.call( this );
-
-	this.type = 'TorusBufferGeometry';
 
 	this.parameters = {
 		radius: radius,
