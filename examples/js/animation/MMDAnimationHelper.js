@@ -945,6 +945,9 @@ THREE.MMDAnimationHelper = ( function () {
 			}
 
 			if ( this.currentTime < this.delayTime ) return false;
+			
+			// 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
+			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
 
 			this.audio.startTime = this.currentTime - this.delayTime;
 
