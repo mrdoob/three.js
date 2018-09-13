@@ -11,129 +11,122 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			An AnimationClip is a reusable set of keyframe tracks which represent an animation.<br /><br />
+			动画剪辑（AnimationClip）是一个可重用的关键帧轨迹集，它代表动画。<br /><br />
 
-			For an overview of the different elements of the three.js animation system see the
-			"Animation System" article in the "Next Steps" section of the manual.
+			在使用手册的“下一步”章节中，“动画系统”一文对three.js动画系统中的不同元素作出了概述
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:String name], [param:Number duration], [param:Array tracks] )</h3>
 		<p>
-			[page:String name] - a name for this clip.<br />
-			[page:Number duration] - the duration of this clip (in seconds). If a negative value is passed,
-			the duration will be calculated from the passed *tracks* array.<br />
-			[page:Array tracks] - an array of [page:KeyframeTrack KeyframeTracks].<br /><br />
+			[page:String name] - 此剪辑的名称<br />
+			[page:Number duration] - 持续时间 (单位秒). 如果传入负数, 持续时间将会从传入的数组中计算得到。<br />
+			[page:Array tracks] - 一个由关键帧轨迹（[page:KeyframeTrack KeyframeTracks]）组成的数组。<br /><br />
 
-			Note: Instead of instantiating an AnimationClip directly with the constructor, you can use one
-			of its static methods to create AnimationClips: from JSON ([page:.parse parse]), from morph
-			target sequences ([page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence],
-			[page:.CreateClipsFromMorphTargetSequences CreateClipsFromMorphTargetSequences]) or from
-			animation hierarchies ([page:.parseAnimation parseAnimation]) - if your model doesn't already
-			hold AnimationClips in its geometry's animations array.
+			说明: 与其直接调用构造函数实例化一个动画剪辑, 不如使用其静态方法中的一个来创建：
+			用JSON ([page:.parse parse]), 用变形目标序列([page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence],
+			[page:.CreateClipsFromMorphTargetSequences CreateClipsFromMorphTargetSequences])或者用动画层级 ([page:.parseAnimation parseAnimation])来创建 - 如果你的模型中几何体的动画数组中还没有保存动画剪辑的话。
+
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 
 		<h3>[property:Number duration]</h3>
 		<p>
-			The duration of this clip (in seconds). This can be calculated from the [page:.tracks tracks]
-			array via [page:.resetDuration resetDuration].
+			剪辑的持续时间 (单位秒). 可以通过[page:.resetDuration resetDuration]从轨迹数组（[page:.tracks tracks]）计算出来。
+
 		</p>
 
 		<h3>[property:String name]</h3>
 		<p>
-			A name for this clip. A certain clip can be searched via [page:.findByName findByName].
+			剪辑的名称. 调用[page:.findByName findByName]根据名称搜索某个剪辑
 		</p>
 
 		<h3>[property:Array tracks]</h3>
 		<p>
-			An array containing a [page:KeyframeTrack] for each property that are animated by this clip.
+            一个包含该剪辑中有动画的所有属性的关键帧轨迹（[page:KeyframeTrack]）的数组。
 		</p>
 
 		<h3>[property:String uuid]</h3>
 		<p>
-			The [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this clip instance.
-			It gets automatically assigned and shouldn't be edited.
+			剪辑实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]，自动分配且不可编辑。
+
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:this optimize]()</h3>
 		<p>
-			Optimizes each track by removing equivalent sequential keys (which are common in morph target
-			sequences).
+            通过移除等效的顺序键（在变形目标序列中很常见）来优化每一个轨迹
+
 		</p>
 
 		<h3>[method:this resetDuration]()</h3>
 		<p>
-			Sets the [page:.duration duration] of the clip to the duration of its longest
-			[page:KeyframeTrack].
+			将剪辑的持续时间（[page:.duration duration]）设为最长的关键帧轨迹([page:KeyframeTrack])的持续时间。
+			.
 		</p>
 
 		<h3>[method:this trim]()</h3>
 		<p>
-			Trims all tracks to the clip's duration.
+			修剪所有的轨迹到该剪辑的持续时间。
 		</p>
 
 		<h3>[method:Boolean validate]()</h3>
 		<p>
-			Performs minimal validation on each track in the clip. Returns true if all tracks are valid.
+            对剪辑中的每个轨迹执行最小验证。如果所有轨道都有效，返回true。
 		</p>
 
 
-		<h2>Static Methods</h2>
+		<h2>静态方法</h2>
 
 
 		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
-			Returns an array of new AnimationClips created from the [page:Geometry.morphTargets morph
-			target sequences] of a geometry, trying to sort morph target names into animation-group-based
-			patterns like "Walk_001, Walk_002, Run_001, Run_002 ..."<br /><br />
+			返回从几何体的变形目标序列([page:Geometry.morphTargets morph
+			target sequences])创建的新动画剪辑(AnimationClip)数组，并尝试将变形目标名称分类为基于动画组的模式，如“Walk_001、Walk_002、Run_001、Run_002……”。<br /><br />
 
-			This method is called by the [page:JSONLoader] internally, and it uses
+			该方法被[page:JSONLoader]内部调用, 并且它使用了
 			[page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence].
 		</p>
 
 		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
-			Returns a new AnimationClip from the passed [page:Geometry.morphTargets morph targets array]
-			of a geometry, taking a name and the number of frames per second.<br /><br />
+            返回一个由几何体变形目标数组([page:Geometry.morphTargets morph targets array])得到的新动画剪辑，接收名称和帧率参数。<br /><br />
 
-			Note: The fps parameter is required, but the animation speed can be overridden in an
-			*AnimationAction* via [page:AnimationAction.setDuration animationAction.setDuration].
+			说明: 帧率是必须参数, 但是动画速度可能会在*AnimationAction*中被[page:AnimationAction.setDuration animationAction.setDuration]方法重写。
+
 		</p>
 
 		<h3>[method:AnimationClip findByName]( [param:Object objectOrClipArray], [param:String name] )</h3>
 		<p>
-			Searches for an AnimationClip by name, taking as its first parameter either an array of
-			AnimationClips, or a mesh or geometry that contains an array named "animations".
+			根据名称搜索动画剪辑(AnimationClip), 接收一个动画剪辑数组或者一个包含名为"animation"的数组的网格（或几何体）作为第一个参数。
 		</p>
 
 		<h3>[method:AnimationClip parse]( [param:Object json] )</h3>
 		<p>
-			Parses a JSON representation of a clip and returns an AnimationClip.
+			解析剪辑的JSON表示，并返回一个动画剪辑(AnimationClip)。
 		</p>
 
 		<h3>[method:AnimationClip parseAnimation]( [param:Object animation], [param:Array bones] )</h3>
 		<p>
-			Parses the animation.hierarchy format and returns an AnimationClip.
+            解析动画层级格式并返回动画剪辑。
 		</p>
 
 		<h3>[method:Object toJSON]( [param:AnimationClip clip] )</h3>
 		<p>
-			Takes an AnimationClip and returns a JSON object.
+			接收一个动画剪辑为参数并返回一个JSON对象.
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
