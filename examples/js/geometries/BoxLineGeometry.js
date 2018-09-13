@@ -6,6 +6,8 @@ THREE.BoxLineGeometry = function ( width, height, depth, widthSegments, heightSe
 
 	THREE.BufferGeometry.call( this );
 
+	this.type = 'BoxLineGeometry';
+
 	width = width || 1;
 	height = height || 1;
 	depth = depth || 1;

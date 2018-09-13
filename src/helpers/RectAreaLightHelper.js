@@ -13,6 +13,7 @@ import { BufferAttribute } from '../core/BufferAttribute.js';
 function RectAreaLightHelper( light, color ) {
 
 	Object3D.call( this );
+	this.type = 'RectAreaLightHelper';
 
 	this.light = light;
 	this.light.updateMatrixWorld();

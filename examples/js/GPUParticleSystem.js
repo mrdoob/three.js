@@ -19,6 +19,8 @@ THREE.GPUParticleSystem = function ( options ) {
 
 	THREE.Object3D.apply( this, arguments );
 
+	this.type = 'GPUParticleSystem';
+
 	options = options || {};
 
 	// parse options and use defaults
@@ -270,6 +272,8 @@ THREE.GPUParticleSystem.prototype.constructor = THREE.GPUParticleSystem;
 THREE.GPUParticleContainer = function ( maxParticles, particleSystem ) {
 
 	THREE.Object3D.apply( this, arguments );
+
+	this.type = 'GPUParticleContainer';
 
 	this.PARTICLE_COUNT = maxParticles || 100000;
 	this.PARTICLE_CURSOR = 0;

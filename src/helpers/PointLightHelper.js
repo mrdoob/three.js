@@ -19,6 +19,8 @@ function PointLightHelper( light, sphereSize, color ) {
 
 	Mesh.call( this, geometry, material );
 
+	this.type = 'PointLightHelper';
+
 	this.matrix = this.light.matrixWorld;
 	this.matrixAutoUpdate = false;
 

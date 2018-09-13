@@ -17,6 +17,8 @@ THREE.ShadowMesh = function ( mesh ) {
 
 	THREE.Mesh.call( this, mesh.geometry, shadowMaterial );
 
+	this.type = 'ShadowMesh';
+
 	this.meshMatrix = mesh.matrixWorld;
 
 	this.frustumCulled = false;

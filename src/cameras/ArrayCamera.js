@@ -8,6 +8,8 @@ function ArrayCamera( array ) {
 
 	PerspectiveCamera.call( this );
 
+	this.type = 'ArrayCamera';
+
 	this.cameras = array || [];
 
 }
