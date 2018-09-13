@@ -27,6 +27,7 @@ function Object3D() {
 	this.type = 'Object3D';
 
 	this.parent = null;
+	this.scene = null;
 	this.children = [];
 
 	this.up = Object3D.DefaultUp.clone();
@@ -382,6 +383,19 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			}
 
 			object.parent = this;
+
+			var scene = this.scene;
+
+			if ( object.scene !== scene ) {
+
+				object.traverse( function ( child ) {
+
+					child.scene = scene;
+
+				} );
+
+			}
+
 			object.dispatchEvent( { type: 'added' } );
 
 			this.children.push( object );
@@ -415,6 +429,12 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( index !== - 1 ) {
 
 			object.parent = null;
+
+			object.traverse( function ( child ) {
+
+				child.scene = null;
+
+			} );
 
 			object.dispatchEvent( { type: 'removed' } );
 
