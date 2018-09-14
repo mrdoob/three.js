@@ -46,8 +46,7 @@
 
 		<script>
 
-			var camera, scene, renderer,
-			loader, mesh;
+			var camera, scene, renderer, mesh;
 
 			init();
 			animate();
@@ -61,8 +60,8 @@
 
 				scene = new THREE.Scene();
 
-				loader = new THREE.JSONLoader();
-				loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial( { overdraw: 0.5 } ) );
 					scene.add( mesh );
@@ -99,8 +98,6 @@
 			}
 
 			function render() {
-
-				var time = Date.now() * 0.0005;
 
 				if ( mesh ) {
 

@@ -189,8 +189,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	updateProjectionMatrix: function () {
 
 		var near = this.near,
-			top = near * Math.tan(
-				_Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+			top = near * Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
 			height = 2 * top,
 			width = this.aspect * height,
 			left = - 0.5 * width,
@@ -212,6 +211,8 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
 		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
+
+		this.projectionMatrixInverse.getInverse( this.projectionMatrix );
 
 	},
 

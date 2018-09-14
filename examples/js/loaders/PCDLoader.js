@@ -28,7 +28,23 @@ THREE.PCDLoader.prototype = {
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data, url ) );
+			try {
+
+				onLoad( scope.parse( data, url ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					throw e;
+
+				}
+
+			}
 
 		}, onProgress, onError );
 

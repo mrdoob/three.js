@@ -38,7 +38,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
-
+		<script src="js/utils/BufferGeometryUtils.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -46,7 +46,6 @@
 			var container, stats;
 			var camera, controls, scene, renderer;
 			var pickingData = [], pickingTexture, pickingScene;
-			var objects = [];
 			var highlightBox;
 
 			var mouse = new THREE.Vector2();
@@ -84,34 +83,34 @@
 				light.position.set( 0, 500, 2000 );
 				scene.add( light );
 
-				var geometry = new THREE.Geometry(),
-				pickingGeometry = new THREE.Geometry(),
-				pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } ),
-				defaultMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0	} );
+				var pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0	} );
 
-				function applyVertexColors( g, c ) {
+				function applyVertexColors( geometry, color ) {
 
-					g.faces.forEach( function( f ) {
+					var position = geometry.attributes.position;
+					var colors = [];
 
-						var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+					for ( var i = 0; i < position.count; i ++ ) {
 
-						for( var j = 0; j < n; j ++ ) {
+						colors.push( color.r, color.g, color.b );
 
-							f.vertexColors[ j ] = c;
+					}
 
-						}
-
-					} );
+					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				}
 
-				var geom = new THREE.BoxGeometry( 1, 1, 1 );
-				var color = new THREE.Color();
+				var geometriesDrawn = [];
+				var geometriesPicking = [];
 
 				var matrix = new THREE.Matrix4();
 				var quaternion = new THREE.Quaternion();
+				var color = new THREE.Color();
 
 				for ( var i = 0; i < 5000; i ++ ) {
+
+					var geometry = new THREE.BoxBufferGeometry();
 
 					var position = new THREE.Vector3();
 					position.x = Math.random() * 10000 - 5000;
@@ -131,17 +130,21 @@
 					quaternion.setFromEuler( rotation, false );
 					matrix.compose( position, quaternion, scale );
 
-					// give the geom's vertices a random color, to be displayed
+					geometry.applyMatrix( matrix );
 
-					applyVertexColors( geom, color.setHex( Math.random() * 0xffffff ) );
+					// give the geometry's vertices a random color, to be displayed
 
-					geometry.merge( geom, matrix );
+					applyVertexColors( geometry, color.setHex( Math.random() * 0xffffff ) );
 
-					// give the geom's vertices a color corresponding to the "id"
+					geometriesDrawn.push( geometry );
 
-					applyVertexColors( geom, color.setHex( i ) );
+					geometry = geometry.clone();
 
-					pickingGeometry.merge( geom, matrix );
+					// give the geometry's vertices a color corresponding to the "id"
+
+					applyVertexColors( geometry, color.setHex( i ) );
+
+					geometriesPicking.push( geometry );
 
 					pickingData[ i ] = {
 
@@ -153,13 +156,13 @@
 
 				}
 
-				var drawnObject = new THREE.Mesh( geometry, defaultMaterial );
-				scene.add( drawnObject );
+				var objects = new THREE.Mesh( THREE.BufferGeometryUtils.mergeBufferGeometries( geometriesDrawn ), defaultMaterial );
+				scene.add( objects );
 
-				pickingScene.add( new THREE.Mesh( pickingGeometry, pickingMaterial ) );
+				pickingScene.add( new THREE.Mesh( THREE.BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
 
 				highlightBox = new THREE.Mesh(
-					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.BoxBufferGeometry(),
 					new THREE.MeshLambertMaterial( { color: 0xffff00 }
 				) );
 				scene.add( highlightBox );
@@ -201,14 +204,16 @@
 				renderer.render( pickingScene, camera, pickingTexture );
 
 				//create buffer for reading single pixel
+
 				var pixelBuffer = new Uint8Array( 4 );
 
 				//read the pixel under the mouse from the texture
-				renderer.readRenderTargetPixels(pickingTexture, mouse.x, pickingTexture.height - mouse.y, 1, 1, pixelBuffer);
+
+				renderer.readRenderTargetPixels( pickingTexture, mouse.x, pickingTexture.height - mouse.y, 1, 1, pixelBuffer );
 
 				//interpret the pixel as an ID
 
-				var id = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+				var id = ( pixelBuffer[ 0 ] << 16 ) | ( pixelBuffer[ 1 ] << 8 ) | ( pixelBuffer[ 2 ] );
 				var data = pickingData[ id ];
 
 				if ( data) {

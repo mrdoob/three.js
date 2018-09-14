@@ -51,7 +51,7 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/BufferGeometryUtils.js"></script>
+		<script src="js/utils/BufferGeometryUtils.js"></script>
 
 		<script src="js/shaders/NormalMapShader.js"></script>
 		<script src="js/ShaderTerrain.js"></script>
@@ -465,8 +465,6 @@
 				var delta = clock.getDelta();
 
 				if ( terrain.visible ) {
-
-					var time = Date.now() * 0.001;
 
 					var fLow = 0.1, fHigh = 0.8;
 

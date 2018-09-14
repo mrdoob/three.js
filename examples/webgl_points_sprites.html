@@ -75,7 +75,7 @@
 				var sprite4 = textureLoader.load( 'textures/sprites/snowflake4.png' );
 				var sprite5 = textureLoader.load( 'textures/sprites/snowflake5.png' );
 
-				for ( i = 0; i < 10000; i ++ ) {
+				for ( var i = 0; i < 10000; i ++ ) {
 
 					var x = Math.random() * 2000 - 1000;
 					var y = Math.random() * 2000 - 1000;
@@ -132,7 +132,7 @@
 
 				var params = {
 					texture: true
-				}
+				};
 
 				gui.add( params, 'texture' ).onChange( function( value ) {
 

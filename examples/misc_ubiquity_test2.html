@@ -56,7 +56,7 @@
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 
-				var geometry = new THREE.BoxGeometry( 150, 150, 150, 4, 4, 4 );
+				var geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 4, 4, 4 );
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				mesh = new THREE.Mesh( geometry, material );

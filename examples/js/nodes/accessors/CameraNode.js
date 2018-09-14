@@ -2,46 +2,66 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.CameraNode = function ( scope, camera ) {
+import { TempNode } from '../core/TempNode.js';
+import { FunctionNode } from '../core/FunctionNode.js';
+import { FloatNode } from '../inputs/FloatNode.js';
+import { PositionNode } from '../accessors/PositionNode.js';
 
-	THREE.TempNode.call( this, 'v3' );
+function CameraNode( scope, camera ) {
 
-	this.setScope( scope || THREE.CameraNode.POSITION );
+	TempNode.call( this, 'v3' );
+
+	this.setScope( scope || CameraNode.POSITION );
 	this.setCamera( camera );
 
-};
+}
 
-THREE.CameraNode.fDepthColor = new THREE.FunctionNode( [
-	"float depthColor( float mNear, float mFar ) {",
-	"	#ifdef USE_LOGDEPTHBUF_EXT",
-	"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
-	"	#else",
-	"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
-	"	#endif",
-	"	return 1.0 - smoothstep( mNear, mFar, depth );",
-	"}"
-].join( "\n" ) );
+CameraNode.Nodes = ( function () {
 
-THREE.CameraNode.POSITION = 'position';
-THREE.CameraNode.DEPTH = 'depth';
-THREE.CameraNode.TO_VERTEX = 'toVertex';
+	var depthColor = new FunctionNode( [
+		"float depthColor( float mNear, float mFar ) {",
 
-THREE.CameraNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.CameraNode.prototype.constructor = THREE.CameraNode;
-THREE.CameraNode.prototype.nodeType = "Camera";
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
 
-THREE.CameraNode.prototype.setCamera = function ( camera ) {
+		"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
+
+		"	#else",
+
+		"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
+
+		"	#endif",
+
+		"	return 1.0 - smoothstep( mNear, mFar, depth );",
+
+		"}"
+	].join( "\n" ) );
+
+	return {
+		depthColor: depthColor
+	};
+
+} )();
+
+CameraNode.POSITION = 'position';
+CameraNode.DEPTH = 'depth';
+CameraNode.TO_VERTEX = 'toVertex';
+
+CameraNode.prototype = Object.create( TempNode.prototype );
+CameraNode.prototype.constructor = CameraNode;
+CameraNode.prototype.nodeType = "Camera";
+
+CameraNode.prototype.setCamera = function ( camera ) {
 
 	this.camera = camera;
 	this.updateFrame = camera !== undefined ? this.onUpdateFrame : undefined;
 
 };
 
-THREE.CameraNode.prototype.setScope = function ( scope ) {
+CameraNode.prototype.setScope = function ( scope ) {
 
 	switch ( this.scope ) {
 
-		case THREE.CameraNode.DEPTH:
+		case CameraNode.DEPTH:
 
 			delete this.near;
 			delete this.far;
@@ -54,12 +74,12 @@ THREE.CameraNode.prototype.setScope = function ( scope ) {
 
 	switch ( scope ) {
 
-		case THREE.CameraNode.DEPTH:
+		case CameraNode.DEPTH:
 
 			var camera = this.camera;
 
-			this.near = new THREE.FloatNode( camera ? camera.near : 1 );
-			this.far = new THREE.FloatNode( camera ? camera.far : 1200 );
+			this.near = new FloatNode( camera ? camera.near : 1 );
+			this.far = new FloatNode( camera ? camera.far : 1200 );
 
 			break;
 
@@ -67,12 +87,13 @@ THREE.CameraNode.prototype.setScope = function ( scope ) {
 
 };
 
-THREE.CameraNode.prototype.getType = function ( builder ) {
+CameraNode.prototype.getType = function ( builder ) {
 
 	switch ( this.scope ) {
 
-		case THREE.CameraNode.DEPTH:
-			return 'fv1';
+		case CameraNode.DEPTH:
+
+			return 'f';
 
 	}
 
@@ -80,12 +101,13 @@ THREE.CameraNode.prototype.getType = function ( builder ) {
 
 };
 
-THREE.CameraNode.prototype.isUnique = function ( builder ) {
+CameraNode.prototype.isUnique = function ( builder ) {
 
 	switch ( this.scope ) {
 
-		case THREE.CameraNode.DEPTH:
-		case THREE.CameraNode.TO_VERTEX:
+		case CameraNode.DEPTH:
+		case CameraNode.TO_VERTEX:
+
 			return true;
 
 	}
@@ -94,11 +116,12 @@ THREE.CameraNode.prototype.isUnique = function ( builder ) {
 
 };
 
-THREE.CameraNode.prototype.isShared = function ( builder ) {
+CameraNode.prototype.isShared = function ( builder ) {
 
 	switch ( this.scope ) {
 
-		case THREE.CameraNode.POSITION:
+		case CameraNode.POSITION:
+
 			return false;
 
 	}
@@ -107,32 +130,29 @@ THREE.CameraNode.prototype.isShared = function ( builder ) {
 
 };
 
-THREE.CameraNode.prototype.generate = function ( builder, output ) {
+CameraNode.prototype.generate = function ( builder, output ) {
 
-	var material = builder.material;
 	var result;
 
 	switch ( this.scope ) {
 
-		case THREE.CameraNode.POSITION:
+		case CameraNode.POSITION:
 
 			result = 'cameraPosition';
 
 			break;
 
-		case THREE.CameraNode.DEPTH:
+		case CameraNode.DEPTH:
 
-			var func = THREE.CameraNode.fDepthColor;
+			var depthColor = builder.include( CameraNode.Nodes.depthColor );
 
-			builder.include( func );
-
-			result = func.name + '(' + this.near.build( builder, 'fv1' ) + ',' + this.far.build( builder, 'fv1' ) + ')';
+			result = depthColor + '( ' + this.near.build( builder, 'f' ) + ', ' + this.far.build( builder, 'f' ) + ' )';
 
 			break;
 
-		case THREE.CameraNode.TO_VERTEX:
+		case CameraNode.TO_VERTEX:
 
-			result = 'normalize( ' + new THREE.PositionNode( THREE.PositionNode.WORLD ).build( builder, 'v3' ) + ' - cameraPosition )';
+			result = 'normalize( ' + new PositionNode( PositionNode.WORLD ).build( builder, 'v3' ) + ' - cameraPosition )';
 
 			break;
 
@@ -142,16 +162,16 @@ THREE.CameraNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.CameraNode.prototype.onUpdateFrame = function ( frame ) {
+CameraNode.prototype.onUpdateFrame = function ( frame ) {
 
 	switch ( this.scope ) {
 
-		case THREE.CameraNode.DEPTH:
+		case CameraNode.DEPTH:
 
 			var camera = this.camera;
 
-			this.near.number = camera.near;
-			this.far.number = camera.far;
+			this.near.value = camera.near;
+			this.far.value = camera.far;
 
 			break;
 
@@ -159,7 +179,32 @@ THREE.CameraNode.prototype.onUpdateFrame = function ( frame ) {
 
 };
 
-THREE.CameraNode.prototype.toJSON = function ( meta ) {
+CameraNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.setScope( source.scope );
+
+	if ( source.camera ) {
+
+		this.setCamera( source.camera );
+
+	}
+
+	switch ( source.scope ) {
+
+		case CameraNode.DEPTH:
+
+			this.near.number = source.near;
+			this.far.number = source.far;
+
+			break;
+
+	}
+
+};
+
+CameraNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -173,10 +218,10 @@ THREE.CameraNode.prototype.toJSON = function ( meta ) {
 
 		switch ( this.scope ) {
 
-			case THREE.CameraNode.DEPTH:
+			case CameraNode.DEPTH:
 
-				data.near = this.near.number;
-				data.far = this.far.number;
+				data.near = this.near.value;
+				data.far = this.far.value;
 
 				break;
 
@@ -187,3 +232,5 @@ THREE.CameraNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { CameraNode };

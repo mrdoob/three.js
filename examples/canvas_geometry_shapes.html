@@ -71,7 +71,7 @@
 
 					// flat shape
 
-					var geometry = new THREE.ShapeGeometry( shape );
+					var geometry = new THREE.ShapeBufferGeometry( shape );
 					var material = new THREE.MeshBasicMaterial( { color: color, overdraw: 0.5 } );
 
 					var mesh = new THREE.Mesh( geometry, material );

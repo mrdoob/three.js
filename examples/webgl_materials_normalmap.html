@@ -158,8 +158,6 @@
 				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-				var canvas = renderer.context.canvas;
-
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
 				effectBleach.uniforms[ 'opacity' ].value = 0.4;

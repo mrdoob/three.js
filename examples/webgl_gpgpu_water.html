@@ -531,9 +531,9 @@
 				var uniforms = heightmapVariable.material.uniforms;
 				if ( mouseMoved ) {
 
-					this.raycaster.setFromCamera( mouseCoords, camera );
+					raycaster.setFromCamera( mouseCoords, camera );
 
-					var intersects = this.raycaster.intersectObject( meshRay );
+					var intersects = raycaster.intersectObject( meshRay );
 
 					if ( intersects.length > 0 ) {
 					    var point = intersects[ 0 ].point;

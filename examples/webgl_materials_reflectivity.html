@@ -166,6 +166,10 @@
 					gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
 					gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
 
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
 				} );
 
 
@@ -259,8 +263,6 @@
 				}
 
 				renderer.toneMappingExposure = params.exposure;
-
-				var timer = Date.now() * 0.00025;
 
 				camera.lookAt( scene.position );
 

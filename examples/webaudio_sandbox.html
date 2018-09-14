@@ -9,30 +9,71 @@
 				background:#777;
 				padding:0;
 				margin:0;
-				font-weight: bold;
 				overflow:hidden;
+				font-family: Monospace;
 			}
 
 			#info {
 				position: absolute;
+				z-index: 2;
 				top: 0px;
 				width: 100%;
 				color: #ffffff;
 				padding: 5px;
-				font-family:Monospace;
+
 				font-size:13px;
 				text-align:center;
+				font-weight: bold;
 			}
 
 			a {
 				color: #ffffff;
 			}
+
+			#overlay {
+				position: absolute;
+				z-index: 1;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 1;
+				background-color: #000000;
+				color: #ffffff;
+			}
+
+			#overlay > div {
+				text-align: center;
+			}
+
+			#overlay > div > button {
+				height: 20px;
+				width: 100px;
+				background: transparent;
+				color: #ffffff;
+				outline: 1px solid #ffffff;
+				border: 0px;
+				cursor: pointer;
+			}
+
+			#overlay > div > p {
+				color: #777777;
+				font-size: 12px;
+			}
 		</style>
 	</head>
 	<body>
-
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Automatic audio playback requires a user interaction.</p>
+			</div>
+		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox |
 			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener">larrylarrybb</a>,
 			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a> and
 			<a href="http://opengameart.org/content/project-utopia-seamless-loop" target="_blank" rel="noopener">congusbongus</a><br/><br/>
@@ -58,10 +99,13 @@
 
 			var clock = new THREE.Clock();
 
-			init();
-			animate();
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', init );
 
 			function init() {
+
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 25, 0 );
@@ -234,6 +278,8 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				animate();
 
 			}
 

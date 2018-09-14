@@ -50,7 +50,7 @@
 
 				// CUBES
 
-				var cube = new THREE.BoxGeometry( 100, 100, 100 );
+				var cube = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
 				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } ) );
 				mesh.position.x = 500;
@@ -76,7 +76,7 @@
 
 				// CYLINDER
 
-				mesh = new THREE.Mesh( new THREE.CylinderGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( new THREE.CylinderBufferGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = -500;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;

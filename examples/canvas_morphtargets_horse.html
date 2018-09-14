@@ -20,6 +20,8 @@
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
+		<script src="js/loaders/GLTFLoader.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -63,22 +65,18 @@
 				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/animated/horse.js", function ( geometry ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 
-					var material = new THREE.MeshLambertMaterial( {
-						vertexColors: THREE.FaceColors,
-						morphTargets: true,
-						overdraw: 0.5
-					} );
-
-					mesh = new THREE.Mesh( geometry, material );
+					var mesh = gltf.scene.children[ 0 ];
+					mesh.material.overdraw = 0.5;
+					mesh.material.vertexColors = THREE.FaceColors;
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					var clip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'gallop', geometry.morphTargets, 30 );
+					var clip = gltf.animations[ 0 ];
 					mixer.clipAction( clip ).setDuration( 1 ).play();
 
 				} );
