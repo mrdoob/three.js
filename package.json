@@ -28,7 +28,7 @@
   "scripts": {
     "build": "rollup -c",
     "build-test": "rollup -c test/rollup.unit.config.js",
-    "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
+    "build-uglify": "rollup -c rollup.uglify.config.js",
     "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
@@ -51,6 +51,9 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
     "concurrently": "^3.6.1",
     "electron": "^2.0.6",
     "eslint": "^5.3.0",
@@ -60,6 +63,10 @@
     "qunit": "^2.6.1",
     "rollup": "^0.63.5",
     "rollup-watch": "^4.3.1",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-eslint": "^5.0.0",
+    "rollup-plugin-three-glsl": "^1.0.1",
+    "rollup-plugin-uglify": "^5.0.2",
     "uglify-js": "^3.3.28"
   },
   "jspm": {

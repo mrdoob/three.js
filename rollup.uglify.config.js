@@ -1,6 +1,9 @@
 import babel from 'rollup-plugin-babel';
+import { uglify } from 'rollup-plugin-uglify';
 import { eslint } from 'rollup-plugin-eslint';
 import { glsl } from 'rollup-plugin-three-glsl';
+
+console.log( glsl );
 
 export default {
 	input: 'src/Three.js',
@@ -15,18 +18,15 @@ export default {
 				'external-helpers'
 			],
 			presets: [[ 'env', { modules: false } ]]
-		} )
+		} ),
+		uglify()
 	],
 	output: [
 		{
+			sourcemap: true,
 			format: 'umd',
 			name: 'THREE',
-			file: 'build/three.js',
-			indent: '\t'
-		},
-		{
-			format: 'es',
-			file: 'build/three.module.js',
+			file: 'build/three.min.js',
 			indent: '\t'
 		}
 	]
