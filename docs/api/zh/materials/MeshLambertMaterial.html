@@ -12,13 +12,13 @@
 
 		<h1>Lambert网格材质([name])</h1>
 
-		<p class="desc"> 一种用于非光泽表面的材质，没有镜面高光。<br /><br />
+		<p class="desc"> 一种非光泽表面的材质，没有镜面高光。<br /><br />
 			该材质使用基于非物理的[link:https://en.wikipedia.org/wiki/Lambertian_reflectance Lambertian]模型来计算反射率。
 			这可以很好地模拟一些表面（例如未经处理的木材或石材），但不能模拟具有镜面高光的光泽表面（例如涂漆木材）。<br /><br />
 
 
-			使用[link:https://en.wikipedia.org/wiki/Gouraud_shading Gouraud]着色模型计算着色。
-			这将计算每个顶点的着色（即在[link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertex shader]中）并在多边形的面上插入结果。<br /><br />
+			使用[link:https://en.wikipedia.org/wiki/Gouraud_shading Gouraud]着色模型计算着色。这将计算每个顶点的着色
+			（即在[link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertex shader]中）并在多边形的面上插入结果。<br /><br />
 			由于反射率和光照模型的简单性，[page:MeshPhongMaterial]，[page:MeshStandardMaterial]或者[page:MeshPhysicalMaterial]
 			上使用这种材质时会以一些图形精度为代价，得到更高的性能。
 		</p>
@@ -56,14 +56,14 @@
 		<p>alpha贴图是一种灰度纹理，用于控制整个表面的不透明度（黑色：完全透明;白色：完全不透明）。默认值为null。<br /><br />
 
 			仅使用纹理的颜色，忽略alpha通道（如果存在）。对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
-			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。单亮度以及亮度/alpha纹理也仍然有效。
+			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。Luminance-only以及luminance/alpha纹理也仍然有效。
 		</p>
 
 		<h3>[property:Texture aoMap]</h3>
 		<p> 该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]纹理属性。</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
-		<p> 环境遮挡效应的强度。默认值为1。零是不遮挡效果。</p>
+		<p> 环境遮挡效果的强度。默认值为1。零是不遮挡效果。</p>
 
 		<h3>[property:Color color]</h3>
 		<p> 材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
@@ -116,9 +116,9 @@
 		<p> 环境贴图对表面的影响程度; 见[page:.combine]。默认值为1，有效范围介于0（无反射）和1（完全反射）之间。</p>
 
 		<h3>[property:Float refractionRatio]</h3>
-		<p>空气的折射率（IOR）（约为1）除以材料的折射率。它与环境映射模式[page:Textures THREE.CubeRefractionMapping]
+		<p>空气的折射率（IOR）（约为1）除以材质的折射率。它与环境映射模式[page:Textures THREE.CubeRefractionMapping]
 			和[page:Textures THREE.EquirectangularRefractionMapping]一起使用。
-			折射率不应超过1.默认值为*0.98*。
+			折射率不应超过1。默认值为*0.98*。
 		</p>
 
 		<h3>[property:Boolean skinning]</h3>
@@ -131,22 +131,22 @@
 		<p>将几何体渲染为线框。默认值为*false*（即渲染为平面多边形）。</p>
 
 		<h3>[property:String wireframeLinecap]</h3>
-		<p>定义线两端的外观。可能的值是 'butt'，'round' 和 'square'。默认为'round'。<br /><br />
-			该属性对应于[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
+		<p>定义线两端的外观。可选值为 'butt'，'round' 和 'square'。默认为'round'。<br /><br />
+			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
 			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
 		</p>
 
 		<h3>[property:String wireframeLinejoin]</h3>
 		<p>
-			定义线连接节点的样式。可用值为 'round', 'bevel' 和 'miter'。默认值为 'round'。<br /><br />
-			该属性对应于[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
+			定义线连接节点的样式。可选值为 'round', 'bevel' 和 'miter'。默认值为 'round'。<br /><br />
+			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
 			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
 		</p>
 
 		<h3>[property:Float wireframeLinewidth]</h3>
 		<p> 控制线框宽度。默认值为1。<br /><br />
 			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与
-			大多数平台上的[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
+			大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
 		</p>
 
 		<h2>方法(Methods)</h2>

@@ -123,7 +123,7 @@
 					片元（或像素）着色器后运行; 它设置渲染到屏幕的每个单独的“片元”（像素）的颜色。
 				</li>
 			</ul>
-			<p>shader中有三种类型的变量: uniforms, attributes, and varyings:</p>
+			<p>shader中有三种类型的变量: uniforms, attributes, 和 varyings:</p>
 			<ul>
 				<li>*Uniforms*是所有顶点都具有相同的值的变量。
 					比如灯光，雾，和阴影贴图就是被储存在uniforms中的数据。
@@ -145,11 +145,11 @@
 	<div>
 			<p>
 				[page:WebGLRenderer]默认情况下为shader提供了许多attributes和uniforms；
-				这些变量定义在着色器程序编译时被自动添加到*片元着色器*和*顶点着色器*代码的前面，你不需要自己声明它们。
+				这些变量定义在shader程序编译时被自动添加到*片元着色器*和*顶点着色器*代码的前面，你不需要自己声明它们。
 				这些变量的描述请参见[page:WebGLProgram]。
 			</p>
 			<p>
-				这些uniforms或attributes（例如，那些和照明，雾等相关的）要求属性设置在材料上，
+				这些uniforms或attributes（例如，那些和照明，雾等相关的）要求属性设置在材质上，
 				以便 [page:WebGLRenderer]来拷贝合适的值到GPU中。
 				如果你想在自己的shader中使用这些功能，请确保设置这些标志。
 			</p>
@@ -167,7 +167,7 @@
 				自定义attributes和uniforms必须在GLSL着色器代码中声明（在 *vertexShader* 和/或 *fragmentShader* 中)。
 				自定义uniforms必须定义为 *ShaderMaterial* 的  *uniforms* 属性，
 				而任何自定义attribtes必须通过[page:BufferAttribute]实例来定义。
-				注意 *varying*s 只需要在shader代码中声明（而不必在材料中）。
+				注意 *varying*s 只需要在shader代码中声明（而不必在材质中）。
 			</p>
 			<p> 要声明一个自定义属性，更多细节请参考[page:BufferGeometry]页面，
 				以及 [page:BufferAttribute] 页面关于*BufferAttribute* 接口。
@@ -269,7 +269,7 @@ this.defaultAttributeValues = {
 
 
 		<h3>[property:Object defines]</h3>
-		<p> 使用 *#define* 指令在GLSL代码为顶点着色器和片段着色器定义自定义常量；每个键/值对产生另一行定义语句：
+		<p> 使用 #define 指令在GLSL代码为顶点着色器和片段着色器定义自定义常量；每个键/值对产生一行定义语句：
 		<code>
 		defines: {
 			FOO: 15,
@@ -328,8 +328,7 @@ this.extensions = {
 
 		<h3>[property:Float linewidth]</h3>
 		<p>控制线框宽度。默认值为1。<br /><br />
-			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与
-			大多数平台上的[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
 		</p>
 
 
@@ -353,7 +352,6 @@ this.extensions = {
 
 		<h3>[property:Boolean skinning]</h3>
 		<p> 定义材质是否使用蒙皮; 如果将蒙皮属性传递给shader，则为true。默认值为false。
-		Define whether the material uses skinning; true to pass skinning attributes to the shader. Default is false.
 		</p>
 
 		<h3>[property:Object uniforms]</h3>
@@ -372,7 +370,7 @@ this.extensions = {
 
 		<h3>[property:Number vertexColors]</h3>
 		<p> 通过定义*colors*属性的生成方式来定义顶点是如何着色的。
-			可能的值是[page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] 和
+			可选值为[page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] 和
 			[page:Materials THREE.VertexColors]。 缺省为 THREE.NoColors。
 		</p>
 
@@ -388,20 +386,19 @@ this.extensions = {
 
 		<h3>[property:Float wireframeLinewidth]</h3>
 		<p>控制线框宽度。默认值为1。<br /><br />
-			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与
-			大多数平台上的[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
 		</p>
 
 
 
 		<h2>方法(Methods)</h2>
-		<p>See the base [page:Material] class for common methods.</p>
+		<p>常用方法请参见基类[page:Material]。</p>
 
 		<h3>[method:ShaderMaterial clone]() [param:ShaderMaterial this]</h3>
-		<p> 创建该材料的一个浅拷贝。需要注意的是，vertexShader和fragmentShader使用<em>引用拷贝</em>；
+		<p> 创建该材质的一个浅拷贝。需要注意的是，vertexShader和fragmentShader使用<em>引用拷贝</em>；
 			*attributes*的定义也是如此;
-			这意味着，克隆的材料将共享相同的编译[page:WebGLProgram]；
-			但是，*uniforms* 是 <em>值拷贝</em>，这样对不同的材料我们可以有不同的uniforms变量。
+			这意味着，克隆的材质将共享相同的编译[page:WebGLProgram]；
+			但是，*uniforms* 是 <em>值拷贝</em>，这样对不同的材质我们可以有不同的uniforms变量。
 		</p>
 
 		<h2>源码(Source)</h2>
