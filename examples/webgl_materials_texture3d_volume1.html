@@ -203,7 +203,7 @@
 			container.appendChild( renderer.domElement );
 
 			controls = new THREE.OrthographicTrackballControls( camera, renderer.domElement );
-			controls.target = new THREE.Vector3(64, 64, 128);
+			controls.target.set( 64, 64, 128 );
 			controls.rotateSpeed = 5.0;
 			controls.zoomSpeed = 5;
 			controls.panSpeed = 2;
