@@ -1928,8 +1928,6 @@
 
 	Object.assign( Quaternion, {
 
-		isQuaternion: true,
-
 		slerp: function ( qa, qb, qm, t ) {
 
 			return qm.copy( qa ).slerp( qb, t );
@@ -2073,6 +2071,8 @@
 	} );
 
 	Object.assign( Quaternion.prototype, {
+
+		isQuaternion: true,
 
 		set: function ( x, y, z, w ) {
 
@@ -14631,7 +14631,7 @@
 					boxMesh = new Mesh(
 						new BoxBufferGeometry( 1, 1, 1 ),
 						new ShaderMaterial( {
-							uniforms: ShaderLib.cube.uniforms,
+							uniforms: UniformsUtils.clone( ShaderLib.cube.uniforms ),
 							vertexShader: ShaderLib.cube.vertexShader,
 							fragmentShader: ShaderLib.cube.fragmentShader,
 							side: BackSide,
@@ -14665,7 +14665,7 @@
 					planeMesh = new Mesh(
 						new PlaneBufferGeometry( 2, 2 ),
 						new ShaderMaterial( {
-							uniforms: ShaderLib.background.uniforms,
+							uniforms: UniformsUtils.clone( ShaderLib.background.uniforms ),
 							vertexShader: ShaderLib.background.vertexShader,
 							fragmentShader: ShaderLib.background.fragmentShader,
 							side: FrontSide,
@@ -31779,7 +31779,7 @@
 
 		this.color.copy( source.color );
 
-		this.matcap = source.map;
+		this.matcap = source.matcap;
 
 		this.map = source.map;
 
