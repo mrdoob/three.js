@@ -36,20 +36,27 @@ function Object3D() {
 	var quaternion = new Quaternion();
 	var scale = new Vector3( 1, 1, 1 );
 
+	var sync = new Quaternion();
+
 	function onRotationChange() {
 
 		quaternion.setFromEuler( rotation, false );
+		sync.copy( quaternion );
 
 	}
 
-	function onQuaternionChange() {
+	function onRotationAccess() {
 
-		rotation.setFromQuaternion( quaternion, undefined, false );
+		if ( ! sync.equals( quaternion ) ) {
+
+			rotation.setFromQuaternion( quaternion, undefined, false );
+			sync.copy( quaternion );
+
+		}
 
 	}
 
 	rotation.onChange( onRotationChange );
-	quaternion.onChange( onQuaternionChange );
 
 	Object.defineProperties( this, {
 		position: {
@@ -58,7 +65,12 @@ function Object3D() {
 		},
 		rotation: {
 			enumerable: true,
-			value: rotation
+			get: function () {
+
+				onRotationAccess();
+				return rotation;
+
+			}
 		},
 		quaternion: {
 			enumerable: true,
