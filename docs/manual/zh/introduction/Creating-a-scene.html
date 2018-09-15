@@ -10,7 +10,7 @@
 	<body>
 		<h1>[name]</h1><br />
 
-		<p>这一部分的目标是对three.js来做一个简要的介绍。我们将建立一个包含有旋转立方体的场景来开始这一部分。为了防止你遇到麻烦时需要帮助，一个已经完成的例子在可以在页面下方找到。</p>
+		<p>这一部分的目标是对three.js来做一个简要的介绍。我们将建立一个包含有旋转立方体的场景来开始这一部分。为了防止你遇到麻烦或者需要帮助，一个已经完成的例子在可以在页面下方找到。</p>
 
 		<h2>开始之前</h2>
 		<p>
@@ -65,11 +65,11 @@
 
 		<p>除了创建一个渲染器的实例之外，我们还需要在我们的应用程序里设置一个渲染器的大小尺寸。比如说，我们可以使用所需要的这个渲染区域的宽高，来将渲染器渲染出的场景，使其填充满我们的应用程序。因此，我们可以将渲染器宽高设置为浏览器窗口宽高。 对于性能比较敏感的应用程序来说，你可以给<strong>setSize</strong>传入一个较小的值，例如<strong>window.innerWidth/2</strong>和<strong>window.innerHeight/2</strong>，这将使得app在渲染时以一半的长宽尺寸渲染场景。</p>
 
-		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling <strong>setSize</strong> with false as <strong>updateStyle</strong> (the third argument). For example, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
+		<p>如果你希望保持你的应用程序的尺寸，但是以较低的分辨率来渲染，你可以在调用<strong>setSize</strong>时，给<strong>updateStyle</strong>（第三个参数）传入false。例如， 假设你的&lt;canvas&gt; 标签具有了100%的宽和高，<strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong>将使得你的应用程序以一半的分辨率来进行渲染。</p>
 
-		<p>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</p>
+		<p>最后，我们将<strong>renderer</strong>（渲染器）这个元素添加到我们的HTML文档中，这也就是渲染器使用&lt;canvas&gt;元素来将场景展现给我们。</p>
 
-		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
+		<p><em>“嗯，看起来很不错，那你说的那个立方体在哪儿？”</em>我们接下来来对它继续进行添加吧。</p>
 
 		<code>
 		var geometry = new THREE.BoxGeometry( 1, 1, 1 );
