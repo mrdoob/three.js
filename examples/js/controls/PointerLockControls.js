@@ -10,9 +10,6 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 	this.domElement = domElement || document.body;
 	this.enabled = false;
 
-	this.onLock = null;
-	this.onUnlock = null;
-
 	camera.rotation.set( 0, 0, 0 );
 
 	var pitchObject = new THREE.Object3D();
@@ -42,13 +39,13 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 		if ( document.pointerLockElement === scope.domElement ) {
 
-			if ( scope.onLock !== null ) scope.onLock();
+			scope.dispatchEvent( { type: 'lock' } );
 
 			scope.enabled = true;
 
 		} else {
 
-			if ( scope.onUnlock !== null ) scope.onUnlock();
+			scope.dispatchEvent( { type: 'unlock' } );
 
 			scope.enabled = false;
 
@@ -124,3 +121,6 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 	this.connect();
 
 };
+
+THREE.PointerLockControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.PointerLockControls.prototype.constructor = THREE.PointerLockControls;

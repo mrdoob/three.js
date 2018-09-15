@@ -118,19 +118,19 @@
 
 				}, false );
 
-				controls.onLock = function() {
+				controls.addEventListener( 'lock', function() {
 
 					instructions.style.display = 'none';
 					blocker.style.display = 'none';
 
-				};
+				} );
 
-				controls.onUnlock = function() {
+				controls.addEventListener( 'unlock', function() {
 
 					blocker.style.display = 'block';
 					instructions.style.display = '';
 
-				};
+				} );
 
 				scene.add( controls.getObject() );
 
