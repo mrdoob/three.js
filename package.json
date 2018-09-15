@@ -28,7 +28,6 @@
   "scripts": {
     "build": "rollup -c",
     "build-test": "rollup -c test/rollup.unit.config.js",
-    "build-uglify": "rollup -c rollup.uglify.config.js",
     "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
@@ -60,14 +59,12 @@
     "eslint-config-mdcs": "^4.2.3",
     "google-closure-compiler": "20180805.0.0",
     "http-server": "^0.11.1",
-    "qunit": "^2.6.1",
-    "rollup": "^0.63.5",
-    "rollup-watch": "^4.3.1",
+    "qunit": "^2.6.2",
+    "rollup": "^0.65.2",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-eslint": "^5.0.0",
     "rollup-plugin-three-glsl": "^1.0.1",
-    "rollup-plugin-uglify": "^5.0.2",
-    "uglify-js": "^3.3.28"
+    "rollup-watch": "^4.3.1"
   },
   "jspm": {
     "files": [
