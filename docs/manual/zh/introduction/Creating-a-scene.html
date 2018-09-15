@@ -107,19 +107,19 @@
 		<p>
 			 在开始之前，如果你已经将上面的代码写入到了你所创建的文件中，你应当已经可以看到一个绿色的盒子。让我们来做一些更加有趣的事——让它旋转起来。</p>
 
-		<p>Add the following right above the <strong>renderer.render</strong> call in your <strong>animate</strong> function:</p>
+		<p>将下列代码加入到animate()函数中，位于<strong>renderer.render</strong>调用的上方：</p>
 
 		<code>
 		cube.rotation.x += 0.01;
 		cube.rotation.y += 0.01;
 		</code>
 
-		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animate loop. You can of course call other functions from there, so that you don't end up with a <strong>animate</strong> function that's hundreds of lines.</p>
+		<p>这将在渲染每一帧时被调用（正常情况下时60次/秒），使得立方体有了一个看起来很不错的旋转动画。基本上来说，在应用程序运行时，你想要移动或者改变任何东西，都必须要经过这个动画循环。当然你也可以在这里调用其它函数，这样你在写<strong>animate</strong>函数的时候，就不用以成千上万行代码而结尾了。</p>
 
-		<h2>The result</h2>
-		<p>Congratulations! You have now completed your first three.js application. It's simple, you have to start somewhere.</p>
+		<h2>结果</h2>
+		<p>祝贺你！你现在已经成功完成了你的第一个Three.js应用程序。它现在很简单, 你现在已经有了一个起点。</p>
 
-		<p>The full code is available below. Play around with it to get a better understanding of how it works.</p>
+		<p>下面是完整的代码，请尽情运行它或者修改它，这将可以让你对它的工作机制有更加深入的了解。</p>
 
 		<code>
 		&lt;html&gt;
