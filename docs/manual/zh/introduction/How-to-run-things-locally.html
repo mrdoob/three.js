@@ -8,61 +8,58 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>如何在本地运行（[name]）</h1>
 		<p>
-			If you use just procedural geometries and don't load any textures, webpages should work
-			straight from the file system, just double-click on HTML file in a file manager and it
-			should appear working in the browser (you'll see <em>file:///yourFile.html</em> in the address bar).
+            倘若你只是使用程序中提供的几何体，且不载入任何纹理贴图，网页是可以从本地的文件系统中打开并且是能够直接运行的，只需在文件管理器中双击HTML文件，它将在浏览器中进行显示。
+            （你将在地址栏中看到类似这样的URL：<em>file:///yourFile.html</em>）
+			
 		</p>
 
-		<h2>Content loaded from external files</h2>
+		<h2>从外部文件载入的内容</h2>
 		<div>
 			<p>
-				If you load models or textures from external files, due to browsers' [link:http://en.wikipedia.org/wiki/Same_origin_policy same origin policy]
-			 	security restrictions, loading from a file system will fail with a security exception.
+                倘若你是从外部文件里载入几何体或是纹理贴图，由于浏览器[link:http://en.wikipedia.org/wiki/Same_origin_policy same origin policy]（同源策略）的安全限制，从本地文件系统载入外部文件将会失败，同时抛出安全性异常。
 		 	</p>
 
-			<p>There are two ways to solve this:</p>
+			<p>这里有两种方法来解决这个问题：</p>
 
 			<ol>
 				<li>
-					Change security for local files in a browser. This allows you to access your page as: <code>file:///yourFile.html</code>
+                    在浏览器中改变本地文件的安全策略，这将使得你通过<code>file:///yourFile.html</code>来直接运行本地文件系统中的文件。
 				</li>
 				<li>
-					Run files from a local web server. This allows you to access your page as: <code>http://localhost/yourFile.html</code>
+                    从本地的服务器运行文件，这可以让你通过<code>http://localhost/yourFile.html</code>来访问运行在本地服务器上的文件。
 				</li>
 			</ol>
 
 			<p>
-				If you use option 1, be aware that you may open yourself to some vulnerabilities if using
-				the same browser for a regular web surfing. You may want to create a separate browser
-				profile / shortcut used just for local development to be safe. Let's go over each option in turn.
+                倘若你选择第一种方法，请小心，倘若你使用同一个浏览器来进行日常网络冲浪，你将会遇到一些漏洞。
+                你或许可以创建一个用于开发环境的独立的浏览器配置文件或者快捷方式，仅用于本地开发；将日常使用环境与开发环境分离，以保证日常使用环境的安全性。
+                接下来我们来看一看除此之外的别的方法。
 			</p>
 		</div>
 
 
-		<h2>Run a local server</h2>
+		<h2>运行一个本地的服务器</h2>
 		<div>
 			<p>
-				Many programming languages have simple HTTP servers built in. They are not as full featured as
-				production servers such as [link:https://www.apache.org/ Apache] or [link:https://nginx.org NGINX], however they should be sufficient for testing your
-				three.js application.
+                很多的编程语言都具有一个内置的建议HTTP服务器。它们的功能并不像能够被用于生产环境的服务器例如[link:https://www.apache.org/ Apache] 或者 [link:https://nginx.org NGINX]那样完善，
+                但对于测试你的three.js应用程序来说，它们可以说是比较够用的。
 			</p>
 
 			<h3>Node.js server</h3>
 			<div>
-				<p>Node.js has a simple HTTP server package. To install:</p>
+				<p>Node.js 具有一个简单的HTTP服务器包，如需安装，请执行：</p>
 				<code>npm install http-server -g</code>
 
-				<p>To run (from your local directory):</p>
+				<p>若要从本地目录下运行，请执行：</p>
 				<code>http-server . -p 8000</code>
 			</div>
 
 			<h3>Python server</h3>
 			<div>
 				<p>
-					If you have [link:http://python.org/ Python] installed, it should be enough to run this
-					from a command line (from your working directory):
+					如果你已经安装好了[link:http://python.org/ Python]，仅仅从命令行里便可以运行它（从工作目录）：
 				</p>
 				<code>
 //Python 2.x
@@ -72,14 +69,14 @@ python -m SimpleHTTPServer
 python -m http.server
 				</code>
 
-				<p>This will serve files from the current directory at localhost under port 8000, i.e in the address bar type:</p>
+				<p>这将会在为当前目录在8000端口创建一个服务器，也就是说你可以在地址栏里输入这个地址来访问已经创建好的服务器：</p>
 
 				<code>http://localhost:8000/</code>
 			</div>
 
 			<h3>Ruby server</h3>
 			<div>
-				<p>If you have Ruby installed, you can get the same result running this instead:</p>
+				<p>如果你已经安装好了Ruby，通过运行下列命也可以创建同样的服务器：</p>
 				<code>
 ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => Dir.pwd); trap('INT') { s.shutdown }; s.start"
 				</code>
@@ -87,13 +84,15 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 
 			<h3>PHP server</h3>
 			<div>
-				<p>PHP also has a built-in web server, starting with php 5.4.0:</p>
+				<p>PHP自5.4.0起，便内置了一个Web服务器：</p>
 				<code>php -S localhost:8000</code>
 			</div>
 
 			<h3>Lighttpd</h3>
 			<div>
 				<p>
+                    Lighttpd是一个轻量级的通用Web服务器，在这里，我们将介绍如何在OS X上使用HomeBrew来安装它。
+                    不像我们在这里讨论的其他服务器，lighttpd是一个成熟的能够为生产环境而准备的服务器。
 					Lighttpd is a very lightweight general purpose webserver. We'll cover installing it on OSX with
 					HomeBrew here. Unlike the other servers discussed here, lighttpd is a full fledged production
 					ready server.
@@ -101,79 +100,76 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 
 				<ol>
 					<li>
-						Install it via homebrew
+						通过HomeBrew安装lighttpd
 						<code>brew install lighttpd</code>
 					</li>
 					<li>
-						Create a configuration file called lighttpd.conf in the directory where you want to run
-						your webserver. There is a sample [link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration here].
+                        在你希望作为服务器来运行的目录里，创建一个名为lighttpd.conf的配置文件。
+                        这是一个配置文件的样本：[link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration TutorialConfiguration]。
 					 </li>
 					<li>
-						In the conf file, change the server.document-root to the directory you want to serve files from.
+                        在配置文件里，将server.document-root更改为你将要创建的服务器中的文件所在的目录。
 					</li>
 					<li>
-						Start it with
+						使用这个命令来启动：
 						<code>lighttpd -f lighttpd.conf</code>
 					</li>
 					<li>
-						Navigate to http://localhost:3000/ and it will serve static files from the directory you
-						chose.
+						使用浏览器打开http://localhost:3000/，然后服务器将可以从你选择的目录中向你提供静态文件。
 					</li>
 				</ol>
 			</div>
 
-		<h2>Change local files security policy</h2>
+		<h2>更改本地文件的安全策略</h2>
 		<div>
 			<h3>Safari</h3>
 			<div>
 				<p>
-					Enable the develop menu using the preferences panel, under Advanced -&gt; "Show develop menu
-					in menu bar".
+                    在“偏好”面板中启用开发菜单，位于“高级”-&gt“在菜单栏中显示开发菜单”
 				</p>
 
 				<p>
-					Then from the safari "Develop" menu, select "Disable local file restrictions", it is also
-					worth noting safari has some odd behaviour with caches, so it is advisable to use the
-					"Disable caches" option in the same menu; if you are editing &amp; debugging using safari.
+                    之后从Safari中的“开发”菜单中，选择“停用本地文件限制”，同样需要注意的是，Safari对于缓存有一些奇怪的行为，
+                    因此建议，在同一菜单中打开“停用缓存”的选项；如果你正在编辑，请使用Safari进行调试。
 				</p>
 			</div>
 
 
 			<h3>Chrome</h3>
 			<div>
-				<p>Close all running Chrome instances first. The important word here is 'all'.</p>
+				<p>请关闭Chrome浏览器正在运行的*所有*实例，注意这里非常重要的关键字是“*所有*”。</p>
 
 				<p>
-					On Windows, you may check for Chrome instances using the Windows Task Manager.
-					Alternatively, if you see a Chrome icon in the system tray, then you may open its context
-					menu and click 'Exit'. This should close all Chrome instances.
+                    在Windows中，你可以在任务管理器中查看所有正在运行的Chorme浏览器的实例。
+                    此外，如果你在系统任务栏中看到了Chrome图标，请鼠标右键打开它的上下文菜单，点击关闭。这样就应当已经关闭所有正在运行的Chrome浏览器实例了。
+
 				</p>
 
-				<p>Then start the Chrome executable with a command line flag:</p>
+				<p>
+                    然后使用命令行执行Chrome浏览器，并在命令行中添加允许访问本地文件的参数：</p>
 
 				<code>chrome --allow-file-access-from-files</code>
 
 				<p>
-					On Windows, probably the easiest is probably to create a special shortcut icon which has
-					added the flag given above (right-click on shortcut -&gt; properties -&gt; target).
+                    在Windows中，最简单的做法或许就是创建一个特别的快捷方式图标，快捷方式的目标指向上面的命令行
+                    （右键点击快捷方式图标-&gt;属性-&gt;目标）。
 				</p>
 
-				<p>On Mac OSX, you can do this with</p>
+				<p>在Mac OS X中，你可以用这种方法来添加允许访问本地文件的参数并运行Chrome：</p>
 
 				<code>open /Applications/Google\ Chrome.app --args --allow-file-access-from-files</code>
 			</div>
-
 			<h3>Firefox</h3>
 			<div>
 				<ol>
 				<li>
-					In the address bar, type <code>about:config</code>
+					在地址栏中，键入<code>about:config</code>
 				</li>
 				<li>
-					Find the <code>security.fileuri.strict_origin_policy</code> parameter
+					找到这个参数<code>security.fileuri.strict_origin_policy</code>
 				</li>
 				<li>
-					Set it to <em>false</em>
+					将其设置为<em>false</em>
 				</li>
 				</ol>
 			</div>
@@ -181,8 +177,7 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 		</div>
 
 			<p>
-				Other simple alternatives are [link:http://stackoverflow.com/q/12905426/24874 discussed here]
-				on Stack Overflow.
+                其它简单的替代方案你可以在Stack Overflow上找到：[link:http://stackoverflow.com/q/12905426/24874 click here]。
 			</p>
 		</div>
 

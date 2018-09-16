@@ -10,17 +10,17 @@
 	<body>
 		[page:Object3D] &rarr; [page:Camera] &rarr;
 
-		<h1>[name]</h1>
+		<h1>透视相机（[name]）</h1>
 
 		<p class="desc">
-			Camera that uses [link:https://en.wikipedia.org/wiki/Perspective_(graphical) perspective projection].<br /><br />
+			这一摄像机使用[link:https://en.wikipedia.org/wiki/Perspective_(graphical) perspective projection]（透视投影）来进行投影。<br /><br />
 
-			This projection mode is designed to mimic the way the human eye sees. It is the most
-			common projection mode used for rendering a 3D scene.
+			这一投影模式被用来模拟人眼所看到的景象，它是3D场景的渲染中使用得最普遍的投影模式。
+
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<p>[example:canvas_geometry_birds geometry / birds ]</p>
 		<p>[example:canvas_geometry_cube geometry / cube ]</p>
@@ -34,126 +34,125 @@
 scene.add( camera );</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far] )</h3>
 		<p>
-		fov — Camera frustum vertical field of view.<br />
-		aspect — Camera frustum aspect ratio.<br />
-		near — Camera frustum near plane.<br />
-		far — Camera frustum far plane.<br /><br />
+		fov — 摄像机视锥体垂直视野角度<br />
+		aspect — 摄像机视锥体长宽比<br />
+		near — 摄像机视锥体近端面<br />
+		far — 摄像机视锥体远端面<br /><br />
 
-			Together these define the camera's [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
+		这些参数一起定义了摄像机的[link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]（视锥体）。
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 		<p>
-			See the base [page:Camera] class for common properties.<br>
-			Note that after making changes to most of these properties you will have to call
-			[page:PerspectiveCamera.updateProjectionMatrix .updateProjectionMatrix] for the changes to take effect.
+			请参阅其基类 [page:Camera] 来查看共有属性。<br>
+			请注意，在大多数属性发生改变之后，你将需要调用[page:PerspectiveCamera.updateProjectionMatrix .updateProjectionMatrix]来使得这些改变生效。
 		</p>
 
 		<h3>[property:Float aspect]</h3>
-		<p>Camera frustum aspect ratio, usually the canvas width / canvas height. Default is *1* (square canvas).</p>
+		<p>摄像机视锥体的长宽比，通常是使用画布的宽/画布的高。默认值是*1*（正方形画布）。</p>
 
 		<h3>[property:Float far]</h3>
 		<p>
-			Camera frustum far plane. Default is *2000*.<br /><br />
-
-			The valid range is between the current value of the [page:.near near] plane and infinity.
+			摄像机的远端面，默认值是*2000*。
+			<br /><br />
+			其有效值范围是在当前摄像机[page:.near near] plane（近端面）的值到无穷远之间。
 		</p>
 
 		<h3>[property:Float filmGauge]</h3>
-		<p>Film size used for the larger axis. Default is 35 (millimeters). This parameter does not influence the projection matrix unless .filmOffset is set to a nonzero value.</p>
+		<p>胶片尺寸，其默认值为35（毫米）。
+			这个参数不会影响摄像机的投影矩阵，除非.filmOffset被设置为了一个非零的值。</p>
 
 		<h3>[property:Float filmOffset]</h3>
-		<p>Horizontal off-center offset in the same unit as .filmGauge. Default is *0*.</p>
+		<p>水平偏离中心偏移量，和.filmGauge单位相同。默认值为*0*。</p>
 
 		<h3>[property:Float focus]</h3>
-		<p>Object distance used for stereoscopy and depth-of-field effects.
-			This parameter does not influence the projection matrix unless a [page:StereoCamera] is being used.
-			Default is *10*.
+		<p>用于立体视觉和景深效果的物体的距离。
+		   这个参数不会影响摄像机的投影矩阵，除非使用了[page:StereoCamera]。
+			默认值是*10*。
 		</p>
 
 		<h3>[property:Float fov]</h3>
-		<p>Camera frustum vertical field of view, from bottom to top of view, in degrees. Default is *50*.</p>
+		<p>摄像机视锥体垂直视野角度，从视图的底部到顶部，以角度来表示。默认值是*50*。</p>
 
 		<h3>[property:Boolean isPerspectiveCamera]</h3>
 		<p>
-			Used to test whether this or derived classes are PerspectiveCameras. Default is *true*.<br /><br />
 
-			This should not be changed as it is used internally by the renderer for optimisation.
+			用于测试这个类或者派生类是否为PerspectiveCameras，默认为true。
+			<br /><br />
+
+			你不应当对这个属性进行改变,因为它在内部由渲染器使用，以用于优化。
 		</p>
 
 
 		<h3>[property:Float near]</h3>
 		<p>
-			Camera frustum near plane. Default is *0.1*.<br /><br />
-
-			The valid range is greater than 0 and less than the current value of the [page:.far far] plane.
-			Note that, unlike for the [page:OrthographicCamera], *0* is <em>not</em> a valid value
-			for a PerspectiveCamera's near plane.
+			摄像机的近端面，默认值是*0.1*。<br /><br />
+			其有效值范围是0到当前摄像机[page:.far far] plane（远端面）的值之间。
+			请注意，和[page:OrthographicCamera]不同，*0*对于PerspectiveCamera的近端面来说<em>不是</em>一个有效值。
 		</p>
 
 		<h3>[property:Object view]</h3>
 		<p>
 			Frustum window specification or null.
-			This is set using the [page:PerspectiveCamera.setViewOffset .setViewOffset] method
-			and cleared using [page:PerspectiveCamera.clearViewOffset .clearViewOffset].
+			这个值使用[page:PerspectiveCamera.setViewOffset .setViewOffset]方法来进行设置，使用[page:PerspectiveCamera.clearViewOffset .clearViewOffset]方法来进行清除。
 		</p>
 
 		<h3>[property:number zoom]</h3>
-		<p>Gets or sets the zoom factor of the camera. Default is *1*.</p>
+		<p>获取或者设置摄像机的缩放倍数，其默认值为*1*。</p>
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:Camera] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Camera]来查看共有属性。</p>
 
 		<h3>[method:null clearViewOffset]()</h3>
-		<p>Removes any offset set by the [page:PerspectiveCamera.setViewOffset .setViewOffset] method.</p>
+		<p>清除任何由[page:PerspectiveCamera.setViewOffset .setViewOffset]设置的偏移量。</p>
 
 		<h3>[method:Float getEffectiveFOV]()</h3>
-		<p>Returns the current vertical field of view angle in degrees considering .zoom.</p>
+		<p>结合.zoom（缩放倍数），以角度返回当前垂直视野角度。</p>
 
 		<h3>[method:Float getFilmHeight]()</h3>
 		<p>
-		Returns the height of the image on the film. If .aspect is less than or equal to one
-		(portrait format), the result equals .filmGauge.
+			返回当前胶片上图像的高，如果.aspect小于或等于1（肖像格式、纵向构图），则结果等于.filmGauge。
+
 		</p>
 
 		<h3>[method:Float getFilmWidth]()</h3>
 		<p>
-		Returns the width of the image on the film. If .aspect is greater than or equal to one
-		(landscape format), the result equals .filmGauge.
+			返回当前胶片上图像的宽，如果.aspect大于或等于1（景观格式、横向构图），则结果等于.filmGauge。
 		</p>
 
 		<h3>[method:Float getFocalLength]()</h3>
-		<p>Returns the focal length of the current .fov in respect to .filmGauge.</p>
+		<p>返回当前.fov（视野角度）相对于.filmGauge（胶片尺寸）的焦距。
 
 		<h3>[method:null setFocalLength]( [param:Float focalLength] )</h3>
 		<p>
-		Sets the FOV by focal length in respect to the current [page:PerspectiveCamera.filmGauge .filmGauge].<br /><br />
-
+			通过相对于当前[page:PerspectiveCamera.filmGauge .filmGauge]的焦距，设置FOV。
+		<br /><br />
+			默认情况下，焦距是为35mm（全画幅）摄像机而指定的。
 		By default, the focal length is specified for a 35mm (full frame) camera.
 		</p>
 
 		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
-		fullWidth — full width of multiview setup<br />
-		fullHeight — full height of multiview setup<br />
-		x — horizontal offset of subcamera<br />
-		y — vertical offset of subcamera<br />
-		width — width of subcamera<br />
-		height — height of subcamera
+		fullWidth — 多视图的全宽设置<br />
+		fullHeight — 多视图的全高设置<br />
+		x — 副摄像机的水平偏移<br />
+		y — 副摄像机的垂直偏移<br />
+		width — 副摄像机的宽度<br />
+		height — 副摄像机的高度
 		</p>
 
 		<p>
-		Sets an offset in a larger frustum. This is useful for multi-window or multi-monitor/multi-machine setups.
+				在较大的viewing frustum（视锥体）中设置偏移量，对于多窗口或者多显示器的设置是很有用的。
 		</p>
 
 		<p>
-		For example, if you have 3x2 monitors and each monitor is 1920x1080 and the monitors are in grid like this:<br />
+			例如，如果你有一个3x2的显示器阵列，每个显示器分辨率都是1920x1080，且这些显示器排列成像这样的网格：<br />
 
 		<pre>
 +---+---+---+
@@ -162,8 +161,7 @@ scene.add( camera );</code>
 | D | E | F |
 +---+---+---+
 		</pre>
-
-		then for each monitor you would call it like this:<br />
+		那对于每个显示器，你可以这样来设置、调用：<br />
 
 		<code>var w = 1920;
 var h = 1080;
@@ -183,21 +181,22 @@ camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
 // F
 camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 </code>
-
-		Note there is no reason monitors have to be the same size or in a grid.
+		请注意，显示器的不必具有相同的大小，或者不必在网格中。
 		</p>
 
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<p>
-		Updates the camera projection matrix. Must be called after any change of parameters.
+
+		更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
+
 		</p>
 
 		<h3>[method:JSON toJSON]()</h3>
 		<p>
-		Return camera data in JSON format.
-		</p>
+				使用JSON格式来返回摄像机数据。
+			</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

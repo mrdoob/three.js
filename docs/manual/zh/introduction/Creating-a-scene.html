@@ -8,9 +8,9 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1><br />
+		<h1>创建一个场景（[name]）</h1><br />
 
-		<p>这一部分的目标是对three.js来做一个简要的介绍。我们将建立一个包含有旋转立方体的场景来开始这一部分。为了防止你遇到麻烦时需要帮助，一个已经完成的例子在可以在页面下方找到。</p>
+		<p>这一部分的目标是对three.js来做一个简要的介绍。我们将建立一个包含有旋转立方体的场景来开始这一部分。为了防止你遇到麻烦或者需要帮助，一个已经完成的例子在可以在页面下方找到。</p>
 
 		<h2>开始之前</h2>
 		<p>
@@ -55,7 +55,7 @@
 
 		<p>three.js里有几种不同的相机，在这里，我们使用的是<strong>PerspectiveCamera</strong>（透视摄像机）。</p>
 
-		<p>第一个属性是<strong>视场角（FOV）</strong>。视场角就是无论在什么时候，你所能在显示器上看到的场景的范围，它的值是一个角度。</p>
+		<p>第一个属性是<strong>视野角度（FOV）</strong>。视野角度就是无论在什么时候，你所能在显示器上看到的场景的范围，它的值是一个角度。</p>
 
 		<p>第二个值是<strong>长宽比（aspect ratio）</strong>。 也就是你用一个物体的宽除以它的高的比值。比如说，当你在一个宽屏电视上播放老电影时，可以看到图像仿佛是被压扁的。</p>
 
@@ -65,11 +65,11 @@
 
 		<p>除了创建一个渲染器的实例之外，我们还需要在我们的应用程序里设置一个渲染器的大小尺寸。比如说，我们可以使用所需要的这个渲染区域的宽高，来将渲染器渲染出的场景，使其填充满我们的应用程序。因此，我们可以将渲染器宽高设置为浏览器窗口宽高。 对于性能比较敏感的应用程序来说，你可以给<strong>setSize</strong>传入一个较小的值，例如<strong>window.innerWidth/2</strong>和<strong>window.innerHeight/2</strong>，这将使得app在渲染时以一半的长宽尺寸渲染场景。</p>
 
-		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling <strong>setSize</strong> with false as <strong>updateStyle</strong> (the third argument). For example, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
+		<p>如果你希望保持你的应用程序的尺寸，但是以较低的分辨率来渲染，你可以在调用<strong>setSize</strong>时，给<strong>updateStyle</strong>（第三个参数）传入false。例如， 假设你的&lt;canvas&gt; 标签具有了100%的宽和高，<strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong>将使得你的应用程序以一半的分辨率来进行渲染。</p>
 
-		<p>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</p>
+		<p>最后，我们将<strong>renderer</strong>（渲染器）这个元素添加到我们的HTML文档中，这也就是渲染器使用&lt;canvas&gt;元素来将场景展现给我们。</p>
 
-		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
+		<p><em>“嗯，看起来很不错，那你说的那个立方体在哪儿？”</em>我们接下来来对它继续进行添加吧。</p>
 
 		<code>
 		var geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -80,17 +80,17 @@
 		camera.position.z = 5;
 		</code>
 
-		<p>To create a cube, we need a <strong>BoxGeometry</strong>. This is an object that contains all the points (<strong>vertices</strong>) and fill (<strong>faces</strong>) of the cube. We'll explore this more in the future.</p>
+		<p>要创建一个立方体，我们需要一个<strong>BoxGeometry</strong>（立方体）对象. 这个对象包含了一个立方体中所有的顶点（<strong>vertices</strong>）和面<strong>faces</strong>。未来我们将在这方面进行更多的探索。</p>
 
-		<p>In addition to the geometry, we need a material to color it. Three.js comes with several materials, but we'll stick to the <strong>MeshBasicMaterial</strong> for now. All materials take an object of properties which will be applied to them. To keep things very simple, we only supply a color attribute of <strong>0x00ff00</strong>, which is green. This works the same way that colors work in CSS or Photoshop (<strong>hex colors</strong>).</p>
+		<p>接下来，对于这个立方体，我们需要给它一个材质来让它有颜色。Three.js自带了几种材质，但在这里我们使用的是<strong>MeshBasicMaterial</strong>。所有的材质是一个将应用于立方体的属性对象。 简单起见, 我们在这里只应用一个color属性，值为<strong>0x00ff00</strong>，也就是绿色。这里所做的事情就相当于在CSS或者Photoshop里使用十六进制(<strong>hex colors</strong>)的颜色格式来设置颜色。</p>
 
-		<p>The third thing we need is a <strong>Mesh</strong>. A mesh is an object that takes a geometry, and applies a material to it, which we then can insert to our scene, and move freely around.</p>
+		<p>第三步，我们需要一个<strong>Mesh</strong>（网格）。 网格是包含有一个几何体以及应用在在此几何体上的材质的对，我们可以直接将网格对象插入到我们的场景中，并在其中自由移动。</p>
 
-		<p>By default, when we call <strong>scene.add()</strong>, the thing we add will be added to the coordinates <strong>(0,0,0)</strong>. This would cause both the camera and the cube to be inside each other. To avoid this, we simply move the camera out a bit.</p>
+		<p>默认情况下，当我们调用<strong>scene.add()</strong>的时候，物体将会被添加到坐标为<strong>(0,0,0)</strong>的位置。可或许会使得摄像机的位置和立方体相互重叠（也就是摄像机位于立方体中）。为了防止这种情况的发生，我们只需要将摄像机稍微向外移动一些。</p>
 
-		<h2>Rendering the scene</h2>
+		<h2>渲染场景</h2>
 
-		<p>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a <strong>render or animate loop</strong>.</p>
+		<p>在此之前，如果你从上面复制了我们已经写好的代码到一个HTML文件中，你将不会在其中看到任何东西。这是因为我们还没有对它进行真正的渲染。为此，我们需要调用一个所谓“<strong>渲染</strong>”或者“<strong>动画循环</strong>”的东西。</p>
 
 		<code>
 		function animate() {
@@ -100,25 +100,26 @@
 		animate();
 		</code>
 
-		<p>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but <strong>requestAnimationFrame</strong> has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</p>
+		<p>在这里我们创建了一个循环——这使得渲染器能够在每次屏幕刷新时对场景进行绘制（在大多数屏幕上，刷新率一般是60次/秒）。如果你正在浏览器里写一个游戏，你或许会说<em>“为什么我们不直接用setInterval来实现刷新的功能呢？”</em>当然啦，我们的确可以用setInterval，但是，<strong>requestAnimationFrame</strong>有很多的优点。最重要的一点或许是当用户切换到其它的标签页时，它会暂停，因此不会浪费用户宝贵的处理器资源以及损耗电池的寿命。</p>
 
-		<h2>Animating the cube</h2>
+		<h2>使立方体动起来</h2>
 
-		<p>If you insert all the code above into the file you created before we began, you should see a green box. Let's make it all a little more interesting by rotating it.</p>
+		<p>
+			 在开始之前，如果你已经将上面的代码写入到了你所创建的文件中，你应当已经可以看到一个绿色的盒子。让我们来做一些更加有趣的事——让它旋转起来。</p>
 
-		<p>Add the following right above the <strong>renderer.render</strong> call in your <strong>animate</strong> function:</p>
+		<p>将下列代码加入到animate()函数中，位于<strong>renderer.render</strong>调用的上方：</p>
 
 		<code>
 		cube.rotation.x += 0.01;
 		cube.rotation.y += 0.01;
 		</code>
 
-		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animate loop. You can of course call other functions from there, so that you don't end up with a <strong>animate</strong> function that's hundreds of lines.</p>
+		<p>这将在渲染每一帧时被调用（正常情况下时60次/秒），使得立方体有了一个看起来很不错的旋转动画。基本上来说，在应用程序运行时，你想要移动或者改变任何东西，都必须要经过这个动画循环。当然你也可以在这里调用其它函数，这样你在写<strong>animate</strong>函数的时候，就不用以成千上万行代码而结尾了。</p>
 
-		<h2>The result</h2>
-		<p>Congratulations! You have now completed your first three.js application. It's simple, you have to start somewhere.</p>
+		<h2>结果</h2>
+		<p>祝贺你！你现在已经成功完成了你的第一个Three.js应用程序。它现在很简单, 你现在已经有了一个起点。</p>
 
-		<p>The full code is available below. Play around with it to get a better understanding of how it works.</p>
+		<p>下面是完整的代码，请尽情运行它或者修改它，这将可以让你对它的工作机制有更加深入的了解。</p>
 
 		<code>
 		&lt;html&gt;

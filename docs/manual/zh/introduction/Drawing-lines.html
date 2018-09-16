@@ -8,14 +8,14 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>画线（[name]）</h1>
 		<div>
 			<p>
-				Let's say you want to draw a line or a circle, not a wireframe [page:Mesh].
-				First we need to setup the [page:WebGLRenderer renderer], [page:Scene scene] and camera (see the Creating a scene page).
+				假设你想画一个圆或者画一条线，而不是一个线框或者说[page:Mesh]（网格）。
+				第一部我们要做的，是设置好[page:WebGLRenderer renderer]（渲染器）、[page:Scene scene]（场景）和[page:Camera camera]（相机）-（请阅读本手册第一章“Creating a scene”）。
 			</p>
 
-			<p>Here is the code that we will use:</p>
+			<p>这是我们将要用到的代码：</p>
 			<code>
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -27,15 +27,17 @@ camera.lookAt( 0, 0, 0 );
 
 var scene = new THREE.Scene();
 			</code>
-			<p>Next thing we will do is define a material. For lines we have to use [page:LineBasicMaterial] or [page:LineDashedMaterial].</p>
+			<p>
+				接下来我们要做的事情是定义一个材质。对于线条来说，我们能使用的材质只有[page:LineBasicMaterial] 或者 [page:LineDashedMaterial]。
+			</p>
 			<code>
 //create a blue LineBasicMaterial
 var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 			</code>
 
 			<p>
-				After material we will need a [page:Geometry] or [page:BufferGeometry] with some vertices
-				(it's recommended to use a BufferGeometry as it's more performant, however for simplicity we'll use a Geometry here):
+				定义好材质之后，我们需要一个带有一些顶点的[page:Geometry] 或者 [page:BufferGeometry]。
+				（推荐使用BufferGeometry，因为它在性能上表现得会更好一些；但在这里，为了简单起见，我们使用Geometry）：
 			</p>
 
 			<code>
@@ -45,20 +47,20 @@ geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
 geometry.vertices.push(new THREE.Vector3( 10, 0, 0) );
 			</code>
 
-			<p>Note that lines are drawn between each consecutive pair of vertices, but not between the first and last (the line is not closed.)</p>
+			<p>注意，线是被画在每一对连续的顶点之间的，而不是在第一个顶点和最后一个定点之间绘制线条（线条并未闭合）。</p>
 
-			<p>Now that we have points for two lines and a material, we can put them together to form a line.</p>
+			<p>既然我们已经有了能够画两条线的点和一个材质，我们现在就能够将他们组合在一起，形成一条线。</p>
 			<code>
 var line = new THREE.Line( geometry, material );
 			</code>
-			<p>All that's left is to add it to the scene and call [page:WebGLRenderer.render render].</p>
+			<p>剩下的就是把它添加到场景中并调用[page:WebGLRenderer.render render]（渲染）函数。</p>
 
 			<code>
 scene.add( line );
 renderer.render( scene, camera );
 			</code>
 
-			<p>You should now be seeing an arrow pointing upwards, made from two blue lines.</p>
+			<p>你现在应当已经看到了一个由两条蓝线组成的、指向上的箭头。</p>
 		</div>
 	</body>
 </html>
