@@ -189,11 +189,7 @@ class MeshStructure {
 /**
  * Calculate a subdivided surface from a base mesh.
  */
-export class SubdivisionModifier {
-
-	// Some constants
-	WARNINGS = true; // Set to true for development
-	ABC = [ 'a', 'b', 'c' ];
+THREE.SubdivisionModifier = class SubdivisionModifier {
 
 	get baseGeometry() {
 
@@ -219,11 +215,16 @@ export class SubdivisionModifier {
 
 		this._baseGeometry.mergeVertices();
 
-		this.init();
+		this.init( false );
 
 	}
 
 	constructor ( geometry, subdivisions = 1 ) {
+
+		// Some constants
+		this.WARNINGS = true; // Set to true for development
+		this.ABC = [ 'a', 'b', 'c' ];
+
 
 		this.subdivisions = subdivisions;
 

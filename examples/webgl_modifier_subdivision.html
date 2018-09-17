@@ -200,8 +200,6 @@
 
 				}
 
-				var modifier = new THREE.SubdivisionModifier( subdivisions );
-
 				var params = geometriesParams[ geometryIndex ];
 
 				geometry = createSomething( THREE[ params.type ], params.args );
@@ -214,7 +212,11 @@
 
 				}
 
-				smooth = modifier.modify( geometry );
+				var modifier = new THREE.SubdivisionModifier( geometry, subdivisions );
+
+				modifier.modify();
+
+				smooth = modifier.geometry;
 
 				var faceIndices = [ 'a', 'b', 'c' ];
 
