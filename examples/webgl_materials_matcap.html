@@ -54,6 +54,7 @@
 			var image;
 
 			var API = {
+				color : 0xffffff,
 				exposure : 1.0
 			}
 
@@ -77,17 +78,19 @@
 				scene = new THREE.Scene();
 
 				// camera
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( - 10, 0, 23 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.set( 0, 0, 12 );
 
 				// controls
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
-				controls.minDistance = 10;
-				controls.maxDistance = 50;
-				controls.enablePan = false;
+				controls.enableZoom = false;
 
-				var loader = new THREE.TextureLoader();
+				// manager
+				var manager = new THREE.LoadingManager( render );
+
+				// matcap
+				var loader = new THREE.TextureLoader( manager );
 
 				var matcap = loader.load( 'textures/matcaps/matcap-porcelain-white.jpg', function( texture ) {
 
@@ -98,42 +101,27 @@
 				} );
 
 				// model
-				new THREE.GLTFLoader().load( 'models/gltf/Nefertiti/Nefertiti.glb', function ( gltf ) {
+				new THREE.GLTFLoader( manager ).load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
-					gltf.scene.traverse( function ( child ) {
+					mesh = gltf.scene.children[ 0 ];
 
-						if ( child.isMesh ) {
+					mesh.material = new THREE.MeshMatcapMaterial( {
 
-							child.material = new THREE.MeshMatcapMaterial( {
-
-								matcap: matcap
-
-							} );
-
-							//
-
-							child.material.side = THREE.DoubleSide;
-
-							child.scale.multiplyScalar( 0.5 );
-
-							// recenter
-
-							new THREE.Box3().setFromObject( child ).getCenter( child.position ).multiplyScalar( - 1 );
-
-							mesh = child;
-
-							scene.add( mesh );
-
-						}
+						color: API.color,
+						matcap: matcap
 
 					} );
 
-					render();
+					scene.add( mesh );
 
 				} );
 
 				// gui
 				var gui = new dat.GUI();
+
+				gui.addColor( API, 'color' )
+					.listen()
+					.onChange( function() { mesh.material.color.set( API.color ); render(); } );
 
 				gui.add( API, 'exposure', 0, 2 )
 					.onChange( function() { renderer.toneMappingExposure = API.exposure; render(); } )
@@ -190,6 +178,9 @@
 				matcap.image = event.target;
 
 				matcap.needsUpdate = true;
+
+				API.color = 0xffffff;
+				mesh.material.color.set( API.color );
 
 				render();
 

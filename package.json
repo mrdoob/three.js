@@ -28,7 +28,6 @@
   "scripts": {
     "build": "rollup -c",
     "build-test": "rollup -c test/rollup.unit.config.js",
-    "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
     "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
@@ -58,9 +57,7 @@
     "google-closure-compiler": "20180805.0.0",
     "http-server": "^0.11.1",
     "qunit": "^2.6.2",
-    "rollup": "^0.65.0",
-    "rollup-watch": "^4.3.1",
-    "uglify-js": "^3.4.9"
+    "rollup": "^0.65.0"
   },
   "jspm": {
     "files": [

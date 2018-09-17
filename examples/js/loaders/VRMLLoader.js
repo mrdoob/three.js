@@ -210,6 +210,7 @@ THREE.VRMLLoader.prototype = {
 						scope.angles = [];
 						break;
 
+					case 'color':
 					case 'skyColor':
 					case 'groundColor':
 						scope.recordingFieldname = fieldName;
@@ -224,7 +225,9 @@ THREE.VRMLLoader.prototype = {
 						scope.points = [];
 						break;
 
+					case 'colorIndex':
 					case 'coordIndex':
+					case 'normalIndex':
 					case 'texCoordIndex':
 						scope.recordingFieldname = fieldName;
 						scope.isRecordingFaces = true;
@@ -446,6 +449,7 @@ THREE.VRMLLoader.prototype = {
 						case 'transparency':
 						case 'shininess':
 						case 'ambientIntensity':
+						case 'creaseAngle':
 							if ( parts.length !== 2 ) {
 
 								console.warn( 'THREE.VRMLLoader: Invalid single float value specification detected for %s.', fieldName );
@@ -810,10 +814,11 @@ THREE.VRMLLoader.prototype = {
 						var geometry = new THREE.BufferGeometry();
 
 						var positions = [];
+						var colors = [];
 						var normals = [];
 						var uvs = [];
 
-						var position, normal, uv;
+						var position, color, normal, uv;
 
 						var i, il, j, jl;
 
@@ -848,6 +853,23 @@ THREE.VRMLLoader.prototype = {
 
 										normal = child.points[ j ];
 										normals.push( normal.x, normal.y, normal.z );
+
+									}
+
+								}
+
+							}
+
+							// colors
+
+							if ( child.nodeType === 'Color' ) {
+
+								if ( child.color ) {
+
+									for ( j = 0, jl = child.color.length; j < jl; j ++ ) {
+
+										color = child.color[ j ];
+										colors.push( color.r, color.g, color.b );
 
 									}
 
@@ -890,76 +912,149 @@ THREE.VRMLLoader.prototype = {
 
 						}
 
-						var skip = 0;
-
 						// some shapes only have vertices for use in other shapes
 
 						if ( data.coordIndex ) {
 
-							var newPositions = [];
-							var newNormals = [];
-							var newUvs = [];
+							function triangulateIndexArray( indexArray, ccw ) {
 
-							position = new THREE.Vector3();
-							normal = new THREE.Vector3();
-							uv = new THREE.Vector2();
+								if ( ccw === undefined ) {
 
-							for ( i = 0, il = data.coordIndex.length; i < il; i ++ ) {
-
-								var indexes = data.coordIndex[ i ];
-
-								// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
-
-								skip = 0;
-
-								while ( indexes.length >= 3 && skip < ( indexes.length - 2 ) ) {
-
-									if ( data.ccw === undefined ) data.ccw = true; // ccw is true by default
-
-									var i1 = indexes[ 0 ];
-									var i2 = indexes[ skip + ( data.ccw ? 1 : 2 ) ];
-									var i3 = indexes[ skip + ( data.ccw ? 2 : 1 ) ];
-
-									// create non indexed geometry, necessary for face normal generation
-
-									position.fromArray( positions, i1 * 3 );
-									newPositions.push( position.x, position.y, position.z );
-									position.fromArray( positions, i2 * 3 );
-									newPositions.push( position.x, position.y, position.z );
-									position.fromArray( positions, i3 * 3 );
-									newPositions.push( position.x, position.y, position.z );
-
-									if ( uvs.length > 0 ) {
-
-										uv.fromArray( uvs, i1 * 2 );
-										newUvs.push( uv.x, uv.y );
-										uv.fromArray( uvs, i2 * 2 );
-										newUvs.push( uv.x, uv.y );
-										uv.fromArray( uvs, i3 * 2 );
-										newUvs.push( uv.x, uv.y );
-
-									}
-
-									if ( normals.length > 0 ) {
-
-										normal.fromArray( normals, i1 * 3 );
-										newNormals.push( normal.x, normal.y, normal.z );
-										normal.fromArray( normals, i2 * 3 );
-										newNormals.push( normal.x, normal.y, normal.z );
-										normal.fromArray( normals, i3 * 3 );
-										newNormals.push( normal.x, normal.y, normal.z );
-
-									}
-
-									skip ++;
+									// ccw is true by default
+									ccw = true;
 
 								}
+
+								var triangulatedIndexArray = [];
+								var skip = 0;
+
+								for ( i = 0, il = indexArray.length; i < il; i ++ ) {
+
+									var indexedFace = indexArray[ i ];
+	
+									// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+	
+									skip = 0;
+	
+									while ( indexedFace.length >= 3 && skip < ( indexedFace.length - 2 ) ) {
+
+										var i1 = indexedFace[ 0 ];
+										var i2 = indexedFace[ skip + ( ccw ? 1 : 2 ) ];
+										var i3 = indexedFace[ skip + ( ccw ? 2 : 1 ) ];
+	
+										triangulatedIndexArray.push( i1, i2, i3 );
+	
+										skip ++;
+	
+									}
+	
+								}
+
+								return triangulatedIndexArray;
+
+							}
+
+							var positionIndexes = data.coordIndex ? triangulateIndexArray( data.coordIndex, data.ccw ) : [];
+							var normalIndexes = data.normalIndex ? triangulateIndexArray( data.normalIndex, data.ccw ) : positionIndexes;
+							var colorIndexes = data.colorIndex ? triangulateIndexArray( data.colorIndex, data.ccw ) : positionIndexes;
+							var uvIndexes = data.texCoordIndex ? triangulateIndexArray( data.texCoordIndex, data.ccw ) : positionIndexes;
+
+							var newIndexes = [];
+							var newPositions = [];
+							var newNormals = [];
+							var newColors = [];
+							var newUvs = [];
+
+							// if any other index array does not match the coordinate indexes, split any points that differ
+
+							var pointMap = Object.create( null );
+
+							for ( i = 0; i < positionIndexes.length; i ++ ) {
+
+								var pointAttributes = [];
+
+								var positionIndex = positionIndexes[ i ];
+								var normalIndex = normalIndexes[ i ];
+								var colorIndex = colorIndexes[ i ];
+								var uvIndex = uvIndexes[ i ];
+
+								var base = 10; // which base to use to represent each value
+
+								pointAttributes.push( positionIndex.toString( base ) );
+
+								if ( normalIndex !== undefined ) {
+
+									pointAttributes.push( normalIndex.toString( base ) );
+
+								}
+
+								if ( colorIndex !== undefined ) { 
+
+									pointAttributes.push( colorIndex.toString( base ) );
+
+								}
+
+								if ( uvIndex !== undefined ) {
+
+									pointAttributes.push( uvIndex.toString( base ) );
+
+								}
+
+								var pointId = pointAttributes.join( ',' );
+								var newIndex = pointMap[ pointId ];
+
+								if ( newIndex === undefined ) {
+
+									newIndex = newPositions.length / 3;
+									pointMap[ pointId ] = newIndex;
+
+									newPositions.push(
+										positions[ positionIndex * 3 ],
+										positions[ positionIndex * 3 + 1 ],
+										positions[ positionIndex * 3 + 2 ]
+									);
+
+									if ( normalIndex !== undefined && normals.length > 0 ) {
+
+										newNormals.push(
+											normals[ normalIndex * 3 ],
+											normals[ normalIndex * 3 + 1 ],
+											normals[ normalIndex * 3 + 2 ]
+										);
+
+									}
+
+									if ( colorIndex !== undefined && colors.length > 0 ) {
+
+										newColors.push(
+											colors[ colorIndex * 3 ],
+											colors[ colorIndex * 3 + 1 ],
+											colors[ colorIndex * 3 + 2 ]
+										);
+
+									}
+
+									if ( uvIndex !== undefined && uvs.length > 0 ) {
+
+										newUvs.push(
+											uvs[ uvIndex * 2 ],
+											uvs[ uvIndex * 2 + 1 ]
+										);
+
+									}
+
+								}
+
+								newIndexes.push( newIndex );
 
 							}
 
 							positions = newPositions;
 							normals = newNormals;
+							color = newColors;
 							uvs = newUvs;
+
+							geometry.setIndex( newIndexes );
 
 						} else {
 
@@ -980,6 +1075,12 @@ THREE.VRMLLoader.prototype = {
 
 						geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
+						if ( colors.length > 0 ) {
+
+							geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+						}
+
 						if ( uvs.length > 0 ) {
 
 							geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
@@ -992,6 +1093,8 @@ THREE.VRMLLoader.prototype = {
 
 						} else {
 
+							// convert geometry to non-indexed to get sharp normals 
+							geometry = geometry.toNonIndexed();
 							geometry.computeVertexNormals();
 
 						}

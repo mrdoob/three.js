@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>通过模块来引入（[name]）</h1><br />
+
+		<p>
+			虽然通过script标签来引入three.js是一个能够快速起步、快速运行的方式，但这种方式对于一些具有较长生命周期的项目来说是有一些缺点的。比如说：
+
+			<ul>
+				<li>你必须手动获得并在你的源代码中包含这个库的一个拷贝</li>
+				<li>更新这个库的版本是一个手动操作的过程</li>
+				<li>在检查新版本的库时，你的版本控制差异对比会被许多行给弄乱。</li>
+			</ul>
+		</p>
+
+		<p>使用像npm这样的依赖包管理器可以很好地避免这些需要注意的问题，只需在你的电脑上下载并导入你所需要的库的版本即可。</p>
+
+		<h2>通过npm来安装</h2>
+
+		<p>Three.js已经作为一个npm包来进行发布，详情请参阅：[link:https://www.npmjs.com/package/three npm]。这意味着在所有你需要包含three.js库的项目中，只需运行"npm install three"即可。</p>
+
+		<h2>导入这个模块</h2>
+
+		<p>假设你正在使用[link:https://webpack.github.io/ Webpack]或者[link:https://github.com/substack/node-browserify Browserify]等允许你“通过打包所有依赖，来在浏览器中使用require('modules')”的打包工具对你的文件进行打包。</p>
+
+		<p>你现在可以在你的源代码中引入模块，并继续像往常一样使用这个库。
+		</p>
+
+		<code>
+		var THREE = require('three');
+
+		var scene = new THREE.Scene();
+		...
+		</code>
+
+		<p>
+			你也可以使用[link:https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/import ES6 import]
+		</p>
+
+		<code>
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+		...
+		</code>
+
+		<p>
+			或者，如果你希望只导入three.js库中的特定部分，例如Scene：
+		</p>
+
+		<code>
+		import { Scene } from 'three';
+
+		const scene = new Scene();
+		...
+		</code>
+
+		<h2>注意事项</h2>
+
+		<p>
+			目前，无法用这种方式导入"examples/js"目录中的文件。
+			这是因为一些文件依赖于THREE的全局命名空间污染。了解更多详情，请参阅<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>。
+		</p>
+	</body>
+</html>
