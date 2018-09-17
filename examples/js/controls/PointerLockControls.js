@@ -1,10 +1,14 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.PointerLockControls = function ( camera ) {
+THREE.PointerLockControls = function ( camera, domElement ) {
 
 	var scope = this;
+
+	this.domElement = domElement || document.body;
+	this.enabled = false;
 
 	camera.rotation.set( 0, 0, 0 );
 
@@ -17,7 +21,7 @@ THREE.PointerLockControls = function ( camera ) {
 
 	var PI_2 = Math.PI / 2;
 
-	var onMouseMove = function ( event ) {
+	function onMouseMove( event ) {
 
 		if ( scope.enabled === false ) return;
 
@@ -29,17 +33,53 @@ THREE.PointerLockControls = function ( camera ) {
 
 		pitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, pitchObject.rotation.x ) );
 
+	}
+
+	function onPointerlockChange() {
+
+		if ( document.pointerLockElement === scope.domElement ) {
+
+			scope.dispatchEvent( { type: 'lock' } );
+
+			scope.enabled = true;
+
+		} else {
+
+			scope.dispatchEvent( { type: 'unlock' } );
+
+			scope.enabled = false;
+
+		}
+
+	}
+
+	function onPointerlockError() {
+
+		console.error( 'THREE.PointerLockControls: Unable to use Pointer Lock API' );
+
+	}
+
+	this.connect = function () {
+
+		document.addEventListener( 'mousemove', onMouseMove, false );
+		document.addEventListener( 'pointerlockchange', onPointerlockChange, false );
+		document.addEventListener( 'pointerlockerror', onPointerlockError, false );
+
+	};
+
+	this.disconnect = function () {
+
+		document.removeEventListener( 'mousemove', onMouseMove, false );
+		document.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
+		document.removeEventListener( 'pointerlockerror', onPointerlockError, false );
+
 	};
 
 	this.dispose = function () {
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
+		this.disconnect();
 
 	};
-
-	document.addEventListener( 'mousemove', onMouseMove, false );
-
-	this.enabled = false;
 
 	this.getObject = function () {
 
@@ -66,4 +106,21 @@ THREE.PointerLockControls = function ( camera ) {
 
 	}();
 
+	this.lock = function () {
+
+		this.domElement.requestPointerLock();
+
+	};
+
+	this.unlock = function () {
+
+		document.exitPointerLock();
+
+	};
+
+	this.connect();
+
 };
+
+THREE.PointerLockControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.PointerLockControls.prototype.constructor = THREE.PointerLockControls;
