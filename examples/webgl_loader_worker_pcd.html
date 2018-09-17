@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - WorkerLoader: Mutli-Loader Example</title>
+		<title>three.js webgl - WorkerLoader: PCDLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -67,7 +67,7 @@
 
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WorkerLoader: Multi-Loader Example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WorkerLoader: PCDLoader
 			<div id="feedback"></div>
 		</div>
 
@@ -78,8 +78,9 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/loaders/PCDLoader.js"></script>
 
-		<script src="js/loaders/LoaderSupport.js"></script>
-		<script src="js/loaders/WorkerLoader.js"></script>
+        <script src="js/loaders/LoaderSupport.js"></script>
+        <script src="js/loaders/WorkerLoader.js"></script>
+		<script src="js/loaders/wrapper/WLPCDLoader.js"></script>
 		<script>
 
 			'use strict';
@@ -139,44 +140,26 @@
 
 				initContent: function () {
 					var local = new THREE.Object3D();
-					local.position.set( 0, 0, 100 );
-					local.scale.set( 50.0, 50.0, 50.0 );
+					local.position.set( 0, 0, 0 );
+					local.scale.set( 100.0, 100.0, 100.0 );
 					this.scene.add( local );
 
 					var scope = this;
 					var callbackOnLoad = function ( event ) {
 						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
 					};
-					var buildWorkerCode = function ( codeSerializer ) {
-						THREE.PCDLoader.prototype._parse = THREE.PCDLoader.prototype.parse;
 
-						THREE.PCDLoader.prototype.parse = function ( data ) {
-							return this._parse( data, 'models/pcd/binary/Zaghetto.pcd' )
-						};
-
-						var workerCode = codeSerializer.serializeClass( 'THREE.PCDLoader', THREE.PCDLoader );
-						return {
-							code: workerCode,
-							parserName: 'THREE.PCDLoader',
-							usesMeshDisassembler: true,
-							defaultGeometryType: 2,
-							libs: {
-								locations: [
-									'build/three.min.js',
-									'examples/js/loaders/PCDLoader.js'
-								],
-								path: '../'
-							},
-							provideThree: true
-						}
-					};
 					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'Zaghetto.pcd', 'models/pcd/binary/Zaghetto.pcd' );
+					var parserConfiguration = {	url: rd.url };
+					rd.setParserConfiguration( parserConfiguration );
+					rd.configureAsync( false, true );
 
 					var loadingTaskConfig = new THREE.WorkerLoader.LoadingTaskConfig( {
 						baseObject3d: local
 					} )
-						.setLoaderConfig( THREE.PCDLoader )
-						.setBuildWorkerCodeFunction( buildWorkerCode )
+						.setLoaderConfig( WLPCDLoader, {
+							builderPath: '../'
+						} )
 						.addResourceDescriptor( rd )
 						.setCallbacksPipeline( callbackOnLoad );
 					new THREE.WorkerLoader()

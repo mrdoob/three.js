@@ -189,6 +189,16 @@ THREE.LoaderSupport.MeshReceiver.prototype = {
 			bufferGeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( meshPayload.buffers.uvs ), 2 ) );
 
 		}
+		if ( this.validator.isValid( meshPayload.buffers.skinIndex ) ) {
+
+			bufferGeometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( new Uint16Array( meshPayload.buffers.skinIndex ), 4 ) );
+
+		}
+		if ( this.validator.isValid( meshPayload.buffers.skinWeight ) ) {
+
+			bufferGeometry.addAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( meshPayload.buffers.skinWeight ), 4 ) );
+
+		}
 
 		var material, materialName, key;
 		var materialNames = meshPayload.materials.materialNames;
@@ -526,11 +536,15 @@ THREE.LoaderSupport.MeshTransmitter.prototype = {
 		var colorBA = bufferGeometry.getAttribute( 'color' );
 		var normalBA = bufferGeometry.getAttribute( 'normal' );
 		var uvBA = bufferGeometry.getAttribute( 'uv' );
+		var skinIndexBA = bufferGeometry.getAttribute( 'skinIndex' );
+		var skinWeightBA = bufferGeometry.getAttribute( 'skinWeight' );
 		var vertexFA = ( vertexBA !== null && vertexBA !== undefined ) ? vertexBA.array: null;
 		var indexUA = ( indexBA !== null && indexBA !== undefined ) ? indexBA.array: null;
 		var colorFA = ( colorBA !== null && colorBA !== undefined ) ? colorBA.array: null;
 		var normalFA = ( normalBA !== null && normalBA !== undefined ) ? normalBA.array: null;
 		var uvFA = ( uvBA !== null && uvBA !== undefined ) ? uvBA.array: null;
+		var skinIndexFA = ( skinIndexBA !== null && skinIndexBA !== undefined ) ? skinIndexBA.array: null;
+		var skinWeightFA = ( skinWeightBA !== null && skinWeightBA !== undefined ) ? skinWeightBA.array: null;
 
 		var materialNames = [ this.defaultMaterials[ this.defaultGeometryType ] ];
 		this.callbackDataReceiver(
@@ -553,7 +567,9 @@ THREE.LoaderSupport.MeshTransmitter.prototype = {
 					indices: indexUA,
 					colors: colorFA,
 					normals: normalFA,
-					uvs: uvFA
+					uvs: uvFA,
+					skinIndex: skinIndexFA,
+					skinWeight: skinWeightFA
 				},
 				// 0: mesh, 1: line, 2: point
 				geometryType: this.defaultGeometryType
@@ -562,7 +578,9 @@ THREE.LoaderSupport.MeshTransmitter.prototype = {
 			indexUA !== null ?  [ indexUA.buffer ] : null,
 			colorFA !== null ? [ colorFA.buffer ] : null,
 			normalFA !== null ? [ normalFA.buffer ] : null,
-			uvFA !== null ? [ uvFA.buffer ] : null
+			uvFA !== null ? [ uvFA.buffer ] : null,
+			skinIndexFA !== null ? [ skinIndexFA.buffer ] : null,
+			skinWeightFA !== null ? [ skinWeightFA.buffer ] : null
 		);
 	}
 };

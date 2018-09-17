@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - WorkerLoader: DRACOLoader</title>
+		<title>three.js webgl - WorkerLoader: GLTFLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -67,7 +67,7 @@
 
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WorkerLoader: DRACOLoader
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WorkerLoader: GLTFLoader
 			<div id="feedback"></div>
 		</div>
 
@@ -76,15 +76,18 @@
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/loaders/DRACOLoader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script src="js/loaders/LoaderSupport.js"></script>
 		<script src="js/loaders/WorkerLoader.js"></script>
 		<script src="js/loaders/wrapper/WLDRACOLoader.js"></script>
+		<script src="js/loaders/wrapper/WLGLTFLoader.js"></script>
+
 		<script>
 
 			'use strict';
 
-			var WLDraco = function ( elementToBindTo ) {
+			var WLGLTF = function ( elementToBindTo ) {
 				this.renderer = null;
 				this.canvas = elementToBindTo;
 				this.aspectRatio = 1;
@@ -104,9 +107,9 @@
 				this.controls = null;
 			};
 
-			WLDraco.prototype = {
+			WLGLTF.prototype = {
 
-				constructor: WLDraco,
+				constructor: WLGLTF,
 
 				initGL: function () {
 					this.renderer = new THREE.WebGLRenderer( {
@@ -114,7 +117,7 @@
 						antialias: true,
 						autoClear: true
 					} );
-					this.renderer.setClearColor( 0x050505 );
+					this.renderer.setClearColor( 0xA5A5A5 );
 
 					this.scene = new THREE.Scene();
 
@@ -140,29 +143,38 @@
 				initContent: function () {
 					var local = new THREE.Object3D();
 					local.position.set( 0, 0, 0 );
-					local.scale.set( 100.0, 100.0, 100.0 );
+					local.scale.set( 1.0, 1.0, 1.0 );
 					this.scene.add( local );
 
 					var scope = this;
-					var callbackOnLoad = function ( event ) {
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
+					var callbackOnLoad = function ( object3d ) {
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + object3d.name } } );
 					};
 
-					var dracoLibsPath = new URL( 'examples/js/libs/draco', window.location.href ).href;
-					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'bunny.drc', 'models/draco/bunny.drc' );
-					var parserConfiguration = {	url: dracoLibsPath };
-					rd.setParserConfiguration( parserConfiguration );
+					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'Monster.gltf', 'models/gltf/Monster/glTF-Draco/Monster.gltf' );
+					rd.configureAsync( false, false );
+					var dracoLibsPath = new URL( 'js/libs/draco/', window.location.href ).href;
 
 					var loadingTaskConfig = new THREE.WorkerLoader.LoadingTaskConfig( {
 						baseObject3d: local
 					} )
-						.setLoaderConfig( WLDRACOLoader, {
-							builderPath: '../'
+						.setLoaderConfig( WLGLTFLoader, {
+							dracoBuilderPath: '../',
+							dracoLibsPath: dracoLibsPath,
+							path: 'models/gltf/Monster/glTF-Draco/'
 						} )
 						.addResourceDescriptor( rd )
 						.setCallbacksPipeline( callbackOnLoad );
 					new THREE.WorkerLoader()
 						.executeLoadingTaskConfig( loadingTaskConfig );
+/*
+					var gltfLoader = new THREE.GLTFLoader();
+					gltfLoader.setPath( 'models/gltf/Monster/glTF-Draco/' );
+					THREE.DRACOLoader.setDecoderPath( dracoLibsPath );
+
+					gltfLoader.setDRACOLoader( new THREE.DRACOLoader() );
+					gltfLoader.load( rd.url );
+*/
 				},
 
 				_reportProgress: function( event ) {
@@ -206,7 +218,7 @@
 			};
 
 
-			var app = new WLDraco( document.getElementById( 'example' ) );
+			var app = new WLGLTF( document.getElementById( 'example' ) );
 
 			var resizeWindow = function () {
 				app.resizeDisplayGL();

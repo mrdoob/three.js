@@ -167,22 +167,6 @@ THREE.WorkerLoader.LoadingTask = function ( description ) {
 };
 
 
-THREE.WorkerLoader.LoadingTask.applyConfiguration = function ( scope, applicableConfiguration, forceCreation ) {
-	// fast-fail
-	if ( scope === undefined || scope === null || applicableConfiguration === undefined || applicableConfiguration === null ) return;
-
-	var property, value;
-	for ( property in applicableConfiguration ) {
-
-		value = applicableConfiguration[ property ];
-		if ( scope.hasOwnProperty( property ) || forceCreation ) {
-
-			scope[ property ] = value;
-
-		}
-	}
-};
-
 THREE.WorkerLoader.LoadingTask.prototype = {
 
 	constructor: THREE.WorkerLoader.LoadingTask,
@@ -428,7 +412,7 @@ THREE.WorkerLoader.LoadingTask.prototype = {
 
 			}
 
-			this.workerSupport.validate( this.loader.buildWorkerCode, provideRds );
+			this.workerSupport.validate( this.loader.ref, this.loader.buildWorkerCode, provideRds );
 			this.workerSupport.updateCallbacks( callbackLoadFiles );
 			this.workerSupport.runAsyncInitWorker( rdForWorkerInit );
 
@@ -469,9 +453,9 @@ THREE.WorkerLoader.LoadingTask.prototype = {
 			this.loader.buildWorkerCode = this.loader.ref.buildWorkerCode;
 
 		}
-		if ( typeof this.loader.buildWorkerCode !== 'function' ) this._throwError( 'No buildWorkerCode function is available for: ' + this.loader.ref.modelName );
+		if ( typeof this.loader.buildWorkerCode !== 'function' ) console.warn( 'No buildWorkerCode function is available for: ' + this.loader.ref.modelName );
 
-		THREE.WorkerLoader.LoadingTask.applyConfiguration( this, ownConfig );
+		THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype.applyProperties( this, ownConfig );
 		if ( loadingTaskConfig !== null ) {
 
 			this.resetResourceDescriptors( loadingTaskConfig.resourceDescriptors );
@@ -495,8 +479,8 @@ THREE.WorkerLoader.LoadingTask.prototype = {
 		} else {
 
 			// this will ensure that any base configuration on LoadingTask and Loader are aligned
-			THREE.WorkerLoader.LoadingTask.applyConfiguration( this.loader.ref, ownConfig );
-			THREE.WorkerLoader.LoadingTask.applyConfiguration( this.loader.ref, this.loader.config );
+			THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype.applyProperties( this.loader.ref, ownConfig );
+			THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype.applyProperties( this.loader.ref, this.loader.config );
 			if ( typeof this.loader.ref.setGenericErrorHandler === 'function' ) this.loader.ref.setGenericErrorHandler( this.callbacks.app.onReportError );
 
 		}
@@ -507,10 +491,8 @@ THREE.WorkerLoader.LoadingTask.prototype = {
 	_executeLoadFiles: function () {
 		var loadingTask = this;
 
-		// TODO: loop needs to be done within FileLoadingExecutor, then it can be used as is in Worker, otherwise duplicated code is required
 		var fileLoadingExecutor = new THREE.WorkerLoader.FileLoadingExecutor( loadingTask.instanceNo, loadingTask.description );
 		fileLoadingExecutor
-			.setPath( loadingTask.loader.ref.path )
 			.setCallbacks( loadingTask.callbacks.app.onReport, loadingTask._throwError );
 
 		var loadAllResources = function ( index ) {
@@ -617,7 +599,22 @@ THREE.WorkerLoader.LoadingTask.prototype = {
 
 			} else {
 
-				result = loadingTask.loader.ref.parse( resourceDescriptorCurrent.content, resourceDescriptorCurrent.parserConfiguration );
+				THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype.applyProperties( loadingTask.loader.ref, resourceDescriptorCurrent.parserConfiguration );
+				if ( typeof loadingTask.loader.ref.getParseFunctionName === 'function' ) {
+
+					var parseFunctionName = loadingTask.loader.ref.getParseFunctionName();
+					result = loadingTask.loader.ref[ parseFunctionName ]( resourceDescriptorCurrent.content, resourceDescriptorCurrent.parserConfiguration );
+
+				} else {
+
+					result = loadingTask.loader.ref.parse( resourceDescriptorCurrent.content, resourceDescriptorCurrent.parserConfiguration );
+
+				}
+				if ( typeof loadingTask.loader.ref.setBaseObject3d === 'function' ) {
+
+					loadingTask.loader.ref[ 'setBaseObject3d' ]( loadingTask.baseObject3d );
+
+				}
 				resourceDescriptorCurrent.setParserResult( result );
 				var callbackOnProcessResult = resourceDescriptorCurrent.getCallbackOnProcessResult();
 				if ( THREE.LoaderSupport.Validator.isValid( callbackOnProcessResult ) ) callbackOnProcessResult( resourceDescriptorCurrent );
@@ -678,9 +675,10 @@ THREE.WorkerLoader.LoadingTask.prototype = {
 				materials: materialsContainer,
 				data: {
 					input: resourceDescriptor.content,
-					options: null
+					options: resourceDescriptor.dataOptions
 				}
-			}
+			},
+			resourceDescriptor.transferables
 		)
 	},
 
@@ -702,7 +700,11 @@ THREE.WorkerLoader.LoadingTask.prototype = {
 
 		} else {
 
-			if ( THREE.LoaderSupport.Validator.isValid( this.callbacks.pipeline.onComplete ) ) this.callbacks.pipeline.onComplete( this.baseObject3d );
+			if ( THREE.LoaderSupport.Validator.isValid( this.callbacks.pipeline.onComplete ) ) {
+
+				this.callbacks.pipeline.onComplete( this.baseObject3d );
+
+			}
 
 		}
 	}
@@ -715,7 +717,7 @@ THREE.WorkerLoader.FileLoadingExecutor = function ( instanceNo, description ) {
 	};
 	this.instanceNo = instanceNo;
 	this.description = description;
-	this.path;
+	this.path = '';
 };
 
 THREE.WorkerLoader.FileLoadingExecutor.prototype = {
@@ -723,7 +725,7 @@ THREE.WorkerLoader.FileLoadingExecutor.prototype = {
 	constructor: THREE.WorkerLoader.FileLoadingExecutor,
 
 	setPath: function ( path ) {
-		this.path = path;
+		this.path = THREE.LoaderSupport.Validator.verifyInput( path, this.path );
 		return this;
 	},
 
@@ -796,13 +798,13 @@ THREE.WorkerLoader.FileLoadingExecutor.prototype = {
  * Encapsulates the configuration for a complete {@link THREE.WorkerLoader.LoadingTask}.
  * @constructor
  */
-THREE.WorkerLoader.LoadingTaskConfig = function ( loadingTaskConfig ) {
+THREE.WorkerLoader.LoadingTaskConfig = function ( ownConfig ) {
 	this.loader = {
 		classDef: null,
 		config: {},
 		buildWorkerCode: null
 	};
-	this.config = THREE.LoaderSupport.Validator.verifyInput( loadingTaskConfig, {} );
+	this.config = THREE.LoaderSupport.Validator.verifyInput( ownConfig, {} );
 	this.resourceDescriptors = [];
 	this.extension = 'unknown';
 
@@ -933,7 +935,7 @@ THREE.WorkerLoader.LoadingTaskConfig.prototype = {
 THREE.WorkerLoader.ResourceDescriptor = function ( resourceType, name, input ) {
 	this.name = ( name !== undefined && name !== null ) ? name : 'Unnamed_Resource';
 	this.resourceType = resourceType;
-	this.input = ( input !== undefined && input !== null ) ? input : null;
+
 	this.content;
 	this.url = null;
 	this.filename = null;
@@ -946,20 +948,23 @@ THREE.WorkerLoader.ResourceDescriptor = function ( resourceType, name, input ) {
 	this.parserConfiguration = {
 		payloadType: 'arraybuffer'
 	};
+	this.dataOptions = {};
+	this.transferables = [];
 	this.result = null;
 
-	this._init();
+	this._init( input );
 };
 
 THREE.WorkerLoader.ResourceDescriptor.prototype = {
 
 	constructor: THREE.WorkerLoader.ResourceDescriptor,
 
-	_init: function () {
+	_init: function ( input ) {
+		input = ( input !== undefined && input !== null ) ? input : null;
 
 		if ( this.resourceType === 'URL' ) {
 
-			this.url = ( this.input !== null ) ? this.input : this.name;
+			this.url = ( input !== null ) ? input : this.name;
 			this.url = new URL( this.url, window.location.href ).href;
 			this.filename = this.url;
 			var urlParts = this.url.split( '/' );
@@ -977,12 +982,12 @@ THREE.WorkerLoader.ResourceDescriptor.prototype = {
 		} else if ( this.resourceType === 'Buffer' ) {
 
 			this.parserConfiguration.payloadType = 'arraybuffer';
-			this.setBuffer( this.input );
+			this.setBuffer( input );
 
 		} else if ( this.resourceType === 'String' ) {
 
 			this.parserConfiguration.payloadType = 'text';
-			this.setString( this.input );
+			this.setString( input );
 
 		} else if ( this.resourceType === 'Metadata' ) {
 
@@ -1031,9 +1036,22 @@ THREE.WorkerLoader.ResourceDescriptor.prototype = {
 	},
 
 	setParserConfiguration: function ( parserConfiguration ) {
-		THREE.WorkerLoader.LoadingTask.applyConfiguration( this.parserConfiguration, parserConfiguration, true );
+		THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype.applyProperties( this.parserConfiguration, parserConfiguration, true );
 		if ( this.parserConfiguration.name === undefined || this.parserConfiguration.name === null ) this.parserConfiguration.name = this.name;
 		return this;
+	},
+
+	setDataOption: function ( name, object, transferables ) {
+		if ( ! Array.isArray( transferables ) ) transferables = [];
+		this.dataOptions[ name ] = {
+			name: name,
+			object: object
+		};
+		if ( transferables.length > 0 ) {
+
+			this.transferables = this.transferables.concat( transferables );
+
+		}
 	},
 
 	setParserResult: function ( result ) {
@@ -1103,7 +1121,6 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 				name: 'THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl',
 				impl: THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl,
 				parserName: null,
-				parseFunction: null,
 				usesMeshDisassembler: null,
 				defaultGeometryType: null
 			},
@@ -1198,7 +1215,7 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 	 *
 	 * @param {Function} buildWorkerCode The function that is invoked to create the worker code of the parser.
 	 */
-	validate: function ( buildWorkerCode, containFileLoadingCode ) {
+	validate: function ( loaderRef, buildWorkerCode, containFileLoadingCode ) {
 		if ( THREE.LoaderSupport.Validator.isValid( this.worker.native ) ) return;
 		if ( this.logging.enabled ) {
 
@@ -1207,8 +1224,16 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 			if ( ! this.worker.workerRunner.haveUserImpl ) console.info( 'WorkerSupport: Using DEFAULT "' + this.worker.workerRunner.name + '" as Runner class for worker.' );
 
 		}
-		var codeBuilderInstructions = buildWorkerCode( THREE.WorkerLoader.WorkerSupport.CodeSerializer );
+		var codeBuilderInstructions = {
+			code: '',
+			parserName: 'Parser',
+			provideThree: false
+		};
+		if ( THREE.LoaderSupport.Validator.isValid( buildWorkerCode ) ) {
 
+			codeBuilderInstructions = buildWorkerCode( THREE.WorkerLoader.WorkerSupport.CodeSerializer, loaderRef );
+
+		}
 		// Enforce codeBuilderInstructions flag for availability of three code
 		if ( THREE.LoaderSupport.Validator.isValid( codeBuilderInstructions.provideThree ) ) {
 
@@ -1237,7 +1262,7 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 				userWorkerCode += THREE.DefaultLoadingManager.constructor.toString();
 				userWorkerCode += 'var DefaultLoadingManager = new LoadingManager();\n\n';
 				userWorkerCode += 'var Cache = THREE.Cache;\n\n';
-				userWorkerCode += THREE.WorkerLoader.WorkerSupport.CodeSerializer.serializeClass( 'THREE.FileLoader', THREE.FileLoader, null, [], 'FileLoader' );
+				userWorkerCode += THREE.WorkerLoader.WorkerSupport.CodeSerializer.serializeClass( 'THREE.FileLoader', THREE.FileLoader, 'FileLoader' );
 
 			}
 			userWorkerCode += THREE.WorkerLoader.WorkerSupport.CodeSerializer.serializeClass( 'THREE.WorkerLoader.ResourceDescriptor', THREE.WorkerLoader.ResourceDescriptor );
@@ -1255,7 +1280,6 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 			var blob = new Blob( [ stringifiedCode ], { type: 'application/javascript' } );
 			scope.worker.native = new Worker( window.URL.createObjectURL( blob ) );
 			scope.worker.native.onmessage = scopedReceiveWorkerMessage;
-			scope.worker.workerRunner.parseFunction = THREE.LoaderSupport.Validator.verifyInput( codeBuilderInstructions.parseFunction, 'parse' );
 			scope.worker.workerRunner.usesMeshDisassembler = codeBuilderInstructions.usesMeshDisassembler;
 			scope.worker.workerRunner.defaultGeometryType = THREE.LoaderSupport.Validator.verifyInput( codeBuilderInstructions.defaultGeometryType, 0 );
 
@@ -1391,17 +1415,16 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 	 *
 	 * @param {Object} payload Raw mesh description (buffers, params, materials) used to build one to many meshes.
 	 */
-	runAsyncParse: function( payload ) {
+	runAsyncParse: function( payload, transferables ) {
 		payload.cmd = 'parse';
-		payload.parseFunction = this.worker.workerRunner.parseFunction;
 		payload.usesMeshDisassembler = this.worker.workerRunner.usesMeshDisassembler;
 		payload.defaultGeometryType = this.worker.workerRunner.defaultGeometryType;
-		if ( ! this._verifyWorkerIsAvailable( payload ) ) return;
+		if ( ! this._verifyWorkerIsAvailable( payload, transferables ) ) return;
 
 		this._postMessage();
 	},
 
-	_verifyWorkerIsAvailable: function ( payload ) {
+	_verifyWorkerIsAvailable: function ( payload, transferables ) {
 		this._verifyCallbacks();
 		var ready = true;
 		if ( THREE.LoaderSupport.Validator.isValid( this.worker.queuedMessage ) ) {
@@ -1411,7 +1434,10 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 
 		} else {
 
-			this.worker.queuedMessage = payload;
+			this.worker.queuedMessage = {
+				payload: payload,
+				transferables: transferables
+			};
 			this.worker.started = true;
 
 		}
@@ -1421,23 +1447,28 @@ THREE.WorkerLoader.WorkerSupport.prototype = {
 	_postMessage: function () {
 		if ( THREE.LoaderSupport.Validator.isValid( this.worker.queuedMessage ) && THREE.LoaderSupport.Validator.isValid( this.worker.native ) ) {
 
-			if ( this.worker.queuedMessage.data.input instanceof ArrayBuffer ) {
+			if ( this.worker.queuedMessage.payload.data.input instanceof ArrayBuffer ) {
 
-				var content;
+				var transferables = [];
 				if ( this.worker.forceWorkerDataCopy ) {
 
-					content = this.worker.queuedMessage.data.input.slice( 0 );
+					transferables.push( this.worker.queuedMessage.payload.data.input.slice( 0 ) );
 
 				} else {
 
-					content = this.worker.queuedMessage.data.input;
+					transferables.push( this.worker.queuedMessage.payload.data.input );
 
 				}
-				this.worker.native.postMessage( this.worker.queuedMessage, [ content ] );
+				if ( this.worker.queuedMessage.transferables.length > 0 ) {
+
+					transferables = transferables.concat( this.worker.queuedMessage.transferables );
+
+				}
+				this.worker.native.postMessage( this.worker.queuedMessage.payload, transferables );
 
 			} else {
 
-				this.worker.native.postMessage( this.worker.queuedMessage );
+				this.worker.native.postMessage( this.worker.queuedMessage.payload );
 
 			}
 
@@ -1500,14 +1531,16 @@ THREE.WorkerLoader.WorkerSupport.CodeSerializer = {
 	 * @param ignoreFunctions
 	 * @returns {string}
 	 */
-	serializeClass: function ( fullName, object, basePrototypeName, ignoreFunctions, constructorName ) {
-		var valueString, objectPart, constructorString, i;
+	serializeClass: function ( fullName, object, constructorName, basePrototypeName, ignoreFunctions, includeFunctions, overrideFunctions ) {
+		var valueString, objectPart, constructorString, i, funcOverride;
 		var prototypeFunctions = [];
 		var objectProperties = [];
 		var objectFunctions = [];
 		var isExtended = ( basePrototypeName !== null && basePrototypeName !== undefined );
 
 		if ( ! Array.isArray( ignoreFunctions ) ) ignoreFunctions = [];
+		if ( ! Array.isArray( includeFunctions ) ) includeFunctions = null;
+		if ( ! Array.isArray( overrideFunctions ) ) overrideFunctions = [];
 
 		for ( var name in object.prototype ) {
 
@@ -1519,8 +1552,14 @@ THREE.WorkerLoader.WorkerSupport.CodeSerializer = {
 
 			} else if ( typeof objectPart === 'function' ) {
 
-				if ( ignoreFunctions.indexOf( name ) < 0 ) {
+				if ( ignoreFunctions.indexOf( name ) < 0 && ( includeFunctions === null || includeFunctions.indexOf( name ) >= 0 ) ) {
 
+					funcOverride = overrideFunctions[ name ];
+					if ( funcOverride && funcOverride.fullName === fullName + '.prototype.' + name ) {
+
+						valueString = funcOverride.code;
+
+					}
 					if ( isExtended ) {
 
 						prototypeFunctions.push( fullName + '.prototype.' + name + ' = ' + valueString + ';\n\n' );
@@ -1541,10 +1580,19 @@ THREE.WorkerLoader.WorkerSupport.CodeSerializer = {
 
 			if ( typeof objectPart === 'function' ) {
 
-				if ( ignoreFunctions.indexOf( name ) < 0 ) {
+				if ( ignoreFunctions.indexOf( name ) < 0 && ( includeFunctions === null || includeFunctions.indexOf( name ) >= 0 ) ) {
 
-					valueString = objectPart.toString();
-					objectFunctions.push( fullName + '.' + name + ' = ' + objectPart + ';\n\n' );
+					funcOverride = overrideFunctions[ name ];
+					if ( funcOverride && funcOverride.fullName === fullName + '.' + name ) {
+
+						valueString = funcOverride.code;
+
+					} else {
+
+						valueString = objectPart.toString();
+
+					}
+					objectFunctions.push( fullName + '.' + name + ' = ' + valueString + ';\n\n' );
 
 				}
 
@@ -1569,7 +1617,7 @@ THREE.WorkerLoader.WorkerSupport.CodeSerializer = {
 			}
 
 		}
-		if ( constructorString === undefined && typeof object.prototype.constructor === 'function' ) {
+		if ( ( constructorString === undefined || constructorString === null ) && typeof object.prototype.constructor === 'function' ) {
 
 			constructorString = fullName + ' = ' + object.prototype.constructor.toString().replace( constructorName, '' );
 
@@ -1604,39 +1652,6 @@ THREE.WorkerLoader.WorkerSupport.CodeSerializer = {
 
 		return objectString;
 	},
-
-	serializeSingleton: function ( fullName, object, internalName, basePrototypeName, ignoreFunctions ) {
-		var objectName = ( THREE.LoaderSupport.Validator.isValid( internalName ) ) ? internalName : object.name;
-
-		var objectString = fullName + ' = (function () {\n\n';
-		var inheritanceBlock = '\n';
-		if ( THREE.LoaderSupport.Validator.isValid( basePrototypeName ) ) {
-
-			inheritanceBlock += '\t' + objectName + '.prototype = Object.create( ' + basePrototypeName + '.prototype );\n';
-			inheritanceBlock += '\t' + objectName + '.constructor = ' + objectName + ';\n\n';
-
-		}
-		objectString += inheritanceBlock;
-		objectString += '\t' + object.prototype.constructor.toString() + '\n\n';
-
-		var funcString, objectPart;
-		ignoreFunctions = THREE.LoaderSupport.Validator.verifyInput( ignoreFunctions, [] );
-		for ( var name in object.prototype ) {
-
-			objectPart = object.prototype[ name ];
-			if ( typeof objectPart === 'function' && ignoreFunctions.indexOf( name ) < 0 ) {
-
-				funcString = objectPart.toString();
-				objectString += '\t' + objectName + '.prototype.' + name + ' = ' + funcString + ';\n\n';
-
-			}
-
-		}
-		objectString += '\treturn ' + objectName + ';\n';
-		objectString += '})();\n\n';
-
-		return objectString;
-	}
 };
 
 
@@ -1668,7 +1683,10 @@ THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype = {
 	 * @param {Object} parser The parser instance
 	 * @param {Object} params The parameter object
 	 */
-	applyProperties: function ( parser, params ) {
+	applyProperties: function ( parser, params, forceCreation ) {
+		// fast-fail
+		if ( parser === undefined || parser === null || params === undefined || params === null ) return;
+
 		var property, funcName, values;
 		for ( property in params ) {
 			funcName = 'set' + property.substring( 0, 1 ).toLocaleUpperCase() + property.substring( 1 );
@@ -1678,7 +1696,7 @@ THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype = {
 
 				parser[ funcName ]( values );
 
-			} else if ( parser.hasOwnProperty( property ) ) {
+			} else if ( parser.hasOwnProperty( property ) || forceCreation ) {
 
 				parser[ property ] = values;
 
@@ -1767,9 +1785,12 @@ THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype = {
 				arraybuffer = payload.data.input;
 
 			}
+
+			var parseFunctionName = 'parse';
+			if ( typeof parser.getParseFunctionName === 'function' ) parseFunctionName = parser.getParseFunctionName();
 			if ( payload.usesMeshDisassembler ) {
 
-				var object3d = parser[ payload.parseFunction ] ( arraybuffer, payload.data.options );
+				var object3d = parser[ parseFunctionName ] ( arraybuffer, payload.data.options );
 				var meshTransmitter = new THREE.LoaderSupport.MeshTransmitter();
 
 				meshTransmitter.setDefaultGeometryType( payload.defaultGeometryType );
@@ -1778,7 +1799,7 @@ THREE.WorkerLoader.WorkerSupport._WorkerRunnerRefImpl.prototype = {
 
 			} else {
 
-				parser[ payload.parseFunction ] ( arraybuffer, payload.data.options );
+				parser[ parseFunctionName ] ( arraybuffer, payload.data.options );
 
 			}
 			if ( this.logging.enabled ) console.log( 'WorkerRunner: Run complete!' );
@@ -2193,8 +2214,7 @@ THREE.WorkerLoader.Director.Pool.prototype = {
 			.setCallbacksApp( wrapperOnReport, wrapperOnReportError )
 			.setCallbacksParsing( wrapperOnMesh, wrapperOnLoadMaterials )
 			.setCallbacksPipeline( wrapperOnComplete );
-		supportDesc.workerLoader.getLoadingTask()
-			.execute( loadingTaskConfig, supportDesc.workerSupport );
+		supportDesc.workerLoader.executeLoadingTaskConfig( loadingTaskConfig, supportDesc.workerSupport );
 	},
 
 	_deregister: function ( supportDesc ) {
