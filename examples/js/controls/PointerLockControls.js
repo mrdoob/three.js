@@ -8,7 +8,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 	var scope = this;
 
 	this.domElement = domElement || document.body;
-	this.enabled = false;
+	this.isLocked = false;
 
 	camera.rotation.set( 0, 0, 0 );
 
@@ -23,7 +23,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	function onMouseMove( event ) {
 
-		if ( scope.enabled === false ) return;
+		if ( scope.isLocked === false ) return;
 
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
@@ -41,13 +41,13 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 			scope.dispatchEvent( { type: 'lock' } );
 
-			scope.enabled = true;
+			scope.isLocked = true;
 
 		} else {
 
 			scope.dispatchEvent( { type: 'unlock' } );
 
-			scope.enabled = false;
+			scope.isLocked = false;
 
 		}
 

@@ -297,7 +297,7 @@
 
 				requestAnimationFrame( animate );
 
-				if ( controls.enabled === true ) {
+				if ( controls.isLocked === true ) {
 
 					raycaster.ray.origin.copy( controls.getObject().position );
 					raycaster.ray.origin.y -= 10;
