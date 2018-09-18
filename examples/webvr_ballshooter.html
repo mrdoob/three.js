@@ -136,7 +136,7 @@
 				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
 				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
 
-				var material = new THREE.LineBasicMaterial( { vertexColors: true, linewidth: 2, blending: THREE.AdditiveBlending } );
+				var material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
 
 				controller1.add( new THREE.Line( geometry, material ) );
 				controller2.add( new THREE.Line( geometry, material ) );
