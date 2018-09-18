@@ -835,12 +835,7 @@ THREE.FBXLoader = ( function () {
 
 					var transform = generateTransform( node.userData.transformData );
 
-					// if ( node.parent ) transform = node.parent.matrix.getInverse( node.parent.matrix ).multiply( transform );
-
 					node.applyMatrix( transform );
-
-					// if ( node.parent )
-
 
 				}
 
@@ -3931,8 +3926,6 @@ THREE.FBXLoader = ( function () {
 	// ref: http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/_transformations_2main_8cxx-example.html,topicNumber=cpp_ref__transformations_2main_8cxx_example_htmlfc10a1e1-b18d-4e72-9dc0-70d0f1959f5e
 	function generateTransform( transformData ) {
 
-		// console.log( 'transformData', transformData );
-
 		var lTranslationM = new THREE.Matrix4();
 		var lPreRotationM = new THREE.Matrix4();
 		var lRotationM = new THREE.Matrix4();
@@ -4023,7 +4016,6 @@ THREE.FBXLoader = ( function () {
 
 		}
 
-
 		// Calculate the local transform matrix
 		lTransform = lTranslationM.multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM.getInverse( lRotationPivotM ) ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM.getInverse( lScalingPivotM ) );
 
@@ -4035,8 +4027,6 @@ THREE.FBXLoader = ( function () {
 		lTransform = lGlobalT.multiply( lGlobalRS );
 
 		return lTransform;
-
-		// = new THREE.Matrix4();
 
 	}
 
