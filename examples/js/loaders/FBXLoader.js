@@ -66,7 +66,7 @@ THREE.FBXLoader = ( function () {
 
 			}, onProgress, onError );
 
-},
+		},
 
 		setCrossOrigin: function ( value ) {
 
@@ -101,7 +101,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			console.log( fbxTree );
+			// console.log( fbxTree );
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
 
@@ -1245,23 +1245,16 @@ THREE.FBXLoader = ( function () {
 			var transformData = {};
 
 			if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
-
-			// rotation order
 			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
 
-			// translation
 			if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
 
-			// rotation
 			if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
 			if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
 			if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
 
-			// scaling
 			if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
 
-
-			// offset and pivot
 			if ( 'ScalingOffset' in modelNode ) transformData.scalingOffset = modelNode.ScalingOffset.value;
 			if ( 'ScalingPivot' in modelNode ) transformData.scalingPivot = modelNode.ScalingPivot.value;
 
@@ -2525,36 +2518,17 @@ THREE.FBXLoader = ( function () {
 
 			var transformData = {};
 
-			// if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
-
-			// if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
-			// if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
-
-			// if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
-			// if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
-
-			// if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
-
-			// if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
-
 			if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
-
-			// rotation order
 			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
 
-			// translation
 			if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
 
-			// rotation
 			if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
 			if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
 			if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
 
-			// scaling
 			if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
 
-
-			// offset and pivot
 			if ( 'ScalingOffset' in modelNode ) transformData.scalingOffset = modelNode.ScalingOffset.value;
 			if ( 'ScalingPivot' in modelNode ) transformData.scalingPivot = modelNode.ScalingPivot.value;
 
