@@ -815,18 +815,6 @@ THREE.FBXLoader = ( function () {
 
 			this.setupMorphMaterials();
 
-			var animations = new AnimationParser().parse();
-
-			// if all the models where already combined in a single group, just return that
-			if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
-
-				sceneGraph.children[ 0 ].animations = animations;
-				sceneGraph = sceneGraph.children[ 0 ];
-
-			}
-
-			sceneGraph.animations = animations;
-
 			sceneGraph.traverse( function ( node ) {
 
 				if ( node.userData.transformData ) {
@@ -840,6 +828,18 @@ THREE.FBXLoader = ( function () {
 				}
 
 			} );
+
+			var animations = new AnimationParser().parse();
+
+			// if all the models where already combined in a single group, just return that
+			if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
+
+				sceneGraph.children[ 0 ].animations = animations;
+				sceneGraph = sceneGraph.children[ 0 ];
+
+			}
+
+			sceneGraph.animations = animations;
 
 		},
 
@@ -1245,7 +1245,9 @@ THREE.FBXLoader = ( function () {
 			var transformData = {};
 
 			if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
-			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
+
+			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
+			else transformData.eulerOrder = 'ZYX';
 
 			if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
 
@@ -1516,13 +1518,13 @@ THREE.FBXLoader = ( function () {
 
 			}, null );
 
-			// Assume one model and get the preRotations from that
+			// Assume one model and get the preRotation from that
 			// if there is more than one model associated with the geometry this may cause problems
 			var modelNode = modelNodes[ 0 ];
 
 			var transformData = {};
 
-			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = modelNode.RotationOrder.value;
+			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
 			if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
 
 			if ( 'GeometricTranslation' in modelNode ) transformData.translation = modelNode.GeometricTranslation.value;
@@ -2422,7 +2424,6 @@ THREE.FBXLoader = ( function () {
 					// all the animationCurveNodes used in the layer
 					var children = connection.children;
 
-					var self = this;
 					children.forEach( function ( child, i ) {
 
 						if ( curveNodesMap.has( child.ID ) ) {
@@ -2447,17 +2448,28 @@ THREE.FBXLoader = ( function () {
 									var node = {
 
 										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+										ID: rawModel.id,
 										initialPosition: [ 0, 0, 0 ],
 										initialRotation: [ 0, 0, 0 ],
 										initialScale: [ 1, 1, 1 ],
-										transform: self.getModelAnimTransform( rawModel ),
 
 									};
 
+									sceneGraph.traverse( function ( child ) {
+
+										if ( child.ID = rawModel.id ) {
+
+											node.transform = child.matrix;
+											if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
+
+										}
+
+									} );
+
 									// if the animated model is pre rotated, we'll have to apply the pre rotations to every
 									// animation value as well
-									if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
-									if ( 'PostRotation' in rawModel ) node.postRotations = rawModel.PostRotation.value;
+									if ( 'PreRotation' in rawModel ) node.preRotation = rawModel.PreRotation.value;
+									if ( 'PostRotation' in rawModel ) node.postRotation = rawModel.PostRotation.value;
 
 									layerCurveNodes[ i ] = node;
 
@@ -2511,31 +2523,6 @@ THREE.FBXLoader = ( function () {
 			}
 
 			return layersMap;
-
-		},
-
-		getModelAnimTransform: function ( modelNode ) {
-
-			var transformData = {};
-
-			if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
-			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = parseInt( modelNode.RotationOrder.value );
-
-			if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
-
-			if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
-			if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
-			if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
-
-			if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
-
-			if ( 'ScalingOffset' in modelNode ) transformData.scalingOffset = modelNode.ScalingOffset.value;
-			if ( 'ScalingPivot' in modelNode ) transformData.scalingPivot = modelNode.ScalingPivot.value;
-
-			if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
-			if ( 'RotationPivot' in modelNode ) transformData.rotationPivot = modelNode.RotationPivot.value;
-
-			return generateTransform( transformData );
 
 		},
 
@@ -2601,7 +2588,7 @@ THREE.FBXLoader = ( function () {
 			if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
 
 			initialPosition = initialPosition.toArray();
-			initialRotation = new THREE.Euler().setFromQuaternion( initialRotation ).toArray(); // todo: euler order
+			initialRotation = new THREE.Euler().setFromQuaternion( initialRotation, rawTracks.eulerOrder ).toArray();
 			initialScale = initialScale.toArray();
 
 			if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
@@ -2613,7 +2600,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
 
-				var rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotations, rawTracks.postRotations );
+				var rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder );
 				if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 			}
@@ -2645,7 +2632,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		generateRotationTrack: function ( modelName, curves, initialValue, preRotations, postRotations ) {
+		generateRotationTrack: function ( modelName, curves, initialValue, preRotation, postRotation, eulerOrder ) {
 
 			if ( curves.x !== undefined ) {
 
@@ -2669,23 +2656,23 @@ THREE.FBXLoader = ( function () {
 			var times = this.getTimesForAllAxes( curves );
 			var values = this.getKeyframeTrackValues( times, curves, initialValue );
 
-			if ( preRotations !== undefined ) {
+			if ( preRotation !== undefined ) {
 
-				preRotations = preRotations.map( THREE.Math.degToRad );
-				preRotations.push( 'ZYX' );
+				preRotation = preRotation.map( THREE.Math.degToRad );
+				preRotation.push( eulerOrder );
 
-				preRotations = new THREE.Euler().fromArray( preRotations );
-				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+				preRotation = new THREE.Euler().fromArray( preRotation );
+				preRotation = new THREE.Quaternion().setFromEuler( preRotation );
 
 			}
 
-			if ( postRotations !== undefined ) {
+			if ( postRotation !== undefined ) {
 
-				postRotations = postRotations.map( THREE.Math.degToRad );
-				postRotations.push( 'ZYX' );
+				postRotation = postRotation.map( THREE.Math.degToRad );
+				postRotation.push( eulerOrder );
 
-				postRotations = new THREE.Euler().fromArray( postRotations );
-				postRotations = new THREE.Quaternion().setFromEuler( postRotations ).inverse();
+				postRotation = new THREE.Euler().fromArray( postRotation );
+				postRotation = new THREE.Quaternion().setFromEuler( postRotation ).inverse();
 
 			}
 
@@ -2696,12 +2683,12 @@ THREE.FBXLoader = ( function () {
 
 			for ( var i = 0; i < values.length; i += 3 ) {
 
-				euler.set( values[ i ], values[ i + 1 ], values[ i + 2 ], 'ZYX' );
+				euler.set( values[ i ], values[ i + 1 ], values[ i + 2 ], eulerOrder );
 
 				quaternion.setFromEuler( euler );
 
-				if ( preRotations !== undefined ) quaternion.premultiply( preRotations );
-				if ( postRotations !== undefined ) quaternion.multiply( postRotations );
+				if ( preRotation !== undefined ) quaternion.premultiply( preRotation );
+				if ( postRotation !== undefined ) quaternion.multiply( postRotation );
 
 				quaternion.toArray( quaternionValues, ( i / 3 ) * 4 );
 
@@ -3908,7 +3895,6 @@ THREE.FBXLoader = ( function () {
 		var lGlobalT = new THREE.Matrix4();
 		var lGlobalRS = new THREE.Matrix4();
 
-		var order = ( transformData.eulerOrder ) ? getEulerOrder( transformData.eulerOrder ) : getEulerOrder( 0 );
 		var inheritType = ( transformData.inheritType ) ? transformData.inheritType : 0;
 
 		if ( transformData.translation ) lTranslationM.setPosition( tempVec.fromArray( transformData.translation ) );
@@ -3916,7 +3902,7 @@ THREE.FBXLoader = ( function () {
 		if ( transformData.preRotation ) {
 
 			var array = transformData.preRotation.map( THREE.Math.degToRad );
-			array.push( order );
+			array.push( transformData.eulerOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 		}
@@ -3924,7 +3910,7 @@ THREE.FBXLoader = ( function () {
 		if ( transformData.rotation ) {
 
 			var array = transformData.rotation.map( THREE.Math.degToRad );
-			array.push( order );
+			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 		}
@@ -3932,7 +3918,7 @@ THREE.FBXLoader = ( function () {
 		if ( transformData.postRotation ) {
 
 			var array = transformData.postRotation.map( THREE.Math.degToRad );
-			array.push( order );
+			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 		}
@@ -3999,6 +3985,8 @@ THREE.FBXLoader = ( function () {
 	// Returns the three.js intrinsic Euler order corresponding to FBX extrinsic Euler order
 	// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
 	function getEulerOrder( order ) {
+
+		order = order || 0;
 
 		var enums = [
 			'ZYX', // -> XYZ extrinsic
