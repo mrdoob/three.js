@@ -19,7 +19,7 @@ THREE.ColladaLoader.prototype = {
 
 		var scope = this;
 
-		var path = scope.path === undefined ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
@@ -33,6 +33,13 @@ THREE.ColladaLoader.prototype = {
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
+
+	},
+
+	setResourcePath: function ( value ) {
+
+		this.resourcePath = value;
 		return this;
 
 	},
@@ -3801,14 +3808,14 @@ THREE.ColladaLoader.prototype = {
 
 		var asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 		var textureLoader = new THREE.TextureLoader( this.manager );
-		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		var tgaLoader;
 
 		if ( THREE.TGALoader ) {
 
 			tgaLoader = new THREE.TGALoader( this.manager );
-			tgaLoader.setPath( path );
+			tgaLoader.setPath( this.resourcePath || path );
 
 		}
 
