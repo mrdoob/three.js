@@ -8,13 +8,11 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>Deprecated API List</h1>
+		<h1>已被弃用API列表（Deprecated API List）</h1>
 
 		<p>
-			As three.js has a rapidly evolving interface, you may come across examples that
-			suggest the use of API elements that are no longer part of the core.<br /><br />
-
-			Below is a list of such elements, along with info regarding their replacements.
+			由于three.js具有一个快速发展的接口，你可能会遇上类似“提示你当前所调用的API元素不再是Three.js核心的一部分”的提示。<br /><br />
+			下面就列举出了这些API元素，以及一些关于他们的替代信息。
 		</p>
 
 
@@ -26,16 +24,16 @@
 
 
 
-		<h2>Audio</h2>
+		<h2>音频（Audio）</h2>
 
 		<h3>[page:Audio]</h3>
-		<p>Audio.load has been deprecated. Use [page:AudioLoader] instead.</p>
+		<p>Audio.load 已被弃用。 请使用 [page:AudioLoader]。</p>
 
 		<h3>[page:AudioAnalyser]</h3>
-		<p>AudioAnalyser.getData() has been renamed to [page:AudioAnalyser.getFrequencyData]().</p>
+		<p>AudioAnalyser.getData() 已被重命名为 [page:AudioAnalyser.getFrequencyData]().</p>
 
 		<h3>[page:BinaryTextureLoader]</h3>
-		<p>BinaryTextureLoader has been renamed to [page:DataTextureLoader].</p>
+		<p>BinaryTextureLoader 已被重命名为 [page:DataTextureLoader].</p>
 
 
 
@@ -47,42 +45,42 @@
 
 
 
-		<h2>Buffers</h2>
+		<h2>缓冲器（Buffers）</h2>
 
 		<h3>[page:BufferAttribute]</h3>
-		<p>BufferAttribute.length has been renamed to [page:BufferAttribute.count].</p>
-		<p>BufferAttribute.copyIndicesArray() has been removed.</p>
+		<p>BufferAttribute.length 已被重命名为 [page:BufferAttribute.count].</p>
+		<p>BufferAttribute.copyIndicesArray() 已被删除。</p>
 
 
 		<h3>[page:DynamicBufferAttribute]</h3>
-		<p>DynamicBufferAttribute has been removed. Use [page:BufferAttribute.setDynamic]( true ) instead.</p>
+		<p>DynamicBufferAttribute 已被删除。 请使用[page:BufferAttribute.setDynamic]( true )。</p>
 
 		<h3>[page:Int8Attribute]</h3>
-		<p>Int8Attribute has been removed. Use [page:BufferAttributeTypes Int8BufferAttribute] instead.</p>
+		<p>Int8Attribute 已被删除。 请使用[page:BufferAttributeTypes Int8BufferAttribute]。</p>
 
 		<h3>[page:Uint8Attribute]</h3>
-		<p>Uint8Attribute has been removed. Use [page:BufferAttributeTypes Uint8BufferAttribute] instead.</p>
+		<p>Uint8Attribute 已被删除。 请使用[page:BufferAttributeTypes Uint8BufferAttribute]。</p>
 
 		<h3>[page:Uint8ClampedAttribute]</h3>
-		<p>Uint8ClampedAttribute has been removed. Use [page:BufferAttributeTypes Uint8ClampedBufferAttribute] instead.</p>
+		<p>Uint8ClampedAttribute 已被删除。 请使用[page:BufferAttributeTypes Uint8ClampedBufferAttribute]。</p>
 
 		<h3>[page:Int16Attribute]</h3>
-		<p>Int16Attribute has been removed. Use [page:BufferAttributeTypes Int16BufferAttribute] instead.</p>
+		<p>Int16Attribute 已被删除。 请使用[page:BufferAttributeTypes Int16BufferAttribute]。</p>
 
 		<h3>[page:Uint16Attribute]</h3>
-		<p>Uint16Attribute has been removed. Use [page:BufferAttributeTypes Uint16BufferAttribute] instead.</p>
+		<p>Uint16Attribute 已被删除。 请使用[page:BufferAttributeTypes Uint16BufferAttribute]。</p>
 
 		<h3>[page:Int32Attribute]</h3>
-		<p>Int32Attribute has been removed. Use [page:BufferAttributeTypes Int32BufferAttribute] instead.</p>
+		<p>Int32Attribute 已被删除。 请使用[page:BufferAttributeTypes Int32BufferAttribute]。</p>
 
 		<h3>[page:Uint32Attribute]</h3>
-		<p>Uint32Attribute has been removed. Use [page:BufferAttributeTypes Uint32BufferAttribute] instead.</p>
+		<p>Uint32Attribute 已被删除。 请使用[page:BufferAttributeTypes Uint32BufferAttribute]。</p>
 
 		<h3>[page:Float32Attribute]</h3>
-		<p>Float32Attribute has been removed. Use [page:BufferAttributeTypes Float32BufferAttribute] instead.</p>
+		<p>Float32Attribute 已被删除。 请使用[page:BufferAttributeTypes Float32BufferAttribute]。</p>
 
 		<h3>[page:Float64Attribute]</h3>
-		<p>Float64Attribute has been removed. Use [page:BufferAttributeTypes Float64BufferAttribute] instead.</p>
+		<p>Float64Attribute 已被删除。 请使用[page:BufferAttributeTypes Float64BufferAttribute]。</p>
 
 
 
@@ -90,12 +88,12 @@
 
 
 
-		<h2>Cameras</h2>
+		<h2>摄像机（Cameras）</h2>
 
 		<h3>[page:PerspectiveCamera]</h3>
 		<p>
-		PerspectiveCamera.setLens() is deprecated. Use [page:PerspectiveCamera.setFocalLength]()
-		 and [page:PerspectiveCamera.filmGauge]() for a photographic setup.
+		PerspectiveCamera.setLens() 已被弃用。 请使用[page:PerspectiveCamera.setFocalLength]()
+		 和 [page:PerspectiveCamera.filmGauge]() 来对摄像机拍摄进行设置。
 		</p>
 
 
@@ -104,33 +102,33 @@
 
 
 
-		<h2>Constants</h2>
+		<h2>常量（Constants）</h2>
 
 		<h3>[page:LineStrip]</h3>
 
 		<h3>[page:LinePieces]</h3>
 		<p>
-		LinePieces mode is no longer supported for [page:Line]s. Create a [page:LineSegments] instead.
+		LinePieces mode 已经不再对 [page:Line]s 进行支持。 请创建一个 [page:LineSegments] 。
 		</p>
 
 
 
 
 
-		<h2>Core</h2>
+		<h2>核心（Core）</h2>
 
 		<h3>[page:EventDispatcher]</h3>
-		<p>EventDispatcher.apply has been removed. Inherit or Object.assign the prototype to mix-in instead.</p>
+		<p>EventDispatcher.apply 已被删除。 Inherit or Object.assign the prototype to mix-in。</p>
 
 		<h3>[page:Raycaster]</h3>
-		<p>Raycaster.params.PointCloud has been renamed to [page:Raycaster.params.Points].</p>
+		<p>Raycaster.params.PointCloud 已被重命名为 [page:Raycaster.params.Points].</p>
 
 
 		<h3>[page:Uniform]</h3>
 		<p>
-			Uniform.dynamic has been removed. Use object.onBeforeRender() instead.<br /><br />
+			Uniform.dynamic 已被删除。 请使用object.onBeforeRender()。<br /><br />
 
-			Uniform.onUpdate has been removed. Use object.onBeforeRender() instead.
+			Uniform.onUpdate 已被删除。 请使用object.onBeforeRender() 。
 		</p>
 
 
@@ -138,13 +136,13 @@
 
 
 
-		<h2>Extras</h2>
+		<h2>附件（Extras）</h2>
 
 		<h3>[page:ClosedSplineCurve3]</h3>
-		<p>ClosedSplineCurve3 has been deprecated. Use [page:CatmullRomCurve3] instead.</p>
+		<p>ClosedSplineCurve3 已被弃用。 请使用[page:CatmullRomCurve3]。</p>
 
 		<h3>[page:SplineCurve3]</h3>
-		<p>SplineCurve3 has been deprecated. Use [page:CatmullRomCurve3] instead.</p>
+		<p>SplineCurve3 已被弃用。 请使用[page:CatmullRomCurve3]。</p>
 
 
 
@@ -152,48 +150,48 @@
 
 
 
-		<h2>Geometry</h2>
+		<h2>几何体（Geometry）</h2>
 
 		<p>
-			Geometry.computeTangents() has been removed.<br /><br />
+			Geometry.computeTangents() 已被删除。<br /><br />
 
-			Geometry.computeLineDistances() has been removed. Use [page:Line.computeLineDistances] instead.<br /><br />
+			Geometry.computeLineDistances() 已被删除。 请使用[page:Line.computeLineDistances]。<br /><br />
 		</p>
 
 		<h3>[page:BufferGeometry]</h3>
 		<p>
-			BufferGeometry.addIndex has been renamed to [page:BufferGeometry.setIndex].<br /><br />
+			BufferGeometry.addIndex 已被重命名为 [page:BufferGeometry.setIndex].<br /><br />
 
-			BufferGeometry.addDrawCall is now [page:BufferGeometry.addGroup].<br /><br />
+			BufferGeometry.addDrawCall 现在是 [page:BufferGeometry.addGroup].<br /><br />
 
-			BufferGeometry.clearDrawCalls is now [page:BufferGeometry.clearGroups].<br /><br />
+			BufferGeometry.clearDrawCalls 现在是 [page:BufferGeometry.clearGroups].<br /><br />
 
-			BufferGeometry.computeTangents has been removed.<br /><br />
+			BufferGeometry.computeTangents 已被删除。<br /><br />
 
-			BufferGeometry.computeOffsets has been removed.<br /><br />
+			BufferGeometry.computeOffsets 已被删除。<br /><br />
 
-			BufferGeometry.drawcalls has been renamed to [page:BufferGeometry.groups].<br /><br />
+			BufferGeometry.drawcalls 已被重命名为 [page:BufferGeometry.groups].<br /><br />
 
-			BufferGeometry.offsets has been renamed to [page:BufferGeometry.groups].<br /><br />
+			BufferGeometry.offsets 已被重命名为 [page:BufferGeometry.groups].<br /><br />
 
 		</p>
 
 		<h3>[page:CubeGeometry]</h3>
-		<p>CubeGeometry has been renamed to [page:BoxGeometry].</p>
+		<p>CubeGeometry 已被重命名为 [page:BoxGeometry].</p>
 
 		<h3>[page:Geometry]</h3>
-		<p>Geometry.computeTangents() has been removed.</p>
+		<p>Geometry.computeTangents() 已被删除。</p>
 
 		<h3>[page:GeometryUtils]</h3>
 		<p>
-			GeometryUtils.merge has been moved to [page:Geometry]. Use [page:Geometry.merge]( geometry2, matrix, materialIndexOffset ) instead.<br /><br />
+			GeometryUtils.merge 已被移动到了 [page:Geometry]. 请使用[page:Geometry.merge]( geometry2, matrix, materialIndexOffset )。<br /><br />
 
-			GeometryUtils.center has been moved to [page:Geometry]. Use [page:Geometry.center]( ) instead.
+			GeometryUtils.center 已被移动到了 [page:Geometry]. 请使用[page:Geometry.center]( ) instead.
 		</p>
 
 		<h3>[page:Plane]</h3>
 		<p>
-			Plane.isIntersectionLine() has been renamed to	[page:Plane.intersectsLine]().
+			Plane.isIntersectionLine() 已被重命名为	[page:Plane.intersectsLine]().
 		</p>
 
 
@@ -203,46 +201,46 @@
 
 
 
-		<h2>Helpers</h2>
+		<h2>辅助工具（Helpers）</h2>
 
 		<h3>[page:BoundingBoxHelper]</h3>
-		<p>BoundingBoxHelper has been deprecated. Use [page:BoxHelper] instead.</p>
+		<p>BoundingBoxHelper 已被弃用。 请使用[page:BoxHelper]。</p>
 
 		<h3>[page:EdgesHelper]</h3>
-		<p>EdgesHelper has been removed. Use [page:EdgesGeometry] instead.</p>
+		<p>EdgesHelper 已被删除。 请使用[page:EdgesGeometry]。</p>
 
 		<h3>[page:GridHelper]</h3>
-		<p>GridHelper.setColors() has been deprecated, pass them in the constructor instead.</p>
+		<p>GridHelper.setColors() 已被弃用，请在构造器中传递它们。</p>
 
 		<h3>[page:WireframeHelper WireframeHelper]</h3>
-		<p>WireframeHelper has been removed. Use [page:WireframeGeometry] instead.</p>
+		<p>WireframeHelper 已被删除。 请使用[page:WireframeGeometry]。</p>
 
 
 
 
-		<h2>Lights</h2>
+		<h2>灯光（Lights）</h2>
 
 		<h3>[page:Light]</h3>
 		<p>
-			Light.onlyShadow has been removed.<br /><br />
+			Light.onlyShadow 已被删除。<br /><br />
 
-			Light.shadowCameraLeft is now [page:Light.shadow.camera.left].<br /><br />
+			Light.shadowCameraLeft 现在是 [page:Light.shadow.camera.left].<br /><br />
 
-			Light.shadowCameraRight is now [page:Light.shadow.camera.right].<br /><br />
+			Light.shadowCameraRight 现在是 [page:Light.shadow.camera.right].<br /><br />
 
-			Light.shadowCameraTop is now [page:Light.shadow.camera.top].<br /><br />
+			Light.shadowCameraTop 现在是 [page:Light.shadow.camera.top].<br /><br />
 
-			Light.shadowCameraBottom is now [page:Light.shadow.camera.bottom].<br /><br />
+			Light.shadowCameraBottom 现在是 [page:Light.shadow.camera.bottom].<br /><br />
 
-			Light.shadowCameraNear is now [page:Light.shadow.camera.near].<br /><br />
+			Light.shadowCameraNear 现在是 [page:Light.shadow.camera.near].<br /><br />
 
-			Light.shadowCameraFar is now [page:Light.shadow.camera.far].<br /><br />
+			Light.shadowCameraFar 现在是 [page:Light.shadow.camera.far].<br /><br />
 
-			Light.shadowCameraVisible has been removed. Use [page:CameraHelper] ( light.shadow.camera ) instead.<br /><br />
+			Light.shadowCameraVisible 已被删除。 请使用[page:CameraHelper] ( light.shadow.camera )。<br /><br />
 
-			Light.shadowMapWidth is now [page:Light.shadow.mapSize.width].<br /><br />
+			Light.shadowMapWidth 现在是 [page:Light.shadow.mapSize.width].<br /><br />
 
-			Light.shadowMapHeight is now [page:Light.shadow.mapSize.height].
+			Light.shadowMapHeight 现在是 [page:Light.shadow.mapSize.height].
 		</p>
 
 
@@ -252,10 +250,10 @@
 
 
 
-		<h2>Loaders</h2>
+		<h2>加载器（Loaders）</h2>
 
 		<h3>[page:XHRLoader]</h3>
-		<p>XHRLoader has been renamed to [page:FileLoader].</p>
+		<p>XHRLoader 已被重命名为 [page:FileLoader].</p>
 
 
 
@@ -264,146 +262,146 @@
 
 
 
-		<h2>Maths</h2>
+		<h2>数学（Maths）</h2>
 
 		<h3>[page:Box2]</h3>
 		<p>
-			Box2.center has been renamed to [page:Box2.getCenter]().<br /><br />
+			Box2.center 已被重命名为 [page:Box2.getCenter]().<br /><br />
 
-			Box2.empty has been renamed to [page:Box2.isEmpty]().<br /><br />
+			Box2.empty 已被重命名为 [page:Box2.isEmpty]().<br /><br />
 
-			Box2.isIntersectionBox has been renamed to [page:Box2.intersectsBox]().<br /><br />
+			Box2.isIntersectionBox 已被重命名为 [page:Box2.intersectsBox]().<br /><br />
 
-			Box2.size has been renamed to [page:Box2.getSize]().
+			Box2.size 已被重命名为 [page:Box2.getSize]().
 
 		</p>
 
 		<h3>[page:Box3]</h3>
 		<p>
-			Box3.center has been renamed to [page:Box3.getCenter]().<br /><br />
+			Box3.center 已被重命名为 [page:Box3.getCenter]().<br /><br />
 
-			Box3.empty has been renamed to [page:Box3.isEmpty]().<br /><br />
+			Box3.empty 已被重命名为 [page:Box3.isEmpty]().<br /><br />
 
-			Box3.isIntersectionBox has been renamed to [page:Box3.intersectsBox]().<br /><br />
+			Box3.isIntersectionBox 已被重命名为 [page:Box3.intersectsBox]().<br /><br />
 
-			Box3.isIntersectionSphere has been renamed to [page:Box3.intersectsSphere]().<br /><br />
+			Box3.isIntersectionSphere 已被重命名为 [page:Box3.intersectsSphere]().<br /><br />
 
-			Box3.size has been renamed to [page:Box3.getSize]().
+			Box3.size 已被重命名为 [page:Box3.getSize]().
 		</p>
 
 		<h3>[page:Face4]</h3>
-		<p>Face4 has been removed. Use [page:Face3] instead.</p>
+		<p>Face4 已被删除。 请使用[page:Face3]。</p>
 
 		<h3>[page:Line3]</h3>
-		<p>Line3.center has been renamed to [page:Line3.getCenter]().</p>
+		<p>Line3.center 已被重命名为 [page:Line3.getCenter]().</p>
 
 		<h3>[page:Math]</h3>
 		<p>
-			Math.random16() has been deprecated. Use Math.random() instead.
+			Math.random16() 已被弃用。 请使用Math.random() instead.
 		</p>
 
 		<h3>[page:Matrix3]</h3>
 		<p>
-			Matrix3.flattenToArrayOffset is deprecated. Use [page:Matrix3.toArray]() instead.<br /><br />
+			Matrix3.flattenToArrayOffset 已被弃用。请使用[page:Matrix3.toArray]()。<br /><br />
 
-			Matrix3.multiplyVector3 has been removed. Use vector.applyMatrix3( matrix ) instead.<br /><br />
+			Matrix3.multiplyVector3 已被删除。 请使用vector.applyMatrix3( matrix )。<br /><br />
 
-			Matrix3.multiplyVector3Array has been renamed to [page:Matrix3.applyToVector3Array]( array ).<br /><br />
+			Matrix3.multiplyVector3Array 已被重命名为 [page:Matrix3.applyToVector3Array]( array ).<br /><br />
 
-			Matrix3.applyToBuffer has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.<br /><br />
+			Matrix3.applyToBuffer 已被删除。 请使用matrix.applyToBufferAttribute( attribute )。<br /><br />
 
-			Matrix3.applyToVector3Array has been removed.
+			Matrix3.applyToVector3Array 已被删除。
 		<p>
 
 		<h3>[page:Matrix4]</h3>
 		<p>
-			Matrix4.flattenToArrayOffset() is deprecated. Use [page:Matrix4.toArray]() instead.<br /><br />
+			Matrix4.flattenToArrayOffset() 已被弃用。请使用[page:Matrix4.toArray]()。<br /><br />
 
-			Matrix4.extractPosition() has been renamed to [page:Matrix4.copyPosition]( matrix ).<br /><br />
+			Matrix4.extractPosition() 已被重命名为 [page:Matrix4.copyPosition]( matrix ).<br /><br />
 
-			Matrix4.getPosition() has been removed. Use [page:Vector3.setFromMatrixPosition]( matrix ) instead.<br /><br />
+			Matrix4.getPosition() 已被删除。 请使用[page:Vector3.setFromMatrixPosition]( matrix )。<br /><br />
 
-			Matrix4.setRotationFromQuaternion() has been renamed to [page:Matrix4.makeRotationFromQuaternion]( quaternion ).<br /><br />
+			Matrix4.setRotationFromQuaternion() 已被重命名为 [page:Matrix4.makeRotationFromQuaternion]( quaternion ).<br /><br />
 
-			Matrix4.multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
+			Matrix4.multiplyVector3() 已被删除。 请使用vector.applyMatrix4( matrix )。<br /><br />
 
-			Matrix4.multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
+			Matrix4.multiplyVector4() 已被删除。 请使用vector.applyMatrix4( matrix )。<br /><br />
 
-			Matrix4.multiplyVector3Array() has been renamed to [page:Matrix4.applyToVector3Array] ( array ).<br /><br />
+			Matrix4.multiplyVector3Array() 已被重命名为 [page:Matrix4.applyToVector3Array] ( array ).<br /><br />
 
-			Matrix4.rotateAxis() has been removed. Use [page:Matrix4.transformDirection]( matrix ) instead.<br /><br />
+			Matrix4.rotateAxis() 已被删除。 请使用[page:Matrix4.transformDirection]( matrix )。<br /><br />
 
-			Matrix4.crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
+			Matrix4.crossVector() 已被删除。 请使用vector.applyMatrix4( matrix )。<br /><br />
 
-			Matrix4.rotateX() has been removed.<br /><br />
+			Matrix4.rotateX() 已被删除。<br /><br />
 
-			Matrix4.rotateY() has been removed.<br /><br />
+			Matrix4.rotateY() 已被删除。<br /><br />
 
-			Matrix4.rotateZ() has been removed.<br /><br />
+			Matrix4.rotateZ() 已被删除。<br /><br />
 
-			Matrix4.rotateByAxis() has been removed.<br /><br />
+			Matrix4.rotateByAxis() 已被删除。<br /><br />
 
-			Matrix4.applyToBuffer() has been removed. Use matrix.applyToBufferAttribute() instead.<br /><br />
+			Matrix4.applyToBuffer() 已被删除。 请使用matrix.applyToBufferAttribute()。<br /><br />
 
-			Matrix4.applyToVector3Array() has been removed.<br /><br />
+			Matrix4.applyToVector3Array() 已被删除。<br /><br />
 
-			Matrix4.makeFrustum() has been removed. Use [page:Matrix4.makePerspective]( left, right, top, bottom, near, far ) instead.
+			Matrix4.makeFrustum() 已被删除。 请使用[page:Matrix4.makePerspective]( left, right, top, bottom, near, far ) instead.
 		</p>
 
 
 		<h3>[page:Quaternion.multiplyVector3]</h3>
-		<p>Quaternion.multiplyVector3() has been removed. Use vector.applyQuaternion( quaternion ) instead.</p>
+		<p>Quaternion.multiplyVector3() 已被删除。 请使用vector.applyQuaternion( quaternion )。</p>
 
 		<h3>[page:Ray]</h3>
 		<p>
-			Ray.isIntersectionBox() has been renamed to [page:Ray.intersectsBox]().<br /><br />
+			Ray.isIntersectionBox() 已被重命名为 [page:Ray.intersectsBox]().<br /><br />
 
-			Ray.isIntersectionPlane has been renamed to [page:Ray.intersectsPlane].<br /><br />
+			Ray.isIntersectionPlane 已被重命名为 [page:Ray.intersectsPlane].<br /><br />
 
-			Ray.isIntersectionSphere has been renamed to [page:Ray.intersectsSphere].
+			Ray.isIntersectionSphere 已被重命名为 [page:Ray.intersectsSphere].
 		</p>
 
 		<h3>[page:Triangle]</h3>
 		<p>
-			Triangle.area() has been renamed to [page:Triangle.getArea]().<br /><br />
-			Triangle.barycoordFromPoint() has been renamed to [page:Triangle.getBarycoord]().<br /><br />
-			Triangle.midpoint() has been renamed to [page:Triangle.getMidpoint]().<br /><br />
-			Triangle.normal() has been renamed to [page:Triangle.getNormal]().<br /><br />
-			Triangle.plane() has been renamed to [page:Triangle.getPlane]().
+			Triangle.area() 已被重命名为 [page:Triangle.getArea]().<br /><br />
+			Triangle.barycoordFromPoint() 已被重命名为 [page:Triangle.getBarycoord]().<br /><br />
+			Triangle.midpoint() 已被重命名为 [page:Triangle.getMidpoint]().<br /><br />
+			Triangle.normal() 已被重命名为 [page:Triangle.getNormal]().<br /><br />
+			Triangle.plane() 已被重命名为 [page:Triangle.getPlane]().
 		</p>
 
 		<h3>[page:Vector2]</h3>
 		<p>
-			Vector2.fromAttribute() has been renamed to [page:Vector2.fromBufferAttribute]().
+			Vector2.fromAttribute() 已被重命名为 [page:Vector2.fromBufferAttribute]().
 		</p>
 
 		<h3>[page:Vector3]</h3>
 		<p>
-			Vector3.setEulerFromRotationMatrix() has been removed. Use [page:Euler.setFromRotationMatrix]() instead.<br /><br />
+			Vector3.setEulerFromRotationMatrix() 已被删除。 请使用[page:Euler.setFromRotationMatrix]()。<br /><br />
 
-			Vector3.setEulerFromQuaternion() has been removed. Use [page:Euler.setFromQuaternion]() instead.<br /><br />
+			Vector3.setEulerFromQuaternion() 已被删除。 请使用[page:Euler.setFromQuaternion]()。<br /><br />
 
-			Vector3.getPositionFromMatrix() has been renamed to [page:Vector3.setFromMatrixPosition]().<br /><br />
+			Vector3.getPositionFromMatrix() 已被重命名为 [page:Vector3.setFromMatrixPosition]().<br /><br />
 
-			Vector3.getScaleFromMatrix() has been renamed to [page:Vector3.setFromMatrixScale]().<br /><br />
+			Vector3.getScaleFromMatrix() 已被重命名为 [page:Vector3.setFromMatrixScale]().<br /><br />
 
-			Vector3.getColumnFromMatrix() has been renamed to [page:Vector3.setFromMatrixColumn]().<br /><br />
+			Vector3.getColumnFromMatrix() 已被重命名为 [page:Vector3.setFromMatrixColumn]().<br /><br />
 
-			Vector3.applyProjection() has been removed. Use [page:Vector3.applyMatrix4]() instead.<br /><br />
+			Vector3.applyProjection() 已被删除。 请使用[page:Vector3.applyMatrix4]()。<br /><br />
 
-			Vector3.fromAttribute() has been renamed to [page:Vector3.fromBufferAttribute]().
+			Vector3.fromAttribute() 已被重命名为 [page:Vector3.fromBufferAttribute]().
 		</p>
 
 		<h3>[page:Vector4]</h3>
 		<p>
-			Vector4.fromAttribute() has been renamed to [page:Vector4.fromBufferAttribute]().
+			Vector4.fromAttribute() 已被重命名为 [page:Vector4.fromBufferAttribute]().
 		</p>
 
 		<h3>[page:Vertex]</h3>
-		<p>Vertex has been removed. Use [page:Vector3] instead.</p>
+		<p>Vertex 已被删除。 请使用[page:Vector3]。</p>
 
 		<h3>[page:Spline]</h3>
-		<p>Spline has been removed. Use [page:CatmullRomCurve3] instead.</p>
+		<p>Spline 已被删除。 请使用[page:CatmullRomCurve3]。</p>
 
 
 
@@ -416,36 +414,36 @@
 
 
 
-		<h2>Materials</h2>
+		<h2>材质（Materials）</h2>
 
 		<h3>[page:Material]</h3>
 		<p>
-			Material.wrapAround has been removed.<br /><br />
+			Material.wrapAround 已被删除。<br /><br />
 
-			Material.wrapRGB has been removed.
+			Material.wrapRGB 已被删除。
 
 		</p>
 
 		<h3>[page:MeshFaceMaterial]</h3>
-		<p>MeshFaceMaterial has been removed. Use an array of materials instead.</p>
+		<p>MeshFaceMaterial 已被删除。 请使用一个材质数组。</p>
 
 		<h3>[page:MultiMaterial]</h3>
-		<p>MultiMaterial has been removed. Use an array of materials instead.</p>
+		<p>MultiMaterial 已被删除。 请使用一个材质数组。</p>
 
 		<h3>[page:MeshPhongMaterial]</h3>
-		<p>MeshPhongMaterial.metal has been removed. Use [page:MeshStandardMaterial] instead.</p>
+		<p>MeshPhongMaterial.metal 已被删除。 请使用[page:MeshStandardMaterial]。</p>
 
 		<h3>[page:ParticleBasicMaterial]</h3>
-		<p>ParticleBasicMaterial has been renamed to [page:PointsMaterial].</p>
+		<p>ParticleBasicMaterial 已被重命名为 [page:PointsMaterial].</p>
 
 		<h3>[page:ParticleSystemMaterial]</h3>
-		<p>ParticleBasicMaterial has been renamed to [page:PointsMaterial].</p>
+		<p>ParticleBasicMaterial 已被重命名为 [page:PointsMaterial].</p>
 
 		<h3>[page:PointCloudMaterial]</h3>
-		<p>PointCloudMaterial has been renamed to [page:PointsMaterial].</p>
+		<p>PointCloudMaterial 已被重命名为 [page:PointsMaterial].</p>
 
 		<h3>[page:ShaderMaterial.derivatives]</h3>
-		<p>ShaderMaterial.derivatives has been moved to [page:ShaderMaterial.extensions.derivatives].</p>
+		<p>ShaderMaterial.derivatives 已被移动到了 [page:ShaderMaterial.extensions.derivatives].</p>
 
 
 
@@ -457,41 +455,41 @@
 		<h2>Objects</h2>
 
 		<h3>[page:LOD.objects]</h3>
-		<p>LOD.objects has been renamed to [page:LOD.levels].</p>
+		<p>LOD.objects 已被重命名为 [page:LOD.levels].</p>
 
 		<h3>[page:Object3D]</h3>
 		<p>
-			Object3D.eulerOrder is now [page:Object3D.rotation.order].<br /><br />
+			Object3D.eulerOrder 现在是 [page:Object3D.rotation.order].<br /><br />
 
-			Object3D.getChildByName() has been renamed to [page:Object3D.getObjectByName]().<br /><br />
+			Object3D.getChildByName() 已被重命名为 [page:Object3D.getObjectByName]().<br /><br />
 
-			Object3D.renderDepth has been removed. Use [page:Object3D.renderOrder] instead.<br /><br />
+			Object3D.renderDepth 已被删除。 请使用[page:Object3D.renderOrder]。<br /><br />
 
-			Object3D.translate() has been removed. Use [page:Object3D.translateOnAxis]( axis, distance ) instead.<br /><br />
+			Object3D.translate() 已被删除。 请使用[page:Object3D.translateOnAxis]( axis, distance )。<br /><br />
 
-			Object3D.useQuaternion has been removed. The library now uses quaternions by default.
+			Object3D.useQuaternion 已被删除。 The library now uses quaternions by default.
 		</p>
 
 		<h3>[page:LensFlare]</h3>
 		<p>
-			LensFlare has been moved to [link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/Lensflare.js /examples/js/objects/Lensflare.js].
+			LensFlare 已被移动到了 [link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/Lensflare.js /examples/js/objects/Lensflare.js].
 		</p>
 
 
 		<h3>[page:Particle]</h3>
-		<p>Particle has been renamed to [page:Sprite].</p>
+		<p>Particle 已被重命名为 [page:Sprite].</p>
 
 		<h3>[page:ParticleSystem]</h3>
-		<p>ParticleSystem has been renamed to [page:Points].</p>
+		<p>ParticleSystem 已被重命名为 [page:Points].</p>
 
 		<h3>[page:PointCloud]</h3>
-		<p>PointCloud has been renamed to [page:Points].</p>
+		<p>PointCloud 已被重命名为 [page:Points].</p>
 
 		<h3>[page:Shape]</h3>
 		<p>
-			Shape.extrude has been removed. Use [page:ExtrudeGeometry] instead.<br /><br />
+			Shape.extrude 已被删除。 请使用[page:ExtrudeGeometry]。<br /><br />
 
-			Shape.makeGeometry has been removed. Use [page:ShapeGeometry] instead.
+			Shape.makeGeometry 已被删除。 请使用[page:ShapeGeometry] instead.
 		</p>
 
 
@@ -501,117 +499,117 @@
 
 
 
-		<h2>Renderer</h2>
+		<h2>渲染器（Renderer）</h2>
 
 		<h3>[page:Projector]</h3>
 		<p>
-			CanvasRenderer has been moved to [link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/CanvasRenderer.js /examples/js/renderers/CanvasRenderer.js].
+			CanvasRenderer 已被移动到了 [link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/CanvasRenderer.js /examples/js/renderers/CanvasRenderer.js].
 		</p>
 
 		<h3>[page:Projector]</h3>
 		<p>
-			Projector has been moved to
+			Projector 已被移动到了
 			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/Projector.js 	/examples/js/renderers/Projector.js].<br /><br />
 
-			Projector.projectVector() is now [page:Vector.project]().<br /><br />
+			Projector.projectVector() 现在是 [page:Vector.project]().<br /><br />
 
-			Projector.unprojectVector() is now [page:Vector.unproject]().<br /><br />
+			Projector.unprojectVector() 现在是 [page:Vector.unproject]().<br /><br />
 
-			Projector:.pickingRay() is now [page:Raycaster.setFromCamera]().
+			Projector:.pickingRay() 现在是 [page:Raycaster.setFromCamera]().
 		</p>
 
 		<h3>[page:WebGLProgram]</h3>
 		<p>
-			WebGLProgram.uniforms is now [page:WebGLProgram.getUniforms]().<br /><br />
+			WebGLProgram.uniforms 现在是 [page:WebGLProgram.getUniforms]().<br /><br />
 
-			WebGLProgram.attributes is now [page:WebGLProgram.getAttributes]().
+			WebGLProgram.attributes 现在是 [page:WebGLProgram.getAttributes]().
 		</p>
 
 		<h3>[page:WebGLRenderer]</h3>
 		<p>
-			WebGLRenderer.supportsFloatTextures() is now [page:WebGLRenderer.extensions.get]( 'OES_texture_float' ).<br /><br />
+			WebGLRenderer.supportsFloatTextures() 现在是 [page:WebGLRenderer.extensions.get]( 'OES_texture_float' ).<br /><br />
 
-			WebGLRenderer.supportsHalfFloatTextures() is now [page:WebGLRenderer.extensions.get]( 'OES_texture_half_float' ).<br /><br />
+			WebGLRenderer.supportsHalfFloatTextures() 现在是 [page:WebGLRenderer.extensions.get]( 'OES_texture_half_float' ).<br /><br />
 
-			WebGLRenderer.supportsStandardDerivatives() is now [page:WebGLRenderer.extensions.get]( 'OES_standard_derivatives' ).<br /><br />
+			WebGLRenderer.supportsStandardDerivatives() 现在是 [page:WebGLRenderer.extensions.get]( 'OES_standard_derivatives' ).<br /><br />
 
-			WebGLRenderer.supportsCompressedTextureS3TC() is now [page:WebGLRenderer.extensions.get]( 'WEBGL_compressed_texture_s3tc' ).<br /><br />
+			WebGLRenderer.supportsCompressedTextureS3TC() 现在是 [page:WebGLRenderer.extensions.get]( 'WEBGL_compressed_texture_s3tc' ).<br /><br />
 
-			WebGLRenderer.supportsCompressedTexturePVRTC() is now [page:WebGLRenderer.extensions.get]( 'WEBGL_compressed_texture_pvrtc' ).<br /><br />
+			WebGLRenderer.supportsCompressedTexturePVRTC() 现在是 [page:WebGLRenderer.extensions.get]( 'WEBGL_compressed_texture_pvrtc' ).<br /><br />
 
-			WebGLRenderer.supportsBlendMinMax() is now [page:WebGLRenderer.extensions.get]( 'EXT_blend_minmax' ).<br /><br />
+			WebGLRenderer.supportsBlendMinMax() 现在是 [page:WebGLRenderer.extensions.get]( 'EXT_blend_minmax' ).<br /><br />
 
-			WebGLRenderer.supportsVertexTextures() is now [page:WebGLRenderer.capabilities.vertexTextures].<br /><br />
+			WebGLRenderer.supportsVertexTextures() 现在是 [page:WebGLRenderer.capabilities.vertexTextures].<br /><br />
 
-			WebGLRenderer.supportsInstancedArrays() is now [page:WebGLRenderer.extensions.get]( 'ANGLE_instanced_arrays' ).<br /><br />
+			WebGLRenderer.supportsInstancedArrays() 现在是 [page:WebGLRenderer.extensions.get]( 'ANGLE_instanced_arrays' ).<br /><br />
 
-			WebGLRenderer.enableScissorTest() is now [page:WebGLRenderer.setScissorTest]().<br /><br />
+			WebGLRenderer.enableScissorTest() 现在是 [page:WebGLRenderer.setScissorTest]().<br /><br />
 
-			WebGLRenderer.initMaterial() has been removed.<br /><br />
+			WebGLRenderer.initMaterial() 已被删除。<br /><br />
 
-			WebGLRenderer.addPrePlugin() has been removed.<br /><br />
+			WebGLRenderer.addPrePlugin() 已被删除。<br /><br />
 
-			WebGLRenderer.addPostPlugin() has been removed.<br /><br />
+			WebGLRenderer.addPostPlugin() 已被删除。<br /><br />
 
-			WebGLRenderer.updateShadowMap() has been removed.<br /><br />
+			WebGLRenderer.updateShadowMap() 已被删除。<br /><br />
 
-			WebGLRenderer.setFaceCulling() has been removed.<br /><br />
+			WebGLRenderer.setFaceCulling() 已被删除。<br /><br />
 
-			WebGLRenderer.setTexture is deprecated, use [page:WebGLRenderer.setTexture2D]() instead.<br /><br />
+			WebGLRenderer.setTexture is deprecated, 请使用[page:WebGLRenderer.setTexture2D]()。<br /><br />
 
-			WebGLRenderer.shadowMapEnabled is now [page:WebGLRenderer.shadowMap.enabled].<br /><br />
+			WebGLRenderer.shadowMapEnabled 现在是 [page:WebGLRenderer.shadowMap.enabled].<br /><br />
 
-			WebGLRenderer.shadowMapType is now [page:WebGLRenderer.shadowMap.type].<br /><br />
+			WebGLRenderer.shadowMapType 现在是 [page:WebGLRenderer.shadowMap.type].<br /><br />
 
-			WebGLRenderer.shadowMapCullFace has been removed. Set [page:Material.shadowSide] instead.<br /><br />
+			WebGLRenderer.shadowMapCullFace 已被删除。 Set [page:Material.shadowSide]。<br /><br />
 
-			WebGLRenderer.shadowMap.cullFace has been removed. Set [page:Material.shadowSide] instead.<br /><br />
+			WebGLRenderer.shadowMap.cullFace 已被删除。 Set [page:Material.shadowSide]。<br /><br />
 
-			WebGLRenderer.shadowMap.renderReverseSided has been removed. Set [page:Material.shadowSide] instead.<br /><br />
+			WebGLRenderer.shadowMap.renderReverseSided 已被删除。 Set [page:Material.shadowSide]。<br /><br />
 
-			WebGLRenderer.shadowMap.renderSingleSided has been removed. Set [page:Material.shadowSide] instead.
+			WebGLRenderer.shadowMap.renderSingleSided 已被删除。 Set [page:Material.shadowSide] instead.
 
 		</p>
 
 		<h3>[page:WebGLRenderTarget]</h3>
 		<p>
-			WebGLRenderTarget.wrapS is now [page:WebGLRenderTarget.texture.wrapS].<br /><br />
+			WebGLRenderTarget.wrapS 现在是 [page:WebGLRenderTarget.texture.wrapS].<br /><br />
 
-			WebGLRenderTarget.wrapT is now [page:WebGLRenderTarget.texture.wrapT].<br /><br />
+			WebGLRenderTarget.wrapT 现在是 [page:WebGLRenderTarget.texture.wrapT].<br /><br />
 
-			WebGLRenderTarget.magFilter is now [page:WebGLRenderTarget.texture.magFilter].<br /><br />
+			WebGLRenderTarget.magFilter 现在是 [page:WebGLRenderTarget.texture.magFilter].<br /><br />
 
-			WebGLRenderTarget.minFilter is now [page:WebGLRenderTarget.texture.minFilter].<br /><br />
+			WebGLRenderTarget.minFilter 现在是 [page:WebGLRenderTarget.texture.minFilter].<br /><br />
 
-			WebGLRenderTarget.anisotropy is now [page:WebGLRenderTarget.texture.anisotropy].<br /><br />
+			WebGLRenderTarget.anisotropy 现在是 [page:WebGLRenderTarget.texture.anisotropy].<br /><br />
 
-			WebGLRenderTarget.offset is now [page:WebGLRenderTarget.texture.offset].<br /><br />
+			WebGLRenderTarget.offset 现在是 [page:WebGLRenderTarget.texture.offset].<br /><br />
 
-			WebGLRenderTarget.repeat is now [page:WebGLRenderTarget.texture.repeat].<br /><br />
+			WebGLRenderTarget.repeat 现在是 [page:WebGLRenderTarget.texture.repeat].<br /><br />
 
-			WebGLRenderTarget.format is now [page:WebGLRenderTarget.texture.format].<br /><br />
+			WebGLRenderTarget.format 现在是 [page:WebGLRenderTarget.texture.format].<br /><br />
 
-			WebGLRenderTarget.type is now [page:WebGLRenderTarget.texture.type].<br /><br />
+			WebGLRenderTarget.type 现在是 [page:WebGLRenderTarget.texture.type].<br /><br />
 
-			WebGLRenderTarget.generateMipmaps is now [page:WebGLRenderTarget.texture.generateMipmaps].
+			WebGLRenderTarget.generateMipmaps 现在是 [page:WebGLRenderTarget.texture.generateMipmaps].
 		</p>
 
 
-		<h2>Textures</h2>
+		<h2>纹理（Textures）</h2>
 
 		<h3>[page:ImageUtils]</h3>
 		<p>
-			ImageUtils.loadTexture has been deprecated. Use [page:TextureLoader] instead.<br /><br />
+			ImageUtils.loadTexture 已被弃用。 请使用[page:TextureLoader]。<br /><br />
 
-			ImageUtils.loadTextureCube has been deprecated. Use [page:CubeTextureLoader] instead.<br /><br />
+			ImageUtils.loadTextureCube 已被弃用。 请使用[page:CubeTextureLoader]。<br /><br />
 
-			ImageUtils.loadCompressedTexture has been removed. Use [page:DDSLoader] instead.<br /><br />
+			ImageUtils.loadCompressedTexture 已被删除。 请使用[page:DDSLoader]。<br /><br />
 
-			ImageUtils.loadCompressedTextureCube has been removed. Use [page:DDSLoader] instead.
+			ImageUtils.loadCompressedTextureCube 已被删除。 请使用[page:DDSLoader] instead.
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/Three.Legacy.js src/Three.Legacy.js]
 
