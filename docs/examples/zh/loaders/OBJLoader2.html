@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">A loader for loading a <em>.obj</em> resource.<br />
+			The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format
+			that represents 3D geometry in a human redeable format as, the position of each vertex, the UV position of
+			each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of
+			vertices, and texture vertices.
+		</p>
+
+		<h2>Examples</h2>
+
+		<code>
+		// instantiate the loader
+		var loader = new THREE.OBJLoader2();
+
+		// function called on successful load
+		var callbackOnLoad = function ( event ) {
+			scene.add( event.detail.loaderRootNode );
+		};
+
+		// load a resource from provided URL synchronously
+		loader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null, false );
+		</code>
+
+		[example:webgl_loader_obj2] - Simple example <br>
+		[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse, load and run with instructions (sync and async)<br>
+		[example:webgl_loader_obj2_run_director] - Advanced example using [page:LoaderSupport.LoaderWorkerDirector] for orchestration of multiple workers.
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:LoadingManager manager], [param:LoaderSupport.ConsoleLogger logger] )</h3>
+		<p>
+			[page:LoadingManager manager] - The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br>
+			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
+		</p>
+		<p>
+			Use [name] to load OBJ data from files or to parse OBJ data from arraybuffer or text.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Object3D parse]( {[param:arraybuffer content]|[param:String content]] )</h3>
+		<p>
+			[[page:arraybuffer content]|[page:String content]] OBJ data as Uint8Array or String
+		</p>
+		<p>
+			Parses OBJ data synchronously from arraybuffer or string and returns the [page:Object3D loaderRoorNode].
+		</p>
+
+
+		<h3>[method:Object3D parseAsync]( [param:arraybuffer content], [param:Function onLoad] )</h3>
+		<p>
+			[page:arraybuffer content] - OBJ data as Uint8Array<br>
+			[page:Function onLoad] - Called after worker successfully completed loading<br>
+		</p>
+		<p>
+			Parses OBJ content asynchronously from arraybuffer.
+		</p>
+
+
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError], [param:Function onMeshAlter], [param:boolean useAsync] )</h3>
+		<p>
+			[page:String url] - A string containing the path/URL of the file to be loaded.<br>
+			[page:Function onLoad] - A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br>
+			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
+			[page:Function onError] - (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br>
+			[page:Function onMeshAlter] - (optional) A function to be called after a new mesh raw data becomes available for alteration.<br>
+			[page:boolean useAsync] - (optional) If true, uses async loading with worker, if false loads data synchronously.
+		</p>
+		<p>
+			Use this convenient method to load a file at the given URL. By default the fileLoader uses an ArrayBuffer.
+		</p>
+
+
+		<h3>[method:null run]( [param:LoaderSupport.PrepData params], [param:LoaderSupport.WorkerSupport workerSupportExternal] )</h3>
+		<p>
+			[page:LoaderSupport.PrepData params] - prepData All parameters and resources required for execution<br>
+			[page:LoaderSupport.WorkerSupport workerSupportExternal] - Use pre-existing WorkerSupport
+		</p>
+		<p>
+			Run the loader according the provided instructions.
+		</p>
+
+
+		<h3>[method:null setLogging]( [param:Boolean enabled], [param:Boolean debug] )</h3>
+		<p>
+			[page:Boolean enabled] True or false.<br>
+			[page:Boolean debug] True or false.
+		</p>
+		<p>
+			Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
+		</p>
+
+
+		<h3>[method:null setModelName] ( [param:String modelName] )</h3>
+		<p>
+			[page:String modelName]
+		</p>
+		<p>
+			Set the name of the model.
+		</p>
+
+
+		<h3>[method:null setPath] ( [param:String path] )</h3>
+		<p>
+			[page:String path] - URL
+		</p>
+		<p>
+			The URL of the base path.
+		</p>
+
+
+		<h3>[method:null setStreamMeshesTo] ( [param:Object3D streamMeshesTo] )</h3>
+		<p>
+			[page:Object3D streamMeshesTo] - Object already attached to scenegraph where new meshes will be attached to
+		</p>
+		<p>
+			Set the node where the loaded objects will be attached directly.
+		</p>
+
+
+		<h3>[method:null setMaterials] ( Array of [param:Material materials] )</h3>
+		<p>
+			Array of [page:Material materials] - Array of [page:Material Materials]
+		</p>
+		<p>
+			Set materials loaded by MTLLoader or any other supplier of an Array of [page:Material Materials].
+		</p>
+
+
+		<h3>[method:null setUseIndices]( [param:Boolean useIndices] )</h3>
+		<p>
+			[page:Boolean useIndices]
+		</p>
+		<p>
+			Instructs loaders to create indexed [page:BufferGeometry].
+		</p>
+
+
+		<h3>[method:null setDisregardNormals]( [param:Boolean disregardNormals] )</h3>
+		<p>
+			[page:Boolean disregardNormals]
+		</p>
+		<p>
+			Tells whether normals should be completely disregarded and regenerated.
+		</p>
+
+
+		<h3>[method:null setMaterialPerSmoothingGroup] ( [param:boolean materialPerSmoothingGroup] )</h3>
+		<p>
+			[page:boolean materialPerSmoothingGroup]
+		</p>
+		<p>
+			Tells whether a material shall be created per smoothing group.
+		</p>
+
+
+		<h3>[method:null onProgress]( [param:String type], [param:String text], [param:Number numericalValue] )</h3>
+		<p>
+			[page:String type] - The type of event<br>
+			[page:String text] - Textual description of the event<br>
+			[page:Number numericalValue] - Numerical value describing the progress
+		</p>
+		<p>
+			Announce feedback which is give to the registered [page:LoaderSupport.Callbacks].
+		</p>
+
+
+		<h3>[method:null loadMtl]( [param:String url], [param:Object content], [param:Function callbackOnLoad], [param:String crossOrigin], [param:Object materialOptions]) </h3>
+		<p>
+			[page:String url] - URL to the file<br>
+			[page:Object content] - The file content as arraybuffer or text<br>
+			[page:Function onLoad] - Callback to be called after successful load<br>
+			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
+			[page:Function onError] - (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br>
+			[page:String crossOrigin] - (optional) CORS value<br>
+			[page:Function materialOptions] - (optional) Set material loading options for MTLLoader
+		</p>
+		<p>
+			Utility method for loading an mtl file according resource description. Provide url or content.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/OBJLoader2.js examples/js/loaders/OBJLoader2.js]
+	</body>
+</html>

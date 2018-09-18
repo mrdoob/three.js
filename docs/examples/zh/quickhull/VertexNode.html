@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A vertex as a double linked list node.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] A point (x, y, z) in 3D space.<br /><br />
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Vector3 point]</h3>
+		<p>
+			A point (x, y, z) in 3D space. Default is undefined.
+		</p>
+
+		<h3>[property:VertexNode prev]</h3>
+		<p>
+			Reference to the previous vertex in the double linked list. Default is null.
+		</p>
+
+		<h3>[property:VertexNode next]</h3>
+		<p>
+			Reference to the next vertex in the double linked list. Default is null.
+		</p>
+
+		<h3>[property:Face face]</h3>
+		<p>
+			Reference to the face that is able to see this vertex. Default is undefined.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/QuickHull.js examples/js/QuickHull.js]
+	</body>
+</html>

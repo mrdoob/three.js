@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc"> 用 <a href="https://sites.google.com/site/auraliusproject/ccd-algorithm"><em>CCD算法</em></a>求解IK. <br /><br />
+		[name] 用CCD算法求解逆运动学问题.
+		[name] 设计用于 用 [page:MMDLoader]加载的 [page:SkinnedMesh]但也可用于普通 [page:SkinnedMesh].
+		</p>
+
+		<h2>Example</h2>
+
+		<code>
+		var ikSolver;
+
+		// Load MMD resources and instantiate CCDIKSolver
+		new THREE.MMDLoader().load(
+			'models/mmd/miku.pmd',
+			function ( mesh ) {
+
+				ikSolver = new CCDIKSolver( mesh, mesh.geometry.iks );
+				scene.add( mesh );
+
+			}
+		);
+
+		function render() {
+
+			animate(); // update bones
+			if ( ikSolver !== undefined ) ikSolver.update();
+			renderer.render( scene, camera );
+
+		}
+		</code>
+
+		[example:webgl_loader_mmd]<br />
+		[example:webgl_loader_mmd_pose]<br />
+		[example:webgl_loader_mmd_audio]<br />
+
+		<br />
+		<hr>
+
+		<h2>Constructor（构造器）</h2>
+
+		<h3>[name]( [param:SkinnedMesh mesh], [param:Array iks] )</h3>
+		<p>
+		[page:SkinnedMesh mesh] — [page:SkinnedMesh] , [name] 解决了 IK 问题.<br />
+		[page:Array iks] — 指定了 IK 参数的[page:Object]数组. target, effector, 和 link-index 是 .skeleton.bones中的索引整数.
+		骨骼关系应该是 "links[ n ], links[ n - 1 ], ..., links[ 0 ], effector" 以从父到子的顺序.<br />
+		<ul>
+			<li>[page:Integer target] — 目标骨骼.</li>
+			<li>[page:Integer effector] — 效应器骨.</li>
+			<li>[page:Array links] — 指定链接骨骼的[page：Object]数组.
+			<ul>
+				<li>[page:Integer index] — 链接骨骼.</li>
+				<li>[page:Vector3 limitation] — (可选的) 旋转轴。 默认值undefined.</li>
+				<li>[page:Vector3 rotationMin] — (可选的) 旋转最小限制. 默认值 undefined.</li>
+				<li>[page:Vector3 rotationMax] — (可选的) 旋转最最大限制. 默认值 undefined.</li>
+				<li>[page:Boolean enabled] — (可选的) 默认值 true.</li>
+			</ul>
+			</li>
+			<li>[page:Integer iteration] — (可选的) 迭代次数计算。 更小的值更快但更不精确. 默认值 1.</li>
+			<li>[page:Number minAngle] — (可选的) 步骤中的最小旋转角度. 默认值 undefined.</li>
+			<li>[page:Number maxAngle] — (可选的) 步骤中的最大旋转角度. 默认值 undefined.</li>
+		</ul>
+		</p>
+		<p>
+		创建一个新 [name].
+		</p>
+
+		<h2>Properties(属性)</h2>
+
+		<h3>[property:Array iks]</h3>
+		<p>传递给构造函数的IK参数数组.</p>
+
+		<h3>[property:SkinnedMesh mesh]</h3>
+		<p>[page:SkinnedMesh] 传递给构造函数.</p>
+
+		<h2>Methods(方法)</h2>
+
+		<h3>[method:CCDIKHelper createHelper]()</h3>
+		<p>
+		返回 [page:CCDIKHelper]. 可以通过向场景添加帮助程序来可视化IK骨骼。
+		</p>
+
+		<h3>[method:CCDIKSolver update]()</h3>
+		<p>
+			通过求解CCD算法更新骨骼四元数。
+		</p>
+
+		<h2>Source(来源)</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/animation/CCDIKSolver.js examples/js/animation/CCDIKSolver.js]
+	</body>
+</html>
