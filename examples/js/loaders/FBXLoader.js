@@ -1244,13 +1244,6 @@ THREE.FBXLoader = ( function () {
 
 			var transformData = {};
 
-			// 0 = RrSs, 1 = RSrs, 2 = Rrs
-			// RrSs: Scaling of parent is applied in the child world after the local child rotation
-			// RrSs:= GlobalRM(x) * (GlobalSHM(x) * GlobalSM(x)) = GlobalRM(P(x)) * LocalRM(x) * [GlobalSHM(P(x)) * GlobalSM(P(x))] * LocalSM(x)
-			// RSrs: Scaling of parent is applied in the parent world
-			// RSrs:= GlobalRM(x) * (GlobalSHM(x) * GlobalSM(x)) = GlobalRM(P(x)) * [GlobalSHM(P(x)) * GlobalSM(P(x))] * LocalRM(x) * LocalSM(x)
-			// Rrs: Scaling of parent does not affect the scaling of children
-			// Rrs:= GlobalRM(x) * (GlobalSHM(x) * GlobalSM(x)) = GlobalRM(P(x)) * LocalRM(x) * LocalSM(x)
 			if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
 
 			// rotation order
@@ -3917,7 +3910,6 @@ THREE.FBXLoader = ( function () {
 
 	}
 
-	var tempMat = new THREE.Matrix4();
 	var tempEuler = new THREE.Euler();
 	var tempVec = new THREE.Vector3();
 
