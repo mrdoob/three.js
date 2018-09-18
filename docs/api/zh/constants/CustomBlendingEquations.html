@@ -8,15 +8,15 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>Custom Blending Equation Constants</h1>
+		<h1>自定义混合方程常量</h1>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 		<p>[example:webgl_materials_blending_custom materials / blending / custom ]</p>
 
-		<h2>Usage</h2>
+		<h2>用法</h2>
 		<p>
-			These work with all material types. First set the material's blending mode to THREE.CustomBlending, then set the desired Blending Equation, Source Factor and Destination Factor.
+			这个常量可以用于所有的材质类型。首先将材质的混合模式设置为THREE.CustomBlending，然后设置所需要的混合方程、来源因子和目标因子。
 		</p>
 
 		<code>
@@ -27,7 +27,7 @@
 		material.blendDst = THREE.OneMinusSrcAlphaFactor; //default
 		</code>
 
-		<h2>Blending Equations</h2>
+		<h2>混合方程</h2>
 		<code>
 		THREE.AddEquation
 		THREE.SubtractEquation
@@ -36,7 +36,7 @@
 		THREE.MaxEquation
 		</code>
 
-		<h2>Source Factors</h2>
+		<h2>源因子</h2>
 		<code>
 		THREE.ZeroFactor
 		THREE.OneFactor
@@ -51,12 +51,12 @@
 		THREE.SrcAlphaSaturateFactor
 		</code>
 
-		<h2>Destination Factors</h2>
+		<h2>目标因子</h2>
 		<p>
-			All of the Source Factors are valid as Destination Factors, except for <code>THREE.SrcAlphaSaturateFactor</code>
+			所有的源因子的值，在目标因子中都是有效的。除了：<code>THREE.SrcAlphaSaturateFactor</code>
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
 	</body>
