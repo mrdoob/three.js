@@ -577,7 +577,7 @@ var Loader = function ( editor ) {
 			case 'geometry':
 
 				var loader = new THREE.JSONLoader();
-				loader.setTexturePath( scope.texturePath );
+				loader.setResourcePath( scope.texturePath );
 
 				var result = loader.parse( data );
 
