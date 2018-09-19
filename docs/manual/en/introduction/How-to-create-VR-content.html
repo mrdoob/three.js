@@ -49,7 +49,8 @@ renderer.vr.enabled = true;
 
 	<p>
 		Finally, you have to adjust your animation loop since we can't use our well known
-		*window.requestAnimationFrame()* function. The minimal code looks like this:
+		*window.requestAnimationFrame()* function. For VR projects we use [page:WebGLRenderer.setAnimationLoop setAnimationLoop]. 
+		The minimal code looks like this:
 	</p>
 
 	<code>
