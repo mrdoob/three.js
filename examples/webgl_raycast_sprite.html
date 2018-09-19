@@ -87,6 +87,26 @@
 			sprite.material.rotation = Math.PI / 3;
 			group2.add( sprite );
 
+
+			var num = 20;
+			var radius = 10;
+			while(num --) {
+
+				var x = Math.random() - 0.5;
+				var y = Math.random() - 0.5;
+				var z = Math.random() - 0.5;
+
+				var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#96f' } ));
+				sprite.position.set( x, y, z );
+				sprite.position.normalize();
+				sprite.position.multiplyScalar( radius );
+				sprite.scale.set(0.05 * Math.random(), 0.05 * Math.random(), 0.05 * Math.random());
+				sprite.material.rotation = Math.random() * Math.PI * 2;
+				sprite.material.sizeAttenuation = false;
+				group.add( sprite );
+
+			}
+
 			window.addEventListener( 'resize', onWindowResize, false );
 			window.addEventListener( "mousemove", onDocumentMouseMove, false );
 
@@ -115,7 +135,7 @@
 			event.preventDefault();
 			if ( selectedObject ) {
 
-				selectedObject.material.color.set( '#69f' );
+				selectedObject.material.color.set( selectedObject.originColor );
 				selectedObject = null;
 
 			}
@@ -132,6 +152,7 @@
 				if ( res && res.object ) {
 
 					selectedObject = res.object;
+					selectedObject.originColor = selectedObject.material.color.getHex();
 					selectedObject.material.color.set( '#f00' );
 
 				}
