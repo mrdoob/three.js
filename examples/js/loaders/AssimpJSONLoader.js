@@ -30,6 +30,7 @@ THREE.AssimpJSONLoader.prototype = {
 		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			var json = JSON.parse( text );
