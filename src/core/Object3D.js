@@ -328,7 +328,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			position.setFromMatrixPosition( this.matrixWorld );
 
-			if ( this.isCamera ) {
+			if ( this.isCamera || this.isLight ) {
 
 				m1.lookAt( position, target, this.up );
 
