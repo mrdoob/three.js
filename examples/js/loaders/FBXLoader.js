@@ -712,9 +712,9 @@ THREE.FBXLoader = ( function () {
 					ID: child.ID,
 					indices: [],
 					weights: [],
-					transform: new THREE.Matrix4().fromArray( boneNode.Transform.a ),
 					transformLink: new THREE.Matrix4().fromArray( boneNode.TransformLink.a ),
-					linkMode: boneNode.Mode,
+					// transform: new THREE.Matrix4().fromArray( boneNode.Transform.a ),
+					// linkMode: boneNode.Mode,
 
 				};
 
@@ -873,7 +873,10 @@ THREE.FBXLoader = ( function () {
 						case 'NurbsCurve':
 							model = this.createCurve( relationships, geometryMap );
 							break;
-						case 'LimbNode': // usually associated with a Bone, however if a Bone was not created we'll make a Group instead
+						case 'LimbNode':
+						case 'Root':
+							model = new THREE.Bone();
+							break;
 						case 'Null':
 						default:
 							model = new THREE.Group();
@@ -911,6 +914,7 @@ THREE.FBXLoader = ( function () {
 
 							var subBone = bone;
 							bone = new THREE.Bone();
+
 							bone.matrixWorld.copy( rawBone.transformLink );
 
 							// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
@@ -2280,7 +2284,6 @@ THREE.FBXLoader = ( function () {
 
 			var animationClips = [];
 
-
 			var rawClips = this.parseClips();
 
 			if ( rawClips === undefined ) return;
@@ -2460,11 +2463,14 @@ THREE.FBXLoader = ( function () {
 										if ( child.ID = rawModel.id ) {
 
 											node.transform = child.matrix;
+
 											if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
 
 										}
 
 									} );
+
+									if ( ! node.transform ) node.transform = new THREE.Matrix4();
 
 									// if the animated model is pre rotated, we'll have to apply the pre rotations to every
 									// animation value as well
@@ -2585,7 +2591,7 @@ THREE.FBXLoader = ( function () {
 			var initialRotation = new THREE.Quaternion();
 			var initialScale = new THREE.Vector3();
 
-			if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
+			rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
 
 			initialPosition = initialPosition.toArray();
 			initialRotation = new THREE.Euler().setFromQuaternion( initialRotation, rawTracks.eulerOrder ).toArray();
