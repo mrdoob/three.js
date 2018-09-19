@@ -104,7 +104,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			viewWorldMatrix.getInverse( this.modelViewMatrix ).premultiply( this.matrixWorld );
 			mvPosition.setFromMatrixPosition( this.modelViewMatrix );
 
-			if ( ! this.material.sizeAttenuation ) {
+			if ( this.material.sizeAttenuation === false ) {
 
 				worldScale.multiplyScalar( - mvPosition.z );
 
