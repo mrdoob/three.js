@@ -10,8 +10,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc"> A Physics handler for <a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a> resources. <br /><br />
-		[name] calculates Physics for model loaded by [page:MMDLoader] with <a href="https://github.com/kripken/ammo.js/">ammo.js</a> (Bullet-based JavaScript Physics engine).
+		<p class="desc"> 一个 <a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a> 资源的物理处理程序. <br /><br />
+		[name] 计算由[page:MMDLoader]和 <a href="https://github.com/kripken/ammo.js/">ammo.js</a> 加载的模型的Physics (基于 Bullet 的 JavaScript Physics 引擎).
 		</p>
 
 		<h2>Example</h2>
@@ -46,66 +46,66 @@
 		<br />
 		<hr>
 
-		<h2>Constructor</h2>
+		<h2>Constructor（构造器）</h2>
 
 		<h3>[name]( [param:SkinnedMesh mesh], [param:Array rigidBodyParams], [param:Array constraintParams], [param:Object params] )</h3>
 		<p>
-		[page:SkinnedMesh mesh] — [page:SkinnedMesh] for which [name] calculates Physics.<br />
-		[page:Array rigidBodyParams] — An array of [page:Object] specifying Rigid Body parameters.<br />
-		[page:Array constraintParams] — (optional) An array of [page:Object] specifying Constraint parameters.<br />
-		[page:Object params] — (optional)<br />
+		[page:SkinnedMesh mesh] — [page:SkinnedMesh] , [name] 提供计算 Physics.<br />
+		[page:Array rigidBodyParams] — [page:Object] 数组，定义了Rigid Body 参数.<br />
+		[page:Array constraintParams] — (可选的)  [page:Object]数组，定义了 Constraint 参数.<br />
+		[page:Object params] — (可选的)<br />
 		<ul>
-			<li>[page:Number unitStep] - Default is 1 / 65.</li>
-			<li>[page:Integer maxStepNum] - Default is 3.</li>
-			<li>[page:Vector3 gravity] - Default is ( 0, - 9.8 * 10, 0 )</li>
+			<li>[page:Number unitStep] - 默认为 1 / 65.</li>
+			<li>[page:Integer maxStepNum] - 默认为 3.</li>
+			<li>[page:Vector3 gravity] - 默认为 ( 0, - 9.8 * 10, 0 )</li>
 		</ul>
 		</p>
 		<p>
-		Creates a new [name].
+		新建 [name].
 		</p>
 
-		<h2>Properties</h2>
+		<h2>Properties（属性）</h2>
 
 		<h3>[property:Array mesh]</h3>
-		<p>[page:SkinnedMesh] passed to the constructor.</p>
+		<p>[page:SkinnedMesh] 传递给 constructor.</p>
 
-		<h2>Methods</h2>
+		<h2>Methods（方法）</h2>
 
 		<h3>[method:MMDPhysicsHelper createHelper]()</h3>
 		<p>
-		Return [page:MMDPhysicsHelper]. You can visualize Rigid bodies by adding the helper to scene.
+		返回 [page:MMDPhysicsHelper]. 你可以通过将助手添加到场景来可视化Rigid bodies.
 		</p>
 
 		<h3>[method:CCDIKSolver reset]()</h3>
 		<p>
-		Resets Rigid bodies transorm to current bone's.
+		重置Rigid bodies 为当前骨骼。.
 		</p>
 
 		<h3>[method:CCDIKSolver setGravity]( [param:Vector3 gravity] )</h3>
 		<p>
-		[page:Vector3 gravity] — Direction and volume of gravity.
+		[page:Vector3 gravity] — 重力的方向和大小
 		</p>
 		<p>
-		Set gravity.
+		设定 gravity.
 		</p>
 
 		<h3>[method:CCDIKSolver update]( [param:Number delta] )</h3>
 		<p>
-		[page:Number delta] — Time in second.
+		[page:Number delta] — 时间秒.
 		</p>
 		<p>
-		Advance Physics calculation and updates bones.
+		高级物理计算和更新骨骼。
 		</p>
 
 		<h3>[method:CCDIKSolver warmup]( [param:Integer cycles] )</h3>
 		<p>
-		[page:Number delta] — Time in second.
+		[page:Number delta] — 时间秒.
 		</p>
 		<p>
-		Warm up Rigid bodies. Calculates cycles steps.
+		热身Rigid bodies. 计算循环步骤。.
 		</p>
 
-		<h2>Source</h2>
+		<h2>Source(来源)</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/animation/MMDPhysics.js examples/js/animation/MMDPhysics.js]
 	</body>
