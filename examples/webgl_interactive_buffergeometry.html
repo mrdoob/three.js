@@ -206,7 +206,7 @@
 				var geometry = new THREE.BufferGeometry();
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
 
-				var material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2, transparent: true } );
+				var material = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true } );
 
 				line = new THREE.Line( geometry, material );
 				scene.add( line );
