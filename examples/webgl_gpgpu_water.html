@@ -344,7 +344,7 @@
 				sun2.position.set( -100, 350, -200 );
 				scene.add( sun2 );
 
-				renderer = new THREE.WebGLRenderer( { premultipliedAlpha : false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -487,7 +487,6 @@
 
 				// Create compute shader to read water volume
 				readVolumeShader = gpuCompute.createShaderMaterial( document.getElementById( 'sumFragmentShader' ).textContent, { texture: { value: null } } );
-				readVolumeShader.blending = 0;
 				
 				// Create a 1x1 pixel image and a render target (Uint8, 4 channels, 1 byte per channel) to read water height
 				readVolumeImage = new Uint8Array( 1 * 1 * 4 );
