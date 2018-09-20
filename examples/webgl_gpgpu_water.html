@@ -55,6 +55,7 @@
 			uniform vec2 mousePos;
 			uniform float mouseSize;
 			uniform float viscosityConstant;
+			uniform float heightCompensation;
 
 			#define deltaTime ( 1.0 / 60.0 )
 			#define GRAVITY_CONSTANT ( resolution.x * deltaTime * 3.0 )
@@ -91,6 +92,9 @@
 				float mousePhase = clamp( length( ( uv - vec2( 0.5 ) ) * BOUNDS - vec2( mousePos.x, - mousePos.y ) ) * PI / mouseSize, 0.0, PI );
 				heightmapValue.x += cos( mousePhase ) + 1.0;
 
+				// Water height reset compensation
+				heightmapValue.x += heightCompensation;
+
 				gl_FragColor = heightmapValue;
 
 			}
@@ -118,6 +122,72 @@
 				textureValue /= 5.0;
 
 				gl_FragColor = textureValue;
+
+			}
+
+		</script>
+		
+		<!-- This is a 'compute shader' to calculate the current volume of water -->
+		<!-- It is used with a variable of size 1x1 -->
+		<script id="sumFragmentShader" type="x-shader/x-fragment">
+		
+			uniform sampler2D texture;
+		
+			// Integer to float conversion from https://stackoverflow.com/questions/17981163/webgl-read-pixels-from-floating-point-render-target
+			
+			float shift_right( float v, float amt ) {
+				v = floor( v ) + 0.5;
+				return floor( v / exp2( amt ) );
+			}
+			float shift_left( float v, float amt ) { 
+				return floor( v * exp2( amt ) + 0.5 );
+			}
+			float mask_last( float v, float bits ) {
+				return mod( v, shift_left( 1.0, bits ) );
+			}
+			float extract_bits( float num, float from, float to ) {
+				from = floor( from + 0.5 ); to = floor( to + 0.5 );
+				return mask_last( shift_right( num, from ), to - from );
+			}
+			vec4 encode_float( float val ) {
+				if ( val == 0.0 ) return vec4( 0, 0, 0, 0 );
+				float sign = val > 0.0 ? 0.0 : 1.0;
+				val = abs( val );
+				float exponent = floor( log2( val ) );
+				float biased_exponent = exponent + 127.0;
+				float fraction = ( ( val / exp2( exponent ) ) - 1.0 ) * 8388608.0;
+				float t = biased_exponent / 2.0;
+				float last_bit_of_biased_exponent = fract( t ) * 2.0;
+				float remaining_bits_of_biased_exponent = floor( t );
+				float byte4 = extract_bits( fraction, 0.0, 8.0 ) / 255.0;
+				float byte3 = extract_bits( fraction, 8.0, 16.0 ) / 255.0;
+				float byte2 = ( last_bit_of_biased_exponent * 128.0 + extract_bits( fraction, 16.0, 23.0 ) ) / 255.0;
+				float byte1 = ( sign * 128.0 + remaining_bits_of_biased_exponent ) / 255.0;
+				return vec4( byte4, byte3, byte2, byte1 );
+			}
+
+			void main()	{
+
+				vec2 cellSize = 1.0 / resolution.xy;
+				
+				float volume = 0.0;
+				
+				const int rx = int( resolution.x );
+				const int ry = int( resolution.y );
+
+				// Sum of water height over all water cells
+				for ( int j = 0; j < ry; j++ ) {
+					for ( int i = 0; i < rx; i++ ) {
+					
+						vec2 uv = vec2( i, j ) * cellSize;
+						vec4 textureValue = texture2D( texture, uv );
+						
+						volume += textureValue.x;
+
+					}
+				}
+
+				gl_FragColor = encode_float( volume );
 
 			}
 
@@ -226,6 +296,11 @@
 			var heightmapVariable;
 			var waterUniforms;
 			var smoothShader;
+			var readVolumeShader;
+			var readVolumeRenderTarget;
+			var readVolumeImage;
+			var heightCompensation = 0;
+			var numFrames = 0;
 
 			var simplex = new SimplexNoise();
 
@@ -269,7 +344,7 @@
 				sun2.position.set( -100, 350, -200 );
 				scene.add( sun2 );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { premultipliedAlpha : false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -399,6 +474,7 @@
 				heightmapVariable.material.uniforms.mousePos = { value: new THREE.Vector2( 10000, 10000 ) };
 				heightmapVariable.material.uniforms.mouseSize = { value: 20.0 };
 				heightmapVariable.material.uniforms.viscosityConstant = { value: 0.03 };
+				heightmapVariable.material.uniforms.heightCompensation = { value: 0 };
 				heightmapVariable.material.defines.BOUNDS = BOUNDS.toFixed( 1 );
 
 				var error = gpuCompute.init();
@@ -408,6 +484,24 @@
 
 				// Create compute shader to smooth the water surface and velocity
 				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { value: null } } );
+
+				// Create compute shader to read water volume
+				readVolumeShader = gpuCompute.createShaderMaterial( document.getElementById( 'sumFragmentShader' ).textContent, { texture: { value: null } } );
+				readVolumeShader.blending = 0;
+				
+				// Create a 1x1 pixel image and a render target (Uint8, 4 channels, 1 byte per channel) to read water height
+				readVolumeImage = new Uint8Array( 1 * 1 * 4 );
+
+				readVolumeRenderTarget = new THREE.WebGLRenderTarget( 1, 1, {
+					wrapS: THREE.ClampToEdgeWrapping,
+					wrapT: THREE.ClampToEdgeWrapping,
+					minFilter: THREE.NearestFilter,
+					magFilter: THREE.NearestFilter,
+					format: THREE.RGBAFormat,
+					type: THREE.UnsignedByteType,
+					stencilBuffer: false,
+					depthBuffer: false
+				} );
 
 			}
 
@@ -462,6 +556,25 @@
 
 				}
 				
+			}
+
+			function readWaterLevel() {
+				
+				// Returns current average water level
+
+				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
+
+				readVolumeShader.uniforms.texture.value = currentRenderTarget.texture;
+
+				gpuCompute.doRenderTarget( readVolumeShader, readVolumeRenderTarget );
+
+				var gl = renderer.context;
+				gl.readPixels( 0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, readVolumeImage );
+
+				var pixels = new Float32Array( readVolumeImage.buffer );
+
+				return pixels[ 0 ] / NUM_TEXELS;
+
 			}
 
 
@@ -531,9 +644,9 @@
 				var uniforms = heightmapVariable.material.uniforms;
 				if ( mouseMoved ) {
 
-					this.raycaster.setFromCamera( mouseCoords, camera );
+					raycaster.setFromCamera( mouseCoords, camera );
 
-					var intersects = this.raycaster.intersectObject( meshRay );
+					var intersects = raycaster.intersectObject( meshRay );
 
 					if ( intersects.length > 0 ) {
 					    var point = intersects[ 0 ].point;
@@ -548,6 +661,24 @@
 				}
 				else {
 					uniforms.mousePos.value.set( 10000, 10000 );
+				}
+
+				// Read height value once in a time, since it has some cost
+				if ( ++numFrames > 120 ) {
+				
+					numFrames = 0;
+				
+					heightCompensation = readWaterLevel();
+
+				}
+
+				// Apply gradually height compensation to reset water level
+				if ( heightCompensation !== 0 ) {
+				
+					var decremHeight = Math.min( 1, Math.abs( heightCompensation ) ) * Math.sign( heightCompensation );
+					heightCompensation -= decremHeight;
+					heightmapVariable.material.uniforms.heightCompensation.value = - decremHeight * Math.sign( heightCompensation );
+					
 				}
 
 				// Do the gpu computation
