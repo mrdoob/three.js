@@ -149,6 +149,8 @@ function WebGL2Renderer( parameters ) {
 		var background = scene.background;
 		var forceClear = false;
 
+		scene.currentCamera = camera;
+
 		if ( background === null ) {
 
 			state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
