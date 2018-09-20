@@ -1035,7 +1035,6 @@ function WebGLRenderer( parameters ) {
 		_currentGeometryProgram.program = null;
 		_currentGeometryProgram.wireframe = false;
 		_currentMaterialId = - 1;
-		_currentCamera = null;
 
 		// update scene graph
 
@@ -1155,6 +1154,7 @@ function WebGLRenderer( parameters ) {
 
 		currentRenderList = null;
 		currentRenderState = null;
+		_currentCamera = null;
 
 	};
 
