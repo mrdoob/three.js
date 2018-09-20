@@ -17,12 +17,20 @@ THREE.MD2Loader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
 			onLoad( scope.parse( buffer ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 

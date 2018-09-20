@@ -32,12 +32,29 @@ THREE.VRMLLoader.prototype = {
 
 		var scope = this;
 
+		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			onLoad( scope.parse( text, path ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
+
+	},
+
+	setResourcePath: function ( value ) {
+
+		this.resourcePath = value;
+		return this;
 
 	},
 
@@ -48,13 +65,12 @@ THREE.VRMLLoader.prototype = {
 
 	},
 
-	parse: function ( data ) {
+	parse: function ( data, path ) {
 
 		var scope = this;
-		var texturePath = this.texturePath || '';
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
-		textureLoader.setCrossOrigin( this.crossOrigin );
+		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		function parseV2( lines, scene ) {
 
@@ -931,23 +947,23 @@ THREE.VRMLLoader.prototype = {
 								for ( i = 0, il = indexArray.length; i < il; i ++ ) {
 
 									var indexedFace = indexArray[ i ];
-	
+
 									// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
-	
+
 									skip = 0;
-	
+
 									while ( indexedFace.length >= 3 && skip < ( indexedFace.length - 2 ) ) {
 
 										var i1 = indexedFace[ 0 ];
 										var i2 = indexedFace[ skip + ( ccw ? 1 : 2 ) ];
 										var i3 = indexedFace[ skip + ( ccw ? 2 : 1 ) ];
-	
+
 										triangulatedIndexArray.push( i1, i2, i3 );
-	
+
 										skip ++;
-	
+
 									}
-	
+
 								}
 
 								return triangulatedIndexArray;
@@ -988,7 +1004,7 @@ THREE.VRMLLoader.prototype = {
 
 								}
 
-								if ( colorIndex !== undefined ) { 
+								if ( colorIndex !== undefined ) {
 
 									pointAttributes.push( colorIndex.toString( base ) );
 
@@ -1093,7 +1109,7 @@ THREE.VRMLLoader.prototype = {
 
 						} else {
 
-							// convert geometry to non-indexed to get sharp normals 
+							// convert geometry to non-indexed to get sharp normals
 							geometry = geometry.toNonIndexed();
 							geometry.computeVertexNormals();
 
@@ -1180,7 +1196,7 @@ THREE.VRMLLoader.prototype = {
 
 								parent.material.name = textureName[ 1 ];
 
-								parent.material.map = textureLoader.load( texturePath + textureName[ 1 ] );
+								parent.material.map = textureLoader.load( textureName[ 1 ] );
 
 							}
 
