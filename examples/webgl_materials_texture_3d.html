@@ -23,7 +23,7 @@
 				text-align:center;
 			}
 
-			a {
+			#info a {
 				color: #ffffff;
 			}
 		</style>
@@ -64,7 +64,7 @@
 
 		vec4 color = texture( diffuse, vUv );
 		color.r *= 1.5; // lighten a bit
-		color.gba = vec3( color.x );
+		color.gb = vec2( color.r );
 
 		out_FragColor = vec4( color.rgb, 1.0 );
 
