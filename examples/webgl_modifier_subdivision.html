@@ -29,7 +29,7 @@
 
 			var camera, controls, scene, renderer;
 
-			var cube, mesh, material, geometry, smooth, group;
+			var cube, mesh, material, geometry, group, wireframe;
 
 			// Create new object by parameters
 
@@ -47,7 +47,7 @@
 
 			};
 
-			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
+			var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.15, transparent: true } );
 			var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
 
@@ -126,7 +126,7 @@
 
 
 			var info;
-			var subdivisions = 2;
+			var modifier;
 			var geometryIndex = 0;
 
 			// start scene
@@ -136,8 +136,15 @@
 
 			function nextSubdivision( x ) {
 
-				subdivisions = Math.max( 0, subdivisions + x );
-				addStuff();
+				if ( modifier ) {
+
+					modifier.subdivisions = Math.max( 0, modifier.subdivisions + x );
+
+					modifier.modify();
+
+				}
+
+				updateDisplay();
 
 			}
 
@@ -155,11 +162,12 @@
 
 			}
 
-			function switchGeometry(i) {
+			function switchGeometry( i ) {
 
 				geometryIndex = i;
 
 				addStuff();
+
 			}
 
 			function updateInfo() {
@@ -180,11 +188,11 @@
 
 				info.innerHTML = 'Drag to spin THREE.' + params.type +
 
-					'<br><br>Subdivisions: ' + subdivisions +
+					'<br><br>Subdivisions: ' + modifier.subdivisions +
 					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
 					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
-					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
+					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + modifier.geometry.vertices.length +
+					'<br>Face count: before ' + geometry.faces.length + ' after ' + modifier.geometry.faces.length
 
 			}
 
@@ -193,7 +201,6 @@
 				if ( cube !== undefined ) {
 
 					geometry.dispose();
-					smooth.dispose();
 
 					scene.remove( group );
 					scene.remove( cube );
@@ -212,22 +219,42 @@
 
 				}
 
-				var modifier = new THREE.SubdivisionModifier( geometry, subdivisions );
+				modifier = new THREE.SubdivisionModifier( geometry, 2 );
 
 				modifier.modify();
 
-				smooth = modifier.geometry;
+				group = new THREE.Group();
+				scene.add( group );
+
+				mesh = new THREE.Mesh( geometry, material );
+				group.add( mesh );
+
+				cube = new THREE.Mesh( modifier.geometry, smoothMaterial );
+				wireframe = new THREE.LineSegments( new THREE.WireframeGeometry(modifier.geometry), wireframeMaterial );
+
+				cube.add( wireframe );
+
+				cube.scale.setScalar( params.meshScale ? params.meshScale : 1 );
+				scene.add( cube );
+
+				group.scale.copy( cube.scale );
+
+				updateDisplay();
+
+			}
+
+			function updateDisplay() {
 
 				var faceIndices = [ 'a', 'b', 'c' ];
 
-				for ( var i = 0; i < smooth.faces.length; i ++ ) {
+				for ( var i = 0; i < modifier.geometry.faces.length; i ++ ) {
 
-					var face  = smooth.faces[ i ];
+					var face  = modifier.geometry.faces[ i ];
 
 					for ( var j = 0; j < 3; j ++ ) {
 
 						var vertexIndex = face[ faceIndices[ j ] ];
-						var vertex = smooth.vertices[ vertexIndex ];
+						var vertex = modifier.geometry.vertices[ vertexIndex ];
 
 						var hue = ( vertex.y / 200 ) + 0.5;
 						var color = new THREE.Color().setHSL( hue, 1, 0.5 );
@@ -238,22 +265,9 @@
 
 				}
 
+				wireframe.geometry = new THREE.WireframeGeometry(modifier.geometry);
+
 				updateInfo();
-
-				group = new THREE.Group();
-				scene.add( group );
-
-				mesh = new THREE.Mesh( geometry, material );
-				group.add( mesh );
-
-				cube = new THREE.Mesh( smooth, smoothMaterial );
-				var wireframe = new THREE.Mesh( smooth, wireframeMaterial );
-				cube.add( wireframe );
-
-				cube.scale.setScalar( params.meshScale ? params.meshScale : 1 );
-				scene.add( cube );
-
-				group.scale.copy( cube.scale );
 
 			}
 
