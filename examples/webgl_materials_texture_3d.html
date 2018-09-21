@@ -35,7 +35,7 @@
 	uniform vec2 size;
 	out vec3 vUv;
 
-        void main() {
+	void main() {
 
 		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
@@ -68,7 +68,7 @@
 
 		out_FragColor = vec4( color.rgb, 1.0 );
 
-        }
+	}
 	</script>
 	<body>
 		<div id="info">
