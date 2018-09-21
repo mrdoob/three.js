@@ -1029,13 +1029,6 @@ function WebGLRenderer( parameters ) {
 
 		if ( _isContextLost ) return;
 
-		// reset caching for this frame
-
-		_currentGeometryProgram.geometry = null;
-		_currentGeometryProgram.program = null;
-		_currentGeometryProgram.wireframe = false;
-		_currentMaterialId = - 1;
-
 		// update scene graph
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
@@ -1152,9 +1145,16 @@ function WebGLRenderer( parameters ) {
 
 		// _gl.finish();
 
+		// reset caching for next frame
+
+		_currentGeometryProgram.geometry = null;
+		_currentGeometryProgram.program = null;
+		_currentGeometryProgram.wireframe = false;
+		_currentMaterialId = - 1;
+		_currentCamera = null;
+
 		currentRenderList = null;
 		currentRenderState = null;
-		_currentCamera = null;
 
 	};
 
