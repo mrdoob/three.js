@@ -11,35 +11,36 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			本文介绍如何将three.js放入[link:https://nodejs.org/en/ node.js]环境中执行自动化测试。 测试可以在命令行上运行，也可以通过自动化
-			CI工具，如[link:https://travis-ci.org/ Travis]
+			This article shows how to get three.js into a [link:https://nodejs.org/en/ node.js] environment so that you
+			can execute automated tests. Tests can be run on the command line, or by automated
+			CI tools like [link:https://travis-ci.org/ Travis].
 		</p>
 
-		<h2>The short version（简版）</h2>
+		<h2>The short version</h2>
 
 		<p>
-			如果你熟悉node 和 npm,
+			If you're comfortable with node and npm,
 			<code>
 				$ npm install three --save-dev
 			</code>
-			然后添加
+			and add
 		<code>
 			var THREE = require('three');
 		</code>
-			到你的测试文件中
+			to your test.
 		</p>
 
-		<h2>Create a testable project from scratch（从头开始创建一个可测试的项目）</h2>
+		<h2>Create a testable project from scratch</h2>
 		<p>
-		如果你不熟悉这些工具，这里有一个快速指南（对于linux，安装过程
-		使用Windows会略有不同，但NPM命令是相同的）。
+			If you're not familiar with these tools, here's a quick guide (for linux, the installation process
+			will be slightly different using windows, but the NPM commands are identical).
 		</p>
 
-		<h3>Basic setup（基本步骤）</h3>
+		<h3>Basic setup</h3>
 		<div>
 			<ol>
 				<li>
-					安装 [link:https://www.npmjs.org/ npm] 和 nodejs. 最简短的方法通常类似这样
+					Install [link:https://www.npmjs.org/ npm] and nodejs. The shortest path typically looks something like
 					<code>
 $ sudo apt-get install -y npm nodejs-legacy
 # fix any problems with SSL in the default registry URL
@@ -48,27 +49,28 @@ $ npm config set registry http://registry.npmjs.org/
 				</li>
 
 				<li>
-					创建一个新的项目目录
+					Make a new project directory
 					<code>
 						 $ mkdir test-example; cd test-example
 					</code>
 				</li>
 
 				<li>
-					用npm创建一个项目文件:
+					Ask npm to create a new project file for you:
 					<code>
 					 $ npm init
 					</code>
-					接受所有默认设定，在提示问题时候都按回车。这会创建package.json文件。
+					 and accept all defaults by hitting Enter on all the prompts.
+					 This will create package.json.
 				</li><br />
 
 				<li>
-					尝试并启动测试功能
+					Try and start the test feature with
 					<code>
 $ npm test
 					</code>
-					这将会失败，符合预期。
-					在package.json中, 测试脚本的定义是
+					This will fail, which is expected.
+					If you look in the package.json, the definition of the test script is
 					<code>
 						"test": "echo \"Error: no test specified\" && exit 1"
 					</code>
@@ -77,58 +79,59 @@ $ npm test
 			</ol>
 		</div>
 
-		<h2>Add mocha（增加mocha）</h2>
+		<h2>Add mocha</h2>
 		<div>
-			我们将要使用 [link:https://mochajs.org/ mocha].
+			We're going to use [link:https://mochajs.org/ mocha].
 
 			<ol>
 				<li>
-					安装 mocha
+					Install mocha with
 					<code>
 $ npm install mocha --save-dev
 					</code>
-					注意依赖存储路径 node_modules/ 会被创建.
-				  同时注意package.json被更新了: 属性devDependencies
-					被新增，由于这个指令 --save-dev.
+					Notice that node_modules/ is created and your dependencies appear in there.
+				  Also notice that your package.json has been updated: the property devDependencies
+					is added and updated by the use of --save-dev.
 				</li><br />
 
 				<li>
-					编辑 package.json 来调用 mocha来测试. 当测试被调用, 我们只想运行mocha并且定义个显式的reporter。
-					默认情况这回运行test/路径下所有的测试
-					(如果目录test/不存在可能会导致npm ERR!, 通过 mkdir test创建该目录)
+					Edit package.json to use mocha for testing. When test is invoked, we just want to run
+					mocha and specify a verbose reporter. By default this will run anything in test/
+					(not having directory test/ can run into npm ERR!, create it by mkdir test)
 					<code>
 						"test": "mocha --reporter list"
 					</code>
 				</li>
 
 				<li>
-					重新运行测试
+					Rerun the test with
 					<code>
 						$ npm test
 					</code>
 
-					现在应该成功，并报告 0 passing (1ms)
-				 	或者类似的。
+					This should now succeed, reporting 0 passing (1ms)
+				 	or similar.
 				</li>
 
 			</ol>
 		</div>
 
-		<h2>Add three.js（增加three.js）</h2>
+		<h2>Add three.js</h2>
 		<div>
 			<ol>
 				<li>
-					增加 three.js 作为依赖
+					Let's pull in our three.js dependency with
 					<code>
 $ npm install three --save-dev
 					</code>
 					<ul>
 						<li>
-							如果想要指定版本号，那么运行
+							If you need a different three version, use
 							<code>
 								$ npm show three versions
 							</code>
-							来看可用的版本号。为了告诉npm正确的版本，使用
+						  to see
+							what's available. To tell npm the right one, use
 							<code>
  $ npm install three@0.84.0 --save
 							</code>
@@ -139,15 +142,15 @@ $ npm install three --save-dev
 				</li>
 
 				<li>
-					Mocha 会搜索 test/下的测试, 所以
+					Mocha will look for tests in test/, so let's
 					<code>
 					$ mkdir test
 					</code>
 				</li>
 
 				<li>
-					最后，我们实际上需要运行JS测试。 让我们添加一个简单的测试来验证
-					three.js对象可用且正常工作。 创建包含以下内容的test/verify-three.js：
+					Finally we actually need a JS test to run. Let's add a simple test that will verify that
+					the three.js object is available and working. Create test/verify-three.js containing:
 <code>
 var THREE = require('three');
 var assert = require("assert");
@@ -166,8 +169,8 @@ describe('The THREE object', function() {
 				</li>
 
 				<li>
-				最后再用 $ npm test测试一下. 这将运行测试并成功,
-				显示如下内容:
+				Finally let's test again with $ npm test. This should run the tests above and succeed,
+				showing something like:
 				<code>
 The THREE object should have a defined BasicShadowMap constant: 0ms
 The THREE object should be able to construct a Vector3 with default of x=0: 0ms
@@ -177,29 +180,29 @@ The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 			</ol>
 		</div>
 
-		<h2>Add your own code（增加自己的代码）</h2>
+		<h2>Add your own code</h2>
 		<div>
-			你需要做三件事:
+			You need to do three things:
 
 			<ol>
 				<li>
-					为了你的行为代码编写测试, 放在 test/路径下.
-					[link:https://github.com/air/encounter/blob/master/test/Physics-test.js Here] 是一个真实项目的例子.
+					Write a test for the expected behaviour of your code, and place it under test/.
+					[link:https://github.com/air/encounter/blob/master/test/Physics-test.js Here] is an example from a real project.
 				</li>
 
 				<li>
-					以nodejs可以识别的方式导出您的功能代码，以与require一起使用。
-					见 [link:https://github.com/air/encounter/blob/master/js/Physics.js here].
+					Export your functional code in such a way that nodejs can see it, for use in conjunction with require.
+					See it [link:https://github.com/air/encounter/blob/master/js/Physics.js here].
 				</li>
 
 				<li>
-					在测试文件中Require 你的代码, 跟上面例子中的 require('three') 类似.
+					Require your code into the test file, in the same way we did a require('three') in the example above.
 				</li>
 			</ol>
 
 			<p>
-				第2项和第3项将根据您管理代码的方式而有所不同。 在Physics.js的例子中
-				如上所述，export部分在最后。 我们将一个对象分配给module.exports：
+				Items 2 and 3 will vary depending on how you manage your code. In the example of Physics.js
+		  	given above, the export part is right at the end. We assign an object to module.exports:
 			</p>
 			<code>
 //=============================================================================
@@ -212,30 +215,33 @@ if (typeof exports !== 'undefined')
 			</code>
 		</div>
 
-		<h2>Dealing with dependencies（处理依赖）</h2>
+		<h2>Dealing with dependencies</h2>
 		<div>
 			<p>
-				如果你已经使用了聪明的东西，比如require.js或browserify，请跳过这一部分。
+				If you're already using something clever like require.js or browserify, skip this part.
 			</p>
 			<p>
-				通常一个three.js项目会在浏览器运行。浏览器通过执行一堆标签脚本来加载模块。你的个人文件没必要担心依赖问题。但在nodejs上下文中，没有index.html绑定这些，所以必须显式声明。
+				Typically a three.js project is going to run in the browser. Module loading is hence done by
+				the browser executing a bunch of script tags. Your individual files don't have to worry
+				about dependencies. In a nodejs context however, there is no index.html binding everything
+				together, so you have to be explicit.
 			</p>
 			<p>
-				如果您要导出依赖于其他文件的模块，则必须告诉节点加载它们。
-				这是一种方法：
+				If you're exporting a module that depends on other files, you're going to have to tell node to load them.
+				Here is one approach:
 			</p>
 			<ol>
 				<li>
-				在模块开始时，检查您是否在nodejs环境中。
+					At the start of your module, check to see if you're in a nodejs environment.
 				</li>
 				<li>
-				如果是这样，请显式声明您的依赖项。
+					If so, explicitly declare your dependencies.
 				</li>
 				<li>
-						如果没有，您可能在浏览器中，因此您不需要做任何其他事情。
+					If not, you're probably in a browser so you don't need to do anything else.
 				</li>
 			</ol>
-			Example 代码来自Physics.js:
+			Example code from Physics.js:
 			<code>
 //=============================================================================
 // setup for server-side testing
