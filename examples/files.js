@@ -167,6 +167,7 @@ var files = {
 		"webgl_materials_shaders_fresnel",
 		"webgl_materials_skin",
 		"webgl_materials_standard",
+		"webgl_materials_texture_3d",
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_canvas",
 		"webgl_materials_texture_filters",
