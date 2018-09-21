@@ -111,8 +111,6 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.PlaneBufferGeometry( planeWidth, planeHeight );
-
 				// width 256, height 256, depth 109, 8-bit, zip archived raw data
 
 				new THREE.FileLoader()
@@ -138,6 +136,8 @@
 						vertexShader: document.getElementById( 'vs' ).textContent.trim(),
 						fragmentShader: document.getElementById( 'fs' ).textContent.trim()
 					} );
+
+					var geometry = new THREE.PlaneBufferGeometry( planeWidth, planeHeight );
 
 					mesh = new THREE.Mesh( geometry, material );
 
