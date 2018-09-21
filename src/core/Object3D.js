@@ -29,6 +29,32 @@ function Object3D() {
 	this.parent = null;
 	this.children = [];
 
+	var scene = null;
+
+	Object.defineProperty( this, 'scene', {
+
+		get: function () {
+
+			return scene;
+
+		},
+
+		set: function ( value ) {
+
+			if ( scene === value ) return;
+
+			scene = ( ! value && this.isScene ) ? this : value;
+
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+				this.children[ i ].scene = scene;
+
+			}
+
+		}
+
+	} );
+
 	this.up = Object3D.DefaultUp.clone();
 
 	var position = new Vector3();
@@ -382,6 +408,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			}
 
 			object.parent = this;
+
+			object.scene = this.scene;
+
 			object.dispatchEvent( { type: 'added' } );
 
 			this.children.push( object );
@@ -415,6 +444,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( index !== - 1 ) {
 
 			object.parent = null;
+
+			object.scene = null;
 
 			object.dispatchEvent( { type: 'removed' } );
 
