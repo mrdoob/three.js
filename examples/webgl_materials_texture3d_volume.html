@@ -133,8 +133,8 @@
 				volmaterial.side = THREE.BackSide;  // The volume shader uses the backface as its "reference point"
 
 				// Apply standard volume material uniform info
-				volmaterial.uniforms.u_data = { type: 't', value: texture };
-				volmaterial.uniforms.u_size = { type: 'v3', value: [ volume.xLength, volume.yLength, volume.zLength ] };
+				volmaterial.uniforms.u_data.value = texture;
+				volmaterial.uniforms.u_size.value = [ volume.xLength, volume.yLength, volume.zLength ];
 
 				// Geometry for the volume
 				var volgeometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
@@ -194,10 +194,10 @@
 
 			config = this.volumeConfig;
 
-			this.volmaterial.uniforms.u_clim = { type: 'v2', value: [ config.clim1, config.clim2 ] };
-			this.volmaterial.uniforms.u_renderstyle = { type: 'int', value: config.renderstyle == 'mip' ? 0 : 1 }; // 0: MIP, 1: ISO
-			this.volmaterial.uniforms.u_renderthreshold = { type: 'f', value: config.isothreshold };  // For ISO renderstyle
-			this.volmaterial.uniforms.u_cmdata = { type: 't', value: this.cmtextures[config.colormap] };
+			this.volmaterial.uniforms.u_clim.value = [ config.clim1, config.clim2 ];
+			this.volmaterial.uniforms.u_renderstyle.value = config.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+			this.volmaterial.uniforms.u_renderthreshold.value = config.isothreshold;  // For ISO renderstyle
+			this.volmaterial.uniforms.u_cmdata.value = this.cmtextures[config.colormap];
 
 			this.volmaterial.needsUpdate = true;
 
@@ -233,14 +233,6 @@
 			renderer2.render( scene2, camera2);
 
 			stats.update();
-
-		}
-
-		function rotateAroundWorldAxis(object, axis, radians) {
-			var rotWorldMatrix = new THREE.Matrix4();
-			rotWorldMatrix.makeRotationAxis( axis.normalize(), radians );
-
-			object.applyMatrix( rotWorldMatrix );
 
 		}
 
