@@ -132,7 +132,7 @@
 					var material = new THREE.ShaderMaterial( {
 						uniforms: {
 							diffuse: { value: texture },
-							depth: { value: 0 },// 50 / 109 },
+							depth: { value: 0 },
 							size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent.trim(),
