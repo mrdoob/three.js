@@ -10,11 +10,11 @@
 	<body>
 		[page:Material] &rarr;
 
-		<h1>[name]</h1>
+		<h1>点材质([name])</h1>
 
-		<p class="desc">The default material used by [page:Points].</p>
+		<p class="desc">[page:Points]使用的默认材质。</p>
 
-		<h2>Examples</h2>
+		<h2>例子(Examples)</h2>
 		<p>
 			[example:misc_controls_fly misc / controls / fly]<br />
 			[example:webgl_buffergeometry_drawcalls WebGL / BufferGeometry / drawcalls]<br />
@@ -56,44 +56,41 @@ scene.add( starField );
 		</code>
 
 		<h3>[name]( [param:Object parameters] )</h3>
-		<p>
-			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
-			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。<br /><br />
 
-			The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-			string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:Material] class for common properties.</p>
+		<h2>属性(Properties)</h2>
+		<p>常用属性请参见基类[page:Material]。</p>
 
 		<h3>[property:Color color]</h3>
-		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
+		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
 
 		<h3>[property:Boolean isPointsMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are points materials. Default is *true*.<br /><br />
+		<p> 用于检查此类或派生类是否为点材质。默认值为 *true*。<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			因为其通常用在内部优化，所以不应该更改该属性值。
 		</p>
 
 		<h3>[property:Texture map]</h3>
 
-		<p>Sets the color of the points using data from a [page:Texture].</p>
+		<p>使用[page:Texture]中的数据设置点的颜色。</p>
 
 		<h3>[property:Boolean morphTargets]</h3>
-		<p>Define whether the material uses morphTargets. Default is false.</p>
+		<p>材质是否使用morphTargets。默认值为false。</p>
 
 		<h3>[property:Number size]</h3>
-		<p>Sets the size of the points. Default is 1.0.</p>
+		<p>设置点的大小。默认值为1.0。</p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
-		<p>Specify whether points' size is attenuated by the camera depth. (Perspective camera only.) Default is true.</p>
+		<p>指定点的大小是否因相机深度而衰减。（仅限透视摄像头。）默认为true。 </p>
 
 
-		<h2>Methods</h2>
+		<h2>方法(Methods)</h2>
 
-		<h2>Source</h2>
+		<h2>源码(Source)</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
