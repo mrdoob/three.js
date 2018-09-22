@@ -48,7 +48,21 @@ THREE.FBXLoader = ( function () {
 
 			loader.load( url, function ( buffer ) {
 
-				onLoad( self.parse( buffer, path ) );
+				try {
+
+					onLoad( self.parse( buffer, path ) );
+
+				} catch ( error ) {
+
+					setTimeout( function () {
+
+						if ( onError ) onError( error );
+
+						self.manager.itemError( url );
+
+					}, 0 );
+
+				}
 
 			}, onProgress, onError );
 
@@ -300,8 +314,6 @@ THREE.FBXLoader = ( function () {
 					return;
 
 			}
-
-			console.log();
 
 			if ( typeof content === 'string' ) { // ASCII format
 
