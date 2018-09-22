@@ -41,16 +41,16 @@ THREE.FBXLoader = ( function () {
 
 			var self = this;
 
-			var resourceDirectory = THREE.LoaderUtils.extractUrlBase( url );
+			var path = ( self.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : self.path;
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
+
 			loader.load( url, function ( buffer ) {
 
 				try {
 
-					var scene = self.parse( buffer, resourceDirectory );
-					onLoad( scene );
+					onLoad( self.parse( buffer, path ) );
 
 				} catch ( error ) {
 
@@ -68,6 +68,20 @@ THREE.FBXLoader = ( function () {
 
 		},
 
+		setPath: function ( value ) {
+
+			this.path = value;
+			return this;
+
+		},
+
+		setResourcePath: function ( value ) {
+
+			this.resourcePath = value;
+			return this;
+
+		},
+
 		setCrossOrigin: function ( value ) {
 
 			this.crossOrigin = value;
@@ -75,7 +89,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		parse: function ( FBXBuffer, resourceDirectory ) {
+		parse: function ( FBXBuffer, path ) {
 
 			if ( isFbxFormatBinary( FBXBuffer ) ) {
 
@@ -103,7 +117,7 @@ THREE.FBXLoader = ( function () {
 
 			// console.log( fbxTree );
 
-			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ).setCrossOrigin( this.crossOrigin );
+			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 			return new FBXTreeParser( textureLoader ).parse( fbxTree );
 
@@ -282,7 +296,10 @@ THREE.FBXLoader = ( function () {
 
 						if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
 
-							THREE.Loader.Handlers.add( /\.tga$/i, new THREE.TGALoader() );
+							var tgaLoader = new THREE.TGALoader();
+							tgaLoader.setPath( this.textureLoader.path );
+
+							THREE.Loader.Handlers.add( /\.tga$/i, tgaLoader );
 
 						}
 
