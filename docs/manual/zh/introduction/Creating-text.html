@@ -17,7 +17,7 @@
 		<h2>1. DOM + CSS</h2>
 		<div>
 			<p>
-				使用HTML是通常是最简单、最快的添加文本的方法，这是大多数的Three.js示例中用于添加描述性叠加文字的方法。
+				使用HTML通常是最简单、最快速的添加文本的方法，这是大多数的Three.js示例中用于添加描述性叠加文字的方法。
 			</p>
 			<p>你可以在这里添加内容</p>
 			<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
@@ -55,18 +55,18 @@
 
 
 
-		<h2>4. three.js自带的文字几何体Procedural Text Geometry</h2>
+		<h2>4. three.js自带的文字几何体</h2>
 		<div>
 			<p>
-				如果你更喜欢使用纯three.js来工作或者创建能够由程序改变的、动态的3D文字，你可以创建一个其几何体为THREE.TextGeometry实例的网格：
+				如果你更喜欢使用纯three.js来工作，或者创建能够由程序改变的、动态的3D文字，你可以创建一个其几何体为THREE.TextGeometry的实例的网格：
 			</p>
 			<p>
 				<code>new THREE.TextGeometry( text, parameters );</code>
 			</p>
 			<p>
-				然而，为了使得它能够工作，你的TextGeometry需要在其“font”参数上设置一个THREE.Font的实例
-
-				请参阅 [page:TextGeometry] 页面来阅读如何完成此操作的详细信息，以及每一个接收的参数的描述，还有由three.js分发的自带JSON字体的列表。
+				然而，为了使得它能够工作，你的TextGeometry需要在其“font”参数上设置一个THREE.Font的实例。
+<br>
+				请参阅 [page:TextGeometry] 页面来阅读如何完成此操作的详细信息，以及每一个接收的参数的描述，还有由three.js分发、自带的JSON字体的列表。
 			</p>
 
 			<h3>示例</h3>
@@ -75,8 +75,8 @@
 			[example:webgl_shadowmap WebGL / shadowmap]
 
 			<p>
-				如果Typeface已经关闭，或者没有你所想使用的字体，这有一个教程，这是一个在blender上运行的python脚本，能够让你将文字导出为Three.js的JSON格式。
-				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
+				如果Typeface已经关闭，或者没有你所想使用的字体，这有一个教程:[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]<br>
+				这是一个在blender上运行的python脚本，能够让你将文字导出为Three.js的JSON格式。
 				</p>
 
 		</div>
@@ -91,7 +91,7 @@
 			</p>
 			<p>
 				现有库存的字体在项目中同样可用，就像[link:https://github.com/etiennepinchon/aframe-fonts A-Frame Fonts]一样，
-				或者你也可以从任何TTF字体中创建你自己的自己，优化时只包含项目中所需的字符即可。
+				或者你也可以从任何TTF字体中创建你自己的字体，优化时，只需要包含项目中所需的字符即可。
 			</p>
 			<p>
 				这是一些有用的工具：
