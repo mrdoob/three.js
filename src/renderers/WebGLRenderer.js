@@ -1037,6 +1037,10 @@ function WebGLRenderer( parameters ) {
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 
+		// Update scene camera
+
+		scene.currentCamera = camera;
+
 		// update scene graph
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();

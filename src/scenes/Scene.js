@@ -10,6 +10,7 @@ function Scene() {
 
 	this.type = 'Scene';
 
+	this.currentCamera = null;
 	this.background = null;
 	this.fog = null;
 	this.overrideMaterial = null;
