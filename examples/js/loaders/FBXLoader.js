@@ -1424,31 +1424,26 @@ THREE.FBXLoader = ( function () {
 
 		setupMorphMaterials: function () {
 
+			var self = this;
 			sceneGraph.traverse( function ( child ) {
 
 				if ( child.isMesh ) {
 
-					if ( child.geometry.morphAttributes.position || child.geometry.morphAttributes.normal ) {
+					if ( child.geometry.morphAttributes.position && child.geometry.morphAttributes.position.length ) {
 
-						var uuid = child.uuid;
-						var matUuid = child.material.uuid;
+						if ( Array.isArray( child.material ) ) {
 
-						// if a geometry has morph targets, it cannot share the material with other geometries
-						var sharedMat = false;
+							child.material.forEach( function ( material, i ) {
 
-						sceneGraph.traverse( function ( child ) {
+								self.setupMorphMaterial( child, material, i );
 
-							if ( child.isMesh ) {
+							} );
 
-								if ( child.material.uuid === matUuid && child.uuid !== uuid ) sharedMat = true;
+						} else {
 
-							}
+							self.setupMorphMaterial( child, child.material );
 
-						} );
-
-						if ( sharedMat === true ) child.material = child.material.clone();
-
-						child.material.morphTargets = true;
+						}
 
 					}
 
@@ -1457,6 +1452,44 @@ THREE.FBXLoader = ( function () {
 			} );
 
 		},
+
+		setupMorphMaterial: function ( child, material, index ) {
+
+			var uuid = child.uuid;
+			var matUuid = material.uuid;
+
+			// if a geometry has morph targets, it cannot share the material with other geometries
+			var sharedMat = false;
+
+			sceneGraph.traverse( function ( node ) {
+
+				if ( node.isMesh ) {
+
+					if ( Array.isArray( node.material ) ) {
+
+						node.material.forEach( function ( mat ) {
+
+							if ( mat.uuid === matUuid && node.uuid !== uuid ) sharedMat = true;
+
+						} );
+
+					} else if ( node.material.uuid === matUuid && node.uuid !== uuid ) sharedMat = true;
+
+				}
+
+			} );
+
+			if ( sharedMat === true ) {
+
+				var clonedMat = material.clone();
+				clonedMat.morphTargets = true;
+
+				if ( index === undefined ) child.material = clonedMat;
+				else child.material[ index ] = clonedMat;
+
+			} else material.morphTargets = true;
+
+		}
 
 	};
 
@@ -2608,7 +2641,7 @@ THREE.FBXLoader = ( function () {
 			var initialRotation = new THREE.Quaternion();
 			var initialScale = new THREE.Vector3();
 
-			rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
+			if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
 
 			initialPosition = initialPosition.toArray();
 			initialRotation = new THREE.Euler().setFromQuaternion( initialRotation, rawTracks.eulerOrder ).toArray();
