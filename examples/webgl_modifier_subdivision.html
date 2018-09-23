@@ -29,7 +29,7 @@
 
 			var camera, controls, scene, renderer;
 
-			var cube, mesh, material, geometry, group, wireframe;
+			var subMesh, mesh, material, geometry, group, wireframe, clock;
 
 			// Create new object by parameters
 
@@ -50,8 +50,8 @@
 			var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.15, transparent: true } );
 			var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-
-			// Cube
+			var staticGeometry = new THREE.Geometry();
+			var tempVec = new THREE.Vector3();
 
 			var materials = [];
 
@@ -128,6 +128,9 @@
 			var info;
 			var modifier;
 			var geometryIndex = 0;
+			var pulse = true;
+			var pulseTime = 3;
+			var sharpness = 0;
 
 			// start scene
 
@@ -143,6 +146,42 @@
 					modifier.modify();
 
 				}
+
+				updateDisplay();
+
+			}
+
+			function nextSharpness( x ) {
+
+				setSharpness( sharpness + x )
+
+			}
+
+			function setSharpness( newSharpness, reset ) {
+
+				var edges = modifier._baseStructure.edges;
+
+				for ( var edge in edges ) {
+
+					if ( edges.hasOwnProperty( edge ) ) {
+
+						if (
+							( sharpness !== 0 && edges[ edge ].sharpness !== 0 )
+							|| ( ( sharpness === 0 || reset ) && Math.random() > 0.5 )
+						) {
+
+							edges[ edge ].sharpness = newSharpness;
+
+						}
+
+					}
+
+				}
+
+				sharpness = newSharpness;
+
+				modifier.reset();
+				modifier.modify();
 
 				updateDisplay();
 
@@ -170,6 +209,51 @@
 
 			}
 
+			function togglePulse() {
+
+				pulse = ! pulse;
+
+				if ( pulse ) {
+
+					var shift = ( typeof performance === 'undefined' ? Date : performance ).now() - ( clock.elapsedTime * 1000 ) - clock.startTime;
+
+					clock.startTime += shift;
+					clock.oldTime += shift;
+					clock.running = true;
+
+				} else {
+
+					clock.stop();
+
+				}
+
+			}
+
+			function doPulse() {
+
+				var time = clock.getElapsedTime();
+
+				var cycleTime = time % ( geometry.vertices.length * pulseTime );
+
+				var vertTime = cycleTime % pulseTime;
+
+				var i = Math.floor( cycleTime / pulseTime );
+
+				var scale = 1 + ( 1 - Math.cos( vertTime / pulseTime * 2 * Math.PI ) )
+					* 0.25
+					/ ( geometriesParams[ geometryIndex ].meshScale ? geometriesParams[ geometryIndex ].meshScale : 1 );
+
+				tempVec.copy( staticGeometry.vertices[ i ] ).multiplyScalar( scale );
+
+				geometry.vertices[ i ].copy( tempVec );
+				geometry.verticesNeedUpdate = true;
+
+				modifier.update( [ i ] );
+
+				wireframe.geometry = new THREE.WireframeGeometry( modifier.geometry );
+
+			}
+
 			function updateInfo() {
 
 				var params = geometriesParams[ geometryIndex ];
@@ -191,6 +275,9 @@
 					'<br><br>Subdivisions: ' + modifier.subdivisions +
 					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
 					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
+					'<br>Pulse: <input type="checkbox" onclick="togglePulse()" ' + ( pulse ? 'checked' : '' ) + ' />' +
+					' Sharp Edges: ' + sharpness +
+					' <a href="#" onclick="nextSharpness(1); return false;">more</a>/<a href="#" onclick="nextSharpness(-1); return false;">less</a>' +
 					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + modifier.geometry.vertices.length +
 					'<br>Face count: before ' + geometry.faces.length + ' after ' + modifier.geometry.faces.length
 
@@ -198,12 +285,12 @@
 
 			function addStuff() {
 
-				if ( cube !== undefined ) {
+				if ( subMesh !== undefined ) {
 
 					geometry.dispose();
 
 					scene.remove( group );
-					scene.remove( cube );
+					scene.remove( subMesh );
 
 				}
 
@@ -219,9 +306,9 @@
 
 				}
 
-				modifier = new THREE.SubdivisionModifier( geometry, 2 );
+				staticGeometry.copy( geometry );
 
-				modifier.modify();
+				modifier = new THREE.SubdivisionModifier( geometry, 2 );
 
 				group = new THREE.Group();
 				scene.add( group );
@@ -229,15 +316,19 @@
 				mesh = new THREE.Mesh( geometry, material );
 				group.add( mesh );
 
-				cube = new THREE.Mesh( modifier.geometry, smoothMaterial );
+				subMesh = new THREE.Mesh( modifier.geometry, smoothMaterial );
 				wireframe = new THREE.LineSegments( new THREE.WireframeGeometry(modifier.geometry), wireframeMaterial );
 
-				cube.add( wireframe );
+				subMesh.add( wireframe );
 
-				cube.scale.setScalar( params.meshScale ? params.meshScale : 1 );
-				scene.add( cube );
+				subMesh.scale.setScalar( params.meshScale ? params.meshScale : 1 );
+				scene.add( subMesh );
 
-				group.scale.copy( cube.scale );
+				group.scale.copy( subMesh.scale );
+
+				setSharpness( sharpness, true );
+
+				modifier.modify();
 
 				updateDisplay();
 
@@ -265,13 +356,15 @@
 
 				}
 
-				wireframe.geometry = new THREE.WireframeGeometry(modifier.geometry);
+				wireframe.geometry = new THREE.WireframeGeometry( modifier.geometry );
 
 				updateInfo();
 
 			}
 
 			function init() {
+
+				clock = new THREE.Clock();
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -293,6 +386,10 @@
 				var light = new THREE.PointLight( 0xffffff, 1.5 );
 				light.position.set( 1000, 1000, 2000 );
 				scene.add( light );
+
+				var light2 = new THREE.PointLight( 0xffffff, 0.5 );
+				light2.position.set( -1000, -1000, -2000 );
+				scene.add( light2 );
 
 				addStuff();
 
@@ -328,7 +425,11 @@
 				requestAnimationFrame( animate );
 
 				stats.begin();
+
+				if ( pulse ) doPulse();
+
 				render();
+
 				stats.end();
 
 			}

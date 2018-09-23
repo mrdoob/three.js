@@ -216,7 +216,9 @@ THREE.SubdivisionModifier = class SubdivisionModifier {
 
 		this._baseGeometry.mergeVertices();
 
-		this.init( false );
+		this.calculateStructure( false );
+
+		this.reset();
 
 	}
 
@@ -308,7 +310,7 @@ THREE.SubdivisionModifier = class SubdivisionModifier {
 	 * Create model of base mesh structure.
 	 * @param {boolean} keepEdgeSharpness Retain edge sharpeness from current edge structure? Otherwise set all edges to smooth.
 	 */
-	init( keepEdgeSharpness ) {
+	calculateStructure( keepEdgeSharpness ) {
 
 		if ( this.WARNINGS ) console.info( 'init: create base geometry structure.' );
 
@@ -325,12 +327,10 @@ THREE.SubdivisionModifier = class SubdivisionModifier {
 
 		this.geometry = this.geometry || new THREE.Geometry();
 
-		this.geometry.copy( this._baseGeometry );
-
 	}
 
 	/**
-	 * Reinitialize subdivision. Keep base geometry and structure.
+	 * [Re]initialize subdivision. Keep base geometry and structure.
 	 */
 	reset() {
 
@@ -338,9 +338,9 @@ THREE.SubdivisionModifier = class SubdivisionModifier {
 
 		this.activeSubdivisions = 0;
 
-		this.geometry.copy( this._baseGeometry );
-
 		this._subdivStructure = this._baseStructure;
+
+		this.geometry.copy( this._baseGeometry );
 
 		// Initialize vertex weights, for quick updating. Initially, each vertex is solely dependent on itself.
 		this.vertexWeights = [];
@@ -364,7 +364,7 @@ THREE.SubdivisionModifier = class SubdivisionModifier {
 
 		if ( this.WARNINGS ) console.info( 'Apply modifier: ', this.subdivisions, ' subdivisions.' );
 
-		if ( ! this.activeSubdivisions || this.activeSubdivisions >= this.subdivisions ) {
+		if ( this.activeSubdivisions > this.subdivisions ) {
 
 			this.reset();
 
@@ -442,12 +442,6 @@ THREE.SubdivisionModifier = class SubdivisionModifier {
 
 		this.geometry.verticesNeedUpdate = true;
 		this.geometry.computeVertexNormals();
-
-		if ( this.geometry.faceVertexUvs[ 0 ] !== undefined ) {
-
-			this.geometry.uvsNeedUpdate = true;
-
-		}
 
 	}
 
