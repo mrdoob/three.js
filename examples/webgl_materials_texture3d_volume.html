@@ -49,16 +49,13 @@
 
 	<script src="../build/three.js"></script>
 
-	<script src="js/controls/OrthographicTrackballControls.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
 
 	<script src="js/Volume.js"></script>
-	<script src="js/VolumeSlice.js"></script>
 	<script src="js/loaders/NRRDLoader.js"></script>
 	<script src="js/shaders/VolumeShader.js"></script>
 
 	<script src="js/Detector.js"></script>
-	<script src="js/libs/stats.min.js"></script>
 	<script src="js/libs/gunzip.min.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
 
@@ -67,46 +64,67 @@
 		if ( ! Detector.webgl ) { Detector.addGetWebGLMessage(); }
 
 		var container,
-			stats,
+			renderer,
+			scene,
 			camera,
 			controls,
-			scene,
-			renderer,
-			gui;
+			volmaterial,
+			volconfig,
+			cmtextures,
+			gui,
+			drawrequested;
 
 		init();
-		animate();
 
 		function init() {
 
-			// The volume renderer does not work very well with perspective yet
-			//camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
-			camera = new THREE.OrthographicCamera()
-			camera.position.z = 1000;
-			this.camera.right = window.innerWidth / 5.0;
-			this.camera.left = -this.camera.right;
-			this.camera.top = window.innerHeight / 5.0;
-			this.camera.bottom = -this.camera.top;
-			this.camera.near = 0.1;
-			this.camera.far = 5000;
-
-			this.camera.updateProjectionMatrix();
-
 			scene = new THREE.Scene();
 
+			// Create renderer
+			var canvas = document.createElement( 'canvas' );
+			var context = canvas.getContext( 'webgl2' );
+			renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+
+			// Attach renderer to DOM
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			container.appendChild( renderer.domElement );
+
+			// Create camera (The volume renderer does not work very well with perspective yet)
+			camera = new THREE.OrthographicCamera()
+			camera.position.z = 1000;
+			camera.near = 0.1;
+			camera.far = 5000;
+			camera.up = new THREE.Vector3( 0, 0, 1 );  // In our data, z is the up/down axis !!
 			scene.add( camera );
 
-			// light
+			// Create controls
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.addEventListener( 'change', animate );
+			controls.target.set( 64, 64, 128 );
+			controls.enableDamping  = false;
+			controls.update();
 
-			var dirLight = new THREE.DirectionalLight( 0xffffff );
-			dirLight.position.set( 200, 200, 1000 ).normalize();
+			// Lighting is backed into the shader a.t.m.
+			// var dirLight = new THREE.DirectionalLight( 0xffffff );
 
-			camera.add( dirLight );
-			camera.add( dirLight.target );
+			// The gui for interaction
+			volconfig = { clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'viridis' };
+			var gui = new dat.GUI();
+			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
+			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
+			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
+			// Keep track of window size (and initialize now)
+			window.addEventListener( 'resize', onWindowResize, false );
+			onWindowResize();
+
+			// Load the data ...
 			var loader = new THREE.NRRDLoader();
 			loader.load( "models/nrrd/stent.nrrd", function ( volume ) {
-
+				window.volume = volume;
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
 				// THREEJS will select R32F (33326) based on the RedFormat and FloatType.
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
@@ -119,13 +137,13 @@
 				texture.needsUpdate = true;
 
 				// Colormap textures
-				this.cmtextures = {
+				cmtextures = {
 					viridis: new THREE.TextureLoader().load( 'textures/cm_viridis.png' ),
 					gray: new THREE.TextureLoader().load( 'textures/cm_gray.png' )
 				};
 
 				// Material (shaders) to render the volume using raycasting
-				var volmaterial = new THREE.ShaderMaterial( THREE.VolumeRenderShader1 );
+				volmaterial = new THREE.ShaderMaterial( THREE.VolumeRenderShader1 );
 				volmaterial.side = THREE.BackSide;  // The volume shader uses the backface as its "reference point"
 
 				// Apply standard volume material uniform info
@@ -138,83 +156,57 @@
 				var volcube = new THREE.Mesh( volgeometry, volmaterial );
 				scene.add( volcube );
 
-				// Support modifying volume rendering settings at runtime
-				this.volmaterial = volmaterial;
-				this.volumeConfig = { clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'viridis' };
+				// Apply uniforms now, this will call animate(), but apparently that's not enough sometimes
 				this.updateUniforms();
-
-				gui.add( volumeConfig, 'clim1', 0, 1, 0.01 ).onChange( this.updateUniforms.bind( this ) );
-				gui.add( volumeConfig, 'clim2', 0, 1, 0.01 ).onChange( this.updateUniforms.bind( this ) );
-				gui.add( volumeConfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( this.updateUniforms.bind( this ) );
-				gui.add( volumeConfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( this.updateUniforms.bind( this ) );
-				gui.add( volumeConfig, 'isothreshold', 0, 1, 0.01 ).onChange( this.updateUniforms.bind( this ) );
-
-				// TODO: the texture coordinates currently map directly to world coordinates. That's why we translate
-				// the geometry above. We'd need to add a material attribute with texture coordinates to fix this.
+				window.setTimeout(animate, 100);
+				window.setTimeout(animate, 1000);
 
 			} );
-
-			// renderer
-			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( 'webgl2' );
-			renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-
-			container = document.createElement( 'div' );
-			document.body.appendChild( container );
-			container.appendChild( renderer.domElement );
-
-			controls = new THREE.OrthographicTrackballControls( camera, renderer.domElement );
-			//controls = new THREE.OrbitControls( camera, renderer.comElement );
-			//controls.addEventListener( 'change', this.animate.bind(this) );
-			controls.target.set( 64, 64, 128 );
-			controls.zoomSpeed = -1.0;  // trackball does it wrong
-			controls.staticMoving = true;
-			//controls.dynamicDampingFactor = 0.3;
-
-			stats = new Stats();
-			container.appendChild( stats.dom );
-
-			var gui = new dat.GUI();
-
-			window.addEventListener( 'resize', onWindowResize, false );
 
 		}
 
 		function updateUniforms() {
 
-			config = this.volumeConfig;
+			volmaterial.uniforms.u_clim.value = [ volconfig.clim1, volconfig.clim2 ];
+			volmaterial.uniforms.u_renderstyle.value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+			volmaterial.uniforms.u_renderthreshold.value = volconfig.isothreshold;  // For ISO renderstyle
+			volmaterial.uniforms.u_cmdata.value = cmtextures[volconfig.colormap];
 
-			this.volmaterial.uniforms.u_clim.value = [ config.clim1, config.clim2 ];
-			this.volmaterial.uniforms.u_renderstyle.value = config.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-			this.volmaterial.uniforms.u_renderthreshold.value = config.isothreshold;  // For ISO renderstyle
-			this.volmaterial.uniforms.u_cmdata.value = this.cmtextures[config.colormap];
-
-			this.volmaterial.needsUpdate = true;
+			volmaterial.needsUpdate = true;
+			animate();
 
 		}
 
 		function onWindowResize() {
 
-			this.camera.right = window.innerWidth / 5.0;
-			this.camera.left = -this.camera.right;
-			this.camera.top = window.innerHeight / 5.0;
-			this.camera.bottom = -this.camera.top;
+			camera.right = window.innerWidth / 5.0;
+			camera.left = -camera.right;
+			camera.top = window.innerHeight / 5.0;
+			camera.bottom = -camera.top;
 			camera.updateProjectionMatrix();
 
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
-			controls.handleResize();
+			if (controls.handleResize) { controls.handleResize(); }
 
+			animate();
 		}
 
 		function animate() {
 
-			requestAnimationFrame( animate );
-			controls.update();
+			// throttled animate function
+			if ( !drawrequested ) {
+				drawrequested = true;
+				window.requestAnimationFrame( _animate );
+			}
+
+		}
+
+		function _animate() {
+
+			drawrequested = false;
 			renderer.render( scene, camera );
-			stats.update();
 
 		}
 
