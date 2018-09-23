@@ -19,6 +19,7 @@ var list = {
 
 		"Next Steps": {
 			"How to update things": "manual/{lan}/introduction/How-to-update-things",
+			"How to create VR content": "manual/{lan}/introduction/How-to-create-VR-content",
 			"Matrix transformations": "manual/{lan}/introduction/Matrix-transformations",
 			"Animation system": "manual/{lan}/introduction/Animation-system"
 		},
