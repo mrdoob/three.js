@@ -1254,28 +1254,28 @@ THREE.GLTFLoader = ( function () {
 
 			if ( hasMorphPosition ) {
 
-				pendingPositionAccessors.push(
-					target.POSITION !== undefined
-						? parser.getDependency( 'accessor', target.POSITION )
-							.then( function ( accessor ) {
-								// Cloning not to pollute original accessor below
-								return cloneBufferAttribute( accessor );
-							} )
-						: geometry.attributes.position
-				);
+				var accessor = target.POSITION !== undefined
+					? parser.getDependency( 'accessor', target.POSITION )
+						.then( function ( accessor ) {
+							// Cloning not to pollute original accessor below
+							return cloneBufferAttribute( accessor );
+						} )
+					: geometry.attributes.position;
+
+				pendingPositionAccessors.push( accessor );
 
 			}
 
 			if ( hasMorphNormal ) {
 
-				pendingNormalAccessors.push(
-					target.NORMAL !== undefined
-						? parser.getDependency( 'accessor', target.NORMAL )
-							.then( function ( accessor ) {
-								return cloneBufferAttribute( accessor );
-							} )
-						: geometry.attributes.normal
-				);
+				var accessor = target.NORMAL !== undefined
+					? parser.getDependency( 'accessor', target.NORMAL )
+						.then( function ( accessor ) {
+							return cloneBufferAttribute( accessor );
+						} )
+					: geometry.attributes.normal;
+
+				pendingNormalAccessors.push( accessor );
 
 			}
 
@@ -2539,11 +2539,11 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0, il = primitives.length; i < il; i ++ ) {
 
-			pending.push(
-				primitives[ i ].material === undefined
-					? createDefaultMaterial()
-					: this.getDependency( 'material', primitives[ i ].material )
-			);
+			var material = primitives[ i ].material === undefined
+				? createDefaultMaterial()
+				: this.getDependency( 'material', primitives[ i ].material );
+
+			pending.push( material );
 
 		}
 
