@@ -63,10 +63,9 @@
 	void main() {
 
 		vec4 color = texture( diffuse, vUv );
-		color.r *= 1.5; // lighten a bit
-		color.gb = vec2( color.r );
 
-		out_FragColor = vec4( color.rgb, 1.0 );
+		// lighten a bit
+		out_FragColor = vec4( color.rrr * 1.5, 1.0 );
 
 	}
 	</script>
