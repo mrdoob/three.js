@@ -2303,7 +2303,7 @@ THREE.GLTFLoader = ( function () {
 
 		var pending = [];
 
-		function loadAttributeAccessor( accessorIndex, attributeName ) {
+		function assignAttributeAccessor( accessorIndex, attributeName ) {
 
 			return parser.getDependency( 'accessor', accessorIndex )
 				.then( function ( accessor ) {
@@ -2323,7 +2323,7 @@ THREE.GLTFLoader = ( function () {
 			// Skip attributes already provided by e.g. Draco extension.
 			if ( threeAttributeName in geometry.attributes ) continue;
 
-			pending.push( loadAttributeAccessor( attributes[ gltfAttributeName ], threeAttributeName ) );
+			pending.push( assignAttributeAccessor( attributes[ gltfAttributeName ], threeAttributeName ) );
 
 		}
 
