@@ -13,58 +13,54 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Used by the [page:CubeCamera] as its [page:WebGLRenderTarget].
+		被[page:CubeCamera]作为它的[page:WebGLRenderTarget]使用
 		</p>
 
-		<h2>Examples</h2>
+		<h2>例子</h2>
 
-		<p>See [page:CubeCamera] for examples.</p>
+		<p>有关示例请参阅[page:CubeCamera]</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]([param:Number width], [param:Number height], [param:Object options])</h3>
 		<p>
-		[page:Float width] - The width of the renderTarget. <br />
-		[page:Float height] - The height of the renderTarget. <br />
-		options - (optional) object that holds texture parameters for an auto-generated target
-		texture and depthBuffer/stencilBuffer booleans.
+		[page:Float width] - renderTarget的宽度 <br />
+		[page:Float height] - renderTarget的高度 <br />
+		options - (可选)一个保存着自动生成的目标纹理的纹理参数以及表示是否使用深度缓存/模板缓存的布尔值的对象。
+		有关纹理参数的说明，请参阅[page:Texture Texture]. 以下是合理选项：<br /><br />
 
-		For an explanation of the texture parameters see [page:Texture Texture]. The following are
-		valid options:<br /><br />
+		[page:Constant wrapS] - 默认是[page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant wrapT] - 默认是[page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant magFilter] - 默认是[page:Textures .LinearFilter]. <br />
+		[page:Constant minFilter] - 默认是[page:Textures LinearFilter]. <br />
+		[page:Constant format] - 默认是[page:Textures RGBAFormat]. <br />
+		[page:Constant type] - 默认是[page:Textures UnsignedByteType]. <br />
+		[page:Number anisotropy] - 默认是 *1*. 参见[page:Texture.anistropy]<br />
+		[page:Constant encoding] - 默认是[page:Textures LinearEncoding]. <br />
+		[page:Boolean depthBuffer] - 默认是*true*.如果不需要就设为false <br />
+		[page:Boolean stencilBuffer] - 默认是*true*.如果不需要就设为false<br /><br />
 
-		[page:Constant wrapS] - default is [page:Textures ClampToEdgeWrapping]. <br />
-		[page:Constant wrapT] - default is [page:Textures ClampToEdgeWrapping]. <br />
-		[page:Constant magFilter] - default is [page:Textures .LinearFilter]. <br />
-		[page:Constant minFilter] - default is [page:Textures LinearFilter]. <br />
-		[page:Constant format] - default is [page:Textures RGBAFormat]. <br />
-		[page:Constant type] - default is [page:Textures UnsignedByteType]. <br />
-		[page:Number anisotropy] - default is *1*. See [page:Texture.anistropy]<br />
-		[page:Constant encoding] - default is [page:Textures LinearEncoding]. <br />
-		[page:Boolean depthBuffer] - default is *true*. Set this to false if you don't need it. <br />
-		[page:Boolean stencilBuffer] - default is *true*. Set this to false if you don't need it.<br /><br />
-
-		Creates a new [name]
+		创建一个新[name]
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:integer activeCubeFace]</h3>
 		<p>
-		The activeCubeFace property corresponds to a cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) and is
-		used and set internally by the [page:CubeCamera].
+		activeCubeFace属性对应立方体的面(PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) 并由[page:CubeCamera]内部使用和设置
 		</p>
 
-		<h3>See [page:WebGLRenderTarget] for inherited properties</h3>
+		<h3>继承属性，请参阅[page:WebGLRenderTarget]</h3>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
-		<h3>See [page:WebGLRenderTarget] for inherited methods</h3>
+		<h3>继承方法，请参阅[page:WebGLRenderTarget]</h3>
 
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

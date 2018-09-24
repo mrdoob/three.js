@@ -10,11 +10,11 @@
 	<body>
 		[page:Material] &rarr;
 
-		<h1>[name]</h1>
+		<h1>点精灵材质([name])</h1>
 
-		<p class="desc">A material for a use with a [page:Sprite].</p>
+		<p class="desc">一种使用[page:Sprite]的材质。</p>
 
-		<h2>Examples</h2>
+		<h2>例子(Examples)</h2>
 		<div>
 			[example:webgl_sprites WebGL / sprites]<br />
 			[example:misc_ubiquity_test misc / ubiquity / test]<br />
@@ -39,41 +39,40 @@ scene.add( sprite );
 
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
-			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
-			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
+			[page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material] 和 [page:ShaderMaterial]继承的任何属性)。<br /><br />
 
-			The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-			string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
-
-			SpriteMaterials are not clipped by using [page:Material.clippingPlanes].
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），
+			内部调用[page:Color.set](color)。
+			SpriteMaterials不会被[page:Material.clippingPlanes]裁剪。
 		</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Material] class for common properties.</p>
+		<h2>属性(Properties)</h2>
+		<p>常用属性请参见基类[page:Material]。</p>
 
 		<h3>[property:Color color]</h3>
-		<p>[page:Color] of the material, by default set to white (0xffffff). The [page:.map] is mutiplied by the color.</p>
+		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。 [page:.map]会和 color 相乘。</p>
 
 		<h3>[property:boolean fog]</h3>
-		<p>Whether or not this material affected by the scene's fog. Default is false</p>
+		<p>材质是否受场景雾的影响。默认值为*false*。</p>
 
 		<h3>[property:Boolean lights]</h3>
-		<p>Whether the material is affected by lights. Default is *false*.</p>
+		<p>材质是否受到光照的影响。默认值为 *false*。</p>
 
 		<h3>[property:Texture map]</h3>
-		<p>The texture map. Default is null.</p>
+		<p>颜色贴图。默认为null。</p>
 
 		<h3>[property:Radians rotation]</h3>
-		<p>The rotation of the sprite in radians. Default is 0.</p>
+		<p> sprite的转动，以弧度为单位。默认值为0。</p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
-		<p>Whether the size of the sprite is attenuated by the camera depth. (Perspective camera only.) Default is *true*.</p>
+		<p> 精灵的大小是否会被相机深度衰减。（仅限透视摄像头。）默认为*true*。</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:Material] class for common methods.</p>
+		<h2>方法(Methods)</h2>
+		<p>常用方法请参见基类[page:Material]。</p>
 
-		<h2>Source</h2>
+		<h2>源码(Source)</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

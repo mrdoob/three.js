@@ -11,98 +11,89 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			The AnimationMixer is a player for animations on a particular object in the scene. When
-			multiple objects in the scene are animated independently, one AnimationMixer may be used for
-			each object.<br /><br />
+            动画混合器是用于场景中特定对象的动画的播放器。当场景中的多个对象独立动画时，每个对象都可以使用同一个动画混合器。<br /><br />
 
-			For an overview of the different elements of the three.js animation system see the
-			"Animation System" article in the "Next Steps" section of the manual.
+			在使用手册的“下一步”章节中，“动画系统”一文对three.js动画系统中的不同元素作出了概述
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Object3D rootObject] )</h3>
 		<p>
-			[page:Object3D rootObject] - the object whose animations shall be played by this mixer.<br />
+			[page:Object3D rootObject] - 混合器播放的动画所属的对象<br />
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 
 		<h3>[property:Number time]</h3>
 		<p>
-			The global mixer time (in seconds; starting with 0 on the mixer's creation).
+			全局的混合器时间(单位秒; 混合器创建的时刻记作0时刻)
 		</p>
 
 		<h3>[property:Number timeScale]</h3>
 		<p>
-			A scaling factor for the global [page:.time mixer time].<br /><br />
+			全局时间([page:.time mixer time])的比例因子<br /><br />
 
-			Note: Setting the mixer's timeScale to 0 and later back to 1 is a possibility to pause/unpause
-			all actions that are controlled by this mixer.
+			说明: 将混合器的时间比例设为0, 稍后再设置为1，可以暂停/取消暂停由该混合器控制的所有动作。
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
-			Returns an [page:AnimationAction] for the passed clip, optionally using a root object different
-			from the mixer's default root. The first parameter can be either an [page:AnimationClip] object
-			or the name of an AnimationClip.<br /><br />
+			返回所传入的剪辑参数的[page:AnimationAction], 根对象参数可选，默认值为混合器的默认根对象。第一个参数可以是动画剪辑([page:AnimationClip])对象或者动画剪辑的名称。<br /><br />
 
-			If an action fitting the clip and root parameters doesn't yet exist, it will be created by
-			this method. Calling this method several times with the same clip and root parameters always
-			returns the same clip instance.
+			如果不存在符合传入的剪辑和根对象这两个参数的动作, 该方法将会创建一个。传入相同的参数多次调用将会返回同一个剪辑实例。
 		</p>
 
 		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
-			Returns an existing [page:AnimationAction] for the passed clip, optionally using a root object
-			different from the mixer's default root.<br /><br />
+			返回传入剪辑的已有[page:AnimationAction], 根对象参数可选，默认值为混合器的默认根对象。<br /><br />
 
-			The first parameter can be either an [page:AnimationClip] object or the name of an AnimationClip.
+			第一个参数可以是动画剪辑([page:AnimationClip])对象或者动画剪辑的名称。
 		</p>
 
 		<h3>[method:Object3D getRoot]()</h3>
 		<p>
-			Returns this mixer's root object.
+			返回混合器的根对象
 		</p>
 
 		<h3>[method:AnimationMixer stopAllAction]()</h3>
 		<p>
-			Deactivates all previously scheduled actions on this mixer.
+			停用混合器上所有预定的动作
 		</p>
 
 		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
 		<p>
-			Advances the global mixer time and updates the animation.<br /><br />
+			推进混合器时间并更新动画 <br /><br />
 
-			This is usually done in the render loop, passing [page:Clock.getDelta clock.getDelta] scaled by the mixer's [page:.timeScale timeScale]).
+			通常在渲染循环中完成, 传入按照混合器的时间比例([page:.timeScale timeScale])缩放过的[page:Clock.getDelta clock.getDelta]
 		</p>
 
 		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
 
 		<p>
-			Deallocates all memory resources for a clip.
+			释放剪辑的所有内存资源
 		</p>
 
 		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
 		<p>
-			Deallocates all memory resources for a root object.
+			释放根对象的所有内存资源
 		</p>
 
 		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
-			Deallocates all memory resources for an action.
+			释放动作的所有内存资源
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

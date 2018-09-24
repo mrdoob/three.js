@@ -174,6 +174,7 @@ var files = {
 		"webgl_materials_texture_partialupdate",
 		"webgl_materials_texture_rotation",
 		"webgl_materials_texture3d",
+		"webgl_materials_texture3d_volume",
 		"webgl_materials_translucency",
 		"webgl_materials_transparency",
 		"webgl_materials_variations_basic",

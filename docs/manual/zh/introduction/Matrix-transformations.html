@@ -11,55 +11,56 @@
 		<h1>[name]</h1>
 
 		<p>
-		Three.js uses *matrices* to encode 3D transformations---translations (position), rotations, and scaling. Every instance of [page:Object3D] has a [page:Object3D.matrix matrix] which stores that object's position, rotation, and scale. This page describes how to update an object's transformation.
+				Three.js使用*matrix*编码3D变换 - 平移（位置），旋转和缩放。 [page:Object3D]的每个实例都有一个[page:Object3D.matrix matrix]，用于存储该对象的位置，旋转和比例。 本页介绍如何更新对象的转换。
 		</p>
 
-		<h2>Convenience properties and *matrixAutoUpdate*</h2>
+		<h2>Convenience properties and *matrixAutoUpdate*(便利属性和 *matrixAutoUpdate*)</h2>
 
-		There are two ways to update an object's transformation:
+		有两种方法可以更新对象的转换：
 		<ol>
 			<li>
-				Modify the object's *position*, *quaternion*, and *scale* properties, and let three.js recompute
-				the object's matrix from these properties:
+				修改对象的* position *，* quaternion *和* scale *属性，让three.js重新计算
+				来自这些属性的对象矩阵：
 				<code>
 				object.position.copy(start_position);
 				object.quaternion.copy(quaternion);
 				</code>
-				By default, the *matrixAutoUpdate* property is set true, and the matrix will be automatically recalculated.
-				If the object is static, or you wish to manually control when recalculation occurs, better performance can be obtained by setting the property false:
+				默认情况下，* matrixAutoUpdate *属性设置为true，并且将自动重新计算矩阵。
+如果对象是静态的，或者您希望在重新计算时手动控制，则可以通过将属性设置为false来获得更好的性能：
 				<code>
 				object.matrixAutoUpdate = false;
 				</code>
-				And after changing any properties, manually update the matrix:
+				更改任何属性后，手动更新矩阵：
 				<code>
 				object.updateMatrix();
 				</code>
 			</li>
 			<li>
-				Modify the object's matrix directly. The [page:Matrix4] class has various methods for modifying the matrix:
+				直接修改对象的矩阵。 [page：Matrix4]类有各种修改矩阵的方法：
 				<code>
 				object.matrix.setRotationFromQuaternion(quaternion);
 				object.matrix.setPosition(start_position);
 				object.matrixAutoUpdate = false;
 				</code>
-				Note that *matrixAutoUpdate* <em>must</em> be set to *false* in this case, and you should make sure <em>not</em> to call *updateMatrix*. Calling *updateMatrix* will clobber the manual changes made to the matrix, recalculating the matrix from *position*, *scale*, and so on.
+				请注意，在这种情况下，* matrixAutoUpdate * <em>必须</em>设置为* false *，并且您应该确保<em>不</em>调用* updateMatrix *。 调用* updateMatrix *将破坏对矩阵所做的手动更改，从* position *，* scale *重新计算矩阵，依此类推。
 			</li>
 		</ol>
 
-		<h2>Object and world matrices</h2>
+		<h2>Object and world matrices(对象和世界矩阵)</h2>
 		<p>
-		An object's [page:Object3D.matrix matrix] stores the object's transformation <em>relative</em> to the object's [page:Object3D.parent parent]; to get the object's transformation in <em>world</em> coordinates, you must access the object's [page:Object3D.matrixWorld].
+		对象的[page：Object3D.matrix matrix]将对象的转换<em> 相对于 </em>对象的[page：Object3D.parent parent]; 要在<em> 世界 </em>坐标中获取对象的转换，您必须访问该对象的[page：Object3D.matrixWorld]。
+		An object's [page:Object3D.matrix matrix] stores the object's transformation 
 		</p>
 		<p>
-		When either the parent or the child object's transformation changes, you can request that the child object's [page:Object3D.matrixWorld matrixWorld] be updated by calling [page:Object3D.updateMatrixWorld updateMatrixWorld]().
+		当父对象或子对象的转换发生更改时，可以通过调用[page：Object3D.updateMatrixWorld updateMatrixWorld]（）来请求更新子对象的[page：Object3D.matrixWorld matrixWorld]。
 		</p>
 
-		<h2>Rotation and Quaternion</h2>
+		<h2>Rotation and Quaternion(旋转和四元数)</h2>
 		<p>
-		Three.js provides two ways of representing 3D rotations: [page:Euler Euler angles] and [page:Quaternion Quaternions], as well as methods for converting between the two. Euler angles are subject to a problem called "gimbal lock," where certain configurations can lose a degree of freedom (preventing the object from being rotated about one axis). For this reason, object rotations are <em>always</em> stored in the object's [page:Object3D.quaternion quaternion].
+		Three.js提供了两种表示3D旋转的方式：[page：Euler Euler angles]和[page：Quaternion Quaternions]，以及两者之间的转换方法。 欧拉角受到称为“万向节锁定”的问题，其中某些配置可能失去一定程度的自由度（防止物体绕一个轴旋转）。 因此，对象旋转<em>始终</em>存储在对象的[page：Object3D.quaternion quaternion]中。
 		</p>
 		<p>
-		Previous versions of the library included a *useQuaternion* property which, when set to false, would cause the object's [page:Object3D.matrix matrix] to be calculated from an Euler angle. This practice is deprecated---instead, you should use the [page:Object3D.setRotationFromEuler setRotationFromEuler] method, which will update the quaternion.
+		该库的早期版本包含* useQuaternion *属性，当设置为false时，将导致对象的[page：Object3D.matrix矩阵]从欧拉角计算。 这种做法已被弃用 - 相反，您应该使用[page：Object3D.setRotationFromEuler setRotationFromEuler]方法，该方法将更新四元数。	
 		</p>
 
 	</body>
