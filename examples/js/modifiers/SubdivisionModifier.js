@@ -1,6 +1,3 @@
-/* Modified from three/examples/js/modifiers/SubdivisionModifier.js */
-
-
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *	@author centerionware / http://www.centerionware.com
