@@ -279,7 +279,7 @@ THREE.SubdivisionModifier = class SubdivisionModifier {
 
 			array.forEach( function ( el, i ) {
 
-				array[ i ] = el * arrayWeight;
+				array[ i ] *= arrayWeight;
 
 			} );
 
