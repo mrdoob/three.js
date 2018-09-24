@@ -8,49 +8,48 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>常见问题（[name]）</h1>
 
-		<h2>Which 3D model format is best supported?</h2>
+		<h2>哪一种三维物体格式能够得到最好地支持呢？</h2>
 		<div>
 			<p>
-				The recommended format for importing and exporting assets is glTF (GL Transmission Format). Because glTF is focused on runtime asset delivery, it is compact to transmit and fast to load.
+			推荐使用glTF（gl传输格式）来对三维物体进行导入和导出，由于glTF这种格式是专注于在程序运行时呈现三维物体的，所以它的传输效率非常高，且加载速度非常快。
 			</p>
-			<p>
-				three.js provides loaders for many other popular formats like FBX, Collada or OBJ as well. Nevertheless, you should always try to establish a glTF based workflow in your projects first. For more information, see [link:#manual/introduction/Loading-3D-models loading 3D models].
+			
+			
+			<p>three.js同样也为其它广受欢迎的格式像FBX、Collada以及OBJ等等提供了载入工具。虽然如此，你应当还是首先尝试着在你的项目里建立一个基于glTF的工作流程。
+				了解更多详细信息，请查看[link:#manual/introduction/Loading-3D-models loading 3D models]。
 			</p>
 		</div>
 
-		<h2>Why are there meta viewport tags in examples?</h2>
+		<h2>为什么在示例中会有一些和viewport相关的meta标签？</h2>
 		<div>
 			<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">meta</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>viewport<span class="pl-pds">"</span></span> <span class="pl-e">content</span>=<span class="pl-s"><span class="pl-pds">"</span>width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0<span class="pl-pds">"</span></span>&gt;</pre></div>
 
-				<p>These tags control viewport size and scale for mobile browsers (where page content may be rendered at different size than visible viewport).</p>
+				<p>这些标签用于在移动端浏览器上控制视口的大小和缩放（页面内容可能会以与可视区域不同的大小来呈现）。</p>
 
 				<p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
 
 				<p>[link:https://developer.mozilla.org/en/Mobile/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
 		</div>
 
-		<h2>How can scene scale be preserved on resize?</h2>
+		<h2>如何在窗口调整大小时保持场景比例不变？</h2>
 		<p>
-			We want all objects, regardless of their distance from the camera, to appear the same size, even as the window is resized.
-
-			The key equation to solving this is this formula for the visible height at a given distance:
-
+			我们希望所有的物体，无论它们距离摄像机有多远，都能呈现相同尺寸，即使是在窗口被重新调整大小的时候。
+			解决这个问题的关键，是一个很重要的公式：给定距离，求可见高度
 			<code>
-visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;<br>
 			</code>
-			If we increase the window height by a certain percentage, then what we want is the visible height at all distances
-			to increase by the same percentage.
-
-			This can not be done by changing the camera position. Instead you have to change the camera field-of-view.
-			[link:http://jsfiddle.net/Q4Jpu/ Example].
+			如果我们以一定的百分比增加了窗口的高度，那我们所想要的结果便是所有距离的可见高度都增加相同的百分比。
+			这并不能通过改变摄像机的位置来实现，相反，你得改变摄像机的视野角度（FOV）。这是个示例：[link:http://jsfiddle.net/Q4Jpu/ Example].
 		</p>
 
-		<h2>Why is part of my object invisible?</h2>
+		<h2>为什么我的物体的一部分是不可见的？</h2>
 		<p>
-			This could be because of face culling. Faces have an orientation that  decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
+			这可能是由于面消隐而导致的。面是具有朝向的，这个朝向决定了哪边是正面或者哪边是背面。
+			在正常情况下，渲染时会将背面进行消隐。要查看这是不是你所遇到的问题，请将material的slide更改为THREE.DoubleSide。
 			<code>material.side = THREE.DoubleSide</code>
 		</p>
 	</body>
 </html>
+

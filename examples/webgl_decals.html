@@ -128,7 +128,7 @@
 			var geometry = new THREE.BufferGeometry();
 			geometry.setFromPoints( [ new THREE.Vector3(), new THREE.Vector3() ] );
 
-			line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { linewidth: 4 } ) );
+			line = new THREE.Line( geometry, new THREE.LineBasicMaterial() );
 			scene.add( line );
 
 			loadLeePerrySmith();

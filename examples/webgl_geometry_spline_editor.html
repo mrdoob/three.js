@@ -258,8 +258,7 @@
 				curve.curveType = 'catmullrom';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0xff0000,
-					opacity: 0.35,
-					linewidth: 2
+					opacity: 0.35
 					} ) );
 				curve.mesh.castShadow = true;
 				splines.uniform = curve;
@@ -268,8 +267,7 @@
 				curve.curveType = 'centripetal';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0x00ff00,
-					opacity: 0.35,
-					linewidth: 2
+					opacity: 0.35
 					} ) );
 				curve.mesh.castShadow = true;
 				splines.centripetal = curve;
@@ -278,8 +276,7 @@
 				curve.curveType = 'chordal';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0x0000ff,
-					opacity: 0.35,
-					linewidth: 2
+					opacity: 0.35
 					} ) );
 				curve.mesh.castShadow = true;
 				splines.chordal = curve;

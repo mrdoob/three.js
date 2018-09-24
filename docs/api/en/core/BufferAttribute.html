@@ -35,12 +35,12 @@
 		attribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3.
 		<br /><br />
 
-		[page:Boolean normalized] -- (optional) Indicates how the underlying data in the buffer maps
-		to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance of
-		UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array
+		[page:Boolean normalized] -- (optional) Applies to integer data only. Indicates how the underlying data
+		in the buffer maps to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance
+		of UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array
 		 data will be mapped to 0.0f - +1.0f in the GLSL attribute. An Int16Array (signed) would map
 		 from -32767 - +32767  to -1.0f - +1.0f. If [page:Boolean normalized] is false, the values
-		 will be converted to floats which contain the exact value, i.e. 32767 becomes 32767.0f.
+		 will be converted to floats unmodified, i.e. 32767 becomes 32767.0f.
 		</p>
 
 		<h2>Properties</h2>

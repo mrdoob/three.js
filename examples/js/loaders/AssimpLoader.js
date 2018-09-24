@@ -18,9 +18,10 @@ THREE.AssimpLoader.prototype = {
 
 		var scope = this;
 
-		var path = THREE.LoaderUtils.extractUrlBase( url );
+		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( buffer ) {
@@ -28,6 +29,20 @@ THREE.AssimpLoader.prototype = {
 			onLoad( scope.parse( buffer, path ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
+
+	},
+
+	setResourcePath: function ( value ) {
+
+		this.resourcePath = value;
+		return this;
 
 	},
 
@@ -41,7 +56,7 @@ THREE.AssimpLoader.prototype = {
 	parse: function ( buffer, path ) {
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
-		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		var Virtulous = {};
 

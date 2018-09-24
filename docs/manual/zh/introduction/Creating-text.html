@@ -8,26 +8,22 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>创建文字（[name]）</h1>
 		<div>
-			<p>
-				There are often times when you might need to use text in your three.js application - here are
-				a couple of ways that you can do so.
+			<p>有时候，您可能需要在你的Three.js应用程序中使用到文本，这里有几种方法可以做到。
 			</p>
 		</div>
 
 		<h2>1. DOM + CSS</h2>
 		<div>
 			<p>
-				Using HTML is generally the easiest and fastest manner to add text. This is the method
-				used for descriptive overlays in most three.js examples.
+				使用HTML通常是最简单、最快速的添加文本的方法，这是大多数的Three.js示例中用于添加描述性叠加文字的方法。
 			</p>
-			<p>You can add content to a</p>
+			<p>你可以在这里添加内容</p>
 			<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
 
 			<p>
-				and use CSS markup to position absolutely at a position above all others with a
-				z-index especially if you are running three.js full screen.
+				然后使用CSS来将其绝对定位在其它具有z-index的元素之上，尤其是当你全屏运行three.js的时候。
 			</p>
 
 			<code>
@@ -45,66 +41,60 @@
 
 
 
-		<h2>2. Draw text to canvas and use as a [page:Texture]</h2>
+		<h2>2. 将文字绘制到画布中，并将其用作[page:Texture]（纹理）</h2>
 		<div>
-			<p>Use this method if you wish to draw text easily on a plane in your three.js scene.</p>
+			<p>如果你希望在three.js的场景中的平面上轻松地绘制文本，请使用此方法。</p>
 		</div>
 
 
-		<h2>3. Create a model in your favourite 3D application and export to three.js</h2>
+		<h2>3. 在你所喜欢的3D软件里创建模型，并导出给three.js
+			 </h2>
 		<div>
-			<p>Use this method if you prefer working with your 3d applications and importing the models to three.js</p>
+			<p>如果你更喜欢使用3D建模软件来工作并导出模型到three.js，请使用这种方法。</p>
 		</div>
 
 
 
-		<h2>4. Procedural Text Geometry</h2>
+		<h2>4. three.js自带的文字几何体</h2>
 		<div>
 			<p>
-				If you prefer to work purely in THREE.js or to create procedural and dynamic 3D
-				text geometries, you can create a mesh whose geometry is an instance of THREE.TextGeometry:
+				如果你更喜欢使用纯three.js来工作，或者创建能够由程序改变的、动态的3D文字，你可以创建一个其几何体为THREE.TextGeometry的实例的网格：
 			</p>
 			<p>
 				<code>new THREE.TextGeometry( text, parameters );</code>
 			</p>
 			<p>
-				In order for this to work, however, your TextGeometry will need an instance of THREE.Font
-				to be set on its "font" parameter.
-
-				See the [page:TextGeometry] page for more info on how this can be done, descriptions of each
-				accepted parameter, and a list of the JSON fonts that come with the THREE.js distribution itself.
+				然而，为了使得它能够工作，你的TextGeometry需要在其“font”参数上设置一个THREE.Font的实例。
+<br>
+				请参阅 [page:TextGeometry] 页面来阅读如何完成此操作的详细信息，以及每一个接收的参数的描述，还有由three.js分发、自带的JSON字体的列表。
 			</p>
 
-			<h3>Examples</h3>
+			<h3>示例</h3>
 			[example:webgl_geometry_text WebGL / geometry / text]<br />
 			[example:canvas_geometry_text canvas / geometry / text]<br />
 			[example:webgl_shadowmap WebGL / shadowmap]
 
 			<p>
-				If Typeface is down, or you want to use a font that is not there, there's a tutorial
-				with a python script for blender that allows you to export text to Three.js's JSON format:
-				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
+				如果Typeface已经关闭，或者没有你所想使用的字体，这有一个教程:[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]<br>
+				这是一个在blender上运行的python脚本，能够让你将文字导出为Three.js的JSON格式。
 				</p>
 
 		</div>
 
 
 
-		<h2>5. Bitmap Fonts</h2>
+		<h2>5. 位图字体</h2>
 		<div>
 			<p>
-				BMFonts (bitmap fonts) allow batching glyphs into a single BufferGeometry. BMFont rendering
-				supports word-wrapping, letter spacing, kerning, signed distance fields with standard
-				derivatives, multi-channel signed distance fields, multi-texture fonts, and more.
-				See [link:https://github.com/Jam3/three-bmfont-text three-bmfont-text].
+				BMFonts (位图字体) 可以将字形批处理为单个BufferGeometry。BMFont的渲染支持自动换行、字母间距、字句调整、signed distance fields with standard derivatives、multi-channel signed distance fields、多纹理字体等特性。
+				详情请参阅[link:https://github.com/Jam3/three-bmfont-text three-bmfont-text]。
 			</p>
 			<p>
-				Stock fonts are available in projects like
-				[link:https://github.com/etiennepinchon/aframe-fonts A-Frame Fonts], or you can create your own
-				from any .TTF font, optimizing to include only characters required for a project.
+				现有库存的字体在项目中同样可用，就像[link:https://github.com/etiennepinchon/aframe-fonts A-Frame Fonts]一样，
+				或者你也可以从任何TTF字体中创建你自己的字体，优化时，只需要包含项目中所需的字符即可。
 			</p>
 			<p>
-				Some helpful tools:
+				这是一些有用的工具：
 			</p>
 			<ul>
 				<li>[link:http://msdf-bmfont.donmccurdy.com/ msdf-bmfont-web] <i>(web-based)</i></li>
