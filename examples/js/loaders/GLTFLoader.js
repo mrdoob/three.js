@@ -25,9 +25,21 @@ THREE.GLTFLoader = ( function () {
 
 			var scope = this;
 
-			var path = this.resourcePath !== undefined
-				? this.resourcePath
-				: THREE.LoaderUtils.extractUrlBase( url );
+			var resourcePath;
+
+			if ( this.resourcePath !== undefined ) {
+
+				resourcePath = this.resourcePath;
+
+			} else if ( this.path !== undefined ) {
+
+				resourcePath = this.path;
+
+			} else {
+
+				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
+
+			}
 
 			var loader = new THREE.FileLoader( scope.manager );
 
@@ -38,7 +50,7 @@ THREE.GLTFLoader = ( function () {
 
 				try {
 
-					scope.parse( data, path, onLoad, onError );
+					scope.parse( data, resourcePath, onLoad, onError );
 
 				} catch ( e ) {
 
