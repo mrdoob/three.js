@@ -2114,8 +2114,6 @@ THREE.GLTFLoader = ( function () {
 
 			materialParams[ textureName ] = texture;
 
-			return texture;
-
 		} );
 
 	};
