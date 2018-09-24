@@ -1,7 +1,7 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
- * Development repository: https://github.com/kaisalmen/WWOBJLoader
- */
+  * @author Kai Salmen / https://kaisalmen.de
+  * Development repository: https://github.com/kaisalmen/WWOBJLoader
+  */
 
 'use strict';
 
@@ -157,7 +157,7 @@ THREE.OBJLoader2 = (function () {
 	 * @param {number} numericalValue Numerical value describing the progress
 	 */
 	OBJLoader2.prototype.onProgress = function ( type, text, numericalValue ) {
-		var content = Validator.isValid( text ) ? text : '';
+		var content = Validator.isValid( text ) ? text: '';
 		var event = {
 			detail: {
 				type: type,
@@ -181,12 +181,12 @@ THREE.OBJLoader2 = (function () {
 			output += '\nurl: ' + event.currentTarget.responseURL + '\nstatus: ' + event.currentTarget.statusText;
 
 		}
-		this.onProgress( 'error', output, - 1 );
+		this.onProgress( 'error', output, -1 );
 		this._throwError( output );
 	};
 
 	OBJLoader2.prototype._throwError = function ( errorMessage ) {
-		if ( Validator.isValid( this.callbacks.onReportError ) ) {
+		if ( Validator.isValid( this.callbacks.onReportError ) )  {
 
 			this.callbacks.onReportError( errorMessage );
 
@@ -272,6 +272,7 @@ THREE.OBJLoader2 = (function () {
 				};
 			}
 
+
 			var fileLoader = new THREE.FileLoader( this.manager );
 			fileLoader.setPath( this.path );
 			fileLoader.setResponseType( 'arraybuffer' );
@@ -279,6 +280,7 @@ THREE.OBJLoader2 = (function () {
 
 		}
 	};
+
 
 	/**
 	 * Run the loader according the provided instructions.
@@ -291,21 +293,9 @@ THREE.OBJLoader2 = (function () {
 		this._applyPrepData( prepData );
 		var available = prepData.checkResourceDescriptorFiles( prepData.resources,
 			[
-				{
-					ext: "obj",
-					type: "ArrayBuffer",
-					ignore: false
-				},
-				{
-					ext: "mtl",
-					type: "String",
-					ignore: false
-				},
-				{
-					ext: "zip",
-					type: "String",
-					ignore: true
-				}
+				{ ext: "obj", type: "ArrayBuffer", ignore: false },
+				{ ext: "mtl", type: "String", ignore: false },
+				{ ext: "zip", type: "String", ignore: true }
 			]
 		);
 		if ( Validator.isValid( workerSupportExternal ) ) {
@@ -452,8 +442,8 @@ THREE.OBJLoader2 = (function () {
 			workerCode += '/**\n';
 			workerCode += '  * This code was constructed by OBJLoader2 buildCode.\n';
 			workerCode += '  */\n\n';
-			workerCode += 'THREE = { ' + LoaderSupport.constructor.name + ': {} };\n\n';
-			workerCode += funcBuildObject( 'THREE.' + LoaderSupport.constructor.name + '.' + LoaderSupport.Validator.constructor.name, Validator );
+			workerCode += 'THREE = { LoaderSupport: {} };\n\n';
+			workerCode += funcBuildObject( 'THREE.LoaderSupport.Validator', Validator );
 			workerCode += funcBuildSingleton( 'Parser', Parser );
 
 			return workerCode;
@@ -494,6 +484,7 @@ THREE.OBJLoader2 = (function () {
 		);
 	};
 
+
 	/**
 	 * Parse OBJ data either from ArrayBuffer or string
 	 * @class
@@ -525,13 +516,13 @@ THREE.OBJLoader2 = (function () {
 				mtllibName: '',
 
 				// reset with new mesh
-				faceType: - 1,
+				faceType: -1,
 				subGroups: [],
 				subGroupInUse: null,
 				smoothingGroup: {
 					splitMaterials: false,
-					normalized: - 1,
-					real: - 1
+					normalized: -1,
+					real: -1
 				},
 				counts: {
 					doubleIndicesCount: 0,
@@ -562,8 +553,8 @@ THREE.OBJLoader2 = (function () {
 			// faces are stored according combined index of group, material and smoothingGroup (0 or not)
 			this.rawMesh.subGroups = [];
 			this.rawMesh.subGroupInUse = null;
-			this.rawMesh.smoothingGroup.normalized = - 1;
-			this.rawMesh.smoothingGroup.real = - 1;
+			this.rawMesh.smoothingGroup.normalized = -1;
+			this.rawMesh.smoothingGroup.real = -1;
 
 			// this default index is required as it is possible to define faces without 'g' or 'usemtl'
 			this.pushSmoothingGroup( 1 );
@@ -653,25 +644,25 @@ THREE.OBJLoader2 = (function () {
 			this.globalCounts.totalBytes = length;
 			var buffer = new Array( 128 );
 
-			for ( var code, word = '', bufferPointer = 0, slashesCount = 0, i = 0; i < length; i ++ ) {
+			for ( var code, word = '', bufferPointer = 0, slashesCount = 0, i = 0; i < length; i++ ) {
 
 				code = arrayBufferView[ i ];
 				switch ( code ) {
 					// space
 					case 32:
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
 						break;
 					// slash
 					case 47:
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
-						slashesCount ++;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
+						slashesCount++;
 						word = '';
 						break;
 
 					// LF
 					case 10:
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
 						this.globalCounts.lineByte = this.globalCounts.currentByte;
 						this.globalCounts.currentByte = i;
@@ -690,7 +681,7 @@ THREE.OBJLoader2 = (function () {
 				}
 			}
 			this.finalizeParsing();
-			if ( this.logging.enabled ) console.timeEnd( 'OBJLoader2.Parser.parse' );
+			if ( this.logging.enabled ) console.timeEnd(  'OBJLoader2.Parser.parse' );
 		};
 
 		/**
@@ -700,7 +691,7 @@ THREE.OBJLoader2 = (function () {
 		 * @param {string} text OBJ data as string
 		 */
 		Parser.prototype.parseText = function ( text ) {
-			if ( this.logging.enabled ) console.time( 'OBJLoader2.Parser.parseText' );
+			if ( this.logging.enabled ) console.time(  'OBJLoader2.Parser.parseText' );
 			this.configure();
 			this.legacyMode = true;
 			this.contentRef = text;
@@ -708,23 +699,23 @@ THREE.OBJLoader2 = (function () {
 			this.globalCounts.totalBytes = length;
 			var buffer = new Array( 128 );
 
-			for ( var char, word = '', bufferPointer = 0, slashesCount = 0, i = 0; i < length; i ++ ) {
+			for ( var char, word = '', bufferPointer = 0, slashesCount = 0, i = 0; i < length; i++ ) {
 
 				char = text[ i ];
 				switch ( char ) {
 					case ' ':
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
 						break;
 
 					case '/':
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
-						slashesCount ++;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
+						slashesCount++;
 						word = '';
 						break;
 
 					case '\n':
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
 						this.globalCounts.lineByte = this.globalCounts.currentByte;
 						this.globalCounts.currentByte = i;
@@ -754,15 +745,12 @@ THREE.OBJLoader2 = (function () {
 					var i;
 					if ( legacyMode ) {
 
-						for ( i = start; i < stop; i ++ ) {
-							line += content[ i ];
-						}
+						for ( i = start; i < stop; i++ ) line += content[ i ];
 
 					} else {
 
-						for ( i = start; i < stop; i ++ ) {
-							line += String.fromCharCode( content[ i ] );
-						}
+
+						for ( i = start; i < stop; i++ ) line += String.fromCharCode( content[ i ] );
 
 					}
 					line = line.trim();
@@ -813,8 +801,8 @@ THREE.OBJLoader2 = (function () {
 
 						}
 
-						// "f vertex/uv ..."
-					} else if ( bufferLength === slashesCount * 2 ) {
+					// "f vertex/uv ..."
+					} else if  ( bufferLength === slashesCount * 2 ) {
 
 						this.checkFaceType( 1 );
 						for ( i = 3, length = bufferLength - 2; i < length; i += 2 ) {
@@ -825,8 +813,8 @@ THREE.OBJLoader2 = (function () {
 
 						}
 
-						// "f vertex/uv/normal ..."
-					} else if ( bufferLength * 2 === slashesCount * 3 ) {
+					// "f vertex/uv/normal ..."
+					} else if  ( bufferLength * 2 === slashesCount * 3 ) {
 
 						this.checkFaceType( 2 );
 						for ( i = 4, length = bufferLength - 3; i < length; i += 3 ) {
@@ -837,7 +825,7 @@ THREE.OBJLoader2 = (function () {
 
 						}
 
-						// "f vertex//normal ..."
+					// "f vertex//normal ..."
 					} else {
 
 						this.checkFaceType( 3 );
@@ -855,19 +843,15 @@ THREE.OBJLoader2 = (function () {
 				case 'l':
 				case 'p':
 					bufferLength = bufferPointer - 1;
-					if ( bufferLength === slashesCount * 2 ) {
+					if ( bufferLength === slashesCount * 2 )  {
 
 						this.checkFaceType( 4 );
-						for ( i = 1, length = bufferLength + 1; i < length; i += 2 ) {
-							this.buildFace( buffer[ i ], buffer[ i + 1 ] );
-						}
+						for ( i = 1, length = bufferLength + 1; i < length; i += 2 ) this.buildFace( buffer[ i ], buffer[ i + 1 ] );
 
 					} else {
 
-						this.checkFaceType( ( lineDesignation === 'l' ) ? 5 : 6 );
-						for ( i = 1, length = bufferLength + 1; i < length; i ++ ) {
-							this.buildFace( buffer[ i ] );
-						}
+						this.checkFaceType( ( lineDesignation === 'l' ) ? 5 : 6  );
+						for ( i = 1, length = bufferLength + 1; i < length; i ++ ) this.buildFace( buffer[ i ] );
 
 					}
 					break;
@@ -897,7 +881,7 @@ THREE.OBJLoader2 = (function () {
 					if ( mtlName !== '' && this.rawMesh.activeMtlName !== mtlName ) {
 
 						this.rawMesh.activeMtlName = mtlName;
-						this.rawMesh.counts.mtlCount ++;
+						this.rawMesh.counts.mtlCount++;
 						this.checkSubGroup();
 
 					}
@@ -920,7 +904,7 @@ THREE.OBJLoader2 = (function () {
 
 			if ( smoothCheck !== smoothingGroupInt ) {
 
-				this.rawMesh.counts.smoothingGroupCount ++;
+				this.rawMesh.counts.smoothingGroupCount++;
 				this.checkSubGroup();
 
 			}
@@ -980,16 +964,16 @@ THREE.OBJLoader2 = (function () {
 				var indexPointerV = 3 * ( faceIndexVi > 0 ? faceIndexVi - 1 : faceIndexVi + scope.vertices.length / 3 );
 
 				var vertices = scope.rawMesh.subGroupInUse.vertices;
-				vertices.push( scope.vertices[ indexPointerV ++ ] );
-				vertices.push( scope.vertices[ indexPointerV ++ ] );
+				vertices.push( scope.vertices[ indexPointerV++ ] );
+				vertices.push( scope.vertices[ indexPointerV++ ] );
 				vertices.push( scope.vertices[ indexPointerV ] );
 
 				var indexPointerC = scope.colors.length > 0 ? indexPointerV + 1 : null;
 				if ( indexPointerC !== null ) {
 
 					var colors = scope.rawMesh.subGroupInUse.colors;
-					colors.push( scope.colors[ indexPointerC ++ ] );
-					colors.push( scope.colors[ indexPointerC ++ ] );
+					colors.push( scope.colors[ indexPointerC++ ] );
+					colors.push( scope.colors[ indexPointerC++ ] );
 					colors.push( scope.colors[ indexPointerC ] );
 
 				}
@@ -998,7 +982,7 @@ THREE.OBJLoader2 = (function () {
 					var faceIndexUi = parseInt( faceIndexU );
 					var indexPointerU = 2 * ( faceIndexUi > 0 ? faceIndexUi - 1 : faceIndexUi + scope.uvs.length / 2 );
 					var uvs = scope.rawMesh.subGroupInUse.uvs;
-					uvs.push( scope.uvs[ indexPointerU ++ ] );
+					uvs.push( scope.uvs[ indexPointerU++ ] );
 					uvs.push( scope.uvs[ indexPointerU ] );
 
 				}
@@ -1007,8 +991,8 @@ THREE.OBJLoader2 = (function () {
 					var faceIndexNi = parseInt( faceIndexN );
 					var indexPointerN = 3 * ( faceIndexNi > 0 ? faceIndexNi - 1 : faceIndexNi + scope.normals.length / 3 );
 					var normals = scope.rawMesh.subGroupInUse.normals;
-					normals.push( scope.normals[ indexPointerN ++ ] );
-					normals.push( scope.normals[ indexPointerN ++ ] );
+					normals.push( scope.normals[ indexPointerN++ ] );
+					normals.push( scope.normals[ indexPointerN++ ] );
 					normals.push( scope.normals[ indexPointerN ] );
 
 				}
@@ -1020,14 +1004,14 @@ THREE.OBJLoader2 = (function () {
 				var indicesPointer = this.rawMesh.subGroupInUse.indexMappings[ mappingName ];
 				if ( THREE.LoaderSupport.Validator.isValid( indicesPointer ) ) {
 
-					this.rawMesh.counts.doubleIndicesCount ++;
+					this.rawMesh.counts.doubleIndicesCount++;
 
 				} else {
 
 					indicesPointer = this.rawMesh.subGroupInUse.vertices.length / 3;
 					updateSubGroupInUse();
 					this.rawMesh.subGroupInUse.indexMappings[ mappingName ] = indicesPointer;
-					this.rawMesh.subGroupInUse.indexMappingsCount ++;
+					this.rawMesh.subGroupInUse.indexMappingsCount++;
 
 				}
 				this.rawMesh.subGroupInUse.indices.push( indicesPointer );
@@ -1037,7 +1021,7 @@ THREE.OBJLoader2 = (function () {
 				updateSubGroupInUse();
 
 			}
-			this.rawMesh.counts.faceCount ++;
+			this.rawMesh.counts.faceCount++;
 		};
 
 		Parser.prototype.createRawMeshReport = function ( inputObjectCount ) {
@@ -1074,9 +1058,7 @@ THREE.OBJLoader2 = (function () {
 					indices = meshOutputGroup.indices;
 					if ( indices.length > 0 && absoluteIndexMappingsCount > 0 ) {
 
-						for ( var i in indices ) {
-							indices[ i ] = indices[ i ] + absoluteIndexMappingsCount;
-						}
+						for ( var i in indices ) indices[ i ] = indices[ i ] + absoluteIndexMappingsCount;
 
 					}
 					meshOutputGroupTemp.push( meshOutputGroup );
@@ -1120,7 +1102,7 @@ THREE.OBJLoader2 = (function () {
 
 				}
 				if ( this.logging.enabled && this.logging.debug ) console.debug( this.createRawMeshReport( this.inputObjectCount ) );
-				this.inputObjectCount ++;
+				this.inputObjectCount++;
 
 				this.buildMesh( result );
 				var progressBytesPercent = this.globalCounts.currentByte / this.globalCounts.totalBytes;
@@ -1183,6 +1165,7 @@ THREE.OBJLoader2 = (function () {
 
 					materialName = materialNameOrg + ( haveVertexColors ? '_vertexColor' : '' ) + ( meshOutputGroup.smoothingGroup === 0 ? '_flat' : '' );
 
+
 				} else {
 
 					materialName = this.rawMesh.faceType === 6 ? 'defaultPointMaterial' : 'defaultLineMaterial';
@@ -1196,11 +1179,9 @@ THREE.OBJLoader2 = (function () {
 
 					var defaultMaterialName = haveVertexColors ? 'defaultVertexColorMaterial' : 'defaultMaterial';
 					materialOrg = this.materials[ defaultMaterialName ];
-					if ( this.logging.enabled ) {
-						console.warn( 'object_group "' + meshOutputGroup.objectName + '_' +
-							meshOutputGroup.groupName + '" was defined with unresolvable material "' +
-							materialNameOrg + '"! Assigning "' + defaultMaterialName + '".' );
-					}
+					if ( this.logging.enabled ) console.warn( 'object_group "' + meshOutputGroup.objectName + '_' +
+						meshOutputGroup.groupName + '" was defined with unresolvable material "' +
+						materialNameOrg + '"! Assigning "' + defaultMaterialName + '".' );
 					materialNameOrg = defaultMaterialName;
 
 					// if names are identical then there is no need for later manipulation
@@ -1244,7 +1225,7 @@ THREE.OBJLoader2 = (function () {
 						selectedMaterialIndex = materialIndex;
 						materialIndexMapping[ materialName ] = materialIndex;
 						materialNames.push( materialName );
-						materialIndex ++;
+						materialIndex++;
 
 					}
 					materialGroupLength = this.useIndices ? meshOutputGroup.indices.length : meshOutputGroup.vertices.length / 3;
@@ -1312,7 +1293,7 @@ THREE.OBJLoader2 = (function () {
 
 			}
 
-			this.outputObjectCount ++;
+			this.outputObjectCount++;
 			this.callbackMeshBuilder(
 				{
 					cmd: 'meshData',
@@ -1371,13 +1352,14 @@ THREE.OBJLoader2 = (function () {
 	 * @param {callback} [onProgress] A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains total and Integer bytes.
 	 * @param {callback} [onError] A function to be called if an error occurs during loading. The function receives the error as an argument.
 	 * @param {string} [crossOrigin] CORS value
-	 * @param {Object} [materialOptions] Set material loading options for MTLLoader
+ 	 * @param {Object} [materialOptions] Set material loading options for MTLLoader
 	 */
 	OBJLoader2.prototype.loadMtl = function ( url, content, onLoad, onProgress, onError, crossOrigin, materialOptions ) {
 		var resource = new THREE.LoaderSupport.ResourceDescriptor( url, 'MTL' );
 		resource.setContent( content );
 		this._loadMtl( resource, onLoad, onProgress, onError, crossOrigin, materialOptions );
 	};
+
 
 	OBJLoader2.prototype._loadMtl = function ( resource, onLoad, onProgress, onError, crossOrigin, materialOptions ) {
 		if ( THREE.MTLLoader === undefined ) console.error( '"THREE.MTLLoader" is not available. "THREE.OBJLoader2" requires it for loading MTL files.' );
