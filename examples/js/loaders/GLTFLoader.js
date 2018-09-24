@@ -2329,14 +2329,13 @@ THREE.GLTFLoader = ( function () {
 
 		if ( primitiveDef.indices !== undefined && ! geometry.index ) {
 
-			pending.push(
-				parser.getDependency( 'accessor', primitiveDef.indices )
-					.then( function ( accessor ) {
+			var accessor = parser.getDependency( 'accessor', primitiveDef.indices ).then( function ( accessor ) {
 
-					geometry.setIndex( accessor );
+				geometry.setIndex( accessor );
 
-				} )
-			);
+			} );
+
+			pending.push( accessor );
 
 		}
 
