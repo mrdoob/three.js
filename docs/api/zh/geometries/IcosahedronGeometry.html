@@ -10,9 +10,9 @@
 	<body>
 		[page:Geometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>二十面几何体（[name]）</h1>
 
-		<p class="desc">A class for generating an icosahedron geometry.</p>
+		<p class="desc">一个用于生成二十面体的类。</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#IcosahedronGeometry"></iframe>
 
@@ -32,22 +32,21 @@
 
 		</script>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]([param:Float radius], [param:Integer detail])</h3>
 		<p>
-		radius — Default is 1. <br />
-		detail — Default is 0.  Setting this to a value greater than 0 adds more vertices making it no longer an icosahedron.  When detail is greater than 1, it's effectively a sphere.
+			radius — 二十面体的半径，默认为1。 <br />
+			detail — 默认值为0。将这个值设为一个大于0的数将会为它增加一些顶点，使其不再是一个二十面体。当这个值大于1的时候，实际上它将变成一个球体。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
-		</p>
+			构造函数中所包含着的每一个参数的对象。在实例化之后，该属性的任何更改都不会改变这个几何体。</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

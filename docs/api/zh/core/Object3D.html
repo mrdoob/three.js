@@ -8,42 +8,42 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>三维物体（[name]）</h1>
 
 		<p class="desc">
+			这是Three.js中大部分对象的基类，提供了一系列的属性和方法来对三维空间中的物体进行操纵。
 			This is the base class for most objects in three.js and provides a set of properties and methods
 			for manipulating objects in 3D space.<br /><br />
 
-			Note that this can be used for grouping objects via the [page:.add]( object ) method
-			which adds the object as a child, however it is better to use [page:Group] for this.
+			请注意，它可以通过[page:.add]( object )方法来将对象进行组合，该方法将对象添加为子对象，但为此最好使用[page:Group]（来作为父对象）。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]()</h3>
 		<p>
-		The constructor takes no arguments.
+			构造器中不带有参数。
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Boolean castShadow]</h3>
-		<p>Whether the object gets rendered into shadow map. Default is *false*.</p>
+		<p>对象是否被渲染到阴影贴图中。默认值为*false*。</p>
 
 		<h3>[property:Object3D children]</h3>
-		<p>Array with object's children. See [page:Group] for info on manually grouping objects.</p>
+		<p>含有对象的子级的数组。请参阅[page:Group]来了解将手动对象进行分组的相关信息。</p>
 
 		<h3>[property:Boolean frustumCulled]</h3>
 		<p>
-		When this is set, it checks every frame if the object is in the frustum of the camera before rendering the object.
-		Otherwise the object gets rendered every frame even if it isn't visible. Default is *true*.
+			当这个属性被设置的时候，它将在渲染物体之前，检查每一帧的物体是否在摄像机的视锥体中。
+			否则，即使该物体不可见，它也将在每一帧中被渲染，默认值为*true*。
 		</p>
 
 		<h3>[property:Integer id]</h3>
-		<p>readonly – Unique number for this object instance.</p>
+		<p>只读 —— 表示对象实例ID的唯一数字</p>
 
 		<h3>[property:Boolean isObject3D]</h3>
 		<p>

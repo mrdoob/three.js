@@ -10,9 +10,10 @@
 	<body>
 		[page:Geometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>圆形几何体（[name]）</h1>
 
-		<p class="desc">CircleGeometry is a simple shape of Euclidean geometry.  It is contructed from a number of triangular segments that are oriented around a central point and extend as far out as a given radius.  It is built counter-clockwise from a start angle and a given central angle.  It can also be used to create regular polygons, where the number of segments determines the number of sides.
+		<p class="desc">CircleGeometry是欧式几何的一个简单形状，它由围绕着一个中心点的三角分段的数量所构造，由给定的半径来延展。
+			同时它也可以用于创建规则多边形，其分段数量取决于该规则多边形的边数。
 		</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#CircleGeometry"></iframe>
@@ -33,7 +34,7 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
 		var geometry = new THREE.CircleGeometry( 5, 32 );
@@ -42,24 +43,24 @@
 		scene.add( circle );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]([param:Float radius], [param:Integer segments], [param:Float thetaStart], [param:Float thetaLength])</h3>
 		<p>
-		radius — Radius of the circle, default = 1.<br />
-		segments — Number of segments (triangles), minimum = 3, default = 8.<br />
-		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
-		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete circle.
+			radius — 圆形的半径，默认值为1<br />
+			segments — 分段（三角面）的数量，最小值为3，默认值为8。<br />
+			thetaStart — 第一个分段的起始角度，默认为0。（three o'clock position）<br />
+			thetaLength — 圆形扇区的中心角，通常被称为“θ”（西塔）。默认值是2*Pi，这使其成为一个完整的圆。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		构造函数中所包含着的每一个参数的对象。在实例化之后，该属性的任何更改都不会改变这个几何体。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

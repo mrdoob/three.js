@@ -10,9 +10,10 @@
 	<body>
 		[page:BufferGeometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>立方缓冲几何体（[name]）</h1>
 
-		<p class="desc">This is the [page:BufferGeometry] port of [page:BoxGeometry].</p>
+		<p class="desc">
+			这是[page:BoxGeometry]中的[page:BufferGeometry]接口。</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#BoxBufferGeometry"></iframe>
 
@@ -32,7 +33,7 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
@@ -40,35 +41,35 @@
 		scene.add( cube );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]([param:Float width], [param:Float height], [param:Float depth], [param:Integer widthSegments], [param:Integer heightSegments], [param:Integer depthSegments])</h3>
 		<p>
-		width — Width of the sides on the X axis. Default is 1.<br />
-		height — Height of the sides on the Y axis. Default is 1.<br />
-		depth — Depth of the sides on the Z axis. Default is 1.<br />
-		widthSegments — Optional. Number of segmented faces along the width of the sides. Default is 1.<br />
-		heightSegments — Optional. Number of segmented faces along the height of the sides. Default is 1.<br />
-		depthSegments — Optional. Number of segmented faces along the depth of the sides. Default is 1.
+		width — X轴上面的宽度，默认值为1。<br />
+		height — Y轴上面的高度，默认值为1。<br />
+		depth — Z轴上面的深度，默认值为1。<br />
+		widthSegments — （可选）宽度的分段数，默认值是1。<br />
+		heightSegments — （可选）宽度的分段数，默认值是1。<br />
+		depthSegments — （可选）宽度的分段数，默认值是1。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
-		</p>
+				构造函数中所包含着的每一个参数的对象。在实例化之后，该属性的任何更改都不会改变这个几何体。
+			</p>
  		<p>
-			Using the above example code above as our basis:
+			 使用上面的示例代码来作为我们的基础：
 			<code>
-		geometry.parameters; // outputs an object {width: 1, height: 1, depth: 1, widthSegments: undefined, heightSegments: undefined}
-		cube.geometry.parameters; // as above
-		cube.geometry.parameters.width; // === 1
-		cube.geometry.parameters.widthSegments // === undefined.
+				geometry.parameters; // outputs an object {width: 1, height: 1, depth: 1, widthSegments: undefined, heightSegments: undefined}
+				cube.geometry.parameters; // as above
+				cube.geometry.parameters.width; // === 1
+				cube.geometry.parameters.widthSegments // === undefined.
 			</code>
  		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/BoxGeometry.js src/geometries/BoxGeometry.js]
 	</body>

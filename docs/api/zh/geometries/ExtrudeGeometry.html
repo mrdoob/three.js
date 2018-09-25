@@ -10,9 +10,9 @@
 	<body>
 		[page:Geometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>挤压几何体（[name]）</h1>
 
-		<p class="desc">Creates extruded geometry from a path shape.</p>
+		<p class="desc">从一条形状路径中，挤压出一个Geometry。</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#ExtrudeGeometry"></iframe>
 
@@ -32,7 +32,7 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 
 		<code>
@@ -61,45 +61,43 @@
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]([param:Array shapes], [param:Object options])</h3>
-		<p>
-		shapes — Shape or an array of shapes. <br />
-		options — Object that can contain the following parameters.
+		<p>shapes — 形状或者一个包含形状的数组。<br />
+			options — 一个包含有下列参数的对象：
 
 			<ul>
-				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
-				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
-				<li>depth — float. Depth to extrude the shape. Default is 100.</li>
-				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
-				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
-				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
-				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded.</li>
-				<li>UVGenerator —  Object. object that provides UV generator functions</li>
+				<li>curveSegments — int，曲线上点的数量，默认值是12。</li>
+				<li>steps — int，用于沿着挤出样条的深度细分的点的数量，默认值为1。
+				</li>
+				<li>depth — float，挤出的形状的深度，默认值为100。</li>
+				<li>bevelEnabled — bool，对挤出的形状应用是否斜角，默认值为true。</li>
+				<li>bevelThickness — float，设置原始形状上的斜角将有多深。默认值为6。</li>
+				<li>bevelSize — float。斜角延伸的形状轮廓之间的距离，默认值为bevelThickness-2。</li>
+				<li>bevelSegments — int。斜角面的分段层数，默认值为3。</li>
+				<li>extrudePath — THREE.CurvePath对象。一条沿着被挤出形状的三维样条线。</li>
+				<li>UVGenerator —  Object。提供了UV生成器函数的对象。</li>
 			</ul>
 
 		</p>
 		<p>
-			This object extrudes a 2D shape to a 3D geometry.
-		</p>
+				该对象将一个二维形状挤出为一个三维几何体。
+			</p>
 
 		<p>
-			When creating a Mesh with this geometry, if you'd like to have a separate material used for its face
-			and its extruded sides, you can use an array of materials. The first material will be
-			applied to the face; the second material will be applied to the sides.
+				当使用这个几何体创建Mesh的时候，如果你希望分别对它的表面和它挤出的侧面使用单独的材质，你可以使用一个材质数组。
+				第一个材质将用于其表面；第二个材质则将用于其挤压出的侧面。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
-		</p>
+				构造函数中所包含着的每一个参数的对象。在实例化之后，该属性的任何更改都不会改变这个几何体。		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
