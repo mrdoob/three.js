@@ -71,8 +71,7 @@
 		<p>
 			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
 			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
-			[page:Float distance] - Maximum distance from origin where light will shine whose intensity
-			is attenuated linearly based on distance from origin. <br />
+			[page:Float distance] - Maximum range of the light. Default is 0 (no limit).<br />
 			[page:Radians angle] - Maximum angle of light dispersion from its direction whose upper
 			bound is Math.PI/2.<br />
 			[page:Float penumbra] - Percent of the spotlight cone that is attenuated due to penumbra.
@@ -109,8 +108,18 @@
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			If non-zero, light will attenuate linearly from maximum intensity at the light's
-			position down to zero at this distance from the light. Default is *0.0*.
+			<em>Default mode</em> — When distance is zero, light does not attenuate. When distance is
+			non-zero, light will attenuate linearly from maximum intensity at the light's position down to
+			zero at this distance from the light.
+		</p>
+		<p>
+			<em>[page:WebGLRenderer.physicallyCorrectLights Physically correct] mode</em> — When distance
+			is zero, light will attenuate according to inverse-square law to infinite distance. When
+			distance is non-zero, a more sudden cutoff is applied at this distance from the light, in
+			addition to inverse-square attenuation, limiting the light's range.
+		</p>
+		<p>
+			Default is *0.0*.
 		</p>
 
 		<h3>[property:Boolean isSpotLight]</h3>
