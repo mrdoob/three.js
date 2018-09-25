@@ -236,6 +236,7 @@ THREE.PLYLoader.prototype = {
 				vertices: [],
 				normals: [],
 				uvs: [],
+				faceVertexUvs: [],
 				colors: []
 			};
 
@@ -316,6 +317,13 @@ THREE.PLYLoader.prototype = {
 
 			}
 
+			if ( buffer.faceVertexUvs.length > 0 ) {
+
+				geometry = geometry.toNonIndexed();
+				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
+
+			}
+
 			geometry.computeBoundingSphere();
 
 			return geometry;
@@ -349,10 +357,19 @@ THREE.PLYLoader.prototype = {
 			} else if ( elementName === 'face' ) {
 
 				var vertex_indices = element.vertex_indices || element.vertex_index; // issue #9338
+				var texcoord = element.texcoord;
 
 				if ( vertex_indices.length === 3 ) {
 
 					buffer.indices.push( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 2 ] );
+
+					if ( texcoord && texcoord.length === 6 ) {
+
+						buffer.faceVertexUvs.push( texcoord[ 0 ], texcoord[ 1 ] );
+						buffer.faceVertexUvs.push( texcoord[ 2 ], texcoord[ 3 ] );
+						buffer.faceVertexUvs.push( texcoord[ 4 ], texcoord[ 5 ] );
+
+					}
 
 				} else if ( vertex_indices.length === 4 ) {
 
@@ -429,6 +446,7 @@ THREE.PLYLoader.prototype = {
 				vertices: [],
 				normals: [],
 				uvs: [],
+				faceVertexUvs: [],
 				colors: []
 			};
 

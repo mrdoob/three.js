@@ -5,7 +5,7 @@
  *
  * // How to set default outline parameters
  * new THREE.OutlineEffect( renderer, {
- * 	defaultThickNess: 0.01,
+ * 	defaultThickness: 0.01,
  * 	defaultColor: [ 0, 0, 0 ],
  * 	defaultAlpha: 0.8,
  * 	defaultKeepAlive: true // keeps outline material in cache even if material is removed from scene
@@ -13,7 +13,7 @@
  *
  * // How to set outline parameters for each material
  * material.userData.outlineParameters = {
- * 	thickNess: 0.01,
+ * 	thickness: 0.01,
  * 	color: [ 0, 0, 0 ]
  * 	alpha: 0.8,
  * 	visible: true,
@@ -448,7 +448,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	 * The following property copies and wrapper methods enable
 	 * THREE.OutlineEffect to be called from other *Effect, like
 	 *
-	 * effect = new THREE.VREffect( new THREE.OutlineEffect( renderer ) );
+	 * effect = new THREE.StereoEffect( new THREE.OutlineEffect( renderer ) );
 	 *
 	 * function render () {
 	 *

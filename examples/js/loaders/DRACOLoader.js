@@ -42,9 +42,6 @@ THREE.DRACOLoader.prototype = {
         var loader = new THREE.FileLoader(scope.manager);
         loader.setPath(this.path);
         loader.setResponseType('arraybuffer');
-        if (this.crossOrigin !== undefined) {
-          loader.crossOrigin = this.crossOrigin;
-        }
         loader.load(url, function(blob) {
             scope.decodeDracoFile(blob, onLoad);
         }, onProgress, onError);
@@ -52,14 +49,12 @@ THREE.DRACOLoader.prototype = {
 
     setPath: function(value) {
         this.path = value;
-    },
-
-    setCrossOrigin: function(value) {
-        this.crossOrigin = value;
+        return this;
     },
 
     setVerbosity: function(level) {
         this.verbosity = level;
+        return this;
     },
 
     /**
@@ -70,6 +65,7 @@ THREE.DRACOLoader.prototype = {
      */
     setDrawMode: function(drawMode) {
         this.drawMode = drawMode;
+        return this;
     },
 
     /**
@@ -84,6 +80,7 @@ THREE.DRACOLoader.prototype = {
           skipDequantization = skip;
         this.getAttributeOptions(attributeName).skipDequantization =
             skipDequantization;
+        return this;
     },
 
     /**
@@ -132,7 +129,7 @@ THREE.DRACOLoader.prototype = {
           console.log('Loaded a point cloud.');
         }
       } else {
-        var errorMsg = 'THREE.DRACOLoader: Unknown geometry type.'
+        var errorMsg = 'THREE.DRACOLoader: Unknown geometry type.';
         console.error(errorMsg);
         throw new Error(errorMsg);
       }
@@ -141,7 +138,7 @@ THREE.DRACOLoader.prototype = {
     },
 
     addAttributeToGeometry: function(dracoDecoder, decoder, dracoGeometry,
-                                     attributeName, attributeType, attribute, 
+                                     attributeName, attributeType, attribute,
                                      geometry, geometryBuffer) {
       if (attribute.ptr === 0) {
         var errorMsg = 'THREE.DRACOLoader: No attribute ' + attributeName;
@@ -219,7 +216,7 @@ THREE.DRACOLoader.prototype = {
           throw new Error( errorMsg );
 
       }
-      
+
       // Copy data from decoder.
       for (var i = 0; i < numValues; i++) {
         geometryBuffer[attributeName][i] = attributeData.GetValue(i);

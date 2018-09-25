@@ -26,7 +26,7 @@ THREE.VRMLLoader.prototype = {
 
 	recordingFieldname: null,
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -44,11 +44,13 @@ THREE.VRMLLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
 	parse: function ( data ) {
 
+		var scope = this;
 		var texturePath = this.texturePath || '';
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
@@ -203,34 +205,38 @@ THREE.VRMLLoader.prototype = {
 
 					case 'skyAngle':
 					case 'groundAngle':
-						this.recordingFieldname = fieldName;
-						this.isRecordingAngles = true;
-						this.angles = [];
+						scope.recordingFieldname = fieldName;
+						scope.isRecordingAngles = true;
+						scope.angles = [];
 						break;
 
+					case 'color':
 					case 'skyColor':
 					case 'groundColor':
-						this.recordingFieldname = fieldName;
-						this.isRecordingColors = true;
-						this.colors = [];
+						scope.recordingFieldname = fieldName;
+						scope.isRecordingColors = true;
+						scope.colors = [];
 						break;
 
 					case 'point':
-						this.recordingFieldname = fieldName;
-						this.isRecordingPoints = true;
-						this.points = [];
+					case 'vector':
+						scope.recordingFieldname = fieldName;
+						scope.isRecordingPoints = true;
+						scope.points = [];
 						break;
 
+					case 'colorIndex':
 					case 'coordIndex':
+					case 'normalIndex':
 					case 'texCoordIndex':
-						this.recordingFieldname = fieldName;
-						this.isRecordingFaces = true;
-						this.indexes = [];
+						scope.recordingFieldname = fieldName;
+						scope.isRecordingFaces = true;
+						scope.indexes = [];
 						break;
 
 				}
 
-				if ( this.isRecordingFaces ) {
+				if ( scope.isRecordingFaces ) {
 
 					// the parts hold the indexes as strings
 					if ( parts.length > 0 ) {
@@ -249,7 +255,7 @@ THREE.VRMLLoader.prototype = {
 
 								if ( index.length > 0 ) {
 
-									this.indexes.push( index );
+									scope.indexes.push( index );
 
 								}
 
@@ -271,19 +277,19 @@ THREE.VRMLLoader.prototype = {
 
 						if ( index.length > 0 ) {
 
-							this.indexes.push( index );
+							scope.indexes.push( index );
 
 						}
 
 						// start new one
 						index = [];
 
-						this.isRecordingFaces = false;
-						node[ this.recordingFieldname ] = this.indexes;
+						scope.isRecordingFaces = false;
+						node[ scope.recordingFieldname ] = scope.indexes;
 
 					}
 
-				} else if ( this.isRecordingPoints ) {
+				} else if ( scope.isRecordingPoints ) {
 
 					if ( node.nodeType == 'Coordinate' ) {
 
@@ -295,7 +301,23 @@ THREE.VRMLLoader.prototype = {
 								z: parseFloat( parts[ 3 ] )
 							};
 
-							this.points.push( point );
+							scope.points.push( point );
+
+						}
+
+					}
+
+					if ( node.nodeType == 'Normal' ) {
+
+  						while ( null !== ( parts = float3_pattern.exec( line ) ) ) {
+
+							point = {
+								x: parseFloat( parts[ 1 ] ),
+								y: parseFloat( parts[ 2 ] ),
+								z: parseFloat( parts[ 3 ] )
+							};
+
+							scope.points.push( point );
 
 						}
 
@@ -310,7 +332,7 @@ THREE.VRMLLoader.prototype = {
 								y: parseFloat( parts[ 2 ] )
 							};
 
-							this.points.push( point );
+							scope.points.push( point );
 
 						}
 
@@ -319,12 +341,12 @@ THREE.VRMLLoader.prototype = {
 					// end
 					if ( /]/.exec( line ) ) {
 
-						this.isRecordingPoints = false;
-						node.points = this.points;
+						scope.isRecordingPoints = false;
+						node.points = scope.points;
 
 					}
 
-				} else if ( this.isRecordingAngles ) {
+				} else if ( scope.isRecordingAngles ) {
 
 					// the parts hold the angles as strings
 					if ( parts.length > 0 ) {
@@ -338,7 +360,7 @@ THREE.VRMLLoader.prototype = {
 
 							}
 
-							this.angles.push( parseFloat( parts[ ind ] ) );
+							scope.angles.push( parseFloat( parts[ ind ] ) );
 
 						}
 
@@ -347,12 +369,12 @@ THREE.VRMLLoader.prototype = {
 					// end
 					if ( /]/.exec( line ) ) {
 
-						this.isRecordingAngles = false;
-						node[ this.recordingFieldname ] = this.angles;
+						scope.isRecordingAngles = false;
+						node[ scope.recordingFieldname ] = scope.angles;
 
 					}
 
-				} else if ( this.isRecordingColors ) {
+				} else if ( scope.isRecordingColors ) {
 
 					while ( null !== ( parts = float3_pattern.exec( line ) ) ) {
 
@@ -362,15 +384,15 @@ THREE.VRMLLoader.prototype = {
 							b: parseFloat( parts[ 3 ] )
 						};
 
-						this.colors.push( color );
+						scope.colors.push( color );
 
 					}
 
 					// end
 					if ( /]/.exec( line ) ) {
 
-						this.isRecordingColors = false;
-						node[ this.recordingFieldname ] = this.colors;
+						scope.isRecordingColors = false;
+						node[ scope.recordingFieldname ] = scope.colors;
 
 					}
 
@@ -427,6 +449,7 @@ THREE.VRMLLoader.prototype = {
 						case 'transparency':
 						case 'shininess':
 						case 'ambientIntensity':
+						case 'creaseAngle':
 							if ( parts.length !== 2 ) {
 
 								console.warn( 'THREE.VRMLLoader: Invalid single float value specification detected for %s.', fieldName );
@@ -791,9 +814,11 @@ THREE.VRMLLoader.prototype = {
 						var geometry = new THREE.BufferGeometry();
 
 						var positions = [];
+						var colors = [];
+						var normals = [];
 						var uvs = [];
 
-						var position, uv;
+						var position, color, normal, uv;
 
 						var i, il, j, jl;
 
@@ -811,6 +836,40 @@ THREE.VRMLLoader.prototype = {
 
 										uv = child.points[ j ];
 										uvs.push( uv.x, uv.y );
+
+									}
+
+								}
+
+							}
+
+							// normals
+
+							if ( child.nodeType === 'Normal' ) {
+
+								if ( child.points ) {
+
+									for ( j = 0, jl = child.points.length; j < jl; j ++ ) {
+
+										normal = child.points[ j ];
+										normals.push( normal.x, normal.y, normal.z );
+
+									}
+
+								}
+
+							}
+
+							// colors
+
+							if ( child.nodeType === 'Color' ) {
+
+								if ( child.color ) {
+
+									for ( j = 0, jl = child.color.length; j < jl; j ++ ) {
+
+										color = child.color[ j ];
+										colors.push( color.r, color.g, color.b );
 
 									}
 
@@ -853,59 +912,149 @@ THREE.VRMLLoader.prototype = {
 
 						}
 
-						var skip = 0;
-
 						// some shapes only have vertices for use in other shapes
 
 						if ( data.coordIndex ) {
 
-							var newPositions = [];
-							var newUvs = [];
+							function triangulateIndexArray( indexArray, ccw ) {
 
-							position = new THREE.Vector3();
-							uv = new THREE.Vector2();
+								if ( ccw === undefined ) {
 
-							for ( i = 0, il = data.coordIndex.length; i < il; i ++ ) {
-
-								var indexes = data.coordIndex[ i ];
-
-								// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
-
-								skip = 0;
-
-								while ( indexes.length >= 3 && skip < ( indexes.length - 2 ) ) {
-
-									if ( data.ccw === undefined ) data.ccw = true; // ccw is true by default
-
-									var i1 = indexes[ 0 ];
-									var i2 = indexes[ skip + ( data.ccw ? 1 : 2 ) ];
-									var i3 = indexes[ skip + ( data.ccw ? 2 : 1 ) ];
-
-									// create non indexed geometry, necessary for face normal generation
-
-									position.fromArray( positions, i1 * 3 );
-									uv.fromArray( uvs, i1 * 2 );
-									newPositions.push( position.x, position.y, position.z );
-									newUvs.push( uv.x, uv.y );
-
-									position.fromArray( positions, i2 * 3 );
-									uv.fromArray( uvs, i2 * 2 );
-									newPositions.push( position.x, position.y, position.z );
-									newUvs.push( uv.x, uv.y );
-
-									position.fromArray( positions, i3 * 3 );
-									uv.fromArray( uvs, i3 * 2 );
-									newPositions.push( position.x, position.y, position.z );
-									newUvs.push( uv.x, uv.y );
-
-									skip ++;
+									// ccw is true by default
+									ccw = true;
 
 								}
+
+								var triangulatedIndexArray = [];
+								var skip = 0;
+
+								for ( i = 0, il = indexArray.length; i < il; i ++ ) {
+
+									var indexedFace = indexArray[ i ];
+	
+									// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+	
+									skip = 0;
+	
+									while ( indexedFace.length >= 3 && skip < ( indexedFace.length - 2 ) ) {
+
+										var i1 = indexedFace[ 0 ];
+										var i2 = indexedFace[ skip + ( ccw ? 1 : 2 ) ];
+										var i3 = indexedFace[ skip + ( ccw ? 2 : 1 ) ];
+	
+										triangulatedIndexArray.push( i1, i2, i3 );
+	
+										skip ++;
+	
+									}
+	
+								}
+
+								return triangulatedIndexArray;
+
+							}
+
+							var positionIndexes = data.coordIndex ? triangulateIndexArray( data.coordIndex, data.ccw ) : [];
+							var normalIndexes = data.normalIndex ? triangulateIndexArray( data.normalIndex, data.ccw ) : positionIndexes;
+							var colorIndexes = data.colorIndex ? triangulateIndexArray( data.colorIndex, data.ccw ) : positionIndexes;
+							var uvIndexes = data.texCoordIndex ? triangulateIndexArray( data.texCoordIndex, data.ccw ) : positionIndexes;
+
+							var newIndexes = [];
+							var newPositions = [];
+							var newNormals = [];
+							var newColors = [];
+							var newUvs = [];
+
+							// if any other index array does not match the coordinate indexes, split any points that differ
+
+							var pointMap = Object.create( null );
+
+							for ( i = 0; i < positionIndexes.length; i ++ ) {
+
+								var pointAttributes = [];
+
+								var positionIndex = positionIndexes[ i ];
+								var normalIndex = normalIndexes[ i ];
+								var colorIndex = colorIndexes[ i ];
+								var uvIndex = uvIndexes[ i ];
+
+								var base = 10; // which base to use to represent each value
+
+								pointAttributes.push( positionIndex.toString( base ) );
+
+								if ( normalIndex !== undefined ) {
+
+									pointAttributes.push( normalIndex.toString( base ) );
+
+								}
+
+								if ( colorIndex !== undefined ) { 
+
+									pointAttributes.push( colorIndex.toString( base ) );
+
+								}
+
+								if ( uvIndex !== undefined ) {
+
+									pointAttributes.push( uvIndex.toString( base ) );
+
+								}
+
+								var pointId = pointAttributes.join( ',' );
+								var newIndex = pointMap[ pointId ];
+
+								if ( newIndex === undefined ) {
+
+									newIndex = newPositions.length / 3;
+									pointMap[ pointId ] = newIndex;
+
+									newPositions.push(
+										positions[ positionIndex * 3 ],
+										positions[ positionIndex * 3 + 1 ],
+										positions[ positionIndex * 3 + 2 ]
+									);
+
+									if ( normalIndex !== undefined && normals.length > 0 ) {
+
+										newNormals.push(
+											normals[ normalIndex * 3 ],
+											normals[ normalIndex * 3 + 1 ],
+											normals[ normalIndex * 3 + 2 ]
+										);
+
+									}
+
+									if ( colorIndex !== undefined && colors.length > 0 ) {
+
+										newColors.push(
+											colors[ colorIndex * 3 ],
+											colors[ colorIndex * 3 + 1 ],
+											colors[ colorIndex * 3 + 2 ]
+										);
+
+									}
+
+									if ( uvIndex !== undefined && uvs.length > 0 ) {
+
+										newUvs.push(
+											uvs[ uvIndex * 2 ],
+											uvs[ uvIndex * 2 + 1 ]
+										);
+
+									}
+
+								}
+
+								newIndexes.push( newIndex );
 
 							}
 
 							positions = newPositions;
+							normals = newNormals;
+							color = newColors;
 							uvs = newUvs;
+
+							geometry.setIndex( newIndexes );
 
 						} else {
 
@@ -926,13 +1075,30 @@ THREE.VRMLLoader.prototype = {
 
 						geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
+						if ( colors.length > 0 ) {
+
+							geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+						}
+
 						if ( uvs.length > 0 ) {
 
 							geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 						}
 
-						geometry.computeVertexNormals();
+						if ( normals.length > 0 ) {
+
+							geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+
+						} else {
+
+							// convert geometry to non-indexed to get sharp normals 
+							geometry = geometry.toNonIndexed();
+							geometry.computeVertexNormals();
+
+						}
+
 						geometry.computeBoundingSphere();
 
 						// see if it's a define
@@ -1047,6 +1213,10 @@ THREE.VRMLLoader.prototype = {
 		for ( var i = lines.length - 1; i > - 1; i -- ) {
 
 			var line = lines[ i ];
+
+			// The # symbol indicates that all subsequent text, until the end of the line is a comment,
+			// and should be ignored. (see http://gun.teipir.gr/VRML-amgem/spec/part1/grammar.html)
+			line = line.replace( /(#.*)/, '' );
 
 			// split lines with {..{ or {..[ - some have both
 			if ( /{.*[{\[]/.test( line ) ) {

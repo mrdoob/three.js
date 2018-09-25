@@ -55,10 +55,11 @@ Menubar.File = function ( editor ) {
 	document.body.appendChild( form );
 
 	var fileInput = document.createElement( 'input' );
+	fileInput.multiple = true;
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( event ) {
 
-		editor.loader.loadFile( fileInput.files[ 0 ] );
+		editor.loader.loadFiles( fileInput.files );
 		form.reset();
 
 	} );
@@ -184,6 +185,24 @@ Menubar.File = function ( editor ) {
 
 	options.add( new UI.HorizontalRule() );
 
+	// Export DAE
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export DAE' );
+	option.onClick( function () {
+
+		var exporter = new THREE.ColladaExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveString( result.data, 'scene.dae' );
+
+		} );
+
+	} );
+	options.add( option );
+
 	// Export GLB
 
 	var option = new UI.Row();
@@ -200,7 +219,7 @@ Menubar.File = function ( editor ) {
 			// forceIndices: true, forcePowerOfTwoTextures: true
 			// to allow compatibility with facebook
 		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
-		
+
 	} );
 	options.add( option );
 

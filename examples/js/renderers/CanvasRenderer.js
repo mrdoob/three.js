@@ -7,7 +7,7 @@ THREE.SpriteCanvasMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'SpriteCanvasMaterial';
-
+	this.rotation = 0;
 	this.color = new THREE.Color( 0xffffff );
 	this.program = function () {};
 

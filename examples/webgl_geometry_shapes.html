@@ -97,7 +97,7 @@
 
 					// extruded shape
 
-					var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+					var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
 
 					var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
 					mesh.position.set( x, y, z - 75 );
@@ -123,7 +123,7 @@
 
 					// solid line
 
-					var line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
+					var line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color } ) );
 					line.position.set( x, y, z - 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
@@ -131,7 +131,7 @@
 
 					// line from equidistance sampled points
 
-					var line = new THREE.Line( geometrySpacedPoints, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
+					var line = new THREE.Line( geometrySpacedPoints, new THREE.LineBasicMaterial( { color: color } ) );
 					line.position.set( x, y, z + 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );

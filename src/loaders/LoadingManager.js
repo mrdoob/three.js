@@ -11,6 +11,9 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	var itemsTotal = 0;
 	var urlModifier = undefined;
 
+	// Refer to #5689 for the reason why we don't set .onStart
+	// in the constructor
+
 	this.onStart = undefined;
 	this.onLoad = onLoad;
 	this.onProgress = onProgress;

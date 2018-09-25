@@ -161,7 +161,6 @@
 						THREE.ShaderChunk[ "common" ],
 						THREE.ShaderChunk[ "bsdfs" ],
 						THREE.ShaderChunk[ "lights_pars_begin" ],
-						THREE.ShaderChunk[ "lights_pars_maps" ],
 						THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 
 						"void main() {",
@@ -203,11 +202,11 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var earthDiffuse = textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
 					earthMat.map = tex;
 					earthMat.needsUpdate = true;
 				} );
-				var earthSpecular = textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
 					earthMat.specularMap = tex;
 					earthMat.needsUpdate = true;
 				} );
@@ -236,7 +235,7 @@
 					depthTest: false
 				} );
 
-				var earthClouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
 					earthCloudsMat.map = tex;
 					earthCloudsMat.needsUpdate = true;
 				} );

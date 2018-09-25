@@ -2,12 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Quaternion } from '../../math/Quaternion.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 
 function WebVRManager( renderer ) {
 
@@ -18,8 +20,11 @@ function WebVRManager( renderer ) {
 
 	var poseTarget = null;
 
+	var controllers = [];
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
+
+	var frameOfReferenceType = 'stage';
 
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
@@ -67,9 +72,101 @@ function WebVRManager( renderer ) {
 
 			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
 
-		} else if ( scope.enabled ) {
+			animation.start();
 
-			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+		} else {
+
+			if ( scope.enabled ) {
+
+				renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+
+			}
+
+			animation.stop();
+
+		}
+
+	}
+
+	//
+
+	var triggers = [];
+
+	function findGamepad( id ) {
+
+		var gamepads = navigator.getGamepads && navigator.getGamepads();
+
+		for ( var i = 0, j = 0, l = gamepads.length; i < l; i ++ ) {
+
+			var gamepad = gamepads[ i ];
+
+			if ( gamepad && ( gamepad.id === 'Daydream Controller' ||
+				gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ||
+				gamepad.id === 'OpenVR Gamepad' || gamepad.id.startsWith( 'Oculus Touch' ) ||
+				gamepad.id.startsWith( 'Spatial Controller' ) ) ) {
+
+				if ( j === id ) return gamepad;
+
+				j ++;
+
+			}
+
+		}
+
+	}
+
+	function updateControllers() {
+
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			var controller = controllers[ i ];
+
+			var gamepad = findGamepad( i );
+
+			if ( gamepad !== undefined && gamepad.pose !== undefined ) {
+
+				if ( gamepad.pose === null ) return;
+
+				//  Pose
+
+				var pose = gamepad.pose;
+
+				if ( pose.hasPosition === false ) controller.position.set( 0.2, - 0.6, - 0.05 );
+
+				if ( pose.position !== null ) controller.position.fromArray( pose.position );
+				if ( pose.orientation !== null ) controller.quaternion.fromArray( pose.orientation );
+				controller.matrix.compose( controller.position, controller.quaternion, controller.scale );
+				controller.matrix.premultiply( standingMatrix );
+				controller.matrix.decompose( controller.position, controller.quaternion, controller.scale );
+				controller.matrixWorldNeedsUpdate = true;
+				controller.visible = true;
+
+				//  Trigger
+
+				var buttonId = gamepad.id === 'Daydream Controller' ? 0 : 1;
+
+				if ( triggers[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+					triggers[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+					if ( triggers[ i ] === true ) {
+
+						controller.dispatchEvent( { type: 'selectstart' } );
+
+					} else {
+
+						controller.dispatchEvent( { type: 'selectend' } );
+						controller.dispatchEvent( { type: 'select' } );
+
+					}
+
+				}
+
+			} else {
+
+				controller.visible = false;
+
+			}
 
 		}
 
@@ -78,7 +175,24 @@ function WebVRManager( renderer ) {
 	//
 
 	this.enabled = false;
-	this.userHeight = 1.6;
+
+	this.getController = function ( id ) {
+
+		var controller = controllers[ id ];
+
+		if ( controller === undefined ) {
+
+			controller = new Group();
+			controller.matrixAutoUpdate = false;
+			controller.visible = false;
+
+			controllers[ id ] = controller;
+
+		}
+
+		return controller;
+
+	};
 
 	this.getDevice = function () {
 
@@ -90,6 +204,14 @@ function WebVRManager( renderer ) {
 
 		if ( value !== undefined ) device = value;
 
+		animation.setContext( value );
+
+	};
+
+	this.setFrameOfReferenceType = function ( value ) {
+
+		frameOfReferenceType = value;
+
 	};
 
 	this.setPoseTarget = function ( object ) {
@@ -100,7 +222,14 @@ function WebVRManager( renderer ) {
 
 	this.getCamera = function ( camera ) {
 
-		if ( device === null ) return camera;
+		var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
+
+		if ( device === null ) {
+
+			camera.position.set( 0, userHeight, 0 );
+			return camera;
+
+		}
 
 		device.depthNear = camera.near;
 		device.depthFar = camera.far;
@@ -109,15 +238,19 @@ function WebVRManager( renderer ) {
 
 		//
 
-		var stageParameters = device.stageParameters;
+		if ( frameOfReferenceType === 'stage' ) {
 
-		if ( stageParameters ) {
+			var stageParameters = device.stageParameters;
 
-			standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
+			if ( stageParameters ) {
 
-		} else {
+				standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
 
-			standingMatrix.makeTranslation( 0, scope.userHeight, 0 );
+			} else {
+
+				standingMatrix.makeTranslation( 0, userHeight, 0 );
+
+			}
 
 		}
 
@@ -167,8 +300,12 @@ function WebVRManager( renderer ) {
 
 		standingMatrixInverse.getInverse( standingMatrix );
 
-		cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
-		cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
+		if ( frameOfReferenceType === 'stage' ) {
+
+			cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
+			cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
+
+		}
 
 		var parent = poseObject.parent;
 
@@ -216,6 +353,8 @@ function WebVRManager( renderer ) {
 
 		}
 
+		updateControllers();
+
 		return cameraVR;
 
 	};
@@ -228,9 +367,13 @@ function WebVRManager( renderer ) {
 
 	this.isPresenting = isPresenting;
 
-	this.requestAnimationFrame = function ( callback ) {
+	// Animation Loop
 
-		device.requestAnimationFrame( callback );
+	var animation = new WebGLAnimation();
+
+	this.setAnimationLoop = function ( callback ) {
+
+		animation.setAnimationLoop( callback );
 
 	};
 

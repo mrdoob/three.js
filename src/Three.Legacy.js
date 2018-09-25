@@ -73,6 +73,7 @@ import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { WebVRManager } from './renderers/webvr/WebVRManager.js';
+import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 
@@ -1329,6 +1330,21 @@ Object.defineProperties( ShaderMaterial.prototype, {
 
 Object.assign( WebGLRenderer.prototype, {
 
+	clearTarget: function ( renderTarget, color, depth, stencil ) {
+
+		console.warn( 'THREE.WebGLRenderer: .clearTarget() has been deprecated. Use .setRenderTarget() and .clear() instead.' );
+		this.setRenderTarget( renderTarget );
+		this.clear( color, depth, stencil );
+
+	},
+
+	animate: function ( callback ) {
+
+		console.warn( 'THREE.WebGLRenderer: .animate() is now .setAnimationLoop().' );
+		this.setAnimationLoop( callback );
+
+	},
+
 	getCurrentRenderTarget: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
@@ -1683,6 +1699,13 @@ Object.defineProperties( WebVRManager.prototype, {
 			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
 
 		}
+	},
+	userHeight: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebVRManager: .userHeight has been removed.' );
+
+		}
 	}
 
 } );
@@ -1750,51 +1773,47 @@ export var GeometryUtils = {
 
 };
 
-export var ImageUtils = {
+ImageUtils.crossOrigin = undefined;
 
-	crossOrigin: undefined,
+ImageUtils.loadTexture = function ( url, mapping, onLoad, onError ) {
 
-	loadTexture: function ( url, mapping, onLoad, onError ) {
+	console.warn( 'THREE.ImageUtils.loadTexture has been deprecated. Use THREE.TextureLoader() instead.' );
 
-		console.warn( 'THREE.ImageUtils.loadTexture has been deprecated. Use THREE.TextureLoader() instead.' );
+	var loader = new TextureLoader();
+	loader.setCrossOrigin( this.crossOrigin );
 
-		var loader = new TextureLoader();
-		loader.setCrossOrigin( this.crossOrigin );
+	var texture = loader.load( url, onLoad, undefined, onError );
 
-		var texture = loader.load( url, onLoad, undefined, onError );
+	if ( mapping ) texture.mapping = mapping;
 
-		if ( mapping ) texture.mapping = mapping;
+	return texture;
 
-		return texture;
+};
 
-	},
+ImageUtils.loadTextureCube = function ( urls, mapping, onLoad, onError ) {
 
-	loadTextureCube: function ( urls, mapping, onLoad, onError ) {
+	console.warn( 'THREE.ImageUtils.loadTextureCube has been deprecated. Use THREE.CubeTextureLoader() instead.' );
 
-		console.warn( 'THREE.ImageUtils.loadTextureCube has been deprecated. Use THREE.CubeTextureLoader() instead.' );
+	var loader = new CubeTextureLoader();
+	loader.setCrossOrigin( this.crossOrigin );
 
-		var loader = new CubeTextureLoader();
-		loader.setCrossOrigin( this.crossOrigin );
+	var texture = loader.load( urls, onLoad, undefined, onError );
 
-		var texture = loader.load( urls, onLoad, undefined, onError );
+	if ( mapping ) texture.mapping = mapping;
 
-		if ( mapping ) texture.mapping = mapping;
+	return texture;
 
-		return texture;
+};
 
-	},
+ImageUtils.loadCompressedTexture = function () {
 
-	loadCompressedTexture: function () {
+	console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' );
 
-		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' );
+};
 
-	},
+ImageUtils.loadCompressedTextureCube = function () {
 
-	loadCompressedTextureCube: function () {
-
-		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
-
-	}
+	console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
 
 };
 

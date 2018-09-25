@@ -221,7 +221,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( params.ik !== false ) {
 
-				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK );  // this param is experimental
+				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK ); // this param is experimental
 
 			}
 
@@ -275,7 +275,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 */
 		createGrantSolver: function ( mesh ) {
 
-			return new GrantSolver( mesh, mesh.geometry.grants );
+			return new GrantSolver( mesh, mesh.geometry.userData.MMD.grants );
 
 		},
 
@@ -324,7 +324,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( params.animation !== undefined ) {
 
-				this._setupCameraAnimation( camera, params.animation )
+				this._setupCameraAnimation( camera, params.animation );
 
 			}
 
@@ -581,8 +581,8 @@ THREE.MMDAnimationHelper = ( function () {
 
 		_optimizeIK: function ( mesh, physicsEnabled ) {
 
-			var iks = mesh.geometry.iks;
-			var bones = mesh.geometry.bones;
+			var iks = mesh.geometry.userData.MMD.iks;
+			var bones = mesh.geometry.userData.MMD.bones;
 
 			for ( var i = 0, il = iks.length; i < il; i ++ ) {
 
@@ -619,7 +619,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			return new THREE.CCDIKSolver( mesh, mesh.geometry.iks );
+			return new THREE.CCDIKSolver( mesh, mesh.geometry.userData.MMD.iks );
 
 		},
 
@@ -632,7 +632,10 @@ THREE.MMDAnimationHelper = ( function () {
 			}
 
 			return new THREE.MMDPhysics(
-				mesh, mesh.geometry.rigidBodies, mesh.geometry.constraints, params );
+				mesh,
+				mesh.geometry.userData.MMD.rigidBodies,
+				mesh.geometry.userData.MMD.constraints,
+				params );
 
 		},
 
@@ -665,7 +668,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 						objects.set( clip, {
 							duration: clip.duration
-						} )
+						} );
 
 					}
 
@@ -689,7 +692,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 							objects.set( clip, {
 								duration: clip.duration
-							} )
+							} );
 
 						}
 
@@ -942,6 +945,9 @@ THREE.MMDAnimationHelper = ( function () {
 			}
 
 			if ( this.currentTime < this.delayTime ) return false;
+			
+			// 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
+			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
 
 			this.audio.startTime = this.currentTime - this.delayTime;
 

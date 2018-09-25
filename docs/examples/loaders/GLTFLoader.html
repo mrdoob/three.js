@@ -12,8 +12,8 @@
 		<h1>[name]</h1>
 
 		<p class="desc"> A loader for <em>glTF 2.0</em> resources. <br /><br />
-		<a href="https://www.khronos.org/gltf">glTF</a> (GL Transmission Format) is an
-		<a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">open format specification</a>
+		[link:https://www.khronos.org/gltf glTF] (GL Transmission Format) is an
+		[link:https://github.com/KhronosGroup/glTF/tree/master/specification/2.0 open format specification]
 		for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
 		or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
 		data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
@@ -24,14 +24,14 @@
 
 		<p>
 			GLTFLoader supports the following
-			<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/">glTF 2.0 extensions</a>:
+			[link:https://github.com/KhronosGroup/glTF/tree/master/extensions/ glTF 2.0 extensions]:
 		</p>
 
 		<ul>
 			<li>KHR_draco_mesh_compression</li>
 			<li>KHR_materials_pbrSpecularGlossiness</li>
 			<li>KHR_materials_unlit</li>
-			<li>KHR_lights (experimental)</li>
+			<li>KHR_lights_punctual (experimental)</li>
 		</ul>
 
 		<h2>Example</h2>
@@ -60,7 +60,7 @@
 				gltf.asset; // Object
 
 			},
-			// called when loading is in progresses
+			// called while loading is progressing
 			function ( xhr ) {
 
 				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -79,11 +79,36 @@
 
 		<h2>Browser compatibility</h2>
 
-		<p>GLTFLoader relies on ES6 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a>,
+		<p>GLTFLoader relies on ES6 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promises],
 		which are not supported in IE11. To use the loader in IE11, you must
-		<a href="https://github.com/stefanpenner/es6-promise">include a polyfill</a>
+		[link:https://github.com/stefanpenner/es6-promise include a polyfill]
 		providing a Promise replacement.</p>
 
+		<h2>Textures</h2>
+		
+		<p>Textures containing color information (.map, .emissiveMap, and .specularMap) always use sRGB colorspace in
+		glTF, while vertex colors and material properties (.color, .emissive, .specular) use linear colorspace. In a
+		typical rendering workflow, textures are converted to linear colorspace by the renderer, lighting calculations
+		are made, then final output is converted back to sRGB and displayed on screen. Unless you need post-processing
+		in linear colorspace, always configure [page:WebGLRenderer] as follows when using glTF:</p>
+			
+		<code>
+		renderer.gammaOutput = true;
+		renderer.gammaFactor = 2.2;
+		</code>
+		
+		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
+		assumption that the renderer is set up as shown above. When loading textures externally (e.g., using
+		[page:TextureLoader]) and applying them to a glTF model, colorspace and orientation must be given:</p>
+		
+		<code>
+		// If texture is used for color information, set colorspace.
+		texture.encoding = THREE.sRGBEncoding;
+
+		// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+		texture.flipY = false;
+		</code>		
+		
 		<h2>Custom extensions</h2>
 
 		<p>

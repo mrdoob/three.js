@@ -12,15 +12,16 @@ THREE.AssimpLoader.prototype = {
 
 	constructor: THREE.AssimpLoader,
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = THREE.LoaderUtils.extractUrlBase( url );
+		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( buffer ) {
@@ -31,16 +32,31 @@ THREE.AssimpLoader.prototype = {
 
 	},
 
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
+
+	},
+
+	setResourcePath: function ( value ) {
+
+		this.resourcePath = value;
+		return this;
+
+	},
+
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
 	parse: function ( buffer, path ) {
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
-		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		var Virtulous = {};
 
@@ -1129,7 +1145,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 			if ( ! key ) {
-				
+
 				return null;
 
 			} else if ( nextKey ) {
@@ -1150,7 +1166,7 @@ THREE.AssimpLoader.prototype = {
 				var l = T / dT;
 
 				return lerp( key.mValue.toTHREE(), nextKey.mValue.toTHREE(), l );
-				
+
 			}
 
 		}

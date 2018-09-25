@@ -8,24 +8,22 @@
  *    - http://www.melax.com/polychop/
  */
 
-THREE.SimplifyModifier = function() {
+THREE.SimplifyModifier = function () {};
 
-};
-
-(function() {
+( function () {
 
 	var cb = new THREE.Vector3(), ab = new THREE.Vector3();
 
 	function pushIfUnique( array, object ) {
 
-		if ( array.indexOf( object ) === -1 ) array.push( object );
+		if ( array.indexOf( object ) === - 1 ) array.push( object );
 
 	}
 
 	function removeFromArray( array, object ) {
 
 		var k = array.indexOf( object );
-		if ( k > -1 ) array.splice( k, 1 );
+		if ( k > - 1 ) array.splice( k, 1 );
 
 	}
 
@@ -38,14 +36,14 @@ THREE.SimplifyModifier = function() {
 		var curvature = 0;
 
 		var sideFaces = [];
-		var i, uFaces = u.faces, il = u.faces.length, face, sideFace;
+		var i, il = u.faces.length, face, sideFace;
 
 		// find the "sides" triangles that are on the edge uv
-		for ( i = 0 ; i < il; i ++ ) {
+		for ( i = 0; i < il; i ++ ) {
 
 			face = u.faces[ i ];
 
-			if ( face.hasVertex(v) ) {
+			if ( face.hasVertex( v ) ) {
 
 				sideFaces.push( face );
 
@@ -55,20 +53,22 @@ THREE.SimplifyModifier = function() {
 
 		// use the triangle facing most away from the sides
 		// to determine our curvature term
-		for ( i = 0 ; i < il; i ++ ) {
+		for ( i = 0; i < il; i ++ ) {
 
 			var minCurvature = 1;
 			face = u.faces[ i ];
 
-			for( var j = 0; j < sideFaces.length; j ++ ) {
+			for ( var j = 0; j < sideFaces.length; j ++ ) {
 
 				sideFace = sideFaces[ j ];
 				// use dot product of face normals.
 				var dotProd = face.normal.dot( sideFace.normal );
-				minCurvature = Math.min( minCurvature, ( 1.001 - dotProd ) / 2);
+				minCurvature = Math.min( minCurvature, ( 1.001 - dotProd ) / 2 );
+
 			}
 
 			curvature = Math.max( curvature, minCurvature );
+
 		}
 
 		// crude approach in attempt to preserve borders
@@ -79,6 +79,7 @@ THREE.SimplifyModifier = function() {
 			// we add some arbitrary cost for borders,
 			// borders += 10;
 			curvature = 1;
+
 		}
 
 		var amt = edgelength * curvature + borders;
@@ -88,6 +89,7 @@ THREE.SimplifyModifier = function() {
 	}
 
 	function computeEdgeCostAtVertex( v ) {
+
 		// compute the edge collapse cost for all edges that start
 		// from vertex v.  Since we are only interested in reducing
 		// the object by selecting the min cost edge at each step, we
@@ -113,12 +115,14 @@ THREE.SimplifyModifier = function() {
 
 			var collapseCost = computeEdgeCollapseCost( v, v.neighbors[ i ] );
 
-			if ( !v.collapseNeighbor ) {
+			if ( ! v.collapseNeighbor ) {
+
 				v.collapseNeighbor = v.neighbors[ i ];
 				v.collapseCost = collapseCost;
 				v.minCost = collapseCost;
 				v.totalCost = 0;
 				v.costCount = 0;
+
 			}
 
 			v.costCount ++;
@@ -163,16 +167,19 @@ THREE.SimplifyModifier = function() {
 		if ( f.v3 ) removeFromArray( f.v3.faces, f );
 
 		// TODO optimize this!
-		var vs = [ this.v1, this.v2, this.v3 ];
+		var vs = [ f.v1, f.v2, f.v3 ];
 		var v1, v2;
 
-		for( var i = 0 ; i < 3 ; i ++ ) {
-			v1 = vs[ i ];
-			v2 = vs[( i+1) % 3 ];
+		for ( var i = 0; i < 3; i ++ ) {
 
-			if( !v1 || !v2 ) continue;
+			v1 = vs[ i ];
+			v2 = vs[ ( i + 1 ) % 3 ];
+
+			if ( ! v1 || ! v2 ) continue;
+
 			v1.removeIfNonNeighbor( v2 );
 			v2.removeIfNonNeighbor( v1 );
+
 		}
 
 	}
@@ -181,7 +188,7 @@ THREE.SimplifyModifier = function() {
 
 		// Collapse the edge uv by moving vertex u onto v
 
-		if ( !v ) {
+		if ( ! v ) {
 
 			// u is a vertex all by itself so just delete it..
 			removeVertex( u, vertices );
@@ -192,7 +199,7 @@ THREE.SimplifyModifier = function() {
 		var i;
 		var tmpVertices = [];
 
-		for( i = 0 ; i < u.neighbors.length; i ++ ) {
+		for ( i = 0; i < u.neighbors.length; i ++ ) {
 
 			tmpVertices.push( u.neighbors[ i ] );
 
@@ -200,7 +207,7 @@ THREE.SimplifyModifier = function() {
 
 
 		// delete triangles on edge uv:
-		for( i = u.faces.length - 1; i >= 0; i -- ) {
+		for ( i = u.faces.length - 1; i >= 0; i -- ) {
 
 			if ( u.faces[ i ].hasVertex( v ) ) {
 
@@ -211,9 +218,9 @@ THREE.SimplifyModifier = function() {
 		}
 
 		// update remaining triangles to have v instead of u
-		for( i = u.faces.length -1 ; i >= 0; i -- ) {
+		for ( i = u.faces.length - 1; i >= 0; i -- ) {
 
-			u.faces[i].replaceVertex( u, v );
+			u.faces[ i ].replaceVertex( u, v );
 
 		}
 
@@ -221,7 +228,7 @@ THREE.SimplifyModifier = function() {
 		removeVertex( u, vertices );
 
 		// recompute the edge collapse costs in neighborhood
-		for( i = 0; i < tmpVertices.length; i ++ ) {
+		for ( i = 0; i < tmpVertices.length; i ++ ) {
 
 			computeEdgeCostAtVertex( tmpVertices[ i ] );
 
@@ -237,13 +244,14 @@ THREE.SimplifyModifier = function() {
 
 		var least = vertices[ 0 ];
 
-		for (var i = 0; i < vertices.length; i ++ ) {
+		for ( var i = 0; i < vertices.length; i ++ ) {
 
 			if ( vertices[ i ].collapseCost < least.collapseCost ) {
 
 				least = vertices[ i ];
 
 			}
+
 		}
 
 		return least;
@@ -253,6 +261,7 @@ THREE.SimplifyModifier = function() {
 	// we use a triangle class to represent structure of face slightly differently
 
 	function Triangle( v1, v2, v3, a, b, c ) {
+
 		this.a = a;
 		this.b = b;
 		this.c = c;
@@ -280,7 +289,7 @@ THREE.SimplifyModifier = function() {
 
 	}
 
-	Triangle.prototype.computeNormal = function() {
+	Triangle.prototype.computeNormal = function () {
 
 		var vA = this.v1.position;
 		var vB = this.v2.position;
@@ -294,13 +303,13 @@ THREE.SimplifyModifier = function() {
 
 	};
 
-	Triangle.prototype.hasVertex = function( v ) {
+	Triangle.prototype.hasVertex = function ( v ) {
 
 		return v === this.v1 || v === this.v2 || v === this.v3;
 
 	};
 
-	Triangle.prototype.replaceVertex = function( oldv, newv ) {
+	Triangle.prototype.replaceVertex = function ( oldv, newv ) {
 
 		if ( oldv === this.v1 ) this.v1 = newv;
 		else if ( oldv === this.v2 ) this.v2 = newv;
@@ -347,17 +356,19 @@ THREE.SimplifyModifier = function() {
 
 	}
 
-	Vertex.prototype.addUniqueNeighbor = function( vertex ) {
-		pushIfUnique(this.neighbors, vertex);
+	Vertex.prototype.addUniqueNeighbor = function ( vertex ) {
+
+		pushIfUnique( this.neighbors, vertex );
+
 	};
 
-	Vertex.prototype.removeIfNonNeighbor = function( n ) {
+	Vertex.prototype.removeIfNonNeighbor = function ( n ) {
 
 		var neighbors = this.neighbors;
 		var faces = this.faces;
 
 		var offset = neighbors.indexOf( n );
-		if ( offset === -1 ) return;
+		if ( offset === - 1 ) return;
 		for ( var i = 0; i < faces.length; i ++ ) {
 
 			if ( faces[ i ].hasVertex( n ) ) return;
@@ -365,13 +376,15 @@ THREE.SimplifyModifier = function() {
 		}
 
 		neighbors.splice( offset, 1 );
+
 	};
 
-	THREE.SimplifyModifier.prototype.modify = function( geometry, count ) {
+	THREE.SimplifyModifier.prototype.modify = function ( geometry, count ) {
 
-		if ( geometry instanceof THREE.BufferGeometry && !geometry.vertices && !geometry.faces ) {
-			console.log('converting BufferGeometry to Geometry');
+		if ( geometry.isBufferGeometry ) {
+
 			geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+
 		}
 
 		geometry.mergeVertices();
@@ -379,83 +392,103 @@ THREE.SimplifyModifier = function() {
 		var oldVertices = geometry.vertices; // Three Position
 		var oldFaces = geometry.faces; // Three Face
 
-		var newGeometry = new THREE.Geometry();
-
 		// conversion
-		var vertices = new Array( oldVertices.length ); // Simplify Custom Vertex Struct
-		var faces = new Array( oldFaces.length ); // Simplify Custom Traignle Struct
+		var vertices = [];
+		var faces = [];
 
-		var i, il, face;
+		var i, il;
 
 		//
 		// put data of original geometry in different data structures
 		//
 
 		// add vertices
+
 		for ( i = 0, il = oldVertices.length; i < il; i ++ ) {
 
-			vertices[ i ] = new Vertex( oldVertices[ i ], i );
+			var vertex = new Vertex( oldVertices[ i ], i );
+			vertices.push( vertex );
 
 		}
 
 		// add faces
+
 		for ( i = 0, il = oldFaces.length; i < il; i ++ ) {
 
-			face = oldFaces[ i ];
-			faces[ i ] = new Triangle( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ], face.a, face.b, face.c );
+			var face = oldFaces[ i ];
+
+			var a = face.a;
+			var b = face.b;
+			var c = face.c;
+
+			var triangle = new Triangle( vertices[ a ], vertices[ b ], vertices[ c ], a, b, c );
+			faces.push( triangle );
 
 		}
 
 		// compute all edge collapse costs
+
 		for ( i = 0, il = vertices.length; i < il; i ++ ) {
 
 			computeEdgeCostAtVertex( vertices[ i ] );
 
 		}
 
-		var permutation = new Array( vertices.length );
-		var map = new Array( vertices.length );
-
 		var nextVertex;
 
 		var z = count;
 
-		// console.time('z')
-		// console.profile('zz');
+		while ( z -- ) {
 
-		while( z-- ) {
 			nextVertex = minimumCostEdge( vertices );
-			if (!nextVertex) {
-				console.log('no next vertex');
+
+			if ( ! nextVertex ) {
+
+				console.log( 'THREE.SimplifyModifier: No next vertex' );
 				break;
+
 			}
+
 			collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
+
 		}
 
-		// console.profileEnd('zz');
-		// console.timeEnd('z')
+		//
 
-		// TODO convert to buffer geometry.
-		var newGeo = new THREE.Geometry();
+		var simplifiedGeometry = new THREE.BufferGeometry();
+		var position = [];
+		var index = [];
+
+		//
 
 		for ( i = 0; i < vertices.length; i ++ ) {
 
-			var v = vertices[ i ];
-			newGeo.vertices.push( v.position )
+			var vertex = vertices[ i ].position;
+			position.push( vertex.x, vertex.y, vertex.z );
 
 		}
+
+		//
 
 		for ( i = 0; i < faces.length; i ++ ) {
 
-			var tri = faces[ i ];
-			newGeo.faces.push( new THREE.Face3(
-				vertices.indexOf(tri.v1),
-				vertices.indexOf(tri.v2),
-				vertices.indexOf(tri.v3)
-			) )
+			var face = faces[ i ];
+
+			var a = vertices.indexOf( face.v1 );
+			var b = vertices.indexOf( face.v2 );
+			var c = vertices.indexOf( face.v3 );
+
+			index.push( a, b, c );
 
 		}
 
-		return newGeo;
+		//
+
+		simplifiedGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+		simplifiedGeometry.setIndex( index );
+
+		return simplifiedGeometry;
+
 	};
-})();
+
+} )();

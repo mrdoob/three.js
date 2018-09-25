@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>骨架（[name]）</h1>
+
+		<p class="desc">
+			使用一个[page:Bone bones]数组来创建一个可以由[page:SkinnedMesh]使用的骨架。
+		</p>
+
+		<h2>实例</h2>
+<code>
+// Create a simple "arm"
+
+var bones = [];
+
+var shoulder = new THREE.Bone();
+var elbow = new THREE.Bone();
+var hand = new THREE.Bone();
+
+shoulder.add( elbow );
+elbow.add( hand );
+
+bones.push( shoulder );
+bones.push( elbow );
+bones.push( hand );
+
+shoulder.position.y = -5;
+elbow.position.y = 0;
+hand.position.y = 5;
+
+var armSkeleton = new THREE.Skeleton( bones );
+</code>
+		<p>
+			请查看[page:SkinnedMesh]页面，来查看其在标准的[page:BufferGeometry]中使用的示例。
+ 		</p>
+
+		<h2>构造器</h2>
+
+
+		<h3>[name]( [param:Array bones], [param:Array boneInverses] )</h3>
+		<p>
+		[page:Array bones] —— 包含有一组[page:Bone bone]的数组，默认值是一个空数组。<br/>
+		[page:Array boneInverses] —— （可选） 包含[page:Matrix4 Matrix4]的数组。<br /><br />
+
+		创建一个新的[name].
+		</p>
+
+
+		<h2>属性</h2>
+
+		<h3>[property:Array bones]</h3>
+		<p>
+		包含有一组[page:Bone bone]的数组。请注意，这是一份原始数组的拷贝，不是引用，所以你可以在不对当前数组造成影响的情况下，修改原始数组。
+		</p>
+
+		<h3>[property:Array boneInverses]</h3>
+		<p>
+		包含有一组[page:Matrix4 Matrix4]，表示每个独立骨骼[page:Matrix4 matrixWorld]矩阵的逆矩阵。
+		</p>
+
+		<h3>[property:Float32Array boneMatrices]</h3>
+		<p>
+		当使用顶点纹理时，数组缓冲区保存着骨骼数据。
+		</p>
+
+		<h3>[property:DataTexture boneTexture]</h3>
+		<p>
+		当使用顶点纹理时，[page:DataTexture]保存着骨骼数据。
+		</p>
+
+
+		<h2>方法</h2>
+
+		<h3>[method:Skeleton clone]()</h3>
+		<p>
+			返回一个当前Skeleton对象的克隆。
+		</p>
+
+
+		<h3>[method:null calculateInverses]()</h3>
+		<p>如果没有在构造器中提供，生成[page:.boneInverses boneInverses]数组。
+		</p>
+
+
+		<h3>[method:null pose]()</h3>
+		<p>返回骨架的基础姿势。</p>
+
+
+		<h3>[method:null update]()</h3>
+		<p>
+			在改变骨骼后，更新[page:Float32Array boneMatrices] 和 [page:DataTexture boneTexture]的值。
+			如果骨架被用于[page:SkinnedMesh]，则它将会被[page:WebGLRenderer]自动调用。
+		</p>
+
+		<h3>[method:Bone getBoneByName]( [param:String name] )</h3>
+		<p>
+			
+		name -- 匹配Bone对象中.name属性的字符串。<br /><br />
+		在骨架中的骨骼数组中遍览，并返回第一个能够和name匹配上的骨骼对象。<br />
+		</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

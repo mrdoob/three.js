@@ -100,6 +100,8 @@
 
 		var effectController;
 
+		var controls;
+
 		var time = 0;
 		var clock = new THREE.Clock();
 
@@ -313,7 +315,7 @@
 
 			"flat" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, flatShading: true } ),
+				m: new THREE.MeshLambertMaterial( { color: 0x000000, flatShading: true } ),
 				h: 0, s: 0, l: 1
 			},
 

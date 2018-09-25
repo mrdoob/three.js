@@ -124,7 +124,7 @@
 						camera.position.y = heightData[ terrainHalfWidth + terrainHalfDepth * terrainWidth ] * ( terrainMaxHeight - terrainMinHeight ) + 5;
 
 						camera.position.z = terrainDepthExtents / 2;
-						camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+						camera.lookAt( 0, 0, 0 );
 
 						controls = new THREE.OrbitControls( camera );
 
@@ -204,7 +204,7 @@
 
 						// Create the terrain body
 
-						var groundShape = this.createTerrainShape( heightData );
+						var groundShape = createTerrainShape();
 						var groundTransform = new Ammo.btTransform();
 						groundTransform.setIdentity();
 						// Shifts the terrain, since bullet re-centers it on its bounding box.

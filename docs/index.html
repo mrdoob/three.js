@@ -32,6 +32,18 @@
 
 		<script>
 
+			var hash = window.location.hash.substring( 1 );
+
+			// Route non-localised api links
+
+			if ( /^(api|manual)/.test( hash ) && /^(api|manual)\/(en|zh)\//.test( hash ) === false ) {
+
+				window.location.hash = hash.replace( /^(api|manual)/, '$1/en' );
+
+			}
+
+			//
+
 			var panel = document.getElementById( 'panel' );
 			var content = document.getElementById( 'content' );
 			var clearFilterButton = document.getElementById( 'clearFilterButton' );
@@ -93,6 +105,8 @@
 				link.setAttribute( 'target', 'viewer' );
 				link.addEventListener( 'click', function ( event ) {
 
+					if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+
 					window.location.hash = pageURL;
 					panel.classList.add( 'collapsed' );
 
@@ -140,6 +154,10 @@
 							// Create page links
 
 							var pageURL = pages[ pageName ];
+
+							// Localisation
+
+							pageURL = pageURL.replace( '{lan}', 'en' );
 
 							var listElement = document.createElement( 'li' );
 							categoryContent.appendChild( listElement );

@@ -125,6 +125,11 @@ Sidebar.Geometry = function ( editor ) {
 
 	container.add( geometryNameRow );
 
+	// parameters
+
+	var parameters = new UI.Span();
+	container.add( parameters );
+
 	// geometry
 
 	container.add( new Sidebar.Geometry.Geometry( editor ) );
@@ -133,11 +138,12 @@ Sidebar.Geometry = function ( editor ) {
 
 	container.add( new Sidebar.Geometry.BufferGeometry( editor ) );
 
-	// parameters
+	// size
 
-	var parameters = new UI.Span();
-	container.add( parameters );
+	var geometryBoundingSphere = new UI.Text();
 
+	container.add( new UI.Text( 'Bounds' ).setWidth( '90px' ) );
+	container.add( geometryBoundingSphere );
 
 	//
 
@@ -169,6 +175,8 @@ Sidebar.Geometry = function ( editor ) {
 				parameters.add( new Sidebar.Geometry[ geometry.type ]( editor, object ) );
 
 			}
+
+			geometryBoundingSphere.setValue( Math.floor( geometry.boundingSphere.radius * 1000 ) / 1000 );
 
 		} else {
 

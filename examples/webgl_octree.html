@@ -23,7 +23,7 @@
 				scene,
 				renderer,
 				octree,
-				geometry,
+				geometry = new THREE.BoxBufferGeometry( 50, 50, 50 ),
 				material,
 				mesh,
 				meshes = [],
@@ -122,8 +122,6 @@
 
 			}
 
-			var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
-
 			function modifyOctree() {
 
 				// if is adding objects to octree
@@ -132,7 +130,7 @@
 
 					// create new object
 
-					mesh = new THREE.Line( geometry, new THREE.MeshBasicMaterial( { color: new THREE.Color( base ) } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: new THREE.Color( base ) } ) );
 
 					// give new object a random position in radius
 
@@ -218,10 +216,6 @@
 					Math.random() * radiusMax - radiusMaxHalf
 				);
 
-				// record start time
-
-				var timeStart = Date.now();
-
 				// search octree from search mesh position with search radius
 				// optional third parameter: boolean, if should sort results by object when using faces in octree
 				// optional fourth parameter: vector3, direction of search when using ray (assumes radius is distance/far of ray)
@@ -230,11 +224,7 @@
 				direction.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 ).normalize();
 				rayCaster.set( origin, direction );
 				meshesSearch = octree.search( rayCaster.ray.origin, radiusSearch, true, rayCaster.ray.direction );
-				var intersections = rayCaster.intersectOctreeObjects( meshesSearch );
-
-				// record end time
-
-				var timeEnd = Date.now();
+				rayCaster.intersectOctreeObjects( meshesSearch );
 
 				// set color of all meshes found in search
 
@@ -243,15 +233,6 @@
 					meshesSearch[ i ].object.material.color.copy( found );
 
 				}
-
-				/*
-
-				// results to console
-
-				console.log( 'OCTREE: ', octree );
-				console.log( '... searched ', meshes.length, ' and found ', meshesSearch.length, ' with intersections ', intersections.length, ' and took ', ( timeEnd - timeStart ), ' ms ' );
-
-				*/
 
 			}
 

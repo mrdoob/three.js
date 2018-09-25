@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A light that gets emitted from a single point in all directions. A common use case for this
+			is to replicate the light emitted from a bare lightbulb.<br /><br />
+
+			 This light can cast shadows - see [page:LightShadow] page for details.
+		</p>
+
+
+		<h2>Example</h2>
+
+		<p>
+			[example:canvas_lights_pointlights lights / pointlights ]<br />
+			[example:webgl_lights_pointlights lights / pointlights ]<br />
+			[example:webgl_lights_pointlights2 lights / pointlights2 ]<br />
+			[example:webgldeferred_animation animation ]<br />
+			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
+			[example:webgl_geometry_text geometry / text ]<br />
+			[example:webgl_lensflares lensflares ]
+		</p>
+
+		<code>
+var light = new THREE.PointLight( 0xff0000, 1, 100 );
+light.position.set( 50, 50, 50 );
+scene.add( light );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Number distance], [param:Float decay] )</h3>
+		<p>
+			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
+			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+			[page:Number distance] - The distance from the light where the intensity is 0.
+			When set to 0, then the light never stops. Default is 0.<br />
+			[page:Float decay] - The amount the light dims along the distance of the light. Default is 1.
+			For [page:WebGLRenderer.physicallyCorrectLights physically correct] lighting, set this to 2.<br /><br />
+
+			Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+		<p>
+			See the base [page:Light Light] class for common properties.
+		</p>
+
+		<h3>[property:Float decay]</h3>
+		<p>
+			The amount the light dims along the distance of the light<br />
+			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, decay = 2 leads to physically realistic light falloff.<br/>
+			Default is *1*.
+		</p>
+
+		<h3>[property:Float distance]</h3>
+		<p>
+			If non-zero, light will attenuate linearly from maximum intensity at the light's
+			position down to zero at this distance from the light. Default is *0.0*.
+		</p>
+
+		<h3>[property:Boolean isPointLight]</h3>
+		<p>
+			Used to check whether this or derived classes are point lights. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+		<h3>[property:Float power]</h3>
+		<p>
+			The light's power.<br />
+			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, the luminous
+			power of the light measured in lumens. Default is *4Math.PI*. <br /><br />
+
+			This is directly related to the [page:.intensity intensity] in the ratio
+			<code>
+				power = intensity * 4&pi;
+			</code>
+			and changing this will also change the intensity.
+		</p>
+
+		<h3>[property:LightShadow shadow]</h3>
+		<p>
+			A [page:LightShadow] used to calculate shadows for this light.<br /><br />
+
+			 The lightShadow's [page:LightShadow.camera camera]
+			is set to a  [page:PerspectiveCamera] with [page:PerspectiveCamera.fov fov] of 90,
+			[page:PerspectiveCamera.aspect aspect] of 1, [page:PerspectiveCamera.near near]
+			clipping plane at 0.5 and	[page:PerspectiveCamera.far far] clipping plane at 500.
+		</p>
+
+		<h2>Methods</h2>
+		<p>
+			See the base [page:Light Light] class for common methods.
+		</p>
+
+		<h3>[method:PointLight copy]( [param:PointLight source] )</h3>
+		<p>
+		Copies value of all the properties from the [page:PointLight source] to this
+		PointLight.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

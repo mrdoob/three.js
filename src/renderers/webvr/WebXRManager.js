@@ -2,28 +2,30 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Matrix4 } from '../../math/Matrix4.js';
+import { Group } from '../../objects/Group.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { Vector3 } from '../../math/Vector3.js';
-import { Quaternion } from '../../math/Quaternion.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 
-function WebXRManager( gl ) {
+function WebXRManager( renderer ) {
 
-	var scope = this;
+	var gl = renderer.context;
 
 	var device = null;
 	var session = null;
 
-	var frameOfRef = null;
-	var isExclusive = false;
+	var frameOfReference = null;
+	var frameOfReferenceType = 'stage';
 
 	var pose = null;
 
+	var controllers = [];
+	var inputSources = [];
+
 	function isPresenting() {
 
-		return session !== null && frameOfRef !== null;
+		return session !== null && frameOfReference !== null;
 
 	}
 
@@ -45,6 +47,24 @@ function WebXRManager( gl ) {
 
 	this.enabled = false;
 
+	this.getController = function ( id ) {
+
+		var controller = controllers[ id ];
+
+		if ( controller === undefined ) {
+
+			controller = new Group();
+			controller.matrixAutoUpdate = false;
+			controller.visible = false;
+
+			controllers[ id ] = controller;
+
+		}
+
+		return controller;
+
+	};
+
 	this.getDevice = function () {
 
 		return device;
@@ -54,8 +74,29 @@ function WebXRManager( gl ) {
 	this.setDevice = function ( value ) {
 
 		if ( value !== undefined ) device = value;
+		if ( value instanceof XRDevice ) gl.setCompatibleXRDevice( value );
 
-		gl.setCompatibleXRDevice( value );
+	};
+
+	//
+
+	function onSessionEvent( event ) {
+
+		var controller = controllers[ inputSources.indexOf( event.inputSource ) ];
+		if ( controller ) controller.dispatchEvent( { type: event.type } );
+
+	}
+
+	function onSessionEnd() {
+
+		renderer.setFramebuffer( null );
+		animation.stop();
+
+	}
+
+	this.setFrameOfReferenceType = function ( value ) {
+
+		frameOfReferenceType = value;
 
 	};
 
@@ -65,11 +106,31 @@ function WebXRManager( gl ) {
 
 		if ( session !== null ) {
 
-			session.baseLayer = new XRWebGLLayer( session, gl );
-			session.requestFrameOfReference( 'stage' ).then( function ( value ) {
+			session.addEventListener( 'select', onSessionEvent );
+			session.addEventListener( 'selectstart', onSessionEvent );
+			session.addEventListener( 'selectend', onSessionEvent );
+			session.addEventListener( 'end', onSessionEnd );
 
-				frameOfRef = value;
-				isExclusive = session.exclusive;
+			session.baseLayer = new XRWebGLLayer( session, gl );
+			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
+
+				frameOfReference = value;
+
+				renderer.setFramebuffer( session.baseLayer.framebuffer );
+
+				animation.setContext( session );
+				animation.start();
+
+			} );
+
+			//
+
+			inputSources = session.getInputSources();
+
+			session.addEventListener( 'inputsourceschange', function () {
+
+				inputSources = session.getInputSources();
+				console.log( inputSources );
 
 			} );
 
@@ -77,19 +138,70 @@ function WebXRManager( gl ) {
 
 	};
 
+	function updateCamera( camera, parent ) {
+
+		if ( parent === null ) {
+
+			camera.matrixWorld.copy( camera.matrix );
+
+		} else {
+
+			camera.matrixWorld.multiplyMatrices( parent.matrixWorld, camera.matrix );
+
+		}
+
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
+	}
+
 	this.getCamera = function ( camera ) {
 
-		return isPresenting() ? cameraVR : camera;
+		if ( isPresenting() ) {
+
+			var parent = camera.parent;
+			var cameras = cameraVR.cameras;
+
+			// apply camera.parent to cameraVR
+
+			updateCamera( cameraVR, parent );
+
+			for ( var i = 0; i < cameras.length; i ++ ) {
+
+				updateCamera( cameras[ i ], parent );
+
+			}
+
+			// update camera and its children
+
+			camera.matrixWorld.copy( cameraVR.matrixWorld );
+
+			var children = camera.children;
+
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+				children[ i ].updateMatrixWorld( true );
+
+			}
+
+			return cameraVR;
+
+		}
+
+		return camera;
 
 	};
 
 	this.isPresenting = isPresenting;
 
-	this.requestAnimationFrame = function ( callback ) {
+	// Animation Loop
 
-		function onFrame( time, frame ) {
+	var onAnimationFrameCallback = null;
 
-			pose = frame.getDevicePose( frameOfRef );
+	function onAnimationFrame( time, frame ) {
+
+		pose = frame.getDevicePose( frameOfReference );
+
+		if ( pose !== null ) {
 
 			var layer = session.baseLayer;
 			var views = frame.views;
@@ -101,15 +213,13 @@ function WebXRManager( gl ) {
 				var viewMatrix = pose.getViewMatrix( view );
 
 				var camera = cameraVR.cameras[ i ];
+				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
 				camera.projectionMatrix.fromArray( view.projectionMatrix );
-				camera.matrixWorldInverse.fromArray( viewMatrix );
-				camera.matrixWorld.getInverse( camera.matrixWorldInverse );
 				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
 				if ( i === 0 ) {
 
-					cameraVR.matrixWorld.copy( camera.matrixWorld );
-					cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
+					cameraVR.matrix.copy( camera.matrix );
 
 					// HACK (mrdoob)
 					// https://github.com/w3c/webvr/issues/203
@@ -120,21 +230,72 @@ function WebXRManager( gl ) {
 
 			}
 
-			gl.bindFramebuffer( gl.FRAMEBUFFER, session.baseLayer.framebuffer );
+		}
 
-			callback();
+		//
+
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			var controller = controllers[ i ];
+
+			var inputSource = inputSources[ i ];
+
+			if ( inputSource ) {
+
+				var inputPose = frame.getInputPose( inputSource, frameOfReference );
+
+				if ( inputPose !== null ) {
+
+					if ( 'targetRay' in inputPose ) {
+
+						controller.matrix.elements = inputPose.targetRay.transformMatrix;
+
+					} else if ( 'pointerMatrix' in inputPose ) {
+
+						// DEPRECATED
+
+						controller.matrix.elements = inputPose.pointerMatrix;
+
+					}
+
+					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
+					controller.visible = true;
+
+					continue;
+
+				}
+
+			}
+
+			controller.visible = false;
 
 		}
 
-		session.requestAnimationFrame( onFrame );
+		if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
+
+	}
+
+	var animation = new WebGLAnimation();
+	animation.setAnimationLoop( onAnimationFrame );
+
+	this.setAnimationLoop = function ( callback ) {
+
+		onAnimationFrameCallback = callback;
 
 	};
 
-	this.submitFrame = function () {
+	this.dispose = function () {};
 
-		// if ( device && device.isPresenting ) device.submitFrame();
+	// DEPRECATED
+
+	this.getStandingMatrix = function () {
+
+		console.warn( 'THREE.WebXRManager: getStandingMatrix() is no longer needed.' );
+		return new THREE.Matrix4();
 
 	};
+
+	this.submitFrame = function () {};
 
 }
 

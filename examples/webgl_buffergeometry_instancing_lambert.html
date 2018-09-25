@@ -56,152 +56,148 @@
 
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-		THREE.CustomShaderLib = {
+		THREE.ShaderLib.customDepthRGBA = { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
 
-			customDepthRGBA: { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
+			uniforms: THREE.ShaderLib.depth.uniforms,
 
-				uniforms: THREE.ShaderLib.depth.uniforms,
+			vertexShader:
+				`
+				// instanced
+				#ifdef INSTANCED
 
-				vertexShader:
-					`
-					// instanced
-					#ifdef INSTANCED
+					attribute vec3 instanceOffset;
+					attribute float instanceScale;
 
-						attribute vec3 instanceOffset;
-						attribute float instanceScale;
+				#endif
 
-					#endif
+				#include <common>
+				#include <uv_pars_vertex>
+				#include <displacementmap_pars_vertex>
+				#include <morphtarget_pars_vertex>
+				#include <skinning_pars_vertex>
+				#include <logdepthbuf_pars_vertex>
+				#include <clipping_planes_pars_vertex>
 
-					#include <common>
-					#include <uv_pars_vertex>
-					#include <displacementmap_pars_vertex>
-					#include <morphtarget_pars_vertex>
-					#include <skinning_pars_vertex>
-					#include <logdepthbuf_pars_vertex>
-					#include <clipping_planes_pars_vertex>
+				void main() {
 
-					void main() {
+					#include <uv_vertex>
 
-						#include <uv_vertex>
+					#include <skinbase_vertex>
 
-						#include <skinbase_vertex>
-
-						#ifdef USE_DISPLACEMENTMAP
-
-							#include <beginnormal_vertex>
-							#include <morphnormal_vertex>
-							#include <skinnormal_vertex>
-
-						#endif
-
-						#include <begin_vertex>
-
-						// instanced
-						#ifdef INSTANCED
-
-							transformed *= instanceScale;
-							transformed = transformed + instanceOffset;
-
-						#endif
-
-						#include <morphtarget_vertex>
-						#include <skinning_vertex>
-						#include <displacementmap_vertex>
-						#include <project_vertex>
-						#include <logdepthbuf_vertex>
-						#include <clipping_planes_vertex>
-
-					}
-				`,
-
-				fragmentShader: THREE.ShaderChunk.depth_frag
-
-			},
-
-			lambert: { // this is a cut-and-paste of the lambert shader -- modified to accommodate instancing for this app
-
-				uniforms: THREE.ShaderLib.lambert.uniforms,
-
-				vertexShader:
-					`
-					#define LAMBERT
-
-					#ifdef INSTANCED
-						attribute vec3 instanceOffset;
-						attribute vec3 instanceColor;
-						attribute float instanceScale;
-					#endif
-
-					varying vec3 vLightFront;
-
-					#ifdef DOUBLE_SIDED
-
-						varying vec3 vLightBack;
-
-					#endif
-
-					#include <common>
-					#include <uv_pars_vertex>
-					#include <uv2_pars_vertex>
-					#include <envmap_pars_vertex>
-					#include <bsdfs>
-					#include <lights_pars_begin>
-					#include <lights_pars_maps>
-					#include <color_pars_vertex>
-					#include <fog_pars_vertex>
-					#include <morphtarget_pars_vertex>
-					#include <skinning_pars_vertex>
-					#include <shadowmap_pars_vertex>
-					#include <logdepthbuf_pars_vertex>
-					#include <clipping_planes_pars_vertex>
-
-					void main() {
-
-						#include <uv_vertex>
-						#include <uv2_vertex>
-						#include <color_vertex>
-
-						// vertex colors instanced
-						#ifdef INSTANCED
-							#ifdef USE_COLOR
-								vColor.xyz = instanceColor.xyz;
-							#endif
-						#endif
+					#ifdef USE_DISPLACEMENTMAP
 
 						#include <beginnormal_vertex>
 						#include <morphnormal_vertex>
-						#include <skinbase_vertex>
 						#include <skinnormal_vertex>
-						#include <defaultnormal_vertex>
 
-						#include <begin_vertex>
+					#endif
 
-						// position instanced
-						#ifdef INSTANCED
-							transformed *= instanceScale;
-							transformed = transformed + instanceOffset;
-						#endif
+					#include <begin_vertex>
 
-						#include <morphtarget_vertex>
-						#include <skinning_vertex>
-						#include <project_vertex>
-						#include <logdepthbuf_vertex>
-						#include <clipping_planes_vertex>
+					// instanced
+					#ifdef INSTANCED
 
-						#include <worldpos_vertex>
-						#include <envmap_vertex>
-						#include <lights_lambert_vertex>
-						#include <shadowmap_vertex>
-						#include <fog_vertex>
+						transformed *= instanceScale;
+						transformed = transformed + instanceOffset;
 
-					}
-					`,
+					#endif
 
-				fragmentShader: THREE.ShaderLib.lambert.fragmentShader
+					#include <morphtarget_vertex>
+					#include <skinning_vertex>
+					#include <displacementmap_vertex>
+					#include <project_vertex>
+					#include <logdepthbuf_vertex>
+					#include <clipping_planes_vertex>
 
-			}
+				}
+			`,
+
+			fragmentShader: THREE.ShaderChunk.depth_frag
 
 		};
+
+		THREE.ShaderLib.lambert = { // this is a cut-and-paste of the lambert shader -- modified to accommodate instancing for this app
+
+			uniforms: THREE.ShaderLib.lambert.uniforms,
+
+			vertexShader:
+				`
+				#define LAMBERT
+
+				#ifdef INSTANCED
+					attribute vec3 instanceOffset;
+					attribute vec3 instanceColor;
+					attribute float instanceScale;
+				#endif
+
+				varying vec3 vLightFront;
+
+				#ifdef DOUBLE_SIDED
+
+					varying vec3 vLightBack;
+
+				#endif
+
+				#include <common>
+				#include <uv_pars_vertex>
+				#include <uv2_pars_vertex>
+				#include <envmap_pars_vertex>
+				#include <bsdfs>
+				#include <lights_pars_begin>
+				#include <color_pars_vertex>
+				#include <fog_pars_vertex>
+				#include <morphtarget_pars_vertex>
+				#include <skinning_pars_vertex>
+				#include <shadowmap_pars_vertex>
+				#include <logdepthbuf_pars_vertex>
+				#include <clipping_planes_pars_vertex>
+
+				void main() {
+
+					#include <uv_vertex>
+					#include <uv2_vertex>
+					#include <color_vertex>
+
+					// vertex colors instanced
+					#ifdef INSTANCED
+						#ifdef USE_COLOR
+							vColor.xyz = instanceColor.xyz;
+						#endif
+					#endif
+
+					#include <beginnormal_vertex>
+					#include <morphnormal_vertex>
+					#include <skinbase_vertex>
+					#include <skinnormal_vertex>
+					#include <defaultnormal_vertex>
+
+					#include <begin_vertex>
+
+					// position instanced
+					#ifdef INSTANCED
+						transformed *= instanceScale;
+						transformed = transformed + instanceOffset;
+					#endif
+
+					#include <morphtarget_vertex>
+					#include <skinning_vertex>
+					#include <project_vertex>
+					#include <logdepthbuf_vertex>
+					#include <clipping_planes_vertex>
+
+					#include <worldpos_vertex>
+					#include <envmap_vertex>
+					#include <lights_lambert_vertex>
+					#include <shadowmap_vertex>
+					#include <fog_vertex>
+
+				}
+				`,
+
+			fragmentShader: THREE.ShaderLib.lambert.fragmentShader
+
+		};
+
 
 		//
 
@@ -272,8 +268,6 @@
 			var colors = new Float32Array( INSTANCES * 3 ); // rgb
 			var scales = new Float32Array( INSTANCES * 1 ); // s
 
-			var color = new THREE.Color();
-
 			for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
 
 				var index = 3 * i;
@@ -303,48 +297,30 @@
 			var envMap = new THREE.TextureLoader().load( `textures/metal.jpg`, function ( texture ) {
 
 				texture.mapping = THREE.SphericalReflectionMapping;
+				texture.encoding = THREE.sRGBEncoding;
+				if ( mesh ) mesh.material.needsUpdate = true;
 
 			} );
 
-			var shader = THREE.CustomShaderLib[ 'lambert' ];
+			var material = new THREE.MeshLambertMaterial( {
 
-			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-			uniforms[ "diffuse" ].value.set( 0xffb54a );
-			uniforms[ "envMap" ].value = envMap;
-			uniforms[ "reflectivity" ].value = 1;
-
-			// defines - Since we are reusing the ShaderChunks, we must specify the required defines.
-			// The renderer does not set these defines for ShaderMaterial
-
-			var defines = {
-				'INSTANCED': "",
-				'USE_ENVMAP': "",
-				'ENVMAP_TYPE_SPHERE': "",
-				'ENVMAP_MODE_REFLECTION': "",
-				'ENVMAP_BLENDING_MULTIPLY': "",
-			};
-
-			var material = new THREE.ShaderMaterial( {
-
-				// Material and ShaderMaterial properties can be set here -- except opacity
-				// the Lambert-properties must be set in the uniforms or defines
-
-				defines: defines,
-				uniforms: uniforms,
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader,
+				color: 0xffb54a,
+				envMap: envMap,
+				combine: THREE.MultiplyOperation,
+				reflectivity: 0.8,
 
 				vertexColors: THREE.VertexColors,
-				lights: true,
 				fog: true
 
 			} );
 
+			material.defines = material.defines || {};
+			material.defines[ 'INSTANCED'] = "";
+
 
 			// custom depth material - required for instanced shadows
 
-			var shader = THREE.CustomShaderLib[ 'customDepthRGBA' ];
+			var shader = THREE.ShaderLib[ 'customDepthRGBA' ];
 
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 

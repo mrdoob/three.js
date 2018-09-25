@@ -50,7 +50,7 @@ THREE.MMDLoader = ( function () {
 
 		constructor: MMDLoader,
 
-		crossOrigin: undefined,
+		crossOrigin: 'anonymous',
 
 		/**
 		 * @param {string} value
@@ -75,7 +75,6 @@ THREE.MMDLoader = ( function () {
 		 */
 		load: function ( url, onLoad, onProgress, onError ) {
 
-			var parser = this._getParser();
 			var builder = this.meshBuilder.setCrossOrigin( this.crossOrigin );
 
 			var texturePath = THREE.LoaderUtils.extractUrlBase( url );
@@ -216,7 +215,6 @@ THREE.MMDLoader = ( function () {
 			var vmds = [];
 			var vmdNum = urls.length;
 
-			var scope = this;
 			var parser = this._getParser();
 
 			this.loader
@@ -246,9 +244,7 @@ THREE.MMDLoader = ( function () {
 		 * @param {function} onProgress
 		 * @param {function} onError
 		 */
-		loadVPD: function ( url, isUnicode, onLoad, onProgress, onError, params ) {
-
-			params = params || {};
+		loadVPD: function ( url, isUnicode, onLoad, onProgress, onError ) {
 
 			var parser = this._getParser();
 
@@ -329,7 +325,7 @@ THREE.MMDLoader = ( function () {
 
 		constructor: MeshBuilder,
 
-		crossOrigin: undefined,
+		crossOrigin: 'anonymous',
 
 		/**
 		 * @param {string} crossOrigin
@@ -353,9 +349,9 @@ THREE.MMDLoader = ( function () {
 
 			var geometry = this.geometryBuilder.build( data );
 			var material = this.materialBuilder
-					.setCrossOrigin( this.crossOrigin )
-					.setTexturePath( texturePath )
-					.build( data, geometry, onProgress, onError );
+				.setCrossOrigin( this.crossOrigin )
+				.setTexturePath( texturePath )
+				.build( data, geometry, onProgress, onError );
 
 			var mesh = new THREE.SkinnedMesh( geometry, material );
 
@@ -841,13 +837,14 @@ THREE.MMDLoader = ( function () {
 			geometry.morphTargets = morphTargets;
 			geometry.morphAttributes.position = morphPositions;
 
-			geometry.iks = iks;
-			geometry.grants = grants;
-
-			geometry.rigidBodies = rigidBodies;
-			geometry.constraints = constraints;
-
-			geometry.mmdFormat = data.metadata.format;
+			geometry.userData.MMD = {
+				bones: bones,
+				iks: iks,
+				grants: grants,
+				rigidBodies: rigidBodies,
+				constraints: constraints,
+				format: data.metadata.format
+			};
 
 			geometry.computeBoundingSphere();
 
@@ -875,7 +872,7 @@ THREE.MMDLoader = ( function () {
 
 		constructor: MaterialBuilder,
 
-		crossOrigin: undefined,
+		crossOrigin: 'anonymous',
 
 		texturePath: undefined,
 
@@ -945,7 +942,7 @@ THREE.MMDLoader = ( function () {
 				params.shininess = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 				params.transparent = params.opacity !== 1.0;
 
-				// 
+				//
 
 				params.skinning = geometry.bones.length > 0 ? true : false;
 				params.morphTargets = geometry.morphTargets.length > 0 ? true : false;
@@ -1080,7 +1077,7 @@ THREE.MMDLoader = ( function () {
 
 					// parameters for OutlineEffect
 					params.userData.outlineParameters = {
-						thickness: material.edgeSize / 300,  // TODO: better calculation?
+						thickness: material.edgeSize / 300, // TODO: better calculation?
 						color: material.edgeColor.slice( 0, 3 ),
 						alpha: material.edgeColor[ 3 ],
 						visible: ( material.flag & 0x10 ) !== 0 && material.edgeSize > 0.0
@@ -1438,7 +1435,7 @@ THREE.MMDLoader = ( function () {
 				array.push( interpolation[ index + 4 ] / 127 ); // y1
 				array.push( interpolation[ index + 12 ] / 127 ); // y2
 
-			};
+			}
 
 			var tracks = [];
 
@@ -1592,7 +1589,7 @@ THREE.MMDLoader = ( function () {
 				array.push( interpolation[ index * 4 + 2 ] / 127 ); // y1
 				array.push( interpolation[ index * 4 + 3 ] / 127 ); // y2
 
-			};
+			}
 
 			var tracks = [];
 

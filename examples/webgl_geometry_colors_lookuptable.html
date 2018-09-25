@@ -52,12 +52,12 @@
 
 			var camera, scene, renderer, lut, legendLayout;
 
-			var position;
-
-			var mesh;
+			var mesh, material;
 
 			var colorMap;
 			var numberOfColors;
+
+			var loader = new THREE.BufferGeometryLoader();
 
 			init();
 			animate();
@@ -71,16 +71,14 @@
 				scene.background = new THREE.Color( 0xffffff );
 
 				// CAMERA
-				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.name = 'camera';
-				scene.add( camera );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.set( 0, 0, 10 );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				// LIGHT
 				var ambientLight = new THREE.AmbientLight( 0x444444 );
-				ambientLight.name = 'ambientLight';
 				scene.add( ambientLight );
 
 				colorMap = 'rainbow';
@@ -88,17 +86,16 @@
 
 				legendLayout = 'vertical';
 
+				material = new THREE.MeshLambertMaterial( {
+					side: THREE.DoubleSide,
+					color: 0xF5F5F5,
+					vertexColors: THREE.VertexColors
+				} );
+
 				loadModel( colorMap, numberOfColors, legendLayout );
 
-				camera.position.x = 17;
-				camera.position.y = 9;
-				camera.position.z = 32;
-
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
-				directionalLight.position.x = 17;
-				directionalLight.position.y = 9;
-				directionalLight.position.z = 30;
-				directionalLight.name = 'directionalLight';
+				directionalLight.position.set( 17, 9, 30 );
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -107,23 +104,7 @@
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				window.addEventListener( "keydown", onKeyDown, true);
-
-			}
-
-			var rotWorldMatrix;
-
-			function rotateAroundWorldAxis( object, axis, radians ) {
-
-				if ( ! axis ) return;
-
-				rotWorldMatrix = new THREE.Matrix4();
-				rotWorldMatrix.makeRotationAxis( axis.normalize(), radians );
-				rotWorldMatrix.multiply( object.matrix );
-
-				object.matrix = rotWorldMatrix;
-				object.rotation.setFromRotationMatrix( object.matrix );
+				window.addEventListener( 'keydown', onKeyDown, true);
 
 			}
 
@@ -148,30 +129,18 @@
 
 			function render() {
 
-				rotateAroundWorldAxis(mesh, position, Math.PI / 180);
+				if ( mesh !== undefined ) mesh.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
 
 			}
 
-			var center = new THREE.Vector3();
-
 			function loadModel ( colorMap, numberOfColors, legendLayout ) {
 
-				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/pressure.json', function( geometry ) {
 
-				loader.load( "models/json/pressure.json", function( geometry ) {
-
+					geometry.center();
 					geometry.computeVertexNormals();
-					geometry.normalizeNormals();
-
-					var material = new THREE.MeshLambertMaterial( {
-
-						side: THREE.DoubleSide,
-						color: 0xF5F5F5,
-						vertexColors: THREE.VertexColors
-
-					} );
 
 					var lutColors = [];
 
@@ -180,19 +149,19 @@
 					lut.setMax( 2000 );
 					lut.setMin( 0 );
 
-					for ( var i = 0; i < geometry.attributes.pressure.array.length; i++ ) {
+					for ( var i = 0; i < geometry.attributes.pressure.array.length; i ++ ) {
 
 						var colorValue = geometry.attributes.pressure.array[ i ];
 
 						var color = lut.getColor( colorValue );
 
-						if ( color == undefined ) {
+						if ( color === undefined ) {
 
-							console.log( "ERROR: " + colorValue );
+							console.log( 'Unable to determine color for value:', colorValue );
 
 						} else {
 
-							lutColors[ 3 * i     ] = color.r;
+							lutColors[ 3 * i ] = color.r;
 							lutColors[ 3 * i + 1 ] = color.g;
 							lutColors[ 3 * i + 2 ] = color.b;
 
@@ -200,29 +169,20 @@
 
 					}
 
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( lutColors ), 3 ) );
+					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( lutColors, 3 ) );
+					geometry.removeAttribute( 'pressure' );
 
-					mesh = new THREE.Mesh ( geometry, material );
+					mesh = new THREE.Mesh( geometry, material );
 
-					geometry.computeBoundingBox();
-					var boundingBox = geometry.boundingBox;
-					boundingBox.getCenter( center );
-
-					if ( position === undefined ) {
-
-						position = new THREE.Vector3(center.x, center.y, center.z);
-
-					}
-
-					scene.add ( mesh );
+					scene.add( mesh );
 
 					if ( legendLayout ) {
 
 						var legend;
 
-						if ( legendLayout == 'horizontal' ) {
+						if ( legendLayout === 'horizontal' ) {
 
-							legend = lut.setLegendOn( { 'layout':'horizontal', 'position': { 'x': 21, 'y': 6, 'z': 5 } } );
+							legend = lut.setLegendOn( { 'layout':'horizontal', 'position': { 'x': 4, 'y': 0, 'z': 0 } } );
 
 						} else {
 
@@ -236,7 +196,7 @@
 
 						scene.add ( labels['title'] );
 
-						for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i++ ) {
+						for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
 
 							scene.add ( labels[ 'ticks' ][ i ] );
 							scene.add ( labels[ 'lines' ][ i ] );
@@ -249,17 +209,31 @@
 
 			}
 
-			function cleanScene () {
+			function cleanScene() {
 
 				var elementsInTheScene = scene.children.length;
 
-				for ( var i = elementsInTheScene-1; i > 0; i-- ) {
+				for ( var i = elementsInTheScene - 1; i > 0; i -- ) {
 
-					if ( scene.children [ i ].name != 'camera' &&
-						 scene.children [ i ].name != 'ambientLight' &&
-						 scene.children [ i ].name != 'directionalLight') {
+					var child = scene.children[ i ];
 
-						scene.remove ( scene.children [ i ] );
+					if ( ! child.isLight ) {
+
+						scene.remove( child );
+
+						if ( child.isMesh || child.isLine ) {
+
+							child.geometry.dispose();
+							child.material.dispose();
+							if ( child.material.map ) child.material.map.dispose();
+
+
+						} else if ( child.isSprite ) {
+
+							child.material.dispose();
+							if ( child.material.map ) child.material.map.dispose();
+
+						}
 
 					}
 
@@ -267,14 +241,13 @@
 
 			}
 
-
-			function onKeyDown ( e ) {
+			function onKeyDown( e ) {
 
 				var maps = [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ];
 
-				var colorNumbers = ['16', '128', '256', '512' ];
+				var colorNumbers = [ '16', '128', '256', '512' ];
 
-				if ( e.keyCode == 65 ) {
+				if ( e.keyCode === 65 ) {
 
 					cleanScene();
 
@@ -282,9 +255,9 @@
 
 					colorMap = maps [ index ];
 
-					loadModel ( colorMap, numberOfColors, legendLayout );
+					loadModel( colorMap, numberOfColors, legendLayout );
 
-				} else if ( e.keyCode == 83 ) {
+				} else if ( e.keyCode === 83 ) {
 
 					cleanScene();
 
@@ -292,9 +265,9 @@
 
 					numberOfColors = colorNumbers [ index ];
 
-					loadModel ( colorMap ,  numberOfColors, legendLayout );
+					loadModel( colorMap ,  numberOfColors, legendLayout );
 
-				} else if ( e.keyCode == 68 ) {
+				} else if ( e.keyCode === 68 ) {
 
 					if ( ! legendLayout ) {
 
@@ -302,7 +275,7 @@
 
 						legendLayout = 'vertical';
 
-						loadModel ( colorMap ,  numberOfColors, legendLayout );
+						loadModel( colorMap ,  numberOfColors, legendLayout );
 
 					} else {
 
@@ -310,11 +283,11 @@
 
 						legendLayout = lut.setLegendOff();
 
-						loadModel ( colorMap ,  numberOfColors, legendLayout );
+						loadModel( colorMap ,  numberOfColors, legendLayout );
 
 					}
 
-				} else if ( e.keyCode == 70 ) {
+				} else if ( e.keyCode === 70 ) {
 
 					cleanScene();
 
@@ -322,7 +295,7 @@
 
 					lut.setLegendOff();
 
-					if ( legendLayout == 'horizontal') {
+					if ( legendLayout === 'horizontal') {
 
 						legendLayout = 'vertical';
 
@@ -332,7 +305,7 @@
 
 					}
 
-					loadModel ( colorMap ,  numberOfColors, legendLayout );
+					loadModel( colorMap ,  numberOfColors, legendLayout );
 
 				}
 

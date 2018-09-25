@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials - equiangular exr image based lighting</title>
+		<title>threejs webgl - materials - equirectangular exr image based lighting</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -28,13 +28,13 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of an IBL (Image based lighting) pipeline based around<br> equiangular EXR lightprobe data. Created by <a href="https://github.com/richardmonette" target="_blank" rel="noopener">Richard Monette</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of an IBL (Image based lighting) pipeline based around<br> equirectangular EXR lightprobe data. Created by <a href="https://github.com/richardmonette" target="_blank" rel="noopener">Richard Monette</a></div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/loaders/EXRLoader.js"></script>
-		<script src="js/loaders/EquiangularToCubeGenerator.js"></script>
+		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -106,7 +106,7 @@
 					texture.magFilter = THREE.NearestFilter;
 					texture.encoding = THREE.LinearEncoding;
 
-					var cubemapGenerator = new THREE.EquiangularToCubeGenerator( texture, 512 );
+					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
@@ -124,11 +124,11 @@
 
 				} );
 
-				new THREE.TextureLoader().load( 'textures/equiangular.png', function ( texture ) {
+				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
 
 					texture.encoding = THREE.sRGBEncoding;
 
-					var cubemapGenerator = new THREE.EquiangularToCubeGenerator( texture, 512 );
+					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512 } );
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );

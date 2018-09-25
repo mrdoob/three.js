@@ -89,6 +89,19 @@
 		If an <em>obj</em> object or group uses multiple materials while declaring faces, geometry groups and an array of materials are used.
 		</p>
 
+		<h3>[method:OBJLoader setMaterials]( [param:Array materials] )</h3>
+		<p>
+		[page:Array materials] - Array of [page:Material Materials].
+		</p>
+		<p>
+		Sets materials loaded by MTLLoader or any other supplier of an Array of [page:Material Materials].
+		</p>
+
+		<h3>[method:OBJLoader setPath]( [param:String path] )</h3>
+		<p>
+		Sets the base path or URL from which to load files. This can be useful to avoid repetition if you are calling [page:OBJLoader.load .load] multiple times on the same directory.
+		</p>
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/OBJLoader.js examples/js/loaders/OBJLoader.js]

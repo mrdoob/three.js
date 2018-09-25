@@ -132,7 +132,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		for ( var i = 0; i < HUF_DECSIZE; i ++ ) {
 
-			hdec[ i ] = {}
+			hdec[ i ] = {};
 			hdec[ i ].len = 0;
 			hdec[ i ].lit = 0;
 			hdec[ i ].p = null;
@@ -355,16 +355,17 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 			lc -= 8;
 
 			var cs = ( c >> lc );
+			var cs = new Uint8Array([cs])[0];
 
-			if ( out + cs > oe ) {
+			if ( outBufferOffset.value + cs > outBufferEndOffset ) {
 
-				throw 'Issue with getCode';
+				return false;
 
 			}
 
-			var s = out[ - 1 ];
+			var s = outBuffer[ outBufferOffset.value - 1 ];
 
-			while ( cs -- > 0 ) {
+			while ( cs-- > 0 ) {
 
 				outBuffer[ outBufferOffset.value ++ ] = s;
 
@@ -376,7 +377,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		} else {
 
-			throw 'Issue with getCode';
+			return false;
 
 		}
 
@@ -691,7 +692,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		if ( maxNonZero >= BITMAP_SIZE ) {
 
-			throw 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE'
+			throw 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE';
 
 		}
 
@@ -714,7 +715,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		var pizChannelData = new Array( num_channels );
 
-		var outBufferEnd = 0
+		var outBufferEnd = 0;
 
 		for ( var i = 0; i < num_channels; i ++ ) {
 
@@ -917,7 +918,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		var whiteX = parseFloat32( dataView, offset );
 		var whiteY = parseFloat32( dataView, offset );
 
-		return { redX: redX, redY: redY, greenX, greenY, blueX, blueY, whiteX, whiteY };
+		return { redX: redX, redY: redY, greenX: greenX, greenY: greenY, blueX: blueX, blueY: blueY, whiteX: whiteX, whiteY: whiteY };
 
 	}
 
@@ -1171,7 +1172,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		width: width,
 		height: height,
 		data: byteArray,
-		format: THREE.RGBFormat,
+		format: EXRHeader.channels.length == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
 		type: THREE.FloatType
 	};
 

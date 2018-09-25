@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #ffffff;
 				margin: 0px;
@@ -73,7 +73,7 @@
 		<script src="../build/three.js"></script>
 		<script>
 
-			CanvasTexture = function ( parentTexture ) {
+			var CanvasTexture = function ( parentTexture ) {
 
 				this._canvas = document.createElement( "canvas" );
 				this._canvas.width = this._canvas.height = 1024;
@@ -181,10 +181,7 @@
 
 				}
 
-			}
-
-		</script>
-		<script>
+			};
 
 			var width = window.innerWidth;
 			var height = window.innerHeight;
