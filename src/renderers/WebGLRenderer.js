@@ -300,7 +300,13 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+	var vr = null;
+
+	if ( typeof navigator !== 'undefined' ) {
+
+		vr = ( 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+
+	}
 
 	this.vr = vr;
 
