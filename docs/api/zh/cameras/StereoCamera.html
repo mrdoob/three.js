@@ -12,55 +12,53 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Dual [page:PerspectiveCamera PerspectiveCamera]s used for effects such as
-		[link:https://en.wikipedia.org/wiki/Anaglyph_3D 3D Anaglyph] or [link:https://en.wikipedia.org/wiki/parallax_barrier Parallax Barrier].
+		双[page:PerspectiveCamera PerspectiveCamera]（透视摄像机）用于
+		[link:https://en.wikipedia.org/wiki/Anaglyph_3D 3D Anaglyph]（立体影像）or [link:https://en.wikipedia.org/wiki/parallax_barrier Parallax Barrier]（视差屏障）等效果。
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>例子</h2>
 
 		<p>[example:webgl_effects_anaglyph effects / anaglyph ]</p>
 		<p>[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]</p>
 		<p>[example:webgl_effects_stereo effects / stereo ]</p>
 
 		<p>
-		This class is used internally in the files<br /><br />
+		这个类在内部使用的文件<br /><br />
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/effects/AnaglyphEffect.js examples/js/effects/AnaglyphEffect.js]<br /><br />
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/effects/ParallaxBarrierEffect.js examples/js/effects/ParallaxBarrierEffect.js]<br /><br />
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/effects/StereoEffect.js examples/js/effects/StereoEffect.js]<br /><br />
-		used in the above examples.
+		在上面的例子中使用。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( )</h3>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Float aspect]</h3>
-		<p>Default is *1*.</p>
+		<p>默认值为*1*。</p>
 
 		<h3>[property:Float eyeSep]</h3>
-		<p>Default is *0.064*.</p>
+		<p>默认值为*0.064*。</p>
 
 		<h3>[property:PerspectiveCamera cameraL]</h3>
-		<p>Left camera. This is added to [page:Layers layer 1] - objects to be rendered
-		by the left camera must also be added to this layer.</p>
+		<p>左摄像机。这将添加到[page:Layers layer 1] - 要被左摄像机渲染的对象也必须添加到此层。</p>
 
 		<h3>[property:PerspectiveCamera cameraR]</h3>
-		<p>Right camera.This is added to [page:Layers layer 2] - objects to be rendered
-		by the right camera must also be added to this layer.</p>
+		<p>右摄像机。这被添加到[page:Layers layer 2] - 要被右摄像机渲染的对象也必须添加到该层。</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null update]( [param:PerspectiveCamera camera] )</h3>
 		<p>
-		Update the stereo cameras based on the camera passed in.
+		根据传入的摄像机更新立体摄像机。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
