@@ -119,7 +119,7 @@
 					var zip = new JSZip( data );
 					var array = zip.files[ 'head256x256x109' ].asUint8Array();
 
-					var texture = new THREE.Texture3D( array, 256, 256, 109 );
+					var texture = new THREE.DataTexture3D( array, 256, 256, 109 );
 
 					texture.format = THREE.RedFormat;
 					texture.type = THREE.UnsignedByteType;
