@@ -15640,12 +15640,12 @@
 	 * @author Artur Trzesiok
 	 */
 
-	function Texture3D( data, width, height, depth ) {
+	function DataTexture3D( data, width, height, depth ) {
 
 		// We're going to add .setXXX() methods for setting properties later.
-		// Users can still set in Texture3D directly.
+		// Users can still set in DataTexture3D directly.
 		//
-		//	var texture = new THREE.Texture3D( data, width, height, depth );
+		//	var texture = new THREE.DataTexture3D( data, width, height, depth );
 		// 	texture.anisotropy = 16;
 		//
 		// See #14839
@@ -15662,9 +15662,9 @@
 
 	}
 
-	Texture3D.prototype = Object.create( Texture.prototype );
-	Texture3D.prototype.constructor = Texture3D;
-	Texture3D.prototype.isTexture3D = true;
+	DataTexture3D.prototype = Object.create( Texture.prototype );
+	DataTexture3D.prototype.constructor = DataTexture3D;
+	DataTexture3D.prototype.isDataTexture3D = true;
 
 	/**
 	 * @author tschw
@@ -15718,7 +15718,7 @@
 	 */
 
 	var emptyTexture = new Texture();
-	var emptyTexture3d = new Texture3D();
+	var emptyTexture3d = new DataTexture3D();
 	var emptyCubeTexture = new CubeTexture();
 
 	// --- Base for inner nodes (including the root) ---
@@ -20296,7 +20296,7 @@
 
 			var textureType;
 
-			if ( texture.isTexture3D ) {
+			if ( texture.isDataTexture3D ) {
 
 				textureType = _gl.TEXTURE_3D;
 
@@ -20455,7 +20455,7 @@
 
 				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
-			} else if ( texture.isTexture3D ) {
+			} else if ( texture.isDataTexture3D ) {
 
 				state.texImage3D( _gl.TEXTURE_3D, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
 				textureProperties.__maxMipLevel = 0;
@@ -37808,9 +37808,10 @@
 
 			var scope = this;
 
-			var texturePath = this.texturePath && ( typeof this.texturePath === 'string' ) ? this.texturePath : LoaderUtils.extractUrlBase( url );
+			var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
 			var loader = new FileLoader( this.manager );
+			loader.setPath( this.path );
 			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( text ) {
 
@@ -37834,23 +37835,30 @@
 
 				}
 
-				var object = scope.parse( json, texturePath );
+				var object = scope.parse( json, path );
 				onLoad( object.geometry, object.materials );
 
 			}, onProgress, onError );
 
 		},
 
-		setCrossOrigin: function ( value ) {
+		setPath: function ( value ) {
 
-			this.crossOrigin = value;
+			this.path = value;
 			return this;
 
 		},
 
-		setTexturePath: function ( value ) {
+		setResourcePath: function ( value ) {
 
-			this.texturePath = value;
+			this.resourcePath = value;
+			return this;
+
+		},
+
+		setCrossOrigin: function ( value ) {
+
+			this.crossOrigin = value;
 			return this;
 
 		},
@@ -38298,7 +38306,7 @@
 
 			}
 
-			return function parse( json, texturePath ) {
+			return function parse( json, path ) {
 
 				if ( json.data !== undefined ) {
 
@@ -38333,7 +38341,7 @@
 
 				} else {
 
-					var materials = Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
+					var materials = Loader.prototype.initMaterials( json.materials, this.resourcePath || path, this.crossOrigin );
 
 					return { geometry: geometry, materials: materials };
 
@@ -46143,6 +46151,17 @@
 
 	}
 
+	Object.assign( JSONLoader.prototype, {
+
+		setTexturePath: function ( value ) {
+
+			console.warn( 'THREE.JSONLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+			return this.setResourcePath( value );
+
+		}
+
+	} );
+
 	//
 
 	Object.assign( Box2.prototype, {
@@ -47622,7 +47641,7 @@
 	exports.Group = Group;
 	exports.VideoTexture = VideoTexture;
 	exports.DataTexture = DataTexture;
-	exports.Texture3D = Texture3D;
+	exports.DataTexture3D = DataTexture3D;
 	exports.CompressedTexture = CompressedTexture;
 	exports.CubeTexture = CubeTexture;
 	exports.CanvasTexture = CanvasTexture;
