@@ -79,6 +79,8 @@
 
 			var camera, scene, renderer;
 
+			var controls;
+
 			var ninjaMeshRaw, curvatureAttribute, bufferGeo;
 
 			init();
@@ -338,7 +340,7 @@
 				topologyFolder.add( params, 'filterConvex' );
 				topologyFolder.add( params, 'filterConcave' );
 				topologyFolder.add( params, 'filterBoth' );
-				topologyFolder.open()
+				topologyFolder.open();
 
 				onWindowResize();
 

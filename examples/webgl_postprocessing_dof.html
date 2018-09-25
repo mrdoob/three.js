@@ -112,8 +112,6 @@
 
 				var geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
 
-				var start = Date.now();
-
 				var xgrid = 14,
 					ygrid = 9,
 					zgrid = 14;
@@ -136,7 +134,7 @@
 					} else {
 
 						mesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( parameters ) );
-						materials[ count ] = mesh.material
+						materials[ count ] = mesh.material;
 
 					}
 
@@ -156,8 +154,6 @@
 					count ++;
 
 				}
-
-				//console.log("init time: ", Date.now() - start );
 
 				scene.matrixAutoUpdate = false;
 

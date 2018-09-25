@@ -53,6 +53,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -124,14 +125,14 @@
 					color: 0xdddddd,
 					specular: 0x222222,
 					shininess: 35,
-					map: textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" ),
-					specularMap: textureLoader.load( "models/json/leeperrysmith/Map-SPEC.jpg" ),
-					normalMap: textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+					specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
+					normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
-				loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function( gltf ) { createScene( gltf.scene.children[ 0 ].geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -157,8 +158,6 @@
 				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
 				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-
-				var canvas = renderer.context.canvas;
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 

@@ -31,7 +31,7 @@
 		<div id="info">
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		<a href="http://openctm.sourceforge.net/" target="_blank" rel="noopener">CTM format</a> loader test -
-		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
+		using <a href="https://github.com/jcmellado/js-openctm" target="_blank" rel="noopener">js-openctm</a> -
 		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank" rel="noopener">The Utah 3D Animation Repository</a>,
 		<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a>,
 		<a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
@@ -64,6 +64,7 @@
 
 			var textureLoader = new THREE.TextureLoader();
 			var cubeTextureLoader = new THREE.CubeTextureLoader();
+			var reflectionCube;
 
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
@@ -180,9 +181,9 @@
 
 						specular: 0x303030,
 						shininess: 50,
-						map: textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" ),
-						specularMap: textureLoader.load( "models/json/leeperrysmith/Map-SPEC.jpg" ),
-						normalMap: textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+						map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+						specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
+						normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 						normalScale: new THREE.Vector2( 0.8, 0.8 )
 
 					} );

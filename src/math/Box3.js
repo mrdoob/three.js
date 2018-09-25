@@ -384,7 +384,7 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		return ( min <= plane.constant && max >= plane.constant );
+		return ( min <= - plane.constant && max >= - plane.constant );
 
 	},
 

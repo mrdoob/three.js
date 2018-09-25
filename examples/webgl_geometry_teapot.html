@@ -32,7 +32,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - the Utah Teapot<br />
-			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291">Udacity Interactive 3D Graphics</a>
+			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291" target="_blank" rel="noopener">Udacity Interactive 3D Graphics</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -250,7 +250,8 @@
 				h.add( effectController, "nonblinn" ).name( "original scale" ).onChange( render );
 
 				// shading
-				h = gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
+
+				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
 
 			}
 

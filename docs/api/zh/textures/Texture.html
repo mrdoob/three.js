@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Create a texture to apply to a surface or as a reflection or refraction map.</p>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+
+		<h2>Example</h2>
+
+		<code>
+		// load a texture, set wrap mode to repeat
+		var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set( 4, 4 );
+		</code>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Integer id]</h3>
+		<p>
+		Readonly - unique number for this texture instance.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
+		This gets automatically assigned, so this shouldn't be edited.
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+		Optional name of the object (doesn't need to be unique). Default is an empty string.
+		</p>
+
+		<h3>[property:Image image]</h3>
+		<p>
+		An image object, typically created using the [page:TextureLoader.load] method.
+		This can be any image (e.g., PNG, JPG, GIF, DDS) or video (e.g., MP4, OGG/OGV) type supported by three.js.<br /><br />
+
+		To use video as a texture you need to have a playing HTML5
+		video element as a source for your texture image and continuously update this texture
+		as long as video is playing - the [page:VideoTexture VideoTexture] class handles this automatically.
+		</p>
+
+		<h3>[property:array mipmaps]</h3>
+		<p>
+		Array of user-specified mipmaps (optional).
+		</p>
+
+		<h3>[property:number mapping]</h3>
+		<p>
+		How the image is applied to the object. An object type of [page:Textures THREE.UVMapping] is the default,
+		where the U,V coordinates are used to apply the map.<br />
+
+		See the [page:Textures texture constants] page for other mapping types.
+		</p>
+
+		<h3>[property:number wrapS]</h3>
+		<p>
+		This defines how the texture is wrapped horizontally and corresponds to *U* in UV mapping.<br />
+		The default is [page:Textures THREE.ClampToEdgeWrapping], where the edge is clamped to the outer edge texels.
+		The other two choices are [page:Textures THREE.RepeatWrapping] and [page:Textures THREE.MirroredRepeatWrapping].
+		See the [page:Textures texture constants] page for details.
+		</p>
+
+		<h3>[property:number wrapT]</h3>
+		<p>
+		This defines how the texture is wrapped vertically and corresponds to *V* in UV mapping.<br />
+		The same choices are available as for [property:number wrapS].<br /><br />
+
+		NOTE: tiling of images in textures only functions if image dimensions are powers of two
+		 (2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, ...) in terms of pixels.
+		 Individual dimensions need not be equal, but each must be a power of two.
+		 This is a limitation of WebGL, not three.js.
+		</p>
+
+		<h3>[property:number magFilter]</h3>
+		<p>
+		How the texture is sampled when a texel covers more than one pixel. The default is
+		 [page:Textures THREE.LinearFilter], which takes the four closest texels and bilinearly interpolates among them.
+		 The other option is [page:Textures THREE.NearestFilter], which uses the value of the closest texel.<br />
+		 See the [page:Textures texture constants] page for details.
+		</p>
+
+		<h3>[property:number minFilter]</h3>
+		<p>
+		How the texture is sampled when a texel covers less than one pixel. The default is
+		[page:Textures THREE.LinearMipMapLinearFilter], which uses mipmapping and a trilinear filter. <br /><br />
+
+		See the [page:Textures texture constants] page for all possible choices.
+		</p>
+
+		<h3>[property:number anisotropy]</h3>
+		<p>
+		The number of samples taken along the axis through the pixel that has the highest density of texels.
+		By default, this value is 1. A higher value gives a less blurry result than a basic mipmap,
+		at the cost of more texture samples being used. Use [page:WebGLRenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() to
+		find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.
+		</p>
+
+		<h3>[property:number format]</h3>
+		<p>
+		The default is [page:Textures THREE.RGBAFormat], although the [page:TextureLoader TextureLoader] will automatically
+		set this to [page:Textures THREE.RGBFormat] for JPG images. <br /><br />
+
+		See the [page:Textures texture constants] page for details of other formats.
+		</p>
+
+		<h3>[property:number type]</h3>
+		<p>
+		This must correspond to the [page:Texture.format .format]. The default is [page:Textures THREE.UnsignedByteType],
+		which will be used for most texture formats.<br /><br />
+
+		See the [page:Textures texture constants] page for details of other formats.
+		</p>
+
+		<h3>[property:Vector2 offset]</h3>
+		<p>
+		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
+		Typical range is *0.0* to *1.0*.  _Note:_ The offset property is a convenience modifier and only affects
+		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
+		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually
+		assigned to achieve the desired offset.
+		</p>
+
+		<h3>[property:Vector2 repeat]</h3>
+		<p>
+		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
+		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
+		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
+		tiling effect.  _Note:_ The repeat property is a convenience modifier and only affects
+		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
+		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually
+		assigned to achieve the desired repetiton.
+		</p>
+
+		<h3>[property:number rotation]</h3>
+		<p>
+		How much the texture is rotated around the center point, in radians. Postive values are counter-clockwise. Default is *0*.
+		</p>
+
+		<h3>[property:Vector2 center]</h3>
+		<p>
+		The point around which rotation occurs. A value of (0.5, 0.5) corresponds to the center of the texture. Default is (0, 0), the lower left.
+		</p>
+
+		<h3>[property:boolean matrixAutoUpdate]</h3>
+		<p>
+		Whether to update the texture's uv-transform [page:Texture.matrix .matrix] from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+		[page:Texture.rotation .rotation], and [page:Texture.center .center]. True by default.
+		Set this to false if you are specifying the uv-transform matrix directly.
+		</p>
+
+		<h3>[property:Matrix3 matrix]</h3>
+		<p>
+		The uv-transform matrix for the texture. Updated by the renderer from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+		[page:Texture.rotation .rotation], and [page:Texture.center .center] when the texture's [page:Texture.matrixAutoUpdate .matrixAutoUpdate] property is true.
+		When [page:Texture.matrixAutoUpdate .matrixAutoUpdate] property is false, this matrix may be set manually.
+		Default is the identity matrix.
+		</p>
+
+		<h3>[property:boolean generateMipmaps]</h3>
+		<p>
+		Whether to generate mipmaps (if possible) for a texture. True by default. Set this to false if you are
+		creating mipmaps manually.
+		</p>
+
+		<h3>[property:boolean premultiplyAlpha]</h3>
+		<p>
+		False by default, which is the norm for PNG images. Set to true if the RGB values have
+		been stored premultiplied by alpha.
+		</p>
+
+		<h3>[property:boolean flipY]</h3>
+		<p>
+		True by default. Flips the image's Y axis to match the WebGL texture coordinate space.
+		</p>
+
+		<h3>[property:number unpackAlignment]</h3>
+		<p>
+		4 by default. Specifies the alignment requirements for the start of each pixel row in memory.
+		The allowable values are 1 (byte-alignment), 2 (rows aligned to even-numbered bytes),
+		4 (word-alignment), and 8 (rows start on double-word boundaries).
+		See [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]
+		for more information.
+		</p>
+
+		<h3>[property:number encoding]</h3>
+		<p>
+		[page:Textures THREE.LinearEncoding] is the default.
+		See the [page:Textures texture constants] page for details of other formats.<br /><br />
+
+		Note that if this value is changed on a texture after the material has been used,
+		it is necessary to trigger a Material.needsUpdate for this value to be realized in the shader.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+		This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
+		</p>
+
+		<h3>[property:Function onUpdate]</h3>
+		<p>
+		A callback function, called when the texture is updated (e.g., when needsUpdate has been set to true
+		and then the texture is used).
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+		Set this to *true* to trigger an update next time the texture is used. Particularly important for setting the wrap mode.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+
+		<h3>[method:null updateMatrix]()</h3>
+		<p>
+		Update the texture's uv-transform [page:Texture.matrix .matrix] from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+		[page:Texture.rotation .rotation], and [page:Texture.center .center].
+		</p>
+
+		<h3>[method:Texture clone]()</h3>
+		<p>
+		Make copy of the texture. Note this is not a "deep copy", the image is shared.
+		</p>
+
+		<h3>[method:Texture toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta -- optional object containing metadata.<br />
+		Convert the material to three.js JSON format.
+		</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+		Call [page:EventDispatcher EventDispatcher].dispatchEvent with a 'dispose' event type.
+		</p>
+
+		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>
+		<p>
+		Transform the uv based on the value of this texture's [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+		[page:Texture.wrapS .wrapS], [page:Texture.wrapT .wrapT] and [page:Texture.flipY .flipY] properties.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

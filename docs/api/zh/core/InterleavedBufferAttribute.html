@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+
+		</p>
+
+		<h2>Constructor</h2>
+		<h3>[name]( [param:InterleavedBuffer interleavedBuffer], [param:Integer itemSize], [param:Integer offset], [param:Boolean normalized] )</h3>
+		<p>
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:InterleavedBuffer data]</h3>
+		<p>
+			The [page:InterleavedBuffer InterleavedBuffer] instance passed in the constructor.
+		</p>
+
+		<h3>[property:TypedArray array]</h3>
+		<p>
+			The value of [page:InterleavedBufferAttribute.data data].array.
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			The value of [page:InterleavedBufferAttribute.data data].count.
+
+			If the buffer is storing a 3-component item (such as a position, normal, or color),
+			then this will count the number of such items stored.
+		</p>
+
+		<h3>[property:Integer itemSize]</h3>
+		<p>
+			How many values make up each item.
+		</p>
+
+		<h3>[property:Integer offset]</h3>
+		<p>
+			The offset in the underlying array buffer where an item starts.
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+			Default is *true*.
+		</p>
+
+		<h3>[property:Boolean isInterleavedBufferAttribute]</h3>
+		<p>
+			Default is *true*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Number getX]( [param:Integer index] ) </h3>
+		<p>Returns the x component of the item at the given index.</p>
+
+		<h3>[method:Number getY]( [param:Integer index] ) </h3>
+		<p>Returns the y component of the item at the given index.</p>
+
+		<h3>[method:Number getZ]( [param:Integer index] ) </h3>
+		<p>Returns the z component of the item at the given index.</p>
+
+		<h3>[method:Number getW]( [param:Integer index] ) </h3>
+		<p>Returns the w component of the item at the given index.</p>
+
+		<h3>[method:null setX]( [param:Integer index], [param:Float x] ) </h3>
+		<p>Sets the x component of the item at the given index.</p>
+
+		<h3>[method:null setY]( [param:Integer index], [param:Float y] ) </h3>
+		<p>Sets the y component of the item at the given index.</p>
+
+		<h3>[method:null setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<p>Sets the z component of the item at the given index.</p>
+
+		<h3>[method:null setW]( [param:Integer index], [param:Float w] ) </h3>
+		<p>Sets the w component of the item at the given index.</p>
+
+		<h3>[method:null setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<p>Sets the x and y components of the item at the given index.</p>
+
+		<h3>[method:null setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<p>Sets the x, y and z components of the item at the given index.</p>
+
+		<h3>[method:null setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<p>Sets the x, y, z and w components of the item at the given index.</p>
+
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
