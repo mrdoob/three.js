@@ -32,6 +32,8 @@
 	</head>
 
 	<body>
+		<script src="js/Detector.js"></script>
+
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl2 sandbox.</div>
 
 		<script type="module">
@@ -47,6 +49,8 @@
 			import { WebGLRenderer } from '../src/renderers/WebGLRenderer.js';
 
 			//
+
+			if ( ! Detector.webgl2 ) Detector.addGetWebGL2Message();
 
 			var camera, scene, renderer;
 
