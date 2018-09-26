@@ -13,7 +13,6 @@
  *  bevelThickness: <float>, // how deep into the original shape bevel goes
  *  bevelSize: <float>, // how far from shape outline is bevel
  *  bevelSegments: <int>, // number of bevel layers
- *  bevelSubtract: <bool>, // subtract bevel instead of adding it
  *
  *  extrudePath: <THREE.Curve> // curve to extrude shape along
  *
@@ -111,7 +110,14 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
 		var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
 		var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
-		var bevelSubtract = options.bevelSubtract !== undefined ? options.bevelSubtract : false;
+		var bevelSubtract = false;
+
+		if ( bevelSize < 0 ) {
+
+			bevelSize = - bevelSize;
+			bevelSubtract = true;
+
+		}
 
 		var extrudePath = options.extrudePath;
 

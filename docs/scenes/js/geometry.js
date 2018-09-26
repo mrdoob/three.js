@@ -852,8 +852,7 @@ var guis = {
 			bevelEnabled: false,
 			bevelThickness: 1,
 			bevelSize: 0.5,
-			bevelSegments: 3,
-			bevelSubtract: false
+			bevelSegments: 3
 		};
 
 		var fonts = [
@@ -880,8 +879,7 @@ var guis = {
 					bevelEnabled: data.bevelEnabled,
 					bevelThickness: data.bevelThickness,
 					bevelSize: data.bevelSize,
-					bevelSegments: data.bevelSegments,
-					bevelSubtract: data.bevelSubtract
+					bevelSegments: data.bevelSegments
 				} );
 				geometry.center();
 
@@ -904,9 +902,8 @@ var guis = {
 		folder.add( data, 'weight', weights ).onChange( generateGeometry );
 		folder.add( data, 'bevelEnabled' ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 0.1, 3 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSize', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', -0.5, 3 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSegments', 0, 8 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSubtract' ).onChange( generateGeometry );
 
 		generateGeometry();
 
@@ -924,8 +921,7 @@ var guis = {
 			bevelEnabled: false,
 			bevelThickness: 1,
 			bevelSize: 0.5,
-			bevelSegments: 3,
-			bevelSubtract: false
+			bevelSegments: 3
 		};
 
 		var fonts = [
@@ -952,8 +948,7 @@ var guis = {
 					bevelEnabled: data.bevelEnabled,
 					bevelThickness: data.bevelThickness,
 					bevelSize: data.bevelSize,
-					bevelSegments: data.bevelSegments,
-					bevelSubtract: data.bevelSubtract
+					bevelSegments: data.bevelSegments
 				} );
 				geometry.center();
 
@@ -976,9 +971,8 @@ var guis = {
 		folder.add( data, 'weight', weights ).onChange( generateGeometry );
 		folder.add( data, 'bevelEnabled' ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 0.1, 3 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSize', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', -0.5, 3 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSegments', 0, 8 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSubtract' ).onChange( generateGeometry );
 
 		generateGeometry();
 
@@ -1274,8 +1268,7 @@ var guis = {
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
-			bevelSegments: 1,
-			bevelSubtract: false
+			bevelSegments: 1
 		};
 
 		var length = 12, width = 8;
@@ -1301,9 +1294,8 @@ var guis = {
 		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'depth', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', -4, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSubtract' ).onChange( generateGeometry );
 
 		generateGeometry();
 
@@ -1317,8 +1309,7 @@ var guis = {
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
-			bevelSegments: 1,
-			bevelSubtract: false
+			bevelSegments: 1
 		};
 
 		var length = 12, width = 8;
@@ -1344,9 +1335,8 @@ var guis = {
 		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'depth', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', -4, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSubtract' ).onChange( generateGeometry );
 
 		generateGeometry();
 
