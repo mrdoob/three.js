@@ -32,7 +32,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - per vertex ambient occlusion:
 			<a href="https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter14.html">article 1</a>,
-			<a href="https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter14.html">article 2</a>,
+			<a href="https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch12.html">article 2</a>,
 			<a href="http://www.danenglesson.com/images/portfolio/point-based/Report.pdf">article 3</a><br />
 		</div>
 
@@ -51,41 +51,15 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script id="vertexShader" type="x-shader/x-vertex">
-
-		</script>
-
 		<script>
 
 			// https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter14.html
 			// http://www.danenglesson.com/images/portfolio/point-based/Report.pdf
 			// http://www.aduprat.com/portfolio/?page=articles%2FPBGI
+			// https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch12.html
+			// http://www.rorydriscoll.com/2012/01/15/cubemap-texel-solid-angle/
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			var vertexShader = `
-				precision highp float;
-
-				attribute float area;
-
-				void main() {
-
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-				}
-			`;
-
-			var fragmentShader = `
-				precision highp float;
-
-				void main() {
-
-					gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
-
-				}
-			`;
-
-
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
@@ -196,128 +170,241 @@
 
 				}
 
+				function saturate( num ) {
+					return num <= 0 ? 0 : num >= 1 ? 1 : num;
+				}
+
+				function solidAngle( v, d2, receiverNormal, emitterNormal, emitterArea ) {
+
+					var dotR = saturate( receiverNormal.dot( v ) );
+					var dotE = saturate( emitterNormal.dot( v.negate() ) );
+
+					return emitterArea * dotE * dotR / ( d2 + emitterArea / Math.PI ) / Math.PI;
+
+				}
+
+
 				function ambientOcclusion( geometry ) {
+
+					console.log(geometry);
 
 					var colors = [];
 
 					var positions = geometry.attributes.position.array;
 					var normals = geometry.attributes.normal.array;
+					var bentNormals = normals.slice();
 					var areas = geometry.attributes.area.array;
+
+					var receiver = new THREE.Vector3();
+					var receiverNormal = new THREE.Vector3();
 
 					var emitter = new THREE.Vector3();
 					var emitterNormal = new THREE.Vector3();
 
-					var receiver = new THREE.Vector3();
-					var receiverNormal = new THREE.Vector3();
 					var bentNormal = new THREE.Vector3();
+					var v = new THREE.Vector3();
 
-					for ( var i = 0; i < positions.length; i += 3 ) {
+					function computeVertexOcclusion( i, pass ) {
 
-						emitter.fromArray( positions, i );
-						emitterNormal.fromArray( normals, i );
-						var area = areas[ i / 3 ];
-
-						var occlusion = 255;
+						var value = 0;
 
 						for ( var j = 0; j < positions.length; j += 3 ) {
 
-							if ( j !== i ) {
+							var emitterArea = areas[ j / 3 ];
 
-								receiver.fromArray( positions, j );
+							emitter.fromArray( positions, j );
+							emitterNormal.fromArray( normals, j );
 
-								bentNormal.subVectors( emitter, receiver )
+							v.subVectors( emitter, receiver )
 
-								var distance = bentNormal.lengthSq() + 1e-16;
+							var d2 = v.dot( v ) + 1e-16;
 
-								if( distance < area ) {
+							if( d2 < 4 * emitterArea) {
 
-									bentNormal.normalize();
+								v.multiplyScalar( 1 / Math.sqrt( d2 ) ); // normalise
 
-									receiverNormal.fromArray( normals, j );
+								value += solidAngle( v, d2, receiverNormal, emitterNormal, emitterArea );
 
-									var cosR = receiverNormal.dot( bentNormal );
-									var cosE = emitterNormal.dot( bentNormal.negate() );
-
-									var a = 1 ;
-									occlusion -= a * ( Math.max( cosE, 0 ) * Math.max( cosR, 0 ) ) / ( Math.PI * distance + a );
-
-								}
-
-								// console.log(distanceSqr);
-								// todo: discard if distance less than radius of disk
-
-								//
-
-								// bentNormal.subVectors( receiverNormal, emitterNormal );
-								// bentNormal.normalize(); // needed?
-
-								// var dstFactor = 1 - ( 1 / Math.sqrt( ( area / ( Math.PI * distanceSqr ) ) + 1 ) );
-
-								// // console.log(dstFactor);
-								// var dotE = emitterNormal.dot( bentNormal );
-								// var dotR = 4 * receiverNormal.dot( bentNormal );
-
+								if( pass === 0 ) bentNormal.sub( v.multiplyScalar( value ) );
 
 							}
 
 						}
 
-						// console.log(occlusion);
-						occlusion = Math.abs( 255 / occlusion );
-
-						colors.push( occlusion, occlusion, occlusion );
-
+						if( pass === 0 ) bentNormal.normalize();
+						return saturate( 1 - value );
 
 					}
 
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
+					for( var pass = 0; pass < 3; pass ++ ) {
+						for ( var i = 0; i < positions.length; i += 3 ) {
+
+							receiver.fromArray( positions, i );
+							receiverNormal.fromArray( normals, i );
+							if( pass === 0 ) bentNormal.copy( receiverNormal ); // initialise
+
+							// initialise to 1 for first pass
+							if( !colors[ i / 3 ] ) colors[ i / 3 ] = 1;
+
+							var value = computeVertexOcclusion( i, pass );
+
+							if( pass === 0 ) bentNormal.toArray( bentNormals, i );
+
+							colors[ i / 3 ] *= value;
+
+							}
+
+					}
+
+					// geometry.attributes.normal.set( bentNormals );
+					// geometry.attributes.normal.needsUpdate = true;
+					// console.log(colors, bentNormals);
+
+					var vColors = [];
+					for( var k = 0; k < colors.length; k ++ ) vColors.push( colors[ k ], colors[ k ], colors[ k ] );
+
+					geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( vColors ), 3 ) );
 
 				}
 
-
-
-				// var occlusionMat = new THREE.ShaderMaterial( {
-				// 		vertexShader: vertexShader,
-				// 		fragmentShader: fragmentShader,
-				// 		vertexColors: THREE.VertexColors,
-				// 	} );
-
 				var occlusionMat = new THREE.MeshBasicMaterial( {
-					color: 0xffffff,
 					vertexColors: THREE.VertexColors,
 				} );
 
-				// var geometry = new THREE.CylinderBufferGeometry();
-				// console.log( geometry );
 
-				// calculateAreas( geometry );
-				// ambientOcclusion( geometry );
+				function loadCustom()  {
 
-				// scene.add( new THREE.Mesh( geometry, occlusionMat ) );
+					var positions = [
+						-0.5, 0.5, -0.5,
+						-0.5, 0.5, 0.5,
+						-0.5, -0.5, -0.5,
+						-0.5, -0.5, 0.5,
 
-				var loader = new THREE.GLTFLoader();
-				loader.load( './models/gltf/Duck/glTF-Binary/Duck.glb', function ( gltf ) {
+						-0.5, -0.5, -0.5,
+						0.5, -0.5, -0.5,
+						-0.5, -0.5, 0.5,
+						0.5, -0.5, 0.5
+					];
 
-					var duck = gltf.scene.getObjectByName( 'LOD3spShape' );
-					// duck.scale.multiplyScalar( 0.01 );
+					var normals = [
+						-1, 0, 0,
+						-1, 0, 0,
+						-1, 0, 0,
+						-1, 0, 0,
 
-					duck.geometry.computeBoundingSphere();
-					var scl = 1 / duck.geometry.boundingSphere.radius
-					duck.geometry.scale( scl, scl, scl );
+						0, 1, 0,
+						0, 1, 0,
+						0, 1, 0,
+						0, 1, 0,
+					];
+
+					var indices = [
+						1, 2, 0,
+						1, 3, 2,
+
+						4, 6, 5,
+						6, 7, 5,
+					];
+
+					var geometry = new THREE.BufferGeometry();
+					geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
+					geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) )
+
+					geometry.setIndex( indices );
+
+					calculateAreas( geometry );
+					ambientOcclusion( geometry );
+
+					console.log( geometry );
+
+					var mesh = new THREE.Mesh( geometry, occlusionMat );
+					mesh.position.y += 1;
+					scene.add( mesh );
+
+				}
+
+				function loadBox() {
+					var geometry = new THREE.BoxBufferGeometry();
+
+					calculateAreas( geometry );
+					ambientOcclusion( geometry );
+
+					scene.add( new THREE.Mesh( geometry, occlusionMat ) );
+				}
+
+				function loadCylinder() {
+					var geometry = new THREE.CylinderBufferGeometry();
+
+					calculateAreas( geometry );
+					ambientOcclusion( geometry );
+
+					scene.add( new THREE.Mesh( geometry, occlusionMat ) );
+				}
+
+				function loadTorus() {
+					var geometry = new THREE.TorusBufferGeometry( 1, 0.4, 3, 3 );
+
+					calculateAreas( geometry );
+					ambientOcclusion( geometry );
+
+					scene.add( new THREE.Mesh( geometry, occlusionMat ) );
+				}
+
+				function loadModel( url, modelName, scale ) {
+
+					var loader = new THREE.GLTFLoader();
+					loader.load( url, function ( gltf ) {
+
+						var model = gltf.scene.getObjectByName( modelName );
+						model.scale.multiplyScalar( scale );
+
+						calculateAreas( model.geometry );
+						ambientOcclusion( model.geometry );
+
+						var oldMat = model.material;
+
+						console.log(oldMat);
+						model.material = new THREE.MeshBasicMaterial( {
+							// color: oldMat.color,
+							map: oldMat.map,
+							vertexColors: THREE.VertexColors,
+						} )
+
+						toggleVertexColors( model.material );
+
+						// console.log( model.geometry );
+
+						console.log(model);
+						scene.add( model );
+
+					} );
+				}
+
+				function toggleVertexColors( material ) {
+					window.addEventListener( 'click', function() {
+
+						if( material.vertexColors === THREE.VertexColors ) {
+							material.vertexColors = THREE.NoColors;
+							material.needsUpdate = true;
+							console.log('No colors!');
+						}
+						else {
+							material.vertexColors = THREE.VertexColors;
+							material.needsUpdate = true;
+							console.log('Vertex colors!');
+						}
+					} )
+				}
 
 
+				// loadCustom()
+				// loadTorus();
+				// loadBox();
+				// loadCylinder();
+				loadModel( './models/gltf/Duck/glTF-Binary/Duck.glb', 'LOD3spShape', 0.01 );
 
-					calculateAreas( duck.geometry );
-					ambientOcclusion( duck.geometry );
+				// loadModel( './models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', 'node_damagedHelmet_-6514', 1 );
 
-					duck.material = occlusionMat;
-					// duck.material.vertexColors = THREE.VertexColors;
-
-					console.log( duck.geometry );
-
-					scene.add( duck );
-
-				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
