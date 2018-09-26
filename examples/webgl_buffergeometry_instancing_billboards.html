@@ -27,7 +27,7 @@
 			color: #ffffff;
 		}
 
-		#oldie a {
+		#webglmessage a {
 			color: #da0;
 		}
 
@@ -48,7 +48,7 @@
 	</div>
 
 	<script src="../build/three.js"></script>
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vshader" type="x-shader/x-vertex">
@@ -116,9 +116,9 @@
 
 		function init() {
 
-			if ( !Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 				return false;
 
 			}

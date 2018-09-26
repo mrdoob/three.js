@@ -28,7 +28,7 @@
 				color: #ffffff;
 			}
 
-			#oldie a { color:#da0 }
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
 	<body>
@@ -37,7 +37,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - curvature estimation of a geometry by <a href="http://codercat.club" target="_blank" rel="noopener">CoderCat</a></div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
@@ -73,7 +73,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 

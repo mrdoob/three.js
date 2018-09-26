@@ -29,7 +29,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -45,13 +45,18 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats;
 			var controls;
@@ -92,10 +97,10 @@
 
 				};
 
-				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function( geometry ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function( gltf ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new THREE.Mesh( gltf.scene.children[ 0 ].geometry, material );
 					mesh.position.y = - 50;
 					mesh.scale.setScalar( 100 );
 					scene.add( mesh );

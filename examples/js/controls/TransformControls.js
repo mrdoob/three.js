@@ -511,7 +511,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
 			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
 			button: event.button
-		}
+		};
 
 	}
 
@@ -604,7 +604,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		console.warn( 'THREE.TransformControls: update function has been depricated.' );
 
-	}
+	};
 
 };
 

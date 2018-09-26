@@ -73,7 +73,7 @@
 
 				gui = new dat.GUI();
 
-				var example = gui.add( param, 'example', {
+				gui.add( param, 'example', {
 					'basic / color-adjustment': 'color-adjustment',
 					'basic / blends': 'blends',
 					'basic / fade': 'fade',
@@ -317,7 +317,6 @@
 						var normal = new THREE.TextureNode( decalNormal );
 						var normalXY = new THREE.SwitchNode( normal, 'xy' );
 						var scale = new THREE.FloatNode( .5 );
-						var flip = new THREE.Vector2Node( - 1, 1 );
 
 						var normalXYFlip = new THREE.Math1Node(
 							normalXY,

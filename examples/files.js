@@ -59,6 +59,7 @@ var files = {
 		"webgl_interactive_raycasting_points",
 		"webgl_interactive_voxelpainter",
 		"webgl_kinect",
+		"webgl_layers",
 		"webgl_lensflares",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
@@ -149,7 +150,6 @@ var files = {
 		"webgl_materials_cubemap_balls_reflection",
 		"webgl_materials_cubemap_balls_refraction",
 		"webgl_materials_cubemap_dynamic",
-		"webgl_materials_cubemap_dynamic2",
 		"webgl_materials_cubemap_refraction",
 		"webgl_materials_curvature",
 		"webgl_materials_displacementmap",
@@ -158,6 +158,7 @@ var files = {
 		"webgl_materials_envmaps_hdr",
 		"webgl_materials_grass",
 		"webgl_materials_lightmap",
+		"webgl_materials_matcap",
 		"webgl_materials_nodes",
 		"webgl_materials_normalmap",
 		"webgl_materials_normalmap_object_space",
@@ -309,11 +310,11 @@ var files = {
 	"webgl deferred": [
 		"webgldeferred_animation"
 	],
-	/*
 	"webgl2": [
-		"webgl2_sandbox"
+		"webgl2_materials_texture3d",
+		"webgl2_materials_texture3d_volume"
+		// "webgl2_sandbox"
 	],
-	*/
 	"webaudio": [
 		"webaudio_orientation",
 		"webaudio_sandbox",
@@ -383,7 +384,7 @@ var files = {
 		"canvas_geometry_text",
 		"canvas_interactive_cubes",
 		"canvas_interactive_cubes_tween",
-		"canvas_interactive_particles",
+		"canvas_interactive_sprites",
 		"canvas_interactive_voxelpainter",
 		"canvas_lights_pointlights",
 		"canvas_lines",
