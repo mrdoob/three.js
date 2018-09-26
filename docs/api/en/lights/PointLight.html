@@ -73,8 +73,9 @@ scene.add( light );
 		<p>
 			<em>[page:WebGLRenderer.physicallyCorrectLights Physically correct] mode</em> — When distance
 			is zero, light will attenuate according to inverse-square law to infinite distance. When
-			distance is non-zero, a more sudden cutoff is applied at this distance from the light, in
-			addition to inverse-square attenuation, limiting the light's range.
+			distance is non-zero, light will attenuate according to inverse-square law until near the
+			distance cutoff, where it will then attenuate quickly and smoothly to 0. Inherently, cutoffs
+			are not physically correct.
 		</p>
 		<p>
 			Default is *0.0*.
