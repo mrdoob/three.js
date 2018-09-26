@@ -41,7 +41,7 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<!-- HDR fragment shader -->
@@ -91,7 +91,11 @@
 				exposure: 1.0,
 			};
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -111,7 +115,8 @@
 
 				var loader = new THREE.EXRLoader();
 
-				var texture = loader.load( "textures/piz_compressed.exr", function( texture, textureData ){
+				loader.load( "textures/piz_compressed.exr", function( texture, textureData ) {
+
 					console.log( textureData.header ); // exr header
 
 					texture.minFilter = THREE.NearestFilter;
@@ -133,6 +138,7 @@
 					quad.position.z = -100;
 					scene.add( quad );
 					animate();
+
 				} );
 
 				renderer = new THREE.WebGLRenderer();

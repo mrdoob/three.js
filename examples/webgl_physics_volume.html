@@ -33,15 +33,18 @@
 		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			// Detects webgl
-			if ( ! Detector.webgl ) {
-					Detector.addGetWebGLMessage();
-					document.getElementById( 'container' ).innerHTML = "";
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+				document.getElementById( 'container' ).innerHTML = "";
+
 			}
 
 			// - Global variables -
@@ -204,7 +207,7 @@
 				var geometry = new THREE.Geometry().fromBufferGeometry( bufGeometry );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles
-				var vertsDiff = geometry.mergeVertices();
+				geometry.mergeVertices();
 
 				// Convert again to BufferGeometry, indexed
 				var indexedBufferGeom = createIndexedBufferGeometryFromGeometry( geometry );
@@ -339,7 +342,7 @@
 				volumeSoftBody.get_m_materials().at( 0 ).set_m_kLST( 0.9 );
 				volumeSoftBody.get_m_materials().at( 0 ).set_m_kAST( 0.9 );
 
-				volumeSoftBody.setTotalMass( mass, false )
+				volumeSoftBody.setTotalMass( mass, false );
 				Ammo.castObject( volumeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin );
 				physicsWorld.addSoftBody( volumeSoftBody, 1, -1 );
 				volume.userData.physicsBody = volumeSoftBody;

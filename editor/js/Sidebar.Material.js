@@ -517,7 +517,7 @@ Sidebar.Material = function ( editor ) {
 
 		if ( currentMaterialSlot !== previousSelectedSlot ) refreshUI( true );
 
-		var material = editor.getObjectMaterial( currentObject, currentMaterialSlot )
+		var material = editor.getObjectMaterial( currentObject, currentMaterialSlot );
 
 		var textureWarning = false;
 		var objectHasUvs = false;

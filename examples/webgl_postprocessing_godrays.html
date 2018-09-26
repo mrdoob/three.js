@@ -35,7 +35,7 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/ShaderGodRays.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<div id="info">
@@ -45,7 +45,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer, materialDepth;
@@ -300,7 +304,8 @@
 
 					// Clear colors and depths, will clear to sky color
 
-					renderer.clearTarget( postprocessing.rtTextureColors, true, true, false );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
+					renderer.clear( true, true, false );
 
 					// Sun render. Runs a shader that gives a brightness based on the screen
 					// space distance to the sun. Not very efficient, so i make a scissor

@@ -38,11 +38,15 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, controls, scene, renderer;
 
@@ -76,7 +80,7 @@
 				controls.screenSpacePanning = false;
 
 				controls.minDistance = 100;
-				controls.maxDistance = 500
+				controls.maxDistance = 500;
 
 				controls.maxPolarAngle = Math.PI / 2;
 

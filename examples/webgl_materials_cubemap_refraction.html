@@ -22,7 +22,7 @@
 			#d { text-align:center; margin:1em auto -9.5em; z-index:200; position:relative; display:block;
 				background:rgba(0,0,0,0.5); padding:0.5em; width:400px; border-radius:15px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
 
-			#oldie { margin-top:15em !important }
+			#webglmessage { margin-top:15em !important }
 		</style>
 	</head>
 
@@ -38,12 +38,16 @@
 
 		<script src="js/loaders/PLYLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var FLOOR = -250;
 

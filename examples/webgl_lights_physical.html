@@ -44,11 +44,15 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer,
 			bulbLight, bulbMat, hemiLight,
@@ -290,7 +294,6 @@
 
 				hemiLight.intensity = hemiLuminousIrradiances[ params.hemiIrradiance ];
 				var time = Date.now() * 0.0005;
-				var delta = clock.getDelta();
 
 				bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
 

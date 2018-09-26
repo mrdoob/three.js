@@ -39,7 +39,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
@@ -58,7 +58,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
@@ -202,11 +206,11 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var earthDiffuse = textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
 					earthMat.map = tex;
 					earthMat.needsUpdate = true;
 				} );
-				var earthSpecular = textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
 					earthMat.specularMap = tex;
 					earthMat.needsUpdate = true;
 				} );
@@ -235,7 +239,7 @@
 					depthTest: false
 				} );
 
-				var earthClouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
 					earthCloudsMat.map = tex;
 					earthCloudsMat.needsUpdate = true;
 				} );

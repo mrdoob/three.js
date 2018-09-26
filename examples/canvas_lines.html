@@ -30,10 +30,6 @@
 			windowHalfX = window.innerWidth / 2,
 			windowHalfY = window.innerHeight / 2,
 
-			SEPARATION = 200,
-			AMOUNTX = 10,
-			AMOUNTY = 10,
-
 			camera, scene, renderer;
 
 			init();
@@ -41,10 +37,7 @@
 
 			function init() {
 
-				var container, separation = 100, amountX = 50, amountY = 50,
-				particles, particle;
-
-				container = document.createElement('div');
+				var container = document.createElement('div');
 				document.body.appendChild(container);
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -77,7 +70,7 @@
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					particle = new THREE.Sprite( material );
+					var particle = new THREE.Sprite( material );
 					particle.position.x = Math.random() * 2 - 1;
 					particle.position.y = Math.random() * 2 - 1;
 					particle.position.z = Math.random() * 2 - 1;

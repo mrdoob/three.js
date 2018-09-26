@@ -46,7 +46,7 @@
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/FilmPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 	</head>
@@ -59,7 +59,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var radius = 6371;
 			var tilt = 0.41;

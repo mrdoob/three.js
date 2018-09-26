@@ -45,13 +45,17 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
 			var container = document.getElementById( 'container' );
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer, scene, camera;
 

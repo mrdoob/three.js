@@ -19,17 +19,21 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/modifiers/SubdivisionModifier.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
 			var camera, controls, scene, renderer;
 
-			var cube, mesh, material;
+			var cube, mesh, material, geometry, smooth, group;
 
 			// Create new object by parameters
 
@@ -49,7 +53,7 @@
 
 			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
 			var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
-			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } )
+			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
 
 			// Cube
 
@@ -94,10 +98,12 @@
 
 			} );
 
-			var loader = new THREE.JSONLoader();
-			loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
+			var loader = new THREE.BufferGeometryLoader();
+			loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( geometry ) {
 
-				geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
+				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+
+				geometriesParams.push( {type: 'WaltHead', args: [ ], meshScale: 6 } );
 
 				THREE.WaltHead = function() {
 					return geometry.clone();
@@ -112,7 +118,7 @@
 
 				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
-				geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
+				geometriesParams.push( {type: 'Suzanne', args: [ ], scale: 100, meshScale:2 } );
 
 				THREE.Suzanne = function() {
 					return geometry.clone();

@@ -38,7 +38,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -201,7 +201,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var hash = document.location.hash.substr( 1 );
 			if ( hash ) hash = parseInt( hash, 0 );
@@ -531,9 +535,9 @@
 				var uniforms = heightmapVariable.material.uniforms;
 				if ( mouseMoved ) {
 
-					this.raycaster.setFromCamera( mouseCoords, camera );
+					raycaster.setFromCamera( mouseCoords, camera );
 
-					var intersects = this.raycaster.intersectObject( meshRay );
+					var intersects = raycaster.intersectObject( meshRay );
 
 					if ( intersects.length > 0 ) {
 					    var point = intersects[ 0 ].point;

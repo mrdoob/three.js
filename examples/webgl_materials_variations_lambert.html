@@ -31,12 +31,16 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -75,10 +79,6 @@
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
-
-				var shininess = 50, specular = 0x333333;
-
-				var materials = [];
 
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;

@@ -78,8 +78,9 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			var parser = new GLTFParser( json, extensions, {
 
-				path: path || this.path,
-				crossOrigin: this.crossOrigin
+				crossOrigin: this.crossOrigin,
+				manager: this.manager,
+				path: path || this.path
 
 			} );
 
@@ -922,7 +923,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				return new Promise( function ( resolve ) {
 
-					var loader = new THREE.FileLoader();
+					var loader = new THREE.FileLoader( options.manager );
 					loader.setResponseType( 'text' );
 					loader.load( resolveURL( shader.uri, options.path ), function ( shaderText ) {
 
@@ -956,7 +957,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				return new Promise( function ( resolve ) {
 
-					var loader = new THREE.FileLoader();
+					var loader = new THREE.FileLoader( options.manager );
 					loader.setResponseType( 'arraybuffer' );
 					loader.load( resolveURL( buffer.uri, options.path ), function ( buffer ) {
 
@@ -1081,7 +1082,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						if ( textureLoader === null ) {
 
-							textureLoader = new THREE.TextureLoader();
+							textureLoader = new THREE.TextureLoader( options.manager );
 
 						}
 

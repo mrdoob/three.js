@@ -34,7 +34,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -51,7 +51,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var params = {
@@ -160,7 +164,7 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				var hdrCubeMap = new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
+				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update( renderer );
@@ -170,6 +174,10 @@
 
 					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 					standardMaterial.needsUpdate = true;
+
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
 
 				} );
 
@@ -217,7 +225,7 @@
 				gui.add( params, 'exposure', 0, 10 );
 				gui.add( params, 'whitePoint', 0, 10 );
 				gui.add( params, 'opacity', 0, 1 );
-				gui.add( params, 'renderMode', [ 'Renderer', 'Composer'] );
+				gui.add( params, 'renderMode', [ 'Renderer', 'Composer' ] );
 				gui.open();
 
 			}
@@ -249,23 +257,20 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				standardMaterial.roughness = params.roughness;
+				standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+				standardMaterial.opacity = params.opacity;
 
-
-					standardMaterial.roughness = params.roughness;
-					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
-					standardMaterial.opacity = params.opacity;
-
-				}
 				if( renderer.toneMapping !== toneMappingOptions[ params.toneMapping ] ) {
+
 					renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-					if( standardMaterial ) standardMaterial.needsUpdate = true;
-					if( floorMaterial ) floorMaterial.needsUpdate = true;
+					standardMaterial.needsUpdate = true;
+					floorMaterial.needsUpdate = true;
+
 				}
+
 				renderer.toneMappingExposure = params.exposure;
 				renderer.toneMappingWhitePoint = params.whitePoint;
-
-				var timer = Date.now() * 0.00025;
 
 				camera.lookAt( scene.position );
 
@@ -277,10 +282,13 @@
 				}
 
 				if( params.renderMode === "Composer" ) {
+
 					composer.render();
-				}
-				else {
+
+				} else {
+
 					renderer.render( scene, camera );
+
 				}
 
 			}

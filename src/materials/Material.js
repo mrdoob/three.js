@@ -218,6 +218,9 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			data.envMap = this.envMap.toJSON( meta ).uuid;
 			data.reflectivity = this.reflectivity; // Scale behind envMap
 
+			if ( this.combine !== undefined ) data.combine = this.combine;
+			if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
+
 		}
 
 		if ( this.gradientMap && this.gradientMap.isTexture ) {
@@ -243,6 +246,10 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// rotation (SpriteMaterial)
 		if ( this.rotation !== 0 ) data.rotation = this.rotation;
+
+		if ( this.polygonOffset === true ) data.polygonOffset = true;
+		if ( this.polygonOffsetFactor !== 0 ) data.polygonOffsetFactor = this.polygonOffsetFactor;
+		if ( this.polygonOffsetUnits !== 0 ) data.polygonOffsetUnits = this.polygonOffsetUnits;
 
 		if ( this.linewidth !== 1 ) data.linewidth = this.linewidth;
 		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;

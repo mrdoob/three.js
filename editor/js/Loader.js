@@ -209,7 +209,10 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
+					THREE.DRACOLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+
 					var loader = new THREE.GLTFLoader();
+					loader.setDRACOLoader( new THREE.DRACOLoader() );
 					loader.parse( contents, '', function ( result ) {
 
 						result.scene.name = filename;
@@ -574,7 +577,7 @@ var Loader = function ( editor ) {
 			case 'geometry':
 
 				var loader = new THREE.JSONLoader();
-				loader.setTexturePath( scope.texturePath );
+				loader.setResourcePath( scope.texturePath );
 
 				var result = loader.parse( data );
 

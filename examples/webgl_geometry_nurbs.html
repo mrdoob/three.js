@@ -112,7 +112,7 @@
 				var nurbsGeometry = new THREE.BufferGeometry();
 				nurbsGeometry.setFromPoints( nurbsCurve.getPoints( 200 ) );
 
-				var nurbsMaterial = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333 } );
+				var nurbsMaterial = new THREE.LineBasicMaterial( { color: 0x333333 } );
 
 				var nurbsLine = new THREE.Line( nurbsGeometry, nurbsMaterial );
 				nurbsLine.position.set( 200, - 100, 0 );
@@ -121,7 +121,7 @@
 				var nurbsControlPointsGeometry = new THREE.BufferGeometry();
 				nurbsControlPointsGeometry.setFromPoints( nurbsCurve.controlPoints );
 
-				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { linewidth: 2, color: 0x333333, opacity: 0.25, transparent: true } );
+				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { color: 0x333333, opacity: 0.25, transparent: true } );
 
 				var nurbsControlPointsLine = new THREE.Line( nurbsControlPointsGeometry, nurbsControlPointsMaterial );
 				nurbsControlPointsLine.position.copy( nurbsLine.position );
