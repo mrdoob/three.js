@@ -28,7 +28,7 @@
 				color: yellow;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(0,0,50) !important;
 				color:#fff !important;
 			}
@@ -43,12 +43,16 @@
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, controls, scene, renderer, stats;
 
