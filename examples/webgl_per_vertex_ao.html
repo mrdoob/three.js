@@ -31,20 +31,13 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - per vertex ambient occlusion:
-			<a href="https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter14.html">article 1</a>,
-			<a href="https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch12.html">article 2</a>,
-			<a href="http://www.danenglesson.com/images/portfolio/point-based/Report.pdf">article 3</a><br />
+			<a href="https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter14.html">article</a>
 		</div>
 
 		<script src="../build/three.js"></script>
-
-		<!-- <script src="js/libs/inflate.min.js"></script>
-		<script src="js/loaders/FBXLoader.js"></script> -->
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-
-
-		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/loaders/GLTFLoader.js"></script>
 
@@ -62,360 +55,77 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats, controls;
-			var camera, scene, renderer, light;
+			var camera, scene, renderer, light, model, materials, envMap;
 
 			init();
-			animate();
 
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 2, 4 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( -1.8, 0.9, 2.7 );
 
 				controls = new THREE.OrbitControls( camera, container );
-				controls.target.set( 0, 1, 0 );
+				controls.target.set( 0, -0.2, -0.2 );
 				controls.update();
+
+				var path = 'textures/cube/Bridge2/';
+				var format = '.jpg';
+				var envMap = new THREE.CubeTextureLoader().load( [
+					path + 'posx' + format, path + 'negx' + format,
+					path + 'posy' + format, path + 'negy' + format,
+					path + 'posz' + format, path + 'negz' + format
+				] );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
+
+				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
+				light.position.set( 0, 1, 0 );
+				scene.add( light );
 
 				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
 
-				function getAllIndexes(arr, val) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( './models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', function ( gltf ) {
 
-						var indexes = [];
-						for( var i = 0; i < arr.length; i++) {
+					model = gltf.scene.getObjectByName( 'node_damagedHelmet_-6514' );
 
-							if ( arr[i] === val ) indexes.push( i );
+					calculateAreas( model.geometry );
+					ambientOcclusion( model.geometry );
 
-						}
+					initMaterials( model.material );
+					model.material = materials.basicGrey;
 
-						return indexes;
+					scene.add( model );
 
-				}
-
-				var edge1 = new THREE.Vector3();
-				var edge2 = new THREE.Vector3();
-
-				function calculateAreas( geometry ) {
-
-					var positions = geometry.attributes.position.array;
-					var indices = geometry.index.array;
-
-					var encounteredIndices = [];
-
-					var areas = [];
-
-					// for each vertex, the area is calculated as the weighted sum of the area of each face it is a member of
-					indices.forEach( function ( pIndex ) {
-
-						if ( encounteredIndices[ pIndex ] === 'x' ) return;
-						encounteredIndices[ pIndex ] ='x'; // mark an 'x' for each index we have processed
-
-						// find all faces the vertex is a member of
-						var allIndices = getAllIndexes( indices, pIndex );
-
-						areas[ pIndex ] = 0;
-						allIndices.forEach( function( j ) {
-
-							var edge1Index;
-							var edge2Index;
-
-							if ( j % 3 === 0 ) { // j is first index in face
-
-								edge1Index = indices[ j + 1 ];
-								edge2Index = indices[ j + 2 ];
-
-							} else if ( j % 3 === 1 ) { // j is second index in face
-
-								edge1Index = indices[ j - 1 ];
-								edge2Index = indices[ j + 1 ];
-
-							} else { // j is last index in face
-
-								edge1Index = indices[ j - 1 ];
-								edge2Index = indices[ j - 2 ];
-
-							}
-
-							edge1.set(
-								positions[ pIndex * 3 ] - positions[ edge1Index * 3 ],
-								positions[ pIndex * 3 + 1 ] - positions[ edge1Index * 3 + 1 ],
-								positions[ pIndex * 3 + 2 ] - positions[ edge1Index * 3 + 2 ]
-							);
-
-							edge2.set(
-								positions[ pIndex * 3 ] - positions[ edge2Index * 3 ],
-								positions[ pIndex * 3 + 1 ] - positions[ edge2Index * 3 + 1 ],
-								positions[ pIndex * 3 + 2 ] - positions[ edge2Index * 3 + 2 ]
-							);
-
-							areas[ pIndex ] += 0.5 * edge1.cross( edge2 ).length();
-
-						} )
-
-						areas[ pIndex ] /= 3;
-
-					} );
-
-					// finally add the weighted areas as an attribute to be accessed in the shader
-					geometry.addAttribute( 'area', new THREE.Float32BufferAttribute( areas, 1 ) );
-
-				}
-
-				function saturate( num ) {
-					return num <= 0 ? 0 : num >= 1 ? 1 : num;
-				}
-
-				function solidAngle( v, d2, receiverNormal, emitterNormal, emitterArea ) {
-
-					var dotR = saturate( receiverNormal.dot( v ) );
-					var dotE = saturate( emitterNormal.dot( v.negate() ) );
-
-					return emitterArea * dotE * dotR / ( d2 + emitterArea / Math.PI ) / Math.PI;
-
-				}
-
-
-				function ambientOcclusion( geometry ) {
-
-					console.log(geometry);
-
-					var colors = [];
-
-					var positions = geometry.attributes.position.array;
-					var normals = geometry.attributes.normal.array;
-					var bentNormals = normals.slice();
-					var areas = geometry.attributes.area.array;
-
-					var receiver = new THREE.Vector3();
-					var receiverNormal = new THREE.Vector3();
-
-					var emitter = new THREE.Vector3();
-					var emitterNormal = new THREE.Vector3();
-
-					var bentNormal = new THREE.Vector3();
-					var v = new THREE.Vector3();
-
-					function computeVertexOcclusion( i, pass ) {
-
-						var value = 0;
-
-						for ( var j = 0; j < positions.length; j += 3 ) {
-
-							var emitterArea = areas[ j / 3 ];
-
-							emitter.fromArray( positions, j );
-							emitterNormal.fromArray( normals, j );
-
-							v.subVectors( emitter, receiver )
-
-							var d2 = v.dot( v ) + 1e-16;
-
-							if( d2 < 4 * emitterArea) {
-
-								v.multiplyScalar( 1 / Math.sqrt( d2 ) ); // normalise
-
-								value += solidAngle( v, d2, receiverNormal, emitterNormal, emitterArea );
-
-								if( pass === 0 ) bentNormal.sub( v.multiplyScalar( value ) );
-
-							}
-
-						}
-
-						if( pass === 0 ) bentNormal.normalize();
-						return saturate( 1 - value );
-
-					}
-
-					for( var pass = 0; pass < 3; pass ++ ) {
-						for ( var i = 0; i < positions.length; i += 3 ) {
-
-							receiver.fromArray( positions, i );
-							receiverNormal.fromArray( normals, i );
-							if( pass === 0 ) bentNormal.copy( receiverNormal ); // initialise
-
-							// initialise to 1 for first pass
-							if( !colors[ i / 3 ] ) colors[ i / 3 ] = 1;
-
-							var value = computeVertexOcclusion( i, pass );
-
-							if( pass === 0 ) bentNormal.toArray( bentNormals, i );
-
-							colors[ i / 3 ] *= value;
-
-							}
-
-					}
-
-					// geometry.attributes.normal.set( bentNormals );
-					// geometry.attributes.normal.needsUpdate = true;
-					// console.log(colors, bentNormals);
-
-					var vColors = [];
-					for( var k = 0; k < colors.length; k ++ ) vColors.push( colors[ k ], colors[ k ], colors[ k ] );
-
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( vColors ), 3 ) );
-
-				}
-
-				var occlusionMat = new THREE.MeshBasicMaterial( {
-					vertexColors: THREE.VertexColors,
 				} );
-
-
-				function loadCustom()  {
-
-					var positions = [
-						-0.5, 0.5, -0.5,
-						-0.5, 0.5, 0.5,
-						-0.5, -0.5, -0.5,
-						-0.5, -0.5, 0.5,
-
-						-0.5, -0.5, -0.5,
-						0.5, -0.5, -0.5,
-						-0.5, -0.5, 0.5,
-						0.5, -0.5, 0.5
-					];
-
-					var normals = [
-						-1, 0, 0,
-						-1, 0, 0,
-						-1, 0, 0,
-						-1, 0, 0,
-
-						0, 1, 0,
-						0, 1, 0,
-						0, 1, 0,
-						0, 1, 0,
-					];
-
-					var indices = [
-						1, 2, 0,
-						1, 3, 2,
-
-						4, 6, 5,
-						6, 7, 5,
-					];
-
-					var geometry = new THREE.BufferGeometry();
-					geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) )
-
-					geometry.setIndex( indices );
-
-					calculateAreas( geometry );
-					ambientOcclusion( geometry );
-
-					console.log( geometry );
-
-					var mesh = new THREE.Mesh( geometry, occlusionMat );
-					mesh.position.y += 1;
-					scene.add( mesh );
-
-				}
-
-				function loadBox() {
-					var geometry = new THREE.BoxBufferGeometry();
-
-					calculateAreas( geometry );
-					ambientOcclusion( geometry );
-
-					scene.add( new THREE.Mesh( geometry, occlusionMat ) );
-				}
-
-				function loadCylinder() {
-					var geometry = new THREE.CylinderBufferGeometry();
-
-					calculateAreas( geometry );
-					ambientOcclusion( geometry );
-
-					scene.add( new THREE.Mesh( geometry, occlusionMat ) );
-				}
-
-				function loadTorus() {
-					var geometry = new THREE.TorusBufferGeometry( 1, 0.4, 3, 3 );
-
-					calculateAreas( geometry );
-					ambientOcclusion( geometry );
-
-					scene.add( new THREE.Mesh( geometry, occlusionMat ) );
-				}
-
-				function loadModel( url, modelName, scale ) {
-
-					var loader = new THREE.GLTFLoader();
-					loader.load( url, function ( gltf ) {
-
-						var model = gltf.scene.getObjectByName( modelName );
-						model.scale.multiplyScalar( scale );
-
-						calculateAreas( model.geometry );
-						ambientOcclusion( model.geometry );
-
-						var oldMat = model.material;
-
-						console.log(oldMat);
-						model.material = new THREE.MeshBasicMaterial( {
-							// color: oldMat.color,
-							map: oldMat.map,
-							vertexColors: THREE.VertexColors,
-						} )
-
-						toggleVertexColors( model.material );
-
-						// console.log( model.geometry );
-
-						console.log(model);
-						scene.add( model );
-
-					} );
-				}
-
-				function toggleVertexColors( material ) {
-					window.addEventListener( 'click', function() {
-
-						if( material.vertexColors === THREE.VertexColors ) {
-							material.vertexColors = THREE.NoColors;
-							material.needsUpdate = true;
-							console.log('No colors!');
-						}
-						else {
-							material.vertexColors = THREE.VertexColors;
-							material.needsUpdate = true;
-							console.log('Vertex colors!');
-						}
-					} )
-				}
-
-
-				// loadCustom()
-				// loadTorus();
-				// loadBox();
-				// loadCylinder();
-				loadModel( './models/gltf/Duck/glTF-Binary/Duck.glb', 'LOD3spShape', 0.01 );
-
-				// loadModel( './models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', 'node_damagedHelmet_-6514', 1 );
-
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// stats
 				stats = new Stats();
 				container.appendChild( stats.dom );
+
+				buildGUI();
+
+				renderer.setAnimationLoop( function() {
+
+					renderer.render( scene, camera );
+					stats.update();
+
+				} );
 
 			}
 
@@ -428,18 +138,287 @@
 
 			}
 
-			//
+			function initMaterials( originalMaterial ) {
 
-			function animate() {
+				originalMaterial.vertexColors = THREE.VertexColors;
 
-				requestAnimationFrame( animate );
+				var color = originalMaterial.color;
+				var map = originalMaterial.map;
 
-				renderer.render( scene, camera );
+				materials = {
+					standardColor: originalMaterial,
+					phongColor: new THREE.MeshPhongMaterial( { color: color, map: map, vertexColors: THREE.VertexColors } ),
+					basicColor: new THREE.MeshBasicMaterial( { color: color, map: map, vertexColors: THREE.VertexColors } ),
+					standardGrey: new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors } ),
+					phongGrey: new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors } ),
+					basicGrey: new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } )
+				}
+			}
 
-				stats.update();
+			function vertexColors( enabled ) {
+
+				var colors = enabled ? THREE.VertexColors : THREE.NoColors;
+
+				for( var name in materials ) {
+
+					var material = materials[ name ];
+					material.vertexColors = colors;
+					material.needsUpdate = true;
+
+				}
 
 			}
 
+			function buildGUI() {
+
+				var gui = new dat.GUI( { width: 300 } );
+				gui.open();
+
+				params = {
+					output: 0,
+					material: 0,
+				};
+
+				var controls = gui.addFolder( 'Controls' );
+				controls.open();
+
+				controls.add( params, 'output', {
+
+					'AO only': 0,
+					'Material + AO': 1,
+					'Material Only': 2,
+
+
+				} ).name( 'Output' ).onChange( function() {
+
+					switch( parseInt( params.output ) ) {
+
+						case 0:
+							if( params.material === 0 ) model.material = materials.basicGrey;
+							else if ( params.material === 1 ) model.material = materials.phongGrey;
+							else if ( params.material === 2 ) model.material = materials.standardGrey;
+							break;
+						case 1:
+							vertexColors( true );
+							if( params.material === 0 ) model.material = materials.basicColor;
+							else if ( params.material === 1 ) model.material = materials.phongColor;
+							else if ( params.material === 2 ) model.material = materials.standardColor;
+							break;
+						case 2:
+							vertexColors( false );
+							if( params.material === 0 ) model.material = materials.basicColor;
+							else if ( params.material === 1 ) model.material = materials.phongColor;
+							else if ( params.material === 2 ) model.material = materials.standardColor;
+							break;
+
+					}
+
+				} )
+
+				controls.add( params, 'material', {
+
+					'Basic': 0,
+					'Phong': 1,
+					'Standard': 2
+
+				} ).name( 'Material Type' ).onChange( function() {
+
+					switch( parseInt( params.material ) ) {
+
+						case 0:
+							if( params.output === 0 ) model.material = materials.basicGrey;
+							else model.material = materials.basicColor;
+							break;
+						case 1:
+							if( params.output === 0 ) model.material = materials.phongGrey;
+							else model.material = materials.phongColor;
+							break;
+						case 2:
+							if( params.output === 0 ) model.material = materials.standardGrey;
+							else model.material = materials.standardColor;
+							break;
+
+					}
+
+				} )
+			}
+
+			function getAllIndexes(arr, val) {
+
+				var indexes = [];
+				for( var i = 0; i < arr.length; i++) {
+
+					if ( arr[i] === val ) indexes.push( i );
+
+				}
+
+				return indexes;
+
+			}
+
+			function saturate( num ) {
+				return num <= 0 ? 0 : num >= 1 ? 1 : num;
+			}
+
+			function solidAngle( v, d2, receiverNormal, emitterNormal, emitterArea ) {
+
+				var dotR = saturate( receiverNormal.dot( v ) );
+				var dotE = saturate( emitterNormal.dot( v.negate() ) );
+
+				return emitterArea * dotE * dotR / ( d2 + emitterArea / Math.PI ) / Math.PI;
+
+			}
+
+			// calculate the area of a disk around each vertex as the weighted sum of the area
+			// of each polygon it is a member of.
+			// Note:  the method used here requires indexed geometry.
+			function calculateAreas( geometry ) {
+
+				var edge1 = new THREE.Vector3();
+				var edge2 = new THREE.Vector3();
+
+				var positions = geometry.attributes.position.array;
+				var indices = geometry.index.array;
+
+				var encounteredIndices = [];
+
+				var areas = [];
+
+				// for each vertex, the area is calculated as the weighted sum of the area of each face it is a member of
+				indices.forEach( function ( pIndex ) {
+
+					if ( encounteredIndices[ pIndex ] === 'x' ) return;
+					encounteredIndices[ pIndex ] ='x'; // mark an 'x' for each index we have processed
+
+					// find all faces the vertex is a member of
+					var allIndices = getAllIndexes( indices, pIndex );
+
+					areas[ pIndex ] = 0;
+					allIndices.forEach( function( j ) {
+
+						var edge1Index;
+						var edge2Index;
+
+						if ( j % 3 === 0 ) { // j is first index in face
+
+							edge1Index = indices[ j + 1 ];
+							edge2Index = indices[ j + 2 ];
+
+						} else if ( j % 3 === 1 ) { // j is second index in face
+
+							edge1Index = indices[ j - 1 ];
+							edge2Index = indices[ j + 1 ];
+
+						} else { // j is last index in face
+
+							edge1Index = indices[ j - 1 ];
+							edge2Index = indices[ j - 2 ];
+
+						}
+
+						edge1.set(
+							positions[ pIndex * 3 ] - positions[ edge1Index * 3 ],
+							positions[ pIndex * 3 + 1 ] - positions[ edge1Index * 3 + 1 ],
+							positions[ pIndex * 3 + 2 ] - positions[ edge1Index * 3 + 2 ]
+						);
+
+						edge2.set(
+							positions[ pIndex * 3 ] - positions[ edge2Index * 3 ],
+							positions[ pIndex * 3 + 1 ] - positions[ edge2Index * 3 + 1 ],
+							positions[ pIndex * 3 + 2 ] - positions[ edge2Index * 3 + 2 ]
+						);
+
+						areas[ pIndex ] += 0.5 * edge1.cross( edge2 ).length();
+
+					} )
+
+					areas[ pIndex ] /= 3;
+
+				} );
+
+				// finally add the weighted areas as an attribute.
+				// This can then be used to implement the as a shader pass
+				geometry.addAttribute( 'area', new THREE.Float32BufferAttribute( areas, 1 ) );
+
+			}
+
+			function ambientOcclusion( geometry ) {
+
+				var colors = [];
+
+				var positions = geometry.attributes.position.array;
+				var normals = geometry.attributes.normal.array;
+				var bentNormals = normals.slice();
+				var areas = geometry.attributes.area.array;
+
+				var receiver = new THREE.Vector3();
+				var receiverNormal = new THREE.Vector3();
+
+				var emitter = new THREE.Vector3();
+				var emitterNormal = new THREE.Vector3();
+
+				var bentNormal = new THREE.Vector3();
+				var v = new THREE.Vector3();
+
+				function computeVertexOcclusion( i ) {
+
+					var value = 0;
+
+					for ( var j = 0; j < positions.length; j += 3 ) {
+
+						var emitterArea = areas[ j / 3 ];
+
+						emitter.fromArray( positions, j );
+						emitterNormal.fromArray( normals, j );
+
+						v.subVectors( emitter, receiver )
+
+						var d2 = v.dot( v ) + 1e-16;
+
+						if( d2 < 4 * emitterArea) {
+
+							v.multiplyScalar( 1 / Math.sqrt( d2 ) ); // normalise
+
+							value += solidAngle( v, d2, receiverNormal, emitterNormal, emitterArea );
+
+							bentNormal.sub( v.multiplyScalar( value ) );
+
+						}
+
+					}
+
+					bentNormal.normalize();
+					return saturate( 1 - value );
+
+				}
+
+				// loop over each vertex
+				for ( var i = 0; i < positions.length; i += 3 ) {
+
+					receiver.fromArray( positions, i );
+					receiverNormal.fromArray( normals, i );
+					bentNormal.copy( receiverNormal ); // initialise
+
+					// initialise to 1
+					if( !colors[ i / 3 ] ) colors[ i / 3 ] = 1;
+
+					var value = computeVertexOcclusion( i );
+
+					bentNormal.toArray( bentNormals, i );
+
+					colors[ i / 3 ] *= value;
+
+				}
+
+				geometry.attributes.normal.set( bentNormals );
+				geometry.attributes.normal.needsUpdate = true;
+
+				var vColors = [];
+				for( var k = 0; k < colors.length; k ++ ) vColors.push( colors[ k ], colors[ k ], colors[ k ] );
+
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( vColors ), 3 ) );
+
+				}
 		</script>
 
 	</body>
