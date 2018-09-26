@@ -28,7 +28,7 @@
 		  color: gold;
 		}
 
-		#oldie {
+		#webglmessage {
 		  font-family: monospace;
 		  font-size: 13px;
 
@@ -73,13 +73,17 @@
 	<script src="js/MarchingCubes.js"></script>
 	<script src="js/ShaderToon.js"></script>
 
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
 
 
 	<script>
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var MARGIN = 0;
 

@@ -67,7 +67,7 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 	</head>
@@ -87,7 +87,11 @@
 
 	<script>
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	if ( WEBGL.isWebGLAvailable() === false ) {
+
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
 
 	var scene, camera, renderer, audio;
 

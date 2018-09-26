@@ -67,7 +67,7 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -119,7 +119,11 @@
 
 	<script>
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	if ( WEBGL.isWebGLAvailable() === false ) {
+
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
 
 	var scene, camera, renderer, analyser, uniforms;
 

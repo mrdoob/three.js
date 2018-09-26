@@ -82,13 +82,16 @@
 		<!--<script src="js/controls/OrbitControls.js"></script>-->
 
 		<script src="js/libs/jszip.min.js"></script>
-
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGL2Available() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+
+			}
 
 			var camera, scene, mesh, renderer, stats;
 

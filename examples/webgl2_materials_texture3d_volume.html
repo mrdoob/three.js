@@ -54,13 +54,17 @@
 	<script src="js/loaders/NRRDLoader.js"></script>
 	<script src="js/shaders/VolumeShader.js"></script>
 
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/gunzip.min.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
 
 	<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGL2Available() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+
+		}
 
 		var container,
 			renderer,
@@ -159,7 +163,7 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
-				
+
 				render();
 
 			} );
