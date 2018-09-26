@@ -5,6 +5,7 @@
 /* global QUnit */
 
 import { Object3D } from '../../../../src/core/Object3D';
+import { Scene } from '../../../../src/scenes/Scene';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Euler } from '../../../../src/math/Euler';
 import { Quaternion } from '../../../../src/math/Quaternion';
@@ -331,6 +332,36 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.children.length, 1, "The second one was added to the parent (no remove)" );
 			assert.strictEqual( a.children[ 0 ], child2, "The second one is now the parent's child again" );
 			assert.strictEqual( child1.children.length, 0, "The first one no longer has any children" );
+
+		} );
+
+		QUnit.test( "parent/scene property", ( assert ) => {
+
+			var scene1 = new Scene();
+			var scene2 = new Scene();
+			var child1 = new Object3D();
+			var child2 = new Object3D();
+
+			assert.strictEqual( scene1.scene, scene1, "scene property is the scene itself" );
+			assert.strictEqual( child1.parent, null, "Starts with parent property unset" );
+			assert.strictEqual( child1.scene, null, "Starts with scene property unset" );
+
+			child1.add( child2 );
+			scene1.add( child1 );
+			assert.strictEqual( child1.parent, scene1, "parent property was set" );
+			assert.strictEqual( child1.scene, scene1, "scene property was set" );
+			assert.strictEqual( child2.scene, scene1, "scene property was set for descendent" );
+
+			scene2.add( scene1 );
+			assert.strictEqual( child2.scene, scene2, "scene property was set to top-most scene" );
+
+			scene2.remove( scene1 );
+			assert.strictEqual( child2.scene, scene1, "scene property was reset to scene" );
+
+			scene1.remove( child1 );
+			assert.strictEqual( child1.parent, null, "parent property reset" );
+			assert.strictEqual( child1.scene, null, "scene property reset" );
+			assert.strictEqual( child2.scene, null, "scene property reset for descendent" );
 
 		} );
 

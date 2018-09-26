@@ -10,6 +10,8 @@ function Scene() {
 
 	this.type = 'Scene';
 
+	this.scene = this;
+
 	this.background = null;
 	this.fog = null;
 	this.overrideMaterial = null;
@@ -21,6 +23,8 @@ function Scene() {
 Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Scene,
+
+	isScene: true,
 
 	copy: function ( source, recursive ) {
 
