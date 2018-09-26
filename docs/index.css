@@ -58,7 +58,7 @@ a {
 	width: 260px;
 	height: 100%;
 	overflow: auto;
-	padding-left: 20px;
+	padding: 0px 20px 0px 20px;
 	background: #fafafa;
 }
 
@@ -77,7 +77,6 @@ iframe {
 }
 
 .filterBlock {
-	margin-right: 20px;
 	position: relative;
 }
 
