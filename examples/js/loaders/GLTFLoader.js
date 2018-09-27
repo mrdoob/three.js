@@ -25,7 +25,21 @@ THREE.GLTFLoader = ( function () {
 
 			var scope = this;
 
-			var path = this.path !== undefined ? this.path : THREE.LoaderUtils.extractUrlBase( url );
+			var resourcePath;
+
+			if ( this.resourcePath !== undefined ) {
+
+				resourcePath = this.resourcePath;
+
+			} else if ( this.path !== undefined ) {
+
+				resourcePath = this.path;
+
+			} else {
+
+				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
+
+			}
 
 			// Tells the LoadingManager to track an extra item, which resolves after
 			// the model is fully loaded. This means the count of items loaded will
@@ -51,13 +65,14 @@ THREE.GLTFLoader = ( function () {
 
 			var loader = new THREE.FileLoader( scope.manager );
 
+			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			loader.load( url, function ( data ) {
 
 				try {
 
-					scope.parse( data, path, function ( gltf ) {
+					scope.parse( data, resourcePath, function ( gltf ) {
 
 						onLoad( gltf );
 
@@ -85,6 +100,13 @@ THREE.GLTFLoader = ( function () {
 		setPath: function ( value ) {
 
 			this.path = value;
+			return this;
+
+		},
+
+		setResourcePath: function ( value ) {
+
+			this.resourcePath = value;
 			return this;
 
 		},
@@ -186,7 +208,7 @@ THREE.GLTFLoader = ( function () {
 
 			var parser = new GLTFParser( json, extensions, {
 
-				path: path || this.path || '',
+				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
 				manager: this.manager
 
@@ -311,7 +333,7 @@ THREE.GLTFLoader = ( function () {
 
 				case 'directional':
 					lightNode = new THREE.DirectionalLight( color );
-					lightNode.target.position.set( 0, 0, 1 );
+					lightNode.target.position.set( 0, 0, -1 );
 					lightNode.add( lightNode.target );
 					break;
 
@@ -329,7 +351,7 @@ THREE.GLTFLoader = ( function () {
 					lightDef.spot.outerConeAngle = lightDef.spot.outerConeAngle !== undefined ? lightDef.spot.outerConeAngle : Math.PI / 4.0;
 					lightNode.angle = lightDef.spot.outerConeAngle;
 					lightNode.penumbra = 1.0 - lightDef.spot.innerConeAngle / lightDef.spot.outerConeAngle;
-					lightNode.target.position.set( 0, 0, 1 );
+					lightNode.target.position.set( 0, 0, -1 );
 					lightNode.add( lightNode.target );
 					break;
 

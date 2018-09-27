@@ -49,12 +49,16 @@
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/PCDLoader.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, controls, scene, renderer;
