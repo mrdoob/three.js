@@ -7,13 +7,11 @@
 		<style>
 			body {
 				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
+				color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
 			#info {
-				color: #fff;
 				position: absolute;
 				top: 10px;
 				width: 100%;
@@ -31,7 +29,8 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - per vertex ambient occlusion:
-			<a href="https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter14.html">article</a>
+			<a href="https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter14.html" target="_blank" rel="noopener">article</a><br>
+			<div id="performance"></div>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -46,16 +45,10 @@
 
 		<script>
 
-			// https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter14.html
-			// http://www.danenglesson.com/images/portfolio/point-based/Report.pdf
-			// http://www.aduprat.com/portfolio/?page=articles%2FPBGI
-			// https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch12.html
-			// http://www.rorydriscoll.com/2012/01/15/cubemap-texel-solid-angle/
-
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats, controls;
-			var camera, scene, renderer, light, model, materials, envMap;
+			var camera, scene, renderer, light, model, materials, envMap, shadowLight;
 
 			init();
 
@@ -64,57 +57,95 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 120 );
 				camera.position.set( -1.8, 0.9, 2.7 );
 
 				controls = new THREE.OrbitControls( camera, container );
 				controls.target.set( 0, -0.2, -0.2 );
 				controls.update();
 
-				var path = 'textures/cube/Bridge2/';
+				var path = 'textures/cube/skyboxsun25deg/';
 				var format = '.jpg';
-				var envMap = new THREE.CubeTextureLoader().load( [
-					path + 'posx' + format, path + 'negx' + format,
-					path + 'posy' + format, path + 'negy' + format,
-					path + 'posz' + format, path + 'negz' + format
+				envMap = new THREE.CubeTextureLoader().load( [
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
 				] );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
+				scene.background = envMap;
 
-				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 200, 200 ),
+					new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.15 }
+				) );
+				ground.rotation.x = - Math.PI / 2;
+				ground.position.y -= 0.9;
+				ground.receiveShadow = true;
+				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
+				grid.position.y -= 0.9;
 				grid.material.transparent = true;
 				scene.add( grid );
+
+				var hemiLight = new THREE.HemisphereLight( 0x7c849b, 0xd7cbb1, 0.1 );
+				hemiLight.position.set( 0, 1, 0 );
+				scene.add( hemiLight );
+
+				shadowLight  = new THREE.DirectionalLight( 0xffffee, 0.1 );
+				shadowLight.position.set( -1.5, 1.25, -1.5 );
+				shadowLight.castShadow = true;
+				shadowLight.shadow.width = 1024;
+				shadowLight.shadow.height = 1024;
+				shadowLight.shadow.camera.top = 1;
+				shadowLight.shadow.camera.bottom = -1;
+				shadowLight.shadow.camera.left = -1.25;
+				shadowLight.shadow.camera.right = 0.9;
+				shadowLight.shadow.camera.near = 1.25;
+				shadowLight.shadow.camera.far = 5.5;
+				shadowLight.shadow.bias = 0.001;
+
+				scene.add( shadowLight );
 
 				var loader = new THREE.GLTFLoader();
 				loader.load( './models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', function ( gltf ) {
 
 					model = gltf.scene.getObjectByName( 'node_damagedHelmet_-6514' );
+					scene.add( model );
 
-					calculateAreas( model.geometry );
-					ambientOcclusion( model.geometry );
+					model.castShadow = true;
+					model.receiveShadow = true;
 
 					initMaterials( model.material );
-					model.material = materials.basicGrey;
+					model.material = materials[ 0 ];
 
-					scene.add( model );
+					var time = performance.now();
+					calculateAreas( model.geometry );
+					var time2 = performance.now();
+
+					var areaTime = Math.floor( time2 - time );
+					ambientOcclusion( model.geometry );
+					var occlusionTime = Math.floor( performance.now() - time2 );
+
+					var totalTime = Math.floor( performance.now() - time );
+
+					var numVertices = model.geometry.attributes.position.count;
+					document.querySelector( '#performance' ).innerHTML = 'Calculation Time (' + numVertices + ' vertices): Surface element areas: ' + areaTime + 'ms. Ambient Occlusion: ' + occlusionTime + 'ms. Total: ' + totalTime + 'ms.';
 
 				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
-
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				// stats
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -142,30 +173,16 @@
 
 				originalMaterial.vertexColors = THREE.VertexColors;
 
-				var color = originalMaterial.color;
 				var map = originalMaterial.map;
+				originalMaterial.aoMap = null;
+				originalMaterial.vertexColors = THREE.VertexColors;
 
-				materials = {
-					standardColor: originalMaterial,
-					phongColor: new THREE.MeshPhongMaterial( { color: color, map: map, vertexColors: THREE.VertexColors } ),
-					basicColor: new THREE.MeshBasicMaterial( { color: color, map: map, vertexColors: THREE.VertexColors } ),
-					standardGrey: new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors } ),
-					phongGrey: new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors } ),
-					basicGrey: new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } )
-				}
-			}
-
-			function vertexColors( enabled ) {
-
-				var colors = enabled ? THREE.VertexColors : THREE.NoColors;
-
-				for( var name in materials ) {
-
-					var material = materials[ name ];
-					material.vertexColors = colors;
-					material.needsUpdate = true;
-
-				}
+				materials = [
+					new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } ),
+					new THREE.MeshBasicMaterial( { map: map, vertexColors: THREE.VertexColors } ),
+					new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors } ),
+					originalMaterial,
+				]
 
 			}
 
@@ -175,70 +192,76 @@
 				gui.open();
 
 				params = {
-					output: 0,
+					enabled: true,
+					envMap: false,
+					shadows: true,
 					material: 0,
 				};
 
 				var controls = gui.addFolder( 'Controls' );
 				controls.open();
 
-				controls.add( params, 'output', {
+				controls.add( params, 'enabled' ).name( 'AO enabled' ).onChange( function() {
 
-					'AO only': 0,
-					'Material + AO': 1,
-					'Material Only': 2,
+					materials.forEach( function( material ) {
+
+						if( params.enabled ) model.material.vertexColors = THREE.VertexColors;
+						else model.material.vertexColors = THREE.NoColors;
+
+						material.needsUpdate = true;
+
+					} );
+
+					model.material.needsUpdate = true;
+
+				} );
+
+				controls.add( params, 'envMap' ).name( 'Environment map' ).onChange( function() {
+
+					materials.forEach( function( material ) {
+
+						if( params.envMap ) material.envMap = envMap;
+						else material.envMap = null;
+
+						material.needsUpdate = true;
+
+					} );
 
 
-				} ).name( 'Output' ).onChange( function() {
+				} ).listen();
 
-					switch( parseInt( params.output ) ) {
+				controls.add( params, 'shadows' ).name( 'Shadows' ).onChange( function() {
 
-						case 0:
-							if( params.material === 0 ) model.material = materials.basicGrey;
-							else if ( params.material === 1 ) model.material = materials.phongGrey;
-							else if ( params.material === 2 ) model.material = materials.standardGrey;
-							break;
-						case 1:
-							vertexColors( true );
-							if( params.material === 0 ) model.material = materials.basicColor;
-							else if ( params.material === 1 ) model.material = materials.phongColor;
-							else if ( params.material === 2 ) model.material = materials.standardColor;
-							break;
-						case 2:
-							vertexColors( false );
-							if( params.material === 0 ) model.material = materials.basicColor;
-							else if ( params.material === 1 ) model.material = materials.phongColor;
-							else if ( params.material === 2 ) model.material = materials.standardColor;
-							break;
+					renderer.shadowMap.enabled = params.shadows;
+					renderer.setRenderTarget( shadowLight.shadow.map );
+					renderer.clear();
 
-					}
-
-				} )
+				} );
 
 				controls.add( params, 'material', {
 
-					'Basic': 0,
-					'Phong': 1,
-					'Standard': 2
+					'Basic greyscale': 0,
+					'Basic color': 1,
+					'Standard greyscale': 2,
+					'Standard color': 3
 
-				} ).name( 'Material Type' ).onChange( function() {
+				} ).name( 'Material' ).onChange( function() {
 
-					switch( parseInt( params.material ) ) {
+					var num = parseInt( params.material );
 
-						case 0:
-							if( params.output === 0 ) model.material = materials.basicGrey;
-							else model.material = materials.basicColor;
-							break;
-						case 1:
-							if( params.output === 0 ) model.material = materials.phongGrey;
-							else model.material = materials.phongColor;
-							break;
-						case 2:
-							if( params.output === 0 ) model.material = materials.standardGrey;
-							else model.material = materials.standardColor;
-							break;
+					// enable envMap by default for original material
+					if( num === 3 ) {
+
+						materials[ num ].envMap = envMap;
+						params.envMap = true;
+
+					} else {
+
+						params.envMap = ( materials[ num ].envMap === null ) ? false : true;
 
 					}
+					model.material = materials[ num ];
+					model.material.needsUpdate = true;
 
 				} )
 			}
@@ -260,6 +283,7 @@
 				return num <= 0 ? 0 : num >= 1 ? 1 : num;
 			}
 
+			// amount of occlusion from emitter surface to reciever surface
 			function solidAngle( v, d2, receiverNormal, emitterNormal, emitterArea ) {
 
 				var dotR = saturate( receiverNormal.dot( v ) );
@@ -336,8 +360,6 @@
 
 				} );
 
-				// finally add the weighted areas as an attribute.
-				// This can then be used to implement the as a shader pass
 				geometry.addAttribute( 'area', new THREE.Float32BufferAttribute( areas, 1 ) );
 
 			}
@@ -358,6 +380,7 @@
 				var emitterNormal = new THREE.Vector3();
 
 				var bentNormal = new THREE.Vector3();
+
 				var v = new THREE.Vector3();
 
 				function computeVertexOcclusion( i ) {
@@ -397,7 +420,9 @@
 
 					receiver.fromArray( positions, i );
 					receiverNormal.fromArray( normals, i );
-					bentNormal.copy( receiverNormal ); // initialise
+
+					if( bentNormals[ i ] ) receiverNormal.fromArray( bentNormals, i );
+					else bentNormal.copy( receiverNormal ); // initialise
 
 					// initialise to 1
 					if( !colors[ i / 3 ] ) colors[ i / 3 ] = 1;
@@ -410,13 +435,13 @@
 
 				}
 
-				geometry.attributes.normal.set( bentNormals );
-				geometry.attributes.normal.needsUpdate = true;
+				// ignoring bent normals for now since with a single pass they don't improve appearance of the current model
+				// geometry.attributes.normal.set( bentNormals );
 
-				var vColors = [];
-				for( var k = 0; k < colors.length; k ++ ) vColors.push( colors[ k ], colors[ k ], colors[ k ] );
+				var vertexColors = [];
+				for( var k = 0; k < colors.length; k ++ ) vertexColors.push( colors[ k ], colors[ k ], colors[ k ] );
 
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( vColors ), 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( vertexColors ), 3 ) );
 
 				}
 		</script>
