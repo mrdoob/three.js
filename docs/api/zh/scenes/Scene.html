@@ -9,49 +9,52 @@
 	</head>
 	<body>
 		[page:Object3D] &rarr;
-		<h1>[name]</h1>
+		<h1>场景（[name]）</h1>
 
-		<p class="desc">Scenes allow you to set up what and where is to be rendered by three.js. This is where you place objects, lights and cameras.</p>
+		<p class="desc">
+			场景允许你在什么地方、摆放什么东西来交给three.js来渲染，这是你放置物体、灯光和摄像机的地方。</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]()</h3>
 		<p>
-		Create a new scene object.
-		</p>
+创建一个新的场景对象。
+</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Fog fog]</h3>
 
-		<p>A [page:Fog fog] instance defining the type of fog that affects everything rendered in the scene. Default is null.</p>
+		<p>一个[page:Fog fog]实例定义了影响场景中的每个物体的雾的类型。默认值为null。
+		</p>
 
 		<h3>[property:Material overrideMaterial]</h3>
 
-		<p>If not null, it will force everything in the scene to be rendered with that material. Default is null.</p>
+		<p>如果不为空，它将强制场景中的每个物体使用这里的材质来渲染。默认值为null。</p>
 
 		<h3>[property:boolean autoUpdate]</h3>
 		<p>
-		Default is true. If set, then the renderer checks every frame if the scene and its objects needs matrix updates.
-		When it isn't, then you have to maintain all matrices in the scene yourself.
+			默认值为true，若设置了这个值，则渲染器会检查每一帧是否需要更新场景及其中物体的矩阵。
+			当设为false时，你必须亲自手动维护场景中的矩阵。
 		</p>
 
 		<h3>[property:Object background]</h3>
 		<p>
-		If not null, sets the background used when rendering the scene, and is always rendered first. Can be set to a [page:Color] which sets the clear color, a [page:Texture] covering the canvas, or a [page:CubeTexture]. Default is null.
+            若不为空，在渲染场景的时候将设置背景，且背景总是首先被渲染的。
+            可以设置一个用于的“clear”的[page:Color]（颜色）、一个覆盖canvas的[page:Texture]（纹理），或是一个[page:CubeTexture]。默认值为null。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:JSON toJSON]</h3>
 		<p>
-		Return the scene data in JSON format.
+			使用JSON格式返回场景数据。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
