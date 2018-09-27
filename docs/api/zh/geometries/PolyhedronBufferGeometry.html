@@ -10,16 +10,15 @@
 	<body>
 		[page:BufferGeometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>多面缓冲几何体（[name]）</h1>
 
 		<p class="desc">
-			A polyhedron is a solid in three dimensions with flat faces. This class will take an array of vertices,
-			project them onto a sphere, and then divide them up to the desired level of detail. This class is used
-			by [page:DodecahedronBufferGeometry], [page:IcosahedronBufferGeometry], [page:OctahedronBufferGeometry],
-			and [page:TetrahedronBufferGeometry] to generate their respective geometries.
+				多面体在三维空间中具有一些平面的立体图形。这个类将一个顶点数组投射到一个球面上，之后将它们细分为所需的细节级别。
+				这个类由[page:DodecahedronBufferGeometry]、[page:IcosahedronBufferGeometry]、[page:OctahedronBufferGeometry]和[page:TetrahedronBufferGeometry]
+				所使用，以生成它们各自的几何结构。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 <code>
 var verticesOfCube = [
     -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
@@ -38,27 +37,27 @@ var indicesOfFaces = [
 var geometry = new THREE.PolyhedronBufferGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
 </code>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]([param:Array vertices], [param:Array indices], [param:Float radius], [param:Integer detail])</h3>
 		<p>
-		vertices — [page:Array] of points of the form [1,1,1, -1,-1,-1, ... ] <br />
-		indices — [page:Array] of indices that make up the faces of the form [0,1,2, 2,3,0, ... ] <br />
-		radius — [page:Float] - The radius of the final shape <br />
-		detail — [page:Integer] - How many levels to subdivide the geometry. The more detail, the smoother the shape.
+		vertices — 一个顶点[page:Array]（数组）：[1,1,1, -1,-1,-1, ... ]。 <br />
+		indices — 一个构成面的索引[page:Array]（数组）， [0,1,2, 2,3,0, ... ]。<br />
+		radius — [page:Float] - 最终形状的半径。<br />
+		detail — [page:Integer] - 将对这个几何体细分多少个级别。细节越多，形状就越平滑。
 		</p>
-
-		<h2>Properties</h2>
+		
+		<h2>属性</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
-		</p>
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+			</p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/PolyhedronGeometry.js src/geometries/PolyhedronGeometry.js]
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
 </html>
