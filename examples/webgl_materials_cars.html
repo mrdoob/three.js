@@ -118,7 +118,7 @@
 				hemiLight.position.set( 0, 1, 0 );
 				scene.add( hemiLight );
 
-				shadowLight  = new THREE.DirectionalLight( 0xffffee, 0.1 );
+				var shadowLight  = new THREE.DirectionalLight( 0xffffee, 0.1 );
 				shadowLight.position.set( -1.5, 1.25, -1.5 );
 				shadowLight.castShadow = true;
 				shadowLight.shadow.width = 512;
