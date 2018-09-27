@@ -29,15 +29,13 @@
 
 		<script>
 
-			var AMOUNT = 100;
-
 			var container, stats;
 
 			var camera, scene, renderer;
 
 			var video, image, imageContext,
-			imageReflection, imageReflectionContext, imageReflectionGradient,
-			texture, textureReflection;
+				imageReflection, imageReflectionContext, imageReflectionGradient,
+				texture, textureReflection;
 
 			var mesh;
 
@@ -107,10 +105,10 @@
 
 				mesh = new THREE.Mesh( plane, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
-				scene.add(mesh);
+				scene.add( mesh );
 
 				mesh = new THREE.Mesh( plane, materialReflection );
-				mesh.position.y = -306;
+				mesh.position.y = - 306;
 				mesh.rotation.x = - Math.PI;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
 				scene.add( mesh );
@@ -135,13 +133,13 @@
 
 				} );
 
-				for ( var ix = 0; ix < amountx; ix++ ) {
+				for ( var ix = 0; ix < amountx; ix ++ ) {
 
-					for ( var iy = 0; iy < amounty; iy++ ) {
+					for ( var iy = 0; iy < amounty; iy ++ ) {
 
 						var sprite = new THREE.Sprite( material );
 						sprite.position.x = ix * separation - ( ( amountx * separation ) / 2 );
-						sprite.position.y = -153;
+						sprite.position.y = - 153;
 						sprite.position.z = iy * separation - ( ( amounty * separation ) / 2 );
 						sprite.scale.setScalar( 2 );
 						scene.add( sprite );
