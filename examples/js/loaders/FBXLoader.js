@@ -3994,10 +3994,10 @@ THREE.FBXLoader = ( function () {
 		lParentGX.extractRotation( lParentGRM );
 
 		// Global Shear*Scaling
-		var lLSM = new THREE.Matrix4();
-		var lParentGSM = new THREE.Matrix4();
-		var lParentGRSM = new THREE.Matrix4();
 		var lParentTM = new THREE.Matrix4();
+		var lLSM;
+		var lParentGSM;
+		var lParentGRSM;
 
 		lParentTM.copyPosition( lParentGX );
 		lParentGRSM = lParentTM.getInverse( lParentTM ).multiply( lParentGX );
