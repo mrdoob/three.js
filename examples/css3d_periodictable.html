@@ -262,7 +262,7 @@
 
 					var number = document.createElement( 'div' );
 					number.className = 'number';
-					number.textContent = (i/5) + 1;
+					number.textContent = ( i / 5 ) + 1;
 					element.appendChild( number );
 
 					var symbol = document.createElement( 'div' );
@@ -299,7 +299,7 @@
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-					var phi = Math.acos( -1 + ( 2 * i ) / l );
+					var phi = Math.acos( - 1 + ( 2 * i ) / l );
 					var theta = Math.sqrt( l * Math.PI ) * phi;
 
 					var object = new THREE.Object3D();
@@ -366,28 +366,28 @@
 				controls.addEventListener( 'change', render );
 
 				var button = document.getElementById( 'table' );
-				button.addEventListener( 'click', function ( event ) {
+				button.addEventListener( 'click', function () {
 
 					transform( targets.table, 2000 );
 
 				}, false );
 
 				var button = document.getElementById( 'sphere' );
-				button.addEventListener( 'click', function ( event ) {
+				button.addEventListener( 'click', function () {
 
 					transform( targets.sphere, 2000 );
 
 				}, false );
 
 				var button = document.getElementById( 'helix' );
-				button.addEventListener( 'click', function ( event ) {
+				button.addEventListener( 'click', function () {
 
 					transform( targets.helix, 2000 );
 
 				}, false );
 
 				var button = document.getElementById( 'grid' );
-				button.addEventListener( 'click', function ( event ) {
+				button.addEventListener( 'click', function () {
 
 					transform( targets.grid, 2000 );
 
