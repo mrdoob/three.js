@@ -212,6 +212,7 @@ var files = {
 		"webgl_performance_doublesided",
 		"webgl_performance_nodes",
 		"webgl_performance_static",
+		"webgl_per_vertex_ao",
 		"webgl_physics_cloth",
 		"webgl_physics_convex_break",
 		"webgl_physics_rope",
