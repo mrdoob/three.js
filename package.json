@@ -23,7 +23,10 @@
     "test": "test"
   },
   "eslintConfig": {
-    "extends": "mdcs"
+    "extends": "mdcs",
+    "plugins": [
+        "html"
+    ]
   },
   "scripts": {
     "build": "rollup -c",
@@ -54,6 +57,7 @@
     "electron": "^2.0.8",
     "eslint": "^5.5.0",
     "eslint-config-mdcs": "^4.2.3",
+    "eslint-plugin-html": "^4.0.6",
     "google-closure-compiler": "20180805.0.0",
     "http-server": "^0.11.1",
     "qunit": "^2.6.2",
