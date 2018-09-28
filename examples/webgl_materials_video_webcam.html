@@ -108,7 +108,7 @@
 
 							// apply the stream to the video element used in the texture
 
-							video.src = window.URL.createObjectURL( stream );
+							video.srcObject = stream;
 							video.play();
 
 					} ).catch( function( error ) {
