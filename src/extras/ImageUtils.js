@@ -10,7 +10,11 @@ var ImageUtils = {
 
 		var canvas;
 
-		if ( image instanceof HTMLCanvasElement ) {
+		if ( typeof HTMLCanvasElement == 'undefined' ) {
+
+			return image.src;
+
+		} if ( image instanceof HTMLCanvasElement ) {
 
 			canvas = image;
 
