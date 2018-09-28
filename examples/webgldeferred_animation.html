@@ -36,10 +36,11 @@
 	<body>
 		<div id="container"></div>
 
+		<script src="../build/three.js"></script>
+
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
@@ -144,7 +145,7 @@
 				var distance = 20;
 
 				var c = new THREE.Vector3();
-				var geometry = new THREE.SphereGeometry( 1, 1, 1 );
+				var geometry = new THREE.SphereBufferGeometry( 1, 1, 1 );
 
 				for ( var i = 0; i < numLights; i ++ ) {
 

@@ -4,6 +4,7 @@
  */
 /* global QUnit */
 
+import { runStdGeometryTests } from '../../qunit-utils';
 import { BoxHelper } from '../../../../src/helpers/BoxHelper';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
 import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';

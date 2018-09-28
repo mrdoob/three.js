@@ -52,7 +52,7 @@
 				var material = new THREE.MeshNormalMaterial();
 
 				var loader = new THREE.BufferGeometryLoader();
-				loader.load( 'models/json/suzanne.json', function ( geometry ) {
+				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
@@ -75,7 +75,7 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				//renderer.sortObjects = false;

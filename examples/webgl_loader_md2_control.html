@@ -40,17 +40,21 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src='js/loaders/MD2Loader.js'></script>
-		<script src='js/MorphBlendMesh.js'></script>
-		<script src='js/MD2CharacterComplex.js'></script>
-		<script src='js/Gyroscope.js'></script>
+		<script src="js/loaders/MD2Loader.js"></script>
+		<script src="js/MorphBlendMesh.js"></script>
+		<script src="js/MD2CharacterComplex.js"></script>
+		<script src="js/Gyroscope.js"></script>
 
-		<script src='js/Detector.js'></script>
-		<script src='js/libs/stats.min.js'></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;

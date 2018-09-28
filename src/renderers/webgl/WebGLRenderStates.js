@@ -4,23 +4,17 @@
 
 import { WebGLLights } from './WebGLLights.js';
 
-var count = 0;
-
 function WebGLRenderState() {
 
-	var id = count ++;
-
-	var lights = new WebGLLights( id );
+	var lights = new WebGLLights();
 
 	var lightsArray = [];
 	var shadowsArray = [];
-	var spritesArray = [];
 
 	function init() {
 
 		lightsArray.length = 0;
 		shadowsArray.length = 0;
-		spritesArray.length = 0;
 
 	}
 
@@ -36,12 +30,6 @@ function WebGLRenderState() {
 
 	}
 
-	function pushSprite( shadowLight ) {
-
-		spritesArray.push( shadowLight );
-
-	}
-
 	function setupLights( camera ) {
 
 		lights.setup( lightsArray, shadowsArray, camera );
@@ -51,7 +39,6 @@ function WebGLRenderState() {
 	var state = {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
-		spritesArray: spritesArray,
 
 		lights: lights
 	};
@@ -62,8 +49,7 @@ function WebGLRenderState() {
 		setupLights: setupLights,
 
 		pushLight: pushLight,
-		pushShadow: pushShadow,
-		pushSprite: pushSprite
+		pushShadow: pushShadow
 	};
 
 }
@@ -74,14 +60,26 @@ function WebGLRenderStates() {
 
 	function get( scene, camera ) {
 
-		var hash = scene.id + ',' + camera.id;
+		var renderState;
 
-		var renderState = renderStates[ hash ];
-
-		if ( renderState === undefined ) {
+		if ( renderStates[ scene.id ] === undefined ) {
 
 			renderState = new WebGLRenderState();
-			renderStates[ hash ] = renderState;
+			renderStates[ scene.id ] = {};
+			renderStates[ scene.id ][ camera.id ] = renderState;
+
+		} else {
+
+			if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
+
+				renderState = new WebGLRenderState();
+				renderStates[ scene.id ][ camera.id ] = renderState;
+
+			} else {
+
+				renderState = renderStates[ scene.id ][ camera.id ];
+
+			}
 
 		}
 

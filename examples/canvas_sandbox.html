@@ -27,8 +27,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
-			var controls, group;
+			var camera, scene, renderer, group;
 
 			init();
 			animate();
@@ -56,7 +55,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.IcosahedronGeometry( 100, 1 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 100, 1 );
 
 				var envMap = new THREE.TextureLoader().load( 'textures/metal.jpg' );
 				envMap.mapping = THREE.SphericalReflectionMapping;
@@ -87,7 +86,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild(stats.dom);
+				container.appendChild( stats.dom );
 
 				//
 
@@ -117,7 +116,7 @@
 
 			function render() {
 
-				for ( var i = 0, l = group.children.length; i < l; i++ ) {
+				for ( var i = 0, l = group.children.length; i < l; i ++ ) {
 
 					var object = group.children[ i ];
 

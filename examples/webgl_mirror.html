@@ -64,7 +64,7 @@
 				var container = document.getElementById( 'container' );
 
 				// renderer
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -116,13 +116,13 @@
 				sphereGroup = new THREE.Object3D();
 				scene.add( sphereGroup );
 
-				var geometry = new THREE.CylinderGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
+				var geometry = new THREE.CylinderBufferGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x444444 } );
 				var sphereCap = new THREE.Mesh( geometry, material );
-				sphereCap.position.y = -15 * Math.sin( Math.PI / 180 * 30 ) - 0.05;
-				sphereCap.rotateX(-Math.PI);
+				sphereCap.position.y = - 15 * Math.sin( Math.PI / 180 * 30 ) - 0.05;
+				sphereCap.rotateX( - Math.PI );
 
-				var geometry = new THREE.SphereGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
+				var geometry = new THREE.SphereBufferGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
 				var halfSphere = new THREE.Mesh( geometry, material );
 				halfSphere.add( sphereCap );
 				halfSphere.rotateX( - Math.PI / 180 * 135 );
@@ -131,7 +131,7 @@
 
 				sphereGroup.add( halfSphere );
 
-				var geometry = new THREE.IcosahedronGeometry( 5, 0 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 5, 0 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
 				smallSphere = new THREE.Mesh( geometry, material );
 				scene.add(smallSphere);

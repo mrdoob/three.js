@@ -97,9 +97,9 @@ Sidebar.Object = function ( editor ) {
 	// position
 
 	var objectPositionRow = new UI.Row();
-	var objectPositionX = new UI.Number().setWidth( '50px' ).onChange( update );
-	var objectPositionY = new UI.Number().setWidth( '50px' ).onChange( update );
-	var objectPositionZ = new UI.Number().setWidth( '50px' ).onChange( update );
+	var objectPositionX = new UI.Number().setPrecision( 3 ).setWidth( '50px' ).onChange( update );
+	var objectPositionY = new UI.Number().setPrecision( 3 ).setWidth( '50px' ).onChange( update );
+	var objectPositionZ = new UI.Number().setPrecision( 3 ).setWidth( '50px' ).onChange( update );
 
 	objectPositionRow.add( new UI.Text( 'Position' ).setWidth( '90px' ) );
 	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
@@ -122,9 +122,9 @@ Sidebar.Object = function ( editor ) {
 
 	var objectScaleRow = new UI.Row();
 	var objectScaleLock = new UI.Checkbox( true ).setPosition( 'absolute' ).setLeft( '75px' );
-	var objectScaleX = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleX );
-	var objectScaleY = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleY );
-	var objectScaleZ = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleZ );
+	var objectScaleX = new UI.Number( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleX );
+	var objectScaleY = new UI.Number( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleY );
+	var objectScaleZ = new UI.Number( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleZ );
 
 	objectScaleRow.add( new UI.Text( 'Scale' ).setWidth( '90px' ) );
 	objectScaleRow.add( objectScaleLock );
@@ -258,6 +258,26 @@ Sidebar.Object = function ( editor ) {
 	objectVisibleRow.add( objectVisible );
 
 	container.add( objectVisibleRow );
+
+	// frustumCulled
+
+	var objectFrustumCulledRow = new UI.Row();
+	var objectFrustumCulled = new UI.Checkbox().onChange( update );
+
+	objectFrustumCulledRow.add( new UI.Text( 'Frustum Cull' ).setWidth( '90px' ) );
+	objectFrustumCulledRow.add( objectFrustumCulled );
+
+	container.add( objectFrustumCulledRow );
+
+	// renderOrder
+
+	var objectRenderOrderRow = new UI.Row();
+	var objectRenderOrder = new UI.Integer().setWidth( '50px' ).onChange( update );
+
+	objectRenderOrderRow.add( new UI.Text( 'Render Order' ).setWidth( '90px' ) );
+	objectRenderOrderRow.add( objectRenderOrder );
+
+	container.add( objectRenderOrderRow );
 
 	// user data
 
@@ -433,6 +453,18 @@ Sidebar.Object = function ( editor ) {
 			if ( object.visible !== objectVisible.getValue() ) {
 
 				editor.execute( new SetValueCommand( object, 'visible', objectVisible.getValue() ) );
+
+			}
+
+			if ( object.frustumCulled !== objectFrustumCulled.getValue() ) {
+
+				editor.execute( new SetValueCommand( object, 'frustumCulled', objectFrustumCulled.getValue() ) );
+
+			}
+
+			if ( object.renderOrder !== objectRenderOrder.getValue() ) {
+
+				editor.execute( new SetValueCommand( object, 'renderOrder', objectRenderOrder.getValue() ) );
 
 			}
 
@@ -654,6 +686,8 @@ Sidebar.Object = function ( editor ) {
 		}
 
 		objectVisible.setValue( object.visible );
+		objectFrustumCulled.setValue( object.frustumCulled );
+		objectRenderOrder.setValue( object.renderOrder );
 
 		try {
 

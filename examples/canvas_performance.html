@@ -53,7 +53,7 @@
 
 				// Spheres
 
-				var geometry = new THREE.SphereGeometry( 100, 26, 18 );
+				var geometry = new THREE.SphereBufferGeometry( 100, 26, 18 );
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 20; i ++ ) {
@@ -85,7 +85,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild(stats.dom);
+				container.appendChild( stats.dom );
 
 				//
 

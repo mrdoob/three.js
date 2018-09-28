@@ -55,10 +55,11 @@ Menubar.File = function ( editor ) {
 	document.body.appendChild( form );
 
 	var fileInput = document.createElement( 'input' );
+	fileInput.multiple = true;
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( event ) {
 
-		editor.loader.loadFile( fileInput.files[ 0 ] );
+		editor.loader.loadFiles( fileInput.files );
 		form.reset();
 
 	} );
@@ -184,6 +185,44 @@ Menubar.File = function ( editor ) {
 
 	options.add( new UI.HorizontalRule() );
 
+	// Export DAE
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export DAE' );
+	option.onClick( function () {
+
+		var exporter = new THREE.ColladaExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveString( result.data, 'scene.dae' );
+
+		} );
+
+	} );
+	options.add( option );
+
+	// Export GLB
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export GLB' );
+	option.onClick( function () {
+
+		var exporter = new THREE.GLTFExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveArrayBuffer( result, 'scene.glb' );
+
+			// forceIndices: true, forcePowerOfTwoTextures: true
+			// to allow compatibility with facebook
+		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+
+	} );
+	options.add( option );
+
 	// Export GLTF
 
 	var option = new UI.Row();
@@ -295,18 +334,19 @@ Menubar.File = function ( editor ) {
 
 			if ( config.getKey( 'project/editable' ) ) {
 
-				editButton = `
-			var button = document.createElement( 'a' );
-			button.href = 'https://threejs.org/editor/#file=' + location.href.split( '/' ).slice( 0, - 1 ).join( '/' ) + '/app.json';
-			button.style.cssText = 'position: absolute; bottom: 20px; right: 20px; padding: 12px 14px; color: #fff; border: 1px solid #fff; border-radius: 4px; text-decoration: none;';
-			button.target = '_blank';
-			button.textContent = 'EDIT';
-			document.body.appendChild( button );
-				`;
-
+				editButton = [
+					'',
+					'			var button = document.createElement( \'a\' );',
+					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
+					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 12px 14px; color: #fff; border: 1px solid #fff; border-radius: 4px; text-decoration: none;\';',
+					'			button.target = \'_blank\';',
+					'			button.textContent = \'EDIT\';',
+					'			document.body.appendChild( button );',
+					''
+				].join( '\n' );
 			}
 
-			content = content.replace( '/* edit button */', editButton );
+			content = content.replace( '\n\t\t\t/* edit button */\n', editButton );
 
 			zip.file( 'index.html', content );
 
@@ -335,27 +375,6 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	/*
-	// Publish (Dropbox)
-
-	var option = new UI.Row();
-	option.setClass( 'option' );
-	option.setTextContent( 'Publish (Dropbox)' );
-	option.onClick( function () {
-
-		var parameters = {
-			files: [
-				{ 'url': 'data:text/plain;base64,' + window.btoa( "Hello, World" ), 'filename': 'app/test.txt' }
-			]
-		};
-
-		Dropbox.save( parameters );
-
-	} );
-	options.add( option );
-	*/
-
-
 	//
 
 	var link = document.createElement( 'a' );
@@ -369,6 +388,12 @@ Menubar.File = function ( editor ) {
 		link.click();
 
 		// URL.revokeObjectURL( url ); breaks Firefox...
+
+	}
+
+	function saveArrayBuffer( buffer, filename ) {
+
+		save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
 
 	}
 

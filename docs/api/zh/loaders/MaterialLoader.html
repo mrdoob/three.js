@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A loader for loading a [page:Material] in JSON format.
+			This uses the [page:FileLoader] internally for loading files.
+		</p>
+
+		<h2>Example</h2>
+
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.MaterialLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'path/to/material.json',
+
+			// onLoad callback
+			function ( material ) {
+				object.material = material;
+			},
+
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError callback
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:LoadingManager manager]</h3>
+		<p>
+			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
+		</p>
+
+		<h3>[property:Object textures]</h3>
+		<p>Object holding any textures used by the material. See [page:.setTextures].</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — the path or URL to the file. This can also be a
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Material].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the progress event.<br />
+		[page:Function onError] — Will be called when load errors.<br /><br />
+
+		Begin loading from url and return the [page:Material] object that will contain the data.
+		</p>
+
+		<h3>[method:Material parse]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — The json object containing the parameters of the Material.<br /><br />
+
+		Parse a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object.
+		</p>
+
+		<h3>[method:null setTextures]( [param:Object textures] )</h3>
+		<p>
+		[page:Object textures] — object containing any textures used by the material.
+		</p>
+
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

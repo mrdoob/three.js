@@ -9,6 +9,7 @@ THREE.Lensflare = function () {
 
 	this.type = 'Lensflare';
 	this.frustumCulled = false;
+	this.renderOrder = Infinity;
 
 	//
 
@@ -34,15 +35,38 @@ THREE.Lensflare = function () {
 
 	var geometry = THREE.Lensflare.Geometry;
 
-	var shader = THREE.Lensflare.Shader;
-
 	var material1a = new THREE.RawShaderMaterial( {
 		uniforms: {
 			'scale': { value: null },
 			'screenPosition': { value: null }
 		},
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader1,
+		vertexShader: [
+
+			'precision highp float;',
+
+			'uniform vec3 screenPosition;',
+			'uniform vec2 scale;',
+
+			'attribute vec3 position;',
+
+			'void main() {',
+
+			'	gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );',
+
+			'}'
+
+		].join( '\n' ),
+		fragmentShader: [
+
+			'precision highp float;',
+
+			'void main() {',
+
+			'	gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );',
+
+			'}'
+
+		].join( '\n' ),
 		depthTest: true,
 		depthWrite: false,
 		transparent: false
@@ -54,8 +78,42 @@ THREE.Lensflare = function () {
 			'scale': { value: null },
 			'screenPosition': { value: null }
 		},
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader2,
+		vertexShader: [
+
+			'precision highp float;',
+
+			'uniform vec3 screenPosition;',
+			'uniform vec2 scale;',
+
+			'attribute vec3 position;',
+			'attribute vec2 uv;',
+
+			'varying vec2 vUV;',
+
+			'void main() {',
+
+			'	vUV = uv;',
+
+			'	gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );',
+
+			'}'
+
+		].join( '\n' ),
+		fragmentShader: [
+
+			'precision highp float;',
+
+			'uniform sampler2D map;',
+
+			'varying vec2 vUV;',
+
+			'void main() {',
+
+			'	gl_FragColor = texture2D( map, vUV );',
+
+			'}'
+
+		].join( '\n' ),
 		depthTest: false,
 		depthWrite: false,
 		transparent: false
@@ -195,6 +253,12 @@ THREE.Lensflare = function () {
 		tempMap.dispose();
 		occlusionMap.dispose();
 
+		for ( var i = 0, l = elements.length; i < l; i ++ ) {
+
+			elements[ i ].texture.dispose();
+
+		}
+
 	};
 
 };
@@ -202,62 +266,6 @@ THREE.Lensflare = function () {
 THREE.Lensflare.prototype = Object.create( THREE.Mesh.prototype );
 THREE.Lensflare.prototype.constructor = THREE.Lensflare;
 THREE.Lensflare.prototype.isLensflare = true;
-
-THREE.Lensflare.Shader = {
-
-	vertexShader: [
-
-		'precision highp float;',
-
-		'uniform vec3 screenPosition;',
-		'uniform vec2 scale;',
-
-		'attribute vec3 position;',
-		'attribute vec2 uv;',
-
-		'varying vec2 vUV;',
-
-		'void main() {',
-
-		'	vUV = uv;',
-
-		'	vec2 pos = position.xy;',
-
-		'	gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );',
-
-		'}'
-
-	].join( '\n' ),
-
-	fragmentShader1: [
-
-		'precision highp float;',
-
-		'void main() {',
-
-		'		gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );',
-
-		'}'
-
-	].join( '\n' ),
-
-	fragmentShader2: [
-
-		'precision highp float;',
-
-		'uniform sampler2D map;',
-
-		'varying vec2 vUV;',
-
-		'void main() {',
-
-		'		gl_FragColor = texture2D( map, vUV );',
-
-		'}'
-
-	].join( '\n' )
-
-};
 
 //
 

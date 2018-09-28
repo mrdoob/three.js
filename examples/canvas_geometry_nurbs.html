@@ -49,7 +49,6 @@
 			var mouseXOnMouseDown = 0;
 
 			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -105,25 +104,26 @@
 
 				}
 
-				var nurbsCurve = new THREE.NURBSCurve(nurbsDegree, nurbsKnots, nurbsControlPoints);
+				var nurbsCurve = new THREE.NURBSCurve( nurbsDegree, nurbsKnots, nurbsControlPoints );
 
-				var nurbsGeometry = new THREE.Geometry();
-				nurbsGeometry.vertices = nurbsCurve.getPoints( 200 );
+				var nurbsGeometry = new THREE.BufferGeometry();
+				nurbsGeometry.setFromPoints( nurbsCurve.getPoints( 200 ) );
+
 				var nurbsMaterial = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333 } );
 
 				var nurbsLine = new THREE.Line( nurbsGeometry, nurbsMaterial );
-				nurbsLine.position.set( 0, -100, 0 );
+				nurbsLine.position.set( 0, - 100, 0 );
+				group.add( nurbsLine );
 
-				var nurbsControlPointsGeometry = new THREE.Geometry();
-				nurbsControlPointsGeometry.vertices = nurbsCurve.controlPoints;
+				var nurbsControlPointsGeometry = new THREE.BufferGeometry();
+				nurbsControlPointsGeometry.setFromPoints( nurbsCurve.controlPoints );
+
 				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { linewidth: 2, color: 0x333333, opacity: 0.25 } );
 
 				var nurbsControlPointsLine = new THREE.Line( nurbsControlPointsGeometry, nurbsControlPointsMaterial );
 				nurbsControlPointsLine.position.copy( nurbsLine.position );
 
-				group.add( nurbsLine, nurbsControlPointsLine );
-				// this also works:
-				// group.add( nurbsLine ).add( nurbsControlPointsLine );
+				group.add( nurbsControlPointsLine );
 
 				//
 
@@ -148,7 +148,6 @@
 			function onWindowResize() {
 
 				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -180,7 +179,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -188,7 +187,7 @@
 
 			}
 
-			function onDocumentMouseOut( event ) {
+			function onDocumentMouseOut() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );

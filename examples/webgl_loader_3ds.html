@@ -64,7 +64,7 @@
 				var normal = loader.load( 'models/3ds/portalgun/textures/normal.jpg' );
 
 				var loader = new THREE.TDSLoader( );
-				loader.setPath( 'models/3ds/portalgun/textures/' );
+				loader.setResourcePath( 'models/3ds/portalgun/textures/' );
 				loader.load( 'models/3ds/portalgun/portalgun.3ds', function ( object ) {
 
 					object.traverse( function ( child ) {

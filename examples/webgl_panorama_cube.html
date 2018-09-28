@@ -64,6 +64,7 @@
 			controls.enableZoom = false;
 			controls.enablePan = false;
 			controls.enableDamping = true;
+			controls.rotateSpeed = - 0.25;
 
 			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 
@@ -75,7 +76,7 @@
 
 			}
 
-			var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), materials );
+			var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), materials );
 			skyBox.geometry.scale( 1, 1, - 1 );
 			scene.add( skyBox );
 

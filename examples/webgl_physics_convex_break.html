@@ -35,7 +35,7 @@
 	<script src="../build/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/ConvexObjectBreaker.js"></script>
 	<script src="js/QuickHull.js"></script>
@@ -44,9 +44,12 @@
 		<script>
 
 		// Detects webgl
-		if ( ! Detector.webgl ) {
-			Detector.addGetWebGLMessage();
+
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 			document.getElementById( 'container' ).innerHTML = "";
+
 		}
 
 		// - Global variables -
@@ -184,7 +187,7 @@
 
 		function createObject( mass, halfExtents, pos, quat, material ) {
 
-			var object = new THREE.Mesh( new THREE.BoxGeometry( halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2 ), material );
+			var object = new THREE.Mesh( new THREE.BoxBufferGeometry( halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2 ), material );
 			object.position.copy( pos );
 			object.quaternion.copy( quat );
 			convexBreaker.prepareBreakableObject( object, mass, new THREE.Vector3(), new THREE.Vector3(), true );
@@ -212,19 +215,19 @@
 			var towerHalfExtents = new THREE.Vector3( 2, 5, 2 );
 			pos.set( -8, 5, 0 );
 			quat.set( 0, 0, 0, 1 );
-			createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xF0A024 ) );
+			createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xB03014 ) );
 
 			// Tower 2
 			pos.set( 8, 5, 0 );
 			quat.set( 0, 0, 0, 1 );
-			createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xF4A321 ) );
+			createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xB03214 ) );
 
 			//Bridge
 			var bridgeMass = 100;
 			var bridgeHalfExtents = new THREE.Vector3( 7, 0.2, 1.5 );
 			pos.set( 0, 10.2, 0 );
 			quat.set( 0, 0, 0, 1 );
-			createObject( bridgeMass, bridgeHalfExtents, pos, quat, createMaterial( 0xB38835 ) );
+			createObject( bridgeMass, bridgeHalfExtents, pos, quat, createMaterial( 0xB3B865 ) );
 
 			// Stones
 			var stoneMass = 120;
@@ -250,7 +253,7 @@
 			mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( 0, mountainHalfExtents.y, 0 ) );
-			var mountain = new THREE.Mesh( new THREE.ConvexGeometry( mountainPoints ), createMaterial( 0xFFB443 ) );
+			var mountain = new THREE.Mesh( new THREE.ConvexBufferGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
 			mountain.position.copy( pos );
 			mountain.quaternion.copy( quat );
 			convexBreaker.prepareBreakableObject( mountain, mountainMass, new THREE.Vector3(), new THREE.Vector3(), true );
@@ -260,7 +263,7 @@
 
 		function createParalellepipedWithPhysics( sx, sy, sz, mass, pos, quat, material ) {
 
-			var object = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
+			var object = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
 			var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 			shape.setMargin( margin );
 
@@ -275,7 +278,7 @@
 			object.castShadow = true;
 			object.receiveShadow = true;
 
-			var shape = createConvexHullPhysicsShape( object.geometry.vertices );
+			var shape = createConvexHullPhysicsShape( object.geometry.attributes.position.array );
 			shape.setMargin( margin );
 
 			var body = createRigidBody( object, shape, object.userData.mass, null, null, object.userData.velocity, object.userData.angularVelocity );
@@ -295,15 +298,14 @@
 
 		}
 
-		function createConvexHullPhysicsShape( points ) {
+		function createConvexHullPhysicsShape( coords ) {
 
 			var shape = new Ammo.btConvexHullShape();
 
-			for ( var i = 0, il = points.length; i < il; i++ ) {
-				var p = points[ i ];
-				this.tempBtVec3_1.setValue( p.x, p.y, p.z );
-				var lastOne = ( i === ( il - 1 ) );
-				shape.addPoint( this.tempBtVec3_1, lastOne );
+			for ( var i = 0, il = coords.length; i < il; i+= 3 ) {
+				tempBtVec3_1.setValue( coords[ i ], coords[ i + 1 ], coords[ i + 2 ] );
+				var lastOne = ( i >= ( il - 3 ) );
+				shape.addPoint( tempBtVec3_1, lastOne );
 			}
 
 			return shape;
@@ -387,7 +389,7 @@
 				var ballMass = 35;
 				var ballRadius = 0.4;
 
-				var ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 14, 10 ), ballMaterial );
+				var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 14, 10 ), ballMaterial );
 				ball.castShadow = true;
 				ball.receiveShadow = true;
 				var ballShape = new Ammo.btSphereShape( ballRadius );

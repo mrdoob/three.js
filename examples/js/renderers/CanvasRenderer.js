@@ -7,7 +7,7 @@ THREE.SpriteCanvasMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'SpriteCanvasMaterial';
-
+	this.rotation = 0;
 	this.color = new THREE.Color( 0xffffff );
 	this.program = function () {};
 
@@ -135,11 +135,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		}
 
 	};
-
-	// WebGLRenderer compatibility
-
-	this.supportsVertexTextures = function () {};
-	this.setFaceCulling = function () {};
 
 	// API
 

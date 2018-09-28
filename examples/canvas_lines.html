@@ -26,26 +26,18 @@
 		<script>
 
 			var mouseX = 0, mouseY = 0,
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
 
-			windowHalfX = window.innerWidth / 2,
-			windowHalfY = window.innerHeight / 2,
-
-			SEPARATION = 200,
-			AMOUNTX = 10,
-			AMOUNTY = 10,
-
-			camera, scene, renderer;
+				camera, scene, renderer;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container, separation = 100, amountX = 50, amountY = 50,
-				particles, particle;
-
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				var container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
@@ -73,11 +65,11 @@
 
 				} );
 
-				var geometry = new THREE.Geometry();
+				var points = [];
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					particle = new THREE.Sprite( material );
+					var particle = new THREE.Sprite( material );
 					particle.position.x = Math.random() * 2 - 1;
 					particle.position.y = Math.random() * 2 - 1;
 					particle.position.z = Math.random() * 2 - 1;
@@ -86,11 +78,13 @@
 					particle.scale.x = particle.scale.y = 10;
 					scene.add( particle );
 
-					geometry.vertices.push( particle.position );
+					points.push( particle.position );
 
 				}
 
 				// lines
+
+				var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
 				var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.5 } ) );
 				scene.add( line );
@@ -119,7 +113,7 @@
 
 			//
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;

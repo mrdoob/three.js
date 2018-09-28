@@ -263,6 +263,7 @@ THREE.Water.WaterShader = {
 
 	fragmentShader: [
 
+		'#include <common>',
 		'#include <fog_pars_fragment>',
 
 		'uniform sampler2D tReflectionMap;',
@@ -321,7 +322,7 @@ THREE.Water.WaterShader = {
 		'	vec3 coord = vCoord.xyz / vCoord.w;',
 		'	vec2 uv = coord.xy + coord.z * normal.xz * 0.05;',
 
-		'	vec4 reflectColor = texture2D( tReflectionMap, uv );',
+		'	vec4 reflectColor = texture2D( tReflectionMap, vec2( 1.0 - uv.x, uv.y ) );',
 		'	vec4 refractColor = texture2D( tRefractionMap, uv );',
 
 		// multiply water color with the mix of both textures

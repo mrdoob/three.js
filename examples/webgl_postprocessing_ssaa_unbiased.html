@@ -107,7 +107,7 @@
 				var aspect = width / height;
 				var devicePixelRatio = window.devicePixelRatio || 1;
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );

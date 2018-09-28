@@ -25,12 +25,12 @@
 				padding: 5px;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(100,0,0) !important;
 				color:#fff !important;
 				margin-top:10em !important;
 			}
-			#oldie a { color:#fff }
+			#webglmessage a { color:#fff }
 
 		</style>
 	</head>
@@ -47,14 +47,14 @@
 
 		<script src="js/ImprovedNoise.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 				document.getElementById( 'container' ).innerHTML = "";
 
 			}
@@ -160,7 +160,6 @@
 				//
 
 				var geometry = new THREE.Geometry();
-				var dummy = new THREE.Mesh();
 
 				for ( var z = 0; z < worldDepth; z ++ ) {
 
@@ -275,11 +274,16 @@
 
 				}
 
+				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
 				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
 				texture.minFilter = THREE.LinearMipMapLinearFilter;
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, vertexColors: THREE.VertexColors } ) );
+				var mesh = new THREE.Mesh(
+					geometry,
+					new THREE.MeshLambertMaterial( { map: texture, vertexColors: THREE.VertexColors, side: THREE.DoubleSide } )
+				);
 				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );

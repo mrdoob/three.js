@@ -43,11 +43,15 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/tween.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -61,10 +65,11 @@
 			var matFloor = new THREE.MeshPhongMaterial();
 			var matBox = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
 
-			var geoFloor = new THREE.BoxGeometry( 2000, 1, 2000 );
-			var geoBox = new THREE.BoxGeometry( 3, 1, 2 );
+			var geoFloor = new THREE.PlaneBufferGeometry( 2000, 2000 );
+			var geoBox = new THREE.BoxBufferGeometry( 3, 1, 2 );
 
 			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
+			mshFloor.rotation.x = - Math.PI * 0.5;
 			var mshBox = new THREE.Mesh( geoBox, matBox );
 
 			var ambient = new THREE.AmbientLight( 0x111111 );

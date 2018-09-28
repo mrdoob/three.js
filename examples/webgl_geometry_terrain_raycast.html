@@ -39,15 +39,14 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
-				document.getElementById( 'container' ).innerHTML = "";
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
 			}
 
@@ -58,7 +57,7 @@
 			var mesh, texture;
 
 			var worldWidth = 256, worldDepth = 256,
-			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
+				worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
 
 			var clock = new THREE.Clock();
 
@@ -73,21 +72,31 @@
 			function init() {
 
 				container = document.getElementById( 'container' );
+				container.innerHTML = "";
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				controls = new THREE.OrbitControls(camera);
-				controls.target.set( 0.0, 100.0, 0.0 );
-				controls.userPanSpeed = 100;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 20000 );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1000;
+				controls.maxDistance = 10000;
+				controls.maxPolarAngle = Math.PI / 2;
+
+				//
 
 				var data = generateHeight( worldWidth, worldDepth );
 
 				controls.target.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
-				camera.position.y =  controls.target.y + 2000;
+				camera.position.y = controls.target.y + 2000;
 				camera.position.x = 2000;
+				controls.update();
 
 				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
@@ -100,7 +109,9 @@
 
 				}
 
-				geometry.computeFaceNormals();
+				geometry.computeFaceNormals(); // needed for helper
+
+				//
 
 				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
 				texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -109,19 +120,12 @@
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				var geometry = new THREE.CylinderGeometry( 0, 20, 100, 3 );
+				var geometry = new THREE.ConeBufferGeometry( 20, 100, 3 );
 				geometry.translate( 0, 50, 0 );
 				geometry.rotateX( Math.PI / 2 );
 				helper = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial() );
 				scene.add( helper );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
-				container.appendChild( renderer.domElement );
 				container.addEventListener( 'mousemove', onMouseMove, false );
 
 				stats = new Stats();
@@ -145,13 +149,13 @@
 			function generateHeight( width, height ) {
 
 				var size = width * height, data = new Uint8Array( size ),
-				perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
+					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {
 
 					for ( var i = 0; i < size; i ++ ) {
 
-						var x = i % width, y = ~~ ( i / width );
+						var x = i % width, y = ~ ~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
 
 					}
@@ -166,8 +170,9 @@
 
 			function generateTexture( data, width, height ) {
 
-				var canvas, canvasScaled, context, image, imageData,
-				level, diff, vector3, sun, shade;
+				// bake lighting into texture
+
+				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
 
 				vector3 = new THREE.Vector3( 0, 0, 0 );
 
@@ -197,6 +202,7 @@
 					imageData[ i ] = ( 96 + shade * 128 ) * ( 0.5 + data[ j ] * 0.007 );
 					imageData[ i + 1 ] = ( 32 + shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
 					imageData[ i + 2 ] = ( shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
+
 				}
 
 				context.putImageData( image, 0, 0 );
@@ -216,7 +222,7 @@
 
 				for ( var i = 0, l = imageData.length; i < l; i += 4 ) {
 
-					var v = ~~ ( Math.random() * 5 );
+					var v = ~ ~ ( Math.random() * 5 );
 
 					imageData[ i ] += v;
 					imageData[ i + 1 ] += v;
@@ -243,7 +249,6 @@
 
 			function render() {
 
-				controls.update();
 				renderer.render( scene, camera );
 
 			}

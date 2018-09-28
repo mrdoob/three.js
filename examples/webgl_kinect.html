@@ -36,9 +36,8 @@
 		<script src="../build/three.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
-
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script id="vs" type="x-shader/x-vertex">
 
@@ -106,14 +105,14 @@
 
 			var video, texture;
 
-			if ( Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() ) {
 
 				init();
 				animate();
 
 			} else {
 
-				document.body.appendChild( Detector.getWebGLErrorMessage() );
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
 			}
 
@@ -142,6 +141,7 @@
 
 					texture = new THREE.VideoTexture( video );
 					texture.minFilter = THREE.NearestFilter;
+					texture.format = THREE.RGBFormat;
 
 					var width = 640, height = 480;
 					var nearClipping = 850, farClipping = 4000;
@@ -193,6 +193,7 @@
 
 
 				}, false );
+				video.crossOrigin = 'anonymous';
 				video.loop = true;
 				video.muted = true;
 				video.src = 'textures/kinect.webm';

@@ -468,13 +468,19 @@ Object.assign( AnimationAction.prototype, {
 	_updateTime: function ( deltaTime ) {
 
 		var time = this.time + deltaTime;
+		var duration = this._clip.duration;
+		var loop = this.loop;
+		var loopCount = this._loopCount;
 
-		if ( deltaTime === 0 ) return time;
+		var pingPong = ( loop === LoopPingPong );
 
-		var duration = this._clip.duration,
+		if ( deltaTime === 0 ) {
 
-			loop = this.loop,
-			loopCount = this._loopCount;
+			if ( loopCount === - 1 ) return time;
+
+			return ( pingPong && ( loopCount & 1 ) === 1 ) ? duration - time : time;
+
+		}
 
 		if ( loop === LoopOnce ) {
 
@@ -511,8 +517,6 @@ Object.assign( AnimationAction.prototype, {
 
 		} else { // repetitive Repeat or PingPong
 
-			var pingPong = ( loop === LoopPingPong );
-
 			if ( loopCount === - 1 ) {
 
 				// just started
@@ -546,7 +550,7 @@ Object.assign( AnimationAction.prototype, {
 
 				var pending = this.repetitions - loopCount;
 
-				if ( pending < 0 ) {
+				if ( pending <= 0 ) {
 
 					// have to stop (switch state, clamp time, fire event)
 
@@ -564,7 +568,7 @@ Object.assign( AnimationAction.prototype, {
 
 					// keep running
 
-					if ( pending === 0 ) {
+					if ( pending === 1 ) {
 
 						// entering the last round
 

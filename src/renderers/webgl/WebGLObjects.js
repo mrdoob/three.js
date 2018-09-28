@@ -2,13 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLObjects( geometries, infoRender ) {
+function WebGLObjects( geometries, info ) {
 
 	var updateList = {};
 
 	function update( object ) {
 
-		var frame = infoRender.frame;
+		var frame = info.render.frame;
 
 		var geometry = object.geometry;
 		var buffergeometry = geometries.get( object, geometry );

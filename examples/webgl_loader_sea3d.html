@@ -29,6 +29,8 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Studio</a>. Asset by <a href="http://vhalldez.cgsociety.org/" style="color:#FFFFFF" target="_blank" rel="noopener">Valdez Araujo</a>
+			<br/>
+			<br/>Geometry Compression with <a href="https://github.com/google/draco" style="color:#FFFFFF" target="_blank" rel="noopener">Google Draco</a> and content with LZMA using <a href="http://sunag.github.io/sea3d/IO/index.html" style="color:#FFFFFF" target="_blank">SEA3D I.O.</a> Tools<br>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -47,12 +49,19 @@
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/libs/draco/draco_decoder.js"></script>
+		<script src="js/loaders/sea3d/SEA3DDraco.js"></script>
+
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
 
@@ -73,7 +82,8 @@
 			loader = new THREE.SEA3D( {
 
 				autoPlay : true, // Auto play animations
-				container : scene // Container to add models
+				container : scene, // Container to add models
+				progressive : true // Progressive download
 
 			} );
 
@@ -82,17 +92,15 @@
 				// Get camera from SEA3D Studio
 				// use loader.get... to get others objects
 
-				var cam = loader.getCamera( "Camera007" );
-				camera.position.copy( cam.position );
-				camera.rotation.copy( cam.rotation );
+				//var cam = loader.getCamera( "Camera007" );
+				//camera.position.copy( cam.position );
+				//camera.rotation.copy( cam.rotation );
 
-				controls = new THREE.OrbitControls( camera );
-
-				animate();
+				console.log("SEA3D asset loaded!");
 
 			};
 
-			loader.load( './models/sea3d/mascot.tjs.sea' );
+			loader.load( './models/sea3d/mascot.draco.tjs.sea' );
 
 			//
 
@@ -105,7 +113,10 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 1000, - 300, 1000 );
+				camera.position.set( 1000, 1000, 1000 );
+				camera.lookAt( 0, 0, 0 );
+
+				controls = new THREE.OrbitControls( camera );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -179,6 +190,8 @@
 				composer.render( dlt );
 
 			}
+
+			animate();
 
 		</script>
 	</body>

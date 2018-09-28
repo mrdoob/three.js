@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr;
+
+		<h1>线段（[name]）</h1>
+
+		<p class="desc">
+			在若干对的顶点之间绘制的一系列的线。<br /><br />
+			它和[page:Line]几乎是相同的，唯一的区别是它在渲染时使用的是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]，
+			而不是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP]。
+		</p>
+
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+
+		<p>
+		[page:Geometry geometry] —— 表示每条线段的两个顶点。<br />
+		[page:Material material] —— 线的材质，默认值是[page:LineBasicMaterial LineBasicMaterial]。
+		</p>
+
+		<p>如果没有指定材质，一个随机颜色的线的材质将会被创建，并应用到该物体上。</p>
+
+
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Line]来查看共有属性。</p>
+
+		<h3>[property:Boolean isLineSegments]</h3>
+		<p>
+			用于检查这个类或者其派生类是否为线段，默认值为*true*。
+			你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
+		</p>
+
+
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Line]来查看共有属性。</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

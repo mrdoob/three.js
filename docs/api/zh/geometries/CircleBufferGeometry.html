@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>圆形缓冲几何体[name]</h1>
+
+		<p class="desc">这是[page:CircleGeometry]中的[page:BufferGeometry]接口。</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#CircleBufferGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>示例</h2>
+
+		<code>
+		var geometry = new THREE.CircleBufferGeometry( 5, 32 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var circle = new THREE.Mesh( geometry, material );
+		scene.add( circle );
+		</code>
+
+		<h2>构造器</h2>
+
+		<h3>[name]([param:Float radius], [param:Integer segments], [param:Float thetaStart], [param:Float thetaLength])</h3>
+		<p>
+		radius — 圆形的半径，默认值为1<br />
+		segments — 分段（三角面）的数量，最小值为3，默认值为8。<br />
+		thetaStart — 第一个分段的起始角度，默认为0。（three o'clock position）<br />
+		thetaLength — 圆形扇区的中心角，通常被称为“θ”（西塔）。默认值是2*Pi，这使其成为一个完整的圆。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+			</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/CircleGeometry.js src/geometries/CircleGeometry.js]
+	</body>
+</html>

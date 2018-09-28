@@ -100,11 +100,15 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var scenes = [], views, t, canvas, renderer;
 
@@ -132,8 +136,10 @@
 					var scene = new THREE.Scene();
 					scene.background = new THREE.Color( 0xffffff );
 
-					var geometry = new THREE.Geometry();
-					var geometry0 = new THREE.Geometry();
+					var geometry0 = new THREE.BufferGeometry();
+					var geometry1 = new THREE.BufferGeometry();
+
+					var vertices = [];
 
 					if ( views[n].lattice ) {
 
@@ -144,8 +150,7 @@
 
 								for ( var k = -range ; k <= range ; k++ ) {
 
-									geometry.vertices.push( new THREE.Vector3( i, j, k ) );
-									geometry0.vertices.push( new THREE.Vector3( i, j, k ) );
+									vertices.push( i, j, k );
 
 								}
 
@@ -161,12 +166,14 @@
 							var j = balls * Math.random() - balls / 2;
 							var k = balls * Math.random() - balls / 2;
 
-							geometry.vertices.push( new THREE.Vector3( i, j, k ) );
-							geometry0.vertices.push( new THREE.Vector3( i, j, k ) );
+							vertices.push( i, j, k );
 
 						}
 
 					}
+
+					geometry0.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+					geometry1.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices.slice(), 3 ) );
 
 					var index = Math.floor( colors.length * Math.random() );
 
@@ -177,21 +184,20 @@
 					context.arc( 64, 64, 64, 0, 2 * Math.PI );
 					context.fillStyle = colors[ index ];
 					context.fill();
-					var texture = new THREE.Texture( canvas2 );
-					texture.needsUpdate = true;
+					var texture = new THREE.CanvasTexture( canvas2 );
 
-					var material = new THREE.PointsMaterial( { size: size, map: texture, transparent: true, alphaTest: .1 } );
+					var material = new THREE.PointsMaterial( { size: size, map: texture, transparent: true, alphaTest: 0.1 } );
 
-					scene.add( new THREE.Points( geometry, material ) );
+					scene.add( new THREE.Points( geometry0, material ) );
 
-					scene.userData.view = views[n];
-					scene.userData.geometry0 = geometry0;
+					scene.userData.view = views[ n ];
+					scene.userData.geometry1 = geometry1;
 
-					var camera = new THREE.PerspectiveCamera( 75, 1, .1, 100 );
-					camera.position.set( 0, 0, 1.2*balls );
+					var camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 100 );
+					camera.position.set( 0, 0, 1.2 * balls );
 					scene.userData.camera = camera;
 
-					var controls = new THREE.OrbitControls( camera, views[n] );
+					var controls = new THREE.OrbitControls( camera, views[ n ] );
 					scene.userData.controls = controls;
 
 					scenes.push( scene );
@@ -253,15 +259,23 @@
 
 					renderer.render( scene, scene.userData.camera );
 
-					for ( var i = 0 ; i < scene.children[0].geometry.vertices.length ; i++ ) {
+					var points = scene.children[ 0 ];
+					var position = points.geometry.attributes.position;
 
-						var v0 = scene.userData.geometry0.vertices[i];
-						var v = scene.userData.view.displacement( v0.x, v0.y, v0.z, t/5 );
-						scene.children[0].geometry.vertices[i].set( v.x + v0.x, v.y + v0.y, v.z + v0.z );
+					var point = new THREE.Vector3();
+					var offset = new THREE.Vector3();
+
+					for ( var i = 0 ; i < position.count; i ++ ) {
+
+						point.fromBufferAttribute( scene.userData.geometry1.attributes.position, i );
+
+						scene.userData.view.displacement( point.x, point.y, point.z, t / 5, offset );
+
+						position.setXYZ( i, point.x + offset.x, point.y + offset.y, point.z + offset.z );
 
 					}
 
-					scene.children[0].geometry.verticesNeedUpdate = true;
+					position.needsUpdate = true;
 
 				} );
 
@@ -328,9 +342,9 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t ) {
+			parent.displacement = function( x, y, z, t, target ) {
 
-				return new THREE.Vector3( Math.sin( x - t ), 0, 0);
+				return target.set( Math.sin( x - t ), 0, 0 );
 
 			};
 
@@ -348,9 +362,9 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t ) {
+			parent.displacement = function( x, y, z, t, target ) {
 
-				return new THREE.Vector3( Math.sin( x - t ), 0, 0);
+				return target.set( Math.sin( x - t ), 0, 0 );
 
 			};
 
@@ -442,18 +456,18 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t ) {
+			parent.displacement = function( x, y, z, t, target ) {
 
 				if ( x * x + y * y < 0.01 ) {
 
-					return new THREE.Vector3( 0, 0, 0);
+					return target.set( 0, 0, 0 );
 
 				} else {
 
 					var rho = Math.sqrt( x * x + y * y );
 					var phi = Math.atan2( y, x );
 
-					return new THREE.Vector3( 1.5 * Math.cos( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 1.5 * Math.sin( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 0);
+					return target.set( 1.5 * Math.cos( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 1.5 * Math.sin( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 0 );
 
 				}
 
@@ -473,18 +487,18 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t ) {
+			parent.displacement = function( x, y, z, t, target ) {
 
 				if ( x * x + y * y < 0.01 ) {
 
-					return new THREE.Vector3( 0, 0, 0);
+					return target.set( 0, 0, 0 );
 
 				} else {
 
 					var rho = Math.sqrt( x * x + y * y );
 					var phi = Math.atan2( y, x );
 
-					return new THREE.Vector3( 1.5 * Math.cos( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 1.5 * Math.sin( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 0);
+					return target.set( 1.5 * Math.cos( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 1.5 * Math.sin( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 0 );
 
 				}
 
@@ -578,11 +592,11 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t ) {
+			parent.displacement = function( x, y, z, t, target ) {
 
 				if ( x * x + y * y + z * z < 0.01 ) {
 
-					return new THREE.Vector3( 0, 0, 0);
+					return target.set( 0, 0, 0 );
 
 				} else {
 
@@ -590,7 +604,7 @@
 					var theta = Math.acos( z / r );
 					var phi = Math.atan2( y, x );
 
-					return new THREE.Vector3( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
+					return target.set( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
 
 				}
 
@@ -610,11 +624,11 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t ) {
+			parent.displacement = function( x, y, z, t, target ) {
 
 				if ( x * x + y * y + z * z < 0.01 ) {
 
-					return new THREE.Vector3( 0, 0, 0);
+					return target.set( 0, 0, 0 );
 
 				} else {
 
@@ -622,7 +636,7 @@
 					var theta = Math.acos( z / r );
 					var phi = Math.atan2( y, x );
 
-					return new THREE.Vector3( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
+					return target.set( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
 
 				}
 			};

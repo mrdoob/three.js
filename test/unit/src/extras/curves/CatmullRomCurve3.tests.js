@@ -54,7 +54,7 @@ export default QUnit.module( 'Extras', () => {
 			QUnit.test( "catmullrom check", ( assert ) => {
 
 				var curve = new CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				curve.curveType = 'catmullrom';
 
 				var expectedPoints = [
 
@@ -90,7 +90,7 @@ export default QUnit.module( 'Extras', () => {
 
 				var curve = new CatmullRomCurve3( positions );
 
-				curve.type = 'chordal';
+				curve.curveType = 'chordal';
 
 				var expectedPoints = [
 					new Vector3( - 60, - 100, 60 ),
@@ -123,7 +123,7 @@ export default QUnit.module( 'Extras', () => {
 			QUnit.test( "centripetal basic check", ( assert ) => {
 
 				var curve = new CatmullRomCurve3( positions );
-				curve.type = 'centripetal';
+				curve.curveType = 'centripetal';
 
 				var expectedPoints = [
 					new Vector3( - 60, - 100, 60 ),
@@ -156,7 +156,7 @@ export default QUnit.module( 'Extras', () => {
 			QUnit.test( "closed catmullrom basic check", ( assert ) => {
 
 				var curve = new CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				curve.curveType = 'catmullrom';
 				curve.closed = true;
 
 				var expectedPoints = [
@@ -192,8 +192,8 @@ export default QUnit.module( 'Extras', () => {
 			//
 			QUnit.test( "getLength/getLengths", ( assert ) => {
 
-				var curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				var curve = new CatmullRomCurve3( positions );
+				curve.curveType = 'catmullrom';
 
 				var length = curve.getLength();
 				var expectedLength = 551.549686276872;
@@ -221,14 +221,14 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( "getPointAt", ( assert ) => {
 
-				var curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				var curve = new CatmullRomCurve3( positions );
+				curve.curveType = 'catmullrom';
 
 				var expectedPoints = [
-					new THREE.Vector3( - 60, - 100, 60 ),
-					new THREE.Vector3( - 64.84177333183106, 64.86956465359813, 64.84177333183106 ),
-					new THREE.Vector3( - 28.288507045700854, 104.83101184518996, 28.288507045700854 ),
-					new THREE.Vector3( 60, - 100, - 60 )
+					new Vector3( - 60, - 100, 60 ),
+					new Vector3( - 64.84177333183106, 64.86956465359813, 64.84177333183106 ),
+					new Vector3( - 28.288507045700854, 104.83101184518996, 28.288507045700854 ),
+					new Vector3( 60, - 100, - 60 )
 				];
 
 				var points = [
@@ -244,15 +244,15 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( "getTangent/getTangentAt", ( assert ) => {
 
-				var curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				var curve = new CatmullRomCurve3( positions );
+				curve.curveType = 'catmullrom';
 
 				var expectedTangents = [
-					new THREE.Vector3( 0, 1, 0 ),
-					new THREE.Vector3( - 0.0001090274561657922, 0.9999999881130137, 0.0001090274561657922 ),
-					new THREE.Vector3( 0.7071067811865475, - 2.0930381713877622e-13, - 0.7071067811865475 ),
-					new THREE.Vector3( 0.43189437062802816, - 0.7917919583070032, - 0.43189437062802816 ),
-					new THREE.Vector3( - 0.00019991333100812723, - 0.9999999600346592, 0.00019991333100812723 )
+					new Vector3( 0, 1, 0 ),
+					new Vector3( - 0.0001090274561657922, 0.9999999881130137, 0.0001090274561657922 ),
+					new Vector3( 0.7071067811865475, - 2.0930381713877622e-13, - 0.7071067811865475 ),
+					new Vector3( 0.43189437062802816, - 0.7917919583070032, - 0.43189437062802816 ),
+					new Vector3( - 0.00019991333100812723, - 0.9999999600346592, 0.00019991333100812723 )
 				];
 
 				var tangents = [
@@ -275,11 +275,11 @@ export default QUnit.module( 'Extras', () => {
 				//
 
 				var expectedTangents = [
-					new THREE.Vector3( 0, 1, 0 ),
-					new THREE.Vector3( - 0.10709018822205997, 0.9884651653817284, 0.10709018822205997 ),
-					new THREE.Vector3( 0.6396363672964268, - 0.4262987629159402, - 0.6396363672964268 ),
-					new THREE.Vector3( 0.5077298411616501, - 0.6960034603275557, - 0.5077298411616501 ),
-					new THREE.Vector3( - 0.00019991333100812723, - 0.9999999600346592, 0.00019991333100812723 )
+					new Vector3( 0, 1, 0 ),
+					new Vector3( - 0.10709018822205997, 0.9884651653817284, 0.10709018822205997 ),
+					new Vector3( 0.6396363672964268, - 0.4262987629159402, - 0.6396363672964268 ),
+					new Vector3( 0.5077298411616501, - 0.6960034603275557, - 0.5077298411616501 ),
+					new Vector3( - 0.00019991333100812723, - 0.9999999600346592, 0.00019991333100812723 )
 				];
 
 				var tangents = [
@@ -303,24 +303,24 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( "computeFrenetFrames", ( assert ) => {
 
-				var curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				var curve = new CatmullRomCurve3( positions );
+				curve.curveType = 'catmullrom';
 
 				var expected = {
 					binormals: [
-						new THREE.Vector3( - 1, 0, 0 ),
-						new THREE.Vector3( - 0.28685061854203, 0.6396363672964267, - 0.7131493814579701 ),
-						new THREE.Vector3( - 1.9982670528160395e-8, - 0.0001999133310081272, - 0.9999999800173295 )
+						new Vector3( - 1, 0, 0 ),
+						new Vector3( - 0.28685061854203, 0.6396363672964267, - 0.7131493814579701 ),
+						new Vector3( - 1.9982670528160395e-8, - 0.0001999133310081272, - 0.9999999800173295 )
 					],
 					normals: [
-						new THREE.Vector3( 0, 0, - 1 ),
-						new THREE.Vector3( - 0.7131493814579699, - 0.6396363672964268, - 0.2868506185420297 ),
-						new THREE.Vector3( - 0.9999999800173294, 0.00019991333100810582, - 1.99826701852146e-8 )
+						new Vector3( 0, 0, - 1 ),
+						new Vector3( - 0.7131493814579699, - 0.6396363672964268, - 0.2868506185420297 ),
+						new Vector3( - 0.9999999800173294, 0.00019991333100810582, - 1.99826701852146e-8 )
 					],
 					tangents: [
-						new THREE.Vector3( 0, 1, 0 ),
-						new THREE.Vector3( 0.6396363672964269, - 0.4262987629159403, - 0.6396363672964269 ),
-						new THREE.Vector3( - 0.0001999133310081273, - 0.9999999600346594, 0.0001999133310081273 )
+						new Vector3( 0, 1, 0 ),
+						new Vector3( 0.6396363672964269, - 0.4262987629159403, - 0.6396363672964269 ),
+						new Vector3( - 0.0001999133310081273, - 0.9999999600346594, 0.0001999133310081273 )
 					]
 				};
 
@@ -342,8 +342,8 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( "getUtoTmapping", ( assert ) => {
 
-				var curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				var curve = new CatmullRomCurve3( positions );
+				curve.curveType = 'catmullrom';
 
 				var start = curve.getUtoTmapping( 0, 0 );
 				var end = curve.getUtoTmapping( 0, curve.getLength() );
@@ -359,16 +359,16 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( "getSpacedPoints", ( assert ) => {
 
-				var curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				var curve = new CatmullRomCurve3( positions );
+				curve.curveType = 'catmullrom';
 
 				var expectedPoints = [
-					new THREE.Vector3( - 60, - 100, 60 ),
-					new THREE.Vector3( - 60, 10.311489426555056, 60 ),
-					new THREE.Vector3( - 65.05889864636504, 117.99691802595966, 65.05889864636504 ),
-					new THREE.Vector3( 6.054276900088592, 78.7153118386369, - 6.054276900088592 ),
-					new THREE.Vector3( 64.9991491385602, 8.386980812799566, - 64.9991491385602 ),
-					new THREE.Vector3( 60, - 100, - 60 )
+					new Vector3( - 60, - 100, 60 ),
+					new Vector3( - 60, 10.311489426555056, 60 ),
+					new Vector3( - 65.05889864636504, 117.99691802595966, 65.05889864636504 ),
+					new Vector3( 6.054276900088592, 78.7153118386369, - 6.054276900088592 ),
+					new Vector3( 64.9991491385602, 8.386980812799566, - 64.9991491385602 ),
+					new Vector3( 60, - 100, - 60 )
 				];
 
 				var points = curve.getSpacedPoints();

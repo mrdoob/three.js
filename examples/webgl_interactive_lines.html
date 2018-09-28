@@ -50,14 +50,15 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var geometry = new THREE.SphereGeometry( 5 );
+				var geometry = new THREE.SphereBufferGeometry( 5 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
 				sphereInter = new THREE.Mesh( geometry, material );
 				sphereInter.visible = false;
 				scene.add( sphereInter );
 
-				var geometry = new THREE.Geometry();
+				var lineGeometry = new THREE.BufferGeometry();
+				var points = [];
 
 				var point = new THREE.Vector3();
 				var direction = new THREE.Vector3();
@@ -70,10 +71,11 @@
 					direction.normalize().multiplyScalar( 10 );
 
 					point.add( direction );
-
-					geometry.vertices.push( point.clone() );
+					points.push( point.x, point.y, point.z );
 
 				}
+
+				lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
 
 				parentTransform = new THREE.Object3D();
 				parentTransform.position.x = Math.random() * 40 - 20;
@@ -94,11 +96,11 @@
 
 					if ( Math.random() > 0.5 ) {
 
-						object = new THREE.Line( geometry );
+						object = new THREE.Line( lineGeometry );
 
 					} else {
 
-						object = new THREE.LineSegments( geometry );
+						object = new THREE.LineSegments( lineGeometry );
 
 					}
 
@@ -187,25 +189,12 @@
 
 				if ( intersects.length > 0 ) {
 
-					if ( currentIntersected !== undefined ) {
-
-						currentIntersected.material.linewidth = 1;
-
-					}
-
 					currentIntersected = intersects[ 0 ].object;
-					currentIntersected.material.linewidth = 5;
 
 					sphereInter.visible = true;
 					sphereInter.position.copy( intersects[ 0 ].point );
 
 				} else {
-
-					if ( currentIntersected !== undefined ) {
-
-						currentIntersected.material.linewidth = 1;
-
-					}
 
 					currentIntersected = undefined;
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+        允许加权累加的缓冲场景图属性，内部使用
+		</p>
+
+
+		<h2>构造器</h2>
+
+
+		<h3>[name]( [param:PropertyBinding binding], [param:String typeName], [param:Number valueSize] )</h3>
+		<p>
+			-- binding <br />
+			-- typeName <br />
+			-- valueSize <br />
+		</p>
+
+
+		<h2>属性</h2>
+
+
+		<h3>[property:PropertyBinding binding]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:TypedArray buffer]</h3>
+		<p>
+			大小为 4 * [page:PropertyMixer valueSize] 的缓冲区 <br /><br />
+			布局为: [ incoming | accu0 | accu1 | orig ]<br /><br />
+			插值器可使用 .buffer 作为 .result 且数据会进入'incoming'区.
+			'accu0'和'accu1'用于按帧交错累加‘incoming’中的数据并进行比较以侦测变化。'orig'存储着属性的原始状态。
+		</p>
+
+		<h3>[property:Number cumulativeWeight]</h3>
+		<p>
+			默认值是0
+		</p>
+
+		<h3>[property:Number valueSize]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Number referenceCount]</h3>
+		<p>
+            默认值是0
+		</p>
+
+		<h3>[property:Number useCount]</h3>
+		<p>
+           默认值是0
+		</p>
+
+
+		<h2>方法</h2>
+
+
+		<h3>[method:null accumulate]( [param:Number accuIndex], [param:Number weight] )</h3>
+		<p>
+			将[page:PropertyMixer.buffer buffer][accuIndex]中'incoming'区的数据累加到'accu[i]'区中。<br />
+
+			如果权值为0，则什么都不做。
+		</p>
+
+		<h3>[method:null apply]( [param:Number accuIndex] )</h3>
+		<p>
+			当累加值不同时，将[page:PropertyMixer.buffer buffer] 'accu[i]区的状态应用于绑定.
+		</p>
+
+		<h3>[method:null saveOriginalState]( )</h3>
+		<p>
+			记住绑定属性的状态并复制到两个'accu'区中.
+		</p>
+
+		<h3>[method:null restoreOriginalState](  )</h3>
+		<p>
+            将预先通过'saveOriginalState'方法取得的状态应用于绑定。
+		</p>
+
+
+		<h2>方法</h2>
+
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

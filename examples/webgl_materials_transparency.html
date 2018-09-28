@@ -33,23 +33,18 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var params = { opacity: 0.25 };
 
@@ -71,7 +66,7 @@
 
 				//
 
-				var geometry = new THREE.SphereGeometry( 18, 30, 30 );
+				var geometry = new THREE.SphereBufferGeometry( 18, 30, 30 );
 
 				var material1 = new THREE.MeshStandardMaterial( {
 					opacity: params.opacity,
@@ -141,7 +136,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -198,7 +193,7 @@
 
 					var object = scene.children[ i ];
 
-					if ( object.geometry instanceof THREE.SphereGeometry ) {
+					if ( object.geometry instanceof THREE.SphereBufferGeometry ) {
 
 						object.rotation.x = performance.now() * 0.0002;
 						object.rotation.y = - performance.now() * 0.0002;

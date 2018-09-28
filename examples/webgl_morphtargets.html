@@ -39,13 +39,17 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -62,7 +66,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -70,8 +74,8 @@
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
 				var light = new THREE.PointLight( 0xff2200 );
-				light.position.set( 100, 100, 100 );
-				scene.add( light );
+				camera.add( light );
+				scene.add( camera );
 
 				var light = new THREE.AmbientLight( 0x111111 );
 				scene.add( light );
@@ -102,6 +106,8 @@
 					geometry.morphTargets.push( { name: "target" + i, vertices: vertices } );
 
 				}
+
+				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
 
 				mesh = new THREE.Mesh( geometry, material );
 
@@ -142,7 +148,9 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 400;
+				controls.maxDistance = 1000;
 
 				//
 

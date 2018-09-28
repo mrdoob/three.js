@@ -45,11 +45,15 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, mesh, material;
 			var drawStartPos = new THREE.Vector2();
@@ -67,7 +71,7 @@
 
 				material = new THREE.MeshBasicMaterial();
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -79,42 +83,52 @@
 
 			}
 
-			// Sets up the drawing canvas and adds it as the material map.
+			// Sets up the drawing canvas and adds it as the material map
+
 			function setupCanvasDrawing() {
+
 				// get canvas and context
+
 				var drawingCanvas = document.getElementById( 'drawing-canvas' );
 				var drawingContext = drawingCanvas.getContext( '2d' );
 
 				// draw white background
-				drawingContext.fillStyle = "#FFFFFF";
+
+				drawingContext.fillStyle = '#FFFFFF';
 				drawingContext.fillRect( 0, 0, 128, 128 );
 
 				// set canvas as material.map (this could be done to any map, bump, displacement etc.)
-				material.map = new THREE.Texture( drawingCanvas );
-				// need to flag the map as needing updating.
-				material.map.needsUpdate = true;
+
+				material.map = new THREE.CanvasTexture( drawingCanvas );
 
 				// set the variable to keep track of when to draw
+
 				var paint = false;
 
 				// add canvas event listeners
 				drawingCanvas.addEventListener( 'mousedown', function( e ) {
+
 					paint = true;
 					drawStartPos.set( e.offsetX, e.offsetY );
+
 				} );
 
 				drawingCanvas.addEventListener( 'mousemove', function( e ) {
-					if(paint){
-						draw( drawingContext, e.offsetX, e.offsetY );
-					}
+
+					if( paint ) draw( drawingContext, e.offsetX, e.offsetY );
+
 				} );
 
 				drawingCanvas.addEventListener( 'mouseup', function( e ) {
+
 					paint = false;
+
 				} );
 
 				drawingCanvas.addEventListener( 'mouseleave', function( e ) {
+
 					paint = false;
+
 				} );
 
 			}
