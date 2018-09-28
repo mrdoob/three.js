@@ -28,7 +28,7 @@ Object.assign( DataTextureLoader.prototype, {
 
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
-
+		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
 			var texData = scope._parser( buffer );
@@ -86,6 +86,13 @@ Object.assign( DataTextureLoader.prototype, {
 
 
 		return texture;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
