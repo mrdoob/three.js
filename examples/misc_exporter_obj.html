@@ -75,17 +75,17 @@
 				var exporter = new THREE.OBJExporter();
 				var result = exporter.parse( scene );
 				floatingDiv.style.display = 'block';
-				floatingDiv.innerHTML = result.split( '\n' ).join ( '<br />' );
+				floatingDiv.innerHTML = result.split( '\n' ).join( '<br />' );
 
 			}
 
 			function addGeometry( type ) {
 
-				for( var i = 0; i < scene.children.length; i ++ ) {
+				for ( var i = 0; i < scene.children.length; i ++ ) {
 
 					var child = scene.children[ i ];
 
-					if( child.isMesh ) {
+					if ( child.isMesh ) {
 
 						child.geometry.dispose();
 						scene.remove( child );
@@ -97,7 +97,7 @@
 
 				if ( type === 1 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 					var geometry = generateTriangleGeometry();
 
 					scene.add( new THREE.Mesh( geometry, material ) );
@@ -105,23 +105,23 @@
 
 				} else if ( type === 2 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 					var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} else if ( type === 3 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 					var geometry = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} else if ( type === 4 || type === 5 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 					var geometry = generateTriangleGeometry();
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = -200;
+					mesh.position.x = - 200;
 					scene.add( mesh );
 
 					var geometry2 = new THREE.BoxBufferGeometry( 100, 100, 100 );
@@ -167,14 +167,38 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseover', onDocumentMouseMove, false );
 
-				document.getElementById( 'triangle' ).addEventListener( 'click', function() { addGeometry( 1 ); } );
-				document.getElementById( 'cube' ).addEventListener( 'click', function() { addGeometry( 2 ); } );
-				document.getElementById( 'cylinder' ).addEventListener( 'click', function() { addGeometry( 3 ); } );
-				document.getElementById( 'both' ).addEventListener( 'click', function() { addGeometry( 4 ); } );
-				document.getElementById( 'transformed' ).addEventListener( 'click', function() { addGeometry( 5 ); } );
+				document.getElementById( 'triangle' ).addEventListener( 'click', function () {
+
+					addGeometry( 1 );
+
+				} );
+				document.getElementById( 'cube' ).addEventListener( 'click', function () {
+
+					addGeometry( 2 );
+
+				} );
+				document.getElementById( 'cylinder' ).addEventListener( 'click', function () {
+
+					addGeometry( 3 );
+
+				} );
+				document.getElementById( 'both' ).addEventListener( 'click', function () {
+
+					addGeometry( 4 );
+
+				} );
+				document.getElementById( 'transformed' ).addEventListener( 'click', function () {
+
+					addGeometry( 5 );
+
+				} );
 
 				exportButton = document.getElementById( 'export' );
-				exportButton.addEventListener( 'click', function() { exportToObj(); });
+				exportButton.addEventListener( 'click', function () {
+
+					exportToObj();
+
+				} );
 
 				floatingDiv = document.createElement( 'div' );
 				floatingDiv.className = 'floating';
@@ -187,7 +211,7 @@
 				var needToClose = true;
 				var target = event.target;
 
-				while( target !== null ) {
+				while ( target !== null ) {
 
 					if ( target === floatingDiv || target === exportButton ) {
 

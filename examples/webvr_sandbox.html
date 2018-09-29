@@ -93,7 +93,7 @@
 				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
 				var lensflare = new THREE.Lensflare();
-				lensflare.position.set( 0, 5, -5 );
+				lensflare.position.set( 0, 5, - 5 );
 				lensflare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
 				lensflare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
 				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
@@ -110,7 +110,7 @@
 				} );
 				reflector.position.x = 1;
 				reflector.position.y = 0.5;
-				reflector.position.z = -3;
+				reflector.position.z = - 3;
 				reflector.rotation.y = - Math.PI / 4;
 				scene.add( reflector );
 

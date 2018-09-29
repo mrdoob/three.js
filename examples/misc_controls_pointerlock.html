@@ -112,20 +112,20 @@
 				var blocker = document.getElementById( 'blocker' );
 				var instructions = document.getElementById( 'instructions' );
 
-				instructions.addEventListener( 'click', function ( event ) {
+				instructions.addEventListener( 'click', function () {
 
 					controls.lock();
 
 				}, false );
 
-				controls.addEventListener( 'lock', function() {
+				controls.addEventListener( 'lock', function () {
 
 					instructions.style.display = 'none';
 					blocker.style.display = 'none';
 
 				} );
 
-				controls.addEventListener( 'unlock', function() {
+				controls.addEventListener( 'unlock', function () {
 
 					blocker.style.display = 'block';
 					instructions.style.display = '';
@@ -168,7 +168,7 @@
 
 				var onKeyUp = function ( event ) {
 
-					switch( event.keyCode ) {
+					switch ( event.keyCode ) {
 
 						case 38: // up
 						case 87: // w
