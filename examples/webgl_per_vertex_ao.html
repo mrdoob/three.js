@@ -54,6 +54,9 @@
 			var container, stats, controls;
 			var camera, scene, renderer, model, materials, envMap, shadowLight;
 
+			// 1x256 B/W gradient
+			var aoMap = new THREE.TextureLoader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAIElEQVQ4T2NkYGD4z8TExAACo/RoOIymg5GTDxgZGRkA/oMD/vOwS0YAAAAASUVORK5CYII=' );
+
 			init();
 
 			function init() {
@@ -83,7 +86,7 @@
 				var ground = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 200, 200 ),
 					new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.15 }
-				) );
+					) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.position.y -= 0.9;
 				ground.receiveShadow = true;
@@ -145,6 +148,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -175,16 +179,13 @@
 
 			function initMaterials( originalMaterial ) {
 
-				originalMaterial.vertexColors = THREE.VertexColors;
-
 				var map = originalMaterial.map;
-				originalMaterial.aoMap = null;
-				originalMaterial.vertexColors = THREE.VertexColors;
+				originalMaterial.aoMap = aoMap;
 
 				materials = [
-					new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } ),
-					new THREE.MeshBasicMaterial( { map: map, vertexColors: THREE.VertexColors } ),
-					new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors } ),
+					new THREE.MeshBasicMaterial( { aoMap: aoMap } ),
+					new THREE.MeshBasicMaterial( { map: map, aoMap: aoMap } ),
+					new THREE.MeshStandardMaterial( { aoMap: aoMap } ),
 					originalMaterial,
 				];
 
@@ -209,8 +210,8 @@
 
 					materials.forEach( function ( material ) {
 
-						if ( params.enabled ) model.material.vertexColors = THREE.VertexColors;
-						else model.material.vertexColors = THREE.NoColors;
+						if ( params.enabled ) model.material.aoMap = aoMap;
+						else model.material.aoMap = null;
 
 						material.needsUpdate = true;
 
@@ -367,7 +368,7 @@
 
 			function ambientOcclusion( geometry ) {
 
-				var colors = [];
+				var ao = [];
 
 				var positions = geometry.attributes.position.array;
 				var normals = geometry.attributes.normal.array;
@@ -426,23 +427,28 @@
 					else bentNormal.copy( receiverNormal ); // initialise
 
 					// initialise to 1
-					if ( ! colors[ i / 3 ] ) colors[ i / 3 ] = 1;
+					if ( ! ao[ i / 3 ] ) ao[ i / 3 ] = 1;
 
 					var value = computeVertexOcclusion( i );
 
 					bentNormal.toArray( bentNormals, i );
 
-					colors[ i / 3 ] *= value;
+					ao[ i / 3 ] *= value;
 
 				}
 
 				// ignoring bent normals for now since with a single pass they don't improve appearance of the current model
 				// geometry.attributes.normal.set( bentNormals );
 
-				var vertexColors = [];
-				for ( var k = 0; k < colors.length; k ++ ) vertexColors.push( colors[ k ], colors[ k ], colors[ k ] );
+				var uv2Data = new Float32Array( ao.length * 2 );
 
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( vertexColors ), 3 ) );
+				for ( var i = 0; i < ao.length; i ++ ) {
+
+					uv2Data[ i * 2 ] = uv2Data[ i * 2 + 1 ] = ao[ i ];
+
+				}
+
+				geometry.addAttribute( 'uv2', new THREE.BufferAttribute( uv2Data, 2 ) );
 
 			}
 
