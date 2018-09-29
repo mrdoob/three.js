@@ -42,8 +42,6 @@
 
 			var scene2, renderer2;
 
-			var controls;
-
 			init();
 			animate();
 
@@ -55,7 +53,7 @@
 
 				camera.position.set( - 200, 200, 200 );
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );

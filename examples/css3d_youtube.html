@@ -11,7 +11,6 @@
 			}
 			#blocker {
 				position: absolute;
-				/* background-color: rgba(255, 0, 0, 0.5); */
 				top: 0px;
 				left: 0px;
 				width: 100%;
@@ -87,8 +86,16 @@
 				var blocker = document.getElementById( 'blocker' );
 				blocker.style.display = 'none';
 
-				document.addEventListener( 'mousedown', function () { blocker.style.display = ''; } );
-				document.addEventListener( 'mouseup', function () { blocker.style.display = 'none'; } );
+				document.addEventListener( 'mousedown', function () {
+
+					blocker.style.display = '';
+
+				} );
+				document.addEventListener( 'mouseup', function () {
+
+					blocker.style.display = 'none';
+
+				} );
 
 			}
 

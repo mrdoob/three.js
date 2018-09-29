@@ -151,9 +151,9 @@
 				uniforms.u_cmdata.value = cmtextures[ volconfig.colormap ];
 
 				material = new THREE.ShaderMaterial( {
-					uniforms        : uniforms,
-					vertexShader    : shader.vertexShader,
-					fragmentShader  : shader.fragmentShader,
+					uniforms: uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader,
 					side: THREE.BackSide // The volume shader uses the backface as its "reference point"
 				} );
 
