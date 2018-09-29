@@ -621,6 +621,20 @@ THREE.GLTFExporter.prototype = {
 
 		}
 
+		function toBlob( canvas, callback, mimeType ) {
+
+			if ( canvas.msToBlob ) {
+
+				callback( canvas.msToBlob() );
+
+			} else {
+
+				canvas.toBlob( callback, mimeType );
+
+			}
+
+		}
+
 		/**
 		 * Process image
 		 * @param  {Image} image to process
@@ -637,7 +651,17 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var cachedImages = cachedData.images.get( image );
-			var mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+
+			var detectedMSEdgeCanvas = !! HTMLCanvasElement.prototype.msToBlob;
+
+			if ( detectedMSEdgeCanvas && format !== THREE.RGBAFormat ) {
+
+				console.warn( 'GLTFExporter: Microsoft Edge msToBlob only supports PNG. Exporting as PNG instead of JPEG.', image.src );
+
+			}
+
+			var mimeType = ( detectedMSEdgeCanvas || format === THREE.RGBAFormat ) ? 'image/png' : 'image/jpeg';
+
 			var key = mimeType + ":flipY/" + flipY.toString();
 
 			if ( cachedImages[ key ] !== undefined ) {
@@ -685,7 +709,7 @@ THREE.GLTFExporter.prototype = {
 
 					pending.push( new Promise( function ( resolve ) {
 
-						canvas.toBlob( function ( blob ) {
+						toBlob( canvas, function ( blob ) {
 
 							processBufferViewImage( blob ).then( function ( bufferViewIndex ) {
 
