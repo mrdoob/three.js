@@ -289,6 +289,18 @@
 
 			}
 
+			function rearrange() {
+
+				group.children.forEach( function ( o ) {
+
+ 					o.position.y += ( Math.random() - 0.5 ) * 100;
+					o.position.x += ( Math.random() - 0.5 ) * 400;
+					o.position.z += ( Math.random() - 0.5 ) * 400;
+
+				} );
+
+ 			}
+
 			function render() {
 
 				renderer.render( scene, camera );
