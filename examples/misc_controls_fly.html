@@ -74,11 +74,11 @@
 
 			var MARGIN = 0;
 			var SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
-			var SCREEN_WIDTH  = window.innerWidth;
+			var SCREEN_WIDTH = window.innerWidth;
 
 			var camera, controls, scene, renderer, stats;
 			var geometry, meshPlanet, meshClouds, meshMoon;
-			var dirLight, pointLight, ambientLight;
+			var dirLight;
 
 			var composer;
 
@@ -100,7 +100,7 @@
 				scene.fog = new THREE.FogExp2( 0x000000, 0.00000025 );
 
 				dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( -1, 0, 1 ).normalize();
+				dirLight.position.set( - 1, 0, 1 ).normalize();
 				scene.add( dirLight );
 
 				var materialNormalMap = new THREE.MeshPhongMaterial( {
@@ -246,10 +246,10 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_HEIGHT = window.innerHeight;
-				SCREEN_WIDTH  = window.innerWidth;
+				SCREEN_WIDTH = window.innerWidth;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
