@@ -10,17 +10,15 @@
 	<body>
 		[page:Object3D] &rarr;
 
-		<h1>[name]</h1>
+		<h1>多细节层次（[name]，Levels of Detail）</h1>
 
 		<p class="desc">
-			Level of Detail - show meshes with more or less geometry based on distance from the camera.<br /><br />
-
-		  Every level is associated with an object, and rendering can be switched between them at the distances
-			specified. Typically you would create, say, three meshes, one for far away (low detail), one for mid range (medium detail)
-			and one for close up (high detail).
+			多细节层次 —— 在显示网格时，根据摄像机距离物体的距离，来使用更多或者更少的几何体来对其进行显示。<br /><br />
+			每一个级别都和一个几何体相关联，且在渲染时，可以根据给定的距离，来在这些级别对应的几何体之间进行切换。
+			通常情况下，你会创建多个几何体，比如说三个，一个距离很远（低细节），一个距离适中（中等细节），还有一个距离非常近（高质量）。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 		
 		<p>
 			[example:webgl_lod webgl / lod ]
@@ -44,76 +42,72 @@ scene.add( lod );
 		</code>
 
 		<p>
-		Note that for the LOD to switch between the different detail levels, you will
-		have to call [page:.update update]( camera ) in your render loop. See the source code
-		for this example for details:
+			请注意，要使得LOD在各不同细节层次之间进行切换，你将需要在你的渲染循环中调用[page:.update update]( camera )。
+			详情请查看这个示例中的源代码：
 		[example:webgl_lod WebGL / LOD]
 		</div>
 
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
 		<p>
-			Creates a new [name].
+			创建一个新的 [name].
 		</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Object3D] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Object3D]来查看公共属性。</p>
 
 		<h3>[property:array levels]</h3>
 		<p>
-		An array of [page:object level] objects<br /><br />
+			一个包含有[page:object level] objects（各层次物体）的数组。<br /><br />
 
-		Each level is an object with two properties:<br />
-		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
-		[page:Float distance] - The distance at which to display this level of detail.
+			每一个层级都是一个对象，具有以下两个属性：
+			[page:Object3D object] —— 在这个层次中将要显示的[page:Object3D]。<br />
+			[page:Float distance] —— 将显示这一细节层次的距离。
 		</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:Object3D] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
 
 		<h3>[method:null addLevel]( [param:Object3D object], [param:Float distance] )</h3>
 		<p>
-		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
-		[page:Float distance] - The distance at which to display this level of detail.<br /><br />
+		[page:Object3D object] —— 在这个层次中将要显示的[page:Object3D]。<br />
+		[page:Float distance] —— 将显示这一细节层次的距离。<br /><br />
 
-		Adds a mesh that will display at a certain distance and greater. Typically the further away the distance,
-		the lower the detail on the mesh.
+		添加在一定距离和更大范围内显示的网格。通常来说，距离越远，网格中的细节就越少。
 		</p>
 
 		<h3>[method:LOD clone]()</h3>
 		<p>
-		Returns a clone of this LOD object and its associated distance specific objects.
+			返回一个LOD对象及其所关联的在特定距离中的物体。
 		</p>
 
 
 		<h3>[method:Object3D getObjectForDistance]( [param:Float distance] )</h3>
 		<p>
-		Get a reference to the first [page:Object3D] (mesh) that is greater than [page:Float distance].
+			获得第一个比[page:Float distance]大的[page:Object3D]（网格）的引用。
 		</p>
 
 		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
-		Get intersections between a casted [page:Ray] and this LOD.
-		[page:Raycaster.intersectObject] will call this method.
+			在一条投射出去的[page:Ray]（射线）和这个LOD之间获得交互。
+			[page:Raycaster.intersectObject]将会调用这个方法。
 		</p>
 
 
 
 		<h3>[method:null toJSON]( meta )</h3>
 		<p>
-		Create a JSON structure with details of this LOD object.
+			使用这个方法，为LOD对象中的每个细节层次创建一个JSON结构。
 		</p>
 
 		<h3>[method:null update]( [param:Camera camera] )</h3>
 		<p>
-			Set the visibility of each [page:levels level]'s [page:Object3D object] based on
-			distance from the [page:Camera camera]. This needs to be called in the render loop
-			for levels of detail to be updated dynamically.
+			基于每个[page:levels level]中的[page:Object3D object]和[page:Camera camera]（摄像机）之间的距离，来设置其可见性。
+			为了使得多细节层次能够被自动地更新，这个方法需要在渲染循环中被调用。
 		</p>
 
-		<h2>Source</h2>
-
+		<h2>源代码</h2>
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
 </html>

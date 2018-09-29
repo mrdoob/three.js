@@ -1,78 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="list.js"></script>
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
-		[page:Object3D] &rarr;
 
-		<h1>[name]</h1>
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="list.js"></script>
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-		<p class="desc">
-			A class for displaying points.
-			The points are rendered by the [page:WebGLRenderer] using
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.POINTS].
-		</p>
+<body>
+	[page:Object3D] &rarr;
 
+	<h1>点（[name]）</h1>
 
-		<h2>Constructor</h2>
-
-		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
-		<p>
-			[page:Geometry geometry] — (optional) an instance of [page:Geometry] or [page:BufferGeometry].
-				Default is a new [page:BufferGeometry].<br />
-			[page:Material material] — (optional) a [page:Material]. Default is a new [page:PointsMaterial]
-				with a random color.
-		</p>
+	<p class="desc">
+		一个用于显示点的类。
+		由[page:WebGLRenderer]渲染的点使用
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.POINTS]。
+	</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Object3D] class for common properties.</p>
+	<h2>构造器</h2>
 
-		<h3>[property:Geometry geometry]</h3>
-		<p>
-			An instance of [page:Geometry] or [page:BufferGeometry] (or derived classes),
-			defining the object's structure.<br /><br />
-
-			Its recommended to always use a [page:BufferGeometry] if possible for best performance.
-		</p>
-
-		<h3>[property:Boolean isPoints]</h3>
-		<p>
-			Used to check whether this or derived classes are points. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
-		<h3>[property:Material material]</h3>
-		<p>
-			An instance of [page:Material], defining the object's appearance.
-			Default is a [page:PointsMaterial] with a random color.
-		</p>
+	<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+	<p>
+		[page:Geometry geometry] —— （可选）是一个[page:Geometry]或者[page:BufferGeometry]的实例，默认值是一个新的[page:BufferGeometry]。
+		<br />
+		[page:Material material] —— （可选） 是一个对象，默认值是一个具有随机颜色的新的[page:PointsMaterial]。
+	</p>
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:Object3D] class for common methods.</p>
+	<h2>属性</h2>
+	<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
 
-		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
-		<p>
-		Get intersections between a casted ray and this Points.
-		[page:Raycaster.intersectObject] will call this method.
-		</p>
+	<h3>[property:Geometry geometry]</h3>
+	<p>
+		一个[page:Geometry]或[page:BufferGeometry]的实例（或者派生类），定义了物体的结构。<br /><br />
+		如有可能，推荐总是使用[page:BufferGeometry]来获得最佳表现。
+	</p>
 
-		<h3>[method:Points clone]()</h3>
-		<p>
-		Returns a clone of this Points object and its descendants.
-		</p>
+	<h3>[property:Boolean isPoints]</h3>
+	<p>用于检查这个类或者其派生类是否为点，默认值为*true*。<br /><br />
+		你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
+	</p>
+
+	<h3>[property:Material material]</h3>
+	<p>
+		[page:Material]的实例。定义了物体的外观。默认值是一个具有随机颜色的[page:PointsMaterial]。
+	</p>
 
 
-		<h2>Source</h2>
+	<h2>方法</h2>
+	<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+	<p>
+		在一条投射出去的[page:Ray]（射线）和点之间产生交互。
+		[page:Raycaster.intersectObject]将会调用这个方法。
+	</p>
 
-	</body>
+	<h3>[method:Points clone]()</h3>
+	<p>
+		返回这个点及其子集的一个克隆对象。
+	</p>
+
+
+	<h2>源代码</h2>
+
+	[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+
+</body>
+
 </html>

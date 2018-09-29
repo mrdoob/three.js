@@ -10,11 +10,11 @@
 	<body>
 		[page:BufferGeometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>边缘几何体（[name]）</h1>
 
-		<p class="desc">This can be used as a helper object to view the edges of a [page:Geometry Geometry] object.</p>
+		<p class="desc">这可以作为一个辅助对象来查看[page:Geometry Geometry]的边缘。</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		[example:webgl_helpers helpers]
 
@@ -25,22 +25,22 @@ var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 
 scene.add( line );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]( [param:Geometry geometry], [param:Integer thresholdAngle] )</h3>
 		<p>
-		geometry — Any geometry object.<br />
-		thresholdAngle — An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
+		geometry — 任何一个几何体对象。<br />
+		thresholdAngle — 仅当相邻面的法线之间的角度（单位为角度）超过这个值时，才会渲染边缘。默认值为1。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

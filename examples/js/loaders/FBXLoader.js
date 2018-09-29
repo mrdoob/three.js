@@ -3939,7 +3939,6 @@ THREE.FBXLoader = ( function () {
 		var lPreRotationM = new THREE.Matrix4();
 		var lRotationM = new THREE.Matrix4();
 		var lPostRotationM = new THREE.Matrix4();
-		var lTransform = new THREE.Matrix4();
 
 		var lScalingM = new THREE.Matrix4();
 		var lScalingPivotM = new THREE.Matrix4();
@@ -3949,7 +3948,6 @@ THREE.FBXLoader = ( function () {
 
 		var lParentGX = new THREE.Matrix4();
 		var lGlobalT = new THREE.Matrix4();
-		var lGlobalRS = new THREE.Matrix4();
 
 		var inheritType = ( transformData.inheritType ) ? transformData.inheritType : 0;
 
@@ -3996,16 +3994,17 @@ THREE.FBXLoader = ( function () {
 		lParentGX.extractRotation( lParentGRM );
 
 		// Global Shear*Scaling
-		var lLSM = new THREE.Matrix4();
-		var lParentGSM = new THREE.Matrix4();
-		var lParentGRSM = new THREE.Matrix4();
 		var lParentTM = new THREE.Matrix4();
+		var lLSM;
+		var lParentGSM;
+		var lParentGRSM;
 
 		lParentTM.copyPosition( lParentGX );
 		lParentGRSM = lParentTM.getInverse( lParentTM ).multiply( lParentGX );
 		lParentGSM = lParentGRM.getInverse( lParentGRM ).multiply( lParentGRSM );
 		lLSM = lScalingM;
-
+		
+		var lGlobalRS;
 		if ( inheritType === 0 ) {
 
 			lGlobalRS = lParentGRM.multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
@@ -4025,7 +4024,7 @@ THREE.FBXLoader = ( function () {
 		}
 
 		// Calculate the local transform matrix
-		lTransform = lTranslationM.multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM.getInverse( lRotationPivotM ) ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM.getInverse( lScalingPivotM ) );
+		var lTransform = lTranslationM.multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM.getInverse( lRotationPivotM ) ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM.getInverse( lScalingPivotM ) );
 
 		var lLocalTWithAllPivotAndOffsetInfo = new THREE.Matrix4().copyPosition( lTransform );
 

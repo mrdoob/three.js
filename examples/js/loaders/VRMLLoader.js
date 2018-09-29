@@ -1067,7 +1067,7 @@ THREE.VRMLLoader.prototype = {
 
 							positions = newPositions;
 							normals = newNormals;
-							color = newColors;
+							colors = newColors;
 							uvs = newUvs;
 
 							geometry.setIndex( newIndexes );
