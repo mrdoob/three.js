@@ -140,7 +140,8 @@
 
 								// calculate velocity towards another side of platform from jump pad position
 								temp.copy( pads[ j ] );
-								temp.y = 0; temp.setLength( - 0.8 );
+								temp.y = 0;
+								temp.setLength( - 0.8 );
 								temp.y = 0.7;
 
 								motion.airborne = true;
@@ -227,7 +228,8 @@
 
 							// wrap horizontal rotation to 0...2π
 
-							motion.rotation.y += tau; motion.rotation.y %= tau;
+							motion.rotation.y += tau;
+							motion.rotation.y %= tau;
 
 							timeLeft -= dt;
 
@@ -331,7 +333,8 @@
 				var lastTimeStamp;
 				var render = function ( timeStamp ) {
 
-					var timeElapsed = lastTimeStamp ? timeStamp - lastTimeStamp : 0; lastTimeStamp = timeStamp;
+					var timeElapsed = lastTimeStamp ? timeStamp - lastTimeStamp : 0;
+					lastTimeStamp = timeStamp;
 
 					// call our game loop with the time elapsed since last rendering, in ms
 					gameLoop( timeElapsed );
