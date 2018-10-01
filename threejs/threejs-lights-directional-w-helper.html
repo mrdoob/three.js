@@ -126,7 +126,7 @@ function main() {
 
     const gui = new dat.GUI();
     gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-    gui.add(light, 'intensity', 0, 2);
+    gui.add(light, 'intensity', 0, 2, 0.01);
 
     makeXYZGUI(gui, light.position, 'position', updateLight);
     makeXYZGUI(gui, light.target.position, 'target', updateLight);

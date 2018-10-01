@@ -106,7 +106,7 @@ function main() {
 
     const gui = new dat.GUI();
     gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-    gui.add(light, 'intensity', 0, 2);
+    gui.add(light, 'intensity', 0, 2, 0.01);
   }
 
   function resizeRendererToDisplaySize(renderer) {

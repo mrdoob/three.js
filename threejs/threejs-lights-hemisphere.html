@@ -109,7 +109,7 @@ function main() {
     const gui = new dat.GUI();
     gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
     gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
-    gui.add(light, 'intensity', 0, 2);
+    gui.add(light, 'intensity', 0, 2, 0.01);
   }
 
   function resizeRendererToDisplaySize(renderer) {

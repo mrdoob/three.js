@@ -139,7 +139,7 @@ function main() {
 
     const gui = new dat.GUI();
     gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-    gui.add(light, 'intensity', 0, 10);
+    gui.add(light, 'intensity', 0, 10, 0.01);
     gui.add(light, 'width', 0, 20).onChange(updateLight);
     gui.add(light, 'height', 0, 20).onChange(updateLight);
     gui.add(new DegRadHelper(light.rotation, 'x'), 'value', -180, 180).name('x rotation').onChange(updateLight);

@@ -156,7 +156,7 @@ And here's our code setting up dat.GUI
 ```javascript
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2);
+gui.add(light, 'intensity', 0, 2, 0.01);
 ```
 
 And here's the result
@@ -204,7 +204,7 @@ const gui = new dat.GUI();
 -gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 +gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
 +gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
-gui.add(light, 'intensity', 0, 2);
+gui.add(light, 'intensity', 0, 2, 0.01);
 ```
 
 The result:
@@ -242,7 +242,7 @@ our GUI.
 ```javascript
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2);
+gui.add(light, 'intensity', 0, 2, 0.01);
 gui.add(light.target.position, 'x', -10, 10);
 gui.add(light.target.position, 'z', -10, 10);
 gui.add(light.target.position, 'y', 0, 10);
@@ -294,7 +294,7 @@ and the target's position like this
 
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2);
+gui.add(light, 'intensity', 0, 2, 0.01);
 
 +makeXYZGUI(gui, light.position, 'position', updateLight);
 +makeXYZGUI(gui, light.target.position, 'target', updateLight);
@@ -359,7 +359,7 @@ Let's setup the GUI so we can adjust the distance.
 ```javascript
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2);
+gui.add(light, 'intensity', 0, 2, 0.01);
 +gui.add(light, 'distance', 0, 40).onChange(updateLight);
 
 makeXYZGUI(gui, light.position, 'position', updateLight);
@@ -416,7 +416,7 @@ outer cone. When `penumbra` is .5 then the light fades starting from 50% between
 the center of the outer cone.
 
 ```javascript
-gui.add(light, 'penumbra', 0, 1);
+gui.add(light, 'penumbra', 0, 1, 0.01);
 ```
 
 {{{example url="../threejs-lights-spot-w-helper.html" }}}
@@ -507,7 +507,7 @@ its `width` and `height`
 ```javascript
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 10);
+gui.add(light, 'intensity', 0, 10, 0.01);
 gui.add(light, 'width', 0, 20).onChange(updateLight);
 gui.add(light, 'height', 0, 20).onChange(updateLight);
 gui.add(new DegRadHelper(light.rotation, 'x'), 'value', -180, 180).name('x rotation').onChange(updateLight);
@@ -558,7 +558,7 @@ and we'll add gui so we can change the `power` and `decay`
 ```javascript
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'decay', 0, 4);
+gui.add(light, 'decay', 0, 4, 0.01);
 gui.add(light, 'power', 0, 2000);
 ```
 
