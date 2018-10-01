@@ -59,6 +59,7 @@ var files = {
 		"webgl_interactive_raycasting_points",
 		"webgl_interactive_voxelpainter",
 		"webgl_kinect",
+		"webgl_layers",
 		"webgl_lensflares",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
@@ -309,11 +310,11 @@ var files = {
 	"webgl deferred": [
 		"webgldeferred_animation"
 	],
-	/*
 	"webgl2": [
-		"webgl2_sandbox"
+		"webgl2_materials_texture3d",
+		"webgl2_materials_texture3d_volume"
+		// "webgl2_sandbox"
 	],
-	*/
 	"webaudio": [
 		"webaudio_orientation",
 		"webaudio_sandbox",

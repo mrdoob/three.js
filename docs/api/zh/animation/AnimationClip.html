@@ -11,7 +11,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			动画剪辑（AnimationClip）是一个可重用的关键帧轨迹集，它代表动画。<br /><br />
+			动画剪辑（AnimationClip）是一个可重用的关键帧轨道集，它代表动画。<br /><br />
 
 			在使用手册的“下一步”章节中，“动画系统”一文对three.js动画系统中的不同元素作出了概述
 		</p>
@@ -24,7 +24,7 @@
 		<p>
 			[page:String name] - 此剪辑的名称<br />
 			[page:Number duration] - 持续时间 (单位秒). 如果传入负数, 持续时间将会从传入的数组中计算得到。<br />
-			[page:Array tracks] - 一个由关键帧轨迹（[page:KeyframeTrack KeyframeTracks]）组成的数组。<br /><br />
+			[page:Array tracks] - 一个由关键帧轨道（[page:KeyframeTrack KeyframeTracks]）组成的数组。<br /><br />
 
 			说明: 与其直接调用构造函数实例化一个动画剪辑, 不如使用其静态方法中的一个来创建：
 			用JSON ([page:.parse parse]), 用变形目标序列([page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence],
@@ -38,7 +38,7 @@
 
 		<h3>[property:Number duration]</h3>
 		<p>
-			剪辑的持续时间 (单位秒). 可以通过[page:.resetDuration resetDuration]从轨迹数组（[page:.tracks tracks]）计算出来。
+			剪辑的持续时间 (单位秒). 可以通过[page:.resetDuration resetDuration]从轨道数组（[page:.tracks tracks]）计算出来。
 
 		</p>
 
@@ -49,7 +49,7 @@
 
 		<h3>[property:Array tracks]</h3>
 		<p>
-            一个包含该剪辑中有动画的所有属性的关键帧轨迹（[page:KeyframeTrack]）的数组。
+            一个包含该剪辑中有动画的所有属性的关键帧轨道（[page:KeyframeTrack]）的数组。
 		</p>
 
 		<h3>[property:String uuid]</h3>
@@ -64,24 +64,24 @@
 
 		<h3>[method:this optimize]()</h3>
 		<p>
-            通过移除等效的顺序键（在变形目标序列中很常见）来优化每一个轨迹
+            通过移除等效的顺序键（在变形目标序列中很常见）来优化每一个轨道
 
 		</p>
 
 		<h3>[method:this resetDuration]()</h3>
 		<p>
-			将剪辑的持续时间（[page:.duration duration]）设为最长的关键帧轨迹([page:KeyframeTrack])的持续时间。
+			将剪辑的持续时间（[page:.duration duration]）设为最长的关键帧轨道([page:KeyframeTrack])的持续时间。
 			.
 		</p>
 
 		<h3>[method:this trim]()</h3>
 		<p>
-			修剪所有的轨迹到该剪辑的持续时间。
+			修剪所有的轨道到该剪辑的持续时间。
 		</p>
 
 		<h3>[method:Boolean validate]()</h3>
 		<p>
-            对剪辑中的每个轨迹执行最小验证。如果所有轨道都有效，返回true。
+            对剪辑中的每个轨道执行最小验证。如果所有轨道都有效，返回true。
 		</p>
 
 

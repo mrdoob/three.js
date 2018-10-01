@@ -44,6 +44,7 @@ import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { DataTextureLoader } from './loaders/DataTextureLoader.js';
+import { JSONLoader } from './loaders/JSONLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
@@ -434,6 +435,17 @@ export function BinaryTextureLoader( manager ) {
 	return new DataTextureLoader( manager );
 
 }
+
+Object.assign( JSONLoader.prototype, {
+
+	setTexturePath: function ( value ) {
+
+		console.warn( 'THREE.JSONLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+		return this.setResourcePath( value );
+
+	}
+
+} );
 
 //
 

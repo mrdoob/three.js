@@ -5,12 +5,12 @@
 import { Texture } from './Texture.js';
 import { NearestFilter } from '../constants.js';
 
-function Texture3D( data, width, height, depth ) {
+function DataTexture3D( data, width, height, depth ) {
 
 	// We're going to add .setXXX() methods for setting properties later.
-	// Users can still set in Texture3D directly.
+	// Users can still set in DataTexture3D directly.
 	//
-	//	var texture = new THREE.Texture3D( data, width, height, depth );
+	//	var texture = new THREE.DataTexture3D( data, width, height, depth );
 	// 	texture.anisotropy = 16;
 	//
 	// See #14839
@@ -27,8 +27,8 @@ function Texture3D( data, width, height, depth ) {
 
 }
 
-Texture3D.prototype = Object.create( Texture.prototype );
-Texture3D.prototype.constructor = Texture3D;
-Texture3D.prototype.isTexture3D = true;
+DataTexture3D.prototype = Object.create( Texture.prototype );
+DataTexture3D.prototype.constructor = DataTexture3D;
+DataTexture3D.prototype.isDataTexture3D = true;
 
-export { Texture3D };
+export { DataTexture3D };

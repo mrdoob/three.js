@@ -67,7 +67,7 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
@@ -93,7 +93,11 @@
 
 	<script>
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	if ( WEBGL.isWebGLAvailable() === false ) {
+
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
 
 	var scene, camera, renderer;
 
@@ -131,8 +135,8 @@
 		light.position.set( 0, 200, 100 );
 		light.castShadow = true;
 		light.shadow.camera.top = 180;
-		light.shadow.camera.bottom = -100;
-		light.shadow.camera.left = -120;
+		light.shadow.camera.bottom = - 100;
+		light.shadow.camera.left = - 120;
 		light.shadow.camera.right = 120;
 		scene.add( light );
 
@@ -163,13 +167,13 @@
 		//
 
 		var gltfLoader = new THREE.GLTFLoader();
-		gltfLoader.load( 'models/gltf/BoomBox/glTF-Binary/BoomBox.glb', function( gltf ) {
+		gltfLoader.load( 'models/gltf/BoomBox/glTF-Binary/BoomBox.glb', function ( gltf ) {
 
-			var boomBox =  gltf.scene;
+			var boomBox = gltf.scene;
 			boomBox.position.set( 0, 0.2, 0 );
 			boomBox.scale.set( 20, 20, 20 );
 
-			boomBox.traverse( function( object ) {
+			boomBox.traverse( function ( object ) {
 
 				if ( object.isMesh ) {
 
@@ -221,7 +225,7 @@
 
 	}
 
-	function onWindowResize( event ) {
+	function onWindowResize() {
 
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();

@@ -96,7 +96,7 @@
 				renderer = new THREE.CanvasRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
@@ -163,9 +163,10 @@
 
 			function onDocumentKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
-					case 16: isShiftDown = true; break;
+					case 16: isShiftDown = true;
+						break;
 
 				}
 
@@ -173,16 +174,18 @@
 
 			function onDocumentKeyUp( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
-					case 16: isShiftDown = false; break;
+					case 16: isShiftDown = false;
+						break;
 
 				}
+
 			}
 
 			function save() {
 
-				window.open( renderer.domElement.toDataURL('image/png'), 'mywindow' );
+				window.open( renderer.domElement.toDataURL( 'image/png' ), 'mywindow' );
 				return false;
 
 			}

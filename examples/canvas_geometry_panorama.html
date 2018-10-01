@@ -42,14 +42,11 @@
 			var camera, scene, renderer;
 
 			var texture_placeholder,
-			isUserInteracting = false,
-			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-			onPointerDownPointerX = 0, onPointerDownPointerY = 0,
-			onPointerDownLon = 0, onPointerDownLat = 0,
-			lon = 90, onMouseDownLon = 0,
-			lat = 0, onMouseDownLat = 0,
-			phi = 0, theta = 0,
-			target = new THREE.Vector3();
+				isUserInteracting = false,
+				onPointerDownPointerX = 0, onPointerDownPointerY = 0,
+				onPointerDownLon = 0, onPointerDownLat = 0,
+				lon = 90, lat = 0, phi = 0, theta = 0,
+				target = new THREE.Vector3();
 
 			init();
 			animate();
@@ -79,7 +76,7 @@
 					loadTexture( 'textures/cube/skybox/py.jpg' ), // top
 					loadTexture( 'textures/cube/skybox/ny.jpg' ), // bottom
 					loadTexture( 'textures/cube/skybox/pz.jpg' ), // back
-					loadTexture( 'textures/cube/skybox/nz.jpg' )  // front
+					loadTexture( 'textures/cube/skybox/nz.jpg' ) // front
 
 				];
 
@@ -160,7 +157,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				isUserInteracting = false;
 
@@ -199,8 +196,8 @@
 
 					event.preventDefault();
 
-					lon = ( onPointerDownPointerX - event.touches[0].pageX ) * 0.1 + onPointerDownLon;
-					lat = ( event.touches[0].pageY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+					lon = ( onPointerDownPointerX - event.touches[ 0 ].pageX ) * 0.1 + onPointerDownLon;
+					lat = ( event.touches[ 0 ].pageY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
 
 				}
 

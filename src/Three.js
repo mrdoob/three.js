@@ -24,7 +24,7 @@ export { Points } from './objects/Points.js';
 export { Group } from './objects/Group.js';
 export { VideoTexture } from './textures/VideoTexture.js';
 export { DataTexture } from './textures/DataTexture.js';
-export { Texture3D } from './textures/Texture3D.js';
+export { DataTexture3D } from './textures/DataTexture3D.js';
 export { CompressedTexture } from './textures/CompressedTexture.js';
 export { CubeTexture } from './textures/CubeTexture.js';
 export { CanvasTexture } from './textures/CanvasTexture.js';
