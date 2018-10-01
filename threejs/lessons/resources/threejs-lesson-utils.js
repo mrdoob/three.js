@@ -2,6 +2,7 @@ import * as THREE from '../../resources/threejs/r114/build/three.module.js';
 import {TrackballControls} from '../../resources/threejs/r114/examples/jsm/controls/TrackballControls.js';
 
 export const threejsLessonUtils = {
+  _afterPrettifyFuncs: [],
   init() {
     if (this.renderer) {
       return;
@@ -205,6 +206,14 @@ export const threejsLessonUtils = {
     };
 
     this.renderFuncs.push(render);
+  },
+  onAfterPrettify(fn) {
+    this._afterPrettifyFuncs.push(fn);
+  },
+  afterPrettify() {
+    this._afterPrettifyFuncs.forEach((fn) => {
+      fn();
+    });
   },
 };
 

@@ -370,6 +370,9 @@ $(document).ready(function($){
     window.location.href = this.value;
   });
 
+  if (window.threejsLessonUtils) {
+    window.threejsLessonUtils.afterPrettify();
+  }
 });
 }(jQuery));
 
