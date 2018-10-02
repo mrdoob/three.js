@@ -94,6 +94,7 @@ import cube_frag from './ShaderLib/cube_frag.glsl';
 import cube_vert from './ShaderLib/cube_vert.glsl';
 import depth_frag from './ShaderLib/depth_frag.glsl';
 import depth_vert from './ShaderLib/depth_vert.glsl';
+import depthRGBA_vert from './ShaderLib/depthRGBA_vert.glsl';
 import distanceRGBA_frag from './ShaderLib/distanceRGBA_frag.glsl';
 import distanceRGBA_vert from './ShaderLib/distanceRGBA_vert.glsl';
 import equirect_frag from './ShaderLib/equirect_frag.glsl';
@@ -216,6 +217,7 @@ export var ShaderChunk = {
 	cube_vert: cube_vert,
 	depth_frag: depth_frag,
 	depth_vert: depth_vert,
+	depthRGBA_vert: depthRGBA_vert,
 	distanceRGBA_frag: distanceRGBA_frag,
 	distanceRGBA_vert: distanceRGBA_vert,
 	equirect_frag: equirect_frag,

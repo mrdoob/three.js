@@ -1,5 +1,11 @@
 #define PHYSICAL
 
+#ifdef INSTANCED
+	attribute vec3 instanceOffset;
+	attribute vec3 instanceColor;
+	attribute float instanceScale;
+#endif
+
 varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
@@ -26,6 +32,13 @@ void main() {
 	#include <uv2_vertex>
 	#include <color_vertex>
 
+	// vertex colors instanced
+	#ifdef INSTANCED
+		#ifdef USE_COLOR
+			vColor.xyz = instanceColor.xyz;
+		#endif
+	#endif
+
 	#include <beginnormal_vertex>
 	#include <morphnormal_vertex>
 	#include <skinbase_vertex>
@@ -39,6 +52,14 @@ void main() {
 #endif
 
 	#include <begin_vertex>
+
+	// position instanced
+	#ifdef INSTANCED
+		transformed *= instanceScale;
+		transformed = transformed + instanceOffset;
+	#endif
+
+	
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
 	#include <displacementmap_vertex>
