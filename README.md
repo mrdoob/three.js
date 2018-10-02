@@ -74,7 +74,7 @@ If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
 
 ### Change log ###
 
-[releases](https://github.com/mrdoob/three.js/releases)
+[Releases](https://github.com/mrdoob/three.js/releases)
 
 
 [npm-badge]: https://img.shields.io/npm/v/three.svg
