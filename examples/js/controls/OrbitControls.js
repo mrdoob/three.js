@@ -9,9 +9,9 @@
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
 //
-//    Orbit - left mouse / touch: one-finger move
-//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-//    Pan - right mouse, or left mouse + ctrl/metaKey, or arrow keys / touch: two-finger move
+// Orbit - left mouse / touch: one-finger move
+// Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+// Pan - right mouse, or left mouse + ctrl/metaKey, or arrow keys / touch: two-finger move
 
 THREE.OrbitControls = function ( object, domElement ) {
 
@@ -82,10 +82,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.position0 = this.object.position.clone();
 	this.zoom0 = this.object.zoom;
 
-	//
 	// public methods
-	//
-
 	this.getPolarAngle = function () {
 
 		return spherical.phi;
@@ -212,11 +209,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 				zoomChanged = false;
 
 				return true;
-
 			}
 
 			return false;
-
 		};
 
 	}();
@@ -240,9 +235,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	//
 	// internals
-	//
 
 	var scope = this;
 
