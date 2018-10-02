@@ -1,3 +1,8 @@
+#ifdef INSTANCED
+	attribute vec3 instanceOffset;
+	attribute vec3 instanceColor;
+	attribute float instanceScale;
+#endif
 #include <common>
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
@@ -14,6 +19,13 @@ void main() {
 	#include <uv_vertex>
 	#include <uv2_vertex>
 	#include <color_vertex>
+
+	#ifdef INSTANCED
+		#ifdef USE_COLOR
+			vColor.xyz = instanceColor.xyz;
+		#endif
+	#endif
+
 	#include <skinbase_vertex>
 
 	#ifdef USE_ENVMAP
@@ -26,6 +38,12 @@ void main() {
 	#endif
 
 	#include <begin_vertex>
+
+	#ifdef INSTANCED
+		transformed *= instanceScale;
+		transformed = transformed + instanceOffset;
+	#endif
+	
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
 	#include <project_vertex>

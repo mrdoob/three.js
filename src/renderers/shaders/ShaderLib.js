@@ -163,6 +163,18 @@ var ShaderLib = {
 
 	},
 
+	depthRGBA: {
+
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.common,
+			UniformsLib.displacementmap
+		] ),
+
+		vertexShader: ShaderChunk.depthRGBA_vert,
+		fragmentShader: ShaderChunk.depth_frag
+
+	},
+
 	normal: {
 
 		uniforms: UniformsUtils.merge( [
