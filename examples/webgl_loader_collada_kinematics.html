@@ -39,12 +39,16 @@
 		<script src="js/libs/tween.min.js"></script>
 		<script src="js/loaders/ColladaLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -102,7 +106,7 @@
 
 				scene.add( dae );
 
-				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
@@ -149,7 +153,7 @@
 
 							tweenParameters[ prop ] = position;
 
-							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max )
+							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max );
 
 						}
 
@@ -212,7 +216,7 @@
 				camera.position.y = 10;
 				camera.position.z = Math.sin( timer ) * 20;
 
-				camera.lookAt( new THREE.Vector3( 0, 5, 0 ) );
+				camera.lookAt( 0, 5, 0 );
 
 				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>蒙皮网格（[name]）</h1>
+
+		<p class="desc">
+			具有[page:Skeleton]（骨架）和[page:Bone bones]（骨骼）的网格，可用于给几何体上的顶点添加动画。
+			其材质必须支持蒙皮，并且已经启用了蒙皮 —— 请阅读[page:MeshStandardMaterial.skinning]。
+		</p>
+
+		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>示例</h2>
+
+		<code>
+		var geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
+
+		//Create the skin indices and skin weights
+		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+
+			// Imaginary functions to calculate the indices and weights
+			// This part will need to be changed depending your skeleton and model
+			var skinIndex = calculateSkinIndex( geometry.vertices, i );
+			var skinWeight = calculateSkinWeight( geometry.vertices, i );
+
+			// Ease between each bone
+			geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex + 1, 0, 0 ) );
+			geometry.skinWeights.push( new THREE.Vector4( 1 - skinWeight, skinWeight, 0, 0 ) );
+
+		}
+
+		var mesh = new THREE.SkinnedMesh( geometry, material );
+
+		// See example from THREE.Skeleton for the armSkeleton
+		var rootBone = armSkeleton.bones[ 0 ];
+		mesh.add( rootBone );
+
+		// Bind the skeleton to the mesh
+		mesh.bind( armSkeleton );
+
+		// Move the bones and manipulate the model
+		armSkeleton.bones[ 0 ].rotation.x = -0.1;
+		armSkeleton.bones[ 1 ].rotation.x = 0.2;
+		</code>
+
+		<h2>构造器</h2>
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<p>
+    [page:Geometry geometry] —— 一个[page:Geometry]或者[page:BufferGeometry]（推荐）的实例。
+	[page:Geometry.skinIndices skinIndices] 和 [page:Geometry.skinWeights skinWeights] 在几何体上应当被设置为true。<br />
+    [page:Material material] —— （可选）一个[page:Material]的实例，默认值是一个新的[page:MeshBasicMaterial]。
+		</p>
+
+
+
+
+
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Mesh]来查看共有属性。</p>
+
+		<h3>[property:string bindMode]</h3>
+		<p>
+			“attached”（附加）或者“detached”（分离）。“attached”使用[page:SkinnedMesh.matrixWorld]
+			属性作为对骨骼的基本变换矩阵，“detached”则使用[page:SkinnedMesh.bindMatrix]。
+			默认值是“attached”。
+		</p>
+
+		<h3>[property:Matrix4 bindMatrix]</h3>
+		<p>
+		用于绑定的骨骼变换的基础矩阵。
+		</p>
+
+		<h3>[property:Matrix4 bindMatrixInverse]</h3>
+		<p>
+		用于重置绑定的骨骼变换的基础矩阵。
+		</p>
+
+		<h3>[property:Boolean isSkinnedMesh]</h3>
+		<p>
+			用于检查这个类或者其派生类是否为蒙皮网格，默认值为*true*。<br /><br />
+			你不应当对这个属性进行改变，因为它在使用，以用于优化。
+		</p>
+
+		<h3>[property:Skeleton skeleton]</h3>
+		<p>
+			[page:Skeleton]是由从构造函数中传入的[page:Geometry]中的[page:Geometry.bones bones]来创建的。
+		</p>
+
+
+
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Mesh]来查看共有方法。</p>
+
+		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
+		<p>
+		[page:Skeleton skeleton] —— 由一棵[page:Bone Bones]树创建的[page:Skeleton]。<br/>
+		[page:Matrix4 bindMatrix] —— 代表着骨架基本变换的[page:Matrix4]（4x4矩阵）。<br /><br />
+		将骨架绑定到一个蒙皮网格上。bindMatrix会被保存到.bindMatrix属性中，其逆矩阵.bindMatrixInverse也会被计算出来。
+		它在构造函数中会被自动调用，其骨架是由传入到构造函数的[page:Geometry]中的[page:Geometry.bones bones]来创建的。
+		</p>
+
+		<h3>[method:SkinnedMesh clone]()</h3>
+		<p>
+		返回当前SkinnedMesh对象的一个克隆及其任何后代。
+		</p>
+
+		<h3>[method:null normalizeSkinWeights]()</h3>
+		<p>
+		规范化[page:Geometry.skinWeights]矢量。不会对[page:BufferGeometry]产生影响。
+		</p>
+
+		<h3>[method:null pose]()</h3>
+		<p>
+		这个方法设置了在“休息”状态下蒙皮网格的姿势（重置姿势）。
+		</p>
+
+		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
+		<p>
+		更新[page:Matrix4 MatrixWorld]矩阵。
+		</p>
+
+		<h3>[method:null initBones]()</h3>
+		<p>
+		从内部几何体中创建一个分层[page:Bone bones]对象的数组。
+		</p>
+
+		<h2>源代码</h2>
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

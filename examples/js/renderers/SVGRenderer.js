@@ -18,38 +18,38 @@ THREE.SVGRenderer = function () {
 	console.log( 'THREE.SVGRenderer', THREE.REVISION );
 
 	var _this = this,
-	_renderData, _elements, _lights,
-	_projector = new THREE.Projector(),
-	_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ),
-	_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
+		_renderData, _elements, _lights,
+		_projector = new THREE.Projector(),
+		_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ),
+		_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
 
-	_v1, _v2, _v3, _v4,
+		_v1, _v2, _v3,
 
-	_clipBox = new THREE.Box2(),
-	_elemBox = new THREE.Box2(),
+		_clipBox = new THREE.Box2(),
+		_elemBox = new THREE.Box2(),
 
-	_color = new THREE.Color(),
-	_diffuseColor = new THREE.Color(),
-	_ambientLight = new THREE.Color(),
-	_directionalLights = new THREE.Color(),
-	_pointLights = new THREE.Color(),
-	_clearColor = new THREE.Color(),
-	_clearAlpha = 1,
+		_color = new THREE.Color(),
+		_diffuseColor = new THREE.Color(),
+		_ambientLight = new THREE.Color(),
+		_directionalLights = new THREE.Color(),
+		_pointLights = new THREE.Color(),
+		_clearColor = new THREE.Color(),
+		_clearAlpha = 1,
 
-	_vector3 = new THREE.Vector3(), // Needed for PointLight
-	_centroid = new THREE.Vector3(),
-	_normal = new THREE.Vector3(),
-	_normalViewMatrix = new THREE.Matrix3(),
+		_vector3 = new THREE.Vector3(), // Needed for PointLight
+		_centroid = new THREE.Vector3(),
+		_normal = new THREE.Vector3(),
+		_normalViewMatrix = new THREE.Matrix3(),
 
-	_viewMatrix = new THREE.Matrix4(),
-	_viewProjectionMatrix = new THREE.Matrix4(),
+		_viewMatrix = new THREE.Matrix4(),
+		_viewProjectionMatrix = new THREE.Matrix4(),
 
-	_svgPathPool = [],
-	_svgNode, _pathCount = 0,
+		_svgPathPool = [],
+		_svgNode, _pathCount = 0,
 
-	_currentPath, _currentStyle,
+		_currentPath, _currentStyle,
 
-	_quality = 1, _precision = null;
+		_quality = 1, _precision = null;
 
 	this.domElement = _svg;
 
@@ -68,7 +68,7 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.setQuality = function( quality ) {
+	this.setQuality = function ( quality ) {
 
 		switch ( quality ) {
 
@@ -88,7 +88,7 @@ THREE.SVGRenderer = function () {
 
 	this.setPixelRatio = function () {};
 
-	this.setSize = function( width, height ) {
+	this.setSize = function ( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;
 		_svgWidthHalf = _svgWidth / 2; _svgHeightHalf = _svgHeight / 2;
@@ -120,7 +120,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function getSvgColor ( color, opacity ) {
+	function getSvgColor( color, opacity ) {
 
 		var arg = Math.floor( color.r * 255 ) + ',' + Math.floor( color.g * 255 ) + ',' + Math.floor( color.b * 255 );
 
@@ -130,9 +130,9 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function convert ( c ) {
+	function convert( c ) {
 
-		return _precision !== null ? c.toFixed(_precision) : c;
+		return _precision !== null ? c.toFixed( _precision ) : c;
 
 	}
 
@@ -252,7 +252,7 @@ THREE.SVGRenderer = function () {
 				_vector3.setFromMatrixPosition( object.matrixWorld );
 				_vector3.applyMatrix4( _viewProjectionMatrix );
 
-				var x =   _vector3.x * _svgWidthHalf;
+				var x = _vector3.x * _svgWidthHalf;
 				var y = - _vector3.y * _svgHeightHalf;
 
 				var node = object.node;
@@ -277,19 +277,19 @@ THREE.SVGRenderer = function () {
 			var light = lights[ l ];
 			var lightColor = light.color;
 
-			if ( light instanceof THREE.AmbientLight ) {
+			if ( light.isAmbientLight ) {
 
 				_ambientLight.r += lightColor.r;
 				_ambientLight.g += lightColor.g;
 				_ambientLight.b += lightColor.b;
 
-			} else if ( light instanceof THREE.DirectionalLight ) {
+			} else if ( light.isDirectionalLight ) {
 
 				_directionalLights.r += lightColor.r;
 				_directionalLights.g += lightColor.g;
 				_directionalLights.b += lightColor.b;
 
-			} else if ( light instanceof THREE.PointLight ) {
+			} else if ( light.isPointLight ) {
 
 				_pointLights.r += lightColor.r;
 				_pointLights.g += lightColor.g;
@@ -308,7 +308,7 @@ THREE.SVGRenderer = function () {
 			var light = lights[ l ];
 			var lightColor = light.color;
 
-			if ( light instanceof THREE.DirectionalLight ) {
+			if ( light.isDirectionalLight ) {
 
 				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
 
@@ -322,7 +322,7 @@ THREE.SVGRenderer = function () {
 				color.g += lightColor.g * amount;
 				color.b += lightColor.b * amount;
 
-			} else if ( light instanceof THREE.PointLight ) {
+			} else if ( light.isPointLight ) {
 
 				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
 
@@ -352,11 +352,13 @@ THREE.SVGRenderer = function () {
 		var scaleY = element.scale.y * _svgHeightHalf;
 
 		if ( material.isPointsMaterial ) {
+
 			scaleX *= material.size;
 			scaleY *= material.size;
+
 		}
 
-		var path = 'M' + convert( v1.x - scaleX * 0.5 ) + ',' + convert( v1.y - scaleY * 0.5 ) + 'h' + convert( scaleX ) + 'v' + convert( scaleY ) + 'h' + convert(-scaleX) + 'z';
+		var path = 'M' + convert( v1.x - scaleX * 0.5 ) + ',' + convert( v1.y - scaleY * 0.5 ) + 'h' + convert( scaleX ) + 'v' + convert( scaleY ) + 'h' + convert( - scaleX ) + 'z';
 		var style = "";
 
 		if ( material.isSpriteMaterial || material.isPointsMaterial ) {
@@ -397,7 +399,7 @@ THREE.SVGRenderer = function () {
 		var path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y ) + 'L' + convert( v3.positionScreen.x ) + ',' + convert( v3.positionScreen.y ) + 'z';
 		var style = '';
 
-		if ( material instanceof THREE.MeshBasicMaterial ) {
+		if ( material.isMeshBasicMaterial ) {
 
 			_color.copy( material.color );
 
@@ -407,7 +409,7 @@ THREE.SVGRenderer = function () {
 
 			}
 
-		} else if ( material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
+		} else if ( material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshStandardMaterial ) {
 
 			_diffuseColor.copy( material.color );
 
@@ -425,7 +427,7 @@ THREE.SVGRenderer = function () {
 
 			_color.multiply( _diffuseColor ).add( material.emissive );
 
-		} else if ( material instanceof THREE.MeshNormalMaterial ) {
+		} else if ( material.isMeshNormalMaterial ) {
 
 			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
 
@@ -447,11 +449,11 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function addPath ( style, path ) {
+	function addPath( style, path ) {
 
 		if ( _currentStyle === style ) {
 
-			_currentPath += path
+			_currentPath += path;
 
 		} else {
 

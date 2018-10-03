@@ -25,12 +25,36 @@ THREE.PCDLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data, url ) );
+			try {
+
+				onLoad( scope.parse( data, url ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					throw e;
+
+				}
+
+			}
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 
@@ -166,6 +190,8 @@ THREE.PCDLoader.prototype = {
 			var lines = pcdData.split( '\n' );
 
 			for ( var i = 0, l = lines.length; i < l; i ++ ) {
+
+				if ( lines[ i ] === '' ) continue;
 
 				var line = lines[ i ].split( ' ' );
 

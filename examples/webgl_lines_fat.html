@@ -38,7 +38,7 @@
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -55,9 +55,13 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var line, renderer, scene, camera, controls;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var line, renderer, scene, camera, camera2, controls;
 			var line1;
 			var matLine, matLineBasic, matLineDashed;
 			var stats;
@@ -82,6 +86,9 @@
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( - 40, 0, 60 );
+
+				camera2 = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
+				camera2.position.copy( camera.position );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 10;
@@ -165,8 +172,11 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				insetWidth = window.innerWidth / 4;
+				insetWidth = window.innerHeight / 4; // square
 				insetHeight = window.innerHeight / 4;
+
+				camera2.aspect = insetWidth / insetHeight;
+				camera2.updateProjectionMatrix();
 
 			}
 
@@ -178,17 +188,18 @@
 
 				// main scene
 
-				// renderer will set this eventually
-				matLine.resolution.set( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000, 0 );
 
 				renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
+
+				// renderer will set this eventually
+				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
 
 				renderer.render( scene, camera );
 
 				// inset scene
 
-				// renderer will set this eventually
-				//matLine.resolution.set( insetWidth, insetHeight ); // not sure what behavior we want here...
+				renderer.setClearColor( 0x222222, 1 );
 
 				renderer.clearDepth(); // important!
 
@@ -198,7 +209,13 @@
 
 				renderer.setViewport( 20, 20, insetWidth, insetHeight );
 
-				renderer.render( scene, camera );
+				camera2.position.copy( camera.position );
+				camera2.quaternion.copy( camera.quaternion );
+
+				// renderer will set this eventually
+				matLine.resolution.set( insetWidth, insetHeight ); // resolution of the inset viewport
+
+				renderer.render( scene, camera2 );
 
 				renderer.setScissorTest( false );
 
@@ -241,7 +258,7 @@
 
 				} );
 
-				gui.add( param, 'width (px)', 1, 10, 1 ).onChange( function ( val ) {
+				gui.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
 

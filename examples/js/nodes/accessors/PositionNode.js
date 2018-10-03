@@ -2,28 +2,32 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.PositionNode = function ( scope ) {
+import { TempNode } from '../core/TempNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
-	THREE.TempNode.call( this, 'v3' );
+function PositionNode( scope ) {
 
-	this.scope = scope || THREE.PositionNode.LOCAL;
+	TempNode.call( this, 'v3' );
 
-};
+	this.scope = scope || PositionNode.LOCAL;
 
-THREE.PositionNode.LOCAL = 'local';
-THREE.PositionNode.WORLD = 'world';
-THREE.PositionNode.VIEW = 'view';
-THREE.PositionNode.PROJECTION = 'projection';
+}
 
-THREE.PositionNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.PositionNode.prototype.constructor = THREE.PositionNode;
-THREE.PositionNode.prototype.nodeType = "Position";
+PositionNode.LOCAL = 'local';
+PositionNode.WORLD = 'world';
+PositionNode.VIEW = 'view';
+PositionNode.PROJECTION = 'projection';
 
-THREE.PositionNode.prototype.getType = function ( builder ) {
+PositionNode.prototype = Object.create( TempNode.prototype );
+PositionNode.prototype.constructor = PositionNode;
+PositionNode.prototype.nodeType = "Position";
+
+PositionNode.prototype.getType = function ( ) {
 
 	switch ( this.scope ) {
 
-		case THREE.PositionNode.PROJECTION:
+		case PositionNode.PROJECTION:
+
 			return 'v4';
 
 	}
@@ -32,12 +36,13 @@ THREE.PositionNode.prototype.getType = function ( builder ) {
 
 };
 
-THREE.PositionNode.prototype.isShared = function ( builder ) {
+PositionNode.prototype.isShared = function ( builder ) {
 
 	switch ( this.scope ) {
 
-		case THREE.PositionNode.LOCAL:
-		case THREE.PositionNode.WORLD:
+		case PositionNode.LOCAL:
+		case PositionNode.WORLD:
+
 			return false;
 
 	}
@@ -46,42 +51,37 @@ THREE.PositionNode.prototype.isShared = function ( builder ) {
 
 };
 
-THREE.PositionNode.prototype.generate = function ( builder, output ) {
+PositionNode.prototype.generate = function ( builder, output ) {
 
-	var material = builder.material;
 	var result;
 
 	switch ( this.scope ) {
 
-		case THREE.PositionNode.LOCAL:
+		case PositionNode.LOCAL:
 
-			material.requires.position = true;
+			builder.requires.position = true;
 
-			if ( builder.isShader( 'vertex' ) ) result = 'transformed';
-			else result = 'vPosition';
-
-			break;
-
-		case THREE.PositionNode.WORLD:
-
-			material.requires.worldPosition = true;
-
-			if ( builder.isShader( 'vertex' ) ) result = 'vWPosition';
-			else result = 'vWPosition';
+			result = builder.isShader( 'vertex' ) ? 'transformed' : 'vPosition';
 
 			break;
 
-		case THREE.PositionNode.VIEW:
+		case PositionNode.WORLD:
 
-			if ( builder.isShader( 'vertex' ) ) result = '-mvPosition.xyz';
-			else result = 'vViewPosition';
+			builder.requires.worldPosition = true;
+
+			result = 'vWPosition';
 
 			break;
 
-		case THREE.PositionNode.PROJECTION:
+		case PositionNode.VIEW:
 
-			if ( builder.isShader( 'vertex' ) ) result = '(projectionMatrix * modelViewMatrix * vec4( position, 1.0 ))';
-			else result = 'vec4( 0.0 )';
+			result = builder.isShader( 'vertex' ) ? '-mvPosition.xyz' : 'vViewPosition';
+
+			break;
+
+		case PositionNode.PROJECTION:
+
+			result = builder.isShader( 'vertex' ) ? '( projectionMatrix * modelViewMatrix * vec4( position, 1.0 ) )' : 'vec4( 0.0 )';
 
 			break;
 
@@ -91,7 +91,15 @@ THREE.PositionNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.PositionNode.prototype.toJSON = function ( meta ) {
+PositionNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.scope = source.scope;
+
+};
+
+PositionNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -106,3 +114,23 @@ THREE.PositionNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+NodeLib.addKeyword( 'position', function () {
+
+	return new PositionNode();
+
+} );
+
+NodeLib.addKeyword( 'worldPosition', function () {
+
+	return new PositionNode( PositionNode.WORLD );
+
+} );
+
+NodeLib.addKeyword( 'viewPosition', function () {
+
+	return new PositionNode( NormalNode.VIEW );
+
+} );
+
+export { PositionNode };

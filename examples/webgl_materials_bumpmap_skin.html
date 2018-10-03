@@ -27,7 +27,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -36,7 +36,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl simple single-pass skin material with <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">tangent-less bump mapping</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl simple, single-pass, skin material with tangent-less bump mapping</a> -
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
@@ -51,12 +51,18 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var statsEnabled = true;
 
@@ -125,10 +131,10 @@
 
 				//
 
-				loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function ( geometry ) {
+				loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
-					createScene( geometry, 100 )
+					createScene( gltf.scene.children[ 0 ].geometry, 100 )
 
 				} );
 
@@ -187,19 +193,19 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var mapHeight = textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				mapHeight.anisotropy = 4;
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
-				var mapSpecular = textureLoader.load( "models/json/leeperrysmith/Map-SPEC.jpg" );
+				var mapSpecular = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
 
 				mapSpecular.anisotropy = 4;
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
 				mapSpecular.format = THREE.RGBFormat;
 
-				var mapColor = textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" );
+				var mapColor = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
 
 				mapColor.anisotropy = 4;
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;

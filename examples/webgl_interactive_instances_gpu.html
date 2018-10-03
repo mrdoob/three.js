@@ -354,7 +354,7 @@
 		var mouse = new THREE.Vector2();
 		var scale = 1.03;
 
-		var loader = new THREE.JSONLoader();
+		var loader = new THREE.BufferGeometryLoader();
 
 		//create buffer for reading a single pixel
 		var pixelBuffer = new Uint8Array( 4 );
@@ -500,8 +500,9 @@
 			clean();
 
 			// make instances
-			loader.load( 'models/json/suzanne_geometry.json', function ( geo ) {
+			loader.load( 'models/json/suzanne_buffergeometry.json', function ( geo ) {
 
+				geo = geo.toNonIndexed();
 				geo.computeBoundingBox();
 				geo.boundingBox.getSize( geometrySize );
 				geometryList.push( geo );
@@ -740,29 +741,39 @@
 
 			// geometry
 
-			var bgeo = new THREE.BufferGeometry().fromGeometry( geo );
-			geometryList.push( bgeo );
-
 			var mgeo = new THREE.BufferGeometry();
 			geometryList.push( mgeo );
 
-			var pos = bgeo.attributes.position;
-			var posLen = bgeo.attributes.position.count * 3;
+			var pos = geo.attributes.position;
+			var posLen = geo.attributes.position.count * 3;
 			var vertices = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * posLen ), 3
 			);
+
+			var vertex = new THREE.Vector3();
 			var matrix = new THREE.Matrix4();
+
 			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
+
+				var offset = i * posLen;
 
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
 				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
-				vertices.set( pos.array, i * posLen );
-				matrix.applyToVector3Array( vertices.array, i * posLen, posLen )
+				vertices.set( pos.array, offset );
+
+				for ( var k = 0, l = offset; k < posLen; k += 3, l += 3 ) {
+
+					vertex.fromArray( vertices.array, l );
+					vertex.applyMatrix4( matrix );
+					vertex.toArray( vertices.array, l );
+
+				}
 
 			}
+
 			mgeo.addAttribute( 'position', vertices );
 
 			var colCount = posLen / 3;
@@ -833,13 +844,10 @@
 
 			// geometry
 
-			var bgeo = new THREE.BufferGeometry().fromGeometry( geo );
-			geometryList.push( bgeo );
-
 			var igeo = new THREE.InstancedBufferGeometry();
 			geometryList.push( igeo );
 
-			var vertices = bgeo.attributes.position.clone();
+			var vertices = geo.attributes.position.clone();
 			igeo.addAttribute( 'position', vertices );
 
 			// var matrices = new THREE.InstancedBufferAttribute(
@@ -936,12 +944,11 @@
 			// highlight box
 
 			highlightBox = new THREE.Mesh(
-				new THREE.BoxGeometry( 1, 1, 1 ),
+				new THREE.BoxBufferGeometry( 1, 1, 1 ),
 				new THREE.MeshLambertMaterial( {
 					emissive: 0xffff00,
 					transparent: true,
-					opacity: 0.5,
-					side: THREE.FrontSide
+					opacity: 0.5
 				} )
 			);
 
@@ -952,7 +959,7 @@
 				antialias: true,
 				alpha: true
 			} );
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				document.getElementById( "notSupported" ).style.display = "";
 				return;
@@ -963,7 +970,7 @@
 			//renderer.sortObjects = false;
 			container.appendChild( renderer.domElement );
 
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				throw 'ANGLE_instanced_arrays not supported';
 

@@ -9,28 +9,65 @@
 				background:#777;
 				padding:0;
 				margin:0;
-				font-weight: bold;
 				overflow:hidden;
+				font-family: Monospace;
 			}
 
 			#info {
 				position: absolute;
+				z-index: 2;
 				top: 0px;
 				width: 100%;
 				color: #ffffff;
 				padding: 5px;
-				font-family:Monospace;
+
 				font-size:13px;
 				text-align:center;
+				font-weight: bold;
 			}
 
 			a {
 				color: #ffffff;
 			}
+
+			#overlay {
+				position: absolute;
+				z-index: 1;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 1;
+				background-color: #000000;
+				color: #ffffff;
+			}
+
+			#overlay > div {
+				text-align: center;
+			}
+
+			#overlay > div > button {
+				height: 20px;
+				width: 100px;
+				background: transparent;
+				color: #ffffff;
+				outline: 1px solid #ffffff;
+				border: 0px;
+				cursor: pointer;
+			}
+
+			#overlay > div > p {
+				color: #777777;
+				font-size: 12px;
+			}
+
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -68,25 +105,39 @@
 
 	</head>
 	<body>
-
-	<div id="container"></div>
-	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio - visualizer<br/>
-		music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a>
-	</div>
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Automatic audio playback requires a user interaction.</p>
+			</div>
+		</div>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio - visualizer |
+			music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a>
+		</div>
 
 	<script>
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	if ( WEBGL.isWebGLAvailable() === false ) {
+
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
 
 	var scene, camera, renderer, analyser, uniforms;
 
-	init();
-	animate();
+	var startButton = document.getElementById( 'startButton' );
+	startButton.addEventListener( 'click', init );
 
 	function init() {
 
 		var fftSize = 128;
+
+		//
+
+		var overlay = document.getElementById( 'overlay' );
+		overlay.remove();
 
 		//
 
@@ -104,19 +155,15 @@
 
 		//
 
-		var audioLoader = new THREE.AudioLoader();
-
 		var listener = new THREE.AudioListener();
 
 		var audio = new THREE.Audio( listener );
 
-		audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3', function ( buffer ) {
+		var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
+		mediaElement.loop = true;
+		mediaElement.play();
 
-			audio.setBuffer( buffer );
-			audio.setLoop( true );
-			audio.play();
-
-		} );
+		audio.setMediaElementSource( mediaElement );
 
 		analyser = new THREE.AudioAnalyser( audio, fftSize );
 
@@ -144,6 +191,8 @@
 		//
 
 		window.addEventListener( 'resize', onResize, false );
+
+		animate();
 
 	}
 

@@ -1,5 +1,6 @@
 import { Line } from './Line.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -47,7 +48,7 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 					}
 
-					geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
+					geometry.addAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
 
 				} else {
 

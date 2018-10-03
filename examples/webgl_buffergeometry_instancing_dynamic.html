@@ -27,7 +27,7 @@
 			color: #ffffff;
 		}
 
-		#oldie a {
+		#webglmessage a {
 			color: #da0;
 		}
 
@@ -50,7 +50,7 @@
 
 	<script src="../build/three.js"></script>
 
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vertexShader" type="x-shader/x-vertex">
@@ -66,11 +66,17 @@
 
 		varying vec2 vUv;
 
+		// http://www.geeks3d.com/20141201/how-to-rotate-a-vertex-by-a-quaternion-in-glsl/
+
+		vec3 applyQuaternionToVector( vec4 q, vec3 v ){
+
+			return v + 2.0 * cross( q.xyz, cross( q.xyz, v ) + q.w * v );
+
+		}
+
 		void main() {
 
-			vec3 vPosition = position;
-			vec3 vcV = cross( orientation.xyz, vPosition );
-			vPosition = vcV * ( 2.0 * orientation.w ) + ( cross( orientation.xyz, vcV ) * 2.0 + vPosition );
+			vec3 vPosition = applyQuaternionToVector( orientation, position );
 
 			vUv = uv;
 
@@ -95,7 +101,11 @@
 
 	<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var container, stats;
 		var camera, scene, renderer, mesh;
@@ -192,7 +202,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				document.getElementById( 'notSupported' ).style.display = '';
 				return;

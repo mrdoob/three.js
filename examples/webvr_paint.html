@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webvr - paint</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-09-11 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-09-11" content="AqhFUYKxq/d+E8CDT0fuYRCg8TvlTP52x0Jv7I9t27sLhR30LmcahBRfSwzP89ukjs2+ia99VrrLoRyaFAwJVA0AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNjYyNDAwMH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2018-10-27 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2018-10-27" content="An4ZYOGvf6kVHNxqZxS02TPAvpZESkmBhcVCM/byViDDuEB2XKvCF43aCJjrAU/R8H3WDlv+1bDGTL/XxstHGgoAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0MDY1NTAyMn0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-10-24 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-10-24" content="Agrr6lZhlwzv5jmv/mpLZA37DIiVcg3HvX8bH8EWB+OBruV3sUJuzDfYz6qs/je+LcH41DkrmPn4k9RaUaqpQAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQwMzg4NjI0fQ==">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #101010;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			a {
+				color: #f00;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script src="js/vr/WebVR.js"></script>
+
+		<script src="js/loaders/OBJLoader.js"></script>
+
+		<script>
+
+			var container;
+			var camera, scene, renderer;
+			var controller1, controller2;
+
+			var line;
+			var shapes = {};
+
+			var up = new THREE.Vector3( 0, 1, 0 );
+
+			var vector1 = new THREE.Vector3();
+			var vector2 = new THREE.Vector3();
+			var vector3 = new THREE.Vector3();
+			var vector4 = new THREE.Vector3();
+
+			init();
+			initGeometry();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - paint';
+				container.appendChild( info );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
+
+				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0x444444,
+					roughness: 1.0,
+					metalness: 0.0
+				} );
+				var table = new THREE.Mesh( geometry, material );
+				table.position.y = 0.35;
+				table.position.z = 0.85;
+				table.castShadow = true;
+				table.receiveShadow = true;
+				scene.add( table );
+
+				/*
+				var table = new THREE.Mesh( geometry, material );
+				table.position.y = 0.35;
+				table.position.z = -0.85;
+				table.castShadow = true;
+				table.receiveShadow = true;
+				scene.add( table );
+				*/
+
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0x222222,
+					roughness: 1.0,
+					metalness: 0.0
+				} );
+				var floor = new THREE.Mesh( geometry, material );
+				floor.rotation.x = - Math.PI / 2;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
+
+				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 6, 0 );
+				light.castShadow = true;
+				light.shadow.camera.top = 2;
+				light.shadow.camera.bottom = - 2;
+				light.shadow.camera.right = 2;
+				light.shadow.camera.left = - 2;
+				light.shadow.mapSize.set( 4096, 4096 );
+				scene.add( light );
+
+				// scene.add( new THREE.DirectionalLightHelper( light ) );
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( WEBVR.createButton( renderer ) );
+
+				// controllers
+
+				function onSelectStart() {
+
+					this.userData.isSelecting = true;
+
+				}
+
+				function onSelectEnd() {
+
+					this.userData.isSelecting = false;
+
+				}
+
+				controller1 = renderer.vr.getController( 0 );
+				controller1.addEventListener( 'selectstart', onSelectStart );
+				controller1.addEventListener( 'selectend', onSelectEnd );
+				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
+				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
+				scene.add( controller1 );
+
+				controller2 = renderer.vr.getController( 1 );
+				controller2.addEventListener( 'selectstart', onSelectStart );
+				controller2.addEventListener( 'selectend', onSelectEnd );
+				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
+				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
+				scene.add( controller2 );
+
+				var loader = new THREE.OBJLoader();
+				loader.setPath( 'models/obj/vive-controller/' );
+				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+
+					var loader = new THREE.TextureLoader();
+					loader.setPath( 'models/obj/vive-controller/' );
+
+					var controller = object.children[ 0 ];
+					controller.material.map = loader.load( 'onepointfive_texture.png' );
+					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+					controller.castShadow = true;
+					controller.receiveShadow = true;
+
+					// var pivot = new THREE.Group();
+					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
+					pivot.name = 'pivot';
+					pivot.position.y = - 0.016;
+					pivot.position.z = - 0.043;
+					pivot.rotation.x = Math.PI / 5.5;
+					controller.add( pivot );
+
+					controller1.add( controller.clone() );
+
+					pivot.material = pivot.material.clone();
+					controller2.add( controller.clone() );
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function initGeometry() {
+
+				var geometry = new THREE.BufferGeometry();
+
+				var positions = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				positions.dynamic = true;
+				geometry.addAttribute( 'position', positions );
+
+				var normals = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				normals.dynamic = true;
+				geometry.addAttribute( 'normal', normals );
+
+				var colors = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				colors.dynamic = true;
+				geometry.addAttribute( 'color', colors );
+
+				geometry.drawRange.count = 0;
+
+				//
+
+				/*
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
+
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				*/
+
+				var material = new THREE.MeshStandardMaterial( {
+					roughness: 0.9,
+					metalness: 0.0,
+					// envMap: reflectionCube,
+					vertexColors: THREE.VertexColors,
+					side: THREE.DoubleSide
+				} );
+
+				line = new THREE.Mesh( geometry, material );
+				line.frustumCulled = false;
+				line.castShadow = true;
+				line.receiveShadow = true;
+				scene.add( line );
+
+				// Shapes
+				shapes[ 'tube' ] = getTubeShapes( 1.0 );
+
+			}
+
+			function getTubeShapes( size ) {
+
+				var PI2 = Math.PI * 2;
+
+				var sides = 10;
+				var array = [];
+				var radius = 0.01 * size;
+
+				for ( var i = 0; i < sides; i ++ ) {
+
+					var angle = ( i / sides ) * PI2;
+					array.push( new THREE.Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
+
+				}
+
+				return array;
+
+			}
+
+			function stroke( controller, point1, point2, matrix1, matrix2 ) {
+
+				var color = new THREE.Color( 0xffffff );
+				var size = 1;
+
+				var shapes = getTubeShapes( size );
+
+				var geometry = line.geometry;
+				var attributes = geometry.attributes;
+				var count = geometry.drawRange.count;
+
+				var positions = attributes.position.array;
+				var normals = attributes.normal.array;
+				var colors = attributes.color.array;
+
+				for ( var j = 0, jl = shapes.length; j < jl; j ++ ) {
+
+					var vertex1 = shapes[ j ];
+					var vertex2 = shapes[ ( j + 1 ) % jl ];
+
+					// positions
+
+					vector1.copy( vertex1 );
+					vector1.applyMatrix4( matrix2 );
+					vector1.add( point2 );
+
+					vector2.copy( vertex2 );
+					vector2.applyMatrix4( matrix2 );
+					vector2.add( point2 );
+
+					vector3.copy( vertex2 );
+					vector3.applyMatrix4( matrix1 );
+					vector3.add( point1 );
+
+					vector4.copy( vertex1 );
+					vector4.applyMatrix4( matrix1 );
+					vector4.add( point1 );
+
+					vector1.toArray( positions, ( count + 0 ) * 3 );
+					vector2.toArray( positions, ( count + 1 ) * 3 );
+					vector4.toArray( positions, ( count + 2 ) * 3 );
+
+					vector2.toArray( positions, ( count + 3 ) * 3 );
+					vector3.toArray( positions, ( count + 4 ) * 3 );
+					vector4.toArray( positions, ( count + 5 ) * 3 );
+
+					// normals
+
+					vector1.copy( vertex1 );
+					vector1.applyMatrix4( matrix2 );
+					vector1.normalize();
+
+					vector2.copy( vertex2 );
+					vector2.applyMatrix4( matrix2 );
+					vector2.normalize();
+
+					vector3.copy( vertex2 );
+					vector3.applyMatrix4( matrix1 );
+					vector3.normalize();
+
+					vector4.copy( vertex1 );
+					vector4.applyMatrix4( matrix1 );
+					vector4.normalize();
+
+					vector1.toArray( normals, ( count + 0 ) * 3 );
+					vector2.toArray( normals, ( count + 1 ) * 3 );
+					vector4.toArray( normals, ( count + 2 ) * 3 );
+
+					vector2.toArray( normals, ( count + 3 ) * 3 );
+					vector3.toArray( normals, ( count + 4 ) * 3 );
+					vector4.toArray( normals, ( count + 5 ) * 3 );
+
+					// colors
+
+					color.toArray( colors, ( count + 0 ) * 3 );
+					color.toArray( colors, ( count + 1 ) * 3 );
+					color.toArray( colors, ( count + 2 ) * 3 );
+
+					color.toArray( colors, ( count + 3 ) * 3 );
+					color.toArray( colors, ( count + 4 ) * 3 );
+					color.toArray( colors, ( count + 5 ) * 3 );
+
+					count += 6;
+
+				}
+
+				geometry.drawRange.count = count;
+
+			}
+
+			function updateGeometry( start, end ) {
+
+				if ( start === end ) return;
+
+				var offset = start * 3;
+				var count = ( end - start ) * 3;
+
+				var geometry = line.geometry;
+				var attributes = geometry.attributes;
+
+				attributes.position.updateRange.offset = offset;
+				attributes.position.updateRange.count = count;
+				attributes.position.needsUpdate = true;
+
+				attributes.normal.updateRange.offset = offset;
+				attributes.normal.updateRange.count = count;
+				attributes.normal.needsUpdate = true;
+
+				attributes.color.updateRange.offset = offset;
+				attributes.color.updateRange.count = count;
+				attributes.color.needsUpdate = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function handleController( controller ) {
+
+				var pivot = controller.getObjectByName( 'pivot' );
+
+				if ( pivot ) {
+
+					var matrix = pivot.matrixWorld;
+
+					var point1 = controller.userData.points[ 0 ];
+					var point2 = controller.userData.points[ 1 ];
+
+					var matrix1 = controller.userData.matrices[ 0 ];
+					var matrix2 = controller.userData.matrices[ 1 ];
+
+					point1.setFromMatrixPosition( matrix );
+					matrix1.lookAt( point2, point1, up );
+
+					if ( controller.userData.isSelecting === true ) {
+
+						stroke( controller, point1, point2, matrix1, matrix2 );
+
+					}
+
+					point2.copy( point1 );
+					matrix2.copy( matrix1 );
+
+				}
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				var count = line.geometry.drawRange.count;
+
+				handleController( controller1 );
+				handleController( controller2 );
+
+				updateGeometry( count, line.geometry.drawRange.count );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

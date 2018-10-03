@@ -78,7 +78,6 @@
 		<div id="feedback">
 		</div>
 
-		<script src="js/Detector.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
@@ -154,7 +153,7 @@
 					this.scene.add( directionalLight2 );
 					this.scene.add( ambientLight );
 
-					var geometry = new THREE.BoxGeometry( 10, 10, 10 );
+					var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 					var material = new THREE.MeshNormalMaterial();
 					this.cube = new THREE.Mesh( geometry, material );
 					this.cube.position.set( 0, 0, 0 );
@@ -258,8 +257,8 @@
 						}
 					};
 
-					var callbackMeshAlter = function ( event ) {
-						var override = new THREE.LoaderSupport.LoadedMeshUserOverride( false, false );
+					var callbackMeshAlter = function ( event, override ) {
+						if ( ! Validator.isValid( override ) ) override = new THREE.LoaderSupport.LoadedMeshUserOverride( false, false );
 
 						var material = event.detail.material;
 						var meshName = event.detail.meshName;
@@ -277,15 +276,22 @@
 						return override;
 					};
 
+					var callbackOnLoadMaterials = function ( materials ) {
+						console.log( 'Materials loaded' );
+						return materials;
+					};
+
 					var callbacks = new THREE.LoaderSupport.Callbacks();
 					callbacks.setCallbackOnProgress( callbackReportProgress );
 					callbacks.setCallbackOnLoad( callbackOnLoad );
 					callbacks.setCallbackOnMeshAlter( callbackMeshAlter );
+					callbacks.setCallbackOnLoadMaterials( callbackOnLoadMaterials );
 
 					this.workerDirector.prepareWorkers( callbacks, maxQueueSize, maxWebWorkers );
 					if ( this.logging.enabled ) console.info( 'Configuring WWManager with queue size ' + this.workerDirector.getMaxQueueSize() + ' and ' + this.workerDirector.getMaxWebWorkers() + ' workers.' );
 
 					var modelPrepDatas = [];
+					var prepData;
 					prepData = new THREE.LoaderSupport.PrepData( 'male02' );
 					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/male02/male02.obj', 'OBJ ') );
 					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/male02/male02.mtl', 'MTL' ) );
@@ -321,7 +327,6 @@
 					var distributionMax = 1000;
 					var modelPrepDataIndex = 0;
 					var modelPrepData;
-					var prepData;
 					var scale;
 					for ( i = 0; i < maxQueueSize; i++ ) {
 

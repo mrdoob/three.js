@@ -12,43 +12,47 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Create a material that can draw custom sprites using a 2d canvas.</div>
+		<p class="desc">Create a material that can draw custom sprites using a 2d canvas.</p>
 
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]( [param:Object parameters] )</h3>
-		<div>
+		<p>
 		parameters is an object that can be used to set up the default properties
-		</div>
-		<div>
+		</p>
+		<p>
+		rotation - the rotation of the sprite<br/>
 		color - the color of the sprite<br/>
 		program - the program used to draw the sprite
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
-
+		<h3>[property:Radians rotation]</h3>
+		<p>
+		The rotation of the sprite in radians. Default is 0.
+		</p>
 
 		<h3>[property:Color color]</h3>
-		<div>
+		<p>
 		The color of the sprite. The material will set up the color for the context before calling the material's program.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
 
 
 		<h3>[method:null program]([param:CanvasRenderingContext2D context], [param:Color color])</h3>
-		<div>
+		<p>
 		context -- The canvas context <br />
 		color -- The color of the sprite
-		</div>
-		<div>
+		</p>
+		<p>
 			Define a program that will use the context to draw the sprite.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

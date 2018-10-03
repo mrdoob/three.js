@@ -72,36 +72,20 @@
 			scene.add( lights[ 1 ] );
 			scene.add( lights[ 2 ] );
 
-			var mesh = new THREE.Object3D();
+			var group = new THREE.Group();
 
-			mesh.add( new THREE.LineSegments(
+			var geometry = new THREE.BufferGeometry();
+			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [], 3 ) );
 
-				new THREE.Geometry(),
+			var lineMaterial = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.5 } );
+			var meshMaterial = new THREE.MeshPhongMaterial( { color: 0x156289, emissive: 0x072534, side: THREE.DoubleSide, flatShading: true } );
 
-				new THREE.LineBasicMaterial( {
-					color: 0xffffff,
-					transparent: true,
-					opacity: 0.5
-				} )
+			group.add( new THREE.LineSegments( geometry, lineMaterial ) );
+			group.add( new THREE.Mesh( geometry, meshMaterial ) );
 
-			) );
+			var options = chooseFromHash( group );
 
-			mesh.add( new THREE.Mesh(
-
-				new THREE.Geometry(),
-
-				new THREE.MeshPhongMaterial( {
-					color: 0x156289,
-					emissive: 0x072534,
-					side: THREE.DoubleSide,
-					flatShading: true
-				} )
-
-			) );
-
-			var options = chooseFromHash( mesh );
-
-			scene.add( mesh );
+			scene.add( group );
 
 			var prevFog = false;
 
@@ -111,8 +95,8 @@
 
 				if ( ! options.fixed ) {
 
-					mesh.rotation.x += 0.005;
-					mesh.rotation.y += 0.005;
+					group.rotation.x += 0.005;
+					group.rotation.y += 0.005;
 
 				}
 

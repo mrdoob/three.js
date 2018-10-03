@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>法线网格材质([name])</h1>
+
+		<p class="desc">一种把法向量映射到RGB颜色的材质。</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshNormalMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。
+		</p>
+
+
+		<h2>属性(Properties)</h2>
+		<p>常用属性请参见基类[page:Material]。</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认值为*false*。</p>
+
+		<h3>[property:Boolean isMeshNormalMaterial]</h3>
+		<p> 用于检查此类或派生类是否为法线网格材质。默认值为 *true*。<br /><br />
+
+			因为其通常用在内部优化，所以不应该更改该属性值。
+		</p>
+
+		<h3>[property:Boolean lights]</h3>
+		<p>材质是否受到光照的影响。默认值为 *false*。</p>
+
+		<h3>[property:boolean morphTargets]</h3>
+		<p>定义材质是否使用morphTargets。默认值为false。</p>
+
+		<h3>[property:boolean wireframe]</h3>
+		<p>
+			将几何体渲染为线框。默认值为*false*（即渲染为平滑着色）。
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>控制线框宽度。默认值为1。<br /><br />
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>常用方法请参见基类[page:Material]。</p>
+
+
+
+		<h2>源码(Source)</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

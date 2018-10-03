@@ -72,7 +72,6 @@
 		<div id="feedback"></div>
 	</div>
 
-		<script src="js/Detector.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -251,13 +250,12 @@
 						var fixedOffsetY;
 						var fixedOffsetZ;
 						var s, t;
-						// complete triagle
-						var sizeVaring = this.sizeFactor * Math.random();
+						// complete triangle
 						// local coords offset
 						var localOffsetFactor = this.localOffsetFactor;
 
 						for ( var i = 0; i < this.quantity; i++ ) {
-							sizeVaring = this.sizeFactor * Math.random();
+							var sizeVaring = this.sizeFactor * Math.random();
 
 							s = 2 * Math.PI * Math.random();
 							t = Math.PI * Math.random();
@@ -427,7 +425,7 @@
 					var helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
 					this.scene.add( helper );
 
-					var geometry = new THREE.BoxGeometry( 10, 10, 10 );
+					var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 					var material = new THREE.MeshNormalMaterial();
 					this.cube = new THREE.Mesh( geometry, material );
 					this.cube.position.set( 0, 0, 0 );

@@ -9,54 +9,92 @@
 				background:#777;
 				padding:0;
 				margin:0;
-				font-weight: bold;
 				overflow:hidden;
+				font-family: Monospace;
 			}
 
 			#info {
 				position: absolute;
+				z-index: 2;
 				top: 0px;
 				width: 100%;
 				color: #ffffff;
 				padding: 5px;
-				font-family:Monospace;
+
 				font-size:13px;
 				text-align:center;
+				font-weight: bold;
 			}
 
 			a {
 				color: #ffffff;
 			}
+
+			#overlay {
+				position: absolute;
+				z-index: 1;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 1;
+				background-color: #000000;
+				color: #ffffff;
+			}
+
+			#overlay > div {
+				text-align: center;
+			}
+
+			#overlay > div > button {
+				height: 20px;
+				width: 100px;
+				background: transparent;
+				color: #ffffff;
+				outline: 1px solid #ffffff;
+				border: 0px;
+				cursor: pointer;
+			}
+
+			#overlay > div > p {
+				color: #777777;
+				font-size: 12px;
+			}
 		</style>
 	</head>
 	<body>
-
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Automatic audio playback requires a user interaction.</p>
+			</div>
+		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox |
 			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener">larrylarrybb</a>,
 			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a> and
 			<a href="http://opengameart.org/content/project-utopia-seamless-loop" target="_blank" rel="noopener">congusbongus</a><br/><br/>
 			navigate with WASD / arrows / mouse
 		</div>
 
-
-		<div id="container"></div>
-
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FirstPersonControls.js"></script>
-
-		<script src="js/Detector.js"></script>
-
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container;
-			var camera, controls, scene, renderer;
-			var light, pointLight;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var camera, controls, scene, renderer, light;
 
 			var material1, material2, material3;
 
@@ -64,12 +102,13 @@
 
 			var clock = new THREE.Clock();
 
-			init();
-			animate();
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', init );
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 25, 0 );
@@ -84,7 +123,7 @@
 				light.position.set( 0, 0.5, 1 ).normalize();
 				scene.add( light );
 
-				var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+				var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
 
 				material1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
 				material2 = new THREE.MeshPhongMaterial( { color: 0xff2200, flatShading: true, shininess: 0 } );
@@ -95,15 +134,17 @@
 				var audioLoader = new THREE.AudioLoader();
 
 				var mesh1 = new THREE.Mesh( sphere, material1 );
-				mesh1.position.set( -250, 30, 0 );
+				mesh1.position.set( - 250, 30, 0 );
 				scene.add( mesh1 );
 
 				var sound1 = new THREE.PositionalAudio( listener );
-				audioLoader.load( 'sounds/358232_j_s_song.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/358232_j_s_song.ogg', function ( buffer ) {
+
 					sound1.setBuffer( buffer );
 					sound1.setRefDistance( 20 );
 					sound1.play();
-				});
+
+				} );
 				mesh1.add( sound1 );
 
 				//
@@ -113,29 +154,30 @@
 				scene.add( mesh2 );
 
 				var sound2 = new THREE.PositionalAudio( listener );
-				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function ( buffer ) {
+
 					sound2.setBuffer( buffer );
 					sound2.setRefDistance( 20 );
 					sound2.play();
-				});
+
+				} );
 				mesh2.add( sound2 );
 
 				//
 
-
 				var mesh3 = new THREE.Mesh( sphere, material3 );
-				mesh3.position.set( 0, 30, -250 );
+				mesh3.position.set( 0, 30, - 250 );
 				scene.add( mesh3 );
 
 				var sound3 = new THREE.PositionalAudio( listener );
 				var oscillator = listener.context.createOscillator();
 				oscillator.type = 'sine';
-				oscillator.frequency.value = 144;
-				oscillator.start(0);
-				sound3.setNodeSource(oscillator);
+				oscillator.frequency.setValueAtTime( 144, sound3.context.currentTime );
+				oscillator.start( 0 );
+				sound3.setNodeSource( oscillator );
 				sound3.setRefDistance( 20 );
-				sound3.setVolume(0.5);
-				mesh3.add(sound3);
+				sound3.setVolume( 0.5 );
+				mesh3.add( sound3 );
 
 				// analysers
 
@@ -146,12 +188,14 @@
 				// global ambient audio
 
 				var sound4 = new THREE.Audio( listener );
-				audioLoader.load( 'sounds/Project_Utopia.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/Project_Utopia.ogg', function ( buffer ) {
+
 					sound4.setBuffer( buffer );
-					sound4.setLoop(true);
-					sound4.setVolume(0.5);
+					sound4.setLoop( true );
+					sound4.setVolume( 0.5 );
 					sound4.play();
-				});
+
+				} );
 
 				// ground
 
@@ -160,58 +204,79 @@
 				scene.add( helper );
 
 				//
-    			var SoundControls = function() {
-					   this.master = listener.getMasterVolume();
-					   this.firstSphere =  sound1.getVolume();
-					   this.secondSphere =  sound2.getVolume();
-					   this.thirdSphere = sound3.getVolume();
-					   this.Ambient =  sound4.getVolume();
+
+				var SoundControls = function () {
+
+					this.master = listener.getMasterVolume();
+					this.firstSphere = sound1.getVolume();
+					this.secondSphere = sound2.getVolume();
+					this.thirdSphere = sound3.getVolume();
+					this.Ambient = sound4.getVolume();
+
 				};
-				var GeneratorControls = function() {
-					   this.frequency = oscillator.frequency.value;
-					   this.wavetype = oscillator.type;
+
+				var GeneratorControls = function () {
+
+					this.frequency = oscillator.frequency.value;
+					this.wavetype = oscillator.type;
+
 				};
-      			var gui = new dat.GUI();
+
+				var gui = new dat.GUI();
 				var soundControls = new SoundControls();
 				var generatorControls = new GeneratorControls();
-				var volumeFolder = gui.addFolder('sound volume');
-				var generatorFolder = gui.addFolder('sound generator');
-				volumeFolder.add(soundControls, 'master').min(0.0).max(1.0).step(0.01).onChange(function() {
-					listener.setMasterVolume(soundControls.master);
-				});
-				volumeFolder.add(soundControls, 'firstSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
-					sound1.setVolume(soundControls.firstSphere);
-				});
-				volumeFolder.add(soundControls, 'secondSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
-					sound2.setVolume(soundControls.secondSphere);
-				});
+				var volumeFolder = gui.addFolder( 'sound volume' );
+				var generatorFolder = gui.addFolder( 'sound generator' );
 
-				volumeFolder.add(soundControls, 'thirdSphere').min(0.0).max(1.0).step(0.01).onChange(function() {
-					sound3.setVolume(soundControls.thirdSphere);
-				});
-				volumeFolder.add(soundControls, 'Ambient').min(0.0).max(1.0).step(0.01).onChange(function() {
-					sound4.setVolume(soundControls.Ambient);
-				});
+				volumeFolder.add( soundControls, 'master' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+
+					listener.setMasterVolume( soundControls.master );
+
+				} );
+				volumeFolder.add( soundControls, 'firstSphere' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+
+					sound1.setVolume( soundControls.firstSphere );
+
+				} );
+				volumeFolder.add( soundControls, 'secondSphere' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+
+					sound2.setVolume( soundControls.secondSphere );
+
+				} );
+
+				volumeFolder.add( soundControls, 'thirdSphere' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+
+					sound3.setVolume( soundControls.thirdSphere );
+
+				} );
+				volumeFolder.add( soundControls, 'Ambient' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+
+					sound4.setVolume( soundControls.Ambient );
+
+				} );
 				volumeFolder.open();
-				generatorFolder.add(generatorControls, 'frequency').min(50.0).max(5000.0).step(1.0).onChange(function() {
-					oscillator.frequency.value = generatorControls.frequency;
-				});
-				generatorFolder.add(generatorControls, 'wavetype', ['sine', 'square', 'sawtooth', 'triangle']).onChange(function() {
+				generatorFolder.add( generatorControls, 'frequency' ).min( 50.0 ).max( 5000.0 ).step( 1.0 ).onChange( function () {
+
+					oscillator.frequency.setValueAtTime( generatorControls.frequency, listener.context.currentTime );
+
+				} );
+				generatorFolder.add( generatorControls, 'wavetype', [ 'sine', 'square', 'sawtooth', 'triangle' ] ).onChange( function () {
+
 					oscillator.type = generatorControls.wavetype;
-				});
+
+				} );
+
 				generatorFolder.open();
 
-
-
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
+
 				controls = new THREE.FirstPersonControls( camera, renderer.domElement );
 
 				controls.movementSpeed = 70;
@@ -219,9 +284,11 @@
 				controls.noFly = true;
 				controls.lookVertical = false;
 
-
+				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				animate();
 
 			}
 

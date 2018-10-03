@@ -17,21 +17,36 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		constructor: LegacyGLTFLoader,
 
-		crossOrigin: 'Anonymous',
+		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = this.path && ( typeof this.path === "string" ) ? this.path : THREE.LoaderUtils.extractUrlBase( url );
+			var resourcePath;
+
+			if ( this.resourcePath !== undefined ) {
+
+				resourcePath = this.resourcePath;
+
+			} else if ( this.path !== undefined ) {
+
+				resourcePath = this.path;
+
+			} else {
+
+				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
+
+			}
 
 			var loader = new THREE.FileLoader( scope.manager );
 
+			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			loader.load( url, function ( data ) {
 
-				scope.parse( data, path, onLoad );
+				scope.parse( data, resourcePath, onLoad );
 
 			}, onProgress, onError );
 
@@ -40,12 +55,20 @@ THREE.LegacyGLTFLoader = ( function () {
 		setCrossOrigin: function ( value ) {
 
 			this.crossOrigin = value;
+			return this;
 
 		},
 
 		setPath: function ( value ) {
 
 			this.path = value;
+
+		},
+
+		setResourcePath: function ( value ) {
+
+			this.resourcePath = value;
+			return this;
 
 		},
 
@@ -75,18 +98,15 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			}
 
-			console.time( 'LegacyGLTFLoader' );
-
 			var parser = new GLTFParser( json, extensions, {
 
-				path: path || this.path,
-				crossOrigin: this.crossOrigin
+				crossOrigin: this.crossOrigin,
+				manager: this.manager,
+				path: path || this.resourcePath || ''
 
 			} );
 
 			parser.parse( function ( scene, scenes, cameras, animations ) {
-
-				console.timeEnd( 'LegacyGLTFLoader' );
 
 				var glTF = {
 					"scene": scene,
@@ -649,6 +669,13 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		}
 
+		// Blob URL
+		if ( /^blob:.*$/i.test( url ) ) {
+
+			return url;
+
+		}
+
 		// Relative URL
 		return ( path || '' ) + url;
 
@@ -918,7 +945,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				return new Promise( function ( resolve ) {
 
-					var loader = new THREE.FileLoader();
+					var loader = new THREE.FileLoader( options.manager );
 					loader.setResponseType( 'text' );
 					loader.load( resolveURL( shader.uri, options.path ), function ( shaderText ) {
 
@@ -952,7 +979,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				return new Promise( function ( resolve ) {
 
-					var loader = new THREE.FileLoader();
+					var loader = new THREE.FileLoader( options.manager );
 					loader.setResponseType( 'arraybuffer' );
 					loader.load( resolveURL( buffer.uri, options.path ), function ( buffer ) {
 
@@ -1077,7 +1104,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						if ( textureLoader === null ) {
 
-							textureLoader = new THREE.TextureLoader();
+							textureLoader = new THREE.TextureLoader( options.manager );
 
 						}
 

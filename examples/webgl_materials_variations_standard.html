@@ -37,12 +37,16 @@
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -101,10 +105,7 @@
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					var shininess = 50, specular = 0x333333, bumpScale = 1;
-
-					var materials = [];
-
+					var bumpScale = 1;
 					var cubeWidth = 400;
 					var numberOfSphersPerSide = 5;
 					var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -150,7 +151,12 @@
 						index ++;
 
 					}
-				});
+
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
+				} );
 
 				function addLabel( name, location ) {
 

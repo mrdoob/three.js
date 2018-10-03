@@ -384,7 +384,7 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		return ( min <= plane.constant && max >= plane.constant );
+		return ( min <= - plane.constant && max >= - plane.constant );
 
 	},
 
@@ -585,7 +585,7 @@ Object.assign( Box3.prototype, {
 			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
 			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
 			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );	// 111
+			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
 
 			this.setFromPoints( points );
 

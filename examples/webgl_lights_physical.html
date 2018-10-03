@@ -44,11 +44,15 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer,
 			bulbLight, bulbMat, hemiLight,
@@ -111,7 +115,7 @@
 
 				scene = new THREE.Scene();
 
-				var bulbGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
+				var bulbGeometry = new THREE.SphereBufferGeometry( 0.02, 16, 8 );
 				bulbLight = new THREE.PointLight( 0xffee88, 1, 100, 2 );
 
 				bulbMat = new THREE.MeshStandardMaterial( {
@@ -204,14 +208,14 @@
 				floorMesh.rotation.x = -Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				var ballGeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
+				var ballGeometry = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
 				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
 				ballMesh.position.set( 1, 0.5, 1 );
 				ballMesh.rotation.y = Math.PI;
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );
 
-				var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+				var boxGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5 );
 				var boxMesh = new THREE.Mesh( boxGeometry, cubeMat );
 				boxMesh.position.set( -0.5, 0.25, -1 );
 				boxMesh.castShadow = true;
@@ -290,7 +294,6 @@
 
 				hemiLight.intensity = hemiLuminousIrradiances[ params.hemiIrradiance ];
 				var time = Date.now() * 0.0005;
-				var delta = clock.getDelta();
 
 				bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
 

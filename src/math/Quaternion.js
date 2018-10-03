@@ -1,11 +1,12 @@
-import { Vector3 } from './Vector3.js';
-
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://clara.io
  */
+
+import { _Math } from './Math.js';
+import { Vector3 } from './Vector3.js';
 
 function Quaternion( x, y, z, w ) {
 
@@ -161,6 +162,8 @@ Object.defineProperties( Quaternion.prototype, {
 } );
 
 Object.assign( Quaternion.prototype, {
+
+	isQuaternion: true,
 
 	set: function ( x, y, z, w ) {
 
@@ -393,6 +396,26 @@ Object.assign( Quaternion.prototype, {
 
 	}(),
 
+	angleTo: function ( q ) {
+
+		return 2 * Math.acos( Math.abs( _Math.clamp( this.dot( q ), - 1, 1 ) ) );
+
+	},
+
+	rotateTowards: function ( q, step ) {
+
+		var angle = this.angleTo( q );
+
+		if ( angle === 0 ) return this;
+
+		var t = Math.min( 1, step / angle );
+
+		this.slerp( q, t );
+
+		return this;
+
+	},
+
 	inverse: function () {
 
 		// quaternion is assumed to have unit length
@@ -533,19 +556,21 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
+		var sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
 
-		if ( Math.abs( sinHalfTheta ) < 0.001 ) {
+		if ( sqrSinHalfTheta <= Number.EPSILON ) {
 
-			this._w = 0.5 * ( w + this._w );
-			this._x = 0.5 * ( x + this._x );
-			this._y = 0.5 * ( y + this._y );
-			this._z = 0.5 * ( z + this._z );
+			var s = 1 - t;
+			this._w = s * w + t * this._w;
+			this._x = s * x + t * this._x;
+			this._y = s * y + t * this._y;
+			this._z = s * z + t * this._z;
 
-			return this;
+			return this.normalize();
 
 		}
 
+		var sinHalfTheta = Math.sqrt( sqrSinHalfTheta );
 		var halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
 		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
 			ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;

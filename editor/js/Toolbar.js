@@ -8,6 +8,7 @@ var Toolbar = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setId( 'toolbar' );
+	container.setDisplay( 'none' );
 
 	var buttons = new UI.Panel();
 	container.add( buttons );
@@ -15,7 +16,6 @@ var Toolbar = function ( editor ) {
 	// translate / rotate / scale
 
 	var translate = new UI.Button( 'translate' );
-	translate.dom.title = 'W';
 	translate.dom.className = 'Button selected';
 	translate.onClick( function () {
 
@@ -25,7 +25,6 @@ var Toolbar = function ( editor ) {
 	buttons.add( translate );
 
 	var rotate = new UI.Button( 'rotate' );
-	rotate.dom.title = 'E';
 	rotate.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'rotate' );
@@ -34,7 +33,6 @@ var Toolbar = function ( editor ) {
 	buttons.add( rotate );
 
 	var scale = new UI.Button( 'scale' );
-	scale.dom.title = 'R';
 	scale.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'scale' );
@@ -42,13 +40,21 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( scale );
 
-	var local = new UI.THREE.Boolean( false, 'local' )
+	var local = new UI.THREE.Boolean( false, 'local' );
 	local.onChange( function () {
 
 		signals.spaceChanged.dispatch( this.getValue() === true ? 'local' : 'world' );
 
 	} );
 	buttons.add( local );
+
+	//
+
+	signals.objectSelected.add( function ( object ) {
+
+		container.setDisplay( object === null ? 'none' : '' );
+
+	} );
 
 	signals.transformModeChanged.add( function ( mode ) {
 

@@ -48,21 +48,18 @@
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
 			var mouseX = 0, mouseY = 0,
 
-			windowHalfX = window.innerWidth / 2,
-			windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
 
-			camera, scene, renderer, material;
+				camera, scene, renderer, material, stats;
 
 			init();
 			animate();
@@ -85,10 +82,10 @@
 				container.appendChild( renderer.domElement );
 
 				var geometry = new THREE.Geometry(),
-				geometry2 = new THREE.Geometry(),
-				geometry3 = new THREE.Geometry(),
-				points = hilbert3D( new THREE.Vector3(), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
-				colors = [], colors2 = [], colors3 = [];
+					geometry2 = new THREE.Geometry(),
+					geometry3 = new THREE.Geometry(),
+					points = hilbert3D( new THREE.Vector3(), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
+					colors = [], colors2 = [], colors3 = [];
 
 				var subdivisions = 6;
 
@@ -122,17 +119,17 @@
 				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 
 				var line, p, scale = 0.3, d = 225;
-				var parameters =  [
-					[ material, scale*1.5, [-d,0,0],  geometry ],
-					[ material, scale*1.5, [0,0,0],  geometry2 ],
-					[ material, scale*1.5, [d,0,0],  geometry3 ]
+				var parameters = [
+					[ material, scale * 1.5, [ - d, 0, 0 ], geometry ],
+					[ material, scale * 1.5, [ 0, 0, 0 ], geometry2 ],
+					[ material, scale * 1.5, [ d, 0, 0 ], geometry3 ]
 				];
 
 				for ( i = 0; i < parameters.length; ++ i ) {
 
 					p = parameters[ i ];
-					line = new THREE.Line( p[ 3 ],  p[ 0 ] );
-					line.scale.x = line.scale.y = line.scale.z =  p[ 1 ];
+					line = new THREE.Line( p[ 3 ], p[ 0 ] );
+					line.scale.x = line.scale.y = line.scale.z = p[ 1 ];
 					line.position.x = p[ 2 ][ 0 ];
 					line.position.y = p[ 2 ][ 1 ];
 					line.position.z = p[ 2 ][ 2 ];
@@ -166,6 +163,7 @@
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
+
 			}
 
 			function onDocumentTouchStart( event ) {
@@ -176,7 +174,9 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -187,6 +187,7 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
 
 			}
@@ -213,7 +214,7 @@
 
 					if ( object instanceof THREE.Line ) {
 
-						object.rotation.y = time * ( i % 2 ? 1 : -1 );
+						object.rotation.y = time * ( i % 2 ? 1 : - 1 );
 
 					}
 

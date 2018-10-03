@@ -36,9 +36,8 @@
 		<script src="../build/three.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
-
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script id="vs" type="x-shader/x-vertex">
 
@@ -106,14 +105,14 @@
 
 			var video, texture;
 
-			if ( Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() ) {
 
 				init();
 				animate();
 
 			} else {
 
-				document.body.appendChild( Detector.getWebGLErrorMessage() );
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
 			}
 

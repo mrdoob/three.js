@@ -10,10 +10,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">[name] is a simplified version of [page:CSS3DRenderer]. The only transformation that is supported is translation.<br />
+		<p class="desc">[name] is a simplified version of [page:CSS3DRenderer]. The only transformation that is supported is translation.<br /><br />
 			The renderer is very useful if you want to combine HTML based labels with 3D objects. Here too, the respective DOM elements are wrapped into an instance of *CSS2DObject* and added to the scene graph.<br />
-			Unlike [page:CSS3DRenderer], orthographic cameras are supported.
-		</div>
+		</p>
 
 		<script>
 
@@ -33,9 +32,10 @@
 
 		<h2>Examples</h2>
 
-		<div>
+		<p>
+			[example:css2d_label]<br>
 			[example:webgl_loader_pdb molecules]
-		</div>
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -44,19 +44,19 @@
 		<h2>Methods</h2>
 
 		<h3>[method:Object getSize]()</h3>
-		<div>
+		<p>
 			Returns an object containing the width and height of the renderer.
-		</div>
+		</p>
 
 		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
-		<div>
+		<p>
 			Renders a [page:Scene scene] using a [page:Camera camera].<br />
-		</div>
+		</p>
 
 		<h3>[method:null setSize]([param:Number width], [param:Number height])</h3>
-		<div>
+		<p>
 			Resizes the renderer to (width, height).
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

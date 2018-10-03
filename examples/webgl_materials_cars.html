@@ -1,452 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - cube reflection [cars]</title>
+		<title>three.js webgl - materials - car</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
+				font-family: Monospace;
+				background-color: #000;
+				color: #000;
+				margin: 0px;
+				overflow: hidden;
 			}
-			h1 { }
-			a { color:skyblue; text-decoration:none }
-			canvas { pointer-events:none; z-index:10; position:relative; }
-
-			#d { position:absolute; width: 100%; text-align:center; margin:1em 0 -4.5em 0; z-index:1000; }
-
-			.bwrap { margin:0.5em 0 0 0 }
-			button { font-family:georgia; border:0; background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:3px; }
-			button:hover { background:#333 }
-			#buttons_cars button { color:#fa0 }
-
-			#car_info { text-align:center; }
-			#car_name { font-size:1em }
-			#car_author { font-size:1em }
-
-			#oldie { background:rgb(50,0,0) !important; color:#fff !important; margin-top:7em!important }
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+			}
+			#info a {
+				color: blue;
+				font-weight: bold;
+			}
 		</style>
 	</head>
 
 	<body>
-		<div id="d">
-			<div id="info">
-				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
-				texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a> :
-				<span id="car_info">
-					<span id="car_name">Bugatti Veyron model</span>
-					by <span id="car_author"><a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank" rel="noopener">Troyano</a></span>
-				</span>
-
-			</div>
-
-			<div id="buttons_cars" class="bwrap">
-				<button id="veyron">Bugatti Veyron</button>
-				<button id="gallardo">Lamborghini Gallardo</button>
-				<button id="f50">Ferrari F50</button>
-				<button id="camaro">Chevrolet Camaro</button>
-			</div>
-
-			<div id="buttons_materials" class="bwrap"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo :
+			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
+			<br><br>
+			<span>Body: <select id="body-mat"></select></span>
+			<span>Rims / Trim: <select id="rim-mat"></select></span>
+			<span>Glass: <select id="glass-mat"></select></span>
+			<br><br>
+			<span>Follow camera: <input type="checkbox" id="camera-toggle"></span>
 		</div>
+
+		<div id="container"></div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/loaders/DRACOLoader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/Car.js"></script>
+
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var STATS_ENABLED = false;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var CARS = {
+			}
 
-				"veyron": 	{
+			var camera, scene, renderer, stats, carModel, materialsLib, envMap;
 
-					name:	"Bugatti Veyron",
-					url: 	"obj/veyron/VeyronNoUv_bin.js",
-					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank" rel="noopener">Troyano</a>',
-					init_rotation: [ 0, 0, 0 ],
-					scale: 5.5,
-					init_material: 4,
-					body_materials: [ 2 ],
+			var bodyMatSelect = document.getElementById( 'body-mat' );
+			var rimMatSelect = document.getElementById( 'rim-mat' );
+			var glassMatSelect = document.getElementById( 'glass-mat' );
 
-					object: null,
-					buttons: null,
-					materials: null
+			var followCamera = document.getElementById( 'camera-toggle' );
+			followCamera.addEventListener( 'change', onFollowCameraToggle );
 
-				},
+			var lightHolder = new THREE.Group();
+			var clock = new THREE.Clock();
+			var car = new THREE.Car();
+			car.turningRadius = 75;
 
-				"gallardo": {
-
-					name: 	"Lamborghini Gallardo",
-					url:	"obj/gallardo/GallardoNoUv_bin.js",
-					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1711" target="_blank" rel="noopener">machman_3d</a>',
-					init_rotation: [ 0, 0, 0 ],
-					scale: 3.7,
-					init_material: 9,
-					body_materials: [ 3 ],
-
-					object:	null,
-					buttons: null,
-					materials: null
-
-				},
-
-				"f50": {
-
-					name: 	"Ferrari F50",
-					url:	"obj/f50/F50NoUv_bin.js",
-					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank" rel="noopener">daniel sathya</a>',
-					init_rotation: [ 0, 0, 0 ],
-					scale: 0.175,
-					init_material: 2,
-					body_materials: [ 3, 6, 7, 8, 9, 10, 23, 24 ],
-
-					object:	null,
-					buttons: null,
-					materials: null
-
-				},
-
-				"camaro": {
-
-					name: 	"Chevrolet Camaro",
-					url:	"obj/camaro/CamaroNoUv_bin.js",
-					author: '<a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank" rel="noopener">dskfnwn</a>',
-					init_rotation: [ 0.0, 0.0, 0.0 /*0, 1, 0*/ ],
-					scale: 75,
-					init_material: 0,
-					body_materials: [ 0 ],
-
-					object:	null,
-					buttons: null,
-					materials: null
-
-				}
-
+			var carParts = {
+				body: [],
+				rims:[],
+				glass: [],
 			};
 
-
-			var container, stats;
-
-			var camera, scene, renderer;
-
-			var m, mi;
-
-			var directionalLight, pointLight;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-			var loader = new THREE.BinaryLoader();
-
-			init();
-			animate();
+			var damping = 5.0;
+			var distance = 5;
+			var cameraTarget = new THREE.Vector3();
+			var origin = new THREE.Vector3();
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				var container = document.getElementById( 'container' );
 
-				// CAMERAS
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-
-				// SCENE
-
-				var textureCube = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/Bridge2/')
-					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 200 );
+				camera.position.set( 3.25, 2.0, -5 );
 
 				scene = new THREE.Scene();
-				scene.background = textureCube;
+				scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
 
-				// LIGHTS
+				envMap = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/skyboxsun25deg/')
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				var ambient = new THREE.AmbientLight( 0x050505 );
-				scene.add( ambient );
+				scene.background = envMap;
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-				directionalLight.position.set( 2, 1.2, 10 ).normalize();
-				scene.add( directionalLight );
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 2400, 2400 ),
+					new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.15, depthWrite: false }
+				) );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				ground.renderOrder = 1;
+				scene.add( ground );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( -2, 1.2, -10 ).normalize();
-				scene.add( directionalLight );
+				var grid = new THREE.GridHelper( 400, 40, 0x000000, 0x000000 );
+				grid.material.opacity = 0.2;
+				grid.material.depthWrite = false;
+				grid.material.transparent = true;
+				scene.add( grid );
 
-				pointLight = new THREE.PointLight( 0xffaa00, 2 );
-				pointLight.position.set( 2000, 1200, 10000 );
-				scene.add( pointLight );
+				var hemiLight = new THREE.HemisphereLight( 0x7c849b, 0xd7cbb1, 0.1 );
+				hemiLight.position.set( 0, 1, 0 );
+				scene.add( hemiLight );
 
-				//
+				var shadowLight  = new THREE.DirectionalLight( 0xffffee, 0.1 );
+				shadowLight.position.set( -1.5, 1.25, -1.5 );
+				shadowLight.castShadow = true;
+				shadowLight.shadow.width = 512;
+				shadowLight.shadow.height = 512;
+				shadowLight.shadow.camera.top = 2;
+				shadowLight.shadow.camera.bottom = -2;
+				shadowLight.shadow.camera.left = -2.5;
+				shadowLight.shadow.camera.right = 2.5;
+				shadowLight.shadow.camera.far = 5.5;
+				shadowLight.shadow.bias = -0.025;
 
-				renderer = new THREE.WebGLRenderer();
+				lightHolder.add( shadowLight, shadowLight.target );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 
-				if ( STATS_ENABLED ) {
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-					stats = new Stats();
-					container.appendChild( stats.dom );
+				initCar();
+				initMaterials();
+				initMaterialSelectionMenus();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				renderer.setAnimationLoop( function() {
+
+					update();
+
+					renderer.render( scene, camera );
+
+				} );
+
+			}
+
+			function initCar() {
+
+				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+
+				var loader = new THREE.GLTFLoader();
+				loader.setDRACOLoader( new THREE.DRACOLoader() );
+
+				loader.load( 'models/gltf/ferrari.glb', function( gltf ) {
+
+					carModel = gltf.scene.children[ 0 ];
+
+					// add lightHolder to car so that the shadow will track the car as it moves
+					carModel.add( lightHolder );
+
+					car.setModel( carModel );
+
+					carModel.traverse( function ( child ) {
+
+						if ( child.isMesh  ) {
+
+							child.castShadow = true;
+							child.receiveShadow = true;
+							child.material.envMap = envMap;
+
+						}
+
+					} );
+
+					// shadow
+					var texture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
+					var shadow = new THREE.Mesh(
+						new THREE.PlaneBufferGeometry( 0.655 * 4, 1.3 * 4 ).rotateX( - Math.PI / 2 ),
+						new THREE.MeshBasicMaterial( { map: texture, opacity: 0.8, transparent: true } )
+					);
+					shadow.renderOrder = 2;
+					carModel.add( shadow );
+
+					scene.add( carModel );
+
+					// car parts for material selection
+					carParts.body.push( carModel.getObjectByName( 'body' ) );
+
+					carParts.rims.push(
+						carModel.getObjectByName( 'rim_fl' ),
+						carModel.getObjectByName( 'rim_fr' ),
+						carModel.getObjectByName( 'rim_rr' ),
+						carModel.getObjectByName( 'rim_rl' ),
+						carModel.getObjectByName( 'trim' ),
+					);
+
+					carParts.glass.push(
+						carModel.getObjectByName( 'glass' ),
+					 );
+
+					updateMaterials();
+
+				});
+
+			}
+
+			function initMaterials() {
+
+				materialsLib = {
+
+					main: [
+
+						new THREE.MeshStandardMaterial( { color: 0xff4400, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'orange' } ),
+						new THREE.MeshStandardMaterial( { color: 0x001166, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'blue' } ),
+						new THREE.MeshStandardMaterial( { color: 0x990000, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'red' } ),
+						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.9, roughness: 0.5, name: 'black' } ),
+						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.9, roughness: 0.5, name: 'white' } ),
+						new THREE.MeshStandardMaterial( { color: 0x555555, envMap: envMap, envMapIntensity: 2.0, metalness: 1.0, roughness: 0.2, name: 'metallic' } ),
+
+					],
+
+					glass: [
+
+						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.15, transparent: true, premultipliedAlpha: true, name: 'clear' } ),
+						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.15, transparent: true, premultipliedAlpha: true, name: 'smoked' } ),
+						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.9, roughness: 0.1, opacity: 0.15, transparent: true, premultipliedAlpha: true, name: 'blue' } ),
+
+					],
 
 				}
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			}
 
-				// common materials
+			function initMaterialSelectionMenus() {
 
-				var mlib = {
+				function addOption( name, menu ) {
 
-				"Orange": 	new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
-				"Blue": 	new THREE.MeshLambertMaterial( { color: 0x001133, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
-				"Red": 		new THREE.MeshLambertMaterial( { color: 0x660000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
-				"Black": 	new THREE.MeshLambertMaterial( { color: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.15 } ),
-				"White":	new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
+					var option = document.createElement( 'option' );
+					option.text = name;
+					option.value = name;
+					menu.add( option );
 
-				"Carmine": 	new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, envMap: textureCube, combine: THREE.MultiplyOperation } ),
-				"Gold": 	new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, envMap: textureCube, combine: THREE.MultiplyOperation } ),
-				"Bronze":	new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
-				"Chrome": 	new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ),
+				}
 
-				"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MultiplyOperation } ),
-				"Blue metal": 	new THREE.MeshLambertMaterial( { color: 0x001133, envMap: textureCube, combine: THREE.MultiplyOperation } ),
-				"Red metal": 	new THREE.MeshLambertMaterial( { color: 0x770000, envMap: textureCube, combine: THREE.MultiplyOperation } ),
-				"Green metal": 	new THREE.MeshLambertMaterial( { color: 0x007711, envMap: textureCube, combine: THREE.MultiplyOperation } ),
-				"Black metal":	new THREE.MeshLambertMaterial( { color: 0x222222, envMap: textureCube, combine: THREE.MultiplyOperation } ),
+				materialsLib.main.forEach( function( material ) {
 
-				"Pure chrome": 	new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube } ),
-				"Dark chrome":	new THREE.MeshLambertMaterial( { color: 0x444444, envMap: textureCube } ),
-				"Darker chrome":new THREE.MeshLambertMaterial( { color: 0x222222, envMap: textureCube } ),
+					addOption( material.name, bodyMatSelect );
+					addOption( material.name, rimMatSelect );
 
-				"Black glass": 	new THREE.MeshLambertMaterial( { color: 0x101016, envMap: textureCube, opacity: 0.975, transparent: true } ),
-				"Dark glass":	new THREE.MeshLambertMaterial( { color: 0x101046, envMap: textureCube, opacity: 0.25, transparent: true } ),
-				"Blue glass":	new THREE.MeshLambertMaterial( { color: 0x668899, envMap: textureCube, opacity: 0.75, transparent: true } ),
-				"Light glass":	new THREE.MeshBasicMaterial( { color: 0x223344, envMap: textureCube, opacity: 0.25, transparent: true, combine: THREE.MixOperation, reflectivity: 0.25 } ),
+				} );
 
-				"Red glass":	new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.75, transparent: true } ),
-				"Yellow glass":	new THREE.MeshLambertMaterial( { color: 0xffffaa, opacity: 0.75, transparent: true } ),
-				"Orange glass":	new THREE.MeshLambertMaterial( { color: 0x995500, opacity: 0.75, transparent: true } ),
+				materialsLib.glass.forEach( function( material ) {
 
-				"Orange glass 50":	new THREE.MeshLambertMaterial( { color: 0xffbb00, opacity: 0.5, transparent: true } ),
-				"Red glass 50": 	new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } ),
+					addOption( material.name, glassMatSelect );
 
-				"Fullblack rough":	new THREE.MeshLambertMaterial( { color: 0x000000 } ),
-				"Black rough":		new THREE.MeshLambertMaterial( { color: 0x050505 } ),
-				"Darkgray rough":	new THREE.MeshLambertMaterial( { color: 0x090909 } ),
-				"Red rough":		new THREE.MeshLambertMaterial( { color: 0x330500 } ),
+				} );
 
-				"Darkgray shiny":	new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x050505 } ),
-				"Gray shiny":		new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } )
+				bodyMatSelect.selectedIndex = 2;
+				rimMatSelect.selectedIndex = 4;
+				glassMatSelect.selectedIndex = 0;
 
-				};
+				bodyMatSelect.addEventListener( 'change', updateMaterials );
+				rimMatSelect.addEventListener( 'change', updateMaterials );
+				glassMatSelect.addEventListener( 'change', updateMaterials );
 
-				// Gallardo materials
+			}
 
-				CARS[ "gallardo" ].materials = {
+			// set materials to the current values of the selection menus
+			function updateMaterials() {
 
-					body: [
+				var bodyMat = materialsLib.main[ bodyMatSelect.selectedIndex ];
+				var rimMat = materialsLib.main[ rimMatSelect.selectedIndex ];
+				var glassMat = materialsLib.glass[ glassMatSelect.selectedIndex ];
 
-						[ "Orange", 	mlib[ "Orange" ] ],
-						[ "Blue", 		mlib[ "Blue" ] ],
-						[ "Red", 		mlib[ "Red" ] ],
-						[ "Black", 		mlib[ "Black" ] ],
-						[ "White", 		mlib[ "White" ] ],
-
-						[ "Orange metal", 	mlib[ "Orange metal" ] ],
-						[ "Blue metal", 	mlib[ "Blue metal" ] ],
-						[ "Green metal", 	mlib[ "Green metal" ] ],
-						[ "Black metal", 	mlib[ "Black metal" ] ],
-
-						[ "Carmine", 	mlib[ "Carmine" ] ],
-						[ "Gold", 		mlib[ "Gold" ] ],
-						[ "Bronze", 	mlib[ "Bronze" ] ],
-						[ "Chrome", 	mlib[ "Chrome" ] ]
-
-					]
-
-				};
-
-				m = CARS[ "gallardo" ].materials;
-				mi = CARS[ "gallardo" ].init_material;
-
-				CARS[ "gallardo" ].mmap = {
-
-					0: mlib[ "Pure chrome" ], 	// wheels chrome
-					1: mlib[ "Black rough" ],   // tire
-					2: mlib[ "Black glass" ], 	// windshield
-					3: m.body[ mi ][ 1 ], 		// body
-					4: mlib[ "Red glass" ],    	// back lights
-					5: mlib[ "Yellow glass" ],  // front lights
-					6: mlib[ "Dark chrome" ]	// windshield rim
-
-				};
-
-				// Veyron materials
-
-				CARS[ "veyron" ].materials = {
-
-					body: [
-
-						[ "Orange metal", 	mlib[ "Orange metal" ] ],
-						[ "Blue metal", 	mlib[ "Blue metal" ] ],
-						[ "Red metal", 		mlib[ "Red metal" ] ],
-						[ "Green metal",	mlib[ "Green metal" ] ],
-						[ "Black metal", 	mlib[ "Black metal" ] ],
-
-						[ "Gold", 		mlib[ "Gold" ] ],
-						[ "Bronze", 	mlib[ "Bronze" ] ],
-						[ "Chrome", 	mlib[ "Chrome" ] ]
-
-					]
-
-				};
-
-				m = CARS[ "veyron" ].materials;
-				mi = CARS[ "veyron" ].init_material;
-
-				CARS[ "veyron" ].mmap = {
-
-					0: mlib[ "Black rough" ],		// tires + inside
-					1: mlib[ "Pure chrome" ],		// wheels + extras chrome
-					2: m.body[ mi ][ 1 ], 			// back / top / front torso
-					3: mlib[ "Dark glass" ],		// glass
-					4: mlib[ "Pure chrome" ],		// sides torso
-					5: mlib[ "Pure chrome" ],		// engine
-					6: mlib[ "Red glass 50" ],		// backlights
-					7: mlib[ "Orange glass 50" ]	// backsignals
-
-				};
-
-				// F50 materials
-
-				CARS[ "f50" ].materials = {
-
-					body: [
-
-						[ "Orange", 	mlib[ "Orange" ] ],
-						[ "Blue", 		mlib[ "Blue" ] ],
-						[ "Red", 		mlib[ "Red" ] ],
-						[ "Black", 		mlib[ "Black" ] ],
-						[ "White", 		mlib[ "White" ] ],
-
-						[ "Orange metal", 	mlib[ "Orange metal" ] ],
-						[ "Blue metal", 	mlib[ "Blue metal" ] ],
-						[ "Black metal", 	mlib[ "Black metal" ] ],
-
-						[ "Carmine", 	mlib[ "Carmine" ] ],
-						[ "Gold", 		mlib[ "Gold" ] ],
-						[ "Bronze", 	mlib[ "Bronze" ] ],
-						[ "Chrome", 	mlib[ "Chrome" ] ]
-
-					]
-
-				};
-
-				m = CARS[ "f50" ].materials;
-				mi = CARS[ "f50" ].init_material;
-
-				CARS[ "f50" ].mmap = {
-
-					0:  mlib[ "Dark chrome" ], 		// interior + rim
-					1:  mlib[ "Pure chrome" ], 		// wheels + gears chrome
-					2:  mlib[ "Blue glass" ], 		// glass
-					3:  m.body[ mi ][ 1 ], 			// torso mid + front spoiler
-					4:  mlib[ "Darkgray shiny" ], 	// interior + behind seats
-					5:  mlib[ "Darkgray shiny" ], 	// tiny dots in interior
-					6:  m.body[ mi ][ 1 ], 			// back torso
-					7:  m.body[ mi ][ 1 ], 			// right mirror decal
-					8:  m.body[ mi ][ 1 ], 			// front decal
-					9:  m.body[ mi ][ 1 ], 			// front torso
-					10: m.body[ mi ][ 1 ], 			// left mirror decal
-					11: mlib[ "Pure chrome" ], 		// engine
-					12: mlib[ "Darkgray rough" ],	// tires side
-					13: mlib[ "Darkgray rough" ],	// tires bottom
-					14: mlib[ "Darkgray shiny" ], 	// bottom
-					15: mlib[ "Black rough" ],		// ???
-					16: mlib[ "Orange glass" ],		// front signals
-					17: mlib[ "Dark chrome" ], 		// wheels center
-					18: mlib[ "Red glass" ], 		// back lights
-					19: mlib[ "Black rough" ], 		// ???
-					20: mlib[ "Red rough" ], 		// seats
-					21: mlib[ "Black rough" ], 		// back plate
-					22: mlib[ "Black rough" ], 		// front light dots
-					23: m.body[ mi ][ 1 ], 			// back torso
-					24: m.body[ mi ][ 1 ] 			// back torso center
-
-				};
-
-
-				// Camero materials
-
-				CARS[ "camaro" ].materials = {
-
-					body: [
-
-						[ "Orange", 	mlib[ "Orange" ] ],
-						[ "Blue", 		mlib[ "Blue" ] ],
-						[ "Red", 		mlib[ "Red" ] ],
-						[ "Black", 		mlib[ "Black" ] ],
-						[ "White", 		mlib[ "White" ] ],
-
-						[ "Orange metal", 	mlib[ "Orange metal" ] ],
-						[ "Blue metal", 	mlib[ "Blue metal" ] ],
-						[ "Red metal", 		mlib[ "Red metal" ] ],
-						[ "Green metal", 	mlib[ "Green metal" ] ],
-						[ "Black metal", 	mlib[ "Black metal" ] ],
-
-						[ "Gold", 		mlib[ "Gold" ] ],
-						[ "Bronze", 	mlib[ "Bronze" ] ],
-						[ "Chrome", 	mlib[ "Chrome" ] ]
-
-					]
-
-				};
-
-				m = CARS[ "camaro" ].materials;
-				mi = CARS[ "camaro" ].init_material;
-
-				CARS[ "camaro" ].mmap = {
-
-					0: m.body[ mi ][ 1 ], 			// car body
-					1: mlib[ "Pure chrome" ], 		// wheels chrome
-					2: mlib[ "Pure chrome" ], 		// grille chrome
-					3: mlib[ "Dark chrome" ], 		// door lines
-					4: mlib[ "Light glass" ], 		// windshield
-					5: mlib[ "Gray shiny" ],        // interior
-					6: mlib[ "Black rough" ],       // tire
-					7: mlib[ "Fullblack rough" ],   // tireling
-					8: mlib[ "Fullblack rough" ]    // behind grille
-
-				};
-
-				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
-
-				for( var c in CARS ) initCarButton( c );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
+				carParts.body.forEach( function ( part ) { part.material = bodyMat; } );
+				carParts.rims.forEach( function ( part ) { part.material = rimMat; } );
+				carParts.glass.forEach( function ( part ) { part.material = glassMat; } );
 
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -455,152 +302,55 @@
 
 			}
 
-			function initCarButton( car ) {
+			function onFollowCameraToggle() {
 
-				$( car ).addEventListener( 'click', function() {
+				carModel.position.copy( origin );
 
-					if ( ! CARS[ car ].object ) {
+			}
 
-						loader.load( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) } );
+			function update() {
 
-					} else {
+				var delta = clock.getDelta();
 
-						switchCar( car );
+				if ( carModel ) {
+
+					car.update( delta / 3 );
+
+					resetPosition();
+
+					// keep the light (and shadow) pointing in the same direction as the car rotates
+					lightHolder.rotation.y = -carModel.rotation.y;
+
+					if ( followCamera.checked ) {
+
+						carModel.getWorldPosition( cameraTarget );
+						cameraTarget.y = 2.5;
+						cameraTarget.z += distance;
+
+						camera.position.lerp( cameraTarget, delta * damping );
 
 					}
 
-				}, false );
-
-			}
-
-			function $( id ) { return document.getElementById( id ) }
-			function button_name( car, index ) { return "m_" + car  + "_" + index }
-
-			function switchCar( car ) {
-
-				for ( var c in CARS ) {
-
-					if ( c != car && CARS[ c ].object ) {
-
-						CARS[ c ].object.visible = false;
-						CARS[ c ].buttons.style.display = "none";
-
-					}
-				}
-
-				CARS[ car ].object.visible = true;
-				CARS[ car ].buttons.style.display = "block";
-
-				$( "car_name" ).innerHTML = CARS[ car ].name + " model";
-				$( "car_author" ).innerHTML = CARS[ car ].author;
-
-			}
-
-			function createButtons( materials, car ) {
-
-				var buttons, i, src = "";
-
-				for( i = 0; i < materials.length; i ++ ) {
-
-					src += '<button id="' + button_name( car, i ) + '">' + materials[ i ][ 0 ] + '</button> ';
+					camera.lookAt( carModel.position );
 
 				}
 
-				buttons = document.createElement( "div" );
-				buttons.innerHTML = src;
-
-				$( "buttons_materials" ).appendChild( buttons );
-
-				return buttons;
+				stats.update();
 
 			}
 
-			function attachButtonMaterials( materials, faceMaterials, material_indices, car ) {
+			function resetPosition() {
 
-				for( var i = 0; i < materials.length; i ++ ) {
+				if ( carModel.position.distanceTo( origin ) > 200 ) {
 
-					$( button_name( car, i ) ).counter = i;
-					$( button_name( car, i ) ).addEventListener( 'click', function() {
-
-						for ( var j = 0; j < material_indices.length; j ++ ) {
-
-							faceMaterials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
-
-						}
-
-					}, false );
+					carModel.position.copy( origin );
+					car.speed = 0;
 
 				}
 
 			}
 
-			function createScene( geometry, car ) {
-
-				geometry.sortFacesByMaterialIndex();
-
-				var m = [],
-					s = CARS[ car ].scale * 1,
-					r = CARS[ car ].init_rotation,
-					materials = CARS[ car ].materials,
-					mi = CARS[ car ].init_material,
-					bm = CARS[ car ].body_materials;
-
-				for ( var i in CARS[ car ].mmap ) {
-
-					m[ i ] = CARS[ car ].mmap[ i ];
-
-				}
-
-				var mesh = new THREE.Mesh( geometry, m );
-
-				mesh.rotation.x = r[ 0 ];
-				mesh.rotation.y = r[ 1 ];
-				mesh.rotation.z = r[ 2 ];
-
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-
-				scene.add( mesh );
-
-				CARS[ car ].object = mesh;
-
-				CARS[ car ].buttons = createButtons( materials.body, car );
-				attachButtonMaterials( materials.body, m, bm, car );
-
-				switchCar( car );
-
-			}
-
-			function onDocumentMouseMove(event) {
-
-				mouseY = ( event.clientY - window.innerHeight );
-
-			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
-
-				var timer = -0.0002 * Date.now();
-
-				camera.position.x = 1000 * Math.cos( timer );
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.position.z = 1000 * Math.sin( timer );
-
-				camera.lookAt( scene.position );
-
-				renderer.render( scene, camera );
-
-				if ( STATS_ENABLED ) stats.update();
-
-			}
+			init();
 
 		</script>
 

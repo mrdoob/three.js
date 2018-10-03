@@ -10,6 +10,7 @@ import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEnco
 import { _Math } from '../math/Math.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
+import { ImageUtils } from '../extras/ImageUtils.js';
 
 var textureId = 0;
 
@@ -70,6 +71,12 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	isTexture: true,
 
+	updateMatrix: function () {
+
+		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
+
+	},
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
@@ -124,46 +131,6 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
-		function getDataURL( image ) {
-
-			var canvas;
-
-			if ( image instanceof HTMLCanvasElement ) {
-
-				canvas = image;
-
-			} else {
-
-				canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-				canvas.width = image.width;
-				canvas.height = image.height;
-
-				var context = canvas.getContext( '2d' );
-
-				if ( image instanceof ImageData ) {
-
-					context.putImageData( image, 0, 0 );
-
-				} else {
-
-					context.drawImage( image, 0, 0, image.width, image.height );
-
-				}
-
-			}
-
-			if ( canvas.width > 2048 || canvas.height > 2048 ) {
-
-				return canvas.toDataURL( 'image/jpeg', 0.6 );
-
-			} else {
-
-				return canvas.toDataURL( 'image/png' );
-
-			}
-
-		}
-
 		var output = {
 
 			metadata: {
@@ -207,9 +174,31 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
+				var url;
+
+				if ( Array.isArray( image ) ) {
+
+					// process array of images e.g. CubeTexture
+
+					url = [];
+
+					for ( var i = 0, l = image.length; i < l; i ++ ) {
+
+						url.push( ImageUtils.getDataURL( image[ i ] ) );
+
+					}
+
+				} else {
+
+					// process single image
+
+					url = ImageUtils.getDataURL( image );
+
+				}
+
 				meta.images[ image.uuid ] = {
 					uuid: image.uuid,
-					url: getDataURL( image )
+					url: url
 				};
 
 			}
@@ -236,7 +225,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	transformUv: function ( uv ) {
 
-		if ( this.mapping !== UVMapping ) return;
+		if ( this.mapping !== UVMapping ) return uv;
 
 		uv.applyMatrix3( this.matrix );
 
@@ -307,6 +296,8 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			uv.y = 1 - uv.y;
 
 		}
+
+		return uv;
 
 	}
 

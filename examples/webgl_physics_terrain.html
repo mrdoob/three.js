@@ -36,15 +36,18 @@
 				<script src="../build/three.js"></script>
 				<script src="js/libs/ammo.js"></script>
 				<script src="js/controls/OrbitControls.js"></script>
-				<script src="js/Detector.js"></script>
+				<script src="js/WebGL.js"></script>
 				<script src="js/libs/stats.min.js"></script>
 
 				<script>
 
 					// Detects webgl
-					if ( ! Detector.webgl ) {
-						Detector.addGetWebGLMessage();
+
+					if ( WEBGL.isWebGLAvailable() === false ) {
+
+						document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 						document.getElementById( 'container' ).innerHTML = "";
+
 					}
 
 					// - Global variables -
@@ -124,7 +127,7 @@
 						camera.position.y = heightData[ terrainHalfWidth + terrainHalfDepth * terrainWidth ] * ( terrainMaxHeight - terrainMinHeight ) + 5;
 
 						camera.position.z = terrainDepthExtents / 2;
-						camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+						camera.lookAt( 0, 0, 0 );
 
 						controls = new THREE.OrbitControls( camera );
 
@@ -204,7 +207,7 @@
 
 						// Create the terrain body
 
-						var groundShape = this.createTerrainShape( heightData );
+						var groundShape = createTerrainShape();
 						var groundTransform = new Ammo.btTransform();
 						groundTransform.setIdentity();
 						// Shifts the terrain, since bullet re-centers it on its bounding box.
@@ -321,7 +324,7 @@
 							case 1:
 								// Sphere
 								var radius = 1 + Math.random() * objectSize;
-								threeObject = new THREE.Mesh( new THREE.SphereGeometry( radius, 20, 20 ), createObjectMaterial() );
+								threeObject = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, 20, 20 ), createObjectMaterial() );
 								shape = new Ammo.btSphereShape( radius );
 								shape.setMargin( margin );
 								break;
@@ -330,7 +333,7 @@
 								var sx = 1 + Math.random() * objectSize;
 								var sy = 1 + Math.random() * objectSize;
 								var sz = 1 + Math.random() * objectSize;
-								threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), createObjectMaterial() );
+								threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), createObjectMaterial() );
 								shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 								shape.setMargin( margin );
 								break;
@@ -338,7 +341,7 @@
 								// Cylinder
 								var radius = 1 + Math.random() * objectSize;
 								var height = 1 + Math.random() * objectSize;
-								threeObject = new THREE.Mesh( new THREE.CylinderGeometry( radius, radius, height, 20, 1 ), createObjectMaterial() );
+								threeObject = new THREE.Mesh( new THREE.CylinderBufferGeometry( radius, radius, height, 20, 1 ), createObjectMaterial() );
 								shape = new Ammo.btCylinderShape( new Ammo.btVector3( radius, height * 0.5, radius ) );
 								shape.setMargin(margin);
 								break;
@@ -346,7 +349,7 @@
 								// Cone
 								var radius = 1 + Math.random() * objectSize;
 								var height = 2 + Math.random() * objectSize;
-								threeObject = new THREE.Mesh( new THREE.CylinderGeometry( 0, radius, height, 20, 2 ), createObjectMaterial() );
+								threeObject = new THREE.Mesh( new THREE.ConeBufferGeometry( radius, height, 20, 2 ), createObjectMaterial() );
 								shape = new Ammo.btConeShape( radius, height );
 								break;
 						}

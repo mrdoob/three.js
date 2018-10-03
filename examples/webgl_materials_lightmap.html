@@ -23,7 +23,7 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
@@ -112,7 +112,7 @@
 				};
 				uniforms.topColor.value.copy( light.color );
 
-				var skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
+				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
 				var skyMat = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: vertexShader,
@@ -140,19 +140,10 @@
 
 				// MODEL
 
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/json/lightmap/lightmap.json", function ( geometry, materials ) {
+				var loader = new THREE.ObjectLoader();
+				loader.load( "models/json/lightmap/lightmap.json", function ( object ) {
 
-					for ( var i = 0; i < materials.length; i ++ ) {
-
-						materials[ i ].lightMapIntensity = 0.75;
-
-					}
-
-					var mesh = new THREE.Mesh( geometry, materials );
-
-					mesh.scale.multiplyScalar( 100 );
-					scene.add( mesh );
+					scene.add( object );
 
 				} );
 

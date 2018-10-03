@@ -40,7 +40,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/exporters/GLTFExporter.js"></script>
 
@@ -51,14 +51,14 @@
 				var gltfExporter = new THREE.GLTFExporter();
 
 				var options = {
-					trs: document.getElementById('option_trs').checked,
-					onlyVisible: document.getElementById('option_visible').checked,
-					truncateDrawRange: document.getElementById('option_drawrange').checked,
-					binary: document.getElementById('option_binary').checked,
-					forceIndices: document.getElementById('option_forceindices').checked,
-					forcePowerOfTwoTextures: document.getElementById('option_forcepot').checked
+					trs: document.getElementById( 'option_trs' ).checked,
+					onlyVisible: document.getElementById( 'option_visible' ).checked,
+					truncateDrawRange: document.getElementById( 'option_drawrange' ).checked,
+					binary: document.getElementById( 'option_binary' ).checked,
+					forceIndices: document.getElementById( 'option_forceindices' ).checked,
+					forcePowerOfTwoTextures: document.getElementById( 'option_forcepot' ).checked
 				};
-				gltfExporter.parse( input, function( result ) {
+				gltfExporter.parse( input, function ( result ) {
 
 					if ( result instanceof ArrayBuffer ) {
 
@@ -140,7 +140,11 @@
 
 			}
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
@@ -162,7 +166,7 @@
 				// Perspective Camera
 				// ---------------------------------------------------------------------
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set(600, 400, 0);
+				camera.position.set( 600, 400, 0 );
 
 				camera.name = "PerspectiveCamera";
 				scene1.add( camera );
@@ -186,7 +190,7 @@
 				// Grid
 				// ---------------------------------------------------------------------
 				gridHelper = new THREE.GridHelper( 2000, 20 );
-				gridHelper.position.y = -50;
+				gridHelper.position.y = - 50;
 				gridHelper.name = "Grid";
 				scene1.add( gridHelper );
 
@@ -209,7 +213,7 @@
 				} );
 
 				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 0 ), material );
-				object.position.set( -200, 0, 200 );
+				object.position.set( - 200, 0, 200 );
 				object.name = 'Icosahedron';
 				scene1.add( object );
 
@@ -266,7 +270,7 @@
 					roughness: 1
 				} );
 				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 15, 40, 10 ), material );
-				object.position.set( -200, 0, 0 );
+				object.position.set( - 200, 0, 0 );
 				object.name = "Cylinder";
 				scene1.add( object );
 
@@ -278,11 +282,11 @@
 				material = new THREE.MeshStandardMaterial( { map: mapWood, side: THREE.DoubleSide } );
 
 				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 100, 100 ), material );
-				object.position.set( -200, 0, 400 );
+				object.position.set( - 200, 0, 400 );
 				object.name = "Cube";
 				scene1.add( object );
 
-				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40, 2, 2, 2 ), material );
+				var object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
 				object2.name = "SubCube";
@@ -298,10 +302,10 @@
 
 				var group2 = new THREE.Group();
 				group2.name = "subGroup";
-				group2.position.set( 0, 50, 0);
+				group2.position.set( 0, 50, 0 );
 				group1.add( group2 );
 
-				var object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
+				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 0, 400 );
 				group2.add( object2 );
@@ -310,31 +314,31 @@
 				// Triangle Strip
 				// ---------------------------------------------------------------------
 				var geometry = new THREE.BufferGeometry();
-				var positions = new Float32Array([
+				var positions = new Float32Array( [
 					0, 0, 0,
 					0, 80, 0,
 					80, 0, 0,
 					80, 80, 0,
 					80, 0, 80,
 					80, 80, 80,
-				]);
+				] );
 
-				var colors = new Float32Array([
+				var colors = new Float32Array( [
 					1, 0, 0,
 					1, 0, 0,
 					1, 1, 0,
 					1, 1, 0,
 					0, 0, 1,
 					0, 0, 1,
-				]);
+				] );
 
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
-				object.position.set( 140, -40, -250);
+				object.position.set( 140, - 40, - 250 );
 				object.setDrawMode( THREE.TriangleStripDrawMode );
 				object.name = 'Custom buffered';
-				object.userData = { data: 'customdata', list: [ 1,2,3,4 ] };
+				object.userData = { data: 'customdata', list: [ 1, 2, 3, 4 ] };
 
 				scene1.add( object );
 
@@ -346,15 +350,17 @@
 				var numPoints = 100;
 				var positions = new Float32Array( numPoints * 3 );
 
-				for (var i = 0; i < numPoints; i++ ) {
+				for ( var i = 0; i < numPoints; i ++ ) {
+
 					positions[ i * 3 ] = i;
 					positions[ i * 3 + 1 ] = Math.sin( i / 2 ) * 20;
 					positions[ i * 3 + 2 ] = 0;
+
 				}
 
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
-				object.position.set(-50, 0, -200);
+				object.position.set( - 50, 0, - 200 );
 				scene1.add( object );
 
 
@@ -366,16 +372,18 @@
 				var radius = 70;
 				var positions = new Float32Array( numPoints * 3 );
 
-				for (var i = 0; i < numPoints; i++ ) {
+				for ( var i = 0; i < numPoints; i ++ ) {
+
 					var s = i * Math.PI * 2 / numPoints;
-					positions[ i * 3 ] = radius * Math.sin ( s );
-					positions[ i * 3 + 1 ] = radius * Math.cos ( s );
+					positions[ i * 3 ] = radius * Math.sin( s );
+					positions[ i * 3 + 1 ] = radius * Math.cos( s );
 					positions[ i * 3 + 2 ] = 0;
+
 				}
 
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				object = new THREE.LineLoop( geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
-				object.position.set(0, 0, -200);
+				object.position.set( 0, 0, - 200 );
 
 				scene1.add( object );
 
@@ -389,23 +397,23 @@
 				var positions = new Float32Array( ( numElements + outOfRange ) * 3 );
 				var colors = new Float32Array( ( numElements + outOfRange ) * 3 );
 
-				positions.set([
+				positions.set( [
 					0, 0, 0,
 					0, 80, 0,
 					80, 0, 0,
 					80, 0, 0,
 					0, 80, 0,
 					80, 80, 0
-				]);
+				] );
 
-				colors.set([
+				colors.set( [
 					1, 0, 0,
 					1, 0, 0,
 					1, 1, 0,
 					1, 1, 0,
 					0, 0, 1,
 					0, 0, 1,
-				]);
+				] );
 
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
@@ -413,7 +421,7 @@
 
 				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
 				object.name = 'Custom buffered truncated';
-				object.position.set( 340, -40, -200 );
+				object.position.set( 340, - 40, - 200 );
 
 				scene1.add( object );
 
@@ -422,10 +430,12 @@
 				// ---------------------------------------------------------------------
 				var numPoints = 100;
 				var pointsArray = new Float32Array( numPoints * 3 );
-				for ( var i = 0; i < numPoints; i++ ) {
-					pointsArray[ 3 * i ] = -50 + Math.random() * 100;
+				for ( var i = 0; i < numPoints; i ++ ) {
+
+					pointsArray[ 3 * i ] = - 50 + Math.random() * 100;
 					pointsArray[ 3 * i + 1 ] = Math.random() * 100;
-					pointsArray[ 3 * i + 2 ] = -50 + Math.random() * 100;
+					pointsArray[ 3 * i + 2 ] = - 50 + Math.random() * 100;
+
 				}
 
 				var pointsGeo = new THREE.BufferGeometry();
@@ -434,7 +444,7 @@
 				var pointsMaterial = new THREE.PointsMaterial( { color: 0xffff00, size: 5 } );
 				var points = new THREE.Points( pointsGeo, pointsMaterial );
 				points.name = "Points";
-				points.position.set( -200, 0, -200);
+				points.position.set( - 200, 0, - 200 );
 				scene1.add( points );
 
 				// ---------------------------------------------------------------------
@@ -450,15 +460,15 @@
 				} );
 
 				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
-				object.position.set( 200, 0, -400 );
+				object.position.set( 200, 0, - 400 );
 				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
-				object.position.set( 0, 0, -400 );
+				object.position.set( 0, 0, - 400 );
 				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
-				object.position.set( -200, 0, -400 );
+				object.position.set( - 200, 0, - 400 );
 				scene1.add( object );
 
 				//
@@ -494,12 +504,12 @@
 
 					waltHead = obj;
 					waltHead.scale.multiplyScalar( 1.5 );
-					waltHead.position.set(400, 0, 0);
+					waltHead.position.set( 400, 0, 0 );
 					scene1.add( waltHead );
 
 				} );
-				
-				
+
+
 				// ---------------------------------------------------------------------
 				// 2nd Scene
 				// ---------------------------------------------------------------------
@@ -508,7 +518,7 @@
 				object.position.set( 0, 0, 0 );
 				object.name = "Cube2ndScene";
 				scene2.name = 'Scene2';
-				scene2.add(object);
+				scene2.add( object );
 
 				//
 

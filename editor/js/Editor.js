@@ -72,7 +72,7 @@ var Editor = function () {
 
 	};
 
-	this.config = new Config( 'threejs-editor' );
+	this.config = new Config();
 	this.history = new History( this );
 	this.storage = new Storage();
 	this.loader = new Loader( this );

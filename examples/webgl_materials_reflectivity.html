@@ -35,7 +35,7 @@
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/pmrem/PMREMGenerator.js"></script>
@@ -54,7 +54,11 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var params = {
@@ -166,6 +170,10 @@
 					gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
 					gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
 
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
 				} );
 
 
@@ -259,8 +267,6 @@
 				}
 
 				renderer.toneMappingExposure = params.exposure;
-
-				var timer = Date.now() * 0.00025;
 
 				camera.lookAt( scene.position );
 

@@ -4,8 +4,12 @@
 		<title>three.js webvr - panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-09-11 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-09-11" content="AqhFUYKxq/d+E8CDT0fuYRCg8TvlTP52x0Jv7I9t27sLhR30LmcahBRfSwzP89ukjs2+ia99VrrLoRyaFAwJVA0AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNjYyNDAwMH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2018-10-27 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2018-10-27" content="An4ZYOGvf6kVHNxqZxS02TPAvpZESkmBhcVCM/byViDDuEB2XKvCF43aCJjrAU/R8H3WDlv+1bDGTL/XxstHGgoAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0MDY1NTAyMn0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-10-24 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-10-24" content="Agrr6lZhlwzv5jmv/mpLZA37DIiVcg3HvX8bH8EWB+OBruV3sUJuzDfYz6qs/je+LcH41DkrmPn4k9RaUaqpQAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQwMzg4NjI0fQ==">
 		<style>
 			html, body {
 				background-color: #000;
@@ -36,10 +40,9 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.vr.enabled = true;
-			renderer.vr.userHeight = 0; // TOFIX
 			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer ) );
+			document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'head-model' } ) );
 
 			//
 
@@ -48,7 +51,7 @@
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera.layers.enable( 1 );
 
-			var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+			var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 			geometry.scale( 1, 1, - 1 );
 			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );
 
@@ -91,9 +94,8 @@
 
 			}
 
-			var imageObj = new Image();
-
-			imageObj.onload = function() {
+			var loader = new THREE.ImageLoader();
+			loader.load( atlasImgUrl, function ( imageObj ) {
 
 				var canvas, context;
 				var tileWidth = imageObj.height;
@@ -105,14 +107,12 @@
 					canvas.height = tileWidth;
 					canvas.width = tileWidth;
 					context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-					textures[ i ].image = canvas
+					textures[ i ].image = canvas;
 					textures[ i ].needsUpdate = true;
 
 				}
 
-			};
-
-			imageObj.src = atlasImgUrl;
+			} );
 
 			return textures;
 
@@ -129,7 +129,7 @@
 
 		function animate() {
 
-			renderer.animate( render );
+			renderer.setAnimationLoop( render );
 
 		}
 

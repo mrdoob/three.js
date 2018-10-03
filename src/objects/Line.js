@@ -5,7 +5,7 @@ import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { LineSegments } from './LineSegments.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -15,8 +15,7 @@ function Line( geometry, material, mode ) {
 
 	if ( mode === 1 ) {
 
-		console.warn( 'THREE.Line: parameter THREE.LinePieces no longer supported. Created THREE.LineSegments instead.' );
-		return new LineSegments( geometry, material );
+		console.error( 'THREE.Line: parameter THREE.LinePieces no longer supported. Use THREE.LineSegments instead.' );
 
 	}
 
@@ -63,7 +62,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					}
 
-					geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
+					geometry.addAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
 
 				} else {
 
@@ -102,7 +101,6 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		return function raycast( raycaster, intersects ) {
 
 			var precision = raycaster.linePrecision;
-			var precisionSq = precision * precision;
 
 			var geometry = this.geometry;
 			var matrixWorld = this.matrixWorld;
@@ -113,6 +111,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			sphere.copy( geometry.boundingSphere );
 			sphere.applyMatrix4( matrixWorld );
+			sphere.radius += precision;
 
 			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
@@ -120,6 +119,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			inverseMatrix.getInverse( matrixWorld );
 			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+			var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+			var localPrecisionSq = localPrecision * localPrecision;
 
 			var vStart = new Vector3();
 			var vEnd = new Vector3();
@@ -147,7 +149,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 						var distSq = ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-						if ( distSq > precisionSq ) continue;
+						if ( distSq > localPrecisionSq ) continue;
 
 						interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -179,7 +181,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 						var distSq = ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-						if ( distSq > precisionSq ) continue;
+						if ( distSq > localPrecisionSq ) continue;
 
 						interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -213,7 +215,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					var distSq = ray.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-					if ( distSq > precisionSq ) continue;
+					if ( distSq > localPrecisionSq ) continue;
 
 					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 

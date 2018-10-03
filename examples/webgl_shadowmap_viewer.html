@@ -32,12 +32,16 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 		<script src="js/utils/ShadowMapViewer.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, clock, stats;
 			var dirLight, spotLight;
@@ -101,7 +105,7 @@
 				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
 				// Geometry
-				var geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
+				var geometry = new THREE.TorusKnotBufferGeometry( 25, 8, 75, 20 );
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xff0000,
 					shininess: 150,
@@ -115,14 +119,14 @@
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
 
-				var geometry = new THREE.BoxGeometry( 3, 3, 3 );
+				var geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
 				cube = new THREE.Mesh( geometry, material );
 				cube.position.set( 8, 3, 8 );
 				cube.castShadow = true;
 				cube.receiveShadow = true;
 				scene.add( cube );
 
-				var geometry = new THREE.BoxGeometry( 10, 0.15, 10 );
+				var geometry = new THREE.BoxBufferGeometry( 10, 0.15, 10 );
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xa0adaf,
 					shininess: 150,
@@ -155,7 +159,7 @@
 
 			function initMisc() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;

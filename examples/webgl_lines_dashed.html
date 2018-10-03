@@ -35,12 +35,16 @@
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer, scene, camera, stats;
 			var objects = [];
@@ -66,7 +70,7 @@
 				var spline = new THREE.CatmullRomCurve3( points );
 
 				var samples = spline.getPoints( points.length * subdivisions );
-				var geometrySpline = new THREE.Geometry().setFromPoints( samples );
+				var geometrySpline = new THREE.BufferGeometry().setFromPoints( samples );
 
 				var line = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
 				line.computeLineDistances();
@@ -76,7 +80,7 @@
 
 				var geometryCube = cube( 50 );
 
-				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ) );
+				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
 				lineSegments.computeLineDistances();
 
 				objects.push( lineSegments );

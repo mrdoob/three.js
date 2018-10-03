@@ -9,49 +9,101 @@
 				background:#777;
 				padding:0;
 				margin:0;
-				font-weight: bold;
 				overflow:hidden;
+				font-family: Monospace;
 			}
 
 			#info {
 				position: absolute;
+				z-index: 2;
 				top: 0px;
 				width: 100%;
 				color: #ffffff;
 				padding: 5px;
-				font-family:Monospace;
+
 				font-size:13px;
 				text-align:center;
+				font-weight: bold;
 			}
 
 			a {
 				color: #ffffff;
 			}
+
+			#overlay {
+				position: absolute;
+				z-index: 1;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 1;
+				background-color: #000000;
+				color: #ffffff;
+			}
+
+			#overlay > div {
+				text-align: center;
+			}
+
+			#overlay > div > button {
+				height: 20px;
+				width: 100px;
+				background: transparent;
+				color: #ffffff;
+				outline: 1px solid #ffffff;
+				border: 0px;
+				cursor: pointer;
+			}
+
+			#overlay > div > p {
+				color: #777777;
+				font-size: 12px;
+			}
+
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 	</head>
 <body>
 
+	<div id="overlay">
+		<div>
+			<button id="startButton">Click to Play</button>
+			<p>Automatic audio playback requires a user interaction.</p>
+		</div>
+	</div>
 	<div id="container"></div>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio timing | sound effect by <a href="https://freesound.org/people/michorvath/sounds/269718/" target="_blank" rel="noopener noreferrer">michorvath</a>
+		<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio timing |
+		sound effect by <a href="https://freesound.org/people/michorvath/sounds/269718/" target="_blank" rel="noopener noreferrer">michorvath</a>
 	</div>
 
 	<script>
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	if ( WEBGL.isWebGLAvailable() === false ) {
 
-	var scene, camera, renderer, audio;
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
+
+	var scene, camera, renderer;
 
 	var objects = [];
 
-	init();
+	var startButton = document.getElementById( 'startButton' );
+	startButton.addEventListener( 'click', init );
 
 	function init() {
+
+		var overlay = document.getElementById( 'overlay' );
+		overlay.remove();
 
 		var container = document.getElementById( 'container' );
 
@@ -159,7 +211,7 @@
 
 	}
 
-	function onWindowResize( event ) {
+	function onWindowResize() {
 
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();

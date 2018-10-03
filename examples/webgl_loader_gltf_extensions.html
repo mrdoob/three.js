@@ -30,129 +30,186 @@
 				z-index: -1;
 			}
 
-			#controls {
-				position: absolute;
-				width: 200px;
-				bottom: 0px;
-				left: 0px;
-				padding: 10px;
-				background-color: White;
-				font: 13px "Lucida Grande", Lucida, Verdana, sans-serif;
-			}
-
-			#controls > div {
-				margin-bottom: 8px;
-			}
-
-			#controls hr {
-				border: 0px;
-				height: 1px;
-				margin-bottom: 10px;
-				background-color: #bbb;
-			}
-
 			#info a, .button {
 				color: #f00;
 				font-weight: bold;
 				text-decoration: underline;
 				cursor: pointer
 			}
+
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 2.0 loader
-		<br>
-		BoomBox by <a href="https://www.microsoft.com/" target="_blank" rel="noopener">Microsoft</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 2.0 loader<br />
+			<div id="description"></div>
 		</div>
-	<div id="container"></div>
-	<div id="controls">
-		<div id="status">Loading...</div>
-		<hr />
-		<div>
-			Model
-			<select id="scenes_list" size="1" onchange="selectScene();" ondblclick="selectScene();"></select>
-		</div>
-		<div>
-			Camera
-			<select id="cameras_list" size="1" onchange="selectCamera();" ondblclick="selectCamera();"></select>
-		</div>
-		<div>
-			Animations
-			<input type="checkbox" checked onclick="toggleAnimations();">Play</input>
-		</div>
-		<div>
-			Extension
-			<select id="extensions_list" onchange="selectExtension();">
-				<option value="glTF">None (Default)</option>
-				<option value="glTF-Embedded">None (Embedded)</option>
-				<option value="glTF-Binary">None (Binary)</option>
-				<option value="glTF-MaterialsUnlit">Materials Unlit</option>
-				<option value="glTF-pbrSpecularGlossiness">Specular-Glossiness (PBR)</option>
-				<option value="glTF-Draco">Draco (Compressed)</option>
-			</select>
-		</div>
-	</div>
+
+		<div id="container"></div>
+
 		<script src="../build/three.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/DRACOLoader.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
-			var orbitControls = null;
+			var orbitControls;
 			var container, camera, scene, renderer, loader;
+			var gltf, envMap, mixer, gui, extensionControls;
 
-			var cameraIndex = 0;
-			var cameras = [];
-			var cameraNames = [];
-			var defaultCamera = null;
-			var gltf = null;
-			var mixer = null;
 			var clock = new THREE.Clock();
+
+			var scenes = {
+				Boombox: {
+					name: 'BoomBox (PBR)',
+					url: './models/gltf/BoomBox/%s/BoomBox.gltf',
+					author: 'Microsoft',
+					authorURL: 'https://www.microsoft.com/',
+					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
+					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
+					addLights: true,
+					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
+					addEnvMap: true
+				},
+				'Bot Skinned': {
+					name: 'Bot Skinned',
+					url: './models/gltf/BotSkinned/%s/Bot_Skinned.gltf',
+					author: 'MozillaVR',
+					authorURL: 'https://vr.mozilla.org/',
+					cameraPos: new THREE.Vector3( 0.5, 2, 2 ),
+					center: new THREE.Vector3( 0, 1.2, 0 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
+					addLights: true,
+					addGround: true,
+					shadows: true,
+					extensions: [ 'glTF-MaterialsUnlit' ]
+				},
+				MetalRoughSpheres: {
+					name: 'MetalRoughSpheres (PBR)',
+					url: './models/gltf/MetalRoughSpheres/%s/MetalRoughSpheres.gltf',
+					author: '@emackey',
+					authorURL: 'https://twitter.com/emackey',
+					cameraPos: new THREE.Vector3( 2, 1, 15 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
+					addLights: true,
+					extensions: [ 'glTF', 'glTF-Embedded' ],
+					addEnvMap: true
+				},
+				Duck: {
+					name: 'Duck',
+					url: './models/gltf/Duck/%s/Duck.gltf',
+					author: 'Sony',
+					authorURL: 'https://www.playstation.com/en-us/corporate/about/',
+					cameraPos: new THREE.Vector3( 0, 3, 5 ),
+					addLights: true,
+					addGround: true,
+					shadows: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco' ]
+				},
+				Monster: {
+					name: 'Monster',
+					url: './models/gltf/Monster/%s/Monster.gltf',
+					author: '3drt.com',
+					authorURL: 'http://www.3drt.com/downloads.htm',
+					cameraPos: new THREE.Vector3( 30, 10, 70 ),
+					objectScale: new THREE.Vector3( 0.4, 0.4, 0.4 ),
+					objectPosition: new THREE.Vector3( 2, 1, 0 ),
+					objectRotation: new THREE.Euler( 0, - 3 * Math.PI / 4, 0 ),
+					animationTime: 3,
+					addLights: true,
+					shadows: true,
+					addGround: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco', 'glTF-lights' ]
+				},
+				'Cesium Man': {
+					name: 'Cesium Man',
+					url: './models/gltf/CesiumMan/%s/CesiumMan.gltf',
+					author: 'Cesium',
+					authorURL: 'https://cesiumjs.org/',
+					cameraPos: new THREE.Vector3( 0, 3, 10 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
+					addLights: true,
+					addGround: true,
+					shadows: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco' ]
+				},
+				'Cesium Milk Truck': {
+					name: 'Cesium Milk Truck',
+					url: './models/gltf/CesiumMilkTruck/%s/CesiumMilkTruck.gltf',
+					author: 'Cesium',
+					authorURL: 'https://cesiumjs.org/',
+					cameraPos: new THREE.Vector3( 0, 3, 10 ),
+					addLights: true,
+					addGround: true,
+					shadows: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco' ]
+				},
+				'Outlined Box': {
+					name: 'Outlined Box',
+					url: './models/gltf/OutlinedBox/OutlinedBox.gltf',
+					author: '@twittmann',
+					authorURL: 'https://github.com/twittmann',
+					cameraPos: new THREE.Vector3( 0, 5, 15 ),
+					objectScale: new THREE.Vector3( 0.01, 0.01, 0.01 ),
+					objectRotation: new THREE.Euler( 0, 90, 0 ),
+					addLights: true,
+					shadows: true,
+					extensions: [ 'glTF' ]
+				},
+			};
+
+			var state = {
+				scene: Object.keys( scenes )[ 0 ],
+				extension: scenes[ Object.keys( scenes )[ 0 ] ].extensions[ 0 ],
+				playAnimation: true
+			};
 
 			function onload() {
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'keydown', function(e) { onKeyDown(e); }, false );
 
-				buildSceneList();
-				switchScene(0);
+				buildGUI();
+				initScene( scenes[ state.scene ] );
 				animate();
 
 			}
 
-			function initScene(index) {
+			function initScene( sceneInfo ) {
 
 				container = document.getElementById( 'container' );
+
+				var descriptionEl = document.getElementById( 'description' );
+
+				if ( sceneInfo.author && sceneInfo.authorURL ) {
+
+					descriptionEl.innerHTML = sceneInfo.name + ' by <a href="' + sceneInfo.authorURL + '" target="_blank" rel="noopener">' + sceneInfo.author + '</a>';
+
+				}
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				defaultCamera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
+				scene.add( camera );
 
-				//defaultCamera.up = new THREE.Vector3( 0, 1, 0 );
-				scene.add( defaultCamera );
-				camera = defaultCamera;
+				var spot1;
 
-				var sceneInfo = sceneList[index];
-
-				var spot1 = null;
-
-				if (sceneInfo.addLights) {
+				if ( sceneInfo.addLights ) {
 
 					var ambient = new THREE.AmbientLight( 0x222222 );
 					scene.add( ambient );
 
-					var directionalLight = new THREE.DirectionalLight( 0xdddddd );
+					var directionalLight = new THREE.DirectionalLight( 0xdddddd, 4 );
 					directionalLight.position.set( 0, 0, 1 ).normalize();
 					scene.add( directionalLight );
 
-					spot1   = new THREE.SpotLight( 0xffffff, 1 );
+					spot1 = new THREE.SpotLight( 0xffffff, 1 );
 					spot1.position.set( 10, 20, 10 );
 					spot1.angle = 0.25;
-					spot1.distance = 1024;
 					spot1.penumbra = 0.75;
 
 					if ( sceneInfo.shadows ) {
@@ -170,39 +227,44 @@
 
 				// RENDERER
 
+				// TODO: Reuse existing WebGLRenderer, GLTFLoaders, and so on
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
+				renderer.physicallyCorrectLights = true;
 
-				if (sceneInfo.shadows) {
+				if ( sceneInfo.shadows ) {
+
 					renderer.shadowMap.enabled = true;
 					renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
 				}
 
 				container.appendChild( renderer.domElement );
 
-				var ground = null;
+				orbitControls = new THREE.OrbitControls( camera, renderer.domElement );
 
-				if (sceneInfo.addGround) {
-					var groundMaterial = new THREE.MeshPhongMaterial({
-							color: 0xFFFFFF
-						});
-					ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(512, 512), groundMaterial);
+				if ( sceneInfo.addGround ) {
 
-					if (sceneInfo.shadows) {
-						ground.receiveShadow = true;
-					}
+					var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
+					var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 512, 512 ), groundMaterial );
+					ground.receiveShadow = !! sceneInfo.shadows;
 
-					if (sceneInfo.groundPos) {
-						ground.position.copy(sceneInfo.groundPos);
+					if ( sceneInfo.groundPos ) {
+
+						ground.position.copy( sceneInfo.groundPos );
+
 					} else {
-						ground.position.z = -70;
+
+						ground.position.z = - 70;
+
 					}
 
-					ground.rotation.x = -Math.PI / 2;
+					ground.rotation.x = - Math.PI / 2;
 
-					scene.add(ground);
+					scene.add( ground );
+
 				}
 
 				loader = new THREE.GLTFLoader();
@@ -210,63 +272,64 @@
 				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 				loader.setDRACOLoader( new THREE.DRACOLoader() );
 
-				for (var i = 0; i < extensionSelect.children.length; i++) {
-					var child = extensionSelect.children[i];
-					child.disabled = sceneInfo.extensions.indexOf(child.value) === -1;
-					if (child.disabled && child.selected) {
-						if (sceneInfo.extensions.length === 0) {
-							extensionSelect.value = extension = 'glTF';
-						} else {
-							extensionSelect.value = extension = sceneInfo.extensions[0];
-						}
-					}
-				}
+				var url = sceneInfo.url.replace( /%s/g, state.extension );
 
-				var url = sceneInfo.url;
-				var r = eval("/" + '\%s' + "/g");
-				url = url.replace(r, extension);
+				if ( state.extension === 'glTF-Binary' ) {
 
-				if (extension === 'glTF-Binary') {
-					url = url.replace('.gltf', '.glb');
+					url = url.replace( '.gltf', '.glb' );
+
 				}
 
 				var loadStartTime = performance.now();
-				var status = document.getElementById("status");
-				status.innerHTML = "Loading...";
 
-				loader.load( url, function(data) {
+				loader.load( url, function( data ) {
 
 					gltf = data;
 
 					var object = gltf.scene;
 
-					status.innerHTML = "Load time: " + ( performance.now() - loadStartTime ).toFixed( 2 ) + " ms.";
+					console.info( 'Load time: ' + ( performance.now() - loadStartTime ).toFixed( 2 ) + ' ms.' );
 
-					if (sceneInfo.cameraPos)
-						defaultCamera.position.copy(sceneInfo.cameraPos);
+					if ( sceneInfo.cameraPos ) {
 
-					if (sceneInfo.center) {
-						orbitControls.target.copy(sceneInfo.center);
+						camera.position.copy( sceneInfo.cameraPos );
+
 					}
 
-					if (sceneInfo.objectPosition) {
-						object.position.copy(sceneInfo.objectPosition);
+					if ( sceneInfo.center ) {
 
-						if (spot1) {
-							spot1.position.set(sceneInfo.objectPosition.x - 100, sceneInfo.objectPosition.y + 200, sceneInfo.objectPosition.z - 100 );
-							spot1.target.position.copy(sceneInfo.objectPosition);
+						orbitControls.target.copy( sceneInfo.center );
+
+					}
+
+					if ( sceneInfo.objectPosition ) {
+
+						object.position.copy( sceneInfo.objectPosition );
+
+						if ( spot1 ) {
+
+							spot1.position.set( sceneInfo.objectPosition.x - 100, sceneInfo.objectPosition.y + 200, sceneInfo.objectPosition.z - 100 );
+							spot1.target.position.copy( sceneInfo.objectPosition );
+
 						}
+
 					}
 
-					if (sceneInfo.objectRotation)
-						object.rotation.copy(sceneInfo.objectRotation);
+					if ( sceneInfo.objectRotation ) {
 
-					if (sceneInfo.objectScale)
-						object.scale.copy(sceneInfo.objectScale);
+						object.rotation.copy( sceneInfo.objectRotation );
+
+					}
+
+					if ( sceneInfo.objectScale ) {
+
+						object.scale.copy( sceneInfo.objectScale );
+
+					}
 
 					if ( sceneInfo.addEnvMap ) {
 
-						var envMap = getEnvMap();
+						if ( ! envMap ) envMap = getEnvMap();
 
 						object.traverse( function( node ) {
 
@@ -286,43 +349,9 @@
 
 					object.traverse( function ( node ) {
 
-						if ( node.isMesh ) node.castShadow = true;
+						if ( node.isMesh || node.isLight ) node.castShadow = true;
 
 					} );
-
-					cameraIndex = 0;
-					cameras = [];
-					cameraNames = [];
-
-					if (gltf.cameras && gltf.cameras.length) {
-
-						var i, len = gltf.cameras.length;
-
-						for (i = 0; i < len; i++) {
-
-							var addCamera = true;
-							var cameraName = gltf.cameras[i].parent.name || ('camera_' + i);
-
-							if (sceneInfo.cameras && !(cameraName in sceneInfo.cameras)) {
-									addCamera = false;
-							}
-
-							if (addCamera) {
-								cameraNames.push(cameraName);
-								cameras.push(gltf.cameras[i]);
-							}
-
-						}
-
-						updateCamerasList();
-						switchCamera(1);
-
-					} else {
-
-						updateCamerasList();
-						switchCamera(0);
-
-					}
 
 					var animations = gltf.animations;
 
@@ -336,10 +365,15 @@
 
 							// There's .3333 seconds junk at the tail of the Monster animation that
 							// keeps it from looping cleanly. Clip it at 3 seconds
-							if ( sceneInfo.animationTime )
+							if ( sceneInfo.animationTime ) {
+
 								animation.duration = sceneInfo.animationTime;
 
-							mixer.clipAction( animation ).play();
+							}
+
+							var action = mixer.clipAction( animation );
+
+							if ( state.playAnimation ) action.play();
 
 						}
 
@@ -354,69 +388,36 @@
 
 				} );
 
-			orbitControls = new THREE.OrbitControls(defaultCamera, renderer.domElement);
-
 			}
 
 			function onWindowResize() {
 
-				defaultCamera.aspect = container.offsetWidth / container.offsetHeight;
-				defaultCamera.updateProjectionMatrix();
-
-				var i, len = cameras.length;
-
-				for (i = 0; i < len; i++) { // just do it for default
-					cameras[i].aspect = container.offsetWidth / container.offsetHeight;
-					cameras[i].updateProjectionMatrix();
-				}
+				camera.aspect = container.offsetWidth / container.offsetHeight;
+				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
 			function animate() {
+
 				requestAnimationFrame( animate );
-				if (mixer) mixer.update(clock.getDelta());
-				if (cameraIndex == 0)
-					orbitControls.update();
+
+				if ( mixer ) mixer.update( clock.getDelta() );
+
+				orbitControls.update();
+
 				render();
+
 			}
 
 			function render() {
+
 				renderer.render( scene, camera );
-			}
-
-			function onKeyDown(event) {
-
-				var chr = String.fromCharCode(event.keyCode);
-
-				if (chr == ' ') {
-
-					var index = cameraIndex + 1;
-					if (index > cameras.length)
-					index = 0;
-					switchCamera(index);
-
-				} else {
-
-					var index = parseInt(chr);
-					if (!isNaN(index)	&& (index <= cameras.length)) {
-						switchCamera(index);
-					}
-
-				}
 
 			}
-
-			var envMap;
 
 			function getEnvMap() {
-
-				if ( envMap ) {
-
-					return envMap;
-
-				}
 
 				var path = 'textures/cube/Park2/';
 				var format = '.jpg';
@@ -428,215 +429,68 @@
 
 				envMap = new THREE.CubeTextureLoader().load( urls );
 				envMap.format = THREE.RGBFormat;
+
 				return envMap;
 
 			}
 
-			var sceneList = [
-				{
-					name : 'BoomBox (PBR)', url : './models/gltf/BoomBox/%s/BoomBox.gltf',
-					cameraPos: new THREE.Vector3(0.02, 0.01, 0.03),
-					objectRotation: new THREE.Euler(0, Math.PI, 0),
-					addLights:true,
-					extensions: ['glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary'],
-					addEnvMap: true
-				},
-				{
-					name : 'Bot Skinned', url : './models/gltf/BotSkinned/%s/Bot_Skinned.gltf',
-					cameraPos: new THREE.Vector3(0, 4, 6),
-					objectRotation: new THREE.Euler(0, 0, 0),
-					addLights:true,
-					extensions: ['glTF-MaterialsUnlit'],
-					addEnvMap: true
-				},
-				{
-					name : 'MetalRoughSpheres (PBR)', url : './models/gltf/MetalRoughSpheres/%s/MetalRoughSpheres.gltf',
-					cameraPos: new THREE.Vector3(2, 1, 15),
-					objectRotation: new THREE.Euler(0, 0, 0),
-					addLights:true,
-					extensions: ['glTF', 'glTF-Embedded'],
-					addEnvMap: true
-				},
-				{
-					name : 'Duck', url : './models/gltf/Duck/%s/Duck.gltf',
-					cameraPos: new THREE.Vector3(0, 3, 5),
-					addLights:true,
-					addGround:true,
-					shadows:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco']
-				},
-				{
-					name : "Monster", url : "./models/gltf/Monster/%s/Monster.gltf",
-					cameraPos: new THREE.Vector3(30, 10, 70),
-					objectScale: new THREE.Vector3(0.4, 0.4, 0.4),
-					objectPosition: new THREE.Vector3(2, 1, 0),
-					objectRotation: new THREE.Euler(0, - 3 * Math.PI / 4, 0),
-					animationTime: 3,
-					addLights:true,
-					shadows:true,
-					addGround:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco']
-				},
-				{
-					name : "Cesium Man", url : "./models/gltf/CesiumMan/%s/CesiumMan.gltf",
-					cameraPos: new THREE.Vector3(0, 3, 10),
-					objectRotation: new THREE.Euler(0, 0, 0),
-					addLights:true,
-					addGround:true,
-					shadows:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco']
-				},
-				{
-					name : "Cesium Milk Truck",
-					url : "./models/gltf/CesiumMilkTruck/%s/CesiumMilkTruck.gltf",
-					cameraPos: new THREE.Vector3(0, 3, 10),
-					addLights:true,
-					addGround:true,
-					shadows:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco']
-				},
-				{
-					name : 'Outlined Box',
-					url : './models/gltf/OutlinedBox/OutlinedBox.gltf',
-					cameraPos: new THREE.Vector3(0, 5, 15),
-					objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
-					objectRotation: new THREE.Euler(0, 90, 0),
-					addLights:true,
-					shadows:true,
-					extensions: ['glTF']
-				},
-			];
+			function buildGUI() {
 
-			function buildSceneList() {
+				gui = new dat.GUI( { width: 330 } );
+				gui.domElement.parentElement.style.zIndex = 101;
 
-				var elt = document.getElementById('scenes_list');
+				var sceneCtrl = gui.add( state, 'scene', Object.keys( scenes ) );
+				sceneCtrl.onChange( reload );
 
-				while( elt.hasChildNodes() ){
-					elt.removeChild(elt.lastChild);
-				}
+				var animCtrl = gui.add( state, 'playAnimation' );
+				animCtrl.onChange( toggleAnimations );
 
-				var i, len = sceneList.length;
-
-				for (i = 0; i < len; i++) {
-					var option = document.createElement("option");
-					option.text=sceneList[i].name;
-					elt.add(option);
-				}
+				updateGUI();
 
 			}
 
-			function switchScene(index) {
+			function updateGUI() {
 
-				cleanup();
-				initScene(index);
-				var elt = document.getElementById('scenes_list');
-				elt.selectedIndex = index;
+				if ( extensionControls ) extensionControls.remove();
 
-			}
+				var sceneInfo = scenes[ state.scene ];
 
-			function selectScene() {
+				if ( sceneInfo.extensions.indexOf( state.extension ) === - 1 ) {
 
-				var select = document.getElementById("scenes_list");
-				var index = select.selectedIndex;
+					state.extension = sceneInfo.extensions[ 0 ];
 
-				if (index >= 0) {
-					switchScene(index);
 				}
 
-			}
-
-			function switchCamera(index) {
-
-				cameraIndex = index;
-
-				if (cameraIndex == 0) {
-					camera = defaultCamera;
-				}
-
-				if (cameraIndex >= 1 && cameraIndex <= cameras.length) {
-					camera = cameras[cameraIndex - 1];
-				}
-
-				var elt = document.getElementById('cameras_list');
-				elt.selectedIndex = cameraIndex;
-
-			}
-
-			function updateCamerasList() {
-
-				var elt = document.getElementById('cameras_list');
-
-				while( elt.hasChildNodes() ){
-					elt.removeChild(elt.lastChild);
-				}
-
-				var option = document.createElement("option");
-				option.text="[default]";
-				elt.add(option);
-
-				var i, len = cameraNames.length;
-
-				for (i = 0; i < len; i++) {
-					var option = document.createElement("option");
-					option.text=cameraNames[i];
-					elt.add(option);
-				}
-
-			}
-
-			function selectCamera() {
-
-				var select = document.getElementById("cameras_list");
-				var index = select.selectedIndex;
-
-				if (index >= 0) {
-					switchCamera(index);
-				}
+				extensionControls = gui.add( state, 'extension', sceneInfo.extensions );
+				extensionControls.onChange( reload );
 
 			}
 
 			function toggleAnimations() {
 
-				var i, len = gltf.animations.length;
+				for ( var i = 0; i < gltf.animations.length; i ++ ) {
 
-				for (i = 0; i < len; i++) {
-
-					var clip = gltf.animations[i];
+					var clip = gltf.animations[ i ];
 					var action = mixer.existingAction( clip );
 
-					if (action.isRunning()) {
-						action.stop();
-					} else {
-						action.play();
-					}
+					state.playAnimation ? action.play() : action.stop();
 
 				}
 
 			}
 
-			var extensionSelect = document.getElementById("extensions_list");
-			var extension = extensionSelect.value;
-			function selectExtension()
-			{
-				extension = extensionSelect.value;
-				selectScene();
-			}
+			function reload() {
 
-			function cleanup() {
+				if ( container && renderer ) {
 
-				if (container && renderer) {
-					container.removeChild(renderer.domElement);
+					container.removeChild( renderer.domElement );
+
 				}
 
-				cameraIndex = 0;
-				cameras = [];
-				cameraNames = [];
-				defaultCamera = null;
+				if ( loader && mixer ) mixer.stopAllAction();
 
-				if (!loader || !mixer)
-					return;
-
-				mixer.stopAllAction();
+				updateGUI();
+				initScene( scenes[ state.scene ] );
 
 			}
 

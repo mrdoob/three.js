@@ -28,7 +28,7 @@
 
 			var mouse, raycaster, isShiftDown = false;
 
-			var cubeGeometry = new THREE.BoxGeometry( 50, 50, 50 );
+			var cubeGeometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
 			var cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, overdraw: 0.5 } );
 
 			var objects = [];
@@ -51,7 +51,7 @@
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 500, 800, 1300 );
-				camera.lookAt( new THREE.Vector3() );
+				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -73,8 +73,6 @@
 				scene.add( plane );
 
 				objects.push( plane );
-
-				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
 				// Lights
 
@@ -98,7 +96,7 @@
 				renderer = new THREE.CanvasRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
@@ -165,9 +163,10 @@
 
 			function onDocumentKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
-					case 16: isShiftDown = true; break;
+					case 16: isShiftDown = true;
+						break;
 
 				}
 
@@ -175,16 +174,18 @@
 
 			function onDocumentKeyUp( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
-					case 16: isShiftDown = false; break;
+					case 16: isShiftDown = false;
+						break;
 
 				}
+
 			}
 
 			function save() {
 
-				window.open( renderer.domElement.toDataURL('image/png'), 'mywindow' );
+				window.open( renderer.domElement.toDataURL( 'image/png' ), 'mywindow' );
 				return false;
 
 			}

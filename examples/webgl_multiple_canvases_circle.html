@@ -143,13 +143,17 @@
 		</div>
 	</div>
 
-		<script type="text/javascript" src="../build/three.js"></script>
+		<script src="../build/three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var views = [];
 
@@ -209,8 +213,8 @@
 				var fudge = 0.45; // I don't know why this is needed :-(
 				var rot = 30 * THREE.Math.DEG2RAD;
 
-				views.push( new View( canvas1, rot * -2 * fudge ) );
-				views.push( new View( canvas2, rot * -1 * fudge ) );
+				views.push( new View( canvas1, rot * - 2 * fudge ) );
+				views.push( new View( canvas2, rot * - 1 * fudge ) );
 				views.push( new View( canvas3, rot *	0 * fudge ) );
 				views.push( new View( canvas4, rot *	1 * fudge ) );
 				views.push( new View( canvas5, rot *	2 * fudge ) );
@@ -248,42 +252,39 @@
 				for ( var i = 0; i < noof_balls; i ++ ) { // create shadows
 
 					var shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-					shadowMesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i * 400;
+					shadowMesh.position.x = - ( noof_balls - 1 ) / 2 * 400 + i * 400;
 					shadowMesh.position.y = - 250;
 					shadowMesh.rotation.x = - Math.PI / 2;
 					scene.add( shadowMesh );
 
 				}
 
-				var faceIndices = [ 'a', 'b', 'c' ];
+				var radius = 200;
 
-				var radius = 200,
+				var geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
 
-				geometry1 = new THREE.IcosahedronGeometry( radius, 1 );
+				var count = geometry1.attributes.position.count;
+				geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
-				for ( var i = 0; i < geometry1.faces.length; i ++ ) {
+				var color = new THREE.Color();
+				var positions = geometry1.attributes.position;
+				var colors = geometry1.attributes.color;
 
-					var f1 = geometry1.faces[ i ];
+				for ( var i = 0; i < count; i ++ ) {
 
-					for( var j = 0; j < 3; j ++ ) {
+					color.setHSL( ( positions.getY( i ) / radius + 1 ) / 2, 1.0, 0.5 );
 
-						var vertexIndex = f1[ faceIndices[ j ] ];
-
-						var p = geometry1.vertices[ vertexIndex ];
-
-						var color = new THREE.Color( 0xffffff );
-						color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
-
-						f1.vertexColors[ j ] = color;
-
-						var color = new THREE.Color( 0xffffff );
-						color.setHSL( 0.0, ( p.y / radius + 1 ) / 2, 0.5 );
-
-					}
+					colors.setXYZ( i, color.r, color.g, color.b );
 
 				}
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					flatShading: true,
+					vertexColors: THREE.VertexColors,
+					shininess: 0
+				} );
+
 				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
 				for ( var i = 0; i < noof_balls; i ++ ) { // create balls
@@ -292,7 +293,7 @@
 					var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
 					mesh.add( wireframe );
 
-					mesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i *400;
+					mesh.position.x = - ( noof_balls - 1 ) / 2 * 400 + i * 400;
 					mesh.rotation.x = i * 0.5;
 					scene.add( mesh );
 
@@ -306,7 +307,7 @@
 
 			}
 
-			function onDocumentMouseMove ( event ) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;

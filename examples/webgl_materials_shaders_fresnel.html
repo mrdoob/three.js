@@ -26,7 +26,7 @@
 
 			a {	color: #ffffff;	}
 
-			#oldie a { color:#0b0 }
+			#webglmessage a { color:#0b0 }
 		</style>
 	</head>
 
@@ -38,11 +38,15 @@
 
 		<script src="js/shaders/FresnelShader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
@@ -89,7 +93,7 @@
 
 				//
 
-				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
 				var shader = THREE.FresnelShader;
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
