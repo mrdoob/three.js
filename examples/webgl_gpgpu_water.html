@@ -294,7 +294,6 @@
 			var readWaterLevelShader;
 			var readWaterLevelRenderTarget;
 			var readWaterLevelImage;
-			var heightCompensation = 0;
 			var numFrames = 0;
 
 			var simplex = new SimplexNoise();
@@ -658,18 +657,13 @@
 				}
 
 				// Read height value once in a time, since it has some cost
-				if ( ++numFrames > 120 ) {
-				
-					numFrames = 0;
-				
-					heightCompensation = - readWaterLevel();
+				if ( ++ numFrames > 120 ) {
 
-				}
-				else {
+					numFrames = 0;
 
 					// Apply gradually height compensation to reset water level
-				
-					heightmapVariable.material.uniforms.heightCompensation.value = heightCompensation / 120;
+
+					heightmapVariable.material.uniforms.heightCompensation.value = - readWaterLevel() / 120;
 
 				}
 
