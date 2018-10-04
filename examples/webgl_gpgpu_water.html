@@ -127,7 +127,7 @@
 
 		</script>
 		
-		<!-- This is a 'compute shader' to calculate the current volume of water at the center -->
+		<!-- This is a 'compute shader' to calculate the current level of water at the center -->
 		<!-- It is used with a variable of size 1x1 -->
 		<script id="sumFragmentShader" type="x-shader/x-fragment">
 		
@@ -291,9 +291,9 @@
 			var heightmapVariable;
 			var waterUniforms;
 			var smoothShader;
-			var readVolumeShader;
-			var readVolumeRenderTarget;
-			var readVolumeImage;
+			var readWaterLevelShader;
+			var readWaterLevelRenderTarget;
+			var readWaterLevelImage;
 			var heightCompensation = 0;
 			var numFrames = 0;
 
@@ -480,13 +480,13 @@
 				// Create compute shader to smooth the water surface and velocity
 				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { value: null } } );
 
-				// Create compute shader to read water volume
-				readVolumeShader = gpuCompute.createShaderMaterial( document.getElementById( 'sumFragmentShader' ).textContent, { texture: { value: null } } );
+				// Create compute shader to read water level
+				readWaterLevelShader = gpuCompute.createShaderMaterial( document.getElementById( 'sumFragmentShader' ).textContent, { texture: { value: null } } );
 				
 				// Create a 1x1 pixel image and a render target (Uint8, 4 channels, 1 byte per channel) to read water height
-				readVolumeImage = new Uint8Array( 1 * 1 * 4 );
+				readWaterLevelImage = new Uint8Array( 1 * 1 * 4 );
 
-				readVolumeRenderTarget = new THREE.WebGLRenderTarget( 1, 1, {
+				readWaterLevelRenderTarget = new THREE.WebGLRenderTarget( 1, 1, {
 					wrapS: THREE.ClampToEdgeWrapping,
 					wrapT: THREE.ClampToEdgeWrapping,
 					minFilter: THREE.NearestFilter,
@@ -558,14 +558,14 @@
 
 				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
 
-				readVolumeShader.uniforms.texture.value = currentRenderTarget.texture;
+				readWaterLevelShader.uniforms.texture.value = currentRenderTarget.texture;
 
-				gpuCompute.doRenderTarget( readVolumeShader, readVolumeRenderTarget );
+				gpuCompute.doRenderTarget( readWaterLevelShader, readWaterLevelRenderTarget );
 
 				var gl = renderer.context;
-				gl.readPixels( 0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, readVolumeImage );
+				gl.readPixels( 0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, readWaterLevelImage );
 
-				var pixels = new Float32Array( readVolumeImage.buffer );
+				var pixels = new Float32Array( readWaterLevelImage.buffer );
 
 				return pixels[ 0 ];
 
