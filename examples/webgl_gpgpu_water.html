@@ -665,21 +665,13 @@
 					heightCompensation = - readWaterLevel();
 
 				}
-
-				// Apply gradually height compensation to reset water level
-				if ( heightCompensation !== 0 ) {
-				
-					var decremHeight = Math.min( 0.2, Math.abs( heightCompensation ) ) * Math.sign( heightCompensation );
-					heightCompensation -= decremHeight;
-					heightmapVariable.material.uniforms.heightCompensation.value = decremHeight;
-					
-				}
 				else {
+
+					// Apply gradually height compensation to reset water level
 				
-					heightmapVariable.material.uniforms.heightCompensation.value = 0;
+					heightmapVariable.material.uniforms.heightCompensation.value = heightCompensation / 120;
 
 				}
-				
 
 				// Do the gpu computation
 				gpuCompute.compute();
