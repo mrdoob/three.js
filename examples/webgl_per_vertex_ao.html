@@ -16,8 +16,7 @@
 				top: 10px;
 				width: 100%;
 				text-align: center;
-				z-index: 100;
-				display:block;
+				display: block;
 			}
 			#info a {
 				color: #046;
@@ -179,13 +178,11 @@
 
 			function initMaterials( originalMaterial ) {
 
-				var map = originalMaterial.map;
+				originalMaterial.envMap = envMap;
 				originalMaterial.aoMap = aoMap;
 
 				materials = [
 					new THREE.MeshBasicMaterial( { aoMap: aoMap } ),
-					new THREE.MeshBasicMaterial( { map: map, aoMap: aoMap } ),
-					new THREE.MeshStandardMaterial( { aoMap: aoMap } ),
 					originalMaterial,
 				];
 
@@ -197,58 +194,29 @@
 				gui.open();
 
 				var params = {
-					enabled: true,
-					envMap: false,
-					shadows: true,
+					intensity: 1,
 					material: 0,
 				};
 
 				var controls = gui.addFolder( 'Controls' );
 				controls.open();
 
-				controls.add( params, 'enabled' ).name( 'AO enabled' ).onChange( function () {
+
+
+				controls.add( params, 'intensity', 0, 1 ).name( 'AO intensity' ).onChange( function ( value ) {
 
 					materials.forEach( function ( material ) {
 
-						if ( params.enabled ) model.material.aoMap = aoMap;
-						else model.material.aoMap = null;
-
-						material.needsUpdate = true;
+						material.aoMapIntensity = value;
 
 					} );
-
-					model.material.needsUpdate = true;
-
-				} );
-
-				controls.add( params, 'envMap' ).name( 'Environment map' ).onChange( function () {
-
-					materials.forEach( function ( material ) {
-
-						if ( params.envMap ) material.envMap = envMap;
-						else material.envMap = null;
-
-						material.needsUpdate = true;
-
-					} );
-
-
-				} ).listen();
-
-				controls.add( params, 'shadows' ).name( 'Shadows' ).onChange( function () {
-
-					renderer.shadowMap.enabled = params.shadows;
-					renderer.setRenderTarget( shadowLight.shadow.map );
-					renderer.clear();
 
 				} );
 
 				controls.add( params, 'material', {
 
-					'Basic greyscale': 0,
-					'Basic color': 1,
-					'Standard greyscale': 2,
-					'Standard color': 3
+					'AO': 0,
+					'Standard + AO': 1
 
 				} ).name( 'Material' ).onChange( function () {
 
