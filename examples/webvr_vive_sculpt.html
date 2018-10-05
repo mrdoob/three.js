@@ -39,7 +39,7 @@
 			var camera, scene, renderer;
 			var controller1, controller2;
 
-			var blob, vector;
+			var blob;
 
 			var points = [];
 
@@ -97,9 +97,9 @@
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = -2;
+				light.shadow.camera.bottom = - 2;
 				light.shadow.camera.right = 2;
-				light.shadow.camera.left = -2;
+				light.shadow.camera.left = - 2;
 				light.shadow.mapSize.set( 4096, 4096 );
 
 				scene.add( light );
@@ -146,8 +146,8 @@
 					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
 					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.002, 2 ), blob.material );
 					pivot.name = 'pivot';
-					pivot.position.y = -0.016;
-					pivot.position.z = -0.043;
+					pivot.position.y = - 0.016;
+					pivot.position.z = - 0.043;
 					pivot.rotation.x = Math.PI / 5.5;
 					controller.add( pivot );
 
@@ -198,7 +198,7 @@
 
 				points = [
 					{ position: new THREE.Vector3(), strength: - 0.08, subtract: 10 },
-					{ position: new THREE.Vector3(), strength:   0.04, subtract: 10 }
+					{ position: new THREE.Vector3(), strength: 0.04, subtract: 10 }
 				];
 
 			}

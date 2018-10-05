@@ -38,7 +38,6 @@
 		<script>
 
 			var camera, scene, renderer;
-			var geometry, material, mesh;
 			var target = new THREE.Vector3();
 
 			var lon = 90, lat = 0;
@@ -58,32 +57,32 @@
 				var sides = [
 					{
 						url: 'textures/cube/Bridge2/posx.jpg',
-						position: [ -512, 0, 0 ],
+						position: [ - 512, 0, 0 ],
 						rotation: [ 0, Math.PI / 2, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negx.jpg',
 						position: [ 512, 0, 0 ],
-						rotation: [ 0, -Math.PI / 2, 0 ]
+						rotation: [ 0, - Math.PI / 2, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/posy.jpg',
-						position: [ 0,  512, 0 ],
+						position: [ 0, 512, 0 ],
 						rotation: [ Math.PI / 2, 0, Math.PI ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negy.jpg',
-						position: [ 0, -512, 0 ],
+						position: [ 0, - 512, 0 ],
 						rotation: [ - Math.PI / 2, 0, Math.PI ]
 					},
 					{
 						url: 'textures/cube/Bridge2/posz.jpg',
-						position: [ 0, 0,  512 ],
+						position: [ 0, 0, 512 ],
 						rotation: [ 0, Math.PI, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negz.jpg',
-						position: [ 0, 0, -512 ],
+						position: [ 0, 0, - 512 ],
 						rotation: [ 0, 0, 0 ]
 					}
 				];
@@ -147,7 +146,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp );
@@ -193,7 +192,7 @@
 
 				requestAnimationFrame( animate );
 
-				lon +=  0.1;
+				lon += 0.1;
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.Math.degToRad( 90 - lat );
 				theta = THREE.Math.degToRad( lon );

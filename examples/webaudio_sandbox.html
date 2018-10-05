@@ -94,8 +94,7 @@
 
 			}
 
-			var camera, controls, scene, renderer;
-			var light, pointLight;
+			var camera, controls, scene, renderer, light;
 
 			var material1, material2, material3;
 
@@ -135,15 +134,17 @@
 				var audioLoader = new THREE.AudioLoader();
 
 				var mesh1 = new THREE.Mesh( sphere, material1 );
-				mesh1.position.set( -250, 30, 0 );
+				mesh1.position.set( - 250, 30, 0 );
 				scene.add( mesh1 );
 
 				var sound1 = new THREE.PositionalAudio( listener );
-				audioLoader.load( 'sounds/358232_j_s_song.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/358232_j_s_song.ogg', function ( buffer ) {
+
 					sound1.setBuffer( buffer );
 					sound1.setRefDistance( 20 );
 					sound1.play();
-				});
+
+				} );
 				mesh1.add( sound1 );
 
 				//
@@ -153,17 +154,19 @@
 				scene.add( mesh2 );
 
 				var sound2 = new THREE.PositionalAudio( listener );
-				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function ( buffer ) {
+
 					sound2.setBuffer( buffer );
 					sound2.setRefDistance( 20 );
 					sound2.play();
-				});
+
+				} );
 				mesh2.add( sound2 );
 
 				//
 
 				var mesh3 = new THREE.Mesh( sphere, material3 );
-				mesh3.position.set( 0, 30, -250 );
+				mesh3.position.set( 0, 30, - 250 );
 				scene.add( mesh3 );
 
 				var sound3 = new THREE.PositionalAudio( listener );
@@ -185,12 +188,14 @@
 				// global ambient audio
 
 				var sound4 = new THREE.Audio( listener );
-				audioLoader.load( 'sounds/Project_Utopia.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/Project_Utopia.ogg', function ( buffer ) {
+
 					sound4.setBuffer( buffer );
-					sound4.setLoop(true);
-					sound4.setVolume(0.5);
+					sound4.setLoop( true );
+					sound4.setVolume( 0.5 );
 					sound4.play();
-				});
+
+				} );
 
 				// ground
 
@@ -200,17 +205,17 @@
 
 				//
 
-				var SoundControls = function() {
+				var SoundControls = function () {
 
 					this.master = listener.getMasterVolume();
-					this.firstSphere =  sound1.getVolume();
-					this.secondSphere =  sound2.getVolume();
+					this.firstSphere = sound1.getVolume();
+					this.secondSphere = sound2.getVolume();
 					this.thirdSphere = sound3.getVolume();
-					this.Ambient =  sound4.getVolume();
+					this.Ambient = sound4.getVolume();
 
 				};
 
-				var GeneratorControls = function() {
+				var GeneratorControls = function () {
 
 					this.frequency = oscillator.frequency.value;
 					this.wavetype = oscillator.type;
