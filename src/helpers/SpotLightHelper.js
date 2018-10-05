@@ -66,7 +66,6 @@ SpotLightHelper.prototype.dispose = function () {
 SpotLightHelper.prototype.update = function () {
 
 	var vector = new Vector3();
-	var vector2 = new Vector3();
 
 	return function update() {
 
@@ -77,11 +76,10 @@ SpotLightHelper.prototype.update = function () {
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		vector.setFromMatrixPosition( this.light.matrixWorld );
-		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
+		vector.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.position.copy( vector );
-		this.cone.lookAt( vector2.sub( vector ) );
+		this.position.setFromMatrixPosition( this.light.matrixWorld );
+		this.cone.lookAt( vector.sub( this.position ) );
 
 		if ( this.color !== undefined ) {
 
