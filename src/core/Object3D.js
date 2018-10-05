@@ -54,18 +54,22 @@ function Object3D() {
 	Object.defineProperties( this, {
 		position: {
 			enumerable: true,
+			configurable: true,
 			value: position
 		},
 		rotation: {
 			enumerable: true,
+			configurable: true,
 			value: rotation
 		},
 		quaternion: {
 			enumerable: true,
+			configurable: true,
 			value: quaternion
 		},
 		scale: {
 			enumerable: true,
+			configurable: true,
 			value: scale
 		},
 		modelViewMatrix: {
