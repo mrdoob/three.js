@@ -18,6 +18,7 @@ Object.assign( AudioLoader.prototype, {
 
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
 			// Create a copy of the buffer. The `decodeAudioData` method
@@ -32,6 +33,13 @@ Object.assign( AudioLoader.prototype, {
 			} );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
