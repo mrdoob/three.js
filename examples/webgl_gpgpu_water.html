@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - gpgpu - water</title>
@@ -57,17 +57,14 @@
 			uniform float viscosityConstant;
 			uniform float heightCompensation;
 
-			#define deltaTime ( 1.0 / 60.0 )
-			#define GRAVITY_CONSTANT ( resolution.x * deltaTime * 3.0 )
-
 			void main()	{
 
 				vec2 cellSize = 1.0 / resolution.xy;
 
 				vec2 uv = gl_FragCoord.xy * cellSize;
 
-				// heightmapValue.x == height
-				// heightmapValue.y == velocity
+				// heightmapValue.x == height from previous frame
+				// heightmapValue.y == height from penultimate frame
 				// heightmapValue.z, heightmapValue.w not used
 				vec4 heightmapValue = texture2D( heightmap, uv );
 
@@ -77,23 +74,14 @@
 				vec4 east = texture2D( heightmap, uv + vec2( cellSize.x, 0.0 ) );
 				vec4 west = texture2D( heightmap, uv + vec2( - cellSize.x, 0.0 ) );
 
-				float sump = north.x + south.x + east.x + west.x - 4.0 * heightmapValue.x;
-
-				float accel = sump * GRAVITY_CONSTANT;
-
-				// Dynamics
-				heightmapValue.y += accel;
-				heightmapValue.x += heightmapValue.y * deltaTime;
-
-				// Viscosity
-				heightmapValue.x += sump * viscosityConstant;
+				float newHeight = ( ( north.x + south.x + east.x + west.x ) * 0.5 - heightmapValue.y ) * viscosityConstant;
 
 				// Mouse influence
 				float mousePhase = clamp( length( ( uv - vec2( 0.5 ) ) * BOUNDS - vec2( mousePos.x, - mousePos.y ) ) * PI / mouseSize, 0.0, PI );
-				heightmapValue.x += cos( mousePhase ) + 1.0;
-
-				// Water height reset compensation
-				heightmapValue.x += heightCompensation;
+				newHeight += ( cos( mousePhase ) + 1.0 ) * 0.28;
+				
+				heightmapValue.y = heightmapValue.x;
+				heightmapValue.x = newHeight;
 
 				gl_FragColor = heightmapValue;
 
@@ -127,9 +115,11 @@
 
 		</script>
 		
-		<!-- This is a 'compute shader' to calculate the current level of water at the center -->
+		<!-- This is a 'compute shader' to read the current level and normal of water at a point -->
 		<!-- It is used with a variable of size 1x1 -->
-		<script id="sumFragmentShader" type="x-shader/x-fragment">
+		<script id="readWaterLevelFragmentShader" type="x-shader/x-fragment">
+
+			uniform vec2 point1;
 		
 			uniform sampler2D texture;
 		
@@ -180,9 +170,34 @@
 
 			void main()	{
 
-				float waterLevel = texture2D( texture, vec2( 0.5, 0.5 ) ).x;
+				vec2 cellSize = 1.0 / resolution.xy;
 
-				gl_FragColor = encode_float( waterLevel );
+				float waterLevel = texture2D( texture, point1 ).x;
+
+				vec2 normal = vec2(
+					( texture2D( texture, point1 + vec2( - cellSize.x, 0 ) ).x - texture2D( texture, point1 + vec2( cellSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
+					( texture2D( texture, point1 + vec2( 0, - cellSize.y ) ).x - texture2D( texture, point1 + vec2( 0, cellSize.y ) ).x ) * WIDTH / BOUNDS );
+
+				if ( gl_FragCoord.x < 1.5 ) {
+
+					gl_FragColor = encode_float( waterLevel );
+				
+				}
+				else if ( gl_FragCoord.x < 2.5 ) {
+
+					gl_FragColor = encode_float( normal.x );
+
+				}
+				else if ( gl_FragCoord.x < 3.5 ) {
+
+					gl_FragColor = encode_float( normal.y );
+
+				}
+				else {
+
+					gl_FragColor = encode_float( 0.0 );
+
+				}
 
 			}
 
@@ -294,7 +309,11 @@
 			var readWaterLevelShader;
 			var readWaterLevelRenderTarget;
 			var readWaterLevelImage;
-			var numFrames = 0;
+			var waterNormal = new THREE.Vector3();
+			
+			var NUM_SPHERES = 5;
+			var spheres = [];
+			var spheresEnabled = true;
 
 			var simplex = new SimplexNoise();
 
@@ -372,27 +391,37 @@
 
 				var effectController = {
 					mouseSize: 20.0,
-					viscosity: 0.03
+					viscosity: 0.98,
+					spheresEnabled: spheresEnabled
 				};
 
 				var valuesChanger = function() {
 
 					heightmapVariable.material.uniforms.mouseSize.value = effectController.mouseSize;
 					heightmapVariable.material.uniforms.viscosityConstant.value = effectController.viscosity;
+					spheresEnabled = effectController.spheresEnabled;
+					for ( var i = 0; i < NUM_SPHERES; i++ ) {
+						if ( spheres[ i ] ) {
+							spheres[ i ].visible = spheresEnabled;
+						}
+					}
 
 				};
 
 				gui.add( effectController, "mouseSize", 1.0, 100.0, 1.0 ).onChange( valuesChanger );
-				gui.add( effectController, "viscosity", 0.0, 0.1, 0.001 ).onChange( valuesChanger );
+				gui.add( effectController, "viscosity", 0.9, 0.999, 0.001 ).onChange( valuesChanger );
+				gui.add( effectController, "spheresEnabled", 0, 1, 1 ).onChange( valuesChanger );
 				var buttonSmooth = {
 				    smoothWater: function() {
-					smoothWater();
+						smoothWater();
 				    }
 				};
 				gui.add( buttonSmooth, 'smoothWater' );
 
 
 				initWater();
+				
+				createSpheres();
 
 				valuesChanger();
 
@@ -467,7 +496,7 @@
 
 				heightmapVariable.material.uniforms.mousePos = { value: new THREE.Vector2( 10000, 10000 ) };
 				heightmapVariable.material.uniforms.mouseSize = { value: 20.0 };
-				heightmapVariable.material.uniforms.viscosityConstant = { value: 0.03 };
+				heightmapVariable.material.uniforms.viscosityConstant = { value: 0.98 };
 				heightmapVariable.material.uniforms.heightCompensation = { value: 0 };
 				heightmapVariable.material.defines.BOUNDS = BOUNDS.toFixed( 1 );
 
@@ -480,12 +509,17 @@
 				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { value: null } } );
 
 				// Create compute shader to read water level
-				readWaterLevelShader = gpuCompute.createShaderMaterial( document.getElementById( 'sumFragmentShader' ).textContent, { texture: { value: null } } );
+				readWaterLevelShader = gpuCompute.createShaderMaterial( document.getElementById( 'readWaterLevelFragmentShader' ).textContent, {
+					point1: { value: new THREE.Vector2() },
+					texture: { value: null }
+				} );
+				readWaterLevelShader.defines.WIDTH = WIDTH.toFixed( 1 );
+				readWaterLevelShader.defines.BOUNDS = BOUNDS.toFixed( 1 );
 				
-				// Create a 1x1 pixel image and a render target (Uint8, 4 channels, 1 byte per channel) to read water height
-				readWaterLevelImage = new Uint8Array( 1 * 1 * 4 );
+				// Create a 4x1 pixel image and a render target (Uint8, 4 channels, 1 byte per channel) to read water height and orientation
+				readWaterLevelImage = new Uint8Array( 4 * 1 * 4 );
 
-				readWaterLevelRenderTarget = new THREE.WebGLRenderTarget( 1, 1, {
+				readWaterLevelRenderTarget = new THREE.WebGLRenderTarget( 4, 1, {
 					wrapS: THREE.ClampToEdgeWrapping,
 					wrapT: THREE.ClampToEdgeWrapping,
 					minFilter: THREE.NearestFilter,
@@ -523,8 +557,8 @@
 						var x = i * 128 / WIDTH;
 						var y = j * 128 / WIDTH;
 
-					        pixels[ p + 0 ] = noise( x, y, 123.4 );
-						pixels[ p + 1 ] = 0;
+						pixels[ p + 0 ] = noise( x, y, 123.4 );
+						pixels[ p + 1 ] = pixels[ p + 0 ];
 						pixels[ p + 2 ] = 0;
 						pixels[ p + 3 ] = 1;
 
@@ -551,22 +585,86 @@
 				
 			}
 
-			function readWaterLevel() {
-				
-				// Returns current water level at the center
+			function createSpheres() {
+
+				var sphereTemplate = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 24, 12 ), new THREE.MeshPhongMaterial( { color: 0xFFFF00 } ) );
+
+				for ( var i = 0; i < NUM_SPHERES; i++ ) {
+
+					var sphere = sphereTemplate;
+					if ( i < NUM_SPHERES - 1 ) {
+						sphere = sphereTemplate.clone();
+					}
+
+					sphere.position.x = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
+					sphere.position.z = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
+					
+					sphere.userData.velocity = new THREE.Vector3();
+
+					scene.add( sphere );
+
+					spheres[ i ] = sphere;
+
+				}
+
+			}
+
+			function sphereDynamics() {
 
 				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
 
 				readWaterLevelShader.uniforms.texture.value = currentRenderTarget.texture;
-
-				gpuCompute.doRenderTarget( readWaterLevelShader, readWaterLevelRenderTarget );
-
 				var gl = renderer.context;
-				gl.readPixels( 0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, readWaterLevelImage );
 
-				var pixels = new Float32Array( readWaterLevelImage.buffer );
+				for ( var i = 0; i < NUM_SPHERES; i++ ) {
 
-				return pixels[ 0 ];
+					var sphere = spheres[ i ];
+					
+					if ( sphere ) {
+
+						// Read water level and orientation
+						var u = 0.5 * sphere.position.x / BOUNDS_HALF + 0.5;
+						var v = 1 - ( 0.5 * sphere.position.z / BOUNDS_HALF + 0.5 );
+						readWaterLevelShader.uniforms.point1.value.set( u, v );
+						gpuCompute.doRenderTarget( readWaterLevelShader, readWaterLevelRenderTarget );
+						gl.readPixels( 0, 0, 4, 1, gl.RGBA, gl.UNSIGNED_BYTE, readWaterLevelImage );
+						var pixels = new Float32Array( readWaterLevelImage.buffer );
+						
+						// Get orientation
+						waterNormal.set( pixels[ 1 ], 0, - pixels[ 2 ] );
+						
+						var pos = sphere.position;
+						
+						// Set height
+						pos.y = pixels[ 0 ];
+						
+						// Move sphere
+						waterNormal.multiplyScalar( 0.1 );
+						sphere.userData.velocity.add( waterNormal );
+						sphere.userData.velocity.multiplyScalar( 0.998 );
+						pos.add( sphere.userData.velocity );
+						
+						if ( pos.x < - BOUNDS_HALF ) {
+							pos.x = - BOUNDS_HALF + 0.001;
+							sphere.userData.velocity.x *= - 0.3;
+						}
+						else if ( pos.x > BOUNDS_HALF ) {
+							pos.x = BOUNDS_HALF - 0.001;
+							sphere.userData.velocity.x *= - 0.3;
+						}
+
+						if ( pos.z < - BOUNDS_HALF ) {
+							pos.z = - BOUNDS_HALF + 0.001;
+							sphere.userData.velocity.z *= - 0.3;
+						}
+						else if ( pos.z > BOUNDS_HALF ) {
+							pos.z = BOUNDS_HALF - 0.001;
+							sphere.userData.velocity.z *= - 0.3;
+						}
+
+					}
+
+				}
 
 			}
 
@@ -656,19 +754,12 @@
 					uniforms.mousePos.value.set( 10000, 10000 );
 				}
 
-				// Read height value once in a time, since it has some cost
-				if ( ++ numFrames > 120 ) {
-
-					numFrames = 0;
-
-					// Apply gradually height compensation to reset water level
-
-					heightmapVariable.material.uniforms.heightCompensation.value = - readWaterLevel() / 120;
-
-				}
-
 				// Do the gpu computation
 				gpuCompute.compute();
+
+				if ( spheresEnabled ) {
+					sphereDynamics();
+				}
 
 				// Get compute output in custom uniform
 				waterUniforms.heightmap.value = gpuCompute.getCurrentRenderTarget( heightmapVariable ).texture;
