@@ -240,19 +240,6 @@
 
 			}
 
-			function getAllIndexes( arr, val ) {
-
-				var indices = [];
-				for ( var i = 0; i < arr.length; i ++ ) {
-
-					if ( arr[ i ] === val ) indices.push( i );
-
-				}
-
-				return indices;
-
-			}
-
 			// amount of occlusion from emitter surface to reciever surface
 			function solidAngle( v, d2, receiverNormal, emitterNormal, emitterArea ) {
 
@@ -268,65 +255,42 @@
 			// Note:  the method used here requires indexed geometry.
 			function calculateAreas( geometry ) {
 
+				var geo = new THREE.Geometry().fromBufferGeometry( geometry );
+
+				// initialise areas to 0
+				var areas = new Array( geo.vertices.length ).fill( 0 );
+
+				// store how many faces each vertex is a member of (initialise to 0)
+				var numFaces = areas.slice();
+
 				var edge1 = new THREE.Vector3();
 				var edge2 = new THREE.Vector3();
 
-				var positions = geometry.attributes.position.array;
-				var indices = geometry.index.array;
+				geo.faces.forEach( function ( face ) {
 
-				var encounteredIndices = [];
+					var v1 = geo.vertices[ face.a ];
+					var v2 = geo.vertices[ face.b ];
+					var v3 = geo.vertices[ face.c ];
 
-				var areas = [];
+					edge1.copy( v1 ).sub( v2 );
+					edge2.copy( v1 ).sub( v3 );
 
-				// for each vertex, the area is calculated as the weighted sum of the area of each face it is a member of
-				indices.forEach( function ( pIndex ) {
+					var area = 0.5 * edge1.cross( edge2 ).length();
 
-					if ( encounteredIndices[ pIndex ] === 'x' ) return;
-					encounteredIndices[ pIndex ] = 'x'; // mark an 'x' for each index we have processed
+					// accumulate areas for each vertex in face
+					areas[ face.a ] += area;
+					areas[ face.b ] += area;
+					areas[ face.c ] += area;
 
-					// find all faces the vertex is a member of
-					var allIndices = getAllIndexes( indices, pIndex );
+					numFaces[ face.a ] ++;
+					numFaces[ face.b ] ++;
+					numFaces[ face.c ] ++;
 
-					areas[ pIndex ] = 0;
-					allIndices.forEach( function ( j ) {
+				} );
 
-						var edge1Index;
-						var edge2Index;
+				areas.forEach( function ( area, i ) {
 
-						if ( j % 3 === 0 ) { // j is first index in face
-
-							edge1Index = indices[ j + 1 ];
-							edge2Index = indices[ j + 2 ];
-
-						} else if ( j % 3 === 1 ) { // j is second index in face
-
-							edge1Index = indices[ j - 1 ];
-							edge2Index = indices[ j + 1 ];
-
-						} else { // j is last index in face
-
-							edge1Index = indices[ j - 1 ];
-							edge2Index = indices[ j - 2 ];
-
-						}
-
-						edge1.set(
-							positions[ pIndex * 3 ] - positions[ edge1Index * 3 ],
-							positions[ pIndex * 3 + 1 ] - positions[ edge1Index * 3 + 1 ],
-							positions[ pIndex * 3 + 2 ] - positions[ edge1Index * 3 + 2 ]
-						);
-
-						edge2.set(
-							positions[ pIndex * 3 ] - positions[ edge2Index * 3 ],
-							positions[ pIndex * 3 + 1 ] - positions[ edge2Index * 3 + 1 ],
-							positions[ pIndex * 3 + 2 ] - positions[ edge2Index * 3 + 2 ]
-						);
-
-						areas[ pIndex ] += 0.5 * edge1.cross( edge2 ).length();
-
-					} );
-
-					areas[ pIndex ] /= 3;
+					areas[ i ] /= numFaces[ i ];
 
 				} );
 
@@ -397,7 +361,7 @@
 					// initialise to 1
 					if ( ! ao[ i / 3 ] ) ao[ i / 3 ] = 1;
 
-					var value = computeVertexOcclusion( i );
+					var value = computeVertexOcclusion();
 
 					bentNormal.toArray( bentNormals, i );
 
