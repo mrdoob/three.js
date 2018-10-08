@@ -10,9 +10,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">A lower level function to compile either a vertex or fragment shader.</p>
+		<p class="desc">编译顶点或片元着色器的更底层的函数</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
 		var gl = renderer.context;
@@ -28,21 +28,22 @@
 		gl.linkProgram( program );
 		</code>
 
-		<h2>Function</h2>
+		<h2>函数</h2>
 
 		<h3>[page:WebGLShader objects]([page:WebGLContext gl], [page:WebGLEnum type], [page:String source])</h3>
 
 		<p>
-		gl -- The current WebGL context
-		type -- The WebGL type, either gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
-		source -- The source code for the shader
+		gl -- 当前的WebGL环境
+		type -- WebGL类型，值是gl.VERTEX_SHADER 或者 gl.FRAGMENT_SHADER
+		source -- 着色器源码
 		</p>
 		<p>
-		This will compile an individual shader, but won't link it to be a complete [page:WebGLProgram]. Note: this
-		is a function so the new operator should not be used.
+        此函数将编译一个独立的着色器，不会将它和一个完整的[page:WebGLProgram]链接起来。
+		说明: 这是一个函数，因此不应该使用新的操作符。
+
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

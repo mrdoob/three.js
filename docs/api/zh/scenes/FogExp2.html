@@ -10,36 +10,36 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">This class contains the parameters that define exponential fog, i.e., that grows exponentially denser with the distance.</p>
+		<p class="desc">此类包含定义指数雾化的参数，即雾的浓度会随着距离指数增长</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Integer color], [param:Float density] )</h3>
 
-		<p>The color parameter is passed to the [page:Color] constructor to set the color property. Color can be a hexadecimal integer or a CSS-style string.</p>
-		<h2>Properties</h2>
+		<p>颜色参数会传入[page:Color]构造器以设置颜色属性. 颜色可以是十六进制的或者CSS风格的字符串</p>
+		<h2>属性</h2>
 
 		<h3>[property:String name]</h3>
-		<p>Optional name of the object (doesn't need to be unique). Default is an empty string.</p>
+		<p>对象的可选名称(不需要唯一)。 默认是一个空串</p>
 
 		<h3>[property:Color color]</h3>
-		<p>Fog color. Example: If set to black, far away objects will be rendered black.</p>
+		<p>雾的颜色。例如:如果是黑色, 远处的对象将会被渲染为黑色</p>
 
 		<h3>[property:Float density]</h3>
-		<p>Defines how fast the fog will grow dense.</p>
-		<p>Default is 0.00025.</p>
+		<p>定义雾的浓度增长多快</p>
+		<p>默认是0.00025.</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:FogExp2 clone]()</h3>
-		<p>Returns a new FogExp2 instance with the same parameters as this one.</p>
+		<p>返回一个新的FogExp2实例，他拥有和传入实例一样的参数</p>
 
 		<h3>[method:FogExp2 toJSON]()</h3>
-		<p>Return FogExp2 data in JSON format.</p>
+		<p>返回JSON格式的指数雾化数据</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
