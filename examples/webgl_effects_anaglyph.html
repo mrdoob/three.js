@@ -49,14 +49,9 @@
 
 			}
 
-			var container;
+			var container, camera, scene, renderer, effect;
 
-			var camera, scene, renderer, effect;
-
-			var mesh, lightMesh, geometry;
 			var spheres = [];
-
-			var directionalLight, pointLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -140,7 +135,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) / 100;
 				mouseY = ( event.clientY - windowHalfY ) / 100;

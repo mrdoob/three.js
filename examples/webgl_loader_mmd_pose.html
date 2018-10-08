@@ -50,14 +50,12 @@
 
 		<script>
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer, effect;
 			var mesh, helper;
 
 			var vpds = [];
-
-			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -102,10 +100,7 @@
 
 					}
 
-				};
-
-				function onError( xhr ) {
-				};
+				}
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vpdFiles = [
@@ -155,13 +150,13 @@
 
 							}
 
-						}, onProgress, onError );
+						}, onProgress, null );
 
 					}
 
 					loadVpd();
 
-				}, onProgress, onError );
+				}, onProgress, null );
 
 				//
 
@@ -195,7 +190,7 @@
 
 						controls.pose = - 1;
 
-						for ( var i = 0; i < vpdFiles.length; i++ ) {
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
 
 							controls[ getBaseName( vpdFiles[ i ] ) ] = false;
 
@@ -217,7 +212,7 @@
 
 						var files = { default: - 1 };
 
-						for ( var i = 0; i < vpdFiles.length; i++ ) {
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
 
 							files[ getBaseName( vpdFiles[ i ] ) ] = i;
 
@@ -239,7 +234,7 @@
 
 					function onChangeMorph() {
 
-						for ( var i = 0; i < keys.length; i++ ) {
+						for ( var i = 0; i < keys.length; i ++ ) {
 
 							var key = keys[ i ];
 							var value = controls[ key ];

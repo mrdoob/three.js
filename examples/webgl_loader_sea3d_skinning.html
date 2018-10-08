@@ -86,7 +86,7 @@
 
 			} );
 
-			loader.onComplete = function ( e ) {
+			loader.onComplete = function () {
 
 				// Get the first camera from SEA3D Studio
 				// use loader.get... to get others objects
@@ -95,7 +95,7 @@
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera );
 
 				// get meshes
 				player = loader.getMesh( "Player" );

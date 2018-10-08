@@ -79,7 +79,7 @@
 					group.scale.multiplyScalar( 0.25 );
 					group.position.x = - 70;
 					group.position.y = 70;
-					group.scale.y *= -1;
+					group.scale.y *= - 1;
 
 					for ( var i = 0; i < paths.length; i ++ ) {
 
@@ -136,7 +136,7 @@
 					var group = scene.children[ 1 ];
 					group.traverse( function ( child ) {
 
-						if ( child.material ) child.material.wireframe = !child.material.wireframe;
+						if ( child.material ) child.material.wireframe = ! child.material.wireframe;
 
 					} );
 

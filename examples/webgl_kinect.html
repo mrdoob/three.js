@@ -25,9 +25,7 @@
 			}
 
 			a {
-
 				color: #0040ff;
-
 			}
 		</style>
 	</head>
@@ -98,8 +96,8 @@
 
 			var container;
 
-			var scene, camera, light, renderer;
-			var geometry, cube, mesh, material;
+			var scene, camera, renderer;
+			var geometry, mesh, material;
 			var mouse, center;
 			var stats;
 
@@ -137,7 +135,7 @@
 				center.z = - 1000;
 
 				video = document.createElement( 'video' );
-				video.addEventListener( 'loadedmetadata', function ( event ) {
+				video.addEventListener( 'loadedmetadata', function () {
 
 					texture = new THREE.VideoTexture( video );
 					texture.minFilter = THREE.NearestFilter;
@@ -163,14 +161,14 @@
 
 						uniforms: {
 
-							"map":          { value: texture },
-							"width":        { value: width },
-							"height":       { value: height },
+							"map": { value: texture },
+							"width": { value: width },
+							"height": { value: height },
 							"nearClipping": { value: nearClipping },
-							"farClipping":  { value: farClipping },
+							"farClipping": { value: farClipping },
 
-							"pointSize":    { value: 2 },
-							"zOffset":      { value: 1000 }
+							"pointSize": { value: 2 },
+							"zOffset": { value: 1000 }
 
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,

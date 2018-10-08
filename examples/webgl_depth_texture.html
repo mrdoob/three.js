@@ -111,7 +111,7 @@
 
 				renderer = new THREE.WebGLRenderer( { canvas: document.querySelector( 'canvas' ) } );
 
-				if ( !renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
+				if ( ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
 
 					supportsExtension = false;
 					document.querySelector( '#error' ).style.display = 'block';
@@ -158,7 +158,7 @@
 
 			}
 
-			function setupPost () {
+			function setupPost() {
 
 				// Setup post processing stage
 				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
@@ -167,11 +167,11 @@
 					fragmentShader: document.querySelector( '#post-frag' ).textContent.trim(),
 					uniforms: {
 						cameraNear: { value: camera.near },
-						cameraFar:  { value: camera.far },
-						tDiffuse:   { value: target.texture },
-						tDepth:     { value: target.depthTexture }
+						cameraFar: { value: camera.far },
+						tDiffuse: { value: target.texture },
+						tDepth: { value: target.depthTexture }
 					}
-				});
+				} );
 				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
 				var postQuad = new THREE.Mesh( postPlane, postMaterial );
 				postScene = new THREE.Scene();
@@ -179,7 +179,7 @@
 
 			}
 
-			function setupScene () {
+			function setupScene() {
 
 				//var diffuse = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
 				//diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
@@ -224,7 +224,7 @@
 
 			function animate() {
 
-				if ( !supportsExtension ) return;
+				if ( ! supportsExtension ) return;
 
 				requestAnimationFrame( animate );
 

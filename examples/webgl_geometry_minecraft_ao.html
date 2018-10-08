@@ -59,17 +59,14 @@
 
 			}
 
-			var fogExp2 = true;
-
 			var container, stats;
 
 			var camera, controls, scene, renderer;
 
-			var mesh, mat;
-
-			var worldWidth = 200, worldDepth = 200,
-			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
-			data = generateHeight( worldWidth, worldDepth );
+			var worldWidth = 200, worldDepth = 200;
+			var worldHalfWidth = worldWidth / 2;
+			var worldHalfDepth = worldDepth / 2;
+			var data = generateHeight( worldWidth, worldDepth );
 
 			var clock = new THREE.Clock();
 
@@ -321,21 +318,10 @@
 
 			}
 
-			function loadTexture( path, callback ) {
-
-				var image = new Image();
-
-				image.onload = function () { callback(); };
-				image.src = path;
-
-				return image;
-
-			}
-
 			function generateHeight( width, height ) {
 
 				var data = [], perlin = new ImprovedNoise(),
-				size = width * height, quality = 2, z = Math.random() * 100;
+					size = width * height, quality = 2, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {
 
@@ -348,7 +334,7 @@
 
 					}
 
-					quality *= 4
+					quality *= 4;
 
 				}
 

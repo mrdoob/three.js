@@ -87,7 +87,7 @@
 
 			var renderer, scene, camera, stats;
 
-			var particles, uniforms;
+			var particles;
 
 			var PARTICLE_SIZE = 20;
 
@@ -139,7 +139,7 @@
 				var material = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						color:   { value: new THREE.Color( 0xffffff ) },
+						color: { value: new THREE.Color( 0xffffff ) },
 						texture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,

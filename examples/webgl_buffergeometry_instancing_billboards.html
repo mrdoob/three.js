@@ -126,8 +126,10 @@
 			renderer = new THREE.WebGLRenderer();
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+
 				document.getElementById( 'notSupported' ).style.display = '';
 				return false;
+
 			}
 
 			container = document.createElement( 'div' );

@@ -83,7 +83,7 @@
 
 			} );
 
-			loader.onComplete = function ( e ) {
+			loader.onComplete = function () {
 
 				// Get the first camera from 3ds Max
 				// use loader.get... to get others objects
@@ -211,13 +211,13 @@
 
 			}
 
-			function onMouseClick( e ) {
+			function onMouseClick() {
 
 				// 0 at 3 demos
 
 				switch ( demoAt = ++ demoAt % 4 ) {
 
-						// play all animation to sequence "crash#1"
+					// play all animation to sequence "crash#1"
 
 					case 0:
 

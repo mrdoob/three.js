@@ -17,7 +17,7 @@
 				top: 10px;
 				width: 100%;
 				text-align: center;
-				z-index: 0; // to not conflict with dat.gui
+				z-index: 0; /* to not conflict with dat.gui */
 				display:block;
 			}
 		</style>
@@ -92,12 +92,10 @@
 
 				}
 
-				raycaster = new THREE.Raycaster();
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -107,9 +105,21 @@
 				//
 				// Init gui
 				var gui = new dat.GUI();
-				gui.add( layers, 'red' ).onChange( function () { camera.layers.toggle( 0 ); } );
-				gui.add( layers, 'green' ).onChange( function () { camera.layers.toggle( 1 ); } );
-				gui.add( layers, 'blue' ).onChange( function () { camera.layers.toggle( 2 ); } );
+				gui.add( layers, 'red' ).onChange( function () {
+
+					camera.layers.toggle( 0 );
+
+				} );
+				gui.add( layers, 'green' ).onChange( function () {
+
+					camera.layers.toggle( 1 );
+
+				} );
+				gui.add( layers, 'blue' ).onChange( function () {
+
+					camera.layers.toggle( 2 );
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -77,7 +77,7 @@
 				scene.add( light1 );
 
 				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light2.position.set( 0, -1, 0 );
+				light2.position.set( 0, - 1, 0 );
 				scene.add( light2 );
 
 				//
@@ -160,7 +160,11 @@
 
 				}
 
-				function disposeArray() { this.array = null; }
+				function disposeArray() {
+
+					this.array = null;
+
+				}
 
 				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ).onUpload( disposeArray ) );
 				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ).onUpload( disposeArray ) );

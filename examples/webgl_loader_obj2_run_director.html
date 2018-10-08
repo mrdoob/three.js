@@ -89,11 +89,12 @@
 
 			'use strict';
 
-			var WWParallels = (function () {
+			var WWParallels = ( function () {
 
 				var Validator = THREE.LoaderSupport.Validator;
 
 				function WWParallels( elementToBindTo ) {
+
 					this.renderer = null;
 					this.canvas = elementToBindTo;
 					this.aspectRatio = 1;
@@ -126,9 +127,11 @@
 					this.feedbackArray = null;
 
 					this.running = false;
+
 				}
 
 				WWParallels.prototype.initGL = function () {
+
 					this.renderer = new THREE.WebGLRenderer( {
 						canvas: this.canvas,
 						antialias: true,
@@ -146,8 +149,8 @@
 					var directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
 					var directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
 
-					directionalLight1.position.set( -100, -50, 100 );
-					directionalLight2.position.set( 100, 50, -100 );
+					directionalLight1.position.set( - 100, - 50, 100 );
+					directionalLight2.position.set( 100, 50, - 100 );
 
 					this.scene.add( directionalLight1 );
 					this.scene.add( directionalLight2 );
@@ -158,35 +161,45 @@
 					this.cube = new THREE.Mesh( geometry, material );
 					this.cube.position.set( 0, 0, 0 );
 					this.scene.add( this.cube );
+
 				};
 
 				WWParallels.prototype.resizeDisplayGL = function () {
+
 					this.controls.handleResize();
 
 					this.recalcAspectRatio();
 					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
 
 					this.updateCamera();
+
 				};
 
 				WWParallels.prototype.recalcAspectRatio = function () {
+
 					this.aspectRatio = ( this.canvas.offsetHeight === 0 ) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+
 				};
 
 				WWParallels.prototype.resetCamera = function () {
+
 					this.camera.position.copy( this.cameraDefaults.posCamera );
 					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
 
 					this.updateCamera();
+
 				};
 
 				WWParallels.prototype.updateCamera = function () {
+
 					this.camera.aspect = this.aspectRatio;
 					this.camera.lookAt( this.cameraTarget );
 					this.camera.updateProjectionMatrix();
+
 				};
 
 				WWParallels.prototype.render = function () {
+
 					if ( ! this.renderer.autoClear ) this.renderer.clear();
 
 					this.controls.update();
@@ -195,18 +208,22 @@
 					this.cube.rotation.y += 0.05;
 
 					this.renderer.render( this.scene, this.camera );
+
 				};
 
-				WWParallels.prototype._reportProgress = function( content ) {
+				WWParallels.prototype._reportProgress = function ( content ) {
+
 					var output = content;
 					if ( Validator.isValid( content ) && Validator.isValid( content.detail ) ) output = content.detail.text;
 
 					output = Validator.verifyInput( output, '' );
-					if ( this.logging.enabled ) console.info( 'Progress:\n\t' + output.replace(/\<br\>/g, '\n\t' ) );
+					if ( this.logging.enabled ) console.info( 'Progress:\n\t' + output.replace( /\<br\>/g, '\n\t' ) );
 					document.getElementById( 'feedback' ).innerHTML = output;
+
 				};
 
 				WWParallels.prototype.enqueueAllAssests = function ( maxQueueSize, maxWebWorkers, streamMeshes ) {
+
 					if ( this.running ) {
 
 						return;
@@ -223,7 +240,7 @@
 					scope.reportDonwload = [];
 
 					var i;
-					for ( i = 0; i < maxWebWorkers; i++ ) {
+					for ( i = 0; i < maxWebWorkers; i ++ ) {
 
 						scope.feedbackArray[ i ] = 'Worker #' + i + ': Awaiting feedback';
 						scope.reportDonwload[ i ] = true;
@@ -232,6 +249,7 @@
 					scope._reportProgress( scope.feedbackArray.join( '\<br\>' ) );
 
 					var callbackOnLoad = function ( event ) {
+
 						var instanceNo = event.detail.instanceNo;
 						scope.reportDonwload[ instanceNo ] = false;
 						scope.allAssets.push( event.detail.loaderRootNode );
@@ -242,22 +260,28 @@
 						scope._reportProgress( scope.feedbackArray.join( '\<br\>' ) );
 
 						if ( scope.workerDirector.objectsCompleted + 1 === maxQueueSize ) scope.running = false;
+
 					};
 
 					var callbackReportProgress = function ( event ) {
+
 						var	instanceNo = event.detail.instanceNo;
 						var text = event.detail.text;
 
 						if ( scope.reportDonwload[ instanceNo ] ) {
+
 							var msg = 'Worker #' + instanceNo + ': ' + text;
 							if ( scope.logging.enabled ) console.info( msg );
 
 							scope.feedbackArray[ instanceNo ] = msg;
 							scope._reportProgress( scope.feedbackArray.join( '\<br\>' ) );
+
 						}
+
 					};
 
 					var callbackMeshAlter = function ( event, override ) {
+
 						if ( ! Validator.isValid( override ) ) override = new THREE.LoaderSupport.LoadedMeshUserOverride( false, false );
 
 						var material = event.detail.material;
@@ -274,11 +298,14 @@
 
 						}
 						return override;
+
 					};
 
 					var callbackOnLoadMaterials = function ( materials ) {
+
 						console.log( 'Materials loaded' );
 						return materials;
+
 					};
 
 					var callbacks = new THREE.LoaderSupport.Callbacks();
@@ -293,7 +320,7 @@
 					var modelPrepDatas = [];
 					var prepData;
 					prepData = new THREE.LoaderSupport.PrepData( 'male02' );
-					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/male02/male02.obj', 'OBJ ') );
+					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/male02/male02.obj', 'OBJ ' ) );
 					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/male02/male02.mtl', 'MTL' ) );
 					prepData.setLogging( false, false );
 					modelPrepDatas.push( prepData );
@@ -323,12 +350,12 @@
 					modelPrepDatas.push( prepData );
 
 					var pivot;
-					var distributionBase = -500;
+					var distributionBase = - 500;
 					var distributionMax = 1000;
 					var modelPrepDataIndex = 0;
 					var modelPrepData;
 					var scale;
-					for ( i = 0; i < maxQueueSize; i++ ) {
+					for ( i = 0; i < maxQueueSize; i ++ ) {
 
 						modelPrepDataIndex = Math.floor( Math.random() * modelPrepDatas.length );
 
@@ -348,11 +375,14 @@
 						modelPrepData.streamMeshesTo = pivot;
 
 						this.workerDirector.enqueueForRun( modelPrepData );
+
 					}
 					this.workerDirector.processQueue();
+
 				};
 
 				WWParallels.prototype.clearAllAssests = function () {
+
 					var storedObject3d;
 					for ( var asset in this.allAssets ) {
 
@@ -377,9 +407,13 @@
 										if ( materials.hasOwnProperty( name ) ) materials[ name ].dispose();
 
 									}
+
 								}
+
 							}
+
 							if ( object3d.hasOwnProperty( 'texture' ) )	object3d.texture.dispose();
+
 						};
 						if ( Validator.isValid( storedObject3d ) ) {
 
@@ -388,19 +422,26 @@
 							storedObject3d = null;
 
 						}
+
 					}
 					this.allAssets = [];
+
 				};
 
 				WWParallels.prototype.terminateManager = function () {
+
 					this.workerDirector.tearDown();
 					this.running = false;
+
 				};
 
 				WWParallels.prototype.terminateManagerAndClearScene = function () {
+
 					var scope = this;
-					var scopedClearAllAssests = function (){
+					var scopedClearAllAssests = function () {
+
 						scope.clearAllAssests();
+
 					};
 					if ( this.workerDirector.isRunning() ) {
 
@@ -409,14 +450,16 @@
 					} else {
 
 						scopedClearAllAssests();
+
 					}
 
 					this.running = false;
+
 				};
 
 				return WWParallels;
 
-			})();
+			} )();
 
 
 			var app = new WWParallels( document.getElementById( 'example' ) );
@@ -426,13 +469,19 @@
 				workerCount: 4,
 				streamMeshes: true,
 				run: function () {
+
 					app.enqueueAllAssests( this.queueLength, this.workerCount, this.streamMeshes );
+
 				},
 				terminate: function () {
+
 					app.terminateManager();
+
 				},
 				clearAllAssests: function () {
+
 					app.terminateManagerAndClearScene();
+
 				}
 			};
 			var gui = new dat.GUI( {
@@ -441,7 +490,7 @@
 			} );
 
 			var menuDiv = document.getElementById( 'dat' );
-			menuDiv.appendChild(gui.domElement);
+			menuDiv.appendChild( gui.domElement );
 			var folderQueue = gui.addFolder( 'Web Worker Director Queue Control' );
 			folderQueue.add( wwParallelsControl, 'queueLength' ).min( 1 ).max( 1024 ).step( 1 );
 			folderQueue.add( wwParallelsControl, 'workerCount' ).min( 1 ).max( 16 ).step( 1 );
@@ -454,12 +503,16 @@
 			folderWWControl.add( wwParallelsControl, 'clearAllAssests' ).name( 'Clear Scene' );
 
 			var resizeWindow = function () {
+
 				app.resizeDisplayGL();
+
 			};
 
 			var render = function () {
+
 				requestAnimationFrame( render );
 				app.render();
+
 			};
 
 			window.addEventListener( 'resize', resizeWindow, false );

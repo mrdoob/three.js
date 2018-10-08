@@ -237,8 +237,10 @@
 
 							case 'T':
 								if ( activeCmd === 'T' ) {
+
 									x1 = 2 * x - x1;
 									y1 = 2 * y - y1;
+
 								}
 								nx = eatNum();
 								ny = eatNum();
@@ -292,7 +294,7 @@
 								if ( laf === sf ) norm = - norm;
 
 								x2 = norm * rx * y1 / ry;
-								y2 = norm * -ry * x1 / rx;
+								y2 = norm * - ry * x1 / rx;
 
 								// step 3
 
@@ -338,7 +340,7 @@
 
 					return path;
 
-				}
+				};
 
 			}
 
@@ -348,7 +350,7 @@
 			/// Part from g0v/twgeojson
 			/// Graphic Engine and Geo Data Init Functions
 
-			var addGeoObject = function( group, svgObject ) {
+			var addGeoObject = function ( group, svgObject ) {
 
 				var paths = svgObject.paths;
 				var depths = svgObject.depths;
@@ -490,10 +492,10 @@
 					"M363.4600,128.3904 L366.6300,130.3829 L369.3732,129.3913 L369.5603,125.6695 L374.3989,125.1677 " +
 					"L370.8412,123.6440 L371.0684,118.8252 L369.0431,117.3157 L369.6882,115.7936 L367.8578,112.8749 " +
 					"L368.1217,110.4867 L366.5152,109.2554 L361.9554,112.3435 L358.1163,117.8678 L361.7218,120.2192 " +
-					"L360.7261,126.3232 L362.8064,125.5221 Z"];
+					"L360.7261,126.3232 L362.8064,125.5221 Z" ];
 
 				obj.depths = [ 19, 20, 21 ];
-				obj.colors =  [ 0xC07000, 0xC08000, 0xC0A000 ];
+				obj.colors = [ 0xC07000, 0xC08000, 0xC0A000 ];
 				obj.center = { x: 365, y: 125 };
 
 				return obj;

@@ -108,7 +108,7 @@
 			gui.add( options, "turbulence", 0, 1 );
 
 			gui.add( spawnerOptions, "spawnRate", 10, 30000 );
-			gui.add( spawnerOptions, "timeScale", -1, 1 );
+			gui.add( spawnerOptions, "timeScale", - 1, 1 );
 
 			//
 
@@ -161,7 +161,7 @@
 				options.position.y = Math.sin( tick * spawnerOptions.verticalSpeed ) * 10;
 				options.position.z = Math.sin( tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed ) * 5;
 
-				for ( var x = 0; x < spawnerOptions.spawnRate * delta; x++ ) {
+				for ( var x = 0; x < spawnerOptions.spawnRate * delta; x ++ ) {
 
 					// Yep, that's really it.	Spawning particles is super cheap, and once you spawn them, the rest of
 					// their lifecycle is handled entirely on the GPU, driven by a time uniform updated below

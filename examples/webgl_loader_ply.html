@@ -30,7 +30,6 @@
 			span {
 				display: inline-block;
 				width: 60px;
-				float: left;
 				text-align: center;
 			}
 
@@ -72,7 +71,7 @@
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
 				camera.position.set( 3, 0.15, 3 );
 
-				cameraTarget = new THREE.Vector3( 0, -0.1, 0 );
+				cameraTarget = new THREE.Vector3( 0, - 0.1, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x72645b );
@@ -85,8 +84,8 @@
 					new THREE.PlaneBufferGeometry( 40, 40 ),
 					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 				);
-				plane.rotation.x = -Math.PI/2;
-				plane.position.y = -0.5;
+				plane.rotation.x = - Math.PI / 2;
+				plane.position.y = - 0.5;
 				scene.add( plane );
 
 				plane.receiveShadow = true;
@@ -103,7 +102,7 @@
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
-					mesh.position.z =   0.3;
+					mesh.position.z = 0.3;
 					mesh.rotation.x = - Math.PI / 2;
 					mesh.scale.multiplyScalar( 0.001 );
 
@@ -138,7 +137,7 @@
 				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
+				addShadowedLight( 0.5, 1, - 1, 0xffaa00, 1 );
 
 				// renderer
 
@@ -173,10 +172,10 @@
 				directionalLight.castShadow = true;
 
 				var d = 1;
-				directionalLight.shadow.camera.left = -d;
+				directionalLight.shadow.camera.left = - d;
 				directionalLight.shadow.camera.right = d;
 				directionalLight.shadow.camera.top = d;
-				directionalLight.shadow.camera.bottom = -d;
+				directionalLight.shadow.camera.bottom = - d;
 
 				directionalLight.shadow.camera.near = 1;
 				directionalLight.shadow.camera.far = 4;
@@ -184,7 +183,7 @@
 				directionalLight.shadow.mapSize.width = 1024;
 				directionalLight.shadow.mapSize.height = 1024;
 
-				directionalLight.shadow.bias = -0.001;
+				directionalLight.shadow.bias = - 0.001;
 
 			}
 

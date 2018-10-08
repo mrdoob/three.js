@@ -81,7 +81,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -98,9 +98,9 @@
 
 				var aspect = window.innerWidth / window.innerHeight;
 
-				camera.left   = - frustumSize * aspect / 2;
-				camera.right  =   frustumSize * aspect / 2;
-				camera.top    =   frustumSize / 2;
+				camera.left = - frustumSize * aspect / 2;
+				camera.right = frustumSize * aspect / 2;
+				camera.top = frustumSize / 2;
 				camera.bottom = - frustumSize / 2;
 
 				camera.updateProjectionMatrix();

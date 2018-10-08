@@ -282,7 +282,7 @@
 
 				var loadStartTime = performance.now();
 
-				loader.load( url, function( data ) {
+				loader.load( url, function ( data ) {
 
 					gltf = data;
 
@@ -331,7 +331,7 @@
 
 						if ( ! envMap ) envMap = getEnvMap();
 
-						object.traverse( function( node ) {
+						object.traverse( function ( node ) {
 
 							if ( node.material && ( node.material.isMeshStandardMaterial ||
 								 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {

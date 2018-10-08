@@ -377,7 +377,7 @@
 
 			instanceCount = parseInt( instanceCountElm.value );
 
-			instanceCountElm.addEventListener( "change", function() {
+			instanceCountElm.addEventListener( "change", function () {
 
 				instanceCount = parseInt( instanceCountElm.value );
 				initMesh();
@@ -390,7 +390,7 @@
 
 			method = methodElm.value;
 
-			methodElm.addEventListener( "change", function() {
+			methodElm.addEventListener( "change", function () {
 
 				method = methodElm.value;
 				initMesh();
@@ -403,7 +403,7 @@
 
 			doAnimate = animateElm.checked;
 
-			animateElm.addEventListener( "click", function() {
+			animateElm.addEventListener( "click", function () {
 
 				doAnimate = animateElm.checked;
 				animate();
@@ -416,7 +416,7 @@
 
 			useOverrideMaterial = overrideElm.checked;
 
-			overrideElm.addEventListener( "click", function() {
+			overrideElm.addEventListener( "click", function () {
 
 				useOverrideMaterial = overrideElm.checked;
 				initMesh();
@@ -427,7 +427,7 @@
 
 			var constructElm = document.getElementById( 'construct' );
 
-			constructElm.addEventListener( "click", function() {
+			constructElm.addEventListener( "click", function () {
 
 				initMesh();
 
@@ -439,13 +439,13 @@
 
 			THREE.Cache.clear();
 
-			materialList.forEach( function( m ) {
+			materialList.forEach( function ( m ) {
 
 				m.dispose();
 
 			} );
 
-			geometryList.forEach( function( g ) {
+			geometryList.forEach( function ( g ) {
 
 				g.dispose();
 
@@ -468,14 +468,14 @@
 
 		}
 
-		var randomizeMatrix = function() {
+		var randomizeMatrix = function () {
 
 			var position = new THREE.Vector3();
 			var rotation = new THREE.Euler();
 			var quaternion = new THREE.Quaternion();
 			var scale = new THREE.Vector3();
 
-			return function( matrix ) {
+			return function ( matrix ) {
 
 				position.x = Math.random() * 40 - 20;
 				position.y = Math.random() * 40 - 20;
@@ -509,7 +509,7 @@
 
 				var start = window.performance.now();
 
-				switch ( method ){
+				switch ( method ) {
 
 					case "merged":
 						makeMerged( geo );
@@ -643,35 +643,41 @@
 
 			var matrix = new THREE.Matrix4();
 
-			function onBeforeRender( renderer, scene, camera, geometry, material, group ){
+			function onBeforeRender( renderer, scene, camera, geometry, material ) {
 
 				var updateList = [];
 				var u = material.uniforms;
 				var d = this.userData;
 
-				if( u.pickingColor ){
+				if ( u.pickingColor ) {
+
 					u.pickingColor.value.setHex( d.pickingColor );
 					updateList.push( "pickingColor" );
+
 				}
 
-				if( u.color ){
+				if ( u.color ) {
+
 					u.color.value.setHex( d.color );
 					updateList.push( "color" );
+
 				}
 
-				if( updateList.length ){
+				if ( updateList.length ) {
 
 					var materialProperties = renderer.properties.get( material );
 
-					if( materialProperties.program ){
+					if ( materialProperties.program ) {
 
 						var gl = renderer.getContext();
 						var p = materialProperties.program;
 						gl.useProgram( p.program );
 						var pu = p.getUniforms();
 
-						updateList.forEach( function( name ){
+						updateList.forEach( function ( name ) {
+
 							pu.setValue( gl, name, u[ name ].value );
+
 						} );
 
 					}
@@ -703,7 +709,7 @@
 					object.userData[ "pickingColor" ] = i + 1;
 					object.onBeforeRender = onBeforeRender;
 
-				}else {
+				} else {
 
 					pickingObject.material = pickingMaterial;
 					pickingObject.userData[ "pickingColor" ] = i + 1;
@@ -780,7 +786,7 @@
 			var colors = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * colCount * 3 ), 3
 			);
-			var randCol = function() {
+			var randCol = function () {
 
 				return Math.random();
 
@@ -887,7 +893,7 @@
 			igeo.addAttribute( 'mcol2', mcol2 );
 			igeo.addAttribute( 'mcol3', mcol3 );
 
-			var randCol = function() {
+			var randCol = function () {
 
 				return Math.random();
 
@@ -1008,7 +1014,7 @@
 
 		}
 
-		function onWindowResize( event ) {
+		function onWindowResize() {
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
@@ -1045,7 +1051,7 @@
 				renderer.render( scene, camera, pickingRenderTarget );
 				scene.overrideMaterial = null;
 
-			}else {
+			} else {
 
 				renderer.render( pickingScene, camera, pickingRenderTarget );
 

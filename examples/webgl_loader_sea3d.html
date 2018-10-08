@@ -63,7 +63,7 @@
 
 			}
 
-			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
+			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
 			var container, stats;
 
@@ -81,13 +81,13 @@
 
 			loader = new THREE.SEA3D( {
 
-				autoPlay : true, // Auto play animations
-				container : scene, // Container to add models
-				progressive : true // Progressive download
+				autoPlay: true, // Auto play animations
+				container: scene, // Container to add models
+				progressive: true // Progressive download
 
 			} );
 
-			loader.onComplete = function( e ) {
+			loader.onComplete = function () {
 
 				// Get camera from SEA3D Studio
 				// use loader.get... to get others objects
@@ -96,7 +96,7 @@
 				//camera.position.copy( cam.position );
 				//camera.rotation.copy( cam.rotation );
 
-				console.log("SEA3D asset loaded!");
+				console.log( "SEA3D asset loaded!" );
 
 			};
 

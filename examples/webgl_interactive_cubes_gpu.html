@@ -164,7 +164,7 @@
 				highlightBox = new THREE.Mesh(
 					new THREE.BoxBufferGeometry(),
 					new THREE.MeshLambertMaterial( { color: 0xffff00 }
-				) );
+					) );
 				scene.add( highlightBox );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -216,11 +216,11 @@
 				var id = ( pixelBuffer[ 0 ] << 16 ) | ( pixelBuffer[ 1 ] << 8 ) | ( pixelBuffer[ 2 ] );
 				var data = pickingData[ id ];
 
-				if ( data) {
+				if ( data ) {
 
 					//move our highlightBox so that it surrounds the picked object
 
-					if ( data.position && data.rotation && data.scale ){
+					if ( data.position && data.rotation && data.scale ) {
 
 						highlightBox.position.copy( data.position );
 						highlightBox.rotation.copy( data.rotation );

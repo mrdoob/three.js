@@ -86,7 +86,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var effectController  = {
+				var effectController = {
 
 					focalLength: 15,
 					// jsDepthCalculation: true,
@@ -114,7 +114,7 @@
 
 				};
 
-				var matChanger = function( ) {
+				var matChanger = function ( ) {
 
 					for ( var e in effectController ) {
 
@@ -197,7 +197,7 @@
 
 					var targetDistance = intersects[ 0 ].distance;
 
-					camera.focusAt( targetDistance );  // using Cinematic camera focusAt method
+					camera.focusAt( targetDistance ); // using Cinematic camera focusAt method
 
 					if ( INTERSECTED != intersects[ 0 ].object ) {
 
@@ -206,6 +206,7 @@
 						INTERSECTED = intersects[ 0 ].object;
 						INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
 						INTERSECTED.material.emissive.setHex( 0xff0000 );
+
 					}
 
 				} else {

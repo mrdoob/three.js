@@ -93,7 +93,7 @@
 
 		var renderer, scene, camera, stats;
 
-		var object, uniforms, attributes;
+		var object;
 
 		var vertices1;
 
@@ -121,11 +121,11 @@
 				vertex.z = Math.random() * 2 - 1;
 				vertex.multiplyScalar( radius );
 
-				if ( ( vertex.x > inner || vertex.x < -inner ) ||
-				     ( vertex.y > inner || vertex.y < -inner ) ||
-				     ( vertex.z > inner || vertex.z < -inner )  )
+				if ( ( vertex.x > inner || vertex.x < - inner ) ||
+				     ( vertex.y > inner || vertex.y < - inner ) ||
+				     ( vertex.z > inner || vertex.z < - inner ) )
 
-				vertices.push( vertex );
+					vertices.push( vertex );
 
 			}
 
@@ -158,26 +158,26 @@
 
 			// side 1
 
-			addGeo( geometry2, 0,  110,  110, 0 );
-			addGeo( geometry2, 0,  110, -110, 0 );
-			addGeo( geometry2, 0, -110,  110, 0 );
-			addGeo( geometry2, 0, -110, -110, 0 );
+			addGeo( geometry2, 0, 110, 110, 0 );
+			addGeo( geometry2, 0, 110, - 110, 0 );
+			addGeo( geometry2, 0, - 110, 110, 0 );
+			addGeo( geometry2, 0, - 110, - 110, 0 );
 
 			// side 2
 
-			addGeo( geometry2,  110,  110, 0, Math.PI/2 );
-			addGeo( geometry2,  110, -110, 0, Math.PI/2 );
-			addGeo( geometry2, -110,  110, 0, Math.PI/2 );
-			addGeo( geometry2, -110, -110, 0, Math.PI/2 );
+			addGeo( geometry2, 110, 110, 0, Math.PI / 2 );
+			addGeo( geometry2, 110, - 110, 0, Math.PI / 2 );
+			addGeo( geometry2, - 110, 110, 0, Math.PI / 2 );
+			addGeo( geometry2, - 110, - 110, 0, Math.PI / 2 );
 
 			// corner edges
 
 			var geometry3 = new THREE.BoxGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
 
-			addGeo( geometry3,  110, 0,  110, 0 );
-			addGeo( geometry3,  110, 0, -110, 0 );
-			addGeo( geometry3, -110, 0,  110, 0 );
-			addGeo( geometry3, -110, 0, -110, 0 );
+			addGeo( geometry3, 110, 0, 110, 0 );
+			addGeo( geometry3, 110, 0, - 110, 0 );
+			addGeo( geometry3, - 110, 0, 110, 0 );
+			addGeo( geometry3, - 110, 0, - 110, 0 );
 
 			var positions = new Float32Array( vertices.length * 3 );
 			var colors = new Float32Array( vertices.length * 3 );
@@ -222,13 +222,13 @@
 
 				uniforms: {
 					amplitude: { value: 1.0 },
-					color:     { value: new THREE.Color( 0xffffff ) },
-					texture:   { value: texture }
+					color: { value: new THREE.Color( 0xffffff ) },
+					texture: { value: texture }
 				},
-				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				vertexShader: document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 
-			});
+			} );
 
 			//
 
@@ -284,7 +284,7 @@
 
 				if ( i < vertices1 ) {
 
-					attributes.size.array[ i ] = Math.max(0, 26 + 32 * Math.sin( 0.1 * i + 0.6 * time ));
+					attributes.size.array[ i ] = Math.max( 0, 26 + 32 * Math.sin( 0.1 * i + 0.6 * time ) );
 
 				}
 

@@ -11,10 +11,6 @@
 				overflow: hidden;
 			}
 
-			a {
-				color:#0078ff;
-			}
-
 			#info {
 				position: absolute;
 				top: 10px; width: 100%;
@@ -59,14 +55,13 @@
 			var SCREEN_WIDTH = window.innerWidth,
 				SCREEN_HEIGHT = window.innerHeight,
 
-			r = 450,
+	r = 450,
 
-			mouseX = 0, mouseY = 0,
+	mouseY = 0,
 
-			windowHalfX = window.innerWidth / 2,
-			windowHalfY = window.innerHeight / 2,
+	windowHalfY = window.innerHeight / 2,
 
-			camera, scene, renderer;
+	camera, scene, renderer;
 
 			init();
 			animate();
@@ -79,12 +74,12 @@
 				scene = new THREE.Scene();
 
 				var i, line, material, p,
-					parameters = [ [ 0.25, 0xff7700, 1 ], [ 0.5, 0xff9900, 1 ], [ 0.75, 0xffaa00, 0.75 ], [ 1, 0xffaa00, 0.5 ], [ 1.25, 0x000833, 0.8 ],
-							       [ 3.0, 0xaaaaaa, 0.75 ], [ 3.5, 0xffffff, 0.5 ], [ 4.5, 0xffffff, 0.25 ], [ 5.5, 0xffffff, 0.125 ] ];
+					parameters = [[ 0.25, 0xff7700, 1 ], [ 0.5, 0xff9900, 1 ], [ 0.75, 0xffaa00, 0.75 ], [ 1, 0xffaa00, 0.5 ], [ 1.25, 0x000833, 0.8 ],
+							       [ 3.0, 0xaaaaaa, 0.75 ], [ 3.5, 0xffffff, 0.5 ], [ 4.5, 0xffffff, 0.25 ], [ 5.5, 0xffffff, 0.125 ]];
 
 				var geometry = createGeometry();
 
-				for( i = 0; i < parameters.length; ++ i ) {
+				for ( i = 0; i < parameters.length; ++ i ) {
 
 					p = parameters[ i ];
 
@@ -164,7 +159,6 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
 				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -176,7 +170,6 @@
 
 			function onDocumentMouseMove( event ) {
 
-				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
 
 			}
@@ -187,7 +180,6 @@
 
 					event.preventDefault();
 
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
@@ -200,7 +192,6 @@
 
 					event.preventDefault();
 
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}

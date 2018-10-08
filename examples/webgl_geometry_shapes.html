@@ -171,11 +171,11 @@
 				californiaPts.push( new THREE.Vector2( 180, 640 ) );
 				californiaPts.push( new THREE.Vector2( 165, 680 ) );
 				californiaPts.push( new THREE.Vector2( 150, 670 ) );
-				californiaPts.push( new THREE.Vector2(  90, 737 ) );
-				californiaPts.push( new THREE.Vector2(  80, 795 ) );
-				californiaPts.push( new THREE.Vector2(  50, 835 ) );
-				californiaPts.push( new THREE.Vector2(  64, 870 ) );
-				californiaPts.push( new THREE.Vector2(  60, 945 ) );
+				californiaPts.push( new THREE.Vector2( 90, 737 ) );
+				californiaPts.push( new THREE.Vector2( 80, 795 ) );
+				californiaPts.push( new THREE.Vector2( 50, 835 ) );
+				californiaPts.push( new THREE.Vector2( 64, 870 ) );
+				californiaPts.push( new THREE.Vector2( 60, 945 ) );
 				californiaPts.push( new THREE.Vector2( 300, 945 ) );
 				californiaPts.push( new THREE.Vector2( 300, 743 ) );
 				californiaPts.push( new THREE.Vector2( 600, 473 ) );
@@ -183,7 +183,7 @@
 				californiaPts.push( new THREE.Vector2( 600, 370 ) );
 				californiaPts.push( new THREE.Vector2( 610, 320 ) );
 
-				for( var i = 0; i < californiaPts.length; i ++ ) californiaPts[ i ].multiplyScalar( 0.25 );
+				for ( var i = 0; i < californiaPts.length; i ++ ) californiaPts[ i ].multiplyScalar( 0.25 );
 
 				var californiaShape = new THREE.Shape( californiaPts );
 
@@ -346,17 +346,17 @@
 
 				// addShape( shape, color, x, y, z, rx, ry,rz, s );
 
-				addShape( californiaShape,  extrudeSettings, 0xf08000, -300, -100, 0, 0, 0, 0, 1 );
-				addShape( triangleShape,    extrudeSettings, 0x8080f0, -180,    0, 0, 0, 0, 0, 1 );
-				addShape( roundedRectShape, extrudeSettings, 0x008000, -150,  150, 0, 0, 0, 0, 1 );
-				addShape( trackShape,       extrudeSettings, 0x008080,  200, -100, 0, 0, 0, 0, 1 );
-				addShape( squareShape,      extrudeSettings, 0x0040f0,  150,  100, 0, 0, 0, 0, 1 );
-				addShape( heartShape,       extrudeSettings, 0xf00000,   60,  100, 0, 0, 0, Math.PI, 1 );
-				addShape( circleShape,      extrudeSettings, 0x00f000,  120,  250, 0, 0, 0, 0, 1 );
-				addShape( fishShape,        extrudeSettings, 0x404040, - 60,  200, 0, 0, 0, 0, 1 );
-				addShape( smileyShape,      extrudeSettings, 0xf000f0, -200,  250, 0, 0, 0, Math.PI, 1 );
-				addShape( arcShape,         extrudeSettings, 0x804000,  150,    0, 0, 0, 0, 0, 1 );
-				addShape( splineShape,      extrudeSettings, 0x808080, - 50, -100, 0, 0, 0, 0, 1 );
+				addShape( californiaShape, extrudeSettings, 0xf08000, - 300, - 100, 0, 0, 0, 0, 1 );
+				addShape( triangleShape, extrudeSettings, 0x8080f0, - 180, 0, 0, 0, 0, 0, 1 );
+				addShape( roundedRectShape, extrudeSettings, 0x008000, - 150, 150, 0, 0, 0, 0, 1 );
+				addShape( trackShape, extrudeSettings, 0x008080, 200, - 100, 0, 0, 0, 0, 1 );
+				addShape( squareShape, extrudeSettings, 0x0040f0, 150, 100, 0, 0, 0, 0, 1 );
+				addShape( heartShape, extrudeSettings, 0xf00000, 60, 100, 0, 0, 0, Math.PI, 1 );
+				addShape( circleShape, extrudeSettings, 0x00f000, 120, 250, 0, 0, 0, 0, 1 );
+				addShape( fishShape, extrudeSettings, 0x404040, - 60, 200, 0, 0, 0, 0, 1 );
+				addShape( smileyShape, extrudeSettings, 0xf000f0, - 200, 250, 0, 0, 0, Math.PI, 1 );
+				addShape( arcShape, extrudeSettings, 0x804000, 150, 0, 0, 0, 0, 0, 1 );
+				addShape( splineShape, extrudeSettings, 0x808080, - 50, - 100, 0, 0, 0, 0, 1 );
 
 				addLineShape( arcShape.holes[ 0 ], 0x804000, 150, 0, 0, 0, 0, 0, 1 );
 
@@ -418,7 +418,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -426,7 +426,7 @@
 
 			}
 
-			function onDocumentMouseOut( event ) {
+			function onDocumentMouseOut() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );

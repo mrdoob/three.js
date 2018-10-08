@@ -137,10 +137,10 @@
 				materialHDR = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						tDiffuse:  { value: texture },
-						exposure:  { value: 0.125 },
+						tDiffuse: { value: texture },
+						exposure: { value: 0.125 },
 						brightMax: { value: 0.5 }
-						},
+					},
 					vertexShader: getText( 'vs-hdr' ),
 					fragmentShader: getText( 'fs-hdr' )
 
@@ -149,7 +149,7 @@
 				var plane = new THREE.PlaneBufferGeometry( 512, 768 );
 
 				quad = new THREE.Mesh( plane, materialHDR );
-				quad.position.z = -100;
+				quad.position.z = - 100;
 				scene.add( quad );
 
 				renderer = new THREE.WebGLRenderer();
@@ -208,7 +208,7 @@
 
 				if ( materialHDR.uniforms.exposure.value > 5 || materialHDR.uniforms.exposure.value <= 0 ) {
 
-					sign *= -1;
+					sign *= - 1;
 
 				}
 

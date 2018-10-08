@@ -100,7 +100,7 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var materialHDR, quad, gamma, exposure;
+			var materialHDR, quad;
 
 			init();
 
@@ -115,7 +115,7 @@
 
 				var loader = new THREE.EXRLoader();
 
-				loader.load( "textures/piz_compressed.exr", function( texture, textureData ) {
+				loader.load( "textures/piz_compressed.exr", function ( texture, textureData ) {
 
 					console.log( textureData.header ); // exr header
 
@@ -125,17 +125,17 @@
 					materialHDR = new THREE.ShaderMaterial( {
 
 						uniforms: {
-							tDiffuse:  { value: texture },
-							exposure:  { value: 1.0 },
+							tDiffuse: { value: texture },
+							exposure: { value: 1.0 },
 							brightMax: { value: 18.0 }
-							},
+						},
 						vertexShader: getText( 'vs-hdr' ),
 						fragmentShader: getText( 'fs-hdr' )
 
 					} );
 
 					quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( textureData.width, textureData.height ), materialHDR );
-					quad.position.z = -100;
+					quad.position.z = - 100;
 					scene.add( quad );
 					animate();
 

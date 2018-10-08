@@ -11,10 +11,6 @@
 				overflow: hidden;
 			}
 
-			a {
-				color:#0078ff;
-			}
-
 			#info {
 				position: absolute;
 				top: 10px; width: 100%;
@@ -82,7 +78,7 @@
 
 				//
 
-				var hilbertPoints = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var hilbertPoints = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				var geometry1 = new THREE.BufferGeometry();
 				var geometry2 = new THREE.BufferGeometry();
@@ -100,7 +96,7 @@
 
 				var spline = new THREE.CatmullRomCurve3( hilbertPoints );
 
-				for ( var i = 0; i < hilbertPoints.length * subdivisions; i++ ) {
+				for ( var i = 0; i < hilbertPoints.length * subdivisions; i ++ ) {
 
 					var t = i / ( hilbertPoints.length * subdivisions );
 					spline.getPoint( t, point );
@@ -137,7 +133,7 @@
 				colors2 = [];
 				colors3 = [];
 
-				for ( var i = 0; i < hilbertPoints.length; i++ ) {
+				for ( var i = 0; i < hilbertPoints.length; i ++ ) {
 
 					var point = hilbertPoints[ i ];
 
@@ -168,21 +164,21 @@
 
 				var line, p, scale = 0.3, d = 225;
 
-				var parameters =  [
+				var parameters = [
 					[ material, scale * 1.5, [ - d, - d / 2, 0 ], geometry1 ],
-					[ material, scale * 1.5, [   0, - d / 2, 0 ], geometry2 ],
-					[ material, scale * 1.5, [   d, - d / 2, 0 ], geometry3 ],
+					[ material, scale * 1.5, [ 0, - d / 2, 0 ], geometry2 ],
+					[ material, scale * 1.5, [ d, - d / 2, 0 ], geometry3 ],
 
 					[ material, scale * 1.5, [ - d, d / 2, 0 ], geometry4 ],
-					[ material, scale * 1.5, [   0, d / 2, 0 ], geometry5 ],
-					[ material, scale * 1.5, [   d, d / 2, 0 ], geometry6 ],
+					[ material, scale * 1.5, [ 0, d / 2, 0 ], geometry5 ],
+					[ material, scale * 1.5, [ d, d / 2, 0 ], geometry6 ],
 				];
 
-				for ( var i = 0; i < parameters.length; i++ ) {
+				for ( var i = 0; i < parameters.length; i ++ ) {
 
 					p = parameters[ i ];
-					line = new THREE.Line( p[ 3 ],  p[ 0 ] );
-					line.scale.x = line.scale.y = line.scale.z =  p[ 1 ];
+					line = new THREE.Line( p[ 3 ], p[ 0 ] );
+					line.scale.x = line.scale.y = line.scale.z = p[ 1 ];
 					line.position.x = p[ 2 ][ 0 ];
 					line.position.y = p[ 2 ][ 1 ];
 					line.position.z = p[ 2 ][ 2 ];
@@ -220,6 +216,7 @@
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
+
 			}
 
 			function onDocumentTouchStart( event ) {
@@ -230,7 +227,9 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -241,6 +240,7 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
 
 			}
@@ -269,7 +269,7 @@
 
 					if ( object.isLine ) {
 
-						object.rotation.y = time * ( i % 2 ? 1 : -1 );
+						object.rotation.y = time * ( i % 2 ? 1 : - 1 );
 
 					}
 
