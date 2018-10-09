@@ -1408,7 +1408,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			THREE.AnimationUtils.mergeMorphTargetTracks( clip, root );
+			clip = THREE.AnimationUtils.mergeMorphTargetTracks( clip.clone(), root );
 
 			var tracks = clip.tracks;
 			var channels = [];
