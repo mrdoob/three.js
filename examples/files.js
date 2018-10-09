@@ -325,6 +325,7 @@ var files = {
 		"webvr_ballshooter",
 		"webvr_cubes",
 		"webvr_dragging",
+		"webvr_frustum",
 		"webvr_lorenzattractor",
 		"webvr_panorama",
 		"webvr_paint",
