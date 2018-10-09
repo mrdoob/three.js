@@ -4,6 +4,7 @@
 /* global QUnit */
 
 import { AnimationUtils } from '../../../../src/animation/AnimationUtils';
+import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
 import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack';
 import {
 	InterpolateLinear,
@@ -66,6 +67,54 @@ export default QUnit.module( 'Animation', () => {
 			assert.equal( index, 3, 'tolerance - index' );
 			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30 ], 'tolerance - time' );
 			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'tolerance - value' );
+
+		} );
+
+		QUnit.test( 'mergeMorphTargetTracks', ( assert ) => {
+
+			var trackA = new NumberKeyframeTrack(
+				'foo.morphTargetInfluences[a]',
+				[ 5, 10, 15, 20, 25, 30 ],
+				[ 0, 0.2, 0.4, 0.6, 0.8, 1.0 ],
+				InterpolateLinear
+			);
+
+			var trackB = new NumberKeyframeTrack(
+				'foo.morphTargetInfluences[b]',
+				[ 10, 50 ],
+				[ 0.25, 0.75 ],
+				InterpolateLinear
+			);
+
+			var geometry = new THREE.BufferGeometry();
+			var position = new THREE.BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
+			geometry.addAttribute( 'position',  position );
+			geometry.morphAttributes.position = [ position, position ];
+
+			var mesh = new THREE.Mesh( geometry );
+			mesh.name = 'foo';
+			mesh.morphTargetDictionary.a = 0;
+			mesh.morphTargetDictionary.b = 1;
+
+			var root = new THREE.Object3D();
+			root.add( mesh );
+
+			var clip = new THREE.AnimationClip( 'waltz', undefined, [ trackA, trackB ] );
+			clip = AnimationUtils.mergeMorphTargetTracks( clip, root );
+
+			assert.equal( clip.tracks.length, 1, 'tracks are merged' );
+
+			var track = clip.tracks[ 0 ];
+
+			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30, 50 ], 'all keyframes are present' );
+
+			var expectedValues = [ 0, 0.25, 0.2, 0.25, 0.4, 0.3125, 0.6, 0.375, 0.8, 0.4375, 1.0, 0.5, 1.0, 0.75 ];
+
+			for ( var i = 0; i < track.values.length; i ++ ) {
+
+				assert.numEqual( track.values[ i ], expectedValues[ i ], 'all values are merged or interpolated - ' + i );
+
+			}
 
 		} );
 

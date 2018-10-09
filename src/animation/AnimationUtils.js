@@ -317,11 +317,23 @@ var AnimationUtils = {
 
 			}
 
-			var sourceKeyframeIndex = 0;
 			var mergedKeyframeIndex = 0;
+			var sourceKeyframeIndex = 0;
+			var sourceInterpolant = sourceTrack.createInterpolant( new sourceTrack.ValueBufferType( 1 ) );
 
 			mergedTrack = mergedTracks[ sourceTrackNode.uuid ];
 
+			// For every existing keyframe of the merged track, write a (possibly
+			// interpolated) value from the source track.
+			for ( var j = 0; j < mergedTrack.times.length; j ++ ) {
+
+				mergedTrack.values[ j * targetCount + targetIndex ] = sourceInterpolant.evaluate( mergedTrack.times[ j ] );
+
+			}
+
+			// For every existing keyframe of the source track, write a (possibly
+			// new) keyframe to the merged track. Values from the previous loop may
+			// be written again, but keyframes are de-duplicated.
 			for ( var j = 0; j < sourceTrack.times.length; j ++ ) {
 
 				var keyframeIndex = THREE.AnimationUtils.insertKeyframe( mergedTrack, sourceTrack.times[ j ] );
