@@ -600,30 +600,31 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( json === undefined ) return skeletons;
 
-		for ( var i = 0; i < json.length; i ++ ) {
+		for ( var i = 0, il = json.length; i < il; i ++ ) {
 
 			var skeletonParams = json[ i ];
 
 			var uuid = skeletonParams.uuid;
-			var boneParams = skeletonParams.bones;
-			var boneInverseParams = skeletonParams.boneInverses;
+			var boneUUIDs = skeletonParams.bones;
+			var boneInverseArrays = skeletonParams.boneInverses;
 
 			var bones = [];
 			var boneInverses = [];
 
-			for ( var j = 0, jl = boneParams.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = boneUUIDs.length; j < jl; j ++ ) {
 
-				var bone = object.getObjectByProperty( 'uuid', boneParams[ j ] );
+				var boneUUID = boneUUIDs[ j ];
+				var bone = object.getObjectByProperty( 'uuid', boneUUID );
 
 				if ( bone === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: Not found Bone whose uuid is ' + boneParams[ j ] );
+					console.warn( 'THREE.ObjectLoader: Not found Bone whose uuid is ' + boneUUID );
 					bone = new Bone();
 
 				}
 
 				bones.push( bone );
-				boneInverses.push( new Matrix4().fromArray( boneInverseParams[ j ] ) );
+				boneInverses.push( new Matrix4().fromArray( boneInverseArrays[ j ] ) );
 
 			}
 
@@ -781,28 +782,28 @@ Object.assign( ObjectLoader.prototype, {
 				var geometry = getGeometry( data.geometry );
 				var material = getMaterial( data.material );
 
-				var tmpBones;
+				var currentBones;
 
-				// If data has skeleton, assumes bones are already in scene graph.
-				// Then temporarily undefines geometry.bones not to create bones
-				// in SkinnedMesh constructor.
+				// If data has skeleton, assuming bones are already in scene graph.
+				// Then temporarily undefining geometry.bones not to create duplicated
+				// bones in SkinnedMesh constructor.
 
 				if ( data.skeleton !== undefined && geometry.bones !== undefined ) {
 
-					tmpBones = geometry.bones;
+					currentBones = geometry.bones;
 					geometry.bones = undefined;
 
 				}
 
 				object = new SkinnedMesh( geometry, material );
 
-				// rebinds with skeleton whose uuid is data.skeleton later.
-				if ( data.skeleton !== undefined ) object.skeletonUUID = data.skeleton;
 				if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
 				if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
-				object.updateMatrixWorld( true );
 
-				if ( tmpBones !== undefined ) geometry.bones = tmpBones;
+				// .skeletonUUID is temporal. Deleting after binding the skeleton.
+				// See .bindSkeletons().
+				if ( data.skeleton !== undefined ) object.skeletonUUID = data.skeleton;
+				if ( currentBones !== undefined ) geometry.bones = currentBones;
 
 				break;
 
