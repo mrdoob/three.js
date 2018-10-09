@@ -3,7 +3,12 @@
  */
 /* global QUnit */
 
+import { AnimationClip } from '../../../../src/animation/AnimationClip';
 import { AnimationUtils } from '../../../../src/animation/AnimationUtils';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { Mesh } from '../../../../src/objects/Mesh';
+import { Object3D } from '../../../../src/core/Object3D';
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
 import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack';
 import {
@@ -86,20 +91,20 @@ export default QUnit.module( 'Animation', () => {
 				InterpolateLinear
 			);
 
-			var geometry = new THREE.BufferGeometry();
-			var position = new THREE.BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
+			var geometry = new BufferGeometry();
+			var position = new BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
 			geometry.addAttribute( 'position',  position );
 			geometry.morphAttributes.position = [ position, position ];
 
-			var mesh = new THREE.Mesh( geometry );
+			var mesh = new Mesh( geometry );
 			mesh.name = 'foo';
 			mesh.morphTargetDictionary.a = 0;
 			mesh.morphTargetDictionary.b = 1;
 
-			var root = new THREE.Object3D();
+			var root = new Object3D();
 			root.add( mesh );
 
-			var clip = new THREE.AnimationClip( 'waltz', undefined, [ trackA, trackB ] );
+			var clip = new AnimationClip( 'waltz', undefined, [ trackA, trackB ] );
 			clip = AnimationUtils.mergeMorphTargetTracks( clip, root );
 
 			assert.equal( clip.tracks.length, 1, 'tracks are merged' );

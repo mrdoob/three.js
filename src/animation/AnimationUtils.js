@@ -1,3 +1,6 @@
+import { PropertyBinding } from './PropertyBinding.js';
+import { InterpolateLinear } from '../constants.js';
+
 /**
  * @author tschw
  * @author Ben Houston / http://clara.io/
@@ -253,8 +256,8 @@ var AnimationUtils = {
 		for ( var i = 0; i < sourceTracks.length; ++ i ) {
 
 			var sourceTrack = sourceTracks[ i ];
-			var sourceTrackBinding = THREE.PropertyBinding.parseTrackName( sourceTrack.name );
-			var sourceTrackNode = THREE.PropertyBinding.findNode( root, sourceTrackBinding.nodeName );
+			var sourceTrackBinding = PropertyBinding.parseTrackName( sourceTrack.name );
+			var sourceTrackNode = PropertyBinding.findNode( root, sourceTrackBinding.nodeName );
 
 			if ( sourceTrackBinding.propertyName !== 'morphTargetInfluences' ) {
 
@@ -271,14 +274,14 @@ var AnimationUtils = {
 
 					// This should never happen, because glTF morph target animations
 					// affect all targets already.
-					throw new Error( 'THREE.GLTFExporter: Cannot merge tracks with glTF CUBICSPLINE interpolation.' );
+					throw new Error( 'THREE.AnimationUtils: Cannot merge tracks with glTF CUBICSPLINE interpolation.' );
 
 				}
 
-				console.warn( 'THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
+				console.warn( 'THREE.AnimationUtils: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
 
 				sourceTrack = sourceTrack.clone();
-				sourceTrack.setInterpolation( THREE.InterpolateLinear );
+				sourceTrack.setInterpolation( InterpolateLinear );
 
 			}
 
@@ -336,7 +339,7 @@ var AnimationUtils = {
 			// be written again, but keyframes are de-duplicated.
 			for ( var j = 0; j < sourceTrack.times.length; j ++ ) {
 
-				var keyframeIndex = THREE.AnimationUtils.insertKeyframe( mergedTrack, sourceTrack.times[ j ] );
+				var keyframeIndex = AnimationUtils.insertKeyframe( mergedTrack, sourceTrack.times[ j ] );
 				mergedTrack.values[ keyframeIndex * targetCount + targetIndex ] = sourceTrack.values[ j ];
 
 			}
