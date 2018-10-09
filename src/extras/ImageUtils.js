@@ -14,7 +14,7 @@ var ImageUtils = {
 
 			return image.src;
 
-		} if ( image instanceof HTMLCanvasElement ) {
+		} else if ( image instanceof HTMLCanvasElement ) {
 
 			canvas = image;
 
