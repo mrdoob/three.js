@@ -74,12 +74,14 @@
 				vec4 east = texture2D( heightmap, uv + vec2( cellSize.x, 0.0 ) );
 				vec4 west = texture2D( heightmap, uv + vec2( - cellSize.x, 0.0 ) );
 
+				// https://web.archive.org/web/20080618181901/http://freespace.virgin.net/hugo.elias/graphics/x_water.htm
+
 				float newHeight = ( ( north.x + south.x + east.x + west.x ) * 0.5 - heightmapValue.y ) * viscosityConstant;
 
 				// Mouse influence
 				float mousePhase = clamp( length( ( uv - vec2( 0.5 ) ) * BOUNDS - vec2( mousePos.x, - mousePos.y ) ) * PI / mouseSize, 0.0, PI );
 				newHeight += ( cos( mousePhase ) + 1.0 ) * 0.28;
-				
+
 				heightmapValue.y = heightmapValue.x;
 				heightmapValue.x = newHeight;
 
@@ -114,17 +116,17 @@
 			}
 
 		</script>
-		
+
 		<!-- This is a 'compute shader' to read the current level and normal of water at a point -->
 		<!-- It is used with a variable of size 1x1 -->
 		<script id="readWaterLevelFragmentShader" type="x-shader/x-fragment">
 
 			uniform vec2 point1;
-		
+
 			uniform sampler2D texture;
-		
+
 			// Integer to float conversion from https://stackoverflow.com/questions/17981163/webgl-read-pixels-from-floating-point-render-target
-			
+
 			float shift_right( float v, float amt ) {
 
 				v = floor( v ) + 0.5;
@@ -132,7 +134,7 @@
 
 			}
 
-			float shift_left( float v, float amt ) { 
+			float shift_left( float v, float amt ) {
 
 				return floor( v * exp2( amt ) + 0.5 );
 
@@ -181,19 +183,16 @@
 				if ( gl_FragCoord.x < 1.5 ) {
 
 					gl_FragColor = encode_float( waterLevel );
-				
-				}
-				else if ( gl_FragCoord.x < 2.5 ) {
+
+				} else if ( gl_FragCoord.x < 2.5 ) {
 
 					gl_FragColor = encode_float( normal.x );
 
-				}
-				else if ( gl_FragCoord.x < 3.5 ) {
+				} else if ( gl_FragCoord.x < 3.5 ) {
 
 					gl_FragColor = encode_float( normal.y );
 
-				}
-				else {
+				} else {
 
 					gl_FragColor = encode_float( 0.0 );
 
@@ -314,7 +313,7 @@
 			var readWaterLevelRenderTarget;
 			var readWaterLevelImage;
 			var waterNormal = new THREE.Vector3();
-			
+
 			var NUM_SPHERES = 5;
 			var spheres = [];
 			var spheresEnabled = true;
@@ -424,7 +423,7 @@
 
 
 				initWater();
-				
+
 				createSpheres();
 
 				valuesChanger();
@@ -519,7 +518,7 @@
 				} );
 				readWaterLevelShader.defines.WIDTH = WIDTH.toFixed( 1 );
 				readWaterLevelShader.defines.BOUNDS = BOUNDS.toFixed( 1 );
-				
+
 				// Create a 4x1 pixel image and a render target (Uint8, 4 channels, 1 byte per channel) to read water height and orientation
 				readWaterLevelImage = new Uint8Array( 4 * 1 * 4 );
 
@@ -586,7 +585,7 @@
 					gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
 
 				}
-				
+
 			}
 
 			function createSpheres() {
@@ -602,7 +601,7 @@
 
 					sphere.position.x = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
 					sphere.position.z = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
-					
+
 					sphere.userData.velocity = new THREE.Vector3();
 
 					scene.add( sphere );
@@ -623,7 +622,7 @@
 				for ( var i = 0; i < NUM_SPHERES; i++ ) {
 
 					var sphere = spheres[ i ];
-					
+
 					if ( sphere ) {
 
 						// Read water level and orientation
@@ -633,21 +632,21 @@
 						gpuCompute.doRenderTarget( readWaterLevelShader, readWaterLevelRenderTarget );
 						gl.readPixels( 0, 0, 4, 1, gl.RGBA, gl.UNSIGNED_BYTE, readWaterLevelImage );
 						var pixels = new Float32Array( readWaterLevelImage.buffer );
-						
+
 						// Get orientation
 						waterNormal.set( pixels[ 1 ], 0, - pixels[ 2 ] );
-						
+
 						var pos = sphere.position;
-						
+
 						// Set height
 						pos.y = pixels[ 0 ];
-						
+
 						// Move sphere
 						waterNormal.multiplyScalar( 0.1 );
 						sphere.userData.velocity.add( waterNormal );
 						sphere.userData.velocity.multiplyScalar( 0.998 );
 						pos.add( sphere.userData.velocity );
-						
+
 						if ( pos.x < - BOUNDS_HALF ) {
 							pos.x = - BOUNDS_HALF + 0.001;
 							sphere.userData.velocity.x *= - 0.3;
