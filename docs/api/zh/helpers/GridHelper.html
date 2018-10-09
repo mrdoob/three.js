@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -12,10 +12,10 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.</p>
+		<p class="desc">坐标格辅助对象. 坐标格实际上是2维线数组.</p>
 
 
-		<h2>Example</h2>
+		<h2>例子</h2>
 
 		<code>var size = 10;
 		var divisions = 10;
@@ -26,20 +26,20 @@
 		[example:webgl_helpers Example using various helpers]
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:number size], [param:Number divisions], [param:Color colorCenterLine], [param:Color colorGrid] )</h3>
 		<p>
-		size -- The size of the grid. Default is 10. <br />
-		divisions -- The number of divisions across the grid. Default is 10. <br />
-		colorCenterLine -- The color of the centerline. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x444444 <br />
-		colorGrid -- The color of the lines of the grid. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x888888
+		size -- 坐标格尺寸. 默认为 10. <br />
+		divisions -- 坐标格细分次数. 默认为 10. <br />
+		colorCenterLine -- 中线颜色. 值可以为 [page:Color] 类型, 16进制 和 CSS 颜色名. 默认为 0x444444 <br />
+		colorGrid -- 坐标格网格线颜色. 值可以为 [page:Color] 类型, 16进制 和 CSS 颜色名. 默认为 0x888888
 		</p>
 		<p>
-		Creates a new [name] of size 'size' and divided into 'divisions' segments per side. Colors are optional.
+		创建一个尺寸为 'size' 和 每个维度细分 'divisions' 次的坐标格. 颜色可选.
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
