@@ -23,9 +23,7 @@
 				color: #ffffff;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
 		</style>
 	</head>
@@ -51,11 +49,9 @@
 
 			}
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
-
-			var geometry, objects;
 
 			var mesh;
 
@@ -129,14 +125,46 @@
 				var gui = new dat.GUI();
 
 				var folder = gui.addFolder( 'Morph Targets' );
-				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 0 ] = value; } );
-				folder.add( params, 'influence2', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 1 ] = value; } );
-				folder.add( params, 'influence3', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 2 ] = value; } );
-				folder.add( params, 'influence4', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 3 ] = value; } );
-				folder.add( params, 'influence5', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 4 ] = value; } );
-				folder.add( params, 'influence6', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 5 ] = value; } );
-				folder.add( params, 'influence7', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 6 ] = value; } );
-				folder.add( params, 'influence8', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 7 ] = value; } );
+				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 0 ] = value;
+
+				} );
+				folder.add( params, 'influence2', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 1 ] = value;
+
+				} );
+				folder.add( params, 'influence3', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 2 ] = value;
+
+				} );
+				folder.add( params, 'influence4', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 3 ] = value;
+
+				} );
+				folder.add( params, 'influence5', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 4 ] = value;
+
+				} );
+				folder.add( params, 'influence6', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 5 ] = value;
+
+				} );
+				folder.add( params, 'influence7', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 6 ] = value;
+
+				} );
+				folder.add( params, 'influence8', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 7 ] = value;
+
+				} );
 				folder.open();
 
 				//

@@ -64,7 +64,7 @@
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container,stats;
+			var container, stats;
 
 			var camera, scene1, scene2, renderer;
 
@@ -136,7 +136,7 @@
 				} else {
 
 					document.getElementById( "val_left" ).innerHTML = "not supported";
-					document.getElementById( "val_right" ).innerHTML =  "not supported";
+					document.getElementById( "val_right" ).innerHTML = "not supported";
 
 				}
 
@@ -174,7 +174,7 @@
 			}
 
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
@@ -201,10 +201,10 @@
 				renderer.clear();
 				renderer.setScissorTest( true );
 
-				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
+				renderer.setScissor( 0, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene1, camera );
 
-				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
+				renderer.setScissor( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene2, camera );
 
 				renderer.setScissorTest( false );

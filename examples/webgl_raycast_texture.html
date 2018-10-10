@@ -30,13 +30,9 @@
 				padding: 5px;
 			}
 
-			.control {
-				margin-bottom: 3px;
-			}
+			.control { margin-bottom: 3px; }
 
-			input {
-				width: 50px;
-			}
+			input { width: 50px; }
 		</style>
 	</head>
 	<body>
@@ -88,7 +84,7 @@
 
 				var that = this;
 				this._background = document.createElement( "img" );
-				this._background.addEventListener( "load", function ( event ) {
+				this._background.addEventListener( "load", function () {
 
 					that._canvas.width = that._background.naturalWidth;
 					that._canvas.height = that._background.naturalHeight;

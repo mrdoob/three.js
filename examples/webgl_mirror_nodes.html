@@ -106,7 +106,6 @@
 				var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
 
 				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
-				var maskFlip = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
 
 				var mirror = new THREE.ReflectorNode( groundMirror );
 
@@ -127,13 +126,6 @@
 					offsetNormal, // normal
 					new THREE.FloatNode( 6 ), // scale
 					THREE.OperatorNode.MUL
-				);
-
-				var clr = new THREE.Math3Node(
-					mirror,
-					new THREE.ColorNode( 0xFFFFFF ),
-					mask,
-					THREE.Math3Node.MIX
 				);
 
 				var blurMirror = new THREE.BlurNode( mirror );

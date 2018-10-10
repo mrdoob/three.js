@@ -79,7 +79,7 @@
 
 						material = materialC.clone();
 						material.color.setHSL( 0.5 * Math.random(), 0.75, 0.5 );
-						material.map.offset.set( -0.5, -0.5 );
+						material.map.offset.set( - 0.5, - 0.5 );
 						material.map.repeat.set( 2, 2 );
 
 					}
@@ -111,7 +111,7 @@
 
 			}
 
-			function createHUDSprites ( texture ) {
+			function createHUDSprites( texture ) {
 
 				var material = new THREE.SpriteMaterial( { map: texture } );
 
@@ -152,11 +152,11 @@
 				var width = window.innerWidth / 2;
 				var height = window.innerHeight / 2;
 
-				spriteTL.position.set( - width,   height, 1 ); // top left
-				spriteTR.position.set(   width,   height, 1 ); // top right
+				spriteTL.position.set( - width, height, 1 ); // top left
+				spriteTR.position.set( width, height, 1 ); // top right
 				spriteBL.position.set( - width, - height, 1 ); // bottom left
-				spriteBR.position.set(   width, - height, 1 ); // bottom right
-				spriteC.position.set(        0,        0, 1 ); // center
+				spriteBR.position.set( width, - height, 1 ); // bottom right
+				spriteC.position.set( 0, 0, 1 ); // center
 
 			}
 

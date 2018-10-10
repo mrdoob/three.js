@@ -142,12 +142,12 @@
 
 				var uniforms = material.uniforms;
 
-				uniforms[ 'parallaxScale' ].value = -1.0 * effectController.scale;
+				uniforms[ 'parallaxScale' ].value = - 1.0 * effectController.scale;
 				uniforms[ 'parallaxMinLayers' ].value = effectController.minLayers;
 				uniforms[ 'parallaxMaxLayers' ].value = effectController.maxLayers;
 
 				material.defines = {};
-				material.defines[THREE.ParallaxShader.modes[effectController.mode]] = '';
+				material.defines[ THREE.ParallaxShader.modes[ effectController.mode ] ] = '';
 				material.needsUpdate = true;
 
 			}
@@ -188,7 +188,7 @@
 				renderer.render( scene, camera );
 
 			}
-			
+
 		</script>
 
 	</body>

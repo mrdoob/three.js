@@ -43,7 +43,6 @@
 			var textureEquirec, textureCube, textureSphere;
 			var cubeMesh, sphereMesh;
 			var sphereMaterial;
-			var refract;
 
 			init();
 			animate();
@@ -141,21 +140,27 @@
 
 				var params = {
 					Cube: function () {
+
 						cubeMesh.material = cubeMaterial;
 						cubeMesh.visible = true;
 						sphereMaterial.envMap = textureCube;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Equirectangular: function () {
+
 						cubeMesh.material = equirectMaterial;
 						cubeMesh.visible = true;
 						sphereMaterial.envMap = textureEquirec;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Spherical: function () {
-							cubeMesh.visible = false;
+
+						cubeMesh.visible = false;
 						sphereMaterial.envMap = textureSphere;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Refraction: false
 				};
@@ -164,7 +169,7 @@
 				gui.add( params, 'Cube' );
 				gui.add( params, 'Equirectangular' );
 				gui.add( params, 'Spherical' );
-				gui.add( params, 'Refraction' ).onChange( function( value ) {
+				gui.add( params, 'Refraction' ).onChange( function ( value ) {
 
 					if ( value ) {
 

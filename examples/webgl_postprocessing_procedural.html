@@ -81,10 +81,9 @@
 
 		<script>
 
-			var camera, postCamera, postScene, renderer;
+			var postCamera, postScene, renderer;
 			var postMaterial, noiseRandom1DMaterial, noiseRandom2DMaterial, noiseRandom3DMaterial, postQuad;
-			var gui, stats, texture;
-			var index = 0;
+			var stats;
 
 			var params = { procedure: 'noiseRandom3D' };
 
@@ -114,24 +113,23 @@
 
 				// Setup post processing stage
 				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-				noiseRandom1DMaterial = new THREE.ShaderMaterial({
+				noiseRandom1DMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#noiseRandom1D-frag' ).textContent.trim()
-				});
-				noiseRandom2DMaterial = new THREE.ShaderMaterial({
+				} );
+				noiseRandom2DMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#noiseRandom2D-frag' ).textContent.trim()
-				});
-				noiseRandom3DMaterial = new THREE.ShaderMaterial({
+				} );
+				noiseRandom3DMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#noiseRandom3D-frag' ).textContent.trim()
-				});
+				} );
 				postMaterial = noiseRandom3DMaterial;
 				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
 				postQuad = new THREE.Mesh( postPlane, postMaterial );
 				postScene = new THREE.Scene();
-				postScene.add(postQuad);
-
+				postScene.add( postQuad );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -153,8 +151,6 @@
 
 				requestAnimationFrame( animate );
 
-				index ++;
-
 				switch ( params.procedure ) {
 
 					case 'noiseRandom1D': postMaterial = noiseRandom1DMaterial; break;
@@ -164,7 +160,6 @@
 				}
 
 				postQuad.material = postMaterial;
-
 
 				// render post FX
 				renderer.render( postScene, postCamera );

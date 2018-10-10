@@ -30,7 +30,7 @@
 		<script>
 
 			var camera, scene, renderer, composer;
-			var mesh, light;
+			var mesh;
 
 			var afterimagePass;
 
@@ -57,7 +57,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
-				var geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 2, 2, 2);
+				var geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 2, 2, 2 );
 				var material = new THREE.MeshNormalMaterial();
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -75,7 +75,7 @@
 
 			}
 
-			function createGUI(){
+			function createGUI() {
 
 				var gui = new dat.GUI( { name: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
@@ -100,7 +100,7 @@
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 
-				if( params.enable ){
+				if ( params.enable ) {
 
 					composer.render();
 

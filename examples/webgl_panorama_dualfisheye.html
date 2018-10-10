@@ -41,11 +41,14 @@
 			var camera, scene, renderer;
 
 			var isUserInteracting = false,
-			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-			lon = 0, onMouseDownLon = 0,
-			lat = 0, onMouseDownLat = 0,
-			phi = 0, theta = 0,
-			distance = 500;
+				lon = 0, lat = 0,
+				phi = 0, theta = 0,
+				distance = 500,
+				onPointerDownPointerX = 0,
+				onPointerDownPointerY = 0,
+
+				onPointerDownLon = 0,
+				onPointerDownLat = 0;
 
 			init();
 			animate();
@@ -153,7 +156,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				isUserInteracting = false;
 

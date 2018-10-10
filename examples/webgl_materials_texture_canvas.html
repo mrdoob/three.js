@@ -106,26 +106,26 @@
 				var paint = false;
 
 				// add canvas event listeners
-				drawingCanvas.addEventListener( 'mousedown', function( e ) {
+				drawingCanvas.addEventListener( 'mousedown', function ( e ) {
 
 					paint = true;
 					drawStartPos.set( e.offsetX, e.offsetY );
 
 				} );
 
-				drawingCanvas.addEventListener( 'mousemove', function( e ) {
+				drawingCanvas.addEventListener( 'mousemove', function ( e ) {
 
-					if( paint ) draw( drawingContext, e.offsetX, e.offsetY );
+					if ( paint ) draw( drawingContext, e.offsetX, e.offsetY );
 
 				} );
 
-				drawingCanvas.addEventListener( 'mouseup', function( e ) {
+				drawingCanvas.addEventListener( 'mouseup', function () {
 
 					paint = false;
 
 				} );
 
-				drawingCanvas.addEventListener( 'mouseleave', function( e ) {
+				drawingCanvas.addEventListener( 'mouseleave', function () {
 
 					paint = false;
 

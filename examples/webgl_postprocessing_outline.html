@@ -126,13 +126,13 @@
 
 			var conf = new Configuration();
 
-			var controllerVisible = gui.addColor( conf, 'visibleEdgeColor' ).onChange( function ( value ) {
+			gui.addColor( conf, 'visibleEdgeColor' ).onChange( function ( value ) {
 
 				outlinePass.visibleEdgeColor.set( value );
 
 			} );
 
-			var controllerHidden = gui.addColor( conf, 'hiddenEdgeColor' ).onChange( function ( value ) {
+			gui.addColor( conf, 'hiddenEdgeColor' ).onChange( function ( value ) {
 
 				outlinePass.hiddenEdgeColor.set( value );
 

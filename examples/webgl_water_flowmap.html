@@ -24,9 +24,7 @@
 				text-align:center;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 		</style>
 
 		<script src="../build/three.js"></script>
@@ -53,7 +51,7 @@
 
 		}
 
-		var scene, camera, renderer, controls, water;
+		var scene, camera, renderer, water;
 
 		init();
 		animate();
@@ -79,13 +77,15 @@
 			scene.add( ground );
 
 			var textureLoader = new THREE.TextureLoader();
-			textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function( map ) {
+			textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
+
 				map.wrapS = THREE.RepeatWrapping;
 				map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 				map.repeat.set( 4, 4 );
 				groundMaterial.map = map;
 				groundMaterial.needsUpdate = true;
+
 			} );
 
 			// water
@@ -124,12 +124,12 @@
 			//
 
 			var gui = new dat.GUI();
-			gui.add( helper, 'visible' ).name( 'Show Flow Map');
+			gui.add( helper, 'visible' ).name( 'Show Flow Map' );
 			gui.open();
 
 			//
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			//
 

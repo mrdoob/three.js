@@ -13,7 +13,6 @@
 				font-family:georgia;
 				text-align:center;
 			}
-			h1 { }
 			a { color:skyblue }
 		</style>
 	</head>
@@ -67,8 +66,6 @@
 			var container, stats;
 			var camera, scene, renderer;
 
-			var clock = new THREE.Clock();
-
 			init();
 			animate();
 
@@ -97,7 +94,7 @@
 				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
 				light.position.x = 300;
 				light.position.y = 250;
-				light.position.z = -500;
+				light.position.z = - 500;
 				scene.add( light );
 
 				// SKYDOME
@@ -105,10 +102,10 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor: 	 { type: "c", value: new THREE.Color( 0x0077ff ) },
+					topColor: { type: "c", value: new THREE.Color( 0x0077ff ) },
 					bottomColor: { type: "c", value: new THREE.Color( 0xffffff ) },
-					offset:		 { type: "f", value: 400 },
-					exponent:	 { type: "f", value: 0.6 }
+					offset: { type: "f", value: 400 },
+					exponent: { type: "f", value: 0.6 }
 				};
 				uniforms.topColor.value.copy( light.color );
 

@@ -106,7 +106,7 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( material, 'sizeAttenuation' ).onChange( function() {
+				gui.add( material, 'sizeAttenuation' ).onChange( function () {
 
 					material.needsUpdate = true;
 
@@ -155,6 +155,7 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {

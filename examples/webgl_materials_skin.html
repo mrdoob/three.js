@@ -78,7 +78,7 @@
 
 			var composer, composerUV1, composerUV2, composerUV3, composerBeckmann;
 
-			var directionalLight, pointLight, ambientLight;
+			var directionalLight;
 
 			var mouseX = 0, mouseY = 0;
 			var targetX = 0, targetY = 0;
@@ -109,12 +109,12 @@
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xddddff, 0.5 );
-				directionalLight.position.set( -1, 0.5, -1 );
+				directionalLight.position.set( - 1, 0.5, - 1 );
 				scene.add( directionalLight );
 
 				// MATERIALS
 
-				var diffuse = 0xbbbbbb, specular = 0x555555, shininess = 50;
+				var diffuse = 0xbbbbbb, specular = 0x555555;
 
 				var shader = THREE.ShaderSkin[ "skin" ];
 
@@ -123,7 +123,7 @@
 				var textureLoader = new THREE.TextureLoader();
 
 				uniformsUV[ "tNormal" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniformsUV[ "uNormalScale" ].value = -1.5;
+				uniformsUV[ "uNormalScale" ].value = - 1.5;
 
 				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
 
@@ -154,7 +154,7 @@
 				// LOADER
 
 				loader = new THREE.GLTFLoader();
-				loader.load(  "models/gltf/LeePerrySmith/LeePerrySmith.glb", function( gltf ) {
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
 

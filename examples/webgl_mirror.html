@@ -76,8 +76,8 @@
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
-				cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
-				cameraControls.target.set( 0, 40, 0);
+				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls.target.set( 0, 40, 0 );
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
 				cameraControls.update();
@@ -134,7 +134,7 @@
 				var geometry = new THREE.IcosahedronBufferGeometry( 5, 0 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
 				smallSphere = new THREE.Mesh( geometry, material );
-				scene.add(smallSphere);
+				scene.add( smallSphere );
 
 				// walls
 				var planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
@@ -159,7 +159,7 @@
 				scene.add( planeRight );
 
 				var planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
-				planeLeft.position.x = -50;
+				planeLeft.position.x = - 50;
 				planeLeft.position.y = 50;
 				planeLeft.rotateY( Math.PI / 2 );
 				scene.add( planeLeft );
@@ -199,7 +199,7 @@
 				smallSphere.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
 				smallSphere.rotation.z = timer * 0.8;
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
 			}
 

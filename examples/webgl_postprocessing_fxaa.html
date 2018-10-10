@@ -55,6 +55,7 @@
 
 				var loader = new THREE.TextureLoader();
 				loader.load( "textures/fxaa_scene.png", function onLoad( texture ) {
+
 					var image = texture.image;
 					texture.minFilter = THREE.LinearFilter;
 					texture.magFilter = THREE.LinearFilter;
@@ -75,7 +76,7 @@
 					scene1.add( quad1 );
 					scene2.add( quad2 );
 
-					var camera = new THREE.OrthographicCamera( -0.5, 0.5, 0.5, -0.5, -0.5, 0.5 );
+					var camera = new THREE.OrthographicCamera( - 0.5, 0.5, 0.5, - 0.5, - 0.5, 0.5 );
 
 					var container = document.getElementById( 'container' );
 
@@ -92,8 +93,10 @@
 
 					renderer1.render( scene1, camera );
 					renderer2.render( scene2, camera );
-				});
-			})();
+
+				} );
+
+			} )();
 
 		</script>
 	</body>
