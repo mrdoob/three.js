@@ -327,7 +327,7 @@
 				location.reload();
 				return false;
 
-}
+			}
 
 
 			var options = '';
@@ -336,7 +336,7 @@
 				var j = Math.pow( 2, i );
 				options += '<a href="#" onclick="return change(' + j + ')">' + j + 'x' + j + '</a> ';
 
-}
+			}
 			document.getElementById( 'options' ).innerHTML = options;
 
 			init();
@@ -513,7 +513,7 @@
 
 				    console.error( error );
 
-	}
+				}
 
 				// Create compute shader to smooth the water surface and velocity
 				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { value: null } } );
@@ -557,10 +557,10 @@
 						multR *= 0.53 + 0.025 * i;
 						mult *= 1.25;
 
-		}
+					}
 					return r;
 
-	}
+				}
 
 				var pixels = texture.image.data;
 
@@ -579,9 +579,9 @@
 
 						p += 4;
 
-		}
+					}
 
-	}
+				}
 
 			}
 
@@ -613,7 +613,7 @@
 
 						sphere = sphereTemplate.clone();
 
-		}
+				}
 
 					sphere.position.x = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
 					sphere.position.z = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
@@ -769,15 +769,15 @@
 
 					    uniforms.mousePos.value.set( 10000, 10000 );
 
-		}
+					}
 
 					mouseMoved = false;
 
-	} else {
+				} else {
 
 					uniforms.mousePos.value.set( 10000, 10000 );
 
-	}
+				}
 
 				// Do the gpu computation
 				gpuCompute.compute();
@@ -786,7 +786,7 @@
 
 					sphereDynamics();
 
-	}
+				}
 
 				// Get compute output in custom uniform
 				waterUniforms.heightmap.value = gpuCompute.getCurrentRenderTarget( heightmapVariable ).texture;
