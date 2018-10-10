@@ -11,14 +11,13 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Class for loading a font in JSON format. Returns a [page:Font Font], which is an
-		array of [page:Shape Shape]s representing the font.
-		This uses the [page:FileLoader] internally for loading files. <br /><br />
+		使用JSON格式中加载字体的一个类。返回[page:Font Font], 返回值是表示字体的[page:Shape Shape]类型的数组。
+		其内部使用[page:FileLoader]来加载文件。 <br /><br />
 
-		You can convert fonts online using [link:https://gero3.github.io/facetype.js/ facetype.js]
+		你可以使用[link:https://gero3.github.io/facetype.js/ facetype.js]在线转换字体。
 		</p>
 
-		<h2>Examples</h2>
+		<h2>例子</h2>
 
 		<p>
 		[example:webgl_geometry_text_shapes geometry / text / shapes ]<br/>
@@ -28,71 +27,70 @@
 		<code>
 		var loader = new THREE.FontLoader();
 		var font = loader.load(
-			// resource URL
+			// 资源URL
 			'fonts/helvetiker_bold.typeface.json',
 
-			// onLoad callback
+			// onLoad回调
 			function ( font ) {
 				// do something with the font
 				scene.add( font );
 			},
 
-			// onProgress callback
+			// onProgress回调
 			function ( xhr ) {
 				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
 			},
 
-			// onError callback
+			// onError回调
 			function ( err ) {
 				console.log( 'An error happened' );
 			}
 		);
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
-		Creates a new [name].
+		[page:LoadingManager manager] — 加载器所使用的[page:LoadingManager loadingManager]。默认值为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		创建一个新的[name].
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:LoadingManager manager]</h3>
 		<p>
-			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
+			加载器正在使用的[page:LoadingManager loadingManager]。默认值为[page:DefaultLoadingManager].
 		</p>
 
 		<h3>[property:String path]</h3>
-		<p>The base path from which fonts will be loaded. See [page:.setPath]. Default is *undefined*.</p>
+		<p>所要加载字体的基本路径。 具体参考[page:.setPath]。 默认为*undefined*.</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — the path or URL to the file. This can also be a
+		[page:String url] — 文件的URL或者路径，也可以为
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Texture texture].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br /><br />
+		[page:Function onLoad] — 加载完成时将调用。回调参数是将要被加载的[page:Texture texture].<br />
+		[page:Function onProgress] — 将在加载过程中进行调用。参数为XMLHttpRequest实例，实例包含[page:Integer total]和[page:Integer loaded]字节。<br />
+		[page:Function onError] — 在加载错误时被调用。<br /><br />
 
-		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+            从URL中进行加载，并将被加载的[page:Texture texture]传递给onLoad。
 		</p>
 
 		<h3>[method:Font parse]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — The <em>JSON</em> structure to parse.<br /><br />
-		Parse a <em>JSON</em> structure and return a [page:Font].
+		以<em>JSON</em>格式进行解析，并返回一个[page:Font].
 		</p>
 
 		<h3>[method:FontLoader setPath]( [param:String path] )</h3>
 		<p>
-			Set the base path or URL from which to load fonts. This can be useful if
-			you are loading many fonts from the same directory.
+            设置加载字体的基本路径或URL。当加载同一目录中下的许多字体时，此方法将很有用。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

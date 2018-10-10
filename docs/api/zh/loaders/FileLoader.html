@@ -12,11 +12,11 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A low level class for loading resources with XMLHttpRequest, used internaly by most loaders.
-			It can also be used directly to load any file type that does not have a loader.
+            使用XMLHttpRequest来加载资源的低级类，并由大多数加载器内部使用。
+            它也可以直接用于加载任何没有对应加载器的文件类型。
 		</p>
 
-		<h2>Example</h2>
+		<h2>例子</h2>
 		<p>
 			[example:webgl_loader_msgpack WebGL / loader / msgpack]<br />
 			[example:webgl_morphtargets_human WebGL / morphtargets / human]<br />
@@ -24,23 +24,23 @@
 		<code>
 		var loader = new THREE.FileLoader();
 
-		//load a text file and output the result to the console
+		//加载一个文本文件，并把结果输出到控制台上
 		loader.load(
 			// resource URL
 			'example.txt',
 
-			// onLoad callback
+			// onLoad回调
 			function ( data ) {
 				// output the text to the console
 				console.log( data )
 			},
 
-			// onProgress callback
+			// onProgress回调
 			function ( xhr ) {
 				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
 			},
 
-			// onError callback
+			// onError回调
 			function ( err ) {
 				console.error( 'An error happened' );
 			}
@@ -48,103 +48,102 @@
 		</code>
 
 		<p>
-			<em>Note:</em> The cache must be enabled using
+			<em>注意:</em>
+            必须启用缓存
 			<code>THREE.Cache.enabled = true;</code>
-			This is a global property and only needs to be set once to be used by all loaders that use FileLoader internally.
-			[page:Cache Cache] is a cache module that holds the response from each request made through this loader, so each file is requested once.
+            这是一个全局属性，只需要设置一次，供内部使用FileLoader的所有加载器使用。
+			[page:Cache Cache] 是​​一个缓存模块，用于保存通过此加载器发出的每个请求的响应，因此每个文件都会被请求一次。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name] ( [param:LoadingManager manager] )</h3>
 		<p>
-			[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use.
-			Default is [page:DefaultLoadingManager].
+			[page:LoadingManager manager] — [page:LoadingManager loadingManager] 是加载器所使用的加载管理器。
+			默认为 [page:DefaultLoadingManager].
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:LoadingManager manager]</h3>
 		<p>
-			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
+            [page:LoadingManager loadingManager]  是加载器所使用的加载管理器，默认为 [page:DefaultLoadingManager].
 		</p>
 
 		<h3>[property:String mimeType]</h3>
 		<p>
-			The expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType].
-			See [page:.setMimeType]. Default is *undefined*.
+			详情 [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType].
+			请参考 [page:.setMimeType]。默认为 *undefined*。
 		</p>
 
 		<h3>[property:String path]</h3>
-		<p>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</p>
+		<p>将要加载的文件的基本路径。请参考 [page:.setPath]。 默认为 *undefined*.</p>
 
 		<h3>[property:object requestHeader]</h3>
-		<p>The [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request. See [page:.setRequestHeader]. Default is *undefined*.</p>
+		<p>[link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] 在HTTP 请求中使用。 请参考 [page:.setRequestHeader]。 默认为 *undefined*.</p>
 
 		<h3>[property:String responseType]</h3>
-		<p>The expected response type. See [page:.setResponseType]. Default is *undefined*.</p>
+		<p>请求的响应类型。 请参考 [page:.setResponseType]. 默认为 *undefined*.</p>
 
 		<h3>[property:String withCredentials]</h3>
 		<p>
-			Whether the XMLHttpRequest uses credentials. See [page:.setWithCredentials].
-			Default is *undefined*.
+            XMLHttpRequest是否使用证书。 请参考 [page:.setWithCredentials].
+            默认为 *undefined*.
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-			[page:String url] — the path or URL to the file. This can also be a
+			[page:String url] — 文件的URL或者路径，也可以为
 				[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
-			[page:Function onLoad] (optional) — Will be called when loading completes. The argument will be the loaded response.<br />
-			[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the XMLHttpRequest instance,
-				which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-			[page:Function onError] (optional) — Will be called if an error occurs.<br /><br />
+			[page:Function onLoad] (可选) — 加载完成时将调用。回调参数将是加载的响应。<br />
+			[page:Function onProgress] (可选) — 将在加载过程中进行调用。参数将是XMLHttpRequest实例，
+            其中包含 [page:Integer total] 和 [page:Integer loaded] 字节<br />
+			[page:Function onError] (可选) — 在加载错误时被调用。<br /><br />
 
-			Load the URL and pass the response to the onLoad function.
+            加载URL并将响应传递给onLoad函数。
 		</p>
 
 		<h3>[method:FileLoader setMimeType]( [param:String mimeType] )</h3>
 		<p>
-			Set the expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
-			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is *undefined*.
+            设置正在加载的文件预期类型 [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
+            。请注意，在许多情况下，这将自动确定，因此默认情况下它是 *undefined* 。
 		</p>
 
 		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
 		<p>
-			Set the base path or URL from which to load files. This can be useful if
-			you are loading many models from the same directory.
+            设置加载文件的基本路径或URL。当加载同一目录中的许多模型，此方法将很有用。
 		</p>
 
 		<h3>[method:FileLoader setRequestHeader]( [param:object requestHeader] )</h3>
 		<p>
-			[page:object requestHeader] - key: The name of the header whose value is to be set. value: The value to set as the body of the header.<br /><br />
+			[page:object requestHeader] - key: 要设置header的名称。 value：要设置header的值。<br /><br />
 
-			Set the [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request.
+			请参考在HTTP 请求中的 [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header]。
 		</p>
 
 		<h3>[method:FileLoader setResponseType]( [param:String responseType] )</h3>
 		<p>
-			Change the response type. Valid values are:<br />
-			[page:String text] or empty string (default) - returns the data as [page:String string].<br />
-			[page:String arraybuffer] - loads the data into a [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer ArrayBuffer] and returns that.<br />
-			[page:String blob] - returns the data as a [link:https://developer.mozilla.org/en/docs/Web/API/Blob Blob].<br />
-			[page:String document] - parses the file using the [link:https://developer.mozilla.org/en-US/docs/Web/API/DOMParser DOMParser].<br />
-			[page:String json] - parses the file using [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse JSON.parse].<br />
+			改变响应的类型，其类型有效值如下:<br />
+			[page:String text] 或者空 string (默认) - 返回的数据类型为 [page:String string].<br />
+			[page:String arraybuffer] - 加载的数据类型到一个数组buffer中 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer ArrayBuffer] 并进行返回。<br />
+			[page:String blob] - 返回的数据为 [link:https://developer.mozilla.org/en/docs/Web/API/Blob Blob]。<br />
+			[page:String document] - 使用 [link:https://developer.mozilla.org/en-US/docs/Web/API/DOMParser DOMParser] 解析文件。<br />
+			[page:String json] - 将文件解析为 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse JSON.parse].<br />
 		</p>
 
 		<h3>[method:FileLoader setWithCredentials]( [param:Boolean value] )</h3>
 		<p>
-			Whether the XMLHttpRequest uses credentials such as cookies, authorization headers or
-			TLS client certificates. See [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
-			Note that this has no effect if you are loading files locally or from the same domain.
+            XMLHttpRequest是否使用cookie、授权头或TLS客户端证书等凭据。 请参考 [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
+            请注意，当您在本地或从同一域加载文件，则该方法无效。
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
