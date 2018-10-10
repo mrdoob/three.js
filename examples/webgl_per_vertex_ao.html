@@ -302,6 +302,9 @@
 
 				var ao = [];
 
+				// max distance between faces for which we will calculate occlusion
+				var cutoffParam = 4;
+
 				var positions = geometry.attributes.position.array;
 				var normals = geometry.attributes.normal.array;
 				var bentNormals = normals.slice();
@@ -332,7 +335,7 @@
 
 						var d2 = v.dot( v ) + 1e-16;
 
-						if ( d2 < 4 * emitterArea ) {
+						if ( d2 * d2 < cutoffParam * emitterArea ) {
 
 							v.multiplyScalar( 1 / Math.sqrt( d2 ) ); // normalise
 
