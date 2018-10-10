@@ -179,7 +179,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '97';
+var REVISION = '98dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -3660,7 +3660,11 @@ var ImageUtils = {
 
 		var canvas;
 
-		if ( image instanceof HTMLCanvasElement ) {
+		if ( typeof HTMLCanvasElement == 'undefined' ) {
+
+			return image.src;
+
+		} else if ( image instanceof HTMLCanvasElement ) {
 
 			canvas = image;
 
@@ -21254,7 +21258,66 @@ ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototyp
 
 	constructor: ArrayCamera,
 
-	isArrayCamera: true
+	isArrayCamera: true,
+
+	/**
+	 * Assumes 2 cameras that are perpendicular and share an X-axis, and that
+	 * the cameras' projection and world matrices have already been set.
+	 * And that near and far planes are identical for both cameras.
+	 */
+	setProjectionFromUnion: function () {
+		var cameraLPos = new Vector3();
+		var cameraRPos = new Vector3();
+
+		return function () {
+			cameraLPos.setFromMatrixPosition( this.cameras[ 0 ].matrixWorld );
+			cameraRPos.setFromMatrixPosition( this.cameras[ 1 ].matrixWorld );
+
+			var ipd = cameraLPos.distanceTo( cameraRPos );
+
+			var projL = this.cameras[ 0 ].projectionMatrix;
+			var projR = this.cameras[ 1 ].projectionMatrix;
+
+			// VR systems will have identical far and near planes, and
+			// most likely identical top and bottom frustum extents.
+			// via: https://computergraphics.stackexchange.com/a/4765
+			var near = projL[ 14 ] / ( projL[ 10 ] - 1 );
+			var far = projL[ 14 ] / ( projL[ 10 ] + 1 );
+
+			var leftFovL = ( projL[ 8 ] - 1 ) / projL[ 0 ];
+			var rightFovR = ( projR[ 8 ] + 1 ) / projR[ 0 ];
+			var leftL = leftFovL * near;
+			var rightR = rightFovR * near;
+			var topL = near * ( projL[ 9 ] + 1 ) / projL[ 5 ];
+			var topR = near * ( projR[ 9 ] + 1 ) / projR[ 5 ];
+			var bottomL = near * ( projL[ 9 ] - 1 ) / projL[ 5 ];
+			var bottomR = near * ( projR[ 9 ] - 1 ) / projR[ 5 ];
+
+			// Calculate the new camera's position offset from the
+			// left camera.
+			var zOffset = ipd / (leftFovL + rightFovR);
+			var xOffset = zOffset * leftFovL;
+
+			// TODO: Better way to apply this offset?
+			this.cameras[ 0 ].matrixWorld.decompose( this.position, this.quaternion, this.scale );
+			this.translateX(xOffset);
+			this.translateZ(-zOffset);
+			this.matrixWorld.compose( this.position, this.quaternion, this.scale );
+			this.matrixWorldInverse.getInverse(this.matrixWorld);
+
+			// Find the union of the frustum values of the cameras and scale
+			// the values so that the near plane's position does not change in world space,
+			// although must now be relative to the new union camera.
+			var near2 = near + zOffset;
+			var far2 = far + zOffset;
+			var left = leftL - xOffset;
+			var right = rightR + (ipd - xOffset);
+			var top = Math.max( topL, topR );
+			var bottom = Math.min( bottomL, bottomR );
+
+			this.projectionMatrix.makePerspective( left, right, top, bottom, near2, far2 );
+		}
+	}(),
 
 } );
 
@@ -21541,9 +21604,6 @@ function WebVRManager( renderer ) {
 		cameraL.far = camera.far;
 		cameraR.far = camera.far;
 
-		cameraVR.matrixWorld.copy( camera.matrixWorld );
-		cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
-
 		cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 		cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
@@ -21577,10 +21637,7 @@ function WebVRManager( renderer ) {
 		cameraL.projectionMatrix.fromArray( frameData.leftProjectionMatrix );
 		cameraR.projectionMatrix.fromArray( frameData.rightProjectionMatrix );
 
-		// HACK (mrdoob)
-		// https://github.com/w3c/webvr/issues/203
-
-		cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
+		cameraVR.setProjectionFromUnion();
 
 		//
 
@@ -21803,8 +21860,6 @@ function WebXRManager( renderer ) {
 			var parent = camera.parent;
 			var cameras = cameraVR.cameras;
 
-			// apply camera.parent to cameraVR
-
 			updateCamera( cameraVR, parent );
 
 			for ( var i = 0; i < cameras.length; i ++ ) {
@@ -21824,6 +21879,8 @@ function WebXRManager( renderer ) {
 				children[ i ].updateMatrixWorld( true );
 
 			}
+
+			cameraVR.setProjectionFromUnion();
 
 			return cameraVR;
 
@@ -21862,11 +21919,6 @@ function WebXRManager( renderer ) {
 				if ( i === 0 ) {
 
 					cameraVR.matrix.copy( camera.matrix );
-
-					// HACK (mrdoob)
-					// https://github.com/w3c/webvr/issues/203
-
-					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
 
 				}
 
@@ -32082,9 +32134,9 @@ Object.assign( FileLoader.prototype, {
 			var isBase64 = !! dataUriRegexResult[ 2 ];
 			var data = dataUriRegexResult[ 3 ];
 
-			data = window.decodeURIComponent( data );
+			data = decodeURIComponent( data );
 
-			if ( isBase64 ) data = window.atob( data );
+			if ( isBase64 ) data = atob( data );
 
 			try {
 
@@ -32138,7 +32190,7 @@ Object.assign( FileLoader.prototype, {
 				}
 
 				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
-				window.setTimeout( function () {
+				setTimeout( function () {
 
 					if ( onLoad ) onLoad( response );
 
@@ -32149,7 +32201,7 @@ Object.assign( FileLoader.prototype, {
 			} catch ( error ) {
 
 				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
-				window.setTimeout( function () {
+				setTimeout( function () {
 
 					if ( onError ) onError( error );
 
@@ -32486,7 +32538,7 @@ Object.assign( DataTextureLoader.prototype, {
 
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
-
+		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
 			var texData = scope._parser( buffer );
@@ -32544,6 +32596,13 @@ Object.assign( DataTextureLoader.prototype, {
 
 
 		return texture;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
@@ -37122,17 +37181,12 @@ Object.assign( MaterialLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setTextures: function ( value ) {
-
-		this.textures = value;
 
 	},
 
@@ -37316,9 +37370,66 @@ Object.assign( MaterialLoader.prototype, {
 
 		return material;
 
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
+
+	},
+
+	setTextures: function ( value ) {
+
+		this.textures = value;
+		return this;
+
 	}
 
 } );
+
+/**
+ * @author Don McCurdy / https://www.donmccurdy.com
+ */
+
+var LoaderUtils = {
+
+	decodeText: function ( array ) {
+
+		if ( typeof TextDecoder !== 'undefined' ) {
+
+			return new TextDecoder().decode( array );
+
+		}
+
+		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+		// throws a "maximum call stack size exceeded" error for large arrays.
+
+		var s = '';
+
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
+
+			// Implicitly assumes little-endian.
+			s += String.fromCharCode( array[ i ] );
+
+		}
+
+		// Merges multi-byte utf-8 characters.
+		return decodeURIComponent( escape( s ) );
+
+	},
+
+	extractUrlBase: function ( url ) {
+
+		var index = url.lastIndexOf( '/' );
+
+		if ( index === - 1 ) return './';
+
+		return url.substr( 0, index + 1 );
+
+	}
+
+};
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -37337,6 +37448,7 @@ Object.assign( BufferGeometryLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
@@ -37400,6 +37512,13 @@ Object.assign( BufferGeometryLoader.prototype, {
 		}
 
 		return geometry;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
@@ -37736,49 +37855,6 @@ Object.assign( Loader.prototype, {
 	} )()
 
 } );
-
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
-
-var LoaderUtils = {
-
-	decodeText: function ( array ) {
-
-		if ( typeof TextDecoder !== 'undefined' ) {
-
-			return new TextDecoder().decode( array );
-
-		}
-
-		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-		// throws a "maximum call stack size exceeded" error for large arrays.
-
-		var s = '';
-
-		for ( var i = 0, il = array.length; i < il; i ++ ) {
-
-			// Implicitly assumes little-endian.
-			s += String.fromCharCode( array[ i ] );
-
-		}
-
-		// Merges multi-byte utf-8 characters.
-		return decodeURIComponent( escape( s ) );
-
-	},
-
-	extractUrlBase: function ( url ) {
-
-		var index = url.lastIndexOf( '/' );
-
-		if ( index === - 1 ) return './';
-
-		return url.substr( 0, index + 1 );
-
-	}
-
-};
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -38360,7 +38436,7 @@ Object.assign( JSONLoader.prototype, {
 function ObjectLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-	this.texturePath = '';
+	this.resourcePath = '';
 
 }
 
@@ -38370,15 +38446,13 @@ Object.assign( ObjectLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if ( this.texturePath === '' ) {
-
-			this.texturePath = url.substring( 0, url.lastIndexOf( '/' ) + 1 );
-
-		}
-
 		var scope = this;
 
+		var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+		this.resourcePath = this.resourcePath || path;
+
 		var loader = new FileLoader( scope.manager );
+		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
 			var json = null;
@@ -38412,9 +38486,16 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	setTexturePath: function ( value ) {
+	setPath: function ( value ) {
 
-		this.texturePath = value;
+		this.path = value;
+		return this;
+
+	},
+
+	setResourcePath: function ( value ) {
+
+		this.resourcePath = value;
 		return this;
 
 	},
@@ -38717,7 +38798,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data, this.texturePath ).geometry;
+						geometry = geometryLoader.parse( data, this.resourcePath ).geometry;
 
 						break;
 
@@ -38849,7 +38930,7 @@ Object.assign( ObjectLoader.prototype, {
 
 						var currentUrl = url[ j ];
 
-						var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.texturePath + currentUrl;
+						var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.resourcePath + currentUrl;
 
 						images[ image.uuid ].push( loadImage( path ) );
 
@@ -38859,7 +38940,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					// load single image
 
-					var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
+					var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.resourcePath + image.url;
 
 					images[ image.uuid ] = loadImage( path );
 
@@ -39894,6 +39975,7 @@ Object.assign( AudioLoader.prototype, {
 
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
 			// Create a copy of the buffer. The `decodeAudioData` method
@@ -39908,6 +39990,13 @@ Object.assign( AudioLoader.prototype, {
 			} );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
@@ -46156,6 +46245,17 @@ Object.assign( JSONLoader.prototype, {
 	setTexturePath: function ( value ) {
 
 		console.warn( 'THREE.JSONLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+		return this.setResourcePath( value );
+
+	}
+
+} );
+
+Object.assign( ObjectLoader.prototype, {
+
+	setTexturePath: function ( value ) {
+
+		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
 		return this.setResourcePath( value );
 
 	}
