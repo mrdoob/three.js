@@ -13,13 +13,13 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			The [name] represents a virtual [link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener] of the all positional and non-positional audio effects in the scene.</br>
-			A three.js application usually creates a single instance of [name]. It is a mandatory construtor parameter for audios entities like [page:Audio Audio] and [page:PositionalAudio PositionalAudio].</br>
-			In most cases, the listener object is a child of the camera. So the 3D transformation of the camera represents the 3D transformation of the listener.
+			[name] 用一个虚拟的[link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener]表示在场景中所有的位置和非位置相关的音效.</br>
+			一个three.js程序通常创建一个[name]. 它是音频实体构造函数的必须参数，比如 [page:Audio Audio] and [page:PositionalAudio PositionalAudio].</br>
+			大多数情况下, listener对象是camera的子对象. Camera的3D变换表示了listener的3D变换.
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<p>
 			[example:webaudio_sandbox webaudio / sandbox ]</br>
@@ -46,63 +46,62 @@
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name](  )</h3>
 		<p>
-		Create a new AudioListener.
+		创建一个新的AudioListener.
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:AudioContext context]</h3>
-		<p>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</p>
+		<p>[page:AudioListener listener]构造函数中的[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext].</p>
 
 		<h3>[property:GainNode gain]</h3>
-		<p>A [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] created
-		using [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]().</p>
+		<p>使用[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]()创建 [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode].</p>
 
 		<h3>[property:AudioNode filter]</h3>
-		<p>Default is *null*.</p>
+		<p>默认为*null*.</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:GainNode getInput]()</h3>
 		<p>
-		Return the [page:AudioListener.gain gainNode].
+		返回[page:AudioListener.gain gainNode].
 		</p>
 
 		<h3>[method:AudioListener removeFilter]()</h3>
 		<p>
-		Set the [page:AudioListener.filter filter] property to *null*.
+		设置[page:AudioListener.filter filter]属性为*null*.
 		</p>
 
 		<h3>[method:AudioNode getFilter]()</h3>
 		<p>
-		Returns the value of the [page:AudioListener.filter filter] property.
+		返回[page:AudioListener.filter filter]属性的值.
 		</p>
 
 		<h3>[method:AudioListener setFilter]( [param:AudioNode value] )</h3>
 		<p>
-		Set the [page:AudioListener.filter filter] property to *value*.
+		设置[page:AudioListener.filter filter] 属性的值.
 		</p>
 
 		<h3>[method:Float getMasterVolume]()</h3>
 		<p>
-		Return the volume.
+		返回音量.
 		</p>
 
 		<h3>[method:AudioListener setMasterVolume]( [param:Number value] )</h3>
 		<p>
-		Set the volume.
+		设置音量.
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

@@ -10,16 +10,16 @@
 	<body>
         [page:Object3D] &rarr; [page:Light] &rarr;
 
-		<h1>[name]</h1>
+		<h1>半球光（[name]）</h1>
 
 		<p class="desc">
-			A light source positioned directly above the scene, with color fading from the
-			sky color to the ground color. <br /><br />
+			光源直接放置于场景之上，光照颜色从天空光线颜色颜色渐变到地面光线颜色。
+			<br /><br />
 
-			This light cannot be used to cast shadows.
+			半球光不能投射阴影。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<div>
 			[example:webgl_lights_hemisphere lights / hemisphere ]<br />
@@ -35,64 +35,64 @@ var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 scene.add( light );
 </code>
 
-		<h2>Constructor</h2>
+		<h2>构造器（Constructor）</h2>
 		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
     <p>
-		[page:Integer skyColor] - (optional) hexadecimal color of the sky. Default is 0xffffff.<br />
-		[page:Integer groundColor] - (optional) hexadecimal color of the ground. Default is 0xffffff.<br />
-		[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+		[page:Integer skyColor] - (可选参数) 天空中发出光线的颜色。 缺省值 0xffffff。<br />
+		[page:Integer groundColor] - (可选参数) 地面发出光线的颜色。 缺省值 0xffffff。<br />
+		[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
 
-		Creates a new [name].
+		创建一个半球光。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性（Properties）</h2>
 		<p>
-			See the base [page:Light Light] class for common properties.
+			公共属性请查看基类[page:Light Light]。
 		</p>
 
 		<h3>[property:Boolean castShadow]</h3>
 		<p>
-			This is set to *undefined* in the constructor as hemisphere lights cannot cast shadows.
+			该参数在构造时被设置为 *undefined* 因为半球光不能投射阴影。
 		</p>
 
 
 		<h3>[property:Float color]</h3>
 		<p>
-			The light's sky color, as passed in the constructor.
-			Default is a new [page:Color] set to white (0xffffff).
+			在构造时传递的天空发出光线的颜色。
+			默认会创建 [page:Color] 并设置为白色（0xffffff）。
 		</p>
 
 		<h3>[property:Float groundColor]</h3>
 		<p>
-			The light's ground color, as passed in the constructor.
-			Default is a new [page:Color] set to white (0xffffff).
+			在构造时传递的地面发出光线的颜色。
+			默认会创建 [page:Color] 并设置为白色（0xffffff）。
 		</p>
 
 		<h3>[property:Boolean isHemisphereLight]</h3>
 		<p>
-			Used to check whether this or derived classes are hemisphere lights. Default is *true*.<br /><br />
+				用来校验这个类或者派生类是不是半球光。缺省值为 *true*。<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+				不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
 		</p>
 
 		<h3>[property:Vector3 position]</h3>
 		<p>
-			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
+			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0),那么光线将会从上往下照射。
 		</p>
 
 
 
-		<h2>Methods</h2>
+		<h2>方法（Methods）</h2>
 
-		See the base [page:Light Light] class for common methods.
+		公共方法请查看基类 [page:Light Light]。
 
 		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
 		<p>
-			Copies the value of [page:.color color], [page:.intensity intensity] and
-			[page:.groundColor groundColor] from the [page:Light source] light into this one.
+			从[page:Light source]复制 [page:.color color], [page:.intensity intensity] 和
+			[page:.groundColor groundColor] 的值到当前半球光对象中。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

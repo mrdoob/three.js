@@ -10,12 +10,12 @@
 	<body>
 		<h1>[name]</h1>
 		<div>
-			<p>All objects by default automatically update their matrices if they have been added to the scene with</p>
+			<p>默认情况下，所有对象都会自动更新它们的矩阵（如果它们已添加到场景中）</p>
 			<code>
 var object = new THREE.Object3D();
 scene.add( object );
 			</code>
-			or if they are the child of another object that has been added to the scene:
+			或者它们是已添加到场景中的另一个对象的子节点:
 			<code>
 var object1 = new THREE.Object3D();
 var object2 = new THREE.Object3D();
@@ -25,38 +25,34 @@ scene.add( object1 ); //object1 and object2 will automatically update their matr
 			</code>
 		</div>
 
-		<p>However, if you know object will be static, you can disable this and update the transform matrix manually just when needed.</p>
+		<p>但是，如果你知道对象将是静态的，则可以禁用此选项并在需要时手动更新转换矩阵。</p>
 
 		<code>
 object.matrixAutoUpdate  = false;
 object.updateMatrix();
 		</code>
 
-		<h2>Geometries</h2>
+		<h2>Geometries(几何形状)</h2>
 		<div>
 			<h3>[page:BufferGeometry]</h3>
 			<div>
 				<p>
-					BufferGeometries store information (such as vertex positions, face indices, normals, colors,
-					UVs, and any custom attributes) in [page:BufferAttribute buffers] - that is,
+					BufferGeometries 将信息（例如顶点位置，面索引，法线，颜色，uv和任何自定义属性） 存储在 [page:BufferAttribute buffers] - 也就是,
 					[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays].
-					This makes them generally faster than standard Geometries, at the cost of being somewhat harder to
-					work with.
+					这使得它们通常比标准Geometries更快，缺点是更难用。
 				</p>
 				<p>
-					With regards to updating BufferGeometries, the most important thing to understand is that
-					you cannot resize buffers (this is very costly,	basically the equivalent to creating a new geometry).
-					You can however update the content of buffers.
+					关于更新BufferGeometries, 最重要的是理解你不能调整 buffers 大小(这种操作开销很大,	相当于创建了个新的geometry).
+					但你可以更新 buffers的内容.
 				</p>
 				<p>
-					This means that if you know an attribute of your BufferGeometry will grow, say the number of vertices,
-					you must pre-allocate a buffer large enough to hold any new vertices that may be created. Of
-					course, this also means that there will be a maximum size for your BufferGeometry - there is
-					no way to create a BufferGeometry that can efficiently be extended indefinitely.
+					这意味着如果你知道BufferGeometry的一个属性会增长，比如顶点的数量，
+					你必须预先分配足够大的buffer来容纳可能创建的任何新顶点。
+					当然，这也意味着BufferGeometry将有一个最大大小 - 无法创建一个可以高效地无限扩展的BufferGeometry。
 				</p>
 				<p>
-					We'll use the example of a line that gets extended at render time. We'll allocate space
-					in the buffer for 500 vertices but draw only two at first, using [page:BufferGeometry.drawRange].
+					我们以在渲染时扩展的line来示例。我们将分配可容纳500个顶点的空间但起初仅绘制2个，使用
+					在500个顶点的缓冲区中，但首先只使用 [page:BufferGeometry.drawRange].
 				</p>
 				<code>
 var MAX_POINTS = 500;
@@ -80,7 +76,7 @@ var line = new THREE.Line( geometry,  material );
 scene.add( line );
 				</code>
 			 	<p>
-					Next we'll randomly add points to the line using a pattern like:
+					然后我们随机增加顶点到line中，以这样的一种方式：
 				</p>
 				<code>
 var positions = line.geometry.attributes.position.array;
@@ -101,21 +97,20 @@ for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
 }
 				</code>
 				<p>
-					If you want to change the <em>number of points</em> rendered after the first render, do this:
+					如果要更改第一次渲染后渲染的<em>点数</em>，执行以下操作：
 				</p>
 				<code>
 line.geometry.setDrawRange( 0, newValue );
 				</code>
 				<p>
-					If you want to change the position data values after the first render, you need to
-					set the needsUpdate flag like so:
+					如果要在第一次渲染后更改position数值，则需要像这样设置needsUpdate标志：
 				</p>
 				<code>
 line.geometry.attributes.position.needsUpdate = true; // required after the first render
 				</code>
 
 				<p>
-					[link:http://jsfiddle.net/w67tzfhx/ Here is a fiddle] showing an animated line which you can adapt to your use case.
+					[link:http://jsfiddle.net/w67tzfhx/ 这个fiddle] 展示了一个你可以参考的运动的line.
 				</p>
 
 				<h3>Examples:</h3>
@@ -128,11 +123,10 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 			<h3>[page:Geometry]</h3>
 			<div>
 				<p>
-					The following flags control updating of various geometry attributes. Set flags only
-					for attributes that you need to update, updates are costly. Once buffers
-					change, these flags reset automatically back to false. You need to keep setting them to
-					true if you want to keep updating buffers. Note that this applies only to [page:Geometry]
-					and not to [page:BufferGeometry].
+					以下标志控制各种geometry属性的更新. 仅对于需要更新的属性设置标志
+					，因为更新成本很高. 一旦buffers
+					改变, 这些标志位会自动重置为false. 你需要保持这些设置为true,如果你想要持续更新buffers. 请注意这仅适用于[page:Geometry]
+					而不是 [page:BufferGeometry].
 				</p>
 				<code>
 var geometry = new THREE.Geometry();
@@ -146,8 +140,8 @@ geometry.tangentsNeedUpdate = true;
 				</code>
 
 				<p>
-					In versions prior to [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66] meshes
-					additionally need the <em>dynamic</em> flag enabled (to keep internal typed arrays):
+					在早于 [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66]版本中， meshes
+					需要额外设定 <em>dynamic</em> 标志true (为了维持内部的 typed arrays):
 				</p>
 
 				<code>
@@ -164,19 +158,19 @@ geometry.tangentsNeedUpdate = true;
 
 
 
-		<h2>Materials</h2>
+		<h2>Materials(材质)</h2>
 		<div>
-			<p>All uniforms values can be changed freely (e.g. colors, textures, opacity, etc), values are sent to the shader every frame.</p>
+			<p>所有uniforms值都可以自由改变 (e.g. colors, textures, opacity, etc), 这些数值在每帧都发给shader .</p>
 
-			<p>Also GLstate related parameters can change any time (depthTest, blending, polygonOffset, etc).</p>
+			<p>GL状态相关参数也可以随时改变 (depthTest, blending, polygonOffset, etc).</p>
 
-			<p>Flat / smooth shading is baked into normals. You need to reset normals buffer (see above).</p>
+			<p>平滑/平滑阴影被作到法线. 你需要重置法线 buffer (见上).</p>
 
-			<p>The following properties can't be easily changed at runtime (once the material is rendered at least once):</p>
+			<p>在运行时无法轻松更改以下属性 (一旦material被渲染了一次):</p>
 			<ul>
-				<li>numbers and types of uniforms</li>
-				<li>numbers and types of lights</li>
-				<li>presence or not of
+				<li>uniforms的数量和类型</li>
+				<li>lights的数量和类型</li>
+				<li>存在与否
 					<ul>
 						<li>texture</li>
 						<li>fog</li>
@@ -189,19 +183,19 @@ geometry.tangentsNeedUpdate = true;
 				</li>
 			</ul>
 
-			<p>Changes in these require building of new shader program. You'll need to set</p>
+			<p>这些变化需要建立新的shader程序. 你需要设置</p>
 			<code>material.needsUpdate = true</code>
 
-			<p>Bear in mind this might be quite slow and induce jerkiness in framerate (especially on Windows, as shader compilation is slower in DirectX than OpenGL).</p>
+			<p>请记住，这可能会非常缓慢并导致帧率的波动。 (特别是在Windows上，因为shader编译在directx中比opengl慢).</p>
 
-			<p>For smoother experience you can emulate changes in these features to some degree by having "dummy" values like zero intensity lights, white textures, or zero density fog.</p>
+			<p>为了获得更流畅的体验，您可以通过“虚拟”值（如零强度光，白色纹理或零密度雾）在一定程度上模拟这些功能的变化.</p>
 
-			<p>You can freely change the material used for geometry chunks, however you cannot change how an object is divided into chunks (according to face materials). </p>
+			<p>您可以自由更改用于几何块的材质，但是无法更改对象如何划分为块（根据面材料）. </p>
 
-			<h3>If you need to have different configurations of materials during runtime:</h3>
-			<p>If the number of materials / chunks is small, you could pre-divide the object beforehand (e.g. hair / face / body / upper clothes / trousers for a human, front / sides / top / glass / tire / interior for a car). </p>
+			<h3>如果你需要在运行时使用不同的材料配置：</h3>
+			<p>如果材料/块的数量很少，您可以事先预先划分物体（例如，人的头发/脸部/身体/上衣/裤子，汽车的前部/侧面/顶部/玻璃/轮胎/内部）. </p>
 
-			<p>If the number is large (e.g. each face could be potentially different), consider a different solution, such as using attributes / textures to drive different per-face look.</p>
+			<p>如果数量很大（例如，每个面可能有所不同），请考虑不同的解决方案，例如使用属性/纹理来驱动不同的每个面部外观。</p>
 
 			<h3>Examples:</h3>
 			[example:webgl_materials_cars WebGL / materials / cars]<br />
@@ -209,9 +203,9 @@ geometry.tangentsNeedUpdate = true;
 		</div>
 
 
-		<h2>Textures</h2>
+		<h2>Textures(纹理)</h2>
 		<div>
-			<p>Image, canvas, video and data textures need to have the following flag set if they are changed:</p>
+			<p>如果更改了图像，画布，视频和数据纹理，则需要设置以下标志：</p>
 			<code>
 				texture.needsUpdate = true;
 			</code>
@@ -224,9 +218,9 @@ geometry.tangentsNeedUpdate = true;
 		</div>
 
 
-		<h2>Cameras</h2>
+		<h2>Cameras(相机)</h2>
 		<div>
-			<p>A camera's position and target is updated automatically. If you need to change</p>
+			<p>相机的位置和目标会自动更新。 如果你需要改变</p>
 			<ul>
 				<li>
 					fov
@@ -242,7 +236,7 @@ geometry.tangentsNeedUpdate = true;
 				</li>
 			</ul>
 			<p>
-				then you'll need to recompute the projection matrix:
+				那么你需要重新计算投影矩阵：
 			</p>
 			<code>
 camera.aspect = window.innerWidth / window.innerHeight;

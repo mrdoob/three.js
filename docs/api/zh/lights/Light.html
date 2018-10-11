@@ -13,66 +13,66 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Abstract base class for lights - all other light types inherit the properties and methods
-			described here.
+			光源的基类 - 所有其他的光类型都继承了该类描述的属性和方法。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器（Constructor）</h2>
 
 
 		<h3>[name]( [param:Integer color], [param:float intensity] )</h3>
 		<p>
-		[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
-		[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+		[page:Integer color] - (可选参数) 16进制表示光的颜色。 缺省值 0xffffff (白色)。<br />
+		[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
 
-		Creates a new [name]. Note that this is not intended to be called directly (use one of derived classes instead).
+		创造一个新的光源。注意，这并不是直接调用的（而是使用派生类之一）。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性（Properties）</h2>
 		<p>
-			See the base [page:Object3D Object3D] class for common properties.
+			公共属性请查看基类[page:Object3D Object3D]。
 		</p>
 
 		<h3>[property:Color color]</h3>
 		<p>
-			Color of the light. Defaults to a new [page:Color] set to white, if not passed in the constructor.<br />
+			光源的颜色。如果构造的时候没有传递，默认会创建一个新的 [page:Color] 并设置为白色。
 		</p>
 
 		<h3>[property:Float intensity]</h3>
 		<p>
-			The light's intensity, or strength.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, the product of
-			[page:.color color] * intensity is interpreted as luminous intensity measured in candela.<br />
-			Default - *1.0*.
+			光照的强度，或者说能量。
+			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式下, [page:.color color] 和强度
+			的乘积被解析为以坎德拉（candela）为单位的发光强度。
+			默认值 - *1.0*
+		<br />
 		</p>
 
 		<h3>[property:Boolean isLight]</h3>
 		<p>
-			Used to check whether this or derived classes are lights. Default is *true*.<br /><br />
+			用来校验这个类或者派生类是不是平行光。默认是 *true*。<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			不应该去改变这个变量，因为内部使用这个变量做了些优化的工作。
 		</p>
 
 
 		<h2>Methods</h2>
 		<p>
-			See the base [page:Object3D Object3D] class for common methods.
+			公共方法请查看基类 [page:Object3D Object3D]。
 		</p>
 
 
 		<h3>[method:Light copy]( [param:Light source] )</h3>
 		<p>
-		Copies the value of [page:.color color] and [page:.intensity intensity] from the
-		[page:Light source] light into this one.
+		从[page:Light source]复制 [page:.color color], [page:.intensity intensity] 
+		的值到当前光源对象中。
 		</p>
 
 		<h3>[method:JSON toJSON]( [param:String meta] )</h3>
 		<p>
-		Return Light data in JSON format.
+			以JSON格式返回光数据。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
