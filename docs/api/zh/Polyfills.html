@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../" />
@@ -9,37 +9,37 @@
 	</head>
 	<body>
 
-		<h1>Polyfills</h1>
+		<h1>差异化支持(腻子)</h1>
 
-		<p class="desc">Three.js includes polyfills for the following functions and constants.</p>
+		<p class="desc">Three.js 包含以下方法和常量的差异化支持.</p>
 
 		<h3>[page:Number.EPSILON Number.EPSILON]</h3>
 		<p>
-			 The difference between one and the smallest value greater than one that can be represented as a Number.
+			 表示1和大于1的最小差值，可表示为 Number.
 			 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/EPSILON MDN reference].
 		</p>
 
 		<h3>[page:Math.sign Math.sign]( [page:Number x] )</h3>
 		<p>
-			If the argument is a positive number, negative number, positive zero or negative zero,
-			the function will return 1, -1, 0 or -0 respectively. Otherwise, NaN is returned.
+			如果参数为 正数，负数，正零 或 负零,
+			该方法将分别返回 1, -1, 0 或 -0 . 否则, 返回 NaN.
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign MDN reference].
 		</p>
 
 		<h3>[page:Function.prototype.name Function.prototype.name]( [page:Number x] )</h3>
 		<p>
-			Returns the name of a function, or (before ES6 implementations) an empty string for anonymous functions.
+			返回方法的名字, 或 (在 ES6 实现之前) 为匿名方法返回一个空字符串.
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name MDN reference].
 		</p>
 
 		<h3>[page:Object.assign Object.assign]( [page:Object target], [page:Object ...sources] )</h3>
 		<p>
-			The Object.assign() method is used to copy the values of all enumerable own properties from one or more source objects to a target object.
-			It will return the target object.
+			Object.assign() 方法用于从一个或多个源对象拷贝所有可枚举自身属性到目标对象.
+			该方法将返回目标对象.
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign MDN reference].
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/polyfills.js src/polyfills.js]
 	</body>
