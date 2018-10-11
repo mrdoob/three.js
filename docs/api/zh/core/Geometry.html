@@ -12,17 +12,16 @@
 
 		<div class="desc">
 		<p>
-		Geometry is a user-friendly alternative to [page:BufferGeometry]. Geometries store attributes
-		(vertex positions, faces, colors, etc.) using objects like [page:Vector3] or [page:Color] that
-		are easier to read and edit, but less efficient than typed arrays.
+			Geometry 是对 [page:BufferGeometry] 的用户有好替代。Geometry 利用 [page:Vector3]
+			或 [page:Color] 存储了几何体的相关 attributes（如顶点位置，面信息，颜色等）比起 BufferGeometry
+			更容易读写，但是运行效率不如有类型的队列。
 		</p>
 		<p>
-		Prefer [page:BufferGeometry] for large or serious projects.
+		对于大型工程或正式工程，推荐采用 [page:BufferGeometry]。
 		</p>
 		</div>
 
-
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<div>[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]</div>
 		<div>[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]</div>
@@ -48,125 +47,118 @@
 		geometry.computeBoundingSphere();
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]()</h3>
 		<p>
-		The constructor takes no arguments.
+		构造函数没有任何参数。
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Box3 boundingBox]</h3>
 		<p>
-			Bounding box for the Geometry, which can be calculated with
-			[page:.computeBoundingBox](). Default is *null*.
+			Geometry 的外边界矩形，可以通过 [page:.computeBoundingBox]() 进行计算，默认值是 *null*。
 		</p>
 
 		<h3>[property:Sphere boundingSphere]</h3>
 		<p>
-			Bounding sphere for the Geometry, which can be calculated with
-			[page:.computeBoundingSphere](). Default is *null*.
+			Geometry 的外边界球形，可以通过 [page:.computeBoundingSphere]() 进行计算，默认值是 *null*。
 		</p>
 
 		<h3>[property:Array colors]</h3>
 		<p>
-		Array of vertex [page:Color colors], matching number and order of vertices.<br /><br />
+			顶点 [page:Color colors] 队列，与顶点数量和顺序保持一致。<br /><br />
 
-		This is used by [page:Points] and [page:Line] and any classes derived from those such as [page:LineSegments] and various helpers.
-		[page:Mesh Meshes] use [page:Face3.vertexColors] instead of this.<br /><br />
+			该属性用于 [page:Points] 、 [page:Line] 或派生自 [page:LineSegments] 的类。
+			对于 [page:Mesh Meshes]，请使用 [page:Face3.vertexColors] 函数。<br /><br />
 
-		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
+			如果要标记队列中的数据已经更新，[page:Geometry Geometry.colorsNeedUpdate] 值需要被设置为 true。
 		</p>
 
 		<h3>[property:Array faces]</h3>
 		<p>
-		Array of [page:Face3 faces].<br />
-		The array of faces describe how each vertex in the model is connected to form faces.
-		Additionally it holds information about face and vertex normals and colors.<br /><br />
-		To signal an update in this array, [page:Geometry Geometry.elementsNeedUpdate] needs to be set to true.
+			[page:Face3 faces] 队列。<br />
+
+			描述每个顶点之间如何组成模型面的面队列。同时该队列保存面和顶点的法向量和颜色信息。<br /><br />
+			如果要标记队列中的数据已经更新，[page:Geometry Geometry.elementsNeedUpdate] 值需要被设置为 true。
 		</p>
 
 		<h3>[property:Array faceVertexUvs]</h3>
 		<p>
-		Array of face [link:https://en.wikipedia.org/wiki/UV_mapping UV] layers, used for mapping textures onto the geometry.<br />
-		Each UV layer is an array of [page:UV]s matching the order and number of vertices in faces.<br /><br />
-		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
+			面的 [link:https://en.wikipedia.org/wiki/UV_mapping UV] 层的队列，该队列用于将纹理和几何信息进行映射。<br />
+			每个 UV 层都是一个 [page:UV] 的队列，顺序和数量同面中的顶点相对用。<br /><br />
+			如果要标记队列中的数据已经更新，[page:Geometry Geometry.uvsNeedUpdate] 值需要被设置为 true。
 		</p>
 
 		<h3>[property:Integer id]</h3>
-		<p>Unique number for this geometry instance.</p>
+		<p>当前 geometry 实例的唯一标识符的数。</p>
 
 		<h3>[property:Boolean isGeometry]</h3>
 		<p>
-			Used to check whether this or derived classes are Geometries. Default is *true*.<br /><br />
+			用于判断当前类或派生类属于 Geometries。默认值是 *true*。<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			你不应该改变该值，该值用于内部优化。
 		</p>
 
 		<h3>[property:array lineDistances]</h3>
 		<p>
-		An array containing distances between vertices for Line geometries.
-		This is required for [page:LineDashedMaterial] to render correctly.
+			用于保存线型几何体中每个顶点间距离的。在正确渲染 [page:LineDashedMaterial] 时，需要用到该数据。
 		</p>
 
 		<h3>[property:Array morphTargets]</h3>
 		<p>
-		Array of [link:https://en.wikipedia.org/wiki/Morph_target_animation morph targets]. Each morph target is a Javascript object:
+			[link:https://en.wikipedia.org/wiki/Morph_target_animation morph targets] 的队列。每个
+			morph target 都是一个如下的 javascript 对象：
 		<code>{ name: "targetName", vertices: [ new THREE.Vector3(), ... ] }</code>
-		Morph vertices match number and order of primary vertices.
+			Morph 顶点和几何体原始顶点在数量和顺序上需要一一对应。
 		</p>
 
 		<h3>[property:Array morphNormals]</h3>
 		<p>
-		Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:
+			一个 morph 法向量的数组。Morph 法向量和 morph target 有类似的结构，每个法向量都是一个如下的 Javascript 对象:
 		<code>morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }</code>
 
-		See the [example:webgl_morphnormals WebGL / morphNormals] example.
+			示例详见 [example:webgl_morphnormals WebGL / morphNormals]。
 		</p>
 
 		<h3>[property:String name]</h3>
-		<p>Optional name for this geometry. Default is an empty string.</p>
+		<p>当前几何的可选别名。默认值是一个空字符串。</p>
 
 		<h3>[property:Array skinWeights]</h3>
 		<p>
-		When working with a [page:SkinnedMesh], each vertex can have up to 4 [page:Bone bones] affecting it.
-		The skinWeights property is an array of weight values that correspond to the order of the vertices in
-		the geometry. So for instance, the first skinWeight would correspond to the first vertex in the geometry.
-		Since each vertex can be modified by 4 bones, a [page:Vector4] is used to represent the skin weights
-		for that vertex.
+			当在处理一个 [page:SkinnedMesh] 时，每个顶点最多可以有 4 个相关的 [page:Bone bones] 来影响它。
+			skinWeights 属性是一个权重队列，顺序同几何体中的顶点保持一致。因而，队列中的第一个 skinWeight
+			就对应几何体中的第一个顶点。由于每个顶点可以被 4 个 [page:Bone bones] 营销，因而每个顶点的 skinWeights
+			就采用一个 [page:Vector4] 表示。
 		</p>
 		<p>
-		The values of the vector should typically be between 0 and 1. For instance when set to 0 the bone
-		transformation will have no affect. When set to 0.5 it will have 50% affect. When set to 100%, it will
-		have 100% affect. If there is only 1 bone associated with the vertex then you only need to worry about
-		the first component of the vector, the rest can be ignored and set to 0.
+			skinWeight 矢量中每个元素的取值范围应该在 0 到 1 之间。例如，当设置为 0，骨骼对该顶点的位置没有影响。当设置为 0.5,
+			则对顶点的影响为 50%。 当设置为 100% 则对顶点的影响是 100%。如果矢量中只有一个骨骼与顶点相关联，则你只需要关注矢量中的第一个元素，
+			剩余的元素可以忽略，他们的值可以都设置为 0。
 		</p>
 
 		<h3>[property:Array skinIndices]</h3>
 		<p>
-		Just like the skinWeights property, the skinIndices' values correspond to the geometry's vertices.
-		Each vertex can have up to 4 bones associated with it. So if you look at the first vertex, and the
-		first skinIndex, this will tell you the bones associated with that vertex. For example the first vertex
-		could have a value of <strong>( 10.05, 30.10, 12.12 )</strong>. Then the first skin index could have the
-		value of <strong>( 10, 2, 0, 0 )</strong>. The first skin weight could have the value of
-		<strong>( 0.8, 0.2, 0, 0 )</strong>. In affect this would take the first vertex, and then the bone
-		<strong>mesh.bones[10]</strong> and apply it 80% of the way. Then it would take the bone <strong>skeleton.bones[2]</strong>
-		and apply it 20% of the way. The next two values have a weight of 0, so they would have no affect.
+			就如同 skinWeights 属性一样。skinWeights 的值也是与几何体的顶点相对应。每个顶点可以最多有 4 个骨骼与之相关联。
+			因而第一个 skinIndex 就与几何体的第一个顶点相关联，skinIndex 的值就指明了影响该顶点的骨骼是哪个。例如，第一个顶点的值是
+			<strong>( 10.05, 30.10, 12.12 )</strong>，第一个 skinIndex 的值是<strong>( 10, 2, 0, 0 )</strong>，第一个 skinWeight
+			的值是 <strong>( 0.8, 0.2, 0, 0 )</strong>。上述值表明第一个顶点受到<strong>mesh.bones[10]</strong>骨骼的影响有 80%，
+			受到 <strong>skeleton.bones[2]</strong> 的影响是 20%，由于另外两个 skinWeight 的值是 0，因而他们对顶点没有任何影响。
 		</p>
 		<p>
-		In code another example could look like this:
+			下面以代码的形式展示示例：
 		<code>
-		// e.g.
+		// 例如
 		geometry.skinIndices[15] = new THREE.Vector4(   0,   5,   9, 10 );
 		geometry.skinWeights[15] = new THREE.Vector4( 0.2, 0.5, 0.3,  0 );
 
-		// corresponds with the following vertex
+		// 与该顶点相关
 		geometry.vertices[15];
 
-		// these bones will be used like so:
+		// 相应骨骼可以这样被调用:
 		skeleton.bones[0]; // weight of 0.2
 		skeleton.bones[5]; // weight of 0.5
 		skeleton.bones[9]; // weight of 0.3
@@ -176,169 +168,166 @@
 
 		<h3>[property:String uuid]</h3>
 		<p>
-		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
-		This gets automatically assigned and shouldn't be edited.
+			当前对象实例的 [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
+			该值会被自动分配，请不要修改它。
 		</p>
 
 		<h3>[property:Array vertices]</h3>
 		<p>
-		Array of [page:Vector3 vertices].<br />
-		The array of vertices holds the position of every vertex in the model.<br />
-		To signal an update in this array, [page:.verticesNeedUpdate] needs to be set to true.
+			[page:Vector3 vertices] 的队列。<br />
+			顶点的队列，保存了模型中每个顶点的位置信息。<br />
+			如果要标记队列中的数据已经更新，[page:.verticesNeedUpdate] 值需要被设置为 true。
 		</p>
 
 		<h3>[property:Boolean verticesNeedUpdate]</h3>
-		<p>Set to *true* if the vertices array has been updated.</p>
+		<p> 如果顶点队列中的数据被修改，该值需要被设置为 *true*。</p>
 
 		<h3>[property:Boolean elementsNeedUpdate]</h3>
-		<p>Set to *true* if the faces array has been updated.</p>
+		<p> 如果面队列中的数据被修改，该值需要被设置为 *true*。</p>
 
 		<h3>[property:Boolean uvsNeedUpdate]</h3>
-		<p>Set to *true* if the uvs array has been updated.	</p>
+		<p> 如果 UV 队列中的数据被修改，该值需要被设置为 *true*。</p>
 
 		<h3>[property:Boolean normalsNeedUpdate]</h3>
-		<p>Set to *true* if the normals array has been updated.</p>
+		<p> 如果法向量队列中的数据被修改，该值需要被设置为 *true*。</p>
 
 		<h3>[property:Boolean colorsNeedUpdate]</h3>
-		<p>Set to *true* if the colors array or a face3 color has been updated.</p>
+		<p> 如果颜色队列或 face3 的颜色数据被修改，该值需要被设置为 *true*。</p>
 
 		<h3>[property:Boolean groupsNeedUpdate]</h3>
-		<p>Set to *true* if a face3 materialIndex has been updated.</p>
+		<p> 如果 face3 的 materialIndex 被修改，该值需要被设置为 *true*。</p>
 
 		<h3>[property:Boolean lineDistancesNeedUpdate]</h3>
-		<p>Set to *true* if the linedistances array has been updated.</p>
+		<p> 如果 linedistances 队列中的数据被修改，该值需要被设置为 *true*。</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+		<h3>[page:EventDispatcher EventDispatcher] 该类中可用的函数。</h3>
 
 		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
-		<p>Bakes matrix transform directly into vertex coordinates.</p>
+		<p> 将矩阵信息直接应用于几何体顶点坐标。</p>
 
 		<h3>[method:Geometry center] ()</h3>
-		<p>Center the geometry based on the bounding box.</p>
+		<p> 基于外边界矩形将几何体居中。</p>
 
 		<h3>[method:Geometry clone]()</h3>
-		<p>
-		Creates a new clone of the Geometry.<br /><br />
-
-		This method copies only vertices, faces and uvs. It does not copy any other properties of the geometry.
+		<p>克隆当前几何体。<br /><br />
+			该方法除几何体的顶点、面信息和 UV 外不会复制其他属性。
 		</p>
 
 		<h3>[method:null computeBoundingBox]()</h3>
-		<p>Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.</p>
+		<p> 计算当前几何体的外边界矩形。该方法会更新 [page:Geometry Geometry.boundingBox] 属性值。</p>
 
 		<h3>[method:null computeBoundingSphere]()</h3>
-		<p>Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.</p>
+		<p> 计算当前几何体的外边界球。该方法会更新 [page:Geometry Geometry.boundingSphere] 属性值。</p>
 
 		<p>
-			Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed,
-			otherwise they are *null*.
+			计算外边界矩形或外边界球并不是默认会自动调用的方法，这两个函数需要被显示的调用才能天得到相应属性值，否则对应属性值保持默认值 *null*。
 		</p>
 
 		<h3>[method:null computeFaceNormals]()</h3>
-		<p>Computes [page:Face3.normal face normals].</p>
+		<p> 计算 [page:Face3.normal face normals] 值。</p>
 
 		<h3>[method:null computeFlatVertexNormals]()</h3>
-		<p>Computes flat [page:Face3.vertexNormals vertex normals]. Sets the vertex normal of each vertex of each face to be the same as the face's normal.</p>
+		<p> 计算 flat [page:Face3.vertexNormals vertex normals] 值。
+			该方法会将顶点法向量的值赋值为相应面的法向量值。</p>
 
 		<h3>[method:null computeMorphNormals]()</h3>
-		<p>Computes [page:.morphNormals].</p>
+		<p> 计算 [page:.morphNormals] 值。</p>
 
 		<h3>[method:null computeVertexNormals]( [param:Boolean areaWeighted] )</h3>
 		<p>
-		areaWeighted - If true the contribution of each face normal to the vertex normal is
-		weighted by the area of the face. Default is true.<br /><br />
+		areaWeighted - 如果该值设置为 true，则每个面的法向量对顶点法向量的影响按照面的面积大小来计算。默认值为 true.<br /><br />
 
-		Computes vertex normals by averaging face normals.
+			通过周围面的法向量计算顶点的法向量。
 		</p>
 
 		<h3>[method:Geometry copy]( [param:Geometry geometry] )</h3>
 		<p>
-			Copies vertices, faces and uvs into this geometry. It does not copy any other properties of the geometry.
+			将参数代表的几何体的顶点、面和 UV 复制到当前几何体。该方法不会复制除此以外的别的属性值。
 		</p>
 
 		<h3>[method:null dispose]()</h3>
 		<p>
-		Removes The object from memory. <br />
-		Don't forget to call this method when you remove a geometry because it can cause memory leaks.
+			将对象从内存中删除。 <br />
+
+			在你删除一个几何体时，不要忘记调用该方法，否则会造成内存泄漏。
 		</p>
 
 		<h3>[method:Geometry fromBufferGeometry]( [param:BufferGeometry geometry] )</h3>
-		<p>Convert a [page:BufferGeometry] to a Geometry.</p>
+		<p> 将一个 [page:BufferGeometry] 对象，转换成一个 Geometry 对象。</p>
 
 		<h3>[method:Geometry lookAt] ( [param:Vector3 vector] )</h3>
 		<p>
-		vector - A world vector to look at.<br /><br />
+			vector - 当前几何体朝向的世界坐标。<br /><br />
 
-		Rotates the geometry to face point in space. This is typically done as a one time operation but not during the render loop.<br>
-		Use [page:Object3D.lookAt] for typical real-time mesh usage.
+			该方法将几何体进行旋转，是的几何体朝向参数指定的世界坐标。该方法一般在一次处理中完成，但不在渲染过程中执行。<br>
+			一般使用 [page:Object3D.lookAt] 方法进行实时更改。
 		</p>
 
 		<h3>[method:null merge]( [param:Geometry geometry], [param:Matrix4 matrix], [param:Integer materialIndexOffset] )</h3>
-		<p>Merge two geometries or geometry and geometry from object (using object's transform)</p>
+		<p> 将两个几何体，或一个几何体和一个从对象中通过变换获得的几何体进行合并。</p>
 
 		<h3>[method:null mergeMesh]( [param:Mesh mesh] )</h3>
-		<p>Merge the mesh's geometry with this, also applying the mesh's transform.</p>
+		<p> 将参数指定的面片信息与当前几何体进行合并。同样会使用到参数 mesh 的变换。</p>
 
 
 		<h3>[method:null mergeVertices]()</h3>
 		<p>
-		Checks for duplicate vertices using hashmap.<br />
-		Duplicated vertices are removed and faces' vertices are updated.
+			通过 hashmap 检查重复的顶点。<br />
+			重复的顶点将会被移除，面的顶点信息会被更新。
 		</p>
 
 		<h3>[method:null normalize]()</h3>
 		<p>
-		Normalize the geometry. <br />
-		Make the geometry centered and have a bounding sphere of radius *1.0*.
+			将当前几何体归一化。 <br />
+			将当前几何体居中，并且使得该几何体的外边界球半径为 *1.0*。
 		</p>
 
 		<h3>[method:Geometry rotateX] ( [param:Float radians] )</h3>
 		<p>
-		Rotate the geometry about the X axis. This is typically done as a one time operation but not during the render loop.<br>
-		Use [page:Object3D.rotation] for typical real-time mesh rotation.
+			将几何体绕 X 轴旋转参数指定度数。该操作通常在一次处理中完成，但不会在渲染过程中处理。<br>
+			使用 [page:Object3D.rotation] 对模型面片进行实时旋转处理。
 		</p>
 
 		<h3>[method:Geometry rotateY] ( [param:Float radians] )</h3>
 		<p>
-		Rotate the geometry about the Y axis. This is typically done as a one time operation but not during the render loop.<br>
-    	        Use [page:Object3D.rotation] for typical real-time mesh rotation.
+			将几何体绕 Y 轴旋转参数指定度数。该操作通常在一次处理中完成，但不会在渲染过程中处理。<br>
+			使用 [page:Object3D.rotation] 对模型面片进行实时旋转处理。
 		</p>
 
 		<h3>[method:Geometry rotateZ] ( [param:Float radians] )</h3>
 		<p>
-		Rotate the geometry about the Z axis. This is typically done as a one time operation but not during the render loop.<br>
-	        Use [page:Object3D.rotation] for typical real-time mesh rotation.
+			将几何体绕 Z 轴旋转参数指定度数。该操作通常在一次处理中完成，但不会在渲染过程中处理。<br>
+			使用 [page:Object3D.rotation] 对模型面片进行实时旋转处理。
 		</p>
 
 		<h3>[method:Geometry setFromPoints] ( [param:Array points] )</h3>
-		<p>Sets the vertices for this Geometry from an array of points.</p>
+		<p>通过点队列设置一个 Geometry 中的顶点。</p>
 
 		<h3>[method:null sortFacesByMaterialIndex] (  )</h3>
 		<p>
-		Sorts the faces array according to material index. For complex geometries with several materials,
-		this can result in reduced draw calls and improved performance.
+			通过材质索引对面队列进行排序。对于复杂且有多个材质的几何体，该操作可以有效减少 draw call 从而提升性能。
 		</p>
 
 		<h3>[method:Geometry scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-		Scale the geometry data. This is typically done as a one time operation but not during the render loop.<br>
-		Use [page:Object3D.scale] for typical real-time mesh scaling.
+			缩放几何体大小。该操作通常在一次处理中完成，但不会在渲染过程中处理。<br>
+			使用 [page:Object3D.scale] 对模型面片进行实时缩放处理。
 		</p>
 
 		<h3>[method:JSON toJSON] ( )</h3>
-		<p>Convert the geometry to JSON format.</p>
+		<p> 将 Geometry 对象数据转为  JSON 格式。</p>
 
 		<h3>[method:Geometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-		Translate the geometry. This is typically done as a one time operation but not during the render loop.<br>
-    	        Use [page:Object3D.position] for typical real-time mesh translation.
+			移动当前几何体。该操作通常在一次处理中完成，但不会在渲染过程中处理。<br>
+			使用 [page:Object3D.position] 对模型面片进行实时移动处理。
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>资源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

@@ -11,97 +11,92 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This class is used internally to convert from [page:Geometry] to [page:BufferGeometry].
+			该类在内部被用于 [page:Geometry] 到 [page:BufferGeometry] 的转换。
 		</p>
 
-
-
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]()</h3>
-		<p>This creates a new [name].</p>
+		<p>创建一个新的 [name] 对象。</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Integer id]</h3>
-		<p>Unique number for this [name] instance.</p>
+		<p>当前 [name] 实例的唯一数字标识。</p>
 
 		<h3>[property:String name]</h3>
-		<p>Optional name. Default is the empty string.</p>
+		<p>可选名称. 默认值是空字符串。</p>
 
 		<h3>[property:Array type]</h3>
-		<p>String 'DirectGeometry'.</p>
+		<p>返回 'DirectGeometry' 字符串。</p>
 
 		<h3>[property:Array vertices]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Array normals]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Array colors]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Array uvs]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Array uvs2]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Array groups]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Array morphTargets]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Array skinWeights]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Array skinIndices]</h3>
-		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
+		<p>被初始化为一个空队列, 该属性由 [page:.fromGeometry]() 赋值。</p>
 
 		<h3>[property:Box3 boundingBox]</h3>
 		<p>
-			Bounding box for the bufferGeometry, which can be calculated with
-			[page:.computeBoundingBox](). Default is *null*.
+			对应 bufferGeometry 的外边界矩形，该值可通过 [page:.computeBoundingBox]() 计算。默认值是 *null*。
 		</p>
 
 		<h3>[property:Sphere boundingSphere]</h3>
 		<p>
-			Bounding sphere for the bufferGeometry, which can be calculated with
-			[page:.computeBoundingSphere](). Default is *null*.
+			对应 bufferGeometry 的外边界球，该值可通过 [page:.computeBoundingSphere]() 计算。默认值是 *null*。
 		</p>
 
 		<h3>[property:Boolean verticesNeedUpdate]</h3>
-		<p>Default is false.</p>
+		<p>默认值为 false。</p>
 
 		<h3>[property:Boolean normalsNeedUpdate]</h3>
-		<p>Default is false.</p>
+		<p>默认值为 false。</p>
 
 		<h3>[property:Boolean colorsNeedUpdate]</h3>
-		<p>Default is false.</p>
+		<p>默认值为 false。</p>
 
 		<h3>[property:Boolean uvsNeedUpdate]</h3>
-		<p>Default is false.</p>
+		<p>默认值为 false。</p>
 
 		<h3>[property:Boolean groupsNeedUpdate]</h3>
-		<p>Default is false.</p>
+		<p>默认值为 false。</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[property:null computeGroups]( [param:Geometry geometry] )</h3>
 		<p>
-			Compute the parts of the geometry that have different materialIndex.
-			See [page:BufferGeometry.groups].
+			计算几何体中有不同 materialIndex 的部分，详见 [page:BufferGeometry.groups]。
 		</p>
 
 		<h3>[property:null fromGeometry]( [param:Geometry geometry] )</h3>
-		<p>Pass in a [page:Geometry] instance for conversion.</p>
+		<p>传入一个需要转换的 [page:Geometry] 实例。</p>
 
 
-		<h2>Source</h2>
+		<h2>资源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

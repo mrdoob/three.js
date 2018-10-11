@@ -11,14 +11,14 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			JavaScript events for custom objects.<br />
+			自定义对象的 JavaScript 事件。<br />
 			[link:https://github.com/mrdoob/eventdispatcher.js Eventdispatcher on GitHub]
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
-// Adding events to a custom object
+// 为自定义对象添加事件
 
 var Car = function () {
 
@@ -30,11 +30,11 @@ var Car = function () {
 
 };
 
-// Mixing the EventDispatcher.prototype with the custom object prototype
+// 将 EventDispatcher.prototype 与自定义对象 prototype 进行混合
 
 Object.assign( Car.prototype, EventDispatcher.prototype );
 
-// Using events with the custom object
+// 使用自定义对象的事件
 
 var car = new Car();
 
@@ -47,53 +47,53 @@ car.addEventListener( 'start', function ( event ) {
 car.start();
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]()</h3>
 		<p>
-		Creates EventDispatcher object.
+		创建 EventDispatcher 对象。
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null addEventListener]( [param:String type], [param:Function listener] )</h3>
 		<p>
-		type - The type of event to listen to.<br />
-		listener - The function that gets called when the event is fired.
+		type - 需要添加监听的事件类型。<br />
+		listener - 事件发生时被调用到的函数。
 		</p>
 		<p>
-		Adds a listener to an event type.
+		为指定事件增加监听函数。
 		</p>
 
 		<h3>[method:Boolean hasEventListener]( [param:String type], [param:Function listener] )</h3>
 		<p>
-		type - The type of event to listen to.<br />
-		listener - The function that gets called when the event is fired.
+		type - 需要被监听的事件类型。<br />
+		listener - 事件发生时被调用到的函数。
 		</p>
 		<p>
-		Checks if listener is added to an event type.
+		检查监听函数是否已经添加到指定事件。
 		</p>
 
 		<h3>[method:null removeEventListener]( [param:String type], [param:Function listener] )</h3>
 		<p>
-		type - The type of the listener that gets removed.<br />
-		listener - The listener function that gets removed.
+		type - 需要移除监听的事件类型。<br />
+		listener - 需要被移除的监听函数。
 		</p>
 		<p>
-		Removes a listener from an event type.
+		从指定事件类型中移除监听函数。
 		</p>
 
 		<h3>[method:null dispatchEvent]( [param:object event] )</h3>
 		<p>
-		event - The event that gets fired.
+		event - 将被触发的事件。
 		</p>
 		<p>
-		Fire an event type.
+		触发一个事件。
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>资源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
