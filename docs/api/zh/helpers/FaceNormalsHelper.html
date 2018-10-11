@@ -10,19 +10,22 @@
 	<body>
 		[page:LineSegments] &rarr;
 
-		<h1>[name]</h1>
+		<h1>面法线辅助工具[name]</h1>
 
 		<p class="desc">
+			渲染[page:ArrowHelper arrows]来显示物体中[page:Face3 face]（面）的法线。
+
+
 			Renders [page:ArrowHelper arrows] to visualize an object's [page:Face3 face] normals.
 			Requires  that face normals have been specified on all 	[page:Face3 faces] or calculated
 			with [page:Geometry.computeFaceNormals computeFaceNormals]. <br /><br />
 
-			Note that this only works with the objects whose geometry is an instance of [page:Geometry].
-			For [page:BufferGeometry] use a [page:VertexNormalsHelper] instead.
+			请注意，该辅助工具仅在其几何体为[page:Geometry]实例的对象（物体）上工作。
+			对于[page:BufferGeometry]，请使用[page:VertexNormalsHelper]。
 		<p>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<div>[example:webgl_helpers WebGL / helpers]</div>
 
@@ -37,44 +40,44 @@
 		scene.add( helper );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Object3D object], [param:Number size], [param:Color color], [param:Number linewidth] )</h3>
 		<p>
-		[page:Object3D object] -- object for which to render face normals.<br />
-		[page:Number size] -- (optional) length of the arrows. Default is *1*.<br />
-		[page:Hex color] -- (optional) hex color of the arrows. Default is *0xffff00*.<br />
-		[page:Number linewidth] -- (optional) width of the arrow lines.  Default is *1*.
+		[page:Object3D object] -- 用于渲染面法线的物体。object for which to render face normals.<br />
+		[page:Number size] -- （可选）箭头的长度，默认为*1*。<br />
+		[page:Hex color] -- （可选）箭头的颜色，十六进制格式。默认值为*0xffff00*。<br />
+		[page:Number linewidth] -- （可选）箭头的线宽，默认值为*1*。
 		</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:LineSegments] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:LineSegments]来查看共有属性。</p>
 
 		<h3>[property:object matrixAutoUpdate]</h3>
 		<p>
-			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
-			objects's [page:Object3D.matrixWorld matrixWorld].
+			请参阅[page:Object3D.matrixAutoUpdate]。在这里将其设置为*false*，
+			因为辅助工具使用的是物体的[page:Object3D.matrixWorld matrixWorld]。
 		</p>
 
 		<h3>[property:Object3D object]</h3>
-		<p>The object for which the face normals are being visualized.</p>
+		<p>其面法线将会被可视化的物体。</p>
 
 		<h3>[property:Number size]</h3>
-		<p>Length of the arrows. Default is *1*.</p>
+		<p>箭头的长度，默认值为*1*。</p>
 
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:LineSegments] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:LineSegments]来查看共有方法。</p>
 
 
 		<h3>[method:null update]()</h3>
-		<p>Updates the face normal preview based on movement of the object.</p>
+		<p>基于物体的移动，更新面法线的预览。Updates the face normal preview based on movement of the object.</p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

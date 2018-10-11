@@ -429,7 +429,7 @@ var list = {
 
 		"Manual": {
 
-			"Getting Started": {
+			"起步": {
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
 				"通过模块来引入": "manual/zh/introduction/Import-via-modules",
 				"浏览器支持": "manual/zh/introduction/Browser-support",
@@ -444,21 +444,22 @@ var list = {
 				"一些有用的链接": "manual/zh/introduction/Useful-links"
 			},
 
-			"Next Steps": {
-				"How to update things": "manual/zh/introduction/How-to-update-things",
-				"Matrix transformations": "manual/zh/introduction/Matrix-transformations",
-				"Animation system": "manual/zh/introduction/Animation-system"
+			"接下来的步骤": {
+				"如何更新场景中的物体": "manual/zh/introduction/How-to-update-things",
+				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
+				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
+				"动画系统": "manual/zh/introduction/Animation-system"
 			},
 
-			"Build Tools": {
+			"构建工具": {
 				"Testing with NPM": "manual/zh/buildTools/Testing-with-NPM"
 			}
 
 		},
 
-		"Reference": {
+		"参考文档": {
 
-			"Animation": {
+			"动画": {
 				"AnimationAction": "api/zh/animation/AnimationAction",
 				"AnimationClip": "api/zh/animation/AnimationClip",
 				"AnimationMixer": "api/zh/animation/AnimationMixer",
@@ -478,7 +479,7 @@ var list = {
 				"VectorKeyframeTrack": "api/zh/animation/tracks/VectorKeyframeTrack"
 			},
 
-			"Audio": {
+			"音频": {
 				"Audio": "api/zh/audio/Audio",
 				"AudioAnalyser": "api/zh/audio/AudioAnalyser",
 				"AudioContext": "api/zh/audio/AudioContext",
@@ -486,7 +487,7 @@ var list = {
 				"PositionalAudio": "api/zh/audio/PositionalAudio"
 			},
 
-			"Cameras": {
+			"摄像机": {
 				"ArrayCamera": "api/zh/cameras/ArrayCamera",
 				"Camera": "api/zh/cameras/Camera",
 				"CubeCamera": "api/zh/cameras/CubeCamera",
@@ -495,17 +496,17 @@ var list = {
 				"StereoCamera": "api/zh/cameras/StereoCamera"
 			},
 
-			"Constants": {
-				"Animation": "api/zh/constants/Animation",
-				"Core": "api/zh/constants/Core",
-				"CustomBlendingEquation": "api/zh/constants/CustomBlendingEquations",
-				"DrawModes": "api/zh/constants/DrawModes",
-				"Materials": "api/zh/constants/Materials",
-				"Renderer": "api/zh/constants/Renderer",
-				"Textures": "api/zh/constants/Textures"
+			"常量": {
+				"动画": "api/zh/constants/Animation",
+				"核心": "api/zh/constants/Core",
+				"自定义混合方程": "api/zh/constants/CustomBlendingEquations",
+				"绘图模式": "api/zh/constants/DrawModes",
+				"材质": "api/zh/constants/Materials",
+				"渲染器": "api/zh/constants/Renderer",
+				"纹理贴图": "api/zh/constants/Textures"
 			},
 
-			"Core": {
+			"核心": {
 				"BufferAttribute": "api/zh/core/BufferAttribute",
 				"BufferGeometry": "api/zh/core/BufferGeometry",
 				"Clock": "api/zh/core/Clock",
@@ -564,7 +565,7 @@ var list = {
 				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject",
 			},
 
-			"Geometries": {
+			"几何体": {
 				"BoxBufferGeometry": "api/zh/geometries/BoxBufferGeometry",
 				"BoxGeometry": "api/zh/geometries/BoxGeometry",
 				"CircleBufferGeometry": "api/zh/geometries/CircleBufferGeometry",
@@ -609,7 +610,7 @@ var list = {
 				"WireframeGeometry": "api/zh/geometries/WireframeGeometry"
 			},
 
-			"Helpers": {
+			"辅助工具": {
 				"ArrowHelper": "api/zh/helpers/ArrowHelper",
 				"AxesHelper": "api/zh/helpers/AxesHelper",
 				"BoxHelper": "api/zh/helpers/BoxHelper",
@@ -628,7 +629,7 @@ var list = {
 				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper"
 			},
 
-			"Lights": {
+			"灯光": {
 				"AmbientLight": "api/zh/lights/AmbientLight",
 				"DirectionalLight": "api/zh/lights/DirectionalLight",
 				"HemisphereLight": "api/zh/lights/HemisphereLight",
@@ -644,7 +645,7 @@ var list = {
 				"SpotLightShadow": "api/zh/lights/shadows/SpotLightShadow"
 			},
 
-			"Loaders": {
+			"加载器": {
 				"AnimationLoader": "api/zh/loaders/AnimationLoader",
 				"AudioLoader": "api/zh/loaders/AudioLoader",
 				"BufferGeometryLoader": "api/zh/loaders/BufferGeometryLoader",
@@ -669,7 +670,7 @@ var list = {
 				"LoadingManager": "api/zh/loaders/managers/LoadingManager"
 			},
 
-			"Materials": {
+			"材质": {
 				"LineBasicMaterial": "api/zh/materials/LineBasicMaterial",
 				"LineDashedMaterial": "api/zh/materials/LineDashedMaterial",
 				"Material": "api/zh/materials/Material",
@@ -688,7 +689,7 @@ var list = {
 				"SpriteMaterial": "api/zh/materials/SpriteMaterial"
 			},
 
-			"Math": {
+			"数学库": {
 				"Box2": "api/zh/math/Box2",
 				"Box3": "api/zh/math/Box3",
 				"Color": "api/zh/math/Color",
@@ -718,7 +719,7 @@ var list = {
 				"QuaternionLinearInterpolant": "api/zh/math/interpolants/QuaternionLinearInterpolant"
 			},
 
-			"Objects": {
+			"对象": {
 				"Bone": "api/zh/objects/Bone",
 				"Group": "api/zh/objects/Group",
 				"Line": "api/zh/objects/Line",
@@ -732,7 +733,7 @@ var list = {
 				"Sprite": "api/zh/objects/Sprite"
 			},
 
-			"Renderers": {
+			"渲染器": {
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
 				"WebGLRenderTargetCube": "api/zh/renderers/WebGLRenderTargetCube"
@@ -745,13 +746,13 @@ var list = {
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
 			},
 
-			"Scenes": {
+			"场景": {
 				"Fog": "api/zh/scenes/Fog",
 				"FogExp2": "api/zh/scenes/FogExp2",
 				"Scene": "api/zh/scenes/Scene"
 			},
 
-			"Textures": {
+			"纹理贴图": {
 				"CanvasTexture": "api/zh/textures/CanvasTexture",
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
@@ -763,25 +764,25 @@ var list = {
 
 		},
 
-		"Examples": {
+		"示例": {
 
-			"Animations": {
+			"动画": {
 				"CCDIKSolver": "examples/animations/CCDIKSolver",
 				"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
 				"MMDPhysics": "examples/animations/MMDPhysics"
 			},
 
-			"Controls": {
+			"控制": {
 				"OrbitControls": "examples/controls/OrbitControls"
 			},
 
-			"Geometries": {
+			"几何体": {
 				"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/geometries/DecalGeometry"
 			},
 
-			"Loaders": {
+			"加载器": {
 				"BabylonLoader": "examples/loaders/BabylonLoader",
 				"GLTFLoader": "examples/loaders/GLTFLoader",
 				"MMDLoader": "examples/loaders/MMDLoader",
@@ -796,16 +797,16 @@ var list = {
 				"PRWMLoader": "examples/loaders/PRWMLoader"
 			},
 
-			"Objects": {
+			"物体": {
 				"Lensflare": "examples/objects/Lensflare",
 			},
 
-			"Exporters": {
+			"导出器": {
 				"GLTFExporter": "examples/exporters/GLTFExporter",
 				"PLYExporter": "examples/exporters/PLYExporter"
 			},
 
-			"Plugins": {
+			"插件": {
 				"LookupTable": "examples/Lut",
 				"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
 			},
@@ -818,7 +819,7 @@ var list = {
 				"VertexList": "examples/quickhull/VertexList"
 			},
 
-			"Renderers": {
+			"渲染器": {
 				"CanvasRenderer": "examples/renderers/CanvasRenderer",
 				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
@@ -833,7 +834,7 @@ var list = {
 
 		},
 
-		"Developer Reference": {
+		"开发者参考": {
 
 			"Polyfills": {
 				"Polyfills": "api/zh/Polyfills"

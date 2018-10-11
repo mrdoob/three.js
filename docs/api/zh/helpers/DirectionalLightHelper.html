@@ -10,15 +10,15 @@
 	<body>
 		[page:Object3D] &rarr;
 
-		<h1>[name]</h1>
+		<h1>方向光辅助工具（[name]）</h1>
 
 		<p class="desc">
-			Helper object to assist with visualizing a [page:DirectionalLight]'s effect on the scene.
+			用来在场景中显示[page:DirectionalLight]效果的辅助工具对象。
 
-			This consists of plane and a line representing the light's position and direction.
+			由一个平面和一条表示光的位置与方向的线组成。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
 		var light = new THREE.DirectionalLight( 0xFFFFFF );
@@ -29,25 +29,25 @@
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:DirectionalLight light], [param:Number size], [param:Hex color] )</h3>
 		<p>
-			[page:DirectionalLight light]-- The light to be visualized. <br /><br />
+			[page:DirectionalLight light]-- 将会被可视化的光。 <br /><br />
 
-			[page:Number size] -- (optional) dimensions of the plane. Default is *1*.<br /><br />
+			[page:Number size] -- （可选）平面的大小，默认为*1*。(optional) dimensions of the plane. Default is *1*.<br /><br />
 
-			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
+			[page:Hex color] -- （可选）如果没有设置这个值，辅助工具将会使用光线本身的颜色。(optional) if this is not the set the helper will take the color of the light.
 		</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Object3D] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
 
 
 		<h3>[property:Line lightPlane]</h3>
-		<p>Contains the line mesh showing the location of the directional light.</p>
+		<p>包含着用于显示方向光的位置的线（网格）。</p>
 
 		<h3>[property:DirectionalLight light]</h3>
 		<p>Reference to the [page:DirectionalLight directionalLight] being visualized.</p>

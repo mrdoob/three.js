@@ -10,15 +10,15 @@
 	<body>
 		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
 
-		<h1>[name]</h1>
+		<h1>骨架辅助工具（[name]）</h1>
 
 		<p class="desc">
-		A helper object to assist with visualizing a [page:Skeleton Skeleton].
-		The helper is renderered using a [page:LineBasicMaterial LineBasicMaterial].
+			一个用于辅助[page:Skeleton Skeleton]，使其可视化的辅助工具对象。
+			该辅助工具在渲染时使用[page:LineBasicMaterial LineBasicMaterial]材质。
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		[example:webgl_animation_skinning_blending animation / skinning / blending]<br />
 		[example:webgl_animation_skinning_morph animation / skinning / morph]<br />
@@ -32,30 +32,30 @@ scene.add( helper );
 
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( object )</h3>
 		<p>
-		object -- can be any object that has an array of [page:Bone Bone]s as a sub object. <br />
-		For example, a [page:Skeleton Skeleton] or a [page:SkinnedMesh SkinnedMesh].
+		object -- 可以是任何一个以[page:Bone Bone]（骨骼）数组作为子对象的物体。<br />
+		例如，[page:Skeleton Skeleton]（骨架）或者[page:SkinnedMesh SkinnedMesh]（蒙皮）。
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Array bones]</h3>
 		<p>
-		The list of bones that the helper renders as [page:Line Lines].
+			将被辅助工具作为[page:Line Lines]来渲染的骨骼数组。
 		</p>
 
 		<h3>[property:Object root]</h3>
 		<p>
-		The object passed in the constructor.
+			在构造器中传入的对象。
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

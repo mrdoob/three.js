@@ -10,14 +10,14 @@
 	<body>
 		[page:LineSegments] &rarr;
 
-		<h1>[name]</h1>
+		<h1>Box3辅助工具（[name]）</h1>
 
 		<p class="desc">
-			Helper object to visualize a [page:Box3].
+			一个能使得[page:Box3]能够被看到的辅助工具。
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
 		var box = new THREE.Box3();
@@ -28,36 +28,36 @@
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Box3 box], [param:Color color] )</h3>
 		<p>
-		[page:Box3 box]  -- the Box3 to show.<br />
-		[page:Color color] --  (optional) the box's color. Default is 0xffff00.<br /><br />
-
-		Creates a new wireframe box that represents the passed Box3.
+		[page:Box3 box]  -- 将要显示的Box3对象。<br />
+		[page:Color color] --  （可选） box的颜色，默认值为0xffff00。<br /><br />
+		
+		创建一个用于表示所传入的Box3的线框盒子。
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:LineSegments] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:LineSegments]来查看共有属性。</p>
 
 		<h3>[property:Box3 box]</h3>
-		<p>The Box3 being visualized.</p>
+		<p>将要被显示的Box3。</p>
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:LineSegments] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:LineSegments]来查看共有方法。</p>
 
 
 		<h3>[method:void updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
-			This overrides the method in the base [page:Object3D] class so that it
-			also updates the wireframe box to the extent of the [page:Box3Helper.box .box]
-			property.
+			它覆盖了其基类[page:Object3D]中的方法，所以
+			它还将更新线框盒子到[page:Box3Helper.box .box]
+			属性的范围。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

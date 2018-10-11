@@ -10,14 +10,14 @@
 	<body>
 		[page:LineSegments] &rarr;
 
-		<h1>[name]</h1>
+		<h1>摄像机辅助工具（[name]）</h1>
 
 		<p class="desc">
-		This helps with visualizing what a camera contains in its frustum.<br />
-		It visualizes the frustum of a camera using a [page:LineSegments].
+			它将会显示摄像机，包括摄像机的视锥体。<br />
+			它使用[page:LineSegments]（线段）来显示摄像机视锥体。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<div>[example:webgl_camera WebGL / camera]</div>
 		<div>[example:webgl_geometry_extrude_splines WebGL / extrude / splines]</div>
@@ -29,50 +29,51 @@ scene.add( helper );
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Camera camera] )</h3>
 		<p>
-		[page:Camera camera] -- The camera to visualize.<br /><br />
+		[page:Camera camera] -- 将会被CameraHelper可视化的相机。<br /><br />
 
-		This create a new [Name] for the specified camera.
+		为特定的摄像机创建一个新的 [Name]。
 		</p>
 
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:LineSegments] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:LineSegments]来查看共有属性。</p>
 
 
 
 		<h3>[property:Camera camera]</h3>
-		<p>The camera being visualized.</p>
+		<p>将会被可视化的摄像机。</p>
 
 		<h3>[property:object pointMap]</h3>
-		<p>This contains the points used to visualize the camera.</p>
+		<p>它包括了用于可视化相机的点。
+			This contains the points used to visualize the camera.</p>
 
 		<h3>[property:object matrix]</h3>
-		<p>Reference to the [page:Object3D.matrixWorld camera.matrixWorld].</p>
+		<p>对[page:Object3D.matrixWorld camera.matrixWorld]的引用。</p>
 
 		<h3>[property:object matrixAutoUpdate]</h3>
 		<p>
-			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
-			camera's [page:Object3D.matrixWorld matrixWorld].
+			请参阅[page:Object3D.matrixAutoUpdate]。在这里将其设置为*false*，因为辅助工具使用的是
+			相机的[page:Object3D.matrixWorld matrixWorld]。
 		</p>
 
 
 
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:LineSegments] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:LineSegments]来查看共有方法。</p>
 
 
 		<h3>[method:null update]()</h3>
-		<p>Updates the helper based on the projectionMatrix of the camera.</p>
+		<p>基于摄像机的projectionMatrix（投影矩阵）来更新辅助工具。</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
