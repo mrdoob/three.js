@@ -17723,7 +17723,22 @@
 
 		function init() {
 
+			// make sure renderItem references to various objects are nulls, so that they do not prevent
+			// the objects being garbage collected
+
+			// null only items not used in the previous frame (those are typically only just a few)
+			for ( var i = renderItemsIndex; i < renderItems.length; i ++ ) {
+
+				var renderItem = renderItems[ i ];
+				renderItem.object = null;
+				renderItem.geometry = null;
+				renderItem.material = null;
+				renderItem.program = null;
+
+			}
+
 			renderItemsIndex = 0;
+
 
 			opaque.length = 0;
 			transparent.length = 0;
