@@ -25,10 +25,12 @@ ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototyp
 	 * And that near and far planes are identical for both cameras.
 	 */
 	setProjectionFromUnion: function () {
+
 		var cameraLPos = new Vector3();
 		var cameraRPos = new Vector3();
 
 		return function () {
+
 			cameraLPos.setFromMatrixPosition( this.cameras[ 0 ].matrixWorld );
 			cameraRPos.setFromMatrixPosition( this.cameras[ 1 ].matrixWorld );
 
@@ -54,15 +56,15 @@ ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototyp
 
 			// Calculate the new camera's position offset from the
 			// left camera.
-			var zOffset = ipd / (leftFovL + rightFovR);
+			var zOffset = ipd / ( leftFovL + rightFovR );
 			var xOffset = zOffset * leftFovL;
 
 			// TODO: Better way to apply this offset?
 			this.cameras[ 0 ].matrixWorld.decompose( this.position, this.quaternion, this.scale );
-			this.translateX(xOffset);
-			this.translateZ(-zOffset);
+			this.translateX( xOffset );
+			this.translateZ( - zOffset );
 			this.matrixWorld.compose( this.position, this.quaternion, this.scale );
-			this.matrixWorldInverse.getInverse(this.matrixWorld);
+			this.matrixWorldInverse.getInverse( this.matrixWorld );
 
 			// Find the union of the frustum values of the cameras and scale
 			// the values so that the near plane's position does not change in world space,
@@ -70,12 +72,14 @@ ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototyp
 			var near2 = near + zOffset;
 			var far2 = far + zOffset;
 			var left = leftL - xOffset;
-			var right = rightR + (ipd - xOffset)
+			var right = rightR + ( ipd - xOffset );
 			var top = Math.max( topL, topR );
 			var bottom = Math.min( bottomL, bottomR );
 
 			this.projectionMatrix.makePerspective( left, right, top, bottom, near2, far2 );
-		}
+
+		};
+
 	}(),
 
 } );
