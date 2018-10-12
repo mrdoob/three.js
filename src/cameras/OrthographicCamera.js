@@ -79,6 +79,20 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	},
 
+	setViewFrustrum: function ( left, right, top, bottom, near, far ) {
+
+			this.left = left;
+			this.right = right;
+			this.top = top;
+			this.bottom = bottom;
+
+			this.near = ( near !== undefined ) ? near : 0.1;
+			this.far = ( far !== undefined ) ? far : 2000;
+
+			this.updateProjectionMatrix();
+
+	},
+
 	clearViewOffset: function () {
 
 		if ( this.view !== null ) {
