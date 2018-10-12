@@ -10,17 +10,17 @@
 	<body>
 		[page:LineSegments] &rarr;
 
-		<h1>盒子辅助工具（[name]）</h1>
+		<h1>[name]</h1>
 
 		<p class="desc">
-			一个用于在对象周围显示沿世界轴对齐的定界框的辅助对象。
+			Helper object to show the world-axis-aligned bounding box around an object.
 
-			请注意，该对象必须具有[page:Geometry]或者[page:BufferGeometry]对象才能工作，
-			因此它不适用于[page:Sprite Sprites]。
+			Note that the object must have a [page:Geometry] or [page:BufferGeometry] for this to work,
+			so it won't work with [page:Sprite Sprites].
 		</p>
 
 
-		<h2>示例</h2>
+		<h2>Example</h2>
 
 		<div>[example:webgl_helpers WebGL / helpers]</div>
 		<div>[example:webgl_loader_nrrd WebGL / loader / nrrd]</div>
@@ -35,39 +35,39 @@
 		</code>
 
 
-		<h2>构造器</h2>
+		<h2>Constructor</h2>
 
 
 		<h3>[name]( [param:Object3D object], [param:Color color] )</h3>
 		<p>
-		[page:Object3D object]  -- （可选）将要用于显示沿世界轴对其的定界框的object3D（三维物体）。<br />
-		[page:Color color] --  （可选）十六进制值，用于定义定界框的颜色，默认值为0xffff00。<br /><br />
+		[page:Object3D object]  -- (optional) the object3D to show the world-axis-aligned boundingbox.<br />
+		[page:Color color] --  (optional) hexadecimal value that defines the box's color. Default is 0xffff00.<br /><br />
 
-		创建一个新的、包围着所传入的物体的线框盒子。在内部，它使用[page:Box3.setFromObject]来计算维度。
-		请注意，它包括所传入物体（对象）的任何子级。
+		Creates a new wireframe box that bounds the passed object. Internally this uses [page:Box3.setFromObject]
+		to calculate the dimensions. Note that this includes any children.
 		</p>
 
-		<h2>属性Properties</h2>
-		<p>请参阅其基类[page:LineSegments]来查看共有属性。</p>
+		<h2>Properties</h2>
+		<p>See the base [page:LineSegments] class for common properties.</p>
 
 
-		<h2>方法Methods</h2>
-		<p>请参阅其基类[page:LineSegments]来查看共有方法。</p>
+		<h2>Methods</h2>
+		<p>See the base [page:LineSegments] class for common methods.</p>
 
 		<h3>[method:null update]()</h3>
 		<p>
-			更新辅助工具中的几何体，以匹配该物体（包括其子级）的尺寸。
-			请参阅[page:Box3.setFromObject]。
+			Updates the helper's geometry to match the dimensions
+			of the object, including any children. See [page:Box3.setFromObject].
 		</p>
 
 		<h3>[method:BoxHelper setFromObject]( [param:Object3D object] )</h3>
 		<p>
-			[page:Object3D object] -  将用于创建辅助工具的[page:Object3D]。<br /><br />
+			[page:Object3D object] - [page:Object3D] to create the helper of.<br /><br />
 
-			更新所传入的物体的线框盒子。
+			Updates the wireframe box for the passed object.
 		</p>
 
-		<h2>源代码Source</h2>
+		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

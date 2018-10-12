@@ -10,13 +10,13 @@
 	<body>
 		[page:Object3D] &rarr;
 
-		<h1>半球光辅助工具（[name]）</h1>
+		<h1>[name]</h1>
 
 		<p class="desc">
-			为[page:HemisphereLight HemisphereLight]创建一个由spherical [page:Mesh]（球状网格）所组成的视觉辅助对象。
+			Creates a visual aid consisting of a spherical [page:Mesh] for a [page:HemisphereLight HemisphereLight].
 		</p>
 
-		<h3>示例</h3>
+		<h3>Example</h3>
 
 		<code>
 var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
@@ -27,51 +27,51 @@ scene.add( helper );
 		</code>
 
 
-		<h2>构造器</h2>
+		<h2>Constructor</h2>
 
 		<h3>[name]( [param:HemisphereLight light], [param:Number sphereSize], [param:Hex color] )</h3>
 		<p>
-			[page:HemisphereLight light] -- 将要用于可视化的光线。<br /><br />
+			[page:HemisphereLight light] -- The light being visualized. <br /><br />
 
-			[page:Number size] -- 用于表示可视化的光线的网格大小。<br /><br />
+			[page:Number size] -- The size of the mesh used to visualize the light.<br /><br />
 
-			[page:Hex color] -- （可选）如果没有设置这个值，辅助工具将会使用光线本身的颜色。
+			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
 		</p>
 
 
-		<h2>属性</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
 
 		<h3>[property:HemisphereLight light]</h3>
-		<p>对被可视化的HemisphereLight的引用。</p>
+		<p>Reference to the HemisphereLight being visualized.</p>
 
 		<h3>[property:object matrix]</h3>
-		<p>hemisphereLight中[page:Object3D.matrixWorld matrixWorld]的引用。</p>
+		<p>Reference to the hemisphereLight's [page:Object3D.matrixWorld matrixWorld].</p>
 
 		<h3>[property:object matrixAutoUpdate]</h3>
 		<p>
-			请参阅[page:Object3D.matrixAutoUpdate]。
-			在这里将这个值设为*false*，因为辅助工具使用hemisphereLight中的[page:Object3D.matrixWorld matrixWorld]。
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			hemisphereLight's [page:Object3D.matrixWorld matrixWorld].
 		</p>
 
 		<h3>[property:hex color]</h3>
 		<p>
-			颜色参数是在构造函数中传入的，默认值为*undefined*。
-			如果这个值发生了改变，则在下一次[page:.update update]被调用时，辅助工具的颜色将会更新。
+			 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
+			the next time [page:.update update] is called.
 		</p>
 
 
-		<h2>方法</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
 
 		<h3>[method:null dispose]()</h3>
 		<p>Dispose of the hemisphereLightHelper.</p>
 
 		<h3>[method:null update]()</h3>
-		<p>更新辅助工具，使其匹配[page:.light]的位置与方向。</p>
+		<p>Updates the helper to match the position and direction of the [page:.light].</p>
 
 
-		<h2>源代码</h2>
+		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

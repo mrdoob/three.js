@@ -10,13 +10,12 @@
 	<body>
 		[page:Line] &rarr;
 
-		<h1>极坐标网格辅助工具（[name]）</h1>
+		<h1>[name]</h1>
 
-		<p class="desc">PolarGridHelper（极坐标网格辅助工具）是一个用于定义极坐标网格的对象。
-			 网格是一个由线组成的二维数组。</p>
+		<p class="desc">The PolarGridHelper is an object to define polar grids. Grids are two-dimensional arrays of lines.</p>
 
 
-		<h2>示例</h2>
+		<h2>Example</h2>
 
 		<code>var radius = 10;
 		var radials = 16;
@@ -29,23 +28,22 @@
 		[example:webgl_helpers Example using various helpers]
 
 
-		<h2>构造器</h2>
+		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Number radius], [param:Number radials], [param:Number circles], [param:Number divisions], [param:Color color1], [param:Color color2] )</h3>
 		<p>
-		radius -- 极坐标网格的半径。这个值可以是任意正数，默认值为10。<br />
-		radials -- 圆的径向分段数量。这个值可以是任意正整数，默认值为16。<br />
-		circles -- 圆的数量。这个值可以是任意正整数，默认值为8。<br />
-		divisions -- 每个圆的线分段数。这个值可以是任意大于或等于3的正整数，默认值为64。<br />
-		color1 -- 用于网格元素的第一种颜色。这个值可以是[page:Color]对象、十六进制值或CSS颜色名。默认值是0x444444。<br />
-		color2 -- 用于网格元素的第二种颜色。这个值可以是[page:Color]对象、十六进制值或CSS颜色名。默认值是0x888888。
+		radius -- The radius of the polar grid. This can be any positive number. Default is 10.<br />
+		radials -- The number of radial lines. This can be any positive integer. Default is 16.<br />
+		circles -- The number of circles. This can be any positive integer. Default is 8.<br />
+		divisions -- The number of line segments used for each circle. This can be any positive integer that is 3 or greater. Default is 64.<br />
+		color1 -- The first color used for grid elements. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x444444 <br />
+		color2 -- The second color used for grid elements. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x888888
 		</p>
 		<p>
-		创建一个新的以'radius'为半径、径向分段数为'radials'、具有'circles'个圆的[name]（极坐标网格辅助工具），其每个圆的圆周被细分为'divisions'段。颜色为可选值。
-		Creates a new  of radius 'radius' with 'radials' number of radials and 'circles' number of circles, where each circle is smoothed into 'divisions' number of line segments. Colors are optional.
+		Creates a new [name] of radius 'radius' with 'radials' number of radials and 'circles' number of circles, where each circle is smoothed into 'divisions' number of line segments. Colors are optional.
 		</p>
 
-		<h2>源代码</h2>
+		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

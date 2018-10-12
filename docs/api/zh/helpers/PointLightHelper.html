@@ -10,15 +10,15 @@
 	<body>
 		[page:Mesh] &rarr;
 
-		<h1>点光源辅助工具[name]</h1>
+		<h1>[name]</h1>
 
 		<p class="desc">
-			在场景中显示一个用于使[page:PointLight]（点光源）可视化的、
-			由spherical [page:Mesh]（球形网格）组成的辅助工具对象，
+			This displays a helper object consisting of a spherical [page:Mesh] for visualizing
+			 a [page:PointLight].
 		 </p>
 
 
-		<h2>示例</h2>
+		<h2>Example</h2>
 
 		[example:webgl_helpers WebGL /  helpers]
 
@@ -35,49 +35,49 @@
 
 
 
-		<h2>构造器</h2>
+		<h2>Constructor</h2>
 
 		<h3>[name]( [param:PointLight light], [param:Float sphereSize], [param:Hex color] )</h3>
 		<p>
-		[page:PointLight light] -- 将会被可视化的光。 <br /><br />
+		[page:PointLight light] -- The light to be visualized. <br /><br />
 
-		[page:Float sphereSize] -- （可选）球形辅助工具的尺寸大小，默认值为*1*。<br /><br />
+		[page:Float sphereSize] -- (optional) The size of the sphere helper. Default is *1*.<br /><br />
 
-		[page:Hex color] -- （可选）如果没有设置这个值，辅助工具将会使用光线本身的颜色。
+		[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
 		</p>
 
-		<h2>属性</h2>
-		<p>请参阅其基类[page:Mesh]来查看共有属性。</p>
+		<h2>Properties</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
 
 		<h3>[property:PointLight light]</h3>
-		<p>将会被可视化的[page:PointLight]。</p>
+		<p>The [page:PointLight] that is being visualized.</p>
 
 		<h3>[property:object matrix]</h3>
-		<p>对pointLight的[page:Object3D.matrixWorld matrixWorld]引用。</p>
+		<p>Reference to the pointLight's [page:Object3D.matrixWorld matrixWorld].</p>
 
 		<h3>[property:object matrixAutoUpdate]</h3>
 		<p>
-			请参阅[page:Object3D.matrixAutoUpdate]。在这里将这个值设为*false*，
-			因为辅助工具使用pointLight中的[page:Object3D.matrixWorld matrixWorld]。
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			pointLight's [page:Object3D.matrixWorld matrixWorld].
 		</p>
 
 		<h3>[property:hex color]</h3>
 		<p>
-			颜色参数是在构造函数中传入的，默认值为*undefined*。
-			如果这个值发生了改变，则在下一次[page:.update update]被调用时，辅助工具的颜色将会更新。
+			 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
+			the next time [page:.update update] is called.
 		</p>
 
-		<h2>方法</h2>
-		<p>请参阅其基类[page:Mesh]来查看共有方法。</p>
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
 
 		<h3>[method:null dispose]()</h3>
 		<p>Dispose of the pointLightHelper.</p>
 
 
 		<h3>[method:null update]()</h3>
-		<p>更新辅助工具，使其匹配[page:.light]的位置与方向。</p>
+		<p>Updates the helper to match the position of the [page:.light].</p>
 
-		<h2>源代码</h2>
+		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

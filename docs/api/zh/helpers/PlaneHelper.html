@@ -10,14 +10,14 @@
 	<body>
 		[page:LineSegments] &rarr;
 
-		<h1>平面辅助工具[name]</h1>
+		<h1>[name]</h1>
 
 		<p class="desc">
-			用于显示[page:Plane]（平面）的辅助工具。
+			Helper object to visualize a [page:Plane].
 		</p>
 
 
-		<h2>示例</h2>
+		<h2>Example</h2>
 
 		<code>
 		var plane = new THREE.Plane( new THREE.Vector3( 1, 1, 0.2 ), 3 );
@@ -26,40 +26,39 @@
 		</code>
 
 
-		<h2>构造器</h2>
+		<h2>Constructor</h2>
 
 
 		<h3>[name]( [param:Plane plane], [param:Float size], [param:Color hex] )</h3>
 		<p>
-		[page:Plane plane] --  将会被可视化的平面<br />
-		[page:Float size] -- （可选） 平面辅助工具的边长，默认值为1。<br />
-		[page:Color color] --  （可选）平面辅助工具的颜色，默认值为0xffff00。<br /><br />
+		[page:Plane plane] --  the plane to visualize.<br />
+		[page:Float size] -- (optional) side length of plane helper. Default is 1.<br />
+		[page:Color color] --  (optional) the color of the helper. Default is 0xffff00.<br /><br />
 
-		创建一个新的线框，以用于表示所传入的平面。
 		Creates a new wireframe representation of the passed plane.
 		</p>
 
-		<h2>属性</h2>
-		<p>请参阅其基类[page:LineSegments]来查看共有属性。</p>
+		<h2>Properties</h2>
+		<p>See the base [page:LineSegments] class for common properties.</p>
 
 		<h3>[property:Plane plane]</h3>
-		<p>将会被可视化的[page:Plane plane]（平面）。</p>
+		<p>The [page:Plane plane] being visualized.</p>
 
 		<h3>[property:Float size]</h3>
-		<p>plane helper（平面辅助工具）的边长。</p>
+		<p>The side lengths of plane helper.</p>
 
 
-		<h2>方法</h2>
-		<p>请参阅其基类[page:LineSegments]来查看共有属性。</p>
+		<h2>Methods</h2>
+		<p>See the base [page:LineSegments] class for common methods.</p>
 
 		<h3>[method:void updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
-			该方法覆盖了其基类[page:Object3D]中的方法，因此它也将
-			根据[page:PlaneHelper.plane .plane]和[page:PlaneHelper.size .size]属性
-			来更新辅助工具对象。
+			This overrides the method in the base [page:Object3D] class so that it also
+			updates the helper object according to the [page:PlaneHelper.plane .plane] and
+			[page:PlaneHelper.size .size] properties.
 		</p>
 
-		<h2>源代码</h2>
+		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

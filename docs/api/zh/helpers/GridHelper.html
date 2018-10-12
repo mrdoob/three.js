@@ -10,13 +10,12 @@
 	<body>
 		[page:Line] &rarr;
 
-		<h1>网格辅助工具（[name]）</h1>
+		<h1>[name]</h1>
 
-		<p class="desc">
-			GridHelper是一个用于定义网格的对象，网格是由线组成的二维数组。.</p>
+		<p class="desc">The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.</p>
 
 
-		<h2>示例</h2>
+		<h2>Example</h2>
 
 		<code>var size = 10;
 		var divisions = 10;
@@ -27,20 +26,20 @@
 		[example:webgl_helpers Example using various helpers]
 
 
-		<h2>构造器</h2>
+		<h2>Constructor</h2>
 
 		<h3>[name]( [param:number size], [param:Number divisions], [param:Color colorCenterLine], [param:Color colorGrid] )</h3>
 		<p>
-		size -- 网格的尺寸，默认值为10。<br />
-		divisions -- 网格的划分数，默认值为10。<br />
-		colorCenterLine -- 网格中线的颜色。这个值可以是[page:Color]对象、十六进制值或CSS颜色名。默认值为0x444444。<br />
-		colorGrid -- 网格线的颜色。这个值可以是[page:Color]对象、十六进制值或CSS颜色名。默认值为0x888888。
+		size -- The size of the grid. Default is 10. <br />
+		divisions -- The number of divisions across the grid. Default is 10. <br />
+		colorCenterLine -- The color of the centerline. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x444444 <br />
+		colorGrid -- The color of the lines of the grid. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x888888
 		</p>
 		<p>
-			创建一个新的每条边具有'size'大小、被分为'divisions'段的[name]。其中的颜色值是可选的。
+		Creates a new [name] of size 'size' and divided into 'divisions' segments per side. Colors are optional.
 		</p>
 
-		<h2>源代码</h2>
+		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

@@ -10,12 +10,12 @@
 	<body>
 		[page:Object3D] &rarr;
 
-		<h1>箭头辅助工具（[name]）</h1>
+		<h1>[name]</h1>
 
-		<p class="desc">一个用于将方向可视化的三维物体。</p>
+		<p class="desc">An 3D arrow object for visualizing directions.</p>
 
 
-		<h2>示例</h2>
+		<h2>Example</h2>
 
 		<div>[example:webgl_geometries WebGL / geometries]</div>
 		<div>[example:webgl_geometry_normals WebGL / geometry / normals]</div>
@@ -37,61 +37,61 @@
 
 
 
-		<h2>构造器</h2>
+		<h2>Constructor</h2>
 
 
 		<h3>[name]([param:Vector3 dir], [param:Vector3 origin], [param:Number length], [param:Number hex], [param:Number headLength], [param:Number headWidth] )</h3>
 		<p>
-		[page:Vector3 dir] -- 起始方向，必须是一个单位向量。<br />
-		[page:Vector3 origin] -- 箭头起始点。<br />
-		[page:Number length] -- 箭头长度，默认值为*1*。<br />
-		[page:Number hex] -- 箭头颜色，十六进制值，默认值为0xffff00。<br />
-		[page:Number headLength] -- 箭头头部的长度，默认值为0.2 * length。<br />
-		[page:Number headWidth] -- 箭头头部的宽度，默认值为0.2 * headLength。
+		[page:Vector3 dir] -- direction from origin. Must be a unit vector. <br />
+		[page:Vector3 origin] -- Point at which the arrow starts.<br />
+		[page:Number length] -- length of the arrow. Default is *1*.<br />
+		[page:Number hex] -- hexadecimal value to define color. Default is 0xffff00.<br />
+		[page:Number headLength] -- The length of the head of the arrow. Default is 0.2 * length.<br />
+		[page:Number headWidth] -- The length of the width of the arrow. Default is 0.2 * headLength.
 		</p>
 
-		<h2>属性</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
 
 
 		<h3>[property:Line line]</h3>
-		<p>包含arrowHelper中线的部分。</p>
+		<p>Contains the line part of the arrowHelper.</p>
 
 		<h3>[property:Mesh cone]</h3>
-		<p>包含arrowHelper中圆锥的部分。</p>
+		<p>Contains the cone part of the arrowHelper.</p>
 
 
 
 
-		<h2>方法</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
 
 
 
 		<h3>[method:null setColor]([param:Number hex])</h3>
 		<p>
-		hex -- 颜色值，以十六进制来进行表示。<br /><br />
+		hex -- The hexadecimal value of the color.<br /><br />
 
-		用于设置arrowHelper的颜色。
+		Sets the color of the arrowHelper.
 		</p>
 
 		<h3>[method:null setLength]([param:Number length], [param:Number headLength], [param:Number headWidth])</h3>
 		<p>
-		length -- 所需的arrowHelper的长度。<br />
-		headLength -- 箭头头部的长度。<br />
-		headWidth -- 箭头头部的宽度。<br /><br />
+		length -- The desired length.<br />
+		headLength -- The length of the head of the arrow.<br />
+		headWidth -- The length of the width of the arrow.<br /><br />
 
-		用于设置arrowhelper的长度。
+		Sets the length of the arrowhelper.
 		</p>
 
 		<h3>[method:null setDirection]([param:Vector3 dir])</h3>
 		<p>
-		dir -- 所需的arrowHelper的方向，必须是一个单位向量。<br /><br />
+		dir -- The desired direction. Must be a unit vector.<br /><br />
 
-		用于设置arrowhelper的方向。
+		Sets the direction of the arrowhelper.
 		</p>
 
-		<h2>源代码</h2>
+		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
