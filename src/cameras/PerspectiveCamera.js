@@ -174,7 +174,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	},
 
-	setViewFrustrum: function ( fov, aspect, near, far ) {
+	set: function ( fov, aspect, near, far ) {
 
 		this.fov = ( fov !== undefined ) ? fov : this.fov;
 
