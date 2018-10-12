@@ -81,13 +81,13 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	setViewFrustrum: function ( left, right, top, bottom, near, far ) {
 
-			this.left = left;
-			this.right = right;
-			this.top = top;
-			this.bottom = bottom;
+			this.left = ( left !== undefined ) ? left : this.left;
+			this.right = ( right !== undefined ) ? right: this.right;
+			this.top = ( top !== undefined ) ? top : this.top;
+			this.bottom = ( bottom !== undefined ) ? bottom: this.bottom;
 
-			this.near = ( near !== undefined ) ? near : 0.1;
-			this.far = ( far !== undefined ) ? far : 2000;
+			this.near = ( near !== undefined ) ? near : this.near;
+			this.far = ( far !== undefined ) ? far : this.far;
 
 			this.updateProjectionMatrix();
 

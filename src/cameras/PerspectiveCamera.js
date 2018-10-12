@@ -176,12 +176,12 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	setViewFrustrum: function ( fov, aspect, near, far ) {
 
-			this.fov = ( fov !== undefined ) ? fov : 50;
+			this.fov = ( fov !== undefined ) ? fov : this.fov;
 
-			this.aspect = ( aspect !== undefined ) ? aspect : 1;
+			this.aspect = ( aspect !== undefined ) ? aspect : this.aspect;
 
-			this.near = ( near !== undefined ) ? near : 0.1;
-			this.far = ( far !== undefined ) ? far : 2000;
+			this.near = ( near !== undefined ) ? near : this.near;
+			this.far = ( far !== undefined ) ? far : this.far;
 
 			this.updateProjectionMatrix();
 
