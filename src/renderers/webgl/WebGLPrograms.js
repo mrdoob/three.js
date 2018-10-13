@@ -149,7 +149,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			matcap: !! material.matcap,
 			matcapEncoding: getTextureEncodingFromMap( material.matcap, renderer.gammaInput ),
 			envMap: !! material.envMap,
-			envMapMapping: material.envMap && material.envMap.mapping,
 			envMapMode: material.envMap && material.envMap.mapping,
 			envMapEncoding: getTextureEncodingFromMap( material.envMap, renderer.gammaInput ),
 			envMapCubeUV: ( !! material.envMap ) && ( ( material.envMap.mapping === CubeUVReflectionMapping ) || ( material.envMap.mapping === CubeUVRefractionMapping ) ),
@@ -169,7 +168,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			gradientMap: !! material.gradientMap,
 
 			combine: material.combine,
-			index0AttributeName: material,
+			index0AttributeName: material.index0AttributeName,
 
 			vertexColors: material.vertexColors,
 
