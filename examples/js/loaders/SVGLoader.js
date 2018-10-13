@@ -37,6 +37,77 @@ THREE.SVGLoader.prototype = {
 
 	parse: function ( text ) {
 
+		// Presentation attributes from https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/Presentation 
+		// These are attributes that can be applied to an SVG attribute which represent a style.
+		var presentationAttributes = [
+			'alignment-baseline',
+			'baseline-shift',
+			'clip',
+			'clip-path',
+			'clip-rule',
+			'color',
+			'color-interpolation',
+			'color-interpolation-filters',
+			'color-profile',
+			'color-rendering',
+			'cursor',
+			'direction',
+			'display',
+			'dominant-baseline',
+			'enable-background',
+			'fill',
+			'fill-opacity',
+			'fill-rule',
+			'filter',
+			'flood-color',
+			'flood-opacity',
+			'font-family',
+			'font-size',
+			'font-size-adjust',
+			'font-stretch',
+			'font-style',
+			'font-variant',
+			'font-weight',
+			'glyph-orientation-horizontal',
+			'glyph-orientation-vertical',
+			'image-rendering',
+			'kerning',
+			'letter-spacing',
+			'lighting-color',
+			'marker-end',
+			'marker-mid',
+			'marker-start',
+			'mask',
+			'opacity',
+			'overflow',
+			'paint-order',
+			'pointer-events',
+			'shape-rendering',
+			'solid-color',
+			'solid-opacity',
+			'stop-color',
+			'stop-opacity',
+			'stroke',
+			'stroke-dasharray',
+			'stroke-dashoffset',
+			'stroke-linecap',
+			'stroke-linejoin',
+			'stroke-miterlimit',
+			'stroke-opacity',
+			'stroke-width',
+			'text-anchor',
+			'text-decoration',
+			'text-overflow',
+			'text-rendering',
+			'transform',
+			'unicode-bidi',
+			'vector-effect',
+			'visibility',
+			'white-space',
+			'word-spacing',
+			'writing-mode',
+		];
+
 		function parseNode( node, style ) {
 
 			if ( node.nodeType !== 1 ) return;
@@ -675,20 +746,30 @@ THREE.SVGLoader.prototype = {
 		//
 
 		function parseStyle( node, style ) {
-
+			
 			style = Object.assign( {}, style ); // clone style
 
-			if ( node.hasAttribute( 'fill' ) ) style.fill = node.getAttribute( 'fill' );
-			if ( node.style.fill !== '' ) style.fill = node.style.fill;
+			// Clone the node's style attribute
+			if (node.style)
+				Object.assign(style, node.style);
 
+			presentationAttributes.forEach(attribute => {
+				if ( node.hasAttribute( attribute ) &&
+					 node.getAttribute( attribute ) !== '' ) 
+					 node.style[attribute] = node.getAttribute( attribute );
+			});
+				
 			return style;
 
 		}
 
 		function isVisible( style ) {
 
-			return style.fill !== 'none' && style.fill !== 'transparent';
-
+			return !(
+					(style.visibility && style.visibility == 'hidden') || 
+					(style.display && style.display == 'none')
+			);
+			
 		}
 
 		// http://www.w3.org/TR/SVG11/implnote.html#PathElementImplementationNotes
