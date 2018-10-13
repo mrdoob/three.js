@@ -1499,7 +1499,7 @@ function WebGLRenderer( parameters ) {
 			}
 
 			material.onBeforeCompile( materialProperties.shader, _this );
-			
+
 			parameters.shaderName = materialProperties.shader.name;
 			parameters.vertexShader = materialProperties.shader.vertexShader;
 			parameters.fragmentShader = materialProperties.shader.fragmentShader;

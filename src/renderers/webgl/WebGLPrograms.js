@@ -132,20 +132,24 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		var currentRenderTarget = renderer.getRenderTarget();
 
 		var parameters = {
-			
+
 			shaderName: material.type,
 			shaderID: shaderID,
-			vertexShader : material.vertexShader,
-			fragmentShader : material.fragmentShader,
-
+			vertexShader: material.vertexShader,
+			fragmentShader: material.fragmentShader,
+			defines: material.defines,
 			precision: precision,
 			supportsVertexTextures: capabilities.vertexTextures,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
+
+			isRawShaderMaterial: material.isRawShaderMaterial,
+			isShaderMaterial: material.isShaderMaterial,
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
 			matcap: !! material.matcap,
 			matcapEncoding: getTextureEncodingFromMap( material.matcap, renderer.gammaInput ),
 			envMap: !! material.envMap,
+			envMapMapping: material.envMap && material.envMap.mapping,
 			envMapMode: material.envMap && material.envMap.mapping,
 			envMapEncoding: getTextureEncodingFromMap( material.envMap, renderer.gammaInput ),
 			envMapCubeUV: ( !! material.envMap ) && ( ( material.envMap.mapping === CubeUVReflectionMapping ) || ( material.envMap.mapping === CubeUVRefractionMapping ) ),
@@ -165,6 +169,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			gradientMap: !! material.gradientMap,
 
 			combine: material.combine,
+			index0AttributeName: material,
 
 			vertexColors: material.vertexColors,
 
@@ -210,8 +215,13 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			flipSided: material.side === BackSide,
 
 			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
+
+			isWebGL2: capabilities.isWebGL2,
 			
-			isWebGL2: capabilities.isWebGL2
+			extensionDerivatives: material.extensions && material.extensions.derivatives,
+			extensionFragDepth: material.extensions && material.extensions.frawbuffers,
+			extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
+			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
 
 		};
 
@@ -281,11 +291,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, parameters );
+			program = new WebGLProgram( renderer, extensions, code, parameters );
 			programs.push( program );
 
 		}
-		
+
 		return program;
 
 	};
