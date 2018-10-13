@@ -132,8 +132,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		var currentRenderTarget = renderer.getRenderTarget();
 
 		var parameters = {
-
+			
+			shaderName: material.type,
 			shaderID: shaderID,
+			vertexShader : material.vertexShader,
+			fragmentShader : material.fragmentShader,
 
 			precision: precision,
 			supportsVertexTextures: capabilities.vertexTextures,
@@ -254,7 +257,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	};
 
-	this.acquireProgram = function ( material, shader, parameters, code ) {
+	this.acquireProgram = function ( material, parameters, code ) {
 
 		var program;
 
@@ -276,11 +279,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities );
+			program = new WebGLProgram( renderer, extensions, code, material, parameters, capabilities );
 			programs.push( program );
 
 		}
-
+		
 		return program;
 
 	};

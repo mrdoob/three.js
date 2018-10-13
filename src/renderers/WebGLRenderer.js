@@ -1499,11 +1499,15 @@ function WebGLRenderer( parameters ) {
 			}
 
 			material.onBeforeCompile( materialProperties.shader, _this );
+			
+			parameters.shaderName = materialProperties.shader.name;
+			parameters.vertexShader = materialProperties.shader.vertexShader;
+			parameters.fragmentShader = materialProperties.shader.fragmentShader;
 
 			// Computing code again as onBeforeCompile may have changed the shaders
 			code = programCache.getProgramCode( material, parameters );
 
-			program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
+			program = programCache.acquireProgram( material, parameters, code );
 
 			materialProperties.program = program;
 			material.program = program;
