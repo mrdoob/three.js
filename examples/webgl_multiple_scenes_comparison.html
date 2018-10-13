@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - scene - multiple - compare</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				overflow: hidden;
+				text-align: center;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				z-index: 2;
+			}
+
+			.container {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+			}
+
+			.slider {
+				position: absolute;
+				cursor: ew-resize;
+
+				width: 40px;
+				height: 40px;
+				background-color: #2196F3;
+				opacity: 0.7;
+				border-radius: 50%;
+
+				top: calc(50% - 20px);
+				left: calc(50% - 20px);
+
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple scenes comparison<br />
+		</div>
+
+		<div class="container">
+			<div class="slider"></div>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/WebGL.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script>
+
+			var container, camera, renderer, controls;
+			var sceneL, sceneR;
+
+			var sliderPos = window.innerWidth / 2;
+			var sliderMoved = false;
+
+			function init() {
+
+				container = document.querySelector( '.container' );
+
+				sceneL = new THREE.Scene();
+				sceneL.background = new THREE.Color( 0xff00ff );
+
+				sceneR = new THREE.Scene();
+				sceneR.background = new THREE.Color( 0x8FBCD4 );
+
+				camera = new THREE.PerspectiveCamera( 35, container.clientWidth / container.clientHeight, 0.1, 10 );
+				camera.position.set( 2, 4, 7 );
+
+				controls = new THREE.OrbitControls( camera, container );
+
+				initMeshes();
+				initLights();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( container.clientWidth, container.clientHeight );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setScissorTest( true );
+
+				container.appendChild( renderer.domElement );
+
+				renderer.setAnimationLoop( function () {
+
+					render();
+
+				} );
+
+				initComparisons();
+
+			}
+
+			function initMeshes() {
+
+				var geoB = new THREE.BoxBufferGeometry( 2, 2, 2 );
+				var matB = new THREE.MeshStandardMaterial( { color: 0x0000ff } );
+				var meshB = new THREE.Mesh( geoB, matB );
+				sceneL.add( meshB );
+
+				var geoA = new THREE.IcosahedronBufferGeometry( 1, 0 );
+				var matA = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				var meshA = new THREE.Mesh( geoA, matA );
+				sceneR.add( meshA );
+
+			}
+
+			function initLights() {
+
+				var light1 = new THREE.DirectionalLight();
+				light1.position.set( 20, 20, 20 );
+				sceneL.add( light1 );
+				sceneR.add( light1.clone() );
+
+				var light2 = new THREE.DirectionalLight();
+				light2.position.set( - 20, 20, 20 );
+				sceneL.add( light2 );
+				sceneR.add( light2.clone() );
+
+			}
+
+			function render() {
+
+				renderer.setScissor( 0, 0, sliderPos, window.innerHeight );
+				renderer.render( sceneL, camera );
+
+				renderer.setScissor( sliderPos, 0, window.innerWidth, window.innerHeight );
+				renderer.render( sceneR, camera );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = container.clientWidth / container.clientHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( container.clientWidth, container.clientHeight );
+
+				if ( ! sliderMoved ) sliderPos = window.innerWidth / 2;
+
+			}
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			function initComparisons() {
+
+				var slider = document.querySelector( '.slider' );
+
+				var clicked = false;
+
+				function slideReady() {
+
+					clicked = true;
+					controls.enabled = false;
+
+				}
+
+				function slideFinish() {
+
+					clicked = false;
+					controls.enabled = true;
+
+				}
+
+				function slideMove( e ) {
+
+					if ( ! clicked ) return false;
+
+					sliderMoved = true;
+
+					sliderPos = e.pageX;
+
+					//prevent the slider from being positioned outside the window bounds
+					if ( sliderPos < 0 ) sliderPos = 0;
+					if ( sliderPos > window.innerWidth ) sliderPos = window.innerWidth;
+
+					slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + "px";
+
+				}
+
+				slider.addEventListener( 'mousedown', slideReady );
+				window.addEventListener( 'mouseup', slideFinish );
+				slider.addEventListener( 'touchstart', slideReady );
+				window.addEventListener( 'touchstop', slideFinish );
+				window.addEventListener( 'mousemove', slideMove );
+				window.addEventListener( 'touchmove', slideMove );
+
+			}
+
+			init();
+
+		</script>
+
+	</body>
+
+</html>
