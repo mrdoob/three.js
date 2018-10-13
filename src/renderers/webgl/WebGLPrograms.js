@@ -216,16 +216,15 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
 
 			isWebGL2: capabilities.isWebGL2,
-			
+
 			extensionDerivatives: material.extensions && material.extensions.derivatives,
 			extensionFragDepth: material.extensions && material.extensions.frawbuffers,
 			extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
 			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
-			
-			renderExtensionFragDepth : extensions.get( 'EXT_frag_depth' ) !== undefined,
-			renderExtensionDrawBuffers : extensions.get( 'WEBGL_draw_buffers' ) !== undefined,
-			renderExtensionShaderTextureLod : extensions.get( 'EXT_shader_texture_lod' ) !== undefined,
-			
+
+			renderExtensionFragDepth: extensions.get( 'EXT_frag_depth' ) !== undefined,
+			renderExtensionDrawBuffers: extensions.get( 'WEBGL_draw_buffers' ) !== undefined,
+			renderExtensionShaderTextureLod: extensions.get( 'EXT_shader_texture_lod' ) !== undefined,
 
 		};
 
