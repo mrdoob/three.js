@@ -83,9 +83,9 @@ function generateExtensions( parameters, rendererExtensions ) {
 
 	var chunks = [
 		( parameters.extensionDerivatives || parameters.envMapCubeUV || parameters.bumpMap || ( parameters.normalMap && ! parameters.objectSpaceNormalMap ) || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
-		( parameters.extensionFragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
-		( parameters.extensionDrawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
-		( parameters.extensionShaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''
+		( parameters.extensionFragDepth || parameters.logarithmicDepthBuffer ) && parameters.rendererExtensionFragDepth ? '#extension GL_EXT_frag_depth : enable' : '',
+		( parameters.extensionDrawBuffers && parameters.rendererExtensionDrawBuffers ) ? '#extension GL_EXT_draw_buffers : require' : '',
+		( parameters.extensionShaderTextureLOD || parameters.envMap ) && parameters.rendererExtensionShaderTextureLod ? '#extension GL_EXT_shader_texture_lod : enable' : ''
 	];
 
 	return chunks.filter( filterEmptyLine ).join( '\n' );
@@ -200,7 +200,7 @@ function unrollLoops( string ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, parameters ) {
+function WebGLProgram( renderer, code, parameters ) {
 
 	var gl = renderer.context;
 
@@ -283,7 +283,7 @@ function WebGLProgram( renderer, extensions, code, parameters ) {
 
 	//
 
-	var customExtensions = parameters.isWebGL2 ? '' : generateExtensions( parameters, extensions );
+	var customExtensions = parameters.isWebGL2 ? '' : generateExtensions( parameters );
 
 	var customDefines = generateDefines( defines );
 
@@ -371,7 +371,7 @@ function WebGLProgram( renderer, extensions, code, parameters ) {
 			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || parameters.rendererExtensionFragDepth ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
@@ -476,9 +476,9 @@ function WebGLProgram( renderer, extensions, code, parameters ) {
 			parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || parameters.rendererExtensionFragDepth ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-			parameters.envMap && ( parameters.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
+			parameters.envMap && ( parameters.isWebGL2 || parameters.rendererExtensionShaderTextureLod ) ? '#define TEXTURE_LOD_EXT' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',

@@ -222,6 +222,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			extensionFragDepth: material.extensions && material.extensions.frawbuffers,
 			extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
 			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
+			
+			renderExtensionFragDepth : extensions.get( 'EXT_frag_depth' ) !== undefined,
+			renderExtensionDrawBuffers : extensions.get( 'WEBGL_draw_buffers' ) !== undefined,
+			renderExtensionShaderTextureLod : extensions.get( 'EXT_shader_texture_lod' ) !== undefined,
+			
 
 		};
 
@@ -291,7 +296,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, parameters );
+			program = new WebGLProgram( renderer, code, parameters );
 			programs.push( program );
 
 		}
