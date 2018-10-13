@@ -209,7 +209,9 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
 
-			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false
+			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
+			
+			isWebGL2: capabilities.isWebGL2
 
 		};
 
@@ -279,7 +281,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, parameters, capabilities );
+			program = new WebGLProgram( renderer, extensions, code, material, parameters );
 			programs.push( program );
 
 		}
