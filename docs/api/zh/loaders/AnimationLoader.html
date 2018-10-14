@@ -11,77 +11,77 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Class for loading [page:AnimationClip AnimationClips] in JSON format.
-			This uses the [page:FileLoader] internally for loading files.
+			以JSON格式来加载 [page:AnimationClip AnimationClips] 的一个类。
+			内部使用 [page:FileLoader] 来加载文件。
 		</p>
 
-		<h2>Example</h2>
+		<h2>例子</h2>
 
 		<code>
-		// instantiate a loader
+		// 初始化一个加载器
 		var loader = new THREE.AnimationLoader();
 
-		// load a resource
+		// 加载资源
 		loader.load(
-			// resource URL
+			// 资源URL
 			'animations/animation.js',
 
-			// onLoad callback
+			// onLoad回调
 			function ( animations ) {
-				// animations is an array of AnimationClips
+				// animations时一个AnimationClips组数
 			},
 
-			// onProgress callback
+			// onProgress回调
 			function ( xhr ) {
 				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
 			},
 
-			// onError callback
+			// onError回调
 			function ( err ) {
 				console.log( 'An error happened' );
 			}
 		);
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		[page:LoadingManager manager] — 加载器所使用的[page:LoadingManager loadingManager]。 默认为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 
-		Creates a new [name].
+		创建一个新的[name].
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:LoadingManager manager]</h3>
 		<p>
-			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
+			加载器正在使用的[page:LoadingManager loadingManager]。默认为[page:DefaultLoadingManager].
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — the path or URL to the file. This can also be a
+		[page:String url] — 文件的URL或者路径，也可以为
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Animation animation].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called if load errors.<br /><br />
+		[page:Function onLoad] — 加载完成时将调用。回调参数为将要加载的[page:Animation animation].<br />
+		[page:Function onProgress] —  将在加载过程中进行调用。参数为XMLHttpRequest实例，实例包含[page:Integer total]和[page:Integer loaded]字节。<br />
+		[page:Function onError] — 在加载错误时被调用。<br /><br />
 
-		Begin loading from url and pass the loaded animation to onLoad.
+            从URL中进行加载并将动画传递给onLoad。
 		</p>
 
 		<h3>[method:null parse]( [param:JSON json], [param:Function onLoad] )</h3>
 		<p>
-		[page:JSON json] — required<br />
-		[page:Function onLoad] — Will be called when parsing completes. <br /><br />
+		[page:JSON json] — 请求<br />
+		[page:Function onLoad] — 当解析完成时，将被调用 <br /><br />
 
-		Parse the JSON object and pass the result to onLoad. Individual clips in the object will
-		be parsed with [page:AnimationClip.parse].
+            解析JSON对象并将结果传递给onLoad。对象中的单个片段将
+            用[page [page:AnimationClip.parse]进行解析。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

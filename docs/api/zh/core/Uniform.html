@@ -10,11 +10,12 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Uniforms are global [link:https://www.opengl.org/documentation/glsl/ GLSL] variables. They are passed to shader programs.
+		<p class="desc">Uniforms 是 [link:https://www.opengl.org/documentation/glsl/ GLSL] 着色器中的全局变量。
 		</p>
 
-		<h3>Example</h3>
+		<h3>示例</h3>
 		<p>
+			在声明一个 [page:ShaderMaterial] 的 Uniform 变量时，该变量被值或对象声明。
 		When declaring a uniform of a [page:ShaderMaterial], it is declared by value or by object.
 		</p>
 		<code>
@@ -24,24 +25,21 @@
 		}
 		</code>
 
-		<h3>Uniform types</h3>
+		<h3>Uniform 种类</h3>
 
 		<p>
-		Each uniform must have a *value* property. The type of the value must correspond to the
-		type of the uniform variable in the GLSL code as specified for the primitive GLSL types
-		in the table below. Uniform structures and arrays are also supported. GLSL arrays of primitive
-		type must either be specified as an array of the corresponding THREE objects or as a flat
-		array containing the data of all the objects. In other words; GLSL primitives in arrays
-		must not be represented by arrays. This rule does not apply transitively.
-		An array of *vec2* arrays, each with a length of five vectors, must be an array of arrays,
-		of either five [page:Vector2] objects or ten *number*s.
+			每个 Uniform 必须包括一个 *value* 属性。value 的类型必须和下表中 GLSL 的基本类型相对应。同样，Uniform 的结构体和队列
+			也是支持的。 GLSL基本类型队列必须要么被显示声明为一个 THREE 对象的队列，要么被声明为一个包含所有对象数据的队列。这就是说，
+			队列中的 GLSL 基础类型不能再是一个队列。举例，一个有 5 个 *vec2* 元素的队列，必须是一个包含 5 个 [page:Vector2] 的队列数组，
+			或包含 10 个 *number* 的队列。
+
 		</p>
 		<table>
-			<caption><a id="uniform-types">Uniform types</a></caption>
+			<caption><a id="uniform-types">Uniform 类型</a></caption>
 			<thead>
 				<tr>
-					<th>GLSL type</th>
-					<th>JavaScript type</th>
+					<th>GLSL 类型</th>
+					<th>JavaScript 类型</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -179,34 +177,36 @@
 		</table>
 
 		<p>
-		(*) Same for an (innermost) array (dimension) of the same GLSL type, containing the components of all vectors or matrices in the array.
+
+		(*) 与最内层队列中 GSLS 的类型保持一致。包含队列中所有矢量的元素或矩阵中的元素。
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:Object value] )</h3>
 		<p>
-		value -- An object containing the value to set up the uniform. It's type must be one of the Uniform Types described above.
+		value -- 包含需要设置 Uniform 数据的对象。 数据类型必须是上述类型中的一种。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Object value]</h3>
 		<p>
-		Current value of the uniform.
+			当前 uniform 的值。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Uniform clone]()</h3>
 		<p>
-		Returns a clone of this uniform.<br />
-		If the uniform's value property is an [page:Object] with a clone() method, this is used, otherwise the value is copied by assigment.
-		Array values are shared between cloned [page:Uniform]s.<br /><br />
-		See [example:webgldeferred_animation WebGL deferred animation] for an example of this method in use.
+			返回该 Uniform 的克隆。<br />
+			如果 Uniform 的 value 属性是一个带 clone() 方法的 [page:Object]，则克隆该对象时，value 的 clone() 方法也会被调用，否则克隆时只会使用赋值语句。
+			队列中的值会在该 Uniform 和 被克隆对象间共享。<br /><br />
+
+			该方法的使用示例详见 [example:webgldeferred_animation WebGL deferred animation]。
 		</p>
 
-		<h2>Source</h2>
+		<h2>资源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

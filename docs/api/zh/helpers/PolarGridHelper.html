@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -12,10 +12,10 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">The PolarGridHelper is an object to define polar grids. Grids are two-dimensional arrays of lines.</p>
+		<p class="desc">极坐标格辅助对象. 坐标格实际上是2维线数组.</p>
 
 
-		<h2>Example</h2>
+		<h2>例子</h2>
 
 		<code>var radius = 10;
 		var radials = 16;
@@ -28,22 +28,22 @@
 		[example:webgl_helpers Example using various helpers]
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:Number radius], [param:Number radials], [param:Number circles], [param:Number divisions], [param:Color color1], [param:Color color2] )</h3>
 		<p>
-		radius -- The radius of the polar grid. This can be any positive number. Default is 10.<br />
-		radials -- The number of radial lines. This can be any positive integer. Default is 16.<br />
-		circles -- The number of circles. This can be any positive integer. Default is 8.<br />
-		divisions -- The number of line segments used for each circle. This can be any positive integer that is 3 or greater. Default is 64.<br />
-		color1 -- The first color used for grid elements. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x444444 <br />
-		color2 -- The second color used for grid elements. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x888888
+		radius -- 极坐标格半径. 可以为任何正数. 默认为 10.<br />
+		radials -- 径向辐射线数量. 可以为任何正整数. 默认为 16.<br />
+		circles -- 圆圈的数量. 可以为任何正整数. 默认为 8.<br />
+		divisions -- 圆圈细分段数. 可以为任何大于或等于3的正整数. 默认为 64.<br />
+		color1 -- 极坐标格使用的第一个颜色. 值可以为 [page:Color] 类型, 16进制 和 CSS 颜色名. 默认为 0x444444 <br />
+		color2 -- 极坐标格使用的第二个颜色. 值可以为 [page:Color] 类型, 16进制 和 CSS 颜色名. 默认为 0x888888
 		</p>
 		<p>
-		Creates a new [name] of radius 'radius' with 'radials' number of radials and 'circles' number of circles, where each circle is smoothed into 'divisions' number of line segments. Colors are optional.
+		创建一个半径为'radius' 包含 'radials' 条径向辐射线 和 'circles' 个细分成 'divisions' 段的圆圈的极坐标格辅助对象. 颜色可选.
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

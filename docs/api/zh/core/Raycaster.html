@@ -22,8 +22,7 @@
 
 		function onMouseMove( event ) {
 
-			// calculate mouse position in normalized device coordinates
-			// (-1 to +1) for both components
+			// 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
 
 			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -32,10 +31,10 @@
 
 		function render() {
 
-			// update the picking ray with the camera and mouse position
+			// 通过摄像机和鼠标位置更新射线
 			raycaster.setFromCamera( mouse, camera );
 
-			// calculate objects intersecting the picking ray
+			// 计算物体和射线的焦点
 			var intersects = raycaster.intersectObjects( scene.children );
 
 			for ( var i = 0; i < intersects.length; i++ ) {
@@ -80,6 +79,7 @@
 		[page:Float far] —— 返回的所有结果都比far近。far不能小于near，其默认值为Infinity（正无穷。）</p>
 		<p>
 			这将创建一个新的raycaster对象。<br />
+
 		</p>
 
 
@@ -93,7 +93,9 @@
 
 		<h3>[property:float linePrecision]</h3>
 		<p>
+
 			raycaster与[page:Line]（线）物体相交时的精度因数。
+
 		</p>
 
 		<h3>[property:float near]</h3>
