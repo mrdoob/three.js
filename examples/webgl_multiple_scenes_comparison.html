@@ -178,7 +178,7 @@
 
 					sliderMoved = true;
 
-					sliderPos = e.pageX;
+					sliderPos = e.pageX || e.touches[ 0 ].pageX;
 
 					//prevent the slider from being positioned outside the window bounds
 					if ( sliderPos < 0 ) sliderPos = 0;
@@ -189,9 +189,11 @@
 				}
 
 				slider.addEventListener( 'mousedown', slideReady );
-				window.addEventListener( 'mouseup', slideFinish );
 				slider.addEventListener( 'touchstart', slideReady );
-				window.addEventListener( 'touchstop', slideFinish );
+
+				window.addEventListener( 'mouseup', slideFinish );
+				window.addEventListener( 'touchend', slideFinish );
+
 				window.addEventListener( 'mousemove', slideMove );
 				window.addEventListener( 'touchmove', slideMove );
 
