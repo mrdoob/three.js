@@ -1478,7 +1478,7 @@ function WebGLRenderer( parameters ) {
 
 
 			materialProperties.shader = {
-				name: parameters.type,
+				name: parameters.name,
 				uniforms: parameters.uniforms,
 				vertexShader: parameters.vertexShader,
 				fragmentShader: parameters.fragmentShader
