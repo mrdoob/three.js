@@ -14,15 +14,15 @@
 		</p>
 
 		<p>
-			请将[link:https://github.com/mrdoob/three.js/blob/master/examples/js/Detector.js]引入到你的文件，并在尝试开始渲染之前先运行该文件。
+			请将[link:https://github.com/mrdoob/three.js/blob/master/examples/js/WebGL.js]引入到你的文件，并在尝试开始渲染之前先运行该文件。
         	</p>
 
 <code>
-if (Detector.webgl) {
+if (WEBGL.isWebGLAvailable()) {
     // Initiate function or other initializations here
     animate();
 } else {
-    var warning = Detector.getWebGLErrorMessage();
+    var warning = WEBGL.getWebGLErrorMessage();
     document.getElementById('container').appendChild(warning);
 }
 </code>
