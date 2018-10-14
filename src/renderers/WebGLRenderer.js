@@ -1476,36 +1476,13 @@ function WebGLRenderer( parameters ) {
 
 		if ( programChange ) {
 
-			if ( parameters.shaderID ) {
 
-				var shader = ShaderLib[ parameters.shaderID ];
-
-				materialProperties.shader = {
-					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
-				};
-
-			} else {
-
-				materialProperties.shader = {
-					name: material.type,
-					uniforms: material.uniforms,
-					vertexShader: material.vertexShader,
-					fragmentShader: material.fragmentShader
-				};
-
-			}
-
-			material.onBeforeCompile( materialProperties.shader, _this );
-
-			parameters.shaderName = materialProperties.shader.name;
-			parameters.vertexShader = materialProperties.shader.vertexShader;
-			parameters.fragmentShader = materialProperties.shader.fragmentShader;
-
-			// Computing code again as onBeforeCompile may have changed the shaders
-			code = programCache.getProgramCode( material, parameters );
+			materialProperties.shader = {
+				name: parameters.type,
+				uniforms: parameters.uniforms,
+				vertexShader: parameters.vertexShader,
+				fragmentShader: parameters.fragmentShader
+			};
 
 			program = programCache.acquireProgram( material, parameters, code );
 

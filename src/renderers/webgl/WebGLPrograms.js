@@ -4,6 +4,8 @@
 
 import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding, ObjectSpaceNormalMap } from '../../constants.js';
 import { WebGLProgram } from './WebGLProgram.js';
+import { ShaderLib } from '../shaders/ShaderLib.js';
+import { UniformsUtils } from '../shaders/UniformsUtils.js';
 
 function WebGLPrograms( renderer, extensions, capabilities ) {
 
@@ -106,6 +108,37 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		return encoding;
 
 	}
+	
+	function getShaderObject( material, shaderID ) {
+
+		var shaderobject;
+
+		if ( shaderID ) {
+
+			var shader = ShaderLib[ shaderID ];
+
+			shaderobject = {
+				name: material.type,
+				uniforms: UniformsUtils.clone( shader.uniforms ),
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+			};
+
+		} else {
+
+			shaderobject = {
+				name: material.type,
+				uniforms: material.uniforms,
+				vertexShader: material.vertexShader,
+				fragmentShader: material.fragmentShader
+			};
+
+		}
+
+		return shaderobject;
+
+	}
+	
 
 	this.getParameters = function ( material, lights, shadows, fog, nClipPlanes, nClipIntersection, object ) {
 
@@ -129,14 +162,18 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
+		var shaderobject = getShaderObject( material, shaderID );
+		material.onBeforeCompile( shaderobject, renderer );
+
 		var currentRenderTarget = renderer.getRenderTarget();
 
 		var parameters = {
 
-			shaderName: material.type,
+			shaderName: shaderobject.name,
 			shaderID: shaderID,
-			vertexShader: material.vertexShader,
-			fragmentShader: material.fragmentShader,
+			uniforms: shaderobject.uniforms,
+			vertexShader: shaderobject.vertexShader,
+			fragmentShader: shaderobject.fragmentShader,
 			defines: material.defines,
 			precision: precision,
 			supportsVertexTextures: capabilities.vertexTextures,
