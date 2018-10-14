@@ -1,7 +1,7 @@
 #ifdef USE_FOG
 
 	uniform vec3 fogColor;
-	varying vec3 vFogPosition;
+	varying float fogDepth;
 
 	#ifdef FOG_EXP2
 

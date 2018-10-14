@@ -29,7 +29,7 @@
 						color: #ffffff;
 				}
 
-				#oldie a {
+				#webglmessage a {
 						color: #da0
 				}
 		</style>
@@ -43,11 +43,15 @@
 
 <script src="js/effects/PeppersGhostEffect.js"></script>
 
-<script src="js/Detector.js"></script>
+<script src="js/WebGL.js"></script>
 
 <script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var container;
 

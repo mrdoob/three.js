@@ -9,9 +9,10 @@
 	</head>
 	<body>
 		[page:Object3D] &rarr;
-		<h1>[name]</h1>
+		<h1>场景（[name]）</h1>
 
-		<p class="desc">场景允许你设置threejs在哪里渲染什么内容。场景就是你放置对象、灯光和相机的地方</p>
+		<p class="desc">
+			场景允许你在什么地方、摆放什么东西来交给three.js来渲染，这是你放置物体、灯光和摄像机的地方。</p>
 
 
 		<h2>构造器</h2>
@@ -19,39 +20,41 @@
 
 		<h3>[name]()</h3>
 		<p>
-		创建一个新的场景对象
-		</p>
+创建一个新的场景对象。
+</p>
 
 
 		<h2>属性</h2>
 
 		<h3>[property:Fog fog]</h3>
 
-		<p>一个[page:Fog fog]的实例，定义了一种影响场景中渲染出来的所有东西的雾。默认值是null.</p>
+		<p>一个[page:Fog fog]实例定义了影响场景中的每个物体的雾的类型。默认值为null。
+		</p>
 
 		<h3>[property:Material overrideMaterial]</h3>
 
-		<p>如果不为null, 它会强制场景中的所有东西都用改材质渲染。 默认值是null</p>
+		<p>如果不为空，它将强制场景中的每个物体使用这里的材质来渲染。默认值为null。</p>
 
 		<h3>[property:boolean autoUpdate]</h3>
 		<p>
-		默认是true。如果设置，那么渲染器会检查检查每一帧确定场景及其中的对象是否需要矩阵更新。
-		否则，你必须自己维护场景中的所有矩阵。
+			默认值为true，若设置了这个值，则渲染器会检查每一帧是否需要更新场景及其中物体的矩阵。
+			当设为false时，你必须亲自手动维护场景中的矩阵。
 		</p>
 
 		<h3>[property:Object background]</h3>
 		<p>
-		如果不为null, 在渲染场景时设置下所用背景，它将总是最先被渲染. 可以被设置为[page:Color](它设置了清除颜色)， 一个覆盖了canvas的 [page:Texture]， 或者一个[page:CubeTexture]。默认是null
+            若不为空，在渲染场景的时候将设置背景，且背景总是首先被渲染的。
+            可以设置一个用于的“clear”的[page:Color]（颜色）、一个覆盖canvas的[page:Texture]（纹理），或是一个[page:CubeTexture]。默认值为null。
 		</p>
 
 		<h2>方法</h2>
 
 		<h3>[method:JSON toJSON]</h3>
 		<p>
-        返回JSON格式的场景数据
+			使用JSON格式返回场景数据。
 		</p>
 
-		<h2>源码</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

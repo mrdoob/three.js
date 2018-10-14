@@ -47,7 +47,7 @@
 		<script>
 
 			var camera, scene, renderer, labelRenderer;
-			var controls;
+
 			var clock = new THREE.Clock();
 			var textureLoader = new THREE.TextureLoader();
 
@@ -64,11 +64,9 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 10, 5, 20 );
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera );
 
 				scene = new THREE.Scene();
-
-				scene2 = new THREE.Scene();
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( 0, 0, 1 );

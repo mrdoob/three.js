@@ -27,8 +27,7 @@
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, renderer;
-			var mesh, mixer;
+			var camera, scene, renderer, mixer;
 
 			init();
 			animate();
@@ -62,7 +61,7 @@
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xffefef, 1.5 );
-				light.position.set( -1, -1, -1 ).normalize();
+				light.position.set( - 1, - 1, - 1 ).normalize();
 				scene.add( light );
 
 				var loader = new THREE.GLTFLoader();
@@ -86,7 +85,7 @@
 				renderer = new THREE.CanvasRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				//
 

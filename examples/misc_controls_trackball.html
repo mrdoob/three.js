@@ -41,12 +41,16 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, controls, scene, renderer, stats;
 
@@ -103,7 +107,7 @@
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( -1, -1, -1 );
+				light.position.set( - 1, - 1, - 1 );
 				scene.add( light );
 
 				var light = new THREE.AmbientLight( 0x222222 );

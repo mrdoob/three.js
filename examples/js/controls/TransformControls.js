@@ -104,11 +104,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.addEventListener( "touchstart", onPointerDown, false );
 		domElement.addEventListener( "mousemove", onPointerHover, false );
 		domElement.addEventListener( "touchmove", onPointerHover, false );
-		domElement.addEventListener( "mousemove", onPointerMove, false );
+		document.addEventListener( "mousemove", onPointerMove, false );
 		domElement.addEventListener( "touchmove", onPointerMove, false );
-		domElement.addEventListener( "mouseup", onPointerUp, false );
-		domElement.addEventListener( "mouseleave", onPointerUp, false );
-		domElement.addEventListener( "mouseout", onPointerUp, false );
+		document.addEventListener( "mouseup", onPointerUp, false );
 		domElement.addEventListener( "touchend", onPointerUp, false );
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
@@ -122,11 +120,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.removeEventListener( "touchstart", onPointerDown );
 		domElement.removeEventListener( "mousemove", onPointerHover );
 		domElement.removeEventListener( "touchmove", onPointerHover );
-		domElement.removeEventListener( "mousemove", onPointerMove );
+		document.removeEventListener( "mousemove", onPointerMove );
 		domElement.removeEventListener( "touchmove", onPointerMove );
-		domElement.removeEventListener( "mouseup", onPointerUp );
-		domElement.removeEventListener( "mouseleave", onPointerUp );
-		domElement.removeEventListener( "mouseout", onPointerUp );
+		document.removeEventListener( "mouseup", onPointerUp );
 		domElement.removeEventListener( "touchend", onPointerUp );
 		domElement.removeEventListener( "touchcancel", onPointerUp );
 		domElement.removeEventListener( "touchleave", onPointerUp );
@@ -172,6 +168,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 					_plane[ propName ] = value;
 					_gizmo[ propName ] = value;
 
+					scope.dispatchEvent( { type: propName + "-changed", value: value } );
 					scope.dispatchEvent( changeEvent );
 
 				}
@@ -514,7 +511,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
 			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
 			button: event.button
-		}
+		};
 
 	}
 
@@ -539,7 +536,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( !scope.enabled ) return;
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		scope.pointerHover( getPointer( event ) );
 		scope.pointerDown( getPointer( event ) );
@@ -551,7 +547,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( !scope.enabled ) return;
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		scope.pointerMove( getPointer( event ) );
 
@@ -609,7 +604,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		console.warn( 'THREE.TransformControls: update function has been depricated.' );
 
-	}
+	};
 
 };
 

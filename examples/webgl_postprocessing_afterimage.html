@@ -32,7 +32,13 @@
 			var camera, scene, renderer, composer;
 			var mesh, light;
 
-			var afterimagePass, enable = true;
+			var afterimagePass;
+
+			var params = {
+
+				enable: true
+
+			};
 
 			init();
 			createGUI();
@@ -73,7 +79,7 @@
 
 				var gui = new dat.GUI( { name: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
-				gui.add( this, 'enable' );
+				gui.add( params, 'enable' );
 
 			}
 
@@ -94,7 +100,7 @@
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 
-				if( enable ){
+				if( params.enable ){
 
 					composer.render();
 

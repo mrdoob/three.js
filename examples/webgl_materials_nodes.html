@@ -39,7 +39,7 @@
 		<script src='js/geometries/TeapotBufferGeometry.js'></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		
+
 		<script type="module">
 
 			import './js/nodes/THREE.Nodes.js';
@@ -161,7 +161,7 @@
 
 				gui = new dat.GUI();
 
-				var example = gui.add( param, 'example', {
+				gui.add( param, 'example', {
 					'basic / mesh-standard': 'mesh-standard',
 					'basic / standard': 'standard',
 					'basic / physical': 'physical',

@@ -1,417 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="list.js"></script>
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
-		<h1>[name]</h1>
 
-		<p class="desc">
-			该类是 three.js 中大多数对象的基类。它提供了一组属性和方法用于在 3D 空间下对对象进行操作。<br /><br />
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="list.js"></script>
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-			注意，通过 [page:.add]( object ) 方法，该类可以被应用于成组的对象。然而更好的方式是使用 [page:Group]。
-		</p>
+<body>
+	<h1>三维物体（[name]）</h1>
 
+	<p class="desc">
+		这是Three.js中大部分对象的基类，提供了一系列的属性和方法来对三维空间中的物体进行操纵。<br /><br />
 
-		<h2>构造函数</h2>
+		请注意，可以通过[page:.add]( object )方法来将对象进行组合，该方法将对象添加为子对象，但为此最好使用[page:Group]（来作为父对象）。
+	</p>
 
 
-		<h3>[name]()</h3>
-		<p>
-		构造函数没有任何参数。
-		</p>
+	<h2>构造器</h2>
 
-
-		<h2>属性</h2>
 
-		<h3>[property:Boolean castShadow]</h3>
-		<p> 当前物体是否需要在阴影图 （shadow map）中被渲染，默认值为 *false*。</p>
-
-		<h3>[property:Object3D children]</h3>
-		<p> 子物体的队列。将对象成组的方法详见 [page:Group]。</p>
-
-		<h3>[property:Boolean frustumCulled]</h3>
-		<p>
-			当该值被设置时，在每帧渲染该物体前，都会检查物体是否在视锥内。
-			否则，物体在每帧时都会被渲染，即使物体不可见。默认值为 *true*。
-		</p>
-
-		<h3>[property:Integer id]</h3>
-		<p>只读 – 当前物体唯一标识符。</p>
-
-		<h3>[property:Boolean isObject3D]</h3>
-		<p>
-			用于判断当前类或其派生类是 Object3D 对象。默认值为 *true*。<br /><br />
-
-			该值被用于内部优化，不应该被更改。
-		</p>
-
-		<h3>[property:Layers layers]</h3>
-		<p>
-			当前物体所属图层信息。只有当该物体与摄像机至少共享一个图层时，该物体才可见。
-		</p>
-
-		<h3>[property:Matrix4 matrix]</h3>
-		<p> 局部空间下的转移矩阵。</p>
-
-		<h3>[property:Boolean matrixAutoUpdate]</h3>
-		<p>
-			当设置该值时，对象会重新计算 matrixWorld 属性值，计算位置矩阵、旋转矩阵，并且在每帧都进行缩放。
-			默认值 [page:Object3D.DefaultMatrixAutoUpdate] 为 true。
-		</p>
-
-		<h3>[property:Matrix4 matrixWorld]</h3>
-		<p>
-			对象的全局变换矩阵。如果 Object3D 没有父对象，则该矩阵与局部变换矩阵 [page:.matrix] 相同。
-		</p>
-
-		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
-		<p>
-			当该值设置时，对象会在这帧重新计算 matrixWorld，且将该值设置为 false。默认值为 *false*。
-		</p>
-
-		<h3>[property:Matrix4 modelViewMatrix]</h3>
-		<p>
-			该值被传递给着色器，用于计算对象的坐标。
-		</p>
-
-		<h3>[property:String name]</h3>
-		<p> 对象的可选别名（无需全局唯一）。默认值为空字符串。</p>
-
-		<h3>[property:Matrix3 normalMatrix]</h3>
-		<p>
-			该值传递给着色器用于计算对向的光照。该矩阵等价于 modelViewMatrix 的左上 3x3 子矩阵的逆矩阵的转置。
-
-			需要该矩阵的原因如下，如果单纯使用 modelViewMatrix 会导致法向量在对象缩放时长度未归一化或方向不垂直。<br /><br />
-			This is passed to the shader and used to calculate lighting for the object.<br /><br />
-			另外 modelViewMatrix 中的位移信息在法向量计算时并不相关。因而，normalMatrix 使用 Matrix3 矩阵足矣。
-		</p>
-
-		<h3>[property:function onAfterRender]</h3>
-		<p>
-			可选的回调函数，在每次 Object3D 对象渲染后会被立刻调用。
-			该函数参数列表如下：renderer, scene, camera, geometry, material, group。
-		</p>
-
-		<h3>[property:function onBeforeRender]</h3>
-		<p>
-			可选的回调函数，在每次 Object3D 对象渲染前会被调用。
-			该函数参数列表如下：renderer, scene, camera, geometry, material, group。
-		</p>
-
-		<h3>[property:Object3D parent]</h3>
-		<p> 对象的父对象 [link:https://en.wikipedia.org/wiki/Scene_graph scene graph]。每个对象最多可以有一个父对象。</p>
-
-		<h3>[property:Vector3 position]</h3>
-		<p> [page:Vector3] 向量，用于表示对象的局部坐标系下的位置。默认值为 (0, 0, 0)。</p>
-
-		<h3>[property:Quaternion quaternion]</h3>
-		<p> 对象的本地旋转四元组 [page:Quaternion Quaternion]。</p>
-
-		<h3>[property:Boolean receiveShadow]</h3>
-		<p> 判断当前材质是否接收阴影。默认值是 *false*。</p>
-
-		<h3>[property:Number renderOrder]</h3>
-		<p>
-			该值允许对象的默认渲染顺序 [link:https://en.wikipedia.org/wiki/Scene_graph scene graph] 被修改。
-			但不透明和透明物体依然分开进行渲染排序。渲染顺序的排序是从最低到最高。renderOrder 的默认值为 *0*。
-		</p>
-
-		<h3>[property:Euler rotation]</h3>
-		<p>
-			物体本地坐标系下的旋转信息 (see [link:https://en.wikipedia.org/wiki/Euler_angles Euler angles])，度量单位为弧度。
-		</p>
-
-		<h3>[property:Vector3 scale]</h3>
-		<p>
-			物体本地坐标系下的缩放信息。默认值是 [page:Vector3]( 1, 1, 1 )。
-		</p>
-
-		<h3>[property:Vector3 up]</h3>
-		<p>
-			该值被用于 [page:.lookAt lookAt] 方法。例如，用于判断对象朝向。<br />
-			默认值 [page:Object3D.DefaultUp] 为 ( 0, 1, 0 )。
-		</p>
-
-		<h3>[property:object userData]</h3>
-		<p>
-			用于存储 Object3D 的定制化数据的对象。该对象不应该保存任何函数的引用，这些值在对象被克隆时不会被拷贝。
-		</p>
-
-		<h3>[property:String uuid]</h3>
-		<p>
-			当前对象实例的 [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
-			该值会被自动赋值。不应该被修改。
-		</p>
-
-		<h3>[property:Boolean visible]</h3>
-		<p> 如果该值为 *true*，则对象会被显示。默认值为 *true*。</p>
-
-		<h2>静态属性</h2>
-		<p>
-			不同于非静态属性和方法是按照对象定义的，静态属性和方法是按类定义的，即同一个类的不同实例间是共享静态属性及方法的。
-			这意味着改变 [page:Object3D.DefaultUp] 或 [page:Object3D.DefaultMatrixAutoUpdate]，将会改变在这之后创建的
-			<em>每个</em> Object3D 实例（或其派生类的示例）的 [page:.up up] 和 [page:.matrixAutoUpdate matrixAutoUpdate]
-			的值。已经被创建的 Object3D 实例不受影响。
-		</p>
-
-		<h3>[property:Vector3 DefaultUp]</h3>
-		<p>
-			当前对象的默认的 [page:.up up] 方向，同样被用于 [page:DirectionalLight]、[page:HemisphereLight]、和
-			[page:Spotlight]（光线方向从上至下） 的默认空间位置。<br />
-			默认值为 ( 0, 1, 0 ) 。
-		</p>
+	<h3>[name]()</h3>
+	<p>
+		构造器中不带有参数。
+	</p>
 
-		<h3>[property:Vector3 DefaultMatrixAutoUpdate]</h3>
-		<p>
-			新创建的 Object3D 的 [page:.matrixAutoUpdate matrixAutoUpdate] 的默认值。<br />
-		</p>
 
-		<h2>方法</h2>
+	<h2>属性</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] 可用于此类的方法。</h3>
+	<h3>[property:Boolean castShadow]</h3>
+	<p>对象是否被渲染到阴影贴图中。默认值为*false*。</p>
 
-		<h3>[method:null add]( [param:Object3D object], ... )</h3>
-		<p>
-			将参数指定的 *object* 添加到当前对象。参数指定的对象会被添加一个随机数。由于每个对象只能有一个父对象，
-			在被设置新的父对象后，参数对象的原父对象将会被移除，并有当前对象替代。<br /><br />
+	<h3>[property:Object3D children]</h3>
+	<p>含有对象的子级的数组。请参阅[page:Group]来了解将手动对象进行分组的相关信息。</p>
 
-			手动将对象成组详情见 [page:Group]。
-		</p>
+	<h3>[property:Boolean frustumCulled]</h3>
+	<p>
+		当这个属性被设置的时候，它将在渲染物体之前，检查每一帧的物体是否在摄像机的视锥体中。
+		否则，即使该物体不可见，它也将在每一帧中被渲染，默认值为*true*。
+	</p>
+
+	<h3>[property:Integer id]</h3>
+	<p>只读 —— 表示该对象实例ID的唯一数字。</p>
+
+	<h3>[property:Boolean isObject3D]</h3>
+	<p>
+
+		用于测试这个类或者派生类是否为Object3D，默认为*true*。<br /><br />
+		你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
+	</p>
+
+	<h3>[property:Layers layers]</h3>
+	<p>
+		物体的层级关系。
+		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。
+	</p>
 
-		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
-		<p> 将参数指定的矩阵应用于对象，并且依据矩阵对对象进行位移、旋转和缩放。</p>
+	<h3>[property:Matrix4 matrix]</h3>
+	<p>局部变换矩阵。</p>
 
-		<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
-		<p> 将参数指定的四元数应用于对象，并对对象进行旋转。</p>
+	<h3>[property:Boolean matrixAutoUpdate]</h3>
+	<p>
+		当这个属性设置了之后，它将计算每一帧的位移、旋转（四元变换）和缩放矩阵，并重新计算matrixWorld属性。默认值是[page:Object3D.DefaultMatrixAutoUpdate] (true)。
+	</p>
 
-		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
-		<p>
-			recursive -- 如果为 true, 连同子对象一起克隆。默认值为 true.<br /><br />
+	<h3>[property:Matrix4 matrixWorld]</h3>
+	<p>
+		物体的世界变换。若这个Object3D没有父级，则它将和local transform [page:.matrix]（局部变换矩阵）相同。
+	</p>
+
+	<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
+	<p>
+		当这个属性设置了之后，它将计算在那一帧中的matrixWorld，并将这个值重置为false。默认值为*false*。
+	</p>
 
-			返回该对象的克隆，并且依据参数可能同时返回子对象的克隆。
-		</p>
+	<h3>[property:Matrix4 modelViewMatrix]</h3>
+	<p>这个值传递给着色器，用于计算物体的位置。</p>
 
-		<h3>[method:this copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
-		<p>
-			recursive -- 如果为 true, 参数指定的对象连同子对象一起被复制。默认值为 true.<br /><br />
+	<h3>[property:String name]</h3>
+	<p>对象的名称，可选、不必唯一。默认值是一个空字符串。</p>
 
-			将指定对象拷贝到当前对象。
-		</p>
+	<h3>[property:Matrix3 normalMatrix]</h3>
+	<p>
+		这个值传递给着色器，用于计算物体的光照。
+		它是物体的modelViewMatrix矩阵中，左上角3x3子矩阵的逆的转置矩阵。
+		<br /><br />
+		使用这个特殊矩阵的原因，是只需使用modelViewMatrix就可以得出一个法线（缩放时）的非单位长度或者非垂直的方向（不规则缩放时）。
+		<br /><br />
+		另一方面，modelViewMatrix矩阵中的位移部分和法线的计算无关，因此Matrix3就已经足够了。
+	</p>
 
-		<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>
-		<p>
-			id -- 对象实例的唯一数字标识符。<br /><br />
+	<h3>[property:function onAfterRender]</h3>
+	<p>
+		一个可选的回调函数，在Object3D渲染之后直接执行。
+		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
+	</p>
 
-			搜索对象的所有子对象，并返回第一个 id 与参数匹配的对象。<br />
-			注意，对象的 id 按照时间顺序依次生生成：1，2，3，...每有一个新物体被创建则 id 增加 1。
-		</p>
+	<h3>[property:function onBeforeRender]</h3>
+	<p>
+			一个可选的回调函数，在Object3D渲染之前直接执行。
+			使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
+	</p>
 
-		<h3>[method:Object3D getObjectByName]( [param:String name] )</h3>
-		<p>
-			name -- 匹配子对象 Object3D.name 属性的字符串。 <br /><br />
+	<h3>[property:Object3D parent]</h3>
+	<p>在[link:https://en.wikipedia.org/wiki/Scene_graph scene graph]（场景图）中，一个对象的父级对象。
+		一个对象最多仅能有一个父级对象。</p>
 
-			搜索对象的所有子对象，并返回第一个 Object3D.name 属性与参数匹配的对象。<br />
-			注意，对于大多数对象来说对象名称保持默认值，是一个空的字符串。需要你手动设置才会有意义。
-		</p>
+	<h3>[property:Vector3 position]</h3>
+	<p>表示对象局部位置的[page:Vector3]。默认值为(0, 0, 0)。</p>
 
-		<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Float value] )</h3>
-		<p>
-			name -- 要检索的属性的名称。 <br />
-			value -- 要匹配的属性的值。 <br /><br />
+	<h3>[property:Quaternion quaternion]</h3>
+	<p>表示对象局部旋转的[page:Quaternion Quaternion]（四元数）。</p>
 
-			搜索对象的子对象返回第一个属性名和属性值都匹配的对象。
-		</p>
+	<h3>[property:Boolean receiveShadow]</h3>
+	<p>材质是否接收阴影。默认值为*false*。</p>
 
-		<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>
-		<p>
-		[page:Vector3 target] — 结果将被复制到这个三维矢量中。 <br /><br />
+	<h3>[property:Number renderOrder]</h3>
+	<p>
+		这个值将使得[link:https://en.wikipedia.org/wiki/Scene_graph scene graph]（场景图）中默认的的渲染顺序被覆盖，
+		即使不透明对象和透明对象保持独立顺序。
+		渲染顺序是由低到高来排序的，默认值为*0*。
+	</p>
 
-		返回一个代表对象全局坐标的三维矢量。
-		</p>
+	<h3>[property:Euler rotation]</h3>
+	<p>
+		物体的局部旋转，以弧度来表示。（请参阅[link:https://en.wikipedia.org/wiki/Euler_angles Euler angles]-欧拉角）
+	</p>
 
-		<h3>[method:Quaternion getWorldQuaternion]( [param:Quaternion target] )</h3>
-		<p>
-		[page:Quaternion target] — 结果将被复制到这个四元数中. <br /><br />
-
-		返回代表对象全局旋转的四元数。
-		</p>
-
-		<h3>[method:Vector3 getWorldScale]( [param:Vector3 target] )</h3>
-		<p>
-		[page:Vector3 target] — 结果将被复制到这个三维矢量中。 <br /><br />
-
-		返回代表对象每个轴向的全局缩放参数的三维矢量。
-		</p>
-
-		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
-		<p>
-		[page:Vector3 target] — 结果将被复制到这个三维矢量中。 <br /><br />
-
-		返回代表对象全局坐标系下 z 轴朝向的三维矢量。
-		</p>
-
-		<h3>[method:Vector3 localToWorld]( [param:Vector3 vector] )</h3>
-		<p>
-		vector - 代表本地（局部）坐标位置的三维矢量。<br /><br />
-
-		将参数指定的本地坐标矢量转换为全局坐标。
-		</p>
-
-		<h3>[method:null lookAt]( [param:Vector3 vector] )</br>
+	<h3>[property:Vector3 scale]</h3>
+	<p>
+		物体的局部缩放。默认值是[page:Vector3]( 1, 1, 1 )。
+	</p>
+
+	<h3>[property:Vector3 up]</h3>
+	<p>
+		这个属性由[page:.lookAt lookAt]方法所使用，例如，来决定结果的朝向。
+		默认值是[page:Object3D.DefaultUp]，即( 0, 1, 0 )。
+	</p>
+
+	<h3>[property:object userData]</h3>
+	<p>
+		一个用于存储Object3D自定义数据的对象。
+		它不应当包含对函数的引用，因为这些函数将不会被克隆。
+	</p>
+
+	<h3>[property:String uuid]</h3>
+	<p>
+		该对象实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
+		这是一个自动生成的值，不应当对其进行修改。
+	</p>
+
+	<h3>[property:Boolean visible]</h3>
+	<p>可见性。这个值为*true*时，物体将被渲染。默认值为*true*。</p>
+
+
+
+
+	<h2>静态属性</h2>
+	<p>
+		静态属性和方法由每个类所定义，并非由每个类的实例所定义。
+		也就是说，改变[page:Object3D.DefaultUp]或[page:Object3D.DefaultMatrixAutoUpdate]的值，
+		将改变<b>每个在此之后</b>由Object3D类（或派生类）创建的实例中的[page:.up up]和[page:.matrixAutoUpdate matrixAutoUpdate]的值。（已经创建好的Object3D不会受到影响）。
+	</p>
+
+	<h3>[property:Vector3 DefaultUp]</h3>
+	<p>
+		默认的物体的[page:.up up]方向，同时也作为[page:DirectionalLight]、[page:HemisphereLight]和[page:Spotlight]（自顶向下创建的灯光）的默认方向。
+		默认设为( 0, 1, 0 )。
+	</p>
+
+	<h3>[property:Vector3 DefaultMatrixAutoUpdate]</h3>
+	<p>
+			[page:.matrixAutoUpdate matrixAutoUpdate]的默认设置，用于新创建的Object3D。<br />
+
+	</p>
+
+
+	<h2>方法</h2>
+
+	<h3>[page:EventDispatcher EventDispatcher] 方法在这个类上是可用的。</h3>
+
+	<h3>[method:null add]( [param:Object3D object], ... )</h3>
+	<p>
+		添加<b>对象</b>到这个对象的子级，可以添加任意数量的对象。
+		当前传入的对象中的父级将在这里被移除，因为一个对象仅能有一个父级。<br /><br />
+		请参阅[page:Group]来查看手动编组对象的相关信息。
+	</p>
+
+	<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+	<p>对当前物体应用这个变换矩阵，并更新物体的位置、旋转和缩放。</p>
+
+	<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
+	<p>对当前物体应用由四元数所表示的变换。</p>
+
+	<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
+	<p>
+		recursive —— 如果值为true，则该物体的后代也会被克隆。默认值为true。<br /><br />
+
+		返回对象前物体的克隆（以及可选的所有后代）。
+	</p>
+
+	<h3>[method:this copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
+	<p>
+		recursive —— 如果值为true，则该物体的后代也会被复制。默认值为true。<br /><br />
+		复制给定的对象到这个对象中。
+	</p>
+
+	<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>
+	<p>
+		id —— 标识该对象实例的唯一数字。<br /><br />
+
+		搜索该对象的子级，返回第一个带有匹配id的子对象。<br />
+		请注意，id是按照时间顺序来分配的：1、2、3、……，每增加一个新的对象就自增1。
+	</p>
+
+	<h3>[method:Object3D getObjectByName]( [param:String name] )</h3>
+	<p>
+		name —— 用于来匹配子物体中Object3D.name属性的字符串。<br /><br />
+
+		搜索该对象的子级，返回第一个带有匹配name的子对象。<br />
+		请注意，大多数的对象中name默认是一个空字符串，要使用这个方法，你将需要手动地设置name属性。
+	</p>
+
+	<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Float value] )</h3>
+	<p>
+		name —— 将要用于查找的属性的名称。<br />
+		value —— 给定的属性的值。 <br /><br />
+		搜索该对象的子级，返回第一个给定的属性中包含有匹配的值的子对象。
+	</p>
+
+	<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>
+	<p>
+		[page:Vector3 target] — 结果将被复制到这个Vector3中。<br /><br />
+		返回一个表示该物体在世界空间中位置的矢量。
+	</p>
+
+	<h3>[method:Quaternion getWorldQuaternion]( [param:Quaternion target] )</h3>
+	<p>
+		[page:Quaternion target] — 结果将被复制到这个Quaternion中。<br /><br />
+		返回一个表示该物体在世界空间中旋转的四元数。
+	</p>
+
+	<h3>[method:Vector3 getWorldScale]( [param:Vector3 target] )</h3>
+	<p>
+		[page:Vector3 target] — 结果将被复制到这个Vector3中。<br /><br />
+		返回一个包含着该物体在世界空间中各个轴向上所应用的缩放因数的矢量。
+	</p>
+
+	<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
+	<p>
+		[page:Vector3 target] — 结果将被复制到这个Vector3中。 <br /><br />
+		返回一个表示该物体在世界空间中Z轴正方向的矢量。
+	</p>
+
+
+	<h3>[method:Vector3 localToWorld]( [param:Vector3 vector] )</h3>
+	<p>
+		vector - 一个表示局部（物体）空间中位置的向量。 <br /><br />
+		将局部空间向量转换为世界空间向量。
+	</p>
+
+	<h3>[method:null lookAt]( [param:Vector3 vector] )</br>
 		[method:null lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
-		<p>
-		vector - 代表全局坐标位置的三维矢量。<br /><br />
-		另外, 参数可以由全局坐标的第一维 （[page:.x x]）, 第二维（[page:.y y]） 和 第三维（[page:.z z]）组成的参数列表代替。<br /><br />
+	<p>
+		vector - 一个表示世界空间中位置的向量。<br /><br />
+		也可以使用世界空间中[page:.x x]、[page:.y y]和[page:.z z]的位置分量。<br /><br />
+		旋转物体使其在世界空间中面朝一个点。<br /><br />
+		这一方法不支持其父级被旋转过或者被位移过的物体。
+	</p>
 
-		旋转物体使得其朝向参数指定的全局坐标。<br /><br />
+	<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+	<p>抽象（空方法），在一条被投射出的射线与这个物体之间获得交点。
+		在一些子类，例如[page:Mesh], [page:Line], and [page:Points]实现了这个方法，以用于光线投射。
+	</p>
 
-			该方法旋转仅旋转对象及子对象，不会影响父对象的旋转或位移。
-		</p>
+	<h3>[method:null remove]( [param:Object3D object], ... )</h3>
+	<p>
+		从当前对象的子级中移除<b>对象</b>。可以移除任意数量的对象。
+	</p>
 
-		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
-		<p>
-			抽象（空）方法，用于获取射线与对象的碰撞信息。
-			为使用射线检测，[page:Mesh], [page:Line], [page:Points] 子类实现了该方法。
-		</p>
+	<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
+	<p>
+		axis —— 一个在局部空间中的标准化向量。<br />
+		angle —— 角度，以弧度来表示。<br /><br />
+		在局部空间中绕着该物体的轴来旋转一个物体，假设这个轴已被标准化。
+	</p>
 
-		<h3>[method:null remove]( [param:Object3D object], ... )</h3>
-		<p>
-			将当前对象下，参数指定的子对象进行删除。该方法可能删除任意多个对象。
-		</p>
+	<h3>[method:this rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
+	<p>
+		axis -- 一个在世界空间中的标准化向量。<br />
+		angle -- 角度，以弧度来表示。<br /><br />
 
-		<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
-		<p>
-		axis -- 局部坐标系下的归一化向量。 <br />
-		angle -- 以弧度代表的角度信息。<br /><br />
+		在世界空间中绕着该物体的轴来旋转一个物体，假设这个轴已被标准化。
+		方法假设该物体没有旋转过的父级。
+	</p>
 
-		在局部坐标系下按照参数给定向量对物体进行旋转。参数 axis 为归一化的向量。
-		</p>
+	<h3>[method:this rotateX]( [param:Float rad] )</h3>
+	<p>
+		rad - 将要旋转的角度（以弧度来表示）。<br /><br />
+		绕局部空间的X轴旋转这个物体。
+	</p>
 
-		<h3>[method:this rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
-		<p>
-			axis -- 全局坐标系下的归一化向量。 <br />
-			angle -- 以弧度代表的角度信息。<br /><br />
+	<h3>[method:this rotateY]( [param:Float rad] )</h3>
+	<p>
+		rad - 将要旋转的角度（以弧度来表示）。<br /><br />
+		绕局部空间的Y轴旋转这个物体。
+	</p>
 
-			在全局坐标系下按照参数给定向量对物体进行旋转。参数 axis 为归一化的向量。
-			该方法不会影响父对象旋转。
-		</p>
+	<h3>[method:this rotateZ]( [param:Float rad] )</h3>
+	<p>
+		rad - 将要旋转的角度（以弧度来表示）。<br /><br />
+		绕局部空间的Z轴旋转这个物体。
+	</p>
 
-		<h3>[method:this rotateX]( [param:Float rad] )</h3>
-		<p>
-			rad - 以弧度代表的旋转角度信息。<br /><br />
-			在局部坐标系下根据参数，绕 x 轴旋转物体。
-		</p>
+	<h3>[method:null setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+	<p>
+		axis -- 一个在局部空间中的标准化向量。<br />
+		angle -- 角度（以弧度来表示）。<br /><br />
 
-		<h3>[method:this rotateY]( [param:Float rad] )</h3>
-		<p>
-			rad - 以弧度代表的旋转角度信息。<br /><br />
-			在局部坐标系下根据参数，绕 x 轴旋转物体。
-		</p>
+		调用[page:.quaternion]中的[page:Quaternion.setFromAxisAngle setFromAxisAngle]( [page:Float axis], [page:Float angle] )。
+	</p>
 
-		<h3>[method:this rotateZ]( [param:Float rad] )</h3>
-		<p>
-			rad - 以弧度代表的旋转角度信息。<br /><br />
-			在局部坐标系下根据参数，绕 x 轴旋转物体。
-		</p>
+	<h3>[method:null setRotationFromEuler]( [param:Euler euler] )</h3>
+	<p>
+		euler -- 指定了旋转量的欧拉角。<br />
 
-		<h3>[method:null setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
-		<p>
-			axis -- 局部坐标系下的归一化向量。 <br />
-			angle -- 以弧度代表的角度信息。<br /><br />
+		调用[page:.quaternion]中的[page:Quaternion.setRotationFromEuler setRotationFromEuler]( [page:Euler euler])。
 
-			该方法将会在 [page:.quaternion] 中，调用
-			[page:Quaternion.setFromAxisAngle setFromAxisAngle]( [page:Float axis], [page:Float angle] )。
-		</p>
+	</p>
 
-		<h3>[method:null setRotationFromEuler]( [param:Euler euler] )</h3>
-		<p>
-			euler -- 以欧拉角代表的旋转角度信息。<br />
+	<h3>[method:null setRotationFromMatrix]( [param:Matrix4 m] )</h3>
+	<p>
+		m -- 通过该矩阵中的旋转分量来旋转四元数。<br />
+			
+		调用[page:.quaternion]中的[page:Quaternion.setFromRotationMatrix setFromRotationMatrix]( [page:Matrix4 m])。
+		<br /><br />
 
-			该方法将会在 [page:.quaternion] 中，调用
-			[page:Quaternion.setRotationFromEuler setRotationFromEuler]( [page:Euler euler])。
-		</p>
+		请注意，这里假设m上的3x3矩阵是一个纯旋转矩阵（即未缩放的矩阵）。
+	</p>
 
-		<h3>[method:null setRotationFromMatrix]( [param:Matrix4 m] )</h3>
-		<p>
-			m -- 按照参数给定矩阵旋转对象四元数。<br />
+	<h3>[method:null setRotationFromQuaternion]( [param:Quaternion q] )</h3>
+	<p>
+		q -- 标准化的四元数。<br /><br />
 
-			该方法将会在 [page:.quaternion] 中，调用
-			[page:Quaternion.setFromRotationMatrix setFromRotationMatrix]( [page:Matrix4 m])。<br /><br />
+将所给的四元数复制到[page:.quaternion]中。
+	</p>
 
-			注意，该方法假设参数 m 矩阵的左上 3x3 表示非缩放的旋转信息。
-		</p>
+	<h3>[method:null toJSON]( [param:Quaternion q] )</h3>
+	<p>
+		将这个对象转换为JSON格式。
+	</p>
 
-		<h3>[method:null setRotationFromQuaternion]( [param:Quaternion q] )</h3>
-		<p>
-			q -- 归一化的四元数。<br /><br />
+	<h3>[method:this translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
+	<p>
+		axis -- 一个在局部空间中的标准化向量。<br />
+		distance -- 将要平移的距离。<br /><br />
+		在局部空间中沿着一条轴来平移物体，假设轴已被标准化。
+	</p>
 
-			将参数指定四元数拷贝到 [page:.quaternion]。
-		</p>
+	<h3>[method:this translateX]( [param:Float distance] )</h3>
+	<p>沿着X轴将平移*distance*个单位。</p>
 
-		<h3>[method:null toJSON]( [param:Quaternion q] )</h3>
-		<p>
-			将对象转化为 JSON 格式。
-		</p>
+	<h3>[method:this translateY]( [param:Float distance] )</h3>
+	<p>沿着Y轴将平移*distance*个单位。</p>
 
-		<h3>[method:this translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
-		<p>
-		axis -- 局部坐标系下的归一化向量。<br />
-		distance -- 需要被位移的距离。<br /><br />
+	<h3>[method:this translateZ]( [param:Float distance] )</h3>
+	<p>沿着Z轴将平移*distance*个单位。</p>
 
-		将物体沿参数给定方向移动指定距离。假设方向向量已经被归一化。
-		</p>
+	<h3>[method:null traverse]( [param:Function callback] )</h3>
+	<p>
 
-		<h3>[method:this translateX]( [param:Float distance] )</h3>
-		<p> 将对象沿 X 轴移动参数 *distance* 指定距离。</p>
+		callback - 以一个object3D对象作为第一个参数的函数。
+		<br /><br />
 
-		<h3>[method:this translateY]( [param:Float distance] )</h3>
-		<p> 将对象沿 Y 轴移动参数 *distance* 指定距离。</p>
+		在对象以及后代中执行的回调函数。
+	</p>
 
-		<h3>[method:this translateZ]( [param:Float distance] )</h3>
-		<p> 将对象沿 Z 轴移动参数 *distance* 指定距离。</p>
+	<h3>[method:null traverseVisible]( [param:Function callback] )</h3>
+	<p>
+			callback - 以一个object3D对象作为第一个参数的函数。
+			<br /><br />
 
-		<h3>[method:null traverse]( [param:Function callback] )</h3>
-		<p>
-		callback - 回调函数，第一个参数为 Object3D 对象。<br /><br />
+		类似traverse函数，但在这里，回调函数仅对可见的对象执行，不可见对象的后代将不遍历。
+	</p>
 
-		在该对象及所有子对象上执行该函数。
-		</p>
+	<h3>[method:null traverseAncestors]( [param:Function callback] )</h3>
+	<p>
+		callback - 以一个object3D对象作为第一个参数的函数。<br /><br />
 
-		<h3>[method:null traverseVisible]( [param:Function callback] )</h3>
-		<p>
-		callback - 回调函数，第一个参数为 Object3D 对象。<br /><br />
+		在所有的祖先中执行回调函数。
+	</p>
 
-			如同 traverse 函数，该函数只会在可见的对象及子对象上被调用。
-		</p>
+	<h3>[method:null updateMatrix]()</h3>
+	<p>更新局部变换。</p>
 
-		<h3>[method:null traverseAncestors]( [param:Function callback] )</h3>
-		<p>
-		callback - 回调函数，第一个参数为 Object3D 对象。<br /><br />
-
-		在父对象及所有祖先上被调用。
-		</p>
-
-		<h3>[method:null updateMatrix]()</h3>
-		<p>更新局部变换矩阵。</p>
-
-		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
-		<p>更新当前对象及子对象的全局变换信息。</p>
+	<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
+	<p>更新物体及其子级的全局变换。</p>
 
 
-		<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
-		<p>
-		vector - 全局坐标向量。<br /><br />
+	<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
+	<p>
+		vector - 一个世界向量.<br /><br />
+		将世界空间中的向量转换为局部空间向量。
+	</p>
 
-		将参数给定坐标从全局坐标转换为局部坐标。
-		</p>
+	<h2>源代码</h2>
 
-		<h2>资源</h2>
+	[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+</body>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
-	</body>
 </html>

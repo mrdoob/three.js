@@ -59,7 +59,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				for ( var i = 0; i < 1000; i++ ) {
+				for ( var i = 0; i < 1000; i ++ ) {
 
 					var material = new THREE.SpriteCanvasMaterial( {
 						color: Math.random() * 0x808008 + 0x808080,
@@ -72,6 +72,7 @@
 					particle.position.z = Math.random() * 2000 - 1000;
 					particle.scale.x = particle.scale.y = Math.random() * 20 + 10;
 					group.add( particle );
+
 				}
 
 				renderer = new THREE.CanvasRenderer();
@@ -110,6 +111,7 @@
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
+
 			}
 
 			function onDocumentTouchStart( event ) {

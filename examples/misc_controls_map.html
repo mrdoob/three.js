@@ -38,13 +38,17 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/MapControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, controls, scene, renderer;
 
@@ -121,9 +125,10 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 
-                var gui = new dat.GUI();
+				var gui = new dat.GUI();
 
-				gui.add(controls, 'screenSpacePanning');
+				gui.add( controls, 'screenSpacePanning' );
+
 			}
 
 			function onWindowResize() {

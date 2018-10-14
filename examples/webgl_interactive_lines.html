@@ -189,25 +189,12 @@
 
 				if ( intersects.length > 0 ) {
 
-					if ( currentIntersected !== undefined ) {
-
-						currentIntersected.material.linewidth = 1;
-
-					}
-
 					currentIntersected = intersects[ 0 ].object;
-					currentIntersected.material.linewidth = 5;
 
 					sphereInter.visible = true;
 					sphereInter.position.copy( intersects[ 0 ].point );
 
 				} else {
-
-					if ( currentIntersected !== undefined ) {
-
-						currentIntersected.material.linewidth = 1;
-
-					}
 
 					currentIntersected = undefined;
 

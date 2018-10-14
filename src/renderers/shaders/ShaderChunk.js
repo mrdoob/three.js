@@ -88,6 +88,8 @@ import uv2_pars_vertex from './ShaderChunk/uv2_pars_vertex.glsl';
 import uv2_vertex from './ShaderChunk/uv2_vertex.glsl';
 import worldpos_vertex from './ShaderChunk/worldpos_vertex.glsl';
 
+import background_frag from './ShaderLib/background_frag.glsl';
+import background_vert from './ShaderLib/background_vert.glsl';
 import cube_frag from './ShaderLib/cube_frag.glsl';
 import cube_vert from './ShaderLib/cube_vert.glsl';
 import depth_frag from './ShaderLib/depth_frag.glsl';
@@ -102,6 +104,8 @@ import meshbasic_frag from './ShaderLib/meshbasic_frag.glsl';
 import meshbasic_vert from './ShaderLib/meshbasic_vert.glsl';
 import meshlambert_frag from './ShaderLib/meshlambert_frag.glsl';
 import meshlambert_vert from './ShaderLib/meshlambert_vert.glsl';
+import meshmatcap_frag from './ShaderLib/meshmatcap_frag.glsl';
+import meshmatcap_vert from './ShaderLib/meshmatcap_vert.glsl';
 import meshphong_frag from './ShaderLib/meshphong_frag.glsl';
 import meshphong_vert from './ShaderLib/meshphong_vert.glsl';
 import meshphysical_frag from './ShaderLib/meshphysical_frag.glsl';
@@ -206,6 +210,8 @@ export var ShaderChunk = {
 	uv2_vertex: uv2_vertex,
 	worldpos_vertex: worldpos_vertex,
 
+	background_frag: background_frag,
+	background_vert: background_vert,
 	cube_frag: cube_frag,
 	cube_vert: cube_vert,
 	depth_frag: depth_frag,
@@ -220,6 +226,8 @@ export var ShaderChunk = {
 	meshbasic_vert: meshbasic_vert,
 	meshlambert_frag: meshlambert_frag,
 	meshlambert_vert: meshlambert_vert,
+	meshmatcap_frag: meshmatcap_frag,
+	meshmatcap_vert: meshmatcap_vert,
 	meshphong_frag: meshphong_frag,
 	meshphong_vert: meshphong_vert,
 	meshphysical_frag: meshphysical_frag,

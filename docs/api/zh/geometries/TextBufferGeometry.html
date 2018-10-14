@@ -10,13 +10,13 @@
 	<body>
 		[page:ExtrudeBufferGeometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>文本缓冲几何体（[name]）</h1>
 
 		<p class="desc">
-			A class for generating text as a single geometry. It is constructed by providing a string of text, and a hash of
-			parameters consisting of a loaded [page:Font] and settings for the geometry's parent [page:ExtrudeBufferGeometry].
-			See the [page:Font], [page:FontLoader] and [page:Creating_Text] pages for additional details.
-		</p>
+				一个用于将文本生成为单一的几何体的类。
+				它是由一串给定的文本，以及由加载的[page:Font]（字体）和该几何体[page:ExtrudeGeometry]父类中的设置所组成的参数来构造的。
+				请参阅[page:Font]、[page:FontLoader]和[page:Creating_Text]页面来查看更多详细信息。
+			</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#TextBufferGeometry"></iframe>
 
@@ -36,7 +36,7 @@
 
 		</script>
 
-		<h2>Examples</h2>
+		<h2>示例</h2>
 
 		<p>
 		[example:webgl_geometry_text geometry / text ]
@@ -60,37 +60,37 @@
 		} );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]([param:String text], [param:Object parameters])</h3>
 		<p>
-		text — The text that needs to be shown. <br />
-		parameters — Object that can contains the following parameters.
+		text — 将要显示的文本。<br />
+		parameters — 包含有下列参数的对象：
 		<ul>
-			<li>font — an instance of THREE.Font.</li>
-			<li>size — Float. Size of the text. Default is 100.</li>
-			<li>height — Float. Thickness to extrude text.  Default is 50.</li>
-			<li>curveSegments — Integer. Number of points on the curves. Default is 12.</li>
-			<li>bevelEnabled — Boolean. Turn on bevel. Default is False.</li>
-			<li>bevelThickness — Float. How deep into text bevel goes. Default is 10.</li>
-			<li>bevelSize — Float. How far from text outline is bevel. Default is 8.</li>
-			<li>bevelSegments — Integer. Number of bevel segments. Default is 3.</li>
+			<li>font — THREE.Font的实例。</li>
+			<li>size — Float。字体大小，默认值为100。</li>
+			<li>height — Float。挤出文本的厚度。默认值为50。</li>
+			<li>curveSegments — Integer。（表示文本的）曲线上点的数量。默认值为12。</li>
+			<li>bevelEnabled — Boolean。是否开启斜角，默认为false。</li>
+			<li>bevelThickness — Float。文本上斜角的深度，默认值为20。</li>
+			<li>bevelSize — Float。斜角与原始文本轮廓之间的延伸距离。默认值为8。</li>
+			<li>bevelSegments — Integer。斜角的分段数。默认值为3。</li>
 		</ul>
 		</p>
 
-		<h2>Available Fonts</h2>
+		<h2>可用的字体</h2>
 
 		<p>
-		TextGeometry uses <a href='http://gero3.github.io/facetype.js/' target="_top">typeface.json</a> generated fonts.
-		Some existing fonts can be found located in <b>/examples/fonts</b> and must be included in the page.
-		</p>
+				文本几何体使用 <a href='http://gero3.github.io/facetype.js/' target="_top">typeface.json</a>所生成的字体。
+				一些已有的字体可以在<b>/examples/fonts</b>中找到，且必须在页面中引入。
+			</p>
 		<table>
-			<tr>
-				<th>Font</th>
-				<th>Weight</th>
-				<th>Style</th>
-				<th>File Path</th>
-			</tr>
+				<tr>
+						<th>字体</th>
+						<th>字重</th>
+						<th>风格</th>
+						<th>文件路径</th>
+					</tr>
 			<tr>
 				<td>helvetiker</td>
 				<td>normal</td>
@@ -153,15 +153,15 @@
 			</tr>
 		</table>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/TextGeometry.js src/geometries/TextGeometry.js]
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
 </html>

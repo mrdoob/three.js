@@ -10,11 +10,12 @@
 	<body>
 		[page:Object3D] &rarr;
 
-		<h1>[name]</h1>
+		<h1>立方相机（[name]）</h1>
 
-		<p class="desc">创建6个渲染到[page:WebGLRenderTargetCube]的摄像机</p>
 
-		<h2>例子</h2>
+		<p class="desc">创建6个摄像机，并将它们所拍摄的场景渲染到[page:WebGLRenderTargetCube]上。</p>
+
+		<h2>示例</h2>
 
 		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
 		<p>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</p>
@@ -40,45 +41,52 @@
 		</code>
 
 
-		<h2>构造函数</h2>
+
+		<h2>构造器</h2>
+
 
 
 		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution] )</h3>
 		<p>
-		near -- 近剪裁面距离<br />
-		far -- 远剪裁面距离<br />
-		cubeResolution -- 设置立方体边缘的长度。
+
+		near -- 远剪切面的距离<br />
+		far -- 近剪切面的距离<br />
+		cubeResolution -- 设置立方体边缘的长度
 		</p>
 		<p>
-		构造一个包含6个[page:PerspectiveCamera PerspectiveCameras]的CubeCamera，渲染到[page:WebGLRenderTargetCube]。
+			构造一个包含6个[page:PerspectiveCamera PerspectiveCameras]（透视摄像机）的立方摄像机，并将其拍摄的场景渲染到一个[page:WebGLRenderTargetCube]上。
+
 		</p>
 
 
 		<h2>属性</h2>
-		<p>参阅基类[page:Object3D]的公共属性。</p>
+		<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
 
 		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
 		<p>
-		生成的立方体纹理。
+			生成的立方体纹理<br>
+			（译注：生成的立方体纹理保存在其中的.texture对象中，可作为贴图赋值给其他材质）
 		</p>
 
 		<h2>方法</h2>
-		<p>参阅基类[page:Object3D]的公共方法。</p>
+		<p>请参阅其基类[page:Object3D]来查看其共有方法。</p>
+
 
 
 		<h3>[method:null update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
 		<p>
-		renderer -- 当前WebGL渲染器 <br />
-		scene -- 当前场景
+		renderer -- 当前的WebGL渲染器<br />
+		scene -- 当前的场景
 		</p>
 		<p>
-		调用它来更新[page:CubeCamera.renderTarget renderTarget]。
+			这个方法用来更新[page:CubeCamera.renderTarget renderTarget]（渲染目标对象）。
 		</p>
 
 		<h3>[method:null clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
 		<p>
-		调用此方法以清除[page:CubeCamera.renderTarget renderTarget] 颜色，深度，和/或者模板缓冲区。
-		颜色缓冲区设置为渲染器的当前清除颜色。默认参数为*true*。
+			这个方法用来来清除[page:CubeCamera.renderTarget renderTarget]的颜色、深度和/或模板缓冲区。
+			颜色缓冲区设置为渲染器当前的“清除”色。参数默认值均为*true*。
+
 		</p>
 
 		<h2>源代码</h2>

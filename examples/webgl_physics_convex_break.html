@@ -35,7 +35,7 @@
 	<script src="../build/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/ConvexObjectBreaker.js"></script>
 	<script src="js/QuickHull.js"></script>
@@ -44,9 +44,12 @@
 		<script>
 
 		// Detects webgl
-		if ( ! Detector.webgl ) {
-			Detector.addGetWebGLMessage();
+
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 			document.getElementById( 'container' ).innerHTML = "";
+
 		}
 
 		// - Global variables -
@@ -300,9 +303,9 @@
 			var shape = new Ammo.btConvexHullShape();
 
 			for ( var i = 0, il = coords.length; i < il; i+= 3 ) {
-				this.tempBtVec3_1.setValue( coords[ i ], coords[ i + 1 ], coords[ i + 2 ] );
+				tempBtVec3_1.setValue( coords[ i ], coords[ i + 1 ], coords[ i + 2 ] );
 				var lastOne = ( i >= ( il - 3 ) );
-				shape.addPoint( this.tempBtVec3_1, lastOne );
+				shape.addPoint( tempBtVec3_1, lastOne );
 			}
 
 			return shape;

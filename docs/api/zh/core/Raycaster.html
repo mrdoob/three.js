@@ -8,12 +8,11 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>光线投射[name]</h1>
 
 		<p class="desc">
-			该类被设计为 [link:https://en.wikipedia.org/wiki/Ray_casting raycasting] 类的帮助类。射线检测用于帮助判断用户鼠标
-			在3D空间内选择的物体具体是哪个。（通过检测从摄像机到视锥近平面上鼠标点连线发出的射线，位于3D空间内哪个物体上，从而判断当前
-			用户的选择）。
+			这个类用于进行[link:https://en.wikipedia.org/wiki/Ray_casting raycasting]（光线投射）。
+			光线投射用于进行鼠标拾取（在三维空间中计算出鼠标移过了什么物体）。
 		</p>
 
 		<h2>示例</h2>
@@ -54,7 +53,7 @@
 
 		</code>
 		<div>
-			Examples: [example:webgl_interactive_cubes Raycasting to a Mesh]<br />
+			其它示例：<br>[example:webgl_interactive_cubes Raycasting to a Mesh]<br />
 			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera]<br />
 			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry]<br />
 			[example:webgl_interactive_lines Raycasting to a Line]<br />
@@ -70,17 +69,17 @@
 		</p>
 
 
-		<h2>构造函数</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] ) {</h3>
 		<p>
-		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
-		[page:Vector3 direction] — The direction vector that gives direction to the ray. Should be normalized.<br />
-		[page:Float near] — All results returned are further away than near. Near can't be negative. Default value is 0.<br />
-		[page:Float far] — All results returned are closer than far. Far can't be lower than near. Default value is Infinity.
-		</p>
+		[page:Vector3 origin] —— 光线投射的原点向量。<br />
+		[page:Vector3 direction] —— 向射线提供方向的方向向量，应当被标准化。<br />
+		[page:Float near] —— 返回的所有结果比near远。near不能为负值，其默认值为0。<br />
+		[page:Float far] —— 返回的所有结果都比far近。far不能小于near，其默认值为Infinity（正无穷。）</p>
 		<p>
-			该方法构造一个新的射线对象。<br />
+			这将创建一个新的raycaster对象。<br />
+
 		</p>
 
 
@@ -88,26 +87,26 @@
 
 		<h3>[property:float far]</h3>
 		<p>
-			射线的 far 参数。该参数决定射线最远可达范围，超过 far 的物体在检测时可以忽略。
-			该值不能为负，且应该大于 near 参数。
+			raycaster的远距离因数（投射远点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
+			这个值不应当为负，并且应当比near属性大。
 		</p>
 
 		<h3>[property:float linePrecision]</h3>
 		<p>
-			当与物体焦时，射线当精确度。
+
+			raycaster与[page:Line]（线）物体相交时的精度因数。
+
 		</p>
 
 		<h3>[property:float near]</h3>
 		<p>
-			射线的 near 参数。该参数决定射线的最近距离，近于 near 的物体在检测时可以忽略。
-			该值不能为负，且应该小于 far 参数。
+			raycaster的近距离因数（投射近点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
+			这个值不应当为负，并且应当比near属性小。
 		</p>
 
 		<h3>[property:Object params]</h3>
 		<p>
-			该对象拥有如下属性：
-
-			<code>
+			具有以下属性的物体：<code>
 {
 	Mesh: {},
 	Line: {},
@@ -120,67 +119,73 @@
 		</p>
 
 		<h3>[property:Ray ray]</h3>
-		<p> 射线检测时用到的 [Page:Ray]。</p>
+		<p>用于进行光线投射的[Page:Ray]（射线）。</p>
 
 
 		<h2>方法</h2>
 
 		<h3>[method:null set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
-		[page:Vector3 origin] — 射线的起点坐标。<br />
-		[page:Vector3 direction] — 射线的方向向量，该向量需要被归一化。
+		[page:Vector3 origin] —— 光线投射的原点向量。<br />
+		[page:Vector3 direction] —— 为光线提供方向的标准化方向向量。
 		</p>
 		<p>
-			用参数规定的原点和方向更新射线数据。
+			使用一个新的原点和方向来更新射线。
 		</p>
 
 		<h3>[method:null setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
 		<p>
-		[page:Vector2 coords] — 鼠标的被归一化的 2D 坐标（Normalized Device Coordinate）。X 和 Y 的值都应该components should be between -1 and 1。<br />
-		[page:Camera camera] — 射线应该以哪个摄像机作为原点。
+		[page:Vector2 coords] —— 在标准化设备坐标中鼠标的二维坐标 —— X分量与Y分量应当在-1到1之间。<br />
+								
+		[page:Camera camera] —— 射线所来源的摄像机。
 		</p>
 		<p>
-			用参数规定的新原点和方向更新射线数据。
+			使用一个新的原点和方向来更新射线。
 		</p>
 
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
-		[page:Object3D object] — 用于检测与射线焦的物体。<br />
-		[page:Boolean recursive] — 如果设置为 true, 该方法同样检测所有的子对象与射线的相焦情况。否则，值检测参数指定的物体。默认值为 false。<br />
-		[page:Array optionalTarget] — (可选) 结果存储到指定对象。否则，一个新的队列 [page:Array] 将会被实例化。如果设置了该值, 在调用该函数前，需要清空队列(例如, array.length = 0;)。
+		[page:Object3D object] —— 检查与射线相交的物体。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检查所有的后代。否则将只会检查对象本身。默认值为false。<br />
+		[page:Array optionalTarget] — （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>
-			检查对象和射线的所有焦点，如果 recursive 设置为 true，同样检查子对象。焦点结果被保存在队列中，按照焦点的距离排序，最近结果最先返回。
+			检测所有在射线与物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个）。<br>
+			该方法返回一个包含有交叉部分的数组:
 		</p>
 		<code>
 				[ { distance, point, face, faceIndex, object }, ... ]
 		</code>
 		<p>
-			[page:Float distance] – 射线原点到焦点的距离<br />
-			[page:Vector3 point] – 世界坐标下的焦点位置<br />
-			[page:Face3 face] – 与射线相交的位置<br />
-			[page:Integer faceIndex] – 与射线相交的面的索引<br />
-			[page:Object3D object] – 与射线相交的对象<br />
-			[page:Vector2 uv] - 与射线相交点的物体的 U,V 坐标
+			[page:Float distance] —— 射线投射原点和相交部分之间的距离。<br />
+			[page:Vector3 point] —— 相交部分的点（世界坐标）<br />
+			[page:Face3 face] —— 相交的面<br />
+			[page:Integer faceIndex] —— 相交的面的索引<br />
+			[page:Object3D object] —— 相交的物体<br />
+			[page:Vector2 uv] —— 相交部分的点的UV坐标。
 		</p>
 		<p>
-		*Raycaster* 当计算射线是否与对象相交时，会代理到对象的 [page:Object3D.raycast raycast] 方法。该方法允许 [page:Mesh meshes] 对射线检测的响应与 [page:Line lines] 和 [page:Points pointclouds] 不同。
+			当计算这条射线是否和物体相交的时候，*Raycaster*将传入的对象委托给[page:Object3D.raycast raycast]方法。
+			这将可以让[page:Mesh mesh]对于光线投射的响应不同于[page:Line lines]和[page:Points pointclouds]。
 		</p>
 		<p>
-		*Note* 对于被检测的 mesh 的面，其必须朝向 检测射线 [page:.ray ray] 的原点, 否则该面会被忽略。如果想要射线检测到 mesh 中朝向原点和背向原点的面，你需要设置 [page:Mesh.material material] 的 [page:Material.side side] 属性为 *THREE.DoubleSide*。
+			<strong>请注意</strong>：对于网格来说，面必须朝向射线的原点，以便其能够被检测到。
+			用于交互的射线穿过面的背侧时，将不会被检测到。如果需要对物体中面的两侧进行光线投射，
+			你需要将[page:Mesh.material material]中的[page:Material.side side]属性设置为*THREE.DoubleSide*。
 		</p>
 
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
-		[page:Array objects] — 需要被检测是否与射线碰撞的物体的队列<br />
-		[page:Boolean recursive] — 如果为 true, 检测时除指定对象外，也会递归检测所有子对象。 默认值为 false。<br />
-		[page:Array optionalTarget] — (可选)结果存储到指定对象。否则，一个新的队列 [page:Array] 将会被实例化。如果设置了该值, 在调用该函数前，需要清空队列(例如, array.length = 0;)。
+		[page:Array objects] —— 检测和射线相交的一组物体。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为false。<br />
+		[page:Array optionalTarget] —— （可选）（可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>
-			检查参数队列中的所有对象和当前射线的所有焦点，如果 recursive 设置为 true，同样检查子对象。焦点结果被保存在队列中，按照焦点的距离排序，最近结果最先返回。
+			检测所有在射线与这些物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个），相交部分和[page:.intersectObject]所返回的格式是相同的。
 		</p>
 
-		<h2>资源</h2>
+
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

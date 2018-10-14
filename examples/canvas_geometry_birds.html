@@ -43,15 +43,15 @@
 
 				THREE.Geometry.call( this );
 
-				v(   5,   0,   0 );
-				v( - 5, - 2,   1 );
-				v( - 5,   0,   0 );
+				v( 5, 0, 0 );
+				v( - 5, - 2, 1 );
+				v( - 5, 0, 0 );
 				v( - 5, - 2, - 1 );
 
-				v(   0,   2, - 6 );
-				v(   0,   2,   6 );
-				v(   2,   0,   0 );
-				v( - 3,   0,   0 );
+				v( 0, 2, - 6 );
+				v( 0, 2, 6 );
+				v( 2, 0, 0 );
+				v( - 3, 0, 0 );
 
 				f3( 0, 2, 1 );
 
@@ -72,7 +72,7 @@
 
 				}
 
-			}
+			};
 
 			Bird.prototype = Object.create( THREE.Geometry.prototype );
 			Bird.prototype.constructor = Bird;
@@ -82,8 +82,8 @@
 			var Boid = function () {
 
 				var vector = new THREE.Vector3(),
-				_acceleration, _width = 500, _height = 500, _depth = 200, _goal, _neighborhoodRadius = 100,
-				_maxSpeed = 4, _maxSteerForce = 0.1, _avoidWalls = false;
+					_acceleration, _width = 500, _height = 500, _depth = 200, _goal, _neighborhoodRadius = 100,
+					_maxSpeed = 4, _maxSteerForce = 0.1, _avoidWalls = false;
 
 				this.position = new THREE.Vector3();
 				this.velocity = new THREE.Vector3();
@@ -193,12 +193,12 @@
 
 				this.checkBounds = function () {
 
-					if ( this.position.x >   _width ) this.position.x = - _width;
-					if ( this.position.x < - _width ) this.position.x =   _width;
-					if ( this.position.y >   _height ) this.position.y = - _height;
-					if ( this.position.y < - _height ) this.position.y =  _height;
-					if ( this.position.z >  _depth ) this.position.z = - _depth;
-					if ( this.position.z < - _depth ) this.position.z =  _depth;
+					if ( this.position.x > _width ) this.position.x = - _width;
+					if ( this.position.x < - _width ) this.position.x = _width;
+					if ( this.position.y > _height ) this.position.y = - _height;
+					if ( this.position.y < - _height ) this.position.y = _height;
+					if ( this.position.z > _depth ) this.position.z = - _depth;
+					if ( this.position.z < - _depth ) this.position.z = _depth;
 
 				};
 
@@ -250,7 +250,7 @@
 					var count = 0;
 					var velSum = new THREE.Vector3();
 
-					for ( var i = 0, il = boids.length; i < il; i++ ) {
+					for ( var i = 0, il = boids.length; i < il; i ++ ) {
 
 						if ( Math.random() > 0.6 ) continue;
 
@@ -260,7 +260,7 @@
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
 							velSum.add( boid.velocity );
-							count++;
+							count ++;
 
 						}
 
@@ -300,7 +300,7 @@
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
 							posSum.add( boid.position );
-							count++;
+							count ++;
 
 						}
 
@@ -353,19 +353,14 @@
 
 				};
 
-			}
-
-		</script>
-
-		<script>
+			};
 
 			var SCREEN_WIDTH = window.innerWidth,
-			SCREEN_HEIGHT = window.innerHeight,
-			SCREEN_WIDTH_HALF = SCREEN_WIDTH  / 2,
-			SCREEN_HEIGHT_HALF = SCREEN_HEIGHT / 2;
+				SCREEN_HEIGHT = window.innerHeight,
+				SCREEN_WIDTH_HALF = SCREEN_WIDTH / 2,
+				SCREEN_HEIGHT_HALF = SCREEN_HEIGHT / 2;
 
-			var camera, scene, renderer,
-			birds, bird;
+			var camera, scene, renderer, birds, bird;
 
 			var boid, boids;
 
@@ -397,7 +392,7 @@
 					boid.setAvoidWalls( true );
 					boid.setWorldSize( 500, 500, 400 );
 
-					bird = birds[ i ] = new THREE.Mesh( new Bird(), new THREE.MeshBasicMaterial( { color:Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
+					bird = birds[ i ] = new THREE.Mesh( new Bird(), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 					bird.phase = Math.floor( Math.random() * 62.83 );
 					scene.add( bird );
 
@@ -412,7 +407,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				document.getElementById( 'container' ).appendChild(stats.dom);
+				document.getElementById( 'container' ).appendChild( stats.dom );
 
 				//
 
@@ -433,7 +428,7 @@
 
 				var vector = new THREE.Vector3( event.clientX - SCREEN_WIDTH_HALF, - event.clientY + SCREEN_HEIGHT_HALF, 0 );
 
-				for ( var i = 0, il = boids.length; i < il; i++ ) {
+				for ( var i = 0, il = boids.length; i < il; i ++ ) {
 
 					boid = boids[ i ];
 
@@ -459,7 +454,7 @@
 
 			function render() {
 
-				for ( var i = 0, il = birds.length; i < il; i++ ) {
+				for ( var i = 0, il = birds.length; i < il; i ++ ) {
 
 					boid = boids[ i ];
 					boid.run( boids );
@@ -473,7 +468,7 @@
 					bird.rotation.y = Math.atan2( - boid.velocity.z, boid.velocity.x );
 					bird.rotation.z = Math.asin( boid.velocity.y / boid.velocity.length() );
 
-					bird.phase = ( bird.phase + ( Math.max( 0, bird.rotation.z ) + 0.1 )  ) % 62.83;
+					bird.phase = ( bird.phase + ( Math.max( 0, bird.rotation.z ) + 0.1 ) ) % 62.83;
 					bird.geometry.vertices[ 5 ].y = bird.geometry.vertices[ 4 ].y = Math.sin( bird.phase ) * 5;
 
 				}

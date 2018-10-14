@@ -10,18 +10,20 @@
 	<body>
 		[page:Object3D] &rarr; [page:Camera] &rarr;
 
-		<h1>[name]</h1>
+		<h1>正交相机（[name]）</h1>
 
 		<p class="desc">
-			使用[link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection]的摄像机。<br /><br />
+			这一摄像机使用[link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection]（正交投影）来进行投影。<br /><br />
 
-			在此投影模式下，无论距离摄像机的距离如何，渲染图像中的对象大小都保持不变。<br /><br />
+			在这种投影模式下，无论物体距离相机距离远或者近，在最终渲染的图片中物体的大小都保持不变。
+			<br /><br />
 
-			这对于渲染2D场景和UI元素等非常有用。
+
+			这对于渲染2D场景或者UI元素是非常有用的。
 		</p>
 
 
-		<h2>例子</h2>
+		<h2>示例</h2>
 
 		<p>[example:canvas_camera_orthographic camera / orthographic ]</p>
 		<p>[example:webgl_camera camera ]</p>
@@ -39,98 +41,106 @@
 scene.add( camera );</code>
 
 
-		<h2>构造函数</h2>
+
+		<h2>构造器</h2>
+
 
 
 		<h3>[name]( [param:Number left], [param:Number right], [param:Number top], [param:Number bottom], [param:Number near], [param:Number far] )</h3>
 		<p>
-		left — 摄像机视锥体左平面。<br />
-		right — 摄像机视锥体右平面。<br />
-		top — 摄像机视锥体顶部平面。<br />
-		bottom — 摄像机视锥体底部平面。<br />
-		near — 摄像机视锥体近平面。<br />
-		far — 摄像机视锥体远平面。<br /><br />
 
-		这些一起定义了摄像机的[link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]。
+		left — 摄像机视锥体左侧面。<br />
+		right — 摄像机视锥体右侧面。<br />
+		top — 摄像机视锥体上侧面。<br />
+		bottom — 摄像机视锥体下侧面。<br />
+		near — 摄像机视锥体近端面。<br />
+		far — 摄像机视锥体远端面。<br /><br />
+
+		这些参数一起定义了摄像机的[link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]（视锥体）。
+
 		</p>
 
 
 		<h2>属性</h2>
 		<p>
-			参阅基类[page:Camera]的公共属性。<br>
- 			请注意，在对大多数这些属性进行更改后，必须调用 [page:OrthographicCamera.updateProjectionMatrix .updateProjectionMatrix]才能使更改生效。
+			请参阅其基类[page:Camera]来查看其共有属性。
+			<br>
+			请注意，在大多数属性发生改变之后，你将需要调用[page:OrthographicCamera.updateProjectionMatrix .updateProjectionMatrix]来使得这些改变生效。
 		</p>
 
 		<h3>[property:Float bottom]</h3>
-		<p>摄像机视锥体底部平面。</p>
+		<p>摄像机视锥体下侧面。</p>
 
 		<h3>[property:Float far]</h3>
 		<p>
-		摄像机视锥体远平面。 默认值是*2000*。<br /><br />
+			摄像机视锥体远端面，其默认值为*2000*。<br /><br />
+			其值的有效范围介于[page:.near near]（摄像机视锥体近端面）和无穷大之间。
 
-		有效范围介于[page:.near]平面的当前值和无穷远之间。
 		</p>
 
 		<h3>[property:Boolean isOrthographicCamera]</h3>
 		<p>
-			用于测试此类或派生类是否为正交摄像机。 默认值为*true*。<br /><br />
-
-			这不应该更改，因为渲染器在内部使用它进行优化。
+			用于测试这个类或者派生类是否为OrthographicCameras，默认为*true*。<br /><br />
+			你不应当对这个属性进行改变,因为它在内部由渲染器使用，以用于优化。
 		</p>
 
 		<h3>[property:Float left]</h3>
-		<p>摄像机视锥体左平面。</p>
+		<p>摄像机视锥体左侧面。</p>
 
 		<h3>[property:Float near]</h3>
 		<p>
-			摄像机视锥体近平面。默认值为*0.1*。<br /><br />
+			摄像机视锥体近端面。其默认值为*0.1*.<br /><br />
 
-			有效范围介于0和[page:.far]平面的当前值之间。
-			请注意，与[page:PerspectiveCamera]不同，*0*是正交摄像机近平面的有效值。
+			其值的有效范围介于0和[page:.far far]（摄像机视锥体远端面）之间。
+			<br>
+			请注意，和[page:PerspectiveCamera]不同，*0*对于OrthographicCamera的近端面来说是一个有效值。
+
 		</p>
 
 		<h3>[property:Float right]</h3>
-		<p>摄像机视锥体右平面。</p>
+		<p>摄像机视锥体右侧面。</p>
 
 		<h3>[property:Float top]</h3>
-		<p>摄像机视锥体顶部平面。</p>
+		<p>摄像机视锥体上侧面。</p>
 
 		<h3>[property:Object view]</h3>
-		<p>由[page:OrthographicCamera.setViewOffset setViewOffset]设置。默认值为*null*。</p>
+		<p>这个值是由[page:OrthographicCamera.setViewOffset setViewOffset]来设置的，其默认值为*null*。</p>
 
 		<h3>[property:number zoom]</h3>
-		<p>获取和设置摄像机的缩放系数。默认值为*1*。</p>
+		<p>
+			获取或者设置摄像机的缩放倍数，其默认值为*1*。</p>
 
 		<h2>方法</h2>
-		<p>参阅基类[page:Camera]的公共方法。</p>
+		<p>请参阅其基类[page:Camera]来查看其共有方法。</p>
 
 		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
-		fullWidth — 多视图设置的全宽度<br />
-		fullHeight — 多视图设置的全高度<br />
-		x — 子摄像机的水平偏移<br />
-		y — 子摄像机的竖直偏移<br />
-		width — 子摄像机宽度<br />
-		height — 子摄像机高度<br /><br />
+		fullWidth — 多视图的全宽设置<br />
+		fullHeight — 多视图的全高设置<br />
+		x — 副摄像机的水平偏移<br />
+		y — 副摄像机的垂直偏移<br />
+		width — 副摄像机的宽度<br />
+		height — 副摄像机的高度<br /><br />
 
-			在较大的[link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]中设置偏移。
-			这对于多窗口或多显示器/多机器设置很有用。
-			有关如何使用它的示例，请参阅[page:PerspectiveCamera.setViewOffset PerspectiveCamera]。
+			在较大的[link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]（视锥体）中设置偏移量，对于多窗口或者多显示器的设置是很有用的。
+			对于如何使用它，请查看[page:PerspectiveCamera.setViewOffset PerspectiveCamera]中的示例。
+
 		</p>
 
 		<h3>[method:null clearViewOffset]()</h3>
 		<p>
-		删除[page:PerspectiveCamera.setViewOffset .setViewOffset] 方法设置的任何偏移量。
+			清除任何由.setViewOffset设置的偏移量。
 		</p>
 
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<p>
-		更新摄像机的投影矩阵。必须在更改参数后调用。
+			更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
+
 		</p>
 
 		<h3>[method:JSON toJSON]()</h3>
 		<p>
-		以JSON格式返回摄像机的数据。
+		使用JSON格式来返回摄像机数据。
 		</p>
 
 

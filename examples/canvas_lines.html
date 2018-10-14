@@ -26,19 +26,18 @@
 		<script>
 
 			var mouseX = 0, mouseY = 0,
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
 
-			windowHalfX = window.innerWidth / 2,
-			windowHalfY = window.innerHeight / 2,
-
-			camera, scene, renderer;
+				camera, scene, renderer;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.createElement('div');
-				document.body.appendChild(container);
+				var container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
@@ -114,7 +113,7 @@
 
 			//
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;

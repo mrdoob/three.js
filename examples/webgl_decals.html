@@ -37,6 +37,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/geometries/DecalGeometry.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -127,7 +128,7 @@
 			var geometry = new THREE.BufferGeometry();
 			geometry.setFromPoints( [ new THREE.Vector3(), new THREE.Vector3() ] );
 
-			line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { linewidth: 4 } ) );
+			line = new THREE.Line( geometry, new THREE.LineBasicMaterial() );
 			scene.add( line );
 
 			loadLeePerrySmith();
@@ -239,19 +240,19 @@
 
 		function loadLeePerrySmith( callback ) {
 
-			var loader = new THREE.JSONLoader();
+			var loader = new THREE.GLTFLoader();
 
-			loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function( geometry ) {
+			loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function( gltf ) {
 
-				var material = new THREE.MeshPhongMaterial( {
+				mesh = gltf.scene.children[ 0 ];
+				mesh.material = new THREE.MeshPhongMaterial( {
 					specular: 0x111111,
-					map: textureLoader.load( 'models/json/leeperrysmith/Map-COL.jpg' ),
-					specularMap: textureLoader.load( 'models/json/leeperrysmith/Map-SPEC.jpg' ),
-					normalMap: textureLoader.load( 'models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+					map: textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' ),
+					specularMap: textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' ),
+					normalMap: textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
 					shininess: 25
 				} );
 
-				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 				mesh.scale.set( 10, 10, 10 );
 

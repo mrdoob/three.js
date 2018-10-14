@@ -27,12 +27,12 @@
 				color: #a06851;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(100,0,0) !important;
 				color:#fff !important;
 				margin-top:10em !important;
 			}
-			#oldie a { color:#fff }
+			#webglmessage a { color:#fff }
 
 		</style>
 	</head>
@@ -47,14 +47,14 @@
 
 		<script src="js/utils/BufferGeometryUtils.js"></script>
 		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 				document.getElementById( 'container' ).innerHTML = "";
 
 			}

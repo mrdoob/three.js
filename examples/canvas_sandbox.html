@@ -27,8 +27,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
-			var controls, group;
+			var camera, scene, renderer, group;
 
 			init();
 			animate();
@@ -87,7 +86,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild(stats.dom);
+				container.appendChild( stats.dom );
 
 				//
 
@@ -117,7 +116,7 @@
 
 			function render() {
 
-				for ( var i = 0, l = group.children.length; i < l; i++ ) {
+				for ( var i = 0, l = group.children.length; i < l; i ++ ) {
 
 					var object = group.children[ i ];
 
