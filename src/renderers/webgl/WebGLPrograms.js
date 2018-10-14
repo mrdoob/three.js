@@ -108,7 +108,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		return encoding;
 
 	}
-	
+
 	function getShaderObject( material, shaderID ) {
 
 		var shaderobject;
@@ -138,7 +138,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		return shaderobject;
 
 	}
-	
 
 	this.getParameters = function ( material, lights, shadows, fog, nClipPlanes, nClipIntersection, object ) {
 
