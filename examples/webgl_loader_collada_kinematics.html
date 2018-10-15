@@ -52,7 +52,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, objects;
+			var camera, scene, renderer;
 			var particleLight;
 			var dae;
 
@@ -163,7 +163,7 @@
 
 				kinematicsTween = new TWEEN.Tween( tweenParameters ).to( target, duration ).easing( TWEEN.Easing.Quadratic.Out );
 
-				kinematicsTween.onUpdate( function() {
+				kinematicsTween.onUpdate( function () {
 
 					for ( var prop in kinematics.joints ) {
 

@@ -76,7 +76,11 @@
 				Cineon: THREE.CineonToneMapping
 			};
 
+<<<<<<< HEAD
+			var camera, scene, renderer, group;
+=======
 			var camera, scene, renderer, controls, mesh;
+>>>>>>> dev
 			var composer;
 			var standardMaterial, floorMaterial;
 
@@ -105,8 +109,13 @@
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
+<<<<<<< HEAD
+				textureLoader.load( "textures/brick_diffuse.jpg", function ( map ) {
+
+=======
 
 				textureLoader.load( "textures/brick_diffuse.jpg", function( map ) {
+>>>>>>> dev
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.encoding = THREE.sRGBEncoding;
@@ -114,25 +123,40 @@
 					map.repeat.set( 9, 0.5 );
 					standardMaterial.map = map;
 					standardMaterial.needsUpdate = true;
+<<<<<<< HEAD
+
+	} );
+				textureLoader.load( "textures/brick_bump.jpg", function ( map ) {
+
+=======
 				} );
 
 				textureLoader.load( "textures/brick_bump.jpg", function( map ) {
+>>>>>>> dev
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 0.5 );
 					standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
+<<<<<<< HEAD
+
+	} );
+				textureLoader.load( "textures/brick_roughness.jpg", function ( map ) {
+
+=======
 				} );
 
 				textureLoader.load( "textures/brick_roughness.jpg", function( map ) {
+>>>>>>> dev
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 0.5 );
 					standardMaterial.roughnessMap = map;
 					standardMaterial.needsUpdate = true;
-				} );
+
+	} );
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
 				mesh = new THREE.Mesh( geometry, standardMaterial );
@@ -215,7 +239,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -261,7 +285,7 @@
 				standardMaterial.bumpScale = - 0.05 * params.bumpScale;
 				standardMaterial.opacity = params.opacity;
 
-				if( renderer.toneMapping !== toneMappingOptions[ params.toneMapping ] ) {
+				if ( renderer.toneMapping !== toneMappingOptions[ params.toneMapping ] ) {
 
 					renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
 					standardMaterial.needsUpdate = true;
@@ -274,7 +298,7 @@
 
 				mesh.rotation.y += 0.005;
 
-				if( params.renderMode === "Composer" ) {
+				if ( params.renderMode === "Composer" ) {
 
 					composer.render();
 

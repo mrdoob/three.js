@@ -50,7 +50,7 @@
 			////////////////////////////////////////////////////////////////////////////////
 			// Utah/Newell Teapot demo
 			////////////////////////////////////////////////////////////////////////////////
-			/*global THREE, WEBGL, container, dat, window */
+			/*global THREE, WEBGL, dat, window */
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
@@ -63,10 +63,9 @@
 			var effectController;
 			var teapotSize = 400;
 			var ambientLight, light;
-			var skybox;
 
-			var tess = -1;	// force initialization
-			var bBottom ;
+			var tess = - 1;	// force initialization
+			var bBottom;
 			var bLid;
 			var bBody;
 			var bFitLid;
@@ -93,7 +92,7 @@
 
 				// CAMERA
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
-				camera.position.set( -600, 550, 1300 );
+				camera.position.set( - 600, 550, 1300 );
 
 				// LIGHTS
 				ambientLight = new THREE.AmbientLight( 0x333333 );	// 0.2
@@ -135,7 +134,7 @@
 				var materialColor = new THREE.Color();
 				materialColor.setRGB( 1.0, 1.0, 1.0 );
 
-				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } ) ;
+				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } );
 
 				flatMaterial = new THREE.MeshPhongMaterial( { color: materialColor, specular: 0x000000, flatShading: true, side: THREE.DoubleSide } );
 
@@ -185,13 +184,13 @@
 					ks: 0.2,
 					metallic: true,
 
-					hue:		0.121,
+					hue:	0.121,
 					saturation: 0.73,
-					lightness:  0.66,
+					lightness: 0.66,
 
-					lhue:		 0.04,
+					lhue:	0.04,
 					lsaturation: 0.01,	// non-zero so that fractions will be shown
-					llightness:  1.0,
+					llightness: 1.0,
 
 					// bizarrely, if you initialize these with negative numbers, the sliders
 					// will not show any decimal places.
@@ -241,9 +240,9 @@
 
 				h = gui.addFolder( "Light direction" );
 
-				h.add( effectController, "lx", -1.0, 1.0, 0.025 ).name( "x" ).onChange( render );
-				h.add( effectController, "ly", -1.0, 1.0, 0.025 ).name( "y" ).onChange( render );
-				h.add( effectController, "lz", -1.0, 1.0, 0.025 ).name( "z" ).onChange( render );
+				h.add( effectController, "lx", - 1.0, 1.0, 0.025 ).name( "x" ).onChange( render );
+				h.add( effectController, "ly", - 1.0, 1.0, 0.025 ).name( "y" ).onChange( render );
+				h.add( effectController, "lz", - 1.0, 1.0, 0.025 ).name( "z" ).onChange( render );
 
 				h = gui.addFolder( "Tessellation control" );
 				h.add( effectController, "newTess", [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( "Tessellation Level" ).onChange( render );
@@ -270,8 +269,7 @@
 					effectController.body !== bBody ||
 					effectController.fitLid !== bFitLid ||
 					effectController.nonblinn !== bNonBlinn ||
-					effectController.newShading !== shading )
-				{
+					effectController.newShading !== shading ) {
 
 					tess = effectController.newTess;
 					bBottom = effectController.bottom;
@@ -291,15 +289,12 @@
 				texturedMaterial.shininess = effectController.shininess;
 
 				diffuseColor.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
-				if ( effectController.metallic )
-				{
+				if ( effectController.metallic ) {
 
 					// make colors match to give a more metallic look
 					specularColor.copy( diffuseColor );
 
-				}
-				else
-				{
+				} else {
 
 					// more of a plastic look
 					specularColor.setRGB( 1, 1, 1 );
@@ -358,10 +353,10 @@
 				teapot = new THREE.Mesh(
 					teapotGeometry,
 					shading === "wireframe" ? wireMaterial : (
-					shading === "flat" ? flatMaterial : (
-					shading === "smooth" ? gouraudMaterial : (
-					shading === "glossy" ? phongMaterial : (
-					shading === "textured" ? texturedMaterial : reflectiveMaterial ) ) ) ) );	// if no match, pick Phong
+						shading === "flat" ? flatMaterial : (
+							shading === "smooth" ? gouraudMaterial : (
+								shading === "glossy" ? phongMaterial : (
+									shading === "textured" ? texturedMaterial : reflectiveMaterial ) ) ) ) );	// if no match, pick Phong
 
 				scene.add( teapot );
 

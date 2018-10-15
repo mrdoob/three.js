@@ -1989,7 +1989,7 @@
 						mtl.position.keywords[ "speed" ] = speed;
 
 						// add global keyword ( variable or const )
-						THREE.NodeLib.addKeyword( 'myCustomUv', function ( builder ) {
+						THREE.NodeLib.addKeyword( 'myCustomUv', function () {
 
 							return new THREE.ReflectNode();
 
@@ -2022,7 +2022,7 @@
 						keywordsexample.keywords[ "myAlpha" ] = new THREE.ConstNode( "float myAlpha .05" );
 
 						// add global keyword ( const only )
-						THREE.NodeLib.addKeyword( 'myUV', function ( builder ) {
+						THREE.NodeLib.addKeyword( 'myUV', function () {
 
 							return new THREE.UVNode();
 
@@ -2290,7 +2290,7 @@
 
 						// GUI
 
-						addGui( 'click to reset', false, function ( val ) {
+						addGui( 'click to reset', false, function () {
 
 							// render a single time
 

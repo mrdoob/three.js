@@ -112,7 +112,7 @@
 		function init( font ) {
 
 			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
-			camera.position.set( -100, 100, 200 );
+			camera.position.set( - 100, 100, 200 );
 
 			controls = new THREE.TrackballControls( camera );
 
@@ -133,7 +133,7 @@
 				bevelSize: 1,
 				bevelEnabled: true
 
-			});
+			} );
 
 			geometry.center();
 
@@ -170,11 +170,11 @@
 
 				for ( var i = 0; i < 3; i ++ ) {
 
-					colors[ index + ( 3 * i )     ] = color.r;
+					colors[ index + ( 3 * i ) ] = color.r;
 					colors[ index + ( 3 * i ) + 1 ] = color.g;
 					colors[ index + ( 3 * i ) + 2 ] = color.b;
 
-					displacement[ index + ( 3 * i )     ] = d;
+					displacement[ index + ( 3 * i ) ] = d;
 					displacement[ index + ( 3 * i ) + 1 ] = d;
 					displacement[ index + ( 3 * i ) + 2 ] = d;
 
@@ -195,11 +195,11 @@
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms:       uniforms,
-				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				uniforms: uniforms,
+				vertexShader: document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 
-			});
+			} );
 
 			//
 

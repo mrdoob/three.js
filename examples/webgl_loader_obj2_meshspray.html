@@ -82,11 +82,12 @@
 
 			'use strict';
 
-			var MeshSpray = (function () {
+			var MeshSpray = ( function () {
 
 				var Validator = THREE.LoaderSupport.Validator;
 
 				function MeshSpray( manager ) {
+
 					this.manager = Validator.verifyInput( manager, THREE.DefaultLoadingManager );
 					this.logging = {
 						enabled: true,
@@ -99,19 +100,24 @@
 					this.meshBuilder = new THREE.LoaderSupport.MeshBuilder();
 					this.callbacks = new THREE.LoaderSupport.Callbacks();
 					this.workerSupport = null;
+
 				}
 
 				MeshSpray.prototype.setLogging = function ( enabled, debug ) {
+
 					this.logging.enabled = enabled === true;
 					this.logging.debug = debug === true;
 					this.meshBuilder.setLogging( this.logging.enabled, this.logging.debug );
+
 				};
 
 				MeshSpray.prototype.setStreamMeshesTo = function ( streamMeshesTo ) {
+
 					this.loaderRootNode = Validator.verifyInput( streamMeshesTo, this.loaderRootNode );
+
 				};
 
-				MeshSpray.prototype.setForceWorkerDataCopy = function ( forceWorkerDataCopy  ) {
+				MeshSpray.prototype.setForceWorkerDataCopy = function () {
 					// nothing to do here
 				};
 
@@ -136,14 +142,19 @@
 
 					var scope = this;
 					var scopeBuilderFunc = function ( payload ) {
+
 						var meshes = scope.meshBuilder.processPayload( payload );
 						var mesh;
 						for ( var i in meshes ) {
+
 							mesh = meshes[ i ];
 							scope.loaderRootNode.add( mesh );
+
 						}
+
 					};
-					var scopeFuncComplete = function ( message ) {
+					var scopeFuncComplete = function () {
+
 						var callback = scope.callbacks.onLoad;
 						if ( THREE.LoaderSupport.Validator.isValid( callback ) ) callback(
 							{
@@ -155,9 +166,11 @@
 							}
 						);
 						if ( scope.logging.enabled ) console.timeEnd( 'MeshSpray' + scope.instanceNo );
+
 					};
 
 					var buildCode = function ( funcBuildObject, funcBuildSingleton ) {
+
 						var workerCode = '';
 						workerCode += '/**\n';
 						workerCode += '  * This code was constructed by MeshSpray buildCode.\n';
@@ -167,6 +180,7 @@
 						workerCode += funcBuildSingleton( 'Parser', Parser );
 
 						return workerCode;
+
 					};
 					var libs2Load = [ 'build/three.min.js' ];
 					this.workerSupport.validate( buildCode, 'Parser', libs2Load, '../' );
@@ -191,9 +205,11 @@
 							}
 						}
 					);
+
 				};
 
 				MeshSpray.prototype._applyPrepData = function ( prepData ) {
+
 					if ( Validator.isValid( prepData ) ) {
 
 						this.setLogging( prepData.logging.enabled, prepData.logging.debug );
@@ -202,22 +218,24 @@
 						this._setCallbacks( prepData.getCallbacks() );
 
 					}
+
 				};
 
 				MeshSpray.prototype._setCallbacks = function ( callbacks ) {
+
 					if ( Validator.isValid( callbacks.onProgress ) ) this.callbacks.setCallbackOnProgress( callbacks.onProgress );
 					if ( Validator.isValid( callbacks.onMeshAlter ) ) this.callbacks.setCallbackOnMeshAlter( callbacks.onMeshAlter );
 					if ( Validator.isValid( callbacks.onLoad ) ) this.callbacks.setCallbackOnLoad( callbacks.onLoad );
 					if ( Validator.isValid( callbacks.onLoadMaterials ) ) this.callbacks.setCallbackOnLoadMaterials( callbacks.onLoadMaterials );
 
 					this.meshBuilder._setCallbacks( this.callbacks );
+
 				};
 
-
-
-				var Parser  = ( function () {
+				var Parser = ( function () {
 
 					function Parser() {
+
 						this.sizeFactor = 0.5;
 						this.localOffsetFactor = 1.0;
 						this.globalObjectCount = 0;
@@ -231,15 +249,19 @@
 							enabled: true,
 							debug: false
 						};
-					};
+
+					}
 
 					Parser.prototype.setLogging = function ( enabled, debug ) {
+
 						this.logging.enabled = enabled === true;
 						this.logging.debug = debug === true;
+
 					};
 
 					Parser.prototype.parse = function () {
-						var baseTriangle = [ 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 0.0, -1.0, 1.0 ];
+
+						var baseTriangle = [ 1.0, 1.0, 1.0, - 1.0, 1.0, 1.0, 0.0, - 1.0, 1.0 ];
 						var vertices = [];
 						var colors = [];
 						var normals = [];
@@ -254,7 +276,8 @@
 						// local coords offset
 						var localOffsetFactor = this.localOffsetFactor;
 
-						for ( var i = 0; i < this.quantity; i++ ) {
+						for ( var i = 0; i < this.quantity; i ++ ) {
+
 							var sizeVaring = this.sizeFactor * Math.random();
 
 							s = 2 * Math.PI * Math.random();
@@ -264,13 +287,16 @@
 							fixedOffsetY = dimensionHalf * Math.random() * Math.sin( s ) * Math.sin( t );
 							fixedOffsetZ = dimensionHalf * Math.random() * Math.cos( t );
 							for ( var j = 0; j < baseTriangle.length; j += 3 ) {
+
 								vertices.push( baseTriangle[ j ] * sizeVaring + localOffsetFactor * Math.random() + fixedOffsetX );
 								vertices.push( baseTriangle[ j + 1 ] * sizeVaring + localOffsetFactor * Math.random() + fixedOffsetY );
 								vertices.push( baseTriangle[ j + 2 ] * sizeVaring + localOffsetFactor * Math.random() + fixedOffsetZ );
 								colors.push( Math.random() );
 								colors.push( Math.random() );
 								colors.push( Math.random() );
+
 							}
+
 						}
 
 						var absoluteVertexCount = vertices.length;
@@ -325,7 +351,7 @@
 						};
 						this.callbackMeshBuilder( payload );
 
-						this.globalObjectCount++;
+						this.globalObjectCount ++;
 						this.callbackMeshBuilder(
 							{
 								cmd: 'meshData',
@@ -354,27 +380,32 @@
 						);
 
 						if ( this.logging.enabled ) console.info( 'Global output object count: ' + this.globalObjectCount );
+
 					};
 
 					return Parser;
-				})();
+
+				} )();
 
 
 				Parser.prototype.setSerializedMaterials = function ( serializedMaterials ) {
+
 					if ( THREE.LoaderSupport.Validator.isValid( serializedMaterials ) ) {
 
 						this.serializedMaterials = serializedMaterials;
 
 					}
+
 				};
 
 				return MeshSpray;
 
-			})();
+			} )();
 
-			var MeshSprayApp = (function () {
+			var MeshSprayApp = ( function () {
 
 				function MeshSprayApp( elementToBindTo ) {
+
 					this.renderer = null;
 					this.canvas = elementToBindTo;
 					this.aspectRatio = 1;
@@ -395,9 +426,11 @@
 
 					this.cube = null;
 					this.pivot = null;
+
 				}
 
 				MeshSprayApp.prototype.initGL = function () {
+
 					this.renderer = new THREE.WebGLRenderer( {
 						canvas: this.canvas,
 						antialias: true,
@@ -415,8 +448,8 @@
 					var directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
 					var directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
 
-					directionalLight1.position.set( -100, -50, 100 );
-					directionalLight2.position.set( 100, 50, -100 );
+					directionalLight1.position.set( - 100, - 50, 100 );
+					directionalLight2.position.set( 100, 50, - 100 );
 
 					this.scene.add( directionalLight1 );
 					this.scene.add( directionalLight2 );
@@ -434,9 +467,11 @@
 					this.pivot = new THREE.Object3D();
 					this.pivot.name = 'Pivot';
 					this.scene.add( this.pivot );
+
 				};
 
 				MeshSprayApp.prototype.initContent = function () {
+
 					var maxQueueSize = 1024;
 					var maxWebWorkers = 4;
 					var radius = 640;
@@ -445,13 +480,18 @@
 					workerDirector.setCrossOrigin( 'anonymous' );
 
 					var callbackOnLoad = function ( event ) {
+
 						console.info( 'Worker #' + event.detail.instanceNo + ': Completed loading. (#' + workerDirector.objectsCompleted + ')' );
+
 					};
-					var reportProgress = function( event ) {
+					var reportProgress = function ( event ) {
+
 						document.getElementById( 'feedback' ).innerHTML = event.detail.text;
 						console.info( event.detail.text );
+
 					};
 					var callbackMeshAlter = function ( event ) {
+
 						var override = new THREE.LoaderSupport.LoadedMeshUserOverride( false, true );
 
 						event.detail.side = THREE.DoubleSide;
@@ -460,8 +500,8 @@
 						override.addMesh( mesh );
 
 						return override;
-					};
 
+					};
 
 					var callbacks = new THREE.LoaderSupport.Callbacks();
 					callbacks.setCallbackOnMeshAlter( callbackMeshAlter );
@@ -473,7 +513,8 @@
 					var pivot;
 					var s, t, r, x, y, z;
 					var globalObjectCount = 0;
-					for ( var i = 0; i < maxQueueSize; i++ ) {
+					for ( var i = 0; i < maxQueueSize; i ++ ) {
+
 						prepData = new THREE.LoaderSupport.PrepData( 'Triangles_' + i );
 
 						pivot = new THREE.Object3D();
@@ -490,40 +531,51 @@
 
 						prepData.quantity = 8192;
 						prepData.dimension = Math.max( Math.random() * 500, 100 );
-						prepData.globalObjectCount = globalObjectCount++;
+						prepData.globalObjectCount = globalObjectCount ++;
 
 						workerDirector.enqueueForRun( prepData );
+
 					}
 					workerDirector.processQueue();
+
 				};
 
 				MeshSprayApp.prototype.resizeDisplayGL = function () {
+
 					this.controls.handleResize();
 
 					this.recalcAspectRatio();
 					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
 
 					this.updateCamera();
+
 				};
 
 				MeshSprayApp.prototype.recalcAspectRatio = function () {
+
 					this.aspectRatio = ( this.canvas.offsetHeight === 0 ) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+
 				};
 
 				MeshSprayApp.prototype.resetCamera = function () {
+
 					this.camera.position.copy( this.cameraDefaults.posCamera );
 					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
 
 					this.updateCamera();
+
 				};
 
 				MeshSprayApp.prototype.updateCamera = function () {
+
 					this.camera.aspect = this.aspectRatio;
 					this.camera.lookAt( this.cameraTarget );
 					this.camera.updateProjectionMatrix();
+
 				};
 
 				MeshSprayApp.prototype.render = function () {
+
 					if ( ! this.renderer.autoClear ) this.renderer.clear();
 
 					this.controls.update();
@@ -532,22 +584,27 @@
 					this.cube.rotation.y += 0.05;
 
 					this.renderer.render( this.scene, this.camera );
+
 				};
 
 				return MeshSprayApp;
 
-			})();
+			} )();
 
 			var app = new MeshSprayApp( document.getElementById( 'example' ) );
 
 			// init three.js example application
 			var resizeWindow = function () {
+
 				app.resizeDisplayGL();
+
 			};
 
 			var render = function () {
+
 				requestAnimationFrame( render );
 				app.render();
+
 			};
 
 			window.addEventListener( 'resize', resizeWindow, false );

@@ -53,7 +53,7 @@
 				<td>mech 1</td>
 				<td><select id="mech1_anime" onchange="mech1_changeAnime(this.value)">
 						<option value="stand">stand</option>
-						<option value="wark">wark</option>
+						<option value="wark">walk</option>
 						<option value="attack">attack</option>
 					  </select>
 					</td>
@@ -81,7 +81,6 @@
 		var container, stats, controls;
 		var camera, scene, renderer;
 		var clock = new THREE.Clock();
-		var mixers = [];
 		var manager = null;
 
 		var skeletonHelper = null;
@@ -102,7 +101,7 @@
 
 		};
 
-		var onError = function ( xhr ) {};
+		var onError = function () {};
 
 		function init() {
 
@@ -214,7 +213,7 @@
 
 				for ( var i = 0; i < animates.length; i ++ ) {
 
-					animates[ i ].update( delta * 1000  );
+					animates[ i ].update( delta * 1000 );
 
 				}
 

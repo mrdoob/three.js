@@ -72,12 +72,14 @@
 
 				//
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
 
@@ -124,7 +126,7 @@
 									color: diffuseColor,
 									metalness: 0,
 									roughness: 0.5,
-									clearCoat:  1.0 - alpha,
+									clearCoat: 1.0 - alpha,
 									clearCoatRoughness: 1.0 - beta,
 									reflectivity: 1.0 - gamma,
 									envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.texture : null
@@ -164,7 +166,7 @@
 						height: 1,
 						curveSegments: 1
 
-					});
+					} );
 
 					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
@@ -173,13 +175,13 @@
 
 				}
 
-				addLabel( "+clearCoat", new THREE.Vector3( -350, 0, 0 ) );
+				addLabel( "+clearCoat", new THREE.Vector3( - 350, 0, 0 ) );
 				addLabel( "-clearCoat", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "+clearCoatRoughness", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "+clearCoatRoughness", new THREE.Vector3( 0, - 300, 0 ) );
 				addLabel( "-clearCoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, -300 ) );
+				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "-reflectivity", new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );

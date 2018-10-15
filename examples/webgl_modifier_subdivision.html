@@ -37,9 +37,9 @@
 
 			// Create new object by parameters
 
-			var createSomething = function( klass, args ) {
+			var createSomething = function ( klass, args ) {
 
-				var F = function( klass, args ) {
+				var F = function ( klass, args ) {
 
 					return klass.apply( this, args );
 
@@ -74,19 +74,19 @@
 				{ type: 'TorusKnotGeometry', args: [ 100, 30 ], scale: 0.25, meshScale: 4 },
 				{ type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale: 2 },
 				{ type: 'IcosahedronGeometry', args: [ 100, 1 ], meshScale: 2 },
-				{ type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
-				{ type: 'OctahedronGeometry', args: [200, 0], meshScale: 2 },
-				{ type: 'LatheGeometry', args: [ [
+				{ type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ] },
+				{ type: 'OctahedronGeometry', args: [ 200, 0 ], meshScale: 2 },
+				{ type: 'LatheGeometry', args: [[
 					new THREE.Vector2( 0, 0 ),
 					new THREE.Vector2( 50, 50 ),
 					new THREE.Vector2( 10, 100 ),
 					new THREE.Vector2( 50, 150 ),
-					new THREE.Vector2( 0, 200 ) ] ]},
-				{ type: 'TextGeometry', args: ['&', {
-						size: 200,
-						height: 50,
-						curveSegments: 1
-					}]},
+					new THREE.Vector2( 0, 200 ) ]] },
+				{ type: 'TextGeometry', args: [ '&', {
+					size: 200,
+					height: 50,
+					curveSegments: 1
+				} ] },
 				{ type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
 
 			];
@@ -103,28 +103,32 @@
 
 				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
-				geometriesParams.push( {type: 'WaltHead', args: [ ], meshScale: 6 } );
+				geometriesParams.push( { type: 'WaltHead', args: [ ], meshScale: 6 } );
 
-				THREE.WaltHead = function() {
+				THREE.WaltHead = function () {
+
 					return geometry.clone();
-				};
 
-				updateInfo()
+	};
 
-			});
+				updateInfo();
+
+			} );
 
 			var loader2 = new THREE.BufferGeometryLoader();
 			loader2.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
 				geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
-				geometriesParams.push( {type: 'Suzanne', args: [ ], scale: 100, meshScale:2 } );
+				geometriesParams.push( { type: 'Suzanne', args: [ ], scale: 100, meshScale: 2 } );
 
-				THREE.Suzanne = function() {
+				THREE.Suzanne = function () {
+
 					return geometry.clone();
-				};
 
-				updateInfo()
+	};
+
+				updateInfo();
 
 			} );
 
@@ -159,11 +163,12 @@
 
 			}
 
-			function switchGeometry(i) {
+			function switchGeometry( i ) {
 
 				geometryIndex = i;
 
 				addStuff();
+
 			}
 
 			function updateInfo() {
@@ -173,11 +178,13 @@
 				var dropdown = '<select id="dropdown" onchange="switchGeometry(this.value)">';
 
 				for ( var i = 0; i < geometriesParams.length; i ++ ) {
+
 					dropdown += '<option value="' + i + '"';
 
 					dropdown += ( geometryIndex == i ) ? ' selected' : '';
 
 					dropdown += '>' + geometriesParams[ i ].type + '</option>';
+
 				}
 
 				dropdown += '</select>';
@@ -188,7 +195,7 @@
 					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
 					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
 					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
-					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
+					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length;
 
 			}
 
@@ -224,7 +231,7 @@
 
 				for ( var i = 0; i < smooth.faces.length; i ++ ) {
 
-					var face  = smooth.faces[ i ];
+					var face = smooth.faces[ i ];
 
 					for ( var j = 0; j < 3; j ++ ) {
 
