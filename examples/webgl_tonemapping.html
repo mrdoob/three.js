@@ -76,11 +76,7 @@
 				Cineon: THREE.CineonToneMapping
 			};
 
-<<<<<<< HEAD
 			var camera, scene, renderer, group;
-=======
-			var camera, scene, renderer, controls, mesh;
->>>>>>> dev
 			var composer;
 			var standardMaterial, floorMaterial;
 
@@ -109,13 +105,8 @@
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
-<<<<<<< HEAD
 				textureLoader.load( "textures/brick_diffuse.jpg", function ( map ) {
 
-=======
-
-				textureLoader.load( "textures/brick_diffuse.jpg", function( map ) {
->>>>>>> dev
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.encoding = THREE.sRGBEncoding;
@@ -123,32 +114,22 @@
 					map.repeat.set( 9, 0.5 );
 					standardMaterial.map = map;
 					standardMaterial.needsUpdate = true;
-<<<<<<< HEAD
 
-	} );
-				textureLoader.load( "textures/brick_bump.jpg", function ( map ) {
-
-=======
 				} );
 
-				textureLoader.load( "textures/brick_bump.jpg", function( map ) {
->>>>>>> dev
+				textureLoader.load( "textures/brick_bump.jpg", function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 0.5 );
 					standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
-<<<<<<< HEAD
 
-	} );
-				textureLoader.load( "textures/brick_roughness.jpg", function ( map ) {
-
-=======
 				} );
 
-				textureLoader.load( "textures/brick_roughness.jpg", function( map ) {
->>>>>>> dev
+				textureLoader.load( "textures/brick_roughness.jpg", function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -156,7 +137,7 @@
 					standardMaterial.roughnessMap = map;
 					standardMaterial.needsUpdate = true;
 
-	} );
+				} );
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
 				mesh = new THREE.Mesh( geometry, standardMaterial );
