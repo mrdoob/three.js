@@ -11,204 +11,187 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		This class stores data for an attribute (such as vertex positions, face indices, normals,
-		colors, UVs, and any custom attributes ) associated with a [page:BufferGeometry], which allows
-		for more efficient passing of data to the GPU. See that page for details and a usage example.<br /><br />
+			这个类用于存储与[page:BufferGeometry]相关联的 attribute（例如顶点位置向量，面片索引，法向量，颜色值，UV坐标以及任何自定义 attribute ）。
+			利用 BufferAttribute，可以更高效的向GPU传递数据。详情和例子见该页。<br /><br />
 
-		Data is stored as vectors of any length (defined by [page:BufferAttribute.itemSize itemSize]),
-		and in general in the methods outlined below if passing in an index, this is automatically
-		multiplied by the vector length.
+			在 BufferAttribute 中，数据被存储为任意长度的矢量（通过[page:BufferAttribute.itemSize itemSize]进行定义），下列函数如无特别说明，
+			函数参数中的index会自动乘以矢量长度进行计算。
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 		<h3>[name]( [param:TypedArray array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
 		<p>
-		[page:TypedArray array] -- Must be a [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/TypedArray TypedArray].
-		Used to instantiate the buffer. <br />
-		This array should have
+			[page:TypedArray array] -- 必须是 [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/TypedArray TypedArray].
+			类型，用于实例化缓存。<br />
+			该队列应该包含：
 	 	<code>itemSize * numVertices</code>
-		elements, where numVertices is the number of vertices in the associated [page:BufferGeometry BufferGeometry].<br /><br />
+			个元素，numVertices 是 [page:BufferGeometry BufferGeometry]中的顶点数目<br /><br />
 
 
-		[page:Integer itemSize] --  the number of values of the array that should be associated with
-		a particular vertex. For instance, if this
-		attribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3.
+		[page:Integer itemSize] --
+			队列中与顶点相关的数据值的大小。举例，如果 attribute 存储的是三元组（例如顶点空间坐标、法向量或颜色值）则itemSize的值应该是3。
 		<br /><br />
 
-		[page:Boolean normalized] -- (optional) Indicates how the underlying data in the buffer maps
-		to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance of
-		UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array
-		 data will be mapped to 0.0f - +1.0f in the GLSL attribute. An Int16Array (signed) would map
-		 from -32767 - +32767  to -1.0f - +1.0f. If [page:Boolean normalized] is false, the values
-		 will be converted to floats which contain the exact value, i.e. 32767 becomes 32767.0f.
+			[page:Boolean normalized] -- (可选) 指明缓存中的数据如何与GLSL代码中的数据对应。例如，如果[page:TypedArray array]是
+			UInt16Array类型，且[page:Boolean normalized]的值是 true，则队列中的值将会从 0 - +65535 映射为 GLSL 中的 0.0f - +1.0f。
+			如果[page:TypedArray array]是 Int16Array (有符号)，则值将会从 -32767 - +32767 映射为 -1.0f - +1.0f。若 [page:Boolean normalized]
+			的值为 false，则数据映射不会归一化，而会直接映射为 float 值，例如，32767 将会映射为 32767.0f.
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:TypedArray array]</h3>
 		<p>
-		The [page:TypedArray array] holding data stored in the buffer.
+			在 [page:TypedArray array] 中保存着缓存中的数据。
 		</p>
 
 		<h3>[property:Integer count]</h3>
 		<p>
-		Stores the [page:BufferAttribute.array array]'s length divided by the [page:BufferAttribute.itemSize itemSize].<br /><br />
+			保存 [page:BufferAttribute.array array] 除以 [page:BufferAttribute.itemSize itemSize] 之后的大小。<br /><br />
 
-		If the buffer is storing a 3-component vector (such as a position, normal, or color),
-		then this will count the number of such vectors stored.
+			若缓存存储三元组（例如顶点位置、法向量、颜色值），则该值应等于队列中三元组的个数。
 		</p>
 
 		<h3>[property:Boolean dynamic]</h3>
 		<p>
-			Whether the buffer is dynamic or not. Default is *false*.<br />
+			不论缓存是否是动态的，默认值都将是 *false*<br />
 
-			If false, the GPU is informed that contents of the buffer are likely to be used often and not change often.
-			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.STATIC_DRAW] flag.<br />
-			if true, the GPU is informed that contents of the buffer are likely to be used often and change often.
-			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.DYNAMIC_DRAW] flag.
+			如果该值为 false，即告知 GPU 缓存中的数据会经常使用但不经常变化。
+			该值与 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.STATIC_DRAW] 标志位相一致。<br />
+			如果该值为 true，即告知 GPU 缓存中的数据会经常使用且经常变化。
+			该值与 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.DYNAMIC_DRAW] 标志位相一致。
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>
 		<p>
-			Used to check whether this or derived classes are BufferAttributes. Default is *true*.<br /><br />
+			指示当前类或派生类是 BufferAttributes. 默认值为 *true*.<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			开发者不应当改变该值，该值用于内部实现优化。
 		</p>
 
 		<h3>[property:Integer itemSize]</h3>
-		<p>The length of vectors that are being stored in the [page:BufferAttribute.array array].</p>
+		<p>保存在 [page:BufferAttribute.array array] 中矢量的长度。</p>
 
 		<h3>[property:String name]</h3>
 		<p>
-		Optional name for this attribute instance. Default is an empty string.
+			该 attribute 实例的别名，默认值为空字符串。
 		</p>
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-		Flag to indicate that this attribute has changed and should be re-sent to the GPU.
-		Set this to true when you modify the value of the array.<br /><br />
-
-		Setting this to true also increments the [page:BufferAttribute.version version].
+			该标志位指明当前 attribute 已经被修改过，且需要再次送入 GPU 处理。当开发者改变了该队列的值，则标志位需要设置为 true。<br /><br />
+			将标志位设为 true 同样会增加 [page:BufferAttribute.version version] 的值。
 		</p>
 
 		<h3>[property:Boolean normalized]</h3>
 		<p>
-		Indicates how the underlying data in the buffer maps to the values in the GLSL shader code.
-		See the constructor above for details.
+			指明缓存中数据在转化为GLSL着色器代码中数据时是否需要被归一化。详见构造函数中的说明。
 		</p>
 
 		<h3>[property:Function onUploadCallback]</h3>
 		<p>
-		A callback function that is executed after the Renderer has transfered the attribute array data to the GPU.
+			attribute 数据传输到GPU后的回调函数。
 		</p>
 
 		<h3>[property:Object updateRange]</h3>
-		<p>Object containing:<br />
-			[page:Integer offset]: Default is *0*. Position at whcih to start update.<br />
-			[page:Integer count]: Default is *-1*, which means don't use update ranges. <br /><br />
+		<p>对象包含如下成员:<br />
+			[page:Integer offset]: 默认值为 *0*。 指明更新的起始位置。<br />
+			[page:Integer count]: 默认值为 *-1*，表示不指定更新范围。<br /><br />
 
-			This can be used to only update some components of stored vectors (for example, just the component
-			related to color).
+			该值只可以被用于更新某些矢量数据（例如，颜色相关数据）。
 		</p>
 
 		<h3>[property:Integer version]</h3>
-		<p>A version number, incremented every time the [page:BufferAttribute.needsUpdate needsUpdate] property is set to true.</p>
+		<p>版本号，当 [page:BufferAttribute.needsUpdate needsUpdate] 被设置为 true 时，该值会自增。</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:BufferAttribute clone]() </h3>
-		<p>Return a copy of this bufferAttribute.</p>
+		<p>返回该 BufferAttribute 的拷贝。</p>
 
 		<h3>[method:BufferAttribute copyArray]( array ) </h3>
-		<p>Copy the array given here (which can be a normal array or TypedArray) into
-			[page:BufferAttribute.array array].<br /><br />
-
-			See [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]
-			for notes on requirements if copying a TypedArray.
+		<p>将参数中所给定的普通队列或 TypedArray 拷贝到 [page:BufferAttribute.array array] 中。<br /><br />
+			拷贝 TypedArray 相关注意事项详见 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]。
 		</p>
 
 		<h3>[method:null copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
-		<p>Copy a vector from bufferAttribute[index2] to [page:BufferAttribute.array array][index1].</p>
+		<p>将一个矢量从 bufferAttribute[index2] 拷贝到 [page:BufferAttribute.array array][index1] 中。</p>
 
 		<h3>[method:BufferAttribute copyColorsArray]( [param:Array colors] ) </h3>
-		<p>Copy an array representing RGB color values into [page:BufferAttribute.array array].</p>
+		<p>将一个存储 RGB 颜色值的队列拷贝到 [page:BufferAttribute.array array] 中。</p>
 
 		<h3>[method:BufferAttribute copyVector2sArray]( [param:Array vectors] ) </h3>
-		<p>Copy an array representing [page:Vector2]s into [page:BufferAttribute.array array].</p>
+		<p>将一个存储 [page:Vector2] 的队列拷贝到 [page:BufferAttribute.array array] 中。</p>
 
 		<h3>[method:BufferAttribute copyVector3sArray]( [param:Array vectors] ) </h3>
-		<p>Copy an array representing [page:Vector3]s into [page:BufferAttribute.array array].</p>
+		<p>将一个存储 [page:Vector3] 的队列拷贝到 [page:BufferAttribute.array array] 中。</p>
 
 		<h3>[method:BufferAttribute copyVector4sArray]( [param:Array vectors] ) </h3>
-		<p>Copy an array representing [page:Vector4]s into [page:BufferAttribute.array array].</p>
+		<p>将一个存储 [page:Vector4] 的队列拷贝到 [page:BufferAttribute.array array] 中。</p>
 
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
-		<p>Returns the x component of the vector at the given index.</p>
+		<p>获取给定索引的矢量的第一维元素 （即 X 值）。</p>
 
 		<h3>[method:Number getY]( [param:Integer index] ) </h3>
-		<p>Returns the y component of the vector at the given index.</p>
+		<p>获取给定索引的矢量的第二维元素 （即 Y 值）。</p>
 
 		<h3>[method:Number getZ]( [param:Integer index] ) </h3>
-		<p>Returns the z component of the vector at the given index.</p>
+		<p>获取给定索引的矢量的第三维元素 （即 Z 值）。</p>
 
 		<h3>[method:Number getW]( [param:Integer index] ) </h3>
-		<p>Returns the w component of the vector at the given index.</p>
+		<p>获取给定索引的矢量的第四维元素 （即 W 值）。</p>
 
 		<h3>[method:null onUpload]( [param:Function callback] ) </h3>
-		<p>
-		Sets the value of the onUploadCallback property.<br /><br />
-
-		In the [example:webgl_buffergeometry WebGL / Buffergeometry] this is used to free memory
-		after the buffer has been	transfered to the GPU.
+		<p>见 onUploadCallback 属性。<br /><br />
+			在 [example:webgl_buffergeometry WebGL / Buffergeometry] 中，该方在缓存数据传递给 GPU 后，用于释放内存。
 		</p>
 
 		<h3>[method:BufferAttribute set] ( [param:Array value], [param:Integer offset] ) </h3>
 		<p>
-		value -- an [page:Array] or [page:TypedArray] from which to copy values. <br />
-		offset -- (optional) index of the [page:BufferAttribute.array array] at which to start copying.<br /><br />
+		value -- 被拷贝的 [page:Array] 或 [page:TypedArray] 类型的数据。 <br />
+		offset -- (可选) [page:BufferAttribute.array array] 中开始拷贝的位置索引。<br /><br />
 
-		Calls	[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]( [page:Array value], [page:Integer offset] )
-		on the [page:BufferAttribute.array array].<br /><br />
+		对 [page:BufferAttribute.array array]，调用	[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]( [page:Array value], [page:Integer offset] )
+		方法。<br /><br />
 
-		In particular, see that page for requirements on [page:Array value]
-		being a [page:TypedArray].
+		特别的, 对将 [page:Array value] 转为  [page:TypedArray] 的要求详见上述链接。
 		</p>
 
 		<h3>[method:BufferAttribute setArray] ( [param:TypedArray array] ) </h3>
 		<p>
-		[page:BufferAttribute.array array] to the TypedArray passed in here.<br /><br />
+		[page:BufferAttribute.array array] 被赋值的 TypedArray 队列。<br /><br />
 
-		After setting the array, [page:BufferAttribute.needsUpdate needsUpdate] should be set to true.
+		队列被复制后，[page:BufferAttribute.needsUpdate needsUpdate] 应当被设置为 true。
 		</p>
 
 		<h3>[method:BufferAttribute setDynamic] ( [param:Boolean value] ) </h3>
-		<p>Set [page:BufferAttribute.dynamic dynamic] to value.</p>
+		<p>将 [page:BufferAttribute.dynamic dynamic] 设置为 value.</p>
 
 		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
-		<p>Sets the x component of the vector at the given index.</p>
+		<p>设置给定索引的矢量的第一维数据（设置 X 值）。</p>
 
 		<h3>[method:BufferAttribute setY]( [param:Integer index], [param:Float y] ) </h3>
-		<p>Sets the y component of the vector at the given index.</p>
+		<p>设置给定索引的矢量的第二维数据（设置 Y 值）。</p>
 
 		<h3>[method:BufferAttribute setZ]( [param:Integer index], [param:Float z] ) </h3>
-		<p>Sets the z component of the vector at the given index.</p>
+		<p>设置给定索引的矢量的第三维数据（设置 Z 值）。</p>
 
 		<h3>[method:BufferAttribute setW]( [param:Integer index], [param:Float w] ) </h3>
-		<p>Sets the w component of the vector at the given index.</p>
+		<p>设置给定索引的矢量的第四维数据（设置 W 值）。</p>
 
 		<h3>[method:BufferAttribute setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
-		<p>Sets the x and y components of the vector at the given index.</p>
+		<p>设置给定索引的矢量的第一、二维数据（设置 X 和 Y 值）。</p>
 
 		<h3>[method:BufferAttribute setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
-		<p>Sets the x, y and z components of the vector at the given index.</p>
+		<p>设置给定索引的矢量的第一、二、三维数据（设置 X、Y 和 Z 值）。</p>
 
 		<h3>[method:BufferAttribute setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
-		<p>Sets the x, y, z and w components of the vector at the given index.</p>
+		<p>设置给定索引的矢量的第一、二、三、四维数据（设置 X、Y、Z 和 W 值）。</p>
 
 
 
-		<h2>Source</h2>
+		<h2>资源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

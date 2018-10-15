@@ -12,6 +12,7 @@
 
 		<h1>立方相机（[name]）</h1>
 
+
 		<p class="desc">创建6个摄像机，并将它们所拍摄的场景渲染到[page:WebGLRenderTargetCube]上。</p>
 
 		<h2>示例</h2>
@@ -40,17 +41,21 @@
 		</code>
 
 
+
 		<h2>构造器</h2>
+
 
 
 		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution] )</h3>
 		<p>
+
 		near -- 远剪切面的距离<br />
 		far -- 近剪切面的距离<br />
 		cubeResolution -- 设置立方体边缘的长度
 		</p>
 		<p>
 			构造一个包含6个[page:PerspectiveCamera PerspectiveCameras]（透视摄像机）的立方摄像机，并将其拍摄的场景渲染到一个[page:WebGLRenderTargetCube]上。
+
 		</p>
 
 
@@ -67,6 +72,7 @@
 		<p>请参阅其基类[page:Object3D]来查看其共有方法。</p>
 
 
+
 		<h3>[method:null update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
 		<p>
 		renderer -- 当前的WebGL渲染器<br />
@@ -80,6 +86,7 @@
 		<p>
 			这个方法用来来清除[page:CubeCamera.renderTarget renderTarget]的颜色、深度和/或模板缓冲区。
 			颜色缓冲区设置为渲染器当前的“清除”色。参数默认值均为*true*。
+
 		</p>
 
 		<h2>源代码</h2>

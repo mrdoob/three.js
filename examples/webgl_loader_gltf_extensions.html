@@ -115,9 +115,9 @@
 					url: './models/gltf/Monster/%s/Monster.gltf',
 					author: '3drt.com',
 					authorURL: 'http://www.3drt.com/downloads.htm',
-					cameraPos: new THREE.Vector3( 30, 10, 70 ),
-					objectScale: new THREE.Vector3( 0.4, 0.4, 0.4 ),
-					objectPosition: new THREE.Vector3( 2, 1, 0 ),
+					cameraPos: new THREE.Vector3( 3, 1, 7 ),
+					objectScale: new THREE.Vector3( 0.04, 0.04, 0.04 ),
+					objectPosition: new THREE.Vector3( 0.2, 0.1, 0 ),
 					objectRotation: new THREE.Euler( 0, - 3 * Math.PI / 4, 0 ),
 					animationTime: 3,
 					addLights: true,
@@ -208,9 +208,11 @@
 					scene.add( directionalLight );
 
 					spot1 = new THREE.SpotLight( 0xffffff, 1 );
-					spot1.position.set( 10, 20, 10 );
-					spot1.angle = 0.25;
+					spot1.position.set( 5, 10, 5 );
+					spot1.angle = 0.50;
 					spot1.penumbra = 0.75;
+					spot1.intensity = 100;
+					spot1.decay = 2;
 
 					if ( sceneInfo.shadows ) {
 
@@ -308,7 +310,6 @@
 
 						if ( spot1 ) {
 
-							spot1.position.set( sceneInfo.objectPosition.x - 100, sceneInfo.objectPosition.y + 200, sceneInfo.objectPosition.z - 100 );
 							spot1.target.position.copy( sceneInfo.objectPosition );
 
 						}

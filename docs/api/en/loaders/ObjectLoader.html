@@ -85,9 +85,9 @@
 			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
 		</p>
 
-		<h3>[property:String texturePath]</h3>
+		<h3>[property:String resourcePath]</h3>
 		<p>
-			The base path or URL from which textures will be loaded. See [page:.setTexturePath].
+			The base path or URL from which additional resources like textuures will be loaded. See [page:.setResourcePath].
 			Default is the empty string.
 		</p>
 
@@ -217,11 +217,14 @@
 		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</p>
 
-		<h3>[method:ObjectLoader setTexturePath]( [param:String value] )</h3>
+		<h3>[method:ObjectLoader setPath]( [param:String value] )</h3>
 		<p>
-		[page:String value] — The base path or URL from which textures will be loaded.<br /><br />
+			Set the base path for the original file.
+		</p>
 
-
+		<h3>[method:ObjectLoader setResourcePath]( [param:String value] )</h3>
+		<p>
+			Set the base path for dependent resources like textures.
 		</p>
 
 		<h2>Source</h2>

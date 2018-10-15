@@ -67,13 +67,13 @@
 					mesh.rotation.y = Math.PI / 2;
 					scene.add( mesh );
 
-					var modifer = new THREE.SimplifyModifier();
+					var modifier = new THREE.SimplifyModifier();
 
 					var simplified = mesh.clone();
 					simplified.material = simplified.material.clone();
 					simplified.material.flatShading = true;
 					var count = Math.floor( simplified.geometry.attributes.position.count * 0.875 ); // number of vertices to remove
-					simplified.geometry = modifer.modify( simplified.geometry, count );
+					simplified.geometry = modifier.modify( simplified.geometry, count );
 
 					simplified.position.x = 3;
 					simplified.rotation.y = - Math.PI / 2;

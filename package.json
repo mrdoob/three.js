@@ -57,7 +57,7 @@
     "google-closure-compiler": "20180805.0.0",
     "http-server": "^0.11.1",
     "qunit": "^2.6.2",
-    "rollup": "^0.65.0"
+    "rollup": "^0.65.2"
   },
   "jspm": {
     "files": [

@@ -19,7 +19,7 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 
 #else
 
-	if( cutoffDistance > 0.0 ) {
+	if( cutoffDistance > 0.0 && decayExponent > 0.0 ) {
 
 		return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
 

@@ -626,7 +626,7 @@ var Loader = function ( editor ) {
 			case 'object':
 
 				var loader = new THREE.ObjectLoader();
-				loader.setTexturePath( scope.texturePath );
+				loader.setResourcePath( scope.texturePath );
 
 				var result = loader.parse( data );
 
