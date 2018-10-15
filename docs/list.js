@@ -447,7 +447,7 @@ var list = {
 
 			"进阶": {
 				"如何更新场景": "manual/zh/introduction/How-to-update-things",
-				"如何创建VR内容": "manual/en/introduction/How-to-create-VR-content",
+				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
 				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
 				"动画系统": "manual/zh/introduction/Animation-system"
 			},
