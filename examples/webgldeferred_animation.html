@@ -36,10 +36,11 @@
 	<body>
 		<div id="container"></div>
 
+		<script src="../build/three.js"></script>
+
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
@@ -108,7 +109,7 @@
 
 				var loader = new THREE.JSONLoader();
 
-				loader.load( "models/skinned/knight.js", function( geometry, materials ) {
+				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
 
 					var material = materials[ 0 ];
 					material.emissive.set( 0x101010 );
@@ -116,7 +117,7 @@
 					material.morphTargets = true;
 
 					var mesh = new THREE.SkinnedMesh( geometry, material );
-					mesh.position.y = -30;
+					mesh.position.y = - 30;
 					mesh.scale.multiplyScalar( 5 );
 
 					mixer = new THREE.AnimationMixer( mesh );
@@ -144,7 +145,7 @@
 				var distance = 20;
 
 				var c = new THREE.Vector3();
-				var geometry = new THREE.SphereGeometry( 1, 1, 1 );
+				var geometry = new THREE.SphereBufferGeometry( 1, 1, 1 );
 
 				for ( var i = 0; i < numLights; i ++ ) {
 
@@ -161,7 +162,7 @@
 				}
 
 				var directionalLight = new THREE.DirectionalLight( 0x101010 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				var spotLight = new THREE.SpotLight( 0x404040 );
@@ -182,31 +183,31 @@
 
 				// top
 				var mesh = new THREE.Mesh( geometry, material );
-				mesh.rotation.x = Math.PI/2;
+				mesh.rotation.x = Math.PI / 2;
 				mesh.position.y = size / 2;
 				room.add( mesh );
 
 				// bottom
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.rotation.x = -Math.PI/2;
-				mesh.position.y = -size / 2;
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.position.y = - size / 2;
 				room.add( mesh );
 
 				// left
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = -size / 2;
-				mesh.rotation.y = Math.PI/2;
+				mesh.position.x = - size / 2;
+				mesh.rotation.y = Math.PI / 2;
 				room.add( mesh );
 
 				// right
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = size / 2;
-				mesh.rotation.y = -Math.PI/2;
+				mesh.rotation.y = - Math.PI / 2;
 				room.add( mesh );
 
 				// back
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.z = -size / 2;
+				mesh.position.z = - size / 2;
 				room.add( mesh );
 
 				// front, to check if transparency works
@@ -219,7 +220,7 @@
 
 				// back2, to check if transparency works
 				mesh = new THREE.Mesh( geometry, transparentMaterial );
-				mesh.position.z = -size / 4;
+				mesh.position.z = - size / 4;
 				mesh.scale.multiplyScalar( 0.75 );
 				mesh.visible = false;
 				transparentObjects.push( mesh );
@@ -246,9 +247,9 @@
 					'light pre-pass': 1,
 					'forward': 2
 
-				} ).onChange( function() {
+				} ).onChange( function () {
 
-					switch( parseInt( api.mode ) ) {
+					switch ( parseInt( api.mode ) ) {
 
 						case 0:
 							renderer.forwardRendering = false;
@@ -292,7 +293,7 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				WIDTH = window.innerWidth;
 				HEIGHT = window.innerHeight;

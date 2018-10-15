@@ -96,7 +96,7 @@
 
 				];
 
-				var geometry = new THREE.SphereGeometry( 50, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry( 50, 32, 16 );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
@@ -123,7 +123,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias : true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

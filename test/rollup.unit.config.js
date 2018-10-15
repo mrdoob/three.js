@@ -27,7 +27,6 @@ export default [
 	// editor unit conf
 	{
 		input: 'test/three.editor.unit.js',
-		indent: '\t',
 		plugins: [
 			glsl()
 		],
@@ -39,13 +38,13 @@ export default [
 				file: 'test/unit/three.editor.unit.js',
 				intro: 'QUnit.module( "Editor", () => {',
 				outro: '} );',
+				indent: '\t',
 			}
 		]
 	},
 	// example unit conf
 	{
 		input: 'test/three.example.unit.js',
-		indent: '\t',
 		plugins: [
 			glsl()
 		],
@@ -57,13 +56,13 @@ export default [
 				file: 'test/unit/three.example.unit.js',
 				intro: 'QUnit.module( "Example", () => {',
 				outro: '} );',
+				indent: '\t',
 			}
 		]
 	},
 	// source unit conf
 	{
 		input: 'test/three.source.unit.js',
-		indent: '\t',
 		plugins: [
 			glsl()
 		],
@@ -75,6 +74,7 @@ export default [
 				file: 'test/unit/three.source.unit.js',
 				intro: 'QUnit.module( "Source", () => {',
 				outro: '} );',
+				indent: '\t',
 			}
 		]
 	},

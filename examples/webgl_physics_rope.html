@@ -1,49 +1,51 @@
 <html lang="en">
-    <head>
-        <title>Amjs softbody rope demo</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <style>
-            body {
-                color: #61443e;
-                font-family:Monospace;
-                font-size:13px;
-                text-align:center;
+	<head>
+		<title>Amjs softbody rope demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+				body {
+					color: #61443e;
+					font-family:Monospace;
+					font-size:13px;
+					text-align:center;
 
-                background-color: #bfd1e5;
-                margin: 0px;
-                overflow: hidden;
-            }
+					background-color: #bfd1e5;
+					margin: 0px;
+					overflow: hidden;
+				}
 
-            #info {
-                position: absolute;
-                top: 0px; width: 100%;
-                padding: 5px;
-            }
+				#info {
+					position: absolute;
+					top: 0px; width: 100%;
+					padding: 5px;
+				}
 
-            a {
+				a {
+					color: #a06851;
+				}
 
-                color: #a06851;
-            }
-
-        </style>
-    </head>
-    <body>
+		</style>
+	</head>
+	<body>
 	<div id="info">Ammo.js physics soft body rope demo<br>Press Q or A to move the arm.</div>
-        <div id="container"><br /><br /><br /><br /><br />Loading...</div>
+	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
 
 	<script src="../build/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
-        <script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
-        <script>
+	<script>
 
 		// Detects webgl
-		if ( ! Detector.webgl ) {
-		    Detector.addGetWebGLMessage();
-		    document.getElementById( 'container' ).innerHTML = "";
+
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			document.getElementById( 'container' ).innerHTML = "";
+
 		}
 
 		// - Global variables -
@@ -188,7 +190,7 @@
 			var ballMass = 1.2;
 			var ballRadius = 0.6;
 
-			var ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 20, 20 ), new THREE.MeshPhongMaterial( { color: 0x202020 } ) );
+			var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 20, 20 ), new THREE.MeshPhongMaterial( { color: 0x202020 } ) );
 			ball.castShadow = true;
 			ball.receiveShadow = true;
 			var ballShape = new Ammo.btSphereShape( ballRadius );
@@ -324,7 +326,7 @@
 
 		function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
 
-			var threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
+			var threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
 			var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 			shape.setMargin( margin );
 
@@ -473,7 +475,7 @@
 
 		}
 
-        </script>
+		</script>
 
-    </body>
+	</body>
 </html>

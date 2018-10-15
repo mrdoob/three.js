@@ -3,6 +3,7 @@
  */
 /* global QUnit */
 
+import { runStdGeometryTests } from '../../qunit-utils';
 import {
 	LatheGeometry,
 	LatheBufferGeometry

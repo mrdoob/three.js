@@ -27,7 +27,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -39,18 +39,23 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl bump mapping without tangents using <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">Morten Mikkelsen's</a> method -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl bump mapping without tangents -
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var statsEnabled = true;
 
@@ -110,7 +115,7 @@
 
 				//
 
-				var mapHeight = new THREE.TextureLoader().load( "models/json/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0x552811,
@@ -120,8 +125,8 @@
 					bumpScale: 12
 				} );
 
-				loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function( gltf ) { createScene( gltf.scene.children[ 0 ].geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

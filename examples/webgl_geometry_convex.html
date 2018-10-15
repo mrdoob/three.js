@@ -32,12 +32,16 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/QuickHull.js"></script>
 		<script src="js/geometries/ConvexGeometry.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var group, camera, scene, renderer;
 
@@ -87,11 +91,11 @@
 
 				// points
 
-				var pointsGeometry = new THREE.DodecahedronGeometry( 10 );
+				var vertices = new THREE.DodecahedronGeometry( 10 ).vertices;
 
-				for ( var i = 0; i < pointsGeometry.vertices.length; i ++ ) {
+				for ( var i = 0; i < vertices.length; i ++ ) {
 
-					//pointsGeometry.vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
+					//vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
 
 				}
 
@@ -104,6 +108,8 @@
 
 				} );
 
+				var pointsGeometry = new THREE.BufferGeometry().setFromPoints( vertices );
+
 				var points = new THREE.Points( pointsGeometry, pointsMaterial );
 				group.add( points );
 
@@ -115,7 +121,7 @@
 					transparent: true
 				} );
 
-				var meshGeometry = new THREE.ConvexBufferGeometry( pointsGeometry.vertices );
+				var meshGeometry = new THREE.ConvexBufferGeometry( vertices );
 
 				var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
 				mesh.material.side = THREE.BackSide; // back faces

@@ -195,7 +195,7 @@
 
 			// debug camera
 
-			cameraEye = new THREE.Mesh( new THREE.SphereGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
+			cameraEye = new THREE.Mesh( new THREE.SphereBufferGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
 			parent.add( cameraEye );
 
 			cameraHelper.visible = params.cameraHelper;
@@ -226,7 +226,7 @@
 			folderGeometry.open();
 
 			var folderCamera = gui.addFolder( 'Camera' );
-			folderCamera.add( params, 'animationView').onChange( function( value ) { animateCamera( true ); } );
+			folderCamera.add( params, 'animationView').onChange( function( value ) { animateCamera(); } );
 			folderCamera.add( params, 'lookAhead').onChange( function( value ) { animateCamera(); } );
 			folderCamera.add( params, 'cameraHelper').onChange( function( value ) { animateCamera(); } );
 			folderCamera.open();

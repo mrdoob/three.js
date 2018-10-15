@@ -3,8 +3,8 @@
 	uniform sampler2D bumpMap;
 	uniform float bumpScale;
 
-	// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
-	// http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
+	// Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
+	// http://api.unrealengine.com/attachments/Engine/Rendering/LightingAndShadows/BumpMappingWithoutTangentSpace/mm_sfgrad_bump.pdf
 
 	// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 
@@ -33,6 +33,8 @@
 		vec3 R2 = cross( vN, vSigmaX );
 
 		float fDet = dot( vSigmaX, R1 );
+
+		fDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
 		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );
 		return normalize( abs( fDet ) * surf_norm - vGrad );

@@ -39,11 +39,15 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var mesh, renderer, scene, camera;
 
@@ -82,7 +86,7 @@
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
 
-				var geometry = new THREE.BoxGeometry( 10, 10, 10 );
+				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 
 				var loader = new THREE.TextureLoader();
 				var texture = loader.load( 'textures/UV_Grid_Sm.jpg', render );
@@ -153,8 +157,6 @@
 			}
 
 			function initGui() {
-
-				var drop;
 
 				gui = new dat.GUI();
 

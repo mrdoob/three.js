@@ -9,6 +9,7 @@
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
+				touch-action: none;
 			}
 
 			#info {
@@ -78,10 +79,15 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mousedown', onPointerStart, false );
+				document.addEventListener( 'mousemove', onPointerMove, false );
+				document.addEventListener( 'mouseup', onPointerUp, false );
+
 				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+
+				document.addEventListener( 'touchstart', onPointerStart, false );
+				document.addEventListener( 'touchmove', onPointerMove, false );
+				document.addEventListener( 'touchend', onPointerUp, false );
 
 				//
 
@@ -136,32 +142,36 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
-
-				event.preventDefault();
+			function onPointerStart( event ) {
 
 				isUserInteracting = true;
 
-				onMouseDownMouseX = event.clientX;
-				onMouseDownMouseY = event.clientY;
+				var clientX = event.clientX || event.touches[ 0 ].clientX;
+				var clientY = event.clientY || event.touches[ 0 ].clientY;
+
+				onMouseDownMouseX = clientX;
+				onMouseDownMouseY = clientY;
 
 				onMouseDownLon = lon;
 				onMouseDownLat = lat;
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
 				if ( isUserInteracting === true ) {
 
-					lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
-					lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
+					var clientX = event.clientX || event.touches[ 0 ].clientX;
+					var clientY = event.clientY || event.touches[ 0 ].clientY;
+
+					lon = ( onMouseDownMouseX - clientX ) * 0.1 + onMouseDownLon;
+					lat = ( clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
 
 				}
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onPointerUp( event ) {
 
 				isUserInteracting = false;
 

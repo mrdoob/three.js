@@ -4,6 +4,10 @@
  * parameters = {
  *  color: <hex>,
  *  linewidth: <float>,
+ *  dashed: <boolean>,
+ *  dashScale: <float>,
+ *  dashSize: <float>,
+ *  gapSize: <float>,
  *  resolution: <Vector2>, // to be set by renderer
  * }
  */
@@ -11,7 +15,10 @@
 THREE.UniformsLib.line = {
 
 	linewidth: { value: 1 },
-	resolution: { value: new THREE.Vector2( 1, 1 ) }
+	resolution: { value: new THREE.Vector2( 1, 1 ) },
+	dashScale: { value: 1 },
+	dashSize: { value: 1 },
+	gapSize: { value: 1 } // todo FIX - maybe change to totalSize
 
 };
 
@@ -42,6 +49,15 @@ THREE.ShaderLib[ 'line' ] = {
 
 		varying vec2 vUv;
 
+		#ifdef USE_DASH
+
+			uniform float dashScale;
+			attribute float instanceDistanceStart;
+			attribute float instanceDistanceEnd;
+			varying float vLineDistance;
+
+		#endif
+
 		void trimSegment( const in vec4 start, inout vec4 end ) {
 
 			// trim end segment so it terminates between the camera plane and the near plane
@@ -60,7 +76,15 @@ THREE.ShaderLib[ 'line' ] = {
 		void main() {
 
 			#ifdef USE_COLOR
+
 				vColor.xyz = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
+
+			#endif
+
+			#ifdef USE_DASH
+
+				vLineDistance = ( position.y < 0.5 ) ? dashScale * instanceDistanceStart : dashScale * instanceDistanceEnd;
+
 			#endif
 
 			float aspect = resolution.x / resolution.y;
@@ -144,9 +168,9 @@ THREE.ShaderLib[ 'line' ] = {
 
 			gl_Position = clip;
 
-			#include <logdepthbuf_vertex>
+			vec4 mvPosition = ( position.y < 0.5 ) ? start : end; // this is an approximation
 
-			#include <worldpos_vertex>
+			#include <logdepthbuf_vertex>
 			#include <clipping_planes_vertex>
 			#include <fog_vertex>
 
@@ -158,25 +182,42 @@ THREE.ShaderLib[ 'line' ] = {
 		uniform vec3 diffuse;
 		uniform float opacity;
 
+		#ifdef USE_DASH
+
+			uniform float dashSize;
+			uniform float gapSize;
+
+		#endif
+
+		varying float vLineDistance;
+
 		#include <common>
 		#include <color_pars_fragment>
 		#include <fog_pars_fragment>
 		#include <logdepthbuf_pars_fragment>
 		#include <clipping_planes_pars_fragment>
 
-			varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
 			#include <clipping_planes_fragment>
 
-			if ( vUv.y < 0.5 || vUv.y > 0.5 ) {
+			#ifdef USE_DASH
 
-				float a = vUv.x - 0.5;
-				float b = vUv.y - 0.5;
+				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
+
+				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
+
+			#endif
+
+			if ( abs( vUv.y ) > 1.0 ) {
+
+				float a = vUv.x;
+				float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
 				float len2 = a * a + b * b;
 
-				if ( len2 > 0.25 ) discard;
+				if ( len2 > 1.0 ) discard;
 
 			}
 
@@ -208,6 +249,8 @@ THREE.LineMaterial = function ( parameters ) {
 		fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader
 
 	} );
+
+	this.dashed = false;
 
 	Object.defineProperties( this, {
 
@@ -242,6 +285,60 @@ THREE.LineMaterial = function ( parameters ) {
 			set: function ( value ) {
 
 				this.uniforms.linewidth.value = value;
+
+			}
+
+		},
+
+		dashScale: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.dashScale.value;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.dashScale.value = value;
+
+			}
+
+		},
+
+		dashSize: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.dashSize.value;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.dashSize.value = value;
+
+			}
+
+		},
+
+		gapSize: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.gapSize.value;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.gapSize.value = value;
 
 			}
 

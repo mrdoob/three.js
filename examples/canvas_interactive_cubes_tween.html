@@ -27,7 +27,7 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			
+
 			var raycaster;
 			var mouse;
 
@@ -54,7 +54,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
@@ -71,16 +71,16 @@
 					scene.add( object );
 
 				}
-				
+
 				//
-				
+
 				raycaster = new THREE.Raycaster();
 				mouse = new THREE.Vector2();
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -102,16 +102,16 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-			
+
 			function onDocumentTouchStart( event ) {
-				
+
 				event.preventDefault();
-				
-				event.clientX = event.touches[0].clientX;
-				event.clientY = event.touches[0].clientY;
+
+				event.clientX = event.touches[ 0 ].clientX;
+				event.clientY = event.touches[ 0 ].clientY;
 				onDocumentMouseDown( event );
 
-			}	
+			}
 
 			function onDocumentMouseDown( event ) {
 
@@ -130,13 +130,13 @@
 						x: Math.random() * 800 - 400,
 						y: Math.random() * 800 - 400,
 						z: Math.random() * 800 - 400 }, 2000 )
-					.easing( TWEEN.Easing.Elastic.Out).start();
+						.easing( TWEEN.Easing.Elastic.Out ).start();
 
 					new TWEEN.Tween( intersects[ 0 ].object.rotation ).to( {
 						x: Math.random() * 2 * Math.PI,
 						y: Math.random() * 2 * Math.PI,
 						z: Math.random() * 2 * Math.PI }, 2000 )
-					.easing( TWEEN.Easing.Elastic.Out).start();
+						.easing( TWEEN.Easing.Elastic.Out ).start();
 
 				}
 
@@ -148,6 +148,7 @@
 
 				}
 				*/
+
 			}
 
 			//

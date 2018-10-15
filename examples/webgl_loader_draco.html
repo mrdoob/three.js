@@ -84,7 +84,7 @@
 
 				geometry.computeVertexNormals();
 
-				var material = new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
@@ -130,7 +130,7 @@
 
 			camera.position.x = Math.sin( timer ) * 0.5;
 			camera.position.z = Math.cos( timer ) * 0.5;
-			camera.lookAt( new THREE.Vector3( 0, 0.1, 0 ) );
+			camera.lookAt( 0, 0.1, 0 );
 
 			renderer.render( scene, camera );
 

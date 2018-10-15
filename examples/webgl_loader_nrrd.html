@@ -56,14 +56,18 @@
 		<script src="js/loaders/NRRDLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/gunzip.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container,
 				stats,
@@ -103,17 +107,14 @@
 				var loader = new THREE.NRRDLoader();
 				loader.load( "models/nrrd/I.nrrd", function ( volume ) {
 					var geometry,
-						canvas,
-						canvasMap,
 						material,
-						plane,
 						sliceZ,
 						sliceY,
 						sliceX;
 
 					//box helper to see the extend of the volume
-					var geometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
-					var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+					var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
+					var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					var cube = new THREE.Mesh( geometry, material );
 					cube.visible = false;
 					var box = new THREE.BoxHelper( cube );
@@ -122,18 +123,14 @@
 					scene.add( cube );
 
 					//z plane
-
-					var indexZ = 0;
 					sliceZ = volume.extractSlice('z',Math.floor(volume.RASDimensions[2]/4));
 					scene.add( sliceZ.mesh );
 
 					//y plane
-					var indexY = 0;
 					sliceY = volume.extractSlice('y',Math.floor(volume.RASDimensions[1]/2));
 					scene.add( sliceY.mesh );
 
 					//x plane
-					var indexX = 0;
 					sliceX = volume.extractSlice('x',Math.floor(volume.RASDimensions[0]/2));
 					scene.add( sliceX.mesh );
 

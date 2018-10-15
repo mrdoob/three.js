@@ -114,37 +114,43 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "at", ( assert ) => {
 
 			var a = new Line3( one3.clone(), new Vector3( 1, 1, 2 ) );
+			var point = new Vector3();
 
-			assert.ok( a.at( - 1 ).distanceTo( new Vector3( 1, 1, 0 ) ) < 0.0001, "Passed!" );
-			assert.ok( a.at( 0 ).distanceTo( one3.clone() ) < 0.0001, "Passed!" );
-			assert.ok( a.at( 1 ).distanceTo( new Vector3( 1, 1, 2 ) ) < 0.0001, "Passed!" );
-			assert.ok( a.at( 2 ).distanceTo( new Vector3( 1, 1, 3 ) ) < 0.0001, "Passed!" );
+			a.at( - 1, point );
+			assert.ok( point.distanceTo( new Vector3( 1, 1, 0 ) ) < 0.0001, "Passed!" );
+			a.at( 0, point );
+			assert.ok( point.distanceTo( one3.clone() ) < 0.0001, "Passed!" );
+			a.at( 1, point );
+			assert.ok( point.distanceTo( new Vector3( 1, 1, 2 ) ) < 0.0001, "Passed!" );
+			a.at( 2, point );
+			assert.ok( point.distanceTo( new Vector3( 1, 1, 3 ) ) < 0.0001, "Passed!" );
 
 		} );
 
 		QUnit.test( "closestPointToPoint/closestPointToPointParameter", ( assert ) => {
 
 			var a = new Line3( one3.clone(), new Vector3( 1, 1, 2 ) );
+			var point = new Vector3();
 
 			// nearby the ray
 			assert.ok( a.closestPointToPointParameter( zero3.clone(), true ) == 0, "Passed!" );
-			var b1 = a.closestPointToPoint( zero3.clone(), true );
-			assert.ok( b1.distanceTo( new Vector3( 1, 1, 1 ) ) < 0.0001, "Passed!" );
+			a.closestPointToPoint( zero3.clone(), true, point );
+			assert.ok( point.distanceTo( new Vector3( 1, 1, 1 ) ) < 0.0001, "Passed!" );
 
 			// nearby the ray
 			assert.ok( a.closestPointToPointParameter( zero3.clone(), false ) == - 1, "Passed!" );
-			var b2 = a.closestPointToPoint( zero3.clone(), false );
-			assert.ok( b2.distanceTo( new Vector3( 1, 1, 0 ) ) < 0.0001, "Passed!" );
+			 a.closestPointToPoint( zero3.clone(), false, point );
+			assert.ok( point.distanceTo( new Vector3( 1, 1, 0 ) ) < 0.0001, "Passed!" );
 
 			// nearby the ray
 			assert.ok( a.closestPointToPointParameter( new Vector3( 1, 1, 5 ), true ) == 1, "Passed!" );
-			var b = a.closestPointToPoint( new Vector3( 1, 1, 5 ), true );
-			assert.ok( b.distanceTo( new Vector3( 1, 1, 2 ) ) < 0.0001, "Passed!" );
+			a.closestPointToPoint( new Vector3( 1, 1, 5 ), true, point );
+			assert.ok( point.distanceTo( new Vector3( 1, 1, 2 ) ) < 0.0001, "Passed!" );
 
 			// exactly on the ray
 			assert.ok( a.closestPointToPointParameter( one3.clone(), true ) == 0, "Passed!" );
-			var c = a.closestPointToPoint( one3.clone(), true );
-			assert.ok( c.distanceTo( one3.clone() ) < 0.0001, "Passed!" );
+			a.closestPointToPoint( one3.clone(), true, point );
+			assert.ok( point.distanceTo( one3.clone() ) < 0.0001, "Passed!" );
 
 		} );
 

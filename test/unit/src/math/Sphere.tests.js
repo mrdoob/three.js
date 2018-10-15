@@ -4,7 +4,6 @@
  */
 /* global QUnit */
 
-import { Ray } from '../../../../src/math/Ray';
 import { Box3 } from '../../../../src/math/Box3';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Sphere } from '../../../../src/math/Sphere';
@@ -175,20 +174,26 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "clampPoint", ( assert ) => {
 
 			var a = new Sphere( one3.clone(), 1 );
+			var point = new Vector3();
 
-			assert.ok( a.clampPoint( new Vector3( 1, 1, 3 ) ).equals( new Vector3( 1, 1, 2 ) ), "Passed!" );
-			assert.ok( a.clampPoint( new Vector3( 1, 1, - 3 ) ).equals( new Vector3( 1, 1, 0 ) ), "Passed!" );
+			a.clampPoint( new Vector3( 1, 1, 3 ), point );
+			assert.ok( point.equals( new Vector3( 1, 1, 2 ) ), "Passed!" );
+			a.clampPoint( new Vector3( 1, 1, - 3 ), point );
+			assert.ok( point.equals( new Vector3( 1, 1, 0 ) ), "Passed!" );
 
 		} );
 
 		QUnit.test( "getBoundingBox", ( assert ) => {
 
 			var a = new Sphere( one3.clone(), 1 );
+			var aabb = new Box3();
 
-			assert.ok( a.getBoundingBox().equals( new Box3( zero3, two3 ) ), "Passed!" );
+			a.getBoundingBox( aabb );
+			assert.ok( aabb.equals( new Box3( zero3, two3 ) ), "Passed!" );
 
 			a.set( zero3, 0 );
-			assert.ok( a.getBoundingBox().equals( new Box3( zero3, zero3 ) ), "Passed!" );
+			a.getBoundingBox( aabb );
+			assert.ok( aabb.equals( new Box3( zero3, zero3 ) ), "Passed!" );
 
 		} );
 
@@ -196,8 +201,13 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Sphere( one3.clone(), 1 );
 			var m = new Matrix4().makeTranslation( 1, - 2, 1 );
+			var aabb1 = new Box3();
+			var aabb2 = new Box3();
 
-			assert.ok( a.clone().applyMatrix4( m ).getBoundingBox().equals( a.getBoundingBox().applyMatrix4( m ) ), "Passed!" );
+			a.clone().applyMatrix4( m ).getBoundingBox( aabb1 );
+			a.getBoundingBox( aabb2 );
+
+			assert.ok( aabb1.equals( aabb2.applyMatrix4( m ) ), "Passed!" );
 
 		} );
 

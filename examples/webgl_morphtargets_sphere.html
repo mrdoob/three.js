@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - morph targets - horse</title>
+		<title>three.js webgl - morph targets - sphere</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -63,15 +63,13 @@
 				camera.position.set( 0, 5, 5 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x222222 );
-				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
 				var light = new THREE.PointLight( 0xff2200, 0.7 );
 				light.position.set( 100, 100, 100 );
 				scene.add( light );
 
 				light = new THREE.PointLight( 0x22ff00, 0.7 );
-				light.position.set( -100, -100, -100 );
+				light.position.set( - 100, - 100, - 100 );
 				scene.add( light );
 
 				light = new THREE.AmbientLight( 0x111111 );
@@ -90,9 +88,30 @@
 
 					mesh.rotation.z = Math.PI / 2;
 
+					//mesh.material.visible = false;
+
 					scene.add( mesh );
 
-				});
+					//
+
+					var pointsMaterial = new THREE.PointsMaterial( {
+
+						size: 10,
+						sizeAttenuation: false,
+						map: new THREE.TextureLoader().load( 'textures/sprites/disc.png' ),
+						alphaTest: 0.5,
+						morphTargets: true
+
+					} );
+
+					var points = new THREE.Points( mesh.geometry, pointsMaterial );
+
+					points.morphTargetInfluences = mesh.morphTargetInfluences;
+					points.morphTargetDictionary = mesh.morphTargetDictionary;
+
+					mesh.add( points );
+
+				} );
 
 				//
 
@@ -103,7 +122,9 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 20;
 
 				//
 
@@ -137,7 +158,7 @@
 
 					if ( mesh.morphTargetInfluences[ 1 ] <= 0 || mesh.morphTargetInfluences[ 1 ] >= 1 ) {
 
-						sign *= -1;
+						sign *= - 1;
 
 					}
 

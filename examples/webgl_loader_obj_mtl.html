@@ -36,7 +36,6 @@
 		<script src="js/loaders/MTLLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -77,33 +76,37 @@
 				// model
 
 				var onProgress = function ( xhr ) {
+
 					if ( xhr.lengthComputable ) {
+
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
 					}
+
 				};
 
 				var onError = function ( xhr ) { };
 
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
-				var mtlLoader = new THREE.MTLLoader();
-				mtlLoader.setPath( 'models/obj/male02/' );
-				mtlLoader.load( 'male02_dds.mtl', function( materials ) {
+				new THREE.MTLLoader()
+					.setPath( 'models/obj/male02/' )
+					.load( 'male02_dds.mtl', function ( materials ) {
 
-					materials.preload();
+						materials.preload();
 
-					var objLoader = new THREE.OBJLoader();
-					objLoader.setMaterials( materials );
-					objLoader.setPath( 'models/obj/male02/' );
-					objLoader.load( 'male02.obj', function ( object ) {
+						new THREE.OBJLoader()
+							.setMaterials( materials )
+							.setPath( 'models/obj/male02/' )
+							.load( 'male02.obj', function ( object ) {
 
-						object.position.y = - 95;
-						scene.add( object );
+								object.position.y = - 95;
+								scene.add( object );
 
-					}, onProgress, onError );
+							}, onProgress, onError );
 
-				});
+					} );
 
 				//
 

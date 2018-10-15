@@ -172,7 +172,7 @@
 				renderer.domElement.id = 'renderer_' + name;
 				framecontainer.appendChild(renderer.domElement);
 
-				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera }
+				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera };
 
 			}
 
@@ -192,8 +192,6 @@
 					shininess: 50,
 					emissive: 0x000000
 				};
-
-				var meshes = [];
 
 				var geometry = new THREE.SphereBufferGeometry(0.5, 24, 12);
 

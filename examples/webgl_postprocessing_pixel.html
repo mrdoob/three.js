@@ -113,11 +113,11 @@
 				scene.add( dirLight3 );
 
 				var geometries = [
-					new THREE.SphereGeometry( 1, 64, 64 ),
-					new THREE.BoxGeometry( 1, 1, 1 ),
-					new THREE.ConeGeometry( 1, 1, 32 ),
-					new THREE.TetrahedronGeometry( 1 ),
-					new THREE.TorusKnotGeometry( 1, .4 )
+					new THREE.SphereBufferGeometry( 1, 64, 64 ),
+					new THREE.BoxBufferGeometry( 1, 1, 1 ),
+					new THREE.ConeBufferGeometry( 1, 1, 32 ),
+					new THREE.TetrahedronBufferGeometry( 1 ),
+					new THREE.TorusKnotBufferGeometry( 1, .4 )
 				];
 
 				group = new THREE.Group();

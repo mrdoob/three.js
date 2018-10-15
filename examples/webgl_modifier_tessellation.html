@@ -36,10 +36,9 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/modifiers/ExplodeModifier.js"></script>
 		<script src="js/modifiers/TessellateModifier.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -87,9 +86,15 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var renderer, scene, camera, stats;
+
+		var controls;
 
 		var mesh, uniforms;
 
@@ -140,14 +145,11 @@
 
 			}
 
-			var explodeModifier = new THREE.ExplodeModifier();
-			explodeModifier.modify( geometry );
-
-			var numFaces = geometry.faces.length;
-
 			//
 
 			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+			var numFaces = geometry.attributes.position.count / 3;
 
 			var colors = new Float32Array( numFaces * 3 * 3 );
 			var displacement = new Float32Array( numFaces * 3 * 3 );

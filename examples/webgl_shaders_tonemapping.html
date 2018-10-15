@@ -39,7 +39,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
@@ -58,7 +58,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
@@ -161,7 +165,6 @@
 						THREE.ShaderChunk[ "common" ],
 						THREE.ShaderChunk[ "bsdfs" ],
 						THREE.ShaderChunk[ "lights_pars_begin" ],
-						THREE.ShaderChunk[ "lights_pars_maps" ],
 						THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 
 						"void main() {",
@@ -203,11 +206,11 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var earthDiffuse = textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
 					earthMat.map = tex;
 					earthMat.needsUpdate = true;
 				} );
-				var earthSpecular = textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
 					earthMat.specularMap = tex;
 					earthMat.needsUpdate = true;
 				} );
@@ -236,12 +239,12 @@
 					depthTest: false
 				} );
 
-				var earthClouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
+				textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
 					earthCloudsMat.map = tex;
 					earthCloudsMat.needsUpdate = true;
 				} );
 
-				var earthGeo = new THREE.SphereGeometry( 600, 24, 24 );
+				var earthGeo = new THREE.SphereBufferGeometry( 600, 24, 24 );
 				var sphereMesh = new THREE.Mesh( earthGeo, earthMat );
 				scene.add( sphereMesh );
 
@@ -323,22 +326,8 @@
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
-				var skyboxShader = THREE.ShaderLib[ "cube" ];
-				skyboxShader.uniforms[ "tCube" ].value = textureCube;
 
-				var skyboxMaterial = new THREE.ShaderMaterial( {
-
-					fragmentShader: skyboxShader.fragmentShader,
-					vertexShader: skyboxShader.vertexShader,
-					uniforms: skyboxShader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), skyboxMaterial );
-				sceneCube.add( mesh );
-
+				sceneCube.background = textureCube;
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

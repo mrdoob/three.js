@@ -46,7 +46,7 @@
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/FilmPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 	</head>
@@ -59,7 +59,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var radius = 6371;
 			var tilt = 0.41;
@@ -70,12 +74,11 @@
 
 			var MARGIN = 0;
 			var SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
-			var SCREEN_WIDTH  = window.innerWidth;
+			var SCREEN_WIDTH = window.innerWidth;
 
-			var container, stats;
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer, stats;
 			var geometry, meshPlanet, meshClouds, meshMoon;
-			var dirLight, pointLight, ambientLight;
+			var dirLight;
 
 			var composer;
 
@@ -90,25 +93,14 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7 );
 				camera.position.z = radius * 5;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.00000025 );
 
-				controls = new THREE.FlyControls( camera );
-
-				controls.movementSpeed = 1000;
-				controls.domElement = container;
-				controls.rollSpeed = Math.PI / 24;
-				controls.autoForward = false;
-				controls.dragToLook = false;
-
 				dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( -1, 0, 1 ).normalize();
+				dirLight.position.set( - 1, 0, 1 ).normalize();
 				scene.add( dirLight );
 
 				var materialNormalMap = new THREE.MeshPhongMaterial( {
@@ -124,7 +116,7 @@
 
 				// planet
 
-				geometry = new THREE.SphereGeometry( radius, 100, 50 );
+				geometry = new THREE.SphereBufferGeometry( radius, 100, 50 );
 
 				meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
 				meshPlanet.rotation.y = 0;
@@ -160,31 +152,37 @@
 
 				// stars
 
-				var i, r = radius, starsGeometry = [ new THREE.Geometry(), new THREE.Geometry() ];
+				var i, r = radius, starsGeometry = [ new THREE.BufferGeometry(), new THREE.BufferGeometry() ];
+
+				var vertices1 = [];
+				var vertices2 = [];
+
+				var vertex = new THREE.Vector3();
 
 				for ( i = 0; i < 250; i ++ ) {
 
-					var vertex = new THREE.Vector3();
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
 					vertex.z = Math.random() * 2 - 1;
 					vertex.multiplyScalar( r );
 
-					starsGeometry[ 0 ].vertices.push( vertex );
+					vertices1.push( vertex.x, vertex.y, vertex.z );
 
 				}
 
 				for ( i = 0; i < 1500; i ++ ) {
 
-					var vertex = new THREE.Vector3();
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
 					vertex.z = Math.random() * 2 - 1;
 					vertex.multiplyScalar( r );
 
-					starsGeometry[ 1 ].vertices.push( vertex );
+					vertices2.push( vertex.x, vertex.y, vertex.z );
 
 				}
+
+				starsGeometry[ 0 ].addAttribute( 'position', new THREE.Float32BufferAttribute( vertices1, 3 ) );
+				starsGeometry[ 1 ].addAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
 
 				var stars;
 				var starsMaterials = [
@@ -212,14 +210,25 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				document.body.appendChild( renderer.domElement );
 
-				container.appendChild( renderer.domElement );
+				//
+
+				controls = new THREE.FlyControls( camera );
+
+				controls.movementSpeed = 1000;
+				controls.domElement = renderer.domElement;
+				controls.rollSpeed = Math.PI / 24;
+				controls.autoForward = false;
+				controls.dragToLook = false;
+
+				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -237,10 +246,10 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_HEIGHT = window.innerHeight;
-				SCREEN_WIDTH  = window.innerWidth;
+				SCREEN_WIDTH = window.innerWidth;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webvr - ball shooter</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-09-11 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-09-11" content="AqhFUYKxq/d+E8CDT0fuYRCg8TvlTP52x0Jv7I9t27sLhR30LmcahBRfSwzP89ukjs2+ia99VrrLoRyaFAwJVA0AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNjYyNDAwMH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2018-10-27 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2018-10-27" content="An4ZYOGvf6kVHNxqZxS02TPAvpZESkmBhcVCM/byViDDuEB2XKvCF43aCJjrAU/R8H3WDlv+1bDGTL/XxstHGgoAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0MDY1NTAyMn0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-10-24 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-10-24" content="Agrr6lZhlwzv5jmv/mpLZA37DIiVcg3HvX8bH8EWB+OBruV3sUJuzDfYz6qs/je+LcH41DkrmPn4k9RaUaqpQAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQwMzg4NjI0fQ==">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #101010;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			a {
+				color: #48f;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script src="js/vr/WebVR.js"></script>
+
+		<script src="js/geometries/BoxLineGeometry.js"></script>
+
+		<script>
+
+			var container;
+			var camera, scene, renderer;
+			var controller1, controller2;
+
+			var room;
+
+			var count = 0;
+			var radius = 0.08;
+			var normal = new THREE.Vector3();
+			var relativeVelocity = new THREE.Vector3();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - ball shooter';
+				container.appendChild( info );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+
+				room = new THREE.LineSegments(
+					new THREE.BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
+					new THREE.LineBasicMaterial( { color: 0x808080 } )
+				);
+				room.geometry.translate( 0, 3, 0 );
+				scene.add( room );
+
+				var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				var geometry = new THREE.IcosahedronBufferGeometry( radius, 2 );
+
+				for ( var i = 0; i < 200; i ++ ) {
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+
+					object.position.x = Math.random() * 4 - 2;
+					object.position.y = Math.random() * 4;
+					object.position.z = Math.random() * 4 - 2;
+
+					object.userData.velocity = new THREE.Vector3();
+					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.z = Math.random() * 0.01 - 0.005;
+
+					room.add( object );
+
+				}
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				document.body.appendChild( WEBVR.createButton( renderer ) );
+
+				// controllers
+
+				function onSelectStart() {
+
+					this.userData.isSelecting = true;
+
+				}
+
+				function onSelectEnd() {
+
+					this.userData.isSelecting = false;
+
+				}
+
+				controller1 = renderer.vr.getController( 0 );
+				controller1.addEventListener( 'selectstart', onSelectStart );
+				controller1.addEventListener( 'selectend', onSelectEnd );
+				scene.add( controller1 );
+
+				controller2 = renderer.vr.getController( 1 );
+				controller2.addEventListener( 'selectstart', onSelectStart );
+				controller2.addEventListener( 'selectend', onSelectEnd );
+				scene.add( controller2 );
+
+				// helpers
+
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
+
+				var material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
+
+				controller1.add( new THREE.Line( geometry, material ) );
+				controller2.add( new THREE.Line( geometry, material ) );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function handleController( controller ) {
+
+				if ( controller.userData.isSelecting ) {
+
+					var object = room.children[ count ++ ];
+
+					object.position.copy( controller.position );
+					object.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
+					object.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
+					object.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
+					object.userData.velocity.applyQuaternion( controller.quaternion );
+
+					if ( count === room.children.length ) count = 0;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				handleController( controller1 );
+				handleController( controller2 );
+
+				//
+
+				var range = 3 - radius;
+
+				for ( var i = 0; i < room.children.length; i ++ ) {
+
+					var object = room.children[ i ];
+
+					object.position.add( object.userData.velocity );
+
+					// keep objects inside room
+
+					if ( object.position.x < - range || object.position.x > range ) {
+
+						object.position.x = THREE.Math.clamp( object.position.x, - range, range );
+						object.userData.velocity.x = - object.userData.velocity.x;
+
+					}
+
+					if ( object.position.y < radius || object.position.y > 6 ) {
+
+						object.position.y = Math.max( object.position.y, radius );
+
+						object.userData.velocity.x *= 0.98;
+						object.userData.velocity.y = - object.userData.velocity.y * 0.8;
+						object.userData.velocity.z *= 0.98;
+
+					}
+
+					if ( object.position.z < - range || object.position.z > range ) {
+
+						object.position.z = THREE.Math.clamp( object.position.z, - range, range );
+						object.userData.velocity.z = - object.userData.velocity.z;
+
+					}
+
+					for ( var j = i + 1; j < room.children.length; j ++ ) {
+
+						var object2 = room.children[ j ];
+
+						normal.copy( object.position ).sub( object2.position );
+
+						var distance = normal.length();
+
+						if ( distance < 2 * radius ) {
+
+							normal.multiplyScalar( 0.5 * distance - radius );
+
+							object.position.sub( normal );
+							object2.position.add( normal );
+
+							normal.normalize();
+
+							relativeVelocity.copy( object.userData.velocity ).sub( object2.userData.velocity );
+
+							normal = normal.multiplyScalar( relativeVelocity.dot( normal ) );
+
+							object.userData.velocity.sub( normal );
+							object2.userData.velocity.add( normal );
+
+						}
+
+					}
+
+					object.userData.velocity.y -= 0.00098;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

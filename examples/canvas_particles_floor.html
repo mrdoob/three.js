@@ -53,9 +53,9 @@
 
 				var material = new THREE.SpriteMaterial();
 
-				for ( var ix = 0; ix < AMOUNTX; ix++ ) {
+				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
 
-					for ( var iy = 0; iy < AMOUNTY; iy++ ) {
+					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
 
 						particle = new THREE.Sprite( material );
 						particle.scale.y = 20;
@@ -79,8 +79,6 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -97,12 +95,11 @@
 
 			}
 
-			//
-
 			function onDocumentMouseMove( event ) {
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
+
 			}
 
 			function onDocumentTouchStart( event ) {
@@ -113,7 +110,9 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -124,11 +123,10 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
 
 			}
-
-			//
 
 			function animate() {
 

@@ -44,7 +44,7 @@
 		<script src="js/shaders/DepthLimitedBlurShader.js"></script>
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -54,7 +54,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -73,7 +77,7 @@
 				saoBlurRadius: 12,
 				saoBlurStdDev: 6,
 				saoBlurDepthCutoff: 0.01
-			}
+			};
 			var supportsDepthTextureExtension = false;
 			var isWebGL2 = false;
 
@@ -183,7 +187,6 @@
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
-				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();

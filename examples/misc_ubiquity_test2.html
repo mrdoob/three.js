@@ -56,7 +56,7 @@
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 
-				var geometry = new THREE.BoxGeometry( 150, 150, 150, 4, 4, 4 );
+				var geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 4, 4, 4 );
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -65,7 +65,7 @@
 
 				// SPRITES - from Sprite Sheet
 
-				texture1 = textureLoader.load( 'textures/UV_Grid_Sm.jpg', function() {
+				texture1 = textureLoader.load( 'textures/UV_Grid_Sm.jpg', function () {
 
 					texture1.wrapS = THREE.ClampToEdgeWrapping;
 					texture1.wrapT = THREE.ClampToEdgeWrapping;

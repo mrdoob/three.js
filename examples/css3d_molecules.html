@@ -103,6 +103,7 @@
 			var tmpVec2 = new THREE.Vector3();
 			var tmpVec3 = new THREE.Vector3();
 			var tmpVec4 = new THREE.Vector3();
+			var offset = new THREE.Vector3();
 
 			var visualizationType = 2;
 
@@ -179,11 +180,11 @@
 
 			function generateButtonCallback( url ) {
 
-				return function ( event ) {
+				return function () {
 
 					loadMolecule( url );
 
-				}
+				};
 
 			}
 
@@ -195,7 +196,7 @@
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = "models/molecules/" +  MOLECULES[ m ];
+					var url = "models/molecules/" + MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 
@@ -205,9 +206,24 @@
 				var b_b = document.getElementById( "b_b" );
 				var b_ab = document.getElementById( "b_ab" );
 
-				b_a.addEventListener( 'click', function() { visualizationType = 0; showAtoms() } );
-				b_b.addEventListener( 'click', function() { visualizationType = 1; showBonds() } );
-				b_ab.addEventListener( 'click', function() { visualizationType = 2; showAtomsBonds() } );
+				b_a.addEventListener( 'click', function () {
+
+					visualizationType = 0;
+					showAtoms();
+
+				} );
+				b_b.addEventListener( 'click', function () {
+
+					visualizationType = 1;
+					showBonds();
+
+				} );
+				b_ab.addEventListener( 'click', function () {
+
+					visualizationType = 2;
+					showAtomsBonds();
+
+				} );
 
 			}
 
@@ -334,7 +350,10 @@
 					var geometryBonds = pdb.geometryBonds;
 					var json = pdb.json;
 
-					var offset = geometryAtoms.center();
+					geometryAtoms.computeBoundingBox();
+					geometryAtoms.boundingBox.getCenter( offset ).negate();
+
+					geometryAtoms.translate( offset.x, offset.y, offset.z );
 					geometryBonds.translate( offset.x, offset.y, offset.z );
 
 					var positions = geometryAtoms.getAttribute( 'position' );
@@ -454,7 +473,7 @@
 						joint.updateMatrix();
 
 						var object = new THREE.CSS3DObject( bond );
-						object.rotation.y = Math.PI/2;
+						object.rotation.y = Math.PI / 2;
 
 						object.matrixAutoUpdate = false;
 						object.updateMatrix();
@@ -475,9 +494,15 @@
 
 					switch ( visualizationType ) {
 
-						case 0: showAtoms(); break;
-						case 1: showBonds(); break;
-						case 2: showAtomsBonds(); break;
+						case 0:
+							showAtoms();
+							break;
+						case 1:
+							showBonds();
+							break;
+						case 2:
+							showAtomsBonds();
+							break;
 
 					}
 

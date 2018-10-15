@@ -6,7 +6,6 @@
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { JSONLoader } from '../../../../src/loaders/JSONLoader';
-import { arrayMax } from '../../../../src/utils';
 import { DirectGeometry } from '../../../../src/core/DirectGeometry';
 import {
 	BufferAttribute,
@@ -22,7 +21,7 @@ import { Geometry } from '../../../../src/core/Geometry';
 import { Face3 } from '../../../../src/core/Face3';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { Color } from '../../../../src/math/Color';
-import { LineSegments as Line } from '../../../../src/objects/LineSegments.js';
+import { Line } from '../../../../src/objects/Line.js';
 import {
 	x,
 	y,
@@ -548,6 +547,13 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "fromGeometry/fromDirectGeometry", ( assert ) => {
 
+			if ( typeof XMLHttpRequest === 'undefined' ) {
+
+				assert.expect( 0 );
+				return;
+
+			}
+
 			assert.timeout( 1000 );
 
 			var a = new BufferGeometry();
@@ -603,15 +609,6 @@ export default QUnit.module( 'Core', () => {
 
 				}
 
-				if ( geometry.indices.length > 0 ) {
-
-					var TypeArray = arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
-					var indices = new TypeArray( geometry.indices.length * 3 );
-					attr = new BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices );
-					assert.ok( bufferAttributeEquals( a.indices, attr ), "Indices are identical" );
-
-				}
-
 				// groups
 				assert.deepEqual( a.groups, geometry.groups, "Groups are identical" );
 
@@ -657,9 +654,6 @@ export default QUnit.module( 'Core', () => {
 
 				}
 
-				// TODO
-				// DirectGeometry doesn't actually copy boundingSphere and boundingBox yet,
-				// so they're always null
 				if ( geometry.boundingSphere !== null ) {
 
 					assert.ok( a.boundingSphere.equals( geometry.boundingSphere ), "BoundingSphere is identical" );

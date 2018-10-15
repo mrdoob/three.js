@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #ffffff;
 				margin: 0px;
@@ -73,7 +73,7 @@
 		<script src="../build/three.js"></script>
 		<script>
 
-			CanvasTexture = function ( parentTexture ) {
+			var CanvasTexture = function ( parentTexture ) {
 
 				this._canvas = document.createElement( "canvas" );
 				this._canvas.width = this._canvas.height = 1024;
@@ -181,10 +181,7 @@
 
 				}
 
-			}
-
-		</script>
-		<script>
+			};
 
 			var width = window.innerWidth;
 			var height = window.innerHeight;
@@ -225,20 +222,15 @@
 				cubeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 				canvas = new CanvasTexture( cubeTexture );
 				var cubeMaterial = new THREE.MeshBasicMaterial( { map: cubeTexture } );
-				var cubeGeometry = new THREE.BoxGeometry( 20, 20, 20 );
+				var cubeGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				var uvs = cubeGeometry.attributes.uv.array;
 				// Set a specific texture mapping.
-				var uvs;
-				for ( var i = 0; i < cubeGeometry.faceVertexUvs[ 0 ].length; i ++ ) {
+				for ( var i = 0; i < uvs.length; i ++ ) {
 
-					uvs = cubeGeometry.faceVertexUvs[ 0 ][ i ];
-					for ( var j = 0; j < 3; j ++ ) {
-
-						if ( uvs[ j ].x < 0.1 ) uvs[ j ].x = - 1;
-						if ( uvs[ j ].y < 0.1 ) uvs[ j ].y = - 1;
-
-					}
+					uvs[ i ] *= 2;
 
 				}
+
 				var cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
 				cube.position.x = 4;
 				cube.position.y = - 5;

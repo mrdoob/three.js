@@ -48,7 +48,7 @@
 
 			function d3threeD( exports ) {
 
-				var DEGS_TO_RADS = Math.PI / 180, UNIT_SIZE = 100;
+				var DEGS_TO_RADS = Math.PI / 180;
 				var DIGIT_0 = 48, DIGIT_9 = 57, COMMA = 44, SPACE = 32, PERIOD = 46, MINUS = 45;
 
 				exports.transformSVGPath = function transformSVGPath( pathStr ) {
@@ -351,7 +351,7 @@
 			var addGeoObject = function( group, svgObject ) {
 
 				var paths = svgObject.paths;
-				var amounts = svgObject.amounts;
+				var depths = svgObject.depths;
 				var colors = svgObject.colors;
 				var center = svgObject.center;
 
@@ -363,20 +363,20 @@
 						color: color,
 						emissive: color
 					} );
-					var amount = amounts[ i ];
+					var depth = depths[ i ];
 					var simpleShapes = path.toShapes( true );
 
 					for ( var j = 0; j < simpleShapes.length; j ++ ) {
 
 						var simpleShape = simpleShapes[ j ];
 						var shape3d = new THREE.ExtrudeBufferGeometry( simpleShape, {
-							amount: amount,
+							depth: depth,
 							bevelEnabled: false
 						} );
 
 						var mesh = new THREE.Mesh( shape3d, material );
 						mesh.rotation.x = Math.PI;
-						mesh.translateZ( - amount - 1 );
+						mesh.translateZ( - depth - 1 );
 						mesh.translateX( - center.x );
 						mesh.translateY( - center.y );
 
@@ -492,7 +492,7 @@
 					"L368.1217,110.4867 L366.5152,109.2554 L361.9554,112.3435 L358.1163,117.8678 L361.7218,120.2192 " +
 					"L360.7261,126.3232 L362.8064,125.5221 Z"];
 
-				obj.amounts = [ 19, 20, 21 ];
+				obj.depths = [ 19, 20, 21 ];
 				obj.colors =  [ 0xC07000, 0xC08000, 0xC0A000 ];
 				obj.center = { x: 365, y: 125 };
 

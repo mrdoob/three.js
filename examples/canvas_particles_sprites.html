@@ -54,13 +54,14 @@
 					blending: THREE.AdditiveBlending
 				} );
 
-				for ( var i = 0; i < 1000; i++ ) {
+				for ( var i = 0; i < 1000; i ++ ) {
 
 					particle = new THREE.Sprite( material );
 
 					initParticle( particle, i * 10 );
 
 					scene.add( particle );
+
 				}
 
 				renderer = new THREE.CanvasRenderer();
@@ -145,6 +146,7 @@
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
+
 			}
 
 			function onDocumentTouchStart( event ) {

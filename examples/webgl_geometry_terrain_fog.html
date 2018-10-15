@@ -37,17 +37,15 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FirstPersonControls.js"></script>
-
-		<script src="js/ImprovedNoise.js"></script>
-
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/ImprovedNoise.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 				document.getElementById( 'container' ).innerHTML = "";
 
 			}
@@ -155,8 +153,7 @@
 
 			function generateTexture( data, width, height ) {
 
-				var canvas, canvasScaled, context, image, imageData,
-				level, diff, vector3, sun, shade;
+				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
 
 				vector3 = new THREE.Vector3( 0, 0, 0 );
 

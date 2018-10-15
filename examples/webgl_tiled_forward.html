@@ -42,7 +42,7 @@
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/LuminosityHighPassShader.js"></script>
 		<script src="js/postprocessing/UnrealBloomPass.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -52,7 +52,7 @@
 
 		var RADIUS = 75;
 
-		THREE.ShaderChunk[ 'lights_pars_maps' ] += [
+		THREE.ShaderChunk[ 'lights_pars_begin' ] += [
 			'#if defined TILED_FORWARD',
 			'uniform vec4 tileData;',
 			'uniform sampler2D tileTexture;',
@@ -60,7 +60,7 @@
 			'#endif'
 		].join( '\n' );
 
-		THREE.ShaderChunk[ 'lights_fragment_maps' ] += [
+		THREE.ShaderChunk[ 'lights_fragment_end' ] += [
 			'',
 			'#if defined TILED_FORWARD',
 			'vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;',
@@ -171,7 +171,7 @@
 		// Screen rectangle bounds from light sphere's world AABB
 		var lightBounds = function () {
 
-			v = new THREE.Vector3();
+			var v = new THREE.Vector3();
 			return function ( camera, pos, r ) {
 
 				var minX = State.width, maxX = 0, minY = State.height, maxY = 0, hw = State.width / 2, hh = State.height / 2;
@@ -224,7 +224,7 @@
 		var stats = new Stats();
 		container.appendChild( stats.dom );
 
-		controls = new THREE.OrbitControls( camera, renderer.domElement );
+		var controls = new THREE.OrbitControls( camera, renderer.domElement );
 		controls.minDistance = 120;
 		controls.maxDistance = 320;
 
@@ -383,7 +383,7 @@
 			init( geometry );
 			resize();
 
-			renderer.animate( function ( time ) {
+			renderer.setAnimationLoop( function ( time ) {
 
 				update( time / 1000 );
 				stats.begin();

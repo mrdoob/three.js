@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">The default material used by [page:Points].</p>
+
+		<h2>Examples</h2>
+		<p>
+			[example:misc_controls_fly misc / controls / fly]<br />
+			[example:webgl_buffergeometry_drawcalls WebGL / BufferGeometry / drawcalls]<br />
+			[example:webgl_buffergeometry_points WebGL / BufferGeometry / points]<br />
+			[example:webgl_buffergeometry_points_interleaved WebGL / BufferGeometry / points / interleaved]<br />
+			[example:webgl_camera WebGL / camera ]<br />
+			[example:webgl_geometry_convex WebGL / geometry / convex]<br />
+			[example:webgl_geometry_shapes WebGL / geometry / shapes]<br />
+			[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points]<br />
+			[example:webgl_multiple_elements_text WebGL / multiple / elements / text]<br />
+			[example:webgl_points_billboards WebGL / points / billboards]<br />
+			[example:webgl_points_billboards_colors WebGL / points / billboards / colors]<br />
+			[example:webgl_points_dynamic WebGL / points / dynamic]<br />
+			[example:webgl_points_random WebGL / points / random]<br />
+			[example:webgl_points_sprites WebGL / points / sprites]<br />
+			[example:webgl_trails WebGL / trails]
+		</p>
+
+		<code>
+//This will add a starfield to the background of a scene
+var starsGeometry = new THREE.Geometry();
+
+for ( var i = 0; i < 10000; i ++ ) {
+
+	var star = new THREE.Vector3();
+	star.x = THREE.Math.randFloatSpread( 2000 );
+	star.y = THREE.Math.randFloatSpread( 2000 );
+	star.z = THREE.Math.randFloatSpread( 2000 );
+
+	starsGeometry.vertices.push( star );
+
+}
+
+var starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
+
+var starField = new THREE.Points( starsGeometry, starsMaterial );
+
+scene.add( starField );
+		</code>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
+			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
+
+			The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
+			string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Material] class for common properties.</p>
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
+
+		<h3>[property:Boolean isPointsMaterial]</h3>
+		<p>
+			Used to check whether this or derived classes are points materials. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+		<h3>[property:Texture map]</h3>
+
+		<p>Sets the color of the points using data from a [page:Texture].</p>
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<p>Define whether the material uses morphTargets. Default is false.</p>
+
+		<h3>[property:Number size]</h3>
+		<p>Sets the size of the points. Default is 1.0.</p>
+
+		<h3>[property:Boolean sizeAttenuation]</h3>
+		<p>Specify whether points' size is attenuated by the camera depth. (Perspective camera only.) Default is true.</p>
+
+
+		<h2>Methods</h2>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

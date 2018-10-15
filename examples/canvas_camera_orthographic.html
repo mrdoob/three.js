@@ -58,7 +58,7 @@
 
 				// Cubes
 
-				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
+				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 100; i ++ ) {
@@ -112,9 +112,9 @@
 
 				var aspect = window.innerWidth / window.innerHeight;
 
-				camera.left   = - frustumSize * aspect / 2;
-				camera.right  =   frustumSize * aspect / 2;
-				camera.top    =   frustumSize / 2;
+				camera.left = - frustumSize * aspect / 2;
+				camera.right = frustumSize * aspect / 2;
+				camera.top = frustumSize / 2;
 				camera.bottom = - frustumSize / 2;
 
 				camera.updateProjectionMatrix();

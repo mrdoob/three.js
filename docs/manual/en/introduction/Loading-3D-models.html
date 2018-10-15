@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <base href="../../../" />
+  <script src="list.js"></script>
+  <script src="page.js"></script>
+  <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+  <h1>[name]</h1>
+  <br />
+
+  <p>
+    3D models are available in hundreds of file formats, each with different
+    purposes, assorted features, and varying complexity. Although
+    <a href="https://github.com/mrdoob/three.js/tree/dev/examples/js/loaders" target="_blank" rel="noopener">
+    three.js provides many loaders</a>, choosing the right format and
+    workflow will save time and frustration later on. Some formats are
+    difficult to work with, inefficient for realtime experiences, or simply not
+    fully supported at this time.
+  </p>
+
+  <p>
+    This guide provides a workflow recommended for most users, and suggestions
+    for what to try if things don't go as expected.
+  </p>
+
+  <h2>Before we start</h2>
+
+  <p>
+    If you're new to running a local server, begin with
+    [link:#manual/introduction/How-to-run-things-locally how to run things locally]
+    first. Many common errors viewing 3D models can be avoided by hosting files
+    correctly.
+  </p>
+
+  <h2>Recommended workflow</h2>
+
+  <p>
+    Where possible, we recommend using glTF (GL Transmission Format). Both
+    <small>.GLB</small> and <small>.GLTF</small> versions of the format are
+    well supported. Because glTF is focused on runtime asset delivery, it is
+    compact to transmit and fast to load. Features include meshes, materials,
+    textures, skins, skeletons, morph targets, animations, lights, and
+    cameras.
+  </p>
+
+  <p>
+    Public-domain glTF files are available on sites like
+    <a href="https://sketchfab.com/models?features=downloadable&sort_by=-likeCount&type=models" target="_blank" rel="noopener">
+    Sketchfab</a>, or various tools include glTF export:
+  </p>
+
+  <ul>
+    <li><a href="https://github.com/KhronosGroup/glTF-Blender-Exporter" target="_blank" rel="noopener">glTF-Blender-Exporter</a> by the Khronos Group</li>
+    <li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
+    <li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
+    <li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
+    <li><a href="https://www.allegorithmic.com/products/substance-painter" target="_blank" rel="noopener">Substance Painter</a> by Allegorithmic</li>
+    <li><a href="https://www.foundry.com/products/modo" target="_blank" rel="noopener">Modo</a> by Foundry</li>
+    <li><a href="https://www.marmoset.co/toolbag/" target="_blank" rel="noopener">Toolbag</a> by Marmoset</li>
+    <li>&hellip;and <a href="https://github.com/khronosgroup/gltf#gltf-tools" target="_blank" rel="noopener">many more</a></li>
+  </ul>
+
+  <p>
+    If your preferred tools do not support glTF, consider requesting glTF
+    export from the authors, or posting on
+    <a href="https://github.com/KhronosGroup/glTF/issues/1051" target="_blank" rel="noopener">the glTF roadmap thread</a>.
+  </p>
+
+  <p>
+    When glTF is not an option, popular formats such as FBX, OBJ, or COLLADA
+    are also available and regularly maintained.
+  </p>
+
+  <h2>Troubleshooting</h2>
+
+  <p>
+    You've spent hours modeling an artisanal masterpiece, you load it into
+    the webpage, and — oh no! 😭 It's distorted, miscolored, or missing entirely.
+    Start with these troubleshooting steps:
+  </p>
+
+  <ol>
+    <li>
+      Check the JavaScript console for errors, and make sure you've used an
+      <em>onError</em> callback when calling <em>.load()</em> to log the result.
+    </li>
+    <li>
+      View the model in another application. For glTF, drag-and-drop viewers
+      are available for
+      <a href="https://gltf-viewer.donmccurdy.com/" target="_blank" rel="noopener">three.js</a> and
+      <a href="http://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>. If the model
+      appears correctly in one or more applications,
+      <a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">file a bug against three.js</a>.
+      If the model cannot be shown in any application, we strongly encourage
+      filing a bug with the application used to create the model.
+    </li>
+    <li>
+      Try scaling the model up or down by a factor of 1000. Many models are
+      scaled differently, and large models may not appear if the camera is
+      inside the model.
+    </li>
+    <li>
+      Look for failed texture requests in the network tab, like
+      <em>C:\\Path\To\Model\texture.jpg</em>. Use paths relative to your
+      model instead, such as <em>images/texture.jpg</em> — this may require
+      editing the model file in a text editor.
+    </li>
+  </ol>
+
+  <h2>Asking for help</h2>
+
+  <p>
+    If you've gone through the troubleshooting process above and your model
+    still isn't working, the right approach to asking for help will get you to
+    a solution faster. Post a question on the
+    <a href="https://discourse.threejs.org/" target="_blank" rel="noopener">three.js forum</a> and, whenever possible,
+    include your model (or a simpler model with the same problem) in any formats
+    you have available. Include enough information for someone else to reproduce
+    the issue quickly — ideally, a live demo.
+  </p>
+
+</body>
+
+</html>

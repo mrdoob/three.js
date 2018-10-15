@@ -45,20 +45,23 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
 			var container = document.getElementById( 'container' );
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer, scene, camera;
 
 			var origin = new THREE.Vector3();
 
 			var rectLight;
-			var rectLightMesh;
 
 			var param = {};
 			var stats;
@@ -117,14 +120,14 @@
 				rectLightMeshBack.rotation.y = Math.PI;
 				rectLightMesh.add( rectLightMeshBack );
 
-				var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
+				var geoFloor = new THREE.BoxBufferGeometry( 2000, 0.1, 2000 );
 				var matStdFloor = new THREE.MeshStandardMaterial( { color: 0x808080, roughness: 0, metalness: 0 } );
 				var mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
 				scene.add( mshStdFloor );
 
 				var matStdObjects = new THREE.MeshStandardMaterial( { color: 0xA00000, roughness: 0, metalness: 0 } );
 
-				var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
+				var geoBox = new THREE.BoxBufferGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
 				var mshStdBox = new THREE.Mesh( geoBox, matStdObjects );
 				mshStdBox.position.set( 0, 5, 0 );
 				mshStdBox.rotation.set( 0, Math.PI / 2.0, 0 );
@@ -132,14 +135,14 @@
 				mshStdBox.receiveShadow = true;
 				scene.add( mshStdBox );
 
-				var geoSphere = new THREE.SphereGeometry( 1.5, 32, 32 );
+				var geoSphere = new THREE.SphereBufferGeometry( 1.5, 32, 32 );
 				var mshStdSphere = new THREE.Mesh( geoSphere, matStdObjects );
 				mshStdSphere.position.set( - 5, 5, 0 );
 				mshStdSphere.castShadow = true;
 				mshStdSphere.receiveShadow = true;
 				scene.add( mshStdSphere );
 
-				var geoKnot = new THREE.TorusKnotGeometry( 1.5, 0.5, 100, 16 );
+				var geoKnot = new THREE.TorusKnotBufferGeometry( 1.5, 0.5, 100, 16 );
 				var mshStdKnot = new THREE.Mesh( geoKnot, matStdObjects );
 				mshStdKnot.position.set( 5, 5, 0 );
 				mshStdKnot.castShadow = true;

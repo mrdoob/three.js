@@ -26,29 +26,24 @@
 		<script>
 
 			var SCREEN_WIDTH = window.innerWidth,
-			SCREEN_HEIGHT = window.innerHeight,
+				SCREEN_HEIGHT = window.innerHeight,
 
-			mouseX = 0, mouseY = 0,
+				mouseX = 0, mouseY = 0,
 
-			windowHalfX = window.innerWidth / 2,
-			windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
 
-			SEPARATION = 200,
-			AMOUNTX = 10,
-			AMOUNTY = 10,
-
-			camera, scene, renderer;
+				camera, scene, renderer;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container, separation = 100, amountX = 50, amountY = 50,
-				particles, particle;
+				var container, particle;
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 1000;
@@ -83,7 +78,7 @@
 					particle.position.y = Math.random() * 2 - 1;
 					particle.position.z = Math.random() * 2 - 1;
 					particle.position.normalize();
-					particle.position.multiplyScalar( Math.random() * 10 + 450 );
+					particle.position.multiplyScalar( 450 );
 					particle.scale.multiplyScalar( 2 );
 					scene.add( particle );
 
@@ -91,24 +86,27 @@
 
 				// lines
 
-				for (var i = 0; i < 300; i++) {
+				var vertices = [];
 
-					var geometry = new THREE.Geometry();
+				for ( var i = 0; i < 300; i ++ ) {
 
 					var vertex = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 					vertex.normalize();
 					vertex.multiplyScalar( 450 );
 
-					geometry.vertices.push( vertex );
+					vertices.push( vertex );
 
 					var vertex2 = vertex.clone();
 					vertex2.multiplyScalar( Math.random() * 0.3 + 1 );
 
-					geometry.vertices.push( vertex2 );
+					vertices.push( vertex2 );
 
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: Math.random() } ) );
-					scene.add( line );
 				}
+
+				var geometry = new THREE.BufferGeometry().setFromPoints( vertices );
+
+				var line = new THREE.LineSegments( geometry, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+				scene.add( line );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -134,10 +132,11 @@
 
 			//
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
+
 			}
 
 			function onDocumentTouchStart( event ) {

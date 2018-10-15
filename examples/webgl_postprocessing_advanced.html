@@ -62,12 +62,18 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -111,10 +117,10 @@
 				directionalLight.position.set( 0, -0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function( gltf ) {
 
-					createMesh( geometry, sceneModel, 100 );
+					createMesh( gltf.scene.children[ 0 ].geometry, sceneModel, 100 );
 
 				} );
 
@@ -340,8 +346,8 @@
 					color: 0x999999,
 					specular: 0x080808,
 					shininess: 20,
-					map: new THREE.TextureLoader().load( "models/json/leeperrysmith/Map-COL.jpg" ),
-					normalMap: new THREE.TextureLoader().load("models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+					normalMap: new THREE.TextureLoader().load("models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
 				} );

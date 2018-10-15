@@ -29,7 +29,7 @@
 						color: #ffffff;
 				}
 
-				#oldie a {
+				#webglmessage a {
 						color: #da0
 				}
 		</style>
@@ -43,11 +43,15 @@
 
 <script src="js/effects/PeppersGhostEffect.js"></script>
 
-<script src="js/Detector.js"></script>
+<script src="js/WebGL.js"></script>
 
 <script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var container;
 
@@ -71,17 +75,36 @@
 
 				// Cube
 
-				var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				geometry = geometry.toNonIndexed(); // ensure unique vertices for each triangle
 
-				for ( var i = 0; i < geometry.faces.length; i += 2 ) {
+				var position = geometry.attributes.position;
+				var colors = [];
+				var color = new THREE.Color();
 
-						var hex = Math.random() * 0xffffff;
-						geometry.faces[ i ].color.setHex( hex );
-						geometry.faces[ i + 1 ].color.setHex( hex );
+				// generate for each side of the cube a different color
+
+				for ( var i = 0; i < position.count; i += 6 ) {
+
+					color.setHex( Math.random() * 0xffffff );
+
+					// first face
+
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+
+					// second face
+
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
 
 				}
 
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 

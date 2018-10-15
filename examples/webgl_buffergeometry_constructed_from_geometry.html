@@ -24,16 +24,21 @@
 				color: #0080ff;
 			}
 		</style>
-		<script type="text/javascript" src="../build/three.js"></script>
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/libs/stats.min.js"></script>
-		<script type="text/javascript" src="js/controls/TrackballControls.js"></script>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffer geometry constructed from geometry - (<a target="_blank" href="http://callum.com">author</a>)</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffer geometry constructed from geometry - by <a target="_blank" href="http://callum.com">Callum Prentice</a></div>
+
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var camera, scene, renderer, controls, stats;
 
@@ -42,40 +47,33 @@
 
 		function init() {
 
-			renderer = new THREE.WebGLRenderer( {
-				antialias: true
-			} );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
 			document.body.appendChild( renderer.domElement );
 
 			scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 45.0, window.innerWidth / window.innerHeight, 100, 1500.0 );
 			camera.position.z = 480.0;
-
-			scene.add( new THREE.AmbientLight( 0x444444 ) );
-
-			var light1 = new THREE.DirectionalLight( 0x999999, 0.1 );
-			light1.position.set( 1, 1, 1 );
-			scene.add( light1 );
-
-			var light2 = new THREE.DirectionalLight( 0x999999, 1.5 );
-			light2.position.set( 0, -1, 0 );
-			scene.add( light2 );
+			scene.add( camera );
 
 			controls = new THREE.TrackballControls( camera, renderer.domElement );
 			controls.minDistance = 100.0;
 			controls.maxDistance = 800.0;
 			controls.dynamicDampingFactor = 0.1;
 
+			scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
+
+			var light = new THREE.PointLight( 0xffffff, 0.7 );
+			camera.add( light );
+
+			createScene();
+
 			stats = new Stats();
 			document.body.appendChild( stats.dom );
 
 			window.addEventListener( 'resize', onWindowResize, false );
-
-			createScene();
 
 		}
 
@@ -93,7 +91,7 @@
 			heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
 			var extrudeSettings = {
-				amount: 16,
+				depth: 16,
 				bevelEnabled: true,
 				bevelSegments: 1,
 				steps: 2,
@@ -120,26 +118,26 @@
 			var normals = [];
 			var colors = [];
 
-			var spherical = new THREE.Spherical();
 			var vector = new THREE.Vector3();
+
+			var color = new THREE.Color( 0xffffff );
+			var heartGeometry = createGeometry();
+			var geometry = new THREE.Geometry();
 
 			for ( var i = 1, l = count; i <= l; i ++ ) {
 
-				var phi = Math.acos( -1 + ( 2 * i ) / l );
+				var phi = Math.acos( - 1 + ( 2 * i ) / l );
 				var theta = Math.sqrt( l * Math.PI ) * phi;
 
-				spherical.set( radius, phi, theta );
-				vector.setFromSpherical( spherical );
+				vector.setFromSphericalCoords( radius, phi, theta );
 
-				var geometry = createGeometry();
-
+				geometry.copy( heartGeometry );
 				geometry.lookAt( vector );
 				geometry.translate( vector.x, vector.y, vector.z );
 
-				var color = new THREE.Color( 0xffffff );
 				color.setHSL( ( i / l ), 1.0, 0.7 );
 
-				geometry.faces.forEach( function ( face, index ) {
+				geometry.faces.forEach( function ( face ) {
 
 					positions.push( geometry.vertices[ face.a ].x );
 					positions.push( geometry.vertices[ face.a ].y );
@@ -179,10 +177,7 @@
 			bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 			bufferGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-			var material = new THREE.MeshPhongMaterial( {
-				shininess: 80,
-				vertexColors: THREE.VertexColors
-			} );
+			var material = new THREE.MeshPhongMaterial( { shininess: 80, vertexColors: THREE.VertexColors } );
 
 			var mesh = new THREE.Mesh( bufferGeometry, material );
 			scene.add( mesh );
@@ -203,9 +198,11 @@
 
 			controls.update();
 			stats.update();
+
 			renderer.render( scene, camera );
 
 		}
+
 		</script>
 	</body>
 </html>

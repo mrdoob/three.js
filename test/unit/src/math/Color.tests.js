@@ -76,8 +76,9 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setHSL", ( assert ) => {
 
 			var c = new Color();
+			var hsl = { h: 0, s: 0, l: 0 };
 			c.setHSL( 0.75, 1.0, 0.25 );
-			var hsl = c.getHSL();
+			c.getHSL( hsl );
 
 			assert.ok( hsl.h == 0.75, "hue: " + hsl.h );
 			assert.ok( hsl.s == 1.00, "saturation: " + hsl.s );
@@ -170,7 +171,8 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "getHSL", ( assert ) => {
 
 			var c = new Color( 0x80ffff );
-			var hsl = c.getHSL();
+			var hsl = { h: 0, s: 0, l: 0 };
+			c.getHSL( hsl );
 
 			assert.ok( hsl.h == 0.5, "hue: " + hsl.h );
 			assert.ok( hsl.s == 1.0, "saturation: " + hsl.s );

@@ -33,15 +33,18 @@
 		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			// Detects webgl
-			if ( ! Detector.webgl ) {
-					Detector.addGetWebGLMessage();
-					document.getElementById( 'container' ).innerHTML = "";
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+				document.getElementById( 'container' ).innerHTML = "";
+
 			}
 
 			// - Global variables -
@@ -185,8 +188,8 @@
 				sphereGeometry.translate( 5, 5, 0 );
 				createSoftVolume( sphereGeometry, volumeMass, 250 );
 
-				var boxGeometry = new THREE.BufferGeometry().fromGeometry( new THREE.BoxGeometry( 1, 1, 5, 4, 4, 20 ) );
-				boxGeometry.translate( -2, 5, 0 );
+				var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 5, 4, 4, 20 );
+				boxGeometry.translate( - 2, 5, 0 );
 				createSoftVolume( boxGeometry, volumeMass, 120 );
 
 				// Ramp
@@ -204,7 +207,7 @@
 				var geometry = new THREE.Geometry().fromBufferGeometry( bufGeometry );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles
-				var vertsDiff = geometry.mergeVertices();
+				geometry.mergeVertices();
 
 				// Convert again to BufferGeometry, indexed
 				var indexedBufferGeom = createIndexedBufferGeometryFromGeometry( geometry );
@@ -339,7 +342,7 @@
 				volumeSoftBody.get_m_materials().at( 0 ).set_m_kLST( 0.9 );
 				volumeSoftBody.get_m_materials().at( 0 ).set_m_kAST( 0.9 );
 
-				volumeSoftBody.setTotalMass( mass, false )
+				volumeSoftBody.setTotalMass( mass, false );
 				Ammo.castObject( volumeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin );
 				physicsWorld.addSoftBody( volumeSoftBody, 1, -1 );
 				volume.userData.physicsBody = volumeSoftBody;
@@ -352,7 +355,7 @@
 
 			function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
 
-				var threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
+				var threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
 				var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 				shape.setMargin( margin );
 
@@ -426,7 +429,7 @@
 					var ballMass = 3;
 					var ballRadius = 0.4;
 
-					var ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 18, 16 ), ballMaterial );
+					var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 18, 16 ), ballMaterial );
 					ball.castShadow = true;
 					ball.receiveShadow = true;
 					var ballShape = new Ammo.btSphereShape( ballRadius );

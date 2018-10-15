@@ -2,6 +2,8 @@
  * @author TristanVALCKE / https://github.com/Itee
  */
 
+import './unit/qunit-utils.js';
+
 //src
 import './unit/src/constants.tests';
 import './unit/src/polyfills.tests';
@@ -261,7 +263,6 @@ import './unit/src/renderers/webgl/WebGLProperties.tests';
 import './unit/src/renderers/webgl/WebGLRenderLists.tests';
 import './unit/src/renderers/webgl/WebGLShader.tests';
 import './unit/src/renderers/webgl/WebGLShadowMap.tests';
-import './unit/src/renderers/webgl/WebGLSpriteRenderer.tests';
 import './unit/src/renderers/webgl/WebGLState.tests';
 import './unit/src/renderers/webgl/WebGLTextures.tests';
 import './unit/src/renderers/webgl/WebGLUniforms.tests';

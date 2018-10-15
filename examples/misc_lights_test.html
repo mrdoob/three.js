@@ -13,7 +13,6 @@
 				font-family:georgia;
 				text-align:center;
 			}
-			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
 
@@ -36,13 +35,12 @@
 
 			var SCREEN_WIDTH = window.innerWidth / 2;
 			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = -250;
 
 			var container, stats;
 
 			var camera, scene, canvasRenderer, webglRenderer;
 
-			var mesh, zmesh, geometry, material;
+			var mesh, geometry, material;
 
 			var directionalLight, pointLight;
 
@@ -60,8 +58,8 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
@@ -71,7 +69,7 @@
 
 				// Spheres
 
-				geometry = new THREE.SphereGeometry( 100, 16, 8 );
+				geometry = new THREE.SphereBufferGeometry( 100, 16, 8 );
 				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, overdraw: 0.5, shininess: 0 } );
 
 				for ( var i = 0; i < 30; i ++ ) {
@@ -87,7 +85,7 @@
 
 				// Torus
 
-				geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
+				geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
@@ -97,7 +95,7 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, -70, 100 ).normalize();
+				directionalLight.position.set( 0, - 70, 100 ).normalize();
 
 				setTimeout( function () {
 
@@ -108,7 +106,7 @@
 				pointLight = new THREE.PointLight( 0xffaa00 );
 				scene.add( pointLight );
 
-				geometry = new THREE.SphereGeometry( 100, 8, 4 );
+				geometry = new THREE.SphereBufferGeometry( 100, 8, 4 );
 				material = new THREE.MeshBasicMaterial( { color: 0xffaa00 } );
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.set( 0.05, 0.05, 0.05 );

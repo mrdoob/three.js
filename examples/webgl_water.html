@@ -34,7 +34,7 @@
 		<script src="js/objects/Reflector.js"></script>
 		<script src="js/objects/Refractor.js"></script>
 		<script src="js/objects/Water2.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 	</head>
@@ -47,9 +47,13 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
 
-		var scene, camera, clock, renderer, water;
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
+
+		var scene, camera, clock, renderer, controls, water;
 
 		var torusKnot;
 

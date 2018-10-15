@@ -1211,7 +1211,7 @@ THREE.SEA3D.Dummy = function ( width, height, depth ) {
 	this.height = height != undefined ? height : 100;
 	this.depth = depth != undefined ? depth : 100;
 
-	var geo = new THREE.BoxGeometry( this.width, this.height, this.depth, 1, 1, 1 );
+	var geo = new THREE.BoxBufferGeometry( this.width, this.height, this.depth, 1, 1, 1 );
 
 	geo.computeBoundingBox();
 	geo.computeBoundingSphere();
@@ -1695,7 +1695,7 @@ THREE.SEA3D.prototype.updateTransform = function ( obj3d, sea ) {
 
 	// ignore rotation scale
 
-	obj3d.rotation.setFromRotationMatrix( THREE.SEA3D.identityMatrixScale( mtx ) );
+	obj3d.quaternion.setFromRotationMatrix( THREE.SEA3D.identityMatrixScale( mtx ) );
 
 	// optimize if is static
 
@@ -2418,11 +2418,13 @@ THREE.SEA3D.prototype.readCubeMapURL = function ( sea ) {
 				var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 				pmremCubeUVPacker.update( this.config.renderer );
 
-				texture.dispose();
-
 				this.objects[ "cmap/" + sea.name ] = sea.tag = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
 				this.file.resume = true;
+
+				texture.dispose();
+				pmremGenerator.dispose();
+				pmremCubeUVPacker.dispose();
 
 			}
 

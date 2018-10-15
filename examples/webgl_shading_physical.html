@@ -36,8 +36,9 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -111,18 +112,6 @@
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
 				textureLava.format = THREE.RGBFormat;
 
-				//
-
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-
 				// GROUND
 
 				var groundMaterial = new THREE.MeshPhongMaterial( {
@@ -149,9 +138,9 @@
 
 				// OBJECTS
 
-				var sphereGeometry = new THREE.SphereGeometry( 100, 64, 32 );
-				var torusGeometry = new THREE.TorusGeometry( 240, 60, 32, 64 );
-				var cubeGeometry = new THREE.BoxGeometry( 150, 150, 150 );
+				var sphereGeometry = new THREE.SphereBufferGeometry( 100, 64, 32 );
+				var torusGeometry = new THREE.TorusBufferGeometry( 240, 60, 32, 64 );
+				var cubeGeometry = new THREE.BoxBufferGeometry( 150, 150, 150 );
 
 				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
 				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
@@ -186,9 +175,9 @@
 
 				}
 
-				var bigCube = new THREE.BoxGeometry( 50, 500, 50 );
-				var midCube = new THREE.BoxGeometry( 50, 200, 50 );
-				var smallCube = new THREE.BoxGeometry( 100, 100, 100 );
+				var bigCube = new THREE.BoxBufferGeometry( 50, 500, 50 );
+				var midCube = new THREE.BoxBufferGeometry( 50, 200, 50 );
+				var smallCube = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
 				addObjectColor( bigCube,   0xff0000, -500, 250, 0, 0 );
 				addObjectColor( smallCube, 0xff0000, -500, 50, -150, 0 );
@@ -202,24 +191,22 @@
 				addObjectColor( midCube,   0xff00ff, 0, 100, 500, 0 );
 				addObjectColor( smallCube, 0xff00ff, -150, 50, 500, 0 );
 
-				addObjectColor( new THREE.BoxGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI/4 );
-				addObjectColor( new THREE.BoxGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
+				addObjectColor( new THREE.BoxBufferGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI/4 );
+				addObjectColor( new THREE.BoxBufferGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
 
-				addObjectColor( new THREE.SphereGeometry( 100, 32, 26 ), 0xffffff, -300, 100, 300, 0 );
+				addObjectColor( new THREE.SphereBufferGeometry( 100, 32, 26 ), 0xffffff, -300, 100, 300, 0 );
 
 				// MORPHS
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.GLTFLoader();
 
-				loader.load( "models/animated/sittingBox.js", function( geometry ) {
+				loader.load( "models/gltf/SittingBox.glb", function( gltf ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, flatShading: true } );
-
-					var mesh = new THREE.Mesh( geometry, morphMaterial );
+					var mesh = gltf.scene.children[ 0 ];
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					mixer.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
+					mixer.clipAction( gltf.animations[0] ).setDuration( 10 ).play();
 
 					var s = 200;
 					mesh.scale.set( s, s, s );

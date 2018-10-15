@@ -12,13 +12,13 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Creates a simulated lens flare that tracks a light.<br /><br />
-		</div>
+		</p>
 
 		<h2>Example</h2>
 
-		<div>
+		<p>
 			[example:webgl_lensflares lensflares]
 
 			<code>
@@ -39,29 +39,29 @@ lensflare.addElement( new THREE.LensflareElement( textureFlare2, 60, 0.6 ) );
 light.add( lensflare );
 			</code>
 
-		</div>
+		</p>
 
 		<h2>Constructor</h2>
 
 
 		<h3>LensflareElement( [param:Texture texture], [param:Float size], [param:Float distance], [param:Color color], [param:Materials blending] )</h3>
-		<div>
+		<p>
 		[page:Texture texture] - THREE.Texture to use for the flare. <br />
 		[page:Float size] - (optional) size in pixels <br />
 		[page:Float distance] - (optional) (0-1) from light source (0 = at light source) <br />
 		[page:Color color] - (optional) the [page:Color] of the lens flare<br />
 		[page:Materials blending] - (optional) [page:Materials Blending Mode] - Defaults to THREE.NormalBlending
-		</div>
+		</p>
 
 		<h2>Properties</h2>
-		<div>See the base [page:Mesh] class for common properties.</div>
+		<p>See the base [page:Mesh] class for common properties.</p>
 
 		<h3>[property:Boolean isLensflare]</h3>
-		<div>
+		<p>
 			Used to check whether this or derived classes are lensflares. Default is *true*.<br /><br />
 
 			You should not change this, as it used internally for optimisation.
-		</div>
+		</p>
 
 
 		<h2>Source</h2>

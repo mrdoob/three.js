@@ -27,9 +27,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
-
-			var geometry, group;
+			var camera, scene, renderer, group;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -52,7 +50,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial( { overdraw: 0.5 } );
 
 				group = new THREE.Group();
@@ -99,7 +97,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;

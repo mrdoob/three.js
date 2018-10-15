@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Camera that uses [link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection].<br /><br />
+
+			In this projection mode, an object's size in the rendered image stays constant
+			regardless of its distance from the camera.<br /><br />
+
+			This can be useful for rendering 2D scenes and UI elements, amongst other things.
+		</p>
+
+
+		<h2>Example</h2>
+
+		<p>[example:canvas_camera_orthographic camera / orthographic ]</p>
+		<p>[example:webgl_camera camera ]</p>
+		<p>[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]</p>
+		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
+		<p>[example:webgl_postprocessing_advanced postprocessing / advanced ]</p>
+		<p>[example:webgl_postprocessing_dof2 postprocessing / dof2 ]</p>
+		<p>[example:webgl_postprocessing_godrays postprocessing / godrays ]</p>
+		<p>[example:webgl_rtt rtt ]</p>
+		<p>[example:webgl_shaders_tonemapping shaders / tonemapping ]</p>
+		<p>[example:webgl_shadowmap shadowmap ]</p>
+		<p>[example:webgl_terrain_dynamic terrain / dynamic ]</p>
+
+		<code>var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+scene.add( camera );</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Number left], [param:Number right], [param:Number top], [param:Number bottom], [param:Number near], [param:Number far] )</h3>
+		<p>
+		left — Camera frustum left plane.<br />
+		right — Camera frustum right plane.<br />
+		top — Camera frustum top plane.<br />
+		bottom — Camera frustum bottom plane.<br />
+		near — Camera frustum near plane.<br />
+		far — Camera frustum far plane.<br /><br />
+
+		Together these define the camera's [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>
+			See the base [page:Camera] class for common properties.<br>
+ 			Note that after making changes to most of these properties you will have to call
+ 			[page:OrthographicCamera.updateProjectionMatrix .updateProjectionMatrix] for the changes to take effect.
+		</p>
+
+		<h3>[property:Float bottom]</h3>
+		<p>Camera frustum bottom plane.</p>
+
+		<h3>[property:Float far]</h3>
+		<p>
+		Camera frustum far plane. Default is *2000*.<br /><br />
+
+		The valid range is between the current value of the [page:.near near] plane and infinity.
+		</p>
+
+		<h3>[property:Boolean isOrthographicCamera]</h3>
+		<p>
+			Used to test whether this or derived classes are OrthographicCameras. Default is *true*.<br /><br />
+
+			This should not be changed as it is used internally by the renderer for optimisation.
+		</p>
+
+		<h3>[property:Float left]</h3>
+		<p>Camera frustum left plane.</p>
+
+		<h3>[property:Float near]</h3>
+		<p>
+			Camera frustum near plane. Default is *0.1*.<br /><br />
+
+			The valid range is between 0 and the current value of the [page:.far far] plane.
+			Note that, unlike for the [page:PerspectiveCamera], *0* is a valid value for an
+			OrthographicCamera's near plane.
+		</p>
+
+		<h3>[property:Float right]</h3>
+		<p>Camera frustum right plane.</p>
+
+		<h3>[property:Float top]</h3>
+		<p>Camera frustum top plane.</p>
+
+		<h3>[property:Object view]</h3>
+		<p>Set by [page:OrthographicCamera.setViewOffset setViewOffset]. Default is *null*.</p>
+
+		<h3>[property:number zoom]</h3>
+		<p>Gets or sets the zoom factor of the camera. Default is *1*.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Camera] class for common methods.</p>
+
+		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<p>
+		fullWidth — full width of multiview setup<br />
+		fullHeight — full height of multiview setup<br />
+		x — horizontal offset of subcamera<br />
+		y — vertical offset of subcamera<br />
+		width — width of subcamera<br />
+		height — height of subcamera<br /><br />
+
+			Sets an offset in a larger [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
+			This is useful for multi-window or multi-monitor/multi-machine setups.
+			For an example on how to use it see [page:PerspectiveCamera.setViewOffset PerspectiveCamera].
+		</p>
+
+		<h3>[method:null clearViewOffset]()</h3>
+		<p>
+		Removes any offset set by the .setViewOffset method.
+		</p>
+
+		<h3>[method:null updateProjectionMatrix]()</h3>
+		<p>
+		Updates the camera projection matrix. Must be called after any change of parameters.
+		</p>
+
+		<h3>[method:JSON toJSON]()</h3>
+		<p>
+		Return the camera's data in JSON format.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

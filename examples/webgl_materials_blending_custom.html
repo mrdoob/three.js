@@ -77,11 +77,15 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer;
 
@@ -114,66 +118,63 @@
 
 				// BACKGROUND IMAGES
 
-				var x = document.createElement( "canvas" );
-				var xc = x.getContext( "2d" );
-				x.width = x.height = 128;
-				xc.fillStyle = "#eee";
-				xc.fillRect( 0, 0, 128, 128 );
-				xc.fillStyle = "#999";
-				xc.fillRect( 0, 0, 64, 64 );
-				xc.fillStyle = "#aaa";
-				xc.fillRect( 32, 32, 32, 32 );
-				xc.fillStyle = "#999";
-				xc.fillRect( 64, 64, 64, 64 );
-				xc.fillStyle = "#bbb";
-				xc.fillRect( 96, 96, 32, 32 );
+				var canvas1 = document.createElement( 'canvas' );
+				var ctx1 = canvas1.getContext( '2d' );
+				canvas1.width = canvas1.height = 128;
+				ctx1.fillStyle = '#eee';
+				ctx1.fillRect( 0, 0, 128, 128 );
+				ctx1.fillStyle = '#999';
+				ctx1.fillRect( 0, 0, 64, 64 );
+				ctx1.fillStyle = '#aaa';
+				ctx1.fillRect( 32, 32, 32, 32 );
+				ctx1.fillStyle = '#999';
+				ctx1.fillRect( 64, 64, 64, 64 );
+				ctx1.fillStyle = '#bbb';
+				ctx1.fillRect( 96, 96, 32, 32 );
 
-				document.getElementById("bg_1").appendChild( x );
+				document.getElementById( 'bg_1' ).appendChild( canvas1 );
 
-				var x2 = document.createElement( "canvas" );
-				var xc2 = x2.getContext( "2d" );
-				x2.width = x2.height = 128;
-				xc2.fillStyle = "#444";
-				xc2.fillRect( 0, 0, 128, 128 );
-				xc2.fillStyle = "#000";
-				xc2.fillRect( 0, 0, 64, 64 );
-				xc2.fillStyle = "#111";
-				xc2.fillRect( 32, 32, 32, 32 );
-				xc2.fillStyle = "#000";
-				xc2.fillRect( 64, 64, 64, 64 );
-				xc2.fillStyle = "#222";
-				xc2.fillRect( 96, 96, 32, 32 );
+				var canvas2 = document.createElement( 'canvas' );
+				var ctx2 = canvas2.getContext( '2d' );
+				canvas2.width = canvas2.height = 128;
+				ctx2.fillStyle = '#444';
+				ctx2.fillRect( 0, 0, 128, 128 );
+				ctx2.fillStyle = '#000';
+				ctx2.fillRect( 0, 0, 64, 64 );
+				ctx2.fillStyle = '#111';
+				ctx2.fillRect( 32, 32, 32, 32 );
+				ctx2.fillStyle = '#000';
+				ctx2.fillRect( 64, 64, 64, 64 );
+				ctx2.fillStyle = '#222';
+				ctx2.fillRect( 96, 96, 32, 32 );
 
-				document.getElementById("bg_1").appendChild( x );
-				document.getElementById("bg_2").appendChild( x2 );
+				document.getElementById( 'bg_2' ).appendChild( canvas2 );
 
-				var mapBg0 = new THREE.Texture( x );
+				var mapBg0 = new THREE.CanvasTexture( canvas1 );
 				mapBg0.wrapS = mapBg0.wrapT = THREE.RepeatWrapping;
 				mapBg0.repeat.set( 128, 64 );
-				mapBg0.needsUpdate = true;
 
-				var mapBg1 = new THREE.Texture( x2 );
+				var mapBg1 = new THREE.CanvasTexture( canvas2 );
 				mapBg1.wrapS = mapBg1.wrapT = THREE.RepeatWrapping;
 				mapBg1.repeat.set( 128, 64 );
-				mapBg1.needsUpdate = true;
 
-				var mapBg2 = textureLoader.load( "textures/disturb.jpg" );
+				var mapBg2 = textureLoader.load( 'textures/disturb.jpg' );
 				mapBg2.wrapS = mapBg2.wrapT = THREE.RepeatWrapping;
 				mapBg2.repeat.set( 8, 4 );
 
-				var mapBg3 = textureLoader.load( "textures/crate.gif" );
+				var mapBg3 = textureLoader.load( 'textures/crate.gif' );
 				mapBg3.wrapS = mapBg3.wrapT = THREE.RepeatWrapping;
 				mapBg3.repeat.set( 32, 16 );
 
-				var mapBg4 = textureLoader.load( "textures/lava/lavatile.jpg" );
+				var mapBg4 = textureLoader.load( 'textures/lava/lavatile.jpg' );
 				mapBg4.wrapS = mapBg4.wrapT = THREE.RepeatWrapping;
 				mapBg4.repeat.set( 8, 4 );
 
-				var mapBg5 = textureLoader.load( "textures/water.jpg" );
+				var mapBg5 = textureLoader.load( 'textures/water.jpg' );
 				mapBg5.wrapS = mapBg5.wrapT = THREE.RepeatWrapping;
 				mapBg5.repeat.set( 8, 4 );
 
-				var mapBg6 = textureLoader.load( "textures/lava/cloud.png" );
+				var mapBg6 = textureLoader.load( 'textures/lava/cloud.png' );
 				mapBg6.wrapS = mapBg6.wrapT = THREE.RepeatWrapping;
 				mapBg6.repeat.set( 2, 1 );
 
@@ -208,13 +209,13 @@
 				}
 
 				// FOREGROUND OBJECTS
-				var src = [ "ZeroFactor", "OneFactor", "SrcColorFactor", "OneMinusSrcColorFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor", "DstColorFactor", "OneMinusDstColorFactor", "SrcAlphaSaturateFactor" ];
-				var dst = [ "ZeroFactor", "OneFactor", "SrcColorFactor", "OneMinusSrcColorFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor", "DstColorFactor", "OneMinusDstColorFactor" ];
+				var src = [ 'ZeroFactor', 'OneFactor', 'SrcColorFactor', 'OneMinusSrcColorFactor', 'SrcAlphaFactor', 'OneMinusSrcAlphaFactor', 'DstAlphaFactor', 'OneMinusDstAlphaFactor', 'DstColorFactor', 'OneMinusDstColorFactor', 'SrcAlphaSaturateFactor' ];
+				var dst = [ 'ZeroFactor', 'OneFactor', 'SrcColorFactor', 'OneMinusSrcColorFactor', 'SrcAlphaFactor', 'OneMinusSrcAlphaFactor', 'DstAlphaFactor', 'OneMinusDstAlphaFactor', 'DstColorFactor', 'OneMinusDstColorFactor' ];
 
 				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
 				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
 
-				var blending = "CustomBlending";
+				var blending = 'CustomBlending';
 
 				for ( var i = 0; i < dst.length; i ++ ) {
 
@@ -256,7 +257,7 @@
 					var z = 0;
 					var y = ( 0 - dst.length / 2 ) * 110 + 50;
 
-					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.replace( "Factor", "" ), "rgba( 0, 150, 0, 1 )" ) );
+					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.replace( 'Factor', '' ), 'rgba( 0, 150, 0, 1 )' ) );
 					mesh.position.set( x, - (y - 70), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
@@ -272,7 +273,7 @@
 					var z = 0;
 					var y = ( i - dst.length / 2 ) * 110 + 165;
 
-					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.replace( "Factor", "" ), "rgba( 150, 0, 0, 1 )" ) );
+					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.replace( 'Factor', '' ), 'rgba( 150, 0, 0, 1 )' ) );
 					mesh.position.set( x, - (y - 120), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
@@ -286,8 +287,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.left = "215px";
+				renderer.domElement.style.position = 'absolute';
+				renderer.domElement.style.left = '215px';
 
 				document.body.appendChild( renderer.domElement );
 
@@ -295,30 +296,30 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				addImgHandler( "img_0", 0 );
-				addImgHandler( "img_1", 1 );
-				addImgHandler( "img_2", 2 );
-				addImgHandler( "img_3", 3 );
-				addImgHandler( "img_4", 4 );
-				addImgHandler( "img_5", 5 );
-				addImgHandler( "img_6", 6 );
+				addImgHandler( 'img_0', 0 );
+				addImgHandler( 'img_1', 1 );
+				addImgHandler( 'img_2', 2 );
+				addImgHandler( 'img_3', 3 );
+				addImgHandler( 'img_4', 4 );
+				addImgHandler( 'img_5', 5 );
+				addImgHandler( 'img_6', 6 );
 
-				addBgHandler( "bg_0", mapBg2 );
-				addBgHandler( "bg_1", mapBg0 );
-				addBgHandler( "bg_2", mapBg1 );
-				addBgHandler( "bg_3", mapBg3 );
-				addBgHandler( "bg_4", mapBg4 );
-				addBgHandler( "bg_5", mapBg5 );
-				addBgHandler( "bg_6", mapBg6 );
+				addBgHandler( 'bg_0', mapBg2 );
+				addBgHandler( 'bg_1', mapBg0 );
+				addBgHandler( 'bg_2', mapBg1 );
+				addBgHandler( 'bg_3', mapBg3 );
+				addBgHandler( 'bg_4', mapBg4 );
+				addBgHandler( 'bg_5', mapBg5 );
+				addBgHandler( 'bg_6', mapBg6 );
 
-				addEqHandler( "btn_add", THREE.AddEquation );
-				addEqHandler( "btn_sub", THREE.SubtractEquation );
-				addEqHandler( "btn_rsub", THREE.ReverseSubtractEquation );
-				addEqHandler( "btn_min", THREE.MinEquation );
-				addEqHandler( "btn_max", THREE.MaxEquation );
+				addEqHandler( 'btn_add', THREE.AddEquation );
+				addEqHandler( 'btn_sub', THREE.SubtractEquation );
+				addEqHandler( 'btn_rsub', THREE.ReverseSubtractEquation );
+				addEqHandler( 'btn_min', THREE.MinEquation );
+				addEqHandler( 'btn_max', THREE.MaxEquation );
 
-				addPreHandler( "btn_pre", mapsPre );
-				addPreHandler( "btn_nopre", mapsNoPre );
+				addPreHandler( 'btn_pre', mapsPre );
+				addPreHandler( 'btn_nopre', mapsNoPre );
 
 			}
 
@@ -354,13 +355,13 @@
 
 					}
 
-					document.getElementById( "btn_add" ).style.backgroundColor = "transparent";
-					document.getElementById( "btn_sub" ).style.backgroundColor = "transparent";
-					document.getElementById( "btn_rsub" ).style.backgroundColor = "transparent";
-					document.getElementById( "btn_min" ).style.backgroundColor = "transparent";
-					document.getElementById( "btn_max" ).style.backgroundColor = "transparent";
+					document.getElementById( 'btn_add' ).style.backgroundColor = 'transparent';
+					document.getElementById( 'btn_sub' ).style.backgroundColor = 'transparent';
+					document.getElementById( 'btn_rsub' ).style.backgroundColor = 'transparent';
+					document.getElementById( 'btn_min' ).style.backgroundColor = 'transparent';
+					document.getElementById( 'btn_max' ).style.backgroundColor = 'transparent';
 
-					el.style.backgroundColor = "darkorange";
+					el.style.backgroundColor = 'darkorange';
 
 				});
 
@@ -386,10 +387,10 @@
 
 					}
 
-					document.getElementById( "btn_pre" ).style.backgroundColor = "transparent";
-					document.getElementById( "btn_nopre" ).style.backgroundColor = "transparent";
+					document.getElementById( 'btn_pre' ).style.backgroundColor = 'transparent';
+					document.getElementById( 'btn_nopre' ).style.backgroundColor = 'transparent';
 
-					el.style.backgroundColor = "darkorange";
+					el.style.backgroundColor = 'darkorange';
 
 				} );
 
@@ -410,22 +411,19 @@
 
 			function generateLabelMaterial( text, bg ) {
 
-				var x = document.createElement( "canvas" );
-				var xc = x.getContext( "2d" );
-				x.width = 128;
-				x.height = 32;
+				var canvas = document.createElement( 'canvas' );
+				var ctx = canvas.getContext( '2d' );
+				canvas.width = 128;
+				canvas.height = 32;
 
-				xc.fillStyle = bg;
-				xc.fillRect( 0, 0, 128, 32 );
+				ctx.fillStyle = bg;
+				ctx.fillRect( 0, 0, 128, 32 );
 
-				//xc.shadowColor = "#000";
-				//xc.shadowBlur = 3;
-				xc.fillStyle = "white";
-				xc.font = "12pt arial bold";
-				xc.fillText( text, 8, 22 );
+				ctx.fillStyle = 'white';
+				ctx.font = '12pt arial bold';
+				ctx.fillText( text, 8, 22 );
 
-				var map = new THREE.Texture( x );
-				map.needsUpdate = true;
+				var map = new THREE.CanvasTexture( canvas );
 
 				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
 				return material;

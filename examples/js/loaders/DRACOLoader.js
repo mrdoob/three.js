@@ -42,9 +42,6 @@ THREE.DRACOLoader.prototype = {
         var loader = new THREE.FileLoader(scope.manager);
         loader.setPath(this.path);
         loader.setResponseType('arraybuffer');
-        if (this.crossOrigin !== undefined) {
-          loader.crossOrigin = this.crossOrigin;
-        }
         loader.load(url, function(blob) {
             scope.decodeDracoFile(blob, onLoad);
         }, onProgress, onError);
@@ -52,14 +49,12 @@ THREE.DRACOLoader.prototype = {
 
     setPath: function(value) {
         this.path = value;
-    },
-
-    setCrossOrigin: function(value) {
-        this.crossOrigin = value;
+        return this;
     },
 
     setVerbosity: function(level) {
         this.verbosity = level;
+        return this;
     },
 
     /**
@@ -70,6 +65,7 @@ THREE.DRACOLoader.prototype = {
      */
     setDrawMode: function(drawMode) {
         this.drawMode = drawMode;
+        return this;
     },
 
     /**
@@ -84,6 +80,7 @@ THREE.DRACOLoader.prototype = {
           skipDequantization = skip;
         this.getAttributeOptions(attributeName).skipDequantization =
             skipDequantization;
+        return this;
     },
 
     /**
@@ -100,17 +97,18 @@ THREE.DRACOLoader.prototype = {
      * The format is:
      *     attributeUniqueIdMap[attributeName] = attributeId
      */
-    decodeDracoFile: function(rawBuffer, callback, attributeUniqueIdMap) {
+    decodeDracoFile: function(rawBuffer, callback, attributeUniqueIdMap,
+                              attributeTypeMap) {
       var scope = this;
       THREE.DRACOLoader.getDecoderModule()
           .then( function ( module ) {
             scope.decodeDracoFileInternal( rawBuffer, module.decoder, callback,
-              attributeUniqueIdMap || {});
+              attributeUniqueIdMap || {}, attributeTypeMap || {});
           });
     },
 
     decodeDracoFileInternal: function(rawBuffer, dracoDecoder, callback,
-                                      attributeUniqueIdMap) {
+                                      attributeUniqueIdMap, attributeTypeMap) {
       /*
        * Here is how to use Draco Javascript decoder and get the geometry.
        */
@@ -131,49 +129,114 @@ THREE.DRACOLoader.prototype = {
           console.log('Loaded a point cloud.');
         }
       } else {
-        var errorMsg = 'THREE.DRACOLoader: Unknown geometry type.'
+        var errorMsg = 'THREE.DRACOLoader: Unknown geometry type.';
         console.error(errorMsg);
         throw new Error(errorMsg);
       }
       callback(this.convertDracoGeometryTo3JS(dracoDecoder, decoder,
-          geometryType, buffer, attributeUniqueIdMap));
+          geometryType, buffer, attributeUniqueIdMap, attributeTypeMap));
     },
 
     addAttributeToGeometry: function(dracoDecoder, decoder, dracoGeometry,
-                                     attributeName, attribute, geometry,
-                                     geometryBuffer) {
+                                     attributeName, attributeType, attribute,
+                                     geometry, geometryBuffer) {
       if (attribute.ptr === 0) {
         var errorMsg = 'THREE.DRACOLoader: No attribute ' + attributeName;
         console.error(errorMsg);
         throw new Error(errorMsg);
       }
+
       var numComponents = attribute.num_components();
-      var attributeData = new dracoDecoder.DracoFloat32Array();
-      decoder.GetAttributeFloatForAllPoints(
-          dracoGeometry, attribute, attributeData);
       var numPoints = dracoGeometry.num_points();
       var numValues = numPoints * numComponents;
-      // Allocate space for attribute.
-      geometryBuffer[attributeName] = new Float32Array(numValues);
+      var attributeData;
+      var TypedBufferAttribute;
+
+      switch ( attributeType ) {
+
+        case Float32Array:
+          attributeData = new dracoDecoder.DracoFloat32Array();
+          decoder.GetAttributeFloatForAllPoints(
+            dracoGeometry, attribute, attributeData);
+          geometryBuffer[ attributeName ] = new Float32Array( numValues );
+          TypedBufferAttribute = THREE.Float32BufferAttribute;
+          break;
+
+        case Int8Array:
+          attributeData = new dracoDecoder.DracoInt8Array();
+          decoder.GetAttributeInt8ForAllPoints(
+            dracoGeometry, attribute, attributeData );
+          geometryBuffer[ attributeName ] = new Int8Array( numValues );
+          TypedBufferAttribute = THREE.Int8BufferAttribute;
+          break;
+
+        case Int16Array:
+          attributeData = new dracoDecoder.DracoInt16Array();
+          decoder.GetAttributeInt16ForAllPoints(
+            dracoGeometry, attribute, attributeData);
+          geometryBuffer[ attributeName ] = new Int16Array( numValues );
+          TypedBufferAttribute = THREE.Int16BufferAttribute;
+          break;
+
+        case Int32Array:
+          attributeData = new dracoDecoder.DracoInt32Array();
+          decoder.GetAttributeInt32ForAllPoints(
+            dracoGeometry, attribute, attributeData);
+          geometryBuffer[ attributeName ] = new Int32Array( numValues );
+          TypedBufferAttribute = THREE.Int32BufferAttribute;
+          break;
+
+        case Uint8Array:
+          attributeData = new dracoDecoder.DracoUInt8Array();
+          decoder.GetAttributeUInt8ForAllPoints(
+            dracoGeometry, attribute, attributeData);
+          geometryBuffer[ attributeName ] = new Uint8Array( numValues );
+          TypedBufferAttribute = THREE.Uint8BufferAttribute;
+          break;
+
+        case Uint16Array:
+          attributeData = new dracoDecoder.DracoUInt16Array();
+          decoder.GetAttributeUInt16ForAllPoints(
+            dracoGeometry, attribute, attributeData);
+          geometryBuffer[ attributeName ] = new Uint16Array( numValues );
+          TypedBufferAttribute = THREE.Uint16BufferAttribute;
+          break;
+
+        case Uint32Array:
+          attributeData = new dracoDecoder.DracoUInt32Array();
+          decoder.GetAttributeUInt32ForAllPoints(
+            dracoGeometry, attribute, attributeData);
+          geometryBuffer[ attributeName ] = new Uint32Array( numValues );
+          TypedBufferAttribute = THREE.Uint32BufferAttribute;
+          break;
+
+        default:
+          var errorMsg = 'THREE.DRACOLoader: Unexpected attribute type.';
+          console.error( errorMsg );
+          throw new Error( errorMsg );
+
+      }
+
       // Copy data from decoder.
       for (var i = 0; i < numValues; i++) {
         geometryBuffer[attributeName][i] = attributeData.GetValue(i);
       }
       // Add attribute to THREEJS geometry for rendering.
       geometry.addAttribute(attributeName,
-          new THREE.Float32BufferAttribute(geometryBuffer[attributeName],
+          new TypedBufferAttribute(geometryBuffer[attributeName],
             numComponents));
       dracoDecoder.destroy(attributeData);
     },
 
     convertDracoGeometryTo3JS: function(dracoDecoder, decoder, geometryType,
-                                        buffer, attributeUniqueIdMap) {
+                                        buffer, attributeUniqueIdMap,
+                                        attributeTypeMap) {
         if (this.getAttributeOptions('position').skipDequantization === true) {
           decoder.SkipAttributeTransform(dracoDecoder.POSITION);
         }
         var dracoGeometry;
         var decodingStatus;
-        const start_time = performance.now();
+        var start_time = performance.now();
         if (geometryType === dracoDecoder.TRIANGULAR_MESH) {
           dracoGeometry = new dracoDecoder.Mesh();
           decodingStatus = decoder.DecodeBufferToMesh(buffer, dracoGeometry);
@@ -244,18 +307,19 @@ THREE.DRACOLoader.prototype = {
               }
               var attribute = decoder.GetAttribute(dracoGeometry, attId);
               this.addAttributeToGeometry(dracoDecoder, decoder, dracoGeometry,
-                  attributeName, attribute, geometry, geometryBuffer);
+                  attributeName, Float32Array, attribute, geometry, geometryBuffer);
             }
           }
         }
 
         // Add attributes of user specified unique id. E.g. GLTF models.
         for (var attributeName in attributeUniqueIdMap) {
+          var attributeType = attributeTypeMap[attributeName] || Float32Array;
           var attributeId = attributeUniqueIdMap[attributeName];
           var attribute = decoder.GetAttributeByUniqueId(dracoGeometry,
                                                          attributeId);
           this.addAttributeToGeometry(dracoDecoder, decoder, dracoGeometry,
-              attributeName, attribute, geometry, geometryBuffer);
+              attributeName, attributeType, attribute, geometry, geometryBuffer);
         }
 
         // For mesh, we need to generate the faces.

@@ -30,17 +30,20 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometries</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats;
 
@@ -49,14 +52,12 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 400;
 
 				scene = new THREE.Scene();
 
-				var light, object;
+				var object;
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
@@ -73,43 +74,43 @@
 
 				//
 
-				object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
+				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 75, 20, 10 ), material );
 				object.position.set( - 300, 0, 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 1 ), material );
+				object = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 75, 1 ), material );
 				object.position.set( - 100, 0, 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 2 ), material );
+				object = new THREE.Mesh( new THREE.OctahedronBufferGeometry( 75, 2 ), material );
 				object.position.set( 100, 0, 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
+				object = new THREE.Mesh( new THREE.TetrahedronBufferGeometry( 75, 0 ), material );
 				object.position.set( 300, 0, 200 );
 				scene.add( object );
 
 				//
 
-				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
+				object = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100, 4, 4 ), material );
 				object.position.set( - 300, 0, 0 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 ), material );
+				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100, 4, 4, 4 ), material );
 				object.position.set( - 100, 0, 0 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.CircleBufferGeometry( 50, 20, 0, Math.PI * 2 ), material );
 				object.position.set( 100, 0, 0 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.RingBufferGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
 				object.position.set( 300, 0, 0 );
 				scene.add( object );
 
 				//
 
-				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
+				object = new THREE.Mesh( new THREE.CylinderBufferGeometry( 25, 75, 100, 40, 5 ), material );
 				object.position.set( - 300, 0, - 200 );
 				scene.add( object );
 
@@ -121,15 +122,15 @@
 
 				}
 
-				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
+				object = new THREE.Mesh( new THREE.LatheBufferGeometry( points, 20 ), material );
 				object.position.set( - 100, 0, - 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
+				object = new THREE.Mesh( new THREE.TorusBufferGeometry( 50, 20, 20, 20 ), material );
 				object.position.set( 100, 0, - 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
+				object = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 50, 10, 50, 20 ), material );
 				object.position.set( 300, 0, - 200 );
 				scene.add( object );
 
@@ -138,11 +139,10 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 

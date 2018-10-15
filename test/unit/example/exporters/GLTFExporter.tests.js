@@ -19,7 +19,7 @@ export default QUnit.module( 'Exporters', () => {
 
       var done = assert.async();
 
-      var object = new THREE.Object3D()
+      var object = new THREE.Object3D();
 
       var exporter = new THREE.GLTFExporter();
 
@@ -120,6 +120,41 @@ export default QUnit.module( 'Exporters', () => {
 
     } );
 
+    QUnit.test( 'parse - empty buffergeometry', ( assert ) => {
+
+      var done = assert.async();
+
+      var scene = new THREE.Scene();
+      var geometry = new THREE.BufferGeometry();
+      var numElements = 6;
+
+      var positions = new Float32Array( ( numElements ) * 3 );
+      var colors = new Float32Array( ( numElements ) * 3 );
+
+      geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+      geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+      geometry.setDrawRange( 0, 0 );
+
+      var empty = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
+      empty.name = 'Custom buffered empty (drawrange)';
+      scene.add( empty );
+
+      var exporter = new THREE.GLTFExporter();
+
+      exporter.parse( scene, function ( gltf ) {
+
+        assert.equal( gltf.meshes, undefined, 'empty meshes');
+        assert.equal( gltf.materials, undefined, 'empty materials');
+        assert.equal( gltf.bufferViews, undefined, 'empty bufferViews');
+        assert.equal( gltf.buffers, undefined, 'buffers');
+        assert.equal( gltf.accessors, undefined, 'accessors');
+        assert.equal( gltf.nodes[0].mesh, undefined, 'nodes[0].mesh');
+
+        done();
+
+      });
+
+    } );
 
   } );
 

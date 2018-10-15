@@ -22,12 +22,7 @@
 
 		<script>
 
-			var AMOUNT = 100;
-
-			var stats;
-
-			var camera, scene;
-			var renderer;
+			var camera, scene, renderer, stats;
 
 			var mesh, group;
 
@@ -45,7 +40,7 @@
 				// QRCODE
 
 				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/QRCode.json', function ( geometry) {
+				loader.load( 'models/json/QRCode.json', function ( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { /*emissive: 0xff0000,*/ vertexColors: THREE.FaceColors } ) );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
@@ -55,7 +50,7 @@
 
 				// CUBES
 
-				var cube = new THREE.BoxGeometry( 100, 100, 100 );
+				var cube = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
 				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } ) );
 				mesh.position.x = 500;
@@ -75,14 +70,14 @@
 				// PLANE
 
 				mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
-				mesh.position.y = -500;
+				mesh.position.y = - 500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
 
 				// CYLINDER
 
-				mesh = new THREE.Mesh( new THREE.CylinderGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
-				mesh.position.x = -500;
+				mesh = new THREE.Mesh( new THREE.CylinderBufferGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh.position.x = - 500;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );

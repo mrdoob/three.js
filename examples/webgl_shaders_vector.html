@@ -74,26 +74,7 @@
 
 			var camera, scene, renderer, controls;
 
-			var group, text;
-
-			var t = false;
-
-			function toggle() {
-
-				if ( t ) {
-
-					text2.visible = 0;
-					text1.visible = 1;
-
-				} else {
-
-					text2.visible = 1;
-					text1.visible = 0;
-
-				}
-
-				t = !t;
-			}
+			var group;
 
 			var loader = new THREE.FontLoader();
 			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
@@ -106,45 +87,40 @@
 			function init( font ) {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, 100, 500 );
+				camera.position.set( 50, 100, 500 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 100, 0 );
+				controls.target.set( 50, 100, 0 );
 				controls.update();
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var theText = "&"; // i % & j b 8
+				var theText = '&'; // i % & j b 8
 
 				group = new THREE.Group();
 				scene.add( group );
 
-
 				var textMaterial = new THREE.MeshBasicMaterial( {
-					color: new THREE.Color(0, 0, 1 ),
+					color: new THREE.Color( 0, 0, 1 ),
 					side: THREE.DoubleSide,
 					wireframe: true
 				} );
 
-				var textShapes = font.generateShapes( theText, 180, 2 );
+				var textShapes = font.generateShapes( theText, 180 );
 
-				var text3d = new THREE.ShapeGeometry( textShapes );
+				var geometry = new THREE.ShapeBufferGeometry( textShapes );
 
-				text3d.computeBoundingBox();
-				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
-				text = new THREE.Mesh( text3d, textMaterial );
-
-				text.position.x = centerOffset - 150;
+				var text = new THREE.Mesh( geometry, textMaterial );
+				text.position.x = - 200;
 				group.add( text );
 
 				//
 
 				var vA = new THREE.Vector2();
 				var vB = new THREE.Vector2();
-				var vDot = new THREE.Vector2();
 
-				function processShape(path, reverse) {
+				function processShape( path, reverse ) {
 
 					var pts = []; // bigger area (convex hull)
 					var pts2 = []; // smaller area (full solid shapes)
@@ -154,40 +130,46 @@
 
 					var wind;
 
-					pts.push( path[0].getPoint(0) );
-					pts2.push( path[0].getPoint(0) );
+					pts.push( path[ 0 ].getPoint( 0 ) );
+					pts2.push( path[ 0 ].getPoint( 0 ) );
 
-					for (var i=0; i < path.length; i++) {
-						var curve = path[i];
-						if (curve instanceof THREE.LineCurve) {
+					for ( var i = 0; i < path.length; i ++ ) {
+
+						var curve = path[ i ];
+						if ( curve instanceof THREE.LineCurve ) {
+
 							pts.push( curve.v2 );
 							pts2.push( curve.v2 );
-						} else if (curve instanceof THREE.QuadraticBezierCurve) {
-							vA = vA.subVectors( curve.v1, curve.v0 ); // .normalize()
+
+						} else if ( curve instanceof THREE.QuadraticBezierCurve ) {
+
+							vA = vA.subVectors( curve.v1, curve.v0 );
 							vB = vB.subVectors( curve.v2, curve.v1 );
 							z = vA.x * vB.y - vA.y * vB.x; // z component of cross Production
 							wind = z < 0; // clockwise/anticlock wind
-							// if (reverse) wind = !wind;
 
-							// console.log(z, wind , wind ? 'clockwise' : 'anti');
+							if ( wind ) {
 
-							if (wind) {
 								pts.push( curve.v1 );
 								pts.push( curve.v2 );
 								pts2.push( curve.v2 );
+
 							} else {
-								pts.push( curve.v2 );
-								pts2.push( curve.v1 );
-								pts2.push( curve.v2 );
+
+											pts.push( curve.v2 );
+											pts2.push( curve.v1 );
+											pts2.push( curve.v2 );
+
 							}
 
-							var flip = wind ? 1 : -1;
-							// if (reverse) flip *= -1;
+								var flip = wind ? 1 : - 1;
+								// if (reverse) flip *= -1;
 
-							invert.push(flip, flip, flip);
-							beziers.push( curve.v0, curve.v1, curve.v2);
+								invert.push( flip, flip, flip );
+								beziers.push( curve.v0, curve.v1, curve.v2 );
 
-						}
+							}
+
 					}
 
 					return {
@@ -196,6 +178,7 @@
 						beziers: beziers,
 						invert: invert
 					};
+
 				}
 
 				var pts, pts2;
@@ -209,15 +192,15 @@
 				var process;
 				var hole;
 
-				for (var s=0;s<textShapes.length;s++) {
+				for ( var s = 0; s < textShapes.length; s ++ ) {
 
-					subshape = textShapes[s];
-					process = processShape(subshape.curves);
+					subshape = textShapes[ s ];
+					process = processShape( subshape.curves );
 
 					pts = process.pts;
 					pts2 = process.pts2;
-					beziers = beziers.concat(process.beziers);
-					invert = invert.concat(process.invert);
+					beziers = beziers.concat( process.beziers );
+					invert = invert.concat( process.invert );
 
 					convexhullShape = new THREE.Shape( pts );
 					solidShape = new THREE.Shape( pts2 );
@@ -225,84 +208,69 @@
 					convexhullShapeGroup.push( convexhullShape );
 					solidShapeGroup.push( solidShape );
 
-					for (var i=0; i<subshape.holes.length;i++) {
-						hole = subshape.holes[i];
-						// console.log('hole', hole);
+					for ( var i = 0; i < subshape.holes.length; i ++ ) {
 
-						process = processShape(hole.curves, true);
+						hole = subshape.holes[ i ];
+
+						process = processShape( hole.curves, true );
 
 						pts = process.pts;
 						pts2 = process.pts2;
-						beziers = beziers.concat(process.beziers);
-						invert = invert.concat(process.invert);
+						beziers = beziers.concat( process.beziers );
+						invert = invert.concat( process.invert );
 
-						convexhullShape.holes.push(new THREE.Shape(pts));
-						solidShape.holes.push(new THREE.Shape(pts2));
+						convexhullShape.holes.push( new THREE.Shape( pts ) );
+						solidShape.holes.push( new THREE.Shape( pts2 ) );
 
 					}
 
 				} // end of subshape
 
-				var bezierGeometry = new THREE.Geometry();
+				var bezierGeometry = new THREE.BufferGeometry();
+				var vertices = [];
+				var uvs = [];
 
-				for (var i=0;i<beziers.length;i++) {
-					var p = beziers[i];
-					bezierGeometry.vertices.push( new THREE.Vector3(p.x, p.y, 0) );
+				for ( var i = 0; i < beziers.length; i ++ ) {
+
+					var p = beziers[ i ];
+					vertices.push( p.x, p.y, 0 );
+
 				}
 
-				for (i=0;i<beziers.length;i+=3) {
-					bezierGeometry.faces.push( new THREE.Face3(i, i+1, i+2) );
-					bezierGeometry.faceVertexUvs[0].push( [
-						new THREE.Vector2(0, 0),
-						new THREE.Vector2(0.5, 0),
-						new THREE.Vector2(1, 1)
-					] );
+				for ( var i = 0; i < beziers.length; i += 3 ) {
+
+					uvs.push( 0, 0,  0.5, 0, 1, 1   );
+
 				}
 
-				text3d = new THREE.ShapeGeometry( convexhullShapeGroup );
-				text3d.computeBoundingBox();
-				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
-
-				var text1 = new THREE.Mesh( text3d, textMaterial );
-
-				text1.position.x = centerOffset + 150;
-
-				group.add( text1 );
-
-				text3d = new THREE.ShapeGeometry( solidShapeGroup );
-				text3d.computeBoundingBox();
-				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
-
-				var text2 = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: new THREE.Color(1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
-				text2.position.x = centerOffset + 150;
-				group.add( text2 );
-
-				//
-				bezierGeometry.computeBoundingBox();
-				bezierGeometry.computeFaceNormals();
-				bezierGeometry.computeVertexNormals();
-
-				bezierGeometry = new THREE.BufferGeometry().fromGeometry( bezierGeometry );
+				bezierGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				bezierGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
+				geometry = new THREE.ShapeBufferGeometry( convexhullShapeGroup );
+
+				text = new THREE.Mesh( geometry, textMaterial );
+				text.position.x = 200;
+				group.add( text );
+
+				geometry = new THREE.ShapeBufferGeometry( solidShapeGroup );
+
+				text = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: new THREE.Color( 1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
+				text.position.x = 200;
+				group.add( text );
+
 				//
 
-				var newMaterial = new THREE.ShaderMaterial({
+				var newMaterial = new THREE.ShaderMaterial( {
 					uniforms: {
-						color: { value: new THREE.Color(0.45 * 0xffffff) }
+						color: { value: new THREE.Color( 0.45 * 0xffffff ) }
 					},
 					vertexShader: document.getElementById( 'vs' ).textContent,
 					fragmentShader: document.getElementById( 'fs' ).textContent,
 					side: THREE.DoubleSide
-				});
-
+				} );
 
 				text = new THREE.Mesh( bezierGeometry, newMaterial );
-				text.position.x = centerOffset;
-				text.position.y = 0;
-				text.position.z = 0;
-
-				text.rotation.x = 0;
 				text.rotation.y = Math.PI * 2;
 
 				group.add( text );
@@ -310,15 +278,9 @@
 				//
 
 
-				text3d = new THREE.ShapeGeometry( solidShapeGroup );
-				text3d.computeBoundingBox();
+				geometry = new THREE.ShapeBufferGeometry( solidShapeGroup );
 
-				text = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: 0.45 * 0xffffff, side: THREE.DoubleSide } ) );
-				text.position.x = centerOffset;
-				text.position.y = 0;
-				text.position.z = 0;
-
-				text.rotation.x = 0;
+				text = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0.45 * 0xffffff, side: THREE.DoubleSide } ) );
 				text.rotation.y = Math.PI * 2;
 
 				group.add( text );
@@ -333,8 +295,6 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				document.addEventListener( 'mousedown', toggle, false );
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -347,7 +307,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
 
 			//
 

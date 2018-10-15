@@ -108,7 +108,7 @@ export default QUnit.module( 'Cameras', () => {
 
 			var cam = new PerspectiveCamera( 75, 16 / 9, 0.1, 300.0 );
 
-			// updateProjectionMatrix is called in contructor
+			// updateProjectionMatrix is called in constructor
 			var m = cam.projectionMatrix;
 
 			// perspective projection is given my the 4x4 Matrix

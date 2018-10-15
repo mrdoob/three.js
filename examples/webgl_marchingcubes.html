@@ -28,7 +28,7 @@
 		  color: gold;
 		}
 
-		#oldie {
+		#webglmessage {
 		  font-family: monospace;
 		  font-size: 13px;
 
@@ -73,13 +73,17 @@
 	<script src="js/MarchingCubes.js"></script>
 	<script src="js/ShaderToon.js"></script>
 
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
 
 
 	<script>
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var MARGIN = 0;
 
@@ -99,6 +103,8 @@
 		var composer, effectFXAA, hblur, vblur;
 
 		var effectController;
+
+		var controls;
 
 		var time = 0;
 		var clock = new THREE.Clock();
@@ -313,7 +319,7 @@
 
 			"flat" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, flatShading: true } ),
+				m: new THREE.MeshLambertMaterial( { color: 0x000000, flatShading: true } ),
 				h: 0, s: 0, l: 1
 			},
 

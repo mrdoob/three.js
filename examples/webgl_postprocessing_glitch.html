@@ -76,7 +76,7 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				var geometry = new THREE.SphereGeometry( 1, 4, 4 );
+				var geometry = new THREE.SphereBufferGeometry( 1, 4, 4 );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
@@ -129,8 +129,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				var time = Date.now();
 
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;

@@ -35,11 +35,15 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats;
 			var pointLight, pointLight2;
@@ -67,7 +71,7 @@
 					pointLight.shadow.camera.far = 60;
 					pointLight.shadow.bias = - 0.005; // reduces self-shadowing on double-sided objects
 
-					var geometry = new THREE.SphereGeometry( 0.3, 12, 6 );
+					var geometry = new THREE.SphereBufferGeometry( 0.3, 12, 6 );
 					var material = new THREE.MeshBasicMaterial( { color: color } );
 					material.color.multiplyScalar( intensity );
 					var sphere = new THREE.Mesh( geometry, material );
@@ -79,7 +83,7 @@
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.repeat.set( 1, 3.5 );
 
-					var geometry = new THREE.SphereGeometry( 2, 32, 8 );
+					var geometry = new THREE.SphereBufferGeometry( 2, 32, 8 );
 					var material = new THREE.MeshPhongMaterial( {
 						side: THREE.DoubleSide,
 						alphaMap: texture,
@@ -110,7 +114,7 @@
 
 				//
 
-				var geometry = new THREE.BoxGeometry( 30, 30, 30 );
+				var geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
 
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xa0adaf,

@@ -34,6 +34,7 @@ import { SkeletonHelper } from './helpers/SkeletonHelper.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
+import { ExtrudeBufferGeometry } from './geometries/ExtrudeGeometry.js';
 import { ShapeGeometry } from './geometries/ShapeGeometry.js';
 import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
@@ -43,6 +44,8 @@ import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { DataTextureLoader } from './loaders/DataTextureLoader.js';
+import { JSONLoader } from './loaders/JSONLoader.js';
+import { ObjectLoader } from './loaders/ObjectLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
@@ -59,6 +62,7 @@ import { Matrix4 } from './math/Matrix4.js';
 import { Plane } from './math/Plane.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Ray } from './math/Ray.js';
+import { Triangle } from './math/Triangle.js';
 import { Vector2 } from './math/Vector2.js';
 import { Vector3 } from './math/Vector3.js';
 import { Vector4 } from './math/Vector4.js';
@@ -71,6 +75,7 @@ import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { WebVRManager } from './renderers/webvr/WebVRManager.js';
+import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 
@@ -432,6 +437,28 @@ export function BinaryTextureLoader( manager ) {
 
 }
 
+Object.assign( JSONLoader.prototype, {
+
+	setTexturePath: function ( value ) {
+
+		console.warn( 'THREE.JSONLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+		return this.setResourcePath( value );
+
+	}
+
+} );
+
+Object.assign( ObjectLoader.prototype, {
+
+	setTexturePath: function ( value ) {
+
+		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+		return this.setResourcePath( value );
+
+	}
+
+} );
+
 //
 
 Object.assign( Box2.prototype, {
@@ -705,6 +732,58 @@ Object.assign( Ray.prototype, {
 
 		console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
 		return this.intersectsSphere( sphere );
+
+	}
+
+} );
+
+Object.assign( Triangle.prototype, {
+
+	area: function () {
+
+		console.warn( 'THREE.Triangle: .area() has been renamed to .getArea().' );
+		return this.getArea();
+
+	},
+	barycoordFromPoint: function ( point, target ) {
+
+		console.warn( 'THREE.Triangle: .barycoordFromPoint() has been renamed to .getBarycoord().' );
+		return this.getBarycoord( point, target );
+
+	},
+	midpoint: function ( target ) {
+
+		console.warn( 'THREE.Triangle: .midpoint() has been renamed to .getMidpoint().' );
+		return this.getMidpoint( target );
+
+	},
+	normal: function ( target ) {
+
+		console.warn( 'THREE.Triangle: .normal() has been renamed to .getNormal().' );
+		return this.getNormal( target );
+
+	},
+	plane: function ( target ) {
+
+		console.warn( 'THREE.Triangle: .plane() has been renamed to .getPlane().' );
+		return this.getPlane( target );
+
+	}
+
+} );
+
+Object.assign( Triangle, {
+
+	barycoordFromPoint: function ( point, a, b, c, target ) {
+
+		console.warn( 'THREE.Triangle: .barycoordFromPoint() has been renamed to .getBarycoord().' );
+		return Triangle.getBarycoord( point, a, b, c, target );
+
+	},
+	normal: function ( a, b, c, target ) {
+
+		console.warn( 'THREE.Triangle: .normal() has been renamed to .getNormal().' );
+		return Triangle.getNormal( a, b, c, target );
 
 	}
 
@@ -1149,6 +1228,30 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 //
 
+Object.assign( ExtrudeBufferGeometry.prototype, {
+
+	getArrays: function () {
+
+		console.error( 'THREE.ExtrudeBufferGeometry: .getArrays() has been removed.' );
+
+	},
+
+	addShapeList: function () {
+
+		console.error( 'THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.' );
+
+	},
+
+	addShape: function () {
+
+		console.error( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
+
+	}
+
+} );
+
+//
+
 Object.defineProperties( Uniform.prototype, {
 
 	dynamic: {
@@ -1250,6 +1353,21 @@ Object.defineProperties( ShaderMaterial.prototype, {
 //
 
 Object.assign( WebGLRenderer.prototype, {
+
+	clearTarget: function ( renderTarget, color, depth, stencil ) {
+
+		console.warn( 'THREE.WebGLRenderer: .clearTarget() has been deprecated. Use .setRenderTarget() and .clear() instead.' );
+		this.setRenderTarget( renderTarget );
+		this.clear( color, depth, stencil );
+
+	},
+
+	animate: function ( callback ) {
+
+		console.warn( 'THREE.WebGLRenderer: .animate() is now .setAnimationLoop().' );
+		this.setAnimationLoop( callback );
+
+	},
 
 	getCurrentRenderTarget: function () {
 
@@ -1605,6 +1723,13 @@ Object.defineProperties( WebVRManager.prototype, {
 			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
 
 		}
+	},
+	userHeight: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebVRManager: .userHeight has been removed.' );
+
+		}
 	}
 
 } );
@@ -1672,51 +1797,47 @@ export var GeometryUtils = {
 
 };
 
-export var ImageUtils = {
+ImageUtils.crossOrigin = undefined;
 
-	crossOrigin: undefined,
+ImageUtils.loadTexture = function ( url, mapping, onLoad, onError ) {
 
-	loadTexture: function ( url, mapping, onLoad, onError ) {
+	console.warn( 'THREE.ImageUtils.loadTexture has been deprecated. Use THREE.TextureLoader() instead.' );
 
-		console.warn( 'THREE.ImageUtils.loadTexture has been deprecated. Use THREE.TextureLoader() instead.' );
+	var loader = new TextureLoader();
+	loader.setCrossOrigin( this.crossOrigin );
 
-		var loader = new TextureLoader();
-		loader.setCrossOrigin( this.crossOrigin );
+	var texture = loader.load( url, onLoad, undefined, onError );
 
-		var texture = loader.load( url, onLoad, undefined, onError );
+	if ( mapping ) texture.mapping = mapping;
 
-		if ( mapping ) texture.mapping = mapping;
+	return texture;
 
-		return texture;
+};
 
-	},
+ImageUtils.loadTextureCube = function ( urls, mapping, onLoad, onError ) {
 
-	loadTextureCube: function ( urls, mapping, onLoad, onError ) {
+	console.warn( 'THREE.ImageUtils.loadTextureCube has been deprecated. Use THREE.CubeTextureLoader() instead.' );
 
-		console.warn( 'THREE.ImageUtils.loadTextureCube has been deprecated. Use THREE.CubeTextureLoader() instead.' );
+	var loader = new CubeTextureLoader();
+	loader.setCrossOrigin( this.crossOrigin );
 
-		var loader = new CubeTextureLoader();
-		loader.setCrossOrigin( this.crossOrigin );
+	var texture = loader.load( urls, onLoad, undefined, onError );
 
-		var texture = loader.load( urls, onLoad, undefined, onError );
+	if ( mapping ) texture.mapping = mapping;
 
-		if ( mapping ) texture.mapping = mapping;
+	return texture;
 
-		return texture;
+};
 
-	},
+ImageUtils.loadCompressedTexture = function () {
 
-	loadCompressedTexture: function () {
+	console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' );
 
-		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' );
+};
 
-	},
+ImageUtils.loadCompressedTextureCube = function () {
 
-	loadCompressedTextureCube: function () {
-
-		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
-
-	}
+	console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
 
 };
 

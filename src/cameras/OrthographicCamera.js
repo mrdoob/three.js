@@ -119,6 +119,8 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
 
+		this.projectionMatrixInverse.getInverse( this.projectionMatrix );
+
 	},
 
 	toJSON: function ( meta ) {

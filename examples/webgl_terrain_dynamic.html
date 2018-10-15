@@ -51,12 +51,12 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/BufferGeometryUtils.js"></script>
+		<script src="js/utils/BufferGeometryUtils.js"></script>
 
 		<script src="js/shaders/NormalMapShader.js"></script>
 		<script src="js/ShaderTerrain.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragmentShaderNoise" type="x-shader/x-fragment">
@@ -204,7 +204,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -465,8 +469,6 @@
 				var delta = clock.getDelta();
 
 				if ( terrain.visible ) {
-
-					var time = Date.now() * 0.001;
 
 					var fLow = 0.1, fHigh = 0.8;
 

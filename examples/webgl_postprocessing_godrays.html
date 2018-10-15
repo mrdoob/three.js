@@ -35,7 +35,7 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/ShaderGodRays.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<div id="info">
@@ -45,7 +45,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer, materialDepth;
@@ -81,7 +85,6 @@
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( bgColor );
 
 				//
 
@@ -92,7 +95,7 @@
 				// tree
 
 				var loader = new THREE.OBJLoader();
-				loader.load( "models/obj/tree.obj", function ( object ) {
+				loader.load( 'models/obj/tree.obj', function ( object ) {
 
 					object.material = materialScene;
 					object.position.set( 0, -150, -150 );
@@ -103,7 +106,7 @@
 
 				// sphere
 
-				var geo = new THREE.SphereGeometry( 1, 20, 10 );
+				var geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
 				sphereMesh = new THREE.Mesh( geo, materialScene );
 				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
@@ -111,6 +114,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -191,6 +195,7 @@
 				// targets but the aliasing causes some temporal flickering
 
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				postprocessing.rtTextureDepthMask = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				// Aggressive downsize god-ray ping-pong render targets to minimize cost
 
@@ -200,6 +205,16 @@
 				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( w, h, pars );
 
 				// god-ray shaders
+
+				var godraysMaskShader = THREE.ShaderGodRays[ "godrays_depthMask" ];
+				postprocessing.godrayMaskUniforms = THREE.UniformsUtils.clone( godraysMaskShader.uniforms );
+				postprocessing.materialGodraysDepthMask = new THREE.ShaderMaterial( {
+
+					uniforms: postprocessing.godrayMaskUniforms,
+					vertexShader: godraysMaskShader.vertexShader,
+					fragmentShader: godraysMaskShader.fragmentShader
+
+				} );
 
 				var godraysGenShader = THREE.ShaderGodRays[ "godrays_generate" ];
 				postprocessing.godrayGenUniforms = THREE.UniformsUtils.clone( godraysGenShader.uniforms );
@@ -289,7 +304,8 @@
 
 					// Clear colors and depths, will clear to sky color
 
-					renderer.clearTarget( postprocessing.rtTextureColors, true, true, false );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
+					renderer.clear( true, true, false );
 
 					// Sun render. Runs a shader that gives a brightness based on the screen
 					// space distance to the sun. Not very efficient, so i make a scissor
@@ -323,6 +339,13 @@
 					scene.overrideMaterial = materialDepth;
 					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
 
+					//
+
+					postprocessing.godrayMaskUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
+
+					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysDepthMask;
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureDepthMask  );
+
 					// -- Render god-rays --
 
 					// Maximum length of god-rays (in texture space [0,1]X[0,1])
@@ -344,7 +367,7 @@
 					var stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepthMask.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysGenerate;
 

@@ -83,25 +83,25 @@
 				var loader = new THREE.TextureLoader();
 				var map = loader.load( 'textures/brick_diffuse.jpg' );
 				texCube = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: map, overdraw: 0.5 } ) );
-				texCube.position.set( -300, 0, 0 );
+				texCube.position.set( - 300, 0, 0 );
 				scene.add( texCube );
 
 				// Sprite
 				var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: 0xff0040 } ) );
 				sprite.scale.set( 100, 100, 1 );
-				sprite.position.set( -100, 200, 0 );
+				sprite.position.set( - 100, 200, 0 );
 				scene.add( sprite );
 
 				// Sprite with texture
 				var texLoader = new THREE.TextureLoader();
 				map = texLoader.load( 'textures/sprite1.png' );
-				var texSprite = new THREE.Sprite( new THREE.SpriteMaterial( { map: map,transparent: true } ) );
+				var texSprite = new THREE.Sprite( new THREE.SpriteMaterial( { map: map, transparent: true } ) );
 				texSprite.scale.set( 100, 100, 1 );
 				texSprite.position.set( 100, 200, 0 );
 				scene.add( texSprite );
 
 				// Line
-				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var points = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 				var spline = new THREE.CatmullRomCurve3( points );
 				var n_sub = 6, colors = [];
 
@@ -121,7 +121,7 @@
 				var material = new THREE.LineBasicMaterial( { opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 				var line = new THREE.Line( lineGeometry, material );
 				line.scale.set( 0.5, 0.5, 0.5 );
-				line.position.set( 0, -200, 0);
+				line.position.set( 0, - 200, 0 );
 				scene.add( line );
 
 				renderer = new THREE.SoftwareRenderer();

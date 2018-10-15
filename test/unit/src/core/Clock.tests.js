@@ -66,6 +66,13 @@ export default QUnit.module( 'Core', () => {
 		// OTHERS
 		QUnit.test( "clock with performance", ( assert ) => {
 
+			if ( typeof performance === 'undefined' ) {
+
+				assert.expect( 0 );
+				return;
+
+			}
+
 			mockPerformance();
 
 			var clock = new Clock( false );

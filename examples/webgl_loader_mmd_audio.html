@@ -32,7 +32,7 @@
 		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm11938255" target="_blank" rel="noopener">Audio Data</a><br />
-		<a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank" rel="noopener">Original Camera Data(I've customized this)</a>
+		Camera is customized from <a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank" rel="noopener">this Data</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -45,8 +45,8 @@
 		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
+		<script src="js/animation/MMDAnimationHelper.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -86,7 +86,7 @@
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0x887766 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
@@ -100,14 +100,18 @@
 
 				// model
 
-				var onProgress = function ( xhr ) {
+				function onProgress( xhr ) {
+
 					if ( xhr.lengthComputable ) {
+
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
 					}
+
 				};
 
-				var onError = function ( xhr ) {
+				function onError( xhr ) {
 				};
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
@@ -116,36 +120,33 @@
 				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
 				var audioParams = { delayTime: 160 * 1 / 30 };
 
-				helper = new THREE.MMDHelper();
+				helper = new THREE.MMDAnimationHelper();
 
 				var loader = new THREE.MMDLoader();
 
-				loader.load( modelFile, vmdFiles, function ( object ) {
+				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
-					mesh = object;
+					mesh = mmd.mesh;
 
-					helper.add( mesh );
-					helper.setAnimation( mesh );
-					helper.setPhysics( mesh );
+					helper.add( mesh, {
+						animation: mmd.animation,
+						physics: true
+					} );
 
-					loader.loadVmds( cameraFiles, function ( vmd ) {
+					loader.loadAnimation( cameraFiles, camera, function ( cameraAnimation ) {
 
-						helper.setCamera( camera );
+						helper.add( camera, {
+							animation: cameraAnimation
+						} );
 
-						loader.pourVmdIntoCamera( camera, vmd );
-						helper.setCameraAnimation( camera );
+						new THREE.AudioLoader().load( audioFile, function ( buffer ) {
 
-						loader.loadAudio( audioFile, function ( audio, listener ) {
+							var listener = new THREE.AudioListener();
+							var audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 							listener.position.z = 1;
 
-							helper.setAudio( audio, listener, audioParams );
-
-							/*
-							 * Note: call this method after you set all animations
-							 *       including camera and audio.
-							 */
-							helper.unifyAnimationDuration();
+							helper.add( audio, audioParams );
 
 							scene.add( audio );
 							scene.add( listener );
@@ -199,7 +200,7 @@
 
 				if ( ready ) {
 
-					helper.animate( clock.getDelta() );
+					helper.update( clock.getDelta() );
 
 				}
 

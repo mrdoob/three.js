@@ -66,8 +66,8 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 	var qRow = new UI.Row();
 	var q = new UI.Number( parameters.q ).onChange( update );
 
-	pRow.add( new UI.Text( 'Q' ).setWidth( '90px' ) );
-	pRow.add( q );
+	qRow.add( new UI.Text( 'Q' ).setWidth( '90px' ) );
+	qRow.add( q );
 
 	container.add( qRow );
 

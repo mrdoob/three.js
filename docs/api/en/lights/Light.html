@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Abstract base class for lights - all other light types inherit the properties and methods
+			described here.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Integer color], [param:float intensity] )</h3>
+		<p>
+		[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
+		[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+
+		Creates a new [name]. Note that this is not intended to be called directly (use one of derived classes instead).
+		</p>
+
+		<h2>Properties</h2>
+		<p>
+			See the base [page:Object3D Object3D] class for common properties.
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>
+			Color of the light. Defaults to a new [page:Color] set to white, if not passed in the constructor.<br />
+		</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			The light's intensity, or strength.<br />
+			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, the product of
+			[page:.color color] * intensity is interpreted as luminous intensity measured in candela.<br />
+			Default - *1.0*.
+		</p>
+
+		<h3>[property:Boolean isLight]</h3>
+		<p>
+			Used to check whether this or derived classes are lights. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+
+		<h2>Methods</h2>
+		<p>
+			See the base [page:Object3D Object3D] class for common methods.
+		</p>
+
+
+		<h3>[method:Light copy]( [param:Light source] )</h3>
+		<p>
+		Copies the value of [page:.color color] and [page:.intensity intensity] from the
+		[page:Light source] light into this one.
+		</p>
+
+		<h3>[method:JSON toJSON]( [param:String meta] )</h3>
+		<p>
+		Return Light data in JSON format.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
