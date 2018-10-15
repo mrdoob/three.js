@@ -428,9 +428,9 @@ var list = {
 
 	"zh": {
 
-		"Manual": {
+		"手册": {
 
-			"Getting Started": {
+			"起步": {
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
 				"通过模块来引入": "manual/zh/introduction/Import-via-modules",
 				"浏览器支持": "manual/zh/introduction/Browser-support",
@@ -445,21 +445,22 @@ var list = {
 				"一些有用的链接": "manual/zh/introduction/Useful-links"
 			},
 
-			"Next Steps": {
-				"How to update things": "manual/zh/introduction/How-to-update-things",
-				"Matrix transformations": "manual/zh/introduction/Matrix-transformations",
-				"Animation system": "manual/zh/introduction/Animation-system"
+			"进阶": {
+				"如何更新场景": "manual/zh/introduction/How-to-update-things",
+				"如何创建VR内容": "manual/en/introduction/How-to-create-VR-content",
+				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
+				"动画系统": "manual/zh/introduction/Animation-system"
 			},
 
-			"Build Tools": {
-				"Testing with NPM": "manual/zh/buildTools/Testing-with-NPM"
+			"构建工具": {
+				"使用NPM进行测试": "manual/zh/buildTools/Testing-with-NPM"
 			}
 
 		},
 
-		"Reference": {
+		"参考": {
 
-			"Animation": {
+			"动画": {
 				"AnimationAction": "api/zh/animation/AnimationAction",
 				"AnimationClip": "api/zh/animation/AnimationClip",
 				"AnimationMixer": "api/zh/animation/AnimationMixer",
@@ -470,7 +471,7 @@ var list = {
 				"PropertyMixer": "api/zh/animation/PropertyMixer"
 			},
 
-			"Animation / Tracks": {
+			"动画 / 轨道": {
 				"BooleanKeyframeTrack": "api/zh/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/zh/animation/tracks/ColorKeyframeTrack",
 				"NumberKeyframeTrack": "api/zh/animation/tracks/NumberKeyframeTrack",
@@ -479,7 +480,7 @@ var list = {
 				"VectorKeyframeTrack": "api/zh/animation/tracks/VectorKeyframeTrack"
 			},
 
-			"Audio": {
+			"音频": {
 				"Audio": "api/zh/audio/Audio",
 				"AudioAnalyser": "api/zh/audio/AudioAnalyser",
 				"AudioContext": "api/zh/audio/AudioContext",
@@ -487,7 +488,7 @@ var list = {
 				"PositionalAudio": "api/zh/audio/PositionalAudio"
 			},
 
-			"Cameras": {
+			"摄像机": {
 				"ArrayCamera": "api/zh/cameras/ArrayCamera",
 				"Camera": "api/zh/cameras/Camera",
 				"CubeCamera": "api/zh/cameras/CubeCamera",
@@ -496,7 +497,7 @@ var list = {
 				"StereoCamera": "api/zh/cameras/StereoCamera"
 			},
 
-			"Constants": {
+			"常量": {
 				"Animation": "api/zh/constants/Animation",
 				"Core": "api/zh/constants/Core",
 				"CustomBlendingEquation": "api/zh/constants/CustomBlendingEquations",
@@ -506,7 +507,7 @@ var list = {
 				"Textures": "api/zh/constants/Textures"
 			},
 
-			"Core": {
+			"核心": {
 				"BufferAttribute": "api/zh/core/BufferAttribute",
 				"BufferGeometry": "api/zh/core/BufferGeometry",
 				"Clock": "api/zh/core/Clock",
@@ -525,20 +526,20 @@ var list = {
 				"Uniform": "api/zh/core/Uniform"
 			},
 
-			"Core / BufferAttributes": {
+			"核心 / BufferAttributes": {
 				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"Deprecated": {
+			"弃用列表": {
 				"DeprecatedList": "api/zh/deprecated/DeprecatedList"
 			},
 
-			"Extras": {
+			"附件": {
 				"Earcut": "api/zh/extras/Earcut",
 				"ShapeUtils": "api/zh/extras/ShapeUtils"
 			},
 
-			"Extras / Core": {
+			"附件 / 核心": {
 				"Curve": "api/zh/extras/core/Curve",
 				"CurvePath": "api/zh/extras/core/CurvePath",
 				"Font": "api/zh/extras/core/Font",
@@ -548,7 +549,7 @@ var list = {
 				"ShapePath": "api/zh/extras/core/ShapePath"
 			},
 
-			"Extras / Curves": {
+			"附件 / 曲线": {
 				"ArcCurve": "api/zh/extras/curves/ArcCurve",
 				"CatmullRomCurve3": "api/zh/extras/curves/CatmullRomCurve3",
 				"CubicBezierCurve": "api/zh/extras/curves/CubicBezierCurve",
@@ -561,11 +562,11 @@ var list = {
 				"SplineCurve": "api/zh/extras/curves/SplineCurve"
 			},
 
-			"Extras / Objects": {
+			"附件 / 物体": {
 				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject",
 			},
 
-			"Geometries": {
+			"几何体": {
 				"BoxBufferGeometry": "api/zh/geometries/BoxBufferGeometry",
 				"BoxGeometry": "api/zh/geometries/BoxGeometry",
 				"CircleBufferGeometry": "api/zh/geometries/CircleBufferGeometry",
@@ -610,7 +611,7 @@ var list = {
 				"WireframeGeometry": "api/zh/geometries/WireframeGeometry"
 			},
 
-			"Helpers": {
+			"辅助对象": {
 				"ArrowHelper": "api/zh/helpers/ArrowHelper",
 				"AxesHelper": "api/zh/helpers/AxesHelper",
 				"BoxHelper": "api/zh/helpers/BoxHelper",
@@ -629,7 +630,7 @@ var list = {
 				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper"
 			},
 
-			"Lights": {
+			"灯光": {
 				"AmbientLight": "api/zh/lights/AmbientLight",
 				"DirectionalLight": "api/zh/lights/DirectionalLight",
 				"HemisphereLight": "api/zh/lights/HemisphereLight",
@@ -639,13 +640,13 @@ var list = {
 				"SpotLight": "api/zh/lights/SpotLight"
 			},
 
-			"Lights / Shadows": {
+			"灯光 / 阴影": {
 				"DirectionalLightShadow": "api/zh/lights/shadows/DirectionalLightShadow",
 				"LightShadow": "api/zh/lights/shadows/LightShadow",
 				"SpotLightShadow": "api/zh/lights/shadows/SpotLightShadow"
 			},
 
-			"Loaders": {
+			"加载器": {
 				"AnimationLoader": "api/zh/loaders/AnimationLoader",
 				"AudioLoader": "api/zh/loaders/AudioLoader",
 				"BufferGeometryLoader": "api/zh/loaders/BufferGeometryLoader",
@@ -665,12 +666,12 @@ var list = {
 				"TextureLoader": "api/zh/loaders/TextureLoader"
 			},
 
-			"Loaders / Managers": {
+			"加载器 / 管理器": {
 				"DefaultLoadingManager": "api/zh/loaders/managers/DefaultLoadingManager",
 				"LoadingManager": "api/zh/loaders/managers/LoadingManager"
 			},
 
-			"Materials": {
+			"材质": {
 				"LineBasicMaterial": "api/zh/materials/LineBasicMaterial",
 				"LineDashedMaterial": "api/zh/materials/LineDashedMaterial",
 				"Material": "api/zh/materials/Material",
@@ -689,7 +690,7 @@ var list = {
 				"SpriteMaterial": "api/zh/materials/SpriteMaterial"
 			},
 
-			"Math": {
+			"数学库": {
 				"Box2": "api/zh/math/Box2",
 				"Box3": "api/zh/math/Box3",
 				"Color": "api/zh/math/Color",
@@ -712,14 +713,14 @@ var list = {
 				"Vector4": "api/zh/math/Vector4"
 			},
 
-			"Math / Interpolants": {
+			"数学库 / 插值": {
 				"CubicInterpolant": "api/zh/math/interpolants/CubicInterpolant",
 				"DiscreteInterpolant": "api/zh/math/interpolants/DiscreteInterpolant",
 				"LinearInterpolant": "api/zh/math/interpolants/LinearInterpolant",
 				"QuaternionLinearInterpolant": "api/zh/math/interpolants/QuaternionLinearInterpolant"
 			},
 
-			"Objects": {
+			"物体": {
 				"Bone": "api/zh/objects/Bone",
 				"Group": "api/zh/objects/Group",
 				"Line": "api/zh/objects/Line",
@@ -733,26 +734,26 @@ var list = {
 				"Sprite": "api/zh/objects/Sprite"
 			},
 
-			"Renderers": {
+			"渲染器": {
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
 				"WebGLRenderTargetCube": "api/zh/renderers/WebGLRenderTargetCube"
 			},
 
-			"Renderers / Shaders": {
+			"渲染器 / 着色器": {
 				"ShaderChunk": "api/zh/renderers/shaders/ShaderChunk",
 				"ShaderLib": "api/zh/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/zh/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
 			},
 
-			"Scenes": {
+			"场景": {
 				"Fog": "api/zh/scenes/Fog",
 				"FogExp2": "api/zh/scenes/FogExp2",
 				"Scene": "api/zh/scenes/Scene"
 			},
 
-			"Textures": {
+			"纹理贴图": {
 				"CanvasTexture": "api/zh/textures/CanvasTexture",
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
@@ -765,25 +766,25 @@ var list = {
 
 		},
 
-		"Examples": {
+		"示例": {
 
-			"Animations": {
+			"动画": {
 				"CCDIKSolver": "examples/animations/CCDIKSolver",
 				"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
 				"MMDPhysics": "examples/animations/MMDPhysics"
 			},
 
-			"Controls": {
+			"控制": {
 				"OrbitControls": "examples/controls/OrbitControls"
 			},
 
-			"Geometries": {
+			"几何体": {
 				"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/geometries/DecalGeometry"
 			},
 
-			"Loaders": {
+			"加载器": {
 				"BabylonLoader": "examples/loaders/BabylonLoader",
 				"GLTFLoader": "examples/loaders/GLTFLoader",
 				"MMDLoader": "examples/loaders/MMDLoader",
@@ -798,16 +799,16 @@ var list = {
 				"PRWMLoader": "examples/loaders/PRWMLoader"
 			},
 
-			"Objects": {
+			"物体": {
 				"Lensflare": "examples/objects/Lensflare",
 			},
 
-			"Exporters": {
+			"导出器": {
 				"GLTFExporter": "examples/exporters/GLTFExporter",
 				"PLYExporter": "examples/exporters/PLYExporter"
 			},
 
-			"Plugins": {
+			"插件": {
 				"LookupTable": "examples/Lut",
 				"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
 			},
@@ -820,7 +821,7 @@ var list = {
 				"VertexList": "examples/quickhull/VertexList"
 			},
 
-			"Renderers": {
+			"渲染器": {
 				"CanvasRenderer": "examples/renderers/CanvasRenderer",
 				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
@@ -828,20 +829,20 @@ var list = {
 
 			},
 
-			"Utils": {
+			"实用工具": {
 				"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
 				"SceneUtils": "examples/utils/SceneUtils"
 			}
 
 		},
 
-		"Developer Reference": {
+		"开发者参考": {
 
-			"Polyfills": {
+			"差异化支持": {
 				"Polyfills": "api/zh/Polyfills"
 			},
 
-			"WebGLRenderer": {
+			"WebGL渲染器": {
 				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram",
 				"WebGLShader": "api/zh/renderers/webgl/WebGLShader",
 				"WebGLState": "api/zh/renderers/webgl/WebGLState"
