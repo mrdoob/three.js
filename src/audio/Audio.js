@@ -262,6 +262,26 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
+	setDetune: function ( value ) {
+
+		this.detune = value;
+
+		if ( this.isPlaying === true ) {
+
+			this.source.detune.setValueAtTime( this.detune, this.context.currentTime );
+
+		}
+
+		return this;
+
+	},
+
+	getDetune: function () {
+
+		return this.detune;
+
+	},
+
 	onEnded: function () {
 
 		this.isPlaying = false;
