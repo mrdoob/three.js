@@ -78,7 +78,7 @@ THREE.OBJLoader2.prototype = {
 	},
 
 	/**
-	 * Allow to specify resourcePath for dependencies of specified resource.
+	 * Allows to specify resourcePath for dependencies of specified resource.
 	 * @param {string} resourcePath
 	 */
 	setResourcePath: function ( resourcePath ) {
