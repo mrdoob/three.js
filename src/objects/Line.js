@@ -248,8 +248,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		Object3D.prototype.copy.call( this, source );
 
-		this.geometry.copy( source.geometry );
-		this.material.copy( source.material );
+		this.geometry = source.geometry.clone();
+		this.material = source.material.clone();
 
 		return this;
 
