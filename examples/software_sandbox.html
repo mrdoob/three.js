@@ -82,7 +82,7 @@
 				// Cube with texture
 				var loader = new THREE.TextureLoader();
 				var map = loader.load( 'textures/brick_diffuse.jpg' );
-				texCube = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: map, overdraw: 0.5 } ) );
+				texCube = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: map } ) );
 				texCube.position.set( - 300, 0, 0 );
 				scene.add( texCube );
 

@@ -1288,6 +1288,20 @@ Object.defineProperties( Material.prototype, {
 
 		}
 	},
+
+	overdraw: {
+		get: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		}
+	},
+
 	wrapRGB: {
 		get: function () {
 
