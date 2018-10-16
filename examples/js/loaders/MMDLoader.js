@@ -77,7 +77,7 @@ THREE.MMDLoader = ( function () {
 
 			var builder = this.meshBuilder.setCrossOrigin( this.crossOrigin );
 
-			var texturePath = THREE.LoaderUtils.extractUrlBase( url );
+			var resourcePath = THREE.LoaderUtils.extractUrlBase( url );
 			var modelExtension = this._extractExtension( url ).toLowerCase();
 
 			// Should I detect by seeing header?
@@ -91,7 +91,7 @@ THREE.MMDLoader = ( function () {
 
 			this[ modelExtension === 'pmd' ? 'loadPMD' : 'loadPMX' ]( url, function ( data ) {
 
-				onLoad(	builder.build( data, texturePath, onProgress, onError )	);
+				onLoad(	builder.build( data, resourcePath, onProgress, onError )	);
 
 			}, onProgress, onError );
 
@@ -340,17 +340,17 @@ THREE.MMDLoader = ( function () {
 
 		/**
 		 * @param {Object} data - parsed PMD/PMX data
-		 * @param {string} texturePath
+		 * @param {string} resourcePath
 		 * @param {function} onProgress
 		 * @param {function} onError
 		 * @return {THREE.SkinnedMesh}
 		 */
-		build: function ( data, texturePath, onProgress, onError ) {
+		build: function ( data, resourcePath, onProgress, onError ) {
 
 			var geometry = this.geometryBuilder.build( data );
 			var material = this.materialBuilder
 				.setCrossOrigin( this.crossOrigin )
-				.setTexturePath( texturePath )
+				.setResourcePath( resourcePath )
 				.build( data, geometry, onProgress, onError );
 
 			var mesh = new THREE.SkinnedMesh( geometry, material );
@@ -874,7 +874,7 @@ THREE.MMDLoader = ( function () {
 
 		crossOrigin: 'anonymous',
 
-		texturePath: undefined,
+		resourcePath: undefined,
 
 		/**
 		 * @param {string} crossOrigin
@@ -888,12 +888,12 @@ THREE.MMDLoader = ( function () {
 		},
 
 		/**
-		 * @param {string} texturePath
+		 * @param {string} resourcePath
 		 * @return {MaterialBuilder}
 		 */
-		setTexturePath: function ( texturePath ) {
+		setResourcePath: function ( resourcePath ) {
 
-			this.texturePath = texturePath;
+			this.resourcePath = resourcePath;
 			return this;
 
 		},
@@ -1213,7 +1213,7 @@ THREE.MMDLoader = ( function () {
 
 			} else {
 
-				fullPath = this.texturePath + filePath;
+				fullPath = this.resourcePath + filePath;
 
 			}
 
