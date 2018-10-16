@@ -17,7 +17,6 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/CanvasRenderer.js"></script>
 		<script src="js/renderers/SVGRenderer.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
 
@@ -28,7 +27,7 @@
 			var stats;
 
 			var camera, scene;
-			var canvasRenderer, svgRenderer, softwareRenderer, webglRenderer;
+			var svgRenderer, softwareRenderer, webglRenderer;
 
 			var mesh, group;
 
@@ -187,11 +186,6 @@
 				directional.position.set( - 1, 0.5, 0 );
 				scene.add( directional );
 
-				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setPixelRatio( window.devicePixelRatio );
-				canvasRenderer.setSize( width, height );
-				document.body.appendChild( canvasRenderer.domElement );
-
 				svgRenderer = new THREE.SVGRenderer();
 				svgRenderer.setSize( width, height );
 				svgRenderer.setQuality( 'low' );
@@ -223,7 +217,6 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				canvasRenderer.setSize( width, height );
 				svgRenderer.setSize( width, height );
 				softwareRenderer.setSize( width, height );
 				webglRenderer.setSize( width, height );
@@ -253,7 +246,6 @@
 
 				scene.updateMatrixWorld();
 
-				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );
 				softwareRenderer.render( scene, camera );
 				webglRenderer.render( scene, camera );

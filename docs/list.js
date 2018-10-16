@@ -385,7 +385,6 @@ var list = {
 
 			"Plugins": {
 				"LookupTable": "examples/Lut",
-				"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
 			},
 
 			"QuickHull": {
@@ -397,7 +396,6 @@ var list = {
 			},
 
 			"Renderers": {
-				"CanvasRenderer": "examples/renderers/CanvasRenderer",
 				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/renderers/SVGRenderer"
@@ -811,7 +809,6 @@ var list = {
 
 			"Plugins": {
 				"LookupTable": "examples/Lut",
-				"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
 			},
 
 			"QuickHull": {
@@ -823,7 +820,6 @@ var list = {
 			},
 
 			"Renderers": {
-				"CanvasRenderer": "examples/renderers/CanvasRenderer",
 				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/renderers/SVGRenderer"
