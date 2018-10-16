@@ -196,6 +196,7 @@ var files = {
 		"webgl_multiple_elements",
 		"webgl_multiple_elements_text",
 		"webgl_multiple_renderers",
+		"webgl_multiple_scenes_comparison",
 		"webgl_multiple_views",
 		"webgl_nearestneighbour",
 		"webgl_octree",
