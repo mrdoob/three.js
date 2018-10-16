@@ -26088,9 +26088,20 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}() ),
 
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		this.geometry.copy( source.geometry );
+		this.material.copy( source.material );
+
+		return this;
+
+	},
+
 	clone: function () {
 
-		return new this.constructor( this.geometry, this.material ).copy( this );
+		return new this.constructor().copy( this );
 
 	}
 
@@ -45645,6 +45656,22 @@ BoxHelper.prototype.setFromObject = function ( object ) {
 
 };
 
+BoxHelper.prototype.copy = function ( source ) {
+
+	LineSegments.prototype.copy.call( this, source );
+
+	this.object = source.object;
+
+	return this;
+
+};
+
+BoxHelper.prototype.clone = function () {
+
+	return new this.constructor().copy( this );
+
+};
+
 /**
  * @author WestLangley / http://github.com/WestLangley
  */
@@ -47703,13 +47730,7 @@ function Projector() {
 
 function CanvasRenderer() {
 
-	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
-
-	this.domElement = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-	this.clear = function () {};
-	this.render = function () {};
-	this.setClearColor = function () {};
-	this.setSize = function () {};
+	console.error( 'THREE.CanvasRenderer has been removed' );
 
 }
 
