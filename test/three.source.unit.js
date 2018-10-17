@@ -286,3 +286,7 @@ import './unit/src/textures/DataTexture.tests';
 import './unit/src/textures/DepthTexture.tests';
 import './unit/src/textures/Texture.tests';
 import './unit/src/textures/VideoTexture.tests';
+
+
+//src/controls
+import "./unit/src/controls/OrbitControls.tests"

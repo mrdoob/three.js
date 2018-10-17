@@ -149,5 +149,6 @@ export { Curve } from './extras/core/Curve.js';
 export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
+export { OrbitControls } from "./controls/OrbitControls.js";
 export * from './constants.js';
 export * from './Three.Legacy.js';
