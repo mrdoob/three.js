@@ -1,12 +1,12 @@
 uniform sampler2D tEquirect;
 
-varying vec3 vWorldPosition;
+varying vec3 vWorldDirection;
 
 #include <common>
 
 void main() {
 
-	vec3 direction = normalize( vWorldPosition );
+	vec3 direction = normalize( vWorldDirection );
 
 	vec2 sampleUV;
 
