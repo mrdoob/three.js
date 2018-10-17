@@ -276,8 +276,8 @@ function WebGLRenderer( parameters ) {
 		objects = new WebGLObjects( geometries, info );
 		morphtargets = new WebGLMorphtargets( _gl );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
-		renderLists = new WebGLRenderLists();
-		renderStates = new WebGLRenderStates( properties );
+		renderLists = new WebGLRenderLists( properties );
+		renderStates = new WebGLRenderStates();
 
 		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
