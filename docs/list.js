@@ -758,7 +758,7 @@ var list = {
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
 				"DataTexture": "api/zh/textures/DataTexture",
-				"DataTexture3D": "api/en/textures/DataTexture3D",
+				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
 				"Texture": "api/zh/textures/Texture",
 				"VideoTexture": "api/zh/textures/VideoTexture"
