@@ -8,9 +8,11 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	} else if ( a.program && b.program && a.program !== b.program ) {
+	} else if ( a.program !== b.program ) {
 
-		return a.program.id - b.program.id;
+		var aId = a.program ? a.program.id : - 1;
+		var bId = b.program ? b.program.id : - 1;
+		return aId - bId;
 
 	} else if ( a.material.id !== b.material.id ) {
 
