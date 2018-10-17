@@ -47,7 +47,7 @@ function reversePainterSortStable( a, b ) {
 }
 
 
-function WebGLRenderList() {
+function WebGLRenderList( properties ) {
 
 	var renderItems = [];
 	var renderItemsIndex = 0;
@@ -67,6 +67,7 @@ function WebGLRenderList() {
 	function push( object, geometry, material, z, group ) {
 
 		var renderItem = renderItems[ renderItemsIndex ];
+		var materialproperties = properties.get( material );
 
 		if ( renderItem === undefined ) {
 
@@ -75,7 +76,7 @@ function WebGLRenderList() {
 				object: object,
 				geometry: geometry,
 				material: material,
-				program: material.program,
+				program: materialproperties.program,
 				renderOrder: object.renderOrder,
 				z: z,
 				group: group
@@ -89,7 +90,7 @@ function WebGLRenderList() {
 			renderItem.object = object;
 			renderItem.geometry = geometry;
 			renderItem.material = material;
-			renderItem.program = material.program;
+			renderItem.program = materialproperties.program;
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
 			renderItem.group = group;
@@ -122,7 +123,7 @@ function WebGLRenderList() {
 
 }
 
-function WebGLRenderLists() {
+function WebGLRenderLists( properties ) {
 
 	var lists = {};
 
@@ -135,7 +136,7 @@ function WebGLRenderLists() {
 
 			// console.log( 'THREE.WebGLRenderLists:', hash );
 
-			list = new WebGLRenderList();
+			list = new WebGLRenderList( properties );
 			lists[ hash ] = list;
 
 		}
