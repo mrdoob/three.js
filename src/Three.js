@@ -32,6 +32,7 @@ export { DepthTexture } from './textures/DepthTexture.js';
 export { Texture } from './textures/Texture.js';
 export * from './geometries/Geometries.js';
 export * from './materials/Materials.js';
+export { AnimationLoader } from './loaders/AnimationLoader.js';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader.js';
 export { DataTextureLoader } from './loaders/DataTextureLoader.js';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
