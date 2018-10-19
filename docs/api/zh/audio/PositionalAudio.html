@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Audio] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			创建一个位置相关的音频对象.<br /><br />
+
+			使用了[link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+		</p>
+
+
+		<h2>示例</h2>
+
+		<p>
+			[example:webaudio_orientation webaudio / orientation ]</br>
+			[example:webaudio_sandbox webaudio / sandbox ]</br>
+			[example:webaudio_timing webaudio / timing ]
+		</p>
+
+		<code>
+		// create an AudioListener and add it to the camera
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create the PositionalAudio object (passing in the listener)
+		var sound = new THREE.PositionalAudio( listener );
+
+		// load a sound and set it as the PositionalAudio object's buffer
+		var audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setRefDistance( 20 );
+			sound.play();
+		});
+
+		// create an object for the sound to play from
+		var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
+		var mesh = new THREE.Mesh( sphere, material );
+		scene.add( mesh );
+
+		// finally add the sound to the mesh
+		mesh.add( sound );
+		</code>
+
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:AudioListener listener] )</h3>
+		<p>
+		listener — (必须) [page:AudioListener AudioListener] 实例.
+		</p>
+
+
+		<h2>属性</h2>
+
+		<p>
+			[page:Audio Audio]类的继承属性.
+		</p>
+
+		<h3>[property:PannerNode panner]</h3>
+		<p>位置相关音频的[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode PannerNode].</p>
+
+
+		<h2>方法</h2>
+
+		<p>
+			[page:Audio Audio]类的继承方法.
+		</p>
+
+		<h3>[method:PannerNode getOutput]()</h3>
+		<p>
+		返回[page:PositionalAudio.panner panner].
+		</p>
+
+		<h3>[method:Float getRefDistance]()</h3>
+		<p>
+		返回[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance]的值.
+		</p>
+
+		<h3>[method:PositionalAudio setRefDistance]( [param:Float value] )</h3>
+		<p>
+		设置[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance]的值.
+		</p>
+
+		<h3>[method:Float getRolloffFactor]()</h3>
+		<p>
+		返回[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor]的值.
+		</p>
+
+		<h3>[method:PositionalAudio setRolloffFactor]( [param:Float value] )</h3>
+		<p>
+		设置[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor]的值.
+		</p>
+
+		<h3>[method:String getDistanceModel]()</h3>
+		<p>
+		返回[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel]的值.
+		</p>
+
+		<h3>[method:PositionalAudio setDistanceModel]( [param:String value] )</h3>
+		<p>
+		设置[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel]的值.
+		</p>
+
+		<h3>[method:Float getMaxDistance]()</h3>
+		<p>
+		返回[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance]的值.
+		</p>
+
+		<h3>[method:PositionalAudio setMaxDistance]( [param:Float value] )</h3>
+		<p>
+		设置[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance]的值.
+		</p>
+
+		<h3>[method:PositionalAudio setDirectionalCone]( [param:Float coneInnerAngle], [param:Float coneOuterAngle], [param:Float coneOuterGain] )</h3>
+		<p>
+		这个方法用来把环绕声音转换为定向声音[link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode directional sound].
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

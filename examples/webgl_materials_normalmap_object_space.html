@@ -43,15 +43,17 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var mesh, renderer, scene, camera;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var obj;
+			}
+
+			var renderer, scene, camera;
 
 			init();
 
@@ -123,7 +125,7 @@
 				} );
 
 
-			    window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 

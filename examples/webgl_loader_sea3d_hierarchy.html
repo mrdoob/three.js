@@ -48,16 +48,20 @@
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
-		
+
 		<script src="js/libs/o3dgc.js"></script>
 		<script src="js/loaders/sea3d/o3dgc/SEA3DGC.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
@@ -82,7 +86,7 @@
 
 			} );
 
-			loader.onComplete = function ( e ) {
+			loader.onComplete = function () {
 
 				// play all animations
 

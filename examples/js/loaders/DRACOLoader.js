@@ -236,7 +236,7 @@ THREE.DRACOLoader.prototype = {
         }
         var dracoGeometry;
         var decodingStatus;
-        const start_time = performance.now();
+        var start_time = performance.now();
         if (geometryType === dracoDecoder.TRIANGULAR_MESH) {
           dracoGeometry = new dracoDecoder.Mesh();
           decodingStatus = decoder.DecodeBufferToMesh(buffer, dracoGeometry);

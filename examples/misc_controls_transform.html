@@ -15,12 +15,15 @@
 				line-height: 30px;
 				overflow: hidden;
 			}
+			
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 15px;
 				z-index:100;
+				box-sizing: border-box;
 			}
+			
 			a {
 				color: white;
 			}
@@ -78,7 +81,7 @@
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
-				orbit = new THREE.OrbitControls(camera, renderer.domElement);
+				orbit = new THREE.OrbitControls( camera, renderer.domElement );
 				orbit.update();
 				orbit.addEventListener( 'change', render );
 
@@ -86,7 +89,9 @@
 				control.addEventListener( 'change', render );
 
 				control.addEventListener( 'dragging-changed', function ( event ) {
-					orbit.enabled = !event.value;
+
+					orbit.enabled = ! event.value;
+
 				} );
 
 				var mesh = new THREE.Mesh( geometry, material );
@@ -133,24 +138,24 @@
 							break;
 
 						case 88: // X
-							control.showX = !control.showX;
+							control.showX = ! control.showX;
 							break;
 
 						case 89: // Y
-							control.showY = !control.showY;
+							control.showY = ! control.showY;
 							break;
 
 						case 90: // Z
-							control.showZ = !control.showZ;
+							control.showZ = ! control.showZ;
 							break;
 
 						case 32: // Spacebar
-							control.enabled = !control.enabled;
+							control.enabled = ! control.enabled;
 							break;
 
 					}
 
-				});
+				} );
 
 				window.addEventListener( 'keyup', function ( event ) {
 
@@ -163,7 +168,7 @@
 
 					}
 
-				});
+				} );
 
 			}
 

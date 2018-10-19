@@ -35,7 +35,7 @@
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/pmrem/PMREMGenerator.js"></script>
@@ -54,7 +54,11 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var params = {
@@ -65,9 +69,7 @@
 				exposure: 1.0,
 				gemColor: 'Green'
 			};
-			var camera, scene, renderer, controls, objects = [];
-			var hdrCubeMap;
-			var composer;
+			var camera, scene, renderer, objects = [];
 			var gemBackMaterial, gemFrontMaterial;
 			var hdrCubeRenderTarget;
 
@@ -80,7 +82,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0.0, -10, 20 * 3.5 );
+				camera.position.set( 0.0, - 10, 20 * 3.5 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
@@ -144,13 +146,15 @@
 
 				} );
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
-				};
+
+	};
 
 				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
 				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
@@ -183,11 +187,11 @@
 				scene.add( pointLight1 );
 
 				var pointLight2 = new THREE.PointLight( 0xffffff );
-				pointLight2.position.set( -150, 0, 0 );
+				pointLight2.position.set( - 150, 0, 0 );
 				scene.add( pointLight2 );
 
 				var pointLight3 = new THREE.PointLight( 0xffffff );
-				pointLight3.position.set( 0, -10, -150 );
+				pointLight3.position.set( 0, - 10, - 150 );
 				scene.add( pointLight3 );
 
 				var pointLight4 = new THREE.PointLight( 0xffffff );
@@ -205,7 +209,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -250,13 +254,15 @@
 					gemFrontMaterial.reflectivity = gemBackMaterial.reflectivity = params.reflectivity;
 
 					var newColor = gemBackMaterial.color;
-					switch( params.gemColor ) {
+					switch ( params.gemColor ) {
+
 						case 'Blue': newColor = new THREE.Color( 0x000088 ); break;
 						case 'Red': newColor = new THREE.Color( 0x880000 ); break;
 						case 'Green': newColor = new THREE.Color( 0x008800 ); break;
-						case 'White': newColor =  new THREE.Color( 0x888888 ); break;
-						case 'Black': newColor =  new THREE.Color( 0x0f0f0f ); break;
-					}
+						case 'White': newColor = new THREE.Color( 0x888888 ); break;
+						case 'Black': newColor = new THREE.Color( 0x0f0f0f ); break;
+
+		}
 					gemBackMaterial.color = gemFrontMaterial.color = newColor;
 
 
@@ -266,14 +272,16 @@
 
 				camera.lookAt( scene.position );
 
-				if( params.autoRotate ) {
+				if ( params.autoRotate ) {
+
 					for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 						var object = objects[ i ];
 						object.rotation.y += 0.005;
 
 					}
-				}
+
+	}
 
 				renderer.render( scene, camera );
 

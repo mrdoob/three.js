@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:LightShadow] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			这是用于在[page:DirectionalLight DirectionalLights]内部计算阴影<br /><br />
+
+			与其他阴影类不同，它是使用OrthographicCamera来计算阴影，而不是PerspectiveCamera。这是因为来自DirectionalLight的光线是平行的。
+		</p>
+
+		<h2>例子</h2>
+		<p>
+			<code>
+//Create a WebGLRenderer and turn on shadows in the renderer
+var renderer = new THREE.WebGLRenderer();
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+//Create a DirectionalLight and turn on shadows for the light
+var light = new THREE.DirectionalLight( 0xffffff, 1, 100 );
+light.position.set( 0, 1, 0 ); 			//default; light shining from top
+light.castShadow = true;            // default false
+scene.add( light );
+
+//Set up shadow properties for the light
+light.shadow.mapSize.width = 512;  // default
+light.shadow.mapSize.height = 512; // default
+light.shadow.camera.near = 0.5;    // default
+light.shadow.camera.far = 500;     // default
+
+//Create a sphere that cast shadows (but does not receive them)
+var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+sphere.castShadow = true; //default is false
+sphere.receiveShadow = false; //default
+scene.add( sphere );
+
+//Create a plane that receives shadows (but does not cast them)
+var planeGeometry = new THREE.PlaneBufferGeometry( 20, 20, 32, 32 );
+var planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+plane.receiveShadow = true;
+scene.add( plane );
+
+//Create a helper for the shadow camera (optional)
+var helper = new THREE.CameraHelper( light.shadow.camera );
+scene.add( helper );
+			</code>
+		</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( )</h3>
+		<p>
+			创建一个新的[name]，不能直接调用-它是在[page:DirectionalLight DirectionalLights]内部调用使用
+
+		</p>
+
+		<h2>属性</h2>
+		<p>
+			参阅[page:LightShadow LightShadow]类来了解常用的基本属性
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+			在光的世界里。这用于生成场景的深度图;从光的角度来看，其他物体背后的物体将处于阴影中。<br /><br />
+		</p>
+
+
+		<h2>方法</h2>
+		<p>
+			有关常用方法，请参阅基础[page：LightShadow LightShadow]类。
+		</p>
+
+		<h2>源码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+	</body>
+</html>

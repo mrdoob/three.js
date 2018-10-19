@@ -34,18 +34,21 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer1, renderer2;
 
 			var mesh1, mesh2, mesh3;
 			var color = new THREE.Color();
-			var vec = new THREE.Vector3();
 
 			init();
 			animate();

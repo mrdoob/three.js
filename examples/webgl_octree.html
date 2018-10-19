@@ -24,7 +24,6 @@
 				renderer,
 				octree,
 				geometry = new THREE.BoxBufferGeometry( 50, 50, 50 ),
-				material,
 				mesh,
 				meshes = [],
 				meshesSearch = [],
@@ -157,9 +156,7 @@
 
 					}
 
-				}
-				// else remove objects from octree
-				else {
+				} else { // else remove objects from octree
 
 					// get object
 
@@ -203,7 +200,7 @@
 
 				// revert previous search objects to base color
 
-				for ( i = 0, il = meshesSearch.length; i < il; i++ ) {
+				for ( i = 0, il = meshesSearch.length; i < il; i ++ ) {
 
 					meshesSearch[ i ].object.material.color.copy( base );
 
@@ -228,7 +225,7 @@
 
 				// set color of all meshes found in search
 
-				for ( i = 0, il = meshesSearch.length; i < il; i++ ) {
+				for ( i = 0, il = meshesSearch.length; i < il; i ++ ) {
 
 					meshesSearch[ i ].object.material.color.copy( found );
 

@@ -40,13 +40,12 @@
 
 		<div id="info">
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - clip system
-		- knight by <a href="http://vimeo.com/36113323">apendua</a>
+		- knight by <a href="https://vimeo.com/36113323" target="_blank" rel="noopener">apendua</a>
 			<div id="meminfo"></div>
 		</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -54,9 +53,9 @@
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = -250;
+			var FLOOR = - 250;
 
-			var container,stats;
+			var container, stats;
 
 			var camera, scene;
 			var renderer;
@@ -100,7 +99,7 @@
 
 				var ground = new THREE.Mesh( geometry, material );
 				ground.position.set( 0, FLOOR, 0 );
-				ground.rotation.x = -Math.PI/2;
+				ground.rotation.x = - Math.PI / 2;
 				scene.add( ground );
 
 				ground.receiveShadow = true;
@@ -121,10 +120,10 @@
 
 				var d = 390;
 
-				light.shadow.camera.left = -d;
+				light.shadow.camera.left = - d;
 				light.shadow.camera.right = d;
 				light.shadow.camera.top = d * 1.5;
-				light.shadow.camera.bottom = -d;
+				light.shadow.camera.bottom = - d;
 
 				light.shadow.camera.far = 3500;
 
@@ -153,7 +152,7 @@
 				var loader = new THREE.JSONLoader();
 				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
 
-					createScene( geometry, materials, 0, FLOOR, -300, 60 );
+					createScene( geometry, materials, 0, FLOOR, - 300, 60 );
 
 					// GUI
 
@@ -218,13 +217,12 @@
 				scene.add( mesh2 );
 
 				helper = new THREE.SkeletonHelper( mesh );
-				helper.material.linewidth = 3;
 				helper.visible = false;
 				scene.add( helper );
 
 				mixer = new THREE.AnimationMixer( mesh );
 
-				bonesClip = geometry.animations[0];
+				bonesClip = geometry.animations[ 0 ];
 				facesClip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', mesh.geometry.morphTargets, 3 );
 
 			}
@@ -232,28 +230,34 @@
 			function initGUI() {
 
 				var API = {
-					'show model'    	: true,
-					'show skeleton'		: false,
-					'show 2nd model'	: false,
-					'show mem. info'	: false
+					'show model': true,
+					'show skeleton': false,
+					'show 2nd model': false,
+					'show mem. info': false
 				};
 
 				var gui = new dat.GUI();
 
-				gui.add( API, 'show model' ).onChange( function() {
-						mesh.visible = API[ 'show model' ];
+				gui.add( API, 'show model' ).onChange( function () {
+
+					mesh.visible = API[ 'show model' ];
+
 				} );
 
-				gui.add( API, 'show skeleton' ).onChange( function() {
-						helper.visible = API[ 'show skeleton' ];
+				gui.add( API, 'show skeleton' ).onChange( function () {
+
+					helper.visible = API[ 'show skeleton' ];
+
 				} );
 
-				gui.add( API, 'show 2nd model' ).onChange( function() {
-						mesh2.visible = API[ 'show 2nd model' ];
+				gui.add( API, 'show 2nd model' ).onChange( function () {
+
+					mesh2.visible = API[ 'show 2nd model' ];
+
 				} );
 
 
-				gui.add( API, 'show mem. info' ).onChange( function() {
+				gui.add( API, 'show mem. info' ).onChange( function () {
 
 					showMemInfo = API[ 'show mem. info' ];
 					domMemInfo.style.display = showMemInfo ? 'block' : 'none';
@@ -261,7 +265,7 @@
 				} );
 
 				// utility function used for drop-down options lists in the GUI
-				var objectNames = function( objects ) {
+				var objectNames = function ( objects ) {
 
 					var result = [];
 
@@ -297,14 +301,14 @@
 
 							},
 
-							'stop()': function() {
+							'stop()': function () {
 
 								action = mixer.clipAction( clip, root );
 								action.stop();
 
 							},
 
-							'reset()': function() {
+							'reset()': function () {
 
 								action = mixer.clipAction( clip, root );
 								action.reset();
@@ -375,7 +379,7 @@
 
 							},
 
-							'play delayed': function() {
+							'play delayed': function () {
 
 								action = mixer.clipAction( clip, root );
 								action.startAt( mixer.time + 0.5 ).play();
@@ -408,14 +412,14 @@
 
 							},
 
-							'fade in': function() {
+							'fade in': function () {
 
 								action = mixer.clipAction( clip, root );
 								action.reset().fadeIn( 0.25 ).play();
 
 							},
 
-							'fade out': function() {
+							'fade out': function () {
 
 								action = mixer.clipAction( clip, root );
 								action.fadeOut( 0.25 ).play();
@@ -448,11 +452,11 @@
 
 							},
 
-							'time warp': function() {
+							'time warp': function () {
 
 								action = mixer.clipAction( clip, root );
 								var timeScaleNow = action.getEffectiveTimeScale();
-								var destTimeScale = timeScaleNow > 0 ? -1 : 1;
+								var destTimeScale = timeScaleNow > 0 ? - 1 : 1;
 								action.warp( timeScaleNow, destTimeScale, 4 ).play();
 
 							},
@@ -483,7 +487,11 @@
 
 							},
 
-							get 'local root'() { return rootName; },
+							get 'local root'() {
+
+								return rootName;
+
+							},
 
 							set 'local root'( value ) {
 
@@ -502,14 +510,14 @@
 					folder.add( API, 'paused =' ).listen();
 					folder.add( API, 'enabled =' ).listen();
 					folder.add( API, 'clamp =' );
-					folder.add( API, 'isRunning() =').listen();
+					folder.add( API, 'isRunning() =' ).listen();
 					folder.add( API, 'play delayed' );
 					folder.add( API, 'weight =', 0, 1 ).listen();
 					folder.add( API, 'eff. weight', 0, 1 ).listen();
 					folder.add( API, 'fade in' );
 					folder.add( API, 'fade out' );
-					folder.add( API, 'timeScale =', -2, 2).listen();
-					folder.add( API, 'eff.T.Scale', -2, 2).listen();
+					folder.add( API, 'timeScale =', - 2, 2 ).listen();
+					folder.add( API, 'eff.T.Scale', - 2, 2 ).listen();
 					folder.add( API, 'time warp' );
 					folder.add( API, 'loop mode', {
 						"LoopOnce": THREE.LoopOnce,
@@ -527,7 +535,7 @@
 				clipControl( gui, mixer, bonesClip, [ null, mesh, mesh2 ] );
 				clipControl( gui, mixer, facesClip, [ null, mesh, mesh2 ] );
 
-				var memoryControl = function( gui, mixer, clips, rootObjects ) {
+				var memoryControl = function ( gui, mixer, clips, rootObjects ) {
 
 					var clipNames = objectNames( clips ),
 						rootNames = objectNames( rootObjects );
@@ -542,7 +550,11 @@
 
 						API = {
 
-							get 'clip'() { return clipName; },
+							get 'clip'() {
+
+								return clipName;
+
+							},
 
 							set 'clip'( value ) {
 
@@ -551,7 +563,11 @@
 
 							},
 
-							get 'root'() { return rootName; },
+							get 'root'() {
+
+								return rootName;
+
+							},
 
 							set 'root'( value ) {
 
@@ -560,19 +576,19 @@
 
 							},
 
-							'uncache clip': function() {
+							'uncache clip': function () {
 
 								mixer.uncacheClip( clip );
 
 							},
 
-							'uncache root': function() {
+							'uncache root': function () {
 
 								mixer.uncacheRoot( root );
 
 							},
 
-							'uncache action': function() {
+							'uncache action': function () {
 
 								mixer.uncacheAction( clip, root );
 
@@ -589,7 +605,7 @@
 				};
 
 				memoryControl( gui, mixer,
-						[ bonesClip, facesClip ], [ mesh, mesh2 ] );
+					[ bonesClip, facesClip ], [ mesh, mesh2 ] );
 
 
 			}
@@ -634,7 +650,7 @@
 
 				camera.lookAt( scene.position );
 
-				if( mixer ) {
+				if ( mixer ) {
 
 					mixer.update( delta );
 

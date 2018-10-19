@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">发送到顶点着色器和片元着色器的GLSL程序的构造函数， 包含默认的变量(uniforms)和属性</p>
+
+		<h2>内置的变量(uniforms)和属性</h2>
+
+		<h3>顶点着色器(无条件的):</h3>
+		<div>
+		<code>
+		// = object.matrixWorld
+		uniform mat4 modelMatrix;
+
+		// = camera.matrixWorldInverse * object.matrixWorld
+		uniform mat4 modelViewMatrix;
+
+		// = camera.projectionMatrix
+		uniform mat4 projectionMatrix;
+
+		// = camera.matrixWorldInverse
+		uniform mat4 viewMatrix;
+
+		// = inverse transpose of modelViewMatrix
+		uniform mat3 normalMatrix;
+
+		// = camera position in world space
+		uniform vec3 cameraPosition;
+		</code>
+		<code>
+		// default vertex attributes provided by Geometry and BufferGeometry
+		attribute vec3 position;
+		attribute vec3 normal;
+		attribute vec2 uv;
+		</code>
+		<p>
+        注意，可以通过以下方式计算顶点着色器中顶点的位置：
+		<code>
+		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		</code>
+		或者也可以这样：
+		<code>
+		gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( position, 1.0 );
+		</code>
+		</p>
+		</div>
+
+		<h3>顶点着色器(有条件的):</h3>
+		<div>
+		<code>
+		#ifdef USE_COLOR
+			// vertex color attribute
+			attribute vec3 color;
+		#endif
+		</code>
+		<code>
+		#ifdef USE_MORPHTARGETS
+
+			attribute vec3 morphTarget0;
+			attribute vec3 morphTarget1;
+			attribute vec3 morphTarget2;
+			attribute vec3 morphTarget3;
+
+			#ifdef USE_MORPHNORMALS
+
+				attribute vec3 morphNormal0;
+				attribute vec3 morphNormal1;
+				attribute vec3 morphNormal2;
+				attribute vec3 morphNormal3;
+
+			#else
+
+				attribute vec3 morphTarget4;
+				attribute vec3 morphTarget5;
+				attribute vec3 morphTarget6;
+				attribute vec3 morphTarget7;
+
+			#endif
+		#endif
+		</code>
+		<code>
+		#ifdef USE_SKINNING
+			attribute vec4 skinIndex;
+			attribute vec4 skinWeight;
+		#endif
+		</code>
+		</div>
+
+		<h3>片元着色器:</h3>
+		<div>
+		<code>
+		uniform mat4 viewMatrix;
+		uniform vec3 cameraPosition;
+		</code>
+		</div>
+
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:WebGLRenderer renderer], [param:Object code], [param:Material material], [param:Object parameters] )</h3>
+		<p>参数详见[page:WebGLRenderer WebGLRenderer]</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:String id]</h3>
+		<p></p>
+
+		<h3>[property:String code]</h3>
+		<p></p>
+
+		<h3>[property:Integer usedTimes]</h3>
+		<p></p>
+
+		<h3>[property:Object program]</h3>
+		<p></p>
+
+		<h3>[property:WebGLShader vertexShader]</h3>
+		<p></p>
+
+		<h3>[property:WebGLShader fragmentShader]</h3>
+		<p></p>
+
+		<h2>方法</h2>
+
+		<h3>[method:Object getUniforms]()</h3>
+		<p>
+        返回所有活动态的变量(uniform)位置的name-value映射
+		</p>
+
+		<h3>[method:Object getAttributes]()</h3>
+		<p>
+        返回所有活动态的顶点属性位置的name-value映射
+		</p>
+
+		<h2>源码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

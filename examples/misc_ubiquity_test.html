@@ -17,7 +17,6 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/CanvasRenderer.js"></script>
 		<script src="js/renderers/SVGRenderer.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
 
@@ -25,12 +24,10 @@
 
 		<script>
 
-			var AMOUNT = 100;
-
 			var stats;
 
 			var camera, scene;
-			var canvasRenderer, svgRenderer, softwareRenderer, webglRenderer;
+			var svgRenderer, softwareRenderer, webglRenderer;
 
 			var mesh, group;
 
@@ -52,7 +49,7 @@
 				// QRCODE
 
 				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/QRCode.json', function ( geometry) {
+				loader.load( 'models/json/QRCode.json', function ( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { vertexColors: THREE.FaceColors } ) );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
@@ -82,14 +79,14 @@
 				// PLANE
 
 				mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
-				mesh.position.y = -500;
+				mesh.position.y = - 500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
 
 				// CYLINDER
 
 				mesh = new THREE.Mesh( new THREE.CylinderBufferGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
-				mesh.position.x = -500;
+				mesh.position.x = - 500;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
@@ -189,11 +186,6 @@
 				directional.position.set( - 1, 0.5, 0 );
 				scene.add( directional );
 
-				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setPixelRatio( window.devicePixelRatio );
-				canvasRenderer.setSize( width, height );
-				document.body.appendChild( canvasRenderer.domElement );
-
 				svgRenderer = new THREE.SVGRenderer();
 				svgRenderer.setSize( width, height );
 				svgRenderer.setQuality( 'low' );
@@ -225,7 +217,6 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				canvasRenderer.setSize( width, height );
 				svgRenderer.setSize( width, height );
 				softwareRenderer.setSize( width, height );
 				webglRenderer.setSize( width, height );
@@ -255,7 +246,6 @@
 
 				scene.updateMatrixWorld();
 
-				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );
 				softwareRenderer.render( scene, camera );
 				webglRenderer.render( scene, camera );

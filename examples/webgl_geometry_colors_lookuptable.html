@@ -41,12 +41,16 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/math/Lut.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) { Detector.addGetWebGLMessage(); }
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -100,11 +104,11 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize(  window.innerWidth,  window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'keydown', onKeyDown, true);
+				window.addEventListener( 'keydown', onKeyDown, true );
 
 			}
 
@@ -135,9 +139,9 @@
 
 			}
 
-			function loadModel ( colorMap, numberOfColors, legendLayout ) {
+			function loadModel( colorMap, numberOfColors, legendLayout ) {
 
-				loader.load( 'models/json/pressure.json', function( geometry ) {
+				loader.load( 'models/json/pressure.json', function ( geometry ) {
 
 					geometry.center();
 					geometry.computeVertexNormals();
@@ -182,7 +186,7 @@
 
 						if ( legendLayout === 'horizontal' ) {
 
-							legend = lut.setLegendOn( { 'layout':'horizontal', 'position': { 'x': 4, 'y': 0, 'z': 0 } } );
+							legend = lut.setLegendOn( { 'layout': 'horizontal', 'position': { 'x': 4, 'y': 0, 'z': 0 } } );
 
 						} else {
 
@@ -190,16 +194,16 @@
 
 						}
 
-						scene.add ( legend );
+						scene.add( legend );
 
 						var labels = lut.setLegendLabels( { 'title': 'Pressure', 'um': 'Pa', 'ticks': 5 } );
 
-						scene.add ( labels['title'] );
+						scene.add( labels[ 'title' ] );
 
 						for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
 
-							scene.add ( labels[ 'ticks' ][ i ] );
-							scene.add ( labels[ 'lines' ][ i ] );
+							scene.add( labels[ 'ticks' ][ i ] );
+							scene.add( labels[ 'lines' ][ i ] );
 
 						}
 
@@ -253,7 +257,7 @@
 
 					var index = maps.indexOf( colorMap ) >= maps.length - 1 ? 0 : maps.indexOf( colorMap ) + 1;
 
-					colorMap = maps [ index ];
+					colorMap = maps[ index ];
 
 					loadModel( colorMap, numberOfColors, legendLayout );
 
@@ -263,9 +267,9 @@
 
 					var index = colorNumbers.indexOf( numberOfColors ) >= colorNumbers.length - 1 ? 0 : colorNumbers.indexOf( numberOfColors ) + 1;
 
-					numberOfColors = colorNumbers [ index ];
+					numberOfColors = colorNumbers[ index ];
 
-					loadModel( colorMap ,  numberOfColors, legendLayout );
+					loadModel( colorMap, numberOfColors, legendLayout );
 
 				} else if ( e.keyCode === 68 ) {
 
@@ -275,7 +279,7 @@
 
 						legendLayout = 'vertical';
 
-						loadModel( colorMap ,  numberOfColors, legendLayout );
+						loadModel( colorMap, numberOfColors, legendLayout );
 
 					} else {
 
@@ -283,7 +287,7 @@
 
 						legendLayout = lut.setLegendOff();
 
-						loadModel( colorMap ,  numberOfColors, legendLayout );
+						loadModel( colorMap, numberOfColors, legendLayout );
 
 					}
 
@@ -295,7 +299,7 @@
 
 					lut.setLegendOff();
 
-					if ( legendLayout === 'horizontal') {
+					if ( legendLayout === 'horizontal' ) {
 
 						legendLayout = 'vertical';
 
@@ -305,7 +309,7 @@
 
 					}
 
-					loadModel( colorMap ,  numberOfColors, legendLayout );
+					loadModel( colorMap, numberOfColors, legendLayout );
 
 				}
 

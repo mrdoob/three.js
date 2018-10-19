@@ -30,7 +30,6 @@
 			span {
 				display: inline-block;
 				width: 60px;
-				float: left;
 				text-align: center;
 			}
 
@@ -47,14 +46,18 @@
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/AMFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/jszip.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer;
 
@@ -72,14 +75,14 @@
 				// Z is up for objects intended to be 3D printed.
 
 				camera.up.set( 0, 0, 1 );
-				camera.position.set( 0, -9, 6 );
+				camera.position.set( 0, - 9, 6 );
 
 				camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
 
 				scene.add( camera );
 
 				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
-				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
+				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI / 180 ) );
 				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );

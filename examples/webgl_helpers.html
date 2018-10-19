@@ -16,6 +16,8 @@
 
 		<script src="../build/three.js"></script>
 
+		<script src="js/loaders/GLTFLoader.js"></script>
+
 		<script>
 
 			var scene, renderer;
@@ -55,30 +57,26 @@
 				polarGridHelper.position.x = 200;
 				scene.add( polarGridHelper );
 
-				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function ( geometry, materials ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
-					var material = new THREE.MeshLambertMaterial();
+					var mesh = gltf.scene.children[ 0 ];
 
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 50 );
 					scene.add( group );
 
 					// To make sure that the matrixWorld is up to date for the boxhelpers
-					group.updateMatrixWorld(true);
+					group.updateMatrixWorld( true );
 
-					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
-
-					fnh = new THREE.FaceNormalsHelper( mesh, 5 );
-					scene.add( fnh );
 
 					vnh = new THREE.VertexNormalsHelper( mesh, 5 );
 					scene.add( vnh );
 
 					scene.add( new THREE.BoxHelper( mesh ) );
 
-					var wireframe = new THREE.WireframeGeometry( geometry );
+					var wireframe = new THREE.WireframeGeometry( mesh.geometry );
 					var line = new THREE.LineSegments( wireframe );
 					line.material.depthTest = false;
 					line.material.opacity = 0.25;
@@ -87,12 +85,12 @@
 					group.add( line );
 					scene.add( new THREE.BoxHelper( line ) );
 
-					var edges = new THREE.EdgesGeometry( geometry );
+					var edges = new THREE.EdgesGeometry( mesh.geometry );
 					var line = new THREE.LineSegments( edges );
 					line.material.depthTest = false;
 					line.material.opacity = 0.25;
 					line.material.transparent = true;
-					line.position.x = -4;
+					line.position.x = - 4;
 					group.add( line );
 					scene.add( new THREE.BoxHelper( line ) );
 

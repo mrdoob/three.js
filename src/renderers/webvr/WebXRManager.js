@@ -161,8 +161,6 @@ function WebXRManager( renderer ) {
 			var parent = camera.parent;
 			var cameras = cameraVR.cameras;
 
-			// apply camera.parent to cameraVR
-
 			updateCamera( cameraVR, parent );
 
 			for ( var i = 0; i < cameras.length; i ++ ) {
@@ -182,6 +180,8 @@ function WebXRManager( renderer ) {
 				children[ i ].updateMatrixWorld( true );
 
 			}
+
+			cameraVR.setProjectionFromUnion();
 
 			return cameraVR;
 
@@ -220,11 +220,6 @@ function WebXRManager( renderer ) {
 				if ( i === 0 ) {
 
 					cameraVR.matrix.copy( camera.matrix );
-
-					// HACK (mrdoob)
-					// https://github.com/w3c/webvr/issues/203
-
-					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
 
 				}
 

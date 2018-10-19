@@ -23,7 +23,6 @@
 			}
 
 			a {
-
 				color: #a06851;
 			}
 
@@ -37,17 +36,15 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FirstPersonControls.js"></script>
-
-		<script src="js/ImprovedNoise.js"></script>
-
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/ImprovedNoise.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 				document.getElementById( 'container' ).innerHTML = "";
 
 			}
@@ -58,8 +55,9 @@
 
 			var mesh, texture;
 
-			var worldWidth = 256, worldDepth = 256,
-			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
+			var worldWidth = 256, worldDepth = 256;
+			var worldHalfWidth = worldWidth / 2;
+			var worldHalfDepth = worldDepth / 2;
 
 			var clock = new THREE.Clock();
 
@@ -134,13 +132,13 @@
 			function generateHeight( width, height ) {
 
 				var size = width * height, data = new Uint8Array( size ),
-				perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
+					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {
 
 					for ( var i = 0; i < size; i ++ ) {
 
-						var x = i % width, y = ~~ ( i / width );
+						var x = i % width, y = ~ ~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
 
 					}
@@ -205,7 +203,7 @@
 
 				for ( var i = 0, l = imageData.length; i < l; i += 4 ) {
 
-					var v = ~~ ( Math.random() * 5 );
+					var v = ~ ~ ( Math.random() * 5 );
 
 					imageData[ i ] += v;
 					imageData[ i + 1 ] += v;
