@@ -2407,10 +2407,10 @@
 							"	vec2 ty = position.zx * scale;",
 							"	vec2 tz = position.xy * scale;",
 
-							// Base color texture2D( texture, uv + delta * percent )
-							"	vec4 cx = tex2D(texture, tx) * bf.x;",
-							"	vec4 cy = tex2D(texture, ty) * bf.y;",
-							"	vec4 cz = tex2D(texture, tz) * bf.z;",
+							// Base color
+							"	vec4 cx = texture2D(texture, tx) * bf.x;",
+							"	vec4 cy = texture2D(texture, ty) * bf.y;",
+							"	vec4 cz = texture2D(texture, tz) * bf.z;",
 
 							"	return cx + cy + cz;",
 
