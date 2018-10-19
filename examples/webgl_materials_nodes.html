@@ -2396,9 +2396,9 @@
 
 						var triplanarMapping = new THREE.FunctionNode( [
 							// Reference: https://github.com/keijiro/StandardTriplanar
-							// Blending factor of triplanar mapping
 							"vec4 triplanar_mapping( sampler2D texture, vec3 normal, vec3 position, float scale ) {",
 
+							// Blending factor of triplanar mapping
 							"	vec3 bf = normalize( abs( normal ) );", 
 							"	bf /= dot( bf, vec3( 1.0 ) );",
 
