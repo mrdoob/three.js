@@ -53,12 +53,45 @@ THREE.MMDLoader = ( function () {
 		crossOrigin: 'anonymous',
 
 		/**
-		 * @param {string} value
+		 * @param {string} crossOrigin
 		 * @return {THREE.MMDLoader}
 		 */
 		setCrossOrigin: function ( crossOrigin ) {
 
 			this.crossOrigin = crossOrigin;
+			return this;
+
+		},
+
+		/**
+		 * @param {string} animationPath
+		 * @return {THREE.MMDLoader}
+		 */
+		setAnimationPath: function ( animationPath ) {
+
+			this.animationPath = animationPath;
+			return this;
+
+		},
+
+		/**
+		 * @param {string} path
+		 * @return {THREE.MMDLoader}
+		 */
+		setPath: function ( path ) {
+
+			this.path = path;
+			return this;
+
+		},
+
+		/**
+		 * @param {string} resourcePath
+		 * @return {THREE.MMDLoader}
+		 */
+		setResoucePath: function ( resourcePath ) {
+
+			this.resourcePath = resourcePath;
 			return this;
 
 		},
@@ -77,7 +110,24 @@ THREE.MMDLoader = ( function () {
 
 			var builder = this.meshBuilder.setCrossOrigin( this.crossOrigin );
 
-			var resourcePath = THREE.LoaderUtils.extractUrlBase( url );
+			// resource path
+
+			var resourcePath;
+
+			if ( this.resourcePath !== undefined ) {
+
+				resourcePath = this.resourcePath;
+
+			} else if ( this.path !== undefined ) {
+
+				resourcePath = this.path;
+
+			} else {
+
+				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
+
+			}
+
 			var modelExtension = this._extractExtension( url ).toLowerCase();
 
 			// Should I detect by seeing header?
@@ -167,6 +217,7 @@ THREE.MMDLoader = ( function () {
 
 			this.loader
 				.setMimeType( undefined )
+				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
 				.load( url, function ( buffer ) {
 
@@ -190,6 +241,7 @@ THREE.MMDLoader = ( function () {
 
 			this.loader
 				.setMimeType( undefined )
+				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
 				.load( url, function ( buffer ) {
 
@@ -219,6 +271,7 @@ THREE.MMDLoader = ( function () {
 
 			this.loader
 				.setMimeType( undefined )
+				.setPath( this.animationPath )
 				.setResponseType( 'arraybuffer' );
 
 			for ( var i = 0, il = urls.length; i < il; i ++ ) {
@@ -250,6 +303,7 @@ THREE.MMDLoader = ( function () {
 
 			this.loader
 				.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
+				.setPath( this.animationPath )
 				.setResponseType( 'text' )
 				.load( url, function ( text ) {
 
