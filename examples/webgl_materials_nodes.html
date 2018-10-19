@@ -186,6 +186,7 @@
 					'adv / soft-body': 'soft-body',
 					'adv / wave': 'wave',
 					'adv / triangle-blur': 'triangle-blur',
+					'adv / triplanar-mapping': 'triplanar-mapping',
 					'adv / render-to-texture': 'rtt',
 					'adv / temporal-blur': 'temporal-blur',
 					'adv / conditional': 'conditional',
@@ -2382,6 +2383,56 @@
 							delta.y = val;
 
 						}, false, 0, 1 );
+
+						break;
+
+					case 'triplanar-mapping':
+
+						// MATERIAL
+
+						mtl = new THREE.PhongNodeMaterial();
+
+						var scale = new THREE.FloatNode( .02 );
+
+						var triplanarMapping = new THREE.FunctionNode( [
+							// Reference: https://github.com/keijiro/StandardTriplanar
+							"vec4 triplanar_mapping( sampler2D texture, vec3 normal, vec3 position, float scale ) {",
+
+							// Blending factor of triplanar mapping
+							"	vec3 bf = normalize( abs( normal ) );", 
+							"	bf /= dot( bf, vec3( 1.0 ) );",
+
+							// Triplanar mapping
+							"	vec2 tx = position.yz * scale;",
+							"	vec2 ty = position.zx * scale;",
+							"	vec2 tz = position.xy * scale;",
+
+							// Base color
+							"	vec4 cx = texture2D(texture, tx) * bf.x;",
+							"	vec4 cy = texture2D(texture, ty) * bf.y;",
+							"	vec4 cz = texture2D(texture, tz) * bf.z;",
+
+							"	return cx + cy + cz;",
+
+							"}"
+						].join( "\n" ) );
+
+						var triplanarMappingTexture = new THREE.FunctionCallNode( triplanarMapping, {
+							texture: new THREE.TextureNode( getTexture( "brick" ) ),
+							normal: new THREE.NormalNode( THREE.NormalNode.WORLD ),
+							position: new THREE.PositionNode( THREE.PositionNode.WORLD ),
+							scale: scale,
+						} );
+
+						mtl.color = triplanarMappingTexture;
+
+						// GUI
+
+						addGui( 'scale', scale.value, function ( val ) {
+
+							scale.value = val;
+
+						}, false, 0.001, .1 );
 
 						break;
 
