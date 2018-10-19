@@ -36,7 +36,7 @@
 		<script>
 
 			var camera, scene, renderer;
-			var cube, sphere, torus, material;
+			var cube, sphere, torus, material, backgroundMesh;
 
 			var count = 0, cubeCamera1, cubeCamera2;
 
@@ -62,9 +62,9 @@
 
 				scene = new THREE.Scene();
 
-				var mesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 500, 32, 16 ), new THREE.MeshBasicMaterial( { map: texture } ) );
-				mesh.geometry.scale( - 1, 1, 1 );
-				scene.add( mesh );
+				backgroundMesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 500, 32, 16 ), new THREE.MeshBasicMaterial( { map: texture } ) );
+				backgroundMesh.geometry.scale( - 1, 1, 1 );
+				scene.add( backgroundMesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -196,11 +196,13 @@
 				if ( count % 2 === 0 ) {
 
 					material.envMap = cubeCamera1.renderTarget.texture;
+					backgroundMesh.position.copy( cubeCamera2.position );
 					cubeCamera2.update( renderer, scene );
 
 				} else {
 
 					material.envMap = cubeCamera2.renderTarget.texture;
+					backgroundMesh.position.copy( cubeCamera1.position );
 					cubeCamera1.update( renderer, scene );
 
 				}
@@ -209,6 +211,7 @@
 
 				sphere.visible = true;
 
+				backgroundMesh.position.copy( camera.position );
 				renderer.render( scene, camera );
 
 			}
