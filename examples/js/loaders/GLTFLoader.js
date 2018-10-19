@@ -1454,6 +1454,17 @@ THREE.GLTFLoader = ( function () {
 
 	function isPrimitiveEqual( a, b ) {
 
+		var dracoExtA = a.extensions ? a.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] : undefined;
+		var dracoExtB = b.extensions ? b.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] : undefined;
+
+		if ( dracoExtA && dracoExtB ) {
+
+			if ( dracoExtA.bufferView !== dracoExtB.bufferView ) return false;
+
+			return isObjectEqual( dracoExtA.attributes, dracoExtB.attributes );
+
+		}
+
 		if ( a.indices !== b.indices ) {
 
 			return false;
@@ -1582,6 +1593,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( primitive0.mode !== primitive.mode ) return false;
 			if ( primitive.indices === undefined ) return false;
+			if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) return false;
 			if ( ! isObjectEqual( primitive0.attributes, primitive.attributes ) ) return false;
 
 			var targets = primitive.targets || [];
