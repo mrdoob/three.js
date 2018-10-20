@@ -265,7 +265,7 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	// Export STL
+	// Export STL (ASCII)
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
@@ -279,6 +279,20 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Export STL (Binary)
+	
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export STL (Binary)' );
+	option.onClick( function () {
+
+		var exporter = new THREE.STLExporter();
+
+		saveString( exporter.parse( editor.scene, { binary: true } ), 'model-binary.stl' );
+
+	} );
+	options.add( option );
+	
 	//
 
 	options.add( new UI.HorizontalRule() );
