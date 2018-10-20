@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title> three.js webgl - Plane</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+        body {
+            background-color: rgb(0, 0, 0);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        </style>
+    </head>
+    <body>
+
+        <div id="container"></div>
+
+        <script src="../build/three.js"></script>
+        <script src="js/libs/dat.gui.min.js"></script>
+        <script src="js/controls/OrbitControls.js"></script>
+        <script>
+
+        var SCREEN_WIDTH = window.innerWidth;
+        var SCREEN_HEIGHT = window.innerHeight;
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera( 55, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
+        var clock = new THREE.Clock();
+        var renderer = new THREE.WebGLRenderer({antialias: true});
+
+        var arrowHelper1, arrowHelper2, arrowHelper3;
+        var arrowDirection = new THREE.Vector3();
+        var arrowPosition1 = new THREE.Vector3();
+        var arrowPosition2 = new THREE.Vector3();
+        var arrowPosition3 = new THREE.Vector3();
+        var normalVector = new THREE.Vector3( 0, 1, 0 );
+        var planeConstant = 0;
+        var groundPlane = new THREE.Plane( normalVector, planeConstant );
+        var planeHelper = new THREE.PlaneHelper( groundPlane, 10, 0xff0000 );
+        scene.add( planeHelper );
+        var verticalAngle = 0;
+        var horizontalAngle = 0;
+        var frameTime = 0;
+        var TWO_PI = Math.PI * 2;
+
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+        var gui = new dat.GUI();
+        var controller = {
+            x: 0.5,
+            y: 1,
+            z: 0
+        };
+        var valuesChanger = function () {
+            normalVector.set(controller.x, controller.y, controller.z);
+        };
+        gui.add(
+            controller, 'x', -Math.PI*2, Math.PI*2, 0.01 )
+           .onChange(valuesChanger);
+        gui.add(
+            controller, 'y', -Math.PI*2, Math.PI*2, 0.01 )
+           .onChange(valuesChanger);
+        gui.add(
+            controller, 'z', -Math.PI*2, Math.PI*2, 0.01 )
+           .onChange(valuesChanger);
+
+
+        init();
+        animate();
+
+        function init() {
+
+            scene.background = new THREE.Color( 0x0096ff );
+
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+            document.getElementById( 'container' ).appendChild( renderer.domElement );
+            window.addEventListener( 'resize', onWindowResize, false );
+
+            camera.position.set( 0, 2.5, 10 );
+            scene.add( camera );
+            onWindowResize();
+        }
+
+        function animate() {
+
+            requestAnimationFrame( animate );
+
+            renderer.render( scene, camera );
+
+        }
+
+        function onWindowResize() {
+
+            SCREEN_WIDTH = window.innerWidth;
+            SCREEN_HEIGHT = window.innerHeight;
+
+            renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+            camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+            camera.updateProjectionMatrix();
+
+        }
+        </script>
+    </body>
+</html>
