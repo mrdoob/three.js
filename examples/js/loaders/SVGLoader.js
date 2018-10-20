@@ -756,12 +756,11 @@ THREE.SVGLoader.prototype = {
 
 		function parseTransformNode( node ) {
 
-			var transform = null;
+			var transform = new THREE.Matrix3();
+			var currentTransform = tempTransform0;
 			var transformsTexts = node.getAttribute( 'transform' ).split( ' ' );
 			
 			for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex-- ) {
-
-				var newTransform = null;
 
 				var transformText = transformsTexts[ tIndex ];
 				var openParPos = transformText.indexOf( "(" );
@@ -772,14 +771,14 @@ THREE.SVGLoader.prototype = {
 					var transformType = transformText.substr( 0, openParPos );
 
 					var array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
+					
+					currentTransform.identity();
 
 					switch ( transformType ) {
 
 						case "translate":
 
 							if ( array.length >= 1 ) {
-
-								newTransform = new THREE.Matrix3();
 
 								var tx = array[ 0 ];
 								var ty = tx;
@@ -790,7 +789,7 @@ THREE.SVGLoader.prototype = {
 
 								}
 
-								newTransform.translate( tx, ty );
+								currentTransform.translate( tx, ty );
 
 							}
 
@@ -803,8 +802,6 @@ THREE.SVGLoader.prototype = {
 								var angle = 0;
 								var cx = 0;
 								var cy = 0;
-
-								newTransform = new THREE.Matrix3();
 
 								// Angle
 								angle = - array[ 0 ] * Math.PI / 180;
@@ -822,7 +819,7 @@ THREE.SVGLoader.prototype = {
 								tempTransform2.identity().rotate( angle );
 								tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
 								tempTransform1.identity().translate( cx, cy );
-								newTransform.multiplyMatrices( tempTransform1, tempTransform3 );
+								currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
 
 							}
 
@@ -832,8 +829,6 @@ THREE.SVGLoader.prototype = {
 
 							if ( array.length >= 1 ) {
 
-								newTransform = new THREE.Matrix3();
-
 								var scaleX = array[ 0 ];
 								var scaleY = scaleX;
 
@@ -841,7 +836,7 @@ THREE.SVGLoader.prototype = {
 									scaleY = array[ 1 ];
 								}
 
-								newTransform.scale( scaleX, scaleY );
+								currentTransform.scale( scaleX, scaleY );
 
 							}
 
@@ -851,9 +846,7 @@ THREE.SVGLoader.prototype = {
 
 							if ( array.length === 1 ) {
 
-								newTransform = new THREE.Matrix3();
-
-								newTransform.set(
+								currentTransform.set(
 									1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
 									0, 1, 0,
 									0, 0, 1
@@ -867,9 +860,7 @@ THREE.SVGLoader.prototype = {
 
 							if ( array.length === 1 ) {
 
-								newTransform = new THREE.Matrix3();
-
-								newTransform.set(
+								currentTransform.set(
 									1, 0, 0,
 									Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
 									0, 0, 1
@@ -883,9 +874,7 @@ THREE.SVGLoader.prototype = {
 
 							if ( array.length === 6 ) {
 
-								newTransform = new THREE.Matrix3();
-
-								newTransform.set(
+								currentTransform.set(
 									array[ 0 ], array[ 2 ], array[ 4 ],
 									array[ 1 ], array[ 3 ], array[ 5 ],
 									0, 0, 1
@@ -898,17 +887,7 @@ THREE.SVGLoader.prototype = {
 
 				}
 
-				if ( newTransform ) {
-
-					if ( transform ) {
-					
-						newTransform.multiply( transform );
-					
-					}
-
-					transform = newTransform;
-
-				}
+				transform.premultiply( currentTransform );
 
 			}
 
@@ -1004,6 +983,7 @@ THREE.SVGLoader.prototype = {
 
 		var transformStack = [];
 
+		var tempTransform0 = new THREE.Matrix3();
 		var tempTransform1 = new THREE.Matrix3();
 		var tempTransform2 = new THREE.Matrix3();
 		var tempTransform3 = new THREE.Matrix3();
