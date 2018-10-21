@@ -53,7 +53,7 @@ Menubar.Examples = function ( editor ) {
 			} );
 			options.add( option );
 
-		} )( i )
+		} )( i );
 
 	}
 

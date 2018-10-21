@@ -17,7 +17,6 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -29,7 +28,7 @@
 			var stats;
 
 			var camera, scene;
-			var canvasRenderer, webglRenderer;
+			var webglRenderer;
 
 			var mesh;
 			var texture, texture1, texture2, texture3;
@@ -57,7 +56,7 @@
 				texture.wrapT = THREE.RepeatWrapping;
 
 				var geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 4, 4, 4 );
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -65,7 +64,7 @@
 
 				// SPRITES - from Sprite Sheet
 
-				texture1 = textureLoader.load( 'textures/UV_Grid_Sm.jpg', function() {
+				texture1 = textureLoader.load( 'textures/UV_Grid_Sm.jpg', function () {
 
 					texture1.wrapS = THREE.ClampToEdgeWrapping;
 					texture1.wrapT = THREE.ClampToEdgeWrapping;
@@ -148,12 +147,6 @@
 
 				//
 
-				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setPixelRatio( window.devicePixelRatio );
-				canvasRenderer.setSize( width, height );
-				var container1 = document.getElementById( 'container1' );
-				container1.appendChild( canvasRenderer.domElement );
-
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( width, height );
@@ -177,7 +170,6 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				canvasRenderer.setSize( width, height );
 				webglRenderer.setSize( width, height );
 
 			}
@@ -222,7 +214,6 @@
 
 				//
 
-				canvasRenderer.render( scene, camera );
 				webglRenderer.render( scene, camera );
 
 			}

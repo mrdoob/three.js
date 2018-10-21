@@ -115,6 +115,14 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 				</code>
 
 				<p>
+					If you change the position data values after the initial render, you may need to
+					call `.computeBoundingSphere()` in order to recalculate the geometry's bounding sphere.
+				</p>
+				<code>
+line.geometry.computeBoundingSphere();
+				</code>
+
+				<p>
 					[link:http://jsfiddle.net/w67tzfhx/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 				</p>
 

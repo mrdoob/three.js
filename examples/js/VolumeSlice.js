@@ -7,7 +7,7 @@
  * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
  * @see THREE.Volume
  */
-THREE.VolumeSlice = function( volume, index, axis ) {
+THREE.VolumeSlice = function ( volume, index, axis ) {
 
 	var slice = this;
 	/**
@@ -19,12 +19,12 @@ THREE.VolumeSlice = function( volume, index, axis ) {
 	 */
 	index = index || 0;
 	Object.defineProperty( this, 'index', {
-		get : function() {
+		get: function () {
 
 			return index;
 
 		},
-		set : function( value ) {
+		set: function ( value ) {
 
 			index = value;
 			slice.geometryNeedsUpdate = true;
@@ -57,7 +57,7 @@ THREE.VolumeSlice = function( volume, index, axis ) {
 	var canvasMap = new THREE.Texture( this.canvas );
 	canvasMap.minFilter = THREE.LinearFilter;
 	canvasMap.wrapS = canvasMap.wrapT = THREE.ClampToEdgeWrapping;
-	var material = new THREE.MeshBasicMaterial( { map: canvasMap, side: THREE.DoubleSide, transparent : true } );
+	var material = new THREE.MeshBasicMaterial( { map: canvasMap, side: THREE.DoubleSide, transparent: true } );
 	/**
 	 * @member {THREE.Mesh} mesh The mesh ready to get used in the scene
 	 */
@@ -89,13 +89,13 @@ THREE.VolumeSlice = function( volume, index, axis ) {
 
 THREE.VolumeSlice.prototype = {
 
-	constructor : THREE.VolumeSlice,
+	constructor: THREE.VolumeSlice,
 
 	/**
 	 * @member {Function} repaint Refresh the texture and the geometry if geometryNeedsUpdate is set to true
 	 * @memberof THREE.VolumeSlice
 	 */
-	repaint : function() {
+	repaint: function () {
 
 		if ( this.geometryNeedsUpdate ) {
 
@@ -104,13 +104,11 @@ THREE.VolumeSlice.prototype = {
 		}
 
 		var iLength = this.iLength,
-		jLength = this.jLength,
-		sliceAccess = this.sliceAccess,
-		volume = this.volume,
-		axis = this.axis,
-		index = this.index,
-		canvas = this.canvasBuffer,
-		ctx = this.ctxBuffer;
+			jLength = this.jLength,
+			sliceAccess = this.sliceAccess,
+			volume = this.volume,
+			canvas = this.canvasBuffer,
+			ctx = this.ctxBuffer;
 
 
 		// get the imageData and pixel array from the canvas
@@ -145,8 +143,7 @@ THREE.VolumeSlice.prototype = {
 
 			}
 
-		}
-		else {
+		} else {
 
 			for ( var j = 0; j < jLength; j ++ ) {
 
@@ -184,7 +181,7 @@ THREE.VolumeSlice.prototype = {
 	 * @see THREE.Volume.extractPerpendicularPlane
 	 * @memberof THREE.VolumeSlice
 	 */
-	updateGeometry : function() {
+	updateGeometry: function () {
 
 		var extracted = this.volume.extractPerpendicularPlane( this.axis, this.index );
 		this.sliceAccess = extracted.sliceAccess;

@@ -25,7 +25,7 @@
 
 			var container, info;
 
-			var camera, controls, scene, renderer;
+			var camera, scene, renderer;
 			var group;
 
 			init();
@@ -266,7 +266,7 @@
 				container.appendChild( renderer.domElement );
 
 
-				window.addEventListener( 'resize', function( e ) {
+				window.addEventListener( 'resize', function () {
 
 					renderer.setSize( innerWidth, innerHeight );
 
@@ -283,7 +283,7 @@
 
 				}
 
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js<a/> - raytracing renderer (using '  + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)' +
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js<a/> - raytracing renderer (using ' + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)' +
 				'<br/><button onclick="rearrange()">Rearrange</button><button onclick="render()">Render</button>';
 
 
@@ -291,16 +291,15 @@
 
 			function rearrange() {
 
-				group.children.forEach( function( o ) {
+				group.children.forEach( function ( o ) {
 
-					o.position.y += ( Math.random() - 0.5 ) * 100;
+ 					o.position.y += ( Math.random() - 0.5 ) * 100;
 					o.position.x += ( Math.random() - 0.5 ) * 400;
 					o.position.z += ( Math.random() - 0.5 ) * 400;
 
 				} );
 
-			}
-
+ 			}
 
 			function render() {
 

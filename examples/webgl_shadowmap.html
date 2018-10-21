@@ -20,7 +20,12 @@
 				z-index: 100;
 				display:block;
 			}
-			#info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			a {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
 		</style>
 	</head>
 
@@ -40,16 +45,18 @@
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 		<script src="js/utils/ShadowMapViewer.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
-
-			var HUD_MARGIN = 0.05;
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -164,7 +171,7 @@
 
 			}
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
 				switch ( event.keyCode ) {
 
@@ -280,10 +287,10 @@
 					mesh.speed = speed;
 
 					mixer.clipAction( clip, mesh ).
-							setDuration( duration ).
-							// to shift the playback out of phase:
-							startAt( - duration * Math.random() ).
-							play();
+						setDuration( duration ).
+					// to shift the playback out of phase:
+						startAt( - duration * Math.random() ).
+						play();
 
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI / 2;
@@ -299,7 +306,7 @@
 
 				var loader = new THREE.GLTFLoader();
 
-				loader.load( "models/gltf/Horse.glb", function( gltf ) {
+				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 
@@ -315,7 +322,7 @@
 
 				} );
 
-				loader.load( "models/gltf/Flamingo.glb", function( gltf ) {
+				loader.load( "models/gltf/Flamingo.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 					var clip = gltf.animations[ 0 ];
@@ -324,7 +331,7 @@
 
 				} );
 
-				loader.load( "models/gltf/Stork.glb", function( gltf ) {
+				loader.load( "models/gltf/Stork.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 					var clip = gltf.animations[ 0 ];
@@ -333,7 +340,7 @@
 
 				} );
 
-				loader.load( "models/gltf/Parrot.glb", function( gltf ) {
+				loader.load( "models/gltf/Parrot.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 					var clip = gltf.animations[ 0 ];
@@ -365,7 +372,7 @@
 
 					morph.position.x += morph.speed * delta;
 
-					if ( morph.position.x  > 2000 )  {
+					if ( morph.position.x > 2000 ) {
 
 						morph.position.x = - 1000 - Math.random() * 500;
 

@@ -43,10 +43,10 @@
 			var camera, scene, renderer;
 
 			var isUserInteracting = false,
-			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-			lon = 0, onMouseDownLon = 0,
-			lat = 0, onMouseDownLat = 0,
-			phi = 0, theta = 0;
+				onMouseDownMouseX = 0, onMouseDownMouseY = 0,
+				lon = 0, onMouseDownLon = 0,
+				lat = 0, onMouseDownLat = 0,
+				phi = 0, theta = 0;
 
 			init();
 			animate();
@@ -98,13 +98,13 @@
 
 				}, false );
 
-				document.addEventListener( 'dragenter', function ( event ) {
+				document.addEventListener( 'dragenter', function () {
 
 					document.body.style.opacity = 0.5;
 
 				}, false );
 
-				document.addEventListener( 'dragleave', function ( event ) {
+				document.addEventListener( 'dragleave', function () {
 
 					document.body.style.opacity = 1;
 
@@ -171,7 +171,7 @@
 
 			}
 
-			function onPointerUp( event ) {
+			function onPointerUp() {
 
 				isUserInteracting = false;
 

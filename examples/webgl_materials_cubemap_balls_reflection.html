@@ -24,11 +24,9 @@
 				z-index:1000;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
-			#oldie a { color:#da0 }
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
 
@@ -37,20 +35,21 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
 			var camera, scene, renderer;
 
-			var mesh, lightMesh, geometry;
 			var spheres = [];
-
-			var directionalLight, pointLight;
 
 			var mouseX = 0;
 			var mouseY = 0;

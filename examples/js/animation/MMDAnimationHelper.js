@@ -221,7 +221,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( params.ik !== false ) {
 
-				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK );  // this param is experimental
+				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK ); // this param is experimental
 
 			}
 
@@ -324,7 +324,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( params.animation !== undefined ) {
 
-				this._setupCameraAnimation( camera, params.animation )
+				this._setupCameraAnimation( camera, params.animation );
 
 			}
 
@@ -668,7 +668,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 						objects.set( clip, {
 							duration: clip.duration
-						} )
+						} );
 
 					}
 
@@ -692,7 +692,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 							objects.set( clip, {
 								duration: clip.duration
-							} )
+							} );
 
 						}
 
@@ -945,6 +945,9 @@ THREE.MMDAnimationHelper = ( function () {
 			}
 
 			if ( this.currentTime < this.delayTime ) return false;
+			
+			// 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
+			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
 
 			this.audio.startTime = this.currentTime - this.delayTime;
 

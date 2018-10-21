@@ -15,9 +15,7 @@
 				font-weight: bold;
 			}
 
-			a {
-				color:#00ff78;
-			}
+			a { color:#00ff78; }
 
 			#info {
 				color: #fff;
@@ -44,7 +42,7 @@
 		<script src="js/shaders/DepthLimitedBlurShader.js"></script>
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -54,28 +52,16 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer;
-			var depthMaterial, saoMaterial, saoModulateMaterial, normalMaterial, vBlurMaterial, hBlurMaterial, copyMaterial;
-			var depthRenderTarget, normalRenderTarget, saoRenderTarget, beautyRenderTarget, blurIntermediateRenderTarget;
-            var composer, renderPass, saoPass, copyPass;
+			var composer, renderPass, saoPass;
 			var group;
-			var params = {
-				output: 0,
-				saoBias: 0.5,
-				saoIntensity: 0.25,
-				saoScale: 1,
-				saoKernelRadius: 100,
-				saoMinResolution: 0,
-				saoBlur: true,
-				saoBlurRadius: 12,
-				saoBlurStdDev: 6,
-				saoBlurDepthCutoff: 0.01
-			}
-			var supportsDepthTextureExtension = false;
-			var isWebGL2 = false;
 
 			init();
 			animate();
@@ -105,20 +91,20 @@
 
 				var light = new THREE.PointLight( 0xddffdd, 0.8 );
 				light.position.z = 70;
-				light.position.y = -70;
-				light.position.x = -70;
+				light.position.y = - 70;
+				light.position.x = - 70;
 				scene.add( light );
 
 				var light2 = new THREE.PointLight( 0xffdddd, 0.8 );
 				light2.position.z = 70;
-				light2.position.x = -70;
+				light2.position.x = - 70;
 				light2.position.y = 70;
 				scene.add( light2 );
 
 				var light3 = new THREE.PointLight( 0xddddff, 0.8 );
 				light3.position.z = 70;
 				light3.position.x = 70;
-				light3.position.y = -70;
+				light3.position.y = - 70;
 				scene.add( light3 );
 
 				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
@@ -164,7 +150,11 @@
 					'SAO': THREE.SAOPass.OUTPUT.SAO,
 					'Depth': THREE.SAOPass.OUTPUT.Depth,
 					'Normal': THREE.SAOPass.OUTPUT.Normal
-				} ).onChange( function ( value ) { saoPass.params.output = parseInt( value ); } );
+				} ).onChange( function ( value ) {
+
+					saoPass.params.output = parseInt( value );
+
+				} );
 				gui.add( saoPass.params, 'saoBias', - 1, 1 );
 				gui.add( saoPass.params, 'saoIntensity', 0, 1 );
 				gui.add( saoPass.params, 'saoScale', 0, 10 );

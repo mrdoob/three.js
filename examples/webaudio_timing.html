@@ -67,7 +67,7 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 	</head>
@@ -87,9 +87,13 @@
 
 	<script>
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	if ( WEBGL.isWebGLAvailable() === false ) {
 
-	var scene, camera, renderer, audio;
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
+
+	var scene, camera, renderer;
 
 	var objects = [];
 
@@ -207,7 +211,7 @@
 
 	}
 
-	function onWindowResize( event ) {
+	function onWindowResize() {
 
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();

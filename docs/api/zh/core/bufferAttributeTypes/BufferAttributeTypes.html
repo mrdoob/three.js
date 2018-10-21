@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferAttribute] &rarr;
+
+		<h1>BufferAttribute Types</h1>
+
+		<p class="desc">
+		在 three.js 中一共有 9 种 [page:BufferAttribute]。每种和 JavaScript 中的类型相对应。
+		[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#Syntax Typed Arrays].
+		</p>
+
+		<code>
+		THREE.Float64BufferAttribute
+		THREE.Float32BufferAttribute
+		THREE.Uint32BufferAttribute
+		THREE.Int32BufferAttribute
+		THREE.Uint16BufferAttribute
+		THREE.Int16BufferAttribute
+		THREE.Uint8ClampedBufferAttribute
+		THREE.Uint8BufferAttribute
+		THREE.Int8BufferAttribute
+		</code>
+
+		<h2>构造函数</h2>
+
+		All of the above are called in the same way.
+		<h3>TypedBufferAttribute( [param:Array array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
+		<p>
+			array -- this can be a typed or untyped (normal) array. It will be converted to the Type specified.<br /><br />
+
+			itemSize -- the number of values of the array that should be associated with a particular vertex.<br /><br />
+
+			normalized -- (optional) indicates how the underlying data in the buffer maps to the values in the GLSL code.
+		</p>
+
+		<h2>属性</h2>
+
+		继承属性详见 [page:BufferAttribute]。
+
+		<h2>方法</h2>
+
+		继承方法详见 [page:BufferAttribute]。
+
+		<h2>资源</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js src/core/BufferAttribute.js]
+	</body>
+</html>

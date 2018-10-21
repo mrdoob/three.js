@@ -39,7 +39,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -322,10 +322,14 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var hash = document.location.hash.substr( 1 );
-			if (hash) hash = parseInt(hash, 0);
+			if ( hash ) hash = parseInt( hash, 0 );
 
 			/* TEXTURE WIDTH FOR SIMULATION */
 			var WIDTH = hash || 32;
@@ -356,26 +360,30 @@
 				var v = 0;
 
 				function verts_push() {
-					for (var i=0; i < arguments.length; i++) {
-						vertices.array[v++] = arguments[i];
-					}
-				}
+
+					for ( var i = 0; i < arguments.length; i ++ ) {
+
+						vertices.array[ v ++ ] = arguments[ i ];
+
+		}
+
+	}
 
 				var wingsSpan = 20;
 
-				for (var f = 0; f<BIRDS; f++ ) {
+				for ( var f = 0; f < BIRDS; f ++ ) {
 
 					// Body
 					verts_push(
-						0, -0, -20,
-						0, 4, -20,
+						0, - 0, - 20,
+						0, 4, - 20,
 						0, 0, 30
 					);
 
 					// Left Wing
 					verts_push(
-						0, 0, -15,
-						-wingsSpan, 0, 0,
+						0, 0, - 15,
+						- wingsSpan, 0, 0,
 						0, 0, 15
 					);
 
@@ -383,30 +391,30 @@
 					verts_push(
 						0, 0, 15,
 						wingsSpan, 0, 0,
-						0, 0, -15
+						0, 0, - 15
 					);
 
 				}
 
-				for( var v = 0; v < triangles * 3; v++ ) {
+				for ( var v = 0; v < triangles * 3; v ++ ) {
 
-					var i = ~~(v / 3);
-					var x = (i % WIDTH) / WIDTH;
-					var y = ~~(i / WIDTH) / WIDTH;
+					var i = ~ ~ ( v / 3 );
+					var x = ( i % WIDTH ) / WIDTH;
+					var y = ~ ~ ( i / WIDTH ) / WIDTH;
 
 					var c = new THREE.Color(
 						0x444444 +
-						~~(v / 9) / BIRDS * 0x666666
+						~ ~ ( v / 9 ) / BIRDS * 0x666666
 					);
 
 					birdColors.array[ v * 3 + 0 ] = c.r;
 					birdColors.array[ v * 3 + 1 ] = c.g;
 					birdColors.array[ v * 3 + 2 ] = c.b;
 
-					references.array[ v * 2     ] = x;
+					references.array[ v * 2 ] = x;
 					references.array[ v * 2 + 1 ] = y;
 
-					birdVertex.array[ v         ] = v % 9;
+					birdVertex.array[ v ] = v % 9;
 
 				}
 
@@ -418,7 +426,7 @@
 
 
 			var container, stats;
-			var camera, scene, renderer, geometry, i, h, color;
+			var camera, scene, renderer, i;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -426,21 +434,25 @@
 
 			var BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
-			document.getElementById('birds').innerText = BIRDS;
+			document.getElementById( 'birds' ).innerText = BIRDS;
 
-			function change(n) {
+			function change( n ) {
+
 				location.hash = n;
 				location.reload();
 				return false;
-			}
+
+}
 
 
 			var options = '';
-			for (i=1; i<7; i++) {
-				var j = Math.pow(2, i);
-				options += '<a href="#" onclick="return change(' + j + ')">' + (j * j) + '</a> ';
-			}
-			document.getElementById('options').innerHTML = options;
+			for ( i = 1; i < 7; i ++ ) {
+
+				var j = Math.pow( 2, i );
+				options += '<a href="#" onclick="return change(' + j + ')">' + ( j * j ) + '</a> ';
+
+}
+			document.getElementById( 'options' ).innerHTML = options;
 
 			var last = performance.now();
 
@@ -496,7 +508,7 @@
 					freedom: 0.75
 				};
 
-				var valuesChanger = function() {
+				var valuesChanger = function () {
 
 					velocityUniforms.seperationDistance.value = effectController.seperation;
 					velocityUniforms.alignmentDistance.value = effectController.alignment;
@@ -554,8 +566,10 @@
 
 				var error = gpuCompute.init();
 				if ( error !== null ) {
+
 				    console.error( error );
-				}
+
+	}
 
 			}
 
@@ -574,19 +588,19 @@
 
 				// ShaderMaterial
 				var material = new THREE.ShaderMaterial( {
-					uniforms:       birdUniforms,
-					vertexShader:   document.getElementById( 'birdVS' ).textContent,
+					uniforms: birdUniforms,
+					vertexShader: document.getElementById( 'birdVS' ).textContent,
 					fragmentShader: document.getElementById( 'birdFS' ).textContent,
 					side: THREE.DoubleSide
 
-				});
+				} );
 
 				var birdMesh = new THREE.Mesh( geometry, material );
 				birdMesh.rotation.y = Math.PI / 2;
 				birdMesh.matrixAutoUpdate = false;
 				birdMesh.updateMatrix();
 
-				scene.add(birdMesh);
+				scene.add( birdMesh );
 
 			}
 
@@ -688,9 +702,9 @@
 			function render() {
 
 				var now = performance.now();
-				var delta = (now - last) / 1000;
+				var delta = ( now - last ) / 1000;
 
-				if (delta > 1) delta = 1; // safety cap on large deltas
+				if ( delta > 1 ) delta = 1; // safety cap on large deltas
 				last = now;
 
 				positionUniforms.time.value = now;

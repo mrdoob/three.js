@@ -36,7 +36,7 @@
 		<script src="js/loaders/EXRLoader.js"></script>
 		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/pmrem/PMREMGenerator.js"></script>
@@ -45,7 +45,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var params = {
@@ -106,7 +110,7 @@
 					texture.magFilter = THREE.NearestFilter;
 					texture.encoding = THREE.LinearEncoding;
 
-					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, 512 );
+					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
@@ -128,7 +132,7 @@
 
 					texture.encoding = THREE.sRGBEncoding;
 
-					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, 512 );
+					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512 } );
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
