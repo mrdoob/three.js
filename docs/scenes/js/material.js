@@ -440,6 +440,18 @@ function guiMeshPhongMaterial( gui, mesh, material, geometry ) {
 
 }
 
+function guiMeshToonMaterial( gui, mesh, material, geometry ) {
+
+	var data = {
+		gradientMap: textureMapKeys
+	};
+
+	var folder = gui.addFolder( 'THREE.MeshToonMaterial' );
+
+	folder.add( data, 'gradientMap', textureMapKeys ).onChange( updateTexture( material, 'gradientMap', textureMaps ) );
+
+}
+
 function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 
 	var data = {
@@ -541,6 +553,17 @@ function chooseFromHash( gui, mesh, geometry ) {
 			material = new THREE.MeshPhongMaterial( { color: 0x2194CE } );
 			guiMaterial( gui, mesh, material, geometry );
 			guiMeshPhongMaterial( gui, mesh, material, geometry );
+
+			return material;
+
+			break;
+
+			case 'MeshToonMaterial' :
+
+			material = new THREE.MeshToonMaterial( { color: 0x2194CE } );
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshPhongMaterial( gui, mesh, material, geometry );
+			guiMeshToonMaterial( gui, mesh, material, geometry );
 
 			return material;
 
