@@ -250,6 +250,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		array.push( renderer.gammaOutput );
 
+		array.push( renderer.gammaFactor );
+
 		return array.join();
 
 	};
