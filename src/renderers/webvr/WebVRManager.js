@@ -10,6 +10,7 @@ import { Quaternion } from '../../math/Quaternion.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
+import { setProjectionFromUnion } from './WebVRUtils.js';
 
 function WebVRManager( renderer ) {
 
@@ -323,7 +324,7 @@ function WebVRManager( renderer ) {
 		cameraL.projectionMatrix.fromArray( frameData.leftProjectionMatrix );
 		cameraR.projectionMatrix.fromArray( frameData.rightProjectionMatrix );
 
-		cameraVR.setProjectionFromUnion();
+		setProjectionFromUnion( cameraVR, cameraL, cameraR );
 
 		//
 

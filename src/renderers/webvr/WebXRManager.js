@@ -7,6 +7,7 @@ import { Vector4 } from '../../math/Vector4.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
+import { setProjectionFromUnion } from './WebVRUtils.js';
 
 function WebXRManager( renderer ) {
 
@@ -181,7 +182,7 @@ function WebXRManager( renderer ) {
 
 			}
 
-			cameraVR.setProjectionFromUnion();
+			setProjectionFromUnion( cameraVR, cameraL, cameraR );
 
 			return cameraVR;
 
