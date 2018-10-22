@@ -17554,6 +17554,8 @@
 
 			array.push( renderer.gammaOutput );
 
+			array.push( renderer.gammaFactor );
+
 			return array.join();
 
 		};
