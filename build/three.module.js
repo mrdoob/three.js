@@ -21343,6 +21343,8 @@ function WebVRManager( renderer ) {
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
 
+	var framebufferScaleFactor = 1.0;
+
 	var frameOfReferenceType = 'stage';
 
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
@@ -21383,8 +21385,8 @@ function WebVRManager( renderer ) {
 		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
-			var renderWidth = eyeParameters.renderWidth;
-			var renderHeight = eyeParameters.renderHeight;
+			var renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
+			var renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			currentSize = renderer.getSize();
@@ -21524,6 +21526,12 @@ function WebVRManager( renderer ) {
 		if ( value !== undefined ) device = value;
 
 		animation.setContext( value );
+
+	};
+
+	this.setFramebufferScaleFactor = function ( value ) {
+
+		framebufferScaleFactor = value;
 
 	};
 
@@ -21719,6 +21727,8 @@ function WebXRManager( renderer ) {
 	var device = null;
 	var session = null;
 
+	var framebufferScaleFactor = 1.0;
+
 	var frameOfReference = null;
 	var frameOfReferenceType = 'stage';
 
@@ -21798,6 +21808,12 @@ function WebXRManager( renderer ) {
 
 	}
 
+	this.setFramebufferScaleFactor = function ( value ) {
+
+		framebufferScaleFactor = value;
+
+	};
+
 	this.setFrameOfReferenceType = function ( value ) {
 
 		frameOfReferenceType = value;
@@ -21815,7 +21831,7 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			session.baseLayer = new XRWebGLLayer( session, gl );
+			session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: framebufferScaleFactor } );
 			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
 
 				frameOfReference = value;
