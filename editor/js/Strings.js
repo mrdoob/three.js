@@ -120,6 +120,6 @@ var Strings = function ( config ) {
 
 		}
 
-	}
+	};
 
 };
