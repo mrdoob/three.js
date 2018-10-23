@@ -20,8 +20,8 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
 	var ipd = cameraLPos.distanceTo( cameraRPos );
 
-	var projL = cameraL.projectionMatrix;
-	var projR = cameraR.projectionMatrix;
+	var projL = cameraL.projectionMatrix.elements;
+	var projR = cameraR.projectionMatrix.elements;
 
 	// VR systems will have identical far and near planes, and
 	// most likely identical top and bottom frustum extents.
@@ -40,7 +40,7 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
 	// Calculate the new camera's position offset from the
 	// left camera.
-	var zOffset = ipd / ( leftFovL + rightFovR );
+	var zOffset = ipd / ( Math.abs( leftFovL ) + Math.abs( rightFovR ) );
 	var xOffset = zOffset * leftFovL;
 
 	// TODO: Better way to apply this offset?
