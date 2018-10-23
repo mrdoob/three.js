@@ -15,13 +15,14 @@ Menubar.File = function ( editor ) {
 	//
 
 	var config = editor.config;
+	var strings = editor.strings;
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
 
 	var title = new UI.Panel();
 	title.setClass( 'title' );
-	title.setTextContent( 'File' );
+	title.setTextContent( strings.getKey( 'menubar/file' ) );
 	container.add( title );
 
 	var options = new UI.Panel();
@@ -32,7 +33,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'New' );
+	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
 	option.onClick( function () {
 
 		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
@@ -67,7 +68,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Import' );
+	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
 	option.onClick( function () {
 
 		fileInput.click();
@@ -83,7 +84,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export Geometry' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/geometry' ) );
 	option.onClick( function () {
 
 		var object = editor.selected;
@@ -126,7 +127,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export Object' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/object' ) );
 	option.onClick( function () {
 
 		var object = editor.selected;
@@ -160,7 +161,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export Scene' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/scene' ) );
 	option.onClick( function () {
 
 		var output = editor.scene.toJSON();
@@ -189,7 +190,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export DAE' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/dae' ) );
 	option.onClick( function () {
 
 		var exporter = new THREE.ColladaExporter();
@@ -207,7 +208,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export GLB' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
 	option.onClick( function () {
 
 		var exporter = new THREE.GLTFExporter();
@@ -227,7 +228,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export GLTF' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( function () {
 
 		var exporter = new THREE.GLTFExporter();
@@ -246,7 +247,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export OBJ' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/obj' ) );
 	option.onClick( function () {
 
 		var object = editor.selected;
@@ -269,7 +270,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export STL' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/stl' ) );
 	option.onClick( function () {
 
 		var exporter = new THREE.STLExporter();
@@ -287,7 +288,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Publish' );
+	option.setTextContent( strings.getKey( 'menubar/file/publish' ) );
 	option.onClick( function () {
 
 		var zip = new JSZip();
