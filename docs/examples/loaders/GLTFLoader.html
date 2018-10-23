@@ -37,10 +37,11 @@
 		</ul>
 
 		<p><i>
-			<sup>*</sup>UV transforms are supported, with several key limitations in comparison to the
-			glTF specification. A transform is applied to all textures using that UV set on the current
-			material, and no more than one transform may be used per material. Each use of a texture with
-			a unique transform will result in an additional GPU texture upload. See
+			<sup>*</sup>UV transforms are supported, with several key limitations. Transforms applied to
+			a texture using the first UV slot (all textures except aoMap and lightMap) must share the same
+			transform, or no transfor at all. The aoMap and lightMap textures cannot be transformed. No
+			more than one transform may be used per material. Each use of a texture with a unique
+			transform will result in an additional GPU texture upload. See
 			#[link:https://github.com/mrdoob/three.js/pull/13831 13831] and
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788].
 		</i></p>

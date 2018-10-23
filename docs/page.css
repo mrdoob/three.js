@@ -130,3 +130,13 @@ span.param {
 a.param:hover {
 	color: #777;
 }
+
+sup, sub {
+	/* prevent superscript and subscript elements from affecting line-height */
+  vertical-align: baseline;
+  position: relative;
+  top: -0.4em;
+}
+sub {
+  top: 0.4em;
+}
