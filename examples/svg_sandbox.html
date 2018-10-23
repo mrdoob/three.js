@@ -39,10 +39,10 @@
 
 				// QRCODE
 
-				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/QRCode.json', function ( geometry ) {
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/QRCode_buffergeometry.json', function ( geometry ) {
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { /*emissive: 0xff0000,*/ vertexColors: THREE.FaceColors } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { vertexColors: THREE.VertexColors } ) );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 					scene.add( mesh );
 
