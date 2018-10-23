@@ -40,13 +40,13 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
 	// Calculate the new camera's position offset from the
 	// left camera.
-	var zOffset = ipd / ( Math.abs( leftFovL ) + Math.abs( rightFovR ) );
+	var zOffset = ipd / ( leftFovL - rightFovR );
 	var xOffset = zOffset * leftFovL;
 
 	// TODO: Better way to apply this offset?
 	cameraL.matrixWorld.decompose( camera.position, camera.quaternion, camera.scale );
 	camera.translateX( xOffset );
-	camera.translateZ( - zOffset );
+	camera.translateZ( - zOffset * 2 );
 	camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
 	camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
