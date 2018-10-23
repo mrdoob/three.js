@@ -10,13 +10,13 @@ THREE.EditorControls = function ( object, domElement ) {
 	domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
-
+	this.wheelSpeed = 100;
 	this.enabled = true;
 	this.center = new THREE.Vector3();
 	this.panSpeed = 0.001;
 	this.zoomSpeed = 0.1;
 	this.rotationSpeed = 0.005;
-
+	this.stateList=[0,1,2];
 	// internals
 
 	var scope = this;
@@ -25,8 +25,9 @@ THREE.EditorControls = function ( object, domElement ) {
 	var box = new THREE.Box3();
 
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
-	var state = STATE.NONE;
 
+	var state = STATE.NONE;
+	var stateList=this.stateList;
 	var center = this.center;
 	var normalMatrix = new THREE.Matrix3();
 	var pointer = new THREE.Vector2();
@@ -124,19 +125,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		if ( event.button === 0 ) {
-
-			state = STATE.ROTATE;
-
-		} else if ( event.button === 1 ) {
-
-			state = STATE.ZOOM;
-
-		} else if ( event.button === 2 ) {
-
-			state = STATE.PAN;
-
-		}
+		state=stateList[event.button]
 
 		pointerOld.set( event.clientX, event.clientY );
 
@@ -162,7 +151,11 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		} else if ( state === STATE.ZOOM ) {
 
+<<<<<<< HEAD
+				scope.zoom( new THREE.Vector3( 0, 0, - movementY - movementX ) );
+=======
 			scope.zoom( delta.set( 0, 0, movementY ) );
+>>>>>>> upstream/dev
 
 		} else if ( state === STATE.PAN ) {
 
@@ -189,8 +182,14 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
+<<<<<<< HEAD
+		// if ( scope.enabled === false ) return;
+
+		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY * scope.wheelSpeed ) );
+=======
 		// Normalize deltaY due to https://bugzilla.mozilla.org/show_bug.cgi?id=1392460
 		scope.zoom( delta.set( 0, 0, event.deltaY > 0 ? 1 : - 1 ) );
+>>>>>>> upstream/dev
 
 	}
 
@@ -251,7 +250,6 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	}
 
-
 	function touchMove( event ) {
 
 		if ( scope.enabled === false ) return;
@@ -287,7 +285,6 @@ THREE.EditorControls = function ( object, domElement ) {
 				var distance = touches[ 0 ].distanceTo( touches[ 1 ] );
 				scope.zoom( delta.set( 0, 0, prevDistance - distance ) );
 				prevDistance = distance;
-
 
 				var offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ], prevTouches ) );
 				var offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ], prevTouches ) );

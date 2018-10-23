@@ -10,6 +10,7 @@ var Config = function () {
 		'language': 'en',
 
 		'autosave': true,
+
 		'theme': 'css/light.css',
 
 		'project/title': '',
@@ -29,7 +30,12 @@ var Config = function () {
 		'settings/shortcuts/rotate': 'e',
 		'settings/shortcuts/scale': 'r',
 		'settings/shortcuts/undo': 'z',
-		'settings/shortcuts/focus': 'f'
+		'settings/shortcuts/focus': 'f',
+
+		'settings/mouse/LeftBtn':0,
+		'settings/mouse/MidBtn':1,
+		'settings/mouse/RightBtn':2,
+		'settings/mouse/wheelSpeed': 100,
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

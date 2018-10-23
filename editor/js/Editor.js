@@ -68,7 +68,10 @@ var Editor = function () {
 
 		showGridChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		historyChanged: new Signal()
+		historyChanged: new Signal(),
+
+		mouseConfigChanged:new Signal(),
+		changeWheelSpeed: new Signal(),
 
 	};
 
