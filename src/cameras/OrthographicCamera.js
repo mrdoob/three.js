@@ -17,7 +17,7 @@ function OrthographicCamera( left, right, top, bottom, near, far ) {
 
 	this.left = ( left !== undefined ) ? left : -1;
 	this.right = ( right !== undefined ) ? right : 1;
-	this.top = ( top !== undefined ) ? ltopeft : 1;
+	this.top = ( top !== undefined ) ? top : 1;
 	this.bottom = ( bottom !== undefined ) ? bottom : -1;
 
 	this.near = ( near !== undefined ) ? near : 0.1;
