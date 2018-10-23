@@ -16,6 +16,8 @@ function WebXRManager( renderer ) {
 	var device = null;
 	var session = null;
 
+	var framebufferScaleFactor = 1.0;
+
 	var frameOfReference = null;
 	var frameOfReferenceType = 'stage';
 
@@ -47,7 +49,6 @@ function WebXRManager( renderer ) {
 	//
 
 	this.enabled = false;
-	this.framebufferScaleFactor = 1.0;
 
 	this.getController = function ( id ) {
 
@@ -96,6 +97,12 @@ function WebXRManager( renderer ) {
 
 	}
 
+	this.setFramebufferScaleFactor = function ( value ) {
+
+		framebufferScaleFactor = value;
+
+	};
+
 	this.setFrameOfReferenceType = function ( value ) {
 
 		frameOfReferenceType = value;
@@ -113,7 +120,7 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: this.framebufferScaleFactor } );
+			session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: framebufferScaleFactor } );
 			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
 
 				frameOfReference = value;

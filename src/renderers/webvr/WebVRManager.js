@@ -25,6 +25,8 @@ function WebVRManager( renderer ) {
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
 
+	var framebufferScaleFactor = 1.0;
+
 	var frameOfReferenceType = 'stage';
 
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
@@ -65,8 +67,8 @@ function WebVRManager( renderer ) {
 		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
-			var renderWidth = eyeParameters.renderWidth * scope.framebufferScaleFactor;
-			var renderHeight = eyeParameters.renderHeight * scope.framebufferScaleFactor;
+			var renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
+			var renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			currentSize = renderer.getSize();
@@ -194,7 +196,6 @@ function WebVRManager( renderer ) {
 		return controller;
 
 	};
-	this.framebufferScaleFactor = 1.0;
 
 	this.getDevice = function () {
 
@@ -207,6 +208,12 @@ function WebVRManager( renderer ) {
 		if ( value !== undefined ) device = value;
 
 		animation.setContext( value );
+
+	};
+
+	this.setFramebufferScaleFactor = function ( value ) {
+
+		framebufferScaleFactor = value;
 
 	};
 
