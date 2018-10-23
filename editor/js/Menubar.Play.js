@@ -5,6 +5,7 @@
 Menubar.Play = function ( editor ) {
 
 	var signals = editor.signals;
+	var strings = editor.strings;
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
@@ -13,7 +14,7 @@ Menubar.Play = function ( editor ) {
 
 	var title = new UI.Panel();
 	title.setClass( 'title' );
-	title.setTextContent( 'Play' );
+	title.setTextContent( strings.getKey( 'menubar/play' ) );
 	title.onClick( function () {
 
 		if ( isPlaying === false ) {
