@@ -459,7 +459,7 @@ THREE.OBJLoader = ( function () {
 								parseFloat( data[ 2 ] ),
 								parseFloat( data[ 3 ] )
 							);
-							if ( data.length === 8 ) {
+							if ( data.length >= 7 ) {
 
 								state.colors.push(
 									parseFloat( data[ 4 ] ),
