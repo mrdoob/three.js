@@ -21288,8 +21288,8 @@
 
 		var ipd = cameraLPos.distanceTo( cameraRPos );
 
-		var projL = cameraL.projectionMatrix;
-		var projR = cameraR.projectionMatrix;
+		var projL = cameraL.projectionMatrix.elements;
+		var projR = cameraR.projectionMatrix.elements;
 
 		// VR systems will have identical far and near planes, and
 		// most likely identical top and bottom frustum extents.
@@ -21308,13 +21308,13 @@
 
 		// Calculate the new camera's position offset from the
 		// left camera.
-		var zOffset = ipd / ( leftFovL + rightFovR );
+		var zOffset = ipd / ( leftFovL - rightFovR );
 		var xOffset = zOffset * leftFovL;
 
 		// TODO: Better way to apply this offset?
 		cameraL.matrixWorld.decompose( camera.position, camera.quaternion, camera.scale );
 		camera.translateX( xOffset );
-		camera.translateZ( - zOffset );
+		camera.translateZ( - zOffset * 2 );
 		camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
