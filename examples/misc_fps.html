@@ -262,20 +262,12 @@
 
 			// init 3D stuff
 
-			function makePlatform( jsonUrl, textureUrl, textureQuality ) {
+			function makePlatform( url ) {
 
 				var placeholder = new THREE.Object3D();
 
-				var texture = new THREE.TextureLoader().load( textureUrl );
-				texture.minFilter = THREE.LinearFilter;
-				texture.anisotropy = textureQuality;
-
-				var loader = new THREE.JSONLoader();
-				loader.load( jsonUrl, function ( geometry ) {
-
-					geometry.computeFaceNormals();
-
-					var platform = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+				var loader = new THREE.ObjectLoader();
+				loader.load( url, function ( platform ) {
 
 					platform.name = "platform";
 
@@ -308,11 +300,8 @@
 			scene.background = envMap;
 
 			scene.add( makePlatform(
-				'models/platform/platform.json',
-				'models/platform/platform.jpg',
-				renderer.capabilities.getMaxAnisotropy()
+				'models/json/platform/platform.json'
 			) );
-
 
 			// start the game
 
