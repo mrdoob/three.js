@@ -9,7 +9,7 @@ var cameraLPos = new Vector3();
 var cameraRPos = new Vector3();
 
 /**
- * Assumes 2 cameras that are perpendicular and share an X-axis, and that
+ * Assumes 2 cameras that are parallel and share an X-axis, and that
  * the cameras' projection and world matrices have already been set.
  * And that near and far planes are identical for both cameras.
  */
@@ -31,22 +31,22 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
 	var leftFovL = ( projL[ 8 ] - 1 ) / projL[ 0 ];
 	var rightFovR = ( projR[ 8 ] + 1 ) / projR[ 0 ];
-	var leftL = leftFovL * near;
-	var rightR = rightFovR * near;
+	var leftL = near * leftFovL;
+	var rightR = near * rightFovR;
 	var topL = near * ( projL[ 9 ] + 1 ) / projL[ 5 ];
 	var topR = near * ( projR[ 9 ] + 1 ) / projR[ 5 ];
 	var bottomL = near * ( projL[ 9 ] - 1 ) / projL[ 5 ];
 	var bottomR = near * ( projR[ 9 ] - 1 ) / projR[ 5 ];
 
 	// Calculate the new camera's position offset from the
-	// left camera.
-	var zOffset = ipd / ( leftFovL - rightFovR );
-	var xOffset = zOffset * leftFovL;
+	// left camera. xOffset should be roughly half `ipd`.
+	var zOffset = ipd / ( - leftFovL + rightFovR );
+	var xOffset = zOffset * - leftFovL;
 
 	// TODO: Better way to apply this offset?
 	cameraL.matrixWorld.decompose( camera.position, camera.quaternion, camera.scale );
 	camera.translateX( xOffset );
-	camera.translateZ( - zOffset * 2 );
+	camera.translateZ( zOffset );
 	camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
 	camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
