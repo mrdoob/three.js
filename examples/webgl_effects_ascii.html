@@ -89,10 +89,13 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				// document.body.appendChild( renderer.domElement );
 
 				effect = new THREE.AsciiEffect( renderer );
 				effect.setSize( window.innerWidth, window.innerHeight );
+
+				// Special case: append effect.domElement, instead of renderer.domElement.
+				// AsciiEffect creates a custom domElement (a div container) where the ASCII elements are placed.
+
 				document.body.appendChild( effect.domElement );
 
 				//
