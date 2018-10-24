@@ -470,12 +470,17 @@ Object.assign( ObjectLoader.prototype, {
                     			// Deprecated
 					var array = [];
 					for ( var j = 0; j < data.materials.length; j ++ ) {
-						if (cache[data.materials[ j ].uuid]) {
-							array.push( cache[data.materials[ j ].uuid] );
+
+						if (cache[ data.materials[ j ].uuid ]) {
+
+							array.push( cache[ data.materials[ j ].uuid ] );
+
 						} else {
+
 							var mat = loader.parse( data.materials[ j ] );
 							cache[ data.materials[ j ].uuid ] = mat;
 							array.push( mat );
+
 						}
 
 					}
