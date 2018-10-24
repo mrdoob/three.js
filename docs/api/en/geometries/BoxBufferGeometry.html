@@ -44,12 +44,12 @@
 
 		<h3>[name]([param:Float width], [param:Float height], [param:Float depth], [param:Integer widthSegments], [param:Integer heightSegments], [param:Integer depthSegments])</h3>
 		<p>
-		width — Width of the sides on the X axis. Default is 1.<br />
-		height — Height of the sides on the Y axis. Default is 1.<br />
-		depth — Depth of the sides on the Z axis. Default is 1.<br />
-		widthSegments — Optional. Number of segmented faces along the width of the sides. Default is 1.<br />
-		heightSegments — Optional. Number of segmented faces along the height of the sides. Default is 1.<br />
-		depthSegments — Optional. Number of segmented faces along the depth of the sides. Default is 1.
+		width — Width; that is, the length of the edges parallel to the X axis. Optional; defaults to 1.<br />
+		height — Height; that is, the length of the edges parallel to the Y axis. Optional; defaults to 1.<br />
+		depth — Depth; that is, the length of the edges parallel to the Z axis. Optional; defaults to 1.<br />
+		widthSegments — Number of segmented rectangular faces along the width of the sides. Optional; defaults to 1.<br />
+		heightSegments — Number of segmented rectangular faces along the height of the sides. Optional; defaults to 1.<br />
+		depthSegments — Number of segmented rectangular faces along the depth of the sides. Optional; defaults to 1.<br />
 		</p>
 
 		<h2>Properties</h2>
@@ -59,14 +59,14 @@
 		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
 		</p>
  		<p>
-			Using the above example code above as our basis:
-			<code>
-		geometry.parameters; // outputs an object {width: 1, height: 1, depth: 1, widthSegments: undefined, heightSegments: undefined}
+		Using the above example:
+		<code>
+		geometry.parameters; // {width: 1, height: 1, depth: 1, widthSegments: undefined, heightSegments: undefined, depthSegments: undefined}
 		cube.geometry.parameters; // as above
 		cube.geometry.parameters.width; // === 1
-		cube.geometry.parameters.widthSegments // === undefined.
-			</code>
- 		</p>
+		cube.geometry.parameters.widthSegments; // === undefined.
+		</code>
+		</p>
 
 		<h2>Source</h2>
 
