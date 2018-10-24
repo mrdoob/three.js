@@ -354,7 +354,6 @@ var files = {
 		"misc_fps",
 		"misc_lights_test",
 		"misc_lookat",
-		"misc_ubiquity_test",
 		"misc_ubiquity_test2",
 		"misc_uv_tests"
 	],
