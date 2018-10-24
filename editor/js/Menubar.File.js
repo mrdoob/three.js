@@ -281,10 +281,10 @@ Menubar.File = function ( editor ) {
 	options.add( option );
 
 	// Export STL (Binary)
-	
+
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export STL (Binary)' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/stl_binary' ) );
 	option.onClick( function () {
 
 		var exporter = new THREE.STLExporter();
@@ -293,7 +293,7 @@ Menubar.File = function ( editor ) {
 
 	} );
 	options.add( option );
-	
+
 	//
 
 	options.add( new UI.HorizontalRule() );

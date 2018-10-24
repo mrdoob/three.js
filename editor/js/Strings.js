@@ -20,7 +20,7 @@ var Strings = function ( config ) {
 			'menubar/file/export/gltf': 'Export GLTF',
 			'menubar/file/export/obj': 'Export OBJ',
 			'menubar/file/export/stl': 'Export STL',
-			// 'menubar/file/export/stl_binary': 'Export STL (Binary)',
+			'menubar/file/export/stl_binary': 'Export STL (Binary)',
 			'menubar/file/publish': 'Publish',
 
 			'menubar/edit': 'Edit',
@@ -71,7 +71,7 @@ var Strings = function ( config ) {
 			'menubar/file/export/gltf': '导出GLTF',
 			'menubar/file/export/obj': '导出OBJ',
 			'menubar/file/export/stl': '导出STL',
-			// 'menubar/file/export/stl_binary': '导出STL(二进制)',
+			'menubar/file/export/stl_binary': '导出STL(二进制)',
 			'menubar/file/publish': '发布',
 
 			'menubar/edit': '编辑',
