@@ -43,6 +43,8 @@
 			var normal = new THREE.Vector3();
 			var relativeVelocity = new THREE.Vector3();
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -189,6 +191,8 @@
 
 				//
 
+				var delta = clock.getDelta();
+
 				var range = 3 - radius;
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
@@ -251,7 +255,7 @@
 
 					}
 
-					object.userData.velocity.y -= 0.00098;
+					object.userData.velocity.y -= 0.098 * delta;
 
 				}
 
