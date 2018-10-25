@@ -217,6 +217,7 @@ var files = {
 		"webgl_points_billboards",
 		"webgl_points_dynamic",
 		"webgl_points_sprites",
+		"webgl_points_waves",
 		"webgl_postprocessing",
 		"webgl_postprocessing_advanced",
 		"webgl_postprocessing_afterimage",
