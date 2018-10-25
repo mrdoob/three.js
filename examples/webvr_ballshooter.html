@@ -165,9 +165,9 @@
 					var object = room.children[ count ++ ];
 
 					object.position.copy( controller.position );
-					object.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
-					object.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
-					object.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
+					object.userData.velocity.x = ( Math.random() - 0.5 ) * 3;
+					object.userData.velocity.y = ( Math.random() - 0.5 ) * 3;
+					object.userData.velocity.z = ( Math.random() - 9 );
 					object.userData.velocity.applyQuaternion( controller.quaternion );
 
 					if ( count === room.children.length ) count = 0;
@@ -217,7 +217,7 @@
 						object.position.y = Math.max( object.position.y, radius );
 
 						object.userData.velocity.x *= 0.98;
-						object.userData.velocity.y = - object.userData.velocity.y * 0.9;
+						object.userData.velocity.y = - object.userData.velocity.y * 0.8;
 						object.userData.velocity.z *= 0.98;
 
 					}
@@ -253,18 +253,11 @@
 							object.userData.velocity.sub( normal );
 							object2.userData.velocity.add( normal );
 
-							var impact = relativeVelocity.length() / 10;
-
-							object.material.emissive.r = Math.min( 1, object.material.emissive.r + impact );
-							object2.material.emissive.r = Math.min( 1, object2.material.emissive.r + impact );
-
 						}
 
 					}
 
 					object.userData.velocity.y -= 9.8 * delta;
-
-					object.material.emissive.r = Math.max( 0, object.material.emissive.r - 0.5 * delta );
 
 				}
 
