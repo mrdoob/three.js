@@ -6,6 +6,7 @@ Sidebar.Settings = function ( editor ) {
 
 	var config = editor.config;
 	var signals = editor.signals;
+	var strings = editor.strings;
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
@@ -37,7 +38,7 @@ Sidebar.Settings = function ( editor ) {
 
 	} );
 
-	languageRow.add( new UI.Text( 'Language' ).setWidth( '90px' ) );
+	languageRow.add( new UI.Text( strings.getKey( 'sidebar/settings/language' ) ).setWidth( '90px' ) );
 	languageRow.add( language );
 
 	container.add( languageRow );
@@ -68,7 +69,7 @@ Sidebar.Settings = function ( editor ) {
 
 	} );
 
-	themeRow.add( new UI.Text( 'Theme' ).setWidth( '90px' ) );
+	themeRow.add( new UI.Text( strings.getKey( 'sidebar/settings/theme' ) ).setWidth( '90px' ) );
 	themeRow.add( theme );
 
 	container.add( themeRow );

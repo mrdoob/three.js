@@ -13,6 +13,7 @@ Sidebar.Object = function ( editor ) {
 
 	// Actions
 
+	/*
 	var objectActions = new UI.Select().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
 	objectActions.setOptions( {
 
@@ -50,7 +51,8 @@ Sidebar.Object = function ( editor ) {
 		this.setValue( 'Actions' );
 
 	} );
-	// container.addStatic( objectActions );
+	container.addStatic( objectActions );
+	*/
 
 	// type
 

@@ -9,6 +9,7 @@ var Strings = function ( config ) {
 	var values = {
 
 		en: {
+
 			'menubar/file': 'File',
 			'menubar/file/new': 'New',
 			'menubar/file/import': 'Import',
@@ -56,10 +57,48 @@ var Strings = function ( config ) {
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
-			'menubar/help/about': 'About'
+			'menubar/help/about': 'About',
+
+			'sidebar/scene': 'Scene',
+			'sidebar/scene/background': 'Background',
+			'sidebar/scene/fog': 'Fog',
+
+			'sidebar/properties/object': 'Object',
+			'sidebar/properties/geometry': 'Geometry',
+			'sidebar/properties/material': 'Material',
+			'sidebar/properties/script': 'Script',
+
+			'sidebar/project': 'Project',
+			'sidebar/project/title': 'Title',
+			'sidebar/project/editable': 'Editable',
+			'sidebar/project/vr': 'VR',
+			'sidebar/project/renderer': 'Renderer',
+
+			'sidebar/settings': 'Settings',
+			'sidebar/settings/language': 'Language',
+			'sidebar/settings/theme': 'Theme',
+
+			'sidebar/settings/shortcuts/translate': 'Translate',
+			'sidebar/settings/shortcuts/rotate': 'Rotate',
+			'sidebar/settings/shortcuts/scale': 'Scale',
+			'sidebar/settings/shortcuts/undo': 'Undo',
+			'sidebar/settings/shortcuts/focus': 'Focus',
+
+			'sidebar/settings/viewport/grid': 'Grid',
+
+			'toolbar/translate': 'Translate',
+			'toolbar/rotate': 'Rotate',
+			'toolbar/scale': 'Scale',
+			'toolbar/local': 'Local',
+
+			'viewport/info/objects': 'Objects',
+			'viewport/info/vertices': 'Vertices',
+			'viewport/info/triangles': 'Triangles'
+
 		},
 
 		zh: {
+
 			'menubar/file': '文件',
 			'menubar/file/new': '新建',
 			'menubar/file/import': '导入',
@@ -107,7 +146,42 @@ var Strings = function ( config ) {
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
-			'menubar/help/about': '关于'
+			'menubar/help/about': '关于',
+
+			'sidebar/scene': '场景',
+			'sidebar/scene/background': '背景',
+			'sidebar/scene/fog': '雾',
+
+			'sidebar/properties/object': '属性',
+			'sidebar/properties/geometry': '几何组件',
+			'sidebar/properties/material': '材质组件',
+			'sidebar/properties/script': '脚本',
+
+			'sidebar/project': '项目',
+			'sidebar/project/title': '标题',
+			'sidebar/project/editable': '编辑性',
+			'sidebar/project/vr': '虚拟现实',
+			'sidebar/project/renderer': '渲染器',
+
+			'sidebar/settings': '设置',
+			'sidebar/settings/language': '语言',
+			'sidebar/settings/theme': '主题',
+			'sidebar/settings/shortcuts/translate': '移动',
+			'sidebar/settings/shortcuts/rotate': '旋转',
+			'sidebar/settings/shortcuts/scale': '缩放',
+			'sidebar/settings/shortcuts/undo': '撤销',
+			'sidebar/settings/shortcuts/focus': '聚焦',
+			'sidebar/settings/viewport/grid': '网格',
+
+			'toolbar/translate': '移动',
+			'toolbar/rotate': '旋转',
+			'toolbar/scale': '缩放',
+			'toolbar/local': '本地',
+
+			'viewport/info/objects': '物体',
+			'viewport/info/vertices': '顶点',
+			'viewport/info/triangles': '三角形'
+
 		}
 
 	};
