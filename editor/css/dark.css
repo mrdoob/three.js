@@ -220,6 +220,8 @@ select {
 
 	#toolbar button {
 		margin-right: 6px;
+		line-height: 14px;
+		height: 24px;
 	}
 
 .Outliner {
