@@ -71,7 +71,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_selected.position.copy( _intersection.sub( _offset ) );
+				_selected.position.copy(_selected.parent.worldToLocal(_intersection.sub(_offset)));
 
 			}
 
@@ -89,7 +89,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			var object = intersects[ 0 ].object;
 
-			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), object.position );
+			_plane.setFromNormalAndCoplanarPoint(_camera.getWorldDirection(_plane.normal), object.getWorldPosition(new THREE.Vector3()));
 
 			if ( _hovered !== object ) {
 
@@ -129,7 +129,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_offset.copy( _intersection ).sub( _selected.position );
+				_offset.copy(_intersection).sub(_selected.getWorldPosition(new THREE.Vector3()));
 
 			}
 
@@ -174,7 +174,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_selected.position.copy( _intersection.sub( _offset ) );
+				_selected.position.copy(_selected.parent.worldToLocal(_intersection.sub(_offset)));
 
 			}
 
@@ -204,11 +204,11 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			_selected = intersects[ 0 ].object;
 
-			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _selected.position );
+			_plane.setFromNormalAndCoplanarPoint(_camera.getWorldDirection(_plane.normal), _selected.getWorldPosition(new THREE.Vector3()));
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_offset.copy( _intersection ).sub( _selected.position );
+				_offset.copy(_intersection).sub(_selected.getWorldPosition(new THREE.Vector3()));
 
 			}
 
