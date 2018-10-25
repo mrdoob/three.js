@@ -1,175 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - skinning + morphing [knight]</title>
+		<title>three.js webgl - skinning and morphing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #fff;
+				font-family: Monospace;
+				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
-
 			#info {
 				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
 			}
-
-			#meminfo {
-				margin-top: 8px;
-				font-size: 10px;
-				display: none;
+			#info p {
+				max-width: 600px;
+				margin-left: auto;
+				margin-right: auto;
+				padding: 0 2em;
 			}
-
-			a {
-				color: #0af;
+			#info a {
+				color: #2fa1d6;
+				font-weight: bold;
+			}
+			.dg.ac {
+				z-index: 999 !important;
 			}
 		</style>
 	</head>
 
 	<body>
-
-		<div id="container"></div>
-
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - clip system
-		- knight by <a href="https://vimeo.com/36113323" target="_blank" rel="noopener">apendua</a>
-			<div id="meminfo"></div>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - skinning and morphing<br />
+			<p>
+				The animation system allows clips to be played individually, looped, or crossfaded with
+				other clips. This example shows a character looping in one of several base animation states,
+				then transitioning smoothly to one-time actions. Facial expressions are controlled
+				independently with morph targets.
+			</p>
+			Model by
+			<a href="https://www.patreon.com/quaternius" target="_blank" rel="noopener">Quaternius</a>,
+			modifications by <a href="https://donmccurdy.com/" target="_blank" rel="noopener">Don McCurdy</a>. CC0.<br />
 		</div>
 
 		<script src="../build/three.js"></script>
 
+		<script src="js/loaders/GLTFLoader.js"></script>
+
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = - 250;
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, stats;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var camera, scene;
-			var renderer;
+			}
 
-			var mesh, mesh2, helper;
+			var container, stats, clock, gui, mixer, actions, activeAction, previousAction;
+			var camera, scene, renderer, model, face;
 
-			var mixer, facesClip, bonesClip;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-			var clock = new THREE.Clock();
-
-			var domMemInfo = document.getElementById( 'meminfo' ),
-				showMemInfo = false;
-
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			var api = { state: 'Walking' };
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				camera.position.z = 2200;
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 100 );
+				camera.position.set( - 5, 3, 10 );
+				camera.lookAt( new THREE.Vector3( 0, 2, 0 ) );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
+				scene.background = new THREE.Color( 0xe0e0e0 );
+				scene.fog = new THREE.Fog( 0xe0e0e0, 20, 100 );
 
-				scene.add( camera );
+				clock = new THREE.Clock();
 
-				// GROUND
+				// lights
 
-				var geometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				var material = new THREE.MeshPhongMaterial( { emissive: 0x888888 } );
-
-				var ground = new THREE.Mesh( geometry, material );
-				ground.position.set( 0, FLOOR, 0 );
-				ground.rotation.x = - Math.PI / 2;
-				scene.add( ground );
-
-				ground.receiveShadow = true;
-
-
-				// LIGHTS
-
-				scene.add( new THREE.HemisphereLight( 0x111111, 0x444444 ) );
-
-				var light = new THREE.DirectionalLight( 0xebf3ff, 1.5 );
-				light.position.set( 0, 140, 500 ).multiplyScalar( 1.1 );
+				var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				light.position.set( 0, 20, 0 );
 				scene.add( light );
 
-				light.castShadow = true;
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 20, 10 );
+				scene.add( light );
 
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
+				// ground
 
-				var d = 390;
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				mesh.rotation.x = - Math.PI / 2;
+				scene.add( mesh );
 
-				light.shadow.camera.left = - d;
-				light.shadow.camera.right = d;
-				light.shadow.camera.top = d * 1.5;
-				light.shadow.camera.bottom = - d;
+				var grid = new THREE.GridHelper( 200, 40, 0x000000, 0x000000 );
+				grid.material.opacity = 0.2;
+				grid.material.transparent = true;
+				scene.add( grid );
 
-				light.shadow.camera.far = 3500;
+				// model
 
-				// RENDERER
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function( gltf ) {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
+					model = gltf.scene;
+					scene.add( model );
 
-				container.appendChild( renderer.domElement );
+					createGUI( model, gltf.animations );
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				}, undefined, function( e ) {
 
-				renderer.shadowMap.enabled = true;
-
-
-				// STATS
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				//
-
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
-
-					createScene( geometry, materials, 0, FLOOR, - 300, 60 );
-
-					// GUI
-
-					initGUI();
+					console.error( e );
 
 				} );
 
-				//
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
+				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				// stats
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+			}
+
+			function createGUI( model, animations ) {
+
+				var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
+				var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
+
+				gui = new dat.GUI();
+
+				mixer = new THREE.AnimationMixer( model );
+
+				actions = {};
+
+				for ( var i = 0; i < animations.length; i++ ) {
+
+					var clip = animations[ i ];
+					var action = mixer.clipAction( clip );
+					actions[ clip.name ] = action;
+
+					if ( emotes.indexOf( clip.name ) >= 0 || states.indexOf( clip.name ) >= 4 ) {
+
+							action.clampWhenFinished = true;
+							action.loop = THREE.LoopOnce;
+
+					}
+
+				}
+
+				// states
+
+				var statesFolder = gui.addFolder( 'States' );
+
+				var clipCtrl = statesFolder.add( api, 'state' ).options( states );
+
+				clipCtrl.onChange( function() {
+
+					fadeToAction( api.state, 0.5 );
+
+				} );
+
+				statesFolder.open();
+
+				// emotes
+
+				var emoteFolder = gui.addFolder( 'Emotes' );
+
+				function createEmoteCallback( name ) {
+
+					api[ name ] = function() {
+
+						fadeToAction( name, 0.2 );
+
+						mixer.addEventListener( 'finished', restoreState );
+
+					};
+
+					emoteFolder.add( api, name );
+
+				}
+
+				function restoreState() {
+
+					mixer.removeEventListener( 'finished', restoreState );
+
+					fadeToAction( api.state, 0.2 );
+
+				}
+
+				for ( var i = 0; i < emotes.length; i++ ) {
+
+					createEmoteCallback( emotes[ i ] );
+
+				}
+
+				emoteFolder.open();
+
+				// expressions
+
+				face = model.getObjectByName( 'Head_2' );
+
+				var expressions = Object.keys( face.morphTargetDictionary );
+				var expressionFolder = gui.addFolder('Expressions');
+
+				for ( var i = 0; i < expressions.length; i++ ) {
+
+					expressionFolder.add( face.morphTargetInfluences, i, 0, 1 ).name( expressions[ i ] );
+
+				}
+
+				activeAction = actions['Walking'];
+				activeAction.play();
+
+				expressionFolder.open();
+
+			}
+
+			function fadeToAction( name, duration ) {
+
+				previousAction = activeAction;
+				activeAction = actions[ name ];
+
+				if ( previousAction !== activeAction ) {
+
+					previousAction.fadeOut( duration );
+
+				}
+
+				activeAction
+					.reset()
+					.setEffectiveTimeScale( 1 )
+					.setEffectiveWeight( 1 )
+					.fadeIn( duration )
+					.play();
 
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -178,485 +263,19 @@
 
 			}
 
-			function createScene( geometry, materials, x, y, z, s ) {
-
-				geometry.computeBoundingBox();
-				var bb = geometry.boundingBox;
-
-				for ( var i = 0; i < materials.length; i ++ ) {
-
-					var m = materials[ i ];
-					m.skinning = true;
-					m.morphTargets = true;
-
-					m.specular.setHSL( 0, 0, 0.1 );
-					m.color.setHSL( 0.6, 0, 0.6 );
-
-				}
-
-				mesh = new THREE.SkinnedMesh( geometry, materials );
-				mesh.name = "Knight Mesh";
-				mesh.position.set( x, y - bb.min.y * s, z );
-				mesh.scale.set( s, s, s );
-				scene.add( mesh );
-
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-
-
-				mesh2 = new THREE.SkinnedMesh( geometry, materials );
-				mesh2.name = "Lil' Bro Mesh";
-				mesh2.position.set( x - 240, y - bb.min.y * s, z + 500 );
-				mesh2.scale.set( s / 2, s / 2, s / 2 );
-				mesh2.rotation.y = THREE.Math.degToRad( 60 );
-
-				mesh2.visible = false;
-
-				mesh2.castShadow = true;
-				mesh2.receiveShadow = true;
-				scene.add( mesh2 );
-
-				helper = new THREE.SkeletonHelper( mesh );
-				helper.visible = false;
-				scene.add( helper );
-
-				mixer = new THREE.AnimationMixer( mesh );
-
-				bonesClip = geometry.animations[ 0 ];
-				facesClip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', mesh.geometry.morphTargets, 3 );
-
-			}
-
-			function initGUI() {
-
-				var API = {
-					'show model': true,
-					'show skeleton': false,
-					'show 2nd model': false,
-					'show mem. info': false
-				};
-
-				var gui = new dat.GUI();
-
-				gui.add( API, 'show model' ).onChange( function () {
-
-					mesh.visible = API[ 'show model' ];
-
-				} );
-
-				gui.add( API, 'show skeleton' ).onChange( function () {
-
-					helper.visible = API[ 'show skeleton' ];
-
-				} );
-
-				gui.add( API, 'show 2nd model' ).onChange( function () {
-
-					mesh2.visible = API[ 'show 2nd model' ];
-
-				} );
-
-
-				gui.add( API, 'show mem. info' ).onChange( function () {
-
-					showMemInfo = API[ 'show mem. info' ];
-					domMemInfo.style.display = showMemInfo ? 'block' : 'none';
-
-				} );
-
-				// utility function used for drop-down options lists in the GUI
-				var objectNames = function ( objects ) {
-
-					var result = [];
-
-					for ( var i = 0, n = objects.length; i !== n; ++ i ) {
-
-						var obj = objects[ i ];
-						result.push( obj && obj.name || '&lt;null&gt;' );
-
-					}
-
-					return result;
-
-				};
-
-
-				// creates gui folder with tests / examples for the action API
-				var clipControl = function clipControl( gui, mixer, clip, rootObjects ) {
-
-					var folder = gui.addFolder( "Clip '" + clip.name + "'" ),
-
-						rootNames = objectNames( rootObjects ),
-						rootName = rootNames[ 0 ],
-						root = rootObjects[ 0 ],
-
-						action = null,
-
-						API = {
-
-							'play()': function play() {
-
-								action = mixer.clipAction( clip, root );
-								action.play();
-
-							},
-
-							'stop()': function () {
-
-								action = mixer.clipAction( clip, root );
-								action.stop();
-
-							},
-
-							'reset()': function () {
-
-								action = mixer.clipAction( clip, root );
-								action.reset();
-
-							},
-
-							get 'time ='() {
-
-								return action !== null ? action.time : 0;
-
-							},
-
-							set 'time ='( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.time = value;
-
-							},
-
-							get 'paused ='() {
-
-								return action !== null && action.paused;
-
-							},
-
-							set 'paused ='( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.paused = value;
-
-							},
-
-							get 'enabled ='() {
-
-								return action !== null && action.enabled;
-
-							},
-
-							set 'enabled ='( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.enabled = value;
-
-							},
-
-							get 'clamp ='() {
-
-								return action !== null ? action.clampWhenFinished : false;
-
-							},
-
-							set 'clamp ='( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.clampWhenFinished = value;
-
-							},
-
-							get 'isRunning() ='() {
-
-								return action !== null && action.isRunning();
-
-							},
-
-							set 'isRunning() ='( value ) {
-
-								alert( "Read only - this is the result of a method." );
-
-							},
-
-							'play delayed': function () {
-
-								action = mixer.clipAction( clip, root );
-								action.startAt( mixer.time + 0.5 ).play();
-
-							},
-
-							get 'weight ='() {
-
-								return action !== null ? action.weight : 1;
-
-							},
-
-							set 'weight ='( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.weight = value;
-
-							},
-
-							get 'eff. weight'() {
-
-								return action !== null ? action.getEffectiveWeight() : 1;
-
-							},
-
-							set 'eff. weight'( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.setEffectiveWeight( value );
-
-							},
-
-							'fade in': function () {
-
-								action = mixer.clipAction( clip, root );
-								action.reset().fadeIn( 0.25 ).play();
-
-							},
-
-							'fade out': function () {
-
-								action = mixer.clipAction( clip, root );
-								action.fadeOut( 0.25 ).play();
-
-							},
-
-							get 'timeScale ='() {
-
-								return ( action !== null ) ? action.timeScale : 1;
-
-							},
-
-							set 'timeScale ='( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.timeScale = value;
-
-							},
-
-							get 'eff.T.Scale'() {
-
-								return ( action !== null ) ? action.getEffectiveTimeScale() : 1;
-
-							},
-
-							set 'eff.T.Scale'( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.setEffectiveTimeScale( value );
-
-							},
-
-							'time warp': function () {
-
-								action = mixer.clipAction( clip, root );
-								var timeScaleNow = action.getEffectiveTimeScale();
-								var destTimeScale = timeScaleNow > 0 ? - 1 : 1;
-								action.warp( timeScaleNow, destTimeScale, 4 ).play();
-
-							},
-
-							get 'loop mode'() {
-
-								return action !== null ? action.loop : THREE.LoopRepeat;
-
-							},
-
-							set 'loop mode'( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.loop = + value;
-
-							},
-
-							get 'repetitions'() {
-
-								return action !== null ? action.repetitions : Infinity;
-
-							},
-
-							set 'repetitions'( value ) {
-
-								action = mixer.clipAction( clip, root );
-								action.repetitions = + value;
-
-							},
-
-							get 'local root'() {
-
-								return rootName;
-
-							},
-
-							set 'local root'( value ) {
-
-								rootName = value;
-								root = rootObjects[ rootNames.indexOf( rootName ) ];
-								action = mixer.clipAction( clip, root );
-
-							}
-
-						};
-
-					folder.add( API, 'play()' );
-					folder.add( API, 'stop()' );
-					folder.add( API, 'reset()' );
-					folder.add( API, 'time =', 0, clip.duration ).listen();
-					folder.add( API, 'paused =' ).listen();
-					folder.add( API, 'enabled =' ).listen();
-					folder.add( API, 'clamp =' );
-					folder.add( API, 'isRunning() =' ).listen();
-					folder.add( API, 'play delayed' );
-					folder.add( API, 'weight =', 0, 1 ).listen();
-					folder.add( API, 'eff. weight', 0, 1 ).listen();
-					folder.add( API, 'fade in' );
-					folder.add( API, 'fade out' );
-					folder.add( API, 'timeScale =', - 2, 2 ).listen();
-					folder.add( API, 'eff.T.Scale', - 2, 2 ).listen();
-					folder.add( API, 'time warp' );
-					folder.add( API, 'loop mode', {
-						"LoopOnce": THREE.LoopOnce,
-						"LoopRepeat": THREE.LoopRepeat,
-						"LoopPingPong": THREE.LoopPingPong
-					} );
-					folder.add( API, 'repetitions', 0, Infinity );
-					folder.add( API, 'local root', rootNames );
-
-					API[ 'play()' ]();
-
-				}; // function clipControl
-
-				// one folder per clip
-				clipControl( gui, mixer, bonesClip, [ null, mesh, mesh2 ] );
-				clipControl( gui, mixer, facesClip, [ null, mesh, mesh2 ] );
-
-				var memoryControl = function ( gui, mixer, clips, rootObjects ) {
-
-					var clipNames = objectNames( clips ),
-						rootNames = objectNames( rootObjects );
-
-					var folder = gui.addFolder( "Memory Management" ),
-
-						clipName 	= clipNames[ 0 ],
-						clip 		= clips[ 0 ],
-
-						rootName 	= rootNames[ 0 ],
-						root		= rootObjects[ 0 ],
-
-						API = {
-
-							get 'clip'() {
-
-								return clipName;
-
-							},
-
-							set 'clip'( value ) {
-
-								clipName = value;
-								clip = clips[ clipNames.indexOf( clipName ) ];
-
-							},
-
-							get 'root'() {
-
-								return rootName;
-
-							},
-
-							set 'root'( value ) {
-
-								rootName = value;
-								root = rootObjects[ rootNames.indexOf( rootName ) ];
-
-							},
-
-							'uncache clip': function () {
-
-								mixer.uncacheClip( clip );
-
-							},
-
-							'uncache root': function () {
-
-								mixer.uncacheRoot( root );
-
-							},
-
-							'uncache action': function () {
-
-								mixer.uncacheAction( clip, root );
-
-							}
-
-						};
-
-					folder.add( API, 'clip', clipNames );
-					folder.add( API, 'root', rootNames );
-					folder.add( API, 'uncache root' );
-					folder.add( API, 'uncache clip' );
-					folder.add( API, 'uncache action' );
-
-				};
-
-				memoryControl( gui, mixer,
-					[ bonesClip, facesClip ], [ mesh, mesh2 ] );
-
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
-
-			}
-
 			//
 
 			function animate() {
 
+				var dt = clock.getDelta();
+
+				if ( mixer ) mixer.update( dt );
+
 				requestAnimationFrame( animate );
 
-				stats.begin();
-				render();
-				stats.end();
-
-				if ( showMemInfo ) {
-
-					var s = mixer.stats,
-						ciS = s.controlInterpolants;
-
-					domMemInfo.innerHTML =
-							s.actions.inUse + " / " + s.actions.total + " actions " +
-							s.bindings.inUse + " / " + s.bindings.total + " bindings " +
-							ciS.inUse + " / " + ciS.total + " control interpolants";
-
-				}
-
-			}
-
-			function render() {
-
-				var delta = 0.75 * clock.getDelta();
-
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y = THREE.Math.clamp( camera.position.y + ( - mouseY - camera.position.y ) * .05, 0, 1000 );
-
-				camera.lookAt( scene.position );
-
-				if ( mixer ) {
-
-					mixer.update( delta );
-
-				}
-
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 
