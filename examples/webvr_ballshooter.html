@@ -199,7 +199,9 @@
 
 					var object = room.children[ i ];
 
-					object.position.add( object.userData.velocity );
+					object.position.x += object.userData.velocity.x * delta;
+					object.position.y += object.userData.velocity.y * delta;
+					object.position.z += object.userData.velocity.z * delta;
 
 					// keep objects inside room
 
@@ -215,7 +217,7 @@
 						object.position.y = Math.max( object.position.y, radius );
 
 						object.userData.velocity.x *= 0.98;
-						object.userData.velocity.y = - object.userData.velocity.y * 0.8;
+						object.userData.velocity.y = - object.userData.velocity.y * 0.9;
 						object.userData.velocity.z *= 0.98;
 
 					}
@@ -251,11 +253,18 @@
 							object.userData.velocity.sub( normal );
 							object2.userData.velocity.add( normal );
 
+							var impact = relativeVelocity.length() / 10;
+
+							object.material.emissive.r = Math.min( 1, object.material.emissive.r + impact );
+							object2.material.emissive.r = Math.min( 1, object2.material.emissive.r + impact );
+
 						}
 
 					}
 
-					object.userData.velocity.y -= 0.098 * delta;
+					object.userData.velocity.y -= 9.8 * delta;
+
+					object.material.emissive.r = Math.max( 0, object.material.emissive.r - 0.5 * delta );
 
 				}
 
