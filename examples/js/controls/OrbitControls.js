@@ -426,6 +426,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
+
+	function isPanEvent( event ) {
+
+		return scope.panKeys.some( function ( key ) {
+
+			return event[ key ];
+
+		} );
+
+	}
+
 	//
 	// event callbacks - update the object state
 	//
@@ -682,7 +693,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			case scope.mouseButtons.LEFT:
 
-				if ( scope.panKeys.some( key => event[ key ] ) ) {
+				if ( isPanEvent( event ) ) {
 
 					if ( scope.enablePan === false ) return;
 
