@@ -54,6 +54,7 @@ var files = {
 		"webgl_interactive_lines",
 		"webgl_interactive_points",
 		"webgl_interactive_raycasting_points",
+		"webgl_interactive_boxselection",
 		"webgl_interactive_voxelpainter",
 		"webgl_kinect",
 		"webgl_layers",
