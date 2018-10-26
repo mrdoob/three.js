@@ -429,11 +429,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function isPanEvent( event ) {
 
-		return scope.panKeys.some( function ( key ) {
+		var hasKey = function ( key ) {
 
 			return event[ key ];
 
-		} );
+		};
+
+		return scope.panKeys.some( hasKey );
 
 	}
 
