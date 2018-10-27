@@ -289,6 +289,7 @@ var files = {
 		"webgl_buffergeometry_instancing_lambert",
 		"webgl_buffergeometry_lines",
 		"webgl_buffergeometry_lines_indexed",
+		"webgl_buffergeometry_morphtargets",
 		"webgl_buffergeometry_points",
 		"webgl_buffergeometry_points_interleaved",
 		"webgl_buffergeometry_rawshader",
