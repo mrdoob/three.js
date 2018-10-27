@@ -6,7 +6,7 @@ THREE.ChromaticPass = function () {
 
 	THREE.Pass.call( this );
 
-	this.material = this.getVignettingMaterial();
+	this.material = this.getChromaticMaterial();
 
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
@@ -42,7 +42,7 @@ THREE.ChromaticPass.prototype = Object.assign( Object.create( THREE.Pass.prototy
 
 	},
 
-	getVignettingMaterial: function () {
+	getChromaticMaterial: function () {
 		return new THREE.ShaderMaterial( {
 
 			defines: {
