@@ -150,18 +150,18 @@
 
 				// Set up dat.GUI to control targets
 				var params = {
-					squash: 0,
-					lean: 0,
+					Squash: 0,
+					Lean: 0,
 				};
 				var gui = new dat.GUI();
 				var folder = gui.addFolder( 'Morph Targets' );
 
-				folder.add( params, 'squash', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+				folder.add( params, 'Squash', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
 
 					mesh.morphTargetInfluences[ 0 ] = value;
 
 				} );
-				folder.add( params, 'lean', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+				folder.add( params, 'Lean', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
 
 					mesh.morphTargetInfluences[ 1 ] = value;
 
