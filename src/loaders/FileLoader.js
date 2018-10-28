@@ -168,7 +168,8 @@ Object.assign( FileLoader.prototype, {
 
 			request.addEventListener( 'load', function ( event ) {
 
-				var response = event.target.response;
+				var target = event.target;
+				var response = target.response;
 
 				Cache.add( url, response );
 
@@ -176,12 +177,12 @@ Object.assign( FileLoader.prototype, {
 
 				delete loading[ url ];
 
-				if ( event.target.status === 200 || event.target.status === 0 ) {
+				if ( target.status === 200 || target.status === 0 ) {
 
 					// Some browsers return HTTP Status 0 when using non-http protocol
 					// e.g. 'file://' or 'data://'. Handle as success.
 
-					if ( event.target.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+					if ( target.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
 					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
