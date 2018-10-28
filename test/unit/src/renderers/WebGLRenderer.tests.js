@@ -7,9 +7,17 @@ import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer';
 
 var customDocument = function () {
 
-	this.createElementNS = function ( elementName ) {
+	this.createElementNS = function ( namespace, elementName ) {
 
-		return new customCanvas();
+		if ( namespace === "http://www.w3.org/1999/xhtml" && elementName === "canvas" ) {
+
+			return new customCanvas();
+
+		} else {
+
+			throw new Error( "customDocument.CreateElementNS has not implemented following element " + elementName + " from namespace " + namespace + "." );
+
+		}
 
 	};
 
@@ -20,15 +28,23 @@ var customCanvas = function () {
 	this.width = 200;
 	this.height = 200;
 	this.addEventListener = function () {};
-	this.getContext = function ( context ) {
+	this.getContext = function ( contextName ) {
 
-		return new CustomWebGLContext();
+		if ( contextName === "webgl" ) {
+
+			return new customWebGLContext();
+
+		} else {
+
+			throw new Error( "customCanvas.getContext has not implemented following context " + contextName + "." );
+
+		}
 
 	};
 
 };
 
-var CustomWebGLContext = function () {
+var customWebGLContext = function () {
 
 	this.DEPTH_BUFFER_BIT = 256;
 	this.STENCIL_BUFFER_BIT = 1024;
@@ -480,26 +496,19 @@ var CustomWebGLContext = function () {
 
 };
 
-
-CustomWebGLContext.prototype.getParameter = function ( parameterID ) {
-
-	return parameters[ parameterID ];
-
-};
-
 export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGLRenderer', ( hooks ) => {
 
 		// You can invoke the hooks methods more than once.
-		hooks.beforeEach( function ( assert ) {
+		hooks.beforeEach( function () {
 
 			global.__old__document__ = global.document;
 			global.document = new customDocument();
 
 		} );
 
-		hooks.afterEach( function ( assert ) {
+		hooks.afterEach( function () {
 
 			global.document = global.__old__document__;
 			global.__old__document__ = undefined;
@@ -512,6 +521,20 @@ export default QUnit.module( 'Renderers', () => {
 
 			var webGLRenderer = new WebGLRenderer();
 			assert.ok( webGLRenderer, "webGLRenderer instanciated" );
+			assert.ok( webGLRenderer.domElement instanceof customCanvas, "webGLRenderer instanciated" );
+			assert.ok( webGLRenderer.context instanceof customWebGLContext, "webGLRenderer instanciated" );
+
+			var canvas = new customCanvas();
+			webGLRenderer = new WebGLRenderer( { canvas: canvas } );
+			assert.ok( webGLRenderer, "webGLRenderer instanciated" );
+			assert.ok( webGLRenderer.domElement === canvas, "webGLRenderer instanciated" );
+			assert.ok( webGLRenderer.context instanceof customWebGLContext, "webGLRenderer instanciated" );
+
+			var context = new customWebGLContext();
+			webGLRenderer = new WebGLRenderer( { canvas: canvas, context: context } );
+			assert.ok( webGLRenderer, "webGLRenderer instanciated" );
+			assert.ok( webGLRenderer.domElement === canvas, "webGLRenderer instanciated" );
+			assert.ok( webGLRenderer.context === context, "webGLRenderer instanciated" );
 
 		} );
 
