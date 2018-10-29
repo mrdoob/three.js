@@ -74,9 +74,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// The four arrow keys
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
-	// The panning keys
-	this.panKeys = [ 'ctrlKey', 'metaKey' ];
-
 	// Mouse buttons
 	this.mouseButtons = { LEFT: THREE.MOUSE.LEFT, MIDDLE: THREE.MOUSE.MIDDLE, RIGHT: THREE.MOUSE.RIGHT };
 
@@ -426,19 +423,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-
-	function isPanEvent( event ) {
-
-		var hasKey = function ( key ) {
-
-			return event[ key ];
-
-		};
-
-		return scope.panKeys.some( hasKey );
-
-	}
-
 	//
 	// event callbacks - update the object state
 	//
@@ -695,7 +679,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			case scope.mouseButtons.LEFT:
 
-				if ( isPanEvent( event ) ) {
+				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
 					if ( scope.enablePan === false ) return;
 
