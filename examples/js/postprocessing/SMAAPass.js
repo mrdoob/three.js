@@ -27,42 +27,39 @@ THREE.SMAAPass = function ( width, height ) {
 	this.weightsRT.texture.name = "SMAAPass.weights";
 
 	// textures
+	var self = this;
 
 	var areaTextureImage = new Image();
-	areaTextureImage.src = this.getAreaTexture();
-
 	this.areaTexture = new THREE.Texture();
+
+	areaTextureImage.src = this.getAreaTexture();
+	areaTextureImage.onload = function() {
+		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
+		self.areaTexture.needsUpdate = true;
+	};
+	
 	this.areaTexture.name = "SMAAPass.area";
 	this.areaTexture.image = areaTextureImage;
 	this.areaTexture.format = THREE.RGBFormat;
 	this.areaTexture.minFilter = THREE.LinearFilter;
 	this.areaTexture.generateMipmaps = false;
-	this.areaTexture.needsUpdate = false;
 	this.areaTexture.flipY = false;
 
 	var searchTextureImage = new Image();
-	searchTextureImage.src = this.getSearchTexture();
-
 	this.searchTexture = new THREE.Texture();
+	
+	searchTextureImage.src = this.getSearchTexture();
+	searchTextureImage.onload = function() {
+		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
+		self.searchTexture.needsUpdate = true;
+	};
+	
 	this.searchTexture.name = "SMAAPass.search";
 	this.searchTexture.image = searchTextureImage;
 	this.searchTexture.magFilter = THREE.NearestFilter;
 	this.searchTexture.minFilter = THREE.NearestFilter;
 	this.searchTexture.generateMipmaps = false;
-	this.searchTexture.needsUpdate = false;
 	this.searchTexture.flipY = false;
-
-	var self = this;
-
-	setTimeout( function () {
-
-		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
-		// using setTimeout() avoids the warning "Texture marked for update but image is incomplete"
-
-		self.searchTexture.needsUpdate = true;
-		self.areaTexture.needsUpdate = true;
-
-	}, 0 );
 
 	// materials - pass 1
 
