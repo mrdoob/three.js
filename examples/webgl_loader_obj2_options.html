@@ -141,7 +141,7 @@
 					var helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
 					this.scene.add( helper );
 
-					var geometry = new THREE.BoxGeometry( 10, 10, 10 );
+					var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 					var material = new THREE.MeshNormalMaterial();
 					this.cube = new THREE.Mesh( geometry, material );
 					this.cube.position.set( 0, 0, 0 );

@@ -165,7 +165,7 @@
 					pivot.rotation.x = Math.PI / 5.5;
 					controller.add( pivot );
 
-					var range = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
+					var range = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
 					pivot.add( range );
 
 					controller1.add( controller.clone() );
