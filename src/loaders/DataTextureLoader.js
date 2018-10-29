@@ -35,11 +35,11 @@ Object.assign( DataTextureLoader.prototype, {
 
 			if ( ! texData ) return;
 
-			if ( undefined !== texData.image ) {
+			if ( texData.image !== undefined ) {
 
 				texture.image = texData.image;
 
-			} else if ( undefined !== texData.data ) {
+			} else if ( texData.data !== undefined ) {
 
 				texture.image.width = texData.width;
 				texture.image.height = texData.height;
@@ -47,32 +47,32 @@ Object.assign( DataTextureLoader.prototype, {
 
 			}
 
-			texture.wrapS = undefined !== texData.wrapS ? texData.wrapS : ClampToEdgeWrapping;
-			texture.wrapT = undefined !== texData.wrapT ? texData.wrapT : ClampToEdgeWrapping;
+			texture.wrapS = texData.wrapS !== undefined ? texData.wrapS : ClampToEdgeWrapping;
+			texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : ClampToEdgeWrapping;
 
-			texture.magFilter = undefined !== texData.magFilter ? texData.magFilter : LinearFilter;
-			texture.minFilter = undefined !== texData.minFilter ? texData.minFilter : LinearMipMapLinearFilter;
+			texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
+			texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearMipMapLinearFilter;
 
-			texture.anisotropy = undefined !== texData.anisotropy ? texData.anisotropy : 1;
+			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
 
-			if ( undefined !== texData.format ) {
+			if ( texData.format !== undefined ) {
 
 				texture.format = texData.format;
 
 			}
-			if ( undefined !== texData.type ) {
+			if ( texData.type !== undefined ) {
 
 				texture.type = texData.type;
 
 			}
 
-			if ( undefined !== texData.mipmaps ) {
+			if ( texData.mipmaps !== undefined ) {
 
 				texture.mipmaps = texData.mipmaps;
 
 			}
 
-			if ( 1 === texData.mipmapCount ) {
+			if ( texData.mipmapCount === 1 ) {
 
 				texture.minFilter = LinearFilter;
 
