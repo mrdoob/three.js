@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - performance [nodes]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				margin: 0px;
+				text-align:center;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #999;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
+			}
+
+			.white {
+				color: white;
+			}
+
+			b { color: #ccc; }
+			a { color: white }
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a><span class="white"> - NodeMaterial Performance</span></br>
+			<br>
+			<b>Node Material System</b>
+			<br>
+			<div>
+				Standard<b>Node</b>Material |
+				<span id="node" class="white">None</span>
+			</div>
+			<div>
+				MeshStandard<b>Node</b>Material |
+				<span id="nodeBased" class="white">None</span>
+			</div>
+			<br>
+			<b>Current Material System</b>
+			<br>
+			<div>
+				MeshStandardMaterial |
+				<span id="default" class="white">None</span>
+			</div>
+			<br>
+			<a id="bench" href="javascript:void(0);">Click to benchmark</a>
+		</div>
+
+		<script type="module">
+
+			import './js/nodes/THREE.Nodes.js';
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var geometry;
+			var meshes = [];
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+			animate();
+
+			function createScene( MaterialClass, count ) {
+
+				count = count !== undefined ? count : 70;
+
+				var i = 0;
+
+				for ( i = 0; i < meshes.length; i ++ ) {
+
+					meshes[ i ].material.dispose();
+
+					scene.remove( meshes[ i ] );
+
+				}
+
+				meshes = [];
+
+				for ( i = 0; i < count; i ++ ) {
+
+					var material = new MaterialClass(),
+						color = 0xFFFFFF * Math.random();
+
+					if ( material.color.isNode ) material.color.value.setHex( color );
+					else material.color.setHex( color );
+
+					// prevent share code
+					material.defines.UUID = material.uuid;
+
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.x = Math.random() * 1000 - 500;
+					mesh.position.y = Math.random() * 1000 - 500;
+					mesh.position.z = Math.random() * 1000 - 500;
+					mesh.rotation.x = Math.random() * 2 * Math.PI;
+					mesh.rotation.y = Math.random() * 2 * Math.PI;
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50 + 100;
+					mesh.matrixAutoUpdate = false;
+					mesh.updateMatrix();
+
+					scene.add( mesh );
+
+					meshes.push( mesh );
+
+				}
+
+			}
+
+			function benchmark() {
+
+				var time, benchmarkTime;
+
+				// Stabilizes CPU
+
+				createScene( THREE.MeshStandardMaterial, 10 );
+
+				render();
+
+				// Standard *Node* Material
+
+				time = performance.now();
+
+				createScene( THREE.StandardNodeMaterial );
+
+				render();
+
+				benchmarkTime = ( performance.now() - time ) / 1000;
+
+				document.getElementById( 'node' ).textContent = benchmarkTime.toFixed( 3 ) + " seconds";
+
+				// Mesh Standard *Node* Material
+
+				time = performance.now();
+
+				createScene( THREE.MeshStandardNodeMaterial );
+
+				render();
+
+				benchmarkTime = ( performance.now() - time ) / 1000;
+
+				document.getElementById( 'nodeBased' ).textContent = benchmarkTime.toFixed( 3 ) + " seconds";
+
+				// Mesh Standard Material
+
+				time = performance.now();
+
+				createScene( THREE.MeshStandardMaterial );
+
+				render();
+
+				benchmarkTime = ( performance.now() - time ) / 1000;
+
+				document.getElementById( 'default' ).textContent = benchmarkTime.toFixed( 3 ) + " seconds";
+
+			}
+
+			document.getElementById( 'bench' ).addEventListener( 'click', function () {
+
+				if ( geometry ) {
+
+					benchmark();
+
+				}
+
+			} );
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 3200;
+
+				scene = new THREE.Scene();
+				scene.add( new THREE.PointLight( 0xFFFFFF ) );
+				//scene.background = new THREE.Color( 0xffffff );
+
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geo ) {
+
+					geo.computeVertexNormals();
+
+					geometry = geo;
+
+				} );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				//renderer.sortObjects = false;
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

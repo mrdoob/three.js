@@ -26,17 +26,25 @@ function init( offscreen, width, height, pixelRatio ) {
 
 		var texture = new THREE.CanvasTexture( imageBitmap );
 		var material = new THREE.MeshBasicMaterial( { map: texture } );
-
 		var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 		mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
 
+		animate();
+
+	}, null, function () {
+
+		// Workaround for Firefox
+		// https://bugzilla.mozilla.org/show_bug.cgi?id=1335594
+
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+		mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
 		animate();
 
 	} );
-
-	//
 
 	renderer = new THREE.WebGLRenderer( { antialias: true, canvas: offscreen } );
 	renderer.setPixelRatio( pixelRatio );
@@ -53,6 +61,16 @@ function animate() {
 
 	renderer.render( scene, camera );
 
-	renderer.context.commit().then( animate );
+	if ( self.requestAnimationFrame ) {
+
+		self.requestAnimationFrame( animate );
+
+	} else if ( renderer.context.commit ) {
+
+		// Deprecated
+
+		renderer.context.commit().then( animate );
+
+	}
 
 }

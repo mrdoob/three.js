@@ -123,6 +123,15 @@
 		</p>
 
 
+		<h3>[method:null setResourcePath] ( [param:String resourcePath] )</h3>
+		<p>
+			[page:String resourcePath] - URL
+		</p>
+		<p>
+			Allows to specify resourcePath for dependencies of specified resource.
+		</p>
+
+
 		<h3>[method:null setStreamMeshesTo] ( [param:Object3D streamMeshesTo] )</h3>
 		<p>
 			[page:Object3D streamMeshesTo] - Object already attached to scenegraph where new meshes will be attached to
@@ -183,12 +192,14 @@
 		<p>
 			[page:String url] - URL to the file<br>
 			[page:Object content] - The file content as arraybuffer or text<br>
-			[page:Function callbackOnLoad] - Callback to be called after successful load<br>
+			[page:Function onLoad] - Callback to be called after successful load<br>
+			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
+			[page:Function onError] - (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br>
 			[page:String crossOrigin] - (optional) CORS value<br>
 			[page:Function materialOptions] - (optional) Set material loading options for MTLLoader
 		</p>
 		<p>
-			Utility method for loading an mtl file according resource description. Provide url or content..
+			Utility method for loading an mtl file according resource description. Provide url or content.
 		</p>
 
 

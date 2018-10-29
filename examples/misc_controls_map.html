@@ -22,7 +22,7 @@
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
-
+				box-sizing: border-box;
 			}
 
 			a {
@@ -38,13 +38,17 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/MapControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, controls, scene, renderer;
 
@@ -84,7 +88,8 @@
 
 				// world
 
-				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
+				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				geometry.translate( 0, 0.5, 0 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 500; i ++ ) {
@@ -93,6 +98,9 @@
 					mesh.position.x = Math.random() * 1600 - 800;
 					mesh.position.y = 0;
 					mesh.position.z = Math.random() * 1600 - 800;
+					mesh.scale.x = 20;
+					mesh.scale.y = Math.random() * 80 + 10;
+					mesh.scale.z = 20;
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
 					scene.add( mesh );
@@ -117,9 +125,10 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 
-                var gui = new dat.GUI();
+				var gui = new dat.GUI();
 
-				gui.add(controls, 'screenSpacePanning');
+				gui.add( controls, 'screenSpacePanning' );
+
 			}
 
 			function onWindowResize() {

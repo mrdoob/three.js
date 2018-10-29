@@ -65,7 +65,6 @@ THREE.BokehShader = {
 	fragmentShader: [
 
 		"#include <common>",
-		"#include <packing>",
 
 		"varying vec2 vUv;",
 

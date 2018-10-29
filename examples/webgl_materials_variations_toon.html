@@ -33,12 +33,16 @@
 
 		<script src="js/effects/OutlineEffect.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -78,10 +82,7 @@
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				var shininess = 50, specular = 0x333333, bumpScale = 1;
-
-				var materials = [];
-
+				var bumpScale = 1;
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -137,7 +138,7 @@
 						height: 1,
 						curveSegments: 1
 
-					});
+					} );
 
 					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
@@ -146,13 +147,13 @@
 
 				}
 
-				addLabel( "-shininess", new THREE.Vector3( -350, 0, 0 ) );
+				addLabel( "-shininess", new THREE.Vector3( - 350, 0, 0 ) );
 				addLabel( "+shininess", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-specular, -reflectivity", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "-specular, -reflectivity", new THREE.Vector3( 0, - 300, 0 ) );
 				addLabel( "+specular, +reflectivity", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
+				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );

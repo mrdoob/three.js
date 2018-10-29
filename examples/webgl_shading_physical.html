@@ -36,8 +36,9 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -48,7 +49,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, geometry;
+			var mesh;
 
 			var controls;
 
@@ -66,7 +67,7 @@
 				shadowCameraNear: 750,
 				shadowCameraFar: 4000,
 				shadowCameraFov: 30,
-				shadowBias: -0.0002
+				shadowBias: - 0.0002
 
 			};
 
@@ -111,18 +112,6 @@
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
 				textureLava.format = THREE.RGBFormat;
 
-				//
-
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-
 				// GROUND
 
 				var groundMaterial = new THREE.MeshPhongMaterial( {
@@ -156,7 +145,7 @@
 				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
 				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
 
-				mesh = addObject( sphereGeometry, materialPhongCube, 350, 100, -350, 0 );
+				mesh = addObject( sphereGeometry, materialPhongCube, 350, 100, - 350, 0 );
 				mesh.add( cubeCamera );
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
@@ -171,7 +160,7 @@
 
 					var tmpMesh = new THREE.Mesh( geometry, material );
 
-					tmpMesh.material.color.offsetHSL( 0.1, -0.1, 0 );
+					tmpMesh.material.color.offsetHSL( 0.1, - 0.1, 0 );
 
 					tmpMesh.position.set( x, y, z );
 
@@ -190,36 +179,34 @@
 				var midCube = new THREE.BoxBufferGeometry( 50, 200, 50 );
 				var smallCube = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
-				addObjectColor( bigCube,   0xff0000, -500, 250, 0, 0 );
-				addObjectColor( smallCube, 0xff0000, -500, 50, -150, 0 );
+				addObjectColor( bigCube, 0xff0000, - 500, 250, 0, 0 );
+				addObjectColor( smallCube, 0xff0000, - 500, 50, - 150, 0 );
 
-				addObjectColor( midCube,   0x00ff00, 500, 100, 0, 0 );
-				addObjectColor( smallCube, 0x00ff00, 500, 50, -150, 0 );
+				addObjectColor( midCube, 0x00ff00, 500, 100, 0, 0 );
+				addObjectColor( smallCube, 0x00ff00, 500, 50, - 150, 0 );
 
-				addObjectColor( midCube,   0x0000ff, 0, 100, -500, 0 );
-				addObjectColor( smallCube, 0x0000ff, -150, 50, -500, 0 );
+				addObjectColor( midCube, 0x0000ff, 0, 100, - 500, 0 );
+				addObjectColor( smallCube, 0x0000ff, - 150, 50, - 500, 0 );
 
-				addObjectColor( midCube,   0xff00ff, 0, 100, 500, 0 );
-				addObjectColor( smallCube, 0xff00ff, -150, 50, 500, 0 );
+				addObjectColor( midCube, 0xff00ff, 0, 100, 500, 0 );
+				addObjectColor( smallCube, 0xff00ff, - 150, 50, 500, 0 );
 
-				addObjectColor( new THREE.BoxBufferGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI/4 );
+				addObjectColor( new THREE.BoxBufferGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI / 4 );
 				addObjectColor( new THREE.BoxBufferGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
 
-				addObjectColor( new THREE.SphereBufferGeometry( 100, 32, 26 ), 0xffffff, -300, 100, 300, 0 );
+				addObjectColor( new THREE.SphereBufferGeometry( 100, 32, 26 ), 0xffffff, - 300, 100, 300, 0 );
 
 				// MORPHS
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.GLTFLoader();
 
-				loader.load( "models/animated/sittingBox.js", function( geometry ) {
+				loader.load( "models/gltf/SittingBox.glb", function ( gltf ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, flatShading: true } );
-
-					var mesh = new THREE.Mesh( geometry, morphMaterial );
+					var mesh = gltf.scene.children[ 0 ];
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					mixer.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
+					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 10 ).play();
 
 					var s = 200;
 					mesh.scale.set( s, s, s );
@@ -242,7 +229,7 @@
 				pointLight = new THREE.PointLight( 0xffaa00, 1, 5000 );
 				scene.add( pointLight );
 
-				sunLight = new THREE.SpotLight( 0xffffff, 0.3, 0, Math.PI/2 );
+				sunLight = new THREE.SpotLight( 0xffffff, 0.3, 0, Math.PI / 2 );
 				sunLight.position.set( 1000, 2000, 1000 );
 
 				sunLight.castShadow = true;
@@ -310,41 +297,41 @@
 
 				var shadowGUI = gui.addFolder( "Shadow" );
 
-    		shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+    		shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function () {
 
 					shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
 
-				});
+				} );
 
-				shadowGUI.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function () {
 
 					sunLight.shadow.camera.near = shadowConfig.shadowCameraNear;
 					sunLight.shadow.camera.updateProjectionMatrix();
 					shadowCameraHelper.update();
 
-				});
+				} );
 
-				shadowGUI.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function () {
 
 					sunLight.shadow.camera.far = shadowConfig.shadowCameraFar;
 					sunLight.shadow.camera.updateProjectionMatrix();
 					shadowCameraHelper.update();
 
-				});
+				} );
 
-				shadowGUI.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function () {
 
 					sunLight.shadow.camera.fov = shadowConfig.shadowCameraFov;
 					sunLight.shadow.camera.updateProjectionMatrix();
 					shadowCameraHelper.update();
 
-				});
+				} );
 
-				shadowGUI.add( shadowConfig, 'shadowBias', -0.01, 0.01 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowBias', - 0.01, 0.01 ).onChange( function () {
 
 					sunLight.shadow.bias = shadowConfig.shadowBias;
 
-				});
+				} );
 
 				shadowGUI.open();
 
@@ -352,7 +339,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

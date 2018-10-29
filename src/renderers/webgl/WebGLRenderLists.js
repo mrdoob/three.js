@@ -46,6 +46,7 @@ function reversePainterSortStable( a, b ) {
 
 }
 
+
 function WebGLRenderList() {
 
 	var renderItems = [];
@@ -94,6 +95,7 @@ function WebGLRenderList() {
 			renderItem.group = group;
 
 		}
+
 
 		( material.transparent === true ? transparent : opaque ).push( renderItem );
 

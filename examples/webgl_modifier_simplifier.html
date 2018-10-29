@@ -20,6 +20,7 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 		<script src="js/modifiers/SimplifyModifier.js"></script>
 
 		<script>
@@ -59,25 +60,24 @@
 				camera.add( light );
 				scene.add( camera );
 
-				new THREE.JSONLoader().load( "models/json/leeperrysmith/LeePerrySmith.json", function ( geometry ) {
+				new THREE.GLTFLoader().load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xAEAED5, shininess: 1 } );
-
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = gltf.scene.children[ 0 ];
 					mesh.position.x = - 3;
 					mesh.rotation.y = Math.PI / 2;
 					scene.add( mesh );
 
-					var modifer = new THREE.SimplifyModifier();
+					var modifier = new THREE.SimplifyModifier();
 
-					var simplified = modifer.modify( geometry, Math.floor( geometry.vertices.length * 0.9375 ) ); // number of vertices to remove
+					var simplified = mesh.clone();
+					simplified.material = simplified.material.clone();
+					simplified.material.flatShading = true;
+					var count = Math.floor( simplified.geometry.attributes.position.count * 0.875 ); // number of vertices to remove
+					simplified.geometry = modifier.modify( simplified.geometry, count );
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xAEAED5, shininess: 1, flatShading: true } );
-
-					var mesh = new THREE.Mesh( simplified, material );
-					mesh.position.x = 3;
-					mesh.rotation.y = - Math.PI / 2;
-					scene.add( mesh );
+					simplified.position.x = 3;
+					simplified.rotation.y = - Math.PI / 2;
+					scene.add( simplified );
 
 					render();
 

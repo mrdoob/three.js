@@ -45,7 +45,7 @@
 	</div>
 
 	<script src="../build/three.js"></script>
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
 	<script src="js/controls/OrbitControls.js"></script>
@@ -54,7 +54,11 @@
 
 	<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		THREE.ShaderLib.customDepthRGBA = { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
 
@@ -268,8 +272,6 @@
 			var colors = new Float32Array( INSTANCES * 3 ); // rgb
 			var scales = new Float32Array( INSTANCES * 1 ); // s
 
-			var color = new THREE.Color();
-
 			for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
 
 				var index = 3 * i;
@@ -317,7 +319,7 @@
 			} );
 
 			material.defines = material.defines || {};
-			material.defines[ 'INSTANCED'] = "";
+			material.defines[ 'INSTANCED' ] = "";
 
 
 			// custom depth material - required for instanced shadows
@@ -371,7 +373,7 @@
 
 		}
 
-		function onWindowResize( event ) {
+		function onWindowResize() {
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
 

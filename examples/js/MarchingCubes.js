@@ -342,17 +342,40 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		// normals
 
-		scope.normalArray[ c + 0 ] = norm[ o1 ];
-		scope.normalArray[ c + 1 ] = norm[ o1 + 1 ];
-		scope.normalArray[ c + 2 ] = norm[ o1 + 2 ];
+		if ( scope.material.flatShading === true ) {
 
-		scope.normalArray[ c + 3 ] = norm[ o2 ];
-		scope.normalArray[ c + 4 ] = norm[ o2 + 1 ];
-		scope.normalArray[ c + 5 ] = norm[ o2 + 2 ];
+			var nx = ( norm[ o1 + 0 ] + norm[ o2 + 0 ] + norm[ o3 + 0 ] ) / 3;
+			var ny = ( norm[ o1 + 1 ] + norm[ o2 + 1 ] + norm[ o3 + 1 ] ) / 3;
+			var nz = ( norm[ o1 + 2 ] + norm[ o2 + 2 ] + norm[ o3 + 2 ] ) / 3;
 
-		scope.normalArray[ c + 6 ] = norm[ o3 ];
-		scope.normalArray[ c + 7 ] = norm[ o3 + 1 ];
-		scope.normalArray[ c + 8 ] = norm[ o3 + 2 ];
+			scope.normalArray[ c + 0 ] = nx;
+			scope.normalArray[ c + 1 ] = ny;
+			scope.normalArray[ c + 2 ] = nz;
+
+			scope.normalArray[ c + 3 ] = nx;
+			scope.normalArray[ c + 4 ] = ny;
+			scope.normalArray[ c + 5 ] = nz;
+
+			scope.normalArray[ c + 6 ] = nx;
+			scope.normalArray[ c + 7 ] = ny;
+			scope.normalArray[ c + 8 ] = nz;
+
+
+		} else {
+
+			scope.normalArray[ c + 0 ] = norm[ o1 + 0 ];
+			scope.normalArray[ c + 1 ] = norm[ o1 + 1 ];
+			scope.normalArray[ c + 2 ] = norm[ o1 + 2 ];
+
+			scope.normalArray[ c + 3 ] = norm[ o2 + 0 ];
+			scope.normalArray[ c + 4 ] = norm[ o2 + 1 ];
+			scope.normalArray[ c + 5 ] = norm[ o2 + 2 ];
+
+			scope.normalArray[ c + 6 ] = norm[ o3 + 0 ];
+			scope.normalArray[ c + 7 ] = norm[ o3 + 1 ];
+			scope.normalArray[ c + 8 ] = norm[ o3 + 2 ];
+
+		}
 
 		// uvs
 
@@ -360,13 +383,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			var d = scope.count * 2;
 
-			scope.uvArray[ d + 0 ] = pos[ o1 ];
+			scope.uvArray[ d + 0 ] = pos[ o1 + 0 ];
 			scope.uvArray[ d + 1 ] = pos[ o1 + 2 ];
 
-			scope.uvArray[ d + 2 ] = pos[ o2 ];
+			scope.uvArray[ d + 2 ] = pos[ o2 + 0 ];
 			scope.uvArray[ d + 3 ] = pos[ o2 + 2 ];
 
-			scope.uvArray[ d + 4 ] = pos[ o3 ];
+			scope.uvArray[ d + 4 ] = pos[ o3 + 0 ];
 			scope.uvArray[ d + 5 ] = pos[ o3 + 2 ];
 
 		}
@@ -375,15 +398,15 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		if ( scope.enableColors ) {
 
-			scope.colorArray[ c + 0 ] = pos[ o1 ];
+			scope.colorArray[ c + 0 ] = pos[ o1 + 0 ];
 			scope.colorArray[ c + 1 ] = pos[ o1 + 1 ];
 			scope.colorArray[ c + 2 ] = pos[ o1 + 2 ];
 
-			scope.colorArray[ c + 3 ] = pos[ o2 ];
+			scope.colorArray[ c + 3 ] = pos[ o2 + 0 ];
 			scope.colorArray[ c + 4 ] = pos[ o2 + 1 ];
 			scope.colorArray[ c + 5 ] = pos[ o2 + 2 ];
 
-			scope.colorArray[ c + 6 ] = pos[ o3 ];
+			scope.colorArray[ c + 6 ] = pos[ o3 + 0 ];
 			scope.colorArray[ c + 7 ] = pos[ o3 + 1 ];
 			scope.colorArray[ c + 8 ] = pos[ o3 + 2 ];
 
@@ -438,13 +461,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		this.hasPositions = true;
 		this.hasNormals = true;
 
-		if ( this.enableUvs ) {
+		if ( this.enableUvs && this.material.map ) {
 
 			this.hasUvs = true;
 
 		}
 
-		if ( this.enableColors ) {
+		if ( this.enableColors && this.material.vertexColors !== THREE.NoColors ) {
 
 			this.hasColors = true;
 

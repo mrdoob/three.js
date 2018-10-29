@@ -38,7 +38,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -74,7 +74,11 @@
 
 			}
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -104,11 +108,9 @@
 
 				// lights
 
-				var light, materials;
-
 				scene.add( new THREE.AmbientLight( 0x666666 ) );
 
-				light = new THREE.DirectionalLight( 0xdfebff, 1 );
+				var light = new THREE.DirectionalLight( 0xdfebff, 1 );
 				light.position.set( 50, 200, 100 );
 				light.position.multiplyScalar( 1.3 );
 
@@ -142,7 +144,7 @@
 
 				// cloth geometry
 
-				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
+				clothGeometry = new THREE.ParametricBufferGeometry( clothFunction, cloth.w, cloth.h );
 
 				// cloth mesh
 
@@ -294,13 +296,14 @@
 
 				for ( var i = 0, il = p.length; i < il; i ++ ) {
 
-					clothGeometry.vertices[ i ].copy( p[ i ].position );
+					var v = p[ i ].position;
+
+					clothGeometry.attributes.position.setXYZ( i, v.x, v.y, v.z );
 
 				}
 
-				clothGeometry.verticesNeedUpdate = true;
+				clothGeometry.attributes.position.needsUpdate = true;
 
-				clothGeometry.computeFaceNormals();
 				clothGeometry.computeVertexNormals();
 
 				sphere.position.copy( ballPosition );

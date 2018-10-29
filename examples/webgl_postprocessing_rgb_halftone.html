@@ -23,9 +23,7 @@
 				padding: 2px;
 			}
 
-			.info a {
-				color: #00ffff;
-			}
+			a { color: #00ffff; }
 		</style>
 	</head>
 	<body>
@@ -42,7 +40,7 @@
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src='js/libs/stats.min.js'></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -53,14 +51,14 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) {
+		if ( WEBGL.isWebGLAvailable() === false ) {
 
-			Detector.addGetWebGLMessage();
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
 		}
 
 		// setup
-		var wrapper, renderer, clock, camera, controls, stats;
+		var wrapper, renderer, clock, camera, controls, stats, rotationSpeed;
 
 		wrapper = document.createElement( 'div' );
 		renderer = new THREE.WebGLRenderer();
@@ -103,12 +101,12 @@
 
 				"void main() {",
 
-					"vUV = uv;",
-					"vNormal = vec3( normal );",
-					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+				"vUV = uv;",
+				"vNormal = vec3( normal );",
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 				"}"
-			].join("\n"),
+			].join( "\n" ),
 
 			fragmentShader: [
 				"varying vec2 vUV;",
@@ -116,11 +114,11 @@
 
 				"void main() {",
 
-					"vec4 c = vec4( abs( vNormal ) + vec3( vUV, 0.0 ), 0.0 );",
-					"gl_FragColor = c;",
+				"vec4 c = vec4( abs( vNormal ) + vec3( vUV, 0.0 ), 0.0 );",
+				"gl_FragColor = c;",
 
 				"}"
-			].join("\n")
+			].join( "\n" )
 		} );
 
 		for ( var i = 0; i < 50; ++ i ) {

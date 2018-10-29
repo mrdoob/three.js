@@ -1,5 +1,5 @@
 #ifdef USE_FOG
 
-  varying float fogDepth;
+	varying float fogDepth;
 
 #endif

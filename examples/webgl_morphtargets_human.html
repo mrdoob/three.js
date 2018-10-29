@@ -40,7 +40,7 @@
 
 		<script src="js/UCSCharacter.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -170,13 +170,13 @@
 				morphConfig = {
 				};
 
-				var morphCallback = function( index ) {
+				var morphCallback = function () {
 
 					return function () {
 
 						character.updateMorphs( morphConfig );
 
-					}
+					};
 
 				};
 

@@ -2,26 +2,28 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.JoinNode = function ( x, y, z, w ) {
+import { TempNode } from '../core/TempNode.js';
+import { NodeUtils } from '../core/NodeUtils.js';
 
-	THREE.TempNode.call( this, 'fv1' );
+var inputs = NodeUtils.elements;
+
+function JoinNode( x, y, z, w ) {
+
+	TempNode.call( this, 'f' );
 
 	this.x = x;
 	this.y = y;
 	this.z = z;
 	this.w = w;
 
-};
+}
 
-THREE.JoinNode.inputs = [ 'x', 'y', 'z', 'w' ];
+JoinNode.prototype = Object.create( TempNode.prototype );
+JoinNode.prototype.constructor = JoinNode;
+JoinNode.prototype.nodeType = "Join";
 
-THREE.JoinNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.JoinNode.prototype.constructor = THREE.JoinNode;
-THREE.JoinNode.prototype.nodeType = "Join";
+JoinNode.prototype.getNumElements = function () {
 
-THREE.JoinNode.prototype.getNumElements = function () {
-
-	var inputs = THREE.JoinNode.inputs;
 	var i = inputs.length;
 
 	while ( i -- ) {
@@ -29,6 +31,7 @@ THREE.JoinNode.prototype.getNumElements = function () {
 		if ( this[ inputs[ i ] ] !== undefined ) {
 
 			++ i;
+
 			break;
 
 		}
@@ -39,37 +42,45 @@ THREE.JoinNode.prototype.getNumElements = function () {
 
 };
 
-THREE.JoinNode.prototype.getType = function ( builder ) {
+JoinNode.prototype.getType = function ( builder ) {
 
-	return builder.getFormatFromLength( this.getNumElements() );
+	return builder.getTypeFromLength( this.getNumElements() );
 
 };
 
-THREE.JoinNode.prototype.generate = function ( builder, output ) {
+JoinNode.prototype.generate = function ( builder, output ) {
 
-	var material = builder.material;
-
-	var type = this.getType( builder );
-	var length = this.getNumElements();
-
-	var inputs = THREE.JoinNode.inputs;
-	var outputs = [];
+	var type = this.getType( builder ),
+		length = this.getNumElements(),
+		outputs = [];
 
 	for ( var i = 0; i < length; i ++ ) {
 
 		var elm = this[ inputs[ i ] ];
 
-		outputs.push( elm ? elm.build( builder, 'fv1' ) : '0.' );
+		outputs.push( elm ? elm.build( builder, 'f' ) : '0.0' );
 
 	}
 
-	var code = ( length > 1 ? builder.getConstructorFromLength( length ) : '' ) + '(' + outputs.join( ',' ) + ')';
+	var code = ( length > 1 ? builder.getConstructorFromLength( length ) : '' ) + '( ' + outputs.join( ', ' ) + ' )';
 
 	return builder.format( code, type, output );
 
 };
 
-THREE.JoinNode.prototype.toJSON = function ( meta ) {
+JoinNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	for ( var prop in source.inputs ) {
+
+		this[ prop ] = source.inputs[ prop ];
+
+	}
+
+};
+
+JoinNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -80,7 +91,6 @@ THREE.JoinNode.prototype.toJSON = function ( meta ) {
 		data.inputs = {};
 
 		var length = this.getNumElements();
-		var inputs = THREE.JoinNode.inputs;
 
 		for ( var i = 0; i < length; i ++ ) {
 
@@ -100,3 +110,5 @@ THREE.JoinNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { JoinNode };

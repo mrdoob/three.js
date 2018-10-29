@@ -5,6 +5,12 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			
 			body {
 				color: #000;
 				font-family:Monospace;
@@ -14,7 +20,6 @@
 
 				background-color: #fff;
 				margin: 0px;
-				overflow: hidden;
 			}
 
 			#info {
@@ -22,7 +27,7 @@
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
-
+				box-sizing: border-box;
 			}
 
 			a {
@@ -41,12 +46,16 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, controls, scene, renderer, stats;
 
@@ -103,7 +112,7 @@
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( -1, -1, -1 );
+				light.position.set( - 1, - 1, - 1 );
 				scene.add( light );
 
 				var light = new THREE.AmbientLight( 0x222222 );
@@ -145,14 +154,16 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				
 				controls.update();
+				
+				stats.update();
 
 			}
 
 			function render() {
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

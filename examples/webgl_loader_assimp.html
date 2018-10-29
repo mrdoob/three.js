@@ -33,7 +33,6 @@
 			span {
 				display: inline-block;
 				width: 60px;
-				float: left;
 				text-align: center;
 			}
 		</style>
@@ -49,14 +48,18 @@
 		</div>
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/AssimpLoader.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var container, stats;
 		var camera, scene, renderer;
@@ -70,7 +73,7 @@
 			camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.set( 600, 1150, 5 );
 			camera.up.set( 0, 0, 1 );
-			camera.lookAt( new THREE.Vector3( -100, 0, 0 ) );
+			camera.lookAt( - 100, 0, 0 );
 
 			scene = new THREE.Scene();
 

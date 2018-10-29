@@ -72,6 +72,12 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		QUnit.todo( "validate", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
 	} );
 
 } );
