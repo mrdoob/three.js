@@ -37,7 +37,7 @@ THREE.SMAAPass = function ( width, height ) {
 	this.areaTexture.format = THREE.RGBFormat;
 	this.areaTexture.minFilter = THREE.LinearFilter;
 	this.areaTexture.generateMipmaps = false;
-	this.areaTexture.needsUpdate = true;
+	this.areaTexture.needsUpdate = false;
 	this.areaTexture.flipY = false;
 
 	var searchTextureImage = new Image();
@@ -49,8 +49,20 @@ THREE.SMAAPass = function ( width, height ) {
 	this.searchTexture.magFilter = THREE.NearestFilter;
 	this.searchTexture.minFilter = THREE.NearestFilter;
 	this.searchTexture.generateMipmaps = false;
-	this.searchTexture.needsUpdate = true;
+	this.searchTexture.needsUpdate = false;
 	this.searchTexture.flipY = false;
+
+	var self = this;
+
+	setTimeout( function () {
+
+		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
+		// using setTimeout() avoids the warning "Texture marked for update but image is incomplete"
+
+		self.searchTexture.needsUpdate = true;
+		self.areaTexture.needsUpdate = true;
+
+	}, 0 );
 
 	// materials - pass 1
 
