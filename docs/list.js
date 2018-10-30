@@ -385,7 +385,6 @@ var list = {
 
 			"Plugins": {
 				"LookupTable": "examples/Lut",
-				"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
 			},
 
 			"QuickHull": {
@@ -397,7 +396,7 @@ var list = {
 			},
 
 			"Renderers": {
- 				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
+				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/renderers/SVGRenderer"
 
@@ -811,7 +810,6 @@ var list = {
 
 			"插件": {
 				"LookupTable": "examples/Lut",
-				"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
 			},
 
 			"QuickHull": {
@@ -823,7 +821,7 @@ var list = {
 			},
 
 			"渲染器": {
- 				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
+				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/renderers/SVGRenderer"
 
