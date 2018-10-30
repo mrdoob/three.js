@@ -10,20 +10,19 @@
 </head>
 
 <body>
-	<h1>[name]</h1>
+	<h1>如何使用WebGL 2（[name]）</h1>
 	<br />
 
 	<p>
-		Starting with three.js R95, the engine supports rendering with a WebGL 2 context. By default three.js always uses a
-		WebGL 1 context when creating an instance of *WebGLRenderer*. If you want use a WebGL 2 context, please have a look
-		at the following workflow.
+		从R95版本起，three.js便开始支持使用WebGL 2环境来进行渲染。默认情况下，当创建一个*WebGLRenderer*实例时，
+		three.js总是使用WebGL 1环境。如果你希望来使用WebGL 2环境，请参阅以下的工作流程。
 	</p>
 
-	<h2>Workflow</h2>
+	<h2>工作流程</h2>
 
 	<p>
-		Since WebGL 2 is not supported by all devices that support WebGL 1, it's important to check the respective availability.
-		To do so, please include [link:https://github.com/mrdoob/three.js/blob/master/examples/js/WebGL.js WebGL.js] into your project.
+		由于WebGL 2并不被所有支持WebGL 1的设备所支持，因此检查各种设备上WebGL 2的可用性是非常重要的。
+		要对其可用性进行检查，请将[link:https://github.com/mrdoob/three.js/blob/master/examples/js/WebGL.js WebGL.js]包含到你的项目中。
 	</p>
 
 	<code>
@@ -31,7 +30,7 @@
 	</code>
 
 	<p>
-		Next, use a code similar to the following in order to perform the availability check.
+		接下来，使用和下列代码相似的代码来进行可用性检查。
 	</p>
 
 	<code>
@@ -44,9 +43,8 @@ if ( WEBGL.isWebGL2Available() === false ) {
 	</code>
 
 	<p>
-		Now it's time to create the renderer by applying the HTML5 canvas element and the respective WebGL 2 context
-		to the constructor of *WebGLRenderer*. As a result, three.js will internally use the given context for rendering and
-		automatically convert the built-in material's shader code to GLSL ES 3.00.
+		现在，你就可以将由*WebGLRenderer*所构造的renderer，应用到HTML5 Canvas元素和对应的WebGL 2绘图环境上了。
+		最终，three.js将在内部使用所给定的绘图环境来渲染，并自动将内置的材质的着色器代码转化为GLSL ES 3.00。
 	</p>
 
 	<code>
@@ -56,8 +54,8 @@ var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 	</code>
 
 	<p>
-		Sometimes it is necessary to write custom shader code. Use the following code template as a basis for your own
-		implementation. First, the GLSL ES 3.00 code.
+		有时候，写一些自定义着色器也是非常必要的。请使用下列的代码模板作为你自己来进行实现的基础。
+		首先是GLSL ES 3.00代码。
 	</p>
 
 	<code>
@@ -85,7 +83,7 @@ void main() {
 &lt;/script&gt;
 	</code>
 	<p>
-		Second, the corresponding material creation in JavaScript.
+		然后是使用JavaScript来创建的对应的材质。
 	</p>
 	<code>
 var material = new THREE.ShaderMaterial( {
@@ -94,20 +92,20 @@ var material = new THREE.ShaderMaterial( {
 } );
 	</code>
 
-	<h2>Next Steps</h2>
+	<h2>接下来</h2>
 
 	<p>
-		Have a look at one of the official examples in order to see WebGL 2 features in action.<br /><br />
+		请参阅官方示例，来看一看WebGL 2各种特性的运行。<br /><br />
 
 		[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]<br />
 		[example:webgl2_materials_texture3d_volume WebGL2 / materials / texture3d / volume]<br />
 	</p>
 
-	<h2>Supported features</h2>
+	<h2>支持的特性</h2>
 
 	<p>
-		Right now, the engine does only support a subset of all existing WebGL 2 features. The following list provides an
-		overview about what's already available in the latest version of three.js.
+		当前，three.js引擎仅支持所有现有的WebGL 2特性的一个子集。
+		下列列表展现了在最新版本three.js中，已可用的特性的概览。
 		<ul>
 			<li>3D Textures</li>
 		</ul>
