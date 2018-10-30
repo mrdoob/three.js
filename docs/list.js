@@ -469,13 +469,13 @@ var list = {
 				"PropertyMixer": "api/zh/animation/PropertyMixer"
 			},
 
-			"Animation / Tracks": {
-				"BooleanKeyframeTrack": "api/zh/animation/tracks/BooleanKeyframeTrack",
-				"ColorKeyframeTrack": "api/zh/animation/tracks/ColorKeyframeTrack",
-				"NumberKeyframeTrack": "api/zh/animation/tracks/NumberKeyframeTrack",
-				"QuaternionKeyframeTrack": "api/zh/animation/tracks/QuaternionKeyframeTrack",
-				"StringKeyframeTrack": "api/zh/animation/tracks/StringKeyframeTrack",
-				"VectorKeyframeTrack": "api/zh/animation/tracks/VectorKeyframeTrack"
+			"动画 / 轨道": {
+				"布尔类型关键帧轨道": "api/zh/animation/tracks/BooleanKeyframeTrack",
+				"颜色类型关键帧轨道": "api/zh/animation/tracks/ColorKeyframeTrack",
+				"数字类型关键帧轨道": "api/zh/animation/tracks/NumberKeyframeTrack",
+				"四元数类型关键帧轨道": "api/zh/animation/tracks/QuaternionKeyframeTrack",
+				"字符串类型关键帧轨道": "api/zh/animation/tracks/StringKeyframeTrack",
+				"向量类型关键帧轨道": "api/zh/animation/tracks/VectorKeyframeTrack"
 			},
 
 			"Audio": {
