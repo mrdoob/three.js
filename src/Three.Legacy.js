@@ -1288,6 +1288,20 @@ Object.defineProperties( Material.prototype, {
 
 		}
 	},
+
+	overdraw: {
+		get: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		}
+	},
+
 	wrapRGB: {
 		get: function () {
 
@@ -1873,13 +1887,7 @@ export function Projector() {
 
 export function CanvasRenderer() {
 
-	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
-
-	this.domElement = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-	this.clear = function () {};
-	this.render = function () {};
-	this.setClearColor = function () {};
-	this.setSize = function () {};
+	console.error( 'THREE.CanvasRenderer has been removed' );
 
 }
 

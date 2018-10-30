@@ -81,7 +81,8 @@
 					//console.log( textureData );
 					//console.log( texture );
 
-					texture.generateMipmaps = true;
+					texture.minFilter = THREE.NearestFilter;
+					texture.magFilter = THREE.NearestFilter;
 
 					// these setting are currently set correctly by default
 					//texture.encoding = THREE.LinearEncoding;

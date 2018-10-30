@@ -5994,7 +5994,7 @@ var begin_vertex = "\nvec3 transformed = vec3( position );\n";
 
 var beginnormal_vertex = "\nvec3 objectNormal = vec3( normal );\n";
 
-var bsdfs = "float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n\tfloat distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n\tif( cutoffDistance > 0.0 ) {\n\t\tdistanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n\t}\n\treturn distanceFalloff;\n#else\n\tif( cutoffDistance > 0.0 ) {\n\t\treturn pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n\t}\n\treturn 1.0;\n#endif\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n\treturn RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n\tfloat fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\n\treturn ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\tfloat gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\treturn 1.0 / ( gl * gv );\n}\nfloat G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\treturn 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\tfloat a2 = pow2( alpha );\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n\tfloat alpha = pow2( roughness );\n\tvec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n\tfloat dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );\n\tfloat dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n\tfloat dotNH = saturate( dot( geometry.normal, halfDir ) );\n\tfloat dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, dotLH );\n\tfloat G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\tfloat D = D_GGX( alpha, dotNH );\n\treturn F * ( G * D );\n}\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\tconst float LUT_SIZE  = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS  = 0.5 / LUT_SIZE;\n\tfloat dotNV = saturate( dot( N, V ) );\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\treturn uv;\n}\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\tfloat l = length( f );\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n}\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\tfloat x = dot( v1, v2 );\n\tfloat y = abs( x );\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\treturn cross( v1, v2 ) * theta_sintheta;\n}\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 );\n\tmat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\treturn vec3( result );\n}\nvec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n\tfloat dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n\tconst vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n\tconst vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n\tvec4 r = roughness * c0 + c1;\n\tfloat a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n\tvec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n\treturn specularColor * AB.x + AB.y;\n}\nfloat G_BlinnPhong_Implicit( ) {\n\treturn 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n\treturn RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n\tvec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n\tfloat dotNH = saturate( dot( geometry.normal, halfDir ) );\n\tfloat dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, dotLH );\n\tfloat G = G_BlinnPhong_Implicit( );\n\tfloat D = D_BlinnPhong( shininess, dotNH );\n\treturn F * ( G * D );\n}\nfloat GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\treturn ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );\n}\nfloat BlinnExponentToGGXRoughness( const in float blinnExponent ) {\n\treturn sqrt( 2.0 / ( blinnExponent + 2.0 ) );\n}\n";
+var bsdfs = "float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n\tfloat distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n\tif( cutoffDistance > 0.0 ) {\n\t\tdistanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n\t}\n\treturn distanceFalloff;\n#else\n\tif( cutoffDistance > 0.0 && decayExponent > 0.0 ) {\n\t\treturn pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n\t}\n\treturn 1.0;\n#endif\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n\treturn RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n\tfloat fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\n\treturn ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\tfloat gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\treturn 1.0 / ( gl * gv );\n}\nfloat G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\treturn 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\tfloat a2 = pow2( alpha );\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n\tfloat alpha = pow2( roughness );\n\tvec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n\tfloat dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );\n\tfloat dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n\tfloat dotNH = saturate( dot( geometry.normal, halfDir ) );\n\tfloat dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, dotLH );\n\tfloat G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\tfloat D = D_GGX( alpha, dotNH );\n\treturn F * ( G * D );\n}\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\tconst float LUT_SIZE  = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS  = 0.5 / LUT_SIZE;\n\tfloat dotNV = saturate( dot( N, V ) );\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\treturn uv;\n}\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\tfloat l = length( f );\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n}\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\tfloat x = dot( v1, v2 );\n\tfloat y = abs( x );\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\treturn cross( v1, v2 ) * theta_sintheta;\n}\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 );\n\tmat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\treturn vec3( result );\n}\nvec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n\tfloat dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n\tconst vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n\tconst vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n\tvec4 r = roughness * c0 + c1;\n\tfloat a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n\tvec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n\treturn specularColor * AB.x + AB.y;\n}\nfloat G_BlinnPhong_Implicit( ) {\n\treturn 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n\treturn RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n\tvec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n\tfloat dotNH = saturate( dot( geometry.normal, halfDir ) );\n\tfloat dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, dotLH );\n\tfloat G = G_BlinnPhong_Implicit( );\n\tfloat D = D_BlinnPhong( shininess, dotNH );\n\treturn F * ( G * D );\n}\nfloat GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\treturn ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );\n}\nfloat BlinnExponentToGGXRoughness( const in float blinnExponent ) {\n\treturn sqrt( 2.0 / ( blinnExponent + 2.0 ) );\n}\n";
 
 var bumpmap_pars_fragment = "#ifdef USE_BUMPMAP\n\tuniform sampler2D bumpMap;\n\tuniform float bumpScale;\n\tvec2 dHdxy_fwd() {\n\t\tvec2 dSTdx = dFdx( vUv );\n\t\tvec2 dSTdy = dFdy( vUv );\n\t\tfloat Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n\t\tfloat dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n\t\tfloat dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\t\treturn vec2( dBx, dBy );\n\t}\n\tvec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {\n\t\tvec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );\n\t\tvec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );\n\t\tvec3 vN = surf_norm;\n\t\tvec3 R1 = cross( vSigmaY, vN );\n\t\tvec3 R2 = cross( vN, vSigmaX );\n\t\tfloat fDet = dot( vSigmaX, R1 );\n\t\tfDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\tvec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n\t\treturn normalize( abs( fDet ) * surf_norm - vGrad );\n\t}\n#endif\n";
 
@@ -6162,9 +6162,9 @@ var background_frag = "uniform sampler2D t2D;\nvarying vec2 vUv;\nvoid main() {\
 
 var background_vert = "varying vec2 vUv;\nvoid main() {\n\tvUv = uv;\n\tgl_Position = vec4( position, 1.0 );\n\tgl_Position.z = 1.0;\n}\n";
 
-var cube_frag = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldPosition;\nvoid main() {\n\tgl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n\tgl_FragColor.a *= opacity;\n}\n";
+var cube_frag = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldDirection;\nvoid main() {\n\tgl_FragColor = textureCube( tCube, vec3( tFlip * vWorldDirection.x, vWorldDirection.yz ) );\n\tgl_FragColor.a *= opacity;\n}\n";
 
-var cube_vert = "varying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvWorldPosition = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}\n";
+var cube_vert = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}\n";
 
 var depth_frag = "#if DEPTH_PACKING == 3200\n\tuniform float opacity;\n#endif\n#include <common>\n#include <packing>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( 1.0 );\n\t#if DEPTH_PACKING == 3200\n\t\tdiffuseColor.a = opacity;\n\t#endif\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <logdepthbuf_fragment>\n\t#if DEPTH_PACKING == 3200\n\t\tgl_FragColor = vec4( vec3( 1.0 - gl_FragCoord.z ), opacity );\n\t#elif DEPTH_PACKING == 3201\n\t\tgl_FragColor = packDepthToRGBA( gl_FragCoord.z );\n\t#endif\n}\n";
 
@@ -6174,9 +6174,9 @@ var distanceRGBA_frag = "#define DISTANCE\nuniform vec3 referencePosition;\nunif
 
 var distanceRGBA_vert = "#define DISTANCE\nvarying vec3 vWorldPosition;\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <clipping_planes_vertex>\n\tvWorldPosition = worldPosition.xyz;\n}\n";
 
-var equirect_frag = "uniform sampler2D tEquirect;\nvarying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvec3 direction = normalize( vWorldPosition );\n\tvec2 sampleUV;\n\tsampleUV.y = asin( clamp( direction.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\tsampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;\n\tgl_FragColor = texture2D( tEquirect, sampleUV );\n}\n";
+var equirect_frag = "uniform sampler2D tEquirect;\nvarying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvec3 direction = normalize( vWorldDirection );\n\tvec2 sampleUV;\n\tsampleUV.y = asin( clamp( direction.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\tsampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;\n\tgl_FragColor = texture2D( tEquirect, sampleUV );\n}\n";
 
-var equirect_vert = "varying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvWorldPosition = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n}\n";
+var equirect_vert = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n}\n";
 
 var linedashed_frag = "uniform vec3 diffuse;\nuniform float opacity;\nuniform float dashSize;\nuniform float totalSize;\nvarying float vLineDistance;\n#include <common>\n#include <color_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tif ( mod( vLineDistance, totalSize ) > dashSize ) {\n\t\tdiscard;\n\t}\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <color_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
 
@@ -7545,7 +7545,7 @@ function WebGLAttributes( gl ) {
 	function createBuffer( attribute, bufferType ) {
 
 		var array = attribute.array;
-		var usage = attribute.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+		var usage = attribute.dynamic ? 35048 : 35044;
 
 		var buffer = gl.createBuffer();
 
@@ -7554,11 +7554,11 @@ function WebGLAttributes( gl ) {
 
 		attribute.onUploadCallback();
 
-		var type = gl.FLOAT;
+		var type = 5126;
 
 		if ( array instanceof Float32Array ) {
 
-			type = gl.FLOAT;
+			type = 5126;
 
 		} else if ( array instanceof Float64Array ) {
 
@@ -7566,27 +7566,27 @@ function WebGLAttributes( gl ) {
 
 		} else if ( array instanceof Uint16Array ) {
 
-			type = gl.UNSIGNED_SHORT;
+			type = 5123;
 
 		} else if ( array instanceof Int16Array ) {
 
-			type = gl.SHORT;
+			type = 5122;
 
 		} else if ( array instanceof Uint32Array ) {
 
-			type = gl.UNSIGNED_INT;
+			type = 5125;
 
 		} else if ( array instanceof Int32Array ) {
 
-			type = gl.INT;
+			type = 5124;
 
 		} else if ( array instanceof Int8Array ) {
 
-			type = gl.BYTE;
+			type = 5120;
 
 		} else if ( array instanceof Uint8Array ) {
 
-			type = gl.UNSIGNED_BYTE;
+			type = 5121;
 
 		}
 
@@ -7608,7 +7608,7 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.dynamic === false ) {
 
-			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
+			gl.bufferData( bufferType, array, 35044 );
 
 		} else if ( updateRange.count === - 1 ) {
 
@@ -8180,18 +8180,22 @@ function Object3D() {
 
 	Object.defineProperties( this, {
 		position: {
+			configurable: true,
 			enumerable: true,
 			value: position
 		},
 		rotation: {
+			configurable: true,
 			enumerable: true,
 			value: rotation
 		},
 		quaternion: {
+			configurable: true,
 			enumerable: true,
 			value: quaternion
 		},
 		scale: {
+			configurable: true,
 			enumerable: true,
 			value: scale
 		},
@@ -9230,35 +9234,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
-		var tempNormals = [];
-		var tempUVs = [];
-		var tempUVs2 = [];
-
 		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
 
-			scope.vertices.push( new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
-
-			if ( normals !== undefined ) {
-
-				tempNormals.push( new Vector3( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] ) );
-
-			}
+			scope.vertices.push( new Vector3().fromArray( positions, i ) );
 
 			if ( colors !== undefined ) {
 
-				scope.colors.push( new Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
-
-			}
-
-			if ( uvs !== undefined ) {
-
-				tempUVs.push( new Vector2( uvs[ j ], uvs[ j + 1 ] ) );
-
-			}
-
-			if ( uvs2 !== undefined ) {
-
-				tempUVs2.push( new Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+				scope.colors.push( new Color().fromArray( colors, i ) );
 
 			}
 
@@ -9266,8 +9248,16 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		function addFace( a, b, c, materialIndex ) {
 
-			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
-			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
+			var vertexColors = ( colors === undefined ) ? [] : [
+				scope.colors[ a ].clone(),
+				scope.colors[ b ].clone(),
+				scope.colors[ c ].clone() ];
+
+			var vertexNormals = ( normals === undefined ) ? [] : [
+				new Vector3().fromArray( normals, a * 3 ),
+				new Vector3().fromArray( normals, b * 3 ),
+				new Vector3().fromArray( normals, c * 3 )
+			];
 
 			var face = new Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
@@ -9275,13 +9265,21 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( uvs !== undefined ) {
 
-				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+				scope.faceVertexUvs[ 0 ].push( [
+					new Vector2().fromArray( uvs, a * 2 ),
+					new Vector2().fromArray( uvs, b * 2 ),
+					new Vector2().fromArray( uvs, c * 2 )
+				] );
 
 			}
 
 			if ( uvs2 !== undefined ) {
 
-				scope.faceVertexUvs[ 1 ].push( [ tempUVs2[ a ].clone(), tempUVs2[ b ].clone(), tempUVs2[ c ].clone() ] );
+				scope.faceVertexUvs[ 1 ].push( [
+					new Vector2().fromArray( uvs2, a * 2 ),
+					new Vector2().fromArray( uvs2, b * 2 ),
+					new Vector2().fromArray( uvs2, c * 2 )
+				] );
 
 			}
 
@@ -12628,8 +12626,6 @@ function Material() {
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
-	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
-
 	this.visible = true;
 
 	this.userData = {};
@@ -12686,11 +12682,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
 
 				currentValue.copy( newValue );
-
-			} else if ( key === 'overdraw' ) {
-
-				// ensure overdraw is backwards-compatible with legacy boolean type
-				this[ key ] = Number( newValue );
 
 			} else {
 
@@ -12917,8 +12908,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.alphaTest = source.alphaTest;
 		this.premultipliedAlpha = source.premultipliedAlpha;
-
-		this.overdraw = source.overdraw;
 
 		this.visible = source.visible;
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
@@ -14622,7 +14611,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		}
 
-		if ( background && background.isCubeTexture ) {
+		if ( background && ( background.isCubeTexture || background.isWebGLRenderTargetCube ) ) {
 
 			if ( boxMesh === undefined ) {
 
@@ -14652,8 +14641,10 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			}
 
-			boxMesh.material.uniforms.tCube.value = background;
+			boxMesh.material.uniforms.tCube.value = ( background.isWebGLRenderTargetCube ) ? background.texture : background;
+			boxMesh.material.uniforms.tFlip.value = ( background.isWebGLRenderTargetCube ) ? 1 : - 1;
 
+			// push to the pre-sorted opaque render list
 			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
 		} else if ( background && background.isTexture ) {
@@ -14681,6 +14672,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			planeMesh.material.uniforms.t2D.value = background;
 
+			// push to the pre-sorted opaque render list
 			renderList.push( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
 
 		}
@@ -14813,8 +14805,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 		if ( precision === 'highp' ) {
 
-			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
-			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
+			if ( gl.getShaderPrecisionFormat( 35633, 36338 ).precision > 0 &&
+			     gl.getShaderPrecisionFormat( 35632, 36338 ).precision > 0 ) {
 
 				return 'highp';
 
@@ -14826,8 +14818,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 		if ( precision === 'mediump' ) {
 
-			if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.MEDIUM_FLOAT ).precision > 0 &&
-			     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT ).precision > 0 ) {
+			if ( gl.getShaderPrecisionFormat( 35633, 36337 ).precision > 0 &&
+			     gl.getShaderPrecisionFormat( 35632, 36337 ).precision > 0 ) {
 
 				return 'mediump';
 
@@ -14853,15 +14845,15 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	var logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 
-	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
-	var maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
-	var maxTextureSize = gl.getParameter( gl.MAX_TEXTURE_SIZE );
-	var maxCubemapSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE );
+	var maxTextures = gl.getParameter( 34930 );
+	var maxVertexTextures = gl.getParameter( 35660 );
+	var maxTextureSize = gl.getParameter( 3379 );
+	var maxCubemapSize = gl.getParameter( 34076 );
 
-	var maxAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
-	var maxVertexUniforms = gl.getParameter( gl.MAX_VERTEX_UNIFORM_VECTORS );
-	var maxVaryings = gl.getParameter( gl.MAX_VARYING_VECTORS );
-	var maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
+	var maxAttributes = gl.getParameter( 34921 );
+	var maxVertexUniforms = gl.getParameter( 36347 );
+	var maxVaryings = gl.getParameter( 36348 );
+	var maxFragmentUniforms = gl.getParameter( 36349 );
 
 	var vertexTextures = maxVertexTextures > 0;
 	var floatFragmentTextures = isWebGL2 || !! extensions.get( 'OES_texture_float' );
@@ -15197,13 +15189,13 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		if ( index !== null ) {
 
-			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
+			attributes.update( index, 34963 );
 
 		}
 
 		for ( var name in geometryAttributes ) {
 
-			attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
+			attributes.update( geometryAttributes[ name ], 34962 );
 
 		}
 
@@ -15217,7 +15209,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				attributes.update( array[ i ], gl.ARRAY_BUFFER );
+				attributes.update( array[ i ], 34962 );
 
 			}
 
@@ -15272,7 +15264,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
-		attributes.update( attribute, gl.ELEMENT_ARRAY_BUFFER );
+		attributes.update( attribute, 34963 );
 
 		wireframeAttributes[ geometry.id ] = attribute;
 
@@ -15385,28 +15377,28 @@ function WebGLInfo( gl ) {
 
 		switch ( mode ) {
 
-			case gl.TRIANGLES:
+			case 4:
 				render.triangles += instanceCount * ( count / 3 );
 				break;
 
-			case gl.TRIANGLE_STRIP:
-			case gl.TRIANGLE_FAN:
+			case 5:
+			case 6:
 				render.triangles += instanceCount * ( count - 2 );
 				break;
 
-			case gl.LINES:
+			case 1:
 				render.lines += instanceCount * ( count / 2 );
 				break;
 
-			case gl.LINE_STRIP:
+			case 3:
 				render.lines += instanceCount * ( count - 1 );
 				break;
 
-			case gl.LINE_LOOP:
+			case 2:
 				render.lines += instanceCount * count;
 				break;
 
-			case gl.POINTS:
+			case 0:
 				render.points += instanceCount * count;
 				break;
 
@@ -16470,7 +16462,7 @@ function WebGLUniforms( gl, program, renderer ) {
 
 	this.renderer = renderer;
 
-	var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
+	var n = gl.getProgramParameter( program, 35718 );
 
 	for ( var i = 0; i < n; ++ i ) {
 
@@ -16560,7 +16552,7 @@ function WebGLShader( gl, type, string ) {
 	gl.shaderSource( shader, string );
 	gl.compileShader( shader );
 
-	if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
+	if ( gl.getShaderParameter( shader, 35713 ) === false ) {
 
 		console.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
 
@@ -16568,7 +16560,7 @@ function WebGLShader( gl, type, string ) {
 
 	if ( gl.getShaderInfoLog( shader ) !== '' ) {
 
-		console.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', type === gl.VERTEX_SHADER ? 'vertex' : 'fragment', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
+		console.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', type === 35633 ? 'vertex' : 'fragment', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
 
 	}
 
@@ -16692,7 +16684,7 @@ function fetchAttributeLocations( gl, program ) {
 
 	var attributes = {};
 
-	var n = gl.getProgramParameter( program, gl.ACTIVE_ATTRIBUTES );
+	var n = gl.getProgramParameter( program, 35721 );
 
 	for ( var i = 0; i < n; i ++ ) {
 
@@ -17144,8 +17136,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
 
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
+	var glVertexShader = WebGLShader( gl, 35633, vertexGlsl );
+	var glFragmentShader = WebGLShader( gl, 35632, fragmentGlsl );
 
 	gl.attachShader( program, glVertexShader );
 	gl.attachShader( program, glFragmentShader );
@@ -17175,11 +17167,11 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
 	// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
-	if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
+	if ( gl.getProgramParameter( program, 35714 ) === false ) {
 
 		runnable = false;
 
-		console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
+		console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), '35715', gl.getProgramParameter( program, 35715 ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
 
 	} else if ( programLog !== '' ) {
 
@@ -17551,6 +17543,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		array.push( material.onBeforeCompile.toString() );
 
 		array.push( renderer.gammaOutput );
+
+		array.push( renderer.gammaFactor );
 
 		return array.join();
 
@@ -18512,7 +18506,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		var _state = _renderer.state;
 
 		// Set GL state for depth map.
-		_state.disable( _gl.BLEND );
+		_state.disable( 3042 );
 		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.buffers.depth.setTest( true );
 		_state.setScissorTest( false );
@@ -18912,11 +18906,11 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 				if ( depthTest ) {
 
-					enable( gl.DEPTH_TEST );
+					enable( 2929 );
 
 				} else {
 
-					disable( gl.DEPTH_TEST );
+					disable( 2929 );
 
 				}
 
@@ -18943,53 +18937,53 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 							case NeverDepth:
 
-								gl.depthFunc( gl.NEVER );
+								gl.depthFunc( 512 );
 								break;
 
 							case AlwaysDepth:
 
-								gl.depthFunc( gl.ALWAYS );
+								gl.depthFunc( 519 );
 								break;
 
 							case LessDepth:
 
-								gl.depthFunc( gl.LESS );
+								gl.depthFunc( 513 );
 								break;
 
 							case LessEqualDepth:
 
-								gl.depthFunc( gl.LEQUAL );
+								gl.depthFunc( 515 );
 								break;
 
 							case EqualDepth:
 
-								gl.depthFunc( gl.EQUAL );
+								gl.depthFunc( 514 );
 								break;
 
 							case GreaterEqualDepth:
 
-								gl.depthFunc( gl.GEQUAL );
+								gl.depthFunc( 518 );
 								break;
 
 							case GreaterDepth:
 
-								gl.depthFunc( gl.GREATER );
+								gl.depthFunc( 516 );
 								break;
 
 							case NotEqualDepth:
 
-								gl.depthFunc( gl.NOTEQUAL );
+								gl.depthFunc( 517 );
 								break;
 
 							default:
 
-								gl.depthFunc( gl.LEQUAL );
+								gl.depthFunc( 515 );
 
 						}
 
 					} else {
 
-						gl.depthFunc( gl.LEQUAL );
+						gl.depthFunc( 515 );
 
 					}
 
@@ -19049,11 +19043,11 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 				if ( stencilTest ) {
 
-					enable( gl.STENCIL_TEST );
+					enable( 2960 );
 
 				} else {
 
-					disable( gl.STENCIL_TEST );
+					disable( 2960 );
 
 				}
 
@@ -19144,7 +19138,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	var depthBuffer = new DepthBuffer();
 	var stencilBuffer = new StencilBuffer();
 
-	var maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
+	var maxVertexAttributes = gl.getParameter( 34921 );
 	var newAttributes = new Uint8Array( maxVertexAttributes );
 	var enabledAttributes = new Uint8Array( maxVertexAttributes );
 	var attributeDivisors = new Uint8Array( maxVertexAttributes );
@@ -19173,11 +19167,11 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	var currentPolygonOffsetFactor = null;
 	var currentPolygonOffsetUnits = null;
 
-	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
+	var maxTextures = gl.getParameter( 35661 );
 
 	var lineWidthAvailable = false;
 	var version = 0;
-	var glVersion = gl.getParameter( gl.VERSION );
+	var glVersion = gl.getParameter( 7938 );
 
 	if ( glVersion.indexOf( 'WebGL' ) !== - 1 ) {
 
@@ -19203,12 +19197,12 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 		var texture = gl.createTexture();
 
 		gl.bindTexture( type, texture );
-		gl.texParameteri( type, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-		gl.texParameteri( type, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+		gl.texParameteri( type, 10241, 9728 );
+		gl.texParameteri( type, 10240, 9728 );
 
 		for ( var i = 0; i < count; i ++ ) {
 
-			gl.texImage2D( target + i, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
+			gl.texImage2D( target + i, 0, 6408, 1, 1, 0, 6408, 5121, data );
 
 		}
 
@@ -19217,8 +19211,8 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	}
 
 	var emptyTextures = {};
-	emptyTextures[ gl.TEXTURE_2D ] = createTexture( gl.TEXTURE_2D, gl.TEXTURE_2D, 1 );
-	emptyTextures[ gl.TEXTURE_CUBE_MAP ] = createTexture( gl.TEXTURE_CUBE_MAP, gl.TEXTURE_CUBE_MAP_POSITIVE_X, 6 );
+	emptyTextures[ 3553 ] = createTexture( 3553, 3553, 1 );
+	emptyTextures[ 34067 ] = createTexture( 34067, 34069, 6 );
 
 	// init
 
@@ -19226,12 +19220,12 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	depthBuffer.setClear( 1 );
 	stencilBuffer.setClear( 0 );
 
-	enable( gl.DEPTH_TEST );
+	enable( 2929 );
 	depthBuffer.setFunc( LessEqualDepth );
 
 	setFlipSided( false );
 	setCullFace( CullFaceBack );
-	enable( gl.CULL_FACE );
+	enable( 2884 );
 
 	setBlending( NoBlending );
 
@@ -19323,7 +19317,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 			     extensions.get( 'WEBGL_compressed_texture_etc1' ) ||
 			     extensions.get( 'WEBGL_compressed_texture_astc' ) ) {
 
-				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
+				var formats = gl.getParameter( 34467 );
 
 				for ( var i = 0; i < formats.length; i ++ ) {
 
@@ -19361,7 +19355,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 			if ( currentBlendingEnabled ) {
 
-				disable( gl.BLEND );
+				disable( 3042 );
 				currentBlendingEnabled = false;
 
 			}
@@ -19372,7 +19366,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( ! currentBlendingEnabled ) {
 
-			enable( gl.BLEND );
+			enable( 3042 );
 			currentBlendingEnabled = true;
 
 		}
@@ -19383,7 +19377,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 				if ( currentBlendEquation !== AddEquation || currentBlendEquationAlpha !== AddEquation ) {
 
-					gl.blendEquation( gl.FUNC_ADD );
+					gl.blendEquation( 32774 );
 
 					currentBlendEquation = AddEquation;
 					currentBlendEquationAlpha = AddEquation;
@@ -19395,19 +19389,19 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 					switch ( blending ) {
 
 						case NormalBlending:
-							gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+							gl.blendFuncSeparate( 1, 771, 1, 771 );
 							break;
 
 						case AdditiveBlending:
-							gl.blendFunc( gl.ONE, gl.ONE );
+							gl.blendFunc( 1, 1 );
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
+							gl.blendFuncSeparate( 0, 0, 769, 771 );
 							break;
 
 						case MultiplyBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
+							gl.blendFuncSeparate( 0, 768, 0, 770 );
 							break;
 
 						default:
@@ -19421,19 +19415,19 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 					switch ( blending ) {
 
 						case NormalBlending:
-							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+							gl.blendFuncSeparate( 770, 771, 1, 771 );
 							break;
 
 						case AdditiveBlending:
-							gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+							gl.blendFunc( 770, 1 );
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+							gl.blendFunc( 0, 769 );
 							break;
 
 						case MultiplyBlending:
-							gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+							gl.blendFunc( 0, 768 );
 							break;
 
 						default:
@@ -19492,8 +19486,8 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	function setMaterial( material, frontFaceCW ) {
 
 		material.side === DoubleSide
-			? disable( gl.CULL_FACE )
-			: enable( gl.CULL_FACE );
+			? disable( 2884 )
+			: enable( 2884 );
 
 		var flipSided = ( material.side === BackSide );
 		if ( frontFaceCW ) flipSided = ! flipSided;
@@ -19521,11 +19515,11 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 			if ( flipSided ) {
 
-				gl.frontFace( gl.CW );
+				gl.frontFace( 2304 );
 
 			} else {
 
-				gl.frontFace( gl.CCW );
+				gl.frontFace( 2305 );
 
 			}
 
@@ -19539,21 +19533,21 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( cullFace !== CullFaceNone ) {
 
-			enable( gl.CULL_FACE );
+			enable( 2884 );
 
 			if ( cullFace !== currentCullFace ) {
 
 				if ( cullFace === CullFaceBack ) {
 
-					gl.cullFace( gl.BACK );
+					gl.cullFace( 1029 );
 
 				} else if ( cullFace === CullFaceFront ) {
 
-					gl.cullFace( gl.FRONT );
+					gl.cullFace( 1028 );
 
 				} else {
 
-					gl.cullFace( gl.FRONT_AND_BACK );
+					gl.cullFace( 1032 );
 
 				}
 
@@ -19561,7 +19555,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		} else {
 
-			disable( gl.CULL_FACE );
+			disable( 2884 );
 
 		}
 
@@ -19585,7 +19579,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( polygonOffset ) {
 
-			enable( gl.POLYGON_OFFSET_FILL );
+			enable( 32823 );
 
 			if ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) {
 
@@ -19598,7 +19592,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		} else {
 
-			disable( gl.POLYGON_OFFSET_FILL );
+			disable( 32823 );
 
 		}
 
@@ -19608,11 +19602,11 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( scissorTest ) {
 
-			enable( gl.SCISSOR_TEST );
+			enable( 3089 );
 
 		} else {
 
-			disable( gl.SCISSOR_TEST );
+			disable( 3089 );
 
 		}
 
@@ -19622,7 +19616,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	function activeTexture( webglSlot ) {
 
-		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+		if ( webglSlot === undefined ) webglSlot = 33984 + maxTextures - 1;
 
 		if ( currentTextureSlot !== webglSlot ) {
 
@@ -19909,27 +19903,27 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ! capabilities.isWebGL2 ) return glFormat;
 
-		if ( glFormat === _gl.RED ) {
+		if ( glFormat === 6403 ) {
 
-			if ( glType === _gl.FLOAT ) return _gl.R32F;
-			if ( glType === _gl.HALF_FLOAT ) return _gl.R16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) return _gl.R8;
-
-		}
-
-		if ( glFormat === _gl.RGB ) {
-
-			if ( glType === _gl.FLOAT ) return _gl.RGB32F;
-			if ( glType === _gl.HALF_FLOAT ) return _gl.RGB16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) return _gl.RGB8;
+			if ( glType === 5126 ) return 33326;
+			if ( glType === 5131 ) return 33325;
+			if ( glType === 5121 ) return 33321;
 
 		}
 
-		if ( glFormat === _gl.RGBA ) {
+		if ( glFormat === 6407 ) {
 
-			if ( glType === _gl.FLOAT ) return _gl.RGBA32F;
-			if ( glType === _gl.HALF_FLOAT ) return _gl.RGBA16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) return _gl.RGBA8;
+			if ( glType === 5126 ) return 34837;
+			if ( glType === 5131 ) return 34843;
+			if ( glType === 5121 ) return 32849;
+
+		}
+
+		if ( glFormat === 6408 ) {
+
+			if ( glType === 5126 ) return 34836;
+			if ( glType === 5131 ) return 34842;
+			if ( glType === 5121 ) return 32856;
 
 		}
 
@@ -19943,11 +19937,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( f === NearestFilter || f === NearestMipMapNearestFilter || f === NearestMipMapLinearFilter ) {
 
-			return _gl.NEAREST;
+			return 9728;
 
 		}
 
-		return _gl.LINEAR;
+		return 9729;
 
 	}
 
@@ -20081,8 +20075,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+		state.activeTexture( 33984 + slot );
+		state.bindTexture( 3553, textureProperties.__webglTexture );
 
 	}
 
@@ -20097,8 +20091,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_3D, textureProperties.__webglTexture );
+		state.activeTexture( 33984 + slot );
+		state.bindTexture( 32879, textureProperties.__webglTexture );
 
 	}
 
@@ -20121,10 +20115,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__image__webglTextureCube );
+				state.activeTexture( 33984 + slot );
+				state.bindTexture( 34067, textureProperties.__image__webglTextureCube );
 
-				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+				_gl.pixelStorei( 37440, texture.flipY );
 
 				var isCompressed = ( texture && texture.isCompressedTexture );
 				var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
@@ -20151,7 +20145,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					glType = utils.convert( texture.type ),
 					glInternalFormat = getInternalFormat( glFormat, glType );
 
-				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, isPowerOfTwoImage );
+				setTextureParameters( 34067, texture, isPowerOfTwoImage );
 
 				for ( var i = 0; i < 6; i ++ ) {
 
@@ -20159,11 +20153,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( isDataTexture ) {
 
-							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
+							state.texImage2D( 34069 + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
 
 						} else {
 
-							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+							state.texImage2D( 34069 + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
 
 						}
 
@@ -20179,7 +20173,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
-									state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+									state.compressedTexImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
 								} else {
 
@@ -20189,7 +20183,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							} else {
 
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+								state.texImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
 
 							}
 
@@ -20212,7 +20206,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) {
 
 					// We assume images for cube map have the same size.
-					generateMipmap( _gl.TEXTURE_CUBE_MAP, texture, image.width, image.height );
+					generateMipmap( 34067, texture, image.width, image.height );
 
 				}
 
@@ -20222,8 +20216,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__image__webglTextureCube );
+				state.activeTexture( 33984 + slot );
+				state.bindTexture( 34067, textureProperties.__image__webglTextureCube );
 
 			}
 
@@ -20233,8 +20227,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function setTextureCubeDynamic( texture, slot ) {
 
-		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_CUBE_MAP, properties.get( texture ).__webglTexture );
+		state.activeTexture( 33984 + slot );
+		state.bindTexture( 34067, properties.get( texture ).__webglTexture );
 
 	}
 
@@ -20244,16 +20238,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( isPowerOfTwoImage ) {
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, utils.convert( texture.wrapS ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, utils.convert( texture.wrapT ) );
+			_gl.texParameteri( textureType, 10242, utils.convert( texture.wrapS ) );
+			_gl.texParameteri( textureType, 10243, utils.convert( texture.wrapT ) );
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, utils.convert( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, utils.convert( texture.minFilter ) );
+			_gl.texParameteri( textureType, 10240, utils.convert( texture.magFilter ) );
+			_gl.texParameteri( textureType, 10241, utils.convert( texture.minFilter ) );
 
 		} else {
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+			_gl.texParameteri( textureType, 10242, 33071 );
+			_gl.texParameteri( textureType, 10243, 33071 );
 
 			if ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) {
 
@@ -20261,8 +20255,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterFallback( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterFallback( texture.minFilter ) );
+			_gl.texParameteri( textureType, 10240, filterFallback( texture.magFilter ) );
+			_gl.texParameteri( textureType, 10241, filterFallback( texture.minFilter ) );
 
 			if ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) {
 
@@ -20296,11 +20290,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isDataTexture3D ) {
 
-			textureType = _gl.TEXTURE_3D;
+			textureType = 32879;
 
 		} else {
 
-			textureType = _gl.TEXTURE_2D;
+			textureType = 3553;
 
 		}
 
@@ -20316,16 +20310,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			info.memory.textures ++;
 
 		}
-		state.activeTexture( _gl.TEXTURE0 + slot );
+		state.activeTexture( 33984 + slot );
 
 
 		state.bindTexture( textureType, textureProperties.__webglTexture );
 
 
 
-		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		_gl.pixelStorei( 37440, texture.flipY );
+		_gl.pixelStorei( 37441, texture.premultiplyAlpha );
+		_gl.pixelStorei( 3317, texture.unpackAlignment );
 
 		var image = clampToMaxSize( texture.image, capabilities.maxTextureSize );
 
@@ -20348,21 +20342,21 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			// populate depth texture with dummy data
 
-			glInternalFormat = _gl.DEPTH_COMPONENT;
+			glInternalFormat = 6402;
 
 			if ( texture.type === FloatType ) {
 
 				if ( ! capabilities.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
-				glInternalFormat = _gl.DEPTH_COMPONENT32F;
+				glInternalFormat = 36012;
 
 			} else if ( capabilities.isWebGL2 ) {
 
 				// WebGL 2.0 requires signed internalformat for glTexImage2D
-				glInternalFormat = _gl.DEPTH_COMPONENT16;
+				glInternalFormat = 33189;
 
 			}
 
-			if ( texture.format === DepthFormat && glInternalFormat === _gl.DEPTH_COMPONENT ) {
+			if ( texture.format === DepthFormat && glInternalFormat === 6402 ) {
 
 				// The error INVALID_OPERATION is generated by texImage2D if format and internalformat are
 				// DEPTH_COMPONENT and type is not UNSIGNED_SHORT or UNSIGNED_INT
@@ -20382,7 +20376,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
 			if ( texture.format === DepthStencilFormat ) {
 
-				glInternalFormat = _gl.DEPTH_STENCIL;
+				glInternalFormat = 34041;
 
 				// The error INVALID_OPERATION is generated by texImage2D if format and internalformat are
 				// DEPTH_STENCIL and type is not UNSIGNED_INT_24_8_WEBGL.
@@ -20398,7 +20392,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+			state.texImage2D( 3553, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
 
 		} else if ( texture.isDataTexture ) {
 
@@ -20411,7 +20405,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					state.texImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
 
 				}
 
@@ -20420,7 +20414,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+				state.texImage2D( 3553, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
 				textureProperties.__maxMipLevel = 0;
 
 			}
@@ -20435,7 +20429,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
-						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+						state.compressedTexImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
 					} else {
 
@@ -20445,7 +20439,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				} else {
 
-					state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					state.texImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
 
 				}
 
@@ -20455,7 +20449,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( texture.isDataTexture3D ) {
 
-			state.texImage3D( _gl.TEXTURE_3D, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+			state.texImage3D( 32879, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
 			textureProperties.__maxMipLevel = 0;
 
 		} else {
@@ -20471,7 +20465,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, glFormat, glType, mipmap );
+					state.texImage2D( 3553, i, glInternalFormat, glFormat, glType, mipmap );
 
 				}
 
@@ -20480,7 +20474,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, glFormat, glType, image );
+				state.texImage2D( 3553, 0, glInternalFormat, glFormat, glType, image );
 				textureProperties.__maxMipLevel = 0;
 
 			}
@@ -20489,7 +20483,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) {
 
-			generateMipmap( _gl.TEXTURE_2D, texture, image.width, image.height );
+			generateMipmap( 3553, texture, image.width, image.height );
 
 		}
 
@@ -20508,35 +20502,35 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		var glType = utils.convert( renderTarget.texture.type );
 		var glInternalFormat = getInternalFormat( glFormat, glType );
 		state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		_gl.bindFramebuffer( 36160, framebuffer );
+		_gl.framebufferTexture2D( 36160, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
+		_gl.bindFramebuffer( 36160, null );
 
 	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
 	function setupRenderBufferStorage( renderbuffer, renderTarget ) {
 
-		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
+		_gl.bindRenderbuffer( 36161, renderbuffer );
 
 		if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
 
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height );
-			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
+			_gl.renderbufferStorage( 36161, 33189, renderTarget.width, renderTarget.height );
+			_gl.framebufferRenderbuffer( 36160, 36096, 36161, renderbuffer );
 
 		} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
 
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
-			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
+			_gl.renderbufferStorage( 36161, 34041, renderTarget.width, renderTarget.height );
+			_gl.framebufferRenderbuffer( 36160, 33306, 36161, renderbuffer );
 
 		} else {
 
 			// FIXME: We don't support !depth !stencil
-			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height );
+			_gl.renderbufferStorage( 36161, 32854, renderTarget.width, renderTarget.height );
 
 		}
 
-		_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
+		_gl.bindRenderbuffer( 36161, null );
 
 	}
 
@@ -20546,7 +20540,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		var isCube = ( renderTarget && renderTarget.isWebGLRenderTargetCube );
 		if ( isCube ) throw new Error( 'Depth Texture with cube render targets is not supported' );
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+		_gl.bindFramebuffer( 36160, framebuffer );
 
 		if ( ! ( renderTarget.depthTexture && renderTarget.depthTexture.isDepthTexture ) ) {
 
@@ -20571,11 +20565,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthTexture.format === DepthFormat ) {
 
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+			_gl.framebufferTexture2D( 36160, 36096, 3553, webglDepthTexture, 0 );
 
 		} else if ( renderTarget.depthTexture.format === DepthStencilFormat ) {
 
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+			_gl.framebufferTexture2D( 36160, 33306, 3553, webglDepthTexture, 0 );
 
 		} else {
 
@@ -20606,7 +20600,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
+					_gl.bindFramebuffer( 36160, renderTargetProperties.__webglFramebuffer[ i ] );
 					renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
 					setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget );
 
@@ -20614,7 +20608,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				_gl.bindFramebuffer( 36160, renderTargetProperties.__webglFramebuffer );
 				renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
 				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
 
@@ -20622,7 +20616,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		_gl.bindFramebuffer( 36160, null );
 
 	}
 
@@ -20663,36 +20657,36 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( isCube ) {
 
-			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
-			setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, isTargetPowerOfTwo );
+			state.bindTexture( 34067, textureProperties.__webglTexture );
+			setTextureParameters( 34067, renderTarget.texture, isTargetPowerOfTwo );
 
 			for ( var i = 0; i < 6; i ++ ) {
 
-				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
+				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, 36064, 34069 + i );
 
 			}
 
 			if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) {
 
-				generateMipmap( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, renderTarget.width, renderTarget.height );
+				generateMipmap( 34067, renderTarget.texture, renderTarget.width, renderTarget.height );
 
 			}
 
-			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+			state.bindTexture( 34067, null );
 
 		} else {
 
-			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
-			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
-			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+			state.bindTexture( 3553, textureProperties.__webglTexture );
+			setTextureParameters( 3553, renderTarget.texture, isTargetPowerOfTwo );
+			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, 36064, 3553 );
 
 			if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) {
 
-				generateMipmap( _gl.TEXTURE_2D, renderTarget.texture, renderTarget.width, renderTarget.height );
+				generateMipmap( 3553, renderTarget.texture, renderTarget.width, renderTarget.height );
 
 			}
 
-			state.bindTexture( _gl.TEXTURE_2D, null );
+			state.bindTexture( 3553, null );
 
 		}
 
@@ -20713,7 +20707,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( textureNeedsGenerateMipmaps( texture, isTargetPowerOfTwo ) ) {
 
-			var target = renderTarget.isWebGLRenderTargetCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+			var target = renderTarget.isWebGLRenderTargetCube ? 34067 : 3553;
 			var webglTexture = properties.get( texture ).__webglTexture;
 
 			state.bindTexture( target, webglTexture );
@@ -20759,33 +20753,33 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		var extension;
 
-		if ( p === RepeatWrapping ) return gl.REPEAT;
-		if ( p === ClampToEdgeWrapping ) return gl.CLAMP_TO_EDGE;
-		if ( p === MirroredRepeatWrapping ) return gl.MIRRORED_REPEAT;
+		if ( p === RepeatWrapping ) return 10497;
+		if ( p === ClampToEdgeWrapping ) return 33071;
+		if ( p === MirroredRepeatWrapping ) return 33648;
 
-		if ( p === NearestFilter ) return gl.NEAREST;
-		if ( p === NearestMipMapNearestFilter ) return gl.NEAREST_MIPMAP_NEAREST;
-		if ( p === NearestMipMapLinearFilter ) return gl.NEAREST_MIPMAP_LINEAR;
+		if ( p === NearestFilter ) return 9728;
+		if ( p === NearestMipMapNearestFilter ) return 9984;
+		if ( p === NearestMipMapLinearFilter ) return 9986;
 
-		if ( p === LinearFilter ) return gl.LINEAR;
-		if ( p === LinearMipMapNearestFilter ) return gl.LINEAR_MIPMAP_NEAREST;
-		if ( p === LinearMipMapLinearFilter ) return gl.LINEAR_MIPMAP_LINEAR;
+		if ( p === LinearFilter ) return 9729;
+		if ( p === LinearMipMapNearestFilter ) return 9985;
+		if ( p === LinearMipMapLinearFilter ) return 9987;
 
-		if ( p === UnsignedByteType ) return gl.UNSIGNED_BYTE;
-		if ( p === UnsignedShort4444Type ) return gl.UNSIGNED_SHORT_4_4_4_4;
-		if ( p === UnsignedShort5551Type ) return gl.UNSIGNED_SHORT_5_5_5_1;
-		if ( p === UnsignedShort565Type ) return gl.UNSIGNED_SHORT_5_6_5;
+		if ( p === UnsignedByteType ) return 5121;
+		if ( p === UnsignedShort4444Type ) return 32819;
+		if ( p === UnsignedShort5551Type ) return 32820;
+		if ( p === UnsignedShort565Type ) return 33635;
 
-		if ( p === ByteType ) return gl.BYTE;
-		if ( p === ShortType ) return gl.SHORT;
-		if ( p === UnsignedShortType ) return gl.UNSIGNED_SHORT;
-		if ( p === IntType ) return gl.INT;
-		if ( p === UnsignedIntType ) return gl.UNSIGNED_INT;
-		if ( p === FloatType ) return gl.FLOAT;
+		if ( p === ByteType ) return 5120;
+		if ( p === ShortType ) return 5122;
+		if ( p === UnsignedShortType ) return 5123;
+		if ( p === IntType ) return 5124;
+		if ( p === UnsignedIntType ) return 5125;
+		if ( p === FloatType ) return 5126;
 
 		if ( p === HalfFloatType ) {
 
-			if ( capabilities.isWebGL2 ) return gl.HALF_FLOAT;
+			if ( capabilities.isWebGL2 ) return 5131;
 
 			extension = extensions.get( 'OES_texture_half_float' );
 
@@ -20793,31 +20787,31 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		}
 
-		if ( p === AlphaFormat ) return gl.ALPHA;
-		if ( p === RGBFormat ) return gl.RGB;
-		if ( p === RGBAFormat ) return gl.RGBA;
-		if ( p === LuminanceFormat ) return gl.LUMINANCE;
-		if ( p === LuminanceAlphaFormat ) return gl.LUMINANCE_ALPHA;
-		if ( p === DepthFormat ) return gl.DEPTH_COMPONENT;
-		if ( p === DepthStencilFormat ) return gl.DEPTH_STENCIL;
-		if ( p === RedFormat ) return gl.RED;
+		if ( p === AlphaFormat ) return 6406;
+		if ( p === RGBFormat ) return 6407;
+		if ( p === RGBAFormat ) return 6408;
+		if ( p === LuminanceFormat ) return 6409;
+		if ( p === LuminanceAlphaFormat ) return 6410;
+		if ( p === DepthFormat ) return 6402;
+		if ( p === DepthStencilFormat ) return 34041;
+		if ( p === RedFormat ) return 6403;
 
-		if ( p === AddEquation ) return gl.FUNC_ADD;
-		if ( p === SubtractEquation ) return gl.FUNC_SUBTRACT;
-		if ( p === ReverseSubtractEquation ) return gl.FUNC_REVERSE_SUBTRACT;
+		if ( p === AddEquation ) return 32774;
+		if ( p === SubtractEquation ) return 32778;
+		if ( p === ReverseSubtractEquation ) return 32779;
 
-		if ( p === ZeroFactor ) return gl.ZERO;
-		if ( p === OneFactor ) return gl.ONE;
-		if ( p === SrcColorFactor ) return gl.SRC_COLOR;
-		if ( p === OneMinusSrcColorFactor ) return gl.ONE_MINUS_SRC_COLOR;
-		if ( p === SrcAlphaFactor ) return gl.SRC_ALPHA;
-		if ( p === OneMinusSrcAlphaFactor ) return gl.ONE_MINUS_SRC_ALPHA;
-		if ( p === DstAlphaFactor ) return gl.DST_ALPHA;
-		if ( p === OneMinusDstAlphaFactor ) return gl.ONE_MINUS_DST_ALPHA;
+		if ( p === ZeroFactor ) return 0;
+		if ( p === OneFactor ) return 1;
+		if ( p === SrcColorFactor ) return 768;
+		if ( p === OneMinusSrcColorFactor ) return 769;
+		if ( p === SrcAlphaFactor ) return 770;
+		if ( p === OneMinusSrcAlphaFactor ) return 771;
+		if ( p === DstAlphaFactor ) return 772;
+		if ( p === OneMinusDstAlphaFactor ) return 773;
 
-		if ( p === DstColorFactor ) return gl.DST_COLOR;
-		if ( p === OneMinusDstColorFactor ) return gl.ONE_MINUS_DST_COLOR;
-		if ( p === SrcAlphaSaturateFactor ) return gl.SRC_ALPHA_SATURATE;
+		if ( p === DstColorFactor ) return 774;
+		if ( p === OneMinusDstColorFactor ) return 775;
+		if ( p === SrcAlphaSaturateFactor ) return 776;
 
 		if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
 			p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
@@ -20879,8 +20873,8 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 			if ( capabilities.isWebGL2 ) {
 
-				if ( p === MinEquation ) return gl.MIN;
-				if ( p === MaxEquation ) return gl.MAX;
+				if ( p === MinEquation ) return 32775;
+				if ( p === MaxEquation ) return 32776;
 
 			}
 
@@ -20897,7 +20891,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === UnsignedInt248Type ) {
 
-			if ( capabilities.isWebGL2 ) return gl.UNSIGNED_INT_24_8;
+			if ( capabilities.isWebGL2 ) return 34042;
 
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
@@ -21258,68 +21252,72 @@ ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototyp
 
 	constructor: ArrayCamera,
 
-	isArrayCamera: true,
-
-	/**
-	 * Assumes 2 cameras that are perpendicular and share an X-axis, and that
-	 * the cameras' projection and world matrices have already been set.
-	 * And that near and far planes are identical for both cameras.
-	 */
-	setProjectionFromUnion: function () {
-		var cameraLPos = new Vector3();
-		var cameraRPos = new Vector3();
-
-		return function () {
-			cameraLPos.setFromMatrixPosition( this.cameras[ 0 ].matrixWorld );
-			cameraRPos.setFromMatrixPosition( this.cameras[ 1 ].matrixWorld );
-
-			var ipd = cameraLPos.distanceTo( cameraRPos );
-
-			var projL = this.cameras[ 0 ].projectionMatrix;
-			var projR = this.cameras[ 1 ].projectionMatrix;
-
-			// VR systems will have identical far and near planes, and
-			// most likely identical top and bottom frustum extents.
-			// via: https://computergraphics.stackexchange.com/a/4765
-			var near = projL[ 14 ] / ( projL[ 10 ] - 1 );
-			var far = projL[ 14 ] / ( projL[ 10 ] + 1 );
-
-			var leftFovL = ( projL[ 8 ] - 1 ) / projL[ 0 ];
-			var rightFovR = ( projR[ 8 ] + 1 ) / projR[ 0 ];
-			var leftL = leftFovL * near;
-			var rightR = rightFovR * near;
-			var topL = near * ( projL[ 9 ] + 1 ) / projL[ 5 ];
-			var topR = near * ( projR[ 9 ] + 1 ) / projR[ 5 ];
-			var bottomL = near * ( projL[ 9 ] - 1 ) / projL[ 5 ];
-			var bottomR = near * ( projR[ 9 ] - 1 ) / projR[ 5 ];
-
-			// Calculate the new camera's position offset from the
-			// left camera.
-			var zOffset = ipd / (leftFovL + rightFovR);
-			var xOffset = zOffset * leftFovL;
-
-			// TODO: Better way to apply this offset?
-			this.cameras[ 0 ].matrixWorld.decompose( this.position, this.quaternion, this.scale );
-			this.translateX(xOffset);
-			this.translateZ(-zOffset);
-			this.matrixWorld.compose( this.position, this.quaternion, this.scale );
-			this.matrixWorldInverse.getInverse(this.matrixWorld);
-
-			// Find the union of the frustum values of the cameras and scale
-			// the values so that the near plane's position does not change in world space,
-			// although must now be relative to the new union camera.
-			var near2 = near + zOffset;
-			var far2 = far + zOffset;
-			var left = leftL - xOffset;
-			var right = rightR + (ipd - xOffset);
-			var top = Math.max( topL, topR );
-			var bottom = Math.min( bottomL, bottomR );
-
-			this.projectionMatrix.makePerspective( left, right, top, bottom, near2, far2 );
-		}
-	}(),
+	isArrayCamera: true
 
 } );
+
+/**
+ * @author jsantell / https://www.jsantell.com/
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+var cameraLPos = new Vector3();
+var cameraRPos = new Vector3();
+
+/**
+ * Assumes 2 cameras that are parallel and share an X-axis, and that
+ * the cameras' projection and world matrices have already been set.
+ * And that near and far planes are identical for both cameras.
+ * Visualization of this technique: https://computergraphics.stackexchange.com/a/4765
+ */
+function setProjectionFromUnion( camera, cameraL, cameraR ) {
+
+	cameraLPos.setFromMatrixPosition( cameraL.matrixWorld );
+	cameraRPos.setFromMatrixPosition( cameraR.matrixWorld );
+
+	var ipd = cameraLPos.distanceTo( cameraRPos );
+
+	var projL = cameraL.projectionMatrix.elements;
+	var projR = cameraR.projectionMatrix.elements;
+
+	// VR systems will have identical far and near planes, and
+	// most likely identical top and bottom frustum extents.
+	// Use the left camera for these values.
+	var near = projL[ 14 ] / ( projL[ 10 ] - 1 );
+	var far = projL[ 14 ] / ( projL[ 10 ] + 1 );
+	var topFov = ( projL[ 9 ] + 1 ) / projL[ 5 ];
+	var bottomFov = ( projL[ 9 ] - 1 ) / projL[ 5 ];
+
+	var leftFov = ( projL[ 8 ] - 1 ) / projL[ 0 ];
+	var rightFov = ( projR[ 8 ] + 1 ) / projR[ 0 ];
+	var left = near * leftFov;
+	var right = near * rightFov;
+
+	// Calculate the new camera's position offset from the
+	// left camera. xOffset should be roughly half `ipd`.
+	var zOffset = ipd / ( - leftFov + rightFov );
+	var xOffset = zOffset * - leftFov;
+
+	// TODO: Better way to apply this offset?
+	cameraL.matrixWorld.decompose( camera.position, camera.quaternion, camera.scale );
+	camera.translateX( xOffset );
+	camera.translateZ( zOffset );
+	camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
+	camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
+	// Find the union of the frustum values of the cameras and scale
+	// the values so that the near plane's position does not change in world space,
+	// although must now be relative to the new union camera.
+	var near2 = near + zOffset;
+	var far2 = far + zOffset;
+	var left2 = left - xOffset;
+	var right2 = right + ( ipd - xOffset );
+	var top2 = topFov * far / far2 * near2;
+	var bottom2 = bottomFov * far / far2 * near2;
+
+	camera.projectionMatrix.makePerspective( left2, right2, top2, bottom2, near2, far2 );
+
+}
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -21337,6 +21335,8 @@ function WebVRManager( renderer ) {
 	var controllers = [];
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
+
+	var framebufferScaleFactor = 1.0;
 
 	var frameOfReferenceType = 'stage';
 
@@ -21378,8 +21378,8 @@ function WebVRManager( renderer ) {
 		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
-			var renderWidth = eyeParameters.renderWidth;
-			var renderHeight = eyeParameters.renderHeight;
+			var renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
+			var renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			currentSize = renderer.getSize();
@@ -21522,6 +21522,12 @@ function WebVRManager( renderer ) {
 
 	};
 
+	this.setFramebufferScaleFactor = function ( value ) {
+
+		framebufferScaleFactor = value;
+
+	};
+
 	this.setFrameOfReferenceType = function ( value ) {
 
 		frameOfReferenceType = value;
@@ -21637,7 +21643,7 @@ function WebVRManager( renderer ) {
 		cameraL.projectionMatrix.fromArray( frameData.leftProjectionMatrix );
 		cameraR.projectionMatrix.fromArray( frameData.rightProjectionMatrix );
 
-		cameraVR.setProjectionFromUnion();
+		setProjectionFromUnion( cameraVR, cameraL, cameraR );
 
 		//
 
@@ -21713,6 +21719,8 @@ function WebXRManager( renderer ) {
 
 	var device = null;
 	var session = null;
+
+	var framebufferScaleFactor = 1.0;
 
 	var frameOfReference = null;
 	var frameOfReferenceType = 'stage';
@@ -21793,6 +21801,12 @@ function WebXRManager( renderer ) {
 
 	}
 
+	this.setFramebufferScaleFactor = function ( value ) {
+
+		framebufferScaleFactor = value;
+
+	};
+
 	this.setFrameOfReferenceType = function ( value ) {
 
 		frameOfReferenceType = value;
@@ -21810,7 +21824,7 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			session.baseLayer = new XRWebGLLayer( session, gl );
+			session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: framebufferScaleFactor } );
 			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
 
 				frameOfReference = value;
@@ -21830,6 +21844,13 @@ function WebXRManager( renderer ) {
 
 				inputSources = session.getInputSources();
 				console.log( inputSources );
+
+				for ( var i = 0; i < controllers.length; i ++ ) {
+
+					var controller = controllers[ i ];
+					controller.userData.inputSource = inputSources[ i ];
+
+				}
 
 			} );
 
@@ -21880,7 +21901,7 @@ function WebXRManager( renderer ) {
 
 			}
 
-			cameraVR.setProjectionFromUnion();
+			setProjectionFromUnion( cameraVR, cameraL, cameraR );
 
 			return cameraVR;
 
@@ -22424,9 +22445,9 @@ function WebGLRenderer( parameters ) {
 
 		var bits = 0;
 
-		if ( color === undefined || color ) bits |= _gl.COLOR_BUFFER_BIT;
-		if ( depth === undefined || depth ) bits |= _gl.DEPTH_BUFFER_BIT;
-		if ( stencil === undefined || stencil ) bits |= _gl.STENCIL_BUFFER_BIT;
+		if ( color === undefined || color ) bits |= 16384;
+		if ( depth === undefined || depth ) bits |= 256;
+		if ( stencil === undefined || stencil ) bits |= 1024;
 
 		_gl.clear( bits );
 
@@ -22552,47 +22573,47 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.hasPositions ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.position );
-			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
+			_gl.bindBuffer( 34962, buffers.position );
+			_gl.bufferData( 34962, object.positionArray, 35048 );
 
 			state.enableAttribute( programAttributes.position );
-			_gl.vertexAttribPointer( programAttributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( programAttributes.position, 3, 5126, false, 0, 0 );
 
 		}
 
 		if ( object.hasNormals ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
-			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
+			_gl.bindBuffer( 34962, buffers.normal );
+			_gl.bufferData( 34962, object.normalArray, 35048 );
 
 			state.enableAttribute( programAttributes.normal );
-			_gl.vertexAttribPointer( programAttributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( programAttributes.normal, 3, 5126, false, 0, 0 );
 
 		}
 
 		if ( object.hasUvs ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.uv );
-			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
+			_gl.bindBuffer( 34962, buffers.uv );
+			_gl.bufferData( 34962, object.uvArray, 35048 );
 
 			state.enableAttribute( programAttributes.uv );
-			_gl.vertexAttribPointer( programAttributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( programAttributes.uv, 2, 5126, false, 0, 0 );
 
 		}
 
 		if ( object.hasColors ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.color );
-			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
+			_gl.bindBuffer( 34962, buffers.color );
+			_gl.bufferData( 34962, object.colorArray, 35048 );
 
 			state.enableAttribute( programAttributes.color );
-			_gl.vertexAttribPointer( programAttributes.color, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( programAttributes.color, 3, 5126, false, 0, 0 );
 
 		}
 
 		state.disableUnusedAttributes();
 
-		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
+		_gl.drawArrays( 4, 0, object.count );
 
 		object.count = 0;
 
@@ -22658,7 +22679,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( index !== null ) {
 
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attribute.buffer );
+				_gl.bindBuffer( 34963, attribute.buffer );
 
 			}
 
@@ -22698,22 +22719,22 @@ function WebGLRenderer( parameters ) {
 			if ( material.wireframe === true ) {
 
 				state.setLineWidth( material.wireframeLinewidth * getTargetPixelRatio() );
-				renderer.setMode( _gl.LINES );
+				renderer.setMode( 1 );
 
 			} else {
 
 				switch ( object.drawMode ) {
 
 					case TrianglesDrawMode:
-						renderer.setMode( _gl.TRIANGLES );
+						renderer.setMode( 4 );
 						break;
 
 					case TriangleStripDrawMode:
-						renderer.setMode( _gl.TRIANGLE_STRIP );
+						renderer.setMode( 5 );
 						break;
 
 					case TriangleFanDrawMode:
-						renderer.setMode( _gl.TRIANGLE_FAN );
+						renderer.setMode( 6 );
 						break;
 
 				}
@@ -22731,25 +22752,25 @@ function WebGLRenderer( parameters ) {
 
 			if ( object.isLineSegments ) {
 
-				renderer.setMode( _gl.LINES );
+				renderer.setMode( 1 );
 
 			} else if ( object.isLineLoop ) {
 
-				renderer.setMode( _gl.LINE_LOOP );
+				renderer.setMode( 2 );
 
 			} else {
 
-				renderer.setMode( _gl.LINE_STRIP );
+				renderer.setMode( 3 );
 
 			}
 
 		} else if ( object.isPoints ) {
 
-			renderer.setMode( _gl.POINTS );
+			renderer.setMode( 0 );
 
 		} else if ( object.isSprite ) {
 
-			renderer.setMode( _gl.TRIANGLES );
+			renderer.setMode( 4 );
 
 		}
 
@@ -22835,7 +22856,7 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+						_gl.bindBuffer( 34962, buffer );
 						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
 
 					} else {
@@ -22856,7 +22877,7 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+						_gl.bindBuffer( 34962, buffer );
 						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 					}
@@ -23113,61 +23134,6 @@ function WebGLRenderer( parameters ) {
 		currentRenderState = null;
 
 	};
-
-	/*
-	// TODO Duplicated code (Frustum)
-
-	var _sphere = new Sphere();
-
-	function isObjectViewable( object ) {
-
-		var geometry = object.geometry;
-
-		if ( geometry.boundingSphere === null )
-			geometry.computeBoundingSphere();
-
-		_sphere.copy( geometry.boundingSphere ).
-		applyMatrix4( object.matrixWorld );
-
-		return isSphereViewable( _sphere );
-
-	}
-
-	function isSpriteViewable( sprite ) {
-
-		_sphere.center.set( 0, 0, 0 );
-		_sphere.radius = 0.7071067811865476;
-		_sphere.applyMatrix4( sprite.matrixWorld );
-
-		return isSphereViewable( _sphere );
-
-	}
-
-	function isSphereViewable( sphere ) {
-
-		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
-
-		var numPlanes = _clipping.numPlanes;
-
-		if ( numPlanes === 0 ) return true;
-
-		var planes = _this.clippingPlanes,
-
-			center = sphere.center,
-			negRad = - sphere.radius,
-			i = 0;
-
-		do {
-
-			// out when deeper than radius in the negative halfspace
-			if ( planes[ i ].distanceToPoint( center ) < negRad ) return false;
-
-		} while ( ++ i !== numPlanes );
-
-		return true;
-
-	}
-	*/
 
 	function projectObject( object, camera, sortObjects ) {
 
@@ -24515,7 +24481,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _currentFramebuffer !== framebuffer ) {
 
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+			_gl.bindFramebuffer( 36160, framebuffer );
 			_currentFramebuffer = framebuffer;
 
 		}
@@ -24527,7 +24493,7 @@ function WebGLRenderer( parameters ) {
 		if ( isCube ) {
 
 			var textureProperties = properties.get( renderTarget.texture );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, renderTarget.activeMipMapLevel );
+			_gl.framebufferTexture2D( 36160, 36064, 34069 + renderTarget.activeCubeFace, textureProperties.__webglTexture, renderTarget.activeMipMapLevel );
 
 		}
 
@@ -24550,7 +24516,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( framebuffer !== _currentFramebuffer ) {
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+				_gl.bindFramebuffer( 36160, framebuffer );
 
 				restore = true;
 
@@ -24562,14 +24528,14 @@ function WebGLRenderer( parameters ) {
 				var textureFormat = texture.format;
 				var textureType = texture.type;
 
-				if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+				if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( 35739 ) ) {
 
 					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 					return;
 
 				}
 
-				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
+				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( 35738 ) && // IE11, Edge and Chrome Mac < 52 (#9513)
 					! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
 					! ( textureType === HalfFloatType && ( capabilities.isWebGL2 ? extensions.get( 'EXT_color_buffer_float' ) : extensions.get( 'EXT_color_buffer_half_float' ) ) ) ) {
 
@@ -24578,7 +24544,7 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
+				if ( _gl.checkFramebufferStatus( 36160 ) === 36053 ) {
 
 					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 
@@ -24598,7 +24564,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( restore ) {
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
+					_gl.bindFramebuffer( 36160, _currentFramebuffer );
 
 				}
 
@@ -24616,7 +24582,7 @@ function WebGLRenderer( parameters ) {
 
 		this.setTexture2D( texture, 0 );
 
-		_gl.copyTexImage2D( _gl.TEXTURE_2D, level || 0, glFormat, position.x, position.y, width, height, 0 );
+		_gl.copyTexImage2D( 3553, level || 0, glFormat, position.x, position.y, width, height, 0 );
 
 	};
 
@@ -24631,11 +24597,11 @@ function WebGLRenderer( parameters ) {
 
 		if ( srcTexture.isDataTexture ) {
 
-			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
+			_gl.texSubImage2D( 3553, level || 0, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
 
 		} else {
 
-			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, glFormat, glType, srcTexture.image );
+			_gl.texSubImage2D( 3553, level || 0, position.x, position.y, glFormat, glType, srcTexture.image );
 
 		}
 
@@ -26080,9 +26046,20 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}() ),
 
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		this.geometry.copy( source.geometry );
+		this.material.copy( source.material );
+
+		return this;
+
+	},
+
 	clone: function () {
 
-		return new this.constructor( this.geometry, this.material ).copy( this );
+		return new this.constructor().copy( this );
 
 	}
 
@@ -31926,6 +31903,1751 @@ var Materials = /*#__PURE__*/Object.freeze({
 });
 
 /**
+ * @author tschw
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ */
+
+var AnimationUtils = {
+
+	// same as Array.prototype.slice, but also works on typed arrays
+	arraySlice: function ( array, from, to ) {
+
+		if ( AnimationUtils.isTypedArray( array ) ) {
+
+			// in ios9 array.subarray(from, undefined) will return empty array
+			// but array.subarray(from) or array.subarray(from, len) is correct
+			return new array.constructor( array.subarray( from, to !== undefined ? to : array.length ) );
+
+		}
+
+		return array.slice( from, to );
+
+	},
+
+	// converts an array to a specific type
+	convertArray: function ( array, type, forceClone ) {
+
+		if ( ! array || // let 'undefined' and 'null' pass
+				! forceClone && array.constructor === type ) return array;
+
+		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
+
+			return new type( array ); // create typed array
+
+		}
+
+		return Array.prototype.slice.call( array ); // create Array
+
+	},
+
+	isTypedArray: function ( object ) {
+
+		return ArrayBuffer.isView( object ) &&
+				! ( object instanceof DataView );
+
+	},
+
+	// returns an array by which times and values can be sorted
+	getKeyframeOrder: function ( times ) {
+
+		function compareTime( i, j ) {
+
+			return times[ i ] - times[ j ];
+
+		}
+
+		var n = times.length;
+		var result = new Array( n );
+		for ( var i = 0; i !== n; ++ i ) result[ i ] = i;
+
+		result.sort( compareTime );
+
+		return result;
+
+	},
+
+	// uses the array previously returned by 'getKeyframeOrder' to sort data
+	sortedArray: function ( values, stride, order ) {
+
+		var nValues = values.length;
+		var result = new values.constructor( nValues );
+
+		for ( var i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
+
+			var srcOffset = order[ i ] * stride;
+
+			for ( var j = 0; j !== stride; ++ j ) {
+
+				result[ dstOffset ++ ] = values[ srcOffset + j ];
+
+			}
+
+		}
+
+		return result;
+
+	},
+
+	// function for parsing AOS keyframe formats
+	flattenJSON: function ( jsonKeys, times, values, valuePropertyName ) {
+
+		var i = 1, key = jsonKeys[ 0 ];
+
+		while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
+
+			key = jsonKeys[ i ++ ];
+
+		}
+
+		if ( key === undefined ) return; // no data
+
+		var value = key[ valuePropertyName ];
+		if ( value === undefined ) return; // no data
+
+		if ( Array.isArray( value ) ) {
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					values.push.apply( values, value ); // push all elements
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		} else if ( value.toArray !== undefined ) {
+
+			// ...assume THREE.Math-ish
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					value.toArray( values, values.length );
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		} else {
+
+			// otherwise push as-is
+
+			do {
+
+				value = key[ valuePropertyName ];
+
+				if ( value !== undefined ) {
+
+					times.push( key.time );
+					values.push( value );
+
+				}
+
+				key = jsonKeys[ i ++ ];
+
+			} while ( key !== undefined );
+
+		}
+
+	}
+
+};
+
+/**
+ * Abstract base class of interpolants over parametric samples.
+ *
+ * The parameter domain is one dimensional, typically the time or a path
+ * along a curve defined by the data.
+ *
+ * The sample values can have any dimensionality and derived classes may
+ * apply special interpretations to the data.
+ *
+ * This class provides the interval seek in a Template Method, deferring
+ * the actual interpolation to derived classes.
+ *
+ * Time complexity is O(1) for linear access crossing at most two points
+ * and O(log N) for random access, where N is the number of positions.
+ *
+ * References:
+ *
+ * 		http://www.oodesign.com/template-method-pattern.html
+ *
+ * @author tschw
+ */
+
+function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	this.parameterPositions = parameterPositions;
+	this._cachedIndex = 0;
+
+	this.resultBuffer = resultBuffer !== undefined ?
+		resultBuffer : new sampleValues.constructor( sampleSize );
+	this.sampleValues = sampleValues;
+	this.valueSize = sampleSize;
+
+}
+
+Object.assign( Interpolant.prototype, {
+
+	evaluate: function ( t ) {
+
+		var pp = this.parameterPositions,
+			i1 = this._cachedIndex,
+
+			t1 = pp[ i1 ],
+			t0 = pp[ i1 - 1 ];
+
+		validate_interval: {
+
+			seek: {
+
+				var right;
+
+				linear_scan: {
+
+					//- See http://jsperf.com/comparison-to-undefined/3
+					//- slower code:
+					//-
+					//- 				if ( t >= t1 || t1 === undefined ) {
+					forward_scan: if ( ! ( t < t1 ) ) {
+
+						for ( var giveUpAt = i1 + 2; ; ) {
+
+							if ( t1 === undefined ) {
+
+								if ( t < t0 ) break forward_scan;
+
+								// after end
+
+								i1 = pp.length;
+								this._cachedIndex = i1;
+								return this.afterEnd_( i1 - 1, t, t0 );
+
+							}
+
+							if ( i1 === giveUpAt ) break; // this loop
+
+							t0 = t1;
+							t1 = pp[ ++ i1 ];
+
+							if ( t < t1 ) {
+
+								// we have arrived at the sought interval
+								break seek;
+
+							}
+
+						}
+
+						// prepare binary search on the right side of the index
+						right = pp.length;
+						break linear_scan;
+
+					}
+
+					//- slower code:
+					//-					if ( t < t0 || t0 === undefined ) {
+					if ( ! ( t >= t0 ) ) {
+
+						// looping?
+
+						var t1global = pp[ 1 ];
+
+						if ( t < t1global ) {
+
+							i1 = 2; // + 1, using the scan for the details
+							t0 = t1global;
+
+						}
+
+						// linear reverse scan
+
+						for ( var giveUpAt = i1 - 2; ; ) {
+
+							if ( t0 === undefined ) {
+
+								// before start
+
+								this._cachedIndex = 0;
+								return this.beforeStart_( 0, t, t1 );
+
+							}
+
+							if ( i1 === giveUpAt ) break; // this loop
+
+							t1 = t0;
+							t0 = pp[ -- i1 - 1 ];
+
+							if ( t >= t0 ) {
+
+								// we have arrived at the sought interval
+								break seek;
+
+							}
+
+						}
+
+						// prepare binary search on the left side of the index
+						right = i1;
+						i1 = 0;
+						break linear_scan;
+
+					}
+
+					// the interval is valid
+
+					break validate_interval;
+
+				} // linear scan
+
+				// binary search
+
+				while ( i1 < right ) {
+
+					var mid = ( i1 + right ) >>> 1;
+
+					if ( t < pp[ mid ] ) {
+
+						right = mid;
+
+					} else {
+
+						i1 = mid + 1;
+
+					}
+
+				}
+
+				t1 = pp[ i1 ];
+				t0 = pp[ i1 - 1 ];
+
+				// check boundary cases, again
+
+				if ( t0 === undefined ) {
+
+					this._cachedIndex = 0;
+					return this.beforeStart_( 0, t, t1 );
+
+				}
+
+				if ( t1 === undefined ) {
+
+					i1 = pp.length;
+					this._cachedIndex = i1;
+					return this.afterEnd_( i1 - 1, t0, t );
+
+				}
+
+			} // seek
+
+			this._cachedIndex = i1;
+
+			this.intervalChanged_( i1, t0, t1 );
+
+		} // validate_interval
+
+		return this.interpolate_( i1, t0, t, t1 );
+
+	},
+
+	settings: null, // optional, subclass-specific settings structure
+	// Note: The indirection allows central control of many interpolants.
+
+	// --- Protected interface
+
+	DefaultSettings_: {},
+
+	getSettings_: function () {
+
+		return this.settings || this.DefaultSettings_;
+
+	},
+
+	copySampleValue_: function ( index ) {
+
+		// copies a sample value to the result buffer
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			stride = this.valueSize,
+			offset = index * stride;
+
+		for ( var i = 0; i !== stride; ++ i ) {
+
+			result[ i ] = values[ offset + i ];
+
+		}
+
+		return result;
+
+	},
+
+	// Template methods for derived classes:
+
+	interpolate_: function ( /* i1, t0, t, t1 */ ) {
+
+		throw new Error( 'call to abstract method' );
+		// implementations shall return this.resultBuffer
+
+	},
+
+	intervalChanged_: function ( /* i1, t0, t1 */ ) {
+
+		// empty
+
+	}
+
+} );
+
+//!\ DECLARE ALIAS AFTER assign prototype !
+Object.assign( Interpolant.prototype, {
+
+	//( 0, t, t0 ), returns this.resultBuffer
+	beforeStart_: Interpolant.prototype.copySampleValue_,
+
+	//( N-1, tN-1, t ), returns this.resultBuffer
+	afterEnd_: Interpolant.prototype.copySampleValue_,
+
+} );
+
+/**
+ * Fast and simple cubic spline interpolant.
+ *
+ * It was derived from a Hermitian construction setting the first derivative
+ * at each sample position to the linear slope between neighboring positions
+ * over their parameter interval.
+ *
+ * @author tschw
+ */
+
+function CubicInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+	this._weightPrev = - 0;
+	this._offsetPrev = - 0;
+	this._weightNext = - 0;
+	this._offsetNext = - 0;
+
+}
+
+CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
+
+	constructor: CubicInterpolant,
+
+	DefaultSettings_: {
+
+		endingStart: ZeroCurvatureEnding,
+		endingEnd: ZeroCurvatureEnding
+
+	},
+
+	intervalChanged_: function ( i1, t0, t1 ) {
+
+		var pp = this.parameterPositions,
+			iPrev = i1 - 2,
+			iNext = i1 + 1,
+
+			tPrev = pp[ iPrev ],
+			tNext = pp[ iNext ];
+
+		if ( tPrev === undefined ) {
+
+			switch ( this.getSettings_().endingStart ) {
+
+				case ZeroSlopeEnding:
+
+					// f'(t0) = 0
+					iPrev = i1;
+					tPrev = 2 * t0 - t1;
+
+					break;
+
+				case WrapAroundEnding:
+
+					// use the other end of the curve
+					iPrev = pp.length - 2;
+					tPrev = t0 + pp[ iPrev ] - pp[ iPrev + 1 ];
+
+					break;
+
+				default: // ZeroCurvatureEnding
+
+					// f''(t0) = 0 a.k.a. Natural Spline
+					iPrev = i1;
+					tPrev = t1;
+
+			}
+
+		}
+
+		if ( tNext === undefined ) {
+
+			switch ( this.getSettings_().endingEnd ) {
+
+				case ZeroSlopeEnding:
+
+					// f'(tN) = 0
+					iNext = i1;
+					tNext = 2 * t1 - t0;
+
+					break;
+
+				case WrapAroundEnding:
+
+					// use the other end of the curve
+					iNext = 1;
+					tNext = t1 + pp[ 1 ] - pp[ 0 ];
+
+					break;
+
+				default: // ZeroCurvatureEnding
+
+					// f''(tN) = 0, a.k.a. Natural Spline
+					iNext = i1 - 1;
+					tNext = t0;
+
+			}
+
+		}
+
+		var halfDt = ( t1 - t0 ) * 0.5,
+			stride = this.valueSize;
+
+		this._weightPrev = halfDt / ( t0 - tPrev );
+		this._weightNext = halfDt / ( tNext - t1 );
+		this._offsetPrev = iPrev * stride;
+		this._offsetNext = iNext * stride;
+
+	},
+
+	interpolate_: function ( i1, t0, t, t1 ) {
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			stride = this.valueSize,
+
+			o1 = i1 * stride,		o0 = o1 - stride,
+			oP = this._offsetPrev, 	oN = this._offsetNext,
+			wP = this._weightPrev,	wN = this._weightNext,
+
+			p = ( t - t0 ) / ( t1 - t0 ),
+			pp = p * p,
+			ppp = pp * p;
+
+		// evaluate polynomials
+
+		var sP = - wP * ppp + 2 * wP * pp - wP * p;
+		var s0 = ( 1 + wP ) * ppp + ( - 1.5 - 2 * wP ) * pp + ( - 0.5 + wP ) * p + 1;
+		var s1 = ( - 1 - wN ) * ppp + ( 1.5 + wN ) * pp + 0.5 * p;
+		var sN = wN * ppp - wN * pp;
+
+		// combine data linearly
+
+		for ( var i = 0; i !== stride; ++ i ) {
+
+			result[ i ] =
+					sP * values[ oP + i ] +
+					s0 * values[ o0 + i ] +
+					s1 * values[ o1 + i ] +
+					sN * values[ oN + i ];
+
+		}
+
+		return result;
+
+	}
+
+} );
+
+/**
+ * @author tschw
+ */
+
+function LinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+}
+
+LinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
+
+	constructor: LinearInterpolant,
+
+	interpolate_: function ( i1, t0, t, t1 ) {
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			stride = this.valueSize,
+
+			offset1 = i1 * stride,
+			offset0 = offset1 - stride,
+
+			weight1 = ( t - t0 ) / ( t1 - t0 ),
+			weight0 = 1 - weight1;
+
+		for ( var i = 0; i !== stride; ++ i ) {
+
+			result[ i ] =
+					values[ offset0 + i ] * weight0 +
+					values[ offset1 + i ] * weight1;
+
+		}
+
+		return result;
+
+	}
+
+} );
+
+/**
+ *
+ * Interpolant that evaluates to the sample value at the position preceeding
+ * the parameter.
+ *
+ * @author tschw
+ */
+
+function DiscreteInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+}
+
+DiscreteInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
+
+	constructor: DiscreteInterpolant,
+
+	interpolate_: function ( i1 /*, t0, t, t1 */ ) {
+
+		return this.copySampleValue_( i1 - 1 );
+
+	}
+
+} );
+
+/**
+ *
+ * A timed sequence of keyframes for a specific property.
+ *
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+function KeyframeTrack( name, times, values, interpolation ) {
+
+	if ( name === undefined ) throw new Error( 'THREE.KeyframeTrack: track name is undefined' );
+	if ( times === undefined || times.length === 0 ) throw new Error( 'THREE.KeyframeTrack: no keyframes in track named ' + name );
+
+	this.name = name;
+
+	this.times = AnimationUtils.convertArray( times, this.TimeBufferType );
+	this.values = AnimationUtils.convertArray( values, this.ValueBufferType );
+
+	this.setInterpolation( interpolation || this.DefaultInterpolation );
+
+}
+
+// Static methods
+
+Object.assign( KeyframeTrack, {
+
+	// Serialization (in static context, because of constructor invocation
+	// and automatic invocation of .toJSON):
+
+	toJSON: function ( track ) {
+
+		var trackType = track.constructor;
+
+		var json;
+
+		// derived classes can define a static toJSON method
+		if ( trackType.toJSON !== undefined ) {
+
+			json = trackType.toJSON( track );
+
+		} else {
+
+			// by default, we assume the data can be serialized as-is
+			json = {
+
+				'name': track.name,
+				'times': AnimationUtils.convertArray( track.times, Array ),
+				'values': AnimationUtils.convertArray( track.values, Array )
+
+			};
+
+			var interpolation = track.getInterpolation();
+
+			if ( interpolation !== track.DefaultInterpolation ) {
+
+				json.interpolation = interpolation;
+
+			}
+
+		}
+
+		json.type = track.ValueTypeName; // mandatory
+
+		return json;
+
+	}
+
+} );
+
+Object.assign( KeyframeTrack.prototype, {
+
+	constructor: KeyframeTrack,
+
+	TimeBufferType: Float32Array,
+
+	ValueBufferType: Float32Array,
+
+	DefaultInterpolation: InterpolateLinear,
+
+	InterpolantFactoryMethodDiscrete: function ( result ) {
+
+		return new DiscreteInterpolant( this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	InterpolantFactoryMethodLinear: function ( result ) {
+
+		return new LinearInterpolant( this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	InterpolantFactoryMethodSmooth: function ( result ) {
+
+		return new CubicInterpolant( this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	setInterpolation: function ( interpolation ) {
+
+		var factoryMethod;
+
+		switch ( interpolation ) {
+
+			case InterpolateDiscrete:
+
+				factoryMethod = this.InterpolantFactoryMethodDiscrete;
+
+				break;
+
+			case InterpolateLinear:
+
+				factoryMethod = this.InterpolantFactoryMethodLinear;
+
+				break;
+
+			case InterpolateSmooth:
+
+				factoryMethod = this.InterpolantFactoryMethodSmooth;
+
+				break;
+
+		}
+
+		if ( factoryMethod === undefined ) {
+
+			var message = "unsupported interpolation for " +
+				this.ValueTypeName + " keyframe track named " + this.name;
+
+			if ( this.createInterpolant === undefined ) {
+
+				// fall back to default, unless the default itself is messed up
+				if ( interpolation !== this.DefaultInterpolation ) {
+
+					this.setInterpolation( this.DefaultInterpolation );
+
+				} else {
+
+					throw new Error( message ); // fatal, in this case
+
+				}
+
+			}
+
+			console.warn( 'THREE.KeyframeTrack:', message );
+			return this;
+
+		}
+
+		this.createInterpolant = factoryMethod;
+
+		return this;
+
+	},
+
+	getInterpolation: function () {
+
+		switch ( this.createInterpolant ) {
+
+			case this.InterpolantFactoryMethodDiscrete:
+
+				return InterpolateDiscrete;
+
+			case this.InterpolantFactoryMethodLinear:
+
+				return InterpolateLinear;
+
+			case this.InterpolantFactoryMethodSmooth:
+
+				return InterpolateSmooth;
+
+		}
+
+	},
+
+	getValueSize: function () {
+
+		return this.values.length / this.times.length;
+
+	},
+
+	// move all keyframes either forwards or backwards in time
+	shift: function ( timeOffset ) {
+
+		if ( timeOffset !== 0.0 ) {
+
+			var times = this.times;
+
+			for ( var i = 0, n = times.length; i !== n; ++ i ) {
+
+				times[ i ] += timeOffset;
+
+			}
+
+		}
+
+		return this;
+
+	},
+
+	// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
+	scale: function ( timeScale ) {
+
+		if ( timeScale !== 1.0 ) {
+
+			var times = this.times;
+
+			for ( var i = 0, n = times.length; i !== n; ++ i ) {
+
+				times[ i ] *= timeScale;
+
+			}
+
+		}
+
+		return this;
+
+	},
+
+	// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
+	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
+	trim: function ( startTime, endTime ) {
+
+		var times = this.times,
+			nKeys = times.length,
+			from = 0,
+			to = nKeys - 1;
+
+		while ( from !== nKeys && times[ from ] < startTime ) {
+
+			++ from;
+
+		}
+
+		while ( to !== - 1 && times[ to ] > endTime ) {
+
+			-- to;
+
+		}
+
+		++ to; // inclusive -> exclusive bound
+
+		if ( from !== 0 || to !== nKeys ) {
+
+			// empty tracks are forbidden, so keep at least one keyframe
+			if ( from >= to ) to = Math.max( to, 1 ), from = to - 1;
+
+			var stride = this.getValueSize();
+			this.times = AnimationUtils.arraySlice( times, from, to );
+			this.values = AnimationUtils.arraySlice( this.values, from * stride, to * stride );
+
+		}
+
+		return this;
+
+	},
+
+	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
+	validate: function () {
+
+		var valid = true;
+
+		var valueSize = this.getValueSize();
+		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
+
+			console.error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
+			valid = false;
+
+		}
+
+		var times = this.times,
+			values = this.values,
+
+			nKeys = times.length;
+
+		if ( nKeys === 0 ) {
+
+			console.error( 'THREE.KeyframeTrack: Track is empty.', this );
+			valid = false;
+
+		}
+
+		var prevTime = null;
+
+		for ( var i = 0; i !== nKeys; i ++ ) {
+
+			var currTime = times[ i ];
+
+			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
+
+				console.error( 'THREE.KeyframeTrack: Time is not a valid number.', this, i, currTime );
+				valid = false;
+				break;
+
+			}
+
+			if ( prevTime !== null && prevTime > currTime ) {
+
+				console.error( 'THREE.KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
+				valid = false;
+				break;
+
+			}
+
+			prevTime = currTime;
+
+		}
+
+		if ( values !== undefined ) {
+
+			if ( AnimationUtils.isTypedArray( values ) ) {
+
+				for ( var i = 0, n = values.length; i !== n; ++ i ) {
+
+					var value = values[ i ];
+
+					if ( isNaN( value ) ) {
+
+						console.error( 'THREE.KeyframeTrack: Value is not a valid number.', this, i, value );
+						valid = false;
+						break;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return valid;
+
+	},
+
+	// removes equivalent sequential keys as common in morph target sequences
+	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
+	optimize: function () {
+
+		var times = this.times,
+			values = this.values,
+			stride = this.getValueSize(),
+
+			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
+
+			writeIndex = 1,
+			lastIndex = times.length - 1;
+
+		for ( var i = 1; i < lastIndex; ++ i ) {
+
+			var keep = false;
+
+			var time = times[ i ];
+			var timeNext = times[ i + 1 ];
+
+			// remove adjacent keyframes scheduled at the same time
+
+			if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
+
+				if ( ! smoothInterpolation ) {
+
+					// remove unnecessary keyframes same as their neighbors
+
+					var offset = i * stride,
+						offsetP = offset - stride,
+						offsetN = offset + stride;
+
+					for ( var j = 0; j !== stride; ++ j ) {
+
+						var value = values[ offset + j ];
+
+						if ( value !== values[ offsetP + j ] ||
+							value !== values[ offsetN + j ] ) {
+
+							keep = true;
+							break;
+
+						}
+
+					}
+
+				} else {
+
+					keep = true;
+
+				}
+
+			}
+
+			// in-place compaction
+
+			if ( keep ) {
+
+				if ( i !== writeIndex ) {
+
+					times[ writeIndex ] = times[ i ];
+
+					var readOffset = i * stride,
+						writeOffset = writeIndex * stride;
+
+					for ( var j = 0; j !== stride; ++ j ) {
+
+						values[ writeOffset + j ] = values[ readOffset + j ];
+
+					}
+
+				}
+
+				++ writeIndex;
+
+			}
+
+		}
+
+		// flush last keyframe (compaction looks ahead)
+
+		if ( lastIndex > 0 ) {
+
+			times[ writeIndex ] = times[ lastIndex ];
+
+			for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j ) {
+
+				values[ writeOffset + j ] = values[ readOffset + j ];
+
+			}
+
+			++ writeIndex;
+
+		}
+
+		if ( writeIndex !== times.length ) {
+
+			this.times = AnimationUtils.arraySlice( times, 0, writeIndex );
+			this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
+
+		}
+
+		return this;
+
+	}
+
+} );
+
+/**
+ *
+ * A Track of Boolean keyframe values.
+ *
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+function BooleanKeyframeTrack( name, times, values ) {
+
+	KeyframeTrack.call( this, name, times, values );
+
+}
+
+BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+
+	constructor: BooleanKeyframeTrack,
+
+	ValueTypeName: 'bool',
+	ValueBufferType: Array,
+
+	DefaultInterpolation: InterpolateDiscrete,
+
+	InterpolantFactoryMethodLinear: undefined,
+	InterpolantFactoryMethodSmooth: undefined
+
+	// Note: Actually this track could have a optimized / compressed
+	// representation of a single value and a custom interpolant that
+	// computes "firstValue ^ isOdd( index )".
+
+} );
+
+/**
+ *
+ * A Track of keyframe values that represent color.
+ *
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+function ColorKeyframeTrack( name, times, values, interpolation ) {
+
+	KeyframeTrack.call( this, name, times, values, interpolation );
+
+}
+
+ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+
+	constructor: ColorKeyframeTrack,
+
+	ValueTypeName: 'color'
+
+	// ValueBufferType is inherited
+
+	// DefaultInterpolation is inherited
+
+	// Note: Very basic implementation and nothing special yet.
+	// However, this is the place for color space parameterization.
+
+} );
+
+/**
+ *
+ * A Track of numeric keyframe values.
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+function NumberKeyframeTrack( name, times, values, interpolation ) {
+
+	KeyframeTrack.call( this, name, times, values, interpolation );
+
+}
+
+NumberKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+
+	constructor: NumberKeyframeTrack,
+
+	ValueTypeName: 'number'
+
+	// ValueBufferType is inherited
+
+	// DefaultInterpolation is inherited
+
+} );
+
+/**
+ * Spherical linear unit quaternion interpolant.
+ *
+ * @author tschw
+ */
+
+function QuaternionLinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+}
+
+QuaternionLinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
+
+	constructor: QuaternionLinearInterpolant,
+
+	interpolate_: function ( i1, t0, t, t1 ) {
+
+		var result = this.resultBuffer,
+			values = this.sampleValues,
+			stride = this.valueSize,
+
+			offset = i1 * stride,
+
+			alpha = ( t - t0 ) / ( t1 - t0 );
+
+		for ( var end = offset + stride; offset !== end; offset += 4 ) {
+
+			Quaternion.slerpFlat( result, 0, values, offset - stride, values, offset, alpha );
+
+		}
+
+		return result;
+
+	}
+
+} );
+
+/**
+ *
+ * A Track of quaternion keyframe values.
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+function QuaternionKeyframeTrack( name, times, values, interpolation ) {
+
+	KeyframeTrack.call( this, name, times, values, interpolation );
+
+}
+
+QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+
+	constructor: QuaternionKeyframeTrack,
+
+	ValueTypeName: 'quaternion',
+
+	// ValueBufferType is inherited
+
+	DefaultInterpolation: InterpolateLinear,
+
+	InterpolantFactoryMethodLinear: function ( result ) {
+
+		return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	InterpolantFactoryMethodSmooth: undefined // not yet implemented
+
+} );
+
+/**
+ *
+ * A Track that interpolates Strings
+ *
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+function StringKeyframeTrack( name, times, values, interpolation ) {
+
+	KeyframeTrack.call( this, name, times, values, interpolation );
+
+}
+
+StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+
+	constructor: StringKeyframeTrack,
+
+	ValueTypeName: 'string',
+	ValueBufferType: Array,
+
+	DefaultInterpolation: InterpolateDiscrete,
+
+	InterpolantFactoryMethodLinear: undefined,
+
+	InterpolantFactoryMethodSmooth: undefined
+
+} );
+
+/**
+ *
+ * A Track of vectored keyframe values.
+ *
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ */
+
+function VectorKeyframeTrack( name, times, values, interpolation ) {
+
+	KeyframeTrack.call( this, name, times, values, interpolation );
+
+}
+
+VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
+
+	constructor: VectorKeyframeTrack,
+
+	ValueTypeName: 'vector'
+
+	// ValueBufferType is inherited
+
+	// DefaultInterpolation is inherited
+
+} );
+
+/**
+ *
+ * Reusable set of Tracks that represent an animation.
+ *
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ */
+
+function AnimationClip( name, duration, tracks ) {
+
+	this.name = name;
+	this.tracks = tracks;
+	this.duration = ( duration !== undefined ) ? duration : - 1;
+
+	this.uuid = _Math.generateUUID();
+
+	// this means it should figure out its duration by scanning the tracks
+	if ( this.duration < 0 ) {
+
+		this.resetDuration();
+
+	}
+
+}
+
+function getTrackTypeForValueTypeName( typeName ) {
+
+	switch ( typeName.toLowerCase() ) {
+
+		case 'scalar':
+		case 'double':
+		case 'float':
+		case 'number':
+		case 'integer':
+
+			return NumberKeyframeTrack;
+
+		case 'vector':
+		case 'vector2':
+		case 'vector3':
+		case 'vector4':
+
+			return VectorKeyframeTrack;
+
+		case 'color':
+
+			return ColorKeyframeTrack;
+
+		case 'quaternion':
+
+			return QuaternionKeyframeTrack;
+
+		case 'bool':
+		case 'boolean':
+
+			return BooleanKeyframeTrack;
+
+		case 'string':
+
+			return StringKeyframeTrack;
+
+	}
+
+	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+
+}
+
+function parseKeyframeTrack( json ) {
+
+	if ( json.type === undefined ) {
+
+		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+
+	}
+
+	var trackType = getTrackTypeForValueTypeName( json.type );
+
+	if ( json.times === undefined ) {
+
+		var times = [], values = [];
+
+		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
+
+		json.times = times;
+		json.values = values;
+
+	}
+
+	// derived classes can define a static parse method
+	if ( trackType.parse !== undefined ) {
+
+		return trackType.parse( json );
+
+	} else {
+
+		// by default, we assume a constructor compatible with the base
+		return new trackType( json.name, json.times, json.values, json.interpolation );
+
+	}
+
+}
+
+Object.assign( AnimationClip, {
+
+	parse: function ( json ) {
+
+		var tracks = [],
+			jsonTracks = json.tracks,
+			frameTime = 1.0 / ( json.fps || 1.0 );
+
+		for ( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
+
+			tracks.push( parseKeyframeTrack( jsonTracks[ i ] ).scale( frameTime ) );
+
+		}
+
+		return new AnimationClip( json.name, json.duration, tracks );
+
+	},
+
+	toJSON: function ( clip ) {
+
+		var tracks = [],
+			clipTracks = clip.tracks;
+
+		var json = {
+
+			'name': clip.name,
+			'duration': clip.duration,
+			'tracks': tracks,
+			'uuid': clip.uuid
+
+		};
+
+		for ( var i = 0, n = clipTracks.length; i !== n; ++ i ) {
+
+			tracks.push( KeyframeTrack.toJSON( clipTracks[ i ] ) );
+
+		}
+
+		return json;
+
+	},
+
+	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
+
+		var numMorphTargets = morphTargetSequence.length;
+		var tracks = [];
+
+		for ( var i = 0; i < numMorphTargets; i ++ ) {
+
+			var times = [];
+			var values = [];
+
+			times.push(
+				( i + numMorphTargets - 1 ) % numMorphTargets,
+				i,
+				( i + 1 ) % numMorphTargets );
+
+			values.push( 0, 1, 0 );
+
+			var order = AnimationUtils.getKeyframeOrder( times );
+			times = AnimationUtils.sortedArray( times, 1, order );
+			values = AnimationUtils.sortedArray( values, 1, order );
+
+			// if there is a key at the first frame, duplicate it as the
+			// last frame as well for perfect loop.
+			if ( ! noLoop && times[ 0 ] === 0 ) {
+
+				times.push( numMorphTargets );
+				values.push( values[ 0 ] );
+
+			}
+
+			tracks.push(
+				new NumberKeyframeTrack(
+					'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
+					times, values
+				).scale( 1.0 / fps ) );
+
+		}
+
+		return new AnimationClip( name, - 1, tracks );
+
+	},
+
+	findByName: function ( objectOrClipArray, name ) {
+
+		var clipArray = objectOrClipArray;
+
+		if ( ! Array.isArray( objectOrClipArray ) ) {
+
+			var o = objectOrClipArray;
+			clipArray = o.geometry && o.geometry.animations || o.animations;
+
+		}
+
+		for ( var i = 0; i < clipArray.length; i ++ ) {
+
+			if ( clipArray[ i ].name === name ) {
+
+				return clipArray[ i ];
+
+			}
+
+		}
+
+		return null;
+
+	},
+
+	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
+
+		var animationToMorphTargets = {};
+
+		// tested with https://regex101.com/ on trick sequences
+		// such flamingo_flyA_003, flamingo_run1_003, crdeath0059
+		var pattern = /^([\w-]*?)([\d]+)$/;
+
+		// sort morph target names into animation groups based
+		// patterns like Walk_001, Walk_002, Run_001, Run_002
+		for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
+
+			var morphTarget = morphTargets[ i ];
+			var parts = morphTarget.name.match( pattern );
+
+			if ( parts && parts.length > 1 ) {
+
+				var name = parts[ 1 ];
+
+				var animationMorphTargets = animationToMorphTargets[ name ];
+				if ( ! animationMorphTargets ) {
+
+					animationToMorphTargets[ name ] = animationMorphTargets = [];
+
+				}
+
+				animationMorphTargets.push( morphTarget );
+
+			}
+
+		}
+
+		var clips = [];
+
+		for ( var name in animationToMorphTargets ) {
+
+			clips.push( AnimationClip.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps, noLoop ) );
+
+		}
+
+		return clips;
+
+	},
+
+	// parse the animation.hierarchy format
+	parseAnimation: function ( animation, bones ) {
+
+		if ( ! animation ) {
+
+			console.error( 'THREE.AnimationClip: No animation in JSONLoader data.' );
+			return null;
+
+		}
+
+		var addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
+
+			// only return track if there are actually keys.
+			if ( animationKeys.length !== 0 ) {
+
+				var times = [];
+				var values = [];
+
+				AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
+
+				// empty keys are filtered out, so check again
+				if ( times.length !== 0 ) {
+
+					destTracks.push( new trackType( trackName, times, values ) );
+
+				}
+
+			}
+
+		};
+
+		var tracks = [];
+
+		var clipName = animation.name || 'default';
+		// automatic length determination in AnimationClip.
+		var duration = animation.length || - 1;
+		var fps = animation.fps || 30;
+
+		var hierarchyTracks = animation.hierarchy || [];
+
+		for ( var h = 0; h < hierarchyTracks.length; h ++ ) {
+
+			var animationKeys = hierarchyTracks[ h ].keys;
+
+			// skip empty tracks
+			if ( ! animationKeys || animationKeys.length === 0 ) continue;
+
+			// process morph targets
+			if ( animationKeys[ 0 ].morphTargets ) {
+
+				// figure out all morph targets used in this track
+				var morphTargetNames = {};
+
+				for ( var k = 0; k < animationKeys.length; k ++ ) {
+
+					if ( animationKeys[ k ].morphTargets ) {
+
+						for ( var m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
+
+							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
+
+						}
+
+					}
+
+				}
+
+				// create a track for each morph target with all zero
+				// morphTargetInfluences except for the keys in which
+				// the morphTarget is named.
+				for ( var morphTargetName in morphTargetNames ) {
+
+					var times = [];
+					var values = [];
+
+					for ( var m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
+
+						var animationKey = animationKeys[ k ];
+
+						times.push( animationKey.time );
+						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
+
+					}
+
+					tracks.push( new NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
+
+				}
+
+				duration = morphTargetNames.length * ( fps || 1.0 );
+
+			} else {
+
+				// ...assume skeletal animation
+
+				var boneName = '.bones[' + bones[ h ].name + ']';
+
+				addNonemptyTrack(
+					VectorKeyframeTrack, boneName + '.position',
+					animationKeys, 'pos', tracks );
+
+				addNonemptyTrack(
+					QuaternionKeyframeTrack, boneName + '.quaternion',
+					animationKeys, 'rot', tracks );
+
+				addNonemptyTrack(
+					VectorKeyframeTrack, boneName + '.scale',
+					animationKeys, 'scl', tracks );
+
+			}
+
+		}
+
+		if ( tracks.length === 0 ) {
+
+			return null;
+
+		}
+
+		var clip = new AnimationClip( clipName, duration, tracks );
+
+		return clip;
+
+	}
+
+} );
+
+Object.assign( AnimationClip.prototype, {
+
+	resetDuration: function () {
+
+		var tracks = this.tracks, duration = 0;
+
+		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
+
+			var track = this.tracks[ i ];
+
+			duration = Math.max( duration, track.times[ track.times.length - 1 ] );
+
+		}
+
+		this.duration = duration;
+
+		return this;
+
+	},
+
+	trim: function () {
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			this.tracks[ i ].trim( 0, this.duration );
+
+		}
+
+		return this;
+
+	},
+
+	validate: function () {
+
+		var valid = true;
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			valid = valid && this.tracks[ i ].validate();
+
+		}
+
+		return valid;
+
+	},
+
+	optimize: function () {
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			this.tracks[ i ].optimize();
+
+		}
+
+		return this;
+
+	}
+
+} );
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -32205,8 +33927,8 @@ Object.assign( FileLoader.prototype, {
 
 					if ( onError ) onError( error );
 
-					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
+					scope.manager.itemEnd( url );
 
 				}, 0 );
 
@@ -32265,8 +33987,8 @@ Object.assign( FileLoader.prototype, {
 
 					}
 
-					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
+					scope.manager.itemEnd( url );
 
 				}
 
@@ -32298,8 +34020,8 @@ Object.assign( FileLoader.prototype, {
 
 				}
 
-				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
 
 			}, false );
 
@@ -32316,8 +34038,8 @@ Object.assign( FileLoader.prototype, {
 
 				}
 
-				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
 
 			}, false );
 
@@ -32373,6 +34095,57 @@ Object.assign( FileLoader.prototype, {
 	setRequestHeader: function ( value ) {
 
 		this.requestHeader = value;
+		return this;
+
+	}
+
+} );
+
+/**
+ * @author bhouston / http://clara.io/
+ */
+
+function AnimationLoader( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+
+}
+
+Object.assign( AnimationLoader.prototype, {
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var scope = this;
+
+		var loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
+		loader.load( url, function ( text ) {
+
+			onLoad( scope.parse( JSON.parse( text ) ) );
+
+		}, onProgress, onError );
+
+	},
+
+	parse: function ( json, onLoad ) {
+
+		var animations = [];
+
+		for ( var i = 0; i < json.length; i ++ ) {
+
+			var clip = AnimationClip.parse( json[ i ] );
+
+			animations.push( clip );
+
+		}
+
+		onLoad( animations );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 		return this;
 
 	}
@@ -32545,11 +34318,11 @@ Object.assign( DataTextureLoader.prototype, {
 
 			if ( ! texData ) return;
 
-			if ( undefined !== texData.image ) {
+			if ( texData.image !== undefined ) {
 
 				texture.image = texData.image;
 
-			} else if ( undefined !== texData.data ) {
+			} else if ( texData.data !== undefined ) {
 
 				texture.image.width = texData.width;
 				texture.image.height = texData.height;
@@ -32557,32 +34330,32 @@ Object.assign( DataTextureLoader.prototype, {
 
 			}
 
-			texture.wrapS = undefined !== texData.wrapS ? texData.wrapS : ClampToEdgeWrapping;
-			texture.wrapT = undefined !== texData.wrapT ? texData.wrapT : ClampToEdgeWrapping;
+			texture.wrapS = texData.wrapS !== undefined ? texData.wrapS : ClampToEdgeWrapping;
+			texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : ClampToEdgeWrapping;
 
-			texture.magFilter = undefined !== texData.magFilter ? texData.magFilter : LinearFilter;
-			texture.minFilter = undefined !== texData.minFilter ? texData.minFilter : LinearMipMapLinearFilter;
+			texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
+			texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearMipMapLinearFilter;
 
-			texture.anisotropy = undefined !== texData.anisotropy ? texData.anisotropy : 1;
+			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
 
-			if ( undefined !== texData.format ) {
+			if ( texData.format !== undefined ) {
 
 				texture.format = texData.format;
 
 			}
-			if ( undefined !== texData.type ) {
+			if ( texData.type !== undefined ) {
 
 				texture.type = texData.type;
 
 			}
 
-			if ( undefined !== texData.mipmaps ) {
+			if ( texData.mipmaps !== undefined ) {
 
 				texture.mipmaps = texData.mipmaps;
 
 			}
 
-			if ( 1 === texData.mipmapCount ) {
+			if ( texData.mipmapCount === 1 ) {
 
 				texture.minFilter = LinearFilter;
 
@@ -32673,8 +34446,8 @@ Object.assign( ImageLoader.prototype, {
 
 			if ( onError ) onError( event );
 
-			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
+			scope.manager.itemEnd( url );
 
 		}
 
@@ -35167,10 +36940,10 @@ function OrthographicCamera( left, right, top, bottom, near, far ) {
 	this.zoom = 1;
 	this.view = null;
 
-	this.left = left;
-	this.right = right;
-	this.top = top;
-	this.bottom = bottom;
+	this.left = ( left !== undefined ) ? left : - 1;
+	this.right = ( right !== undefined ) ? right : 1;
+	this.top = ( top !== undefined ) ? top : 1;
+	this.bottom = ( bottom !== undefined ) ? bottom : - 1;
 
 	this.near = ( near !== undefined ) ? near : 0.1;
 	this.far = ( far !== undefined ) ? far : 2000;
@@ -35413,1751 +37186,6 @@ RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 		data.object.height = this.height;
 
 		return data;
-
-	}
-
-} );
-
-/**
- * @author tschw
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
-
-var AnimationUtils = {
-
-	// same as Array.prototype.slice, but also works on typed arrays
-	arraySlice: function ( array, from, to ) {
-
-		if ( AnimationUtils.isTypedArray( array ) ) {
-
-			// in ios9 array.subarray(from, undefined) will return empty array
-			// but array.subarray(from) or array.subarray(from, len) is correct
-			return new array.constructor( array.subarray( from, to !== undefined ? to : array.length ) );
-
-		}
-
-		return array.slice( from, to );
-
-	},
-
-	// converts an array to a specific type
-	convertArray: function ( array, type, forceClone ) {
-
-		if ( ! array || // let 'undefined' and 'null' pass
-				! forceClone && array.constructor === type ) return array;
-
-		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
-
-			return new type( array ); // create typed array
-
-		}
-
-		return Array.prototype.slice.call( array ); // create Array
-
-	},
-
-	isTypedArray: function ( object ) {
-
-		return ArrayBuffer.isView( object ) &&
-				! ( object instanceof DataView );
-
-	},
-
-	// returns an array by which times and values can be sorted
-	getKeyframeOrder: function ( times ) {
-
-		function compareTime( i, j ) {
-
-			return times[ i ] - times[ j ];
-
-		}
-
-		var n = times.length;
-		var result = new Array( n );
-		for ( var i = 0; i !== n; ++ i ) result[ i ] = i;
-
-		result.sort( compareTime );
-
-		return result;
-
-	},
-
-	// uses the array previously returned by 'getKeyframeOrder' to sort data
-	sortedArray: function ( values, stride, order ) {
-
-		var nValues = values.length;
-		var result = new values.constructor( nValues );
-
-		for ( var i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
-
-			var srcOffset = order[ i ] * stride;
-
-			for ( var j = 0; j !== stride; ++ j ) {
-
-				result[ dstOffset ++ ] = values[ srcOffset + j ];
-
-			}
-
-		}
-
-		return result;
-
-	},
-
-	// function for parsing AOS keyframe formats
-	flattenJSON: function ( jsonKeys, times, values, valuePropertyName ) {
-
-		var i = 1, key = jsonKeys[ 0 ];
-
-		while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
-
-			key = jsonKeys[ i ++ ];
-
-		}
-
-		if ( key === undefined ) return; // no data
-
-		var value = key[ valuePropertyName ];
-		if ( value === undefined ) return; // no data
-
-		if ( Array.isArray( value ) ) {
-
-			do {
-
-				value = key[ valuePropertyName ];
-
-				if ( value !== undefined ) {
-
-					times.push( key.time );
-					values.push.apply( values, value ); // push all elements
-
-				}
-
-				key = jsonKeys[ i ++ ];
-
-			} while ( key !== undefined );
-
-		} else if ( value.toArray !== undefined ) {
-
-			// ...assume THREE.Math-ish
-
-			do {
-
-				value = key[ valuePropertyName ];
-
-				if ( value !== undefined ) {
-
-					times.push( key.time );
-					value.toArray( values, values.length );
-
-				}
-
-				key = jsonKeys[ i ++ ];
-
-			} while ( key !== undefined );
-
-		} else {
-
-			// otherwise push as-is
-
-			do {
-
-				value = key[ valuePropertyName ];
-
-				if ( value !== undefined ) {
-
-					times.push( key.time );
-					values.push( value );
-
-				}
-
-				key = jsonKeys[ i ++ ];
-
-			} while ( key !== undefined );
-
-		}
-
-	}
-
-};
-
-/**
- * Abstract base class of interpolants over parametric samples.
- *
- * The parameter domain is one dimensional, typically the time or a path
- * along a curve defined by the data.
- *
- * The sample values can have any dimensionality and derived classes may
- * apply special interpretations to the data.
- *
- * This class provides the interval seek in a Template Method, deferring
- * the actual interpolation to derived classes.
- *
- * Time complexity is O(1) for linear access crossing at most two points
- * and O(log N) for random access, where N is the number of positions.
- *
- * References:
- *
- * 		http://www.oodesign.com/template-method-pattern.html
- *
- * @author tschw
- */
-
-function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-
-	this.parameterPositions = parameterPositions;
-	this._cachedIndex = 0;
-
-	this.resultBuffer = resultBuffer !== undefined ?
-		resultBuffer : new sampleValues.constructor( sampleSize );
-	this.sampleValues = sampleValues;
-	this.valueSize = sampleSize;
-
-}
-
-Object.assign( Interpolant.prototype, {
-
-	evaluate: function ( t ) {
-
-		var pp = this.parameterPositions,
-			i1 = this._cachedIndex,
-
-			t1 = pp[ i1 ],
-			t0 = pp[ i1 - 1 ];
-
-		validate_interval: {
-
-			seek: {
-
-				var right;
-
-				linear_scan: {
-
-					//- See http://jsperf.com/comparison-to-undefined/3
-					//- slower code:
-					//-
-					//- 				if ( t >= t1 || t1 === undefined ) {
-					forward_scan: if ( ! ( t < t1 ) ) {
-
-						for ( var giveUpAt = i1 + 2; ; ) {
-
-							if ( t1 === undefined ) {
-
-								if ( t < t0 ) break forward_scan;
-
-								// after end
-
-								i1 = pp.length;
-								this._cachedIndex = i1;
-								return this.afterEnd_( i1 - 1, t, t0 );
-
-							}
-
-							if ( i1 === giveUpAt ) break; // this loop
-
-							t0 = t1;
-							t1 = pp[ ++ i1 ];
-
-							if ( t < t1 ) {
-
-								// we have arrived at the sought interval
-								break seek;
-
-							}
-
-						}
-
-						// prepare binary search on the right side of the index
-						right = pp.length;
-						break linear_scan;
-
-					}
-
-					//- slower code:
-					//-					if ( t < t0 || t0 === undefined ) {
-					if ( ! ( t >= t0 ) ) {
-
-						// looping?
-
-						var t1global = pp[ 1 ];
-
-						if ( t < t1global ) {
-
-							i1 = 2; // + 1, using the scan for the details
-							t0 = t1global;
-
-						}
-
-						// linear reverse scan
-
-						for ( var giveUpAt = i1 - 2; ; ) {
-
-							if ( t0 === undefined ) {
-
-								// before start
-
-								this._cachedIndex = 0;
-								return this.beforeStart_( 0, t, t1 );
-
-							}
-
-							if ( i1 === giveUpAt ) break; // this loop
-
-							t1 = t0;
-							t0 = pp[ -- i1 - 1 ];
-
-							if ( t >= t0 ) {
-
-								// we have arrived at the sought interval
-								break seek;
-
-							}
-
-						}
-
-						// prepare binary search on the left side of the index
-						right = i1;
-						i1 = 0;
-						break linear_scan;
-
-					}
-
-					// the interval is valid
-
-					break validate_interval;
-
-				} // linear scan
-
-				// binary search
-
-				while ( i1 < right ) {
-
-					var mid = ( i1 + right ) >>> 1;
-
-					if ( t < pp[ mid ] ) {
-
-						right = mid;
-
-					} else {
-
-						i1 = mid + 1;
-
-					}
-
-				}
-
-				t1 = pp[ i1 ];
-				t0 = pp[ i1 - 1 ];
-
-				// check boundary cases, again
-
-				if ( t0 === undefined ) {
-
-					this._cachedIndex = 0;
-					return this.beforeStart_( 0, t, t1 );
-
-				}
-
-				if ( t1 === undefined ) {
-
-					i1 = pp.length;
-					this._cachedIndex = i1;
-					return this.afterEnd_( i1 - 1, t0, t );
-
-				}
-
-			} // seek
-
-			this._cachedIndex = i1;
-
-			this.intervalChanged_( i1, t0, t1 );
-
-		} // validate_interval
-
-		return this.interpolate_( i1, t0, t, t1 );
-
-	},
-
-	settings: null, // optional, subclass-specific settings structure
-	// Note: The indirection allows central control of many interpolants.
-
-	// --- Protected interface
-
-	DefaultSettings_: {},
-
-	getSettings_: function () {
-
-		return this.settings || this.DefaultSettings_;
-
-	},
-
-	copySampleValue_: function ( index ) {
-
-		// copies a sample value to the result buffer
-
-		var result = this.resultBuffer,
-			values = this.sampleValues,
-			stride = this.valueSize,
-			offset = index * stride;
-
-		for ( var i = 0; i !== stride; ++ i ) {
-
-			result[ i ] = values[ offset + i ];
-
-		}
-
-		return result;
-
-	},
-
-	// Template methods for derived classes:
-
-	interpolate_: function ( /* i1, t0, t, t1 */ ) {
-
-		throw new Error( 'call to abstract method' );
-		// implementations shall return this.resultBuffer
-
-	},
-
-	intervalChanged_: function ( /* i1, t0, t1 */ ) {
-
-		// empty
-
-	}
-
-} );
-
-//!\ DECLARE ALIAS AFTER assign prototype !
-Object.assign( Interpolant.prototype, {
-
-	//( 0, t, t0 ), returns this.resultBuffer
-	beforeStart_: Interpolant.prototype.copySampleValue_,
-
-	//( N-1, tN-1, t ), returns this.resultBuffer
-	afterEnd_: Interpolant.prototype.copySampleValue_,
-
-} );
-
-/**
- * Fast and simple cubic spline interpolant.
- *
- * It was derived from a Hermitian construction setting the first derivative
- * at each sample position to the linear slope between neighboring positions
- * over their parameter interval.
- *
- * @author tschw
- */
-
-function CubicInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-
-	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
-
-	this._weightPrev = - 0;
-	this._offsetPrev = - 0;
-	this._weightNext = - 0;
-	this._offsetNext = - 0;
-
-}
-
-CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
-
-	constructor: CubicInterpolant,
-
-	DefaultSettings_: {
-
-		endingStart: ZeroCurvatureEnding,
-		endingEnd: ZeroCurvatureEnding
-
-	},
-
-	intervalChanged_: function ( i1, t0, t1 ) {
-
-		var pp = this.parameterPositions,
-			iPrev = i1 - 2,
-			iNext = i1 + 1,
-
-			tPrev = pp[ iPrev ],
-			tNext = pp[ iNext ];
-
-		if ( tPrev === undefined ) {
-
-			switch ( this.getSettings_().endingStart ) {
-
-				case ZeroSlopeEnding:
-
-					// f'(t0) = 0
-					iPrev = i1;
-					tPrev = 2 * t0 - t1;
-
-					break;
-
-				case WrapAroundEnding:
-
-					// use the other end of the curve
-					iPrev = pp.length - 2;
-					tPrev = t0 + pp[ iPrev ] - pp[ iPrev + 1 ];
-
-					break;
-
-				default: // ZeroCurvatureEnding
-
-					// f''(t0) = 0 a.k.a. Natural Spline
-					iPrev = i1;
-					tPrev = t1;
-
-			}
-
-		}
-
-		if ( tNext === undefined ) {
-
-			switch ( this.getSettings_().endingEnd ) {
-
-				case ZeroSlopeEnding:
-
-					// f'(tN) = 0
-					iNext = i1;
-					tNext = 2 * t1 - t0;
-
-					break;
-
-				case WrapAroundEnding:
-
-					// use the other end of the curve
-					iNext = 1;
-					tNext = t1 + pp[ 1 ] - pp[ 0 ];
-
-					break;
-
-				default: // ZeroCurvatureEnding
-
-					// f''(tN) = 0, a.k.a. Natural Spline
-					iNext = i1 - 1;
-					tNext = t0;
-
-			}
-
-		}
-
-		var halfDt = ( t1 - t0 ) * 0.5,
-			stride = this.valueSize;
-
-		this._weightPrev = halfDt / ( t0 - tPrev );
-		this._weightNext = halfDt / ( tNext - t1 );
-		this._offsetPrev = iPrev * stride;
-		this._offsetNext = iNext * stride;
-
-	},
-
-	interpolate_: function ( i1, t0, t, t1 ) {
-
-		var result = this.resultBuffer,
-			values = this.sampleValues,
-			stride = this.valueSize,
-
-			o1 = i1 * stride,		o0 = o1 - stride,
-			oP = this._offsetPrev, 	oN = this._offsetNext,
-			wP = this._weightPrev,	wN = this._weightNext,
-
-			p = ( t - t0 ) / ( t1 - t0 ),
-			pp = p * p,
-			ppp = pp * p;
-
-		// evaluate polynomials
-
-		var sP = - wP * ppp + 2 * wP * pp - wP * p;
-		var s0 = ( 1 + wP ) * ppp + ( - 1.5 - 2 * wP ) * pp + ( - 0.5 + wP ) * p + 1;
-		var s1 = ( - 1 - wN ) * ppp + ( 1.5 + wN ) * pp + 0.5 * p;
-		var sN = wN * ppp - wN * pp;
-
-		// combine data linearly
-
-		for ( var i = 0; i !== stride; ++ i ) {
-
-			result[ i ] =
-					sP * values[ oP + i ] +
-					s0 * values[ o0 + i ] +
-					s1 * values[ o1 + i ] +
-					sN * values[ oN + i ];
-
-		}
-
-		return result;
-
-	}
-
-} );
-
-/**
- * @author tschw
- */
-
-function LinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-
-	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
-
-}
-
-LinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
-
-	constructor: LinearInterpolant,
-
-	interpolate_: function ( i1, t0, t, t1 ) {
-
-		var result = this.resultBuffer,
-			values = this.sampleValues,
-			stride = this.valueSize,
-
-			offset1 = i1 * stride,
-			offset0 = offset1 - stride,
-
-			weight1 = ( t - t0 ) / ( t1 - t0 ),
-			weight0 = 1 - weight1;
-
-		for ( var i = 0; i !== stride; ++ i ) {
-
-			result[ i ] =
-					values[ offset0 + i ] * weight0 +
-					values[ offset1 + i ] * weight1;
-
-		}
-
-		return result;
-
-	}
-
-} );
-
-/**
- *
- * Interpolant that evaluates to the sample value at the position preceeding
- * the parameter.
- *
- * @author tschw
- */
-
-function DiscreteInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-
-	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
-
-}
-
-DiscreteInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
-
-	constructor: DiscreteInterpolant,
-
-	interpolate_: function ( i1 /*, t0, t, t1 */ ) {
-
-		return this.copySampleValue_( i1 - 1 );
-
-	}
-
-} );
-
-/**
- *
- * A timed sequence of keyframes for a specific property.
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
-function KeyframeTrack( name, times, values, interpolation ) {
-
-	if ( name === undefined ) throw new Error( 'THREE.KeyframeTrack: track name is undefined' );
-	if ( times === undefined || times.length === 0 ) throw new Error( 'THREE.KeyframeTrack: no keyframes in track named ' + name );
-
-	this.name = name;
-
-	this.times = AnimationUtils.convertArray( times, this.TimeBufferType );
-	this.values = AnimationUtils.convertArray( values, this.ValueBufferType );
-
-	this.setInterpolation( interpolation || this.DefaultInterpolation );
-
-}
-
-// Static methods
-
-Object.assign( KeyframeTrack, {
-
-	// Serialization (in static context, because of constructor invocation
-	// and automatic invocation of .toJSON):
-
-	toJSON: function ( track ) {
-
-		var trackType = track.constructor;
-
-		var json;
-
-		// derived classes can define a static toJSON method
-		if ( trackType.toJSON !== undefined ) {
-
-			json = trackType.toJSON( track );
-
-		} else {
-
-			// by default, we assume the data can be serialized as-is
-			json = {
-
-				'name': track.name,
-				'times': AnimationUtils.convertArray( track.times, Array ),
-				'values': AnimationUtils.convertArray( track.values, Array )
-
-			};
-
-			var interpolation = track.getInterpolation();
-
-			if ( interpolation !== track.DefaultInterpolation ) {
-
-				json.interpolation = interpolation;
-
-			}
-
-		}
-
-		json.type = track.ValueTypeName; // mandatory
-
-		return json;
-
-	}
-
-} );
-
-Object.assign( KeyframeTrack.prototype, {
-
-	constructor: KeyframeTrack,
-
-	TimeBufferType: Float32Array,
-
-	ValueBufferType: Float32Array,
-
-	DefaultInterpolation: InterpolateLinear,
-
-	InterpolantFactoryMethodDiscrete: function ( result ) {
-
-		return new DiscreteInterpolant( this.times, this.values, this.getValueSize(), result );
-
-	},
-
-	InterpolantFactoryMethodLinear: function ( result ) {
-
-		return new LinearInterpolant( this.times, this.values, this.getValueSize(), result );
-
-	},
-
-	InterpolantFactoryMethodSmooth: function ( result ) {
-
-		return new CubicInterpolant( this.times, this.values, this.getValueSize(), result );
-
-	},
-
-	setInterpolation: function ( interpolation ) {
-
-		var factoryMethod;
-
-		switch ( interpolation ) {
-
-			case InterpolateDiscrete:
-
-				factoryMethod = this.InterpolantFactoryMethodDiscrete;
-
-				break;
-
-			case InterpolateLinear:
-
-				factoryMethod = this.InterpolantFactoryMethodLinear;
-
-				break;
-
-			case InterpolateSmooth:
-
-				factoryMethod = this.InterpolantFactoryMethodSmooth;
-
-				break;
-
-		}
-
-		if ( factoryMethod === undefined ) {
-
-			var message = "unsupported interpolation for " +
-				this.ValueTypeName + " keyframe track named " + this.name;
-
-			if ( this.createInterpolant === undefined ) {
-
-				// fall back to default, unless the default itself is messed up
-				if ( interpolation !== this.DefaultInterpolation ) {
-
-					this.setInterpolation( this.DefaultInterpolation );
-
-				} else {
-
-					throw new Error( message ); // fatal, in this case
-
-				}
-
-			}
-
-			console.warn( 'THREE.KeyframeTrack:', message );
-			return this;
-
-		}
-
-		this.createInterpolant = factoryMethod;
-
-		return this;
-
-	},
-
-	getInterpolation: function () {
-
-		switch ( this.createInterpolant ) {
-
-			case this.InterpolantFactoryMethodDiscrete:
-
-				return InterpolateDiscrete;
-
-			case this.InterpolantFactoryMethodLinear:
-
-				return InterpolateLinear;
-
-			case this.InterpolantFactoryMethodSmooth:
-
-				return InterpolateSmooth;
-
-		}
-
-	},
-
-	getValueSize: function () {
-
-		return this.values.length / this.times.length;
-
-	},
-
-	// move all keyframes either forwards or backwards in time
-	shift: function ( timeOffset ) {
-
-		if ( timeOffset !== 0.0 ) {
-
-			var times = this.times;
-
-			for ( var i = 0, n = times.length; i !== n; ++ i ) {
-
-				times[ i ] += timeOffset;
-
-			}
-
-		}
-
-		return this;
-
-	},
-
-	// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
-	scale: function ( timeScale ) {
-
-		if ( timeScale !== 1.0 ) {
-
-			var times = this.times;
-
-			for ( var i = 0, n = times.length; i !== n; ++ i ) {
-
-				times[ i ] *= timeScale;
-
-			}
-
-		}
-
-		return this;
-
-	},
-
-	// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
-	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
-	trim: function ( startTime, endTime ) {
-
-		var times = this.times,
-			nKeys = times.length,
-			from = 0,
-			to = nKeys - 1;
-
-		while ( from !== nKeys && times[ from ] < startTime ) {
-
-			++ from;
-
-		}
-
-		while ( to !== - 1 && times[ to ] > endTime ) {
-
-			-- to;
-
-		}
-
-		++ to; // inclusive -> exclusive bound
-
-		if ( from !== 0 || to !== nKeys ) {
-
-			// empty tracks are forbidden, so keep at least one keyframe
-			if ( from >= to ) to = Math.max( to, 1 ), from = to - 1;
-
-			var stride = this.getValueSize();
-			this.times = AnimationUtils.arraySlice( times, from, to );
-			this.values = AnimationUtils.arraySlice( this.values, from * stride, to * stride );
-
-		}
-
-		return this;
-
-	},
-
-	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-	validate: function () {
-
-		var valid = true;
-
-		var valueSize = this.getValueSize();
-		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
-
-			console.error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
-			valid = false;
-
-		}
-
-		var times = this.times,
-			values = this.values,
-
-			nKeys = times.length;
-
-		if ( nKeys === 0 ) {
-
-			console.error( 'THREE.KeyframeTrack: Track is empty.', this );
-			valid = false;
-
-		}
-
-		var prevTime = null;
-
-		for ( var i = 0; i !== nKeys; i ++ ) {
-
-			var currTime = times[ i ];
-
-			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
-
-				console.error( 'THREE.KeyframeTrack: Time is not a valid number.', this, i, currTime );
-				valid = false;
-				break;
-
-			}
-
-			if ( prevTime !== null && prevTime > currTime ) {
-
-				console.error( 'THREE.KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
-				valid = false;
-				break;
-
-			}
-
-			prevTime = currTime;
-
-		}
-
-		if ( values !== undefined ) {
-
-			if ( AnimationUtils.isTypedArray( values ) ) {
-
-				for ( var i = 0, n = values.length; i !== n; ++ i ) {
-
-					var value = values[ i ];
-
-					if ( isNaN( value ) ) {
-
-						console.error( 'THREE.KeyframeTrack: Value is not a valid number.', this, i, value );
-						valid = false;
-						break;
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return valid;
-
-	},
-
-	// removes equivalent sequential keys as common in morph target sequences
-	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
-	optimize: function () {
-
-		var times = this.times,
-			values = this.values,
-			stride = this.getValueSize(),
-
-			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
-
-			writeIndex = 1,
-			lastIndex = times.length - 1;
-
-		for ( var i = 1; i < lastIndex; ++ i ) {
-
-			var keep = false;
-
-			var time = times[ i ];
-			var timeNext = times[ i + 1 ];
-
-			// remove adjacent keyframes scheduled at the same time
-
-			if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
-
-				if ( ! smoothInterpolation ) {
-
-					// remove unnecessary keyframes same as their neighbors
-
-					var offset = i * stride,
-						offsetP = offset - stride,
-						offsetN = offset + stride;
-
-					for ( var j = 0; j !== stride; ++ j ) {
-
-						var value = values[ offset + j ];
-
-						if ( value !== values[ offsetP + j ] ||
-							value !== values[ offsetN + j ] ) {
-
-							keep = true;
-							break;
-
-						}
-
-					}
-
-				} else {
-
-					keep = true;
-
-				}
-
-			}
-
-			// in-place compaction
-
-			if ( keep ) {
-
-				if ( i !== writeIndex ) {
-
-					times[ writeIndex ] = times[ i ];
-
-					var readOffset = i * stride,
-						writeOffset = writeIndex * stride;
-
-					for ( var j = 0; j !== stride; ++ j ) {
-
-						values[ writeOffset + j ] = values[ readOffset + j ];
-
-					}
-
-				}
-
-				++ writeIndex;
-
-			}
-
-		}
-
-		// flush last keyframe (compaction looks ahead)
-
-		if ( lastIndex > 0 ) {
-
-			times[ writeIndex ] = times[ lastIndex ];
-
-			for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j ) {
-
-				values[ writeOffset + j ] = values[ readOffset + j ];
-
-			}
-
-			++ writeIndex;
-
-		}
-
-		if ( writeIndex !== times.length ) {
-
-			this.times = AnimationUtils.arraySlice( times, 0, writeIndex );
-			this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
-
-		}
-
-		return this;
-
-	}
-
-} );
-
-/**
- *
- * A Track of Boolean keyframe values.
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
-function BooleanKeyframeTrack( name, times, values ) {
-
-	KeyframeTrack.call( this, name, times, values );
-
-}
-
-BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: BooleanKeyframeTrack,
-
-	ValueTypeName: 'bool',
-	ValueBufferType: Array,
-
-	DefaultInterpolation: InterpolateDiscrete,
-
-	InterpolantFactoryMethodLinear: undefined,
-	InterpolantFactoryMethodSmooth: undefined
-
-	// Note: Actually this track could have a optimized / compressed
-	// representation of a single value and a custom interpolant that
-	// computes "firstValue ^ isOdd( index )".
-
-} );
-
-/**
- *
- * A Track of keyframe values that represent color.
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
-function ColorKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: ColorKeyframeTrack,
-
-	ValueTypeName: 'color'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-	// Note: Very basic implementation and nothing special yet.
-	// However, this is the place for color space parameterization.
-
-} );
-
-/**
- *
- * A Track of numeric keyframe values.
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
-function NumberKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-NumberKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: NumberKeyframeTrack,
-
-	ValueTypeName: 'number'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-} );
-
-/**
- * Spherical linear unit quaternion interpolant.
- *
- * @author tschw
- */
-
-function QuaternionLinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-
-	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
-
-}
-
-QuaternionLinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
-
-	constructor: QuaternionLinearInterpolant,
-
-	interpolate_: function ( i1, t0, t, t1 ) {
-
-		var result = this.resultBuffer,
-			values = this.sampleValues,
-			stride = this.valueSize,
-
-			offset = i1 * stride,
-
-			alpha = ( t - t0 ) / ( t1 - t0 );
-
-		for ( var end = offset + stride; offset !== end; offset += 4 ) {
-
-			Quaternion.slerpFlat( result, 0, values, offset - stride, values, offset, alpha );
-
-		}
-
-		return result;
-
-	}
-
-} );
-
-/**
- *
- * A Track of quaternion keyframe values.
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
-function QuaternionKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: QuaternionKeyframeTrack,
-
-	ValueTypeName: 'quaternion',
-
-	// ValueBufferType is inherited
-
-	DefaultInterpolation: InterpolateLinear,
-
-	InterpolantFactoryMethodLinear: function ( result ) {
-
-		return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
-
-	},
-
-	InterpolantFactoryMethodSmooth: undefined // not yet implemented
-
-} );
-
-/**
- *
- * A Track that interpolates Strings
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
-function StringKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: StringKeyframeTrack,
-
-	ValueTypeName: 'string',
-	ValueBufferType: Array,
-
-	DefaultInterpolation: InterpolateDiscrete,
-
-	InterpolantFactoryMethodLinear: undefined,
-
-	InterpolantFactoryMethodSmooth: undefined
-
-} );
-
-/**
- *
- * A Track of vectored keyframe values.
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
-function VectorKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: VectorKeyframeTrack,
-
-	ValueTypeName: 'vector'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-} );
-
-/**
- *
- * Reusable set of Tracks that represent an animation.
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
-
-function AnimationClip( name, duration, tracks ) {
-
-	this.name = name;
-	this.tracks = tracks;
-	this.duration = ( duration !== undefined ) ? duration : - 1;
-
-	this.uuid = _Math.generateUUID();
-
-	// this means it should figure out its duration by scanning the tracks
-	if ( this.duration < 0 ) {
-
-		this.resetDuration();
-
-	}
-
-}
-
-function getTrackTypeForValueTypeName( typeName ) {
-
-	switch ( typeName.toLowerCase() ) {
-
-		case 'scalar':
-		case 'double':
-		case 'float':
-		case 'number':
-		case 'integer':
-
-			return NumberKeyframeTrack;
-
-		case 'vector':
-		case 'vector2':
-		case 'vector3':
-		case 'vector4':
-
-			return VectorKeyframeTrack;
-
-		case 'color':
-
-			return ColorKeyframeTrack;
-
-		case 'quaternion':
-
-			return QuaternionKeyframeTrack;
-
-		case 'bool':
-		case 'boolean':
-
-			return BooleanKeyframeTrack;
-
-		case 'string':
-
-			return StringKeyframeTrack;
-
-	}
-
-	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
-
-}
-
-function parseKeyframeTrack( json ) {
-
-	if ( json.type === undefined ) {
-
-		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
-
-	}
-
-	var trackType = getTrackTypeForValueTypeName( json.type );
-
-	if ( json.times === undefined ) {
-
-		var times = [], values = [];
-
-		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
-
-		json.times = times;
-		json.values = values;
-
-	}
-
-	// derived classes can define a static parse method
-	if ( trackType.parse !== undefined ) {
-
-		return trackType.parse( json );
-
-	} else {
-
-		// by default, we assume a constructor compatible with the base
-		return new trackType( json.name, json.times, json.values, json.interpolation );
-
-	}
-
-}
-
-Object.assign( AnimationClip, {
-
-	parse: function ( json ) {
-
-		var tracks = [],
-			jsonTracks = json.tracks,
-			frameTime = 1.0 / ( json.fps || 1.0 );
-
-		for ( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
-
-			tracks.push( parseKeyframeTrack( jsonTracks[ i ] ).scale( frameTime ) );
-
-		}
-
-		return new AnimationClip( json.name, json.duration, tracks );
-
-	},
-
-	toJSON: function ( clip ) {
-
-		var tracks = [],
-			clipTracks = clip.tracks;
-
-		var json = {
-
-			'name': clip.name,
-			'duration': clip.duration,
-			'tracks': tracks,
-			'uuid': clip.uuid
-
-		};
-
-		for ( var i = 0, n = clipTracks.length; i !== n; ++ i ) {
-
-			tracks.push( KeyframeTrack.toJSON( clipTracks[ i ] ) );
-
-		}
-
-		return json;
-
-	},
-
-	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
-
-		var numMorphTargets = morphTargetSequence.length;
-		var tracks = [];
-
-		for ( var i = 0; i < numMorphTargets; i ++ ) {
-
-			var times = [];
-			var values = [];
-
-			times.push(
-				( i + numMorphTargets - 1 ) % numMorphTargets,
-				i,
-				( i + 1 ) % numMorphTargets );
-
-			values.push( 0, 1, 0 );
-
-			var order = AnimationUtils.getKeyframeOrder( times );
-			times = AnimationUtils.sortedArray( times, 1, order );
-			values = AnimationUtils.sortedArray( values, 1, order );
-
-			// if there is a key at the first frame, duplicate it as the
-			// last frame as well for perfect loop.
-			if ( ! noLoop && times[ 0 ] === 0 ) {
-
-				times.push( numMorphTargets );
-				values.push( values[ 0 ] );
-
-			}
-
-			tracks.push(
-				new NumberKeyframeTrack(
-					'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
-					times, values
-				).scale( 1.0 / fps ) );
-
-		}
-
-		return new AnimationClip( name, - 1, tracks );
-
-	},
-
-	findByName: function ( objectOrClipArray, name ) {
-
-		var clipArray = objectOrClipArray;
-
-		if ( ! Array.isArray( objectOrClipArray ) ) {
-
-			var o = objectOrClipArray;
-			clipArray = o.geometry && o.geometry.animations || o.animations;
-
-		}
-
-		for ( var i = 0; i < clipArray.length; i ++ ) {
-
-			if ( clipArray[ i ].name === name ) {
-
-				return clipArray[ i ];
-
-			}
-
-		}
-
-		return null;
-
-	},
-
-	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
-
-		var animationToMorphTargets = {};
-
-		// tested with https://regex101.com/ on trick sequences
-		// such flamingo_flyA_003, flamingo_run1_003, crdeath0059
-		var pattern = /^([\w-]*?)([\d]+)$/;
-
-		// sort morph target names into animation groups based
-		// patterns like Walk_001, Walk_002, Run_001, Run_002
-		for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
-
-			var morphTarget = morphTargets[ i ];
-			var parts = morphTarget.name.match( pattern );
-
-			if ( parts && parts.length > 1 ) {
-
-				var name = parts[ 1 ];
-
-				var animationMorphTargets = animationToMorphTargets[ name ];
-				if ( ! animationMorphTargets ) {
-
-					animationToMorphTargets[ name ] = animationMorphTargets = [];
-
-				}
-
-				animationMorphTargets.push( morphTarget );
-
-			}
-
-		}
-
-		var clips = [];
-
-		for ( var name in animationToMorphTargets ) {
-
-			clips.push( AnimationClip.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps, noLoop ) );
-
-		}
-
-		return clips;
-
-	},
-
-	// parse the animation.hierarchy format
-	parseAnimation: function ( animation, bones ) {
-
-		if ( ! animation ) {
-
-			console.error( 'THREE.AnimationClip: No animation in JSONLoader data.' );
-			return null;
-
-		}
-
-		var addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
-
-			// only return track if there are actually keys.
-			if ( animationKeys.length !== 0 ) {
-
-				var times = [];
-				var values = [];
-
-				AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
-
-				// empty keys are filtered out, so check again
-				if ( times.length !== 0 ) {
-
-					destTracks.push( new trackType( trackName, times, values ) );
-
-				}
-
-			}
-
-		};
-
-		var tracks = [];
-
-		var clipName = animation.name || 'default';
-		// automatic length determination in AnimationClip.
-		var duration = animation.length || - 1;
-		var fps = animation.fps || 30;
-
-		var hierarchyTracks = animation.hierarchy || [];
-
-		for ( var h = 0; h < hierarchyTracks.length; h ++ ) {
-
-			var animationKeys = hierarchyTracks[ h ].keys;
-
-			// skip empty tracks
-			if ( ! animationKeys || animationKeys.length === 0 ) continue;
-
-			// process morph targets
-			if ( animationKeys[ 0 ].morphTargets ) {
-
-				// figure out all morph targets used in this track
-				var morphTargetNames = {};
-
-				for ( var k = 0; k < animationKeys.length; k ++ ) {
-
-					if ( animationKeys[ k ].morphTargets ) {
-
-						for ( var m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
-
-							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
-
-						}
-
-					}
-
-				}
-
-				// create a track for each morph target with all zero
-				// morphTargetInfluences except for the keys in which
-				// the morphTarget is named.
-				for ( var morphTargetName in morphTargetNames ) {
-
-					var times = [];
-					var values = [];
-
-					for ( var m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
-
-						var animationKey = animationKeys[ k ];
-
-						times.push( animationKey.time );
-						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
-
-					}
-
-					tracks.push( new NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
-
-				}
-
-				duration = morphTargetNames.length * ( fps || 1.0 );
-
-			} else {
-
-				// ...assume skeletal animation
-
-				var boneName = '.bones[' + bones[ h ].name + ']';
-
-				addNonemptyTrack(
-					VectorKeyframeTrack, boneName + '.position',
-					animationKeys, 'pos', tracks );
-
-				addNonemptyTrack(
-					QuaternionKeyframeTrack, boneName + '.quaternion',
-					animationKeys, 'rot', tracks );
-
-				addNonemptyTrack(
-					VectorKeyframeTrack, boneName + '.scale',
-					animationKeys, 'scl', tracks );
-
-			}
-
-		}
-
-		if ( tracks.length === 0 ) {
-
-			return null;
-
-		}
-
-		var clip = new AnimationClip( clipName, duration, tracks );
-
-		return clip;
-
-	}
-
-} );
-
-Object.assign( AnimationClip.prototype, {
-
-	resetDuration: function () {
-
-		var tracks = this.tracks, duration = 0;
-
-		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
-
-			var track = this.tracks[ i ];
-
-			duration = Math.max( duration, track.times[ track.times.length - 1 ] );
-
-		}
-
-		this.duration = duration;
-
-		return this;
-
-	},
-
-	trim: function () {
-
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			this.tracks[ i ].trim( 0, this.duration );
-
-		}
-
-		return this;
-
-	},
-
-	validate: function () {
-
-		var valid = true;
-
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			valid = valid && this.tracks[ i ].validate();
-
-		}
-
-		return valid;
-
-	},
-
-	optimize: function () {
-
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			this.tracks[ i ].optimize();
-
-		}
-
-		return this;
 
 	}
 
@@ -38901,8 +38929,8 @@ Object.assign( ObjectLoader.prototype, {
 
 			}, undefined, function () {
 
-				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
 
 			} );
 
@@ -39432,8 +39460,8 @@ ImageBitmapLoader.prototype = {
 
 			if ( onError ) onError( e );
 
-			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
+			scope.manager.itemEnd( url );
 
 		} );
 
@@ -40101,7 +40129,7 @@ Object.assign( StereoCamera.prototype, {
  * @author alteredq / http://alteredqualia.com/
  */
 
-function CubeCamera( near, far, cubeResolution ) {
+function CubeCamera( near, far, cubeResolution, options ) {
 
 	Object3D.call( this );
 
@@ -40139,7 +40167,7 @@ function CubeCamera( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
-	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
+	options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";
@@ -40200,6 +40228,77 @@ CubeCamera.prototype = Object.create( Object3D.prototype );
 CubeCamera.prototype.constructor = CubeCamera;
 
 /**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+function Clock( autoStart ) {
+
+	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
+
+	this.startTime = 0;
+	this.oldTime = 0;
+	this.elapsedTime = 0;
+
+	this.running = false;
+
+}
+
+Object.assign( Clock.prototype, {
+
+	start: function () {
+
+		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
+
+		this.oldTime = this.startTime;
+		this.elapsedTime = 0;
+		this.running = true;
+
+	},
+
+	stop: function () {
+
+		this.getElapsedTime();
+		this.running = false;
+		this.autoStart = false;
+
+	},
+
+	getElapsedTime: function () {
+
+		this.getDelta();
+		return this.elapsedTime;
+
+	},
+
+	getDelta: function () {
+
+		var diff = 0;
+
+		if ( this.autoStart && ! this.running ) {
+
+			this.start();
+			return 0;
+
+		}
+
+		if ( this.running ) {
+
+			var newTime = ( typeof performance === 'undefined' ? Date : performance ).now();
+
+			diff = ( newTime - this.oldTime ) / 1000;
+			this.oldTime = newTime;
+
+			this.elapsedTime += diff;
+
+		}
+
+		return diff;
+
+	}
+
+} );
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -40215,6 +40314,8 @@ function AudioListener() {
 	this.gain.connect( this.context.destination );
 
 	this.filter = null;
+
+	this.timeDelta = 0;
 
 }
 
@@ -40291,6 +40392,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var scale = new Vector3();
 
 		var orientation = new Vector3();
+		var clock = new Clock();
 
 		return function updateMatrixWorld( force ) {
 
@@ -40299,21 +40401,27 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			var listener = this.context.listener;
 			var up = this.up;
 
+			this.timeDelta = clock.getDelta();
+
 			this.matrixWorld.decompose( position, quaternion, scale );
 
 			orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 			if ( listener.positionX ) {
 
-				listener.positionX.setValueAtTime( position.x, this.context.currentTime );
-				listener.positionY.setValueAtTime( position.y, this.context.currentTime );
-				listener.positionZ.setValueAtTime( position.z, this.context.currentTime );
-				listener.forwardX.setValueAtTime( orientation.x, this.context.currentTime );
-				listener.forwardY.setValueAtTime( orientation.y, this.context.currentTime );
-				listener.forwardZ.setValueAtTime( orientation.z, this.context.currentTime );
-				listener.upX.setValueAtTime( up.x, this.context.currentTime );
-				listener.upY.setValueAtTime( up.y, this.context.currentTime );
-				listener.upZ.setValueAtTime( up.z, this.context.currentTime );
+				// code path for Chrome (see #14393)
+
+				var endTime = this.context.currentTime + this.timeDelta;
+
+				listener.positionX.linearRampToValueAtTime( position.x, endTime );
+				listener.positionY.linearRampToValueAtTime( position.y, endTime );
+				listener.positionZ.linearRampToValueAtTime( position.z, endTime );
+				listener.forwardX.linearRampToValueAtTime( orientation.x, endTime );
+				listener.forwardY.linearRampToValueAtTime( orientation.y, endTime );
+				listener.forwardZ.linearRampToValueAtTime( orientation.z, endTime );
+				listener.upX.linearRampToValueAtTime( up.x, endTime );
+				listener.upY.linearRampToValueAtTime( up.y, endTime );
+				listener.upZ.linearRampToValueAtTime( up.z, endTime );
 
 			} else {
 
@@ -40339,6 +40447,7 @@ function Audio( listener ) {
 
 	this.type = 'Audio';
 
+	this.listener = listener;
 	this.context = listener.context;
 
 	this.gain = this.context.createGain();
@@ -40750,8 +40859,25 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
-			panner.setPosition( position.x, position.y, position.z );
-			panner.setOrientation( orientation.x, orientation.y, orientation.z );
+			if ( panner.positionX ) {
+
+				// code path for Chrome and Firefox (see #14393)
+
+				var endTime = this.context.currentTime + this.listener.timeDelta;
+
+				panner.positionX.linearRampToValueAtTime( position.x, endTime );
+				panner.positionY.linearRampToValueAtTime( position.y, endTime );
+				panner.positionZ.linearRampToValueAtTime( position.z, endTime );
+				panner.orientationX.linearRampToValueAtTime( orientation.x, endTime );
+				panner.orientationY.linearRampToValueAtTime( orientation.y, endTime );
+				panner.orientationZ.linearRampToValueAtTime( orientation.z, endTime );
+
+			} else {
+
+				panner.setPosition( position.x, position.y, position.z );
+				panner.setOrientation( orientation.x, orientation.y, orientation.z );
+
+			}
 
 		};
 
@@ -43788,77 +43914,6 @@ Object.assign( Raycaster.prototype, {
 } );
 
 /**
- * @author alteredq / http://alteredqualia.com/
- */
-
-function Clock( autoStart ) {
-
-	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
-
-	this.startTime = 0;
-	this.oldTime = 0;
-	this.elapsedTime = 0;
-
-	this.running = false;
-
-}
-
-Object.assign( Clock.prototype, {
-
-	start: function () {
-
-		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
-
-		this.oldTime = this.startTime;
-		this.elapsedTime = 0;
-		this.running = true;
-
-	},
-
-	stop: function () {
-
-		this.getElapsedTime();
-		this.running = false;
-		this.autoStart = false;
-
-	},
-
-	getElapsedTime: function () {
-
-		this.getDelta();
-		return this.elapsedTime;
-
-	},
-
-	getDelta: function () {
-
-		var diff = 0;
-
-		if ( this.autoStart && ! this.running ) {
-
-			this.start();
-			return 0;
-
-		}
-
-		if ( this.running ) {
-
-			var newTime = ( typeof performance === 'undefined' ? Date : performance ).now();
-
-			diff = ( newTime - this.oldTime ) / 1000;
-			this.oldTime = newTime;
-
-			this.elapsedTime += diff;
-
-		}
-
-		return diff;
-
-	}
-
-} );
-
-/**
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  *
@@ -44791,7 +44846,7 @@ function PointLightHelper( light, sphereSize, color ) {
 
 
 	/*
-	var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
+	var distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
 	var distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 
 	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
@@ -45637,6 +45692,22 @@ BoxHelper.prototype.setFromObject = function ( object ) {
 
 };
 
+BoxHelper.prototype.copy = function ( source ) {
+
+	LineSegments.prototype.copy.call( this, source );
+
+	this.object = source.object;
+
+	return this;
+
+};
+
+BoxHelper.prototype.clone = function () {
+
+	return new this.constructor().copy( this );
+
+};
+
 /**
  * @author WestLangley / http://github.com/WestLangley
  */
@@ -45761,8 +45832,10 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	Object3D.call( this );
 
-	if ( color === undefined ) color = 0xffff00;
+	if ( dir === undefined ) dir = new THREE.Vector3( 0, 0, 1 );
+	if ( origin === undefined ) origin = new THREE.Vector3( 0, 0, 0 );
 	if ( length === undefined ) length = 1;
+	if ( color === undefined ) color = 0xffff00;
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
@@ -45843,6 +45916,23 @@ ArrowHelper.prototype.setColor = function ( color ) {
 
 	this.line.material.color.copy( color );
 	this.cone.material.color.copy( color );
+
+};
+
+ArrowHelper.prototype.copy = function ( source ) {
+
+	Object3D.prototype.copy.call( this, source, false );
+
+	this.line.copy( source.line );
+	this.cone.copy( source.cone );
+
+	return this;
+
+};
+
+ArrowHelper.prototype.clone = function () {
+
+	return new this.constructor().copy( this );
 
 };
 
@@ -47091,6 +47181,20 @@ Object.defineProperties( Material.prototype, {
 
 		}
 	},
+
+	overdraw: {
+		get: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		}
+	},
+
 	wrapRGB: {
 		get: function () {
 
@@ -47676,13 +47780,7 @@ function Projector() {
 
 function CanvasRenderer() {
 
-	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
-
-	this.domElement = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-	this.clear = function () {};
-	this.render = function () {};
-	this.setClearColor = function () {};
-	this.setSize = function () {};
+	console.error( 'THREE.CanvasRenderer has been removed' );
 
 }
 
@@ -47718,4 +47816,4 @@ function LensFlare() {
 
 }
 
-export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, LineLoop, Line, Points, Group, VideoTexture, DataTexture, DataTexture3D, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, ImageBitmapLoader, FontLoader, FileLoader, Loader, LoaderUtils, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, ArrayCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, Box3Helper, PlaneHelper, ArrowHelper, AxesHelper, Shape, Path, ShapePath, Font, CurvePath, Curve, ImageUtils, ShapeUtils, WebGLUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, TextBufferGeometry, SphereGeometry, SphereBufferGeometry, RingGeometry, RingBufferGeometry, PlaneGeometry, PlaneBufferGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, ExtrudeBufferGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleGeometry, CircleBufferGeometry, BoxGeometry, BoxBufferGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshBasicMaterial, MeshMatcapMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, ArcCurve, CatmullRomCurve3, CubicBezierCurve, CubicBezierCurve3, EllipseCurve, LineCurve, LineCurve3, QuadraticBezierCurve, QuadraticBezierCurve3, SplineCurve, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RedFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, TangentSpaceNormalMap, ObjectSpaceNormalMap, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, MultiMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, SplineCurve3, Spline, AxisHelper, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, BinaryTextureLoader, GeometryUtils, Projector, CanvasRenderer, SceneUtils, LensFlare };
+export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, LineLoop, Line, Points, Group, VideoTexture, DataTexture, DataTexture3D, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, AnimationLoader, CompressedTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, ImageBitmapLoader, FontLoader, FileLoader, Loader, LoaderUtils, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, ArrayCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, Box3Helper, PlaneHelper, ArrowHelper, AxesHelper, Shape, Path, ShapePath, Font, CurvePath, Curve, ImageUtils, ShapeUtils, WebGLUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, TextBufferGeometry, SphereGeometry, SphereBufferGeometry, RingGeometry, RingBufferGeometry, PlaneGeometry, PlaneBufferGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, ExtrudeBufferGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleGeometry, CircleBufferGeometry, BoxGeometry, BoxBufferGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshBasicMaterial, MeshMatcapMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, ArcCurve, CatmullRomCurve3, CubicBezierCurve, CubicBezierCurve3, EllipseCurve, LineCurve, LineCurve3, QuadraticBezierCurve, QuadraticBezierCurve3, SplineCurve, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RedFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, TangentSpaceNormalMap, ObjectSpaceNormalMap, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, MultiMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, SplineCurve3, Spline, AxisHelper, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, BinaryTextureLoader, GeometryUtils, Projector, CanvasRenderer, SceneUtils, LensFlare };

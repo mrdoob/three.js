@@ -284,7 +284,7 @@
 			var WIDTH = hash || ( ( isIE || isEdge ) ? 4 : 64 );
 
 			var container, stats;
-			var camera, scene, renderer, geometry, controls;
+			var camera, scene, renderer, geometry;
 
 			var PARTICLES = WIDTH * WIDTH;
 
@@ -298,10 +298,9 @@
 
 			}
 
-
 			var options = '';
 
-			for ( var i = 1; i < 8; i++ ) {
+			for ( var i = 1; i < 8; i ++ ) {
 
 				var j = Math.pow( 2, i );
 				options += '<a href="#" onclick="return change(' + j + ')">' + ( j * j ) + '</a> ';
@@ -319,7 +318,6 @@
 			var gpuCompute;
 			var velocityVariable;
 			var positionVariable;
-			var positionUniforms;
 			var velocityUniforms;
 			var particleUniforms;
 			var effectController;
@@ -343,7 +341,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				effectController = {
 					// Can be changed dynamically
@@ -390,7 +388,6 @@
 				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
 				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
 
-				positionUniforms = positionVariable.material.uniforms;
 				velocityUniforms = velocityVariable.material.uniforms;
 
 				velocityUniforms.gravityConstant = { value: 0.0 };
@@ -427,23 +424,23 @@
 				var positions = new Float32Array( PARTICLES * 3 );
 				var p = 0;
 
-				for ( var i = 0; i < PARTICLES; i++ ) {
+				for ( var i = 0; i < PARTICLES; i ++ ) {
 
-					positions[ p++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
-					positions[ p++ ] = 0; //( Math.random() * 2 - 1 ) * effectController.radius;
-					positions[ p++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
+					positions[ p ++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
+					positions[ p ++ ] = 0; //( Math.random() * 2 - 1 ) * effectController.radius;
+					positions[ p ++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
 
 				}
 
 				var uvs = new Float32Array( PARTICLES * 2 );
 				p = 0;
 
-				for ( var j = 0; j < WIDTH; j++ ) {
+				for ( var j = 0; j < WIDTH; j ++ ) {
 
-					for ( var i = 0; i < WIDTH; i++ ) {
+					for ( var i = 0; i < WIDTH; i ++ ) {
 
-						uvs[ p++ ] = i / ( WIDTH - 1 );
-						uvs[ p++ ] = j / ( WIDTH - 1 );
+						uvs[ p ++ ] = i / ( WIDTH - 1 );
+						uvs[ p ++ ] = j / ( WIDTH - 1 );
 
 					}
 
@@ -461,8 +458,8 @@
 
 				// ShaderMaterial
 				var material = new THREE.ShaderMaterial( {
-					uniforms:       particleUniforms,
-					vertexShader:   document.getElementById( 'particleVertexShader' ).textContent,
+					uniforms: particleUniforms,
+					vertexShader: document.getElementById( 'particleVertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'particleFragmentShader' ).textContent
 				} );
 
@@ -573,7 +570,11 @@
 				folder2.add( effectController, "randVelocity", 0.0, 50.0, 0.1 );
 
 				var buttonRestart = {
-					restartSimulation: function() { restartSimulation(); }
+					restartSimulation: function () {
+
+						restartSimulation();
+
+					}
 				};
 
 				folder2.add( buttonRestart, 'restartSimulation' );

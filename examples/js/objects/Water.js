@@ -162,7 +162,7 @@ THREE.Water = function ( geometry, options ) {
 			'	float distance = length(worldToEye);',
 
 			'	vec2 distortion = surfaceNormal.xz * ( 0.001 + 1.0 / distance ) * distortionScale;',
-			'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.z + distortion ) );',
+			'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) );',
 
 			'	float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );',
 			'	float rf0 = 0.3;',

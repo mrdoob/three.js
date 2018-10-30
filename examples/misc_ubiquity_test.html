@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background-color: #ffffff;
+				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -15,196 +15,140 @@
 	<body>
 
 		<script src="../build/three.js"></script>
-
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/CanvasRenderer.js"></script>
-		<script src="js/renderers/SVGRenderer.js"></script>
-		<script src="js/renderers/SoftwareRenderer.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
+
+		<div id='container1' style='float: left '></div>
+		<div id='container2' style='float: right'></div>
 
 		<script>
 
 			var stats;
 
 			var camera, scene;
-			var canvasRenderer, svgRenderer, softwareRenderer, webglRenderer;
+			var webglRenderer;
 
-			var mesh, group;
+			var mesh;
+			var texture, texture1, texture2, texture3;
 
 			init();
 			animate();
 
 			function init() {
 
-				var width = window.innerWidth / 2;
-				var height = window.innerHeight / 2;
+				var width = window.innerWidth / 2 - 2;
+				var height = window.innerHeight;
 
-				camera = new THREE.PerspectiveCamera( 75, width / height, 1, 10000 );
-				camera.position.z = 500;
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 4000 );
+				camera.position.z = 2000;
 
 				scene = new THREE.Scene();
-				scene.autoUpdate = false;
 				scene.background = new THREE.Color( 0xf0f0f0 );
-
-				// QRCODE
-
-				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/QRCode.json', function ( geometry ) {
-
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { vertexColors: THREE.FaceColors } ) );
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-					scene.add( mesh );
-
-				} );
-
-				// CUBES
-
-				var cube = new THREE.BoxBufferGeometry( 100, 100, 100 );
-
-				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } ) );
-				mesh.position.x = 500;
-				mesh.rotation.x = Math.random();
-				mesh.rotation.y = Math.random();
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.add( mesh );
-
-				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
-				mesh.position.x = 500;
-				mesh.position.y = 500;
-				mesh.rotation.x = Math.random();
-				mesh.rotation.y = Math.random();
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.add( mesh );
-
-				// PLANE
-
-				mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
-				mesh.position.y = - 500;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.add( mesh );
-
-				// CYLINDER
-
-				mesh = new THREE.Mesh( new THREE.CylinderBufferGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
-				mesh.position.x = - 500;
-				mesh.rotation.x = - Math.PI / 2;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.add( mesh );
-
-				// POLYFIELD
-
-				var geometry = new THREE.Geometry();
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, side: THREE.DoubleSide } );
-
-				for ( var i = 0; i < 100; i ++ ) {
-
-					var v = new THREE.Vector3(
-						Math.random() * 1000 - 500,
-						Math.random() * 1000 - 500,
-						Math.random() * 1000 - 500
-					);
-
-					var v0 = new THREE.Vector3(
-						Math.random() * 100 - 50,
-						Math.random() * 100 - 50,
-						Math.random() * 100 - 50
-					);
-
-					var v1 = new THREE.Vector3(
-						Math.random() * 100 - 50,
-						Math.random() * 100 - 50,
-						Math.random() * 100 - 50
-					);
-
-					var v2 = new THREE.Vector3(
-						Math.random() * 100 - 50,
-						Math.random() * 100 - 50,
-						Math.random() * 100 - 50
-					);
-
-					v0.add( v );
-					v1.add( v );
-					v2.add( v );
-
-					var face = new THREE.Face3(
-						geometry.vertices.push( v0 ) - 1,
-						geometry.vertices.push( v1 ) - 1,
-						geometry.vertices.push( v2 ) - 1,
-						null,
-						new THREE.Color( Math.random() * 0xffffff )
-					);
-
-					geometry.faces.push( face );
-
-				}
-
-				geometry.computeFaceNormals();
-
-				group = new THREE.Mesh( geometry, material );
-				group.scale.set( 2, 2, 2 );
-				scene.add( group );
-
-				// SPRITES
 
 				var textureLoader = new THREE.TextureLoader();
 
-				textureLoader.load( 'textures/sprite.png', function ( texture ) {
+				// MESH - Repeat Pattern
 
-					var material = new THREE.SpriteMaterial( { map: texture, transparent: true } );
+				texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
 
-					for ( var i = 0; i < 50; i ++ ) {
+				var geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 4, 4, 4 );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+
+				// SPRITES - from Sprite Sheet
+
+				texture1 = textureLoader.load( 'textures/UV_Grid_Sm.jpg', function () {
+
+					texture1.wrapS = THREE.ClampToEdgeWrapping;
+					texture1.wrapT = THREE.ClampToEdgeWrapping;
+
+					for ( var i = 0; i < 20; i ++ ) {
+
+						var tex = texture1.clone();
+
+						tex.needsUpdate = true; // cloning does not set this
+
+						tex.offset.x = 0.1 * THREE.Math.randInt( 0, 7 );
+						tex.offset.y = 0.1 * THREE.Math.randInt( 0, 7 );
+						tex.repeat.x = 0.1 * THREE.Math.randInt( 1, 3 );
+						tex.repeat.y = 0.1 * THREE.Math.randInt( 1, 3 );
+
+						var material = new THREE.SpriteMaterial( { map: tex } );
+						material.rotation = 0.5 * Math.PI * ( Math.random() - 0.5 );
 
 						var sprite = new THREE.Sprite( material );
+
 						sprite.position.x = Math.random() * 1000 - 500;
 						sprite.position.y = Math.random() * 1000 - 500;
 						sprite.position.z = Math.random() * 1000 - 500;
-						sprite.scale.set( 64, 64, 1 );
+
+						sprite.scale.set( 96, 96, 1 );
+
 						scene.add( sprite );
 
 					}
 
 				} );
 
-				for ( var i = 0; i < 50; i ++ ) {
 
-					var material = new THREE.SpriteMaterial( { color: Math.random() * 0xffffff } );
+				// SPRITES - Repeat Pattern
+
+				texture2 = textureLoader.load( 'textures/sprite0.jpg' );
+				texture2.wrapS = THREE.RepeatWrapping;
+				texture2.wrapT = THREE.RepeatWrapping;
+
+				for ( var i = 0; i < 20; i ++ ) {
+
+					var material = new THREE.SpriteMaterial( { map: texture2, opacity: 0.7 } );
 					var sprite = new THREE.Sprite( material );
+
+					sprite.material.rotation = 0.5 * Math.PI * ( Math.random() - 0.5 );
+
 					sprite.position.x = Math.random() * 1000 - 500;
 					sprite.position.y = Math.random() * 1000 - 500;
 					sprite.position.z = Math.random() * 1000 - 500;
+
 					sprite.scale.set( 64, 64, 1 );
+
 					scene.add( sprite );
 
 				}
 
-				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x80ffff );
-				scene.add( ambient );
+				// SPRITES - PNG
 
-				var directional = new THREE.DirectionalLight( 0xffff00 );
-				directional.position.set( - 1, 0.5, 0 );
-				scene.add( directional );
+				texture3 = textureLoader.load( 'textures/sprite1.png' );
+				texture3.wrapS = THREE.ClampToEdgeWrapping;
+				texture3.wrapT = THREE.ClampToEdgeWrapping;
 
-				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setPixelRatio( window.devicePixelRatio );
-				canvasRenderer.setSize( width, height );
-				document.body.appendChild( canvasRenderer.domElement );
+				for ( var i = 0; i < 20; i ++ ) {
 
-				svgRenderer = new THREE.SVGRenderer();
-				svgRenderer.setSize( width, height );
-				svgRenderer.setQuality( 'low' );
-				document.body.appendChild( svgRenderer.domElement );
+					var material = new THREE.SpriteMaterial( { map: texture3 } );
+					material.rotation = 2 * Math.PI * ( Math.random() - 0.5 );
 
-				softwareRenderer = new THREE.SoftwareRenderer();
-				softwareRenderer.setSize( width, height );
-				document.body.appendChild( softwareRenderer.domElement );
+					var sprite = new THREE.Sprite( material );
+
+					sprite.position.x = Math.random() * 1000 - 500;
+					sprite.position.y = Math.random() * 1000 - 500;
+					sprite.position.z = Math.random() * 1000 - 500;
+
+					sprite.scale.set( 64, 64, 1 );
+
+					scene.add( sprite );
+
+				}
+
+				//
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( width, height );
-				document.body.appendChild( webglRenderer.domElement );
+				var container2 = document.getElementById( 'container2' );
+				container2.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -217,15 +161,12 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth / 2;
-				var height = window.innerHeight / 2;
+				var width = window.innerWidth / 2 - 2;
+				var height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				canvasRenderer.setSize( width, height );
-				svgRenderer.setSize( width, height );
-				softwareRenderer.setSize( width, height );
 				webglRenderer.setSize( width, height );
 
 			}
@@ -243,19 +184,33 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0002;
+				var time = performance.now() * 0.0001;
 
 				camera.position.x = Math.sin( time ) * 500;
 				camera.position.z = Math.cos( time ) * 500;
 				camera.lookAt( scene.position );
 
-				group.rotation.x += 0.01;
+				//
 
-				scene.updateMatrixWorld();
+				texture.repeat.x = Math.sin( time ) * 0.5 + 1.0;
+				texture.repeat.y = Math.cos( time ) * 0.5 + 1.0;
 
-				canvasRenderer.render( scene, camera );
-				svgRenderer.render( scene, camera );
-				softwareRenderer.render( scene, camera );
+				texture.offset.x = Math.sin( time ) * 0.5 + 0.5;
+				texture.offset.y = Math.cos( time ) * 0.5 + 0.5;
+
+				mesh.rotation.x = time * 2;
+				mesh.rotation.y = time * 4;
+
+				//
+
+				texture2.repeat.x = Math.sin( time ) + 1.25;
+				texture2.repeat.y = Math.sin( time ) + 1.25;
+
+				texture2.offset.x = Math.sin( time );
+				texture2.offset.y = Math.cos( time );
+
+				//
+
 				webglRenderer.render( scene, camera );
 
 			}
@@ -263,4 +218,5 @@
 		</script>
 
 	</body>
+
 </html>

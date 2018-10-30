@@ -6,11 +6,11 @@ Sidebar.Project = function ( editor ) {
 
 	var config = editor.config;
 	var signals = editor.signals;
+	var strings = editor.strings;
 
 	var rendererTypes = {
 
 		'WebGLRenderer': THREE.WebGLRenderer,
-		'CanvasRenderer': THREE.CanvasRenderer,
 		'SVGRenderer': THREE.SVGRenderer,
 		'SoftwareRenderer': THREE.SoftwareRenderer,
 		'RaytracingRenderer': THREE.RaytracingRenderer
@@ -30,7 +30,7 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 
-	titleRow.add( new UI.Text( 'Title' ).setWidth( '90px' ) );
+	titleRow.add( new UI.Text( strings.getKey( 'sidebar/project/title' ) ).setWidth( '90px' ) );
 	titleRow.add( title );
 
 	container.add( titleRow );
@@ -44,7 +44,7 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 
-	editableRow.add( new UI.Text( 'Editable' ).setWidth( '90px' ) );
+	editableRow.add( new UI.Text( strings.getKey( 'sidebar/project/editable' ) ).setWidth( '90px' ) );
 	editableRow.add( editable );
 
 	container.add( editableRow );
@@ -58,7 +58,7 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 
-	vrRow.add( new UI.Text( 'VR' ).setWidth( '90px' ) );
+	vrRow.add( new UI.Text( strings.getKey( 'sidebar/project/vr' ) ).setWidth( '90px' ) );
 	vrRow.add( vr );
 
 	container.add( vrRow );
@@ -86,7 +86,7 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 
-	rendererTypeRow.add( new UI.Text( 'Renderer' ).setWidth( '90px' ) );
+	rendererTypeRow.add( new UI.Text( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
 	rendererTypeRow.add( rendererType );
 
 	container.add( rendererTypeRow );
@@ -152,12 +152,6 @@ Sidebar.Project = function ( editor ) {
 	}
 
 	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
-
-		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
-
-			type = 'CanvasRenderer';
-
-		}
 
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 

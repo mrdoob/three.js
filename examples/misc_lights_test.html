@@ -26,9 +26,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/CanvasRenderer.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -38,7 +35,7 @@
 
 			var container, stats;
 
-			var camera, scene, canvasRenderer, webglRenderer;
+			var camera, scene, webglRenderer;
 
 			var mesh, geometry, material;
 
@@ -70,7 +67,7 @@
 				// Spheres
 
 				geometry = new THREE.SphereBufferGeometry( 100, 16, 8 );
-				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, overdraw: 0.5, shininess: 0 } );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, shininess: 0 } );
 
 				for ( var i = 0; i < 30; i ++ ) {
 
@@ -112,11 +109,6 @@
 				mesh.scale.set( 0.05, 0.05, 0.05 );
 				pointLight.add( mesh );
 
-				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setPixelRatio( window.devicePixelRatio );
-				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( canvasRenderer.domElement );
-
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -141,7 +133,6 @@
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
@@ -200,7 +191,6 @@
 				pointLight.position.x = 200 * Math.cos( r );
 				pointLight.position.z = 200 * Math.sin( r );
 
-				canvasRenderer.render( scene, camera );
 				webglRenderer.render( scene, camera );
 
 			}

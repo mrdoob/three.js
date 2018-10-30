@@ -1,37 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js canvas - particles - waves</title>
+		<title>three.js webgl - particles - waves</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background-color: #000000;
+				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
 			}
 
 			a {
 				color:#0078ff;
 			}
+
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+			}
 		</style>
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particles waves example
+		</div>
+
 		<script src="../build/three.js"></script>
 
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/CanvasRenderer.js"></script>
-
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+		<script type="x-shader/x-vertex" id="vertexshader">
+
+			attribute float scale;
+
+			void main() {
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_PointSize = scale * ( 300.0 / - mvPosition.z );
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			uniform vec3 color;
+
+			void main() {
+
+				if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;
+
+				gl_FragColor = vec4( color, 1.0 );
+
+			}
+
+		</script>
+
 		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
 
 			var container, stats;
 			var camera, scene, renderer;
 
-			var particles, particle, count = 0;
+			var particles, count = 0;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -51,38 +103,54 @@
 
 				scene = new THREE.Scene();
 
-				particles = new Array();
+				//
 
-				var PI2 = Math.PI * 2;
-				var material = new THREE.SpriteCanvasMaterial( {
+				var numParticles = AMOUNTX * AMOUNTY;
 
-					color: 0xffffff,
-					program: function ( context ) {
+				var positions = new Float32Array( numParticles * 3 );
+				var scales = new Float32Array( numParticles );
 
-						context.beginPath();
-						context.arc( 0, 0, 0.5, 0, PI2, true );
-						context.fill();
-
-					}
-
-				} );
-
-				var i = 0;
+				var i = 0, j = 0;
 
 				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
 
 					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
 
-						particle = particles[ i ++ ] = new THREE.Sprite( material );
-						particle.position.x = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 );
-						particle.position.z = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 );
-						scene.add( particle );
+						positions[ i ] = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 ); // x
+						positions[ i + 1 ] = 0; // y
+						positions[ i + 2 ] = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 ); // z
+
+						scales[ j ] = 1;
+
+						i += 3;
+						j ++;
 
 					}
 
 				}
 
-				renderer = new THREE.CanvasRenderer();
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'scale', new THREE.BufferAttribute( scales, 1 ) );
+
+				var material = new THREE.ShaderMaterial( {
+
+					uniforms: {
+						color: { value: new THREE.Color( 0xffffff ) },
+					},
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+
+				} );
+
+				//
+
+				particles = new THREE.Points( geometry, material );
+				scene.add( particles );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -164,21 +232,30 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 
-				var i = 0;
+				var positions = particles.geometry.attributes.position.array;
+				var scales = particles.geometry.attributes.scale.array;
+
+				var i = 0, j = 0;
 
 				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
 
 					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
 
-						particle = particles[ i ++ ];
-						particle.position.y = ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
-							( Math.sin( ( iy + count ) * 0.5 ) * 50 );
-						particle.scale.x = particle.scale.y = ( Math.sin( ( ix + count ) * 0.3 ) + 1 ) * 4 +
-							( Math.sin( ( iy + count ) * 0.5 ) + 1 ) * 4;
+						positions[ i + 1 ] = ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
+										( Math.sin( ( iy + count ) * 0.5 ) * 50 );
+
+						scales[ j ] = ( Math.sin( ( ix + count ) * 0.3 ) + 1 ) * 8 +
+										( Math.sin( ( iy + count ) * 0.5 ) + 1 ) * 8;
+
+						i += 3;
+						j ++;
 
 					}
 
 				}
+
+				particles.geometry.attributes.position.needsUpdate = true;
+				particles.geometry.attributes.scale.needsUpdate = true;
 
 				renderer.render( scene, camera );
 

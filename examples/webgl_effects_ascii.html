@@ -1,36 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - ASCII Effect</title>
+		<title>three.js webgl - effects - ascii</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
 			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #000000;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			a {
+				color: #ff0000;
+			}
+
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
-	<body>
 
+	<body>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - ascii</div>
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/effects/AsciiEffect.js"></script>
 
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/CanvasRenderer.js"></script>
-
-		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			var container, stats;
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var camera, controls, scene, renderer;
-			var effect;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var camera, controls, scene, renderer, effect;
 
 			var sphere, plane;
 
@@ -41,21 +59,7 @@
 
 			function init() {
 
-				var width = window.innerWidth || 2;
-				var height = window.innerHeight || 2;
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to change the view';
-				container.appendChild( info );
-
-				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
 
@@ -82,16 +86,16 @@
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
-				renderer = new THREE.CanvasRenderer();
-				renderer.setSize( width, height );
-				// container.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				effect = new THREE.AsciiEffect( renderer );
-				effect.setSize( width, height );
-				container.appendChild( effect.domElement );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				// Special case: append effect.domElement, instead of renderer.domElement.
+				// AsciiEffect creates a custom domElement (a div container) where the ASCII elements are placed.
+
+				document.body.appendChild( effect.domElement );
 
 				//
 
@@ -115,9 +119,7 @@
 
 				requestAnimationFrame( animate );
 
-				stats.begin();
 				render();
-				stats.end();
 
 			}
 
@@ -136,5 +138,6 @@
 			}
 
 		</script>
+
 	</body>
 </html>

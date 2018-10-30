@@ -141,8 +141,8 @@
 			var orientationsStart = [];
 			var orientationsEnd = [];
 
-			positions.push( 0.025, -0.025, 0 );
-			positions.push( -0.025, 0.025, 0 );
+			positions.push( 0.025, - 0.025, 0 );
+			positions.push( - 0.025, 0.025, 0 );
 			positions.push( 0, 0, 0.025 );
 
 			// instanced attributes
@@ -233,7 +233,7 @@
 
 		}
 
-		function onWindowResize( event ) {
+		function onWindowResize() {
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();

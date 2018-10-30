@@ -1164,61 +1164,6 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	/*
-	// TODO Duplicated code (Frustum)
-
-	var _sphere = new Sphere();
-
-	function isObjectViewable( object ) {
-
-		var geometry = object.geometry;
-
-		if ( geometry.boundingSphere === null )
-			geometry.computeBoundingSphere();
-
-		_sphere.copy( geometry.boundingSphere ).
-		applyMatrix4( object.matrixWorld );
-
-		return isSphereViewable( _sphere );
-
-	}
-
-	function isSpriteViewable( sprite ) {
-
-		_sphere.center.set( 0, 0, 0 );
-		_sphere.radius = 0.7071067811865476;
-		_sphere.applyMatrix4( sprite.matrixWorld );
-
-		return isSphereViewable( _sphere );
-
-	}
-
-	function isSphereViewable( sphere ) {
-
-		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
-
-		var numPlanes = _clipping.numPlanes;
-
-		if ( numPlanes === 0 ) return true;
-
-		var planes = _this.clippingPlanes,
-
-			center = sphere.center,
-			negRad = - sphere.radius,
-			i = 0;
-
-		do {
-
-			// out when deeper than radius in the negative halfspace
-			if ( planes[ i ].distanceToPoint( center ) < negRad ) return false;
-
-		} while ( ++ i !== numPlanes );
-
-		return true;
-
-	}
-	*/
-
 	function projectObject( object, camera, sortObjects ) {
 
 		if ( object.visible === false ) return;
