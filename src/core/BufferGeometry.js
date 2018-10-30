@@ -1028,7 +1028,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			var oldAttribute = this.getAttribute( name );
 			var attribute;
 
-			var buffer = new attribute.array.constructor( attrArrays[ name ] );
+			var buffer = new oldAttribute.array.constructor( attrArrays[ name ] );
 			if ( oldAttribute.isInterleavedBufferAttribute ) {
 
 				attribute = new THREE.BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.itemSize );
