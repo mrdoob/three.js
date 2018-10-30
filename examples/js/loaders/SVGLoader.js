@@ -98,7 +98,7 @@ THREE.SVGLoader.prototype = {
 
 				transformPath( path, currentTransform );
 
-				paths.push( path );
+				paths.set( node, path );
 
 			}
 
@@ -979,7 +979,7 @@ THREE.SVGLoader.prototype = {
 
 		console.log( 'THREE.SVGLoader' );
 
-		var paths = [];
+		var paths = new Map();
 
 		var transformStack = [];
 
