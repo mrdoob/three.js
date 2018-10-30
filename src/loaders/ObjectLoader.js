@@ -451,7 +451,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-    	parseMaterials: function ( json, textures ) {
+	parseMaterials: function ( json, textures ) {
 
 		var materials = {};
 		var cache = {};
