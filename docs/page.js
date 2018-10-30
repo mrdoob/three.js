@@ -30,6 +30,10 @@ function onDocumentLoad( event ) {
 	var pathname = window.location.pathname;
 	var section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
 	var name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
+	var languageReg = new RegExp( "/" + section + "/[A-z0-9\-]+/[A-z0-9\-]+/" );
+	var language = languageReg.exec( pathname );
+	languageReg = new RegExp( "/"+section+"/[A-z0-9\-]+/" );
+	language = ( language !== null ) ? languageReg.exec( language ).toString().replace( "/" + section + "/", "" ) : "";
 
 	switch ( section ) {
 
@@ -49,6 +53,8 @@ function onDocumentLoad( event ) {
 			break;
 
 	}
+
+	path = path.replace( language, '' );
 
 	var text = document.body.innerHTML;
 
@@ -97,7 +103,7 @@ function onDocumentLoad( event ) {
 
 	button.addEventListener( 'click', function ( event ) {
 
-		window.open( 'https://github.com/mrdoob/three.js/blob/dev/docs/' + section + '/' + path + '.html' );
+		window.open( 'https://github.com/mrdoob/three.js/blob/dev/docs/' + section + '/' + language + path + '.html' );
 
 	}, false );
 
