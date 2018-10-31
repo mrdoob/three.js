@@ -15,7 +15,7 @@
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
-				color: #000000;
+				color: #ffffff;
 				padding: 5px;
 				font-family:Monospace;
 				font-size:13px;
@@ -66,7 +66,6 @@
 				controls = new THREE.TrackballControls( camera );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var light = new THREE.PointLight( 0xffffff );
 				light.position.set( 500, 500, 500 );
@@ -76,7 +75,7 @@
 				light.position.set( - 500, - 500, - 500 );
 				scene.add( light );
 
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshLambertMaterial() );
+				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true }) );
 				scene.add( sphere );
 
 				// Plane
@@ -86,11 +85,13 @@
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				effect = new THREE.AsciiEffect( renderer );
+				effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.domElement.style.color = 'white';
+				effect.domElement.style.backgroundColor = 'black';
 
 				// Special case: append effect.domElement, instead of renderer.domElement.
 				// AsciiEffect creates a custom domElement (a div container) where the ASCII elements are placed.
