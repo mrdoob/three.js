@@ -467,7 +467,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				if ( data.type === 'MultiMaterial' ) {
 
-                    			// Deprecated
+					// Deprecated
 					var array = [];
 					for ( var j = 0; j < data.materials.length; j ++ ) {
 
