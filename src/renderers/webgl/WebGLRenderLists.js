@@ -128,15 +128,23 @@ function WebGLRenderLists() {
 
 	function get( scene, camera ) {
 
-		var hash = scene.id + ',' + camera.id;
-		var list = lists[ hash ];
-
-		if ( list === undefined ) {
-
-			// console.log( 'THREE.WebGLRenderLists:', hash );
+		var cameras = lists[ scene.id ];
+		var list;
+		if ( cameras === undefined ) {
 
 			list = new WebGLRenderList();
-			lists[ hash ] = list;
+			lists[ scene.id ] = {};
+			lists[ scene.id ][ camera.id ] = list;
+
+		} else {
+
+			list = cameras[ camera.id ];
+			if ( list === undefined ) {
+
+				list = new WebGLRenderList();
+				cameras[ camera.id ] = list;
+
+			}
 
 		}
 
