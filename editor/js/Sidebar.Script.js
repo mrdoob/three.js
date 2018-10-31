@@ -4,12 +4,14 @@
 
 Sidebar.Script = function ( editor ) {
 
+	var strings = editor.strings;
+
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Text( strings.getKey( 'sidebar/script' ) ).setTextTransform( 'uppercase' ) );
 	container.add( new UI.Break() );
 	container.add( new UI.Break() );
 
@@ -18,7 +20,7 @@ Sidebar.Script = function ( editor ) {
 	var scriptsContainer = new UI.Row();
 	container.add( scriptsContainer );
 
-	var newScript = new UI.Button( 'New' );
+	var newScript = new UI.Button( strings.getKey( 'sidebar/script/new' ) );
 	newScript.onClick( function () {
 
 		var script = { name: '', source: 'function update( event ) {}' };
@@ -66,7 +68,7 @@ Sidebar.Script = function ( editor ) {
 					} );
 					scriptsContainer.add( name );
 
-					var edit = new UI.Button( 'Edit' );
+					var edit = new UI.Button( strings.getKey( 'sidebar/script/edit' ) );
 					edit.setMarginLeft( '4px' );
 					edit.onClick( function () {
 
@@ -75,7 +77,7 @@ Sidebar.Script = function ( editor ) {
 					} );
 					scriptsContainer.add( edit );
 
-					var remove = new UI.Button( 'Remove' );
+					var remove = new UI.Button( strings.getKey( 'sidebar/script/remove' ) );
 					remove.setMarginLeft( '4px' );
 					remove.onClick( function () {
 
