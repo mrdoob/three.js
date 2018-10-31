@@ -6,6 +6,8 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
+				font-family: Monospace;
+				font-size: 13px;
 				margin: 0px;
 				overflow: hidden;
 				text-align: center;
@@ -46,21 +48,28 @@
 
 				}
 
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x8FBCD4 );
+
+				scene.add( new THREE.AmbientLight( 0x8FBCD4, 0.4 ) );
+
 				container = document.getElementById( 'container' );
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
-				camera.position.z = 10;
+				camera.position.z = 8;
+				scene.add( camera );
 
 				var controls = new THREE.OrbitControls( camera, container );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x8FBCD4 );
 				var pointLight = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( pointLight );
-				scene.add( camera );
 
 				var geometry = createGeometry();
 
-				var material = new THREE.MeshPhongMaterial( { flatShading: true, color: 0xff0000, morphTargets: true } );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xff0000,
+					flatShading: true,
+					morphTargets: true
+				} );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
