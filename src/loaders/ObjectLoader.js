@@ -453,8 +453,8 @@ Object.assign( ObjectLoader.prototype, {
 
 	parseMaterials: function ( json, textures ) {
 
+		var cache = {}; // MultiMaterial
 		var materials = {};
-		var cache = {};
 
 		if ( json !== undefined ) {
 
@@ -468,25 +468,24 @@ Object.assign( ObjectLoader.prototype, {
 				if ( data.type === 'MultiMaterial' ) {
 
 					// Deprecated
+
 					var array = [];
+
 					for ( var j = 0; j < data.materials.length; j ++ ) {
 
-						if ( cache[ data.materials[ j ].uuid ] ) {
+						var material = data.materials[ j ];
 
-							array.push( cache[ data.materials[ j ].uuid ] );
+						if ( cache[ material.uuid ] === undefined ) {
 
-						} else {
-
-							var mat = loader.parse( data.materials[ j ] );
-							cache[ data.materials[ j ].uuid ] = mat;
-							array.push( mat );
+							cache[ material.uuid ] = loader.parse( material );
 
 						}
+
+						array.push( cache[ material.uuid ] );
 
 					}
 
 					materials[ data.uuid ] = array;
-					cache[ data.uuid ] = array;
 
 				} else {
 
