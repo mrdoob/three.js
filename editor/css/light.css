@@ -103,6 +103,7 @@ select {
 			color: #888;
 			margin: 0;
 			padding: 8px;
+			line-height: 16px;
 		}
 
 		#menubar .menu .options {

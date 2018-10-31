@@ -4,6 +4,8 @@
 
 Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
+	var strings = editor.strings;
+
 	var signals = editor.signals;
 
 	var container = new UI.Row();
@@ -16,7 +18,7 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 	var segmentsRow = new UI.Row();
 	var segments = new UI.Integer( parameters.segments ).onChange( update );
 
-	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ) );
+	segmentsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/segments' ) ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
 
 	container.add( segmentsRow );
@@ -26,7 +28,7 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 	var phiStartRow = new UI.Row();
 	var phiStart = new UI.Number( parameters.phiStart * 180 / Math.PI ).onChange( update );
 
-	phiStartRow.add( new UI.Text( 'Phi start (°)' ).setWidth( '90px' ) );
+	phiStartRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/phistart' ) ).setWidth( '90px' ) );
 	phiStartRow.add( phiStart );
 
 	container.add( phiStartRow );
@@ -36,7 +38,7 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 	var phiLengthRow = new UI.Row();
 	var phiLength = new UI.Number( parameters.phiLength * 180 / Math.PI ).onChange( update );
 
-	phiLengthRow.add( new UI.Text( 'Phi length (°)' ).setWidth( '90px' ) );
+	phiLengthRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/philength' ) ).setWidth( '90px' ) );
 	phiLengthRow.add( phiLength );
 
 	container.add( phiLengthRow );
@@ -47,7 +49,7 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 	var pointsUI = [];
 
 	var pointsRow = new UI.Row();
-	pointsRow.add( new UI.Text( 'Points' ).setWidth( '90px' ) );
+	pointsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setWidth( '90px' ) );
 
 	var points = new UI.Span().setDisplay( 'inline-block' );
 	pointsRow.add( points );
