@@ -144,7 +144,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/sphere_geometry/philength': 'Phi length',
 			'sidebar/geometry/sphere_geometry/thetastart': 'Theta start',
 			'sidebar/geometry/sphere_geometry/thetalength': 'Theta length',
-			
+
 			'sidebar/geometry/torus_geometry/radius': 'Radius',
 			'sidebar/geometry/torus_geometry/tube': 'Tube',
 			'sidebar/geometry/torus_geometry/radialsegments': 'Radial segments',
@@ -157,7 +157,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/torusKnot_geometry/radialsegments': 'Radial segments',
 			'sidebar/geometry/torusKnot_geometry/p': 'P',
 			'sidebar/geometry/torusKnot_geometry/q': 'Q',
-			
+
 			'sidebar/material/new': 'New',
 			'sidebar/material/copy': 'Copy',
 			'sidebar/material/paste': 'Paste',
@@ -188,7 +188,7 @@ var Strings = function ( config ) {
 			'sidebar/material/displacemap': 'Displace Map',
 			'sidebar/material/roughmap': 'Rough. Map',
 			'sidebar/material/metalmap': 'Metal. Map',
-			'sidebar/material/specularmap': 'Specular. Map',
+			'sidebar/material/specularmap': 'Specular Map',
 			'sidebar/material/envmap': 'Env Map',
 			'sidebar/material/lightmap': 'Light Map',
 			'sidebar/material/aomap': 'AO Map',
@@ -445,7 +445,7 @@ var Strings = function ( config ) {
 			'sidebar/material/transparent': '透明性',
 			'sidebar/material/alphatest': 'α测试',
 			'sidebar/material/wireframe': '线框',
-			
+
 			'sidebar/script': '脚本',
 			'sidebar/script/new': '新建',
 			'sidebar/script/edit': '编辑',
