@@ -77,9 +77,9 @@
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = -2;
+				light.shadow.camera.bottom = - 2;
 				light.shadow.camera.right = 2;
-				light.shadow.camera.left = -2;
+				light.shadow.camera.left = - 2;
 				light.shadow.mapSize.set( 4096, 4096 );
 				scene.add( light );
 
@@ -223,7 +223,7 @@
 				tempMatrix.identity().extractRotation( controller.matrixWorld );
 
 				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-				raycaster.ray.direction.set( 0, 0, -1 ).applyMatrix4( tempMatrix );
+				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
 				return raycaster.intersectObjects( group.children );
 

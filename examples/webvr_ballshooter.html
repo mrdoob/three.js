@@ -43,6 +43,8 @@
 			var normal = new THREE.Vector3();
 			var relativeVelocity = new THREE.Vector3();
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -163,9 +165,9 @@
 					var object = room.children[ count ++ ];
 
 					object.position.copy( controller.position );
-					object.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
-					object.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
-					object.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
+					object.userData.velocity.x = ( Math.random() - 0.5 ) * 3;
+					object.userData.velocity.y = ( Math.random() - 0.5 ) * 3;
+					object.userData.velocity.z = ( Math.random() - 9 );
 					object.userData.velocity.applyQuaternion( controller.quaternion );
 
 					if ( count === room.children.length ) count = 0;
@@ -189,13 +191,17 @@
 
 				//
 
+				var delta = clock.getDelta() * 0.8; // slow down simulation
+
 				var range = 3 - radius;
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
 					var object = room.children[ i ];
 
-					object.position.add( object.userData.velocity );
+					object.position.x += object.userData.velocity.x * delta;
+					object.position.y += object.userData.velocity.y * delta;
+					object.position.z += object.userData.velocity.z * delta;
 
 					// keep objects inside room
 
@@ -251,7 +257,7 @@
 
 					}
 
-					object.userData.velocity.y -= 0.00098;
+					object.userData.velocity.y -= 9.8 * delta;
 
 				}
 

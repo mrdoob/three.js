@@ -153,19 +153,26 @@
 			}
 
 			function onPointerRestricted() {
+
 				var pointerLockElement = renderer.domElement;
-				if ( pointerLockElement && typeof(pointerLockElement.requestPointerLock) === 'function' ) {
+				if ( pointerLockElement && typeof ( pointerLockElement.requestPointerLock ) === 'function' ) {
+
 					pointerLockElement.requestPointerLock();
 
 				}
+
 			}
 
 			function onPointerUnrestricted() {
+
 				var currentPointerLockElement = document.pointerLockElement;
 				var expectedPointerLockElement = renderer.domElement;
-				if ( currentPointerLockElement && currentPointerLockElement === expectedPointerLockElement && typeof(document.exitPointerLock) === 'function' ) {
+				if ( currentPointerLockElement && currentPointerLockElement === expectedPointerLockElement && typeof ( document.exitPointerLock ) === 'function' ) {
+
 					document.exitPointerLock();
+
 				}
+
 			}
 
 			function onWindowResize() {

@@ -11,16 +11,16 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Handles and keeps track of loaded and pending data. A default global instance of this class
-			is created and used by loaders if not supplied manually - see [page:DefaultLoadingManager].<br /><br />
 
-			In general that should be sufficient, however there are times when it can be useful to have seperate loaders -
-			for example if you want to show seperate loading bars for objects and textures.
+            其功能时处理并跟踪已加载和待处理的数据。如果未手动设置加强管理器，则会为加载器创建和使用默认全局实例加载器管理器
+            - 请参阅 [page:DefaultLoadingManager].<br /><br />
+
+            一般来说，默认的加载管理器已足够使用了，但有时候也需要设置单独的加载器 - 例如，如果你想为对象和纹理显示单独的加载条。
 
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>例子</h2>
 
 		<p>
 			[example:webgl_loader_babylon WebGL / loader / babylon]<br />
@@ -32,8 +32,7 @@
 		</p>
 
 		<p>
-			This example shows how to use LoadingManager to track the progress of
-			[page:OBJLoader].
+			下面的例子将介绍，如何使用加载管理器来跟踪 [page:OBJLoader] 的加载进度流程。
 		</p>
 
 		<code>
@@ -72,19 +71,18 @@
 		</code>
 
 		<p>
-			In addition to observing progress, a LoadingManager can be used to
-			override resource URLs during loading. This may be helpful for assets
-			coming from drag-and-drop events, WebSockets, WebRTC, or other APIs. An
-			example showing how to load an in-memory model using Blob URLs is below.
+
+            除了观察进度流程之外，还可以使用LoadingManager在加载期间覆写资源URL。当某资源来自拖拽事件、
+            WebSockets、WebRTC或其他API时，此方法可以有所帮助。下面显示了如何使用Blob URL加载内存模型的示例。
 		</p>
 
 		<code>
-		// Blob or File objects created when dragging files into the webpage.
+		// 将文件拖入网页时创建的Blob或File对象。
 		var blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
 
 		var manager = new THREE.LoadingManager();
 
-		// Initialize loading manager with URL callback.
+		// 使用URL回调初始化加载管理器。
 		var objectURLs = [];
 		manager.setURLModifier( ( url ) => {
 
@@ -96,7 +94,7 @@
 
 		} );
 
-		// Load as usual, then revoke the blob URLs.
+		// 像通常一样加载，然后撤消blob URL
 		var loader = new THREE.GLTFLoader( manager );
 		loader.load( 'fish.gltf', (gltf) => {
 
@@ -107,75 +105,73 @@
 		});
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造方法</h2>
 
 		<h3>[name]( [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:Function onLoad] — (optional) this function will be called when all loaders are done.<br />
-		[page:Function onProgress] — (optional) this function will be called when an item is complete.<br />
-		[page:Function onError] — (optional) this function will be called a loader encounters errors. <br />
+		[page:Function onLoad] — (可选) 所有加载器加载完成后，将调用此函数。<br />
+		[page:Function onProgress] — (可选) 当每个项目完成后，将调用此函数。<br />
+		[page:Function onError] — (可选) 当一个加载器遇到错误时，将调用此函数。 <br />
 
-		Creates a new [name].
+		创建一个新的 [name].
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Function onStart]</h3>
 		<p>
-			This function will be called when loading starts.
-			The arguments are:<br />
-			[page:String url] — The url of the item just loaded.<br />
-			[page:Integer itemsLoaded] — the number  of items already loaded so far.<br />
-			[page:Iteger itemsTotal] — the total amount of items to be loaded.<br /><br />
+			此换上咋加载开始时，被调用.
+			有如下参数:<br />
+			[page:String url] — 被加载的项的url。<br />
+			[page:Integer itemsLoaded] — 目前已加载项的个数。<br />
+			[page:Iteger itemsTotal] — 总共所需要加载项的个数。<br /><br />
 
-			By default this is undefined.
+			此方法默认时未定义。
 		</p>
 
 		<h3>[property:Function onLoad]</h3>
 		<p>
-			This function will be called when all loading is completed. By default this is undefined,
-			unless passed in the constructor.
+            所有的项加载完成后将调用此函数。默认情况下，此方法时未定义的，除非在构造函数中进行传递。
 		</p>
 
 		<h3>[property:Function onProgress]</h3>
 		<p>
-		This function will be called when an item is complete.
-		The arguments are:<br />
-		[page:String url] — The url of the item just loaded.<br />
-		[page:Integer itemsLoaded] — the number  of items already loaded so far.<br />
-		[page:Iteger itemsTotal] — the total amount of items to be loaded.<br /><br />
+		    此方法加载每一个项，加载完成时进行调用。
+            有如下参数:<br />
+		[page:String url] — 被加载的项的url。<br />
+		[page:Integer itemsLoaded] — 目前已加载项的个数。<br />
+		[page:Iteger itemsTotal] — 总共所需要加载项的个数。<br /><br />
 
-		By default this is undefined, unless passed in the constructor.
+            默认情况下，此方法时未定义的，除非在构造函数中进行传递。
 		</p>
 
 		<h3>[property:Function onError]</h3>
 		<p>
-			This function will be called when any item errors, with the argument:<br />
-			[page:String url] — The url of the item that errored.<br /><br />
+            此方法将在任意项加载错误时，进行调用。
+            有如下参数:<br />
+			[page:String url] — 所加载出错误的项的url<br /><br />
 
-			By default this is undefined, unless passed in the constructor.
+            默认情况下，此方法时未定义的，除非在构造函数中进行传递。
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
 		<p>
-		[page:Function callback] — URL modifier callback. Called with [page:String url] argument, and
-		must return [page:String resolvedURL].<br /><br />
+		[page:Function callback] —
+            设置URL修饰符成功时回调。使用url参数进行回调，并且必须返回 [page:String resolvedURL] 。<br /><br />
 
-		If provided, the callback will be passed each resource URL before a request is sent. The
-		callback may return the original URL, or a new URL to override loading behavior. This
-		behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
+            如果设置了回调，则在发送请求之前将向每个资源URL传递回调。回调可以返回最初的URL，也可以返回新URL以覆盖加载行为。
+            此行为可用于从.ZIP、拖拽API和数据URI中加载资源文件。
 		</p>
 
 		<h3>[method:String resolveURL]( [param:String url] )</h3>
 		<p>
-		[page:String url] — the url to load<br /><br />
+		[page:String url] — 所要加载的url<br /><br />
 
-		Given a URL, uses the URL modifier callback (if any) and returns a resolved URL. If no
-		URL modifier is set, returns the original URL.
+            给定URL，使用URL修饰符回调（如果有）并返回已解析的URL。如果未设置URL修饰符，则返回原始URL。
 		</p>
 
 		<br /><br />
@@ -186,27 +182,27 @@
 
 		<h3>[method:null itemStart]( [param:String url] )</h3>
 		<p>
-		[page:String url] — the url to load<br /><br />
+		[page:String url] — 所要加载的url<br /><br />
 
-		This should be called by any loader using the manager when the loader starts loading an url.
+           任何使用管理器的加载器都会调用此方法， 当加载器需要开始加载URL时。
 		</p>
 
 		<h3>[method:null itemEnd]( [param:String url] )</h3>
 		<p>
-		[page:String url] — the loaded url<br /><br />
+		[page:String url] — 所要加载的url<br /><br />
 
-		This should be called by any loader using the manager when the loader ended loading an url.
+            任何使用管理器的加载器都会调用此方法， 当加载器需要加载URL结束时。
 		</p>
 
 
 		<h3>[method:null itemError]( [param:String url] )</h3>
 		<p>
-		[page:String url] — the loaded url<br /><br />
+		[page:String url] — 所要加载的url<br /><br />
 
-		This should be called by any loader using the manager when the loader errors loading an url.
+            任何使用管理器的加载器都会调用此方法， 当加载器出现加载错误时。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]
 	</body>

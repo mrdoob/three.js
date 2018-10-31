@@ -124,9 +124,9 @@
 				var fullWidth = 550;
 				var fullHeight = 600;
 
-				views.push( new View( canvas1, fullWidth, fullHeight,   0,   0, canvas1.clientWidth, canvas1.clientHeight ) );
+				views.push( new View( canvas1, fullWidth, fullHeight, 0, 0, canvas1.clientWidth, canvas1.clientHeight ) );
 				views.push( new View( canvas2, fullWidth, fullHeight, 150, 200, canvas2.clientWidth, canvas2.clientHeight ) );
-				views.push( new View( canvas3, fullWidth, fullHeight,  75, 300, canvas3.clientWidth, canvas3.clientHeight ) );
+				views.push( new View( canvas3, fullWidth, fullHeight, 75, 300, canvas3.clientWidth, canvas3.clientHeight ) );
 
 				//
 
@@ -249,7 +249,7 @@
 
 			function animate() {
 
-				for ( var i = 0; i < views.length; ++i ) {
+				for ( var i = 0; i < views.length; ++ i ) {
 
 					views[ i ].render();
 

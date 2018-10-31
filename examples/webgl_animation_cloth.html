@@ -144,7 +144,7 @@
 
 				// cloth geometry
 
-				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
+				clothGeometry = new THREE.ParametricBufferGeometry( clothFunction, cloth.w, cloth.h );
 
 				// cloth mesh
 
@@ -296,13 +296,14 @@
 
 				for ( var i = 0, il = p.length; i < il; i ++ ) {
 
-					clothGeometry.vertices[ i ].copy( p[ i ].position );
+					var v = p[ i ].position;
+
+					clothGeometry.attributes.position.setXYZ( i, v.x, v.y, v.z );
 
 				}
 
-				clothGeometry.verticesNeedUpdate = true;
+				clothGeometry.attributes.position.needsUpdate = true;
 
-				clothGeometry.computeFaceNormals();
 				clothGeometry.computeVertexNormals();
 
 				sphere.position.copy( ballPosition );

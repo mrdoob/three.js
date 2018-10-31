@@ -777,13 +777,11 @@ THREE.FBXLoader = ( function () {
 
 				if ( morphTargetNode.attrType !== 'BlendShapeChannel' ) return;
 
-				var targetRelationships = connections.get( parseInt( child.ID ) );
+				rawMorphTarget.geoID = connections.get( parseInt( child.ID ) ).children.filter( function ( child ) {
 
-				targetRelationships.children.forEach( function ( child ) {
+					return child.relationship === undefined;
 
-					if ( child.relationship === undefined ) rawMorphTarget.geoID = child.ID;
-
-				} );
+				} )[ 0 ].ID;
 
 				rawMorphTargets.push( rawMorphTarget );
 
@@ -2488,62 +2486,62 @@ THREE.FBXLoader = ( function () {
 
 								if ( layerCurveNodes[ i ] === undefined ) {
 
-									var modelID;
+									var modelID = connections.get( child.ID ).parents.filter( function ( parent ) {
 
-									connections.get( child.ID ).parents.forEach( function ( parent ) {
+										return parent.relationship !== undefined;
 
-										if ( parent.relationship !== undefined ) modelID = parent.ID;
+									} )[ 0 ].ID;
 
-									} );
+									if ( modelID !== undefined ) {
 
-									var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
+										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
 
-									var node = {
+										var node = {
 
-										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
-										ID: rawModel.id,
-										initialPosition: [ 0, 0, 0 ],
-										initialRotation: [ 0, 0, 0 ],
-										initialScale: [ 1, 1, 1 ],
+											modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+											ID: rawModel.id,
+											initialPosition: [ 0, 0, 0 ],
+											initialRotation: [ 0, 0, 0 ],
+											initialScale: [ 1, 1, 1 ],
 
-									};
+										};
 
-									sceneGraph.traverse( function ( child ) {
+										sceneGraph.traverse( function ( child ) {
 
-										if ( child.ID = rawModel.id ) {
+											if ( child.ID = rawModel.id ) {
 
-											node.transform = child.matrix;
+												node.transform = child.matrix;
 
-											if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
+												if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
 
-										}
+											}
 
-									} );
+										} );
 
-									if ( ! node.transform ) node.transform = new THREE.Matrix4();
+										if ( ! node.transform ) node.transform = new THREE.Matrix4();
 
-									// if the animated model is pre rotated, we'll have to apply the pre rotations to every
-									// animation value as well
-									if ( 'PreRotation' in rawModel ) node.preRotation = rawModel.PreRotation.value;
-									if ( 'PostRotation' in rawModel ) node.postRotation = rawModel.PostRotation.value;
+										// if the animated model is pre rotated, we'll have to apply the pre rotations to every
+										// animation value as well
+										if ( 'PreRotation' in rawModel ) node.preRotation = rawModel.PreRotation.value;
+										if ( 'PostRotation' in rawModel ) node.postRotation = rawModel.PostRotation.value;
 
-									layerCurveNodes[ i ] = node;
+										layerCurveNodes[ i ] = node;
+
+									}
 
 								}
 
-								layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
+								if ( layerCurveNodes[ i ] ) layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
 
 							} else if ( curveNode.curves.morph !== undefined ) {
 
 								if ( layerCurveNodes[ i ] === undefined ) {
 
-									var deformerID;
+									var deformerID = connections.get( child.ID ).parents.filter( function ( parent ) {
 
-									connections.get( child.ID ).parents.forEach( function ( parent ) {
+										return parent.relationship !== undefined;
 
-										if ( parent.relationship !== undefined ) deformerID = parent.ID;
-
-									} );
+									} )[ 0 ].ID;
 
 									var morpherID = connections.get( deformerID ).parents[ 0 ].ID;
 									var geoID = connections.get( morpherID ).parents[ 0 ].ID;
@@ -3939,7 +3937,6 @@ THREE.FBXLoader = ( function () {
 		var lPreRotationM = new THREE.Matrix4();
 		var lRotationM = new THREE.Matrix4();
 		var lPostRotationM = new THREE.Matrix4();
-		var lTransform = new THREE.Matrix4();
 
 		var lScalingM = new THREE.Matrix4();
 		var lScalingPivotM = new THREE.Matrix4();
@@ -3949,7 +3946,6 @@ THREE.FBXLoader = ( function () {
 
 		var lParentGX = new THREE.Matrix4();
 		var lGlobalT = new THREE.Matrix4();
-		var lGlobalRS = new THREE.Matrix4();
 
 		var inheritType = ( transformData.inheritType ) ? transformData.inheritType : 0;
 
@@ -3996,16 +3992,17 @@ THREE.FBXLoader = ( function () {
 		lParentGX.extractRotation( lParentGRM );
 
 		// Global Shear*Scaling
-		var lLSM = new THREE.Matrix4();
-		var lParentGSM = new THREE.Matrix4();
-		var lParentGRSM = new THREE.Matrix4();
 		var lParentTM = new THREE.Matrix4();
+		var lLSM;
+		var lParentGSM;
+		var lParentGRSM;
 
 		lParentTM.copyPosition( lParentGX );
 		lParentGRSM = lParentTM.getInverse( lParentTM ).multiply( lParentGX );
 		lParentGSM = lParentGRM.getInverse( lParentGRM ).multiply( lParentGRSM );
 		lLSM = lScalingM;
 
+		var lGlobalRS;
 		if ( inheritType === 0 ) {
 
 			lGlobalRS = lParentGRM.multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
@@ -4025,7 +4022,7 @@ THREE.FBXLoader = ( function () {
 		}
 
 		// Calculate the local transform matrix
-		lTransform = lTranslationM.multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM.getInverse( lRotationPivotM ) ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM.getInverse( lScalingPivotM ) );
+		var lTransform = lTranslationM.multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM.getInverse( lRotationPivotM ) ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM.getInverse( lScalingPivotM ) );
 
 		var lLocalTWithAllPivotAndOffsetInfo = new THREE.Matrix4().copyPosition( lTransform );
 

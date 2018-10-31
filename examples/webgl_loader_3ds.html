@@ -72,13 +72,14 @@
 						if ( child instanceof THREE.Mesh ) {
 
 							child.material.normalMap = normal;
+
 						}
 
 					} );
 
 					scene.add( object );
 
-				});
+				} );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

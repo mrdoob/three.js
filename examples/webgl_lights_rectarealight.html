@@ -33,7 +33,6 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Demo of RectAreaLight - by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a><br />
 			Click and drag to move OrbitControls.<br />
@@ -48,8 +47,6 @@
 		<script src="js/WebGL.js"></script>
 
 		<script>
-
-			var container = document.getElementById( 'container' );
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
@@ -92,7 +89,7 @@
 
 				}
 
-				if ( ! gl.getExtension('OES_texture_float_linear' ) ) {
+				if ( ! gl.getExtension( 'OES_texture_float_linear' ) ) {
 
 					alert( 'OES_texture_float_linear not supported' );
 					throw 'missing webgl extension';

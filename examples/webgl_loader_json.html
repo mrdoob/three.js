@@ -51,7 +51,7 @@
 			}
 
 			var container, stats, clock, mixer;
-			var camera, scene, renderer, objects;
+			var camera, scene, renderer;
 
 			init();
 			animate();
@@ -85,7 +85,7 @@
 
 						// random placement in a grid
 
-						var x = ( ( i % 27 )  - 13.5 ) * 2 + THREE.Math.randFloatSpread( 1 );
+						var x = ( ( i % 27 ) - 13.5 ) * 2 + THREE.Math.randFloatSpread( 1 );
 						var z = ( Math.floor( i / 27 ) - 13.5 ) * 2 + THREE.Math.randFloatSpread( 1 );
 
 						mesh.position.set( x, 0, z );
@@ -93,7 +93,7 @@
 						var s = THREE.Math.randFloat( 0.00075, 0.001 );
 						mesh.scale.set( s, s, s );
 
-						mesh.rotation.y = THREE.Math.randFloat( -0.25, 0.25 );
+						mesh.rotation.y = THREE.Math.randFloat( - 0.25, 0.25 );
 
 						mesh.matrixAutoUpdate = false;
 						mesh.updateMatrix();
@@ -101,9 +101,9 @@
 						scene.add( mesh );
 
 						mixer.clipAction( geometry.animations[ 0 ], mesh )
-								.setDuration( 1 )			// one second
-								.startAt( - Math.random() )	// random phase (already running)
-								.play();					// let's go
+							.setDuration( 1 )			// one second
+							.startAt( - Math.random() )	// random phase (already running)
+							.play();					// let's go
 
 					}
 
@@ -138,7 +138,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

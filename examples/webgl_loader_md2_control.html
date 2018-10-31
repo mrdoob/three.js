@@ -114,10 +114,10 @@
 				light.shadow.camera.near = 100;
 				light.shadow.camera.far = 1200;
 
-				light.shadow.camera.left = -1000;
+				light.shadow.camera.left = - 1000;
 				light.shadow.camera.right = 1000;
 				light.shadow.camera.top = 350;
-				light.shadow.camera.bottom = -350;
+				light.shadow.camera.bottom = - 350;
 
 				scene.add( light );
 				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
@@ -181,7 +181,7 @@
 					skins: [ "grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
 							 "gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
 							 "sharokh.png" ],
-					weapons:  [ [ "weapon.md2", "weapon.jpg" ] ],
+					weapons: [[ "weapon.md2", "weapon.jpg" ]],
 					animations: {
 						move: "run",
 						idle: "stand",
@@ -232,7 +232,7 @@
 							cloneCharacter.setWeapon( 0 );
 							cloneCharacter.setSkin( i );
 
-							cloneCharacter.root.position.x = ( i - nSkins/2 ) * 150;
+							cloneCharacter.root.position.x = ( i - nSkins / 2 ) * 150;
 							cloneCharacter.root.position.z = j * 250;
 
 							scene.add( cloneCharacter.root );
@@ -257,23 +257,23 @@
 
 			// EVENT HANDLERS
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				camera.aspect = SCREEN_WIDTH/ SCREEN_HEIGHT;
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
 			}
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
 				event.stopPropagation();
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 38: /*up*/
 					case 87: /*W*/ 	controls.moveForward = true; break;
@@ -282,10 +282,10 @@
 					case 83: /*S*/ 	 controls.moveBackward = true; break;
 
 					case 37: /*left*/
-					case 65: /*A*/   controls.moveLeft = true; break;
+					case 65: /*A*/ controls.moveLeft = true; break;
 
 					case 39: /*right*/
-					case 68: /*D*/    controls.moveRight = true; break;
+					case 68: /*D*/ controls.moveRight = true; break;
 
 					//case 67: /*C*/     controls.crouch = true; break;
 					//case 32: /*space*/ controls.jump = true; break;
@@ -295,11 +295,11 @@
 
 			}
 
-			function onKeyUp ( event ) {
+			function onKeyUp( event ) {
 
 				event.stopPropagation();
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 38: /*up*/
 					case 87: /*W*/ controls.moveForward = false; break;
@@ -311,7 +311,7 @@
 					case 65: /*A*/ 	 controls.moveLeft = false; break;
 
 					case 39: /*right*/
-					case 68: /*D*/ 	  controls.moveRight = false; break;
+					case 68: /*D*/ controls.moveRight = false; break;
 
 					//case 67: /*C*/     controls.crouch = false; break;
 					//case 32: /*space*/ controls.jump = false; break;

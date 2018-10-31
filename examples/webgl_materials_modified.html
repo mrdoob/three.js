@@ -14,9 +14,7 @@
 				overflow:hidden;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
 			#info {
 				position: absolute;
@@ -59,7 +57,6 @@
 			}
 
 			var camera, scene, renderer, stats;
-			var controls;
 
 			var materialShader;
 
@@ -75,8 +72,6 @@
 
 				var material = new THREE.MeshNormalMaterial();
 				material.onBeforeCompile = function ( shader ) {
-
-					// console.log( shader )
 
 					shader.uniforms.time = { value: 0 };
 
@@ -98,7 +93,7 @@
 				};
 
 				var loader = new THREE.GLTFLoader();
-				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function( gltf ) {
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					var mesh = new THREE.Mesh( gltf.scene.children[ 0 ].geometry, material );
 					mesh.position.y = - 50;
@@ -112,7 +107,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				//
 
@@ -127,7 +122,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;

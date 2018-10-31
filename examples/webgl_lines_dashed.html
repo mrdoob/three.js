@@ -110,41 +110,41 @@
 				var position = [];
 
 				position.push(
-					-h, -h, -h,
-					-h, h, -h,
+					- h, - h, - h,
+					- h, h, - h,
 
-					-h, h, -h,
-					h, h, -h,
+					- h, h, - h,
+					h, h, - h,
 
-					h, h, -h,
-					h, -h, -h,
+					h, h, - h,
+					h, - h, - h,
 
-					h, -h, -h,
-					-h, -h, -h,
+					h, - h, - h,
+					- h, - h, - h,
 
-					-h, -h, h,
-					-h, h, h,
+					- h, - h, h,
+					- h, h, h,
 
-					-h, h, h,
+					- h, h, h,
 					h, h, h,
 
 					h, h, h,
-					h, -h, h,
+					h, - h, h,
 
-					h, -h, h,
-					-h, -h, h,
+					h, - h, h,
+					- h, - h, h,
 
-					-h, -h, -h,
-					-h, -h, h,
+					- h, - h, - h,
+					- h, - h, h,
 
-					-h, h, -h,
-					-h, h, h,
+					- h, h, - h,
+					- h, h, h,
 
-					h, h, -h,
+					h, h, - h,
 					h, h, h,
 
-					h, -h, -h,
-					h, -h, h
+					h, - h, - h,
+					h, - h, h
 				 );
 
 				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
@@ -175,7 +175,7 @@
 
 				var time = Date.now() * 0.001;
 
-				scene.traverse( function( object ) {
+				scene.traverse( function ( object ) {
 
 					if ( object.isLine ) {
 

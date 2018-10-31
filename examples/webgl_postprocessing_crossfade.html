@@ -22,9 +22,7 @@
 				width: 100%;
 			}
 
-			.info a {
-				color: #00ffff;
-			}
+			a { color: #00ffff; }
 		</style>
 	</head>
 	<body>
@@ -68,10 +66,10 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var sceneA = new Scene( "cube", 5000, 1200, 120, new THREE.Vector3(0,-0.4,0), 0xffffff );
-				var sceneB = new Scene( "sphere", 500, 2000, 50, new THREE.Vector3(0,0.2,0.1), 0x000000 );
+				var sceneA = new Scene( "cube", 5000, 1200, 120, new THREE.Vector3( 0, - 0.4, 0 ), 0xffffff );
+				var sceneB = new Scene( "sphere", 500, 2000, 50, new THREE.Vector3( 0, 0.2, 0.1 ), 0x000000 );
 
-				transition = new Transition(sceneA,sceneB);
+				transition = new Transition( sceneA, sceneB );
 
 			}
 

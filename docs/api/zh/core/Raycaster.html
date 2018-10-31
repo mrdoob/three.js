@@ -8,23 +8,21 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>光线投射[name]</h1>
 
 		<p class="desc">
-		This class is designed to assist with [link:https://en.wikipedia.org/wiki/Ray_casting raycasting].
-		Raycasting is used for mouse picking (working out what objects in the 3d space the mouse is over) amongst
-		other things.
+			这个类用于进行[link:https://en.wikipedia.org/wiki/Ray_casting raycasting]（光线投射）。
+			光线投射用于进行鼠标拾取（在三维空间中计算出鼠标移过了什么物体）。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 		<code>
 		var raycaster = new THREE.Raycaster();
 		var mouse = new THREE.Vector2();
 
 		function onMouseMove( event ) {
 
-			// calculate mouse position in normalized device coordinates
-			// (-1 to +1) for both components
+			// 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
 
 			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -33,10 +31,10 @@
 
 		function render() {
 
-			// update the picking ray with the camera and mouse position
+			// 通过摄像机和鼠标位置更新射线
 			raycaster.setFromCamera( mouse, camera );
 
-			// calculate objects intersecting the picking ray
+			// 计算物体和射线的焦点
 			var intersects = raycaster.intersectObjects( scene.children );
 
 			for ( var i = 0; i < intersects.length; i++ ) {
@@ -55,7 +53,7 @@
 
 		</code>
 		<div>
-			Examples: [example:webgl_interactive_cubes Raycasting to a Mesh]<br />
+			其它示例：<br>[example:webgl_interactive_cubes Raycasting to a Mesh]<br />
 			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera]<br />
 			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry]<br />
 			[example:webgl_interactive_lines Raycasting to a Line]<br />
@@ -71,44 +69,44 @@
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] ) {</h3>
 		<p>
-		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
-		[page:Vector3 direction] — The direction vector that gives direction to the ray. Should be normalized.<br />
-		[page:Float near] — All results returned are further away than near. Near can't be negative. Default value is 0.<br />
-		[page:Float far] — All results returned are closer than far. Far can't be lower than near. Default value is Infinity.
-		</p>
+		[page:Vector3 origin] —— 光线投射的原点向量。<br />
+		[page:Vector3 direction] —— 向射线提供方向的方向向量，应当被标准化。<br />
+		[page:Float near] —— 返回的所有结果比near远。near不能为负值，其默认值为0。<br />
+		[page:Float far] —— 返回的所有结果都比far近。far不能小于near，其默认值为Infinity（正无穷。）</p>
 		<p>
-		This creates a new raycaster object.<br />
+			这将创建一个新的raycaster对象。<br />
+
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:float far]</h3>
 		<p>
-		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.
-		This value shouldn't be negative and should be larger than the near property.
+			raycaster的远距离因数（投射远点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
+			这个值不应当为负，并且应当比near属性大。
 		</p>
 
 		<h3>[property:float linePrecision]</h3>
 		<p>
-		The precision factor of the raycaster when intersecting [page:Line] objects.
+
+			raycaster与[page:Line]（线）物体相交时的精度因数。
+
 		</p>
 
 		<h3>[property:float near]</h3>
 		<p>
-		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.
-		This value shouldn't be negative and should be smaller than the far property.
+			raycaster的近距离因数（投射近点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
+			这个值不应当为负，并且应当比near属性小。
 		</p>
 
 		<h3>[property:Object params]</h3>
 		<p>
-		An object with the following properties:
-
-			<code>
+			具有以下属性的物体：<code>
 {
 	Mesh: {},
 	Line: {},
@@ -121,68 +119,73 @@
 		</p>
 
 		<h3>[property:Ray ray]</h3>
-		<p>The [Page:Ray] used for the raycasting.</p>
+		<p>用于进行光线投射的[Page:Ray]（射线）。</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
-		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
-		[page:Vector3 direction] — The normalized direction vector that gives direction to the ray.
+		[page:Vector3 origin] —— 光线投射的原点向量。<br />
+		[page:Vector3 direction] —— 为光线提供方向的标准化方向向量。
 		</p>
 		<p>
-		Updates the ray with a new origin and direction.
+			使用一个新的原点和方向来更新射线。
 		</p>
 
 		<h3>[method:null setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
 		<p>
-		[page:Vector2 coords] — 2D coordinates of the mouse, in normalized device coordinates (NDC)---X and Y components should be between -1 and 1.<br />
-		[page:Camera camera] — camera from which the ray should originate
+		[page:Vector2 coords] —— 在标准化设备坐标中鼠标的二维坐标 —— X分量与Y分量应当在-1到1之间。<br />
+								
+		[page:Camera camera] —— 射线所来源的摄像机。
 		</p>
 		<p>
-		Updates the ray with a new origin and direction.
+			使用一个新的原点和方向来更新射线。
 		</p>
 
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
-		[page:Object3D object] — The object to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersecton with the object. Default is false.<br />
-		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
+		[page:Object3D object] —— 检查与射线相交的物体。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检查所有的后代。否则将只会检查对象本身。默认值为false。<br />
+		[page:Array optionalTarget] — （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>
-		Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first. An array of intersections is returned...
+			检测所有在射线与物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个）。<br>
+			该方法返回一个包含有交叉部分的数组:
 		</p>
 		<code>
 				[ { distance, point, face, faceIndex, object }, ... ]
 		</code>
 		<p>
-			[page:Float distance] – distance between the origin of the ray and the intersection<br />
-			[page:Vector3 point] – point of intersection, in world coordinates<br />
-			[page:Face3 face] – intersected face<br />
-			[page:Integer faceIndex] – index of the intersected face<br />
-			[page:Object3D object] – the intersected object<br />
-			[page:Vector2 uv] - U,V coordinates at point of intersection
+			[page:Float distance] —— 射线投射原点和相交部分之间的距离。<br />
+			[page:Vector3 point] —— 相交部分的点（世界坐标）<br />
+			[page:Face3 face] —— 相交的面<br />
+			[page:Integer faceIndex] —— 相交的面的索引<br />
+			[page:Object3D object] —— 相交的物体<br />
+			[page:Vector2 uv] —— 相交部分的点的UV坐标。
 		</p>
 		<p>
-		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
+			当计算这条射线是否和物体相交的时候，*Raycaster*将传入的对象委托给[page:Object3D.raycast raycast]方法。
+			这将可以让[page:Mesh mesh]对于光线投射的响应不同于[page:Line lines]和[page:Points pointclouds]。
 		</p>
 		<p>
-		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.
+			<strong>请注意</strong>：对于网格来说，面必须朝向射线的原点，以便其能够被检测到。
+			用于交互的射线穿过面的背侧时，将不会被检测到。如果需要对物体中面的两侧进行光线投射，
+			你需要将[page:Mesh.material material]中的[page:Material.side side]属性设置为*THREE.DoubleSide*。
 		</p>
 
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
-		[page:Array objects] — The objects to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If true, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects. Default is false.<br />
-		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
+		[page:Array objects] —— 检测和射线相交的一组物体。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为false。<br />
+		[page:Array optionalTarget] —— （可选）（可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>
-		Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].
+			检测所有在射线与这些物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个），相交部分和[page:.intersectObject]所返回的格式是相同的。
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
