@@ -129,7 +129,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_offset.copy( _intersection ).sub(_selected.getWorldPosition( _worldPosition ));
+				_offset.copy( _intersection ).sub( _selected.getWorldPosition( _worldPosition ));
 
 			}
 
