@@ -355,7 +355,6 @@ var files = {
 		"misc_exporter_stl",
 		"misc_fps",
 		"misc_lookat",
-		"misc_ubiquity_test",
 		"misc_uv_tests"
 	],
 	"css3d": [
