@@ -2,9 +2,12 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { RGBFormat } from '../constants.js';
 import { Texture } from './Texture.js';
 
 function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+	if ( format === undefined ) format = RGBFormat;
 
 	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
