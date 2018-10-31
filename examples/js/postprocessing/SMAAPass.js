@@ -27,17 +27,16 @@ THREE.SMAAPass = function ( width, height ) {
 	this.weightsRT.texture.name = "SMAAPass.weights";
 
 	// textures
-	var self = this;
+	var scope = this;
 
 	var areaTextureImage = new Image();
-	this.areaTexture = new THREE.Texture();
-
 	areaTextureImage.src = this.getAreaTexture();
 	areaTextureImage.onload = function() {
 		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
-		self.areaTexture.needsUpdate = true;
+		scope.areaTexture.needsUpdate = true;
 	};
-	
+
+	this.areaTexture = new THREE.Texture();
 	this.areaTexture.name = "SMAAPass.area";
 	this.areaTexture.image = areaTextureImage;
 	this.areaTexture.format = THREE.RGBFormat;
@@ -46,14 +45,13 @@ THREE.SMAAPass = function ( width, height ) {
 	this.areaTexture.flipY = false;
 
 	var searchTextureImage = new Image();
-	this.searchTexture = new THREE.Texture();
-	
 	searchTextureImage.src = this.getSearchTexture();
 	searchTextureImage.onload = function() {
 		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
-		self.searchTexture.needsUpdate = true;
+		scope.searchTexture.needsUpdate = true;
 	};
-	
+
+	this.searchTexture = new THREE.Texture();
 	this.searchTexture.name = "SMAAPass.search";
 	this.searchTexture.image = searchTextureImage;
 	this.searchTexture.magFilter = THREE.NearestFilter;
