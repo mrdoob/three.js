@@ -837,7 +837,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.Material} material Material to process
 		 * @return {Integer}      Index of the processed material in the "materials" array
 		 */
-		function processMaterial( material ) {
+		function processMaterial( material, aoMapUVIndex ) {
 
 			if ( cachedData.materials.has( material ) ) {
 
@@ -981,9 +981,11 @@ THREE.GLTFExporter.prototype = {
 			// occlusionTexture
 			if ( material.aoMap ) {
 
-				var occlusionMapDef = {
+				gltfMaterial.occlusionTexture = {
+
 					index: processTexture( material.aoMap ),
-					texCoord: 1
+					texCoord: aoMapUVIndex
+
 				};
 
 				if ( material.aoMapIntensity !== 1.0 ) {
@@ -1336,7 +1338,9 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
+				var aoMapUVIndex = geometry.attributes.uv2 === undefined ? 0 : 1;
+
+				var material = processMaterial( materials[ groups[ i ].materialIndex ], aoMapUVIndex );
 
 				if ( material !== null ) {
 
