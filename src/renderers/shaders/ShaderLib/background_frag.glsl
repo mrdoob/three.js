@@ -4,6 +4,11 @@ varying vec2 vUv;
 
 void main() {
 
-	gl_FragColor = texture2D( t2D, vUv );
+	vec4 texColor = texture2D( t2D, vUv );
+
+	gl_FragColor = mapTexelToLinear( texColor );
+
+	#include <tonemapping_fragment>
+	#include <encodings_fragment>
 
 }
