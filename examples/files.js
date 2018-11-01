@@ -189,7 +189,6 @@ var files = {
 		"webgl_modifier_tessellation",
 		"webgl_morphtargets",
 		"webgl_morphtargets_horse",
-		"webgl_morphtargets_human",
 		"webgl_morphtargets_sphere",
 		"webgl_multiple_canvases_circle",
 		"webgl_multiple_canvases_complex",
@@ -289,6 +288,7 @@ var files = {
 		"webgl_buffergeometry_instancing_lambert",
 		"webgl_buffergeometry_lines",
 		"webgl_buffergeometry_lines_indexed",
+		"webgl_buffergeometry_morphtargets",
 		"webgl_buffergeometry_points",
 		"webgl_buffergeometry_points_interleaved",
 		"webgl_buffergeometry_rawshader",
@@ -354,9 +354,7 @@ var files = {
 		"misc_exporter_obj",
 		"misc_exporter_stl",
 		"misc_fps",
-		"misc_lights_test",
 		"misc_lookat",
-		"misc_ubiquity_test2",
 		"misc_uv_tests"
 	],
 	"css3d": [

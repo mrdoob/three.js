@@ -857,19 +857,19 @@
 			igeo.addAttribute( 'position', vertices );
 
 			// var matrices = new THREE.InstancedBufferAttribute(
-			// 	new Float32Array( instanceCount * 16 ), 16, 1
+			// 	new Float32Array( instanceCount * 16 ), 16
 			// );
 			var mcol0 = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			var mcol1 = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			var mcol2 = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			var mcol3 = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			var matrix = new THREE.Matrix4();
 			var me = matrix.elements;
@@ -899,7 +899,7 @@
 
 			};
 			var colors = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			for ( var i = 0, ul = colors.count; i < ul; i ++ ) {
 
@@ -910,7 +910,7 @@
 
 			var col = new THREE.Color();
 			var pickingColors = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			for ( var i = 0, ul = pickingColors.count; i < ul; i ++ ) {
 

@@ -453,6 +453,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	parseMaterials: function ( json, textures ) {
 
+		var cache = {}; // MultiMaterial
 		var materials = {};
 
 		if ( json !== undefined ) {
@@ -472,7 +473,15 @@ Object.assign( ObjectLoader.prototype, {
 
 					for ( var j = 0; j < data.materials.length; j ++ ) {
 
-						array.push( loader.parse( data.materials[ j ] ) );
+						var material = data.materials[ j ];
+
+						if ( cache[ material.uuid ] === undefined ) {
+
+							cache[ material.uuid ] = loader.parse( material );
+
+						}
+
+						array.push( cache[ material.uuid ] );
 
 					}
 
@@ -481,6 +490,7 @@ Object.assign( ObjectLoader.prototype, {
 				} else {
 
 					materials[ data.uuid ] = loader.parse( data );
+					cache[ data.uuid ] = materials[ data.uuid ];
 
 				}
 
@@ -527,8 +537,8 @@ Object.assign( ObjectLoader.prototype, {
 
 			}, undefined, function () {
 
-				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
 
 			} );
 

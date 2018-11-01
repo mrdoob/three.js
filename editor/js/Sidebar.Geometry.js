@@ -10,6 +10,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
+	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
 	// Actions
