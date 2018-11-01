@@ -52,6 +52,8 @@ var Strings = function ( config ) {
 			'menubar/add/perspectivecamera': 'PerspectiveCamera',
 
 			'menubar/play': 'Play',
+			'menubar/play/stop': 'Stop',
+			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
 
@@ -288,6 +290,8 @@ var Strings = function ( config ) {
 			'menubar/add/perspectivecamera': '透视相机',
 
 			'menubar/play': '启动',
+			'menubar/play/stop': '暂停',
+			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
 

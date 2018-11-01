@@ -20,13 +20,13 @@ Menubar.Play = function ( editor ) {
 		if ( isPlaying === false ) {
 
 			isPlaying = true;
-			title.setTextContent( 'Stop' );
+			title.setTextContent( strings.getKey( 'menubar/play/stop' ) );
 			signals.startPlayer.dispatch();
 
 		} else {
 
 			isPlaying = false;
-			title.setTextContent( 'Play' );
+			title.setTextContent( strings.getKey( 'menubar/play/play' ) );
 			signals.stopPlayer.dispatch();
 
 		}
