@@ -63,10 +63,8 @@
 				scene = new THREE.Scene();
 
 				video = document.getElementById( 'video' );
+
 				var texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.format = THREE.RGBFormat;
 
 				var geometry = new THREE.PlaneBufferGeometry( 16, 9 );
 				geometry.scale( 0.5, 0.5, 0.5 );
