@@ -67,6 +67,17 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 				};
 
+				// enable code injection for non-built-in material
+				Object.defineProperty( boxMesh.material, 'envMap', {
+
+					get: function () {
+
+						return this.uniforms.tCube.value;
+
+					}
+
+				} );
+
 				objects.update( boxMesh );
 
 			}
@@ -96,6 +107,17 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 				);
 
 				planeMesh.geometry.removeAttribute( 'normal' );
+
+				// enable code injection for non-built-in material
+				Object.defineProperty( planeMesh.material, 'map', {
+
+					get: function () {
+
+						return this.uniforms.t2D.value;
+
+					}
+
+				} );
 
 				objects.update( planeMesh );
 
