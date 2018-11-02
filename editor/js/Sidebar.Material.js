@@ -132,7 +132,7 @@ Sidebar.Material = function ( editor ) {
 	var materialProgramRow = new UI.Row();
 	materialProgramRow.add( new UI.Text( strings.getKey( 'sidebar/material/program' ) ).setWidth( '90px' ) );
 
-	var materialProgramInfo = new UI.Button( 'Info' );
+	var materialProgramInfo = new UI.Button( strings.getKey( 'sidebar/material/info' ) );
 	materialProgramInfo.setMarginLeft( '4px' );
 	materialProgramInfo.onClick( function () {
 

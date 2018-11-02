@@ -51,7 +51,11 @@ var Strings = function ( config ) {
 			'menubar/add/ambientlight': 'AmbientLight',
 			'menubar/add/perspectivecamera': 'PerspectiveCamera',
 
+			'menubar/status/autosave': 'autosave',
+
 			'menubar/play': 'Play',
+			'menubar/play/stop': 'Stop',
+			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
 
@@ -220,10 +224,20 @@ var Strings = function ( config ) {
 			'sidebar/project/editable': 'Editable',
 			'sidebar/project/vr': 'VR',
 			'sidebar/project/renderer': 'Renderer',
+			'sidebar/project/renderer/webglrenderer': 'WebGLRenderer',
+			'sidebar/project/renderer/svgrenderer': 'SVGRenderer',
+			'sidebar/project/renderer/softwarerenderer': 'SoftwareRenderer',
+			'sidebar/project/renderer/raytracingrenderer': 'RaytracingRenderer',
+			'sidebar/project/antialias': 'antialias',
+			'sidebar/project/shadows': 'shadows',
+			'sidebar/project/gammainput': 'γ input',
+			'sidebar/project/gammaoutput': 'γ output',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
 			'sidebar/settings/theme': 'Theme',
+			'sidebar/settings/theme/light': 'light',
+			'sidebar/settings/theme/dark': 'dark',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
@@ -232,6 +246,9 @@ var Strings = function ( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grid',
+
+			'sidebar/history/history': 'HISTORY',
+			'sidebar/history/persistent': 'persistent',
 
 			'toolbar/translate': 'Translate',
 			'toolbar/rotate': 'Rotate',
@@ -287,7 +304,11 @@ var Strings = function ( config ) {
 			'menubar/add/ambientlight': '环境光',
 			'menubar/add/perspectivecamera': '透视相机',
 
+			'menubar/status/autosave': '自动保存',
+
 			'menubar/play': '启动',
+			'menubar/play/stop': '暂停',
+			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
 
@@ -403,13 +424,13 @@ var Strings = function ( config ) {
 			'sidebar/material/program': '程序',
 			'sidebar/material/info': '信息',
 			'sidebar/material/vertex': '顶点',
-			'sidebar/material/fragment': '分段',
+			'sidebar/material/fragment': '片元',
 			'sidebar/material/color': '颜色',
-			'sidebar/material/roughness': '粗糙性',
-			'sidebar/material/metalness': '金属性',
-			'sidebar/material/emissive': '放射性',
+			'sidebar/material/roughness': '粗糙度',
+			'sidebar/material/metalness': '金属度',
+			'sidebar/material/emissive': '自发光',
 			'sidebar/material/specular': '高光',
-			'sidebar/material/shininess': '发光',
+			'sidebar/material/shininess': '高光大小',
 			'sidebar/material/clearcoat': '透明贴图',
 			'sidebar/material/clearcoatroughness': '透明贴图粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
@@ -421,17 +442,17 @@ var Strings = function ( config ) {
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',
 			'sidebar/material/normalmap': '法线贴图',
-			'sidebar/material/displacemap': '位移贴图',
+			'sidebar/material/displacemap': '置换贴图',
 			'sidebar/material/roughmap': '粗糙贴图',
 			'sidebar/material/metalmap': '金属贴图',
 			'sidebar/material/specularmap': '高光贴图',
 			'sidebar/material/envmap': '环境贴图',
 			'sidebar/material/lightmap': '光照贴图',
-			'sidebar/material/aomap': '烘培贴图',
-			'sidebar/material/emissivemap': '烘培贴图',
+			'sidebar/material/aomap': '环境光遮蔽贴图',
+			'sidebar/material/emissivemap': '自发光贴图',
 			'sidebar/material/side': '面',
 			'sidebar/material/side/front': '正面',
-			'sidebar/material/side/back': '反面',
+			'sidebar/material/side/back': '背面',
 			'sidebar/material/side/double': '双面',
 			'sidebar/material/flatshaded': '平面着色',
 			'sidebar/material/blending': '混合',
@@ -456,16 +477,31 @@ var Strings = function ( config ) {
 			'sidebar/project/editable': '编辑性',
 			'sidebar/project/vr': '虚拟现实',
 			'sidebar/project/renderer': '渲染器',
+			'sidebar/project/renderer/webglrenderer': 'WebGL渲染器',
+			'sidebar/project/renderer/svgrenderer': 'SVG渲染器',
+			'sidebar/project/renderer/softwarerenderer': '软件渲染器',
+			'sidebar/project/renderer/raytracingrenderer': '光线追踪渲染器',
+			'sidebar/project/antialias': '抗锯齿',
+			'sidebar/project/shadows': '阴影',
+			'sidebar/project/gammainput': 'γ输入',
+			'sidebar/project/gammaoutput': 'γ输出',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
 			'sidebar/settings/theme': '主题',
+			'sidebar/settings/theme/light': '浅色',
+			'sidebar/settings/theme/dark': '深色',
+
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
 			'sidebar/settings/shortcuts/scale': '缩放',
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
+
 			'sidebar/settings/viewport/grid': '网格',
+
+			'sidebar/history/history': '历史记录',
+			'sidebar/history/persistent': '本地存储',
 
 			'toolbar/translate': '移动',
 			'toolbar/rotate': '旋转',
