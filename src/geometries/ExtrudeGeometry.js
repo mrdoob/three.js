@@ -110,14 +110,6 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
 		var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
 		var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
-		var bevelSubtract = false;
-
-		if ( bevelSize < 0 ) {
-
-			bevelSize = - bevelSize;
-			bevelSubtract = true;
-
-		}
 
 		var extrudePath = options.extrudePath;
 
@@ -400,11 +392,11 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			t = b / bevelSegments;
 			z = bevelThickness * Math.cos( t * Math.PI / 2 );
-			bs = bevelSize * Math.sin( t * Math.PI / 2 );
+			bs = Math.abs( bevelSize ) * Math.sin( t * Math.PI / 2 );
 
-			if ( bevelSubtract ) {
+			if ( bevelSize < 0 ) {
 
-				bs -= bevelSize;
+				bs += bevelSize;
 
 			}
 
@@ -437,7 +429,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		}
 
-		bs = ( bevelSubtract ? 0 : bevelSize );
+		bs = ( bevelSize < 0 ? 0 : - bevelSize );
 
 		// Back facing vertices
 
@@ -504,11 +496,11 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			t = b / bevelSegments;
 			z = bevelThickness * Math.cos( t * Math.PI / 2 );
-			bs = bevelSize * Math.sin( t * Math.PI / 2 );
+			bs = Math.abs( bevelSize ) * Math.sin( t * Math.PI / 2 );
 
-			if ( bevelSubtract ) {
+			if ( bevelSize < 0 ) {
 
-				bs -= bevelSize;
+				bs += bevelSize;
 
 			}
 
