@@ -22,7 +22,8 @@ THREE.SVGLoader.prototype = {
 		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			var parsed = scope.parse( text );
+			onLoad( parsed[0], parsed[1] );
 
 		}, onProgress, onError );
 
@@ -98,7 +99,8 @@ THREE.SVGLoader.prototype = {
 
 				transformPath( path, currentTransform );
 
-				paths.set( node, path );
+				paths.push( path );
+				nodeMap.set( path, node );
 
 			}
 
@@ -759,7 +761,7 @@ THREE.SVGLoader.prototype = {
 			var transform = new THREE.Matrix3();
 			var currentTransform = tempTransform0;
 			var transformsTexts = node.getAttribute( 'transform' ).split( ' ' );
-			
+
 			for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex-- ) {
 
 				var transformText = transformsTexts[ tIndex ];
@@ -771,7 +773,7 @@ THREE.SVGLoader.prototype = {
 					var transformType = transformText.substr( 0, openParPos );
 
 					var array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
-					
+
 					currentTransform.identity();
 
 					switch ( transformType ) {
@@ -979,7 +981,8 @@ THREE.SVGLoader.prototype = {
 
 		console.log( 'THREE.SVGLoader' );
 
-		var paths = new Map();
+		var paths = [];
+		var nodeMap = new Map();
 
 		var transformStack = [];
 
@@ -1005,7 +1008,7 @@ THREE.SVGLoader.prototype = {
 
 		console.timeEnd( 'THREE.SVGLoader: Parse' );
 
-		return paths;
+		return [ paths, nodeMap ];
 
 	}
 
