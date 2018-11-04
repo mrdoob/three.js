@@ -1001,7 +1001,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMesh( mesh ) {
 
-			var geometry = mesh.geometry;
+			var geometry = mesh.geometry._bufferGeometry || mesh.geometry;
 
 			var mode;
 
