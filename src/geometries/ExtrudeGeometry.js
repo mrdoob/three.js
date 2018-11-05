@@ -429,7 +429,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		}
 
-		bs = ( bevelSize < 0 ? 0 : - bevelSize );
+		bs = ( bevelSize < 0 ? 0 : bevelSize );
 
 		// Back facing vertices
 
