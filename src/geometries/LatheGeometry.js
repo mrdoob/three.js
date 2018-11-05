@@ -1,16 +1,15 @@
 /**
- * @author astrodud / http://astrodud.isgreat.org/
  * @author zz85 / https://github.com/zz85
  * @author bhouston / http://clara.io
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Geometry } from '../core/Geometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
-import { _Math } from '../math/Math';
+import { Geometry } from '../core/Geometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector2 } from '../math/Vector2.js';
+import { _Math } from '../math/Math.js';
 
 // LatheGeometry
 

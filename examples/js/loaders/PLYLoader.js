@@ -44,12 +44,20 @@ THREE.PLYLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 
@@ -61,38 +69,16 @@ THREE.PLYLoader.prototype = {
 
 	parse: function ( data ) {
 
-		function bin2str( buf ) {
-
-			var array_buffer = new Uint8Array( buf );
-
-			if ( window.TextDecoder !== undefined ) {
-
-				return new TextDecoder().decode( array_buffer );
-
-			}
-
-			var str = '';
-
-			for ( var i = 0, il = buf.byteLength; i < il; i ++ ) {
-
-				str += String.fromCharCode( array_buffer[ i ] ); // implicitly assumes little-endian
-
-			}
-
-			return str;
-
-		}
-
 		function parseHeader( data ) {
 
-			var patternHeader = /ply([\s\S]*)end_header\s/;
+			var patternHeader = /ply([\s\S]*)end_header\r?\n/;
 			var headerText = '';
 			var headerLength = 0;
 			var result = patternHeader.exec( data );
 
 			if ( result !== null ) {
 
-				headerText = result [ 1 ];
+				headerText = result[ 1 ];
 				headerLength = result[ 0 ].length;
 
 			}
@@ -203,14 +189,14 @@ THREE.PLYLoader.prototype = {
 
 			switch ( type ) {
 
-			case 'char': case 'uchar': case 'short': case 'ushort': case 'int': case 'uint':
-			case 'int8': case 'uint8': case 'int16': case 'uint16': case 'int32': case 'uint32':
+				case 'char': case 'uchar': case 'short': case 'ushort': case 'int': case 'uint':
+				case 'int8': case 'uint8': case 'int16': case 'uint16': case 'int32': case 'uint32':
 
-				return parseInt( n );
+					return parseInt( n );
 
-			case 'float': case 'double': case 'float32': case 'float64':
+				case 'float': case 'double': case 'float32': case 'float64':
 
-				return parseFloat( n );
+					return parseFloat( n );
 
 			}
 
@@ -254,11 +240,12 @@ THREE.PLYLoader.prototype = {
 			// PLY ascii format specification, as per http://en.wikipedia.org/wiki/PLY_(file_format)
 
 			var buffer = {
-				indices : [],
-				vertices : [],
-				normals : [],
-				uvs : [],
-				colors : []
+				indices: [],
+				vertices: [],
+				normals: [],
+				uvs: [],
+				faceVertexUvs: [],
+				colors: []
 			};
 
 			var result;
@@ -267,7 +254,7 @@ THREE.PLYLoader.prototype = {
 			var body = '';
 			if ( ( result = patternBody.exec( data ) ) !== null ) {
 
-				body = result [ 1 ];
+				body = result[ 1 ];
 
 			}
 
@@ -338,6 +325,13 @@ THREE.PLYLoader.prototype = {
 
 			}
 
+			if ( buffer.faceVertexUvs.length > 0 ) {
+
+				geometry = geometry.toNonIndexed();
+				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
+
+			}
+
 			geometry.computeBoundingSphere();
 
 			return geometry;
@@ -371,10 +365,19 @@ THREE.PLYLoader.prototype = {
 			} else if ( elementName === 'face' ) {
 
 				var vertex_indices = element.vertex_indices || element.vertex_index; // issue #9338
+				var texcoord = element.texcoord;
 
 				if ( vertex_indices.length === 3 ) {
 
 					buffer.indices.push( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 2 ] );
+
+					if ( texcoord && texcoord.length === 6 ) {
+
+						buffer.faceVertexUvs.push( texcoord[ 0 ], texcoord[ 1 ] );
+						buffer.faceVertexUvs.push( texcoord[ 2 ], texcoord[ 3 ] );
+						buffer.faceVertexUvs.push( texcoord[ 4 ], texcoord[ 5 ] );
+
+					}
 
 				} else if ( vertex_indices.length === 4 ) {
 
@@ -447,11 +450,12 @@ THREE.PLYLoader.prototype = {
 		function parseBinary( data, header ) {
 
 			var buffer = {
-				indices : [],
-				vertices : [],
-				normals : [],
-				uvs : [],
-				colors : []
+				indices: [],
+				vertices: [],
+				normals: [],
+				uvs: [],
+				faceVertexUvs: [],
+				colors: []
 			};
 
 			var little_endian = ( header.format === 'binary_little_endian' );
@@ -483,7 +487,7 @@ THREE.PLYLoader.prototype = {
 
 		if ( data instanceof ArrayBuffer ) {
 
-			var text = bin2str( data );
+			var text = THREE.LoaderUtils.decodeText( new Uint8Array( data ) );
 			var header = parseHeader( text );
 
 			geometry = header.format === 'ascii' ? parseASCII( text, header ) : parseBinary( data, header );

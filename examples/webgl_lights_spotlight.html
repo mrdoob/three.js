@@ -42,11 +42,15 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer, scene, camera;
 
@@ -100,20 +104,21 @@
 				shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera );
 				scene.add( shadowCameraHelper );
 
-				scene.add( new THREE.AxisHelper( 10 ) );
+				scene.add( new THREE.AxesHelper( 10 ) );
 
 				var material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
 
-				var geometry = new THREE.BoxGeometry( 2000, 1, 2000 );
+				var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, - 1, 0 );
+				mesh.rotation.x = - Math.PI * 0.5;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
 				var material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
 
-				var geometry = new THREE.BoxGeometry( 3, 1, 2 );
+				var geometry = new THREE.BoxBufferGeometry( 3, 1, 2 );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 40, 2, 0 );
@@ -157,7 +162,7 @@
 					angle: spotLight.angle,
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay
-				}
+				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
 

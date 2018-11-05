@@ -3,11 +3,11 @@
  * @author Mugen87 / http://github.com/Mugen87
  */
 
-import { Box3 } from '../math/Box3';
-import { LineSegments } from '../objects/LineSegments';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
+import { Box3 } from '../math/Box3.js';
+import { LineSegments } from '../objects/LineSegments.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
 
 function BoxHelper( object, color ) {
 
@@ -75,10 +75,10 @@ BoxHelper.prototype.update = ( function () {
 		var position = this.geometry.attributes.position;
 		var array = position.array;
 
-		array[  0 ] = max.x; array[  1 ] = max.y; array[  2 ] = max.z;
-		array[  3 ] = min.x; array[  4 ] = max.y; array[  5 ] = max.z;
-		array[  6 ] = min.x; array[  7 ] = min.y; array[  8 ] = max.z;
-		array[  9 ] = max.x; array[ 10 ] = min.y; array[ 11 ] = max.z;
+		array[ 0 ] = max.x; array[ 1 ] = max.y; array[ 2 ] = max.z;
+		array[ 3 ] = min.x; array[ 4 ] = max.y; array[ 5 ] = max.z;
+		array[ 6 ] = min.x; array[ 7 ] = min.y; array[ 8 ] = max.z;
+		array[ 9 ] = max.x; array[ 10 ] = min.y; array[ 11 ] = max.z;
 		array[ 12 ] = max.x; array[ 13 ] = max.y; array[ 14 ] = min.z;
 		array[ 15 ] = min.x; array[ 16 ] = max.y; array[ 17 ] = min.z;
 		array[ 18 ] = min.x; array[ 19 ] = min.y; array[ 20 ] = min.z;
@@ -101,5 +101,20 @@ BoxHelper.prototype.setFromObject = function ( object ) {
 
 };
 
+BoxHelper.prototype.copy = function ( source ) {
+
+	LineSegments.prototype.copy.call( this, source );
+
+	this.object = source.object;
+
+	return this;
+
+};
+
+BoxHelper.prototype.clone = function () {
+
+	return new this.constructor().copy( this );
+
+};
 
 export { BoxHelper };

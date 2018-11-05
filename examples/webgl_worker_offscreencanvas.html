@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - worker - offscreen canvas</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000000;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			#message {
+				color: #ff0000;
+				font-size:14px;
+				display: none;
+			}
+
+			#message > a {
+				color: #ff0000;
+			}
+
+			a { color: #ffffff; }
+		</style>
+		<script src="js/WebGL.js"></script>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> offscreen canvas<br/><br/>
+			three.js runs in a worker and produces asynchronously frames for the canvas element in the main thread. <br/>
+			This is an <a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas" target="_blank" rel="noopener noreferrer"> experimental feature</a>!
+			<p id="message">Your browser does not support OffscreenCanvas. Check the browser support <a href="https://caniuse.com/#feat=offscreencanvas" target="_blank" rel="noopener noreferrer">here</a></p>
+		</div>
+
+		<canvas id="canvas" style="width: 100%; height: 100%"></canvas>
+	</body>
+	<script>
+
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
+
+		var canvas = document.getElementById( 'canvas' );
+
+		if ( canvas.transferControlToOffscreen !== undefined ) {
+
+			var offscreen = canvas.transferControlToOffscreen();
+			var worker = new Worker( 'js/workers/OffscreenCanvas.js' );
+
+			worker.postMessage( {
+				drawingSurface: offscreen,
+				width: window.innerWidth,
+				height: window.innerHeight,
+				pixelRatio: window.devicePixelRatio
+			}, [ offscreen ] ); // transfer
+
+		} else {
+
+			document.getElementById( 'message' ).style.display = 'block';
+
+		}
+
+	</script>
+</html>

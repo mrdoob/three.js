@@ -3,12 +3,12 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Matrix3 } from '../math/Matrix3';
-import { Vector3 } from '../math/Vector3';
-import { LineSegments } from '../objects/LineSegments';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
+import { Matrix3 } from '../math/Matrix3.js';
+import { Vector3 } from '../math/Vector3.js';
+import { LineSegments } from '../objects/LineSegments.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
 
 function VertexNormalsHelper( object, size, hex, linewidth ) {
 

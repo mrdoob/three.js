@@ -5,6 +5,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style type="text/css">
+			html, body {
+				height: 100%;
+			}
+
 			body {
 				background-color: black;
 				margin: 0;
@@ -13,20 +17,18 @@
 
 			a { color: skyblue }
 
-			canvas {
-				display: block;
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				margin: auto;
+			#container {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 
 			#info {
+				position: absolute;
 				color: white;
 				font-size: 13px;
-				position: absolute;
 				bottom: 10px;
 				width: 100%;
 				text-align: center;
@@ -38,7 +40,10 @@
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example -
-			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article in Japanese</a>)
+			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article</a>)
+		</div>
+		<div id="container">
+			<canvas id="canvas"></canvas>
 		</div>
 
 		<script id="fragment_shader" type="x-shader/x-fragment">
@@ -46,15 +51,19 @@
 			precision highp float;
 
 			uniform vec2 resolution;
-			uniform vec3 cameraPos;
-			uniform vec3 cameraDir;
+
+			uniform mat4 viewMatrix;
+			uniform vec3 cameraPosition;
+
+			uniform mat4 cameraWorldMatrix;
+			uniform mat4 cameraProjectionMatrixInverse;
 
 			const float EPS = 0.01;
 			const float OFFSET = EPS * 100.0;
 			const vec3 lightDir = vec3( -0.48666426339228763, 0.8111071056538127, -0.3244428422615251 );
 
 			// distance functions
-			vec3 onRep( vec3 p, float interval ) {
+			vec3 opRep( vec3 p, float interval ) {
 
 				vec2 q = mod( p.xz, interval ) - interval * 0.5;
 				return vec3( q.x, p.y, q.y );
@@ -63,7 +72,7 @@
 
 			float sphereDist( vec3 p, float r ) {
 
-				return length( onRep( p, 3.0 ) ) - r;
+				return length( opRep( p, 3.0 ) ) - r;
 
 			}
 
@@ -155,18 +164,18 @@
 
 			}
 
-			vec3 getRayColor( vec3 origin, vec3 ray, out vec3 p, out vec3 normal, out bool hit ) {
+			vec3 getRayColor( vec3 origin, vec3 ray, out vec3 pos, out vec3 normal, out bool hit ) {
 
 				// marching loop
 				float dist;
 				float depth = 0.0;
-				p = origin;
+				pos = origin;
 
 				for ( int i = 0; i < 64; i++ ){
 
-					dist = sceneDist( p );
+					dist = sceneDist( pos );
 					depth += dist;
-					p = origin + depth * ray;
+					pos = origin + depth * ray;
 
 					if ( abs(dist) < EPS ) break;
 
@@ -177,11 +186,11 @@
 
 				if ( abs(dist) < EPS ) {
 
-					normal = getNormal(p);
+					normal = getNormal( pos );
 					float diffuse = clamp( dot( lightDir, normal ), 0.1, 1.0 );
 					float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 );
-					float shadow = getShadow( p + normal * OFFSET, lightDir );
-					color = ( sceneColor( p ).rgb * diffuse + vec3( 0.8 ) * specular ) * max( 0.5, shadow );
+					float shadow = getShadow( pos + normal * OFFSET, lightDir );
+					color = ( sceneColor( pos ).rgb * diffuse + vec3( 0.8 ) * specular ) * max( 0.5, shadow );
 
 					hit = true;
 
@@ -197,34 +206,37 @@
 
 			void main(void) {
 
-				// fragment position
-				vec2 p = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y );
+				// screen position
+				vec2 screenPos = ( gl_FragCoord.xy * 2.0 - resolution ) / resolution;
 
-				// camera and ray
-				vec3 cPos  = cameraPos;
-				vec3 cDir  = cameraDir;
-				vec3 cSide = normalize( cross( cDir, vec3( 0.0, 1.0 ,0.0 ) ) );
-				vec3 cUp   = normalize( cross( cSide, cDir ) );
-				float targetDepth = 1.3;
-				vec3 ray = normalize( cSide * p.x + cUp * p.y + cDir * targetDepth );
+				// ray direction in normalized device coordinate
+				vec4 ndcRay = vec4( screenPos.xy, 1.0, 1.0 );
 
+				// convert ray direction from normalized device coordinate to world coordinate
+				vec3 ray = ( cameraWorldMatrix * cameraProjectionMatrixInverse * ndcRay ).xyz;
+				ray = normalize( ray );
+
+				// camera position
+				vec3 cPos = cameraPosition;
+
+				// cast ray
 				vec3 color = vec3( 0.0 );
-				vec3 q, normal;
+				vec3 pos, normal;
 				bool hit;
 				float alpha = 1.0;
 
 				for ( int i = 0; i < 3; i++ ) {
 
-					color += alpha * getRayColor( cPos, ray, q, normal, hit );
+					color += alpha * getRayColor( cPos, ray, pos, normal, hit );
 					alpha *= 0.3;
 					ray = normalize( reflect( ray, normal ) );
-					cPos = q + normal * OFFSET;
+					cPos = pos + normal * OFFSET;
 
 					if ( !hit ) break;
 
 				}
 
-				gl_FragColor = vec4(color, 1.0);
+				gl_FragColor = vec4( color, 1.0 );
 
 			}
 
@@ -243,29 +255,26 @@
 		</script>
 
 		<script src="../build/three.js"></script>
-		<script src="js/controls/FlyControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			var camera, dummyCamera, scene, controls, renderer;
+			var dolly, camera, scene, renderer;
 			var geometry, material, mesh;
-			var mouse = new THREE.Vector2( 0.5, 0.5 );
-			var canvas;
 			var stats;
 
-			var clock = new THREE.Clock();
+			var canvas = document.querySelector( '#canvas' );
 
 			var config = {
-				saveImage: function() {
+				saveImage: function () {
 
-					renderer.render( scene, dummyCamera );
+					renderer.render( scene, camera );
 					window.open( canvas.toDataURL() );
 
 				},
-				freeCamera: false,
 				resolution: '512'
 			};
 
@@ -274,106 +283,79 @@
 
 			function init() {
 
+				renderer = new THREE.WebGLRenderer( { canvas: canvas } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( config.resolution, config.resolution );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// Scene
 				scene = new THREE.Scene();
-				camera = new THREE.Camera();
-				dummyCamera = new THREE.Camera();
-				camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ) );
+
+				dolly = new THREE.Group();
+				scene.add( dolly );
+
+				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
+				camera.position.z = 4;
+				dolly.add( camera );
 
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
 					uniforms: {
-						resolution: { value: new THREE.Vector2( 512, 512 ) },
-						cameraPos:  { value: camera.getWorldPosition() },
-						cameraDir:  { value: camera.getWorldDirection() }
+						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
+						cameraWorldMatrix: { value: camera.matrixWorld },
+						cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse( camera.projectionMatrix ) }
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
 				} );
 				mesh = new THREE.Mesh( geometry, material );
+				mesh.frustumCulled = false;
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( 512, 512 );
+				// Controls
+				var controls = new THREE.OrbitControls( camera, canvas );
 
-				canvas = renderer.domElement;
-				canvas.addEventListener( 'mousemove', onMouseMove );
-				window.addEventListener( 'resize', onWindowResize );
-				document.body.appendChild( canvas );
-
-				controls = new THREE.FlyControls( camera, canvas );
-
-				controls.autoForward = true;
-				controls.dragToLook = false;
-				controls.rollSpeed = Math.PI / 12;
-				controls.movementSpeed = 0.5;
-
+				// GUI
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
-				gui.add( config, 'freeCamera' ).name( 'Free Camera' );
-				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( function( value ) {
-
-					if ( value !== 'full' ) {
-
-						canvas.width = value;
-						canvas.height = value;
-
-					}
-					onWindowResize();
-
-				} );
+				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
 			}
 
-			function render( timestamp ) {
-
-				var delta = clock.getDelta();
-
-				stats.begin();
-
-				if ( config.freeCamera ) {
-
-					controls.update( delta );
-
-				} else {
-
-					camera.position.set( mouse.x - 0.5, mouse.y * 4, timestamp * 0.001 );
-					camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ).add( camera.position ) );
-
-				}
-
-				if ( camera.position.y < 0 ) camera.position.y = 0;
-
-				material.uniforms.resolution.value = new THREE.Vector2( canvas.width, canvas.height );
-				material.uniforms.cameraPos.value = camera.getWorldPosition();
-				material.uniforms.cameraDir.value = camera.getWorldDirection();
-				renderer.render( scene, dummyCamera );
-
-				stats.end();
-				requestAnimationFrame( render );
-
-			}
-
-			function onMouseMove( e ) {
-
-				mouse.x = e.offsetX / canvas.width;
-				mouse.y = e.offsetY / canvas.height;
-
-			}
-
-			function onWindowResize( e ) {
+			function onWindowResize() {
 
 				if ( config.resolution === 'full' ) {
 
-					canvas.width = window.innerWidth;
-					canvas.height = window.innerHeight;
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				} else {
+
+					renderer.setSize( config.resolution, config.resolution );
 
 				}
 
-				renderer.setSize( canvas.width, canvas.height );
+				camera.aspect = canvas.width / canvas.height;
+				camera.updateProjectionMatrix();
+
+				material.uniforms.resolution.value.set( canvas.width, canvas.height );
+				material.uniforms.cameraProjectionMatrixInverse.value.getInverse( camera.projectionMatrix );
+
+			}
+
+			function render( time ) {
+
+				stats.begin();
+
+				dolly.position.z = - time / 1000;
+
+				renderer.render( scene, camera );
+
+				stats.end();
+				requestAnimationFrame( render );
 
 			}
 

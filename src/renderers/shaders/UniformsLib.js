@@ -1,7 +1,6 @@
-import { Vector4 } from '../../math/Vector4';
-import { Color } from '../../math/Color';
-import { Vector2 } from '../../math/Vector2';
-import { DataTexture } from '../../textures/DataTexture';
+import { Color } from '../../math/Color.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { Matrix3 } from '../../math/Matrix3.js';
 
 /**
  * Uniforms library for shared webgl shaders
@@ -15,7 +14,7 @@ var UniformsLib = {
 		opacity: { value: 1.0 },
 
 		map: { value: null },
-		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) },
+		uvTransform: { value: new Matrix3() },
 
 		alphaMap: { value: null },
 
@@ -32,7 +31,8 @@ var UniformsLib = {
 		envMap: { value: null },
 		flipEnvMap: { value: - 1 },
 		reflectivity: { value: 1.0 },
-		refractionRatio: { value: 0.98 }
+		refractionRatio: { value: 0.98 },
+		maxMipLevel: { value: 0 }
 
 	},
 
@@ -180,7 +180,18 @@ var UniformsLib = {
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
 		map: { value: null },
-		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) }
+		uvTransform: { value: new Matrix3() }
+
+	},
+
+	sprite: {
+
+		diffuse: { value: new Color( 0xeeeeee ) },
+		opacity: { value: 1.0 },
+		center: { value: new Vector2( 0.5, 0.5 ) },
+		rotation: { value: 0.0 },
+		map: { value: null },
+		uvTransform: { value: new Matrix3() }
 
 	}
 

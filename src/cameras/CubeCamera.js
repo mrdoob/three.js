@@ -1,8 +1,8 @@
-import { Object3D } from '../core/Object3D';
-import { WebGLRenderTargetCube } from '../renderers/WebGLRenderTargetCube';
-import { LinearFilter, RGBFormat } from '../constants';
-import { Vector3 } from '../math/Vector3';
-import { PerspectiveCamera } from './PerspectiveCamera';
+import { Object3D } from '../core/Object3D.js';
+import { WebGLRenderTargetCube } from '../renderers/WebGLRenderTargetCube.js';
+import { LinearFilter, RGBFormat } from '../constants.js';
+import { Vector3 } from '../math/Vector3.js';
+import { PerspectiveCamera } from './PerspectiveCamera.js';
 
 /**
  * Camera for rendering cube maps
@@ -11,7 +11,7 @@ import { PerspectiveCamera } from './PerspectiveCamera';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function CubeCamera( near, far, cubeResolution ) {
+function CubeCamera( near, far, cubeResolution, options ) {
 
 	Object3D.call( this );
 
@@ -49,7 +49,7 @@ function CubeCamera( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
-	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
+	options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";
@@ -102,7 +102,7 @@ function CubeCamera( near, far, cubeResolution ) {
 
 		renderer.setRenderTarget( null );
 
-	}
+	};
 
 }
 

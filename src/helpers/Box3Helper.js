@@ -2,11 +2,12 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { LineSegments } from '../objects/LineSegments';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferAttribute } from '../core/BufferAttribute';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
+import { LineSegments } from '../objects/LineSegments.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Object3D } from '../core/Object3D.js';
 
 function Box3Helper( box, hex ) {
 
@@ -30,14 +31,12 @@ function Box3Helper( box, hex ) {
 
 	this.geometry.computeBoundingSphere();
 
-	this.onBeforeRender();
-
 }
 
 Box3Helper.prototype = Object.create( LineSegments.prototype );
 Box3Helper.prototype.constructor = Box3Helper;
 
-Box3Helper.prototype.onBeforeRender = function () {
+Box3Helper.prototype.updateMatrixWorld = function ( force ) {
 
 	var box = this.box;
 
@@ -48,6 +47,8 @@ Box3Helper.prototype.onBeforeRender = function () {
 	box.getSize( this.scale );
 
 	this.scale.multiplyScalar( 0.5 );
+
+	Object3D.prototype.updateMatrixWorld.call( this, force );
 
 };
 

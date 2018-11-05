@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - cube reflection [cars]</title>
+		<title>three.js webgl - materials - environment maps</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -43,7 +43,6 @@
 			var textureEquirec, textureCube, textureSphere;
 			var cubeMesh, sphereMesh;
 			var sphereMaterial;
-			var refract;
 
 			init();
 			animate();
@@ -135,28 +134,33 @@
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setFaceCulling( THREE.CullFaceNone );
 				document.body.appendChild( renderer.domElement );
 
 				//
 
 				var params = {
 					Cube: function () {
+
 						cubeMesh.material = cubeMaterial;
 						cubeMesh.visible = true;
 						sphereMaterial.envMap = textureCube;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Equirectangular: function () {
+
 						cubeMesh.material = equirectMaterial;
 						cubeMesh.visible = true;
 						sphereMaterial.envMap = textureEquirec;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Spherical: function () {
-							cubeMesh.visible = false;
+
+						cubeMesh.visible = false;
 						sphereMaterial.envMap = textureSphere;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Refraction: false
 				};
@@ -165,7 +169,7 @@
 				gui.add( params, 'Cube' );
 				gui.add( params, 'Equirectangular' );
 				gui.add( params, 'Spherical' );
-				gui.add( params, 'Refraction' ).onChange( function( value ) {
+				gui.add( params, 'Refraction' ).onChange( function ( value ) {
 
 					if ( value ) {
 
@@ -211,8 +215,6 @@
 			}
 
 			function render() {
-
-				var timer = -0.0002 * Date.now();
 
 				camera.lookAt( scene.position );
 				cameraCube.rotation.copy( camera.rotation );

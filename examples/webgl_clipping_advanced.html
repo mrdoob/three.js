@@ -23,6 +23,7 @@
 		<script>
 
 			function planesFromMesh( vertices, indices ) {
+
 				// creates a clipping volume from a convex triangular mesh
 				// specified by the arrays 'vertices' and 'indices'
 
@@ -31,12 +32,12 @@
 
 				for ( var i = 0, j = 0; i < n; ++ i, j += 3 ) {
 
-					var a = vertices[ indices[   j   ] ],
+					var a = vertices[ indices[ j ] ],
 						b = vertices[ indices[ j + 1 ] ],
 						c = vertices[ indices[ j + 2 ] ];
 
 					result[ i ] = new THREE.Plane().
-							setFromCoplanarPoints( a, b, c );
+						setFromCoplanarPoints( a, b, c );
 
 				}
 
@@ -45,6 +46,7 @@
 			}
 
 			function createPlanes( n ) {
+
 				// creates an array of n uninitialized plane objects
 
 				var result = new Array( n );
@@ -57,6 +59,7 @@
 			}
 
 			function assignTransformedPlanes( planesOut, planesIn, matrix ) {
+
 				// sets an array of existing planes to transformed 'planesIn'
 
 				for ( var i = 0, n = planesIn.length; i !== n; ++ i )
@@ -74,7 +77,7 @@
 						angle = i * Math.PI * 2 / n;
 
 					plane.normal.set(
-							Math.cos( angle ), 0, Math.sin( angle ) );
+						Math.cos( angle ), 0, Math.sin( angle ) );
 
 					plane.constant = innerRadius;
 
@@ -84,7 +87,8 @@
 
 			}
 
-			var planeToMatrix = ( function() {
+			var planeToMatrix = ( function () {
+
 				// creates a matrix that aligns X/Y to a given plane
 
 				// temporaries:
@@ -102,11 +106,11 @@
 
 					if ( Math.abs( zAxis.x ) > Math.abs( zAxis.z ) ) {
 
-						yAxis.set( -zAxis.y, zAxis.x, 0 );
+						yAxis.set( - zAxis.y, zAxis.x, 0 );
 
 					} else {
 
-						yAxis.set( 0, -zAxis.z, zAxis.y );
+						yAxis.set( 0, - zAxis.z, zAxis.y );
 
 					}
 
@@ -117,7 +121,7 @@
 						xAxis.x, yAxis.x, zAxis.x, trans.x,
 						xAxis.y, yAxis.y, zAxis.y, trans.y,
 						xAxis.z, yAxis.z, zAxis.z, trans.z,
-							0,		0,		0,			1 );
+						0,	 0, 0, 1 );
 
 				};
 
@@ -127,10 +131,10 @@
 			// A regular tetrahedron for the clipping volume:
 
 			var Vertices = [
-					new THREE.Vector3( + 1,   0, + Math.SQRT1_2 ),
-					new THREE.Vector3( - 1,   0, + Math.SQRT1_2 ),
-					new THREE.Vector3(   0, + 1, - Math.SQRT1_2 ),
-					new THREE.Vector3(   0, - 1, - Math.SQRT1_2 )
+					new THREE.Vector3( + 1, 0, + Math.SQRT1_2 ),
+					new THREE.Vector3( - 1, 0, + Math.SQRT1_2 ),
+					new THREE.Vector3( 0, + 1, - Math.SQRT1_2 ),
+					new THREE.Vector3( 0, - 1, - Math.SQRT1_2 )
 				],
 
 				Indices = [
@@ -154,7 +158,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera(
-						36, window.innerWidth / window.innerHeight, 0.25, 16 );
+					36, window.innerWidth / window.innerHeight, 0.25, 16 );
 
 				camera.position.set( 0, 1.5, 3 );
 
@@ -205,16 +209,16 @@
 
 				var geometry = new THREE.BoxBufferGeometry( 0.18, 0.18, 0.18 );
 
-				for ( var z = -2; z <= 2; ++ z )
-				for ( var y = -2; y <= 2; ++ y )
-				for ( var x = -2; x <= 2; ++ x ) {
+				for ( var z = - 2; z <= 2; ++ z )
+					for ( var y = - 2; y <= 2; ++ y )
+						for ( var x = - 2; x <= 2; ++ x ) {
 
-					var mesh = new THREE.Mesh( geometry, clipMaterial );
-					mesh.position.set( x / 5, y / 5, z / 5 );
-					mesh.castShadow = true;
-					object.add( mesh );
+							var mesh = new THREE.Mesh( geometry, clipMaterial );
+							mesh.position.set( x / 5, y / 5, z / 5 );
+							mesh.castShadow = true;
+							object.add( mesh );
 
-				}
+						}
 
 				scene.add( object );
 
@@ -230,7 +234,7 @@
 				for ( var i = 0, n = Planes.length; i !== n; ++ i ) {
 
 					var material = new THREE.MeshBasicMaterial( {
-						color:  color.setHSL( i / n, 0.5, 0.5 ).getHex(),
+						color: color.setHSL( i / n, 0.5, 0.5 ).getHex(),
 						side: THREE.DoubleSide,
 
 						opacity: 0.2,
@@ -239,7 +243,11 @@
 						// clip to the others to show the volume (wildly
 						// intersecting transparent planes look bad)
 						clippingPlanes: clipMaterial.clippingPlanes.
-								filter( function( _, j ) { return j !== i; } )
+							filter( function ( _, j ) {
+
+								return j !== i;
+
+							} )
 
 						// no need to enable shadow clipping - the plane
 						// visualization does not cast shadows
@@ -247,7 +255,7 @@
 					} );
 
 					volumeVisualization.add(
-							new THREE.Mesh( planeGeometry, material ) );
+						new THREE.Mesh( planeGeometry, material ) );
 
 				}
 
@@ -255,8 +263,8 @@
 
 
 				var ground = new THREE.Mesh( planeGeometry,
-						new THREE.MeshPhongMaterial( {
-							color: 0xa0adaf, shininess: 150 } ) );
+					new THREE.MeshPhongMaterial( {
+						color: 0xa0adaf, shininess: 150 } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.multiplyScalar( 3 );
 				ground.receiveShadow = true;
@@ -268,7 +276,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.renderSingleSided = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -294,18 +301,40 @@
 				var gui = new dat.GUI(),
 					folder = gui.addFolder( "Local Clipping" ),
 					props = {
-						get 'Enabled'() { return renderer.localClippingEnabled; },
+						get 'Enabled'() {
+
+							return renderer.localClippingEnabled;
+
+						},
 						set 'Enabled'( v ) {
-								renderer.localClippingEnabled = v;
-								if ( ! v ) volumeVisualization.visible = false; },
 
-						get 'Shadows'() { return clipMaterial.clipShadows; },
-						set 'Shadows'( v ) { clipMaterial.clipShadows = v; },
+							renderer.localClippingEnabled = v;
+							if ( ! v ) volumeVisualization.visible = false;
 
-						get 'Visualize'() { return volumeVisualization.visible; },
+						},
+
+						get 'Shadows'() {
+
+							return clipMaterial.clipShadows;
+
+						},
+						set 'Shadows'( v ) {
+
+							clipMaterial.clipShadows = v;
+
+						},
+
+						get 'Visualize'() {
+
+							return volumeVisualization.visible;
+
+						},
 						set 'Visualize'( v ) {
-								if ( renderer.localClippingEnabled )
-									volumeVisualization.visible = v; }
+
+							if ( renderer.localClippingEnabled )
+								volumeVisualization.visible = v;
+
+						}
 					};
 
 				folder.add( props, 'Enabled' );
@@ -313,11 +342,19 @@
 				folder.add( props, 'Visualize' ).listen();
 
 				gui.addFolder( "Global Clipping" ).
-						add( {
-							get 'Enabled'() { return renderer.clippingPlanes !== Empty; },
-							set 'Enabled'( v  ) { renderer.clippingPlanes = v ?
-									globalClippingPlanes : Empty; }
-						}, "Enabled" );
+					add( {
+						get 'Enabled'() {
+
+							return renderer.clippingPlanes !== Empty;
+
+						},
+						set 'Enabled'( v ) {
+
+							renderer.clippingPlanes = v ?
+								globalClippingPlanes : Empty;
+
+						}
+					}, "Enabled" );
 
 
 				// Start
@@ -336,6 +373,7 @@
 			}
 
 			function setObjectWorldMatrix( object, matrix ) {
+
 				// set the orientation of an object based on a world matrix
 
 				var parent = object.parent;
@@ -364,10 +402,10 @@
 
 				var bouncy = Math.cos( time * .5 ) * 0.5 + 0.7;
 				transform.multiply(
-						tmpMatrix.makeScale( bouncy, bouncy, bouncy ) );
+					tmpMatrix.makeScale( bouncy, bouncy, bouncy ) );
 
 				assignTransformedPlanes(
-						clipMaterial.clippingPlanes, Planes, transform );
+					clipMaterial.clippingPlanes, Planes, transform );
 
 				var planeMeshes = volumeVisualization.children;
 
@@ -381,7 +419,7 @@
 				transform.makeRotationY( time * 0.1 );
 
 				assignTransformedPlanes(
-						globalClippingPlanes, GlobalClippingPlanes, transform );
+					globalClippingPlanes, GlobalClippingPlanes, transform );
 
 				stats.begin();
 				renderer.render( scene, camera );

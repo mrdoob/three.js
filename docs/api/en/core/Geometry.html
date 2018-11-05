@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		<p>
+		Geometry is a user-friendly alternative to [page:BufferGeometry]. Geometries store attributes
+		(vertex positions, faces, colors, etc.) using objects like [page:Vector3] or [page:Color] that
+		are easier to read and edit, but less efficient than typed arrays.
+		</p>
+		<p>
+		Prefer [page:BufferGeometry] for large or serious projects.
+		</p>
+		</div>
+
+
+		<h2>Example</h2>
+
+		<div>[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]</div>
+		<div>[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]</div>
+		<div>[example:webgl_geometry_nurbs WebGL / geometry / nurbs ]</div>
+		<div>[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor ]</div>
+		<div>[example:webgl_interactive_cubes_gpu WebGL / interactive / cubes / gpu ]</div>
+		<div>[example:webgl_interactive_lines WebGL / interactive / lines ]</div>
+		<div>[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points ]</div>
+		<div>[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter ]</div>
+		<div>[example:webgl_morphnormals WebGL / morphNormals ]</div>
+
+
+		<code>var geometry = new THREE.Geometry();
+
+		geometry.vertices.push(
+			new THREE.Vector3( -10,  10, 0 ),
+			new THREE.Vector3( -10, -10, 0 ),
+			new THREE.Vector3(  10, -10, 0 )
+		);
+
+		geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+		geometry.computeBoundingSphere();
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+		The constructor takes no arguments.
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			Bounding box for the Geometry, which can be calculated with
+			[page:.computeBoundingBox](). Default is *null*.
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			Bounding sphere for the Geometry, which can be calculated with
+			[page:.computeBoundingSphere](). Default is *null*.
+		</p>
+
+		<h3>[property:Array colors]</h3>
+		<p>
+		Array of vertex [page:Color colors], matching number and order of vertices.<br /><br />
+
+		This is used by [page:Points] and [page:Line] and any classes derived from those such as [page:LineSegments] and various helpers.
+		[page:Mesh Meshes] use [page:Face3.vertexColors] instead of this.<br /><br />
+
+		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
+		</p>
+
+		<h3>[property:Array faces]</h3>
+		<p>
+		Array of [page:Face3 faces].<br />
+		The array of faces describe how each vertex in the model is connected to form faces.
+		Additionally it holds information about face and vertex normals and colors.<br /><br />
+		To signal an update in this array, [page:Geometry Geometry.elementsNeedUpdate] needs to be set to true.
+		</p>
+
+		<h3>[property:Array faceVertexUvs]</h3>
+		<p>
+		Array of face [link:https://en.wikipedia.org/wiki/UV_mapping UV] layers, used for mapping textures onto the geometry.<br />
+		Each UV layer is an array of [page:UV]s matching the order and number of vertices in faces.<br /><br />
+		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
+		</p>
+
+		<h3>[property:Integer id]</h3>
+		<p>Unique number for this geometry instance.</p>
+
+		<h3>[property:Boolean isGeometry]</h3>
+		<p>
+			Used to check whether this or derived classes are Geometries. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+		<h3>[property:array lineDistances]</h3>
+		<p>
+		An array containing distances between vertices for Line geometries.
+		This is required for [page:LineDashedMaterial] to render correctly.
+		</p>
+
+		<h3>[property:Array morphTargets]</h3>
+		<p>
+		Array of [link:https://en.wikipedia.org/wiki/Morph_target_animation morph targets]. Each morph target is a Javascript object:
+		<code>{ name: "targetName", vertices: [ new THREE.Vector3(), ... ] }</code>
+		Morph vertices match number and order of primary vertices.
+		</p>
+
+		<h3>[property:Array morphNormals]</h3>
+		<p>
+		Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:
+		<code>morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }</code>
+
+		See the [example:webgl_morphnormals WebGL / morphNormals] example.
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>Optional name for this geometry. Default is an empty string.</p>
+
+		<h3>[property:Array skinWeights]</h3>
+		<p>
+		When working with a [page:SkinnedMesh], each vertex can have up to 4 [page:Bone bones] affecting it.
+		The skinWeights property is an array of weight values that correspond to the order of the vertices in
+		the geometry. So for instance, the first skinWeight would correspond to the first vertex in the geometry.
+		Since each vertex can be modified by 4 bones, a [page:Vector4] is used to represent the skin weights
+		for that vertex.
+		</p>
+		<p>
+		The values of the vector should typically be between 0 and 1. For instance when set to 0 the bone
+		transformation will have no affect. When set to 0.5 it will have 50% affect. When set to 100%, it will
+		have 100% affect. If there is only 1 bone associated with the vertex then you only need to worry about
+		the first component of the vector, the rest can be ignored and set to 0.
+		</p>
+
+		<h3>[property:Array skinIndices]</h3>
+		<p>
+		Just like the skinWeights property, the skinIndices' values correspond to the geometry's vertices.
+		Each vertex can have up to 4 bones associated with it. So if you look at the first vertex, and the
+		first skinIndex, this will tell you the bones associated with that vertex. For example the first vertex
+		could have a value of <strong>( 10.05, 30.10, 12.12 )</strong>. Then the first skin index could have the
+		value of <strong>( 10, 2, 0, 0 )</strong>. The first skin weight could have the value of
+		<strong>( 0.8, 0.2, 0, 0 )</strong>. In affect this would take the first vertex, and then the bone
+		<strong>mesh.bones[10]</strong> and apply it 80% of the way. Then it would take the bone <strong>skeleton.bones[2]</strong>
+		and apply it 20% of the way. The next two values have a weight of 0, so they would have no affect.
+		</p>
+		<p>
+		In code another example could look like this:
+		<code>
+		// e.g.
+		geometry.skinIndices[15] = new THREE.Vector4(   0,   5,   9, 10 );
+		geometry.skinWeights[15] = new THREE.Vector4( 0.2, 0.5, 0.3,  0 );
+
+		// corresponds with the following vertex
+		geometry.vertices[15];
+
+		// these bones will be used like so:
+		skeleton.bones[0]; // weight of 0.2
+		skeleton.bones[5]; // weight of 0.5
+		skeleton.bones[9]; // weight of 0.3
+		skeleton.bones[10]; // weight of 0
+		</code>
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
+		This gets automatically assigned and shouldn't be edited.
+		</p>
+
+		<h3>[property:Array vertices]</h3>
+		<p>
+		Array of [page:Vector3 vertices].<br />
+		The array of vertices holds the position of every vertex in the model.<br />
+		To signal an update in this array, [page:.verticesNeedUpdate] needs to be set to true.
+		</p>
+
+		<h3>[property:Boolean verticesNeedUpdate]</h3>
+		<p>Set to *true* if the vertices array has been updated.</p>
+
+		<h3>[property:Boolean elementsNeedUpdate]</h3>
+		<p>Set to *true* if the faces array has been updated.</p>
+
+		<h3>[property:Boolean uvsNeedUpdate]</h3>
+		<p>Set to *true* if the uvs array has been updated.	</p>
+
+		<h3>[property:Boolean normalsNeedUpdate]</h3>
+		<p>Set to *true* if the normals array has been updated.</p>
+
+		<h3>[property:Boolean colorsNeedUpdate]</h3>
+		<p>Set to *true* if the colors array or a face3 color has been updated.</p>
+
+		<h3>[property:Boolean groupsNeedUpdate]</h3>
+		<p>Set to *true* if a face3 materialIndex has been updated.</p>
+
+		<h3>[property:Boolean lineDistancesNeedUpdate]</h3>
+		<p>Set to *true* if the linedistances array has been updated.</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+
+		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<p>Bakes matrix transform directly into vertex coordinates.</p>
+
+		<h3>[method:Geometry center] ()</h3>
+		<p>Center the geometry based on the bounding box.</p>
+
+		<h3>[method:Geometry clone]()</h3>
+		<p>
+		Creates a new clone of the Geometry.<br /><br />
+
+		This method copies only vertices, faces and uvs. It does not copy any other properties of the geometry.
+		</p>
+
+		<h3>[method:null computeBoundingBox]()</h3>
+		<p>Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.</p>
+
+		<h3>[method:null computeBoundingSphere]()</h3>
+		<p>Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.</p>
+
+		<p>
+			Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed,
+			otherwise they are *null*.
+		</p>
+
+		<h3>[method:null computeFaceNormals]()</h3>
+		<p>Computes [page:Face3.normal face normals].</p>
+
+		<h3>[method:null computeFlatVertexNormals]()</h3>
+		<p>Computes flat [page:Face3.vertexNormals vertex normals]. Sets the vertex normal of each vertex of each face to be the same as the face's normal.</p>
+
+		<h3>[method:null computeMorphNormals]()</h3>
+		<p>Computes [page:.morphNormals].</p>
+
+		<h3>[method:null computeVertexNormals]( [param:Boolean areaWeighted] )</h3>
+		<p>
+		areaWeighted - If true the contribution of each face normal to the vertex normal is
+		weighted by the area of the face. Default is true.<br /><br />
+
+		Computes vertex normals by averaging face normals.
+		</p>
+
+		<h3>[method:Geometry copy]( [param:Geometry geometry] )</h3>
+		<p>
+			Copies vertices, faces and uvs into this geometry. It does not copy any other properties of the geometry.
+		</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+		Removes The object from memory. <br />
+		Don't forget to call this method when you remove a geometry because it can cause memory leaks.
+		</p>
+
+		<h3>[method:Geometry fromBufferGeometry]( [param:BufferGeometry geometry] )</h3>
+		<p>Convert a [page:BufferGeometry] to a Geometry. <br />
+		When converting from BufferGeometry to Geometry, all vertices are preserved, so duplicated vertices may appear.
+		Use [page:Geometry.mergeVertices] to remove them.</p>
+
+		<h3>[method:Geometry lookAt] ( [param:Vector3 vector] )</h3>
+		<p>
+		vector - A world vector to look at.<br /><br />
+
+		Rotates the geometry to face point in space. This is typically done as a one time operation but not during the render loop.<br>
+		Use [page:Object3D.lookAt] for typical real-time mesh usage.
+		</p>
+
+		<h3>[method:null merge]( [param:Geometry geometry], [param:Matrix4 matrix], [param:Integer materialIndexOffset] )</h3>
+		<p>Merge two geometries or geometry and geometry from object (using object's transform)</p>
+
+		<h3>[method:null mergeMesh]( [param:Mesh mesh] )</h3>
+		<p>Merge the mesh's geometry with this, also applying the mesh's transform.</p>
+
+
+		<h3>[method:null mergeVertices]()</h3>
+		<p>
+		Checks for duplicate vertices using hashmap.<br />
+		Duplicated vertices are removed and faces' vertices are updated.
+		</p>
+
+		<h3>[method:null normalize]()</h3>
+		<p>
+		Normalize the geometry. <br />
+		Make the geometry centered and have a bounding sphere of radius *1.0*.
+		</p>
+
+		<h3>[method:Geometry rotateX] ( [param:Float radians] )</h3>
+		<p>
+		Rotate the geometry about the X axis. This is typically done as a one time operation but not during the render loop.<br>
+		Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</p>
+
+		<h3>[method:Geometry rotateY] ( [param:Float radians] )</h3>
+		<p>
+		Rotate the geometry about the Y axis. This is typically done as a one time operation but not during the render loop.<br>
+    	        Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</p>
+
+		<h3>[method:Geometry rotateZ] ( [param:Float radians] )</h3>
+		<p>
+		Rotate the geometry about the Z axis. This is typically done as a one time operation but not during the render loop.<br>
+	        Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</p>
+
+		<h3>[method:Geometry setFromPoints] ( [param:Array points] )</h3>
+		<p>Sets the vertices for this Geometry from an array of points.</p>
+
+		<h3>[method:null sortFacesByMaterialIndex] (  )</h3>
+		<p>
+		Sorts the faces array according to material index. For complex geometries with several materials,
+		this can result in reduced draw calls and improved performance.
+		</p>
+
+		<h3>[method:Geometry scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+		Scale the geometry data. This is typically done as a one time operation but not during the render loop.<br>
+		Use [page:Object3D.scale] for typical real-time mesh scaling.
+		</p>
+
+		<h3>[method:JSON toJSON] ( )</h3>
+		<p>Convert the geometry to JSON format.</p>
+
+		<h3>[method:Geometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+		Translate the geometry. This is typically done as a one time operation but not during the render loop.<br>
+    	        Use [page:Object3D.position] for typical real-time mesh translation.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

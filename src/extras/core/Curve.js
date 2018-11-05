@@ -1,14 +1,14 @@
-import { _Math } from '../../math/Math';
-import { Vector3 } from '../../math/Vector3';
-import { Matrix4 } from '../../math/Matrix4';
+import { _Math } from '../../math/Math.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { Matrix4 } from '../../math/Matrix4.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Extensible curve object
  *
  * Some common of curve methods:
- * .getPoint(t), getTangent(t)
- * .getPointAt(u), getTangentAt(u)
+ * .getPoint( t, optionalTarget ), .getTangent( t )
+ * .getPointAt( u, optionalTarget ), .getTangentAt( u )
  * .getPoints(), .getSpacedPoints()
  * .getLength()
  * .updateArcLengths()
@@ -39,6 +39,8 @@ import { Matrix4 } from '../../math/Matrix4';
 
 function Curve() {
 
+	this.type = 'Curve';
+
 	this.arcLengthDivisions = 200;
 
 }
@@ -48,7 +50,7 @@ Object.assign( Curve.prototype, {
 	// Virtual base class method to overwrite and implement in subclasses
 	//	- t [0 .. 1]
 
-	getPoint: function () {
+	getPoint: function ( /* t, optionalTarget */ ) {
 
 		console.warn( 'THREE.Curve: .getPoint() not implemented.' );
 		return null;
@@ -58,10 +60,10 @@ Object.assign( Curve.prototype, {
 	// Get point at relative position in curve according to arc length
 	// - u [0 .. 1]
 
-	getPointAt: function ( u ) {
+	getPointAt: function ( u, optionalTarget ) {
 
 		var t = this.getUtoTmapping( u );
-		return this.getPoint( t );
+		return this.getPoint( t, optionalTarget );
 
 	},
 
@@ -375,6 +377,45 @@ Object.assign( Curve.prototype, {
 			normals: normals,
 			binormals: binormals
 		};
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	copy: function ( source ) {
+
+		this.arcLengthDivisions = source.arcLengthDivisions;
+
+		return this;
+
+	},
+
+	toJSON: function () {
+
+		var data = {
+			metadata: {
+				version: 4.5,
+				type: 'Curve',
+				generator: 'Curve.toJSON'
+			}
+		};
+
+		data.arcLengthDivisions = this.arcLengthDivisions;
+		data.type = this.type;
+
+		return data;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		this.arcLengthDivisions = json.arcLengthDivisions;
+
+		return this;
 
 	}
 

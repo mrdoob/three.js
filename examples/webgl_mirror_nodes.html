@@ -36,67 +36,14 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/Mirror.js"></script>
-		<script src="js/MirrorRTT.js"></script>
+		<script src="js/objects/Reflector.js"></script>
+		<script src="js/objects/ReflectorRTT.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<!-- NodeLibrary -->
-		<script src="js/nodes/GLNode.js"></script>
-		<script src="js/nodes/RawNode.js"></script>
-		<script src="js/nodes/TempNode.js"></script>
-		<script src="js/nodes/InputNode.js"></script>
-		<script src="js/nodes/ConstNode.js"></script>
-		<script src="js/nodes/FunctionNode.js"></script>
-		<script src="js/nodes/FunctionCallNode.js"></script>
-		<script src="js/nodes/NodeBuilder.js"></script>
-		<script src="js/nodes/NodeLib.js"></script>
-		<script src="js/nodes/NodeMaterial.js"></script>
+		<script type="module">
 
-		<!-- Accessors -->
-		<script src="js/nodes/accessors/PositionNode.js"></script>
-		<script src="js/nodes/accessors/NormalNode.js"></script>
-		<script src="js/nodes/accessors/UVNode.js"></script>
-		<script src="js/nodes/accessors/ScreenUVNode.js"></script>
-		<script src="js/nodes/accessors/ColorsNode.js"></script>
-		<script src="js/nodes/accessors/CameraNode.js"></script>
-		<script src="js/nodes/accessors/ReflectNode.js"></script>
-		<script src="js/nodes/accessors/LightNode.js"></script>
-
-		<!-- Inputs -->
-		<script src="js/nodes/inputs/IntNode.js"></script>
-		<script src="js/nodes/inputs/FloatNode.js"></script>
-		<script src="js/nodes/inputs/ColorNode.js"></script>
-		<script src="js/nodes/inputs/Vector2Node.js"></script>
-		<script src="js/nodes/inputs/Vector3Node.js"></script>
-		<script src="js/nodes/inputs/Vector4Node.js"></script>
-		<script src="js/nodes/inputs/TextureNode.js"></script>
-		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
-		<script src="js/nodes/inputs/Matrix4Node.js"></script>
-		<script src="js/nodes/inputs/MirrorNode.js"></script>
-
-		<!-- Math -->
-		<script src="js/nodes/math/Math1Node.js"></script>
-		<script src="js/nodes/math/Math2Node.js"></script>
-		<script src="js/nodes/math/Math3Node.js"></script>
-		<script src="js/nodes/math/OperatorNode.js"></script>
-
-		<!-- Utils -->
-		<script src="js/nodes/utils/SwitchNode.js"></script>
-		<script src="js/nodes/utils/JoinNode.js"></script>
-		<script src="js/nodes/utils/TimerNode.js"></script>
-		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
-		<script src="js/nodes/utils/VelocityNode.js"></script>
-		<script src="js/nodes/utils/LuminanceNode.js"></script>
-		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
-		<script src="js/nodes/utils/NoiseNode.js"></script>
-		<script src="js/nodes/utils/ResolutionNode.js"></script>
-		<script src="js/nodes/utils/BlurNode.js"></script>
-
-		<!-- Phong Material -->
-		<script src="js/nodes/materials/PhongNode.js"></script>
-		<script src="js/nodes/materials/PhongNodeMaterial.js"></script>
-
-		<script>
+			import './js/nodes/THREE.Nodes.js';
+			import './js/loaders/NodeMaterialLoader.js';
 
 			// scene size
 			var WIDTH = window.innerWidth;
@@ -123,6 +70,8 @@
 			var sphereGroup, smallSphere;
 			var groundMirrorMaterial;
 
+			var frame = new THREE.NodeFrame();
+
 			function init() {
 
 				// renderer
@@ -134,11 +83,11 @@
 				scene = new THREE.Scene();
 
 				// camera
-				camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
-				cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
-				cameraControls.target.set( 0, 40, 0);
+				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls.target.set( 0, 40, 0 );
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
 				cameraControls.update();
@@ -152,16 +101,16 @@
 
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
-				// MIRROR planes
-				var groundMirror = new THREE.MirrorRTT( 100, 100, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
+				// reflector/mirror plane
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
 
 				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
-				var maskFlip = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
 
-				var mirror = new THREE.MirrorNode( groundMirror );
+				var mirror = new THREE.ReflectorNode( groundMirror );
 
-				var normal = new THREE.TextureNode( decalNormal );
-				var normalXY = new THREE.SwitchNode( normal, 'xy' );
+				var normalMap = new THREE.TextureNode( decalNormal );
+				var normalXY = new THREE.SwitchNode( normalMap, 'xy' );
 				var normalXYFlip = new THREE.Math1Node(
 					normalXY,
 					THREE.Math1Node.INVERT
@@ -175,24 +124,17 @@
 
 				mirror.offset = new THREE.OperatorNode(
 					offsetNormal, // normal
-					new THREE.FloatNode( 6 ),// scale
+					new THREE.FloatNode( 6 ), // scale
 					THREE.OperatorNode.MUL
-				);
-
-				var clr = new THREE.Math3Node(
-					mirror,
-					new THREE.ColorNode( 0xFFFFFF ),
-					mask,
-					THREE.Math3Node.MIX
 				);
 
 				var blurMirror = new THREE.BlurNode( mirror );
 				blurMirror.size = new THREE.Vector2( WIDTH, HEIGHT );
-				blurMirror.coord = new THREE.FunctionNode( "projCoord.xyz / projCoord.q", "vec3" );
-				blurMirror.coord.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.coord, THREE.OperatorNode.ADD );
+				blurMirror.uv = new THREE.ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
+				blurMirror.uv.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.uv, THREE.OperatorNode.ADD );
 				blurMirror.radius.x = blurMirror.radius.y = 0;
 
-				gui.add( { blur : blurMirror.radius.x }, "blur", 0, 25 ).onChange( function(v) {
+				gui.add( { blur: blurMirror.radius.x }, "blur", 0, 25 ).onChange( function ( v ) {
 
 					blurMirror.radius.x = blurMirror.radius.y = v;
 
@@ -201,25 +143,40 @@
 				groundMirrorMaterial = new THREE.PhongNodeMaterial();
 				groundMirrorMaterial.environment = blurMirror; // or add "mirror" variable to disable blur
 				groundMirrorMaterial.environmentAlpha = mask;
-				groundMirrorMaterial.normal = normal;
+				groundMirrorMaterial.normal = new THREE.NormalMapNode( normalMap );
 				//groundMirrorMaterial.normalScale = new THREE.FloatNode( 1 );
-				groundMirrorMaterial.build();
+
+				// test serialization
+				/*
+						var library = {};
+						library[ groundMirror.uuid ] = groundMirror;
+						library[ decalDiffuse.uuid ] = decalDiffuse;
+						library[ decalNormal.uuid ] = decalNormal;
+						library[ mirror.textureMatrix.uuid ] = mirror.textureMatrix; // use textureMatrix to projection
+
+						var json = groundMirrorMaterial.toJSON();
+
+						groundMirrorMaterial = new THREE.NodeMaterialLoader( null, library ).parse( json );
+					*/
+				//--
 
 				var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
-				mirrorMesh.add( groundMirror );
-				mirrorMesh.rotateX( - Math.PI / 2 );
-				scene.add( mirrorMesh );
+				// add all alternative mirror materials inside the ReflectorRTT to prevent:
+				// glDrawElements: Source and destination textures of the draw are the same.
+				groundMirror.add( mirrorMesh );
+				groundMirror.rotateX( - Math.PI / 2 );
+				scene.add( groundMirror );
 
 				sphereGroup = new THREE.Object3D();
 				scene.add( sphereGroup );
 
-				var geometry = new THREE.CylinderGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
+				var geometry = new THREE.CylinderBufferGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x444444 } );
 				var sphereCap = new THREE.Mesh( geometry, material );
-				sphereCap.position.y = -15 * Math.sin( Math.PI / 180 * 30 ) - 0.05;
-				sphereCap.rotateX(-Math.PI);
+				sphereCap.position.y = - 15 * Math.sin( Math.PI / 180 * 30 ) - 0.05;
+				sphereCap.rotateX( - Math.PI );
 
-				var geometry = new THREE.SphereGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
+				var geometry = new THREE.SphereBufferGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
 				var halfSphere = new THREE.Mesh( geometry, material );
 				halfSphere.add( sphereCap );
 				halfSphere.rotateX( - Math.PI / 180 * 135 );
@@ -228,10 +185,10 @@
 
 				sphereGroup.add( halfSphere );
 
-				var geometry = new THREE.IcosahedronGeometry( 5, 0 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 5, 0 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
 				smallSphere = new THREE.Mesh( geometry, material );
-				scene.add(smallSphere);
+				scene.add( smallSphere );
 
 				// walls
 				var planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
@@ -240,7 +197,7 @@
 				scene.add( planeTop );
 
 				var planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
-				planeBack.position.z = -50;
+				planeBack.position.z = - 50;
 				planeBack.position.y = 50;
 				scene.add( planeBack );
 
@@ -257,7 +214,7 @@
 				scene.add( planeRight );
 
 				var planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
-				planeLeft.position.x = -50;
+				planeLeft.position.x = - 50;
 				planeLeft.position.y = 50;
 				planeLeft.rotateY( Math.PI / 2 );
 				scene.add( planeLeft );
@@ -283,7 +240,7 @@
 
 			function render() {
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
 			}
 
@@ -304,9 +261,10 @@
 				smallSphere.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
 				smallSphere.rotation.z = timer * 0.8;
 
-				groundMirrorMaterial.updateFrame( delta );
+				frame.update( delta ).updateNode( groundMirrorMaterial );
 
 				render();
+
 			}
 
 			init();

@@ -18,11 +18,19 @@ THREE.PlayCanvasLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 
@@ -140,7 +148,7 @@ THREE.PlayCanvasLoader.prototype = {
 			object.name = data.name;
 
 			object.position.fromArray( data.position );
-			object.rotation.fromArray( data.rotation );
+			object.quaternion.setFromEuler( new THREE.Euler().fromArray( data.rotation ) );
 			object.scale.fromArray( data.scale );
 
 			data._object = object;
@@ -181,7 +189,7 @@ THREE.PlayCanvasLoader.prototype = {
 
 			var parent = model.parents[ i ];
 
-			if ( parent === -1 ) continue;
+			if ( parent === - 1 ) continue;
 
 			model.nodes[ parent ]._object.add( model.nodes[ i ]._object );
 

@@ -104,8 +104,8 @@
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
 
-		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank" rel="noopener">info</a>.</div>
+		<div id="container"></div>
 		<div id="menu">
 			<button id="table">TABLE</button>
 			<button id="sphere">SPHERE</button>
@@ -228,12 +228,12 @@
 				"Ds", "Darmstadium", "(281)", 10, 7,
 				"Rg", "Roentgenium", "(280)", 11, 7,
 				"Cn", "Copernicium", "(285)", 12, 7,
-				"Uut", "Unutrium", "(284)", 13, 7,
+				"Nh", "Nihonium", "(286)", 13, 7,
 				"Fl", "Flerovium", "(289)", 14, 7,
-				"Uup", "Ununpentium", "(288)", 15, 7,
+				"Mc", "Moscovium", "(290)", 15, 7,
 				"Lv", "Livermorium", "(293)", 16, 7,
-				"Uus", "Ununseptium", "(294)", 17, 7,
-				"Uuo", "Ununoctium", "(294)", 18, 7
+				"Ts", "Tennessine", "(294)", 17, 7,
+				"Og", "Oganesson", "(294)", 18, 7
 			];
 
 			var camera, scene, renderer;
@@ -262,7 +262,7 @@
 
 					var number = document.createElement( 'div' );
 					number.className = 'number';
-					number.textContent = (i/5) + 1;
+					number.textContent = ( i / 5 ) + 1;
 					element.appendChild( number );
 
 					var symbol = document.createElement( 'div' );
@@ -296,18 +296,15 @@
 				// sphere
 
 				var vector = new THREE.Vector3();
-				var spherical = new THREE.Spherical();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-					var phi = Math.acos( -1 + ( 2 * i ) / l );
+					var phi = Math.acos( - 1 + ( 2 * i ) / l );
 					var theta = Math.sqrt( l * Math.PI ) * phi;
 
 					var object = new THREE.Object3D();
 
-					spherical.set( 800, phi, theta );
-
-					object.position.setFromSpherical( spherical );
+					object.position.setFromSphericalCoords( 800, phi, theta );
 
 					vector.copy( object.position ).multiplyScalar( 2 );
 
@@ -320,7 +317,6 @@
 				// helix
 
 				var vector = new THREE.Vector3();
-				var cylindrical = new THREE.Cylindrical();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
@@ -329,9 +325,7 @@
 
 					var object = new THREE.Object3D();
 
-					cylindrical.set( 900, theta, y );
-
-					object.position.setFromCylindrical( cylindrical );
+					object.position.setFromCylindricalCoords( 900, theta, y );
 
 					vector.x = object.position.x * 2;
 					vector.y = object.position.y;
@@ -361,7 +355,6 @@
 
 				renderer = new THREE.CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.domElement.style.position = 'absolute';
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//
@@ -373,28 +366,28 @@
 				controls.addEventListener( 'change', render );
 
 				var button = document.getElementById( 'table' );
-				button.addEventListener( 'click', function ( event ) {
+				button.addEventListener( 'click', function () {
 
 					transform( targets.table, 2000 );
 
 				}, false );
 
 				var button = document.getElementById( 'sphere' );
-				button.addEventListener( 'click', function ( event ) {
+				button.addEventListener( 'click', function () {
 
 					transform( targets.sphere, 2000 );
 
 				}, false );
 
 				var button = document.getElementById( 'helix' );
-				button.addEventListener( 'click', function ( event ) {
+				button.addEventListener( 'click', function () {
 
 					transform( targets.helix, 2000 );
 
 				}, false );
 
 				var button = document.getElementById( 'grid' );
-				button.addEventListener( 'click', function ( event ) {
+				button.addEventListener( 'click', function () {
 
 					transform( targets.grid, 2000 );
 

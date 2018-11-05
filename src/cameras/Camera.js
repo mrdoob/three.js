@@ -4,10 +4,9 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-import { Matrix4 } from '../math/Matrix4';
-import { Quaternion } from '../math/Quaternion';
-import { Object3D } from '../core/Object3D';
-import { Vector3 } from '../math/Vector3';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Object3D } from '../core/Object3D.js';
+import { Vector3 } from '../math/Vector3.js';
 
 function Camera() {
 
@@ -16,7 +15,9 @@ function Camera() {
 	this.type = 'Camera';
 
 	this.matrixWorldInverse = new Matrix4();
+
 	this.projectionMatrix = new Matrix4();
+	this.projectionMatrixInverse = new Matrix4();
 
 }
 
@@ -31,27 +32,30 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		Object3D.prototype.copy.call( this, source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+
 		this.projectionMatrix.copy( source.projectionMatrix );
+		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
 
 		return this;
 
 	},
 
-	getWorldDirection: function () {
+	getWorldDirection: function ( target ) {
 
-		var quaternion = new Quaternion();
+		if ( target === undefined ) {
 
-		return function getWorldDirection( optionalTarget ) {
+			console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+			target = new Vector3();
 
-			var result = optionalTarget || new Vector3();
+		}
 
-			this.getWorldQuaternion( quaternion );
+		this.updateMatrixWorld( true );
 
-			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+		var e = this.matrixWorld.elements;
 
-		};
+		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
 
-	}(),
+	},
 
 	updateMatrixWorld: function ( force ) {
 

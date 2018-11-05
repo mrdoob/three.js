@@ -23,12 +23,9 @@
 				padding: 5px;
 			}
 
-			a {
+			a { color: #ffffff; }
 
-				color: #ffffff;
-			}
-
-			#oldie a { color:#da0 }
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
 	<body>
@@ -49,13 +46,11 @@
 		<script src="js/postprocessing/BloomPass.js"></script>
 		<script src="js/postprocessing/FilmPass.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
 			uniform float time;
-			uniform vec2 resolution;
 
 			uniform float fogDensity;
 			uniform vec3 fogColor;
@@ -67,11 +62,11 @@
 
 			void main( void ) {
 
-				vec2 position = -1.0 + 2.0 * vUv;
+				vec2 position = - 1.0 + 2.0 * vUv;
 
 				vec4 noise = texture2D( texture1, vUv );
-				vec2 T1 = vUv + vec2( 1.5, -1.5 ) * time  *0.02;
-				vec2 T2 = vUv + vec2( -0.5, 2.0 ) * time * 0.01;
+				vec2 T1 = vUv + vec2( 1.5, - 1.5 ) * time * 0.02;
+				vec2 T2 = vUv + vec2( - 0.5, 2.0 ) * time * 0.01;
 
 				T1.x += noise.x * 2.0;
 				T1.y += noise.y * 2.0;
@@ -83,9 +78,9 @@
 				vec4 color = texture2D( texture2, T2 * 2.0 );
 				vec4 temp = color * ( vec4( p, p, p, p ) * 2.0 ) + ( color * color - 0.1 );
 
-				if( temp.r > 1.0 ){ temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
-				if( temp.g > 1.0 ){ temp.rb += temp.g - 1.0; }
-				if( temp.b > 1.0 ){ temp.rg += temp.b - 1.0; }
+				if( temp.r > 1.0 ) { temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
+				if( temp.g > 1.0 ) { temp.rb += temp.g - 1.0; }
+				if( temp.b > 1.0 ) { temp.rg += temp.b - 1.0; }
 
 				gl_FragColor = temp;
 
@@ -118,24 +113,17 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, stats;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var clock = new THREE.Clock();
+			}
 
-			var camera, scene, renderer, composer;
+			var container;
 
-			var uniforms, material, mesh;
+			var camera, scene, renderer, composer, clock;
 
-			var mouseX = 0, mouseY = 0,
-			lat = 0, lon = 0, phy = 0, theta = 0;
-
-			var width = window.innerWidth || 2;
-			var height = window.innerHeight || 2;
-
-			var windowHalfX = width / 2;
-			var windowHalfY = height / 2;
+			var uniforms, mesh;
 
 			init();
 			animate();
@@ -144,22 +132,23 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 35, windowHalfX / windowHalfY, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
+
+				clock = new THREE.Clock();
 
 				var textureLoader = new THREE.TextureLoader();
 
 				uniforms = {
 
 					fogDensity: { value: 0.45 },
-					fogColor:   { value: new THREE.Vector3( 0, 0, 0 ) },
-					time:       { value: 1.0 },
-					resolution: { value: new THREE.Vector2() },
-					uvScale:    { value: new THREE.Vector2( 3.0, 1.0 ) },
-					texture1:   { value: textureLoader.load( "textures/lava/cloud.png" ) },
-					texture2:   { value: textureLoader.load( "textures/lava/lavatile.jpg" ) }
+					fogColor: { value: new THREE.Vector3( 0, 0, 0 ) },
+					time: { value: 1.0 },
+					uvScale: { value: new THREE.Vector2( 3.0, 1.0 ) },
+					texture1: { value: textureLoader.load( 'textures/lava/cloud.png' ) },
+					texture2: { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
 
 				};
 
@@ -168,7 +157,7 @@
 
 				var size = 0.65;
 
-				material = new THREE.ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -176,7 +165,7 @@
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), material );
+				mesh = new THREE.Mesh( new THREE.TorusBufferGeometry( size, 0.3, 30, 30 ), material );
 				mesh.rotation.x = 0.3;
 				scene.add( mesh );
 
@@ -187,10 +176,6 @@
 				container.appendChild( renderer.domElement );
 				renderer.autoClear = false;
 
-				//
-
-				stats = new Stats();
-				//container.appendChild( stats.dom );
 
 				//
 
@@ -214,10 +199,7 @@
 
 			}
 
-			function onWindowResize( event ) {
-
-				uniforms.resolution.value.x = window.innerWidth;
-				uniforms.resolution.value.y = window.innerHeight;
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -235,7 +217,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 

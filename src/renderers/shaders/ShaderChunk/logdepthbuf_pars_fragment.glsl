@@ -1,11 +1,6 @@
-#ifdef USE_LOGDEPTHBUF
+#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
 
 	uniform float logDepthBufFC;
-
-	#ifdef USE_LOGDEPTHBUF_EXT
-
-		varying float vFragDepth;
-
-	#endif
+	varying float vFragDepth;
 
 #endif

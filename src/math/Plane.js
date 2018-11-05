@@ -1,5 +1,5 @@
-import { Matrix3 } from './Matrix3';
-import { Vector3 } from './Vector3';
+import { Matrix3 } from './Matrix3.js';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -110,11 +110,16 @@ Object.assign( Plane.prototype, {
 
 	},
 
-	projectPoint: function ( point, optionalTarget ) {
+	projectPoint: function ( point, target ) {
 
-		var result = optionalTarget || new Vector3();
+		if ( target === undefined ) {
 
-		return result.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
+			console.warn( 'THREE.Plane: .projectPoint() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
 
 	},
 
@@ -122,9 +127,14 @@ Object.assign( Plane.prototype, {
 
 		var v1 = new Vector3();
 
-		return function intersectLine( line, optionalTarget ) {
+		return function intersectLine( line, target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Plane: .intersectLine() target is now required' );
+				target = new Vector3();
+
+			}
 
 			var direction = line.delta( v1 );
 
@@ -135,7 +145,7 @@ Object.assign( Plane.prototype, {
 				// line is coplanar, return origin
 				if ( this.distanceToPoint( line.start ) === 0 ) {
 
-					return result.copy( line.start );
+					return target.copy( line.start );
 
 				}
 
@@ -152,7 +162,7 @@ Object.assign( Plane.prototype, {
 
 			}
 
-			return result.copy( direction ).multiplyScalar( t ).add( line.start );
+			return target.copy( direction ).multiplyScalar( t ).add( line.start );
 
 		};
 
@@ -181,11 +191,16 @@ Object.assign( Plane.prototype, {
 
 	},
 
-	coplanarPoint: function ( optionalTarget ) {
+	coplanarPoint: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
+		if ( target === undefined ) {
 
-		return result.copy( this.normal ).multiplyScalar( - this.constant );
+			console.warn( 'THREE.Plane: .coplanarPoint() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return target.copy( this.normal ).multiplyScalar( - this.constant );
 
 	},
 

@@ -2,11 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Vector2 } from '../math/Vector2';
+import { Vector2 } from '../math/Vector2.js';
 
 function DirectGeometry() {
 
-	this.indices = [];
 	this.vertices = [];
 	this.normals = [];
 	this.colors = [];
@@ -104,7 +103,10 @@ Object.assign( DirectGeometry.prototype, {
 
 			for ( var i = 0; i < morphTargetsLength; i ++ ) {
 
-				morphTargetsPosition[ i ] = [];
+				morphTargetsPosition[ i ] = {
+					name: morphTargets[ i ].name,
+				 	data: []
+				};
 
 			}
 
@@ -123,7 +125,10 @@ Object.assign( DirectGeometry.prototype, {
 
 			for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
-				morphTargetsNormal[ i ] = [];
+				morphTargetsNormal[ i ] = {
+					name: morphNormals[ i ].name,
+				 	data: []
+				};
 
 			}
 
@@ -140,6 +145,12 @@ Object.assign( DirectGeometry.prototype, {
 		var hasSkinWeights = skinWeights.length === vertices.length;
 
 		//
+
+		if ( vertices.length > 0 && faces.length === 0 ) {
+
+			console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
+
+		}
 
 		for ( var i = 0; i < faces.length; i ++ ) {
 
@@ -217,7 +228,7 @@ Object.assign( DirectGeometry.prototype, {
 
 				var morphTarget = morphTargets[ j ].vertices;
 
-				morphTargetsPosition[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
+				morphTargetsPosition[ j ].data.push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
 
@@ -225,7 +236,7 @@ Object.assign( DirectGeometry.prototype, {
 
 				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
-				morphTargetsNormal[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
+				morphTargetsNormal[ j ].data.push( morphNormal.a, morphNormal.b, morphNormal.c );
 
 			}
 

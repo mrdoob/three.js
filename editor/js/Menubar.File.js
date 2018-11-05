@@ -14,12 +14,15 @@ Menubar.File = function ( editor ) {
 
 	//
 
+	var config = editor.config;
+	var strings = editor.strings;
+
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
 
 	var title = new UI.Panel();
 	title.setClass( 'title' );
-	title.setTextContent( 'File' );
+	title.setTextContent( strings.getKey( 'menubar/file' ) );
 	container.add( title );
 
 	var options = new UI.Panel();
@@ -30,7 +33,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'New' );
+	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
 	option.onClick( function () {
 
 		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
@@ -53,10 +56,11 @@ Menubar.File = function ( editor ) {
 	document.body.appendChild( form );
 
 	var fileInput = document.createElement( 'input' );
+	fileInput.multiple = true;
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( event ) {
 
-		editor.loader.loadFile( fileInput.files[ 0 ] );
+		editor.loader.loadFiles( fileInput.files );
 		form.reset();
 
 	} );
@@ -64,7 +68,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Import' );
+	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
 	option.onClick( function () {
 
 		fileInput.click();
@@ -80,7 +84,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export Geometry' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/geometry' ) );
 	option.onClick( function () {
 
 		var object = editor.selected;
@@ -123,7 +127,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export Object' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/object' ) );
 	option.onClick( function () {
 
 		var object = editor.selected;
@@ -157,7 +161,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export Scene' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/scene' ) );
 	option.onClick( function () {
 
 		var output = editor.scene.toJSON();
@@ -182,11 +186,49 @@ Menubar.File = function ( editor ) {
 
 	options.add( new UI.HorizontalRule() );
 
+	// Export DAE
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/dae' ) );
+	option.onClick( function () {
+
+		var exporter = new THREE.ColladaExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveString( result.data, 'scene.dae' );
+
+		} );
+
+	} );
+	options.add( option );
+
+	// Export GLB
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
+	option.onClick( function () {
+
+		var exporter = new THREE.GLTFExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveArrayBuffer( result, 'scene.glb' );
+
+			// forceIndices: true, forcePowerOfTwoTextures: true
+			// to allow compatibility with facebook
+		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+
+	} );
+	options.add( option );
+
 	// Export GLTF
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export GLTF' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( function () {
 
 		var exporter = new THREE.GLTFExporter();
@@ -205,7 +247,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export OBJ' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/obj' ) );
 	option.onClick( function () {
 
 		var object = editor.selected;
@@ -224,16 +266,30 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	// Export STL
+	// Export STL (ASCII)
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export STL' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/stl' ) );
 	option.onClick( function () {
 
 		var exporter = new THREE.STLExporter();
 
 		saveString( exporter.parse( editor.scene ), 'model.stl' );
+
+	} );
+	options.add( option );
+
+	// Export STL (Binary)
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/stl_binary' ) );
+	option.onClick( function () {
+
+		var exporter = new THREE.STLExporter();
+
+		saveArrayBuffer( exporter.parse( editor.scene, { binary: true } ), 'model-binary.stl' );
 
 	} );
 	options.add( option );
@@ -246,7 +302,7 @@ Menubar.File = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Publish' );
+	option.setTextContent( strings.getKey( 'menubar/file/publish' ) );
 	option.onClick( function () {
 
 		var zip = new JSZip();
@@ -266,14 +322,18 @@ Menubar.File = function ( editor ) {
 
 		//
 
+		var title = config.getKey( 'project/title' );
+
 		var manager = new THREE.LoadingManager( function () {
 
-			save( zip.generate( { type: 'blob' } ), 'download.zip' );
+			save( zip.generate( { type: 'blob' } ), ( title !== '' ? title : 'untitled' ) + '.zip' );
 
 		} );
 
 		var loader = new THREE.FileLoader( manager );
 		loader.load( 'js/libs/app/index.html', function ( content ) {
+
+			content = content.replace( '<!-- title -->', title );
 
 			var includes = [];
 
@@ -284,6 +344,24 @@ Menubar.File = function ( editor ) {
 			}
 
 			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
+
+			var editButton = '';
+
+			if ( config.getKey( 'project/editable' ) ) {
+
+				editButton = [
+					'',
+					'			var button = document.createElement( \'a\' );',
+					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
+					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 12px 14px; color: #fff; border: 1px solid #fff; border-radius: 4px; text-decoration: none;\';',
+					'			button.target = \'_blank\';',
+					'			button.textContent = \'EDIT\';',
+					'			document.body.appendChild( button );',
+					''
+				].join( '\n' );
+			}
+
+			content = content.replace( '\n\t\t\t/* edit button */\n', editButton );
 
 			zip.file( 'index.html', content );
 
@@ -312,27 +390,6 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	/*
-	// Publish (Dropbox)
-
-	var option = new UI.Row();
-	option.setClass( 'option' );
-	option.setTextContent( 'Publish (Dropbox)' );
-	option.onClick( function () {
-
-		var parameters = {
-			files: [
-				{ 'url': 'data:text/plain;base64,' + window.btoa( "Hello, World" ), 'filename': 'app/test.txt' }
-			]
-		};
-
-		Dropbox.save( parameters );
-
-	} );
-	options.add( option );
-	*/
-
-
 	//
 
 	var link = document.createElement( 'a' );
@@ -346,6 +403,12 @@ Menubar.File = function ( editor ) {
 		link.click();
 
 		// URL.revokeObjectURL( url ); breaks Firefox...
+
+	}
+
+	function saveArrayBuffer( buffer, filename ) {
+
+		save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
 
 	}
 

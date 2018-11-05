@@ -37,18 +37,22 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/libs/tween.min.js"></script>
-		<script src="js/loaders/ColladaLoader2.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
-			var camera, scene, renderer, objects;
+			var camera, scene, renderer;
 			var particleLight;
 			var dae;
 
@@ -57,8 +61,8 @@
 			var tweenParameters = {};
 
 			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
-			loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
+			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
+			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
 				dae = collada.scene;
 
@@ -102,7 +106,7 @@
 
 				scene.add( dae );
 
-				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
@@ -135,27 +139,43 @@
 
 				var target = {};
 
-				for ( var i = 0; i < kinematics.joints.length; i ++ ) {
+				for ( var prop in kinematics.joints ) {
 
-					var joint = kinematics.joints[ i ];
+					if ( kinematics.joints.hasOwnProperty( prop ) ) {
 
-					var old = tweenParameters[ i ];
+						if ( ! kinematics.joints[ prop ].static ) {
 
-					var position = old ? old : joint.zeroPosition;
+							var joint = kinematics.joints[ prop ];
 
-					tweenParameters[ i ] = position;
+							var old = tweenParameters[ prop ];
 
-					target[ i ] = THREE.Math.randInt( joint.limits.min, joint.limits.max )
+							var position = old ? old : joint.zeroPosition;
+
+							tweenParameters[ prop ] = position;
+
+							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max );
+
+						}
+
+					}
 
 				}
 
 				kinematicsTween = new TWEEN.Tween( tweenParameters ).to( target, duration ).easing( TWEEN.Easing.Quadratic.Out );
 
-				kinematicsTween.onUpdate( function() {
+				kinematicsTween.onUpdate( function () {
 
-					for ( var i = 0; i < kinematics.joints.length; i ++ ) {
+					for ( var prop in kinematics.joints ) {
 
-						kinematics.setJointValue( i, this[ i ] );
+						if ( kinematics.joints.hasOwnProperty( prop ) ) {
+
+							if ( ! kinematics.joints[ prop ].static ) {
+
+								kinematics.setJointValue( prop, this[ prop ] );
+
+							}
+
+						}
 
 					}
 
@@ -192,11 +212,11 @@
 
 				var timer = Date.now() * 0.0001;
 
-				camera.position.x = Math.cos( timer ) * 17;
+				camera.position.x = Math.cos( timer ) * 20;
 				camera.position.y = 10;
-				camera.position.z = Math.sin( timer ) * 17;
+				camera.position.z = Math.sin( timer ) * 20;
 
-				camera.lookAt( scene.position );
+				camera.lookAt( 0, 5, 0 );
 
 				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;

@@ -5,43 +5,43 @@
 
 ( function () {
 
-	var UNCOMPRESSED  = 0,
-			DEFLATE       = 1,
-			LZMA          = 2,
+	var UNCOMPRESSED = 0,
+		DEFLATE = 1,
+		LZMA = 2,
 
-			AWD_FIELD_INT8      = 1,
-			AWD_FIELD_INT16     = 2,
-			AWD_FIELD_INT32     = 3,
-			AWD_FIELD_UINT8     = 4,
-			AWD_FIELD_UINT16    = 5,
-			AWD_FIELD_UINT32    = 6,
-			AWD_FIELD_FLOAT32   = 7,
-			AWD_FIELD_FLOAT64   = 8,
-			AWD_FIELD_BOOL      = 21,
-			AWD_FIELD_COLOR     = 22,
-			AWD_FIELD_BADDR     = 23,
-			AWD_FIELD_STRING    = 31,
-			AWD_FIELD_BYTEARRAY = 32,
-			AWD_FIELD_VECTOR2x1 = 41,
-			AWD_FIELD_VECTOR3x1 = 42,
-			AWD_FIELD_VECTOR4x1 = 43,
-			AWD_FIELD_MTX3x2    = 44,
-			AWD_FIELD_MTX3x3    = 45,
-			AWD_FIELD_MTX4x3    = 46,
-			AWD_FIELD_MTX4x4    = 47,
+		AWD_FIELD_INT8 = 1,
+		AWD_FIELD_INT16 = 2,
+		AWD_FIELD_INT32 = 3,
+		AWD_FIELD_UINT8 = 4,
+		AWD_FIELD_UINT16 = 5,
+		AWD_FIELD_UINT32 = 6,
+		AWD_FIELD_FLOAT32 = 7,
+		AWD_FIELD_FLOAT64 = 8,
+		AWD_FIELD_BOOL = 21,
+		AWD_FIELD_COLOR = 22,
+		AWD_FIELD_BADDR = 23,
+		AWD_FIELD_STRING = 31,
+		AWD_FIELD_BYTEARRAY = 32,
+		AWD_FIELD_VECTOR2x1 = 41,
+		AWD_FIELD_VECTOR3x1 = 42,
+		AWD_FIELD_VECTOR4x1 = 43,
+		AWD_FIELD_MTX3x2 = 44,
+		AWD_FIELD_MTX3x3 = 45,
+		AWD_FIELD_MTX4x3 = 46,
+		AWD_FIELD_MTX4x4 = 47,
 
-			BOOL       = 21,
-			COLOR      = 22,
-			BADDR      = 23,
+		BOOL = 21,
+		COLOR = 22,
+		BADDR = 23,
 
-			INT8    = 1,
-			INT16   = 2,
-			INT32   = 3,
-			UINT8   = 4,
-			UINT16  = 5,
-			UINT32  = 6,
-			FLOAT32 = 7,
-			FLOAT64 = 8;
+		INT8 = 1,
+		INT16 = 2,
+		INT32 = 3,
+		UINT8 = 4,
+		UINT16 = 5,
+		UINT32 = 6,
+		FLOAT32 = 7,
+		FLOAT64 = 8;
 
 	var littleEndian = true;
 
@@ -55,17 +55,23 @@
 	function AWDProperties() {}
 
 	AWDProperties.prototype = {
-		set: function( key, value ) {
+		set: function ( key, value ) {
 
 			this[ key ] = value;
 
 		},
 
-		get: function( key, fallback ) {
+		get: function ( key, fallback ) {
 
-			if ( this.hasOwnProperty( key ) )
+			if ( this.hasOwnProperty( key ) ) {
+
 				return this[ key ];
-			else return fallback;
+
+			} else {
+
+				return fallback;
+
+			}
 
 		}
 	};
@@ -78,13 +84,13 @@
 
 		this.materialFactory = undefined;
 
-		this._url     = '';
+		this._url = '';
 		this._baseDir = '';
 
 		this._data = undefined;
 		this._ptr = 0;
 
-		this._version =  [];
+		this._version = [];
 		this._streaming = false;
 		this._optimized_for_accuracy = false;
 		this._compression = 0;
@@ -92,9 +98,9 @@
 
 		this._blocks = [ new Block() ];
 
-		this._accuracyMatrix  = false;
-		this._accuracyGeo     = false;
-		this._accuracyProps   = false;
+		this._accuracyMatrix = false;
+		this._accuracyGeo = false;
+		this._accuracyProps = false;
 
 	};
 
@@ -110,12 +116,20 @@
 			this._baseDir = url.substr( 0, url.lastIndexOf( '/' ) + 1 );
 
 			var loader = new THREE.FileLoader( this.manager );
+			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( text ) {
 
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
+
+		},
+
+		setPath: function ( value ) {
+
+			this.path = value;
+			return this;
 
 		},
 
@@ -128,7 +142,7 @@
 
 			this._parseHeader( );
 
-			if ( this._compression != 0  ) {
+			if ( this._compression != 0 ) {
 
 				console.error( 'compressed AWD not supported' );
 
@@ -136,7 +150,7 @@
 
 			if ( ! this._streaming && this._bodylen != data.byteLength - this._ptr ) {
 
-				console.error( 'AWDLoader: body len does not match file length', this._bodylen,  blen - this._ptr );
+				console.error( 'AWDLoader: body len does not match file length', this._bodylen, blen - this._ptr );
 
 			}
 
@@ -150,62 +164,76 @@
 
 		},
 
-		parseNextBlock: function() {
+		parseNextBlock: function () {
 
 			var assetData,
-					ns, type, len, block,
-					blockId = this.readU32(),
-					ns      = this.readU8(),
-					type    = this.readU8(),
-					flags   = this.readU8(),
-					len     = this.readU32();
+				ns, type, len, block,
+				blockId = this.readU32(),
+				ns = this.readU8(),
+				type = this.readU8(),
+				flags = this.readU8(),
+				len = this.readU32();
 
 
 			switch ( type ) {
+
 				case 1:
 					assetData = this.parseMeshData( len );
 					break;
+
 				case 22:
 					assetData = this.parseContainer( len );
 					break;
+
 				case 23:
 					assetData = this.parseMeshInstance( len );
 					break;
+
 				case 81:
 					assetData = this.parseMaterial( len );
 					break;
+
 				case 82:
 					assetData = this.parseTexture( len );
 					break;
+
 				case 101:
 					assetData = this.parseSkeleton( len );
 					break;
 
-	//      case 111:
-	//        assetData = this.parseMeshPoseAnimation(len, true);
-	//        break;
+	    //  case 111:
+	    //    assetData = this.parseMeshPoseAnimation(len, true);
+	    //    break;
+
 				case 112:
 					assetData = this.parseMeshPoseAnimation( len, false );
 					break;
+
 				case 113:
 					assetData = this.parseVertexAnimationSet( len );
 					break;
+
 				case 102:
 					assetData = this.parseSkeletonPose( len );
 					break;
+
 				case 103:
 					assetData = this.parseSkeletonAnimation( len );
 					break;
+
 				case 122:
 					assetData = this.parseAnimatorSet( len );
 					break;
+
 				// case 121:
 				//  assetData = parseUVAnimation(len);
 				//  break;
+
 				default:
 					//debug('Ignoring block!',type, len);
 					this._ptr += len;
 					break;
+
 			}
 
 
@@ -220,10 +248,7 @@
 		_parseHeader: function () {
 
 			var version = this._version,
-					awdmagic =
-							( this.readU8() << 16 )
-					|   ( this.readU8() << 8 )
-					|     this.readU8();
+				awdmagic = ( this.readU8() << 16 ) | ( this.readU8() << 8 ) | this.readU8();
 
 			if ( awdmagic != 4282180 )
 				throw new Error( "AWDLoader - bad magic" );
@@ -237,17 +262,17 @@
 
 			if ( ( version[ 0 ] === 2 ) && ( version[ 1 ] === 1 ) ) {
 
-				this._accuracyMatrix =  ( flags & 0x2 ) === 0x2;
-				this._accuracyGeo =     ( flags & 0x4 ) === 0x4;
-				this._accuracyProps =   ( flags & 0x8 ) === 0x8;
+				this._accuracyMatrix = ( flags & 0x2 ) === 0x2;
+				this._accuracyGeo = ( flags & 0x4 ) === 0x4;
+				this._accuracyProps = ( flags & 0x8 ) === 0x8;
 
 			}
 
-			this._geoNrType     = this._accuracyGeo     ? FLOAT64 : FLOAT32;
-			this._matrixNrType  = this._accuracyMatrix  ? FLOAT64 : FLOAT32;
-			this._propsNrType   = this._accuracyProps   ? FLOAT64 : FLOAT32;
+			this._geoNrType = this._accuracyGeo ? FLOAT64 : FLOAT32;
+			this._matrixNrType = this._accuracyMatrix ? FLOAT64 : FLOAT32;
+			this._propsNrType = this._accuracyProps ? FLOAT64 : FLOAT32;
 
-			this._optimized_for_accuracy  = ( flags & 0x2 ) === 0x2;
+			this._optimized_for_accuracy = ( flags & 0x2 ) === 0x2;
 
 			this._compression = this.readU8();
 			this._bodylen = this.readU32();
@@ -257,9 +282,9 @@
 		parseContainer: function ( len ) {
 
 			var parent,
-					ctr     = new THREE.Object3D(),
-					par_id  = this.readU32(),
-					mtx     = this.parseMatrix4();
+				ctr = new THREE.Object3D(),
+				par_id = this.readU32(),
+				mtx = this.parseMatrix4();
 
 			ctr.name = this.readUTF();
 			ctr.applyMatrix( mtx );
@@ -283,18 +308,18 @@
 		parseMeshInstance: function ( len ) {
 
 			var name,
-					mesh, geometries, meshLen, meshes,
-					par_id, data_id,
-					mtx,
-					materials, mat, mat_id,
-					num_materials,
-					parent,
-					i;
+				mesh, geometries, meshLen, meshes,
+				par_id, data_id,
+				mtx,
+				materials, mat, mat_id,
+				num_materials,
+				parent,
+				i;
 
-			par_id        = this.readU32();
-			mtx           = this.parseMatrix4();
-			name          = this.readUTF();
-			data_id       = this.readU32();
+			par_id = this.readU32();
+			mtx = this.parseMatrix4();
+			name = this.readUTF();
+			data_id = this.readU32();
 			num_materials = this.readU16();
 
 			geometries = this.getBlock( data_id );
@@ -314,7 +339,7 @@
 
 			// TODO : BufferGeometry don't support "geometryGroups" for now.
 			// so we create sub meshes for each groups
-			if ( meshLen  > 1 ) {
+			if ( meshLen > 1 ) {
 
 				mesh = new THREE.Object3D();
 				for ( i = 0; i < meshLen; i ++ ) {
@@ -357,16 +382,16 @@
 		parseMaterial: function ( len ) {
 
 			var name,
-					type,
-					props,
-					mat,
-					attributes,
-					finalize,
-					num_methods,
-					methods_parsed;
+				type,
+				props,
+				mat,
+				attributes,
+				finalize,
+				num_methods,
+				methods_parsed;
 
-			name        = this.readUTF();
-			type        = this.readU8();
+			name = this.readUTF();
+			type = this.readU8();
 			num_methods = this.readU8();
 
 			//log( "AWDLoader parseMaterial ",name )
@@ -374,8 +399,8 @@
 			// Read material numerical properties
 			// (1=color, 2=bitmap url, 11=alpha_blending, 12=alpha_threshold, 13=repeat)
 			props = this.parseProperties( {
-				1:  AWD_FIELD_INT32,
-				2:  AWD_FIELD_BADDR,
+				1: AWD_FIELD_INT32,
+				2: AWD_FIELD_BADDR,
 				11: AWD_FIELD_BOOL,
 				12: AWD_FIELD_FLOAT32,
 				13: AWD_FIELD_BOOL
@@ -424,12 +449,12 @@
 
 		},
 
-		parseTexture: function( len ) {
+		parseTexture: function ( len ) {
 
 			var name = this.readUTF(),
-					type = this.readU8(),
-					asset,
-					data_len;
+				type = this.readU8(),
+				asset,
+				data_len;
 
 			// External
 			if ( type === 0 ) {
@@ -451,13 +476,13 @@
 
 		},
 
-		loadTexture: function( url ) {
+		loadTexture: function ( url ) {
 
 			var tex = new THREE.Texture();
 
 			var loader = new THREE.ImageLoader( this.manager );
 
-			loader.load( this._baseDir + url, function( image ) {
+			loader.load( this._baseDir + url, function ( image ) {
 
 				tex.image = image;
 				tex.needsUpdate = true;
@@ -468,13 +493,13 @@
 
 		},
 
-		parseSkeleton: function( len ) {
+		parseSkeleton: function ( len ) {
 
 			// Array<Bone>
-			var name          = this.readUTF(),
-					num_joints    = this.readU16(),
-					skeleton      = [],
-					joints_parsed = 0;
+			var name = this.readUTF(),
+				num_joints = this.readU16(),
+				skeleton = [],
+				joints_parsed = 0;
 
 			this.parseProperties( null );
 
@@ -509,7 +534,7 @@
 
 		},
 
-		parseSkeletonPose: function( blockID ) {
+		parseSkeletonPose: function ( blockID ) {
 
 			var name = this.readUTF();
 
@@ -552,7 +577,7 @@
 
 		},
 
-		parseSkeletonAnimation: function( blockID ) {
+		parseSkeletonAnimation: function ( blockID ) {
 
 			var frame_dur;
 			var pose_addr;
@@ -578,8 +603,8 @@
 				pose = this._blocks[ pose_addr ].data;
 				// debug( 'pose address ',pose[2].elements[12],pose[2].elements[13],pose[2].elements[14] );
 				clip.push( {
-					pose : pose,
-					duration : frame_dur
+					pose: pose,
+					duration: frame_dur
 				} );
 
 				frames_parsed ++;
@@ -598,14 +623,14 @@
 
 		},
 
-		parseVertexAnimationSet: function( len ) {
+		parseVertexAnimationSet: function ( len ) {
 
 			var poseBlockAdress,
-					name           = this.readUTF(),
-					num_frames     = this.readU16(),
-					props          = this.parseProperties( { 1: UINT16 } ),
-					frames_parsed  = 0,
-					skeletonFrames = [];
+				name = this.readUTF(),
+				num_frames = this.readU16(),
+				props = this.parseProperties( { 1: UINT16 } ),
+				frames_parsed = 0,
+				skeletonFrames = [];
 
 			while ( frames_parsed < num_frames ) {
 
@@ -622,7 +647,7 @@
 
 		},
 
-		parseAnimatorSet: function( len ) {
+		parseAnimatorSet: function ( len ) {
 
 			var targetMesh;
 
@@ -655,7 +680,7 @@
 
 				//      returnedArray = getAssetByID(meshAdresses[i], [AssetType.MESH]);
 				//      if (returnedArray[0])
-				targetMeshes.push( this._blocks[ meshAdresses[ i ]].data );
+				targetMeshes.push( this._blocks[ meshAdresses[ i ] ].data );
 
 			}
 
@@ -666,8 +691,8 @@
 
 
 				thisAnimator = {
-					animationSet : targetAnimationSet,
-					skeleton : this._blocks[ props.get( 1, 0 ) ].data
+					animationSet: targetAnimationSet,
+					skeleton: this._blocks[ props.get( 1, 0 ) ].data
 				};
 
 			} else if ( type == 2 ) {
@@ -688,19 +713,16 @@
 
 		parseMeshData: function ( len ) {
 
-			var name      = this.readUTF(),
-				num_subs  = this.readU16(),
+			var name = this.readUTF(),
+				num_subs = this.readU16(),
 				geom,
 				subs_parsed = 0,
-				props,
 				buffer,
 				skinW, skinI,
 				geometries = [];
 
-			props = this.parseProperties( {
-				1: this._geoNrType,
-				2: this._geoNrType
-			} );
+			// Ignore for now
+			this.parseProperties( { 1: this._geoNrType, 2: this._geoNrType } );
 
 			// Loop through sub meshes
 			while ( subs_parsed < num_subs ) {
@@ -723,14 +745,14 @@
 				while ( this._ptr < sm_end ) {
 
 					var idx = 0,
-							str_type  = this.readU8(),
-							str_ftype = this.readU8(),
-							str_len   = this.readU32(),
-							str_end   = str_len + this._ptr;
+						str_type = this.readU8(),
+						str_ftype = this.readU8(),
+						str_len = this.readU32(),
+						str_end = str_len + this._ptr;
 
-					// VERTICES
-					// ------------------
 					if ( str_type === 1 ) {
+
+						// VERTICES
 
 						buffer = new Float32Array( ( str_len / 12 ) * 3 );
 						attrib = new THREE.BufferAttribute( buffer, 3 );
@@ -740,18 +762,16 @@
 
 						while ( this._ptr < str_end ) {
 
-							buffer[ idx ]   = - this.readF32();
+							buffer[ idx ] = - this.readF32();
 							buffer[ idx + 1 ] = this.readF32();
 							buffer[ idx + 2 ] = this.readF32();
 							idx += 3;
 
 						}
 
-					}
+					} else if ( str_type === 2 ) {
 
-					// INDICES
-					// -----------------
-					else if ( str_type === 2 ) {
+						// INDICES
 
 						buffer = new Uint16Array( str_len / 2 );
 						attrib = new THREE.BufferAttribute( buffer, 1 );
@@ -761,18 +781,16 @@
 
 						while ( this._ptr < str_end ) {
 
-							buffer[ idx + 1 ]   = this.readU16();
-							buffer[ idx ]     = this.readU16();
-							buffer[ idx + 2 ]   = this.readU16();
+							buffer[ idx + 1 ] = this.readU16();
+							buffer[ idx ] = this.readU16();
+							buffer[ idx + 2 ] = this.readU16();
 							idx += 3;
 
 						}
 
-					}
+					} else if ( str_type === 3 ) {
 
-					// UVS
-					// -------------------
-					else if ( str_type === 3 ) {
+						// UVS
 
 						buffer = new Float32Array( ( str_len / 8 ) * 2 );
 						attrib = new THREE.BufferAttribute( buffer, 2 );
@@ -782,16 +800,15 @@
 
 						while ( this._ptr < str_end ) {
 
-							buffer[ idx ]   = this.readF32();
+							buffer[ idx ] = this.readF32();
 							buffer[ idx + 1 ] = 1.0 - this.readF32();
 							idx += 2;
 
 						}
 
-					}
+					} else if ( str_type === 4 ) {
 
-					// NORMALS
-					else if ( str_type === 4 ) {
+						// NORMALS
 
 						buffer = new Float32Array( ( str_len / 12 ) * 3 );
 						attrib = new THREE.BufferAttribute( buffer, 3 );
@@ -800,35 +817,14 @@
 
 						while ( this._ptr < str_end ) {
 
-							buffer[ idx ]   = - this.readF32();
+							buffer[ idx ] = - this.readF32();
 							buffer[ idx + 1 ] = this.readF32();
 							buffer[ idx + 2 ] = this.readF32();
 							idx += 3;
 
 						}
 
-					}
-
-					// else if (str_type == 6) {
-					//   skinI = new Float32Array( str_len>>1 );
-					//   idx = 0
-
-					//   while (this._ptr < str_end) {
-					//     skinI[idx]   = this.readU16();
-					//     idx++;
-					//   }
-
-					// }
-					// else if (str_type == 7) {
-					//   skinW = new Float32Array( str_len>>2 );
-					//   idx = 0;
-
-					//   while (this._ptr < str_end) {
-					//     skinW[idx]   = this.readF32();
-					//     idx++;
-					//   }
-					// }
-					else {
+					} else {
 
 						this._ptr = str_end;
 
@@ -852,31 +848,31 @@
 
 		},
 
-		parseMeshPoseAnimation: function( len, poseOnly ) {
+		parseMeshPoseAnimation: function ( len, poseOnly ) {
 
 			var num_frames = 1,
-					num_submeshes,
-					frames_parsed,
-					subMeshParsed,
-					frame_dur,
-					x, y, z,
+				num_submeshes,
+				frames_parsed,
+				subMeshParsed,
+				frame_dur,
+				x, y, z,
 
-					str_len,
-					str_end,
-					geom,
-					subGeom,
-					idx = 0,
-					clip = {},
-					indices,
-					verts,
-					num_Streams,
-					streamsParsed,
-					streamtypes = [],
+				str_len,
+				str_end,
+				geom,
+				subGeom,
+				idx = 0,
+				clip = {},
+				indices,
+				verts,
+				num_Streams,
+				streamsParsed,
+				streamtypes = [],
 
-					props,
-					thisGeo,
-					name = this.readUTF(),
-					geoAdress = this.readU32();
+				props,
+				thisGeo,
+				name = this.readUTF(),
+				geoAdress = this.readU32();
 
 			var mesh = this.getBlock( geoAdress );
 
@@ -932,7 +928,7 @@
 							//geom.addAttribute( 'morphTarget'+frames_parsed, Float32Array, str_len/12, 3 );
 							var buffer = new Float32Array( str_len / 4 );
 							geom.morphTargets.push( {
-								array : buffer
+								array: buffer
 							} );
 
 							//buffer = geom.attributes['morphTarget'+frames_parsed].array
@@ -940,9 +936,9 @@
 
 							while ( this._ptr < str_end ) {
 
-								buffer[ idx ]     = this.readF32();
-								buffer[ idx + 1 ]   = this.readF32();
-								buffer[ idx + 2 ]   = this.readF32();
+								buffer[ idx ] = this.readF32();
+								buffer[ idx + 1 ] = this.readF32();
+								buffer[ idx + 2 ] = this.readF32();
 								idx += 3;
 
 							}
@@ -1055,40 +1051,49 @@
 			var read_func;
 
 			switch ( type ) {
+
 				case AWD_FIELD_INT8:
 					elem_len = 1;
 					read_func = this.readI8;
 					break;
+
 				case AWD_FIELD_INT16:
 					elem_len = 2;
 					read_func = this.readI16;
 					break;
+
 				case AWD_FIELD_INT32:
 					elem_len = 4;
 					read_func = this.readI32;
 					break;
+
 				case AWD_FIELD_BOOL:
 				case AWD_FIELD_UINT8:
 					elem_len = 1;
 					read_func = this.readU8;
 					break;
+
 				case AWD_FIELD_UINT16:
 					elem_len = 2;
 					read_func = this.readU16;
 					break;
+
 				case AWD_FIELD_UINT32:
 				case AWD_FIELD_BADDR:
 					elem_len = 4;
 					read_func = this.readU32;
 					break;
+
 				case AWD_FIELD_FLOAT32:
 					elem_len = 4;
 					read_func = this.readF32;
 					break;
+
 				case AWD_FIELD_FLOAT64:
 					elem_len = 8;
 					read_func = this.readF64;
 					break;
+
 				case AWD_FIELD_VECTOR2x1:
 				case AWD_FIELD_VECTOR3x1:
 				case AWD_FIELD_VECTOR4x1:
@@ -1099,6 +1104,7 @@
 					elem_len = 8;
 					read_func = this.readF64;
 					break;
+
 			}
 
 			if ( elem_len < len ) {
@@ -1219,9 +1225,7 @@
 
 					var c2 = this._data.getUint8( this._ptr ++, littleEndian );
 					var c3 = this._data.getUint8( this._ptr ++, littleEndian );
-					out[ c ++ ] = String.fromCharCode(
-							( c1 & 15 ) << 12 | ( c2 & 63 ) << 6 | c3 & 63
-					);
+					out[ c ++ ] = String.fromCharCode( ( c1 & 15 ) << 12 | ( c2 & 63 ) << 6 | c3 & 63 );
 
 				}
 

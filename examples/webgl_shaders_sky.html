@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - shaders - sky sun shader</title>
@@ -27,9 +27,7 @@
 
 			}
 
-			a {
-				color: #fff;
-			}
+			a { color: #fff; }
 
 		</style>
 	</head>
@@ -44,17 +42,18 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/SkyShader.js"></script>
+		<script src="js/objects/Sky.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var container;
+			}
 
 			var camera, controls, scene, renderer;
 
@@ -65,9 +64,10 @@
 
 			function initSky() {
 
-				// Add Sky Mesh
+				// Add Sky
 				sky = new THREE.Sky();
-				scene.add( sky.mesh );
+				sky.scale.setScalar( 450000 );
+				scene.add( sky );
 
 				// Add Sun Helper
 				sunSphere = new THREE.Mesh(
@@ -95,7 +95,7 @@
 
 				function guiChanged() {
 
-					var uniforms = sky.uniforms;
+					var uniforms = sky.material.uniforms;
 					uniforms.turbidity.value = effectController.turbidity;
 					uniforms.rayleigh.value = effectController.rayleigh;
 					uniforms.luminance.value = effectController.luminance;
@@ -111,7 +111,7 @@
 
 					sunSphere.visible = effectController.sun;
 
-					sky.uniforms.sunPosition.value.copy( sunSphere.position );
+					uniforms.sunPosition.value.copy( sunSphere.position );
 
 					renderer.render( scene, camera );
 

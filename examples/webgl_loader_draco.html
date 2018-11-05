@@ -38,12 +38,17 @@
 		<a href="https://github.com/google/draco" target="_blank" rel="noopener">DRACO</a> loader
 	</div>
 	<script src="../build/three.js"></script>
-	<script src="js/loaders/draco/draco_decoder.js"></script>
-	<script src="js/loaders/draco/DRACOLoader.js"></script>
+	<script src="js/loaders/DRACOLoader.js"></script>
 	<script>
 
 		var camera, scene, renderer;
 
+		var container = document.querySelector( '#container' );
+
+		// Configure and create Draco decoder.
+		THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/' );
+		THREE.DRACOLoader.setDecoderConfig( { type: 'js' } );
+		var dracoLoader = new THREE.DRACOLoader();
 		init();
 		animate();
 
@@ -64,7 +69,7 @@
 			plane.rotation.x = - Math.PI / 2;
 			plane.position.y = 0.03;
 			plane.receiveShadow = true;
-			scene.add(plane);
+			scene.add( plane );
 
 			// Lights
 			var light = new THREE.HemisphereLight( 0x443333, 0x111122 );
@@ -77,16 +82,18 @@
 			light.position.set( - 1, 1, 1 );
 			scene.add( light );
 
-			var loader = new THREE.DRACOLoader();
-			loader.load( 'models/draco/bunny.drc', function ( geometry ) {
+			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
 
 				geometry.computeVertexNormals();
 
-				var material = new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
+
+				// Release decoder resources.
+				THREE.DRACOLoader.releaseDecoderModule();
 
 			} );
 
@@ -125,7 +132,7 @@
 
 			camera.position.x = Math.sin( timer ) * 0.5;
 			camera.position.z = Math.cos( timer ) * 0.5;
-			camera.lookAt( new THREE.Vector3( 0, 0.1, 0 ) );
+			camera.lookAt( 0, 0.1, 0 );
 
 			renderer.render( scene, camera );
 

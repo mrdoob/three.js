@@ -28,7 +28,7 @@
 				color: #ffffff;
 			}
 
-			#oldie a { color:#da0 }
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
 
@@ -39,20 +39,19 @@
 
 		<script src="js/effects/AnaglyphEffect.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var camera, scene, renderer, effect;
+			}
 
-			var mesh, lightMesh, geometry;
+			var container, camera, scene, renderer, effect;
+
 			var spheres = [];
-
-			var directionalLight, pointLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -108,7 +107,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
@@ -136,7 +135,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) / 100;
 				mouseY = ( event.clientY - windowHalfY ) / 100;

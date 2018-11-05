@@ -28,7 +28,7 @@
 				color: yellow;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(0,0,50) !important;
 				color:#fff !important;
 			}
@@ -37,45 +37,38 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dynamic geometry demo - webgl<br />(left click: forward, right click: backward)</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
-				document.getElementById( 'container' ).innerHTML = "";
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
 			}
 
-			var container, stats;
+			var camera, controls, scene, renderer, stats;
 
-			var camera, controls, scene, renderer;
+			var mesh, geometry, material, clock;
 
-			var mesh, texture, geometry, material;
-
-			var worldWidth = 128, worldDepth = 128,
-			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
-
-			var clock = new THREE.Clock();
+			var worldWidth = 128, worldDepth = 128;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = 200;
+
+				clock = new THREE.Clock();
 
 				controls = new THREE.FirstPersonControls( camera );
 
@@ -86,16 +79,20 @@
 				scene.background = new THREE.Color( 0xaaccff );
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
 
-				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry = new THREE.PlaneBufferGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
-				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+				var position = geometry.attributes.position;
+				position.dynamic = true;
 
-					geometry.vertices[ i ].y = 35 * Math.sin( i / 2 );
+				for ( var i = 0; i < position.count; i ++ ) {
+
+					var y = 35 * Math.sin( i / 2 );
+					position.setY( i, y );
 
 				}
 
-				var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+				var texture = new THREE.TextureLoader().load( 'textures/water.jpg' );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 5, 5 );
 
@@ -104,16 +101,13 @@
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -145,16 +139,19 @@
 
 			function render() {
 
-				var delta = clock.getDelta(),
-					time = clock.getElapsedTime() * 10;
+				var delta = clock.getDelta();
+				var time = clock.getElapsedTime() * 10;
 
-				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+				var position = geometry.attributes.position;
 
-					geometry.vertices[ i ].y = 35 * Math.sin( i / 5 + ( time + i ) / 7 );
+				for ( var i = 0; i < position.count; i ++ ) {
+
+					var y = 35 * Math.sin( i / 5 + ( time + i ) / 7 );
+					position.setY( i, y );
 
 				}
 
-				mesh.geometry.verticesNeedUpdate = true;
+				position.needsUpdate = true;
 
 				controls.update( delta );
 				renderer.render( scene, camera );

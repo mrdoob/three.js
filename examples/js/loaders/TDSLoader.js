@@ -1,5 +1,5 @@
 /*
- * Autodesk 3DS threee.js file loader, based on lib3ds.
+ * Autodesk 3DS three.js file loader, based on lib3ds.
  *
  * Loads geometry with uv and materials basic properties with texture support.
  *
@@ -22,14 +22,14 @@ THREE.TDSLoader = function ( manager ) {
 	this.materials = [];
 	this.meshes = [];
 
-	this.path = "";
-
 };
 
 THREE.TDSLoader.prototype = {
 
 	constructor: THREE.TDSLoader,
-	
+
+	crossOrigin: 'anonymous',
+
 	/**
 	 * Load 3ds file from url.
 	 *
@@ -39,17 +39,19 @@ THREE.TDSLoader.prototype = {
 	 * @param {Function} onProgress onProgress callback.
 	 * @param {Function} onError onError callback.
 	 */
-	load : function ( url, onLoad, onProgress, onError ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var path = this.path !== undefined ? this.path : THREE.LoaderUtils.extractUrlBase( url );
 
+		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data ) );
+			onLoad( scope.parse( data, path ) );
 
 		}, onProgress, onError );
 
@@ -63,14 +65,14 @@ THREE.TDSLoader.prototype = {
 	 * @param {String} path Path for external resources.
 	 * @return {Object3D} Group loaded from 3ds file.
 	 */
-	parse : function ( arraybuffer ) {
+	parse: function ( arraybuffer, path ) {
 
 		this.group = new THREE.Group();
 		this.position = 0;
 		this.materials = [];
 		this.meshes = [];
 
-		this.readFile( arraybuffer );
+		this.readFile( arraybuffer, path );
 
 		for ( var i = 0; i < this.meshes.length; i ++ ) {
 
@@ -88,7 +90,7 @@ THREE.TDSLoader.prototype = {
 	 * @method readFile
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
 	 */
-	readFile : function ( arraybuffer ) {
+	readFile: function ( arraybuffer, path ) {
 
 		var data = new DataView( arraybuffer );
 		var chunk = this.readChunk( data );
@@ -107,7 +109,7 @@ THREE.TDSLoader.prototype = {
 				} else if ( next === MDATA ) {
 
 					this.resetPosition( data );
-					this.readMeshData( data );
+					this.readMeshData( data, path );
 
 				} else {
 
@@ -131,7 +133,7 @@ THREE.TDSLoader.prototype = {
 	 * @method readMeshData
 	 * @param {Dataview} data Dataview in use.
 	 */
-	readMeshData : function ( data ) {
+	readMeshData: function ( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
@@ -159,7 +161,7 @@ THREE.TDSLoader.prototype = {
 
 				this.debugMessage( 'Material' );
 				this.resetPosition( data );
-				this.readMaterialEntry( data );
+				this.readMaterialEntry( data, path );
 
 			} else {
 
@@ -179,7 +181,7 @@ THREE.TDSLoader.prototype = {
 	 * @method readNamedObject
 	 * @param {Dataview} data Dataview in use.
 	 */
-	readNamedObject : function ( data ) {
+	readNamedObject: function ( data ) {
 
 		var chunk = this.readChunk( data );
 		var name = this.readString( data, 64 );
@@ -215,7 +217,7 @@ THREE.TDSLoader.prototype = {
 	 * @method readMaterialEntry
 	 * @param {Dataview} data Dataview in use.
 	 */
-	readMaterialEntry : function ( data ) {
+	readMaterialEntry: function ( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
@@ -270,29 +272,29 @@ THREE.TDSLoader.prototype = {
 				material.shininess = shininess;
 				this.debugMessage( '   Shininess : ' + shininess );
 
-			} else if( next === MAT_TEXMAP ) {
+			} else if ( next === MAT_TEXMAP ) {
 
 				this.debugMessage( '   ColorMap' );
 				this.resetPosition( data );
-				material.map = this.readMap( data );
+				material.map = this.readMap( data, path );
 
-			} else if( next === MAT_BUMPMAP ) {
+			} else if ( next === MAT_BUMPMAP ) {
 
 				this.debugMessage( '   BumpMap' );
 				this.resetPosition( data );
-				material.bumpMap = this.readMap( data );
+				material.bumpMap = this.readMap( data, path );
 
-			} else if( next == MAT_OPACMAP ) {
+			} else if ( next === MAT_OPACMAP ) {
 
 				this.debugMessage( '   OpacityMap' );
 				this.resetPosition( data );
-				material.alphaMap = this.readMap( data );
+				material.alphaMap = this.readMap( data, path );
 
-			} else if( next == MAT_SPECMAP ) {
+			} else if ( next === MAT_SPECMAP ) {
 
 				this.debugMessage( '   SpecularMap' );
 				this.resetPosition( data );
-				material.specularMap = this.readMap( data );
+				material.specularMap = this.readMap( data, path );
 
 			} else {
 
@@ -316,24 +318,13 @@ THREE.TDSLoader.prototype = {
 	 * @method readMesh
 	 * @param {Dataview} data Dataview in use.
 	 */
-	readMesh : function ( data ) {
+	readMesh: function ( data ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
 
-		var useBufferGeometry = false;
-		var geometry = null;
+		var geometry = new THREE.BufferGeometry();
 		var uvs = [];
-
-		if ( useBufferGeometry ) {
-
-			geometry = new THREE.BufferGeometry();
-
-		}	else {
-
-			geometry = new THREE.Geometry();
-
-		}
 
 		var material = new THREE.MeshPhongMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
@@ -349,28 +340,17 @@ THREE.TDSLoader.prototype = {
 
 				//BufferGeometry
 
-				if ( useBufferGeometry )	{
+				var vertices = [];
 
-					var vertices = [];
-					for ( var i = 0; i < points; i ++ )		{
+				for ( var i = 0; i < points; i ++ )		{
 
-						vertices.push( this.readFloat( data ) );
-						vertices.push( this.readFloat( data ) );
-						vertices.push( this.readFloat( data ) );
-
-					}
-
-					geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
-
-				} else	{ //Geometry
-
-					for ( var i = 0; i < points; i ++ )		{
-
-						geometry.vertices.push( new THREE.Vector3( this.readFloat( data ), this.readFloat( data ), this.readFloat( data ) ) );
-
-					}
+					vertices.push( this.readFloat( data ) );
+					vertices.push( this.readFloat( data ) );
+					vertices.push( this.readFloat( data ) );
 
 				}
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 			} else if ( next === FACE_ARRAY ) {
 
@@ -385,71 +365,61 @@ THREE.TDSLoader.prototype = {
 
 				//BufferGeometry
 
-				if ( useBufferGeometry )	{
+				var uvs = [];
 
-					var uvs = [];
-					for ( var i = 0; i < texels; i ++ )		{
+				for ( var i = 0; i < texels; i ++ )		{
 
-						uvs.push( this.readFloat( data ) );
-						uvs.push( this.readFloat( data ) );
-
-					}
-					geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( uvs ), 2 ) );
-
-				} else { //Geometry
-
-					uvs = [];
-					for ( var i = 0; i < texels; i ++ )		{
-
-						uvs.push( new THREE.Vector2( this.readFloat( data ), this.readFloat( data ) ) );
-
-					}
+					uvs.push( this.readFloat( data ) );
+					uvs.push( this.readFloat( data ) );
 
 				}
+
+				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+
 
 			} else if ( next === MESH_MATRIX ) {
 
 				this.debugMessage( '   Tranformation Matrix (TODO)' );
 
 				var values = [];
-				for( var i = 0; i < 12; i++ ) {
+				for ( var i = 0; i < 12; i ++ ) {
 
 					values[ i ] = this.readFloat( data );
-				
+
 				}
 
 				var matrix = new THREE.Matrix4();
 
 				//X Line
-				matrix.elements[0] = values[0];
-				matrix.elements[1] = values[6];
-				matrix.elements[2] = values[3];
-				matrix.elements[3] = values[9];
+				matrix.elements[ 0 ] = values[ 0 ];
+				matrix.elements[ 1 ] = values[ 6 ];
+				matrix.elements[ 2 ] = values[ 3 ];
+				matrix.elements[ 3 ] = values[ 9 ];
 
 				//Y Line
-				matrix.elements[4] = values[2];
-				matrix.elements[5] = values[8];
-				matrix.elements[6] = values[5];
-				matrix.elements[7] = values[11];
+				matrix.elements[ 4 ] = values[ 2 ];
+				matrix.elements[ 5 ] = values[ 8 ];
+				matrix.elements[ 6 ] = values[ 5 ];
+				matrix.elements[ 7 ] = values[ 11 ];
 
 				//Z Line
-				matrix.elements[8] = values[1];
-				matrix.elements[9] = values[7];
-				matrix.elements[10] = values[4];
-				matrix.elements[11] = values[10];
+				matrix.elements[ 8 ] = values[ 1 ];
+				matrix.elements[ 9 ] = values[ 7 ];
+				matrix.elements[ 10 ] = values[ 4 ];
+				matrix.elements[ 11 ] = values[ 10 ];
 
 				//W Line
-				matrix.elements[12] = 0;
-				matrix.elements[13] = 0;
-				matrix.elements[14] = 0;
-				matrix.elements[15] = 1;
+				matrix.elements[ 12 ] = 0;
+				matrix.elements[ 13 ] = 0;
+				matrix.elements[ 14 ] = 0;
+				matrix.elements[ 15 ] = 1;
 
 				matrix.transpose();
 
 				var inverse = new THREE.Matrix4();
 				inverse.getInverse( matrix, true );
 				geometry.applyMatrix( inverse );
-				
+
 				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
 
 			} else {
@@ -464,27 +434,7 @@ THREE.TDSLoader.prototype = {
 
 		this.endChunk( chunk );
 
-		if ( ! useBufferGeometry ) {
-
-			//geometry.faceVertexUvs[0][faceIndex][vertexIndex]
-
-			if ( uvs.length > 0 ) {
-
-				var faceUV = [];
-
-				for ( var i = 0; i < geometry.faces.length; i ++ ) {
-
-					faceUV.push( [ uvs[ geometry.faces[ i ].a ], uvs[ geometry.faces[ i ].b ], uvs[ geometry.faces[ i ].c ] ] );
-
-				}
-
-				geometry.faceVertexUvs[ 0 ] = faceUV;
-	
-			}		
-
-			geometry.computeVertexNormals();
-
-		}
+		geometry.computeVertexNormals();
 
 		return mesh;
 
@@ -497,20 +447,24 @@ THREE.TDSLoader.prototype = {
 	 * @param {Dataview} data Dataview in use.
 	 * @param {Mesh} mesh Mesh to be filled with the data read.
 	 */
-	readFaceArray : function ( data, mesh ) {
+	readFaceArray: function ( data, mesh ) {
 
 		var chunk = this.readChunk( data );
 		var faces = this.readWord( data );
 
 		this.debugMessage( '   Faces: ' + faces );
 
+		var index = [];
+
 		for ( var i = 0; i < faces; ++ i ) {
 
-			mesh.geometry.faces.push( new THREE.Face3( this.readWord( data ), this.readWord( data ), this.readWord( data ) ) );
+			index.push( this.readWord( data ), this.readWord( data ), this.readWord( data ) );
 
 			var visibility = this.readWord( data );
 
 		}
+
+		mesh.geometry.setIndex( index );
 
 		//The rest of the FACE_ARRAY chunk is subchunks
 
@@ -561,50 +515,45 @@ THREE.TDSLoader.prototype = {
 	 * @param {Dataview} data Dataview in use.
 	 * @return {Texture} Texture read from this data chunk.
 	 */
-	readMap : function( data ) {
+	readMap: function ( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
 		var texture = {};
 
-		var loader = new THREE.TextureLoader();
-		loader.setPath( this.path );
+		var loader = new THREE.TextureLoader( this.manager );
+		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		while( next !== 0 ) {
+		while ( next !== 0 ) {
 
 			if ( next === MAT_MAPNAME ) {
 
 				var name = this.readString( data, 128 );
 				texture = loader.load( name );
 
-				this.debugMessage( '      File: ' + this.path + name );
+				this.debugMessage( '      File: ' + path + name );
 
-			}
-			else if ( next === MAT_MAP_UOFFSET) {
+			} else if ( next === MAT_MAP_UOFFSET ) {
 
 				texture.offset.x = this.readFloat( data );
 				this.debugMessage( '      OffsetX: ' + texture.offset.x );
 
-			}
-			else if ( next === MAT_MAP_VOFFSET) {
+			} else if ( next === MAT_MAP_VOFFSET ) {
 
 				texture.offset.y = this.readFloat( data );
 				this.debugMessage( '      OffsetY: ' + texture.offset.y );
 
-			}
-			else if ( next === MAT_MAP_USCALE) {
+			} else if ( next === MAT_MAP_USCALE ) {
 
 				texture.repeat.x = this.readFloat( data );
 				this.debugMessage( '      RepeatX: ' + texture.repeat.x );
 
-			}
-			else if ( next === MAT_MAP_VSCALE) {
+			} else if ( next === MAT_MAP_VSCALE ) {
 
 				texture.repeat.y = this.readFloat( data );
 				this.debugMessage( '      RepeatY: ' + texture.repeat.y );
 
-			}
-			else {
+			} else {
 
 				this.debugMessage( '      Unknown map chunk: ' + next.toString( 16 ) );
 
@@ -627,7 +576,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {Dataview} data Dataview in use.
 	 * @return {Object} Object with name and index of the object.
 	 */
-	readMaterialGroup : function ( data ) {
+	readMaterialGroup: function ( data ) {
 
 		var chunk = this.readChunk( data );
 		var name = this.readString( data, 64 );
@@ -654,7 +603,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview.
 	 * @return {Color} Color value read..
 	 */
-	readColor : function ( data ) {
+	readColor: function ( data ) {
 
 		var chunk = this.readChunk( data );
 		var color = new THREE.Color();
@@ -681,7 +630,7 @@ THREE.TDSLoader.prototype = {
 
 		}	else {
 
-			this.debugMessage( '      Unknown color chunk: ' + c.toString( 16 ) );
+			this.debugMessage( '      Unknown color chunk: ' + chunk.toString( 16 ) );
 
 		}
 
@@ -697,7 +646,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview.
 	 * @return {Object} Chunk of data read.
 	 */
-	readChunk : function ( data ) {
+	readChunk: function ( data ) {
 
 		var chunk = {};
 
@@ -717,7 +666,7 @@ THREE.TDSLoader.prototype = {
 	 * @method endChunk
 	 * @param {Object} chunk Data chunk.
 	 */
-	endChunk : function ( chunk ) {
+	endChunk: function ( chunk ) {
 
 		this.position = chunk.end;
 
@@ -730,7 +679,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview.
 	 * @param {Object} chunk Data chunk.
 	 */
-	nextChunk : function ( data, chunk ) {
+	nextChunk: function ( data, chunk ) {
 
 		if ( chunk.cur >= chunk.end ) {
 
@@ -761,7 +710,7 @@ THREE.TDSLoader.prototype = {
 	 * @method resetPosition
 	 * @param {DataView} data Dataview.
 	 */
-	resetPosition : function ( data, chunk ) {
+	resetPosition: function () {
 
 		this.position -= 6;
 
@@ -774,7 +723,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readByte : function ( data ) {
+	readByte: function ( data ) {
 
 		var v = data.getUint8( this.position, true );
 		this.position += 1;
@@ -789,7 +738,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readFloat : function ( data ) {
+	readFloat: function ( data ) {
 
 		try {
 
@@ -812,7 +761,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readInt : function ( data ) {
+	readInt: function ( data ) {
 
 		var v = data.getInt32( this.position, true );
 		this.position += 4;
@@ -827,7 +776,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readShort : function ( data ) {
+	readShort: function ( data ) {
 
 		var v = data.getInt16( this.position, true );
 		this.position += 2;
@@ -842,7 +791,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readDWord : function ( data ) {
+	readDWord: function ( data ) {
 
 		var v = data.getUint32( this.position, true );
 		this.position += 4;
@@ -857,7 +806,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readWord : function ( data ) {
+	readWord: function ( data ) {
 
 		var v = data.getUint16( this.position, true );
 		this.position += 2;
@@ -873,7 +822,7 @@ THREE.TDSLoader.prototype = {
 	 * @param {Number} maxLength Max size of the string to be read.
 	 * @return {String} Data read from the dataview.
 	 */
-	readString : function ( data, maxLength ) {
+	readString: function ( data, maxLength ) {
 
 		var s = '';
 
@@ -895,18 +844,46 @@ THREE.TDSLoader.prototype = {
 	},
 
 	/**
-	 * Set resource path used to determine the file path to attached resources.
+	 * Set path to adjust the path to the original 3ds file.
 	 *
 	 * @method setPath
-	 * @param {String} path Path to resources.
+	 * @param {String} path Path to file.
 	 * @return Self for chaining.
 	 */
-	setPath : function ( path ) {
+	setPath: function ( path ) {
 
-		if(path !== undefined)
-		{
-			this.path = path;
-		}
+		this.path = path;
+
+		return this;
+
+	},
+
+	/**
+	 * Set resource path used to determine the path to attached resources like textures.
+	 *
+	 * @method setResourcePath
+	 * @param {String} resourcePath Path to resources.
+	 * @return Self for chaining.
+	 */
+	setResourcePath: function ( resourcePath ) {
+
+		this.resourcePath = resourcePath;
+
+		return this;
+
+	},
+
+	/**
+	 * Set crossOrigin value to configure CORS settings
+	 * for the image loading process.
+	 *
+	 * @method setCrossOrigin
+	 * @param {String} crossOrigin crossOrigin string.
+	 * @return Self for chaining.
+	 */
+	setCrossOrigin: function ( crossOrigin ) {
+
+		this.crossOrigin = crossOrigin;
 
 		return this;
 
@@ -920,7 +897,7 @@ THREE.TDSLoader.prototype = {
 	 * @method debugMessage
 	 * @param {Object} message Debug message to print to the console.
 	 */
-	debugMessage : function ( message ) {
+	debugMessage: function ( message ) {
 
 		if ( this.debug ) {
 
@@ -1148,4 +1125,3 @@ var VIEWPORT_DATA = 0x7011;
 var VIEWPORT_DATA_3 = 0x7012;
 var VIEWPORT_SIZE = 0x7020;
 var NETWORK_VIEW = 0x7030;
-

@@ -30,19 +30,21 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - basic use
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var stats, clock;
 			var scene, camera, renderer, mixer;
@@ -54,8 +56,6 @@
 
 				scene = new THREE.Scene();
 
-				var container = document.getElementById( 'container' );
-
 				//
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -64,13 +64,13 @@
 
 				//
 
-				var axisHelper = new THREE.AxisHelper( 10 );
-				scene.add( axisHelper );
+				var axesHelper = new THREE.AxesHelper( 10 );
+				scene.add( axesHelper );
 
 				//
 
 				var geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true } );
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
@@ -97,9 +97,12 @@
 				// COLOR
 				var colorKF = new THREE.ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
 
+				// OPACITY
+				var opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
+
 				// create an animation sequence with the tracks
 				// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
-				var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF ] );
+				var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
 
 				// setup the AnimationMixer
 				mixer = new THREE.AnimationMixer( mesh );
@@ -110,15 +113,15 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 

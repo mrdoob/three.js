@@ -254,15 +254,15 @@ Object.assign( Vector4.prototype, {
 
 		if ( s < 0.0001 ) {
 
-			 this.x = 1;
-			 this.y = 0;
-			 this.z = 0;
+			this.x = 1;
+			this.y = 0;
+			this.z = 0;
 
 		} else {
 
-			 this.x = q.x / s;
-			 this.y = q.y / s;
-			 this.z = q.z / s;
+			this.x = q.x / s;
+			this.y = q.y / s;
+			this.z = q.z / s;
 
 		}
 
@@ -538,7 +538,7 @@ Object.assign( Vector4.prototype, {
 
 	},
 
-	lengthManhattan: function () {
+	manhattanLength: function () {
 
 		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z ) + Math.abs( this.w );
 

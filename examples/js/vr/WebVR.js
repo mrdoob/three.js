@@ -7,180 +7,232 @@
 
 var WEBVR = {
 
-	isAvailable: function () {
+	createButton: function ( renderer, options ) {
 
-		console.warn( 'WEBVR: isAvailable() is being deprecated. Use .checkAvailability() instead.' );
-		return navigator.getVRDisplays !== undefined;
+		if ( options && options.frameOfReferenceType ) {
 
-	},
-
-	checkAvailability: function () {
-
-		return new Promise( function( resolve, reject ) {
-
-			if ( navigator.getVRDisplays !== undefined ) {
-
-				navigator.getVRDisplays().then( function ( displays ) {
-
-					if ( displays.length === 0 ) {
-
-						reject( 'WebVR supported, but no VRDisplays found.' );
-
-					} else {
-
-						resolve();
-
-					}
-
-				} );
-
-			} else {
-
-				reject( 'Your browser does not support WebVR. See <a href="https://webvr.info">webvr.info</a> for assistance.' );
-
-			}
-
-		} );
-
-	},
-
-	getVRDisplay: function ( onDisplay ) {
-
-		if ( 'getVRDisplays' in navigator ) {
-
-			navigator.getVRDisplays()
-				.then( function ( displays ) {
-					onDisplay( displays[ 0 ] );
-				} );
+			renderer.vr.setFrameOfReferenceType( options.frameOfReferenceType );
 
 		}
 
-	},
+		function showEnterVR( device ) {
 
-	getMessage: function () {
+			button.style.display = '';
 
-		console.warn( 'WEBVR: getMessage() is being deprecated. Use .getMessageContainer( message ) instead.' );
-
-		var message;
-
-		if ( navigator.getVRDisplays ) {
-
-			navigator.getVRDisplays().then( function ( displays ) {
-
-				if ( displays.length === 0 ) message = 'WebVR supported, but no VRDisplays found.';
-
-			} );
-
-		} else {
-
-			message = 'Your browser does not support WebVR. See <a href="http://webvr.info">webvr.info</a> for assistance.';
-
-		}
-
-		if ( message !== undefined ) {
-
-			var container = document.createElement( 'div' );
-			container.style.position = 'absolute';
-			container.style.left = '0';
-			container.style.top = '0';
-			container.style.right = '0';
-			container.style.zIndex = '999';
-			container.align = 'center';
-
-			var error = document.createElement( 'div' );
-			error.style.fontFamily = 'sans-serif';
-			error.style.fontSize = '16px';
-			error.style.fontStyle = 'normal';
-			error.style.lineHeight = '26px';
-			error.style.backgroundColor = '#fff';
-			error.style.color = '#000';
-			error.style.padding = '10px 20px';
-			error.style.margin = '50px';
-			error.style.display = 'inline-block';
-			error.innerHTML = message;
-			container.appendChild( error );
-
-			return container;
-
-		}
-
-	},
-
-	getMessageContainer: function ( message ) {
-
-		var container = document.createElement( 'div' );
-		container.style.position = 'absolute';
-		container.style.left = '0';
-		container.style.top = '0';
-		container.style.right = '0';
-		container.style.zIndex = '999';
-		container.align = 'center';
-
-		var error = document.createElement( 'div' );
-		error.style.fontFamily = 'sans-serif';
-		error.style.fontSize = '16px';
-		error.style.fontStyle = 'normal';
-		error.style.lineHeight = '26px';
-		error.style.backgroundColor = '#fff';
-		error.style.color = '#000';
-		error.style.padding = '10px 20px';
-		error.style.margin = '50px';
-		error.style.display = 'inline-block';
-		error.innerHTML = message;
-		container.appendChild( error );
-
-		return container;
-
-	},
-
-	getButton: function ( display, canvas ) {
-
-		if ( 'VREffect' in THREE && display instanceof THREE.VREffect ) {
-
-			console.error( 'WebVR.getButton() now expects a VRDisplay.' );
-			return document.createElement( 'button' );
-
-		}
-
-		var button = document.createElement( 'button' );
-		button.style.position = 'absolute';
-		button.style.left = 'calc(50% - 50px)';
-		button.style.bottom = '20px';
-		button.style.width = '100px';
-		button.style.border = '0';
-		button.style.padding = '8px';
-		button.style.cursor = 'pointer';
-		button.style.backgroundColor = '#000';
-		button.style.color = '#fff';
-		button.style.fontFamily = 'sans-serif';
-		button.style.fontSize = '13px';
-		button.style.fontStyle = 'normal';
-		button.style.textAlign = 'center';
-		button.style.zIndex = '999';
-
-		if ( display ) {
+			button.style.cursor = 'pointer';
+			button.style.left = 'calc(50% - 50px)';
+			button.style.width = '100px';
 
 			button.textContent = 'ENTER VR';
+
+			button.onmouseenter = function () { button.style.opacity = '1.0'; };
+			button.onmouseleave = function () { button.style.opacity = '0.5'; };
+
 			button.onclick = function () {
 
-				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas } ] );
+				device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
 
 			};
 
-			window.addEventListener( 'vrdisplaypresentchange', function () {
-
-				button.textContent = display.isPresenting ? 'EXIT VR' : 'ENTER VR';
-
-			}, false );
-
-		} else {
-
-			button.textContent = 'NO VR DISPLAY';
+			renderer.vr.setDevice( device );
 
 		}
 
-		return button;
+		function showEnterXR( device ) {
 
+			var currentSession = null;
+
+			function onSessionStarted( session ) {
+
+				session.addEventListener( 'end', onSessionEnded );
+
+				renderer.vr.setSession( session );
+				button.textContent = 'EXIT VR';
+
+				currentSession = session;
+
+			}
+
+			function onSessionEnded( event ) {
+
+				currentSession.removeEventListener( 'end', onSessionEnded );
+
+				renderer.vr.setSession( null );
+				button.textContent = 'ENTER VR';
+
+				currentSession = null;
+
+			}
+
+			//
+
+			button.style.display = '';
+
+			button.style.cursor = 'pointer';
+			button.style.left = 'calc(50% - 50px)';
+			button.style.width = '100px';
+
+			button.textContent = 'ENTER VR';
+
+			button.onmouseenter = function () { button.style.opacity = '1.0'; };
+			button.onmouseleave = function () { button.style.opacity = '0.5'; };
+
+			button.onclick = function () {
+
+				if ( currentSession === null ) {
+
+					device.requestSession( { immersive: true, exclusive: true /* DEPRECATED */ } ).then( onSessionStarted );
+
+				} else {
+
+					currentSession.end();
+
+				}
+
+			};
+
+			renderer.vr.setDevice( device );
+
+		}
+
+		function showVRNotFound() {
+
+			button.style.display = '';
+
+			button.style.cursor = 'auto';
+			button.style.left = 'calc(50% - 75px)';
+			button.style.width = '150px';
+
+			button.textContent = 'VR NOT FOUND';
+
+			button.onmouseenter = null;
+			button.onmouseleave = null;
+
+			button.onclick = null;
+
+			renderer.vr.setDevice( null );
+
+		}
+
+		function stylizeElement( element ) {
+
+			element.style.position = 'absolute';
+			element.style.bottom = '20px';
+			element.style.padding = '12px 6px';
+			element.style.border = '1px solid #fff';
+			element.style.borderRadius = '4px';
+			element.style.background = 'rgba(0,0,0,0.1)';
+			element.style.color = '#fff';
+			element.style.font = 'normal 13px sans-serif';
+			element.style.textAlign = 'center';
+			element.style.opacity = '0.5';
+			element.style.outline = 'none';
+			element.style.zIndex = '999';
+
+		}
+
+		if ( 'xr' in navigator ) {
+
+			var button = document.createElement( 'button' );
+			button.style.display = 'none';
+
+			stylizeElement( button );
+
+			navigator.xr.requestDevice().then( function ( device ) {
+
+				device.supportsSession( { immersive: true, exclusive: true /* DEPRECATED */ } )
+					.then( function () { showEnterXR( device ); } )
+					.catch( showVRNotFound );
+
+			} ).catch( showVRNotFound );
+
+			return button;
+
+		} else if ( 'getVRDisplays' in navigator ) {
+
+			var button = document.createElement( 'button' );
+			button.style.display = 'none';
+
+			stylizeElement( button );
+
+			window.addEventListener( 'vrdisplayconnect', function ( event ) {
+
+				showEnterVR( event.display );
+
+			}, false );
+
+			window.addEventListener( 'vrdisplaydisconnect', function ( event ) {
+
+				showVRNotFound();
+
+			}, false );
+
+			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
+
+				button.textContent = event.display.isPresenting ? 'EXIT VR' : 'ENTER VR';
+
+			}, false );
+
+			window.addEventListener( 'vrdisplayactivate', function ( event ) {
+
+				event.display.requestPresent( [ { source: renderer.domElement } ] );
+
+			}, false );
+
+			navigator.getVRDisplays()
+				.then( function ( displays ) {
+
+					if ( displays.length > 0 ) {
+
+						showEnterVR( displays[ 0 ] );
+
+					} else {
+
+						showVRNotFound();
+
+					}
+
+				} ).catch( showVRNotFound );
+
+			return button;
+
+		} else {
+
+			var message = document.createElement( 'a' );
+			message.href = 'https://webvr.info';
+			message.innerHTML = 'WEBVR NOT SUPPORTED';
+
+			message.style.left = 'calc(50% - 90px)';
+			message.style.width = '180px';
+			message.style.textDecoration = 'none';
+
+			stylizeElement( message );
+
+			return message;
+
+		}
+
+	},
+
+	// DEPRECATED
+
+	checkAvailability: function () {
+		console.warn( 'WEBVR.checkAvailability has been deprecated.' );
+		return new Promise( function () {} );
+	},
+
+	getMessageContainer: function () {
+		console.warn( 'WEBVR.getMessageContainer has been deprecated.' );
+		return document.createElement( 'div' );
+	},
+
+	getButton: function () {
+		console.warn( 'WEBVR.getButton has been deprecated.' );
+		return document.createElement( 'div' );
+	},
+
+	getVRDisplay: function () {
+		console.warn( 'WEBVR.getVRDisplay has been deprecated.' );
 	}
 
 };

@@ -43,6 +43,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FlyControls.js"></script>
+		<script src="js/objects/Lensflare.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -86,13 +87,12 @@
 
 				var s = 250;
 
-				var cube = new THREE.BoxGeometry( s, s, s );
+				var geometry = new THREE.BoxBufferGeometry( s, s, s );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 50 } );
-
 
 				for ( var i = 0; i < 3000; i ++ ) {
 
-					var mesh = new THREE.Mesh( cube, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
 					mesh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
@@ -113,21 +113,19 @@
 				// lights
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.05 );
-				dirLight.position.set( 0, -1, 0 ).normalize();
+				dirLight.position.set( 0, - 1, 0 ).normalize();
+				dirLight.color.setHSL( 0.1, 0.7, 0.5 );
 				scene.add( dirLight );
 
-				dirLight.color.setHSL( 0.1, 0.7, 0.5 );
-
-				// lens flares
+				// lensflares
 				var textureLoader = new THREE.TextureLoader();
 
-				var textureFlare0 = textureLoader.load( "textures/lensflare/lensflare0.png" );
-				var textureFlare2 = textureLoader.load( "textures/lensflare/lensflare2.png" );
-				var textureFlare3 = textureLoader.load( "textures/lensflare/lensflare3.png" );
+				var textureFlare0 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
+				var textureFlare3 = textureLoader.load( 'textures/lensflare/lensflare3.png' );
 
-				addLight( 0.55, 0.9, 0.5, 5000, 0, -1000 );
-				addLight( 0.08, 0.8, 0.5,    0, 0, -1000 );
-				addLight( 0.995, 0.5, 0.9, 5000, 5000, -1000 );
+				addLight( 0.55, 0.9, 0.5, 5000, 0, - 1000 );
+				addLight( 0.08, 0.8, 0.5, 0, 0, - 1000 );
+				addLight( 0.995, 0.5, 0.9, 5000, 5000, - 1000 );
 
 				function addLight( h, s, l, x, y, z ) {
 
@@ -136,24 +134,13 @@
 					light.position.set( x, y, z );
 					scene.add( light );
 
-					var flareColor = new THREE.Color( 0xffffff );
-					flareColor.setHSL( h, s, l + 0.5 );
-
-					var lensFlare = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
-
-					lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-
-					lensFlare.add( textureFlare3, 60, 0.6, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare3, 70, 0.7, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
-
-					lensFlare.customUpdateCallback = lensFlareUpdateCallback;
-					lensFlare.position.copy( light.position );
-
-					scene.add( lensFlare );
+					var lensflare = new THREE.Lensflare();
+					lensflare.addElement( new THREE.LensflareElement( textureFlare0, 700, 0, light.color ) );
+					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 60, 0.6 ) );
+					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 0.7 ) );
+					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 120, 0.9 ) );
+					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 1 ) );
+					light.add( lensflare );
 
 				}
 
@@ -182,33 +169,7 @@
 
 			//
 
-			 function lensFlareUpdateCallback( object ) {
-
-				var f, fl = object.lensFlares.length;
-				var flare;
-				var vecX = -object.positionScreen.x * 2;
-				var vecY = -object.positionScreen.y * 2;
-
-
-				for( f = 0; f < fl; f++ ) {
-
-					flare = object.lensFlares[ f ];
-
-					flare.x = object.positionScreen.x + vecX * flare.distance;
-					flare.y = object.positionScreen.y + vecY * flare.distance;
-
-					flare.rotation = 0;
-
-				}
-
-				object.lensFlares[ 2 ].y += 0.025;
-				object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
-
-			}
-
-			//
-
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

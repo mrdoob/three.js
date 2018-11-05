@@ -14,23 +14,17 @@ import {
 
 	MirroredRepeatWrapping,
 	RepeatWrapping
-} from '../constants';
-import { _Math } from '../math/Math';
-import { MaterialLoader } from './MaterialLoader';
-import { TextureLoader } from './TextureLoader';
-import { Color } from '../math/Color';
+} from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { MaterialLoader } from './MaterialLoader.js';
+import { TextureLoader } from './TextureLoader.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Loader() {
-
-	this.onLoadStart = function () {};
-	this.onLoadProgress = function () {};
-	this.onLoadComplete = function () {};
-
-}
+function Loader() {}
 
 Loader.Handlers = {
 
@@ -67,19 +61,13 @@ Loader.Handlers = {
 
 Object.assign( Loader.prototype, {
 
-	crossOrigin: undefined,
+	crossOrigin: 'anonymous',
 
-	extractUrlBase: function ( url ) {
+	onLoadStart: function () {},
 
-		var parts = url.split( '/' );
+	onLoadProgress: function () {},
 
-		if ( parts.length === 1 ) return './';
-
-		parts.pop();
-
-		return parts.join( '/' ) + '/';
-
-	},
+	onLoadComplete: function () {},
 
 	initMaterials: function ( materials, texturePath, crossOrigin ) {
 
@@ -265,7 +253,7 @@ Object.assign( Loader.prototype, {
 						json.normalMap = loadTexture( value, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 						break;
 					case 'mapNormalFactor':
-						json.normalScale = [ value, value ];
+						json.normalScale = value;
 						break;
 					case 'mapNormalRepeat':
 					case 'mapNormalOffset':
@@ -350,6 +338,5 @@ Object.assign( Loader.prototype, {
 	} )()
 
 } );
-
 
 export { Loader };

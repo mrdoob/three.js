@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js raycast - texture</title>
@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #ffffff;
 				margin: 0px;
@@ -30,13 +30,9 @@
 				padding: 5px;
 			}
 
-			.control {
-				margin-bottom: 3px;
-			}
+			.control { margin-bottom: 3px; }
 
-			input {
-				width: 50px;
-			}
+			input { width: 50px; }
 		</style>
 	</head>
 	<body>
@@ -66,11 +62,14 @@
 				Repeat : X <input type="number" value="1" step="0.1" onchange="setRepeatU(this)" />
 				Y <input type="number" value="1" step="0.1" onchange="setRepeatV(this)" />
 			</div>
+			<div class="control">
+				Rotation : <input type="number" value="0" step="0.1" onchange="setRotation(this)" />
+			</div>
 		</fieldset>
 		<script src="../build/three.js"></script>
 		<script>
 
-			CanvasTexture = function ( parentTexture ) {
+			var CanvasTexture = function ( parentTexture ) {
 
 				this._canvas = document.createElement( "canvas" );
 				this._canvas.width = this._canvas.height = 1024;
@@ -85,7 +84,7 @@
 
 				var that = this;
 				this._background = document.createElement( "img" );
-				this._background.addEventListener( "load", function ( event ) {
+				this._background.addEventListener( "load", function () {
 
 					that._canvas.width = that._background.naturalWidth;
 					that._canvas.height = that._background.naturalHeight;
@@ -178,10 +177,7 @@
 
 				}
 
-			}
-
-		</script>
-		<script>
+			};
 
 			var width = window.innerWidth;
 			var height = window.innerHeight;
@@ -222,20 +218,15 @@
 				cubeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 				canvas = new CanvasTexture( cubeTexture );
 				var cubeMaterial = new THREE.MeshBasicMaterial( { map: cubeTexture } );
-				var cubeGeometry = new THREE.BoxGeometry( 20, 20, 20 );
+				var cubeGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				var uvs = cubeGeometry.attributes.uv.array;
 				// Set a specific texture mapping.
-				var uvs;
-				for ( var i = 0; i < cubeGeometry.faceVertexUvs[ 0 ].length; i ++ ) {
+				for ( var i = 0; i < uvs.length; i ++ ) {
 
-					uvs = cubeGeometry.faceVertexUvs[ 0 ][ i ];
-					for ( var j = 0; j < 3; j ++ ) {
-
-						if ( uvs[ j ].x < 0.1 ) uvs[ j ].x = - 1;
-						if ( uvs[ j ].y < 0.1 ) uvs[ j ].y = - 1;
-
-					}
+					uvs[ i ] *= 2;
 
 				}
+
 				var cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
 				cube.position.x = 4;
 				cube.position.y = - 5;
@@ -370,6 +361,12 @@
 			function setRepeatV( that ) {
 
 				circleTexture.repeat.y = parseFloat( that.value );
+
+			}
+
+			function setRotation( that ) {
+
+				circleTexture.rotation = parseFloat( that.value );
 
 			}
 

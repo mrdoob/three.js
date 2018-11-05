@@ -14,7 +14,6 @@
  *
  * Materials now supported, material colors supported
  * Zip support, requires jszip
- * TextDecoder polyfill required by some browsers (particularly IE, Edge)
  * No constellation support (yet)!
  *
  */
@@ -34,12 +33,20 @@ THREE.AMFLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function( text ) {
+		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 
@@ -59,7 +66,7 @@ THREE.AMFLoader.prototype = {
 
 				try {
 
-					zip = new JSZip( data );
+					zip = new JSZip( data ); // eslint-disable-line no-undef
 
 				} catch ( e ) {
 
@@ -87,14 +94,7 @@ THREE.AMFLoader.prototype = {
 
 			}
 
-			if ( window.TextDecoder === undefined ) {
-
-				console.log( 'THREE.AMFLoader: TextDecoder not present. Please use TextDecoder polyfill.' );
-				return null;
-
-			}
-
-			var fileText = new TextDecoder( 'utf-8' ).decode( view );
+			var fileText = THREE.LoaderUtils.decodeText( view );
 			var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
 			if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
@@ -146,15 +146,15 @@ THREE.AMFLoader.prototype = {
 
 			var loadedMaterial = null;
 
-			for ( var i = 0; i < node.children.length; i ++ ) {
+			for ( var i = 0; i < node.childNodes.length; i ++ ) {
 
-				var matChildEl = node.children[ i ];
+				var matChildEl = node.childNodes[ i ];
 
 				if ( matChildEl.nodeName === 'metadata' && matChildEl.attributes.type !== undefined ) {
 
 					if ( matChildEl.attributes.type.value === 'name' ) {
 
-						matname = matChildEl.textContent;
+						matName = matChildEl.textContent;
 
 					}
 
@@ -187,9 +187,9 @@ THREE.AMFLoader.prototype = {
 
 			var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
 
-			for ( var i = 0; i < node.children.length; i ++ ) {
+			for ( var i = 0; i < node.childNodes.length; i ++ ) {
 
-				var matColor = node.children[ i ];
+				var matColor = node.childNodes[ i ];
 
 				if ( matColor.nodeName === 'r' ) {
 
@@ -371,13 +371,13 @@ THREE.AMFLoader.prototype = {
 		var amfScale = loadDocumentScale( xmlData );
 		var amfMaterials = {};
 		var amfObjects = {};
-		var children = xmlData.documentElement.children;
+		var childNodes = xmlData.documentElement.childNodes;
 
 		var i, j;
 
-		for ( i = 0; i < children.length; i ++ ) {
+		for ( i = 0; i < childNodes.length; i ++ ) {
 
-			var child = children[ i ];
+			var child = childNodes[ i ];
 
 			if ( child.nodeName === 'metadata' ) {
 
@@ -465,7 +465,7 @@ THREE.AMFLoader.prototype = {
 					newGeometry.setIndex( volume.triangles );
 					newGeometry.addAttribute( 'position', vertices.clone() );
 
-					if( normals ) {
+					if ( normals ) {
 
 						newGeometry.addAttribute( 'normal', normals.clone() );
 

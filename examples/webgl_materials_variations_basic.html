@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #000;
 				margin: 0px;
@@ -31,12 +31,16 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -76,10 +80,6 @@
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				var shininess = 50, specular = 0x333333;
-
-				var materials = [];
-
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -93,7 +93,7 @@
 
 						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 );
+							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 );
 
 							var material = new THREE.MeshBasicMaterial( {
 								map: imgTexture,
@@ -126,7 +126,7 @@
 						height: 1,
 						curveSegments: 1
 
-					});
+					} );
 
 					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
@@ -135,16 +135,16 @@
 
 				}
 
-				addLabel( "+hue", new THREE.Vector3( -350, 0, 0 ) );
+				addLabel( "+hue", new THREE.Vector3( - 350, 0, 0 ) );
 				addLabel( "-hue", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-reflectivity", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "-reflectivity", new THREE.Vector3( 0, - 300, 0 ) );
 				addLabel( "+reflectivity", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
+				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
 
-				addLabel( "envMap", new THREE.Vector3( -350, 300, 0 ) );
+				addLabel( "envMap", new THREE.Vector3( - 350, 300, 0 ) );
 				addLabel( "no envMap", new THREE.Vector3( 350, 300, 0 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );

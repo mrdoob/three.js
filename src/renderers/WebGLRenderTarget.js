@@ -1,8 +1,7 @@
-import { EventDispatcher } from '../core/EventDispatcher';
-import { Texture } from '../textures/Texture';
-import { LinearFilter } from '../constants';
-import { Vector4 } from '../math/Vector4';
-import { _Math } from '../math/Math';
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { Texture } from '../textures/Texture.js';
+import { LinearFilter } from '../constants.js';
+import { Vector4 } from '../math/Vector4.js';
 
 /**
  * @author szimek / https://github.com/szimek/
@@ -16,8 +15,6 @@ import { _Math } from '../math/Math';
  * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 */
 function WebGLRenderTarget( width, height, options ) {
-
-	this.uuid = _Math.generateUUID();
 
 	this.width = width;
 	this.height = height;
@@ -33,13 +30,17 @@ function WebGLRenderTarget( width, height, options ) {
 
 	this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
+	this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : true;
+
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 	this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
 }
 
-Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
+WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: WebGLRenderTarget,
 
 	isWebGLRenderTarget: true,
 

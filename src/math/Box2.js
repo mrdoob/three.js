@@ -1,4 +1,4 @@
-import { Vector2 } from './Vector2';
+import { Vector2 } from './Vector2.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -84,17 +84,29 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	getCenter: function ( optionalTarget ) {
+	getCenter: function ( target ) {
 
-		var result = optionalTarget || new Vector2();
-		return this.isEmpty() ? result.set( 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box2: .getCenter() target is now required' );
+			target = new Vector2();
+
+		}
+
+		return this.isEmpty() ? target.set( 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	getSize: function ( optionalTarget ) {
+	getSize: function ( target ) {
 
-		var result = optionalTarget || new Vector2();
-		return this.isEmpty() ? result.set( 0, 0 ) : result.subVectors( this.max, this.min );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box2: .getSize() target is now required' );
+			target = new Vector2();
+
+		}
+
+		return this.isEmpty() ? target.set( 0, 0 ) : target.subVectors( this.max, this.min );
 
 	},
 
@@ -139,14 +151,19 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	getParameter: function ( point, optionalTarget ) {
+	getParameter: function ( point, target ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		var result = optionalTarget || new Vector2();
+		if ( target === undefined ) {
 
-		return result.set(
+			console.warn( 'THREE.Box2: .getParameter() target is now required' );
+			target = new Vector2();
+
+		}
+
+		return target.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y )
 		);
@@ -162,10 +179,16 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	clampPoint: function ( point, optionalTarget ) {
+	clampPoint: function ( point, target ) {
 
-		var result = optionalTarget || new Vector2();
-		return result.copy( point ).clamp( this.min, this.max );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box2: .clampPoint() target is now required' );
+			target = new Vector2();
+
+		}
+
+		return target.copy( point ).clamp( this.min, this.max );
 
 	},
 

@@ -3,8 +3,8 @@
  * @author atix / arthursilber.de
  */
 
-import { Texture } from './Texture';
-import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants';
+import { Texture } from './Texture.js';
+import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants.js';
 
 function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
 

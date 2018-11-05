@@ -37,6 +37,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/geometries/DecalGeometry.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -45,7 +46,7 @@
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, stats;
-		var mesh, decal;
+		var mesh;
 		var raycaster;
 		var line;
 
@@ -79,13 +80,12 @@
 		var position = new THREE.Vector3();
 		var orientation = new THREE.Euler();
 		var size = new THREE.Vector3( 10, 10, 10 );
-		var up = new THREE.Vector3( 0, 1, 0 );
 
 		var params = {
 			minScale: 10,
 			maxScale: 20,
 			rotate: true,
-			clear: function() {
+			clear: function () {
 
 				removeDecals();
 
@@ -121,20 +121,20 @@
 			scene.add( light );
 
 			var light = new THREE.DirectionalLight( 0xccccff, 1 );
-			light.position.set( -1, 0.75, -0.5 );
+			light.position.set( - 1, 0.75, - 0.5 );
 			scene.add( light );
 
-			var geometry = new THREE.Geometry();
-			geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
+			var geometry = new THREE.BufferGeometry();
+			geometry.setFromPoints( [ new THREE.Vector3(), new THREE.Vector3() ] );
 
-			line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { linewidth: 4 } ) );
+			line = new THREE.Line( geometry, new THREE.LineBasicMaterial() );
 			scene.add( line );
 
 			loadLeePerrySmith();
 
 			raycaster = new THREE.Raycaster();
 
-			mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
+			mouseHelper = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
 			mouseHelper.visible = false;
 			scene.add( mouseHelper );
 
@@ -142,7 +142,7 @@
 
 			var moved = false;
 
-			controls.addEventListener( 'change', function() {
+			controls.addEventListener( 'change', function () {
 
 				moved = true;
 
@@ -154,7 +154,7 @@
 
 			}, false );
 
-			window.addEventListener( 'mouseup', function() {
+			window.addEventListener( 'mouseup', function () {
 
 				checkIntersection();
 				if ( ! moved && intersection.intersects ) shoot();
@@ -202,15 +202,17 @@
 					intersection.point.copy( p );
 
 					var n = intersects[ 0 ].face.normal.clone();
+					n.transformDirection( mesh.matrixWorld );
 					n.multiplyScalar( 10 );
 					n.add( intersects[ 0 ].point );
 
 					intersection.normal.copy( intersects[ 0 ].face.normal );
 					mouseHelper.lookAt( n );
 
-					line.geometry.vertices[ 0 ].copy( intersection.point );
-					line.geometry.vertices[ 1 ].copy( n );
-					line.geometry.verticesNeedUpdate = true;
+					var positions = line.geometry.attributes.position;
+					positions.setXYZ( 0, p.x, p.y, p.z );
+					positions.setXYZ( 1, n.x, n.y, n.z );
+					positions.needsUpdate = true;
 
 					intersection.intersects = true;
 
@@ -235,21 +237,21 @@
 
 		}
 
-		function loadLeePerrySmith( callback ) {
+		function loadLeePerrySmith() {
 
-			var loader = new THREE.JSONLoader();
+			var loader = new THREE.GLTFLoader();
 
-			loader.load( 'obj/leeperrysmith/LeePerrySmith.js', function( geometry ) {
+			loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
-				var material = new THREE.MeshPhongMaterial( {
+				mesh = gltf.scene.children[ 0 ];
+				mesh.material = new THREE.MeshPhongMaterial( {
 					specular: 0x111111,
-					map: textureLoader.load( 'obj/leeperrysmith/Map-COL.jpg' ),
-					specularMap: textureLoader.load( 'obj/leeperrysmith/Map-SPEC.jpg' ),
-					normalMap: textureLoader.load( 'obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+					map: textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' ),
+					specularMap: textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' ),
+					normalMap: textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
 					shininess: 25
 				} );
 
-				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 				mesh.scale.set( 10, 10, 10 );
 
@@ -279,7 +281,7 @@
 
 		function removeDecals() {
 
-			decals.forEach( function( d ) {
+			decals.forEach( function ( d ) {
 
 				scene.remove( d );
 

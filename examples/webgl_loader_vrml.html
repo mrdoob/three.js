@@ -21,7 +21,12 @@
 				z-index: 100;
 				display:block;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			#info a, .button {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
 		</style>
 	</head>
 
@@ -38,18 +43,20 @@
 
 		<script src="js/loaders/VRMLLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
 			var camera, controls, scene, renderer;
-
-			var cross;
 
 			init();
 			animate();
@@ -60,9 +67,6 @@
 				camera.position.z = 6;
 
 				controls = new THREE.OrbitControls( camera );
-
-				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
 
 				scene = new THREE.Scene();
 				scene.add( camera );
@@ -84,7 +88,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

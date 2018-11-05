@@ -35,19 +35,21 @@
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer, scene, camera, stats;
 			var objects = [];
 
-
-			var WIDTH = window.innerWidth,
-				HEIGHT = window.innerHeight;
+			var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
 
 			init();
 			animate();
@@ -61,39 +63,28 @@
 				scene.background = new THREE.Color( 0x111111 );
 				scene.fog = new THREE.Fog( 0x111111, 150, 200 );
 
-				root = new THREE.Object3D();
-
 				var subdivisions = 6;
 				var recursion = 1;
 
-				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
-
+				var points = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
 				var spline = new THREE.CatmullRomCurve3( points );
-				var geometrySpline = new THREE.Geometry();
 
-				for ( var i = 0; i < points.length * subdivisions; i ++ ) {
+				var samples = spline.getPoints( points.length * subdivisions );
+				var geometrySpline = new THREE.BufferGeometry().setFromPoints( samples );
 
-					var index = i / ( points.length * subdivisions );
-					var position = spline.getPoint( index );
+				var line = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
+				line.computeLineDistances();
 
-					geometrySpline.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
-
-				}
+				objects.push( line );
+				scene.add( line );
 
 				var geometryCube = cube( 50 );
 
-				geometryCube.computeLineDistances();
-				geometrySpline.computeLineDistances();
+				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
+				lineSegments.computeLineDistances();
 
-				var object = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
-
-				objects.push( object );
-				scene.add( object );
-
-				var object = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ) );
-
-				objects.push( object );
-				scene.add( object );
+				objects.push( lineSegments );
+				scene.add( lineSegments );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -115,46 +106,48 @@
 
 				var h = size * 0.5;
 
-				var geometry = new THREE.Geometry();
+				var geometry = new THREE.BufferGeometry();
+				var position = [];
 
-				geometry.vertices.push(
-					new THREE.Vector3( -h, -h, -h ),
-					new THREE.Vector3( -h, h, -h ),
+				position.push(
+					- h, - h, - h,
+					- h, h, - h,
 
-					new THREE.Vector3( -h, h, -h ),
-					new THREE.Vector3( h, h, -h ),
+					- h, h, - h,
+					h, h, - h,
 
-					new THREE.Vector3( h, h, -h ),
-					new THREE.Vector3( h, -h, -h ),
+					h, h, - h,
+					h, - h, - h,
 
-					new THREE.Vector3( h, -h, -h ),
-					new THREE.Vector3( -h, -h, -h ),
+					h, - h, - h,
+					- h, - h, - h,
 
+					- h, - h, h,
+					- h, h, h,
 
-					new THREE.Vector3( -h, -h, h ),
-					new THREE.Vector3( -h, h, h ),
+					- h, h, h,
+					h, h, h,
 
-					new THREE.Vector3( -h, h, h ),
-					new THREE.Vector3( h, h, h ),
+					h, h, h,
+					h, - h, h,
 
-					new THREE.Vector3( h, h, h ),
-					new THREE.Vector3( h, -h, h ),
+					h, - h, h,
+					- h, - h, h,
 
-					new THREE.Vector3( h, -h, h ),
-					new THREE.Vector3( -h, -h, h ),
+					- h, - h, - h,
+					- h, - h, h,
 
-					new THREE.Vector3( -h, -h, -h ),
-					new THREE.Vector3( -h, -h, h ),
+					- h, h, - h,
+					- h, h, h,
 
-					new THREE.Vector3( -h, h, -h ),
-					new THREE.Vector3( -h, h, h ),
+					h, h, - h,
+					h, h, h,
 
-					new THREE.Vector3( h, h, -h ),
-					new THREE.Vector3( h, h, h ),
-
-					new THREE.Vector3( h, -h, -h ),
-					new THREE.Vector3( h, -h, h )
+					h, - h, - h,
+					h, - h, h
 				 );
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
 
 				return geometry;
 
@@ -182,15 +175,16 @@
 
 				var time = Date.now() * 0.001;
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				scene.traverse( function ( object ) {
 
-					var object = objects[ i ];
+					if ( object.isLine ) {
 
-					//object.rotation.x = 0.25 * time * ( i%2 == 1 ? 1 : -1);
-					object.rotation.x = 0.25 * time;
-					object.rotation.y = 0.25 * time;
+						object.rotation.x = 0.25 * time;
+						object.rotation.y = 0.25 * time;
 
-				}
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 

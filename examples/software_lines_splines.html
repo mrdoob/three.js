@@ -48,28 +48,25 @@
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
 			var mouseX = 0, mouseY = 0,
 
-			windowHalfX = window.innerWidth / 2,
-			windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
 
-			camera, scene, renderer, material;
+				camera, scene, renderer, material, stats;
 
 			init();
 			animate();
 
 			function init() {
 
-				var i, n_sub, container;
+				var i, container;
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -85,32 +82,29 @@
 				container.appendChild( renderer.domElement );
 
 				var geometry = new THREE.Geometry(),
-				geometry2 = new THREE.Geometry(),
-				geometry3 = new THREE.Geometry(),
-				points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
-				colors = [], colors2 = [], colors3 = [];
+					geometry2 = new THREE.Geometry(),
+					geometry3 = new THREE.Geometry(),
+					points = hilbert3D( new THREE.Vector3(), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
+					colors = [], colors2 = [], colors3 = [];
 
-				n_sub = 6;
-
-				var position, index;
+				var subdivisions = 6;
 
 				var spline = new THREE.CatmullRomCurve3( points );
+				var point = new THREE.Vector3();
 
-				for ( i = 0; i < points.length * n_sub; i ++ ) {
+				for ( i = 0; i < points.length * subdivisions; i ++ ) {
 
-					index = i / ( points.length * n_sub );
-					position = spline.getPoint( index );
-
-					geometry.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
+					var t = i / ( points.length * subdivisions );
+					geometry.vertices[ i ] = spline.getPoint( t );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, - position.x / 200 ) + 0.5 );
+					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, - point.x / 200 ) + 0.5 );
 
 					colors2[ i ] = new THREE.Color( 0xffffff );
-					colors2[ i ].setHSL( 0.9, 1.0, Math.max( 0, - position.y / 200 ) + 0.5 );
+					colors2[ i ].setHSL( 0.9, 1.0, Math.max( 0, - point.y / 200 ) + 0.5 );
 
 					colors3[ i ] = new THREE.Color( 0xffffff );
-					colors3[ i ].setHSL( i / ( points.length * n_sub ), 1.0, 0.5 );
+					colors3[ i ].setHSL( i / ( points.length * subdivisions ), 1.0, 0.5 );
 
 				}
 
@@ -125,17 +119,17 @@
 				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 
 				var line, p, scale = 0.3, d = 225;
-				var parameters =  [
-					[ material, scale*1.5, [-d,0,0],  geometry ],
-					[ material, scale*1.5, [0,0,0],  geometry2 ],
-					[ material, scale*1.5, [d,0,0],  geometry3 ]
+				var parameters = [
+					[ material, scale * 1.5, [ - d, 0, 0 ], geometry ],
+					[ material, scale * 1.5, [ 0, 0, 0 ], geometry2 ],
+					[ material, scale * 1.5, [ d, 0, 0 ], geometry3 ]
 				];
 
 				for ( i = 0; i < parameters.length; ++ i ) {
 
 					p = parameters[ i ];
-					line = new THREE.Line( p[ 3 ],  p[ 0 ] );
-					line.scale.x = line.scale.y = line.scale.z =  p[ 1 ];
+					line = new THREE.Line( p[ 3 ], p[ 0 ] );
+					line.scale.x = line.scale.y = line.scale.z = p[ 1 ];
 					line.position.x = p[ 2 ][ 0 ];
 					line.position.y = p[ 2 ][ 1 ];
 					line.position.z = p[ 2 ][ 2 ];
@@ -169,6 +163,7 @@
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
+
 			}
 
 			function onDocumentTouchStart( event ) {
@@ -179,7 +174,9 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -190,6 +187,7 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
 
 			}
@@ -216,7 +214,7 @@
 
 					if ( object instanceof THREE.Line ) {
 
-						object.rotation.y = time * ( i % 2 ? 1 : -1 );
+						object.rotation.y = time * ( i % 2 ? 1 : - 1 );
 
 					}
 

@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DDSLoader = function () {
+THREE.DDSLoader = function ( manager ) {
+
+	THREE.CompressedTextureLoader.call( this, manager );
 
 	this._parser = THREE.DDSLoader.parse;
 
@@ -186,7 +188,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 				&& header[ off_RBitMask ] & 0xff0000
 				&& header[ off_GBitMask ] & 0xff00
 				&& header[ off_BBitMask ] & 0xff
-				&& header[ off_ABitMask ] & 0xff000000  ) {
+				&& header[ off_ABitMask ] & 0xff000000 ) {
 
 				isRGBAUncompressed = true;
 				blockBytes = 64;
@@ -198,6 +200,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 				return dds;
 
 			}
+
 	}
 
 	dds.mipmapCount = 1;
@@ -217,7 +220,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 		! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEY ) ||
 		! ( caps2 & DDSCAPS2_CUBEMAP_POSITIVEZ ) ||
 		! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEZ )
-		) ) {
+	) ) {
 
 		console.error( 'THREE.DDSLoader.parse: Incomplete cubemap faces' );
 		return dds;

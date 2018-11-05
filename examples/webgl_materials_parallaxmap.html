@@ -26,7 +26,7 @@
 				text-align:center;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -47,7 +47,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -56,10 +56,14 @@
 		<script src="js/shaders/ParallaxShader.js"></script>
 
 		<script>
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var stats;
-			var camera, scene, material, renderer;
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var camera, scene, material, renderer, stats;
 
 			var effectController = {
 				'mode': 'relief',
@@ -81,7 +85,35 @@
 				camera.position.z = 2;
 				scene = new THREE.Scene();
 
-				initScene();
+				//
+
+				var shader = THREE.ParallaxShader;
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				var parameters = {
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: uniforms
+				};
+
+				//
+
+				var textureLoader = new THREE.TextureLoader();
+
+				material = new THREE.ShaderMaterial( parameters );
+				material.map = textureLoader.load( 'textures/brick_diffuse.jpg' );
+				material.bumpMap = textureLoader.load( 'textures/brick_bump.jpg' );
+				material.map.anisotropy = 4;
+				material.bumpMap.anisotropy = 4;
+				uniforms[ 'map' ].value = material.map;
+				uniforms[ 'bumpMap' ].value = material.bumpMap;
+
+				//
+
+				var geometry = new THREE.BoxBufferGeometry( 1.0, 1.0, 1.0 );
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -91,10 +123,16 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
+				//
+
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				//
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -104,12 +142,12 @@
 
 				var uniforms = material.uniforms;
 
-				uniforms[ 'parallaxScale' ].value = -1.0 * effectController.scale;
+				uniforms[ 'parallaxScale' ].value = - 1.0 * effectController.scale;
 				uniforms[ 'parallaxMinLayers' ].value = effectController.minLayers;
 				uniforms[ 'parallaxMaxLayers' ].value = effectController.maxLayers;
 
 				material.defines = {};
-				material.defines[THREE.ParallaxShader.modes[effectController.mode]] = '';
+				material.defines[ THREE.ParallaxShader.modes[ effectController.mode ] ] = '';
 				material.needsUpdate = true;
 
 			}
@@ -124,6 +162,7 @@
 				gui.add( effectController, 'maxLayers', 1.0, 30, 1 ).onChange( guiChanged );
 
 				guiChanged();
+
 			}
 
 			function onWindowResize() {
@@ -132,32 +171,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function initScene() {
-
-				var shader = THREE.ParallaxShader;
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-				var parameters = {
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: uniforms
-				};
-
-				var textureLoader = new THREE.TextureLoader();
-
-				material = new THREE.ShaderMaterial( parameters );
-				material.map = textureLoader.load( 'textures/brick_diffuse.jpg' );
-				material.bumpMap = textureLoader.load( 'textures/brick_bump.jpg' );
-				material.map.anisotropy = 4;
-				material.bumpMap.anisotropy = 4;
-				uniforms[ 'map' ].value = material.map;
-				uniforms[ 'bumpMap' ].value = material.bumpMap;
-
-				var geometry = new THREE.BoxGeometry( 1.0, 1.0, 1.0 );
-				var mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
 
 			}
 
@@ -175,6 +188,7 @@
 				renderer.render( scene, camera );
 
 			}
+
 		</script>
 
 	</body>

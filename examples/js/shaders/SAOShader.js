@@ -88,7 +88,7 @@ THREE.SAOShader = {
 		"	#if PERSPECTIVE_CAMERA == 1",
 		"	return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );",
 		"	#else",
-		"	return orthoDepthToViewZ( depth, cameraNear, cameraFar );",
+		"	return orthographicDepthToViewZ( depth, cameraNear, cameraFar );",
 		"	#endif",
 		"}",
 
@@ -102,7 +102,7 @@ THREE.SAOShader = {
 
 		"vec3 getViewNormal( const in vec3 viewPosition, const in vec2 screenPosition ) {",
 		"	#if NORMAL_TEXTURE == 1",
-		"	return -unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );",
+		"	return unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );",
 		"	#else",
 		"	return normalize( cross( dFdx( viewPosition ), dFdy( viewPosition ) ) );",
 		"	#endif",

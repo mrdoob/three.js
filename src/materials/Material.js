@@ -1,6 +1,6 @@
-import { EventDispatcher } from '../core/EventDispatcher';
-import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants';
-import { _Math } from '../math/Math';
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants.js';
+import { _Math } from '../math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -44,6 +44,8 @@ function Material() {
 	this.clipIntersection = false;
 	this.clipShadows = false;
 
+	this.shadowSide = null;
+
 	this.colorWrite = true;
 
 	this.precision = null; // override the renderer's default precision for this material
@@ -57,8 +59,6 @@ function Material() {
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
-	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
-
 	this.visible = true;
 
 	this.userData = {};
@@ -67,7 +67,9 @@ function Material() {
 
 }
 
-Object.assign( Material.prototype, EventDispatcher.prototype, {
+Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: Material,
 
 	isMaterial: true,
 
@@ -114,11 +116,6 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 				currentValue.copy( newValue );
 
-			} else if ( key === 'overdraw' ) {
-
-				// ensure overdraw is backwards-compatible with legacy boolean type
-				this[ key ] = Number( newValue );
-
 			} else {
 
 				this[ key ] = newValue;
@@ -131,7 +128,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 	toJSON: function ( meta ) {
 
-		var isRoot = meta === undefined;
+		var isRoot = ( meta === undefined || typeof meta === 'string' );
 
 		if ( isRoot ) {
 
@@ -162,6 +159,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
+		if ( this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
+
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
 		if ( this.clearCoat !== undefined ) data.clearCoat = this.clearCoat;
@@ -170,18 +169,29 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 		if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
 		if ( this.lightMap && this.lightMap.isTexture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
+
+		if ( this.aoMap && this.aoMap.isTexture ) {
+
+			data.aoMap = this.aoMap.toJSON( meta ).uuid;
+			data.aoMapIntensity = this.aoMapIntensity;
+
+		}
+
 		if ( this.bumpMap && this.bumpMap.isTexture ) {
 
 			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
 			data.bumpScale = this.bumpScale;
 
 		}
+
 		if ( this.normalMap && this.normalMap.isTexture ) {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
+			data.normalMapType = this.normalMapType;
 			data.normalScale = this.normalScale.toArray();
 
 		}
+
 		if ( this.displacementMap && this.displacementMap.isTexture ) {
 
 			data.displacementMap = this.displacementMap.toJSON( meta ).uuid;
@@ -189,6 +199,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 			data.displacementBias = this.displacementBias;
 
 		}
+
 		if ( this.roughnessMap && this.roughnessMap.isTexture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
 		if ( this.metalnessMap && this.metalnessMap.isTexture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
 
@@ -199,6 +210,9 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 			data.envMap = this.envMap.toJSON( meta ).uuid;
 			data.reflectivity = this.reflectivity; // Scale behind envMap
+
+			if ( this.combine !== undefined ) data.combine = this.combine;
+			if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
 
 		}
 
@@ -222,6 +236,18 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
+
+		// rotation (SpriteMaterial)
+		if ( this.rotation !== 0 ) data.rotation = this.rotation;
+
+		if ( this.polygonOffset === true ) data.polygonOffset = true;
+		if ( this.polygonOffsetFactor !== 0 ) data.polygonOffsetFactor = this.polygonOffsetFactor;
+		if ( this.polygonOffsetUnits !== 0 ) data.polygonOffsetUnits = this.polygonOffsetUnits;
+
+		if ( this.linewidth !== 1 ) data.linewidth = this.linewidth;
+		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
+		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
+		if ( this.scale !== undefined ) data.scale = this.scale;
 
 		if ( this.dithering === true ) data.dithering = true;
 
@@ -316,8 +342,6 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		this.alphaTest = source.alphaTest;
 		this.premultipliedAlpha = source.premultipliedAlpha;
 
-		this.overdraw = source.overdraw;
-
 		this.visible = source.visible;
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
@@ -338,6 +362,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		}
 
 		this.clippingPlanes = dstPlanes;
+
+		this.shadowSide = source.shadowSide;
 
 		return this;
 

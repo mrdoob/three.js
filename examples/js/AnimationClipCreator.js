@@ -6,10 +6,9 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationClipCreator = function() {
-};
+THREE.AnimationClipCreator = function () {};
 
-THREE.AnimationClipCreator.CreateRotationAnimation = function( period, axis ) {
+THREE.AnimationClipCreator.CreateRotationAnimation = function ( period, axis ) {
 
 	var times = [ 0, period ], values = [ 0, 360 ];
 
@@ -22,7 +21,7 @@ THREE.AnimationClipCreator.CreateRotationAnimation = function( period, axis ) {
 
 };
 
-THREE.AnimationClipCreator.CreateScaleAxisAnimation = function( period, axis ) {
+THREE.AnimationClipCreator.CreateScaleAxisAnimation = function ( period, axis ) {
 
 	var times = [ 0, period ], values = [ 0, 1 ];
 
@@ -35,11 +34,11 @@ THREE.AnimationClipCreator.CreateScaleAxisAnimation = function( period, axis ) {
 
 };
 
-THREE.AnimationClipCreator.CreateShakeAnimation = function( duration, shakeScale ) {
+THREE.AnimationClipCreator.CreateShakeAnimation = function ( duration, shakeScale ) {
 
 	var times = [], values = [], tmp = new THREE.Vector3();
 
-	for( var i = 0; i < duration * 10; i ++ ) {
+	for ( var i = 0; i < duration * 10; i ++ ) {
 
 		times.push( i / 10 );
 
@@ -58,11 +57,11 @@ THREE.AnimationClipCreator.CreateShakeAnimation = function( duration, shakeScale
 };
 
 
-THREE.AnimationClipCreator.CreatePulsationAnimation = function( duration, pulseScale ) {
+THREE.AnimationClipCreator.CreatePulsationAnimation = function ( duration, pulseScale ) {
 
 	var times = [], values = [], tmp = new THREE.Vector3();
 
-	for( var i = 0; i < duration * 10; i ++ ) {
+	for ( var i = 0; i < duration * 10; i ++ ) {
 
 		times.push( i / 10 );
 
@@ -74,14 +73,14 @@ THREE.AnimationClipCreator.CreatePulsationAnimation = function( duration, pulseS
 
 	var trackName = '.scale';
 
-	var track = new THREE.VectorKeyframeTrack( trackName, keys );
+	var track = new THREE.VectorKeyframeTrack( trackName, times, values );
 
 	return new THREE.AnimationClip( null, duration, [ track ] );
 
 };
 
 
-THREE.AnimationClipCreator.CreateVisibilityAnimation = function( duration ) {
+THREE.AnimationClipCreator.CreateVisibilityAnimation = function ( duration ) {
 
 	var times = [ 0, duration / 2, duration ], values = [ true, false, true ];
 
@@ -94,14 +93,14 @@ THREE.AnimationClipCreator.CreateVisibilityAnimation = function( duration ) {
 };
 
 
-THREE.AnimationClipCreator.CreateMaterialColorAnimation = function( duration, colors, loop ) {
+THREE.AnimationClipCreator.CreateMaterialColorAnimation = function ( duration, colors ) {
 
 	var times = [], values = [],
 		timeStep = duration / colors.length;
 
-	for( var i = 0; i <= colors.length; i ++ ) {
+	for ( var i = 0; i <= colors.length; i ++ ) {
 
-		timees.push( i * timeStep );
+		times.push( i * timeStep );
 		values.push( colors[ i % colors.length ] );
 
 	}

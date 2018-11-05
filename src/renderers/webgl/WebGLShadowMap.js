@@ -3,18 +3,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants';
-import { WebGLRenderTarget } from '../WebGLRenderTarget';
-import { ShaderMaterial } from '../../materials/ShaderMaterial';
-import { UniformsUtils } from '../shaders/UniformsUtils';
-import { ShaderLib } from '../shaders/ShaderLib';
-import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial';
-import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial';
-import { Vector4 } from '../../math/Vector4';
-import { Vector3 } from '../../math/Vector3';
-import { Vector2 } from '../../math/Vector2';
-import { Matrix4 } from '../../math/Matrix4';
-import { Frustum } from '../../math/Frustum';
+import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants.js';
+import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
+import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
+import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial.js';
+import { Vector4 } from '../../math/Vector4.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+import { Frustum } from '../../math/Frustum.js';
 
 function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
@@ -36,6 +33,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		_distanceMaterials = new Array( _NumberOfMaterialVariants ),
 
 		_materialCache = {};
+
+	var shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide };
 
 	var cubeDirections = [
 		new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
@@ -93,9 +92,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	this.needsUpdate = false;
 
 	this.type = PCFShadowMap;
-
-	this.renderReverseSided = true;
-	this.renderSingleSided = true;
 
 	this.render = function ( lights, scene, camera ) {
 
@@ -353,22 +349,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
 
-		var side = material.side;
-
-		if ( scope.renderSingleSided && side == DoubleSide ) {
-
-			side = FrontSide;
-
-		}
-
-		if ( scope.renderReverseSided ) {
-
-			if ( side === FrontSide ) side = BackSide;
-			else if ( side === BackSide ) side = FrontSide;
-
-		}
-
-		result.side = side;
+		result.side = ( material.shadowSide != null ) ? material.shadowSide : shadowSide[ material.side ];
 
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;

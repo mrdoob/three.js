@@ -17,12 +17,12 @@
  * }
  */
 
-import { Geometry } from '../core/Geometry';
-import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
+import { Geometry } from '../core/Geometry.js';
+import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
 
 // TextGeometry
 
-function TextGeometry(  text, parameters ) {
+function TextGeometry( text, parameters ) {
 
 	Geometry.call( this );
 
@@ -56,11 +56,11 @@ function TextBufferGeometry( text, parameters ) {
 
 	}
 
-	var shapes = font.generateShapes( text, parameters.size, parameters.curveSegments );
+	var shapes = font.generateShapes( text, parameters.size );
 
 	// translate parameters to ExtrudeGeometry API
 
-	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+	parameters.depth = parameters.height !== undefined ? parameters.height : 50;
 
 	// defaults
 

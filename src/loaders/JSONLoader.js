@@ -1,13 +1,14 @@
-import { Loader } from './Loader';
-import { AnimationClip } from '../animation/AnimationClip';
-import { Vector3 } from '../math/Vector3';
-import { Vector4 } from '../math/Vector4';
-import { Color } from '../math/Color';
-import { Vector2 } from '../math/Vector2';
-import { Face3 } from '../core/Face3';
-import { Geometry } from '../core/Geometry';
-import { FileLoader } from './FileLoader';
-import { DefaultLoadingManager } from './LoadingManager';
+import { Loader } from './Loader.js';
+import { LoaderUtils } from './LoaderUtils.js';
+import { AnimationClip } from '../animation/AnimationClip.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Color } from '../math/Color.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Face3 } from '../core/Face3.js';
+import { Geometry } from '../core/Geometry.js';
+import { FileLoader } from './FileLoader.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -31,13 +32,16 @@ function JSONLoader( manager ) {
 
 Object.assign( JSONLoader.prototype, {
 
+	crossOrigin: 'anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : Loader.prototype.extractUrlBase( url );
+		var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
 		var loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
@@ -57,27 +61,35 @@ Object.assign( JSONLoader.prototype, {
 
 					}
 
-					if ( type.toLowerCase() === 'scene' ) {
-
-						console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.SceneLoader instead.' );
-						return;
-
-					}
-
 				}
 
 			}
 
-			var object = scope.parse( json, texturePath );
+			var object = scope.parse( json, path );
 			onLoad( object.geometry, object.materials );
 
 		}, onProgress, onError );
 
 	},
 
-	setTexturePath: function ( value ) {
+	setPath: function ( value ) {
 
-		this.texturePath = value;
+		this.path = value;
+		return this;
+
+	},
+
+	setResourcePath: function ( value ) {
+
+		this.resourcePath = value;
+		return this;
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+		return this;
 
 	},
 
@@ -524,7 +536,7 @@ Object.assign( JSONLoader.prototype, {
 
 		}
 
-		return function ( json, texturePath ) {
+		return function parse( json, path ) {
 
 			if ( json.data !== undefined ) {
 
@@ -559,7 +571,7 @@ Object.assign( JSONLoader.prototype, {
 
 			} else {
 
-				var materials = Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
+				var materials = Loader.prototype.initMaterials( json.materials, this.resourcePath || path, this.crossOrigin );
 
 				return { geometry: geometry, materials: materials };
 

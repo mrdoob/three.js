@@ -1,16 +1,14 @@
-import { Material } from './Material';
-import { Color } from '../math/Color';
+import { Material } from './Material.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
  *  color: <hex>,
- *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
- *
- *	uvOffset: new THREE.Vector2(),
- *	uvScale: new THREE.Vector2()
+ *  rotation: <float>,
+ *  sizeAttenuation: <bool>
  * }
  */
 
@@ -25,8 +23,10 @@ function SpriteMaterial( parameters ) {
 
 	this.rotation = 0;
 
-	this.fog = false;
+	this.sizeAttenuation = true;
+
 	this.lights = false;
+	this.transparent = true;
 
 	this.setValues( parameters );
 
@@ -44,6 +44,8 @@ SpriteMaterial.prototype.copy = function ( source ) {
 	this.map = source.map;
 
 	this.rotation = source.rotation;
+
+	this.sizeAttenuation = source.sizeAttenuation;
 
 	return this;
 

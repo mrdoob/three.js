@@ -103,7 +103,7 @@ function WebGLMorphtargets( gl ) {
 
 		update: update
 
-	}
+	};
 
 }
 

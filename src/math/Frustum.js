@@ -1,6 +1,6 @@
-import { Vector3 } from './Vector3';
-import { Sphere } from './Sphere';
-import { Plane } from './Plane';
+import { Vector3 } from './Vector3.js';
+import { Sphere } from './Sphere.js';
+import { Plane } from './Plane.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -140,8 +140,7 @@ Object.assign( Frustum.prototype, {
 
 	intersectsBox: function () {
 
-		var p1 = new Vector3(),
-			p2 = new Vector3();
+		var p = new Vector3();
 
 		return function intersectsBox( box ) {
 
@@ -151,19 +150,13 @@ Object.assign( Frustum.prototype, {
 
 				var plane = planes[ i ];
 
-				p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
-				p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
-				p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
-				p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+				// corner at max distance
 
-				var d1 = plane.distanceToPoint( p1 );
-				var d2 = plane.distanceToPoint( p2 );
+				p.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+				p.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+				p.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-				// if both outside plane, no intersection
-
-				if ( d1 < 0 && d2 < 0 ) {
+				if ( plane.distanceToPoint( p ) < 0 ) {
 
 					return false;
 

@@ -1,5 +1,5 @@
-﻿<!DOCTYPE html>
-<html lang='en'>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 	<title>three.js webgl - loaders - X-File loader</title>
 	<meta charset='utf-8'>
@@ -23,49 +23,97 @@
 		a {
 			color: #ff0000
 		}
+
+		#info2 {
+			color: #fff;
+			background-color: #000;
+			position: absolute;
+			top: 3em;
+			right : 0px;
+			width: 10em;
+			z-index: 200;
+			display: block;
+		}
+
+		td {
+			padding: 0.5em;
+		}
+
 	</style>
 </head>
 <body>
-	<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - X-File Loader</div>
-	<div id="container"></div>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - X-File Loader <br>
+		<a href="https://github.com/adrs2002/threeXfileLoader" target="_new">see more info and samples</a> <br />
+	</div>
 
-	<script src='../build/three.js'></script>
-	<script src='js/controls/OrbitControls.js'></script>
+	<div id="info2">
+		<table>
+			<tr>
+				<td>mech 1</td>
+				<td><select id="mech1_anime" onchange="mech1_changeAnime(this.value)">
+						<option value="stand">stand</option>
+						<option value="wark">walk</option>
+						<option value="attack">attack</option>
+					  </select>
+					</td>
+			</tr>
+		</table>
+	</div>
 
-	<script src='js/loaders/XLoader.js'></script>
+	<div id="canvase3d"></div>
 
-	<script src='js/Detector.js'></script>
-	<script src='js/libs/stats.min.js'></script>
-	<script src='js/libs/dat.gui.min.js'></script>
+	<script src="../build/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/loaders/XLoader.js"></script>
+	<script src="js/libs/dat.gui.min.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+	<script src="js/WebGL.js"></script>
+
 	<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
 
-		var stats;
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
+
+		var container, stats, controls;
 		var camera, scene, renderer;
 		var clock = new THREE.Clock();
-		var gui = new dat.GUI();
-		var mixers = [];
-		var models = [];
+		var manager = null;
+
+		var skeletonHelper = null;
 		var animates = [];
 		var actions = [];
+		var Models = [];
 
 		init();
 
+		var onProgress = function ( xhr ) {
+
+			if ( xhr.lengthComputable ) {
+
+				var percentComplete = xhr.loaded / xhr.total * 100;
+				console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+			}
+
+		};
+
+		var onError = function () {};
+
 		function init() {
 
-			var container = document.getElementById( 'container' );
+			container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-			camera.position.set( 2, 20, 30 );
-
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x666666 );
+			scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
 
 			// grid
 
-			var gridHelper = new THREE.GridHelper( 20, 20 );
+			var gridHelper = new THREE.GridHelper( 14, 1, 0x303030, 0x303030 );
 			scene.add( gridHelper );
 
 			// stats
@@ -73,104 +121,77 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			// model
-
-			var loader = new THREE.XLoader();
-
-			// read (download) model file
-
-			loader.load( [ 'models/xfile/SSR06_Born2.x', false ], function ( object ) {
-
-				for ( var i = 0; i < object.FrameInfo.length; i ++ ) {
-
-					models.push( object.FrameInfo[ i ] );
-					var model = models[ i ];
-
-					scene.add( model );
-
-					if ( model instanceof THREE.SkinnedMesh ) {
-
-						var skeletonHelper = new THREE.SkeletonHelper( model );
-						scene.add( skeletonHelper );
-
-						if ( object.XAnimationObj !== undefined && object.XAnimationObj.length !== 0 ) {
-
-							model.geometry.animations = [];
-
-							model.geometry.animations.push( THREE.AnimationClip.parseAnimation( splitAnimation( object.XAnimationObj[ 0 ], 'stand', 10 * object.XAnimationObj[ 0 ].fps, 11 * object.XAnimationObj[ 0 ].fps), model.skeleton.bones ) );
-							model.geometry.animations.push( THREE.AnimationClip.parseAnimation( splitAnimation( object.XAnimationObj[ 0 ], 'walk', 50 * object.XAnimationObj[ 0 ].fps, 80 * object.XAnimationObj[ 0 ].fps), model.skeleton.bones ) );
-							model.geometry.animations.push( THREE.AnimationClip.parseAnimation( splitAnimation( object.XAnimationObj[ 0 ], 'dash', 140 * object.XAnimationObj[ 0 ].fps, 160 * object.XAnimationObj[ 0 ].fps), model.skeleton.bones ) );
-							model.geometry.animations.push( THREE.AnimationClip.parseAnimation( splitAnimation( object.XAnimationObj[ 0 ], 'dashing', 160 * object.XAnimationObj[ 0 ].fps, 165 * object.XAnimationObj[ 0 ].fps), model.skeleton.bones ) );
-							model.geometry.animations.push( THREE.AnimationClip.parseAnimation( splitAnimation( object.XAnimationObj[ 0 ], 'damage', 500 * object.XAnimationObj[ 0 ].fps, 530 * object.XAnimationObj[ 0 ].fps), model.skeleton.bones ) );
-
-							model.mixer = new THREE.AnimationMixer( model );
-							animates.push( model.mixer );
-
-							var stand = model.mixer.clipAction( 'stand' );
-							stand.setLoop( THREE.LoopRepeat );
-							actions[ 'stand' ] = stand;
-
-							var walk = model.mixer.clipAction( 'walk' );
-							walk.setLoop( THREE.LoopRepeat );
-							walk.play();
-							actions[ 'walk' ] = walk;
-
-							var dash = model.mixer.clipAction( 'dash' );
-							dash.setLoop( THREE.LoopRepeat );
-							actions[ 'dash' ] = dash;
-
-							var dashing = model.mixer.clipAction( 'dashing' );
-							dashing.setLoop( THREE.LoopPingPong );
-							actions[ 'dashing' ] = dashing;
-
-							var damage = model.mixer.clipAction( 'damage' );
-							damage.setLoop( THREE.LoopRepeat );
-							actions[ 'damage' ] = damage;
-
-							var actionKeys = Object.keys( actions );
-							var dmy = {};
-							dmy.gui = '';
-							dmy.action = '';
-							gui.add( dmy, 'action', actionKeys ).onChange( function ( v ) {
-
-									animates[ 0 ].stopAllAction();
-									actions[ v ].play();
-
-							});
-
-						}
-
-					}
-
-				}
-
-				object = null;
-
-			} );
-
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0x666666 );
 			container.appendChild( renderer.domElement );
 
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
-			controls.target.set( 0, 6, 0 );
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+			camera.position.set( 2, 10, - 28 );
+			camera.up.set( 0, 1, 0 );
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 5, 0 );
 			controls.update();
 
-			var directionalLight1 = new THREE.DirectionalLight( 0xeeeeff, 2 );
-			directionalLight1.position.set( 10, 100, 1 ).normalize();
-			scene.add( directionalLight1 );
+			var light = new THREE.DirectionalLight( 0xffffff, 1 );
+			light.position.set( 10, 100, - 10 ).normalize();
+			scene.add( light );
 
-			var directionalLight2 = new THREE.DirectionalLight( 0x555588 );
-			directionalLight2.position.set( - 1, - 1, - 1 ).normalize();
-			scene.add( directionalLight2 );
-
-			var ambientLight = new THREE.AmbientLight( 0x999999 );
-			scene.add( ambientLight );
+			var light2 = new THREE.DirectionalLight( 0x777666, 1 );
+			light2.position.set( - 1, - 1, - 1 ).normalize();
+			scene.add( light2 );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			animate();
+
+			// model loading
+
+			manager = new THREE.LoadingManager();
+			manager.onProgress = function ( item, loaded, total ) {
+
+				console.log( item, loaded, total );
+
+			};
+
+			var loader = new THREE.XLoader( manager );
+
+			actions[ 0 ] = {};
+
+			//download Model file
+
+			loader.load( [ 'models/xfile/SSR06_model.x' ], function ( object ) {
+
+				for ( var i = 0; i < object.models.length; i ++ ) {
+
+					var model = object.models[ i ];
+
+					model.scale.x *= - 1;
+
+					Models.push( model );
+
+				}
+
+				loadAnimation( 'stand', 0, () => {
+
+					scene.add( Models[ 0 ] );
+
+					if ( Models[ 0 ] instanceof THREE.SkinnedMesh ) {
+
+						skeletonHelper = new THREE.SkeletonHelper( Models[ 0 ] );
+						scene.add( skeletonHelper );
+
+					}
+
+					actions[ 0 ][ 'stand' ].play();
+
+				} );
+
+				object = null;
+
+			}, onProgress, onError );
 
 		}
 
@@ -181,14 +202,14 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
-		//
+
 		function animate() {
 
 			requestAnimationFrame( animate );
 
 			var delta = clock.getDelta();
 
-			if ( animates ) {
+			if ( animates != null && animates.length > 0 ) {
 
 				for ( var i = 0; i < animates.length; i ++ ) {
 
@@ -209,63 +230,80 @@
 
 		}
 
-		// this is not must mount codes.
-		// split	One and Long Animation, for time
+		/////////////////////////////////////////////////////////////////////////////////
+		function loadAnimation( animeName, modelId, _callback ) {
 
-		function splitAnimation( _baseAnime, _name, _beginTime, _endTime ) {
+			if ( actions[ modelId ][ animeName ] ) {
 
-			var animation = {};
-			animation.fps = _baseAnime.fps;
-			animation.name = _name;
-			animation.length = _endTime - _beginTime;
-			animation.hierarchy = [];
+				if ( _callback ) {
 
-			for ( var i = 0; i < _baseAnime.hierarchy.length; i ++ ) {
-
-				var firstKey = -1;
-				var lastKey = -1;
-				var frame = {};
-				frame.name = _baseAnime.hierarchy[ i ].name;
-				frame.parent = _baseAnime.hierarchy[ i ].parent;
-				frame.keys = [];
-
-				for ( var m = 1; m < _baseAnime.hierarchy[ i ].keys.length; m ++ ) {
-
-					if ( _baseAnime.hierarchy[ i ].keys[ m ].time > _beginTime ) {
-
-						if ( firstKey === -1 ) {
-
-							firstKey = m - 1;
-							frame.keys.push( _baseAnime.hierarchy[ i ].keys[ m - 1 ] );
-
-						}
-
-						frame.keys.push( _baseAnime.hierarchy[ i ].keys[ m ] );
-
-					}
-
-					if ( _endTime <= _baseAnime.hierarchy[ i ].keys[ m ].time || m >= _baseAnime.hierarchy[ i ].keys.length - 1 ) {
-
-						break;
-
-					}
+					_callback();
 
 				}
 
-				for ( var m = 0; m < frame.keys.length; m ++ ) {
+			} else {
 
-					frame.keys[ m ].time -= _beginTime;
+				var loader2 = new THREE.XLoader( manager );
+				loader2.load( [ 'models/xfile/' + animeName + '.x', { putPos: false, putScl: false } ], function () {
 
-				}
+					// !! important!
+					// associate divided model and animation.
+					loader2.assignAnimation( Models[ modelId ] );
+					if ( ! animates[ modelId ] ) {
 
-				animation.hierarchy.push( frame );
+						animates[ modelId ] = Models[ modelId ].animationMixer;
+
+					}
+
+					actions[ modelId ][ animeName ] = Models[ modelId ].animationMixer.clipAction( animeName );
+
+					if ( animeName == 'stand' ) {
+
+						actions[ modelId ][ animeName ].setLoop( THREE.LoopOnce );
+
+					}
+
+					actions[ modelId ][ animeName ].clampWhenFinished = true;
+
+					if ( _callback ) {
+
+						_callback(); return;
+
+					}
+
+					actions[ modelId ][ animeName ].play();
+
+				}, onProgress, onError );
 
 			}
 
-			return animation;
+		}
+
+		function mech1_changeAnime( val ) {
+
+			loadAnimation( val, 0, function () {
+
+				Object.keys( actions[ 0 ] ).forEach( function ( p ) {
+
+					if ( p == val ) {
+
+						actions[ 0 ][ p ].play();
+
+					} else {
+
+						actions[ 0 ][ p ].stop();
+
+					}
+
+				} );
+
+			} );
 
 		}
 
+
 	</script>
+
 </body>
+
 </html>

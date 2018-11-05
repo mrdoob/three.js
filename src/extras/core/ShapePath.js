@@ -1,13 +1,18 @@
-import { Path } from './Path';
-import { Shape } from './Shape';
-import { ShapeUtils } from '../ShapeUtils';
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
  **/
 
+import { Color } from '../../math/Color.js';
+import { Path } from './Path.js';
+import { Shape } from './Shape.js';
+import { ShapeUtils } from '../ShapeUtils.js';
+
 function ShapePath() {
+
+	this.type = 'ShapePath';
+
+	this.color = new Color();
 
 	this.subPaths = [];
 	this.currentPath = null;
@@ -80,7 +85,7 @@ Object.assign( ShapePath.prototype, {
 			var inside = false;
 			for ( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
 
-				var edgeLowPt  = inPolygon[ p ];
+				var edgeLowPt = inPolygon[ p ];
 				var edgeHighPt = inPolygon[ q ];
 
 				var edgeDx = edgeHighPt.x - edgeLowPt.x;
@@ -91,7 +96,7 @@ Object.assign( ShapePath.prototype, {
 					// not parallel
 					if ( edgeDy < 0 ) {
 
-						edgeLowPt  = inPolygon[ q ]; edgeDx = - edgeDx;
+						edgeLowPt = inPolygon[ q ]; edgeDx = - edgeDx;
 						edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
 
 					}

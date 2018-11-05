@@ -14,12 +14,20 @@ THREE.NRRDLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( data ) {
 
 			onLoad( scope.parse( data ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 
@@ -91,7 +99,7 @@ THREE.NRRDLoader.prototype = {
 
 			// increase the data pointer in-place
 			var _bytes = new _array_type( _data.slice( _dataPointer,
-			_dataPointer += chunks * _chunkSize ) );
+				_dataPointer += chunks * _chunkSize ) );
 
 			// if required, flip the endianness of the bytes
 			if ( _nativeLittleEndian != _littleEndian ) {
@@ -285,7 +293,7 @@ THREE.NRRDLoader.prototype = {
 
 			// we need to decompress the datastream
 			// here we start the unzipping and get a typed Uint8Array back
-			var inflate = new Zlib.Gunzip( new Uint8Array( _data ) );
+			var inflate = new Zlib.Gunzip( new Uint8Array( _data ) ); // eslint-disable-line no-undef
 			_data = inflate.decompress();
 
 		} else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
@@ -330,11 +338,11 @@ THREE.NRRDLoader.prototype = {
 		volume.zLength = volume.dimensions[ 2 ];
 		// spacing
 		var spacingX = ( new THREE.Vector3( headerObject.vectors[ 0 ][ 0 ], headerObject.vectors[ 0 ][ 1 ],
-		headerObject.vectors[ 0 ][ 2 ] ) ).length();
+			headerObject.vectors[ 0 ][ 2 ] ) ).length();
 		var spacingY = ( new THREE.Vector3( headerObject.vectors[ 1 ][ 0 ], headerObject.vectors[ 1 ][ 1 ],
-		headerObject.vectors[ 1 ][ 2 ] ) ).length();
+			headerObject.vectors[ 1 ][ 2 ] ) ).length();
 		var spacingZ = ( new THREE.Vector3( headerObject.vectors[ 2 ][ 0 ], headerObject.vectors[ 2 ][ 1 ],
-		headerObject.vectors[ 2 ][ 2 ] ) ).length();
+			headerObject.vectors[ 2 ][ 2 ] ) ).length();
 		volume.spacing = [ spacingX, spacingY, spacingZ ];
 
 
@@ -359,19 +367,21 @@ THREE.NRRDLoader.prototype = {
 
 		if ( ! headerObject.vectors ) {
 
-			volume.matrix.set( _spaceX, 0, 0, 0,
-			0, _spaceY, 0, 0,
-			0, 0, _spaceZ, 0,
-			0, 0, 0, 1 );
+			volume.matrix.set(
+				_spaceX, 0, 0, 0,
+				0, _spaceY, 0, 0,
+				0, 0, _spaceZ, 0,
+				0, 0, 0, 1 );
 
 		} else {
 
 			var v = headerObject.vectors;
 
-			volume.matrix.set( _spaceX * v[ 0 ][ 0 ], _spaceX * v[ 1 ][ 0 ], _spaceX * v[ 2 ][ 0 ], 0,
-			_spaceY * v[ 0 ][ 1 ], _spaceY * v[ 1 ][ 1 ], _spaceY * v[ 2 ][ 1 ], 0,
-			_spaceZ * v[ 0 ][ 2 ], _spaceZ * v[ 1 ][ 2 ], _spaceZ * v[ 2 ][ 2 ], 0,
-			0, 0, 0, 1 );
+			volume.matrix.set(
+				_spaceX * v[ 0 ][ 0 ], _spaceX * v[ 1 ][ 0 ], _spaceX * v[ 2 ][ 0 ], 0,
+				_spaceY * v[ 0 ][ 1 ], _spaceY * v[ 1 ][ 1 ], _spaceY * v[ 2 ][ 1 ], 0,
+				_spaceZ * v[ 0 ][ 2 ], _spaceZ * v[ 1 ][ 2 ], _spaceZ * v[ 2 ][ 2 ], 0,
+				0, 0, 0, 1 );
 
 		}
 

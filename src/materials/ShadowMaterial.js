@@ -2,13 +2,12 @@
  * @author mrdoob / http://mrdoob.com/
  *
  * parameters = {
- *  color: <THREE.Color>,
- *  opacity: <float>
+ *  color: <THREE.Color>
  * }
  */
 
-import { Material } from './Material';
-import { Color } from '../math/Color';
+import { Material } from './Material.js';
+import { Color } from '../math/Color.js';
 
 function ShadowMaterial( parameters ) {
 
@@ -17,9 +16,6 @@ function ShadowMaterial( parameters ) {
 	this.type = 'ShadowMaterial';
 
 	this.color = new Color( 0x000000 );
-	this.opacity = 1.0;
-
-	this.lights = true;
 	this.transparent = true;
 
 	this.setValues( parameters );
@@ -30,6 +26,16 @@ ShadowMaterial.prototype = Object.create( Material.prototype );
 ShadowMaterial.prototype.constructor = ShadowMaterial;
 
 ShadowMaterial.prototype.isShadowMaterial = true;
+
+ShadowMaterial.prototype.copy = function ( source ) {
+
+	Material.prototype.copy.call( this, source );
+
+	this.color.copy( source.color );
+
+	return this;
+
+};
 
 
 export { ShadowMaterial };

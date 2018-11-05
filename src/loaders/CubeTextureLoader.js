@@ -1,10 +1,11 @@
-import { ImageLoader } from './ImageLoader';
-import { CubeTexture } from '../textures/CubeTexture';
-import { DefaultLoadingManager } from './LoadingManager';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { ImageLoader } from './ImageLoader.js';
+import { CubeTexture } from '../textures/CubeTexture.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
+
 
 function CubeTextureLoader( manager ) {
 
@@ -14,7 +15,7 @@ function CubeTextureLoader( manager ) {
 
 Object.assign( CubeTextureLoader.prototype, {
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( urls, onLoad, onProgress, onError ) {
 

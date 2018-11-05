@@ -1,4 +1,3 @@
-import { _Math } from '../math/Math';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -6,16 +5,12 @@ import { _Math } from '../math/Math';
 
 function InterleavedBuffer( array, stride ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.array = array;
 	this.stride = stride;
 	this.count = array !== undefined ? array.length / stride : 0;
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
-
-	this.onUploadCallback = function () {};
 
 	this.version = 0;
 
@@ -35,6 +30,8 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	isInterleavedBuffer: true,
 
+	onUploadCallback: function () {},
+
 	setArray: function ( array ) {
 
 		if ( Array.isArray( array ) ) {
@@ -45,6 +42,8 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		this.count = array !== undefined ? array.length / this.stride : 0;
 		this.array = array;
+
+		return this;
 
 	},
 

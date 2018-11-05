@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p>
+		An efficient representation of mesh, line, or point geometry. Includes vertex positions, face
+		indices, normals, colors, UVs, and custom attributes within buffers, reducing the cost of
+		passing all this data to the GPU.
+		</p>
+		<p>
+		To read and edit data in BufferGeometry attributes, see [page:BufferAttribute] documentation.
+		</p>
+		<p>
+		For a less efficient but easier-to-use representation of geometry, see [page:Geometry].
+		</p>
+
+		<h2>Example</h2>
+		<code>
+		var geometry = new THREE.BufferGeometry();
+		// create a simple square shape. We duplicate the top left and bottom right
+		// vertices because each vertex needs to appear once per triangle.
+		var vertices = new Float32Array( [
+			-1.0, -1.0,  1.0,
+			 1.0, -1.0,  1.0,
+			 1.0,  1.0,  1.0,
+
+			 1.0,  1.0,  1.0,
+			-1.0,  1.0,  1.0,
+			-1.0, -1.0,  1.0
+		] );
+
+		// itemSize = 3 because there are 3 values (components) per vertex
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		</code>
+		<p>
+			[example:webgl_buffergeometry Mesh with non-indexed faces]<br />
+			[example:webgl_buffergeometry_indexed Mesh with indexed faces]<br />
+			[example:webgl_buffergeometry_lines Lines]<br />
+			[example:webgl_buffergeometry_lines_indexed Indexed Lines]<br />
+			[example:webgl_buffergeometry_custom_attributes_particles Particles]<br />
+			[example:webgl_buffergeometry_rawshader Raw Shaders]
+		</p>
+
+
+		<h2>Accessing Attributes</h2>
+		<p>
+		WebGL stores data associated with individual vertices of a geometry in <em>attributes</em>.
+		Examples include the position of the vertex, the normal vector for the vertex, the vertex color,
+		and so on. When using [page:Geometry], the [page:WebGLRenderer renderer] takes care of wrapping
+		up this information into typed array buffers and sending this data to the shader. With
+		BufferGeometry, all of this data is stored in buffers associated with individual attributes.
+		This means that to get the position data associated with a vertex (for instance), you must call
+		[page:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual
+		x, y, and z coordinates of the position.
+		</p>
+		<p>
+		The following attributes are set by various members of this class:
+		</p>
+		<h3>[page:BufferAttribute position] (itemSize: 3)</h3>
+		<p>
+		Stores the x, y, and z coordinates of each vertex in this geometry. Set by [page:.fromGeometry]().
+		</p>
+
+		<h3>[page:BufferAttribute normal] (itemSize: 3)</h3>
+		<p>
+		Stores the x, y, and z components of the vertex normal vector of each vertex in this geometry.
+		Set by [page:.fromGeometry]().
+		</p>
+
+		<h3>[page:BufferAttribute color] (itemSize: 3)</h3>
+		<p>
+		Stores the red, green, and blue channels of vertex color of each vertex in this geometry.
+		Set by [page:.fromGeometry]().
+		</p>
+
+		<p>
+		In addition to the the built-in attributes, you can set your own custom attributes using the addAttribute method. With [page:Geometry], these attributes are set and stored on the [page:Material]. In BufferGeometry, the attributes are stored with the geometry itself. Note that you still need to set the attributes information on the material as well, but the value of each attribute is stored in the BufferGeometry.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<div>
+		This creates a new [name]. It also sets several properties to a default value.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Object attributes]</h3>
+		<p>
+		This hashmap has as id the name of the attribute to be set and as value the [page:BufferAttribute buffer] to set it to.
+		Rather than accessing this property directly, use [page:.addAttribute] and [page:.getAttribute] to access attributes of this geometry.
+		</p>
+
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			Bounding box for the bufferGeometry, which can be calculated with
+			[page:.computeBoundingBox](). Default is *null*.
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			Bounding sphere for the bufferGeometry, which can be calculated with
+			[page:.computeBoundingSphere](). Default is *null*.
+		</p>
+
+		<h3>[property:Object drawRange]</h3>
+		<p>
+			Determines the part of the geometry to render. This should not
+			be set directly, instead use [page:.setDrawRange]. Default is
+			<code>
+				{ start: 0, count: Infinity }
+			</code>
+			For non-indexed BufferGeometry, count is the number of vertices to render.
+			For indexed BufferGeometry, count is the number of indices to render.
+		</p>
+
+		<h3>[property:Array groups]</h3>
+		<p>
+			Split the geometry into groups, each of which will be rendered in a separate WebGL draw call.
+			This allows an array of materials to be used with the bufferGeometry.<br /><br />
+
+			Each group is an object of the form:
+			<code>{ start: Integer, count: Integer, materialIndex: Integer }</code>
+			where start specifies the first element in this draw call – the first vertex for non-indexed geometry,
+			otherwise the first triangle index. Count specifies how many vertices (or indices) are included, and
+			materialIndex specifies the material array index to use.<br /><br />
+
+			Use [page:.addGroup] to add groups, rather than modifying this array directly.
+		</p>
+
+
+		<!-- Note: groups used to be called drawCalls
+
+		<h3>[property:Array drawcalls]</h3>
+		<p>
+		For geometries that use indexed triangles, this Array can be used to split the object
+		into multiple WebGL draw calls. Each draw call will draw some subset of the vertices
+		in this geometry using the configured [page:Material shader]. This may be necessary if,
+		for instance, you have more than 65535 vertices in your object.
+		</p> -->
+
+
+		<h3>[property:Integer id]</h3>
+		<p>Unique number for this bufferGeometry instance.</p>
+
+		<h3>[property:BufferAttribute index]</h3>
+		<p>
+			Allows for vertices to be re-used across multiple triangles; this is called using "indexed triangles" and
+			works much the same as it does in [page:Geometry]: each triangle is associated with the indices of three vertices.
+			This attribute therefore stores the index of each vertex for each triangular face.
+
+			If this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous
+			positions represent a single triangle.
+
+			Default is *null*.
+		</p>
+
+		<h3>[property:Boolean isBufferGeometry]</h3>
+		<p>
+			Used to check whether this or derived classes are BufferGeometries. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+		<h3>[property:Object morphAttributes]</h3>
+		<p>
+			Hashmap of [page:BufferAttribute]s holding details of the geometry's [page:Geometry.morphTargets morphTargets].
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+		Optional name for this bufferGeometry instance. Default is an empty string.
+		</p>
+
+		<h3>[property:Object userData]</h3>
+		<p>
+		An object that can be used to store custom data about the BufferGeometry. It should not hold
+		references to functions as these will not be cloned.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
+		This gets automatically assigned and shouldn't be edited.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+
+		<h3>[method:BufferGeometry addAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
+		<p>
+		Adds an attribute to this geometry. Use this rather than the attributes property,
+		because an internal hashmap of [page:.attributes] is maintained to speed up iterating over
+		attributes.
+		</p>
+
+		<h3>[method:null addGroup]( [param:Integer start], [param:Integer count], [param:Integer materialIndex] )</h3>
+		<p>
+			Adds a group to this geometry; see the [page:BufferGeometry.groups groups]
+			property for details.
+		</p>
+
+
+		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<p>Bakes matrix transform directly into vertex coordinates.</p>
+
+		<h3>[method:BufferGeometry center] ()</h3>
+		<p>Center the geometry based on the bounding box.</p>
+
+		<h3>[method:BufferGeometry clone]()</h3>
+		<p>Creates a clone of this BufferGeometry.</p>
+
+		<h3>[method:BufferGeometry copy]( [param:BufferGeometry bufferGeometry] )</h3>
+		<p>Copies another BufferGeometry to this BufferGeometry.</p>
+
+		<h3>[method:null clearGroups]( )</h3>
+		<p>Clears all groups.</p>
+
+		<h3>[method:null computeBoundingBox]()</h3>
+		<p>
+		Computes bounding box of the geometry, updating [page:.boundingBox] attribute.<br />
+		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
+		</p>
+
+		<h3>[method:null computeBoundingSphere]()</h3>
+		<p>
+		Computes bounding sphere of the geometry, updating [page:.boundingSphere] attribute.<br />
+		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
+		</p>
+
+		<h3>[method:null computeVertexNormals]()</h3>
+		<p>Computes vertex normals by averaging face normals.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+		Disposes the object from memory. <br />
+		You need to call this when you want the BufferGeometry removed while the application is running.
+		</p>
+
+		<h3>[method:BufferGeometry fromDirectGeometry]( [param:Geometry] )</h3>
+		<p>
+			Populates this BufferGeometry with data from a [page:DirectGeometry] object containing faces. Not implemented for a line geometry.<br /><br />
+
+			Note: [page:DirectGeometry] is mainly used as an intermediary object for converting between [page:Geometry]
+			and BufferGeometry.
+		</p>
+
+		<h3>[method:BufferGeometry fromGeometry]( [param:Geometry] )</h3>
+		<p>Populates this BufferGeometry with data from a [page:Geometry] object containing faces. Not implemented for a line geometry.</p>
+
+		<h3>[method:BufferAttribute getAttribute]( [param:String name] )</h3>
+		<p>Returns the [page:BufferAttribute attribute] with the specified name.</p>
+
+		<h3>[method:BufferAttribute getIndex] ()</h3>
+		<p>Return the [page:.index] buffer.</p>
+
+		<h3>[method:BufferGeometry lookAt] ( [param:Vector3 vector] )</h3>
+		<p>
+		vector - A world vector to look at.<br /><br />
+
+		Rotates the geometry to face a point in space. This is typically done as a one time operation, and not during a loop.
+		Use [page:Object3D.lookAt] for typical real-time mesh usage.
+		</p>
+
+		<h3>[method:null merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
+		<p>Merge in another BufferGeometry with an optional offset of where to start merging in.</p>
+
+		<h3>[method:null normalizeNormals]()</h3>
+		<p>
+		Every normal vector in a geometry will have a magnitude of 1.
+		This will correct lighting on the geometry surfaces.
+		</p>
+
+		<h3>[method:BufferAttribute removeAttribute]( [param:String name] )</h3>
+		<p>Removes the [page:BufferAttribute attribute] with the specified name.</p>
+
+		<h3>[method:BufferGeometry rotateX] ( [param:Float radians] )</h3>
+		<p>
+		Rotate the geometry about the X axis. This is typically done as a one time operation, and not during a loop.
+    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</p>
+
+		<h3>[method:BufferGeometry rotateY] ( [param:Float radians] )</h3>
+		<p>
+		Rotate the geometry about the Y axis. This is typically done as a one time operation, and not during a loop.
+    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</p>
+
+		<h3>[method:BufferGeometry rotateZ] ( [param:Float radians] )</h3>
+		<p>
+		Rotate the geometry about the Z axis. This is typically done as a one time operation, and not during a loop.
+    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		</p>
+
+		<h3>[method:BufferGeometry scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+		Scale the geometry data. This is typically done as a one time operation, and not during a loop.
+		Use [page:Object3D.scale] for typical real-time mesh scaling.
+		</p>
+
+		<h3>[method:null setIndex] ( [param:BufferAttribute index] )</h3>
+		<p>Set the [page:.index] buffer.</p>
+
+		<h3>[method:null setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
+		<p>Set the [page:.drawRange] property. For non-indexed BufferGeometry, count is the number of vertices to render.
+		For indexed BufferGeometry, count is the number of indices to render.</p>
+
+		<h3>[method:BufferGeometry setFromObject] ( [param:Object3D object] )</h3>
+		<p>Sets the attributes for this BufferGeometry from an [page:Object3D].</p>
+
+		<h3>[method:BufferGeometry setFromPoints] ( [param:Array points] )</h3>
+		<p>Sets the attributes for this BufferGeometry from an array of points.</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>Returns a JSON object representation of the BufferGeometry.</p>
+
+		<h3>[method:BufferGeometry toNonIndexed]()</h3>
+		<p>Return a non-index version of an indexed BufferGeometry.</p>
+
+		<h3>[method:BufferGeometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+		Translate the geometry. This is typically done as a one time operation, and not during a loop.
+    Use [page:Object3D.position] for typical real-time mesh translation.
+		</p>
+
+		<h3>[method:BufferGeometry updateFromObject] ( [param:Object3D object] )</h3>
+		<div>Updates the attributes for this BufferGeometry from an [page:Object3D].</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

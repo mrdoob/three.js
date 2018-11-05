@@ -1,38 +1,75 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author moraxy / https://github.com/moraxy
+ */
+/* global QUnit */
 
-	'use strict';
+import { runStdLightTests } from '../../qunit-utils';
+import { RectAreaLight } from '../../../../src/lights/RectAreaLight';
 
-	var parameters = {
-		color: 0xaaaaaa,
-		intensity: 0.5,
-	};
+export default QUnit.module( 'Lights', () => {
 
-	var lights;
+	QUnit.module( 'RectAreaLight', ( hooks ) => {
 
-	// TODO (abelnation): verify this works
+		var lights = undefined;
+		hooks.beforeEach( function () {
 
-	QUnit.module( "Lights - RectAreaLight", {
-
-		beforeEach: function() {
+			const parameters = {
+				color: 0xaaaaaa,
+				intensity: 0.5,
+				width: 100,
+				height: 50
+			};
 
 			lights = [
-
-				new THREE.RectAreaLight( parameters.color ),
-				new THREE.RectAreaLight( parameters.color, parameters.intensity ),
-				new THREE.RectAreaLight( parameters.color, parameters.intensity, 5.0 ),
-				new THREE.RectAreaLight( parameters.color, parameters.intensity, 5.0, 20.0 ),
-				new THREE.RectAreaLight( parameters.color, parameters.intensity, undefined, 20.0 ),
-
+				new RectAreaLight( parameters.color ),
+				new RectAreaLight( parameters.color, parameters.intensity ),
+				new RectAreaLight( parameters.color, parameters.intensity, parameters.width ),
+				new RectAreaLight( parameters.color, parameters.intensity, parameters.width, parameters.height )
 			];
 
-		}
+		} );
 
-	});
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			assert.ok( false, "everything's gonna be alright" );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// PUBLIC STUFF
+		QUnit.todo( "isRectAreaLight", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.todo( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.todo( "toJSON", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard light tests', ( assert ) => {
+
+			runStdLightTests( assert, lights );
+
+		} );
+
+	} );
+
+} );

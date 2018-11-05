@@ -500,10 +500,6 @@
         "dispose": {
           "!type": "fn()",
           "!doc": "Removes The object from memory. <br>\n\t\tDon't forget to call this method when you remove a geometry because it can cause memory leaks."
-        },
-        "computeLineDistances": {
-          "!type": "fn()",
-          "!doc": "Compute distances between vertices for Line geometries."
         }
       },
       "!doc": "Base class for geometries.<br>\n\t\tA geometry holds all data necessary to describe a 3D model.",
@@ -746,114 +742,6 @@
       "!doc": "Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.",
       "!type": "fn(colormap, numberOfColors)"
     },
-    "CombinedCamera": {
-      "!url": "http://threejs.org/docs/#Reference/examples/cameras/CombinedCamera",
-      "prototype": {
-        "!proto": "THREE.Camera.prototype",
-        "fov": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum vertical field of view in perspective view."
-        },
-        "left": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum left plane in orthographic view."
-        },
-        "right": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum right plane in orthographic view."
-        },
-        "top": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum top plane in orthographic view."
-        },
-        "bottom": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum bottom plane in orthographic view."
-        },
-        "zoom": {
-          "!type": "number",
-          "!doc": "Gets or sets the zoom factor of the camera."
-        },
-        "near": {
-          "!type": "number",
-          "!doc": "Gets camera frustum near plane."
-        },
-        "far": {
-          "!type": "number",
-          "!doc": "Gets camera frustum far plane."
-        },
-        "cameraO": {
-          "!type": "+THREE.OrthographicCamera",
-          "!doc": "Gets or sets the internal OrthographicCamera used as camera."
-        },
-        "cameraP": {
-          "!type": "+THREE.PerspectiveCamera",
-          "!doc": "Gets or sets the internal PerspectiveCamera used as camera."
-        },
-        "inOrthographicMode": {
-          "!type": "boolean",
-          "!doc": "Gets whether the combinedCamera is in Orthographic Mode."
-        },
-        "inPerspectiveMode": {
-          "!type": "boolean",
-          "!doc": "Gets whether the combinedCamera is in Perspective Mode."
-        },
-        "setFov": {
-          "!type": "fn(fov: number)",
-          "!doc": "sets the camera frustum vertical field of view in perspective view."
-        },
-        "setZoom": {
-          "!type": "fn(zoom: number)",
-          "!doc": "Sets the zoomfactor."
-        },
-        "setLens": {
-          "!type": "fn(focalLength: number, frameHeight: number)",
-          "!doc": "Sets the fov based on lens data."
-        },
-        "toFrontView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the front of the target."
-        },
-        "toBackView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the back of the target."
-        },
-        "toLeftView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the left of the target."
-        },
-        "toRightView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the right of the target."
-        },
-        "toTopView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the top."
-        },
-        "toBottomView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the bottom."
-        },
-        "setSize": {
-          "!type": "fn(width: number, height: number)",
-          "!doc": "Sets the size of the orthographic view."
-        },
-        "toOrthographic": {
-          "!type": "fn()",
-          "!doc": "Change the camera to orthographic view."
-        },
-        "toPerspective": {
-          "!type": "fn()",
-          "!doc": "Change the camera to Perspective view."
-        },
-        "updateProjectionMatrix": {
-          "!type": "fn()",
-          "!doc": "Updates the ProjectionMatrix."
-        }
-      },
-      "!doc": "A general purpose camera, for setting FOV, Lens Focal Length,\n \t\tand switching between perspective and orthographic views easily.\n \t\tUse this only if you do not wish to manage\n \t\tboth an Orthographic and Perspective Camera",
-      "!type": "fn(width: number, height: number, fov: number, near: number, far: number, orthoNear: number, orthoFar: number)"
-    },
     "FontUtils": {
       "!url": "http://threejs.org/docs/#Reference/extras/FontUtils",
       "prototype": {
@@ -912,62 +800,6 @@
       "!url": "http://threejs.org/docs/#Reference/extras/GeometryUtils",
       "prototype": {},
       "!doc": "Contains handy functions geometry manipulations."
-    },
-    "ImageUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/ImageUtils",
-      "prototype": {
-        "crossOrigin": {
-          "!type": "string",
-          "!doc": "The crossOrigin string to implement CORS for loading the image from a different domain that allows CORS."
-        },
-        "generateDataTexture": {
-          "!type": "fn(width: number, height: number, color: number) -> +THREE.DataTexture",
-          "!doc": "Generates a texture of a single color. It is a DataTexture with format, RGBFormat."
-        },
-        "parseDDS": {
-          "!type": "fn(buffer: string, loadMipmaps: boolean) -> +THREE.CompressedTexture",
-          "!doc": "Parses a DDS Image from the string into a CompressedTexture."
-        },
-        "loadCompressedTexture": {
-          "!type": "fn(url: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTexture": {
-          "!type": "fn(url: string, mapping: UVMapping, onLoad: function, onError: function) -> todo",
-          "!doc": "todo"
-        },
-        "getNormalMap": {
-          "!type": "fn(image: todo, depth: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadCompressedTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "A Helper class to ease the loading of images of different types."
-    },
-    "SceneUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/SceneUtils",
-      "prototype": {
-        "createMultiMaterialObject": {
-          "!type": "fn(geometry: +THREE.Geometry, materials: []) -> +THREE.Object3D",
-          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as MultiMaterial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
-        },
-        "attach": {
-          "!type": "fn(child: +THREE.Object3D, scene: +THREE.Object3D, parent: +THREE.Object3D)",
-          "!doc": "Attaches the object to the parent without the moving the object in the worldspace."
-        },
-        "detach": {
-          "!type": "fn(child: +THREE.Object3D, parent: +THREE.Object3D, scene: +THREE.Object3D)",
-          "!doc": "Detaches the object from the parent and adds it back to the scene without moving in worldspace."
-        }
-      },
-      "!doc": "A class containing useful utility functions for scene manipulation."
     },
     "Curve": {
       "!url": "http://threejs.org/docs/#Reference/extras/core/Curve",
@@ -1032,32 +864,8 @@
           "!type": "boolean",
           "!doc": "todo"
         },
-        "getWrapPoints": {
-          "!type": "fn(oldPts: todo, path: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createPointsGeometry": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "addWrapPath": {
-          "!type": "fn(bendpath: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createGeometry": {
-          "!type": "fn(points: todo) -> todo",
-          "!doc": "todo"
-        },
         "add": {
           "!type": "fn(curve: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getTransformedSpacedPoints": {
-          "!type": "fn(segments: todo, bends: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createSpacedPointsGeometry": {
-          "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
         "closePath": {
@@ -1069,14 +877,6 @@
           "!doc": "todo"
         },
         "getCurveLengths": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "getTransformedPoints": {
-          "!type": "fn(segments: todo, bends: todo) -> todo",
-          "!doc": "todo"
-        },
-        "checkConnection": {
           "!type": "fn() -> todo",
           "!doc": "todo"
         }
@@ -1100,7 +900,7 @@
           "!type": "array",
           "!doc": "The possible actions that define the path."
         },
-        "fromPoints": {
+        "setFromPoints": {
           "!type": "fn(vectors) -> todo",
           "!doc": "Adds to the Path from the points. The first vector defines the offset. After that the lines get defined."
         },
@@ -1152,23 +952,7 @@
           "!type": "array",
           "!doc": "todo"
         },
-        "makeGeometry": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ShapeGeometry"
-        },
-        "extractAllPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of shape and holes (keypoints based on segments parameter)"
-        },
-        "extrude": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ExtrudeGeometry"
-        },
         "extractPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "extractAllSpacedPoints": {
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
@@ -1176,10 +960,6 @@
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "Get points of holes"
         },
-        "getSpacedPointsHoles": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of holes (spaced by regular distance)"
-        }
       },
       "!doc": "Defines a 2d shape plane using paths.",
       "!type": "fn()"
@@ -2012,10 +1792,6 @@
         "initMaterials": {
           "!type": "fn(materials: [], texturePath: string) -> []",
           "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
-        },
-        "extractUrlBase": {
-          "!type": "fn(url: string) -> string",
-          "!doc": "Extract the base from the URL."
         }
       },
       "!doc": "Base class for implementing loaders.",
@@ -2060,7 +1836,7 @@
           "!doc": "Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br>"
         }
       },
-      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].",
+      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJLoader].",
       "!type": "fn(baseUrl: string, options: object, crossOrigin: string)"
     },
     "MaterialLoader": {
@@ -3926,11 +3702,11 @@
           "!type": "fn(a: +THREE.Vector3, b: +THREE.Vector3, c: +THREE.Vector3) -> +THREE.Triangle",
           "!doc": "Sets the triangle's vectors to the passed vectors."
         },
-        "normal": {
+        "getNormal": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the calculated normal of the triangle."
         },
-        "barycoordFromPoint": {
+        "getBarycoord": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return a barycentric coordinate from the given vector. <br><br>\n\t\t[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png](Picture of barycentric coordinates)"
         },
@@ -3938,11 +3714,11 @@
           "!type": "fn() -> +THREE.Triangle",
           "!doc": "Return a new copy of this triangle."
         },
-        "area": {
+        "getArea": {
           "!type": "fn() -> number",
           "!doc": "Return the area of the triangle."
         },
-        "midpoint": {
+        "getMidpoint": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the midpoint of the triangle. Optionally sets a target vector."
         },
@@ -3950,7 +3726,7 @@
           "!type": "fn(triangle: +THREE.Triangle) -> bool",
           "!doc": "Checks to see if two triangles are equal (share the same vectors)."
         },
-        "plane": {
+        "getPlane": {
           "!type": "fn(optionalTarget: +THREE.Plane) -> +THREE.Plane",
           "!doc": "Return a [page:Plane plane] based on the triangle. Optionally sets a target plane."
         },
@@ -4568,30 +4344,6 @@
       "!doc": "todo",
       "!type": "fn()"
     },
-    "LensFlare": {
-      "!url": "http://threejs.org/docs/#Reference/objects/LensFlare",
-      "prototype": {
-        "!proto": "THREE.Object3D.prototype",
-        "lensFlares": {
-          "!type": "array",
-          "!doc": "todo"
-        },
-        "positionScreen": {
-          "!type": "+THREE.Vector3",
-          "!doc": "todo"
-        },
-        "customUpdateCallback": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "updateLensFlares": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(texture: todo, size: todo, distance: todo, blending: todo, color: todo)"
-    },
     "Line": {
       "!url": "http://threejs.org/docs/#Reference/objects/Line",
       "prototype": {
@@ -4626,7 +4378,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised color."
         },
         "getMorphTargetIndexByName": {
           "!type": "fn(name: string) -> number",
@@ -4730,7 +4482,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised color."
         },
         "clone": {
           "!type": "fn() -> +THREE.PointCloud",
@@ -5065,10 +4817,6 @@
           "!type": "fn(camera, lights, fog, material, object)",
           "!doc": "Renders an immediate Object using a camera."
         },
-        "setFaceCulling": {
-          "!type": "fn(cullFace, frontFace)",
-          "!doc": "If cullFace is false, culling will be disabled."
-        },
         "setDepthTest": {
           "!type": "fn(depthTest: boolean)",
           "!doc": "This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer."
@@ -5161,23 +4909,12 @@
       "prototype": {},
       "!doc": "todo"
     },
-    "LensFlarePlugin": {
-      "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/LensFlarePlugin",
-      "prototype": {
-        "render": {
-          "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera, viewportWidth: number, viewportHeight: number)",
-          "!doc": "Renders the lensflares defined in the scene. This gets automatically called as post render function to draw the lensflares."
-        }
-      },
-      "!doc": "The Webglrenderer plugin class that allows lensflares to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
-      "!type": "fn()"
-    },
     "ShadowMapPlugin": {
       "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/ShadowMapPlugin",
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Prepares the shadowmaps to be rendered defined in the scene. This gets automatically called as pre render function to draw the lensflares."
+          "!doc": "Prepares the shadowmaps to be rendered defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows shadowmaps to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -5188,7 +4925,7 @@
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Renders the sprites defined in the scene. This gets automatically called as post-render function to draw the lensflares."
+          "!doc": "Renders the sprites defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows Sprites to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -5297,7 +5034,7 @@
         },
         "image": {
           "!type": "Image",
-          "!doc": "An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
+          "!doc": "An Image object, typically created using the [page:ImageLoader ImageLoader] class. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
         },
         "mapping": {
           "!type": "object",

@@ -70,16 +70,17 @@
 
 				//
 
-				geometry = new THREE.BoxGeometry( size, size, size );
+				geometry = new THREE.BoxBufferGeometry( size, size, size );
 				material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = -150;
+				mesh.position.x = - 150;
 				scene.add( mesh );
 
 				//
 
-				geometry = new THREE.BufferGeometry().fromGeometry( new THREE.BoxGeometry( size, size, size ) );
+				geometry = new THREE.BoxBufferGeometry( size, size, size );
+				geometry = geometry.toNonIndexed();
 
 				setupAttributes( geometry );
 
@@ -97,7 +98,8 @@
 
 				//
 
-				geometry = new THREE.BufferGeometry().fromGeometry( new THREE.SphereGeometry( size / 2, 32, 16 ) );
+				geometry = new THREE.SphereBufferGeometry( size / 2, 32, 16 );
+				geometry = geometry.toNonIndexed();
 
 				setupAttributes( geometry );
 
@@ -110,7 +112,7 @@
 				material.extensions.derivatives = true;
 
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = -150;
+				mesh.position.x = - 150;
 				scene.add( mesh );
 
 				// renderer

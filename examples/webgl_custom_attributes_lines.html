@@ -31,7 +31,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="../build/three.js"></script>
@@ -75,7 +75,11 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var renderer, scene, camera, stats;
 
@@ -100,24 +104,24 @@
 			uniforms = {
 
 				amplitude: { value: 5.0 },
-				opacity:   { value: 0.3 },
-				color:     { value: new THREE.Color( 0xff0000 ) }
+				opacity: { value: 0.3 },
+				color: { value: new THREE.Color( 0xffffff ) }
 
 			};
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms:       uniforms,
-				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				uniforms: uniforms,
+				vertexShader: document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-				blending:       THREE.AdditiveBlending,
-				depthTest:      false,
-				transparent:    true
+				blending: THREE.AdditiveBlending,
+				depthTest: false,
+				transparent: true
 
-			});
+			} );
 
 
-			var geometry = new THREE.TextGeometry( 'three.js', {
+			var geometry = new THREE.TextBufferGeometry( 'three.js', {
 
 				font: font,
 
@@ -130,35 +134,28 @@
 				bevelEnabled: true,
 				bevelSegments: 10,
 
-				steps: 40
-
 			} );
 
 			geometry.center();
 
-			var vertices = geometry.vertices;
+			var count = geometry.attributes.position.count;
 
-			var buffergeometry = new THREE.BufferGeometry();
+			var displacement = new THREE.Float32BufferAttribute( count * 3, 3 );
+			geometry.addAttribute( 'displacement', displacement );
 
-			var position = new THREE.Float32BufferAttribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
-			buffergeometry.addAttribute( 'position', position );
-
-			var displacement = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
-			buffergeometry.addAttribute( 'displacement', displacement );
-
-			var customColor = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
-			buffergeometry.addAttribute( 'customColor', customColor );
+			var customColor = new THREE.Float32BufferAttribute( count * 3, 3 );
+			geometry.addAttribute( 'customColor', customColor );
 
 			var color = new THREE.Color( 0xffffff );
 
-			for( var i = 0, l = customColor.count; i < l; i ++ ) {
+			for ( var i = 0, l = customColor.count; i < l; i ++ ) {
 
 				color.setHSL( i / l, 0.5, 0.5 );
 				color.toArray( customColor.array, i * customColor.itemSize );
 
 			}
 
-			object = new THREE.Line( buffergeometry, shaderMaterial );
+			object = new THREE.Line( geometry, shaderMaterial );
 			object.rotation.x = 0.2;
 			scene.add( object );
 
@@ -210,7 +207,7 @@
 
 			for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
-				array[ i     ] += 0.3 * ( 0.5 - Math.random() );
+				array[ i ] += 0.3 * ( 0.5 - Math.random() );
 				array[ i + 1 ] += 0.3 * ( 0.5 - Math.random() );
 				array[ i + 2 ] += 0.3 * ( 0.5 - Math.random() );
 

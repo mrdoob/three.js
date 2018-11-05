@@ -1,35 +1,68 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author moraxy / https://github.com/moraxy
+ */
+/* global QUnit */
 
-	'use strict';
+import { runStdLightTests } from '../../qunit-utils';
+import { HemisphereLight } from '../../../../src/lights/HemisphereLight';
 
-	var parameters = {
-		skyColor: 0x123456,
-		groundColor: 0xabc012,
-		intensity: 0.6
-	};
+export default QUnit.module( 'Lights', () => {
 
-	var lights;
+	QUnit.module( 'HemisphereLight', ( hooks ) => {
 
-	QUnit.module( "Lights - HemisphereLight", {
+		var lights = undefined;
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				skyColor: 0x123456,
+				groundColor: 0xabc012,
+				intensity: 0.6
+			};
 
 			lights = [
-
-				new THREE.HemisphereLight( parameters.skyColor ),
-				new THREE.HemisphereLight( parameters.skyColor, parameters.groundColor ),
-				new THREE.HemisphereLight( parameters.skyColor, parameters.groundColor, parameters.intensity ),
-
+				new HemisphereLight(),
+				new HemisphereLight( parameters.skyColor ),
+				new HemisphereLight( parameters.skyColor, parameters.groundColor ),
+				new HemisphereLight( parameters.skyColor, parameters.groundColor, parameters.intensity ),
 			];
 
-		}
+		} );
 
-	});
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			assert.ok( false, "everything's gonna be alright" );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// PUBLIC STUFF
+		QUnit.todo( "isHemisphereLight", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.todo( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard light tests', ( assert ) => {
+
+			runStdLightTests( assert, lights );
+
+		} );
+
+	} );
+
+} );

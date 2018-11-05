@@ -1,5 +1,5 @@
-import { Vector3 } from '../../math/Vector3';
-import { Curve } from '../core/Curve';
+import { Vector3 } from '../../math/Vector3.js';
+import { Curve } from '../core/Curve.js';
 
 /**
  * @author zz85 https://github.com/zz85
@@ -83,32 +83,38 @@ function CubicPoly() {
 var tmp = new Vector3();
 var px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
 
-function CatmullRomCurve3( points ) {
+function CatmullRomCurve3( points, closed, curveType, tension ) {
 
 	Curve.call( this );
 
-	if ( points.length < 2 ) console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
+	this.type = 'CatmullRomCurve3';
 
 	this.points = points || [];
-	this.closed = false;
+	this.closed = closed || false;
+	this.curveType = curveType || 'centripetal';
+	this.tension = tension || 0.5;
 
 }
 
 CatmullRomCurve3.prototype = Object.create( Curve.prototype );
 CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
 
-CatmullRomCurve3.prototype.getPoint = function ( t ) {
+CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
+
+CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+
+	var point = optionalTarget || new Vector3();
 
 	var points = this.points;
 	var l = points.length;
 
-	var point = ( l - ( this.closed ? 0 : 1 ) ) * t;
-	var intPoint = Math.floor( point );
-	var weight = point - intPoint;
+	var p = ( l - ( this.closed ? 0 : 1 ) ) * t;
+	var intPoint = Math.floor( p );
+	var weight = p - intPoint;
 
 	if ( this.closed ) {
 
-		intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+		intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / l ) + 1 ) * l;
 
 	} else if ( weight === 0 && intPoint === l - 1 ) {
 
@@ -146,10 +152,10 @@ CatmullRomCurve3.prototype.getPoint = function ( t ) {
 
 	}
 
-	if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
+	if ( this.curveType === 'centripetal' || this.curveType === 'chordal' ) {
 
 		// init Centripetal / Chordal Catmull-Rom
-		var pow = this.type === 'chordal' ? 0.5 : 0.25;
+		var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
 		var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
 		var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
 		var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
@@ -163,16 +169,85 @@ CatmullRomCurve3.prototype.getPoint = function ( t ) {
 		py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
 		pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
 
-	} else if ( this.type === 'catmullrom' ) {
+	} else if ( this.curveType === 'catmullrom' ) {
 
-		var tension = this.tension !== undefined ? this.tension : 0.5;
-		px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
-		py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
-		pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
+		px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, this.tension );
+		py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, this.tension );
+		pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, this.tension );
 
 	}
 
-	return new Vector3( px.calc( weight ), py.calc( weight ), pz.calc( weight ) );
+	point.set(
+		px.calc( weight ),
+		py.calc( weight ),
+		pz.calc( weight )
+	);
+
+	return point;
+
+};
+
+CatmullRomCurve3.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.points = [];
+
+	for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+		var point = source.points[ i ];
+
+		this.points.push( point.clone() );
+
+	}
+
+	this.closed = source.closed;
+	this.curveType = source.curveType;
+	this.tension = source.tension;
+
+	return this;
+
+};
+
+CatmullRomCurve3.prototype.toJSON = function () {
+
+	var data = Curve.prototype.toJSON.call( this );
+
+	data.points = [];
+
+	for ( var i = 0, l = this.points.length; i < l; i ++ ) {
+
+		var point = this.points[ i ];
+		data.points.push( point.toArray() );
+
+	}
+
+	data.closed = this.closed;
+	data.curveType = this.curveType;
+	data.tension = this.tension;
+
+	return data;
+
+};
+
+CatmullRomCurve3.prototype.fromJSON = function ( json ) {
+
+	Curve.prototype.fromJSON.call( this, json );
+
+	this.points = [];
+
+	for ( var i = 0, l = json.points.length; i < l; i ++ ) {
+
+		var point = json.points[ i ];
+		this.points.push( new Vector3().fromArray( point ) );
+
+	}
+
+	this.closed = json.closed;
+	this.curveType = json.curveType;
+	this.tension = json.tension;
+
+	return this;
 
 };
 

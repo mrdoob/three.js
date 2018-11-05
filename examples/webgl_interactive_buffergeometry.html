@@ -36,12 +36,16 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -76,7 +80,7 @@
 				scene.add( light1 );
 
 				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light2.position.set( 0, -1, 0 );
+				light2.position.set( 0, - 1, 0 );
 				scene.add( light2 );
 
 				//
@@ -91,8 +95,8 @@
 
 				var color = new THREE.Color();
 
-				var n = 800, n2 = n/2;	// triangles spread in the cube
-				var d = 120, d2 = d/2;	// individual triangle size
+				var n = 800, n2 = n / 2;	// triangles spread in the cube
+				var d = 120, d2 = d / 2;	// individual triangle size
 
 				var pA = new THREE.Vector3();
 				var pB = new THREE.Vector3();
@@ -121,7 +125,7 @@
 					var cy = y + Math.random() * d - d2;
 					var cz = z + Math.random() * d - d2;
 
-					positions[ i ]     = ax;
+					positions[ i ] = ax;
 					positions[ i + 1 ] = ay;
 					positions[ i + 2 ] = az;
 
@@ -149,7 +153,7 @@
 					var ny = cb.y;
 					var nz = cb.z;
 
-					normals[ i ]     = nx;
+					normals[ i ] = nx;
 					normals[ i + 1 ] = ny;
 					normals[ i + 2 ] = nz;
 
@@ -169,7 +173,7 @@
 
 					color.setRGB( vx, vy, vz );
 
-					colors[ i ]     = color.r;
+					colors[ i ] = color.r;
 					colors[ i + 1 ] = color.g;
 					colors[ i + 2 ] = color.b;
 
@@ -190,8 +194,8 @@
 				geometry.computeBoundingSphere();
 
 				var material = new THREE.MeshPhongMaterial( {
-						color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-						side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -206,14 +210,14 @@
 				var geometry = new THREE.BufferGeometry();
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
 
-				var material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2, transparent: true } );
+				var material = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true } );
 
 				line = new THREE.Line( geometry, material );
 				scene.add( line );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

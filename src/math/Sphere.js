@@ -1,5 +1,5 @@
-import { Box3 } from './Box3';
-import { Vector3 } from './Vector3';
+import { Box3 } from './Box3.js';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -111,33 +111,43 @@ Object.assign( Sphere.prototype, {
 
 	},
 
-	clampPoint: function ( point, optionalTarget ) {
+	clampPoint: function ( point, target ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
 
-		var result = optionalTarget || new Vector3();
+		if ( target === undefined ) {
 
-		result.copy( point );
-
-		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
-
-			result.sub( this.center ).normalize();
-			result.multiplyScalar( this.radius ).add( this.center );
+			console.warn( 'THREE.Sphere: .clampPoint() target is now required' );
+			target = new Vector3();
 
 		}
 
-		return result;
+		target.copy( point );
+
+		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
+
+			target.sub( this.center ).normalize();
+			target.multiplyScalar( this.radius ).add( this.center );
+
+		}
+
+		return target;
 
 	},
 
-	getBoundingBox: function ( optionalTarget ) {
+	getBoundingBox: function ( target ) {
 
-		var box = optionalTarget || new Box3();
+		if ( target === undefined ) {
 
-		box.set( this.center, this.center );
-		box.expandByScalar( this.radius );
+			console.warn( 'THREE.Sphere: .getBoundingBox() target is now required' );
+			target = new Box3();
 
-		return box;
+		}
+
+		target.set( this.center, this.center );
+		target.expandByScalar( this.radius );
+
+		return target;
 
 	},
 

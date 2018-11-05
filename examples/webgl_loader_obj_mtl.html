@@ -36,7 +36,6 @@
 		<script src="js/loaders/MTLLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -67,43 +66,47 @@
 
 				scene = new THREE.Scene();
 
-				var ambient = new THREE.AmbientLight( 0x444444 );
-				scene.add( ambient );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
-				scene.add( directionalLight );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
 
 				// model
 
 				var onProgress = function ( xhr ) {
+
 					if ( xhr.lengthComputable ) {
+
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
 					}
+
 				};
 
-				var onError = function ( xhr ) { };
+				var onError = function () { };
 
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
-				var mtlLoader = new THREE.MTLLoader();
-				mtlLoader.setPath( 'obj/male02/' );
-				mtlLoader.load( 'male02_dds.mtl', function( materials ) {
+				new THREE.MTLLoader()
+					.setPath( 'models/obj/male02/' )
+					.load( 'male02_dds.mtl', function ( materials ) {
 
-					materials.preload();
+						materials.preload();
 
-					var objLoader = new THREE.OBJLoader();
-					objLoader.setMaterials( materials );
-					objLoader.setPath( 'obj/male02/' );
-					objLoader.load( 'male02.obj', function ( object ) {
+						new THREE.OBJLoader()
+							.setMaterials( materials )
+							.setPath( 'models/obj/male02/' )
+							.load( 'male02.obj', function ( object ) {
 
-						object.position.y = - 95;
-						scene.add( object );
+								object.position.y = - 95;
+								scene.add( object );
 
-					}, onProgress, onError );
+							}, onProgress, onError );
 
-				});
+					} );
 
 				//
 

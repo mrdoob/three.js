@@ -5,16 +5,14 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			body
-			{
+			body {
 				font-family: Monospace;
 				background-color: #000;
 				color: #fff;
 				margin: 0px;
 				overflow: hidden;
 			}
-			#info
-			{
+			#info {
 				position: absolute;
 				top: 10px;
 				width: 100%;
@@ -22,55 +20,28 @@
 				z-index: 100;
 				display:block;
 			}
-			#info a, .button
-			{
+			#info a, .button {
 				color: #f00;
 				font-weight: bold;
 				text-decoration: underline;
 				cursor: pointer
 			}
-			.actions{
-				padding: 2em;
-				line-height: 0;
-			}
-			.actions span{
-				line-height: 4em;
-				padding: 1em;
-				border: 1px solid white;
-				cursor: pointer;
-				white-space: nowrap;
-				user-select: none;
-			}
-			.actions span:hover{
-				color: red;
-				border-color: red;
-			}
-			.actions span:active{
-				color: black;
-				background-color: red;
-				border-color: red;
-			}
 		</style>
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/loaders/ImageBitmapLoader.js"></script>
+		<script src="js/WebGL.js"></script>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Texture loader using ImageBitmap
-			<div class="actions">
-				<span id="add_ib_btn">Add ImageBitmap</span>
-				<span id="add_i_btn">Add Image</span>
-				<span id="clear_btn">Clear</span>
-			</div>
 		</div>
-
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			THREE.Cache.enabled = true;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
@@ -80,45 +51,51 @@
 			init();
 			animate();
 
-			function addImageBitmap () {
+			function addImageBitmap() {
 
 				new THREE.ImageBitmapLoader()
 					.setOptions( { imageOrientation: 'none' } )
-					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function( imageBitmap ) {
+					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
-						var tex = new THREE.CanvasTexture( imageBitmap );
+						var texture = new THREE.CanvasTexture( imageBitmap );
+						var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 						/* ImageBitmap should be disposed when done with it
 						   Can't be done until it's actually uploaded to WebGLTexture */
 
 						// imageBitmap.close();
 
-						addCube( tex );
+						addCube( material );
 
-					}, function( p ) {
+					}, function ( p ) {
+
 						console.log( p );
-					}, function( e ) {
+
+					}, function ( e ) {
+
 						console.log( e );
+
 					} );
 
 			}
 
-			function addImage () {
+			function addImage() {
 
 				new THREE.ImageLoader()
 					.setCrossOrigin( '*' )
-					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function( image ) {
-							var tex = new THREE.CanvasTexture( image );
-							addCube( tex );
-				});
+					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( image ) {
+
+						var texture = new THREE.CanvasTexture( image );
+						var material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
+						addCube( material );
+
+					} );
 
 			}
 
-			var geometry = new THREE.BoxBufferGeometry( 1,1,1 );
+			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 
-			function addCube( texture ) {
-
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+			function addCube( material ) {
 
 				var cube = new THREE.Mesh( geometry, material );
 				cube.position.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
@@ -136,7 +113,7 @@
 
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.set( 0, 4, 7 );
-				camera.lookAt( new THREE.Vector3() );
+				camera.lookAt( 0, 0, 0 );
 
 				// SCENE
 
@@ -152,31 +129,6 @@
 				cubes = new THREE.Group();
 				group.add( cubes );
 
-				addImageBitmap();
-				addImage();
-
-				var ibBtn = document.getElementById( 'add_ib_btn' );
-				ibBtn.addEventListener( 'click', function( e ) {
-					addImageBitmap();
-					e.preventDefault();
-				} );
-
-				var iBtn = document.getElementById( 'add_i_btn' );
-				iBtn.addEventListener( 'click', function( e ) {
-					addImage();
-					e.preventDefault();
-				} );
-
-				var clearBtn = document.getElementById( 'clear_btn' );
-				clearBtn.addEventListener( 'click', function( e ) {
-					while( cubes.children.length ) {
-						var cube = cubes.children[ 0 ]
-						cubes.remove( cube );
-						cube.geometry.dispose();
-						cube.material.map.dispose();
-					}
-				})
-
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -184,9 +136,19 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				// TESTS
+
+				setTimeout( addImage, 300 );
+				setTimeout( addImage, 600 );
+				setTimeout( addImage, 900 );
+				setTimeout( addImageBitmap, 1300 );
+				setTimeout( addImageBitmap, 1600 );
+				setTimeout( addImageBitmap, 1900 );
+
 				// EVENTS
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
 			function onWindowResize() {

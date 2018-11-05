@@ -10,28 +10,29 @@
 	},
 	"camera": {
 		"metadata": {
-			"version": 4.4,
+			"version": 4.5,
 			"type": "Object",
 			"generator": "Object3D.toJSON"
 		},
 		"object": {
-			"uuid": "FC3E973B-5A4A-4177-BD9C-A58E61E0593B",
+			"uuid": "4AC7ADED-CC22-4B16-8218-2E0A0C38C8F8",
 			"type": "PerspectiveCamera",
 			"name": "Camera",
+			"layers": 1,
 			"matrix": [0.605503,0,-0.795843,0,-0.261526,0.944464,-0.198978,0,0.751645,0.328615,0.571876,0,2.571484,1.124239,1.956469,1],
 			"fov": 50,
 			"zoom": 1,
 			"near": 0.1,
 			"far": 10000,
 			"focus": 10,
-			"aspect": 1.368715,
+			"aspect": 1.428977,
 			"filmGauge": 35,
 			"filmOffset": 0
 		}
 	},
 	"scene": {
 		"metadata": {
-			"version": 4.4,
+			"version": 4.5,
 			"type": "Object",
 			"generator": "Object3D.toJSON"
 		},
@@ -50,11 +51,9 @@
 				"depthTest": true,
 				"depthWrite": true,
 				"wireframe": true,
-				"skinning": false,
-				"morphTargets": false,
 				"uniforms": {
 					"time": {
-						"value": 0.0
+						"value": 0
 					}
 				},
 				"vertexShader": "uniform float time;\nvarying vec3 vPosition;\nvoid main() {\n\tvPosition = position;\n\tvPosition.x += sin( time + vPosition.z * 4.0 ) / 4.0;\n\tvPosition.y += cos( time + vPosition.z * 4.0 ) / 4.0;\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );\n}",
@@ -64,12 +63,14 @@
 			"uuid": "5FC9ACA9-2A93-474D-AA32-FACC76551914",
 			"type": "Scene",
 			"name": "Scene",
+			"layers": 1,
 			"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
 			"children": [
 				{
 					"uuid": "FC7B6CF2-6386-4F47-9CE6-8ADB9FCA6E1F",
 					"type": "Mesh",
 					"name": "Icosahedron 1",
+					"layers": 1,
 					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
 					"geometry": "EA781333-F3AE-470D-9110-A9724FCB42AA",
 					"material": "50ED51F1-DEA4-4B61-8082-BF41609E8C27"

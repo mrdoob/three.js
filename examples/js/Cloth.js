@@ -46,13 +46,13 @@ var lastTime;
 
 function plane( width, height ) {
 
-	return function( u, v ) {
+	return function ( u, v, target ) {
 
 		var x = ( u - 0.5 ) * width;
 		var y = ( v + 0.5 ) * height;
 		var z = 0;
 
-		return new THREE.Vector3( x, y, z );
+		target.set( x, y, z );
 
 	};
 
@@ -60,20 +60,26 @@ function plane( width, height ) {
 
 function Particle( x, y, z, mass ) {
 
-	this.position = clothFunction( x, y ); // position
-	this.previous = clothFunction( x, y ); // previous
-	this.original = clothFunction( x, y );
+	this.position = new THREE.Vector3();
+	this.previous = new THREE.Vector3();
+	this.original = new THREE.Vector3();
 	this.a = new THREE.Vector3( 0, 0, 0 ); // acceleration
 	this.mass = mass;
 	this.invMass = 1 / mass;
 	this.tmp = new THREE.Vector3();
 	this.tmp2 = new THREE.Vector3();
 
+	// init
+
+	clothFunction( x, y, this.position ); // position
+	clothFunction( x, y, this.previous ); // previous
+	clothFunction( x, y, this.original );
+
 }
 
 // Force -> Acceleration
 
-Particle.prototype.addForce = function( force ) {
+Particle.prototype.addForce = function ( force ) {
 
 	this.a.add(
 		this.tmp2.copy( force ).multiplyScalar( this.invMass )
@@ -84,7 +90,7 @@ Particle.prototype.addForce = function( force ) {
 
 // Performs Verlet integration
 
-Particle.prototype.integrate = function( timesq ) {
+Particle.prototype.integrate = function ( timesq ) {
 
 	var newPos = this.tmp.subVectors( this.position, this.previous );
 	newPos.multiplyScalar( DRAG ).add( this.position );
@@ -237,19 +243,23 @@ function simulate( time ) {
 
 	if ( wind ) {
 
-		var face, faces = clothGeometry.faces, normal;
+		var indx;
+		var normal = new THREE.Vector3();
+		var indices = clothGeometry.index;
+		var normals = clothGeometry.attributes.normal;
 
 		particles = cloth.particles;
 
-		for ( i = 0, il = faces.length; i < il; i ++ ) {
+		for ( i = 0, il = indices.count; i < il; i += 3 ) {
 
-			face = faces[ i ];
-			normal = face.normal;
+			for ( j = 0; j < 3; j ++ ) {
 
-			tmpForce.copy( normal ).normalize().multiplyScalar( normal.dot( windForce ) );
-			particles[ face.a ].addForce( tmpForce );
-			particles[ face.b ].addForce( tmpForce );
-			particles[ face.c ].addForce( tmpForce );
+				indx = indices.getX( i + j );
+				normal.fromBufferAttribute( normals, indx )
+				tmpForce.copy( normal ).normalize().multiplyScalar( normal.dot( windForce ) );
+				particles[ indx ].addForce( tmpForce );
+
+			}
 
 		}
 
@@ -278,7 +288,7 @@ function simulate( time ) {
 
 	// Ball Constraints
 
-	ballPosition.z = - Math.sin( Date.now() / 600 ) * 90 ; //+ 40;
+	ballPosition.z = - Math.sin( Date.now() / 600 ) * 90; //+ 40;
 	ballPosition.x = Math.cos( Date.now() / 400 ) * 70;
 
 	if ( sphere.visible ) {

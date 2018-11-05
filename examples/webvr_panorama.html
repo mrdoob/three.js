@@ -4,8 +4,12 @@
 		<title>three.js webvr - panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-09-03 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-09-03" content="Aqj+6XPnxHoSxQj/CDjGXhzrVFeP12/Pgvj7rfqFqVzodYX0ZXJNHTJIvCVExQfvip+Zq9GES+SOQ/zJlpceZgcAAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwNDQ2NDIwNn0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-09-11 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-09-11" content="AqhFUYKxq/d+E8CDT0fuYRCg8TvlTP52x0Jv7I9t27sLhR30LmcahBRfSwzP89ukjs2+ia99VrrLoRyaFAwJVA0AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNjYyNDAwMH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2018-12-02 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2018-12-02" content="Ah46myef4Ax/+fcLtkeotXmIqnvun4lg4bYbHVttuJvbsWiE4oacrvroId7hbCEb4/byxFHIO6+uwq4pwr6RfQkAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Mzc1ODIyNn0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-12-02 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-12-02" content="AqI9LIanbGxr/HoTOsYCUNxG82Vy94NZbjhv83R+bF+5NX2jiZOaf7ny+mFoTUP5wrWpYlPjQ6+HeVas9f1lRwYAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQzNzU4MjI2fQ==">
 		<style>
 			html, body {
 				background-color: #000;
@@ -23,14 +27,6 @@
 
 		<script>
 
-		WEBVR.checkAvailability().catch( function( message ) {
-
-			document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-		} );
-
-		//
-
 		var camera;
 		var renderer;
 		var scene;
@@ -43,24 +39,20 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.vr.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			renderer.vr.enabled = true;
+			document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'head-model' } ) );
+
+			//
 
 			scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera.layers.enable( 1 );
 
-			WEBVR.getVRDisplay( function ( display ) {
-
-				renderer.vr.setDevice( display );
-
-				document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-			} );
-
-			var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+			var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+			geometry.scale( 1, 1, - 1 );
 			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );
 
 			var materials = [];
@@ -72,7 +64,6 @@
 			}
 
 			var skyBox = new THREE.Mesh( geometry, materials );
-			skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
 			skyBox.layers.set( 1 );
 			scene.add( skyBox );
 
@@ -86,7 +77,6 @@
 			}
 
 			var skyBoxR = new THREE.Mesh( geometry, materialsR );
-			skyBoxR.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
 			skyBoxR.layers.set( 2 );
 			scene.add( skyBoxR );
 
@@ -104,9 +94,8 @@
 
 			}
 
-			var imageObj = new Image();
-
-			imageObj.onload = function() {
+			var loader = new THREE.ImageLoader();
+			loader.load( atlasImgUrl, function ( imageObj ) {
 
 				var canvas, context;
 				var tileWidth = imageObj.height;
@@ -118,14 +107,12 @@
 					canvas.height = tileWidth;
 					canvas.width = tileWidth;
 					context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-					textures[ i ].image = canvas
+					textures[ i ].image = canvas;
 					textures[ i ].needsUpdate = true;
 
 				}
 
-			};
-
-			imageObj.src = atlasImgUrl;
+			} );
 
 			return textures;
 
@@ -142,7 +129,7 @@
 
 		function animate() {
 
-			renderer.animate( render );
+			renderer.setAnimationLoop( render );
 
 		}
 

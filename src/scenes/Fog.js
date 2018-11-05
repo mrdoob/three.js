@@ -1,11 +1,11 @@
-import { Color } from '../math/Color';
+import { Color } from '../math/Color.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Fog ( color, near, far ) {
+function Fog( color, near, far ) {
 
 	this.name = '';
 
@@ -20,11 +20,11 @@ Fog.prototype.isFog = true;
 
 Fog.prototype.clone = function () {
 
-	return new Fog( this.color.getHex(), this.near, this.far );
+	return new Fog( this.color, this.near, this.far );
 
 };
 
-Fog.prototype.toJSON = function ( meta ) {
+Fog.prototype.toJSON = function ( /* meta */ ) {
 
 	return {
 		type: 'Fog',

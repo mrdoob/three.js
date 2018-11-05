@@ -120,7 +120,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	function init( parameters ) {
 
-		_this.renderer = parameters.renderer !== undefined ? parameters.renderer : new THREE.WebGLRenderer( { antialias: false } );
+		_this.renderer = parameters.renderer !== undefined ? parameters.renderer : new THREE.WebGLRenderer();
 		_this.domElement = _this.renderer.domElement;
 
 		_gl = _this.renderer.context;
@@ -797,7 +797,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	function createDeferredPointLight( light ) {
 
-		var mesh = createDeferredLightMesh( light, new THREE.SphereGeometry( 1, 16, 8 ) );
+		var mesh = createDeferredLightMesh( light, new THREE.SphereBufferGeometry( 1, 16, 8 ) );
 		mesh.onBeforeRender = updateDeferredPointLightUniforms;
 		return mesh;
 

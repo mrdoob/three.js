@@ -2,11 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { REVISION } from '../constants';
-import { WebGLExtensions } from './webgl/WebGLExtensions';
-import { WebGLState } from './webgl/WebGLState';
-import { Color } from '../math/Color';
-import { Vector4 } from '../math/Vector4';
+import { REVISION } from '../constants.js';
+import { WebGLExtensions } from './webgl/WebGLExtensions.js';
+import { WebGLState } from './webgl/WebGLState.js';
+import { Color } from '../math/Color.js';
+import { Vector4 } from '../math/Vector4.js';
 
 function WebGL2Renderer( parameters ) {
 
@@ -15,14 +15,15 @@ function WebGL2Renderer( parameters ) {
 	parameters = parameters || {};
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
-	_context = parameters.context !== undefined ? parameters.context : null,
+		_context = parameters.context !== undefined ? parameters.context : null,
 
-	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
-	_depth = parameters.depth !== undefined ? parameters.depth : true,
-	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
-	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
-	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false;
+		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
+		_depth = parameters.depth !== undefined ? parameters.depth : true,
+		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
+		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
+		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
+		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
 
 	// initialize
 
@@ -36,8 +37,14 @@ function WebGL2Renderer( parameters ) {
 			stencil: _stencil,
 			antialias: _antialias,
 			premultipliedAlpha: _premultipliedAlpha,
-			preserveDrawingBuffer: _preserveDrawingBuffer
+			preserveDrawingBuffer: _preserveDrawingBuffer,
+			powerPreference: _powerPreference
 		};
+
+		// event listeners must be registered before WebGL context is created, see #12753
+
+		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
+		_canvas.addEventListener( 'webglcontextrestored', function () { } );
 
 		gl = _context || _canvas.getContext( 'webgl2', attributes );
 
@@ -45,29 +52,25 @@ function WebGL2Renderer( parameters ) {
 
 			if ( _canvas.getContext( 'webgl2' ) !== null ) {
 
-				throw 'Error creating WebGL2 context with your selected attributes.';
+				throw new Error( 'Error creating WebGL2 context with your selected attributes.' );
 
 			} else {
 
-				throw 'Error creating WebGL2 context.';
+				throw new Error( 'Error creating WebGL2 context.' );
 
 			}
 
 		}
 
-		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
-
 	} catch ( error ) {
 
-		console.error( 'THREE.WebGL2Renderer: ' + error );
+		console.error( 'THREE.WebGL2Renderer: ' + error.message );
 
 	}
 
 	//
 
-	var _this = this,
-
-		_autoClear = true,
+	var _autoClear = true,
 		_autoClearColor = true,
 		_autoClearDepth = true,
 		_autoClearStencil = true,

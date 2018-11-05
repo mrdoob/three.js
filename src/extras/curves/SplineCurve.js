@@ -1,13 +1,15 @@
-import { Curve } from '../core/Curve';
-import { CatmullRom } from '../core/Interpolations';
-import { Vector2 } from '../../math/Vector2';
+import { Curve } from '../core/Curve.js';
+import { CatmullRom } from '../core/Interpolations.js';
+import { Vector2 } from '../../math/Vector2.js';
 
 
 function SplineCurve( points /* array of Vector2 */ ) {
 
 	Curve.call( this );
 
-	this.points = ( points === undefined ) ? [] : points;
+	this.type = 'SplineCurve';
+
+	this.points = points || [];
 
 }
 
@@ -16,24 +18,81 @@ SplineCurve.prototype.constructor = SplineCurve;
 
 SplineCurve.prototype.isSplineCurve = true;
 
-SplineCurve.prototype.getPoint = function ( t ) {
+SplineCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+	var point = optionalTarget || new Vector2();
 
 	var points = this.points;
-	var point = ( points.length - 1 ) * t;
+	var p = ( points.length - 1 ) * t;
 
-	var intPoint = Math.floor( point );
-	var weight = point - intPoint;
+	var intPoint = Math.floor( p );
+	var weight = p - intPoint;
 
-	var point0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
-	var point1 = points[ intPoint ];
-	var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
-	var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
+	var p0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
+	var p1 = points[ intPoint ];
+	var p2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
+	var p3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-	return new Vector2(
-		CatmullRom( weight, point0.x, point1.x, point2.x, point3.x ),
-		CatmullRom( weight, point0.y, point1.y, point2.y, point3.y )
+	point.set(
+		CatmullRom( weight, p0.x, p1.x, p2.x, p3.x ),
+		CatmullRom( weight, p0.y, p1.y, p2.y, p3.y )
 	);
 
+	return point;
+
 };
+
+SplineCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.points = [];
+
+	for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+		var point = source.points[ i ];
+
+		this.points.push( point.clone() );
+
+	}
+
+	return this;
+
+};
+
+SplineCurve.prototype.toJSON = function () {
+
+	var data = Curve.prototype.toJSON.call( this );
+
+	data.points = [];
+
+	for ( var i = 0, l = this.points.length; i < l; i ++ ) {
+
+		var point = this.points[ i ];
+		data.points.push( point.toArray() );
+
+	}
+
+	return data;
+
+};
+
+SplineCurve.prototype.fromJSON = function ( json ) {
+
+	Curve.prototype.fromJSON.call( this, json );
+
+	this.points = [];
+
+	for ( var i = 0, l = json.points.length; i < l; i ++ ) {
+
+		var point = json.points[ i ];
+		this.points.push( new Vector2().fromArray( point ) );
+
+	}
+
+	return this;
+
+};
+
 
 export { SplineCurve };

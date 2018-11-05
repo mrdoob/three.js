@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { _Math } from './Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -313,23 +313,73 @@ Object.assign( Color.prototype, {
 
 	},
 
-	convertGammaToLinear: function () {
+	convertGammaToLinear: function ( gammaFactor ) {
 
-		var r = this.r, g = this.g, b = this.b;
-
-		this.r = r * r;
-		this.g = g * g;
-		this.b = b * b;
+		this.copyGammaToLinear( this, gammaFactor );
 
 		return this;
 
 	},
 
-	convertLinearToGamma: function () {
+	convertLinearToGamma: function ( gammaFactor ) {
 
-		this.r = Math.sqrt( this.r );
-		this.g = Math.sqrt( this.g );
-		this.b = Math.sqrt( this.b );
+		this.copyLinearToGamma( this, gammaFactor );
+
+		return this;
+
+	},
+
+	copySRGBToLinear: function () {
+
+		function SRGBToLinear( c ) {
+
+			return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+		}
+
+		return function copySRGBToLinear( color ) {
+
+			this.r = SRGBToLinear( color.r );
+			this.g = SRGBToLinear( color.g );
+			this.b = SRGBToLinear( color.b );
+
+			return this;
+
+		};
+
+	}(),
+
+	copyLinearToSRGB: function () {
+
+		function LinearToSRGB( c ) {
+
+			return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+
+		}
+
+		return function copyLinearToSRGB( color ) {
+
+			this.r = LinearToSRGB( color.r );
+			this.g = LinearToSRGB( color.g );
+			this.b = LinearToSRGB( color.b );
+
+			return this;
+
+		};
+
+	}(),
+
+	convertSRGBToLinear: function () {
+
+		this.copySRGBToLinear( this );
+
+		return this;
+
+	},
+
+	convertLinearToSRGB: function () {
+
+		this.copyLinearToSRGB( this );
 
 		return this;
 
@@ -347,11 +397,16 @@ Object.assign( Color.prototype, {
 
 	},
 
-	getHSL: function ( optionalTarget ) {
+	getHSL: function ( target ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		var hsl = optionalTarget || { h: 0, s: 0, l: 0 };
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Color: .getHSL() target is now required' );
+			target = { h: 0, s: 0, l: 0 };
+
+		}
 
 		var r = this.r, g = this.g, b = this.b;
 
@@ -384,11 +439,11 @@ Object.assign( Color.prototype, {
 
 		}
 
-		hsl.h = hue;
-		hsl.s = saturation;
-		hsl.l = lightness;
+		target.h = hue;
+		target.s = saturation;
+		target.l = lightness;
 
-		return hsl;
+		return target;
 
 	},
 
@@ -398,17 +453,23 @@ Object.assign( Color.prototype, {
 
 	},
 
-	offsetHSL: function ( h, s, l ) {
+	offsetHSL: function () {
 
-		var hsl = this.getHSL();
+		var hsl = {};
 
-		hsl.h += h; hsl.s += s; hsl.l += l;
+		return function ( h, s, l ) {
 
-		this.setHSL( hsl.h, hsl.s, hsl.l );
+			this.getHSL( hsl );
 
-		return this;
+			hsl.h += h; hsl.s += s; hsl.l += l;
 
-	},
+			this.setHSL( hsl.h, hsl.s, hsl.l );
+
+			return this;
+
+		};
+
+	}(),
 
 	add: function ( color ) {
 
@@ -440,7 +501,7 @@ Object.assign( Color.prototype, {
 
 	},
 
-	sub: function( color ) {
+	sub: function ( color ) {
 
 		this.r = Math.max( 0, this.r - color.r );
 		this.g = Math.max( 0, this.g - color.g );
@@ -479,6 +540,28 @@ Object.assign( Color.prototype, {
 		return this;
 
 	},
+
+	lerpHSL: function () {
+
+		var hslA = { h: 0, s: 0, l: 0 };
+		var hslB = { h: 0, s: 0, l: 0 };
+
+		return function lerpHSL( color, alpha ) {
+
+			this.getHSL( hslA );
+			color.getHSL( hslB );
+
+			var h = _Math.lerp( hslA.h, hslB.h, alpha );
+			var s = _Math.lerp( hslA.s, hslB.s, alpha );
+			var l = _Math.lerp( hslA.l, hslB.l, alpha );
+
+			this.setHSL( h, s, l );
+
+			return this;
+
+		};
+
+	}(),
 
 	equals: function ( c ) {
 

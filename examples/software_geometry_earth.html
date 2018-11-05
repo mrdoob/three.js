@@ -71,9 +71,9 @@
 				var loader = new THREE.TextureLoader();
 				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg', function ( texture ) {
 
-					var geometry = new THREE.SphereGeometry( 200, 20, 20 );
+					var geometry = new THREE.SphereBufferGeometry( 200, 20, 20 );
 
-					var material = new THREE.MeshLambertMaterial( { map: texture, overdraw: 0.5 } );
+					var material = new THREE.MeshLambertMaterial( { map: texture } );
 					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
 
@@ -103,7 +103,7 @@
 				var texture = new THREE.CanvasTexture( canvas );
 
 				var geometry = new THREE.PlaneBufferGeometry( 300, 300, 3, 3 );
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 250;

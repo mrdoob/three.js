@@ -10,7 +10,7 @@
  * @constructor
  */
 
-var SetMaterialColorCommand = function ( object, attributeName, newValue, slot ) {
+var SetMaterialColorCommand = function ( object, attributeName, newValue, materialSlot ) {
 
 	Command.call( this );
 
@@ -19,30 +19,30 @@ var SetMaterialColorCommand = function ( object, attributeName, newValue, slot )
 	this.updatable = true;
 
 	this.object = object;
-	this.attributeName = attributeName;
-	this.slot = slot;
+	this.material = this.editor.getObjectMaterial( object, materialSlot );
 
-	var material = this.editor.getObjectMaterial( this.object, this.slot );
-
-	this.oldValue = ( material !== undefined ) ? material[ this.attributeName ].getHex() : undefined;
+	this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ].getHex() : undefined;
 	this.newValue = newValue;
-	
+
+	this.attributeName = attributeName;
+
 };
 
 SetMaterialColorCommand.prototype = {
 
 	execute: function () {
-		var material = this.editor.getObjectMaterial( this.object, this.slot )
-		material[ this.attributeName ].setHex( this.newValue );
-		this.editor.signals.materialChanged.dispatch( material );
+
+		this.material[ this.attributeName ].setHex( this.newValue );
+
+		this.editor.signals.materialChanged.dispatch( this.material );
 
 	},
 
 	undo: function () {
-		var material = this.editor.getObjectMaterial( this.object, this.slot )
 
-		material[ this.attributeName ].setHex( this.oldValue );
-		this.editor.signals.materialChanged.dispatch( material );
+		this.material[ this.attributeName ].setHex( this.oldValue );
+
+		this.editor.signals.materialChanged.dispatch( this.material );
 
 	},
 

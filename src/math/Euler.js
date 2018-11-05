@@ -1,7 +1,7 @@
-import { Quaternion } from './Quaternion';
-import { Vector3 } from './Vector3';
-import { Matrix4 } from './Matrix4';
-import { _Math } from './Math';
+import { Quaternion } from './Quaternion.js';
+import { Vector3 } from './Vector3.js';
+import { Matrix4 } from './Matrix4.js';
+import { _Math } from './Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

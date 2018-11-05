@@ -441,7 +441,7 @@ THREE.SEA3D.Domain.prototype.applyContainerTransform = function () {
 	var matrix = this.container.matrix.clone();
 
 	this.container.position.set( 0, 0, 0 );
-	this.container.rotation.set( 0, 0, 0 );
+	this.container.quaternion.set( 0, 0, 0, 1 );
 	this.container.scale.set( 1, 1, 1 );
 
 	this.applyTransform( matrix );
@@ -491,7 +491,7 @@ THREE.SEA3D.Domain.prototype.applyTransform = function ( matrix ) {
 		// ignore rotation scale
 
 		mtx.scale( vec.set( 1 / obj3d.scale.x, 1 / obj3d.scale.y, 1 / obj3d.scale.z ) );
-		obj3d.rotation.setFromRotationMatrix( mtx );
+		obj3d.quaternion.setFromRotationMatrix( mtx );
 
 	}
 

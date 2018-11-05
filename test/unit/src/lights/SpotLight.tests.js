@@ -1,41 +1,91 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author moraxy / https://github.com/moraxy
+ */
+/* global QUnit */
 
-	'use strict';
+import { runStdLightTests } from '../../qunit-utils';
+import { SpotLight } from '../../../../src/lights/SpotLight';
 
-	var parameters = {
-		color: 0xaaaaaa,
-		intensity: 0.5,
-		distance: 100,
-		angle: 0.8,
-		exponent: 8,
-		decay: 2
-	};
+export default QUnit.module( 'Lights', () => {
 
-	var lights;
+	QUnit.module( 'SpotLight', ( hooks ) => {
 
-	QUnit.module( "Lights - SpotLight", {
+		var lights = undefined;
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				color: 0xaaaaaa,
+				intensity: 0.5,
+				distance: 100,
+				angle: 0.8,
+				penumbra: 8,
+				decay: 2
+			};
 
 			lights = [
-
-				new THREE.SpotLight( parameters.color ),
-				new THREE.SpotLight( parameters.color, parameters.intensity ),
-				new THREE.SpotLight( parameters.color, parameters.intensity, parameters.distance ),
-				new THREE.SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle ),
-				new THREE.SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.exponent ),
-				new THREE.SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.exponent, parameters.decay ),
-
+				new SpotLight( parameters.color ),
+				new SpotLight( parameters.color, parameters.intensity ),
+				new SpotLight( parameters.color, parameters.intensity, parameters.distance ),
+				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle ),
+				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.penumbra ),
+				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.penumbra, parameters.decay ),
 			];
 
-		}
+		} );
 
-	});
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			assert.ok( false, "everything's gonna be alright" );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( "power", ( assert ) => {
+
+			var a = new SpotLight( 0xaaaaaa );
+
+			a.intensity = 100;
+			assert.numEqual( a.power, 100 * Math.PI, "Correct power for an intensity of 100" );
+
+			a.intensity = 40;
+			assert.numEqual( a.power, 40 * Math.PI, "Correct power for an intensity of 40" );
+
+			a.power = 100;
+			assert.numEqual( a.intensity, 100 / Math.PI, "Correct intensity for a power of 100" );
+
+		} );
+
+		// PUBLIC STUFF
+		QUnit.todo( "isSpotLight", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.todo( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard light tests', ( assert ) => {
+
+			runStdLightTests( assert, lights );
+
+		} );
+
+
+
+	} );
+
+} );

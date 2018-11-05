@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.
+			The material must support skinning and have skinning enabled - see [page:MeshStandardMaterial.skinning].
+		</p>
+
+		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
+
+		<code>
+		var geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
+
+		//Create the skin indices and skin weights
+		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+
+			// Imaginary functions to calculate the indices and weights
+			// This part will need to be changed depending your skeleton and model
+			var skinIndex = calculateSkinIndex( geometry.vertices, i );
+			var skinWeight = calculateSkinWeight( geometry.vertices, i );
+
+			// Ease between each bone
+			geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex + 1, 0, 0 ) );
+			geometry.skinWeights.push( new THREE.Vector4( 1 - skinWeight, skinWeight, 0, 0 ) );
+
+		}
+
+		var mesh = new THREE.SkinnedMesh( geometry, material );
+
+		// See example from THREE.Skeleton for the armSkeleton
+		var rootBone = armSkeleton.bones[ 0 ];
+		mesh.add( rootBone );
+
+		// Bind the skeleton to the mesh
+		mesh.bind( armSkeleton );
+
+		// Move the bones and manipulate the model
+		armSkeleton.bones[ 0 ].rotation.x = -0.1;
+		armSkeleton.bones[ 1 ].rotation.x = 0.2;
+		</code>
+
+		<h2>Constructor</h2>
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<p>
+    [page:Geometry geometry] - an instance of [page:Geometry] or [page:BufferGeometry] (recommended).
+		[page:Geometry.skinIndices skinIndices] and [page:Geometry.skinWeights skinWeights] should be set to true on the geometry.<br />
+    [page:Material material] - (optional) an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].
+		</p>
+
+
+
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:string bindMode]</h3>
+		<p>
+		Either "attached" or "detached". "attached" uses the [page:SkinnedMesh.matrixWorld]
+		property for the base transform	matrix of the bones. "detached" uses the
+		[page:SkinnedMesh.bindMatrix]. Default is "attached".
+		</p>
+
+		<h3>[property:Matrix4 bindMatrix]</h3>
+		<p>
+		The base matrix that is used for the bound bone transforms.
+		</p>
+
+		<h3>[property:Matrix4 bindMatrixInverse]</h3>
+		<p>
+		The base matrix that is used for resetting the bound bone transforms.
+		</p>
+
+		<h3>[property:Boolean isSkinnedMesh]</h3>
+		<p>
+			Used to check whether this or derived classes are skinned meshes. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+		<h3>[property:Skeleton skeleton]</h3>
+		<p>
+		[page:Skeleton] created from the [page:Geometry.bones bones] of the [page:Geometry] passed in the
+		constructor.
+		</p>
+
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
+		<p>
+		[page:Skeleton skeleton] - [page:Skeleton] created from a [page:Bone Bones] tree.<br/>
+		[page:Matrix4 bindMatrix] - [page:Matrix4] that represents the base transform of the skeleton.<br /><br />
+
+		Bind a skeleton to the skinned mesh. The bindMatrix gets saved to .bindMatrix property
+		and the .bindMatrixInverse gets calculated. This is called automatically in the constructor, and the skeleton
+		is created from the [page:Geometry.bones bones] of the [page:Geometry] passed in the
+		constructor.
+		</p>
+
+		<h3>[method:SkinnedMesh clone]()</h3>
+		<p>
+		Returns a clone of this SkinnedMesh object and any descendants.
+		</p>
+
+		<h3>[method:null normalizeSkinWeights]()</h3>
+		<p>
+		Normalizes the [page:Geometry.skinWeights] vectors. Does not affect [page:BufferGeometry].
+		</p>
+
+		<h3>[method:null pose]()</h3>
+		<p>
+		This method sets the skinned mesh in the rest pose (resets the pose).
+		</p>
+
+		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
+		<p>
+		Updates the [page:Matrix4 MatrixWorld].
+		</p>
+
+		<h3>[method:null initBones]()</h3>
+		<p>
+		Creates an array of hierarchical [page:Bone bones] objects from the internal geometry.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

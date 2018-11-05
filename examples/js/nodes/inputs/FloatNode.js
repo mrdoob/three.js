@@ -2,28 +2,50 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.FloatNode = function( value ) {
+import { InputNode } from '../core/InputNode.js';
 
-	THREE.InputNode.call( this, 'fv1' );
+function FloatNode( value ) {
 
-	this.value = [ value || 0 ];
+	InputNode.call( this, 'f' );
+
+	this.value = value || 0;
+
+}
+
+FloatNode.prototype = Object.create( InputNode.prototype );
+FloatNode.prototype.constructor = FloatNode;
+FloatNode.prototype.nodeType = "Float";
+
+FloatNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+
+	return builder.format( this.value + ( this.value % 1 ? '' : '.0' ), type, output );
 
 };
 
-THREE.FloatNode.prototype = Object.create( THREE.InputNode.prototype );
-THREE.FloatNode.prototype.constructor = THREE.FloatNode;
+FloatNode.prototype.copy = function ( source ) {
 
-Object.defineProperties( THREE.FloatNode.prototype, {
-	number: {
-		get: function() {
+	InputNode.prototype.copy.call( this, source );
 
-			return this.value[ 0 ];
+	this.value = source.value;
 
-		},
-		set: function( val ) {
+};
 
-			this.value[ 0 ] = val;
+FloatNode.prototype.toJSON = function ( meta ) {
 
-		}
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.value = this.value;
+
+		if ( this.readonly === true ) data.readonly = true;
+
 	}
-} );
+
+	return data;
+
+};
+
+export { FloatNode };

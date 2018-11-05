@@ -10,7 +10,7 @@
 
 THREE.PVRLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.CompressedTextureLoader.call( this, manager );
 
 	this._parser = THREE.PVRLoader.parse;
 
@@ -27,24 +27,25 @@ THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 
 	var pvrDatas = {
 		buffer: buffer,
-		header : header,
-		loadMipmaps : loadMipmaps
+		header: header,
+		loadMipmaps: loadMipmaps
 	};
 
-	// PVR v3
 	if ( header[ 0 ] === 0x03525650 ) {
+
+		// PVR v3
 
 		return THREE.PVRLoader._parseV3( pvrDatas );
 
-	}
-	// PVR v2
-	else if ( header[ 11 ] === 0x21525650 ) {
+	} else if ( header[ 11 ] === 0x21525650 ) {
+
+		// PVR v2
 
 		return THREE.PVRLoader._parseV2( pvrDatas );
 
 	} else {
 
-		throw new Error( "[THREE.PVRLoader] Unknown PVR format" );
+		console.error( 'THREE.PVRLoader: Unknown PVR format.' );
 
 	}
 
@@ -56,43 +57,48 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 	var bpp, format;
 
 
-	var metaLen 	  = header[ 12 ],
-		pixelFormat   =  header[ 2 ],
-		height        =  header[ 6 ],
-		width         =  header[ 7 ],
-		numSurfs      =  header[ 9 ],
-		numFaces      =  header[ 10 ],
-		numMipmaps    =  header[ 11 ];
+	var metaLen = header[ 12 ],
+		pixelFormat = header[ 2 ],
+		height = header[ 6 ],
+		width = header[ 7 ],
+		// numSurfs = header[ 9 ],
+		numFaces = header[ 10 ],
+		numMipmaps = header[ 11 ];
 
 	switch ( pixelFormat ) {
+
 		case 0 : // PVRTC 2bpp RGB
 			bpp = 2;
 			format = THREE.RGB_PVRTC_2BPPV1_Format;
 			break;
+
 		case 1 : // PVRTC 2bpp RGBA
 			bpp = 2;
 			format = THREE.RGBA_PVRTC_2BPPV1_Format;
 			break;
+
 		case 2 : // PVRTC 4bpp RGB
 			bpp = 4;
 			format = THREE.RGB_PVRTC_4BPPV1_Format;
 			break;
+
 		case 3 : // PVRTC 4bpp RGBA
 			bpp = 4;
 			format = THREE.RGBA_PVRTC_4BPPV1_Format;
 			break;
+
 		default :
-			throw new Error( "pvrtc - unsupported PVR format " + pixelFormat );
+			console.error( 'THREE.PVRLoader: Unsupported PVR format:', pixelFormat );
+
 	}
 
-	pvrDatas.dataPtr 	 = 52 + metaLen;
-	pvrDatas.bpp 		 = bpp;
-	pvrDatas.format 	 = format;
-	pvrDatas.width 		 = width;
-	pvrDatas.height 	 = height;
+	pvrDatas.dataPtr = 52 + metaLen;
+	pvrDatas.bpp = bpp;
+	pvrDatas.format = format;
+	pvrDatas.width = width;
+	pvrDatas.height = height;
 	pvrDatas.numSurfaces = numFaces;
-	pvrDatas.numMipmaps  = numMipmaps;
-
+	pvrDatas.numMipmaps = numMipmaps;
 	pvrDatas.isCubemap 	= ( numFaces === 6 );
 
 	return THREE.PVRLoader._extract( pvrDatas );
@@ -103,19 +109,19 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 
 	var header = pvrDatas.header;
 
-	var headerLength  =  header[ 0 ],
-		height        =  header[ 1 ],
-		width         =  header[ 2 ],
-		numMipmaps    =  header[ 3 ],
-		flags         =  header[ 4 ],
-		dataLength    =  header[ 5 ],
-		// bpp           =  header[ 6 ],
-		bitmaskRed    =  header[ 7 ],
-		bitmaskGreen  =  header[ 8 ],
-		bitmaskBlue   =  header[ 9 ],
-		bitmaskAlpha  =  header[ 10 ],
-		pvrTag        =  header[ 11 ],
-		numSurfs      =  header[ 12 ];
+	var headerLength = header[ 0 ],
+		height = header[ 1 ],
+		width = header[ 2 ],
+		numMipmaps = header[ 3 ],
+		flags = header[ 4 ],
+		// dataLength = header[ 5 ],
+		// bpp =  header[ 6 ],
+		// bitmaskRed = header[ 7 ],
+		// bitmaskGreen = header[ 8 ],
+		// bitmaskBlue = header[ 9 ],
+		bitmaskAlpha = header[ 10 ],
+		// pvrTag = header[ 11 ],
+		numSurfs = header[ 12 ];
 
 
 	var TYPE_MASK = 0xff;
@@ -123,8 +129,6 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 		PVRTC_4 = 25;
 
 	var formatFlags = flags & TYPE_MASK;
-
-
 
 	var bpp, format;
 	var _hasAlpha = bitmaskAlpha > 0;
@@ -139,18 +143,19 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 		format = _hasAlpha ? THREE.RGBA_PVRTC_2BPPV1_Format : THREE.RGB_PVRTC_2BPPV1_Format;
 		bpp = 2;
 
-	} else
-		throw new Error( "pvrtc - unknown format " + formatFlags );
+	} else {
 
+		console.error( 'THREE.PVRLoader: Unknown PVR format:', formatFlags );
 
+	}
 
-	pvrDatas.dataPtr 	 = headerLength;
-	pvrDatas.bpp 		 = bpp;
-	pvrDatas.format 	 = format;
-	pvrDatas.width 		 = width;
-	pvrDatas.height 	 = height;
+	pvrDatas.dataPtr = headerLength;
+	pvrDatas.bpp = bpp;
+	pvrDatas.format = format;
+	pvrDatas.width = width;
+	pvrDatas.height = height;
 	pvrDatas.numSurfaces = numSurfs;
-	pvrDatas.numMipmaps  = numMipmaps + 1;
+	pvrDatas.numMipmaps = numMipmaps + 1;
 
 	// guess cubemap type seems tricky in v2
 	// it juste a pvr containing 6 surface (no explicit cubemap type)
@@ -169,31 +174,10 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 		height: pvrDatas.height,
 		format: pvrDatas.format,
 		mipmapCount: pvrDatas.numMipmaps,
-		isCubemap : pvrDatas.isCubemap
+		isCubemap: pvrDatas.isCubemap
 	};
 
 	var buffer = pvrDatas.buffer;
-
-
-
-	// console.log( "--------------------------" );
-
-	// console.log( "headerLength ", headerLength);
-	// console.log( "height       ", height      );
-	// console.log( "width        ", width       );
-	// console.log( "numMipmaps   ", numMipmaps  );
-	// console.log( "flags        ", flags       );
-	// console.log( "dataLength   ", dataLength  );
-	// console.log( "bpp          ", bpp         );
-	// console.log( "bitmaskRed   ", bitmaskRed  );
-	// console.log( "bitmaskGreen ", bitmaskGreen);
-	// console.log( "bitmaskBlue  ", bitmaskBlue );
-	// console.log( "bitmaskAlpha ", bitmaskAlpha);
-	// console.log( "pvrTag       ", pvrTag      );
-	// console.log( "numSurfs     ", numSurfs    );
-
-
-
 
 	var dataOffset = pvrDatas.dataPtr,
 		bpp = pvrDatas.bpp,
@@ -204,8 +188,6 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 		blockHeight = 0,
 		widthBlocks = 0,
 		heightBlocks = 0;
-
-
 
 	if ( bpp === 2 ) {
 
@@ -228,19 +210,16 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 	while ( mipLevel < pvrDatas.numMipmaps ) {
 
 		var sWidth = pvrDatas.width >> mipLevel,
-		sHeight = pvrDatas.height >> mipLevel;
+			sHeight = pvrDatas.height >> mipLevel;
 
 		widthBlocks = sWidth / blockWidth;
 		heightBlocks = sHeight / blockHeight;
 
 		// Clamp to minimum number of blocks
-		if ( widthBlocks < 2 )
-			widthBlocks = 2;
-		if ( heightBlocks < 2 )
-			heightBlocks = 2;
+		if ( widthBlocks < 2 ) widthBlocks = 2;
+		if ( heightBlocks < 2 ) heightBlocks = 2;
 
 		dataSize = widthBlocks * heightBlocks * blockSize;
-
 
 		for ( var surfIndex = 0; surfIndex < numSurfs; surfIndex ++ ) {
 
@@ -256,13 +235,11 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 			dataOffset += dataSize;
 
-
 		}
 
 		mipLevel ++;
 
 	}
-
 
 	return pvr;
 
