@@ -141,7 +141,7 @@
 			var selectionBox = new SelectionBox( camera, scene );
     		var helper = new SelectionHelper( selectionBox, renderer, "selectBox" );
 
-			document.addEventListener("mousedown", function ( e ) {
+			document.addEventListener("mousedown", function ( event ) {
 
 				for ( var item of selectionBox.collection ) {
 
@@ -155,7 +155,7 @@
 					 0.5 );
     		} );
 
-    		document.addEventListener( "mousemove", function ( e ) {
+    		document.addEventListener( "mousemove", function ( event ) {
 
 				if ( helper.isDown ) {
 
@@ -181,7 +181,7 @@
 
 			} );
 
-			document.addEventListener("mouseup", function (e) {
+			document.addEventListener("mouseup", function ( event ) {
 				
 				selectionBox.endPoint.set(
 					(event.clientX / window.innerWidth) * 2 - 1,
