@@ -145,6 +145,7 @@ function WebXRManager( renderer ) {
 
 					var controller = controllers[ i ];
 					controller.userData.inputSource = inputSources[ i ];
+					controller.dispatchEvent( { type: 'inputsourceschange' } );
 
 				}
 
