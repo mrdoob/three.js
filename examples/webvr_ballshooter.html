@@ -140,8 +140,48 @@
 
 				var material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
 
-				controller1.add( new THREE.Line( geometry, material ) );
-				controller2.add( new THREE.Line( geometry, material ) );
+				var helperLine = new THREE.Line( geometry, material );
+				helperLine.name = 'helperLine';
+
+				function isControllerHandHeld( controller ) {
+
+					if ( controller.userData.inputSource ) {
+
+						return controller.userData.inputSource.targetRayMode === 'pointing';
+
+					}
+
+					return false;
+
+				}
+
+				controller1.addEventListener( 'inputsourceschange', function() {
+
+					if ( isControllerHandHeld( controller1 ) ) {
+
+						if ( !controller1.getObjectByName( 'helperLine' ) ) {
+
+							controller1.add( helperLine.clone() );
+
+						}
+
+					}
+
+				});
+
+				controller2.addEventListener( 'inputsourceschange', function() {
+
+					if ( isControllerHandHeld( controller2 ) ) {
+
+						if ( !controller2.getObjectByName( 'helperLine' ) ) {
+
+							controller2.add( helperLine.clone() );
+
+						}
+
+					}
+
+				});
 
 				//
 
