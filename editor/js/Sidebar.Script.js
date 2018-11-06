@@ -52,13 +52,9 @@ Sidebar.Script = function ( editor ) {
 
 		var scripts = editor.scripts[ object.uuid ];
 
-		if ( scripts !== undefined ) {
+		if ( scripts !== undefined && scripts.length > 0 ) {
 
-			if ( scripts.length > 0 ) {
-
-				scriptsContainer.setDisplay( 'block' );
-
-			}
+			scriptsContainer.setDisplay( 'block' );
 
 			for ( var i = 0; i < scripts.length; i ++ ) {
 
