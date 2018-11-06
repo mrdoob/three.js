@@ -47,6 +47,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 				boxMesh = new Mesh(
 					new BoxBufferGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
+						type: 'BackgroundCubeMaterial',
 						uniforms: UniformsUtils.clone( ShaderLib.cube.uniforms ),
 						vertexShader: ShaderLib.cube.vertexShader,
 						fragmentShader: ShaderLib.cube.fragmentShader,
@@ -66,6 +67,17 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 				};
 
+				// enable code injection for non-built-in material
+				Object.defineProperty( boxMesh.material, 'envMap', {
+
+					get: function () {
+
+						return this.uniforms.tCube.value;
+
+					}
+
+				} );
+
 				objects.update( boxMesh );
 
 			}
@@ -83,6 +95,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 				planeMesh = new Mesh(
 					new PlaneBufferGeometry( 2, 2 ),
 					new ShaderMaterial( {
+						type: 'BackgroundMaterial',
 						uniforms: UniformsUtils.clone( ShaderLib.background.uniforms ),
 						vertexShader: ShaderLib.background.vertexShader,
 						fragmentShader: ShaderLib.background.fragmentShader,
@@ -95,11 +108,30 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 				planeMesh.geometry.removeAttribute( 'normal' );
 
+				// enable code injection for non-built-in material
+				Object.defineProperty( planeMesh.material, 'map', {
+
+					get: function () {
+
+						return this.uniforms.t2D.value;
+
+					}
+
+				} );
+
 				objects.update( planeMesh );
 
 			}
 
 			planeMesh.material.uniforms.t2D.value = background;
+
+			if ( background.matrixAutoUpdate === true ) {
+
+				background.updateMatrix();
+
+			}
+
+			planeMesh.material.uniforms.uvTransform.value.copy( background.matrix );
 
 			// push to the pre-sorted opaque render list
 			renderList.push( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
