@@ -34,6 +34,12 @@ Object.assign( CubeTextureLoader.prototype, {
 				texture.images[ i ] = image;
 
 				loaded ++;
+				
+				if(onProgress){
+
+					onProgress(loaded);
+						
+				}
 
 				if ( loaded === 6 ) {
 
