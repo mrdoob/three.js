@@ -503,7 +503,7 @@ THREE.OBJLoader2.prototype = {
 		if ( THREE.MTLLoader === undefined ) console.error( '"THREE.MTLLoader" is not available. "THREE.OBJLoader2" requires it for loading MTL files.' );
 		if ( THREE.LoaderSupport.Validator.isValid( resource ) && this.logging.enabled ) console.time( 'Loading MTL: ' + resource.name );
 
-		var materials = [];
+		var materials = {};
 		var scope = this;
 		var processMaterials = function ( materialCreator ) {
 			var materialCreatorMaterials = [];
