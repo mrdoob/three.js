@@ -8,53 +8,48 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>四维矩阵（[name]</h1>
 
 		<p class="desc">
-			A class representing a 4x4 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].<br /><br />
+			表示为一个 4x4 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].<br /><br />
 
-			The most common use of a 4x4 matrix in 3D computer graphics is as a
-			[link:https://en.wikipedia.org/wiki/Transformation_matrix Transformation Matrix].
-			For an introduction to transformation matrices as used in WebGL, check out
-			[link:http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices this tutorial].<br /><br />
+			在3D计算机图形学中，4x4矩阵最常用的用法是作为一个变换矩阵[link:https://en.wikipedia.org/wiki/Transformation_matrix Transformation Matrix]。
+			有关WebGL中使用的变换矩阵的介绍，请参阅本教程[link:http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices this tutorial]。<br /><br />
 
-			This allows a [page:Vector3] representing a point in 3D space to undergo transformations
-			such as translation, rotation, shear, scale, reflection, orthogonal or perspective projection
-			and so on, by being multiplied by the matrix. This is known as	<em>applying</em>
-			the matrix to the vector.<br /><br />
+			这使得表示三维空间中的一个点的向量[page:Vector3]通过乘以矩阵来进行转换，如平移、旋转、剪切、缩放、反射、正交或透视投影等。这就是把矩阵<em>应用</em>到向量上。<br /><br />
 
-			Every [page:Object3D] has three associated Matrix4s:
+			任何3D物体[page:Object3D]都有三个关联的矩阵：
 			<ul>
 				<li>
-					[page:Object3D.matrix]: This stores the local transform of the object. This is the object's transformation relative to its parent.
+					[page:Object3D.matrix]: 存储物体的本地变换。 这是对象相对于其父对象的变换。
 				</li>
 				<li>
-					[page:Object3D.matrixWorld]: The global or world transform of the object. If the object has no parent, then this is identical to the local transform stored in [page:Object3D.matrix matrix].
+					[page:Object3D.matrixWorld]: 对象的全局或世界变换。如果对象没有父对象，那么这与存储在矩阵[page:Object3D.matrix matrix]中的本地变换相同。
 				</li>
 				<li>
-					[page:Object3D.modelViewMatrix]: This represents the object's transformation relative to the camera's coordinate system.
-					An object's modelViewMatrix is the object's matrixWorld pre-multiplied by the camera's matrixWorldInverse.
+					[page:Object3D.modelViewMatrix]: 表示对象相坐标相对于摄像机空间坐标转换，
+					一个对象的 modelViewMatrix 是物体世界变换矩阵乘以摄像机相对于世界空间变换矩阵的逆矩阵。
 				</li>
 			</ul>
 
-			[page:Camera Cameras] have two additional Matrix4s:
+			摄像机[page:Camera Cameras] 有两个额外的四维矩阵:
 			<ul>
 				<li>
-					[page:Camera.matrixWorldInverse]: The view matrix - the inverse of the Camera's [page:Object3D.matrixWorld matrixWorld].
+					[page:Camera.matrixWorldInverse]: 视矩阵 - 摄像机世界坐标变换的逆矩阵。
 				</li>
 				<li>
-					[page:Camera.projectionMatrix]: Represents the information how to project the scene to clip space.
+					[page:Camera.projectionMatrix]: 表示将场景中的信息投影到裁剪空间。
 				</li>
 			</ul>
-			Note: [page:Object3D.normalMatrix] is not a Matrix4, but a [page:Matrix3].
+			注意：物体的正规矩阵 [page:Object3D.normalMatrix] 并不是一个4维矩阵，而是一个三维矩阵[page:Matrix3]。
 		</p>
 
-		<h2>A Note on Row-Major and Column-Major Ordering</h2>
+		<h2>注意行优先列优先的顺序。</h2>
 		<p>
-			The [page:set]() method takes arguments in [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]
-			order, while internally they are stored in the [page:.elements elements] array in column-major order.<br /><br />
+				设置[page:set]()方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
+				而它们在内部是用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]顺序存储在数组当中。<br /><br />
 
-			This means that calling
+				这意味着
 		<code>
 var m = new Matrix4();
 
@@ -64,107 +59,99 @@ m.set( 11, 12, 13, 14,
        41, 42, 43, 44 );
 
 		</code>
-		will result in the [page:.elements elements] array containing:
+		元素数组[page:.elements elements]将存储为:
 		<code>
 m.elements = [ 11, 21, 31, 41,
                12, 22, 32, 42,
                13, 23, 33, 43,
                14, 24, 34, 44 ];
 		</code>
-		and internally all calculations are performed using column-major ordering. However, as the actual ordering
-		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
-		the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
-		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
+		在内部，所有的计算都是使用列优先顺序进行的。然而，由于实际的排序在数学上没有什么不同，
+		而且大多数人习惯于以行优先顺序考虑矩阵，所以three.js文档以行为主的顺序显示矩阵。
+		请记住，如果您正在阅读源代码，您必须对这里列出的任何矩阵进行转置[link:https://en.wikipedia.org/wiki/Transpose transpose]，以理解计算。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器（Constructor）</h2>
 
 
 		<h3>[name]()</h3>
 
 		<p>
-			Creates and initializes the [name] to the 4x4
-			[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+			创建并初始化一个4X4的单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
 	</p>
 
-		<h2>Properties</h2>
+		<h2>属性（Properties）</h2>
 
 		<h3>[property:Float32Array elements]</h3>
 		<p>
-		A [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]
-		 list of matrix values.
+		矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
 		</p>
 
 		<h3>[property:Boolean isMatrix4]</h3>
 		<p>
-			Used to check whether this or derived classes are Matrix4s. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
+			用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
+		
+			不应该改变该值，因为它在内部用于优化。
 		</p>
 
 
 
 
-		<h2>Methods</h2>
+		<h2>方法（Methods）</h2>
 
 		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
 		<p>
-		[page:BufferAttribute attribute] - An attribute of floats that represent 3D vectors.<br /><br />
+		[page:BufferAttribute attribute] - 表示三维向量缓存属性。<br /><br />
 
-		Multiplies (applies) this matrix to every 3D vector in the [page:BufferAttribute attribute].
+		用这个矩阵乘以缓存属性[page:BufferAttribute attribute]里的所有3d向量。
 		</p>
 
 
 		<h3>[method:Matrix4 clone]()</h3>
-		<p>Creates a new Matrix4 with identical [page:.elements elements] to this one.</p>
+		<p>创建一个新的矩阵，元素[page:.elements elements]与该矩阵相同。</p>
 
 		<h3>[method:this compose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
-		Sets this matrix to the transformation composed of [page:Vector3 position],
-		[page:Quaternion quaternion] and [page:Vector3 scale]. Internally this calls
-		[page:.makeRotationFromQuaternion makeRotationFromQuaternion]( [page:Quaternion quaternion] )
-		followed by [page:.scale scale]( [page:Vector3 scale] ), then finally
-		[page:.setPosition setPosition]( [page:Vector3 position] ).
+		设置将该对象由位置[page:Vector3 position]，四元数[page:Quaternion quaternion] 和 缩放[page:Vector3 scale]
+		组合变换的矩阵。内部先调用[page:.makeRotationFromQuaternion makeRotationFromQuaternion]( [page:Quaternion quaternion] )
+		再调用缩放[page:.scale scale]( [page:Vector3 scale] )最后是平移[page:.setPosition setPosition]( [page:Vector3 position] )。
 		</p>
 
 		<h3>[method:this copy]( [param:Matrix4 m] )</h3>
-		<p>Copies the [page:.elements elements] of matrix [page:Matrix4 m] into this matrix.</p>
+		<p>将矩阵[page:Matrix3 m]的元素[page:.elements elements]复制到当前矩阵中。</p>
 
 		<h3>[method:this copyPosition]( [param:Matrix4 m] )</h3>
 		<p>
-		Copies the translation component of the supplied matrix [page:Matrix4 m] into this
-		matrix's translation component.
+		将给定矩阵[param:Matrix4 m] 的平移分量拷贝到当前矩阵中。
 		</p>
 
 		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
-		Decomposes this matrix into it's [page:Vector3 position], [page:Quaternion quaternion] and
-		[page:Vector3 scale] components.
+			将矩阵分解到给定的平移[page:Vector3 position] ,旋转 [page:Quaternion quaternion]，缩放[page:Vector3 scale]分量中。
 		</p>
 
 		<h3>[method:Float determinant]()</h3>
 		<p>
-		Computes and returns the
-		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.<br /><br />
+				计算并返回矩阵的行列式[link:https://en.wikipedia.org/wiki/Determinant determinant] 。<br /><br />
 
-		Based on the method outlined [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here].
+		基于这个的方法概述[link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here]。
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Matrix4 m] )</h3>
-		<p>Return true if this matrix and [page:Matrix4 m] are equal.</p>
+		<p>如果矩阵[page:Matrix3 m] 与当前矩阵所有对应元素相同则返回true。</p>
 
 		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
-		Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] of this
-		matrix into the three axis vectors provided. If this matrix is:
+			将矩阵的基向量[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]提取到指定的3个轴向量中。
+			如果矩阵如下：
 		<code>
 a, b, c, d,
 e, f, g, h,
 i, j, k, l,
 m, n, o, p
 		</code>
-		then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] will be set to:
+		然后x轴y轴z轴被设为：
 		<code>
 xAxis = (a, e, i)
 yAxis = (b, f, j)
@@ -174,58 +161,54 @@ zAxis = (c, g, k)
 
 		<h3>[method:this extractRotation]( [param:Matrix4 m] )</h3>
 		<p>
-		Extracts the rotation component of the supplied matrix [page:Matrix4 m] into this matrix's
-		rotation component.
+		将给定矩阵[page:Matrix4 m]的旋转分量提取到该矩阵的旋转分量中。
 		</p>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - the array to read the elements from.<br />
-		[page:Integer offset] - ( optional ) offset into the array. Default is 0.<br /><br />
-
-		Sets the elements of this matrix based on an [page:Array array] in
-		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
-		</p>
+			[page:Array array] - 用来存储设置元素数据的数组<br />
+			[page:Integer offset] - (可选参数) 数组的偏移量，默认值为 0。<br /><br />
+	
+			使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
+			</p>
 
 		<h3>[method:this getInverse]( [param:Matrix4 m], [param:Boolean throwOnDegenerate] )</h3>
 		<p>
-		[page:Matrix4 m] - the matrix to take the inverse of.<br />
-		[page:Boolean throwOnDegenerate] - (optional) If true, throw an error if the matrix is degenerate (not invertible).<br /><br />
-
-		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix4 m],
-		using the method outlined [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here].
-
-		If [page:Boolean throwOnDegenerate] is not set and the matrix is not invertible, set this to the 4x4 identity matrix.
-		</p>
+			[page:Matrix3 m] - 取逆的矩阵。<br />
+			[page:Boolean throwOnDegenerate] - (optional) 如果设置为true，如果矩阵是退化的（如果不可逆的话），则会抛出一个错误。<br /><br />
+			
+			使用逆矩阵计算方法[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method]，
+			将当前矩阵设置为给定矩阵的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse]，如果[page:Boolean throwOnDegenerate]
+			参数没有设置且给定矩阵不可逆，那么将当前矩阵设置为3X3单位矩阵。
+				</p>
 
 
 		<h3>[method:Float getMaxScaleOnAxis]()</h3>
-		<p>Gets the maximum scale value of the 3 axes.</p>
+		<p>获取3个轴方向的最大缩放值。</p>
 
 		<h3>[method:this identity]()</h3>
-		<p>Resets this matrix to the [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].</p>
+		<p>将当前矩阵重置为单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix]。</p>
 
 		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 center], [param:Vector3 up], )</h3>
 		<p>
-			Constructs a rotation matrix, looking from [page:Vector3 eye] towards [page:Vector3 center]
-			oriented by the [page:Vector3 up] vector.
+			构造一个旋转矩阵，从[page:Vector3 eye] 指向 [page:Vector3 center]，由向量 [param:Vector3 up] 定向。
+<!--			Constructs a rotation matrix, looking from [page:Vector3 eye] towards [page:Vector3 center]
+			oriented by the [page:Vector3 up] vector.-->
 		</p>
 
 		<h3>[method:this makeRotationAxis]( [param:Vector3 axis], [param:Float theta] )</h3>
 		<p>
-		[page:Vector3 axis] — Rotation axis, should be normalized.<br />
-		[page:Float theta] — Rotation angle in radians.<br /><br />
+		[page:Vector3 axis] — 旋转轴，需要被归一化。<br />
+		[page:Float theta] — 旋转量（弧度）。<br /><br />
 
-		Sets this matrix as rotation transform around [page:Vector3 axis] by [page:Float theta] radians.<br />
+		设置当前矩阵为围绕轴 [page:Vector3 axis] 旋转量为 [page:Float theta]弧度。<br />
 
-		This is a somewhat controversial but mathematically sound alternative to rotating via [page:Quaternions].
-		See the discussion [link:http://www.gamedev.net/reference/articles/article1199.asp here].
+		这是一种有点争议但在数学上可以替代通过四元数[page:Quaternions]旋转的办法。 请参阅此处[link:http://www.gamedev.net/reference/articles/article1199.asp here]的讨论。
 		</p>
 
 		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
-		Set this to the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] matrix consisting
-		of the three provided basis vectors:
+			通过给定的三个向量设置该矩阵为基矩阵[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]：
 		<code>
 xAxis.x, yAxis.x, zAxis.x, 0,
 xAxis.y, yAxis.y, zAxis.y, 0,
@@ -236,28 +219,27 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 
 		<h3>[method:this makePerspective]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
 		<p>
-			Creates a [link:https://en.wikipedia.org/wiki/3D_projection#Perspective_projection perspective projection] matrix.
-			This is used internally by [page:PerspectiveCamera.updateProjectionMatrix]()
+			创建一个透视投影矩阵[link:https://en.wikipedia.org/wiki/3D_projection#Perspective_projection perspective projection]。
+			在引擎内部由[page:PerspectiveCamera.updateProjectionMatrix]()使用。
 		</p>
 
 		<h3>[method:this makeOrthographic]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
 		<p>
-		Creates an [link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection] matrix.
-		This is used internally by [page:OrthographicCamera.updateProjectionMatrix]().
+			创建一个正交投影矩阵[link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection]。
+			在引擎内部由[page:OrthographicCamera.updateProjectionMatrix]()使用。
 		</p>
 
 		<h3>[method:this makeRotationFromEuler]( [param:Euler euler] )</h3>
 		<p>
-		Sets the rotation component (the upper left 3x3 matrix) of this matrix to the rotation specified by the given [page:Euler Euler Angle].
-		The rest of the matrix is set to the identity. Depending on the [page:Euler.order order] of the [page:Euler euler], there are six possible outcomes.
-		See [link:https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix this page] for a complete list.
+		将传入的欧拉角转换为该矩阵的旋转分量(左上角的3x3矩阵)。
+		矩阵的其余部分被设为单位矩阵。根据欧拉角[page:Euler euler]的旋转顺序[page:Euler.order order]，总共有六种可能的结果。
+		详细信息，请参阅本页[link:https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix this page]。
 		</p>
 
 		<h3>[method:this makeRotationFromQuaternion]( [param:Quaternion q] )</h3>
 		<p>
-		Sets the rotation component of this matrix to the rotation specified by [page:Quaternion q], as outlined
-		[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here].
-		The rest of the matrix is set to the identity. So, given [page:Quaternion q] = w + xi + yj + zk, the resulting matrix will be:
+		将这个矩阵的旋转分量设置为四元数[page:Quaternion q]指定的旋转，如下链接所诉[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here]。
+		矩阵的其余部分被设为单位矩阵。因此，给定四元数[page:Quaternion q] = w + xi + yj + zk，得到的矩阵为:
 		<code>
 1-2y²-2z²    2xy-2zw    2xz+2yw    0
 2xy+2zw      1-2x²-2z²  2yz-2xw    0
@@ -269,9 +251,9 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
-
-		Sets this matrix as a rotational transformation around the X axis by [page:Float theta] (&theta;) radians.
-		The resulting matrix will be:
+		
+		把该矩阵设置为绕x轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
+		结果如下：
 		<code>
 1 0      0        0
 0 cos(&theta;) -sin(&theta;)  0
@@ -284,8 +266,8 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
-		Sets this matrix as a rotational transformation around the Y axis by [page:Float theta] (&theta;) radians.
-		The resulting matrix will be:
+		把该矩阵设置为绕Y轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
+		结果如下：
 		<code>
 cos(&theta;)  0 sin(&theta;) 0
 0       1 0      0
@@ -298,8 +280,8 @@ cos(&theta;)  0 sin(&theta;) 0
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
-		Sets this matrix as a rotational transformation around the Z axis by [page:Float theta] (&theta;) radians.
-		The resulting matrix will be:
+		把该矩阵设置为绕z轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
+		结果如下：
 		<code>
 cos(&theta;) -sin(&theta;) 0 0
 sin(&theta;) cos(&theta;)  0 0
@@ -310,11 +292,11 @@ sin(&theta;) cos(&theta;)  0 0
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-			[page:Float x] - the amount to scale in the X axis.<br />
-			[page:Float y] - the amount to scale in the Y axis.<br />
-			[page:Float z] - the amount to scale in the Z axis.<br /><br />
+			[page:Float x] - 在X轴方向的缩放比。<br />
+			[page:Float y] - 在Y轴方向的缩放比。<br />
+			[page:Float z] - 在Z轴方向的缩放比。<br /><br />
 
-			Sets this matrix as scale transform:
+			将这个矩阵设置为缩放变换:
 			<code>
 x, 0, 0, 0,
 0, y, 0, 0,
@@ -325,11 +307,11 @@ x, 0, 0, 0,
 
 		<h3>[method:this makeShear]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-		[page:Float x] - the amount to shear in the X axis.<br />
-		[page:Float y] - the amount to shear in the Y axis.<br />
-		[page:Float z] - the amount to shear in the Z axis.<br /><br />
+		[page:Float x] - 在X轴上剪切的量。<br />
+		[page:Float y] - 在Y轴上剪切的量。<br />
+		[page:Float z] - 在Z轴上剪切的量。<br /><br />
 
-		Sets this matrix as a shear transform:
+		将此矩阵设置为剪切变换:
 <code>
 1, y, z, 0,
 x, 1, z, 0,
@@ -340,11 +322,11 @@ x, y, 1, 0,
 
 		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-			[page:Float x] - the amount to translate in the X axis.<br />
-			[page:Float y] - the amount to translate in the Y axis.<br />
-			[page:Float z] - the amount to translate in the Z axis.<br /><br />
+			[page:Float x] - 在X轴上的平移量。<br />
+			[page:Float y] - 在Y轴上的平移量。<br />
+			[page:Float z] - 在Z轴上的平移量。<br /><br />
 
-		Sets this matrix as a translation transform:
+		设置该矩阵为平移变换：
 		<code>
 1, 0, 0, x,
 0, 1, 0, y,
@@ -354,37 +336,35 @@ x, y, 1, 0,
 		</p>
 
 		<h3>[method:this multiply]( [param:Matrix4 m] )</h3>
-		<p>Post-multiplies this matrix by [page:Matrix4 m].</p>
+		<p>将当前矩阵乘以矩阵[page:Matrix4 m]。</p>
 
 		<h3>[method:this multiplyMatrices]( [param:Matrix4 a], [param:Matrix4 b] )</h3>
-		<p>Sets this matrix to [page:Matrix4 a] x [page:Matrix4 b].</p>
+		<p>设置当前矩阵为矩阵[page:Matrix4 a] x 矩阵[page:Matrix4 b]。</p>
 
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
-		<p>Multiplies every component of the matrix by a scalar value [page:Float s].</p>
+		<p>当前矩阵所有的元素乘以该缩放值*s*</p>
 
 		<h3>[method:this premultiply]( [param:Matrix4 m] )</h3>
-		<p>Pre-multiplies this matrix by [page:Matrix4 m].</p>
+		<p>将矩阵[page:Matrix4 m]乘以当前矩阵。</p>
 
 		<h3>[method:this scale]( [param:Vector3 v] )</h3>
-		<p>Multiplies the columns of this matrix by vector [page:Vector3 v].</p>
+		<p>将该矩阵的列向量乘以对应向量[page:Vector3 v]的分量。</p>
 
 		<h3>[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n14], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n24], [param:Float n31], [param:Float n32], [param:Float n33], [param:Float n34], [param:Float n41], [param:Float n42], [param:Float n43], [param:Float n44] )</h3>
 		<p>
-			Set the [page:.elements elements] of this matrix to the supplied row-major values [page:Float n11],
-			[page:Float n12], ... [page:Float n44].
+			以行优先的格式将传入的数值设置给该矩阵中的元素[page:.elements elements]。
 		</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
 		<p>
-			Sets the position component for this matrix from vector [page:Vector3 v], without affecting the
-			rest of the matrix - i.e. if the matrix is currently:
+			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:
 <code>
 a, b, c, d,
 e, f, g, h,
 i, j, k, l,
 m, n, o, p
 </code>
-This becomes:
+变成:
 <code>
 a, b, c, v.x,
 e, f, g, v.y,
@@ -395,17 +375,16 @@ m, n, o, p
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - (optional) array to store the resulting vector in.<br />
-		[page:Integer offset] - (optional) offset in the array at which to put the result.<br /><br />
+		[page:Array array] - (可选参数) 存储矩阵元素的数组，如果未指定会创建一个新的数组。<br />
+		[page:Integer offset] -  (可选参数) 存放矩阵元素数组的偏移量。<br /><br />
 
-		Writes the elements of this matrix to an array in
-		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
+		使用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]格式将此矩阵的元素写入数组中。
 		</p>
 
 		<h3>[method:this transpose]()</h3>
-		<p>[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix.</p>
+		<p>将该矩阵转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]。</p>
 
-		<h2>Source</h2>
+		<h2>源码（Source）</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
