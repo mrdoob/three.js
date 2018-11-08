@@ -176,8 +176,8 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		this._actionsByClip = {};
 		// inside:
 		// {
-		// 		knownActions: Array< AnimationAction >	- used as prototypes
-		// 		actionByRoot: AnimationAction			- lookup
+		// 	knownActions: Array< AnimationAction > - used as prototypes
+		// 	actionByRoot: AnimationAction - lookup
 		// }
 
 
