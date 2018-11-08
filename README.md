@@ -2,7 +2,7 @@ three.js
 ========
 
 [![Latest NPM release][npm-badge]][npm-badge-url]
-[![License][license-badge]][license-badge-url]
+[![Build Size][build-size]][build-size-url]
 [![Dependencies][dependencies-badge]][dependencies-badge-url]
 [![Dev Dependencies][devDependencies-badge]][devDependencies-badge-url]
 [![Build Status](https://travis-ci.org/mrdoob/three.js.svg?branch=dev)](https://travis-ci.org/mrdoob/three.js)
@@ -79,8 +79,8 @@ If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
 
 [npm-badge]: https://img.shields.io/npm/v/three.svg
 [npm-badge-url]: https://www.npmjs.com/package/three
-[license-badge]: https://img.shields.io/npm/l/three.svg
-[license-badge-url]: ./LICENSE
+[build-size]: https://badge-size.herokuapp.com/mrdoob/three.js/master/build/three.min.js.svg?compression=gzip
+[build-size-url]: https://github.com/mrdoob/three.js/tree/master/build
 [dependencies-badge]: https://img.shields.io/david/mrdoob/three.js.svg
 [dependencies-badge-url]: https://david-dm.org/mrdoob/three.js
 [devDependencies-badge]: https://img.shields.io/david/dev/mrdoob/three.js.svg
