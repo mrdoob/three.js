@@ -183,11 +183,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			maxMorphTargets: renderer.maxMorphTargets,
 			maxMorphNormals: renderer.maxMorphNormals,
 
-			numDirLights: lights.directional.length,
-			numPointLights: lights.point.length,
-			numSpotLights: lights.spot.length,
-			numRectAreaLights: lights.rectArea.length,
-			numHemiLights: lights.hemi.length,
+			numDirLights: countLights( object, lights.directionalAffectedLayers ),
+			numPointLights: countLights( object, lights.pointAffectedLayers ),
+			numSpotLights: countLights( object, lights.spotAffectedLayers ),
+			numRectAreaLights: countLights( object, lights.rectAreaAffectedLayers ),
+			numHemiLights: countLights( object, lights.hemiAffectedLayers ),
 
 			numClippingPlanes: nClipPlanes,
 			numClipIntersection: nClipIntersection,
@@ -214,6 +214,19 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	};
 
+	function countLights( object, lightLayers ) {
+		var i = 0, result = 0;
+	   var len = 0;
+	   if ( lightLayers != undefined )
+		   len = lightLayers.length;
+		for ( i = 0; i < len; i ++ ) {
+			if ( ! object.material || object.material.lightLayers.test( lightLayers[ i ] ) ) {
+				result ++;
+			}
+		}
+		return result;
+	}
+	
 	this.getProgramCode = function ( material, parameters ) {
 
 		var array = [];

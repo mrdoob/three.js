@@ -1,6 +1,7 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants.js';
 import { _Math } from '../math/Math.js';
+import { Layers } from '../core/Layers.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -20,6 +21,9 @@ function Material() {
 
 	this.fog = true;
 	this.lights = true;
+
+	this.lightLayers = new Layers();
+	this.lightLayers.mask = - 1;
 
 	this.blending = NormalBlending;
 	this.side = FrontSide;
@@ -310,6 +314,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.fog = source.fog;
 		this.lights = source.lights;
 
+		this.lightLayers = source.lightLayers;
+		
 		this.blending = source.blending;
 		this.side = source.side;
 		this.flatShading = source.flatShading;

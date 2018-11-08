@@ -250,7 +250,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				// set object matrices & frustum culling
 
-				renderObject( scene, camera, shadowCamera, isPointLight );
+				renderObject( scene, camera, shadowCamera, isPointLight, light.affectedLayers );
 
 			}
 
@@ -370,13 +370,15 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function renderObject( object, camera, shadowCamera, isPointLight ) {
+	function renderObject( object, camera, shadowCamera, isPointLight, shadowLayers ) {
 
 		if ( object.visible === false ) return;
 
 		var visible = object.layers.test( camera.layers );
 
-		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
+		//Objects not affected by current light should not project shadows.
+		var projectsShadowOnLayer = ! object.material || object.material.lightLayers.test( shadowLayers );
+ 		if ( visible && projectsShadowOnLayer && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 			if ( object.castShadow && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
@@ -418,7 +420,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			renderObject( children[ i ], camera, shadowCamera, isPointLight );
+			renderObject( children[ i ], camera, shadowCamera, isPointLight, shadowLayers );
 
 		}
 
