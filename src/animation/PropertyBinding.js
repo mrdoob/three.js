@@ -38,8 +38,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].setValue( array, offset );
 
@@ -51,8 +50,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].bind();
 
@@ -64,8 +62,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].unbind();
 
