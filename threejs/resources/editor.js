@@ -58,7 +58,7 @@ function fixSourceLinks(url, source) {
   const srcRE = /(src=)"(.*?)"/g;
   const linkRE = /(href=)"(.*?")/g;
   const imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
-  const loaderLoadRE = /(loader\.load)\(('|")(.*?)('|")/g;
+  const loaderLoadRE = /(loader.load[a-z]*)\(('|")(.*?)('|")/ig;
   const prefix = getPrefix(url);
 
   function addPrefix(url) {
