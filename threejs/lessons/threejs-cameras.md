@@ -595,7 +595,7 @@ That's the fundamentals of cameras. We'll cover a few common ways to move camera
 in other articles. For now lets move on to [shadows](threejs-shadows.html).
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r94/three.min.js"></script>
-<script src="../resources/threejs/r94/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r98/three.min.js"></script>
+<script src="../resources/threejs/r98/js/controls/TrackballControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-cameras.js"></script>
