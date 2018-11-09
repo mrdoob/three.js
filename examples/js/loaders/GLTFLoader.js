@@ -952,6 +952,7 @@ THREE.GLTFLoader = ( function () {
 				if (material.envMap) {
 
 					uniforms.envMap.value = material.envMap;
+					uniforms.envMapIntensity.value = material.envMapIntensity;
 
 					// don't flip CubeTexture envMaps, flip everything else:
 					//  WebGLRenderTargetCube will be flipped for backwards compatibility
