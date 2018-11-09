@@ -949,7 +949,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				if (material.envMap) {
+				if ( material.envMap ) {
 
 					uniforms.envMap.value = material.envMap;
 					uniforms.envMapIntensity.value = material.envMapIntensity;
