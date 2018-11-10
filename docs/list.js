@@ -344,67 +344,67 @@ var list = {
 		"Examples": {
 
 			"Animations": {
-				"CCDIKSolver": "examples/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/animations/MMDPhysics"
+				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
+				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
+				"MMDPhysics": "examples/en/animations/MMDPhysics"
 			},
 
 			"Controls": {
-				"OrbitControls": "examples/controls/OrbitControls"
+				"OrbitControls": "examples/en/controls/OrbitControls"
 			},
 
 			"Geometries": {
-				"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-				"ConvexGeometry": "examples/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/geometries/DecalGeometry"
+				"ConvexBufferGeometry": "examples/en/geometries/ConvexBufferGeometry",
+				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
+				"DecalGeometry": "examples/en/geometries/DecalGeometry"
 			},
 
 			"Loaders": {
-				"BabylonLoader": "examples/loaders/BabylonLoader",
-				"GLTFLoader": "examples/loaders/GLTFLoader",
-				"MMDLoader": "examples/loaders/MMDLoader",
-				"MTLLoader": "examples/loaders/MTLLoader",
-				"OBJLoader": "examples/loaders/OBJLoader",
-				"OBJLoader2": "examples/loaders/OBJLoader2",
-				"LoaderSupport": "examples/loaders/LoaderSupport",
-				"PCDLoader": "examples/loaders/PCDLoader",
-				"PDBLoader": "examples/loaders/PDBLoader",
-				"SVGLoader": "examples/loaders/SVGLoader",
-				"TGALoader": "examples/loaders/TGALoader",
-				"PRWMLoader": "examples/loaders/PRWMLoader"
+				"BabylonLoader": "examples/en/loaders/BabylonLoader",
+				"GLTFLoader": "examples/en/loaders/GLTFLoader",
+				"MMDLoader": "examples/en/loaders/MMDLoader",
+				"MTLLoader": "examples/en/loaders/MTLLoader",
+				"OBJLoader": "examples/en/loaders/OBJLoader",
+				"OBJLoader2": "examples/en/loaders/OBJLoader2",
+				"LoaderSupport": "examples/en/loaders/LoaderSupport",
+				"PCDLoader": "examples/en/loaders/PCDLoader",
+				"PDBLoader": "examples/en/loaders/PDBLoader",
+				"SVGLoader": "examples/en/loaders/SVGLoader",
+				"TGALoader": "examples/en/loaders/TGALoader",
+				"PRWMLoader": "examples/en/loaders/PRWMLoader"
 			},
 
 			"Objects": {
-				"Lensflare": "examples/objects/Lensflare",
+				"Lensflare": "examples/en/objects/Lensflare",
 			},
 
 			"Exporters": {
-				"GLTFExporter": "examples/exporters/GLTFExporter",
-				"PLYExporter": "examples/exporters/PLYExporter"
+				"GLTFExporter": "examples/en/exporters/GLTFExporter",
+				"PLYExporter": "examples/en/exporters/PLYExporter"
 			},
 
 			"Plugins": {
-				"LookupTable": "examples/Lut",
+				"LookupTable": "examples/en/Lut",
 			},
 
 			"QuickHull": {
-				"Face": "examples/quickhull/Face",
-				"HalfEdge": "examples/quickhull/HalfEdge",
-				"QuickHull": "examples/quickhull/QuickHull",
-				"VertexNode": "examples/quickhull/VertexNode",
-				"VertexList": "examples/quickhull/VertexList"
+				"Face": "examples/en/quickhull/Face",
+				"HalfEdge": "examples/en/quickhull/HalfEdge",
+				"QuickHull": "examples/en/quickhull/QuickHull",
+				"VertexNode": "examples/en/quickhull/VertexNode",
+				"VertexList": "examples/en/quickhull/VertexList"
 			},
 
 			"Renderers": {
-				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
-				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
-				"SVGRenderer": "examples/renderers/SVGRenderer"
+				"CSS2DRenderer": "examples/en/renderers/CSS2DRenderer",
+				"CSS3DRenderer": "examples/en/renderers/CSS3DRenderer",
+				"SVGRenderer": "examples/en/renderers/SVGRenderer"
 
 			},
 
 			"Utils": {
-				"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/utils/SceneUtils"
+				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
+				"SceneUtils": "examples/en/utils/SceneUtils"
 			}
 
 		},
@@ -769,67 +769,67 @@ var list = {
 		"示例": {
 
 			"动画": {
-				"CCDIKSolver": "examples/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/animations/MMDPhysics"
+				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
+				"MMDAnimationHelper": "examples/zh/animations/MMDAnimationHelper",
+				"MMDPhysics": "examples/zh/animations/MMDPhysics"
 			},
 
 			"控制": {
-				"OrbitControls": "examples/controls/OrbitControls"
+				"OrbitControls": "examples/zh/controls/OrbitControls"
 			},
 
 			"几何体": {
-				"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-				"ConvexGeometry": "examples/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/geometries/DecalGeometry"
+				"ConvexBufferGeometry": "examples/zh/geometries/ConvexBufferGeometry",
+				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
+				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
 			},
 
 			"加载器": {
-				"BabylonLoader": "examples/loaders/BabylonLoader",
-				"GLTFLoader": "examples/loaders/GLTFLoader",
-				"MMDLoader": "examples/loaders/MMDLoader",
-				"MTLLoader": "examples/loaders/MTLLoader",
-				"OBJLoader": "examples/loaders/OBJLoader",
-				"OBJLoader2": "examples/loaders/OBJLoader2",
-				"LoaderSupport": "examples/loaders/LoaderSupport",
-				"PCDLoader": "examples/loaders/PCDLoader",
-				"PDBLoader": "examples/loaders/PDBLoader",
-				"SVGLoader": "examples/loaders/SVGLoader",
-				"TGALoader": "examples/loaders/TGALoader",
-				"PRWMLoader": "examples/loaders/PRWMLoader"
+				"BabylonLoader": "examples/zh/loaders/BabylonLoader",
+				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
+				"MMDLoader": "examples/zh/loaders/MMDLoader",
+				"MTLLoader": "examples/zh/loaders/MTLLoader",
+				"OBJLoader": "examples/zh/loaders/OBJLoader",
+				"OBJLoader2": "examples/zh/loaders/OBJLoader2",
+				"LoaderSupport": "examples/zh/loaders/LoaderSupport",
+				"PCDLoader": "examples/zh/loaders/PCDLoader",
+				"PDBLoader": "examples/zh/loaders/PDBLoader",
+				"SVGLoader": "examples/zh/loaders/SVGLoader",
+				"TGALoader": "examples/zh/loaders/TGALoader",
+				"PRWMLoader": "examples/zh/loaders/PRWMLoader"
 			},
 
 			"物体": {
-				"Lensflare": "examples/objects/Lensflare",
+				"Lensflare": "examples/zh/objects/Lensflare",
 			},
 
 			"导出器": {
-				"GLTFExporter": "examples/exporters/GLTFExporter",
-				"PLYExporter": "examples/exporters/PLYExporter"
+				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
+				"PLYExporter": "examples/zh/exporters/PLYExporter"
 			},
 
 			"插件": {
-				"LookupTable": "examples/Lut",
+				"LookupTable": "examples/zh/Lut",
 			},
 
 			"QuickHull": {
-				"Face": "examples/quickhull/Face",
-				"HalfEdge": "examples/quickhull/HalfEdge",
-				"QuickHull": "examples/quickhull/QuickHull",
-				"VertexNode": "examples/quickhull/VertexNode",
-				"VertexList": "examples/quickhull/VertexList"
+				"Face": "examples/zh/quickhull/Face",
+				"HalfEdge": "examples/zh/quickhull/HalfEdge",
+				"QuickHull": "examples/zh/quickhull/QuickHull",
+				"VertexNode": "examples/zh/quickhull/VertexNode",
+				"VertexList": "examples/zh/quickhull/VertexList"
 			},
 
 			"渲染器": {
-				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
-				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
-				"SVGRenderer": "examples/renderers/SVGRenderer"
+				"CSS2DRenderer": "examples/zh/renderers/CSS2DRenderer",
+				"CSS3DRenderer": "examples/zh/renderers/CSS3DRenderer",
+				"SVGRenderer": "examples/zh/renderers/SVGRenderer"
 
 			},
 
 			"实用工具": {
-				"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/utils/SceneUtils"
+				"BufferGeometryUtils": "examples/zh/utils/BufferGeometryUtils",
+				"SceneUtils": "examples/zh/utils/SceneUtils"
 			}
 
 		},
