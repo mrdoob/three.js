@@ -267,12 +267,18 @@ $(document).ready(function($){
     GLTFExporter: 'https://threejs.org/docs/examples/exporters/GLTFExporter.html',
   };
 
+  function getKeywordLink(keyword) {
+    return keyword.startsWith('THREE.')
+      ? codeKeywordLinks[keyword.substring(6)]
+      : codeKeywordLinks[keyword];
+  }
+
   $('code').filter(function() {
-    return codeKeywordLinks[this.textContent] &&
+    return getKeywordLink(this.textContent) &&
            this.parentElement.nodeName !== 'A';
   }).wrap(function() {
     const a = document.createElement('a');
-    a.href = codeKeywordLinks[this.textContent];
+    a.href = getKeywordLink(this.textContent);
     return a;
   });
 
@@ -282,12 +288,12 @@ $(document).ready(function($){
     const href = this.getAttribute('href');
     const m = methodPropertyRE.exec(href);
     if (m) {
-      const codeKeywordLink = codeKeywordLinks[m[1]];
+      const codeKeywordLink = getKeywordLink(m[1]);
       if (codeKeywordLink) {
         this.setAttribute('href', `${codeKeywordLink}#${m[2]}`);
       }
     } else if (classRE.test(href)) {
-      const codeKeywordLink = codeKeywordLinks[href];
+      const codeKeywordLink = getKeywordLink(href);
       if (codeKeywordLink) {
         this.setAttribute('href', codeKeywordLink);
       }
