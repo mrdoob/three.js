@@ -85,6 +85,9 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 		}
 
+		if ( json.name ) geometry.name = json.name;
+		if ( json.userData ) geometry.userData = json.userData;
+
 		return geometry;
 
 	},
