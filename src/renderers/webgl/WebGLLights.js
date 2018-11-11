@@ -359,18 +359,24 @@ function WebGLLights() {
 	}
 
 	// Function used to count lights per type and per layer using a flat array.
-	
+
 	function addLightToLightConfig( layers, config, typeIndex, castShadow ) {
+
 		var i = 0,
 		   mask = 0,
 		   index = 0;
 		for ( i = 0; i < 32; i ++ ) {
+
 			mask = 1 << i;
 			if ( mask & layers.mask && castShadow ) {
+
 				index = i * NumberOfLightTypes + typeIndex;
 			   config[ index ] ++;
+
 			}
+
 		}
+
 	}
 
 	return {

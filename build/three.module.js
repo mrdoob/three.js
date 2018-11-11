@@ -17543,18 +17543,24 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 	};
 
 	function countLights( object, lightLayers ) {
+
 		var i = 0, result = 0;
 	   var len = 0;
 	   if ( lightLayers != undefined )
 		   len = lightLayers.length;
 		for ( i = 0; i < len; i ++ ) {
+
 			if ( ! object.material || object.layers.test( lightLayers[ i ] ) ) {
+
 				result ++;
+
 			}
+
 		}
 		return result;
+
 	}
-	
+
 	this.getProgramCode = function ( material, parameters ) {
 
 		var array = [];
@@ -18221,18 +18227,24 @@ function WebGLLights() {
 	}
 
 	// Function used to count lights per type and per layer using a flat array.
-	
+
 	function addLightToLightConfig( layers, config, typeIndex, castShadow ) {
+
 		var i = 0,
 		   mask = 0,
 		   index = 0;
 		for ( i = 0; i < 32; i ++ ) {
+
 			mask = 1 << i;
 			if ( mask & layers.mask && castShadow ) {
+
 				index = i * NumberOfLightTypes + typeIndex;
 			   config[ index ] ++;
+
 			}
+
 		}
+
 	}
 
 	return {
@@ -23585,6 +23597,7 @@ function WebGLRenderer( parameters ) {
 		lightsHash.shadowsLength = lightsStateHash.shadowsLength;
 
 		if ( material.lights ) {
+
 			// get all lights affecting this object's layers
 
 			var ambientLightSetup = filterAmbientLights( object, lights.state.ambientAffectedLayers, lights.state.ambient );
@@ -23624,45 +23637,61 @@ function WebGLRenderer( parameters ) {
 	/* Function to only consider lights and shadow maps/matrices that should
 	affect the considered object */
 	function filterLights( object, lightAffectedLayers, lights, shadowMaps, shadowMatrices ) {
+
 		var materialLayers = object.layers;
 		var result = { lights: [], shadowMaps: [], shadowMatrices: [] };
 		var i = 0, light, lightLayers;
 		var lightsLength = 0, shadowMapsLength = 0, shadowMatricesLength = 0;
 		for ( i = 0; i < lights.length; i ++ ) {
+
 			light = lights[ i ];
 			lightLayers = lightAffectedLayers[ i ];
 			if ( lightLayers.test( materialLayers ) ) {
+
 				result.lights[ lightsLength ++ ] = light;
 				if ( shadowMaps ) {
+
 					result.shadowMaps[ shadowMapsLength ++ ] = shadowMaps[ i ];
+
 				}
 				if ( shadowMatrices ) {
+
 					result.shadowMatrices[ shadowMatricesLength ++ ] = shadowMatrices[ i ];
+
 				}
+
 			}
+
 		}
 		result.lights.length = lightsLength;
 		result.shadowMaps.length = shadowMapsLength;
 		result.shadowMatrices.length = shadowMatricesLength;
 		return result;
+
 	}
 	/* Merge all ambient colors affecting the object's layer into a single color. */
 	function filterAmbientLights( object, lightAffectedLayers, lights ) {
+
 		var materialLayers = object.layers;
 		var result = [ 0, 0, 0 ];
 		var i = 0, light, lightLayers;
 		for ( i = 0; i < lights.length; i ++ ) {
+
 			light = lights[ i ];
 			lightLayers = lightAffectedLayers[ i ];
 			if ( lightLayers.test( materialLayers ) ) {
+
 				result[ 0 ] += light.r;
 				result[ 1 ] += light.g;
 				result[ 2 ] += light.b;
+
 			}
+
 		}
 		return result;
+
 	}
-   
+
 
 	function setProgram( camera, fog, material, object ) {
 
@@ -36786,6 +36815,7 @@ function Light( color, intensity ) {
 
 	this.affectedLayers = new Layers();
 	this.affectedLayers.mask = - 1;
+
 }
 
 Light.prototype = Object.assign( Object.create( Object3D.prototype ), {

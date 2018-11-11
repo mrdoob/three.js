@@ -215,18 +215,24 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 	};
 
 	function countLights( object, lightLayers ) {
+
 		var i = 0, result = 0;
 	   var len = 0;
 	   if ( lightLayers != undefined )
 		   len = lightLayers.length;
 		for ( i = 0; i < len; i ++ ) {
+
 			if ( ! object.material || object.layers.test( lightLayers[ i ] ) ) {
+
 				result ++;
+
 			}
+
 		}
 		return result;
+
 	}
-	
+
 	this.getProgramCode = function ( material, parameters ) {
 
 		var array = [];

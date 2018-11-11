@@ -20,6 +20,7 @@ function Light( color, intensity ) {
 
 	this.affectedLayers = new Layers();
 	this.affectedLayers.mask = - 1;
+
 }
 
 Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
