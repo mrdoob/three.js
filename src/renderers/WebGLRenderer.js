@@ -1522,12 +1522,12 @@ function WebGLRenderer( parameters ) {
 		if ( material.lights ) {
 			// get all lights affecting this object's layers
 
-			var ambientLightSetup = filterAmbientLights( material.lightLayers, lights.state.ambientAffectedLayers, lights.state.ambient );
- 			var directionalSetup = filterLights( material.lightLayers, lights.state.directionalAffectedLayers, lights.state.directional, lights.state.directionalShadowMap, lights.state.directionalShadowMatrix );
-			var spotSetup = filterLights( material.lightLayers, lights.state.spotAffectedLayers, lights.state.spot, lights.state.spotShadowMap, lights.state.spotShadowMatrix );
-			var rectAreaSetup = filterLights( material.lightLayers, lights.state.rectAreaAffectedLayers, lights.state.rectArea );
-			var pointSetup = filterLights( material.lightLayers, lights.state.pointAffectedLayers, lights.state.point, lights.state.pointShadowMap, lights.state.pointShadowMatrix );
-			var hemiSetup = filterLights( material.lightLayers, lights.state.hemiAffectedLayers, lights.state.hemi );
+			var ambientLightSetup = filterAmbientLights( object, lights.state.ambientAffectedLayers, lights.state.ambient );
+ 			var directionalSetup = filterLights( object, lights.state.directionalAffectedLayers, lights.state.directional, lights.state.directionalShadowMap, lights.state.directionalShadowMatrix );
+			var spotSetup = filterLights( object, lights.state.spotAffectedLayers, lights.state.spot, lights.state.spotShadowMap, lights.state.spotShadowMatrix );
+			var rectAreaSetup = filterLights( object, lights.state.rectAreaAffectedLayers, lights.state.rectArea );
+			var pointSetup = filterLights( object, lights.state.pointAffectedLayers, lights.state.point, lights.state.pointShadowMap, lights.state.pointShadowMatrix );
+			var hemiSetup = filterLights( object, lights.state.hemiAffectedLayers, lights.state.hemi );
 
 
 			// wire up the material to this renderer's lighting state
@@ -1558,7 +1558,8 @@ function WebGLRenderer( parameters ) {
 
 	/* Function to only consider lights and shadow maps/matrices that should
 	affect the considered object */
-	function filterLights( materialLayers, lightAffectedLayers, lights, shadowMaps, shadowMatrices ) {
+	function filterLights( object, lightAffectedLayers, lights, shadowMaps, shadowMatrices ) {
+		var materialLayers = object.layers;
 		var result = { lights: [], shadowMaps: [], shadowMatrices: [] };
 		var i = 0, light, lightLayers;
 		var lightsLength = 0, shadowMapsLength = 0, shadowMatricesLength = 0;
@@ -1581,7 +1582,8 @@ function WebGLRenderer( parameters ) {
 		return result;
 	}
 	/* Merge all ambient colors affecting the object's layer into a single color. */
-	function filterAmbientLights( materialLayers, lightAffectedLayers, lights ) {
+	function filterAmbientLights( object, lightAffectedLayers, lights ) {
+		var materialLayers = object.layers;
 		var result = [ 0, 0, 0 ];
 		var i = 0, light, lightLayers;
 		for ( i = 0; i < lights.length; i ++ ) {

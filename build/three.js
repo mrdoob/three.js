@@ -12596,9 +12596,6 @@
 		this.fog = true;
 		this.lights = true;
 
-		this.lightLayers = new Layers();
-		this.lightLayers.mask = - 1;
-
 		this.blending = NormalBlending;
 		this.side = FrontSide;
 		this.flatShading = false;
@@ -12888,8 +12885,6 @@
 			this.fog = source.fog;
 			this.lights = source.lights;
 
-			this.lightLayers = source.lightLayers;
-			
 			this.blending = source.blending;
 			this.side = source.side;
 			this.flatShading = source.flatShading;
@@ -17559,7 +17554,7 @@
 		   if ( lightLayers != undefined )
 			   len = lightLayers.length;
 			for ( i = 0; i < len; i ++ ) {
-				if ( ! object.material || object.material.lightLayers.test( lightLayers[ i ] ) ) {
+				if ( ! object.material || object.layers.test( lightLayers[ i ] ) ) {
 					result ++;
 				}
 			}
@@ -18882,7 +18877,7 @@
 			var visible = object.layers.test( camera.layers );
 
 			//Objects not affected by current light should not project shadows.
-			var projectsShadowOnLayer = ! object.material || object.material.lightLayers.test( shadowLayers );
+			var projectsShadowOnLayer = ! object.material || object.layers.test( shadowLayers );
 	 		if ( visible && projectsShadowOnLayer && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 				if ( object.castShadow && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
@@ -23598,12 +23593,12 @@
 			if ( material.lights ) {
 				// get all lights affecting this object's layers
 
-				var ambientLightSetup = filterAmbientLights( material.lightLayers, lights.state.ambientAffectedLayers, lights.state.ambient );
-	 			var directionalSetup = filterLights( material.lightLayers, lights.state.directionalAffectedLayers, lights.state.directional, lights.state.directionalShadowMap, lights.state.directionalShadowMatrix );
-				var spotSetup = filterLights( material.lightLayers, lights.state.spotAffectedLayers, lights.state.spot, lights.state.spotShadowMap, lights.state.spotShadowMatrix );
-				var rectAreaSetup = filterLights( material.lightLayers, lights.state.rectAreaAffectedLayers, lights.state.rectArea );
-				var pointSetup = filterLights( material.lightLayers, lights.state.pointAffectedLayers, lights.state.point, lights.state.pointShadowMap, lights.state.pointShadowMatrix );
-				var hemiSetup = filterLights( material.lightLayers, lights.state.hemiAffectedLayers, lights.state.hemi );
+				var ambientLightSetup = filterAmbientLights( object, lights.state.ambientAffectedLayers, lights.state.ambient );
+	 			var directionalSetup = filterLights( object, lights.state.directionalAffectedLayers, lights.state.directional, lights.state.directionalShadowMap, lights.state.directionalShadowMatrix );
+				var spotSetup = filterLights( object, lights.state.spotAffectedLayers, lights.state.spot, lights.state.spotShadowMap, lights.state.spotShadowMatrix );
+				var rectAreaSetup = filterLights( object, lights.state.rectAreaAffectedLayers, lights.state.rectArea );
+				var pointSetup = filterLights( object, lights.state.pointAffectedLayers, lights.state.point, lights.state.pointShadowMap, lights.state.pointShadowMatrix );
+				var hemiSetup = filterLights( object, lights.state.hemiAffectedLayers, lights.state.hemi );
 
 
 				// wire up the material to this renderer's lighting state
@@ -23634,7 +23629,8 @@
 
 		/* Function to only consider lights and shadow maps/matrices that should
 		affect the considered object */
-		function filterLights( materialLayers, lightAffectedLayers, lights, shadowMaps, shadowMatrices ) {
+		function filterLights( object, lightAffectedLayers, lights, shadowMaps, shadowMatrices ) {
+			var materialLayers = object.layers;
 			var result = { lights: [], shadowMaps: [], shadowMatrices: [] };
 			var i = 0, light, lightLayers;
 			var lightsLength = 0, shadowMapsLength = 0, shadowMatricesLength = 0;
@@ -23657,7 +23653,8 @@
 			return result;
 		}
 		/* Merge all ambient colors affecting the object's layer into a single color. */
-		function filterAmbientLights( materialLayers, lightAffectedLayers, lights ) {
+		function filterAmbientLights( object, lightAffectedLayers, lights ) {
+			var materialLayers = object.layers;
 			var result = [ 0, 0, 0 ];
 			var i = 0, light, lightLayers;
 			for ( i = 0; i < lights.length; i ++ ) {

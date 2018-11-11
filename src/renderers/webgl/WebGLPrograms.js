@@ -220,7 +220,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 	   if ( lightLayers != undefined )
 		   len = lightLayers.length;
 		for ( i = 0; i < len; i ++ ) {
-			if ( ! object.material || object.material.lightLayers.test( lightLayers[ i ] ) ) {
+			if ( ! object.material || object.layers.test( lightLayers[ i ] ) ) {
 				result ++;
 			}
 		}

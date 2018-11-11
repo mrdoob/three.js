@@ -113,6 +113,7 @@
 				light1.shadow.mapSize.width = SHADOW_MAP_WIDTH;
 				light1.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
 				light1.affectedLayers.set(1);
+				light1.affectedLayers.set(2);
 
 				scene.add( light1 );
 
@@ -127,6 +128,7 @@
 
 				light2.shadow.mapSize.width = SHADOW_MAP_WIDTH;
 				light2.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
+				light2.affectedLayers.set(1);
 				light2.affectedLayers.set(2);
 
 				scene.add( light2 );
@@ -213,7 +215,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xff00ff } );
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
@@ -221,8 +223,10 @@
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 100, 100, 100 );
 
-				ground.castShadow = false;
+				ground.castShadow = true;
 				ground.receiveShadow = true;
+				ground.layers.set(1);
+				ground.layers.set(2);
 
 				scene.add( ground );
 
@@ -249,15 +253,14 @@
 					var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
 					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
-					textMaterial.lightLayers.set(2);
 
 					var mesh = new THREE.Mesh( textGeo, textMaterial );
+					mesh.layers.set(2);
 					mesh.position.x = centerOffset;
 					mesh.position.y = FLOOR + 67;
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
-					mesh.layers.set(2);
 
 					scene.add( mesh );
 
@@ -272,7 +275,8 @@
 
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
-
+				
+				mesh.layers.set(2);
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1600, 170, 250 ), planeMaterial );
@@ -289,70 +293,6 @@
 
 				mixer = new THREE.AnimationMixer( scene );
 
-				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
-
-					var material = new THREE.MeshPhongMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
-					material.lightLayers.set(1);
-					if ( fudgeColor ) {
-
-						material.color.offsetHSL( 0, Math.random() * 0.5 - 0.25, Math.random() * 0.5 - 0.25 );
-
-					}
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.speed = speed;
-
-					var clip = geometry.animations[ 0 ];
-
-					mixer.clipAction( clip, mesh ).
-							setDuration( duration ).
-							// to shift the playback out of phase:
-							startAt( - duration * Math.random() ).
-							play();
-
-					mesh.position.set( x, y, z );
-					mesh.rotation.y = Math.PI / 2;
-
-					mesh.castShadow = true;
-					mesh.receiveShadow = true;
-
-					scene.add( mesh );
-
-					morphs.push( mesh );
-
-				}
-
-				var loader = new THREE.JSONLoader();
-
-				loader.load( "models/animated/horse.js", function( geometry ) {
-
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 300, true );
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 450, true );
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 600, true );
-
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, - 300, true );
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, - 450, true );
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, - 600, true );
-
-				} );
-
-				loader.load( "models/animated/flamingo.js", function( geometry ) {
-
-					addMorph( geometry, 500, 1, 500 - Math.random() * 500, FLOOR + 350, 40 );
-
-				} );
-
-				loader.load( "models/animated/stork.js", function( geometry ) {
-
-					addMorph( geometry, 350, 1, 500 - Math.random() * 500, FLOOR + 350, 340 );
-
-				} );
-
-				loader.load( "models/animated/parrot.js", function( geometry ) {
-
-					addMorph( geometry, 450, 0.5, 500 - Math.random() * 500, FLOOR + 300, 700 );
-
-				} );
 
 			}
 

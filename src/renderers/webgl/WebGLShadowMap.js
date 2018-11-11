@@ -377,7 +377,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		var visible = object.layers.test( camera.layers );
 
 		//Objects not affected by current light should not project shadows.
-		var projectsShadowOnLayer = ! object.material || object.material.lightLayers.test( shadowLayers );
+		var projectsShadowOnLayer = ! object.material || object.layers.test( shadowLayers );
  		if ( visible && projectsShadowOnLayer && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 			if ( object.castShadow && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
