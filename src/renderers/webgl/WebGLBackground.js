@@ -68,7 +68,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 				};
 
 				// enable code injection for non-built-in material
-				Object.defineProperty( boxMesh.material, 'envMap', {
+				Object.defineProperty( boxMesh.material, 'map', {
 
 					get: function () {
 
