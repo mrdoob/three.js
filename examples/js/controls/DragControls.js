@@ -20,6 +20,8 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	var _offset = new THREE.Vector3();
 	var _intersection = new THREE.Vector3();
 	var _worldPosition = new THREE.Vector3();
+	var _inverseMatrix = new THREE.Matrix4();
+	
 	var _selected = null, _hovered = null;
 
 	//
@@ -71,7 +73,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_selected.position.copy( _selected.parent.worldToLocal( _intersection.sub( _offset ) ) );
+				_selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
 
 			}
 
@@ -129,6 +131,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
+				_inverseMatrix.getInverse( _selected.parent.matrixWorld );
 				_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
 			}
@@ -174,7 +177,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_selected.position.copy( _selected.parent.worldToLocal( _intersection.sub( _offset ) ) );
+				_selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
 
 			}
 
@@ -208,6 +211,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
+				_inverseMatrix.getInverse( _selected.parent.matrixWorld );
 				_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
 			}
