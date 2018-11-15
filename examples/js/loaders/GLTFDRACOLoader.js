@@ -71,7 +71,7 @@ THREE.GLTFDRACOLoader.prototype = {
 
       if ( !this.workerSourceURL ) {
 
-        var fn = GLTFDRACOWorker.toString(); // this part may fail!
+        var fn = GLTFDRACOWorker.toString();
         var body = fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) );
         this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
 
@@ -155,14 +155,12 @@ function GLTFDRACOWorker () {
     switch ( message.type ) {
 
       case 'init':
-        console.log('worker:init');
         decoderPath = message.decoderPath;
         decoderConfig = message.decoderConfig;
         getDecoderModule();
         break;
 
       case 'decode':
-        console.log('worker:decode');
         decode( message.rawBuffer, message.attributeIDs, message.attributeTypes )
           .then( function ( mesh ) {
 
