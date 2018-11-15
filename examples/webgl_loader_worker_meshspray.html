@@ -72,12 +72,12 @@
 		<div id="feedback"></div>
 	</div>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/loaders/LoaderSupport.js"></script>
+		<script src="js/loaders/MeshTransfer.js"></script>
 		<script src="js/loaders/WorkerLoader.js"></script>
 
 		<script>
@@ -97,7 +97,7 @@
 				this.instanceNo = 0;
 				this.baseObject3d = new THREE.Group();
 
-				this.dataReceiver = new THREE.LoaderSupport.MeshReceiver();
+				this.dataReceiver = new THREE.MeshTransfer.MeshReceiver();
 			};
 
 			MeshSpray.Loader.prototype = {
@@ -375,7 +375,7 @@
 						console.info( event.detail.text );
 					};
 					var callbackOnMesh = function ( event ) {
-						var override = new THREE.LoaderSupport.LoadedMeshUserOverride( false, true );
+						var override = new THREE.MeshTransfer.LoadedMeshUserOverride( false, true );
 
 						event.detail.side = THREE.DoubleSide;
 						var mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );

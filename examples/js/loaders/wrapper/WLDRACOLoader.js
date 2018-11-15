@@ -2,37 +2,35 @@
  * @author Kai Salmen / www.kaisalmen.de
  */
 
-'use strict';
-
-var WLDRACOLoader = function ( manager ) {
+THREE.WLDRACOLoader = function ( manager ) {
 	THREE.DRACOLoader.call( this, manager );
 	this.builderPath = '../';
 	this.callbackDataReceiver = null;
-	this.url = 'js/libs/draco/';
+	this.resourcePath = 'js/libs/draco/';
 };
 
-WLDRACOLoader.prototype = Object.create( THREE.DRACOLoader.prototype );
-WLDRACOLoader.prototype.constructor = WLDRACOLoader;
+THREE.WLDRACOLoader.prototype = Object.create( THREE.DRACOLoader.prototype );
+THREE.WLDRACOLoader.prototype.constructor = THREE.WLDRACOLoader;
 
-WLDRACOLoader.prototype.setBuilderPath = function ( builderPath ) {
+THREE.WLDRACOLoader.prototype.setBuilderPath = function ( builderPath ) {
 	this.builderPath = builderPath;
 };
 
-WLDRACOLoader.prototype.setCallbackDataReceiver = function ( callbackDataReceiver ) {
+THREE.WLDRACOLoader.prototype.setCallbackDataReceiver = function ( callbackDataReceiver ) {
 	this.callbackDataReceiver = callbackDataReceiver;
 };
 
-WLDRACOLoader.prototype.setUrl = function ( url ) {
-	this.url = url;
+THREE.WLDRACOLoader.prototype.setResourcePath = function ( resourcePath ) {
+	this.resourcePath = resourcePath;
 };
 
-WLDRACOLoader.prototype.parse = function ( arrayBuffer, options ) {
-	THREE.DRACOLoader.setDecoderPath( this.url );
+THREE.WLDRACOLoader.prototype.parse = function ( arrayBuffer, options ) {
+	THREE.DRACOLoader.setDecoderPath( this.resourcePath );
 	THREE.DRACOLoader.setDecoderConfig( { type: 'js' } );
 
 	var scope = this;
 	var scopedOnLoad = function ( bufferGeometry ) {
-		var meshTransmitter = new THREE.LoaderSupport.MeshTransmitter();
+		var meshTransmitter = new THREE.MeshTransfer.MeshTransmitter();
 
 		meshTransmitter.setCallbackDataReceiver( scope.callbackDataReceiver );
 		meshTransmitter.setDefaultGeometryType( 0 );
@@ -91,9 +89,10 @@ WLDRACOLoader.prototype.parse = function ( arrayBuffer, options ) {
 
 	}
 	this.decodeDracoFile( arrayBuffer, scopedOnLoad, attributeUniqueIdMapObject, attributeTypeMapObject );
+
 };
 
-WLDRACOLoader.prototype.buildWorkerCode = function ( codeSerializer, scope ) {
+THREE.WLDRACOLoader.prototype.buildWorkerCode = function ( codeSerializer, scope ) {
 	scope = ( scope === null || scope === undefined ) ? this : scope;
 	var decodeDracoFile = function( rawBuffer, callback, attributeUniqueIdMap, attributeTypeMap ) {
 		var dracoScope = this;
@@ -128,10 +127,11 @@ WLDRACOLoader.prototype.buildWorkerCode = function ( codeSerializer, scope ) {
 		code: getDecoderModule.toString()
 	};
 	var workerCode = codeSerializer.serializeClass( 'THREE.DRACOLoader', THREE.DRACOLoader, 'THREE.DRACOLoader', null, null, null, overrideFunctions );
-	workerCode += codeSerializer.serializeClass( 'WLDracoWrapper', WLDRACOLoader, 'WLDracoWrapper', 'THREE.DRACOLoader', null, [ 'setBasePath', 'setUrl', 'setCallbackDataReceiver', 'parse' ] );
+	workerCode += codeSerializer.serializeClass( 'THREE.WLDRACOLoader', THREE.WLDRACOLoader, 'THREE.WLDRACOLoader', 'THREE.DRACOLoader', null,
+		[ 'setBuilderPath', 'setResourcePath', 'setCallbackDataReceiver', 'parse' ] );
 	return {
 		code: workerCode,
-		parserName: 'WLDracoWrapper',
+		parserName: 'THREE.WLDRACOLoader',
 		containsMeshDisassembler: true,
 		usesMeshDisassembler: false,
 		libs: {
@@ -146,8 +146,7 @@ WLDRACOLoader.prototype.buildWorkerCode = function ( codeSerializer, scope ) {
 };
 
 
-
-var WWDRACOLoader = function () {
+THREE.WWDRACOLoader = function () {
 	this.dracoBuilderPath = '../../';
 	this.dracoLibsPath = '';
 	this.workerLoader = new THREE.WorkerLoader();
@@ -155,9 +154,9 @@ var WWDRACOLoader = function () {
 		.setTerminateWorkerOnLoad( false );
 };
 
-WWDRACOLoader.prototype = {
+THREE.WWDRACOLoader.prototype = {
 
-	constructor: WWDRACOLoader,
+	constructor: THREE.WWDRACOLoader,
 
 	setDracoBuilderPath: function ( dracoBuilderPath ) {
 		this.dracoBuilderPath = dracoBuilderPath;
@@ -169,7 +168,7 @@ WWDRACOLoader.prototype = {
 
 	decodeDracoFile: function ( rawBuffer, callback, attributeUniqueIdMap, attributeTypeMap ) {
 		var wrapperOnMesh = function ( event, override ) {
-			console.log( 'WWDRACOLoader delivered BufferGeometry!' );
+			console.log( 'THREE.WWDRACOLoader delivered BufferGeometry!' );
 			callback( event.detail.bufferGeometry );
 		};
 
@@ -209,13 +208,13 @@ WWDRACOLoader.prototype = {
 
 		}
 		var rd = new THREE.WorkerLoader.ResourceDescriptor( 'Buffer', 'DracoLoaderArrayBuffer', rawBuffer );
-		var parserConfiguration = {	url: this.dracoLibsPath };
+		var parserConfiguration = {	resourcePath: this.dracoLibsPath };
 		rd.setParserConfiguration( parserConfiguration );
 		rd.setDataOption( 'attributeUniqueIdMap', attributeUniqueIdMap );
 		rd.setDataOption( 'attributeTypeMap', attributeTypeMap );
 		var loadingTaskConfig = new THREE.WorkerLoader.LoadingTaskConfig();
 		loadingTaskConfig
-			.setLoaderConfig( WLDRACOLoader, {
+			.setLoaderConfig( THREE.WLDRACOLoader, {
 				builderPath: this.dracoBuilderPath
 			} )
 			.addResourceDescriptor( rd )

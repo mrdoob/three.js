@@ -71,14 +71,14 @@
 			<div id="feedback"></div>
 		</div>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/loaders/PCDLoader.js"></script>
 
-        <script src="js/loaders/LoaderSupport.js"></script>
+        <script src="js/loaders/MeshTransfer.js"></script>
         <script src="js/loaders/WorkerLoader.js"></script>
 		<script src="js/loaders/wrapper/WLPCDLoader.js"></script>
 		<script>
@@ -150,14 +150,14 @@
 					};
 
 					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'Zaghetto.pcd', 'models/pcd/binary/Zaghetto.pcd' );
-					var parserConfiguration = {	url: rd.url };
+					var parserConfiguration = {	resourcePath: rd.path };
 					rd.setParserConfiguration( parserConfiguration );
 					rd.configureAsync( false, true );
 
 					var loadingTaskConfig = new THREE.WorkerLoader.LoadingTaskConfig( {
 						baseObject3d: local
 					} )
-						.setLoaderConfig( WLPCDLoader, {
+						.setLoaderConfig( THREE.WLPCDLoader, {
 							builderPath: '../'
 						} )
 						.addResourceDescriptor( rd )
@@ -167,7 +167,7 @@
 				},
 
 				_reportProgress: function( event ) {
-					var output = THREE.LoaderSupport.Validator.verifyInput( event.detail.text, '' );
+					var output = THREE.MeshTransfer.Validator.verifyInput( event.detail.text, '' );
 					console.log( 'Progress: ' + output );
 					document.getElementById( 'feedback' ).innerHTML = output;
 				},
