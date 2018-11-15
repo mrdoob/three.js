@@ -178,6 +178,7 @@ function WebVRManager( renderer ) {
 	//
 
 	this.enabled = false;
+	this.useStandingMatrix = true;
 
 	this.getController = function ( id ) {
 
@@ -247,45 +248,50 @@ function WebVRManager( renderer ) {
 
 		//
 
-		if ( frameOfReferenceType === 'stage' ) {
+        var poseObject = poseTarget !== null ? poseTarget : camera;
 
-			var stageParameters = device.stageParameters;
+        if (this.useStandingMatrix) {
+            if ( frameOfReferenceType === 'stage' ) {
 
-			if ( stageParameters ) {
+                var stageParameters = device.stageParameters;
 
-				standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
+                if ( stageParameters ) {
 
-			} else {
+                    standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
 
-				standingMatrix.makeTranslation( 0, userHeight, 0 );
+                } else {
 
-			}
+                    standingMatrix.makeTranslation( 0, userHeight, 0 );
 
+                }
+
+            }
+
+
+
+            var pose = frameData.pose;
+
+            // We want to manipulate poseObject by its position and quaternion components since users may rely on them.
+            poseObject.matrix.copy( standingMatrix );
+            poseObject.matrix.decompose( poseObject.position, poseObject.quaternion, poseObject.scale );
+
+            if ( pose.orientation !== null ) {
+
+                tempQuaternion.fromArray( pose.orientation );
+                poseObject.quaternion.multiply( tempQuaternion );
+
+            }
+
+            if ( pose.position !== null ) {
+
+                tempQuaternion.setFromRotationMatrix( standingMatrix );
+                tempPosition.fromArray( pose.position );
+                tempPosition.applyQuaternion( tempQuaternion );
+                poseObject.position.add( tempPosition );
+
+            }
 		}
 
-
-		var pose = frameData.pose;
-		var poseObject = poseTarget !== null ? poseTarget : camera;
-
-		// We want to manipulate poseObject by its position and quaternion components since users may rely on them.
-		poseObject.matrix.copy( standingMatrix );
-		poseObject.matrix.decompose( poseObject.position, poseObject.quaternion, poseObject.scale );
-
-		if ( pose.orientation !== null ) {
-
-			tempQuaternion.fromArray( pose.orientation );
-			poseObject.quaternion.multiply( tempQuaternion );
-
-		}
-
-		if ( pose.position !== null ) {
-
-			tempQuaternion.setFromRotationMatrix( standingMatrix );
-			tempPosition.fromArray( pose.position );
-			tempPosition.applyQuaternion( tempQuaternion );
-			poseObject.position.add( tempPosition );
-
-		}
 
 		poseObject.updateMatrixWorld();
 
@@ -304,7 +310,7 @@ function WebVRManager( renderer ) {
 
 		// TODO (mrdoob) Double check this code
 
-		standingMatrixInverse.getInverse( standingMatrix );
+		standingMatrixInverse.getInverse( this.useStandingMatrix ? standingMatrix : poseObject.matrix );
 
 		if ( frameOfReferenceType === 'stage' ) {
 
