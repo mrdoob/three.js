@@ -128,6 +128,7 @@
 				};
 
 				var cubeCamera = new THREE.CubeCamera( 1, 20000, 256 );
+				cubeCamera.renderTarget.texture.generateMipmaps = true;
 				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 
 				function updateSun() {
