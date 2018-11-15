@@ -11,10 +11,9 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			一个用来加载JSON资源的加载器。 不像[page:JSONLoader]，这个加载器使用
-			<em>.type</em>对象属性，来映射它自己到源类。<br /><br />
+			A loader for loading a JSON resource in the [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].<br /><br />
 
-			请注意这个加载器不能用来加载[page:Geometries]，而是用[page:JSONLoader]进行加载。<br /><br />
+			Note that this loader can't load geometries of type [page:Geometry]. Use [page:JSONLoader] instead for that.<br /><br />
 
 			此加载器内部使用[page:FileLoader]进行加载文件。
 		</p>
@@ -22,10 +21,9 @@
 		<h2>例子</h2>
 
 		<p>
-
-			[example:webgl_animation_scene WebGL / animation / scene]<br />
+			[example:webgl_animation_skinning_blending WebGL / animation / skinning / blending]<br />
 			[example:webgl_loader_json_claraio WebGL / loader / json / claraio]<br />
-			[example:webgl_loader_msgpack WebGL / loader / msgpack]
+			[example:webgl_materials_lightmap WebGL / materials / lightmap]
 		</p>
 
 		<code>
