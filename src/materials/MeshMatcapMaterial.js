@@ -72,7 +72,7 @@ function MeshMatcapMaterial( parameters ) {
 
 	if ( this.matcap === null ) {
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 		canvas.width = 1;
 		canvas.height = 1;
 
