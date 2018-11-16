@@ -86,16 +86,16 @@
 
 				}
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 100, 700 );
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 5, 3 );
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var material = new THREE.MeshBasicMaterial();
@@ -111,7 +111,7 @@
 					mesh.rotation.y = Math.random();
 					mesh.rotation.z = Math.random();
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 10 + 1;
+					mesh.scale.setScalar( Math.random() * 10 + 1 );
 					group.add( mesh );
 
 				}
