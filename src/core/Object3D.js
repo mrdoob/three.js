@@ -307,7 +307,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	lookAt: function () {
 
-		// This method does not support objects having non-uniformly-scaled parent(s)
+		// This method operates relatively to object's parent
 
 		var q1 = new Quaternion();
 		var m1 = new Matrix4();
@@ -326,11 +326,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-			var parent = this.parent;
+			this.updateMatrix();
 
-			this.updateWorldMatrix( true, false );
-
-			position.setFromMatrixPosition( this.matrixWorld );
+			position.setFromMatrixPosition( this.matrix );
 
 			if ( this.isCamera ) {
 
@@ -344,17 +342,33 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
-			if ( parent ) {
-
-				m1.extractRotation( parent.matrixWorld );
-				q1.setFromRotationMatrix( m1 );
-				this.quaternion.premultiply( q1.inverse() );
-
-			}
-
 		};
 
 	}(),
+
+  lookAtObject3D: function () {
+
+    var m1 = new Matrix4();
+    var position = new Vector3();
+
+    return function lookAtObject3D(object) {
+
+      this.parent.updateWorldMatrix(true, false);
+
+      object.updateWorldMatrix(true, false);
+
+      m1
+        .getInverse(this.parent.matrixWorld)
+        .multiply(object.matrixWorld);
+
+      position.setFromMatrixPosition(m1);
+
+      this.lookAt(position);
+
+      return;
+    };
+
+  }(),
 
 	add: function ( object ) {
 
