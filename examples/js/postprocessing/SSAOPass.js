@@ -141,6 +141,10 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.quadScene.add( this.quad );
 
+	//
+
+	this.originalClearColor = new THREE.Color();
+
 };
 
 THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
@@ -233,7 +237,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		var originalClearColor = renderer.getClearColor();
+		this.originalClearColor.copy( renderer.getClearColor() );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
@@ -252,14 +256,14 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( originalClearColor );
+		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	},
 
 	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		var originalClearColor = renderer.getClearColor();
+		this.originalClearColor.copy( renderer.getClearColor() );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
@@ -284,7 +288,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		// restore original state
 
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( originalClearColor );
+		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	},
