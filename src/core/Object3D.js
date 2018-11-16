@@ -351,19 +351,19 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
     var m1 = new Matrix4();
     var position = new Vector3();
 
-    return function lookAtObject3D(object) {
+    return function lookAtObject3D( object ) {
 
-      this.parent.updateWorldMatrix(true, false);
+      this.parent.updateWorldMatrix( true, false );
 
-      object.updateWorldMatrix(true, false);
+      object.updateWorldMatrix( true, false );
 
       m1
-        .getInverse(this.parent.matrixWorld)
-        .multiply(object.matrixWorld);
+        .getInverse( this.parent.matrixWorld )
+        .multiply( object.matrixWorld );
 
-      position.setFromMatrixPosition(m1);
+      position.setFromMatrixPosition( m1 );
 
-      this.lookAt(position);
+      this.lookAt( position );
 
       return;
     };
