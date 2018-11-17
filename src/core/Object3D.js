@@ -309,7 +309,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// This method operates relatively to object's parent
 
-		var q1 = new Quaternion();
 		var m1 = new Matrix4();
 		var target = new Vector3();
 		var position = new Vector3();
