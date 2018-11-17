@@ -350,7 +350,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var m1 = new Matrix4();
 		var position = new Vector3();
-		var parentMatrix;
+		var parentWorldMatrix;
 
 		return function lookAtObject3D( object ) {
 
@@ -360,16 +360,16 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 				this.parent.updateWorldMatrix( true, false );
 
-				parentMatrix = this.parent.matrixWorld;
+				parentWorldMatrix = this.parent.matrixWorld;
 
 			} else {
 
-				parentMatrix = m1.identity();
+				parentWorldMatrix = m1.identity();
 
 			}
 
 			m1
-				.getInverse( parentMatrix )
+				.getInverse( parentWorldMatrix )
 				.multiply( object.matrixWorld );
 
 			position.setFromMatrixPosition( m1 );
