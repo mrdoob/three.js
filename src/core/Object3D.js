@@ -356,7 +356,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			object.updateWorldMatrix( true, false );
 
-			if (this.parent) {
+			if ( this.parent ) {
 
 				this.parent.updateWorldMatrix( true, false );
 
