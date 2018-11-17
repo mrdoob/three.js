@@ -35,7 +35,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	depthTexture.minFilter = THREE.NearestFilter;
 	depthTexture.maxFilter = THREE.NearestFilter;
 
-	this.beautyRenderTarget = new THREE.WebGLRenderTarget( width, height, {
+	this.beautyRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBAFormat,
@@ -45,7 +45,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	// normal render target
 
-	this.normalRenderTarget = new THREE.WebGLRenderTarget( width, height, {
+	this.normalRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 		minFilter: THREE.NearestFilter,
 		magFilter: THREE.NearestFilter,
 		format: THREE.RGBAFormat
@@ -53,7 +53,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	// ssao render target
 
-	this.ssaoRenderTarget = new THREE.WebGLRenderTarget( width, height, {
+	this.ssaoRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBAFormat
@@ -84,7 +84,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	this.ssaoMaterial.uniforms[ 'kernel' ].value = this.kernel;
 	this.ssaoMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 	this.ssaoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-	this.ssaoMaterial.uniforms[ 'resolution' ].value.set( width, height );
+	this.ssaoMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 	this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
 
@@ -102,7 +102,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 		fragmentShader: THREE.SSAOBlurShader.fragmentShader
 	} );
 	this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
-	this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
+	this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 
 	// material for rendering the depth
 
