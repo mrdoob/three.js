@@ -119,7 +119,10 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				ssaoPass = new THREE.SSAOPass( scene, camera );
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
 				ssaoPass.renderToScreen = true;
 
 				effectComposer = new THREE.EffectComposer( renderer );
