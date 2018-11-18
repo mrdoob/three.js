@@ -43,6 +43,10 @@ function onDocumentLoad( event ) {
 
 		case 'examples':
 			path = /\/examples\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
+
+			// Remove localized part of the path (e.g. 'en/' or 'es-MX/'):
+			path = path.replace( /^[A-z0-9-]+\//, '' );
+			
 			break;
 
 		case 'manual':
