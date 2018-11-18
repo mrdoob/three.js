@@ -90,13 +90,13 @@
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — 一个包含有<em>.svg</em>文件路径或URL的字符串。<br />
-		[page:Function onLoad] — （可选） 当载入过程成功完成以后将被调用的函数。这一函数接收一个[page:ShapePath]数组来作为参数。<br />
-		[page:Function onProgress] — （可选） 载入过程正在进行的时候被调用的函数。其参数是一个XMLHttpRequest实例，其包含了[page:Integer total] bytes（总的字节数）和[page:Integer loaded] bytes（已经载入的字节数）。<br />
-		[page:Function onError] — （可选） 载入过程中若发生了错误将被调用的函数。这一函数接收错误来作为一个参数。<br />
+		[page:String url] — 一个包含有<em>.svg</em>文件的路径或URL的字符串。<br />
+		[page:Function onLoad] — （可选） 当加载过程成功完成以后将被调用的函数。这一函数接收一个[page:ShapePath]数组来作为参数。<br />
+		[page:Function onProgress] — （可选） 加载过程正在进行的时候被调用的函数。其参数是一个XMLHttpRequest实例，其包含了[page:Integer total] bytes（总的字节数）和[page:Integer loaded] bytes（已经载入的字节数）。<br />
+		[page:Function onError] — （可选） 加载过程中若发生了错误将被调用的函数。这一函数接收错误作为参数。<br />
 		</p>
 		<p>
-		开始从URL中进行载入，并调用onLoad来处理响应的内容。
+		开始从URL中进行加载，并调用onLoad来处理响应的内容。
 		</p>
 
 		<h3>[method:SVGLoader setPath]( [param:String path] )</h3>
@@ -104,7 +104,7 @@
 		[page:String path] — 基础路径。
 		</p>
 		<p>
-		设置文件的基本路径。
+		设置文件的基础路径。
 		</p>
 
 		<h2>源代码</h2>
