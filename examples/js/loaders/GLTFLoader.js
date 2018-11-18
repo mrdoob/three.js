@@ -949,11 +949,22 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				uniforms.envMap.value = material.envMap;
-				uniforms.envMapIntensity.value = material.envMapIntensity;
-				uniforms.flipEnvMap.value = ( material.envMap && material.envMap.isCubeTexture ) ? - 1 : 1;
+				if ( material.envMap ) {
 
-				uniforms.refractionRatio.value = material.refractionRatio;
+					uniforms.envMap.value = material.envMap;
+					uniforms.envMapIntensity.value = material.envMapIntensity;
+
+					// don't flip CubeTexture envMaps, flip everything else:
+					//  WebGLRenderTargetCube will be flipped for backwards compatibility
+					//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
+					// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+					uniforms.flipEnvMap.value = material.envMap.isCubeTexture ? - 1 : 1;
+
+					uniforms.reflectivity.value = material.reflectivity;
+					uniforms.refractionRatio.value = material.refractionRatio;
+
+					uniforms.maxMipLevel.value = renderer.properties.get( material.envMap ).__maxMipLevel;
+				}
 
 				uniforms.specular.value.copy( material.specular );
 				uniforms.glossiness.value = material.glossiness;
