@@ -196,7 +196,7 @@ function main() {
       const boxCenter = box.getCenter(new THREE.Vector3());
 
       // set the camera to frame the box
-      frameArea(boxSize * 1.2, boxSize, boxCenter, camera);
+      frameArea(boxSize * 0.5, boxSize, boxCenter, camera);
 
       // update the Trackball controls to handle the new size
       controls.maxDistance = boxSize * 10;
