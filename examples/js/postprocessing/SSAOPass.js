@@ -151,11 +151,32 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 	constructor: THREE.SSAOPass,
 
+	dispose: function () {
+
+		// dispose render targets
+
+		this.beautyRenderTarget.dispose();
+		this.normalRenderTarget.dispose();
+		this.ssaoRenderTarget.dispose();
+		this.blurRenderTarget.dispose();
+
+		// dispose geometry
+
+		this.quad.geometry.dispose();
+
+		// dispose materials
+
+		this.normalMaterial.dispose();
+		this.blurMaterial.dispose();
+		this.copyMaterial.dispose();
+		this.depthRenderMaterial.dispose();
+
+	},
+
 	render: function ( renderer, writeBuffer /*, readBuffer, delta, maskActive */ ) {
 
 		// render beauty and depth
 
-		renderer.setClearColor( 0x000000 );
 		renderer.render( this.scene, this.camera, this.beautyRenderTarget, true );
 
 		// render normals
@@ -181,7 +202,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null, true );
+				this.renderPass( renderer, this.copyMaterial, null );
 
 				break;
 
@@ -189,7 +210,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null, true );
+				this.renderPass( renderer, this.copyMaterial, null );
 
 				break;
 
@@ -197,13 +218,13 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null, true );
+				this.renderPass( renderer, this.copyMaterial, null );
 
 				break;
 
 			case THREE.SSAOPass.OUTPUT.Depth:
 
-				this.renderPass( renderer, this.depthRenderMaterial, null, true );
+				this.renderPass( renderer, this.depthRenderMaterial, null );
 
 				break;
 
@@ -211,7 +232,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null, true );
+				this.renderPass( renderer, this.copyMaterial, null );
 
 				break;
 
@@ -219,7 +240,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null, true );
+				this.renderPass( renderer, this.copyMaterial, null );
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = THREE.CustomBlending;
