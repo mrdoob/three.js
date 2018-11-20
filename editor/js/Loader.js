@@ -574,55 +574,6 @@ var Loader = function ( editor ) {
 
 				break;
 
-			case 'geometry':
-
-				var loader = new THREE.JSONLoader();
-				loader.setResourcePath( scope.texturePath );
-
-				var result = loader.parse( data );
-
-				var geometry = result.geometry;
-				var material;
-
-				if ( result.materials !== undefined ) {
-
-					if ( result.materials.length > 1 ) {
-
-						material = new THREE.MultiMaterial( result.materials );
-
-					} else {
-
-						material = result.materials[ 0 ];
-
-					}
-
-				} else {
-
-					material = new THREE.MeshStandardMaterial();
-
-				}
-
-				geometry.sourceType = "ascii";
-				geometry.sourceFile = file.name;
-
-				var mesh;
-
-				if ( geometry.animation && geometry.animation.hierarchy ) {
-
-					mesh = new THREE.SkinnedMesh( geometry, material );
-
-				} else {
-
-					mesh = new THREE.Mesh( geometry, material );
-
-				}
-
-				mesh.name = filename;
-
-				editor.execute( new AddObjectCommand( mesh ) );
-
-				break;
-
 			case 'object':
 
 				var loader = new THREE.ObjectLoader();
