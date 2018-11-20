@@ -181,7 +181,7 @@ function glsl() {
 
 		}
 
-	}
+	};
 
 }
 
