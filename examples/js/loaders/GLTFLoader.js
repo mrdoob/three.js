@@ -171,7 +171,8 @@ THREE.GLTFLoader = ( function () {
 					var extensionsRequired = json.extensionsRequired || [];
 
 					switch ( extensionName ) {
-
+						
+						case EXTENSIONS.KHR_LIGHTS:
 						case EXTENSIONS.KHR_LIGHTS_PUNCTUAL:
 							extensions[ extensionName ] = new GLTFLightsExtension( json );
 							break;
@@ -284,6 +285,7 @@ THREE.GLTFLoader = ( function () {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
 		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
 		KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
+		KHR_LIGHTS: 'KHR_lights',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
@@ -317,9 +319,17 @@ THREE.GLTFLoader = ( function () {
 	 */
 	function GLTFLightsExtension( json ) {
 
-		this.name = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
+		if (json.extensions[ EXTENSIONS.KHR_LIGHTS ] )
+		{
+			this.name = EXTENSIONS.KHR_LIGHTS
+		}
+		else (json.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] )
+		{
+			this.name = EXTENSIONS.KHR_LIGHTS
+		}
 
-		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] ) || {};
+		var extension = ( json.extensions && json.extensions[ this.name ]) || {};
+
 		this.lightDefs = extension.lights || [];
 
 	}
@@ -1847,7 +1857,20 @@ THREE.GLTFLoader = ( function () {
 					break;
 
 				case 'light':
-					dependency = this.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].loadLight( index );
+
+					let lightNodeName = null;
+
+					if (this.extensions[ EXTENSIONS.KHR_LIGHTS ] )
+					{
+						lightNodeName = EXTENSIONS.KHR_LIGHTS
+					}
+					else (this.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] )
+					{
+						lightNodeName = EXTENSIONS.KHR_LIGHTS
+					}
+
+					dependency = this.extensions[ lightNodeName ].loadLight( index );
+
 					break
 
 				default:
@@ -3171,11 +3194,25 @@ THREE.GLTFLoader = ( function () {
 
 				parser.getDependency( 'camera', nodeDef.camera ).then( resolve );
 
-			} else if ( nodeDef.extensions
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
+			} else if ( nodeDef.extensions &&
+						(nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS ] || 
+						nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]) ) {
 
-				parser.getDependency( 'light', nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light ).then( resolve );
+				let lightNodeName = null;
+
+				if (json.extensions[ EXTENSIONS.KHR_LIGHTS ] )
+				{
+					lightNodeName = EXTENSIONS.KHR_LIGHTS
+				}
+				else (json.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] )
+				{
+					lightNodeName = EXTENSIONS.KHR_LIGHTS
+				}
+
+				if (nodeDef.extensions[lightNodeName])
+				{
+					parser.getDependency( 'light', nodeDef.extensions[lightNodeName].light ).then( resolve );
+				}
 
 			} else {
 
