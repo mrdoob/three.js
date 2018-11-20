@@ -168,13 +168,13 @@ function WebGLLights() {
 			var intensity = light.intensity;
 			var distance = light.distance;
 
-			affectedLayers = light.affectedLayers;
+			affectedLayers = light.layers;
 
 			var shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 			if ( light.isAmbientLight ) {
 
-				color.multiplyScalar( intensity );
+				color = color.clone().multiplyScalar( intensity );
  				state.ambientAffectedLayers[ ambientLength ] = affectedLayers;
 				state.ambient[ ambientLength ] = color;
 				addLightToLightConfig( affectedLayers, state.config, 0, false );
@@ -362,16 +362,14 @@ function WebGLLights() {
 
 	function addLightToLightConfig( layers, config, typeIndex, castShadow ) {
 
-		var i = 0,
-		   mask = 0,
-		   index = 0;
+		var i = 0, mask = 0, index = 0;
 		for ( i = 0; i < 32; i ++ ) {
 
 			mask = 1 << i;
 			if ( mask & layers.mask && castShadow ) {
 
 				index = i * NumberOfLightTypes + typeIndex;
-			   config[ index ] ++;
+				config[ index ] ++;
 
 			}
 

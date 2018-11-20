@@ -18036,13 +18036,13 @@ function WebGLLights() {
 			var intensity = light.intensity;
 			var distance = light.distance;
 
-			affectedLayers = light.affectedLayers;
+			affectedLayers = light.layers;
 
 			var shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 			if ( light.isAmbientLight ) {
 
-				color.multiplyScalar( intensity );
+				color = color.clone().multiplyScalar( intensity );
  				state.ambientAffectedLayers[ ambientLength ] = affectedLayers;
 				state.ambient[ ambientLength ] = color;
 				addLightToLightConfig( affectedLayers, state.config, 0, false );
@@ -18230,16 +18230,14 @@ function WebGLLights() {
 
 	function addLightToLightConfig( layers, config, typeIndex, castShadow ) {
 
-		var i = 0,
-		   mask = 0,
-		   index = 0;
+		var i = 0, mask = 0, index = 0;
 		for ( i = 0; i < 32; i ++ ) {
 
 			mask = 1 << i;
 			if ( mask & layers.mask && castShadow ) {
 
 				index = i * NumberOfLightTypes + typeIndex;
-			   config[ index ] ++;
+				config[ index ] ++;
 
 			}
 
@@ -18756,7 +18754,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				// set object matrices & frustum culling
 
-				renderObject( scene, camera, shadowCamera, isPointLight, light.affectedLayers );
+				renderObject( scene, camera, shadowCamera, isPointLight, light.layers );
 
 			}
 
@@ -36812,10 +36810,6 @@ function Light( color, intensity ) {
 	this.intensity = intensity !== undefined ? intensity : 1;
 
 	this.receiveShadow = undefined;
-
-	this.affectedLayers = new Layers();
-	this.affectedLayers.mask = - 1;
-
 }
 
 Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
@@ -36830,9 +36824,6 @@ Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		this.color.copy( source.color );
 		this.intensity = source.intensity;
-
-		this.affectedLayers = new Layers();
-		this.affectedLayers.mask = source.affectedLayers.mask;
 
 		return this;
 

@@ -8,8 +8,7 @@ import {
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
 	LinearToneMapping,
-	BackSide,
-	NumberOfLightTypes
+	BackSide
 } from '../constants.js';
 import { _Math } from '../math/Math.js';
 import { DataTexture } from '../textures/DataTexture.js';

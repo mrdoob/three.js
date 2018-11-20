@@ -250,7 +250,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				// set object matrices & frustum culling
 
-				renderObject( scene, camera, shadowCamera, isPointLight, light.affectedLayers );
+				renderObject( scene, camera, shadowCamera, isPointLight, light.layers );
 
 			}
 
