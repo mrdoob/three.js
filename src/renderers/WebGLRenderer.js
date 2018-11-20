@@ -16,7 +16,7 @@ import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { ShaderLib } from './shaders/ShaderLib.js';
 import { UniformsLib } from './shaders/UniformsLib.js';
-import { UniformsUtils } from './shaders/UniformsUtils.js';
+import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
@@ -1427,7 +1427,7 @@ function WebGLRenderer( parameters ) {
 
 				materialProperties.shader = {
 					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
+					uniforms: cloneUniforms( shader.uniforms ),
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};

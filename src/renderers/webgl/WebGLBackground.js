@@ -9,7 +9,7 @@ import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
-import { UniformsUtils } from '../shaders/UniformsUtils.js';
+import { cloneUniforms } from '../shaders/UniformsUtils.js';
 
 function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
@@ -48,7 +48,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					new BoxBufferGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
 						type: 'BackgroundCubeMaterial',
-						uniforms: UniformsUtils.clone( ShaderLib.cube.uniforms ),
+						uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
 						vertexShader: ShaderLib.cube.vertexShader,
 						fragmentShader: ShaderLib.cube.fragmentShader,
 						side: BackSide,
@@ -96,7 +96,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					new PlaneBufferGeometry( 2, 2 ),
 					new ShaderMaterial( {
 						type: 'BackgroundMaterial',
-						uniforms: UniformsUtils.clone( ShaderLib.background.uniforms ),
+						uniforms: cloneUniforms( ShaderLib.background.uniforms ),
 						vertexShader: ShaderLib.background.vertexShader,
 						fragmentShader: ShaderLib.background.fragmentShader,
 						side: FrontSide,
