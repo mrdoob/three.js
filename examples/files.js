@@ -314,8 +314,8 @@ var files = {
 	],
 	"webgl2": [
 		"webgl2_materials_texture3d",
-		"webgl2_materials_texture3d_volume"
-		// "webgl2_sandbox"
+		"webgl2_materials_texture3d_volume",
+		"webgl2_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
