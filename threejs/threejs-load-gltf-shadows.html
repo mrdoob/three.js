@@ -101,8 +101,10 @@ function main() {
 
     const cameraHelper = new THREE.CameraHelper(cam);
     scene.add(cameraHelper);
+    cameraHelper.visible = false;
     const helper = new THREE.DirectionalLightHelper(light, 100);
     scene.add(helper);
+    helper.visible = false;
 
     function makeXYZGUI(gui, vector3, name, onChangeFn) {
       const folder = gui.addFolder(name);
@@ -117,12 +119,10 @@ function main() {
       light.updateMatrixWorld();
       light.target.updateMatrixWorld();
       helper.update();
-      helper.visible = false;
       // update the light's shadow camera's projection matrix
       light.shadow.camera.updateProjectionMatrix();
       // and now update the camera helper we're using to show the light's shadow camera
       cameraHelper.update();
-      cameraHelper.visible = false;
     }
     updateCamera();
 
@@ -167,13 +167,11 @@ function main() {
     class VisibleGUIHelper {
       constructor(...objects) {
         this.objects = [...objects];
-        this.show = this.objects[0].visible;
       }
       get value() {
-        return this.show;
+        return this.objects[0].visible;
       }
       set value(v) {
-        this.show = v;
         this.objects.forEach((obj) => {
           obj.visible = v;
         });
