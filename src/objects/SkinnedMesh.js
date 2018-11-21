@@ -130,7 +130,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 				var sw = this.geometry.skinWeights[ i ];
 
-				scale = 1.0 / sw.manhattanLength();
+				scale = 1.0 / ( sw.x + sw.y + sw.z + sw.w );
 
 				if ( scale !== Infinity ) {
 
@@ -157,7 +157,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				vec.z = skinWeight.getZ( i );
 				vec.w = skinWeight.getW( i );
 
-				scale = 1.0 / vec.manhattanLength();
+				scale = 1.0 / ( vec.x + vec.y + vec.z + vec.w );
 
 				if ( scale !== Infinity ) {
 
