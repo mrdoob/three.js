@@ -56,11 +56,13 @@
 				envMap: 'EXR',
 				roughness: 0.0,
 				metalness: 0.0,
-				exposure: 1.0
+				exposure: 1.0,
+				showBackground: true,
 			};
 			var camera, scene, renderer, controls, objects = [];
 			var standardMaterial, floorMaterial;
 			var pngCubeRenderTarget, exrCubeRenderTarget;
+			var pngBackground, exrBackground;
 
 			init();
 			animate();
@@ -111,6 +113,7 @@
 					texture.encoding = THREE.LinearEncoding;
 
 					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
+					exrBackground = cubemapGenerator.renderTarget;
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
@@ -122,7 +125,6 @@
 					exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 					texture.dispose();
-					cubemapGenerator.dispose();
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 
@@ -133,6 +135,8 @@
 					texture.encoding = THREE.sRGBEncoding;
 
 					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512 } );
+					pngBackground = cubemapGenerator.renderTarget;
+
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
@@ -144,7 +148,6 @@
 					pngCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 					texture.dispose();
-					cubemapGenerator.dispose();
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 
@@ -173,6 +176,7 @@
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'metalness', 0, 1 );
 				gui.add( params, 'exposure', 0, 2 );
+				gui.add( params, 'showBackground', true);
 				gui.open();
 
 			}
@@ -201,31 +205,44 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				standardMaterial.roughness = params.roughness;
+				standardMaterial.metalness = params.metalness;
 
-					standardMaterial.roughness = params.roughness;
-					standardMaterial.metalness = params.metalness;
+				var newEnvMap = standardMaterial.envMap;
 
-					var newEnvMap = standardMaterial.envMap;
+				switch ( params.envMap ) {
 
-					switch ( params.envMap ) {
-
-						case 'EXR': newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null; break;
-						case 'PNG': newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null; break;
-
-					}
-
-					if ( newEnvMap !== standardMaterial.envMap ) {
-
-						standardMaterial.envMap = newEnvMap;
-						standardMaterial.needsUpdate = true;
-
-						floorMaterial.map = newEnvMap;
-						floorMaterial.needsUpdate = true;
-
-					}
+					case 'EXR':
+						newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null;
+						background = exrBackground;
+						break;
+					case 'PNG':
+						newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null;
+						background = pngBackground;
+						break;
 
 				}
+
+				if ( newEnvMap !== standardMaterial.envMap ) {
+
+					standardMaterial.envMap = newEnvMap;
+					standardMaterial.needsUpdate = true;
+
+					floorMaterial.map = newEnvMap;
+					floorMaterial.needsUpdate = true;
+
+				}
+
+				if ( ! params.showBackground ) {
+
+					scene.background = null;
+
+				} else {
+
+					scene.background = background;
+
+				}
+
 
 				renderer.toneMappingExposure = params.exposure;
 
