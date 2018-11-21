@@ -78,6 +78,19 @@ Object.assign( EventDispatcher.prototype, {
 
 		}
 
+	},
+
+	dispose: function () {
+
+		for ( var type in this._listeners ) {
+
+			this._listeners[ type ].length = 0;
+			delete this._listeners[ type ];
+
+		}
+
+		delete this._listeners;
+
 	}
 
 } );
