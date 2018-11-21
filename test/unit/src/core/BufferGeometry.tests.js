@@ -5,10 +5,13 @@
 /* global QUnit */
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { JSONLoader } from '../../../../src/loaders/JSONLoader';
+import { DirectGeometry } from '../../../../src/core/DirectGeometry';
 import {
 	BufferAttribute,
 	Uint16BufferAttribute,
-	Uint32BufferAttribute
+	Uint32BufferAttribute,
+	Float32BufferAttribute
 } from '../../../../src/core/BufferAttribute';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
@@ -539,6 +542,133 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( u.length * 2, uvs.length, "Both arrays have the same size" );
 			assert.strictEqual( geometry.attributes.uv.count, u.length, "Correct number of UV coordinates" );
 			assert.ok( compareUvs( uvs, u ), "UVs are identical" );
+
+		} );
+
+		QUnit.test( "fromGeometry/fromDirectGeometry", ( assert ) => {
+
+			if ( typeof XMLHttpRequest === 'undefined' ) {
+
+				assert.expect( 0 );
+				return;
+
+			}
+
+			assert.timeout( 1000 );
+
+			var a = new BufferGeometry();
+			// BoxGeometry is a bit too simple but works fine in a pinch
+			// var b = new BoxGeometry( 1, 1, 1 );
+			// b.mergeVertices();
+			// b.computeVertexNormals();
+			// b.computeBoundingBox();
+			// b.computeBoundingSphere();
+			var asyncDone = assert.async(); // tell QUnit we're done with asserts
+
+			var loader = new JSONLoader();
+			loader.load( "../../examples/models/skinned/simple/simple.js", function ( modelGeometry ) {
+
+				a.fromGeometry( modelGeometry );
+
+				var attr;
+				var geometry = new DirectGeometry().fromGeometry( modelGeometry );
+
+				var positions = new Float32Array( geometry.vertices.length * 3 );
+				attr = new BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices );
+				assert.ok( bufferAttributeEquals( a.attributes.position, attr ), "Vertices are identical" );
+
+				if ( geometry.normals.length > 0 ) {
+
+					var normals = new Float32Array( geometry.normals.length * 3 );
+					attr = new BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals );
+					assert.ok( bufferAttributeEquals( a.attributes.normal, attr ), "Normals are identical" );
+
+				}
+
+				if ( geometry.colors.length > 0 ) {
+
+					var colors = new Float32Array( geometry.colors.length * 3 );
+					attr = new BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors );
+					assert.ok( bufferAttributeEquals( a.attributes.color, attr ), "Colors are identical" );
+
+				}
+
+				if ( geometry.uvs.length > 0 ) {
+
+					var uvs = new Float32Array( geometry.uvs.length * 2 );
+					attr = new BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs );
+					assert.ok( bufferAttributeEquals( a.attributes.uv, attr ), "UVs are identical" );
+
+				}
+
+				if ( geometry.uvs2.length > 0 ) {
+
+					var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
+					attr = new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 );
+					assert.ok( bufferAttributeEquals( a.attributes.uv2, attr ), "UV2s are identical" );
+
+				}
+
+				// groups
+				assert.deepEqual( a.groups, geometry.groups, "Groups are identical" );
+
+				// morphs
+				if ( geometry.morphTargets !== undefined ) {
+
+					for ( var name in geometry.morphTargets ) {
+
+						var morphTargets = geometry.morphTargets[ name ];
+
+						for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
+
+							var morphTarget = morphTargets[ i ];
+
+							attr = new Float32BufferAttribute( morphTarget.length * 3, 3 );
+							attr.copyVector3sArray( morphTarget );
+
+							assert.ok(
+								bufferAttributeEquals( a.morphAttributes[ name ][ i ], attr ),
+								"MorphTargets #" + i + " are identical"
+							);
+
+						}
+
+					}
+
+				}
+
+				// skinning
+				if ( geometry.skinIndices.length > 0 ) {
+
+					attr = new Float32BufferAttribute( geometry.skinIndices.length * 4, 4 );
+					attr.copyVector4sArray( geometry.skinIndices );
+					assert.ok( bufferAttributeEquals( a.attributes.skinIndex, attr ), "SkinIndices are identical" );
+
+				}
+
+				if ( geometry.skinWeights.length > 0 ) {
+
+					attr = new Float32BufferAttribute( geometry.skinWeights.length * 4, 4 );
+					attr.copyVector4sArray( geometry.skinWeights );
+					assert.ok( bufferAttributeEquals( a.attributes.skinWeight, attr ), "SkinWeights are identical" );
+
+				}
+
+				if ( geometry.boundingSphere !== null ) {
+
+					assert.ok( a.boundingSphere.equals( geometry.boundingSphere ), "BoundingSphere is identical" );
+
+				}
+
+				if ( geometry.boundingBox !== null ) {
+
+					assert.ok( a.boundingBox.equals( geometry.boundingBox ), "BoundingBox is identical" );
+
+				}
+
+				asyncDone();
+
+			} );
 
 		} );
 

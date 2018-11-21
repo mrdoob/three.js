@@ -91,7 +91,10 @@
 		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
 			返回从几何体的变形目标序列([page:Geometry.morphTargets morph
-			target sequences])创建的新动画剪辑(AnimationClip)数组，并尝试将变形目标名称分类为基于动画组的模式，如“Walk_001、Walk_002、Run_001、Run_002……”。
+			target sequences])创建的新动画剪辑(AnimationClip)数组，并尝试将变形目标名称分类为基于动画组的模式，如“Walk_001、Walk_002、Run_001、Run_002……”。<br /><br />
+
+			该方法被[page:JSONLoader]内部调用, 并且它使用了
+			[page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence].
 		</p>
 
 		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
