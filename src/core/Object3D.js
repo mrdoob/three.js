@@ -21,10 +21,10 @@ function Object3D() {
 
 	Object.defineProperty( this, 'id', { value: object3DId ++ } );
 
-	this.uuid = _Math.generateUUID();
-
 	this.name = '';
 	this.type = 'Object3D';
+
+	this.uuid = _Math.generateUUID();
 
 	this.parent = null;
 	this.children = [];
