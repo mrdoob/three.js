@@ -183,7 +183,6 @@ function main() {
       for (const car of loadedCars.children.slice()) {
         const fix = fixes.find(fix => car.name.startsWith(fix.prefix));
         const obj = new THREE.Object3D();
-        car.getWorldPosition(obj.position);
         car.position.set(0, fix.y, 0);
         car.rotation.set(...fix.rot);
         obj.add(car);

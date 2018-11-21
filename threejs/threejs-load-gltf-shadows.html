@@ -309,7 +309,6 @@ function main() {
         const obj = new THREE.Object3D();
         car.position.set(0, fix.y, 0);
         car.rotation.set(...fix.rot);
-        car.scale.set(1, 1, 1);
         obj.add(car);
         scene.add(obj);
         cars.push(obj);
