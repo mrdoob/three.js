@@ -37,7 +37,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 		this.renderTargetsHorizontal.push( renderTarget );
 
-		var renderTarget = new THREE.WebGLRenderTarget( resx, resy, pars );
+		renderTarget = new THREE.WebGLRenderTarget( resx, resy, pars );
 
 		renderTarget.texture.name = "UnrealBloomPass.v" + i;
 		renderTarget.texture.generateMipmaps = false;
@@ -71,8 +71,8 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 	// Gaussian Blur Materials
 	this.separableBlurMaterials = [];
 	var kernelSizeArray = [ 3, 5, 7, 9, 11 ];
-	var resx = Math.round( this.resolution.x / 2 );
-	var resy = Math.round( this.resolution.y / 2 );
+	resx = Math.round( this.resolution.x / 2 );
+	resy = Math.round( this.resolution.y / 2 );
 
 	for ( var i = 0; i < this.nMips; i ++ ) {
 
