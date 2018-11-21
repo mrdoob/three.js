@@ -228,6 +228,8 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	dispose: function () {
 
+		EventDispatcher.prototype.dispose.call( this );
+
 		this.dispatchEvent( { type: 'dispose' } );
 
 	},

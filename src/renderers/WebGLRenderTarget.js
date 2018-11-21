@@ -35,6 +35,8 @@ function WebGLRenderTarget( width, height, options ) {
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 	this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
+	this._isSettingSize = false;
+
 }
 
 WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
@@ -50,7 +52,9 @@ WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prot
 			this.width = width;
 			this.height = height;
 
+			this._isSettingSize = true;
 			this.dispose();
+			this._isSettingSize = false;
 
 		}
 
@@ -83,6 +87,11 @@ WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prot
 	},
 
 	dispose: function () {
+
+		// don't clear event handlers if only size is being set
+
+		if ( ! this._isSettingSize )
+    		EventDispatcher.prototype.dispose.call( this );
 
 		this.dispatchEvent( { type: 'dispose' } );
 

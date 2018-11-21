@@ -753,6 +753,16 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+	},
+
+	dispose: function () {
+
+		EventDispatcher.prototype.dispose.call( this );
+
+		this.stopAllAction();
+
+		// TODO is that it?
+
 	}
 
 } );
