@@ -17,8 +17,8 @@ THREE.PMREMGenerator = function ( sourceTexture, samplesPerLevel, resolution ) {
 	this.resolution = ( resolution !== undefined ) ? resolution : 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
 	this.samplesPerLevel = ( samplesPerLevel !== undefined ) ? samplesPerLevel : 16;
 
-	var monotonicEncoding = ( sourceTexture.encoding === THREE.LinearEncoding ) ||
-		( sourceTexture.encoding === THREE.GammaEncoding ) || ( sourceTexture.encoding === THREE.sRGBEncoding );
+	var monotonicEncoding = ( this.sourceTexture.encoding === THREE.LinearEncoding ) ||
+		( this.sourceTexture.encoding === THREE.GammaEncoding ) || ( this.sourceTexture.encoding === THREE.sRGBEncoding );
 
 	this.sourceTexture.minFilter = ( monotonicEncoding ) ? THREE.LinearFilter : THREE.NearestFilter;
 	this.sourceTexture.magFilter = ( monotonicEncoding ) ? THREE.LinearFilter : THREE.NearestFilter;
@@ -82,6 +82,9 @@ THREE.PMREMGenerator.prototype = {
 	 * http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
 	 */
 	update: function ( renderer ) {
+		// Texture should only be flipped for CubeTexture, not for
+		// a Texture created via THREE.WebGLRenderTargetCube.
+		var tFlip = ( this.sourceTexture.isCubeTexture ) ? - 1 : 1;
 
 		this.shader.uniforms[ 'envMap' ].value = this.sourceTexture;
 		this.shader.envMap = this.sourceTexture;
@@ -101,7 +104,8 @@ THREE.PMREMGenerator.prototype = {
 
 			var r = i / ( this.numLods - 1 );
 			this.shader.uniforms[ 'roughness' ].value = r * 0.9; // see comment above, pragmatic choice
-			this.shader.uniforms[ 'queryScale' ].value.x = ( i == 0 ) ? - 1 : 1;
+			// Only apply the tFlip for the first LOD
+			this.shader.uniforms[ 'tFlip' ].value = ( i == 0 ) ? tFlip : 1;
 			var size = this.cubeLods[ i ].width;
 			this.shader.uniforms[ 'mapSize' ].value = size;
 			this.renderToCubeMapTarget( renderer, this.cubeLods[ i ] );
@@ -149,8 +153,8 @@ THREE.PMREMGenerator.prototype = {
 				"roughness": { value: 0.5 },
 				"mapSize": { value: 0.5 },
 				"envMap": { value: null },
-				"queryScale": { value: new THREE.Vector3( 1, 1, 1 ) },
 				"testColor": { value: new THREE.Vector3( 1, 1, 1 ) },
+				"tFlip": { value: - 1 },
 			},
 
 			vertexShader:
@@ -168,7 +172,7 @@ THREE.PMREMGenerator.prototype = {
 				uniform samplerCube envMap;\n\
 				uniform float mapSize;\n\
 				uniform vec3 testColor;\n\
-				uniform vec3 queryScale;\n\
+				uniform float tFlip;\n\
 				\n\
 				float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\
 					float a = ggxRoughness + 0.0001;\n\
@@ -239,7 +243,8 @@ THREE.PMREMGenerator.prototype = {
 					} else {\n\
 						sampleDirection = vec3(-uv.x, -uv.y, -1.0);\n\
 					}\n\
-					mat3 vecSpace = matrixFromVector(normalize(sampleDirection * queryScale));\n\
+					vec3 correctedDirection = vec3( tFlip * sampleDirection.x, sampleDirection.yz );\n\
+					mat3 vecSpace = matrixFromVector( normalize( correctedDirection ) );\n\
 					vec3 rgbColor = vec3(0.0);\n\
 					const int NumSamples = SAMPLES_PER_LEVEL;\n\
 					vec3 vect;\n\
@@ -251,7 +256,7 @@ THREE.PMREMGenerator.prototype = {
 						vect = ImportanceSampleGGX(vec2(float(i) / float(NumSamples), r), vecSpace, roughness);\n\
 						float dotProd = dot(vect, normalize(sampleDirection));\n\
 						weight += dotProd;\n\
-						vec3 color = envMapTexelToLinear(textureCube(envMap,vect)).rgb;\n\
+						vec3 color = envMapTexelToLinear(textureCube(envMap, vect)).rgb;\n\
 						rgbColor.rgb += color;\n\
 					}\n\
 					rgbColor /= float(NumSamples);\n\
