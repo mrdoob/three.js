@@ -494,11 +494,12 @@ cubes on the path instead of loaded car models.
 
 Here's a more minimal example taking all the above into account. It
 shrunk from 271 lines to 135. We might consider shrinking it even
-more by simplifying our path.
+more by simplifying our path. Maybe a path with 3 or 4 points would
+work just as well as our path with 21 points.
 
 {{{example url="../threejs-debugging-mcve.html" }}}
 
-I keep the `OrbitController` just because it's useful for others
+I kept the `OrbitController` just because it's useful for others
 to move the camera and figure out what's going on but depending
 on your issue you might be able to remove that as well.
 
@@ -511,6 +512,15 @@ On top of that it's respectful of all the people's time who you are
 asking to look at your code on Stack Overflow. By making the minimal
 example you make it much easier for them to help you. You'll also
 learn in the process.
+
+Also important, when you go to Stack Overflow to post your question
+**put your code [in a snippet](https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/)*. Of course you are welcome to use
+JSFiddle or Codepen or similar site to test out your MCVE but
+once you actually get to posting your question on Stack Overflow
+you're required to put the code **in the question itself*.
+
+Follow these suggestions and your far more likely to get help
+with your issue.
 
 ## Put something in front of the camera
 
