@@ -15,9 +15,13 @@ export default /* glsl */`
 
 	#endif
 
-	#if defined( USE_ENVMAP ) && defined( PHYSICAL ) && defined( ENVMAP_TYPE_CUBE_UV )
+	#if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
-		irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, maxMipLevel );
+		#if defined( ENVMAP_TYPE_CUBE_UV ) || defined( ENVMAP_TYPE_SH )
+
+			irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, maxMipLevel );
+
+		#endif
 
 	#endif
 
