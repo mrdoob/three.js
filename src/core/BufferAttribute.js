@@ -2,6 +2,7 @@ import { Vector4 } from '../math/Vector4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
+import { EventDispatcher } from './EventDispatcher.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -29,17 +30,9 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 }
 
-Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
+BufferAttribute.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-	set: function ( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-} );
-
-Object.assign( BufferAttribute.prototype, {
+	constructor: BufferAttribute,
 
 	isBufferAttribute: true,
 
@@ -318,6 +311,22 @@ Object.assign( BufferAttribute.prototype, {
 	clone: function () {
 
 		return new this.constructor( this.array, this.itemSize ).copy( this );
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
+} );
+
+Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 

@@ -6,6 +6,16 @@ function WebGLAttributes( gl ) {
 
 	var buffers = new WeakMap();
 
+	function onAttributeDispose( event ) {
+
+		var attribute = event.target;
+
+		remove( attribute );
+
+		attribute.removeEventListener( 'dispose', onAttributeDispose );
+
+	}
+
 	function createBuffer( attribute, bufferType ) {
 
 		var array = attribute.array;
@@ -128,6 +138,8 @@ function WebGLAttributes( gl ) {
 		var data = buffers.get( attribute );
 
 		if ( data === undefined ) {
+
+			attribute.addEventListener( 'dispose', onAttributeDispose );
 
 			buffers.set( attribute, createBuffer( attribute, bufferType ) );
 
