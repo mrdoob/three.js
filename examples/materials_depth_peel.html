@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - depth peel</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			a {
+				color: #ffa;
+				font-weight: bold;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl depth peel demo<br />
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/WebGL.js"></script>
+
+		<script src="./js/libs/dat.gui.min.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var renderer, scene, camera;
+
+			var	gui = new dat.GUI( { width: 350 } );
+
+			var stats
+
+			const MAX_LAYERS = 6
+
+			const LAYERS = {
+				OPAQUE: 0,
+				TRANSPARENT: 1,
+			}
+
+			var debugScene, debugCamera
+			var depthMaterial, depthTarget, compositeMaterial, gl
+
+			var compositeScene = new THREE.Scene()
+
+			var transparentObjects = []
+			var opaqueObjects = []
+			const targets = []
+
+			const globalPeelUniforms = { 
+				uLayer: { value: 0 },
+				uPrevDepthTexture: { value: null },
+				uPrevColorTexture: { value: null },
+				uScreenSize: { value: new THREE.Vector2(1,1) },
+				uDepthPeel: { value: 1 },
+				uDepthOffset: { value: 0 },
+			} 
+
+			var options = {
+				layers: 1,
+				opacity: 0.5,
+				doubleSide: false,
+				defaultMode: false,
+				monochrome: false,
+			}
+
+			gui.add(options, 'layers', 1, 6).step(1)
+			gui.add(options, 'opacity', 0, 1).onChange(onOpacityChange)
+			gui.add(options, 'doubleSide').onChange(onSideChange)
+			gui.add(options, 'defaultMode').onChange(onModeChange)
+			gui.add(options, 'monochrome').onChange(onMonochromeChange)
+
+			function onOpacityChange(val){
+				transparentObjects.forEach(o=>o.material.opacity=val)
+			}
+
+			function getColorKey(){
+				return options.monochrome ? 'colorB' : 'colorA'
+			}
+
+			function onMonochromeChange(){
+				const color = getColorKey()
+				transparentObjects.forEach(o=>{
+					o.material.color.copy(o.material[color])
+				})
+			}
+
+			function onSideChange(val){ 
+				
+				const side = getSide()
+
+				depthMaterial.side = side
+				depthMaterial.needsUpdate = true
+
+				scene.traverse(o=>{
+					if(o.material) {
+						o.material.side = side
+						o.material.needsUpdate = true
+					}
+				})
+			}
+
+			function onModeChange(){
+				transparentObjects.forEach(o=>{
+					o.material.transparent = options.defaultMode
+				})
+				globalPeelUniforms.uDepthPeel.value = options.defaultMode ? 0 : 1 
+			}
+
+			function getSide(){
+				return options.doubleSide ? THREE.DoubleSide : THREE.FrontSide 
+			}
+
+			function depthOnbeforeCompile(shader){
+
+				shader.uniforms.uScreenSize = globalPeelUniforms.uScreenSize
+				shader.uniforms.uPrevDepthTexture = globalPeelUniforms.uPrevDepthTexture
+				shader.uniforms.uLayer = globalPeelUniforms.uLayer
+				shader.uniforms.uDepthOffset = globalPeelUniforms.uDepthOffset
+				shader.uniforms.uDepthPeel = globalPeelUniforms.uDepthPeel
+				
+				shader.fragmentShader = `
+					uniform vec2 uScreenSize;
+					uniform sampler2D uPrevDepthTexture;
+					uniform int uLayer;
+					uniform int uDepthPeel;
+					uniform float uDepthOffset;
+
+					${shader.fragmentShader}
+				`
+				shader.fragmentShader = shader.fragmentShader.replace(
+					/}$/gm,
+					`	
+						if(uDepthPeel == 0) return;
+
+						if(uLayer != 0 ){
+						
+						    vec2 screenPos = gl_FragCoord.xy * uScreenSize;
+						    
+						    float prevDepth = unpackRGBAToDepth(texture2D(uPrevDepthTexture,screenPos));
+						    
+						    if(prevDepth + uDepthOffset - gl_FragCoord.z >= 0. ){
+						   	    discard;
+						    }
+						}
+				    }
+					`
+				)
+
+			}
+
+			function colorOnBeforeCompile(shader){
+
+				shader.fragmentShader = shader.fragmentShader.replace('#include <packing>','')
+				shader.fragmentShader = `
+					#include <packing>
+					uniform sampler2D uPrevColorTexture;
+
+					${shader.fragmentShader}
+				`
+				depthOnbeforeCompile(shader)
+
+				shader.fragmentShader = shader.fragmentShader.replace(
+					/}$/gm,
+					`	
+						gl_FragColor.xyz *= gl_FragColor.a;
+					}
+					`
+				)
+			}
+
+			function initTargets(){
+				if(targets.length)
+					for( let i = 0 ; i < 4 ; i++ ){
+						targets.pop().dispose()
+					}
+
+				for( let i = 0 ; i < 4 ; i ++ ){
+
+					targets.push(
+						new THREE.WebGLRenderTarget(
+							window.innerWidth,
+							window.innerHeight, 
+							{
+								minFilter: THREE.NearestFilter, 
+								magFilter: THREE.NearestFilter 
+							}
+						)
+					)
+
+					debugScene.children[i].material.map = targets[i]
+				
+				}
+
+			}
+
+			init();
+
+			function init() {
+
+
+				// renderer
+				renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false
+				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom )
+
+				renderer.gammaOutput = true;
+
+				gl = renderer.getContext()
+
+				// scene
+				scene = new THREE.Scene();
+
+				scene.autoUpdate = false;
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.set( - 10, 0, 23 );
+				scene.add( camera );
+
+				// controls
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.minDistance = 10;
+				controls.maxDistance = 150;
+				controls.screenSpacePanning = true
+
+				// ---------------------------DEPTH PEEL ------------------------------- //
+				debugCamera = new THREE.PerspectiveCamera( 40 , window.innerWidth / window.innerHeight , 1, 10)
+				debugCamera.position.z = 5
+				debugScene = new THREE.Scene()
+				const planeGeometry = new THREE.PlaneBufferGeometry(2,2,1,1)
+
+				//debug
+				for( let i = 0 ; i < 4 ; i ++ ){
+					const plane = new THREE.Mesh(planeGeometry, new THREE.MeshBasicMaterial())
+					plane.material.depthTest = false
+					plane.scale.multiplyScalar(0.3)
+					debugScene.add(plane)
+					plane.position.x = (i - 2 + 0.5) * 0.7
+					plane.position.y = 1.5
+				}
+
+				compositeMaterial = new THREE.ShaderMaterial({
+					uniforms:{
+						uTextureA: { value: null },
+						uTextureB: { value: null },
+						uBlit: {value: 0 }
+					},
+					vertexShader:`
+						varying vec2 vUv;
+						void main(){
+							vUv = uv;
+							gl_Position = vec4(position.xy,0.,1.);
+						}
+					`,
+					fragmentShader:`
+						varying vec2 vUv;
+						uniform sampler2D uTextureA;
+						uniform sampler2D uTextureB;
+						uniform int uBlit;
+
+						void main(){
+							vec4 src = texture2D(uTextureA,vUv);
+							vec4 dst = texture2D(uTextureB,vUv);
+	
+							float a1 = 1.-src.a;					
+							gl_FragColor.a = src.a + a1 * dst.a;
+							gl_FragColor.rgb = src.rgb + a1 * dst.rgb;
+							gl_FragColor.rgb /= gl_FragColor.a;
+						}
+					`,
+					transparent:true,
+					depthTest:false,
+					depthWrite: false,
+				})
+
+				const compositePlane = new THREE.Mesh(planeGeometry,compositeMaterial)
+				compositePlane.frustumCulled = false
+				compositeScene.add(compositePlane)
+
+				depthMaterial = new THREE.MeshDepthMaterial()
+				depthMaterial.side = getSide()
+				depthMaterial.depthPacking = THREE.RGBADepthPacking
+				depthMaterial.onBeforeCompile = depthOnbeforeCompile
+
+				initTargets()
+
+				globalPeelUniforms.uScreenSize.value.set(1/window.innerWidth,1/window.innerHeight)
+				const numItems = 10
+
+				const boxGeometry = new THREE.BoxBufferGeometry(2,2,2,1,1,1)
+
+				for ( let i = 0 ; i < numItems ; i ++ ){
+
+					const mesh = new THREE.Mesh(
+						boxGeometry, 
+						new THREE.MeshPhongMaterial({
+						// new THREE.MeshBasicMaterial({
+							opacity: options.opacity,
+							side: getSide(),
+						})
+					)
+
+					mesh.renderOrder = 1
+
+					mesh.layers.set
+					transparentObjects.push(mesh)
+					
+					mesh.material.onBeforeCompile = colorOnBeforeCompile
+
+					mesh.material.colorA = new THREE.Color().setHSL(
+						(i%2==0 ? numItems - i : i ) / numItems,
+						1,
+						0.5
+					)
+
+					mesh.material.colorB = new THREE.Color().setRGB(1,1,1)
+
+					mesh.material.color.copy(mesh.material[getColorKey()])
+
+					mesh.rotation.y = i * Math.PI/2
+					mesh.scale.y = 2
+					mesh.position.y = (i - numItems /2)* 2.5 
+					mesh.scale.x = 10
+
+
+					scene.add(mesh)
+				}
+
+				// const opaque = new THREE.MeshBasicMaterial({color:'white'})
+				const opaque = new THREE.MeshPhongMaterial({color:'white'})
+				opaque.onBeforeCompile = colorOnBeforeCompile
+
+				for( let i = 0 ; i < 4 ; i ++ ){
+					const m = new THREE.Mesh(boxGeometry, opaque)
+					scene.add(m)
+					const angle = i / 2 * Math.PI
+					m.position.set(Math.sin(angle),0,Math.cos(angle)).multiplyScalar(10)
+					m.scale.multiplyScalar(1.5)
+					m.scale.y = 3.5
+				}
+
+				// ambient
+				scene.add( new THREE.AmbientLight( 0xffffff, .5 ) );
+
+				// light
+				var light = new THREE.PointLight( 0xffffff, 0.8 );
+				light.position.set(20,20,20)
+				scene.add( light );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				scene.updateMatrixWorld()
+
+				animate()
+
+			}
+
+			function renderDepthPeel(){
+				renderer.setClearColor(0x000,1)
+				renderer.clear()
+
+
+				globalPeelUniforms.uLayer.value = 0
+
+				scene.overrideMaterial = depthMaterial
+				renderer.setClearColor(0xffffff,1)
+				renderer.render( scene, camera, targets[0], true)
+
+				scene.overrideMaterial = null
+				renderer.setClearColor(0x000,0)
+				renderer.render( scene, camera, targets[2], true)
+
+				for( let i = 0 ; i < options.layers ; i ++ ){
+					
+					const a = i % 3
+					const b = (i+1) % 3
+					const c = (i+2) % 3
+					const d = 3
+
+					globalPeelUniforms.uPrevDepthTexture.value = targets[a]
+					globalPeelUniforms.uLayer.value = i + 1
+
+					scene.overrideMaterial = depthMaterial
+					renderer.setClearColor(0xffffff,1)
+					renderer.render( scene, camera, targets[b], true)
+					
+					scene.overrideMaterial = null
+					renderer.setClearColor(0x000,0)
+					renderer.render( scene, camera, targets[d], true)
+
+					compositeMaterial.uniforms.uTextureA.value = targets[c]
+					compositeMaterial.uniforms.uTextureB.value = targets[d]
+					renderer.render( compositeScene, camera, targets[a], true)
+
+				}
+
+				globalPeelUniforms.uPrevDepthTexture.value = null
+
+				transparentObjects.forEach(o=>o.visible = false)
+				renderer.render( scene, camera )
+				renderer.render( compositeScene, camera )
+
+				transparentObjects.forEach(o=>o.visible = true)
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				globalPeelUniforms.uScreenSize.value.set(1/window.innerWidth,1/window.innerHeight)
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				debugCamera.aspect = camera.aspect
+				debugCamera.updateProjectionMatrix()
+				initTargets()
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate )
+
+				stats.update()
+
+				camera.updateMatrixWorld()
+
+				render()
+
+			}
+
+			function render() {
+
+				if(options.defaultMode){
+
+					renderer.clear()
+					renderer.render( scene, camera )
+				
+				} else {
+
+					renderDepthPeel()
+					renderer.render( debugScene , debugCamera )
+				
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>

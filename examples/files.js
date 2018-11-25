@@ -275,6 +275,7 @@ var files = {
 		"webgl_water_flowmap"
 	],
 	"webgl / advanced": [
+		"materials_depth_peel",
 		"webgl_buffergeometry",
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
