@@ -18,8 +18,7 @@
 		<h2>Example</h2>
 
 		<p>
-		[example:webgl_loader_json WebGL / loader / json]<br />
-		[example:webgl_loader_json_objconverter WebGL / loader / json / objconverter]
+		[example:webgl_loader_json WebGL / loader / json]
 		</p>
 
 		<code>
@@ -93,23 +92,27 @@
 		Begin loading from url and pass the <em>JSON</em> to onLoad.
 		</p>
 
+		<h3>[method:Object3D parse]( [param:Object json], [param:String path] )</h3>
+		<p>
+		[page:String json] — JSON object to parse.<br />
+		[page:String path] — Base path for resources if no resource path is defined.<br /><br />
+
+		Parse a <em>JSON</em> structure and return an [page:object] containing the parsed [page:Geometry geometry] and [page:Array materials].
+		</p>
+
 		<h3>[method:JSONLoader setCrossOrigin]( [param:String value] )</h3>
 		<p>
 			Set the [page:.crossOrigin] attribute.
 		</p>
 
-		<h3>[method:JSONLoader setTexturePath]( [param:String texturePath] )</h3>
+		<h3>[method:JSONLoader setPath]( [param:String value] )</h3>
 		<p>
-			Set the base path or URL from which to load files. This can be useful if
-			you are loading many files from the same directory.
+			Set the base path for the original file.
 		</p>
 
-		<h3>[method:Object3D parse]( [param:Object json], [param:String texturePath] )</h3>
+		<h3>[method:JSONLoader setResourcePath]( [param:String value] )</h3>
 		<p>
-		[page:String json] — JSON object to parse.<br />
-		[page:String texturePath] — Base path for textures.<br /><br />
-
-		Parse a <em>JSON</em> structure and return an [page:object] containing the parsed [page:Geometry geometry] and [page:Array materials].
+			Set the base path for dependent resources like textures.
 		</p>
 
 		<h2>Source</h2>

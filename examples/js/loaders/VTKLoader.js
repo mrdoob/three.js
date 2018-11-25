@@ -22,12 +22,20 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 
@@ -769,36 +777,9 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					delete ele[ '#text' ];
 
-					// Get the content and optimize it
-					if ( ele.attributes.type === 'Float32' ) {
+					if ( ele.attributes.type === 'Int64' ) {
 
 						if ( ele.attributes.format === 'binary' ) {
-
-							if ( ! compressed ) {
-
-								txt = txt.filter( function ( el, idx ) {
-
-									if ( idx !== 0 ) return true;
-
-								} );
-
-							}
-
-						}
-
-					} else if ( ele.attributes.type === 'Int64' ) {
-
-						if ( ele.attributes.format === 'binary' ) {
-
-							if ( ! compressed ) {
-
-								txt = txt.filter( function ( el, idx ) {
-
-									if ( idx !== 0 ) return true;
-
-								} );
-
-							}
 
 							txt = txt.filter( function ( el, idx ) {
 

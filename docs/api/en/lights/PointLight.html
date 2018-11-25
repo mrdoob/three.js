@@ -23,7 +23,6 @@
 		<h2>Example</h2>
 
 		<p>
-			[example:canvas_lights_pointlights lights / pointlights ]<br />
 			[example:webgl_lights_pointlights lights / pointlights ]<br />
 			[example:webgl_lights_pointlights2 lights / pointlights2 ]<br />
 			[example:webgldeferred_animation animation ]<br />
@@ -45,8 +44,7 @@ scene.add( light );
 		<p>
 			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
 			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
-			[page:Number distance] - The distance from the light where the intensity is 0.
-			When set to 0, then the light never stops. Default is 0.<br />
+			[page:Number distance] - Maximum range of the light. Default is 0 (no limit).<br />
 			[page:Float decay] - The amount the light dims along the distance of the light. Default is 1.
 			For [page:WebGLRenderer.physicallyCorrectLights physically correct] lighting, set this to 2.<br /><br />
 
@@ -67,8 +65,19 @@ scene.add( light );
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			If non-zero, light will attenuate linearly from maximum intensity at the light's
-			position down to zero at this distance from the light. Default is *0.0*.
+			<em>Default mode</em> — When distance is zero, light does not attenuate. When distance is
+			non-zero, light will attenuate linearly from maximum intensity at the light's position down to
+			zero at this distance from the light.
+		</p>
+		<p>
+			<em>[page:WebGLRenderer.physicallyCorrectLights Physically correct] mode</em> — When distance
+			is zero, light will attenuate according to inverse-square law to infinite distance. When
+			distance is non-zero, light will attenuate according to inverse-square law until near the
+			distance cutoff, where it will then attenuate quickly and smoothly to 0. Inherently, cutoffs
+			are not physically correct.
+		</p>
+		<p>
+			Default is *0.0*.
 		</p>
 
 		<h3>[property:Boolean isPointLight]</h3>

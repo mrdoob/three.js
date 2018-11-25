@@ -22,6 +22,13 @@
 				<input type="text" id="filterInput" placeholder="Type to filter" autocorrect="off" autocapitalize="off" spellcheck="false">
 				<a href="#" id="clearFilterButton">x</a>
 			</div>
+
+			<div style="text-align:center">
+				<br />
+				<a href="javascript:setLanguage('en')">en</a> |
+				<a href="javascript:setLanguage('zh')">zh</a>
+			</div>
+
 			<div id="content"></div>
 
 		</div>
@@ -34,15 +41,36 @@
 
 			var hash = window.location.hash.substring( 1 );
 
-			// Route non-localised api links
+			// Localisation
 
-			if ( /^(api|manual)/.test( hash ) && /^(api|manual)\/(en|zh)\//.test( hash ) === false ) {
+			var language = 'en';
 
-				window.location.hash = hash.replace( /^(api|manual)/, '$1/en' );
+			if ( /^(api|manual)/.test( hash ) ) {
+
+				var hashLanguage = /^(api|manual)\/(en|zh)\//.exec( hash );
+
+				if ( hashLanguage === null ) {
+
+					// Route old non-localised api links
+
+					window.location.hash = hash.replace( /^(api|manual)/, '$1/en' );
+
+				} else {
+
+					language = hashLanguage[ 2 ];
+
+				}
 
 			}
 
 			//
+
+			function setLanguage( value ) {
+
+				language = value;
+				createNavigation();
+
+			}
 
 			var panel = document.getElementById( 'panel' );
 			var content = document.getElementById( 'content' );
@@ -54,6 +82,8 @@
 			var pageProperties = {};
 			var titles = {};
 			var categoryElements = [];
+
+			var navigation;
 
 
 			// Functionality for hamburger button (on small devices)
@@ -118,16 +148,24 @@
 
 			function createNavigation() {
 
+				if ( navigation !== undefined ) {
+
+					content.removeChild( navigation );
+
+				}
+
 				// Create the navigation panel using data from list.js
 
-				var navigation = document.createElement( 'div' );
+				navigation = document.createElement( 'div' );
 				content.appendChild( navigation );
 
-				for ( var section in list ) {
+				var localList = list[ language ];
+
+				for ( var section in localList ) {
 
 					// Create sections
 
-					var categories = list[ section ];
+					var categories = localList[ section ];
 
 					var sectionHead = document.createElement( 'h2' );
 					sectionHead.textContent = section;
@@ -156,8 +194,6 @@
 							var pageURL = pages[ pageName ];
 
 							// Localisation
-
-							pageURL = pageURL.replace( '{lan}', 'en' );
 
 							var listElement = document.createElement( 'li' );
 							categoryContent.appendChild( listElement );
@@ -382,7 +418,8 @@
 
 		</script>
 
-		<script src="../build/three.min.js"></script> <!-- console sandbox -->
+		<!-- console sandbox -->
+		<script src="../build/three.min.js"></script>
 
 	</body>
 

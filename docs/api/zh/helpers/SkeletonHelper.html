@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		用来模拟骨骼 [page:Skeleton Skeleton] 的辅助对象.
+		该辅助对象使用 [page:LineBasicMaterial LineBasicMaterial] 材质.
+		</p>
+
+
+		<h2>例子</h2>
+
+		[example:webgl_animation_skinning_blending animation / skinning / blending]<br />
+		[example:webgl_animation_skinning_morph animation / skinning / morph]<br />
+		[example:webgl_loader_bvh loader / bvh ]
+
+		<code>
+var helper = new THREE.SkeletonHelper( mesh );
+helper.material.linewidth = 3;
+scene.add( helper );
+		</code>
+
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( object )</h3>
+		<p>
+		object -- 可以是任何拥有一组骨 [page:Bone Bone] 作为子对象的对象. <br />
+		比如, 一个骨骼 [page:Skeleton Skeleton] 或 一个蒙皮网格 [page:SkinnedMesh SkinnedMesh].
+		</p>
+
+
+		<h2>属性</h2>
+
+		<h3>[property:Array bones]</h3>
+		<p>
+		辅助对象使用 [page:Line Lines] 渲染的骨数组.
+		</p>
+
+		<h3>[property:Object root]</h3>
+		<p>
+		构造函数传入的对象.
+		</p>
+
+
+		<h2>源码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

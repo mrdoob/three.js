@@ -48,14 +48,18 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container = document.getElementById( 'container' );
 
@@ -179,23 +183,39 @@
 				var folder6 = panel.addFolder( 'General Speed' );
 
 				settings = {
-					'show model':            true,
-					'show skeleton':         false,
-					'deactivate all':        deactivateAllActions,
-					'activate all':          activateAllActions,
-					'pause/continue':        pauseContinue,
-					'make single step':      toSingleStepMode,
-					'modify step size':      0.05,
-					'from walk to idle':     function () { prepareCrossFade( walkAction, idleAction, 1.0 ) },
-					'from idle to walk':     function () { prepareCrossFade( idleAction, walkAction, 0.5 ) },
-					'from walk to run':      function () { prepareCrossFade( walkAction, runAction, 2.5 ) },
-					'from run to walk':      function () { prepareCrossFade( runAction, walkAction, 5.0 ) },
-					'use default duration':  true,
-					'set custom duration':   3.5,
-					'modify idle weight':    0.0,
-					'modify walk weight':    1.0,
-					'modify run weight':     0.0,
-					'modify time scale':     1.0
+					'show model': true,
+					'show skeleton': false,
+					'deactivate all': deactivateAllActions,
+					'activate all': activateAllActions,
+					'pause/continue': pauseContinue,
+					'make single step': toSingleStepMode,
+					'modify step size': 0.05,
+					'from walk to idle': function () {
+
+						prepareCrossFade( walkAction, idleAction, 1.0 );
+
+					},
+					'from idle to walk': function () {
+
+						prepareCrossFade( idleAction, walkAction, 0.5 );
+
+					},
+					'from walk to run': function () {
+
+						prepareCrossFade( walkAction, runAction, 2.5 );
+
+					},
+					'from run to walk': function () {
+
+						prepareCrossFade( runAction, walkAction, 5.0 );
+
+					},
+					'use default duration': true,
+					'set custom duration': 3.5,
+					'modify idle weight': 0.0,
+					'modify walk weight': 1.0,
+					'modify run weight': 0.0,
+					'modify time scale': 1.0
 				};
 
 				folder1.add( settings, 'show model' ).onChange( showModel );
@@ -211,9 +231,21 @@
 				crossFadeControls.push( folder4.add( settings, 'from run to walk' ) );
 				folder4.add( settings, 'use default duration' );
 				folder4.add( settings, 'set custom duration', 0, 10, 0.01 );
-				folder5.add( settings, 'modify idle weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) { setWeight( idleAction, weight ) } );
-				folder5.add( settings, 'modify walk weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) { setWeight( walkAction, weight ) } );
-				folder5.add( settings, 'modify run weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) { setWeight( runAction, weight ) } );
+				folder5.add( settings, 'modify idle weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) {
+
+					setWeight( idleAction, weight );
+
+				} );
+				folder5.add( settings, 'modify walk weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) {
+
+					setWeight( walkAction, weight );
+
+				} );
+				folder5.add( settings, 'modify run weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) {
+
+					setWeight( runAction, weight );
+
+				} );
 				folder6.add( settings, 'modify time scale', 0.0, 1.5, 0.01 ).onChange( modifyTimeScale );
 
 				folder1.open();
@@ -376,7 +408,6 @@
 
 			}
 
-
 			function setCrossFadeDuration( defaultDuration ) {
 
 				// Switch default crossfade duration <-> custom crossfade duration
@@ -392,7 +423,6 @@
 				}
 
 			}
-
 
 			function synchronizeCrossFade( startAction, endAction, duration ) {
 
@@ -412,7 +442,6 @@
 
 			}
 
-
 			function executeCrossFade( startAction, endAction, duration ) {
 
 				// Not only the start action, but also the end action must get a weight of 1 before fading
@@ -427,7 +456,6 @@
 
 			}
 
-
 			// This function is needed, since animationAction.crossFadeTo() disables its start action and sets
 			// the start action's timeScale to ((start animation's duration) / (end animation's duration))
 
@@ -439,7 +467,6 @@
 
 			}
 
-
 			// Called by the render loop
 
 			function updateWeightSliders() {
@@ -449,7 +476,6 @@
 				settings[ 'modify run weight' ] = runWeight;
 
 			}
-
 
 			// Called by the render loop
 
@@ -482,7 +508,6 @@
 
 			}
 
-
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -491,7 +516,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
 
 			function animate() {
 

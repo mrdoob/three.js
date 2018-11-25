@@ -64,7 +64,7 @@
 				var normal = loader.load( 'models/3ds/portalgun/textures/normal.jpg' );
 
 				var loader = new THREE.TDSLoader( );
-				loader.setPath( 'models/3ds/portalgun/textures/' );
+				loader.setResourcePath( 'models/3ds/portalgun/textures/' );
 				loader.load( 'models/3ds/portalgun/portalgun.3ds', function ( object ) {
 
 					object.traverse( function ( child ) {
@@ -72,13 +72,14 @@
 						if ( child instanceof THREE.Mesh ) {
 
 							child.material.normalMap = normal;
+
 						}
 
 					} );
 
 					scene.add( object );
 
-				});
+				} );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

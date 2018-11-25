@@ -42,11 +42,15 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer, scene, camera;
 
@@ -158,7 +162,7 @@
 					angle: spotLight.angle,
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay
-				}
+				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
 

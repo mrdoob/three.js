@@ -1666,6 +1666,12 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			if ( scene.userData && Object.keys( scene.userData ).length > 0 ) {
+
+				gltfScene.extras = serializeUserData( scene );
+
+			}
+
 			outputJSON.scenes.push( gltfScene );
 
 			var nodes = [];

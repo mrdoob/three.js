@@ -5,8 +5,17 @@
  */
 
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { UVMapping } from '../constants.js';
-import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants.js';
+import {
+	MirroredRepeatWrapping,
+	ClampToEdgeWrapping,
+	RepeatWrapping,
+	LinearEncoding,
+	UnsignedByteType,
+	RGBAFormat,
+	LinearMipMapLinearFilter,
+	LinearFilter,
+	UVMapping
+} from '../constants.js';
 import { _Math } from '../math/Math.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';

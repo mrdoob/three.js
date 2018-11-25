@@ -102,8 +102,16 @@
 				container.appendChild( renderer.domElement );
 
 				var dragControls = new THREE.DragControls( objects, camera, renderer.domElement );
-				dragControls.addEventListener( 'dragstart', function ( event ) { controls.enabled = false; } );
-				dragControls.addEventListener( 'dragend', function ( event ) { controls.enabled = true; } );
+				dragControls.addEventListener( 'dragstart', function () {
+
+					controls.enabled = false;
+
+				} );
+				dragControls.addEventListener( 'dragend', function () {
+
+					controls.enabled = true;
+
+				} );
 
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';

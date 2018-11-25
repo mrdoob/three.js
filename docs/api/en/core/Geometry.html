@@ -266,7 +266,9 @@
 		</p>
 
 		<h3>[method:Geometry fromBufferGeometry]( [param:BufferGeometry geometry] )</h3>
-		<p>Convert a [page:BufferGeometry] to a Geometry.</p>
+		<p>Convert a [page:BufferGeometry] to a Geometry. <br />
+		When converting from BufferGeometry to Geometry, all vertices are preserved, so duplicated vertices may appear.
+		Use [page:Geometry.mergeVertices] to remove them.</p>
 
 		<h3>[method:Geometry lookAt] ( [param:Vector3 vector] )</h3>
 		<p>

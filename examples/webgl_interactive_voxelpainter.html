@@ -37,11 +37,15 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer;
 			var plane, cube;
@@ -177,7 +181,7 @@
 
 						}
 
-					// create cube
+						// create cube
 
 					} else {
 
@@ -198,7 +202,7 @@
 
 			function onDocumentKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 16: isShiftDown = true; break;
 

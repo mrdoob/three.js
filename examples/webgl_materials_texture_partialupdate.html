@@ -29,7 +29,7 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 	</head>
 	<body>
@@ -41,7 +41,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, clock, dataTexture, diffuseMap;
 
@@ -110,8 +114,8 @@
 
 					last = elapsedTime;
 
-					position.x = ( 32 * THREE.Math.randInt( 1, 16 ) ) - 32 ;
-					position.y = ( 32 * THREE.Math.randInt( 1, 16 ) ) - 32 ;
+					position.x = ( 32 * THREE.Math.randInt( 1, 16 ) ) - 32;
+					position.y = ( 32 * THREE.Math.randInt( 1, 16 ) ) - 32;
 
 					// generate new color data
 

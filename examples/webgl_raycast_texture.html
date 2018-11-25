@@ -30,13 +30,9 @@
 				padding: 5px;
 			}
 
-			.control {
-				margin-bottom: 3px;
-			}
+			.control { margin-bottom: 3px; }
 
-			input {
-				width: 50px;
-			}
+			input { width: 50px; }
 		</style>
 	</head>
 	<body>
@@ -73,7 +69,7 @@
 		<script src="../build/three.js"></script>
 		<script>
 
-			CanvasTexture = function ( parentTexture ) {
+			var CanvasTexture = function ( parentTexture ) {
 
 				this._canvas = document.createElement( "canvas" );
 				this._canvas.width = this._canvas.height = 1024;
@@ -88,7 +84,7 @@
 
 				var that = this;
 				this._background = document.createElement( "img" );
-				this._background.addEventListener( "load", function ( event ) {
+				this._background.addEventListener( "load", function () {
 
 					that._canvas.width = that._background.naturalWidth;
 					that._canvas.height = that._background.naturalHeight;
@@ -181,10 +177,7 @@
 
 				}
 
-			}
-
-		</script>
-		<script>
+			};
 
 			var width = window.innerWidth;
 			var height = window.innerHeight;
