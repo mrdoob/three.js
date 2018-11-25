@@ -27518,7 +27518,7 @@ void main() {
 			lightsHash.hemiLength = lightsStateHash.hemiLength;
 			lightsHash.shadowsLength = lightsStateHash.shadowsLength;
 
-			if ( material.lights ) {
+			if (material.needsUpdate && material.lights ) {
 
 				// get all lights affecting this object's layers
 

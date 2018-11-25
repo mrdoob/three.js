@@ -38,11 +38,6 @@
 
 	<div id="info">
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl_lights_selective_lights
-		<br />
-		<br />
-		(1) to toggle spot light from layer 1 (cube1 layer)<br />
-		(2) to toggle spot light from layer 2 (cube2 layer)<br />
-		(3) to toggle spot light from layer 3 (cube3 layer)<br />
 	</div>
 
 	<script src="../build/three.js"></script>
@@ -70,7 +65,7 @@
 
 		var cube1, cube2, cube3;
 
-		var gui;
+		var params, gui;
 
 		function init() {
 
@@ -171,6 +166,33 @@
 
 			window.addEventListener('resize', onResize, false);
 
+			// GUI
+
+			var gui = new dat.GUI();
+
+			var layers = { layer1: true, layer2: false, layer3: true };
+
+			var leverFolder = gui.addFolder('Layers');
+			gui.add(layers, 'layer1').onChange(function () {
+
+				spotLight.layers.toggle(1);
+				cube1.material.needsUpdate = true;
+			});
+
+			gui.add(layers, 'layer2').onChange(function () {
+
+				spotLight.layers.toggle(2);
+				cube2.material.needsUpdate = true;
+			});
+
+			gui.add(layers, 'layer3').onChange(function () {
+
+				spotLight.layers.toggle(3);
+				cube3.material.needsUpdate = true;
+
+			});
+
+
 		}
 
 		function onResize() {
@@ -196,27 +218,6 @@
 
 		render();
 
-		function onKeyDown(event) {
-
-			switch (event.keyCode) {
-
-				case 49:	/*1*/
-					spotLight.layers.toggle(1);
-					cube1.material.needsUpdate = true;
-					break;
-				case 50:	/*2*/
-					spotLight.layers.toggle(2);
-					cube2.material.needsUpdate = true;
-					break;
-				case 51:	/*3*/
-					spotLight.layers.toggle(3);
-					cube3.material.needsUpdate = true;
-					break;
-			}
-
-		}
-
-		window.addEventListener('keydown', onKeyDown, false);
 	</script>
 
 </body>
