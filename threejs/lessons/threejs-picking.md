@@ -1,535 +1,404 @@
 Title: Three.js Picking
 Description: Selecting Objects with the Mouse in Three.js
 
-*Picking* refers to the process of figuring out which object
-a user clicked on or touched. There are tons of ways to implement
-picking each with their tradeoffs. Let's go over the 2 most common.
+*Picking* refers to the process of figuring out which object a user clicked on or touched. There are tons of ways to implement picking each with their tradeoffs. Let's go over the 2 most common.
 
-Probably the most common way of *picking* is by doing raycasting
-which means to *cast* a ray from the mouse through the frustum
-of the scene and computing which objects that ray intersects.
-Conceptually it's very simple.
+Probably the most common way of *picking* is by doing raycasting which means to *cast* a ray from the mouse through the frustum of the scene and computing which objects that ray intersects. Conceptually it's very simple.
 
-First we'd take the position of the mouse. We'd convert that into
-world space by applying the camera's projection and orientation.
-We'd compute a ray from the near plane of the camera's frustum
-to the far plane. Then, for every triangle of every object in the
-scene we'd check if that ray intersects that triangle. If your
-scene has 1000 objects and each object has 1000 triangles then
-1 million triangles will need to be checked.
+First we'd take the position of the mouse. We'd convert that into world space by applying the camera's projection and orientation. We'd compute a ray from the near plane of the camera's frustum to the far plane. Then, for every triangle of every object in the scene we'd check if that ray intersects that triangle. If your scene has 1000 objects and each object has 1000 triangles then 1 million triangles will need to be checked.
 
-A few optimizations would include first checking if the ray intersects
-with an object's bounding sphere or bounding box, the sphere or box
-that contains the entire object. If the ray doesn:'t intersect
-one of those then we don't have to check the triangles of that object.
+A few optimizations would include first checking if the ray intersects with an object's bounding sphere or bounding box, the sphere or box that contains the entire object. If the ray doesn't intersect one of those then we don't have to check the triangles of that object.
 
 THREE.js provides a `RayCaster` class that does exactly this.
 
+Let's make a scene with a 100 objects and try picking them. We'll
+start with an example from [the article on responsive pages](three.js)
 
+A few changes
 
-
-
-
-This article is part of a series of articles about three.js. The
-first article is [three.js fundamentals](three-fundamentals.html). If
-you haven't read that yet and you're new to three.js you might want to
-consider starting there. The 
-[previous article was about cameras](threejs-cameras.html) which is
-important to have read before you read this article as well as
-the [article before that one about lights](threejs-lights.html).
-
-Shadows on computers can be a complicated topic. There are various
-solutions and all of them have tradeoffs including the solutions
-available in three.js
-
-Three.js by default uses *shadow maps*. The way a shadow map works
-is, *for every light that casts shadows all objects marked to cast
-shadows are rendered from the point of view of the light*. **READ THAT
-AGAIN!** and let it sink in. 
-
-In other words, if you have 20 objects, and 5 lights, and
-all 20 objects are casting shadows and all 5 lights are casting
-shadows then your entire scene will be drawn 6 times. All 20 objects
-will be drawn for light #1, then all 20 objects will be drawn for 
-light #2, then #3, etc and finally the actual scene will be drawn
-using data from the first 5 renders.
-
-It gets worse, if you have a point light casting shadows the scene
-has to be drawn 6 times just for that light!
-
-For these reasons it's common find other solutions than to have
-a bunch of lights all generating shadows. One common solution
-is to have multiple lights but only one directional light generating
-shadows.
-
-Yet another solution is to use lightmaps and or ambient occlusion maps
-to pre-compute the effects of lighting offline. This results in static
-lighting or static lighting hints but at least it's fast. We'll
-cover both of those in another article.
-
-Another solution is to use fake shadows. Make a plane, put a grayscale
-texture in the plane that approximates a shadow, 
-draw it above the ground below your object.
-
-For example let's use this texture as a fake shadow
-
-<div class="threejs_center"><img src="../resources/images/roundshadow.png"></div>
-
-We'll use some of the code from [the previous article](threejs-cameras.html).
-
-Let's set the background color to white.
+We'll parent the camera to another object so we can spin that other object and the camera will move around the scene just like a selfie stick.
 
 ```
+*const fov = 60;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+*const far = 200;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+*camera.position.z = 30;
+
 const scene = new THREE.Scene();
 +scene.background = new THREE.Color('white');
+
++// put the camera on a pole (parent it to an object)
++// so we can spin the pole to move the camera around the scene
++const cameraPole = new THREE.Object3D();
++scene.add(cameraPole);
++cameraPole.add(camera);
 ```
 
-Then we'll setup the same checkerboard ground but this time it's using
-a `MeshBasicMaterial` as we don't need lighting for the ground.
+and in the `render` function we'll spin the camera pole.
 
 ```
-+const loader = new THREE.TextureLoader();
+cameraPole.rotation.y = time * .1;
+```
 
-{
-  const planeSize = 40;
+Let's generate 100 cubes with random colors in random positions, orientations,
+and scales.
 
--  const loader = new THREE.TextureLoader();
-  const texture = loader.load('resources/images/checker.png');
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.magFilter = THREE.NearestFilter;
-  const repeats = planeSize / 2;
-  texture.repeat.set(repeats, repeats);
+```
+const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
-  const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
-  const planeMat = new THREE.MeshBasicMaterial({
-    map: texture,
-    side: THREE.DoubleSide,
-  });
-+  planeMat.color.setRGB(1.5, 1.5, 1.5);
-  const mesh = new THREE.Mesh(planeGeo, planeMat);
-  mesh.rotation.x = Math.PI * -.5;
-  scene.add(mesh);
+function rand(min, max) {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return min + (max - min) * Math.random();
 }
-```
 
-Note we're setting the color to `1.5, 1.5, 1.5`. This will multiply the checkerboard
-texture's colors by 1.5, 1.5, 1.5. Since the texture's colors are 0x808080 and 0xC0C0C0
-which is medium gray and light gray, multiplying them by 1.5 will give is a white and 
-light grey checkerboard.
-
-Let's load the shadow texture
-
-```javascript
-const shadowTexture = loader.load('resources/images/roundshadow.png');
-```
-
-and make an array to remember each sphere and associated objects.
-
-```javascript
-const sphereShadowBases = [];
-```
-
-Then we'll make a sphere geometry
-
-```javascript
-const sphereRadius = 1;
-const sphereWidthDivisions = 32;
-const sphereHeightDivisions = 16;
-const sphereGeo = new THREE.SphereBufferGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
-```
-
-And a plane geometry for the fake shadow
-
-```
-const planeSize = 1;
-const shadowGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
-```
-
-Now we'll make a bunch of spheres. For each sphere we'll create a `base`
-`THREE.Object3D` and we'll make both the shadow plane mesh and the sphere mesh
-children of the base. That way if we move the base both the sphere and the shadow
-will move. We need to put the shadow slightly above the ground to prevent z-fighting. 
-We also set `depthWrite` to false so that the shadows don't mess each other up.
-We'll go over both of these issues in [another article](threejs-transparency.html).
-The shadow is a `MeshBasicMaterial` because it doesn't need lighting.
-
-We make each sphere a different hue and then save off the base, the sphere mesh,
-the shadow mesh and the initial y position of each sphere.
-
-
-```javascript
-const numSpheres = 15;
-for (let i = 0; i < numSpheres; ++i) {
-  // make a base for the shadow and the sphere.
-  // so they move together.
-  const base = new THREE.Object3D();
-  scene.add(base);
-
-  // add the shadow to the base
-  // note: we make a new material for each sphere
-  // so we can set that sphere's material transparency
-  // separately.
-  const shadowMat = new THREE.MeshBasicMaterial({
-    map: shadowTexture,
-    transparent: true,    // so we can see the ground
-    depthWrite: false,    // so we don't have to sort
-  });
-  const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-  shadowMesh.position.y = 0.001;  // so we're above the ground slightly
-  shadowMesh.rotation.x = Math.PI * -.5;
-  const shadowSize = sphereRadius * 4;
-  shadowMesh.scale.set(shadowSize, shadowSize, shadowSize);
-  base.add(shadowMesh);
-
-  // add the sphere to the base
-  const u = i / numSpheres;   // goes from 0 to 1 as we iterate the spheres.
-  const sphereMat = new THREE.MeshPhongMaterial();
-  sphereMat.color.setHSL(u, 1, .75);
-  const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
-  sphereMesh.position.set(0, sphereRadius + 2, 0);
-  base.add(sphereMesh);
-
-  // remember all 3 plus the y position
-  sphereShadowBases.push({base, sphereMesh, shadowMesh, y: sphereMesh.position.y});
+function randomColor() {
+  return `hsl(${rand(360) | 0}, ${rand(50, 100) | 0}%, 50%)`;
 }
-```
 
-We setup 2 lights. One is a `HemisphereLight` with the itensity set to 2 to really
-brighten things up.
-
-```javascript
-{
-  const skyColor = 0xB1E1FF;  // light blue
-  const groundColor = 0xB97A20;  // brownish orange
-  const intensity = 2;
-  const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
-  scene.add(light);
-}
-```
-
-The other is a `DirectionalLight` so the spheres get some defintion
-
-```javascript
-{
-  const color = 0xFFFFFF;
-  const intensity = 1;
-  const light = new THREE.DirectionalLight(color, intensity);
-  light.position.set(0, 10, 5);
-  light.target.position.set(-5, 0, 0);
-  scene.add(light);
-  scene.add(light.target);
-}
-```
-
-It would render as is but let's animate there spheres.
-For each sphere, shadow, base set we move the base in the xz plane, we
-move the sphere up and down using `Math.abs(Math.sin(time))`
-which gives us a bouncy animation. And, we also set the shadow material's 
-opacity so that as each sphere goes higher its shadow fades out.
-
-```javascript
-function render(time) {
-  time *= 0.001;  // convert to seconds
-
-  ...
-
-  sphereShadowBases.forEach((sphereShadowBase, ndx) => {
-    const {base, sphereMesh, shadowMesh, y} = sphereShadowBase;
-
-    // u is a value that goes from 0 to 1 as we iterate the spheres
-    const u = ndx / sphereShadowBases.length;
-
-    // compute a position for there base. This will move
-    // both the sphere and its shadow
-    const speed = time * .2;
-    const angle = speed + u * Math.PI * 2 * (ndx % 1 ? 1 : -1);
-    const radius = Math.sin(speed - ndx) * 10;
-    base.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
-
-    // yOff is a value that goes from 0 to 1
-    const yOff = Math.abs(Math.sin(time * 2 + ndx));
-    // move the sphere up and down
-    sphereMesh.position.y = y + THREE.Math.lerp(-2, 2, yOff);
-    // fade the shadow as the sphere goes up
-    shadowMesh.material.opacity = THREE.Math.lerp(1, .25, yOff);
+const numObjects = 100;
+for (let i = 0; i < numObjects; ++i) {
+  const material = new THREE.MeshPhongMaterial({
+    color: randomColor(),
   });
 
-  ...
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  cube.position.set(rand(-20, 20), rand(-20, 20), rand(-20, 20));
+  cube.rotation.set(rand(Math.PI), rand(Math.PI), 0);
+  cube.scale.set(rand(3, 6), rand(3, 6), rand(3, 6));
+}
 ```
 
-And here's 15 kind of bouncing balls.
+And finally let's pick.
 
-{{{example url="../threejs-shadows-fake.html" }}}
-
-In some apps it's common to use a round or oval shadow for everything but
-of course you could also use different shaped shadow textures. You might also
-give the shadow a harder edge. A good example of using this type
-of shadow is [Animal Crossing Pocket Camp](https://www.google.com/search?tbm=isch&q=animal+crossing+pocket+camp+screenshots) 
-where you can see each character has a simple round shadow. It's effective and cheap.
-[Monument Valley](https://www.google.com/search?q=monument+valley+screenshots&tbm=isch) 
-appears to also use this kind of shadow for the main character.
-
-So, moving on to shadow maps, there are 3 lights with can cast shadows. The `DirectionalLight`,
-the `PointLight`, and the `SpotLight`.
-
-Let's start with the `DirectionaLight` with helper example from [the lights article](threejs-lights.html). 
-
-The first thing we need to do is turn on shadows in the renderer.
+Let's make a simple class to manage the picking
 
 ```
-const renderer = new THREE.WebGLRenderer({canvas: canvas});
-+renderer.shadowMap.enabled = true;
+class PickHelper {
+  constructor() {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
+    // cast a ray through the frustum
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // get the list of objects the ray intersected
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // pick the first object. It's the closest one
+      this.pickedObject = intersectedObjects[0].object;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 > 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
 ```
 
-Then we also need to tell the light to cast a shadow
+You can see we create a `RayCaster` and then we can call the `pick` function to cast a ray through the scene. If the ray hits something we change the color of the first thing it hits.
 
-```javascript
-const light = new THREE.DirectionalLight(color, intensity);
-+light.castShadow = true;
+Of course we could call this function only when the user pressed the mouse *down* which is probaby usually what you want but for this example we'll pick every frame whatever is under the mouse. To do this we first need to track where the mouse
+is
+
 ```
-
-We also need to go to each mesh in the scene and decide if it should
-both cast shadows and/or receive shadows.
-
-Let's make the plane (the ground) only receive shadows since we don't
-really care what happens underneath.
-
-```javascript
-const mesh = new THREE.Mesh(planeGeo, planeMat);
-mesh.receiveShadow = true;
-```
-
-For the cube and the sphere let's have them both receive and cast shadows
-
-```javascript
-const mesh = new THREE.Mesh(cubeGeo, cubeMat);
-mesh.castShadow = true;
-mesh.receiveShadow = true;
+const pickPosition = {x: -1, y: -1};
 
 ...
 
-const mesh = new THREE.Mesh(sphereGeo, sphereMat);
-mesh.castShadow = true;
-mesh.receiveShadow = true;
-```
-
-And then we run it.
-
-{{{example url="../threejs-shadows-directional-light.html" }}}
-
-What happened? Why are parts of the shadows missing?
-
-The reason is shadow maps are created by rendering the scene from the point
-of view of the light. In this case there is a camera at the `DirectionalLight`
-that is looking at its target. Just like [the camera's we previously covered](threejs-cameras.html)
-the light's shadow camera defines an area inside of which
-the shadows get rendered. In the example above that area is too small.
-
-In order to visualize that area we can get the light's shadow camera and add
-a `CameraHelper` to the scene.
-
-```javascript
-const cameraHelper = new THREE.CameraHelper(light.shadow.camera);
-scene.add(cameraHelper);
-```
-
-And now you can see the area for which shadows are cast and received.
-
-{{{example url="../threejs-shadows-directional-light-with-camera-helper.html" }}}
-
-Adjust the target x value back and forth and it should be pretty clear that only
-what's inside the light's shadow camera box is where shadows are drawn.
-
-We can adjust the size of that box by adjusting the light's shadow camera.
-
-Let's add some GUI setting to adjust the light's shadow camera box. Since a 
-`DirectionalLight` represents light all going in a parallel direction the
-`DirectionalLight` uses an `OrthographicCamera` for its shadow camera.
-We went over how an `OrthographicCamera` works in [the previous article about cameras.](threejs-cameras.html).
-
-Recall an `OrthographicCamera` defines
-its box or *view frustum* by its `left`, `right`, `top`, `bottom`, `near`, `far`,
-and `zoom` properties.
-
-Again let's make a helper class for the dat.GUI. We'll make a `DimensionGUIHelper`
-that we'll pass an object and 2 properties. It will present one property that dat.GUI
-can adjust and in response will set the two properties one positive and one negative.
-We can use this to set `left` and `right` as `width` and `up` and `down` as `height`.
-
-```javascript
-class DimensionGUIHelper {
-  constructor(obj, minProp, maxProp) {
-    this.obj = obj;
-    this.minProp = minProp;
-    this.maxProp = maxProp;
-  }
-  get value() {
-    return this.obj[this.maxProp] * 2;
-  }
-  set value(v) {
-    this.obj[this.maxProp] = v /  2;
-    this.obj[this.minProp] = v / -2;
-  }
+function setPickPosition(event) {
+  pickPosition.x = (event.clientX / canvas.clientWidth ) *  2 - 1;
+  pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
 }
+
+window.addEventListener('mousemove', setPickPosition);
 ```
 
-We'll also use the `MinMaxGUIHelper` we created in the [camera article](threejs-cameras.html)
-to adjust `near` and `far`.
+Notice we're recording a normalized mouse position. Reguardless of the size of the canvas we need a value that goes from -1 on the left to +1 on the right. Similarly we need a value that goes from -1 on the bottom to +1 on the top.
+
+While we're at it lets support mobile as well
 
 ```
-const gui = new dat.GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 2, 0.01);
-+{
-+  const folder = gui.addFolder('Shadow Camera');
-+  folder.open();
-+  folder.add(new DimensionGUIHelper(light.shadow.camera, 'left', 'right'), 'value', 1, 100)
-+    .name('width')
-+    .onChange(updateCamera);
-+  folder.add(new DimensionGUIHelper(light.shadow.camera, 'bottom', 'top'), 'value', 1, 100)
-+    .name('height')
-+    .onChange(updateCamera);
-+  const minMaxGUIHelper = new MinMaxGUIHelper(light.shadow.camera, 'near', 'far', 0.1);
-+  folder.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
-+  folder.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
-+  folder.add(light.shadow.camera, 'zoom', 0.01, 1.5, 0.01).onChange(updateCamera);
-+}
+window.addEventListener('touchstart', (event) => {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+window.addEventListener('touchmove', (event) => {
+  setPickPosition(event.touches[0]);
+});
+
+window.addEventListener('touchend', () => {
+  // unlike the mouse which always has a position,
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+  pickPosition.x = -100000;
+  pickPosition.y = -100000;
+});
 ```
 
-We tell the GUI to call our `updateCamera` function anytime anything changes.
-Let's write that function to update the light, the helper for the light, the
-light's shadow camera, and the helper showing the light's shadow camera.
+And finally in our `render` function we call call the `PickHelper`'s `pick` function.
 
 ```
-function updateCamera() {
-  // update the light target's matrixWorld because it's needed by the helper
-  light.target.updateMatrixWorld();
-  helper.update();
-  // update the light's shadow camera's projection matrix
-  light.shadow.camera.updateProjectionMatrix();
-  // and now update the camera helper we're using to show the light's shadow camera
-  cameraHelper.update();
-}
-updateCamera();
++const pickHelper = new PickHelper();
+
+function render(time) {
+  time *= 0.001;  // convert to seconds;
+
+  ...
+
++  pickHelper.pick(pickPosition, scene, camera, time);
+
+  renderer.render(scene, camera);
+
+  ...
 ```
 
-And now that we've given the light's shadow camera a GUI we can play with the values.
+and here's the result
 
-{{{example url="../threejs-shadows-directional-light-with-camera-gui.html" }}}
+{{{example url="../threejs-picking-raycaster.html" }}}
 
-Set the `width` and `height` to about 30 and you can see the shadows are correct
-and the areas that need to be in shadow for this scene are entirely covered.
+This appears to work great and it probably does for many use cases
+but there are several issues.
 
-But this brings up the question, why not just set `width` and `height` to some
-giant numbers to just cover everything? Set the `width` and `height` to 100
-and you might see something like this
+1. It's CPU based.
 
-<div class="threejs_center"><img src="resources/images/low-res-shadow-map.png" style="width: 369px"></div>
+   JavaScript is going through each object and checking if the ray intersects
+   that object's bounding box or bounding sphere. If it does then JavaScript
+   has to go through each and every triangle in that object and check if the
+   ray intersects the triangle.
 
-What's going on with these low-res shadows!
+   The good part of this is JavaScript can easily compute exactly where the
+   ray intersected the triangle and provide us with that data. For example
+   if you wanted to put a marker where the intersection happened.
 
-This issue is yet another shadow related setting to be aware of. 
-Shadow maps are textures the shadows get drawn into. 
-Those textures have a size. The shadow camera's area we set above is stretched
-across that size. That means the larger area you set the more blocky your shadows will
-be.
+   The bad part is that's a lot of work for the CPU to do. If you have
+   objects with lots of triangles it might be slow.
 
-You can set the resolution of the shadow map's texture by setting `light.shadow.mapSize.width`
-and `light.shadow.mapSize.height`. They default to 512x512.
-The larger you make them the more memory they take and the slower they are to compute so you want
-to set them as small as you can and still make your scene work. The same is true with the
-light's shadow camera area. Smaller means better looking shadows so make the area as small as you 
-can and still cover your scene. Be aware that each user's machine has a maximum texture size
-allowed which is available on the renderer as [`renderer.capabilities.maxTextureSize`](WebGLRenderer.capabilities).
+2. It doesn't handle any strange shaders or displacements.
 
-<!--
-Ok but what about `near` and `far` I hear you thinking. Can we set `near` to 0.00001 and far to `100000000`
--->
+   If you have a shader that deforms or morphs the geometry JavaScript
+   has no knowledge of that deformation and so will give the wrong answer.
+   For example AFAIK you can't use this method with skinned objects.
 
-Switching to the `SpotLight` the light's shadow camera becomes a `PerspectiveCamera`. Unlike the `DirectionalLight`'s shadow camera
-where we could manually set most its settings, `SpotLight`'s shadow camera is controlled by the `SpotLight` itself. The `fov` for the shadow
-camera is directly connected to the `SpotLight`'s `angle` setting.
-The `aspect` is set automatically based on the size of the shadow map.
+3. It doesn't handle transparent holes.
 
-```javascript
--const light = new THREE.DirectionalLight(color, intensity);
-+const light = new THREE.SpotLight(color, intensity);
+As an example let's apply this texture to the cubes.
+
+<div class="threejs_center"><img class="checkerboard" src="../resources/images/frame.png"></div>
+
+We'll just make these changes
+
 ```
++const loader = new THREE.TextureLoader();
++const texture = loader.load('resources/images/frame.png');
 
-and we added back in the `penumbra` and `angle` settings
-from our [article about lights](threejs-lights.html).
-
-{{{example url="../threejs-shadows-spot-light-with-camera-gui.html" }}}
-
-
-<!--
-You can notice, just like the last example if we set the angle high
-then the shadow map, the texture is spread over a very large area and
-the resolution of our shadows gets really low.
-
-div class="threejs_center"><img src="resources/images/low-res-shadow-map-spotlight.png" style="width: 344px"></div>
-
-You can increase the size of the shadow map as mentioned above. You can
-also blur the result
-
-{{{example url="../threejs-shadows-spot-light-with-shadow-radius" }}}
--->
-
-
-
-And finally there's shadows with a `PointLight`. Since a `PointLight`
-shines in all directions the only relevent settings are `near` and `far`.
-Otherwise the `PointLight` shadow is effectively 6 `SpotLight` shadows
-each one pointing to the face of a cube around the light. This means
-`PointLight` shadows are much slower since the entire scene must be
-drawn 6 times, one for each direction.
-
-Let's put a box around our scene so we can see shadows on the walls 
-and ceiling. We'll set the material's `side` property to `THREE.BackSide` 
-so we render the inside of the box instead of the outside. Like the floor
-we'll set it only to receive shadows. Also we'll set the position of the
-box so its bottom is slightly below the floor so the floor and the bottom
-of the box don't z-fight.
-
-```javascript
-{
-  const cubeSize = 30;
-  const cubeGeo = new THREE.BoxBufferGeometry(cubeSize, cubeSize, cubeSize);
-  const cubeMat = new THREE.MeshPhongMaterial({
-    color: '#CCC',
-    side: THREE.BackSide,
+const numObjects = 100;
+for (let i = 0; i < numObjects; ++i) {
+  const material = new THREE.MeshPhongMaterial({
+    color: randomColor(),
+    +map: texture,
+    +transparent: true,
+    +side: THREE.DoubleSide,
+    +alphaTest: 0.1,
   });
-  const mesh = new THREE.Mesh(cubeGeo, cubeMat);
-  mesh.receiveShadow = true;
-  mesh.position.set(0, cubeSize / 2 - 0.1, 0);
-  scene.add(mesh);
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  ...
+```
+
+And running that you should quickly see the issue
+
+{{{example url="../threejs-picking-raycaster-transparency.html" }}}
+
+Try to pick something through a box and you can't
+
+<div class="threejs_center"><img src="resources/images/picking-transparent-issue.jpg" style="width: 635px;"></div>
+
+This is because JavaScript can't easily look into the textures and materials and figure out if part of your object is really transparent or not.
+
+A solution all of these issues is to use GPU based picking. Unfortunately while it is conceptually simple it is more complicated to use than the ray casting method above.
+
+To do GPU picking we render each object in a unique color offscreen. We then look up the color of the pixel corresponding to the mouse position. The color tells us which object was picked.
+
+This can solve issue 2 and 3 above. As for issue 1, speed, it really depends. Every object has to be drawn twice. Once to draw it for viewing and again to draw it for picking. It's possible with fancier solutions maybe both of those could be done at the same time but we're not going to try that.
+
+One thing we can do though is since we're only going to be reading one pixel we can just setup the camera so only that one pixel is drawn. We can do this using `PerspectiveCamera.setViewOffset` which lets us tell THREE.js to compute a camera that just renders a smaller part of a larger rectangle. This should save some time.
+
+To do this type of picking in THREE.js at the moment requires we create 2 scenes. One we will fill with our normal meshes. The other we'll fill with meshes
+that use our picking material.
+
+So, first create a second scene and make sure it clears to black.
+
+```
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('white');
+const pickingScene = new THREE.Scene();
+pickingScene.background = new THREE.Color(0);
+```
+
+Then, for each cube we place in the main scene we make a corresponding "picking cube" at the same position as the original cube, put it in the `pickingScene`, and set it's material to something that will draw the object's id as its color. Also we keep a map of ids to objects so when we look up an id later we can map it back to its corresponding object.
+
+```
+const idToObject = {};
++const numObjects = 100;
+for (let i = 0; i < numObjects; ++i) {
++  const id = i + 1;
+  const material = new THREE.MeshPhongMaterial({
+    color: randomColor(),
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+    alphaTest: 0.1,
+  });
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
++  idToObject[id] = cube;
+
+  cube.position.set(rand(-20, 20), rand(-20, 20), rand(-20, 20));
+  cube.rotation.set(rand(Math.PI), rand(Math.PI), 0);
+  cube.scale.set(rand(3, 6), rand(3, 6), rand(3, 6));
+
++  const pickingMaterial = new THREE.MeshPhongMaterial({
++    emissive: new THREE.Color(id),
++    color: new THREE.Color(0, 0, 0),
++    map: texture,
++    transparent: true,
++    side: THREE.DoubleSide,
++    alphaTest: 0.1,
++    blending: THREE.NoBlending,
++  });
++  const pickingCube = new THREE.Mesh(geometry, pickingMaterial);
++  pickingScene.add(pickingCube);
++  pickingCube.position.copy(cube.position);
++  pickingCube.rotation.copy(cube.rotation);
++  pickingCube.scale.copy(cube.scale);
 }
 ```
 
-And of course we need to switch the light to a `PointLight`.
+Note that we are abusing the `MeshPhongMaterial` here. By setting its `emissive` to our id and the `color` to 0 that will end up rendering the id only where the texture's alpha is greater than `alphaTest`. We also need to set `blending` to `NoBlending` so that the id is not multiplied by alpha.
 
-```javascript
--const light = new THREE.SpotLight(color, intensity);
-+const light = new THREE.PointLight(color, intensity);
+Note that abusing the `MeshPhongMaterial` might not be the best solution as it will still calculate all our lights when drawing the picking scene even though we don't need those calculations. A more optimized solution would make a custom shader that just writes the id where the texture's alpha is greater than `alphaTest`.
 
-....
+Because we're picking from pixels instead of ray casting we can change the code that sets the pick position to just use pixels.
 
-// so we can easily see where the point light is
-+const helper = new THREE.PointLightHelper(light);
-+scene.add(helper);
+```
+function setPickPosition(event) {
+-  pickPosition.x = (event.clientX / canvas.clientWidth ) *  2 - 1;
+-  pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
++  pickPosition.x = event.clientX;
++  pickPosition.y = event.clientY;
+}
 ```
 
-{{{example url="../threejs-shadows-point-light.html" }}}
+Then let's change the `PickHelper` into a `GPUPickHelper`
 
-Use the `position` GUI settings to move the light around
-and you'll see the shadows fall on all the walls. You can
-also adjust `near` and `far` settings and see just like
-the other shadows when things are closer than `near` they
-no longer receive a shadow and they are further than `far`
-they are always in shadow.
+```
+-class PickHelper {
++class GPUPickHelper {
+  constructor() {
+-    this.raycaster = new THREE.Raycaster();
++    // create a 1x1 pixel render target
++    this.pickingTexture = new THREE.WebGLRenderTarget(1, 1);
++    this.pixelBuffer = new Uint8Array(4);
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(cssPosition, scene, camera, time) {
++    const {pickingTexture, pixelBuffer} = this;
 
-<!--
-self shadow, shadow acne
--->
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
 
++    // set the view offset to represent just a single pixel under the mouse
++    const pixelRatio = renderer.getPixelRatio();
++    camera.setViewOffset(
++        renderer.context.drawingBufferWidth,   // full width
++        renderer.context.drawingBufferHeight,  // full top
++        cssPosition.x * pixelRatio | 0,        // rect x
++        cssPosition.y * pixelRatio | 0,        // rect y
++        1,                                     // rect width
++        1,                                     // rect height
++    );
++    // render the scene
++    renderer.render(scene, camera, pickingTexture);
++    // clear the view offset so rendering returns to normal
++    camera.clearViewOffset();
++    //read the pixel
++    renderer.readRenderTargetPixels(
++        pickingTexture,
++        0,   // x
++        0,   // y
++        1,   // width
++        1,   // height
++        pixelBuffer);
++
++    const id =
++        (pixelBuffer[0] << 16) |
++        (pixelBuffer[1] <<  8) |
++        (pixelBuffer[2]      );
+
+-    // cast a ray through the frustum
+-    this.raycaster.setFromCamera(normalizedPosition, camera);
+-    // get the list of objects the ray intersected
+-    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+-    if (intersectedObjects.length) {
+-      // pick the first object. It's the closest one
+-      this.pickedObject = intersectedObjects[0].object;
+
++    const intersectedObject = idToObject[id];
++    if (intersectedObject) {
++      // pick the first object. It's the closest one
++      this.pickedObject = intersectedObject;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 > 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+```
+
+Then we just need to use it
+
+```
+-const pickHelper = new PickHelper();
++const pickHelper = new GPUPickHelper();
+```
+
+and pass it the `pickScene` instead of the `scene`.
+
+```
+-  pickHelper.pick(pickPosition, scene, camera, time);
++  pickHelper.pick(pickPosition, pickScene, camera, time);
+```
+
+And now it should let you pick through the transparent parts
+
+{{{example url="../threejs-picking-gpu.html" }}}
+
+I hope that gives some idea of how to implement picking. In a future article maybe we can cover how to manipulate objects with the mouse.

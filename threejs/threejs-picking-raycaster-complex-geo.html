@@ -1,0 +1,157 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Picking - RayCaster</title>
+    <style>
+    body {
+        margin: 0;
+        position: fixed;
+    }
+    #c {
+        width: 100vw;
+        height: 100vh;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script src="resources/threejs/r98/three.min.js"></script>
+<script>
+'use strict';
+
+/* global THREE */
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+
+  const fov = 60;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 200;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.z = 30;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('white');
+
+  // put the camera on a pole (parent it to an object)
+  // so we can spin the pole to move the camera around the scene
+  const cameraPole = new THREE.Object3D();
+  scene.add(cameraPole);
+  cameraPole.add(camera);
+
+  {
+    const color = 0xFFFFFF;
+    const intensity = 1;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
+  }
+
+  const geometry = new THREE.SphereBufferGeometry(.6, 100, 100);
+
+  function rand(min, max) {
+    if (max === undefined) {
+      max = min;
+      min = 0;
+    }
+    return min + (max - min) * Math.random();
+  }
+
+  function randomColor() {
+    return `hsl(${rand(360) | 0}, ${rand(50, 100) | 0}%, 50%)`;
+  }
+
+  const numObjects = 100;
+  for (let i = 0; i < numObjects; ++i) {
+    const material = new THREE.MeshPhongMaterial({color: randomColor()});
+
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    cube.position.set(rand(-20, 20), rand(-20, 20), rand(-20, 20));
+    cube.rotation.set(rand(Math.PI), rand(Math.PI), 0);
+    cube.scale.set(rand(3, 6), rand(3, 6), rand(3, 6));
+  }
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  class PickHelper {
+    constructor() {
+      this.raycaster = new THREE.Raycaster();
+      this.pickedObject = null;
+      this.pickedObjectSavedColor = 0;
+    }
+    pick(normalizedPosition, scene, camera, time) {
+      // restore the color if there is a picked object
+      if (this.pickedObject) {
+        this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+        this.pickedObject = undefined;
+      }
+
+      this.raycaster.setFromCamera(normalizedPosition, camera);
+      const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+      if (intersectedObjects.length) {
+        this.pickedObject = intersectedObjects[0].object;
+        this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+        this.pickedObject.material.emissive.setHex((time * 8) % 2 > 1 ? 0xFFFF00 : 0xFF0000);
+      }
+    }
+  }
+
+  const pickHelper = new PickHelper();
+  const pickPosition = {x: -1, y: -1};
+
+  function render(time) {
+    time *= 0.001;  // convert to seconds;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    cameraPole.rotation.y = time * .1;
+
+    pickHelper.pick(pickPosition, scene, camera, time);
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+
+  window.addEventListener('mousemove', (event) => {
+    pickPosition.x = (event.clientX / canvas.clientWidth ) *  2 - 1;
+    pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
+  });
+
+  window.addEventListener('touchstart', (event) => {
+    event.preventDefault();
+  }, {passive: false});
+  window.addEventListener('touchmove', (event) => {
+    const touch = event.touches[0];
+    pickPosition.x = (touch.clientX / canvas.clientWidth ) *  2 - 1;
+    pickPosition.y = (touch.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
+  }, {passive: false});
+}
+
+main();
+</script>
+</html>
+
