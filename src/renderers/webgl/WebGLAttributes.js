@@ -133,13 +133,15 @@ function WebGLAttributes( gl ) {
 
 	function update( attribute, bufferType ) {
 
+		var bufferAttribute = attribute;
+
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
 		var data = buffers.get( attribute );
 
 		if ( data === undefined ) {
 
-			attribute.addEventListener( 'dispose', onAttributeDispose );
+			bufferAttribute.addEventListener( 'dispose', onAttributeDispose );
 
 			buffers.set( attribute, createBuffer( attribute, bufferType ) );
 

@@ -1,3 +1,4 @@
+import { EventDispatcher } from './EventDispatcher.js';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -13,31 +14,9 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 
 }
 
-Object.defineProperties( InterleavedBufferAttribute.prototype, {
+InterleavedBufferAttribute.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-	count: {
-
-		get: function () {
-
-			return this.data.count;
-
-		}
-
-	},
-
-	array: {
-
-		get: function () {
-
-			return this.data.array;
-
-		}
-
-	}
-
-} );
-
-Object.assign( InterleavedBufferAttribute.prototype, {
+	constructor: InterleavedBufferAttribute,
 
 	isInterleavedBufferAttribute: true,
 
@@ -131,9 +110,38 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
 
 } );
 
+Object.defineProperties( InterleavedBufferAttribute.prototype, {
+
+	count: {
+
+		get: function () {
+
+			return this.data.count;
+
+		}
+
+	},
+
+	array: {
+
+		get: function () {
+
+			return this.data.array;
+
+		}
+
+	}
+
+} );
 
 export { InterleavedBufferAttribute };
