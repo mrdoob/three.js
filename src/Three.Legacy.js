@@ -44,7 +44,6 @@ import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { DataTextureLoader } from './loaders/DataTextureLoader.js';
-import { JSONLoader } from './loaders/JSONLoader.js';
 import { ObjectLoader } from './loaders/ObjectLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
@@ -437,17 +436,6 @@ export function BinaryTextureLoader( manager ) {
 	return new DataTextureLoader( manager );
 
 }
-
-Object.assign( JSONLoader.prototype, {
-
-	setTexturePath: function ( value ) {
-
-		console.warn( 'THREE.JSONLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( value );
-
-	}
-
-} );
 
 Object.assign( ObjectLoader.prototype, {
 
@@ -1895,6 +1883,14 @@ export function Projector() {
 export function CanvasRenderer() {
 
 	console.error( 'THREE.CanvasRenderer has been removed' );
+
+}
+
+//
+
+export function JSONLoader() {
+
+	console.error( 'THREE.JSONLoader has been removed.' );
 
 }
 

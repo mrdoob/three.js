@@ -50,7 +50,6 @@ import { AnimationClip } from '../animation/AnimationClip.js';
 import { MaterialLoader } from './MaterialLoader.js';
 import { LoaderUtils } from './LoaderUtils.js';
 import { BufferGeometryLoader } from './BufferGeometryLoader.js';
-import { JSONLoader } from './JSONLoader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import * as Curves from '../extras/curves/Curves.js';
@@ -101,7 +100,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
 
-				console.error( 'THREE.ObjectLoader: Can\'t load ' + url + '. Use THREE.JSONLoader instead.' );
+				console.error( 'THREE.ObjectLoader: Can\'t load ' + url );
 				return;
 
 			}
@@ -191,7 +190,6 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( json !== undefined ) {
 
-			var geometryLoader = new JSONLoader();
 			var bufferGeometryLoader = new BufferGeometryLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
@@ -424,7 +422,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data, this.resourcePath ).geometry;
+						console.error( 'THREE.ObjectLoader: "Geometry" is no longer supported.' );
 
 						break;
 
