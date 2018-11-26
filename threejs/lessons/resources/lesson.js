@@ -356,3 +356,5 @@ $(document).ready(function($){
 });
 }(jQuery));
 
+// ios needs this to allow touch events in an iframe
+window.addEventListener('touchstart', {});
