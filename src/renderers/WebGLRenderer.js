@@ -53,8 +53,7 @@ import { WebXRManager } from './webvr/WebXRManager.js';
 
 function WebGLRenderer( parameters ) {
 
-	// console.log( 'THREE.WebGLRenderer', REVISION );
-	window.dispatchEvent( new CustomEvent( 'three-renderer', { detail: this } ) );
+	console.log( 'THREE.WebGLRenderer', REVISION );
 
 	parameters = parameters || {};
 
