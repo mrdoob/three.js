@@ -46,7 +46,7 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+	geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 );
 	material = new THREE.MeshNormalMaterial();
 
 	mesh = new THREE.Mesh( geometry, material );
@@ -70,7 +70,7 @@ function animate() {
 }
 ```
 
-If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
+If everything went well you should see [this](https://jsfiddle.net/cfLzo0qr/).
 
 ### Change log ###
 
