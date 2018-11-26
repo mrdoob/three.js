@@ -125,6 +125,7 @@ function main() {
 
   const pickPosition = {x: 0, y: 0};
   const pickHelper = new PickHelper();
+  clearPickPosition();
 
   function render(time) {
     time *= 0.001;  // convert to seconds;
@@ -150,7 +151,17 @@ function main() {
     pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
   }
 
+  function clearPickPosition() {
+    // unlike the mouse which always has a position
+    // if the user stops touching the screen we want
+    // to stop picking. For now we just pick a value
+    // unlikely to pick something
+    pickPosition.x = -100000;
+    pickPosition.y = -100000;
+  }
   window.addEventListener('mousemove', setPickPosition);
+  window.addEventListener('mouseout', clearPickPosition);
+  window.addEventListener('mouseleave', clearPickPosition);
 
   window.addEventListener('touchstart', (event) => {
     // prevent the window from scrolling
@@ -162,15 +173,7 @@ function main() {
     setPickPosition(event.touches[0]);
   });
 
-  window.addEventListener('touchend', () => {
-    // unlike the mouse which always has a position,
-    // if the user stops touching the screen we want
-    // to stop picking. For now we just pick a value
-    // unlikely to pick something
-    pickPosition.x = -100000;
-    pickPosition.y = -100000;
-  });
-
+  window.addEventListener('touchend', clearPickPosition);
 }
 
 main();

@@ -85,7 +85,7 @@ function main() {
       map: texture,
       transparent: true,
       side: THREE.DoubleSide,
-      alphaTest: 0.1,
+      alphaTest: 0.5,
     });
 
     const cube = new THREE.Mesh(geometry, material);
@@ -99,10 +99,11 @@ function main() {
     const pickingMaterial = new THREE.MeshPhongMaterial({
       emissive: new THREE.Color(id),
       color: new THREE.Color(0, 0, 0),
+      specular: new THREE.Color(0, 0, 0),
       map: texture,
       transparent: true,
       side: THREE.DoubleSide,
-      alphaTest: 0.1,
+      alphaTest: 0.5,
       blending: THREE.NoBlending,
     });
     const pickingCube = new THREE.Mesh(geometry, pickingMaterial);
@@ -183,6 +184,7 @@ function main() {
 
   const pickPosition = {x: 0, y: 0};
   const pickHelper = new GPUPickHelper();
+  clearPickPosition();
 
   function render(time) {
     time *= 0.001;  // convert to seconds;
@@ -208,7 +210,18 @@ function main() {
     pickPosition.y = event.clientY;
   }
 
+  function clearPickPosition() {
+    // unlike the mouse which always has a position
+    // if the user stops touching the screen we want
+    // to stop picking. For now we just pick a value
+    // unlikely to pick something
+    pickPosition.x = -100000;
+    pickPosition.y = -100000;
+  }
+
   window.addEventListener('mousemove', setPickPosition);
+  window.addEventListener('mouseout', clearPickPosition);
+  window.addEventListener('mouseleave', clearPickPosition);
 
   window.addEventListener('touchstart', (event) => {
     // prevent the window from scrolling
@@ -220,15 +233,7 @@ function main() {
     setPickPosition(event.touches[0]);
   });
 
-  window.addEventListener('touchend', () => {
-    // unlike the mouse which always has a position
-    // if the user stops touching the screen we want
-    // to stop picking. For now we just pick a value
-    // unlikely to pick something
-    pickPosition.x = -100000;
-    pickPosition.y = -100000;
-  });
-
+  window.addEventListener('touchend', clearPickPosition);
 }
 
 main();

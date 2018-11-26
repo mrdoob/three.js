@@ -118,7 +118,8 @@ Of course we could call this function only when the user pressed the mouse *down
 is
 
 ```
-const pickPosition = {x: -1, y: -1};
+const pickPosition = {x: 0, y: 0};
+clearPickPosition();
 
 ...
 
@@ -127,7 +128,18 @@ function setPickPosition(event) {
   pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
 }
 
+function clearPickPosition() {
+  // unlike the mouse which always has a position
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+  pickPosition.x = -100000;
+  pickPosition.y = -100000;
+}
+
 window.addEventListener('mousemove', setPickPosition);
+window.addEventListener('mouseout', clearPickPosition);
+window.addEventListener('mouseleave', clearPickPosition);
 ```
 
 Notice we're recording a normalized mouse position. Reguardless of the size of the canvas we need a value that goes from -1 on the left to +1 on the right. Similarly we need a value that goes from -1 on the bottom to +1 on the top.
@@ -145,14 +157,7 @@ window.addEventListener('touchmove', (event) => {
   setPickPosition(event.touches[0]);
 });
 
-window.addEventListener('touchend', () => {
-  // unlike the mouse which always has a position,
-  // if the user stops touching the screen we want
-  // to stop picking. For now we just pick a value
-  // unlikely to pick something
-  pickPosition.x = -100000;
-  pickPosition.y = -100000;
-});
+window.addEventListener('touchend', clearPickPosition);
 ```
 
 And finally in our `render` function we call call the `PickHelper`'s `pick` function.
@@ -283,10 +288,11 @@ for (let i = 0; i < numObjects; ++i) {
 +  const pickingMaterial = new THREE.MeshPhongMaterial({
 +    emissive: new THREE.Color(id),
 +    color: new THREE.Color(0, 0, 0),
++    specular: new THREE.Color(0, 0, 0),
 +    map: texture,
 +    transparent: true,
 +    side: THREE.DoubleSide,
-+    alphaTest: 0.1,
++    alphaTest: 0.5,
 +    blending: THREE.NoBlending,
 +  });
 +  const pickingCube = new THREE.Mesh(geometry, pickingMaterial);
@@ -297,7 +303,7 @@ for (let i = 0; i < numObjects; ++i) {
 }
 ```
 
-Note that we are abusing the `MeshPhongMaterial` here. By setting its `emissive` to our id and the `color` to 0 that will end up rendering the id only where the texture's alpha is greater than `alphaTest`. We also need to set `blending` to `NoBlending` so that the id is not multiplied by alpha.
+Note that we are abusing the `MeshPhongMaterial` here. By setting its `emissive` to our id and the `color` and `specular` to 0 that will end up rendering the id only where the texture's alpha is greater than `alphaTest`. We also need to set `blending` to `NoBlending` so that the id is not multiplied by alpha.
 
 Note that abusing the `MeshPhongMaterial` might not be the best solution as it will still calculate all our lights when drawing the picking scene even though we don't need those calculations. A more optimized solution would make a custom shader that just writes the id where the texture's alpha is greater than `alphaTest`.
 
