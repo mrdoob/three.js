@@ -61,6 +61,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 				boxMesh.geometry.removeAttribute( 'normal' );
 				boxMesh.geometry.removeAttribute( 'uv' );
 
+				boxMesh.renderOrder = renderer.backgroundRenderOrder;
+
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
 					this.matrixWorld.copyPosition( camera.matrixWorld );
@@ -107,6 +109,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 				);
 
 				planeMesh.geometry.removeAttribute( 'normal' );
+
+				planeMesh.renderOrder = renderer.backgroundRenderOrder;
 
 				// enable code injection for non-built-in material
 				Object.defineProperty( planeMesh.material, 'map', {

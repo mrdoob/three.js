@@ -113,6 +113,10 @@ function WebGLRenderer( parameters ) {
 	this.maxMorphTargets = 8;
 	this.maxMorphNormals = 4;
 
+	// background
+
+	this.backgroundRenderOrder = Infinity;
+
 	// internal properties
 
 	var _this = this,
@@ -1073,6 +1077,10 @@ function WebGLRenderer( parameters ) {
 		currentRenderList = renderLists.get( scene, camera );
 		currentRenderList.init();
 
+		// add background objects to scene
+
+		background.render( currentRenderList, scene, camera, forceClear );
+
 		projectObject( scene, camera, _this.sortObjects );
 
 		if ( _this.sortObjects === true ) {
@@ -1104,10 +1112,6 @@ function WebGLRenderer( parameters ) {
 		}
 
 		this.setRenderTarget( renderTarget );
-
-		//
-
-		background.render( currentRenderList, scene, camera, forceClear );
 
 		// render scene
 
