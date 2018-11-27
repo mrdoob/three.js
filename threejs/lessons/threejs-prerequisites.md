@@ -305,7 +305,7 @@ You'll get warnings using `THREE` so add `/* global THREE */` at the top of your
 
 Above you can see eslint knows the rule that `UpperCaseNames` are constructors and so you should be using `new`. Another error caught and avoided. This is [the `new-cap` rule](https://eslint.org/docs/rules/new-cap).
 
-There's 100s of rules you can turn on or off or customize. For example above I mentioned you should use `const` and `let` over `var`.
+There are [100s of rules you can turn on or off or customize](https://eslint.org/docs/rules/). For example above I mentioned you should use `const` and `let` over `var`.
 
 Here I used `var` and it warned me I should use `let` or `const`
 
@@ -314,6 +314,8 @@ Here I used `var` and it warned me I should use `let` or `const`
 Here I used `let` but it saw I never change the value so it suggested I use `const`.
 
 <div class="threejs_center"><img style="width: 615px;" src="resources/images/vscode-eslint-let.png"></div>
+
+Of course if you'd prefer to keep using `var` you can just turn off that rule. As I said above though I prefer to use `const` and `let` over `var` as they just work better and prevent bugs.
 
 For those cases where you really need to override a rule [you can add comments to disable them](https://eslint.org/docs/user-guide/configuring#disabling-rules-with-inline-comments) for a single line or a section of code.
 
