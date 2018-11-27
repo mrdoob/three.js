@@ -32,7 +32,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl depth peel demo<br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl depth peel demo by <a href="http://dusanbosnjak.com" target="_blank" rel="noopener">pailhead</a>.<br />
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -59,12 +59,7 @@
 
 			var stats
 
-			const MAX_LAYERS = 6
-
-			const LAYERS = {
-				OPAQUE: 0,
-				TRANSPARENT: 1,
-			}
+			var MAX_LAYERS = 6
 
 			var debugScene, debugCamera
 			var depthMaterial, depthTarget, compositeMaterial, gl
@@ -73,9 +68,9 @@
 
 			var transparentObjects = []
 			var opaqueObjects = []
-			const targets = []
+			var targets = []
 
-			const globalPeelUniforms = { 
+			var globalPeelUniforms = { 
 				uLayer: { value: 0 },
 				uPrevDepthTexture: { value: null },
 				uPrevColorTexture: { value: null },
@@ -88,14 +83,14 @@
 				layers: 1,
 				opacity: 0.5,
 				doubleSide: false,
-				defaultMode: false,
+				enabled: false,
 				monochrome: false,
 			}
 
 			gui.add(options, 'layers', 1, 6).step(1)
 			gui.add(options, 'opacity', 0, 1).onChange(onOpacityChange)
+			gui.add(options, 'enabled').onChange(onModeChange)
 			gui.add(options, 'doubleSide').onChange(onSideChange)
-			gui.add(options, 'defaultMode').onChange(onModeChange)
 			gui.add(options, 'monochrome').onChange(onMonochromeChange)
 
 			function onOpacityChange(val){
@@ -107,7 +102,7 @@
 			}
 
 			function onMonochromeChange(){
-				const color = getColorKey()
+				var color = getColorKey()
 				transparentObjects.forEach(o=>{
 					o.material.color.copy(o.material[color])
 				})
@@ -115,7 +110,7 @@
 
 			function onSideChange(val){ 
 				
-				const side = getSide()
+				var side = getSide()
 
 				depthMaterial.side = side
 				depthMaterial.needsUpdate = true
@@ -130,9 +125,9 @@
 
 			function onModeChange(){
 				transparentObjects.forEach(o=>{
-					o.material.transparent = options.defaultMode
+					o.material.transparent = options.enabled
 				})
-				globalPeelUniforms.uDepthPeel.value = options.defaultMode ? 0 : 1 
+				globalPeelUniforms.uDepthPeel.value = options.enabled ? 0 : 1 
 			}
 
 			function getSide(){
@@ -156,6 +151,7 @@
 
 					${shader.fragmentShader}
 				`
+				//peel depth
 				shader.fragmentShader = shader.fragmentShader.replace(
 					/}$/gm,
 					`	
@@ -177,6 +173,7 @@
 
 			}
 
+			//premultiply alpha
 			function colorOnBeforeCompile(shader){
 
 				shader.fragmentShader = shader.fragmentShader.replace('#include <packing>','')
@@ -186,6 +183,7 @@
 
 					${shader.fragmentShader}
 				`
+				//this has early return
 				depthOnbeforeCompile(shader)
 
 				shader.fragmentShader = shader.fragmentShader.replace(
@@ -237,8 +235,6 @@
 				document.body.appendChild( stats.dom )
 
 				renderer.gammaOutput = true;
-
-				gl = renderer.getContext()
 
 				// scene
 				scene = new THREE.Scene();
@@ -323,6 +319,7 @@
 
 				const boxGeometry = new THREE.BoxBufferGeometry(2,2,2,1,1,1)
 
+				//setup objects
 				for ( let i = 0 ; i < numItems ; i ++ ){
 
 					const mesh = new THREE.Mesh(
@@ -336,7 +333,6 @@
 
 					mesh.renderOrder = 1
 
-					mesh.layers.set
 					transparentObjects.push(mesh)
 					
 					mesh.material.onBeforeCompile = colorOnBeforeCompile
@@ -355,7 +351,6 @@
 					mesh.scale.y = 2
 					mesh.position.y = (i - numItems /2)* 2.5 
 					mesh.scale.x = 10
-
 
 					scene.add(mesh)
 				}
@@ -390,47 +385,55 @@
 			}
 
 			function renderDepthPeel(){
+
+				//clear main frame
 				renderer.setClearColor(0x000,1)
 				renderer.clear()
 
-
 				globalPeelUniforms.uLayer.value = 0
 
+				//render first depth
 				scene.overrideMaterial = depthMaterial
 				renderer.setClearColor(0xffffff,1)
 				renderer.render( scene, camera, targets[0], true)
 
+				//first color
 				scene.overrideMaterial = null
 				renderer.setClearColor(0x000,0)
 				renderer.render( scene, camera, targets[2], true)
 
 				for( let i = 0 ; i < options.layers ; i ++ ){
 					
-					const a = i % 3
+					const a = i % 3 //shift these around
 					const b = (i+1) % 3
 					const c = (i+2) % 3
-					const d = 3
+					const d = 3 //peel into this
 
 					globalPeelUniforms.uPrevDepthTexture.value = targets[a]
 					globalPeelUniforms.uLayer.value = i + 1
 
+					//render next depth
 					scene.overrideMaterial = depthMaterial
 					renderer.setClearColor(0xffffff,1)
 					renderer.render( scene, camera, targets[b], true)
 					
+					//peel
 					scene.overrideMaterial = null
 					renderer.setClearColor(0x000,0)
 					renderer.render( scene, camera, targets[d], true)
 
+					//combine
 					compositeMaterial.uniforms.uTextureA.value = targets[c]
 					compositeMaterial.uniforms.uTextureB.value = targets[d]
 					renderer.render( compositeScene, camera, targets[a], true)
 
 				}
 
+				//render final result over opaque objects
 				globalPeelUniforms.uPrevDepthTexture.value = null
 
 				transparentObjects.forEach(o=>o.visible = false)
+				
 				renderer.render( scene, camera )
 				renderer.render( compositeScene, camera )
 
@@ -448,7 +451,9 @@
 
 				debugCamera.aspect = camera.aspect
 				debugCamera.updateProjectionMatrix()
+				
 				initTargets()
+			
 			}
 
 			function animate() {
@@ -465,7 +470,7 @@
 
 			function render() {
 
-				if(options.defaultMode){
+				if(options.enabled){
 
 					renderer.clear()
 					renderer.render( scene, camera )
@@ -473,7 +478,7 @@
 				} else {
 
 					renderDepthPeel()
-					renderer.render( debugScene , debugCamera )
+					// renderer.render( debugScene , debugCamera )
 				
 				}
 

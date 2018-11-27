@@ -275,7 +275,6 @@ var files = {
 		"webgl_water_flowmap"
 	],
 	"webgl / advanced": [
-		"materials_depth_peel",
 		"webgl_buffergeometry",
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
@@ -304,6 +303,7 @@ var files = {
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
 		"webgl_gpu_particle_system",
+		"webgl_materials_depthpeel",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
