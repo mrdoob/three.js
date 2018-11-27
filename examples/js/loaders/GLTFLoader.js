@@ -1061,7 +1061,7 @@ THREE.GLTFLoader = ( function () {
 		var s3 = ppp - pp;
 		var s0 = 1 - s2;
 		var s1 = s3 - pp + p;
-		
+
 		// Layout of keyframe output values for CUBICSPLINE animations:
 		//   [ inTangent_1, splineVertex_1, outTangent_1, inTangent_2, splineVertex_2, ... ]
 		for ( var i = 0; i !== stride; i ++ ) {
@@ -2704,6 +2704,8 @@ THREE.GLTFLoader = ( function () {
 						mesh = meshDef.isSkinnedMesh === true
 							? new THREE.SkinnedMesh( geometry, material )
 							: new THREE.Mesh( geometry, material );
+
+						if ( mesh.isSkinnedMesh === true ) mesh.normalizeSkinWeights(); // #15319
 
 						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
 
