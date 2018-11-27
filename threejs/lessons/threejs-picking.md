@@ -42,6 +42,13 @@ and in the `render` function we'll spin the camera pole.
 cameraPole.rotation.y = time * .1;
 ```
 
+Also let's put the light on the camera so the light moves with it.
+
+```
+-scene.add(light);
++camera.add(light);
+```
+
 Let's generate 100 cubes with random colors in random positions, orientations,
 and scales.
 
