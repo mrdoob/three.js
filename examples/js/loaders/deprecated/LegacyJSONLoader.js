@@ -3,9 +3,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.JSONLoader = ( function () {
+THREE.LegacyJSONLoader = ( function () {
 
-	function JSONLoader( manager ) {
+	function LegacyJSONLoader( manager ) {
 
 		if ( typeof manager === 'boolean' ) {
 
@@ -20,7 +20,7 @@ THREE.JSONLoader = ( function () {
 
 	}
 
-	Object.assign( JSONLoader.prototype, {
+	Object.assign( LegacyJSONLoader.prototype, {
 
 		crossOrigin: 'anonymous',
 
@@ -573,6 +573,6 @@ THREE.JSONLoader = ( function () {
 
 	} );
 
-	return JSONLoader;
+	return LegacyJSONLoader;
 
 } )();
