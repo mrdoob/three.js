@@ -5,6 +5,7 @@
 Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
+	var strings = editor.strings;
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
@@ -119,7 +120,7 @@ Sidebar.Scene = function ( editor ) {
 
 	var backgroundColor = new UI.Color().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
 
-	backgroundRow.add( new UI.Text( 'Background' ).setWidth( '90px' ) );
+	backgroundRow.add( new UI.Text( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundColor );
 
 	container.add( backgroundRow );
@@ -153,7 +154,7 @@ Sidebar.Scene = function ( editor ) {
 
 	} );
 
-	fogTypeRow.add( new UI.Text( 'Fog' ).setWidth( '90px' ) );
+	fogTypeRow.add( new UI.Text( strings.getKey( 'sidebar/scene/fog' ) ).setWidth( '90px' ) );
 	fogTypeRow.add( fogType );
 
 	container.add( fogTypeRow );

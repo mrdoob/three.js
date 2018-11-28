@@ -99,22 +99,22 @@
 
 			uniforms = {
 
-				texture:   { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
+				texture: { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 
 			};
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms:       uniforms,
-				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				uniforms: uniforms,
+				vertexShader: document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-				blending:       THREE.AdditiveBlending,
-				depthTest:      false,
-				transparent:    true,
-				vertexColors:   true
+				blending: THREE.AdditiveBlending,
+				depthTest: false,
+				transparent: true,
+				vertexColors: true
 
-			});
+			} );
 
 
 			var radius = 200;
@@ -137,7 +137,7 @@
 
 				colors.push( color.r, color.g, color.b );
 
-				sizes.push( 20 );;
+				sizes.push( 20 );
 
 			}
 
@@ -191,7 +191,7 @@
 
 			var sizes = geometry.attributes.size.array;
 
-			for ( var i = 0; i < particles; i++ ) {
+			for ( var i = 0; i < particles; i ++ ) {
 
 				sizes[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
 

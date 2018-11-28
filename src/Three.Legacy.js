@@ -44,7 +44,6 @@ import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { DataTextureLoader } from './loaders/DataTextureLoader.js';
-import { JSONLoader } from './loaders/JSONLoader.js';
 import { ObjectLoader } from './loaders/ObjectLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
@@ -71,6 +70,7 @@ import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
 import { Sprite } from './objects/Sprite.js';
 import { Skeleton } from './objects/Skeleton.js';
+import { SkinnedMesh } from './objects/SkinnedMesh.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
@@ -436,17 +436,6 @@ export function BinaryTextureLoader( manager ) {
 	return new DataTextureLoader( manager );
 
 }
-
-Object.assign( JSONLoader.prototype, {
-
-	setTexturePath: function ( value ) {
-
-		console.warn( 'THREE.JSONLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( value );
-
-	}
-
-} );
 
 Object.assign( ObjectLoader.prototype, {
 
@@ -1012,6 +1001,12 @@ Object.defineProperty( Skeleton.prototype, 'useVertexTexture', {
 
 } );
 
+SkinnedMesh.prototype.initBones = function () {
+
+	console.error( 'THREE.SkinnedMesh: initBones() has been removed.' );
+
+};
+
 Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
 
 	get: function () {
@@ -1288,6 +1283,20 @@ Object.defineProperties( Material.prototype, {
 
 		}
 	},
+
+	overdraw: {
+		get: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		}
+	},
+
 	wrapRGB: {
 		get: function () {
 
@@ -1873,13 +1882,15 @@ export function Projector() {
 
 export function CanvasRenderer() {
 
-	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
+	console.error( 'THREE.CanvasRenderer has been removed' );
 
-	this.domElement = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-	this.clear = function () {};
-	this.render = function () {};
-	this.setClearColor = function () {};
-	this.setSize = function () {};
+}
+
+//
+
+export function JSONLoader() {
+
+	console.error( 'THREE.JSONLoader has been removed.' );
 
 }
 

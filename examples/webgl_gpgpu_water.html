@@ -291,14 +291,13 @@
 
 			// Texture width for simulation
 			var WIDTH = hash || 128;
-			var NUM_TEXELS = WIDTH * WIDTH;
 
 			// Water size in system units
 			var BOUNDS = 512;
 			var BOUNDS_HALF = BOUNDS * 0.5;
 
 			var container, stats;
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer;
 			var mouseMoved = false;
 			var mouseCoords = new THREE.Vector2();
 			var raycaster = new THREE.Raycaster();
@@ -320,24 +319,25 @@
 
 			var simplex = new SimplexNoise();
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			document.getElementById( 'waterSize' ).innerText = WIDTH + ' x ' + WIDTH;
 
-			function change(n) {
+			function change( n ) {
+
 				location.hash = n;
 				location.reload();
 				return false;
+
 			}
 
 
 			var options = '';
-			for ( var i = 4; i < 10; i++ ) {
+			for ( var i = 4; i < 10; i ++ ) {
+
 				var j = Math.pow( 2, i );
 				options += '<a href="#" onclick="return change(' + j + ')">' + j + 'x' + j + '</a> ';
+
 			}
-			document.getElementById('options').innerHTML = options;
+			document.getElementById( 'options' ).innerHTML = options;
 
 			init();
 			animate();
@@ -357,7 +357,7 @@
 				scene.add( sun );
 
 				var sun2 = new THREE.DirectionalLight( 0x40A040, 0.6 );
-				sun2.position.set( -100, 350, -200 );
+				sun2.position.set( - 100, 350, - 200 );
 				scene.add( sun2 );
 
 				renderer = new THREE.WebGLRenderer();
@@ -365,8 +365,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
-
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -375,7 +374,7 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
-				document.addEventListener( 'keydown', function( event ) {
+				document.addEventListener( 'keydown', function ( event ) {
 
 					// W Pressed: Toggle wireframe
 					if ( event.keyCode === 87 ) {
@@ -385,7 +384,7 @@
 
 					}
 
-				} , false );
+				}, false );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -398,15 +397,19 @@
 					spheresEnabled: spheresEnabled
 				};
 
-				var valuesChanger = function() {
+				var valuesChanger = function () {
 
 					heightmapVariable.material.uniforms.mouseSize.value = effectController.mouseSize;
 					heightmapVariable.material.uniforms.viscosityConstant.value = effectController.viscosity;
 					spheresEnabled = effectController.spheresEnabled;
-					for ( var i = 0; i < NUM_SPHERES; i++ ) {
+					for ( var i = 0; i < NUM_SPHERES; i ++ ) {
+
 						if ( spheres[ i ] ) {
+
 							spheres[ i ].visible = spheresEnabled;
+
 						}
+
 					}
 
 				};
@@ -415,9 +418,11 @@
 				gui.add( effectController, "viscosity", 0.9, 0.999, 0.001 ).onChange( valuesChanger );
 				gui.add( effectController, "spheresEnabled", 0, 1, 1 ).onChange( valuesChanger );
 				var buttonSmooth = {
-				    smoothWater: function() {
+					smoothWater: function () {
+
 						smoothWater();
-				    }
+
+					}
 				};
 				gui.add( buttonSmooth, 'smoothWater' );
 
@@ -435,7 +440,7 @@
 
 				var materialColor = 0x0040C0;
 
-				var geometry = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH -1 );
+				var geometry = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
 
 				// material: make a ShaderMaterial clone of MeshPhongMaterial, with customized vertex shader
 				var material = new THREE.ShaderMaterial( {
@@ -505,7 +510,9 @@
 
 				var error = gpuCompute.init();
 				if ( error !== null ) {
+
 				    console.error( error );
+
 				}
 
 				// Create compute shader to smooth the water surface and velocity
@@ -539,23 +546,28 @@
 
 				var waterMaxHeight = 10;
 
-				function noise( x, y, z ) {
+				function noise( x, y ) {
+
 					var multR = waterMaxHeight;
 					var mult = 0.025;
 					var r = 0;
-					for ( var i = 0; i < 15; i++ ) {
+					for ( var i = 0; i < 15; i ++ ) {
+
 						r += multR * simplex.noise( x * mult, y * mult );
 						multR *= 0.53 + 0.025 * i;
 						mult *= 1.25;
+
 					}
 					return r;
+
 				}
 
 				var pixels = texture.image.data;
 
 				var p = 0;
-				for ( var j = 0; j < WIDTH; j++ ) {
-					for ( var i = 0; i < WIDTH; i++ ) {
+				for ( var j = 0; j < WIDTH; j ++ ) {
+
+					for ( var i = 0; i < WIDTH; i ++ ) {
 
 						var x = i * 128 / WIDTH;
 						var y = j * 128 / WIDTH;
@@ -566,7 +578,9 @@
 						pixels[ p + 3 ] = 1;
 
 						p += 4;
+
 					}
+
 				}
 
 			}
@@ -576,7 +590,7 @@
 				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
 				var alternateRenderTarget = gpuCompute.getAlternateRenderTarget( heightmapVariable );
 
-				for ( var i = 0; i < 10; i++ ) {
+				for ( var i = 0; i < 10; i ++ ) {
 
 					smoothShader.uniforms.texture.value = currentRenderTarget.texture;
 					gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );
@@ -592,12 +606,14 @@
 
 				var sphereTemplate = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 24, 12 ), new THREE.MeshPhongMaterial( { color: 0xFFFF00 } ) );
 
-				for ( var i = 0; i < NUM_SPHERES; i++ ) {
+				for ( var i = 0; i < NUM_SPHERES; i ++ ) {
 
 					var sphere = sphereTemplate;
 					if ( i < NUM_SPHERES - 1 ) {
+
 						sphere = sphereTemplate.clone();
-					}
+
+				}
 
 					sphere.position.x = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
 					sphere.position.z = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
@@ -619,7 +635,7 @@
 				readWaterLevelShader.uniforms.texture.value = currentRenderTarget.texture;
 				var gl = renderer.context;
 
-				for ( var i = 0; i < NUM_SPHERES; i++ ) {
+				for ( var i = 0; i < NUM_SPHERES; i ++ ) {
 
 					var sphere = spheres[ i ];
 
@@ -648,21 +664,27 @@
 						pos.add( sphere.userData.velocity );
 
 						if ( pos.x < - BOUNDS_HALF ) {
+
 							pos.x = - BOUNDS_HALF + 0.001;
 							sphere.userData.velocity.x *= - 0.3;
-						}
-						else if ( pos.x > BOUNDS_HALF ) {
+
+						} else if ( pos.x > BOUNDS_HALF ) {
+
 							pos.x = BOUNDS_HALF - 0.001;
 							sphere.userData.velocity.x *= - 0.3;
+
 						}
 
 						if ( pos.z < - BOUNDS_HALF ) {
+
 							pos.z = - BOUNDS_HALF + 0.001;
 							sphere.userData.velocity.z *= - 0.3;
-						}
-						else if ( pos.z > BOUNDS_HALF ) {
+
+						} else if ( pos.z > BOUNDS_HALF ) {
+
 							pos.z = BOUNDS_HALF - 0.001;
 							sphere.userData.velocity.z *= - 0.3;
+
 						}
 
 					}
@@ -671,11 +693,7 @@
 
 			}
 
-
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -743,25 +761,31 @@
 					var intersects = raycaster.intersectObject( meshRay );
 
 					if ( intersects.length > 0 ) {
+
 					    var point = intersects[ 0 ].point;
 					    uniforms.mousePos.value.set( point.x, point.z );
 
-					}
-					else {
+					} else {
+
 					    uniforms.mousePos.value.set( 10000, 10000 );
+
 					}
 
 					mouseMoved = false;
-				}
-				else {
+
+				} else {
+
 					uniforms.mousePos.value.set( 10000, 10000 );
+
 				}
 
 				// Do the gpu computation
 				gpuCompute.compute();
 
 				if ( spheresEnabled ) {
+
 					sphereDynamics();
+
 				}
 
 				// Get compute output in custom uniform

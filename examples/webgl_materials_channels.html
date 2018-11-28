@@ -59,7 +59,7 @@
 
 			var stats;
 
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer;
 
 			var params = {
 				material: 'normal',
@@ -78,8 +78,6 @@
 
 			var mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
 
-			var pointLight, ambientLight;
-
 			var height = 500; // of camera frustum
 
 			var SCALE = 2.436143; // from original model
@@ -96,6 +94,7 @@
 				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
+
 			}
 
 			function init() {

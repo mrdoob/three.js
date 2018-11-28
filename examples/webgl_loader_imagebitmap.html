@@ -67,10 +67,14 @@
 
 						addCube( material );
 
-					}, function( p ) {
+					}, function ( p ) {
+
 						console.log( p );
-					}, function( e ) {
+
+					}, function ( e ) {
+
 						console.log( e );
+
 					} );
 
 			}
@@ -80,14 +84,16 @@
 				new THREE.ImageLoader()
 					.setCrossOrigin( '*' )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( image ) {
-							var texture = new THREE.CanvasTexture( image );
-							var material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
-							addCube( material );
-				});
+
+						var texture = new THREE.CanvasTexture( image );
+						var material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
+						addCube( material );
+
+					} );
 
 			}
 
-			var geometry = new THREE.BoxBufferGeometry( 1,1,1 );
+			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 
 			function addCube( material ) {
 

@@ -36,9 +36,11 @@
 		<script>
 
 			var camera, scene, renderer;
-			var cube, sphere, torus, material;
+			var cube, sphere, torus, material, backgroundMesh;
 
 			var count = 0, cubeCamera1, cubeCamera2;
+
+			var onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
 
 			var lon = 0, lat = 0;
 			var phi = 0, theta = 0;
@@ -60,19 +62,21 @@
 
 				scene = new THREE.Scene();
 
-				var mesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 500, 32, 16 ), new THREE.MeshBasicMaterial( { map: texture } ) );
-				mesh.geometry.scale( - 1, 1, 1 );
-				scene.add( mesh );
+				backgroundMesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 500, 32, 16 ), new THREE.MeshBasicMaterial( { map: texture } ) );
+				backgroundMesh.geometry.scale( - 1, 1, 1 );
+				scene.add( backgroundMesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera1.renderTarget.texture.generateMipmaps = true;
 				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera1 );
 
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera2.renderTarget.texture.generateMipmaps = true;
 				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera2 );
 
@@ -102,7 +106,7 @@
 
 			}
 
-			function onWindowResized( event ) {
+			function onWindowResized() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -133,7 +137,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -194,11 +198,13 @@
 				if ( count % 2 === 0 ) {
 
 					material.envMap = cubeCamera1.renderTarget.texture;
+					backgroundMesh.position.copy( cubeCamera2.position );
 					cubeCamera2.update( renderer, scene );
 
 				} else {
 
 					material.envMap = cubeCamera2.renderTarget.texture;
+					backgroundMesh.position.copy( cubeCamera1.position );
 					cubeCamera1.update( renderer, scene );
 
 				}
@@ -207,6 +213,7 @@
 
 				sphere.visible = true;
 
+				backgroundMesh.position.copy( camera.position );
 				renderer.render( scene, camera );
 
 			}

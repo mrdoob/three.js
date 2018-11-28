@@ -17,9 +17,7 @@
 				text-align:center;
 			}
 
-			a {
-				color:#0078ff;
-			}
+			a { color:#0078ff; }
 
 			#info {
 				color:#fff;
@@ -109,9 +107,6 @@
 				video = document.getElementById( 'video' );
 
 				texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.format = THREE.RGBFormat;
 
 				//
 
@@ -130,42 +125,42 @@
 				cube_count = 0;
 
 				for ( i = 0; i < xgrid; i ++ )
-				for ( j = 0; j < ygrid; j ++ ) {
+					for ( j = 0; j < ygrid; j ++ ) {
 
-					ox = i;
-					oy = j;
+						ox = i;
+						oy = j;
 
-					geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
+						geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
 
-					change_uvs( geometry, ux, uy, ox, oy );
+						change_uvs( geometry, ux, uy, ox, oy );
 
-					materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
+						materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
 
-					material = materials[ cube_count ];
+						material = materials[ cube_count ];
 
-					material.hue = i/xgrid;
-					material.saturation = 1 - j/ygrid;
+						material.hue = i / xgrid;
+						material.saturation = 1 - j / ygrid;
 
-					material.color.setHSL( material.hue, material.saturation, 0.5 );
+						material.color.setHSL( material.hue, material.saturation, 0.5 );
 
-					mesh = new THREE.Mesh( geometry, material );
+						mesh = new THREE.Mesh( geometry, material );
 
-					mesh.position.x =   ( i - xgrid/2 ) * xsize;
-					mesh.position.y =   ( j - ygrid/2 ) * ysize;
-					mesh.position.z = 0;
+						mesh.position.x = ( i - xgrid / 2 ) * xsize;
+						mesh.position.y = ( j - ygrid / 2 ) * ysize;
+						mesh.position.z = 0;
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+						mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 
-					scene.add( mesh );
+						scene.add( mesh );
 
-					mesh.dx = 0.001 * ( 0.5 - Math.random() );
-					mesh.dy = 0.001 * ( 0.5 - Math.random() );
+						mesh.dx = 0.001 * ( 0.5 - Math.random() );
+						mesh.dy = 0.001 * ( 0.5 - Math.random() );
 
-					meshes[ cube_count ] = mesh;
+						meshes[ cube_count ] = mesh;
 
-					cube_count += 1;
+						cube_count += 1;
 
-				}
+					}
 
 				renderer.autoClear = false;
 
@@ -218,7 +213,7 @@
 			}
 
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY ) * 0.3;
@@ -278,8 +273,8 @@
 
 						mesh = meshes[ i ];
 
-						mesh.dx *= -1;
-						mesh.dy *= -1;
+						mesh.dx *= - 1;
+						mesh.dy *= - 1;
 
 					}
 

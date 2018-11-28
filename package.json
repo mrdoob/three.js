@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.97.0",
+  "version": "0.98.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
@@ -23,12 +23,15 @@
     "test": "test"
   },
   "eslintConfig": {
-    "extends": "mdcs"
+    "extends": "mdcs",
+    "plugins": [
+      "html"
+    ]
   },
   "scripts": {
     "build": "rollup -c",
     "build-test": "rollup -c test/rollup.unit.config.js",
-    "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler-java/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "start": "npm run dev",
@@ -51,13 +54,14 @@
   "homepage": "https://threejs.org/",
   "devDependencies": {
     "concurrently": "^4.0.1",
-    "electron": "^2.0.8",
-    "eslint": "^5.5.0",
+    "electron": "^3.0.8",
+    "eslint": "^5.9.0",
     "eslint-config-mdcs": "^4.2.3",
-    "google-closure-compiler": "20180805.0.0",
+    "eslint-plugin-html": "^5.0.0",
+    "google-closure-compiler": "20181028.0.1",
     "http-server": "^0.11.1",
-    "qunit": "^2.6.2",
-    "rollup": "^0.65.2"
+    "qunit": "^2.8.0",
+    "rollup": "^0.67.1"
   },
   "jspm": {
     "files": [

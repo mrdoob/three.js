@@ -1,11 +1,4 @@
 <!DOCTYPE html>
-
-<!--Reference:
-SSAO algo: http://devlog-martinsh.blogspot.tw/2011/12/ssao-shader-update-v12.html?showComment=1398158188712#c1563204765906693531
-log depth http://outerra.blogspot.tw/2013/07/logarithmic-depth-buffer-optimizations.html
-convert the exponential depth to a linear value: http://www.ozone3d.net/blogs/lab/20090206/how-to-linearize-the-depth-value/
-Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info/wiki/Evenly_distributed_points_on_sphere-->
-
 <html lang="en">
 	<head>
 		<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
@@ -22,9 +15,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				font-weight: bold;
 			}
 
-			a {
-				color:#00ff78;
-			}
+			a { color:#00ff78; }
 
 			#info {
 				color: #fff;
@@ -42,21 +33,24 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/SSAOShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/SSAOPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/SimplexNoise.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl screen space ambient occlusion example<br/>
-			shader by <a href="http://alteredqualia.com">alteredq</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
+
+			<div id="error" style="display: none;">
+				Your browser does not support <strong>WEBGL_depth_texture</strong>.<br/><br/>
+				This demo will not work.
+			</div>
 		</div>
 
 		<script>
@@ -73,8 +67,6 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 			var ssaoPass;
 			var group;
 
-			var postprocessing = { enabled: true, onlyAO: false, radius: 32, aoClamp: 0.25, lumInfluence: 0.7 };
-
 			init();
 			animate();
 
@@ -87,16 +79,23 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 100, 700 );
+				if ( ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
+
+					document.querySelector( '#error' ).style.display = 'block';
+					return;
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 5, 3 );
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var material = new THREE.MeshBasicMaterial();
@@ -112,7 +111,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 					mesh.rotation.y = Math.random();
 					mesh.rotation.z = Math.random();
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 10 + 1;
+					mesh.scale.setScalar( Math.random() * 10 + 1 );
 					group.add( mesh );
 
 				}
@@ -120,24 +119,39 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				// Init postprocessing
-				initPostprocessing();
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
+				ssaoPass.renderToScreen = true;
+
+				effectComposer = new THREE.EffectComposer( renderer );
+				effectComposer.addPass( ssaoPass );
 
 				// Init gui
 				var gui = new dat.GUI();
-				gui.add( postprocessing, 'enabled' );
 
-				gui.add( postprocessing, 'onlyAO', false ).onChange( function( value ) { ssaoPass.onlyAO = value; } );
-				gui.add( postprocessing, 'radius' ).min( 0 ).max( 64 ).onChange( function( value ) { ssaoPass.radius = value; } );
-				gui.add( postprocessing, 'aoClamp' ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.aoClamp = value; } );
-				gui.add( postprocessing, 'lumInfluence' ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.lumInfluence = value; } );
+				gui.add( ssaoPass, 'output', {
+					'Default': THREE.SSAOPass.OUTPUT.Default,
+					'SSAO Only': THREE.SSAOPass.OUTPUT.SSAO,
+					'SSAO Only + Blur': THREE.SSAOPass.OUTPUT.Blur,
+					'Beauty': THREE.SSAOPass.OUTPUT.Beauty,
+					'Depth': THREE.SSAOPass.OUTPUT.Depth,
+					'Normal': THREE.SSAOPass.OUTPUT.Normal
+				} ).onChange( function ( value ) {
+
+					ssaoPass.output = parseInt( value );
+
+				} );
+				gui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
+				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
+				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				onWindowResize();
 
 			}
-
 
 			function onWindowResize() {
 
@@ -148,29 +162,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				camera.updateProjectionMatrix();
 				renderer.setSize( width, height );
 
-				// Resize renderTargets
 				ssaoPass.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
-				effectComposer.setSize( newWidth, newHeight );
-
-			}
-
-			function initPostprocessing() {
-
-				// Setup render pass
-				var renderPass = new THREE.RenderPass( scene, camera );
-
-				// Setup SSAO pass
-				ssaoPass = new THREE.SSAOPass( scene, camera );
-				ssaoPass.renderToScreen = true;
-
-				// Add pass to effect composer
-				effectComposer = new THREE.EffectComposer( renderer );
-				effectComposer.addPass( renderPass );
-				effectComposer.addPass( ssaoPass );
 
 			}
 
@@ -190,15 +182,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
-				if ( postprocessing.enabled ) {
-
-					effectComposer.render();
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				effectComposer.render();
 
 			}
 

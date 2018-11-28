@@ -65,15 +65,9 @@
 
 			var statsEnabled = true;
 
-			var container, stats, loader;
+			var container, stats;
 
-			var camera, scene, renderer;
-
-			var controls;
-
-			var mesh;
-
-			var spotLight;
+			var camera, scene, renderer, controls;
 
 			init();
 			animate();
@@ -156,12 +150,14 @@
 
 					} );
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
@@ -199,7 +195,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

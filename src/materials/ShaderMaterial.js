@@ -1,5 +1,5 @@
 import { Material } from './Material.js';
-import { UniformsUtils } from '../renderers/shaders/UniformsUtils.js';
+import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -91,7 +91,7 @@ ShaderMaterial.prototype.copy = function ( source ) {
 	this.fragmentShader = source.fragmentShader;
 	this.vertexShader = source.vertexShader;
 
-	this.uniforms = UniformsUtils.clone( source.uniforms );
+	this.uniforms = cloneUniforms( source.uniforms );
 
 	this.defines = Object.assign( {}, source.defines );
 

@@ -126,7 +126,7 @@
 						height: 1,
 						curveSegments: 1
 
-					});
+					} );
 
 					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
@@ -135,16 +135,16 @@
 
 				}
 
-				addLabel( "+hue", new THREE.Vector3( -350, 0, 0 ) );
+				addLabel( "+hue", new THREE.Vector3( - 350, 0, 0 ) );
 				addLabel( "-hue", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-reflectivity", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "-reflectivity", new THREE.Vector3( 0, - 300, 0 ) );
 				addLabel( "+reflectivity", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
+				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
 
-				addLabel( "envMap", new THREE.Vector3( -350, 300, 0 ) );
+				addLabel( "envMap", new THREE.Vector3( - 350, 300, 0 ) );
 				addLabel( "no envMap", new THREE.Vector3( 350, 300, 0 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );

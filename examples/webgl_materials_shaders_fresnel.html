@@ -52,10 +52,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
 			var spheres = [];
-
-			var directionalLight, pointLight;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -80,10 +77,10 @@
 				var path = "textures/cube/Park2/";
 				var format = '.jpg';
 				var urls = [
-						path + 'posx' + format, path + 'negx' + format,
-						path + 'posy' + format, path + 'negy' + format,
-						path + 'posz' + format, path + 'negz' + format
-					];
+					path + 'posx' + format, path + 'negx' + format,
+					path + 'posy' + format, path + 'negy' + format,
+					path + 'posz' + format, path + 'negz' + format
+				];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
