@@ -64,7 +64,7 @@ function WebGLRenderList() {
 
 	}
 
-	function push( object, geometry, material, z, group ) {
+	function getNextRenderItem( object, geometry, material, z, group ) {
 
 		var renderItem = renderItems[ renderItemsIndex ];
 
@@ -96,10 +96,25 @@ function WebGLRenderList() {
 
 		}
 
+		renderItemsIndex ++;
+
+		return renderItem;
+
+	}
+
+	function push( object, geometry, material, z, group ) {
+
+		var renderItem = getNextRenderItem( object, geometry, material, z, group );
 
 		( material.transparent === true ? transparent : opaque ).push( renderItem );
 
-		renderItemsIndex ++;
+	}
+
+	function unshift( object, geometry, material, z, group ) {
+
+		var renderItem = getNextRenderItem( object, geometry, material, z, group );
+
+		( material.transparent === true ? transparent : opaque ).unshift( renderItem );
 
 	}
 
@@ -116,6 +131,7 @@ function WebGLRenderList() {
 
 		init: init,
 		push: push,
+		unshift: unshift,
 
 		sort: sort
 	};

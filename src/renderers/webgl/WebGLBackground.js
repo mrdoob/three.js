@@ -105,7 +105,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			}
 
 			// push to the pre-sorted opaque render list
-			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
+			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
 		} else if ( background && background.isTexture ) {
 
@@ -119,7 +119,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 						vertexShader: ShaderLib.background.vertexShader,
 						fragmentShader: ShaderLib.background.fragmentShader,
 						side: FrontSide,
-						depthTest: true,
+						depthTest: false,
 						depthWrite: false,
 						fog: false
 					} )
@@ -164,7 +164,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 
 			// push to the pre-sorted opaque render list
-			renderList.push( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
+			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
 
 		}
 
