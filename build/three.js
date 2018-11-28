@@ -14689,7 +14689,7 @@
 				}
 
 				// push to the pre-sorted opaque render list
-				renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
+				renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
 			} else if ( background && background.isTexture ) {
 
@@ -14703,7 +14703,7 @@
 							vertexShader: ShaderLib.background.vertexShader,
 							fragmentShader: ShaderLib.background.fragmentShader,
 							side: FrontSide,
-							depthTest: true,
+							depthTest: false,
 							depthWrite: false,
 							fog: false
 						} )
@@ -14748,7 +14748,7 @@
 
 
 				// push to the pre-sorted opaque render list
-				renderList.push( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
+				renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
 
 			}
 
@@ -17798,7 +17798,7 @@
 
 		}
 
-		function push( object, geometry, material, z, group ) {
+		function getNextRenderItem( object, geometry, material, z, group ) {
 
 			var renderItem = renderItems[ renderItemsIndex ];
 
@@ -17830,10 +17830,25 @@
 
 			}
 
+			renderItemsIndex ++;
+
+			return renderItem;
+
+		}
+
+		function push( object, geometry, material, z, group ) {
+
+			var renderItem = getNextRenderItem( object, geometry, material, z, group );
 
 			( material.transparent === true ? transparent : opaque ).push( renderItem );
 
-			renderItemsIndex ++;
+		}
+
+		function unshift( object, geometry, material, z, group ) {
+
+			var renderItem = getNextRenderItem( object, geometry, material, z, group );
+
+			( material.transparent === true ? transparent : opaque ).unshift( renderItem );
 
 		}
 
@@ -17850,6 +17865,7 @@
 
 			init: init,
 			push: push,
+			unshift: unshift,
 
 			sort: sort
 		};
