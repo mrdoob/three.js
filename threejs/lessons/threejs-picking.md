@@ -257,8 +257,7 @@ This can solve issue 2 and 3 above. As for issue 1, speed, it really depends. Ev
 
 One thing we can do though is since we're only going to be reading one pixel we can just setup the camera so only that one pixel is drawn. We can do this using `PerspectiveCamera.setViewOffset` which lets us tell THREE.js to compute a camera that just renders a smaller part of a larger rectangle. This should save some time.
 
-To do this type of picking in THREE.js at the moment requires we create 2 scenes. One we will fill with our normal meshes. The other we'll fill with meshes
-that use our picking material.
+To do this type of picking in THREE.js at the moment requires we create 2 scenes. One we will fill with our normal meshes. The other we'll fill with meshes that use our picking material.
 
 So, first create a second scene and make sure it clears to black.
 
@@ -325,7 +324,7 @@ function setPickPosition(event) {
 }
 ```
 
-Then let's change the `PickHelper` into a `GPUPickHelper`
+Then let's change the `PickHelper` into a `GPUPickHelper`. It will use a `WebGLRenderTarget` like we covered the [article on render targets](threejs-rendertargets.html). Our render target here is only a single pixel in size, 1x1. 
 
 ```
 -class PickHelper {
