@@ -115,7 +115,7 @@ And voilà
 
 The cube is red because we set the `background` of the `rtScene` to red so the render target's texture is being cleared to red.
 
-Render target are used for all kinds of things. Shadows use a render target. [Picking can use a render target](threejs-picking.html). Various kinds of [post processing effects](threejs-post-processing.html) require a render target.
+Render target are used for all kinds of things. Shadows use a render target. [Picking can use a render target](threejs-picking.html). Various kinds of [post processing effects](threejs-post-processing.html) require a render target. Rendering a rear view mirror in a car or a live view on a monitor inside a 3D scene might use a render target.
 
 A few notes about using `WebGLRenderTarget`.
 
