@@ -51,6 +51,7 @@
 		var RADIUS = 75;
 
 		THREE.ShaderChunk[ 'lights_pars_begin' ] += [
+			'',
 			'#if defined TILED_FORWARD',
 			'uniform vec4 tileData;',
 			'uniform sampler2D tileTexture;',
