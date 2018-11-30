@@ -104,6 +104,7 @@ THREE.GLTFExporter.prototype = {
 		var extensionsUsed = {};
 		var cachedData = {
 
+			meshes: new Map(),
 			attributes: new Map(),
 			attributesNormalized: new Map(),
 			materials: new Map(),
@@ -1002,6 +1003,13 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMesh( mesh ) {
 
+			var cacheKey = mesh.geometry.uuid + ':' + mesh.material.uuid;
+			if ( cachedData.meshes.has( cacheKey ) ) {
+
+				return cachedData.meshes.get( cacheKey );
+
+			}
+
 			var geometry = mesh.geometry;
 
 			var mode;
@@ -1311,7 +1319,10 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.meshes.push( gltfMesh );
 
-			return outputJSON.meshes.length - 1;
+			var index = outputJSON.meshes.length - 1;
+			cachedData.meshes.set( cacheKey, index );
+
+			return index;
 
 		}
 
