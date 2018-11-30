@@ -105,6 +105,7 @@ THREE.GLTFExporter.prototype = {
 		var cachedData = {
 
 			attributes: new Map(),
+			attributesNormalized: new Map(),
 			materials: new Map(),
 			textures: new Map(),
 			images: new Map()
@@ -214,7 +215,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function isNormalizedNormalAttribute( normal ) {
 
-			if ( cachedData.attributes.has( normal ) ) {
+			if ( cachedData.attributesNormalized.has( normal ) ) {
 
 				return false;
 
@@ -242,9 +243,9 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function createNormalizedNormalAttribute( normal ) {
 
-			if ( cachedData.attributes.has( normal ) ) {
+			if ( cachedData.attributesNormalized.has( normal ) ) {
 
-				return cachedData.attributes.get( normal );
+				return cachedData.attributesNormalized.get( normal );
 
 			}
 
@@ -271,7 +272,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			cachedData.attributes.set( normal, attribute );
+			cachedData.attributesNormalized.set( normal, attribute );
 
 			return attribute;
 
@@ -1083,23 +1084,32 @@ THREE.GLTFExporter.prototype = {
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
+				if ( cachedData.attributes.has( attribute ) ) {
+
+					attributes[ attributeName ] = cachedData.attributes.get( attribute );
+					continue;
+
+				}
+
 				// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
+				var modifiedAttribute;
 				var array = attribute.array;
 				if ( attributeName === 'JOINTS_0' &&
 					! ( array instanceof Uint16Array ) &&
 					! ( array instanceof Uint8Array ) ) {
 
 					console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
-					attribute = new THREE.BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
+					modifiedAttribute = new THREE.BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
 
 				}
 
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
 
-					var accessor = processAccessor( attribute, geometry );
+					var accessor = processAccessor( modifiedAttribute || attribute, geometry );
 					if ( accessor !== null ) {
 
 						attributes[ attributeName ] = accessor;
+						cachedData.attributes.set( attribute, accessor );
 
 					}
 
@@ -1158,6 +1168,7 @@ THREE.GLTFExporter.prototype = {
 						}
 
 						var attribute = geometry.morphAttributes[ attributeName ][ i ];
+						var gltfAttributeName = attributeName.toUpperCase();
 
 						// Three.js morph attribute has absolute values while the one of glTF has relative values.
 						//
@@ -1165,6 +1176,14 @@ THREE.GLTFExporter.prototype = {
 						// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#morph-targets
 
 						var baseAttribute = geometry.attributes[ attributeName ];
+
+						if ( cachedData.attributes.has( baseAttribute ) ) {
+
+							target[ gltfAttributeName ] = cachedData.attributes.get( baseAttribute );
+							continue;
+
+						}
+
 						// Clones attribute not to override
 						var relativeAttribute = attribute.clone();
 
@@ -1179,7 +1198,8 @@ THREE.GLTFExporter.prototype = {
 
 						}
 
-						target[ attributeName.toUpperCase() ] = processAccessor( relativeAttribute, geometry );
+						target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
+						cachedData.attributes.set( baseAttribute, target[ gltfAttributeName ] );
 
 					}
 
@@ -1250,7 +1270,16 @@ THREE.GLTFExporter.prototype = {
 
 				if ( geometry.index !== null ) {
 
-					primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+					if ( cachedData.attributes.has( geometry.index ) ) {
+
+						primitive.indices = cachedData.attributes.get( geometry.index );
+
+					} else {
+
+						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+						cachedData.attributes.set( geometry.index, primitive.indices );
+
+					}
 
 				}
 
