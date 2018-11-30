@@ -207,6 +207,12 @@ function WebXRManager( renderer ) {
 
 	};
 
+	this.getCameraPose = function ( ) {
+
+		return pose;
+
+	};
+
 	this.isPresenting = isPresenting;
 
 	// Animation Loop
