@@ -76,7 +76,7 @@ THREE.PMREMGenerator = ( function () {
      * the roughness by 0.9(totally empirical) to try to visually match the original result.
      * The condition "if(i <5)" is also an attemt to make the result match the original result.
      * This method requires the most amount of thinking I guess. Here is a paper which we could try to implement in future::
-     * http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
+     * https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch20.html
      */
 		update: function ( renderer ) {
 
