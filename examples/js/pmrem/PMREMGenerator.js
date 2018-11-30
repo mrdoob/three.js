@@ -25,7 +25,7 @@ THREE.PMREMGenerator = ( function () {
 
 		this.sourceTexture = sourceTexture;
 		this.resolution = ( resolution !== undefined ) ? resolution : 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
-		this.samplesPerLevel = ( samplesPerLevel !== undefined ) ? samplesPerLevel : 16;
+		this.samplesPerLevel = ( samplesPerLevel !== undefined ) ? samplesPerLevel : 32;
 
 		var monotonicEncoding = ( this.sourceTexture.encoding === THREE.LinearEncoding ) ||
       ( this.sourceTexture.encoding === THREE.GammaEncoding ) || ( this.sourceTexture.encoding === THREE.sRGBEncoding );
@@ -166,7 +166,6 @@ THREE.PMREMGenerator = ( function () {
 				"roughness": { value: 0.5 },
 				"mapSize": { value: 0.5 },
 				"envMap": { value: null },
-				"testColor": { value: new THREE.Vector3( 1, 1, 1 ) },
 				"tFlip": { value: - 1 },
 			},
 
@@ -184,7 +183,6 @@ THREE.PMREMGenerator = ( function () {
         uniform float roughness;\n\
         uniform samplerCube envMap;\n\
         uniform float mapSize;\n\
-        uniform vec3 testColor;\n\
         uniform float tFlip;\n\
         \n\
         float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\
