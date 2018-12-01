@@ -267,7 +267,8 @@
 
 		<h3>[method:Geometry fromBufferGeometry]( [param:BufferGeometry geometry] )</h3>
 		<p>Convert a [page:BufferGeometry] to a Geometry. <br />
-		The array used to store the vertices in the bufferGeometry is a non indexed array, so the resultant geometry may contain duplicated vertices. Use [page:mergeVertices] to remove them.</p>
+		When converting from BufferGeometry to Geometry, all vertices are preserved, so duplicated vertices may appear.
+		Use [page:Geometry.mergeVertices] to remove them.</p>
 
 		<h3>[method:Geometry lookAt] ( [param:Vector3 vector] )</h3>
 		<p>

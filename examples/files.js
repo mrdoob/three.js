@@ -90,7 +90,6 @@ var files = {
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_extensions",
 		"webgl_loader_imagebitmap",
-		"webgl_loader_json",
 		"webgl_loader_json_claraio",
 		"webgl_loader_kmz",
 		"webgl_loader_md2",
@@ -315,8 +314,8 @@ var files = {
 	],
 	"webgl2": [
 		"webgl2_materials_texture3d",
-		"webgl2_materials_texture3d_volume"
-		// "webgl2_sandbox"
+		"webgl2_materials_texture3d_volume",
+		"webgl2_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
