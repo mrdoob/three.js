@@ -185,7 +185,7 @@
 
 	} );
 
-	var REVISION = '99dev';
+	var REVISION = '99';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
@@ -39910,6 +39910,7 @@
 		this.autoplay = false;
 
 		this.buffer = null;
+		this.detune = 0;
 		this.loop = false;
 		this.startTime = 0;
 		this.offset = 0;
@@ -39984,6 +39985,7 @@
 			var source = this.context.createBufferSource();
 
 			source.buffer = this.buffer;
+			source.detune.value = this.detune;
 			source.loop = this.loop;
 			source.onended = this.onEnded.bind( this );
 			source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
@@ -40112,6 +40114,26 @@
 
 		},
 
+		setDetune: function ( value ) {
+
+			this.detune = value;
+
+			if ( this.isPlaying === true ) {
+
+				this.source.detune.setTargetAtTime( this.detune, this.context.currentTime, 0.01 );
+
+			}
+
+			return this;
+
+		},
+
+		getDetune: function () {
+
+			return this.detune;
+
+		},
+
 		getFilter: function () {
 
 			return this.getFilters()[ 0 ];
@@ -40137,7 +40159,7 @@
 
 			if ( this.isPlaying === true ) {
 
-				this.source.playbackRate.setValueAtTime( this.playbackRate, this.context.currentTime );
+				this.source.playbackRate.setTargetAtTime( this.playbackRate, this.context.currentTime, 0.01 );
 
 			}
 
