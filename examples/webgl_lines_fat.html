@@ -63,7 +63,8 @@
 
 			var line, renderer, scene, camera, camera2, controls;
 			var line1;
-			var matLine, matLineBasic, matLineDashed;
+			var matLine, matLineBasic, matLineDashed, interactive;
+			var prevLinewidth;
 			var stats;
 			var gui;
 
@@ -155,6 +156,8 @@
 
 				//
 
+				window.addEventListener( "mousemove", onDocumentMouseMove, false );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 				onWindowResize();
 
@@ -223,6 +226,59 @@
 
 			//
 
+			function onDocumentMouseMove( event ) {
+
+				if ( ! interactive ) return;
+
+				event.preventDefault();
+
+				var intersects = getIntersects( event.layerX, event.layerY );
+
+				if ( intersects.length > 0 ) {
+
+					if ( prevLinewidth === undefined ) {
+
+						prevLinewidth = matLine.linewidth
+
+					}
+
+					var res = intersects.filter( function ( res ) {
+
+						return res && res.object;
+
+					} )[ 0 ];
+
+					if ( res && res.object ) {
+
+						selectedObject = res.object;
+						selectedObject.material.linewidth = prevLinewidth + prevLinewidth / 3;
+
+					}
+
+				} else if ( prevLinewidth !== undefined ) {
+
+					matLine.linewidth = prevLinewidth
+					prevLinewidth = undefined
+
+				}
+
+			}
+
+			var raycaster = new THREE.Raycaster();
+			var mouseVector = new THREE.Vector3();
+
+			function getIntersects( x, y ) {
+
+				x = ( x / window.innerWidth ) * 2 - 1;
+				y = - ( y / window.innerHeight ) * 2 + 1;
+
+				mouseVector.set( x, y, 0.5 );
+				raycaster.setFromCamera( mouseVector, camera );
+
+				return raycaster.intersectObject( scene, true );
+
+			}
+
 			function initGui() {
 
 				gui = new dat.GUI();
@@ -231,6 +287,7 @@
 					'line type': 0,
 					'width (px)': 5,
 					'dashed': false,
+					'interactive': false,
 					'dash scale': 1,
 					'dash / gap': 1
 				};
@@ -277,6 +334,10 @@
 					line1.material = val ? matLineDashed : matLineBasic;
 
 				} );
+
+				gui.add( param, 'interactive' ).onChange( function ( val ) {
+					interactive = val
+				})
 
 				gui.add( param, 'dash scale', 0.5, 2, 0.1 ).onChange( function ( val ) {
 
