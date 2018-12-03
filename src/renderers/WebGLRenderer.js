@@ -863,67 +863,67 @@ function WebGLRenderer( parameters ) {
 
 					if ( previousBuffers.get( geometryAttribute ) !== programAttribute ) {
 
-						var normalized = geometryAttribute.normalized;
-						var size = geometryAttribute.itemSize;
+					var normalized = geometryAttribute.normalized;
+					var size = geometryAttribute.itemSize;
 
-						var attribute = attributes.get( geometryAttribute );
+					var attribute = attributes.get( geometryAttribute );
 
-						// TODO Attribute may not be available on context restore
+					// TODO Attribute may not be available on context restore
 
-						if ( attribute === undefined ) continue;
+					if ( attribute === undefined ) continue;
 
-						var buffer = attribute.buffer;
-						var type = attribute.type;
-						var bytesPerElement = attribute.bytesPerElement;
+					var buffer = attribute.buffer;
+					var type = attribute.type;
+					var bytesPerElement = attribute.bytesPerElement;
 
-						if ( geometryAttribute.isInterleavedBufferAttribute ) {
+					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
-							var data = geometryAttribute.data;
-							var stride = data.stride;
-							var offset = geometryAttribute.offset;
+						var data = geometryAttribute.data;
+						var stride = data.stride;
+						var offset = geometryAttribute.offset;
 
-							if ( data && data.isInstancedInterleavedBuffer ) {
+						if ( data && data.isInstancedInterleavedBuffer ) {
 
-								state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
+							state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
 
-								if ( geometry.maxInstancedCount === undefined ) {
+							if ( geometry.maxInstancedCount === undefined ) {
 
-									geometry.maxInstancedCount = data.meshPerAttribute * data.count;
-
-								}
-
-							} else {
-
-								state.enableAttribute( programAttribute );
+								geometry.maxInstancedCount = data.meshPerAttribute * data.count;
 
 							}
-
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-							_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
-
 
 						} else {
 
-							if ( geometryAttribute.isInstancedBufferAttribute ) {
+							state.enableAttribute( programAttribute );
 
-								state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
+						}
 
-								if ( geometry.maxInstancedCount === undefined ) {
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
 
-									geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
-								}
+					} else {
 
-							} else {
+						if ( geometryAttribute.isInstancedBufferAttribute ) {
 
-								state.enableAttribute( programAttribute );
+							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
+
+							if ( geometry.maxInstancedCount === undefined ) {
+
+								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
 							}
 
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-							_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+						} else {
+
+							state.enableAttribute( programAttribute );
 
 						}
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+
+					}
 
 					} else {
 
