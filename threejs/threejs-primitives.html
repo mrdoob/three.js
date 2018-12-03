@@ -28,7 +28,6 @@
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas: canvas});
-  renderer.setClearColor(0xAAAAAA);
 
   const fov = 40;
   const aspect = 2;  // the canvas default
@@ -38,6 +37,7 @@ function main() {
   camera.position.z = 120;
 
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xAAAAAA);
 
   {
     const color = 0xFFFFFF;

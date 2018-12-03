@@ -40,7 +40,6 @@ function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas: canvas});
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color().setHSL(0.6, 0, 1);
 
   const aspect = 2;  // the canvas default
   const fov = 35;
@@ -62,7 +61,6 @@ function main() {
     controls.update();
   }
 
-  renderer.setClearColor(0xAACCFF);
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
   renderer.shadowMap.enabled = true;

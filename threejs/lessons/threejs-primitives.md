@@ -81,9 +81,8 @@ with the [examples from the previous article](threejs-responsive.html).
 Near the top let's set a background color
 
 ```
-const canvas = document.querySelector('#c');
-const renderer = new THREE.WebGLRenderer({canvas: canvas});
-+renderer.setClearColor(0xAAAAAA);
+const scene = new THREE.Scene();
++scene.background = new THREE.Color(0xAAAAAA);
 ```
 
 This tells three.js to clear to lightish gray.
