@@ -58,6 +58,10 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 		var ray = new THREE.Ray();
 		var inverseMatrix = new THREE.Matrix4();
+		var pointOnSegment = new THREE.Vector3();
+		var pointOnRay = new THREE.Vector3();
+		var startPoint3 = new THREE.Vector3();
+		var endPoint3 = new THREE.Vector3();
 
 		return function raycast( raycaster, intersects ) {
 
@@ -67,10 +71,6 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 			const geometry = this.geometry;
-			var pointOnSegment = new THREE.Vector3();
-			var pointOnRay = new THREE.Vector3();
-			var startPoint3 = new THREE.Vector3();
-			var endPoint3 = new THREE.Vector3();
 			var count = geometry.attributes.instanceStart.count;
 
 			for ( var i = 0; i < count; ++ i ) {

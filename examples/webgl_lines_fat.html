@@ -242,16 +242,11 @@
 
 					}
 
-					var res = intersects.filter( function ( res ) {
-
-						return res && res.object;
-
-					} )[ 0 ];
+					var res = intersects[ 0 ];
 
 					if ( res && res.object ) {
 
-						selectedObject = res.object;
-						selectedObject.material.linewidth = prevLinewidth + prevLinewidth / 3;
+						res.object.selectedObject.material.linewidth = prevLinewidth + prevLinewidth / 3;
 
 					}
 
@@ -337,7 +332,7 @@
 
 				gui.add( param, 'interactive' ).onChange( function ( val ) {
 					interactive = val
-				})
+				} );
 
 				gui.add( param, 'dash scale', 0.5, 2, 0.1 ).onChange( function ( val ) {
 
