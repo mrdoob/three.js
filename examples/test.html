@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - extrude shapes from geodata</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+		body {
+			color: #ffffff;
+			font-family: Monospace;
+			font-size: 13px;
+			text-align: center;
+			font-weight: bold;
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		#info {
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			padding: 5px;
+		}
+
+		a {
+			color: #ffffff;
+		}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> reuse attributes
+		</div>
+
+		<script type="text/javascript" src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+			var renderer, stats, scene, camera;
+
+			init();
+			animate();
+
+			//
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				//
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xb0b0b0 );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 0, 200 );
+
+				//
+
+				var group = new THREE.Group();
+				scene.add( group );
+
+				//
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
+				directionalLight.position.set( 0.75, 0.75, 1.0 ).normalize();
+				scene.add( directionalLight );
+
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.2 );
+				scene.add( ambientLight );
+
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+
+				//-----------------------------------------------------------------------------//
+				
+				const masterGeometry = new THREE.SphereBufferGeometry(1) //pos, uv, normal
+
+				const geomBasic = new THREE.BufferGeometry()
+
+				geomBasic.addAttribute('position', masterGeometry.attributes.position)
+				geomBasic.setIndex(masterGeometry.index)
+
+				const mBasic = new THREE.Mesh(geomBasic, new THREE.MeshBasicMaterial())
+				const mLight = new THREE.Mesh(masterGeometry, new THREE.MeshPhongMaterial())
+				
+				mLight.position.x = -2
+				mBasic.position.x = 2
+				mLight.renderOrder = 1
+				mBasic.renderOrder = 0
+
+				scene.add(mLight)
+				scene.add(mBasic)
+
+				const geomInstanceBasic = new THREE.InstancedBufferGeometry()
+				geomInstanceBasic.addAttribute('position', masterGeometry.attributes.position)
+				geomInstanceBasic.setIndex(masterGeometry.index)
+
+				const instancePositions = []
+
+				for( let i = 0 ; i < 16 ; i ++ ){
+					instancePositions.push((Math.random() * 2 - 1) * 3) 
+					instancePositions.push((Math.random() * 2 - 1) * 3) 
+					instancePositions.push((Math.random() * 2 - 1) * 3) 
+				}
+
+				geomInstanceBasic.addAttribute('aInstance', new THREE.InstancedBufferAttribute(
+					new Float32Array(instancePositions),
+					3,
+					false,
+					1
+				))
+
+
+				const instanceMaterial = new THREE.ShaderMaterial({
+					vertexShader:`
+						attribute vec3 aInstance;
+
+						#ifdef NORMAL
+						varying vec3 vNormal;
+						#endif
+						
+						void main () {
+
+							vec4 pos = vec4(position, 1.);
+							pos.xyz += aInstance;
+
+
+							#ifdef NORMAL
+							  vNormal = ( modelViewMatrix * vec4(normal,.0) ).xyz;
+							#endif
+
+							gl_Position = projectionMatrix * modelViewMatrix * pos;
+
+						}
+					`,
+					fragmentShader:`
+						#ifdef NORMAL
+						varying vec3 vNormal;
+						#endif
+
+						void main(){
+
+							vec3 col = vec3(1.,0.,.0);
+
+							#ifdef NORMAL
+							  col = vNormal;
+							#endif
+
+							gl_FragColor = vec4(col,1.);
+						}
+					`
+				})
+
+				const mInstancedBasic = new THREE.Mesh( geomInstanceBasic, instanceMaterial )
+				mInstancedBasic.position.x = 5
+				mInstancedBasic.renderOrder = 2
+
+				scene.add(mInstancedBasic)
+
+				const geomInstanceLight = new THREE.InstancedBufferGeometry()
+
+				geomInstanceLight.addAttribute('position', masterGeometry.attributes.position)
+				geomInstanceLight.addAttribute('normal', masterGeometry.attributes.normal)
+				geomInstanceLight.addAttribute('aInstance', geomInstanceBasic.attributes.aInstance)
+				geomInstanceLight.setIndex(masterGeometry.index)
+
+				const mInstancedLight = new THREE.Mesh(geomInstanceLight, instanceMaterial.clone())
+
+				mInstancedLight.material.defines = { NORMAL: '' }
+
+				scene.add(mInstancedLight)
+
+				mInstancedLight.renderOrder = 3 
+				mInstancedLight.position.x = 10
+
+				console.log(masterGeometry.attributes.position)
+				console.log(geomBasic.attributes.position)
+				console.log(geomInstanceBasic.attributes.position)
+				console.log(geomInstanceLight.attributes.position === masterGeometry.attributes.position)
+
+			}
+
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
