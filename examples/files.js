@@ -226,6 +226,7 @@ var files = {
 		"webgl_postprocessing_fxaa",
 		"webgl_postprocessing_glitch",
 		"webgl_postprocessing_godrays",
+		"webgl_postprocessing_lut",
 		"webgl_postprocessing_rgb_halftone",
 		"webgl_postprocessing_masking",
 		"webgl_postprocessing_ssaa",

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - lut</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000;
+				margin: 0;
+			}
+
+			canvas {
+				width: 100vw;
+				height: 100vh;
+				display: block;
+			}
+
+			#info {
+				color:#fff;
+				background-color: rgba( 0, 0, 0, 0.5 );
+				position: relative;
+				margin: 0 auto -2.1em;
+				top: 0;
+				max-width: 550px;
+				padding: 5px;
+			}
+
+			#notes {
+				color:#fff;
+				background-color: rgba( 0, 0, 0, 0.5 );
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				padding: 5px;
+				z-index:100;
+			}
+
+			a { color: red; }
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing lut - a port of <a href="https://webglsamples.org">color-adjust</a>
+		</div>
+
+		<div id="notes">
+			<a href="http://g3d.cs.williams.edu/g3d/data10/index.html#mesh19" target="_blank" rel="noopener">Lee Perry-Smith</a> head
+		</div>
+
+		<canvas></canvas>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/LUTShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+
+		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+
+			const renderer = new THREE.WebGLRenderer( { canvas: document.querySelector( 'canvas' ) } );
+			renderer.autoClear = false;
+			renderer.gammaInput = true;
+			renderer.gammaOutput = true;
+
+			const gui = new dat.GUI( { width: 300 } );
+
+			const lutTextures = [
+				{ name: 'default',         size: 8, url: 'textures/lut/default.png' },
+				{ name: 'monochrome',      size: 8, url: 'textures/lut/monochrome.png' },
+				{ name: 'sepia',           size: 8, url: 'textures/lut/sepia.png' },
+				{ name: 'saturated',       size: 8, url: 'textures/lut/saturated.png', },
+				{ name: 'posterize',       size: 8, url: 'textures/lut/posterize.png', },
+				{ name: 'posterize-3-rgb', size: 8, url: 'textures/lut/posterize-3-rgb.png', },
+				{ name: 'posterize-3-lab', size: 8, url: 'textures/lut/posterize-3-lab.png', },
+				{ name: 'posterize-4-lab', size: 8, url: 'textures/lut/posterize-4-lab.png', },
+				{ name: 'posterize-more',  size: 8, url: 'textures/lut/posterize-more.png', },
+				{ name: 'inverse',         size: 8, url: 'textures/lut/inverse.png', },
+				{ name: 'color negative',  size: 8, url: 'textures/lut/color-negative.png', },
+				{ name: 'high contrast',   size: 8, url: 'textures/lut/high-contrast-bw.png', },
+				{ name: 'funky contrast',  size: 8, url: 'textures/lut/funky-contrast.png', },
+				{ name: 'nightvision',     size: 8, url: 'textures/lut/nightvision.png', },
+				{ name: 'thermal',         size: 8, url: 'textures/lut/thermal.png', },
+				{ name: 'b/w',             size: 8, url: 'textures/lut/black-white.png', },
+				{ name: 'hue +60',         size: 8, url: 'textures/lut/hue-plus-60.png', },
+				{ name: 'hue +180',        size: 8, url: 'textures/lut/hue-plus-180.png', },
+				{ name: 'hue -60',         size: 8, url: 'textures/lut/hue-minus-60.png', },
+				{ name: 'red to cyan',     size: 8, url: 'textures/lut/red-to-cyan.png' },
+				{ name: 'blues',           size: 8, url: 'textures/lut/blues.png' },
+				{ name: 'infrared',        size: 8, url: 'textures/lut/infrared.png' },
+				{ name: 'radioactive',     size: 8, url: 'textures/lut/radioactive.png' },
+				{ name: 'goolgey',         size: 8, url: 'textures/lut/googley.png' },
+				{ name: 'bgy',             size: 8, url: 'textures/lut/bgy.png' },
+			];
+
+			const imgLoader = new THREE.ImageLoader();
+			const ctx = document.createElement( 'canvas' ).getContext( '2d' );
+			const identityLUT = new Uint8Array([
+				   0,   0,   0, 255,   255,   0,   0, 255,    0,   0, 255, 255,   255,   0, 255, 255,
+				   0, 255,   0, 255,   255, 255,   0, 255,    0, 255, 255, 255,   255, 255, 255, 255,
+			]);
+
+			const lutNameIndexMap = {};
+			lutTextures.forEach( function( info, ndx ) {
+				lutNameIndexMap[ info.name ] = ndx;
+				const texture = new THREE.DataTexture( identityLUT, 4, 2 );
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.needsUpdate = true;
+				texture.flipY = false;
+
+				info.texture = texture;
+				const lutSize = info.size;
+
+				// set the size to 2 (the identity size). We'll restore it when the
+				// image has loaded. This way the code using the lut doesn't have to
+			    // care if the image has loaded or not
+				info.size = 2;
+
+				imgLoader.load( info.url, function( image ) {
+					const width = lutSize * lutSize;
+					const height = lutSize;
+					info.size = lutSize;
+					ctx.canvas.width = width;
+					ctx.canvas.height = height;
+					ctx.drawImage( image, 0, 0 );
+					const imageData = ctx.getImageData( 0, 0, width, height );
+
+					texture.image.data = new Uint8Array(imageData.data.buffer);
+					texture.image.width = width;
+					texture.image.height = height;
+					texture.needsUpdate = true;
+				});
+			});
+
+			const lutSettings = {
+			  lut: lutNameIndexMap.thermal,
+			};
+			gui.add(lutSettings, 'lut', lutNameIndexMap );
+
+			const cameraOrtho = new THREE.OrthographicCamera( -0.5, 0.5, 0.5, -0.5, -1, 1 );
+
+			const cameraPerspective = new THREE.PerspectiveCamera( 50, 2, 1, 10000 );
+			cameraPerspective.position.z = 900;
+
+			const sceneModel = new THREE.Scene();
+			const sceneBG = new THREE.Scene();
+
+			const directionalLight = new THREE.DirectionalLight( 0xffffff );
+			directionalLight.position.set( 0, - 0.1, 1 ).normalize();
+			sceneModel.add( directionalLight );
+
+			const loader = new THREE.GLTFLoader();
+			loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
+
+				createMesh( gltf.scene.children[ 0 ].geometry, sceneModel, 100 );
+
+			} );
+
+			const materialColor = new THREE.MeshBasicMaterial( {
+				map: new THREE.TextureLoader().load( 'textures/cube/SwedishRoyalCastle/pz.jpg' ),
+				depthTest: false,
+			} );
+
+			quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), materialColor );
+			sceneBG.add( quadBG );
+
+			const effectLUT = new THREE.ShaderPass( THREE.LUTShader );
+			effectLUT.renderToScreen = true;
+
+			const renderBackground = new THREE.RenderPass( sceneBG, cameraOrtho );
+			const renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
+
+			renderModel.clear = false;
+
+			const rtParameters = {
+				minFilter: THREE.LinearFilter,
+				magFilter: THREE.LinearFilter,
+				format: THREE.RGBFormat,
+			};
+			composer1 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( 1, 1, rtParameters ) );
+
+			composer1.addPass( renderBackground );
+			composer1.addPass( renderModel );
+			composer1.addPass( effectLUT )
+
+			function resizeRendererToDisplaySize( renderer ) {
+
+				const canvas = renderer.domElement;
+				const width = canvas.clientWidth;
+				const height = canvas.clientHeight;
+
+				const needResize = canvas.width !== width || canvas.height !== height;
+				if ( needResize ) {
+
+					renderer.setSize( width, height, false );
+
+				}
+				return needResize;
+			}
+
+
+			const modelRoot = new THREE.Object3D();
+			sceneModel.add( modelRoot );
+
+			function createMesh( geometry, scene, scale ) {
+
+				const mat = new THREE.MeshPhongMaterial( {
+
+					color: 0x999999,
+					specular: 0x080808,
+					shininess: 20,
+					map: new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Map-COL.jpg' ),
+					normalMap: new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+					normalScale: new THREE.Vector2( 0.75, 0.75 )
+
+				} );
+
+				const mesh = new THREE.Mesh( geometry, mat );
+				mesh.position.set( 0, - 50, 0 );
+				mesh.scale.set( scale, scale, scale );
+
+				modelRoot.add( mesh );
+
+			}
+
+			let then = 0;
+
+			function render( now ) {
+
+				now *= 0.001;  // convert to seconds
+				const delta = now - then;
+				then = now;
+
+				if ( resizeRendererToDisplaySize( renderer ) ) {
+
+					const canvas = renderer.domElement;
+					const aspect = canvas.clientWidth / canvas.clientHeight
+					cameraPerspective.aspect = aspect;
+					cameraPerspective.updateProjectionMatrix();
+
+					const imageAspect = materialColor.map.image
+						? materialColor.map.image.width / materialColor.map.image.height
+						: 1;
+
+					let xScale = imageAspect / aspect;
+					let yScale = 1;
+					if ( xScale < 1 ) {
+						yScale = 1 / xScale;
+						xScale = 1;
+					}
+					quadBG.scale.set( xScale, yScale, 1 );
+
+					cameraOrtho.updateProjectionMatrix();
+
+					composer1.setSize( canvas.width, canvas.height );
+
+				}
+
+				modelRoot.rotation.y = -now;
+
+				const lutInfo = lutTextures[ lutSettings.lut ];
+				effectLUT.uniforms.lutMap.value = lutInfo.texture;
+				effectLUT.uniforms.lutMapSize.value = lutInfo.size;
+
+				composer1.render( delta );
+
+				requestAnimationFrame( render );
+			}
+
+			requestAnimationFrame( render );
+
+		</script>
+	</body>
+</html>
