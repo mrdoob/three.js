@@ -54,6 +54,56 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 	}() ),
 
+	raycast: ( function () {
+
+		var ray = new THREE.Ray();
+		var inverseMatrix = new THREE.Matrix4();
+
+		return function raycast( raycaster, intersects ) {
+
+			var precision = raycaster.linePrecision; // todo: calculate proper precision
+
+			inverseMatrix.getInverse( this.matrixWorld );
+			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+			const geometry = this.geometry;
+			var pointOnSegment = new THREE.Vector3();
+			var pointOnRay = new THREE.Vector3();
+			var startPoint3 = new THREE.Vector3();
+			var endPoint3 = new THREE.Vector3();
+			var count = geometry.attributes.instanceStart.count;
+
+			for ( var i = 0; i < count; ++ i ) {
+
+				startPoint3.fromBufferAttribute( geometry.attributes.instanceStart, i );
+				endPoint3.fromBufferAttribute( geometry.attributes.instanceEnd, i );
+
+				var distSq = ray.distanceSqToSegment( startPoint3, endPoint3, pointOnRay, pointOnSegment );
+
+				if ( distSq > precision ) continue;
+
+				pointOnRay.applyMatrix4( this.matrixWorld );
+
+				var distance = raycaster.ray.origin.distanceTo( pointOnRay );
+
+				if ( distance > raycaster.near && distance < raycaster.far ) {
+
+					intersects.push( {
+
+						distance: distance,
+						point: pointOnSegment.clone().applyMatrix4( this.matrixWorld ),
+						object: this
+
+					} );
+
+				}
+
+			}
+
+		};
+
+	}() ),
+
 	copy: function ( source ) {
 
 		// todo
