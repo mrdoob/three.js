@@ -648,6 +648,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		var frontFaceCW = ( object.isMesh && object.normalMatrix.determinant() < 0 );
@@ -819,6 +820,8 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	var previousBuffers = new WeakMap()
+
 	function setupVertexAttributes( material, program, geometry ) {
 
 		if ( geometry && geometry.isInstancedBufferGeometry & ! capabilities.isWebGL2 ) {
@@ -831,6 +834,8 @@ function WebGLRenderer( parameters ) {
 			}
 
 		}
+
+		var nextBuffers = new WeakMap()
 
 		state.initAttributes();
 
@@ -848,7 +853,9 @@ function WebGLRenderer( parameters ) {
 
 				var geometryAttribute = geometryAttributes[ name ];
 
-				if ( geometryAttribute !== undefined ) {
+				if ( geometryAttribute !== undefined ) 
+
+				if( previousBuffers.get(geometryAttribute) !== programAttribute ) {
 
 					var normalized = geometryAttribute.normalized;
 					var size = geometryAttribute.itemSize;
@@ -888,6 +895,7 @@ function WebGLRenderer( parameters ) {
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
 						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
 
+
 					} else {
 
 						if ( geometryAttribute.isInstancedBufferAttribute ) {
@@ -910,6 +918,16 @@ function WebGLRenderer( parameters ) {
 						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 					}
+
+				} 
+
+				else {
+					
+					state.enableAttribute( programAttribute )
+				
+				}
+
+				nextBuffers.set(geometryAttribute, programAttribute )
 
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
@@ -943,6 +961,8 @@ function WebGLRenderer( parameters ) {
 			}
 
 		}
+
+		previousBuffers = nextBuffers
 
 		state.disableUnusedAttributes();
 
@@ -1042,6 +1062,8 @@ function WebGLRenderer( parameters ) {
 		_currentGeometryProgram.wireframe = false;
 		_currentMaterialId = - 1;
 		_currentCamera = null;
+
+		previousBuffers = new WeakMap()
 
 		// update scene graph
 
