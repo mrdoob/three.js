@@ -196,7 +196,7 @@
 				var aspect = width / height;
 
 				cameraP.aspect = aspect;
-				cameraO.updateProjectionMatrix();
+				cameraP.updateProjectionMatrix();
 
 				cameraO.left = - height * aspect;
 				cameraO.right = height * aspect;
@@ -207,8 +207,8 @@
 				renderer.setSize( width, height );
 
 				var pixelRatio = renderer.getPixelRatio();
-				var newWidth = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
+				var newWidth = Math.floor( width * pixelRatio ) || 1;
+				var newHeight = Math.floor( height * pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
 
 			}
