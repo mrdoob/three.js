@@ -166,10 +166,7 @@ THREE.Fire = function ( geometry, options ) {
 
 	this.fieldGeometry = new THREE.PlaneGeometry( textureWidth, textureHeight );
 
-	this.internalSource = new THREE.DataTexture( this.sourceData,
-										       textureWidth,
-										       textureHeight,
-										       THREE.RGBAFormat );
+	this.internalSource = new THREE.DataTexture( this.sourceData, textureWidth, textureHeight, THREE.RGBAFormat );
 
 	// Source Shader
 
