@@ -1072,19 +1072,19 @@ THREE.MMDPhysics = ( function () {
 
 			var manager = this.manager;
 
-			var tr = this._getWorldTransformForBone();
+			var tr = this.body.getCenterOfMassTransform();
+			var origin = tr.getOrigin();
+			
+			var matrixInv = manager.allocThreeMatrix4();
+			matrixInv.copy( this.bone.parent.matrixWorld ).getInverse( matrixInv );
+			
+			var pos = manager.allocThreeVector3();
+			pos.set(origin.x(), origin.y(), origin.z()).applyMatrix4(matrixInv);
 
-			var thV = manager.allocThreeVector3();
+			this.bone.position.copy(pos);
 
-			var o = manager.getOrigin( tr );
-			thV.set( o.x(), o.y(), o.z() );
-
-			var v = this.bone.worldToLocal( thV );
-			this.bone.position.add( v );
-
-			manager.freeThreeVector3( thV );
-
-			manager.freeTransform( tr );
+			manager.freeThreeVector3( pos );
+			manager.freeThreeMatrix4( matrixInv );
 
 		}
 
