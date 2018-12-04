@@ -134,9 +134,7 @@ THREE.Fire = function ( geometry, options ) {
 	};
 
 
-	this.field0 = new THREE.WebGLRenderTarget( textureWidth,
-											   textureHeight,
-											   parameters );
+	this.field0 = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
 	this.field0.background = new THREE.Color( 0x000000 );
 
@@ -146,9 +144,7 @@ THREE.Fire = function ( geometry, options ) {
 
 	this.field0.background = new THREE.Color( 0x000000 );
 
-	this.fieldProj = new THREE.WebGLRenderTarget( textureWidth,
-											      textureHeight,
-											      parameters );
+	this.fieldProj = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
 	this.field0.background = new THREE.Color( 0x000000 );
 
@@ -165,11 +161,7 @@ THREE.Fire = function ( geometry, options ) {
 	this.fieldScene = new THREE.Scene();
 	this.fieldScene.background = new THREE.Color( 0x000000 );
 
-	this.orthoCamera = new THREE.OrthographicCamera( textureWidth / - 2,
-											         textureWidth / 2,
-											         textureHeight / 2,
-											         textureHeight / - 2,
-											         1, 2 );
+	this.orthoCamera = new THREE.OrthographicCamera( textureWidth / - 2, textureWidth / 2, textureHeight / 2, textureHeight / - 2, 1, 2 );
 	this.orthoCamera.position.z = 1;
 
 	this.fieldGeometry = new THREE.PlaneGeometry( textureWidth, textureHeight );
