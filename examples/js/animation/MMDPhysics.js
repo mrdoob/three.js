@@ -1079,9 +1079,9 @@ THREE.MMDPhysics = ( function () {
 			matrixInv.copy( this.bone.parent.matrixWorld ).getInverse( matrixInv );
 			
 			var pos = manager.allocThreeVector3();
-			pos.set(origin.x(), origin.y(), origin.z()).applyMatrix4(matrixInv);
+			pos.set( origin.x(), origin.y(), origin.z() ).applyMatrix4( matrixInv );
 
-			this.bone.position.copy(pos);
+			this.bone.position.copy( pos );
 
 			manager.freeThreeVector3( pos );
 			manager.freeThreeMatrix4( matrixInv );
