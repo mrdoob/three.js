@@ -32,7 +32,7 @@
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/Fire.js"></script>
+		<script src="js/objects/Fire.js"></script>
 
 	</head>
 	<body>
@@ -96,7 +96,7 @@
 				camera.add( pointLight );
 				scene.add( camera );
 
-				var plane = new THREE.PlaneGeometry( 20, 20 );
+				var plane = new THREE.PlaneBufferGeometry( 20, 20 );
 				fire = new THREE.Fire( plane, {
 					textureWidth: 512,
 					textureHeight: 512,
@@ -109,7 +109,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
-				renderer.antialias = true;
 				document.body.appendChild( renderer.domElement );
 
 				function updateColor1( value ) {
