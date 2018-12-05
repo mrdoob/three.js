@@ -1061,7 +1061,7 @@ THREE.GLTFLoader = ( function () {
 		var s3 = ppp - pp;
 		var s0 = 1 - s2;
 		var s1 = s3 - pp + p;
-		
+
 		// Layout of keyframe output values for CUBICSPLINE animations:
 		//   [ inTangent_1, splineVertex_1, outTangent_1, inTangent_2, splineVertex_2, ... ]
 		for ( var i = 0; i !== stride; i ++ ) {
@@ -2705,6 +2705,8 @@ THREE.GLTFLoader = ( function () {
 							? new THREE.SkinnedMesh( geometry, material )
 							: new THREE.Mesh( geometry, material );
 
+						if ( mesh.isSkinnedMesh === true ) mesh.normalizeSkinWeights(); // #15319
+
 						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
 
 							mesh.drawMode = THREE.TriangleStripDrawMode;
@@ -3127,16 +3129,16 @@ THREE.GLTFLoader = ( function () {
 
 		var nodeDef = json.nodes[ nodeIndex ];
 
-		return new Promise( function ( resolve ) {
+		return ( function() {
 
 			// .isBone isn't in glTF spec. See .markDefs
 			if ( nodeDef.isBone === true ) {
 
-				resolve( new THREE.Bone() );
+				return Promise.resolve( new THREE.Bone() );
 
 			} else if ( nodeDef.mesh !== undefined ) {
 
-				parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
+				return parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
 
 					var node;
 
@@ -3163,27 +3165,27 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					resolve( node );
+					return node;
 
 				} );
 
 			} else if ( nodeDef.camera !== undefined ) {
 
-				parser.getDependency( 'camera', nodeDef.camera ).then( resolve );
+				return parser.getDependency( 'camera', nodeDef.camera );
 
 			} else if ( nodeDef.extensions
 				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
 				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
 
-				parser.getDependency( 'light', nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light ).then( resolve );
+				return parser.getDependency( 'light', nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light );
 
 			} else {
 
-				resolve( new THREE.Object3D() );
+				return Promise.resolve( new THREE.Object3D() );
 
 			}
 
-		} ).then( function ( node ) {
+		}() ).then( function ( node ) {
 
 			if ( nodeDef.name !== undefined ) {
 

@@ -183,8 +183,7 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <lights_pars_begin>",
 			"#include <lights_physical_pars_fragment>",
 			"#include <shadowmap_pars_fragment>",
-			"#include <logdepthbuf_pars_fragment>",
-			"#include <logdepthbuf_vertex>"
+			"#include <logdepthbuf_pars_fragment>"
 		].join( "\n" ) );
 
 		var output = [

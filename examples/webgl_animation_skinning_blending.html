@@ -20,7 +20,7 @@
 				padding: 5px;
 			}
 			a {
-				color: #bbb;
+				color: #ff0000;
 			}
 			.ac {  /* prevent dat-gui from being selected */
 				-webkit-user-select: none;
@@ -40,17 +40,16 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Skeletal Animation Blending
-			(model from <a href="http://realitymeltdown.com" target="_blank" rel="noopener">realitymeltdown.com</a>)
-			<br><br>camera orbit/zoom/pan with left/middle/right mouse button
-			<br>Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Skeletal Animation Blending
+			(model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)
+			<br/><br/>Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
 		</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
@@ -61,115 +60,113 @@
 
 			}
 
-			var container = document.getElementById( 'container' );
-
-			var scene, renderer, camera, controls, stats;
-			var mesh, skeleton, mixer;
+			var scene, renderer, camera, stats;
+			var model, skeleton, mixer, clock;
 
 			var crossFadeControls = [];
 
 			var idleAction, walkAction, runAction;
 			var idleWeight, walkWeight, runWeight;
-			var actions;
-			var settings;
-
-			var clock = new THREE.Clock();
+			var actions, settings;
 
 			var singleStepMode = false;
 			var sizeOfNextStep = 0;
 
-			var url = 'models/skinned/marine/marine_anims_core.json';
+			init();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 1, 2, - 3 );
+				camera.lookAt( 0, 1, 0 );
+
+				clock = new THREE.Clock();
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
+
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				hemiLight.position.set( 0, 20, 0 );
+				scene.add( hemiLight );
+
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( - 3, 10, - 10 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.top = 2;
+				dirLight.shadow.camera.bottom = - 2;
+				dirLight.shadow.camera.left = - 2;
+				dirLight.shadow.camera.right = 2;
+				dirLight.shadow.camera.near = 0.1;
+				dirLight.shadow.camera.far = 40;
+				scene.add( dirLight );
+
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+
+				// ground
+
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/Soldier.glb', function ( gltf ) {
+
+					model = gltf.scene;
+					scene.add( model );
+
+					model.traverse( function ( object ) {
+
+						if ( object.isMesh ) object.castShadow = true;
+
+					} );
+
+					//
+
+					skeleton = new THREE.SkeletonHelper( model );
+					skeleton.visible = false;
+					scene.add( skeleton );
+
+					//
+
+					createPanel();
 
 
-			// Initialize stats (fps display)
+					//
 
-			stats = new Stats();
-			container.appendChild( stats.dom );
+					var animations = gltf.animations;
 
+					mixer = new THREE.AnimationMixer( model );
 
-			// Initialize scene, light and renderer
+					idleAction = mixer.clipAction( animations[ 0 ] );
+					walkAction = mixer.clipAction( animations[ 3 ] );
+					runAction = mixer.clipAction( animations[ 1 ] );
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x333333 );
-			scene.add( new THREE.AmbientLight( 0xffffff ) );
+					actions = [ idleAction, walkAction, runAction ];
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
+					activateAllActions();
 
-			container.appendChild( renderer.domElement );
-
-
-			// Load skinned mesh
-
-			new THREE.ObjectLoader().load( url, function ( loadedObject ) {
-
-				loadedObject.traverse( function ( child ) {
-
-					if ( child instanceof THREE.SkinnedMesh ) {
-
-						mesh = child;
-
-					}
+					animate();
 
 				} );
 
-				if ( mesh === undefined ) {
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
 
-					alert( 'Unable to find a SkinnedMesh in this place:\n\n' + url + '\n\n' );
-					return;
-
-				}
-
-
-				// Add mesh and skeleton helper to scene
-
-				mesh.rotation.y = - 135 * Math.PI / 180;
-				scene.add( mesh );
-
-				skeleton = new THREE.SkeletonHelper( mesh );
-				skeleton.visible = false;
-				scene.add( skeleton );
-
-
-				// Initialize camera and camera controls
-
-				var radius = mesh.geometry.boundingSphere.radius;
-
-				var aspect = window.innerWidth / window.innerHeight;
-				camera = new THREE.PerspectiveCamera( 45, aspect, 1, 10000 );
-				camera.position.set( 0.0, radius, radius * 3.5 );
-
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, radius, 0 );
-				controls.update();
-
-
-				// Create the control panel
-
-				createPanel();
-
-
-				// Initialize mixer and clip actions
-
-				mixer = new THREE.AnimationMixer( mesh );
-
-				idleAction = mixer.clipAction( 'idle' );
-				walkAction = mixer.clipAction( 'walk' );
-				runAction = mixer.clipAction( 'run' );
-				actions = [ idleAction, walkAction, runAction ];
-
-				activateAllActions();
-
-
-				// Listen on window resizing and start the render loop
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				animate();
 
-
-			} );
-
+			}
 
 			function createPanel() {
 
@@ -281,7 +278,7 @@
 
 			function showModel( visibility ) {
 
-				mesh.visible = visibility;
+				model.visible = visibility;
 
 			}
 
@@ -310,7 +307,6 @@
 
 			}
 
-
 			function activateAllActions() {
 
 				setWeight( idleAction, settings[ 'modify idle weight' ] );
@@ -324,7 +320,6 @@
 				} );
 
 			}
-
 
 			function pauseContinue() {
 
@@ -349,7 +344,6 @@
 
 			}
 
-
 			function pauseAllActions() {
 
 				actions.forEach( function ( action ) {
@@ -359,7 +353,6 @@
 				} );
 
 			}
-
 
 			function unPauseAllActions() {
 
@@ -371,7 +364,6 @@
 
 			}
 
-
 			function toSingleStepMode() {
 
 				unPauseAllActions();
@@ -380,7 +372,6 @@
 				sizeOfNextStep = settings[ 'modify step size' ];
 
 			}
-
 
 			function prepareCrossFade( startAction, endAction, defaultDuration ) {
 
