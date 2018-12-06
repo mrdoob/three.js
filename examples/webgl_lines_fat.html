@@ -232,7 +232,9 @@
 
 				event.preventDefault();
 
-				var intersects = getIntersects( event.layerX, event.layerY );
+				var intersects = [];
+
+				getIntersects( event.layerX, event.layerY, intersects );
 
 				if ( intersects.length > 0 ) {
 
@@ -260,17 +262,17 @@
 			}
 
 			var raycaster = new THREE.Raycaster();
-			var mouseVector = new THREE.Vector3();
+			var mouseVector = new THREE.Vector2();
 
-			function getIntersects( x, y ) {
+			function getIntersects( x, y, intersects ) {
 
 				x = ( x / window.innerWidth ) * 2 - 1;
 				y = - ( y / window.innerHeight ) * 2 + 1;
 
-				mouseVector.set( x, y, 0.5 );
+				mouseVector.set( x, y );
 				raycaster.setFromCamera( mouseVector, camera );
 
-				return raycaster.intersectObject( scene, true );
+				raycaster.intersectObject( scene, true, intersects );
 
 			}
 
