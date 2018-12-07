@@ -30,7 +30,6 @@
 			span {
 				display: inline-block;
 				width: 60px;
-				float: left;
 				text-align: center;
 			}
 
@@ -72,8 +71,8 @@
 
 				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
 				camera.position.x = 0.4;
-				camera.position.z = -2;
-				camera.up.set(0,0,1);
+				camera.position.z = - 2;
+				camera.up.set( 0, 0, 1 );
 
 				controls = new THREE.TrackballControls( camera );
 
@@ -102,7 +101,7 @@
 
 					scene.add( mesh );
 					var center = mesh.geometry.boundingSphere.center;
-					controls.target.set( center.x, center.y, center.z);
+					controls.target.set( center.x, center.y, center.z );
 					controls.update();
 
 				} );
@@ -116,7 +115,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				window.addEventListener('keypress', keyboard);
+				window.addEventListener( 'keypress', keyboard );
 
 			}
 
@@ -129,24 +128,24 @@
 
 			}
 
-			function keyboard ( ev ) {
+			function keyboard( ev ) {
 
 				var ZaghettoMesh = scene.getObjectByName( 'Zaghetto.pcd' );
 
 				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
 
 					case '+':
-						ZaghettoMesh.material.size*=1.2;
+						ZaghettoMesh.material.size *= 1.2;
 						ZaghettoMesh.material.needsUpdate = true;
 						break;
 
 					case '-':
-						ZaghettoMesh.material.size/=1.2;
+						ZaghettoMesh.material.size /= 1.2;
 						ZaghettoMesh.material.needsUpdate = true;
 						break;
 
 					case 'c':
-						ZaghettoMesh.material.color.setHex(Math.random()*0xffffff);
+						ZaghettoMesh.material.color.setHex( Math.random() * 0xffffff );
 						ZaghettoMesh.material.needsUpdate = true;
 						break;
 

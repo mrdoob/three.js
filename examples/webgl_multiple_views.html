@@ -64,10 +64,12 @@
 					eye: [ 0, 300, 1800 ],
 					up: [ 0, 1, 0 ],
 					fov: 30,
-					updateCamera: function ( camera, scene, mouseX, mouseY ) {
+					updateCamera: function ( camera, scene, mouseX ) {
+
 					  camera.position.x += mouseX * 0.05;
-					  camera.position.x = Math.max( Math.min( camera.position.x, 2000 ), -2000 );
+					  camera.position.x = Math.max( Math.min( camera.position.x, 2000 ), - 2000 );
 					  camera.lookAt( scene.position );
+
 					}
 				},
 				{
@@ -79,10 +81,12 @@
 					eye: [ 0, 1800, 0 ],
 					up: [ 0, 0, 1 ],
 					fov: 45,
-					updateCamera: function ( camera, scene, mouseX, mouseY ) {
+					updateCamera: function ( camera, scene, mouseX ) {
+
 					  camera.position.x -= mouseX * 0.05;
-					  camera.position.x = Math.max( Math.min( camera.position.x, 2000 ), -2000 );
+					  camera.position.x = Math.max( Math.min( camera.position.x, 2000 ), - 2000 );
 					  camera.lookAt( camera.position.clone().setY( 0 ) );
+
 					}
 				},
 				{
@@ -94,10 +98,12 @@
 					eye: [ 1400, 800, 1400 ],
 					up: [ 0, 1, 0 ],
 					fov: 60,
-					updateCamera: function ( camera, scene, mouseX, mouseY ) {
+					updateCamera: function ( camera, scene, mouseX ) {
+
 					  camera.position.y -= mouseX * 0.05;
-					  camera.position.y = Math.max( Math.min( camera.position.y, 1600 ), -1600 );
+					  camera.position.y = Math.max( Math.min( camera.position.y, 1600 ), - 1600 );
 					  camera.lookAt( scene.position );
+
 					}
 				}
 			];
@@ -109,9 +115,9 @@
 
 				container = document.getElementById( 'container' );
 
-				for (var ii =  0; ii < views.length; ++ii ) {
+				for ( var ii = 0; ii < views.length; ++ ii ) {
 
-					var view = views[ii];
+					var view = views[ ii ];
 					var camera = new THREE.PerspectiveCamera( view.fov, window.innerWidth / window.innerHeight, 1, 10000 );
 					camera.position.fromArray( view.eye );
 					camera.up.fromArray( view.up );
@@ -148,19 +154,19 @@
 
 				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.y = - 250;
-				shadowMesh.rotation.x = - Math. PI / 2;
+				shadowMesh.rotation.x = - Math.PI / 2;
 				scene.add( shadowMesh );
 
 				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.x = - 400;
 				shadowMesh.position.y = - 250;
-				shadowMesh.rotation.x = - Math. PI / 2;
+				shadowMesh.rotation.x = - Math.PI / 2;
 				scene.add( shadowMesh );
 
 				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.x = 400;
 				shadowMesh.position.y = - 250;
-				shadowMesh.rotation.x = - Math. PI / 2;
+				shadowMesh.rotation.x = - Math.PI / 2;
 				scene.add( shadowMesh );
 
 				var radius = 200;
@@ -244,10 +250,10 @@
 
 				if ( windowWidth != window.innerWidth || windowHeight != window.innerHeight ) {
 
-					windowWidth  = window.innerWidth;
+					windowWidth = window.innerWidth;
 					windowHeight = window.innerHeight;
 
-					renderer.setSize ( windowWidth, windowHeight );
+					renderer.setSize( windowWidth, windowHeight );
 
 				}
 
@@ -259,15 +265,16 @@
 				stats.update();
 
 				requestAnimationFrame( animate );
+
 			}
 
 			function render() {
 
 				updateSize();
 
-				for ( var ii = 0; ii < views.length; ++ii ) {
+				for ( var ii = 0; ii < views.length; ++ ii ) {
 
-					var view = views[ii];
+					var view = views[ ii ];
 					var camera = view.camera;
 
 					view.updateCamera( camera, scene, mouseX, mouseY );

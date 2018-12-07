@@ -10,56 +10,55 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Base class for implementing loaders.</p>
+		<p class="desc">所有加载器的基类</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造方法</h2>
 
 
 		<h3>[name]()</h3>
 		<p>
-		Creates a new [name]. This should be called as base class.
+		当创建一个新的 [name]， 将调用此基类。
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Function onLoadStart]</h3>
-		<p>Will be called when load starts.</p>
-		<p>The default is a function with empty body.</p>
+		<p>当加载开始时，将被调用。</p>
+		<p>默认实现是一个空函数体。</p>
 
 		<h3>[property:Function onLoadProgress]</h3>
-		<p>Will be called while load progresses.</p>
-		<p>The default is a function with empty body.</p>
+		<p>当进入加载流程中，将被调用。</p>
+		<p>默认实现是一个空函数体。</p>
 
 		<h3>[property:Function onLoadComplete]</h3>
-		<p>Will be called when load completes.</p>
-		<p>The default is a function with empty body.</p>
+		<p>当加载完成时，将被调用。</p>
+		<p>默认实现是一个空函数体。</p>
 
 		<h3>[property:string crossOrigin]</h3>
 		<p>
-		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
-		Default is *"anonymous"*.
+            跨域字符串，用于实现跨域，以便从允许CORS从其他域加载url。默认为"anonymous"。
 		</p>
 
 		<h2>Methods</h2>
 
 		<h3>[method:Material createMaterial]( [param:object m], [param:string texturePath] )</h3>
 		<p>
-		[page:Object m] — The parameters to create the material. <br />
-		[page:String texturePath] — The base path of the textures.
+		[page:Object m] — 所要创建的材质的参数。 <br />
+		[page:String texturePath] — 纹理加载路径。
 		</p>
 		<p>
-		Creates the Material based on the parameters m.
+		基于参数m来创建材质。
 		</p>
 
 		<h3>[method:Array initMaterials]( [param:Array materials], [param:string texturePath] )</h3>
 		<p>
-		[page:Array materials] — an array of parameters to create materials. <br />
-		[page:String texturePath] —  The base path of the textures.
+		[page:Array materials] — 用于创建材质的参数数组。 <br />
+		[page:String texturePath] —  纹理加载路径。
 		</p>
 		<p>
-		Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials.
+		基于参数数组m,来创建 [page:Material] 数组. 参数索引与材质的索引一致。
 		</p>
 
 

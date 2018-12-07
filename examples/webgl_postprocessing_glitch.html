@@ -21,9 +21,7 @@
 				width: 100%;
 			}
 
-			label, input {
-				cursor: pointer;
-			}
+			input { cursor: pointer; }
 		</style>
 	</head>
 	<body>
@@ -54,8 +52,10 @@
 			animate();
 
 			function updateOptions() {
-				var wildGlitch = document.getElementById('wildGlitch');
-				glitchPass.goWild=wildGlitch.checked;
+
+				var wildGlitch = document.getElementById( 'wildGlitch' );
+				glitchPass.goWild = wildGlitch.checked;
+
 			}
 
 			function init() {

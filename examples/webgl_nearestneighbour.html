@@ -80,10 +80,6 @@
 
 			var clock = new THREE.Clock();
 
-			var blocker = document.getElementById( 'blocker' );
-			var instructions = document.getElementById( 'instructions' );
-
-
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000000 );
@@ -128,7 +124,7 @@
 						tex1: { value: imagePreviewTexture },
 						zoom: { value: 9.0 }
 					},
-					vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 					transparent: true
 				} );
@@ -137,7 +133,7 @@
 				//create particles with buffer geometry
 				var distanceFunction = function ( a, b ) {
 
-					return Math.pow( a[ 0 ] - b [0 ], 2 ) +  Math.pow( a[ 1 ] - b[ 1 ], 2 ) +  Math.pow( a[ 2 ] - b[ 2 ], 2 );
+					return Math.pow( a[ 0 ] - b[ 0 ], 2 ) + Math.pow( a[ 1 ] - b[ 1 ], 2 ) + Math.pow( a[ 2 ] - b[ 2 ], 2 );
 
 				};
 
@@ -183,6 +179,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				controls.handleResize();
+
 			}
 
 			function animate() {

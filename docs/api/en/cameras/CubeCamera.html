@@ -43,11 +43,17 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution] )</h3>
+		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution], [param:Object options] )</h3>
 		<p>
 		near -- The near clipping distance. <br />
 		far -- The far clipping distance <br />
-		cubeResolution -- Sets the length of the cube's edges.
+		cubeResolution -- Sets the length of the cube's edges. <br />
+		options - (optional) object that holds texture parameters passed to the auto-generated WebGLRenderTargetCube.
+		If not specified, the options default to:
+		<code>
+		{ format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter }
+		</code>
+
 		</p>
 		<p>
 		Constructs a CubeCamera that contains 6 [page:PerspectiveCamera PerspectiveCameras] that

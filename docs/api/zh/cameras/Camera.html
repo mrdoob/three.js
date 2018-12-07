@@ -13,20 +13,24 @@
 		<h1>摄像机（[name]）</h1>
 
 		<p class="desc">
-			摄像机的抽象基类，你创建一个摄像机总会继承这个类。
+			摄像机的抽象基类。在构建新摄像机时，应始终继承此类。
 		</p>
 
 
-		<h2>构造器</h2>
+		<h2>构造函数</h2>
+
 
 
 		<h3>[name]()</h3>
 		<p>
+
 			创建一个新的[name]（摄像机）。注意：这个类并不是被直接调用的；你所想要的或许是一个 [page:PerspectiveCamera]（透视摄像机）或者 [page:OrthographicCamera]（正交摄像机）。
+
 		</p>
 
 
 		<h2>属性</h2>
+
 		<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
 
 		<h3>[property:Boolean isCamera]</h3>
@@ -35,16 +39,20 @@
 			<br /><br />
 
 			你不应当对这个属性进行改变，因为它在内部由渲染器使用，以用于优化。
+
 		</p>
 
 		<h3>[property:Layers layers]</h3>
 		<p>
+
 		摄像机是一个[page:Layers layers]的成员. 这是一个从[page:Object3D]继承而来的属性。<br /><br />
 			 当摄像机的视点被渲染的时候，物体必须和当前被看到的摄像机共享至少一个层。
+
 		</p>
 
 		<h3>[property:Matrix4 matrixWorldInverse]</h3>
 		<p>
+
 			这是matrixWorld矩阵的逆矩阵。 MatrixWorld包含了相机的世界变换矩阵。
 		</p>
 
@@ -61,15 +69,19 @@
 		<h3>[method:Camera clone]( )</h3>
 		<p>
 			 返回一个具有和当前相机的属性一样的新的相机。
+
 		</p>
 
 		<h3>[method:Camera copy]( [param:Camera source], [param:Boolean recursive] )</h3>
 		<p>
+
 		将源摄像机的属性复制到新摄像机中。
+
 		</p>
 
 		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
 		<p>
+
 		[page:Vector3 target] — 调用该函数的结果将复制给该Vector3对象。<br /><br />
 
 		返回一个能够表示当前摄像机所正视的世界空间方向的[page:Vector3]对象。

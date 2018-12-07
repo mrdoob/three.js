@@ -51,11 +51,9 @@
 
 			}
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
-
-			var geometry, objects;
 
 			var controls, clock = new THREE.Clock();
 
@@ -115,7 +113,7 @@
 					}
 
 					lod.position.x = 10000 * ( 0.5 - Math.random() );
-					lod.position.y =  7500 * ( 0.5 - Math.random() );
+					lod.position.y = 7500 * ( 0.5 - Math.random() );
 					lod.position.z = 10000 * ( 0.5 - Math.random() );
 					lod.updateMatrix();
 					lod.matrixAutoUpdate = false;
