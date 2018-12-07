@@ -98,6 +98,20 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
+	this.setAngle = function (phi, theta, distance) {
+
+		var r = distance || scope.object.position.distanceTo(scope.target);
+
+		var x = r * Math.cos(phi - Math.PI / 2) * Math.sin(theta) + scope.target.x;
+		var y = r * Math.sin(phi + Math.PI / 2) + scope.target.y;
+		var z = r * Math.cos(phi - Math.PI / 2) * Math.cos(theta) + scope.target.z;
+
+		scope.object.position.set(x, y, z);
+
+		scope.object.lookAt(scope.target);
+
+	};
+	
 	this.saveState = function () {
 
 		scope.target0.copy( scope.target );
