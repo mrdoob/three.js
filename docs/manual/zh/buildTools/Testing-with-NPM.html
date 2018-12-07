@@ -8,69 +8,67 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>使用NPM进行测试（[name]）</h1>
 
 		<p class="desc">
-			This article shows how to get three.js into a [link:https://nodejs.org/en/ node.js] environment so that you
-			can execute automated tests. Tests can be run on the command line, or by automated
-			CI tools like [link:https://travis-ci.org/ Travis].
+			这篇文章展示了如何将three.js置入[link:https://nodejs.org/en/ node.js]环境中，
+			这样你就可以执行自动化测试了。测试可以通过命令行或者类似[link:https://travis-ci.org/ Travis]的CI工具来运行。
 		</p>
 
-		<h2>The short version</h2>
+		<h2>一句话概括</h2>
 
 		<p>
-			If you're comfortable with node and npm,
+			如果你习惯使用node和npm，
 			<code>
 				$ npm install three --save-dev
 			</code>
-			and add
+			并将
 		<code>
 			var THREE = require('three');
 		</code>
-			to your test.
+			添加到你的测试中。
 		</p>
 
-		<h2>Create a testable project from scratch</h2>
+		<h2>从头创建一个可测试的项目</h2>
 		<p>
-			If you're not familiar with these tools, here's a quick guide (for linux, the installation process
-			will be slightly different using windows, but the NPM commands are identical).
+			如果你不太熟悉这些工具，下面是一个快速入门。（基于linux，在windows上的安装过程会稍稍有点不一样，不过NPM指令是相同的。）
 		</p>
 
-		<h3>Basic setup</h3>
+		<h3>基本设置</h3>
 		<div>
 			<ol>
 				<li>
-					Install [link:https://www.npmjs.org/ npm] and nodejs. The shortest path typically looks something like
+					安装[link:https://www.npmjs.org/ npm]和nodejs。最简单的方式一般像这样
 					<code>
 $ sudo apt-get install -y npm nodejs-legacy
-# fix any problems with SSL in the default registry URL
+# 修复默认registry URL中任何SSL的问题
 $ npm config set registry http://registry.npmjs.org/
 					</code>
 				</li>
 
 				<li>
-					Make a new project directory
+					新建一个项目路径
 					<code>
 						 $ mkdir test-example; cd test-example
 					</code>
 				</li>
 
 				<li>
-					Ask npm to create a new project file for you:
+					让npm为你创建一份新的项目文件：
 					<code>
 					 $ npm init
 					</code>
-					 and accept all defaults by hitting Enter on all the prompts.
-					 This will create package.json.
+					 在所有出现的提示中敲击回车键来接受默认值。
+					 这样，一份package.json就建立好了。
 				</li><br />
 
 				<li>
-					Try and start the test feature with
+					尝试启动测试功能
 					<code>
 $ npm test
 					</code>
-					This will fail, which is expected.
-					If you look in the package.json, the definition of the test script is
+					当然，这一定会失败。
+					如果你检查一下package.json，test script的定义是这样的
 					<code>
 						"test": "echo \"Error: no test specified\" && exit 1"
 					</code>
@@ -79,78 +77,75 @@ $ npm test
 			</ol>
 		</div>
 
-		<h2>Add mocha</h2>
+		<h2>添加mocha</h2>
 		<div>
-			We're going to use [link:https://mochajs.org/ mocha].
+			我们将使用[link:https://mochajs.org/ mocha]。
 
 			<ol>
 				<li>
-					Install mocha with
+					安装mocha
 					<code>
 $ npm install mocha --save-dev
 					</code>
-					Notice that node_modules/ is created and your dependencies appear in there.
-				  Also notice that your package.json has been updated: the property devDependencies
-					is added and updated by the use of --save-dev.
+					你会注意到 node_modules/ 被创建了，并且你的依赖都出现在了这里面。
+					还有你的package.json被更新了，--save-dev指令向其中加入并更新了devDependencies属性。
 				</li><br />
 
 				<li>
-					Edit package.json to use mocha for testing. When test is invoked, we just want to run
-					mocha and specify a verbose reporter. By default this will run anything in test/
-					(not having directory test/ can run into npm ERR!, create it by mkdir test)
+					编辑package.json来使用mocha进行测试。当调用测试的时候，我们只想运行mocha并且生成一份详细的报告。
+					默认情况下这会运行 test/ 中的任何东西。
+					（如果项目中没有 test/ 目录的话，会导致npm报错。你可以通过mkdir test来创建这个目录）
 					<code>
 						"test": "mocha --reporter list"
 					</code>
 				</li>
 
 				<li>
-					Rerun the test with
+					重新运行测试
 					<code>
 						$ npm test
 					</code>
 
-					This should now succeed, reporting 0 passing (1ms)
-				 	or similar.
+					现在应该就能成功执行了，生成类似 0 passing (1ms) 的报告。
 				</li>
 
 			</ol>
 		</div>
 
-		<h2>Add three.js</h2>
+		<h2>添加three.js</h2>
 		<div>
 			<ol>
 				<li>
-					Let's pull in our three.js dependency with
+					现在添加我们的three.js依赖
 					<code>
 $ npm install three --save-dev
 					</code>
 					<ul>
 						<li>
-							If you need a different three version, use
+							如果你需要three.js的其他版本，使用
 							<code>
 								$ npm show three versions
 							</code>
-						  to see
-							what's available. To tell npm the right one, use
+						  	来确认哪些是可用的。要让npm使用正确的版本，执行
 							<code>
  $ npm install three@0.84.0 --save
 							</code>
-							(0.84.0 in this example). --save makes this a dependency of this project, rather than
-							dev dependency. See the docs [link:https://www.npmjs.org/doc/json.html here] for more info.
+							（例子中用的是0.84.0）。 --save 指令将此加入项目的dependency而不是dev dependency。
+							更多信息请参阅<a href="https://www.npmjs.org/doc/json.html">这份文档</a>。
 						</li>
 					</ul>
 				</li>
 
 				<li>
-					Mocha will look for tests in test/, so let's
+					Mocha会在 test/ 目录中寻找测试文件，所以我们先创建这个目录：
 					<code>
 					$ mkdir test
 					</code>
 				</li>
 
 				<li>
-					Finally we actually need a JS test to run. Let's add a simple test that will verify that
-					the three.js object is available and working. Create test/verify-three.js containing:
+					最后我们需要一份JS测试文件来运行。我们就添加一段简单的测试程序，这段程序会检验three.js对象是否能正常工作。
+					在 test/ 目录下创建verify-three.js包含以下代码：
 <code>
 var THREE = require('three');
 var assert = require("assert");
@@ -169,8 +164,7 @@ describe('The THREE object', function() {
 				</li>
 
 				<li>
-				Finally let's test again with $ npm test. This should run the tests above and succeed,
-				showing something like:
+				最后再次通过$ npm test来测试。这次应该能正确执行上面的代码，并且返回类似：
 				<code>
 The THREE object should have a defined BasicShadowMap constant: 0ms
 The THREE object should be able to construct a Vector3 with default of x=0: 0ms
@@ -180,33 +174,33 @@ The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 			</ol>
 		</div>
 
-		<h2>Add your own code</h2>
+		<h2>加入你自己的代码</h2>
 		<div>
-			You need to do three things:
+			你需要做下面三件事：
 
 			<ol>
 				<li>
-					Write a test for the expected behaviour of your code, and place it under test/.
-					[link:https://github.com/air/encounter/blob/master/test/Physics-test.js Here] is an example from a real project.
+					为你的代码写一段测试程序来检验期望结果，并把它放在 test/ 目录下。
+					<a href="https://github.com/air/encounter/blob/master/test/Physics-test.js">这里</a>有一个实际项目的例子。
 				</li>
 
 				<li>
-					Export your functional code in such a way that nodejs can see it, for use in conjunction with require.
-					See it [link:https://github.com/air/encounter/blob/master/js/Physics.js here].
+					将你的代码以nodejs承认的方式导出，即可以通过require的方式引用。
+					参考<a href="https://github.com/air/encounter/blob/master/js/Physics.js">这份代码</a>。
 				</li>
 
 				<li>
-					Require your code into the test file, in the same way we did a require('three') in the example above.
+					在测试程序中通过require引入你自己的代码，就像上面例子中我们通过require('three')来引入一样。
 				</li>
 			</ol>
 
 			<p>
-				Items 2 and 3 will vary depending on how you manage your code. In the example of Physics.js
-		  	given above, the export part is right at the end. We assign an object to module.exports:
+				第2、3条会根据你组织代码的方式而改变。在上面给出的Physics.js的例子中，导出的部分在代码的最末尾。
+				我们将module.exports赋值为一个对象:
 			</p>
 			<code>
 //=============================================================================
-// make available in nodejs
+// 为了在nodejs中可用
 //=============================================================================
 if (typeof exports !== 'undefined')
 {
@@ -215,38 +209,35 @@ if (typeof exports !== 'undefined')
 			</code>
 		</div>
 
-		<h2>Dealing with dependencies</h2>
+		<h2>处理依赖</h2>
 		<div>
 			<p>
-				If you're already using something clever like require.js or browserify, skip this part.
+				如果你已经在使用require.js或者browserify之类的便捷工具，就跳过这个部分。
 			</p>
 			<p>
-				Typically a three.js project is going to run in the browser. Module loading is hence done by
-				the browser executing a bunch of script tags. Your individual files don't have to worry
-				about dependencies. In a nodejs context however, there is no index.html binding everything
-				together, so you have to be explicit.
+				一般来说，一个three.js项目将在浏览器中运行，浏览器会通过执行一系列script标签来加载模块。
+				你自己的文件不用考虑依赖的问题。然而在nodejs环境中，没有一个关联所有文件的index.html，所以你需要显式地加载。
 			</p>
 			<p>
-				If you're exporting a module that depends on other files, you're going to have to tell node to load them.
-				Here is one approach:
+				如果你要导出的模块还依赖其他文件，你需要告诉node去加载它们。下面是一种方式：
 			</p>
 			<ol>
 				<li>
-					At the start of your module, check to see if you're in a nodejs environment.
+					在你的模块顶部，检查是否处于nodejs环境中。
 				</li>
 				<li>
-					If so, explicitly declare your dependencies.
+					如果是，那就显式地声明你的依赖。
 				</li>
 				<li>
-					If not, you're probably in a browser so you don't need to do anything else.
+					如果不是，你多半处于浏览器环境中。这时候你不需要做任何多余操作。
 				</li>
 			</ol>
-			Example code from Physics.js:
+			用Physics.js中的代码举例:
 			<code>
 //=============================================================================
-// setup for server-side testing
+// 服务器端测试配置
 //=============================================================================
-if (typeof require === 'function') // test for nodejs environment
+if (typeof require === 'function') // 检测nodejs环境
 {
   var THREE = require('three');
   var MY3 = require('./MY3.js');

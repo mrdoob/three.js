@@ -11,43 +11,40 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		A class containing utility functions for shapes.<br /><br />
+		一个包含形状实用函数的类。<br /><br />
 
-		Note that these are all linear functions so it is neccessary to calculate separately for
-		x, y (and z, w if present) components of a vector.
+		请注意，这些都是线性函数，因此有必要分别计算向量的x，y（和z，w，如果存在的话）分量。
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Number area]( contour )</h3>
 		<p>
-		contour -- 2D polygon.<br /><br />
+		contour -- 2D多边形。<br /><br />
 
-		Calculate area of a ( 2D ) contour polygon.<br /><br />
+		计算（2D）轮廓多边形的面积。<br /><br />
 
 		</p>
 
 		<h3>[method:Boolean isClockwise]( pts )</h3>
 		<p>
-		pts -- points defining a 2D polygon<br /><br />
+		pts -- 定义2D多边形的点<br /><br />
 
-		Note that this is a linear function so it is neccessary to calculate separately for
-		x, y  components of a polygon.<br /><br />
+		请注意，这是一个线性函数，因此需要分别计算多边形的x，y分量。<br /><br />
 
-		Used internally by [page:Path Path],
-		[page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry].
+		由[page:Path Path]，[page:ExtrudeGeometry ExtrudeGeometry]和[page:ShapeGeometry ShapeGeometry]内部使用。
 		</p>
 
 		<h3>[method:Array triangulateShape]( contour, holes )</h3>
 		<p>
-		contour -- 2D polygon.<br />
-		holes -- array of holes<br /><br />
+		contour -- 2D多边形。<br />
+		holes -- 空洞数组<br /><br />
 
-		Used internally by [page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry] to calculate faces in shapes with holes.
+		由[page:ExtrudeGeometry ExtrudeGeometry]和[page:ShapeGeometry ShapeGeometry]内部使用以计算带孔的形状中的面。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
