@@ -70,15 +70,6 @@
 			var opaqueObjects = []
 			var targets = []
 
-			var globalPeelUniforms = { 
-				uLayer: { value: 0 },
-				uPrevDepthTexture: { value: null },
-				uPrevColorTexture: { value: null },
-				uScreenSize: { value: new THREE.Vector2(1,1) },
-				uDepthPeel: { value: 1 },
-				uDepthOffset: { value: 0 },
-			} 
-
 			var options = {
 				layers: 1,
 				opacity: 0.5,
@@ -86,6 +77,15 @@
 				enabled: false,
 				monochrome: false,
 			}
+
+			var globalPeelUniforms = { 
+				uLayer: { value: 0 },
+				uPrevDepthTexture: { value: null },
+				uPrevColorTexture: { value: null },
+				uScreenSize: { value: new THREE.Vector2(1,1) },
+				uDepthPeel: { value: Number(options.enabled) },
+				uDepthOffset: { value: 0 },
+			} 
 
 			gui.add(options, 'layers', 1, 6).step(1)
 			gui.add(options, 'opacity', 0, 1).onChange(onOpacityChange)
@@ -125,9 +125,9 @@
 
 			function onModeChange(){
 				transparentObjects.forEach(o=>{
-					o.material.transparent = options.enabled
+					o.material.transparent = !options.enabled
 				})
-				globalPeelUniforms.uDepthPeel.value = options.enabled ? 0 : 1 
+				globalPeelUniforms.uDepthPeel.value = Number(options.enabled) 
 			}
 
 			function getSide(){
@@ -380,6 +380,8 @@
 
 				scene.updateMatrixWorld()
 
+				onModeChange()
+
 				animate()
 
 			}
@@ -470,7 +472,7 @@
 
 			function render() {
 
-				if(options.enabled){
+				if(!options.enabled){
 
 					renderer.clear()
 					renderer.render( scene, camera )
