@@ -67,6 +67,7 @@
 			var prevLinewidth;
 			var stats;
 			var gui;
+			var intersects = [];
 
 			// viewport
 			var insetWidth;
@@ -232,8 +233,6 @@
 
 				event.preventDefault();
 
-				var intersects = [];
-
 				getIntersects( event.layerX, event.layerY, intersects );
 
 				if ( intersects.length > 0 ) {
@@ -251,6 +250,8 @@
 						res.object.material.linewidth = prevLinewidth + prevLinewidth / 3;
 
 					}
+
+					intersects.length = 0;
 
 				} else if ( prevLinewidth !== undefined ) {
 
