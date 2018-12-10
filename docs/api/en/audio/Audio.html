@@ -62,6 +62,9 @@
 		<h3>[property:AudioContext context]</h3>
 		<p>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</p>
 
+		<h3>[property:Number detune]</h3>
+		<p>Modify pitch, measured in cents. +/- 100 is a semitone. +/- 1200 is an octave. Default is *0*.</p>
+
 		<h3>[property:Array filters]</h3>
 		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</p>
 
@@ -73,11 +76,14 @@
 		<p>Whether playback can be controlled using the [page:Audio.play play](),
 			[page:Audio.pause pause]() etc. methods. Default is *true*.</p>
 
-		<h3>[property:Number playbackRate]</h3>
-		<p>Speed of playback. Default is *1*.</p>
-
 		<h3>[property:Boolean isPlaying]</h3>
 		<p>Whether the audio is currently playing.</p>
+
+		<h3>[property:AudioListener listener]</h3>
+		<p>A reference to the listener object of this audio.</p>
+
+		<h3>[property:Number playbackRate]</h3>
+		<p>Speed of playback. Default is *1*.</p>
 
 		<h3>[property:Number startTime]</h3>
 		<p>The time at which the sound should begin to play. Same as the *when* paramter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *0*.</p>

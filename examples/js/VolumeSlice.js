@@ -196,13 +196,15 @@ THREE.VolumeSlice.prototype = {
 		this.ctx = this.canvas.getContext( '2d' );
 		this.ctxBuffer = this.canvasBuffer.getContext( '2d' );
 
+		if ( this.geometry ) this.geometry.dispose(); // dispose existing geometry
+
 		this.geometry = new THREE.PlaneBufferGeometry( extracted.planeWidth, extracted.planeHeight );
 
 		if ( this.mesh ) {
 
 			this.mesh.geometry = this.geometry;
 			//reset mesh matrix
-			this.mesh.matrix = ( new THREE.Matrix4() ).identity();
+			this.mesh.matrix.identity();
 			this.mesh.applyMatrix( this.matrix );
 
 		}

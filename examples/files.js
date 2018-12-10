@@ -14,6 +14,7 @@ var files = {
 		"webgl_decals",
 		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
+		"webgl_effects_ascii",
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
@@ -89,7 +90,6 @@ var files = {
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_extensions",
 		"webgl_loader_imagebitmap",
-		"webgl_loader_json",
 		"webgl_loader_json_claraio",
 		"webgl_loader_kmz",
 		"webgl_loader_md2",
@@ -188,7 +188,6 @@ var files = {
 		"webgl_modifier_tessellation",
 		"webgl_morphtargets",
 		"webgl_morphtargets_horse",
-		"webgl_morphtargets_human",
 		"webgl_morphtargets_sphere",
 		"webgl_multiple_canvases_circle",
 		"webgl_multiple_canvases_complex",
@@ -216,6 +215,7 @@ var files = {
 		"webgl_points_billboards",
 		"webgl_points_dynamic",
 		"webgl_points_sprites",
+		"webgl_points_waves",
 		"webgl_postprocessing",
 		"webgl_postprocessing_advanced",
 		"webgl_postprocessing_afterimage",
@@ -287,6 +287,7 @@ var files = {
 		"webgl_buffergeometry_instancing_lambert",
 		"webgl_buffergeometry_lines",
 		"webgl_buffergeometry_lines_indexed",
+		"webgl_buffergeometry_morphtargets",
 		"webgl_buffergeometry_points",
 		"webgl_buffergeometry_points_interleaved",
 		"webgl_buffergeometry_rawshader",
@@ -313,8 +314,8 @@ var files = {
 	],
 	"webgl2": [
 		"webgl2_materials_texture3d",
-		"webgl2_materials_texture3d_volume"
-		// "webgl2_sandbox"
+		"webgl2_materials_texture3d_volume",
+		"webgl2_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -326,7 +327,6 @@ var files = {
 		"webvr_ballshooter",
 		"webvr_cubes",
 		"webvr_dragging",
-		"webvr_frustum",
 		"webvr_lorenzattractor",
 		"webvr_panorama",
 		"webvr_paint",
@@ -341,6 +341,7 @@ var files = {
 		"misc_animation_authoring",
 		"misc_animation_groups",
 		"misc_animation_keys",
+		"misc_boxselection",
 		"misc_controls_deviceorientation",
 		"misc_controls_fly",
 		"misc_controls_map",
@@ -352,9 +353,7 @@ var files = {
 		"misc_exporter_obj",
 		"misc_exporter_stl",
 		"misc_fps",
-		"misc_lights_test",
 		"misc_lookat",
-		"misc_ubiquity_test2",
 		"misc_uv_tests"
 	],
 	"css3d": [
