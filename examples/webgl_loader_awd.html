@@ -37,17 +37,21 @@
 		<script src="js/loaders/AWDLoader.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
-			var camera, scene, renderer, objects, controls;
-			var particleLight, pointLight;
+			var camera, scene, renderer;
+			var pointLight;
 			var trunk;
 
 			var loader = new THREE.AWDLoader();
@@ -62,8 +66,8 @@
 
 			} );
 
+			function createMaterial() {
 
-			function createMaterial( name ){
 				// console.log( name );
 				// var mat = new THREE.MeshPhongMaterial({
 				// 	color: 0xaaaaaa,
@@ -72,8 +76,8 @@
 				// });
 				// return mat;
 				return null;
-			}
 
+			}
 
 			function init() {
 
@@ -81,24 +85,22 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 70, 50, -100 );
+				camera.position.set( 70, 50, - 100 );
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera );
 
 				scene = new THREE.Scene();
-
 
 				// Add the AWD SCENE
 
 				scene.add( trunk );
 
-
 				// Lights
 
 				scene.add( new THREE.AmbientLight( 0x606060 ) );
 
-				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
-				directionalLight.position.set( .2, -1, .2 );
+				var directionalLight = new THREE.DirectionalLight( /*Math.random() * 0xffffff*/0xeeeeee );
+				directionalLight.position.set( .2, - 1, .2 );
 				directionalLight.position.normalize();
 				scene.add( directionalLight );
 
@@ -127,8 +129,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
-
 
 			function render() {
 

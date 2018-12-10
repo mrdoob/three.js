@@ -7,7 +7,7 @@
  *
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
- *  amount: <int>, // Depth to extrude the shape
+ *  depth: <float>, // Depth to extrude the shape
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into the original shape bevel goes
@@ -49,6 +49,17 @@ function ExtrudeGeometry( shapes, options ) {
 ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
 ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
 
+ExtrudeGeometry.prototype.toJSON = function () {
+
+	var data = Geometry.prototype.toJSON.call( this );
+
+	var shapes = this.parameters.shapes;
+	var options = this.parameters.options;
+
+	return toJSON( shapes, options, data );
+
+};
+
 // ExtrudeBufferGeometry
 
 function ExtrudeBufferGeometry( shapes, options ) {
@@ -72,7 +83,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
 
 		var shape = shapes[ i ];
-		addShape( shape, options );
+		addShape( shape );
 
 	}
 
@@ -93,7 +104,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 		var steps = options.steps !== undefined ? options.steps : 1;
-		var amount = options.amount !== undefined ? options.amount : 100;
+		var depth = options.depth !== undefined ? options.depth : 100;
 
 		var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
 		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
@@ -103,6 +114,15 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		var extrudePath = options.extrudePath;
 
 		var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
+
+		// deprecated options
+
+		if ( options.amount !== undefined ) {
+
+			console.warn( 'THREE.ExtrudeBufferGeometry: amount has been renamed to depth.' );
+			depth = options.amount;
+
+		}
 
 		//
 
@@ -444,7 +464,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				if ( ! extrudeByPath ) {
 
-					v( vert.x, vert.y, amount / steps * s );
+					v( vert.x, vert.y, depth / steps * s );
 
 				} else {
 
@@ -478,7 +498,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-				v( vert.x, vert.y, amount + z );
+				v( vert.x, vert.y, depth + z );
 
 			}
 
@@ -495,7 +515,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 					if ( ! extrudeByPath ) {
 
-						v( vert.x, vert.y, amount + z );
+						v( vert.x, vert.y, depth + z );
 
 					} else {
 
@@ -708,6 +728,19 @@ function ExtrudeBufferGeometry( shapes, options ) {
 ExtrudeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
 
+ExtrudeBufferGeometry.prototype.toJSON = function () {
+
+	var data = BufferGeometry.prototype.toJSON.call( this );
+
+	var shapes = this.parameters.shapes;
+	var options = this.parameters.options;
+
+	return toJSON( shapes, options, data );
+
+};
+
+//
+
 var WorldUVGenerator = {
 
 	generateTopUV: function ( geometry, vertices, indexA, indexB, indexC ) {
@@ -764,6 +797,36 @@ var WorldUVGenerator = {
 
 	}
 };
+
+function toJSON( shapes, options, data ) {
+
+	//
+
+	data.shapes = [];
+
+	if ( Array.isArray( shapes ) ) {
+
+		for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+			var shape = shapes[ i ];
+
+			data.shapes.push( shape.uuid );
+
+		}
+
+	} else {
+
+		data.shapes.push( shapes.uuid );
+
+	}
+
+	//
+
+	if ( options.extrudePath !== undefined ) data.options.extrudePath = options.extrudePath.toJSON();
+
+	return data;
+
+}
 
 
 export { ExtrudeGeometry, ExtrudeBufferGeometry };

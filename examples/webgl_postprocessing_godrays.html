@@ -16,9 +16,7 @@
 				text-align:center;
 			}
 
-			a {
-				color:#0078ff;
-			}
+			a { color:#0078ff; }
 
 			#info {
 				color:#fff;
@@ -35,7 +33,7 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/ShaderGodRays.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<div id="info">
@@ -45,14 +43,18 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer, materialDepth;
 
 			var sphereMesh;
 
-			var sunPosition = new THREE.Vector3( 0, 1000, -1000 );
+			var sunPosition = new THREE.Vector3( 0, 1000, - 1000 );
 			var screenSpacePosition = new THREE.Vector3();
 
 			var mouseX = 0, mouseY = 0;
@@ -60,7 +62,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var postprocessing = { enabled : true };
+			var postprocessing = { enabled: true };
 
 			var orbitRadius = 200;
 
@@ -81,7 +83,6 @@
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( bgColor );
 
 				//
 
@@ -95,7 +96,7 @@
 				loader.load( 'models/obj/tree.obj', function ( object ) {
 
 					object.material = materialScene;
-					object.position.set( 0, -150, -150 );
+					object.position.set( 0, - 150, - 150 );
 					object.scale.multiplyScalar( 400 );
 					scene.add( object );
 
@@ -111,6 +112,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -175,7 +177,7 @@
 
 				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				postprocessing.scene.add( postprocessing.camera );
@@ -191,6 +193,7 @@
 				// targets but the aliasing causes some temporal flickering
 
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				postprocessing.rtTextureDepthMask = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				// Aggressive downsize god-ray ping-pong render targets to minimize cost
 
@@ -200,6 +203,16 @@
 				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( w, h, pars );
 
 				// god-ray shaders
+
+				var godraysMaskShader = THREE.ShaderGodRays[ "godrays_depthMask" ];
+				postprocessing.godrayMaskUniforms = THREE.UniformsUtils.clone( godraysMaskShader.uniforms );
+				postprocessing.materialGodraysDepthMask = new THREE.ShaderMaterial( {
+
+					uniforms: postprocessing.godrayMaskUniforms,
+					vertexShader: godraysMaskShader.vertexShader,
+					fragmentShader: godraysMaskShader.fragmentShader
+
+				} );
 
 				var godraysGenShader = THREE.ShaderGodRays[ "godrays_generate" ];
 				postprocessing.godrayGenUniforms = THREE.UniformsUtils.clone( godraysGenShader.uniforms );
@@ -240,7 +253,7 @@
 					new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ),
 					postprocessing.materialGodraysGenerate
 				);
-				postprocessing.quad.position.z = -9900;
+				postprocessing.quad.position.z = - 9900;
 				postprocessing.scene.add( postprocessing.quad );
 
 			}
@@ -289,7 +302,8 @@
 
 					// Clear colors and depths, will clear to sky color
 
-					renderer.clearTarget( postprocessing.rtTextureColors, true, true, false );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
+					renderer.clear( true, true, false );
 
 					// Sun render. Runs a shader that gives a brightness based on the screen
 					// space distance to the sun. Not very efficient, so i make a scissor
@@ -323,6 +337,13 @@
 					scene.overrideMaterial = materialDepth;
 					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
 
+					//
+
+					postprocessing.godrayMaskUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
+
+					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysDepthMask;
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureDepthMask );
+
 					// -- Render god-rays --
 
 					// Maximum length of god-rays (in texture space [0,1]X[0,1])
@@ -341,10 +362,10 @@
 					// pass 1 - render into first ping-pong target
 
 					var pass = 1.0;
-					var stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
+					var stepLen = filterLen * Math.pow( TAPS_PER_PASS, - pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepthMask.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysGenerate;
 
@@ -353,27 +374,27 @@
 					// pass 2 - render into second ping-pong target
 
 					pass = 2.0;
-					stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
+					stepLen = filterLen * Math.pow( TAPS_PER_PASS, - pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
 					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays2.texture;
 
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays1  );
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays1 );
 
 					// pass 3 - 1st RT
 
 					pass = 3.0;
-					stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
+					stepLen = filterLen * Math.pow( TAPS_PER_PASS, - pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
 					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays1.texture;
 
-					renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays2 );
 
 					// final pass - composite god-rays onto colors
 
-					postprocessing.godrayCombineUniforms["tColors"].value = postprocessing.rtTextureColors.texture;
-					postprocessing.godrayCombineUniforms["tGodRays"].value = postprocessing.rtTextureGodRays2.texture;
+					postprocessing.godrayCombineUniforms[ "tColors" ].value = postprocessing.rtTextureColors.texture;
+					postprocessing.godrayCombineUniforms[ "tGodRays" ].value = postprocessing.rtTextureGodRays2.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
 

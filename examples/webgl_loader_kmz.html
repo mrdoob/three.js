@@ -23,14 +23,11 @@
 
 			}
 
-			a { color: skyblue }
-			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
-			.highlight { background:orange; color:#fff; }
+			a { color: red }
 
 			span {
 				display: inline-block;
 				width: 60px;
-				float: left;
 				text-align: center;
 			}
 
@@ -46,14 +43,18 @@
 		<script src="js/loaders/KMZLoader.js"></script>
 		<script src="js/loaders/ColladaLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/jszip.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer;
 

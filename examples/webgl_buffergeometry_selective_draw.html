@@ -26,9 +26,9 @@
 		color: #0080ff;
 	}
 	</style>
-	<script type="text/javascript" src="../build/three.js"></script>
-	<script type="text/javascript" src="js/Detector.js"></script>
-	<script type="text/javascript" src="js/libs/stats.min.js"></script>
+	<script src="../build/three.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+	<script src="js/WebGL.js"></script>
 
 	<script type="x-shader/x-vertex" id="vertexshader">
 		attribute float visible;
@@ -59,7 +59,7 @@
 				discard;
 
 			}
-			
+
 		}
 	</script>
 	</head>
@@ -72,7 +72,11 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var camera, scene, renderer, stats;
 		var geometry, mesh;

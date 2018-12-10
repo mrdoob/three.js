@@ -27,12 +27,12 @@
 				color: #a06851;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(100,0,0) !important;
 				color:#fff !important;
 				margin-top:10em !important;
 			}
-			#oldie a { color:#fff }
+			#webglmessage a { color:#fff }
 
 		</style>
 	</head>
@@ -45,15 +45,16 @@
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
+		<script src="js/utils/BufferGeometryUtils.js"></script>
 		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 				document.getElementById( 'container' ).innerHTML = "";
 
 			}
@@ -62,11 +63,10 @@
 
 			var camera, controls, scene, renderer;
 
-			var mesh;
-
-			var worldWidth = 128, worldDepth = 128,
-			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
-			data = generateHeight( worldWidth, worldDepth );
+			var worldWidth = 128, worldDepth = 128;
+			var worldHalfWidth = worldWidth / 2;
+			var worldHalfDepth = worldDepth / 2;
+			var data = generateHeight( worldWidth, worldDepth );
 
 			var clock = new THREE.Clock();
 
@@ -120,17 +120,11 @@
 				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nzGeometry.rotateY( Math.PI );
-				nzGeometry.translate( 0, 0, -50 );
+				nzGeometry.translate( 0, 0, - 50 );
 
 				//
 
-				// BufferGeometry cannot be merged yet.
-				var tmpGeometry = new THREE.Geometry();
-				var pxTmpGeometry = new THREE.Geometry().fromBufferGeometry( pxGeometry );
-				var nxTmpGeometry = new THREE.Geometry().fromBufferGeometry( nxGeometry );
-				var pyTmpGeometry = new THREE.Geometry().fromBufferGeometry( pyGeometry );
-				var pzTmpGeometry = new THREE.Geometry().fromBufferGeometry( pzGeometry );
-				var nzTmpGeometry = new THREE.Geometry().fromBufferGeometry( nzGeometry );
+				var geometries = [];
 
 				for ( var z = 0; z < worldDepth; z ++ ) {
 
@@ -149,29 +143,29 @@
 						var pz = getY( x, z + 1 );
 						var nz = getY( x, z - 1 );
 
-						tmpGeometry.merge( pyTmpGeometry, matrix );
+						geometries.push( pyGeometry.clone().applyMatrix( matrix ) );
 
 						if ( ( px !== h && px !== h + 1 ) || x === 0 ) {
 
-							tmpGeometry.merge( pxTmpGeometry, matrix );
+							geometries.push( pxGeometry.clone().applyMatrix( matrix ) );
 
 						}
 
 						if ( ( nx !== h && nx !== h + 1 ) || x === worldWidth - 1 ) {
 
-							tmpGeometry.merge( nxTmpGeometry, matrix );
+							geometries.push( nxGeometry.clone().applyMatrix( matrix ) );
 
 						}
 
 						if ( ( pz !== h && pz !== h + 1 ) || z === worldDepth - 1 ) {
 
-							tmpGeometry.merge( pzTmpGeometry, matrix );
+							geometries.push( pzGeometry.clone().applyMatrix( matrix ) );
 
 						}
 
 						if ( ( nz !== h && nz !== h + 1 ) || z === 0 ) {
 
-							tmpGeometry.merge( nzTmpGeometry, matrix );
+							geometries.push( nzGeometry.clone().applyMatrix( matrix ) );
 
 						}
 
@@ -179,14 +173,13 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry().fromGeometry( tmpGeometry );
+				var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries );
 				geometry.computeBoundingSphere();
 
 				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
-				texture.minFilter = THREE.LinearMipMapLinearFilter;
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture } ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
 				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );
@@ -196,7 +189,7 @@
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -227,7 +220,7 @@
 			function generateHeight( width, height ) {
 
 				var data = [], perlin = new ImprovedNoise(),
-				size = width * height, quality = 2, z = Math.random() * 100;
+					size = width * height, quality = 2, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {
 

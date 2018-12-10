@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Helper object to assist with visualizing a [page:DirectionalLight]'s effect on the scene.
+
+			This consists of plane and a line representing the light's position and direction.
+		</p>
+
+		<h2>Example</h2>
+
+		<code>
+		var light = new THREE.DirectionalLight( 0xFFFFFF );
+
+		var helper = new THREE.DirectionalLightHelper( light, 5 );
+
+		scene.add( helper );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:DirectionalLight light], [param:Number size], [param:Hex color] )</h3>
+		<p>
+			[page:DirectionalLight light]-- The light to be visualized. <br /><br />
+
+			[page:Number size] -- (optional) dimensions of the plane. Default is *1*.<br /><br />
+
+			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+
+		<h3>[property:Line lightPlane]</h3>
+		<p>Contains the line mesh showing the location of the directional light.</p>
+
+		<h3>[property:DirectionalLight light]</h3>
+		<p>Reference to the [page:DirectionalLight directionalLight] being visualized.</p>
+
+		<h3>[property:object matrix]</h3>
+		<p>Reference to the light's [page:Object3D.matrixWorld matrixWorld].</p>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<p>
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			light's [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+		<h3>[property:hex color]</h3>
+		<p>
+			The color parameter passed in the constructor. Default is *undefined*. If this is changed,
+			the helper's color will update the next time [page:.update update] is called.
+		</p>
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>Dispose of the directionalLightHelper.</p>
+
+
+		<h3>[method:null update]()</h3>
+		<p>Updates the helper to match the position and direction of the [page:.light directionalLight] being visualized.</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

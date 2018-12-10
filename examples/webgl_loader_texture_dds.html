@@ -36,11 +36,15 @@
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/DDSLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer;
 			var meshes = [];
@@ -88,24 +92,30 @@
 				map6.anisotropy = 4;
 
 				var cubemap1 = loader.load( 'textures/compressed/Mountains.dds', function ( texture ) {
+
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
 					material1.needsUpdate = true;
+
 				} );
 
 				var cubemap2 = loader.load( 'textures/compressed/Mountains_argb_mip.dds', function ( texture ) {
+
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
 					material5.needsUpdate = true;
+
 				} );
 
 				var cubemap3 = loader.load( 'textures/compressed/Mountains_argb_nomip.dds', function ( texture ) {
+
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
 					material6.needsUpdate = true;
+
 				} );
 
 				var material1 = new THREE.MeshBasicMaterial( { map: map1, envMap: cubemap1 } );
@@ -119,25 +129,25 @@
 
 
 				var mesh = new THREE.Mesh( new THREE.TorusBufferGeometry( 100, 50, 32, 16 ), material1 );
-				mesh.position.x = -600;
-				mesh.position.y = -200;
+				mesh.position.x = - 600;
+				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material2 );
-				mesh.position.x = -200;
-				mesh.position.y = -200;
+				mesh.position.x = - 200;
+				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material3 );
-				mesh.position.x = -200;
+				mesh.position.x = - 200;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material4 );
-				mesh.position.x = -600;
+				mesh.position.x = - 600;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
@@ -150,13 +160,13 @@
 
 				mesh = new THREE.Mesh( geometry, material6 );
 				mesh.position.x = 200;
-				mesh.position.y = -200;
+				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material7 );
 				mesh.position.x = 600;
-				mesh.position.y = -200;
+				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
@@ -165,7 +175,6 @@
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
-
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );

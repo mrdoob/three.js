@@ -2,7 +2,10 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.NodePass = function () {
+import { NodeMaterial } from '../materials/NodeMaterial.js';
+import { ScreenNode } from '../inputs/ScreenNode.js';
+
+function NodePass() {
 
 	THREE.ShaderPass.call( this );
 
@@ -13,30 +16,42 @@ THREE.NodePass = function () {
 
 	this.textureID = 'renderTexture';
 
-	this.fragment = new THREE.RawNode( new THREE.ScreenNode() );
+	this.input = new ScreenNode();
 
-	this.node = new THREE.NodeMaterial();
-	this.node.fragment = this.fragment;
+	this.material = new NodeMaterial();
 
-	this.build();
+	this.needsUpdate = true;
+
+}
+
+NodePass.prototype = Object.create( THREE.ShaderPass.prototype );
+NodePass.prototype.constructor = NodePass;
+
+NodePass.prototype.render = function () {
+
+	if ( this.needsUpdate ) {
+
+		this.material.dispose();
+
+		this.material.fragment.value = this.input;
+
+		this.needsUpdate = false;
+
+	}
+
+	this.uniforms = this.material.uniforms;
+
+	THREE.ShaderPass.prototype.render.apply( this, arguments );
 
 };
 
-THREE.NodePass.prototype = Object.create( THREE.ShaderPass.prototype );
-THREE.NodePass.prototype.constructor = THREE.NodePass;
+NodePass.prototype.copy = function ( source ) {
 
-THREE.NodeMaterial.addShortcuts( THREE.NodePass.prototype, 'fragment', [ 'value' ] );
-
-THREE.NodePass.prototype.build = function () {
-
-	this.node.build();
-
-	this.uniforms = this.node.uniforms;
-	this.material = this.node;
+	this.input = source.input;
 
 };
 
-THREE.NodePass.prototype.toJSON = function ( meta ) {
+NodePass.prototype.toJSON = function ( meta ) {
 
 	var isRootObject = ( meta === undefined || typeof meta === 'string' );
 
@@ -63,7 +78,7 @@ THREE.NodePass.prototype.toJSON = function ( meta ) {
 
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
-		data.value = this.value.toJSON( meta ).uuid;
+		data.input = this.input.toJSON( meta ).uuid;
 
 	}
 
@@ -72,3 +87,5 @@ THREE.NodePass.prototype.toJSON = function ( meta ) {
 	return meta;
 
 };
+
+export { NodePass };

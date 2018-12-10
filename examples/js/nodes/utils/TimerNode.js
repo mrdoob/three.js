@@ -2,65 +2,82 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.TimerNode = function ( scale, scope ) {
+import { FloatNode } from '../inputs/FloatNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
-	THREE.FloatNode.call( this );
+function TimerNode( scale, scope, timeScale ) {
+
+	FloatNode.call( this );
 
 	this.scale = scale !== undefined ? scale : 1;
-	this.scope = scope || THREE.TimerNode.GLOBAL;
+	this.scope = scope || TimerNode.GLOBAL;
 
-	this.timeScale = this.scale !== 1;
+	this.timeScale = timeScale !== undefined ? timeScale : this.scale !== 1;
 
-};
+}
 
-THREE.TimerNode.GLOBAL = 'global';
-THREE.TimerNode.LOCAL = 'local';
-THREE.TimerNode.DELTA = 'delta';
+TimerNode.GLOBAL = 'global';
+TimerNode.LOCAL = 'local';
+TimerNode.DELTA = 'delta';
 
-THREE.TimerNode.prototype = Object.create( THREE.FloatNode.prototype );
-THREE.TimerNode.prototype.constructor = THREE.TimerNode;
-THREE.TimerNode.prototype.nodeType = "Timer";
+TimerNode.prototype = Object.create( FloatNode.prototype );
+TimerNode.prototype.constructor = TimerNode;
+TimerNode.prototype.nodeType = "Timer";
 
-THREE.TimerNode.prototype.isReadonly = function ( builder ) {
+TimerNode.prototype.isReadonly = function () {
+
+	// never use TimerNode as readonly but aways as "uniform"
 
 	return false;
 
 };
 
-THREE.TimerNode.prototype.isUnique = function ( builder ) {
+TimerNode.prototype.isUnique = function () {
 
 	// share TimerNode "uniform" input if is used on more time with others TimerNode
-	return this.timeScale && ( this.scope === THREE.TimerNode.GLOBAL || this.scope === THREE.TimerNode.DELTA );
+
+	return this.timeScale && ( this.scope === TimerNode.GLOBAL || this.scope === TimerNode.DELTA );
 
 };
 
-THREE.TimerNode.prototype.updateFrame = function ( frame ) {
+TimerNode.prototype.updateFrame = function ( frame ) {
 
 	var scale = this.timeScale ? this.scale : 1;
 
-	switch( this.scope ) {
+	switch ( this.scope ) {
 
-		case THREE.TimerNode.LOCAL:
+		case TimerNode.LOCAL:
 
-			this.number += frame.delta * scale;
+			this.value += frame.delta * scale;
 
 			break;
 
-		case THREE.TimerNode.DELTA:
+		case TimerNode.DELTA:
 
-			this.number = frame.delta * scale;
+			this.value = frame.delta * scale;
 
 			break;
 
 		default:
 
-			this.number = frame.time * scale;
+			this.value = frame.time * scale;
 
 	}
 
 };
 
-THREE.TimerNode.prototype.toJSON = function ( meta ) {
+TimerNode.prototype.copy = function ( source ) {
+
+	FloatNode.prototype.copy.call( this, source );
+
+	this.scope = source.scope;
+	this.scale = source.scale;
+
+	this.timeScale = source.timeScale;
+
+};
+
+TimerNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -70,6 +87,7 @@ THREE.TimerNode.prototype.toJSON = function ( meta ) {
 
 		data.scope = this.scope;
 		data.scale = this.scale;
+
 		data.timeScale = this.timeScale;
 
 	}
@@ -77,3 +95,11 @@ THREE.TimerNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+NodeLib.addKeyword( 'time', function () {
+
+	return new TimerNode();
+
+} );
+
+export { TimerNode };

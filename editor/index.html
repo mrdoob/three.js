@@ -4,6 +4,10 @@
 		<title>three.js / editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
 	</head>
 	<body ontouchstart="">
 		<link href="css/main.css" rel="stylesheet" />
@@ -22,6 +26,7 @@
 		<script src="../examples/js/loaders/AWDLoader.js"></script>
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/DRACOLoader.js"></script>
 		<script src="../examples/js/loaders/FBXLoader.js"></script>
 		<script src="../examples/js/loaders/GLTFLoader.js"></script>
 		<script src="../examples/js/loaders/deprecated/LegacyGLTFLoader.js"></script>
@@ -35,18 +40,18 @@
 		<script src="../examples/js/loaders/SVGLoader.js"></script>
 		<script src="../examples/js/loaders/TGALoader.js"></script>
 		<script src="../examples/js/loaders/TDSLoader.js"></script>
-		<script src="../examples/js/loaders/UTF8Loader.js"></script>
 		<script src="../examples/js/loaders/VRMLLoader.js"></script>
 		<script src="../examples/js/loaders/VTKLoader.js"></script>
 		<script src="../examples/js/loaders/ctm/lzma.js"></script>
 		<script src="../examples/js/loaders/ctm/ctm.js"></script>
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
-		<script src="../examples/js/exporters/OBJExporter.js"></script>
+
+		<script src="../examples/js/exporters/ColladaExporter.js"></script>
 		<script src="../examples/js/exporters/GLTFExporter.js"></script>
+		<script src="../examples/js/exporters/OBJExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
-		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
 		<script src="../examples/js/renderers/RaytracingRenderer.js"></script>
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
@@ -131,6 +136,7 @@
 		<script src="js/Sidebar.Animation.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
 		<script src="js/Sidebar.History.js"></script>
+		<script src="js/Strings.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
@@ -176,14 +182,14 @@
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
+			var toolbar = new Toolbar( editor );
+			document.body.appendChild( toolbar.dom );
+
 			var script = new Script( editor );
 			document.body.appendChild( script.dom );
 
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
-
-			var toolbar = new Toolbar( editor );
-			document.body.appendChild( toolbar.dom );
 
 			var menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );
@@ -284,11 +290,7 @@
 
 				event.preventDefault();
 
-				if ( event.dataTransfer.files.length > 0 ) {
-
-					editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
-
-				}
+				editor.loader.loadFiles( event.dataTransfer.files );
 
 			}, false );
 

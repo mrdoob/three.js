@@ -70,9 +70,9 @@ Object.assign( FileLoader.prototype, {
 			var isBase64 = !! dataUriRegexResult[ 2 ];
 			var data = dataUriRegexResult[ 3 ];
 
-			data = window.decodeURIComponent( data );
+			data = decodeURIComponent( data );
 
-			if ( isBase64 ) data = window.atob( data );
+			if ( isBase64 ) data = atob( data );
 
 			try {
 
@@ -126,7 +126,7 @@ Object.assign( FileLoader.prototype, {
 				}
 
 				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
-				window.setTimeout( function () {
+				setTimeout( function () {
 
 					if ( onLoad ) onLoad( response );
 
@@ -137,12 +137,12 @@ Object.assign( FileLoader.prototype, {
 			} catch ( error ) {
 
 				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
-				window.setTimeout( function () {
+				setTimeout( function () {
 
 					if ( onError ) onError( error );
 
-					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
+					scope.manager.itemEnd( url );
 
 				}, 0 );
 
@@ -176,23 +176,12 @@ Object.assign( FileLoader.prototype, {
 
 				delete loading[ url ];
 
-				if ( this.status === 200 ) {
-
-					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
-
-						var callback = callbacks[ i ];
-						if ( callback.onLoad ) callback.onLoad( response );
-
-					}
-
-					scope.manager.itemEnd( url );
-
-				} else if ( this.status === 0 ) {
+				if ( this.status === 200 || this.status === 0 ) {
 
 					// Some browsers return HTTP Status 0 when using non-http protocol
 					// e.g. 'file://' or 'data://'. Handle as success.
 
-					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+					if ( this.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
 					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
@@ -212,8 +201,8 @@ Object.assign( FileLoader.prototype, {
 
 					}
 
-					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
+					scope.manager.itemEnd( url );
 
 				}
 
@@ -245,8 +234,26 @@ Object.assign( FileLoader.prototype, {
 
 				}
 
-				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
+
+			}, false );
+
+			request.addEventListener( 'abort', function ( event ) {
+
+				var callbacks = loading[ url ];
+
+				delete loading[ url ];
+
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					var callback = callbacks[ i ];
+					if ( callback.onError ) callback.onError( event );
+
+				}
+
+				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
 
 			}, false );
 

@@ -42,12 +42,16 @@
 		<script src="js/loaders/GLTFLoader.js"></script>
 		<script src="js/loaders/VRMLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
@@ -83,12 +87,35 @@
 
 						if ( object.material ) {
 
-							var material = new THREE.MeshBasicMaterial();
-							THREE.Material.prototype.copy.call( material, object.material );
-							material.color.copy( object.material.color );
-							material.map = object.material.map;
-							material.lights = false;
-							object.material = material;
+							if ( Array.isArray( object.material ) ) {
+
+								for ( var i = 0, il = object.material.length; i < il; i ++ ) {
+
+									var material = new THREE.MeshBasicMaterial();
+									THREE.Material.prototype.copy.call( material, object.material[ i ] );
+									material.color.copy( object.material[ i ].color );
+									material.map = object.material[ i ].map;
+									material.lights = false;
+									material.skinning = object.material[ i ].skinning;
+									material.morphTargets = object.material[ i ].morphTargets;
+									material.morphNormals = object.material[ i ].morphNormals;
+									object.material[ i ] = material;
+
+								}
+
+							} else {
+
+								var material = new THREE.MeshBasicMaterial();
+								THREE.Material.prototype.copy.call( material, object.material );
+								material.color.copy( object.material.color );
+								material.map = object.material.map;
+								material.lights = false;
+								material.skinning = object.material.skinning;
+								material.morphTargets = object.material.morphTargets;
+								material.morphNormals = object.material.morphNormals;
+								object.material = material;
+
+							}
 
 						}
 

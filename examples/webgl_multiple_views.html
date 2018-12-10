@@ -35,12 +35,16 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -60,10 +64,12 @@
 					eye: [ 0, 300, 1800 ],
 					up: [ 0, 1, 0 ],
 					fov: 30,
-					updateCamera: function ( camera, scene, mouseX, mouseY ) {
+					updateCamera: function ( camera, scene, mouseX ) {
+
 					  camera.position.x += mouseX * 0.05;
-					  camera.position.x = Math.max( Math.min( camera.position.x, 2000 ), -2000 );
+					  camera.position.x = Math.max( Math.min( camera.position.x, 2000 ), - 2000 );
 					  camera.lookAt( scene.position );
+
 					}
 				},
 				{
@@ -75,10 +81,12 @@
 					eye: [ 0, 1800, 0 ],
 					up: [ 0, 0, 1 ],
 					fov: 45,
-					updateCamera: function ( camera, scene, mouseX, mouseY ) {
+					updateCamera: function ( camera, scene, mouseX ) {
+
 					  camera.position.x -= mouseX * 0.05;
-					  camera.position.x = Math.max( Math.min( camera.position.x, 2000 ), -2000 );
+					  camera.position.x = Math.max( Math.min( camera.position.x, 2000 ), - 2000 );
 					  camera.lookAt( camera.position.clone().setY( 0 ) );
+
 					}
 				},
 				{
@@ -90,10 +98,12 @@
 					eye: [ 1400, 800, 1400 ],
 					up: [ 0, 1, 0 ],
 					fov: 60,
-					updateCamera: function ( camera, scene, mouseX, mouseY ) {
+					updateCamera: function ( camera, scene, mouseX ) {
+
 					  camera.position.y -= mouseX * 0.05;
-					  camera.position.y = Math.max( Math.min( camera.position.y, 1600 ), -1600 );
+					  camera.position.y = Math.max( Math.min( camera.position.y, 1600 ), - 1600 );
 					  camera.lookAt( scene.position );
+
 					}
 				}
 			];
@@ -105,9 +115,9 @@
 
 				container = document.getElementById( 'container' );
 
-				for (var ii =  0; ii < views.length; ++ii ) {
+				for ( var ii = 0; ii < views.length; ++ ii ) {
 
-					var view = views[ii];
+					var view = views[ ii ];
 					var camera = new THREE.PerspectiveCamera( view.fov, window.innerWidth / window.innerHeight, 1, 10000 );
 					camera.position.fromArray( view.eye );
 					camera.up.fromArray( view.up );
@@ -144,82 +154,76 @@
 
 				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.y = - 250;
-				shadowMesh.rotation.x = - Math. PI / 2;
+				shadowMesh.rotation.x = - Math.PI / 2;
 				scene.add( shadowMesh );
 
 				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.x = - 400;
 				shadowMesh.position.y = - 250;
-				shadowMesh.rotation.x = - Math. PI / 2;
+				shadowMesh.rotation.x = - Math.PI / 2;
 				scene.add( shadowMesh );
 
 				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.x = 400;
 				shadowMesh.position.y = - 250;
-				shadowMesh.rotation.x = - Math. PI / 2;
+				shadowMesh.rotation.x = - Math.PI / 2;
 				scene.add( shadowMesh );
 
-				var faceIndices = [ 'a', 'b', 'c' ];
+				var radius = 200;
 
-				var color, f, f2, f3, p, vertexIndex,
+				var geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
 
-					radius = 200,
+				var count = geometry1.attributes.position.count;
+				geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
-					geometry  = new THREE.IcosahedronGeometry( radius, 1 ),
-					geometry2 = new THREE.IcosahedronGeometry( radius, 1 ),
-					geometry3 = new THREE.IcosahedronGeometry( radius, 1 );
+				var geometry2 = geometry1.clone();
+				var geometry3 = geometry1.clone();
 
-				for ( var i = 0; i < geometry.faces.length; i ++ ) {
+				var color = new THREE.Color();
+				var positions1 = geometry1.attributes.position;
+				var positions2 = geometry2.attributes.position;
+				var positions3 = geometry3.attributes.position;
+				var colors1 = geometry1.attributes.color;
+				var colors2 = geometry2.attributes.color;
+				var colors3 = geometry3.attributes.color;
 
-					f  = geometry.faces[ i ];
-					f2 = geometry2.faces[ i ];
-					f3 = geometry3.faces[ i ];
+				for ( var i = 0; i < count; i ++ ) {
 
-					for( var j = 0; j < 3; j++ ) {
+					color.setHSL( ( positions1.getY( i ) / radius + 1 ) / 2, 1.0, 0.5 );
+					colors1.setXYZ( i, color.r, color.g, color.b );
 
-						vertexIndex = f[ faceIndices[ j ] ];
+					color.setHSL( 0, ( positions2.getY( i ) / radius + 1 ) / 2, 0.5 );
+					colors2.setXYZ( i, color.r, color.g, color.b );
 
-						p = geometry.vertices[ vertexIndex ];
-
-						color = new THREE.Color( 0xffffff );
-						color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
-
-						f.vertexColors[ j ] = color;
-
-						color = new THREE.Color( 0xffffff );
-						color.setHSL( 0.0, ( p.y / radius + 1 ) / 2, 0.5 );
-
-						f2.vertexColors[ j ] = color;
-
-						color = new THREE.Color( 0xffffff );
-						color.setHSL( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 0.5 );
-
-						f3.vertexColors[ j ] = color;
-
-					}
+					color.setRGB( 1, 0.8 - ( positions3.getY( i ) / radius + 1 ) / 2, 0 );
+					colors3.setXYZ( i, color.r, color.g, color.b );
 
 				}
 
-				var mesh, wireframe;
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					flatShading: true,
+					vertexColors: THREE.VertexColors,
+					shininess: 0
+				} );
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } );
 				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
-				mesh = new THREE.Mesh( geometry, material );
-				wireframe = new THREE.Mesh( geometry, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry1, material );
+				var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
 				mesh.add( wireframe );
 				mesh.position.x = - 400;
 				mesh.rotation.x = - 1.87;
 				scene.add( mesh );
 
-				mesh = new THREE.Mesh( geometry2, material );
-				wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry2, material );
+				var wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
 				mesh.add( wireframe );
 				mesh.position.x = 400;
 				scene.add( mesh );
 
-				mesh = new THREE.Mesh( geometry3, material );
-				wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry3, material );
+				var wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
 				mesh.add( wireframe );
 				scene.add( mesh );
 
@@ -246,10 +250,10 @@
 
 				if ( windowWidth != window.innerWidth || windowHeight != window.innerHeight ) {
 
-					windowWidth  = window.innerWidth;
+					windowWidth = window.innerWidth;
 					windowHeight = window.innerHeight;
 
-					renderer.setSize ( windowWidth, windowHeight );
+					renderer.setSize( windowWidth, windowHeight );
 
 				}
 
@@ -261,22 +265,23 @@
 				stats.update();
 
 				requestAnimationFrame( animate );
+
 			}
 
 			function render() {
 
 				updateSize();
 
-				for ( var ii = 0; ii < views.length; ++ii ) {
+				for ( var ii = 0; ii < views.length; ++ ii ) {
 
-					var view = views[ii];
+					var view = views[ ii ];
 					var camera = view.camera;
 
 					view.updateCamera( camera, scene, mouseX, mouseY );
 
-					var left   = Math.floor( windowWidth  * view.left );
-					var top    = Math.floor( windowHeight * view.top );
-					var width  = Math.floor( windowWidth  * view.width );
+					var left = Math.floor( windowWidth * view.left );
+					var top = Math.floor( windowHeight * view.top );
+					var width = Math.floor( windowWidth * view.width );
 					var height = Math.floor( windowHeight * view.height );
 
 					renderer.setViewport( left, top, width, height );

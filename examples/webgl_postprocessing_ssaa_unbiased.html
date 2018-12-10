@@ -55,7 +55,7 @@
 			var scene, renderer, composer, copyPass;
 			var cameraP, ssaaRenderPassP;
 			var cameraO, ssaaRenderPassO;
-			var gui, stats, texture;
+			var gui, stats;
 
 			var params = {
 				sampleLevel: 4,
@@ -134,20 +134,20 @@
 
 				var light = new THREE.PointLight( 0xddffdd, 1.0 );
 				light.position.z = 70;
-				light.position.y = -70;
-				light.position.x = -70;
+				light.position.y = - 70;
+				light.position.x = - 70;
 				scene.add( light );
 
 				var light2 = new THREE.PointLight( 0xffdddd, 1.0 );
 				light2.position.z = 70;
-				light2.position.x = -70;
+				light2.position.x = - 70;
 				light2.position.y = 70;
 				scene.add( light2 );
 
 				var light3 = new THREE.PointLight( 0xddddff, 1.0 );
 				light3.position.z = 70;
 				light3.position.x = 70;
-				light3.position.y = -70;
+				light3.position.y = - 70;
 				scene.add( light3 );
 
 				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
@@ -207,7 +207,7 @@
 				renderer.setSize( width, height );
 
 				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
+				var newWidth = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
 
@@ -219,7 +219,8 @@
 
 				stats.begin();
 
-				if( params.autoRotate ) {
+				if ( params.autoRotate ) {
+
 					for ( var i = 0; i < scene.children.length; i ++ ) {
 
 						var child = scene.children[ i ];
@@ -228,15 +229,18 @@
 						child.rotation.y += 0.01;
 
 					}
+
 				}
 
 				var newColor = ssaaRenderPassP.clearColor;
-				switch( params.clearColor ) {
+				switch ( params.clearColor ) {
+
 					case 'blue': newColor = 0x0000ff; break;
 					case 'red': newColor = 0xff0000; break;
 					case 'green': newColor = 0x00ff00; break;
 					case 'white': newColor = 0xffffff; break;
 					case 'black': newColor = 0x000000; break;
+
 				}
 				ssaaRenderPassP.clearColor = ssaaRenderPassO.clearColor = newColor;
 				ssaaRenderPassP.clearAlpha = ssaaRenderPassO.clearAlpha = params.clearAlpha;
@@ -248,7 +252,7 @@
 				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
 
 				ssaaRenderPassP.renderToScreen = ssaaRenderPassO.renderToScreen = params.renderToScreen;
-				copyPass.enabled = !params.renderToScreen;
+				copyPass.enabled = ! params.renderToScreen;
 
 				composer.render();
 

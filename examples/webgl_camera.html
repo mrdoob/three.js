@@ -18,17 +18,13 @@
 
 			#info {
 				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+				top: 5px; width: 100%;
 				z-index: 100;
 			}
 
-			a {
-
-				color: #0080ff;
-			}
-
+			a {color: #0080ff; }
 			b { color: lightgreen }
+
 		</style>
 	</head>
 	<body>
@@ -120,29 +116,27 @@
 
 				//
 
-				var geometry = new THREE.Geometry();
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					var vertex = new THREE.Vector3();
-					vertex.x = THREE.Math.randFloatSpread( 2000 );
-					vertex.y = THREE.Math.randFloatSpread( 2000 );
-					vertex.z = THREE.Math.randFloatSpread( 2000 );
-
-					geometry.vertices.push( vertex );
+					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // x
+					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // y
+					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // z
 
 				}
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
 
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
 				renderer.autoClear = false;
@@ -161,9 +155,9 @@
 
 			//
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 79: /*O*/
 
@@ -185,7 +179,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
@@ -199,9 +193,9 @@
 				cameraPerspective.aspect = 0.5 * aspect;
 				cameraPerspective.updateProjectionMatrix();
 
-				cameraOrtho.left   = - 0.5 * frustumSize * aspect / 2;
-				cameraOrtho.right  =   0.5 * frustumSize * aspect / 2;
-				cameraOrtho.top    =   frustumSize / 2;
+				cameraOrtho.left = - 0.5 * frustumSize * aspect / 2;
+				cameraOrtho.right = 0.5 * frustumSize * aspect / 2;
+				cameraOrtho.top = frustumSize / 2;
 				cameraOrtho.bottom = - frustumSize / 2;
 				cameraOrtho.updateProjectionMatrix();
 
@@ -259,12 +253,12 @@
 
 				activeHelper.visible = false;
 
-				renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				renderer.setViewport( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
 				renderer.render( scene, activeCamera );
 
 				activeHelper.visible = true;
 
-				renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
 
 			}

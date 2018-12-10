@@ -33,7 +33,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -76,10 +76,14 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var renderer, scene, camera, stats;
-		var sphere, vertices1;
+		var sphere, length1;
 
 		var WIDTH = window.innerWidth;
 		var HEIGHT = window.innerHeight;
@@ -96,12 +100,12 @@
 
 			var radius = 100, segments = 68, rings = 38;
 
-			var geometry1 = new THREE.SphereGeometry( radius, segments, rings );
-			var geometry2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
+			var vertices1 = new THREE.SphereGeometry( radius, segments, rings ).vertices;
+			var vertices2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 ).vertices;
 
-			vertices1 = geometry1.vertices.length;
+			length1 = vertices1.length;
 
-			var vertices = geometry1.vertices.concat( geometry2.vertices );
+			var vertices = vertices1.concat( vertices2 );
 
 			var positions = new Float32Array( vertices.length * 3 );
 			var colors = new Float32Array( vertices.length * 3 );
@@ -115,9 +119,9 @@
 				vertex = vertices[ i ];
 				vertex.toArray( positions, i * 3 );
 
-				if ( i < vertices1 ) {
+				if ( i < length1 ) {
 
-					color.setHSL( 0.01 + 0.1 * ( i / vertices1 ), 0.99, ( vertex.y + radius ) / ( 4 * radius ) );
+					color.setHSL( 0.01 + 0.1 * ( i / length1 ), 0.99, ( vertex.y + radius ) / ( 4 * radius ) );
 
 				} else {
 
@@ -127,7 +131,7 @@
 
 				color.toArray( colors, i * 3 );
 
-				sizes[ i ] = i < vertices1 ? 10 : 40;
+				sizes[ i ] = i < length1 ? 10 : 40;
 
 			}
 
@@ -146,14 +150,14 @@
 
 				uniforms: {
 					amplitude: { value: 1.0 },
-					color:     { value: new THREE.Color( 0xffffff ) },
-					texture:   { value: texture }
+					color: { value: new THREE.Color( 0xffffff ) },
+					texture: { value: texture }
 				},
-				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				vertexShader: document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-				transparent:    true
+				transparent: true
 
-			});
+			} );
 
 			//
 
@@ -273,7 +277,7 @@
 
 			for ( var i = 0; i < attributes.size.array.length; i ++ ) {
 
-				if ( i < vertices1 ) {
+				if ( i < length1 ) {
 
 					attributes.size.array[ i ] = 16 + 12 * Math.sin( 0.1 * i + time );
 

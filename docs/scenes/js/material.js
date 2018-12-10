@@ -302,7 +302,6 @@ function guiMaterial( gui, mesh, material, geometry ) {
 	// folder.add( material, 'polygonOffsetFactor' );
 	// folder.add( material, 'polygonOffsetUnits' );
 	folder.add( material, 'alphaTest', 0, 1 );
-	// folder.add( material, 'overdraw', 0, 5 );
 	folder.add( material, 'visible' );
 	folder.add( material, 'side', constants.side ).onChange( needsUpdate( material, geometry ) );
 

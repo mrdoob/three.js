@@ -28,22 +28,27 @@
 	<div id="container"></div>
 	<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
 		<br/>Fast subsurface scattering in Blinn-Phong shading demo<br/>
-		[Thanks for the art support from <a href="https://github.com/shaochun">Shaochun Lin</a>]
+		[Thanks for the art support from <a href="https://github.com/shaochun" target="_blank" rel="noopener">Shaochun Lin</a>]
 	</div>
 	<script src="../build/three.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
 
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
+	<script src="js/libs/dat.gui.min.js"></script>
 	<script src="js/loaders/FBXLoader.js"></script>
 	<script src="js/ShaderTranslucent.js"></script>
 
 	<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var container, stats;
-		var camera, scene, renderer, controls;
+		var camera, scene, renderer;
 		var model;
 
 		init();
@@ -71,15 +76,15 @@
 			pointLight1.add( new THREE.PointLight( 0x888888, 7.0, 300 ) );
 			scene.add( pointLight1 );
 			pointLight1.position.x = 0;
-			pointLight1.position.y = 0;
+			pointLight1.position.y = - 50;
 			pointLight1.position.z = 350;
 
 			var pointLight2 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
 			pointLight2.add( new THREE.PointLight( 0x888800, 1.0, 500 ) );
 			scene.add( pointLight2 );
-			pointLight2.position.x = 150;
-			pointLight2.position.y = -100;
-			pointLight2.position.z = -250;
+			pointLight2.position.x = - 100;
+			pointLight2.position.y = 20;
+			pointLight2.position.z = - 260;
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -94,7 +99,7 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			controls = new THREE.OrbitControls( camera );
+			var controls = new THREE.OrbitControls( camera, container );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
@@ -106,7 +111,7 @@
 
 			var loader = new THREE.TextureLoader();
 			var imgTexture = loader.load( 'models/fbx/white.jpg' );
-			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.png' );
+			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
 			var shader = new THREE.TranslucentShader();
@@ -118,12 +123,12 @@
 			uniforms[ 'shininess' ].value = 500;
 
 			uniforms[ 'thicknessMap' ].value = thicknessTexture;
-			uniforms[ 'thicknessColor' ].value = new THREE.Vector3( 0.5, 0.3, 0.3 );
+			uniforms[ 'thicknessColor' ].value = new THREE.Vector3( 0.5, 0.3, 0.0 );
 			uniforms[ 'thicknessDistortion' ].value = 0.1;
-			uniforms[ 'thicknessAmbient' ].value = 0.1;
+			uniforms[ 'thicknessAmbient' ].value = 0.4;
 			uniforms[ 'thicknessAttenuation' ].value = 0.8;
-			uniforms[ 'thicknessPower' ].value = 2;
-			uniforms[ 'thicknessScale' ].value = 10.0;
+			uniforms[ 'thicknessPower' ].value = 2.0;
+			uniforms[ 'thicknessScale' ].value = 16.0;
 
 			var material = new THREE.ShaderMaterial( {
 				uniforms: uniforms,
@@ -145,6 +150,59 @@
 				scene.add( model );
 
 			} );
+
+			initGUI( uniforms );
+
+		}
+
+		function initGUI( uniforms ) {
+
+			var gui = new dat.GUI();
+
+			var ThicknessControls = function () {
+
+				this.distoration = uniforms[ 'thicknessDistortion' ].value;
+				this.ambient = uniforms[ 'thicknessAmbient' ].value;
+				this.attenuation = uniforms[ 'thicknessAttenuation' ].value;
+				this.power = uniforms[ 'thicknessPower' ].value;
+				this.scale = uniforms[ 'thicknessScale' ].value;
+
+			};
+
+			var thicknessControls = new ThicknessControls();
+			var thicknessFolder = gui.addFolder( 'Thickness Control' );
+
+			thicknessFolder.add( thicknessControls, 'distoration' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
+
+				uniforms[ 'thicknessDistortion' ].value = thicknessControls.distoration;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'ambient' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+
+				uniforms[ 'thicknessAmbient' ].value = thicknessControls.ambient;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'attenuation' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+
+				uniforms[ 'thicknessAttenuation' ].value = thicknessControls.attenuation;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'power' ).min( 0.01 ).max( 16.0 ).step( 0.1 ).onChange( function () {
+
+				uniforms[ 'thicknessPower' ].value = thicknessControls.power;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'scale' ).min( 0.01 ).max( 50.0 ).step( 0.1 ).onChange( function () {
+
+				uniforms[ 'thicknessScale' ].value = thicknessControls.scale;
+
+			} );
+
+			thicknessFolder.open();
 
 		}
 

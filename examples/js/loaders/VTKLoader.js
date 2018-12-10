@@ -22,12 +22,20 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 
@@ -250,76 +258,50 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 			}
 
-			var geometry;
-			var stagger = 'point';
+			var geometry = new THREE.BufferGeometry();
+			geometry.setIndex( indices );
+			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
-			if ( colors.length === indices.length ) {
+			if ( normals.length === positions.length ) {
 
-				stagger = 'cell';
+				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 			}
 
-			if ( stagger === 'point' ) {
+			if ( colors.length !== indices.length ) {
 
-				// Nodal. Use BufferGeometry
-				geometry = new THREE.BufferGeometry();
-				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( indices ), 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
+				// stagger
 
 				if ( colors.length === positions.length ) {
 
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
-
-				}
-
-				if ( normals.length === positions.length ) {
-
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
+					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				}
 
 			} else {
 
-				// Cell centered colors. The only way to attach a solid color to each triangle
-				// is to use Geometry, which is less efficient than BufferGeometry
-				geometry = new THREE.Geometry();
+				// cell
 
-				var numTriangles = indices.length / 3;
-				var numPoints = positions.length / 3;
-				var face;
-				var ia, ib, ic;
-				var x, y, z;
-				var r, g, b;
+				geometry = geometry.toNonIndexed();
+				var numTriangles = geometry.attributes.position.count / 3;
 
-				for ( var j = 0; j < numPoints; ++ j ) {
+				if ( colors.length === ( numTriangles * 3 ) ) {
 
-					x = positions[ 3 * j + 0 ];
-					y = positions[ 3 * j + 1 ];
-					z = positions[ 3 * j + 2 ];
-					geometry.vertices.push( new THREE.Vector3( x, y, z ) );
+					var newColors = [];
 
-				}
+					for ( var i = 0; i < numTriangles; i ++ ) {
 
-				for ( var i = 0; i < numTriangles; ++ i ) {
+						var r = colors[ 3 * i + 0 ];
+						var g = colors[ 3 * i + 1 ];
+						var b = colors[ 3 * i + 2 ];
 
-					ia = indices[ 3 * i + 0 ];
-					ib = indices[ 3 * i + 1 ];
-					ic = indices[ 3 * i + 2 ];
-					geometry.faces.push( new THREE.Face3( ia, ib, ic ) );
-
-				}
-
-				if ( colors.length === numTriangles * 3 ) {
-
-					for ( var i = 0; i < numTriangles; ++ i ) {
-
-						face = geometry.faces[ i ];
-						r = colors[ 3 * i + 0 ];
-						g = colors[ 3 * i + 1 ];
-						b = colors[ 3 * i + 2 ];
-						face.color = new THREE.Color().setRGB( r, g, b );
+						newColors.push( r, g, b );
+						newColors.push( r, g, b );
+						newColors.push( r, g, b );
 
 					}
+
+					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( newColors, 3 ) );
 
 				}
 
@@ -795,36 +777,9 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					delete ele[ '#text' ];
 
-					// Get the content and optimize it
-					if ( ele.attributes.type === 'Float32' ) {
+					if ( ele.attributes.type === 'Int64' ) {
 
 						if ( ele.attributes.format === 'binary' ) {
-
-							if ( ! compressed ) {
-
-								txt = txt.filter( function ( el, idx ) {
-
-									if ( idx !== 0 ) return true;
-
-								} );
-
-							}
-
-						}
-
-					} else if ( ele.attributes.type === 'Int64' ) {
-
-						if ( ele.attributes.format === 'binary' ) {
-
-							if ( ! compressed ) {
-
-								txt = txt.filter( function ( el, idx ) {
-
-									if ( idx !== 0 ) return true;
-
-								} );
-
-							}
 
 							txt = txt.filter( function ( el, idx ) {
 

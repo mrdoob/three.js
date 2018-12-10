@@ -6,26 +6,47 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				background:#777;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
 			}
 
-			#oldie { background-color: #ddd !important }
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			a {
+				color: #ff0000;
+			}
 		</style>
 	</head>
 	<body>
 
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - voxel painter - webgl<br>
+			<strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel
+		</div>
+
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
 			var camera, scene, renderer;
 			var plane, cube;
 			var mouse, raycaster, isShiftDown = false;
@@ -40,35 +61,24 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - voxel painter - webgl<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel';
-				container.appendChild( info );
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 500, 800, 1300 );
-				camera.lookAt( new THREE.Vector3() );
+				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// roll-over helpers
 
-				var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
+				var rollOverGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
 				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 				scene.add( rollOverMesh );
 
 				// cubes
 
-				cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( "textures/square-outline-textured.png" ) } );
+				cubeGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( 'textures/square-outline-textured.png' ) } );
 
 				// grid
 
@@ -88,7 +98,7 @@
 
 				objects.push( plane );
 
-				// Lights
+				// lights
 
 				var ambientLight = new THREE.AmbientLight( 0x606060 );
 				scene.add( ambientLight );
@@ -100,7 +110,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -163,7 +173,7 @@
 
 					if ( isShiftDown ) {
 
-						if ( intersect.object != plane ) {
+						if ( intersect.object !== plane ) {
 
 							scene.remove( intersect.object );
 
@@ -171,7 +181,7 @@
 
 						}
 
-					// create cube
+						// create cube
 
 					} else {
 
@@ -192,7 +202,7 @@
 
 			function onDocumentKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 16: isShiftDown = true; break;
 

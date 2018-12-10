@@ -4,8 +4,10 @@
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-05-12 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-05-12" content="AkM+gi6Fb7IUBwFLs18hn/x6dusbsVRYG9KBTWUUjvmT0m0wGkxRPy63Aj/i+Ti4d6qMEMnRcsR7MVV5Wuvp/AIAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyNjExODIwMH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
 		<style>
 			body {
 				font-family: Monospace;
@@ -22,8 +24,9 @@
 	<body>
 
 		<script src="../build/three.js"></script>
-
 		<script src="js/vr/WebVR.js"></script>
+
+		<script src="js/geometries/BoxLineGeometry.js"></script>
 
 		<script>
 
@@ -71,9 +74,9 @@
 				crosshair.position.z = - 2;
 				camera.add( crosshair );
 
-				room = new THREE.Mesh(
-					new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
+				room = new THREE.LineSegments(
+					new THREE.BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
+					new THREE.LineBasicMaterial( { color: 0x808080 } )
 				);
 				room.position.y = 3;
 				scene.add( room );
@@ -148,19 +151,26 @@
 			}
 
 			function onPointerRestricted() {
+
 				var pointerLockElement = renderer.domElement;
-				if ( pointerLockElement && typeof(pointerLockElement.requestPointerLock) === 'function' ) {
+				if ( pointerLockElement && typeof ( pointerLockElement.requestPointerLock ) === 'function' ) {
+
 					pointerLockElement.requestPointerLock();
 
 				}
+
 			}
 
 			function onPointerUnrestricted() {
+
 				var currentPointerLockElement = document.pointerLockElement;
 				var expectedPointerLockElement = renderer.domElement;
-				if ( currentPointerLockElement && currentPointerLockElement === expectedPointerLockElement && typeof(document.exitPointerLock) === 'function' ) {
+				if ( currentPointerLockElement && currentPointerLockElement === expectedPointerLockElement && typeof ( document.exitPointerLock ) === 'function' ) {
+
 					document.exitPointerLock();
+
 				}
+
 			}
 
 			function onWindowResize() {
@@ -176,7 +186,7 @@
 
 			function animate() {
 
-				renderer.animate( render );
+				renderer.setAnimationLoop( render );
 
 			}
 

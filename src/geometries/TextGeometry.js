@@ -56,11 +56,11 @@ function TextBufferGeometry( text, parameters ) {
 
 	}
 
-	var shapes = font.generateShapes( text, parameters.size, parameters.curveSegments );
+	var shapes = font.generateShapes( text, parameters.size );
 
 	// translate parameters to ExtrudeGeometry API
 
-	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+	parameters.depth = parameters.height !== undefined ? parameters.height : 50;
 
 	// defaults
 

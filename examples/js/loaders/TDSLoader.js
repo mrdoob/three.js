@@ -1,5 +1,5 @@
 /*
- * Autodesk 3DS threee.js file loader, based on lib3ds.
+ * Autodesk 3DS three.js file loader, based on lib3ds.
  *
  * Loads geometry with uv and materials basic properties with texture support.
  *
@@ -28,6 +28,8 @@ THREE.TDSLoader.prototype = {
 
 	constructor: THREE.TDSLoader,
 
+	crossOrigin: 'anonymous',
+
 	/**
 	 * Load 3ds file from url.
 	 *
@@ -44,7 +46,7 @@ THREE.TDSLoader.prototype = {
 		var path = this.path !== undefined ? this.path : THREE.LoaderUtils.extractUrlBase( url );
 
 		var loader = new THREE.FileLoader( this.manager );
-
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( data ) {
@@ -321,19 +323,8 @@ THREE.TDSLoader.prototype = {
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
 
-		var useBufferGeometry = false;
-		var geometry = null;
+		var geometry = new THREE.BufferGeometry();
 		var uvs = [];
-
-		if ( useBufferGeometry ) {
-
-			geometry = new THREE.BufferGeometry();
-
-		}	else {
-
-			geometry = new THREE.Geometry();
-
-		}
 
 		var material = new THREE.MeshPhongMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
@@ -349,28 +340,17 @@ THREE.TDSLoader.prototype = {
 
 				//BufferGeometry
 
-				if ( useBufferGeometry )	{
+				var vertices = [];
 
-					var vertices = [];
-					for ( var i = 0; i < points; i ++ )		{
+				for ( var i = 0; i < points; i ++ )		{
 
-						vertices.push( this.readFloat( data ) );
-						vertices.push( this.readFloat( data ) );
-						vertices.push( this.readFloat( data ) );
-
-					}
-
-					geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
-
-				} else	{ //Geometry
-
-					for ( var i = 0; i < points; i ++ )		{
-
-						geometry.vertices.push( new THREE.Vector3( this.readFloat( data ), this.readFloat( data ), this.readFloat( data ) ) );
-
-					}
+					vertices.push( this.readFloat( data ) );
+					vertices.push( this.readFloat( data ) );
+					vertices.push( this.readFloat( data ) );
 
 				}
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 			} else if ( next === FACE_ARRAY ) {
 
@@ -385,27 +365,17 @@ THREE.TDSLoader.prototype = {
 
 				//BufferGeometry
 
-				if ( useBufferGeometry )	{
+				var uvs = [];
 
-					var uvs = [];
-					for ( var i = 0; i < texels; i ++ )		{
+				for ( var i = 0; i < texels; i ++ )		{
 
-						uvs.push( this.readFloat( data ) );
-						uvs.push( this.readFloat( data ) );
-
-					}
-					geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( uvs ), 2 ) );
-
-				} else { //Geometry
-
-					uvs = [];
-					for ( var i = 0; i < texels; i ++ )		{
-
-						uvs.push( new THREE.Vector2( this.readFloat( data ), this.readFloat( data ) ) );
-
-					}
+					uvs.push( this.readFloat( data ) );
+					uvs.push( this.readFloat( data ) );
 
 				}
+
+				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+
 
 			} else if ( next === MESH_MATRIX ) {
 
@@ -464,27 +434,7 @@ THREE.TDSLoader.prototype = {
 
 		this.endChunk( chunk );
 
-		if ( ! useBufferGeometry ) {
-
-			//geometry.faceVertexUvs[0][faceIndex][vertexIndex]
-
-			if ( uvs.length > 0 ) {
-
-				var faceUV = [];
-
-				for ( var i = 0; i < geometry.faces.length; i ++ ) {
-
-					faceUV.push( [ uvs[ geometry.faces[ i ].a ], uvs[ geometry.faces[ i ].b ], uvs[ geometry.faces[ i ].c ] ] );
-
-				}
-
-				geometry.faceVertexUvs[ 0 ] = faceUV;
-
-			}
-
-			geometry.computeVertexNormals();
-
-		}
+		geometry.computeVertexNormals();
 
 		return mesh;
 
@@ -504,13 +454,17 @@ THREE.TDSLoader.prototype = {
 
 		this.debugMessage( '   Faces: ' + faces );
 
+		var index = [];
+
 		for ( var i = 0; i < faces; ++ i ) {
 
-			mesh.geometry.faces.push( new THREE.Face3( this.readWord( data ), this.readWord( data ), this.readWord( data ) ) );
+			index.push( this.readWord( data ), this.readWord( data ), this.readWord( data ) );
 
 			var visibility = this.readWord( data );
 
 		}
+
+		mesh.geometry.setIndex( index );
 
 		//The rest of the FACE_ARRAY chunk is subchunks
 
@@ -568,7 +522,7 @@ THREE.TDSLoader.prototype = {
 		var texture = {};
 
 		var loader = new THREE.TextureLoader( this.manager );
-		loader.setPath( path );
+		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		while ( next !== 0 ) {
 
@@ -890,15 +844,46 @@ THREE.TDSLoader.prototype = {
 	},
 
 	/**
-	 * Set resource path used to determine the file path to attached resources.
+	 * Set path to adjust the path to the original 3ds file.
 	 *
 	 * @method setPath
-	 * @param {String} path Path to resources.
+	 * @param {String} path Path to file.
 	 * @return Self for chaining.
 	 */
 	setPath: function ( path ) {
 
 		this.path = path;
+
+		return this;
+
+	},
+
+	/**
+	 * Set resource path used to determine the path to attached resources like textures.
+	 *
+	 * @method setResourcePath
+	 * @param {String} resourcePath Path to resources.
+	 * @return Self for chaining.
+	 */
+	setResourcePath: function ( resourcePath ) {
+
+		this.resourcePath = resourcePath;
+
+		return this;
+
+	},
+
+	/**
+	 * Set crossOrigin value to configure CORS settings
+	 * for the image loading process.
+	 *
+	 * @method setCrossOrigin
+	 * @param {String} crossOrigin crossOrigin string.
+	 * @return Self for chaining.
+	 */
+	setCrossOrigin: function ( crossOrigin ) {
+
+		this.crossOrigin = crossOrigin;
 
 		return this;
 

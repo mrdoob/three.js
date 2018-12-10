@@ -23,6 +23,18 @@ THREE.SubdivisionModifier = function ( subdivisions ) {
 // Applies the "modify" pattern
 THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
+	if ( geometry.isBufferGeometry ) {
+
+		geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+
+	} else {
+
+		geometry = geometry.clone();
+
+	}
+
+	geometry.mergeVertices();
+
 	var repeats = this.subdivisions;
 
 	while ( repeats -- > 0 ) {
@@ -34,9 +46,11 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
 
+	return geometry;
+
 };
 
-( function() {
+( function () {
 
 	// Some constants
 	var WARNINGS = ! true; // Set to true for development
@@ -98,7 +112,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	function generateLookups( vertices, faces, metaVertices, edges ) {
 
-		var i, il, face, edge;
+		var i, il, face;
 
 		for ( i = 0, il = vertices.length; i < il; i ++ ) {
 
@@ -118,9 +132,9 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	}
 
-	function newFace( newFaces, a, b, c ) {
+	function newFace( newFaces, a, b, c, materialIndex ) {
 
-		newFaces.push( new THREE.Face3( a, b, c ) );
+		newFaces.push( new THREE.Face3( a, b, c, undefined, undefined, materialIndex ) );
 
 	}
 
@@ -146,7 +160,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var oldVertices, oldFaces, oldUvs;
 		var newVertices, newFaces, newUVs = [];
 
-		var n, l, i, il, j, k;
+		var n, i, il, j, k;
 		var metaVertices, sourceEdges;
 
 		// new stuff.
@@ -346,10 +360,10 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			// create 4 faces.
 
-			newFace( newFaces, edge1, edge2, edge3 );
-			newFace( newFaces, face.a, edge1, edge3 );
-			newFace( newFaces, face.b, edge2, edge1 );
-			newFace( newFaces, face.c, edge3, edge2 );
+			newFace( newFaces, edge1, edge2, edge3, face.materialIndex );
+			newFace( newFaces, face.a, edge1, edge3, face.materialIndex );
+			newFace( newFaces, face.b, edge2, edge1, face.materialIndex );
+			newFace( newFaces, face.c, edge3, edge2, face.materialIndex );
 
 			// create 4 new uv's
 

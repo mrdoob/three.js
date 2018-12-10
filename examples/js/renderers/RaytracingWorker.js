@@ -1,13 +1,12 @@
-var worker;
 var BLOCK = 128;
-var startX, startY, division, completed = 0;
+var startX, startY;
 
 var scene, camera, renderer, loader, sceneId;
 
 importScripts( '../../../build/three.js' );
 
 
-self.onmessage = function( e ) {
+self.onmessage = function ( e ) {
 
 	var data = e.data;
 	if ( ! data ) return;
@@ -18,7 +17,6 @@ self.onmessage = function( e ) {
 			width = data.init[ 0 ],
 			height = data.init[ 1 ];
 
-		worker = data.worker;
 		BLOCK = data.blockSize;
 
 		if ( ! renderer ) renderer = new THREE.RaytracingRendererWorker();
@@ -29,8 +27,6 @@ self.onmessage = function( e ) {
 		// TODO fix passing maxRecursionDepth as parameter.
 		// if (data.maxRecursionDepth) maxRecursionDepth = data.maxRecursionDepth;
 
-		completed = 0;
-
 	}
 
 	if ( data.scene ) {
@@ -39,7 +35,7 @@ self.onmessage = function( e ) {
 		camera = loader.parse( data.camera );
 
 		var meta = data.annex;
-		scene.traverse( function( o ) {
+		scene.traverse( function ( o ) {
 
 			if ( o.isPointLight ) {
 
@@ -49,10 +45,11 @@ self.onmessage = function( e ) {
 
 			var mat = o.material;
 
-			if (!mat) return;
+			if ( ! mat ) return;
 
 			var material = meta[ mat.uuid ];
-			for (var m in material) {
+
+			for ( var m in material ) {
 
 				mat[ m ] = material[ m ];
 
@@ -61,6 +58,7 @@ self.onmessage = function( e ) {
 		} );
 
 		sceneId = data.sceneId;
+
 	}
 
 	if ( data.render && scene && camera ) {
@@ -71,7 +69,7 @@ self.onmessage = function( e ) {
 
 	}
 
-}
+};
 
 /**
  * DOM-less version of Raytracing Renderer
@@ -83,8 +81,6 @@ self.onmessage = function( e ) {
 THREE.RaytracingRendererWorker = function () {
 
 	console.log( 'THREE.RaytracingRendererWorker', THREE.REVISION );
-
-	var scope = this;
 
 	var maxRecursionDepth = 3;
 
@@ -172,7 +168,7 @@ THREE.RaytracingRendererWorker = function () {
 			var material = object.material;
 			var face = intersection.face;
 
-			var vertices = object.geometry.vertices;
+			var geometry = object.geometry;
 
 			//
 
@@ -254,7 +250,7 @@ THREE.RaytracingRendererWorker = function () {
 						// (should be possible to cache even more)
 
 						localPoint.copy( point ).applyMatrix4( _object.inverseMatrix );
-						computePixelNormal( normalVector, localPoint, material.flatShading, face, vertices );
+						computePixelNormal( normalVector, localPoint, material.flatShading, face, geometry );
 						normalVector.applyMatrix3( _object.normalMatrix ).normalize();
 
 						normalComputed = true;
@@ -382,14 +378,17 @@ THREE.RaytracingRendererWorker = function () {
 
 	var computePixelNormal = ( function () {
 
+		var vA = new THREE.Vector3();
+		var vB = new THREE.Vector3();
+		var vC = new THREE.Vector3();
+
 		var tmpVec1 = new THREE.Vector3();
 		var tmpVec2 = new THREE.Vector3();
 		var tmpVec3 = new THREE.Vector3();
 
-		return function computePixelNormal( outputVector, point, flatShading, face, vertices ) {
+		return function computePixelNormal( outputVector, point, flatShading, face, geometry ) {
 
 			var faceNormal = face.normal;
-			var vertexNormals = face.vertexNormals;
 
 			if ( flatShading === true ) {
 
@@ -397,11 +396,14 @@ THREE.RaytracingRendererWorker = function () {
 
 			} else {
 
-				// compute barycentric coordinates
+				var positions = geometry.attributes.position;
+				var normals = geometry.attributes.normal;
 
-				var vA = vertices[ face.a ];
-				var vB = vertices[ face.b ];
-				var vC = vertices[ face.c ];
+				vA.fromBufferAttribute( positions, face.a );
+				vB.fromBufferAttribute( positions, face.b );
+				vC.fromBufferAttribute( positions, face.c );
+
+				// compute barycentric coordinates
 
 				tmpVec3.crossVectors( tmpVec1.subVectors( vB, vA ), tmpVec2.subVectors( vC, vA ) );
 				var areaABC = faceNormal.dot( tmpVec3 );
@@ -418,13 +420,12 @@ THREE.RaytracingRendererWorker = function () {
 
 				// compute interpolated vertex normal
 
-				tmpVec1.copy( vertexNormals[ 0 ] );
+				tmpVec1.fromBufferAttribute( normals, face.a );
+				tmpVec2.fromBufferAttribute( normals, face.b );
+				tmpVec3.fromBufferAttribute( normals, face.c );
+
 				tmpVec1.multiplyScalar( a );
-
-				tmpVec2.copy( vertexNormals[ 1 ] );
 				tmpVec2.multiplyScalar( b );
-
-				tmpVec3.copy( vertexNormals[ 2 ] );
 				tmpVec3.multiplyScalar( c );
 
 				outputVector.addVectors( tmpVec1, tmpVec2 );
@@ -479,21 +480,16 @@ THREE.RaytracingRendererWorker = function () {
 				blockY: blockY,
 				blockSize: blockSize,
 				sceneId: sceneId,
-				time: Date.now() - reallyThen, // time for this renderer
+				time: Date.now(), // time for this renderer
 			}, [ data.buffer ] );
 
 			data = new Uint8ClampedArray( blockSize * blockSize * 4 );
-
-			// OK Done!
-			completed ++;
 
 		};
 
 	}() );
 
 	this.render = function ( scene, camera ) {
-
-		reallyThen = Date.now()
 
 		// update scene graph
 

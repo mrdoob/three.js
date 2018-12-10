@@ -110,7 +110,15 @@ function WebGLLights() {
 
 		id: count ++,
 
-		hash: '',
+		hash: {
+			stateID: - 1,
+			directionalLength: - 1,
+			pointLength: - 1,
+			spotLength: - 1,
+			rectAreaLength: - 1,
+			hemiLength: - 1,
+			shadowsLength: - 1
+		},
 
 		ambient: [ 0, 0, 0 ],
 		directional: [],
@@ -204,7 +212,7 @@ function WebGLLights() {
 
 				uniforms.coneCos = Math.cos( light.angle );
 				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
-				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+				uniforms.decay = light.decay;
 
 				uniforms.shadow = light.castShadow;
 
@@ -265,7 +273,7 @@ function WebGLLights() {
 
 				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 				uniforms.distance = light.distance;
-				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+				uniforms.decay = light.decay;
 
 				uniforms.shadow = light.castShadow;
 
@@ -316,7 +324,13 @@ function WebGLLights() {
 		state.point.length = pointLength;
 		state.hemi.length = hemiLength;
 
-		state.hash = state.id + ',' + directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
+		state.hash.stateID = state.id;
+		state.hash.directionalLength = directionalLength;
+		state.hash.pointLength = pointLength;
+		state.hash.spotLength = spotLength;
+		state.hash.rectAreaLength = rectAreaLength;
+		state.hash.hemiLength = hemiLength;
+		state.hash.shadowsLength = shadows.length;
 
 	}
 

@@ -27,7 +27,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -56,13 +56,17 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-
-		<script src="js/Detector.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var statsEnabled = true;
 
@@ -74,7 +78,7 @@
 
 			var composer, composerUV1, composerUV2, composerUV3, composerBeckmann;
 
-			var directionalLight, pointLight, ambientLight;
+			var directionalLight;
 
 			var mouseX = 0, mouseY = 0;
 			var targetX = 0, targetY = 0;
@@ -105,12 +109,12 @@
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xddddff, 0.5 );
-				directionalLight.position.set( -1, 0.5, -1 );
+				directionalLight.position.set( - 1, 0.5, - 1 );
 				scene.add( directionalLight );
 
 				// MATERIALS
 
-				var diffuse = 0xbbbbbb, specular = 0x555555, shininess = 50;
+				var diffuse = 0xbbbbbb, specular = 0x555555;
 
 				var shader = THREE.ShaderSkin[ "skin" ];
 
@@ -118,10 +122,10 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				uniformsUV[ "tNormal" ].value = textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniformsUV[ "uNormalScale" ].value = -1.5;
+				uniformsUV[ "tNormal" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniformsUV[ "uNormalScale" ].value = - 1.5;
 
-				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 
@@ -149,10 +153,10 @@
 
 				// LOADER
 
-				loader = new THREE.JSONLoader();
-				loader.load(  "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) {
+				loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
-					createScene( geometry, 100, material );
+					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
 
 				} );
 
@@ -197,6 +201,7 @@
 				//
 
 				var pars = {
+					generateMipmaps: true,
 					minFilter: THREE.LinearMipmapLinearFilter,
 					magFilter: THREE.LinearFilter,
 					format: THREE.RGBFormat,

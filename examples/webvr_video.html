@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webvr - video</title>
+		<title>three.js webvr - 360 stereo video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-05-12 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-05-12" content="AkM+gi6Fb7IUBwFLs18hn/x6dusbsVRYG9KBTWUUjvmT0m0wGkxRPy63Aj/i+Ti4d6qMEMnRcsR7MVV5Wuvp/AIAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyNjExODIwMH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
 		<style>
 			body {
 				font-family: Monospace;
@@ -28,7 +30,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - vr video<br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - 360 stereo video<br />
 			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.
 		</div>
 
@@ -133,10 +135,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
-				renderer.vr.userHeight = 0; // TOFIX
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'head-model' } ) );
 
 				//
 
@@ -155,7 +156,7 @@
 
 			function animate() {
 
-				renderer.animate( render );
+				renderer.setAnimationLoop( render );
 
 			}
 

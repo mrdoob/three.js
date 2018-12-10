@@ -1264,7 +1264,7 @@ var guis = {
 
 		var data = {
 			steps: 2,
-			amount: 16,
+			depth: 16,
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
@@ -1292,7 +1292,7 @@ var guis = {
 		var folder = gui.addFolder( 'THREE.ExtrudeGeometry' );
 
 		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'depth', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
@@ -1305,7 +1305,7 @@ var guis = {
 
 		var data = {
 			steps: 2,
-			amount: 16,
+			depth: 16,
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
@@ -1333,7 +1333,7 @@ var guis = {
 		var folder = gui.addFolder( 'THREE.ExtrudeBufferGeometry' );
 
 		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'depth', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );

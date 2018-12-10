@@ -107,7 +107,7 @@
 					wireframe: true
 				} );
 
-				var textShapes = font.generateShapes( theText, 180, 2 );
+				var textShapes = font.generateShapes( theText, 180 );
 
 				var geometry = new THREE.ShapeBufferGeometry( textShapes );
 
@@ -119,9 +119,8 @@
 
 				var vA = new THREE.Vector2();
 				var vB = new THREE.Vector2();
-				var vDot = new THREE.Vector2();
 
-				function processShape( path, reverse ) {
+				function processShape( path ) {
 
 					var pts = []; // bigger area (convex hull)
 					var pts2 = []; // smaller area (full solid shapes)
@@ -157,19 +156,19 @@
 
 							} else {
 
-											pts.push( curve.v2 );
-											pts2.push( curve.v1 );
-											pts2.push( curve.v2 );
+								pts.push( curve.v2 );
+								pts2.push( curve.v1 );
+								pts2.push( curve.v2 );
 
 							}
 
-								var flip = wind ? 1 : - 1;
-								// if (reverse) flip *= -1;
+							var flip = wind ? 1 : - 1;
+							// if (reverse) flip *= -1;
 
-								invert.push( flip, flip, flip );
-								beziers.push( curve.v0, curve.v1, curve.v2 );
+							invert.push( flip, flip, flip );
+							beziers.push( curve.v0, curve.v1, curve.v2 );
 
-							}
+						}
 
 					}
 
@@ -240,7 +239,7 @@
 
 				for ( var i = 0; i < beziers.length; i += 3 ) {
 
-					uvs.push( 0, 0,  0.5, 0, 1, 1   );
+					uvs.push( 0, 0, 0.5, 0, 1, 1 );
 
 				}
 
