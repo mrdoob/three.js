@@ -8,135 +8,132 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>三角形（[name]）</h1>
 
 		<p class="desc">
-			A geometric triangle as defined by three [page:Vector3 Vector3s] representing its
-			three corners.
+			一个三角形由三个表示其三个角的[page:Vector3 Vector3]所定义。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
 		<p>
-		[page:Vector3 a] - the first corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).<br />
-		[page:Vector3 b] - the second corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).<br />
-		[page:Vector3 c] - the final corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).<br /><br />
+		[page:Vector3 a] - 三角形的第一个角，默认值是一个在(0, 0, 0)处的[page:Vector3]。<br />
+		[page:Vector3 b] - 三角形的第二个角，默认值是一个在(0, 0, 0)处的[page:Vector3]。<br />
+		[page:Vector3 c] - 三角形的第三个角（最后一个角），默认值是一个在(0, 0, 0)处的[page:Vector3]。<br /><br />
 
-		Creates a new [name].
+		创建一个新的[name]。
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Vector3 a]</h3>
 		<p>
-			The first corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).
+			三角形的第一个角，默认值是一个在(0, 0, 0)处的[page:Vector3]。
 		</p>
 
 		<h3>[property:Vector3 b]</h3>
 		<p>
-			The second corner of the triangle. Default is a [page:Vector3] at (0, 0, 0).
+			三角形的第二个角，默认值是一个在(0, 0, 0)处的[page:Vector3]。
 		</p>
 
 		<h3>[property:Vector3 c]</h3>
 		<p>
-		the final corner of the triangle. Default is a [page:Vector3] at (0, 0, 0)
+			三角形的第三个角（最后一个角），默认值是一个在(0, 0, 0)处的[page:Vector3]。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Triangle clone]()</h3>
 		<p>
-			Returns a new triangle with the same [page:.a a], [page:.b b] and  [page:.c c] properties as this one.
+			返回一个和该三角形具有相同[page:.a a]、[page:.b b]和[page:.c c]属性的新三角形。
 		</p>
 
 		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
 		<p>
 		[page:Vector3 point] - [page:Vector3] <br />
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Vector3 target] — 结果将被拷贝到这一Vector3中。<br /><br />
 
-		Returns the closest point on the triangle to [page:Vector3 point].
+		返回三角形上最靠近所给定的[page:Vector3 point]的点。
 		</p>
 
 		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] to check.<br /><br />
+		[page:Vector3 point] - 将被检测的[page:Vector3]。<br /><br />
 
-		Returns true if the passed point, when projected onto the plane of the triangle, lies within the triangle.
+		如果传入的点投影到三角形的平面内，则返回true。
 		</p>
 
 		<h3>[method:Triangle copy]( [param:Triangle triangle] )</h3>
 		<p>
-			Copies the values of the passed triangles's [page:.a a], [page:.b b] and [page:.c c]
-			properties to this triangle.
+			将传入的三角形的[page:.a a]、[page:.b b]和[page:.c c]属性复制给这一三角形。
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Triangle triangle] )</h3>
 		<p>
-		Returns true if the two triangles have identical [page:.a a], [page:.b b] and [page:.c c] properties.
+			若这两个三角形具有相同的[page:.a a]、[page:.b b]和[page:.c c]属性，则返回true。
 		</p>
 
 		<h3>[method:Float getArea]()</h3>
-		<p>Return the area of the triangle.</p>
+		<p>返回三角形的面积。</p>
 
 		<h3>[method:Vector3 getBarycoord]( [param:Vector3 point], [param:Vector3 target] )</h3>
 		<p>
 		[page:Vector3 point] - [page:Vector3] <br />
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Vector3 target] — 结果将会被拷贝到这一Vector3中。<br /><br />
 
-		Return a [link:https://en.wikipedia.org/wiki/Barycentric_coordinate_system barycentric coordinate]
-		 from the given vector. <br/><br/>
+		从给定的向量中返回一个[link:https://en.wikipedia.org/wiki/Barycentric_coordinate_system barycentric coordinate]（重心坐标）。<br/><br/>
 
-		[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png Picture of barycentric coordinates]
+		请参阅关于这一概念的相关图片：[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png Picture of barycentric coordinates]。
 		</p>
 
 		<h3>[method:Vector3 getMidpoint]( [param:Vector3 target] )</h3>
 		<p>
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Vector3 target] — 结果将会被拷贝到这一Vector3中。<br /><br />
 
-		Calculate the midpoint of the triangle.
+		计算三角形的中点。
 		</p>
 
 		<h3>[method:Vector3 getNormal]( [param:Vector3 target] )</h3>
 		<p>
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Vector3 target] — 结果将会被拷贝到这一Vector3中。<br /><br />
 
-		Calculate the [link:https://en.wikipedia.org/wiki/Normal_(geometry) normal vector] of the triangle.
+		计算三角形的法向量（[link:https://en.wikipedia.org/wiki/Normal_(geometry) normal vector]）。
 		</p>
 
 		<h3>[method:Plane getPlane]( [param:Plane target] )</h3>
 		<p>
-		[page:Vector3 target] — the result will be copied into this Plane.<br /><br />
+		[page:Vector3 target] — 结果将会被拷贝到这一Plane中。<br /><br />
 
-		Calculate a [page:Plane plane] based on the triangle. .
+		基于三角形计算出一个平面（[page:Plane plane]）。
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box] - Box to check for intersection against.<br /><br />
+		[page:Box3 box] - 将被用于检测是否与三角形有交集的box。<br /><br />
 
-		Determines whether or not this triangle intersects [page:Box3 box].
+		判定三角形与传入的[page:Box3 box]是否相交。
 		</p>
 
 		<h3>[method:Triangle set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
 		<p>
-		Sets the triangle's [page:.a a], [page:.b b] and [page:.c c] properties to the passed [page:vector3 vector3s].
+			将三角形的[page:.a a]、[page:.b b]和[page:.c c]属性设置为所传入的[page:vector3 vector3]。
 		</p>
 
 		<h3>[method:Triangle setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
 		<p>
-		points - [page:Array] of [page:Vector3]s <br />
-		i0 - [page:Integer] index <br />
-		i1 - [page:Integer] index <br />
-		i2 - [page:Integer] index<br /><br />
+		points - [page:Vector3]数组（[page:Array]） <br />
+		i0 - 整数（[page:Integer]）索引 <br />
+		i1 - 整数（[page:Integer]）索引 <br />
+		i2 - 整数（[page:Integer]）索引<br /><br />
 
-		Sets the triangle's vectors to the vectors in the array.
+		设置三角形的向量为数组中的向量。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
