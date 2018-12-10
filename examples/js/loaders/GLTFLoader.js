@@ -12,6 +12,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.dracoLoader = null;
+		this.resolveUrl = defaultResolveURL;
 
 	}
 
@@ -118,6 +119,13 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
+		setResolveUrl: function ( resolveUrl ) {
+
+			this.resolveUrl = resolveUrl;
+			return this;
+
+		},
+
 		parse: function ( data, path, onLoad, onError ) {
 
 			var content;
@@ -214,7 +222,8 @@ THREE.GLTFLoader = ( function () {
 
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
-				manager: this.manager
+				manager: this.manager,
+				resolveUrl: this.resolveUrl
 
 			} );
 
@@ -1247,7 +1256,7 @@ THREE.GLTFLoader = ( function () {
 
 	/* UTILITY FUNCTIONS */
 
-	function resolveURL( url, path ) {
+	function defaultResolveURL( url, path ) {
 
 		// Invalid URL
 		if ( typeof url !== 'string' || url === '' ) return '';
@@ -1691,6 +1700,8 @@ THREE.GLTFLoader = ( function () {
 		this.multiplePrimitivesCache = [];
 		this.multiPassGeometryCache = [];
 
+		this.resolveUrl = this.options.resolveUrl || defaultResolveURL;
+
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
@@ -1957,7 +1968,7 @@ THREE.GLTFLoader = ( function () {
 
 		return new Promise( function ( resolve, reject ) {
 
-			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
+			loader.load( this.resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
 
 				reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
 
@@ -2180,7 +2191,7 @@ THREE.GLTFLoader = ( function () {
 
 			return new Promise( function ( resolve, reject ) {
 
-				loader.load( resolveURL( sourceURI, options.path ), resolve, undefined, reject );
+				loader.load( this.resolveURL( sourceURI, options.path ), resolve, undefined, reject );
 
 			} );
 
