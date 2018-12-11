@@ -1017,7 +1017,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				if ( skeleton === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: No skeleton with UUID:' + child.skeletonUUID );
+					console.warn( 'THREE.ObjectLoader: No skeleton found with UUID:', child.skeletonUUID );
 
 				} else {
 
