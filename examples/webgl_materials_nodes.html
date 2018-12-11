@@ -1073,7 +1073,7 @@
 
 						mtl.color = new THREE.ColorNode( 0x3399FF );
 						mtl.environment = color;
-						mtl.environmentAlpha = new THREE.Math1Node( fresnel, THREE.Math1Node.SAT );
+						mtl.environmentAlpha = new THREE.Math1Node( fresnel, THREE.Math1Node.SATURATE );
 
 						// GUI
 
@@ -1209,7 +1209,7 @@
 							THREE.OperatorNode.ADD
 						);
 
-						var clamp0at1 = new THREE.Math1Node( offsetClamp, THREE.Math1Node.SAT );
+						var clamp0at1 = new THREE.Math1Node( offsetClamp, THREE.Math1Node.SATURATE );
 
 						var blend = new THREE.Math3Node( top, bottom, clamp0at1, THREE.Math3Node.MIX );
 
@@ -1498,7 +1498,7 @@
 						var mask = new THREE.SwitchNode( worldNormal, 'y' );
 
 						// clamp0at1
-						mask = new THREE.Math1Node( mask, THREE.Math1Node.SAT );
+						mask = new THREE.Math1Node( mask, THREE.Math1Node.SATURATE );
 
 						var timeOffset = new THREE.OperatorNode(
 							time,
@@ -1531,7 +1531,7 @@
 						var voronoiColors = new THREE.Math3Node(
 							colorB,
 							colorA,
-							new THREE.Math1Node( voronoiIntensity, THREE.Math1Node.SAT ), // mix needs clamp
+							new THREE.Math1Node( voronoiIntensity, THREE.Math1Node.SATURATE ), // mix needs clamp
 							THREE.Math3Node.MIX
 						);
 
@@ -1780,7 +1780,7 @@
 							THREE.OperatorNode.MUL
 						);
 
-						var bloodArea = new THREE.Math1Node( wrappedLightColor, THREE.Math1Node.SAT );
+						var bloodArea = new THREE.Math1Node( wrappedLightColor, THREE.Math1Node.SATURATE );
 
 						var totalLight = new THREE.OperatorNode(
 							directLight,
@@ -1903,7 +1903,7 @@
 							THREE.Math3Node.SMOOTHSTEP
 						);
 
-						var innerContour = new THREE.Math1Node( new THREE.Math1Node( lineScaled, THREE.Math1Node.SAT ), THREE.Math1Node.INVERT );
+						var innerContour = new THREE.Math1Node( new THREE.Math1Node( lineScaled, THREE.Math1Node.SATURATE ), THREE.Math1Node.INVERT );
 
 						// APPLY
 
@@ -2550,7 +2550,7 @@
 							THREE.Math3Node.SMOOTHSTEP
 						);
 
-						var sssAlpha = new THREE.Math1Node( sss, THREE.Math1Node.SAT );
+						var sssAlpha = new THREE.Math1Node( sss, THREE.Math1Node.SATURATE );
 
 						var frontColor, backColor;
 
