@@ -71,8 +71,8 @@
 
 		<h3>[property:String crossOrigin]</h3>
 		<p>
-            如果设置了，在开始加载前， 将为图片分配 [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
-            属性，其值为 *crossOrigin*, 默认为"anonymous"。
+			如果设置了，在开始加载前， 将为图片分配 [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
+			属性，其值为 *crossOrigin*, 默认为"anonymous"。
 		</p>
 
 		<h3>[property:LoadingManager manager]</h3>
@@ -105,16 +105,16 @@
 		[page:Function onError] — 在加载错误时被调用。<br />
 		</p>
 		<p>
-            从URL中进行加载，并将被解析的响应内容传递给onLoad。
+			从URL中进行加载，并将被解析的响应内容传递给onLoad。
 		</p>
 
 
-		<h3>[method:Object3D parse]( [param:Object json], [param:Function onLoad]  )</h3>
+		<h3>[method:Object3D parse]( [param:Object json], [param:Function onLoad]	)</h3>
 		<p>
 		[page:Object json] — 必选参数，需要被解析的JSON源。<br /><br />
 		[page:Function onLoad] — 当解析完成时被调用，其中参数被解析为[page:Object3D object].<br /><br />
 
-            解析一个<em>JSON</em>结构，并返回一个threejs对象.
+		解析一个<em>JSON</em>结构，并返回一个threejs对象.
 		内部使用[page:.load]进行加载, 但也可以直接用于解析先前加载的JSON结构。
 		</p>
 
@@ -122,28 +122,27 @@
 		<p>
 		[page:Object json] — 必选参数，需要被解析的JSON源。<br /><br />
 
-            此函数以JSON结构，用[page:.parse]去解析[page:Geometry geometries]或[page:BufferGeometry buffer geometries]。
+		此函数以JSON结构，用[page:.parse]去解析[page:Geometry geometries]或[page:BufferGeometry buffer geometries]。
 		</p>
 
 		<h3>[method:Object parseMaterials]( [param:Object json] )</h3>
 		<p>
-		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+		[page:Object json] —	必选参数，需要被解析的JSON源。<br /><br />
 
 		此函数通过[page:.parse]来使用[page:MaterialLoader]，以解析JSON结构中任意材质。
 		</p>
 
 		<h3>[method:Array parseAnimations]( [param:Object json] )</h3>
 		<p>
-		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+		[page:Object json] —	必选参数，需要被解析的JSON源。<br /><br />
 
 		此函数通过[page:.parse]来使用[page:AnimationClip.parse]， 以解析JSON结构中任意动画。
-    </p>
+		</p>
 
 		<h3>[method:Object parseImages]( [param:Object json] )</h3>
 		<p>
-		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
-
-            此函数通过[page:.parse]来使用[page:ImageLoader]， 以解析JSON结构中任意图片。
+		[page:Object json] —	必选参数，需要被解析的JSON源。<br /><br />
+		此函数通过[page:.parse]来使用[page:ImageLoader]， 以解析JSON结构中任意图片。
 		</p>
 
 		<h3>[method:Object parseShapes]( [param:Object json] )</h3>
@@ -153,7 +152,7 @@
 		TODO.
 		</p>
 
-		<h3>[method:Object parseSkeletons]( [param:Object json],  [param:Object3D object] )</h3>
+		<h3>[method:Object parseSkeletons]( [param:Object json],	[param:Object3D object] )</h3>
 		<p>
 		[page:Object json] — TODO.<br /><br />
 		[page:Object3D object] — TODO.<br /><br />
@@ -163,17 +162,17 @@
 
 		<h3>[method:Object parseTextures]( [param:Object json] )</h3>
 		<p>
-		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
-            此函数通过[page:.parse]来解析JSON结构中任意纹理。
+		[page:Object json] —	必选参数，需要被解析的JSON源。<br /><br />
+		此函数通过[page:.parse]来解析JSON结构中任意纹理。
 		</p>
 
 		<h3>[method:Object3D parseObject]( [param:Object data], [param:Object geometries], [param:Object materials] )</h3>
 		<p>
-		[page:Object data] —  必选参数，需要被解析的JSON源。<br /><br />
+		[page:Object data] —	必选参数，需要被解析的JSON源。<br /><br />
 		[page:Object geometries] — TODO.<br /><br />
 		[page:Object materials] — TODO.<br /><br />
 
-            此函数通过[page:.parse]来解析JSON结构中任意对象。
+		此函数通过[page:.parse]来解析JSON结构中任意对象。
 		对象可以为如下类型：
 
 		<ul>
@@ -202,7 +201,13 @@
 				[page:HemisphereLight]
 			</li>
 			<li>
+				[page:SkinnedMesh]
+			</li>
+			<li>
 				[page:Mesh]
+			</li>
+			<li>
+				[page:Bone]
 			</li>
 			<li>
 				[page:LOD]
