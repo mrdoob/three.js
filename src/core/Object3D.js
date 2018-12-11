@@ -687,7 +687,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 				materials: {},
 				textures: {},
 				images: {},
-				shapes: {}
+				shapes: {},
+				skeletons: {}
 			};
 
 			output.metadata = {
@@ -762,6 +763,21 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
+		if ( this.isSkinnedMesh ) {
+
+			if ( this.bindMode !== undefined ) object.bindMode = this.bindMode;
+			if ( this.bindMatrix !== undefined ) object.bindMatrix = this.bindMatrix.toArray();
+
+			if ( this.skeleton !== undefined ) {
+
+				serialize( meta.skeletons, this.skeleton );
+
+				object.skeleton = this.skeleton.uuid;
+
+			}
+
+		}
+
 		if ( this.material !== undefined ) {
 
 			if ( Array.isArray( this.material ) ) {
@@ -805,12 +821,14 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			var textures = extractFromCache( meta.textures );
 			var images = extractFromCache( meta.images );
 			var shapes = extractFromCache( meta.shapes );
+			var skeletons = extractFromCache( meta.skeletons );
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
 			if ( textures.length > 0 ) output.textures = textures;
 			if ( images.length > 0 ) output.images = images;
 			if ( shapes.length > 0 ) output.shapes = shapes;
+			if ( skeletons.length > 0 ) output.skeletons = skeletons;
 
 		}
 

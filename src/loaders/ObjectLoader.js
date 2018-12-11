@@ -30,6 +30,8 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LOD } from '../objects/LOD.js';
 import { Mesh } from '../objects/Mesh.js';
 import { SkinnedMesh } from '../objects/SkinnedMesh.js';
+import { Bone } from '../objects/Bone.js';
+import { Skeleton } from '../objects/Skeleton.js';
 import { Shape } from '../extras/core/Shape.js';
 import { Fog } from '../scenes/Fog.js';
 import { FogExp2 } from '../scenes/FogExp2.js';
@@ -134,7 +136,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	parse: function ( json, onLoad ) {
 
-		var shapes = this.parseShape( json.shapes );
+		var shapes = this.parseShapes( json.shapes );
 		var geometries = this.parseGeometries( json.geometries, shapes );
 
 		var images = this.parseImages( json.images, function () {
@@ -147,6 +149,10 @@ Object.assign( ObjectLoader.prototype, {
 		var materials = this.parseMaterials( json.materials, textures );
 
 		var object = this.parseObject( json.object, geometries, materials );
+
+		var skeletons = this.parseSkeletons( json.skeletons, object );
+
+		this.bindSkeletons( object, skeletons );
 
 		if ( json.animations ) {
 
@@ -164,7 +170,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parseShape: function ( json ) {
+	parseShapes: function ( json ) {
 
 		var shapes = {};
 
@@ -181,6 +187,26 @@ Object.assign( ObjectLoader.prototype, {
 		}
 
 		return shapes;
+
+	},
+
+	parseSkeletons: function ( json, object ) {
+
+		var skeletons = {};
+
+		if ( json !== undefined ) {
+
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+				var skeleton = new Skeleton().fromJSON( json[ i ], object );
+
+				skeletons[ skeleton.uuid ] = skeleton;
+
+			}
+
+		}
+
+		return skeletons;
 
 	},
 
@@ -828,22 +854,32 @@ Object.assign( ObjectLoader.prototype, {
 
 			case 'SkinnedMesh':
 
-				console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
+				var geometry = getGeometry( data.geometry );
+				var material = getMaterial( data.material );
+
+				object = new SkinnedMesh( geometry, material );
+
+				if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
+				if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
+
+				// "skeletonUUID" is used to indentify the correct skeleton in .bindSkeletons()
+
+				if ( data.skeleton !== undefined ) object.skeletonUUID = data.skeleton;
+
+				break;
 
 			case 'Mesh':
 
 				var geometry = getGeometry( data.geometry );
 				var material = getMaterial( data.material );
 
-				if ( geometry.bones && geometry.bones.length > 0 ) {
+				object = new Mesh( geometry, material );
 
-					object = new SkinnedMesh( geometry, material );
+				break;
 
-				} else {
+			case 'Bone':
 
-					object = new Mesh( geometry, material );
-
-				}
+				object = new Bone();
 
 				break;
 
@@ -966,6 +1002,36 @@ Object.assign( ObjectLoader.prototype, {
 		}
 
 		return object;
+
+	},
+
+	bindSkeletons: function ( object, skeletons ) {
+
+		if ( Object.keys( skeletons ).length === 0 ) return;
+
+		object.traverse( function ( child ) {
+
+			if ( child.isSkinnedMesh === true && child.skeletonUUID !== undefined ) {
+
+				var skeleton = skeletons[ child.skeletonUUID ];
+
+				if ( skeleton === undefined ) {
+
+					console.warn( 'THREE.ObjectLoader: No skeleton with UUID:' + child.skeletonUUID );
+
+				} else {
+
+					child.bind( skeleton, child.bindMatrix );
+
+				}
+
+				delete child.skeletonUUID;
+
+			}
+
+		} );
+
+		return this;
 
 	}
 

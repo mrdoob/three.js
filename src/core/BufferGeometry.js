@@ -952,7 +952,30 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var attribute = attributes[ key ];
 
-			var array = Array.prototype.slice.call( attribute.array );
+			var array;
+
+			if ( attribute.isInterleavedBufferAttribute ) {
+
+				var count = attribute.count;
+				var itemSize = attribute.itemSize;
+				array = attribute.array.slice( 0, count * itemSize );
+
+				var s = 0;
+
+				for ( var i = 0; i < count; ++ i ) {
+
+					array[ s ++ ] = attribute.getX( i );
+					if ( itemSize >= 2 ) array[ s ++ ] = attribute.getY( i );
+					if ( itemSize >= 3 ) array[ s ++ ] = attribute.getZ( i );
+					if ( itemSize >= 4 ) array[ s ++ ] = attribute.getW( i );
+
+				}
+
+			} else {
+
+				array = Array.prototype.slice.call( attribute.array );
+
+			}
 
 			data.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,

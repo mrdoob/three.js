@@ -79,6 +79,11 @@ var armSkeleton = new THREE.Skeleton( bones );
 		The [page:DataTexture] holding the bone data when using a vertex texture.
 		</p>
 
+		<h3>[property:Number boneTextureSize]</h3>
+		<p>
+		The size of the bone texture.
+		</p>
+
 
 		<h2>Methods</h2>
 
@@ -92,8 +97,20 @@ var armSkeleton = new THREE.Skeleton( bones );
 		<p>Generates the [page:.boneInverses boneInverses] array if not provided in the constructor.</p>
 
 
+		<h3>[method:Skeleton fromJSON]( [param:Object json], [param:Object3D object])</h3>
+		<p>Creates the skeleton by the given JSON data and object hierarchy.</p>
+
+
+		<h3>[method:Skeleton init]()</h3>
+		<p>Initializes [page:.boneMatrices] and [page:.boneInverses] if necessary.</p>
+
+
 		<h3>[method:null pose]()</h3>
 		<p>Returns the skeleton to the base pose.</p>
+
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>Serializes this skeleton object.</p>
 
 
 		<h3>[method:null update]()</h3>

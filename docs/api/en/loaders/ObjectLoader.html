@@ -88,6 +88,14 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:ObjectLoader bindSkeletons]( [param:Object3D object], [param:Array skeletons] )</h3>
+		<p>
+		[page:Object3D object] — required. The parsed object hierarchy.<br /><br />
+		[page:Array skeletons] — required. An array of parsed skeletons.<br /><br />
+
+		Used to bind skeletons to objects of type [page:SkinnedMesh].
+		</p>
+
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — the path or URL to the file. This can also be a
@@ -100,7 +108,6 @@
 		Begin loading from url and call onLoad with the parsed response content.
 		</p>
 
-
 		<h3>[method:Object3D parse]( [param:Object json], [param:Function onLoad]  )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
@@ -111,46 +118,41 @@
 		a previously loaded JSON structure.
 		</p>
 
-		<h3>[method:Object3D parseGeometries]( [param:Object json] )</h3>
+		<h3>[method:Array parseAnimations]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
-		This is used [page:.parse] to parse any [page:Geometry geometries] or [page:BufferGeometry buffer geometries]  in the JSON structure.
+		This is used by [page:.parse]() to parse any animations in the JSON structure, using [page:AnimationClip.parse]().
 		</p>
 
-		<h3>[method:Object3D parseMaterials]( [param:Object json] )</h3>
+		<h3>[method:Object parseGeometries]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
-		This is used [page:.parse] to parse any materials in the JSON structure using [page:MaterialLoader].
+		This is used by [page:.parse]() to parse any geometries in the JSON structure.
 		</p>
 
-		<h3>[method:Object3D parseAnimations]( [param:Object json] )</h3>
-		<p>
-		[page:Object json] — required. The JSON source to parse.<br /><br />
-
-		This is used [page:.parse] to parse any animations in the JSON structure, using [page:AnimationClip.parse].
-		</p>
-
-		<h3>[method:Object3D parseImages]( [param:Object json] )</h3>
+		<h3>[method:Object parseImages]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used [page:.parse] to parse any images in the JSON structure, using [page:ImageLoader].
 		</p>
 
-		<h3>[method:Object3D parseTextures]( [param:Object json] )</h3>
+		<h3>[method:Object parseMaterials]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
-		This is used [page:.parse] to parse any textures in the JSON structure.
+		This is used by [page:.parse]() to parse any materials in the JSON structure using [page:MaterialLoader].
 		</p>
 
-		<h3>[method:Object3D parseObject]( [param:Object json] )</h3>
+		<h3>[method:Object3D parseObject]( [param:Object data], [param:Object geometries], [param:Object materials] )</h3>
 		<p>
-		[page:Object json] — required. The JSON source to parse.<br /><br />
+		[page:Object data] — required. The JSON source to parse.<br /><br />
+		[page:Object geometries] — The parsed geometries.<br /><br />
+		[page:Object materials] — The parsed materials.<br /><br />
 
-		This is used [page:.parse] to parse any objects in the JSON structure.
+		This is used by [page:.parse]() to parse any objects in the JSON structure.
 		Objects can be of the following types:
 
 		<ul>
@@ -204,6 +206,28 @@
 			</li>
 
 		</ul>
+		</p>
+
+		<h3>[method:Object parseShapes]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — required. The JSON source to parse.<br /><br />
+
+		This is used by [page:.parse]() to parse any shapes in the JSON structure.
+		</p>
+
+		<h3>[method:Object parseSkeletons]( [param:Object json],  [param:Object3D object] )</h3>
+		<p>
+		[page:Object json] — required. The JSON source to parse.<br /><br />
+		[page:Object3D object] — required. A hierarchy of 3D objects which is used to query the bones.<br /><br />
+
+		This is used by [page:.parse]() to parse any skeletons in the JSON structure.
+		</p>
+
+		<h3>[method:Object parseTextures]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — required. The JSON source to parse.<br /><br />
+
+		This is used by [page:.parse]() to parse any textures in the JSON structure.
 		</p>
 
 		<h3>[method:ObjectLoader setCrossOrigin]( [param:String value] )</h3>
