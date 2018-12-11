@@ -14,7 +14,7 @@ function Raycaster( origin, direction, near, far, camera = undefined ) {
 	this.near = near || 0;
 	this.far = far || Infinity;
 
-	this.camera = camera
+	this.camera = camera;
 
 	this.params = {
 		Mesh: {},
