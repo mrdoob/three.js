@@ -6,13 +6,15 @@ import { Ray } from '../math/Ray.js';
  * @author stephomi / http://stephaneginier.com/
  */
 
-function Raycaster( origin, direction, near, far ) {
+function Raycaster( origin, direction, near, far, camera = undefined ) {
 
 	this.ray = new Ray( origin, direction );
 	// direction is assumed to be normalized (for accurate distance calculations)
 
 	this.near = near || 0;
 	this.far = far || Infinity;
+
+	this.camera = camera
 
 	this.params = {
 		Mesh: {},
@@ -65,11 +67,13 @@ Object.assign( Raycaster.prototype, {
 
 	linePrecision: 1,
 
-	set: function ( origin, direction ) {
+	set: function ( origin, direction, camera = undefined ) {
 
 		// direction is assumed to be normalized (for accurate distance calculations)
 
 		this.ray.set( origin, direction );
+
+		this.camera = camera;
 
 	},
 
@@ -80,10 +84,14 @@ Object.assign( Raycaster.prototype, {
 			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
 			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 
+			this.camera = camera;
+
 		} else if ( ( camera && camera.isOrthographicCamera ) ) {
 
 			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
 			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
+
+			this.camera = camera;
 
 		} else {
 

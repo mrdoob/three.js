@@ -59,13 +59,17 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 		var ray = new THREE.Ray();
 		var inverseMatrix = new THREE.Matrix4();
 		var pointOnSegment = new THREE.Vector3();
+		var pointOnSegmentNDC = new THREE.Vector3();
 		var pointOnRay = new THREE.Vector3();
+		var pointOnRayNDC = new THREE.Vector3();
 		var startPoint3 = new THREE.Vector3();
 		var endPoint3 = new THREE.Vector3();
 
 		return function raycast( raycaster, intersects ) {
 
-			var precision = raycaster.linePrecision; // todo: calculate proper precision
+			if ( raycaster.camera === undefined ) return;
+
+			var precision = this.material.linewidth / this.material.resolution.y;
 
 			inverseMatrix.getInverse( this.matrixWorld );
 			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
@@ -78,7 +82,13 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 				startPoint3.fromBufferAttribute( geometry.attributes.instanceStart, i );
 				endPoint3.fromBufferAttribute( geometry.attributes.instanceEnd, i );
 
-				var distSq = ray.distanceSqToSegment( startPoint3, endPoint3, pointOnRay, pointOnSegment );
+				ray.distanceSqToSegment( startPoint3, endPoint3, pointOnRay, pointOnSegment );
+
+				// Set z to 0 because for raycasting we shouldn't consider depth.
+				pointOnSegmentNDC.copy( pointOnSegment ).project( raycaster.camera ).setZ( 0 );
+				pointOnRayNDC.copy( pointOnRay ).project( raycaster.camera ).setZ( 0 );
+
+				var distSq = pointOnSegmentNDC.distanceTo( pointOnRayNDC )
 
 				if ( distSq > precision ) continue;
 
