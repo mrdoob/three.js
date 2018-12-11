@@ -8,62 +8,61 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>射线（[name]）</h1>
 
 		<p class="desc">
-			A ray that emits from an origin in a certain direction. This is used by the
-			[page:Raycaster] to assist with [link:https://en.wikipedia.org/wiki/Ray_casting raycasting].
-			Raycasting is used for mouse picking (working out what objects in the 3D space the mouse is over) amongst
-			other things.
+			射线由一个原点向一个确定的方向发射。它被[page:Raycaster]（光线投射）所使用，
+			以用于辅助[link:https://en.wikipedia.org/wiki/Ray_casting raycasting]。
+			光线投射用于在各个物体之间进行拾取（当鼠标经过三维空间中的物体/对象时进行拾取）。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
-		[page:Vector3 origin] - (optional) the origin of the [page:Ray]. Default is a [page:Vector3] at (0, 0, 0).<br />
-		[page:Vector3 direction] - [page:Vector3] The direction of the [page:Ray]. This must be normalized
-		 (with [page:Vector3.normalize]) for the methods to operate properly.  Default is a [page:Vector3] at (0, 0, 0).<br /><br />
+		[page:Vector3 origin] - （可选）[page:Ray]（射线）的原点，默认值是一个位于(0, 0, 0)的[page:Vector3]。<br />
+		[page:Vector3 direction] - [page:Vector3] [page:Ray]（射线）的方向。该向量必须被标准化（使用[page:Vector3.normalize]函数），这样才能使方法正常运行。
+		默认值是一个位于(0, 0, 0)的[page:Vector3]。<br /><br />
 
-		Creates a new [name].
+		创建一个新的[name]。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Vector3 origin]</h3>
-		<p>The origin of the [page:Ray]. Default is a [page:Vector3] at (0, 0, 0).</p>
+		<p>[page:Ray]（射线）的原点，默认值是一个位于(0, 0, 0)的[page:Vector3]。</p>
 
 		<h3>[property:Vector3 direction]</h3>
 		<p>
-		The direction of the [page:Ray]. This must be normalized (with [page:Vector3.normalize])
-		for the methods to operate properly. Default is a [page:Vector3] at (0, 0, 0).
+		[page:Ray]（射线）的方向。该向量必须被标准化（使用[page:Vector3.normalize]函数），这样才能使方法正常运行。
+		默认值是一个位于(0, 0, 0)的[page:Vector3]。
 		</p>
 
 
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Ray applyMatrix4]( [param:Matrix4 matrix4] )</h3>
 		<p>
-		[page:Matrix4 matrix4] - the [page:Matrix4] to apply to this [page:Ray].<br /><br />
+		[page:Matrix4 matrix4] - 将被用于这个[page:Ray]的[page:Matrix4]。<br /><br />
 
-		Transform this [page:Ray] by the [page:Matrix4].
+		使用传入的[page:Matrix4]来变换这个[page:Ray]。
 		</p>
 
 		<h3>[method:Vector3 at]( [param:Float t], [param:Vector3 target] ) </h3>
 		<p>
-		[page:Float t] - the distance along the [page:Ray] to retrieve a position for.<br />
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Float t] - 使用这一传入的距离，在[page:Ray]上确定一个位置。<br />
+		[page:Vector3 target] — 结果将复制到这一Vector3中。<br /><br />
 
-		Get a [page:Vector3] that is a given distance along this [page:Ray].
+		获得这一[page:Ray]上给定距离处的[page:Vector3]。
 		</p>
 
 		<h3>[method:Ray clone]()</h3>
 		<p>
-			Creates a new Ray with identical [page:.origin origin] and [page:.direction direction]  to this one.
+			创建一个新的和这个Ray具有相同[page:.origin origin]和[page:.direction direction]的Ray。
 		</p>
 
 		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
@@ -71,20 +70,19 @@
 		[page:Vector3 point] - the point to get the closest approach to. <br />
 		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		Get the point along this [page:Ray] that is closest to the [page:Vector3] provided.
+		沿着[page:Ray]，获得与所传入[page:Vector3]最接近的点。
 		</p>
 
 		<h3>[method:Ray copy]( [param:Ray ray] )</h3>
 		<p>
-			Copies the [page:.origin origin] and [page:.direction direction] properties
-			of [page:Ray ray] into this ray.
+			复制所传入Ray的[page:.origin origin]和[page:.direction direction]属性到这个Ray上。
 		</p>
 
 		<h3>[method:Float distanceSqToPoint]( [param:Vector3 point] )</h3>
 		<p>
 		[page:Vector3 point] - the [page:Vector3] to compute a distance to.<br /><br />
 
-		Get the squared distance of the closest approach between the [page:Ray] and the [page:Vector3].
+		获得[page:Ray]与传入的[page:Vector3]之间最近的平方距离。
 		</p>
 
 		<h3>[method:Float distanceSqToSegment]( [param:Vector3 v0], [param:Vector3 v1], [param:Vector3 optionalPointOnRay], [param:Vector3 optionalPointOnSegment] )</h3>
@@ -116,10 +114,9 @@
 
 		<h3>[method:Boolean equals]( [param:Ray ray] )</h3>
 		<p>
-		[page:Ray ray] - the [page:Ray] to compare to.<br /><br />
+		[page:Ray ray] - 用于比较的[page:Ray]。<br /><br />
 
-		Returns true if this and the other [page:Ray ray] have equal [page:.offset offset]
-		 and [page:.direction direction].
+		如果所传入的[page:Ray ray]具有和当前Ray相同的[page:.offset offset]和[page:.direction direction]则返回true。
 		</p>
 
 		<h3>[method:Vector3 intersectBox]( [param:Box3 box], [param:Vector3 target] )</h3>
@@ -127,6 +124,7 @@
 		[page:Box3 box] - the [page:Box3] to intersect with.<br />
 		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
+		相交
 		Intersect this [page:Ray] with a [page:Box3], returning the intersection point or
 		*null* if there is no intersection.
 		</p>
@@ -182,9 +180,9 @@
 
 		<h3>[method:Ray lookAt]( [param:Vector3 v] )</h3>
 		<p>
-		[page:Vector3 v] - The [page:Vector3] to look at.<br /><br />
+		[page:Vector3 v] - 将要“直视”的[page:Vector3]<br /><br />
 
-		Adjusts the direction of the ray to point at the vector in world coordinates.
+		调整光线的方向到世界坐标中该向量所指代的点。
 		</p>
 
 		<h3>[method:Ray recast]( [param:Float t] )</h3>
@@ -207,7 +205,7 @@
 
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
