@@ -10,11 +10,11 @@
 	<body>
 		[page:Object3D] &rarr; [page:Mesh] &rarr;
 
-		<h1>[name]</h1>
+		<h1>蒙皮网格（[name]）</h1>
 
 		<p class="desc">
-			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.
-			The material must support skinning and have skinning enabled - see [page:MeshStandardMaterial.skinning].
+			具有[page:Skeleton]（骨架）和[page:Bone bones]（骨骼）的网格，可用于给几何体上的顶点添加动画。
+			其材质必须支持蒙皮，并且已经启用了蒙皮 —— 请阅读[page:MeshStandardMaterial.skinning]。
 		</p>
 
 		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
@@ -35,127 +35,134 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
-		var geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
+		var geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 5, 15, 5, 30 );
 
-		//Create the skin indices and skin weights
-		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+		// create the skin indices and skin weights
 
-			// Imaginary functions to calculate the indices and weights
-			// This part will need to be changed depending your skeleton and model
-			var skinIndex = calculateSkinIndex( geometry.vertices, i );
-			var skinWeight = calculateSkinWeight( geometry.vertices, i );
+		var position = geometry.attributes.position;
 
-			// Ease between each bone
-			geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex + 1, 0, 0 ) );
-			geometry.skinWeights.push( new THREE.Vector4( 1 - skinWeight, skinWeight, 0, 0 ) );
+		var vertex = new THREE.Vector3();
+
+		var skinIndices = [];
+		var skinWeights = [];
+
+		for ( var i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+
+			// compute skinIndex and skinWeight based on some configuration data
+
+			var y = ( vertex.y + sizing.halfHeight );
+
+			var skinIndex = Math.floor( y / sizing.segmentHeight );
+			var skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+
+			skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
+			skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
 
 		}
 
-		var mesh = new THREE.SkinnedMesh( geometry, material );
+		geometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+		geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 
-		// See example from THREE.Skeleton for the armSkeleton
-		var rootBone = armSkeleton.bones[ 0 ];
+		// create skinned mesh and skeleton
+
+		var mesh = new THREE.SkinnedMesh( geometry, material );
+		var skeleton = new THREE.Skeleton( bones );
+
+		// see example from THREE.Skeleton
+
+		var rootBone = skeleton.bones[ 0 ];
 		mesh.add( rootBone );
 
-		// Bind the skeleton to the mesh
-		mesh.bind( armSkeleton );
+		// bind the skeleton to the mesh
 
-		// Move the bones and manipulate the model
-		armSkeleton.bones[ 0 ].rotation.x = -0.1;
-		armSkeleton.bones[ 1 ].rotation.x = 0.2;
+		mesh.bind( skeleton );
+
+		// move the bones and manipulate the model
+
+		skeleton.bones[ 0 ].rotation.x = -0.1;
+		skeleton.bones[ 1 ].rotation.x = 0.2;
 		</code>
 
-		<h2>Constructor</h2>
-		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<h2>构造器</h2>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-    [page:Geometry geometry] - an instance of [page:Geometry] or [page:BufferGeometry] (recommended).
-		[page:Geometry.skinIndices skinIndices] and [page:Geometry.skinWeights skinWeights] should be set to true on the geometry.<br />
-    [page:Material material] - (optional) an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].
+    [page:BufferGeometry geometry] —— TODO<br />
+    [page:Material material] —— （可选）一个[page:Material]的实例，默认值是一个新的[page:MeshBasicMaterial]。
 		</p>
 
 
 
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Mesh] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Mesh]来查看共有属性。</p>
 
 		<h3>[property:string bindMode]</h3>
 		<p>
-		Either "attached" or "detached". "attached" uses the [page:SkinnedMesh.matrixWorld]
-		property for the base transform	matrix of the bones. "detached" uses the
-		[page:SkinnedMesh.bindMatrix]. Default is "attached".
+			“attached”（附加）或者“detached”（分离）。“attached”使用[page:SkinnedMesh.matrixWorld]
+			属性作为对骨骼的基本变换矩阵，“detached”则使用[page:SkinnedMesh.bindMatrix]。
+			默认值是“attached”。
 		</p>
 
 		<h3>[property:Matrix4 bindMatrix]</h3>
 		<p>
-		The base matrix that is used for the bound bone transforms.
+		用于绑定的骨骼变换的基础矩阵。
 		</p>
 
 		<h3>[property:Matrix4 bindMatrixInverse]</h3>
 		<p>
-		The base matrix that is used for resetting the bound bone transforms.
+		用于重置绑定的骨骼变换的基础矩阵。
 		</p>
 
 		<h3>[property:Boolean isSkinnedMesh]</h3>
 		<p>
-			Used to check whether this or derived classes are skinned meshes. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
+			用于检查这个类或者其派生类是否为蒙皮网格，默认值为*true*。<br /><br />
+			你不应当对这个属性进行改变，因为它在使用，以用于优化。
 		</p>
 
 		<h3>[property:Skeleton skeleton]</h3>
 		<p>
-		[page:Skeleton] created from the [page:Geometry.bones bones] of the [page:Geometry] passed in the
-		constructor.
+			TODO
 		</p>
 
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:Mesh] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Mesh]来查看共有方法。</p>
 
 		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
 		<p>
-		[page:Skeleton skeleton] - [page:Skeleton] created from a [page:Bone Bones] tree.<br/>
-		[page:Matrix4 bindMatrix] - [page:Matrix4] that represents the base transform of the skeleton.<br /><br />
-
-		Bind a skeleton to the skinned mesh. The bindMatrix gets saved to .bindMatrix property
-		and the .bindMatrixInverse gets calculated. This is called automatically in the constructor, and the skeleton
-		is created from the [page:Geometry.bones bones] of the [page:Geometry] passed in the
-		constructor.
+		[page:Skeleton skeleton] —— 由一棵[page:Bone Bones]树创建的[page:Skeleton]。<br/>
+		[page:Matrix4 bindMatrix] —— 代表着骨架基本变换的[page:Matrix4]（4x4矩阵）。<br /><br />
+		将骨架绑定到一个蒙皮网格上。bindMatrix会被保存到.bindMatrix属性中，其逆矩阵.bindMatrixInverse也会被计算出来。
 		</p>
 
 		<h3>[method:SkinnedMesh clone]()</h3>
 		<p>
-		Returns a clone of this SkinnedMesh object and any descendants.
+		返回当前SkinnedMesh对象的一个克隆及其任何后代。
 		</p>
 
 		<h3>[method:null normalizeSkinWeights]()</h3>
 		<p>
-		Normalizes the [page:Geometry.skinWeights] vectors. Does not affect [page:BufferGeometry].
+		TODO
 		</p>
 
 		<h3>[method:null pose]()</h3>
 		<p>
-		This method sets the skinned mesh in the rest pose (resets the pose).
+		这个方法设置了在“休息”状态下蒙皮网格的姿势（重置姿势）。
 		</p>
 
 		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
-		Updates the [page:Matrix4 MatrixWorld].
+		更新[page:Matrix4 MatrixWorld]矩阵。
 		</p>
 
-		<h3>[method:null initBones]()</h3>
-		<p>
-		Creates an array of hierarchical [page:Bone bones] objects from the internal geometry.
-		</p>
-
-		<h2>Source</h2>
-
+		<h2>源代码</h2>
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
 </html>

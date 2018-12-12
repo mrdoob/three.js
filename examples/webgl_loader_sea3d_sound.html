@@ -96,12 +96,16 @@
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
@@ -131,7 +135,7 @@
 
 			} );
 
-			loader.onComplete = function ( e ) {
+			loader.onComplete = function () {
 
 				audioListener = loader.audioListener;
 
@@ -179,11 +183,10 @@
 
 					var element = document.body;
 
-					var pointerlockchange = function ( event ) {
+					var pointerlockchange = function () {
 
 						if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
 
-							controlsEnabled = true;
 							controls.enabled = true;
 
 							blocker.style.display = 'none';
@@ -202,7 +205,7 @@
 
 					};
 
-					var pointerlockerror = function ( event ) {
+					var pointerlockerror = function () {
 
 						instructions.style.display = '';
 
@@ -217,7 +220,7 @@
 					document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
 					document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
 
-					instructions.addEventListener( 'click', function ( event ) {
+					instructions.addEventListener( 'click', function () {
 
 						instructions.style.display = 'none';
 

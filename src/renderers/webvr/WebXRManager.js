@@ -7,6 +7,7 @@ import { Vector4 } from '../../math/Vector4.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
+import { setProjectionFromUnion } from './WebVRUtils.js';
 
 function WebXRManager( renderer ) {
 
@@ -14,6 +15,8 @@ function WebXRManager( renderer ) {
 
 	var device = null;
 	var session = null;
+
+	var framebufferScaleFactor = 1.0;
 
 	var frameOfReference = null;
 	var frameOfReferenceType = 'stage';
@@ -94,6 +97,12 @@ function WebXRManager( renderer ) {
 
 	}
 
+	this.setFramebufferScaleFactor = function ( value ) {
+
+		framebufferScaleFactor = value;
+
+	};
+
 	this.setFrameOfReferenceType = function ( value ) {
 
 		frameOfReferenceType = value;
@@ -111,7 +120,7 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			session.baseLayer = new XRWebGLLayer( session, gl );
+			session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: framebufferScaleFactor } );
 			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
 
 				frameOfReference = value;
@@ -131,6 +140,13 @@ function WebXRManager( renderer ) {
 
 				inputSources = session.getInputSources();
 				console.log( inputSources );
+
+				for ( var i = 0; i < controllers.length; i ++ ) {
+
+					var controller = controllers[ i ];
+					controller.userData.inputSource = inputSources[ i ];
+
+				}
 
 			} );
 
@@ -161,8 +177,6 @@ function WebXRManager( renderer ) {
 			var parent = camera.parent;
 			var cameras = cameraVR.cameras;
 
-			// apply camera.parent to cameraVR
-
 			updateCamera( cameraVR, parent );
 
 			for ( var i = 0; i < cameras.length; i ++ ) {
@@ -182,6 +196,8 @@ function WebXRManager( renderer ) {
 				children[ i ].updateMatrixWorld( true );
 
 			}
+
+			setProjectionFromUnion( cameraVR, cameraL, cameraR );
 
 			return cameraVR;
 
@@ -220,11 +236,6 @@ function WebXRManager( renderer ) {
 				if ( i === 0 ) {
 
 					cameraVR.matrix.copy( camera.matrix );
-
-					// HACK (mrdoob)
-					// https://github.com/w3c/webvr/issues/203
-
-					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
 
 				}
 

@@ -11,22 +11,22 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This holds a reference to a real property in the scene graph; used internally.
+            对场景图中某一真实属性的引用，内部使用。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Object3D rootNode], path, parsedPath )</h3>
 		<p>
 			-- [page:Object3D rootNode]:
 			-- path
-			-- parsedPath (optional)
+			-- parsedPath (可选)
 
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Number path]</h3>
 		<p>
@@ -70,7 +70,7 @@
 
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null getValue]( [param:Array targetArray], [param:Number offset] )</h3>
 		<p>
@@ -82,28 +82,27 @@
 
 		<h3>[method:null bind]( )</h3>
 		<p>
-			Create getter / setter pair for a property in the scene graph. Used internally by
-			[page:PropertyBinding.getValue getValue] and [page:PropertyBinding.setValue setValue].
+			为场景图中的属性创建 getter / setter对。 被[page:PropertyBinding.getValue getValue]和[page:PropertyBinding.setValue setValue]方法内部使用。
 		</p>
 
 		<h3>[method:null unbind]( )</h3>
 		<p>
-			Unbind getter / setter pair for a property in the scene graph.
+			解绑场景图中某属性的getter / setter对。
 		</p>
 
 		<h3>[method:Constructor Composite]( targetGroup, path, optionalParsedPath )</h3>
 		<p>
-			Create a new Composite PropertyBinding.
+			创建一个新的复合属性绑定(Composite PropertyBinding)
 		</p>
 
 		<h3>[method:Constructor create]( root, path, parsedPath )</h3>
 		<p>
-			Create a new Composite PropertyBinding (if root is an [page:AnimationObjectGroup]) or PropertyBinding.
+            创建一个新的复合属性绑定(Composite PropertyBinding) (如果根对象是[page:AnimationObjectGroup])或普通属性绑定
 		</p>
 
 		<h3>[method:Constructor parseTrackName]( trackName )</h3>
 		<p>
-			Matches strings in the following forms:<br />
+			匹配以下形式的字符串：<br />
 			-- nodeName.property<br />
 			-- nodeName.property[accessor]<br />
 			-- nodeName.material.property[accessor]<br />
@@ -117,13 +116,13 @@
 
 		<h3>[method:Constructor findNode]( root, nodeName )</h3>
 		<p>
-			Find a node in a node tree or [page:Skeleton Skeleton].
+            从节点树或骨骼([page:Skeleton Skeleton])中找出某节点
 		</p>
 
 
 
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

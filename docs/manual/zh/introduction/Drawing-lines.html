@@ -11,8 +11,8 @@
 		<h1>画线（[name]）</h1>
 		<div>
 			<p>
-				假设你想画一个圆或者画一条线，而不是一个线框或者说[page:Mesh]（网格）。
-				第一部我们要做的，是设置好[page:WebGLRenderer renderer]（渲染器）、[page:Scene scene]（场景）和[page:Camera camera]（相机）-（请阅读本手册第一章“Creating a scene”）。
+				假设你将要画一个圆或者画一条线，而不是一个线框，或者说不是一个[page:Mesh]（网格）。
+				第一步我们要做的，是设置好[page:WebGLRenderer renderer]（渲染器）、[page:Scene scene]（场景）和[page:Camera camera]（相机）-（如果对这里所提到的东西，还不了解，请阅读本手册第一章“创建一个场景 - Creating a scene”）。
 			</p>
 
 			<p>这是我们将要用到的代码：</p>
@@ -47,13 +47,13 @@ geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
 geometry.vertices.push(new THREE.Vector3( 10, 0, 0) );
 			</code>
 
-			<p>注意，线是被画在每一对连续的顶点之间的，而不是在第一个顶点和最后一个定点之间绘制线条（线条并未闭合）。</p>
+			<p>注意，线是画在每一对连续的顶点之间的，而不是在第一个顶点和最后一个顶点之间绘制线条（线条并未闭合）。</p>
 
-			<p>既然我们已经有了能够画两条线的点和一个材质，我们现在就能够将他们组合在一起，形成一条线。</p>
+			<p>既然我们已经有了能够画两条线的点和一个材质，那我们现在就可以将他们组合在一起，形成一条线。</p>
 			<code>
 var line = new THREE.Line( geometry, material );
 			</code>
-			<p>剩下的就是把它添加到场景中并调用[page:WebGLRenderer.render render]（渲染）函数。</p>
+			<p>剩下的事情就是把它添加到场景中，并调用[page:WebGLRenderer.render render]（渲染）函数。</p>
 
 			<code>
 scene.add( line );

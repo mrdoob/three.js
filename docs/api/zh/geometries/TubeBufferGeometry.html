@@ -10,9 +10,9 @@
 	<body>
 		[page:BufferGeometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>管道缓冲几何体（[name]）</h1>
 
-		<p class="desc">Creates a tube that extrudes along a 3d curve.</p>
+		<p class="desc">创建一个沿着三维曲线延伸的管道。</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#TubeBufferGeometry"></iframe>
 
@@ -32,7 +32,7 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
 		function CustomSinCurve( scale ) {
@@ -63,43 +63,43 @@
 		scene.add( mesh );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]([param:Curve path], [param:Integer tubularSegments], [param:Float radius], [param:Integer radialSegments], [param:Boolean closed])</h3>
 		<p>
-		path — [page:Curve] - A path that inherits from the [page:Curve] base class<br />
-		tubularSegments — [page:Integer] - The number of segments that make up the tube, default is 64<br />
-		radius — [page:Float] - The radius of the tube, default is 1<br />
-		radialSegments — [page:Integer] - The number of segments that make up the cross-section, default is 8 <br />
-		closed — [page:Boolean] Is the tube open or closed, default is false <br />
+				path — [page:Curve] - 一个由基类[page:Curve]继承而来的路径。<br />
+				tubularSegments — [page:Integer] - 组成这一管道的分段数，默认值为64。<br />
+				radius — [page:Float] - 管道的半径，默认值为1。<br />
+				radialSegments — [page:Integer] - 管道横截面的分段数目，默认值为8。<br />
+				closed — [page:Boolean] 管道的两端是否闭合，默认值为false。<br />
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
-		</p>
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+</p>
 
 		<h3>[property:Array tangents]</h3>
 		<p>
-		An array of [page:Vector3] tangents
+			一个[page:Vector3]切线数组。
 		</p>
 
 		<h3>[property:Array normals]</h3>
 		<p>
-		An array of [page:Vector3] normals
+			一个[page:Vector3]法线数组。
 		</p>
 
 		<h3>[property:Array binormals]</h3>
 		<p>
-		An array of [page:Vector3] binormals
+			一个[page:Vector3]次法线数组。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/TubeGeometry.js src/geometries/TubeGeometry.js]
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
 </html>

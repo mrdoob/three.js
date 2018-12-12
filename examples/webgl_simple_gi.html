@@ -11,9 +11,7 @@
 				overflow: hidden;
 			}
 
-			a {
-				color: #0078ff;
-			}
+			a { color: #0078ff; }
 
 			#info {
 				position: absolute;
@@ -159,11 +157,11 @@
 
 				requestAnimationFrame( compute );
 
-			}
+			};
 
 			//
 
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer;
 
 			init();
 			animate();
@@ -179,7 +177,7 @@
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
 				// var geometry = new THREE.BoxBufferGeometry( 1, 1, 1, 10, 10, 10 )
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors });
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				// mesh.position.y = 1;
@@ -226,7 +224,7 @@
 
 				new SimpleGI( renderer, scene );
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

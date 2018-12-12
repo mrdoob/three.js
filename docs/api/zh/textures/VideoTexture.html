@@ -10,15 +10,15 @@
 	<body>
 		[page:Texture] &rarr;
 
-		<h1>[name]</h1>
+		<h1>视频纹理（[name]）</h1>
 
 		<p class="desc">
-		Creates a texture for use with a video texture.<br /><br />
+		创建一个使用视频来作为贴图的纹理对象。<br /><br />
 
-		This is almost the same as the base [page:Texture Texture] class, except that it continuosly sets [page:Texture.needsUpdate needsUpdate] to *true* so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
+		它和其基类[page:Texture Texture]几乎是相同的，除了它总是将[page:Texture.needsUpdate needsUpdate]设置为*true*，以便使得贴图能够在视频播放时进行更新。自动创建[page:Texture.mipmaps mipmaps]也会被禁用。
 		</p>
 
-    <h2>Example</h2>
+    <h2>示例</h2>
 
 		<p>[example:webgl_materials_video materials / video ]</p>
 
@@ -33,63 +33,63 @@ texture.format = THREE.RGBFormat;
     </code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 		<h3>[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
 		<p>
-		[page:Video video] -- The video element to use as the texture. <br />
+		[page:Video video] -- 将被作为纹理贴图来使用的Video元素。<br />
 
-		[page:Constant mapping] --  How the image is applied to the object. An object type of [page:Textures THREE.UVMapping].
-		See [page:Textures mapping constants] for other choices.<br />
+		[page:Constant mapping] --  纹理贴图将被如何应用（映射）到物体上，它是[page:Textures THREE.UVMapping]中的对象类型。
+		请参阅[page:Textures mapping constants]（映射模式常量）来了解其他选项。<br />
 
-		[page:Constant wrapS] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
-		See [page:Textures wrap mode constants] for other choices.<br />
+		[page:Constant wrapS] -- 默认值是[page:Textures THREE.ClampToEdgeWrapping].
+		请参阅[page:Textures wrap mode constants]（包裹模式常量）来了解其他选项。<br />
 
-		[page:Constant wrapT] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
-		See [page:Textures wrap mode constants] for other choices.<br />
+		[page:Constant wrapT] -- 默认值是[page:Textures THREE.ClampToEdgeWrapping].
+		请参阅[page:Textures wrap mode constants]（包裹模式常量）来了解其他选项。<br />
 
-		[page:Constant magFilter] -- How the texture is sampled when a texel covers more than one pixel.
-		The default is [page:Textures THREE.LinearFilter]. See [page:Textures magnification filter constants] for other choices.<br />
+		[page:Constant magFilter] -- 当一个纹素覆盖大于一个像素时，贴图将如何采样。
+		其默认值为[page:Textures THREE.LinearFilter]。请参阅[page:Textures magnification filter constants]（放大滤镜常量）来了解其它选项。<br />
 
-		[page:Constant minFilter] -- How the texture is sampled when a texel covers less than one pixel.
-		 The default is [page:Textures THREE.LinearMipMapLinearFilter]. See [page:Textures minification filter constants] for other choices.<br />
+		[page:Constant minFilter] -- 当一个纹素覆盖小于一个像素时，贴图将如何采样。
+		其默认值为[page:Textures THREE.LinearMipMapLinearFilter]。请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其它选项。<br />
 
-    [page:Constant format] -- The format used in the texture.
-     See [page:Textures format constants] for other choices.<br />
+    	[page:Constant format] -- 在纹理贴图中使用的格式。
+     	请参阅[page:Textures format constants]（格式常量）来了解各个选项。<br />
 
-    [page:Constant type] -- Default is [page:Textures THREE.UnsignedByteType].
-     See [page:Textures type constants] for other choices.<br />
+    	[page:Constant type] -- 默认值是[page:Textures THREE.UnsignedByteType].
+     	请参阅[page:Textures type constants]（类型常量）来了解其他选项。<br />
 
-		[page:Number anisotropy] -- The number of samples taken along the axis through the pixel that has the highest density of texels.
-		By default, this value is 1. A higher value gives a less blurry result than a basic mipmap, at the cost of more texture samples being used.
-		Use [page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.<br /><br />
+		[page:Number anisotropy] -- 沿着轴，通过具有最高纹素密度的像素的采样数。
+		默认情况下，这个值为1。设置一个较高的值将会比基本的mipmap产生更清晰的效果，代价是需要使用更多纹理样本。
+		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。<br /><br />
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<p>
-    See the base [page:Texture Texture] class for common properties.
+    请参阅其基类[page:Texture Texture]来了解共有属性。
     </p>
 
 		<h3>[property:boolean needsUpdate]</h3>
 		<p>
-		You will not need to set this manually here as it is handled by the [page:VideoTexture.update update] method.
+		在这里，你不必手动设置这个值，因为它是由[page:VideoTexture.update update]方法来进行控制的。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
     <p>
-    See the base [page:Texture Texture] class for common methods.
+    请参阅其基类[page:Texture Texture]来查看共有方法。
     </p>
 
     <h3>[method:null update]()</h3>
 		<p>
-		This is called automatically and sets [property:boolean needsUpdate] to *true* every time
-    a new frame is available.
+		在每一次新的一帧可用时，这个方法将被自动调用，
+		并将[property:boolean needsUpdate]设置为*true*。
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

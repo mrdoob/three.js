@@ -52,12 +52,16 @@
 		<script src="js/loaders/BVHLoader.js"></script>
 		<script src="js/utils/SkeletonUtils.js"></script>
 		
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 

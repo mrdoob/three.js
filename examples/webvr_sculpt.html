@@ -4,12 +4,10 @@
 		<title>three.js webvr - sculpt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-09-11 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-09-11" content="AqhFUYKxq/d+E8CDT0fuYRCg8TvlTP52x0Jv7I9t27sLhR30LmcahBRfSwzP89ukjs2+ia99VrrLoRyaFAwJVA0AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNjYyNDAwMH0=">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2018-10-27 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2018-10-27" content="An4ZYOGvf6kVHNxqZxS02TPAvpZESkmBhcVCM/byViDDuEB2XKvCF43aCJjrAU/R8H3WDlv+1bDGTL/XxstHGgoAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0MDY1NTAyMn0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-10-24 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-10-24" content="Agrr6lZhlwzv5jmv/mpLZA37DIiVcg3HvX8bH8EWB+OBruV3sUJuzDfYz6qs/je+LcH41DkrmPn4k9RaUaqpQAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQwMzg4NjI0fQ==">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
 		<style>
 			body {
 				font-family: Monospace;
@@ -37,7 +35,7 @@
 			var camera, scene, renderer;
 			var controller1, controller2;
 
-			var blob, vector;
+			var blob;
 
 			var points = [];
 
@@ -95,9 +93,9 @@
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = -2;
+				light.shadow.camera.bottom = - 2;
 				light.shadow.camera.right = 2;
-				light.shadow.camera.left = -2;
+				light.shadow.camera.left = - 2;
 				light.shadow.mapSize.set( 4096, 4096 );
 
 				scene.add( light );
@@ -160,12 +158,12 @@
 					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
 					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.002, 2 ), blob.material );
 					pivot.name = 'pivot';
-					pivot.position.y = -0.016;
-					pivot.position.z = -0.043;
+					pivot.position.y = - 0.016;
+					pivot.position.z = - 0.043;
 					pivot.rotation.x = Math.PI / 5.5;
 					controller.add( pivot );
 
-					var range = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
+					var range = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
 					pivot.add( range );
 
 					controller1.add( controller.clone() );
@@ -212,7 +210,7 @@
 			function initPoints() {
 
 				points = [
-					{ position: new THREE.Vector3(), strength:   0.04, subtract: 10 },
+					{ position: new THREE.Vector3(), strength: 0.04, subtract: 10 },
 					{ position: new THREE.Vector3(), strength: - 0.08, subtract: 10 }
 				];
 

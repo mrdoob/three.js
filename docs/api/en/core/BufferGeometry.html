@@ -119,12 +119,13 @@
 
 		<h3>[property:Object drawRange]</h3>
 		<p>
-			Used to determine what part of the geometry should be rendered. This should not
-			be set directly, instead use [page:.setDrawRange].<br />
-			Default is
+			Determines the part of the geometry to render. This should not
+			be set directly, instead use [page:.setDrawRange]. Default is
 			<code>
 				{ start: 0, count: Infinity }
 			</code>
+			For non-indexed BufferGeometry, count is the number of vertices to render.
+			For indexed BufferGeometry, count is the number of indices to render.
 		</p>
 
 		<h3>[property:Array groups]</h3>
@@ -232,7 +233,7 @@
 
 		<h3>[method:null computeBoundingBox]()</h3>
 		<p>
-		Computes bounding box of the geometry, updating [param:.boundingBox] attribute.<br />
+		Computes bounding box of the geometry, updating [page:.boundingBox] attribute.<br />
 		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
 		</p>
 
@@ -316,7 +317,8 @@
 		<p>Set the [page:.index] buffer.</p>
 
 		<h3>[method:null setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
-		<p>Set the [page:.drawRange] buffer. See that property for details.</p>
+		<p>Set the [page:.drawRange] property. For non-indexed BufferGeometry, count is the number of vertices to render.
+		For indexed BufferGeometry, count is the number of indices to render.</p>
 
 		<h3>[method:BufferGeometry setFromObject] ( [param:Object3D object] )</h3>
 		<p>Sets the attributes for this BufferGeometry from an [page:Object3D].</p>

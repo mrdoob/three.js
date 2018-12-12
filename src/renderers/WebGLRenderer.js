@@ -16,7 +16,7 @@ import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { ShaderLib } from './shaders/ShaderLib.js';
 import { UniformsLib } from './shaders/UniformsLib.js';
-import { UniformsUtils } from './shaders/UniformsUtils.js';
+import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
@@ -300,7 +300,13 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+	var vr = null;
+
+	if ( typeof navigator !== 'undefined' ) {
+
+		vr = ( 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+
+	}
 
 	this.vr = vr;
 
@@ -1158,61 +1164,6 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	/*
-	// TODO Duplicated code (Frustum)
-
-	var _sphere = new Sphere();
-
-	function isObjectViewable( object ) {
-
-		var geometry = object.geometry;
-
-		if ( geometry.boundingSphere === null )
-			geometry.computeBoundingSphere();
-
-		_sphere.copy( geometry.boundingSphere ).
-		applyMatrix4( object.matrixWorld );
-
-		return isSphereViewable( _sphere );
-
-	}
-
-	function isSpriteViewable( sprite ) {
-
-		_sphere.center.set( 0, 0, 0 );
-		_sphere.radius = 0.7071067811865476;
-		_sphere.applyMatrix4( sprite.matrixWorld );
-
-		return isSphereViewable( _sphere );
-
-	}
-
-	function isSphereViewable( sphere ) {
-
-		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
-
-		var numPlanes = _clipping.numPlanes;
-
-		if ( numPlanes === 0 ) return true;
-
-		var planes = _this.clippingPlanes,
-
-			center = sphere.center,
-			negRad = - sphere.radius,
-			i = 0;
-
-		do {
-
-			// out when deeper than radius in the negative halfspace
-			if ( planes[ i ].distanceToPoint( center ) < negRad ) return false;
-
-		} while ( ++ i !== numPlanes );
-
-		return true;
-
-	}
-	*/
-
 	function projectObject( object, camera, sortObjects ) {
 
 		if ( object.visible === false ) return;
@@ -1476,7 +1427,7 @@ function WebGLRenderer( parameters ) {
 
 				materialProperties.shader = {
 					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
+					uniforms: cloneUniforms( shader.uniforms ),
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};
@@ -1986,7 +1937,7 @@ function WebGLRenderer( parameters ) {
 			//  WebGLRenderTargetCube will be flipped for backwards compatibility
 			//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
 			// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
-			uniforms.flipEnvMap.value = ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1;
+			uniforms.flipEnvMap.value = material.envMap.isCubeTexture ? - 1 : 1;
 
 			uniforms.reflectivity.value = material.reflectivity;
 			uniforms.refractionRatio.value = material.refractionRatio;

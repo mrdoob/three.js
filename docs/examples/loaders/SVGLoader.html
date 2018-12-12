@@ -91,7 +91,7 @@
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — A string containing the path/URL of the <em>.svg</em> file.<br />
-		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives the loaded [page:SVGDocument] as an argument.<br />
+		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives an array of [page:ShapePath] as an argument.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
 		</p>
@@ -99,6 +99,13 @@
 		Begin loading from url and call onLoad with the response content.
 		</p>
 
+		<h3>[method:SVGLoader setPath]( [param:String path] )</h3>
+		<p>
+		[page:String path] — Base path.
+		</p>
+		<p>
+		Set the base path for the file.
+		</p>
 
 		<h2>Source</h2>
 

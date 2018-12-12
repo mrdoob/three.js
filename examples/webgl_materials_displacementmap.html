@@ -45,13 +45,17 @@
 
 		<script src="js/loaders/OBJLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var stats;
 
@@ -70,12 +74,6 @@
 
 			var pointLight, ambientLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			var height = 500; // of camera frustum
 
 			var r = 0.0;
@@ -89,43 +87,43 @@
 
 				var gui = new dat.GUI();
 				//var gui = gui.addFolder( "Material" );
-				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.metalness = value;
 
 				} );
 
-				gui.add( settings, "roughness" ).min( 0 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "roughness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.roughness = value;
 
 				} );
 
-				gui.add( settings, "aoMapIntensity" ).min( 0 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "aoMapIntensity" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.aoMapIntensity = value;
 
 				} );
 
-				gui.add( settings, "ambientIntensity" ).min( 0 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "ambientIntensity" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					ambientLight.intensity = value;
 
 				} );
 
-				gui.add( settings, "envMapIntensity" ).min( 0 ).max( 3 ).onChange( function( value ) {
+				gui.add( settings, "envMapIntensity" ).min( 0 ).max( 3 ).onChange( function ( value ) {
 
 					material.envMapIntensity = value;
 
 				} );
 
-				gui.add( settings, "displacementScale" ).min( 0 ).max( 3.0 ).onChange( function( value ) {
+				gui.add( settings, "displacementScale" ).min( 0 ).max( 3.0 ).onChange( function ( value ) {
 
 					material.displacementScale = value;
 
 				} );
 
-				gui.add( settings, "normalScale" ).min( - 1 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "normalScale" ).min( - 1 ).max( 1 ).onChange( function ( value ) {
 
 					material.normalScale.set( 1, - 1 ).multiplyScalar( value );
 
@@ -181,10 +179,10 @@
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
 
 				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 

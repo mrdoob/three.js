@@ -12,39 +12,31 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A KeyframeTrack is a timed sequence of [link:https://en.wikipedia.org/wiki/Key_frame keyframes],
-			which are composed of lists of times and related values, and which are used to animate a
-			specific property of an object.
+			关键帧轨道(KeyframeTrack)是关键帧([link:https://en.wikipedia.org/wiki/Key_frame keyframes])的定时序列,
+			它由时间和相关值的列表组成, 用来让一个对象的某个特定属性动起来。
 		</p>
 
 		<p>
-			For an overview of the different elements of the three.js animation system see the
-			"Animation System" article in the "Next Steps" section of the manual.
+            在使用手册的“下一步”章节中，“动画系统”一文对three.js动画系统中的不同元素作出了概述
 		</p>
 
 		<p>
-			In contrast to the animation hierarchy of the
-			[link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format] a
-			*KeyframeTrack* doesn't store its single keyframes as objects in a "keys" array (holding the
-			times and the values for each frame together in one place).
+            和[link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format]的动画层级相反，
+            关键帧轨道（KeyframeTrack）不会将单帧作为对象存储在“key”数组(一个存有每一帧的时间和值的地方)中。
+
 		</p>
 
 		<p>
-			Instead of this there are always two arrays in a *KeyframeTrack*: the [page:.times times] array
-			stores the time values for all keyframes of this track in sequential order, and the
-			[page:.values values] array contains the corresponding changing values of the animated property.
+            关键帧轨道(KeyframeTrack)中总是存在两个数组：[page:.times times]数组按顺序存储该轨道的所有关键帧的时间值，而[page:.values values]数组包含动画属性的相应更改值。
 		</p>
 
 		<p>
-			A single value, belonging to a certain point of time, can not only be a simple number, but (for
-			example) a vector (if a position is animated) or a quaternion (if a rotation is animated). For
-			this reason the values array (which is a flat array, too) might be three or four times as long as the
-			times array.
+            值数组中的每一个成员，属于某一特定时间点，不仅可以是一个简单的数字，还可以是（比如）一个向量（如果是位置动画）或者是一个四元数（如果是旋转动画）。
+            因此，值数组（也是一个平面阵列）的长度可能是时间数组的三四倍。
 		</p>
 
 		<p>
-			Corresponding to the different possible types of animated values there are several subclasses of
-			*KeyframeTrack*, inheriting the most properties and methods:
+            与不同类型的动画值对应，存在若干关键帧轨道(KeyframeTrack)的子类，继承了它大多数属性和方法：
 		</p>
 
 		<ul>
@@ -57,206 +49,181 @@
 		</ul>
 
 		<p>
-			Some examples of how to manually create [page:AnimationClip AnimationClips] with different sorts
-			of KeyframeTracks can be found in the [link:https://threejs.org/examples/js/AnimationClipCreator.js]
-			file.
+            可以在[link:https://threejs.org/examples/js/AnimationClipCreator.js]文件中找到用不同类型的关键帧轨道创建动画剪辑([page:AnimationClip AnimationClips])的示例。
 		</p>
 
 		<p>
-			Since explicit values are only specified for the discrete points of time stored in the times array,
-			all values in between have to be interpolated.
+            由于显式值仅针对存储在时间数组中的离散时间点指定，因此必须在两个时间点之间进行插值
 		</p>
 
 		<p>
-			The track's name is important for the connection of this track with a specific property of the
-			animated node (done by [page:PropertyBinding]).
+            轨道的名称对于这个轨道与动画节点的特定属性的连接(由[page:PropertyBinding]完成)很重要。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:String name], [param:Array times], [param:Array values], [param:Constant interpolation] )</h3>
 		<p>
-			[page:String name] - the identifier for the *KeyframeTrack*.<br />
-			[page:Array times] - an array of keyframe times, converted internally to a
+			[page:String name] - 关键帧轨道(KeyframeTrack)的标识符.<br />
+			[page:Array times] - 关键帧的时间数组, 被内部转化为
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
-			[page:Array values] - an array with the values related to the times array, converted internally to a
+			[page:Array values] - 与时间数组中的时间点相关的值组成的数组, 被内部转化为
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
-			[page:Constant interpolation] - the type of interpolation to use. See
+			[page:Constant interpolation] - 使用的插值类型。 参见
 			[page:Animation Animation Constants] for possible values. Default is [page:Animation InterpolateLinear].
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 
 		<h3>[property:String name]</h3>
 		<p>
-			The track's name can refer to [page:Geometry.morphTargets morph targets] or
-			[page:SkinnedMesh bones] or possibly other values within an animated object. See
-			[page:PropertyBinding.parseTrackName] for the forms of strings that can be parsed for property
-			binding:
+            轨道的名称可以指动画对象中的变形目标([page:Geometry.morphTargets morph targets])、骨骼([page:SkinnedMesh bones])或可能的其他值
+			查看[page:PropertyBinding.parseTrackName]可获知哪些形式的字符串可以解析出绑定的属性:
+		</p>
+		<p>
+            可以使用节点名称或uuid（尽管它需要位于传递到混合器的场景图节点的子树中）引用到某节点。或者， 如果轨道名称的首字符是点,
+			该轨道会应用到传入到混合器的根节点上。
 		</p>
 
 		<p>
-			The name can specify the node either using its name or its uuid (although it needs to be in the
-			subtree of the scene graph node passed into the mixer). Or, if the track name starts with a dot,
-			the track applies to the root node that was passed into the mixer.
+			通常，在该节点之后会直接指定一个属性。 但是也可以再指定一个子属性， 例如 如果只是想通过浮动轨道使X组件旋转，可使用 .rotation[x]。
 		</p>
 
 		<p>
-			Usually after the node a property will be specified directly. But you can also specify a
-			subproperty, such as .rotation[x], if you just want to drive the X component of the rotation
-			via a float track.
+            还可以使用对象名称来指定骨骼或多材质，例如：.bones[R_hand].scale；再比如，材料数组中的第四个材料的漫反射颜色的红通道可以通过 .materials[3].diffuse[r]访问到。
 		</p>
 
 		<p>
-			You can also specify bones or multimaterials by using an object name, for example:
-			.bones[R_hand].scale; the red channel of the diffuse color of the fourth material in a
-			materials array - as a further example - can be accessed with .materials[3].diffuse[r].
+			属性绑定也会解析变形目标名称, 例如: .morphTargetInfluences[run]
 		</p>
 
 		<p>
-			PropertyBinding will also resolve morph target names, for example: .morphTargetInfluences[run].
-		</p>
-
-		<p>
-			Note: The track's name does not necessarily have to be unique. Multiple tracks can drive the same
-			property. The result should be based on a weighted blend between the multiple tracks according to
-			the weights of their respective actions.
+			说明: 轨道名称不一定得唯一。 多个轨道可驱动统一属性， 此时结果应该基于多个轨道之间根据其各自动作的权重的加权混合。
 		</p>
 
 		<h3>[property:Float32Array times]</h3>
 		<p>
-			A [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			converted from the times array which is passed in the constructor.
+			一个[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]类型的值，由传入构造器中时间数组参数转化而来。
 		</p>
 
 		<h3>[property:Float32Array values]</h3>
 		<p>
-			A [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			converted from the values array which is passed in the constructor.
+			一个[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]类型的值，
+			由传入构造器中值数组参数转化而来
 		</p>
 
 		<h3>[property:Constant DefaultInterpolation]</h3>
 		<p>
-			The default interpolation type: [page:Animation InterpolateLinear].
+			默认的参数插值类型： [page:Animation InterpolateLinear].
 		</p>
 
 		<h3>[property:Constant TimeBufferType ]</h3>
 		<p>
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			the type of the buffer internally used for the times.
+			内部用于时间数组的缓冲区的类型
 		</p>
 
 		<h3>[property:Constant ValueBufferType ]</h3>
 		<p>
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			the type of the buffer internally used for the values.
+			内部用于值数组的缓冲区的类型
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:null createInterpolant]()</h3>
 		<p>
-			Creates a [page:LinearInterpolant LinearInterpolant], [page:CubicInterpolant CubicInterpolant]
-			or [page:DiscreteInterpolant DiscreteInterpolant], depending on the value of the interpolation
-			parameter passed in the constructor.
+			根据传入构造器中的插值类型参数，创建线性插值([page:LinearInterpolant LinearInterpolant])，立方插值([page:CubicInterpolant CubicInterpolant])或离散插值
+			([page:DiscreteInterpolant DiscreteInterpolant])
 		</p>
 
 		<h3>[method:null getInterpolation]()</h3>
 		<p>
-			Returns the interpolation type.
+			返回插值类型
 		</p>
 
 		<h3>[method:Number getValueSize]()</h3>
 		<p>
-			Returns the size of each value (that is the length of the [page:.values values] array divided
-			by the length of the [page:.times times] array).
+			返回每个值的大小(即[page:.values values]数组的长度除以[page:.times times]数组的长度
+
 		</p>
 
 		<h3>[method:DiscreteInterpolant InterpolantFactoryMethodDiscrete]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
-			Creates a new [page:DiscreteInterpolant DiscreteInterpolant] from the
-			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
-			passed which will receive the results. Otherwise a new array with the appropriate size will be
-			created automatically.
+            根据时间([page:KeyframeTrack.times times])和值([page:KeyframeTrack.times values])创建一个新的离散插值([page:DiscreteInterpolant DiscreteInterpolant])。
+            可传入一个Float32Array类型的变量来接收结果， 否则会自动创建一个长度适宜的新数组。
 		</p>
 
 		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
-			Creates a new [page:LinearInterpolant LinearInterpolant] from the
-			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
-			passed which will receive the results. Otherwise a new array with the appropriate size will be
-			created automatically.
+            根据时间([page:KeyframeTrack.times times])和值([page:KeyframeTrack.times values])创建一个新的线性插值([page:LinearInterpolant LinearInterpolant])。
+            可传入一个Float32Array类型的变量来接收结果， 否则会自动创建一个长度适宜的新数组。
 		</p>
 
 		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
-			Create a new [page:CubicInterpolant CubicInterpolant] from the
-			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
-			passed which will receive the results. Otherwise a new array with the appropriate size will be
-			created automatically.
+            根据时间([page:KeyframeTrack.times times])和值([page:KeyframeTrack.times values])创建一个新的立方插值([page:CubicInterpolant CubicInterpolant])。
+            可传入一个Float32Array类型的变量来接收结果， 否则会自动创建一个长度适宜的新数组。
 		</p>
 
 		<h3>[method:this optimize]()</h3>
 		<p>
-			Removes equivalent sequential keys, which are common in morph target sequences.
+            删除等效的顺序键，这些键在变形目标序列中很常见。
 		</p>
 
 		<h3>[method:this scale]()</h3>
 		<p>
-			Scales all keyframe times by a factor.<br /><br />
+            缩放所有关键帧的时间。<br /><br />
 
-			Note: This is useful, for example, for conversions to a certain rate of frames per seconds (as it
-			is done internally by
-			[page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]).
+			说明: 这个方法很有用，例如， 可用于转化为某一特定帧率(正如[page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]内部所做的一样)。
 		</p>
 
 		<h3>[method:this setInterpolation]( [param:Constant interpolationType] )</h3>
 		<p>
-			Sets the interpolation type. See [page:Animation Animation Constants] for choices.
+			设置插值类型。 参阅[page:Animation Animation Constants]以供选择。
 		</p>
 
 		<h3>[method:this shift]( [param:Number timeOffsetInSeconds] )</h3>
 		<p>
-			Moves all keyframes either forward or backward in time.
+            及时删除之前或之后的所有关键帧。
 		</p>
 
 
 		<h3>[method:this trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
 		<p>
-			Removes keyframes before *startTime* and after *endTime*,
-			without changing any values within the range [*startTime*, *endTime*].
+			删除开始时间(startTime)之前以及结束时间(endTime)之后的关键帧，不改变[*startTime*, *endTime*]范围内的任何值。
 		</p>
 
 		<h3>[method:Boolean validate]()</h3>
 		<p>
-			Performs minimal validation on the tracks. Returns true if valid.
+            在轨道上执行最小验证，有效则返回true
 		</p>
 
 		<p>
-			This method logs errors to the console, if a track is empty, if the [page:.valueSize value size] is not valid, if an item
-			in the [page:.times times] or [page:.values values] array is not a valid number or if the items in the *times* array are out of order.
+			如果出现以下情况，该方法会在控制台输出错误日志: 轨道为空; [page:.valueSize value size]值不可靠；
+			[page:.times times]数组或[page:.values values]数组中的元素不是数字；*times*数组中的元素乱序。
 		</p>
 
-		<h2>Static Methods</h2>
+		<h2>静态方法</h2>
 
 		<h3>[method:KeyframeTrack parse]( [param:JSON json] )</h3>
 		<p>
-		Parses a JSON object and returns a new keyframe track of the correct type.
+            解析JSON对象并返回一个正确类型的新关键帧轨道。
 		</p>
 
 		<h3>[method:JSON toJSON]( [param:KeyframeTrack track] )</h3>
 		<p>
-		Converts the track to JSON.
+		    将该轨道转化为JSON
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

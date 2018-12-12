@@ -74,8 +74,7 @@
 				scene.background = new THREE.Color( 0xffffff );
 
 				pickingScene = new THREE.Scene();
-				pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				pickingTexture.texture.minFilter = THREE.LinearFilter;
+				pickingTexture = new THREE.WebGLRenderTarget( 1, 1 );
 
 				scene.add( new THREE.AmbientLight( 0x555555 ) );
 
@@ -164,7 +163,7 @@
 				highlightBox = new THREE.Mesh(
 					new THREE.BoxBufferGeometry(),
 					new THREE.MeshLambertMaterial( { color: 0xffff00 }
-				) );
+					) );
 				scene.add( highlightBox );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -201,26 +200,36 @@
 
 				//render the picking scene off-screen
 
+				// set the view offset to represent just a single pixel under the mouse
+
+				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, mouse.x * window.devicePixelRatio | 0, mouse.y * window.devicePixelRatio | 0, 1, 1 );
+
+				// render the scene
+
 				renderer.render( pickingScene, camera, pickingTexture );
+
+				// clear the view offset so rendering returns to normal
+
+				camera.clearViewOffset();
 
 				//create buffer for reading single pixel
 
 				var pixelBuffer = new Uint8Array( 4 );
 
-				//read the pixel under the mouse from the texture
+				//read the pixel
 
-				renderer.readRenderTargetPixels( pickingTexture, mouse.x, pickingTexture.height - mouse.y, 1, 1, pixelBuffer );
+				renderer.readRenderTargetPixels( pickingTexture, 0, 0, 1, 1, pixelBuffer );
 
 				//interpret the pixel as an ID
 
 				var id = ( pixelBuffer[ 0 ] << 16 ) | ( pixelBuffer[ 1 ] << 8 ) | ( pixelBuffer[ 2 ] );
 				var data = pickingData[ id ];
 
-				if ( data) {
+				if ( data ) {
 
 					//move our highlightBox so that it surrounds the picked object
 
-					if ( data.position && data.rotation && data.scale ){
+					if ( data.position && data.rotation && data.scale ) {
 
 						highlightBox.position.copy( data.position );
 						highlightBox.rotation.copy( data.rotation );

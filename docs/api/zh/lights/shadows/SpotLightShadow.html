@@ -13,10 +13,10 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This is used internally by [page:SpotLight SpotLights] for calculating shadows.
+			这在SpotLights内部用于计算阴影。
 		</p>
 
-		<h2>Example</h2>
+		<h2>例子</h2>
 		<p>
 			<code>
 //Create a WebGLRenderer and turn on shadows in the renderer
@@ -57,41 +57,30 @@ scene.add( helper );
 		</p>
 
 
-		<h2>Constructor</h2>
-
-		The constructor creates a [param:PerspectiveCamera PerspectiveCamera] to manage the shadow's view of the world.
-
-		<h2>Properties</h2>
-		See the base [page:LightShadow LightShadow] class for common properties.
-
-
+		<h2>构造函数</h2>
+	        	构造函数创建一个 [param:PerspectiveCamera PerspectiveCamera] 来管理阴影的世界视图
+		<h2>属性</h2>
+		有关常用属性，请参阅基础LightShadow类。
 	 <h3>[property:Camera camera]</h3>
 	 <p>
-		 The light's view of the world. This is used to generate a depth map of the scene; objects behind
-		 other objects from the light's perspective will be in shadow.<br /><br />
+		 在光的世界里。这用于生成场景的深度图;从光的角度来看，其他物体背后的物体将处于阴影中。<br /><br />
 
-		 The default is a  [page:PerspectiveCamera] with [page:PerspectiveCamera.near near] clipping plane at 0.5.
-		 The [page:PerspectiveCamera.fov fov] will track the [page:SpotLight.angle angle] property of the owning
-		 [page:SpotLight SpotLight] via the [page:SpotLightShadow.update update] method. Similarly, the
-		 [page:PerspectiveCamera.aspect aspect] property will track the aspect of the
-		 [page:LightShadow.mapSize mapSize]. If the [page:SpotLight.distance distance] property of the light is
-		 set, the [page:PerspectiveCamera.far far] clipping plane will track that, otherwise it defaults to 500.
+		 默认值为PerspectiveCamera，近剪裁平面为0.5。 fov将通过更新方法跟踪拥有SpotLight的角度属性。同样，aspect属性将跟踪mapSize的方面。如果设置了灯光的距离属性，则远剪裁平面将跟踪该值，否则默认为500。
 
 	 </p>
 
 	 <h3>[property:Boolean isSpotLightShadow]</h3>
 	 <p>
-		 Used to check whether this or derived classes are spot light shadows. Default is *true*.<br /><br />
 
-		 You should not change this, as it used internally for optimisation.
+		 用于检查此类或派生类是否为聚光灯阴影。默认为true。<br /><br />
+		 您不应该更改它，因为它在内部用于优化。
 	 </p>
 
-		<h2>Methods</h2>
-		See the base [page:LightShadow LightShadow] class for common methods.
-
+		<h2>方法</h2>
+		有关常用方法，请参阅基础LightShadow类。
 		<h3>[method:SpotLightShadow update]( [param:SpotLight light] )</h3>
 		<p>
-		Updates the internal perspective [page:.camera camera] based on the passed in [page:SpotLight light].
+			根据传入的[page:SpotLight light]更新内部透视[page:.camera camera]。
 		</p>
 
 		<h2>Source</h2>

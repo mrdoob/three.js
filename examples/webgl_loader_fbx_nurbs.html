@@ -41,12 +41,16 @@
 		<script src="js/curves/NURBSUtils.js"></script>
 		<script src="js/loaders/FBXLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
@@ -86,7 +90,7 @@
 
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( 'models/fbx/nurbs.fbx', function( object ) {
+				loader.load( 'models/fbx/nurbs.fbx', function ( object ) {
 
 					scene.add( object );
 

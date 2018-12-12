@@ -8,26 +8,25 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>圆柱体[name]</h1>
 
 		<p class="desc">
 			A point's [link:https://en.wikipedia.org/wiki/Cylindrical_coordinate_system cylindrical coordinates].
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器（Constructor）</h2>
 
 		<h3>[name]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
 		<p>
-		[page:Float radius] - distance from the origin to a point in the x-z plane.
-		Default is *1.0*.<br />
-		[page:Float theta] - counterclockwise angle in the x-z plane measured in radians
-		from the positive z-axis. Default is *0*.<br />
-		[page:Float y] - height above the x-z plane. Default is *0*.
+		[page:Float radius] - 从原点到x-z平面上一点的距离
+		默认值为 *1.0*.<br />
+		[page:Float theta] - 在x-z平面内的逆时针角度，以z轴正方向的计算弧度。默认值为0。<br />
+		[page:Float y] - x-z平面以上的高度 默认值为 *0*.
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性（Properties）</h2>
 
 		<h3>[property:Float radius]</h3>
 
@@ -40,33 +39,32 @@
 
 		<h3>[method:Cylindrical clone]()</h3>
 		<p>
-		Returns a new cylindrical with the same [page:.radius radius], [page:.theta theta]
-		and [page:.y y] properties as this one.
+			返回一个与当前拥有相同 [page:.radius radius], [page:.theta theta] 和 [page:.y y] 属性的圆柱体。
 		</p>
 
 		<h3>[method:Cylindrical copy]( [param:Cylindrical other] )</h3>
 		<p>
-			Copies the values of the passed Cylindrical's [page:.radius radius], [page:.theta theta]
-			and [page:.y y] properties to this cylindrical.
+			将传入的圆柱体对象的 [page:.radius radius], [page:.theta theta] 和 [page:.y y] 属性赋给当前对象。
 		</p>
 
 		<h3>[method:Cylindrical set]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
-		<p>Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
-		and [page:.y y] properties.</p>
+		<p>设置该对象的 [page:.radius radius], [page:.theta theta]
+		和 [page:.y y] 属性。</p>
 
 		<h3>[method:Cylindrical setFromVector3]( [param:Vector3 vec3] )</h3>
 		<p>
-			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
-			and [page:.y y] properties from the [page:Vector3 Vector3].
+			从 [page:Vector3 Vector3] 中取x,y,z,并调用setFromCartesianCoords来设置圆柱体的
+			[page:.radius radius]、[page:.theta theta] 和 [page:.y y] 的属性值。
+
 		</p>
 
 		<h3>[method:Cylindrical setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
-			and [page:.y y] properties from Cartesian coordinates.
+			使用笛卡尔坐标来设置该圆柱体的 [page:.radius radius], [page:.theta theta]
+			and [page:.y y] 属性值。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码（Source）</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

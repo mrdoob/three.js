@@ -12,9 +12,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			a {
-				color: #f00;
-			}
+			a { color: #f00; }
 
 			#info {
 				position: absolute;
@@ -42,7 +40,7 @@
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/LuminosityHighPassShader.js"></script>
 		<script src="js/postprocessing/UnrealBloomPass.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -53,6 +51,7 @@
 		var RADIUS = 75;
 
 		THREE.ShaderChunk[ 'lights_pars_begin' ] += [
+			'',
 			'#if defined TILED_FORWARD',
 			'uniform vec4 tileData;',
 			'uniform sampler2D tileTexture;',
@@ -89,7 +88,7 @@
 			'#endif'
 		].join( '\n' );
 
-		var lights = [], objects = [];
+		var lights = [];
 
 		var State = {
 			rows: 0,
@@ -194,7 +193,7 @@
 
 				return [ minX, maxX, minY, maxY ];
 
-		};
+			};
 
 		}();
 
@@ -362,7 +361,7 @@
 
 		}
 
-		function postEffect( renderer, scene, camera ) {
+		function postEffect( renderer ) {
 
 			bloom.render( renderer, null, renderTarget );
 

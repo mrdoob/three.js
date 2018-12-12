@@ -30,19 +30,19 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	for ( var i = 0; i < this.nMips; i ++ ) {
 
-		var renderTarget = new THREE.WebGLRenderTarget( resx, resy, pars );
+		var renderTargetHorizonal = new THREE.WebGLRenderTarget( resx, resy, pars );
 
-		renderTarget.texture.name = "UnrealBloomPass.h" + i;
-		renderTarget.texture.generateMipmaps = false;
+		renderTargetHorizonal.texture.name = "UnrealBloomPass.h" + i;
+		renderTargetHorizonal.texture.generateMipmaps = false;
 
-		this.renderTargetsHorizontal.push( renderTarget );
+		this.renderTargetsHorizontal.push( renderTargetHorizonal );
 
-		var renderTarget = new THREE.WebGLRenderTarget( resx, resy, pars );
+		var renderTargetVertical = new THREE.WebGLRenderTarget( resx, resy, pars );
 
-		renderTarget.texture.name = "UnrealBloomPass.v" + i;
-		renderTarget.texture.generateMipmaps = false;
+		renderTargetVertical.texture.name = "UnrealBloomPass.v" + i;
+		renderTargetVertical.texture.generateMipmaps = false;
 
-		this.renderTargetsVertical.push( renderTarget );
+		this.renderTargetsVertical.push( renderTargetVertical );
 
 		resx = Math.round( resx / 2 );
 
