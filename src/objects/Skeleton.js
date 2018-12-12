@@ -201,6 +201,9 @@ Object.assign( Skeleton.prototype, {
 		for ( var i = 0, l = json.bones.length; i < l; i ++ ) {
 
 			var boneUUID = json.bones[ i ];
+
+			// consider to use a lookup table for bones in order to improve performance
+
 			var bone = object.getObjectByProperty( 'uuid', boneUUID );
 
 			if ( bone === undefined ) {
