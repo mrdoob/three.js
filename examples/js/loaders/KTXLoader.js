@@ -68,23 +68,24 @@ var KhronosTextureContainer = ( function () {
 
 		}
 
-		// load the reset of the header in native 32 bit int
-		var header = new Int32Array( this.arrayBuffer, 12, 13 );
-		// determine of the remaining header values are recorded in the opposite endianness & require conversion
-		var oppositeEndianess = header[ 0 ] === 0x01020304;
-		// read all the header elements in order they exist in the file, without modification (sans endainness)
-		this.glType = oppositeEndianess ? this.switchEndainness( header[ 1 ] ) : header[ 1 ]; // must be 0 for compressed textures
-		this.glTypeSize = oppositeEndianess ? this.switchEndainness( header[ 2 ] ) : header[ 2 ]; // must be 1 for compressed textures
-		this.glFormat = oppositeEndianess ? this.switchEndainness( header[ 3 ] ) : header[ 3 ]; // must be 0 for compressed textures
-		this.glInternalFormat = oppositeEndianess ? this.switchEndainness( header[ 4 ] ) : header[ 4 ]; // the value of arg passed to gl.compressedTexImage2D(,,x,,,,)
-		this.glBaseInternalFormat = oppositeEndianess ? this.switchEndainness( header[ 5 ] ) : header[ 5 ]; // specify GL_RGB, GL_RGBA, GL_ALPHA, etc (un-compressed only)
-		this.pixelWidth = oppositeEndianess ? this.switchEndainness( header[ 6 ] ) : header[ 6 ]; // level 0 value of arg passed to gl.compressedTexImage2D(,,,x,,,)
-		this.pixelHeight = oppositeEndianess ? this.switchEndainness( header[ 7 ] ) : header[ 7 ]; // level 0 value of arg passed to gl.compressedTexImage2D(,,,,x,,)
-		this.pixelDepth = oppositeEndianess ? this.switchEndainness( header[ 8 ] ) : header[ 8 ]; // level 0 value of arg passed to gl.compressedTexImage3D(,,,,,x,,)
-		this.numberOfArrayElements = oppositeEndianess ? this.switchEndainness( header[ 9 ] ) : header[ 9 ]; // used for texture arrays
-		this.numberOfFaces = oppositeEndianess ? this.switchEndainness( header[ 10 ] ) : header[ 10 ]; // used for cubemap textures, should either be 1 or 6
-		this.numberOfMipmapLevels = oppositeEndianess ? this.switchEndainness( header[ 11 ] ) : header[ 11 ]; // number of levels; disregard possibility of 0 for compressed textures
-		this.bytesOfKeyValueData = oppositeEndianess ? this.switchEndainness( header[ 12 ] ) : header[ 12 ]; // the amount of space after the header for meta-data
+		// load the reset of the header in native 32 bit uint
+        const dataSize = Uint32Array.BYTES_PER_ELEMENT;
+        const headerDataView = new DataView(this.arrayBuffer, 12, 13 * dataSize);
+        const endianness = headerDataView.getUint32(0, true);
+        const littleEndian = endianness === 0x04030201;
+
+        this.glType = headerDataView.getUint32(1 * dataSize, littleEndian); // must be 0 for compressed textures
+        this.glTypeSize = headerDataView.getUint32(2 * dataSize, littleEndian); // must be 1 for compressed textures
+        this.glFormat = headerDataView.getUint32(3 * dataSize, littleEndian); // must be 0 for compressed textures
+        this.glInternalFormat = headerDataView.getUint32(4 * dataSize, littleEndian); // the value of arg passed to gl.compressedTexImage2D(,,x,,,,)
+        this.glBaseInternalFormat = headerDataView.getUint32(5 * dataSize, littleEndian); // specify GL_RGB, GL_RGBA, GL_ALPHA, etc (un-compressed only)
+        this.pixelWidth = headerDataView.getUint32(6 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage2D(,,,x,,,)
+        this.pixelHeight = headerDataView.getUint32(7 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage2D(,,,,x,,)
+        this.pixelDepth = headerDataView.getUint32(8 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage3D(,,,,,x,,)
+        this.numberOfArrayElements = headerDataView.getUint32(9 * dataSize, littleEndian); // used for texture arrays
+        this.numberOfFaces = headerDataView.getUint32(10 * dataSize, littleEndian); // used for cubemap textures, should either be 1 or 6
+        this.numberOfMipmapLevels = headerDataView.getUint32(11 * dataSize, littleEndian); // number of levels; disregard possibility of 0 for compressed textures
+        this.bytesOfKeyValueData = headerDataView.getUint32(12 * dataSize, littleEndian); // the amount of space after the header for meta-data
 
 		// Make sure we have a compressed type.  Not only reduces work, but probably better to let dev know they are not compressing.
 		if ( this.glType !== 0 ) {
@@ -121,13 +122,6 @@ var KhronosTextureContainer = ( function () {
 		this.loadType = KhronosTextureContainer.COMPRESSED_2D;
 
 	}
-
-	// not as fast hardware based, but will probably never need to use
-	KhronosTextureContainer.prototype.switchEndainness = function ( val ) {
-
-		return ( ( val & 0xFF ) << 24 ) | ( ( val & 0xFF00 ) << 8 ) | ( ( val >> 8 ) & 0xFF00 ) | ( ( val >> 24 ) & 0xFF );
-
-	};
 
 	// return mipmaps for THREE.js
 	KhronosTextureContainer.prototype.mipmaps = function ( loadMipmaps ) {
