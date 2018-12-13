@@ -2131,6 +2131,11 @@
 
 		}
 
+		// we should sort it, the elements in it aren't arranged by distance.
+		intersects.sort( function( a, b ) {
+			return a.distance - b.distance;
+		} );
+
 		return intersects;
 
 	};

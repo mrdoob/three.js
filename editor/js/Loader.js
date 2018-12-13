@@ -574,6 +574,12 @@ var Loader = function ( editor ) {
 
 				break;
 
+			case 'geometry':
+
+				console.error( 'Loader: "Geometry" is no longer supported.' );
+
+				break;
+
 			case 'object':
 
 				var loader = new THREE.ObjectLoader();

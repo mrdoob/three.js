@@ -10,14 +10,15 @@ import {
 	Uint16BufferAttribute,
 	Uint32BufferAttribute
 } from '../../../../src/core/BufferAttribute';
+import { Color } from '../../../../src/math/Color';
+import { Vector2 } from '../../../../src/math/Vector2';
 import { Vector3 } from '../../../../src/math/Vector3';
+import { Vector4 } from '../../../../src/math/Vector4';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Sphere } from '../../../../src/math/Sphere';
-import { Vector2 } from '../../../../src/math/Vector2';
 import { Geometry } from '../../../../src/core/Geometry';
 import { Face3 } from '../../../../src/core/Face3';
 import { Mesh } from '../../../../src/objects/Mesh';
-import { Color } from '../../../../src/math/Color';
 import { Line } from '../../../../src/objects/Line.js';
 import {
 	x,
@@ -539,6 +540,94 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( u.length * 2, uvs.length, "Both arrays have the same size" );
 			assert.strictEqual( geometry.attributes.uv.count, u.length, "Correct number of UV coordinates" );
 			assert.ok( compareUvs( uvs, u ), "UVs are identical" );
+
+		} );
+
+		QUnit.test( "fromGeometry/fromDirectGeometry", ( assert ) => {
+
+			// geometry definition
+
+			var geometry = new Geometry();
+
+			// vertices
+
+			var v1 = new Vector3( 1, - 1, 0 );
+			var v2 = new Vector3( 1, 1, 0 );
+			var v3 = new Vector3( - 1, 1, 0 );
+			var v4 = new Vector3( - 1, - 1, 0 );
+
+			// faces, normals and colors
+
+			geometry.vertices.push( v1, v2, v3, v4 );
+
+			var f1 = new Face3( 0, 1, 2 );
+			f1.normal.set( 0, 0, 1 );
+			f1.color.set( 0xff0000 );
+			var f2 = new Face3( 2, 3, 0 );
+			f2.normal.set( 0, 0, 1 );
+			f2.color.set( 0xff0000 );
+
+			geometry.faces.push( f1, f2 );
+
+			// uvs
+
+			var uvs = geometry.faceVertexUvs[ 0 ];
+			uvs.length = 0;
+
+			uvs.push( [
+				new Vector2( 1, 0 ),
+			  new Vector2( 1, 1 ),
+			  new Vector2( 0, 1 )
+			] );
+
+			uvs.push( [
+				new Vector2( 0, 1 ),
+			  new Vector2( 0, 0 ),
+			  new Vector2( 1, 0 )
+			] );
+
+			// skin weights
+
+			var sw1 = new Vector4( 0.8, 0.2, 0, 0 );
+			var sw2 = new Vector4( 0.7, 0.2, 0.1, 0 );
+			var sw3 = new Vector4( 0.8, 0.1, 0.1, 0 );
+			var sw4 = new Vector4( 1, 0, 0, 0 );
+
+			geometry.skinWeights.push( sw1, sw2, sw3, sw4 );
+
+			 // skin indices
+
+			var si1 = new Vector4( 0, 1, 2, 3 );
+			var si2 = new Vector4( 2, 3, 4, 5 );
+			var si3 = new Vector4( 4, 5, 6, 7 );
+			var si4 = new Vector4( 6, 7, 8, 9 );
+
+			geometry.skinIndices.push( si1, si2, si3, si4 );
+
+			// create BufferGeometry
+
+			var bufferGeometry = new BufferGeometry().fromGeometry( geometry );
+
+			// expected values
+
+			var vertices = new Float32Array( [ 1, - 1, 0, 1, 1, 0, - 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ] );
+			var normals = new Float32Array( [ 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 ] );
+			var colors = new Float32Array( [ 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 ] );
+			var uvs = new Float32Array( [ 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0 ] );
+			var skinIndices = new Float32Array( [ 0, 1, 2, 3, 2, 3, 4, 5, 4, 5, 6, 7, 4, 5, 6, 7, 6, 7, 8, 9, 0, 1, 2, 3 ] );
+			var skindWeights = new Float32Array( [
+				0.8, 0.2, 0, 0, 0.7, 0.2, 0.1, 0, 0.8, 0.1, 0.1, 0,
+				0.8, 0.1, 0.1, 0, 1, 0, 0, 0, 0.8, 0.2, 0, 0
+			] );
+
+			var attributes = bufferGeometry.attributes;
+
+			assert.deepEqual( attributes.position.array, vertices, "Vertices are as expected" );
+			assert.deepEqual( attributes.normal.array, normals, "Normals are as expected" );
+			assert.deepEqual( attributes.color.array, colors, "Colors are as expected" );
+			assert.deepEqual( attributes.uv.array, uvs, "Texture coordinates are as expected" );
+			assert.deepEqual( attributes.skinIndex.array, skinIndices, "Skin indices are as expected" );
+			assert.deepEqual( attributes.skinWeight.array, skindWeights, "Skin weights are as expected" );
 
 		} );
 

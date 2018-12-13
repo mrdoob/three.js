@@ -158,6 +158,7 @@
 		camera.add( listener );
 
 		var audioElement = document.getElementById( 'music' );
+		audioElement.play();
 
 		var positionalAudio = new THREE.PositionalAudio( listener );
 		positionalAudio.setMediaElementSource( audioElement );
@@ -184,7 +185,6 @@
 
 			} );
 
-			audioElement.play();
 			boomBox.add( positionalAudio );
 			scene.add( boomBox );
 			animate();

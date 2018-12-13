@@ -32,6 +32,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
 
 		<script>
 
@@ -58,17 +59,27 @@
 
 			function init( texture ) {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-
-				scene = new THREE.Scene();
-
-				backgroundMesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 500, 32, 16 ), new THREE.MeshBasicMaterial( { map: texture } ) );
-				backgroundMesh.geometry.scale( - 1, 1, 1 );
-				scene.add( backgroundMesh );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+
+				// background
+
+				var options = {
+					resolution: 1024,
+
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipMapLinearFilter,
+					magFilter: THREE.LinearFilter
+				};
+
+				scene.background = new THREE.CubemapGenerator( renderer ).fromEquirectangular( texture, options );
+
+				//
 
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
 				cubeCamera1.renderTarget.texture.generateMipmaps = true;
@@ -198,13 +209,11 @@
 				if ( count % 2 === 0 ) {
 
 					material.envMap = cubeCamera1.renderTarget.texture;
-					backgroundMesh.position.copy( cubeCamera2.position );
 					cubeCamera2.update( renderer, scene );
 
 				} else {
 
 					material.envMap = cubeCamera2.renderTarget.texture;
-					backgroundMesh.position.copy( cubeCamera1.position );
 					cubeCamera1.update( renderer, scene );
 
 				}
@@ -213,7 +222,6 @@
 
 				sphere.visible = true;
 
-				backgroundMesh.position.copy( camera.position );
 				renderer.render( scene, camera );
 
 			}
