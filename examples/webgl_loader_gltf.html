@@ -69,31 +69,26 @@
 				controls.target.set( 0, - 0.2, - 0.2 );
 				controls.update();
 
-				// envmap
-				var path = 'textures/cube/Bridge2/';
-				var format = '.jpg';
-				var envMap = new THREE.CubeTextureLoader().load( [
-					path + 'posx' + format, path + 'negx' + format,
-					path + 'posy' + format, path + 'negy' + format,
-					path + 'posz' + format, path + 'negz' + format
-				] );
+				var urls = [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ];
+				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/Bridge2/' );
+				var background = loader.load( urls );
 
 				scene = new THREE.Scene();
-				scene.background = envMap;
+				scene.background = background;
 
 				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
 				// model
-				var loader = new THREE.GLTFLoader();
-				loader.load( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', function ( gltf ) {
+				var loader = new THREE.GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 					gltf.scene.traverse( function ( child ) {
 
 						if ( child.isMesh ) {
 
-							child.material.envMap = envMap;
+							child.material.envMap = background;
 
 						}
 

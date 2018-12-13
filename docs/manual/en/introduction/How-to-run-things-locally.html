@@ -122,64 +122,6 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 				</ol>
 			</div>
 
-		<h2>Change local files security policy</h2>
-		<div>
-			<h3>Safari</h3>
-			<div>
-				<p>
-					Enable the develop menu using the preferences panel, under Advanced -&gt; "Show develop menu
-					in menu bar".
-				</p>
-
-				<p>
-					Then from the safari "Develop" menu, select "Disable local file restrictions", it is also
-					worth noting safari has some odd behaviour with caches, so it is advisable to use the
-					"Disable caches" option in the same menu; if you are editing &amp; debugging using safari.
-				</p>
-			</div>
-
-
-			<h3>Chrome</h3>
-			<div>
-				<p>Close all running Chrome instances first. The important word here is 'all'.</p>
-
-				<p>
-					On Windows, you may check for Chrome instances using the Windows Task Manager.
-					Alternatively, if you see a Chrome icon in the system tray, then you may open its context
-					menu and click 'Exit'. This should close all Chrome instances.
-				</p>
-
-				<p>Then start the Chrome executable with a command line flag:</p>
-
-				<code>chrome --allow-file-access-from-files</code>
-
-				<p>
-					On Windows, the easiest is probably to create a special shortcut icon which has
-					added the flag given above (right-click on shortcut -&gt; properties -&gt; target).
-				</p>
-
-				<p>On Mac OSX, you can do this with</p>
-
-				<code>open /Applications/Google\ Chrome.app --args --allow-file-access-from-files</code>
-			</div>
-
-			<h3>Firefox</h3>
-			<div>
-				<ol>
-				<li>
-					In the address bar, type <code>about:config</code>
-				</li>
-				<li>
-					Find the <code>security.fileuri.strict_origin_policy</code> parameter
-				</li>
-				<li>
-					Set it to <em>false</em>
-				</li>
-				</ol>
-			</div>
-
-		</div>
-
 			<p>
 				Other simple alternatives are [link:http://stackoverflow.com/q/12905426/24874 discussed here]
 				on Stack Overflow.

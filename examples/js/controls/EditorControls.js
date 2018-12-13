@@ -32,6 +32,7 @@ THREE.EditorControls = function ( object, domElement ) {
 	var pointer = new THREE.Vector2();
 	var pointerOld = new THREE.Vector2();
 	var spherical = new THREE.Spherical();
+	var sphere = new THREE.Sphere();
 
 	// events
 
@@ -45,8 +46,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( box.isEmpty() === false ) {
 
-			center.copy( box.getCenter() );
-			distance = box.getBoundingSphere().radius;
+			box.getCenter( center );
+			distance = box.getBoundingSphere( sphere ).radius;
 
 		} else {
 

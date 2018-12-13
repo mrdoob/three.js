@@ -15,7 +15,12 @@ void main() {
 
 	sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;
 
-	gl_FragColor = texture2D( tEquirect, sampleUV );
+	vec4 texColor = texture2D( tEquirect, sampleUV );
+
+	gl_FragColor = mapTexelToLinear( texColor );
+
+	#include <tonemapping_fragment>
+	#include <encodings_fragment>
 
 }
 `;

@@ -9,7 +9,7 @@ import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
-import { UniformsUtils } from '../shaders/UniformsUtils.js';
+import { cloneUniforms } from '../shaders/UniformsUtils.js';
 
 function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
@@ -18,6 +18,10 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 	var planeMesh;
 	var boxMesh;
+	// Store the current background texture and its `version`
+	// so we can recompile the material accordingly.
+	var currentBackground = null;
+	var currentBackgroundVersion = 0;
 
 	function render( renderList, scene, camera, forceClear ) {
 
@@ -26,11 +30,15 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 		if ( background === null ) {
 
 			setClear( clearColor, clearAlpha );
+			currentBackground = null;
+			currentBackgroundVersion = 0;
 
 		} else if ( background && background.isColor ) {
 
 			setClear( background, 1 );
 			forceClear = true;
+			currentBackground = null;
+			currentBackgroundVersion = 0;
 
 		}
 
@@ -48,7 +56,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					new BoxBufferGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
 						type: 'BackgroundCubeMaterial',
-						uniforms: UniformsUtils.clone( ShaderLib.cube.uniforms ),
+						uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
 						vertexShader: ShaderLib.cube.vertexShader,
 						fragmentShader: ShaderLib.cube.fragmentShader,
 						side: BackSide,
@@ -82,11 +90,22 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			}
 
-			boxMesh.material.uniforms.tCube.value = ( background.isWebGLRenderTargetCube ) ? background.texture : background;
+			var texture = background.isWebGLRenderTargetCube ? background.texture : background;
+			boxMesh.material.uniforms.tCube.value = texture;
 			boxMesh.material.uniforms.tFlip.value = ( background.isWebGLRenderTargetCube ) ? 1 : - 1;
 
+			if ( currentBackground !== background ||
+			     currentBackgroundVersion !== texture.version ) {
+
+				boxMesh.material.needsUpdate = true;
+
+				currentBackground = background;
+				currentBackgroundVersion = texture.version;
+
+			}
+
 			// push to the pre-sorted opaque render list
-			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
+			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
 		} else if ( background && background.isTexture ) {
 
@@ -96,11 +115,11 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					new PlaneBufferGeometry( 2, 2 ),
 					new ShaderMaterial( {
 						type: 'BackgroundMaterial',
-						uniforms: UniformsUtils.clone( ShaderLib.background.uniforms ),
+						uniforms: cloneUniforms( ShaderLib.background.uniforms ),
 						vertexShader: ShaderLib.background.vertexShader,
 						fragmentShader: ShaderLib.background.fragmentShader,
 						side: FrontSide,
-						depthTest: true,
+						depthTest: false,
 						depthWrite: false,
 						fog: false
 					} )
@@ -133,8 +152,19 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			planeMesh.material.uniforms.uvTransform.value.copy( background.matrix );
 
+			if ( currentBackground !== background ||
+				   currentBackgroundVersion !== background.version ) {
+
+				planeMesh.material.needsUpdate = true;
+
+				currentBackground = background;
+				currentBackgroundVersion = background.version;
+
+			}
+
+
 			// push to the pre-sorted opaque render list
-			renderList.push( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
+			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
 
 		}
 

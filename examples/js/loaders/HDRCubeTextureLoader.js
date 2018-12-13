@@ -102,7 +102,7 @@ THREE.HDRCubeTextureLoader.prototype.load = function ( type, urls, onLoad, onPro
 	texture.generateMipmaps = ( texture.encoding !== THREE.RGBEEncoding );
 	texture.anisotropy = 0;
 
-	var scope = this.hdrLoader;
+	var scope = this;
 
 	var loaded = 0;
 
@@ -115,7 +115,7 @@ THREE.HDRCubeTextureLoader.prototype.load = function ( type, urls, onLoad, onPro
 
 			loaded ++;
 
-			var texData = scope._parser( buffer );
+			var texData = scope.hdrLoader._parser( buffer );
 
 			if ( ! texData ) return;
 
