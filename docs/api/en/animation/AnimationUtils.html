@@ -38,26 +38,9 @@
 		Returns an array by which times and values can be sorted.
 		</p>
 
-		<h3>[method:Number insertKeyframe]( [param:KeyframeTrack track], [param:Number time] )</h3>
-		<p>
-		Inserts a new keyframe into the track at the given time, if it doesn't already exist. Keyframe
-		values are interpolated from existing keyframes. Returns the keyframe index.
-		</p>
-
 		<h3>[method:Boolean isTypedArray]( object )</h3>
 		<p>
 		Returns *true* if the object is a typed array.
-		</p>
-
-		<h3>[method:AnimationClip mergeMorphTargetTracks]( [param:AnimationClip clip], [param:Object3D root] )</h3>
-		<p>
-		Merges all KeyframeTracks that animate morph targets on a single mesh. The clip provided will
-		be modified and returned.
-		</p>
-		<p>
-		If a clip contains three tracks each controlling one of an object's five morph targets, those
-		three tracks will be merged and two empty tracks created for the remaining morph targets, so
-		that all morph targets are controlled by a single track.
 		</p>
 
 		<h3>[method:Array sortedArray]( values, stride, order )</h3>
