@@ -1541,7 +1541,7 @@ THREE.GLTFLoader = ( function () {
 
 		} else {
 
-			geometryKey = primitiveDef.indices + ':' + createAttributesKey( primitiveDef.attributes );
+			geometryKey = primitiveDef.indices + ':' + createAttributesKey( primitiveDef.attributes ) + primitiveDef.mode;
 
 		}
 
