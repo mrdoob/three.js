@@ -1509,30 +1509,6 @@ THREE.GLTFLoader = ( function () {
 		}
 
 	}
-
-	function isPrimitiveEqual( a, b ) {
-
-		var dracoExtA = a.extensions ? a.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] : undefined;
-		var dracoExtB = b.extensions ? b.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] : undefined;
-
-		if ( dracoExtA && dracoExtB ) {
-
-			if ( dracoExtA.bufferView !== dracoExtB.bufferView ) return false;
-
-			return isObjectEqual( dracoExtA.attributes, dracoExtB.attributes );
-
-		}
-
-		if ( a.indices !== b.indices ) {
-
-			return false;
-
-		}
-
-		return isObjectEqual( a.attributes, b.attributes );
-
-	}
-
 	function isObjectEqual( a, b ) {
 
 		if ( Object.keys( a ).length !== Object.keys( b ).length ) return false;
@@ -1547,59 +1523,57 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	function isArrayEqual( a, b ) {
+	function createGeometryKey( geometry ) {
 
-		if ( a.length !== b.length ) return false;
+		var dracoExtension = geometry.extensions && geometry.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ];
+		var geometryKey;
+
+		if ( dracoExtension ) {
+
+			geometryKey = 'draco:' + dracoExtension.bufferView
+				+ ':' + dracoExtension.indices
+				+ ':' + createAttributesKey( dracoExtension.attributes );
+
+		} else {
+
+			geometryKey = geometry.indices + ':' + createAttributesKey( geometry.attributes );
+
+		}
+
+		return geometryKey;
+
+	}
+
+	function createAttributesKey( attributes ) {
+
+		var attributesKey = '';
+
+		for ( var key in attributes ) {
+
+			attributesKey += key + attributes[ key ];
+
+		}
+
+		return attributesKey;
+
+	}
+	function createArrayKey( a ) {
+
+		var arrayKey = '';
 
 		for ( var i = 0, il = a.length; i < il; i ++ ) {
 
-			if ( a[ i ] !== b[ i ] ) return false;
+			arrayKey += i + a[ i ];
 
 		}
 
-		return true;
+		return arrayKey;
 
 	}
 
-	function getCachedGeometry( cache, newPrimitive ) {
+	function createMultiPassGeometryKey( geometry, primitives ) {
 
-		for ( var i = 0, il = cache.length; i < il; i ++ ) {
-
-			var cached = cache[ i ];
-
-			if ( isPrimitiveEqual( cached.primitive, newPrimitive ) ) return cached.promise;
-
-		}
-
-		return null;
-
-	}
-
-	function getCachedCombinedGeometry( cache, geometries ) {
-
-		for ( var i = 0, il = cache.length; i < il; i ++ ) {
-
-			var cached = cache[ i ];
-
-			if ( isArrayEqual( geometries, cached.baseGeometries ) ) return cached.geometry;
-
-		}
-
-		return null;
-
-	}
-
-	function getCachedMultiPassGeometry( cache, geometry, primitives ) {
-
-		for ( var i = 0, il = cache.length; i < il; i ++ ) {
-
-			var cached = cache[ i ];
-
-			if ( geometry === cached.baseGeometry && isArrayEqual( primitives, cached.primitives ) ) return cached.geometry;
-
-		}
-
-		return null;
+		return createGeometryKey( geometry ) + createArrayKey( primitives );
 
 	}
 
@@ -1682,9 +1656,9 @@ THREE.GLTFLoader = ( function () {
 		this.cache = new GLTFRegistry();
 
 		// BufferGeometry caching
-		this.primitiveCache = [];
-		this.multiplePrimitivesCache = [];
-		this.multiPassGeometryCache = [];
+		this.primitiveCache = {};
+		this.multiplePrimitivesCache = {};
+		this.multiPassGeometryCache = {};
 
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
@@ -2524,14 +2498,15 @@ THREE.GLTFLoader = ( function () {
 		for ( var i = 0, il = primitives.length; i < il; i ++ ) {
 
 			var primitive = primitives[ i ];
+			var cacheKey = createGeometryKey( primitive );
 
 			// See if we've already created this geometry
-			var cached = getCachedGeometry( cache, primitive );
+			var cached = cache[ cacheKey ];
 
 			if ( cached ) {
 
 				// Use the cached geometry if it exists
-				pending.push( cached );
+				pending.push( cached.promise );
 
 			} else {
 
@@ -2550,7 +2525,7 @@ THREE.GLTFLoader = ( function () {
 				}
 
 				// Cache this geometry
-				cache.push( { primitive: primitive, promise: geometryPromise } );
+				cache[ cacheKey ] = { primitive: primitive, promise: geometryPromise };
 
 				pending.push( geometryPromise );
 
@@ -2566,7 +2541,8 @@ THREE.GLTFLoader = ( function () {
 
 				// See if we've already created this combined geometry
 				var cache = parser.multiPassGeometryCache;
-				var cached = getCachedMultiPassGeometry( cache, baseGeometry, originalPrimitives );
+				var cacheKey = createMultiPassGeometryKey( baseGeometry, originalPrimitives );
+				var cached = cache[ cacheKey ];
 
 				if ( cached !== null ) return [ cached.geometry ];
 
@@ -2607,7 +2583,7 @@ THREE.GLTFLoader = ( function () {
 
 					geometry.setIndex( indices );
 
-					cache.push( { geometry: geometry, baseGeometry: baseGeometry, primitives: originalPrimitives } );
+					cache[ cacheKey ] = { geometry: geometry, baseGeometry: baseGeometry, primitives: originalPrimitives };
 
 					return [ geometry ];
 
@@ -2626,7 +2602,8 @@ THREE.GLTFLoader = ( function () {
 
 				// See if we've already created this combined geometry
 				var cache = parser.multiplePrimitivesCache;
-				var cached = getCachedCombinedGeometry( cache, geometries );
+				var cacheKey = createArrayKey( geometries );
+				var cached = cache[ cacheKey ];
 
 				if ( cached ) {
 
@@ -2636,7 +2613,7 @@ THREE.GLTFLoader = ( function () {
 
 					var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries, true );
 
-					cache.push( { geometry: geometry, baseGeometries: geometries } );
+					cache[ cacheKey ] = { geometry: geometry, baseGeometries: geometries };
 
 					if ( geometry !== null ) return [ geometry ];
 
