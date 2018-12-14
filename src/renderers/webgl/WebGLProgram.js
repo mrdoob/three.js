@@ -186,15 +186,18 @@ function parseIncludes( string ) {
 
 function unrollLoops( string ) {
 
-	var pattern = /#pragma unroll_loop[\s]+?for\s*?\(\s*?int\s*?i\s*?\=\s*?(\d+)\;\s*?i\s*?<\s*?(\d+)\;\s*?i\s*?\+\+\s*?\)\s*?\{([\s\S]+?)(?=\})\}/g;
+	var pattern = /#pragma unroll_loop[\s]+?for\s*?\(\s*?int\s*?([\w]+?)\s*?\=\s*?(\d+)\;\s*?\1\s*?<\s*?(\d+)\;\s*?\1\s*?\+\+\s*?\)\s*?\{([\s\S]+?)(?=\})\}/g;
 
-	function replace( match, start, end, snippet ) {
+	function replace( match, token, start, end, snippet ) {
+
+		var unroll = '';
+		var toBeReplaced = new RegExp('\\[ ' + token + ' \\]', 'g')
 
 		var unroll = '';
 
 		for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
 
-			unroll += snippet.replace( /\[ i \]/g, '[ ' + i + ' ]' );
+			unroll += snippet.replace( toBeReplaced, '[ ' + i + ' ]' );
 
 		}
 
