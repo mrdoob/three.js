@@ -191,13 +191,11 @@ function unrollLoops( string ) {
 	function replace( match, token, start, end, snippet ) {
 
 		var unroll = '';
-		var toBeReplaced = new RegExp('\\[ ' + token + ' \\]', 'g')
-
-		var unroll = '';
+		var toBeReplaced = new RegExp('([^\\w])' + token + '([^\\w])', 'g')
 
 		for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
 
-			unroll += snippet.replace( toBeReplaced, '[ ' + i + ' ]' );
+			unroll += snippet.replace( toBeReplaced,  '$1' + i + '$2' );
 
 		}
 
