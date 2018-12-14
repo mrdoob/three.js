@@ -338,7 +338,7 @@ THREE.GLTFLoader = ( function () {
 
 			case 'directional':
 				lightNode = new THREE.DirectionalLight( color );
-				lightNode.target.position.set( 0, 0, -1 );
+				lightNode.target.position.set( 0, 0, - 1 );
 				lightNode.add( lightNode.target );
 				break;
 
@@ -356,7 +356,7 @@ THREE.GLTFLoader = ( function () {
 				lightDef.spot.outerConeAngle = lightDef.spot.outerConeAngle !== undefined ? lightDef.spot.outerConeAngle : Math.PI / 4.0;
 				lightNode.angle = lightDef.spot.outerConeAngle;
 				lightNode.penumbra = 1.0 - lightDef.spot.innerConeAngle / lightDef.spot.outerConeAngle;
-				lightNode.target.position.set( 0, 0, -1 );
+				lightNode.target.position.set( 0, 0, - 1 );
 				lightNode.add( lightNode.target );
 				break;
 
@@ -964,6 +964,7 @@ THREE.GLTFLoader = ( function () {
 					uniforms.refractionRatio.value = material.refractionRatio;
 
 					uniforms.maxMipLevel.value = renderer.properties.get( material.envMap ).__maxMipLevel;
+
 				}
 
 				uniforms.specular.value.copy( material.specular );
@@ -1356,8 +1357,10 @@ THREE.GLTFLoader = ( function () {
 				var accessor = target.POSITION !== undefined
 					? parser.getDependency( 'accessor', target.POSITION )
 						.then( function ( accessor ) {
+
 							// Cloning not to pollute original accessor below
 							return cloneBufferAttribute( accessor );
+
 						} )
 					: geometry.attributes.position;
 
@@ -1371,7 +1374,9 @@ THREE.GLTFLoader = ( function () {
 				var accessor = target.NORMAL !== undefined
 					? parser.getDependency( 'accessor', target.NORMAL )
 						.then( function ( accessor ) {
+
 							return cloneBufferAttribute( accessor );
+
 						} )
 					: geometry.attributes.normal;
 
@@ -1523,9 +1528,9 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	function createGeometryKey( geometry ) {
+	function createGeometryKey( primitiveDef ) {
 
-		var dracoExtension = geometry.extensions && geometry.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ];
+		var dracoExtension = primitiveDef.extensions && primitiveDef.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ];
 		var geometryKey;
 
 		if ( dracoExtension ) {
@@ -1536,7 +1541,7 @@ THREE.GLTFLoader = ( function () {
 
 		} else {
 
-			geometryKey = geometry.indices + ':' + createAttributesKey( geometry.attributes );
+			geometryKey = primitiveDef.indices + ':' + createAttributesKey( primitiveDef.attributes );
 
 		}
 
@@ -1557,13 +1562,20 @@ THREE.GLTFLoader = ( function () {
 		return attributesKey;
 
 	}
+
 	function createArrayKey( a ) {
 
 		var arrayKey = '';
 
 		for ( var i = 0, il = a.length; i < il; i ++ ) {
 
-			arrayKey += i + a[ i ];
+			arrayKey += i;
+
+			for ( var j = 0, jl = a[ i ].lenght; j < jl; j ++ ) {
+
+				arrayKey += j + a[ i ][ j ];
+
+			}
 
 		}
 
@@ -1822,7 +1834,7 @@ THREE.GLTFLoader = ( function () {
 
 				case 'light':
 					dependency = this.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].loadLight( index );
-					break
+					break;
 
 				default:
 					throw new Error( 'Unknown type: ' + type );
@@ -3106,7 +3118,7 @@ THREE.GLTFLoader = ( function () {
 
 		var nodeDef = json.nodes[ nodeIndex ];
 
-		return ( function() {
+		return ( function () {
 
 			// .isBone isn't in glTF spec. See .markDefs
 			if ( nodeDef.isBone === true ) {
@@ -3299,7 +3311,7 @@ THREE.GLTFLoader = ( function () {
 
 						mesh.bind( new THREE.Skeleton( bones, boneInverses ), mesh.matrixWorld );
 
-					};
+					}
 
 					return node;
 
