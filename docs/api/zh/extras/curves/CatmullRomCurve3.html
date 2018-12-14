@@ -12,10 +12,11 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">Create a smooth 3d spline curve from a series of points using the
-			[link:https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline Catmull-Rom] algorithm.</p>
+		<p class="desc">
+			使用[link:https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline Catmull-Rom]算法，
+			从一系列的点创建一条光滑的三维样条曲线。</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 <code>
 //Create a closed wavey loop
@@ -39,42 +40,42 @@ var curveObject = new THREE.Line( geometry, material );
 		<h3>[example:webgl_geometry_extrude_splines geometry / extrude / splines]</h3>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:Array points], [param:Boolean closed], [param:String curveType], [param:Float tension] )</h3>
 		<p>
-			points – An array of [page:Vector3] points<br/>
-			closed – Whether the curve is closed. Default is *false*.<br/>
-			curveType – Type of the curve. Default is *centripetal*.<br/>
-			tension – Tension of the curve. Default is *0.5*.
+			points – [page:Vector3]点数组<br/>
+			closed – 该曲线是否闭合，默认值为false。<br/>
+			curveType – 曲线的类型，默认值为*centripetal*。<br/>
+			tension – 曲线的张力，默认为*0.5*。
 		</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Curve] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Curve]来了解共有属性。</p>
 
 		<h3>[property:Boolean isCatmullRomCurve3]</h3>
 		<p>
-			Used to check whether this or derived classes are CatmullRomCurve3s. Default is *true*.<br /><br />
+			用于检查该类或者其派生类是否为CatmullRomCurve3。默认值为*true*。<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			你不应当对这一属性进行改变，它在内部使用，以用于优化。
 		</p>
 
 		<h3>[property:Array points]</h3>
-		<p>The array of [page:Vector3] points that define the curve. It needs at least two entries.</p>
+		<p>定义了这一曲线的[page:Vector3]点数组，数组中至少需要两个点。</p>
 
 		<h3>[property:Boolean closed]</h3>
-		<p>The curve will loop back onto itself when this is true.</p>
+		<p>当该值为true时，曲线将会闭合（环回自身）。</p>
 
 		<h3>[property:String curveType]</h3>
-		<p>Possible values are *centripetal*, *chordal* and *catmullrom*.</p>
+		<p>可能的值为*centripetal*、*chordal*和*catmullrom*。</p>
 
 		<h3>[property:float tension]</h3>
-		<p>When [page:.type] is *catmullrom*, defines catmullrom's tension.</p>
+		<p>当[page:.type]为*catmullrom*时，定义catmullrom的张力。</p>
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:Curve] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Curve]来了解共有方法。</p>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

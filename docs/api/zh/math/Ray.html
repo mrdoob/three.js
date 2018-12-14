@@ -23,7 +23,7 @@
 		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
 		[page:Vector3 origin] - （可选）[page:Ray]（射线）的原点，默认值是一个位于(0, 0, 0)的[page:Vector3]。<br />
-		[page:Vector3 direction] - [page:Vector3] [page:Ray]（射线）的方向。该向量必须被标准化（使用[page:Vector3.normalize]函数），这样才能使方法正常运行。
+		[page:Vector3 direction] - [page:Vector3] [page:Ray]（射线）的方向。该向量必须经过标准化（使用[page:Vector3.normalize]），这样才能使方法正常运行。
 		默认值是一个位于(0, 0, 0)的[page:Vector3]。<br /><br />
 
 		创建一个新的[name]。
@@ -36,7 +36,7 @@
 
 		<h3>[property:Vector3 direction]</h3>
 		<p>
-		[page:Ray]（射线）的方向。该向量必须被标准化（使用[page:Vector3.normalize]函数），这样才能使方法正常运行。
+		[page:Ray]（射线）的方向。该向量必须经过标准化（使用[page:Vector3.normalize]），这样才能使方法正常运行。
 		默认值是一个位于(0, 0, 0)的[page:Vector3]。
 		</p>
 
@@ -87,27 +87,27 @@
 
 		<h3>[method:Float distanceSqToSegment]( [param:Vector3 v0], [param:Vector3 v1], [param:Vector3 optionalPointOnRay], [param:Vector3 optionalPointOnSegment] )</h3>
 		<p>
-		[page:Vector3 v0] - the start of the line segment.<br />
-		[page:Vector3 v1] - the end of the line segment.<br />
-		optionalPointOnRay - (optional) if this is provided, it receives the point on this
-			[page:Ray] that is closest to the segment.<br />
-		optionalPointOnSegment - (optional) if this is provided, it receives the point
-			on the line segment that is closest to this [page:Ray].<br /><br />
+		[page:Vector3 v0] - 线段的起点。<br />
+		[page:Vector3 v1] - 线段的终点。<br />
+		optionalPointOnRay - （可选）若这个值被给定，它将接收在[page:Ray]（射线）上距离线段最近的点。
+			<br />
+		optionalPointOnSegment - （可选）若这个值被给定，它将接收在线段上距离[page:Ray]（射线）最近的点。<br /><br />
 
-		Get the squared distance between this [page:Ray] and a line segment.
+		获取[page:Ray]（射线）与线段之间的平方距离。
 		</p>
 
 		<h3>[method:Float distanceToPlane]( [param:Plane plane] )</h3>
 		<p>
-		[page:Plane plane] - the [page:Plane] to get the distance to.<br /><br />
+		[page:Plane plane] - 将要获取射线原点到该平面的距离的平面。<br /><br />
 
-		Get the distance from [page:.origin origin] to the [page:Plane], or *null* if the [page:Ray] doesn't intersect the [page:Plane].
+		获取射线原点（[page:.origin origin]）到平面（[page:Plane]）之间的距离。若射线（[page:Ray]）不与平面（[page:Plane]）相交，则将返回*null*。
 		</p>
 
 		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] The [page:Vector3] to compute a distance to.<br /><br />
+		[page:Vector3 point] - [page:Vector3] 将被用于计算到其距离的[page:Vector3]。<br /><br />
 
+		获得射线到所传入[page:Vector3 point]之间最接近的距离。
 		Get the distance of the closest approach between the [page:Ray] and the [page:Vector3 point].
 		</p>
 
@@ -121,61 +121,56 @@
 
 		<h3>[method:Vector3 intersectBox]( [param:Box3 box], [param:Vector3 target] )</h3>
 		<p>
-		[page:Box3 box] - the [page:Box3] to intersect with.<br />
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Box3 box] - 将会与之相交的[page:Box3]。<br />
+		[page:Vector3 target] — 结果将会被复制到这一Vector3中。<br /><br />
 
-		相交
-		Intersect this [page:Ray] with a [page:Box3], returning the intersection point or
-		*null* if there is no intersection.
+		将[page:Ray]（射线）与一个[page:Box3]相交，并返回交点，倘若没有交点将返回*null*。
 		</p>
 
 		<h3>[method:Vector3 intersectPlane]( [param:Plane plane], [param:Vector3 target] )</h3>
 		<p>
-		[page:Plane plane] - the [page:Plane] to intersect with.<br />
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Plane plane] - 将会与之相交的[page:Plane]。<br />
+		[page:Vector3 target] — 结果将会被复制到这一Vector3中。<br /><br />
 
-		Intersect this [page:Ray] with a [page:Plane], returning the intersection point or
-		*null* if there is no intersection.
+		将[page:Ray]（射线）与一个[page:Plane]相交，并返回交点，倘若没有交点将返回*null*。
 		</p>
 
 		<h3>[method:Vector3 intersectSphere]( [param:Sphere sphere], [param:Vector3 target] )</h3>
 		<p>
-		[page:Sphere sphere] - the [page:Sphere] to intersect with.<br />
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Sphere sphere] - 将会与之相交的[page:Sphere]。<br />
+		[page:Vector3 target] — 结果将会被复制到这一Vector3中。<br /><br />
 
-		Intersect this [page:Ray] with a [page:Sphere], returning the intersection point or
-		*null* if there is no intersection.
+		将[page:Ray]（射线）与一个[page:Sphere]（球）相交，并返回交点，倘若没有交点将返回*null*。
 		</p>
 
 		<h3>[method:Vector3 intersectTriangle]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c], [param:Boolean backfaceCulling], [param:Vector3 target] )</h3>
 		<p>
-		[page:Vector3 a], [page:Vector3 b], [page:Vector3 c] - The [page:Vector3] points making up the triangle.<br />
-		[page:Boolean backfaceCulling] - whether to use backface culling.<br />
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+		[page:Vector3 a], [page:Vector3 b], [page:Vector3 c] - 组成三角形的三个[page:Vector3]。<br />
+		[page:Boolean backfaceCulling] - 是否使用背面剔除。<br />
+		[page:Vector3 target] — 结果将会被复制到这一Vector3中。<br /><br />
 
-		Intersect this [page:Ray] with a triangle, returning the intersection point or *null*
-		if there is no intersection.
+		将[page:Ray]（射线）与一个三角形相交，并返回交点，倘若没有交点将返回*null*。
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box] - the [page:Box3] to intersect with.<br /><br />
+		[page:Box3 box] - 将被检查是否与之相交的[page:Box3]。<br /><br />
 
-		Return true if this [page:Ray] intersects with the [page:Box3].
+		若这一射线与[page:Box3]相交，则将返回true。
 		</p>
 
 		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
 		<p>
-		[page:Plane plane] - the [page:Plane] to intersect with.<br /><br />
+		[page:Plane plane] - 将被检查是否与之相交的[page:Plane]。<br /><br />
 
-		Return true if this [page:Ray] intersects with the [page:Plane].
+		若这一射线与[page:Plane]相交，则将返回true。
 		</p>
 
 		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
 		<p>
-		[page:Sphere sphere] - the [page:Sphere] to intersect with.<br /><br />
+		[page:Sphere sphere] - 将被检查是否与之相交的[page:Sphere]。<br /><br />
 
-		Return true if this [page:Ray] intersects with the [page:Sphere].
+		若这一射线与[page:Sphere]相交，则将返回true。
 		</p>
 
 		<h3>[method:Ray lookAt]( [param:Vector3 v] )</h3>
@@ -194,13 +189,13 @@
 
 		<h3>[method:Ray set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
-		[page:Vector3 origin] - the [page:.origin origin] of the [page:Ray].<br />
-		[page:Vector3 origin] - the [page:.direction direction] of the [page:Ray].
-		This must be normalized (with [page:Vector3.normalize]) for the methods to operate
-		properly.<br /><br />
+		[page:Vector3 origin] - [page:Ray]（射线）的[page:.origin origin]（原点）。<br />
+		[page:Vector3 origin] - [page:Ray]（射线）的[page:.direction direction]（方向）。
+		
+		该向量必须经过标准化（使用[page:Vector3.normalize]），这样才能使方法正常运行。
+		<br /><br />
 
-		Copy the parameters to the [page:.origin origin] and [page:.direction direction] properties
-		of this ray.
+		将传入的参数赋值给射线的[page:.origin origin]和[page:.direction direction]。
 		</p>
 
 

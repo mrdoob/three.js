@@ -8,36 +8,33 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>二维向量（[name]）</h1>
 
 		<p class="desc">
-			Class representing a 2D [link:https://en.wikipedia.org/wiki/Vector_space vector].
+			表示2D [link:https://en.wikipedia.org/wiki/Vector_space vector]（二维向量）的类。
 
-			A 2D vector is an ordered pair of numbers (labeled x and y), which can be used to
-			represent a number of things, such as:
+			一个二维向量是一对有顺序的数字（标记为x和y），可被用于表示很多事物，例如：
 		</p>
 
 		<ul>
 			<li>
-				A point in 2D space (i.e. a position on a plane).
+				一个位于二维空间中的点（例如一个在平面上的点）。
 			</li>
 			<li>
-				A direction and length across a plane. In three.js the length will always be the
-				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
-				(straight-line distance) from (0, 0) to (x, y) and the direction is also
-				measured from (0, 0) towards (x, y).
+				横过平面的方向与长度。在three.js中，长度总是从(0, 0)到(x, y)的
+				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]（欧几里德距离，即直线距离），
+				方向也是从(0, 0)到(x, y)的方向。
 			</li>
 			<li>
-				Any arbitrary ordered pair of numbers.
+				任意的、有顺序的一对数字。
 			</li>
 		</ul>
 
 		<p>
-			There are other things a 2D vector can be used to represent, such as momentum
-			vectors, complex numbers and so on,	however these are the most common uses in three.js.
+			其他的一些事物也可以使用二维向量进行表示，比如说动量矢量、复数等等；但以上这些是three.js中的常用用途。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
 		var a = new THREE.Vector2( 0, 1 );
@@ -49,38 +46,39 @@
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:Float x], [param:Float y] )</h3>
 		<p>
-		[page:Float x] - the x value of the vector. Default is *0*.<br />
-		[page:Float y] -  the y value of the vector. Default is *0*.<br /><br />
+		[page:Float x] - 向量的x值，默认值为*0*。<br />
+		[page:Float y] -  向量的y值，默认值为*0*。<br /><br />
 
-		Creates a new [name].
+		创建一个新的[name]。
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Boolean isVector2]</h3>
 		<p>
-			Used to check whether this or derived classes are Vector2s. Default is *true*.<br /><br />
+			用于检查该类或者其派生类是否为Vector2，默认值为true。
+			<br /><br />
 
-			You should not change this, as it is used internally for optimisation.
+			你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
 		</p>
 
 		<h3>[property:Float height]</h3>
-		<p>Alias for [page:.y y].</p>
+		<p>[page:.y y]的别名。</p>
 
 		<h3>[property:Float width]</h3>
-		<p>Alias for [page:.x x].</p>
+		<p>[page:.x x]的别名。</p>
 
 		<h3>[property:Float x]</h3>
 
 		<h3>[property:Float y]</h3>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:this add]( [param:Vector2 v] )</h3>
 		<p>Adds [page:Vector2 v] to this vector.</p>
