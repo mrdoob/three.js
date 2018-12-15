@@ -186,7 +186,7 @@ function parseIncludes( string ) {
 
 function unrollLoops( string ) {
 
-	var pattern = /#pragma unroll_loop[\s]+?for\s*?\(\s*?int\s*?([\w]+?)\s*?\=\s*?(\d+)\;\s*?\1\s*?<\s*?(\d+)\;\s*?\1\s*?\+\+\s*?\)\s*?\{([\s\S]+?)(?=\})\}/g;
+	var pattern = /#pragma unroll_loop[\s]+?for\s*?\(\s*?int\s+?([\w]+?)\s*?\=\s*?(\d+)\;\s*?\1\s*?<\s*?(\d+)\;\s*?\1\s*?\+\+\s*?\)\s*?\{([\s\S]+?)(?=\})\}/g;
 
 	function replace( match, token, start, end, snippet ) {
 
