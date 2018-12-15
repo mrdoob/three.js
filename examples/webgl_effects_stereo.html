@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - effects - stereo</title>
@@ -15,7 +15,7 @@
 
 			#info {
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0px;
 				color: #ffffff;
 				padding: 5px;
 				font-family:Monospace;
@@ -43,6 +43,8 @@
 
 		<script src="js/WebGL.js"></script>
 
+        <script src="http://threejs.org/examples/js/libs/dat.gui.min.js"></script>
+
 		<script>
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
@@ -51,7 +53,7 @@
 
 			}
 
-			var container, camera, scene, renderer, effect;
+			var container, camera, scene, renderer, effect, scale = 1000;
 
 			var spheres = [];
 
@@ -70,15 +72,20 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 3200;
+			    // CAMERA
+
+				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01 * scale, 10 * scale);
+				camera.position.set(1 * scale, 1 * scale, 5 * scale);
+
+			    // SCENE
 
 				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog(0x000000, 250 * scale, 1400 * scale);
 				scene.background = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/Park3Med/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry(0.1 * scale, 32, 16);
 
 				var textureCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/Park3Med/' )
@@ -90,9 +97,9 @@
 				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 10000 - 5000;
-					mesh.position.y = Math.random() * 10000 - 5000;
-					mesh.position.z = Math.random() * 10000 - 5000;
+					mesh.position.x = Math.random() * 10 * scale - 5 * scale;
+					mesh.position.y = Math.random() * 10 * scale - 5 * scale;
+					mesh.position.z = Math.random() * 10 * scale - 5 * scale;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
 					scene.add( mesh );
 
@@ -109,7 +116,12 @@
 				effect = new THREE.StereoEffect( renderer );
 				effect.setSize( window.innerWidth, window.innerHeight );
 
-				//
+			    //dat-gui JavaScript Controller Library
+
+				var gui = new dat.GUI();
+				effect.gui(gui);
+
+			    //
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -129,8 +141,8 @@
 
 			function onDocumentMouseMove( event ) {
 
-				mouseX = ( event.clientX - windowHalfX ) * 10;
-				mouseY = ( event.clientY - windowHalfY ) * 10;
+			    mouseX = (event.clientX - windowHalfX) * 0.01 * scale;
+			    mouseY = (event.clientY - windowHalfY) * 0.01 * scale;
 
 			}
 
@@ -156,8 +168,8 @@
 
 					var sphere = spheres[ i ];
 
-					sphere.position.x = 5000 * Math.cos( timer + i );
-					sphere.position.y = 5000 * Math.sin( timer + i * 1.1 );
+					sphere.position.x = 5 * scale * Math.cos(timer + i);
+					sphere.position.y = 5 * scale * Math.sin(timer + i * 1.1);
 
 				}
 
