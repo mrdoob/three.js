@@ -10,7 +10,7 @@
 	<body>
 		<h1>常见问题（[name]）</h1>
 
-		<h2>哪一种三维物体格式能够得到最好地支持呢？</h2>
+		<h2>哪一种三维物体格式能够得到最好地支持？</h2>
 		<div>
 			<p>
 			推荐使用glTF（gl传输格式）来对三维物体进行导入和导出，由于glTF这种格式是专注于在程序运行时呈现三维物体的，所以它的传输效率非常高，且加载速度非常快。
@@ -41,13 +41,13 @@
 visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;<br>
 			</code>
 			如果我们以一定的百分比增加了窗口的高度，那我们所想要的结果便是所有距离的可见高度都增加相同的百分比。
-			这并不能通过改变摄像机的位置来实现，相反，你得改变摄像机的视野角度（FOV）。这是个示例：[link:http://jsfiddle.net/Q4Jpu/ Example].
+			这并不能通过改变摄像机的位置来实现，相反，你需要改变摄像机的视野角度（FOV）。这是个示例：[link:http://jsfiddle.net/Q4Jpu/ Example].
 		</p>
 
 		<h2>为什么我的物体的一部分是不可见的？</h2>
 		<p>
-			这可能是由于面消隐而导致的。面是具有朝向的，这个朝向决定了哪边是正面或者哪边是背面。
-			在正常情况下，渲染时会将背面进行消隐。要查看这是不是你所遇到的问题，请将material的slide更改为THREE.DoubleSide。
+			这可能是由于面剔除而导致的。面是具有朝向的，这个朝向决定了哪边是正面或者哪边是背面。
+			在正常情况下，渲染时会将背面进行剔除。要查看这是否为你所遇到的问题，请将material的slide更改为THREE.DoubleSide。
 			<code>material.side = THREE.DoubleSide</code>
 		</p>
 	</body>

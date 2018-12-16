@@ -8,16 +8,18 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>四元数（[name]）</h1>
+		<h1>[name]</h1>
 
 		<p class="desc">
-			这个类是对[link:http://en.wikipedia.org/wiki/Quaternion quaternion]（四元数）的实现。
-			它用于排除万向锁（[link:http://en.wikipedia.org/wiki/Gimbal_lock gimbal lock]）问题，以对物体进行旋转（[link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotating things]），
-			此外它还具有其它优点。
+			Implementation of a [link:http://en.wikipedia.org/wiki/Quaternion quaternion].
+			This is used for [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotating things]
+			without encountering the dreaded
+			[link:http://en.wikipedia.org/wiki/Gimbal_lock gimbal lock] issue, amongst other
+			advantages.
 		</p>
 
 
-		<h2>示例</h2>
+		<h2>Example</h2>
 
 		<code>
 		var quaternion = new THREE.Quaternion();
@@ -28,7 +30,7 @@
 		</code>
 
 
-		<h2>构造函数</h2>
+		<h2>Constructor</h2>
 
 
 		<h3>[name]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
@@ -40,31 +42,32 @@
 		</p>
 
 
-		<h2>属性</h2>
+		<h2>Properties</h2>
 
 		<h3>[property:Float x]</h3>
-		<p>改变这一属性将会导致[page:.onChangeCallback onChangeCallback]被调用。</p>
+		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float y]</h3>
-		<p>改变这一属性将会导致[page:.onChangeCallback onChangeCallback]被调用。</p>
+		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float z]</h3>
-		<p>改变这一属性将会导致[page:.onChangeCallback onChangeCallback]被调用。</p>
+		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float w]</h3>
-		<p>改变这一属性将会导致[page:.onChangeCallback onChangeCallback]被调用。</p>
+		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 
-		<h2>方法</h2>
+		<h2>Methods</h2>
 
 		<h3>[method:Float angleTo]( [param:Quaternion q] )</h3>
 		<p>
-			以弧度的形式返回这一四元数与四元数[page:Quaternion q]之间的夹角。
+			Returns the angle between this quaternion and quaternion [page:Quaternion q] in radians.
 		</p>
 
 		<h3>[method:Quaternion clone]()</h3>
 		<p>
-			以和这一四元数相同的[page:.x x]、[page:.y y]、[page:.z z]和[page:.w w]属性来创建一个新的四元数。
+			Creates a new Quaternion with identical [page:.x x], [page:.y y],
+			[page:.z z] and [page:.w w] properties to this one.
 		</p>
 
 		<h3>[method:Quaternion conjugate]()</h3>
