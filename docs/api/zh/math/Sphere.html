@@ -117,11 +117,10 @@
 		<h3>[method:Sphere setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
 		<p>
 		[page:Array points] - 一个包含有[page:Vector3]位置的[page:Array]。<br />
-		[page:Vector3 optionalCenter] - 可选， [page:Vector3] position for the sphere's center.<br /><br />
+		[page:Vector3 optionalCenter] - 可选， [page:Vector3] 球心位置。<br /><br />
 
-		Computes the minimum bounding sphere for an array of [page:Array points]. If  [page:Vector3 optionalCenter]is given,
-		it is used as the sphere's center. Otherwise, the center of the axis-aligned bounding box encompassing
-		[page:Array points] is calculated.
+		计算一个[page:Array points]数组（中的点）的最小边界球。如果给定了[page:Vector3 optionalCenter]，则它将被用作该球的球心；
+		否则，环绕[page:Array points]的包围盒的轴心将通过计算来得到。
 		</p>
 
 		<h3>[method:Sphere translate]( [param:Vector3 offset] )</h3>
