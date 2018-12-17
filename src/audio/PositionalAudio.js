@@ -106,10 +106,11 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 			if ( this.isPlaying === false ) return;
 
-			var panner = this.panner;
 			this.matrixWorld.decompose( position, quaternion, scale );
 
 			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+
+			var panner = this.panner;
 
 			if ( panner.positionX ) {
 
