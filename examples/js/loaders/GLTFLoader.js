@@ -1613,10 +1613,10 @@ THREE.GLTFLoader = ( function () {
 
 			for ( var i = 0, j = 0; i < count; ++ i ) {
 
-				array[ j++ ] = attribute.getX( i );
-				if ( itemSize >= 2 ) array[ j++ ] = attribute.getY( i );
-				if ( itemSize >= 3 ) array[ j++ ] = attribute.getZ( i );
-				if ( itemSize >= 4 ) array[ j++ ] = attribute.getW( i );
+				array[ j ++ ] = attribute.getX( i );
+				if ( itemSize >= 2 ) array[ j ++ ] = attribute.getY( i );
+				if ( itemSize >= 3 ) array[ j ++ ] = attribute.getZ( i );
+				if ( itemSize >= 4 ) array[ j ++ ] = attribute.getW( i );
 
 			}
 
