@@ -67,9 +67,50 @@
 		当glTF不可用的时候，诸如FBX、OBJ或者COLLADA等等其它广受欢迎的格式在Three.js中也是可以使用、并且定期维护的。
 	</p>
 
-	<h2>Loading</h2>
+	<h2>加载</h2>
 
-	<p>TODO.</p>
+	<p>
+		three.js中默认仅包含了几个加载器（例如：[page:ObjectLoader]）——其它加载器需要你分别地添加到页面中。
+		取决于你对构建工具的偏好，选择以下任意一种方式：
+	</p>
+
+	<code>
+		// global script
+		&lt;script src="GLTFLoader.js"&gt;&lt;/script&gt;
+
+		// commonjs
+		var THREE = window.THREE = require('three');
+		require('three/examples/js/loaders/GLTFLoader');
+	</code>
+
+	<p>
+		目前three.js示例不能作为ES modules （import &hellip; from '&hellip;'）来使用。
+		这里讨论了一些解决方法：
+		<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank" rel="noopener">#9562</a>.
+	</p>
+
+	<p>
+		一旦你引入了一个加载器，你就已经准备好为场景添加模型了。不同加载器之间可能具有不同的语法 ——
+		当使用其它格式的时候请参阅该格式加载器的示例以及文档。对于glTF，基本用法类似：
+	</p>
+
+	<code>
+		var loader = new THREE.GLTFLoader();
+
+		loader.load( 'path/to/model.glb', function ( gltf ) {
+
+			scene.add( gltf.scene );
+
+		}, undefined, function ( error ) {
+
+			console.error( error );
+
+		} );
+	</code>
+
+	<p>
+		请参阅[page:GLTFLoader GLTFLoader documentation]来深入了解详细信息。
+	</p>
 
 	<h2>故障排除</h2>
 
