@@ -21,8 +21,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 		alpha: parameters.alpha === true
 	} );
 
-	var maxRecursionDepth = 3;
-
 	var canvasWidth, canvasHeight;
 
 	var clearColor = new THREE.Color( 0x000000 );
@@ -39,15 +37,16 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	console.log( '%cSpinning off ' + workers + ' Workers ', 'font-size: 20px; background: black; color: white; font-family: monospace;' );
 
-	this.setWorkers = function( w ) {
+	this.setWorkers = function ( w ) {
 
 		workers = w || navigator.hardwareConcurrency || 4;
 
 		while ( pool.length < workers ) {
-			var worker = new Worker( parameters.workerPath );
-			worker.id = workerId++;
 
-			worker.onmessage = function( e ) {
+			var worker = new Worker( parameters.workerPath );
+			worker.id = workerId ++;
+
+			worker.onmessage = function ( e ) {
 
 				var data = e.data;
 
@@ -75,7 +74,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			};
 
-			worker.color = new THREE.Color().setHSL( Math.random() , 0.8, 0.8 ).getHexString();
+			worker.color = new THREE.Color().setHSL( Math.random(), 0.8, 0.8 ).getHexString();
 			pool.push( worker );
 
 			updateSettings( worker );
@@ -109,7 +108,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	this.setWorkers( workers );
 
-	this.setClearColor = function ( color, alpha ) {
+	this.setClearColor = function ( color /*, alpha */ ) {
 
 		clearColor.set( color );
 
@@ -155,6 +154,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	}
 
 	function renderNext( worker ) {
+
 		if ( ! toRender.length ) {
 
 			renderering = false;
@@ -213,6 +213,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 		}
 
 		materials[ mat.uuid ] = props;
+
 	}
 
 	this.render = function ( scene, camera ) {
@@ -234,7 +235,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		scene.traverse( serializeObject );
 
-		pool.forEach( function( worker ) {
+		pool.forEach( function ( worker ) {
 
 			worker.postMessage( {
 				scene: sceneJSON,
@@ -242,6 +243,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 				annex: materials,
 				sceneId: sceneId
 			} );
+
 		} );
 
 		context.clearRect( 0, 0, canvasWidth, canvasHeight );
@@ -266,7 +268,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			for ( var i = 0; i < totalBlocks; i ++ ) {
 
-				var swap = Math.random()  * totalBlocks | 0;
+				var swap = Math.random() * totalBlocks | 0;
 				var tmp = toRender[ swap ];
 				toRender[ swap ] = toRender[ i ];
 				toRender[ i ] = tmp;

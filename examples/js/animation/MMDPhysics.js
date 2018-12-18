@@ -47,7 +47,7 @@ THREE.MMDPhysics = ( function () {
 		this.maxStepNum = ( params.maxStepNum !== undefined ) ? params.maxStepNum : 3;
 		this.gravity = new THREE.Vector3( 0, - 9.8 * 10, 0 );
 
-		if ( params.gravity !== undefined ) this.gravity.copy( gravity );
+		if ( params.gravity !== undefined ) this.gravity.copy( params.gravity );
 
 		this.world = params.world !== undefined ? params.world : null; // experimental
 
@@ -116,7 +116,7 @@ THREE.MMDPhysics = ( function () {
 
 			if ( isNonDefaultScale ) {
 
-				if ( parent !== null ) parent.parent = parent;
+				if ( parent !== null ) mesh.parent = parent;
 
 				mesh.scale.copy( scale );
 
@@ -1072,19 +1072,19 @@ THREE.MMDPhysics = ( function () {
 
 			var manager = this.manager;
 
-			var tr = this._getWorldTransformForBone();
+			var tr = this.body.getCenterOfMassTransform();
+			var origin = tr.getOrigin();
+			
+			var matrixInv = manager.allocThreeMatrix4();
+			matrixInv.copy( this.bone.parent.matrixWorld ).getInverse( matrixInv );
+			
+			var pos = manager.allocThreeVector3();
+			pos.set( origin.x(), origin.y(), origin.z() ).applyMatrix4( matrixInv );
 
-			var thV = manager.allocThreeVector3();
+			this.bone.position.copy( pos );
 
-			var o = manager.getOrigin( tr );
-			thV.set( o.x(), o.y(), o.z() );
-
-			var v = this.bone.worldToLocal( thV );
-			this.bone.position.add( v );
-
-			manager.freeThreeVector3( thV );
-
-			manager.freeTransform( tr );
+			manager.freeThreeVector3( pos );
+			manager.freeThreeMatrix4( matrixInv );
 
 		}
 

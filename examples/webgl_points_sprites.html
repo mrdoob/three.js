@@ -39,13 +39,17 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats, materials = [], parameters;
 			var mouseX = 0, mouseY = 0;
@@ -88,23 +92,23 @@
 				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				parameters = [
-					[ [ 1.0, 0.2, 0.5 ], sprite2, 20 ],
-					[ [ 0.95, 0.1, 0.5 ], sprite3, 15 ],
-					[ [ 0.90, 0.05, 0.5 ], sprite1, 10 ],
-					[ [ 0.85, 0, 0.5 ], sprite5, 8 ],
-					[ [ 0.80, 0, 0.5 ], sprite4, 5 ]
+					[[ 1.0, 0.2, 0.5 ], sprite2, 20 ],
+					[[ 0.95, 0.1, 0.5 ], sprite3, 15 ],
+					[[ 0.90, 0.05, 0.5 ], sprite1, 10 ],
+					[[ 0.85, 0, 0.5 ], sprite5, 8 ],
+					[[ 0.80, 0, 0.5 ], sprite4, 5 ]
 				];
 
 				for ( var i = 0; i < parameters.length; i ++ ) {
 
-					var color  = parameters[ i ][ 0 ];
+					var color = parameters[ i ][ 0 ];
 					var sprite = parameters[ i ][ 1 ];
-					var size   = parameters[ i ][ 2 ];
+					var size = parameters[ i ][ 2 ];
 
-					materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
+					materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
 					materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ] );
 
-					var particles = new THREE.Points( geometry, materials[i] );
+					var particles = new THREE.Points( geometry, materials[ i ] );
 
 					particles.rotation.x = Math.random() * 6;
 					particles.rotation.y = Math.random() * 6;
@@ -132,9 +136,9 @@
 
 				var params = {
 					texture: true
-				}
+				};
 
-				gui.add( params, 'texture' ).onChange( function( value ) {
+				gui.add( params, 'texture' ).onChange( function ( value ) {
 
 					for ( var i = 0; i < materials.length; i ++ ) {
 
@@ -246,7 +250,6 @@
 				renderer.render( scene, camera );
 
 			}
-
 
 		</script>
 	</body>

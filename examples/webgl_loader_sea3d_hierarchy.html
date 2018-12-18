@@ -48,22 +48,26 @@
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
-		
+
 		<script src="js/libs/o3dgc.js"></script>
 		<script src="js/loaders/sea3d/o3dgc/SEA3DGC.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls;
+			var camera, scene, renderer, composer;
 
 			var loader;
 
@@ -77,30 +81,30 @@
 
 			loader = new THREE.SEA3D( {
 
-				autoPlay : false, // Auto play animations
-				container : scene // Container to add models
+				autoPlay: false, // Auto play animations
+				container: scene // Container to add models
 
 			} );
 
-			loader.onComplete = function( e ) {
+			loader.onComplete = function () {
 
 				// play all animations
 
-				for(var i = 0; i < loader.meshes.length; i++) {
+				for ( var i = 0; i < loader.meshes.length; i ++ ) {
 
-					if (loader.meshes[i].animator)
-						loader.meshes[i].animator.play( "root" );
+					if ( loader.meshes[ i ].animator )
+						loader.meshes[ i ].animator.play( "root" );
 
 				}
 
 				// Get the first camera from SEA3D Studio
 				// use loader.get... to get others objects
 
-				var cam = loader.cameras[0];
+				var cam = loader.cameras[ 0 ];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
-				controls = new THREE.OrbitControls( camera );
+				new THREE.OrbitControls( camera );
 
 				animate();
 

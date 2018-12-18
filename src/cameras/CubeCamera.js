@@ -11,7 +11,7 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function CubeCamera( near, far, cubeResolution ) {
+function CubeCamera( near, far, cubeResolution, options ) {
 
 	Object3D.call( this );
 
@@ -49,7 +49,7 @@ function CubeCamera( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
-	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
+	options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";

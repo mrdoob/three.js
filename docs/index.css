@@ -5,7 +5,7 @@
 	font-style: normal;
 }
 
-*{
+* {
 	box-sizing: border-box;
 }
 
@@ -27,7 +27,6 @@ body {
 h1 {
 	margin-top: 30px;
 	margin-bottom: 40px;
-	margin-left: 20px;
 	font-size: 25px;
 	font-weight: normal;
 }
@@ -38,7 +37,6 @@ h2 {
 	font-weight: normal;
 
 	margin-top: 20px;
-	margin-left: 20px;
 }
 
 h3 {
@@ -47,7 +45,6 @@ h3 {
 	font-weight: normal;
 
 	margin-top: 20px;
-	margin-left: 20px;
 }
 
 a {
@@ -61,13 +58,13 @@ a {
 	width: 260px;
 	height: 100%;
 	overflow: auto;
+	padding: 0px 20px 0px 20px;
 	background: #fafafa;
 }
 
 #panel ul {
 	list-style-type: none;
 	padding: 0px;
-	margin-left: 20px;
 }
 
 iframe {
@@ -79,8 +76,7 @@ iframe {
 	overflow: auto;
 }
 
-.filterBlock{
-	margin: 20px;
+.filterBlock {
 	position: relative;
 }
 
@@ -158,12 +154,12 @@ iframe {
 
 @media all and ( max-width: 640px ) {
 
-	h1{
+	h1 {
 		margin-top: 20px;
 		margin-bottom: 20px;
 	}
 
-	#panel{
+	#panel {
 		position: absolute;
 		left: 0;
 		top: 0;
@@ -175,7 +171,19 @@ iframe {
 		border-bottom: 1px solid #dedede;
 	}
 
-	#content{
+	#content {
+		position: absolute;
+		left: 0;
+		top: 120px;
+		right: 0;
+		bottom: 0;
+		font-size: 17px;
+		line-height: 22px;
+		padding-left: 20px;
+		overflow: auto;
+	}
+
+	#navigation {
 		position: absolute;
 		left: 0;
 		top: 90px;
@@ -186,18 +194,7 @@ iframe {
 		overflow: auto;
 	}
 
-	#navigation{
-		position: absolute;
-		left: 0;
-		top: 90px;
-		right: 0;
-		bottom: 0;
-		font-size: 17px;
-		line-height: 22px;
-		overflow: auto;
-	}
-
-	iframe{
+	iframe {
 		position: absolute;
 		left: 0;
 		top: 56px;
@@ -205,11 +202,11 @@ iframe {
 		height: calc(100% - 56px);
 	}
 
-	#expandButton{
+	#expandButton {
 		display: block;
 	}
 
-	#panel.collapsed{
+	#panel.collapsed {
 		height: 56px;
 	}
 

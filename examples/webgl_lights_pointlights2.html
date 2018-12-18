@@ -42,12 +42,16 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, controls;
 			var light1, light2, light3, light4, light5, light6;
@@ -217,7 +221,7 @@
 			function render() {
 
 				var time = Date.now() * 0.00025;
-				var z = 20, d = 150;
+				var d = 150;
 
 				light1.position.x = Math.sin( time * 0.7 ) * d;
 				light1.position.z = Math.cos( time * 0.3 ) * d;

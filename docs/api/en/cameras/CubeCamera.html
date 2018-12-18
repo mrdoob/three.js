@@ -17,7 +17,6 @@
 		<h2>Examples</h2>
 
 		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
-		<p>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</p>
 		<p>[example:webgl_shading_physical shading / physical ]</p>
 
 		<code>// Create cube camera
@@ -43,11 +42,17 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution] )</h3>
+		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution], [param:Object options] )</h3>
 		<p>
 		near -- The near clipping distance. <br />
 		far -- The far clipping distance <br />
-		cubeResolution -- Sets the length of the cube's edges.
+		cubeResolution -- Sets the length of the cube's edges. <br />
+		options - (optional) object that holds texture parameters passed to the auto-generated WebGLRenderTargetCube.
+		If not specified, the options default to:
+		<code>
+		{ format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter }
+		</code>
+
 		</p>
 		<p>
 		Constructs a CubeCamera that contains 6 [page:PerspectiveCamera PerspectiveCameras] that

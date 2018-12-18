@@ -64,7 +64,7 @@
 				scene = new THREE.Scene();
 
 				var image = document.createElement( 'img' );
-				image.addEventListener( 'load', function ( event ) {
+				image.addEventListener( 'load', function () {
 
 					for ( var i = 0; i < particlesTotal; i ++ ) {
 
@@ -135,7 +135,7 @@
 
 				for ( var i = 0; i < particlesTotal; i ++ ) {
 
-					var phi = Math.acos( -1 + ( 2 * i ) / particlesTotal );
+					var phi = Math.acos( - 1 + ( 2 * i ) / particlesTotal );
 					var theta = Math.sqrt( particlesTotal * Math.PI ) * phi;
 
 					positions.push(

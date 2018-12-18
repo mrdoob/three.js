@@ -35,12 +35,16 @@
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer, scene, camera, stats;
 			var objects = [];
@@ -76,7 +80,7 @@
 
 				var geometryCube = cube( 50 );
 
-				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ) );
+				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
 				lineSegments.computeLineDistances();
 
 				objects.push( lineSegments );
@@ -106,41 +110,41 @@
 				var position = [];
 
 				position.push(
-					-h, -h, -h,
-					-h, h, -h,
+					- h, - h, - h,
+					- h, h, - h,
 
-					-h, h, -h,
-					h, h, -h,
+					- h, h, - h,
+					h, h, - h,
 
-					h, h, -h,
-					h, -h, -h,
+					h, h, - h,
+					h, - h, - h,
 
-					h, -h, -h,
-					-h, -h, -h,
+					h, - h, - h,
+					- h, - h, - h,
 
-					-h, -h, h,
-					-h, h, h,
+					- h, - h, h,
+					- h, h, h,
 
-					-h, h, h,
+					- h, h, h,
 					h, h, h,
 
 					h, h, h,
-					h, -h, h,
+					h, - h, h,
 
-					h, -h, h,
-					-h, -h, h,
+					h, - h, h,
+					- h, - h, h,
 
-					-h, -h, -h,
-					-h, -h, h,
+					- h, - h, - h,
+					- h, - h, h,
 
-					-h, h, -h,
-					-h, h, h,
+					- h, h, - h,
+					- h, h, h,
 
-					h, h, -h,
+					h, h, - h,
 					h, h, h,
 
-					h, -h, -h,
-					h, -h, h
+					h, - h, - h,
+					h, - h, h
 				 );
 
 				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
@@ -171,7 +175,7 @@
 
 				var time = Date.now() * 0.001;
 
-				scene.traverse( function( object ) {
+				scene.traverse( function ( object ) {
 
 					if ( object.isLine ) {
 

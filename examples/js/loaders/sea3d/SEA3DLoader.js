@@ -1296,9 +1296,11 @@ THREE.SEA3D.Mesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype 
 //	Skinning
 //
 
-THREE.SEA3D.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
+THREE.SEA3D.SkinnedMesh = function ( geometry, material ) {
 
-	THREE.SkinnedMesh.call( this, geometry, material, useVertexTexture );
+	THREE.SkinnedMesh.call( this, geometry, material );
+
+	this.bind( new THREE.Skeleton( this.initBones() ), this.matrixWorld );
 
 	this.updateAnimations( geometry.animations, new THREE.AnimationMixer( this ) );
 
@@ -1307,6 +1309,66 @@ THREE.SEA3D.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 THREE.SEA3D.SkinnedMesh.prototype = Object.assign( Object.create( THREE.SkinnedMesh.prototype ), THREE.SEA3D.Mesh.prototype, THREE.SEA3D.Animator.prototype, {
 
 	constructor: THREE.SEA3D.SkinnedMesh,
+
+	initBones: function () {
+
+		var bones = [], bone, gbone;
+		var i, il;
+
+		if ( this.geometry && this.geometry.bones !== undefined ) {
+
+			// first, create array of 'Bone' objects from geometry data
+
+			for ( i = 0, il = this.geometry.bones.length; i < il; i ++ ) {
+
+				gbone = this.geometry.bones[ i ];
+
+				// create new 'Bone' object
+
+				bone = new THREE.Bone();
+				bones.push( bone );
+
+				// apply values
+
+				bone.name = gbone.name;
+				bone.position.fromArray( gbone.pos );
+				bone.quaternion.fromArray( gbone.rotq );
+				if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+
+			}
+
+			// second, create bone hierarchy
+
+			for ( i = 0, il = this.geometry.bones.length; i < il; i ++ ) {
+
+				gbone = this.geometry.bones[ i ];
+
+				if ( ( gbone.parent !== - 1 ) && ( gbone.parent !== null ) && ( bones[ gbone.parent ] !== undefined ) ) {
+
+					// subsequent bones in the hierarchy
+
+					bones[ gbone.parent ].add( bones[ i ] );
+
+				} else {
+
+					// topmost bone, immediate child of the skinned mesh
+
+					this.add( bones[ i ] );
+
+				}
+
+			}
+
+		}
+
+		// now the bones are part of the scene graph and children of the skinned mesh.
+		// let's update the corresponding matrices
+
+		this.updateMatrixWorld( true );
+
+		return bones;
+
+	},
 
 	boneByName: function ( name ) {
 
@@ -2418,11 +2480,13 @@ THREE.SEA3D.prototype.readCubeMapURL = function ( sea ) {
 				var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 				pmremCubeUVPacker.update( this.config.renderer );
 
-				texture.dispose();
-
 				this.objects[ "cmap/" + sea.name ] = sea.tag = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
 				this.file.resume = true;
+
+				texture.dispose();
+				pmremGenerator.dispose();
+				pmremCubeUVPacker.dispose();
 
 			}
 

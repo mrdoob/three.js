@@ -24,6 +24,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	defineProperty( "camera", camera );
 	defineProperty( "object", undefined );
+	defineProperty( "enabled", true );
 	defineProperty( "axis", null );
 	defineProperty( "mode", "translate" );
 	defineProperty( "translationSnap", null );
@@ -51,7 +52,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		X: new THREE.Vector3( 1, 0, 0 ),
 		Y: new THREE.Vector3( 0, 1, 0 ),
 		Z: new THREE.Vector3( 0, 0, 1 )
-	}
+	};
 	var _identityQuaternion = new THREE.Quaternion();
 	var _alignVector = new THREE.Vector3();
 
@@ -103,11 +104,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.addEventListener( "touchstart", onPointerDown, false );
 		domElement.addEventListener( "mousemove", onPointerHover, false );
 		domElement.addEventListener( "touchmove", onPointerHover, false );
-		domElement.addEventListener( "mousemove", onPointerMove, false );
 		domElement.addEventListener( "touchmove", onPointerMove, false );
-		domElement.addEventListener( "mouseup", onPointerUp, false );
-		domElement.addEventListener( "mouseleave", onPointerUp, false );
-		domElement.addEventListener( "mouseout", onPointerUp, false );
+		document.addEventListener( "mouseup", onPointerUp, false );
 		domElement.addEventListener( "touchend", onPointerUp, false );
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
@@ -121,11 +119,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.removeEventListener( "touchstart", onPointerDown );
 		domElement.removeEventListener( "mousemove", onPointerHover );
 		domElement.removeEventListener( "touchmove", onPointerHover );
-		domElement.removeEventListener( "mousemove", onPointerMove );
 		domElement.removeEventListener( "touchmove", onPointerMove );
-		domElement.removeEventListener( "mouseup", onPointerUp );
-		domElement.removeEventListener( "mouseleave", onPointerUp );
-		domElement.removeEventListener( "mouseout", onPointerUp );
+		document.removeEventListener( "mouseup", onPointerUp );
 		domElement.removeEventListener( "touchend", onPointerUp );
 		domElement.removeEventListener( "touchcancel", onPointerUp );
 		domElement.removeEventListener( "touchleave", onPointerUp );
@@ -171,6 +166,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 					_plane[ propName ] = value;
 					_gizmo[ propName ] = value;
 
+					scope.dispatchEvent( { type: propName + "-changed", value: value } );
 					scope.dispatchEvent( changeEvent );
 
 				}
@@ -231,7 +227,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-	}
+	};
 
 	this.pointerDown = function( pointer ) {
 
@@ -288,7 +284,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-	}
+	};
 
 	this.pointerMove = function( pointer ) {
 
@@ -482,7 +478,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		this.dispatchEvent( changeEvent );
 		this.dispatchEvent( objectChangeEvent );
 
-	}
+	};
 
 	this.pointerUp = function( pointer ) {
 
@@ -499,7 +495,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( pointer.button === undefined ) this.axis = null;
 
-	}
+	};
 
 	// normalize mouse / touch pointer and remap {x,y} to view space.
 
@@ -513,7 +509,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
 			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
 			button: event.button
-		}
+		};
 
 	}
 
@@ -527,7 +523,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerHover( event ) {
 
-		// event.preventDefault();
+		if ( !scope.enabled ) return;
 
 		scope.pointerHover( getPointer( event ) );
 
@@ -535,8 +531,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerDown( event ) {
 
+		if ( !scope.enabled ) return;
+
 		event.preventDefault();
-		event.stopPropagation();
+		
+		document.addEventListener( "mousemove", onPointerMove, false );
 
 		scope.pointerHover( getPointer( event ) );
 		scope.pointerDown( getPointer( event ) );
@@ -545,8 +544,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerMove( event ) {
 
+		if ( !scope.enabled ) return;
+
 		event.preventDefault();
-		event.stopPropagation();
 
 		scope.pointerMove( getPointer( event ) );
 
@@ -554,7 +554,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerUp( event ) {
 
+		if ( !scope.enabled ) return;
+
 		event.preventDefault(); // Prevent MouseEvent on mobile
+
+		document.removeEventListener( "mousemove", onPointerMove, false );
 
 		scope.pointerUp( getPointer( event ) );
 
@@ -602,7 +606,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		console.warn( 'THREE.TransformControls: update function has been depricated.' );
 
-	}
+	};
 
 };
 
@@ -687,9 +691,6 @@ THREE.TransformControlsGizmo = function () {
 
 	var matLineMagenta = gizmoLineMaterial.clone();
 	matLineMagenta.color.set( 0xff00ff );
-
-	var matLineBlue = gizmoLineMaterial.clone();
-	matLineBlue.color.set( 0x0000ff );
 
 	var matLineYellow = gizmoLineMaterial.clone();
 	matLineYellow.color.set( 0xffff00 );
@@ -1312,12 +1313,10 @@ THREE.TransformControlsGizmo = function () {
 			}
 
 			// Hide disabled axes
-			for ( var a in handle.name ) {
-				handle.visible = handle.visible && ( handle.name.indexOf( "X" ) === -1 || this.showX );
-				handle.visible = handle.visible && ( handle.name.indexOf( "Y" ) === -1 || this.showY );
-				handle.visible = handle.visible && ( handle.name.indexOf( "Z" ) === -1 || this.showZ );
-				handle.visible = handle.visible && ( handle.name.indexOf( "E" ) === -1 || ( this.showX && this.showY && this.showZ ) );
-			}
+			handle.visible = handle.visible && ( handle.name.indexOf( "X" ) === -1 || this.showX );
+			handle.visible = handle.visible && ( handle.name.indexOf( "Y" ) === -1 || this.showY );
+			handle.visible = handle.visible && ( handle.name.indexOf( "Z" ) === -1 || this.showZ );
+			handle.visible = handle.visible && ( handle.name.indexOf( "E" ) === -1 || ( this.showX && this.showY && this.showZ ) );
 
 			// highlight selected axis
 
@@ -1327,7 +1326,12 @@ THREE.TransformControlsGizmo = function () {
 			handle.material.color.copy( handle.material._color );
 			handle.material.opacity = handle.material._opacity;
 
-			if ( this.axis ) {
+			if ( !this.enabled ) {
+
+				handle.material.opacity *= 0.5;
+				handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
+
+			} else if ( this.axis ) {
 
 				if ( handle.name === this.axis ) {
 
@@ -1341,7 +1345,8 @@ THREE.TransformControlsGizmo = function () {
 
 				} else {
 
-					handle.material.opacity *= 0.05;
+					handle.material.opacity *= 0.25;
+					handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
 
 				}
 
