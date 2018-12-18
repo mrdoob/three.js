@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - Occlusion Queries</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				padding: 10px;
+				width: 100%;
+				text-align: center;
+				color: #fff;
+			}
+
+			a { color: blue; }
+
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Occlusion Queries<br />
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLQuery" target="_blank" rel="noopener">More info on WebGL2 Queries</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/WebGL.js"></script>
+
+		<script>
+
+			/*global THREE, WEBGL, window */
+
+			if ( WEBGL.isWebGL2Available() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+				document.querySelector('#info').style.display = 'none';
+				throw new Error('no webgl2');
+
+			}
+
+			var camera, scene, renderer;
+			var cameraControls;
+			var ambientLight, light;
+
+			var queryResult;
+
+			function init() {
+
+				var container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				queryResult = document.createElement( 'div' );
+				document.body.appendChild( queryResult );
+				queryResult.style.position = 'absolute';
+				queryResult.style.margin = '0 auto';
+				queryResult.style.top = '100px';
+				queryResult.style.fontSize = '24px';
+				queryResult.style.left = '0';
+				queryResult.style.right = '0';
+
+				shadowQueryResult = document.createElement( 'div' );
+				document.body.appendChild( shadowQueryResult );
+				shadowQueryResult.style.position = 'absolute';
+				shadowQueryResult.style.margin = '0 auto';
+				shadowQueryResult.style.top = '130px';
+				shadowQueryResult.style.fontSize = '24px';
+				shadowQueryResult.style.left = '0';
+				shadowQueryResult.style.right = '0';
+
+				var canvasWidth = window.innerWidth;
+				var canvasHeight = window.innerHeight;
+
+				// CAMERA
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 400 );
+				camera.position.set( 0, 8, 20 );
+
+				// LIGHTS
+				ambientLight = new THREE.AmbientLight( 0x333333 );
+
+				light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				light.position.x = 2;
+				light.position.y = 7;
+				light.position.z = 10;
+				light.castShadow = true;
+				light.shadow.bias = -0.001;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
+				light.shadow.camera.top = 10;
+				light.shadow.camera.bottom = -10;
+				light.shadow.camera.left = 10;
+				light.shadow.camera.right = -10;
+
+				// RENDERER
+				var canvas = document.createElement( 'canvas' );
+				var context = canvas.getContext( 'webgl2' );
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+				renderer.shadowMap.enabled = true;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( canvasWidth, canvasHeight );
+				container.appendChild( renderer.domElement );
+
+				// EVENTS
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// CONTROLS
+				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xAAAAAA );
+
+				scene.add( ambientLight );
+				scene.add( light );
+
+			}
+
+
+			function onWindowResize() {
+
+				var canvasWidth = window.innerWidth;
+				var canvasHeight = window.innerHeight;
+
+				renderer.setSize( canvasWidth, canvasHeight );
+
+				camera.aspect = canvasWidth / canvasHeight;
+				camera.updateProjectionMatrix();
+
+				render();
+
+			}
+
+
+			function render() {
+
+
+				renderer.render( scene, camera );
+
+			}
+
+			var sphere;
+			function createScene() {
+
+
+				var ground = new THREE.Mesh(new THREE.PlaneBufferGeometry(100, 100, 10, 10), new THREE.MeshStandardMaterial({ color: 0x22CC66, side: THREE.DoubleSide }));
+				ground.receiveShadow = true;
+				ground.position.set(0, -5, 0);
+				ground.rotation.x = -Math.PI / 2;
+				scene.add(ground);
+
+				sphere = new THREE.OcclusionQueryMesh(new THREE.SphereBufferGeometry(1, 15, 15), new THREE.MeshStandardMaterial({
+					color: 0xFF4411,
+					// disabling colorWrite should not break the occlusion testing
+					colorWrite: true
+				}));
+				sphere.frustumCulled = false;
+				sphere.receiveShadow = true;
+				sphere.castShadow = true;
+				sphere.renderOrder = 999
+				var highestFrame = -1;
+				var shadowHighestFrame = -1;
+				sphere.occlusionQueryCallback = function ( result, frame, queryCamera ) {
+
+					var text;
+					if ( queryCamera === camera && frame > highestFrame ) {
+
+						highestFrame = frame;
+						var text = result ? 'Sphere visible onscreen' : 'Sphere occluded onscreen';
+						if ( queryResult.innerText !== text ) { queryResult.innerText = text; }
+
+					}
+					if ( queryCamera === light.shadow.camera && frame > shadowHighestFrame ) {
+
+						shadowHighestFrame = frame;
+						text = result ? 'Sphere visible in shadowmap' : 'Sphere occluded in shadowmap';
+						if ( shadowQueryResult.innerText !== text ) { shadowQueryResult.innerText = text; }
+
+					}
+
+				};
+
+				var mat = new THREE.MeshStandardMaterial({ color: 0x6666AA });
+				var leftBox = new THREE.Mesh(new THREE.TorusKnotBufferGeometry( 2, 0.8, 128, 16 ), mat);
+				leftBox.receiveShadow = true;
+				leftBox.castShadow = true;
+				leftBox.position.set(-5, 0, -3);
+				scene.add(leftBox);
+				var rightBox = new THREE.Mesh(new THREE.BoxBufferGeometry(5, 9, 1), mat);
+				rightBox.receiveShadow = true;
+				rightBox.castShadow = true;
+				rightBox.position.set(5, 0, 3);
+				scene.add(rightBox);
+
+				scene.add(sphere);
+
+				// var helper = new THREE.CameraHelper( light.shadow.camera );
+				// scene.add( helper );
+
+			}
+
+			init();
+
+			createScene();
+
+			var t = 0;
+			var tick = function (t) {
+				sphere.position.x = Math.sin(t / 1000) * 5
+				render();
+				requestAnimationFrame(tick);
+			};
+			tick(1);
+
+		</script>
+
+	</body>
+</html>

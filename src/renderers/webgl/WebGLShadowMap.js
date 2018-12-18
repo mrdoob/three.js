@@ -368,6 +368,18 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		}
 
+		if ( object.isOcclusionQueryMesh ) {
+
+			result.depthWrite = material.colorWrite; // yes colorWrite
+			result.colorWrite = material.colorWrite;
+
+		} else {
+
+			result.depthWrite = true;
+			result.colorWrite = true;
+
+		}
+
 		return result;
 
 	}

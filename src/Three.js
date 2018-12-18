@@ -22,6 +22,7 @@ export { LineLoop } from './objects/LineLoop.js';
 export { Line } from './objects/Line.js';
 export { Points } from './objects/Points.js';
 export { Group } from './objects/Group.js';
+export { OcclusionQueryMesh } from './objects/OcclusionQueryMesh.js';
 export { VideoTexture } from './textures/VideoTexture.js';
 export { DataTexture } from './textures/DataTexture.js';
 export { DataTexture2DArray } from './textures/DataTexture2DArray.js';

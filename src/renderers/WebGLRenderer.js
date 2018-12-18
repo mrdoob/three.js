@@ -22,6 +22,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
+import { WebGLQueries } from './webgl/WebGLQueries.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
@@ -237,7 +238,7 @@ function WebGLRenderer( parameters ) {
 	}
 
 	var extensions, capabilities, state, info;
-	var properties, textures, attributes, geometries, objects;
+	var properties, textures, attributes, geometries, objects, queries;
 	var programCache, renderLists, renderStates;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
@@ -275,6 +276,7 @@ function WebGLRenderer( parameters ) {
 		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, info );
+		queries = new WebGLQueries( _gl, info, capabilities );
 		objects = new WebGLObjects( geometries, info );
 		morphtargets = new WebGLMorphtargets( _gl );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
@@ -556,6 +558,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.pollAllOcclusionQueries = function () {
+
+		queries.pollAllOcclusionQueries( false );
+
+	};
+
 	//
 
 	this.dispose = function () {
@@ -567,6 +575,7 @@ function WebGLRenderer( parameters ) {
 		renderStates.dispose();
 		properties.dispose();
 		objects.dispose();
+		queries.dispose();
 
 		vr.dispose();
 
@@ -859,6 +868,13 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		var didQuery = false;
+		if ( object.isOcclusionQueryMesh ) {
+
+			didQuery = queries.occlusionQueryStart( object, camera );
+
+		}
+
 		if ( geometry && geometry.isInstancedBufferGeometry ) {
 
 			if ( geometry.maxInstancedCount > 0 ) {
@@ -870,6 +886,12 @@ function WebGLRenderer( parameters ) {
 		} else {
 
 			renderer.render( drawStart, drawCount );
+
+		}
+
+		if ( didQuery ) {
+
+			queries.occlusionQueryEnd();
 
 		}
 
@@ -1237,6 +1259,9 @@ function WebGLRenderer( parameters ) {
 
 		currentRenderList = null;
 		currentRenderState = null;
+
+		// check any occlusion query meshes that were removed from the scene while their queries were still pending
+		queries.pollAllOcclusionQueries( true );
 
 	};
 

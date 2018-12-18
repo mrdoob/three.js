@@ -497,6 +497,13 @@
 		(x, y) is the lower-left corner of the region.
 		</p>
 
+		<h3>[method:null pollAllOcclusionQueries]( )</h3>
+		<p>
+		Polls all alive occlusion queries. This happens automatically during rendering, you should use this function if you need
+		occlusion query results while not rendering a frame. Calling this in a loop doesn't work, the status of an occlusion query
+		can only change when control returns to the event loop.
+		</p>
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
