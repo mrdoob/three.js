@@ -6,7 +6,7 @@ import { Ray } from '../math/Ray.js';
  * @author stephomi / http://stephaneginier.com/
  */
 
-function Raycaster( origin, direction, near, far, camera = undefined ) {
+function Raycaster( origin, direction, near, far, camera ) {
 
 	this.ray = new Ray( origin, direction );
 	// direction is assumed to be normalized (for accurate distance calculations)
@@ -67,13 +67,11 @@ Object.assign( Raycaster.prototype, {
 
 	linePrecision: 1,
 
-	set: function ( origin, direction, camera = undefined ) {
+	set: function ( origin, direction ) {
 
 		// direction is assumed to be normalized (for accurate distance calculations)
 
 		this.ray.set( origin, direction );
-
-		this.camera = camera;
 
 	},
 
