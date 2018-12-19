@@ -107,18 +107,8 @@
 				geomBasic.addAttribute('position', masterGeometry.attributes.position)
 				geomBasic.setIndex(masterGeometry.index)
 
-				const mBasic = new THREE.Mesh(geomBasic, new THREE.MeshBasicMaterial())
-				const mLight = new THREE.Mesh(masterGeometry, new THREE.MeshPhongMaterial())
-				
-				mLight.position.x = -2
-				mBasic.position.x = 2
-				mLight.renderOrder = 1
-				mBasic.renderOrder = 0
-
-				scene.add(mLight)
-				scene.add(mBasic)
-
 				const geomInstanceBasic = new THREE.InstancedBufferGeometry()
+				
 				geomInstanceBasic.addAttribute('position', masterGeometry.attributes.position)
 				geomInstanceBasic.setIndex(masterGeometry.index)
 
@@ -137,6 +127,12 @@
 					1
 				))
 
+				const geomInstanceLight = new THREE.InstancedBufferGeometry()
+
+				geomInstanceLight.addAttribute('position', masterGeometry.attributes.position)
+				geomInstanceLight.addAttribute('normal', masterGeometry.attributes.normal)
+				geomInstanceLight.addAttribute('aInstance', geomInstanceBasic.attributes.aInstance)
+				geomInstanceLight.setIndex(masterGeometry.index)
 
 				const instanceMaterial = new THREE.ShaderMaterial({
 					vertexShader:`
@@ -178,32 +174,58 @@
 					`
 				})
 
-				const mInstancedBasic = new THREE.Mesh( geomInstanceBasic, instanceMaterial )
-				mInstancedBasic.position.x = 5
-				mInstancedBasic.renderOrder = 2
+				const instanceMaterialNormal = instanceMaterial.clone()
 
-				scene.add(mInstancedBasic)
+				instanceMaterialNormal.defines = { NORMAL: '' }
 
-				const geomInstanceLight = new THREE.InstancedBufferGeometry()
+				function getRand(){
+					return Math.random() * 2 - 1
+				}
 
-				geomInstanceLight.addAttribute('position', masterGeometry.attributes.position)
-				geomInstanceLight.addAttribute('normal', masterGeometry.attributes.normal)
-				geomInstanceLight.addAttribute('aInstance', geomInstanceBasic.attributes.aInstance)
-				geomInstanceLight.setIndex(masterGeometry.index)
+				const size = 120
 
-				const mInstancedLight = new THREE.Mesh(geomInstanceLight, instanceMaterial.clone())
+				for ( let i = 0 ; i < 1000 ; i ++ ){
 
-				mInstancedLight.material.defines = { NORMAL: '' }
+					const i4 = i * 4
 
-				scene.add(mInstancedLight)
+					const mBasic = new THREE.Mesh(geomBasic, new THREE.MeshBasicMaterial())
+					const mLight = new THREE.Mesh(masterGeometry, new THREE.MeshPhongMaterial())
+					const mInstancedBasic = new THREE.Mesh( geomInstanceBasic, instanceMaterial )
+					const mInstancedLight = new THREE.Mesh(geomInstanceLight, )
 
-				mInstancedLight.renderOrder = 3 
-				mInstancedLight.position.x = 10
+					mLight.position.set(
+						getRand(),
+						getRand(),
+						getRand()
+					).multiplyScalar(size)
+					mBasic.position.set(
+						getRand(),
+						getRand(),
+						getRand()
+					).multiplyScalar(size)
+					mInstancedBasic.position.set(
+						getRand(),
+						getRand(),
+						getRand()
+					).multiplyScalar(size)
+					mInstancedLight.position.set(
+						getRand(),
+						getRand(),
+						getRand()
+					).multiplyScalar(size)
 
-				console.log(masterGeometry.attributes.position)
-				console.log(geomBasic.attributes.position)
-				console.log(geomInstanceBasic.attributes.position)
-				console.log(geomInstanceLight.attributes.position === masterGeometry.attributes.position)
+					mLight.renderOrder = i4 +1
+					mBasic.renderOrder = i4
+					mInstancedBasic.renderOrder = i4 + 2
+					mInstancedLight.renderOrder = i4 + 3 
+
+
+					scene.add(mLight)
+					scene.add(mBasic)
+					scene.add(mInstancedBasic)
+					scene.add(mInstancedLight)
+				
+				}
 
 			}
 
