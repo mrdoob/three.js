@@ -198,8 +198,6 @@ var files = {
 		"webgl_multiple_scenes_comparison",
 		"webgl_multiple_views",
 		"webgl_nearestneighbour",
-		"webgl_octree",
-		"webgl_octree_raycasting",
 		"webgl_panorama_cube",
 		"webgl_panorama_dualfisheye",
 		"webgl_panorama_equirectangular",
