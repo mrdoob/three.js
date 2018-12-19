@@ -26,7 +26,7 @@
 
 			a {	color: #ffffff;	}
 
-			#oldie a { color:#0b0 }
+			#webglmessage a { color:#0b0 }
 		</style>
 	</head>
 
@@ -38,20 +38,21 @@
 
 		<script src="js/shaders/FresnelShader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
 			var spheres = [];
-
-			var directionalLight, pointLight;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -76,10 +77,10 @@
 				var path = "textures/cube/Park2/";
 				var format = '.jpg';
 				var urls = [
-						path + 'posx' + format, path + 'negx' + format,
-						path + 'posy' + format, path + 'negy' + format,
-						path + 'posz' + format, path + 'negz' + format
-					];
+					path + 'posx' + format, path + 'negx' + format,
+					path + 'posy' + format, path + 'negy' + format,
+					path + 'posz' + format, path + 'negz' + format
+				];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;

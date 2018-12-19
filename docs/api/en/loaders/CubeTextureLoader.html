@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Class for loading a [page:CubeTexture CubeTexture].
+			This uses the [page:ImageLoader] internally for loading files.
+		</p>
+
+		<h2>Example</h2>
+
+		<p>
+			[example:webgl_materials_cubemap materials / cubemap]<br />
+			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection]<br />
+			[example:webgl_materials_cubemap_balls_refraction materials / cubemap / balls / refraction]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
+			[example:webgl_materials_cubemap_refraction materials / cubemap / refraction]
+		</p>
+
+		<code>
+var scene = new THREE.Scene();
+scene.background = new THREE.CubeTextureLoader()
+	.setPath( 'textures/cubeMaps/' )
+	.load( [
+				'px.png',
+				'nx.png',
+				'py.png',
+				'ny.png',
+				'pz.png',
+				'nz.png'
+			] );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		Creates a new [name].
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:String crossOrigin]</h3>
+		<p>
+		If set, assigns the [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
+	 attribute of the image to the value of *crossOrigin*,
+		prior to starting the load. Default is *"anonymous"*.
+		</p>
+
+		<h3>[property:LoadingManager manager]</h3>
+		<p>
+			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
+		</p>
+
+		<h3>[property:String path]</h3>
+		<p>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</p>
+
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String urls] — array of 6 urls to images, one for each side of the CubeTexture.
+		The urls should be specified in the following order: pos-x, neg-x, pos-y, neg-y, pos-z, neg-z.
+		They can also be [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URIs].<br />
+		Note that, by convention, cube maps are specified in a coordinate system in which positive-x is to the right
+		when looking up the positive-z axis -- in other words, using a left-handed coordinate system.
+		Since three.js uses a right-handed coordinate system, environment maps used in three.js will have pos-x and neg-x swapped.<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Texture texture].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</p>
+		<p>
+		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+		</p>
+
+		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
+		<p>		Set the [page:.crossOrigin] attribute.</p>
+
+		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
+		<p>
+			Set the base path or URL from which to load files. This can be useful if
+			you are loading many textures from the same directory.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

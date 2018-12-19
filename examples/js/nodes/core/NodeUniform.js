@@ -11,26 +11,26 @@ function NodeUniform( params ) {
 	this.node = params.node;
 	this.needsUpdate = params.needsUpdate;
 
-};
+}
 
 Object.defineProperties( NodeUniform.prototype, {
-	
+
 	value: {
-		
+
 		get: function () {
 
 			return this.node.value;
 
 		},
-		
+
 		set: function ( val ) {
 
 			this.node.value = val;
 
 		}
-		
+
 	}
-	
+
 } );
 
 export { NodeUniform };

@@ -11,7 +11,7 @@ function BlinnExponentToRoughnessNode( blinnExponent ) {
 
 	this.blinnExponent = blinnExponent || new BlinnShininessExponentNode();
 
-};
+}
 
 BlinnExponentToRoughnessNode.prototype = Object.create( TempNode.prototype );
 BlinnExponentToRoughnessNode.prototype.constructor = BlinnExponentToRoughnessNode;
@@ -24,11 +24,11 @@ BlinnExponentToRoughnessNode.prototype.generate = function ( builder, output ) {
 };
 
 BlinnExponentToRoughnessNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.blinnExponent = source.blinnExponent;
-	
+
 };
 
 BlinnExponentToRoughnessNode.prototype.toJSON = function ( meta ) {

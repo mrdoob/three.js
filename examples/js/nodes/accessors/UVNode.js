@@ -4,17 +4,17 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
- 
+
 var vertexDict = [ 'uv', 'uv2' ],
 	fragmentDict = [ 'vUv', 'vUv2' ];
- 
+
 function UVNode( index ) {
 
 	TempNode.call( this, 'v2', { shared: false } );
 
 	this.index = index || 0;
 
-};
+}
 
 UVNode.prototype = Object.create( TempNode.prototype );
 UVNode.prototype.constructor = UVNode;
@@ -31,11 +31,11 @@ UVNode.prototype.generate = function ( builder, output ) {
 };
 
 UVNode.prototype.copy = function ( source ) {
-		
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	this.index = source.index;
-	
+
 };
 
 UVNode.prototype.toJSON = function ( meta ) {

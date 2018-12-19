@@ -2,21 +2,21 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from '../../core/GLNode.js';
+import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
- 
+
 function PhongNode() {
 
-	GLNode.call( this );
+	Node.call( this );
 
 	this.color = new ColorNode( 0xEEEEEE );
 	this.specular = new ColorNode( 0x111111 );
 	this.shininess = new FloatNode( 30 );
 
-};
+}
 
-PhongNode.prototype = Object.create( GLNode.prototype );
+PhongNode.prototype = Object.create( Node.prototype );
 PhongNode.prototype.constructor = PhongNode;
 PhongNode.prototype.nodeType = "Phong";
 
@@ -25,18 +25,17 @@ PhongNode.prototype.build = function ( builder ) {
 	var code;
 
 	builder.define( 'PHONG' );
-	builder.define( 'ALPHATEST', '0.0' );
 
 	builder.requires.lights = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
+		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
+			THREE.UniformsLib.fog,
+			THREE.UniformsLib.lights
 
 		] ) );
 
@@ -49,13 +48,13 @@ PhongNode.prototype.build = function ( builder ) {
 
 			"#endif",
 
-			"#include <common>",
-			"#include <encodings_pars_fragment>", // encoding functions
+			//"#include <encodings_pars_fragment>", // encoding functions
 			"#include <fog_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
 			"#include <skinning_pars_vertex>",
 			"#include <shadowmap_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>"
+			"#include <logdepthbuf_pars_vertex>",
+			"#include <clipping_planes_pars_vertex>"
 		].join( "\n" ) );
 
 		var output = [
@@ -65,7 +64,7 @@ PhongNode.prototype.build = function ( builder ) {
 			"#include <skinnormal_vertex>",
 			"#include <defaultnormal_vertex>",
 
-			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
+			"#ifndef FLAT_SHADED", // normal computed with derivatives when FLAT_SHADED
 
 			"	vNormal = normalize( transformedNormal );",
 
@@ -74,11 +73,11 @@ PhongNode.prototype.build = function ( builder ) {
 			"#include <begin_vertex>"
 		];
 
-		if ( transform ) {
+		if ( position ) {
 
 			output.push(
-				transform.code,
-				transform.result ? "transformed = " + transform.result + ";" : ''
+				position.code,
+				position.result ? "transformed = " + position.result + ";" : ''
 			);
 
 		}
@@ -89,11 +88,13 @@ PhongNode.prototype.build = function ( builder ) {
 			"	#include <project_vertex>",
 			"	#include <fog_vertex>",
 			"	#include <logdepthbuf_vertex>",
+			"	#include <clipping_planes_vertex>",
 
 			"	vViewPosition = - mvPosition.xyz;",
 
 			"	#include <worldpos_vertex>",
-			"	#include <shadowmap_vertex>"
+			"	#include <shadowmap_vertex>",
+			"	#include <fog_vertex>"
 		);
 
 		code = output.join( "\n" );
@@ -109,7 +110,6 @@ PhongNode.prototype.build = function ( builder ) {
 		if ( this.alpha ) this.alpha.parse( builder );
 
 		if ( this.normal ) this.normal.parse( builder );
-		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
 		if ( this.light ) this.light.parse( builder, { cache: 'light' } );
 
@@ -130,7 +130,6 @@ PhongNode.prototype.build = function ( builder ) {
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
-		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
 		var light = this.light ? this.light.buildCode( builder, 'v3', { cache: 'light' } ) : undefined;
 
@@ -145,7 +144,6 @@ PhongNode.prototype.build = function ( builder ) {
 		builder.requires.transparent = alpha != undefined;
 
 		builder.addParsCode( [
-			"#include <common>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
 			"#include <lights_pars_begin>",
@@ -180,7 +178,11 @@ PhongNode.prototype.build = function ( builder ) {
 
 			output.push(
 				alpha.code,
-				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;'
+				'#ifdef ALPHATEST',
+
+				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+
+				'#endif'
 			);
 
 		}
@@ -191,7 +193,7 @@ PhongNode.prototype.build = function ( builder ) {
 				normal.code,
 				'normal = ' + normal.result + ';'
 			);
-		
+
 		}
 
 		// optimization for now
@@ -281,19 +283,19 @@ PhongNode.prototype.build = function ( builder ) {
 			}
 
 		}
-/*
+		/*
 		switch( builder.material.combine ) {
 
 			case THREE.ENVMAP_BLENDING_MULTIPLY:
-				
+
 				//output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
 				//outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
-				
+
 				break;
-			
-			
+
+
 		}
-	*/	
+	*/
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
@@ -320,12 +322,12 @@ PhongNode.prototype.build = function ( builder ) {
 };
 
 PhongNode.prototype.copy = function ( source ) {
-			
-	GLNode.prototype.copy.call( this, source );
-	
+
+	Node.prototype.copy.call( this, source );
+
 	// vertex
 
-	if ( source.transform ) this.transform = source.transform;
+	if ( source.position ) this.position = source.position;
 
 	// fragment
 
@@ -341,7 +343,7 @@ PhongNode.prototype.copy = function ( source ) {
 	if ( source.shadow ) this.shadow = source.shadow;
 
 	if ( source.ao ) this.ao = source.ao;
-	
+
 	if ( source.emissive ) this.emissive = source.emissive;
 	if ( source.ambient ) this.ambient = source.ambient;
 
@@ -360,7 +362,7 @@ PhongNode.prototype.toJSON = function ( meta ) {
 
 		// vertex
 
-		if ( this.transform ) data.transform = this.transform.toJSON( meta ).uuid;
+		if ( this.position ) data.position = this.position.toJSON( meta ).uuid;
 
 		// fragment
 

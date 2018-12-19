@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			表示 [link:http://en.wikipedia.org/wiki/Euler_angles Euler] 的类。<br /><br />
+			欧拉角描述一个旋转变换，通过指定轴顺序和其各个轴向上的指定旋转角度来旋转一个物体。
+		</p>
+
+		<h2>示例（Example）</h2>
+
+		<code>var a = new THREE.Euler( 0, 1, 1.57, 'XYZ' );
+		var b = new THREE.Vector3( 1, 0, 1 );
+		b.applyEuler(a);
+		</code>
+
+
+		<h2>构造器（Constructor）</h2>
+
+
+		<h3>[name]( [param:Float x], [param:Float y], [param:Float z], [param:String order] )</h3>
+		<p>
+		[page:Float x] - (optional) 用弧度表示x轴旋转量。 默认值是 *0*。<br />
+		[page:Float y] - (optional) 用弧度表示y轴旋转量。 默认值是 *0*。<br />
+		[page:Float z] - (optional) 用弧度表示z轴旋转量。 默认值是 *0*。<br />
+		[page:String order] - (optional) 表示旋转顺序的字符串，默认为'XYZ'（必须是大写）。<br /><br />
+
+		</p>
+
+
+		<h2>属性（Properties）</h2>
+
+		<h3>[property:Boolean isEuler]</h3>
+		<p>
+			用于判定此对象或者此类的派生对象是否是欧拉角。默认值为 *true*。<br /><br />
+			
+			不应该改变该值，因为它在内部用于优化。
+		</p>
+
+		<h3>[property:String order]</h3>
+		<p>
+			order值应用于旋转顺序。默认值为 'XYZ'，这意味着对象将首先是
+			绕X轴旋转，然后是Y轴，最后是Z轴。其他可能性包括:
+			'YZX'， 'ZXY'， 'XZY'， 'YXZ'和'ZYX'。这些必须是大写字母。<br /><br />
+			Three.js 使用<em>intrinsic</em> Tait-Bryan angles（Yaw、Pitch、Roll）。
+			这意味着旋转是在<em>本地</em>坐标系下进行的。也就是说，对于“XYZ”订单，首先是围绕local-X轴旋转(与world- x轴相同)，
+			然后是local-Y(现在可能与world y轴不同)，然后是local-Z(可能与world z轴不同)。<br /><br />
+
+			如果order值被改变，[page:.onChangeCallback onChangeCallback] 会被调用。
+		</p>
+
+		<h3>[property:Float x]</h3>
+		<p>
+			当前x分量的值。<br /><br />
+
+			如果这个值发生变化，[page:.onChangeCallback onChangeCallback] 会被调用。
+		</p>
+
+		<h3>[property:Float y]</h3>
+		<p>
+			当前y分量的值。<br /><br />
+
+			如果这个值发生变化，[page:.onChangeCallback onChangeCallback] 会被调用。
+		</p>
+
+		<h3>[property:Float z]</h3>
+		<p>
+			当前z分量的值。<br /><br />
+
+			如果这个值发生变化，[page:.onChangeCallback onChangeCallback] 会被调用。
+		</p>
+
+		<h2>方法（Methods）</h2>
+
+		<h3>[method:Euler copy]( [param:Euler euler] )</h3>
+		<p>将 [page:Euler euler] 的属性拷贝到当前对象。</p>
+
+		<h3>[method:Euler clone]()</h3>
+		<p>返回一个与当前参数相同的新欧拉角。</p>
+
+		<h3>[method:Boolean equals]( [param:Euler euler] )</h3>
+		<p>检查 [page:Euler euler] 是否与当前对象相同。</p>
+
+		<h3>[method:Euler fromArray]( [param:Array array] )</h3>
+		<p>
+		长度为3或4的一个 [page:Array array] 。array[3] 是一个可选的 [page:.order order] 参数。<br /><br />
+		
+		将欧拉角的x分量设置为 array[0]。 <br />
+		将欧拉角的x分量设置为 array[1]。 <br />
+		将欧拉角的x分量设置为 array[2]。 <br />
+		将array[3]设置给欧拉角的 [page:.order order] 。可选。
+		</p>
+
+		<h3>[method:Euler onChange]( [param:Function onChangeCallback] )</h3>
+		<p>
+			[page:Function onChangeCallback] - 为 onChangeCallback() 函数赋值。
+		</p>
+
+		<h3>[method:Euler onChangeCallback](  )</h3>
+		<p>
+			默认情况下，这个函数为空，但是它可以通过[page:.onChange onChange]()来设置。<br />
+			在更改 [page:.x x], [page:.y y], [page:.z z] 或 [page:.order order] 属性之后调用它，
+			在调用大多数setter函数之后也会调用它(详细信息请参阅那些函数)。
+		</p>
+
+		<h3>[method:Euler reorder]( [param:String newOrder] )</h3>
+		<p>
+		通过这个欧拉角创建一个四元数，然后用这个四元数和新顺序设置这个欧拉角。 <br /><br />
+
+		<em>警告</em>: 这将弃用旋转信息。
+		</p>
+
+		<h3>[method:Euler set]( [param:Float x], [param:Float y], [param:Float z], [param:String order] )</h3>
+		<p>
+			[page:.x x] - 用弧度表示x轴旋转量。<br />
+			[page:.y y] - 用弧度表示y轴旋转量。<br />
+			[page:.z z] - 用弧度表示z轴旋转量。<br />
+			[page:.order order] - (optional) 表示旋转顺序的字符串。<br /><br />
+
+			设置该欧拉变换的角度和旋转顺序 [page:.order order] ，然后调用  [page:.onChangeCallback onChangeCallback]()。
+		</p>
+
+		<h3>[method:Euler setFromRotationMatrix]( [param:Matrix4 m], [param:String order], [param:Boolean update] )</h3>
+		<p>
+		[page:Matrix4 m] - [page:Matrix4] 矩阵上面的3x3部分是一个纯旋转矩阵[link:https://en.wikipedia.org/wiki/Rotation_matrix rotation matrix]
+		（也就是不发生缩放）<br />
+		[page:.order order] - (可选参数) 表示旋转顺序的字符串。<br />
+		[page:Boolean update] - (可选参数) 表示设置完变换矩阵后是否调用 [page:.onChangeCallback onChangeCallback]。<br /><br />
+
+		使用基于 [page:.order order] 顺序的纯旋转矩阵来设置当前欧拉角。
+		</p>
+
+		<h3>[method:Euler setFromQuaternion]( [param:Quaternion q], [param:String order], [param:Boolean update] )</h3>
+		<p>
+		[page:Quaternion q] - 归一化的四元数。<br />
+		[page:.order order] - (可选参数) 表示旋转顺序的字符串。<br />
+		[page:Boolean update] - (可选参数) 表示设置完变换矩阵后是否调用 [page:.onChangeCallback onChangeCallback]。<br /><br />
+
+		根据 [page:.order order] 指定的方向，使用归一化四元数设置这个欧拉变换的角度。
+		</p>
+
+
+		<h3>[method:Euler setFromVector3]( [param:Vector3 vector], [param:String order] )</h3>
+		<p>
+		[page:Vector3 vector] - [page:Vector3].<br />
+		[page:.order order] - (可选参数) 表示旋转顺序的字符串。<br /><br />
+
+		设置 [page:.x x], [page:.y y] and [page:.z z] 并且选择性更新 [page:.order order]。
+		更改完成之后调用 [page:.onChangeCallback onChangeCallback]()。
+		</p>
+
+
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - (可选参数) 存储欧拉角的数组。<br />
+		[page:Integer offset] (可选参数) 数组的偏移量。<br />
+
+		返回一个数组：[[page:.x x], [page:.y y], [page:.z z], [page:.order order ]]。
+		</p>
+
+		<h3>[method:Vector3 toVector3]( [param:Vector3 optionalResult] )</h3>
+		<p>
+			[page:Vector3 optionalResult] — (可选参数) 如果指定了该参数结果将会被复制给该参数，否者会创建一个新的 Vector3 <br /><br />
+
+			以 [page:Vector3] 的形式返回欧拉角的 [page:.x x], [page:.y y] 和 [page:.z z]。
+		</p>
+
+
+		<h2>源码（Source）</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

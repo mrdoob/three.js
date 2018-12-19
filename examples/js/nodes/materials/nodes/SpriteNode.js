@@ -2,19 +2,19 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from '../../core/GLNode.js';
+import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 
 function SpriteNode() {
 
-	GLNode.call( this );
+	Node.call( this );
 
 	this.color = new ColorNode( 0xEEEEEE );
 	this.spherical = true;
 
-};
+}
 
-SpriteNode.prototype = Object.create( GLNode.prototype );
+SpriteNode.prototype = Object.create( Node.prototype );
 SpriteNode.prototype.constructor = SpriteNode;
 SpriteNode.prototype.nodeType = "Sprite";
 
@@ -25,29 +25,32 @@ SpriteNode.prototype.build = function ( builder ) {
 	builder.define( 'SPRITE' );
 
 	builder.requires.lights = false;
-	builder.requires.transparent = this.alpha != undefined;
+	builder.requires.transparent = this.alpha !== undefined;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
+		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
-			THREE.UniformsLib[ "fog" ]
+			THREE.UniformsLib.fog
 		] ) );
 
 		builder.addParsCode( [
-			"#include <fog_pars_vertex>"
+			"#include <fog_pars_vertex>",
+			"#include <logdepthbuf_pars_vertex>",
+			"#include <clipping_planes_pars_vertex>"
 		].join( "\n" ) );
 
 		output = [
+			"#include <clipping_planes_fragment>",
 			"#include <begin_vertex>"
 		];
 
-		if ( transform ) {
+		if ( position ) {
 
 			output.push(
-				transform.code,
-				transform.result ? "transformed = " + transform.result + ";" : ''
+				position.code,
+				position.result ? "transformed = " + position.result + ";" : ''
 			);
 
 		}
@@ -98,43 +101,64 @@ SpriteNode.prototype.build = function ( builder ) {
 			'modelViewMtx[2][1] = 0.0;',
 			'modelViewMtx[2][2] = 1.0;',
 
-			// apply
-			'gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( transformed, 1.0 );'
+			"gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( transformed, 1.0 );",
+
+			"#include <logdepthbuf_vertex>",
+			"#include <clipping_planes_vertex>",
+			"#include <fog_vertex>"
 		);
 
 	} else {
 
 		builder.addParsCode( [
 			"#include <fog_pars_fragment>",
+			"#include <logdepthbuf_pars_fragment>",
+			"#include <clipping_planes_pars_fragment>"
+		].join( "\n" ) );
+
+		builder.addCode( [
+			"#include <clipping_planes_fragment>",
+			"#include <logdepthbuf_fragment>"
 		].join( "\n" ) );
 
 		// parse all nodes to reuse generate codes
 
-		this.color.parse( builder, { slot: 'color' } );
-
 		if ( this.alpha ) this.alpha.parse( builder );
+
+		this.color.parse( builder, { slot: 'color' } );
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
-		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
-
-		output = [ color.code ];
+		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined,
+			color = this.color.buildCode( builder, 'c', { slot: 'color' } );
 
 		if ( alpha ) {
 
-			output.push(
+			output = [
 				alpha.code,
+				'#ifdef ALPHATEST',
+
+				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+
+				'#endif',
+				color.code,
 				"gl_FragColor = vec4( " + color.result + ", " + alpha.result + " );"
-			);
+			];
 
 		} else {
 
-			output.push( "gl_FragColor = vec4( " + color.result + ", 1.0 );" );
+			output = [
+				color.code,
+				"gl_FragColor = vec4( " + color.result + ", 1.0 );"
+			];
 
 		}
 
-		output.push( "#include <fog_fragment>" );
+		output.push(
+			"#include <tonemapping_fragment>",
+			"#include <encodings_fragment>",
+			"#include <fog_fragment>"
+		);
 
 	}
 
@@ -143,19 +167,19 @@ SpriteNode.prototype.build = function ( builder ) {
 };
 
 SpriteNode.prototype.copy = function ( source ) {
-			
-	GLNode.prototype.copy.call( this, source );
-	
+
+	Node.prototype.copy.call( this, source );
+
 	// vertex
-	
-	if ( source.transform ) this.transform = source.transform;
-	
+
+	if ( source.position ) this.position = source.position;
+
 	// fragment
-	
+
 	this.color = source.color;
-	
-	if ( source.spherical !== undefined ) this.spherical = source.transform;
-	
+
+	if ( source.spherical !== undefined ) this.spherical = source.spherical;
+
 	if ( source.alpha ) this.alpha = source.alpha;
 
 };
@@ -170,12 +194,12 @@ SpriteNode.prototype.toJSON = function ( meta ) {
 
 		// vertex
 
-		if ( this.transform ) data.transform = this.transform.toJSON( meta ).uuid;
+		if ( this.position ) data.position = this.position.toJSON( meta ).uuid;
 
 		// fragment
 
 		data.color = this.color.toJSON( meta ).uuid;
-		
+
 		if ( this.spherical === false ) data.spherical = false;
 
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;

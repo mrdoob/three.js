@@ -15,14 +15,18 @@
 	<body>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer;
-			var mesh, mapBg;
+			var mapBg;
 
 			var textureLoader = new THREE.TextureLoader();
 
@@ -42,27 +46,26 @@
 
 				// BACKGROUND
 
-				var x = document.createElement( "canvas" );
-				var xc = x.getContext( "2d" );
-				x.width = x.height = 128;
-				xc.fillStyle = "#ddd";
-				xc.fillRect( 0, 0, 128, 128 );
-				xc.fillStyle = "#555";
-				xc.fillRect( 0, 0, 64, 64 );
-				xc.fillStyle = "#999";
-				xc.fillRect( 32, 32, 32, 32 );
-				xc.fillStyle = "#555";
-				xc.fillRect( 64, 64, 64, 64 );
-				xc.fillStyle = "#777";
-				xc.fillRect( 96, 96, 32, 32 );
+				var canvas = document.createElement( 'canvas' );
+				var ctx = canvas.getContext( '2d' );
+				canvas.width = canvas.height = 128;
+				ctx.fillStyle = '#ddd';
+				ctx.fillRect( 0, 0, 128, 128 );
+				ctx.fillStyle = '#555';
+				ctx.fillRect( 0, 0, 64, 64 );
+				ctx.fillStyle = '#999';
+				ctx.fillRect( 32, 32, 32, 32 );
+				ctx.fillStyle = '#555';
+				ctx.fillRect( 64, 64, 64, 64 );
+				ctx.fillStyle = '#777';
+				ctx.fillRect( 96, 96, 32, 32 );
 
-				mapBg = new THREE.Texture( x );
+				mapBg = new THREE.CanvasTexture( canvas );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 128, 64 );
-				mapBg.needsUpdate = true;
 
 				/*
-				var mapBg = textureLoader.load( "textures/disturb.jpg" );
+				var mapBg = textureLoader.load( 'textures/disturb.jpg' );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 8, 4 );
 				*/
@@ -70,12 +73,12 @@
 				var materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
 
 				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
-				meshBg.position.set( 0, 0, -1 );
+				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
 				// OBJECTS
 
-				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending" ];
+				var blendings = [ 'NoBlending', 'NormalBlending', 'AdditiveBlending', 'SubtractiveBlending', 'MultiplyBlending' ];
 
 				var map0 = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
 				var map1 = textureLoader.load( 'textures/sprite0.jpg' );
@@ -89,8 +92,8 @@
 				addImageRow( map0, 300 );
 				addImageRow( map1, 150 );
 				addImageRow( map2, 0 );
-				addImageRow( map3, -150 );
-				addImageRow( map4, -300 );
+				addImageRow( map3, - 150 );
+				addImageRow( map4, - 300 );
 
 				function addImageRow( map, y ) {
 
@@ -110,7 +113,7 @@
 						scene.add( mesh );
 
 
-						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.replace( "Blending", "" ) ) );
+						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.replace( 'Blending', '' ) ) );
 						mesh.position.set( x, y - 75, z );
 						scene.add( mesh );
 
@@ -133,7 +136,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				var SCREEN_WIDTH = window.innerWidth;
 				var SCREEN_HEIGHT = window.innerHeight;
@@ -148,22 +151,22 @@
 
 			function generateLabelMaterial( text ) {
 
-				var x = document.createElement( "canvas" );
-				var xc = x.getContext( "2d" );
-				x.width = 128;
-				x.height = 32;
+				var canvas = document.createElement( 'canvas' );
+				var ctx = canvas.getContext( '2d' );
+				canvas.width = 128;
+				canvas.height = 32;
 
-				xc.fillStyle = "rgba( 0, 0, 0, 0.95 )";
-				xc.fillRect( 0, 0, 128, 32 );
+				ctx.fillStyle = 'rgba( 0, 0, 0, 0.95 )';
+				ctx.fillRect( 0, 0, 128, 32 );
 
-				xc.fillStyle = "white";
-				xc.font = "12pt arial bold";
-				xc.fillText( text, 10, 22 );
+				ctx.fillStyle = 'white';
+				ctx.font = '12pt arial bold';
+				ctx.fillText( text, 10, 22 );
 
-				var map = new THREE.Texture( x );
-				map.needsUpdate = true;
+				var map = new THREE.CanvasTexture( canvas );
 
 				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
+
 				return material;
 
 			}
@@ -173,8 +176,8 @@
 				requestAnimationFrame( animate );
 
 				var time = Date.now() * 0.00025;
-				var ox = ( time * -0.01 * mapBg.repeat.x ) % 1;
-				var oy = ( time * -0.01 * mapBg.repeat.y ) % 1;
+				var ox = ( time * - 0.01 * mapBg.repeat.x ) % 1;
+				var oy = ( time * - 0.01 * mapBg.repeat.y ) % 1;
 
 				mapBg.offset.set( ox, oy );
 

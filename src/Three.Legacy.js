@@ -44,6 +44,7 @@ import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { DataTextureLoader } from './loaders/DataTextureLoader.js';
+import { ObjectLoader } from './loaders/ObjectLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
@@ -69,6 +70,7 @@ import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
 import { Sprite } from './objects/Sprite.js';
 import { Skeleton } from './objects/Skeleton.js';
+import { SkinnedMesh } from './objects/SkinnedMesh.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
@@ -434,6 +436,17 @@ export function BinaryTextureLoader( manager ) {
 	return new DataTextureLoader( manager );
 
 }
+
+Object.assign( ObjectLoader.prototype, {
+
+	setTexturePath: function ( value ) {
+
+		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+		return this.setResourcePath( value );
+
+	}
+
+} );
 
 //
 
@@ -988,6 +1001,12 @@ Object.defineProperty( Skeleton.prototype, 'useVertexTexture', {
 
 } );
 
+SkinnedMesh.prototype.initBones = function () {
+
+	console.error( 'THREE.SkinnedMesh: initBones() has been removed.' );
+
+};
+
 Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
 
 	get: function () {
@@ -1264,6 +1283,20 @@ Object.defineProperties( Material.prototype, {
 
 		}
 	},
+
+	overdraw: {
+		get: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.Material: .overdraw has been removed.' );
+
+		}
+	},
+
 	wrapRGB: {
 		get: function () {
 
@@ -1329,6 +1362,14 @@ Object.defineProperties( ShaderMaterial.prototype, {
 //
 
 Object.assign( WebGLRenderer.prototype, {
+
+	clearTarget: function ( renderTarget, color, depth, stencil ) {
+
+		console.warn( 'THREE.WebGLRenderer: .clearTarget() has been deprecated. Use .setRenderTarget() and .clear() instead.' );
+		this.setRenderTarget( renderTarget );
+		this.clear( color, depth, stencil );
+
+	},
 
 	animate: function ( callback ) {
 
@@ -1691,6 +1732,13 @@ Object.defineProperties( WebVRManager.prototype, {
 			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
 
 		}
+	},
+	userHeight: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebVRManager: .userHeight has been removed.' );
+
+		}
 	}
 
 } );
@@ -1834,13 +1882,15 @@ export function Projector() {
 
 export function CanvasRenderer() {
 
-	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
+	console.error( 'THREE.CanvasRenderer has been removed' );
 
-	this.domElement = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-	this.clear = function () {};
-	this.render = function () {};
-	this.setClearColor = function () {};
-	this.setSize = function () {};
+}
+
+//
+
+export function JSONLoader() {
+
+	console.error( 'THREE.JSONLoader has been removed.' );
 
 }
 

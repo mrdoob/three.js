@@ -39,12 +39,16 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/ColladaLoader.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats, clock;
 			var camera, scene, renderer, elf;
@@ -58,7 +62,7 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.set( 8, 10, 8 );
-				camera.lookAt( new THREE.Vector3( 0, 3, 0 ) );
+				camera.lookAt( 0, 3, 0 );
 
 				scene = new THREE.Scene();
 
@@ -66,7 +70,7 @@
 
 				// loading manager
 
-				var loadingManager = new THREE.LoadingManager( function() {
+				var loadingManager = new THREE.LoadingManager( function () {
 
 					scene.add( elf );
 

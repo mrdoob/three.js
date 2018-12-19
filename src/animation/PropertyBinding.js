@@ -38,8 +38,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].setValue( array, offset );
 
@@ -51,8 +50,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].bind();
 
@@ -64,8 +62,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].unbind();
 
@@ -594,15 +591,15 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		// determine versioning scheme
 		var versioning = this.Versioning.None;
 
+		this.targetObject = targetObject;
+
 		if ( targetObject.needsUpdate !== undefined ) { // material
 
 			versioning = this.Versioning.NeedsUpdate;
-			this.targetObject = targetObject;
 
 		} else if ( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
 
 			versioning = this.Versioning.MatrixWorldNeedsUpdate;
-			this.targetObject = targetObject;
 
 		}
 

@@ -26,7 +26,7 @@
 				text-align:center;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -47,7 +47,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -57,7 +57,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, material, renderer, stats;
 
@@ -138,12 +142,12 @@
 
 				var uniforms = material.uniforms;
 
-				uniforms[ 'parallaxScale' ].value = -1.0 * effectController.scale;
+				uniforms[ 'parallaxScale' ].value = - 1.0 * effectController.scale;
 				uniforms[ 'parallaxMinLayers' ].value = effectController.minLayers;
 				uniforms[ 'parallaxMaxLayers' ].value = effectController.maxLayers;
 
 				material.defines = {};
-				material.defines[THREE.ParallaxShader.modes[effectController.mode]] = '';
+				material.defines[ THREE.ParallaxShader.modes[ effectController.mode ] ] = '';
 				material.needsUpdate = true;
 
 			}
@@ -184,7 +188,7 @@
 				renderer.render( scene, camera );
 
 			}
-			
+
 		</script>
 
 	</body>

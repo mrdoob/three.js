@@ -27,7 +27,7 @@
 			color: #ffffff;
 		}
 
-		#oldie a {
+		#webglmessage a {
 			color: #da0;
 		}
 
@@ -50,7 +50,7 @@
 
 	<script src="../build/three.js"></script>
 
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vertexShader" type="x-shader/x-vertex">
@@ -103,7 +103,11 @@
 
 	<script>
 
-	if ( !Detector.webgl ) Detector.addGetWebGLMessage();
+	if ( WEBGL.isWebGLAvailable() === false ) {
+
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
 
 	var container, stats;
 
@@ -116,7 +120,6 @@
 		container = document.getElementById( 'container' );
 
 		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
-		//camera.position.z = 20;
 
 		scene = new THREE.Scene();
 		scene.background = new THREE.Color( 0x101010 );
@@ -133,35 +136,35 @@
 		// only use x,y,z and u,v; but x, y, z, nx, ny, nz, u, v would be a good layout
 		var vertexBuffer = new THREE.InterleavedBuffer( new Float32Array( [
 			// Front
-			-1, 1, 1, 0, 0, 0, 0, 0,
+			- 1, 1, 1, 0, 0, 0, 0, 0,
 			1, 1, 1, 0, 1, 0, 0, 0,
-			-1, -1, 1, 0, 0, 1, 0, 0,
-			1, -1, 1, 0, 1, 1, 0, 0,
+			- 1, - 1, 1, 0, 0, 1, 0, 0,
+			1, - 1, 1, 0, 1, 1, 0, 0,
 			// Back
-			1, 1, -1, 0, 1, 0, 0, 0,
-			-1, 1, -1, 0, 0, 0, 0, 0,
-			1, -1, -1, 0, 1, 1, 0, 0,
-			-1, -1, -1, 0, 0, 1, 0, 0,
+			1, 1, - 1, 0, 1, 0, 0, 0,
+			- 1, 1, - 1, 0, 0, 0, 0, 0,
+			1, - 1, - 1, 0, 1, 1, 0, 0,
+			- 1, - 1, - 1, 0, 0, 1, 0, 0,
 			// Left
-			-1, 1, -1, 0, 1, 1, 0, 0,
-			-1, 1, 1, 0, 1, 0, 0, 0,
-			-1, -1, -1, 0, 0, 1, 0, 0,
-			-1, -1, 1, 0, 0, 0, 0, 0,
+			- 1, 1, - 1, 0, 1, 1, 0, 0,
+			- 1, 1, 1, 0, 1, 0, 0, 0,
+			- 1, - 1, - 1, 0, 0, 1, 0, 0,
+			- 1, - 1, 1, 0, 0, 0, 0, 0,
 			// Right
 			1, 1, 1, 0, 1, 0, 0, 0,
-			1, 1, -1, 0, 1, 1, 0, 0,
-			1, -1, 1, 0, 0, 0, 0, 0,
-			1, -1, -1, 0, 0, 1, 0, 0,
+			1, 1, - 1, 0, 1, 1, 0, 0,
+			1, - 1, 1, 0, 0, 0, 0, 0,
+			1, - 1, - 1, 0, 0, 1, 0, 0,
 			// Top
-			-1, 1, 1, 0, 0, 0, 0, 0,
+			- 1, 1, 1, 0, 0, 0, 0, 0,
 			1, 1, 1, 0, 1, 0, 0, 0,
-			-1, 1, -1, 0, 0, 1, 0, 0,
-			1, 1, -1, 0, 1, 1, 0, 0,
+			- 1, 1, - 1, 0, 0, 1, 0, 0,
+			1, 1, - 1, 0, 1, 1, 0, 0,
 			// Bottom
-			1, -1, 1, 0, 1, 0, 0, 0,
-			-1, -1, 1, 0, 0, 0, 0, 0,
-			1, -1, -1, 0, 1, 1, 0, 0,
-			-1, -1, -1, 0, 0, 1, 0, 0
+			1, - 1, 1, 0, 1, 0, 0, 0,
+			- 1, - 1, 1, 0, 0, 0, 0, 0,
+			1, - 1, - 1, 0, 1, 1, 0, 0,
+			- 1, - 1, - 1, 0, 0, 1, 0, 0
 		] ), 8 );
 
 		// Use vertexBuffer, starting at offset 0, 3 items in position attribute
@@ -193,7 +196,8 @@
 		var offsets = new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 );
 
 		var vector = new THREE.Vector4();
-		for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
+		for ( var i = 0, ul = offsets.count; i < ul; i ++ ) {
+
 			var x = Math.random() * 100 - 50;
 			var y = Math.random() * 100 - 50;
 			var z = Math.random() * 100 - 50;
@@ -207,7 +211,7 @@
 
 		orientations = new THREE.InterleavedBufferAttribute( instanceBuffer, 4, 4 );
 
-		for ( var i = 0, ul = orientations.count; i < ul; i++ ) {
+		for ( var i = 0, ul = orientations.count; i < ul; i ++ ) {
 
 			vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 			vector.normalize();
@@ -240,8 +244,10 @@
 
 
 		if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+
 			document.getElementById( "notSupported" ).style.display = "";
 			return;
+
 		}
 
 		renderer.setPixelRatio( window.devicePixelRatio );
@@ -255,7 +261,7 @@
 
 	}
 
-	function onWindowResize( event ) {
+	function onWindowResize() {
 
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
@@ -285,7 +291,7 @@
 		var time = performance.now();
 
 
-		var object = scene.children[0];
+		var object = scene.children[ 0 ];
 
 		object.rotation.y = time * 0.00005;
 
@@ -294,9 +300,10 @@
 		var delta = ( time - lastTime ) / 5000;
 		tmpQ.set( moveQ.x * delta, moveQ.y * delta, moveQ.z * delta, 1 ).normalize();
 
-		for ( var i = 0, ul = orientations.count; i < ul; i++ ) {
+		for ( var i = 0, ul = orientations.count; i < ul; i ++ ) {
+
 			var index = i * instanceBuffer.stride + orientations.offset;
-			currentQ.set( instanceBuffer.array[index], instanceBuffer.array[index + 1], instanceBuffer.array[index + 2], instanceBuffer.array[index + 3] );
+			currentQ.set( instanceBuffer.array[ index ], instanceBuffer.array[ index + 1 ], instanceBuffer.array[ index + 2 ], instanceBuffer.array[ index + 3 ] );
 			currentQ.multiply( tmpQ );
 
 			orientations.setXYZW( i, currentQ.x, currentQ.y, currentQ.z, currentQ.w );
@@ -304,6 +311,7 @@
 		}
 		instanceBuffer.needsUpdate = true;
 		lastTime = time;
+
 	}
 
 	init();

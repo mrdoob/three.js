@@ -36,13 +36,17 @@
 		<script src="js/objects/Water.js"></script>
 		<script src="js/objects/Sky.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer, light;
@@ -86,13 +90,15 @@
 						textureWidth: 512,
 						textureHeight: 512,
 						waterNormals: new THREE.TextureLoader().load( 'textures/waternormals.jpg', function ( texture ) {
+
 							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-						}),
+
+						} ),
 						alpha: 1.0,
 						sunDirection: light.position.clone().normalize(),
 						sunColor: 0xffffff,
 						waterColor: 0x001e0f,
-						distortionScale:  3.7,
+						distortionScale: 3.7,
 						fog: scene.fog !== undefined
 					}
 				);
@@ -122,6 +128,7 @@
 				};
 
 				var cubeCamera = new THREE.CubeCamera( 1, 20000, 256 );
+				cubeCamera.renderTarget.texture.generateMipmaps = true;
 				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 
 				function updateSun() {

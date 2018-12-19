@@ -30,9 +30,6 @@ function KeyframeTrack( name, times, values, interpolation ) {
 
 	this.setInterpolation( interpolation || this.DefaultInterpolation );
 
-	this.validate();
-	this.optimize();
-
 }
 
 // Static methods
@@ -157,11 +154,13 @@ Object.assign( KeyframeTrack.prototype, {
 			}
 
 			console.warn( 'THREE.KeyframeTrack:', message );
-			return;
+			return this;
 
 		}
 
 		this.createInterpolant = factoryMethod;
+
+		return this;
 
 	},
 

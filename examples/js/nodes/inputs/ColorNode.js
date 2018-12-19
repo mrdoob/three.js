@@ -11,7 +11,7 @@ function ColorNode( color, g, b ) {
 
 	this.value = color instanceof THREE.Color ? color : new THREE.Color( color || 0, g, b );
 
-};
+}
 
 ColorNode.prototype = Object.create( InputNode.prototype );
 ColorNode.prototype.constructor = ColorNode;
@@ -26,11 +26,11 @@ ColorNode.prototype.generateReadonly = function ( builder, output, uuid, type, n
 };
 
 ColorNode.prototype.copy = function ( source ) {
-			
+
 	InputNode.prototype.copy.call( this, source );
-	
+
 	this.value.copy( source );
-	
+
 };
 
 ColorNode.prototype.toJSON = function ( meta ) {

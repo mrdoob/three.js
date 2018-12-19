@@ -3,14 +3,12 @@
  */
 
 import { Vector2Node } from '../inputs/Vector2Node.js';
- 
-function ResolutionNode( renderer ) {
+
+function ResolutionNode() {
 
 	Vector2Node.call( this );
 
-	this.renderer = renderer;
-
-};
+}
 
 ResolutionNode.prototype = Object.create( Vector2Node.prototype );
 ResolutionNode.prototype.constructor = ResolutionNode;
@@ -18,20 +16,28 @@ ResolutionNode.prototype.nodeType = "Resolution";
 
 ResolutionNode.prototype.updateFrame = function ( frame ) {
 
-	var size = this.renderer.getSize(),
-		pixelRatio = this.renderer.getPixelRatio();
+	if ( frame.renderer ) {
 
-	this.x = size.width * pixelRatio;
-	this.y = size.height * pixelRatio;
+		var size = frame.renderer.getSize(),
+			pixelRatio = frame.renderer.getPixelRatio();
+
+		this.x = size.width * pixelRatio;
+		this.y = size.height * pixelRatio;
+
+	} else {
+
+		console.warn( "ResolutionNode need a renderer in NodeFrame" );
+
+	}
 
 };
 
 ResolutionNode.prototype.copy = function ( source ) {
-			
+
 	Vector2Node.prototype.copy.call( this, source );
-	
+
 	this.renderer = source.renderer;
-	
+
 };
 
 ResolutionNode.prototype.toJSON = function ( meta ) {

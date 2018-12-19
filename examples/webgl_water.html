@@ -24,9 +24,7 @@
 				text-align:center;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 		</style>
 
 		<script src="../build/three.js"></script>
@@ -34,7 +32,7 @@
 		<script src="js/objects/Reflector.js"></script>
 		<script src="js/objects/Refractor.js"></script>
 		<script src="js/objects/Water2.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 	</head>
@@ -47,7 +45,11 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var scene, camera, clock, renderer, water;
 
@@ -98,13 +100,15 @@
 			scene.add( ground );
 
 			var textureLoader = new THREE.TextureLoader();
-			textureLoader.load( 'textures/hardwood2_diffuse.jpg', function( map ) {
+			textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
+
 				map.wrapS = THREE.RepeatWrapping;
 				map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 				map.repeat.set( 4, 4 );
 				groundMaterial.map = map;
 				groundMaterial.needsUpdate = true;
+
 			} );
 
 			// water
@@ -167,23 +171,23 @@
 
 			var gui = new dat.GUI();
 
-			gui.addColor( params, 'color' ).onChange( function( value ) {
+			gui.addColor( params, 'color' ).onChange( function ( value ) {
 
 				water.material.uniforms.color.value.set( value );
 
 			} );
-			gui.add( params, 'scale', 1, 10 ).onChange( function( value ) {
+			gui.add( params, 'scale', 1, 10 ).onChange( function ( value ) {
 
 				water.material.uniforms.config.value.w = value;
 
 			} );
-			gui.add( params, 'flowX', - 1, 1 ).step( 0.01 ).onChange( function( value ) {
+			gui.add( params, 'flowX', - 1, 1 ).step( 0.01 ).onChange( function ( value ) {
 
 				water.material.uniforms.flowDirection.value.x = value;
 				water.material.uniforms.flowDirection.value.normalize();
 
 			} );
-			gui.add( params, 'flowY', - 1, 1 ).step( 0.01 ).onChange( function( value ) {
+			gui.add( params, 'flowY', - 1, 1 ).step( 0.01 ).onChange( function ( value ) {
 
 				water.material.uniforms.flowDirection.value.y = value;
 				water.material.uniforms.flowDirection.value.normalize();
@@ -194,7 +198,7 @@
 
 			//
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			//
 
