@@ -82,6 +82,9 @@
 				queryResult = document.querySelector('#query-result'),
 				shadowQueryResult = document.querySelector('#shadow-query-result');
 
+			init();
+			animate();
+
 			function init() {
 
 				var canvasWidth = window.innerWidth;
@@ -128,43 +131,32 @@
 				// CONTROLS
 				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
 
-			}
-
-
-			function onWindowResize() {
-
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
-
-				renderer.setSize( canvasWidth, canvasHeight );
-
-				camera.aspect = canvasWidth / canvasHeight;
-				camera.updateProjectionMatrix();
-
-				render();
-
-			}
-
-
-			function render() {
-
-				renderer.render( scene, camera );
-
-			}
-
-			function createScene() {
-
+				// STATICS
 				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100, 10, 10 ), new THREE.MeshStandardMaterial( { color: 0x22CC66, side: THREE.DoubleSide } ) );
+				scene.add( ground );
 				ground.receiveShadow = true;
 				ground.position.set( 0, -5, 0 );
 				ground.rotation.x = -Math.PI / 2;
-				scene.add( ground );
+
+				var mat = new THREE.MeshStandardMaterial( { color: 0x6666AA } );
+				var leftBox = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 2, 0.8, 128, 16 ), mat );
+				scene.add( leftBox );
+				leftBox.receiveShadow = true;
+				leftBox.castShadow = true;
+				leftBox.position.set( -5, 0, -3 );
+
+				var rightBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 5, 9, 1 ), mat );
+				scene.add( rightBox );
+				rightBox.receiveShadow = true;
+				rightBox.castShadow = true;
+				rightBox.position.set( 5, 0, 3 );
 
 				sphere = new THREE.OcclusionQueryMesh( new THREE.SphereBufferGeometry(1, 15, 15), new THREE.MeshStandardMaterial( {
 					color: 0xFF4411,
 					// disabling colorWrite should not break the occlusion testing
 					colorWrite: true
 				} ) );
+				scene.add( sphere );
 				sphere.frustumCulled = false;
 				sphere.receiveShadow = true;
 				sphere.castShadow = true;
@@ -191,28 +183,25 @@
 
 				};
 
-				var mat = new THREE.MeshStandardMaterial( { color: 0x6666AA } );
-				var leftBox = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 2, 0.8, 128, 16 ), mat );
-				leftBox.receiveShadow = true;
-				leftBox.castShadow = true;
-				leftBox.position.set( -5, 0, -3 );
-				scene.add( leftBox );
-				var rightBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 5, 9, 1 ), mat );
-				rightBox.receiveShadow = true;
-				rightBox.castShadow = true;
-				rightBox.position.set( 5, 0, 3 );
-				scene.add( rightBox );
-
-				scene.add( sphere );
-
 				// var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 			}
 
-			init();
 
-			createScene();
+			function onWindowResize() {
+
+				var canvasWidth = window.innerWidth;
+				var canvasHeight = window.innerHeight;
+
+				renderer.setSize( canvasWidth, canvasHeight );
+
+				camera.aspect = canvasWidth / canvasHeight;
+				camera.updateProjectionMatrix();
+
+				render();
+
+			}
 
 			function animate() {
 
@@ -225,7 +214,12 @@
 				render();
 
 			}
-			animate( 0 );
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
 
 		</script>
 
