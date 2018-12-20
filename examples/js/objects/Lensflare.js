@@ -14,6 +14,7 @@ THREE.Lensflare = function () {
 	//
 
 	var positionScreen = new THREE.Vector3();
+	var positionView = new THREE.Vector3();
 
 	// textures
 
@@ -175,10 +176,12 @@ THREE.Lensflare = function () {
 
 		// calculate position in screen space
 
-		positionScreen.setFromMatrixPosition( this.matrixWorld );
+		positionView.setFromMatrixPosition( this.matrixWorld );
+		positionView.applyMatrix4( camera.matrixWorldInverse );
 
-		positionScreen.applyMatrix4( camera.matrixWorldInverse );
-		positionScreen.applyMatrix4( camera.projectionMatrix );
+		if ( positionView.z > 0 ) return; // lensflare is behind the camera
+
+		positionScreen.copy( positionView ).applyMatrix4( camera.projectionMatrix );
 
 		// horizontal and vertical coordinate of the lower left corner of the pixels to copy
 
