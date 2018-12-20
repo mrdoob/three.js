@@ -1,0 +1,18 @@
+0 Hi-Res Circle 0.0833
+0 Name: 48\1-12edge.dat
+0 Author: Andy Westrate [westrate]
+0 !LDRAW_ORG 48_Primitive UPDATE 2009-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2009-05-02 [PTadmin] Official Update 2009-01
+
+2 24 1 0 0 .9914 0 .1305
+2 24 .9914 0 .1305 .9659 0 .2588
+2 24 .9659 0 .2588 .9239 0 .3827
+2 24 .9239 0 .3827 .866 0 .5
+
+0 end of file 
+
+

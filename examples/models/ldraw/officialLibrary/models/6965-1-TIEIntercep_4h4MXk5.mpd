@@ -1,0 +1,58 @@
+0 FILE 6965 - TIE Interceptor - Mini.mpd
+0 TIE Interceptor - Mini
+0 Name: 6965 - TIE Interceptor - Mini.mpd
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom" 
+0 ROTATION CONFIG 0 0
+1 0 0 0 0 1 0 0 0 1 0 0 0 1 6965 - 1.ldr
+1 0 -40 10 12 0 -1 0 1 0 0 0 0 1 6965 - 2.ldr
+1 0 40 10 12 0 1 0 -1 0 0 0 0 1 6965 - 2.ldr
+0
+0 FILE 6965 - 1.ldr
+0 1
+0 Name: 6965 - 1.ldr
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom" 
+0 ROTATION CONFIG 0 0
+1 0 0 0 0 1 0 0 0 1 0 0 0 1 4733.dat
+1 379 -0 -8 0 1 0 0 0 1 0 0 0 1 3070bps3.dat
+0 STEP
+1 379 0 10 18 1 0 0 0 0 1 0 -1 0 4740.dat
+1 47 0 10 -18 -1 0 0 0 0 1 0 1 0 4740.dat
+0 STEP
+1 0 24 10 22 0 1 0 -1 0 0 0 0 1 4623.dat
+1 0 -24 10 22 0 -1 0 1 0 0 0 0 1 4623.dat
+0 
+0
+0 FILE 6965 - 2.ldr
+0 2
+0 Name: 6965 - 2.ldr
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom" 
+0 ROTATION CONFIG 0 0
+1 0 0 0 0 0 0 1 0 1 0 -1 0 0 4871.dat
+1 0 -10 -8 10 0 0 1 0 1 0 -1 0 0 4589.dat
+1 0 10 -8 10 0 0 1 0 1 0 -1 0 0 4589.dat
+0 STEP
+1 0 -10 8 -10 -1 0 0 0 1 0 0 0 -1 2555.dat
+1 0 10 8 -10 -1 0 0 0 1 0 0 0 -1 2555.dat
+0 STEP
+1 0 -30 -8 0 0 0 -1 0 1 0 1 0 0 3069b.dat
+1 0 30 -8 0 0 0 -1 0 1 0 1 0 0 3069b.dat
+1 72 -10 2 0 -0.707107 0 -0.707107 0.707107 0 -0.707107 0 -1 0 30374.dat
+1 72 10 2 0 0.707107 0 -0.707107 0.707107 0 0.707107 0 -1 0 30374.dat
+0 STEP
+1 0 -26.97 4.828 -60 0.707107 -0.707107 0 0.707107 0.707107 0 0 0 1 41769.dat
+1 0 -14.243 6.242 -30 0.707107 -0.707107 0 0.707107 0.707107 0 0 0 1 2555.dat
+0 STEP
+1 0 26.97 4.828 -60 0.707107 0.707107 0 -0.707107 0.707107 0 0 0 1 41770.dat
+1 0 14.243 6.242 -30 0.707107 0.707107 0 -0.707107 0.707107 0 0 0 1 2555.dat
+0 
+0
+0

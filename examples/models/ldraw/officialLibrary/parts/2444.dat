@@ -1,0 +1,87 @@
+0 Plate  2 x  2 with Hole and Split Underside Ribs
+0 Name: 2444.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2016-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-06-08 [jriley]  BFC compliant
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-05-12 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2013-09-12 [cwdee]   Reworked
+0 !HISTORY 2013-09-12 [MMR1988] Removed t-junctions, used more prims
+0 !HISTORY 2013-09-13 [arezey]  Simplified underside
+0 !HISTORY 2013-09-14 [MMR1988] Reduced diameter of outer cylinder
+0 !HISTORY 2013-12-23 [PTadmin] Official Update 2013-02
+0 !HISTORY 2016-09-22 [MagFors] Made space for pin
+0 !HISTORY 2016-12-31 [PTadmin] Official Update 2016-01
+
+1 16 0 8 0 0 0 -20 0 -8 0 20 0 0 box4-1.dat
+0 BFC INVERTNEXT
+1 16 -4 5.5 0 0 -12 0 2.5 0 0 0 0 16 box3u2p.dat
+0 BFC INVERTNEXT
+1 16 7.5 5.5 12.5 0 0 8.5 2.5 0 0 0 3.5 0 box2-5.dat
+0 BFC INVERTNEXT
+1 16 7.5 5.5 -12.5 0 0 8.5 2.5 0 0 0 -3.5 0 box2-5.dat
+
+4 16 20 10 9 20 8 9 20 2 8 20 10 8
+4 16 20 10 -9 20 10 -8 20 2 -8 20 8 -9
+4 16 20 8 20 20 0 20 20 2 8 20 8 9
+4 16 20 8 -20 20 8 -9 20 2 -8 20 0 -20
+3 16 20 0 -20 20 2 -8 20 2 0
+4 16 20 0 -20 20 2 0 20 2 8 20 0 20
+1 16 20 10 0 0 -1 0 0 0 -8 8 0 0 2-4ndis.dat
+2 24 20 8 -20 20 8 -9
+2 24 20 8 -9 20 10 -9
+2 24 20 10 9 20 8 9
+2 24 20 8 9 20 8 20
+
+4 16 20 8 9 16 8 9 16 8 16 20 8 20
+3 16 20 8 20 16 8 16 -1 8 16
+4 16 20 8 20 -1 8 16 -4 8 16 -20 8 20
+3 16 -4 8 16 -16 8 16 -20 8 20
+4 16 -20 8 20 -16 8 16 -16 8 -16 -20 8 -20
+3 16 -1 8 -16 16 8 -16 20 8 -20
+4 16 -20 8 -20 -4 8 -16 -1 8 -16 20 8 -20
+3 16 -20 8 -20 -16 8 -16 -4 8 -16
+4 16 20 8 -20 16 8 -16 16 8 -9 20 8 -9
+2 24 16 8 -9 20 8 -9
+2 24 20 8 9 16 8 9
+
+1 16 20 10 0 0 -1 0 0 0 -1 -1 0 0 peghole.dat
+0 BFC INVERTNEXT
+1 16 2 10 0 0 16 0 0 0 -6 -6 0 0 4-4cyli.dat
+1 16 2 10 0 0 -1 0 -6 0 0 0 0 -6 4-4edge.dat
+1 16 20 10 0 0 -1 0 0 0 1 1 0 0 2-4ring8.dat
+
+1 16 20 10 0 0 -18 0 0 0 9 9 0 0 2-4cylo.dat
+4 16 20 10 9 2 10 9 16 8 9 20 8 9
+4 16 16 8 9 2 10 9 2 3 9 16 3 9
+4 16 20 10 -9 20 8 -9 16 8 -9 2 10 -9
+4 16 16 8 -9 16 3 -9 2 3 -9 2 10 -9
+
+1 16 -2.5 3 11.5 0 0 1.5 0 5 0 4.5 0 0 box3u8p.dat
+1 16 -2.5 3 -11.5 0 0 1.5 0 5 0 4.5 0 0 box3u8p.dat
+1 16 -2.5 8 7 1.5 0 0 0 -5 0 0 0 -1.5 2-4cylc.dat
+1 16 -2.5 8 -7 1.5 0 0 0 -5 0 0 0 1.5 2-4cylc.dat
+
+1 16 2 10 0 0 1 0 0 0 3 -3 0 0 2-4ring2.dat
+1 16 2 10 0 0 1 0 0 0 -6 6 0 0 2-4ndis.dat
+
+2 24 2 3 9 2 10 9
+2 24 2 3 -9 2 10 -9
+4 16 2 10 6 2 4 6 2 3 9 2 10 9
+4 16 2 10 -6 2 10 -9 2 3 -9 2 4 -6
+4 16 2 4 6 2 4 -6 2 3 -9 2 3 9
+
+1 16 9 3 0 0 0 -7 0 1 0 9 0 0 recte3.dat
+
+4 16 -16 3 -16 2 3 -9 16 3 -9 16 3 -16
+4 16 -16 3 -16 -16 3 16 2 3 9 2 3 -9
+4 16 -16 3 16 16 3 16 16 3 9 2 3 9
+
+1 16 -10 3 0 1 0 0 0 -1.25 0 0 0 1 stud3.dat
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 stug2-2x2.dat

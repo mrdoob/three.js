@@ -1,0 +1,65 @@
+0 Dish  2 x  2
+0 Name: 2654.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2010-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS boat stud  2 x  2, spherical, smooth bottom, skid plate, inverted tile
+0 !KEYWORDS round
+
+0 !HISTORY 2003-06-08 [jriley] BFC compliant
+0 !HISTORY 2003-10-04 [OrionP] Changed name, add keywords
+0 !HISTORY 2004-04-22 [PTadmin] Official Update 2004-02
+0 !HISTORY 2007-05-17 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2010-05-09 [cwdee] Remove CATEGORY Round
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+
+1 16 10 0 10 1 0 0 0 1 0 0 0 1 stud6a.dat
+1 16 -10 0 10 0 0 -1 0 1 0 1 0 0 stud6a.dat
+1 16 10 0 -10 0 0 1 0 1 0 -1 0 0 stud6a.dat
+1 16 -10 0 -10 -1 0 0 0 1 0 0 0 -1 stud6a.dat
+1 16 0 4 0 6 0 0 0 1 0 0 0 6 4-4edge.dat
+1 16 0 0 0 20 0 0 0 1 0 0 0 20 4-4edge.dat
+1 16 0 2 0 20 0 0 0 1 0 0 0 20 4-4edge.dat
+1 16 0 4 0 6 0 0 0 1 0 0 0 6 4-4disc.dat
+1 16 0 0 0 20 0 0 0 2 0 0 0 20 4-4cyli.dat
+1 16 0 2 0 20 0 0 0 6 0 0 0 20 4-8sphe.dat
+1 16 10 0 10 4 0 0 0 1 0 0 0 4 4-4edge.dat
+1 16 -10 0 10 4 0 0 0 1 0 0 0 4 4-4edge.dat
+1 16 10 0 -10 4 0 0 0 1 0 0 0 4 4-4edge.dat
+1 16 -10 0 -10 4 0 0 0 1 0 0 0 4 4-4edge.dat
+1 16 10 0 10 4 0 0 0 1 0 0 0 4 4-4disc.dat
+1 16 -10 0 10 4 0 0 0 1 0 0 0 4 4-4disc.dat
+1 16 10 0 -10 4 0 0 0 1 0 0 0 4 4-4disc.dat
+1 16 -10 0 -10 4 0 0 0 1 0 0 0 4 4-4disc.dat
+1 16 10 0 10 4.2 0 4.2 0 1 0 -4.2 0 4.2 2-4edge.dat
+1 16 -10 0 10 -4.2 0 -4.2 0 1 0 -4.2 0 4.2 2-4edge.dat
+1 16 10 0 -10 4.2 0 4.2 0 1 0 4.2 0 -4.2 2-4edge.dat
+1 16 -10 0 -10 -4.2 0 -4.2 0 1 0 4.2 0 -4.2 2-4edge.dat
+1 16 10 0 10 -4.2 0 -4.2 0 1 2.8 4.2 0 -4.2 2-4edge.dat
+1 16 -10 0 10 4.2 0 4.2 0 1 2.8 4.2 0 -4.2 2-4edge.dat
+1 16 10 0 -10 -4.2 0 -4.2 0 1 2.8 -4.2 0 4.2 2-4edge.dat
+1 16 -10 0 -10 4.2 0 4.2 0 1 2.8 -4.2 0 4.2 2-4edge.dat
+1 16 10 0 10 -4.2 0 -4.2 0 2.8 0 4.2 0 -4.2 2-4cyli.dat
+1 16 -10 0 10 4.2 0 4.2 0 2.8 0 4.2 0 -4.2 2-4cyli.dat
+1 16 10 0 -10 -4.2 0 -4.2 0 2.8 0 -4.2 0 4.2 2-4cyli.dat
+1 16 -10 0 -10 4.2 0 4.2 0 2.8 0 -4.2 0 4.2 2-4cyli.dat
+2 24 0 0 15.3 -5.8 0 14.2
+2 24 -14.2 0 5.8 -15.3 0 0
+2 24 -15.3 0 0 -14.2 0 -5.8
+2 24 -5.8 0 -14.2 0 0 -15.3
+2 24 0 0 -15.3 5.8 0 -14.2
+2 24 14.2 0 -5.8 15.3 0 0
+2 24 15.3 0 0 14.2 0 5.8
+2 24 5.8 0 14.2 0 0 15.3
+0 BFC INVERTNEXT
+1 16 0 1.4194 0 6 0 0 0 2.5806 0 0 0 6 4-4con1.dat
+0 BFC INVERTNEXT
+1 16 0 0.3871 0 2.4 0 0 0 1.0323 0 0 0 2.4 4-4con5.dat
+0 BFC INVERTNEXT
+1 16 0 0 0 0.9 0 0 0 0.3871 0 0 0 0.9 4-4con16.dat
+1 16 0 0 0 1.7 0 0 0 1 0 0 0 1.7 4-4ring9.dat
+1 16 0 0 0 4 0 0 0 1 0 0 0 4 4-4ring4.dat
+0

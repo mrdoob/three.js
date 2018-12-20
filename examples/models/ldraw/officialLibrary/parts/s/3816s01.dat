@@ -1,0 +1,32 @@
+0 ~Minifig Leg Right without Front Surfaces
+0 Name: s\3816s01.dat
+0 Author: Steve Bliss [sbliss]
+0 !LDRAW_ORG Subpart UPDATE 2013-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+
+0 !HISTORY 1999-02-01 [PTadmin] Official Update 1999-01
+0 !HISTORY 2002-05-29 [fwcain]  removed all front surfaces (put into "main" file[s])...
+0 !HISTORY 2002-08-18 [PTadmin] Official Update 2002-04
+0 !HISTORY 2007-09-13 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2008-07-07 [tchang]  Add BFC, partially rebuild
+0 !HISTORY 2008-12-31 [tchang]  Corrected some conditional lines
+0 !HISTORY 2009-08-24 [PTadmin] Renamed from s/971s01
+0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
+0 !HISTORY 2013-04-01 [tchang]  Suppress overlap faces
+0 !HISTORY 2013-04-03 [MagFors] Used new file s\3816s02.dat
+0 !HISTORY 2013-12-23 [PTadmin] Official Update 2013-02
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 s\3816s02.dat
+0 // outer side surface
+4 16 -19.5 28 -11 -19.5 28 9 -19.18 20 -6 -19.18 20 -11
+4 16 -19.18 20 -6 -19.5 28 9 -18.36 0 9 -18.64 6.74 -6
+3 16 -18.36 0 9 -18.36 0 0 -18.64 6.74 -6
+4 16 -18.36 0 0 -18.36 0 9 -18.23 -3.42 8.28 -18.11 -6.3 6.3
+4 16 -18.36 0 0 -18.11 -6.3 6.3 -18.03 -8.28 3.42 -18 -9 0
+4 16 -18.36 0 0 -18 -9 0 -18.03 -8.28 -3.42 -18.11 -6.3 -6.3
+4 16 -18.36 0 0 -18.11 -6.3 -6.3 -18.23 -3.42 -8.28 -18.36 0 -9
+4 16 -18.36 0 0 -18.36 0 -9 -18.5 3.42 -8.28 -18.64 6.74 -6
+

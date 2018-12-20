@@ -1,0 +1,16 @@
+0 Technic Axle  3
+0 Name: 4519.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2004-07-11 [guyvivan] BFC'ed
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-07-08 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 30 0 0 0 -60 0 1 0 0 0 0 1 axle.dat
+0
+

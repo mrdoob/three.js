@@ -1,0 +1,48 @@
+0 Plate  3 x  3 without Corner
+0 Name: 2450.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2011-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-08-07 [jriley] BFC compliant
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-05-13 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2008-07-07 [mkennedy] Used ribt45, optimized with box2-5 and stug2, used rect1 in gaps (2006-06-29)
+0 !HISTORY 2010-12-31 [PTadmin] Official Update 2010-03
+0 !HISTORY 2011-03-12 [anathema] Corrected winding of triangles and quads
+0 !HISTORY 2011-07-25 [PTadmin] Official Update 2011-01
+
+1 16 10 4 10 1 0 0 0 -1 0 0 0 1 stud4.dat
+1 16 -10 4 10 1 0 0 0 -1 0 0 0 1 stud4.dat
+1 16 -10 4 -10 1 0 0 0 -1 0 0 0 1 stud4.dat
+1 16 0 4 0 0 0 -30 4 0 0 0 30 0 box2-5.dat
+1 16 -20 4 -30 10 0 0 0 0 4 0 1 0 rect2p.dat
+1 16 30 4 20 0 -1 0 0 0 4 10 0 0 rect2p.dat
+1 16 10 4 -10 1 0 0 0 1 0 0 0 1 ribt45.dat
+1 16 -1.42 4 -18.58 1.41 0 4.25 0 -1 0 -1.41 0 4.25 rect1.dat
+1 16 18.58 4 1.42 1.41 0 4.25 0 -1 0 -1.41 0 4.25 rect1.dat
+0 BFC INVERTNEXT
+1 16 0 6 0 0 -26 0 2 0 0 0 0 26 box2-5.dat
+1 16 -18.82 6 -26 -7.18 0 0 0 0 2 0 -1 0 rect2p.dat
+1 16 -7.13 6 -27.13 -2.87 -1 0 0 0 2 -2.87 0 0 rect2a.dat
+1 16 25.13 6 7.95 0 -1.41 -2.28 2 0 0 0 1.41 -2.28 box2-5.dat
+1 16 26 6 18.82 0 1 0 0 0 2 7.18 0 0 rect2p.dat
+1 16 27.13 6 7.13 2.87 -1 0 0 0 2 2.87 0 0 rect2a.dat
+1 16 -7.95 6 -25.13 0 -1.41 2.28 2 0 0 0 1.41 2.28 box2-5.dat
+1 16 10 2 -10 20 -1 0 0 0 -2 20 0 0 rect3.dat
+4 16 26 8 26 -26 8 26 -30 8 30 30 8 30
+4 16 -26 8 26 -26 8 -26 -30 8 -30 -30 8 30
+4 16 -26 8 -26 -11.65 8 -26 -10 8 -30 -30 8 -30
+4 16 -11.65 8 -26 -7.07 8 -21.41 -4.24 8 -24.24 -10 8 -30
+4 16 21.41 8 7.07 26 8 11.65 30 8 10 24.24 8 4.24
+4 16 26 8 11.65 26 8 26 30 8 30 30 8 10
+4 16 26 4 11.65 -11.65 4 -26 -26 4 -26 26 4 26
+3 16 26 4 26 -26 4 -26 -26 4 26
+4 16 -30 0 -30 -10 0 -30 30 0 10 30 0 30
+3 16 30 0 30 -30 0 30 -30 0 -30
+1 16 20 0 20 0 0 -1 0 1 0 1 0 0 stud.dat
+1 16 -10 0 10 0 0 -1 0 1 0 1 0 0 stug-2x2.dat
+1 16 -20 0 -20 0 0 -1 0 1 0 1 0 0 stud.dat

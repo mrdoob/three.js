@@ -1,0 +1,23 @@
+0 Peg Hole End
+0 Name: peghole.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2010-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-05-01 [mkennedy] replace code with ring3
+0 !HISTORY 2002-05-01 [sbliss] BFC
+0 !HISTORY 2002-06-11 [PTadmin] Official Update 2002-03
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2010-01-14 [cwdee] Update ring3 to 4-4ring3
+0 !HISTORY 2010-04-05 [PTadmin] Official Update 2010-01
+
+1 16 0 0 0 8 0 0 0 1 0 0 0 8 4-4edge.dat
+1 16 0 2 0 8 0 0 0 1 0 0 0 8 4-4edge.dat
+1 16 0 2 0 6 0 0 0 1 0 0 0 6 4-4edge.dat
+1 16 0 2 0 2 0 0 0 1 0 0 0 2 4-4ring3.dat
+0 BFC INVERTNEXT
+1 16 0 0 0 8 0 0 0 2 0 0 0 8 4-4cyli.dat
+0

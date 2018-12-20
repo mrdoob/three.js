@@ -1,0 +1,14 @@
+0 ~Cylinder  2 x  2 with Dome Top with SW R2 Pattern Panel  7
+0 Name: s\30367ps1s09.dat
+0 Author: Daniel Goerner [TK-949]
+0 !LDRAW_ORG Subpart UPDATE 2012-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2012-12-28 [PTadmin] Official Update 2012-03
+
+4 16 15.482 4.684 -5.056 15.375 4.684 -5.591 17.407 9.035 -6.33 17.527 9.035 -5.724
+4 16 12.954 4.307 -8.98 13.291 4.678 -9.213 13.595 4.679 -8.758 13.251 4.308 -8.536
+4 16 15.089 4.311 -4.927 14.985 4.311 -5.449 15.375 4.684 -5.591 15.482 4.684 -5.056
+4 16 13.595 4.679 -8.758 13.291 4.678 -9.213 15.048 9.044 -10.431 15.392 9.043 -9.916

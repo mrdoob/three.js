@@ -1,0 +1,32 @@
+0 Tile  1 x  3 with Groove
+0 Name: 63864.dat
+0 Author: Tim Gould [timgould]
+0 !LDRAW_ORG Part UPDATE 2010-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2010-04-05 [PTadmin] Official Update 2010-01
+
+4 16 -30 0 -10  30 0 -10  30 0 10  -30 0 10
+
+1 16 0 0 0 30 0 0 0 7 0 0 0 10 box4.dat
+1 16 0 7 0 29 0 0 0 1 0 0 0 9 box4.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 -26 0 0 0 -4 0 0 0 6 box5.dat
+
+4 16 -30 7 -10 -29 7 -9 29 7 -9 30 7 -10
+4 16 30 7 10 29 7 9 -29 7 9 -30 7 10
+4 16 -30 7 -10 -30 7 10 -29 7 9 -29 7 -9
+4 16 30 7 10 30 7 -10 29 7 -9 29 7 9
+
+4 16 -29 8 -9 -26 8 -6 26 8 -6 29 8 -9
+4 16 29 8 9 26 8 6 -26 8 6 -29 8 9
+4 16 -29 8 -9 -29 8 9 -26 8 6 -26 8 -6
+4 16 29 8 9 29 8 -9 26 8 -6 26 8 6
+
+1 16  10 4 0  1 0 0   0 -1 0   0 0 1  stud3.dat
+1 16  -10 4 0  1 0 0   0 -1 0   0 0 1  stud3.dat
+
+0
+

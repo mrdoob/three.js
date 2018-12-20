@@ -1,0 +1,18 @@
+0 Stud Open Group  2 x  2
+0 Name: stug2-2x2.dat
+0 Author: Steffen [Steffen]
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2009-05-02 [PTadmin] Official Update 2009-01
+0 !HISTORY 2011-06-30 [PTadmin] Renamed from stug2a
+0 !HISTORY 2011-07-25 [PTadmin] Official Update 2011-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+1 16 -10 0 -10 1 0 0 0 1 0 0 0 1 stud2.dat
+1 16 10 0 -10 1 0 0 0 1 0 0 0 1 stud2.dat
+1 16 -10 0 10 1 0 0 0 1 0 0 0 1 stud2.dat
+1 16 10 0 10 1 0 0 0 1 0 0 0 1 stud2.dat

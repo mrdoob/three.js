@@ -1,0 +1,54 @@
+0 ~Cylinder  2 x  2 with Dome Top Subpart - Quarter
+0 Name: s\30367s01.dat
+0 Author: Steve Bliss [sbliss]
+0 !LDRAW_ORG Subpart UPDATE 2018-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+
+0 !HISTORY 2004-04-22 [PTadmin] Official Update 2004-02
+0 !HISTORY 2007-09-10 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2008-07-07 [PTadmin] Renamed from s\553s01 (2004-11-05)
+0 !HISTORY 2009-10-10 [anathema] Increased use of primitives; fixed gaps in stud closure
+0 !HISTORY 2010-12-31 [PTadmin] Official Update 2010-03
+0 !HISTORY 2012-05-15 [MagFors] Moved part of file, to use it in 30367b and 30367c
+0 !HISTORY 2012-12-23 [MagFors] Divided into quarter section
+0 !HISTORY 2012-12-28 [PTadmin] Official Update 2012-03
+0 !HISTORY 2018-03-26 [cwdee] Replace t04ounit with identical r04o1000
+0 !HISTORY 2018-12-08 [PTadmin] Official Update 2018-02
+
+2 24 16 20 11.36 14.14 20 14.14
+2 24 14.14 20 14.14 11.36 20 16
+2 24 16 24 -11.36 16 24 11.36
+2 24 11.36 20 16 0 20 16
+2 24 16 20 0 16 20 11.36
+1 16 0 20 0 16 0 0 0 1 0 0 0 16 1-4edge.dat
+1 16 0 24 0 18.4776 0 7.6537 0 1 0 -7.6537 0 18.4776 1-8edge.dat
+1 16 0 24 0 18.4776 0 7.6537 0 -1 0 7.6537 0 -18.4776 1-8chrd.dat
+4 16 18.4776 24 -7.6537 18.47744 24 7.65358 16 24 11.36 16 24 -11.36
+4 16 16 24 11.36 16 20 11.36 16 20 0 16 24 -11.36
+1 16 0 20 0 18.4776 0 7.6537 0 4 0 -7.6537 0 18.4776 1-8cyli.dat
+1 16 17.23872 22 9.50679 -1.23872 -1 0 0 0 2 1.85321 0 0 rect2a.dat
+5 24 18.477 24 7.654 18.477 20 7.654 16 20 11.36 20.001 20 0
+3 16 0 20 16 11.36 20 16 11.36 24 16
+1 16 9.507 22 17.239 0 0 1.853 2 0 0 0 -1 -1.239 rect2a.dat
+5 24 18.478 20 -7.654 18.478 24 -7.654 16 24 -11.36 20.001 24 0
+3 16 16 20 0 16 20 11.36 14.7824 20 6.1232
+4 16 14.7824 20 6.1232 16 20 11.36 14.14 20 14.14 11.3136 20 11.3136
+4 16 6.1232 20 14.7824 11.3136 20 11.3136 14.14 20 14.14 11.36 20 16
+3 16 0 20 16 6.1232 20 14.7824 11.36 20 16
+1 16 0 4 0 7.391 0 -3.061 0 1 0 3.061 0 7.391 1-8edge.dat
+1 16 0 4 0 7.391 0 -3.061 0 12 0 3.061 0 7.391 1-8cyli.dat
+1 16 7.5465 10 2.2805 0.1555 -1 0 0 0 -6 -0.7805 0 0 rect2a.dat
+5 24 7.391 4 3.061 7.391 16 3.061 7.702 16 1.5 5.657 16 5.657
+1 16 7.702 16 1.5 8 0 0 0 0 -12 0 1 0 1-4edge.dat
+1 16 7.702 16 1.5 8 0 0 0 0 -12 0 -1 0 1-4disc.dat
+1 16 11.851 16 0.75 4 0 -0.149 0 -1 0 0 0 0.75 rect3.dat
+1 16 2.281 10 7.546 0 0 -0.78087 -6 0 0 0 -1 0.1557 rect2a.dat
+5 24 3.062 4 7.391 3.062 16 7.391 1.5 16 7.702 5.657 16 5.657
+1 16 1.5 16 7.702 0 -1 0 0 0 -12 8 0 0 1-4disc.dat
+1 16 1.5 16 7.702 0 -1 0 0 0 -12 8 0 0 1-4edge.dat
+1 16 0.75 16 11.851 0 0 0.75 0 -1 0 -4 0 -0.149 rect3.dat
+0 BFC INVERTNEXT
+1 16 0 16 0 8 0 0 0 -12 0 0 0 8 r04o1000.dat

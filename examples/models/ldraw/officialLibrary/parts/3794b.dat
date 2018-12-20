@@ -1,0 +1,25 @@
+0 Plate  1 x  2 with Groove with 1 Centre Stud
+0 Name: 3794b.dat
+0 Author: Magnus Forsberg [MagFors]
+0 !LDRAW_ORG Part UPDATE 2011-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS jumper, offset, tile, spacer
+
+0 !HISTORY 2011-12-29 [PTadmin] Official Update 2011-02
+
+1 16 0 4 0 1 0 0 0 -1 0 0 0 1 stud3.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 16 0 0 0 -4 0 0 0 6 box5.dat
+4 16 19 8 9 16 8 6 -16 8 6 -19 8 9
+4 16 -19 8 9 -16 8 6 -16 8 -6 -19 8 -9
+4 16 -19 8 -9 -16 8 -6 16 8 -6 19 8 -9
+4 16 19 8 -9 16 8 -6 16 8 6 19 8 9
+1 16 0 8 0 19 0 0 0 -1 0 0 0 9 box4.dat
+4 16 20 7 10 19 7 9 -19 7 9 -20 7 10
+4 16 -20 7 10 -19 7 9 -19 7 -9 -20 7 -10
+4 16 -20 7 -10 -19 7 -9 19 7 -9 20 7 -10
+4 16 20 7 -10 19 7 -9 19 7 9 20 7 10
+1 16 0 7 0 20 0 0 0 -7 0 0 0 10 box5.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 stud2.dat

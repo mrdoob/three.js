@@ -1,0 +1,24 @@
+0 Minifig Torso with Blue Futuron Pattern
+0 Name: 973p6c.dat
+0 Author: Chris Dee [cwdee]
+0 !LDRAW_ORG Part UPDATE 2015-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+0 !KEYWORDS Space
+0 !CMDLINE -c15
+
+0 !HISTORY 2002-11-30 [PTadmin] Official Update 2002-05
+0 !HISTORY 2007-07-29 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2013-08-10 [Steffen] replaced gold color by 82
+0 !HISTORY 2015-12-30 [PTadmin] Official Update 2015-02
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 s\973s01.dat
+1 0 0 -4 0 4.243 0 -4.243 0 -8 0 -4.243 0 -4.243 1-4cyli.dat
+4 16 -19 32 10 19 32 10 19 29 10 -19 29 10
+4 16 -14.345 2 10 -19 29 10 19 29 10 14.345 2 10
+4 16 12 0 10 -12 0 10 -14.345 2 10 14.345 2 10
+1 82 0 0 0 1 0 0 0 1 0 0 0 1 s\973p65a.dat
+1 1  0 0 0 1 0 0 0 1 0 0 0 1 s\973p65b.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 s\973p65c.dat

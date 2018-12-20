@@ -1,0 +1,25 @@
+0 Plate  1 x  2 with Vertical Bar on Long Side and Long Arm
+0 Name: 4623.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2011-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS hook, handle
+
+0 !HISTORY 2004-10-09 [guyvivan] Made BFC Compliant
+0 !HISTORY 2004-11-06 [PTadmin] Official Update 2004-04
+0 !HISTORY 2007-07-08 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2011-12-18 [cwdee] Update description to distinguish from 88072
+0 !HISTORY 2011-12-29 [PTadmin] Official Update 2011-02
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 3023.DAT
+1 16 0 4 -10 4 0 0 0 0 4 0 1 0 4-4edge.dat
+1 16 0 -16 -22 4 0 0 0 1 0 0 0 4 4-4edge.dat
+1 16 0 4 -22 4 0 0 0 1 -4 0 0 4 2-4edge.dat
+1 16 0 -16 -22 4 0 0 0 1 0 0 0 4 4-4disc.dat
+1 16 0 4 -22 4 0 0 0 4 0 0 0 -4 2-8sphe.dat
+1 16 0 4 -10 4 0 0 0 0 4 0 -12 0 4-4cyli.dat
+1 16 0 -16 -22 4 0 0 0 20 0 0 0 4 4-4cyli.dat
+0

@@ -1,0 +1,19 @@
+0 Technic Friction Pin 1.0 with Base Collar and Blind Hole
+0 Name: confric4.dat
+0 Author: Owen Burgoyne [C3POwen]
+0 !LDRAW_ORG Primitive UPDATE 2015-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2015-10-11 [PTadmin] Official Update 2015-01
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 connect8.dat
+1 16 0 -2 0 0.707107 0 -0.707107 0 1 0 0.707107 0 0.707107 fric.dat
+1 16 0 -2 0 0.707107 0 0.707107 0 1 0 -0.707107 0 0.707107 fric.dat
+1 16 0 -2 0 -0.707107 0 0.707107 0 1 0 -0.707107 0 -0.707107 fric.dat
+1 16 0 -2 0 -0.707107 0 -0.707107 0 1 0 0.707107 0 -0.707107 fric.dat
+1 16 0 -18 0 0.707107 0 -0.707107 0 -1 0 0.707107 0 0.707107 fric.dat
+1 16 0 -18 0 0.707107 0 0.707107 0 -1 0 -0.707107 0 0.707107 fric.dat
+1 16 0 -18 0 -0.707107 0 0.707107 0 -1 0 -0.707107 0 -0.707107 fric.dat
+1 16 0 -18 0 -0.707107 0 -0.707107 0 -1 0 0.707107 0 -0.707107 fric.dat

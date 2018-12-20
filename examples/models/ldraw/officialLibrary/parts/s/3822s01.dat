@@ -1,0 +1,80 @@
+0 ~Door  1 x  3 x  1 Left without Front Face and Stud
+0 Name: s\3822s01.dat
+0 Author: Thomas Burger [grapeape]
+0 !LDRAW_ORG Subpart UPDATE 2003-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-12-31 [PTadmin] Official Update 2002-06
+0 !HISTORY 2003-01-28 [sbliss] Moved stud to main files, BFC'ed, changed polygons to primitives
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-09-05 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+0 // Use upon Templates: Quad co-ordinates
+0 // 10 14 46   10 14 34   10 10 34   10 10 46
+
+ 1 16 0 24 0 6 0 0 0 1 0 0 0 6 4-4edge.dat
+ 1 16 0 4 0 6 0 0 0 1 0 0 0 6 4-4edge.dat
+0 BFC INVERTNEXT
+ 1 16 0 4 0 6 0 0 0 1 0 0 0 6 4-4disc.dat
+0 BFC INVERTNEXT
+ 1 16 0 4 0 6 0 0 0 20 0 0 0 6 4-4cyli.dat
+ 2 24 6 24 10 6 24 50 
+ 2 24 6 24 50 10 24 50 
+ 2 24 10 24 50 10 24 0 
+ 1 16 0 24 0 10 0 0 0 1 0 0 0 -10 3-4edge.dat
+ 2 24 0 24 10 6 24 10 
+ 2 24 6 0 10 6 0 50 
+ 2 24 6 0 50 10 0 50 
+ 2 24 10 0 50 10 0 0 
+ 1 16 0 0 0 10 0 0 0 1 0 0 0 -10 3-4edge.dat
+ 2 24 0 0 10 6 0 10 
+ 2 24 6 0 10 6 24 10 
+ 2 24 6 0 50 6 24 50 
+ 2 24 10 0 50 10 24 50 
+1 16 0 24 0 0 0 10 0 -1 0 10 0 0 1-4ndis.dat
+ 4 16 6 24 10 6 24 50 10 24 50 10 24 10 
+ 4 16 6 24 50 6 0 50 10 0 50 10 24 50 
+ 1 16 0 0 0 10 0 0 0 24 0 0 0 -10 3-4cyli.dat
+ 4 16 0 24 10 0 0 10 6 0 10 6 24 10 
+ 1 16 0 0 0 10 0 0 0 1 0 0 0 -10 3-4disc.dat
+4 16 10 0 10 0 0 10 0 0 0 10 0 0
+4 16 10 0 50 6 0 50 6 0 10 10 0 10
+ 1 16 6 12 44 0 1 0 2 0 0 0 0 2 4-4edge.dat
+ 1 16 10 12 44 0 1 0 2 0 0 0 0 2 2-4edge.dat
+ 1 16 10 12 36 0 1 0 2 0 0 0 0 -2 2-4edge.dat
+ 2 24 10 14 44 10 14 36 
+ 2 24 10 10 44 10 10 36 
+ 1 16 13 12 44 0 1 0 2 0 0 0 0 2 4-4edge.dat
+ 2 24 10 14 44 13 14 44 
+ 2 24 10 10 44 13 10 44 
+ 1 16 15 12 44 0 1 0 2 0 0 0 0 2 2-4edge.dat
+ 1 16 15 12 36 0 1 0 2 0 0 0 0 -2 2-4edge.dat
+ 2 24 15 14 44 15 14 36 
+ 2 24 15 10 44 15 10 36 
+ 1 16 6 12 44 0 1 0 2 0 0 0 0 2 4-4ndis.dat
+1 16 10 12 44 0 -1 0 -2 0 0 0 0 2 2-4ndis.dat
+1 16 10 12 36 0 -1 0 -2 0 0 0 0 -2 2-4ndis.dat
+ 1 16 13 12 44 0 1 0 2 0 0 0 0 2 4-4disc.dat
+1 16 15 12 44 0 -1 0 -2 0 0 0 0 2 2-4disc.dat
+1 16 15 12 36 0 -1 0 -2 0 0 0 0 -2 2-4disc.dat
+0 BFC INVERTNEXT
+ 1 16 10 12 44 0 -4 0 2 0 0 0 0 2 2-4cyli.dat
+0 BFC INVERTNEXT
+ 1 16 13 12 44 0 -7 0 2 0 0 0 0 -2 2-4cyli.dat
+ 1 16 15 12 44 0 -2 0 2 0 0 0 0 2 2-4cyli.dat
+ 1 16 15 12 36 0 -5 0 2 0 0 0 0 -2 2-4cyli.dat
+ 4 16 15 14 44 15 10 44 15 10 36 15 14 36 
+ 4 16 10 14 44 15 14 44 15 14 36 10 14 36 
+4 16 15 10 36 15 10 44 10 10 44 10 10 36
+
+4 16 6 14 42 6 14 46 6 24 50 6 24 10
+4 16 6 10 42 6 14 42 6 24 10 6 0 10
+4 16 6 10 46 6 10 42 6 0 10 6 0 50
+4 16 6 14 46 6 10 46 6 0 50 6 24 50
+
+1 16 0 24 0 2 0 0 0 -1 0 0 0 -2 ring3.dat
+1 16 0 24 0 2 0 0 0 -1 0 0 0 -2 ring4.dat
+0

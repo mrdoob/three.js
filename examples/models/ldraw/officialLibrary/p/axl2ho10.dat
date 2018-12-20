@@ -1,0 +1,19 @@
+0 Technic Axle Hole Reduced Tooth Surface
+0 Name: axl2ho10.dat
+0 Author: Michael Heidemann [mikeheide]
+0 !LDRAW_ORG Primitive UPDATE 2010-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+
+4 16 5.602 0 2 5.543 0 2.296 4.243 0 4.243 4 0 2
+4 16 4 0 2 4.243 0 4.243 2 0 4 2.5 0 2.5
+4 16 2.296 0 5.543 2 0 5.602 2 0 4 4.243 0 4.243
+4 16 -3.743 0 4.577 -4.243 0 4.243 -4.577 0 3.743 -2.5 0 2.5
+4 16 3.743 0 -4.577 4.243 0 -4.243 4.577 0 -3.743 2.5 0 -2.5
+4 16 -5.602 0 -2 -5.543 0 -2.296 -4.243 0 -4.243 -4 0 -2
+4 16 -4 0 -2 -4.243 0 -4.243 -2 0 -4 -2.5 0 -2.5
+4 16 -2.296 0 -5.543 -2 0 -5.602 -2 0 -4 -4.243 0 -4.243
+0 //

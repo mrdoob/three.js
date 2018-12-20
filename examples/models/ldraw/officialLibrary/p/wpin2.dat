@@ -1,0 +1,29 @@
+0 Wheel Holding Pin with 2 Fillets
+0 Name: wpin2.dat
+0 Author: Mark Kennedy [mkennedy]
+0 !LDRAW_ORG Primitive UPDATE 2009-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2006-08-11 [WilliamH] Modified to use new wpin2a primitive
+0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
+
+1 16 0 0 0 3.53 0 3.53 0 -1 0 -3.53 0 3.53 1-4edge.dat
+2 24 3.53 0 3.53 3 0 3.89
+2 24 3.53 0 -3.53 3 0 -3.89
+2 24 3 2 -3.89 3 2 3.89
+1 16 0 2 0 3.53 0 3.53 0 -1 0 -3.53 0 3.53 1-4edge.dat
+2 24 3.53 2 3.53 3 2 3.89
+2 24 3 2 3.89 3 0 3.89
+2 24 3.53 2 -3.53 3 2 -3.89
+2 24 3 2 -3.89 3 0 -3.89
+1 16 0 2 0 3.53 0 3.53 0 -2 0 -3.53 0 3.53 1-4cyli.dat
+4 16 3.53 2 3.53 3 2 3.89 3 0 3.89 3.53 0 3.53
+4 16 3.53 0 -3.53 3 0 -3.89 3 2 -3.89 3.53 2 -3.53
+1 16 0 0 0 3.53 0 3.53 0 1 0 -3.53 0 3.53 1-4chrd.dat
+4 16 3.53 0 3.53 3 0 3.89 3 0 -3.89 3.53 0 -3.53
+1 16 0 2 0 3.53 0 3.53 0 -1 0 3.53 0 -3.53 1-4chrd.dat
+4 16 3.53 2 -3.53 3 2 -3.89 3 2 3.89 3.53 2 3.53
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 wpin2a.dat
+0

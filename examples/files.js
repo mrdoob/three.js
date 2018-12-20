@@ -92,6 +92,7 @@ var files = {
 		"webgl_loader_imagebitmap",
 		"webgl_loader_json_claraio",
 		"webgl_loader_kmz",
+		"webgl_loader_ldraw",
 		"webgl_loader_md2",
 		"webgl_loader_md2_control",
 		"webgl_loader_mmd",

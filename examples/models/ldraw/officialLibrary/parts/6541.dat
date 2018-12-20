@@ -1,0 +1,47 @@
+0 Technic Brick  1 x  1 with Hole
+0 Name: 6541.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2003-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-08-31 [izanette] Modified with WINDZ for BFC compliance
+0 !HISTORY 2003-07-06 [Steffen] removed matrix-all-zero errors; deleted erroneous INVERTNEXT statments before references to peghole.dat
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-07-16 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+0 BFC INVERTNEXT
+1 16 0 24 0 6 0 0 0 -4 0 0 0 6 box5.dat
+4 16 10 24 10 6 24 6 -6 24 6 -10 24 10
+4 16 -10 24 10 -6 24 6 -6 24 -6 -10 24 -10
+4 16 -10 24 -10 -6 24 -6 6 24 -6 10 24 -10
+4 16 10 24 -10 6 24 -6 6 24 6 10 24 10
+2 24 10 24 10 -10 24 10
+2 24 -10 24 10 -10 24 -10
+2 24 -10 24 -10 10 24 -10
+2 24 10 24 -10 10 24 10
+2 24 10 24 10 10 0 10
+2 24 -10 24 10 -10 0 10
+2 24 -10 24 -10 -10 0 -10
+2 24 10 24 -10 10 0 -10
+1 16 0 10 10 1 0 0 0 0 1 0 -1 0 peghole.dat
+1 16 0 10 -10 1 0 0 0 0 1 0 1 0 peghole.dat
+0 BFC INVERTNEXT
+1 16 0 10 -8 6 0 0 0 0 6 0 16 0 4-4cyli.dat
+1 16 0 10 10 8 0 0 0 0 8 0 -1 0 4-4ndis.dat
+1 16 0 10 -10 8 0 0 0 0 8 0 1 0 4-4ndis.dat
+4 16 10 24 10 10 0 10 10 0 -10 10 24 -10
+4 16 -10 24 10 -10 24 -10 -10 0 -10 -10 0 10
+4 16 10 24 10 -10 24 10 -8 18 10 8 18 10
+4 16 10 0 10 8 2 10 -8 2 10 -10 0 10
+4 16 10 24 10 8 18 10 8 2 10 10 0 10
+4 16 -10 24 10 -10 0 10 -8 2 10 -8 18 10
+4 16 10 24 -10 8 18 -10 -8 18 -10 -10 24 -10
+4 16 10 0 -10 -10 0 -10 -8 2 -10 8 2 -10
+4 16 10 24 -10 10 0 -10 8 2 -10 8 18 -10
+4 16 -10 24 -10 -8 18 -10 -8 2 -10 -10 0 -10
+1 16 0 0 0 10 0 0 0 1 0 0 0 10 rect.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 stud2.dat
+0

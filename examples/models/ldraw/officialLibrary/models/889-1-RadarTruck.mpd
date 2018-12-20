@@ -1,0 +1,92 @@
+0 FILE 889 - Rader Truck.ldr
+0 Rader Truck
+0 Name: 889 - Rader Truck.ldr
+0 Author: Willy Tschager [Holly-Wood]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 !THEME Space / Classic Space
+0 !KEYWORDS moon, astronaut, 1979
+
+0 !HISTORY 2012-03-01 [Holly-Wood] Creation
+
+0 STEP
+1 0 0 0 0 1 0 0 0 1 0 0 0 1 889 - Truck.ldr
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 889 - Minifig.ldr
+
+0 FILE 889 - Truck.ldr
+0 Truck
+0 Name: 889 - Truck.ldr
+0 Author: Willy Tschager [Holly-Wood]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 !THEME Space / Classic Space
+0 !KEYWORDS moon, astronaut, 1979
+0 !HISTORY 2012-03-01 [Holly-Wood] Creation
+
+1 7 0 0 0 0 0 1 0 1 0 -1 0 0 3795.dat
+1 7 0 0 70 1 0 0 0 1 0 0 0 1 3023.dat
+0 STEP
+1 7 0 -16 -40 1 0 0 0 1 0 0 0 1 3787.dat
+1 7 0 -8 30 1 0 0 0 1 0 0 0 1 3023.dat
+1 7 0 -16 60 1 0 0 0 1 0 0 0 1 3787.dat
+0 STEP
+1 7 20 8 10 0 0 1 0 1 0 -1 0 0 3021.dat
+1 7 -20 8 10 0 0 1 0 1 0 -1 0 0 3021.dat
+1 7 0 8 -40 1 0 0 0 1 0 0 0 1 122c01.dat
+1 7 0 8 60 1 0 0 0 1 0 0 0 1 122c01.dat
+1 0 -30 14 -40 0 0 1 0 1 0 -1 0 0 3641.dat
+1 0 30 14 -40 0 0 1 0 1 0 -1 0 0 3641.dat
+1 0 30 14 60 0 0 1 0 1 0 -1 0 0 3641.dat
+1 0 -30 14 60 0 0 1 0 1 0 -1 0 0 3641.dat
+0 ROTSTEP 0 0 180 REL
+1 7 0 -16 -50 1 0 0 0 1 0 0 0 1 3794a.dat
+1 7 0 -16 60 0 0 1 0 1 0 -1 0 0 3020.dat
+0 ROTSTEP END
+1 7 0 -16 -50 -1 0 0 0 1 0 0 0 -1 3838.dat
+1 7 0 -16 -30 1 0 0 0 1 0 0 0 1 3829c01.dat
+1 7 0 -24 80 1 0 0 0 1 0 0 0 1 3956.dat
+1 7 0 -54 60 1 0 0 0 0 -1 0 1 0 3938.dat
+0 STEP
+1 16 0 -54 70 -1 0 0 0 -0.694658 0.71934 0 0.71934 0.694658 889 - Truck - Radar dish.ldr
+
+0 FILE 889 - Truck - Radar dish.ldr
+0 Truck - Radar dish
+0 Name: 889 - Truck - Radar dish.ldr
+0 Author: Willy Tschager [Holly-Wood]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 !THEME Space / Classic Space
+0 !KEYWORDS moon, astronaut, 1979
+0 !HISTORY 2012-03-01 [Holly-Wood] Creation
+
+1 7 0 -10 0 1 0 0 0 1 0 0 0 1 3937.dat
+1 7 0 14 10 1 0 0 0 1 0 0 0 1 3022.dat
+1 7 -10 22 0 1 0 0 0 1 0 0 0 1 3024.dat
+1 7 -10 30 0 1 0 0 0 1 0 0 0 1 3960.dat
+1 7 -10 62 0 1 0 0 0 0 -1 0 1 0 3959.dat
+
+0 FILE 889 - Minifig.ldr
+0 Minifig
+0 Name: 889 - Minifig.ldr
+0 Author: Willy Tschager [Holly-Wood]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 !THEME Space / Classic Space
+0 !KEYWORDS moon, astronaut, 1979
+0 !HISTORY 2012-03-01 [Holly-Wood] Creation
+
+1 4 0 -80 8 0.819152 0 0.573576 0 1 0 -0.573576 0 0.819152 3842a.dat
+1 14 0 -80 8 0.819152 0 0.573576 0 1 0 -0.573576 0 0.819152 3626bp01.dat
+1 4 0 -53 8 1 0 0 0 1 0 0 0 1 3838.dat
+1 4 0 -53 8 1 0 0 0 1 0 0 0 1 973p90.dat
+1 4 0 -21 8 1 0 0 0 1 0 0 0 1 3815.dat
+1 4 -15.552 -44 8 0.985 -0.17 0 0.17 0.985 0 0 0 1 3818.dat
+1 4 15.552 -44 8 0.985 0.151471 0.0771784 -0.17 0.877641 0.447181 0 -0.45399 0.891007 3819.dat
+1 4 -23.8634 -26.4044 -2.321 0.985 -0.12019 0.12019 0.17 0.696395 -0.696395 0 0.707 0.707 3820.dat
+1 4 22.7192 -33.0339 -9.7134 0.985 0.161655 -0.052525 -0.17 0.936649 -0.304336 0 0.30897 0.950913 3820.dat
+1 4 0 -9 8 1 0 0 0 0 1 0 -1 0 3816.dat
+1 4 0 -9 8 1 0 0 0 0 1 0 -1 0 3817.dat

@@ -1,0 +1,60 @@
+0 Technic Brick  1 x  2 with Hole
+0 Name: 3700.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2010-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-08-31 [izanette] Modified with WINDZ for BFC compliance
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-06-29 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2008-07-07 [guyvivan] Add missing element cylj4x8.dat and use more primitives (2005-11-30)
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+
+1 16 0 18 0 1 0 0 0 -1.5 0 0 0 1 STUD3A.DAT
+1 16 0 18 0 1 0 0 0 1 0 0 0 1 cylj4x8.DAT
+1 16 0 10 10 1 0 0 0 0 1 0 -1 0 peghole.dat
+1 16 0 10 -10 1 0 0 0 0 1 0 1 0 peghole.dat
+2 24 16 24 6 -16 24 6
+2 24 16 24 -6 -16 24 -6
+2 24 20 24 10 -20 24 10
+2 24 20 24 -10 -20 24 -10
+0 BFC INVERTNEXT
+1 16 12 14 0 0 0 4 0 -10 0 -6 0 0 box2-5.dat
+0 BFC INVERTNEXT
+1 16 -12 14 0 0 0 -4 0 -10 0 6 0 0 box2-5.dat
+1 16 0 10 6 8 0 0 0 0 8 0 -12 0 2-4cyli.DAT
+1 16 8 7 0 0 -1 0 -3 0 0 0 0 -6 rect2p.dat
+1 16 -8 7 0 0 1 0 -3 0 0 0 0 6 rect2p.dat
+1 16 0 10 6 8 0 0 0 0 8 0 1 0 2-4ndis.dat
+1 16 0 10 -6 8 0 0 0 0 8 0 -1 0 2-4ndis.dat
+4 16 16 24 6 16 4 6 8 4 6 8 18 6
+4 16 16 24 -6 8 18 -6 8 4 -6 16 4 -6
+4 16 -8 18 6 -8 4 6 -16 4 6 -16 24 6
+4 16 -8 18 -6 -16 24 -6 -16 4 -6 -8 4 -6
+4 16 16 24 6 8 18 6 -8 18 6 -16 24 6
+4 16 16 24 -6 -16 24 -6 -8 18 -6 8 18 -6
+4 16 20 24 10 16 24 6 -16 24 6 -20 24 10
+4 16 20 24 -10 -20 24 -10 -16 24 -6 16 24 -6
+4 16 20 24 10 20 24 -10 16 24 -6 16 24 6
+4 16 -20 24 10 -16 24 6 -16 24 -6 -20 24 -10
+0 BFC INVERTNEXT
+1 16 0 10 8 6 0 0 0 0 6 0 -16 0 4-4cyli.dat
+1 16 0 10 6 8 0 0 0 0 8 0 -1 0 2-4edge.DAT
+1 16 0 10 -6 8 0 0 0 0 8 0 -1 0 2-4edge.DAT
+1 16 0 24 0 0 0 -20 0 -24 0 -10 0 0 box3u2p.dat
+1 16 0 10 10 8 0 0 0 0 8 0 -1 0 4-4ndis.dat
+1 16 0 10 -10 8 0 0 0 0 8 0 1 0 4-4ndis.dat
+4 16 20 24 10 -20 24 10 -8 18 10 8 18 10
+4 16 20 24 -10 8 18 -10 -8 18 -10 -20 24 -10
+4 16 20 0 10 8 2 10 -8 2 10 -20 0 10
+4 16 20 0 -10 -20 0 -10 -8 2 -10 8 2 -10
+4 16 20 24 10 8 18 10 8 2 10 20 0 10
+4 16 20 24 -10 20 0 -10 8 2 -10 8 18 -10
+4 16 -20 24 10 -20 0 10 -8 2 10 -8 18 10
+4 16 -20 24 -10 -8 18 -10 -8 2 -10 -20 0 -10
+1 16 10 0 0 1 0 0 0 1 0 0 0 1 stud2.dat
+1 16 -10 0 0 1 0 0 0 1 0 0 0 1 stud2.dat
+0

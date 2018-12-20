@@ -1,0 +1,23 @@
+0 Technic Axle Hole Reduced Tooth Inner Edges
+0 Name: axl2hol9.dat
+0 Author: Michael Heidemann [mikeheide]
+0 !LDRAW_ORG Primitive UPDATE 2010-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+
+2 24 -3.743 0 4.577 -2.5 0 2.5
+2 24 -2.5 0 2.5 -4.577 0 3.743
+2 24 3.743 0 -4.577 2.5 0 -2.5
+2 24 2.5 0 -2.5 4.577 0 -3.743
+2 24 5.602 0 2 4 0 2
+2 24 4 0 2 2.5 0 2.5
+2 24 2.5 0 2.5 2 0 4
+2 24 2 0 4 2 0 5.602
+2 24 -5.602 0 -2 -4 0 -2
+2 24 -4 0 -2 -2.5 0 -2.5
+2 24 -2.5 0 -2.5 -2 0 -4
+2 24 -2 0 -4 -2 0 -5.602
+0

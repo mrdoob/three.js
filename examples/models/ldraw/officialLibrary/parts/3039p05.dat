@@ -1,0 +1,36 @@
+0 Slope Brick 45  2 x  2 with Black Grille Pattern
+0 Name: 3039p05.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2003-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-09-13 [izanette] Modified with WINDZ for BFC compliance
+0 !HISTORY 2003-03-08 [OrionP] Moved guts to subpart
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-06-09 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 s\3039s01.dat 
+
+ 4 16 20 20 -30 16 18 -28 -16 18 -28 -20 20 -30
+ 4 16 -20 20 -30 -16 18 -28 -16 2 -12 -20 0 -10
+ 4 16 -20 0 -10 -16 2 -12 16 2 -12 20 0 -10
+ 4 16 20 0 -10 16 2 -12 16 18 -28 20 20 -30
+
+ 4 16 14 18 -28 14 2 -12 11 2 -12 11 18 -28
+ 4 16 9 18 -28 9 2 -12 6 2 -12 6 18 -28
+ 4 16 4 18 -28 4 2 -12 1 2 -12 1 18 -28
+ 4 16 -1 18 -28 -1 2 -12 -4 2 -12 -4 18 -28
+ 4 16 -6 18 -28 -6 2 -12 -9 2 -12 -9 18 -28
+ 4 16 -11 18 -28 -11 2 -12 -14 2 -12 -14 18 -28
+
+ 4 0 -14 18 -28 -14 2 -12 -16 2 -12 -16 18 -28
+ 4 0 -9 18 -28 -9 2 -12 -11 2 -12 -11 18 -28
+ 4 0 -4 18 -28 -4 2 -12 -6 2 -12 -6 18 -28
+ 4 0 1 18 -28 1 2 -12 -1 2 -12 -1 18 -28
+ 4 0 6 18 -28 6 2 -12 4 2 -12 4 18 -28
+ 4 0 11 18 -28 11 2 -12 9 2 -12 9 18 -28
+ 4 0 16 18 -28 16 2 -12 14 2 -12 14 18 -28
+0

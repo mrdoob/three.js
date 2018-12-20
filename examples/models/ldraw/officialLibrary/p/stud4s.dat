@@ -1,0 +1,25 @@
+0 Stud Tube Open Sloped
+0 Name: stud4s.dat
+0 Author: Guy Vivan [guyvivan]
+0 !LDRAW_ORG Primitive UPDATE 2009-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HELP For use between a stud4a and a sloped surface. It is enough
+0 !HELP to know coordinates Y of the centre and that of the outside
+0 !HELP circle. The difference of both coordinates is the height of
+0 !HELP the primitive to be applied. Finally, this primitive can be
+0 !HELP used with all the parts sloped using a STUD4A. H = Y center
+0 !HELP sloped - Y common border.
+
+0 !HISTORY 2009-09-03 [PTadmin] Official Update 2009-02
+
+1 16 0 0 0 8 0 0 0 -1 0 0 0 8 4-4cyls.dat
+0 BFC INVERTNEXT
+1 16 0 -0.25 0 6 0 0 0 -0.75 0 0 0 6 4-4cyls.dat
+0 BFC INVERTNEXT
+1 16 0 0 0 6 0 0 0 -0.25 0 0 0 6 4-4cyli.dat
+1 16 0 -1 0 6 0 0 0.75 1 0 0 0 6 4-4edge.dat
+1 16 0 -1 0 8 0 0 1 1 0 0 0 8 4-4edge.dat
+0

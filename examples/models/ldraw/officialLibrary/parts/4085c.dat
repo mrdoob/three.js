@@ -1,0 +1,33 @@
+0 Plate  1 x  1 with Clip Vertical (Thick U-Clip)
+0 Name: 4085c.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2013-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2001-11-29 [cwdee] rewrite
+0 !HISTORY 2001-11-30 [PTadmin] Official Update 2001-02
+0 !HISTORY 2003-01-28 [sbliss] Completed header
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-07-01 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2013-08-07 [C3POwen] Utilised clip2.dat primitive
+0 !HISTORY 2013-12-23 [PTadmin] Official Update 2013-02
+
+4 16 -6 8 6 -6 8 -6 -10 8 -10 -10 8 10
+4 16 6 8 6 -6 8 6 -10 8 10 10 8 10
+4 16 6 8 -6 6 8 6 10 8 10 10 8 -10
+3 16 -10 8 -10 -6 8 -6 -4.75 8 -10
+4 16 6 8 -6 4.75 8 -10 -4.75 8 -10 -6 8 -6
+3 16 4.75 8 -10 6 8 -6 10 8 -10
+0 BFC INVERTNEXT
+1 16 0 8 0 -6 0 0 0 -4 0 0 0 -6 box5.dat
+1 16 0 4 -10 0 0 10 4 0 0 0 20 0 box3u2p.dat
+3 16 -10 0 10 -10 0 -10 -4.75 0 -10
+4 16 -10 0 10 -4.75 0 -10 4.75 0 -10 10 0 10
+3 16 10 0 10 4.75 0 -10 10 0 -10
+1 16 -7.375 4 -10 0 0 2.625 4 0 0 0 1 0 rect3.dat
+1 16 0 4 -10 1 0 0 0 1 0 0 0 1 clip2.dat
+1 16 7.375 4 -10 0 0 -2.625 -4 0 0 0 1 0 rect3.dat
+1 16 0 0 0 0 0 -1 0 1 0 1 0 0 stud.dat

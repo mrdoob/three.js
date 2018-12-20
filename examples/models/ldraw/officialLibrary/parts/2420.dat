@@ -1,0 +1,38 @@
+0 Plate  2 x  2 Corner
+0 Name: 2420.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2003-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-09-08 [jriley] BFC compliant
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-05-08 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 4 10 1 0 0 0 -1 0 0 0 1 stud3.dat
+1 16 10 4 0 1 0 0 0 -1 0 0 0 1 stud3.dat
+4 16 10 8 30 6 8 26 -6 8 26 -10 8 30
+4 16 -10 8 30 -6 8 26 -6 8 -6 -10 8 -10
+4 16 -10 8 -10 -6 8 -6 26 8 -6 30 8 -10
+4 16 30 8 -10 26 8 -6 26 8 6 30 8 10
+4 16 30 8 10 26 8 6 6 8 6 10 8 10
+4 16 10 8 10 6 8 6 6 8 26 10 8 30
+4 16 26 4 -6 -6 4 -6 6 4 6 26 4 6
+4 16 6 4 26 6 4 6 -6 4 -6 -6 4 26
+4 16 30 0 10 10 0 10 -10 0 -10 30 0 -10
+4 16 10 0 10 10 0 30 -10 0 30 -10 0 -10
+1 16 20 4 0 0 10 0 4 0 0 0 0 10 box2-5.dat
+1 16 0 4 20 0 10 0 4 0 0 0 0 10 box2-5.dat
+1 16 10 4 10 0 -20 0 4 0 0 0 0 -20 box2-5.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 stud.dat
+1 16 20 0 0 1 0 0 0 1 0 0 0 1 stud.dat
+1 16 0 0 20 1 0 0 0 1 0 0 0 1 stud.dat
+0 BFC INVERTNEXT
+1 16 0 6 16 0 6 0 2 0 0 0 0 10 box2-5.dat
+0 BFC INVERTNEXT
+1 16 16 6 0 0 10 0 2 0 0 0 0 6 box2-5.dat
+0 BFC INVERTNEXT
+1 16 10 6 10 0 -16 0 2 0 0 0 0 -16 box2-5.dat
+0

@@ -1,0 +1,31 @@
+0 Plate  1 x  2 without Groove with 1 Centre Stud
+0 Name: 3794a.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2011-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS jumper, offset, tile, spacer
+
+0 !HISTORY 2002-07-16 [fwcain] Added keywords.
+0 !HISTORY 2002-08-18 [PTadmin] Official Update 2002-04
+0 !HISTORY 2004-07-25 [guyvivan] Made BFC Compliant
+0 !HISTORY 2004-11-06 [PTadmin] Official Update 2004-04
+0 !HISTORY 2007-06-29 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2011-11-12 [PTadmin] Renamed from 3794
+0 !HISTORY 2011-12-05 [MagFors] Retitled, was "Plate  1 x  2 with 1 Stud" 
+0 !HISTORY 2011-12-29 [PTadmin] Official Update 2011-02
+
+1 16 0 4 0 1 0 0 0 -1 0 0 0 1 stud3.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 16 0 0 0 -4 0 0 0 6 box5.dat
+0 
+4 16 20 8 10 16 8 6 -16 8 6 -20 8 10
+4 16 -20 8 10 -16 8 6 -16 8 -6 -20 8 -10
+4 16 -20 8 -10 -16 8 -6 16 8 -6 20 8 -10
+4 16 20 8 -10 16 8 -6 16 8 6 20 8 10
+1 16 0 8 0 20 0 0 0 -8 0 0 0 10 box5.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 stud2.dat
+0
+

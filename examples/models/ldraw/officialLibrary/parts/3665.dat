@@ -1,0 +1,12 @@
+0 ~Moved to 3665a
+0 Name: 3665.dat
+0 Author: [PTadmin]
+0 !LDRAW_ORG Part UPDATE 2018-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2018-12-08 [PTadmin] Official Update 2018-02
+
+0 // Slope Brick 45  2 x  1 Inverted
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 3665a.dat

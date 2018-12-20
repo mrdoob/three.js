@@ -1,0 +1,47 @@
+0 ~Slope Brick 45  2 x  1 Inverted without Inner Stopper Ring and Front Face
+0 Name: s\3665as01.dat
+0 Author: Michael Heidemann [mikeheide]
+0 !LDRAW_ORG Subpart UPDATE 2018-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+
+0 !HISTORY 2008-07-11 [mkennedy] Made use of stud2s and more box and rect primitives.
+0 !HISTORY 2010-05-18 [Steffen] corrected stud orientation
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+0 !HISTORY 2016-01-11 [PTadmin] Renamed from s/3665s01
+0 !HISTORY 2018-12-08 [PTadmin] Official Update 2018-02
+
+0 BFC INVERTNEXT
+1 16 0 24 0 6 0 0 0 -20 0 0 0 6 box5.dat
+4 16 -10 24 10 -6 24 6 6 24 6 10 24 10
+4 16 -10 24 -10 -6 24 -6 -6 24 6 -10 24 10
+4 16 10 24 -10 6 24 -6 -6 24 -6 -10 24 -10
+4 16 10 24 10 6 24 6 6 24 -6 10 24 -10
+2 24 10 24 -10 10 24 10
+2 24 10 24 -10 -10 24 -10
+2 24 -10 24 -10 -10 24 10
+2 24 10 4 -30 10 24 -10
+2 24 -10 4 -30 -10 24 -10
+2 24 10 0 -30 10 0 10
+2 24 -10 0 -30 -10 0 10
+2 24 -8 0 -10 -8 0 -26
+2 24 8 0 -26 8 0 -10
+0 BFC INVERTNEXT
+1 16 0 10 -18 8 0 0 0 2 -8 0 0 -8 box2-5.dat
+4 16 10 24 10 10 24 -10 10 4 -30 10 0 10
+3 16 10 0 10 10 4 -30 10 0 -30
+1 16 0 12 10 10 0 0 0 0 12 0 -1 0 rect.dat
+4 16 -10 24 10 -10 0 10 -10 4 -30 -10 24 -10
+3 16 -10 0 -30 -10 4 -30 -10 0 10
+1 16 0 2 -30 10 0 0 0 0 2 0 1 0 rect.dat
+4 16 8 4 -26 8 20 -10 8 0 -10 8 0 -26
+4 16 -8 4 -26 -8 0 -26 -8 0 -10 -8 20 -10
+1 16 0 10 -10 8 0 0 0 0 -10 0 1 0 rect3.dat
+4 16 -10 0 10 10 0 10 8 0 -10 -8 0 -10
+4 16 -10 0 -30 -10 0 10 -8 0 -10 -8 0 -26
+4 16 10 0 -30 -10 0 -30 -8 0 -26 8 0 -26
+4 16 10 0 10 10 0 -30 8 0 -26 8 0 -10
+1 16 0 0 0 0 0 1 0 1 0 -1 0 0 stud.dat
+1 16 0 4 -20 1 0 0 0 2 0 0 0 1 stud2a.dat
+1 16 0 4 -20 0 0 1 0 6 0 -1 0 0 stud2s.dat

@@ -1,0 +1,40 @@
+0 Plate  2 x  2 with Pin Type 1
+0 Name: 2476a.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-06-08 [jriley] BFC compliant, ring substitutions
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-05-13 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 8 0 1 0 0 0 -1 0 0 0 1 connect.dat
+1 16 0 4 0 4 0 0 0 1 0 0 0 4 4-4edge.dat
+1 16 0 4 0 8 0 0 0 1 0 0 0 8 4-4edge.dat
+0 BFC INVERTNEXT
+1 16 0 4 0 4 0 0 0 4 0 0 0 4 4-4cyli.dat
+1 16 0 4 0 8 0 0 0 4 0 0 0 8 4-4cyli.dat
+1 16 0 8 0 11 0 0 0 1 0 0 0 11 4-4edge.dat
+1 16 0 8 0 13 0 0 0 1 0 0 0 13 4-4edge.dat
+1 16 0 4 0 11 0 0 0 1 0 0 0 11 4-4edge.dat
+1 16 0 4 0 13 0 0 0 1 0 0 0 13 4-4edge.dat
+0 BFC INVERTNEXT
+1 16 0 4 0 11 0 0 0 4 0 0 0 11 4-4cyli.dat
+1 16 0 4 0 13 0 0 0 4 0 0 0 13 4-4cyli.dat
+1 16 0 8 0 1 0 0 0 -1 0 0 0 -1 4-4rin11.dat
+1 16 0 8 0 1 0 0 0 -1 0 0 0 -1 4-4rin12.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 16 0 0 0 -4 0 0 0 16 box5.dat
+4 16 20 8 20 16 8 16 -16 8 16 -20 8 20
+4 16 -20 8 -20 -16 8 -16 16 8 -16 20 8 -20
+4 16 20 8 -20 16 8 -16 16 8 16 20 8 20
+4 16 -20 8 20 -16 8 16 -16 8 -16 -20 8 -20
+1 16 0 8 0 20 0 0 0 -8 0 0 0 20 box5.dat
+1 16 10 0 10 1 0 0 0 1 0 0 0 1 stud2.dat
+1 16 -10 0 10 1 0 0 0 1 0 0 0 1 stud2.dat
+1 16 10 0 -10 1 0 0 0 1 0 0 0 1 stud2.dat
+1 16 -10 0 -10 1 0 0 0 1 0 0 0 1 stud2.dat
+0

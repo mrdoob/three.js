@@ -1,0 +1,47 @@
+0 Brick  4 x  4 Round with Pinhole and Snapstud
+0 Name: 87081.dat
+0 Author: Magnus Forsberg [MagFors]
+0 !LDRAW_ORG Part UPDATE 2011-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 !HELP turntable together with 61485
+
+0 BFC CERTIFY CCW
+
+0 !KEYWORDS Turntable
+
+0 !HISTORY 2011-12-29 [PTadmin] Official Update 2011-02
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 s\87081s01.dat
+1 16 0 0 0 0 0 1 0 1 0 1 0 0 s\87081s01.dat
+1 16 0 0 0 0 0 -1 0 1 0 1 0 0 s\87081s01.dat
+1 16 0 0 0 -1 0 0 0 1 0 0 0 1 s\87081s01.dat
+1 16 0 0 0 -1 0 0 0 1 0 0 0 -1 s\87081s01.dat
+1 16 0 0 0 0 0 -1 0 1 0 -1 0 0 s\87081s01.dat
+1 16 0 0 0 0 0 1 0 1 0 -1 0 0 s\87081s01.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 -1 s\87081s01.dat
+1 16 0 0 0 14 0 0 0 1 0 0 0 14 48\4-4aring.dat
+1 16 0 4 0 20 0 0 0 -1 0 0 0 20 48\4-4aring.dat
+0 // click lock against part 61485
+1 16 36 23.5 0 0 0 -0.75 0 -19.5 0 -0.75 0 0 2-4cylc.dat
+2 24 36 23.5 0 35.951 23.5 0.74
+2 24 35.951 4 0.74 35.951 23.5 0.74
+2 24 35.951 23.5 -0.74 36 23.5 0
+2 24 35.951 4 -0.74 35.951 23.5 -0.74
+1 16 -36 23.5 0 0 0 0.75 0 -19.5 0 0.75 0 0 2-4cylc.dat
+2 24 -36 23.5 0 -35.951 23.5 0.74
+2 24 -35.951 4 0.74 -35.951 23.5 0.74
+2 24 -35.951 23.5 -0.74 -36 23.5 0
+2 24 -35.951 4 -0.74 -35.951 23.5 -0.74
+1 16 0 20 0 8 0 0 0 1 0 0 0 8 4-4edge.dat
+1 16 0 20 0 1 0 0 0 -1 0 0 0 1 stud18a.dat
+1 16 -20 20 0 1 0 0 0 -1 0 0 0 -1 stud4a.dat
+1 16 20 20 0 1 0 0 0 -1 0 0 0 -1 stud4a.dat
+1 16 0 20 20 1 0 0 0 -1 0 0 0 -1 stud4a.dat
+1 16 0 20 -20 1 0 0 0 -1 0 0 0 -1 stud4a.dat
+1 16 20 0 0 1 0 0 0 1 0 0 0 1 stug-2x2.dat
+1 16 -20 0 0 1 0 0 0 1 0 0 0 1 stug-2x2.dat
+1 16 -10 0 30 1 0 0 0 1 0 0 0 1 stud.dat
+1 16 10 0 30 1 0 0 0 1 0 0 0 1 stud.dat
+1 16 -10 0 -30 1 0 0 0 1 0 0 0 1 stud.dat
+1 16 10 0 -30 1 0 0 0 1 0 0 0 1 stud.dat

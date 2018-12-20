@@ -1,0 +1,112 @@
+0 FILE 6966 - Jedi Starfighter - Mini.mpd
+0 Jedi Starfighter - Mini
+0 Name: 6966 - Jedi Starfighter - Mini.mpd
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 !HISTORY 2018-12-08 [technicbasics] OMRize File
+
+0 ROTATION CENTER 0 0 0 1 "Custom" 
+0 ROTATION CONFIG 0 0
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 6966 - Part 4.ldr
+0 FILE 6966 - Part 1.ldr
+0 Part 1
+0 Name: 6966 - Part 1.ldr
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom"
+0 ROTATION CONFIG 0 0
+1 72 -50 0 30 1 0 0 0 1 0 0 0 1 32000.dat
+1 71 -60 10 20 0 0 1 0 1 0 -1 0 0 4274.dat
+1 71 -40 10 20 0 0 1 0 1 0 -1 0 0 4274.dat
+0 STEP
+1 0 -50 10 12 -1 0 0 0 0 1 0 1 0 3794a.dat
+0 STEP
+1 40 -50 10 4 -1 0 0 0 0 1 0 1 0 4740.dat
+1 40 -50 0 40 1 0 0 0 1 0 0 0 1 30602.dat
+
+
+
+
+0 FILE 6966 - Part 2.ldr
+0 Part 2
+0 Name: 6966 - Part 2.ldr
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom"
+0 ROTATION CONFIG 0 0
+1 72 -30 0 40 0 0 -1 0 1 0 1 0 0 2450.dat
+1 72 -30 0 -60 1 0 0 0 1 0 0 0 1 2450.dat
+1 0 -10 0 -10 0 0 -1 0 1 0 1 0 0 2540.dat
+0 STEP
+1 72 -40 -8 -10 0 0 -1 0 1 0 1 0 0 44570.dat
+0 STEP
+1 15 -30 -8 -60 0 0 -1 0 1 0 1 0 0 6141.dat
+1 14 -50 -8 -60 0 0 1 0 1 0 -1 0 0 4081a.dat
+1 14 -40 -8 -110 1 0 0 0 1 0 0 0 1 41770.dat
+1 0 -10 -16 -10 0 0 -1 0 1 0 1 0 0 2540.dat
+1 14 10 2 10 0.766044 0 -0.642788 0.642788 0 0.766044 0 -1 0 2335.dat
+0 STEP
+1 14 10 -14 10 -0.766044 0 -0.642788 0.642788 0 -0.766044 0 -1 0 2335.dat
+1 14 -50 -16 -30 0 0 -1 0 1 0 1 0 0 6636.dat
+1 71 -70 -6 -140 0 0 -1 1 0 0 0 -1 0 3957a.dat
+
+
+
+
+0 FILE 6966 - Part 3.ldr
+0 Part 3
+0 Name: 6966 - Part 3.ldr
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom"
+0 ROTATION CONFIG 0 0
+1 72 10 0 40 -1 0 0 0 1 0 0 0 -1 2450.dat
+1 72 10 0 -60 0 0 1 0 1 0 -1 0 0 2450.dat
+1 0 -10 0 -10 0 0 1 0 1 0 -1 0 0 2540.dat
+0 STEP
+1 72 20 -8 -10 0 0 1 0 1 0 -1 0 0 44570.dat
+0 STEP
+1 15 10 -8 -60 0 0 -1 0 1 0 1 0 0 6141.dat
+1 14 30 -8 -60 0 0 -1 0 1 0 1 0 0 4081a.dat
+1 14 20 -8 -110 1 0 0 0 1 0 0 0 1 41769.dat
+1 0 -10 -16 -10 0 0 1 0 1 0 -1 0 0 2540.dat
+1 14 -30 2 -30 -0.766044 0 0.642788 0.642788 0 0.766044 0 1 0 2335.dat
+0 STEP
+1 14 -30 -14 -30 0.766044 0 0.642788 0.642788 0 -0.766044 0 1 0 2335.dat
+1 14 30 -16 -30 0 0 -1 0 1 0 1 0 0 6636.dat
+1 71 50 -6 -140 0 0 -1 1 0 0 0 -1 0 3957a.dat
+
+
+
+
+0 FILE 6966 - Part 4.ldr
+0 Part 4
+0 Name: 6966 - Part 4.ldr
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom"
+0 ROTATION CONFIG 0 0
+1 72 -30 0 -20 1 0 0 0 1 0 0 0 1 32000.dat
+1 72 -40 10 -10 1 0 0 0 0 -1 0 1 0 3062b.dat
+1 72 -20 10 -10 1 0 0 0 0 -1 0 1 0 3062b.dat
+0 STEP
+1 71 -40 10 -30 0 -1 0 0 0 -1 1 0 0 4274.dat
+1 71 -20 10 -30 0 -1 0 0 0 -1 1 0 0 4274.dat
+0 STEP
+1 72 -30 0 -40 1 0 0 0 1 0 0 0 1 32000.dat
+0 STEP
+1 0 -20 -8 -30 0 0 -1 0 1 0 1 0 0 44567.dat
+1 0 -40 -8 -30 0 0 1 0 1 0 -1 0 0 44567.dat
+0 STEP
+1 0 20 -8 -90 1 0 0 0 1 0 0 0 1 6966 - Part 1.ldr
+1 72 -30 -8 -10 -1 0 0 0 1 0 0 0 -1 30602.dat
+0 STEP
+1 72 60.905 29.022 -40 0.906308 -0.422618 0 0.422618 0.906308 0 0 0 1 6966 - Part 2.ldr
+0 STEP
+1 5 -102.78 20.569 -40 0.906308 0.422618 0 -0.422618 0.906308 0 0 0 1 6966 - Part 3.ldr

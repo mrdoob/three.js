@@ -1,0 +1,27 @@
+0 ~Brick  1 x  2 with One Stud and Square Hole
+0 Name: 30472.dat
+0 Author: Michael Heidemann [mikeheide]
+0 !LDRAW_ORG Part UPDATE 2010-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+
+1 16 0 4 0 1 0 0 0 -5 0 0 0 1 stud3.dat
+0 BFC INVERTNEXT
+1 16 0 24 0 16 0 0 0 -20 0 0 0 6 box5.dat
+4 16 -20 24 10 -16 24 6 16 24 6 20 24 10
+4 16 20 24 10 16 24 6 16 24 -6 20 24 -10
+4 16 20 24 -10 16 24 -6 -16 24 -6 -20 24 -10
+4 16 -20 24 -10 -16 24 -6 -16 24 6 -20 24 10
+1 16 0 12 0 0 20 0 12 0 0 0 0 10 box3u4a.dat
+0 BFC INVERTNEXT
+1 16 10 0 0 6 0 0 0 2 0 0 0 6 box5.dat
+1 16 -10 24 0 0 0 -10 0 -24 0 10 0 0 box4-4a.dat
+1 16 -10 0 0 1 0 0 0 1 0 0 0 1 stud.dat
+4 16 20 0 -10 16 0 -6 16 0 6 20 0 10
+4 16 0 0 -10 4 0 -6 16 0 -6 20 0 -10
+4 16 0 0 10 4 0 6 4 0 -6 0 0 -10
+4 16 20 0 10 16 0 6 4 0 6 0 0 10
+0 //

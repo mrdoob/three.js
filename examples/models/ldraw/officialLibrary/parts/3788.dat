@@ -1,0 +1,66 @@
+0 Car Mudguard  2 x  4
+0 Name: 3788.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2017-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2007-12-20 [PTadmin]      Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin]      Official Update 2008-01
+0 !HISTORY 2008-07-07 [DeannaEarley] Removed erroneous BFC CERTIFY entry; Corrected stud orientation; Made some use of primitives (2005-08-29)
+0 !HISTORY 2009-05-02 [PTadmin]      Official Update 2009-01
+0 !HISTORY 2017-01-09 [Steffen]      compacted file
+0 !HISTORY 2017-12-30 [PTadmin] Official Update 2017-01
+
+1 16 -30 0 0 0 0 1 0 1 0 -1 0 0 stug-1x2.dat
+1 16 30 0 0 0 0 1 0 1 0 -1 0 0 stug-1x2.dat
+1 16 0 8 0 0 0 1 0 1 0 -1 0 0 stug-2x2.dat
+0 BFC INVERTNEXT
+1 16 0 16 0 16 0 0 0 -4 0 0 0 16 box5.dat
+1 16 18 16 0 2 0 0 0 -1 0 0 0 -16 rect1.dat
+1 16 -18 16 0 -2 0 0 0 -1 0 0 0 16 rect1.dat
+1 16 0 16 18 -40 0 0 0 -1 0 0 0 2 rect3.dat
+1 16 0 16 -18 40 0 0 0 -1 0 0 0 -2 rect3.dat
+2 24 20 16 16 40 16 16
+2 24 -20 16 16 -40 16 16
+2 24 20 16 -16 40 16 -16
+2 24 -20 16 -16 -40 16 -16
+2 24 36 16 16 36 4 16
+2 24 36 16 -16 36 4 -16
+2 24 -36 16 16 -36 4 16
+2 24 -36 16 -16 -36 4 -16
+1 16 30 4 0 6 0 0 0 -1 0 0 0 16 rect.dat
+1 16 -30 4 0 6 0 0 0 -1 0 0 0 16 rect.dat
+1 16 0 8 0 20 0 0 0 1 0 0 0 20 rect.dat
+1 16 40 4 0 0 -20 0 0 0 -4 20 0 0 box4-4a.dat
+1 16 -40 4 0 0 20 0 0 0 -4 20 0 0 box4-4a.dat
+4 16 40 0 20 40 5 8 40 16 16 40 16 20
+4 16 40 16 -20 40 16 -16 40 5 -8 40 0 -20
+4 16 40 0 -20 40 5 -8 40 5 8 40 0 20
+3 16 36 16 16 36 5 8 36 4 16
+3 16 36 4 -16 36 5 -8 36 16 -16
+4 16 36 4 16 36 5 8 36 5 -8 36 4 -16
+1 16 24 5 0 0 -1 0 0 0 1 -16 0 0 rect3.dat
+1 16 22 11 0 2 -5 0 -5 -2 0 0 0 -16 rect2p.dat
+1 16 -24 5 0 0 1 0 0 0 1 16 0 0 rect3.dat
+1 16 -22 11 0 -2 5 0 -5 -2 0 0 0 16 rect2p.dat
+3 16 -36 4 16 -36 5 8 -36 16 16
+3 16 -36 16 -16 -36 5 -8 -36 4 -16
+4 16 -36 4 -16 -36 5 -8 -36 5 8 -36 4 16
+4 16 -40 16 20 -40 16 16 -40 5 8 -40 0 20
+4 16 -40 0 -20 -40 5 -8 -40 16 -16 -40 16 -20
+4 16 -40 0 20 -40 5 8 -40 5 -8 -40 0 -20
+1 16 0 12 20 0 0 40 -4 0 0 0 -1 0 rect2p.dat
+4 16 36 16 16 36 4 16 24 4 16 20 16 16
+4 16 -20 16 16 -24 4 16 -36 4 16 -36 16 16
+4 16 20 16 -16 24 4 -16 36 4 -16 36 16 -16
+4 16 -36 16 -16 -36 4 -16 -24 4 -16 -20 16 -16
+1 16 0 12 -20 0 0 -40 -4 0 0 0 1 0 rect2p.dat
+1 16 38 10.5 -12 -2 0 0 0 -8 -5.5 0 -11 4 rect3.dat
+1 16 38 5 0 -2 0 0 0 -1 0 0 0 8 rect3.dat
+1 16 38 10.5 12 0 0 2 5.5 -8 0 4 11 0 rect2p.dat
+1 16 -38 5 0 2 0 0 0 -1 0 0 0 -8 rect.dat
+1 16 -38 10.5 12 0 0 -2 -5.5 -8 0 -4 11 0 rect2p.dat
+1 16 -38 10.5 -12 0 0 -2 5.5 -8 0 -4 -11 0 rect2p.dat
+1 16 0 12 0 1 0 0 0 -1 0 0 0 1 stud4.dat

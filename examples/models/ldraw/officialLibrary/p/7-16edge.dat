@@ -1,0 +1,19 @@
+0 Circle 0.4375
+0 Name: 7-16edge.dat
+0 Author: Orion Pobursky [OrionP]
+0 !LDRAW_ORG Primitive UPDATE 2017-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2009-05-02 [PTadmin] Official Update 2009-01
+0 !HISTORY 2017-01-15 [Steffen] BFCed
+0 !HISTORY 2017-12-30 [PTadmin] Official Update 2017-01
+
+2 24 1 0 0 .9239 0 .3827
+2 24 .9239 0 .3827 .7071 0 .7071
+2 24 .7071 0 .7071 .3827 0 .9239
+2 24 .3827 0 .9239 0 0 1
+2 24 0 0 1 -.3827 0 .9239
+2 24 -.3827 0 .9239 -.7071 0 .7071
+2 24 -.7071 0 .7071 -.9239 0 .3827

@@ -1,0 +1,28 @@
+0 ~Tile  1 x  6 without Top Face
+0 Name: s\6636s01.dat
+0 Author: C.L.Rasmussen [johnny-thunder]
+0 !LDRAW_ORG Subpart UPDATE 2009-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
+
+1 16 40 4 0 1 0 0 0 -1 0 0 0 -1 stud3.dat
+1 16 20 4 0 1 0 0 0 -1 0 0 0 -1 stud3.dat
+1 16 0 4 0 1 0 0 0 -1 0 0 0 -1 stud3.dat
+1 16 -20 4 0 1 0 0 0 -1 0 0 0 -1 stud3.dat
+1 16 -40 4 0 1 0 0 0 -1 0 0 0 -1 stud3.dat
+1 16 0 7 0 60 0 0 0 -7 0 0 0 10 box4.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 56 0 0 0 -4 0 0 0 6 box5.dat
+4 16 59 8 9 56 8 6 -56 8 6 -59 8 9
+4 16 -59 8 9 -56 8 6 -56 8 -6 -59 8 -9
+4 16 -59 8 -9 -56 8 -6 56 8 -6 59 8 -9
+4 16 59 8 -9 56 8 -6 56 8 6 59 8 9
+1 16 0 8 0 59 0 0 0 -1 0 0 0 9 box4.dat
+4 16 60 7 10 59 7 9 -59 7 9 -60 7 10
+4 16 -60 7 10 -59 7 9 -59 7 -9 -60 7 -10
+4 16 -60 7 -10 -59 7 -9 59 7 -9 60 7 -10
+4 16 60 7 -10 59 7 -9 59 7 9 60 7 10
+0

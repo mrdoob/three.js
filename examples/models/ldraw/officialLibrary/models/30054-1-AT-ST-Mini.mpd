@@ -1,0 +1,142 @@
+0 FILE 30054 - AT-ST.ldr
+0 AT-ST
+0 Name: 30054 - AT-ST.ldr
+0 Author: Jude Parrill
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 !THEME Star Wars / Mini / Star Wars Episode 4/5/6
+
+0 !HISTORY 2016-02-22 [legolijntje] Updated ~moved references
+
+0 // ROTSTEP 35 55 0 ABS
+
+1 0 0 0 10 1 0 0 0 1 0 0 0 1 3794a.dat
+1 0 0 0 -10 1 0 0 0 1 0 0 0 1 3794a.dat
+0 STEP
+1 71 0 -8 -10 0 0 1 0 1 0 -1 0 0 3623.dat
+0 STEP
+1 71 0 -16 10 0 0 1 0 1 0 -1 0 0 3623.dat
+1 72 0 -12 -30 1 0 0 0 1 0 0 0 1 30162.dat
+0 STEP
+1 0 0 -40 10 1 0 0 0 1 0 0 0 1 3005.dat
+1 71 0 -40 -10 0 0 1 0 1 0 -1 0 0 47905.dat
+1 71 0 -40 30 0 0 1 0 1 0 -1 0 0 47905.dat
+0 STEP
+1 71 0 -64 30 0 0 1 0 1 0 -1 0 0 6541.dat
+1 72 0 -48 0 0 0 1 0 1 0 -1 0 0 3023.dat
+1 72 0 -56 0 0 0 1 0 1 0 -1 0 0 3023.dat
+1 0 0 -64 0 0 0 1 0 1 0 -1 0 0 3794a.dat
+0 STEP
+1 71 18 -40 20 0 -1 0 0 0 1 -1 0 0 3022.dat
+1 71 26 -50 20 0 -1 0 0 0 1 -1 0 0 3069b.dat
+1 71 -18 -40 20 0 1 0 0 0 1 1 0 0 3022.dat
+1 71 -26 -50 20 0 1 0 0 0 1 1 0 0 3069b.dat
+0 STEP
+1 71 18 -30 -20 0 -1 0 0 0 1 -1 0 0 43723.dat
+1 71 -18 -30 -20 0 1 0 0 0 1 1 0 0 43722.dat
+0 STEP
+1 0 26 -30 0 0 -1 0 0 0 1 -1 0 0 3794a.dat
+1 0 -26 -30 0 0 1 0 0 0 1 1 0 0 3794a.dat
+0 STEP
+1 71 0 -72 30 1 0 0 0 1 0 0 0 1 32028.dat
+1 72 0 -72 0 1 0 0 0 1 0 0 0 1 2540.dat
+1 71 20 -70 -20 0 -1 0 -0.309017 0 0.951057 -0.951057 0 -0.309017 2335.dat
+0 STEP
+1 72 34 -30 0 0 -1 0 0 0 1 -1 0 0 4740.dat
+1 71 42 -30 0 0 -1 0 -1 0 0 0 0 -1 4592.dat
+1 0 42 -30 0 0 0 -1 -1 0 0 0 1 0 4593.dat
+0 STEP
+0 ROTSTEP 35 -125 0 ABS
+1 72 -34 -30 0 0 1 0 0 0 1 1 0 0 4740.dat
+1 71 -46 -30 4 0 0 1 -1 0 0 0 -1 0 4599a.dat
+0 STEP
+1 71 0 8 0 1 0 0 0 1 0 0 0 1 2476a.dat
+0 STEP
+1 71 0 26 0 1 0 0 0 1 0 0 0 1 30054 - Hips.ldr
+
+0 FILE 30054 - Hips.ldr
+0 Hips
+0 Name: 30054 - Hips.ldr
+0 Author: Jude Parrill
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 !THEME Star Wars / Mini / Star Wars Episode 4/5/6
+0 ROTSTEP 35 -125 0 ABS
+1 71 0 0 20 1 0 0 0 1 0 0 0 1 4519.dat
+1 71 20 0 20 0 0 -1 0 1 0 1 0 0 32039.dat
+0 STEP
+1 72 0 0 20 -1 0 0 0 0 -1 0 -1 0 6536.dat
+1 71 -20 0 20 0 0 1 0 1 0 -1 0 0 32039.dat
+0 STEP
+1 0 -40 0 30 0 0 1 0 1 0 -1 0 0 32062.dat
+1 0 40 0 30 0 0 1 0 1 0 -1 0 0 32062.dat
+0 STEP
+1 72 -40 0 50 -1 0 0 0 1 0 0 0 -1 30553.dat
+1 72 40 0 50 -1 0 0 0 1 0 0 0 -1 30553.dat
+0 STEP
+1 72 40 0 60 1 0 0 0 0 -1 0 1 0 30054 - Left Leg.ldr
+0 STEP
+1 72 -40 0 60 1 0 0 0 0 -1 0 1 0 30054 - Right Leg.ldr
+
+0 FILE 30054 - Left Leg.ldr
+0 Left Leg
+0 Name: 30054 - Left Leg.ldr
+0 Author: Jude Parrill
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 !THEME Star Wars / Mini / Star Wars Episode 4/5/6
+0 ROTSTEP 35 -125 0 ABS
+1 71 0 0 -20 -1 0 0 0 1 0 0 0 -1 30554a.dat
+0 STEP
+1 71 0 0 -40 1 0 0 0 0.707107 0.707107 0 -0.707107 0.707107 30054 - Left Ankle.ldr
+
+0 FILE 30054 - Left Ankle.ldr
+0 Left Ankle
+0 Name: 30054 - Left Ankle.ldr
+0 Author: Jude Parrill
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 !THEME Star Wars / Mini / Star Wars Episode 4/5/6
+0 ROTSTEP 35 -125 0 ABS
+1 71 0 0 -20 -1 0 0 0 1 0 0 0 -1 30554a.dat
+0 STEP
+1 71 0 0 -40 1 0 0 0 0.707107 0.707107 0 -0.707107 0.707107 30054 - Foot.ldr
+
+0 FILE 30054 - Foot.ldr
+0 Foot
+0 Name: 30054 - Foot.ldr
+0 Author: Jude Parrill
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 !THEME Star Wars / Mini / Star Wars Episode 4/5/6
+0 ROTSTEP 35 -125 0 ABS
+1 71 0 14 0 0 0 -1 0 1 0 1 0 0 6141.dat
+1 71 0 14 -40 0 0 -1 0 1 0 1 0 0 4740.dat
+0 STEP
+1 72 0 6 -20 0 0 -1 0 1 0 1 0 0 44300.dat
+
+0 FILE 30054 - Right Leg.ldr
+0 Right Leg
+0 Name: 30054 - Right Leg.ldr
+0 Author: Jude Parrill
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 !THEME Star Wars / Mini / Star Wars Episode 4/5/6
+0 ROTSTEP 35 -125 0 ABS
+1 71 0 0 -20 -1 0 0 0 1 0 0 0 -1 30554a.dat
+0 STEP
+1 0 0 0 -40 1 0 0 0 0.707107 0.707107 0 -0.707107 0.707107 30054 - Right Ankle.ldr
+
+0 FILE 30054 - Right Ankle.ldr
+0 Right Ankle
+0 Name: 30054 - Right Ankle.ldr
+0 Author: Jude Parrill
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 !THEME Star Wars / Mini / Star Wars Episode 4/5/6
+0 ROTSTEP 35 -125 0 ABS
+1 71 0 0 -20 -1 0 0 0 1 0 0 0 -1 30554a.dat
+0 STEP
+1 71 0 0 -40 1 0 0 0 0.707107 0.707107 0 -0.707107 0.707107 30054 - Foot.ldr
+

@@ -1,0 +1,23 @@
+0 Hinge Brick  1 x  2 Locking with Dual Finger On End
+0 Name: 30365.dat
+0 Author: John Van Zwieten [jvan]
+0 !LDRAW_ORG Part UPDATE 2004-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+
+0 !HISTORY 1999-07-05 [PTadmin] Official Update 1999-05
+0 !HISTORY 2003-04-30 [technog] BFC'd and switch to primitives
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2003-08-29 [cwdee] rename swh3 subpart to 30364s01
+0 !HISTORY 2003-12-30 [technog] Modified for corrected clh4
+0 !HISTORY 2004-03-02 [PTadmin] Official Update 2004-01
+0 !HISTORY 2007-06-07 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 26 10 0 0 0 1 0 1 0 -1 0 0 clh4.dat
+1 16 20 10 -6.25 0 6 0 0 0 6 2.25 0 0 box4o4a.dat
+1 16 26 10 0 0 0 1 0 1 0 1 0 0 clh4.dat
+1 16 20 10 6.25 0 6 0 0 0 6 2.25 0 0 box4o4a.dat
+1 16 30 9 0 1 0 0 0 1 0 0 0 1 s\30364s01.dat
+0
