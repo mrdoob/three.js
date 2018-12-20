@@ -32,7 +32,7 @@ OcclusionQueryMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
-	},
+	}
 
 } );
 

@@ -27,6 +27,20 @@
 
 			a { color: blue; }
 
+			#query-result, #shadow-query-result {
+				position: absolute;
+				margin: 0 auto;
+				font-size: 24px;
+				left: 0;
+				right: 0;
+			}
+			#query-result {
+				top: 100px;
+			}
+			#shadow-query-result {
+				top: 130px;
+			}
+
 		</style>
 	</head>
 	<body>
@@ -34,6 +48,9 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Occlusion Queries<br />
 			<a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLQuery" target="_blank" rel="noopener">More info on WebGL2 Queries</a>
 		</div>
+		<div id='query-result'></div>
+		<div id='shadow-query-result'></div>
+		<div id='container'></div>
 
 		<script src="../build/three.js"></script>
 
@@ -53,37 +70,26 @@
 
 			}
 
+			var clock = new THREE.Clock();
+
 			var camera, scene, renderer;
 			var cameraControls;
 			var ambientLight, light;
 
-			var queryResult;
+			var sphere;
+
+			var container = document.querySelector('#container'),
+				queryResult = document.querySelector('#query-result'),
+				shadowQueryResult = document.querySelector('#shadow-query-result');
 
 			function init() {
 
-				var container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				queryResult = document.createElement( 'div' );
-				document.body.appendChild( queryResult );
-				queryResult.style.position = 'absolute';
-				queryResult.style.margin = '0 auto';
-				queryResult.style.top = '100px';
-				queryResult.style.fontSize = '24px';
-				queryResult.style.left = '0';
-				queryResult.style.right = '0';
-
-				shadowQueryResult = document.createElement( 'div' );
-				document.body.appendChild( shadowQueryResult );
-				shadowQueryResult.style.position = 'absolute';
-				shadowQueryResult.style.margin = '0 auto';
-				shadowQueryResult.style.top = '130px';
-				shadowQueryResult.style.fontSize = '24px';
-				shadowQueryResult.style.left = '0';
-				shadowQueryResult.style.right = '0';
-
 				var canvasWidth = window.innerWidth;
 				var canvasHeight = window.innerHeight;
+
+				// SCENE
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xAAAAAA );
 
 				// CAMERA
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 400 );
@@ -91,8 +97,10 @@
 
 				// LIGHTS
 				ambientLight = new THREE.AmbientLight( 0x333333 );
+				scene.add( ambientLight );
 
 				light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				scene.add( light );
 				light.position.x = 2;
 				light.position.y = 7;
 				light.position.z = 10;
@@ -120,12 +128,6 @@
 				// CONTROLS
 				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xAAAAAA );
-
-				scene.add( ambientLight );
-				scene.add( light );
-
 			}
 
 
@@ -146,26 +148,23 @@
 
 			function render() {
 
-
 				renderer.render( scene, camera );
 
 			}
 
-			var sphere;
 			function createScene() {
 
-
-				var ground = new THREE.Mesh(new THREE.PlaneBufferGeometry(100, 100, 10, 10), new THREE.MeshStandardMaterial({ color: 0x22CC66, side: THREE.DoubleSide }));
+				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100, 10, 10 ), new THREE.MeshStandardMaterial( { color: 0x22CC66, side: THREE.DoubleSide } ) );
 				ground.receiveShadow = true;
-				ground.position.set(0, -5, 0);
+				ground.position.set( 0, -5, 0 );
 				ground.rotation.x = -Math.PI / 2;
-				scene.add(ground);
+				scene.add( ground );
 
-				sphere = new THREE.OcclusionQueryMesh(new THREE.SphereBufferGeometry(1, 15, 15), new THREE.MeshStandardMaterial({
+				sphere = new THREE.OcclusionQueryMesh( new THREE.SphereBufferGeometry(1, 15, 15), new THREE.MeshStandardMaterial( {
 					color: 0xFF4411,
 					// disabling colorWrite should not break the occlusion testing
 					colorWrite: true
-				}));
+				} ) );
 				sphere.frustumCulled = false;
 				sphere.receiveShadow = true;
 				sphere.castShadow = true;
@@ -192,19 +191,19 @@
 
 				};
 
-				var mat = new THREE.MeshStandardMaterial({ color: 0x6666AA });
-				var leftBox = new THREE.Mesh(new THREE.TorusKnotBufferGeometry( 2, 0.8, 128, 16 ), mat);
+				var mat = new THREE.MeshStandardMaterial( { color: 0x6666AA } );
+				var leftBox = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 2, 0.8, 128, 16 ), mat );
 				leftBox.receiveShadow = true;
 				leftBox.castShadow = true;
-				leftBox.position.set(-5, 0, -3);
-				scene.add(leftBox);
-				var rightBox = new THREE.Mesh(new THREE.BoxBufferGeometry(5, 9, 1), mat);
+				leftBox.position.set( -5, 0, -3 );
+				scene.add( leftBox );
+				var rightBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 5, 9, 1 ), mat );
 				rightBox.receiveShadow = true;
 				rightBox.castShadow = true;
-				rightBox.position.set(5, 0, 3);
-				scene.add(rightBox);
+				rightBox.position.set( 5, 0, 3 );
+				scene.add( rightBox );
 
-				scene.add(sphere);
+				scene.add( sphere );
 
 				// var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
@@ -215,13 +214,18 @@
 
 			createScene();
 
-			var t = 0;
-			var tick = function (t) {
-				sphere.position.x = Math.sin(t / 1000) * 5
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var t = clock.getElapsedTime();
+
+				sphere.position.x = Math.sin( t ) * 5;
+
 				render();
-				requestAnimationFrame(tick);
-			};
-			tick(1);
+
+			}
+			animate( 0 );
 
 		</script>
 
