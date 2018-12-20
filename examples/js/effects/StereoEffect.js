@@ -23,7 +23,7 @@ THREE.StereoEffectParameters = {
 //StereoEffect
 //Uses dual PerspectiveCameras for Parallax Barrier https://en.wikipedia.org/wiki/Parallax_barrier effects
 //renderer: THREE.WebGLRenderer
-//parameters:
+//parameters: - optional
 //{
 //  spatialMultiplex: Default spatial multiplex
 //      See https://en.wikipedia.org/wiki/DVB_3D-TV for details
@@ -54,10 +54,10 @@ THREE.StereoEffect = function (renderer, parameters) {
 	function get_cookie(cookie_name, defaultValue) { return defaultValue;}
 
 	if (parameters == undefined) parameters = {};
-	if (parameters.spatialMultiplex == undefined)
-	    parameters.spatialMultiplex = get_cookie('spatialMultiplex', THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS);//Use 'Side by side' for compability with previous version of THREE.StereoEffect
 	if (parameters.get_cookie != undefined)
 	    get_cookie = parameters.get_cookie;
+	if (parameters.spatialMultiplex == undefined)
+	    parameters.spatialMultiplex = get_cookie('spatialMultiplex', THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS);//Use 'Side by side' for compability with previous version of THREE.StereoEffect
 	if (parameters.zeroParallax == undefined)
 	    parameters.zeroParallax = parseInt(get_cookie('zeroParallax', THREE.StereoEffectParameters.zeroParallaxDefault));
 
