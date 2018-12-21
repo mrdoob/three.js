@@ -1231,6 +1231,7 @@ THREE.FBXLoader = ( function () {
 				} );
 
 				model = new THREE.SkinnedMesh( geometry, material );
+				model.normalizeSkinWeights();
 
 			} else {
 
