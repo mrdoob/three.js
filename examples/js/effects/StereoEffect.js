@@ -23,7 +23,7 @@ THREE.StereoEffectParameters = {
 //StereoEffect
 //Uses dual PerspectiveCameras for Parallax Barrier https://en.wikipedia.org/wiki/Parallax_barrier effects
 //renderer: THREE.WebGLRenderer
-//parameters: - optional
+//options:
 //{
 //  spatialMultiplex: Default spatial multiplex
 //      See https://en.wikipedia.org/wiki/DVB_3D-TV for details
@@ -46,20 +46,20 @@ THREE.StereoEffectParameters = {
 //          defaultValue: default setting
 //      returns a StereoEffects setting, saved before or defaultValue
 //}
-THREE.StereoEffect = function (renderer, parameters) {
+THREE.StereoEffect = function (renderer, options) {
 
 	var _stereo = new THREE.StereoCamera();
 	_stereo.aspect = 0.5;
 
 	function get_cookie(cookie_name, defaultValue) { return defaultValue;}
 
-	if (parameters == undefined) parameters = {};
-	if (parameters.get_cookie != undefined)
-	    get_cookie = parameters.get_cookie;
-	if (parameters.spatialMultiplex == undefined)
-	    parameters.spatialMultiplex = get_cookie('spatialMultiplex', THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS);//Use 'Side by side' for compability with previous version of THREE.StereoEffect
-	if (parameters.zeroParallax == undefined)
-	    parameters.zeroParallax = parseInt(get_cookie('zeroParallax', THREE.StereoEffectParameters.zeroParallaxDefault));
+	options = options || {};
+	if (options.get_cookie != undefined)
+	    get_cookie = options.get_cookie;
+	if (options.spatialMultiplex == undefined)
+	    options.spatialMultiplex = get_cookie('spatialMultiplex', THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS);//Use 'Side by side' for compability with previous version of THREE.StereoEffect
+	if (options.zeroParallax == undefined)
+	    options.zeroParallax = parseInt(get_cookie('zeroParallax', THREE.StereoEffectParameters.zeroParallaxDefault));
 
 	_stereo.eyeSep = (get_cookie('eyeSeparation', new THREE.StereoCamera().eyeSep) * 10000) / 10000;
 
@@ -88,8 +88,8 @@ THREE.StereoEffect = function (renderer, parameters) {
 
 		var xL, yL, widthL, heightL,
             xR, yR, widthR, heightR,
-	        parallax = parameters.zeroParallax,
-            spatialMultiplex = parseInt(parameters.spatialMultiplex),
+	        parallax = options.zeroParallax,
+            spatialMultiplex = parseInt(options.spatialMultiplex),
             spatialMultiplexsIndexs = THREE.StereoEffectParameters.spatialMultiplexsIndexs;
 
 		switch (spatialMultiplex) {
@@ -226,7 +226,7 @@ THREE.StereoEffect = function (renderer, parameters) {
 
         //
 
-	    gui.remember(parameters);
+	    gui.remember(options);
 	    gui.remember(_stereo);
 
 	    function displayControllers(value) {
@@ -240,7 +240,7 @@ THREE.StereoEffect = function (renderer, parameters) {
 	        elPropertyName, propertyName = ".property-name";
 
 	    //Spatial  multiplex
-	    var controllerSpatialMultiplex = fStereoEffects.add(parameters, 'spatialMultiplex',
+	    var controllerSpatialMultiplex = fStereoEffects.add(options, 'spatialMultiplex',
             lang.spatialMultiplexs).onChange(function (value) {
 
                 value = parseInt(value);
@@ -264,7 +264,7 @@ THREE.StereoEffect = function (renderer, parameters) {
 
 	    //Zero parallax
 	    //http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
-	    var controllerZeroParallax = fStereoEffects.add(parameters, 'zeroParallax', -60, 30);
+	    var controllerZeroParallax = fStereoEffects.add(options, 'zeroParallax', -60, 30);
 	    elPropertyName = controllerZeroParallax.onChange(function (value) {
 	        SetCookie('zeroParallax', value);
 	    }).__li.querySelector(propertyName);
@@ -277,7 +277,7 @@ THREE.StereoEffect = function (renderer, parameters) {
 	            _stereo.eyeSep = new THREE.StereoCamera().eyeSep;
 	            controllerEyeSep.setValue(_stereo.eyeSep);
 
-	            parameters.zeroParallax = THREE.StereoEffectParameters.zeroParallaxDefault;
+	            options.zeroParallax = THREE.StereoEffectParameters.zeroParallaxDefault;
 	            controllerZeroParallax.setValue(THREE.StereoEffectParameters.zeroParallaxDefault);
 	        },
 	    }
@@ -286,6 +286,6 @@ THREE.StereoEffect = function (renderer, parameters) {
 	    elPropertyName.innerHTML = lang.defaultButton;
 	    elPropertyName.title = lang.defaultTitle;
 
-	    displayControllers(parameters.spatialMultiplex);
+	    displayControllers(options.spatialMultiplex);
 	};
 };
