@@ -182,6 +182,16 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
 
+	var extensions = {};
+
+	for ( var key in this.extensions ) {
+
+		if ( this.extensions[ key ] === true ) extensions[ key ] = true;
+
+	}
+
+	if ( Object.keys( extensions ).length > 0 ) data.extensions = extensions;
+
 	return data;
 
 };
