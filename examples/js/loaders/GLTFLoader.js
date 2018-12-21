@@ -1555,9 +1555,9 @@ THREE.GLTFLoader = ( function () {
 
 		var keys = Object.keys( attributes ).sort();
 
-		for ( var key of keys ) {
+		for ( var i = 0, il = keys.length; i < il; i ++ ) {
 
-			attributesKey += key + attributes[ key ];
+			attributesKey += keys[ i ] + attributes[ keys[ i ] ];
 
 		}
 
