@@ -365,6 +365,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.shadowSide = source.shadowSide;
 
+		this.onBeforeCompile = source.onBeforeCompile;
+
 		return this;
 
 	},
