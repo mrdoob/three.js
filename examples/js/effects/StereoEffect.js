@@ -207,21 +207,11 @@ THREE.StereoEffect = function (renderer, options) {
                 if ((guiParams.lang == undefined) || (guiParams.lang.languageCode != languageCode))
                     break;
 
-                if (guiParams.lang.stereoEffects != undefined) lang.stereoEffects = guiParams.lang.stereoEffects;//'Stereo effects'
-
-                if (guiParams.lang.spatialMultiplexName != undefined) lang.spatialMultiplexName = guiParams.lang.spatialMultiplexName;//'Spatial  multiplex'
-                if (guiParams.lang.spatialMultiplexTitle != undefined) lang.spatialMultiplexTitle = guiParams.lang.spatialMultiplexTitle;
-
-                if (guiParams.lang.spatialMultiplexs != undefined) lang.spatialMultiplexs = guiParams.lang.spatialMultiplexs;
-
-                if (guiParams.lang.eyeSeparationName != undefined) lang.eyeSeparationName = guiParams.lang.eyeSeparationName;
-                if (guiParams.lang.eyeSeparationTitle != undefined) lang.eyeSeparationTitle = guiParams.lang.eyeSeparationTitle;
-
-                if (guiParams.lang.zeroParallaxName != undefined) lang.zeroParallaxName = guiParams.lang.zeroParallaxName;
-                if (guiParams.lang.zeroParallaxTitle != undefined) lang.zeroParallaxTitle = guiParams.lang.zeroParallaxTitle;
-
-                if (guiParams.lang.defaultButton != undefined) lang.defaultButton = guiParams.lang.defaultButton;
-                if (guiParams.lang.defaultTitle != undefined) lang.defaultTitle = guiParams.lang.defaultTitle;
+                Object.keys(guiParams.lang).forEach(function (key) {
+                    if (lang[key] === undefined)
+                        return;
+                    lang[key] = guiParams.lang[key];
+                });
 	    }
 
         //
@@ -239,6 +229,12 @@ THREE.StereoEffect = function (renderer, options) {
 	    var fStereoEffects = gui.addFolder(lang.stereoEffects),//Stero effects folder
 	        elPropertyName, propertyName = ".property-name";
 
+	    function controllerNameAndTitle(controller, name, title) {
+	        var elPropertyName = controller.__li.querySelector(".property-name");
+	        elPropertyName.innerHTML = name;
+	        elPropertyName.title = title;
+        }
+
 	    //Spatial  multiplex
 	    var controllerSpatialMultiplex = fStereoEffects.add(options, 'spatialMultiplex',
             lang.spatialMultiplexs).onChange(function (value) {
@@ -249,27 +245,21 @@ THREE.StereoEffect = function (renderer, options) {
 
                 SetCookie('spatialMultiplex', value);
             });
-	    elPropertyName = controllerSpatialMultiplex.__li.querySelector(propertyName);
-	    elPropertyName.innerHTML = lang.spatialMultiplexName;
-	    elPropertyName.title = lang.spatialMultiplexTitle;
+	    controllerNameAndTitle(controllerSpatialMultiplex, lang.spatialMultiplexName, lang.spatialMultiplexTitle);
 
 	    //eyeSeparation
 	    //http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
-	    var controllerEyeSep = fStereoEffects.add(_stereo, 'eyeSep', -1, 1, 0.001);
-	    elPropertyName = controllerEyeSep.onChange(function (value) {
+	    var controllerEyeSep = fStereoEffects.add(_stereo, 'eyeSep', -1, 1, 0.001).onChange(function (value) {
 	        SetCookie('eyeSeparation', value);
-	    }).__li.querySelector(propertyName);
-	    elPropertyName.innerHTML = lang.eyeSeparationName;
-	    elPropertyName.title = lang.eyeSeparationTitle;
+	    });
+	    controllerNameAndTitle(controllerEyeSep, lang.eyeSeparationName, lang.eyeSeparationTitle);
 
 	    //Zero parallax
 	    //http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
-	    var controllerZeroParallax = fStereoEffects.add(options, 'zeroParallax', -60, 30);
-	    elPropertyName = controllerZeroParallax.onChange(function (value) {
+	    var controllerZeroParallax = fStereoEffects.add(options, 'zeroParallax', -60, 30).onChange(function (value) {
 	        SetCookie('zeroParallax', value);
-	    }).__li.querySelector(propertyName);
-	    elPropertyName.innerHTML = lang.zeroParallaxName;
-	    elPropertyName.title = lang.zeroParallaxTitle;
+	    });
+	    controllerNameAndTitle(controllerZeroParallax, lang.zeroParallaxName, lang.zeroParallaxTitle);
 
 	    //default button
 	    var defaultParams = {
@@ -282,9 +272,7 @@ THREE.StereoEffect = function (renderer, options) {
 	        },
 	    }
 	    var controllerDefaultF = fStereoEffects.add(defaultParams, 'defaultF');
-	    elPropertyName = controllerDefaultF.__li.querySelector(propertyName);
-	    elPropertyName.innerHTML = lang.defaultButton;
-	    elPropertyName.title = lang.defaultTitle;
+	    controllerNameAndTitle(controllerDefaultF, lang.defaultButton, lang.defaultTitle);
 
 	    displayControllers(options.spatialMultiplex);
 	};
