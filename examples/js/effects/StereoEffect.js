@@ -226,8 +226,7 @@ THREE.StereoEffect = function (renderer, options) {
 	        controllerZeroParallax.__li.style.display = display;
         }
 
-	    var fStereoEffects = gui.addFolder(lang.stereoEffects),//Stero effects folder
-	        elPropertyName, propertyName = ".property-name";
+	    var fStereoEffects = gui.addFolder(lang.stereoEffects);//Stero effects folder
 
 	    function controllerNameAndTitle(controller, name, title) {
 	        var elPropertyName = controller.__li.querySelector(".property-name");
