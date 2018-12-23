@@ -402,27 +402,34 @@ THREE.ColladaExporter.prototype = {
 
 					'</emission>' +
 
-					'<diffuse>' +
-
 					(
-						m.map ?
-							'<texture texture="diffuse-sampler" texcoord="TEXCOORD" />' :
-							`<color sid="diffuse">${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color>`
+						type !== 'constant' ?
+						'<diffuse>' +
+
+						(
+							m.map ?
+								'<texture texture="diffuse-sampler" texcoord="TEXCOORD" />' :
+								`<color sid="diffuse">${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color>`
+						) +
+						'</diffuse>'
+						: ''
 					) +
 
-					'</diffuse>' +
-
-					`<specular><color sid="specular">${ specular.r } ${ specular.g } ${ specular.b } 1</color></specular>` +
-
-					'<shininess>' +
-
 					(
-						m.specularMap ?
-							'<texture texture="specular-sampler" texcoord="TEXCOORD" />' :
-							`<float sid="shininess">${ shininess }</float>`
-					) +
+						type === 'phong' ?
+						`<specular><color sid="specular">${ specular.r } ${ specular.g } ${ specular.b } 1</color></specular>` +
 
-					'</shininess>' +
+						'<shininess>' +
+
+						(
+							m.specularMap ?
+								'<texture texture="specular-sampler" texcoord="TEXCOORD" />' :
+								`<float sid="shininess">${ shininess }</float>`
+						) +
+
+						'</shininess>' 
+						: ''
+					) +
 
 					`<reflective><color>${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color></reflective>` +
 
@@ -508,7 +515,8 @@ THREE.ColladaExporter.prototype = {
 				// the materials.
 				var mat = o.material || new THREE.MeshBasicMaterial();
 				var materials = Array.isArray( mat ) ? mat : [ mat ];
-				matids = new Array( geometry.groups.length )
+				// matids = new Array( geometry.groups.length )
+				matids = new Array( materials.length )
 					.fill()
 					.map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
 
