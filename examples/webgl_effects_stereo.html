@@ -43,7 +43,7 @@
 
 		<script src="js/WebGL.js"></script>
 
-        <script src="http://threejs.org/examples/js/libs/dat.gui.min.js"></script>
+		<script src="http://threejs.org/examples/js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -72,12 +72,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-			    // CAMERA
+				// CAMERA
 
 				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01 * scale, 10 * scale);
 				camera.position.set(1 * scale, 1 * scale, 5 * scale);
 
-			    // SCENE
+				// SCENE
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog(0x000000, 250 * scale, 1400 * scale);
@@ -116,12 +116,12 @@
 				effect = new THREE.StereoEffect( renderer );
 				effect.setSize( window.innerWidth, window.innerHeight );
 
-			    //dat-gui JavaScript Controller Library
+				//dat-gui JavaScript Controller Library
 
 				var gui = new dat.GUI();
 				effect.gui(gui);
 
-			    //
+				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -141,8 +141,8 @@
 
 			function onDocumentMouseMove( event ) {
 
-			    mouseX = (event.clientX - windowHalfX) * 0.01 * scale;
-			    mouseY = (event.clientY - windowHalfY) * 0.01 * scale;
+				mouseX = (event.clientX - windowHalfX) * 0.01 * scale;
+				mouseY = (event.clientY - windowHalfY) * 0.01 * scale;
 
 			}
 
