@@ -366,7 +366,8 @@
 			}
 
 			var exporter = new THREE.ColladaExporter();
-			function exportASCII() {
+			
+			function saveColladaFile() {
 
 				var result = exporter.parse( teapot );
 				var material_type = "Phong";
@@ -376,23 +377,13 @@
 				if ( shading === "smooth" ) {
 					material_type = "Lambert"
 				}
-				console.log(result.textures)
-				saveString( result.data, 'teapot_' + material_type + '.dae' );
+
+				saveString( result.data, 'teapot_' + shading + "_" + material_type + '.dae' );
 				result.textures.forEach( tex => {
 					saveArrayBuffer( tex.data, `${ tex.name }.${ tex.ext }` );
 				});
 
 			}
-
-			var link = document.createElement( 'a' );
-			link.style.display = 'none';
-			document.body.appendChild( link );
-
-			var savecolladabutton = document.getElementById("savecolladabutton");
-			savecolladabutton.addEventListener('click', function(){
-				exportASCII();
-			});
-
 
 			function save( blob, filename ) {
 
@@ -408,19 +399,20 @@
 
 			}
 
-			function exportBinary() {
-
-				var result = exporter.parse( mesh, { binary: true } );
-				saveArrayBuffer( result, 'box.stl' );
-
-			}
-
 			function saveArrayBuffer( buffer, filename ) {
 
 				save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
 
 			}
 
+			var link = document.createElement( 'a' );
+			link.style.display = 'none';
+			document.body.appendChild( link );
+
+			var savecolladabutton = document.getElementById("savecolladabutton");
+			savecolladabutton.addEventListener('click', function(){
+				saveColladaFile();
+			});
 
 		</script>
 

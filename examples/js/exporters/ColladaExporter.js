@@ -509,17 +509,20 @@ THREE.ColladaExporter.prototype = {
 
 				// ids of the materials to bind to the geometry
 				var matids = null;
+				var matidsArray = [];
 
 				// get a list of materials to bind to the sub groups of the geometry.
 				// If the amount of subgroups is greater than the materials, than reuse
 				// the materials.
 				var mat = o.material || new THREE.MeshBasicMaterial();
 				var materials = Array.isArray( mat ) ? mat : [ mat ];
-				// matids = new Array( geometry.groups.length )
-				matids = new Array( materials.length )
-					.fill()
+				if ( geometry.groups.length > materials.length ) {
+					matidsArray = new Array( geometry.groups.length );
+				} else {
+					matidsArray = new Array( materials.length )
+				}
+				matids = matidsArray.fill()
 					.map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
-
 
 				node +=
 					`<instance_geometry url="#${ meshid }">` +
