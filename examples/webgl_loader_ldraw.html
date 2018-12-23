@@ -39,34 +39,32 @@
 
 		<script>
 
-			var container, stats;
+			var container, stats, progressBar, progressBarDiv;
 
 			var camera, scene, renderer, pointLight, controls, gui, guiData;
 
-			var materials, modelFileList, filesMap, model, textureCube;
+			var modelFileList, model, textureCube;
 
 			var envMapActivated = false;
 
 			var ldrawPath = 'models/ldraw/officialLibrary/';
 
-			var materialsFileName = 'LDConfig.ldr';
-
 			var modelFileList = [
-				'models/car.ldr',
-				'models/1621-1-LunarMPVVehicle.mpd',
-				'models/889-1-RadarTruck.mpd',
-				'models/4838-1-MiniVehicles.mpd',
-				'models/4915-1-MiniConstruction.mpd',
-				'models/4918-1-MiniFlyers.mpd',
-				'models/5935-1-IslandHopper.mpd',
-				'models/30023-1-Lighthouse.ldr',
-				'models/30051-1-X-wingFighter-Mini.mpd',
-				'models/30054-1-AT-ST-Mini.mpd',
-				'models/4489-1-AT-AT-Mini.mpd',
-				'models/4494-1-Imperial Shuttle-Mini.mpd',
-				'models/6965-1-TIEIntercep_4h4MXk5.mpd',
-				'models/6966-1-JediStarfighter-Mini.mpd',
-				'models/7140-1-X-wingFighter.mpd'
+				'models/car.ldr_Packed.mpd',
+				'models/1621-1-LunarMPVVehicle.mpd_Packed.mpd',
+				'models/889-1-RadarTruck.mpd_Packed.mpd',
+				'models/4838-1-MiniVehicles.mpd_Packed.mpd',
+				'models/4915-1-MiniConstruction.mpd_Packed.mpd',
+				'models/4918-1-MiniFlyers.mpd_Packed.mpd',
+				'models/5935-1-IslandHopper.mpd_Packed.mpd',
+				'models/30023-1-Lighthouse.ldr_Packed.mpd',
+				'models/30051-1-X-wingFighter-Mini.mpd_Packed.mpd',
+				'models/30054-1-AT-ST-Mini.mpd_Packed.mpd',
+				'models/4489-1-AT-AT-Mini.mpd_Packed.mpd',
+				'models/4494-1-Imperial Shuttle-Mini.mpd_Packed.mpd',
+				'models/6965-1-TIEIntercep_4h4MXk5.mpd_Packed.mpd',
+				'models/6966-1-JediStarfighter-Mini.mpd_Packed.mpd',
+				'models/7140-1-X-wingFighter.mpd_Packed.mpd'
 			];
 
 			init();
@@ -126,7 +124,7 @@
 
 					envMapActivated = value;
 
-					reloadMaterials( false );
+					reloadObject( false );
 
 				} );
 
@@ -134,25 +132,60 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				progressBarDiv = document.createElement( 'div' );
+				progressBarDiv.innerText = "Loading...";
+				progressBarDiv.style.fontSize = "3em";
+				progressBarDiv.style.display = "block";
+				progressBarDiv.style.position = "absolute";
+				progressBarDiv.style.top = "50%";
+				progressBarDiv.style.left = "50%";
+
+
 				// load materials and then the model
 
-				reloadMaterials( true );
+				reloadObject( true );
 
 			}
 
-			function reloadMaterials ( resetCamera ) {
+			function reloadObject ( resetCamera ) {
 
-				var materialLoader = new THREE.LDrawLoader()
-				materialLoader
+				if ( model ) {
+
+					scene.remove( model );
+
+				}
+
+				model = null;
+
+				updateProgressBar( 0 );
+				showProgressBar();
+
+				var lDrawLoader = new THREE.LDrawLoader();
+				lDrawLoader
 					.setPath( ldrawPath )
-					.load( materialsFileName, function ( group1 ) {
+					.load( guiData.modelFileName, function ( group2 ) {
 
-						materials = materialLoader.materials;
+						if ( model ) {
+
+							scene.remove( model );
+
+						}
+
+						model = group2;
+
+						// Convert from LDraw coordinates: rotate 180 degrees around OX
+						model.rotation.x = Math.PI;
+
+						scene.add( model );
+
+						// Adjust materials
+
+						var materials = lDrawLoader.materials;
 
 						if ( envMapActivated ) {
 
 							if ( ! textureCube ) {
-							
+
 								// Envmap texture
 								var r = "textures/cube/Bridge2/";
 								var urls = [ r + "posx.jpg", r + "negx.jpg",
@@ -178,46 +211,7 @@
 
 						}
 
-						new THREE.FileLoader()
-							.setPath( ldrawPath )
-							.load( "filesMap.json", function( filesMapJSON ) {
-
-								filesMap = JSON.parse( filesMapJSON );
-
-								reloadObject( resetCamera );
-
-							} );
-
-					} );
-
-			}
-
-			function reloadObject ( resetCamera ) {
-
-				if ( model ) {
-
-					scene.remove( model );
-
-				}
-
-				new THREE.LDrawLoader()
-					.setMaterials( materials )
-					.setPath( ldrawPath )
-					.setFileMap( filesMap[ guiData.modelFileName ] ?  filesMap[ guiData.modelFileName ] : null )
-					.load( guiData.modelFileName, function ( group2 ) {
-
-						if ( model ) {
-
-							scene.remove( model );
-
-						}
-
-						model = group2;
-
-						// Convert from LDraw coordinates: rotate 180 degrees around OX
-						model.rotation.x = Math.PI;
-
-						scene.add( model );
+						// Adjust camera and light
 
 						var bbox = new THREE.Box3().setFromObject( model );
 						var size = bbox.getSize( new THREE.Vector3() );
@@ -232,6 +226,8 @@
 						}
 
 						pointLight.position.normalize().multiplyScalar( radius * 3 );
+
+						hideProgressBar();
 
 					}, onProgress, onError );
 
@@ -265,8 +261,9 @@
 
 				if ( xhr.lengthComputable ) {
 
-					var percentComplete = xhr.loaded / xhr.total * 100;
-					console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+					updateProgressBar( xhr.loaded / xhr.total );
+
+					console.log( Math.round( xhr.loaded / xhr.total * 100, 2 ) + '% downloaded' );
 
 				}
 
@@ -275,6 +272,26 @@
 			function onError ( error ) {
 
 				console.log( "Error loading model. " + error );
+
+			}
+
+			function showProgressBar () {
+
+				document.body.appendChild( progressBarDiv );
+
+			}
+
+			function hideProgressBar () {
+
+				document.body.removeChild( progressBarDiv );
+
+			}
+
+			function updateProgressBar ( fraction ) {
+
+				setTimeout( function() {
+					progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
+				}, 0 );
 
 			}
 
