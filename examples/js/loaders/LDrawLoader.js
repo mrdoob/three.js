@@ -213,10 +213,14 @@ THREE.LDrawLoader = ( function () {
 			this.parseColourMetaDirective( new LineParser( "Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333" ) )
 		] );
 
-		// Temporary matrices
-		this.tempMatrix180 = new THREE.Matrix4().makeRotationX( Math.PI );
-		this.tempMatrix = new THREE.Matrix4();
+		// If this flag is set to true, each subobject will be a THREE.Object.
+		// If not (the default), only one object which contains all the merged primitives will be created.
+		this.separateObjects = false;
 
+		// Current merged object and primitives
+		this.currentGroupObject = null;
+		this.currentTriangles = null;
+		this.currentLineSegments = null;
 
 	}
 
@@ -246,7 +250,9 @@ THREE.LDrawLoader = ( function () {
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			if ( ! this.fileMap ) {
+
 				this.fileMap = {};
+
 			}
 
 			var scope = this;
@@ -264,10 +270,14 @@ THREE.LDrawLoader = ( function () {
 				var parseScope = scope.newParseScopeLevel();
 				parseScope.url = url;
 
+				var parentParseScope = scope.getParentParseScope();
+
 				// Add to cache
-				var currentFileName = scope.getParentParseScope().currentFileName;
+				var currentFileName = parentParseScope.currentFileName;
 				if ( scope.subobjectCache[ currentFileName ] === undefined ) {
+
 					scope.subobjectCache[ currentFileName ] = text;
+
 
 				}
 
@@ -295,12 +305,7 @@ THREE.LDrawLoader = ( function () {
 
 						if ( subobjectGroup ) {
 
-							scope.removeScopeLevel();
-							if ( onProcessed ) {
-
-								onProcessed( objGroup );
-
-							}
+							finalizeObject();
 
 						}
 					}
@@ -309,7 +314,33 @@ THREE.LDrawLoader = ( function () {
 				else {
 
 					// No subobjects, finish object
+					finalizeObject();
+
+				}
+
+				return objGroup;
+
+				function finalizeObject() {
+
+					if ( ! scope.separateObjects && ! parentParseScope.isFromParse ) {
+
+						// We are finalizing the root object and merging primitives is activated, so create the entire Mesh and LineSegments objects now
+						if ( scope.currentLineSegments.length > 0 ) {
+
+							objGroup.add( createObject( scope.currentLineSegments, 2 ) );
+
+						}
+
+						if ( scope.currentTriangles.length > 0 ) {
+
+							objGroup.add( createObject( scope.currentTriangles, 3 ) );
+
+						}
+
+					}
+
 					scope.removeScopeLevel();
+
 					if ( onProcessed ) {
 
 						onProcessed( objGroup );
@@ -318,23 +349,33 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				return objGroup;
-
 				function loadSubobject ( subobject, sync ) {
 
 					parseScope.mainColourCode = subobject.material.userData.code;
 					parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
 					parseScope.currentFileName = subobject.originalFileName;
 
+					if ( ! scope.separateObjects ) {
+
+						// Set current matrix
+						parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
+
+					}
+
 					// If subobject was cached previously, use the cached one
 					var cached = scope.subobjectCache[ subobject.originalFileName ];
 					if ( cached ) {
+
 						var subobjectGroup = processObject( cached, sync ? undefined : onSubobjectLoaded );
 						if ( sync ) {
+
 							addSubobject( subobject, subobjectGroup );
 							return subobjectGroup;
+
 						}
+
 						return;
+
 					}
 
 					// Adjust file name to locate the subobject file path in standard locations (always under directory scope.path)
@@ -447,8 +488,7 @@ THREE.LDrawLoader = ( function () {
 					}
 					else {
 
-						scope.removeScopeLevel();
-						onProcessed( objGroup );
+						finalizeObject();
 
 					}
 
@@ -456,10 +496,14 @@ THREE.LDrawLoader = ( function () {
 
 				function addSubobject ( subobject, subobjectGroup ) {
 
-					subobjectGroup.name = subobject.fileName;
-					objGroup.add( subobjectGroup );
-					subobjectGroup.matrix.copy( subobject.matrix );
-					subobjectGroup.matrixAutoUpdate = false;
+					if ( scope.separateObjects ) {
+
+						subobjectGroup.name = subobject.fileName;
+						objGroup.add( subobjectGroup );
+						subobjectGroup.matrix.copy( subobject.matrix );
+						subobjectGroup.matrixAutoUpdate = false;
+
+					}
 
 					scope.fileMap[ subobject.originalFileName ] = subobject.url;
 
@@ -492,7 +536,11 @@ THREE.LDrawLoader = ( function () {
 
 			this.newParseScopeLevel( materials );
 
+			this.getCurrentParseScope().isFromParse = false;
+
 			this.materials = materials;
+
+			this.currentGroupObject = null;
 
 			return this;
 
@@ -525,6 +573,8 @@ THREE.LDrawLoader = ( function () {
 
 			var topParseScope = this.getCurrentParseScope();
 
+			var parentParseScope = this.getParentParseScope();
+
 			var newParseScope = {
 
 				lib: matLib,
@@ -539,7 +589,10 @@ THREE.LDrawLoader = ( function () {
 				currentFileName: null,
 				mainColourCode: topParseScope ? topParseScope.mainColourCode : '16',
 				mainEdgeColourCode: topParseScope ? topParseScope.mainEdgeColourCode : '24',
+				currentMatrix: new THREE.Matrix4(),
 
+				// If false, it is a root material scope previous to parse
+				isFromParse: true
 			};
 
 			this.parseScopesStack.push( newParseScope );
@@ -884,9 +937,33 @@ THREE.LDrawLoader = ( function () {
 
 			var url = parentParseScope.url;
 
+			var currentParseScope = this.getCurrentParseScope();
+
 			// Parse result variables
-			var triangles = [];
-			var lineSegments = [];
+			var triangles;
+			var lineSegments;
+
+			if ( this.separateObjects ) {
+
+				triangles = [];
+				lineSegments = [];
+
+			}
+			else {
+
+				if ( this.currentGroupObject === null ) {
+
+					this.currentGroupObject = new THREE.Group();
+					this.currentTriangles = [];
+					this.currentLineSegments = [];
+
+				}
+
+				triangles = this.currentTriangles;
+				lineSegments = this.currentLineSegments;
+
+			}
+
 			var subobjects = [];
 
 			var category = null;
@@ -934,6 +1011,20 @@ THREE.LDrawLoader = ( function () {
 				}
 
 				return material;
+
+			}
+
+			function parseVector ( lp ) {
+
+				var v = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
+
+				if ( ! scope.separateObjects ) {
+
+					v.applyMatrix4( parentParseScope.currentMatrix );
+
+				}
+
+				return v;
 
 			}
 
@@ -1085,8 +1176,7 @@ THREE.LDrawLoader = ( function () {
 						var m7 = parseFloat( lp.getToken() );
 						var m8 = parseFloat( lp.getToken() );
 
-						var matrix = new THREE.Matrix4();
-						matrix.set(
+						var matrix = new THREE.Matrix4().set(
 							m0, m1, m2, posX,
 							m3, m4, m5, posY,
 							m6, m7, m8, posZ,
@@ -1137,8 +1227,8 @@ THREE.LDrawLoader = ( function () {
 						lineSegments.push( {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
-							v0: new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) ),
-							v1: new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) )
+							v0: parseVector( lp ),
+							v1: parseVector( lp )
 						} );
 
 						break;
@@ -1151,9 +1241,9 @@ THREE.LDrawLoader = ( function () {
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
-							v0: new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) ),
-							v1: new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) ),
-							v2: new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) )
+							v0: parseVector( lp ),
+							v1: parseVector( lp ),
+							v2: parseVector( lp )
 						} );
 
 						break;
@@ -1163,10 +1253,10 @@ THREE.LDrawLoader = ( function () {
 
 						var material = parseColourCode( lp );
 
-						var v0 = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
-						var v1 = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
-						var v2 = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
-						var v3 = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
+						var v0 = parseVector( lp );
+						var v1 = parseVector( lp );
+						var v2 = parseVector( lp );
+						var v3 = parseVector( lp );
 
 						triangles.push( {
 							material: material,
@@ -1207,23 +1297,35 @@ THREE.LDrawLoader = ( function () {
 
 			//
 
-			var groupObject = new THREE.Group();
+			var groupObject = null;
+
+			if ( this.separateObjects ) {
+
+				groupObject = new THREE.Group();
+
+				if ( lineSegments.length > 0 ) {
+
+					groupObject.add( createObject( lineSegments, 2 ) );
+
+
+				}
+
+				if ( triangles.length > 0 ) {
+
+					groupObject.add( createObject( triangles, 3 ) );
+
+				}
+
+			}
+			else {
+
+				groupObject = this.currentGroupObject;
+
+			}
+
 			groupObject.userData.category = category;
 			groupObject.userData.keywords = keywords;
 			groupObject.userData.subobjects = subobjects;
-
-			if ( lineSegments.length > 0 ) {
-
-				groupObject.add( createObject( lineSegments, 2 ) );
-
-
-			}
-
-			if ( triangles.length > 0 ) {
-
-				groupObject.add( createObject( triangles, 3 ) );
-
-			}
 
 			//console.timeEnd( 'LDrawLoader' );
 

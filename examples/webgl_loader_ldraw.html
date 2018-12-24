@@ -64,7 +64,8 @@
 				'models/4494-1-Imperial Shuttle-Mini.mpd_Packed.mpd',
 				'models/6965-1-TIEIntercep_4h4MXk5.mpd_Packed.mpd',
 				'models/6966-1-JediStarfighter-Mini.mpd_Packed.mpd',
-				'models/7140-1-X-wingFighter.mpd_Packed.mpd'
+				'models/7140-1-X-wingFighter.mpd_Packed.mpd',
+				'models/10174-1-ImperialAT-ST-UCS.mpd_Packed.mpd'
 			];
 
 			init();
@@ -76,7 +77,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 150, 200, 250 );
 
 				// scene
@@ -271,7 +272,9 @@
 
 			function onError ( error ) {
 
-				console.log( "Error loading model. " + error );
+				var message = "Error loading model";
+				progressBarDiv.innerText = message;
+				console.log( message );
 
 			}
 
@@ -289,9 +292,7 @@
 
 			function updateProgressBar ( fraction ) {
 
-				setTimeout( function() {
-					progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
-				}, 0 );
+				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
 
 			}
 
