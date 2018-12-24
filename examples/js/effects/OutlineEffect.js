@@ -5,16 +5,16 @@
  *
  * // How to set default outline parameters
  * new THREE.OutlineEffect( renderer, {
- * 	defaultThickNess: 0.01,
- * 	defaultColor: new THREE.Color( 0x888888 ),
+ * 	defaultThickness: 0.01,
+ * 	defaultColor: [ 0, 0, 0 ],
  * 	defaultAlpha: 0.8,
  * 	defaultKeepAlive: true // keeps outline material in cache even if material is removed from scene
  * } );
  *
  * // How to set outline parameters for each material
- * material.outlineParameters = {
- * 	thickNess: 0.01,
- * 	color: new THREE.Color( 0x888888 ),
+ * material.userData.outlineParameters = {
+ * 	thickness: 0.01,
+ * 	color: [ 0, 0, 0 ]
  * 	alpha: 0.8,
  * 	visible: true,
  * 	keepAlive: true
@@ -31,7 +31,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	this.enabled = true;
 
 	var defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;
-	var defaultColor = parameters.defaultColor !== undefined ? parameters.defaultColor : new THREE.Color( 0x000000 );
+	var defaultColor = new THREE.Color().fromArray( parameters.defaultColor !== undefined ? parameters.defaultColor : [ 0, 0, 0 ] );
 	var defaultAlpha = parameters.defaultAlpha !== undefined ? parameters.defaultAlpha : 1.0;
 	var defaultKeepAlive = parameters.defaultKeepAlive !== undefined ? parameters.defaultKeepAlive : false;
 
@@ -140,7 +140,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		var shaderID = shaderIDs[ originalMaterial.type ];
 		var originalUniforms, originalVertexShader;
-		var outlineParameters = originalMaterial.outlineParameters;
+		var outlineParameters = originalMaterial.userData.outlineParameters;
 
 		if ( shaderID !== undefined ) {
 
@@ -300,14 +300,14 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	function updateUniforms( material, originalMaterial ) {
 
-		var outlineParameters = originalMaterial.outlineParameters;
+		var outlineParameters = originalMaterial.userData.outlineParameters;
 
 		material.uniforms.outlineAlpha.value = originalMaterial.opacity;
 
 		if ( outlineParameters !== undefined ) {
 
 			if ( outlineParameters.thickness !== undefined ) material.uniforms.outlineThickness.value = outlineParameters.thickness;
-			if ( outlineParameters.color !== undefined ) material.uniforms.outlineColor.value.copy( outlineParameters.color );
+			if ( outlineParameters.color !== undefined ) material.uniforms.outlineColor.value.fromArray( outlineParameters.color );
 			if ( outlineParameters.alpha !== undefined ) material.uniforms.outlineAlpha.value = outlineParameters.alpha;
 
 		}
@@ -318,7 +318,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		if ( material.name === 'invisible' ) return;
 
-		var outlineParameters = originalMaterial.outlineParameters;
+		var outlineParameters = originalMaterial.userData.outlineParameters;
 
 		material.skinning = originalMaterial.skinning;
 		material.morphTargets = originalMaterial.morphTargets;
@@ -448,7 +448,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	 * The following property copies and wrapper methods enable
 	 * THREE.OutlineEffect to be called from other *Effect, like
 	 *
-	 * effect = new THREE.VREffect( new THREE.OutlineEffect( renderer ) );
+	 * effect = new THREE.StereoEffect( new THREE.OutlineEffect( renderer ) );
 	 *
 	 * function render () {
 	 *

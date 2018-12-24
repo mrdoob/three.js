@@ -584,9 +584,9 @@
 
 						if ( maxFace !== null ) {
 
-	          	this.addVertexToFace( vertex, maxFace );
+							this.addVertexToFace( vertex, maxFace );
 
-	        	}
+						}
 
 					}
 
@@ -917,9 +917,9 @@
 
 				triangle.set( a.point, b.point, c.point );
 
-				triangle.normal( this.normal );
-				triangle.midpoint( this.midpoint );
-				this.area = triangle.area();
+				triangle.getNormal( this.normal );
+				triangle.getMidpoint( this.midpoint );
+				this.area = triangle.getArea();
 
 				this.constant = this.normal.dot( this.midpoint );
 

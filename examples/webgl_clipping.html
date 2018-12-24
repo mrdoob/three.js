@@ -72,15 +72,15 @@
 				// Geometry
 
 				var material = new THREE.MeshPhongMaterial( {
-						color: 0x80ee10,
-						shininess: 100,
-						side: THREE.DoubleSide,
+					color: 0x80ee10,
+					shininess: 100,
+					side: THREE.DoubleSide,
 
-						// ***** Clipping setup (material): *****
-						clippingPlanes: [ localPlane ],
-						clipShadows: true
+					// ***** Clipping setup (material): *****
+					clippingPlanes: [ localPlane ],
+					clipShadows: true
 
-					} );
+				} );
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.08, 95, 20 );
 
@@ -89,9 +89,9 @@
 				scene.add( object );
 
 				var ground = new THREE.Mesh(
-						new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
-						new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
-					);
+					new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
+					new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
+				);
 
 				ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
 				ground.receiveShadow = true;
@@ -106,7 +106,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.renderSingleSided = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -130,26 +129,65 @@
 					folderLocal = gui.addFolder( 'Local Clipping' ),
 					propsLocal = {
 
-						get 'Enabled'() { return renderer.localClippingEnabled; },
-						set 'Enabled'( v ) { renderer.localClippingEnabled = v; },
+						get 'Enabled'() {
 
-						get 'Shadows'() { return material.clipShadows; },
-						set 'Shadows'( v ) { material.clipShadows = v; },
+							return renderer.localClippingEnabled;
 
-						get 'Plane'() { return localPlane.constant; },
-						set 'Plane'( v ) { localPlane.constant = v }
+						},
+						set 'Enabled'( v ) {
+
+							renderer.localClippingEnabled = v;
+
+						},
+
+						get 'Shadows'() {
+
+							return material.clipShadows;
+
+						},
+						set 'Shadows'( v ) {
+
+							material.clipShadows = v;
+
+						},
+
+						get 'Plane'() {
+
+							return localPlane.constant;
+
+						},
+						set 'Plane'( v ) {
+
+							localPlane.constant = v;
+
+						}
 
 					},
 
 					folderGlobal = gui.addFolder( 'Global Clipping' ),
 					propsGlobal = {
 
-						get 'Enabled'() { return renderer.clippingPlanes !== Empty; },
-						set 'Enabled'( v  ) {
-								renderer.clippingPlanes = v ? globalPlanes : Empty; },
+						get 'Enabled'() {
 
-						get 'Plane'() { return globalPlane.constant; },
-						set 'Plane'( v ) { globalPlane.constant = v; }
+							return renderer.clippingPlanes !== Empty;
+
+						},
+						set 'Enabled'( v ) {
+
+							renderer.clippingPlanes = v ? globalPlanes : Empty;
+
+						},
+
+						get 'Plane'() {
+
+							return globalPlane.constant;
+
+						},
+						set 'Plane'( v ) {
+
+							globalPlane.constant = v;
+
+						}
 
 					};
 
@@ -158,7 +196,7 @@
 				folderLocal.add( propsLocal, 'Plane', 0.3, 1.25 );
 
 				folderGlobal.add( propsGlobal, 'Enabled' );
-				folderGlobal.add( propsGlobal, 'Plane', -0.4, 3 );
+				folderGlobal.add( propsGlobal, 'Plane', - 0.4, 3 );
 
 				// Start
 

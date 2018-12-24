@@ -47,7 +47,6 @@
 			var lightSphere, lightHolder;
 			var pyramid, pyramidShadow;
 			var sphere, sphereShadow;
-			var box, boxShadow;
 			var cube, cubeShadow;
 			var cylinder, cylinderShadow;
 			var torus, torusShadow;
@@ -70,7 +69,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
-				window.addEventListener( 'resize' , onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 				camera.position.set( 0, 2.5, 10 );
 				scene.add( camera );
@@ -103,27 +102,27 @@
 				scene.add( arrowHelper3 );
 
 				// LIGHTBULB
-				var lightSphereGeometry = new THREE.SphereGeometry( 0.09 );
+				var lightSphereGeometry = new THREE.SphereBufferGeometry( 0.09 );
 				var lightSphereMaterial = new THREE.MeshBasicMaterial( { color: 'rgb(255,255,255)' } );
 				lightSphere = new THREE.Mesh( lightSphereGeometry, lightSphereMaterial );
 				scene.add( lightSphere );
 				lightSphere.visible = false;
 
-				var lightHolderGeometry = new THREE.CylinderGeometry( 0.05, 0.05, 0.13 );
+				var lightHolderGeometry = new THREE.CylinderBufferGeometry( 0.05, 0.05, 0.13 );
 				var lightHolderMaterial = new THREE.MeshBasicMaterial( { color: 'rgb(75,75,75)' } );
 				lightHolder = new THREE.Mesh( lightHolderGeometry, lightHolderMaterial );
 				scene.add( lightHolder );
 				lightHolder.visible = false;
 
 				// GROUND
-				var groundGeometry = new THREE.BoxGeometry( 30, 0.01, 40 );
+				var groundGeometry = new THREE.BoxBufferGeometry( 30, 0.01, 40 );
 				var groundMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(0,130,0)' } );
 				groundMesh = new THREE.Mesh( groundGeometry, groundMaterial );
 				groundMesh.position.y = 0.0; //this value must be slightly lower than the planeConstant (0.01) parameter above
 				scene.add( groundMesh );
 
 				// RED CUBE and CUBE's SHADOW
-				var cubeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+				var cubeGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				var cubeMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(255,0,0)', emissive: 0x200000 } );
 				cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
 				cube.position.z = - 1;
@@ -133,7 +132,7 @@
 				scene.add( cubeShadow );
 
 				// BLUE CYLINDER and CYLINDER's SHADOW
-				var cylinderGeometry = new THREE.CylinderGeometry( 0.3, 0.3, 2 );
+				var cylinderGeometry = new THREE.CylinderBufferGeometry( 0.3, 0.3, 2 );
 				var cylinderMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(0,0,255)', emissive: 0x000020 } );
 				cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 				cylinder.position.z = - 2.5;
@@ -143,7 +142,7 @@
 				scene.add( cylinderShadow );
 
 				// MAGENTA TORUS and TORUS' SHADOW
-				var torusGeometry = new THREE.TorusGeometry( 1, 0.2, 10, 16, TWO_PI );
+				var torusGeometry = new THREE.TorusBufferGeometry( 1, 0.2, 10, 16, TWO_PI );
 				var torusMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,0,255)', emissive: 0x200020 } );
 				torus = new THREE.Mesh( torusGeometry, torusMaterial );
 				torus.position.z = - 6;
@@ -153,7 +152,7 @@
 				scene.add( torusShadow );
 
 				// WHITE SPHERE and SPHERE'S SHADOW
-				var sphereGeometry = new THREE.SphereGeometry( 0.5, 20, 10 );
+				var sphereGeometry = new THREE.SphereBufferGeometry( 0.5, 20, 10 );
 				var sphereMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,255)', emissive: 0x222222 } );
 				sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 				sphere.position.set( 4, 0.5, 2 );
@@ -163,7 +162,7 @@
 				scene.add( sphereShadow );
 
 				// YELLOW PYRAMID and PYRAMID'S SHADOW
-				var pyramidGeometry = new THREE.CylinderGeometry( 0, 0.5, 2, 4 );
+				var pyramidGeometry = new THREE.CylinderBufferGeometry( 0, 0.5, 2, 4 );
 				var pyramidMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, flatShading: true, shininess: 0 } );
 				pyramid = new THREE.Mesh( pyramidGeometry, pyramidMaterial );
 				pyramid.position.set( - 4, 1, 2 );
@@ -215,7 +214,6 @@
 
 				renderer.render( scene, camera );
 
-
 			}
 
 			function onWindowResize() {
@@ -232,7 +230,7 @@
 
 			function lightButtonHandler() {
 
-				useDirectionalLight = !useDirectionalLight;
+				useDirectionalLight = ! useDirectionalLight;
 
 				if ( useDirectionalLight ) {
 
@@ -254,7 +252,7 @@
 					lightSphere.visible = false;
 					lightHolder.visible = false;
 
-					document.getElementById( 'lightButton' ).value = "Switch to PointLight" ;
+					document.getElementById( 'lightButton' ).value = "Switch to PointLight";
 
 				} else {
 
@@ -280,7 +278,7 @@
 					lightSphere.visible = true;
 					lightHolder.visible = true;
 
-					document.getElementById( 'lightButton' ).value = "Switch to DirectionalLight" ;
+					document.getElementById( 'lightButton' ).value = "Switch to DirectionalLight";
 
 				}
 

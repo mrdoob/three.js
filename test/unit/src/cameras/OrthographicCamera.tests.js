@@ -54,7 +54,7 @@ export default QUnit.module( 'Cameras', () => {
 			var left = - 1, right = 1, top = 1, bottom = - 1, near = 1, far = 3;
 			var cam = new OrthographicCamera( left, right, top, bottom, near, far );
 
-			// updateProjectionMatrix is called in contructor
+			// updateProjectionMatrix is called in constructor
 			var pMatrix = cam.projectionMatrix.elements;
 
 			// orthographic projection is given my the 4x4 Matrix

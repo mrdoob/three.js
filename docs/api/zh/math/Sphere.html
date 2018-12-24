@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>球（[name]）</h1>
+
+		<p class="desc">一个球由球心和半径所定义。</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( [param:Vector3 center], [param:Float radius] )</h3>
+		<p>
+		[page:Vector3 center] - 球心的位置，默认值是一个位于(0, 0, 0)的[page:Vector3]。<br />
+		[page:Float radius] - 球的半径，默认值是0。<br /><br />
+
+		创建一个新的[name]。
+
+		</p>
+
+
+		<h2>属性</h2>
+
+
+		<h3>[property:Vector3 center]</h3>
+		<p>A [page:Vector3]定义了球心的位置，默认值位于(0, 0, 0)。</p>
+
+		<h3>[property:Float radius]</h3>
+		<p>球的半径，默认值为0。</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:Sphere applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Matrix4 matrix] - 将被应用的[Page:Matrix4]矩阵。<br /><br />
+
+			使用所传入的[page:Matrix4]矩阵来对球进行变换。
+		</p>
+
+		<h3>[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] 将要夹取的点。<br />
+		[page:Vector3 target] — 结果将被复制到这个Vector3中。<br /><br />
+
+		从球中夹取一个点。若这一点位于球外，则将会夹取到该点球边缘最近的点。已位于球中的点将不会受到影响。
+		</p>
+
+		<h3>[method:Sphere clone]()</h3>
+		<p>返回一个新的球，新的球与这个球具有相同的[page:.center center]和[page:.radius radius]。</p>
+
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - the [page:Vector3] to be checked<br /><br />
+
+		检查球体中是否包含所传入的[page:Vector3 point]点，包括球的表面。
+		</p>
+
+		<h3>[method:Sphere copy]( [param:Sphere sphere] )</h3>
+		<p>
+		复制所传入的球的[page:.center center]和[page:.radius radius]到这个球上。
+		</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>
+		返回球的边界到所传入的[page:Vector3 point]点的最近距离。
+		若这个点，则距离将为负值。
+		</p>
+
+		<h3>[method:Boolean empty]()</h3>
+		<p>检查球是否为空（其半径设为了0）.</p>
+
+		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
+		<p>
+		检查这两个球的球心与半径是否相等。
+		</p>
+
+		<h3>[method:Box3 getBoundingBox]( [param:Box3 target] )</h3>
+		<p>
+		[page:Box3 target] — 结果将被复制到这个Box3中。<br /><br />
+
+		返回这个球的[link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Box]（最小包围盒）。
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - 将被用于测试是否与这个球有交集的[page:Box3]。<br /><br />
+
+		检测这个球与所传入的[page:Box3 box]是否有交集。
+		</p>
+
+		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
+		<p>
+		[page:Plane plane] - 将被用于测试是否与这个球有交集的Plane。<br /><br />
+
+		检测这个球与所传入的[page:Plane plane]是否有交集。
+		</p>
+
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - 将被用于测试是否与这个球有交集的Sphere。<br /><br />
+
+		检测两球之间是否有交集。
+		</p>
+
+		<h3>[method:Sphere set]( [param:Vector3 center], [param:Float radius] )</h3>
+		<p>
+			[page:Vector3 center] - 球心位置。<br />
+			[page:Float radius] - 球的半径。<br /><br />
+
+		设置球的[page:.center center]和[page:.radius radius]属性。
+		</p>
+
+		<h3>[method:Sphere setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
+		<p>
+		[page:Array points] - 一个包含有[page:Vector3]位置的[page:Array]。<br />
+		[page:Vector3 optionalCenter] - 可选， [page:Vector3] 球心位置。<br /><br />
+
+		计算一个[page:Array points]数组（中的点）的最小边界球。如果给定了[page:Vector3 optionalCenter]，则它将被用作该球的球心；
+		否则，环绕[page:Array points]的包围盒的轴心将通过计算来得到。
+		</p>
+
+		<h3>[method:Sphere translate]( [param:Vector3 offset] )</h3>
+		<p>
+		使用所给定[page:Vector3] offset（偏移量）平移球心。
+		</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

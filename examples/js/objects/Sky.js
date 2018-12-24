@@ -25,7 +25,7 @@ THREE.Sky = function () {
 		side: THREE.BackSide
 	} );
 
-	THREE.Mesh.call( this, new THREE.SphereBufferGeometry( 1, 32, 15 ), material );
+	THREE.Mesh.call( this, new THREE.BoxBufferGeometry( 1, 1, 1 ), material );
 
 };
 
@@ -96,6 +96,7 @@ THREE.Sky.SkyShader = {
 		'	vWorldPosition = worldPosition.xyz;',
 
 		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		'	gl_Position.z = gl_Position.w;', // set z to camera.far
 
 		'	vSunDirection = normalize( sunPosition );',
 

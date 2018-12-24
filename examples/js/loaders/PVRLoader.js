@@ -10,7 +10,7 @@
 
 THREE.PVRLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.CompressedTextureLoader.call( this, manager );
 
 	this._parser = THREE.PVRLoader.parse;
 

@@ -5,6 +5,12 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			
 			body {
 				color: #000;
 				font-family:Monospace;
@@ -14,7 +20,6 @@
 
 				background-color: #fff;
 				margin: 0px;
-				overflow: hidden;
 			}
 
 			#info {
@@ -22,7 +27,7 @@
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
-
+				box-sizing: border-box;
 			}
 
 			a {
@@ -32,7 +37,6 @@
 	</head>
 
 	<body>
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - trackball controls example<br />
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
@@ -42,18 +46,18 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, stats;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var camera, controls, scene, renderer;
+			}
 
-			var cross;
+			var camera, controls, scene, renderer, stats;
 
 			init();
 			animate();
@@ -85,7 +89,7 @@
 				scene.background = new THREE.Color( 0xcccccc );
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 500; i ++ ) {
@@ -108,7 +112,7 @@
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( -1, -1, -1 );
+				light.position.set( - 1, - 1, - 1 );
 				scene.add( light );
 
 				var light = new THREE.AmbientLight( 0x222222 );
@@ -117,15 +121,13 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container = document.getElementById( 'container' );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -152,14 +154,16 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				
 				controls.update();
+				
+				stats.update();
 
 			}
 
 			function render() {
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

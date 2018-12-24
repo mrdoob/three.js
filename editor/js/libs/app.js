@@ -155,9 +155,11 @@ var APP = {
 
 		}
 
-		var prevTime;
+		var time, prevTime;
 
-		function animate( time ) {
+		function animate() {
+
+			time = performance.now();
 
 			try {
 
@@ -190,7 +192,7 @@ var APP = {
 
 			dispatch( events.start, arguments );
 
-			renderer.animate( animate );
+			renderer.setAnimationLoop( animate );
 
 		};
 
@@ -207,7 +209,7 @@ var APP = {
 
 			dispatch( events.stop, arguments );
 
-			renderer.animate( null );
+			renderer.setAnimationLoop( null );
 
 		};
 

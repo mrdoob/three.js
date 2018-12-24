@@ -2,27 +2,60 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.LightNode = function() {
+import { TempNode } from '../core/TempNode.js';
 
-	THREE.TempNode.call( this, 'v3', { shared: false } );
+function LightNode( scope ) {
 
-};
+	TempNode.call( this, 'v3', { shared: false } );
 
-THREE.LightNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.LightNode.prototype.constructor = THREE.LightNode;
+	this.scope = scope || LightNode.TOTAL;
 
-THREE.LightNode.prototype.generate = function( builder, output ) {
+}
+
+LightNode.TOTAL = 'total';
+
+LightNode.prototype = Object.create( TempNode.prototype );
+LightNode.prototype.constructor = LightNode;
+LightNode.prototype.nodeType = "Light";
+
+LightNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isCache( 'light' ) ) {
 
-		return builder.format( 'reflectedLight.directDiffuse', this.getType( builder ), output )
+		return builder.format( 'reflectedLight.directDiffuse', this.type, output );
 
 	} else {
 
 		console.warn( "THREE.LightNode is only compatible in \"light\" channel." );
 
-		return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
+		return builder.format( 'vec3( 0.0 )', this.type, output );
 
 	}
 
 };
+
+LightNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.scope = source.scope;
+
+};
+
+LightNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.scope = this.scope;
+
+	}
+
+	return data;
+
+};
+
+export { LightNode };

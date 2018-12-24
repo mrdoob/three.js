@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lines - cubes - colors</title>
+		<title>three.js webgl - lines - colors</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -9,10 +9,6 @@
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
-			}
-
-			a {
-				color:#0078ff;
 			}
 
 			#info {
@@ -40,7 +36,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - color lines WebGL demo
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - color lines
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
@@ -48,97 +44,141 @@
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var effectFXAA;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var mouseX = 0, mouseY = 0,
+			}
 
-			windowHalfX = window.innerWidth / 2,
-			windowHalfY = window.innerHeight / 2,
+			var mouseX = 0, mouseY = 0;
 
-			camera, scene, renderer, material, composer;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var camera, scene, renderer;
 
 			init();
 			animate();
 
 			function init() {
 
-				var i, container;
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 700;
+				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.autoClear = false;
+				document.body.appendChild( renderer.domElement );
 
-				container.appendChild( renderer.domElement );
+				//
 
-				var geometry = new THREE.Geometry(),
-					geometry2 = new THREE.Geometry(),
-					geometry3 = new THREE.Geometry(),
-					points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 2, 0, 1, 2, 3, 4, 5, 6, 7 ),
-					colors = [], colors2 = [], colors3 = [];
+				var hilbertPoints = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				for ( i = 0; i < points.length; i ++ ) {
+				var geometry1 = new THREE.BufferGeometry();
+				var geometry2 = new THREE.BufferGeometry();
+				var geometry3 = new THREE.BufferGeometry();
 
-					geometry.vertices.push( points[ i ] );
+				var subdivisions = 6;
 
-					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, ( 200 - points[ i ].x ) / 400 ) * 0.5 + 0.5 );
+				var vertices = [];
+				var colors1 = [];
+				var colors2 = [];
+				var colors3 = [];
 
-					colors2[ i ] = new THREE.Color( 0xffffff );
-					colors2[ i ].setHSL( 0.3, 1.0, Math.max( 0, ( 200 + points[ i ].x ) / 400 ) * 0.5 );
+				var point = new THREE.Vector3();
+				var color = new THREE.Color();
 
-					colors3[ i ] = new THREE.Color( 0xffffff );
-					colors3[ i ].setHSL( i / points.length, 1.0, 0.5 );
+				var spline = new THREE.CatmullRomCurve3( hilbertPoints );
+
+				for ( var i = 0; i < hilbertPoints.length * subdivisions; i ++ ) {
+
+					var t = i / ( hilbertPoints.length * subdivisions );
+					spline.getPoint( t, point );
+
+					vertices.push( point.x, point.y, point.z );
+
+					color.setHSL( 0.6, 1.0, Math.max( 0, - point.x / 200 ) + 0.5 );
+					colors1.push( color.r, color.g, color.b );
+
+					color.setHSL( 0.9, 1.0, Math.max( 0, - point.y / 200 ) + 0.5 );
+					colors2.push( color.r, color.g, color.b );
+
+					color.setHSL( i / ( hilbertPoints.length * subdivisions ), 1.0, 0.5 );
+					colors3.push( color.r, color.g, color.b );
 
 				}
 
-				geometry2.vertices = geometry3.vertices = geometry.vertices;
+				geometry1.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry2.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry3.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-				geometry.colors = colors;
-				geometry2.colors = colors2;
-				geometry3.colors = colors3;
+				geometry1.addAttribute( 'color', new THREE.Float32BufferAttribute( colors1, 3 ) );
+				geometry2.addAttribute( 'color', new THREE.Float32BufferAttribute( colors2, 3 ) );
+				geometry3.addAttribute( 'color', new THREE.Float32BufferAttribute( colors3, 3 ) );
 
-				// lines
+				//
 
-				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
+				var geometry4 = new THREE.BufferGeometry();
+				var geometry5 = new THREE.BufferGeometry();
+				var geometry6 = new THREE.BufferGeometry();
+
+				vertices = [];
+				colors1 = [];
+				colors2 = [];
+				colors3 = [];
+
+				for ( var i = 0; i < hilbertPoints.length; i ++ ) {
+
+					var point = hilbertPoints[ i ];
+
+					vertices.push( point.x, point.y, point.z );
+
+					color.setHSL( 0.6, 1.0, Math.max( 0, ( 200 - hilbertPoints[ i ].x ) / 400 ) * 0.5 + 0.5 );
+					colors1.push( color.r, color.g, color.b );
+
+					color.setHSL( 0.3, 1.0, Math.max( 0, ( 200 + hilbertPoints[ i ].x ) / 400 ) * 0.5 );
+					colors2.push( color.r, color.g, color.b );
+
+					color.setHSL( i / hilbertPoints.length, 1.0, 0.5 );
+					colors3.push( color.r, color.g, color.b );
+
+				}
+
+				geometry4.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry5.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry6.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+				geometry4.addAttribute( 'color', new THREE.Float32BufferAttribute( colors1, 3 ) );
+				geometry5.addAttribute( 'color', new THREE.Float32BufferAttribute( colors2, 3 ) );
+				geometry6.addAttribute( 'color', new THREE.Float32BufferAttribute( colors3, 3 ) );
+
+				// Create lines and add to scene
+
+				var	material = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: THREE.VertexColors } );
 
 				var line, p, scale = 0.3, d = 225;
-				var parameters =  [
-					[ material, scale*1.5, [-d,0,0],  geometry ],
-					[ material, scale*1.5, [0,0,0],  geometry2 ],
-					[ material, scale*1.5, [d,0,0],  geometry3 ]
+
+				var parameters = [
+					[ material, scale * 1.5, [ - d, - d / 2, 0 ], geometry1 ],
+					[ material, scale * 1.5, [ 0, - d / 2, 0 ], geometry2 ],
+					[ material, scale * 1.5, [ d, - d / 2, 0 ], geometry3 ],
+
+					[ material, scale * 1.5, [ - d, d / 2, 0 ], geometry4 ],
+					[ material, scale * 1.5, [ 0, d / 2, 0 ], geometry5 ],
+					[ material, scale * 1.5, [ d, d / 2, 0 ], geometry6 ],
 				];
 
-				for ( i = 0; i < parameters.length; ++i ) {
+				for ( var i = 0; i < parameters.length; i ++ ) {
 
 					p = parameters[ i ];
-					line = new THREE.Line( p[ 3 ],  p[ 0 ] );
-					line.scale.x = line.scale.y = line.scale.z =  p[ 1 ];
+					line = new THREE.Line( p[ 3 ], p[ 0 ] );
+					line.scale.x = line.scale.y = line.scale.z = p[ 1 ];
 					line.position.x = p[ 2 ][ 0 ];
 					line.position.y = p[ 2 ][ 1 ];
 					line.position.z = p[ 2 ][ 2 ];
@@ -148,36 +188,9 @@
 
 				//
 
-				stats = new Stats();
-				//container.appendChild( stats.dom );
-
-				//
-
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
-				//
-
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectBloom = new THREE.BloomPass( 1.3 );
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
-
-				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-
-				var width = window.innerWidth || 2;
-				var height = window.innerHeight || 2;
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
-
-				effectCopy.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer );
-
-				composer.addPass( renderModel );
-				composer.addPass( effectFXAA );
-				composer.addPass( effectBloom );
-				composer.addPass( effectCopy );
 
 				//
 
@@ -194,10 +207,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
-
-				composer.reset();
 
 			}
 
@@ -231,6 +240,7 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
 
 			}
@@ -242,14 +252,12 @@
 				requestAnimationFrame( animate );
 				render();
 
-				stats.update();
-
 			}
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouseY + 200 - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
 
@@ -258,12 +266,16 @@
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 
 					var object = scene.children[ i ];
-					if ( object instanceof THREE.Line ) object.rotation.y = time * ( i % 2 ? 1 : -1 );
+
+					if ( object.isLine ) {
+
+						object.rotation.y = time * ( i % 2 ? 1 : - 1 );
+
+					}
 
 				}
 
-				renderer.clear();
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 

@@ -4,8 +4,10 @@
 		<title>three.js webvr - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
 		<style>
 			body {
 				margin: 0px;
@@ -17,9 +19,10 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/vr/WebVR.js"></script>
-
+		<script src="js/objects/Lensflare.js"></script>
 		<script src="js/objects/Reflector.js"></script>
+
+		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
@@ -40,14 +43,9 @@
 				scene = new THREE.Scene();
 				scene.background = background;
 
-				var user = new THREE.Group();
-				user.position.set( 0, 0.75, 0 );
-				scene.add( user );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				user.add( camera );
 
-				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
+				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 150, 20 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = 0.75;
@@ -56,7 +54,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var geometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
+				var geometry = new THREE.BoxBufferGeometry( 1.5, 0.1, 1.5 );
 				var material = new THREE.MeshPhongMaterial();
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 0.2;
@@ -73,7 +71,7 @@
 				light.target.position.set( 0, 0, - 2 );
 				scene.add( light.target );
 
-				var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				var light = new THREE.DirectionalLight( 0xff0000 );
@@ -84,8 +82,22 @@
 				light.target.position.set( 0, 0, - 2 );
 				scene.add( light.target );
 
-				var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
+
+				// lensflare
+				var loader = new THREE.TextureLoader();
+				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
+				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
+
+				var lensflare = new THREE.Lensflare();
+				lensflare.position.set( 0, 5, - 5 );
+				lensflare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
+				scene.add( lensflare );
 
 				//
 
@@ -96,11 +108,11 @@
 				} );
 				reflector.position.x = 1;
 				reflector.position.y = 0.5;
-				reflector.position.z = -3;
+				reflector.position.z = - 3;
 				reflector.rotation.y = - Math.PI / 4;
 				scene.add( reflector );
 
-				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
+				var geometry = new THREE.BoxBufferGeometry( 1.5, 1.5, 0.1 );
 				var material = new THREE.MeshPhongMaterial();
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.z = - 0.07;
@@ -111,7 +123,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x000000 );
+				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -137,14 +149,14 @@
 
 			function animate() {
 
-				renderer.animate( render );
+				renderer.setAnimationLoop( render );
 
 			}
 
 			function render() {
 
 				var time = performance.now() * 0.0002;
-				var mesh = scene.children[ 1 ];
+				var mesh = scene.children[ 0 ];
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 5;
 

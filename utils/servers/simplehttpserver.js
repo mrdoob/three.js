@@ -17,8 +17,20 @@ var port = 8000,
 	urlParser = require('url'),
 	fs = require('fs'),
 	path = require('path'),
-	currentDir = process.cwd();
-
+	currentDir = process.cwd(),
+	mimeTypes = {
+		"html": "text/html",
+		"js": "text/javascript",
+		"css": "text/css",
+		"jpg": "image/jpeg",
+		"png": "image/png",
+		"gif": "image/gif",
+		"ogg": "audio/ogg",
+		"mp3": "audio/mpeg",
+		"mp4": "video/mp4",
+		"txt": "text/plain",
+		"bin": "application/octet-stream"
+	};
 
 port = process.argv[2] ? parseInt(process.argv[2], 0) : port;
 
@@ -49,9 +61,15 @@ function handleRequest(request, response) {
 					return;
 				}
 
-				response.writeHead(200, {});
+				var fileType = filePath.split('.').pop().toLowerCase();
+
+				response.writeHead(200, { 
+					"Content-Type": mimeTypes[fileType] || mimeTypes['bin']
+				} );
+
 				response.write(data);
 				response.end();
+
 			});
 
 		} else if (stats.isDirectory()) {

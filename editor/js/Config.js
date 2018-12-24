@@ -2,9 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Config = function ( name ) {
+var Config = function () {
+
+	var name = 'threejs-editor';
 
 	var storage = {
+		'language': 'en',
+
 		'autosave': true,
 		'theme': 'css/light.css',
 
@@ -19,7 +23,13 @@ var Config = function ( name ) {
 
 		'project/vr': false,
 
-		'settings/history': false
+		'settings/history': false,
+
+		'settings/shortcuts/translate': 'w',
+		'settings/shortcuts/rotate': 'e',
+		'settings/shortcuts/scale': 'r',
+		'settings/shortcuts/undo': 'z',
+		'settings/shortcuts/focus': 'f'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

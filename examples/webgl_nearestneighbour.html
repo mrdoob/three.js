@@ -76,12 +76,9 @@
 
 			var amountOfParticles = 500000, maxDistance = Math.pow( 120, 2 );
 			var positions, alphas, particles, _particleGeom;
+			var kdtree;
 
 			var clock = new THREE.Clock();
-
-			var blocker = document.getElementById( 'blocker' );
-			var instructions = document.getElementById( 'instructions' );
-
 
 			function init() {
 
@@ -108,7 +105,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer(); // Detector.webgl? new THREE.WebGLRenderer(): new THREE.CanvasRenderer()
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -127,7 +124,7 @@
 						tex1: { value: imagePreviewTexture },
 						zoom: { value: 9.0 }
 					},
-					vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 					transparent: true
 				} );
@@ -136,7 +133,7 @@
 				//create particles with buffer geometry
 				var distanceFunction = function ( a, b ) {
 
-					return Math.pow( a[ 0 ] - b [0 ], 2 ) +  Math.pow( a[ 1 ] - b[ 1 ], 2 ) +  Math.pow( a[ 2 ] - b[ 2 ], 2 );
+					return Math.pow( a[ 0 ] - b[ 0 ], 2 ) + Math.pow( a[ 1 ] - b[ 1 ], 2 ) + Math.pow( a[ 2 ] - b[ 2 ], 2 );
 
 				};
 
@@ -182,6 +179,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				controls.handleResize();
+
 			}
 
 			function animate() {

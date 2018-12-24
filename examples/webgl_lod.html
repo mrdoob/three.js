@@ -40,18 +40,20 @@
 
 		<script src="js/controls/FlyControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, stats;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var container;
 
 			var camera, scene, renderer;
-
-			var geometry, objects;
 
 			var controls, clock = new THREE.Clock();
 
@@ -84,11 +86,11 @@
 
 				var geometry = [
 
-					[ new THREE.IcosahedronGeometry( 100, 4 ), 50 ],
-					[ new THREE.IcosahedronGeometry( 100, 3 ), 300 ],
-					[ new THREE.IcosahedronGeometry( 100, 2 ), 1000 ],
-					[ new THREE.IcosahedronGeometry( 100, 1 ), 2000 ],
-					[ new THREE.IcosahedronGeometry( 100, 0 ), 8000 ]
+					[ new THREE.IcosahedronBufferGeometry( 100, 4 ), 50 ],
+					[ new THREE.IcosahedronBufferGeometry( 100, 3 ), 300 ],
+					[ new THREE.IcosahedronBufferGeometry( 100, 2 ), 1000 ],
+					[ new THREE.IcosahedronBufferGeometry( 100, 1 ), 2000 ],
+					[ new THREE.IcosahedronBufferGeometry( 100, 0 ), 8000 ]
 
 				];
 
@@ -111,7 +113,7 @@
 					}
 
 					lod.position.x = 10000 * ( 0.5 - Math.random() );
-					lod.position.y =  7500 * ( 0.5 - Math.random() );
+					lod.position.y = 7500 * ( 0.5 - Math.random() );
 					lod.position.z = 10000 * ( 0.5 - Math.random() );
 					lod.updateMatrix();
 					lod.matrixAutoUpdate = false;
@@ -120,7 +122,7 @@
 				}
 
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

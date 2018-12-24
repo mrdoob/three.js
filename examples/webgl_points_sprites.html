@@ -23,9 +23,9 @@
 			#info {
 				color:#fff;
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0px;
+				width: 100%;
 				padding: 5px;
-				z-index:100;
 			}
 
 		</style>
@@ -39,15 +39,19 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, stats;
-			var camera, scene, renderer, particles, geometry, materials = [], parameters, i, h, color, sprite, size;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var camera, scene, renderer, stats, materials = [], parameters;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -58,54 +62,53 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
 
-				geometry = new THREE.Geometry();
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var sprite1 = textureLoader.load( "textures/sprites/snowflake1.png" );
-				var sprite2 = textureLoader.load( "textures/sprites/snowflake2.png" );
-				var sprite3 = textureLoader.load( "textures/sprites/snowflake3.png" );
-				var sprite4 = textureLoader.load( "textures/sprites/snowflake4.png" );
-				var sprite5 = textureLoader.load( "textures/sprites/snowflake5.png" );
+				var sprite1 = textureLoader.load( 'textures/sprites/snowflake1.png' );
+				var sprite2 = textureLoader.load( 'textures/sprites/snowflake2.png' );
+				var sprite3 = textureLoader.load( 'textures/sprites/snowflake3.png' );
+				var sprite4 = textureLoader.load( 'textures/sprites/snowflake4.png' );
+				var sprite5 = textureLoader.load( 'textures/sprites/snowflake5.png' );
 
-				for ( i = 0; i < 10000; i ++ ) {
+				for ( var i = 0; i < 10000; i ++ ) {
 
-					var vertex = new THREE.Vector3();
-					vertex.x = Math.random() * 2000 - 1000;
-					vertex.y = Math.random() * 2000 - 1000;
-					vertex.z = Math.random() * 2000 - 1000;
+					var x = Math.random() * 2000 - 1000;
+					var y = Math.random() * 2000 - 1000;
+					var z = Math.random() * 2000 - 1000;
 
-					geometry.vertices.push( vertex );
+					vertices.push( x, y, z );
 
 				}
 
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
 				parameters = [
-					[ [1.0, 0.2, 0.5], sprite2, 20 ],
-					[ [0.95, 0.1, 0.5], sprite3, 15 ],
-					[ [0.90, 0.05, 0.5], sprite1, 10 ],
-					[ [0.85, 0, 0.5], sprite5, 8 ],
-					[ [0.80, 0, 0.5], sprite4, 5 ]
+					[[ 1.0, 0.2, 0.5 ], sprite2, 20 ],
+					[[ 0.95, 0.1, 0.5 ], sprite3, 15 ],
+					[[ 0.90, 0.05, 0.5 ], sprite1, 10 ],
+					[[ 0.85, 0, 0.5 ], sprite5, 8 ],
+					[[ 0.80, 0, 0.5 ], sprite4, 5 ]
 				];
 
-				for ( i = 0; i < parameters.length; i ++ ) {
+				for ( var i = 0; i < parameters.length; i ++ ) {
 
-					color  = parameters[i][0];
-					sprite = parameters[i][1];
-					size   = parameters[i][2];
+					var color = parameters[ i ][ 0 ];
+					var sprite = parameters[ i ][ 1 ];
+					var size = parameters[ i ][ 2 ];
 
-					materials[i] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
-					materials[i].color.setHSL( color[0], color[1], color[2] );
+					materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+					materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ] );
 
-					particles = new THREE.Points( geometry, materials[i] );
+					var particles = new THREE.Points( geometry, materials[ i ] );
 
 					particles.rotation.x = Math.random() * 6;
 					particles.rotation.y = Math.random() * 6;
@@ -115,13 +118,38 @@
 
 				}
 
+				//
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
+
+				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
+
+				//
+
+				var gui = new dat.GUI();
+
+				var params = {
+					texture: true
+				};
+
+				gui.add( params, 'texture' ).onChange( function ( value ) {
+
+					for ( var i = 0; i < materials.length; i ++ ) {
+
+						materials[ i ].map = ( value === true ) ? parameters[ i ][ 1 ] : null;
+						materials[ i ].needsUpdate = true;
+
+					}
+
+				} );
+
+				gui.open();
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -198,7 +226,7 @@
 
 				camera.lookAt( scene.position );
 
-				for ( i = 0; i < scene.children.length; i ++ ) {
+				for ( var i = 0; i < scene.children.length; i ++ ) {
 
 					var object = scene.children[ i ];
 
@@ -210,19 +238,18 @@
 
 				}
 
-				for ( i = 0; i < materials.length; i ++ ) {
+				for ( var i = 0; i < materials.length; i ++ ) {
 
-					color = parameters[i][0];
+					var color = parameters[ i ][ 0 ];
 
-					h = ( 360 * ( color[0] + time ) % 360 ) / 360;
-					materials[i].color.setHSL( h, color[1], color[2] );
+					var h = ( 360 * ( color[ 0 ] + time ) % 360 ) / 360;
+					materials[ i ].color.setHSL( h, color[ 1 ], color[ 2 ] );
 
 				}
 
 				renderer.render( scene, camera );
 
 			}
-
 
 		</script>
 	</body>

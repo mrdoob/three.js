@@ -4,57 +4,25 @@
 /* global QUnit */
 
 import {
-	ShapeGeometry,
 	ShapeBufferGeometry
 } from '../../../../src/geometries/ShapeGeometry';
 
+import { Shape } from '../../../../src/extras/core/Shape';
+
 export default QUnit.module( 'Geometries', () => {
-
-	QUnit.module( 'ShapeGeometry', ( hooks ) => {
-
-		var geometries = undefined;
-		hooks.beforeEach( function () {
-
-			const parameters = {};
-
-			geometries = [
-				new ShapeGeometry()
-			];
-
-		} );
-
-		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
-
-			runStdGeometryTests( assert, geometries );
-
-		} );
-
-	} );
 
 	QUnit.module( 'ShapeBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+			var triangleShape = new Shape();
+			triangleShape.moveTo( 0, - 1 );
+			triangleShape.lineTo( 1, 1 );
+			triangleShape.lineTo( - 1, 1 );
 
 			geometries = [
-				new ShapeBufferGeometry()
+				new ShapeBufferGeometry( triangleShape )
 			];
 
 		} );
@@ -74,9 +42,9 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
+		QUnit.todo( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, geometries );
+			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 

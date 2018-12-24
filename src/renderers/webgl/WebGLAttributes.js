@@ -4,7 +4,7 @@
 
 function WebGLAttributes( gl ) {
 
-	var buffers = {};
+	var buffers = new WeakMap();
 
 	function createBuffer( attribute, bufferType ) {
 
@@ -101,7 +101,7 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		return buffers[ attribute.uuid ];
+		return buffers.get( attribute );
 
 	}
 
@@ -109,13 +109,13 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers[ attribute.uuid ];
+		var data = buffers.get( attribute );
 
 		if ( data ) {
 
 			gl.deleteBuffer( data.buffer );
 
-			delete buffers[ attribute.uuid ];
+			buffers.delete( attribute );
 
 		}
 
@@ -125,11 +125,11 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers[ attribute.uuid ];
+		var data = buffers.get( attribute );
 
 		if ( data === undefined ) {
 
-			buffers[ attribute.uuid ] = createBuffer( attribute, bufferType );
+			buffers.set( attribute, createBuffer( attribute, bufferType ) );
 
 		} else if ( data.version < attribute.version ) {
 

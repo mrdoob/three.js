@@ -23,9 +23,7 @@
 				color: #ffffff;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
 		</style>
 	</head>
@@ -39,19 +37,21 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, stats;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var container;
 
 			var camera, scene, renderer;
-
-			var geometry, objects;
 
 			var mesh;
 
@@ -62,7 +62,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -70,8 +70,8 @@
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
 				var light = new THREE.PointLight( 0xff2200 );
-				light.position.set( 100, 100, 100 );
-				scene.add( light );
+				camera.add( light );
+				scene.add( camera );
 
 				var light = new THREE.AmbientLight( 0x111111 );
 				scene.add( light );
@@ -103,6 +103,8 @@
 
 				}
 
+				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
 				mesh = new THREE.Mesh( geometry, material );
 
 				scene.add( mesh );
@@ -123,14 +125,46 @@
 				var gui = new dat.GUI();
 
 				var folder = gui.addFolder( 'Morph Targets' );
-				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 0 ] = value; } );
-				folder.add( params, 'influence2', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 1 ] = value; } );
-				folder.add( params, 'influence3', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 2 ] = value; } );
-				folder.add( params, 'influence4', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 3 ] = value; } );
-				folder.add( params, 'influence5', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 4 ] = value; } );
-				folder.add( params, 'influence6', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 5 ] = value; } );
-				folder.add( params, 'influence7', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 6 ] = value; } );
-				folder.add( params, 'influence8', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 7 ] = value; } );
+				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 0 ] = value;
+
+				} );
+				folder.add( params, 'influence2', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 1 ] = value;
+
+				} );
+				folder.add( params, 'influence3', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 2 ] = value;
+
+				} );
+				folder.add( params, 'influence4', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 3 ] = value;
+
+				} );
+				folder.add( params, 'influence5', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 4 ] = value;
+
+				} );
+				folder.add( params, 'influence6', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 5 ] = value;
+
+				} );
+				folder.add( params, 'influence7', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 6 ] = value;
+
+				} );
+				folder.add( params, 'influence8', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 7 ] = value;
+
+				} );
 				folder.open();
 
 				//
@@ -142,7 +176,9 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 400;
+				controls.maxDistance = 1000;
 
 				//
 

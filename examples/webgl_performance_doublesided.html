@@ -18,18 +18,20 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
 			var camera, scene, renderer;
-
-			var mesh, geometry;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -61,7 +63,7 @@
 				scene.add( light );
 
 				var light = new THREE.PointLight( 0xff1100, 1, 5500 );
-				light.position.set( -4000, 0, 0 );
+				light.position.set( - 4000, 0, 0 );
 				scene.add( light );
 
 				var light = new THREE.PointLight( 0xffaa00, 2, 3000 );
@@ -71,17 +73,17 @@
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
 
 				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 				reflectionCube.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
 
-				var geometry = new THREE.SphereGeometry( 1, 32, 16, 0, Math.PI );
+				var geometry = new THREE.SphereBufferGeometry( 1, 32, 16, 0, Math.PI );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
@@ -121,7 +123,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
@@ -136,7 +138,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;

@@ -1,3 +1,8 @@
+/**
+ * @author adrs2002 / https://github.com/adrs2002
+ */
+
+
 ( function ( global, factory ) {
 
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -201,23 +206,18 @@
 
 	};
 
-	"use strict";
-
 	var XLoader = function () {
 
-		function XLoader( manager, texloader ) {
+		function XLoader( manager ) {
 
 			classCallCheck( this, XLoader );
 
 			this.debug = false;
 			this.manager = manager !== undefined ? manager : new THREE.DefaultLoadingManager();
-			this.texloader = texloader !== undefined ? texloader : new THREE.TextureLoader();
+			this.texloader = new THREE.TextureLoader( this.manager );
 			this.url = "";
-			this.baseDir = "";
 			this._putMatLength = 0;
 			this._nowMat = null;
-			this._tmpUvArray = [];
-			this._facesNormal = [];
 			this._nowFrameName = "";
 			this.frameHierarchie = [];
 			this.Hierarchies = {};
@@ -237,14 +237,20 @@
 		}
 
 		createClass( XLoader, [ {
-			key: 'load',
-			value: function load( _arg, onLoad, onProgress, onError ) {
+			key: 'crossOrigin',
+			value: 'anonymous'
+		}, {
+			key: '_setArgOption',
+			value: function _setArgOption( _arg ) {
 
-				var _this = this;
+				var _start = arguments.length > 1 && arguments[ 1 ] !== undefined ? arguments[ 1 ] : 0;
 
-				var loader = new THREE.FileLoader( this.manager );
-				loader.setResponseType( 'arraybuffer' );
-				for ( var i = 0; i < _arg.length; i ++ ) {
+				if ( ! _arg ) {
+
+					return;
+
+				}
+				for ( var i = _start; i < _arg.length; i ++ ) {
 
 					switch ( i ) {
 
@@ -263,11 +269,102 @@
 					this.options = {};
 
 				}
+
+			}
+		}, {
+			key: 'load',
+			value: function load( _arg, onLoad, onProgress, onError ) {
+
+				var _this = this;
+
+				this._setArgOption( _arg );
+				var loader = new THREE.FileLoader( this.manager );
+				loader.setPath( this.path );
+				loader.setResponseType( 'arraybuffer' );
 				loader.load( this.url, function ( response ) {
 
 					_this._parse( response, onLoad );
 
 				}, onProgress, onError );
+
+			}
+		}, {
+			key: 'setCrossOrigin',
+			value: function setCrossOrigin( value ) {
+
+				this.crossOrigin = value;
+				return this;
+
+			}
+		}, {
+			key: 'setPath',
+			value: function setPath( value ) {
+
+				this.path = value;
+				return this;
+
+			}
+		}, {
+			key: 'setResourcePath',
+			value: function setResourcePath( value ) {
+
+				this.resourcePath = value;
+				return this;
+
+			}
+		}, {
+			key: 'fromResponsedData',
+			value: function fromResponsedData( _data, _arg, onLoad ) {
+
+				this._setArgOption( _arg );
+				this._parse( _data, onLoad );
+
+			}
+		}, {
+			key: '_readLine',
+			value: function _readLine( line ) {
+
+				var readed = 0;
+				while ( true ) {
+
+					var find = - 1;
+					find = line.indexOf( '//', readed );
+					if ( find === - 1 ) {
+
+						find = line.indexOf( '#', readed );
+
+					}
+					if ( find > - 1 && find < 2 ) {
+
+						var foundNewLine = - 1;
+						foundNewLine = line.indexOf( "\r\n", readed );
+						if ( foundNewLine > 0 ) {
+
+							readed = foundNewLine + 2;
+
+						} else {
+
+							foundNewLine = line.indexOf( "\r", readed );
+							if ( foundNewLine > 0 ) {
+
+								readed = foundNewLine + 1;
+
+							} else {
+
+								readed = line.indexOf( "\n", readed ) + 1;
+
+							}
+
+						}
+
+					} else {
+
+						break;
+
+					}
+
+				}
+				return line.substr( readed );
 
 			}
 		}, {
@@ -370,14 +467,7 @@
 
 				if ( typeof buf !== "string" ) {
 
-					var array_buffer = new Uint8Array( buf );
-					var str = '';
-					for ( var i = 0; i < buf.byteLength; i ++ ) {
-
-						str += String.fromCharCode( array_buffer[ i ] );
-
-					}
-					return str;
+					return THREE.LoaderUtils.decodeText( new Uint8Array( buf ) );
 
 				} else {
 
@@ -400,18 +490,31 @@
 			key: '_parseBinary',
 			value: function _parseBinary( data ) {
 
-				return this._parseASCII( String.fromCharCode.apply( null, data ) );
+				return this._parseASCII( THREE.LoaderUtils.decodeText( new Uint8Array( data ) ) );
 
 			}
 		}, {
 			key: '_parseASCII',
 			value: function _parseASCII() {
 
-				if ( this.url.lastIndexOf( "/" ) > 0 ) {
+				var path;
 
-					this.baseDir = this.url.substr( 0, this.url.lastIndexOf( "/" ) + 1 );
+				if ( this.resourcePath !== undefined ) {
+
+					path = this.resourcePath;
+
+				} else if ( this.path !== undefined ) {
+
+					path = this.path;
+
+				} else {
+
+					path = THREE.LoaderUtils.extractUrlBase( this.url );
 
 				}
+
+				this.texloader.setPath( path ).setCrossOrigin( this.crossOrigin );
+
 				var endRead = 16;
 				this.Hierarchies.children = [];
 				this._hierarchieParse( this.Hierarchies, endRead );
@@ -518,7 +621,6 @@
 
 				} else {
 
-					this._readFinalize();
 					setTimeout( function () {
 
 						_this2.onLoad( {
@@ -559,7 +661,15 @@
 								this._currentGeo.name = this._currentObject.name.trim();
 								this._currentGeo.parentName = this._getParentName( this._currentObject ).trim();
 								this._currentGeo.VertexSetedBoneCount = [];
-								this._currentGeo.Geometry = new THREE.Geometry();
+								this._currentGeo.GeometryData = {
+									vertices: [],
+									normals: [],
+									uvs: [],
+									skinIndices: [],
+									skinWeights: [],
+									indices: [],
+									materialIndices: []
+								};
 								this._currentGeo.Materials = [];
 								this._currentGeo.normalVectors = [];
 								this._currentGeo.BoneInfs = [];
@@ -759,7 +869,6 @@
 				var mode = 0;
 				var mode_local = 0;
 				var maxLength = 0;
-				var nowReadedLine = 0;
 				while ( true ) {
 
 					var changeMode = false;
@@ -768,7 +877,6 @@
 						var refO = this._readInt1( endRead );
 						endRead = refO.endRead;
 						mode_local = 1;
-						nowReadedLine = 0;
 						maxLength = this._currentObject.data.indexOf( ';;', endRead ) + 1;
 						if ( maxLength <= 0 ) {
 
@@ -816,16 +924,12 @@
 									case 0:
 										this._readNormalVector1( this._currentObject.data.substr( endRead, find - endRead ) );
 										break;
-									case 1:
-										this._readNormalFace1( this._currentObject.data.substr( endRead, find - endRead ), nowReadedLine );
-										break;
 
 								}
 								break;
 
 						}
 						endRead = find + 1;
-						nowReadedLine ++;
 						if ( changeMode ) {
 
 							mode ++;
@@ -858,9 +962,9 @@
 			value: function _readVertex1( line ) {
 
 				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ";" );
-				this._currentGeo.Geometry.vertices.push( new THREE.Vector3( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) ) );
-				this._currentGeo.Geometry.skinIndices.push( new THREE.Vector4( 0, 0, 0, 0 ) );
-				this._currentGeo.Geometry.skinWeights.push( new THREE.Vector4( 1, 0, 0, 0 ) );
+				this._currentGeo.GeometryData.vertices.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) );
+				this._currentGeo.GeometryData.skinIndices.push( 0, 0, 0, 0 );
+				this._currentGeo.GeometryData.skinWeights.push( 1, 0, 0, 0 );
 				this._currentGeo.VertexSetedBoneCount.push( 0 );
 
 			}
@@ -869,7 +973,7 @@
 			value: function _readFace1( line ) {
 
 				var data = this._readLine( line.trim() ).substr( 2, line.length - 4 ).split( "," );
-				this._currentGeo.Geometry.faces.push( new THREE.Face3( parseInt( data[ 0 ], 10 ), parseInt( data[ 1 ], 10 ), parseInt( data[ 2 ], 10 ), new THREE.Vector3( 1, 1, 1 ).normalize() ) );
+				this._currentGeo.GeometryData.indices.push( parseInt( data[ 0 ], 10 ), parseInt( data[ 1 ], 10 ), parseInt( data[ 2 ], 10 ) );
 
 			}
 		}, {
@@ -877,84 +981,97 @@
 			value: function _readNormalVector1( line ) {
 
 				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ";" );
-				if ( this.options.zflag ) {
-
-					this._currentGeo.normalVectors.push( new THREE.Vector3( parseFloat( data[ 0 ] ) * - 1, parseFloat( data[ 1 ] ) * - 1, parseFloat( data[ 2 ] ) * - 1 ) );
-
-				} else {
-
-					this._currentGeo.normalVectors.push( new THREE.Vector3( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) ) );
-
-				}
+				this._currentGeo.GeometryData.normals.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) );
 
 			}
 		}, {
-			key: '_readNormalFace1',
-			value: function _readNormalFace1( line, nowReaded ) {
+			key: '_buildGeometry',
+			value: function _buildGeometry() {
 
-				var data = this._readLine( line.trim() ).substr( 2, line.length - 4 ).split( "," );
-				var nowID = parseInt( data[ 0 ], 10 );
-				var v1 = this._currentGeo.normalVectors[ nowID ];
-				nowID = parseInt( data[ 1 ], 10 );
-				var v2 = this._currentGeo.normalVectors[ nowID ];
-				nowID = parseInt( data[ 2 ], 10 );
-				var v3 = this._currentGeo.normalVectors[ nowID ];
-				this._currentGeo.Geometry.faces[ nowReaded ].vertexNormals = [ v1, v2, v3 ];
+				var bufferGeometry = new THREE.BufferGeometry();
+				var position = [];
+				var normals = [];
+				var uvs = [];
+				var skinIndices = [];
+				var skinWeights = [];
+
+				//
+
+				var data = this._currentGeo.GeometryData;
+
+				for ( var i = 0, l = data.indices.length; i < l; i ++ ) {
+
+					var stride2 = data.indices[ i ] * 2;
+					var stride3 = data.indices[ i ] * 3;
+					var stride4 = data.indices[ i ] * 4;
+
+					position.push( data.vertices[ stride3 ], data.vertices[ stride3 + 1 ], data.vertices[ stride3 + 2 ] );
+					normals.push( data.normals[ stride3 ], data.normals[ stride3 + 1 ], data.normals[ stride3 + 2 ] );
+					skinIndices.push( data.skinIndices[ stride4 ], data.skinIndices[ stride4 + 1 ], data.skinIndices[ stride4 + 2 ], data.skinIndices[ stride4 + 3 ] );
+					skinWeights.push( data.skinWeights[ stride4 ], data.skinWeights[ stride4 + 1 ], data.skinWeights[ stride4 + 2 ], data.skinWeights[ stride4 + 3 ] );
+					uvs.push( data.uvs[ stride2 ], data.uvs[ stride2 + 1 ] );
+
+				}
+
+				//
+
+				bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+				bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				bufferGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				bufferGeometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+				bufferGeometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+
+				this._computeGroups( bufferGeometry, data.materialIndices );
+
+				return bufferGeometry;
 
 			}
 		}, {
-			key: '_setMeshNormals',
-			value: function _setMeshNormals() {
+			key: '_computeGroups',
+			value: function _computeGroups( bufferGeometry, materialIndices ) {
 
-				var endRead = 0;
-				var mode = 0;
-				var mode_local = 0;
-				while ( true ) {
+				var group;
+				var groups = [];
+				var materialIndex = undefined;
 
-					switch ( mode ) {
+				for ( var i = 0; i < materialIndices.length; i ++ ) {
 
-						case 0:
-							if ( mode_local === 0 ) {
+					var currentMaterialIndex = materialIndices[ i ];
 
-								var refO = this._readInt1( 0 );
-								endRead = refO.endRead;
-								mode_local = 1;
+					if ( currentMaterialIndex !== materialIndex ) {
 
-							} else {
+						materialIndex = currentMaterialIndex;
 
-								var find = this._currentObject.data.indexOf( ',', endRead ) + 1;
-								if ( find === - 1 ) {
+						if ( group !== undefined ) {
 
-									find = this._currentObject.data.indexOf( ';;', endRead ) + 1;
-									mode = 2;
-									mode_local = 0;
+							group.count = ( i * 3 ) - group.start;
+							groups.push( group );
 
-								}
-								var line = this._currentObject.data.substr( endRead, find - endRead );
-								var data = this._readLine( line.trim() ).split( ";" );
-								this._currentGeo.normalVectors.push( [ parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) ] );
-								endRead = find + 1;
+						}
 
-							}
-							break;
-
-					}
-					if ( endRead >= this._currentObject.data.length ) {
-
-						break;
+						group = {
+							start: i * 3,
+							materialIndex: materialIndex
+						};
 
 					}
 
 				}
+
+				if ( group !== undefined ) {
+
+					group.count = ( i * 3 ) - group.start;
+					groups.push( group );
+
+				}
+
+				bufferGeometry.groups = groups;
 
 			}
 		}, {
 			key: '_setMeshTextureCoords',
 			value: function _setMeshTextureCoords() {
 
-				this._tmpUvArray = [];
-				this._currentGeo.Geometry.faceVertexUvs = [];
-				this._currentGeo.Geometry.faceVertexUvs.push( [] );
 				var endRead = 0;
 				var mode = 0;
 				var mode_local = 0;
@@ -983,11 +1100,11 @@
 								var data = this._readLine( line.trim() ).split( ";" );
 								if ( this.IsUvYReverse ) {
 
-									this._tmpUvArray.push( new THREE.Vector2( parseFloat( data[ 0 ] ), 1 - parseFloat( data[ 1 ] ) ) );
+									this._currentGeo.GeometryData.uvs.push( parseFloat( data[ 0 ] ), 1 - parseFloat( data[ 1 ] ) );
 
 								} else {
 
-									this._tmpUvArray.push( new THREE.Vector2( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ) ) );
+									this._currentGeo.GeometryData.uvs.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ) );
 
 								}
 								endRead = find + 1;
@@ -1003,16 +1120,6 @@
 					}
 
 				}
-				this._currentGeo.Geometry.faceVertexUvs[ 0 ] = [];
-				for ( var m = 0; m < this._currentGeo.Geometry.faces.length; m ++ ) {
-
-					this._currentGeo.Geometry.faceVertexUvs[ 0 ][ m ] = [];
-					this._currentGeo.Geometry.faceVertexUvs[ 0 ][ m ].push( this._tmpUvArray[ this._currentGeo.Geometry.faces[ m ].a ] );
-					this._currentGeo.Geometry.faceVertexUvs[ 0 ][ m ].push( this._tmpUvArray[ this._currentGeo.Geometry.faces[ m ].b ] );
-					this._currentGeo.Geometry.faceVertexUvs[ 0 ][ m ].push( this._tmpUvArray[ this._currentGeo.Geometry.faces[ m ].c ] );
-
-				}
-				this._currentGeo.Geometry.uvsNeedUpdate = true;
 
 			}
 		}, {
@@ -1044,7 +1151,7 @@
 						var data = this._readLine( line.trim() ).split( "," );
 						for ( var i = 0; i < data.length; i ++ ) {
 
-							this._currentGeo.Geometry.faces[ i ].materialIndex = parseInt( data[ i ] );
+							this._currentGeo.GeometryData.materialIndices[ i ] = parseInt( data[ i ] );
 
 						}
 						endRead = this._currentObject.data.length;
@@ -1066,15 +1173,7 @@
 				var _nowMat = new THREE.MeshPhongMaterial( {
 					color: Math.random() * 0xffffff
 				} );
-				if ( this.options.zflag ) {
-
-					_nowMat.side = THREE.BackSide;
-
-				} else {
-
-					_nowMat.side = THREE.FrontSide;
-
-				}
+				_nowMat.side = THREE.FrontSide;
 				_nowMat.name = this._currentObject.name;
 				var endRead = 0;
 				var find = this._currentObject.data.indexOf( ';;', endRead );
@@ -1121,21 +1220,21 @@
 						switch ( localObject.type ) {
 
 							case "TextureFilename":
-								_nowMat.map = this.texloader.load( this.baseDir + fileName );
+								_nowMat.map = this.texloader.load( fileName );
 								break;
 							case "BumpMapFilename":
-								_nowMat.bumpMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.bumpMap = this.texloader.load( fileName );
 								_nowMat.bumpScale = 0.05;
 								break;
 							case "NormalMapFilename":
-								_nowMat.normalMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.normalMap = this.texloader.load( fileName );
 								_nowMat.normalScale = new THREE.Vector2( 2, 2 );
 								break;
 							case "EmissiveMapFilename":
-								_nowMat.emissiveMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.emissiveMap = this.texloader.load( fileName );
 								break;
 							case "LightMapFilename":
-								_nowMat.lightMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.lightMap = this.texloader.load( fileName );
 								break;
 
 						}
@@ -1238,13 +1337,6 @@
 			key: '_makeOutputGeometry',
 			value: function _makeOutputGeometry() {
 
-				this._currentGeo.Geometry.computeBoundingBox();
-				this._currentGeo.Geometry.computeBoundingSphere();
-				this._currentGeo.Geometry.verticesNeedUpdate = true;
-				this._currentGeo.Geometry.normalsNeedUpdate = true;
-				this._currentGeo.Geometry.colorsNeedUpdate = true;
-				this._currentGeo.Geometry.uvsNeedUpdate = true;
-				this._currentGeo.Geometry.groupsNeedUpdate = true;
 				var mesh = null;
 				if ( this._currentGeo.BoneInfs.length > 0 ) {
 
@@ -1269,23 +1361,26 @@
 
 							var nowVertexID = this._currentGeo.BoneInfs[ bi ].Indeces[ vi ];
 							var nowVal = this._currentGeo.BoneInfs[ bi ].Weights[ vi ];
+
+							var stride = nowVertexID * 4;
+
 							switch ( this._currentGeo.VertexSetedBoneCount[ nowVertexID ] ) {
 
 								case 0:
-									this._currentGeo.Geometry.skinIndices[ nowVertexID ].x = boneIndex;
-									this._currentGeo.Geometry.skinWeights[ nowVertexID ].x = nowVal;
+									this._currentGeo.GeometryData.skinIndices[ stride ] = boneIndex;
+									this._currentGeo.GeometryData.skinWeights[ stride ] = nowVal;
 									break;
 								case 1:
-									this._currentGeo.Geometry.skinIndices[ nowVertexID ].y = boneIndex;
-									this._currentGeo.Geometry.skinWeights[ nowVertexID ].y = nowVal;
+									this._currentGeo.GeometryData.skinIndices[ stride + 1 ] = boneIndex;
+									this._currentGeo.GeometryData.skinWeights[ stride + 1 ] = nowVal;
 									break;
 								case 2:
-									this._currentGeo.Geometry.skinIndices[ nowVertexID ].z = boneIndex;
-									this._currentGeo.Geometry.skinWeights[ nowVertexID ].z = nowVal;
+									this._currentGeo.GeometryData.skinIndices[ stride + 2 ] = boneIndex;
+									this._currentGeo.GeometryData.skinWeights[ stride + 2 ] = nowVal;
 									break;
 								case 3:
-									this._currentGeo.Geometry.skinIndices[ nowVertexID ].w = boneIndex;
-									this._currentGeo.Geometry.skinWeights[ nowVertexID ].w = nowVal;
+									this._currentGeo.GeometryData.skinIndices[ stride + 3 ] = boneIndex;
+									this._currentGeo.GeometryData.skinWeights[ stride + 3 ] = nowVal;
 									break;
 
 							}
@@ -1318,14 +1413,15 @@
 						}
 
 					}
-					var bufferGeometry = new THREE.BufferGeometry().fromGeometry( this._currentGeo.Geometry );
-					bufferGeometry.bones = putBones;
+
+					var bufferGeometry = this._buildGeometry();
 					mesh = new THREE.SkinnedMesh( bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
-					mesh.skeleton.boneInverses = offsetList;
+
+					this._initSkeleton( mesh, putBones, offsetList );
 
 				} else {
 
-					var _bufferGeometry = new THREE.BufferGeometry().fromGeometry( this._currentGeo.Geometry );
+					var _bufferGeometry = this._buildGeometry();
 					mesh = new THREE.Mesh( _bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
 
 				}
@@ -1354,6 +1450,50 @@
 				this.Meshes.push( mesh );
 
 			}
+		}, {
+			key: '_initSkeleton',
+			value: function _initSkeleton( mesh, boneList, boneInverses ) {
+
+				var bones = [], bone, gbone;
+				var i, il;
+
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
+
+					gbone = boneList[ i ];
+
+					bone = new THREE.Bone();
+					bones.push( bone );
+
+					bone.name = gbone.name;
+					bone.position.fromArray( gbone.pos );
+					bone.quaternion.fromArray( gbone.rotq );
+					if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+
+				}
+
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
+
+					gbone = boneList[ i ];
+
+					if ( ( gbone.parent !== - 1 ) && ( gbone.parent !== null ) && ( bones[ gbone.parent ] !== undefined ) ) {
+
+						bones[ gbone.parent ].add( bones[ i ] );
+
+					} else {
+
+						mesh.add( bones[ i ] );
+
+					}
+
+				}
+
+				mesh.updateMatrixWorld( true );
+
+				var skeleton = new THREE.Skeleton( bones, boneInverses );
+				mesh.bind( skeleton, mesh.matrixWorld );
+
+			}
+
 		}, {
 			key: '_readAnimationKey',
 			value: function _readAnimationKey() {
@@ -1437,7 +1577,6 @@
 
 				var model = _model;
 				var animation = _animation;
-				var bindFlag = _isBind ? _isBind : true;
 				if ( ! model ) {
 
 					model = this.Meshes[ 0 ];
@@ -1522,32 +1661,15 @@
 					model.geometry.animations = [];
 
 				}
-				if ( bindFlag ) {
 
-					model.geometry.animations.push( THREE.AnimationClip.parseAnimation( put, model.skeleton.bones ) );
-					if ( ! model.animationMixer ) {
+				model.geometry.animations.push( THREE.AnimationClip.parseAnimation( put, model.skeleton.bones ) );
+				if ( ! model.animationMixer ) {
 
-						model.animationMixer = new THREE.AnimationMixer( model );
-
-					}
+					model.animationMixer = new THREE.AnimationMixer( model );
 
 				}
+
 				return put;
-
-			}
-		}, {
-			key: '_readFinalize',
-			value: function _readFinalize() {
-
-				if ( this.options.zflag ) {
-
-					for ( var i = 0; i < this.Meshes.length; i ++ ) {
-
-						this.Meshes[ i ].scale.set( - 1, 1, 1 );
-
-					}
-
-				}
 
 			}
 		}, {

@@ -130,29 +130,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyIndicesArray", ( assert ) => {
-
-			var attr = new BufferAttribute( new Float32Array( 6 ), 3 );
-
-			attr.copyIndicesArray( [
-				{
-					a: 1,
-					b: 2,
-					c: 3
-				},
-				{
-					a: 4,
-					b: 5,
-					c: 6
-				}
-			] );
-
-			var i = attr.array;
-			assert.ok( i[ 0 ] === 1 && i[ 1 ] === 2 && i[ 2 ] === 3, 'first indices were copied correctly' );
-			assert.ok( i[ 3 ] === 4 && i[ 4 ] === 5 && i[ 5 ] === 6, 'second indices were copied correctly' );
-
-		} );
-
 		QUnit.test( "copyVector2sArray", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( 4 ), 2 );

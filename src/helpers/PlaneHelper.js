@@ -9,6 +9,7 @@ import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Object3D } from '../core/Object3D.js';
+import { FrontSide, BackSide } from '../constants.js';
 
 function PlaneHelper( plane, size, hex ) {
 
@@ -50,6 +51,8 @@ PlaneHelper.prototype.updateMatrixWorld = function ( force ) {
 	if ( Math.abs( scale ) < 1e-8 ) scale = 1e-8; // sign does not matter
 
 	this.scale.set( 0.5 * this.size, 0.5 * this.size, scale );
+
+	this.children[ 0 ].material.side = ( scale < 0 ) ? BackSide : FrontSide; // renderer flips side when determinant < 0; flipping not wanted here
 
 	this.lookAt( this.plane.normal );
 

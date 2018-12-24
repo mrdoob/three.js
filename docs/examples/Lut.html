@@ -10,9 +10,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.
-		</div>
+		</p>
 
 
 		<h2>Example</h2>
@@ -25,58 +25,58 @@
 
 
 		<h3>[name]( colormap, numberOfColors )</h3>
-                <div>
-                colormap - optional argument that sets a colormap from predefined colormaps. Available colormaps are : "rainbow", "cooltowarm", "blackbody".
-                numberOfColors - optional argument that sets the number of colors used to represent the data array.
-		</div>
+		<p>
+		colormap - optional argument that sets a colormap from predefined colormaps. Available colormaps are : "rainbow", "cooltowarm", "blackbody".
+		numberOfColors - optional argument that sets the number of colors used to represent the data array.
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Float minV]</h3>
-		<div>
+		<p>
 		The minimum value to be represented with the lookup table. Default is 0.
-		</div>
+		</p>
 
 		<h3>[property:Float maxV]</h3>
-		<div>
+		<p>
 		The maximum value to be represented with the lookup table. Default is 1.
-		</div>
+		</p>
 
 		<h3>.[legend]</h3>
-		<div>
+		<p>
 		The legend of the lookup table.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:null copy]( [page:Lut lut] ) [page:Lut this]</h3>
-		<div>
+		<h3>[method:null copy]( [param:Lut lut] ) [param:Lut this]</h3>
+		<p>
 		color — Lut to copy.
-		</div>
-		<div>
+		</p>
+		<p>
 		Copies given lut.
-		</div>
+		</p>
 
 		<h3>.setLegendOn [parameters]</h3>
-		<div>
+		<p>
 		parameters - { layout: value, position: { x: value, y: value, z: value }, dimensions: { width: value, height: value } }
 		layout — Horizontal or vertical layout. Default is vertical.<br />
 		position — The position x,y,z of the legend.<br />
 		dimensions — The dimensions (width and height) of the legend.<br />
-		</div>
-		<div>
+		</p>
+		<p>
 		Sets this Lut with the legend on.
-		</div>
+		</p>
 
 		<h3>.setLegendOff</h3>
-		<div>
-		</div>
-		<div>
+		<p>
+		</p>
+		<p>
 		Sets this Lut with the legend off.
-		</div>
+		</p>
 
     <h3>.setLegendLabels [parameters, callback]</h3>
-		<div>
+		<p>
 		parameters - { fontsize: value, fontface: value, title: value, um: value, ticks: value, decimal: value, notation: value }
 		fontsize — Font size to be used for labels.<br />
 		fontface — Font type to be used for labels.<br />
@@ -86,55 +86,55 @@
 		decimal — The number of decimals to be used for legend values.<br />
 		notation — Legend notation: standard (default) or scientific.<br />
 		callback — An optional callback to be used to format the legend labels.<br />
-		</div>
-		<div>
+		</p>
+		<p>
 		Sets the labels of the legend of this Lut.
-		</div>
+		</p>
 
-		<h3>[method:Lut setminV]( [page:Float minV] )</h3>
-		<div>
+		<h3>[method:Lut setMin]( [param:Float minV] )</h3>
+		<p>
 		minV — The minimum value to be represented with the lookup table.<br />
-		</div>
-		<div>
+		</p>
+		<p>
 		Sets this Lut with the minimum value to be represented.
-		</div>
+		</p>
 
-		<h3>[method:Lut setmaxV]( [page:Float maxV] )</h3>
-		<div>
+		<h3>[method:Lut setMax]( [param:Float maxV] )</h3>
+		<p>
 		maxV — The maximum value to be represented with the lookup table.<br />
-		</div>
-		<div>
+		</p>
+		<p>
 		Sets this Lut with the maximum value to be represented.
-		</div>
+		</p>
 
-		<h3>[method:Lut changeNumberOfColors]( [page:Float numberOfColors] )</h3>
-		<div>
+		<h3>[method:Lut changeNumberOfColors]( [param:Float numberOfColors] )</h3>
+		<p>
 		numberOfColors — The number of colors to be used to represent the data array.<br />
-		</div>
-		<div>
+		</p>
+		<p>
 		Sets this Lut with the number of colors to be used.
-                </div>
+		</p>
 
-		<h3>[method:Lut changeColorMap]( [page:Float colorMap] )</h3>
-		<div>
+		<h3>[method:Lut changeColorMap]( [param:Float colorMap] )</h3>
+		<p>
 		colorMap — The name of the color map to be used to represent the data array.<br />
-		</div>
-		<div>
+		</p>
+		<p>
 		Sets this Lut with the colormap to be used.
-		</div>
+		</p>
 
 		<h3>[method:Lut addColorMap]( colorMapName, arrayOfColors )</h3>
-		<div>
+		<p>
 		Insert a new color map into the set of available color maps.
-		</div>
+		</p>
 
-		<h3>[method:Lut getColor]( value ) [page:Lut this]</h3>
-		<div>
+		<h3>[method:Lut getColor]( value ) [param:Lut this]</h3>
+		<p>
 		value -- the data value to be displayed as a color.
-		</div>
-		<div>
+		</p>
+		<p>
 		Returns a [page:Color].
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

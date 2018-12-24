@@ -34,7 +34,7 @@ export default QUnit.module( 'Core', () => {
 		// PROPERTIES
 		QUnit.test( "needsUpdate", ( assert ) => {
 
-			var a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4 ], 2 ) );
+			var a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4 ] ), 2 );
 
 			a.needsUpdate = true;
 

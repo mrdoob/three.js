@@ -1,4 +1,4 @@
-﻿// Author: Aleksandr Albert
+// Author: Aleksandr Albert
 // Website: www.routter.co.tt
 
 // Description: A deep water ocean shader set

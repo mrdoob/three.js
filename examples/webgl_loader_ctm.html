@@ -31,7 +31,7 @@
 		<div id="info">
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		<a href="http://openctm.sourceforge.net/" target="_blank" rel="noopener">CTM format</a> loader test -
-		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
+		using <a href="https://github.com/jcmellado/js-openctm" target="_blank" rel="noopener">js-openctm</a> -
 		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank" rel="noopener">The Utah 3D Animation Repository</a>,
 		<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a>,
 		<a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
@@ -43,7 +43,7 @@
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -55,8 +55,6 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, geometry;
-
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -64,8 +62,9 @@
 
 			var textureLoader = new THREE.TextureLoader();
 			var cubeTextureLoader = new THREE.CubeTextureLoader();
+			var reflectionCube;
 
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
 			animate();
@@ -99,7 +98,7 @@
 				scene.add( ambient );
 
 				var light = new THREE.SpotLight( 0xffeedd, 1.2, 650, Math.PI / 6 );
-				light.position.set( 0, -100, 500 );
+				light.position.set( 0, - 100, 500 );
 
 				light.castShadow = true;
 				light.shadow.mapWidth = 1024;
@@ -144,7 +143,7 @@
 					if ( c === 3 ) {
 
 						var e = Date.now();
-						console.log( "Total parse time: " + (e-s) + " ms" );
+						console.log( "Total parse time: " + ( e - s ) + " ms" );
 
 					}
 
@@ -152,37 +151,37 @@
 
 				var loader = new THREE.CTMLoader();
 
-				loader.load( "models/ctm/ben.ctm",   function( geometry ) {
+				loader.load( "models/ctm/ben.ctm", function ( geometry ) {
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: textureLoader.load( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
-					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
+					callbackModel( geometry, 450, material, 0, - 200, 0, 0, 0 );
 					checkTime();
 
 				}, { useWorker: true } );
 
-				loader.load( "models/ctm/WaltHead.ctm",  function( geometry ) {
+				loader.load( "models/ctm/WaltHead.ctm", function ( geometry ) {
 
 					var material1 = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 					var material2 = new THREE.MeshPhongMaterial( { color: 0xff4400, specular: 0x333333, shininess: 100 } );
 					var material3 = new THREE.MeshPhongMaterial( { color: 0x00ff44, specular: 0x333333, shininess: 100 } );
 
-					callbackModel( geometry, 5, material1, -200, 0, -50, 0, 0 );
-					callbackModel( geometry, 2, material2,  100, 0, 125, 0, 0 );
-					callbackModel( geometry, 2, material3, -100, 0, 125, 0, 0 );
+					callbackModel( geometry, 5, material1, - 200, 0, - 50, 0, 0 );
+					callbackModel( geometry, 2, material2, 100, 0, 125, 0, 0 );
+					callbackModel( geometry, 2, material3, - 100, 0, 125, 0, 0 );
 
 					checkTime();
 
 				}, { useWorker: true } );
 
-				loader.load( "models/ctm/LeePerry.ctm",  function( geometry ) {
+				loader.load( "models/ctm/LeePerry.ctm", function ( geometry ) {
 
 					var material = new THREE.MeshPhongMaterial( {
 
 						specular: 0x303030,
 						shininess: 50,
-						map: textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" ),
-						specularMap: textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" ),
-						normalMap: textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+						map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+						specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
+						normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 						normalScale: new THREE.Vector2( 0.8, 0.8 )
 
 					} );
@@ -212,7 +211,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;

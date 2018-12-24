@@ -17,21 +17,36 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		constructor: LegacyGLTFLoader,
 
-		crossOrigin: 'Anonymous',
+		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = this.path && ( typeof this.path === "string" ) ? this.path : THREE.Loader.prototype.extractUrlBase( url );
+			var resourcePath;
+
+			if ( this.resourcePath !== undefined ) {
+
+				resourcePath = this.resourcePath;
+
+			} else if ( this.path !== undefined ) {
+
+				resourcePath = this.path;
+
+			} else {
+
+				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
+
+			}
 
 			var loader = new THREE.FileLoader( scope.manager );
 
+			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			loader.load( url, function ( data ) {
 
-				scope.parse( data, onLoad, path );
+				scope.parse( data, resourcePath, onLoad );
 
 			}, onProgress, onError );
 
@@ -40,6 +55,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		setCrossOrigin: function ( value ) {
 
 			this.crossOrigin = value;
+			return this;
 
 		},
 
@@ -49,12 +65,19 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		},
 
-		parse: function ( data, callback, path ) {
+		setResourcePath: function ( value ) {
+
+			this.resourcePath = value;
+			return this;
+
+		},
+
+		parse: function ( data, path, callback ) {
 
 			var content;
 			var extensions = {};
 
-			var magic = convertUint8ArrayToString( new Uint8Array( data, 0, 4 ) );
+			var magic = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
 
 			if ( magic === BINARY_EXTENSION_HEADER_DEFAULTS.magic ) {
 
@@ -63,7 +86,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			} else {
 
-				content = convertUint8ArrayToString( new Uint8Array( data ) );
+				content = THREE.LoaderUtils.decodeText( new Uint8Array( data ) );
 
 			}
 
@@ -75,18 +98,15 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			}
 
-			console.time( 'LegacyGLTFLoader' );
-
 			var parser = new GLTFParser( json, extensions, {
 
-				path: path || this.path,
-				crossOrigin: this.crossOrigin
+				crossOrigin: this.crossOrigin,
+				manager: this.manager,
+				path: path || this.resourcePath || ''
 
 			} );
 
 			parser.parse( function ( scene, scenes, cameras, animations ) {
-
-				console.timeEnd( 'LegacyGLTFLoader' );
 
 				var glTF = {
 					"scene": scene,
@@ -358,7 +378,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
 
 		var header = {
-			magic: convertUint8ArrayToString( new Uint8Array( data.slice( 0, 4 ) ) ),
+			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true ),
 			contentLength: headerView.getUint32( 12, true ),
@@ -380,7 +400,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH, header.contentLength );
 
 		this.header = header;
-		this.content = convertUint8ArrayToString( contentArray );
+		this.content = THREE.LoaderUtils.decodeText( contentArray );
 		this.body = data.slice( BINARY_EXTENSION_HEADER_LENGTH + header.contentLength, header.length );
 
 	}
@@ -390,17 +410,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var bufferView = bufferViews[ shader.extensions[ EXTENSIONS.KHR_BINARY_GLTF ].bufferView ];
 		var array = new Uint8Array( bufferView );
 
-		return convertUint8ArrayToString( array );
-
-	};
-
-	GLTFBinaryExtension.prototype.loadTextureSourceUri = function ( source, bufferViews ) {
-
-		var metadata = source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ];
-		var bufferView = bufferViews[ metadata.bufferView ];
-		var stringData = convertUint8ArrayToString( new Uint8Array( bufferView ) );
-
-		return 'data:' + metadata.mimeType + ';base64,' + btoa( stringData );
+		return THREE.LoaderUtils.decodeText( array );
 
 	};
 
@@ -659,31 +669,15 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		}
 
+		// Blob URL
+		if ( /^blob:.*$/i.test( url ) ) {
+
+			return url;
+
+		}
+
 		// Relative URL
 		return ( path || '' ) + url;
-
-	}
-
-	function convertUint8ArrayToString( array ) {
-
-		if ( window.TextDecoder !== undefined ) {
-
-			return new TextDecoder().decode( array );
-
-		}
-
-		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-		// throws a "maximum call stack size exceeded" error for large arrays.
-
-		var s = '';
-
-		for ( var i = 0, il = array.length; i < il; i ++ ) {
-
-			s += String.fromCharCode( array[ i ] );
-
-		}
-
-		return s;
 
 	}
 
@@ -951,7 +945,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				return new Promise( function ( resolve ) {
 
-					var loader = new THREE.FileLoader();
+					var loader = new THREE.FileLoader( options.manager );
 					loader.setResponseType( 'text' );
 					loader.load( resolveURL( shader.uri, options.path ), function ( shaderText ) {
 
@@ -985,7 +979,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				return new Promise( function ( resolve ) {
 
-					var loader = new THREE.FileLoader();
+					var loader = new THREE.FileLoader( options.manager );
 					loader.setResponseType( 'arraybuffer' );
 					loader.load( resolveURL( buffer.uri, options.path ), function ( buffer ) {
 
@@ -1094,10 +1088,15 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						var source = json.images[ texture.source ];
 						var sourceUri = source.uri;
+						var isObjectURL = false;
 
 						if ( source.extensions && source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ] ) {
 
-							sourceUri = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].loadTextureSourceUri( source, dependencies.bufferViews );
+							var metadata = source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ];
+							var bufferView = dependencies.bufferViews[ metadata.bufferView ];
+							var blob = new Blob( [ bufferView ], { type: metadata.mimeType } );
+							sourceUri = URL.createObjectURL( blob );
+							isObjectURL = true;
 
 						}
 
@@ -1105,13 +1104,15 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						if ( textureLoader === null ) {
 
-							textureLoader = new THREE.TextureLoader();
+							textureLoader = new THREE.TextureLoader( options.manager );
 
 						}
 
 						textureLoader.setCrossOrigin( options.crossOrigin );
 
 						textureLoader.load( resolveURL( sourceUri, options.path ), function ( _texture ) {
+
+							if ( isObjectURL ) URL.revokeObjectURL( sourceUri );
 
 							_texture.flipY = false;
 
@@ -1142,6 +1143,8 @@ THREE.LegacyGLTFLoader = ( function () {
 							resolve( _texture );
 
 						}, undefined, function () {
+
+							if ( isObjectURL ) URL.revokeObjectURL( sourceUri );
 
 							resolve();
 
@@ -1656,6 +1659,26 @@ THREE.LegacyGLTFLoader = ( function () {
 								case 'JOINT':
 									geometry.addAttribute( 'skinIndex', bufferAttribute );
 									break;
+
+								default:
+
+									if ( ! primitive.material ) break;
+
+									var material = json.materials[ primitive.material ];
+
+									if ( ! material.technique ) break;
+
+									var parameters = json.techniques[ material.technique ].parameters || {};
+
+									for( var attributeName in parameters ) {
+
+										if ( parameters [ attributeName ][ 'semantic' ] === attributeId ) {
+
+											geometry.addAttribute( attributeName, bufferAttribute );
+
+										}
+
+									}
 
 							}
 

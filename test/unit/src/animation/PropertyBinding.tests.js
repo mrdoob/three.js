@@ -42,15 +42,27 @@ export default QUnit.module( 'Animation', () => {
 			);
 
 			assert.equal(
+				PropertyBinding.sanitizeNodeName( '急須' ),
+				'急須',
+				'Leaves non-latin unicode characters intact.'
+			);
+
+			assert.equal(
 				PropertyBinding.sanitizeNodeName( 'space separated name 123_ -' ),
 				'space_separated_name_123__-',
 				'Replaces spaces with underscores.'
 			);
 
 			assert.equal(
-				PropertyBinding.sanitizeNodeName( '"invalid" name %123%_' ),
-				'invalid_name_123_',
-				'Strips invalid characters.'
+				PropertyBinding.sanitizeNodeName( '"Mátyás" %_* 😇' ),
+				'"Mátyás"_%_*_😇',
+				'Allows various punctuation and symbols.'
+			);
+
+			assert.equal(
+				PropertyBinding.sanitizeNodeName( '/invalid: name ^123.[_]' ),
+				'invalid_name_^123_',
+				'Strips reserved characters.'
 			);
 
 		} );
@@ -236,7 +248,30 @@ export default QUnit.module( 'Animation', () => {
 						propertyName: 'position',
 						propertyIndex: undefined
 					}
+				],
+
+				[
+					'急須.材料[零]',
+					{
+						nodeName: '急須',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: '材料',
+						propertyIndex: '零'
+					}
+				],
+
+				[
+					'📦.🎨[🔴]',
+					{
+						nodeName: '📦',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: '🎨',
+						propertyIndex: '🔴'
+					}
 				]
+
 			];
 
 			paths.forEach( function ( path ) {
