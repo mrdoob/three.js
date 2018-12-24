@@ -115,6 +115,7 @@
 				moonLabel.position.set( 0, MOON_RADIUS, 0 );
 				moon.add( moonLabel );
 
+				moon.position.set(0,0,10);
 				//
 
 				renderer = new THREE.WebGLRenderer();
@@ -134,10 +135,8 @@
 
 				requestAnimationFrame( animate );
 
-				var elapsed = clock.getElapsedTime();
-
-				moon.position.set( Math.sin( elapsed ) * 5, 0, Math.cos( elapsed ) * 5 );
-
+				moon.position.applyAxisAngle(new THREE.Vector3(0,2,0),Math.PI/120);
+				earth.rotateOnAxis(new THREE.Vector3(1,1,1),Math.PI/120);
 				renderer.render( scene, camera );
 				labelRenderer.render( scene, camera );
 

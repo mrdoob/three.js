@@ -164,9 +164,11 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var q1 = new Quaternion();
 
-		return function rotateOnAxis( axis, angle ) {
+		return function rotateOnAxis( vec3, angle ) {
 
-			q1.setFromAxisAngle( axis, angle );
+			vec3.clone().normalize();
+
+			q1.setFromAxisAngle( vec3, angle );
 
 			this.quaternion.multiply( q1 );
 

@@ -272,17 +272,19 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
-	setFromAxisAngle: function ( axis, angle ) {
+	setFromAxisAngle: function ( vec3, angle ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
 
 		// assumes axis is normalized
 
+		vec3.clone().normalize();
+
 		var halfAngle = angle / 2, s = Math.sin( halfAngle );
 
-		this._x = axis.x * s;
-		this._y = axis.y * s;
-		this._z = axis.z * s;
+		this._x = vec3.x * s;
+		this._y = vec3.y * s;
+		this._z = vec3.z * s;
 		this._w = Math.cos( halfAngle );
 
 		this.onChangeCallback();

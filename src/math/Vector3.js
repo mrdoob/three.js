@@ -291,25 +291,14 @@ Object.assign( Vector3.prototype, {
 	},
 
 	applyQuaternion: function ( q ) {
-
-		var x = this.x, y = this.y, z = this.z;
-		var qx = q.x, qy = q.y, qz = q.z, qw = q.w;
-
-		// calculate quat * vector
-
-		var ix = qw * x + qy * z - qz * y;
-		var iy = qw * y + qz * x - qx * z;
-		var iz = qw * z + qx * y - qy * x;
-		var iw = - qx * x - qy * y - qz * z;
-
-		// calculate result * inverse quat
-
-		this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
-		this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
-		this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
-
-		return this;
-
+		// v3 => quat
+        var p = new Quaternion(this.x,this.y,this.z,0);
+        p.premultiply(q).multiply(q.clone().conjugate());
+        // quat =>v3
+        this.x  = p.x;
+        this.y  = p.y;
+        this.z  = p.z;
+        return this;
 	},
 
 	project: function ( camera ) {
