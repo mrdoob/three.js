@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 vec3 diffuse = vec3( 1.0 );
 
 GeometricContext geometry;

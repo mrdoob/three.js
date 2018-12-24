@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 uniform samplerCube tCube;
 uniform float tFlip;
 uniform float opacity;

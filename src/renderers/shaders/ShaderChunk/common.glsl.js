@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #define PI 3.14159265359
 #define PI2 6.28318530718
 #define PI_HALF 1.5707963267949

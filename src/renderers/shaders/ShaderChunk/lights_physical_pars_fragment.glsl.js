@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 struct PhysicalMaterial {
 
 	vec3	diffuseColor;

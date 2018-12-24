@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 uniform float scale;
 attribute float lineDistance;
 
