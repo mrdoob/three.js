@@ -278,7 +278,7 @@ Object.assign( Quaternion.prototype, {
 
 		// assumes axis is normalized
 
-		vec3.clone().normalize();
+		vec3.normalize();
 
 		var halfAngle = angle / 2, s = Math.sin( halfAngle );
 

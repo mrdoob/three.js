@@ -166,7 +166,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return function rotateOnAxis( vec3, angle ) {
 
-			vec3.clone().normalize();
 
 			q1.setFromAxisAngle( vec3, angle );
 
