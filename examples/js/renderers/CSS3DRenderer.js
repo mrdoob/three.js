@@ -186,7 +186,7 @@ THREE.CSS3DRenderer = function () {
 			var element = object.element;
 			var cachedStyle = cache.objects.get( object );
 
-			if ( cachedStyle === undefined || cachedStyle !== style ) {
+			if ( cachedStyle === undefined || cachedStyle.style !== style ) {
 
 				element.style.WebkitTransform = style;
 				element.style.transform = style;
