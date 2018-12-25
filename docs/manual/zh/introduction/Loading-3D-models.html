@@ -14,15 +14,14 @@
 	<br />
 
 	<p>
-	3D模型目前的有成千上万种格式可供选择，但每一种格式都具有不同的目的、用途以及复杂性。
+	目前，3D模型的格式有成千上万种可供选择，但每一种格式都具有不同的目的、用途以及复杂性。
 		虽然<a href="https://github.com/mrdoob/three.js/tree/dev/examples/js/loaders" target="_blank" rel="noopener">
-	three.js已经提供了多种导入工具</a>
-	但是选择正确的文件格式以及工作流程将可以节省很多时间，以及避免很多挫折。某些格式难以使用，或者实时体验效率低下，或者目前尚未得到完全支持。
+	three.js已经提供了多种导入工具</a>，
+	但是选择正确的文件格式以及工作流程将可以节省很多时间，以及避免遭受很多挫折。某些格式难以使用，或者实时体验效率低下，或者目前尚未得到完全支持。
 	</p>
 
 	<p>
 		对大多数用户，本指南向你推荐了一个工作流程，并向你提供了一些当没有达到预期效果时的建议。
-
 	</p>
 
 	<h2>在开始之前</h2>
@@ -125,28 +124,28 @@
 		在Javascript的Console中查找错误，并确定当你调用<em>.load()</em>的时候，使用了<em>onError</em>回调函数来输出结果。
 		</li>
 		<li>
-		请在别的应用程序中查看3D模型。对于glTF格式的模型来说，可以直接在下面的应用程序中进行查看：
+		请在其它的应用程序中查看3D模型。对于glTF格式的模型来说，可以直接在下面的应用程序中进行查看：
 			<a href="https://gltf-viewer.donmccurdy.com/" target="_blank" rel="noopener">three.js</a>和
 		<a href="http://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>。
-	 如果该模型能够在一个或者更多应用程序里正确地呈现，请<a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">点击这里向three.js提交Bug报告</a>。
+	 如果该模型能够在一个或者多个应用程序中正确地呈现，请<a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">点击这里向three.js提交Bug报告</a>。
 	 如果模型不能在任意一个应用程序里显示，我们强烈鼓励你向我们提交Bug报告，并告知我们你的模型是使用哪一款应用程序创建的。
 
 		</li>
 		<li>
-		尝试将模型放大或缩小到原来的1000倍。许多模型的缩放比例各不相同，倘若摄像机位于相机内，则大型模型将可能不会显示。
+		尝试将模型放大或缩小到原来的1000倍。许多模型的缩放比例各不相同，如果摄像机位于模型内，则大型模型将可能不会显示。
 		</li>
 		<li>
-		在网络面板中查找失败的纹理贴图请求，像<em>C:\\Path\To\Model\texture.jpg</em>。使用相对于你的模型的文件路径，例如
-		<em>images/texture.jpg</em>——这或许需要在文本编辑器中来对模型文件进行修改。
+		在网络面板中查找失败的纹理贴图请求，比如说<em>C:\\Path\To\Model\texture.jpg</em>。载入贴图时，请使用相对于模型文件路径，例如
+		<em>images/texture.jpg</em> —— 这或许需要在文本编辑器中来对模型文件进行修改。
 		</li>
 	</ol>
 
 	<h2>请求帮助</h2>
 
 	<p>
-	倘若你已经尝试经历了以上故障排除的过程，但是你的模型仍然无法工作，寻求正确的方法来获得帮助将使您更快地获得解决方案。
+	如果你已经尝试经历了以上故障排除的过程，但是你的模型仍然无法工作，寻求正确的方法来获得帮助将使您更快地获得解决方案。
 您可以将您的问题发布到<a href="https://discourse.threejs.org/" target="_blank" rel="noopener">three.js forum</a>，
-	同时，尽可能将你的模型（或者一个简单的、具有相同问题的模型）包含在你能够使用的任何格式中，为其他人提供足够的信息，以便快速重现这个问题——最好是一个能够现场演示的Demo。
+	同时，尽可能将你的模型（或者一个简单的、具有相同问题的模型）包含在你能够使用的任何格式中，为其他人提供足够的信息，以便快速重现这个问题 —— 最好是一个能够现场演示的Demo。
 	</p>
 
 </body>
