@@ -279,11 +279,14 @@ Object.assign( Quaternion.prototype, {
 		// assumes axis is normalized
 
 		if ( ! this.normalizedAxis ) {
+
 			axis.normalize();
 			this.normalizedAxis = axis;
-		}
-		else {
+
+		} else {
+
 			axis = this.normalizedAxis;
+
 		}
 
 		var halfAngle = angle / 2, s = Math.sin( halfAngle );
