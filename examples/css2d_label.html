@@ -53,6 +53,7 @@
 
 			var earth, moon;
 
+			var moonDir = new THREE.Vector3( 0, 2, 0 ), earthDir = new THREE.Vector3( 1, 1, 1 );
 			init();
 			animate();
 
@@ -115,7 +116,7 @@
 				moonLabel.position.set( 0, MOON_RADIUS, 0 );
 				moon.add( moonLabel );
 
-				moon.position.set(0,0,10);
+				moon.position.set( 0, 0, 10 );
 				//
 
 				renderer = new THREE.WebGLRenderer();
@@ -128,18 +129,13 @@
 				labelRenderer.domElement.style.position = 'absolute';
 				labelRenderer.domElement.style.top = 0;
 				document.body.appendChild( labelRenderer.domElement );
-
 			}
-
-			function animate() {
-
+			function animate(){
 				requestAnimationFrame( animate );
-
-				moon.position.applyAxisAngle(new THREE.Vector3(0,2,0),Math.PI/120);
-				earth.rotateOnAxis(new THREE.Vector3(1,1,1),Math.PI/120);
+				moon.position.applyAxisAngle( moonDir, Math.PI / 120 );
+				earth.rotateOnAxis( earthDir, Math.PI / 120 );
 				renderer.render( scene, camera );
 				labelRenderer.render( scene, camera );
-
 			}
 
 		</script>
