@@ -147,7 +147,7 @@ THREE.LDrawLoader = ( function () {
 
 				prevMaterial = elem.material;
 				index0 = iElem * elementSize;
-				numGroupVerts = 0;
+				numGroupVerts = elementSize;
 
 			}
 			else {
