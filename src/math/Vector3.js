@@ -255,11 +255,13 @@ Object.assign( Vector3.prototype, {
 		var q = new Quaternion();
 		var p = new Quaternion();
 		return function applyAxisAngle( axis, angle ) {
+
 			p.x = this.x;
 			p.y = this.y;
 			p.z = this.z;
 			p.w = 0;
 			return this.applyQuaternion( q.setFromAxisAngle( axis, angle ), p );
+
 		};
 
 	}(),
@@ -293,6 +295,7 @@ Object.assign( Vector3.prototype, {
 	},
 
 	applyQuaternion: function ( q, p ) {
+
 		q = q || q.setFromAxisAngle();
 		p = p || new Quaternion( this.x, this.y, this.z, 0 );
 		p.premultiply( q ).multiply( q.conjugate() );
@@ -300,6 +303,7 @@ Object.assign( Vector3.prototype, {
 		this.y = p.y;
 		this.z = p.z;
 		return this;
+
 	},
 
 	project: function ( camera ) {
