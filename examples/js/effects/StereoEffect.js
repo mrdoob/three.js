@@ -117,7 +117,7 @@ THREE.StereoEffect = function (renderer, options) {
 				xR = 0 - parallax; yR = size.height / 2; widthR = size.width; heightR = size.height / 2;
 
 				break;
-			default: console.error('Invalid "Spatial  multiplex" parameter: ' + spatialMultiplex);
+			default: console.error('THREE.StereoEffect.render: Invalid "Spatial  multiplex" parameter: ' + spatialMultiplex);
 		}
 
 		_stereo.update( camera );
@@ -258,7 +258,6 @@ THREE.StereoEffect = function (renderer, options) {
 
 		//Zero parallax
 		//http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
-//		var controllerZeroParallax = fStereoEffects.add(options, 'zeroParallax', -60, 30, 0.1)
 		var minMax = (60 - (400 / 9)) * guiParams.scale + 400 / 9;
 		var controllerZeroParallax = fStereoEffects.add(options, 'zeroParallax', -minMax, minMax)
 			.onChange(function (value) {
