@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_SKINNING
 
 	mat4 boneMatX = getBoneMatrix( skinIndex.x );

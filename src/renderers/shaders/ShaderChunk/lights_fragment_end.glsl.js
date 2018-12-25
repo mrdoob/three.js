@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #if defined( RE_IndirectDiffuse )
 
 	RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );

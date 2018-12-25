@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #define DISTANCE
 
 uniform vec3 referencePosition;
