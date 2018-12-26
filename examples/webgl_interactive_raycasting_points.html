@@ -55,8 +55,8 @@
 
 			var threshold = 0.1;
 			var pointSize = 0.05;
-			var width = 150;
-			var length = 150;
+			var width = 80;
+			var length = 160;
 			var rotateY = new THREE.Matrix4().makeRotationY( 0.005 );
 
 			init();
@@ -79,7 +79,7 @@
 						var u = i / width;
 						var v = j / length;
 						var x = u - 0.5;
-						var y = ( Math.cos( u * Math.PI * 8 ) + Math.sin( v * Math.PI * 8 ) ) / 20;
+						var y = ( Math.cos( u * Math.PI * 4 ) + Math.sin( v * Math.PI * 8 ) ) / 20;
 						var z = v - 0.5;
 
 						positions[ 3 * k ] = x;
@@ -108,11 +108,9 @@
 			function generatePointcloud( color, width, length ) {
 
 				var geometry = generatePointCloudGeometry( color, width, length );
-
 				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.Points( geometry, material );
 
-				return pointcloud;
+				return  new THREE.Points( geometry, material );
 
 			}
 
@@ -138,9 +136,8 @@
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.Points( geometry, material );
 
-				return pointcloud;
+				return new THREE.Points( geometry, material );
 
 			}
 
@@ -167,9 +164,8 @@
 				geometry.addGroup( 0, indices.length );
 
 				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.Points( geometry, material );
 
-				return pointcloud;
+				return new THREE.Points( geometry, material );
 
 			}
 
@@ -182,25 +178,25 @@
 				clock = new THREE.Clock();
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 15, 15, 15 );
+				camera.position.set( 10, 10, 10 );
 				camera.lookAt( scene.position );
 				camera.updateMatrix();
 
 				//
 
 				var pcBuffer = generatePointcloud( new THREE.Color( 1, 0, 0 ), width, length );
-				pcBuffer.scale.set( 10, 10, 10 );
-				pcBuffer.position.set( - 10, 0, 0 );
+				pcBuffer.scale.set( 5, 10, 10 );
+				pcBuffer.position.set( - 5, 0, 0 );
 				scene.add( pcBuffer );
 
 				var pcIndexed = generateIndexedPointcloud( new THREE.Color( 0, 1, 0 ), width, length );
-				pcIndexed.scale.set( 10, 10, 10 );
+				pcIndexed.scale.set( 5, 10, 10 );
 				pcIndexed.position.set( 0, 0, 0 );
 				scene.add( pcIndexed );
 
 				var pcIndexedOffset = generateIndexedWithOffsetPointcloud( new THREE.Color( 0, 1, 1 ), width, length );
-				pcIndexedOffset.scale.set( 10, 10, 10 );
-				pcIndexedOffset.position.set( 10, 0, 0 );
+				pcIndexedOffset.scale.set( 5, 10, 10 );
+				pcIndexedOffset.position.set( 5, 0, 0 );
 				scene.add( pcIndexedOffset );
 
 				pointclouds = [ pcBuffer, pcIndexed, pcIndexedOffset ];
