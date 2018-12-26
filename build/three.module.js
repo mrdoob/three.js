@@ -13079,42 +13079,42 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 		var uniform = this.uniforms[ name ];
 		var value = uniform.value;
 
-		if ( value.isTexture ) {
+		if ( value && value.isTexture ) {
 
 			data.uniforms[ name ] = {
 				type: 't',
 				value: value.toJSON( meta ).uuid
 			};
 
-		} else if ( value.isColor ) {
+		} else if ( value && value.isColor ) {
 
 			data.uniforms[ name ] = {
 				type: 'c',
 				value: value.getHex()
 			};
 
-		} else if ( value.isVector2 ) {
+		} else if ( value && value.isVector2 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v2',
 				value: value.toArray()
 			};
 
-		} else if ( value.isVector3 ) {
+		} else if ( value && value.isVector3 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v3',
 				value: value.toArray()
 			};
 
-		} else if ( value.isVector4 ) {
+		} else if ( value && value.isVector4 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v4',
 				value: value.toArray()
 			};
 
-		} else if ( value.isMatrix4 ) {
+		} else if ( value && value.isMatrix4 ) {
 
 			data.uniforms[ name ] = {
 				type: 'm4',
@@ -40335,10 +40335,11 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 			if ( this.isPlaying === false ) return;
 
-			var panner = this.panner;
 			this.matrixWorld.decompose( position, quaternion, scale );
 
 			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+
+			var panner = this.panner;
 
 			if ( panner.positionX ) {
 
