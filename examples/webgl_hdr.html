@@ -37,8 +37,6 @@
 			based on <a href="http://spidergl.org/example.php?id=13" target="_blank" rel="noopener">SpiderGL</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
 
 		<!-- HDR fragment shader -->
@@ -102,6 +100,7 @@
 
 		<script type="module">
 
+			import * as THREE from "../build/three.module.js";
 			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {

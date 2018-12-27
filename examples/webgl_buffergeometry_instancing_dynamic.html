@@ -48,8 +48,6 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="../build/three.js"></script>
-
 	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vertexShader" type="x-shader/x-vertex">
@@ -100,6 +98,7 @@
 
 	<script type="module">
 
+		import * as THREE from "../build/three.module.js";
 		import {WEBGL} from "./jsm/WebGL.js";
 
 		if ( WEBGL.isWebGLAvailable() === false ) {

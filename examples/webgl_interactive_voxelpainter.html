@@ -35,10 +35,9 @@
 			<strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel
 		</div>
 
-		<script src="../build/three.js"></script>
-
 		<script type="module">
 
+			import * as THREE from "../build/three.module.js";
 			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {

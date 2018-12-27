@@ -82,10 +82,11 @@
 			Logarithmic handles all but the smallest objects with ease
 		</div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from "../build/three.module.js";
 
 			// 1 micrometer to 100 billion light years in one scene, with 1 unit = 1 meter?  preposterous!  and yet...
 			var NEAR = 1e-6, FAR = 1e27;

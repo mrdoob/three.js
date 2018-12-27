@@ -26,7 +26,6 @@
 		color: #0080ff;
 	}
 	</style>
-	<script src="../build/three.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
 	<script type="x-shader/x-vertex" id="vertexshader">
@@ -71,6 +70,7 @@
 
 		<script type="module">
 
+		import * as THREE from "../build/three.module.js";
 		import {WEBGL} from "./jsm/WebGL.js";
 
 		if ( WEBGL.isWebGLAvailable() === false ) {

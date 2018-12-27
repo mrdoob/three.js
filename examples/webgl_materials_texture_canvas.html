@@ -43,10 +43,9 @@
 		</div>
 		<canvas id="drawing-canvas" height="128" width="128"></canvas>
 
-		<script src="../build/three.js"></script>
-
 		<script type="module">
 
+			import * as THREE from "../build/three.module.js";
 			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {

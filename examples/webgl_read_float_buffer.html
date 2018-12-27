@@ -33,8 +33,6 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> read float pixels webgl example</div>
 
-		<script src="../build/three.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader_screen" type="x-shader/x-fragment">
@@ -83,6 +81,7 @@
 
 		<script type="module">
 
+			import * as THREE from "../build/three.module.js";
 			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {

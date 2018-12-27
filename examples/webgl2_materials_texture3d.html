@@ -78,14 +78,12 @@
 			<a href="https://www.codeproject.com/info/cpol10.aspx" target="_blank" rel="noopener">CPOL</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<!--<script src="js/controls/OrbitControls.js"></script>-->
-
 		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="module">
 
+			import * as THREE from "../build/three.module.js";
 			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGL2Available() === false ) {

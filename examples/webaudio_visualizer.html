@@ -66,8 +66,6 @@
 
 		</style>
 
-		<script src="../build/three.js"></script>
-
 		<script id="vertexShader" type="x-shader/x-vertex">
 
 			varying vec2 vUv;
@@ -118,6 +116,7 @@
 
 	<script type="module">
 
+	import * as THREE from "../build/three.module.js";
 	import {WEBGL} from "./jsm/WebGL.js";
 
 	if ( WEBGL.isWebGLAvailable() === false ) {
