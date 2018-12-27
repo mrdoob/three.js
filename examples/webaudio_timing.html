@@ -67,7 +67,6 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 	</head>
@@ -85,7 +84,9 @@
 		sound effect by <a href="https://freesound.org/people/michorvath/sounds/269718/" target="_blank" rel="noopener noreferrer">michorvath</a>
 	</div>
 
-	<script>
+	<script type="module">
+
+	import {WEBGL} from "./jsm/WebGL.js";
 
 	if ( WEBGL.isWebGLAvailable() === false ) {
 

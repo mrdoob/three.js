@@ -36,9 +36,15 @@
 <script src="../build/three.js"></script>
 <script src="js/loaders/KTXLoader.js"></script>
 
-<script src="js/WebGL.js"></script>
+<script type="module">
 
-<script>
+	import {WEBGL} from "./jsm/WebGL.js";
+
+	if ( WEBGL.isWebGLAvailable() === false ) {
+
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
 
 	/*
 	This is how compressed textures are supposed to be used:
@@ -54,12 +60,6 @@
 	ETC1 - opaque textures
 	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
 	*/
-
-	if ( WEBGL.isWebGLAvailable() === false ) {
-
-		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-	}
 
 	var camera, scene, renderer;
 	var meshes = [];

@@ -46,8 +46,6 @@
 		<script src="js/postprocessing/BloomPass.js"></script>
 		<script src="js/postprocessing/FilmPass.js"></script>
 
-		<script src="js/WebGL.js"></script>
-
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
 			uniform float time;
@@ -111,7 +109,9 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

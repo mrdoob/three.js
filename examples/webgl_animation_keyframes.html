@@ -44,13 +44,14 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/DRACOLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			var scene, camera, pointLight, stats;
 			var renderer, mixer, controls;

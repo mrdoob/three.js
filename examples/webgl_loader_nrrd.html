@@ -56,12 +56,13 @@
 		<script src="js/loaders/NRRDLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/gunzip.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

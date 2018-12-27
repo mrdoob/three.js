@@ -33,7 +33,6 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/shaders/WaterRefractionShader.js"></script>
 		<script src="js/objects/Refractor.js"></script>
-		<script src="js/WebGL.js"></script>
 
 	</head>
 	<body>
@@ -43,7 +42,9 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> refraction
 		</div>
 
-		<script>
+		<script type="module">
+
+		import {WEBGL} from "./jsm/WebGL.js";
 
 		if ( WEBGL.isWebGLAvailable() === false ) {
 

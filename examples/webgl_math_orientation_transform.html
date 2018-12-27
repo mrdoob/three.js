@@ -30,7 +30,6 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
 
 	</head>
 	<body>
@@ -40,7 +39,9 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - gradually transform an orientation to a target orientation
 		</div>
 
-		<script>
+		<script type="module">
+
+		import {WEBGL} from "./jsm/WebGL.js";
 
 		if ( WEBGL.isWebGLAvailable() === false ) {
 

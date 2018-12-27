@@ -49,7 +49,6 @@
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/FilmPass.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 	</head>
@@ -60,7 +59,9 @@
 		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw<br/>
 		</div>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

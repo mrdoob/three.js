@@ -36,7 +36,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -44,6 +43,7 @@
 
 			import './js/nodes/THREE.Nodes.js';
 			import './js/loaders/NodeMaterialLoader.js';
+			import {TeapotBufferGeometry} from "./jsm/geometries/TeapotBufferGeometry.js";
 
 			var container = document.getElementById( 'container' );
 
@@ -89,7 +89,7 @@
 				light.position.set( - 1, 0.75, - 0.5 );
 				scene.add( light );
 
-				teapot = new THREE.TeapotBufferGeometry( 15, 18 );
+				teapot = new TeapotBufferGeometry( 15, 18 );
 
 				mesh = new THREE.Mesh( teapot );
 				scene.add( mesh );

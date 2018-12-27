@@ -35,7 +35,6 @@
 
 		<script src='js/libs/dat.gui.min.js'></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
 
 		<script id="vs" type="x-shader/x-vertex">
 
@@ -92,7 +91,9 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			var container;
 

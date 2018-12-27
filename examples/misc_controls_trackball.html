@@ -10,7 +10,7 @@
 				height: 100%;
 				overflow: hidden;
 			}
-			
+
 			body {
 				color: #000;
 				font-family:Monospace;
@@ -46,10 +46,11 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
@@ -154,9 +155,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				
+
 				controls.update();
-				
+
 				stats.update();
 
 			}

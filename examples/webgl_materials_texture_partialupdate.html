@@ -29,7 +29,6 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
 
 	</head>
 	<body>
@@ -39,7 +38,9 @@
 			replace parts of an existing texture with all data of another texture
 		</div>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

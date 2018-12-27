@@ -67,7 +67,6 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -117,7 +116,9 @@
 			music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a>
 		</div>
 
-	<script>
+	<script type="module">
+
+	import {WEBGL} from "./jsm/WebGL.js";
 
 	if ( WEBGL.isWebGLAvailable() === false ) {
 

@@ -52,10 +52,11 @@
 		<script src="js/libs/o3dgc.js"></script>
 		<script src="js/loaders/sea3d/o3dgc/SEA3DGC.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

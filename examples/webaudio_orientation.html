@@ -67,7 +67,6 @@
 		</style>
 
 		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
@@ -91,7 +90,9 @@
 		music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener noreferrer">skullbeatz</a>
 	</div>
 
-	<script>
+	<script type="module">
+
+	import {WEBGL} from "./jsm/WebGL.js";
 
 	if ( WEBGL.isWebGLAvailable() === false ) {
 

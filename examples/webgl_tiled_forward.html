@@ -40,10 +40,17 @@
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/LuminosityHighPassShader.js"></script>
 		<script src="js/postprocessing/UnrealBloomPass.js"></script>
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+
+		import {WEBGL} from "./jsm/WebGL.js";
+
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		// Simple form of tiled forward lighting
 		// using texels as bitmasks of 32 lights

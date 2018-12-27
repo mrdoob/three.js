@@ -38,34 +38,41 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/Cloth.js"></script>
+		<script type="module">
 
-		<script>
+			import {WEBGL} from "./jsm/WebGL.js";
+			import {cloth, clothFunction, ballSize, windForce, simulate, ballPosition, pins} from "./jsm/Cloth.js";
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			/* testing cloth simulation */
 
 			var pinsFormation = [];
-			var pins = [ 6 ];
+			var _pins = [ 6 ];
 
 			pinsFormation.push( pins );
 
-			pins = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-			pinsFormation.push( pins );
+			_pins = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+			pinsFormation.push( _pins );
 
-			pins = [ 0 ];
-			pinsFormation.push( pins );
+			_pins = [ 0 ];
+			pinsFormation.push( _pins );
 
-			pins = []; // cut the rope ;)
-			pinsFormation.push( pins );
+			_pins = []; // cut the rope ;)
+			pinsFormation.push( _pins );
 
-			pins = [ 0, cloth.w ]; // classic 2 pins
-			pinsFormation.push( pins );
+			_pins = [ 0, cloth.w ]; // classic 2 pins
+			pinsFormation.push( _pins );
 
-			pins = pinsFormation[ 1 ];
+			pins.length = 0;
+			pins.push( ...pinsFormation[ 1 ] );
 
 
 			function togglePins() {
@@ -74,16 +81,10 @@
 
 			}
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
 			var container, stats;
 			var camera, scene, renderer;
-
 			var clothGeometry;
+
 			var sphere;
 			var object;
 
@@ -284,7 +285,7 @@
 				windForce.normalize()
 				windForce.multiplyScalar( windStrength );
 
-				simulate( time );
+				simulate( clothGeometry, sphere, time );
 				render();
 				stats.update();
 

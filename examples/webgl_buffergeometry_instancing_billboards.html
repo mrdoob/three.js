@@ -48,7 +48,6 @@
 	</div>
 
 	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vshader" type="x-shader/x-vertex">
@@ -108,7 +107,10 @@
 		}
 	</script>
 
-	<script>
+	<script type="module">
+
+		import {WEBGL} from "./jsm/WebGL.js";
+
 		var container, stats;
 
 		var camera, scene, renderer;

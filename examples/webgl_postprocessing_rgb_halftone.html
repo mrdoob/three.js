@@ -40,7 +40,6 @@
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
 		<script src='js/libs/stats.min.js'></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -49,7 +48,9 @@
 			<a href="https://github.com/meatbags" target="_blank">Xavier Burrow</a>
 		</div>
 
-		<script>
+		<script type="module">
+
+		import {WEBGL} from "./jsm/WebGL.js";
 
 		if ( WEBGL.isWebGLAvailable() === false ) {
 

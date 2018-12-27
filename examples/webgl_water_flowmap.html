@@ -32,7 +32,6 @@
 		<script src="js/objects/Reflector.js"></script>
 		<script src="js/objects/Refractor.js"></script>
 		<script src="js/objects/Water2.js"></script>
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 	</head>
@@ -43,7 +42,9 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - water flow map
 		</div>
 
-		<script>
+		<script type="module">
+
+		import {WEBGL} from "./jsm/WebGL.js";
 
 		if ( WEBGL.isWebGLAvailable() === false ) {
 

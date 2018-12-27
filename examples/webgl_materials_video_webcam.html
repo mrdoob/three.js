@@ -38,11 +38,12 @@
 
 		<script src="../build/three.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
 
 		<video id="video" autoplay style="display:none"></video>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

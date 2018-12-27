@@ -30,7 +30,6 @@
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
 		<script src="js/loaders/TTFLoader.js"></script>
 		<script src="js/libs/opentype.min.js"></script>
 		<div id="info">
@@ -39,7 +38,9 @@
 		</div>
 
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

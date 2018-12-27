@@ -35,9 +35,9 @@
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/PVRLoader.js"></script>
 
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script>
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

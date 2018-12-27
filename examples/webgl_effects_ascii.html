@@ -38,9 +38,9 @@
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/effects/AsciiEffect.js"></script>
 
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script>
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

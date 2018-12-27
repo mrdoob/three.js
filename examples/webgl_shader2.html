@@ -37,7 +37,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader4" type="x-shader/x-fragment">
@@ -160,7 +159,9 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

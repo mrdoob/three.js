@@ -51,11 +51,12 @@
 
 		<script src="js/loaders/BVHLoader.js"></script>
 		<script src="js/utils/SkeletonUtils.js"></script>
-		
-		<script src="js/WebGL.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

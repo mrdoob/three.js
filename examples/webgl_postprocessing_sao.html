@@ -42,7 +42,6 @@
 		<script src="js/shaders/DepthLimitedBlurShader.js"></script>
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -50,7 +49,9 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - Scalable Ambient Occlusion (SAO) shader by <a href="http://clara.io">Ben Houston</a> / Post-processing pass by <a href="http://ludobaka.github.io">Ludobaka</a>
 		</div>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

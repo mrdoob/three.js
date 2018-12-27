@@ -1,3 +1,5 @@
+import {Vector3} from "../../build/three.module.js";
+
 /*
  * Cloth Simulation using a relaxed constraints solver
  */
@@ -23,7 +25,7 @@ var clothFunction = plane( restDistance * xSegs, restDistance * ySegs );
 var cloth = new Cloth( xSegs, ySegs );
 
 var GRAVITY = 981 * 1.4;
-var gravity = new THREE.Vector3( 0, - GRAVITY, 0 ).multiplyScalar( MASS );
+var gravity = new Vector3( 0, - GRAVITY, 0 ).multiplyScalar( MASS );
 
 
 var TIMESTEP = 18 / 1000;
@@ -34,12 +36,12 @@ var pins = [];
 
 var wind = true;
 var windStrength = 2;
-var windForce = new THREE.Vector3( 0, 0, 0 );
+var windForce = new Vector3( 0, 0, 0 );
 
-var ballPosition = new THREE.Vector3( 0, - 45, 0 );
+var ballPosition = new Vector3( 0, - 45, 0 );
 var ballSize = 60; //40
 
-var tmpForce = new THREE.Vector3();
+var tmpForce = new Vector3();
 
 var lastTime;
 
@@ -60,14 +62,14 @@ function plane( width, height ) {
 
 function Particle( x, y, z, mass ) {
 
-	this.position = new THREE.Vector3();
-	this.previous = new THREE.Vector3();
-	this.original = new THREE.Vector3();
-	this.a = new THREE.Vector3( 0, 0, 0 ); // acceleration
+	this.position = new Vector3();
+	this.previous = new Vector3();
+	this.original = new Vector3();
+	this.a = new Vector3( 0, 0, 0 ); // acceleration
 	this.mass = mass;
 	this.invMass = 1 / mass;
-	this.tmp = new THREE.Vector3();
-	this.tmp2 = new THREE.Vector3();
+	this.tmp = new Vector3();
+	this.tmp2 = new Vector3();
 
 	// init
 
@@ -105,7 +107,7 @@ Particle.prototype.integrate = function ( timesq ) {
 };
 
 
-var diff = new THREE.Vector3();
+var diff = new Vector3();
 
 function satisfyConstraints( p1, p2, distance ) {
 
@@ -228,7 +230,7 @@ function Cloth( w, h ) {
 
 }
 
-function simulate( time ) {
+function simulate( clothGeometry, sphere, time ) {
 
 	if ( ! lastTime ) {
 
@@ -237,14 +239,14 @@ function simulate( time ) {
 
 	}
 
-	var i, il, particles, particle, pt, constraints, constraint;
+	var i, j, il, particles, particle, pt, constraints, constraint;
 
 	// Aerodynamics forces
 
 	if ( wind ) {
 
 		var indx;
-		var normal = new THREE.Vector3();
+		var normal = new Vector3();
 		var indices = clothGeometry.index;
 		var normals = clothGeometry.attributes.normal;
 
@@ -338,3 +340,5 @@ function simulate( time ) {
 
 
 }
+
+export {cloth, clothFunction, ballSize, windForce, simulate, ballPosition, pins}

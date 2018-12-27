@@ -35,7 +35,6 @@
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/pmrem/PMREMGenerator.js"></script>
@@ -52,7 +51,9 @@
 		<script src="js/shaders/ConvolutionShader.js"></script>
 
 		<script src="js/loaders/OBJLoader.js"></script>
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

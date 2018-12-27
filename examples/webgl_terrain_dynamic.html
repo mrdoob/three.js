@@ -56,7 +56,6 @@
 		<script src="js/shaders/NormalMapShader.js"></script>
 		<script src="js/ShaderTerrain.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragmentShaderNoise" type="x-shader/x-fragment">
@@ -202,7 +201,9 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 

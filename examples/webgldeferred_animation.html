@@ -40,7 +40,6 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
@@ -52,7 +51,15 @@
 
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script>
+		<script type="module">
+
+			import {WEBGL} from "./jsm/WebGL.js";
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight;

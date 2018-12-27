@@ -33,7 +33,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -82,8 +81,9 @@
 
 		</script>
 
+		<script type="module">
 
-		<script>
+		import {WEBGL} from "./jsm/WebGL.js";
 
 		if ( WEBGL.isWebGLAvailable() === false ) {
 

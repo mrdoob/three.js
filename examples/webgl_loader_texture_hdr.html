@@ -40,9 +40,9 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script>
+			import {WEBGL} from "./jsm/WebGL.js";
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
