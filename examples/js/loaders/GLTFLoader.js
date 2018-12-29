@@ -23,6 +23,52 @@ THREE.GLTFLoader = ( function () {
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
+			this._load( url, onLoad, onProgress, onError, false );
+
+		},
+
+		setCrossOrigin: function ( value ) {
+
+			this.crossOrigin = value;
+			return this;
+
+		},
+
+		setPath: function ( value ) {
+
+			this.path = value;
+			return this;
+
+		},
+
+		setResourcePath: function ( value ) {
+
+			this.resourcePath = value;
+			return this;
+
+		},
+
+		setDRACOLoader: function ( dracoLoader ) {
+
+			this.dracoLoader = dracoLoader;
+			return this;
+
+		},
+
+		parse: function ( data, path, onLoad, onError ) {
+
+			this._parse( data, path, onLoad, onError, false );
+
+		},
+
+		getParser: function ( url, onLoad, onProgress, onError ) {
+
+			this._load( url, onLoad, onProgress, onError, true );
+
+		},
+
+		_load: function ( url, onLoad, onProgress, onError, getParser ) {
+
 			var scope = this;
 
 			var resourcePath;
@@ -72,13 +118,13 @@ THREE.GLTFLoader = ( function () {
 
 				try {
 
-					scope.parse( data, resourcePath, function ( gltf ) {
+					scope._parse( data, resourcePath, function ( gltf ) {
 
 						onLoad( gltf );
 
 						scope.manager.itemEnd( url );
 
-					}, _onError );
+					}, _onError, getParser );
 
 				} catch ( e ) {
 
@@ -90,35 +136,7 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setDRACOLoader: function ( dracoLoader ) {
-
-			this.dracoLoader = dracoLoader;
-			return this;
-
-		},
-
-		parse: function ( data, path, onLoad, onError ) {
+		_parse: function ( data, path, onLoad, onError, getParser ) {
 
 			var content;
 			var extensions = {};
@@ -217,6 +235,14 @@ THREE.GLTFLoader = ( function () {
 				manager: this.manager
 
 			} );
+
+			if ( getParser ) {
+
+				parser.markDefs();
+				onLoad( parser );
+				return;
+
+			}
 
 			parser.parse( function ( scene, scenes, cameras, animations, json ) {
 
