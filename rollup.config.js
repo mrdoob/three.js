@@ -189,9 +189,18 @@ export default {
 	input: 'src/Three.js',
 	plugins: [
 		glconstants(),
-		glsl()
+		glsl(),
+		eslint( {
+			include: '**/*.js'
+		} ),
+		babel( {
+			babelrc: false,
+			'plugins': [
+				'external-helpers'
+			],
+			presets: [[ 'env', { modules: false } ]]
+		} )
 	],
-	// sourceMap: true,
 	output: [
 		{
 			format: 'umd',

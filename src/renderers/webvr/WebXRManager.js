@@ -77,7 +77,7 @@ function WebXRManager( renderer ) {
 	this.setDevice = function ( value ) {
 
 		if ( value !== undefined ) device = value;
-		if ( value instanceof XRDevice ) gl.setCompatibleXRDevice( value );
+		if ( value instanceof window.XRDevice ) gl.setCompatibleXRDevice( value );
 
 	};
 
