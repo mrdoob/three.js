@@ -1,4 +1,5 @@
 .DS_Store
+.package-lock.json
 *.swp
 .project
 node_modules
