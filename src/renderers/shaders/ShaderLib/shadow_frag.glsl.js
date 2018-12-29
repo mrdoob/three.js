@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 uniform vec3 color;
 uniform float opacity;
 

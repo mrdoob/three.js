@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_MORPHTARGETS
 
 	#ifndef USE_MORPHNORMALS
