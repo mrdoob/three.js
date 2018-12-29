@@ -25,9 +25,10 @@
 
     </p>
 
-    <h3>[method:BufferGeometry mergeBufferGeometries]( [param:Array geometries] )</h3>
+    <h3>[method:BufferGeometry mergeBufferGeometries]( [param:Array geometries], [param:Boolean useGroups] )</h3>
     <p>
-    geometries -- Array of [page:BufferGeometry BufferGeometry] instances.<br /><br />
+    geometries -- Array of [page:BufferGeometry BufferGeometry] instances.<br />
+    useGroups -- Whether groups should be generated for the merged geometry or not.<br /><br />
 
     Merges a set of geometries into a single instance. All geometries must have compatible attributes.
     If merge does not succeed, the method returns null.<br /><br />

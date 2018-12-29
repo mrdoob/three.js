@@ -19,8 +19,6 @@ function Quaternion( x, y, z, w ) {
 
 Object.assign( Quaternion, {
 
-	isQuaternion: true,
-
 	slerp: function ( qa, qb, qm, t ) {
 
 		return qm.copy( qa ).slerp( qb, t );
@@ -164,6 +162,8 @@ Object.defineProperties( Quaternion.prototype, {
 } );
 
 Object.assign( Quaternion.prototype, {
+
+	isQuaternion: true,
 
 	set: function ( x, y, z, w ) {
 

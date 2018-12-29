@@ -27,9 +27,10 @@ THREE.AssimpJSONLoader.prototype = {
 
 		var scope = this;
 
-		var path = THREE.LoaderUtils.extractUrlBase( url );
+		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			var json = JSON.parse( text );
@@ -47,7 +48,7 @@ THREE.AssimpJSONLoader.prototype = {
 					onError( 'THREE.AssimpJSONLoader: Not an assimp2json scene.' );
 					return;
 
-				// check major format version
+					// check major format version
 
 				} else if ( metadata.version < 100 && metadata.version >= 200 ) {
 
@@ -61,6 +62,20 @@ THREE.AssimpJSONLoader.prototype = {
 			onLoad( scope.parse( json, path ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
+
+	},
+
+	setResourcePath: function ( value ) {
+
+		this.resourcePath = value;
+		return this;
 
 	},
 
@@ -263,7 +278,7 @@ THREE.AssimpJSONLoader.prototype = {
 		}
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
-		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		var meshes = parseList( json.meshes, parseMesh );
 		var materials = parseList( json.materials, parseMaterial );

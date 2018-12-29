@@ -24,7 +24,7 @@
 				top: 10px;
 				width: 100%;
 				text-align: center;
-				z-index: 0; // to not conflict with dat.gui
+				z-index: 0; /* to not conflict with dat.gui */
 				display:block;
 			}
 		</style>
@@ -43,27 +43,31 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var mesh, renderer, scene, camera;
 
 			var image;
 
 			var API = {
-				color : 0xffffff,
-				exposure : 1.0
-			}
+				color: 0xffffff,
+				exposure: 1.0
+			};
 
 			init();
 
 			function init() {
 
 				// renderer
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -92,11 +96,9 @@
 				// matcap
 				var loader = new THREE.TextureLoader( manager );
 
-				var matcap = loader.load( 'textures/matcaps/matcap-porcelain-white.jpg', function( texture ) {
+				var matcap = loader.load( 'textures/matcaps/matcap-porcelain-white.jpg', function () {
 
 					matcap.encoding = THREE.sRGBEncoding;
-
-					if ( mesh ) mesh.material.needsUpdate = true;
 
 				} );
 
@@ -121,10 +123,18 @@
 
 				gui.addColor( API, 'color' )
 					.listen()
-					.onChange( function() { mesh.material.color.set( API.color ); render(); } );
+					.onChange( function () {
+
+						mesh.material.color.set( API.color ); render();
+
+					} );
 
 				gui.add( API, 'exposure', 0, 2 )
-					.onChange( function() { renderer.toneMappingExposure = API.exposure; render(); } )
+					.onChange( function () {
+
+						renderer.toneMappingExposure = API.exposure; render();
+
+					} );
 
 				gui.domElement.style.webkitUserSelect = 'none';
 
@@ -146,7 +156,7 @@
 				image.src = 'textures/matcaps/matcap-porcelain-white.jpg';
 				div.appendChild( image );
 
-			    window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -173,18 +183,18 @@
 
 			function imgCallback( event ) {
 
-				var matcap = mesh.material.matcap;
+				if ( mesh.material.matcap ) {
 
-				matcap.image = event.target;
+					mesh.material.matcap.dispose();
 
-				matcap.needsUpdate = true;
+				}
 
-				API.color = 0xffffff;
-				mesh.material.color.set( API.color );
+				mesh.material.matcap = new THREE.Texture( event.target );
+				mesh.material.matcap.needsUpdate = true;
+
+				image.src = mesh.material.matcap.image.src; // corner div
 
 				render();
-
-				image.src = matcap.image.src; // corner div
 
 			}
 

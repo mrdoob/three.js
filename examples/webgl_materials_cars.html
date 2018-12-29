@@ -47,12 +47,16 @@
 
 		<script src="js/Car.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats, carModel, materialsLib, envMap;
 
@@ -114,7 +118,7 @@
 				hemiLight.position.set( 0, 1, 0 );
 				scene.add( hemiLight );
 
-				shadowLight  = new THREE.DirectionalLight( 0xffffee, 0.1 );
+				var shadowLight  = new THREE.DirectionalLight( 0xffffee, 0.1 );
 				shadowLight.position.set( -1.5, 1.25, -1.5 );
 				shadowLight.castShadow = true;
 				shadowLight.shadow.width = 512;
@@ -123,7 +127,7 @@
 				shadowLight.shadow.camera.bottom = -2;
 				shadowLight.shadow.camera.left = -2.5;
 				shadowLight.shadow.camera.right = 2.5;
-				shadowLight.shadow.camera.far = 5.5;
+				shadowLight.shadow.camera.far = 5.75;
 				shadowLight.shadow.bias = -0.025;
 
 				lightHolder.add( shadowLight, shadowLight.target );

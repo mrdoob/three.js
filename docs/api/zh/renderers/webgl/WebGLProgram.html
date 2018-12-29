@@ -10,11 +10,11 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Constructor for the GLSL program sent to vertex and fragment shaders, including default uniforms and attributes.</p>
+		<p class="desc">发送到顶点着色器和片元着色器的GLSL程序的构造函数， 包含默认的变量(uniforms)和属性</p>
 
-		<h2>Built-in uniforms and attributes</h2>
+		<h2>内置的变量(uniforms)和属性</h2>
 
-		<h3>Vertex shader (unconditional):</h3>
+		<h3>顶点着色器(无条件的):</h3>
 		<div>
 		<code>
 		// = object.matrixWorld
@@ -42,18 +42,18 @@
 		attribute vec2 uv;
 		</code>
 		<p>
-		Note that you can therefore calculate the position of a vertex in the vertex shader by:
+        注意，可以通过以下方式计算顶点着色器中顶点的位置：
 		<code>
 		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		</code>
-		or alternatively
+		或者也可以这样：
 		<code>
 		gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( position, 1.0 );
 		</code>
 		</p>
 		</div>
 
-		<h3>Vertex shader (conditional):</h3>
+		<h3>顶点着色器(有条件的):</h3>
 		<div>
 		<code>
 		#ifdef USE_COLOR
@@ -94,7 +94,7 @@
 		</code>
 		</div>
 
-		<h3>Fragment shader:</h3>
+		<h3>片元着色器:</h3>
 		<div>
 		<code>
 		uniform mat4 viewMatrix;
@@ -103,12 +103,12 @@
 		</div>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]( [param:WebGLRenderer renderer], [param:Object code], [param:Material material], [param:Object parameters] )</h3>
-		<p>For parameters see [page:WebGLRenderer WebGLRenderer]</p>
+		<p>参数详见[page:WebGLRenderer WebGLRenderer]</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:String id]</h3>
 		<p></p>
@@ -128,19 +128,19 @@
 		<h3>[property:WebGLShader fragmentShader]</h3>
 		<p></p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Object getUniforms]()</h3>
 		<p>
-		Returns a name-value mapping of all active uniform locations.
+        返回所有活动态的变量(uniform)位置的name-value映射
 		</p>
 
 		<h3>[method:Object getAttributes]()</h3>
 		<p>
-		Returns a name-value mapping of all active vertex attribute locations.
+        返回所有活动态的顶点属性位置的name-value映射
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

@@ -10,9 +10,9 @@
 	<body>
 		[page:Material] &rarr; [page:MeshPhongMaterial] &rarr;
 
-		<h1>[name]</h1>
+		<h1>卡通网格材质([name])</h1>
 
-		<div class="desc">An extension of the [page:MeshPhongMaterial] with toon shading.</div>
+		<div class="desc">[page:MeshPhongMaterial]卡通着色的扩展。</div>
 
 		<!-- <iframe id="scene" src="scenes/material-browser.html#MeshStandardMaterial"></iframe>
 
@@ -32,49 +32,45 @@
 
 		</script> -->
 
-		<h2>Examples</h2>
+		<h2>例子(Examples)</h2>
 		[example:webgl_materials_variations_toon materials / variations / toon]<br />
 
-		<h2>Constructor</h2>
+		<h2>构造函数(Constructor)</h2>
 
 		<h3>[name]( [param:Object parameters] )</h3>
-		<p>
-		[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
-		Any property of the material (including any property inherited from [page:Material] and [page:MeshStandardMaterial]) can be passed in here.<br /><br />
-
-		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-		string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]和[page:MeshStandardMaterial]继承的任何属性)。<br /><br />
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
 		</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Material] and [page:MeshPhongMaterial] classes for common properties.</p>
+		<h2>属性(Properties)</h2>
+		<p>常用属性请参见基类[page:Material]和[page:MeshPhongMaterial]。</p>
 
 		<h3>[property:Texture gradientMap]</h3>
-		<p>Gradient map for the toon shading. Default is *null*.</p>
+		<p> 卡通着色的渐变贴图，默认值为*null*。</p>
 
 		<h3>[property:Boolean isMeshToonMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are mesh toon materials. Default is *true*.<br /><br />
+		<p> 用于检查此类或派生类是否为卡通网格材质。默认值为 *true*。<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			因为其通常用在内部优化，所以不应该更改该属性值。
 		</p>
 
 		<h3>[property:Object defines]</h3>
-		<p>An object of the form:
+		<p>如下形式的对象:
 			<code>
 				{ 'TOON': '' };
 			</code>
 
-			This is used by the [page:WebGLRenderer] for selecting shaders.
+			[page:WebGLRenderer]使用它来选择shaders。
 		</p>
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:Material] and [page:MeshPhongMaterial] classes for common methods.</p>
+		<h2>方法(Methods)</h2>
+		<p>常用方法请参见基类[page:Material]和[page:MeshPhongMaterial]。</p>
 
 
-		<h2>Source</h2>
+		<h2>源码(Source)</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

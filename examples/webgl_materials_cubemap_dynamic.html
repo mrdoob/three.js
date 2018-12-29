@@ -32,13 +32,16 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
 
 		<script>
 
 			var camera, scene, renderer;
-			var cube, sphere, torus, material;
+			var cube, sphere, torus, material, backgroundMesh;
 
 			var count = 0, cubeCamera1, cubeCamera2;
+
+			var onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
 
 			var lon = 0, lat = 0;
 			var phi = 0, theta = 0;
@@ -56,23 +59,35 @@
 
 			function init( texture ) {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-
-				scene = new THREE.Scene();
-
-				var mesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 500, 32, 16 ), new THREE.MeshBasicMaterial( { map: texture } ) );
-				mesh.geometry.scale( - 1, 1, 1 );
-				scene.add( mesh );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+
+				// background
+
+				var options = {
+					resolution: 1024,
+
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipMapLinearFilter,
+					magFilter: THREE.LinearFilter
+				};
+
+				scene.background = new THREE.CubemapGenerator( renderer ).fromEquirectangular( texture, options );
+
+				//
+
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera1.renderTarget.texture.generateMipmaps = true;
 				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera1 );
 
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera2.renderTarget.texture.generateMipmaps = true;
 				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera2 );
 
@@ -102,7 +117,7 @@
 
 			}
 
-			function onWindowResized( event ) {
+			function onWindowResized() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -133,7 +148,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );

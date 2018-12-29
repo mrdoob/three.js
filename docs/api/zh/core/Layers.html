@@ -11,71 +11,71 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A [page:Layers] object assigns an [page:Object3D] to 1 or more of 32 layers numbered 0 to 31
-			- internally the layers are stored as a [link:https://en.wikipedia.org/wiki/Mask_(computing) bit mask], and by default all
-			Object3Ds are a member of layer 0.<br /><br />
+			[page:Layers] 对象为 [page:Object3D] 分配 1个到 32 个图层。32个图层从 0 到 31 编号标记。
+			在内部实现上，每个图层对象被存储为一个 [link:https://en.wikipedia.org/wiki/Mask_(computing) bit mask]，
+			默认的，所有 [page:Object3D] 对象都存储在第 0 个图层上。<br /><br />
 
-			This can be used to control visibility - an object must share a layer with a [page:Camera camera] to be visible when that camera's
-			view is renderered.<br /><br />
+			图层对象可以用于控制对象的显示。当 [page:Camera camera] 的内容被渲染时与其共享图层相同的物体会被显示。每个对象都需要与一个
+			[page:Camera camera] 共享图层。<br /><br />
 
-			All classes that inherit from [page:Object3D] have an [page:Object3D.layers] property which is an instance of this class.
+			每个继承自 [page:Object3D] 的对象都有一个 [page:Object3D.layers] 对象。
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]()</h3>
 		<p>
-			Create a new Layers object, with membership initially set to layer 0.
+			创建一个新的图层对象，该对象默认与第 0 图层关联。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Integer mask]</h3>
 		<p>
-			A bit mask storing which of the 32 layers this layers object is currently a member of.
+			用 bit mask 表示当前图层对象与 0 - 31 中的哪些图层相对应。所属层所对应的比特位为 1，其他位位 0。
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null disable]( [param:Integer layer] )</h3>
 		<p>
-			layer - an integer from 0 to 31.<br /><br />
+			layer - 一个 0 - 31 的整数。<br /><br />
 
-			Remove membership of this *layer*.
+			删除图层对象与参数指定图层的对应关系。
 		</p>
 
 		<h3>[method:null enable]( [param:Integer layer] )</h3>
 		<p>
-			layer - an integer from 0 to 31.<br /><br />
+			layer - 一个 0 - 31 的整数。<br /><br />
 
-			Add membership of this *layer*.
+			增加图层对象与参数指定图层的对应关系。
 		</p>
 
 		<h3>[method:null set]( [param:Integer layer] )</h3>
 		<p>
-			layer - an integer from 0 to 31.<br /><br />
+			layer - 一个 0 - 31 的整数。<br /><br />
 
-			Set membership to *layer*, and remove membership all other layers.
+			删除图层对象已有的所有对应关系，增加与参数指定的图层的对应关系。
 		</p>
 
 		<h3>[method:Boolean test]( [param:Layers layers] )</h3>
 		<p>
-			layers - a Layers object<br /><br />
+			layers - 一个图层对象。<br /><br />
 
-			Returns true if this and the passed *layers* object are members of the same set of layers.
+			如果传入图层对象与当前对象属于相同的一组图层，则返回 true，否则返回 false。
 		</p>
 
 		<h3>[method:null toggle]( [param:Integer layer] )</h3>
 		<p>
-			layer - an integer from 0 to 31.<br /><br />
+			layer - 一个 0 - 31 的整数。<br /><br />
 
-			Toggle membership of *layer*.
+			根据参数切换对象所属图层。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

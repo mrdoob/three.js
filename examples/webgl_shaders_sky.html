@@ -27,9 +27,7 @@
 
 			}
 
-			a {
-				color: #fff;
-			}
+			a { color: #fff; }
 
 		</style>
 	</head>
@@ -46,15 +44,16 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/objects/Sky.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var container;
+			}
 
 			var camera, controls, scene, renderer;
 

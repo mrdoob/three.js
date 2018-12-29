@@ -8,42 +8,43 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>雾（[name]）</h1>
 
-		<p class="desc">This class contains the parameters that define linear fog, i.e., that grows linearly denser with the distance.</p>
+		<p class="desc">这个类中的参数定义了线性雾。也就是说，雾的密度是随着距离线性增大的。</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Integer color], [param:Float near], [param:Float far] )</h3>
-		<p>The color parameter is passed to the [page:Color] constructor to set the color property. Color can be a hexadecimal integer or a CSS-style string.</p>
+		<p>颜色参数传入[page:Color]构造函数中，来设置颜色属性。颜色可以是一个十六进制的整型数，或者是CSS风格的字符串。</p>
 
-		<h2>Properties</h2>
+
+		<h2>属性</h2>
 
 		<h3>[property:String name]</h3>
-		<p>Optional name of the object (doesn't need to be unique). Default is an empty string.</p>
+		<p>对象的名称，可选、不必唯一。默认值是一个空字符串。</p>
 
 		<h3>[property:Color color]</h3>
-		<p>Fog color.  Example: If set to black, far away objects will be rendered black.</p>
+		<p>雾的颜色。比如说，如果将其设置为黑色，远处的物体将被渲染成黑色。</p>
 
 		<h3>[property:Float near]</h3>
-		<p>The minimum distance to start applying fog. Objects that are less than 'near' units from the active camera won't be affected by fog.</p>
-		<p>Default is 1.</p>
+		<p>开始应用雾的最小距离。距离小于活动摄像机“near”个单位的物体将不会被雾所影响。</p>
+		<p>默认值是1。</p>
 
 		<h3>[property:Float far]</h3>
-		<p>The maximum distance at which fog stops being calculated and applied. Objects that are more than 'far' units away from the active camera won't be affected by fog.</p>
-		<p>Default is 1000.</p>
+		<p>结束计算、应用雾的最大距离，距离大于活动摄像机“far”个单位的物体将不会被雾所影响。</p>
+		<p>默认值是1000。</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Fog clone]()</h3>
-		<p>Returns a new fog instance with the same parameters as this one.</p>
+		<p>返回一个具有和当前雾参数相同的新的Fog实例。</p>
 
 		<h3>[method:Fog toJSON]()</h3>
-		<p>Return fog data in JSON format.</p>
+		<p>以JSON格式返回Fog的数据。</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

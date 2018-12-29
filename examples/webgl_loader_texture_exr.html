@@ -31,7 +31,6 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example
 		</div>
@@ -41,151 +40,103 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<!-- HDR fragment shader -->
-
-		<script id="fs-hdr" type="x-shader/x-fragment">
-
-			uniform sampler2D   tDiffuse;
-			uniform float       exposure;
-			uniform float       brightMax;
-
-			varying vec2  vUv;
-
-			void main()	{
-
-				vec4 color = texture2D( tDiffuse, vUv );
-
-				// Perform tone-mapping
-				float Y = dot(vec4(0.30, 0.59, 0.11, 0.0), color);
-				float YD = exposure * (exposure / brightMax + 1.0) / (exposure + 1.0);
-				color *= YD;
-
-				gl_FragColor = vec4( color.xyz, 1.0 );
-
-			}
-
-		</script>
-
-		<!-- HDR vertex shader -->
-
-		<script id="vs-hdr" type="x-shader/x-vertex">
-
-			varying vec2 vUv;
-
-			void main()	{
-
-				vUv  = uv;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-			}
-
-		</script>
-
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
 			var params = {
-				exposure: 1.0,
+				exposure: 1.0
 			};
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			var container, stats;
-
-			var camera, scene, renderer;
-			var materialHDR, quad, gamma, exposure;
+			var renderer, scene, camera;
 
 			init();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 900;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = params.exposure;
+
+				renderer.gammaOutput = true;
 
 				scene = new THREE.Scene();
 
-				var loader = new THREE.EXRLoader();
+				var aspect = window.innerWidth / window.innerHeight;
 
-				loader.load( "textures/piz_compressed.exr", function( texture, textureData ) {
+				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-					console.log( textureData.header ); // exr header
+				new THREE.EXRLoader().load( 'textures/piz_compressed.exr', function ( texture, textureData ) {
+
+					//console.log( textureData );
+					//console.log( texture );
 
 					texture.minFilter = THREE.NearestFilter;
 					texture.magFilter = THREE.NearestFilter;
 
-					materialHDR = new THREE.ShaderMaterial( {
+					// these setting are currently set correctly by default
+					//texture.encoding = THREE.LinearEncoding;
+					//texture.minFilter = THREE.LinearMipMapLinearFilter;
+					//texture.magFilter = THREE.LinearFilter;
+					//texture.flipY = true;
 
-						uniforms: {
-							tDiffuse:  { value: texture },
-							exposure:  { value: 1.0 },
-							brightMax: { value: 18.0 }
-							},
-						vertexShader: getText( 'vs-hdr' ),
-						fragmentShader: getText( 'fs-hdr' )
+					var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-					} );
+					var quad = new THREE.PlaneBufferGeometry( textureData.width / textureData.height, 1 );
 
-					quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( textureData.width, textureData.height ), materialHDR );
-					quad.position.z = -100;
-					scene.add( quad );
-					animate();
+					var mesh = new THREE.Mesh( quad, material );
+
+					scene.add( mesh );
+
+					render();
 
 				} );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
-				container.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				window.addEventListener( 'resize', onWindowResize, false );
+				//
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'exposure', 0.1, 5 );
+				gui.add( params, 'exposure', 0, 2 ).onChange( render );
 				gui.open();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-
-
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				var aspect = window.innerWidth / window.innerHeight;
+
+				var frustumHeight = camera.top - camera.bottom;
+
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
+
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			}
-
-			function getText( id ) {
-
-				return document.getElementById( id ).textContent;
+				render();
 
 			}
 
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
 			function render() {
 
-				materialHDR.uniforms.exposure.value = params.exposure;
+				renderer.toneMappingExposure = params.exposure;
 
 				renderer.render( scene, camera );
 

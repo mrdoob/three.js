@@ -39,7 +39,7 @@
 
 			var camera, scene, renderer, stats;
 
-			var mesh, geometry, sphere;
+			var sphere;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -107,7 +107,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;

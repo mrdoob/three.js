@@ -4,6 +4,8 @@
 
 Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 
+	var strings = editor.strings;
+
 	var signals = editor.signals;
 
 	var container = new UI.Row();
@@ -16,7 +18,7 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 	var radiusRow = new UI.Row();
 	var radius = new UI.Number( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
+	radiusRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/torus_geometry/radius' ) ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -26,7 +28,7 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 	var tubeRow = new UI.Row();
 	var tube = new UI.Number( parameters.tube ).onChange( update );
 
-	tubeRow.add( new UI.Text( 'Tube' ).setWidth( '90px' ) );
+	tubeRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/torus_geometry/tube' ) ).setWidth( '90px' ) );
 	tubeRow.add( tube );
 
 	container.add( tubeRow );
@@ -36,7 +38,7 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 	var radialSegmentsRow = new UI.Row();
 	var radialSegments = new UI.Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
-	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
+	radialSegmentsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/torus_geometry/radialsegments' ) ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
 
 	container.add( radialSegmentsRow );
@@ -46,7 +48,7 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 	var tubularSegmentsRow = new UI.Row();
 	var tubularSegments = new UI.Integer( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
-	tubularSegmentsRow.add( new UI.Text( 'Tubular segments' ).setWidth( '90px' ) );
+	tubularSegmentsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/torus_geometry/tubularsegments' ) ).setWidth( '90px' ) );
 	tubularSegmentsRow.add( tubularSegments );
 
 	container.add( tubularSegmentsRow );
@@ -56,7 +58,7 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 	var arcRow = new UI.Row();
 	var arc = new UI.Number( parameters.arc * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
-	arcRow.add( new UI.Text( 'Arc' ).setWidth( '90px' ) );
+	arcRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/torus_geometry/arc' ) ).setWidth( '90px' ) );
 	arcRow.add( arc );
 
 	container.add( arcRow );

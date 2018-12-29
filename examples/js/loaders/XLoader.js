@@ -216,7 +216,6 @@
 			this.manager = manager !== undefined ? manager : new THREE.DefaultLoadingManager();
 			this.texloader = new THREE.TextureLoader( this.manager );
 			this.url = "";
-			this.baseDir = "";
 			this._putMatLength = 0;
 			this._nowMat = null;
 			this._nowFrameName = "";
@@ -238,6 +237,9 @@
 		}
 
 		createClass( XLoader, [ {
+			key: 'crossOrigin',
+			value: 'anonymous'
+		}, {
 			key: '_setArgOption',
 			value: function _setArgOption( _arg ) {
 
@@ -277,12 +279,37 @@
 
 				this._setArgOption( _arg );
 				var loader = new THREE.FileLoader( this.manager );
+				loader.setPath( this.path );
 				loader.setResponseType( 'arraybuffer' );
 				loader.load( this.url, function ( response ) {
 
 					_this._parse( response, onLoad );
 
 				}, onProgress, onError );
+
+			}
+		}, {
+			key: 'setCrossOrigin',
+			value: function setCrossOrigin( value ) {
+
+				this.crossOrigin = value;
+				return this;
+
+			}
+		}, {
+			key: 'setPath',
+			value: function setPath( value ) {
+
+				this.path = value;
+				return this;
+
+			}
+		}, {
+			key: 'setResourcePath',
+			value: function setResourcePath( value ) {
+
+				this.resourcePath = value;
+				return this;
 
 			}
 		}, {
@@ -470,11 +497,24 @@
 			key: '_parseASCII',
 			value: function _parseASCII() {
 
-				if ( this.url.lastIndexOf( "/" ) > 0 ) {
+				var path;
 
-					this.baseDir = this.url.substr( 0, this.url.lastIndexOf( "/" ) + 1 );
+				if ( this.resourcePath !== undefined ) {
+
+					path = this.resourcePath;
+
+				} else if ( this.path !== undefined ) {
+
+					path = this.path;
+
+				} else {
+
+					path = THREE.LoaderUtils.extractUrlBase( this.url );
 
 				}
+
+				this.texloader.setPath( path ).setCrossOrigin( this.crossOrigin );
+
 				var endRead = 16;
 				this.Hierarchies.children = [];
 				this._hierarchieParse( this.Hierarchies, endRead );
@@ -1180,21 +1220,21 @@
 						switch ( localObject.type ) {
 
 							case "TextureFilename":
-								_nowMat.map = this.texloader.load( this.baseDir + fileName );
+								_nowMat.map = this.texloader.load( fileName );
 								break;
 							case "BumpMapFilename":
-								_nowMat.bumpMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.bumpMap = this.texloader.load( fileName );
 								_nowMat.bumpScale = 0.05;
 								break;
 							case "NormalMapFilename":
-								_nowMat.normalMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.normalMap = this.texloader.load( fileName );
 								_nowMat.normalScale = new THREE.Vector2( 2, 2 );
 								break;
 							case "EmissiveMapFilename":
-								_nowMat.emissiveMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.emissiveMap = this.texloader.load( fileName );
 								break;
 							case "LightMapFilename":
-								_nowMat.lightMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.lightMap = this.texloader.load( fileName );
 								break;
 
 						}

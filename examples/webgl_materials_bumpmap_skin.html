@@ -27,7 +27,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -53,12 +53,16 @@
 
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var statsEnabled = true;
 
@@ -66,7 +70,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, mesh2;
+			var mesh;
 
 			var directionalLight;
 
@@ -75,15 +79,12 @@
 
 			var targetX = 0, targetY = 0;
 
-
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var mapColor, mapHeight, mapSpecular;
-
 			var firstPass = true;
 
-			var composer, composerBeckmann;
+			var composerBeckmann;
 
 			init();
 			animate();
@@ -116,12 +117,12 @@
 				directionalLight.shadow.camera.near = 200;
 				directionalLight.shadow.camera.far = 1500;
 
-				directionalLight.shadow.camera.left = -500;
+				directionalLight.shadow.camera.left = - 500;
 				directionalLight.shadow.camera.right = 500;
 				directionalLight.shadow.camera.top = 500;
-				directionalLight.shadow.camera.bottom = -500;
+				directionalLight.shadow.camera.bottom = - 500;
 
-				directionalLight.shadow.bias = -0.005;
+				directionalLight.shadow.bias = - 0.005;
 
 				scene.add( directionalLight );
 
@@ -130,7 +131,7 @@
 				loader = new THREE.GLTFLoader();
 				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
-					createScene( gltf.scene.children[ 0 ].geometry, 100 )
+					createScene( gltf.scene.children[ 0 ].geometry, 100 );
 
 				} );
 
@@ -248,7 +249,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

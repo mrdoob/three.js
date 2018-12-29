@@ -49,12 +49,16 @@
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
@@ -79,7 +83,7 @@
 
 			} );
 
-			loader.onComplete = function ( e ) {
+			loader.onComplete = function () {
 
 				// Get the first camera from 3ds Max
 				// use loader.get... to get others objects
@@ -207,13 +211,13 @@
 
 			}
 
-			function onMouseClick( e ) {
+			function onMouseClick() {
 
 				// 0 at 3 demos
 
 				switch ( demoAt = ++ demoAt % 4 ) {
 
-						// play all animation to sequence "crash#1"
+					// play all animation to sequence "crash#1"
 
 					case 0:
 

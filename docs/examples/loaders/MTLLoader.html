@@ -49,16 +49,16 @@
 			[page:String path] — required<br />
 		</p>
 		<p>
-			 Set base path for resolving references. If set this path will be prepended to each loaded and found reference.
+			 Set base path for MTL file.
 		</p>
 
 
-		<h3>[method:MTLLoader setTexturePath]( [param:String path] )</h3>
+		<h3>[method:MTLLoader setResourcePath]( [param:String path] )</h3>
 		<p>
 			[page:String path] — required<br />
 		</p>
 		<p>
-			Set base path for resolving texture references. If set this path will be prepended found texture reference. If not set and setPath is, it will be used as texture base path.
+			Set base path for additional resources like textures. If set, this path will be used as the base path.
 		</p>
 
 
@@ -88,9 +88,10 @@
 		</p>
 
 
-		<h3>[method:MTLLoaderMaterialCreator parse]( [param:String text] )</h3>
+		<h3>[method:MTLLoaderMaterialCreator parse]( [param:String text, param:String path] )</h3>
 		<p>
 			[page:String text] — The textual <em>mtl</em> structure to parse.
+			[page:String path] — The path to the MTL file.
 		</p>
 		<p>
 			Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br />

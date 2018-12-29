@@ -36,7 +36,7 @@
 <script src="../build/three.js"></script>
 <script src="js/loaders/KTXLoader.js"></script>
 
-<script src="js/Detector.js"></script>
+<script src="js/WebGL.js"></script>
 
 <script>
 
@@ -55,7 +55,11 @@
 	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
 	*/
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	if ( WEBGL.isWebGLAvailable() === false ) {
+
+		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+	}
 
 	var camera, scene, renderer;
 	var meshes = [];

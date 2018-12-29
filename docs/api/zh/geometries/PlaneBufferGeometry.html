@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">This is the [page:BufferGeometry] port of [page:PlaneGeometry].</p>
+		<p class="desc">这是[page:PlaneGeometry]中的[page:BufferGeometry]接口。</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#PlaneBufferGeometry"></iframe>
 
@@ -32,7 +32,7 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>var geometry = new THREE.PlaneBufferGeometry( 5, 20, 32 );
 		var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
@@ -40,21 +40,21 @@
 		scene.add( plane );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]([param:Float width], [param:Float height], [param:Integer widthSegments], [param:Integer heightSegments])</h3>
 		<p>
-		width — Width along the X axis. Default is 1.<br />
-		height — Height along the Y axis. Default is 1.<br />
-		widthSegments — Optional. Default is 1. <br />
-		heightSegments — Optional. Default is 1.
+			width — 平面沿着X轴的宽度。默认值是1。<br />
+			height — 平面沿着Y轴的高度。默认值是1。<br />
+			widthSegments — （可选）平面的宽度分段数，默认值是1。<br />
+			heightSegments — （可选）平面的高度分段数，默认值是1。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>.parameters</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
 		</p>
 
 		<h2>Source</h2>
