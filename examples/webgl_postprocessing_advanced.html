@@ -64,12 +64,16 @@
 
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -83,7 +87,7 @@
 			var halfWidth = width / 2;
 			var halfHeight = height / 2;
 
-			var materialColor, material2D, quadBG, quadMask, renderScene;
+			var quadBG, quadMask, renderScene;
 
 			var delta = 0.01;
 
@@ -96,7 +100,7 @@
 
 				//
 
-				cameraOrtho = new THREE.OrthographicCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
+				cameraOrtho = new THREE.OrthographicCamera( - halfWidth, halfWidth, halfHeight, - halfHeight, - 10000, 10000 );
 				cameraOrtho.position.z = 100;
 
 				cameraPerspective = new THREE.PerspectiveCamera( 50, width / height, 1, 10000 );
@@ -110,11 +114,11 @@
 				//
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, -0.1, 1 ).normalize();
+				directionalLight.position.set( 0, - 0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
 				var loader = new THREE.GLTFLoader();
-				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function( gltf ) {
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createMesh( gltf.scene.children[ 0 ].geometry, sceneModel, 100 );
 
@@ -123,12 +127,12 @@
 				//
 
 				var materialColor = new THREE.MeshBasicMaterial( {
-					map:  new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
+					map: new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
 					depthTest: false
 				} );
 
 				quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), materialColor );
-				quadBG.position.z = -500;
+				quadBG.position.z = - 500;
 				quadBG.scale.set( width, height, 1 );
 				sceneBG.add( quadBG );
 
@@ -136,8 +140,8 @@
 
 				var sceneMask = new THREE.Scene();
 
-				quadMask = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
-				quadMask.position.z = -300;
+				quadMask = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				quadMask.position.z = - 300;
 				quadMask.scale.set( width / 2, height / 2, 1 );
 				sceneMask.add( quadMask );
 
@@ -160,19 +164,19 @@
 				//
 
 				stats = new Stats();
-				//container.appendChild( stats.dom );
+				container.appendChild( stats.dom );
 
 				//
 
 				var shaderBleach = THREE.BleachBypassShader;
 				var shaderSepia = THREE.SepiaShader;
 				var shaderVignette = THREE.VignetteShader;
-				var shaderCopy = THREE.CopyShader;
+				// var shaderCopy = THREE.CopyShader;
 
 				var effectBleach = new THREE.ShaderPass( shaderBleach );
 				var effectSepia = new THREE.ShaderPass( shaderSepia );
 				var effectVignette = new THREE.ShaderPass( shaderVignette );
-				var effectCopy = new THREE.ShaderPass( shaderCopy );
+				// var effectCopy = new THREE.ShaderPass( shaderCopy );
 
 				effectBleach.uniforms[ "opacity" ].value = 0.95;
 
@@ -218,7 +222,7 @@
 					stencilBuffer: true
 				};
 
-				var rtWidth  = width / 2;
+				var rtWidth = width / 2;
 				var rtHeight = height / 2;
 
 				//
@@ -288,17 +292,13 @@
 				//composer4.addPass( clearMask );
 				composer4.addPass( effectVignette );
 
-				//
-
-				//onWindowResize();
-
 				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				halfWidth = window.innerWidth / 2;
 				halfHeight = window.innerHeight / 2;
@@ -306,10 +306,10 @@
 				cameraPerspective.aspect = window.innerWidth / window.innerHeight;
 				cameraPerspective.updateProjectionMatrix();
 
-				cameraOrtho.left = -halfWidth;
+				cameraOrtho.left = - halfWidth;
 				cameraOrtho.right = halfWidth;
 				cameraOrtho.top = halfHeight;
-				cameraOrtho.bottom = -halfHeight;
+				cameraOrtho.bottom = - halfHeight;
 
 				cameraOrtho.updateProjectionMatrix();
 
@@ -329,12 +329,6 @@
 
 			}
 
-			function getText( id ) {
-
-				return document.getElementById( id ).textContent;
-
-			}
-
 			function createMesh( geometry, scene, scale ) {
 
 				var mat2 = new THREE.MeshPhongMaterial( {
@@ -343,13 +337,13 @@
 					specular: 0x080808,
 					shininess: 20,
 					map: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
-					normalMap: new THREE.TextureLoader().load("models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					normalMap: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
 				} );
 
 				mesh = new THREE.Mesh( geometry, mat2 );
-				mesh.position.set( 0, -50, 0 );
+				mesh.position.set( 0, - 50, 0 );
 				mesh.scale.set( scale, scale, scale );
 
 				scene.add( mesh );
@@ -372,7 +366,7 @@
 
 				var time = Date.now() * 0.0004;
 
-				if ( mesh ) mesh.rotation.y = -time;
+				if ( mesh ) mesh.rotation.y = - time;
 
 				renderer.setViewport( 0, 0, halfWidth, halfHeight );
 				composerScene.render( delta );

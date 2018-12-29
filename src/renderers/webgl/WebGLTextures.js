@@ -489,7 +489,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var textureType;
 
-		if ( texture.isTexture3D ) {
+		if ( texture.isDataTexture3D ) {
 
 			textureType = _gl.TEXTURE_3D;
 
@@ -648,7 +648,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			textureProperties.__maxMipLevel = mipmaps.length - 1;
 
-		} else if ( texture.isTexture3D ) {
+		} else if ( texture.isDataTexture3D ) {
 
 			state.texImage3D( _gl.TEXTURE_3D, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
 			textureProperties.__maxMipLevel = 0;

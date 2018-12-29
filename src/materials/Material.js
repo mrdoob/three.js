@@ -59,8 +59,6 @@ function Material() {
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
-	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
-
 	this.visible = true;
 
 	this.userData = {};
@@ -117,11 +115,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
 
 				currentValue.copy( newValue );
-
-			} else if ( key === 'overdraw' ) {
-
-				// ensure overdraw is backwards-compatible with legacy boolean type
-				this[ key ] = Number( newValue );
 
 			} else {
 
@@ -348,8 +341,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.alphaTest = source.alphaTest;
 		this.premultipliedAlpha = source.premultipliedAlpha;
-
-		this.overdraw = source.overdraw;
 
 		this.visible = source.visible;
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );

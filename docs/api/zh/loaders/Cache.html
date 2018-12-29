@@ -11,10 +11,10 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A simple caching system, used internally by [page:FileLoader].
+            一个简单的缓存系统，内部使用[page:FileLoader]。
 		</p>
 
-		<h2>Examples</h2>
+		<h2>例子</h2>
 
 		<p>
 			[example:webgl_geometry_text WebGL / geometry / text ]<br />
@@ -24,51 +24,51 @@
 
 		<h2>Usage</h2>
 
-		<p>To enable caching across all loaders	that use [page:FileLoader], set</p>
+		<p>
+            要在所有使用[page:FileLoader]的加载器上启用缓存， 需设置</p>
 		<code>
 THREE.Cache.enabled = true.
 		</code>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Boolean enabled]</h3>
-		<p>Whether caching is enabled. Default is *false*.</p>
+		<p>是否启用缓存，默认为*false*.</p>
 
 		<h3>[property:Object files]</h3>
-		<p>An [page:Object object] that holds cached files.</p>
+		<p>一个[page:Object object]所持有的缓存文件。</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null add]( [param:String key], file )</h3>
 		<p>
-		[page:String key] — the [page:String key] to reference the cached file by.<br />
-		[page:Object file] — The file to be cached.<br /><br />
+		[page:String key] — 通过引用缓存文件的[page:String key]。<br />
+		[page:Object file] — 所被缓存的文件<br /><br />
 
-		Adds a cache entry with a key to reference the file. If this key already holds a file,
-		it is overwritten.
+           使用key为引用文件增加一个缓存入口。如果该key已持有一个文件，则会被覆盖。
 		</p>
 
 		<h3>[method:null get]( [param:String key] )</h3>
 		<p>
-		[page:String key] — A string key <br /><br />
+		[page:String key] — 一个字符串key <br /><br />
 
-		Get the value of [page:String key]. If the key does not exist *undefined* is returned.
+		获得该[page:String key]的值。 如果该key不存在，则以*undefined*被返回。
 		</p>
 
 		<h3>[method:null remove]( [param:String key] )</h3>
 		<p>
-		[page:String key] — A string key that references a cached file.<br /><br />
+		[page:String key] — 引用缓存文件的一个字符串key<br /><br />
 
-		Remove the cached file associated with the key.
+		使用key来删除相应的缓存文件。
 		</p>
 
 		<h3>[method:null clear]()</h3>
-		<p>Remove all values from the cache.</p>
+		<p>清除所有缓存中的值。</p>
 
 
-		<h2>Source</h2>
+		<h2>源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

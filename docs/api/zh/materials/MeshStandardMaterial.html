@@ -10,35 +10,24 @@
 	<body>
 		[page:Material] &rarr;
 
-		<h1>[name]</h1>
+		<h1>标准网格材质([name])</h1>
 
-		<p class="desc">
-			A standard physically based material, using Metallic-Roughness workflow.<br /><br />
+		<p class="desc"> 一种基于物理的标准材质，使用Metallic-Roughness工作流程。<br /><br />
+			基于物理的渲染（PBR）最近已成为许多3D应用程序的标准，例如[link:https://blogs.unity3d.com/2014/10/29/physically-based-shading-in-unity-5-a-primer/ Unity]，
+			[link:https://docs.unrealengine.com/latest/INT/Engine/Rendering/Materials/PhysicallyBased/ Unreal]和
+			[link:http://area.autodesk.com/blogs/the-3ds-max-blog/what039s-new-for-rendering-in-3ds-max-2017 3D Studio Max]。<br /><br />
+			这种方法与旧方法的不同之处在于，不使用近似值来表示光与表面的相互作用，而是使用物理上正确的模型。
+			我们的想法是，不是在特定照明下调整材质以使其看起来很好，而是可以创建一种材质，能够“正确”地应对所有光照场景。<br /><br />
 
-			Physically based rendering (PBR) has recently become the standard in many 3D applications, such as
-			[link:https://blogs.unity3d.com/2014/10/29/physically-based-shading-in-unity-5-a-primer/ Unity],
-			[link:https://docs.unrealengine.com/latest/INT/Engine/Rendering/Materials/PhysicallyBased/ Unreal] and
-			[link:http://area.autodesk.com/blogs/the-3ds-max-blog/what039s-new-for-rendering-in-3ds-max-2017 3D Studio Max].<br /><br />
+			在实践中，该材质提供了比[page:MeshLambertMaterial] 或[page:MeshPhongMaterial] 更精确和逼真的结果，代价是计算成本更高。<br /><br />
 
-			This approach differs from older approaches in that instead of using approximations for the way in which
-			light	interacts with a surface, a physically correct model is used. The idea is that, instead of
-			tweaking materials to look good under specific lighting, a material can	be created that
-			will react 'correctly' under all lighting scenarios.<br /><br />
 
-			In practice this gives a more	accurate and realistic looking result than the [page:MeshLambertMaterial]
-			or [page:MeshPhongMaterial], at the cost of being somewhat more computationally expensive.<br /><br />
+			计算着色的方式与[page:MeshPhongMaterial]相同，都使用[link:https://en.wikipedia.org/wiki/Phong_shading Phong]着色模型，
+			这会计算每个像素的阴影（即在[link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragment shader]，
+			AKA pixel shader中）， 与[page:MeshLambertMaterial]使用的Gouraud模型相比，该模型的结果更准确，但代价是牺牲一些性能。<br /><br />
 
-			Shading is calculated in the same way as for the [page:MeshPhongMaterial], using a
-			[link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.	This calculates shading
-			per pixel (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragment shader],
-			AKA pixel shader) which gives more accurate results than the Gouraud model used by
-			[page:MeshLambertMaterial], at the cost of some performance.<br /><br />
-
-			Note that for best results you should always specify an [page:.envMap environment map] when using
-			this material.<br /><br />
-
-			For a non-technical introduction to the concept of PBR and how to set up a PBR material,
-			check out these articles by the people at [link:https://www.marmoset.co marmoset]:
+			请注意，为获得最佳效果，您在使用此材质时应始终指定[page:.envMap environment map]。<br /><br />
+			有关PBR概念的非技术性介绍以及如何设置PBR材质，请查看[link:https://www.marmoset.co marmoset]成员的这些文章：
 			<ul>
 				<li>
 					[link:https://www.marmoset.co/posts/basic-theory-of-physically-based-rendering/ Basic Theory of Physically Based Rendering]
@@ -48,10 +37,9 @@
 				</li>
 			</ul>
 		</p>
-		<p>
-			Technical details of the approach used in three.js (and most other PBR systems) can be found is this
-			[link:https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf paper from Disney] (pdf),
-			by Brent Burley.
+		<p>在 three.js（以及其他大多数PBR系统）中使用方法的技术细节，
+			可以在Brent Burley撰写的[link:https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf paper from Disney] (pdf)
+			中查看。
 		</p>
 
 		<iframe id="scene" src="scenes/material-browser.html#MeshStandardMaterial"></iframe>
@@ -72,224 +60,175 @@
 
 		</script>
 
-		<h2>Constructor</h2>
+		<h2>构造函数(Constructor)</h2>
 
 		<h3>[name]( [param:Object parameters] )</h3>
-		<p>
-			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
-			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
-
-			The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-			string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。<br /><br />
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:Material] class for common properties.</p>
+		<h2>属性(Properties)</h2>
+		<p>常用属性请参见基类[page:Material]。</p>
 
 		<h3>[property:Texture alphaMap]</h3>
-		<p>The alpha map is a grayscale texture that controls the opacity across the surface
-			(black: fully transparent; white: fully opaque). Default is null.<br /><br />
-
-			Only the color of the texture is used, ignoring the alpha channel if one exists.
-			For RGB and RGBA textures, the [page:WebGLRenderer WebGL] renderer will use the
-			green channel when sampling this texture due to the extra bit of precision provided
-			for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
-			luminance/alpha textures will also still work as expected.
+		<p>alpha贴图是一种灰度纹理，用于控制整个表面的不透明度（黑色：完全透明;白色：完全不透明）。默认值为null。<br /><br />
+			仅使用纹理的颜色，忽略alpha通道（如果存在）。对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
+			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。Luminance-only以及luminance/alpha纹理也仍然有效。
 		</p>
 
 		<h3>[property:Texture aoMap]</h3>
-		<p>The red channel of this texture is used as the ambient occlusion map. Default is null.
-		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
-		and [page:Texture offset] Texture properties.</p>
+		<p>该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]属性。</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
-		<p>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</p>
+		<p>环境遮挡效果的强度。默认值为1。零是不遮挡效果。</p>
 
 		<h3>[property:Texture bumpMap]</h3>
-		<p>
-			The texture to create a bump map. The black and white values map to the perceived depth in relation to the lights.
-			Bump doesn't actually affect the geometry of the object, only the lighting. If a normal map is defined this will
-			be ignored.
+		<p> 用于创建凹凸贴图的纹理。黑色和白色值映射到与光照相关的感知深度。凹凸实际上不会影响对象的几何形状，只影响光照。如果定义了法线贴图，则将忽略该贴图。
 		</p>
 
 		<h3>[property:Float bumpScale]</h3>
-		<p>How much the bump map affects the material. Typical ranges are 0-1. Default is 1.</p>
+		<p>凹凸贴图会对材质产生多大影响。典型范围是0-1。默认值为1。</p>
 
 
 		<h3>[property:Color color]</h3>
-		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
+		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
 
 		<h3>[property:Object defines]</h3>
-		<p>An object of the form:
+		<p>如下形式的对象:
 			<code>
 				{ 'STANDARD': '' };
 			</code>
-
-			This is used by the [page:WebGLRenderer] for selecting shaders.
+			[page:WebGLRenderer]使用它来选择shaders。
 		</p>
 
 		<h3>[property:Texture displacementMap]</h3>
-		<p>
-			The displacement map affects the position of the mesh's vertices. Unlike other maps
-			which only affect the light and shade of the material the displaced vertices can cast shadows,
-			block other objects, and otherwise act as real geometry. The displacement texture is
-			an image where the value of each pixel (white being the highest) is mapped against,
-			and repositions, the vertices of the mesh.
+		<p> 位移贴图会影响网格顶点的位置，与仅影响材质的光照和阴影的其他贴图不同，移位的顶点可以投射阴影，阻挡其他对象，
+			以及充当真实的几何体。位移纹理是指：网格的所有顶点被映射为图像中每个像素的值（白色是最高的），并且被重定位。
 		</p>
 
 		<h3>[property:Float displacementScale]</h3>
 		<p>
-			How much the displacement map affects the mesh (where black is no displacement,
-			and white is maximum displacement). Without a displacement map set, this value is not applied.
-			 Default is 1.
+			位移贴图对网格的影响程度（黑色是无位移，白色是最大位移）。如果没有设置位移贴图，则不会应用此值。默认值为1。
 		</p>
 
 		<h3>[property:Float displacementBias]</h3>
 		<p>
-			The offset of the displacement map's values on the mesh's vertices.
-			Without a displacement map set, this value is not applied. Default is 0.
+			位移贴图在网格顶点上的偏移量。如果没有设置位移贴图，则不会应用此值。默认值为0。
 		</p>
 
 		<h3>[property:Color emissive]</h3>
-		<p>
-		Emissive (light) color of the material, essentially a solid color unaffected by other lighting.
-		Default is black.
+		<p>材质的放射（光）颜色，基本上是不受其他光照影响的固有颜色。默认为黑色。
 		</p>
 
 		<h3>[property:Texture emissiveMap]</h3>
-		<p>
-		Set emisssive (glow) map. Default is null. The emissive map color is modulated by
-		the emissive color and the emissive intensity. If you have an emissive map, be sure to
-		set the emissive color to something other than black.
+		<p>设置放射（发光）贴图。默认值为null。放射贴图颜色由放射颜色和强度所调节。
+			如果你有一个放射贴图，请务必将放射颜色设置为黑色以外的其他颜色。
 		</p>
 
 		<h3>[property:Float emissiveIntensity]</h3>
-		<p>Intensity of the emissive light. Modulates the emissive color. Default is 1.</p>
+		<p>放射光强度。调节发光颜色。默认为1。</p>
 
 		<h3>[property:TextureCube envMap]</h3>
-		<p>The environment map. Default is null.  Note that in order for the material roughness
-		property to correctly blur out the environment map, the shader must have access to mipmaps
-		of the env texture.  TextureCubes created with default settings are correctly configured;
-		if adjusting texture parameters manually, ensure minFilter is set to one of the MipMap options,
-		and that mip maps have not been otherwise forcibly disabled.</p>
+		<p> 环境贴图。默认值为null。
+			请注意，为了使材质粗糙度属性能够正确地模糊环境贴图，shader必须能够访问环境纹理的mipmaps。
+			使用默认设置创建的TextureCubes已正确配置; 如果手动调整纹理参数，
+			请确保将minFilter设置为其中一个MipMap选项，并且未强制禁用mip贴图。</p>
 		<p>
-		Note: only [link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps] are supported 
-		for MeshStandardMaterial. If you want to use an equirectangular map you will need to use the 
-		[link:https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/EquirectangularToCubeGenerator.js EquirectangularToCubeGenerator]. 
-		See this [link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example] for details.
+			注意：MeshStandardMaterial 仅支持[link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps]。
+			如果要使用equirectangular贴图，则需要使用 [link:https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/EquirectangularToCubeGenerator.js EquirectangularToCubeGenerator]。
+			详细信息请参阅此示例[link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example]。
 		</p>
 
 		<h3>[property:Float envMapIntensity]</h3>
-		<p>Scales the effect of the environment map by multiplying its color.</p>
+		<p> 通过乘以环境贴图的颜色来缩放环境贴图的效果。</p>
 
 		<h3>[property:Boolean isMeshStandardMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are mesh standard materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
+		<p> 用于检查此类或派生类是否为标准网格材质。默认值为 *true*。<br /><br />
+			因为其通常用在内部优化，所以不应该更改该属性值。
 		</p>
 
 
 		<h3>[property:Texture lightMap]</h3>
-		<p>The light map. Default is null. The lightMap requires a second set of UVs,
-		and consequently will ignore the [page:Texture repeat] and [page:Texture offset]
-		Texture properties.</p>
+		<p>光照贴图。默认值为null。lightMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]纹理属性。</p>
 
 		<h3>[property:Float lightMapIntensity]</h3>
-		<p>Intensity of the baked light. Default is 1.</p>
+		<p>烘焙光的强度。默认值为1。</p>
 
 		<h3>[property:Texture map]</h3>
-		<p>The color map. Default is null. The texture map color is modulated by the diffuse [page:.color].</p>
+		<p>颜色贴图。默认为null。纹理贴图颜色由漫反射颜色[page:.color]调节。</p>
 
 		<h3>[property:Float metalness]</h3>
-		<p>
-			How much the material is like a metal. Non-metallic materials such as wood or stone use 0.0, metallic use 1.0, with nothing
-			(usually) in between. Default is 0.5. A value between 0.0 and 1.0 could be used for a rusty metal look. If metalnessMap is
-			also provided, both values are multiplied.
+		<p> 材质与金属的相似度。非金属材质，如木材或石材，使用0.0，金属使用1.0，通常没有中间值。
+			默认值为0.5。0.0到1.0之间的值可用于生锈金属的外观。如果还提供了metalnessMap，则两个值相乘。
 		</p>
 
 		<h3>[property:Texture metalnessMap]</h3>
-		<p>The blue channel of this texture is used to alter the metalness of the material.</p>
+		<p> 该纹理的蓝色通道用于改变材质的金属度。</p>
 
 		<h3>[property:boolean morphNormals]</h3>
-		<p>
-			Defines whether the material uses morphNormals. Set as true to pass morphNormal
-			attributes from the [page:Geometry]	to the shader. Default is *false*.
+		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从[page:Geometry]传递到shader。默认值为*false*。
 		</p>
 
 		<h3>[property:Boolean morphTargets]</h3>
-		<p>Define whether the material uses morphTargets. Default is false.</p>
+		<p>定义材质是否使用morphTargets。默认值为false。</p>
 
 		<h3>[property:Texture normalMap]</h3>
-		<p>
-			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
-			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
+		<p>用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>
-		<p>
-			The type of normal map.<br /><br />
-
-			Options are [page:constant THREE.TangentSpaceNormalMap] (default), and [page:constant THREE.ObjectSpaceNormalMap].
+		<p>法线贴图的类型。<br /><br />
+			选项为[page:constant THREE.TangentSpaceNormalMap]（默认）和[page:constant THREE.ObjectSpaceNormalMap]。
 		</p>
 
 		<h3>[property:Vector2 normalScale]</h3>
-		<p>
-			How much the normal map affects the material. Typical ranges are 0-1.
-			Default is a [page:Vector2] set to (1,1).
+		<p> 法线贴图对材质的影响程度。典型范围是0-1。默认值是[page:Vector2]设置为（1,1）。
 		</p>
 
 		<h3>[property:Float refractionRatio]</h3>
-		<p>
-			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
-			It is used with environment mapping modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
-			The refraction ratio should not exceed 1. Default is *0.98*.
+		<p> 空气的折射率（IOR）（约为1）除以材质的折射率。它与环境映射模式[page:Textures THREE.CubeRefractionMapping]
+			和[page:Textures THREE.EquirectangularRefractionMapping]一起使用。
+			折射率不应超过1。默认值为*0.98*。
 		</p>
 
 		<h3>[property:Float roughness]</h3>
-		<p>
-			How rough the material appears. 0.0 means a smooth mirror reflection, 1.0 means fully diffuse. Default is 0.5.
-			If roughnessMap is also provided, both values are multiplied.
+		<p> 材质的粗糙程度。0.0表示平滑的镜面反射，1.0表示完全漫反射。默认值为0.5。如果还提供roughnessMap，则两个值相乘。
 		</p>
 
 		<h3>[property:Texture roughnessMap]</h3>
-		<p>The green channel of this texture is used to alter the roughness of the material.</p>
+		<p>该纹理的绿色通道用于改变材质的粗糙度。</p>
 
 		<h3>[property:Boolean skinning]</h3>
-		<p>Define whether the material uses skinning. Default is false.</p>
+		<p>材质是否使用蒙皮。默认值为false。</p>
 
 		<h3>[property:Boolean wireframe]</h3>
-		<p>Render geometry as wireframe. Default is *false* (i.e. render as flat polygons).</p>
+		<p>将几何体渲染为线框。默认值为*false*（即渲染为平面多边形）。</p>
 
 		<h3>[property:String wireframeLinecap]</h3>
-		<p>
-			Define appearance of line ends. Possible values are "butt", "round" and "square". Default is 'round'.<br /><br />
-
-			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
-			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
+		<p> 定义线两端的外观。可选值为 'butt'，'round' 和 'square'。默认为'round'。<br /><br />
+			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
+			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
 		</p>
 
 		<h3>[property:String wireframeLinejoin]</h3>
 		<p>
-			Define appearance of line joints. Possible values are "round", "bevel" and "miter". Default is 'round'.<br /><br />
+			定义线连接节点的样式。可选值为 'round', 'bevel' 和 'miter'。默认值为 'round'。<br /><br />
 
-			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
-			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
+			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
+			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
 		</p>
 
 		<h3>[property:Float wireframeLinewidth]</h3>
-		<p>Controls wireframe thickness. Default is 1.<br /><br />
-
-		Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
-		with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will
-		always be 1 regardless of the set value.
+		<p>控制线框宽度。默认值为1。<br /><br />
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
 		</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:Material] class for common methods.</p>
+		<h2>方法(Methods)</h2>
+		<p>常用方法请参见基类[page:Material]。</p>
 
 
-		<h2>Source</h2>
+		<h2>源码(Source)</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

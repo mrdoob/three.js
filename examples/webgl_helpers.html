@@ -67,7 +67,7 @@
 					scene.add( group );
 
 					// To make sure that the matrixWorld is up to date for the boxhelpers
-					group.updateMatrixWorld(true);
+					group.updateMatrixWorld( true );
 
 					group.add( mesh );
 
@@ -90,7 +90,7 @@
 					line.material.depthTest = false;
 					line.material.opacity = 0.25;
 					line.material.transparent = true;
-					line.position.x = -4;
+					line.position.x = - 4;
 					group.add( line );
 					scene.add( new THREE.BoxHelper( line ) );
 

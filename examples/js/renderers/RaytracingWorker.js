@@ -168,7 +168,7 @@ THREE.RaytracingRendererWorker = function () {
 			var material = object.material;
 			var face = intersection.face;
 
-			var vertices = object.geometry.vertices;
+			var geometry = object.geometry;
 
 			//
 
@@ -250,7 +250,7 @@ THREE.RaytracingRendererWorker = function () {
 						// (should be possible to cache even more)
 
 						localPoint.copy( point ).applyMatrix4( _object.inverseMatrix );
-						computePixelNormal( normalVector, localPoint, material.flatShading, face, vertices );
+						computePixelNormal( normalVector, localPoint, material.flatShading, face, geometry );
 						normalVector.applyMatrix3( _object.normalMatrix ).normalize();
 
 						normalComputed = true;
@@ -378,14 +378,17 @@ THREE.RaytracingRendererWorker = function () {
 
 	var computePixelNormal = ( function () {
 
+		var vA = new THREE.Vector3();
+		var vB = new THREE.Vector3();
+		var vC = new THREE.Vector3();
+
 		var tmpVec1 = new THREE.Vector3();
 		var tmpVec2 = new THREE.Vector3();
 		var tmpVec3 = new THREE.Vector3();
 
-		return function computePixelNormal( outputVector, point, flatShading, face, vertices ) {
+		return function computePixelNormal( outputVector, point, flatShading, face, geometry ) {
 
 			var faceNormal = face.normal;
-			var vertexNormals = face.vertexNormals;
 
 			if ( flatShading === true ) {
 
@@ -393,11 +396,14 @@ THREE.RaytracingRendererWorker = function () {
 
 			} else {
 
-				// compute barycentric coordinates
+				var positions = geometry.attributes.position;
+				var normals = geometry.attributes.normal;
 
-				var vA = vertices[ face.a ];
-				var vB = vertices[ face.b ];
-				var vC = vertices[ face.c ];
+				vA.fromBufferAttribute( positions, face.a );
+				vB.fromBufferAttribute( positions, face.b );
+				vC.fromBufferAttribute( positions, face.c );
+
+				// compute barycentric coordinates
 
 				tmpVec3.crossVectors( tmpVec1.subVectors( vB, vA ), tmpVec2.subVectors( vC, vA ) );
 				var areaABC = faceNormal.dot( tmpVec3 );
@@ -414,13 +420,12 @@ THREE.RaytracingRendererWorker = function () {
 
 				// compute interpolated vertex normal
 
-				tmpVec1.copy( vertexNormals[ 0 ] );
+				tmpVec1.fromBufferAttribute( normals, face.a );
+				tmpVec2.fromBufferAttribute( normals, face.b );
+				tmpVec3.fromBufferAttribute( normals, face.c );
+
 				tmpVec1.multiplyScalar( a );
-
-				tmpVec2.copy( vertexNormals[ 1 ] );
 				tmpVec2.multiplyScalar( b );
-
-				tmpVec3.copy( vertexNormals[ 2 ] );
 				tmpVec3.multiplyScalar( c );
 
 				outputVector.addVectors( tmpVec1, tmpVec2 );

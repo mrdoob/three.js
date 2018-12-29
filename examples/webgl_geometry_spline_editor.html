@@ -53,12 +53,11 @@
 			};
 
 			var container, stats;
-			var camera, scene, renderer, spotlight;
-			var splineHelperObjects = [], splineOutline;
+			var camera, scene, renderer;
+			var splineHelperObjects = [];
 			var splinePointsLength = 4;
 			var positions = [];
 			var point = new THREE.Vector3();
-			var options;
 
 			var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 			var transformControl;
@@ -96,18 +95,17 @@
 				light.position.set( 0, 1500, 200 );
 				light.castShadow = true;
 				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 70, 1, 200, 2000 ) );
-				light.shadow.bias = -0.000222;
+				light.shadow.bias = - 0.000222;
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
 				scene.add( light );
-				spotlight = light;
 
 				var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
 				var planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
 
 				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
-				plane.position.y = -200;
+				plane.position.y = - 200;
 				plane.receiveShadow = true;
 				scene.add( plane );
 
@@ -133,10 +131,12 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'uniform' );
-				gui.add( params, 'tension', 0, 1 ).step( 0.01 ).onChange( function( value ) {
+				gui.add( params, 'tension', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
 					splines.uniform.tension = value;
 					updateSplineOutline();
-				});
+
+	} );
 				gui.add( params, 'centripetal' );
 				gui.add( params, 'chordal' );
 				gui.add( params, 'addPoint' );
@@ -149,13 +149,13 @@
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
-				controls.addEventListener( 'start', function() {
+				controls.addEventListener( 'start', function () {
 
 					cancelHideTransorm();
 
 				} );
 
-				controls.addEventListener( 'end', function() {
+				controls.addEventListener( 'end', function () {
 
 					delayHideTransform();
 
@@ -164,30 +164,32 @@
 				transformControl = new THREE.TransformControls( camera, renderer.domElement );
 				transformControl.addEventListener( 'change', render );
 				transformControl.addEventListener( 'dragging-changed', function ( event ) {
-					controls.enabled = !event.value
-				} );
+
+					controls.enabled = ! event.value;
+
+	} );
 				scene.add( transformControl );
 
 				// Hiding transform situation is a little in a mess :()
-				transformControl.addEventListener( 'change', function( e ) {
+				transformControl.addEventListener( 'change', function () {
 
 					cancelHideTransorm();
 
 				} );
 
-				transformControl.addEventListener( 'mouseDown', function( e ) {
+				transformControl.addEventListener( 'mouseDown', function () {
 
 					cancelHideTransorm();
 
 				} );
 
-				transformControl.addEventListener( 'mouseUp', function( e ) {
+				transformControl.addEventListener( 'mouseUp', function () {
 
 					delayHideTransform();
 
 				} );
 
-				transformControl.addEventListener( 'objectChange', function( e ) {
+				transformControl.addEventListener( 'objectChange', function () {
 
 					updateSplineOutline();
 
@@ -202,7 +204,7 @@
 
 				} );
 
-				dragcontrols.addEventListener( 'hoveroff', function ( event ) {
+				dragcontrols.addEventListener( 'hoveroff', function () {
 
 					delayHideTransform();
 
@@ -219,11 +221,11 @@
 
 				function hideTransform() {
 
-					hiding = setTimeout( function() {
+					hiding = setTimeout( function () {
 
 						transformControl.detach( transformControl.object );
 
-					}, 2500 )
+					}, 2500 );
 
 				}
 
@@ -258,9 +260,8 @@
 				curve.curveType = 'catmullrom';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0xff0000,
-					opacity: 0.35,
-					linewidth: 2
-					} ) );
+					opacity: 0.35
+				} ) );
 				curve.mesh.castShadow = true;
 				splines.uniform = curve;
 
@@ -268,9 +269,8 @@
 				curve.curveType = 'centripetal';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0x00ff00,
-					opacity: 0.35,
-					linewidth: 2
-					} ) );
+					opacity: 0.35
+				} ) );
 				curve.mesh.castShadow = true;
 				splines.centripetal = curve;
 
@@ -278,9 +278,8 @@
 				curve.curveType = 'chordal';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0x0000ff,
-					opacity: 0.35,
-					linewidth: 2
-					} ) );
+					opacity: 0.35
+				} ) );
 				curve.mesh.castShadow = true;
 				splines.chordal = curve;
 
@@ -292,9 +291,9 @@
 				}
 
 				load( [ new THREE.Vector3( 289.76843686945404, 452.51481137238443, 56.10018915737797 ),
-						new THREE.Vector3( -53.56300074753207, 171.49711742836848, -14.495472686253045 ),
-						new THREE.Vector3( -91.40118730204415, 176.4306956436485, -6.958271935582161 ),
-						new THREE.Vector3( -383.785318791128, 491.1365363371675, 47.869296953772746 ) ] );
+					new THREE.Vector3( - 53.56300074753207, 171.49711742836848, - 14.495472686253045 ),
+					new THREE.Vector3( - 91.40118730204415, 176.4306956436485, - 6.958271935582161 ),
+					new THREE.Vector3( - 383.785318791128, 491.1365363371675, 47.869296953772746 ) ] );
 
 			}
 
@@ -359,7 +358,7 @@
 
 					for ( var i = 0; i < ARC_SEGMENTS; i ++ ) {
 
-						var t = i /  ( ARC_SEGMENTS - 1 );
+						var t = i / ( ARC_SEGMENTS - 1 );
 						spline.getPoint( t, point );
 						position.setXYZ( i, point.x, point.y, point.z );
 
@@ -378,7 +377,7 @@
 				for ( var i = 0; i < splinePointsLength; i ++ ) {
 
 					var p = splineHelperObjects[ i ].position;
-					strplace.push( 'new THREE.Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) )
+					strplace.push( 'new THREE.Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) );
 
 				}
 

@@ -47,7 +47,6 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -57,11 +56,6 @@
 
 			var mesh, camera, scene, renderer, effect;
 			var helper, ikHelper, physicsHelper;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			var clock = new THREE.Clock();
 
@@ -117,10 +111,8 @@
 
 					}
 
-				};
+				}
 
-				function onError( xhr ) {
-				};
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
@@ -152,7 +144,7 @@
 
 					initGui();
 
-				}, onProgress, onError );
+				}, onProgress, null );
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -194,7 +186,9 @@
 					var gui = new dat.GUI();
 
 					gui.add( api, 'animation' ).onChange( function () {
+
 						helper.enable( 'animation', api[ 'animation' ] );
+
 					} );
 
 					gui.add( api, 'gradient mapping' ).onChange( function () {
@@ -215,23 +209,33 @@
 					} );
 
 					gui.add( api, 'ik' ).onChange( function () {
+
 						helper.enable( 'ik', api[ 'ik' ] );
+
 					} );
 
 					gui.add( api, 'outline' ).onChange( function () {
+
 						effect.enabled = api[ 'outline' ];
+
 					} );
 
 					gui.add( api, 'physics' ).onChange( function () {
+
 						helper.enable( 'physics', api[ 'physics' ] );
+
 					} );
 
 					gui.add( api, 'show IK bones' ).onChange( function () {
+
 						ikHelper.visible = api[ 'show IK bones' ];
+
 					} );
 
 					gui.add( api, 'show rigid bodies' ).onChange( function () {
+
 						if ( physicsHelper !== undefined ) physicsHelper.visible = api[ 'show rigid bodies' ];
+
 					} );
 
 				}
@@ -239,9 +243,6 @@
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

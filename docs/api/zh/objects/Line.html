@@ -10,20 +10,17 @@
 	<body>
 		[page:Object3D] &rarr;
 
-		<h1>[name]</h1>
+		<h1>线（[name]）</h1>
 
 		<p class="desc">
-			A continuous line.<br /><br />
+			一条连续的线。<br /><br />
 
-			This is nearly the same
-			as [page:LineSegments]; the only difference is that it is rendered using
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP]
-			instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]
-
+			它几乎和[page:LineSegments]是一样的，唯一的区别是它在渲染时使用的是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP]，
+			而不是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]。
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>var material = new THREE.LineBasicMaterial({
 			color: 0x0000ff
@@ -41,57 +38,59 @@
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
 
 		<p>
-		[page:Geometry geometry] — vertices representing the line segment(s). Default is a new [page:BufferGeometry].<br />
-		[page:Material material] — material for the line. Default is a new [page:LineBasicMaterial] with random color.<br />
+		[page:Geometry geometry] —— 表示线段的顶点，默认值是一个新的[page:BufferGeometry]。<br />
+		[page:Material material] —— 线的材质，默认值是一个新的具有随机颜色的[page:LineBasicMaterial]。<br />
 		</p>
 
-		<p>If no material is supplied, a randomized line material will be created and assigned to the object.</p>
+		<p>如果没有指定材质，一个随机颜色的线的材质将会被创建，并应用到该物体上。</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Object3D] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类 [page:Object3D] 来查看共有属性。</p>
 
 		<h3>[property:Boolean isLine]</h3>
 		<p>
-			Used to check whether this or derived classes are lines. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
+			用于检查这个类或者其派生类是否为线，默认值为*true*。
+			
+			<br /><br />
+			你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
 		</p>
 
 
 		<h3>[property:Geometry geometry]</h3>
-		<p>Vertices representing the line segment(s).</p>
+		<p>表示线段的顶点。</p>
 
 		<h3>[property:Material material]</h3>
-		<p>Material for the line.</p>
+		<p>线的材质。</p>
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:Object3D] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类 [page:Object3D] 来查看共有方法。</p>
 
 		<h3>[method:Line computeLineDistances]()</h3>
 		<p>
-		Computes an array of distance values which are necessary for [page:LineDashedMaterial]. For each vertex in the geometry, the method calculates the cumulative length from the current point to the very beginning of the line.
+			计算[page:LineDashedMaterial]所需的距离的值的数组。
+			对于几何体中的每一个顶点，这个方法计算出了当前点到线的起始点的累积长度。
 		</p>
 
 		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
-		Get intersections between a casted [page:Ray] and this Line.
-		[page:Raycaster.intersectObject] will call this method.
+			在一条投射出去的[page:Ray]（射线）和这条线之间产生交互。
+			[page:Raycaster.intersectObject]将会调用这个方法。
 		</p>
 
 		<h3>[method:Line clone]()</h3>
 		<p>
-		Returns a clone of this Line object and its descendants.
+			返回这条线及其子集的一个克隆对象。
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

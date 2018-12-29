@@ -104,17 +104,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
 
-				this.morphTargetInfluences = [];
-				this.morphTargetDictionary = {};
-
-				for ( m = 0, ml = morphTargets.length; m < ml; m ++ ) {
-
-					name = morphTargets[ m ].name || String( m );
-
-					this.morphTargetInfluences.push( 0 );
-					this.morphTargetDictionary[ name ] = m;
-
-				}
+				console.error( 'THREE.Mesh.updateMorphTargets() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 			}
 

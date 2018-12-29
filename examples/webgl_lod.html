@@ -40,18 +40,20 @@
 
 		<script src="js/controls/FlyControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, stats;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var container;
 
 			var camera, scene, renderer;
-
-			var geometry, objects;
 
 			var controls, clock = new THREE.Clock();
 
@@ -111,7 +113,7 @@
 					}
 
 					lod.position.x = 10000 * ( 0.5 - Math.random() );
-					lod.position.y =  7500 * ( 0.5 - Math.random() );
+					lod.position.y = 7500 * ( 0.5 - Math.random() );
 					lod.position.z = 10000 * ( 0.5 - Math.random() );
 					lod.updateMatrix();
 					lod.matrixAutoUpdate = false;

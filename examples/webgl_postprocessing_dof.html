@@ -16,9 +16,7 @@
 				text-align: center;
 			}
 
-			a {
-				color: #0078ff;
-			}
+			a { color: #0078ff; }
 
 			#info {
 				color: #fff;
@@ -44,7 +42,7 @@
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/BokehPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -57,13 +55,17 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer,
 				materials = [], objects = [],
 				singleMaterial, zmaterial = [],
-				parameters, i, j, k, h, color, x, y, z, s, n, nobjects, cubeMaterial;
+				parameters, i, j, k, h, x, y, z, nobjects, cubeMaterial;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -96,10 +98,10 @@
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
@@ -108,7 +110,7 @@
 
 				singleMaterial = false;
 
-				if( singleMaterial ) zmaterial = [ cubeMaterial ];
+				if ( singleMaterial ) zmaterial = [ cubeMaterial ];
 
 				var geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
 
@@ -122,38 +124,38 @@
 				var count = 0;
 
 				for ( i = 0; i < xgrid; i ++ )
-				for ( j = 0; j < ygrid; j ++ )
-				for ( k = 0; k < zgrid; k ++ ) {
+					for ( j = 0; j < ygrid; j ++ )
+						for ( k = 0; k < zgrid; k ++ ) {
 
-					var mesh;
+							var mesh;
 
-					if ( singleMaterial ) {
+							if ( singleMaterial ) {
 
-						mesh = new THREE.Mesh( geo, zmaterial );
+								mesh = new THREE.Mesh( geo, zmaterial );
 
-					} else {
+							} else {
 
-						mesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( parameters ) );
-						materials[ count ] = mesh.material;
+								mesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( parameters ) );
+								materials[ count ] = mesh.material;
 
-					}
+							}
 
-					x = 200 * ( i - xgrid/2 );
-					y = 200 * ( j - ygrid/2 );
-					z = 200 * ( k - zgrid/2 );
+							x = 200 * ( i - xgrid / 2 );
+							y = 200 * ( j - ygrid / 2 );
+							z = 200 * ( k - zgrid / 2 );
 
-					mesh.position.set( x, y, z );
-					mesh.scale.set( s, s, s );
+							mesh.position.set( x, y, z );
+							mesh.scale.set( s, s, s );
 
-					mesh.matrixAutoUpdate = false;
-					mesh.updateMatrix();
+							mesh.matrixAutoUpdate = false;
+							mesh.updateMatrix();
 
-					scene.add( mesh );
-					objects.push( mesh );
+							scene.add( mesh );
+							objects.push( mesh );
 
-					count ++;
+							count ++;
 
-				}
+						}
 
 				scene.matrixAutoUpdate = false;
 
@@ -170,15 +172,15 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var effectController  = {
+				var effectController = {
 
-					focus: 		500.0,
+					focus: 500.0,
 					aperture:	5,
 					maxblur:	1.0
 
 				};
 
-				var matChanger = function( ) {
+				var matChanger = function ( ) {
 
 					postprocessing.bokeh.uniforms[ "focus" ].value = effectController.focus;
 					postprocessing.bokeh.uniforms[ "aperture" ].value = effectController.aperture * 0.00001;
@@ -193,6 +195,7 @@
 				gui.close();
 
 				matChanger();
+
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -212,6 +215,7 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -244,10 +248,11 @@
 			}
 
 			function initPostprocessing() {
+
 				var renderPass = new THREE.RenderPass( scene, camera );
 
 				var bokehPass = new THREE.BokehPass( scene, camera, {
-					focus: 		1.0,
+					focus: 1.0,
 					aperture:	0.025,
 					maxblur:	1.0,
 
@@ -282,13 +287,13 @@
 				var time = Date.now() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
-				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
+				camera.position.y += ( - ( mouseY ) - camera.position.y ) * 0.036;
 
 				camera.lookAt( scene.position );
 
-				if ( !singleMaterial ) {
+				if ( ! singleMaterial ) {
 
-					for( i = 0; i < nobjects; i ++ ) {
+					for ( i = 0; i < nobjects; i ++ ) {
 
 						h = ( 360 * ( i / nobjects + time ) % 360 ) / 360;
 						materials[ i ].color.setHSL( h, 1, 0.5 );

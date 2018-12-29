@@ -53,18 +53,22 @@ function Object3D() {
 
 	Object.defineProperties( this, {
 		position: {
+			configurable: true,
 			enumerable: true,
 			value: position
 		},
 		rotation: {
+			configurable: true,
 			enumerable: true,
 			value: rotation
 		},
 		quaternion: {
+			configurable: true,
 			enumerable: true,
 			value: quaternion
 		},
 		scale: {
+			configurable: true,
 			enumerable: true,
 			value: scale
 		},
@@ -328,7 +332,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			position.setFromMatrixPosition( this.matrixWorld );
 
-			if ( this.isCamera ) {
+			if ( this.isCamera || this.isLight ) {
 
 				m1.lookAt( position, target, this.up );
 
