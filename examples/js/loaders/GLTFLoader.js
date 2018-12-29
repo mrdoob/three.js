@@ -252,7 +252,6 @@ THREE.GLTFLoader = ( function () {
 					cameras: cameras,
 					animations: animations,
 					asset: json.asset,
-					parser: parser,
 					userData: {}
 				};
 
