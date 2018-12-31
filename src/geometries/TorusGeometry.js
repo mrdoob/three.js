@@ -11,7 +11,7 @@ import { Vector3 } from '../math/Vector3.js';
 
 // TorusGeometry
 
-function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
+function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc, minorArcStart, minorArcLength ) {
 
 	Geometry.call( this );
 
@@ -22,10 +22,12 @@ function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 		tube: tube,
 		radialSegments: radialSegments,
 		tubularSegments: tubularSegments,
-		arc: arc
+		arc: arc,
+		minorArcStart: minorArcStart,
+		minorArcLength: minorArcLength
 	};
 
-	this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
+	this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc, minorArcStart, minorArcLength ) );
 	this.mergeVertices();
 
 }
@@ -35,7 +37,7 @@ TorusGeometry.prototype.constructor = TorusGeometry;
 
 // TorusBufferGeometry
 
-function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
+function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc, minorArcStart, minorArcLength ) {
 
 	BufferGeometry.call( this );
 
@@ -46,7 +48,9 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 		tube: tube,
 		radialSegments: radialSegments,
 		tubularSegments: tubularSegments,
-		arc: arc
+		arc: arc,
+		minorArcStart: minorArcStart,
+		minorArcLength: minorArcLength
 	};
 
 	radius = radius || 1;
@@ -54,6 +58,8 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 	radialSegments = Math.floor( radialSegments ) || 8;
 	tubularSegments = Math.floor( tubularSegments ) || 6;
 	arc = arc || Math.PI * 2;
+	minorArcStart = minorArcStart || 0;
+	minorArcLength = minorArcLength || Math.PI * 2;
 
 	// buffers
 
@@ -77,13 +83,13 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 		for ( i = 0; i <= tubularSegments; i ++ ) {
 
 			var u = i / tubularSegments * arc;
-			var v = j / radialSegments * Math.PI * 2;
+			var v = j / radialSegments * minorArcLength;
 
 			// vertex
 
-			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
-			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
-			vertex.z = tube * Math.sin( v );
+			vertex.x = ( radius + tube * Math.cos( minorArcStart + v ) ) * Math.cos( u );
+			vertex.y = ( radius + tube * Math.cos( minorArcStart + v ) ) * Math.sin( u );
+			vertex.z = tube * Math.sin( minorArcStart + v );
 
 			vertices.push( vertex.x, vertex.y, vertex.z );
 
