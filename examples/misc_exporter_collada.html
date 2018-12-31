@@ -32,7 +32,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
-			<button id="savecolladabutton">save collada</button>
+			<button onclick="exportCollada()">Export COLLADA</button>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -366,7 +366,7 @@
 
 			var exporter = new THREE.ColladaExporter();
 
-			function saveColladaFile() {
+			function exportCollada() {
 
 				var result = exporter.parse( teapot );
 				var material_type = "Phong";
@@ -407,11 +407,6 @@
 			var link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link );
-
-			var savecolladabutton = document.getElementById("savecolladabutton");
-			savecolladabutton.addEventListener('click', function(){
-				saveColladaFile();
-			});
 
 		</script>
 
