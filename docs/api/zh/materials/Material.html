@@ -83,17 +83,6 @@
     这可以与网格的[page:Integer renderOrder]属性结合使用，以创建遮挡其他对象的不可见对象。默认值为*true*。
 </p>
 
-<h3>[property:Material customDepthMaterial]</h3>
-<p>渲染到深度贴图时此材质要使用的自定义深度材质。
-    当使用[page:DirectionalLight]或[page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
-    （b）使用位移贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
-    您必须指定customDepthMaterial以得到合适的阴影。默认值*undefined*。
-</p>
-
-<h3>[property:Material customDistanceMaterial]</h3>
-<p>与customDepthMaterial相同，但与[page:PointLight]一起使用。默认值为*undefined*。
-</p>
-
 <h3>[property:Object defines]</h3>
 <p> 注入shader的自定义对象。 以键值对形式的对象传递，{ MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }。
     这些键值对在顶点和片元着色器中定义。默认值为*undefined*。
