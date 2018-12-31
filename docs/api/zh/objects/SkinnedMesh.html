@@ -38,41 +38,60 @@
 		<h2>示例</h2>
 
 		<code>
-		var geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
+		var geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 5, 15, 5, 30 );
 
-		//Create the skin indices and skin weights
-		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+		// create the skin indices and skin weights
 
-			// Imaginary functions to calculate the indices and weights
-			// This part will need to be changed depending your skeleton and model
-			var skinIndex = calculateSkinIndex( geometry.vertices, i );
-			var skinWeight = calculateSkinWeight( geometry.vertices, i );
+		var position = geometry.attributes.position;
 
-			// Ease between each bone
-			geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex + 1, 0, 0 ) );
-			geometry.skinWeights.push( new THREE.Vector4( 1 - skinWeight, skinWeight, 0, 0 ) );
+		var vertex = new THREE.Vector3();
+
+		var skinIndices = [];
+		var skinWeights = [];
+
+		for ( var i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+
+			// compute skinIndex and skinWeight based on some configuration data
+
+			var y = ( vertex.y + sizing.halfHeight );
+
+			var skinIndex = Math.floor( y / sizing.segmentHeight );
+			var skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+
+			skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
+			skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
 
 		}
 
-		var mesh = new THREE.SkinnedMesh( geometry, material );
+		geometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+		geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 
-		// See example from THREE.Skeleton for the armSkeleton
-		var rootBone = armSkeleton.bones[ 0 ];
+		// create skinned mesh and skeleton
+
+		var mesh = new THREE.SkinnedMesh( geometry, material );
+		var skeleton = new THREE.Skeleton( bones );
+
+		// see example from THREE.Skeleton
+
+		var rootBone = skeleton.bones[ 0 ];
 		mesh.add( rootBone );
 
-		// Bind the skeleton to the mesh
-		mesh.bind( armSkeleton );
+		// bind the skeleton to the mesh
 
-		// Move the bones and manipulate the model
-		armSkeleton.bones[ 0 ].rotation.x = -0.1;
-		armSkeleton.bones[ 1 ].rotation.x = 0.2;
+		mesh.bind( skeleton );
+
+		// move the bones and manipulate the model
+
+		skeleton.bones[ 0 ].rotation.x = -0.1;
+		skeleton.bones[ 1 ].rotation.x = 0.2;
 		</code>
 
 		<h2>构造器</h2>
-		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-    [page:Geometry geometry] —— 一个[page:Geometry]或者[page:BufferGeometry]（推荐）的实例。
-	[page:Geometry.skinIndices skinIndices] 和 [page:Geometry.skinWeights skinWeights] 在几何体上应当被设置为true。<br />
+    [page:BufferGeometry geometry] —— TODO<br />
     [page:Material material] —— （可选）一个[page:Material]的实例，默认值是一个新的[page:MeshBasicMaterial]。
 		</p>
 
@@ -108,7 +127,7 @@
 
 		<h3>[property:Skeleton skeleton]</h3>
 		<p>
-			[page:Skeleton]是由从构造函数中传入的[page:Geometry]中的[page:Geometry.bones bones]来创建的。
+			TODO
 		</p>
 
 
@@ -121,7 +140,6 @@
 		[page:Skeleton skeleton] —— 由一棵[page:Bone Bones]树创建的[page:Skeleton]。<br/>
 		[page:Matrix4 bindMatrix] —— 代表着骨架基本变换的[page:Matrix4]（4x4矩阵）。<br /><br />
 		将骨架绑定到一个蒙皮网格上。bindMatrix会被保存到.bindMatrix属性中，其逆矩阵.bindMatrixInverse也会被计算出来。
-		它在构造函数中会被自动调用，其骨架是由传入到构造函数的[page:Geometry]中的[page:Geometry.bones bones]来创建的。
 		</p>
 
 		<h3>[method:SkinnedMesh clone]()</h3>
@@ -131,7 +149,7 @@
 
 		<h3>[method:null normalizeSkinWeights]()</h3>
 		<p>
-		规范化[page:Geometry.skinWeights]矢量。不会对[page:BufferGeometry]产生影响。
+		TODO
 		</p>
 
 		<h3>[method:null pose]()</h3>

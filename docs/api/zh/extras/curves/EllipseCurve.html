@@ -10,14 +10,14 @@
 	<body>
 		[page:Curve] &rarr;
 
-		<h1>[name]</h1>
+		<h1>椭圆曲线（[name]）</h1>
 
 		<p class="desc">
-			Creates a 2d curve in the shape of an ellipse. Setting the
-			[page:Number xRadius] equal to the [page:Number yRadius] will result in a circle.
+			创建一个形状为椭圆的曲线。
+			将[page:Number xRadius]与[page:Number yRadius]设为相等的值它将会成为一个圆。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 <code>
 var curve = new THREE.EllipseCurve(
@@ -37,68 +37,61 @@ var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 var ellipse = new THREE.Line( geometry, material );
 </code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( [param:Float aX], [param:Float aY], [param:Float xRadius], [param:Float yRadius], [param:Radians aStartAngle], [param:Radians aEndAngle], [param:Boolean aClockwise], [param:Radians aRotation] )</h3>
 		<p>
-			[page:Float aX] – The X center of the ellipse. Default is *0*.<br/>
-			[page:Float aY] – The Y center of the ellipse. Default is *0*.<br/>
-			[page:Float xRadius] – The radius of the ellipse in the x direction. Default is *1*.<br/>
-			[page:Float yRadius] – The radius of the ellipse in the y direction. Default is *1*.<br/>
-			[page:Radians aStartAngle] – The start angle of the curve in radians starting from the middle right side.  Default is *0*.<br/>
-			[page:Radians aEndAngle] – The end angle of the curve in radians starting from the middle right side. Default is *2 x Math.PI*.<br/>
-			[page:Boolean aClockwise] – Whether the ellipse is drawn clockwise. Default is *false*.<br/>
-			[page:Radians aRotation]  – The rotation angle of the ellipse in radians, counterclockwise from the positive X axis (optional). Default is *0*.<br/><br/>
+			[page:Float aX] – 椭圆的中心的X坐标，默认值为*0*。<br/>
+			[page:Float aY] – 椭圆的中心的Y坐标，默认值为*0*。<br/>
+			[page:Float xRadius] – X轴向上椭圆的半径，默认值为*1*。<br/>
+			[page:Float yRadius] – Y轴向上椭圆的半径，默认值为*1*。<br/>
+			[page:Radians aStartAngle] – 以弧度来表示，从正右侧算起曲线开始的角度，默认值为*0*。<br/>
+			[page:Radians aEndAngle] – 以弧度来表示，从正右侧算起曲线终止的角度，默认值为*2 x Math.PI*。<br/>
+			[page:Boolean aClockwise] – 椭圆是否按照顺时针方向来绘制，默认值为*false*。<br/>
+			[page:Radians aRotation]  – 以弧度表示，椭圆从X轴正方向逆时针的旋转角度（可选），默认值为*0*。<br/><br/>
 
-			<em>Note:</em> When going clockwise it's best to set the start angle to (Math.PI * 2) and then work towards lower numbers.
+			<em>请注意：</em> 当使用顺时针的时候，最好将起始角度角度设为(Math.PI * 2)，并向着更小的数字运行。
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:Curve] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Curve]来了解共有属性。</p>
 
 		<h3>[property:Boolean isEllipseCurve]</h3>
 		<p>
-			Used to check whether this or derived classes are EllipseCurves. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
+			用于检查该类或者其派生类是否为EllipseCurves。默认值为*true*。
+			<br /><br />
+			你不应当更改这个属性，它在内部使用，以用于优化。
 		</p>
 
 		<h3>[property:Float aX]</h3>
-		<p>The X center of the ellipse.</p>
+		<p>椭圆的中心的X坐标。</p>
 
 		<h3>[property:Float aY]</h3>
-		<p>The Y center of the ellipse.</p>
+		<p>椭圆的中心的Y坐标。</p>
 
 		<h3>[property:Radians xRadius]</h3>
-		<p>The radius of the ellipse in the x direction.</p>
+		<p>X轴向上椭圆的半径。</p>
 
 		<h3>[property:Radians yRadius]</h3>
-		<p>The radius of the ellipse in the y direction.</p>
+		<p>Y轴向上椭圆的半径。</p>
 
 		<h3>[property:Float aStartAngle]</h3>
-		<p>The start angle of the curve in radians starting from the middle right side.</p>
+		<p>以弧度来表示，从正右侧算起曲线开始的角度。</p>
 
 		<h3>[property:Float aEndAngle]</h3>
-		<p>The end angle of the curve in radians starting from the middle right side.</p>
+		<p>以弧度来表示，从正右侧算起曲线终止的角度。</p>
 
 		<h3>[property:Boolean aClockwise]</h3>
-		<p>Whether the ellipse is drawn clockwise.</p>
+		<p>椭圆是否按照顺时针方向来绘制。</p>
 
 		<h3>[property:Float aRotation]</h3>
-		<p>The rotation angle of the ellipse in radians, counterclockwise from the positive X axis (optional). Default is *0*.</p>
+		<p>以弧度表示，椭圆在X轴正方向逆时针的旋转角度（可选），默认值为*0*。</p>
 
-		<h3>[property:Boolean isEllipseCurve]</h3>
-		<p>
-			Used to check whether this or derived classes are ellipses. Default is *true*.<br /><br />
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Curve]来了解共有方法。</p>
 
-			You should not change this, as it used internally for optimisation.
-		</p>
-
-		<h2>Methods</h2>
-		<p>See the base [page:Curve] class for common methods.</p>
-
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
