@@ -51,14 +51,13 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
-			- geometries:
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - obj<br /><br />
 			<span class="link" id="triangle">triangle</span>,
 			<span class="link" id="cube">cube</span>,
 			<span class="link" id="cylinder">cylinder</span>,
-			<span class="link" id="both">both</span>,
-			<span class="link" id="transformed">transformed</span>
-			- <span class="link" id="export">export to obj</span>
+			<span class="link" id="multiple">multiple</span>,
+			<span class="link" id="transformed">transformed</span><br /><br />
+			<span class="link" id="export">export to obj</span>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -182,7 +181,7 @@
 					addGeometry( 3 );
 
 				} );
-				document.getElementById( 'both' ).addEventListener( 'click', function () {
+				document.getElementById( 'multiple' ).addEventListener( 'click', function () {
 
 					addGeometry( 4 );
 

@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_SKINNING
 
 	vec4 skinVertex = bindMatrix * vec4( transformed, 1.0 );

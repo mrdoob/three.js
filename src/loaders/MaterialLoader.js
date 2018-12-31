@@ -146,6 +146,16 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 
+		if ( json.extensions !== undefined ) {
+
+			for ( var key in json.extensions ) {
+
+				material.extensions[ key ] = json.extensions[ key ];
+
+			}
+
+		}
+
 		// Deprecated
 
 		if ( json.shading !== undefined ) material.flatShading = json.shading === 1; // THREE.FlatShading
