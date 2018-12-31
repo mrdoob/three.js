@@ -297,6 +297,7 @@ var files = {
 		"webgl_custom_attributes_points",
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
+		"webgl_fire",
 		"webgl_gpgpu_birds",
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
