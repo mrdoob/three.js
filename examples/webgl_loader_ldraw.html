@@ -8,20 +8,23 @@
 			body {
 				font-family: Monospace;
 				background-color: #000;
-				color: #fff;
 				margin: 0px;
 				overflow: hidden;
 			}
 			#info {
-				color: #fff;
+				color: #888;
 				position: absolute;
 				top: 10px;
 				width: 100%;
 				text-align: center;
-				z-index: 100;
 				display:block;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			#info a {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
 		</style>
 	</head>
 
@@ -41,7 +44,7 @@
 
 			var container, stats, progressBar, progressBarDiv;
 
-			var camera, scene, renderer, pointLight, controls, gui, guiData;
+			var camera, scene, renderer, controls, gui, guiData;
 
 			var modelFileList, model, textureCube;
 
@@ -83,13 +86,14 @@
 				// scene
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xdeebed );
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xdeebed, 0.4 );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffffff, 1 );
-				pointLight.position.set( -1000, 1200, 1500 );
-				scene.add( pointLight );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight.position.set( -1000, 1200, 1500 );
+				scene.add( directionalLight );
 
 				//
 
@@ -107,21 +111,15 @@
 					envMapActivated: false
 				};
 
-				gui = new dat.GUI( { width: 350 } );
+				gui = new dat.GUI();
 
-				var modelFolder = gui.addFolder( "Model" );
-
-				modelFolder.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
+				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
 
 					reloadObject( true );
 
 				} );
 
-				modelFolder.open();
-
-				var graphicsFolder = gui.addFolder( "Graphics" );
-
-				graphicsFolder.add( guiData , 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
+				gui.add( guiData , 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
 
 					envMapActivated = value;
 
@@ -129,17 +127,17 @@
 
 				} );
 
-				graphicsFolder.open();
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				progressBarDiv = document.createElement( 'div' );
 				progressBarDiv.innerText = "Loading...";
 				progressBarDiv.style.fontSize = "3em";
+				progressBarDiv.style.color = "#888";
 				progressBarDiv.style.display = "block";
 				progressBarDiv.style.position = "absolute";
 				progressBarDiv.style.top = "50%";
-				progressBarDiv.style.left = "50%";
+				progressBarDiv.style.width = "100%";
+				progressBarDiv.style.textAlign = "center";
 
 
 				// load materials and then the model
@@ -226,8 +224,6 @@
 
 						}
 
-						pointLight.position.normalize().multiplyScalar( radius * 3 );
-
 						hideProgressBar();
 
 					}, onProgress, onError );
@@ -299,7 +295,7 @@
 		</script>
 
 		<!-- LDraw.org CC BY 2.0 Parts Library attribution -->
-		<div style="display: block; position: absolute; bottom: 0px; right: 0px; width: 160px; padding: 2px; border: #838A92 1px solid; background-color: #F3F7F8;">
+		<div style="display: block; position: absolute; bottom: 8px; right: 8px; width: 160px; padding: 10px; background-color: #F3F7F8;">
 			<center>
 				<a href="http://www.ldraw.org"><img style="width: 145px" src="files/ldraw_org_logo/Stamp145.png"></a>
 				<br />
