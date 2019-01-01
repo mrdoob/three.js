@@ -510,10 +510,10 @@
 
 				var valuesChanger = function () {
 
-					velocityUniforms.seperationDistance.value = effectController.seperation;
-					velocityUniforms.alignmentDistance.value = effectController.alignment;
-					velocityUniforms.cohesionDistance.value = effectController.cohesion;
-					velocityUniforms.freedomFactor.value = effectController.freedom;
+					velocityUniforms[ "seperationDistance" ].value = effectController.seperation;
+					velocityUniforms[ "alignmentDistance" ].value = effectController.alignment;
+					velocityUniforms[ "cohesionDistance" ].value = effectController.cohesion;
+					velocityUniforms[ "freedomFactor" ].value = effectController.freedom;
 
 				};
 
@@ -531,7 +531,7 @@
 
 			function initComputeRenderer() {
 
-    				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();
@@ -547,16 +547,16 @@
 				positionUniforms = positionVariable.material.uniforms;
 				velocityUniforms = velocityVariable.material.uniforms;
 
-				positionUniforms.time = { value: 0.0 };
-				positionUniforms.delta = { value: 0.0 };
-				velocityUniforms.time = { value: 1.0 };
-				velocityUniforms.delta = { value: 0.0 };
-				velocityUniforms.testing = { value: 1.0 };
-				velocityUniforms.seperationDistance = { value: 1.0 };
-				velocityUniforms.alignmentDistance = { value: 1.0 };
-				velocityUniforms.cohesionDistance = { value: 1.0 };
-				velocityUniforms.freedomFactor = { value: 1.0 };
-				velocityUniforms.predator = { value: new THREE.Vector3() };
+				positionUniforms[ "time" ] = { value: 0.0 };
+				positionUniforms[ "delta" ] = { value: 0.0 };
+				velocityUniforms[ "time" ] = { value: 1.0 };
+				velocityUniforms[ "delta" ] = { value: 0.0 };
+				velocityUniforms[ "testing" ] = { value: 1.0 };
+				velocityUniforms[ "seperationDistance" ] = { value: 1.0 };
+				velocityUniforms[ "alignmentDistance" ] = { value: 1.0 };
+				velocityUniforms[ "cohesionDistance" ] = { value: 1.0 };
+				velocityUniforms[ "freedomFactor" ] = { value: 1.0 };
+				velocityUniforms[ "predator" ] = { value: new THREE.Vector3() };
 				velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed( 2 );
 
 				velocityVariable.wrapS = THREE.RepeatWrapping;
@@ -579,11 +579,11 @@
 
 				// For Vertex and Fragment
 				birdUniforms = {
-					color: { value: new THREE.Color( 0xff2200 ) },
-					texturePosition: { value: null },
-					textureVelocity: { value: null },
-					time: { value: 1.0 },
-					delta: { value: 0.0 }
+					"color": { value: new THREE.Color( 0xff2200 ) },
+					"texturePosition": { value: null },
+					"textureVelocity": { value: null },
+					"time": { value: 1.0 },
+					"delta": { value: 0.0 }
 				};
 
 				// ShaderMaterial
@@ -707,22 +707,22 @@
 				if ( delta > 1 ) delta = 1; // safety cap on large deltas
 				last = now;
 
-				positionUniforms.time.value = now;
-				positionUniforms.delta.value = delta;
-				velocityUniforms.time.value = now;
-				velocityUniforms.delta.value = delta;
-				birdUniforms.time.value = now;
-				birdUniforms.delta.value = delta;
+				positionUniforms[ "time" ].value = now;
+				positionUniforms[ "delta" ].value = delta;
+				velocityUniforms[ "time" ].value = now;
+				velocityUniforms[ "delta" ].value = delta;
+				birdUniforms[ "time" ].value = now;
+				birdUniforms[ "delta" ].value = delta;
 
-				velocityUniforms.predator.value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
+				velocityUniforms[ "predator" ].value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
 
 				mouseX = 10000;
 				mouseY = 10000;
 
 				gpuCompute.compute();
 
-				birdUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				birdUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				birdUniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				birdUniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 
