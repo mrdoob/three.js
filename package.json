@@ -53,24 +53,29 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-<<<<<<< HEAD
-    "babel-core": "^6.26.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
-    "concurrently": "^4.0.1",
-    "electron": "^3.0.8",
-    "eslint": "^5.9.0",
-=======
+    "@babel/core": "^7.2.2",
+    "@babel/helpers": "^7.2.0",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-decorators": "^7.2.3",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "babel-eslint": "^10.0.1",
     "concurrently": "^4.1.0",
     "electron": "^4.0.0",
     "eslint": "^5.11.1",
->>>>>>> 0dde0819043776d5bd7bab01e6aa229692f06fd2
     "eslint-config-mdcs": "^4.2.3",
+    "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-html": "^5.0.0",
+    "eslint-plugin-import": "^2.14.0",
     "google-closure-compiler": "20181210.0.0",
     "http-server": "^0.11.1",
     "qunit": "^2.8.0",
-    "rollup": "^1.0.0"
+    "rollup": "^1.0.0",
+    "rollup-plugin-babel": "^4.2.0",
+    "rollup-plugin-eslint": "^5.0.0",
+    "rollup-plugin-three-glsl": "^1.0.1"
   },
   "jspm": {
     "files": [

@@ -1,3 +1,7 @@
+import { glsl } from 'rollup-plugin-three-glsl';
+import babel from 'rollup-plugin-babel';
+import { eslint } from 'rollup-plugin-eslint';
+
 function glconstants() {
 
 	var constants = {
@@ -154,54 +158,17 @@ function glconstants() {
 
 }
 
-function glsl() {
-
-	return {
-
-		transform( code, id ) {
-
-			if ( /\.glsl.js$/.test( id ) === false ) return;
-
-			code = code.replace( /\/\* glsl \*\/\`((.*|\n|\r\n)*)\`/, function ( match, p1 ) {
-
-				return JSON.stringify(
-					p1
-						.trim()
-						.replace( /\r/g, '' )
-						.replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
-						.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
-						.replace( /\n{2,}/g, '\n' ) // # \n+ to \n
-				);
-
-			} );
-
-			return {
-				code: code,
-				map: { mappings: '' }
-			};
-
-		}
-
-	};
-
-}
-
 export default {
 	input: 'src/Three.js',
 	plugins: [
 		glconstants(),
 		glsl(),
-		eslint( {
-			include: '**/*.js'
-		} ),
+		eslint(),
 		babel( {
-			babelrc: false,
-			'plugins': [
-				'external-helpers'
-			],
-			presets: [[ 'env', { modules: false } ]]
+			babelrc: true
 		} )
 	],
+	// sourceMap: true,
 	output: [
 		{
 			format: 'umd',
