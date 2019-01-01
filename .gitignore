@@ -1,5 +1,4 @@
 .DS_Store
-.package-lock.json
 *.swp
 .project
 node_modules
@@ -9,3 +8,4 @@ npm-debug.log
 .jshintrc
 .vs/
 test/unit/three.*.unit.js
+.package-lock.json

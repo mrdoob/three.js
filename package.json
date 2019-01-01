@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.99.0",
+  "version": "0.100.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
@@ -67,14 +67,13 @@
     "eslint": "^5.11.1",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-flowtype": "^3.2.0",
     "eslint-plugin-html": "^5.0.0",
     "eslint-plugin-import": "^2.14.0",
     "google-closure-compiler": "20181210.0.0",
     "http-server": "^0.11.1",
     "qunit": "^2.8.0",
     "rollup": "^1.0.0",
-    "rollup-plugin-babel": "^4.1.0",
+    "rollup-plugin-babel": "^4.2.0",
     "rollup-plugin-eslint": "^5.0.0",
     "rollup-plugin-three-glsl": "^1.0.1"
   },

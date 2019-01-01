@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - collada exporter</title>
+		<title>three.js webgl - exporter - collada</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -31,9 +31,8 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - the Utah Teapot<br />
-			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291" target="_blank" rel="noopener">Udacity Interactive 3D Graphics</a>
-			<button id="savecolladabutton">save collada</button>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
+			<button onclick="exportCollada()">Export COLLADA</button>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -366,8 +365,8 @@
 			}
 
 			var exporter = new THREE.ColladaExporter();
-			
-			function saveColladaFile() {
+
+			function exportCollada() {
 
 				var result = exporter.parse( teapot );
 				var material_type = "Phong";
@@ -408,11 +407,6 @@
 			var link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link );
-
-			var savecolladabutton = document.getElementById("savecolladabutton");
-			savecolladabutton.addEventListener('click', function(){
-				saveColladaFile();
-			});
 
 		</script>
 

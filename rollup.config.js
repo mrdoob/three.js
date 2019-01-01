@@ -151,11 +151,10 @@ function glconstants() {
 			return {
 				code: code,
 				map: { mappings: '' }
-			};
-
+			}
 		}
 
-	};
+	}
 
 }
 
@@ -169,6 +168,7 @@ export default {
 			babelrc: true
 		} )
 	],
+	// sourceMap: true,
 	output: [
 		{
 			format: 'umd',
