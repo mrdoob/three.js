@@ -18,17 +18,28 @@ Object.assign( AudioLoader.prototype, {
 
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
-			var context = AudioContext.getContext();
+			// Create a copy of the buffer. The `decodeAudioData` method
+			// detaches the buffer when complete, preventing reuse.
+			var bufferCopy = buffer.slice( 0 );
 
-			context.decodeAudioData( buffer, function ( audioBuffer ) {
+			var context = AudioContext.getContext();
+			context.decodeAudioData( bufferCopy, function ( audioBuffer ) {
 
 				onLoad( audioBuffer );
 
 			} );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 

@@ -20,7 +20,7 @@ Fog.prototype.isFog = true;
 
 Fog.prototype.clone = function () {
 
-	return new Fog( this.color.getHex(), this.near, this.far );
+	return new Fog( this.color, this.near, this.far );
 
 };
 

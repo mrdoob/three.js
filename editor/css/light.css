@@ -49,7 +49,7 @@ select {
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0;
 }
 
 	#viewport #info {
@@ -62,7 +62,7 @@ select {
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0;
 	opacity: 0.9;
 }
 
@@ -71,7 +71,7 @@ select {
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0;
 }
 
 #menubar {
@@ -103,6 +103,7 @@ select {
 			color: #888;
 			margin: 0;
 			padding: 8px;
+			line-height: 16px;
 		}
 
 		#menubar .menu .options {
@@ -194,9 +195,9 @@ select {
 
 #toolbar {
 	position: absolute;
-	left: 0;
-	right: 300px;
-	bottom: 0;
+	left: calc(50% - 290px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
+	width: 280px;
+	bottom: 16px;
 	height: 32px;
 	background: #eee;
 	color: #333;
@@ -213,6 +214,8 @@ select {
 
 	#toolbar button {
 		margin-right: 6px;
+		line-height: 14px;
+		height: 24px;
 	}
 
 .Outliner {

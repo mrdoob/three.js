@@ -27,7 +27,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -44,7 +44,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
@@ -52,24 +52,22 @@
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var statsEnabled = true;
 
-			var container, stats, loader;
+			var container, stats;
 
-			var camera, scene, renderer;
-
-			var controls;
-
-			var mesh;
-
-			var spotLight;
+			var camera, scene, renderer, controls;
 
 			init();
 			animate();
@@ -96,7 +94,7 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 1000 );
 				camera.position.z = 2;
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 				//
 
@@ -152,12 +150,14 @@
 
 					} );
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
@@ -195,7 +195,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -210,6 +210,7 @@
 
 				requestAnimationFrame( animate );
 
+				controls.update();
 				renderer.render( scene, camera );
 
 				if ( statsEnabled ) stats.update();

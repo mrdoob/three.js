@@ -18,7 +18,7 @@ FogExp2.prototype.isFogExp2 = true;
 
 FogExp2.prototype.clone = function () {
 
-	return new FogExp2( this.color.getHex(), this.density );
+	return new FogExp2( this.color, this.density );
 
 };
 

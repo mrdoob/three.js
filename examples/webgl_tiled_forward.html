@@ -12,9 +12,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			a {
-				color: #f00;
-			}
+			a { color: #f00; }
 
 			#info {
 				position: absolute;
@@ -42,7 +40,7 @@
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/LuminosityHighPassShader.js"></script>
 		<script src="js/postprocessing/UnrealBloomPass.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -52,7 +50,8 @@
 
 		var RADIUS = 75;
 
-		THREE.ShaderChunk[ 'lights_pars_maps' ] += [
+		THREE.ShaderChunk[ 'lights_pars_begin' ] += [
+			'',
 			'#if defined TILED_FORWARD',
 			'uniform vec4 tileData;',
 			'uniform sampler2D tileTexture;',
@@ -60,7 +59,7 @@
 			'#endif'
 		].join( '\n' );
 
-		THREE.ShaderChunk[ 'lights_fragment_maps' ] += [
+		THREE.ShaderChunk[ 'lights_fragment_end' ] += [
 			'',
 			'#if defined TILED_FORWARD',
 			'vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;',
@@ -89,7 +88,7 @@
 			'#endif'
 		].join( '\n' );
 
-		var lights = [], objects = [];
+		var lights = [];
 
 		var State = {
 			rows: 0,
@@ -171,7 +170,7 @@
 		// Screen rectangle bounds from light sphere's world AABB
 		var lightBounds = function () {
 
-			v = new THREE.Vector3();
+			var v = new THREE.Vector3();
 			return function ( camera, pos, r ) {
 
 				var minX = State.width, maxX = 0, minY = State.height, maxY = 0, hw = State.width / 2, hh = State.height / 2;
@@ -194,7 +193,7 @@
 
 				return [ minX, maxX, minY, maxY ];
 
-		};
+			};
 
 		}();
 
@@ -224,17 +223,17 @@
 		var stats = new Stats();
 		container.appendChild( stats.dom );
 
-		controls = new THREE.OrbitControls( camera, renderer.domElement );
+		var controls = new THREE.OrbitControls( camera, renderer.domElement );
 		controls.minDistance = 120;
 		controls.maxDistance = 320;
 
 		var materials = [];
 
 		var Heads = [
-			{ type: 'physical', uniforms: { diffuse: 0x888888, metalness: 1.0, roughness: 0.66 }, defines: {} },
-			{ type: 'standard', uniforms: { diffuse: 0x666666, metalness: 0.1, roughness: 0.33 }, defines: {} },
-			{ type: 'phong', uniforms: { diffuse: 0x777777, shininess: 20 }, defines: {} },
-			{ type: 'phong', uniforms: { diffuse: 0x555555, shininess: 10 }, defines: { TOON: 1 } }
+			{ type: 'physical', uniforms: { "diffuse": 0x888888, "metalness": 1.0, "roughness": 0.66 }, defines: {} },
+			{ type: 'standard', uniforms: { "diffuse": 0x666666, "metalness": 0.1, "roughness": 0.33 }, defines: {} },
+			{ type: 'phong', uniforms: { "diffuse": 0x777777, "shininess": 20 }, defines: {} },
+			{ type: 'phong', uniforms: { "diffuse": 0x555555, "shininess": 10 }, defines: { TOON: 1 } }
 		];
 
 		function init( geom ) {
@@ -256,10 +255,10 @@
 					transparent: tIndex === index ? true : false,
 				} );
 
-				mtl.uniforms.opacity.value = tIndex === index ? 0.9 : 1;
-				mtl.uniforms.tileData = State.tileData;
-				mtl.uniforms.tileTexture = State.tileTexture;
-				mtl.uniforms.lightTexture = State.lightTexture;
+				mtl.uniforms[ "opacity" ].value = tIndex === index ? 0.9 : 1;
+				mtl.uniforms[ "tileData" ] = State.tileData;
+				mtl.uniforms[ "tileTexture" ] = State.tileTexture;
+				mtl.uniforms[ "lightTexture" ] = State.lightTexture;
 
 				for ( var u in conf.uniforms ) {
 
@@ -362,7 +361,7 @@
 
 		}
 
-		function postEffect( renderer, scene, camera ) {
+		function postEffect( renderer ) {
 
 			bloom.render( renderer, null, renderTarget );
 
@@ -383,7 +382,7 @@
 			init( geometry );
 			resize();
 
-			renderer.animate( function ( time ) {
+			renderer.setAnimationLoop( function ( time ) {
 
 				update( time / 1000 );
 				stats.begin();

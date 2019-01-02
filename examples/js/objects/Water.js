@@ -69,17 +69,17 @@ THREE.Water = function ( geometry, options ) {
 			THREE.UniformsLib[ 'fog' ],
 			THREE.UniformsLib[ 'lights' ],
 			{
-				normalSampler: { value: null },
-				mirrorSampler: { value: null },
-				alpha: { value: 1.0 },
-				time: { value: 0.0 },
-				size: { value: 1.0 },
-				distortionScale: { value: 20.0 },
-				textureMatrix: { value: new THREE.Matrix4() },
-				sunColor: { value: new THREE.Color( 0x7F7F7F ) },
-				sunDirection: { value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
-				eye: { value: new THREE.Vector3() },
-				waterColor: { value: new THREE.Color( 0x555555 ) }
+				"normalSampler": { value: null },
+				"mirrorSampler": { value: null },
+				"alpha": { value: 1.0 },
+				"time": { value: 0.0 },
+				"size": { value: 1.0 },
+				"distortionScale": { value: 20.0 },
+				"textureMatrix": { value: new THREE.Matrix4() },
+				"sunColor": { value: new THREE.Color( 0x7F7F7F ) },
+				"sunDirection": { value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
+				"eye": { value: new THREE.Vector3() },
+				"waterColor": { value: new THREE.Color( 0x555555 ) }
 			}
 		] ),
 
@@ -162,7 +162,7 @@ THREE.Water = function ( geometry, options ) {
 			'	float distance = length(worldToEye);',
 
 			'	vec2 distortion = surfaceNormal.xz * ( 0.001 + 1.0 / distance ) * distortionScale;',
-			'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.z + distortion ) );',
+			'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) );',
 
 			'	float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );',
 			'	float rf0 = 0.3;',
@@ -190,17 +190,17 @@ THREE.Water = function ( geometry, options ) {
 		fog: fog
 	} );
 
-	material.uniforms.mirrorSampler.value = renderTarget.texture;
-	material.uniforms.textureMatrix.value = textureMatrix;
-	material.uniforms.alpha.value = alpha;
-	material.uniforms.time.value = time;
-	material.uniforms.normalSampler.value = normalSampler;
-	material.uniforms.sunColor.value = sunColor;
-	material.uniforms.waterColor.value = waterColor;
-	material.uniforms.sunDirection.value = sunDirection;
-	material.uniforms.distortionScale.value = distortionScale;
+	material.uniforms[ "mirrorSampler" ].value = renderTarget.texture;
+	material.uniforms[ "textureMatrix" ].value = textureMatrix;
+	material.uniforms[ "alpha" ].value = alpha;
+	material.uniforms[ "time" ].value = time;
+	material.uniforms[ "normalSampler" ].value = normalSampler;
+	material.uniforms[ "sunColor" ].value = sunColor;
+	material.uniforms[ "waterColor" ].value = waterColor;
+	material.uniforms[ "sunDirection" ].value = sunDirection;
+	material.uniforms[ "distortionScale" ].value = distortionScale;
 
-	material.uniforms.eye.value = eye;
+	material.uniforms[ "eye" ].value = eye;
 
 	scope.material = material;
 

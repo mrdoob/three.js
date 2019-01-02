@@ -9,6 +9,7 @@
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
+				touch-action: none;
 			}
 
 			#info {
@@ -42,10 +43,10 @@
 			var camera, scene, renderer;
 
 			var isUserInteracting = false,
-			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-			lon = 0, onMouseDownLon = 0,
-			lat = 0, onMouseDownLat = 0,
-			phi = 0, theta = 0;
+				onMouseDownMouseX = 0, onMouseDownMouseY = 0,
+				lon = 0, onMouseDownLon = 0,
+				lat = 0, onMouseDownLat = 0,
+				phi = 0, theta = 0;
 
 			init();
 			animate();
@@ -78,10 +79,15 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mousedown', onPointerStart, false );
+				document.addEventListener( 'mousemove', onPointerMove, false );
+				document.addEventListener( 'mouseup', onPointerUp, false );
+
 				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+
+				document.addEventListener( 'touchstart', onPointerStart, false );
+				document.addEventListener( 'touchmove', onPointerMove, false );
+				document.addEventListener( 'touchend', onPointerUp, false );
 
 				//
 
@@ -92,13 +98,13 @@
 
 				}, false );
 
-				document.addEventListener( 'dragenter', function ( event ) {
+				document.addEventListener( 'dragenter', function () {
 
 					document.body.style.opacity = 0.5;
 
 				}, false );
 
-				document.addEventListener( 'dragleave', function ( event ) {
+				document.addEventListener( 'dragleave', function () {
 
 					document.body.style.opacity = 1;
 
@@ -136,32 +142,36 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
-
-				event.preventDefault();
+			function onPointerStart( event ) {
 
 				isUserInteracting = true;
 
-				onMouseDownMouseX = event.clientX;
-				onMouseDownMouseY = event.clientY;
+				var clientX = event.clientX || event.touches[ 0 ].clientX;
+				var clientY = event.clientY || event.touches[ 0 ].clientY;
+
+				onMouseDownMouseX = clientX;
+				onMouseDownMouseY = clientY;
 
 				onMouseDownLon = lon;
 				onMouseDownLat = lat;
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
 				if ( isUserInteracting === true ) {
 
-					lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
-					lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
+					var clientX = event.clientX || event.touches[ 0 ].clientX;
+					var clientY = event.clientY || event.touches[ 0 ].clientY;
+
+					lon = ( onMouseDownMouseX - clientX ) * 0.1 + onMouseDownLon;
+					lat = ( clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
 
 				}
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onPointerUp() {
 
 				isUserInteracting = false;
 

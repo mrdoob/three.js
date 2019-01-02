@@ -12,8 +12,8 @@
 		<h1>[name]</h1>
 
 		<p class="desc"> A loader for <em>glTF 2.0</em> resources. <br /><br />
-		<a href="https://www.khronos.org/gltf">glTF</a> (GL Transmission Format) is an
-		<a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">open format specification</a>
+		[link:https://www.khronos.org/gltf glTF] (GL Transmission Format) is an
+		[link:https://github.com/KhronosGroup/glTF/tree/master/specification/2.0 open format specification]
 		for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
 		or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
 		data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
@@ -24,15 +24,27 @@
 
 		<p>
 			GLTFLoader supports the following
-			<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/">glTF 2.0 extensions</a>:
+			[link:https://github.com/KhronosGroup/glTF/tree/master/extensions/ glTF 2.0 extensions]:
 		</p>
 
 		<ul>
 			<li>KHR_draco_mesh_compression</li>
 			<li>KHR_materials_pbrSpecularGlossiness</li>
 			<li>KHR_materials_unlit</li>
-			<li>KHR_lights (experimental)</li>
+			<li>KHR_lights_punctual</li>
+			<li>KHR_texture_transform<sup>*</sup></li>
+			<li>MSFT_texture_dds</li>
 		</ul>
+
+		<p><i>
+			<sup>*</sup>UV transforms are supported, with several key limitations. Transforms applied to
+			a texture using the first UV slot (all textures except aoMap and lightMap) must share the same
+			transform, or no transfor at all. The aoMap and lightMap textures cannot be transformed. No
+			more than one transform may be used per material. Each use of a texture with a unique
+			transform will result in an additional GPU texture upload. See
+			#[link:https://github.com/mrdoob/three.js/pull/13831 13831] and
+			#[link:https://github.com/mrdoob/three.js/issues/12788 12788].
+		</i></p>
 
 		<h2>Example</h2>
 
@@ -60,7 +72,7 @@
 				gltf.asset; // Object
 
 			},
-			// called when loading is in progresses
+			// called while loading is progressing
 			function ( xhr ) {
 
 				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -79,10 +91,57 @@
 
 		<h2>Browser compatibility</h2>
 
-		<p>GLTFLoader relies on ES6 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a>,
+		<p>GLTFLoader relies on ES6 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promises],
 		which are not supported in IE11. To use the loader in IE11, you must
-		<a href="https://github.com/stefanpenner/es6-promise">include a polyfill</a>
+		[link:https://github.com/stefanpenner/es6-promise include a polyfill]
 		providing a Promise replacement.</p>
+
+		<h2>Textures</h2>
+
+		<p>Textures containing color information (.map, .emissiveMap, and .specularMap) always use sRGB colorspace in
+		glTF, while vertex colors and material properties (.color, .emissive, .specular) use linear colorspace. In a
+		typical rendering workflow, textures are converted to linear colorspace by the renderer, lighting calculations
+		are made, then final output is converted back to sRGB and displayed on screen. Unless you need post-processing
+		in linear colorspace, always configure [page:WebGLRenderer] as follows when using glTF:</p>
+
+		<code>
+		renderer.gammaOutput = true;
+		renderer.gammaFactor = 2.2;
+		</code>
+
+		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
+		assumption that the renderer is set up as shown above. When loading textures externally (e.g., using
+		[page:TextureLoader]) and applying them to a glTF model, colorspace and orientation must be given:</p>
+
+		<code>
+		// If texture is used for color information, set colorspace.
+		texture.encoding = THREE.sRGBEncoding;
+
+		// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+		texture.flipY = false;
+		</code>
+
+		<h2>Custom extensions</h2>
+
+		<p>
+			Metadata from unknown extensions is preserved as “.userData.gltfExtensions” on Object3D, Scene, and Material instances,
+			or attached to the response “gltf” object. Example:
+		</p>
+
+		<code>
+		loader.load('foo.gltf', function ( gltf ) {
+
+			var scene = gltf.scene;
+
+			var mesh = scene.children[ 3 ];
+
+			var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
+
+			gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
+				.then( function ( fooBuffer ) { ... } );
+
+		} );
+		</code>
 
 		<br>
 		<hr>
@@ -113,7 +172,15 @@
 		Begin loading from url and call the callback function with the parsed response content.
 		</p>
 
-		<h3>[method:null setPath]( [param:String path] )</h3>
+		<h3>[method:GLTFLoader setPath]( [param:String path] )</h3>
+		<p>
+		[page:String path] — Base path.
+		</p>
+		<p>
+		Set the base path for the .gltf/.glb file.
+		</p>
+
+		<h3>[method:GLTFLoader setResourcePath]( [param:String path] )</h3>
 		<p>
 		[page:String path] — Base path for loading additional resources e.g. textures and .bin data.
 		</p>

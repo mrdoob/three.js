@@ -14,9 +14,7 @@
 				overflow:hidden;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
 			#info {
 				position: absolute;
@@ -29,7 +27,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -44,26 +42,23 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats;
 
-			var mesh, materialShader;
-
-			var mouseX = 0;
-			var mouseY = 0;
-
-			var targetX = 0;
-			var targetY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var materialShader;
 
 			init();
 			animate();
@@ -71,14 +66,12 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1200;
+				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
 
 				var material = new THREE.MeshNormalMaterial();
 				material.onBeforeCompile = function ( shader ) {
-
-					// console.log( shader )
 
 					shader.uniforms.time = { value: 0 };
 
@@ -99,10 +92,10 @@
 
 				};
 
-				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function( geometry ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
-					mesh = new THREE.Mesh( geometry, material );
+					var mesh = new THREE.Mesh( gltf.scene.children[ 0 ].geometry, material );
 					mesh.position.y = - 50;
 					mesh.scale.setScalar( 100 );
 					scene.add( mesh );
@@ -114,6 +107,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
 				//
 
 				stats = new Stats();
@@ -121,32 +116,21 @@
 
 				// EVENTS
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
-
-				windowHalfX = width / 2;
-				windowHalfY = height / 2;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
 
 			}
 
@@ -163,16 +147,6 @@
 			}
 
 			function render() {
-
-				targetX = mouseX * .001;
-				targetY = mouseY * .001;
-
-				if ( mesh ) {
-
-					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
-					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
-
-				}
 
 				if ( materialShader ) {
 

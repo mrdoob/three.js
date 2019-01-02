@@ -16,9 +16,7 @@
 				text-align:center;
 			}
 
-			a {
-				color:#0078ff;
-			}
+			a { color:#0078ff; }
 
 			#info {
 				color:#fff;
@@ -31,15 +29,15 @@
 			}
 		</style>
 	</head>
-<!-- TODO
-Setup Number Focus Test Plates
-Use WEBGL Depth buffer support?
--->
+	<!-- TODO
+		Setup Number Focus Test Plates
+		Use WEBGL Depth buffer support?
+	-->
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/shaders/BokehShader2.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -50,7 +48,11 @@ Use WEBGL Depth buffer support?
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var camera, scene, renderer, materialDepth;
@@ -58,14 +60,13 @@ Use WEBGL Depth buffer support?
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var postprocessing = { enabled  : true };
+			var postprocessing = { enabled: true };
 
 			var shaderSettings = {
 				rings: 3,
 				samples: 4
 			};
 
-			var singleMaterial = false;
 			var mouse = new THREE.Vector2();
 			var raycaster = new THREE.Raycaster();
 			var distance = 100;
@@ -96,9 +97,16 @@ Use WEBGL Depth buffer support?
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
-				materialDepth = new THREE.MeshDepthMaterial();
-				materialDepth.depthPacking = THREE.RGBADepthPacking;
-				materialDepth.blending = THREE.NoBlending;
+				var depthShader = THREE.BokehDepthShader;
+
+				materialDepth = new THREE.ShaderMaterial( {
+					uniforms: depthShader.uniforms,
+					vertexShader: depthShader.vertexShader,
+					fragmentShader: depthShader.fragmentShader
+				} );
+
+				materialDepth.uniforms[ 'mNear' ].value = camera.near;
+				materialDepth.uniforms[ 'mFar' ].value = camera.far;
 
 				// skybox
 
@@ -110,18 +118,32 @@ Use WEBGL Depth buffer support?
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 
-				scene.background = textureCube;
+				var shader = THREE.ShaderLib[ 'cube' ];
+				shader.uniforms[ 'tCube' ].value = textureCube;
+
+				var skyMaterial = new THREE.ShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms,
+					depthWrite: false,
+					side: THREE.BackSide
+
+				} );
+
+				var sky = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), skyMaterial );
+				scene.add( sky );
 
 				// plane particles
 
 				var planePiece = new THREE.PlaneBufferGeometry( 10, 10, 1, 1 );
 
 				var planeMat = new THREE.MeshPhongMaterial( {
-						color: 0xffffff * 0.4,
-						shininess: 0.5,
-						specular: 0xffffff,
-						envMap: textureCube,
-						side: THREE.DoubleSide
+					color: 0xffffff * 0.4,
+					shininess: 0.5,
+					specular: 0xffffff,
+					envMap: textureCube,
+					side: THREE.DoubleSide
 				} );
 
 				var rand = Math.random;
@@ -135,8 +157,8 @@ Use WEBGL Depth buffer support?
 					plane.rotation.dz = rand() * 0.1;
 
 					plane.position.set( rand() * 150, 0 + rand() * 300, rand() * 150 );
-					plane.position.dx = (rand()  - 0.5 );
-					plane.position.dz = (rand()  - 0.5 );
+					plane.position.dx = ( rand() - 0.5 );
+					plane.position.dz = ( rand() - 0.5 );
 					scene.add( plane );
 					planes.push( plane );
 
@@ -150,27 +172,26 @@ Use WEBGL Depth buffer support?
 					geometry.computeVertexNormals();
 
 					var material = new THREE.MeshPhongMaterial( {
-						color: 0xffffff,
-						specular:0xffffff,
+						specular: 0xffffff,
 						envMap: textureCube,
-						combine: THREE.MultiplyOperation,
 						shininess: 50,
-						reflectivity: 1.0
-					});
+						reflectivity: 1.0,
+						flatShading: true
+					} );
 
 					var monkeys = 20;
 
 					for ( var i = 0; i < monkeys; i ++ ) {
 
 						var mesh = new THREE.Mesh( geometry, material );
-						mesh.scale.multiplyScalar(30);
 
 						mesh.position.z = Math.cos( i / monkeys * Math.PI * 2 ) * 200;
 						mesh.position.y = Math.sin( i / monkeys * Math.PI * 3 ) * 20;
 						mesh.position.x = Math.sin( i / monkeys * Math.PI * 2 ) * 200;
 
-						mesh.rotation.y = - Math.PI / 2;
-						mesh.rotation.z = - i / monkeys * Math.PI * 2;
+						mesh.rotation.y = i / monkeys * Math.PI * 2;
+
+						mesh.scale.setScalar( 30 );
 
 						scene.add( mesh );
 
@@ -187,14 +208,14 @@ Use WEBGL Depth buffer support?
 					var ballmaterial = new THREE.MeshPhongMaterial( {
 						color: 0xffffff * Math.random(),
 						shininess: 0.5,
-						specular: 0xffffff ,
+						specular: 0xffffff,
 						envMap: textureCube } );
 
 					var mesh = new THREE.Mesh( geometry, ballmaterial );
 
 					mesh.position.x = ( Math.random() - 0.5 ) * 200;
 					mesh.position.y = Math.random() * 50;
-					mesh.position.z = ( Math.random() - 0.5 )  * 200;
+					mesh.position.z = ( Math.random() - 0.5 ) * 200;
 					mesh.scale.multiplyScalar( 10 );
 					scene.add( mesh );
 
@@ -209,7 +230,7 @@ Use WEBGL Depth buffer support?
 				scene.add( directionalLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( - 2, 1.2, -10 ).normalize();
+				directionalLight.position.set( - 2, 1.2, - 10 ).normalize();
 				scene.add( directionalLight );
 
 				initPostprocessing();
@@ -221,7 +242,7 @@ Use WEBGL Depth buffer support?
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
-				effectController  = {
+				effectController = {
 
 					enabled: true,
 					jsDepthCalculation: true,
@@ -249,7 +270,7 @@ Use WEBGL Depth buffer support?
 
 				};
 
-				var matChanger = function() {
+				var matChanger = function () {
 
 					for ( var e in effectController ) {
 
@@ -264,7 +285,7 @@ Use WEBGL Depth buffer support?
 					postprocessing.enabled = effectController.enabled;
 					postprocessing.bokeh_uniforms[ 'znear' ].value = camera.near;
 					postprocessing.bokeh_uniforms[ 'zfar' ].value = camera.far;
-					camera.setFocalLength(effectController.focalLength);
+					camera.setFocalLength( effectController.focalLength );
 
 				};
 
@@ -286,7 +307,7 @@ Use WEBGL Depth buffer support?
 
 				gui.add( effectController, 'threshold', 0, 1, 0.001 ).onChange( matChanger );
 				gui.add( effectController, 'gain', 0, 100, 0.001 ).onChange( matChanger );
-				gui.add( effectController, 'bias', 0,3, 0.001 ).onChange( matChanger );
+				gui.add( effectController, 'bias', 0, 3, 0.001 ).onChange( matChanger );
 				gui.add( effectController, 'fringe', 0, 5, 0.001 ).onChange( matChanger );
 
 				gui.add( effectController, 'focalLength', 16, 80, 0.001 ).onChange( matChanger );
@@ -297,8 +318,8 @@ Use WEBGL Depth buffer support?
 
 				gui.add( effectController, 'pentagon' ).onChange( matChanger );
 
-				gui.add( shaderSettings, 'rings', 1, 8).step(1).onChange( shaderUpdate );
-				gui.add( shaderSettings, 'samples', 1, 13).step(1).onChange( shaderUpdate );
+				gui.add( shaderSettings, 'rings', 1, 8 ).step( 1 ).onChange( shaderUpdate );
+				gui.add( shaderSettings, 'samples', 1, 13 ).step( 1 ).onChange( shaderUpdate );
 
 				matChanger();
 
@@ -334,6 +355,7 @@ Use WEBGL Depth buffer support?
 					mouse.y = - ( event.touches[ 0 ].pageY - windowHalfY ) / windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -353,7 +375,7 @@ Use WEBGL Depth buffer support?
 
 				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				postprocessing.scene.add( postprocessing.camera );
@@ -378,8 +400,7 @@ Use WEBGL Depth buffer support?
 					fragmentShader: bokeh_shader.fragmentShader,
 					defines: {
 						RINGS: shaderSettings.rings,
-						SAMPLES: shaderSettings.samples,
-						DEPTH_PACKING: 1 // RGBADepth
+						SAMPLES: shaderSettings.samples
 					}
 
 				} );
@@ -414,7 +435,6 @@ Use WEBGL Depth buffer support?
 				return - zfar * znear / ( depth * ( zfar - znear ) - zfar );
 
 			}
-
 
 			function smoothstep( near, far, depth ) {
 
@@ -452,15 +472,15 @@ Use WEBGL Depth buffer support?
 
 						var targetDistance = intersects[ 0 ].distance;
 
-						distance += (targetDistance - distance) * 0.03;
+						distance += ( targetDistance - distance ) * 0.03;
 
-						var sdistance = smoothstep(camera.near, camera.far, distance);
+						var sdistance = smoothstep( camera.near, camera.far, distance );
 
-						var ldistance = linearize(1 -  sdistance);
+						var ldistance = linearize( 1 - sdistance );
 
 						postprocessing.bokeh_uniforms[ 'focalDepth' ].value = ldistance;
 
-						effectController['focalDepth'] = ldistance;
+						effectController[ 'focalDepth' ] = ldistance;
 
 					}
 
@@ -510,7 +530,6 @@ Use WEBGL Depth buffer support?
 				}
 
 			}
-
 
 		</script>
 	</body>

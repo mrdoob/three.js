@@ -23,7 +23,6 @@ var constants = {
 	colors: {
 
 		'THREE.NoColors': THREE.NoColors,
-		'THREE.FaceColors': THREE.FaceColors,
 		'THREE.VertexColors': THREE.VertexColors
 
 	},
@@ -128,51 +127,19 @@ var textureMapKeys = getObjectsKeys( textureMaps );
 
 function generateVertexColors( geometry ) {
 
-	for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
+	var positionAttribute = geometry.attributes.position;
 
-		geometry.faces[ i ].vertexColors.push( new THREE.Color().setHSL(
-			i / il * Math.random(),
-			0.5,
-			0.5
-		) );
-		geometry.faces[ i ].vertexColors.push( new THREE.Color().setHSL(
-			i / il * Math.random(),
-			0.5,
-			0.5
-		) );
-		geometry.faces[ i ].vertexColors.push( new THREE.Color().setHSL(
-			i / il * Math.random(),
-			0.5,
-			0.5
-		) );
+	var colors = [];
+	var color = new THREE.Color();
 
-		geometry.faces[ i ].color = new THREE.Color().setHSL(
-			i / il * Math.random(),
-			0.5,
-			0.5
-		);
+	for ( var i = 0, il = positionAttribute.count; i < il; i ++ ) {
+
+		color.setHSL( i / il * Math.random(), 0.5, 0.5 );
+		colors.push( color.r, color.g, color.b );
 
 	}
 
-}
-
-function generateMorphTargets( mesh, geometry ) {
-
-	var vertices = [], scale;
-
-	for ( var i = 0; i < geometry.vertices.length; i ++ ) {
-
-		vertices.push( geometry.vertices[ i ].clone() );
-
-		scale = 1 + Math.random() * 0.3;
-
-		vertices[ vertices.length - 1 ].x *= scale;
-		vertices[ vertices.length - 1 ].y *= scale;
-		vertices[ vertices.length - 1 ].z *= scale;
-
-	}
-
-	geometry.morphTargets.push( { name: 'target1', vertices: vertices } );
+	geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 }
 
@@ -196,23 +163,12 @@ function needsUpdate( material, geometry ) {
 
 	return function () {
 
-		material.vertexColors = + material.vertexColors; //Ensure number
-		material.side = + material.side; //Ensure number
+		material.vertexColors = parseInt( material.vertexColors ); //Ensure number
+		material.side = parseInt( material.side ); //Ensure number
 		material.needsUpdate = true;
-		geometry.verticesNeedUpdate = true;
-		geometry.normalsNeedUpdate = true;
-		geometry.colorsNeedUpdate = true;
-
-	};
-
-}
-
-function updateMorphs( torus, material ) {
-
-	return function () {
-
-		torus.updateMorphTargets();
-		material.needsUpdate = true;
+		geometry.attributes.position.needsUpdate = true;
+		geometry.attributes.normal.needsUpdate = true;
+		geometry.attributes.color.needsUpdate = true;
 
 	};
 
@@ -302,7 +258,6 @@ function guiMaterial( gui, mesh, material, geometry ) {
 	// folder.add( material, 'polygonOffsetFactor' );
 	// folder.add( material, 'polygonOffsetUnits' );
 	folder.add( material, 'alphaTest', 0, 1 );
-	// folder.add( material, 'overdraw', 0, 5 );
 	folder.add( material, 'visible' );
 	folder.add( material, 'side', constants.side ).onChange( needsUpdate( material, geometry ) );
 
@@ -330,8 +285,7 @@ function guiMeshBasicMaterial( gui, mesh, material, geometry ) {
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
 	folder.add( data, 'specularMap', textureMapKeys ).onChange( updateTexture( material, 'specularMap', textureMaps ) );
 	folder.add( data, 'alphaMap', textureMapKeys ).onChange( updateTexture( material, 'alphaMap', textureMaps ) );
-	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
-	folder.add( material, 'combine', constants.combine ).onChange( updateMorphs( mesh, material ) );
+	folder.add( material, 'combine', constants.combine );
 	folder.add( material, 'reflectivity', 0, 1 );
 	folder.add( material, 'refractionRatio', 0, 1 );
 
@@ -343,7 +297,6 @@ function guiMeshDepthMaterial( gui, mesh, material, geometry ) {
 
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
 
 }
 
@@ -354,7 +307,6 @@ function guiMeshNormalMaterial( gui, mesh, material, geometry ) {
 	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
 
 }
 
@@ -400,11 +352,9 @@ function guiMeshLambertMaterial( gui, mesh, material, geometry ) {
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
 	folder.add( data, 'specularMap', textureMapKeys ).onChange( updateTexture( material, 'specularMap', textureMaps ) );
 	folder.add( data, 'alphaMap', textureMapKeys ).onChange( updateTexture( material, 'alphaMap', textureMaps ) );
-	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
-	folder.add( material, 'combine', constants.combine ).onChange( updateMorphs( mesh, material ) );
+	folder.add( material, 'combine', constants.combine );
 	folder.add( material, 'reflectivity', 0, 1 );
 	folder.add( material, 'refractionRatio', 0, 1 );
-	//folder.add( material, 'skinning' );
 
 }
 
@@ -431,7 +381,7 @@ function guiMeshPhongMaterial( gui, mesh, material, geometry ) {
 	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'vertexColors', constants.colors );
+	folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
@@ -463,7 +413,7 @@ function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'vertexColors', constants.colors );
+	folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
@@ -499,7 +449,7 @@ function guiMeshPhysicalMaterial( gui, mesh, material, geometry ) {
 	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'vertexColors', constants.colors );
+	folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );

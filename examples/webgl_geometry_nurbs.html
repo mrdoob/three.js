@@ -45,7 +45,6 @@
 			var mouseXOnMouseDown = 0;
 
 			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -68,7 +67,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
-				
+
 				scene.add( new THREE.AmbientLight( 0x808080 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
@@ -112,7 +111,7 @@
 				var nurbsGeometry = new THREE.BufferGeometry();
 				nurbsGeometry.setFromPoints( nurbsCurve.getPoints( 200 ) );
 
-				var nurbsMaterial = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333 } );
+				var nurbsMaterial = new THREE.LineBasicMaterial( { color: 0x333333 } );
 
 				var nurbsLine = new THREE.Line( nurbsGeometry, nurbsMaterial );
 				nurbsLine.position.set( 200, - 100, 0 );
@@ -121,7 +120,7 @@
 				var nurbsControlPointsGeometry = new THREE.BufferGeometry();
 				nurbsControlPointsGeometry.setFromPoints( nurbsCurve.controlPoints );
 
-				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { linewidth: 2, color: 0x333333, opacity: 0.25, transparent: true } );
+				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { color: 0x333333, opacity: 0.25, transparent: true } );
 
 				var nurbsControlPointsLine = new THREE.Line( nurbsControlPointsGeometry, nurbsControlPointsMaterial );
 				nurbsControlPointsLine.position.copy( nurbsLine.position );
@@ -131,37 +130,37 @@
 
 				var nsControlPoints = [
 					[
-						new THREE.Vector4 ( -200, -200, 100, 1 ),
-						new THREE.Vector4 ( -200, -100, -200, 1 ),
-						new THREE.Vector4 ( -200, 100, 250, 1 ),
-						new THREE.Vector4 ( -200, 200, -100, 1 )
+						new THREE.Vector4( - 200, - 200, 100, 1 ),
+						new THREE.Vector4( - 200, - 100, - 200, 1 ),
+						new THREE.Vector4( - 200, 100, 250, 1 ),
+						new THREE.Vector4( - 200, 200, - 100, 1 )
 					],
 					[
-						new THREE.Vector4 ( 0, -200, 0, 1 ),
-						new THREE.Vector4 ( 0, -100, -100, 5 ),
-						new THREE.Vector4 ( 0, 100, 150, 5 ),
-						new THREE.Vector4 ( 0, 200, 0, 1 )
+						new THREE.Vector4( 0, - 200, 0, 1 ),
+						new THREE.Vector4( 0, - 100, - 100, 5 ),
+						new THREE.Vector4( 0, 100, 150, 5 ),
+						new THREE.Vector4( 0, 200, 0, 1 )
 					],
 					[
-						new THREE.Vector4 ( 200, -200, -100, 1 ),
-						new THREE.Vector4 ( 200, -100, 200, 1 ),
-						new THREE.Vector4 ( 200, 100, -250, 1 ),
-						new THREE.Vector4 ( 200, 200, 100, 1 )
+						new THREE.Vector4( 200, - 200, - 100, 1 ),
+						new THREE.Vector4( 200, - 100, 200, 1 ),
+						new THREE.Vector4( 200, 100, - 250, 1 ),
+						new THREE.Vector4( 200, 200, 100, 1 )
 					]
 				];
 				var degree1 = 2;
 				var degree2 = 3;
-				var knots1 = [0, 0, 0, 1, 1, 1];
-				var knots2 = [0, 0, 0, 0, 1, 1, 1, 1];
-				var nurbsSurface = new THREE.NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
+				var knots1 = [ 0, 0, 0, 1, 1, 1 ];
+				var knots2 = [ 0, 0, 0, 0, 1, 1, 1, 1 ];
+				var nurbsSurface = new THREE.NURBSSurface( degree1, degree2, knots1, knots2, nsControlPoints );
 
 				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				function getSurfacePoint( u, v ) {
+				function getSurfacePoint( u, v, target ) {
 
-					return nurbsSurface.getPoint( u, v );
+					return nurbsSurface.getPoint( u, v, target );
 
 				}
 
@@ -195,7 +194,6 @@
 			function onWindowResize() {
 
 				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -227,7 +225,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -235,7 +233,7 @@
 
 			}
 
-			function onDocumentMouseOut( event ) {
+			function onDocumentMouseOut() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );

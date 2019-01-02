@@ -39,16 +39,20 @@
 		<script src="js/libs/tween.min.js"></script>
 		<script src="js/loaders/ColladaLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
-			var camera, scene, renderer, objects;
+			var camera, scene, renderer;
 			var particleLight;
 			var dae;
 
@@ -149,7 +153,7 @@
 
 							tweenParameters[ prop ] = position;
 
-							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max )
+							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max );
 
 						}
 
@@ -159,7 +163,7 @@
 
 				kinematicsTween = new TWEEN.Tween( tweenParameters ).to( target, duration ).easing( TWEEN.Easing.Quadratic.Out );
 
-				kinematicsTween.onUpdate( function() {
+				kinematicsTween.onUpdate( function () {
 
 					for ( var prop in kinematics.joints ) {
 
@@ -212,7 +216,7 @@
 				camera.position.y = 10;
 				camera.position.z = Math.sin( timer ) * 20;
 
-				camera.lookAt( new THREE.Vector3( 0, 5, 0 ) );
+				camera.lookAt( 0, 5, 0 );
 
 				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;

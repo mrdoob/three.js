@@ -39,11 +39,15 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var mesh, renderer, scene, camera;
 
@@ -60,8 +64,6 @@
 			};
 
 			init();
-			render();
-
 
 			function init() {
 
@@ -84,20 +86,25 @@
 
 				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 
-				var loader = new THREE.TextureLoader();
-				var texture = loader.load( 'textures/UV_Grid_Sm.jpg', render );
-				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg', function ( texture ) {
 
-				texture.matrixAutoUpdate = false; // set this to false to update texture.matrix manually
+					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+					texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+					//texture.matrixAutoUpdate = false; // default true; set to false to update texture.matrix manually
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+					var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-				updateUvTransform();
+					mesh = new THREE.Mesh( geometry, material );
+					scene.add( mesh );
 
-				initGui();
+					updateUvTransform();
+
+					initGui();
+
+					render();
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -153,8 +160,6 @@
 			}
 
 			function initGui() {
-
-				var drop;
 
 				gui = new dat.GUI();
 

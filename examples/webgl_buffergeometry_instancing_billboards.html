@@ -27,7 +27,7 @@
 			color: #ffffff;
 		}
 
-		#oldie a {
+		#webglmessage a {
 			color: #da0;
 		}
 
@@ -48,7 +48,7 @@
 	</div>
 
 	<script src="../build/three.js"></script>
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vshader" type="x-shader/x-vertex">
@@ -116,9 +116,9 @@
 
 		function init() {
 
-			if ( !Detector.webgl ) {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 				return false;
 
 			}
@@ -126,8 +126,10 @@
 			renderer = new THREE.WebGLRenderer();
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+
 				document.getElementById( 'notSupported' ).style.display = '';
 				return false;
+
 			}
 
 			container = document.createElement( 'div' );
@@ -156,12 +158,12 @@
 
 			}
 
-			geometry.addAttribute( 'translate', new THREE.InstancedBufferAttribute( translateArray, 3, 1 ) );
+			geometry.addAttribute( 'translate', new THREE.InstancedBufferAttribute( translateArray, 3 ) );
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
-					map: { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
-					time: { value: 0.0 }
+					"map": { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
+					"time": { value: 0.0 }
 				},
 				vertexShader: document.getElementById( 'vshader' ).textContent,
 				fragmentShader: document.getElementById( 'fshader' ).textContent,
@@ -208,7 +210,7 @@
 
 			var time = performance.now() * 0.0005;
 
-			material.uniforms.time.value = time;
+			material.uniforms[ "time" ].value = time;
 
 			mesh.rotation.x = time * 0.2;
 			mesh.rotation.y = time * 0.4;

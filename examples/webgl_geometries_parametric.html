@@ -35,7 +35,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/CurveExtras.js"></script>
@@ -43,7 +43,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats;
 
@@ -100,11 +104,15 @@
 
 				//
 
-				var GrannyKnot =  new THREE.Curves.GrannyKnot();
+				var GrannyKnot = new THREE.Curves.GrannyKnot();
 
 				var torus = new THREE.ParametricGeometries.TorusKnotGeometry( 50, 10, 50, 20, 2, 3 );
 				var sphere = new THREE.ParametricGeometries.SphereGeometry( 50, 20, 10 );
 				var tube = new THREE.ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true, false );
+
+				torus = new THREE.BufferGeometry().fromGeometry( torus );
+				sphere = new THREE.BufferGeometry().fromGeometry( sphere );
+				tube = new THREE.BufferGeometry().fromGeometry( tube );
 
 				object = new THREE.Mesh( torus, material );
 				object.position.set( - 200, 0, - 200 );
@@ -160,7 +168,7 @@
 
 				camera.lookAt( scene.position );
 
-				scene.traverse( function( object ) {
+				scene.traverse( function ( object ) {
 
 					if ( object.isMesh === true ) {
 

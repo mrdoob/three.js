@@ -36,7 +36,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Physically accurate lighting example using a incandescent bulb - by <a href="http://clara.io" target="_blank" rel="noopener">Ben Houston</a><br />
-			Using real world scale: Brick cube is 1 meter in size.  Light is 2 meters from floor.  Globe is 25 cm in diameter.<br/>
+			Using real world scale: Brick cube is 50 cm in size. Globe is 50 cm in diameter.<br/>
 			Using Reinhard inline tonemapping with real-world light falloff (decay = 2).
 		</div>
 
@@ -44,15 +44,18 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer,
-			bulbLight, bulbMat, hemiLight,
-			object, loader, stats;
+				bulbLight, bulbMat, hemiLight, stats;
 			var ballMat, cubeMat, floorMat;
 
 
@@ -87,11 +90,8 @@
 				shadows: true,
 				exposure: 0.68,
 				bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
-				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[0]
+				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[ 0 ]
 			};
-
-
-			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -105,7 +105,7 @@
 
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.x = -4;
+				camera.position.x = - 4;
 				camera.position.z = 4;
 				camera.position.y = 2;
 
@@ -118,7 +118,7 @@
 					emissive: 0xffffee,
 					emissiveIntensity: 1,
 					color: 0x000000
-				});
+				} );
 				bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );
 				bulbLight.position.set( 0, 2, 0 );
 				bulbLight.castShadow = true;
@@ -132,93 +132,107 @@
 					color: 0xffffff,
 					metalness: 0.2,
 					bumpScale: 0.0005
-				});
+				} );
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "textures/hardwood2_diffuse.jpg", function( map ) {
+				textureLoader.load( "textures/hardwood2_diffuse.jpg", function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 10, 24 );
 					floorMat.map = map;
 					floorMat.needsUpdate = true;
-				} );
-				textureLoader.load( "textures/hardwood2_bump.jpg", function( map ) {
+
+	} );
+				textureLoader.load( "textures/hardwood2_bump.jpg", function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 10, 24 );
 					floorMat.bumpMap = map;
 					floorMat.needsUpdate = true;
-				} );
-				textureLoader.load( "textures/hardwood2_roughness.jpg", function( map ) {
+
+	} );
+				textureLoader.load( "textures/hardwood2_roughness.jpg", function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 10, 24 );
 					floorMat.roughnessMap = map;
 					floorMat.needsUpdate = true;
-				} );
+
+	} );
 
 				cubeMat = new THREE.MeshStandardMaterial( {
 					roughness: 0.7,
 					color: 0xffffff,
 					bumpScale: 0.002,
 					metalness: 0.2
-				});
-				textureLoader.load( "textures/brick_diffuse.jpg", function( map ) {
+				} );
+				textureLoader.load( "textures/brick_diffuse.jpg", function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 1, 1 );
 					cubeMat.map = map;
 					cubeMat.needsUpdate = true;
-				} );
-				textureLoader.load( "textures/brick_bump.jpg", function( map ) {
+
+	} );
+				textureLoader.load( "textures/brick_bump.jpg", function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 1, 1 );
 					cubeMat.bumpMap = map;
 					cubeMat.needsUpdate = true;
-				} );
+
+	} );
 
 				ballMat = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					roughness: 0.5,
 					metalness: 1.0
-				});
-				textureLoader.load( "textures/planets/earth_atmos_2048.jpg", function( map ) {
+				} );
+				textureLoader.load( "textures/planets/earth_atmos_2048.jpg", function ( map ) {
+
 					map.anisotropy = 4;
 					ballMat.map = map;
 					ballMat.needsUpdate = true;
-				} );
-				textureLoader.load( "textures/planets/earth_specular_2048.jpg", function( map ) {
+
+	} );
+				textureLoader.load( "textures/planets/earth_specular_2048.jpg", function ( map ) {
+
 					map.anisotropy = 4;
 					ballMat.metalnessMap = map;
 					ballMat.needsUpdate = true;
-				} );
+
+	} );
 
 				var floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
 				var floorMesh = new THREE.Mesh( floorGeometry, floorMat );
 				floorMesh.receiveShadow = true;
-				floorMesh.rotation.x = -Math.PI / 2.0;
+				floorMesh.rotation.x = - Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				var ballGeometry = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
+				var ballGeometry = new THREE.SphereBufferGeometry( 0.25, 32, 32 );
 				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
-				ballMesh.position.set( 1, 0.5, 1 );
+				ballMesh.position.set( 1, 0.25, 1 );
 				ballMesh.rotation.y = Math.PI;
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );
 
 				var boxGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5 );
 				var boxMesh = new THREE.Mesh( boxGeometry, cubeMat );
-				boxMesh.position.set( -0.5, 0.25, -1 );
+				boxMesh.position.set( - 0.5, 0.25, - 1 );
 				boxMesh.castShadow = true;
 				scene.add( boxMesh );
 
 				var boxMesh2 = new THREE.Mesh( boxGeometry, cubeMat );
-				boxMesh2.position.set( 0, 0.25, -5 );
+				boxMesh2.position.set( 0, 0.25, - 5 );
 				boxMesh2.castShadow = true;
 				scene.add( boxMesh2 );
 
@@ -251,7 +265,8 @@
 				gui.add( params, 'exposure', 0, 1 );
 				gui.add( params, 'shadows' );
 				gui.open();
-			}
+
+}
 
 			function onWindowResize() {
 
@@ -279,18 +294,19 @@
 				renderer.toneMappingExposure = Math.pow( params.exposure, 5.0 ); // to allow for very bright scenes.
 				renderer.shadowMap.enabled = params.shadows;
 				bulbLight.castShadow = params.shadows;
-				if( params.shadows !== previousShadowMap ) {
+				if ( params.shadows !== previousShadowMap ) {
+
 					ballMat.needsUpdate = true;
 					cubeMat.needsUpdate = true;
 					floorMat.needsUpdate = true;
 					previousShadowMap = params.shadows;
-				}
+
+	}
 				bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
 
 				hemiLight.intensity = hemiLuminousIrradiances[ params.hemiIrradiance ];
 				var time = Date.now() * 0.0005;
-				var delta = clock.getDelta();
 
 				bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
 

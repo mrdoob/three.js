@@ -13,15 +13,16 @@ THREE.ColladaLoader.prototype = {
 
 	constructor: THREE.ColladaLoader,
 
-	crossOrigin: 'Anonymous',
+	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = scope.path === undefined ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text, path ) );
@@ -33,6 +34,14 @@ THREE.ColladaLoader.prototype = {
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
+
+	},
+
+	setResourcePath: function ( value ) {
+
+		this.resourcePath = value;
+		return this;
 
 	},
 
@@ -49,6 +58,7 @@ THREE.ColladaLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
@@ -965,7 +975,15 @@ THREE.ColladaLoader.prototype = {
 
 			// setup bind matrix
 
-			build.bindMatrix = new THREE.Matrix4().fromArray( data.bindShapeMatrix ).transpose();
+			if ( data.bindShapeMatrix ) {
+
+				build.bindMatrix = new THREE.Matrix4().fromArray( data.bindShapeMatrix ).transpose();
+
+			} else {
+
+				build.bindMatrix = new THREE.Matrix4().identity();
+
+			}
 
 			// process bones and inverse bind matrix data
 
@@ -1210,6 +1228,8 @@ THREE.ColladaLoader.prototype = {
 					case 'emission':
 					case 'diffuse':
 					case 'specular':
+					case 'bump':
+					case 'ambient':
 					case 'shininess':
 					case 'transparency':
 						data[ child.nodeName ] = parseEffectParameter( child );
@@ -1439,6 +1459,28 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function getTextureLoader( image ) {
+
+			var loader;
+
+			var extension = image.slice( ( image.lastIndexOf( '.' ) - 1 >>> 0 ) + 2 ); // http://www.jstips.co/en/javascript/get-file-extension/
+			extension = extension.toLowerCase();
+
+			switch ( extension ) {
+
+				case 'tga':
+					loader = tgaLoader;
+					break;
+
+				default:
+					loader = textureLoader;
+
+			}
+
+			return loader;
+
+		}
+
 		function buildMaterial( data ) {
 
 			var effect = getEffect( data.url );
@@ -1489,28 +1531,40 @@ THREE.ColladaLoader.prototype = {
 
 				if ( image !== null ) {
 
-					var texture = textureLoader.load( image );
+					var loader = getTextureLoader( image );
 
-					var extra = textureObject.extra;
+					if ( loader !== undefined ) {
 
-					if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
+						var texture = loader.load( image );
 
-						var technique = extra.technique;
+						var extra = textureObject.extra;
 
-						texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-						texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+						if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
 
-						texture.offset.set( technique.offsetU || 0, technique.offsetV || 0 );
-						texture.repeat.set( technique.repeatU || 1, technique.repeatV || 1 );
+							var technique = extra.technique;
+
+							texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+							texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+
+							texture.offset.set( technique.offsetU || 0, technique.offsetV || 0 );
+							texture.repeat.set( technique.repeatU || 1, technique.repeatV || 1 );
+
+						} else {
+
+							texture.wrapS = THREE.RepeatWrapping;
+							texture.wrapT = THREE.RepeatWrapping;
+
+						}
+
+						return texture;
 
 					} else {
 
-						texture.wrapS = THREE.RepeatWrapping;
-						texture.wrapT = THREE.RepeatWrapping;
+						console.warn( 'THREE.ColladaLoader: Loader for texture %s not found.', image );
+
+						return null;
 
 					}
-
-					return texture;
 
 				} else {
 
@@ -1537,6 +1591,12 @@ THREE.ColladaLoader.prototype = {
 					case 'specular':
 						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
 						if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
+						break;
+					case 'bump':
+						if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
+						break;
+					case 'ambient':
+						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
@@ -2070,7 +2130,9 @@ THREE.ColladaLoader.prototype = {
 						var id = parseId( child.getAttribute( 'source' ) );
 						var semantic = child.getAttribute( 'semantic' );
 						var offset = parseInt( child.getAttribute( 'offset' ) );
-						primitive.inputs[ semantic ] = { id: id, offset: offset };
+						var set = parseInt( child.getAttribute( 'set' ) );
+						var inputname = ( set > 0 ? semantic + set : semantic );
+						primitive.inputs[ inputname ] = { id: id, offset: offset };
 						primitive.stride = Math.max( primitive.stride, offset + 1 );
 						if ( semantic === 'TEXCOORD' ) primitive.hasUV = true;
 						break;
@@ -2173,6 +2235,7 @@ THREE.ColladaLoader.prototype = {
 			var position = { array: [], stride: 0 };
 			var normal = { array: [], stride: 0 };
 			var uv = { array: [], stride: 0 };
+			var uv2 = { array: [], stride: 0 };
 			var color = { array: [], stride: 0 };
 
 			var skinIndex = { array: [], stride: 4 };
@@ -2305,6 +2368,11 @@ THREE.ColladaLoader.prototype = {
 										uv.stride = sources[ id ].stride;
 										break;
 
+									case 'TEXCOORD1':
+										buildGeometryData( primitive, sources[ id ], input.offset, uv2.array );
+										uv.stride = sources[ id ].stride;
+										break;
+
 									default:
 										console.warn( 'THREE.ColladaLoader: Semantic "%s" not handled in geometry build process.', key );
 
@@ -2328,6 +2396,11 @@ THREE.ColladaLoader.prototype = {
 							uv.stride = sources[ input.id ].stride;
 							break;
 
+						case 'TEXCOORD1':
+							buildGeometryData( primitive, sources[ input.id ], input.offset, uv2.array );
+							uv2.stride = sources[ input.id ].stride;
+							break;
+
 					}
 
 				}
@@ -2340,6 +2413,7 @@ THREE.ColladaLoader.prototype = {
 			if ( normal.array.length > 0 ) geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normal.array, normal.stride ) );
 			if ( color.array.length > 0 ) geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( color.array, color.stride ) );
 			if ( uv.array.length > 0 ) geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uv.array, uv.stride ) );
+			if ( uv2.array.length > 0 ) geometry.addAttribute( 'uv2', new THREE.Float32BufferAttribute( uv2.array, uv2.stride ) );
 
 			if ( skinIndex.array.length > 0 ) geometry.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
 			if ( skinWeight.array.length > 0 ) geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
@@ -2685,6 +2759,82 @@ THREE.ColladaLoader.prototype = {
 			return data;
 
 		}
+
+		// physics
+
+		function parsePhysicsModel( xml ) {
+
+			var data = {
+				name: xml.getAttribute( 'name' ) || '',
+				rigidBodies: {}
+			};
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'rigid_body':
+						data.rigidBodies[ child.getAttribute( 'name' ) ] = {};
+						parsePhysicsRigidBody( child, data.rigidBodies[ child.getAttribute( 'name' ) ] );
+						break;
+
+				}
+
+			}
+
+			library.physicsModels[ xml.getAttribute( 'id' ) ] = data;
+
+		}
+
+		function parsePhysicsRigidBody( xml, data ) {
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'technique_common':
+						parsePhysicsTechniqueCommon( child, data );
+						break;
+
+				}
+
+			}
+
+		}
+
+		function parsePhysicsTechniqueCommon( xml, data ) {
+
+			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'inertia':
+						data.inertia = parseFloats( child.textContent );
+						break;
+
+					case 'mass':
+						data.mass = parseFloats( child.textContent )[0];
+						break;
+
+				}
+
+			}
+
+		}
+
+		// scene
 
 		function parseKinematicsScene( xml ) {
 
@@ -3097,7 +3247,15 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			library.nodes[ data.id ] = data;
+			if ( hasNode( data.id ) ) {
+
+				console.warn( 'THREE.ColladaLoader: There is already a node with ID %s. Exclude current node from further processing.', data.id );
+
+			} else {
+
+				library.nodes[ data.id ] = data;
+
+			}
 
 			return data;
 
@@ -3282,7 +3440,7 @@ THREE.ColladaLoader.prototype = {
 						// and weights defined for it. But we still have to add the bone to the sorted bone list in order to
 						// ensure a correct animation of the model.
 
-						 boneInverse = new THREE.Matrix4();
+						boneInverse = new THREE.Matrix4();
 
 					}
 
@@ -3433,6 +3591,8 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		var fallbackMaterial = new THREE.MeshBasicMaterial( { color: 0xff00ff } );
+
 		function resolveMaterialBinding( keys, instanceMaterials ) {
 
 			var materials = [];
@@ -3440,7 +3600,17 @@ THREE.ColladaLoader.prototype = {
 			for ( var i = 0, l = keys.length; i < l; i ++ ) {
 
 				var id = instanceMaterials[ keys[ i ] ];
-				materials.push( getMaterial( id ) );
+
+				if ( id === undefined ) {
+
+					console.warn( 'THREE.ColladaLoader: Material with key %s not found. Apply fallback material.', keys[ i ] );
+					materials.push( fallbackMaterial );
+
+				} else {
+
+					materials.push( getMaterial( id ) );
+
+				}
 
 			}
 
@@ -3661,7 +3831,16 @@ THREE.ColladaLoader.prototype = {
 
 		var asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 		var textureLoader = new THREE.TextureLoader( this.manager );
-		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+
+		var tgaLoader;
+
+		if ( THREE.TGALoader ) {
+
+			tgaLoader = new THREE.TGALoader( this.manager );
+			tgaLoader.setPath( this.resourcePath || path );
+
+		}
 
 		//
 
@@ -3684,6 +3863,7 @@ THREE.ColladaLoader.prototype = {
 			nodes: {},
 			visualScenes: {},
 			kinematicsModels: {},
+			physicsModels: {},
 			kinematicsScenes: {}
 		};
 
@@ -3699,6 +3879,7 @@ THREE.ColladaLoader.prototype = {
 		parseLibrary( collada, 'library_nodes', 'node', parseNode );
 		parseLibrary( collada, 'library_visual_scenes', 'visual_scene', parseVisualScene );
 		parseLibrary( collada, 'library_kinematics_models', 'kinematics_model', parseKinematicsModel );
+		parseLibrary( collada, 'library_physics_models', 'physics_model', parsePhysicsModel );
 		parseLibrary( collada, 'scene', 'instance_kinematics_scene', parseKinematicsScene );
 
 		buildLibrary( library.animations, buildAnimation );

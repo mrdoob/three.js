@@ -4,8 +4,10 @@
 		<title>three.js webvr - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-05-12 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-05-12" content="AkM+gi6Fb7IUBwFLs18hn/x6dusbsVRYG9KBTWUUjvmT0m0wGkxRPy63Aj/i+Ti4d6qMEMnRcsR7MVV5Wuvp/AIAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyNjExODIwMH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
 		<style>
 			body {
 				margin: 0px;
@@ -69,7 +71,7 @@
 				light.target.position.set( 0, 0, - 2 );
 				scene.add( light.target );
 
-				var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				var light = new THREE.DirectionalLight( 0xff0000 );
@@ -80,7 +82,7 @@
 				light.target.position.set( 0, 0, - 2 );
 				scene.add( light.target );
 
-				var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				// lensflare
@@ -89,7 +91,7 @@
 				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
 				var lensflare = new THREE.Lensflare();
-				lensflare.position.set( 0, 5, -5 );
+				lensflare.position.set( 0, 5, - 5 );
 				lensflare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
 				lensflare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
 				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
@@ -106,7 +108,7 @@
 				} );
 				reflector.position.x = 1;
 				reflector.position.y = 0.5;
-				reflector.position.z = -3;
+				reflector.position.z = - 3;
 				reflector.rotation.y = - Math.PI / 4;
 				scene.add( reflector );
 
@@ -121,7 +123,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x000000 );
+				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -147,7 +149,7 @@
 
 			function animate() {
 
-				renderer.animate( render );
+				renderer.setAnimationLoop( render );
 
 			}
 

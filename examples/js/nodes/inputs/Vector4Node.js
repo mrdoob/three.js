@@ -2,27 +2,38 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.Vector4Node = function ( x, y, z, w ) {
+import { InputNode } from '../core/InputNode.js';
+import { NodeUtils } from '../core/NodeUtils.js';
 
-	THREE.InputNode.call( this, 'v4' );
+function Vector4Node( x, y, z, w ) {
 
-	this.value = new THREE.Vector4( x, y, z, w );
+	InputNode.call( this, 'v4' );
 
-};
+	this.value = x instanceof THREE.Vector4 ? x : new THREE.Vector4( x, y, z, w );
 
-THREE.Vector4Node.prototype = Object.create( THREE.InputNode.prototype );
-THREE.Vector4Node.prototype.constructor = THREE.Vector4Node;
-THREE.Vector4Node.prototype.nodeType = "Vector4";
+}
 
-THREE.NodeMaterial.addShortcuts( THREE.Vector4Node.prototype, 'value', [ 'x', 'y', 'z', 'w' ] );
+Vector4Node.prototype = Object.create( InputNode.prototype );
+Vector4Node.prototype.constructor = Vector4Node;
+Vector4Node.prototype.nodeType = "Vector4";
 
-THREE.Vector4Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+NodeUtils.addShortcuts( Vector4Node.prototype, 'value', [ 'x', 'y', 'z', 'w' ] );
+
+Vector4Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
 	return builder.format( "vec4( " + this.x + ", " + this.y + ", " + this.z + ", " + this.w + " )", type, output );
 
 };
 
-THREE.Vector4Node.prototype.toJSON = function ( meta ) {
+Vector4Node.prototype.copy = function ( source ) {
+
+	InputNode.prototype.copy.call( this, source );
+
+	this.value.copy( source );
+
+};
+
+Vector4Node.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -42,3 +53,5 @@ THREE.Vector4Node.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+export { Vector4Node };

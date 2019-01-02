@@ -512,16 +512,19 @@ export default QUnit.module( 'Core', () => {
 					"receiveShadow": true,
 					"visible": false,
 					"userData": { "foo": "bar" },
+					"layers": 1,
 					"matrix": [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
 					"children": [
 						{
 							"uuid": "5D4E9AE8-DA61-4912-A575-71A5BE3D72CD",
 							"type": "Object3D",
+							"layers": 1,
 							"matrix": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ],
 							"children": [
 								{
 									"uuid": "B43854B3-E970-4E85-BD41-AAF8D7BFA189",
 									"type": "Object3D",
+									"layers": 1,
 									"matrix": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ]
 								}
 							]

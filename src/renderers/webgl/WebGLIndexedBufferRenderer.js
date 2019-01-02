@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLIndexedBufferRenderer( gl, extensions, info ) {
+function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 	var mode;
 
@@ -31,16 +31,26 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 	function renderInstances( geometry, start, count ) {
 
-		var extension = extensions.get( 'ANGLE_instanced_arrays' );
+		var extension;
 
-		if ( extension === null ) {
+		if ( capabilities.isWebGL2 ) {
 
-			console.error( 'THREE.WebGLIndexedBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-			return;
+			extension = gl;
+
+		} else {
+
+			var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+			if ( extension === null ) {
+
+				console.error( 'THREE.WebGLIndexedBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+				return;
+
+			}
 
 		}
 
-		extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
+		extension[ capabilities.isWebGL2 ? 'drawElementsInstanced' : 'drawElementsInstancedANGLE' ]( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
 
 		info.update( count, mode, geometry.maxInstancedCount );
 

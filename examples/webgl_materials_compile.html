@@ -22,7 +22,7 @@
 				text-align: center;
 				display:block;
 			}
-			
+
 			#waitScreen {
 				color: #000;
 			    position: absolute;
@@ -33,7 +33,7 @@
 			    width: 100px;
 			    height: 100px;
 			}
-			
+
 			.hide {
 				display:none;
 			}
@@ -59,67 +59,9 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<!-- NodeLibrary -->
-		<script src="js/nodes/GLNode.js"></script>
-		<script src="js/nodes/RawNode.js"></script>
-		<script src="js/nodes/TempNode.js"></script>
-		<script src="js/nodes/InputNode.js"></script>
-		<script src="js/nodes/ConstNode.js"></script>
-		<script src="js/nodes/VarNode.js"></script>
-		<script src="js/nodes/FunctionNode.js"></script>
-		<script src="js/nodes/FunctionCallNode.js"></script>
-		<script src="js/nodes/AttributeNode.js"></script>
-		<script src="js/nodes/NodeBuilder.js"></script>
-		<script src="js/nodes/NodeLib.js"></script>
-		<script src="js/nodes/NodeFrame.js"></script>
-		<script src="js/nodes/NodeMaterial.js"></script>
+		<script type="module">
 
-		<!-- Accessors -->
-		<script src="js/nodes/accessors/PositionNode.js"></script>
-		<script src="js/nodes/accessors/NormalNode.js"></script>
-		<script src="js/nodes/accessors/UVNode.js"></script>
-		<script src="js/nodes/accessors/ScreenUVNode.js"></script>
-		<script src="js/nodes/accessors/ColorsNode.js"></script>
-		<script src="js/nodes/accessors/CameraNode.js"></script>
-		<script src="js/nodes/accessors/ReflectNode.js"></script>
-		<script src="js/nodes/accessors/LightNode.js"></script>
-
-		<!-- Inputs -->
-		<script src="js/nodes/inputs/IntNode.js"></script>
-		<script src="js/nodes/inputs/FloatNode.js"></script>
-		<script src="js/nodes/inputs/ColorNode.js"></script>
-		<script src="js/nodes/inputs/Vector2Node.js"></script>
-		<script src="js/nodes/inputs/Vector3Node.js"></script>
-		<script src="js/nodes/inputs/Vector4Node.js"></script>
-		<script src="js/nodes/inputs/TextureNode.js"></script>
-		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
-
-		<!-- Math -->
-		<script src="js/nodes/math/Math1Node.js"></script>
-		<script src="js/nodes/math/Math2Node.js"></script>
-		<script src="js/nodes/math/Math3Node.js"></script>
-		<script src="js/nodes/math/OperatorNode.js"></script>
-
-		<!-- Utils -->
-		<script src="js/nodes/utils/SwitchNode.js"></script>
-		<script src="js/nodes/utils/JoinNode.js"></script>
-		<script src="js/nodes/utils/TimerNode.js"></script>
-		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
-		<script src="js/nodes/utils/VelocityNode.js"></script>
-		<script src="js/nodes/utils/LuminanceNode.js"></script>
-		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
-		<script src="js/nodes/utils/NoiseNode.js"></script>
-		<script src="js/nodes/utils/ResolutionNode.js"></script>
-		<script src="js/nodes/utils/BumpNode.js"></script>
-		<script src="js/nodes/utils/BlurNode.js"></script>
-
-		<!-- Phong Material -->
-		<script src="js/nodes/materials/PhongNode.js"></script>
-		<script src="js/nodes/materials/PhongNodeMaterial.js"></script>
-
-		<script>
-
-		/* global THREE */
+		import './js/nodes/THREE.Nodes.js';
 
 		var container = document.getElementById( 'container' );
 
@@ -127,21 +69,24 @@
 		var frame = new THREE.NodeFrame();
 		var teapot;
 		var controls;
-		var move = false;
 		var rtTexture, rtMaterial;
 		var meshes = [];
-		
-		document.getElementById( "preload" ).addEventListener( 'click', function() {
+
+		document.getElementById( "preload" ).addEventListener( 'click', function () {
 
 			var hash = document.location.hash.substr( 1 );
 
 			if ( hash.length === 0 ) {
-				window.location.hash = "#NoPreLoad"
+
+				window.location.hash = "#NoPreLoad";
+
 			} else {
-				window.location.hash = ""
+
+				window.location.hash = "";
+
 			}
-			
-			location.reload(true);
+
+			location.reload( true );
 
 		}, false );
 
@@ -180,15 +125,16 @@
 
 			var itemsonrow = 10;
 
-			for (var i = 0 ; i<  itemsonrow * itemsonrow; i ++ ){
-				
+			for ( var i = 0; i < itemsonrow * itemsonrow; i ++ ) {
+
 				var mesh = new THREE.Mesh( teapot );
-				
-				mesh.position.x = 50 *(i%itemsonrow) -50*itemsonrow/2;
-				mesh.position.z = 50*Math.floor(i/itemsonrow)-150; 
-				updateMaterial(mesh);
+
+				mesh.position.x = 50 * ( i % itemsonrow ) - 50 * itemsonrow / 2;
+				mesh.position.z = 50 * Math.floor( i / itemsonrow ) - 150;
+				updateMaterial( mesh );
 				scene.add( mesh );
-				meshes.push(mesh); 
+				meshes.push( mesh );
+
 			}
 
 			window.addEventListener( 'resize', onWindowResize, false );
@@ -197,24 +143,22 @@
 
 			if ( hash.length === 0 ) {
 
-				renderer.compile(scene,camera);
-				
+				renderer.compile( scene, camera );
+
 			}
-			
-			document.getElementById("waitScreen").className = "hide";
-			
-			setTimeout(function() {
-				
+
+			document.getElementById( "waitScreen" ).className = "hide";
+
+			setTimeout( function () {
+
 				onWindowResize();
 				animate();
-				
-			}, 1);
+
+			}, 1 );
 
 		}
 
-		function updateMaterial(mesh) {
-
-			move = false;
+		function updateMaterial( mesh ) {
 
 			if ( mesh.material ) mesh.material.dispose();
 
@@ -263,11 +207,12 @@
 
 			mtl.color = new THREE.ColorNode( 0 );
 			mtl.emissive = cos;
-			
-			
-			var transformer = new THREE.FunctionNode( "position + 0.0 * " + Math.random(), "vec3", [ ]);
+
+
+			var transformer = new THREE.ExpressionNode( "position + 0.0 * " + Math.random(), "vec3", [ ] );
 			mtl.transform = transformer;
-			// build shader
+
+			// build shader ( ignore auto build )
 			mtl.build();
 
 			// set material
@@ -294,9 +239,9 @@
 
 			frame.update( delta );
 
-			for (var i = 0; i < meshes.length; i++ ){
+			for ( var i = 0; i < meshes.length; i ++ ) {
 
-				var mesh = meshes[i];
+				var mesh = meshes[ i ];
 
 				frame.updateNode( mesh.material );
 

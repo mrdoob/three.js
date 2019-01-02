@@ -80,71 +80,6 @@
 
 			var raycaster;
 
-			var blocker = document.getElementById( 'blocker' );
-			var instructions = document.getElementById( 'instructions' );
-
-			// http://www.html5rocks.com/en/tutorials/pointerlock/intro/
-
-			var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-
-			if ( havePointerLock ) {
-
-				var element = document.body;
-
-				var pointerlockchange = function ( event ) {
-
-					if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-
-						controlsEnabled = true;
-						controls.enabled = true;
-
-						blocker.style.display = 'none';
-
-					} else {
-
-						controls.enabled = false;
-
-						blocker.style.display = 'block';
-
-						instructions.style.display = '';
-
-					}
-
-				};
-
-				var pointerlockerror = function ( event ) {
-
-					instructions.style.display = '';
-
-				};
-
-				// Hook pointer lock state change events
-				document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-				document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-				document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
-
-				document.addEventListener( 'pointerlockerror', pointerlockerror, false );
-				document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
-				document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
-
-				instructions.addEventListener( 'click', function ( event ) {
-
-					instructions.style.display = 'none';
-
-					// Ask the browser to lock the pointer
-					element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-					element.requestPointerLock();
-
-				}, false );
-
-			} else {
-
-				instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
-
-			}
-
-			var controlsEnabled = false;
-
 			var moveForward = false;
 			var moveBackward = false;
 			var moveLeft = false;
@@ -173,6 +108,30 @@
 				scene.add( light );
 
 				controls = new THREE.PointerLockControls( camera );
+
+				var blocker = document.getElementById( 'blocker' );
+				var instructions = document.getElementById( 'instructions' );
+
+				instructions.addEventListener( 'click', function () {
+
+					controls.lock();
+
+				}, false );
+
+				controls.addEventListener( 'lock', function () {
+
+					instructions.style.display = 'none';
+					blocker.style.display = 'none';
+
+				} );
+
+				controls.addEventListener( 'unlock', function () {
+
+					blocker.style.display = 'block';
+					instructions.style.display = '';
+
+				} );
+
 				scene.add( controls.getObject() );
 
 				var onKeyDown = function ( event ) {
@@ -186,7 +145,8 @@
 
 						case 37: // left
 						case 65: // a
-							moveLeft = true; break;
+							moveLeft = true;
+							break;
 
 						case 40: // down
 						case 83: // s
@@ -209,7 +169,7 @@
 
 				var onKeyUp = function ( event ) {
 
-					switch( event.keyCode ) {
+					switch ( event.keyCode ) {
 
 						case 38: // up
 						case 87: // w
@@ -249,7 +209,7 @@
 
 				var position = floorGeometry.attributes.position;
 
-				for ( var i = 0; i < position.count; i ++ ) {
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
 
 					vertex.fromBufferAttribute( position, i );
 
@@ -263,10 +223,10 @@
 
 				floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
 
-				count = floorGeometry.attributes.position.count;
+				position = floorGeometry.attributes.position;
 				var colors = [];
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
 
 					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 					colors.push( color.r, color.g, color.b );
@@ -285,10 +245,10 @@
 				var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 				boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
 
-				count = boxGeometry.attributes.position.count;
+				position = boxGeometry.attributes.position;
 				colors = [];
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
 
 					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 					colors.push( color.r, color.g, color.b );
@@ -338,7 +298,7 @@
 
 				requestAnimationFrame( animate );
 
-				if ( controlsEnabled === true ) {
+				if ( controls.isLocked === true ) {
 
 					raycaster.ray.origin.copy( controls.getObject().position );
 					raycaster.ray.origin.y -= 10;

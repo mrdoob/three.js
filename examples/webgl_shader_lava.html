@@ -23,12 +23,9 @@
 				padding: 5px;
 			}
 
-			a {
+			a { color: #ffffff; }
 
-				color: #ffffff;
-			}
-
-			#oldie a { color:#da0 }
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
 	<body>
@@ -49,7 +46,7 @@
 		<script src="js/postprocessing/BloomPass.js"></script>
 		<script src="js/postprocessing/FilmPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
@@ -116,7 +113,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
@@ -142,17 +143,17 @@
 
 				uniforms = {
 
-					fogDensity: { value: 0.45 },
-					fogColor: { value: new THREE.Vector3( 0, 0, 0 ) },
-					time: { value: 1.0 },
-					uvScale: { value: new THREE.Vector2( 3.0, 1.0 ) },
-					texture1: { value: textureLoader.load( 'textures/lava/cloud.png' ) },
-					texture2: { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
+					"fogDensity": { value: 0.45 },
+					"fogColor": { value: new THREE.Vector3( 0, 0, 0 ) },
+					"time": { value: 1.0 },
+					"uvScale": { value: new THREE.Vector2( 3.0, 1.0 ) },
+					"texture1": { value: textureLoader.load( 'textures/lava/cloud.png' ) },
+					"texture2": { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
 
 				};
 
-				uniforms.texture1.value.wrapS = uniforms.texture1.value.wrapT = THREE.RepeatWrapping;
-				uniforms.texture2.value.wrapS = uniforms.texture2.value.wrapT = THREE.RepeatWrapping;
+				uniforms[ "texture1" ].value.wrapS = uniforms[ "texture1" ].value.wrapT = THREE.RepeatWrapping;
+				uniforms[ "texture2" ].value.wrapS = uniforms[ "texture2" ].value.wrapT = THREE.RepeatWrapping;
 
 				var size = 0.65;
 
@@ -198,7 +199,7 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -223,7 +224,7 @@
 
 				var delta = 5 * clock.getDelta();
 
-				uniforms.time.value += 0.2 * delta;
+				uniforms[ "time" ].value += 0.2 * delta;
 
 				mesh.rotation.y += 0.0125 * delta;
 				mesh.rotation.x += 0.05 * delta;

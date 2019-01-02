@@ -354,7 +354,7 @@
 		var mouse = new THREE.Vector2();
 		var scale = 1.03;
 
-		var loader = new THREE.JSONLoader();
+		var loader = new THREE.BufferGeometryLoader();
 
 		//create buffer for reading a single pixel
 		var pixelBuffer = new Uint8Array( 4 );
@@ -377,7 +377,7 @@
 
 			instanceCount = parseInt( instanceCountElm.value );
 
-			instanceCountElm.addEventListener( "change", function() {
+			instanceCountElm.addEventListener( "change", function () {
 
 				instanceCount = parseInt( instanceCountElm.value );
 				initMesh();
@@ -390,7 +390,7 @@
 
 			method = methodElm.value;
 
-			methodElm.addEventListener( "change", function() {
+			methodElm.addEventListener( "change", function () {
 
 				method = methodElm.value;
 				initMesh();
@@ -403,7 +403,7 @@
 
 			doAnimate = animateElm.checked;
 
-			animateElm.addEventListener( "click", function() {
+			animateElm.addEventListener( "click", function () {
 
 				doAnimate = animateElm.checked;
 				animate();
@@ -416,7 +416,7 @@
 
 			useOverrideMaterial = overrideElm.checked;
 
-			overrideElm.addEventListener( "click", function() {
+			overrideElm.addEventListener( "click", function () {
 
 				useOverrideMaterial = overrideElm.checked;
 				initMesh();
@@ -427,7 +427,7 @@
 
 			var constructElm = document.getElementById( 'construct' );
 
-			constructElm.addEventListener( "click", function() {
+			constructElm.addEventListener( "click", function () {
 
 				initMesh();
 
@@ -439,13 +439,13 @@
 
 			THREE.Cache.clear();
 
-			materialList.forEach( function( m ) {
+			materialList.forEach( function ( m ) {
 
 				m.dispose();
 
 			} );
 
-			geometryList.forEach( function( g ) {
+			geometryList.forEach( function ( g ) {
 
 				g.dispose();
 
@@ -468,14 +468,14 @@
 
 		}
 
-		var randomizeMatrix = function() {
+		var randomizeMatrix = function () {
 
 			var position = new THREE.Vector3();
 			var rotation = new THREE.Euler();
 			var quaternion = new THREE.Quaternion();
 			var scale = new THREE.Vector3();
 
-			return function( matrix ) {
+			return function ( matrix ) {
 
 				position.x = Math.random() * 40 - 20;
 				position.y = Math.random() * 40 - 20;
@@ -500,15 +500,16 @@
 			clean();
 
 			// make instances
-			loader.load( 'models/json/suzanne_geometry.json', function ( geo ) {
+			loader.load( 'models/json/suzanne_buffergeometry.json', function ( geo ) {
 
+				geo = geo.toNonIndexed();
 				geo.computeBoundingBox();
 				geo.boundingBox.getSize( geometrySize );
 				geometryList.push( geo );
 
 				var start = window.performance.now();
 
-				switch ( method ){
+				switch ( method ) {
 
 					case "merged":
 						makeMerged( geo );
@@ -582,11 +583,11 @@
 				objectCount ++;
 
 				object.material = material.clone();
-				object.material.uniforms.color.value.setHex( Math.random() * 0xffffff );
+				object.material.uniforms[ "color" ].value.setHex( Math.random() * 0xffffff );
 				materialList.push( object.material );
 
 				pickingObject.material = pickingMaterial.clone();
-				pickingObject.material.uniforms.pickingColor.value.setHex( i + 1 );
+				pickingObject.material.uniforms[ "pickingColor" ].value.setHex( i + 1 );
 				materialList.push( pickingObject.material );
 
 				pickingData[ i + 1 ] = object;
@@ -612,7 +613,7 @@
 				vertexShader: vert,
 				fragmentShader: frag,
 				uniforms: {
-					color: {
+					"color": {
 						value: new THREE.Color()
 					}
 				}
@@ -623,7 +624,7 @@
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
-					pickingColor: {
+					"pickingColor": {
 						value: new THREE.Color()
 					}
 				}
@@ -642,35 +643,41 @@
 
 			var matrix = new THREE.Matrix4();
 
-			function onBeforeRender( renderer, scene, camera, geometry, material, group ){
+			function onBeforeRender( renderer, scene, camera, geometry, material ) {
 
 				var updateList = [];
 				var u = material.uniforms;
 				var d = this.userData;
 
-				if( u.pickingColor ){
+				if ( u.pickingColor ) {
+
 					u.pickingColor.value.setHex( d.pickingColor );
 					updateList.push( "pickingColor" );
+
 				}
 
-				if( u.color ){
+				if ( u.color ) {
+
 					u.color.value.setHex( d.color );
 					updateList.push( "color" );
+
 				}
 
-				if( updateList.length ){
+				if ( updateList.length ) {
 
 					var materialProperties = renderer.properties.get( material );
 
-					if( materialProperties.program ){
+					if ( materialProperties.program ) {
 
 						var gl = renderer.getContext();
 						var p = materialProperties.program;
 						gl.useProgram( p.program );
 						var pu = p.getUniforms();
 
-						updateList.forEach( function( name ){
+						updateList.forEach( function ( name ) {
+
 							pu.setValue( gl, name, u[ name ].value );
+
 						} );
 
 					}
@@ -702,7 +709,7 @@
 					object.userData[ "pickingColor" ] = i + 1;
 					object.onBeforeRender = onBeforeRender;
 
-				}else {
+				} else {
 
 					pickingObject.material = pickingMaterial;
 					pickingObject.userData[ "pickingColor" ] = i + 1;
@@ -740,14 +747,11 @@
 
 			// geometry
 
-			var bgeo = new THREE.BufferGeometry().fromGeometry( geo );
-			geometryList.push( bgeo );
-
 			var mgeo = new THREE.BufferGeometry();
 			geometryList.push( mgeo );
 
-			var pos = bgeo.attributes.position;
-			var posLen = bgeo.attributes.position.count * 3;
+			var pos = geo.attributes.position;
+			var posLen = geo.attributes.position.count * 3;
 			var vertices = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * posLen ), 3
 			);
@@ -782,7 +786,7 @@
 			var colors = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * colCount * 3 ), 3
 			);
-			var randCol = function() {
+			var randCol = function () {
 
 				return Math.random();
 
@@ -846,29 +850,26 @@
 
 			// geometry
 
-			var bgeo = new THREE.BufferGeometry().fromGeometry( geo );
-			geometryList.push( bgeo );
-
 			var igeo = new THREE.InstancedBufferGeometry();
 			geometryList.push( igeo );
 
-			var vertices = bgeo.attributes.position.clone();
+			var vertices = geo.attributes.position.clone();
 			igeo.addAttribute( 'position', vertices );
 
 			// var matrices = new THREE.InstancedBufferAttribute(
-			// 	new Float32Array( instanceCount * 16 ), 16, 1
+			// 	new Float32Array( instanceCount * 16 ), 16
 			// );
 			var mcol0 = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			var mcol1 = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			var mcol2 = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			var mcol3 = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			var matrix = new THREE.Matrix4();
 			var me = matrix.elements;
@@ -892,13 +893,13 @@
 			igeo.addAttribute( 'mcol2', mcol2 );
 			igeo.addAttribute( 'mcol3', mcol3 );
 
-			var randCol = function() {
+			var randCol = function () {
 
 				return Math.random();
 
 			};
 			var colors = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			for ( var i = 0, ul = colors.count; i < ul; i ++ ) {
 
@@ -909,7 +910,7 @@
 
 			var col = new THREE.Color();
 			var pickingColors = new THREE.InstancedBufferAttribute(
-				new Float32Array( instanceCount * 3 ), 3, 1
+				new Float32Array( instanceCount * 3 ), 3
 			);
 			for ( var i = 0, ul = pickingColors.count; i < ul; i ++ ) {
 
@@ -949,12 +950,11 @@
 			// highlight box
 
 			highlightBox = new THREE.Mesh(
-				new THREE.BoxGeometry( 1, 1, 1 ),
+				new THREE.BoxBufferGeometry( 1, 1, 1 ),
 				new THREE.MeshLambertMaterial( {
 					emissive: 0xffff00,
 					transparent: true,
-					opacity: 0.5,
-					side: THREE.FrontSide
+					opacity: 0.5
 				} )
 			);
 
@@ -1014,7 +1014,7 @@
 
 		}
 
-		function onWindowResize( event ) {
+		function onWindowResize() {
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
@@ -1051,7 +1051,7 @@
 				renderer.render( scene, camera, pickingRenderTarget );
 				scene.overrideMaterial = null;
 
-			}else {
+			} else {
 
 				renderer.render( pickingScene, camera, pickingRenderTarget );
 

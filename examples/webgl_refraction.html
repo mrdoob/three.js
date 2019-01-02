@@ -33,7 +33,7 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/shaders/WaterRefractionShader.js"></script>
 		<script src="js/objects/Refractor.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 	</head>
 	<body>
@@ -45,9 +45,13 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
 
-		var scene, camera, clock, renderer, refractor;
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
+
+		var scene, camera, clock, renderer, refractor, controls;
 
 		init();
 
@@ -99,7 +103,7 @@
 			} );
 
 			dudvMap.wrapS = dudvMap.wrapT = THREE.RepeatWrapping;
-			refractor.material.uniforms.tDudv.value = dudvMap;
+			refractor.material.uniforms[ "tDudv" ].value = dudvMap;
 
 			// light
 
@@ -146,7 +150,7 @@
 
 		function render() {
 
-			refractor.material.uniforms.time.value += clock.getDelta();
+			refractor.material.uniforms[ "time" ].value += clock.getDelta();
 
 			renderer.render( scene, camera );
 

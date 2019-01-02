@@ -24,15 +24,21 @@
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/AfterimagePass.js"></script>
-		
+
 		<script src="js/libs/dat.gui.min.js" type="text/javascript" charset="utf-8"></script>
 
 		<script>
 
 			var camera, scene, renderer, composer;
-			var mesh, light;
+			var mesh;
 
-			var afterimagePass, enable = true;
+			var afterimagePass;
+
+			var params = {
+
+				enable: true
+
+			};
 
 			init();
 			createGUI();
@@ -51,10 +57,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
-				object = new THREE.Object3D();
-				scene.add( object );
-
-				var geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 2, 2, 2);
+				var geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 2, 2, 2 );
 				var material = new THREE.MeshNormalMaterial();
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -71,12 +74,12 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
-			
-			function createGUI(){
+
+			function createGUI() {
 
 				var gui = new dat.GUI( { name: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
-				gui.add( this, 'enable' );
+				gui.add( params, 'enable' );
 
 			}
 
@@ -94,12 +97,10 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now();
-
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
-				
-				if( enable ){
+
+				if ( params.enable ) {
 
 					composer.render();
 
