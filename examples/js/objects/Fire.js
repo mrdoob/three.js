@@ -58,7 +58,7 @@ THREE.Fire = function ( geometry, options ) {
 
 		}
 
-		this.sourceMaterial.uniforms.sourceMap.value = this.internalSource;
+		this.sourceMaterial.uniforms[ "sourceMap" ].value = this.internalSource;
 		this.sourceMaterial.needsUpdate = true;
 
 		return this.sourceData;
@@ -121,7 +121,7 @@ THREE.Fire = function ( geometry, options ) {
 	// (0 -> 127 = 0.0 -> 1.0, 128 -> 255 = -1.0 -> 0.0 )
 	this.setSourceMap = function ( texture ) {
 
-		this.sourceMaterial.uniforms.sourceMap.value = texture;
+		this.sourceMaterial.uniforms[ "sourceMap" ].value = texture;
 
 	};
 
@@ -190,8 +190,8 @@ THREE.Fire = function ( geometry, options ) {
 		transparent: false
 	} );
 
-	this.diffuseMaterial.uniforms.oneOverWidth.value = oneOverWidth;
-	this.diffuseMaterial.uniforms.oneOverHeight.value = oneOverHeight;
+	this.diffuseMaterial.uniforms[ "oneOverWidth" ].value = oneOverWidth;
+	this.diffuseMaterial.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
 	this.diffuseMesh = new THREE.Mesh( this.fieldGeometry, this.diffuseMaterial );
 	this.fieldScene.add( this.diffuseMesh );
@@ -206,8 +206,8 @@ THREE.Fire = function ( geometry, options ) {
 		transparent: false
 	} );
 
-	this.driftMaterial.uniforms.oneOverWidth.value = oneOverWidth;
-	this.driftMaterial.uniforms.oneOverHeight.value = oneOverHeight;
+	this.driftMaterial.uniforms[ "oneOverWidth" ].value = oneOverWidth;
+	this.driftMaterial.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
 	this.driftMesh = new THREE.Mesh( this.fieldGeometry, this.driftMaterial );
 	this.fieldScene.add( this.driftMesh );
@@ -222,8 +222,8 @@ THREE.Fire = function ( geometry, options ) {
 		transparent: false
 	} );
 
-	this.projMaterial1.uniforms.oneOverWidth.value = oneOverWidth;
-	this.projMaterial1.uniforms.oneOverHeight.value = oneOverHeight;
+	this.projMaterial1.uniforms[ "oneOverWidth" ].value = oneOverWidth;
+	this.projMaterial1.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
 	this.projMesh1 = new THREE.Mesh( this.fieldGeometry, this.projMaterial1 );
 	this.fieldScene.add( this.projMesh1 );
@@ -239,8 +239,8 @@ THREE.Fire = function ( geometry, options ) {
 	} );
 
 
-	this.projMaterial2.uniforms.oneOverWidth.value = oneOverWidth;
-	this.projMaterial2.uniforms.oneOverHeight.value = oneOverHeight;
+	this.projMaterial2.uniforms[ "oneOverWidth" ].value = oneOverWidth;
+	this.projMaterial2.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
 	this.projMesh2 = new THREE.Mesh( this.fieldGeometry, this.projMaterial2 );
 	this.fieldScene.add( this.projMesh2 );
@@ -256,8 +256,8 @@ THREE.Fire = function ( geometry, options ) {
 	} );
 
 
-	this.projMaterial3.uniforms.oneOverWidth.value = oneOverWidth;
-	this.projMaterial3.uniforms.oneOverHeight.value = oneOverHeight;
+	this.projMaterial3.uniforms[ "oneOverWidth" ].value = oneOverWidth;
+	this.projMaterial3.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
 	this.projMesh3 = new THREE.Mesh( this.fieldGeometry, this.projMaterial3 );
 	this.fieldScene.add( this.projMesh3 );
@@ -280,31 +280,31 @@ THREE.Fire = function ( geometry, options ) {
 		transparent: true
 	} );
 
-	this.material.uniforms.densityMap.value = this.field1.texture;
+	this.material.uniforms[ "densityMap" ].value = this.field1.texture;
 
 	this.configShaders = function ( dt ) {
 
-		this.diffuseMaterial.uniforms.diffuse.value = dt * 0.05 * this.diffuse;
-		this.diffuseMaterial.uniforms.viscosity.value = dt * 0.05 * this.viscosity;
-		this.diffuseMaterial.uniforms.expansion.value = Math.exp( this.expansion * - 1.0 );
-		this.diffuseMaterial.uniforms.swirl.value = Math.exp( this.swirl * - 0.1 );
-		this.diffuseMaterial.uniforms.drag.value = Math.exp( this.drag * - 0.1 );
-		this.diffuseMaterial.uniforms.burnRate.value = this.burnRate * dt * 0.01;
-		this.driftMaterial.uniforms.windVector.value = this.windVector;
-		this.driftMaterial.uniforms.airSpeed.value = dt * this.airSpeed * 0.001 * textureHeight;
-		this.material.uniforms.color1.value = this.color1;
-		this.material.uniforms.color2.value = this.color2;
-		this.material.uniforms.color3.value = this.color3;
-		this.material.uniforms.colorBias.value = this.colorBias;
+		this.diffuseMaterial.uniforms[ "diffuse" ].value = dt * 0.05 * this.diffuse;
+		this.diffuseMaterial.uniforms[ "viscosity" ].value = dt * 0.05 * this.viscosity;
+		this.diffuseMaterial.uniforms[ "expansion" ].value = Math.exp( this.expansion * - 1.0 );
+		this.diffuseMaterial.uniforms[ "swirl" ].value = Math.exp( this.swirl * - 0.1 );
+		this.diffuseMaterial.uniforms[ "drag" ].value = Math.exp( this.drag * - 0.1 );
+		this.diffuseMaterial.uniforms[ "burnRate" ].value = this.burnRate * dt * 0.01;
+		this.driftMaterial.uniforms[ "windVector" ].value = this.windVector;
+		this.driftMaterial.uniforms[ "airSpeed" ].value = dt * this.airSpeed * 0.001 * textureHeight;
+		this.material.uniforms[ "color1" ].value = this.color1;
+		this.material.uniforms[ "color2" ].value = this.color2;
+		this.material.uniforms[ "color3" ].value = this.color3;
+		this.material.uniforms[ "colorBias" ].value = this.colorBias;
 
 	};
 
 	this.clearDiffuse = function () {
 
-		this.diffuseMaterial.uniforms.expansion.value = 1.0;
-		this.diffuseMaterial.uniforms.swirl.value = 1.0;
-		this.diffuseMaterial.uniforms.drag.value = 1.0;
-		this.diffuseMaterial.uniforms.burnRate.value = 0.0;
+		this.diffuseMaterial.uniforms[ "expansion" ].value = 1.0;
+		this.diffuseMaterial.uniforms[ "swirl" ].value = 1.0;
+		this.diffuseMaterial.uniforms[ "drag" ].value = 1.0;
+		this.diffuseMaterial.uniforms[ "burnRate" ].value = 0.0;
 
 	};
 
@@ -340,7 +340,7 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.sourceMesh.visible = true;
 
-		this.sourceMaterial.uniforms.densityMap.value = this.field0.texture;
+		this.sourceMaterial.uniforms[ "densityMap" ].value = this.field0.texture;
 
 		renderer.render( this.fieldScene, this.orthoCamera, this.field1 );
 
@@ -354,7 +354,7 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.diffuseMesh.visible = true;
 
-		this.diffuseMaterial.uniforms.densityMap.value = this.field0.texture;
+		this.diffuseMaterial.uniforms[ "densityMap" ].value = this.field0.texture;
 
 		renderer.render( this.fieldScene, this.orthoCamera, this.field1 );
 
@@ -368,7 +368,7 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.driftMesh.visible = true;
 
-		this.driftMaterial.uniforms.densityMap.value = this.field0.texture;
+		this.driftMaterial.uniforms[ "densityMap" ].value = this.field0.texture;
 
 		renderer.render( this.fieldScene, this.orthoCamera, this.field1 );
 
@@ -384,13 +384,13 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.projMesh1.visible = true;
 
-		this.projMaterial1.uniforms.densityMap.value = this.field0.texture;
+		this.projMaterial1.uniforms[ "densityMap" ].value = this.field0.texture;
 
 		renderer.render( this.fieldScene, this.orthoCamera, this.fieldProj );
 
 		this.projMesh1.visible = false;
 
-		this.projMaterial2.uniforms.densityMap.value = this.fieldProj.texture;
+		this.projMaterial2.uniforms[ "densityMap" ].value = this.fieldProj.texture;
 
 		// Projection pass 2
 
@@ -404,14 +404,14 @@ THREE.Fire = function ( geometry, options ) {
 			this.field1 = this.fieldProj;
 			this.fieldProj = temp;
 
-			this.projMaterial2.uniforms.densityMap.value = this.fieldProj.texture;
+			this.projMaterial2.uniforms[ "densityMap" ].value = this.fieldProj.texture;
 
 		}
 
 		this.projMesh2.visible = false;
 
-		this.projMaterial3.uniforms.densityMap.value = this.field0.texture;
-		this.projMaterial3.uniforms.projMap.value = this.fieldProj.texture;
+		this.projMaterial3.uniforms[ "densityMap" ].value = this.field0.texture;
+		this.projMaterial3.uniforms[ "projMap" ].value = this.fieldProj.texture;
 
 		// Projection pass 3
 

@@ -143,12 +143,12 @@
 
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms.u_data.value = texture;
-				uniforms.u_size.value.set( volume.xLength, volume.yLength, volume.zLength );
-				uniforms.u_clim.value.set( volconfig.clim1, volconfig.clim2 );
-				uniforms.u_renderstyle.value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-				uniforms.u_renderthreshold.value = volconfig.isothreshold; // For ISO renderstyle
-				uniforms.u_cmdata.value = cmtextures[ volconfig.colormap ];
+				uniforms[ "u_data" ].value = texture;
+				uniforms[ "u_size" ].value.set( volume.xLength, volume.yLength, volume.zLength );
+				uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
+				uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+				uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
+				uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
 
 				material = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
@@ -174,10 +174,10 @@
 
 		function updateUniforms() {
 
-			material.uniforms.u_clim.value.set( volconfig.clim1, volconfig.clim2 );
-			material.uniforms.u_renderstyle.value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-			material.uniforms.u_renderthreshold.value = volconfig.isothreshold; // For ISO renderstyle
-			material.uniforms.u_cmdata.value = cmtextures[ volconfig.colormap ];
+			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
+			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
+			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
 
 			render();
 
