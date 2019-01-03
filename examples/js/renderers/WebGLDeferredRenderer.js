@@ -1528,159 +1528,159 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 THREE.DeferredShaderChunk = {
 
-	packVector3: [
+	packVector3: `
 
-		"float vec3_to_float( vec3 data ) {",
+		float vec3_to_float( vec3 data ) {
 
-		"	const float unit = 255.0/256.0;",
-		"	highp float compressed = fract( data.x * unit ) + floor( data.y * unit * 255.0 ) + floor( data.z * unit * 255.0 ) * 255.0;",
-		"	return compressed;",
+			const float unit = 255.0/256.0;
+			highp float compressed = fract( data.x * unit ) + floor( data.y * unit * 255.0 ) + floor( data.z * unit * 255.0 ) * 255.0;
+			return compressed;
 
-		"}"
+		}
 
-	].join( "\n" ),
+	`,
 
-	unpackFloat: [
+	unpackFloat: `
 
-		"vec3 float_to_vec3( float data ) {",
+		vec3 float_to_vec3( float data ) {
 
-		"	const float unit = 255.0;",
-		"	vec3 uncompressed;",
-		"	uncompressed.x = fract( data );",
-		"	float zInt = floor( data / unit );",
-		"	uncompressed.z = fract( zInt / unit );",
-		"	uncompressed.y = fract( floor( data - ( zInt * unit ) ) / unit );",
-		"	return uncompressed;",
+			const float unit = 255.0;
+			vec3 uncompressed;
+			uncompressed.x = fract( data );
+			float zInt = floor( data / unit );
+			uncompressed.z = fract( zInt / unit );
+			uncompressed.y = fract( floor( data - ( zInt * unit ) ) / unit );
+			return uncompressed;
 
-		"}"
+		}
 
-	].join( "\n" ),
+	`,
 
 	// Refer to http://aras-p.info/texts/CompactNormalStorage.html
-	packNormal: [
+	packNormal: `
 
-		"vec2 normal_to_vec2( vec3 normal ) {",
+		vec2 normal_to_vec2( vec3 normal ) {
 
-		"	return normal.xy / sqrt( normal.z * 8.0 + 8.0 ) + 0.5;",
+			return normal.xy / sqrt( normal.z * 8.0 + 8.0 ) + 0.5;
 
-		"}"
+		}
 
-	].join( "\n" ),
+	`,
 
-	unpackVector2: [
+	unpackVector2: `
 
-		"vec3 vec2_to_normal( vec2 data ) {",
+		vec3 vec2_to_normal( vec2 data ) {
 
-		"	vec2 fenc = data * 4.0 - 2.0;",
-		"	float f = dot( fenc, fenc );",
-		"	float g = sqrt( 1.0 - f / 4.0 );",
-		"	vec3 normal;",
-		"	normal.xy = fenc * g;",
-		"	normal.z = 1.0 - f / 2.0;",
-		"	return normal;",
+			vec2 fenc = data * 4.0 - 2.0;
+			float f = dot( fenc, fenc );
+			float g = sqrt( 1.0 - f / 4.0 );
+			vec3 normal;
+			normal.xy = fenc * g;
+			normal.z = 1.0 - f / 2.0;
+			return normal;
 
-		"}"
+		}
 
-	].join( "\n" ),
+	`,
 
-	computeTextureCoord: [
+	computeTextureCoord: `
 
-		"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );"
+		vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );
 
-	].join( "\n" ),
+	`,
 
-	packNormalDepth: [
+	packNormalDepth: `
 
-		"vec4 packedNormalDepth;",
-		"packedNormalDepth.xyz = normal * 0.5 + 0.5;",
-		"packedNormalDepth.w = position.z / position.w;"
+		vec4 packedNormalDepth;
+		packedNormalDepth.xyz = normal * 0.5 + 0.5;
+		packedNormalDepth.w = position.z / position.w;
 
-	].join( "\n" ),
+	`,
 
-	unpackNormalDepth: [
+	unpackNormalDepth: `
 
-		"vec4 normalDepthMap = texture2D( samplerNormalDepth, texCoord );",
-		"float depth = normalDepthMap.w;",
+		vec4 normalDepthMap = texture2D( samplerNormalDepth, texCoord );
+		float depth = normalDepthMap.w;
 
-		"if ( depth == 0.0 ) discard;",
+		if ( depth == 0.0 ) discard;
 
-		"vec3 normal = normalDepthMap.xyz * 2.0 - 1.0;"
+		vec3 normal = normalDepthMap.xyz * 2.0 - 1.0;
 
-	].join( "\n" ),
+	`,
 
-	packNormalDepthShininess: [
+	packNormalDepthShininess: `
 
-		"vec4 packedNormalDepthShininess;",
-		"packedNormalDepthShininess.xy = normal_to_vec2( normal );",
-		"packedNormalDepthShininess.z = shininess;",
-		"packedNormalDepthShininess.w = position.z / position.w;"
+		vec4 packedNormalDepthShininess;
+		packedNormalDepthShininess.xy = normal_to_vec2( normal );
+		packedNormalDepthShininess.z = shininess;
+		packedNormalDepthShininess.w = position.z / position.w;
 
-	].join( "\n" ),
+	`,
 
-	unpackNormalDepthShininess: [
+	unpackNormalDepthShininess: `
 
-		"vec4 normalDepthMap = texture2D( samplerNormalDepthShininess, texCoord );",
-		"float depth = normalDepthMap.w;",
+		vec4 normalDepthMap = texture2D( samplerNormalDepthShininess, texCoord );
+		float depth = normalDepthMap.w;
 
-		"if ( depth == 0.0 ) discard;",
+		if ( depth == 0.0 ) discard;
 
-		"vec3 normal = vec2_to_normal( normalDepthMap.xy );",
-		"float shininess = normalDepthMap.z;"
+		vec3 normal = vec2_to_normal( normalDepthMap.xy );
+		float shininess = normalDepthMap.z;
 
-	].join( "\n" ),
+	`,
 
-	packColor: [
+	packColor: `
 
-		"vec4 packedColor;",
-		"packedColor.x = vec3_to_float( diffuseColor.rgb );",
-		"packedColor.y = vec3_to_float( emissiveColor );",
-		"packedColor.z = vec3_to_float( specularColor );",
-		"packedColor.w = shininess;"
+		vec4 packedColor;
+		packedColor.x = vec3_to_float( diffuseColor.rgb );
+		packedColor.y = vec3_to_float( emissiveColor );
+		packedColor.z = vec3_to_float( specularColor );
+		packedColor.w = shininess;
 
-	].join( "\n" ),
+	`,
 
-	unpackColor: [
+	unpackColor: `
 
-		"vec4 colorMap = texture2D( samplerColor, texCoord );",
-		"vec3 diffuseColor = float_to_vec3( colorMap.x );",
-		"vec3 emissiveColor = float_to_vec3( colorMap.y );",
-		"vec3 specularColor = float_to_vec3( colorMap.z );",
-		"float shininess = colorMap.w;"
+		vec4 colorMap = texture2D( samplerColor, texCoord );
+		vec3 diffuseColor = float_to_vec3( colorMap.x );
+		vec3 emissiveColor = float_to_vec3( colorMap.y );
+		vec3 specularColor = float_to_vec3( colorMap.z );
+		float shininess = colorMap.w;
 
-	].join( "\n" ),
+	`,
 
-	packLight: [
+	packLight: `
 
-		"vec4 packedLight;",
-		"packedLight.xyz = lightIntensity * lightColor * max( dot( lightVector, normal ), 0.0 ) * attenuation;",
-		"packedLight.w = lightIntensity * specular * max( dot( lightVector, normal ), 0.0 ) * attenuation;"
+		vec4 packedLight;
+		packedLight.xyz = lightIntensity * lightColor * max( dot( lightVector, normal ), 0.0 ) * attenuation;
+		packedLight.w = lightIntensity * specular * max( dot( lightVector, normal ), 0.0 ) * attenuation;
 
-	].join( "\n" ),
+	`,
 
-	computeVertexPositionVS: [
+	computeVertexPositionVS: `
 
-		"vec2 xy = texCoord * 2.0 - 1.0;",
-		"vec4 vertexPositionProjected = vec4( xy, depth, 1.0 );",
-		"vec4 vertexPositionVS = matProjInverse * vertexPositionProjected;",
-		"vertexPositionVS.xyz /= vertexPositionVS.w;",
-		"vertexPositionVS.w = 1.0;"
+		vec2 xy = texCoord * 2.0 - 1.0;
+		vec4 vertexPositionProjected = vec4( xy, depth, 1.0 );
+		vec4 vertexPositionVS = matProjInverse * vertexPositionProjected;
+		vertexPositionVS.xyz /= vertexPositionVS.w;
+		vertexPositionVS.w = 1.0;
 
-	].join( "\n" ),
+	`,
 
 	// TODO: calculate schlick
-	computeSpecular: [
+	computeSpecular: `
 
-		"vec3 halfVector = normalize( lightVector - normalize( vertexPositionVS.xyz ) );",
-		"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
-		"float specular = 0.31830988618 * ( shininess * 0.5 + 1.0 ) * pow( dotNormalHalf, shininess );"
+		vec3 halfVector = normalize( lightVector - normalize( vertexPositionVS.xyz ) );
+		float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );
+		float specular = 0.31830988618 * ( shininess * 0.5 + 1.0 ) * pow( dotNormalHalf, shininess );
 
-	].join( "\n" ),
+	`,
 
-	combine: [
+	combine: `
 
-		"gl_FragColor = vec4( lightIntensity * lightColor * max( dot( lightVector, normal ), 0.0 ) * ( diffuseColor + specular * specularColor ) * attenuation, 1.0 );"
+		gl_FragColor = vec4( lightIntensity * lightColor * max( dot( lightVector, normal ), 0.0 ) * ( diffuseColor + specular * specularColor ) * attenuation, 1.0 );
 
-	].join( "\n" )
+	`
 
 };
 
@@ -1703,31 +1703,31 @@ THREE.ShaderDeferred = {
 
 		uniforms: {},
 
-		vertexShader: [
+		vertexShader: `
 
-			"varying vec3 vNormal;",
-			"varying vec4 vPosition;",
+			varying vec3 vNormal;
+			varying vec4 vPosition;
 
-			"#include <morphtarget_pars_vertex>",
-			"#include <skinning_pars_vertex>",
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
 
-			"void main() {",
+			void main() {
 
-			"#include <begin_vertex>",
-			"#include <beginnormal_vertex>",
-			"#include <skinbase_vertex>",
-			"#include <skinnormal_vertex>",
-			"#include <defaultnormal_vertex>",
-			"#include <morphtarget_vertex>",
-			"#include <skinning_vertex>",
-			"#include <project_vertex>",
+			#include <begin_vertex>
+			#include <beginnormal_vertex>
+			#include <skinbase_vertex>
+			#include <skinnormal_vertex>
+			#include <defaultnormal_vertex>
+			#include <morphtarget_vertex>
+			#include <skinning_vertex>
+			#include <project_vertex>
 
-			"	vNormal = normalize( transformedNormal );",
-			"	vPosition = gl_Position;",
+				vNormal = normalize( transformedNormal );
+				vPosition = gl_Position;
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
 		fragmentShader: [
 
@@ -1763,27 +1763,27 @@ THREE.ShaderDeferred = {
 
 		},
 
-		vertexShader: [
+		vertexShader: `
 
-			"#include <uv_pars_vertex>",
-			"#include <morphtarget_pars_vertex>",
-			"#include <skinning_pars_vertex>",
+			#include <uv_pars_vertex>
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
 
-			"void main() {",
+			void main() {
 
-			"#include <uv_vertex>",
-			"#include <begin_vertex>",
-			"#include <beginnormal_vertex>",
-			"#include <skinbase_vertex>",
-			"#include <skinnormal_vertex>",
-			"#include <defaultnormal_vertex>",
-			"#include <morphtarget_vertex>",
-			"#include <skinning_vertex>",
-			"#include <project_vertex>",
+			#include <uv_vertex>
+			#include <begin_vertex>
+			#include <beginnormal_vertex>
+			#include <skinbase_vertex>
+			#include <skinnormal_vertex>
+			#include <defaultnormal_vertex>
+			#include <morphtarget_vertex>
+			#include <skinning_vertex>
+			#include <project_vertex>
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
 		fragmentShader: [
 
@@ -1879,15 +1879,15 @@ THREE.ShaderDeferred = {
 
 		),
 
-		vertexShader: [
+		vertexShader: `
 
-			"void main() {",
+			void main() {
 
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
 		fragmentShader: [
 
@@ -1963,15 +1963,15 @@ THREE.ShaderDeferred = {
 
 		),
 
-		vertexShader: [
+		vertexShader: `
 
-			"void main() { ",
+			void main() { 
 
-			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+				gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
 		fragmentShader: [
 
@@ -2112,31 +2112,31 @@ THREE.ShaderDeferred = {
 
 		},
 
-		vertexShader: [
+		vertexShader: `
 
-			"varying vec3 vNormal;",
-			"varying vec4 vPosition;",
+			varying vec3 vNormal;
+			varying vec4 vPosition;
 
-			"#include <morphtarget_pars_vertex>",
-			"#include <skinning_pars_vertex>",
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
 
-			"void main() {",
+			void main() {
 
-			"#include <begin_vertex>",
-			"#include <beginnormal_vertex>",
-			"#include <skinbase_vertex>",
-			"#include <skinnormal_vertex>",
-			"#include <defaultnormal_vertex>",
-			"#include <morphtarget_vertex>",
-			"#include <skinning_vertex>",
-			"#include <project_vertex>",
+			#include <begin_vertex>
+			#include <beginnormal_vertex>
+			#include <skinbase_vertex>
+			#include <skinnormal_vertex>
+			#include <defaultnormal_vertex>
+			#include <morphtarget_vertex>
+			#include <skinning_vertex>
+			#include <project_vertex>
 
-			"	vNormal = normalize( transformedNormal );",
-			"	vPosition = gl_Position;",
+				vNormal = normalize( transformedNormal );
+				vPosition = gl_Position;
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
 		fragmentShader: [
 
@@ -2181,15 +2181,15 @@ THREE.ShaderDeferred = {
 		),
 
 
-		vertexShader: [
+		vertexShader: `
 
-			"void main() {",
+			void main() {
 
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
 		fragmentShader: [
 
@@ -2255,15 +2255,15 @@ THREE.ShaderDeferred = {
 
 		),
 
-		vertexShader: [
+		vertexShader: `
 
-			"void main() { ",
+			void main() { 
 
-			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+				gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
 		fragmentShader: [
 
@@ -2418,27 +2418,27 @@ THREE.ShaderDeferred = {
 
 		),
 
-		vertexShader: [
+		vertexShader: `
 
-			"#include <uv_pars_vertex>",
-			"#include <morphtarget_pars_vertex>",
-			"#include <skinning_pars_vertex>",
+			#include <uv_pars_vertex>
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
 
-			"void main() {",
+			void main() {
 
-			"#include <uv_vertex>",
-			"#include <begin_vertex>",
-			"#include <beginnormal_vertex>",
-			"#include <skinbase_vertex>",
-			"#include <skinnormal_vertex>",
-			"#include <defaultnormal_vertex>",
-			"#include <morphtarget_vertex>",
-			"#include <skinning_vertex>",
-			"#include <project_vertex>",
+			#include <uv_vertex>
+			#include <begin_vertex>
+			#include <beginnormal_vertex>
+			#include <skinbase_vertex>
+			#include <skinnormal_vertex>
+			#include <defaultnormal_vertex>
+			#include <morphtarget_vertex>
+			#include <skinning_vertex>
+			#include <project_vertex>
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
 		fragmentShader: [
 
@@ -2490,32 +2490,32 @@ THREE.ShaderDeferred = {
 
 		},
 
-		vertexShader: [
+		vertexShader: `
 
-			"varying vec2 texCoord;",
+			varying vec2 texCoord;
 
-			"void main() {",
+			void main() {
 
-			"	vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );",
-			"	texCoord = pos.xy * vec2( 0.5 ) + 0.5;",
-			"	gl_Position = pos;",
+				vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );
+				texCoord = pos.xy * vec2( 0.5 ) + 0.5;
+				gl_Position = pos;
 
-			"}"
+			}
 
-		].join( "\n" ),
+		`,
 
-		fragmentShader: [
+		fragmentShader: `
 
-			"varying vec2 texCoord;",
-			"uniform sampler2D samplerResult;",
+			varying vec2 texCoord;
+			uniform sampler2D samplerResult;
 
-			"void main() {",
+			void main() {
 
-			"	gl_FragColor = texture2D( samplerResult, texCoord );",
+				gl_FragColor = texture2D( samplerResult, texCoord );
 
-			"}"
+			}
 
-		].join( "\n" )
+		`
 
 	}
 

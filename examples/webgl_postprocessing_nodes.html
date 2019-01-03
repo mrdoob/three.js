@@ -281,13 +281,13 @@
 						var screen = new THREE.ScreenNode();
 						var sat = new THREE.FloatNode( 0 );
 
-						var satrgb = new THREE.FunctionNode( [
-							"vec3 satrgb( vec3 rgb, float adjustment ) {",
+						var satrgb = new THREE.FunctionNode( `
+							vec3 satrgb( vec3 rgb, float adjustment ) {
 							// include luminance function from LuminanceNode
-							"	vec3 intensity = vec3( luminance( rgb ) );",
-							"	return mix( intensity, rgb, adjustment );",
-							"}"
-						].join( "\n" ), [ THREE.LuminanceNode.Nodes.luminance ] );
+								vec3 intensity = vec3( luminance( rgb ) );
+								return mix( intensity, rgb, adjustment );
+							}
+						`, [ THREE.LuminanceNode.Nodes.luminance ] );
 
 						var saturation = new THREE.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = screen;

@@ -71,64 +71,64 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		outlineAlpha: { type: "f", value: defaultAlpha }
 	};
 
-	var vertexShaderChunk = [
+	var vertexShaderChunk = `
 
-		"#include <fog_pars_vertex>",
+		#include <fog_pars_vertex>
 
-		"uniform float outlineThickness;",
+		uniform float outlineThickness;
 
-		"vec4 calculateOutline( vec4 pos, vec3 objectNormal, vec4 skinned ) {",
+		vec4 calculateOutline( vec4 pos, vec3 objectNormal, vec4 skinned ) {
 
-		"	float thickness = outlineThickness;",
-		"	const float ratio = 1.0;", // TODO: support outline thickness ratio for each vertex
-		"	vec4 pos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + objectNormal, 1.0 );",
+			float thickness = outlineThickness;
+			const float ratio = 1.0; // TODO: support outline thickness ratio for each vertex
+			vec4 pos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + objectNormal, 1.0 );
 		// NOTE: subtract pos2 from pos because BackSide objectNormal is negative
-		"	vec4 norm = normalize( pos - pos2 );",
-		"	return pos + norm * thickness * pos.w * ratio;",
+			vec4 norm = normalize( pos - pos2 );
+			return pos + norm * thickness * pos.w * ratio;
 
-		"}"
+		}
 
-	].join( "\n" );
+	`;
 
-	var vertexShaderChunk2 = [
+	var vertexShaderChunk2 = `
 
-		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( PHYSICAL )",
-		"	#ifndef USE_ENVMAP",
-		"		vec3 objectNormal = normalize( normal );",
-		"	#endif",
-		"#endif",
+		#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( PHYSICAL )
+			#ifndef USE_ENVMAP
+				vec3 objectNormal = normalize( normal );
+			#endif
+		#endif
 
-		"#ifdef FLIP_SIDED",
-		"	objectNormal = -objectNormal;",
-		"#endif",
+		#ifdef FLIP_SIDED
+			objectNormal = -objectNormal;
+		#endif
 
-		"#ifdef DECLARE_TRANSFORMED",
-		"	vec3 transformed = vec3( position );",
-		"#endif",
+		#ifdef DECLARE_TRANSFORMED
+			vec3 transformed = vec3( position );
+		#endif
 
-		"gl_Position = calculateOutline( gl_Position, objectNormal, vec4( transformed, 1.0 ) );",
+		gl_Position = calculateOutline( gl_Position, objectNormal, vec4( transformed, 1.0 ) );
 
-		"#include <fog_vertex>"
+		#include <fog_vertex>
 
-	].join( "\n" );
+	`;
 
-	var fragmentShader = [
+	var fragmentShader = `
 
-		"#include <common>",
-		"#include <fog_pars_fragment>",
+		#include <common>
+		#include <fog_pars_fragment>
 
-		"uniform vec3 outlineColor;",
-		"uniform float outlineAlpha;",
+		uniform vec3 outlineColor;
+		uniform float outlineAlpha;
 
-		"void main() {",
+		void main() {
 
-		"	gl_FragColor = vec4( outlineColor, outlineAlpha );",
+			gl_FragColor = vec4( outlineColor, outlineAlpha );
 
-		"	#include <fog_fragment>",
+			#include <fog_fragment>
 
-		"}"
+		}
 
-	].join( "\n" );
+	`;
 
 	function createInvisibleMaterial() {
 

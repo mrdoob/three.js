@@ -20,20 +20,20 @@ function RoughnessToBlinnExponentNode( texture ) {
 
 RoughnessToBlinnExponentNode.Nodes = ( function () {
 
-	var getSpecularMIPLevel = new FunctionNode( [
+	var getSpecularMIPLevel = new FunctionNode( `
 		// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
-		"float getSpecularMIPLevel( const in float blinnShininessExponent, const in float maxMIPLevelScalar ) {",
+		float getSpecularMIPLevel( const in float blinnShininessExponent, const in float maxMIPLevelScalar ) {
 
 		//	float envMapWidth = pow( 2.0, maxMIPLevelScalar );
 		//	float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );
 
-		"	float desiredMIPLevel = maxMIPLevelScalar + 0.79248 - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );",
+			float desiredMIPLevel = maxMIPLevelScalar + 0.79248 - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );
 
 		// clamp to allowable LOD ranges.
-		"	return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );",
+			return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
 
-		"}"
-	].join( "\n" ) );
+		}
+	` );
 
 	return {
 		getSpecularMIPLevel: getSpecularMIPLevel

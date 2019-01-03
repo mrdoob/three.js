@@ -20,13 +20,13 @@ NoiseNode.prototype.nodeType = "Noise";
 
 NoiseNode.Nodes = ( function () {
 
-	var snoise = new FunctionNode( [
-		"float snoise(vec2 co) {",
+	var snoise = new FunctionNode( `
+		float snoise(vec2 co) {
 
-		"	return fract( sin( dot( co.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );",
+			return fract( sin( dot( co.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
 
-		"}"
-	].join( "\n" ) );
+		}
+	` );
 
 	return {
 		snoise: snoise

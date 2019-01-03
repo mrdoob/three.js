@@ -258,31 +258,31 @@
 				sphereAtmoMesh.scale.set( 1.05, 1.05, 1.05 );
 				scene.add( sphereAtmoMesh );
 
-				var vBGShader = [
-					// "attribute vec2 uv;",
-					"varying vec2 vUv;",
-					"void main() {",
-					"vUv = uv;",
-					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-					"}"
+				var vBGShader = `
+					// attribute vec2 uv;
+					varying vec2 vUv;
+					void main() {
+					vUv = uv;
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+					}
 
-				].join( "\n" );
+				`;
 
-				var pBGShader = [
+				var pBGShader = `
 
-					"uniform sampler2D map;",
-					"varying vec2 vUv;",
+					uniform sampler2D map;
+					varying vec2 vUv;
 
-					"void main() {",
+					void main() {
 
-					"vec2 sampleUV = vUv;",
-					"vec4 color = texture2D( map, sampleUV, 0.0 );",
+					vec2 sampleUV = vUv;
+					vec4 color = texture2D( map, sampleUV, 0.0 );
 
-					"gl_FragColor = vec4( color.xyz, 1.0 );",
+					gl_FragColor = vec4( color.xyz, 1.0 );
 
-					"}"
+					}
 
-				].join( "\n" );
+				`;
 
 				// Skybox
 				adaptiveLuminanceMat = new THREE.ShaderMaterial( {

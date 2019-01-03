@@ -18,23 +18,23 @@ function CameraNode( scope, camera ) {
 
 CameraNode.Nodes = ( function () {
 
-	var depthColor = new FunctionNode( [
-		"float depthColor( float mNear, float mFar ) {",
+	var depthColor = new FunctionNode( `
+		float depthColor( float mNear, float mFar ) {
 
-		"	#ifdef USE_LOGDEPTHBUF_EXT",
+			#ifdef USE_LOGDEPTHBUF_EXT
 
-		"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
+				float depth = gl_FragDepthEXT / gl_FragCoord.w;
 
-		"	#else",
+			#else
 
-		"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
+				float depth = gl_FragCoord.z / gl_FragCoord.w;
 
-		"	#endif",
+			#endif
 
-		"	return 1.0 - smoothstep( mNear, mFar, depth );",
+			return 1.0 - smoothstep( mNear, mFar, depth );
 
-		"}"
-	].join( "\n" ) );
+		}
+	` );
 
 	return {
 		depthColor: depthColor

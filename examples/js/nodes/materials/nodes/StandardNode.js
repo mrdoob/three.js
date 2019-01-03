@@ -42,24 +42,24 @@ StandardNode.prototype.build = function ( builder ) {
 
 		] ) );
 
-		builder.addParsCode( [
-			"varying vec3 vViewPosition;",
+		builder.addParsCode( `
+			varying vec3 vViewPosition;
 
-			"#ifndef FLAT_SHADED",
+			#ifndef FLAT_SHADED
 
-			"	varying vec3 vNormal;",
+				varying vec3 vNormal;
 
-			"#endif",
+			#endif
 
-			//"#include <encodings_pars_fragment>", // encoding functions
-			"#include <fog_pars_vertex>",
-			"#include <morphtarget_pars_vertex>",
-			"#include <skinning_pars_vertex>",
-			"#include <shadowmap_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
-			"#include <clipping_planes_pars_vertex>"
+			//#include <encodings_pars_fragment> // encoding functions
+			#include <fog_pars_vertex>
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
+			#include <shadowmap_pars_vertex>
+			#include <logdepthbuf_pars_vertex>
+			#include <clipping_planes_pars_vertex>
 
-		].join( "\n" ) );
+		` );
 
 		var output = [
 			"#include <beginnormal_vertex>",
@@ -167,24 +167,24 @@ StandardNode.prototype.build = function ( builder ) {
 
 		builder.requires.transparent = alpha !== undefined;
 
-		builder.addParsCode( [
+		builder.addParsCode( `
 
-			"varying vec3 vViewPosition;",
+			varying vec3 vViewPosition;
 
-			"#ifndef FLAT_SHADED",
+			#ifndef FLAT_SHADED
 
-			"	varying vec3 vNormal;",
+				varying vec3 vNormal;
 
-			"#endif",
+			#endif
 
-			"#include <dithering_pars_fragment>",
-			"#include <fog_pars_fragment>",
-			"#include <bsdfs>",
-			"#include <lights_pars_begin>",
-			"#include <lights_physical_pars_fragment>",
-			"#include <shadowmap_pars_fragment>",
-			"#include <logdepthbuf_pars_fragment>"
-		].join( "\n" ) );
+			#include <dithering_pars_fragment>
+			#include <fog_pars_fragment>
+			#include <bsdfs>
+			#include <lights_pars_begin>
+			#include <lights_physical_pars_fragment>
+			#include <shadowmap_pars_fragment>
+			#include <logdepthbuf_pars_fragment>
+		` );
 
 		var output = [
 			"#include <clipping_planes_fragment>",

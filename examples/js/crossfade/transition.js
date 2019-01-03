@@ -34,53 +34,53 @@ function Transition ( sceneA, sceneB ) {
 				value: this.textures[ 0 ]
 			}
 		},
-		vertexShader: [
+		vertexShader: `
 
-			"varying vec2 vUv;",
+			varying vec2 vUv;
 
-			"void main() {",
+			void main() {
 
-			"vUv = vec2( uv.x, uv.y );",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			vUv = vec2( uv.x, uv.y );
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"}"
+			}
 
-		].join( "\n" ),
-		fragmentShader: [
+		`,
+		fragmentShader: `
 
-			"uniform float mixRatio;",
+			uniform float mixRatio;
 
-			"uniform sampler2D tDiffuse1;",
-			"uniform sampler2D tDiffuse2;",
-			"uniform sampler2D tMixTexture;",
+			uniform sampler2D tDiffuse1;
+			uniform sampler2D tDiffuse2;
+			uniform sampler2D tMixTexture;
 
-			"uniform int useTexture;",
-			"uniform float threshold;",
+			uniform int useTexture;
+			uniform float threshold;
 
-			"varying vec2 vUv;",
+			varying vec2 vUv;
 
-			"void main() {",
+			void main() {
 
-			"	vec4 texel1 = texture2D( tDiffuse1, vUv );",
-			"	vec4 texel2 = texture2D( tDiffuse2, vUv );",
+				vec4 texel1 = texture2D( tDiffuse1, vUv );
+				vec4 texel2 = texture2D( tDiffuse2, vUv );
 
-			"	if (useTexture==1) {",
+				if (useTexture==1) {
 
-			"		vec4 transitionTexel = texture2D( tMixTexture, vUv );",
-			"		float r = mixRatio * (1.0 + threshold * 2.0) - threshold;",
-			"		float mixf=clamp((transitionTexel.r - r)*(1.0/threshold), 0.0, 1.0);",
+					vec4 transitionTexel = texture2D( tMixTexture, vUv );
+					float r = mixRatio * (1.0 + threshold * 2.0) - threshold;
+					float mixf=clamp((transitionTexel.r - r)*(1.0/threshold), 0.0, 1.0);
 
-			"		gl_FragColor = mix( texel1, texel2, mixf );",
+					gl_FragColor = mix( texel1, texel2, mixf );
 
-			"	} else {",
+				} else {
 
-			"		gl_FragColor = mix( texel2, texel1, mixRatio );",
+					gl_FragColor = mix( texel2, texel1, mixRatio );
 
-			"	}",
+				}
 
-			"}"
+			}
 
-		].join( "\n" )
+		`
 
 	} );
 
