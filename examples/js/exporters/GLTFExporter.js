@@ -1590,19 +1590,65 @@ THREE.GLTFExporter.prototype = {
 
 		}
 
+		function processLight( light ) {
+
+			var lightDef = {};
+
+			if ( light.name ) lightDef.name = light.name;
+
+			lightDef.color = light.color.toArray();
+
+			lightDef.intensity = light.intensity;
+
+			if ( light.isDirectionalLight ) {
+
+				lightDef.type = 'directional';
+
+			} else if ( light.isPointLight ) {
+
+				lightDef.type = 'point';
+				lightDef.range = light.distance;
+
+			} else if ( light.isSpotLight ) {
+
+				lightDef.type = 'spot';
+				lightDef.range = light.distance;
+				lightDef.spot = {};
+				lightDef.spot.innerConeAngle = ( light.penumbra - 1.0 ) * light.angle * -1.0;
+				lightDef.spot.outerConeAngle = light.angle;
+
+			}
+
+			if ( light.decay !== undefined && light.decay !== 2 ) {
+
+				console.warn( 'THREE.GLTFExporter: Light decay may be lost. glTF is physically-based, '
+					+ 'and expects light.decay=2.' );
+
+			}
+
+			if ( light.target
+					&& ( light.target.parent !== light
+					 || light.target.position.x !== 0
+					 || light.target.position.y !== 0
+					 || light.target.position.z !== -1 ) ) {
+
+				console.warn( 'THREE.GLTFExporter: Light direction may be lost. For best results, '
+					+ 'make light.target a child of the light with position 0,0,-1.' );
+
+			}
+
+			var lights = outputJSON.extensions[ 'KHR_lights_punctual' ].lights;
+			lights.push( lightDef );
+			return lights.length - 1;
+
+		}
+
 		/**
 		 * Process Object3D node
 		 * @param  {THREE.Object3D} node Object3D to processNode
 		 * @return {Integer}      Index of the node in the nodes list
 		 */
 		function processNode( object ) {
-
-			if ( object.isLight ) {
-
-				console.warn( 'GLTFExporter: Unsupported node type:', object.constructor.name );
-				return null;
-
-			}
 
 			if ( ! outputJSON.nodes ) {
 
@@ -1673,6 +1719,24 @@ THREE.GLTFExporter.prototype = {
 			} else if ( object.isCamera ) {
 
 				gltfNode.camera = processCamera( object );
+
+			} else if ( object.isDirectionalLight || object.isPointLight || object.isSpotLight ) {
+
+				if ( ! extensionsUsed[ 'KHR_lights_punctual' ] ) {
+
+					outputJSON.extensions = outputJSON.extensions || {};
+					outputJSON.extensions[ 'KHR_lights_punctual' ] = { lights: [] };
+					extensionsUsed[ 'KHR_lights_punctual' ] = true;
+
+				}
+
+				gltfNode.extensions = gltfNode.extensions || {};
+				gltfNode.extensions[ 'KHR_lights_punctual' ] = { light: processLight( object ) };
+
+			} else if ( object.isLight ) {
+
+				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.' );
+				return null;
 
 			}
 
