@@ -1,12 +1,12 @@
 Title: Three.js Post Processing
 Description: How to Post Process in THREE.js
 
-*Post processing* generally refers to applying some kind of effect or filter to a 2D image. In the case of THREE.js we have a scene with a bunch of meshes in it. We render that scene into a 2D image. Normally that image is rendered directly into the canvas and displayed in the browser but instead we can [render it to a render target](threejs-rendertargets.html) and then apply some *post processing* effects to the result before drawing it to the canvas.
+*Post processing* generally refers to applying some kind of effect or filter to a 2D image. In the case of THREE.js we have a scene with a bunch of meshes in it. We render that scene into a 2D image. Normally that image is rendered directly into the canvas and displayed in the browser but instead we can [render it to a render target](threejs-rendertargets.html) and then apply some *post processing* effects to the result before drawing it to the canvas. It's called post processing because it happens after (post) the main scene processing.
 
 Examples of post processing are Instagram like filters,
 Photoshop filters, etc...
 
-THREE.js has some example classes to help setup a process processing pipeline. The way it works is you create an `EffectComposer` and to it you add multiple `Pass` objects.
+THREE.js has some example classes to help setup a post processing pipeline. The way it works is you create an `EffectComposer` and to it you add multiple `Pass` objects.
 You then call `EffectComposer.render` and it renders your scene to a [render target](threejs-rendertargets.html) and then applies each `Pass`.
 
 Each `Pass` can be some post processing effect like adding a vignette, blurring, applying a bloom, applying film grain, adjusting the hue, saturation, contrast, etc... and finally rendering the result to the canvas.
