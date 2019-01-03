@@ -1217,6 +1217,13 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
+				if ( object.geometry.isGeometry ) {
+
+					console.error( 'THREE.WebGLRenderer: Geometry objects of type "Geometry" are not renderable anymore. Please use "BufferGeometry".' );
+					return;
+
+				}
+
 				if ( object.isSkinnedMesh ) {
 
 					object.skeleton.update();

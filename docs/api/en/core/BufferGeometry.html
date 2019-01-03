@@ -18,9 +18,6 @@
 		<p>
 		To read and edit data in BufferGeometry attributes, see [page:BufferAttribute] documentation.
 		</p>
-		<p>
-		For a less efficient but easier-to-use representation of geometry, see [page:Geometry].
-		</p>
 
 		<h2>Example</h2>
 		<code>
@@ -56,9 +53,7 @@
 		<p>
 		WebGL stores data associated with individual vertices of a geometry in <em>attributes</em>.
 		Examples include the position of the vertex, the normal vector for the vertex, the vertex color,
-		and so on. When using [page:Geometry], the [page:WebGLRenderer renderer] takes care of wrapping
-		up this information into typed array buffers and sending this data to the shader. With
-		BufferGeometry, all of this data is stored in buffers associated with individual attributes.
+		and so on. [name] stores these data in buffers associated with individual attributes.
 		This means that to get the position data associated with a vertex (for instance), you must call
 		[page:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual
 		x, y, and z coordinates of the position.

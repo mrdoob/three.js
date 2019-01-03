@@ -12,27 +12,14 @@
 
 		<div class="desc">
 		<p>
-		Geometry is a user-friendly alternative to [page:BufferGeometry]. Geometries store attributes
+		Legacy class for representing geometric data. Geometries store attributes
 		(vertex positions, faces, colors, etc.) using objects like [page:Vector3] or [page:Color] that
 		are easier to read and edit, but less efficient than typed arrays.
 		</p>
 		<p>
-		Prefer [page:BufferGeometry] for large or serious projects.
+		<b>As of THREE R101, [page:WebGLRenderer] has stopped rendering [name]. Please use [page:BufferGeometry] instead.</b>
 		</p>
 		</div>
-
-
-		<h2>Example</h2>
-
-		<div>[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]</div>
-		<div>[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]</div>
-		<div>[example:webgl_geometry_nurbs WebGL / geometry / nurbs ]</div>
-		<div>[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor ]</div>
-		<div>[example:webgl_interactive_cubes_gpu WebGL / interactive / cubes / gpu ]</div>
-		<div>[example:webgl_interactive_lines WebGL / interactive / lines ]</div>
-		<div>[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points ]</div>
-		<div>[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter ]</div>
-
 
 		<code>var geometry = new THREE.Geometry();
 
