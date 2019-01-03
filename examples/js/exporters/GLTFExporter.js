@@ -360,6 +360,46 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
+		 * Applies a texture transform, if present, to the map definition. Requires
+		 * the KHR_texture_transform extension.
+		 */
+		function applyTextureTransform( mapDef, texture ) {
+
+			var didTransform = false
+			var transformDef = {};
+
+			if ( texture.offset.x !== 0 || texture.offset.y !== 0 ) {
+
+				transformDef.offset = texture.offset.toArray();
+				didTransform = true;
+
+			}
+
+			if ( texture.rotation !== 0 ) {
+
+				transformDef.rotation = texture.rotation;
+				didTransform = true;
+
+			}
+
+			if ( texture.repeat.x !== 1 || texture.repeat.y !== 1 ) {
+
+				transformDef.scale = texture.repeat.toArray();
+				didTransform = true;				
+
+			}
+
+			if ( didTransform ) {
+
+				mapDef.extensions = mapDef.extensions || {};
+				mapDef.extensions[ 'KHR_texture_transform' ] = transformDef;
+				extensionsUsed[ 'KHR_texture_transform' ] = true;
+
+			}
+
+		}
+
+		/**
 		 * Process a buffer to append to the default one.
 		 * @param  {ArrayBuffer} buffer
 		 * @return {Integer}
@@ -868,11 +908,9 @@ THREE.GLTFExporter.prototype = {
 
 				if ( material.metalnessMap === material.roughnessMap ) {
 
-					gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture = {
-
-						index: processTexture( material.metalnessMap )
-
-					};
+					var metalRoughMapDef = { index: processTexture( material.metalnessMap ) };
+					applyTextureTransform( metalRoughMapDef, material.metalnessMap );
+					gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
 				} else {
 
@@ -885,11 +923,9 @@ THREE.GLTFExporter.prototype = {
 			// pbrMetallicRoughness.baseColorTexture
 			if ( material.map ) {
 
-				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
-
-					index: processTexture( material.map )
-
-				};
+				var baseColorMapDef = { index: processTexture( material.map ) };
+				applyTextureTransform( baseColorMapDef, material.map );
+				gltfMaterial.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
 
 			}
 
@@ -911,11 +947,9 @@ THREE.GLTFExporter.prototype = {
 				// emissiveTexture
 				if ( material.emissiveMap ) {
 
-					gltfMaterial.emissiveTexture = {
-
-						index: processTexture( material.emissiveMap )
-
-					};
+					var emissiveMapDef = { index: processTexture( material.emissiveMap ) };
+					applyTextureTransform( emissiveMapDef, material.emissiveMap );
+					gltfMaterial.emissiveTexture = emissiveMapDef;
 
 				}
 
@@ -924,11 +958,7 @@ THREE.GLTFExporter.prototype = {
 			// normalTexture
 			if ( material.normalMap ) {
 
-				gltfMaterial.normalTexture = {
-
-					index: processTexture( material.normalMap )
-
-				};
+				var normalMapDef = { index: processTexture( material.normalMap ) };
 
 				if ( material.normalScale.x !== - 1 ) {
 
@@ -938,26 +968,30 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					gltfMaterial.normalTexture.scale = material.normalScale.x;
+					normalMapDef.scale = material.normalScale.x;
 
 				}
+
+				applyTextureTransform( normalMapDef, material.normalMap );
+
+				gltfMaterial.normalTexture = normalMapDef;
 
 			}
 
 			// occlusionTexture
 			if ( material.aoMap ) {
 
-				gltfMaterial.occlusionTexture = {
-
-					index: processTexture( material.aoMap )
-
-				};
+				var occlusionMapDef = { index: processTexture( material.aoMap ) };
 
 				if ( material.aoMapIntensity !== 1.0 ) {
 
-					gltfMaterial.occlusionTexture.strength = material.aoMapIntensity;
+					occlusionMapDef.strength = material.aoMapIntensity;
 
 				}
+
+				applyTextureTransform( occlusionMapDef, material.aoMap );
+
+				gltfMaterial.occlusionTexture = occlusionMapDef;
 
 			}
 
