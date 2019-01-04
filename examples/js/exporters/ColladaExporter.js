@@ -359,14 +359,14 @@ THREE.ColladaExporter.prototype = {
 
 					type = 'constant';
 
-                    if ( m.map !== null ) {
+					if ( m.map !== null ) {
 
-                        // The Collada spec does not support diffuse texture maps with the
-                        // constant shader type.
-                        // mrdoob/three.js#15469
-                        console.warn( 'ColladaExporter: Texture maps not supported with MeshBasicMaterial.' );
+						// The Collada spec does not support diffuse texture maps with the
+						// constant shader type.
+						// mrdoob/three.js#15469
+						console.warn( 'ColladaExporter: Texture maps not supported with MeshBasicMaterial.' );
 
-                    }
+					}
 
                 }
 
