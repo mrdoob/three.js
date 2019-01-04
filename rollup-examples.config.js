@@ -23,13 +23,14 @@ function createOutput( file ) {
 			name: 'THREE',
 			file: outputPath,
 
-			globals: () => 'THREE',
+            globals: () => 'THREE',
+            paths: p => /three\.module\.js$/.test( p ) ? 'three' : p,
 			extend: true,
 
 			banner:
 				'/**\n' +
 				` * Generated from '${ path.relative( '.', inputPath.replace( /\\/, '/' ) ) }'\n` +
-				' **/\n'
+				' */\n'
 
 		}
 
