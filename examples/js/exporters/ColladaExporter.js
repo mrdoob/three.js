@@ -368,7 +368,7 @@ THREE.ColladaExporter.prototype = {
 
 					}
 
-                }
+				}
 
 				var emissive = m.emissive ? m.emissive : new THREE.Color( 0, 0, 0 );
 				var diffuse = m.color ? m.color : new THREE.Color( 0, 0, 0 );
