@@ -6,7 +6,7 @@ const fs = require( 'fs' );
 function createOutput( file ) {
 
 	const inputPath = path.resolve( file );
-	const outputPath = inputPath.replace( /[\\\/]examples[\\\/]modules[\\\/]/, '/examples/js/' );
+	const outputPath = inputPath.replace( /[\\\/]examples[\\\/]jsm[\\\/]/, '/examples/js/' );
 
 	// Every import is marked as external so the output is 1-to-1. We
 	// assume that that global object should be the THREE object so we
