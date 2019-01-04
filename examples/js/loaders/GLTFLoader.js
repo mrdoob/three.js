@@ -67,7 +67,7 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
-		_load: function ( url, onLoad, onProgress, onError, getParser ) {
+		_load: function ( url, onLoad, onProgress, onError, parserOnly ) {
 
 			var scope = this;
 
@@ -124,7 +124,7 @@ THREE.GLTFLoader = ( function () {
 
 						scope.manager.itemEnd( url );
 
-					}, _onError, getParser );
+					}, _onError, parserOnly );
 
 				} catch ( e ) {
 
@@ -136,7 +136,7 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
-		_parse: function ( data, path, onLoad, onError, getParser ) {
+		_parse: function ( data, path, onLoad, onError, parserOnly ) {
 
 			var content;
 			var extensions = {};
@@ -236,7 +236,7 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
-			if ( getParser ) {
+			if ( parserOnly ) {
 
 				parser.markDefs();
 				onLoad( parser );
