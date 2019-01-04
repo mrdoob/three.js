@@ -1,8 +1,8 @@
 var path = require( 'path' );
 var fs = require( 'fs' );
 
-// Creates an rollup config object for the given file to
-// be output to umd format
+// Creates a rollup config object for the given file to
+// be converted to umd
 function createOutput( file ) {
 
 	var inputPath = path.resolve( file );
@@ -26,7 +26,6 @@ function createOutput( file ) {
 			globals: () => 'THREE',
 			extend: true,
 
-			indent: false,
 			banner:
 				'/**\n' +
 				` * Generated from '${ path.relative( '.', inputPath.replace( /\\/, '/' ) ) }'\n` +
