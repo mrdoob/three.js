@@ -1,7 +1,7 @@
 /* global module require */
 'use strict';
 
-module.exports = function() { // wrapper in case we're in module_context mode
+module.exports = function(settings) { // wrapper in case we're in module_context mode
 
 const cache      = new (require('inmemfilecache'))();
 const Feed       = require('feed').Feed;
@@ -17,7 +17,7 @@ const utils      = require('./utils');
 const moment     = require('moment');
 const url        = require('url');
 
-//process.title = "build";
+//process.title = 'build';
 
 const executeP = Promise.denodeify(utils.execute);
 
@@ -53,7 +53,7 @@ function writeFileIfChanged(fileName, content) {
     }
   }
   fs.writeFileSync(fileName, content);
-  console.log("Wrote: " + fileName);  // eslint-disable-line
+  console.log('Wrote: ' + fileName);  // eslint-disable-line
 }
 
 function copyFile(src, dst) {
@@ -274,17 +274,18 @@ const Builder = function(outBaseDir, options) {
     //Convert(md_content)
     const metaData = data.headers;
     const content = data.content;
-    //console.log(JSON.stringify(metaData, undefined, "  "));
+    //console.log(JSON.stringify(metaData, undefined, '  '));
     const info = extractHandlebars(content);
     let html = marked(info.content);
     html = insertHandlebars(info, html);
     html = replaceParams(html, [opt_extra, g_langInfo]);
     const relativeOutName = slashify(outFileName).substring(g_outBaseDir.length);
+    const pathRE = new RegExp(`^\\/${settings.rootFolder}\\/lessons\\/$`);
     const langs = Object.keys(g_langDB).map((name) => {
       const lang = g_langDB[name];
       const url = slashify(path.join(lang.basePath, path.basename(outFileName)))
          .replace('index.html', '')
-         .replace(/^\/threejs\/lessons\/$/, '/');
+         .replace(pathRE, '/');
       return {
         lang: lang.lang,
         language: lang.language,
@@ -299,14 +300,14 @@ const Builder = function(outBaseDir, options) {
     metaData['toc'] = opt_extra.toc;
     metaData['templateOptions'] = opt_extra.templateOptions;
     metaData['langInfo'] = g_langInfo;
-    metaData['url'] = 'http://threejsfundamentals.org' + relativeOutName;
+    metaData['url'] = `${settings.baseUrl}${relativeOutName}`;
     metaData['relUrl'] = relativeOutName;
-    metaData['screenshot'] = 'http://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg';
+    metaData['screenshot'] = `${settings.baseUrl}/${settings.rootFolder}/lessons/resources/${settings.siteThumbnail}`;
     const basename = path.basename(contentFileName, '.md');
     ['.jpg', '.png'].forEach(function(ext) {
-      const filename = path.join('threejs', 'lessons', 'screenshots', basename + ext);
+      const filename = path.join(settings.rootFolder, 'lessons', 'screenshots', basename + ext);
       if (fs.existsSync(filename)) {
-        metaData['screenshot'] = 'http://threejsfundamentals.org/threejs/lessons/screenshots/' + basename + ext;
+        metaData['screenshot'] = `${settings.baseUrl}/${settings.rootFolder}/lessons/screenshots/${basename}${ext}`;
       }
     });
     const output = templateManager.apply(templatePath, metaData);
@@ -337,7 +338,7 @@ const Builder = function(outBaseDir, options) {
   const addArticleByLang = function(article, lang) {
     const filename = path.basename(article.dst_file_name);
     let articleInfo = g_articlesByLang[filename];
-    const url = 'http://threejsfundamentals.org' + article.dst_file_name;
+    const url = `${settings.baseUrl}${article.dst_file_name}`;
     if (!articleInfo) {
       articleInfo = {
         url: url,
@@ -353,7 +354,7 @@ const Builder = function(outBaseDir, options) {
   };
 
   const getLanguageSelection = function(lang) {
-    const lessons = lang.lessons || ('threejs/lessons/' + lang.lang);
+    const lessons = lang.lessons || (`${settings.rootFolder}/lessons/${lang.lang}`);
     const langInfo = hanson.parse(fs.readFileSync(path.join(lessons, 'langinfo.hanson'), {encoding: 'utf8'}));
     langInfo.langCode = langInfo.langCode || lang.lang;
     langInfo.home = lang.home || ('/' + lessons + '/');
@@ -371,15 +372,15 @@ const Builder = function(outBaseDir, options) {
 
   this.process = function(options) {
     console.log('Processing Lang: ' + options.lang);  // eslint-disable-line
-    options.lessons     = options.lessons     || ('threejs/lessons/' + options.lang);
-    options.toc         = options.toc         || ('threejs/lessons/' + options.lang + '/toc.html');
+    options.lessons     = options.lessons     || (`${settings.rootFolder}/lessons/${options.lang}`);
+    options.toc         = options.toc         || (`${settings.rootFolder}/lessons/${options.lang}/toc.html`);
     options.template    = options.template    || 'build/templates/lesson.template';
-    options.examplePath = options.examplePath === undefined ? '/threejs/lessons/' : options.examplePath;
+    options.examplePath = options.examplePath === undefined ? `/${settings.rootFolder}/lessons/` : options.examplePath;
 
     g_articles = [];
     g_langInfo = g_langDB[options.lang].langInfo;
 
-    applyTemplateToFiles(options.template, path.join(options.lessons, 'threejs*.md'), options);
+    applyTemplateToFiles(options.template, path.join(options.lessons, settings.lessonGrep), options);
 
     // generate place holders for non-translated files
     const articlesFilenames = g_articles.map(a => path.basename(a.src_file_name));
@@ -454,48 +455,53 @@ const Builder = function(outBaseDir, options) {
         return b.dateAdded - a.dateAdded;
       });
 
-      const feed = new Feed({
-        title:          g_langInfo.title,
-        description:    g_langInfo.description,
-        link:           g_langInfo.link,
-        image:          'http://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg',
-        date:           articles[0].dateModified.toDate(),
-        published:      articles[0].dateModified.toDate(),
-        updated:        articles[0].dateModified.toDate(),
-        author: {
-          name:       'threejsfundamenals contributors',
-          link:       'http://threejsfundamentals.org/contributors.html',
-        },
-      });
-
-      articles.forEach(function(article) {
-        feed.addItem({
-          title:          article.title,
-          link:           'http://threejsfundamentals.org' + article.dst_file_name,
-          description:    '',
-          author: [
-            {
-              name:       'threejsfundamenals contributors',
-              link:       'http://threejsfundamentals.org/contributors.html',
-            },
-          ],
-          // contributor: [
-          // ],
-          date:           article.dateModified.toDate(),
-          published:      article.dateAdded.toDate(),
-          // image:          posts[key].image
+      if (articles.length) {
+        const feed = new Feed({
+          title:          g_langInfo.title,
+          description:    g_langInfo.description,
+          link:           g_langInfo.link,
+          image:          `${settings.baseUrl}/${settings.rootFolder}/lessons/resources/${settings.siteThumbnail}`,
+          date:           articles[0].dateModified.toDate(),
+          published:      articles[0].dateModified.toDate(),
+          updated:        articles[0].dateModified.toDate(),
+          author: {
+            name:       `${settings.siteName} Contributors`,
+            link:       `${settings.baseUrl}/contributors.html`,
+          },
         });
 
-        addArticleByLang(article, options.lang);
-      });
+        articles.forEach(function(article) {
+          feed.addItem({
+            title:          article.title,
+            link:           `${settings.baseUrl}${article.dst_file_name}`,
+            description:    '',
+            author: [
+              {
+                name:       `${settings.siteName} Contributors`,
+                link:       `${settings.baseUrl}/contributors.html`,
+              },
+            ],
+            // contributor: [
+            // ],
+            date:           article.dateModified.toDate(),
+            published:      article.dateAdded.toDate(),
+            // image:          posts[key].image
+          });
 
-      try {
-        const outPath = path.join(g_outBaseDir, options.lessons, 'atom.xml');
-        console.log('write:', outPath);  // eslint-disable-line
-        writeFileIfChanged(outPath, feed.atom1());
-      } catch (err) {
-        return Promise.reject(err);
+          addArticleByLang(article, options.lang);
+        });
+
+        try {
+          const outPath = path.join(g_outBaseDir, options.lessons, 'atom.xml');
+          console.log('write:', outPath);  // eslint-disable-line
+          writeFileIfChanged(outPath, feed.atom1());
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      } else {
+        console.log('no articles!');  // eslint-disable-line
       }
+
       return Promise.resolve();
     }).then(function() {
       // this used to insert a table of contents
@@ -517,7 +523,7 @@ const Builder = function(outBaseDir, options) {
 
   this.writeGlobalFiles = function() {
     const sm = sitemap.createSitemap({
-      hostname: 'http://threejsfundamentals.org',
+      hostname: settings.baseUrl,
       cacheTime: 600000,
     });
     const articleLangs = { };
@@ -534,11 +540,11 @@ const Builder = function(outBaseDir, options) {
     //   articles: articleLangs,
     //   langs: g_langDB,
     // };
-    // var langJS = "window.langDB = " + JSON.stringify(langInfo, null, 2);
-    // writeFileIfChanged(path.join(g_outBaseDir, "langdb.js"), langJS);
+    // var langJS = 'window.langDB = ' + JSON.stringify(langInfo, null, 2);
+    // writeFileIfChanged(path.join(g_outBaseDir, 'langdb.js'), langJS);
     writeFileIfChanged(path.join(g_outBaseDir, 'sitemap.xml'), sm.toString());
-    copyFile(path.join(g_outBaseDir, 'threejs/lessons/atom.xml'), path.join(g_outBaseDir, 'atom.xml'));
-    copyFile(path.join(g_outBaseDir, 'threejs/lessons/index.html'), path.join(g_outBaseDir, 'index.html'));
+    copyFile(path.join(g_outBaseDir, `${settings.rootFolder}/lessons/atom.xml`), path.join(g_outBaseDir, 'atom.xml'));
+    copyFile(path.join(g_outBaseDir, `${settings.rootFolder}/lessons/index.html`), path.join(g_outBaseDir, 'index.html'));
 
     applyTemplateToFile('build/templates/index.template', 'contributors.md', path.join(g_outBaseDir, 'contributors.html'), {
       table_of_contents: '',
@@ -550,7 +556,7 @@ const Builder = function(outBaseDir, options) {
 };
 
 const b = new Builder('out', {
-  origPath: 'threejs/lessons',  // english articles
+  origPath: `${settings.rootFolder}/lessons`,  // english articles
 });
 
 const readdirs = function(dirpath) {
@@ -563,7 +569,7 @@ const readdirs = function(dirpath) {
     return path.join(dirpath, filename);
   };
 
-  return fs.readdirSync('threejs/lessons')
+  return fs.readdirSync(`${settings.rootFolder}/lessons`)
       .map(addPath)
       .filter(dirsOnly);
 };
@@ -584,15 +590,15 @@ let langs = [
   // English is special (sorry it's where I started)
   {
     template: 'build/templates/lesson.template',
-    lessons: 'threejs/lessons',
+    lessons: `${settings.rootFolder}/lessons`,
     lang: 'en',
-    toc: 'threejs/lessons/toc.html',
-    examplePath: '/threejs/lessons/',
+    toc: `${settings.rootFolder}/lessons/toc.html`,
+    examplePath: `/${settings.rootFolder}/lessons/`,
     home: '/',
   },
 ];
 
-langs = langs.concat(readdirs('threejs/lessons')
+langs = langs.concat(readdirs(`${settings.rootFolder}/lessons`)
     .filter(isLangFolder)
     .map(pathToLang));
 

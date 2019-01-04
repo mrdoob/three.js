@@ -63,7 +63,13 @@ module.exports = function(grunt) {
   grunt.registerTask('buildlessons', function() {
     const buildStuff = require('./build/js/build');
     const finish = this.async();
-    buildStuff().then(function() {
+    buildStuff({
+      baseUrl: 'http://threejsfundamentals.org',
+      rootFolder: 'threejs',
+      lessonGrep: 'threejs*.md',
+      siteName: 'ThreeJSFundamentals',
+      siteThumbnail: 'threejsfundamentals.jpg',  // in rootFolder/lessons/resources
+    }).then(function() {
         finish();
     }).done();
   });
