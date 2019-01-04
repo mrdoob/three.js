@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Deprecated API List</h1>
+
+		<p>
+			As three.js has a rapidly evolving interface, you may come across examples that
+			suggest the use of API elements that are no longer part of the core.<br /><br />
+
+			Below is a list of such elements, along with info regarding their replacements.
+		</p>
+
+
+
+
+
+
+
+
+
+
+		<h2>Audio</h2>
+
+		<h3>[page:Audio]</h3>
+		<p>Audio.load has been deprecated. Use [page:AudioLoader] instead.</p>
+
+		<h3>[page:AudioAnalyser]</h3>
+		<p>AudioAnalyser.getData() has been renamed to [page:AudioAnalyser.getFrequencyData]().</p>
+
+		<h3>[page:BinaryTextureLoader]</h3>
+		<p>BinaryTextureLoader has been renamed to [page:DataTextureLoader].</p>
+
+
+
+
+
+
+
+
+
+
+
+		<h2>Buffers</h2>
+
+		<h3>[page:BufferAttribute]</h3>
+		<p>BufferAttribute.length has been renamed to [page:BufferAttribute.count].</p>
+		<p>BufferAttribute.copyIndicesArray() has been removed.</p>
+
+
+		<h3>[page:DynamicBufferAttribute]</h3>
+		<p>DynamicBufferAttribute has been removed. Use [page:BufferAttribute.setDynamic]( true ) instead.</p>
+
+		<h3>[page:Int8Attribute]</h3>
+		<p>Int8Attribute has been removed. Use [page:BufferAttributeTypes Int8BufferAttribute] instead.</p>
+
+		<h3>[page:Uint8Attribute]</h3>
+		<p>Uint8Attribute has been removed. Use [page:BufferAttributeTypes Uint8BufferAttribute] instead.</p>
+
+		<h3>[page:Uint8ClampedAttribute]</h3>
+		<p>Uint8ClampedAttribute has been removed. Use [page:BufferAttributeTypes Uint8ClampedBufferAttribute] instead.</p>
+
+		<h3>[page:Int16Attribute]</h3>
+		<p>Int16Attribute has been removed. Use [page:BufferAttributeTypes Int16BufferAttribute] instead.</p>
+
+		<h3>[page:Uint16Attribute]</h3>
+		<p>Uint16Attribute has been removed. Use [page:BufferAttributeTypes Uint16BufferAttribute] instead.</p>
+
+		<h3>[page:Int32Attribute]</h3>
+		<p>Int32Attribute has been removed. Use [page:BufferAttributeTypes Int32BufferAttribute] instead.</p>
+
+		<h3>[page:Uint32Attribute]</h3>
+		<p>Uint32Attribute has been removed. Use [page:BufferAttributeTypes Uint32BufferAttribute] instead.</p>
+
+		<h3>[page:Float32Attribute]</h3>
+		<p>Float32Attribute has been removed. Use [page:BufferAttributeTypes Float32BufferAttribute] instead.</p>
+
+		<h3>[page:Float64Attribute]</h3>
+		<p>Float64Attribute has been removed. Use [page:BufferAttributeTypes Float64BufferAttribute] instead.</p>
+
+
+
+
+
+
+
+		<h2>Cameras</h2>
+
+		<h3>[page:PerspectiveCamera]</h3>
+		<p>
+		PerspectiveCamera.setLens() is deprecated. Use [page:PerspectiveCamera.setFocalLength]()
+		 and [page:PerspectiveCamera.filmGauge]() for a photographic setup.
+		</p>
+
+
+
+
+
+
+
+		<h2>Constants</h2>
+
+		<h3>[page:LineStrip]</h3>
+
+		<h3>[page:LinePieces]</h3>
+		<p>
+		LinePieces mode is no longer supported for [page:Line]s. Create a [page:LineSegments] instead.
+		</p>
+
+
+
+
+
+		<h2>Core</h2>
+
+		<h3>[page:EventDispatcher]</h3>
+		<p>EventDispatcher.apply has been removed. Inherit or Object.assign the prototype to mix-in instead.</p>
+
+		<h3>[page:Raycaster]</h3>
+		<p>Raycaster.params.PointCloud has been renamed to [page:Raycaster.params.Points].</p>
+
+
+		<h3>[page:Uniform]</h3>
+		<p>
+			Uniform.dynamic has been removed. Use object.onBeforeRender() instead.<br /><br />
+
+			Uniform.onUpdate has been removed. Use object.onBeforeRender() instead.
+		</p>
+
+
+
+
+
+
+		<h2>Extras</h2>
+
+		<h3>[page:ClosedSplineCurve3]</h3>
+		<p>ClosedSplineCurve3 has been deprecated. Use [page:CatmullRomCurve3] instead.</p>
+
+		<h3>[page:SplineCurve3]</h3>
+		<p>SplineCurve3 has been deprecated. Use [page:CatmullRomCurve3] instead.</p>
+
+
+
+
+
+
+
+		<h2>Geometry</h2>
+
+		<p>
+			Geometry.computeTangents() has been removed.<br /><br />
+
+			Geometry.computeLineDistances() has been removed. Use [page:Line.computeLineDistances] instead.<br /><br />
+		</p>
+
+		<h3>[page:BufferGeometry]</h3>
+		<p>
+			BufferGeometry.addIndex has been renamed to [page:BufferGeometry.setIndex].<br /><br />
+
+			BufferGeometry.addDrawCall is now [page:BufferGeometry.addGroup].<br /><br />
+
+			BufferGeometry.clearDrawCalls is now [page:BufferGeometry.clearGroups].<br /><br />
+
+			BufferGeometry.computeTangents has been removed.<br /><br />
+
+			BufferGeometry.computeOffsets has been removed.<br /><br />
+
+			BufferGeometry.drawcalls has been renamed to [page:BufferGeometry.groups].<br /><br />
+
+			BufferGeometry.offsets has been renamed to [page:BufferGeometry.groups].<br /><br />
+
+		</p>
+
+		<h3>[page:CubeGeometry]</h3>
+		<p>CubeGeometry has been renamed to [page:BoxGeometry].</p>
+
+		<h3>[page:Geometry]</h3>
+		<p>Geometry.computeTangents() has been removed.</p>
+
+		<h3>[page:GeometryUtils]</h3>
+		<p>
+			GeometryUtils.merge has been moved to [page:Geometry]. Use [page:Geometry.merge]( geometry2, matrix, materialIndexOffset ) instead.<br /><br />
+
+			GeometryUtils.center has been moved to [page:Geometry]. Use [page:Geometry.center]( ) instead.
+		</p>
+
+		<h3>[page:Plane]</h3>
+		<p>
+			Plane.isIntersectionLine() has been renamed to	[page:Plane.intersectsLine]().
+		</p>
+
+
+
+
+
+
+
+
+		<h2>Helpers</h2>
+
+		<h3>[page:BoundingBoxHelper]</h3>
+		<p>BoundingBoxHelper has been deprecated. Use [page:BoxHelper] instead.</p>
+
+		<h3>[page:EdgesHelper]</h3>
+		<p>EdgesHelper has been removed. Use [page:EdgesGeometry] instead.</p>
+
+		<h3>[page:GridHelper]</h3>
+		<p>GridHelper.setColors() has been deprecated, pass them in the constructor instead.</p>
+
+		<h3>[page:WireframeHelper WireframeHelper]</h3>
+		<p>WireframeHelper has been removed. Use [page:WireframeGeometry] instead.</p>
+
+
+
+
+		<h2>Lights</h2>
+
+		<h3>[page:Light]</h3>
+		<p>
+			Light.onlyShadow has been removed.<br /><br />
+
+			Light.shadowCameraLeft is now [page:Light.shadow.camera.left].<br /><br />
+
+			Light.shadowCameraRight is now [page:Light.shadow.camera.right].<br /><br />
+
+			Light.shadowCameraTop is now [page:Light.shadow.camera.top].<br /><br />
+
+			Light.shadowCameraBottom is now [page:Light.shadow.camera.bottom].<br /><br />
+
+			Light.shadowCameraNear is now [page:Light.shadow.camera.near].<br /><br />
+
+			Light.shadowCameraFar is now [page:Light.shadow.camera.far].<br /><br />
+
+			Light.shadowCameraVisible has been removed. Use [page:CameraHelper] ( light.shadow.camera ) instead.<br /><br />
+
+			Light.shadowMapWidth is now [page:Light.shadow.mapSize.width].<br /><br />
+
+			Light.shadowMapHeight is now [page:Light.shadow.mapSize.height].
+		</p>
+
+		<h2>Loaders</h2>
+
+		<h3>[page:XHRLoader]</h3>
+		<p>XHRLoader has been renamed to [page:FileLoader].</p>
+
+		<h3>[page:JSONLoader]</h3>
+		<p>JSONLoader has been removed from core.</p>
+
+		<h2>Maths</h2>
+
+		<h3>[page:Box2]</h3>
+		<p>
+			Box2.center has been renamed to [page:Box2.getCenter]().<br /><br />
+
+			Box2.empty has been renamed to [page:Box2.isEmpty]().<br /><br />
+
+			Box2.isIntersectionBox has been renamed to [page:Box2.intersectsBox]().<br /><br />
+
+			Box2.size has been renamed to [page:Box2.getSize]().
+
+		</p>
+
+		<h3>[page:Box3]</h3>
+		<p>
+			Box3.center has been renamed to [page:Box3.getCenter]().<br /><br />
+
+			Box3.empty has been renamed to [page:Box3.isEmpty]().<br /><br />
+
+			Box3.isIntersectionBox has been renamed to [page:Box3.intersectsBox]().<br /><br />
+
+			Box3.isIntersectionSphere has been renamed to [page:Box3.intersectsSphere]().<br /><br />
+
+			Box3.size has been renamed to [page:Box3.getSize]().
+		</p>
+
+		<h3>[page:Face4]</h3>
+		<p>Face4 has been removed. Use [page:Face3] instead.</p>
+
+		<h3>[page:Line3]</h3>
+		<p>Line3.center has been renamed to [page:Line3.getCenter]().</p>
+
+		<h3>[page:Math]</h3>
+		<p>
+			Math.random16() has been deprecated. Use Math.random() instead.
+		</p>
+
+		<h3>[page:Matrix3]</h3>
+		<p>
+			Matrix3.flattenToArrayOffset is deprecated. Use [page:Matrix3.toArray]() instead.<br /><br />
+
+			Matrix3.multiplyVector3 has been removed. Use vector.applyMatrix3( matrix ) instead.<br /><br />
+
+			Matrix3.multiplyVector3Array has been renamed to [page:Matrix3.applyToVector3Array]( array ).<br /><br />
+
+			Matrix3.applyToBuffer has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.<br /><br />
+
+			Matrix3.applyToVector3Array has been removed.
+		<p>
+
+		<h3>[page:Matrix4]</h3>
+		<p>
+			Matrix4.flattenToArrayOffset() is deprecated. Use [page:Matrix4.toArray]() instead.<br /><br />
+
+			Matrix4.extractPosition() has been renamed to [page:Matrix4.copyPosition]( matrix ).<br /><br />
+
+			Matrix4.getPosition() has been removed. Use [page:Vector3.setFromMatrixPosition]( matrix ) instead.<br /><br />
+
+			Matrix4.setRotationFromQuaternion() has been renamed to [page:Matrix4.makeRotationFromQuaternion]( quaternion ).<br /><br />
+
+			Matrix4.multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
+
+			Matrix4.multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
+
+			Matrix4.multiplyVector3Array() has been renamed to [page:Matrix4.applyToVector3Array] ( array ).<br /><br />
+
+			Matrix4.rotateAxis() has been removed. Use [page:Matrix4.transformDirection]( matrix ) instead.<br /><br />
+
+			Matrix4.crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
+
+			Matrix4.rotateX() has been removed.<br /><br />
+
+			Matrix4.rotateY() has been removed.<br /><br />
+
+			Matrix4.rotateZ() has been removed.<br /><br />
+
+			Matrix4.rotateByAxis() has been removed.<br /><br />
+
+			Matrix4.applyToBuffer() has been removed. Use matrix.applyToBufferAttribute() instead.<br /><br />
+
+			Matrix4.applyToVector3Array() has been removed.<br /><br />
+
+			Matrix4.makeFrustum() has been removed. Use [page:Matrix4.makePerspective]( left, right, top, bottom, near, far ) instead.
+		</p>
+
+
+		<h3>[page:Quaternion.multiplyVector3]</h3>
+		<p>Quaternion.multiplyVector3() has been removed. Use vector.applyQuaternion( quaternion ) instead.</p>
+
+		<h3>[page:Ray]</h3>
+		<p>
+			Ray.isIntersectionBox() has been renamed to [page:Ray.intersectsBox]().<br /><br />
+
+			Ray.isIntersectionPlane has been renamed to [page:Ray.intersectsPlane].<br /><br />
+
+			Ray.isIntersectionSphere has been renamed to [page:Ray.intersectsSphere].
+		</p>
+
+		<h3>[page:Triangle]</h3>
+		<p>
+			Triangle.area() has been renamed to [page:Triangle.getArea]().<br /><br />
+			Triangle.barycoordFromPoint() has been renamed to [page:Triangle.getBarycoord]().<br /><br />
+			Triangle.midpoint() has been renamed to [page:Triangle.getMidpoint]().<br /><br />
+			Triangle.normal() has been renamed to [page:Triangle.getNormal]().<br /><br />
+			Triangle.plane() has been renamed to [page:Triangle.getPlane]().
+		</p>
+
+		<h3>[page:Vector2]</h3>
+		<p>
+			Vector2.fromAttribute() has been renamed to [page:Vector2.fromBufferAttribute]().
+		</p>
+
+		<h3>[page:Vector3]</h3>
+		<p>
+			Vector3.setEulerFromRotationMatrix() has been removed. Use [page:Euler.setFromRotationMatrix]() instead.<br /><br />
+
+			Vector3.setEulerFromQuaternion() has been removed. Use [page:Euler.setFromQuaternion]() instead.<br /><br />
+
+			Vector3.getPositionFromMatrix() has been renamed to [page:Vector3.setFromMatrixPosition]().<br /><br />
+
+			Vector3.getScaleFromMatrix() has been renamed to [page:Vector3.setFromMatrixScale]().<br /><br />
+
+			Vector3.getColumnFromMatrix() has been renamed to [page:Vector3.setFromMatrixColumn]().<br /><br />
+
+			Vector3.applyProjection() has been removed. Use [page:Vector3.applyMatrix4]() instead.<br /><br />
+
+			Vector3.fromAttribute() has been renamed to [page:Vector3.fromBufferAttribute]().
+		</p>
+
+		<h3>[page:Vector4]</h3>
+		<p>
+			Vector4.fromAttribute() has been renamed to [page:Vector4.fromBufferAttribute]().
+		</p>
+
+		<h3>[page:Vertex]</h3>
+		<p>Vertex has been removed. Use [page:Vector3] instead.</p>
+
+		<h3>[page:Spline]</h3>
+		<p>Spline has been removed. Use [page:CatmullRomCurve3] instead.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+		<h2>Materials</h2>
+
+		<h3>[page:Material]</h3>
+		<p>
+			Material.wrapAround has been removed.<br /><br />
+
+			Material.wrapRGB has been removed.
+
+		</p>
+
+		<h3>[page:MeshFaceMaterial]</h3>
+		<p>MeshFaceMaterial has been removed. Use an array of materials instead.</p>
+
+		<h3>[page:MultiMaterial]</h3>
+		<p>MultiMaterial has been removed. Use an array of materials instead.</p>
+
+		<h3>[page:MeshPhongMaterial]</h3>
+		<p>MeshPhongMaterial.metal has been removed. Use [page:MeshStandardMaterial] instead.</p>
+
+		<h3>[page:ParticleBasicMaterial]</h3>
+		<p>ParticleBasicMaterial has been renamed to [page:PointsMaterial].</p>
+
+		<h3>[page:ParticleSystemMaterial]</h3>
+		<p>ParticleBasicMaterial has been renamed to [page:PointsMaterial].</p>
+
+		<h3>[page:PointCloudMaterial]</h3>
+		<p>PointCloudMaterial has been renamed to [page:PointsMaterial].</p>
+
+		<h3>[page:ShaderMaterial.derivatives]</h3>
+		<p>ShaderMaterial.derivatives has been moved to [page:ShaderMaterial.extensions.derivatives].</p>
+
+
+
+
+
+
+
+
+		<h2>Objects</h2>
+
+		<h3>[page:LOD.objects]</h3>
+		<p>LOD.objects has been renamed to [page:LOD.levels].</p>
+
+		<h3>[page:Object3D]</h3>
+		<p>
+			Object3D.eulerOrder is now [page:Object3D.rotation.order].<br /><br />
+
+			Object3D.getChildByName() has been renamed to [page:Object3D.getObjectByName]().<br /><br />
+
+			Object3D.renderDepth has been removed. Use [page:Object3D.renderOrder] instead.<br /><br />
+
+			Object3D.translate() has been removed. Use [page:Object3D.translateOnAxis]( axis, distance ) instead.<br /><br />
+
+			Object3D.useQuaternion has been removed. The library now uses quaternions by default.
+		</p>
+
+		<h3>[page:LensFlare]</h3>
+		<p>
+			LensFlare has been moved to [link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/Lensflare.js /examples/js/objects/Lensflare.js].
+		</p>
+
+
+		<h3>[page:Particle]</h3>
+		<p>Particle has been renamed to [page:Sprite].</p>
+
+		<h3>[page:ParticleSystem]</h3>
+		<p>ParticleSystem has been renamed to [page:Points].</p>
+
+		<h3>[page:PointCloud]</h3>
+		<p>PointCloud has been renamed to [page:Points].</p>
+
+		<h3>[page:Shape]</h3>
+		<p>
+			Shape.extrude has been removed. Use [page:ExtrudeGeometry] instead.<br /><br />
+
+			Shape.makeGeometry has been removed. Use [page:ShapeGeometry] instead.
+		</p>
+
+		<h3>[page:SkinnedMesh]</h3>
+		<p>
+			SkinnedMesh.initBones() has been removed.
+		</p>
+
+
+		<h2>Renderers</h2>
+
+		<h3>[page:CanvasRenderer]</h3>
+		<p>
+			CanvasRenderer has been removed.
+		</p>
+
+		<h3>[page:Projector]</h3>
+		<p>
+			Projector has been moved to
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/Projector.js 	/examples/js/renderers/Projector.js].<br /><br />
+
+			Projector.projectVector() is now [page:Vector.project]().<br /><br />
+
+			Projector.unprojectVector() is now [page:Vector.unproject]().<br /><br />
+
+			Projector:.pickingRay() is now [page:Raycaster.setFromCamera]().
+		</p>
+
+		<h3>[page:WebGLProgram]</h3>
+		<p>
+			WebGLProgram.uniforms is now [page:WebGLProgram.getUniforms]().<br /><br />
+
+			WebGLProgram.attributes is now [page:WebGLProgram.getAttributes]().
+		</p>
+
+		<h3>[page:WebGLRenderer]</h3>
+		<p>
+			WebGLRenderer.supportsFloatTextures() is now [page:WebGLRenderer.extensions.get]( 'OES_texture_float' ).<br /><br />
+
+			WebGLRenderer.supportsHalfFloatTextures() is now [page:WebGLRenderer.extensions.get]( 'OES_texture_half_float' ).<br /><br />
+
+			WebGLRenderer.supportsStandardDerivatives() is now [page:WebGLRenderer.extensions.get]( 'OES_standard_derivatives' ).<br /><br />
+
+			WebGLRenderer.supportsCompressedTextureS3TC() is now [page:WebGLRenderer.extensions.get]( 'WEBGL_compressed_texture_s3tc' ).<br /><br />
+
+			WebGLRenderer.supportsCompressedTexturePVRTC() is now [page:WebGLRenderer.extensions.get]( 'WEBGL_compressed_texture_pvrtc' ).<br /><br />
+
+			WebGLRenderer.supportsBlendMinMax() is now [page:WebGLRenderer.extensions.get]( 'EXT_blend_minmax' ).<br /><br />
+
+			WebGLRenderer.supportsVertexTextures() is now [page:WebGLRenderer.capabilities.vertexTextures].<br /><br />
+
+			WebGLRenderer.supportsInstancedArrays() is now [page:WebGLRenderer.extensions.get]( 'ANGLE_instanced_arrays' ).<br /><br />
+
+			WebGLRenderer.enableScissorTest() is now [page:WebGLRenderer.setScissorTest]().<br /><br />
+
+			WebGLRenderer.initMaterial() has been removed.<br /><br />
+
+			WebGLRenderer.addPrePlugin() has been removed.<br /><br />
+
+			WebGLRenderer.addPostPlugin() has been removed.<br /><br />
+
+			WebGLRenderer.updateShadowMap() has been removed.<br /><br />
+
+			WebGLRenderer.setFaceCulling() has been removed.<br /><br />
+
+			WebGLRenderer.setTexture is deprecated, use [page:WebGLRenderer.setTexture2D]() instead.<br /><br />
+
+			WebGLRenderer.shadowMapEnabled is now [page:WebGLRenderer.shadowMap.enabled].<br /><br />
+
+			WebGLRenderer.shadowMapType is now [page:WebGLRenderer.shadowMap.type].<br /><br />
+
+			WebGLRenderer.shadowMapCullFace has been removed. Set [page:Material.shadowSide] instead.<br /><br />
+
+			WebGLRenderer.shadowMap.cullFace has been removed. Set [page:Material.shadowSide] instead.<br /><br />
+
+			WebGLRenderer.shadowMap.renderReverseSided has been removed. Set [page:Material.shadowSide] instead.<br /><br />
+
+			WebGLRenderer.shadowMap.renderSingleSided has been removed. Set [page:Material.shadowSide] instead.
+
+		</p>
+
+		<h3>[page:WebGLRenderTarget]</h3>
+		<p>
+			WebGLRenderTarget.wrapS is now [page:WebGLRenderTarget.texture.wrapS].<br /><br />
+
+			WebGLRenderTarget.wrapT is now [page:WebGLRenderTarget.texture.wrapT].<br /><br />
+
+			WebGLRenderTarget.magFilter is now [page:WebGLRenderTarget.texture.magFilter].<br /><br />
+
+			WebGLRenderTarget.minFilter is now [page:WebGLRenderTarget.texture.minFilter].<br /><br />
+
+			WebGLRenderTarget.anisotropy is now [page:WebGLRenderTarget.texture.anisotropy].<br /><br />
+
+			WebGLRenderTarget.offset is now [page:WebGLRenderTarget.texture.offset].<br /><br />
+
+			WebGLRenderTarget.repeat is now [page:WebGLRenderTarget.texture.repeat].<br /><br />
+
+			WebGLRenderTarget.format is now [page:WebGLRenderTarget.texture.format].<br /><br />
+
+			WebGLRenderTarget.type is now [page:WebGLRenderTarget.texture.type].<br /><br />
+
+			WebGLRenderTarget.generateMipmaps is now [page:WebGLRenderTarget.texture.generateMipmaps].
+		</p>
+
+
+		<h2>Textures</h2>
+
+		<h3>[page:ImageUtils]</h3>
+		<p>
+			ImageUtils.loadTexture has been deprecated. Use [page:TextureLoader] instead.<br /><br />
+
+			ImageUtils.loadTextureCube has been deprecated. Use [page:CubeTextureLoader] instead.<br /><br />
+
+			ImageUtils.loadCompressedTexture has been removed. Use [page:DDSLoader] instead.<br /><br />
+
+			ImageUtils.loadCompressedTextureCube has been removed. Use [page:DDSLoader] instead.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/Three.Legacy.js src/Three.Legacy.js]
+
+
+		</body>
+</html>

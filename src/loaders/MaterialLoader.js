@@ -25,17 +25,12 @@ Object.assign( MaterialLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setTextures: function ( value ) {
-
-		this.textures = value;
 
 	},
 
@@ -71,6 +66,7 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.fog !== undefined ) material.fog = json.fog;
 		if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
 		if ( json.blending !== undefined ) material.blending = json.blending;
+		if ( json.combine !== undefined ) material.combine = json.combine;
 		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
@@ -150,6 +146,16 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 
+		if ( json.extensions !== undefined ) {
+
+			for ( var key in json.extensions ) {
+
+				material.extensions[ key ] = json.extensions[ key ];
+
+			}
+
+		}
+
 		// Deprecated
 
 		if ( json.shading !== undefined ) material.flatShading = json.shading === 1; // THREE.FlatShading
@@ -204,6 +210,7 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.specularMap !== undefined ) material.specularMap = getTexture( json.specularMap );
 
 		if ( json.envMap !== undefined ) material.envMap = getTexture( json.envMap );
+		if ( json.envMapIntensity !== undefined ) material.envMapIntensity = json.envMapIntensity;
 
 		if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
 
@@ -216,6 +223,20 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
 
 		return material;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
+
+	},
+
+	setTextures: function ( value ) {
+
+		this.textures = value;
+		return this;
 
 	}
 

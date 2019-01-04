@@ -40,11 +40,15 @@
 
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var params = {
 				exposure: 1.0
@@ -72,7 +76,7 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.RGBELoader().load( 'textures/miranda_uncropped.hdr', function( texture, textureData ) {
+				new THREE.RGBELoader().load( 'textures/miranda_uncropped.hdr', function ( texture, textureData ) {
 
 					//console.log( textureData );
 					//console.log( texture );

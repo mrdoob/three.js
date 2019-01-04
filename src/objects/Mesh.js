@@ -104,17 +104,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
 
-				this.morphTargetInfluences = [];
-				this.morphTargetDictionary = {};
-
-				for ( m = 0, ml = morphTargets.length; m < ml; m ++ ) {
-
-					name = morphTargets[ m ].name || String( m );
-
-					this.morphTargetInfluences.push( 0 );
-					this.morphTargetDictionary[ name ] = m;
-
-				}
+				console.error( 'THREE.Mesh.updateMorphTargets() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 			}
 
@@ -140,24 +130,8 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var uvB = new Vector2();
 		var uvC = new Vector2();
 
-		var barycoord = new Vector3();
-
 		var intersectionPoint = new Vector3();
 		var intersectionPointWorld = new Vector3();
-
-		function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
-
-			Triangle.getBarycoord( point, p1, p2, p3, barycoord );
-
-			uv1.multiplyScalar( barycoord.x );
-			uv2.multiplyScalar( barycoord.y );
-			uv3.multiplyScalar( barycoord.z );
-
-			uv1.add( uv2 ).add( uv3 );
-
-			return uv1.clone();
-
-		}
 
 		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
@@ -206,7 +180,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					uvB.fromBufferAttribute( uv, b );
 					uvC.fromBufferAttribute( uv, c );
 
-					intersection.uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
+					intersection.uv = Triangle.getUV( intersectionPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() );
 
 				}
 
@@ -448,7 +422,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							uvB.copy( uvs_f[ 1 ] );
 							uvC.copy( uvs_f[ 2 ] );
 
-							intersection.uv = uvIntersection( intersectionPoint, fvA, fvB, fvC, uvA, uvB, uvC );
+							intersection.uv = Triangle.getUV( intersectionPoint, fvA, fvB, fvC, uvA, uvB, uvC, new Vector2() );
 
 						}
 

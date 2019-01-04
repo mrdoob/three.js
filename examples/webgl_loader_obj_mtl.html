@@ -36,7 +36,6 @@
 		<script src="js/loaders/MTLLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -87,7 +86,7 @@
 
 				};
 
-				var onError = function ( xhr ) { };
+				var onError = function () { };
 
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 

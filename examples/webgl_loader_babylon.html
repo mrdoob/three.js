@@ -60,18 +60,15 @@
 
 				};
 
-				var texture = new THREE.Texture();
-
-				var material = new THREE.MeshBasicMaterial( { color: 'red' } );
-
 				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
-					}
-				};
 
-				var onError = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
 				};
 
 				// model
@@ -95,7 +92,7 @@
 
 					animate();
 
-				}, onProgress, onError );
+				}, onProgress, null );
 
 				//
 

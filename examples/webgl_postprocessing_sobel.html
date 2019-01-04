@@ -33,7 +33,7 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
@@ -50,7 +50,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, composer;
 
@@ -115,8 +119,8 @@
 
 				effectSobel = new THREE.ShaderPass( THREE.SobelOperatorShader );
 				effectSobel.renderToScreen = true;
-				effectSobel.uniforms.resolution.value.x = window.innerWidth;
-				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				effectSobel.uniforms[ "resolution" ].value.x = window.innerWidth;
+				effectSobel.uniforms[ "resolution" ].value.y = window.innerHeight;
 				composer.addPass( effectSobel );
 
 				var controls = new THREE.OrbitControls( camera );
@@ -136,14 +140,14 @@
 
 			function onWindowResize() {
 
-				camera.aspect =  window.innerWidth / window.innerHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectSobel.uniforms.resolution.value.x = window.innerWidth;
-				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				effectSobel.uniforms[ "resolution" ].value.x = window.innerWidth;
+				effectSobel.uniforms[ "resolution" ].value.y = window.innerHeight;
 
 			}
 

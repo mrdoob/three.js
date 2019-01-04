@@ -34,12 +34,16 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats;
 
@@ -53,7 +57,7 @@
 
 				scene = new THREE.Scene();
 
-				var light, object;
+				var object;
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
@@ -175,7 +179,7 @@
 
 				camera.lookAt( scene.position );
 
-				scene.traverse( function( object ) {
+				scene.traverse( function ( object ) {
 
 					if ( object.isMesh === true ) {
 

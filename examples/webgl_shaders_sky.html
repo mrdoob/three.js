@@ -27,9 +27,7 @@
 
 			}
 
-			a {
-				color: #fff;
-			}
+			a { color: #fff; }
 
 		</style>
 	</head>
@@ -46,15 +44,16 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/objects/Sky.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var container;
+			}
 
 			var camera, controls, scene, renderer;
 
@@ -97,11 +96,11 @@
 				function guiChanged() {
 
 					var uniforms = sky.material.uniforms;
-					uniforms.turbidity.value = effectController.turbidity;
-					uniforms.rayleigh.value = effectController.rayleigh;
-					uniforms.luminance.value = effectController.luminance;
-					uniforms.mieCoefficient.value = effectController.mieCoefficient;
-					uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+					uniforms[ "turbidity" ].value = effectController.turbidity;
+					uniforms[ "rayleigh" ].value = effectController.rayleigh;
+					uniforms[ "luminance" ].value = effectController.luminance;
+					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
+					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
 
 					var theta = Math.PI * ( effectController.inclination - 0.5 );
 					var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
@@ -112,7 +111,7 @@
 
 					sunSphere.visible = effectController.sun;
 
-					uniforms.sunPosition.value.copy( sunSphere.position );
+					uniforms[ "sunPosition" ].value.copy( sunSphere.position );
 
 					renderer.render( scene, camera );
 

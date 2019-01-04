@@ -20,7 +20,7 @@
 				z-index: 100;
 				display:block;
 			}
-			#info a {
+			a {
 				color: #f88;
 				font-weight: bold;
 				text-decoration: underline;
@@ -35,11 +35,15 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer, stats;
 			var pointLight, pointLight2;

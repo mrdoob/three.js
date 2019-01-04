@@ -28,7 +28,7 @@
 		  color: gold;
 		}
 
-		#oldie {
+		#webglmessage {
 		  font-family: monospace;
 		  font-size: 13px;
 
@@ -73,13 +73,17 @@
 	<script src="js/MarchingCubes.js"></script>
 	<script src="js/ShaderToon.js"></script>
 
-	<script src="js/Detector.js"></script>
+	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
 
 
 	<script>
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var MARGIN = 0;
 
@@ -90,11 +94,11 @@
 
 		var camera, scene, renderer;
 
-		var mesh, texture, geometry, materials, material, current_material;
+		var materials, current_material;
 
 		var light, pointLight, ambientLight;
 
-		var effect, resolution, numBlobs;
+		var effect, resolution;
 
 		var composer, effectFXAA, hblur, vblur;
 
@@ -113,7 +117,7 @@
 			// CAMERA
 
 			camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-			camera.position.set( -500, 500, 1500 );
+			camera.position.set( - 500, 500, 1500 );
 
 			// SCENE
 
@@ -141,7 +145,6 @@
 			// MARCHING CUBES
 
 			resolution = 28;
-			numBlobs = 10;
 
 			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m, true, true );
 			effect.position.set( 0, 0, 0 );
@@ -171,7 +174,7 @@
 
 			// CONTROLS
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			// STATS
 
@@ -225,7 +228,7 @@
 
 		//
 
-		function onWindowResize( event ) {
+		function onWindowResize() {
 
 			SCREEN_WIDTH = window.innerWidth;
 			SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
@@ -267,105 +270,105 @@
 			// toons
 
 			var toonMaterial1 = createShaderMaterial( "toon1", light, ambientLight ),
-			toonMaterial2 = createShaderMaterial( "toon2", light, ambientLight ),
-			hatchingMaterial = createShaderMaterial( "hatching", light, ambientLight ),
-			hatchingMaterial2 = createShaderMaterial( "hatching", light, ambientLight ),
-			dottedMaterial = createShaderMaterial( "dotted", light, ambientLight ),
-			dottedMaterial2 = createShaderMaterial( "dotted", light, ambientLight );
+				toonMaterial2 = createShaderMaterial( "toon2", light, ambientLight ),
+				hatchingMaterial = createShaderMaterial( "hatching", light, ambientLight ),
+				hatchingMaterial2 = createShaderMaterial( "hatching", light, ambientLight ),
+				dottedMaterial = createShaderMaterial( "dotted", light, ambientLight ),
+				dottedMaterial2 = createShaderMaterial( "dotted", light, ambientLight );
 
-			hatchingMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
-			hatchingMaterial2.uniforms.uLineColor1.value.setHSL( 0, 0.8, 0.5 );
-			hatchingMaterial2.uniforms.uLineColor2.value.setHSL( 0, 0.8, 0.5 );
-			hatchingMaterial2.uniforms.uLineColor3.value.setHSL( 0, 0.8, 0.5 );
-			hatchingMaterial2.uniforms.uLineColor4.value.setHSL( 0.1, 0.8, 0.5 );
+			hatchingMaterial2.uniforms[ "uBaseColor" ].value.setRGB( 0, 0, 0 );
+			hatchingMaterial2.uniforms[ "uLineColor1" ].value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms[ "uLineColor2" ].value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms[ "uLineColor3" ].value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms[ "uLineColor4" ].value.setHSL( 0.1, 0.8, 0.5 );
 
-			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
-			dottedMaterial2.uniforms.uLineColor1.value.setHSL( 0.05, 1.0, 0.5 );
+			dottedMaterial2.uniforms[ "uBaseColor" ].value.setRGB( 0, 0, 0 );
+			dottedMaterial2.uniforms[ "uLineColor1" ].value.setHSL( 0.05, 1.0, 0.5 );
 
 			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 			var materials = {
 
-			"chrome" :
+				"chrome":
 			{
 				m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
 				h: 0, s: 0, l: 1
 			},
 
-			"liquid" :
+				"liquid":
 			{
 				m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
 				h: 0, s: 0, l: 1
 			},
 
-			"shiny"  :
+				"shiny":
 			{
 				m: new THREE.MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
 				h: 0, s: 0.8, l: 0.2
 			},
 
-			"matte" :
+				"matte":
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1 } ),
 				h: 0, s: 0, l: 1
 			},
 
-			"flat" :
+				"flat":
 			{
 				m: new THREE.MeshLambertMaterial( { color: 0x000000, flatShading: true } ),
 				h: 0, s: 0, l: 1
 			},
 
-			"textured" :
+				"textured":
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
 				h: 0, s: 0, l: 1
 			},
 
-			"colors" :
+				"colors":
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors } ),
 				h: 0, s: 0, l: 1
 			},
 
-			"plastic" :
+				"plastic":
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, shininess: 250 } ),
 				h: 0.6, s: 0.8, l: 0.1
 			},
 
-			"toon1"  :
+				"toon1":
 			{
 				m: toonMaterial1,
 				h: 0.2, s: 1, l: 0.75
 			},
 
-			"toon2" :
+				"toon2":
 			{
 				m: toonMaterial2,
 				h: 0.4, s: 1, l: 0.75
 			},
 
-			"hatching" :
+				"hatching":
 			{
 				m: hatchingMaterial,
 				h: 0.2, s: 1, l: 0.9
 			},
 
-			"hatching2" :
+				"hatching2":
 			{
 				m: hatchingMaterial2,
 				h: 0.0, s: 0.8, l: 0.5
 			},
 
-			"dotted" :
+				"dotted":
 			{
 				m: dottedMaterial,
 				h: 0.2, s: 1, l: 0.9
 			},
 
-			"dotted2" :
+				"dotted2":
 			{
 				m: dottedMaterial2,
 				h: 0.1, s: 1, l: 0.5
@@ -388,10 +391,10 @@
 
 			var material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
 
-			material.uniforms.uDirLightPos.value = light.position;
-			material.uniforms.uDirLightColor.value = light.color;
+			material.uniforms[ "uDirLightPos" ].value = light.position;
+			material.uniforms[ "uDirLightColor" ].value = light.color;
 
-			material.uniforms.uAmbientLightColor.value = ambientLight.color;
+			material.uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
 
 			return material;
 
@@ -401,9 +404,9 @@
 
 		function setupGui() {
 
-			var createHandler = function( id ) {
+			var createHandler = function ( id ) {
 
-				return function() {
+				return function () {
 
 					var mat_old = materials[ current_material ];
 					mat_old.h = m_h.getValue();
@@ -419,8 +422,8 @@
 					m_s.setValue( mat.s );
 					m_l.setValue( mat.l );
 
-					effect.enableUvs = (current_material === "textured") ? true : false;
-					effect.enableColors = (current_material === "colors") ? true : false;
+					effect.enableUvs = ( current_material === "textured" ) ? true : false;
+					effect.enableColors = ( current_material === "colors" ) ? true : false;
 
 				};
 
@@ -428,33 +431,32 @@
 
 			effectController = {
 
-			material: "shiny",
+				material: "shiny",
 
-			speed: 1.0,
-			numBlobs: 10,
-			resolution: 28,
-			isolation: 80,
+				speed: 1.0,
+				numBlobs: 10,
+				resolution: 28,
+				isolation: 80,
 
-			floor: true,
-			wallx: false,
-			wallz: false,
+				floor: true,
+				wallx: false,
+				wallz: false,
 
-			hue: 0.0,
-			saturation: 0.8,
-			lightness: 0.1,
+				hue: 0.0,
+				saturation: 0.8,
+				lightness: 0.1,
 
-			lhue: 0.04,
-			lsaturation: 1.0,
-			llightness: 0.5,
+				lhue: 0.04,
+				lsaturation: 1.0,
+				llightness: 0.5,
 
-			lx: 0.5,
-			ly: 0.5,
-			lz: 1.0,
+				lx: 0.5,
+				ly: 0.5,
+				lz: 1.0,
 
-			postprocessing: false,
+				postprocessing: false,
 
-			dummy: function() {
-			}
+				dummy: function () {}
 
 			};
 
@@ -485,17 +487,17 @@
 
 			h = gui.addFolder( "Point light color" );
 
-			h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name("hue");
-			h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name("saturation");
-			h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name("lightness");
+			h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name( "hue" );
+			h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name( "saturation" );
+			h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name( "lightness" );
 
 			// light (directional)
 
 			h = gui.addFolder( "Directional light orientation" );
 
-			h.add( effectController, "lx", -1.0, 1.0, 0.025 ).name("x");
-			h.add( effectController, "ly", -1.0, 1.0, 0.025 ).name("y");
-			h.add( effectController, "lz", -1.0, 1.0, 0.025 ).name("z");
+			h.add( effectController, "lx", - 1.0, 1.0, 0.025 ).name( "x" );
+			h.add( effectController, "ly", - 1.0, 1.0, 0.025 ).name( "y" );
+			h.add( effectController, "lz", - 1.0, 1.0, 0.025 ).name( "z" );
 
 			// simulation
 
@@ -536,7 +538,7 @@
 				bally = Math.abs( Math.cos( i + 1.12 * time * Math.cos( 1.22 + 0.1424 * i ) ) ) * 0.77; // dip into the floor
 				ballz = Math.cos( i + 1.32 * time * 0.1 * Math.sin( ( 0.92 + 0.53 * i ) ) ) * 0.27 + 0.5;
 
-				object.addBall(ballx, bally, ballz, strength, subtract);
+				object.addBall( ballx, bally, ballz, strength, subtract );
 
 			}
 
@@ -547,7 +549,6 @@
 		}
 
 		//
-
 
 		function animate() {
 
@@ -587,7 +588,7 @@
 
 				if ( current_material === "dotted2" ) {
 
-					effect.material.uniforms.uLineColor1.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+					effect.material.uniforms[ "uLineColor1" ].value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 
 				} else if ( current_material === "hatching2" ) {
 
@@ -600,7 +601,7 @@
 
 				} else {
 
-					effect.material.uniforms.uBaseColor.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+					effect.material.uniforms[ "uBaseColor" ].value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 
 				}
 

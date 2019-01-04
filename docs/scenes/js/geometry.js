@@ -6,6 +6,8 @@ var twoPi = Math.PI * 2;
 
 function updateGroupGeometry( mesh, geometry ) {
 
+	if ( geometry.isGeometry ) geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
 	mesh.children[ 0 ].geometry.dispose();
 	mesh.children[ 1 ].geometry.dispose();
 

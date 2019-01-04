@@ -41,19 +41,23 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
 
 			var clock = new THREE.Clock();
 
-			var mixers = [];
+			var mixer;
 
 			init();
 			animate();
@@ -82,8 +86,8 @@
 				light.position.set( 0, 200, 100 );
 				light.castShadow = true;
 				light.shadow.camera.top = 180;
-				light.shadow.camera.bottom = -100;
-				light.shadow.camera.left = -120;
+				light.shadow.camera.bottom = - 100;
+				light.shadow.camera.left = - 120;
 				light.shadow.camera.right = 120;
 				scene.add( light );
 
@@ -104,10 +108,9 @@
 				var loader = new THREE.FBXLoader();
 				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
 
-					object.mixer = new THREE.AnimationMixer( object );
-					mixers.push( object.mixer );
+					mixer = new THREE.AnimationMixer( object );
 
-					var action = object.mixer.clipAction( object.animations[ 0 ] );
+					var action = mixer.clipAction( object.animations[ 0 ] );
 					action.play();
 
 					object.traverse( function ( child ) {
@@ -154,15 +157,9 @@
 
 				requestAnimationFrame( animate );
 
-				if ( mixers.length > 0 ) {
+				var delta = clock.getDelta();
 
-					for ( var i = 0; i < mixers.length; i ++ ) {
-
-						mixers[ i ].update( clock.getDelta() );
-
-					}
-
-				}
+				if ( mixer ) mixer.update( delta );
 
 				renderer.render( scene, camera );
 

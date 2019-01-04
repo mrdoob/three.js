@@ -28,19 +28,23 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - stl
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - stl<br/><br/>
+			<button onclick="exportASCII()">export ASCII</button> <button onclick="exportBinary()">export binary</button>
 		</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/exporters/STLExporter.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var scene, camera, renderer, exporter, mesh;
 
@@ -108,24 +112,6 @@
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 25, 0 );
 				controls.update();
-
-				//
-
-				var params = {
-					ASCII: function() {
-						exportASCII();
-					},
-					Binary: function() {
-						exportBinary();
-					}
-				}
-
-				var gui = new dat.GUI();
-				var folder = gui.addFolder( 'Export' );
-
-				folder.add( params, 'ASCII' );
-				folder.add( params, 'Binary' );
-				folder.open();
 
 				//
 

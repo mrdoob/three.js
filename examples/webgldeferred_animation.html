@@ -36,10 +36,11 @@
 	<body>
 		<div id="container"></div>
 
+		<script src="../build/three.js"></script>
+
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
@@ -48,6 +49,8 @@
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
+
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 
@@ -92,7 +95,7 @@
 				container.appendChild( renderer.domElement );
 				container.appendChild( stats.domElement );
 
-				initKnight();
+				initModel();
 				initRoom();
 				initLights();
 				initGui();
@@ -104,34 +107,37 @@
 
 			}
 
-			function initKnight() {
+			function initModel() {
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.GLTFLoader();
 
-				loader.load( "models/skinned/knight.js", function( geometry, materials ) {
+				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function ( gltf ) {
 
-					var material = materials[ 0 ];
-					material.emissive.set( 0x101010 );
-					material.skinning = true;
-					material.morphTargets = true;
+					var model = gltf.scene;
+					model.position.y -= 30;
+					model.scale.multiplyScalar( 10 );
 
-					var mesh = new THREE.SkinnedMesh( geometry, material );
-					mesh.position.y = -30;
-					mesh.scale.multiplyScalar( 5 );
+					model.traverse( function ( o ) {
 
-					mixer = new THREE.AnimationMixer( mesh );
+						if ( !o.isMesh ) return;
 
-					for ( var i = 0; i < mesh.geometry.animations.length; i ++ ) {
+						o.material.emissive = o.material.color.clone().multiplyScalar( 0.3 );
 
-						var action = mixer.clipAction( mesh.geometry.animations[ i ] );
+					} );
 
-						if ( i === 1 ) action.timeScale = 0.25;
+					mixer = new THREE.AnimationMixer( model );
 
-						action.play();
+					var dance = gltf.animations.find( function ( clip ) {
 
-					}
+						return clip.name === 'Dance';
 
-					scene.add( mesh );
+					} );
+
+					var action = mixer.clipAction( dance );
+
+					action.play();
+
+					scene.add( model );
 
 					ready = true;
 
@@ -161,7 +167,7 @@
 				}
 
 				var directionalLight = new THREE.DirectionalLight( 0x101010 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				var spotLight = new THREE.SpotLight( 0x404040 );
@@ -182,31 +188,31 @@
 
 				// top
 				var mesh = new THREE.Mesh( geometry, material );
-				mesh.rotation.x = Math.PI/2;
+				mesh.rotation.x = Math.PI / 2;
 				mesh.position.y = size / 2;
 				room.add( mesh );
 
 				// bottom
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.rotation.x = -Math.PI/2;
-				mesh.position.y = -size / 2;
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.position.y = - size / 2;
 				room.add( mesh );
 
 				// left
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = -size / 2;
-				mesh.rotation.y = Math.PI/2;
+				mesh.position.x = - size / 2;
+				mesh.rotation.y = Math.PI / 2;
 				room.add( mesh );
 
 				// right
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = size / 2;
-				mesh.rotation.y = -Math.PI/2;
+				mesh.rotation.y = - Math.PI / 2;
 				room.add( mesh );
 
 				// back
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.z = -size / 2;
+				mesh.position.z = - size / 2;
 				room.add( mesh );
 
 				// front, to check if transparency works
@@ -219,7 +225,7 @@
 
 				// back2, to check if transparency works
 				mesh = new THREE.Mesh( geometry, transparentMaterial );
-				mesh.position.z = -size / 4;
+				mesh.position.z = - size / 4;
 				mesh.scale.multiplyScalar( 0.75 );
 				mesh.visible = false;
 				transparentObjects.push( mesh );
@@ -246,9 +252,9 @@
 					'light pre-pass': 1,
 					'forward': 2
 
-				} ).onChange( function() {
+				} ).onChange( function () {
 
-					switch( parseInt( api.mode ) ) {
+					switch ( parseInt( api.mode ) ) {
 
 						case 0:
 							renderer.forwardRendering = false;
@@ -292,7 +298,7 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				WIDTH = window.innerWidth;
 				HEIGHT = window.innerHeight;

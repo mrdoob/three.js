@@ -22,9 +22,7 @@
 				padding: 5px;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
 		</style>
 	</head>
@@ -35,7 +33,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader_screen" type="x-shader/x-fragment">
@@ -85,7 +83,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -110,7 +112,7 @@
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
 
-				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 				cameraRTT.position.z = 100;
 
 				//
@@ -124,7 +126,7 @@
 				sceneRTT.add( light );
 
 				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
-				light.position.set( 0, 0, -1 ).normalize();
+				light.position.set( 0, 0, - 1 ).normalize();
 				sceneRTT.add( light );
 
 				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
@@ -150,7 +152,7 @@
 				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
-				quad.position.z = -100;
+				quad.position.z = - 100;
 				sceneRTT.add( quad );
 
 				var geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
@@ -169,16 +171,16 @@
 				sceneRTT.add( zmesh2 );
 
 				quad = new THREE.Mesh( plane, materialScreen );
-				quad.position.z = -100;
+				quad.position.z = - 100;
 				sceneScreen.add( quad );
 
 				var n = 5,
 					geometry = new THREE.SphereBufferGeometry( 10, 64, 32 ),
 					material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: rtTexture.texture } );
 
-				for( var j = 0; j < n; j ++ ) {
+				for ( var j = 0; j < n; j ++ ) {
 
-					for( var i = 0; i < n; i ++ ) {
+					for ( var i = 0; i < n; i ++ ) {
 
 						var mesh = new THREE.Mesh( geometry, material2 );
 
@@ -242,13 +244,13 @@
 
 				}
 
-				if ( material.uniforms.time.value > 1 || material.uniforms.time.value < 0 ) {
+				if ( material.uniforms[ "time" ].value > 1 || material.uniforms[ "time" ].value < 0 ) {
 
-					delta *= -1;
+					delta *= - 1;
 
 				}
 
-				material.uniforms.time.value += delta;
+				material.uniforms[ "time" ].value += delta;
 
 				renderer.clear();
 

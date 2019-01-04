@@ -44,9 +44,7 @@
 				text-align: center;
 			}
 
-			a {
-				color: #0080ff;
-			}
+			a { color: #0080ff; }
 
 			.math {
 
@@ -100,11 +98,15 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var scenes = [], views, t, canvas, renderer;
 
@@ -127,7 +129,7 @@
 
 				views = document.querySelectorAll( '.view' );
 
-				for ( var n = 0 ; n < views.length ; n++ ) {
+				for ( var n = 0; n < views.length; n ++ ) {
 
 					var scene = new THREE.Scene();
 					scene.background = new THREE.Color( 0xffffff );
@@ -137,14 +139,14 @@
 
 					var vertices = [];
 
-					if ( views[n].lattice ) {
+					if ( views[ n ].lattice ) {
 
 						var range = balls / 2;
-						for ( var i = -range ; i <= range ; i++ ) {
+						for ( var i = - range; i <= range; i ++ ) {
 
-							for ( var j = -range ; j <= range ; j++ ) {
+							for ( var j = - range; j <= range; j ++ ) {
 
-								for ( var k = -range ; k <= range ; k++ ) {
+								for ( var k = - range; k <= range; k ++ ) {
 
 									vertices.push( i, j, k );
 
@@ -156,7 +158,7 @@
 
 					} else {
 
-						for ( var m = 0 ; m < Math.pow( balls, 3 ) ; m++ ) {
+						for ( var m = 0; m < Math.pow( balls, 3 ); m ++ ) {
 
 							var i = balls * Math.random() - balls / 2;
 							var j = balls * Math.random() - balls / 2;
@@ -236,19 +238,21 @@
 				renderer.setClearColor( 0x000000 );
 				renderer.setScissorTest( true );
 
-				scenes.forEach( function( scene ) {
+				scenes.forEach( function ( scene ) {
 
 					var rect = scene.userData.view.getBoundingClientRect();
 					// check if it's offscreen. If so skip it
-					if ( rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
-						 rect.right  < 0 || rect.left > renderer.domElement.clientWidth ) {
-						return;  // it's off screen
+					if ( rect.bottom < 0 || rect.top > renderer.domElement.clientHeight ||
+						 rect.right < 0 || rect.left > renderer.domElement.clientWidth ) {
+
+						return; // it's off screen
+
 					}
 					// set the viewport
-					var width  = rect.right - rect.left;
+					var width = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
-					var left   = rect.left;
-					var top    = rect.top;
+					var left = rect.left;
+					var top = rect.top;
 
 					renderer.setViewport( left, top, width, height );
 					renderer.setScissor( left, top, width, height );
@@ -261,7 +265,7 @@
 					var point = new THREE.Vector3();
 					var offset = new THREE.Vector3();
 
-					for ( var i = 0 ; i < position.count; i ++ ) {
+					for ( var i = 0; i < position.count; i ++ ) {
 
 						point.fromBufferAttribute( scene.userData.geometry1.attributes.position, i );
 
@@ -338,7 +342,7 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t, target ) {
+			parent.displacement = function ( x, y, z, t, target ) {
 
 				return target.set( Math.sin( x - t ), 0, 0 );
 
@@ -358,7 +362,7 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t, target ) {
+			parent.displacement = function ( x, y, z, t, target ) {
 
 				return target.set( Math.sin( x - t ), 0, 0 );
 
@@ -452,7 +456,7 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t, target ) {
+			parent.displacement = function ( x, y, z, t, target ) {
 
 				if ( x * x + y * y < 0.01 ) {
 
@@ -483,7 +487,7 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t, target ) {
+			parent.displacement = function ( x, y, z, t, target ) {
 
 				if ( x * x + y * y < 0.01 ) {
 
@@ -588,7 +592,7 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t, target ) {
+			parent.displacement = function ( x, y, z, t, target ) {
 
 				if ( x * x + y * y + z * z < 0.01 ) {
 
@@ -600,7 +604,7 @@
 					var theta = Math.acos( z / r );
 					var phi = Math.atan2( y, x );
 
-					return target.set( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
+					return target.set( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r, 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r, 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
 
 				}
 
@@ -620,7 +624,7 @@
 
 			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
-			parent.displacement = function( x, y, z, t, target ) {
+			parent.displacement = function ( x, y, z, t, target ) {
 
 				if ( x * x + y * y + z * z < 0.01 ) {
 
@@ -632,9 +636,10 @@
 					var theta = Math.acos( z / r );
 					var phi = Math.atan2( y, x );
 
-					return target.set( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
+					return target.set( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r, 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r, 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
 
 				}
+
 			};
 
 			parent.lattice = false;

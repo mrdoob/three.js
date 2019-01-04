@@ -39,7 +39,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<!-- HDR fragment shader -->
@@ -103,7 +103,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -133,10 +137,10 @@
 				materialHDR = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						tDiffuse:  { value: texture },
-						exposure:  { value: 0.125 },
-						brightMax: { value: 0.5 }
-						},
+						"tDiffuse": { value: texture },
+						"exposure": { value: 0.125 },
+						"brightMax": { value: 0.5 }
+					},
 					vertexShader: getText( 'vs-hdr' ),
 					fragmentShader: getText( 'fs-hdr' )
 
@@ -145,7 +149,7 @@
 				var plane = new THREE.PlaneBufferGeometry( 512, 768 );
 
 				quad = new THREE.Mesh( plane, materialHDR );
-				quad.position.z = -100;
+				quad.position.z = - 100;
 				scene.add( quad );
 
 				renderer = new THREE.WebGLRenderer();
@@ -192,7 +196,7 @@
 
 				var delta = clock.getDelta() * 5;
 
-				if ( materialHDR.uniforms.exposure.value > 0 || materialHDR.uniforms.exposure.value < 1 ) {
+				if ( materialHDR.uniforms[ "exposure" ].value > 0 || materialHDR.uniforms[ "exposure" ].value < 1 ) {
 
 					rate = 0.25;
 
@@ -202,13 +206,13 @@
 
 				}
 
-				if ( materialHDR.uniforms.exposure.value > 5 || materialHDR.uniforms.exposure.value <= 0 ) {
+				if ( materialHDR.uniforms[ "exposure" ].value > 5 || materialHDR.uniforms[ "exposure" ].value <= 0 ) {
 
-					sign *= -1;
+					sign *= - 1;
 
 				}
 
-				materialHDR.uniforms.exposure.value += sign * rate * delta;
+				materialHDR.uniforms[ "exposure" ].value += sign * rate * delta;
 
 				renderer.render( scene, camera );
 

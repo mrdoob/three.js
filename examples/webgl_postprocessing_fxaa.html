@@ -39,7 +39,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
@@ -47,20 +47,23 @@
 
 				'use strict';
 
-				if ( ! Detector.webgl ) {
-					Detector.addGetWebGLMessage();
+				if ( WEBGL.isWebGLAvailable() === false ) {
+
+					document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
 				}
 
 				var loader = new THREE.TextureLoader();
 				loader.load( "textures/fxaa_scene.png", function onLoad( texture ) {
+
 					var image = texture.image;
 					texture.minFilter = THREE.LinearFilter;
 					texture.magFilter = THREE.LinearFilter;
 
 					var fxaaMaterial = new THREE.ShaderMaterial( THREE.FXAAShader );
-					fxaaMaterial.uniforms.tDiffuse.value = texture;
-					fxaaMaterial.uniforms.resolution.value.x = 1 / image.naturalWidth;
-					fxaaMaterial.uniforms.resolution.value.y = 1 / image.naturalHeight;
+					fxaaMaterial.uniforms[ "tDiffuse" ].value = texture;
+					fxaaMaterial.uniforms[ "resolution" ].value.x = 1 / image.naturalWidth;
+					fxaaMaterial.uniforms[ "resolution" ].value.y = 1 / image.naturalHeight;
 
 					var basicMaterial = new THREE.MeshBasicMaterial( { map: texture } );
 
@@ -73,7 +76,7 @@
 					scene1.add( quad1 );
 					scene2.add( quad2 );
 
-					var camera = new THREE.OrthographicCamera( -0.5, 0.5, 0.5, -0.5, -0.5, 0.5 );
+					var camera = new THREE.OrthographicCamera( - 0.5, 0.5, 0.5, - 0.5, - 0.5, 0.5 );
 
 					var container = document.getElementById( 'container' );
 
@@ -90,8 +93,10 @@
 
 					renderer1.render( scene1, camera );
 					renderer2.render( scene2, camera );
-				});
-			})();
+
+				} );
+
+			} )();
 
 		</script>
 	</body>

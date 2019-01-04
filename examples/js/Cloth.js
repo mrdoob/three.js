@@ -243,19 +243,23 @@ function simulate( time ) {
 
 	if ( wind ) {
 
-		var face, faces = clothGeometry.faces, normal;
+		var indx;
+		var normal = new THREE.Vector3();
+		var indices = clothGeometry.index;
+		var normals = clothGeometry.attributes.normal;
 
 		particles = cloth.particles;
 
-		for ( i = 0, il = faces.length; i < il; i ++ ) {
+		for ( i = 0, il = indices.count; i < il; i += 3 ) {
 
-			face = faces[ i ];
-			normal = face.normal;
+			for ( j = 0; j < 3; j ++ ) {
 
-			tmpForce.copy( normal ).normalize().multiplyScalar( normal.dot( windForce ) );
-			particles[ face.a ].addForce( tmpForce );
-			particles[ face.b ].addForce( tmpForce );
-			particles[ face.c ].addForce( tmpForce );
+				indx = indices.getX( i + j );
+				normal.fromBufferAttribute( normals, indx )
+				tmpForce.copy( normal ).normalize().multiplyScalar( normal.dot( windForce ) );
+				particles[ indx ].addForce( tmpForce );
+
+			}
 
 		}
 

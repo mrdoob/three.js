@@ -56,7 +56,7 @@
 		<script src="js/shaders/NormalMapShader.js"></script>
 		<script src="js/ShaderTerrain.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragmentShaderNoise" type="x-shader/x-fragment">
@@ -204,7 +204,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -222,16 +226,12 @@
 
 			var terrain;
 
-			var textureCounter = 0;
-
-			var animDelta = 0, animDeltaDir = -1;
+			var animDelta = 0, animDeltaDir = - 1;
 			var lightVal = 0, lightDir = 1;
 
 			var clock = new THREE.Clock();
 
 			var updateNoise = true;
-
-			var animateTerrain = false;
 
 			var mlib = {};
 
@@ -246,7 +246,7 @@
 
 				sceneRenderTarget = new THREE.Scene();
 
-				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10000, 10000 );
+				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, - 10000, 10000 );
 				cameraOrtho.position.z = 100;
 
 				sceneRenderTarget.add( cameraOrtho );
@@ -254,7 +254,7 @@
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
-				camera.position.set( -1200, 800, 1200 );
+				camera.position.set( - 1200, 800, 1200 );
 
 				controls = new THREE.OrbitControls( camera );
 
@@ -282,7 +282,6 @@
 				pointLight.position.set( 0, 0, 0 );
 				scene.add( pointLight );
 
-
 				// HEIGHT + NORMAL MAPS
 
 				var normalShader = THREE.NormalMapShader;
@@ -290,7 +289,7 @@
 				var rx = 256, ry = 256;
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
-				heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
+				heightMap = new THREE.WebGLRenderTarget( rx, ry, pars );
 				heightMap.texture.generateMipmaps = false;
 
 				normalMap = new THREE.WebGLRenderTarget( rx, ry, pars );
@@ -298,31 +297,33 @@
 
 				uniformsNoise = {
 
-					time:   { value: 1.0 },
-					scale:  { value: new THREE.Vector2( 1.5, 1.5 ) },
-					offset: { value: new THREE.Vector2( 0, 0 ) }
+					"time": { value: 1.0 },
+					"scale": { value: new THREE.Vector2( 1.5, 1.5 ) },
+					"offset": { value: new THREE.Vector2( 0, 0 ) }
 
 				};
 
 				uniformsNormal = THREE.UniformsUtils.clone( normalShader.uniforms );
 
-				uniformsNormal.height.value = 0.05;
-				uniformsNormal.resolution.value.set( rx, ry );
-				uniformsNormal.heightMap.value = heightMap.texture;
+				uniformsNormal[ "height" ].value = 0.05;
+				uniformsNormal[ "resolution" ].value.set( rx, ry );
+				uniformsNormal[ "heightMap" ].value = heightMap.texture;
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 
 				// TEXTURES
 
-				var loadingManager = new THREE.LoadingManager( function(){
+				var loadingManager = new THREE.LoadingManager( function () {
+
 					terrain.visible = true;
-				});
+
+				} );
 				var textureLoader = new THREE.TextureLoader( loadingManager );
 
 				var specularMap = new THREE.WebGLRenderTarget( 2048, 2048, pars );
 				specularMap.texture.generateMipmaps = false;
 
-				var diffuseTexture1 = textureLoader.load( "textures/terrain/grasslight-big.jpg");
+				var diffuseTexture1 = textureLoader.load( "textures/terrain/grasslight-big.jpg" );
 				var diffuseTexture2 = textureLoader.load( "textures/terrain/backgrounddetailed6.jpg" );
 				var detailTexture = textureLoader.load( "textures/terrain/grasslight-big-nm.jpg" );
 
@@ -362,20 +363,20 @@
 
 				var params = [
 					[ 'heightmap', 	document.getElementById( 'fragmentShaderNoise' ).textContent, 	vertexShader, uniformsNoise, false ],
-					[ 'normal', 	normalShader.fragmentShader,  normalShader.vertexShader, uniformsNormal, false ],
+					[ 'normal', 	normalShader.fragmentShader, normalShader.vertexShader, uniformsNormal, false ],
 					[ 'terrain', 	terrainShader.fragmentShader, terrainShader.vertexShader, uniformsTerrain, true ]
 				 ];
 
-				for( var i = 0; i < params.length; i ++ ) {
+				for ( var i = 0; i < params.length; i ++ ) {
 
 					var material = new THREE.ShaderMaterial( {
 
-						uniforms: 		params[ i ][ 3 ],
-						vertexShader: 	params[ i ][ 2 ],
+						uniforms: params[ i ][ 3 ],
+						vertexShader: params[ i ][ 2 ],
 						fragmentShader: params[ i ][ 1 ],
-						lights: 		params[ i ][ 4 ],
-						fog: 			true
-						} );
+						lights: params[ i ][ 4 ],
+						fog: true
+					} );
 
 					mlib[ params[ i ][ 0 ] ] = material;
 
@@ -385,7 +386,7 @@
 				var plane = new THREE.PlaneBufferGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				quadTarget = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
-				quadTarget.position.z = -500;
+				quadTarget.position.z = - 500;
 				sceneRenderTarget.add( quadTarget );
 
 				// TERRAIN MESH
@@ -395,8 +396,8 @@
 				THREE.BufferGeometryUtils.computeTangents( geometryTerrain );
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ 'terrain' ] );
-				terrain.position.set( 0, -125, 0 );
-				terrain.rotation.x = -Math.PI / 2;
+				terrain.position.set( 0, - 125, 0 );
+				terrain.rotation.x = - Math.PI / 2;
 				terrain.visible = false;
 				scene.add( terrain );
 
@@ -424,7 +425,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
@@ -438,12 +439,12 @@
 
 			//
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
-					case 78: /*N*/  lightDir *= -1; break;
-					case 77: /*M*/  animDeltaDir *= -1; break;
+					case 78: /*N*/ lightDir *= - 1; break;
+					case 77: /*M*/ animDeltaDir *= - 1; break;
 
 				}
 
@@ -465,8 +466,6 @@
 				var delta = clock.getDelta();
 
 				if ( terrain.visible ) {
-
-					var time = Date.now() * 0.001;
 
 					var fLow = 0.1, fHigh = 0.8;
 

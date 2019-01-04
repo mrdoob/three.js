@@ -37,7 +37,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader4" type="x-shader/x-fragment">
@@ -162,7 +162,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -187,15 +191,15 @@
 				var geometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
-					time: { value: 1.0 }
+					"time": { value: 1.0 }
 				};
 
 				uniforms2 = {
-					time: { value: 1.0 },
-					texture: { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
+					"time": { value: 1.0 },
+					"texture": { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
 				};
 
-				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
+				uniforms2[ "texture" ].value.wrapS = uniforms2[ "texture" ].value.wrapT = THREE.RepeatWrapping;
 
 				var params = [
 					[ 'fragment_shader1', uniforms1 ],
@@ -204,7 +208,7 @@
 					[ 'fragment_shader4', uniforms1 ]
 				];
 
-				for( var i = 0; i < params.length; i++ ) {
+				for ( var i = 0; i < params.length; i ++ ) {
 
 					var material = new THREE.ShaderMaterial( {
 
@@ -212,7 +216,7 @@
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
 						fragmentShader: document.getElementById( params[ i ][ 0 ] ).textContent
 
-						} );
+					} );
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = i - ( params.length - 1 ) / 2;
@@ -234,7 +238,7 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -258,15 +262,15 @@
 
 				var delta = clock.getDelta();
 
-				uniforms1.time.value += delta * 5;
-				uniforms2.time.value = clock.elapsedTime;
+				uniforms1[ "time" ].value += delta * 5;
+				uniforms2[ "time" ].value = clock.elapsedTime;
 
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 
 					var object = scene.children[ i ];
 
-					object.rotation.y += delta * 0.5 * ( i % 2 ? 1 : -1 );
-					object.rotation.x += delta * 0.5 * ( i % 2 ? -1 : 1 );
+					object.rotation.y += delta * 0.5 * ( i % 2 ? 1 : - 1 );
+					object.rotation.x += delta * 0.5 * ( i % 2 ? - 1 : 1 );
 
 				}
 

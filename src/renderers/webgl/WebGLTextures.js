@@ -104,23 +104,44 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ! capabilities.isWebGL2 ) return glFormat;
 
+		var internalFormat = glFormat;
+
+		if ( glFormat === _gl.RED ) {
+
+			if ( glType === _gl.FLOAT ) internalFormat = _gl.R32F;
+			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.R16F;
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.R8;
+
+		}
+
 		if ( glFormat === _gl.RGB ) {
 
-			if ( glType === _gl.FLOAT ) return _gl.RGB32F;
-			if ( glType === _gl.HALF_FLOAT ) return _gl.RGB16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) return _gl.RGB8;
+			if ( glType === _gl.FLOAT ) internalFormat = _gl.RGB32F;
+			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGB16F;
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RGB8;
 
 		}
 
 		if ( glFormat === _gl.RGBA ) {
 
-			if ( glType === _gl.FLOAT ) return _gl.RGBA32F;
-			if ( glType === _gl.HALF_FLOAT ) return _gl.RGBA16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) return _gl.RGBA8;
+			if ( glType === _gl.FLOAT ) internalFormat = _gl.RGBA32F;
+			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGBA16F;
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RGBA8;
 
 		}
 
-		return glFormat;
+		if ( internalFormat === _gl.R16F || internalFormat === _gl.R32F ||
+			internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F ) {
+
+			extensions.get( 'EXT_color_buffer_float' );
+
+		} else if ( internalFormat === _gl.RGB16F || internalFormat === _gl.RGB32F ) {
+
+			console.warn( 'THREE.WebGLRenderer: Floating point textures with RGB format not supported. Please use RGBA instead.' );
+
+		}
+
+		return internalFormat;
 
 	}
 
@@ -272,6 +293,23 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 
 	}
+
+	function setTexture3D( texture, slot ) {
+
+		var textureProperties = properties.get( texture );
+
+		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
+
+			uploadTexture( textureProperties, texture, slot );
+			return;
+
+		}
+
+		state.activeTexture( _gl.TEXTURE0 + slot );
+		state.bindTexture( _gl.TEXTURE_3D, textureProperties.__webglTexture );
+
+	}
+
 
 	function setTextureCube( texture, slot ) {
 
@@ -462,6 +500,19 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function uploadTexture( textureProperties, texture, slot ) {
 
+		var textureType;
+
+		if ( texture.isDataTexture3D ) {
+
+			textureType = _gl.TEXTURE_3D;
+
+		} else {
+
+			textureType = _gl.TEXTURE_2D;
+
+		}
+
+
 		if ( textureProperties.__webglInit === undefined ) {
 
 			textureProperties.__webglInit = true;
@@ -473,9 +524,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			info.memory.textures ++;
 
 		}
-
 		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+
+
+		state.bindTexture( textureType, textureProperties.__webglTexture );
+
+
 
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -494,7 +548,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			glType = utils.convert( texture.type ),
 			glInternalFormat = getInternalFormat( glFormat, glType );
 
-		setTextureParameters( _gl.TEXTURE_2D, texture, isPowerOfTwoImage );
+		setTextureParameters( textureType, texture, isPowerOfTwoImage );
 
 		var mipmap, mipmaps = texture.mipmaps;
 
@@ -606,6 +660,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			}
 
 			textureProperties.__maxMipLevel = mipmaps.length - 1;
+
+		} else if ( texture.isDataTexture3D ) {
+
+			state.texImage3D( _gl.TEXTURE_3D, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+			textureProperties.__maxMipLevel = 0;
 
 		} else {
 
@@ -890,6 +949,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	}
 
 	this.setTexture2D = setTexture2D;
+	this.setTexture3D = setTexture3D;
 	this.setTextureCube = setTextureCube;
 	this.setTextureCubeDynamic = setTextureCubeDynamic;
 	this.setupRenderTarget = setupRenderTarget;

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>插值（[name]）</h1>
+
+		<p class="desc">
+		TODO
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:Float CatmullRom]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2], [param:Float p3] )</h3>
+		<p>
+		t -- 插值权重<br />
+		p0, p1, p2, p3 -- 定义了样条曲线的点。<br /><br />
+
+		在内部由[page:SplineCurve SplineCurve]所使用。
+		</p>
+
+		<h3>[method:Float QuadraticBezier]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2] )</h3>
+		<p>
+		t -- 插值权重<br />
+		p0, p1, p2 -- 定义了该曲线的起始点、控制点和终止点。<br /><br />
+
+		在内部由[page:QuadraticBezierCurve3 QuadraticBezierCurve3]、[page:QuadraticBezierCurve QuadraticBezierCurve]和[page:Font Font]所使用。
+		</p>
+
+		<h3>[method:Float CubicBezier]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2], [param:Float p3] )</h3>
+		<p>
+		t -- 插值权重<br />
+		p0, p1, p2, p3 -- 定义了该曲线的起始点、两个控制点和终止点。<br /><br />
+
+		在内部由[page:CubicBezierCurve3 CubicBezierCurve3]、[page:CubicBezierCurve CubicBezierCurve]和[page:Font Font]所使用。
+		</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

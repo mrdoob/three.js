@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A material rendered with custom shaders. A shader is a small program written in
+			[link:https://www.khronos.org/files/opengles_shading_language.pdf GLSL] that runs on the GPU.
+			You may want to use a custom shader if you need to:
+		<ul>
+			<li>implement an effect not included with any of the built-in [page:Material materials]</li>
+			<li>combine many objects into a single [page:Geometry] or [page:BufferGeometry] in order to improve performance</li>
+		</ul>
+		There are the following notes to bear in mind when using a *ShaderMaterial*:
+
+		<ul>
+			<li>
+				A *ShaderMaterial* will only be rendered properly by [page:WebGLRenderer],
+				since the GLSL code in the [link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertexShader]
+				and [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragmentShader] properties must
+				be compiled and run on the GPU using WebGL.
+			</li>
+			<li>
+				As of THREE r72, directly assigning attributes in a ShaderMaterial is no longer supported.
+				A [page:BufferGeometry] instance (instead of a [page:Geometry] instance) must be used instead,
+				using [page:BufferAttribute] instances to define custom attributes.
+			</li>
+			<li>
+				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLRenderTargetCube] instances
+				are no longer supposed to be used as uniforms. Their [page:Texture texture] property
+				must be used instead.
+			</li>
+			<li>
+				Built in attributes and uniforms are passed to the shaders along with your code.
+				If you don't want the [page:WebGLProgram] to add anything to your shader code, you can use
+				[page:RawShaderMaterial] instead of this class.
+			</li>
+			<li>
+				You can use the directive #pragma unroll_loop in order to unroll a *for* loop in GLSL by the shader preprocessor.
+				The directive has to be placed right above the loop. The loop formatting has to correspond to a defined standard.
+				<ul>
+					<li>
+						The loop has to be [link:https://en.wikipedia.org/wiki/Normalized_loop normalized].
+					</li>
+					<li>
+						The loop variable has to be *i*.
+					</li>
+					<li>
+						The loop has to use a certain whitespace formatting.
+					</li>
+				</ul>
+				<code>
+		#pragma unroll_loop
+		for ( int i = 0; i < 10; i ++ ) {
+
+			// ...
+
+		}
+				</code>
+			</li>
+		</ul>
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_animation_cloth webgl / animation / cloth ]<br />
+			[example:webgl_buffergeometry_custom_attributes_particles webgl / buffergeometry / custom / attributes / particles]<br />
+			[example:webgl_buffergeometry_selective_draw webgl / buffergeometry / selective / draw]<br />
+			[example:webgl_custom_attributes webgl / custom / attributes]<br />
+			[example:webgl_custom_attributes_lines webgl / custom / attributes / lines]<br />
+			[example:webgl_custom_attributes_points webgl / custom / attributes / points]<br />
+			[example:webgl_custom_attributes_points2 webgl / custom / attributes / points2]<br />
+			[example:webgl_custom_attributes_points3 webgl / custom / attributes / points3]<br />
+			[example:webgl_depth_texture webgl / depth / texture]<br />
+			[example:webgl_gpgpu_birds webgl / gpgpu / birds]<br />
+			[example:webgl_gpgpu_protoplanet webgl / gpgpu / protoplanet]<br />
+			[example:webgl_gpgpu_water webgl / gpgpu / water]<br />
+			[example:webgl_hdr webgl / hdr]<br />
+			[example:webgl_interactive_points webgl / interactive / points]<br />
+			[example:webgl_kinect webgl / kinect]<br />
+			[example:webgl_lights_hemisphere webgl / lights / hemisphere]<br />
+			[example:webgl_marchingcubes webgl / marchingcubes]<br />
+			[example:webgl_materials_bumpmap_skin webgl / materials / bumpmap / skin]<br />
+			[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
+			[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
+			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
+			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
+			[example:webgl_materials_skin webgl / materials / skin]<br />
+			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
+			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
+			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
+			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
+			[example:webgl_postprocessing_godrays webgl / postprocessing / godrays]
+
+		</p>
+
+		<code>
+		var material = new THREE.ShaderMaterial( {
+
+			uniforms: {
+
+				time: { value: 1.0 },
+				resolution: { value: new THREE.Vector2() }
+
+			},
+
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+		} );
+		</code>
+
+		<h2>Vertex shaders and fragment shaders</h2>
+
+		<div>
+			<p>You can specify two different types of shaders for each material:</p>
+			<ul>
+				<li>
+					The vertex shader runs first; it receives *attributes*, calculates / manipulates
+					the position of each individual vertex, and passes additional data (*varying*s) to the fragment shader.
+				</li>
+				<li>
+					The fragment ( or pixel ) shader runs second; it sets the color of each individual "fragment"
+					(pixel) rendered to the screen.
+				</li>
+			</ul>
+			<p>There are three types of variables in shaders: uniforms, attributes, and varyings:</p>
+			<ul>
+				<li>
+					*Uniforms* are variables that have the same value for all vertices - lighting, fog,
+					and shadow maps are examples of data that would be stored in uniforms.
+					Uniforms can be accessed by both the vertex shader and the fragment shader.
+				</li>
+				<li>
+					*Attributes* are variables associated with each vertex---for instance, the vertex position,
+					face normal, and vertex color are all examples of data that would be stored in attributes.
+					Attributes can <em>only</em> be accessed within the vertex shader.
+				</li>
+				<li>
+					*Varyings* are variables that are passed from the vertex shader to the fragment shader.
+					For each fragment, the value of each varying will be smoothly interpolated from the values of adjacent vertices.
+				</li>
+			</ul>
+			<p>
+				Note that <em>within</em> the shader itself, uniforms and attributes act like constants;
+				you can only modify their values by passing different values to the buffers from your JavaScript code.
+			</p>
+		</div>
+
+
+	<h2>Built-in attributes and uniforms</h2>
+
+	<div>
+			<p>
+			The [page:WebGLRenderer] provides many attributes and uniforms to shaders by default;
+			definitions of these variables are prepended to your *fragmentShader* and *vertexShader*
+			code by the [page:WebGLProgram] when the shader is compiled; you don't need to declare them yourself.
+			See [page:WebGLProgram] for details of these variables.
+			</p>
+			<p>
+			Some of these uniforms or attributes (e.g. those pertaining lighting, fog, etc.)
+			require properties to be set on the material in order for [page:WebGLRenderer] to copy
+			the appropriate values to the GPU - make sure to set these flags if you want to use these
+			features in your own shader.
+			</p>
+			<p>
+			If you don't want [page:WebGLProgram] to add anything to your shader code, you can use
+			[page:RawShaderMaterial] instead of this class.
+			</p>
+		</div>
+
+
+		<h2>Custom attributes and uniforms</h2>
+
+		<div>
+			<p>
+				Both custom attributes and uniforms must be declared in your GLSL shader code
+				(within *vertexShader* and/or *fragmentShader*). Custom uniforms must be defined in <em>both</em>
+				the *uniforms* property of your *ShaderMaterial*, whereas any custom attributes must be
+				defined via [page:BufferAttribute] instances. Note that *varying*s only need to
+				be declared within the shader code (not within the material).
+			</p>
+			<p>
+				To declare a custom attribute, please reference the [page:BufferGeometry] page for an overview,
+				and the [page:BufferAttribute] page for a detailed look at the *BufferAttribute* API.
+			</p>
+			<p>
+				When creating your attributes, each typed array that you create to hold your
+				attribute's data must be a multiple of your data type's size. For example, if your
+				attribute is a [page:Vector3 THREE.Vector3] type, and you have 3000 vertices in your
+				[page:BufferGeometry], your typed array value must be created with a length of 3000 * 3,
+				or 9000 (one value per-component). A table of each data type's size is shown below for reference:
+			</p>
+
+			<table>
+				<caption><a id="attribute-sizes">Attribute sizes</a></caption>
+				<thead>
+					<tr>
+						<th>GLSL type</th>
+						<th>JavaScript type</th>
+						<th>Size</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>float</td>
+						<td>[page:Number]</td>
+						<td>1</td>
+					</tr>
+					<tr>
+						<td>vec2</td>
+						<td>[page:Vector2 THREE.Vector2]</td>
+						<td>2</td>
+					</tr>
+					<tr>
+						<td>vec3</td>
+						<td>[page:Vector3 THREE.Vector3]</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>vec3</td>
+						<td>[page:Color THREE.Color]</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>vec4</td>
+						<td>[page:Vector4 THREE.Vector4]</td>
+						<td>4</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p>
+				Note that attribute buffers are <em>not</em> refreshed automatically when their values change. To update custom attributes,
+				set the *needsUpdate* flag to true on the [page:BufferAttribute] of the geometry (see [page:BufferGeometry]
+				for further details).
+			</p>
+
+			<p>
+			To declare a custom [page:Uniform], use the *uniforms* property:
+			<code>
+			uniforms: {
+				time: { value: 1.0 },
+				resolution: { value: new THREE.Vector2() }
+			}
+			</code>
+			</p>
+
+			<p>
+			You're recommended to update custom [page:Uniform] values depending on [page:Object3D object] and [page:Camera camera]
+			in [page:Object3D.onBeforeRender] because [page:Material] can be shared among [page:Mesh meshes], [page:Matrix4 matrixWorld]
+			of [page:Scene] and [page:Camera] are updated in [page:WebGLRenderer.render], and some effects(ex:VREffect) render a [page:Scene scene]
+			with private their own [page:Camera cameras].
+			</p>
+
+		</div>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
+			Any property of the material (including any property inherited from [page:Material]) can be passed in here.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Material] class for common properties.</p>
+
+		<h3>[property:Boolean clipping]</h3>
+		<p>
+		Defines whether this material supports clipping; true to let the renderer pass the clippingPlanes uniform. Default is false.
+		</p>
+
+		<h3>[property:Object defaultAttributeValues]</h3>
+		<p>
+			When the rendered geometry doesn't include these attributes but the material does,
+			 these default values will be passed to the shaders. This avoids errors when buffer data is missing.
+
+			<code>
+this.defaultAttributeValues = {
+	'color': [ 1, 1, 1 ],
+	'uv': [ 0, 0 ],
+	'uv2': [ 0, 0 ]
+};
+			</code>
+
+		</p>
+
+
+		<h3>[property:Object defines]</h3>
+		<p>
+		Defines custom constants using *#define* directives within the GLSL code for both the
+		vertex shader and the fragment shader; each key/value pair yields another directive:
+		<code>
+		defines: {
+			FOO: 15,
+			BAR: true
+		}
+		</code>
+		yields the lines
+		<code>
+		#define FOO 15
+		#define BAR true
+		</code>
+		in the GLSL code.
+		</p>
+
+		<h3>[property:Object extensions]</h3>
+		<p>
+		An object with the following properties:
+		<code>
+this.extensions = {
+	derivatives: false, // set to use derivatives
+	fragDepth: false, // set to use fragment depth values
+	drawBuffers: false, // set to use draw buffers
+	shaderTextureLOD: false // set to use shader texture LOD
+};
+		</code>
+		</p>
+
+
+		<h3>[property:Boolean fog]</h3>
+		<p>
+			Define whether the material color is affected by global fog settings; true to pass
+			fog uniforms to the shader. Default is false.
+		</p>
+
+
+		<h3>[property:String fragmentShader]</h3>
+		<p>
+		Fragment shader GLSL code.  This is the actual code for the shader. In the example above,
+		the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed
+		as a string directly or loaded via AJAX instead.
+		</p>
+
+		<h3>[property:String index0AttributeName]</h3>
+		<p>
+			If set, this calls [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation]
+			to bind a generic vertex index to an attribute variable.
+			Default is undefined.
+
+		</p>
+
+		<h3>[property:Boolean isShaderMaterial]</h3>
+		<p>
+			Used to check whether this or derived classes are shader materials. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+
+
+
+		<h3>[property:Boolean lights]</h3>
+		<p>
+		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader. Default is false.
+		</p>
+
+		<h3>[property:Float linewidth]</h3>
+		<p>Controls wireframe thickness. Default is 1.<br /><br />
+
+		Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+		with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will
+		always be 1 regardless of the set value.
+		</p>
+
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<p>
+		Defines whether the material uses morphTargets; true morphTarget attributes to this shader
+		</p>
+
+		<h3>[property:boolean morphNormals]</h3>
+		<p>
+			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
+			to the shader. Default is *false*.
+		</p>
+
+
+		<h3>[property:WebGLProgram program]</h3>
+		<p>
+		The compiled shader program associated with this material, generated by [page:WebGLRenderer].
+		You should not need to access this property.
+		</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+		Define whether the material is rendered with flat shading. Default is false.
+		</p>
+
+
+		<h3>[property:Boolean skinning]</h3>
+		<p>
+		Define whether the material uses skinning; true to pass skinning attributes to the shader. Default is false.
+		</p>
+
+		<h3>[property:Object uniforms]</h3>
+		<p>
+			An object of the form:
+			<code>
+{ "uniform1": { value: 1.0 }, "uniform2": { value: 2 } }
+			</code>
+		specifying the uniforms to be passed to the shader code; keys are uniform names, values are definitions of the form
+		<code>
+		{ value: 1.0 }
+		</code>
+		where *value* is the value of the uniform. Names must match the name of the uniform,
+		as defined in the GLSL code. Note that uniforms are refreshed on every frame,
+		so updating the value of the uniform will immediately update the value available to the GLSL code.
+		</p>
+
+
+		<h3>[property:Number vertexColors]</h3>
+		<p>
+		Define how the vertices are colored, by defining how the *colors* attribute gets populated.
+		Possible values are [page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] and
+		[page:Materials THREE.VertexColors]. Default is THREE.NoColors.
+		</p>
+
+		<h3>[property:String vertexShader]</h3>
+		<p>
+		Vertex shader GLSL code.  This is the actual code for the shader. In the example above,
+		the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed
+		as a string directly or loaded via AJAX instead.
+		</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>
+		Render geometry as wireframe (using GL_LINES instead of GL_TRIANGLES). Default is false (i.e. render as flat polygons).
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>Controls wireframe thickness. Default is 1.<br /><br />
+
+		Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+		with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will
+		always be 1 regardless of the set value.
+		</p>
+
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Material] class for common methods.</p>
+
+		<h3>[method:ShaderMaterial clone]() [param:ShaderMaterial this]</h3>
+		<p>
+		Generates a shallow copy of this material. Note that the vertexShader and fragmentShader
+		are copied <em>by reference</em>, as are the definitions of the *attributes*; this means
+		that clones of the material will share the same compiled [page:WebGLProgram]. However, the
+		*uniforms* are copied <em>by value</em>, which allows you to have different sets of uniforms
+		for different copies of the material.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

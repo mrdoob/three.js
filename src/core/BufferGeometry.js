@@ -675,7 +675,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		var index = this.index;
 		var attributes = this.attributes;
-		var groups = this.groups;
 
 		if ( attributes.position ) {
 
@@ -711,46 +710,31 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				var indices = index.array;
 
-				if ( groups.length === 0 ) {
+				for ( var i = 0, il = index.count; i < il; i += 3 ) {
 
-					this.addGroup( 0, indices.length );
+					vA = indices[ i + 0 ] * 3;
+					vB = indices[ i + 1 ] * 3;
+					vC = indices[ i + 2 ] * 3;
 
-				}
+					pA.fromArray( positions, vA );
+					pB.fromArray( positions, vB );
+					pC.fromArray( positions, vC );
 
-				for ( var j = 0, jl = groups.length; j < jl; ++ j ) {
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
 
-					var group = groups[ j ];
+					normals[ vA ] += cb.x;
+					normals[ vA + 1 ] += cb.y;
+					normals[ vA + 2 ] += cb.z;
 
-					var start = group.start;
-					var count = group.count;
+					normals[ vB ] += cb.x;
+					normals[ vB + 1 ] += cb.y;
+					normals[ vB + 2 ] += cb.z;
 
-					for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-						vA = indices[ i + 0 ] * 3;
-						vB = indices[ i + 1 ] * 3;
-						vC = indices[ i + 2 ] * 3;
-
-						pA.fromArray( positions, vA );
-						pB.fromArray( positions, vB );
-						pC.fromArray( positions, vC );
-
-						cb.subVectors( pC, pB );
-						ab.subVectors( pA, pB );
-						cb.cross( ab );
-
-						normals[ vA ] += cb.x;
-						normals[ vA + 1 ] += cb.y;
-						normals[ vA + 2 ] += cb.z;
-
-						normals[ vB ] += cb.x;
-						normals[ vB + 1 ] += cb.y;
-						normals[ vB + 2 ] += cb.z;
-
-						normals[ vC ] += cb.x;
-						normals[ vC + 1 ] += cb.y;
-						normals[ vC + 2 ] += cb.z;
-
-					}
+					normals[ vC ] += cb.x;
+					normals[ vC + 1 ] += cb.y;
+					normals[ vC + 2 ] += cb.z;
 
 				}
 

@@ -27,7 +27,7 @@
 			color: #ffffff;
 		}
 
-		#oldie a {
+		#webglmessage a {
 			color: #da0;
 		}
 
@@ -50,8 +50,8 @@
 
 	<script src="js/libs/dat.gui.min.js"></script>
 	<script src="../build/three.js"></script>
-	<script src="js/Detector.js"></script>
 	<script src="js/libs/stats.min.js"></script>
+	<script src="js/WebGL.js"></script>
 
 	<script id="vertexShader" type="x-shader/x-vertex">
 		precision highp float;
@@ -107,7 +107,11 @@
 
 	<script>
 
-		if ( !Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var container, stats;
 
@@ -129,7 +133,6 @@
 
 			var vector = new THREE.Vector4();
 
-			var triangles = 1;
 			var instances = 50000;
 
 			var positions = [];
@@ -138,8 +141,8 @@
 			var orientationsStart = [];
 			var orientationsEnd = [];
 
-			positions.push( 0.025, -0.025, 0 );
-			positions.push( -0.025, 0.025, 0 );
+			positions.push( 0.025, - 0.025, 0 );
+			positions.push( - 0.025, 0.025, 0 );
 			positions.push( 0, 0, 0.025 );
 
 			// instanced attributes
@@ -185,8 +188,8 @@
 			var material = new THREE.RawShaderMaterial( {
 
 				uniforms: {
-					time: { value: 1.0 },
-					sineTime: { value: 1.0 }
+					"time": { value: 1.0 },
+					"sineTime": { value: 1.0 }
 				},
 				vertexShader: document.getElementById( 'vertexShader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
@@ -230,7 +233,7 @@
 
 		}
 
-		function onWindowResize( event ) {
+		function onWindowResize() {
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
@@ -257,8 +260,8 @@
 			var object = scene.children[ 0 ];
 
 			object.rotation.y = time * 0.0005;
-			object.material.uniforms.time.value = time * 0.005;
-			object.material.uniforms.sineTime.value = Math.sin( object.material.uniforms.time.value * 0.05 );
+			object.material.uniforms[ "time" ].value = time * 0.005;
+			object.material.uniforms[ "sineTime" ].value = Math.sin( object.material.uniforms[ "time" ].value * 0.05 );
 
 			renderer.render( scene, camera );
 

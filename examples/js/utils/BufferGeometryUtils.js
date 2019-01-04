@@ -186,6 +186,7 @@ THREE.BufferGeometryUtils = {
 
 	/**
 	 * @param  {Array<THREE.BufferGeometry>} geometries
+	 * @param  {Boolean} useGroups
 	 * @return {THREE.BufferGeometry}
 	 */
 	mergeBufferGeometries: function ( geometries, useGroups ) {
