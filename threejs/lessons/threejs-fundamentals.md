@@ -29,7 +29,7 @@ so let's start with "Hello Cube!"
 
 The first thing we need is a `<canvas>` tag so
 
-```
+```html
 <body>
   <canvas id="c"></canvas>
 </body>
@@ -38,7 +38,7 @@ The first thing we need is a `<canvas>` tag so
 Three.js will draw into that canvas so we need to look it up
 and pass it to three.js.
 
-```
+```html
 <script>
 'use strict';
 
@@ -69,7 +69,7 @@ that uses WebGL to render 3D to the canvas.
 
 Next up we need a camera.
 
-```
+```js
 const fov = 75;
 const aspect = 2;  // the canvas default
 const near = 0.1;
@@ -106,7 +106,7 @@ The camera defaults to looking down the -Z axis with +Y up. We'll put our cube
 at the origin so we need to move the camera back a litte from the origin
 in order to see anything.
 
-```
+```js
 camera.position.z = 2;
 ```
 
@@ -125,7 +125,7 @@ Next we make a `Scene`. A `Scene` in three.js is the root of a form of scene gra
 Anything you want three.js to draw needs to be added to the scene. We'll
 cover more details of [how scenes work in a future article](threejs-scenegraph.html).
 
-```
+```js
 const scene = new THREE.Scene();
 ```
 
@@ -133,7 +133,7 @@ Next up we create a `BoxGeometry` which contains the data for a box.
 Almost anything we want to display in Three.js needs geometry which defines
 the vertices that make up our 3D object.
 
-```
+```js
 const boxWidth = 1;
 const boxHeight = 1;
 const boxDepth = 1;
@@ -143,7 +143,7 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 We then create a basic material and set its color. Colors can
 be specified using standard CSS style 6 digit hex color values.
 
-```
+```js
 const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 ```
 
@@ -153,20 +153,20 @@ the object, shiny or flat, what color, what texture(s) to apply. Etc.)
 as well as the position, orientation, and scale of that
 object in the scene.
 
-```
+```js
 const cube = new THREE.Mesh(geometry, material);
 ```
 
 And finally we add that mesh to the scene
 
-```
+```js
 scene.add(cube);
 ```
 
 We can then render the scene by calling the renderer's render function
 and passing it the scene and the camera
 
-```
+```js
 renderer.render(scene, camera);
 ```
 
@@ -184,7 +184,7 @@ it clear it's being drawn in 3D. To animate it we'll render inside a render loop
 
 Here's our loop
 
-```
+```js
 function render(time) {
   time *= 0.001;  // convert time to seconds
 
@@ -225,7 +225,7 @@ so let's add a light. There are many kinds of lights in three.js which
 we'll go over in a future article. For now let's create a directional
 light.
 
-```
+```js
 {
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -243,7 +243,7 @@ toward the origin.
 We also need to change the material. The `MeshBasicMaterial` is not affected by
 lights. Let's change it to a `MeshPhongMaterial` which is affected by lights.
 
-```
+```js
 -const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
 +const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
 ```
@@ -264,7 +264,7 @@ with the specified color. Then it creates a mesh using
 the specified geometry and adds it to the scene and
 sets its X position.
 
-```
+```js
 function makeInstance(geometry, color, x) {
   const material = new THREE.MeshPhongMaterial({color});
 
@@ -280,7 +280,7 @@ function makeInstance(geometry, color, x) {
 Then we'll call it 3 times with 3 different colors and X positions
 saving the `Mesh` instances in an array.
 
-```
+```js
 const cubes = [
   makeInstance(geometry, 0x44aa88,  0),
   makeInstance(geometry, 0x8844aa, -2),
@@ -291,7 +291,7 @@ const cubes = [
 Finally we'll spin all 3 cubes in our render function. We
 compute a slightly different rotation for each one.
 
-```
+```js
 function render(time) {
   time *= 0.001;  // convert time to seconds
 

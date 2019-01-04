@@ -80,7 +80,7 @@ with the [examples from the previous article](threejs-responsive.html).
 
 Near the top let's set a background color
 
-```
+```js
 const scene = new THREE.Scene();
 +scene.background = new THREE.Color(0xAAAAAA);
 ```
@@ -90,7 +90,7 @@ This tells three.js to clear to lightish gray.
 The camera needs to change position so that we can see all the
 objects.
 
-```
+```js
 -const fov = 75;
 +const fov = 40;
 const aspect = 2;  // the canvas default
@@ -105,7 +105,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 Let's add a function, `addObject`, that takes an x, y position and an `Object3D` and adds
 the object to the scene.
 
-```
+```js
 const objects = [];
 const spread = 15;
 
@@ -132,7 +132,7 @@ as `luminance` goes from 0.0 to 0.5 the color
 will go from black to `hue`. From 0.5 to 1.0
 the color will go from `hue` to white.
 
-```
+```js
 function createMaterial() {
   const material = new THREE.MeshPhongMaterial({
     side: THREE.DoubleSide,
@@ -169,7 +169,7 @@ we pass a geometry and it creates a random colored
 material via `createMaterial` and adds it to the scene
 via `addObject`.
 
-```
+```js
 function addSolidGeometry(x, y, geometry) {
   const mesh = new THREE.Mesh(geometry, createMaterial());
   addObject(x, y, mesh);
@@ -179,7 +179,7 @@ function addSolidGeometry(x, y, geometry) {
 Now we can use this for the majority of the primitives we create.
 For example creating a box
 
-```
+```js
 {
   const width = 8;
   const height = 8;
@@ -204,7 +204,7 @@ and a callback. The callback is called after the font loads.
 In the callback we create the geometry
 and call `addObject` to add it the scene.
 
-```
+```js
 {
   const loader = new THREE.FontLoader();
   loader.load('resources/threejs/fonts/helvetiker_regular.typeface.json', (font) => {
@@ -263,7 +263,7 @@ The other exceptions are the 2 line based examples for `EdgesGeometry`
 and `WireframeGeometry`. Instead of calling `addSolidGeometry` they call
 `addLineGeomtry` which looks like this
 
-```
+```js
 function addLineGeometry(x, y, geometry) {
   const material = new THREE.LineBasicMaterial({color: 0x000000});
   const mesh = new THREE.LineSegments(geometry, material);

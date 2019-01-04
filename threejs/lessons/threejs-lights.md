@@ -13,7 +13,7 @@ Starting with one of our previous samples let's update the camera.
 We'll set the field of view to 45 degrees, the far plane to 100 units,
 and we'll move the camera 10 units up and 20 units back from the origin
 
-```javascript
+```js
 *const fov = 45;
 const aspect = 2;  // the canvas default
 const near = 0.1;
@@ -27,7 +27,7 @@ or *orbit* the camera around some point. The `OrbitControls` are
 an optional feature of three.js so first we need to include them
 in our page
 
-```javascript
+```html
 <script src="resources/threejs/r98/three.min.js"></script>
 +<script src="resources/threejs/r98/js/controls/OrbitControls.js"></script>
 ```
@@ -35,7 +35,7 @@ in our page
 Then we can use them. We pass the `OrbitControls` a camera to 
 control and the DOM element to use to get input events
 
-```javascript
+```js
 const controls = new THREE.OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
@@ -62,7 +62,7 @@ texture is a 2x2 pixel checkerboard, by repeating and setting the
 repeat to half the size of the plane each check on the checkerboard
 will be exactly 1 unit large;
 
-```javascript
+```js
 const planeSize = 40;
 
 const loader = new THREE.TextureLoader();
@@ -78,7 +78,7 @@ We then make a plane geometry, a material for the plane, and mesh
 to insert it in the scene. Planes default to being in the XY plane
 but the ground is in the XZ plane so we rotate it.
 
-```javascript
+```js
 const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
 const planeMat = new THREE.MeshPhongMaterial({
   map: texture,
@@ -91,7 +91,7 @@ scene.add(mesh);
 
 Let's add a cube and a sphere so we have 3 things to light including the plane
 
-```javascript
+```js
 {
   const cubeSize = 4;
   const cubeGeo = new THREE.BoxBufferGeometry(cubeSize, cubeSize, cubeSize);
@@ -118,7 +118,7 @@ Now that we have a scene to light up let's add lights!
 
 First let's make an `AmbientLight`
 
-```javascript
+```js
 const color = 0xFFFFFF;
 const intensity = 1;
 const light = new THREE.AmbientLight(color, intensity);
@@ -136,7 +136,7 @@ color.
 
 Here's the helper:
 
-```javascript
+```js
 class ColorGUIHelper {
   constructor(object, prop) {
     this.object = object;
@@ -153,7 +153,7 @@ class ColorGUIHelper {
 
 And here's our code setting up dat.GUI
 
-```javascript
+```js
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
@@ -187,7 +187,7 @@ the surface of the object is pointing down.
 
 Here's the new code
 
-```javascript
+```js
 -const color = 0xFFFFFF;
 +const skyColor = 0xB1E1FF;  // light blue
 +const groundColor = 0xB97A20;  // brownish orange
@@ -199,7 +199,7 @@ scene.add(light);
 
 Let's also update the dat.GUI code to edit both colors
 
-```javascript
+```js
 const gui = new dat.GUI();
 -gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 +gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
@@ -222,7 +222,7 @@ other light or a substitute for an `AmbientLight`.
 Let's switch the code to a `DirectionalLight`.
 A `DirectionalLight` is often used to represent the sun.
 
-```javascript
+```js
 const color = 0xFFFFFF;
 const intensity = 1;
 const light = new THREE.DirectionalLight(color, intensity);
@@ -239,7 +239,7 @@ in the direction of its target.
 Let's make it so we can move the target by adding it to
 our GUI.
 
-```javascript
+```js
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
@@ -257,7 +257,7 @@ invisible parts of a scene. In this case we'll use the
 the light, and a line from the light to the target. We just
 pass it the light and add itd add it to the scene.
 
-```javascript
+```js
 const helper = new THREE.DirectionalLightHelper(light);
 scene.add(helper);
 ```
@@ -267,7 +267,7 @@ of the light and the target. To do this we'll make a function
 that given a `Vector3` will adjust its `x`, `y`, and `z` properties
 using `dat.GUI`.
 
-```javascript
+```js
 function makeXYZGUI(gui, vector3, name, onChangeFn) {
   const folder = gui.addFolder(name);
   folder.add(vector3, 'x', -10, 10).onChange(onChangeFn);
@@ -285,7 +285,7 @@ get called anytime dat.GUI updates a value.
 Then we can use that for both the light's position
 and the target's position like this
 
-```javascript
+```js
 +function updateLight{
 +  light.target.updateMatrixWorld();
 +  helper.update();
@@ -315,7 +315,7 @@ shooting out parallel rays of light.
 A `PointLight` is a light that sits at a point and shoots light
 in all directions from that point. Let's change the code.
 
-```javascript
+```js
 const color = 0xFFFFFF;
 const intensity = 1;
 -const light = new THREE.DirectionalLight(color, intensity);
@@ -328,7 +328,7 @@ scene.add(light);
 
 Let's also switch to a `PointLightHelper`
 
-```javascript
+```js
 -const helper = new THREE.DirectionalLightHelper(light);
 +const helper = new THREE.PointLightHelper(light);
 scene.add(helper);
@@ -336,7 +336,7 @@ scene.add(helper);
 
 and as there is no target the `onChange` function can be simpler.
 
-```javascript
+```js
 function updateLight{
 -  light.target.updateMatrixWorld();
   helper.update();
@@ -356,7 +356,7 @@ units away from the light.
 
 Let's setup the GUI so we can adjust the distance.
 
-```javascript
+```js
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
@@ -386,7 +386,7 @@ open toward the target.
 
 Modifying our `DirectionalLight` with helper from above
 
-```javascript
+```js
 const color = 0xFFFFFF;
 const intensity = 1;
 -const light = new THREE.DirectionalLight(color, intensity);
@@ -404,7 +404,7 @@ property in radians. We'll use our `DegRadHelper` from the
 [texture artcle](threejs-textures.html) to present a UI in
 degrees.
 
-```javascript
+```js
 gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(updateLight);
 ```
 
@@ -415,7 +415,7 @@ inner code is the same size (0 = no difference) from the outer cone. When the
 outer cone. When `penumbra` is .5 then the light fades starting from 50% between
 the center of the outer cone.
 
-```javascript
+```js
 gui.add(light, 'penumbra', 0, 1, 0.01);
 ```
 
@@ -437,7 +437,7 @@ fluorescent light or maybe a frosted sky light in a ceiling.
 The `RectAreaLight` only works with the `MeshStandardMaterai` and the
 `MeshPhysicalMaterial` so let's change all our materials to `MeshStandardMaterial`
 
-```javascript
+```js
   ...
 
   const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
@@ -484,7 +484,7 @@ be sure to remember to include the extra data.
 
 Now we can create the light
 
-```javascript
+```js
 const color = 0xFFFFFF;
 *const intensity = 5;
 +const width = 12;
@@ -504,7 +504,7 @@ One thing to notice is that unlike the `DirectionalLight` and the `SpotLight` th
 Let's also adjust the GUI. We'll make it so we can rotate the light and adjust
 its `width` and `height`
 
-```javascript
+```js
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 10, 0.01);
@@ -536,7 +536,7 @@ Let's test that.
 
 First we'll turn on physically correct lights
 
-```javascript
+```js
 const renderer = new THREE.WebGLRenderer({canvas: canvas});
 +renderer.physicallyCorrectLights = true;
 ```
@@ -544,7 +544,7 @@ const renderer = new THREE.WebGLRenderer({canvas: canvas});
 Then we'll set the `power` to 800 lumens, the `decay` to 2, and
 the `distance` to `Infinity`.
 
-```javascript
+```js
 const color = 0xFFFFFF;
 const intensity = 1;
 const light = new THREE.PointLight(color, intensity);
@@ -555,7 +555,7 @@ light.distance = Infinity;
 
 and we'll add gui so we can change the `power` and `decay`
 
-```javascript
+```js
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'decay', 0, 4, 0.01);

@@ -69,7 +69,7 @@ for loading .OBJ and replaced it with code for loading .GLTF
 
 The old .OBJ code was
 
-```
+```js
 const objLoader = new THREE.OBJLoader2();
 objLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', null, (materials) => {
   materials.Material.side = THREE.DoubleSide;
@@ -84,7 +84,7 @@ objLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', null, (materia
 
 The new .GLTF code is
 
-```
+```js
 {
   const gltfLoader = new THREE.GLTFLoader();
   const url = 'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf';
@@ -99,7 +99,7 @@ I kept the auto framing code as before
 
 We also need to include the `GLTFLoader` and we can get rid of the `OBJLoader2`.
 
-```
+```html
 -<script src="resources/threejs/r98/js/loaders/LoaderSupport.js"></script>
 -<script src="resources/threejs/r98/js/loaders/OBJLoader2.js"></script>
 -<script src="resources/threejs/r98/js/loaders/MTLLoader.js"></script>
@@ -121,7 +121,7 @@ console.
 
 Here's the code to print out the scenegraph.
 
-```
+```js
 function dumpObject(obj, lines = [], isLast = true, prefix = '') {
   const localPrefix = isLast ? '└─' : '├─';
   lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
@@ -137,7 +137,7 @@ function dumpObject(obj, lines = [], isLast = true, prefix = '') {
 
 And I just called it right after loading the scene.
 
-```
+```js
 const gltfLoader = new THREE.GLTFLoader();
 gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
   const root = gltf.scene;
@@ -147,7 +147,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 
 [Running that](.../threejs-load-gltf-dump-scenegraph.html) I got this listing
 
-```
+```text
 OSG_Scene [Scene]
   └─RootNode_(gltf_orientation_matrix) [Object3D]
     └─RootNode_(model_correction_matrix) [Object3D]
@@ -191,7 +191,7 @@ OSG_Scene [Scene]
 From that we can see all the cars happen to be under parent
 called `"Cars"`
 
-```
+```text
 *          ├─Cars [Object3D]
           │ ├─CAR_03_1 [Object3D]
           │ │ └─CAR_03_1_World_ap_0 [Mesh]
@@ -207,7 +207,7 @@ all the children of the "Cars" node around their Y axis
 I looked up the "Cars" node after loading the scene
 and saved the result.
 
-```
+```js
 +let cars;
 {
   const gltfLoader = new THREE.GLTFLoader();
@@ -220,7 +220,7 @@ and saved the result.
 Then in the `render` function we can just set the rotation
 of each child of `cars`
 
-```
+```js
 +function render(time) {
 +  time *= 0.001;  // convert to seconds
 
@@ -267,7 +267,7 @@ Each type of car will work with the same adjustments.
 I wrote this code to go through each car, parent it to a new `Object3D`, parent that new `Object3D` to the scene, and apply some per car *type* settings to fix its orientation, and add
 the new `Object3D` a `cars` array.
 
-```
+```js
 -let cars;
 +const cars = [];
 {
@@ -320,7 +320,7 @@ Fortunately I was able to select just my path and export .OBJ checking "write nu
 Opening the .OBJ file I was able to get a list of points
 which I formated into this
 
-```
+```js
 const controlPoints = [
   [1.118281, 5.115846, -3.681386],
   [3.948875, 5.115846, -3.641834],
@@ -367,7 +367,7 @@ This will give us a curve like this
 
 Here's the code to make the curve 
 
-```
+```js
 let curve;
 let curveObject;
 {
@@ -426,7 +426,7 @@ the lines made by connecting those 250 points.
 Running [the example](../threejs-load-gltf-car-path.html) I didn't see the curve. To make it
 visible made it ignore the depth test and render last
 
-```
+```js
     curveObject = new THREE.Line(geometry, material);
 +    material.depthTest = false;
 +    curveObject.renderOrder = 1;
@@ -461,7 +461,7 @@ is less of an issue.
 Going back to the function we wrote above to dump the scene graph,
 let's dump the position, rotation, and scale of each node.
 
-```
+```js
 +function dumpVec3(v3, precision = 3) {
 +  return `${v3.x.toFixed(precision)}, ${v3.y.toFixed(precision)}, ${v3.z.toFixed(precision)}`;
 +}
@@ -487,7 +487,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 
 And the result from [running it](.../threejs-load-gltf-dump-scenegraph-extra.html)
 
-```
+```text
 OSG_Scene [Scene]
   │   pos: 0.000, 0.000, 0.000
   │   rot: 0.000, 0.000, 0.000
@@ -531,7 +531,7 @@ all the major nodes and removed any transformations.
 
 All these nodes at the top
 
-```
+```text
 OSG_Scene [Scene]
   │   pos: 0.000, 0.000, 0.000
   │   rot: 0.000, 0.000, 0.000
@@ -568,7 +568,7 @@ Here's what I ended up with.
 First I adjusted the position of the curve and after I found values
 that seemd to work. I then hid it.
 
-```
+```js
 {
   const points = curve.getPoints(250);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -588,7 +588,7 @@ a position from 0 to 1 along the curve and compute a point in world space
 using the `curveObject` to transform the point. We then pick another point
 slightly further down the curve. We set the car's orientation using `lookAt` and put the car at the mid point between the 2 points.
 
-```
+```js
 // create 2 Vector3s we can use for path calculations
 const carPosition = new THREE.Vector3();
 const carTarget = new THREE.Vector3();
@@ -630,7 +630,7 @@ and when I ran it I found out for each type of car, their height above their ori
 are not consistently set and so I needed to offset each one
 a little.
 
-```
+```js
 const loadedCars = root.getObjectByName('Cars');
 const fixes = [
 -  { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
@@ -669,7 +669,7 @@ into our latest code.
 
 Then, after loading, we need to turn on shadows on all the objects.
 
-```
+```js
 {
   const gltfLoader = new THREE.GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
@@ -687,7 +687,7 @@ Then, after loading, we need to turn on shadows on all the objects.
 I then spent nearly 4 hours trying to figure out why the shadow helpers
 were not working. It was because I forgot to enable shadows with
 
-```
+```js
 renderer.shadowMap.enabled = true;
 ```
 
@@ -697,7 +697,7 @@ I then adjusted the values until our `DirectionLight`'s shadow camera
 had a frustum that covered the entire scene. These are the settings
 I ended up with.
 
-```
+```js
 {
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -724,7 +724,7 @@ I ended up with.
 
 and I set the background color to light blue.
 
-```
+```js
 const scene = new THREE.Scene();
 -scene.background = new THREE.Color('black');
 +scene.background = new THREE.Color('#DEFEFF');

@@ -41,7 +41,7 @@ We'll modify one of our first samples. All we need to do is create a `TextureLoa
 [`load`](TextureLoader.load) method with the URL of an
 image and and set the material's `map` property to the result instead of setting its `color`.
 
-```
+```js
 +const loader = new THREE.TextureLoader();
 
 const material = new THREE.MeshBasicMaterial({
@@ -73,7 +73,7 @@ How about 6 textures, one on each face of a cube?
 
 We just make 6 materials and pass them as an array when we create the `Mesh`
 
-```
+```js
 const loader = new THREE.TextureLoader();
 
 -const material = new THREE.MeshBasicMaterial({
@@ -114,7 +114,7 @@ Most of the code on this site uses the easiest method of loading textures.
 We create a `TextureLoader` and then call its [`load`](TextureLoader.load) method. 
 This returns a `Texture` object.
 
-```
+```js
 const texture = loader.load('resources/images/flower-1.jpg');
 ```
 
@@ -133,7 +133,7 @@ that will be called when the texture has finished loading. Going back to our top
 we can wait for the texture to load before creating our `Mesh` and adding it to scene
 like this
 
-```
+```js
 const loader = new THREE.TextureLoader();
 loader.load('resources/images/wall.jpg', (texture) => {
   const material = new THREE.MeshBasicMaterial({
@@ -156,7 +156,7 @@ To wait until all textures have loaded you can use a `LoadingManager`. Create on
 and pass it to the `TextureLoader` then set its  [`onLoad`](LoadingManager.onLoad)
 property to a callback.
 
-```
+```js
 +const loadManager = new THREE.LoadingManager();
 *const loader = new THREE.TextureLoader(loadManager);
 
@@ -181,7 +181,7 @@ we can set to another callback to show a progress indicator.
 
 First we'll add a progress bar in HTML
 
-```
+```html
 <body>
   <canvas id="c"></canvas>
 +  <div id="loading">
@@ -192,7 +192,7 @@ First we'll add a progress bar in HTML
 
 and the CSS for it
 
-```
+```css
 #loading {
     position: fixed;
     top: 0;
@@ -215,14 +215,13 @@ and the CSS for it
     transform-origin: top left;
     transform: scaleX(0);
 }
-
 ```
 
 Then in the code we'll update the scale of the `progressbar` in our `onProgress` callback. It gets
 called with the URL of the last item loaded, the number of items loaded so far, and the total
 number of items loaded.
 
-```
+```js
 +const loadingElem = document.querySelector('#loading');
 +const progressBarElem = loadingElem.querySelector('.progressbar');
 
@@ -474,14 +473,14 @@ They can be set to one of:
 
 For example to turn on wrapping in both directions:
 
-```
+```js
 someTexture.wrapS = THREE.RepeatWrapping;
 someTexture.wrapT = THREE.RepeatWrapping;
 ```
 
 Repeating is set with the [repeat] repeat property.
 
-```
+```js
 const timesToRepeatHorizontally = 4;
 const timesToRepeatVertically = 2;
 someTexture.repeat.set(timesToRepeatHorizontally, timesToRepeatVertically);
@@ -491,7 +490,7 @@ Offseting the texture can be done by setting the `offset` property. Textures
 are offset with units where 1 unit = 1 texture size. On other words 0 = no offset 
 and 1 = offset one full texture amount.
 
-```
+```js
 const xOffset = .5;   // offset by half the texture
 const yOffset = .25;  // offset by 1/2 the texture
 someTexture.offset.set(xOffset, yOffset);`
@@ -503,7 +502,7 @@ It defaults to 0,0 which rotates from the bottom left corner. Like offset
 these units are in texture size so setting them to `.5, .5` would rotate
 around the center of the texture.
 
-```
+```js
 someTexture.center.set(.5, .5);
 someTexture.rotation = THREE.Math.degToRad(45); 
 ```
@@ -512,7 +511,7 @@ Let's modify the top sample above to play with these values
 
 First we'll keep a reference to the texture so we can manipulate it
 
-```
+```js
 +const texture = loader.load('resources/images/wall.jpg');
 const material = new THREE.MeshBasicMaterial({
 -  map: loader.load('resources/images/wall.jpg');
@@ -522,7 +521,7 @@ const material = new THREE.MeshBasicMaterial({
 
 Then we'll use [dat.GUI](https://github.com/dataarts/dat.gui) again to provide a simple interface.
 
-```
+```html
 <script src="../3rdparty/dat.gui.min.js"></script>
 ```
 
@@ -530,7 +529,7 @@ As we did in previous dat.GUI examples we'll use a simple class to
 give dat.GUI an object that it can manipulate in degrees
 but that will set a property in radians.
 
-```
+```js
 class DegRadHelper {
   constructor(obj, prop) {
     this.obj = obj;
@@ -549,7 +548,7 @@ We also need a class that will convert from a string like `"123"` into
 a number like `123` since three.js requires numbers for enum settings
 like `wrapS` and `wrapT` but dat.GUI only uses strings for enums.
 
-```
+```js
 class StringToNumberHelper {
   constructor(obj, prop) {
     this.obj = obj;
@@ -566,7 +565,7 @@ class StringToNumberHelper {
 
 Using those classes we can setup a simple GUI for the settings above
 
-```
+```js
 const wrapModes = {
   'ClampToEdgeWrapping': THREE.ClampToEdgeWrapping,
   'RepeatWrapping': THREE.RepeatWrapping,

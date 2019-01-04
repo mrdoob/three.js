@@ -14,7 +14,7 @@ accomplish.
 There are 2 ways to set most material properties. One at creation time which
 we've seen before.
 
-```
+```js
 const material = new THREE.MeshPhongMaterial({
   color: 0xFF0000,    // red (can also use a CSS color string here)
   flatShading: true,
@@ -23,7 +23,7 @@ const material = new THREE.MeshPhongMaterial({
 
 The other is after creation
 
-```
+```js
 const material = new THREE.MeshPhongMaterial();
 material.color.setHSL(0, 1, .5);  // red
 material.flatShading = true;
@@ -31,7 +31,7 @@ material.flatShading = true;
 
 note that properties of type `THREE.Color` have multiple ways to be set.
 
-```
+```js
 material.color.set(0x00FFFF);    // same as CSS's #RRGGBB style
 material.color.set(cssString);   // any CSS color, eg 'purple', '#F32', 
                                  // 'rgb(255, 127, 64)',
@@ -43,7 +43,7 @@ material.color.setRGB(r, g, b)   // where r, g, and b are 0 to 1
 
 And at creation time you can pass either a hex number or a CSS string
 
-```
+```js
 const m1 = new THREE.MeshBasicMaterial({color: 0xFF0000});         // red
 const m2 = new THREE.MeshBasicMaterial({color: 'red'});            // red
 const m3 = new THREE.MeshBasicMaterial({color: '#F00'});           // red

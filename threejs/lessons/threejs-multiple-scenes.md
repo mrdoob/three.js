@@ -35,7 +35,7 @@ issues for the same reasons.
 Let's start with a simple example with just 2 scenes. First we'll
 make the HTML
 
-```
+```html
 <canvas id="c"></canvas>
 <p>
   <span id="box" class="diagram left"></span>
@@ -51,7 +51,7 @@ make the HTML
 
 Then we can setup the CSS maybe something like this
 
-```
+```css
 #c {
   position: fixed;
   left: 0;
@@ -83,7 +83,7 @@ We set the canvsas to fill the screen and we set its `z-index` to
 Now we'll make 2 scenes each with a light and a camera.
 To one scene we'll add a cube and to another a diamond.
 
-```
+```js
 function makeScene(elem) {
   const scene = new THREE.Scene();
 
@@ -142,7 +142,7 @@ only if the element is on the screen. We can tell THREE.js
 to only render to part of the canvas by turning on the *scissor*
 test with `Renderer.setScissorTest` and then setting both the scissor and the viewport with `Renderer.setViewport` and `Renderer.setScissor`.
 
-```
+```js
 function rendenerSceneInfo(sceneInfo) {
   const {scene, camera, elem} = sceneInfo;
 
@@ -173,7 +173,7 @@ function rendenerSceneInfo(sceneInfo) {
 And then our render function will just first clear the screen
 and then render each scene.
 
-```
+```js
 function render(time) {
   time *= 0.001;
 
@@ -208,7 +208,7 @@ drawn into the canvas will lag behind the rest of the page.
 
 If we give each area a border 
 
-```
+```css
 .diagram {
   display: inline-block;
   width: 5em;
@@ -219,7 +219,7 @@ If we give each area a border
 
 And we set the background of each scene
 
-```
+```js
 const scene = new THREE.Scene();
 +scene.background = new THREE.Color('red');
 ```
@@ -230,7 +230,7 @@ And if we <a href="../threejs-multiple-scenes-v2.html" target="_blank">quickly s
 
 We can switch to a different method which has a different tradeoff. We'll switch the canvas's CSS from `position: fixed` to `position: absolute`. 
 
-```
+```css
 #c {
 -  position: fixed;
 +  position: absolute;
@@ -240,14 +240,14 @@ Then we'll set the canvas's transform to move it so
 the top of the canvas is at the top of whatever part
 the page is currently scrolled to.
 
-```
+```js
 function render(time) {
   ...
 
   const transform = `translateY(${window.scrollY}px)`;
   renderer.domElement.style.transform = transform;
 
-```
+```js
 
 `position: fixed` kept the canvas from scrolling at all
 while the rest of the page scrolled over it. `position: absolute` will let the canvas scroll with the rest of the page which means whatever we draw will stick with the page as it scrolls even if we're too slow to render. When we finally get a chance to render then we move the canvas so it matches where the page has been scrolled and then we re-render. This means only the edges of the window will show some un-rendered bits for a moment but <a href="../threejs-multiple-scenes-v2.html" target="_blank">the stuff in the middle of the page should match up</a> and not slide. Here's a view of the results of the new method slowed down 10x.
@@ -262,7 +262,7 @@ We could make it so the main render function, the one managing the canvas, just 
 
 Here's the main render function
 
-```
+```js
 const sceneElements = [];
 function addScene(elem, fn) {
   sceneElements.push({elem, fn});
@@ -310,7 +310,7 @@ It checks if the element is on screen. If it is it calls `fn` and passes it the 
 
 Now the setup code for each scene just adds itself to the list of scenes
 
-```
+```js
 {
   const elem = document.querySelector('#box');
   const {scene, camera} = makeScene();
@@ -356,7 +356,7 @@ With that we no longer needed `sceneInfo1` and `sceneInfo2` and the code that wa
 
 One last even more generic thing we can do is use HTML [dataset](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset). This is a way to add your own data to an HTML element. Instead of using `id="..."` we'll use `data-diagram="..."` like this
 
-```
+```html
 <canvas id="c"></canvas>
 <p>
 -  <span id="box" class="diagram left"></span>
@@ -374,7 +374,7 @@ One last even more generic thing we can do is use HTML [dataset](https://develop
 
 We can them change the CSS selector to select for that
 
-```
+```css
 -.diagram
 +*[data-diagram] {
   display: inline-block;
@@ -385,7 +385,7 @@ We can them change the CSS selector to select for that
 
 We'll change the scene setup code to just be a map of names to *scene initialization functions* that return a *scene render function*.
 
-```
+```js
 const sceneInitFunctionsByName = {
   'box': () => {
     const {scene, camera} = makeScene();
@@ -423,7 +423,7 @@ const sceneInitFunctionsByName = {
 
 And to init we can just use `querySelectorAll` to find all the diagrams and call the corresponding init function for that diagram. 
 
-```
+```js
 document.querySelectorAll('[data-diagram]').forEach((elem) => {
   const sceneName = elem.dataset.diagram;
   const sceneInitFunction = sceneInitFunctionsByName[sceneName];
@@ -440,13 +440,13 @@ No change to the visuals but the code is even more generic.
 
 Adding interactively, for example a `TrackballControls` is just as easy. First we add the script for the control.
 
-```
+```html
 <script src="resources/threejs/r98/js/controls/TrackballControls.js"></script>
 ```
 
 And then we can add a `TrackballControls` to each scene passing in the element associated with that scene.
 
-```
+```js
 -function makeScene() {
 +function makeScene(elem) {
   const scene = new THREE.Scene();
@@ -482,7 +482,7 @@ You'll notice we added the camera to the scene and the light to the camera. This
 
 We need up update those controls in our render functions
 
-```
+```js
 const sceneInitFunctionsByName = {
 - 'box': () => {
 -    const {scene, camera} = makeScene();

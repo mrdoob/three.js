@@ -18,7 +18,7 @@ A few changes
 
 We'll parent the camera to another object so we can spin that other object and the camera will move around the scene just like a selfie stick.
 
-```
+```js
 *const fov = 60;
 const aspect = 2;  // the canvas default
 const near = 0.1;
@@ -38,13 +38,13 @@ const scene = new THREE.Scene();
 
 and in the `render` function we'll spin the camera pole.
 
-```
+```js
 cameraPole.rotation.y = time * .1;
 ```
 
 Also let's put the light on the camera so the light moves with it.
 
-```
+```js
 -scene.add(light);
 +camera.add(light);
 ```
@@ -52,7 +52,7 @@ Also let's put the light on the camera so the light moves with it.
 Let's generate 100 cubes with random colors in random positions, orientations,
 and scales.
 
-```
+```js
 const boxWidth = 1;
 const boxHeight = 1;
 const boxDepth = 1;
@@ -89,7 +89,7 @@ And finally let's pick.
 
 Let's make a simple class to manage the picking
 
-```
+```js
 class PickHelper {
   constructor() {
     this.raycaster = new THREE.Raycaster();
@@ -124,7 +124,7 @@ You can see we create a `RayCaster` and then we can call the `pick` function to 
 Of course we could call this function only when the user pressed the mouse *down* which is probaby usually what you want but for this example we'll pick every frame whatever is under the mouse. To do this we first need to track where the mouse
 is
 
-```
+```js
 const pickPosition = {x: 0, y: 0};
 clearPickPosition();
 
@@ -153,7 +153,7 @@ Notice we're recording a normalized mouse position. Reguardless of the size of t
 
 While we're at it lets support mobile as well
 
-```
+```js
 window.addEventListener('touchstart', (event) => {
   // prevent the window from scrolling
   event.preventDefault();
@@ -169,7 +169,7 @@ window.addEventListener('touchend', clearPickPosition);
 
 And finally in our `render` function we call call the `PickHelper`'s `pick` function.
 
-```
+```js
 +const pickHelper = new PickHelper();
 
 function render(time) {
@@ -219,7 +219,7 @@ As an example let's apply this texture to the cubes.
 
 We'll just make these changes
 
-```
+```js
 +const loader = new THREE.TextureLoader();
 +const texture = loader.load('resources/images/frame.png');
 
@@ -261,7 +261,7 @@ To do this type of picking in THREE.js at the moment requires we create 2 scenes
 
 So, first create a second scene and make sure it clears to black.
 
-```
+```js
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('white');
 const pickingScene = new THREE.Scene();
@@ -270,7 +270,7 @@ pickingScene.background = new THREE.Color(0);
 
 Then, for each cube we place in the main scene we make a corresponding "picking cube" at the same position as the original cube, put it in the `pickingScene`, and set it's material to something that will draw the object's id as its color. Also we keep a map of ids to objects so when we look up an id later we can map it back to its corresponding object.
 
-```
+```js
 const idToObject = {};
 +const numObjects = 100;
 for (let i = 0; i < numObjects; ++i) {
@@ -315,7 +315,7 @@ Note that abusing the `MeshPhongMaterial` might not be the best solution as it w
 
 Because we're picking from pixels instead of ray casting we can change the code that sets the pick position to just use pixels.
 
-```
+```js
 function setPickPosition(event) {
 -  pickPosition.x = (event.clientX / canvas.clientWidth ) *  2 - 1;
 -  pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
@@ -326,7 +326,7 @@ function setPickPosition(event) {
 
 Then let's change the `PickHelper` into a `GPUPickHelper`. It will use a `WebGLRenderTarget` like we covered the [article on render targets](threejs-rendertargets.html). Our render target here is only a single pixel in size, 1x1. 
 
-```
+```js
 -class PickHelper {
 +class GPUPickHelper {
   constructor() {
@@ -397,14 +397,14 @@ Then let's change the `PickHelper` into a `GPUPickHelper`. It will use a `WebGLR
 
 Then we just need to use it
 
-```
+```js
 -const pickHelper = new PickHelper();
 +const pickHelper = new GPUPickHelper();
 ```
 
 and pass it the `pickScene` instead of the `scene`.
 
-```
+```js
 -  pickHelper.pick(pickPosition, scene, camera, time);
 +  pickHelper.pick(pickPosition, pickScene, camera, time);
 ```

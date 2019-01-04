@@ -44,7 +44,7 @@ sun, earth, moon as a demonstration of how to use a scenegraph. Of course
 the real sun, earth, and moon use physics but for our purposes we'll
 fake it with a scenegraph.
 
-```
+```js
 // an array of objects who's rotation to update
 const objects = [];
 
@@ -76,7 +76,7 @@ Let's also put a single point light in the center of the scene. We'll go into mo
 details about point lights later but for now the simple version is a point light
 represents light that eminates from a single point.
 
-```
+```js
 {
   const color = 0xFFFFFF;
   const intensity = 3;
@@ -93,7 +93,7 @@ which way the top of the camera is facing or rather which way is "up" for the
 camera. For most situations positive Y being up is good enough but since 
 we are looking straight down we need to tell the camera that positive Z is up.
 
-```
+```js
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.set(0, 50, 0);
 camera.up.set(0, 0, 1);
@@ -103,7 +103,7 @@ camera.lookAt(0, 0, 0);
 In the render loop, adapted from previous examples, we're rotating all
 objects in our `objects` array with this code.
 
-```
+```js
 objects.forEach((obj) => {
   obj.rotation.y = time;
 });
@@ -115,7 +115,7 @@ Since we added the `sunMesh` to the `objects` array it will rotate.
 
 Now let's add an the earth.
 
-```
+```js
 const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
 const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
 earthMesh.position.x = 10;
@@ -136,7 +136,7 @@ rotate too.
 You can see both the sun and the earth are rotating but the earth is not
 going around the sun. Let's make the earth a child of the sun
 
-```
+```js
 -scene.add(earthMesh);
 +sunMesh.add(earthMesh);
 ``` 
@@ -162,7 +162,7 @@ its scale set to 5x with `sunMesh.scale.set(5, 5, 5)`. That means the
 To fix it let's add an empty scene graph node. We'll parent both the sun and the earth
 to that node.
 
-```
+```js
 +const solarSystem = new THREE.Object3D();
 +scene.add(solarSystem);
 +objects.push(solarSystem);
@@ -200,7 +200,7 @@ and rotating itself.
 
 Continuing that same pattern let's add a moon.
 
-```
+```js
 +const earthOrbit = new THREE.Object3D();
 +earthOrbit.position.x = 10;
 +solarSystem.add(earthOrbit);
@@ -246,7 +246,7 @@ One is called an `AxesHelper`. It draws 3 lines representing the local
 <span style="color:blue">Z</span> axes. Let's add one to every node we
 created.
 
-```
+```js
 // add an AxesHelper to each node
 objects.forEach((node) => {
   const axes = new THREE.AxesHelper();
@@ -286,7 +286,7 @@ We want to make both a `GridHelper` and an `AxesHelper` for each node. We need
 a label for each node so we'll get rid of the old loop and switch to calling
 some function to add the helpers for each node
 
-```
+```js
 -// add an AxesHelper to each node
 -objects.forEach((node) => {
 -  const axes = new THREE.AxesHelper();
@@ -318,7 +318,7 @@ that has a getter and setter for a property. That way we can let dat.GUI
 think it's manipulating a single property but internally we can set
 the visible property of both the `AxesHelper` and `GridHelper` for a node.
 
-```
+```js
 // Turns both axes and grid visible on/off
 // dat.GUI requires a property that returns a bool
 // to decide to make a checkbox so we make a setter

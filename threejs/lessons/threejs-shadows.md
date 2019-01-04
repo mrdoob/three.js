@@ -50,7 +50,7 @@ We'll use some of the code from [the previous article](threejs-cameras.html).
 
 Let's set the background color to white.
 
-```
+```js
 const scene = new THREE.Scene();
 +scene.background = new THREE.Color('white');
 ```
@@ -58,7 +58,7 @@ const scene = new THREE.Scene();
 Then we'll setup the same checkerboard ground but this time it's using
 a `MeshBasicMaterial` as we don't need lighting for the ground.
 
-```
+```js
 +const loader = new THREE.TextureLoader();
 
 {
@@ -91,19 +91,19 @@ light grey checkerboard.
 
 Let's load the shadow texture
 
-```javascript
+```js
 const shadowTexture = loader.load('resources/images/roundshadow.png');
 ```
 
 and make an array to remember each sphere and associated objects.
 
-```javascript
+```js
 const sphereShadowBases = [];
 ```
 
 Then we'll make a sphere geometry
 
-```javascript
+```js
 const sphereRadius = 1;
 const sphereWidthDivisions = 32;
 const sphereHeightDivisions = 16;
@@ -112,7 +112,7 @@ const sphereGeo = new THREE.SphereBufferGeometry(sphereRadius, sphereWidthDivisi
 
 And a plane geometry for the fake shadow
 
-```
+```js
 const planeSize = 1;
 const shadowGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
 ```
@@ -129,7 +129,7 @@ We make each sphere a different hue and then save off the base, the sphere mesh,
 the shadow mesh and the initial y position of each sphere.
 
 
-```javascript
+```js
 const numSpheres = 15;
 for (let i = 0; i < numSpheres; ++i) {
   // make a base for the shadow and the sphere.
@@ -169,7 +169,7 @@ for (let i = 0; i < numSpheres; ++i) {
 We setup 2 lights. One is a `HemisphereLight` with the itensity set to 2 to really
 brighten things up.
 
-```javascript
+```js
 {
   const skyColor = 0xB1E1FF;  // light blue
   const groundColor = 0xB97A20;  // brownish orange
@@ -181,7 +181,7 @@ brighten things up.
 
 The other is a `DirectionalLight` so the spheres get some defintion
 
-```javascript
+```js
 {
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -199,7 +199,7 @@ move the sphere up and down using `Math.abs(Math.sin(time))`
 which gives us a bouncy animation. And, we also set the shadow material's 
 opacity so that as each sphere goes higher its shadow fades out.
 
-```javascript
+```js
 function render(time) {
   time *= 0.001;  // convert to seconds
 
@@ -248,14 +248,14 @@ Let's start with the `DirectionaLight` with helper example from [the lights arti
 
 The first thing we need to do is turn on shadows in the renderer.
 
-```
+```js
 const renderer = new THREE.WebGLRenderer({canvas: canvas});
 +renderer.shadowMap.enabled = true;
 ```
 
 Then we also need to tell the light to cast a shadow
 
-```javascript
+```js
 const light = new THREE.DirectionalLight(color, intensity);
 +light.castShadow = true;
 ```
@@ -266,14 +266,14 @@ both cast shadows and/or receive shadows.
 Let's make the plane (the ground) only receive shadows since we don't
 really care what happens underneath.
 
-```javascript
+```js
 const mesh = new THREE.Mesh(planeGeo, planeMat);
 mesh.receiveShadow = true;
 ```
 
 For the cube and the sphere let's have them both receive and cast shadows
 
-```javascript
+```js
 const mesh = new THREE.Mesh(cubeGeo, cubeMat);
 mesh.castShadow = true;
 mesh.receiveShadow = true;
@@ -300,7 +300,7 @@ the shadows get rendered. In the example above that area is too small.
 In order to visualize that area we can get the light's shadow camera and add
 a `CameraHelper` to the scene.
 
-```javascript
+```js
 const cameraHelper = new THREE.CameraHelper(light.shadow.camera);
 scene.add(cameraHelper);
 ```
@@ -328,7 +328,7 @@ that we'll pass an object and 2 properties. It will present one property that da
 can adjust and in response will set the two properties one positive and one negative.
 We can use this to set `left` and `right` as `width` and `up` and `down` as `height`.
 
-```javascript
+```js
 class DimensionGUIHelper {
   constructor(obj, minProp, maxProp) {
     this.obj = obj;
@@ -348,7 +348,7 @@ class DimensionGUIHelper {
 We'll also use the `MinMaxGUIHelper` we created in the [camera article](threejs-cameras.html)
 to adjust `near` and `far`.
 
-```
+```js
 const gui = new dat.GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
@@ -372,7 +372,7 @@ We tell the GUI to call our `updateCamera` function anytime anything changes.
 Let's write that function to update the light, the helper for the light, the
 light's shadow camera, and the helper showing the light's shadow camera.
 
-```
+```js
 function updateCamera() {
   // update the light target's matrixWorld because it's needed by the helper
   light.target.updateMatrixWorld();
@@ -423,7 +423,7 @@ where we could manually set most its settings, `SpotLight`'s shadow camera is co
 camera is directly connected to the `SpotLight`'s `angle` setting.
 The `aspect` is set automatically based on the size of the shadow map.
 
-```javascript
+```js
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 ```
@@ -463,7 +463,7 @@ we'll set it only to receive shadows. Also we'll set the position of the
 box so its bottom is slightly below the floor so the floor and the bottom
 of the box don't z-fight.
 
-```javascript
+```js
 {
   const cubeSize = 30;
   const cubeGeo = new THREE.BoxBufferGeometry(cubeSize, cubeSize, cubeSize);
@@ -480,7 +480,7 @@ of the box don't z-fight.
 
 And of course we need to switch the light to a `PointLight`.
 
-```javascript
+```js
 -const light = new THREE.SpotLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 

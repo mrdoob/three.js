@@ -29,7 +29,7 @@ Lots of 20yr old pages use HTML like
 That style is deprecated. Put your scripts
 at the bottom of the page.
 
-```
+```html
 <html>
   <head>
     ...
@@ -62,7 +62,7 @@ Put `'use strict';` at the top of every JavaScript file. It will help prevent lo
 
 ## Know how closures work
 
-```
+```js
 function a(v) {
   const foo = v;
   return function() {
@@ -123,7 +123,7 @@ the time. Use `let` in those cases where the value changes. This will help avoid
 
 As one example you can iterate over all the key/value pairs of an object with
 
-```
+```js
 for (const [key, value] of Object.entries(someObject)) {
   console.log(key, value);
 }
@@ -153,7 +153,7 @@ new code
 
 old code
 
-```
+```js
  const width = 300;
  const height = 150;
  const obj = {
@@ -167,7 +167,7 @@ old code
 
 new code
 
-```
+```js
  const width = 300;
  const height = 150;
  const obj = {
@@ -183,7 +183,7 @@ new code
 
 The spread operator has a ton of uses. Example
 
-```
+```js
  function log(className, ...args) {
    const elem = document.createElement('div');
    elem.className = className;
@@ -194,7 +194,7 @@ The spread operator has a ton of uses. Example
 
 Another example
 
-```
+```js
 const position = [1, 2, 3];
 somemesh.position.set(...position);
 ```
@@ -216,7 +216,7 @@ of ES5 makes them much easier than pre ES5.
 
 This is especially useful with callbacks and promises.
 
-```
+```js
 loader.load((texture) => {
   // use textrue
 });
@@ -224,7 +224,7 @@ loader.load((texture) => {
 
 Arrow functions bind `this`. They are a shortcut for
 
-```
+```js
 (function(args) {/* code */}).bind(this))
 ```
 
@@ -245,7 +245,7 @@ Template literals are strings using backticks instead of quotes.
 
 Template literals have basically 2 features. One is they can be multi-line
 
-```
+```js
 const foo = `this
 is
 a
@@ -259,7 +259,7 @@ const bar = "this\nis\na\ntemplate\nliteral";
 The other is that you can pop out of string mode and insert snippets of
 JavaScript using `${javascript-expression}`. This is the template part. Example:
 
-```
+```js
 const r = 192;
 const g = 255;
 const b = 64;
@@ -268,14 +268,14 @@ const rgbCSSColor = `rgb(${r},${g},${b})`;
 
 or
 
-```
+```js
 const color = [192, 255, 64];
 const rgbCSSColor = `rgb(${color.join(',')})`;
 ```
 
 or
 
-```
+```js
 const aWidth = 10;
 const bWidth = 20;
 someElement.style.width = `${aWidth + bWidth}px`;

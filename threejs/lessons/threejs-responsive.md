@@ -18,7 +18,7 @@ in the middle of a document is another example.
 The last sample we had used a plain canvas with no css and
 no size
 
-```
+```html
 <canvas id="c"></canvas>
 ```
 
@@ -29,7 +29,7 @@ of something is to use CSS.
 
 Let's make the canvas fill the page by adding CSS
 
-```
+```html
 <style>
 html, body {
    margin: 0;
@@ -82,7 +82,7 @@ display size. We can do that by looking at the canvas's
 
 We'll update our render loop like this
 
-```
+```js
 function render(time) {
   time *= 0.001;
 
@@ -111,7 +111,7 @@ number of pixels in the canvas itself. This is no different than an image.
 For example we might have a 128x64 pixel image and using
 css we might display as 400x200 pixels.
 
-```
+```html
 <img src="some128x64image.jpg" style="width:400px; height:200px">
 ```
 
@@ -124,7 +124,7 @@ attributes.
 Let's write a function that checks if the renderer's canvas is not
 already the size it is being displayed as and if so set its size.
 
-```
+```js
 function resizeRendererToDisplaySize(renderer) {
   const canvas = renderer.domElement;
   const width = canvas.clientWidth;
@@ -152,7 +152,7 @@ Note that our function returns true if the canvas was resized. We can use
 this to check if there are other things we should update. Let's modify
 our render loop to use the new function
 
-```
+```js
 function render(time) {
   time *= 0.001;
 
@@ -237,7 +237,7 @@ you passed in.
 
 The other way is to do it yourself when you resize the canvas.
 
-```
+```js
     function resizeRendererToDisplaySize(renderer) {
       const canvas = renderer.domElement;
       const pixelRatio = window.devicePixelRatio;

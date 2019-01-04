@@ -44,7 +44,7 @@ that were being added to the scene.
 
 From that the first thing we need to do is include the `OBJLoader2` loader in our scene. The `OBJLoader2` also needs the `LoadingSupport.js` file so let's add both.
 
-```
+```html
 <script src="resources/threejs/r98/js/loaders/LoadingSupport.js"></script>
 <script src="resources/threejs/r98/js/loaders/OBJLoader2.js"></script>
 ```
@@ -53,7 +53,7 @@ Then to load the .OBJ file we create an instance of `OBJLoader2`,
 pass it the URL of our .OBJ file, and pass in a callback that adds
 the loaded model to our scene.
 
-```
+```js
 {
   const objLoader = new THREE.OBJLoader2();
   objLoader.load('resources/models/windmill/windmill.obj', (event) => {
@@ -82,7 +82,7 @@ Sometimes .OBJ files come with a .MTL file that defines
 materials. In our case the exporter also created a .MTL file.
 .MTL format is plain ASCII so it's easy to look at. Looking at it here
 
-```
+```mtl
 # Blender MTL File: 'windmill_001.blend'
 # Material Count: 2
 
@@ -143,7 +143,7 @@ Now that we have the textures available we can load the .MTL file.
 
 First we need to include the `MTLLoader`
 
-```
+```html
 <script src="resources/threejs/r98/three.min.js"></script>
 <script src="resources/threejs/r98/js/controls/OrbitControls.js"></script>
 <script src="resources/threejs/r98/js/loaders/LoaderSupport.js"></script>
@@ -153,7 +153,7 @@ First we need to include the `MTLLoader`
 
 Then we first load the .MTL file. When it's finished loading we set the just loaded materials on to the `OBJLoader2` itself and then load the .OBJ file.
 
-```
+```js
 {
 +  const objLoader = new THREE.OBJLoader2();
 +  objLoader.loadMtl('resources/models/windmill/windmill.mtl', null, (materials) => {
@@ -235,7 +235,7 @@ the surface.
 Looking at [the source for the MTLLoader](https://github.com/mrdoob/three.js/blob/1a560a3426e24bbfc9ca1f5fb0dfb4c727d59046/examples/js/loaders/MTLLoader.js#L432)
 it expects the keyword `norm` for normal maps so let's edit the .MTL file
 
-```
+```mtl
 # Blender MTL File: 'windmill_001.blend'
 # Material Count: 2
 
@@ -280,7 +280,7 @@ Searching the net I found this [CC-BY-NC](https://creativecommons.org/licenses/b
 
 It had a .OBJ version already available. Let's load it up (note I removed the .MTL loader for now)
 
-```
+```js
 -  objLoader.load('resources/models/windmill/windmill.obj', ...
 +  objLoader.load('resources/models/windmill-2/windmill.obj', ...
 ```
@@ -294,7 +294,7 @@ camera automatically.
 First off we can ask THREE.js to compute a box that contains the scene
 we just loaded and ask for its size and center
 
-```
+```js
 objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
   const root = event.detail.loaderRootNode;
   scene.add(root);
@@ -308,7 +308,7 @@ objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
 
 Looking in [the JavaScript console](threejs-debugging.html) I see
 
-```
+```js
 size 2123.6499788469982
 center p {x: -0.00006103515625, y: 770.0909731090069, z: -3.313507080078125}
 ```
@@ -347,7 +347,7 @@ given we know the field of view for the frustum and we know the size of the box 
 
 Based on that diagram the formula for computing distance is
 
-```
+```js
 distance = halfSizeToFitOnScreen / tangent(halfFovY)
 ```
 
@@ -355,7 +355,7 @@ Let's translate that to code. First let's make a function that will compute `dis
 camera that `distance` units from the center of the box. We'll then point the
 camera at the `center` of the box.
 
-```
+```js
 function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
   const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
   const halfFovY = THREE.Math.degToRad(camera.fov * .5);
@@ -386,7 +386,7 @@ and used that as `sizeToFitOnScreen` then the math would make the box fit perfec
 the frustum. We want a little extra space above and below so we'll pass in a slightly 
 larger size. 
 
-```
+```js
 {
   const objLoader = new THREE.OBJLoader2();
   objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
@@ -431,7 +431,7 @@ the camera is from the center. All we need to do to do that is zero out the `y` 
 of the vector from the box to the camera. Then, when we normalize that vector it will
 become a vector parallel to the XZ plane. In otherwords parallel to the ground.
 
-```
+```js
 -// compute a unit vector that points in the direction the camera is now
 -// from the center of the box
 -const direction = (new THREE.Vector3()).subVectors(camera.position, boxCenter).normalize();
@@ -453,7 +453,7 @@ Since the windmill is over 2000 units big let's change the size of the ground pl
 something more fitting. We also need to adjust the repeat otherwise our checkerboard
 will be so fine we won't even be able to see it unless we zoom way way in.
 
-```
+```js
 -const planeSize = 40;
 +const planeSize = 4000;
 
@@ -474,7 +474,7 @@ and now we can see this windmill
 Let's add the materials back. Like before there is a .MTL file that references
 some textures but looking at the files I quickly see an issue.
 
-```
+```shell
  $ ls -l windmill
  -rw-r--r--@ 1 gregg  staff       299 May 20  2009 windmill.mtl
  -rw-r--r--@ 1 gregg  staff    142989 May 20  2009 windmill.obj
@@ -507,7 +507,7 @@ Loading the files up they were each 2048x2048. That seemed like a waste to me bu
 course it depends on your use case. I made them each 1024x1024 and saved them at a
 50% quality setting in Photoshop. Getting a file listing
 
-```
+```shell
  $ ls -l ../threejsfundamentals.org/threejs/resources/models/windmill
  -rw-r--r--@ 1 gregg  staff     299 May 20  2009 windmill.mtl
  -rw-r--r--@ 1 gregg  staff  142989 May 20  2009 windmill.obj
@@ -522,7 +522,7 @@ with this compression so be sure to consult with them to discuss the tradeoffs.
 Now, to use the .MTL file we need to edit it to reference the .JPG files
 instead of the .TGA files. Fortunately it's a simple text file so it's easy to edit
 
-```
+```mtl
 newmtl blinn1SG
 Ka 0.10 0.10 0.10
 
@@ -550,7 +550,7 @@ illum 2
 Now that the .MTL file points to some reasonable size textures we need to load it so we'll just do like we did above, first load the materials
 and then set them on the `OBJLoader2`
 
-```
+```js
 {
 +  const objLoader = new THREE.OBJLoader2();
 +  objLoader.loadMtl('resources/models/windmill_2/windmill-fixed.mtl', null, (materials) => {
@@ -584,7 +584,7 @@ Issue #1: The three `MTLLoader` creates materials that multiply the material's d
 
 That's a useful feature but looking a the .MTL file above the line
 
-```
+```mtl
 Kd 0.00 0.00 0.00
 ```
 
@@ -593,7 +593,7 @@ did not multiply the diffuse texture map by the diffuse color. That's why it wor
 
 To fix this we can change the line to
 
-```
+```mtl
 Kd 1.00 1.00 1.00
 ```
 
@@ -608,7 +608,7 @@ needs a specular color set.
 
 Like above we can fix that by editing the .MTL file like this.
 
-```
+```mtl
 -Ks 0.00 0.00 0.00
 +Ks 1.00 1.00 1.00
 ```
@@ -617,7 +617,7 @@ Issue #3: The `windmill_normal.jpg` is a normal map not a bump map.
 
 Just like above we just need to edit the .MTL file
 
-```
+```mtl
 -map_bump windmill_normal.jpg 
 -bump windmill_normal.jpg 
 +norm windmill_normal.jpg 

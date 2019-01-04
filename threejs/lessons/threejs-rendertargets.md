@@ -8,7 +8,7 @@ Let's make a simple example. We'll start with an example from [the article on re
 
 Rendering to a render target just almost exactly the same as normal rendering. First we create a `WebGLRenderTarget`.
 
-```
+```js
 const rtWidth = 512;
 const rtHeight = 512;
 const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
@@ -16,7 +16,7 @@ const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
 
 Then we need a `Camera` and a `Scene`
 
-```
+```js
 const rtFov = 75;
 const rtAspect = rtWidth / rtHeight;
 const rtNear = 0.1;
@@ -32,7 +32,7 @@ Notice we set the aspect to the aspect for the render target, not the canvas.
 
 We fill the scene with stuff. In this case we're using the light and the 3 cubes [from the previous article](threejs-responsive.html).
 
-```
+```js
 {
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -69,7 +69,7 @@ We just need to add stuff to render.
 
 Let's add a cube that uses the render target's texture.
 
-```
+```js
 const material = new THREE.MeshPhongMaterial({
   map: renderTarget.texture,
 });
@@ -79,7 +79,7 @@ scene.add(cube);
 
 Now at render time first we render the render target scene to the render target.
 
-```
+```js
 function render(time) {
   time *= 0.001;
 
@@ -95,12 +95,11 @@ function render(time) {
 
   // draw render target scene to render target
   renderer.render(rtScene, rtCamera, renderTarget);
-
 ```
 
 Then we render the scene with the single cube that is using the render target's texture to the canvas.
 
-```
+```js
   // rotate the cube in the scene
   cube.rotation.x = time;
   cube.rotation.y = time * 1.1;

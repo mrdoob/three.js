@@ -21,7 +21,7 @@ There's also `FogExp2` which grows expotentially with distance from the camera.
 
 To use either type of fog you create one and and assign it to the scene as in
 
-```
+```js
 const scene = new THREE.Scene();
 {
   const color = 0xFFFFFF;  // white
@@ -33,7 +33,7 @@ const scene = new THREE.Scene();
 
 or for `FogExp2` it would be
 
-```
+```js
 const scene = new THREE.Scene();
 {
   const color = 0xFFFFFF;
@@ -67,7 +67,7 @@ The background color is set using the
 [`scene.background`](Scene.background)
 property. To pick a background color you attach a `THREE.Color` to it. For example
 
-```
+```js
 scene.background = new THREE.Color('#F00');  // red
 ```
 
@@ -86,7 +86,7 @@ Here is one of our previous examples with fog added. The only addition
 is right after setting up the scene we add the fog and set the scene's
 backgound color
 
-```
+```js
 const scene = new THREE.Scene();
 
 +{
@@ -114,7 +114,7 @@ the fog's `near` and `far` properties but it's invalid to have
 can manipulate a `near` and `far` property but we'll make sure `near`
 is less than or equal to `far` and `far` is greater than or equal `near`.
 
-```
+```js
 // We use this class to pass to dat.gui
 // so when it manipulates near or far
 // near is never > far and far is never < near
@@ -141,7 +141,7 @@ class FogGUIHelper {
 
 We can then add it like this
 
-```
+```js
 {
   const near = 1;
   const far = 2;
@@ -176,7 +176,7 @@ dat.GUI is only manipulating a single value. Fortunately `THREE.Color`
 as a [`getHexString`](Color.getHexString) method
 we get use to easily get such a string, we just have to prepend a '#' to the front.
 
-```
+```js
 // We use this class to pass to dat.gui
 // so when it manipulates near or far
 // near is never > far and far is never < near
@@ -213,7 +213,7 @@ class FogGUIHelper {
 
 We then call `gui.addColor` to add a color UI for our helper's virutal property.
 
-```
+```js
 {
   const near = 1;
   const far = 2;

@@ -75,14 +75,14 @@ Then pick "Disable Cache (while DevTools is open)".
 Inside all devtools is a *console*. It shows warnings and error messages.
 You can print your own info to the console with with `console.log` as in
 
-```
+```js
 console.log(someObject.position.x, someObject.position.y, someObject.position.z);
 ```
 
 Even cooler, if you log an object you can inspect it. For example if we log
 the root scene object from [the gLTF article](threejs-load-gltf.html)
 
-```
+```js
   {
     const gltfLoader = new THREE.GLTFLoader();
     gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
@@ -105,7 +105,7 @@ and put data in them.
 
 The most obvious way is to make some HTML elements
 
-```
+```html
 <canvas id="c"></canvas>
 +<div id="debug">
 +  <div>x:<span id="x"></span></div>
@@ -117,7 +117,7 @@ The most obvious way is to make some HTML elements
 Style them so they stay on top of the canvas. (assuming your canvas
 fills the page)
 
-```
+```html
 <style>
 #debug {
   position: absolute;
@@ -133,7 +133,7 @@ fills the page)
 
 And then looking the elements up and setting their content.
 
-```
+```js
 // at init time
 const xElem = document.querySelector('#x');
 const yElem = document.querySelector('#y');
@@ -158,7 +158,7 @@ than making an element per piece of data above.
 
 For example let's change the HTML from above to just this
 
-```
+```html
 <canvas id="c"></canvas>
 <div id="debug">
   <pre></pre>
@@ -167,7 +167,7 @@ For example let's change the HTML from above to just this
 
 And let's make simple class to manage this *clear back buffer*.
 
-```
+```js
 class ClearingLogger {
   constructor(elem) {
     this.elem = elem;
@@ -188,7 +188,7 @@ one of the examples from the article on [making things responsive](threejs-respo
 
 Here's the code that adds a new `Mesh` everytime we click the mouse
 
-```
+```js
 const geometry = new THREE.SphereBufferGeometry();
 const material = new THREE.MeshBasicMaterial({color: 'red'});
 
@@ -218,7 +218,7 @@ canvas.addEventListener('click', createThing);
 And here's the code that moves the meshes we created, logs them,
 and removes them when their timer has run out
 
-```
+```js
 const logger = new ClearingLogger(document.querySelector('#debug pre'));
 
 let then = 0;
@@ -275,7 +275,7 @@ the debug stuff only shows up if we put `?debug=true` in the URL.
 
 First we need some code to parse the query string
 
-```
+```js
 /**
   * Returns the query parameters as a key/value object. 
   * Example: If the query parameters are
@@ -303,7 +303,7 @@ function getQuery() {
 
 Then we might make the debug element not show by default
 
-```
+```html
 <canvas id="c"></canvas>
 +<div id="debug" style="display: none;">
   <pre></pre>
@@ -313,7 +313,7 @@ Then we might make the debug element not show by default
 Then in the code we read the params and choose to unhide the
 debug info if and only if `?debug=true` is passed in
 
-```
+```js
 const query = getQuery();
 const debug = query.debug === 'true';
 const logger = debug
@@ -326,7 +326,7 @@ if (debug) {
 
 We also made a `DummyLogger` that does nothing and chose to use it if `?debug=true` has not been passed in.
 
-```
+```js
 class DummyLogger {
   log() {}
   render() {}
@@ -377,7 +377,7 @@ As an example when I first started making the path for the [article about loadin
 
 I then used that curve to move the cars like this
 
-```
+```js
 curve.getPointAt(zeroToOnePointOnCurve, car.position);
 ```
 
@@ -415,7 +415,7 @@ THREE.js to step through the code and see what is going on.
 
 I see this pattern often
 
-```
+```js
 function render() {
    requestAnimationFrame(render);
 
@@ -429,7 +429,7 @@ requestAnimationFrame(render);
 I'd suggest that putting the call to `requestAnimationFrame` at
 the bottom as in
 
-```
+```js
 function render() {
    // -- do stuff --
 
