@@ -1,12 +1,10 @@
-/*eslint-env node*/
-/*eslint no-console: 0*/
-
+/* global module require */
 'use strict';
 
 module.exports = function() { // wrapper in case we're in module_context mode
 
 const cache      = new (require('inmemfilecache'))();
-const Feed       = require('feed');
+const Feed       = require('feed').Feed;
 const fs         = require('fs');
 const glob       = require('glob');
 const Handlebars = require('handlebars');
@@ -55,7 +53,7 @@ function writeFileIfChanged(fileName, content) {
     }
   }
   fs.writeFileSync(fileName, content);
-  console.log('Wrote: ' + fileName);
+  console.log("Wrote: " + fileName);  // eslint-disable-line
 }
 
 function copyFile(src, dst) {
@@ -318,7 +316,7 @@ const Builder = function(outBaseDir, options) {
   };
 
   const applyTemplateToFile = function(templatePath, contentFileName, outFileName, opt_extra) {
-    console.log('processing: ', contentFileName);
+    console.log('processing: ', contentFileName);  // eslint-disable-line
     opt_extra = opt_extra || {};
     const data = loadMD(contentFileName);
     const metaData = applyTemplateToContent(templatePath, contentFileName, outFileName, opt_extra, data);
@@ -372,7 +370,7 @@ const Builder = function(outBaseDir, options) {
   };
 
   this.process = function(options) {
-    console.log('Processing Lang: ' + options.lang);
+    console.log('Processing Lang: ' + options.lang);  // eslint-disable-line
     options.lessons     = options.lessons     || ('threejs/lessons/' + options.lang);
     options.toc         = options.toc         || ('threejs/lessons/' + options.lang + '/toc.html');
     options.template    = options.template    || 'build/templates/lesson.template';
@@ -396,7 +394,7 @@ const Builder = function(outBaseDir, options) {
         origLink: '/' + slashify(path.join(g_origPath, baseName + '.html')),
         toc: options.toc,
       };
-      console.log('  generating missing:', outFileName);
+      console.log('  generating missing:', outFileName);  // eslint-disable-line
       applyTemplateToContent(
           'build/templates/missing.template',
           path.join(options.lessons, 'langinfo.hanson'),
@@ -405,14 +403,19 @@ const Builder = function(outBaseDir, options) {
           data);
     });
 
-    function utcMomentFromGitLog(result) {
+    function utcMomentFromGitLog(result, filename, timeType) {
       const dateStr = result.stdout.split('\n')[0].trim();
       const utcDateStr = dateStr
         .replace(/"/g, '')   // WTF to these quotes come from!??!
         .replace(' ', 'T')
         .replace(' ', '')
         .replace(/(\d\d)$/, ':$1');
-      return moment.utc(utcDateStr);
+      const m = moment.utc(utcDateStr);
+      if (m.isValid()) {
+        return m;
+      }
+      const stat = fs.statSync(filename);
+      return moment(stat[timeType]);
     }
 
     const tasks = g_articles.map((article) => {
@@ -424,7 +427,7 @@ const Builder = function(outBaseDir, options) {
           '--diff-filter=A',
           article.src_file_name,
         ]).then((result) => {
-          article.dateAdded = utcMomentFromGitLog(result);
+          article.dateAdded = utcMomentFromGitLog(result, article.src_file_name, 'ctime');
         });
       };
     }).concat(g_articles.map((article) => {
@@ -436,7 +439,7 @@ const Builder = function(outBaseDir, options) {
            '--max-count=1',
            article.src_file_name,
          ]).then((result) => {
-           article.dateModified = utcMomentFromGitLog(result);
+           article.dateModified = utcMomentFromGitLog(result, article.src_file_name, 'mtime');
          });
        };
     }));
@@ -488,7 +491,7 @@ const Builder = function(outBaseDir, options) {
 
       try {
         const outPath = path.join(g_outBaseDir, options.lessons, 'atom.xml');
-        console.log('write:', outPath);
+        console.log('write:', outPath);  // eslint-disable-line
         writeFileIfChanged(outPath, feed.atom1());
       } catch (err) {
         return Promise.reject(err);
@@ -503,10 +506,10 @@ const Builder = function(outBaseDir, options) {
       });
       return Promise.resolve();
     }, function(err) {
-      console.error('ERROR!:');
-      console.error(err);
+      console.error('ERROR!:');  // eslint-disable-line
+      console.error(err);  // eslint-disable-line
       if (err.stack) {
-        console.error(err.stack);
+        console.error(err.stack);  // eslint-disable-line
       }
       throw new Error(err.toString());
     });
