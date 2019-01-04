@@ -58,6 +58,8 @@ function CubeCamera( near, far, cubeResolution, options ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
+		var prevRenderTarget = renderer.getRenderTarget();
+
 		var renderTarget = this.renderTarget;
 		var generateMipmaps = renderTarget.texture.generateMipmaps;
 
@@ -83,7 +85,7 @@ function CubeCamera( near, far, cubeResolution, options ) {
 		renderTarget.activeCubeFace = 5;
 		renderer.render( scene, cameraNZ, renderTarget );
 
-		renderer.setRenderTarget( null );
+		renderer.setRenderTarget( prevRenderTarget );
 
 	};
 
