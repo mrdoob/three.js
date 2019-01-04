@@ -1,6 +1,3 @@
-import { PropertyBinding } from './PropertyBinding.js';
-import { InterpolateLinear } from '../constants.js';
-
 /**
  * @author tschw
  * @author Ben Houston / http://clara.io/
