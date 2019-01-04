@@ -1192,9 +1192,9 @@ THREE.GLTFExporter.prototype = {
 
 						var baseAttribute = geometry.attributes[ attributeName ];
 
-						if ( cachedData.attributes.has( baseAttribute ) ) {
+						if ( cachedData.attributes.has( attribute ) ) {
 
-							target[ gltfAttributeName ] = cachedData.attributes.get( baseAttribute );
+							target[ gltfAttributeName ] = cachedData.attributes.get( attribute );
 							continue;
 
 						}
@@ -1999,9 +1999,9 @@ THREE.GLTFExporter.Utils = {
 			var sourceTrackBinding = THREE.PropertyBinding.parseTrackName( sourceTrack.name );
 			var sourceTrackNode = THREE.PropertyBinding.findNode( root, sourceTrackBinding.nodeName );
 
-			if ( sourceTrackBinding.propertyName !== 'morphTargetInfluences' ) {
+			if ( sourceTrackBinding.propertyName !== 'morphTargetInfluences' || sourceTrackBinding.propertyIndex === undefined ) {
 
-				// Tracks that don't affect morph targets can be kept as-is.
+				// Tracks that don't affect morph targets, or that affect all morph targets together, can be left as-is.
 				tracks.push( sourceTrack );
 				continue;
 
