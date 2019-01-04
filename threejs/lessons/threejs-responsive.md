@@ -119,7 +119,7 @@ A canvas's internal size, its resolution, is often called its drawingbuffer size
 In three.js we can set the canvas's drawingbuffer size by calling `renderer.setSize`.
 What size should we pick? The most obvious answer is "the same size the canvas is displayed".
 Again, to do that we can look at the canvas's `clientWidth` and `clientHeight`
-attributes.
+properties.
 
 Let's write a function that checks if the renderer's canvas is not
 already the size it is being displayed as and if so set its size.

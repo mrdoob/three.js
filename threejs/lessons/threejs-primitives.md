@@ -34,7 +34,7 @@ for <code>TextBufferGeometry</code> and <code>TextGeometry</code> respectively.<
 <div data-primitive="PlaneBufferGeometry">A 2D plane</div>
 <div data-primitive="PolyhedronBufferGeometry">Takes a set of triangles centered around a point and projects them onto a sphere</div>
 <div data-primitive="RingBufferGeometry">A 2D disc with a hole in the center</div>
-<div data-primitive="ShapeBufferGeometry">A 2d outline that gets trianglulated</div>
+<div data-primitive="ShapeBufferGeometry">A 2d outline that gets triangulated</div>
 <div data-primitive="SphereBufferGeometry">A sphere</div>
 <div data-primitive="TetrahedronBufferGeometry">A terahedron (4 sides)</div>
 <div data-primitive="TextBufferGeometry">3D Text generated from a 3D font and a string</div>
