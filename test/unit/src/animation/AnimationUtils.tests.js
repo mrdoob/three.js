@@ -1,5 +1,5 @@
 /**
- * @author Don McCurdy / https://www.donmccurdy.com
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -10,7 +10,6 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'AnimationUtils', () => {
 
 		// PUBLIC STUFF
-
 		QUnit.todo( "arraySlice", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
