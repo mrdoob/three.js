@@ -91,6 +91,8 @@ function CubeCamera( near, far, cubeResolution, options ) {
 
 	this.clear = function ( renderer, color, depth, stencil ) {
 
+		var currentRenderTarget = renderer.getRenderTarget();
+
 		var renderTarget = this.renderTarget;
 
 		for ( var i = 0; i < 6; i ++ ) {
@@ -102,7 +104,7 @@ function CubeCamera( near, far, cubeResolution, options ) {
 
 		}
 
-		renderer.setRenderTarget( null );
+		renderer.setRenderTarget( currentRenderTarget );
 
 	};
 
