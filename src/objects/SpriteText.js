@@ -20,7 +20,7 @@
 //		A value of (0, 0) corresponds to the left lower corner of the text.
 //		A value of (0, 1) corresponds to the left upper corner of the text.
 //		Default is (0, 1).
-//	rect: text rectangle. 
+//	rect: text rectangle.
 //	{
 //		displayRect: true - the rectangle around the text is visible. Default is false
 //		backgroundColor: RGBA object or RGB object or HEX value. Default is 'rgba(100, 100, 100, 1)' - gray. 
