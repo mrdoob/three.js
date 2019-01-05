@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - effects - stereo</title>
@@ -45,6 +45,10 @@
 
 		<script src="http://threejs.org/examples/js/libs/dat.gui.min.js"></script>
 
+		<script src="js/gui/gui.js"></script>
+
+		<script src="js/gui/StereoEffect.js"></script>
+
 		<script>
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
@@ -53,7 +57,7 @@
 
 			}
 
-			var container, camera, scene, renderer, effect, scale = 1000;
+			var container, camera, scene, renderer, effect, scale = 1;
 
 			var spheres = [];
 
@@ -113,13 +117,16 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.StereoEffect( renderer );
+				//
+
+				var optionsStereoEffect = {};
+				effect = new THREE.StereoEffect(renderer, optionsStereoEffect);
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//dat-gui JavaScript Controller Library
 
 				var gui = new dat.GUI();
-				effect.gui(gui);
+				THREE.gui.stereoEffect(gui, optionsStereoEffect);
 
 				//
 
