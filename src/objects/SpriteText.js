@@ -31,35 +31,39 @@
 //	}
 //}
 //Thanks to / https://github.com/vasturiano/three-spritetext
-function SpriteText (options) {
+function SpriteText( options ) {
 
-	var sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.Texture() }));
+	var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { map: new THREE.Texture() } ) );
 
 	options = options || {};
 	options.text = options.text || 'Sprite Text';
-	options.position = options.position || new THREE.Vector3(0,0,0);
+	options.position = options.position || new THREE.Vector3( 0, 0, 0 );
 	options.textHeight = options.textHeight || 1;
 	options.fontFace = options.fontFace || 'Arial';
 	options.fontColor = options.fontColor || 'rgba(255, 255, 255, 1)';
 	options.bold = options.bold || false;
 	options.italic = options.italic || false;
 	options.fontProperties = options.fontProperties || '';
-	options.center = options.center || new THREE.Vector2(0, 1);
+	options.center = options.center || new THREE.Vector2( 0, 1 );
 
-	var canvas = document.createElement('canvas');
+	var canvas = document.createElement( 'canvas' );
 	sprite.material.map.minFilter = THREE.LinearFilter;
 	var fontSize = 90;
-	const context = canvas.getContext('2d');
+	const context = canvas.getContext( '2d' );
 
-	sprite.update = function(optionsUpdate){
+	sprite.update = function ( optionsUpdate ) {
 
-		if(optionsUpdate != undefined)
-			Object.keys(optionsUpdate).forEach(function (key) { options[key] = optionsUpdate[key]; });
+		if ( optionsUpdate != undefined )
+			Object.keys( optionsUpdate ).forEach( function ( key ) {
+
+				options[ key ] = optionsUpdate[ key ];
+
+			} );
 
 		options.font = `${options.fontProperties ? options.fontProperties + ' ' : ''}${options.bold ? 'bold ' : ''}${options.italic ? 'italic ' : ''}${fontSize}px ${options.fontFace}`;
 
 		context.font = options.font;
-		const textWidth = context.measureText(options.text).width;
+		const textWidth = context.measureText( options.text ).width;
 		canvas.width = textWidth;
 		canvas.height = fontSize;
 
@@ -71,62 +75,68 @@ function SpriteText (options) {
 		var borderThickness = 0;
 		options.rect = options.rect || {};
 		options.rect.displayRect = options.rect.displayRect || false;
-		if (options.rect.displayRect) {
+		if ( options.rect.displayRect ) {
+
 			borderThickness = options.rect.borderThickness || 5;
 
 			// background color
-			context.fillStyle = options.rect.hasOwnProperty("backgroundColor") ?
-				options.rect["backgroundColor"] : 'rgba(100, 100, 100, 1)';
+			context.fillStyle = options.rect.hasOwnProperty( "backgroundColor" ) ?
+				options.rect[ "backgroundColor" ] : 'rgba(100, 100, 100, 1)';
 
 			// border color
-			context.strokeStyle = options.rect.hasOwnProperty("borderColor") ?
-				options.rect["borderColor"] : 'rgba(0, 255, 0, 1)';
+			context.strokeStyle = options.rect.hasOwnProperty( "borderColor" ) ?
+				options.rect[ "borderColor" ] : 'rgba(0, 255, 0, 1)';
 
 			context.lineWidth = borderThickness;
 
 			// function for drawing rounded rectangles
-			function roundRect(ctx, x, y, w, h, r) {
+			function roundRect( ctx, x, y, w, h, r ) {
+
 				ctx.beginPath();
-				ctx.moveTo(x + r, y);
-				ctx.lineTo(x + w - r, y);
-				ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-				ctx.lineTo(x + w, y + h - r);
-				ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-				ctx.lineTo(x + r, y + h);
-				ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-				ctx.lineTo(x, y + r);
-				ctx.quadraticCurveTo(x, y, x + r, y);
+				ctx.moveTo( x + r, y );
+				ctx.lineTo( x + w - r, y );
+				ctx.quadraticCurveTo( x + w, y, x + w, y + r );
+				ctx.lineTo( x + w, y + h - r );
+				ctx.quadraticCurveTo( x + w, y + h, x + w - r, y + h );
+				ctx.lineTo( x + r, y + h );
+				ctx.quadraticCurveTo( x, y + h, x, y + h - r );
+				ctx.lineTo( x, y + r );
+				ctx.quadraticCurveTo( x, y, x + r, y );
 				ctx.closePath();
 				ctx.fill();
 				ctx.stroke();
+
 			}
-			roundRect(context,
+			roundRect( context,
 				borderThickness / 2,
 				borderThickness / 2,
 				textWidth - borderThickness,
 				fontSize - borderThickness,
 				options.rect.borderRadius == undefined ? 6 : options.rect.borderRadius
-				);
+			);
+
 		}
 
 		context.fillStyle = options.fontColor;
 		context.textBaseline = 'bottom';
-		context.fillText(options.text, 0, canvas.height + borderThickness);
+		context.fillText( options.text, 0, canvas.height + borderThickness );
 
 		// Inject canvas into sprite
 		sprite.material.map.image = canvas;
 		sprite.material.map.needsUpdate = true;
 
-		if (options.hasOwnProperty('textHeight'))
-			sprite.scale.set(options.textHeight * canvas.width / canvas.height, options.textHeight);
-		if (options.hasOwnProperty('position'))
-			sprite.position.copy(options.position);
-		if (options.hasOwnProperty('center'))
+		if ( options.hasOwnProperty( 'textHeight' ) )
+			sprite.scale.set( options.textHeight * canvas.width / canvas.height, options.textHeight );
+		if ( options.hasOwnProperty( 'position' ) )
+			sprite.position.copy( options.position );
+		if ( options.hasOwnProperty( 'center' ) )
 			sprite.center = options.center;// == undefined ?  new THREE.Vector2(0, 1) : options.center;
-	}
+
+	};
 	sprite.update();
 
 	return sprite;
+
 }
 
 export { SpriteText };
