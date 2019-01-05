@@ -23,7 +23,7 @@
 //	rect: text rectangle.
 //	{
 //		displayRect: true - the rectangle around the text is visible. Default is false
-//		backgroundColor: RGBA object or RGB object or HEX value. Default is 'rgba(100, 100, 100, 1)' - gray. 
+//		backgroundColor: RGBA object or RGB object or HEX value. Default is 'rgba(100, 100, 100, 1)' - gray.
 //			Examples 'rgba(0, 0, 255, 0.5)', '#00FF00'
 //		borderColor: RGBA object or RGB object or HEX value. Default is 'rgba(0, 255, 0, 1)' - green
 //		borderThickness: Default is 5
@@ -31,7 +31,7 @@
 //	}
 //}
 //Thanks to / https://github.com/vasturiano/three-spritetext
-function SpriteText(options) {
+function SpriteText (options) {
 
 	var sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.Texture() }));
 
