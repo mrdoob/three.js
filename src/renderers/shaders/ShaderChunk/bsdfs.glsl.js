@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 #if defined ( PHYSICALLY_CORRECT_LIGHTS )

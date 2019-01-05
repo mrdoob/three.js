@@ -276,14 +276,14 @@
 				dottedMaterial = createShaderMaterial( "dotted", light, ambientLight ),
 				dottedMaterial2 = createShaderMaterial( "dotted", light, ambientLight );
 
-			hatchingMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
-			hatchingMaterial2.uniforms.uLineColor1.value.setHSL( 0, 0.8, 0.5 );
-			hatchingMaterial2.uniforms.uLineColor2.value.setHSL( 0, 0.8, 0.5 );
-			hatchingMaterial2.uniforms.uLineColor3.value.setHSL( 0, 0.8, 0.5 );
-			hatchingMaterial2.uniforms.uLineColor4.value.setHSL( 0.1, 0.8, 0.5 );
+			hatchingMaterial2.uniforms[ "uBaseColor" ].value.setRGB( 0, 0, 0 );
+			hatchingMaterial2.uniforms[ "uLineColor1" ].value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms[ "uLineColor2" ].value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms[ "uLineColor3" ].value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms[ "uLineColor4" ].value.setHSL( 0.1, 0.8, 0.5 );
 
-			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
-			dottedMaterial2.uniforms.uLineColor1.value.setHSL( 0.05, 1.0, 0.5 );
+			dottedMaterial2.uniforms[ "uBaseColor" ].value.setRGB( 0, 0, 0 );
+			dottedMaterial2.uniforms[ "uLineColor1" ].value.setHSL( 0.05, 1.0, 0.5 );
 
 			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -391,10 +391,10 @@
 
 			var material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
 
-			material.uniforms.uDirLightPos.value = light.position;
-			material.uniforms.uDirLightColor.value = light.color;
+			material.uniforms[ "uDirLightPos" ].value = light.position;
+			material.uniforms[ "uDirLightColor" ].value = light.color;
 
-			material.uniforms.uAmbientLightColor.value = ambientLight.color;
+			material.uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
 
 			return material;
 
@@ -588,7 +588,7 @@
 
 				if ( current_material === "dotted2" ) {
 
-					effect.material.uniforms.uLineColor1.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+					effect.material.uniforms[ "uLineColor1" ].value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 
 				} else if ( current_material === "hatching2" ) {
 
@@ -601,7 +601,7 @@
 
 				} else {
 
-					effect.material.uniforms.uBaseColor.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+					effect.material.uniforms[ "uBaseColor" ].value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 
 				}
 

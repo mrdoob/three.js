@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_SKINNING
 
 	uniform mat4 bindMatrix;

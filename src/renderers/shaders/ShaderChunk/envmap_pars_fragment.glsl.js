@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #if defined( USE_ENVMAP ) || defined( PHYSICAL )
 	uniform float reflectivity;
 	uniform float envMapIntensity;

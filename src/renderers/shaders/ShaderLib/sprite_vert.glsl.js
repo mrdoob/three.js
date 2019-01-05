@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 uniform float rotation;
 uniform vec2 center;
 

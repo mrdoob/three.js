@@ -34,7 +34,7 @@
 
  	var texture = new THREE.HTMLTexture( dom );
 
- 	var geometry = new THREE.PlaneGeometry( texture.image.width * 0.05, texture.image.height * 0.05 );
+ 	var geometry = new THREE.PlaneBufferGeometry( texture.image.width * 0.05, texture.image.height * 0.05 );
  	var material = new THREE.MeshBasicMaterial( { map: texture } );
 
  	THREE.Mesh.call( this, geometry, material );

@@ -2,79 +2,82 @@
  * @author abelnation / http://github.com/abelnation
  * @author Mugen87 / http://github.com/Mugen87
  * @author WestLangley / http://github.com/WestLangley
+ *
+ *  This helper must be added as a child of the light
  */
 
-import { Object3D } from '../core/Object3D.js';
 import { Line } from '../objects/Line.js';
+import { Mesh } from '../objects/Mesh.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { BufferAttribute } from '../core/BufferAttribute.js';
 
 function RectAreaLightHelper( light, color ) {
 
-	Object3D.call( this );
+	this.type = 'RectAreaLightHelper';
 
 	this.light = light;
-	this.light.updateMatrixWorld();
 
-	this.matrix = light.matrixWorld;
-	this.matrixAutoUpdate = false;
+	this.color = color; // optional hardwired color for the helper
 
-	this.color = color;
+	var positions = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0, 1, 1, 0 ];
+
+	var geometry = new BufferGeometry();
+	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+	geometry.computeBoundingSphere();
 
 	var material = new LineBasicMaterial( { fog: false } );
 
-	var geometry = new BufferGeometry();
+	Line.call( this, geometry, material );
 
-	geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 5 * 3 ), 3 ) );
+	//
 
-	this.line = new Line( geometry, material );
-	this.add( this.line );
+	var positions2 = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
 
+	var geometry2 = new BufferGeometry();
+	geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
+	geometry2.computeBoundingSphere();
+
+	this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: THREE.BackSide, fog: false } ) ) );
 
 	this.update();
 
 }
 
-RectAreaLightHelper.prototype = Object.create( Object3D.prototype );
+RectAreaLightHelper.prototype = Object.create( Line.prototype );
 RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
-
-RectAreaLightHelper.prototype.dispose = function () {
-
-	this.children[ 0 ].geometry.dispose();
-	this.children[ 0 ].material.dispose();
-
-};
 
 RectAreaLightHelper.prototype.update = function () {
 
-	// calculate new dimensions of the helper
-
-	var hx = this.light.width * 0.5;
-	var hy = this.light.height * 0.5;
-
-	var position = this.line.geometry.attributes.position;
-	var array = position.array;
-
-	// update vertices
-
-	array[ 0 ] = hx; array[ 1 ] = - hy; array[ 2 ] = 0;
-	array[ 3 ] = hx; array[ 4 ] = hy; array[ 5 ] = 0;
-	array[ 6 ] = - hx; array[ 7 ] = hy; array[ 8 ] = 0;
-	array[ 9 ] = - hx; array[ 10 ] = - hy; array[ 11 ] = 0;
-	array[ 12 ] = hx; array[ 13 ] = - hy; array[ 14 ] = 0;
-
-	position.needsUpdate = true;
+	this.scale.set( 0.5 * this.light.width, 0.5 * this.light.height, 1 );
 
 	if ( this.color !== undefined ) {
 
-		this.line.material.color.set( this.color );
+		this.material.color.set( this.color );
+		this.children[ 0 ].material.color.set( this.color );
 
 	} else {
 
-		this.line.material.color.copy( this.light.color );
+		this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+
+		// prevent hue shift
+		var c = this.material.color;
+		var max = Math.max( c.r, c.g, c.b );
+		if ( max > 1 ) c.multiplyScalar( 1 / max );
+
+		this.children[ 0 ].material.color.copy( this.material.color );
 
 	}
+
+};
+
+RectAreaLightHelper.prototype.dispose = function () {
+
+	this.geometry.dispose();
+	this.material.dispose();
+	this.children[ 0 ].geometry.dispose();
+	this.children[ 0 ].material.dispose();
 
 };
 

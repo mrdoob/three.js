@@ -162,8 +162,8 @@
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
-					map: { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
-					time: { value: 0.0 }
+					"map": { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
+					"time": { value: 0.0 }
 				},
 				vertexShader: document.getElementById( 'vshader' ).textContent,
 				fragmentShader: document.getElementById( 'fshader' ).textContent,
@@ -210,7 +210,7 @@
 
 			var time = performance.now() * 0.0005;
 
-			material.uniforms.time.value = time;
+			material.uniforms[ "time" ].value = time;
 
 			mesh.rotation.x = time * 0.2;
 			mesh.rotation.y = time * 0.4;
