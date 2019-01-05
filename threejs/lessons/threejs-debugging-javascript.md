@@ -40,10 +40,8 @@ Then in the Develop menu you can pick "Show/Connect Web Inspector".
 
 <div class="threejs_center"><img class="border" src="resources/images/devtools-safari.jpg" style="width: 777px;"></div>
 
-With Chrome you can also use Chrome on your computer to debug webpages
-running on Chrome on your Android phone or tablet. Similarly with
-Safari you can use your computer to debug webpages running on Safari
-on iPhones and iPads.
+With Chrome you can also [use Chrome on your computer to debug webpages running on Chrome on your Android phone or tablet](https://developers.google.com/web/tools/chrome-devtools/remote-debugging/). Similarly with Safari you can [use your computer to debug webpages running on Safari
+on iPhones and iPads](https://www.google.com/search?q=safari+remote+debugging+ios).
 
 I'm most familiar with Chrome so this guide will be using Chrome
 as an example when refering to tools but most browsers have similar
@@ -522,6 +520,22 @@ you're required to put the code **in the question itself*.
 Follow these suggestions and your far more likely to get help
 with your issue.
 
+## Use a `MeshBasicMaterial`
+
+Because the `MeshBasicMaterial` uses no lights this is one way to 
+remove reasons something might not be showing up. If your objects
+show up using `MeshBasicMaterial` but not with whatever materials
+you were using then you know the issue is likely with the materials
+and not some other part of the code.
+
+## Check your `near` and `far` settings for your camera
+
+A `PerspectiveCamera` has `near` and `far` settings which are covered in the [article on cameras](threejs-cameras.html). Make sure they are set to fit the space that contains your objects. Maybe even just **temporarily** set them to something large like `near` = 0.001 and `far` = 1000000. You will likely run into depth resolution issues but you'll at least be able to see your objects provided they are in front of the camera.
+
+## Check your scene is in front of the camera
+
+Sometimes things don't appear because they are not in front of the camera. If your camera is not controllable try adding camera control like the `OrbitController` so you can look around and find your scene. Or, try framing the scene using code which is covered in [this article](threejs-load-obj.html). That code finds the size of part of the scene and then moves the camera and adjusts the `near` and `far` settings to make it visible. You can then look in the debugger or add some `console.log` messages to print the size and center of the scene.
+
 ## Put something in front of the camera
 
 This is just another wasy of saying if all else fails start with
@@ -529,7 +543,7 @@ something that works and then slowly add stuff back in. If you get
 a screen with nothing on it then try putting something directly in
 front of the camera. Make a sphere or box, give it a simple material
 like the `MeshBasicMaterial` and make sure you can get that on the screen.
-Then start adding things back a ltitle at time and testing. Eventually
+Then start adding things back a little at time and testing. Eventually
 you'll either reproduce your bug or you'll find it on the way.
 
 ---
