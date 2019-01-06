@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - WebRTC - WebGL canvas recording into video</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #fff;
+				color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #000;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
+			}
+			video{
+				position: fixed;
+				bottom: 0;
+				width: 320px;
+				height: 180px;
+			}
+			.disabled-btn{
+				pointer-events: none;
+			}
+			.disabled-btn .property-name{
+				color: #888;
+				text-decoration: line-through;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebRTC canvas recording into video<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
+		Copyright
+		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
+		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/libs/mmdparser.min.js"></script>
+		<script src="js/libs/ammo.js"></script>
+
+		<script src="js/loaders/TGALoader.js"></script>
+		<script src="js/loaders/MMDLoader.js"></script>
+		<script src="js/animation/CCDIKSolver.js"></script>
+		<script src="js/animation/MMDPhysics.js"></script>
+		<script src="js/animation/MMDAnimationHelper.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/rtc/WebRTCRecorder.js"></script>
+
+		<script>
+
+			var container, stats, recorder;
+
+			var mesh, camera, scene, renderer, effect;
+			var helper, ikHelper, physicsHelper;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 30;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+
+				var gridHelper = new THREE.PolarGridHelper( 30, 10 );
+				gridHelper.position.y = - 10;
+				scene.add( gridHelper );
+
+				var ambient = new THREE.AmbientLight( 0x666666 );
+				scene.add( ambient );
+
+				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
+				scene.add( directionalLight );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				// model
+
+				function onProgress( xhr ) {
+
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
+				}
+
+				var modelFile = 'models/mmd/miku/miku_v2.pmd';
+				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+
+				helper = new THREE.MMDAnimationHelper( {
+					afterglow: 2.0
+				} );
+
+				var loader = new THREE.MMDLoader();
+
+				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
+
+					mesh = mmd.mesh;
+					mesh.position.y = - 10;
+					scene.add( mesh );
+
+					helper.add( mesh, {
+						animation: mmd.animation,
+						physics: true
+					} );
+
+					ikHelper = helper.objects.get( mesh ).ikSolver.createHelper();
+					ikHelper.visible = false;
+					scene.add( ikHelper );
+
+					physicsHelper = helper.objects.get( mesh ).physics.createHelper();
+					physicsHelper.visible = false;
+					scene.add( physicsHelper );
+
+					initRecorder();
+					initGui();
+
+				}, onProgress, null );
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var phongMaterials;
+				var originalMaterials;
+
+				function makePhongMaterials( materials ) {
+
+					var array = [];
+
+					for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+						var m = new THREE.MeshPhongMaterial();
+						m.copy( materials[ i ] );
+						m.needsUpdate = true;
+
+						array.push( m );
+
+					}
+
+					phongMaterials = array;
+
+				}
+
+				// Create WebRTC canvas recorder
+
+				function initRecorder(){
+
+					recorder = new THREE.WebRTCRecorder( renderer.domElement );
+					recorder.video.controls = "controls";
+					document.body.appendChild( recorder.video );
+
+				}
+
+				function initGui() {
+
+					var api = {
+						"fps": recorder.fps,
+						"codecs": "vp9",
+						"show dom": true,
+						"start": recorder.startRecording.bind( recorder ),
+						"stop": recorder.stopRecording.bind( recorder ),
+						"pause": recorder.pauseRecording.bind( recorder ),
+						"resume": recorder.resumeRecording.bind( recorder ),
+						"download": recorder.download.bind( recorder )
+					};
+
+					var gui = new dat.GUI();
+					gui.add( api, "fps", 1, 60 ).step( 1 ).onChange( updateRecorder );
+					gui.add( api, "codecs", ["vp9", "vp8", "h264"] ).onChange( updateRecorder );
+					gui.add( api, "start" ).onChange( function() {
+
+						startBtn.classList.add( "disabled-btn" );
+						stopBtn.classList.remove( "disabled-btn" );
+						pauseBtn.classList.remove( "disabled-btn" );
+						resumeBtn.classList.add( "disabled-btn" );
+
+					});
+					gui.add( api, "resume" ).onChange( function() {
+
+						startBtn.classList.add( "disabled-btn" );
+						stopBtn.classList.remove( "disabled-btn" );
+						pauseBtn.classList.remove( "disabled-btn" );
+						resumeBtn.classList.add( "disabled-btn" );
+
+					});
+					gui.add( api, "pause" ).onChange( function() {
+
+						startBtn.classList.add( "disabled-btn" );
+						stopBtn.classList.remove( "disabled-btn" );
+						pauseBtn.classList.add( "disabled-btn" );
+						resumeBtn.classList.remove( "disabled-btn" );
+
+					});
+					gui.add( api, "stop" ).onChange( function() {
+
+						startBtn.classList.remove( "disabled-btn" );
+						stopBtn.classList.add( "disabled-btn" );
+						pauseBtn.classList.add( "disabled-btn" );
+						resumeBtn.classList.add( "disabled-btn" );
+
+					});
+					gui.add( api, "show dom" ).onChange( function( val ) {
+
+						recorder.video.style.display = val ? "block" : "none";
+
+					} );
+					gui.add( api, "download" );
+
+					var buttons = document.querySelectorAll( ".function" );
+					var startBtn = buttons[ 0 ];
+					var stopBtn = buttons[ 3 ];
+					var pauseBtn = buttons[ 2 ];
+					var resumeBtn = buttons[ 1 ];
+					stopBtn.classList.add( "disabled-btn" );
+					pauseBtn.classList.add( "disabled-btn" );
+					resumeBtn.classList.add( "disabled-btn" );
+
+					function updateRecorder() {
+						recorder.init( {
+							fps: api.fps,
+							codecs: api.codecs
+						} );
+					}
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				helper.update( clock.getDelta() );
+				renderer.render( scene, camera );
+
+			}
+		</script>
+
+	</body>
+</html>

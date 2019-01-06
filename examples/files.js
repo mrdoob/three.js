@@ -324,6 +324,9 @@ var files = {
 		"webaudio_timing",
 		"webaudio_visualizer"
 	],
+	"webrtc": [
+		"webrtc_recorder"
+	],
 	"webvr": [
 		"webvr_ballshooter",
 		"webvr_cubes",
