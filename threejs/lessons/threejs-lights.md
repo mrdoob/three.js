@@ -401,7 +401,7 @@ scene.add(helper);
 
 The spotlight's cone's angle is set with the [`angle`](Spotlight.angle)
 property in radians. We'll use our `DegRadHelper` from the 
-[texture artcle](threejs-textures.html) to present a UI in
+[texture article](threejs-textures.html) to present a UI in
 degrees.
 
 ```js
