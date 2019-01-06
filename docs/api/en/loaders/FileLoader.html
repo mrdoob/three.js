@@ -76,7 +76,7 @@
 		<h3>[property:String path]</h3>
 		<p>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</p>
 
-		<h3>[property:object requestHeader]</h3>
+		<h3>[property:Object requestHeader]</h3>
 		<p>The [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request. See [page:.setRequestHeader]. Default is *undefined*.</p>
 
 		<h3>[property:String responseType]</h3>
@@ -115,7 +115,7 @@
 			you are loading many models from the same directory.
 		</p>
 
-		<h3>[method:FileLoader setRequestHeader]( [param:object requestHeader] )</h3>
+		<h3>[method:FileLoader setRequestHeader]( [param:Object requestHeader] )</h3>
 		<p>
 			[page:object requestHeader] - key: The name of the header whose value is to be set. value: The value to set as the body of the header.<br /><br />
 
@@ -125,7 +125,7 @@
 		<h3>[method:FileLoader setResponseType]( [param:String responseType] )</h3>
 		<p>
 			Change the response type. Valid values are:<br />
-			[page:String text] or empty string (default) - returns the data as [page:String string].<br />
+			[page:String text] or empty string (default) - returns the data as [page:String String].<br />
 			[page:String arraybuffer] - loads the data into a [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer ArrayBuffer] and returns that.<br />
 			[page:String blob] - returns the data as a [link:https://developer.mozilla.org/en/docs/Web/API/Blob Blob].<br />
 			[page:String document] - parses the file using the [link:https://developer.mozilla.org/en-US/docs/Web/API/DOMParser DOMParser].<br />
