@@ -178,6 +178,24 @@
 
 				}
 
+				// CUSTOM FROM FILE
+
+				fetch( 'models/svg/hexagon.svg' )
+					.then( response => response.text() )
+					.then( svg => {
+
+						var node = document.createElementNS( 'http://www.w3.org/2000/svg', 'g' );
+						var parser = new DOMParser();
+						var doc = parser.parseFromString( svg, 'image/svg+xml' );
+
+						node.appendChild( doc.documentElement );
+
+						var object = new THREE.SVGObject( node );
+						object.position.x = 500;
+						scene.add( object );
+
+					} );
+
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x80ffff );
