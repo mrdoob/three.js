@@ -70,7 +70,7 @@ scene.background = new THREE.CubeTextureLoader()
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String urls] — array of 6 urls to images, one for each side of the CubeTexture.
 		The urls should be specified in the following order: pos-x, neg-x, pos-y, neg-y, pos-z, neg-z.
@@ -83,7 +83,7 @@ scene.background = new THREE.CubeTextureLoader()
 		[page:Function onError] — Will be called when load errors.<br />
 		</p>
 		<p>
-		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+		Begin loading from url and pass the loaded [page:CubeTexture texture] to onLoad.
 		</p>
 
 		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
