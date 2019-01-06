@@ -30,7 +30,7 @@ them all at once. Here's quick table of contents for this article.
 ## <a name="hello"></a> Hello Texture
 
 Textures are *generally* images that are most often created
-in some 3rd party program like Photoshop or gIMP. For example let's
+in some 3rd party program like Photoshop or GIMP. For example let's
 put this image on cube.
 
 <div class="threejs_center">
