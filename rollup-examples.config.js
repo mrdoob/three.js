@@ -23,8 +23,8 @@ function createOutput( file ) {
 			name: 'THREE',
 			file: outputPath,
 
-            globals: () => 'THREE',
-            paths: p => /three\.module\.js$/.test( p ) ? 'three' : p,
+			globals: () => 'THREE',
+			paths: p => /three\.module\.js$/.test( p ) ? 'three' : p,
 			extend: true,
 
 			banner:
@@ -39,7 +39,7 @@ function createOutput( file ) {
 }
 
 // Walk the file structure starting at the given directory and fire
-// the callback for every file.
+// the callback for every js file.
 function walk( dir, cb ) {
 
 	var files = fs.readdirSync( dir );
@@ -51,7 +51,7 @@ function walk( dir, cb ) {
 
 			walk( p, cb );
 
-		} else {
+		} else if ( f.endsWith( '.js' ) ) {
 
 			cb( p );
 
