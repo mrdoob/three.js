@@ -233,7 +233,7 @@ const scene = new THREE.Scene();
 И если мы <a href="../threejs-multiple-scenes-v2.html" target="_blank">быстро прокрутим вверх и вниз</a> 
 мы увидим проблему. Вот анимация прокрутки, замедленная в 10 раз.
 
-<div class="threejs_center"><img class="border" src="../resources/images/multi-view-skew.gif"></div>
+<div class="threejs_center"><img class="border" src="resources/images/multi-view-skew.gif"></div>
 
 Мы можем использовать другой метод, который имеет другой компромисс. 
 Мы переключим CSS холста с `position: fixed` на `position: absolute`. 

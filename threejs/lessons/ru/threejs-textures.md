@@ -33,7 +33,7 @@ Description: Использование текстур в three.js
 давайте поместим это изображение на куб.
 
 <div class="threejs_center">
-  <img src="../../resources/images/wall.jpg" style="width: 600px;" class="border" >
+  <img src="../resources/images/wall.jpg" style="width: 600px;" class="border" >
 </div>
 
 Мы изменим один из наших первых примеров. Все, что нам нужно сделать, это создать `TextureLoader`. Вызовите 
@@ -59,14 +59,14 @@ const material = new THREE.MeshBasicMaterial({
 
 <div class="threejs_center">
   <div>
-    <img src="../../resources/images/flower-1.jpg" style="width: 100px;" class="border" >
-    <img src="../../resources/images/flower-2.jpg" style="width: 100px;" class="border" >
-    <img src="../../resources/images/flower-3.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-1.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-2.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-3.jpg" style="width: 100px;" class="border" >
   </div>
   <div>
-    <img src="../../resources/images/flower-4.jpg" style="width: 100px;" class="border" >
-    <img src="../../resources/images/flower-5.jpg" style="width: 100px;" class="border" >
-    <img src="../../resources/images/flower-6.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-4.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-5.jpg" style="width: 100px;" class="border" >
+    <img src="../resources/images/flower-6.jpg" style="width: 100px;" class="border" >
   </div>
 </div>
 
@@ -265,10 +265,10 @@ loadManager.onLoad = () => {
 .jpg и установить его компрессию очень высокой. Например, допустим, я делал сцену из дома. 
 Внутри дома есть стол, и я решил положить эту текстуру дерева на верхнюю поверхность стола.
 
-<div class="threejs_center"><img class="border" src="../resources/images/compressed-but-large-wood-texture.jpg" align="center" style="width: 300px"></div>
+<div class="threejs_center"><img class="border" src="resources/images/compressed-but-large-wood-texture.jpg" align="center" style="width: 300px"></div>
 
 Это изображение всего 157 Кб, поэтому оно будет загружаться относительно быстро, но на 
-[самом деле оно имеет размер 3024 x 3761 пикселей](../resources/images/compressed-but-large-wood-texture.jpg). 
+[самом деле оно имеет размер 3024 x 3761 пикселей](resources/images/compressed-but-large-wood-texture.jpg). 
 Следуя приведенному выше уравнению, это
 
     3024 * 3761 * 4 * 1.33 = 60505764.5
@@ -300,7 +300,7 @@ PNG-файлы имеют сжатие без потерь, поэтому PNG-�
 
 Давайте применим эту текстуру 16x16
 
-<div class="threejs_center"><img src="../resources/images/mip-low-res-enlarged.png" class="border" align="center"></div>
+<div class="threejs_center"><img src="resources/images/mip-low-res-enlarged.png" class="border" align="center"></div>
 
 Это куб
 
@@ -329,7 +329,7 @@ Mips - это копии текстуры, каждая из которых в �
 Мипы создаются до тех пор, пока мы не доберемся до 1 х 1 пикселя. 
 Поскольку изображение выше всех мипов в конечном итоге будет что-то вроде этого
 
-<div class="threejs_center"><img src="../resources/images/mipmap-low-res-enlarged.png" align="center"></div>
+<div class="threejs_center"><img src="resources/images/mipmap-low-res-enlarged.png" align="center"></div>
 
 Теперь, когда куб нарисован настолько маленьким, что его размер составляет всего 1 или 2 пикселя, 
 графический процессор может использовать только наименьший или почти минимальный уровень мипа, 

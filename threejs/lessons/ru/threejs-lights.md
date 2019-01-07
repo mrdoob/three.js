@@ -49,7 +49,7 @@ controls.update();
 шахматной доски размером 2x2, которая выглядит следующим образом
 
 <div class="threejs_center">
-  <img src="../../resources/images/checker.png" class="border" style="
+  <img src="../resources/images/checker.png" class="border" style="
     image-rendering: pixelated;
     width: 128px;
   ">
