@@ -12,7 +12,7 @@ A few optimizations would include first checking if the ray intersects with an o
 THREE.js provides a `RayCaster` class that does exactly this.
 
 Let's make a scene with a 100 objects and try picking them. We'll
-start with an example from [the article on responsive pages](three.js)
+start with an example from [the article on responsive pages](threejs-responsive.html)
 
 A few changes
 

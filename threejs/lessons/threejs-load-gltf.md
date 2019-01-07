@@ -145,7 +145,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
   console.log(dumpObject(root).join('\n'));
 ```
 
-[Running that](.../threejs-load-gltf-dump-scenegraph.html) I got this listing
+[Running that](../threejs-load-gltf-dump-scenegraph.html) I got this listing
 
 ```text
 OSG_Scene [Scene]
@@ -485,7 +485,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 }
 ```
 
-And the result from [running it](.../threejs-load-gltf-dump-scenegraph-extra.html)
+And the result from [running it](../threejs-load-gltf-dump-scenegraph-extra.html)
 
 ```text
 OSG_Scene [Scene]

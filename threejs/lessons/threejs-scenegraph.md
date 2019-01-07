@@ -2,7 +2,7 @@ Title: Three.js Scenegraph
 Description: What's a scene graph?
 
 This article is part of a series of articles about three.js. The
-first article is [three.js fundamentals](three-fundamentals.html). If
+first article is [three.js fundamentals](threejs-fundamentals.html). If
 you haven't read yet you might want to consider starting there.
 
 Three.js's core is arguably its scene graph. A scene graph in a 3D

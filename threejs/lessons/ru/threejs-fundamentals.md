@@ -95,7 +95,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 думайте о слове "frustum" как о трехмерной фигуре,
 такой как сфера, куб и призма.
 
-<img src="../resources/frustum-3d.svg" width="500" class="threejs_center"/>
+<img src="resources/frustum-3d.svg" width="500" class="threejs_center"/>
 
 Высота ближней и дальней плоскостей определяется полем зрения (field of view). 
 Ширина обеих плоскостей определяется полем зрения и соотношением сторон (aspect).
@@ -113,7 +113,7 @@ camera.position.z = 2;
 
 Вот как мы её направили.
 
-<img src="../resources/scene-down.svg" width="500" class="threejs_center"/>
+<img src="resources/scene-down.svg" width="500" class="threejs_center"/>
 
 На диаграмме выше мы видим, что наша камера находится в `z = 2`. И смотрит вниз по оси -Z. 
 Усеченная пирамида начинается с 0.1 единицы спереди камеры и до 5 единиц перед камерой.

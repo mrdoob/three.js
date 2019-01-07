@@ -306,7 +306,7 @@ objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
 +  console.log(boxCenter);
 ```
 
-Looking in [the JavaScript console](threejs-debugging.html) I see
+Looking in [the JavaScript console](threejs-debugging-javascript.html) I see
 
 ```js
 size 2123.6499788469982

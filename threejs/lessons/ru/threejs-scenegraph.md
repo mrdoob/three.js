@@ -9,13 +9,13 @@ Description: Что такое граф сцены?
 движке - это иерархия узлов в графе, где каждый узел представляет 
 локальное пространство.
 
-<img src="../resources/images/scenegraph-generic.svg" align="center">
+<img src="resources/images/scenegraph-generic.svg" align="center">
 
 Это своего рода абстракция, поэтому давайте попробуем привести несколько примеров.
 
 Одним из примеров может быть солнечная система, солнце, земля, луна.
 
-<img src="../resources/images/scenegraph-solarsystem.svg" align="center">
+<img src="resources/images/scenegraph-solarsystem.svg" align="center">
 
 Земля вращается вокруг Солнца. Луна вращается вокруг Земли. Луна движется по 
 кругу вокруг Земли. С точки зрения Луны она вращается в «локальном пространстве» 
@@ -155,7 +155,7 @@ objects.push(earthMesh);
 
 Наш граф сцены в настоящее время выглядит следующим образом
 
-<img src="../resources/images/scenegraph-sun-earth.svg" align="center">
+<img src="resources/images/scenegraph-sun-earth.svg" align="center">
 
 Чтобы это исправить, давайте добавим пустой узел графа сцены. 
 Мы будем связывать солнце и землю с этим узлом.
@@ -186,7 +186,7 @@ objects.push(earthMesh);
 
 Наш новый граф сцены выглядит следующим образом
 
-<img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center">
+<img src="resources/images/scenegraph-sun-earth-fixed.svg" align="center">
 
 И `sunMesh` и `earthMesh` дети `solarSystem`. Все 3 вращаются, и теперь, 
 поскольку они не являются потомками `earthMesh`, `sunMesh` больше не 
@@ -224,7 +224,7 @@ objects.push(earthMesh);
 Снова мы добавили еще один невидимый узел графа сцены `Object3D` под названием `earthOrbit`
 и добавили `earthMesh` и `moonMesh` к нему. Новый граф сцены выглядит следующим образом.
 
-<img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center">
+<img src="resources/images/scenegraph-sun-earth-moon.svg" align="center">
 
 и вот что
 
@@ -362,7 +362,7 @@ class AxisGridHelper {
 Еще несколько примеров графов сцены. Автомобиль в простом игровом мире 
 может иметь такой граф сцены
 
-<img src="../resources/images/scenegraph-car.svg" align="center">
+<img src="resources/images/scenegraph-car.svg" align="center">
 
 Если вы двигаете кузов автомобиля, все колеса будут двигаться вместе с ним. 
 Если вы хотите, чтобы кузов отскакивал отдельно от колес, вы можете привязать 
@@ -370,7 +370,7 @@ class AxisGridHelper {
 
 Другой пример - человек в игровом мире.
 
-<img src="../resources/images/scenegraph-human.svg" align="center">
+<img src="resources/images/scenegraph-human.svg" align="center">
 
 Вы можете видеть, что график сцены становится довольно сложным для человека. 
 На самом деле этот граф сцены упрощен. Например, вы можете расширить его, 

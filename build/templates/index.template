@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </div>
   </div>
 </div>
-<iframe class="background" src="threejs/background.html"></iframe>
+<iframe class="background" src="/threejs/background.html"></iframe>
 <style>
 #forkongithub a {
     background: #000;

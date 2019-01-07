@@ -175,7 +175,7 @@ It should now render with a resolution that matches the display
 size of the canvas.
 
 To make the point about letting CSS handle the resizing let's take
-our code and put it in a [separate `.js` file](../resources/threejs-responsive.js).
+our code and put it in a [separate `.js` file](../threejs-responsive.js).
 Here then are a few more examples where we let CSS choose the size and notice we had
 to change zero code for them to work.
 
