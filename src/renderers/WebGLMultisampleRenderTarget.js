@@ -9,9 +9,7 @@ function WebGLMultisampleRenderTarget( width, height, options ) {
 
 	WebGLRenderTarget.call( this, width, height, options );
 
-	options = options || {};
-
-	this.samples = options.samples !== undefined ? options.samples : 4;
+	this.samples = 4;
 
 }
 
