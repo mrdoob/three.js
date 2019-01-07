@@ -107,14 +107,14 @@
 		On the other hand the translation part of the modelViewMatrix is not relevant for the calculation of normals. Thus a Matrix3 is sufficient.
 		</p>
 
-		<h3>[property:function onAfterRender]</h3>
+		<h3>[property:Function onAfterRender]</h3>
 		<p>
 		An optional callback that is executed immediately after the Object3D is rendered.
 		This function is called with the following parameters: renderer, scene, camera, geometry,
 		material, group.
 		</p>
 
-		<h3>[property:function onBeforeRender]</h3>
+		<h3>[property:Function onBeforeRender]</h3>
 		<p>
 		An optional callback that is executed immediately before the Object3D is rendered.
 		This function is called with the following parameters: renderer, scene, camera, geometry,
@@ -158,7 +158,7 @@
 		Default is [page:Object3D.DefaultUp] - that is, ( 0, 1, 0 ).
 		</p>
 
-		<h3>[property:object userData]</h3>
+		<h3>[property:Object userData]</h3>
 		<p>
 		An object that can be used to store custom data about the Object3D. It should not hold
 		references to functions as these will not be cloned.
@@ -203,7 +203,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:null add]( [param:Object3D object], ... )</h3>
+		<h3>[method:this add]( [param:Object3D object], ... )</h3>
 		<p>
 		Adds *object* as child of this object. An arbitrary number of objects may be added. Any current parent on an
 		object passed in here will be removed, since an object can have at most one parent.<br /><br />
@@ -214,7 +214,7 @@
 		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
 		<p>Applies the matrix transform to the object and updates the object's position, rotation and scale.</p>
 
-		<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
+		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>Applies the rotation represented by the quaternion to the object.</p>
 
 		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
@@ -310,7 +310,7 @@
 		to use raycasting.
 		</p>
 
-		<h3>[method:null remove]( [param:Object3D object], ... )</h3>
+		<h3>[method:this remove]( [param:Object3D object], ... )</h3>
 		<p>
 		Removes *object* as child of this object. An arbitrary number of objects may be removed.
 		</p>
