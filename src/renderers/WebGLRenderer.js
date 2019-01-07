@@ -1141,7 +1141,7 @@ function WebGLRenderer( parameters ) {
 
 			textures.updateRenderTargetMipmap( renderTarget );
 
-			// resolve multisample renderbuffers to to single-sample texture if necessary
+			// resolve multisample renderbuffers to a single-sample texture if necessary
 
 			textures.updateMultisampleRenderTarget( renderTarget );
 
