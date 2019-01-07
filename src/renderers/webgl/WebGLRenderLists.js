@@ -152,6 +152,16 @@ function WebGLRenderLists() {
 
 	var lists = {};
 
+	function onSceneDispose( event ) {
+
+		var scene = event.target;
+
+		scene.removeEventListener( 'dispose', onSceneDispose );
+
+		delete lists[ scene.id ];
+
+	}
+
 	function get( scene, camera ) {
 
 		var cameras = lists[ scene.id ];
@@ -161,6 +171,8 @@ function WebGLRenderLists() {
 			list = new WebGLRenderList();
 			lists[ scene.id ] = {};
 			lists[ scene.id ][ camera.id ] = list;
+
+			scene.addEventListener( 'dispose', onSceneDispose );
 
 		} else {
 
