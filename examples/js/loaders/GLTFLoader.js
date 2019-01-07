@@ -1541,7 +1541,7 @@ THREE.GLTFLoader = ( function () {
 
 		} else {
 
-			geometryKey = primitiveDef.indices + ':' + createAttributesKey( primitiveDef.attributes ) + primitiveDef.mode;
+			geometryKey = primitiveDef.indices + ':' + createAttributesKey( primitiveDef.attributes ) + ':' + primitiveDef.mode;
 
 		}
 
@@ -1557,7 +1557,7 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0, il = keys.length; i < il; i ++ ) {
 
-			attributesKey += keys[ i ] + attributes[ keys[ i ] ];
+			attributesKey += keys[ i ] + ':' + attributes[ keys[ i ] ] + ';';
 
 		}
 
@@ -1565,13 +1565,27 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	function createArrayKey( a ) {
+	function createArrayKeyBufferGeometry( a ) {
 
 		var arrayKey = '';
 
 		for ( var i = 0, il = a.length; i < il; i ++ ) {
 
-			arrayKey += i + createAttributesKey( a[ i ] );
+			arrayKey += i + a[ i ].uuid;
+
+		}
+
+		return arrayKey;
+
+	}
+
+	function createArrayKeyGLTFPrimitive( a ) {
+
+		var arrayKey = '';
+
+		for ( var i = 0, il = a.length; i < il; i ++ ) {
+
+			arrayKey += i + createGeometryKey( a[ i ] );
 
 		}
 
@@ -1581,7 +1595,7 @@ THREE.GLTFLoader = ( function () {
 
 	function createMultiPassGeometryKey( geometry, primitives ) {
 
-		return createGeometryKey( geometry ) + createArrayKey( primitives );
+		return createGeometryKey( geometry ) + createArrayKeyGLTFPrimitive( primitives );
 
 	}
 
@@ -2610,7 +2624,7 @@ THREE.GLTFLoader = ( function () {
 
 				// See if we've already created this combined geometry
 				var cache = parser.multiplePrimitivesCache;
-				var cacheKey = createArrayKey( geometries );
+				var cacheKey = createArrayKeyBufferGeometry( geometries );
 				var cached = cache[ cacheKey ];
 
 				if ( cached ) {
