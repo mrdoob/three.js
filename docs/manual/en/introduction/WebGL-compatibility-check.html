@@ -20,12 +20,16 @@
 		</p>
 
 		<code>
-		if (WEBGL.isWebGLAvailable()) {
+		if ( WEBGL.isWebGLAvailable() ) {
+
 			// Initiate function or other initializations here
 			animate();
+
 		} else {
+
 			var warning = WEBGL.getWebGLErrorMessage();
-			document.getElementById('container').appendChild(warning);
+			document.getElementById( 'container' ).appendChild( warning );
+
 		}
 		</code>
 	</body>
