@@ -1,4 +1,7 @@
-/* global module require */
+/* global module require process */
+/* eslint no-undef: "error" */
+/* eslint no-console: "off" */
+
 'use strict';
 
 module.exports = function(settings) { // wrapper in case we're in module_context mode
@@ -18,6 +21,12 @@ const moment     = require('moment');
 const url        = require('url');
 
 //process.title = 'build';
+
+let numErrors = 0;
+function error(...args) {
+  ++numErrors;
+  console.error(...args);
+}
 
 const executeP = Promise.denodeify(utils.execute);
 
@@ -186,6 +195,10 @@ function slashify(s) {
   return s.replace(/\\/g, '/');
 }
 
+function articleFilter(f) {
+  return !process.env['ARTICLE_FILTER'] || f.indexOf(process.env['ARTICLE_FILTER']) >= 0;
+}
+
 const Builder = function(outBaseDir, options) {
 
   const g_articlesByLang = {};
@@ -196,7 +209,11 @@ const Builder = function(outBaseDir, options) {
   const g_origPath = options.origPath;
 
   // This are the english articles.
-  const g_origArticles = glob.sync(path.join(g_origPath, '*.md')).map(a => path.basename(a)).filter(a => a !== 'index.md');
+  const g_origArticles = glob.
+      sync(path.join(g_origPath, '*.md'))
+      .map(a => path.basename(a))
+      .filter(a => a !== 'index.md')
+      .filter(articleFilter);
 
   const extractHeader = (function() {
     const headerRE = /([A-Z0-9_-]+): (.*?)$/i;
@@ -268,18 +285,114 @@ const Builder = function(outBaseDir, options) {
     return content;
   }
 
+  function isSameDomain(url, pageUrl) {
+    const fdq1 = new URL(pageUrl);
+    const fdq2 = new URL(url, pageUrl);
+    return fdq1.origin === fdq2.origin;
+  }
+
+  function getUrlPath(url) {
+    // yes, this is a hack
+    const q = url.indexOf('?');
+    return q >= 0 ? url.substring(0, q) : url;
+  }
+
+  // Try top fix relative links. This *should* only
+  // happen in translations
+  const iframeLinkRE = /(<iframe[\s\S]*?\s+src=")(.*?)(")/g;
+  const imgLinkRE = /(<img[\s\S]*?\s+src=")(.*?)(")/g;
+  const aLinkRE = /(<a[\s\S]*?\s+href=")(.*?)(")/g;
+  const mdLinkRE = /(\[[\s\S]*?\]\()(.*?)(\))/g;
+  const handlebarLinkRE = /({{{.*?\s+url=")(.*?)(")/g;
+  const linkREs = [
+    iframeLinkRE,
+    imgLinkRE,
+    aLinkRE,
+    mdLinkRE,
+    handlebarLinkRE,
+  ];
+  function hackRelLinks(content, pageUrl) {
+    // console.log('---> pageUrl:', pageUrl);
+    function fixRelLink(m, prefix, url, suffix) {
+      if (isSameDomain(url, pageUrl)) {
+        // a link that starts with "../" should be "../../" if it's in a translation
+        // a link that starts with "resources" should be "../resources" if it's in a translation
+        if (url.startsWith('../') ||
+            url.startsWith('resources')) {
+          // console.log('  url:', url);
+          return `${prefix}../${url}${suffix}`;
+        }
+      }
+      return m;
+    }
+
+    return content
+        .replace(imgLinkRE, fixRelLink)
+        .replace(aLinkRE, fixRelLink)
+        .replace(iframeLinkRE, fixRelLink);
+  }
+
+  /**
+   * Get all the local urls based on a regex that has <prefix><url><suffix>
+   */
+  function getUrls(regex, str) {
+    const links = new Set();
+    let m;
+    do {
+      m = regex.exec(str);
+      if (m  && m[2][0] !== '#' && isSameDomain(m[2], 'http://example.com/a/b/c/d')) {
+        links.add(getUrlPath(m[2]));
+      }
+    } while (m);
+    return links;
+  }
+
+  /**
+   * Get all the local links in content
+   */
+  function getLinks(content) {
+    return new Set(linkREs.map(re => [...getUrls(re, content)]).flat());
+  }
+
+  function fixUrls(regex, content, origLinks) {
+    return content.replace(regex, (m, prefix, url, suffix) => {
+      const q = url.indexOf('?');
+      const urlPath = q >= 0 ? url.substring(0, q) : url;
+      const urlQuery = q >= 0 ? url.substring(q) : '';
+      if (!origLinks.has(urlPath) &&
+          isSameDomain(urlPath, 'https://foo.com/a/b/c/d.html') &&
+          !(/\/..\/^/.test(urlPath)) &&   // hacky test for link to main page. Example /webgl/lessons/ja/
+          urlPath[0] !== '#') {  // test for same page anchor -- bad test :(
+        for (const origLink of origLinks) {
+          if (urlPath.endsWith(origLink)) {
+            const newUrl = `${origLink}${urlQuery}`;
+            console.log('  fixing:', url, 'to', newUrl);
+            return `${prefix}${newUrl}${suffix}`;
+          }
+        }
+        error('could not fix:', url);
+      }
+      return m;
+    });
+  }
+
   const applyTemplateToContent = function(templatePath, contentFileName, outFileName, opt_extra, data) {
     // Call prep's Content which parses the HTML. This helps us find missing tags
     // should probably call something else.
     //Convert(md_content)
+    const relativeOutName = slashify(outFileName).substring(g_outBaseDir.length);
+    const pageUrl = `${settings.baseUrl}${relativeOutName}`;
     const metaData = data.headers;
     const content = data.content;
     //console.log(JSON.stringify(metaData, undefined, '  '));
     const info = extractHandlebars(content);
     let html = marked(info.content);
+    // HACK! :-(
+    if (opt_extra && opt_extra.home && opt_extra.home.length > 1) {
+      html = hackRelLinks(html, pageUrl);
+    }
     html = insertHandlebars(info, html);
     html = replaceParams(html, [opt_extra, g_langInfo]);
-    const relativeOutName = slashify(outFileName).substring(g_outBaseDir.length);
     const pathRE = new RegExp(`^\\/${settings.rootFolder}\\/lessons\\/$`);
     const langs = Object.keys(g_langDB).map((name) => {
       const lang = g_langDB[name];
@@ -300,7 +413,7 @@ const Builder = function(outBaseDir, options) {
     metaData['toc'] = opt_extra.toc;
     metaData['templateOptions'] = opt_extra.templateOptions;
     metaData['langInfo'] = g_langInfo;
-    metaData['url'] = `${settings.baseUrl}${relativeOutName}`;
+    metaData['url'] = pageUrl;
     metaData['relUrl'] = relativeOutName;
     metaData['screenshot'] = `${settings.baseUrl}/${settings.rootFolder}/lessons/resources/${settings.siteThumbnail}`;
     const basename = path.basename(contentFileName, '.md');
@@ -325,7 +438,10 @@ const Builder = function(outBaseDir, options) {
   };
 
   const applyTemplateToFiles = function(templatePath, filesSpec, extra) {
-    const files = glob.sync(filesSpec).sort();
+    const files = glob
+        .sync(filesSpec)
+        .sort()
+        .filter(articleFilter);
     files.forEach(function(fileName) {
       const ext = path.extname(fileName);
       const baseName = fileName.substr(0, fileName.length - ext.length);
@@ -354,10 +470,10 @@ const Builder = function(outBaseDir, options) {
   };
 
   const getLanguageSelection = function(lang) {
-    const lessons = lang.lessons || (`${settings.rootFolder}/lessons/${lang.lang}`);
+    const lessons = lang.lessons;
     const langInfo = hanson.parse(fs.readFileSync(path.join(lessons, 'langinfo.hanson'), {encoding: 'utf8'}));
     langInfo.langCode = langInfo.langCode || lang.lang;
-    langInfo.home = lang.home || ('/' + lessons + '/');
+    langInfo.home = lang.home;
     g_langDB[lang.lang] = {
       lang: lang.lang,
       language: langInfo.language,
@@ -372,18 +488,51 @@ const Builder = function(outBaseDir, options) {
 
   this.process = function(options) {
     console.log('Processing Lang: ' + options.lang);  // eslint-disable-line
-    options.lessons     = options.lessons     || (`${settings.rootFolder}/lessons/${options.lang}`);
-    options.toc         = options.toc         || (`${settings.rootFolder}/lessons/${options.lang}/toc.html`);
-    options.template    = options.template    || 'build/templates/lesson.template';
-    options.examplePath = options.examplePath === undefined ? `/${settings.rootFolder}/lessons/` : options.examplePath;
-
     g_articles = [];
     g_langInfo = g_langDB[options.lang].langInfo;
 
     applyTemplateToFiles(options.template, path.join(options.lessons, settings.lessonGrep), options);
 
-    // generate place holders for non-translated files
     const articlesFilenames = g_articles.map(a => path.basename(a.src_file_name));
+
+    // should do this first was easier to add here
+    if (options.lang !== 'en') {
+      const existing = g_origArticles.filter(name => articlesFilenames.indexOf(name) >= 0);
+      existing.forEach((name) => {
+        const origMdFilename = path.join(g_origPath, name);
+        const transMdFilename = path.join(g_origPath, options.lang, name);
+        const origLinks = getLinks(loadMD(origMdFilename).content);
+        const transLinks = getLinks(loadMD(transMdFilename).content);
+
+        if (process.env['ARTICLE_VERBOSE']) {
+          console.log('---[', transMdFilename, ']---');
+          console.log('origLinks: ---\n   ', [...origLinks].join('\n    '));
+          console.log('transLinks: ---\n   ', [...transLinks].join('\n    '));
+        }
+
+        let show = true;
+        transLinks.forEach((link) => {
+          if (!origLinks.has(link)) {
+            if (show) {
+              show = false;
+              error('---[', transMdFilename, ']---');
+            }
+            error('   link:[', link, '] not found in English file');
+          }
+        });
+
+        if (!show && process.env['ARTICLE_FIX']) {
+          // there was an error, try to auto-fix
+          let fixedMd = fs.readFileSync(transMdFilename, {encoding: 'utf8'});
+          linkREs.forEach((re) => {
+            fixedMd = fixUrls(re, fixedMd, origLinks);
+          });
+          fs.writeFileSync(transMdFilename, fixedMd);
+        }
+      });
+    }
+
+    // generate place holders for non-translated files
     const missing = g_origArticles.filter(name => articlesFilenames.indexOf(name) < 0);
     missing.forEach(name => {
       const ext = path.extname(name);
@@ -512,10 +661,10 @@ const Builder = function(outBaseDir, options) {
       });
       return Promise.resolve();
     }, function(err) {
-      console.error('ERROR!:');  // eslint-disable-line
-      console.error(err);  // eslint-disable-line
+      error('ERROR!:');
+      error(err);
       if (err.stack) {
-        console.error(err.stack);  // eslint-disable-line
+        error(err.stack);  // eslint-disable-line
       }
       throw new Error(err.toString());
     });
@@ -555,7 +704,7 @@ const Builder = function(outBaseDir, options) {
 
 };
 
-const b = new Builder('out', {
+const b = new Builder(settings.outDir, {
   origPath: `${settings.rootFolder}/lessons`,  // english articles
 });
 
@@ -581,8 +730,16 @@ const isLangFolder = function(dirname) {
 
 
 const pathToLang = function(filename) {
+  const lang = path.basename(filename);
+  const lessonBase = `${settings.rootFolder}/lessons`;
+  const lessons = `${lessonBase}/${lang}`;
   return {
-    lang: path.basename(filename),
+    lang,
+    toc: `${settings.rootFolder}/lessons/${lang}/toc.html`,
+    lessons: `${lessonBase}/${lang}`,
+    template: 'build/templates/lesson.template',
+    examplePath: `/${lessonBase}/`,
+    home: `/${lessons}/`,
   };
 };
 
@@ -604,6 +761,18 @@ langs = langs.concat(readdirs(`${settings.rootFolder}/lessons`)
 
 b.preProcess(langs);
 
+{
+  const filename = path.join(settings.outDir, 'link-check.html');
+  const html = `
+  <html>
+  <body>
+  ${langs.map(lang => `<a href="${lang.home}">${lang.lang}</a>`).join('\n')}
+  </body>
+  </html>
+  `;
+  writeFileIfChanged(filename, html);
+}
+
 const tasks = langs.map(function(lang) {
   return function() {
     return b.process(lang);
@@ -615,7 +784,7 @@ return tasks.reduce(function(cur, next) {
 }, Promise.resolve()).then(function() {
   b.writeGlobalFiles();
   cache.clear();
-  return Promise.resolve();
+  return numErrors ? Promise.reject(new Error(`${numErrors} errors`)) : Promise.resolve();
 });
 
 };

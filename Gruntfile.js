@@ -64,6 +64,7 @@ module.exports = function(grunt) {
     const buildStuff = require('./build/js/build');
     const finish = this.async();
     buildStuff({
+      outDir: 'out',
       baseUrl: 'http://threejsfundamentals.org',
       rootFolder: 'threejs',
       lessonGrep: 'threejs*.md',
