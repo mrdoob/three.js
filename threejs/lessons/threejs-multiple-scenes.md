@@ -247,7 +247,7 @@ function render(time) {
   const transform = `translateY(${window.scrollY}px)`;
   renderer.domElement.style.transform = transform;
 
-```js
+```
 
 `position: fixed` kept the canvas from scrolling at all
 while the rest of the page scrolled over it. `position: absolute` will let the canvas scroll with the rest of the page which means whatever we draw will stick with the page as it scrolls even if we're too slow to render. When we finally get a chance to render then we move the canvas so it matches where the page has been scrolled and then we re-render. This means only the edges of the window will show some un-rendered bits for a moment but <a href="../threejs-multiple-scenes-v2.html" target="_blank">the stuff in the middle of the page should match up</a> and not slide. Here's a view of the results of the new method slowed down 10x.
@@ -529,6 +529,6 @@ const sceneInitFunctionsByName = {
 
 And now if you drag the objects they'll rotate.
 
-{{{examples url="../threejs-multiple-scenes-controls.html" }}}
+{{{example url="../threejs-multiple-scenes-controls.html" }}}
 
 These techniques are used on this site itself. In particular [the article about primitives](threejs-primitives.html) and [the article about materials](threejs-materials.html) use this technique to add the various examples throughout the article.
