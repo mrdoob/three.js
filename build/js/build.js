@@ -4,6 +4,11 @@
 
 'use strict';
 
+const requiredNodeVersion = 11;
+if (parseInt((/^v(\d+)\./).exec(process.version)[1]) < requiredNodeVersion) {
+  throw Error(`requires at least node: ${requiredNodeVersion}`);
+}
+
 module.exports = function(settings) { // wrapper in case we're in module_context mode
 
 const cache      = new (require('inmemfilecache'))();
