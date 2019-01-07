@@ -116,7 +116,7 @@
 				//
 
 				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( 'webgl2' );
+				var context = canvas.getContext( 'webgl2', { antialias: false } );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.autoClear = false;
