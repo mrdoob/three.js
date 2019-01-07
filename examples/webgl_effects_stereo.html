@@ -74,18 +74,18 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01 * scale, 10 * scale);
-				camera.position.set(1 * scale, 1 * scale, 5 * scale);
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01 * scale, 10 * scale );
+				camera.position.set( 1 * scale, 1 * scale, 5 * scale );
 
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog(0x000000, 250 * scale, 1400 * scale);
+				scene.fog = new THREE.Fog( 0x000000, 250 * scale, 1400 * scale );
 				scene.background = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/Park3Med/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				var geometry = new THREE.SphereBufferGeometry(0.1 * scale, 32, 16);
+				var geometry = new THREE.SphereBufferGeometry( 0.1 * scale, 32, 16 );
 
 				var textureCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/Park3Med/' )
@@ -115,14 +115,23 @@
 
 				//
 
-				var optionsStereoEffect = {};
-				effect = new THREE.StereoEffect(renderer, optionsStereoEffect);
+				var optionsStereoEffect = {
+
+					getCookie: THREE.gui.getCookie,
+
+				};
+				effect = new THREE.StereoEffect( renderer, optionsStereoEffect );
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//dat-gui JavaScript Controller Library
 
 				var gui = new dat.GUI();
-				THREE.gui.stereoEffect(gui, optionsStereoEffect);
+				THREE.gui.stereoEffect( gui, optionsStereoEffect, {
+
+					getLanguageCode: THREE.gui.getLanguageCode,
+					setCookie: THREE.gui.setCookie,
+
+				} );
 
 				//
 
@@ -144,8 +153,8 @@
 
 			function onDocumentMouseMove( event ) {
 
-				mouseX = (event.clientX - windowHalfX) * 0.01 * scale;
-				mouseY = (event.clientY - windowHalfY) * 0.01 * scale;
+				mouseX = ( event.clientX - windowHalfX ) * 0.01 * scale;
+				mouseY = ( event.clientY - windowHalfY ) * 0.01 * scale;
 
 			}
 
