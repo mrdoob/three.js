@@ -17,6 +17,20 @@ function createOutput( file ) {
 		treeshake: false,
 		external: p => p !== inputPath,
 
+		plugins: [{
+
+			generateBundle: function(options, bundle) {
+
+				for ( var key in bundle ) {
+
+					bundle[ key ].code = bundle[ key ].code.replace( /three_module_js/g, 'THREE' );
+
+				}
+
+			}
+
+		}],
+
 		output: {
 
 			format: 'umd',
@@ -30,7 +44,8 @@ function createOutput( file ) {
 			banner:
 				'/**\n' +
 				` * Generated from '${ path.relative( '.', inputPath.replace( /\\/, '/' ) ) }'\n` +
-				' */\n'
+				' */\n',
+			esModule: false
 
 		}
 
