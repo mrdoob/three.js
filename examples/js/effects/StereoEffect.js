@@ -46,32 +46,34 @@ THREE.StereoEffectParameters = {
 //	zeroParallax: Distance to objects with zero parallax.
 //		See http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf for details.
 //		Default is THREE.StereoEffectParameters.zeroParallaxDefault
-//	getCookie: Your custom getCookie(name, defaultValue) function for loading of the StereoEffects settings
-//			name: name of current setting
-//			defaultValue: default setting
-//		returns a StereoEffects setting, saved before or defaultValue
-//		Default returns defaultValue
+//	cookie: Your custom cookie function for loading of the StereoEffects settings
 //}
 THREE.StereoEffect = function ( renderer, options ) {
 
 	options.stereo = new THREE.StereoCamera();
 	options.stereo.aspect = 0.5;
 
-	function getCookie( cookieName, defaultValue ) {
+	// Default cookie is not saving settings
+	// name: name of current setting
+	function cookie( name ) {
 
-		return defaultValue;
+		this.get = function ( defaultValue ) {
+
+			return defaultValue;
+
+		};
 
 	}
 
 	options = options || {};
-	if ( options.getCookie !== undefined )
-		getCookie = options.getCookie;
+	if ( options.cookie !== undefined )
+		cookie = options.cookie;
 	if ( options.spatialMultiplex === undefined )
-		options.spatialMultiplex = getCookie( 'spatialMultiplex', THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS );//Use 'Side by side' for compability with previous version of THREE.StereoEffect
+		options.spatialMultiplex = new cookie( 'spatialMultiplex' ).get( THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS );//Use 'Side by side' for compability with previous version of THREE.StereoEffect
 	if ( options.zeroParallax === undefined )
-		options.zeroParallax = parseInt( getCookie( 'zeroParallax', THREE.StereoEffectParameters.zeroParallaxDefault ) );
+		options.zeroParallax = parseInt( new cookie( 'zeroParallax' ).get( THREE.StereoEffectParameters.zeroParallaxDefault ) );
 
-	options.stereo.eyeSep = ( getCookie( 'eyeSeparation', new THREE.StereoCamera().eyeSep ) * 10000 ) / 10000;
+	options.stereo.eyeSep = ( new cookie( 'eyeSeparation' ).get( new THREE.StereoCamera().eyeSep ) * 10000 ) / 10000;
 
 	this.setEyeSeparation = function ( eyeSep ) {
 
@@ -146,117 +148,9 @@ THREE.StereoEffect = function ( renderer, options ) {
 
 };
 
-//Some functions, you can use for localization of dat.GUI and saving user settings.
-//See https://github.com/dataarts/dat.gui/blob/master/API.md about dat.GUI API.
-THREE.gui = {
-	controllerNameAndTitle: function ( controller, name, title ) {
-
-		var _elPropertyName = controller.__li.querySelector( ".property-name" );
-		_elPropertyName.innerHTML = name;
-		if ( title !== undefined )
-			_elPropertyName.title = title;
-
-	},
-
-	//returns the "primary language" subtag of the version of the browser.
-	//See the "Syntax" paragraph of RFC 4646 https://tools.ietf.org/html/rfc4646#section-2.1 for details.
-	getLanguageCode: function () {
-
-		//returns the language version of the browser.
-		function getLocale() {
-
-			if ( ! navigator ) {
-
-				console.error( "getLocale() failed! !navigator" );
-				return "";
-
-			}
-
-			if (
-				( navigator.languages !== undefined )
-				&& ( typeof navigator.languages !== 'unknown' )//for IE6
-				&& ( navigator.languages.length > 0 )
-			)
-				return navigator.languages[ 0 ];//Chrome
-
-			//IE
-			if ( navigator.language ) {
-
-				return navigator.language;
-
-			} else if ( navigator.browserLanguage ) {
-
-				return navigator.browserLanguage;
-
-			} else if ( navigator.systemLanguage ) {
-
-				return navigator.systemLanguage;
-
-			} else if ( navigator.userLanguage ) {
-
-				return navigator.userLanguage;
-
-			}
-
-			console.error( "getLocale() failed!" );
-			return "";
-
-		}
-
-		var parts = getLocale().toLowerCase().match( /([a-z]+)(?:-([a-z]+))?/ ),
-			_lang = parts[ 1 ],
-			locale = parts[ 2 ];
-		return _lang;
-
-	},
-
-	// Loading settings saved by THREE.gui.setCookie.
-	// cookieName: name of current setting
-	// defaultValue: default setting
-	getCookie: function ( cookieName, defaultValue ) {
-
-		if ( ! navigator.cookieEnabled ) {
-
-			console.error( 'navigator.cookieEnabled = ' + navigator.cookieEnabled );
-			//Enable cookie
-			//Chrome: Settings/Show advanced settings.../Privacy/Content settings.../Cookies/Allow local data to be set
-			return;
-
-		}
-		var _results = document.cookie.match( '(^|;) ?' + cookieName + '=([^;]*)(;|$)' );
-
-		if ( _results )
-			return ( unescape( _results[ 2 ] ) );
-		if ( defaultValue === undefined )
-			return '';
-		return defaultValue;
-
-	},
-
-	// Saving settings.
-	// name: name of current setting
-	// value: current setting
-	// settings: additional settings
-	setCookie: function ( name, value, settings ) {
-
-		if ( ! navigator.cookieEnabled ) {
-
-			console.error( 'navigator.cookieEnabled = ' + navigator.cookieEnabled );
-			//Enable cookie
-			//Chrome: Settings/Show advanced settings.../Privacy/Content settings.../Cookies/Allow local data to be set
-			return;
-
-		}
-
-		value = value.toString();
-		var _cookieDate = new Date();
-		_cookieDate.setTime( _cookieDate.getTime() + 1000 * 60 * 60 * 24 * 365 );
-		document.cookie = name + "=" + value + ( ( settings === undefined ) ? '' : settings ) + "; expires=" + _cookieDate.toGMTString();
-		return 0;
-
-	}
-
-};
+if ( THREE.gui === undefined )
+	THREE.gui = {};
+else console.error( 'Duplicate THREE.gui object' );
 
 //Adds StereoEffects folder into dat.GUI.
 //See https://github.com/dataarts/dat.gui/blob/master/API.md about dat.GUI API.
@@ -269,10 +163,7 @@ THREE.gui = {
 //		Examples: "en" - English language, "ru" Russian.
 //		See the "Syntax" paragraph of RFC 4646 https://tools.ietf.org/html/rfc4646#section-2.1 for details.
 //		Default returns the 'en' is English language.
-//	setCookie: Your custom setCookie(name, value) function for saving of the StereoEffects settings
-//			name: name of current setting
-//			value: current setting
-//			Default function is nothing saving.
+//	cookie: Your custom cookie function for saving of the StereoEffects settings
 //	lang: Object with localized language values
 //	scale: scale of allowed values. Default is 1.
 //}
@@ -288,8 +179,14 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	}
 	if ( guiParams.getLanguageCode !== undefined ) getLanguageCode = guiParams.getLanguageCode;
 
-	function setCookie( name, value, settings ) { }
-	if ( guiParams.setCookie !== undefined ) setCookie = guiParams.setCookie;
+	// Default cookie is not saving settings
+	// name: name of current setting
+	function cookie( name ) {
+
+		this.set = function ( value ) {};
+
+	}
+	if ( guiParams.cookie !== undefined ) cookie = guiParams.cookie;
 
 	//Localization
 
@@ -370,14 +267,14 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	var _fStereoEffects = gui.addFolder( _lang.stereoEffects );//Stero effects folder
 
 	//Spatial multiplex
-	THREE.gui.controllerNameAndTitle( _fStereoEffects.add( options, 'spatialMultiplex',
+	dat.controllerNameAndTitle( _fStereoEffects.add( options, 'spatialMultiplex',
 		_lang.spatialMultiplexs ).onChange( function ( value ) {
 
 		value = parseInt( value );
 
 		displayControllers( value );
 
-		setCookie( 'spatialMultiplex', value );
+		new cookie( 'spatialMultiplex' ).set( value );
 
 	} ), _lang.spatialMultiplexName, _lang.spatialMultiplexTitle );
 
@@ -386,10 +283,10 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	var _controllerEyeSep = _fStereoEffects.add( options.stereo, 'eyeSep', 0, 1 * guiParams.scale, 0.001 * guiParams.scale )
 		.onChange( function ( value ) {
 
-			setCookie( 'eyeSeparation', value );
+			new cookie( 'eyeSeparation' ).set( value );
 
 		} );
-	THREE.gui.controllerNameAndTitle( _controllerEyeSep, _lang.eyeSeparationName, _lang.eyeSeparationTitle );
+	dat.controllerNameAndTitle( _controllerEyeSep, _lang.eyeSeparationName, _lang.eyeSeparationTitle );
 
 	//Zero parallax
 	//http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
@@ -397,10 +294,10 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	var _controllerZeroParallax = _fStereoEffects.add( options, 'zeroParallax', - _minMax, _minMax )
 		.onChange( function ( value ) {
 
-			setCookie( 'zeroParallax', value );
+			new cookie( 'zeroParallax' ).set( value );
 
 		} );
-	THREE.gui.controllerNameAndTitle( _controllerZeroParallax, _lang.zeroParallaxName, _lang.zeroParallaxTitle );
+	dat.controllerNameAndTitle( _controllerZeroParallax, _lang.zeroParallaxName, _lang.zeroParallaxTitle );
 
 	//default button
 	var controllerDefaultF = _fStereoEffects.add( {
@@ -415,8 +312,136 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 		},
 
 	}, 'defaultF' );
-	THREE.gui.controllerNameAndTitle( controllerDefaultF, _lang.defaultButton, _lang.defaultTitle );
+	dat.controllerNameAndTitle( controllerDefaultF, _lang.defaultButton, _lang.defaultTitle );
 
 	displayControllers( options.spatialMultiplex );
 
 };
+
+
+if ( THREE.getLanguageCode === undefined ) {
+
+	//returns the "primary language" subtag of the version of the browser.
+	//See the "Syntax" paragraph of RFC 4646 https://tools.ietf.org/html/rfc4646#section-2.1 for details.
+	THREE.getLanguageCode = function () {
+
+		//returns the language version of the browser.
+		function _getLocale() {
+
+			if ( ! navigator ) {
+
+				console.error( "getLocale() failed! !navigator" );
+				return "";
+
+			}
+
+			if (
+				( navigator.languages !== undefined )
+				&& ( typeof navigator.languages !== 'unknown' )//for IE6
+				&& ( navigator.languages.length > 0 )
+			)
+				return navigator.languages[ 0 ];//Chrome
+
+			//IE
+			if ( navigator.language ) {
+
+				return navigator.language;
+
+			} else if ( navigator.browserLanguage ) {
+
+				return navigator.browserLanguage;
+
+			} else if ( navigator.systemLanguage ) {
+
+				return navigator.systemLanguage;
+
+			} else if ( navigator.userLanguage ) {
+
+				return navigator.userLanguage;
+
+			}
+
+			console.error( "getLocale() failed!" );
+			return "";
+
+		}
+
+		return _getLocale().toLowerCase().match( /([a-z]+)(?:-([a-z]+))?/ )[ 1 ];
+
+	};
+
+} else console.error( 'Duplicate THREE.getLanguageCode method' );
+
+//Saving user settings.
+if ( THREE.cookie === undefined ) {
+
+	// name: name of current setting
+	THREE.cookie = function ( name ) {
+
+		this.isCookieEnabled = function () {
+
+			if ( ! navigator.cookieEnabled ) {
+
+				console.error( 'navigator.cookieEnabled = ' + navigator.cookieEnabled );
+				//Enable cookie
+				//Chrome: Settings/Show advanced settings.../Privacy/Content settings.../Cookies/Allow local data to be set
+				return false;
+
+			}
+			return true;
+
+		};
+
+		// Loading settings, saved by THREE.cookie.set
+		// defaultValue: default setting
+		this.get = function ( defaultValue ) {
+
+			if ( ! this.isCookieEnabled() )
+				return;
+			var _results = document.cookie.match( '(^|;) ?' + name + '=([^;]*)(;|$)' );
+
+			if ( _results )
+				return ( unescape( _results[ 2 ] ) );
+			if ( defaultValue === undefined )
+				return '';
+			return defaultValue;
+
+		};
+
+		// Saving settings.
+		// value: current setting
+		this.set = function ( value ) {
+
+			if ( ! this.isCookieEnabled() )
+				return;
+
+			var _cookieDate = new Date();
+			_cookieDate.setTime( _cookieDate.getTime() + 1000 * 60 * 60 * 24 * 365 );//One year of expiry period
+			document.cookie = name + "=" + value.toString() + "; expires=" + _cookieDate.toGMTString();
+			return;
+
+		};
+
+	};
+
+} else console.error( 'Duplicate THREE.cookie object' );
+
+if ( typeof dat !== 'undefined' ) {
+
+	//dat.GUI is included into current project
+	//See https://github.com/dataarts/dat.gui/blob/master/API.md about dat.GUI API.
+
+	if ( dat.controllerNameAndTitle === undefined ) {
+
+		dat.controllerNameAndTitle = function ( controller, name, title ) {
+
+			var _elPropertyName = controller.__li.querySelector( ".property-name" );
+			_elPropertyName.innerHTML = name;
+			if ( title !== undefined )
+				_elPropertyName.title = title;
+
+		};
+
+	} else console.error( 'Duplicate dat.controllerNameAndTitle method' );
+
+}

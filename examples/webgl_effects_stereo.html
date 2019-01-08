@@ -39,11 +39,11 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/effects/StereoEffect.js"></script>
-
 		<script src="js/WebGL.js"></script>
 
 		<script src="http://threejs.org/examples/js/libs/dat.gui.min.js"></script>
+
+		<script src="js/effects/StereoEffect.js"></script>
 
 		<script>
 
@@ -117,7 +117,7 @@
 
 				var optionsStereoEffect = {
 
-					getCookie: THREE.gui.getCookie,
+					cookie: THREE.cookie,
 
 				};
 				effect = new THREE.StereoEffect( renderer, optionsStereoEffect );
@@ -128,8 +128,8 @@
 				var gui = new dat.GUI();
 				THREE.gui.stereoEffect( gui, optionsStereoEffect, {
 
-					getLanguageCode: THREE.gui.getLanguageCode,
-					setCookie: THREE.gui.setCookie,
+					getLanguageCode: THREE.getLanguageCode,
+					cookie: THREE.cookie,
 
 				} );
 
