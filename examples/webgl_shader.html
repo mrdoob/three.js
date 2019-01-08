@@ -116,7 +116,7 @@
 				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
 				uniforms = {
-					time: { value: 1.0 }
+					"time": { value: 1.0 }
 				};
 
 				var material = new THREE.ShaderMaterial( {
@@ -152,7 +152,7 @@
 
 				requestAnimationFrame( animate );
 
-				uniforms.time.value = timestamp / 1000;
+				uniforms[ "time" ].value = timestamp / 1000;
 
 				renderer.render( scene, camera );
 

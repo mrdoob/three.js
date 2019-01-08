@@ -61,9 +61,9 @@
 					texture.magFilter = THREE.LinearFilter;
 
 					var fxaaMaterial = new THREE.ShaderMaterial( THREE.FXAAShader );
-					fxaaMaterial.uniforms.tDiffuse.value = texture;
-					fxaaMaterial.uniforms.resolution.value.x = 1 / image.naturalWidth;
-					fxaaMaterial.uniforms.resolution.value.y = 1 / image.naturalHeight;
+					fxaaMaterial.uniforms[ "tDiffuse" ].value = texture;
+					fxaaMaterial.uniforms[ "resolution" ].value.x = 1 / image.naturalWidth;
+					fxaaMaterial.uniforms[ "resolution" ].value.y = 1 / image.naturalHeight;
 
 					var basicMaterial = new THREE.MeshBasicMaterial( { map: texture } );
 

@@ -55,8 +55,8 @@
 
 			var threshold = 0.1;
 			var pointSize = 0.05;
-			var width = 150;
-			var length = 150;
+			var width = 80;
+			var length = 160;
 			var rotateY = new THREE.Matrix4().makeRotationY( 0.005 );
 
 			init();
@@ -79,7 +79,7 @@
 						var u = i / width;
 						var v = j / length;
 						var x = u - 0.5;
-						var y = ( Math.cos( u * Math.PI * 8 ) + Math.sin( v * Math.PI * 8 ) ) / 20;
+						var y = ( Math.cos( u * Math.PI * 4 ) + Math.sin( v * Math.PI * 8 ) ) / 20;
 						var z = v - 0.5;
 
 						positions[ 3 * k ] = x;
@@ -108,11 +108,9 @@
 			function generatePointcloud( color, width, length ) {
 
 				var geometry = generatePointCloudGeometry( color, width, length );
-
 				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.Points( geometry, material );
 
-				return pointcloud;
+				return  new THREE.Points( geometry, material );
 
 			}
 
@@ -138,9 +136,8 @@
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.Points( geometry, material );
 
-				return pointcloud;
+				return new THREE.Points( geometry, material );
 
 			}
 
@@ -167,48 +164,8 @@
 				geometry.addGroup( 0, indices.length );
 
 				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.Points( geometry, material );
 
-				return pointcloud;
-
-			}
-
-			function generateRegularPointcloud( color, width, length ) {
-
-				var geometry = new THREE.Geometry();
-
-				var colors = [];
-
-				var k = 0;
-
-				for ( var i = 0; i < width; i ++ ) {
-
-					for ( var j = 0; j < length; j ++ ) {
-
-						var u = i / width;
-						var v = j / length;
-						var x = u - 0.5;
-						var y = ( Math.cos( u * Math.PI * 8 ) + Math.sin( v * Math.PI * 8 ) ) / 20;
-						var z = v - 0.5;
-						var v = new THREE.Vector3( x, y, z );
-						geometry.vertices.push( v );
-
-						var intensity = ( y + 0.1 ) * 7;
-						colors[ k ] = ( color.clone().multiplyScalar( intensity ) );
-
-						k ++;
-
-					}
-
-				}
-
-				geometry.colors = colors;
-				geometry.computeBoundingBox();
-
-				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
-				var pointcloud = new THREE.Points( geometry, material );
-
-				return pointcloud;
+				return new THREE.Points( geometry, material );
 
 			}
 
@@ -228,26 +185,21 @@
 				//
 
 				var pcBuffer = generatePointcloud( new THREE.Color( 1, 0, 0 ), width, length );
-				pcBuffer.scale.set( 10, 10, 10 );
-				pcBuffer.position.set( - 5, 0, 5 );
+				pcBuffer.scale.set( 5, 10, 10 );
+				pcBuffer.position.set( - 5, 0, 0 );
 				scene.add( pcBuffer );
 
 				var pcIndexed = generateIndexedPointcloud( new THREE.Color( 0, 1, 0 ), width, length );
-				pcIndexed.scale.set( 10, 10, 10 );
-				pcIndexed.position.set( 5, 0, 5 );
+				pcIndexed.scale.set( 5, 10, 10 );
+				pcIndexed.position.set( 0, 0, 0 );
 				scene.add( pcIndexed );
 
 				var pcIndexedOffset = generateIndexedWithOffsetPointcloud( new THREE.Color( 0, 1, 1 ), width, length );
-				pcIndexedOffset.scale.set( 10, 10, 10 );
-				pcIndexedOffset.position.set( 5, 0, - 5 );
+				pcIndexedOffset.scale.set( 5, 10, 10 );
+				pcIndexedOffset.position.set( 5, 0, 0 );
 				scene.add( pcIndexedOffset );
 
-				var pcRegular = generateRegularPointcloud( new THREE.Color( 1, 0, 1 ), width, length );
-				pcRegular.scale.set( 10, 10, 10 );
-				pcRegular.position.set( - 5, 0, - 5 );
-				scene.add( pcRegular );
-
-				pointclouds = [ pcBuffer, pcIndexed, pcIndexedOffset, pcRegular ];
+				pointclouds = [ pcBuffer, pcIndexed, pcIndexedOffset ];
 
 				//
 

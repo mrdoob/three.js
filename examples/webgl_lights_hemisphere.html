@@ -167,14 +167,14 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor: { value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { value: new THREE.Color( 0xffffff ) },
-					offset: { value: 33 },
-					exponent: { value: 0.6 }
+					"topColor": { value: new THREE.Color( 0x0077ff ) },
+					"bottomColor": { value: new THREE.Color( 0xffffff ) },
+					"offset": { value: 33 },
+					"exponent": { value: 0.6 }
 				};
-				uniforms.topColor.value.copy( hemiLight.color );
+				uniforms[ "topColor" ].value.copy( hemiLight.color );
 
-				scene.fog.color.copy( uniforms.bottomColor.value );
+				scene.fog.color.copy( uniforms[ "bottomColor" ].value );
 
 				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
 				var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );

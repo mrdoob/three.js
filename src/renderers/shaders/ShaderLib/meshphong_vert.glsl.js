@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #define PHONG
 
 varying vec3 vViewPosition;

@@ -96,11 +96,11 @@
 				function guiChanged() {
 
 					var uniforms = sky.material.uniforms;
-					uniforms.turbidity.value = effectController.turbidity;
-					uniforms.rayleigh.value = effectController.rayleigh;
-					uniforms.luminance.value = effectController.luminance;
-					uniforms.mieCoefficient.value = effectController.mieCoefficient;
-					uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+					uniforms[ "turbidity" ].value = effectController.turbidity;
+					uniforms[ "rayleigh" ].value = effectController.rayleigh;
+					uniforms[ "luminance" ].value = effectController.luminance;
+					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
+					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
 
 					var theta = Math.PI * ( effectController.inclination - 0.5 );
 					var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
@@ -111,7 +111,7 @@
 
 					sunSphere.visible = effectController.sun;
 
-					uniforms.sunPosition.value.copy( sunSphere.position );
+					uniforms[ "sunPosition" ].value.copy( sunSphere.position );
 
 					renderer.render( scene, camera );
 

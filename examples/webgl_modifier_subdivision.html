@@ -31,7 +31,7 @@
 
 			var container, stats;
 
-			var camera, controls, scene, renderer;
+			var camera, scene, renderer;
 
 			var cube, mesh, material, geometry, smooth, group;
 
@@ -109,7 +109,7 @@
 
 					return geometry.clone();
 
-	};
+				};
 
 				updateInfo();
 
@@ -126,7 +126,7 @@
 
 					return geometry.clone();
 
-	};
+				};
 
 				updateInfo();
 
@@ -252,11 +252,13 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( new THREE.BufferGeometry().fromGeometry( geometry ), material );
 				group.add( mesh );
 
-				cube = new THREE.Mesh( smooth, smoothMaterial );
-				var wireframe = new THREE.Mesh( smooth, wireframeMaterial );
+				var smoothBufferGeometry = new THREE.BufferGeometry().fromGeometry( smooth );
+
+				cube = new THREE.Mesh( smoothBufferGeometry, smoothMaterial );
+				var wireframe = new THREE.Mesh( smoothBufferGeometry, wireframeMaterial );
 				cube.add( wireframe );
 
 				cube.scale.setScalar( params.meshScale ? params.meshScale : 1 );
@@ -301,7 +303,7 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

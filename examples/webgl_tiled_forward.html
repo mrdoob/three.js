@@ -230,10 +230,10 @@
 		var materials = [];
 
 		var Heads = [
-			{ type: 'physical', uniforms: { diffuse: 0x888888, metalness: 1.0, roughness: 0.66 }, defines: {} },
-			{ type: 'standard', uniforms: { diffuse: 0x666666, metalness: 0.1, roughness: 0.33 }, defines: {} },
-			{ type: 'phong', uniforms: { diffuse: 0x777777, shininess: 20 }, defines: {} },
-			{ type: 'phong', uniforms: { diffuse: 0x555555, shininess: 10 }, defines: { TOON: 1 } }
+			{ type: 'physical', uniforms: { "diffuse": 0x888888, "metalness": 1.0, "roughness": 0.66 }, defines: {} },
+			{ type: 'standard', uniforms: { "diffuse": 0x666666, "metalness": 0.1, "roughness": 0.33 }, defines: {} },
+			{ type: 'phong', uniforms: { "diffuse": 0x777777, "shininess": 20 }, defines: {} },
+			{ type: 'phong', uniforms: { "diffuse": 0x555555, "shininess": 10 }, defines: { TOON: 1 } }
 		];
 
 		function init( geom ) {
@@ -255,10 +255,10 @@
 					transparent: tIndex === index ? true : false,
 				} );
 
-				mtl.uniforms.opacity.value = tIndex === index ? 0.9 : 1;
-				mtl.uniforms.tileData = State.tileData;
-				mtl.uniforms.tileTexture = State.tileTexture;
-				mtl.uniforms.lightTexture = State.lightTexture;
+				mtl.uniforms[ "opacity" ].value = tIndex === index ? 0.9 : 1;
+				mtl.uniforms[ "tileData" ] = State.tileData;
+				mtl.uniforms[ "tileTexture" ] = State.tileTexture;
+				mtl.uniforms[ "lightTexture" ] = State.lightTexture;
 
 				for ( var u in conf.uniforms ) {
 

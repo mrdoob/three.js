@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED

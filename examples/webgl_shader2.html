@@ -191,15 +191,15 @@
 				var geometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
-					time: { value: 1.0 }
+					"time": { value: 1.0 }
 				};
 
 				uniforms2 = {
-					time: { value: 1.0 },
-					texture: { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
+					"time": { value: 1.0 },
+					"texture": { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
 				};
 
-				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
+				uniforms2[ "texture" ].value.wrapS = uniforms2[ "texture" ].value.wrapT = THREE.RepeatWrapping;
 
 				var params = [
 					[ 'fragment_shader1', uniforms1 ],
@@ -262,8 +262,8 @@
 
 				var delta = clock.getDelta();
 
-				uniforms1.time.value += delta * 5;
-				uniforms2.time.value = clock.elapsedTime;
+				uniforms1[ "time" ].value += delta * 5;
+				uniforms2[ "time" ].value = clock.elapsedTime;
 
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 

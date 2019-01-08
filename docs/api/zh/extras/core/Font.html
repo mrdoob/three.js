@@ -8,53 +8,55 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>字体（[name]）</h1>
 
 		<p class="desc">
-		Create a set of [page:Shape Shapes] representing a font loaded in JSON format.<br /><br />
+		以JSON格式，创建一系列的[page:Shape Shape]（形状）来表示一个字体。
+		<br /><br />
 
-		This is used internally by the [page:FontLoader].
+		该类在内部由[page:FontLoader]所使用。
 		</p>
 
-		<h2>Examples</h2>
+		<h2>示例</h2>
 
 		<p>
 		[example:webgl_geometry_text_shapes geometry / text / shapes ]<br/>
 		[example:webgl_shaders_vector vector / text ]<br/>
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( data )</h3>
 		<p>
-		data -- JSON data representing the font.<br /><br />
+		data -- 表示字体的JSON数据。<br /><br />
 
-		This constructor creates a new [name], which is an array of [page:Shape Shapes].
+		这一构造函数创建一个新的[name]，它是一个[page:Shape Shapes]数组。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:array data]</h3>
-		<p>The JSON data passed in the constructor.</p>
+		<p>传入到构造函数的JSON数据。</p>
 
 		<h3>[property:Boolean isFont]</h3>
 		<p>
-			Used to check whether this or derived classes are fonts. Default is *true*.<br /><br />
+			用于检查该类或者其派生类是否为字体。默认值为*true*。
+			<br /><br />
 
-			You should not change this, as it used internally by the renderer for optimisation.
+			你不应当对这一属性进行改变，它在内部由渲染器所使用，以用于优化。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null generateShapes]( [param:String text], [param:Float size] )</h3>
 		<p>
-			[page:String text] -- string of text.<br />
-			[page:Float size] -- (optional) scale for the [page:Shape Shapes]. Default is *100*.<br />
+			[page:String text] -- 文本字符串。<br />
+			[page:Float size] -- （可选）[page:Shape Shapes]的缩放，默认值为*100*。<br />
 
-			Creates an array of [page:Shape Shapes] representing the text in the font.
+			创建一个[page:Shape Shapes]数组，表示使用字体的文本。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

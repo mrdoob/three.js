@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_AOMAP
 
 	uniform sampler2D aoMap;

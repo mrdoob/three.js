@@ -121,17 +121,15 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 			shapeVertices = shapeVertices.reverse();
 
-			// also check if holes are in the opposite direction
+		}
 
-			for ( i = 0, l = shapeHoles.length; i < l; i ++ ) {
+		for ( i = 0, l = shapeHoles.length; i < l; i ++ ) {
 
-				shapeHole = shapeHoles[ i ];
+			shapeHole = shapeHoles[ i ];
 
-				if ( ShapeUtils.isClockWise( shapeHole ) === true ) {
+			if ( ShapeUtils.isClockWise( shapeHole ) === true ) {
 
-					shapeHoles[ i ] = shapeHole.reverse();
-
-				}
+				shapeHoles[ i ] = shapeHole.reverse();
 
 			}
 

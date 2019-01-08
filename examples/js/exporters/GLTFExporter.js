@@ -111,7 +111,9 @@ THREE.GLTFExporter.prototype = {
 		var extensionsUsed = {};
 		var cachedData = {
 
+			meshes: new Map(),
 			attributes: new Map(),
+			attributesNormalized: new Map(),
 			materials: new Map(),
 			textures: new Map(),
 			images: new Map()
@@ -221,7 +223,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function isNormalizedNormalAttribute( normal ) {
 
-			if ( cachedData.attributes.has( normal ) ) {
+			if ( cachedData.attributesNormalized.has( normal ) ) {
 
 				return false;
 
@@ -249,9 +251,9 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function createNormalizedNormalAttribute( normal ) {
 
-			if ( cachedData.attributes.has( normal ) ) {
+			if ( cachedData.attributesNormalized.has( normal ) ) {
 
-				return cachedData.attributes.get( normal );
+				return cachedData.attributesNormalized.get( normal );
 
 			}
 
@@ -278,7 +280,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			cachedData.attributes.set( normal, attribute );
+			cachedData.attributesNormalized.set( normal, attribute );
 
 			return attribute;
 
@@ -352,6 +354,46 @@ THREE.GLTFExporter.prototype = {
 					'won\'t be serialized because of JSON.stringify error - ' + error.message );
 
 				return {};
+
+			}
+
+		}
+
+		/**
+		 * Applies a texture transform, if present, to the map definition. Requires
+		 * the KHR_texture_transform extension.
+		 */
+		function applyTextureTransform( mapDef, texture ) {
+
+			var didTransform = false
+			var transformDef = {};
+
+			if ( texture.offset.x !== 0 || texture.offset.y !== 0 ) {
+
+				transformDef.offset = texture.offset.toArray();
+				didTransform = true;
+
+			}
+
+			if ( texture.rotation !== 0 ) {
+
+				transformDef.rotation = texture.rotation;
+				didTransform = true;
+
+			}
+
+			if ( texture.repeat.x !== 1 || texture.repeat.y !== 1 ) {
+
+				transformDef.scale = texture.repeat.toArray();
+				didTransform = true;				
+
+			}
+
+			if ( didTransform ) {
+
+				mapDef.extensions = mapDef.extensions || {};
+				mapDef.extensions[ 'KHR_texture_transform' ] = transformDef;
+				extensionsUsed[ 'KHR_texture_transform' ] = true;
 
 			}
 
@@ -866,11 +908,9 @@ THREE.GLTFExporter.prototype = {
 
 				if ( material.metalnessMap === material.roughnessMap ) {
 
-					gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture = {
-
-						index: processTexture( material.metalnessMap )
-
-					};
+					var metalRoughMapDef = { index: processTexture( material.metalnessMap ) };
+					applyTextureTransform( metalRoughMapDef, material.metalnessMap );
+					gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
 				} else {
 
@@ -883,11 +923,9 @@ THREE.GLTFExporter.prototype = {
 			// pbrMetallicRoughness.baseColorTexture
 			if ( material.map ) {
 
-				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
-
-					index: processTexture( material.map )
-
-				};
+				var baseColorMapDef = { index: processTexture( material.map ) };
+				applyTextureTransform( baseColorMapDef, material.map );
+				gltfMaterial.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
 
 			}
 
@@ -909,11 +947,9 @@ THREE.GLTFExporter.prototype = {
 				// emissiveTexture
 				if ( material.emissiveMap ) {
 
-					gltfMaterial.emissiveTexture = {
-
-						index: processTexture( material.emissiveMap )
-
-					};
+					var emissiveMapDef = { index: processTexture( material.emissiveMap ) };
+					applyTextureTransform( emissiveMapDef, material.emissiveMap );
+					gltfMaterial.emissiveTexture = emissiveMapDef;
 
 				}
 
@@ -922,11 +958,7 @@ THREE.GLTFExporter.prototype = {
 			// normalTexture
 			if ( material.normalMap ) {
 
-				gltfMaterial.normalTexture = {
-
-					index: processTexture( material.normalMap )
-
-				};
+				var normalMapDef = { index: processTexture( material.normalMap ) };
 
 				if ( material.normalScale.x !== - 1 ) {
 
@@ -936,26 +968,30 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					gltfMaterial.normalTexture.scale = material.normalScale.x;
+					normalMapDef.scale = material.normalScale.x;
 
 				}
+
+				applyTextureTransform( normalMapDef, material.normalMap );
+
+				gltfMaterial.normalTexture = normalMapDef;
 
 			}
 
 			// occlusionTexture
 			if ( material.aoMap ) {
 
-				gltfMaterial.occlusionTexture = {
-
-					index: processTexture( material.aoMap )
-
-				};
+				var occlusionMapDef = { index: processTexture( material.aoMap ) };
 
 				if ( material.aoMapIntensity !== 1.0 ) {
 
-					gltfMaterial.occlusionTexture.strength = material.aoMapIntensity;
+					occlusionMapDef.strength = material.aoMapIntensity;
 
 				}
+
+				applyTextureTransform( occlusionMapDef, material.aoMap );
+
+				gltfMaterial.occlusionTexture = occlusionMapDef;
 
 			}
 
@@ -1007,6 +1043,13 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}      Index of the processed mesh in the "meshes" array
 		 */
 		function processMesh( mesh ) {
+
+			var cacheKey = mesh.geometry.uuid + ':' + mesh.material.uuid;
+			if ( cachedData.meshes.has( cacheKey ) ) {
+
+				return cachedData.meshes.get( cacheKey );
+
+			}
 
 			var geometry = mesh.geometry;
 
@@ -1090,23 +1133,32 @@ THREE.GLTFExporter.prototype = {
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
+				if ( cachedData.attributes.has( attribute ) ) {
+
+					attributes[ attributeName ] = cachedData.attributes.get( attribute );
+					continue;
+
+				}
+
 				// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
+				var modifiedAttribute;
 				var array = attribute.array;
 				if ( attributeName === 'JOINTS_0' &&
 					! ( array instanceof Uint16Array ) &&
 					! ( array instanceof Uint8Array ) ) {
 
 					console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
-					attribute = new THREE.BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
+					modifiedAttribute = new THREE.BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
 
 				}
 
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
 
-					var accessor = processAccessor( attribute, geometry );
+					var accessor = processAccessor( modifiedAttribute || attribute, geometry );
 					if ( accessor !== null ) {
 
 						attributes[ attributeName ] = accessor;
+						cachedData.attributes.set( attribute, accessor );
 
 					}
 
@@ -1165,6 +1217,7 @@ THREE.GLTFExporter.prototype = {
 						}
 
 						var attribute = geometry.morphAttributes[ attributeName ][ i ];
+						var gltfAttributeName = attributeName.toUpperCase();
 
 						// Three.js morph attribute has absolute values while the one of glTF has relative values.
 						//
@@ -1172,6 +1225,14 @@ THREE.GLTFExporter.prototype = {
 						// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#morph-targets
 
 						var baseAttribute = geometry.attributes[ attributeName ];
+
+						if ( cachedData.attributes.has( baseAttribute ) ) {
+
+							target[ gltfAttributeName ] = cachedData.attributes.get( baseAttribute );
+							continue;
+
+						}
+
 						// Clones attribute not to override
 						var relativeAttribute = attribute.clone();
 
@@ -1186,7 +1247,8 @@ THREE.GLTFExporter.prototype = {
 
 						}
 
-						target[ attributeName.toUpperCase() ] = processAccessor( relativeAttribute, geometry );
+						target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
+						cachedData.attributes.set( baseAttribute, target[ gltfAttributeName ] );
 
 					}
 
@@ -1257,7 +1319,16 @@ THREE.GLTFExporter.prototype = {
 
 				if ( geometry.index !== null ) {
 
-					primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+					if ( cachedData.attributes.has( geometry.index ) ) {
+
+						primitive.indices = cachedData.attributes.get( geometry.index );
+
+					} else {
+
+						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+						cachedData.attributes.set( geometry.index, primitive.indices );
+
+					}
 
 				}
 
@@ -1289,7 +1360,10 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.meshes.push( gltfMesh );
 
-			return outputJSON.meshes.length - 1;
+			var index = outputJSON.meshes.length - 1;
+			cachedData.meshes.set( cacheKey, index );
+
+			return index;
 
 		}
 
