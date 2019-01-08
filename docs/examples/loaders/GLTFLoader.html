@@ -129,7 +129,7 @@
 		</p>
 
 		<code>
-		loader.getParser( 'foo.gltf', function ( parser ) {
+		loader.createParser( 'foo.gltf', function ( parser ) {
 
 			parser.getDependency( 'mesh', 0 ).then( function ( mesh ) {
 
@@ -212,7 +212,7 @@
 		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
 		</p>
 
-		<h3>[method:null getParser]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:null createParser]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — A string containing the path/URL of the <em>.gltf</em> or <em>.glb</em> file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed. The function receives the parser.<br />
