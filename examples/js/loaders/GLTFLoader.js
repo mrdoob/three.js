@@ -61,7 +61,7 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
-		getParser: function ( url, onLoad, onProgress, onError ) {
+		createParser: function ( url, onLoad, onProgress, onError ) {
 
 			this._load( url, onLoad, onProgress, onError, true );
 
