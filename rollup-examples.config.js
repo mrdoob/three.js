@@ -43,7 +43,7 @@ function createOutput( file ) {
 
 			banner:
 				'/**\n' +
-				` * Generated from '${ path.relative( '.', inputPath.replace( /\\/, '/' ) ) }'\n` +
+				` * Generated from '${ path.relative( '.', inputPath ).replace( /\\/g, '/' ) }'\n` +
 				' */\n',
 			esModule: false
 
