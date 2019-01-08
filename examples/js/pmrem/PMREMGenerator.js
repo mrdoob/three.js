@@ -11,10 +11,13 @@
 
 THREE.PMREMGenerator = ( function () {
 
-	var shader = getShader();
+	var shaders = {
+		randomSampling: undefined,
+		importanceSampling: undefined
+	}
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0.0, 1000 );
 	var scene = new THREE.Scene();
-	var planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2, 0 ), shader );
+	var planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2, 0 ) );
 	planeMesh.material.side = THREE.DoubleSide;
 	scene.add( planeMesh );
 	scene.add( camera );
@@ -23,7 +26,11 @@ THREE.PMREMGenerator = ( function () {
 
 		this.sourceTexture = sourceTexture;
 		this.sourceResolution = ( params.sourceResolution !== undefined ) ? params.sourceResolution : 512;
-		this.targetResolution = ( params.targetResolution !== undefined ) ? params.targetResolution : 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
+		var size = ( params.targetResolution !== undefined ) ? params.targetResolution : 256; // NODE: 256 is currently hard coded in the glsl code for performance reasons
+		if ( params.targetResolution === undefined && params.resolution !== undefined ) {
+			console.warn('PMREMGenerator', 'params.resolution is deprecated, replace with params.targetResolution')
+			size = params.resolution
+		}
 		this.samplesPerLevel = ( params.samplesPerLevel !== undefined ) ? params.samplesPerLevel : 32;
 		this.useImportanceSampling = ( params.useImportanceSampling !== undefined ) ? params.useImportanceSampling : false;
 
@@ -36,7 +43,6 @@ THREE.PMREMGenerator = ( function () {
 
 		this.cubeLods = [];
 
-		var size = this.targetResolution;
 		var params = {
 			format: this.sourceTexture.format,
 			magFilter: this.sourceTexture.magFilter,
@@ -59,12 +65,33 @@ THREE.PMREMGenerator = ( function () {
 
 		}
 
-		var extraUniforms = this.useImportanceSampling? getImportanceSamplingUniforms() : getRandomSamplingUniforms();
-		shader.uniforms = Object.assign(getBaseUniforms(), extraUniforms);
+		if ( this.useImportanceSampling ) {
 
-		var shaderMain = this.useImportanceSampling? getImportanceSamplingFragmentShader() : getRandomSamplingShader();
-		shader.fragmentShader = getBaseFragmentShader() + shaderMain;
+			if ( shaders.importanceSampling === undefined ) {
+			
+				var shader = getShader()
+				shader.uniforms = Object.assign(getBaseUniforms(), getImportanceSamplingUniforms());
+				shader.fragmentShader = getBaseFragmentShader() + getImportanceSamplingFragmentShader();
+				shaders.importanceSampling = shader
 
+			}
+
+			this.shader = shaders.importanceSampling
+
+		} else {
+
+			if ( shaders.randomSampling === undefined ) {
+
+				var shader = getShader()
+				shader.uniforms = Object.assign(getBaseUniforms(), getRandomSamplingUniforms());
+				shader.fragmentShader = getBaseFragmentShader() + getRandomSamplingFragmentShader();
+				shaders.randomSampling = shader
+
+			}
+
+			this.shader = shaders.importanceSampling
+
+		}
 	};
 
 	PMREMGenerator.prototype = {
@@ -77,16 +104,16 @@ THREE.PMREMGenerator = ( function () {
 			// a Texture created via THREE.WebGLRenderTargetCube.
 			var tFlip = ( this.sourceTexture.isCubeTexture ) ? - 1 : 1;
 
-			shader.defines[ 'SAMPLES_PER_LEVEL' ] = this.samplesPerLevel;
-			shader.uniforms[ 'faceIndex' ].value = 0;
-			shader.uniforms[ 'envMap' ].value = this.sourceTexture;
-			shader.envMap = this.sourceTexture;
+			this.shader.defines[ 'SAMPLES_PER_LEVEL' ] = this.samplesPerLevel;
+			this.shader.uniforms[ 'faceIndex' ].value = 0;
+			this.shader.uniforms[ 'envMap' ].value = this.sourceTexture;
+			this.shader.envMap = this.sourceTexture;
 			if ( this.useImportanceSampling ) {
 
-				shader.uniforms[ 'sourceResolution' ].value = this.sourceResolution;
+				this.shader.uniforms[ 'sourceResolution' ].value = this.sourceResolution;
 
 			}
-			shader.needsUpdate = true;
+			this.shader.needsUpdate = true;
 
 			var gammaInput = renderer.gammaInput;
 			var gammaOutput = renderer.gammaOutput;
@@ -99,24 +126,26 @@ THREE.PMREMGenerator = ( function () {
 			renderer.gammaInput = false;
 			renderer.gammaOutput = false;
 
+			planeMesh.material = this.shader;
+
 			for ( var i = 0; i < this.numLods; i ++ ) {
 
 				var r = i / ( this.numLods - 1 );
 				if ( this.useImportanceSampling ) {
 
-					shader.uniforms[ 'roughness' ].value = r;
+					this.shader.uniforms[ 'roughness' ].value = r;
 
 				} else {
 
-					shader.uniforms[ 'roughness' ].value = r * 0.9; // see comment below, pragmatic choice
+					this.shader.uniforms[ 'roughness' ].value = r * 0.9; // see comment below, pragmatic choice
 
 				}
 				// Only apply the tFlip for the first LOD
-				shader.uniforms[ 'tFlip' ].value = ( i == 0 ) ? tFlip : 1;
-				shader.uniforms[ 'mapSize' ].value = this.cubeLods[ i ].width;
+				this.shader.uniforms[ 'tFlip' ].value = ( i == 0 ) ? tFlip : 1;
+				this.shader.uniforms[ 'mapSize' ].value = this.cubeLods[ i ].width;
 				this.renderToCubeMapTarget( renderer, this.cubeLods[ i ] );
 
-				if ( !this.useImportanceSampling && i < 5 ) shader.uniforms[ 'envMap' ].value = this.cubeLods[ i ].texture;
+				if ( !this.useImportanceSampling && i < 5 ) this.shader.uniforms[ 'envMap' ].value = this.cubeLods[ i ].texture;
 
 			}
 
@@ -141,7 +170,7 @@ THREE.PMREMGenerator = ( function () {
 		renderToCubeMapTargetFace: function ( renderer, renderTarget, faceIndex ) {
 
 			renderTarget.activeCubeFace = faceIndex;
-			shader.uniforms[ 'faceIndex' ].value = faceIndex;
+			this.shader.uniforms[ 'faceIndex' ].value = faceIndex;
 			renderer.render( scene, camera, renderTarget, true );
 
 		},
@@ -273,7 +302,7 @@ THREE.PMREMGenerator = ( function () {
 
 	}
 
-	function getRandomSamplingShader() {
+	function getRandomSamplingFragmentShader() {
 
 		/*
 		 * Prashant Sharma / spidersharma03: More thought and work is needed here.
