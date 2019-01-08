@@ -381,6 +381,185 @@ THREE.BufferGeometryUtils = {
 
 		return new THREE.BufferAttribute( array, itemSize, normalized );
 
+	},
+
+	/**
+	 * Checks for duplicate vertices with hashmap.
+	 * Duplicated vertices are removed
+	 * Returns a new indexed THREE.BufferGeometry.
+	 * @param {THREE.BufferGeometry} geometry The geometry to merge its vertices.
+	 * @param {Integer} elementSize Use: 1 for points, 2 for line segments, 3 for triangles.
+	 * @return {THREE.BufferGeometry}
+	 */
+
+	mergeVertices: function ( geometry, elementSize ) {
+
+		if ( geometry.attributes.position === undefined ) return null;
+
+		var positions = geometry.attributes.position.array;
+
+		var numOriginalVerts = Math.floor( positions.length / 3 );
+
+		// Hashmap for looking up vertices by position coordinates (and making sure they are unique)
+		var verticesMap = {};
+
+		var numUnique = 0;
+		var changes = [];
+
+		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
+		var precision = Math.pow( 10, precisionPoints );
+
+		var pos = new THREE.Vector3();
+
+		for ( var i = 0; i < numOriginalVerts; i ++ ) {
+
+			var i3 = i * 3;
+			pos.set( positions[ i3 ], positions[ i3 + 1 ], positions[ i3 + 2 ] );
+			var vertKey = Math.round( pos.x * precision ) + '_' + Math.round( pos.y * precision ) + '_' + Math.round( pos.z * precision );
+
+			if ( verticesMap[ vertKey ] === undefined ) {
+
+				verticesMap[ vertKey ] = i;
+				changes[ i ] = numUnique ++;
+
+			} else {
+
+				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[vertKey]);
+				changes[ i ] = changes[ verticesMap[ vertKey ] ];
+
+			}
+
+		}
+
+		// Construct new indices, discarding elements with some collapsed vertices
+
+		var isIndexed = geometry.index !== null;
+
+		var vertexIndexFunc = null;
+
+		var numOriginalIndices = 0;
+
+		if ( isIndexed ) {
+
+			var indices1 = geometry.index.array;
+
+			vertexIndexFunc = function ( idx ) {
+
+				return indices1[ idx ];
+
+			}
+
+			numOriginalIndices = indices1.length;
+
+		}
+		else {
+
+			vertexIndexFunc = function ( idx ) {
+
+				return idx;
+
+			}
+
+			numOriginalIndices = numOriginalVerts;
+
+		}
+
+		var newIndices = [];
+
+		switch ( elementSize ) {
+
+			case 1:
+
+				for ( var i = 0, il = numOriginalIndices; i < il; i ++ ) {
+
+					newIndices.push( changes[ vertexIndexFunc( i ) ] );
+
+				}
+
+				break;
+
+			case 2:
+
+				for ( var i = 0, il = numOriginalIndices - 2; i <= il; i += 2 ) {
+
+					var a = changes[ vertexIndexFunc( i ) ];
+					var b = changes[ vertexIndexFunc( i + 1 ) ];
+					if ( a !== b ) {
+
+						newIndices.push( a, b );
+
+					}
+
+				}
+
+				break;
+
+			case 3:
+
+				for ( var i = 0, il = numOriginalIndices - 3; i <= il; i += 3 ) {
+
+					var a = changes[ vertexIndexFunc( i ) ];
+					var b = changes[ vertexIndexFunc( i + 1 ) ];
+					var c = changes[ vertexIndexFunc( i + 2 ) ];
+					if ( a !== b && a !== c && b !== c ) {
+
+						newIndices.push( a, b, c );
+
+					}
+
+				}
+
+				break;
+
+			default:
+				console.error( "BufferGeometryUtils.mergeVertices: elementSize not supported (value: " + elementSize + ")" );
+				return null;
+
+		}
+
+		// Create a new indexed BufferGeometry and its attributes
+
+		var indexedBufferGeom = new THREE.BufferGeometry();
+		indexedBufferGeom.setIndex( newIndices );
+
+		for ( var name in geometry.attributes ) {
+
+			var attribute = geometry.attributes[ name ];
+
+			if ( attribute.isInterleavedAttribute ) {
+
+				console.error( "BufferGeometryUtils.mergeVertices: InterleavedAttribute not supported." );
+				return null;
+
+			}
+
+			var itemSize = attribute.itemSize;
+
+			var array = new attribute.array.constructor( numUnique * itemSize );
+
+			var newAttribute = new THREE.BufferAttribute( array, itemSize, attribute.normalized );
+
+			var srcArray = attribute.array;
+
+			for ( var i = 0; i < numOriginalIndices; i ++ ) {
+
+				var coordIndex = i * itemSize;
+				var newCoordIndex = changes[ i ] * itemSize;
+
+				for ( var j = 0; j < itemSize; j ++ ) {
+
+					array[ newCoordIndex + j ] = srcArray[ coordIndex + j ];
+
+				}
+
+			}
+
+			indexedBufferGeom.addAttribute( name, newAttribute );
+
+		}
+
+		return indexedBufferGeom;
+
 	}
 
 };
