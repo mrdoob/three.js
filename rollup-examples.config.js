@@ -17,9 +17,9 @@ function createOutput( file ) {
 		treeshake: false,
 		external: p => p !== inputPath,
 
-		plugins: [{
+		plugins: [ {
 
-			generateBundle: function(options, bundle) {
+			generateBundle: function ( options, bundle ) {
 
 				for ( var key in bundle ) {
 
@@ -29,7 +29,7 @@ function createOutput( file ) {
 
 			}
 
-		}],
+		} ],
 
 		output: {
 
@@ -62,6 +62,7 @@ function walk( dir, cb ) {
 
 		var p = path.join( dir, f );
 		var stats = fs.statSync( p );
+
 		if ( stats.isDirectory() ) {
 
 			walk( p, cb );
