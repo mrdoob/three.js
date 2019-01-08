@@ -40,6 +40,7 @@ THREE.PMREMGenerator = ( function () {
 		this.sourceTexture.minFilter = ( monotonicEncoding ) ? THREE.LinearFilter : THREE.NearestFilter;
 		this.sourceTexture.magFilter = ( monotonicEncoding ) ? THREE.LinearFilter : THREE.NearestFilter;
 		this.sourceTexture.generateMipmaps = this.sourceTexture.generateMipmaps && monotonicEncoding;
+		this.useTestColorMap = ( params.useTestColorMap !== undefined ) ? params.useTestColorMap : false;
 
 		this.cubeLods = [];
 
@@ -107,6 +108,7 @@ THREE.PMREMGenerator = ( function () {
 			this.shader.defines[ 'SAMPLES_PER_LEVEL' ] = this.samplesPerLevel;
 			this.shader.uniforms[ 'faceIndex' ].value = 0;
 			this.shader.uniforms[ 'envMap' ].value = this.sourceTexture;
+			this.shader.uniforms[ 'useTestColorMap' ].value = this.useTestColorMap;
 			this.shader.envMap = this.sourceTexture;
 			if ( this.useImportanceSampling ) {
 
@@ -224,6 +226,7 @@ THREE.PMREMGenerator = ( function () {
 			"mapSize": { value: 0.5 },
 			"envMap": { value: null },
 			"tFlip": { value: - 1 },
+			"useTestColorMap": { value: false },
 		};
 	}
 
@@ -236,6 +239,7 @@ THREE.PMREMGenerator = ( function () {
 			uniform float mapSize;
 			uniform samplerCube envMap;
 			uniform float tFlip;
+			uniform bool useTestColorMap;
 			mat3 MatrixFromVector(vec3 n) {
 				float a = 1.0 / (1.0 + n.z);
 				float b = -n.x * n.y * a;
@@ -336,7 +340,7 @@ THREE.PMREMGenerator = ( function () {
 					rgbColor.rgb += color;
 				}
 				rgbColor /= float(NumSamples);
-				//rgbColor = testColorMap( roughness ).rgb;
+				rgbColor = useTestColorMap ? testColorMap() : rgbColor;
 				gl_FragColor = linearToOutputTexel( vec4( rgbColor, 1.0 ) );
 			}
 		`;
@@ -418,7 +422,7 @@ THREE.PMREMGenerator = ( function () {
 				if (weight > 0.0) {
 					rgbColor /= weight;
 				}
-				//rgbColor = testColorMap();
+				rgbColor = useTestColorMap ? testColorMap() : rgbColor;
 				gl_FragColor = linearToOutputTexel( vec4( rgbColor, 1.0 ) );
 			}`;
 
