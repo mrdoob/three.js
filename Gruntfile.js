@@ -58,6 +58,33 @@ module.exports = function(grunt) {
     clean: [
       'out/**/*',
     ],
+    watch: {
+      main: {
+        files: [
+          'threejs/**',
+          '3rdparty/**',
+        ],
+        tasks: ['copy'],
+        options: {
+          spawn: false,
+        },
+      },
+    },
+  });
+
+  let changedFiles = {};
+  const onChange = grunt.util._.debounce(function() {
+    grunt.config('copy.main.files', Object.keys(changedFiles).filter(noMds).map((file) => {
+      return {
+        src: file,
+        dest: 'out/',
+      };
+    }));
+    changedFiles = {};
+  }, 200);
+  grunt.event.on('watch', function(action, filepath) {
+    changedFiles[filepath] = action;
+    onChange();
   });
 
   grunt.registerTask('buildlessons', function() {
