@@ -1128,6 +1128,7 @@ THREE.GLTFExporter.prototype = {
 
 			// @QUESTION Detect if .vertexColors = THREE.VertexColors?
 			// For every attribute create an accessor
+			var modifiedAttribute = null;
 			for ( var attributeName in geometry.attributes ) {
 
 				var attribute = geometry.attributes[ attributeName ];
@@ -1141,7 +1142,7 @@ THREE.GLTFExporter.prototype = {
 				}
 
 				// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
-				var modifiedAttribute;
+				modifiedAttribute = null;
 				var array = attribute.array;
 				if ( attributeName === 'JOINTS_0' &&
 					! ( array instanceof Uint16Array ) &&
