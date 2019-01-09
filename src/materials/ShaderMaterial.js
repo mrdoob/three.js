@@ -158,6 +158,13 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 				value: value.toArray()
 			};
 
+		} else if ( value && value.isMatrix3 ) {
+
+			data.uniforms[ name ] = {
+				type: 'm3',
+				value: value.toArray()
+			};
+
 		} else if ( value && value.isMatrix4 ) {
 
 			data.uniforms[ name ] = {
