@@ -1128,7 +1128,7 @@ THREE.GLTFExporter.prototype = {
 
 			// @QUESTION Detect if .vertexColors = THREE.VertexColors?
 			// For every attribute create an accessor
-			var modifiedAttribute;
+			var modifiedAttribute = null;
 			for ( var attributeName in geometry.attributes ) {
 
 				var attribute = geometry.attributes[ attributeName ];
