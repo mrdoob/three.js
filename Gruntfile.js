@@ -15,6 +15,11 @@ module.exports = function(grunt) {
     return !s_ignoreRE.test(filename);
   }
 
+  const s_isMdRE = /\.md$/i;
+  function mdsOnly(filename) {
+    return s_isMdRE.test(filename);
+  }
+
   function notFolder(filename) {
     return !fs.statSync(filename).isDirectory();
   }
@@ -58,6 +63,11 @@ module.exports = function(grunt) {
     clean: [
       'out/**/*',
     ],
+    buildlesson: {
+      main: {
+        files: [],
+      },
+    },
     watch: {
       main: {
         files: [
@@ -65,6 +75,15 @@ module.exports = function(grunt) {
           '3rdparty/**',
         ],
         tasks: ['copy'],
+        options: {
+          spawn: false,
+        },
+      },
+      lessons: {
+        files: [
+          'threejs/lessons/**/threejs*.md',
+        ],
+        tasks: ['buildlesson'],
         options: {
           spawn: false,
         },
@@ -80,6 +99,11 @@ module.exports = function(grunt) {
         dest: 'out/',
       };
     }));
+    grunt.config('buildlesson.main.files', Object.keys(changedFiles).filter(mdsOnly).map((file) => {
+      return {
+        src: file,
+      };
+    }));
     changedFiles = {};
   }, 200);
   grunt.event.on('watch', function(action, filepath) {
@@ -87,18 +111,39 @@ module.exports = function(grunt) {
     onChange();
   });
 
+  const buildSettings = {
+    outDir: 'out',
+    baseUrl: 'http://threejsfundamentals.org',
+    rootFolder: 'threejs',
+    lessonGrep: 'threejs*.md',
+    siteName: 'ThreeJSFundamentals',
+    siteThumbnail: 'threejsfundamentals.jpg',  // in rootFolder/lessons/resources
+    templatePath: 'build/templates',
+  };
+
+  // just the hackiest way to get this working.
+  grunt.registerMultiTask('buildlesson', 'build a lesson', function() {
+    const filenames = new Set();
+    this.files.forEach((files) => {
+      files.src.forEach((filename) => {
+        filenames.add(filename);
+      });
+    });
+    const buildStuff = require('./build/js/build');
+    const settings = Object.assign({}, buildSettings, {
+      filenames,
+    });
+    const finish = this.async();
+    buildStuff(settings).then(function() {
+      finish();
+    }).done();
+  });
+
   grunt.registerTask('buildlessons', function() {
     const buildStuff = require('./build/js/build');
     const finish = this.async();
-    buildStuff({
-      outDir: 'out',
-      baseUrl: 'http://threejsfundamentals.org',
-      rootFolder: 'threejs',
-      lessonGrep: 'threejs*.md',
-      siteName: 'ThreeJSFundamentals',
-      siteThumbnail: 'threejsfundamentals.jpg',  // in rootFolder/lessons/resources
-    }).then(function() {
-        finish();
+    buildStuff(buildSettings).then(function() {
+      finish();
     }).done();
   });
 

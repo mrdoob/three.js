@@ -11,6 +11,8 @@ if (parseInt((/^v(\d+)\./).exec(process.version)[1]) < requiredNodeVersion) {
 
 module.exports = function(settings) { // wrapper in case we're in module_context mode
 
+const hackyProcessSelectFiles = settings.filenames !== undefined;
+
 const cache      = new (require('inmemfilecache'))();
 const Feed       = require('feed').Feed;
 const fs         = require('fs');
@@ -201,6 +203,11 @@ function slashify(s) {
 }
 
 function articleFilter(f) {
+  if (hackyProcessSelectFiles) {
+    if (!settings.filenames.has(f)) {
+      return false;
+    }
+  }
   return !process.env['ARTICLE_FILTER'] || f.indexOf(process.env['ARTICLE_FILTER']) >= 0;
 }
 
@@ -537,6 +544,10 @@ const Builder = function(outBaseDir, options) {
       });
     }
 
+    if (hackyProcessSelectFiles) {
+      return Promise.resolve();
+    }
+
     // generate place holders for non-translated files
     const missing = g_origArticles.filter(name => articlesFilenames.indexOf(name) < 0);
     missing.forEach(name => {
@@ -704,6 +715,18 @@ const Builder = function(outBaseDir, options) {
       table_of_contents: '',
       templateOptions: '',
     });
+
+    {
+      const filename = path.join(settings.outDir, 'link-check.html');
+      const html = `
+      <html>
+      <body>
+      ${langs.map(lang => `<a href="${lang.home}">${lang.lang}</a>`).join('\n')}
+      </body>
+      </html>
+      `;
+      writeFileIfChanged(filename, html);
+    }
   };
 
 
@@ -766,16 +789,14 @@ langs = langs.concat(readdirs(`${settings.rootFolder}/lessons`)
 
 b.preProcess(langs);
 
-{
-  const filename = path.join(settings.outDir, 'link-check.html');
-  const html = `
-  <html>
-  <body>
-  ${langs.map(lang => `<a href="${lang.home}">${lang.lang}</a>`).join('\n')}
-  </body>
-  </html>
-  `;
-  writeFileIfChanged(filename, html);
+if (hackyProcessSelectFiles) {
+  const langsInFilenames = new Set();
+  [...settings.filenames].forEach((filename) => {
+    const m = /lessons\/(\w{2}|\w{5})\//.exec(filename);
+    const lang = m ? m[1] : 'en';
+    langsInFilenames.add(lang);
+  });
+  langs = langs.filter(lang => langsInFilenames.has(lang.lang));
 }
 
 const tasks = langs.map(function(lang) {
@@ -787,9 +808,12 @@ const tasks = langs.map(function(lang) {
 return tasks.reduce(function(cur, next) {
   return cur.then(next);
 }, Promise.resolve()).then(function() {
-  b.writeGlobalFiles();
-  cache.clear();
+  if (!hackyProcessSelectFiles) {
+    b.writeGlobalFiles(langs);
+  }
   return numErrors ? Promise.reject(new Error(`${numErrors} errors`)) : Promise.resolve();
+}).finally(() => {
+  cache.clear();
 });
 
 };
