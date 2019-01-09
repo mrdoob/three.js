@@ -41,23 +41,6 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	isInterleavedBufferAttribute: true,
 
-	copy: function ( source ) {
-
-		this.data = source.data;
-		this.itemSize = source.itemSize;
-		this.offset = source.offset;
-		this.normalized = source.normalized;
-
-		return this;
-
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.data, this.itemSize, this.offset, this.normalized ).copy( this );
-
-	},
-
 	setX: function ( index, x ) {
 
 		this.data.array[ index * this.data.stride + this.offset ] = x;
