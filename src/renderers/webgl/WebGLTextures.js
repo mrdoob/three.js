@@ -137,9 +137,19 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getInternalFormat( glFormat, glType ) {
+	function getInternalFormat( texture, glFormat, glType ) {
 
 		if ( isWebGL2 === false ) return glFormat;
+
+		var internalFormatName = texture.internalFormat; // User specified internal format.
+
+		if ( internalFormatName !== null ) {
+
+			if ( _gl[ internalFormatName ] !== undefined ) return _gl[ internalFormatName ];
+
+			console.warn( 'THREE.WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
+
+		}
 
 		var internalFormat = glFormat;
 
@@ -427,7 +437,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				supportsMips = isPowerOfTwo( image ) || isWebGL2,
 				glFormat = utils.convert( texture.format ),
 				glType = utils.convert( texture.type ),
-				glInternalFormat = getInternalFormat( glFormat, glType );
+				glInternalFormat = getInternalFormat( texture, glFormat, glType );
 
 			setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
 
@@ -649,7 +659,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		var supportsMips = isPowerOfTwo( image ) || isWebGL2,
 			glFormat = utils.convert( texture.format ),
 			glType = utils.convert( texture.type ),
-			glInternalFormat = getInternalFormat( glFormat, glType );
+			glInternalFormat = getInternalFormat( texture, glFormat, glType );
 
 		setTextureParameters( textureType, texture, supportsMips );
 
@@ -822,7 +832,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var glFormat = utils.convert( renderTarget.texture.format );
 		var glType = utils.convert( renderTarget.texture.type );
-		var glInternalFormat = getInternalFormat( glFormat, glType );
+		var glInternalFormat = getInternalFormat( renderTarget.texture, glFormat, glType );
 		state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
@@ -872,7 +882,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			var glFormat = utils.convert( renderTarget.texture.format );
 			var glType = utils.convert( renderTarget.texture.type );
-			var glInternalFormat = getInternalFormat( glFormat, glType );
+			var glInternalFormat = getInternalFormat( renderTarget.texture, glFormat, glType );
 
 			if ( isMultisample ) {
 
@@ -1021,7 +1031,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer );
 					var glFormat = utils.convert( renderTarget.texture.format );
 					var glType = utils.convert( renderTarget.texture.type );
-					var glInternalFormat = getInternalFormat( glFormat, glType );
+					var glInternalFormat = getInternalFormat( renderTarget.texture, glFormat, glType );
 					var samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
