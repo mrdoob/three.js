@@ -49,14 +49,14 @@
 			Returns a vector for a given position on the curve according to the arc length.
 		</p>
 
-		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
+		<h3>[method:Array getPoints]( [param:Integer divisions], [param:Array optionalTarget] )</h3>
 		<p>
 			divisions -- number of pieces to divide the curve into. Default is *5*.<br /><br />
 
 			Returns a set of divisions + 1 points using getPoint( t ).
 		</p>
 
-		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
+		<h3>[method:Array getSpacedPoints]( [param:Integer divisions], [param:Array optionalTarget] )</h3>
 		<p>
 			divisions -- number of pieces to divide the curve into. Default is *5*.<br /><br />
 
@@ -79,14 +79,14 @@
 			using [page:.getPoint].
 		 </p>
 
-		<h3>[method:Vector getTangent]( [param:Float t] )</h3>
+		<h3>[method:Vector getTangent]( [param:Float t, [param:Vector optionalTarget] )</h3>
 		<p>
 			Returns a unit vector tangent at t. If the derived curve does not implement its
 			tangent derivation, two points a small delta apart will be used to find its gradient
 			which seems to give a reasonable approximation.
 		</p>
 
-		<h3>[method:Vector getTangentAt]( [param:Float u] )</h3>
+		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
 		<p>
 			Returns tangent at a point which is equidistant to the ends of the curve from the
 			point given in [page:.getTangent].

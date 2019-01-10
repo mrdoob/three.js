@@ -7,9 +7,9 @@ import { Matrix4 } from '../../math/Matrix4.js';
  * Extensible curve object
  *
  * Some common of curve methods:
- * .getPoint( t, optionalTarget ), .getTangent( t )
- * .getPointAt( u, optionalTarget ), .getTangentAt( u )
- * .getPoints(), .getSpacedPoints()
+ * .getPoint( t, optionalTarget ), .getTangent( t, optionalTarget )
+ * .getPointAt( u, optionalTarget ), .getTangentAt( u, optionalTarget )
+ * .getPoints( divisions, optionalTarget ), .getSpacedPoints( divisions, optionalTarget )
  * .getLength()
  * .updateArcLengths()
  *
@@ -69,11 +69,22 @@ Object.assign( Curve.prototype, {
 
 	// Get sequence of points using getPoint( t )
 
-	getPoints: function ( divisions ) {
+	getPoints: function ( divisions, optionalTarget ) {
 
 		if ( divisions === undefined ) divisions = 5;
 
-		var points = [];
+		var points;
+
+		if ( optionalTarget ) {
+
+			points = optionalTarget;
+			points.length = 0;
+
+		} else {
+
+			points = [];
+
+		}
 
 		for ( var d = 0; d <= divisions; d ++ ) {
 
@@ -87,11 +98,22 @@ Object.assign( Curve.prototype, {
 
 	// Get sequence of points using getPointAt( u )
 
-	getSpacedPoints: function ( divisions ) {
+	getSpacedPoints: function ( divisions, optionalTarget ) {
 
 		if ( divisions === undefined ) divisions = 5;
 
-		var points = [];
+		var points;
+
+		if ( optionalTarget ) {
+
+			points = optionalTarget;
+			points.length = 0;
+
+		} else {
+
+			points = [];
+
+		}
 
 		for ( var d = 0; d <= divisions; d ++ ) {
 
@@ -237,29 +259,48 @@ Object.assign( Curve.prototype, {
 	// 2 points a small delta apart will be used to find its gradient
 	// which seems to give a reasonable approximation
 
-	getTangent: function ( t ) {
+	getTangent: ( function () {
 
-		var delta = 0.0001;
-		var t1 = t - delta;
-		var t2 = t + delta;
+		var pt1 = new THREE.Vector3();
+		var pt2 = new THREE.Vector3();
 
-		// Capping in case of danger
+		return function ( t, optionalTarget ) {
 
-		if ( t1 < 0 ) t1 = 0;
-		if ( t2 > 1 ) t2 = 1;
+			var delta = 0.0001;
+			var t1 = t - delta;
+			var t2 = t + delta;
 
-		var pt1 = this.getPoint( t1 );
-		var pt2 = this.getPoint( t2 );
+			// Capping in case of danger
 
-		var vec = pt2.clone().sub( pt1 );
-		return vec.normalize();
+			if ( t1 < 0 ) t1 = 0;
+			if ( t2 > 1 ) t2 = 1;
 
-	},
+			this.getPoint( t1, pt1 );
+			this.getPoint( t2, pt2 );
 
-	getTangentAt: function ( u ) {
+			var vec;
+
+			if ( optionalTarget ) {
+
+				vec = optionalTarget;
+				vec.copy( pt2 ).sub( pt1 );
+
+			} else {
+
+				vec = pt2.clone().sub( pt1 );
+
+			}
+
+			return vec.normalize();
+
+		};
+
+	})(),
+
+	getTangentAt: function ( u, optionalTarget ) {
 
 		var t = this.getUtoTmapping( u );
-		return this.getTangent( t );
+		return this.getTangent( t, optionalTarget );
 
 	},
 
