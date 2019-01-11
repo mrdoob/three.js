@@ -31,25 +31,29 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Vector getPoint]( [param:Float t], [param:Vector optionalTarget] )</h3>
-		<p>
+		<h3>[method:Vector getPoint]( [param:Float t], [param:Vector3 optionalTarget] )</h3>
+    <p>
 			[page:Float t] - A position on the curve. Must be in the range [ 0, 1 ]. <br>
-			[page:Vector optionalTarget] — (optional) If specified, the result will be copied into this Vector,
-			otherwise a new Vector will be created. <br /><br />
-
+		  [page:Vector3 optionalTarget] — (optional) target to set the result. Otherwise a new [page:Vector3] is instantiated.
+		</p>
+		<p>
 			Returns a vector for a given position on the curve.
 		</p>
 
-		<h3>[method:Vector getPointAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
-		<p>
+		<h3>[method:Vector getPointAt]( [param:Float u], [param:Vector3 optionalTarget] )</h3>
+    <p>
 			[page:Float u] - A position on the curve according to the arc length. Must be in the range [ 0, 1 ]. <br>
 			[page:Vector optionalTarget] — (optional) If specified, the result will be copied into this Vector,
-			otherwise a new Vector will be created. <br /><br />
-
+			otherwise a new Vector will be created.
+    </p>
+		<p>
 			Returns a vector for a given position on the curve according to the arc length.
 		</p>
 
 		<h3>[method:Array getPoints]( [param:Integer divisions], [param:Array optionalTarget] )</h3>
+    <p>
+		  [page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated.
+    </p>
 		<p>
 			divisions -- number of pieces to divide the curve into. Default is *5*.<br /><br />
 
@@ -57,6 +61,9 @@
 		</p>
 
 		<h3>[method:Array getSpacedPoints]( [param:Integer divisions], [param:Array optionalTarget] )</h3>
+    <p>
+		  [page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated.
+    </p>
 		<p>
 			divisions -- number of pieces to divide the curve into. Default is *5*.<br /><br />
 
@@ -79,14 +86,20 @@
 			using [page:.getPoint].
 		 </p>
 
-		<h3>[method:Vector getTangent]( [param:Float t, [param:Vector optionalTarget] )</h3>
+		<h3>[method:Vector getTangent]( [param:Float t, [param:Vector3 optionalTarget] )</h3>
+    <p>
+		  [page:Vector3 optionalTarget] — (optional) target to set the result. Otherwise a new [page:Vector3] is instantiated.
+		</p>
 		<p>
 			Returns a unit vector tangent at t. If the derived curve does not implement its
 			tangent derivation, two points a small delta apart will be used to find its gradient
 			which seems to give a reasonable approximation.
 		</p>
 
-		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
+		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector3 optionalTarget] )</h3>
+    <p>
+		  [page:Vector3 optionalTarget] — (optional) target to set the result. Otherwise a new [page:Vector3] is instantiated.
+		</p>
 		<p>
 			Returns tangent at a point which is equidistant to the ends of the curve from the
 			point given in [page:.getTangent].

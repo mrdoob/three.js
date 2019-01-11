@@ -261,8 +261,8 @@ Object.assign( Curve.prototype, {
 
 	getTangent: ( function () {
 
-		var pt1 = new THREE.Vector3();
-		var pt2 = new THREE.Vector3();
+		var pt1 = new Vector3();
+		var pt2 = new Vector3();
 
 		return function ( t, optionalTarget ) {
 
@@ -295,7 +295,7 @@ Object.assign( Curve.prototype, {
 
 		};
 
-	})(),
+	} )(),
 
 	getTangentAt: function ( u, optionalTarget ) {
 
