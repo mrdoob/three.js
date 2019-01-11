@@ -58,7 +58,8 @@ function fixSourceLinks(url, source) {
   const srcRE = /(src=)"(.*?)"/g;
   const linkRE = /(href=)"(.*?")/g;
   const imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
-  const loaderLoadRE = /(loader.load[a-z]*)\(('|")(.*?)('|")/ig;
+  const loaderLoadRE = /(loader.load[a-z]*\()('|")(.*?)('|")/ig;
+  const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
   const prefix = getPrefix(url);
 
   function addPrefix(url) {
@@ -67,12 +68,15 @@ function fixSourceLinks(url, source) {
   function makeLinkFQed(match, p1, url) {
     return p1 + '"' + addPrefix(url) + '"';
   }
+  function makeLinkFDedQuotes(match, fn, q1, url, q2) {
+    return fn + q1 + addPrefix(url) + q2;
+  }
+
   source = source.replace(srcRE, makeLinkFQed);
   source = source.replace(linkRE, makeLinkFQed);
   source = source.replace(imageSrcRE, makeLinkFQed);
-  source = source.replace(loaderLoadRE, function(match, fn, q1, url, q2) {
-    return fn + '(' + q1 + addPrefix(url) + q2;
-  });
+  source = source.replace(urlPropRE, makeLinkFDedQuotes);
+  source = source.replace(loaderLoadRE, makeLinkFDedQuotes);
 
   return source;
 }
