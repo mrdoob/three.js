@@ -6,13 +6,12 @@
 <style>
 canvas {
   min-width: 512px;
+  min-height: 64px;
   image-rendering: pixelated;
 }
-@media (max-width: 530px) {
-  canvas {
-    min-width: 0px;
-    width: calc(100vw - 20px);
-  }
+#cube {
+  max-width: calc(100vw - 20px);
+  overflow: auto;
 }
 </style>
 </head>
@@ -20,7 +19,7 @@ canvas {
 <h1>Color Cube Image Maker</h1>
 <div>size:<input id="size" type="number" value="8" min="2" max="64"/></div>
 <p><button type="button">Save...</button></p>
-<p><canvas></canvas></br>
+<div id="cube"><canvas></canvas></div>
 <div>( note: actual image size is
 <span id="width"></span>x<span id="height"></span> )</div>
 </p>

@@ -13,13 +13,12 @@
     }
     canvas {
       min-width: 512px;
+      min-height: 64px;
       image-rendering: pixelated;
     }
-    @media (max-width: 530px) {
-      canvas {
-        min-width: 0px;
-        width: calc(100vw - 20px);
-      }
+    #cube {
+      max-width: calc(100vw - 20px);
+      overflow: auto;
     }
   </style>
   </head>
@@ -29,7 +28,7 @@
     <div>size:<input id="size" type="number" value="8" min="2" max="64"/></div>
     <p id="result"></p>
     <p><button type="button">Save...</button></p>
-    <canvas id="c"></canvas>
+    <div id="cube"><canvas id="c"></canvas></div>
   </body>
 <script src="resources/threejs/r98/three.js"></script>
 <script src="resources/threejs/r98/js/shaders/CopyShader.js"></script>
