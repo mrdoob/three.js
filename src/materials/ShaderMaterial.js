@@ -30,6 +30,7 @@ function ShaderMaterial( parameters ) {
 
 	this.defines = {};
 	this.uniforms = {};
+	this.uniformBlocks = [];
 
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
@@ -92,6 +93,7 @@ ShaderMaterial.prototype.copy = function ( source ) {
 	this.vertexShader = source.vertexShader;
 
 	this.uniforms = cloneUniforms( source.uniforms );
+	this.uniformBlocks = source.uniformBlocks;
 
 	this.defines = Object.assign( {}, source.defines );
 

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This class enables the usage of Uniform Buffer Objects (UBO). You can use them to define global uniform data that can be
+			shared across all shader programs. Camera and lighting related data are perfect examples of using this technique. If a
+			uniform value changes (e.g. the position of a light) it's only necessary to update the UBO once and not per shader program. This
+			is necessary in context of ordinary uniforms.
+		</p>
+
+		<p>
+			Note: [name] can only be used with a WebGL 2 rendering context and only for [page:ShaderMaterial] and [page:RawShaderMaterial].
+		</p>
+
+		<h3>Example</h3>
+		<p>
+		An instance of [name] is declared like this:
+		</p>
+		<code>
+		var cameraUniformBlock = new THREE.UniformBlock();
+		cameraUniformBlock.setName( 'ViewData' );
+		cameraUniformBlock.add( { value: new THREE.Matrix4() } ); // projection matrix
+		cameraUniformBlock.add( { value: new THREE.Matrix4() } ); // view matrix
+		</code>
+
+		<p>
+		The corresponding shader code looks like so:
+		</p>
+		<code>
+		uniform ViewData {
+			mat4 projectionMatrix;
+			mat4 viewMatrix;
+		};
+		</code>
+
+		<p>
+		There are two things that are important when creating an instance of [name]:
+		<ul>
+			<li>The *name* property needs to match the name of the uniform definition in the shader.</li>
+			<li>The order of uniform values added to the [name] needs to match the definition order in the shader.</li>
+		</ul>
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean dynamic]</h3>
+		<p>
+			Whether the buffer is dynamic or not. Default is *false*.<br /><br />
+
+			If set to false, the GPU is informed that contents of the buffer are likely to be used often and not change often.
+			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.STATIC_DRAW] flag.<br />
+			If set to true, the GPU is informed that contents of the buffer are likely to be used often and change often.
+			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.DYNAMIC_DRAW] flag.
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+		The name of the uniform block. Needs to match the uniform name in the shader.
+		</p>
+
+		<h3>[property:Array uniforms]</h3>
+		<p>
+		An array of uniform values. The order of uniforms needs to match the definition order in the shader.
+		The following types are currently supported.
+		<ul>
+			<li>Float</li>
+			<li>Int</li>
+			<li>[page:Vector2]</li>
+			<li>[page:Vector3]</li>
+			<li>[page:Vector4]</li>
+			<li>[page:Color]</li>
+			<li>[page:Matrix3]</li>
+			<li>[page:Matrix4]</li>
+		</ul>
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:UniformBlock add]( [param:Uniform uniform] )</h3>
+		<p>
+		[page:Object uniform] — The uniform to add.<br /><br />
+
+		Adds an uniform to the [name].
+		</p>
+
+		<h3>[method:UniformBlock remove]( [param:Uniform uniform] )</h3>
+		<p>
+		[page:Object uniform] — The uniform to remove.<br /><br />
+
+		Removes an uniform from the [name].
+		</p>
+
+		<h3>[method:UniformBlock setName]( [param:String name] )</h3>
+		<p>
+		[page:String name] — The name to set.<br /><br />
+
+		Sets the name of this [name].
+		</p>
+
+		<h3>[method:UniformBlock dispose]()</h3>
+		<p>
+		Disposes this [name] so corresponding data cached by [page:WebGLRenderer] are released.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
