@@ -46,34 +46,54 @@ THREE.StereoEffectParameters = {
 //	zeroParallax: Distance to objects with zero parallax.
 //		See http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf for details.
 //		Default is THREE.StereoEffectParameters.zeroParallaxDefault
-//	cookie: Your custom cookie function for loading of the StereoEffects settings
+//	camera: THREE.PerspectiveCamera. Use the camera key if you want control cameras focus.
+//	far: Camera frustum far plane. The far key uses for correct calculation default values of Eye separation and Focus. Default is 10.
+//	cookie: Your custom cookie function for saving and loading of the StereoEffects settings.
 //}
 THREE.StereoEffect = function ( renderer, options ) {
 
+	options = options || {};
+	this.options = options;
+
 	options.stereo = new THREE.StereoCamera();
 	options.stereo.aspect = 0.5;
+	if ( options.cookie === undefined )
+		options.cookie = function ( name ) {
 
-	// Default cookie is not saving settings
-	// name: name of current setting
-	function cookie( name ) {
+			this.get = function ( defaultValue ) {
 
-		this.get = function ( defaultValue ) {
+				// Default cookie is not loading settings
+				return defaultValue;
 
-			return defaultValue;
+			};
+
+			this.set = function () {
+
+				// Default cookie is not saving settings
+
+			};
 
 		};
-
-	}
-
-	options = options || {};
-	if ( options.cookie !== undefined )
-		cookie = options.cookie;
 	if ( options.spatialMultiplex === undefined )
-		options.spatialMultiplex = new cookie( 'spatialMultiplex' ).get( THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS );//Use 'Side by side' for compability with previous version of THREE.StereoEffect
+		options.spatialMultiplex = new options.cookie( 'spatialMultiplex' ).get( THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS );//Use 'Side by side' for compability with previous version of THREE.StereoEffect
+	if ( options.camera !== undefined )
+		options.camera.focus = parseInt( new options.cookie( 'cameraFocus' ).get( new THREE.PerspectiveCamera().focus ) );
 	if ( options.zeroParallax === undefined )
-		options.zeroParallax = parseInt( new cookie( 'zeroParallax' ).get( THREE.StereoEffectParameters.zeroParallaxDefault ) );
+		options.zeroParallax = parseInt( new options.cookie( 'zeroParallax' ).get( THREE.StereoEffectParameters.zeroParallaxDefault ) );
+	if ( options.far === undefined )
+		options.far = 10;
+	options.eyeSep = function () {
 
-	options.stereo.eyeSep = ( new cookie( 'eyeSeparation' ).get( new THREE.StereoCamera().eyeSep ) * 10000 ) / 10000;
+		return ( new THREE.StereoCamera().eyeSep / 10 ) * options.far;
+
+	};
+	options.defaultFocus = function () {
+
+		return ( 6990 / 999 ) * ( options.far / 10 ) + 10 - 6990 / 999;
+
+	};
+
+	options.stereo.eyeSep = ( new options.cookie( 'eyeSeparation' ).get( options.eyeSep() ) * 10000 ) / 10000;
 
 	this.setEyeSeparation = function ( eyeSep ) {
 
@@ -163,7 +183,6 @@ else console.error( 'Duplicate THREE.gui object' );
 //		Examples: "en" - English language, "ru" Russian.
 //		See the "Syntax" paragraph of RFC 4646 https://tools.ietf.org/html/rfc4646#section-2.1 for details.
 //		Default returns the 'en' is English language.
-//	cookie: Your custom cookie function for saving of the StereoEffects settings
 //	lang: Object with localized language values
 //	scale: scale of allowed values. Default is 1.
 //}
@@ -178,15 +197,6 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 	}
 	if ( guiParams.getLanguageCode !== undefined ) getLanguageCode = guiParams.getLanguageCode;
-
-	// Default cookie is not saving settings
-	// name: name of current setting
-	function cookie( name ) {
-
-		this.set = function ( value ) {};
-
-	}
-	if ( guiParams.cookie !== undefined ) cookie = guiParams.cookie;
 
 	//Localization
 
@@ -204,6 +214,9 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 		eyeSeparationName: 'Eye separation',
 		eyeSeparationTitle: 'The distance between left and right cameras.',
+
+		focus: 'Focus',
+		focusTitle: 'Object distance.',
 
 		zeroParallaxName: 'Zero parallax',
 		zeroParallaxTitle: 'Distance to objects with zero parallax.',
@@ -230,6 +243,9 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 			_lang.eyeSeparationName = 'Развод камер';
 			_lang.eyeSeparationTitle = 'Расстояние между левой и правой камерами.';
+
+			_lang.focus = 'Фокус';
+			_lang.focusTitle = 'Расстояние до объекта.';
 
 			_lang.zeroParallaxName = 'Параллакс 0';
 			_lang.zeroParallaxTitle = 'Расстояние до объектов с нулевым параллаксом.';
@@ -259,7 +275,9 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 		var _display = value == THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono ? 'none' : 'block';
 		_controllerEyeSep.__li.style.display = _display;
-		controllerDefaultF.__li.style.display = _display;
+		if ( _controllerCameraFocus !== undefined )
+			_controllerCameraFocus.__li.style.display = _display;
+		_controllerDefaultF.__li.style.display = _display;
 		_controllerZeroParallax.__li.style.display = _display;
 
 	}
@@ -274,19 +292,34 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 		displayControllers( value );
 
-		new cookie( 'spatialMultiplex' ).set( value );
+		new options.cookie( 'spatialMultiplex' ).set( value );
 
 	} ), _lang.spatialMultiplexName, _lang.spatialMultiplexTitle );
 
 	//eyeSeparation
 	//http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
-	var _controllerEyeSep = _fStereoEffects.add( options.stereo, 'eyeSep', 0, 1 * guiParams.scale, 0.001 * guiParams.scale )
+	var _controllerEyeSep = _fStereoEffects.add( options.stereo, 'eyeSep', 0, options.eyeSep() * 3, options.eyeSep() / 10 )
 		.onChange( function ( value ) {
 
-			new cookie( 'eyeSeparation' ).set( value );
+			new options.cookie( 'eyeSeparation' ).set( value );
 
 		} );
 	dat.controllerNameAndTitle( _controllerEyeSep, _lang.eyeSeparationName, _lang.eyeSeparationTitle );
+
+	//camera.focus
+	var _controllerCameraFocus;
+	if ( options.camera ) {
+
+		_controllerCameraFocus = _fStereoEffects.add( options.camera, 'focus',
+			options.defaultFocus() / 10, options.defaultFocus() * 2, options.defaultFocus() / 10 )
+			.onChange( function ( value ) {
+
+				new options.cookie( 'cameraFocus' ).set( value );
+
+			} );
+		dat.controllerNameAndTitle( _controllerCameraFocus, _lang.focus, _lang.focusTitle );
+
+	}
 
 	//Zero parallax
 	//http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
@@ -294,25 +327,32 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	var _controllerZeroParallax = _fStereoEffects.add( options, 'zeroParallax', - _minMax, _minMax )
 		.onChange( function ( value ) {
 
-			new cookie( 'zeroParallax' ).set( value );
+			new options.cookie( 'zeroParallax' ).set( value );
 
 		} );
 	dat.controllerNameAndTitle( _controllerZeroParallax, _lang.zeroParallaxName, _lang.zeroParallaxTitle );
 
 	//default button
-	var controllerDefaultF = _fStereoEffects.add( {
+	var _controllerDefaultF = _fStereoEffects.add( {
 		defaultF: function ( value ) {
 
-			options.stereo.eyeSep = new THREE.StereoCamera().eyeSep;
+			options.stereo.eyeSep = options.eyeSep();
 			_controllerEyeSep.setValue( options.stereo.eyeSep );
 
-			options.zeroParallax = THREE.StereoEffectParameters.zeroParallaxDefault;
-			_controllerZeroParallax.setValue( THREE.StereoEffectParameters.zeroParallaxDefault );
+			if ( options.camera ) {
+
+				options.camera.focus = options.defaultFocus();
+				_controllerCameraFocus.setValue( options.camera.focus );
+
+				options.zeroParallax = THREE.StereoEffectParameters.zeroParallaxDefault;
+				_controllerZeroParallax.setValue( THREE.StereoEffectParameters.zeroParallaxDefault );
+
+			}
 
 		},
 
 	}, 'defaultF' );
-	dat.controllerNameAndTitle( controllerDefaultF, _lang.defaultButton, _lang.defaultTitle );
+	dat.controllerNameAndTitle( _controllerDefaultF, _lang.defaultButton, _lang.defaultTitle );
 
 	displayControllers( options.spatialMultiplex );
 

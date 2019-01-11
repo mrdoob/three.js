@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - effects - stereo</title>
@@ -53,7 +53,7 @@
 
 			}
 
-			var container, camera, scene, renderer, effect, scale = 1;
+			var container, camera, scene, renderer, effect, scale = 1, far = 10 * scale;
 
 			var spheres = [];
 
@@ -74,7 +74,7 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01 * scale, 10 * scale );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01 * scale, far );
 				camera.position.set( 1 * scale, 1 * scale, 5 * scale );
 
 				// SCENE
@@ -115,21 +115,21 @@
 
 				//
 
-				var optionsStereoEffect = {
+				effect = new THREE.StereoEffect( renderer, {
 
 					cookie: THREE.cookie,
+					far: far,
+					camera: camera,
 
-				};
-				effect = new THREE.StereoEffect( renderer, optionsStereoEffect );
+				} );
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//dat-gui JavaScript Controller Library
 
 				var gui = new dat.GUI();
-				THREE.gui.stereoEffect( gui, optionsStereoEffect, {
+				THREE.gui.stereoEffect( gui, effect.options, {
 
 					getLanguageCode: THREE.getLanguageCode,
-					cookie: THREE.cookie,
 
 				} );
 
