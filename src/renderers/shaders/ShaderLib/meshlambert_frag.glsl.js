@@ -4,15 +4,11 @@ uniform vec3 emissive;
 uniform float opacity;
 
 varying vec3 vLightFront;
-#if defined(USE_SHADOWMAP) && NUM_HEMI_LIGHTS > 0
-	varying vec3 vAmbientLightFront;
-#endif
+varying vec3 vIndirectFront;
 
 #ifdef DOUBLE_SIDED
 	varying vec3 vLightBack;
-	#if defined(USE_SHADOWMAP) && NUM_HEMI_LIGHTS > 0
-		varying vec3 vAmbientLightBack;
-	#endif
+	varying vec3 vIndirectBack;
 #endif
 
 
@@ -56,16 +52,14 @@ void main() {
 	// accumulation
 	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );
 
-	#if defined(USE_SHADOWMAP) && NUM_HEMI_LIGHTS > 0
-		#ifdef DOUBLE_SIDED
+	#ifdef DOUBLE_SIDED
 
-			reflectedLight.indirectDiffuse += ( gl_FrontFacing ) ? vAmbientLightFront : vAmbientLightBack;
+		reflectedLight.indirectDiffuse += ( gl_FrontFacing ) ? vIndirectFront : vIndirectBack;
 
-		#else
+	#else
 
-			reflectedLight.indirectDiffuse += vAmbientLightFront;
+		reflectedLight.indirectDiffuse += vIndirectFront;
 
-		#endif
 	#endif
 
 	#include <lightmap_fragment>
