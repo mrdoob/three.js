@@ -29,7 +29,7 @@ npm install canvas vblob
 Usage:
 
 ```
-./legacythree2gltf.js model.json
+./legacythree2gltf.js model.json --optimize
 ```
 
 Known issues:
