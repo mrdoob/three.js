@@ -6,8 +6,13 @@
 <style>
 canvas {
   min-width: 512px;
-  min-height: 32px;
   image-rendering: pixelated;
+}
+@media (max-width: 530px) {
+  canvas {
+    min-width: 0px;
+    width: calc(100vw - 20px);
+  }
 }
 </style>
 </head>
