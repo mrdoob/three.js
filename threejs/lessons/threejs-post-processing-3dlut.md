@@ -486,6 +486,9 @@ Note that Adobe LUTs are not designed for online usage. They are large files. Yo
 
 The sample below is just a modification of the code above. We only draw the background picture, no glTF file. That picture is the an identity lut image created from the script above. We then use the effect to apply whatever LUT file is loaded so the result is the image we'd need to reproduce the LUT file as a PNG.
 
-<script src="resources/threejs-post-processing-3dlut.js"></script>
+{{{example url="../threejs-postprocessing-adobe-lut-to-png-converter.html" }}}
 
 One thing completely skipped is how the shader itself works. Hopefully we can cover a little more GLSL in the future. For now, if you're curious, you can follow the links in the [post processing article](threejs-post-processing.html) as well as maybe [take a look at this video](https://www.youtube.com/watch?v=rfQ8rKGTVlg#t=24m30s).
+
+<script src="resources/threejs-post-processing-3dlut.js"></script>
+
