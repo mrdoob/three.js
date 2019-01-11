@@ -211,7 +211,8 @@ code {
   text-align: center;
   max-width: 95%;
 }
-.threejs_center>img {
+.threejs_center>img,
+.threejs_center>object {
   max-width: 100%;
 }
 .threejs_image>img {
