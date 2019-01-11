@@ -13,8 +13,15 @@ backGeometry.viewDir = geometry.viewDir;
 
 vLightFront = vec3( 0.0 );
 
+#if defined (USE_SHADOWMAP) && NUM_HEMI_LIGHTS > 0
+	vAmbientLightFront = vec3( 0.0 );
+#endif
+
 #ifdef DOUBLE_SIDED
 	vLightBack = vec3( 0.0 );
+	#if defined(USE_SHADOWMAP) && NUM_HEMI_LIGHTS > 0
+		vAmbientLightBack = vec3( 0.0 );
+	#endif
 #endif
 
 IncidentLight directLight;
@@ -103,11 +110,19 @@ vec3 directLightColor_Diffuse;
 	#pragma unroll_loop
 	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-		vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+		#ifdef USE_SHADOWMAP
+			vAmbientLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+		#else
+			vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+		#endif
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
+			#ifdef USE_SHADOWMAP
+				vAmbientLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
+			#else
+				vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
+			#endif
 
 		#endif
 

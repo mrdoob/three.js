@@ -2,11 +2,15 @@ export default /* glsl */`
 #define LAMBERT
 
 varying vec3 vLightFront;
+#if defined(USE_SHADOWMAP) && NUM_HEMI_LIGHTS > 0
+	varying vec3 vAmbientLightFront;
+#endif
 
 #ifdef DOUBLE_SIDED
-
 	varying vec3 vLightBack;
-
+	#if defined(USE_SHADOWMAP) && NUM_HEMI_LIGHTS > 0
+		varying vec3 vAmbientLightBack;
+	#endif
 #endif
 
 #include <common>
