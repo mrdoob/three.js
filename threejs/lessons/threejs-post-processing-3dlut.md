@@ -46,7 +46,7 @@ We'll also add a background image like we covered in [backgrounds and skyboxs](t
 
 Now that we have a scene we need a 3DLUT. The simplest 3DLUT is a 2x2x2 identity LUT where *identity* means nothing happens. It's like multiplying by 1 or doing nothign, even though we're looking up colors in the LUT each color in maps to the same color out.
 
-<div class="threejs_center"><img src="resources/images/3dlut-standard-2x2.svg" style="width: 100px"></div>
+<div class="threejs_center"><img src="resources/images/3dlut-standard-2x2.svg" style="width: 200px"></div>
 
 WebGL1 doesn't support 3D textures so we'll use 4x2 2D texture and treat it as a 3D texture inside a custom shader where each slice of the cube is spread out horizontally across the texture.
 
