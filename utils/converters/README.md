@@ -35,4 +35,3 @@ Usage:
 Known issues:
 - [ ] Creates `.gltf` files with embedded Data URIs. Optimize to `.glb` using glTF-Pipeline to reduce file size.
 - [ ] Limited support for morph targets (https://github.com/mrdoob/three.js/pull/15011)
-- [ ] Conversion to BufferGeometry increases the number of vertices unnecessarily

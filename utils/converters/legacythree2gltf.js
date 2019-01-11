@@ -7,13 +7,18 @@ const { Blob, FileReader } = require( 'vblob' );
 THREE = require( '../../build/three.js' );
 require( '../../examples/js/loaders/deprecated/LegacyJSONLoader.js' );
 require( '../../examples/js/exporters/GLTFExporter.js' );
+require( '../../examples/js/utils/BufferGeometryUtils.js' );
 
 if ( process.argv.length <= 2 ) {
 
-	console.log( `Usage: ${path.basename( __filename )} model.json` );
+	console.log( `Usage: ${path.basename( __filename )} model.json [ --optimize ]` );
 	process.exit( - 1 );
 
 }
+
+var file = process.argv[ 2 ];
+var optimize = process.argv.indexOf( '--optimize' ) > 0;
+var resourceDirectory = THREE.LoaderUtils.extractUrlBase( file );
 
 //
 
@@ -40,11 +45,9 @@ global.document = {
 //
 
 // Load legacy JSON file and construct a mesh.
-var file = process.argv[ 2 ];
-var resourceDirectory = THREE.LoaderUtils.extractUrlBase( file );
-var loader = new THREE.LegacyJSONLoader();
 
 var jsonContent = fs.readFileSync( file, 'utf8' );
+var loader = new THREE.LegacyJSONLoader();
 var { geometry, materials } = loader.parse( JSON.parse( jsonContent ), resourceDirectory );
 
 var mesh;
@@ -61,6 +64,12 @@ if ( geometry.groups.length === 1 ) geometry.clearGroups();
 if ( ! materials ) {
 
 	materials = new THREE.MeshStandardMaterial( { color: 0x888888, roughness: 1, metalness: 0 } );
+
+}
+
+if ( optimize ) {
+
+	geometry = THREE.BufferGeometryUtils.mergeVertices( geometry );
 
 }
 
