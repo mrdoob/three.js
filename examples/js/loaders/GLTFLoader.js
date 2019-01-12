@@ -365,6 +365,10 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		// Some lights (e.g. spot) default to a position other than the origin. Reset the position
+		// here, because node-level parsing will only override position if explicitly specified.
+		lightNode.position.set( 0, 0, 0 );
+
 		lightNode.decay = 2;
 
 		if ( lightDef.intensity !== undefined ) lightNode.intensity = lightDef.intensity;
