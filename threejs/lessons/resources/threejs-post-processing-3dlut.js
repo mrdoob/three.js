@@ -3,27 +3,23 @@
 /* global */
 
 {
-  function makeWaiter() {
-    let resolve;
-    const promise = new Promise((_resolve) => {
-      resolve = _resolve;
-    });
-    return {
-      promise,
-      resolve,
-    };
-  }
+    class Waiter {
+      constructor() {
+        this.promise = new Promise((resolve) => {
+          this.resolve = resolve;
+        });
+      }
+    }
 
-  async function getSVGDocument(elem) {
-    let doc = elem.getSVGDocument();
-    if (!doc) {
-      const waiter = makeWaiter();
+    async function getSVGDocument(elem) {
+      const data = elem.data;
+      elem.data = '';
+      elem.data = data;
+      const waiter = new Waiter();
       elem.addEventListener('load', waiter.resolve);
       await waiter.promise;
-      doc = elem.getSVGDocument();
+      return elem.getSVGDocument();
     }
-    return doc;
-  }
 
   const diagrams = {
     lookup: {
