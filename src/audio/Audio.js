@@ -95,7 +95,9 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var source = this.context.createBufferSource();
 
 		source.buffer = this.buffer;
-		source.detune.value = this.detune;
+		// This line of code makes the sound on the iso12 device not playable.
+		// source.detune.value = this.detune;
+		
 		source.loop = this.loop;
 		source.onended = this.onEnded.bind( this );
 		source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
