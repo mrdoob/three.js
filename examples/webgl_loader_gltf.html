@@ -39,7 +39,7 @@
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="module">
-			import * as THREE from '../build/three.module.js';
+			import { PerspectiveCamera, CubeTextureLoader, Scene, HemisphereLight, WebGLRenderer } from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
@@ -63,7 +63,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.9, 2.7 );
 
 				controls = new OrbitControls( camera );
@@ -71,13 +71,13 @@
 				controls.update();
 
 				var urls = [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ];
-				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/Bridge2/' );
+				var loader = new CubeTextureLoader().setPath( 'textures/cube/Bridge2/' );
 				var background = loader.load( urls );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 				scene.background = background;
 
-				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
+				light = new HemisphereLight( 0xbbbbff, 0x444422 );
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
@@ -103,7 +103,7 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
