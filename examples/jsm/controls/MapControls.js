@@ -1163,4 +1163,4 @@ Object.defineProperties( MapControls.prototype, {
 
 } );
 
-export { MapControls }
+export { MapControls };

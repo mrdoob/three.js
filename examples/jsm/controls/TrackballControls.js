@@ -499,7 +499,7 @@ var TrackballControls = function ( object, domElement ) {
 	function touchstart( event ) {
 
 		if ( _this.enabled === false ) return;
-		
+
 		event.preventDefault();
 
 		switch ( event.touches.length ) {
@@ -625,4 +625,4 @@ var TrackballControls = function ( object, domElement ) {
 TrackballControls.prototype = Object.create( EventDispatcher.prototype );
 TrackballControls.prototype.constructor = THREE.TrackballControls;
 
-export { TrackballControls }
+export { TrackballControls };
