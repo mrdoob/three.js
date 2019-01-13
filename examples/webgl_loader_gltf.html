@@ -35,15 +35,16 @@
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
+			var WEBGL = window.WEBGL;
+			var Stats = window.Stats;
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
@@ -65,7 +66,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.9, 2.7 );
 
-				controls = new THREE.OrbitControls( camera );
+				controls = new OrbitControls( camera );
 				controls.target.set( 0, - 0.2, - 0.2 );
 				controls.update();
 
@@ -81,7 +82,7 @@
 				scene.add( light );
 
 				// model
-				var loader = new THREE.GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+				var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 					gltf.scene.traverse( function ( child ) {
