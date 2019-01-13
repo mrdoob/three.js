@@ -1036,7 +1036,7 @@ var MapControls = function ( object, domElement ) {
 };
 
 MapControls.prototype = Object.create( EventDispatcher.prototype );
-MapControls.prototype.constructor = MapControls;
+MapControls.prototype.constructor = THREE.MapControls;
 
 Object.defineProperties( MapControls.prototype, {
 
