@@ -127,16 +127,21 @@ Object.assign( Curve.prototype, {
 
 	// Get total curve arc length
 
-	getLength: function () {
+	getLength: ( function ( ) {
+		var optionalTarget = [];
 
-		var lengths = this.getLengths();
-		return lengths[ lengths.length - 1 ];
+		return function () {
 
-	},
+			var lengths = this.getLengths( undefined, optionalTarget );
+			return lengths[ lengths.length - 1 ];
+
+		};
+
+	} )(),
 
 	// Get list of cumulative segment lengths
 
-	getLengths: function ( divisions ) {
+	getLengths: function ( divisions, optionalTarget ) {
 
 		if ( divisions === undefined ) divisions = this.arcLengthDivisions;
 
@@ -150,7 +155,9 @@ Object.assign( Curve.prototype, {
 
 		this.needsUpdate = false;
 
-		var cache = [];
+		if ( optionalTarget ) optionalTarget.length = 0;
+
+		var cache = optionalTarget || [];
 		var current, last = this.getPoint( 0 );
 		var p, sum = 0;
 
@@ -261,8 +268,8 @@ Object.assign( Curve.prototype, {
 
 	getTangent: ( function () {
 
-		var pt1 = new Vector3();
-		var pt2 = new Vector3();
+		var pt1 = new THREE.Vector3();
+		var pt2 = new THREE.Vector3();
 
 		return function ( t, optionalTarget ) {
 

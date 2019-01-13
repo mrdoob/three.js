@@ -31,20 +31,20 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Vector getPoint]( [param:Float t], [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector getPoint]( [param:Float t], [param:Vector optionalTarget] )</h3>
     <p>
 			[page:Float t] - A position on the curve. Must be in the range [ 0, 1 ]. <br>
-		  [page:Vector3 optionalTarget] — (optional) target to set the result. Otherwise a new [page:Vector3] is instantiated.
+		  optionalTarget - — (optional) target to set the result. Otherwise a new Vector is instantiated. Can be a [page:Vector2] or [page:Vector3] depending if the curve is in a 2D or 3D context.
 		</p>
 		<p>
 			Returns a vector for a given position on the curve.
 		</p>
 
-		<h3>[method:Vector getPointAt]( [param:Float u], [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector getPointAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
     <p>
 			[page:Float u] - A position on the curve according to the arc length. Must be in the range [ 0, 1 ]. <br>
 			[page:Vector optionalTarget] — (optional) If specified, the result will be copied into this Vector,
-			otherwise a new Vector will be created.
+			otherwise a new [page:Vector2] or [page:Vector3] will be created depending on the context of the curve.
     </p>
 		<p>
 			Returns a vector for a given position on the curve according to the arc length.
@@ -73,7 +73,10 @@
 		<h3>[method:Float getLength]()</h3>
 		<p>Get total curve arc length.</p>
 
-		<h3>[method:Array getLengths]( [param:Integer divisions] )</h3>
+		<h3>[method:Array getLengths]( [param:Integer divisions], [param:Array optionalTarget] )</h3>
+    <p>
+		  [page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated.
+    </p>
 		<p>Get list of cumulative segment lengths.</p>
 
 		<h3>[method:null updateArcLengths]()</h3>
@@ -86,9 +89,9 @@
 			using [page:.getPoint].
 		 </p>
 
-		<h3>[method:Vector getTangent]( [param:Float t, [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector getTangent]( [param:Float t, [param:Vector optionalTarget] )</h3>
     <p>
-		  [page:Vector3 optionalTarget] — (optional) target to set the result. Otherwise a new [page:Vector3] is instantiated.
+		  optionalTarget - — (optional) target to set the result. Otherwise a new Vector is instantiated. Can be a [page:Vector2] or [page:Vector3] depending if the curve is in a 2D or 3D context.
 		</p>
 		<p>
 			Returns a unit vector tangent at t. If the derived curve does not implement its
@@ -96,9 +99,9 @@
 			which seems to give a reasonable approximation.
 		</p>
 
-		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
     <p>
-		  [page:Vector3 optionalTarget] — (optional) target to set the result. Otherwise a new [page:Vector3] is instantiated.
+		  optionalTarget - — (optional) target to set the result. Otherwise a new Vector is instantiated. Can be a [page:Vector2] or [page:Vector3] depending if the curve is in a 2D or 3D context.
 		</p>
 		<p>
 			Returns tangent at a point which is equidistant to the ends of the curve from the
