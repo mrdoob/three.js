@@ -932,7 +932,7 @@ var OrbitControls = function ( object, domElement ) {
 };
 
 OrbitControls.prototype = Object.create( EventDispatcher.prototype );
-OrbitControls.prototype.constructor = THREE.OrbitControls;
+OrbitControls.prototype.constructor = OrbitControls;
 
 Object.defineProperties( OrbitControls.prototype, {
 
