@@ -81,6 +81,21 @@ function fixSourceLinks(url, source) {
   return source;
 }
 
+function fixCSSLinks(url, source) {
+  const cssUrlRE = /(url\()(.*?)(\))/g;
+  const prefix = getPrefix(url);
+
+  function addPrefix(url) {
+    return url.indexOf('://') < 0 ? (prefix + url) : url;
+  }
+  function makeFQ(match, prefix, url, suffix) {
+    return `${prefix}${addPrefix(url)}${suffix}`;
+  }
+
+  source = source.replace(cssUrlRE, makeFQ);
+  return source;
+}
+
 const g = {
   html: '',
 };
@@ -130,7 +145,7 @@ function parseHTML(url, html) {
   const hrefRE = /href="([^"]+)"/;
 
   const obj = { html: html };
-  htmlParts.css.source = getHTMLPart(styleRE, obj, '<style>\n${css}</style>');
+  htmlParts.css.source = fixCSSLinks(url, getHTMLPart(styleRE, obj, '<style>\n${css}</style>'));
   htmlParts.html.source = getHTMLPart(bodyRE, obj, '<body>${html}</body>');
   htmlParts.js.source = getHTMLPart(inlineScriptRE, obj, '<script>${js}</script>');
   html = obj.html;
