@@ -467,17 +467,32 @@ if ( typeof dat !== 'undefined' ) {
 	//dat.GUI is included into current project
 	//See https://github.com/dataarts/dat.gui/blob/master/API.md about dat.GUI API.
 
+	function elNameAndTitle( el, name, title ) {
+
+		el.innerHTML = name;
+		if ( title !== undefined )
+			el.title = title;
+
+	}
+
 	if ( dat.controllerNameAndTitle === undefined ) {
 
 		dat.controllerNameAndTitle = function ( controller, name, title ) {
 
-			var _elPropertyName = controller.__li.querySelector( ".property-name" );
-			_elPropertyName.innerHTML = name;
-			if ( title !== undefined )
-				_elPropertyName.title = title;
+			elNameAndTitle( controller.__li.querySelector( ".property-name" ), name, title );
 
 		};
 
 	} else console.error( 'Duplicate dat.controllerNameAndTitle method' );
+
+	if ( dat.folderNameAndTitle === undefined ) {
+
+		dat.folderNameAndTitle = function ( folder, name, title ) {
+
+			elNameAndTitle( folder.__ul.querySelector( "li.title" ), name, title );
+
+		};
+
+	} else console.error( 'Duplicate dat.folderNameAndTitle method' );
 
 }
