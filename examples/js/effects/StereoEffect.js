@@ -76,22 +76,18 @@ THREE.StereoEffect = function ( renderer, options ) {
 		};
 	if ( options.spatialMultiplex === undefined )
 		options.spatialMultiplex = new options.cookie( 'spatialMultiplex' ).get( THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS );//Use 'Side by side' for compability with previous version of THREE.StereoEffect
-	if ( options.camera !== undefined )
-		options.camera.focus = parseInt( new options.cookie( 'cameraFocus' ).get( new THREE.PerspectiveCamera().focus ) );
 	if ( options.zeroParallax === undefined )
 		options.zeroParallax = parseInt( new options.cookie( 'zeroParallax' ).get( THREE.StereoEffectParameters.zeroParallaxDefault ) );
 	if ( options.far === undefined )
-		options.far = 10;
+		options.far = new THREE.PerspectiveCamera().focus;
 	options.eyeSep = function () {
 
 		return ( new THREE.StereoCamera().eyeSep / 10 ) * options.far;
 
 	};
-	options.defaultFocus = function () {
-
-		return ( 6990 / 999 ) * ( options.far / 10 ) + 10 - 6990 / 999;
-
-	};
+	options.focus = options.camera === undefined ? new THREE.PerspectiveCamera().focus : new THREE.Vector3().distanceTo( options.camera.position );
+	if ( options.camera !== undefined )
+		options.camera.focus = parseInt( new options.cookie( 'cameraFocus' ).get( options.focus ) );
 
 	options.stereo.eyeSep = ( new options.cookie( 'eyeSeparation' ).get( options.eyeSep() ) * 10000 ) / 10000;
 
@@ -311,7 +307,7 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	if ( options.camera ) {
 
 		_controllerCameraFocus = _fStereoEffects.add( options.camera, 'focus',
-			options.defaultFocus() / 10, options.defaultFocus() * 2, options.defaultFocus() / 10 )
+			options.focus / 10 , options.focus * 2, options.focus / 1000 )
 			.onChange( function ( value ) {
 
 				new options.cookie( 'cameraFocus' ).set( value );
@@ -341,7 +337,7 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 			if ( options.camera ) {
 
-				options.camera.focus = options.defaultFocus();
+				options.camera.focus = options.focus;
 				_controllerCameraFocus.setValue( options.camera.focus );
 
 				options.zeroParallax = THREE.StereoEffectParameters.zeroParallaxDefault;
