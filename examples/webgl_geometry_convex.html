@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - convex geometry</title>
@@ -15,7 +15,6 @@
 				position: absolute;
 				color: #fff;
 				top: 0px;
-				width: 100%;
 				padding: 5px;
 				text-align:center;
 			}
@@ -34,6 +33,8 @@
 		<script src="js/geometries/ConvexGeometry.js"></script>
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/effects/StereoEffect.js"></script>
 
 		<script>
 
@@ -135,6 +136,23 @@
 
 				//
 
+				effect = new THREE.StereoEffect( renderer, {
+
+					spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono,
+					far: camera.far,
+					camera: camera,
+
+				} );
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+
+				//dat-gui JavaScript Controller Library
+
+				var gui = new dat.GUI();
+				THREE.gui.stereoEffect( gui, effect.options );
+
+				//
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -166,7 +184,9 @@
 
 			function render() {
 
-				renderer.render( scene, camera );
+				if ( effect === undefined )
+					renderer.render( scene, camera );
+				else effect.render( scene, camera );
 
 			}
 
