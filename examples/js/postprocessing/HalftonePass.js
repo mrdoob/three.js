@@ -55,11 +55,14 @@ THREE.HalftonePass = function ( width, height, params ) {
 
  		if ( this.renderToScreen ) {
 
+ 			renderer.setRenderTarget( null );
  			renderer.render( this.scene, this.camera );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+ 			renderer.setRenderTarget( writeBuffer );
+ 			if ( this.clear ) renderer.clear();
+			renderer.render( this.scene, this.camera );
 
 		}
 

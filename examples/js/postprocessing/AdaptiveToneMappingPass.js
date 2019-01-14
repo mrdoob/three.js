@@ -148,7 +148,8 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			//Render the luminance of the current scene into a render target with mipmapping enabled
 			this.quad.material = this.materialLuminance;
 			this.materialLuminance.uniforms.tDiffuse.value = readBuffer.texture;
-			renderer.render( this.scene, this.camera, this.currentLuminanceRT );
+			renderer.setRenderTarget( this.currentLuminanceRT );
+			renderer.render( this.scene, this.camera );
 
 			//Use the new luminance values, the previous luminance and the frame delta to
 			//adapt the luminance over time.
@@ -156,11 +157,13 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.materialAdaptiveLum.uniforms.delta.value = delta;
 			this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT.texture;
 			this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT.texture;
-			renderer.render( this.scene, this.camera, this.luminanceRT );
+			renderer.setRenderTarget( this.luminanceRT );
+			renderer.render( this.scene, this.camera );
 
 			//Copy the new adapted luminance value so that it can be used by the next frame.
 			this.quad.material = this.materialCopy;
 			this.copyUniforms.tDiffuse.value = this.luminanceRT.texture;
+			renderer.setRenderTarget( this.previousLuminanceRT );
 			renderer.render( this.scene, this.camera, this.previousLuminanceRT );
 
 		}
@@ -170,11 +173,16 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 		if ( this.renderToScreen ) {
 
+			renderer.setRenderTarget( null );
 			renderer.render( this.scene, this.camera );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+			renderer.setRenderTarget( writeBuffer );
+
+			if ( this.clear ) renderer.clear();
+
+			renderer.render( this.scene, this.camera );
 
 		}
 

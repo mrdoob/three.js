@@ -234,7 +234,9 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		// Rendering scene to depth texture
 		renderer.setClearColor( 0x000000 );
-		renderer.render( this.scene, this.camera, this.beautyRenderTarget, true );
+		renderer.setRenderTarget( this.beautyRenderTarget );
+		renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// Re-render scene if depth texture extension is not supported
 		if ( ! this.supportsDepthTextureExtension ) {
@@ -317,18 +319,20 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
+		renderer.setRenderTarget( renderTarget);
+
 		// setup pass state
 		renderer.autoClear = false;
-		var clearNeeded = ( clearColor !== undefined ) && ( clearColor !== null );
-		if ( clearNeeded ) {
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
 			renderer.setClearColor( clearColor );
 			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
 
 		}
 
 		this.quad.material = passMaterial;
-		renderer.render( this.quadScene, this.quadCamera, renderTarget, clearNeeded );
+		renderer.render( this.quadScene, this.quadCamera );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
@@ -343,20 +347,21 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
+		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = false;
 
 		clearColor = overrideMaterial.clearColor || clearColor;
 		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
-		var clearNeeded = ( clearColor !== undefined ) && ( clearColor !== null );
-		if ( clearNeeded ) {
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
 			renderer.setClearColor( clearColor );
 			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
 
 		}
 
 		this.scene.overrideMaterial = overrideMaterial;
-		renderer.render( this.scene, this.camera, renderTarget, clearNeeded );
+		renderer.render( this.scene, this.camera );
 		this.scene.overrideMaterial = null;
 
 		// restore original state

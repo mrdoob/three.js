@@ -75,6 +75,8 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	render: function ( delta ) {
 
+		var currentRenderTarget = this.renderer.getRenderTarget();
+
 		var maskActive = false;
 
 		var pass, i, il = this.passes.length;
@@ -120,6 +122,8 @@ Object.assign( THREE.EffectComposer.prototype, {
 			}
 
 		}
+
+		this.renderer.setRenderTarget( currentRenderTarget );
 
 	},
 
