@@ -58,7 +58,9 @@ function fixSourceLinks(url, source) {
   const srcRE = /(src=)"(.*?)"/g;
   const linkRE = /(href=)"(.*?")/g;
   const imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
-  const loaderLoadRE = /(loader.load[a-z]*\()('|")(.*?)('|")/ig;
+  const loaderLoadRE = /(loader\.load[a-z]*\()('|")(.*?)('|")/ig;
+  const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
+  const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;
   const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
   const prefix = getPrefix(url);
 
@@ -71,12 +73,22 @@ function fixSourceLinks(url, source) {
   function makeLinkFDedQuotes(match, fn, q1, url, q2) {
     return fn + q1 + addPrefix(url) + q2;
   }
+  function makeArrayLinksFDed(match, prefix, arrayStr, suffix) {
+    const lines = arrayStr.split(',').map((line) => {
+      const m = arrayLineRE.exec(line);
+      return m
+          ? `${m[1]}${addPrefix(m[2])}${m[3]}`
+          : line;
+    });
+    return `${prefix}${lines.join(',')}${suffix}`;
+  }
 
   source = source.replace(srcRE, makeLinkFQed);
   source = source.replace(linkRE, makeLinkFQed);
   source = source.replace(imageSrcRE, makeLinkFQed);
   source = source.replace(urlPropRE, makeLinkFDedQuotes);
   source = source.replace(loaderLoadRE, makeLinkFDedQuotes);
+  source = source.replace(loaderArrayLoadRE, makeArrayLinksFDed);
 
   return source;
 }
