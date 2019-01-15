@@ -324,8 +324,8 @@ function RollerCoasterLiftersGeometry( curve, divisions ) {
 
 	for ( var i = 1; i <= divisions; i ++ ) {
 
-		point.copy( curve.getPointAt( i / divisions ) );
-		tangent.copy( curve.getTangentAt( i / divisions ) );
+		curve.getPointAt( i / divisions, point );
+		curve.getTangentAt( i / divisions, tangent );
 
 		var angle = Math.atan2( tangent.x, tangent.z );
 

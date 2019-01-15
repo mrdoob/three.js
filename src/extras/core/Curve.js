@@ -1,4 +1,5 @@
 import { _Math } from '../../math/Math.js';
+import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 
@@ -128,6 +129,7 @@ Object.assign( Curve.prototype, {
 	// Get total curve arc length
 
 	getLength: ( function ( ) {
+
 		var optionalTarget = [];
 
 		return function () {
@@ -268,10 +270,18 @@ Object.assign( Curve.prototype, {
 
 	getTangent: ( function () {
 
-		var pt1 = new THREE.Vector3();
-		var pt2 = new THREE.Vector3();
+		var vec2_1 = new Vector2();
+		var vec2_2 = new Vector2();
+		var vec3_1 = new Vector3();
+		var vec3_2 = new Vector3();
 
-		return function ( t, optionalTarget ) {
+		return function ( t, target ) {
+
+			if ( ! target ) {
+
+				throw new Error( 'THREE.Curve.getTangent: a target (Vector2 or Vector3 depending on the Curve type) is required as the second argument. ' );
+
+			}
 
 			var delta = 0.0001;
 			var t1 = t - delta;
@@ -282,32 +292,42 @@ Object.assign( Curve.prototype, {
 			if ( t1 < 0 ) t1 = 0;
 			if ( t2 > 1 ) t2 = 1;
 
-			this.getPoint( t1, pt1 );
-			this.getPoint( t2, pt2 );
+			var pt1;
+			var pt2;
 
-			var vec;
+			if ( target.isVector3 ) {
 
-			if ( optionalTarget ) {
-
-				vec = optionalTarget;
-				vec.copy( pt2 ).sub( pt1 );
+				pt1 = vec3_1;
+				pt2 = vec3_2;
 
 			} else {
 
-				vec = pt2.clone().sub( pt1 );
+				pt1 = vec2_1;
+				pt2 = vec2_2;
 
 			}
 
-			return vec.normalize();
+			this.getPoint( t1, pt1 );
+			this.getPoint( t2, pt2 );
+
+			target.copy( pt2 ).sub( pt1 );
+
+			return target.normalize();
 
 		};
 
 	} )(),
 
-	getTangentAt: function ( u, optionalTarget ) {
+	getTangentAt: function ( u, target ) {
+
+		if ( ! target ) {
+
+			throw new Error( 'THREE.Curve.getTangentAt: a target ( Vector2 or Vector3 depending on the Curve type ) is required as the second argument. ' );
+
+		}
 
 		var t = this.getUtoTmapping( u );
-		return this.getTangent( t, optionalTarget );
+		return this.getTangent( t, target );
 
 	},
 

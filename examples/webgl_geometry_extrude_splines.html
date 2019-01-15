@@ -310,7 +310,8 @@
 			binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
 			binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
 
-			var dir = tubeGeometry.parameters.path.getTangentAt( t );
+			var dir = new THREE.Vector3();
+			tubeGeometry.parameters.path.getTangentAt( t, dir );
 			var offset = 15;
 
 			normal.copy( binormal ).cross( dir );

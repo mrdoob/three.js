@@ -89,9 +89,9 @@
 			using [page:.getPoint].
 		 </p>
 
-		<h3>[method:Vector getTangent]( [param:Float t, [param:Vector optionalTarget] )</h3>
+		<h3>[method:Vector getTangent]( [param:Float t, [param:Vector target] )</h3>
     <p>
-		  optionalTarget - — (optional) target to set the result. Otherwise a new Vector is instantiated. Can be a [page:Vector2] or [page:Vector3] depending if the curve is in a 2D or 3D context.
+		  target - —  (required) target to set the result. Otherwise a new Vector is instantiated. Can be a [page:Vector2] or [page:Vector3] depending if the curve is in a 2D or 3D context.
 		</p>
 		<p>
 			Returns a unit vector tangent at t. If the derived curve does not implement its
@@ -99,9 +99,9 @@
 			which seems to give a reasonable approximation.
 		</p>
 
-		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector optionalTarget] )</h3>
+		<h3>[method:Vector getTangentAt]( [param:Float u], [param:Vector target] )</h3>
     <p>
-		  optionalTarget - — (optional) target to set the result. Otherwise a new Vector is instantiated. Can be a [page:Vector2] or [page:Vector3] depending if the curve is in a 2D or 3D context.
+		  target - — (required) target to set the result. Otherwise a new Vector is instantiated. Can be a [page:Vector2] or [page:Vector3] depending if the curve is in a 2D or 3D context.
 		</p>
 		<p>
 			Returns tangent at a point which is equidistant to the ends of the curve from the
