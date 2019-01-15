@@ -3182,7 +3182,68 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					return node;
+					if ( nodeDef.skin === undefined ) return node;
+
+					var skinEntry;
+
+					return parser.getDependency( 'skin', nodeDef.skin ).then( function ( skin ) {
+
+						skinEntry = skin;
+
+						var pendingJoints = [];
+
+						for ( var i = 0, il = skinEntry.joints.length; i < il; i ++ ) {
+
+							pendingJoints.push( parser.getDependency( 'node', skinEntry.joints[ i ] ) );
+
+						}
+
+						return Promise.all( pendingJoints );
+
+					} ).then( function ( jointNodes ) {
+
+						var meshes = node.isGroup === true ? node.children : [ node ];
+
+						for ( var i = 0, il = meshes.length; i < il; i ++ ) {
+
+							var mesh = meshes[ i ];
+
+							var bones = [];
+							var boneInverses = [];
+
+							for ( var j = 0, jl = jointNodes.length; j < jl; j ++ ) {
+
+								var jointNode = jointNodes[ j ];
+
+								if ( jointNode ) {
+
+									bones.push( jointNode );
+
+									var mat = new THREE.Matrix4();
+
+									if ( skinEntry.inverseBindMatrices !== undefined ) {
+
+										mat.fromArray( skinEntry.inverseBindMatrices.array, j * 16 );
+
+									}
+
+									boneInverses.push( mat );
+
+								} else {
+
+									console.warn( 'THREE.GLTFLoader: Joint "%s" could not be found.', skinEntry.joints[ j ] );
+
+								}
+
+							}
+
+							mesh.bind( new THREE.Skeleton( bones, boneInverses ), mesh.matrixWorld );
+
+						};
+
+						return node;
+
+					} );
 
 				} );
 
@@ -3242,7 +3303,31 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			return node;
+			var pending = [];
+
+			if ( nodeDef.children ) {
+
+				var children = nodeDef.children;
+
+				for ( var i = 0, il = children.length; i < il; i ++ ) {
+
+					pending.push( parser.getDependency( 'node', children[ i ] ) );
+
+				}
+
+			}
+
+			return Promise.all( pending ).then( function ( nodes ) {
+
+				for ( var i = 0, il = nodes.length; i < il; i ++ ) {
+
+					node.add( nodes[ i ] );
+
+				}
+
+				return node;
+
+			} );
 
 		} );
 
@@ -3253,141 +3338,43 @@ THREE.GLTFLoader = ( function () {
 	 * @param {number} sceneIndex
 	 * @return {Promise<THREE.Scene>}
 	 */
-	GLTFParser.prototype.loadScene = function () {
+	GLTFParser.prototype.loadScene = function ( sceneIndex ) {
 
-		// scene node hierachy builder
+		var json = this.json;
+		var extensions = this.extensions;
+		var sceneDef = this.json.scenes[ sceneIndex ];
+		var parser = this;
 
-		function buildNodeHierachy( nodeId, parentObject, json, parser ) {
+		var scene = new THREE.Scene();
+		if ( sceneDef.name !== undefined ) scene.name = sceneDef.name;
 
-			var nodeDef = json.nodes[ nodeId ];
+		assignExtrasToUserData( scene, sceneDef );
 
-			return parser.getDependency( 'node', nodeId ).then( function ( node ) {
+		if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
 
-				if ( nodeDef.skin === undefined ) return node;
+		var nodeIds = sceneDef.nodes || [];
 
-				// build skeleton here as well
+		var pending = [];
 
-				var skinEntry;
+		for ( var i = 0, il = nodeIds.length; i < il; i ++ ) {
 
-				return parser.getDependency( 'skin', nodeDef.skin ).then( function ( skin ) {
-
-					skinEntry = skin;
-
-					var pendingJoints = [];
-
-					for ( var i = 0, il = skinEntry.joints.length; i < il; i ++ ) {
-
-						pendingJoints.push( parser.getDependency( 'node', skinEntry.joints[ i ] ) );
-
-					}
-
-					return Promise.all( pendingJoints );
-
-				} ).then( function ( jointNodes ) {
-
-					var meshes = node.isGroup === true ? node.children : [ node ];
-
-					for ( var i = 0, il = meshes.length; i < il; i ++ ) {
-
-						var mesh = meshes[ i ];
-
-						var bones = [];
-						var boneInverses = [];
-
-						for ( var j = 0, jl = jointNodes.length; j < jl; j ++ ) {
-
-							var jointNode = jointNodes[ j ];
-
-							if ( jointNode ) {
-
-								bones.push( jointNode );
-
-								var mat = new THREE.Matrix4();
-
-								if ( skinEntry.inverseBindMatrices !== undefined ) {
-
-									mat.fromArray( skinEntry.inverseBindMatrices.array, j * 16 );
-
-								}
-
-								boneInverses.push( mat );
-
-							} else {
-
-								console.warn( 'THREE.GLTFLoader: Joint "%s" could not be found.', skinEntry.joints[ j ] );
-
-							}
-
-						}
-
-						mesh.bind( new THREE.Skeleton( bones, boneInverses ), mesh.matrixWorld );
-
-					};
-
-					return node;
-
-				} );
-
-			} ).then( function ( node ) {
-
-				// build node hierachy
-
-				parentObject.add( node );
-
-				var pending = [];
-
-				if ( nodeDef.children ) {
-
-					var children = nodeDef.children;
-
-					for ( var i = 0, il = children.length; i < il; i ++ ) {
-
-						var child = children[ i ];
-						pending.push( buildNodeHierachy( child, node, json, parser ) );
-
-					}
-
-				}
-
-				return Promise.all( pending );
-
-			} );
+			pending.push( this.getDependency( 'node', nodeIds[ i ] ) );
 
 		}
 
-		return function loadScene( sceneIndex ) {
+		return Promise.all( pending ).then( function ( nodes ) {
 
-			var json = this.json;
-			var extensions = this.extensions;
-			var sceneDef = this.json.scenes[ sceneIndex ];
-			var parser = this;
+			for ( var i = 0, il = nodes.length; i < il; i ++ ) {
 
-			var scene = new THREE.Scene();
-			if ( sceneDef.name !== undefined ) scene.name = sceneDef.name;
-
-			assignExtrasToUserData( scene, sceneDef );
-
-			if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
-
-			var nodeIds = sceneDef.nodes || [];
-
-			var pending = [];
-
-			for ( var i = 0, il = nodeIds.length; i < il; i ++ ) {
-
-				pending.push( buildNodeHierachy( nodeIds[ i ], scene, json, parser ) );
+				scene.add( nodes[ i ] );
 
 			}
 
-			return Promise.all( pending ).then( function () {
+			return scene;
 
-				return scene;
+		} );
 
-			} );
-
-		};
-
-	}();
+	};
 
 	return GLTFLoader;
 
