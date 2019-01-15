@@ -274,4 +274,6 @@ let bgMesh;
 }
 ```
 
+{{{example url="../threejs-background-equirectangularmap.html" }}}
+
 Using equirectagular images requires more complicated shaders and so is slower than using cubemaps. Fortunately it's easy to convert from an equirectangular image to a cubemap. [Here's a site that will do it for you](https://matheowis.github.io/HDRI-to-CubeMap/).
