@@ -58,7 +58,7 @@ function fixSourceLinks(url, source) {
   const srcRE = /(src=)"(.*?)"/g;
   const linkRE = /(href=)"(.*?")/g;
   const imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
-  const loaderLoadRE = /(loader\.load[a-z]*\()('|")(.*?)('|")/ig;
+  const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
   const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
   const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;
   const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
