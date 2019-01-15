@@ -359,6 +359,15 @@ THREE.ColladaExporter.prototype = {
 
 					type = 'constant';
 
+					if ( m.map !== null ) {
+
+						// The Collada spec does not support diffuse texture maps with the
+						// constant shader type.
+						// mrdoob/three.js#15469
+						console.warn( 'ColladaExporter: Texture maps not supported with MeshBasicMaterial.' );
+
+					}
+
 				}
 
 				var emissive = m.emissive ? m.emissive : new THREE.Color( 0, 0, 0 );
@@ -427,7 +436,7 @@ THREE.ColladaExporter.prototype = {
 								`<float sid="shininess">${ shininess }</float>`
 						) +
 
-						'</shininess>' 
+						'</shininess>'
 						: ''
 					) +
 

@@ -31,6 +31,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/utils/BufferGeometryUtils.js"></script>
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -190,57 +191,16 @@
 
 			function processGeometry( bufGeometry ) {
 
-				// Obtain a Geometry
-				var geometry = new THREE.Geometry().fromBufferGeometry( bufGeometry );
+				// Ony consider the position values when merging the vertices
+				var posOnlyBufGeometry = new THREE.BufferGeometry();
+				posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
+				posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles
-				geometry.mergeVertices();
-
-				// Convert again to BufferGeometry, indexed
-				var indexedBufferGeom = createIndexedBufferGeometryFromGeometry( geometry );
+				var indexedBufferGeom = THREE.BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
 
 				// Create index arrays mapping the indexed vertices to bufGeometry vertices
 				mapIndices( bufGeometry, indexedBufferGeom );
-
-			}
-
-			function createIndexedBufferGeometryFromGeometry( geometry ) {
-
-				var numVertices = geometry.vertices.length;
-				var numFaces = geometry.faces.length;
-
-				var bufferGeom = new THREE.BufferGeometry();
-				var vertices = new Float32Array( numVertices * 3 );
-				var indices = new ( numFaces * 3 > 65535 ? Uint32Array : Uint16Array )( numFaces * 3 );
-
-				for ( var i = 0; i < numVertices; i ++ ) {
-
-					var p = geometry.vertices[ i ];
-
-					var i3 = i * 3;
-
-					vertices[ i3 ] = p.x;
-					vertices[ i3 + 1 ] = p.y;
-					vertices[ i3 + 2 ] = p.z;
-
-				}
-
-				for ( var i = 0; i < numFaces; i ++ ) {
-
-					var f = geometry.faces[ i ];
-
-					var i3 = i * 3;
-
-					indices[ i3 ] = f.a;
-					indices[ i3 + 1 ] = f.b;
-					indices[ i3 + 2 ] = f.c;
-
-				}
-
-				bufferGeom.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-				bufferGeom.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-
-				return bufferGeom;
 
 			}
 
