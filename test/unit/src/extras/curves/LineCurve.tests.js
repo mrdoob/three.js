@@ -80,7 +80,7 @@ export default QUnit.module( 'Extras', () => {
 
 				var curve = _curve;
 
-				var tangent = curve.getTangent( 0 );
+				var tangent = curve.getTangent( 0, new Vector2() );
 				var expectedTangent = Math.sqrt( 0.5 );
 
 				assert.numEqual( tangent.x, expectedTangent, "tangent.x correct" );

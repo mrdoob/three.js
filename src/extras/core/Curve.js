@@ -352,7 +352,7 @@ Object.assign( Curve.prototype, {
 
 			u = i / segments;
 
-			tangents[ i ] = this.getTangentAt( u );
+			tangents[ i ] = this.getTangentAt( u, new Vector3() );
 			tangents[ i ].normalize();
 
 		}

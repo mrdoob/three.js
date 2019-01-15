@@ -137,11 +137,11 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				var tangents = [
-					curve.getTangent( 0 ),
-					curve.getTangent( 0.25 ),
-					curve.getTangent( 0.5 ),
-					curve.getTangent( 0.75 ),
-					curve.getTangent( 1 )
+					curve.getTangent( 0, new Vector2() ),
+					curve.getTangent( 0.25, new Vector2() ),
+					curve.getTangent( 0.5, new Vector2() ),
+					curve.getTangent( 0.75, new Vector2() ),
+					curve.getTangent( 1, new Vector2() )
 				];
 
 				expectedTangents.forEach( function ( exp, i ) {
@@ -164,11 +164,11 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				var tangents = [
-					curve.getTangentAt( 0 ),
-					curve.getTangentAt( 0.25 ),
-					curve.getTangentAt( 0.5 ),
-					curve.getTangentAt( 0.75 ),
-					curve.getTangentAt( 1 )
+					curve.getTangentAt( 0, new Vector2() ),
+					curve.getTangentAt( 0.25, new Vector2() ),
+					curve.getTangentAt( 0.5, new Vector2() ),
+					curve.getTangentAt( 0.75, new Vector2() ),
+					curve.getTangentAt( 1, new Vector2() )
 				];
 
 				expectedTangents.forEach( function ( exp, i ) {

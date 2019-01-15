@@ -146,14 +146,14 @@ export default QUnit.module( 'Extras', () => {
 
 				var curve = _curve;
 
-				var tangent = curve.getTangent( 0.5 );
+				var tangent = curve.getTangent( 0.5, new Vector3() );
 				var expectedTangent = Math.sqrt( 1 / 3 );
 
 				assert.numEqual( tangent.x, expectedTangent, "tangent.x correct" );
 				assert.numEqual( tangent.y, expectedTangent, "tangent.y correct" );
 				assert.numEqual( tangent.z, expectedTangent, "tangent.z correct" );
 
-				tangent = curve.getTangentAt( 0.5 );
+				tangent = curve.getTangentAt( 0.5, new Vector3() );
 
 				assert.numEqual( tangent.x, expectedTangent, "tangentAt.x correct" );
 				assert.numEqual( tangent.y, expectedTangent, "tangentAt.y correct" );

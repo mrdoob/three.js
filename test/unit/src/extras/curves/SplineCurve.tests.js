@@ -132,9 +132,9 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				var tangents = [
-					curve.getTangent( 0 ),
-					curve.getTangent( 0.5 ),
-					curve.getTangent( 1 )
+					curve.getTangent( 0, new Vector2() ),
+					curve.getTangent( 0.5, new Vector2() ),
+					curve.getTangent( 1, new Vector2() )
 				];
 
 				tangents.forEach( function ( tangent, i ) {
