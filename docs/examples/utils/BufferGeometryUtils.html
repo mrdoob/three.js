@@ -68,8 +68,8 @@
     geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the vertices of.<br />
     tolerance -- The maximum allowable difference between vertex attributes to merge. Defaults to 1e-4.<br /><br />
 
-    Returns a new [page:BufferGeometry BufferGeometry] with vertices closer than the provided tolerance merged.
-    All vertex attributes are accounted for.
+    Returns a new [page:BufferGeometry BufferGeometry] with vertices for which all similar vertex attributes
+    (within tolerance) are merged.
 
     </p>
 
