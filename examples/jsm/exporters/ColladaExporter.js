@@ -211,7 +211,7 @@ ColladaExporter.prototype = {
 
 				// convert the geometry to bufferGeometry if it isn't already
 				var bufferGeometry = g;
-				if ( bufferGeometry instanceof Geometry ) {
+				if ( bufferGeometry.isGeometry ) {
 
 					bufferGeometry = ( new BufferGeometry() ).fromGeometry( bufferGeometry );
 
@@ -362,11 +362,11 @@ ColladaExporter.prototype = {
 
 				var type = 'phong';
 
-				if ( m instanceof MeshLambertMaterial ) {
+				if ( m.isMeshLambertMaterial ) {
 
 					type = 'lambert';
 
-				} else if ( m instanceof MeshBasicMaterial ) {
+				} else if ( m.isMeshBasicMaterial ) {
 
 					type = 'constant';
 
@@ -519,7 +519,7 @@ ColladaExporter.prototype = {
 
 			node += getTransform( o );
 
-			if ( o instanceof Mesh && o.geometry != null ) {
+			if ( o.isMesh && o.geometry != null ) {
 
 				// function returns the id associated with the mesh and a "BufferGeometry" version
 				// of the geometry in case it's not a geometry.
