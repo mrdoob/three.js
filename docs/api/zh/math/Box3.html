@@ -34,7 +34,7 @@
 		<h3>[property:Boolean isBox3]</h3>
 		<p>
 			用于检测当前对象或者派生类对象是否是Box3。默认为 *true*。<br /><br />
-			
+
 			不应该修改这个值，因为内部使用该属性做了优化的任务。
 		</p>
 
@@ -57,7 +57,7 @@
 		<h3>[method:Box3 applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>
 		[page:Matrix4 matrix] - 要应用的 [page:Matrix4] <br /><br />
-		
+
 		使用传入的矩阵变换Box3（包围盒8个顶点都会乘以这个变换矩阵）。
 		</p>
 
@@ -219,7 +219,7 @@
 		[page:Vector3 min] - [page:Vector3] 表示下边界每个纬度（x,y,z）的值。<br />
 		[page:Vector3 max] - [page:Vector3] 表示上边界每个纬度（x,y,z）的值。<br /><br />
 
-		设置包围盒上下边界每个纬度（x,y,z)的值。 
+		设置包围盒上下边界每个纬度（x,y,z)的值。
 		</p>
 
 		<h3>[method:Box3 setFromArray]( [param:Array array] ) [param:Box3 this]</h3>
@@ -235,14 +235,6 @@
 
 		设置此包围盒的上边界和下边界，以包含 [page:BufferAttribute attribute] 中的所有位置数据。
 		</p>
-
-<!--	<h3>[method:Box3 setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] )</h3>
-		<p>
-		[page:Vector3 center] - 包围盒的中心位置 ([page:Vector3]). <br>
-		[page:Vector3 size] - 需要设置包围盒x,y,z的分量 ([page:Vector3]).<br /><br />
-
-		将包围盒的中心点设为 [page:Vector3 center] ，然后将包围盒的宽高设为指定的 [page:Vector3 size]。
-		</p>-->	
 
 		<h3>[method:Box3 setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] ) [param:Box3 this]</h3>
 		<p>
