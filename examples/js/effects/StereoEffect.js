@@ -307,7 +307,7 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	if ( options.camera ) {
 
 		_controllerCameraFocus = _fStereoEffects.add( options.camera, 'focus',
-			options.focus / 10 , options.focus * 2, options.focus / 1000 )
+			options.focus / 10, options.focus * 2, options.focus / 1000 )
 			.onChange( function ( value ) {
 
 				new options.cookie( 'cameraFocus' ).set( value );
@@ -428,6 +428,20 @@ if ( THREE.cookie === undefined ) {
 
 		};
 
+		// Saving settings.
+		// value: current setting
+		this.set = function ( value ) {
+
+			if ( ! this.isCookieEnabled() )
+				return;
+
+			var _cookieDate = new Date();
+			_cookieDate.setTime( _cookieDate.getTime() + 1000 * 60 * 60 * 24 * 365 );//One year of expiry period
+			document.cookie = name + "=" + value.toString() + "; expires=" + _cookieDate.toGMTString();
+			return;
+
+		};
+
 		// Loading settings, saved by THREE.cookie.set
 		// defaultValue: default setting
 		this.get = function ( defaultValue ) {
@@ -444,17 +458,17 @@ if ( THREE.cookie === undefined ) {
 
 		};
 
-		// Saving settings.
-		// value: current setting
-		this.set = function ( value ) {
+		this.isTrue = function ( defaultValue ) {
 
-			if ( ! this.isCookieEnabled() )
-				return;
+			switch ( this.get() ) {
 
-			var _cookieDate = new Date();
-			_cookieDate.setTime( _cookieDate.getTime() + 1000 * 60 * 60 * 24 * 365 );//One year of expiry period
-			document.cookie = name + "=" + value.toString() + "; expires=" + _cookieDate.toGMTString();
-			return;
+				case 'true':
+					return true;
+				case 'false':
+					return false;
+
+			}
+			return defaultValue;
 
 		};
 
