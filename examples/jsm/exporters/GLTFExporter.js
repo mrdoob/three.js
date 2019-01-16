@@ -1930,7 +1930,7 @@ GLTFExporter.prototype = {
 
 			for ( var i = 0; i < input.length; i ++ ) {
 
-				if ( input[ i ].isScene ) {
+				if ( input[ i ] instanceof Scene ) {
 
 					processScene( input[ i ] );
 

@@ -211,7 +211,7 @@ ColladaExporter.prototype = {
 
 				// convert the geometry to bufferGeometry if it isn't already
 				var bufferGeometry = g;
-				if ( bufferGeometry.isGeometry ) {
+				if ( bufferGeometry instanceof Geometry ) {
 
 					bufferGeometry = ( new BufferGeometry() ).fromGeometry( bufferGeometry );
 
@@ -362,11 +362,11 @@ ColladaExporter.prototype = {
 
 				var type = 'phong';
 
-				if ( m.isMeshLambertMaterial ) {
+				if ( m instanceof MeshLambertMaterial ) {
 
 					type = 'lambert';
 
-				} else if ( m.isMeshBasicMaterial ) {
+				} else if ( m instanceof MeshBasicMaterial ) {
 
 					type = 'constant';
 
@@ -388,7 +388,7 @@ ColladaExporter.prototype = {
 				var reflectivity = m.reflectivity || 0;
 
 				// Do not export and alpha map for the reasons mentioned in issue (#13792)
-				// in js alpha maps are black and white, but collada expects the alpha
+				// in THREE.js alpha maps are black and white, but collada expects the alpha
 				// channel to specify the transparency
 				var transparencyNode = '';
 				if ( m.transparent === true ) {
@@ -519,7 +519,7 @@ ColladaExporter.prototype = {
 
 			node += getTransform( o );
 
-			if ( o.isMesh && o.geometry != null ) {
+			if ( o instanceof Mesh && o.geometry != null ) {
 
 				// function returns the id associated with the mesh and a "BufferGeometry" version
 				// of the geometry in case it's not a geometry.
@@ -592,7 +592,7 @@ ColladaExporter.prototype = {
 			'<asset>' +
 			(
 				'<contributor>' +
-				'<authoring_tool>js Collada Exporter</authoring_tool>' +
+				'<authoring_tool>THREE.js Collada Exporter</authoring_tool>' +
 				( options.author !== null ? `<author>${ options.author }</author>` : '' ) +
 				'</contributor>' +
 				`<created>${ ( new Date() ).toISOString() }</created>` +

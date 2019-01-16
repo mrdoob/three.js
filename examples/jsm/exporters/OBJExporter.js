@@ -42,13 +42,13 @@ OBJExporter.prototype = {
 
 			var normalMatrixWorld = new Matrix3();
 
-			if ( geometry.isGeometry ) {
+			if ( geometry instanceof Geometry ) {
 
 				geometry = new BufferGeometry().setFromObject( mesh );
 
 			}
 
-			if ( geometry.isBufferGeometry ) {
+			if ( geometry instanceof BufferGeometry ) {
 
 				// shortcuts
 				var vertices = geometry.getAttribute( 'position' );
@@ -182,13 +182,13 @@ OBJExporter.prototype = {
 			var geometry = line.geometry;
 			var type = line.type;
 
-			if ( geometry.isGeometry ) {
+			if ( geometry instanceof Geometry ) {
 
 				geometry = new BufferGeometry().setFromObject( line );
 
 			}
 
-			if ( geometry.isBufferGeometry ) {
+			if ( geometry instanceof BufferGeometry ) {
 
 				// shortcuts
 				var vertices = geometry.getAttribute( 'position' );
@@ -251,13 +251,13 @@ OBJExporter.prototype = {
 
 		object.traverse( function ( child ) {
 
-			if ( child.isMesh ) {
+			if ( child instanceof Mesh ) {
 
 				parseMesh( child );
 
 			}
 
-			if ( child.isLine ) {
+			if ( child instanceof Line ) {
 
 				parseLine( child );
 
