@@ -1,5 +1,6 @@
 var path = require( 'path' );
 var fs = require( 'fs' );
+var isModuleCanonical = require( './utils/isModuleCanonical.js' );
 
 // Creates a rollup config object for the given file to
 // be converted to umd
@@ -7,6 +8,23 @@ function createOutput( file ) {
 
 	var inputPath = path.resolve( file );
 	var outputPath = inputPath.replace( /[\\\/]examples[\\\/]jsm[\\\/]/, '/examples/js/' );
+	var relativePath = path.relative( './examples/jsm', file ).replace( /^\.[\/\\]/, '' );
+
+	var banner = '';
+	if ( isModuleCanonical( relativePath ) ) {
+
+		banner = [
+			'/**',
+			` * Generated from original source in "examples/js/${ relativePath.replace( /\\/g, '/' ) }".`,
+			' * Not intended for editing.',
+			' */'
+		].join( '\n' );
+
+	} else {
+
+		return null;
+
+	}
 
 	// Every import is marked as external so the output is 1-to-1. We
 	// assume that that global object should be the THREE object so we
@@ -41,10 +59,7 @@ function createOutput( file ) {
 			paths: p => /three\.module\.js$/.test( p ) ? 'three' : p,
 			extend: true,
 
-			banner:
-				'/**\n' +
-				` * Generated from '${ path.relative( '.', inputPath ).replace( /\\/g, '/' ) }'\n` +
-				' */\n',
+			banner: banner,
 			esModule: false
 
 		}
@@ -82,4 +97,4 @@ var files = [];
 walk( 'examples/jsm/', p => files.push( p ) );
 
 // Create a rollup config for each module.js file
-export default files.map( p => createOutput( p ) );
+export default files.map( p => createOutput( p ) ).filter( p => p );

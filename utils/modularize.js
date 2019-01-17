@@ -3,6 +3,7 @@
  */
 
 var fs = require( 'fs' );
+var isModuleCanonical = require( './isModuleCanonical.js' );
 
 var srcFolder = '../examples/js/';
 var dstFolder = '../examples/jsm/';
@@ -26,6 +27,23 @@ for ( var i = 0; i < files.length; i ++ ) {
 //
 
 function convert( path, ignoreList ) {
+
+	var banner = '';
+	if ( ! isModuleCanonical( path ) ) {
+
+		banner = [
+			'/**',
+			` * Generated from original source in "examples/jsm/${ path.replace( /\\/g, '/' ) }".`,
+			' * Not intended for editing.',
+			' */',
+			''
+		].join( '\n' );
+
+	} else {
+
+		return;
+
+	}
 
 	var contents = fs.readFileSync( srcFolder + path, 'utf8' );
 
@@ -84,8 +102,7 @@ function convert( path, ignoreList ) {
 	var keys = Object.keys( dependencies ).sort().map( value => '\n\t' + value ).toString();
 	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
 	var exports = `export { ${className} }`;
-
-	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
+	var output = banner + contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
 	// console.log( output );
 
