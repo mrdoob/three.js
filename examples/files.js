@@ -60,6 +60,7 @@ var files = {
 		"webgl_interactive_voxelpainter",
 		"webgl_kinect",
 		"webgl_lensflares",
+		"webgl_light_directional",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
