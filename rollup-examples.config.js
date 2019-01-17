@@ -15,7 +15,7 @@ function createOutput( file ) {
 
 		banner = [
 			'/**',
-			` * Generated from original source in "examples/js/${ relativePath.replace( /\\/g, '/' ) }".`,
+			` * Generated from original source in "examples/jsm/${ relativePath.replace( /\\/g, '/' ) }".`,
 			' * Not intended for editing.',
 			' */'
 		].join( '\n' );

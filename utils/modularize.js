@@ -33,7 +33,7 @@ function convert( path, ignoreList ) {
 
 		banner = [
 			'/**',
-			` * Generated from original source in "examples/jsm/${ path.replace( /\\/g, '/' ) }".`,
+			` * Generated from original source in "examples/js/${ path.replace( /\\/g, '/' ) }".`,
 			' * Not intended for editing.',
 			' */',
 			''
