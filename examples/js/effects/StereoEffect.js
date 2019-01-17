@@ -48,7 +48,7 @@ THREE.StereoEffectParameters = {
 //		Default is THREE.StereoEffectParameters.zeroParallaxDefault
 //	camera: THREE.PerspectiveCamera. Use the camera key if you want control cameras focus.
 //	far: Camera frustum far plane. The far key uses for correct calculation default values of Eye separation. Default is 10.
-//	cookie: Your custom cookie function for saving and loading of the StereoEffects settings.
+//	cookie: Your custom cookie function for saving and loading of the StereoEffects settings. Default cookie is not saving settings.
 //}
 THREE.StereoEffect = function ( renderer, options ) {
 
