@@ -80,7 +80,9 @@ THREE.GLTFExporter.prototype = {
 			embedImages: true,
 			animations: [],
 			forceIndices: false,
-			forcePowerOfTwoTextures: false
+			forcePowerOfTwoTextures: false,
+			maxTextureHeight: 4096,
+			maxTextureWidth: 4096
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -707,8 +709,13 @@ THREE.GLTFExporter.prototype = {
 
 				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
 
-				canvas.width = image.width;
-				canvas.height = image.height;
+				if ( image.width > options.maxTextureWidth || image.height > options.maxTextureHeight ) {
+
+					console.warn( 'GLTFExporter: Resized too big image.', image );
+				}
+
+				canvas.width = Math.min( image.width, options.maxTextureWidth );
+				canvas.height = Math.min( image.height, options.maxTextureHeight );
 
 				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( image ) ) {
 
