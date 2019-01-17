@@ -83,7 +83,7 @@ function convert( path, ignoreList ) {
 
 	var keys = Object.keys( dependencies ).sort().map( value => '\n\t' + value ).toString();
 	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
-	var exports = `export { ${className} };`;
+	var exports = `export { ${className} };\n`;
 
 	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
