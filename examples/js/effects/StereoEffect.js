@@ -187,13 +187,6 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	if ( guiParams === undefined ) guiParams = {};
 	guiParams.scale = guiParams.scale || 1;
 
-	function getLanguageCode() {
-
-		return 'en';//Default language is English
-
-	}
-	if ( guiParams.getLanguageCode !== undefined ) getLanguageCode = guiParams.getLanguageCode;
-
 	//Localization
 
 	var _lang = {
@@ -222,7 +215,11 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 	};
 
-	var _languageCode = getLanguageCode();
+	var _languageCode = guiParams.getLanguageCode === undefined ? function () {
+
+		return 'en';//Default language is English
+
+	} : guiParams.getLanguageCode();
 	switch ( _languageCode ) {
 
 		case 'ru'://Russian language
