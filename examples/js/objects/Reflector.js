@@ -63,7 +63,6 @@ THREE.Reflector = function ( geometry, options ) {
 	material.uniforms[ "textureMatrix" ].value = textureMatrix;
 
 	this.material = material;
-	this.renderOrder = - Infinity; // render first
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
 

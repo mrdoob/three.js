@@ -1133,11 +1133,17 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		// Generate mipmap if we're using any kind of mipmap filtering
+		//
 
 		if ( renderTarget ) {
 
+			// Generate mipmap if we're using any kind of mipmap filtering
+
 			textures.updateRenderTargetMipmap( renderTarget );
+
+			// resolve multisample renderbuffers to a single-sample texture if necessary
+
+			textures.updateMultisampleRenderTarget( renderTarget );
 
 		}
 
@@ -2493,6 +2499,10 @@ function WebGLRenderer( parameters ) {
 
 				framebuffer = __webglFramebuffer[ renderTarget.activeCubeFace ];
 				isCube = true;
+
+			} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
+
+				framebuffer = properties.get( renderTarget ).__webglMultisampledFramebuffer;
 
 			} else {
 

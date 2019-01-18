@@ -129,7 +129,10 @@ function glconstants() {
 		MAX_VARYING_VECTORS: 36348,
 		MAX_FRAGMENT_UNIFORM_VECTORS: 36349,
 		UNPACK_FLIP_Y_WEBGL: 37440,
-		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441
+		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441,
+		MAX_SAMPLES: 36183,
+		READ_FRAMEBUFFER: 36008,
+		DRAW_FRAMEBUFFER: 36009
 	};
 
 	return {
@@ -147,10 +150,11 @@ function glconstants() {
 			return {
 				code: code,
 				map: { mappings: '' }
-			}
+			};
+
 		}
 
-	}
+	};
 
 }
 
