@@ -330,18 +330,13 @@ THREE.gui.spriteText = function ( gui, sprite, guiParams, options ) {
 
 	function updateSpriteText() {
 
-		function update( sprite ) {
-
-			sprite.update( options );
-
-		}
 		if ( Array.isArray( sprite ) )
 			sprite.forEach( function ( sprite ) {
 
-				update( sprite );
+				sprite.update( options );
 
 			} );
-		else update( sprite );
+		else sprite.update( options );
 
 		if ( controllerFont !== undefined )
 			controllerFont.setValue( options.font );
