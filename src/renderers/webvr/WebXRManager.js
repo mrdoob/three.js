@@ -78,7 +78,19 @@ function WebXRManager( renderer ) {
 	this.setDevice = function ( value ) {
 
 		if ( value !== undefined ) device = value;
-		if ( value instanceof XRDevice ) gl.setCompatibleXRDevice( value );
+		if ( value instanceof XRDevice ) {
+
+			if ( gl.setCompatibleXRDevice !== undefined ) {
+
+				gl.setCompatibleXRDevice( value );
+
+			} else {
+
+				gl.makeXRCompatible();
+
+			}
+
+		}
 
 	};
 
@@ -96,6 +108,17 @@ function WebXRManager( renderer ) {
 		renderer.setFramebuffer( null );
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
+
+	}
+
+	function onRequestFrameOfReference( value ) {
+
+		frameOfReference = value;
+
+		renderer.setFramebuffer( session.baseLayer.framebuffer );
+
+		animation.setContext( session );
+		animation.start();
 
 	}
 
@@ -123,16 +146,19 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'end', onSessionEnd );
 
 			session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: framebufferScaleFactor } );
-			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
 
-				frameOfReference = value;
+			if ( session.requestFrameOfReference !== undefined ) {
 
-				renderer.setFramebuffer( session.baseLayer.framebuffer );
+				session.requestFrameOfReference( frameOfReferenceType ).then( onRequestFrameOfReference );
 
-				animation.setContext( session );
-				animation.start();
+			} else {
 
-			} );
+				session.requestReferenceSpace( {
+					type: 'stationary',
+					subtype: 'eye-level'
+				} ).then( onRequestFrameOfReference );
+
+			}
 
 			//
 
@@ -217,18 +243,18 @@ function WebXRManager( renderer ) {
 
 	function onAnimationFrame( time, frame ) {
 
-		pose = frame.getDevicePose( frameOfReference );
+		pose = frame.getDevicePose !== undefined ? frame.getDevicePose( frameOfReference ) : frame.getViewerPose( frameOfReference );
 
 		if ( pose !== null ) {
 
 			var layer = session.baseLayer;
-			var views = frame.views;
+			var views = frame.views || pose.views;
 
 			for ( var i = 0; i < views.length; i ++ ) {
 
 				var view = views[ i ];
 				var viewport = layer.getViewport( view );
-				var viewMatrix = pose.getViewMatrix( view );
+				var viewMatrix = view.viewMatrix || pose.getViewMatrix( view );
 
 				var camera = cameraVR.cameras[ i ];
 				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
