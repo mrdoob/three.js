@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - directional light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #fff;
+				color: #111;
+				margin: 0px;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				text-align: center;
+			}
+
+			a {
+				color: #0080ff;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #f00;
+			}
+
+			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
+			strong { color: red }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl directional light example -
+			flamingo by <a href="http://mirada.com/">mirada</a> from <a href="http://www.ro.me">rome</a><br/>
+		</div>
+		<div id="footer">
+			press <strong>d</strong> to toggle directional light
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/WebGL.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>		
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
+
+		<script type="x-shader/x-vertex" id="vertexShader">
+
+			varying vec3 vWorldPosition;
+
+			void main() {
+
+				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+				vWorldPosition = worldPosition.xyz;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentShader">
+
+			uniform vec3 topColor;
+			uniform vec3 bottomColor;
+			uniform float offset;
+			uniform float exponent;
+
+			varying vec3 vWorldPosition;
+
+			void main() {
+
+				float h = normalize( vWorldPosition + offset ).y;
+				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
+
+			}
+
+		</script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var controls, camera, scene, renderer, dirLight, dirLightHeper, shadowCameraHelper;
+			var mixers = [];
+			var stats;
+			var gui = new dat.GUI();
+
+			var clock = new THREE.Clock();
+
+			init();
+			addGui();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				//CAMERA
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.set( 150, 150, 250 );
+
+				//SCENE
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
+				scene.fog = new THREE.Fog( scene.background, 1, 5000 );
+
+				// LIGHTS
+
+				dirLight = new THREE.DirectionalLight( );
+				dirLight.color.setHSL( 0.1, 1, 0.95 );
+				dirLight.position.set( - 1, 1.75, 1 );
+				dirLight.position.multiplyScalar( 30 );
+				scene.add( dirLight );
+
+				dirLightHeper = new THREE.DirectionalLightHelper( dirLight, 10 );
+				scene.add( dirLightHeper );
+
+				//SHADOW
+
+				dirLight.castShadow = true;
+
+				dirLight.shadow.mapSize.width = 2048;
+				dirLight.shadow.mapSize.height = 2048;
+
+				var d = 50;
+
+				dirLight.shadow.camera.left = - d;
+				dirLight.shadow.camera.right = d;
+				dirLight.shadow.camera.top = d;
+				dirLight.shadow.camera.bottom = - d;
+
+				dirLight.shadow.camera.near = 1;
+				dirLight.shadow.camera.far = 150;
+				dirLight.shadow.bias = - 0.0001;
+
+				setShadowCamera();
+
+
+				// GROUND
+
+				var groundGeo = new THREE.PlaneBufferGeometry( 10000, 10000 );
+				var groundMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x050505 } );
+				groundMat.color.setHSL( 0.095, 1, 0.75 );
+
+				var ground = new THREE.Mesh( groundGeo, groundMat );
+				ground.rotation.x = - Math.PI / 2;
+				ground.position.y = - 33;
+				scene.add( ground );
+
+				ground.receiveShadow = true;
+
+				// SKYDOME
+
+				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
+				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+				var uniforms = {
+					topColor: { value: new THREE.Color( 0x0077ff ) },
+					bottomColor: { value: new THREE.Color( 0xffffff ) },
+					offset: { value: 33 },
+					exponent: { value: 0.6 }
+				};
+
+				scene.fog.color.copy( uniforms.bottomColor.value );
+
+				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
+				var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
+
+				var sky = new THREE.Mesh( skyGeo, skyMat );
+				scene.add( sky );
+
+				// MODEL
+
+				var loader = new THREE.GLTFLoader();
+
+				loader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
+
+					var mesh = gltf.scene.children[ 0 ];
+
+					var s = 0.35;
+					mesh.scale.set( s, s, s );
+					mesh.position.y = 15;
+					//mesh.rotation.y = - 1;
+
+					mesh.castShadow = true;
+
+					scene.add( mesh );
+
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
+					mixers.push( mixer );
+
+				} );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				renderer.shadowMap.enabled = true;
+
+				//CONTROLS
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				controls.screenSpacePanning = false;
+				controls.minDistance = 15;
+				controls.maxDistance = 450;
+
+				controls.target.set(0,15,0);
+				controls.update();
+
+				// STATS
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keydown', onKeyDown, false );
+
+			}
+			
+			function addGui() {
+
+				var lightf = gui.addFolder( 'Light' );
+				lightf.open();
+
+				var datal = {
+					color: dirLight.color.getHex(),
+					intensity: dirLight.intensity
+				};
+
+				lightf.addColor( datal, 'color').onChange( function ( value ) {
+
+					if ( typeof value === 'string' ) {
+
+						value = value.replace( '#', '0x' );
+
+					}
+
+					dirLight.color.setHex( value );
+
+				} );
+
+				lightf.add( datal, 'intensity', 0, 1).onChange( function ( value ) {
+
+					dirLight.intensity = value;
+
+				} );
+
+				var shadowf = gui.addFolder( 'Shadow' );
+				shadowf.open();
+
+				var datas = {
+					size: dirLight.shadow.mapSize.width,
+					left: dirLight.shadow.camera.left,
+					right: dirLight.shadow.camera.right,
+					top: dirLight.shadow.camera.top,
+					bottom: dirLight.shadow.camera.bottom,
+					near: dirLight.shadow.camera.near,
+					far: dirLight.shadow.camera.far,
+				};
+
+				shadowf.add( datas, 'size', {
+					'32': 32,
+					'64': 64,
+					'128': 128,
+					'256': 256,
+					'512': 512,
+					'1024': 1024,
+					'2048': 2048
+				} ).onChange( function ( value ) {
+
+					dirLight.shadow.mapSize.width = dirLight.shadow.mapSize.height = value;
+
+				} );
+
+				shadowf.add( datas, 'left' ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.shadow.camera.left = value;
+					setShadowCamera();
+
+				} );
+
+				shadowf.add( datas, 'right' ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.shadow.camera.right = value;
+					setShadowCamera();
+
+				} );
+
+				shadowf.add( datas, 'top' ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.shadow.camera.top = value;
+					setShadowCamera();
+
+				} );
+
+				shadowf.add( datas, 'bottom' ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.shadow.camera.bottom = value;
+					setShadowCamera();
+
+				} );
+
+				shadowf.add( datas, 'near' ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.shadow.camera.near = value;
+					setShadowCamera();
+
+				} );
+
+				shadowf.add( datas, 'far' ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.shadow.camera.far = value;
+					setShadowCamera();
+
+				} );
+			}
+
+			function setShadowCamera() {
+
+				if( shadowCameraHelper ) {
+
+					scene.remove( shadowCameraHelper );
+
+				}
+				shadowCameraHelper = new THREE.CameraHelper( dirLight.shadow.camera );
+				shadowCameraHelper.visible = true;
+				scene.add( shadowCameraHelper );
+
+			}
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onKeyDown( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 68: // d
+
+						dirLight.visible = ! dirLight.visible;
+						dirLightHeper.visible = ! dirLightHeper.visible;
+						break;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				for ( var i = 0; i < mixers.length; i ++ ) {
+
+					mixers[ i ].update( delta );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
