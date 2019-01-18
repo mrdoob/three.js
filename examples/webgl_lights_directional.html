@@ -195,7 +195,6 @@
 					var s = 0.35;
 					mesh.scale.set( s, s, s );
 					mesh.position.y = 15;
-					//mesh.rotation.y = - 1;
 
 					mesh.castShadow = true;
 
@@ -204,6 +203,9 @@
 					var mixer = new THREE.AnimationMixer( mesh );
 					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
 					mixers.push( mixer );
+
+					dirLight.target = mesh;
+					dirLightHelper.update();
 
 				} );
 
@@ -338,6 +340,37 @@
 					setShadowCamera();
 
 				} );
+
+				var targetf = gui.addFolder( 'Target' );
+				targetf.open();
+
+				var datat = {
+					x: dirLight.target.position.x,
+					y: dirLight.target.position.y,
+					z: dirLight.target.position.z
+				};
+
+				targetf.add( datat, 'x', -25, 25 ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.target.position.setX( value );
+					dirLightHelper.update();
+
+				} );
+
+				targetf.add( datat, 'y', -25, 25 ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.target.position.setY( value );
+					dirLightHelper.update();
+
+				} );
+
+				targetf.add( datat, 'z', -25, 25 ).step( 1 ).onChange( function ( value ) {
+
+					dirLight.target.position.setZ( value );
+					dirLightHelper.update();
+
+				} );
+
 			}
 
 			function setShadowCamera() {
