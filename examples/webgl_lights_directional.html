@@ -94,7 +94,7 @@
 
 			}
 
-			var controls, camera, scene, renderer, dirLight, dirLightHeper, shadowCameraHelper;
+			var controls, camera, scene, renderer, dirLight, dirLightHelper, shadowCameraHelper;
 			var mixers = [];
 			var stats;
 			var gui = new dat.GUI();
@@ -124,12 +124,12 @@
 
 				dirLight = new THREE.DirectionalLight( );
 				dirLight.color.setHSL( 0.1, 1, 0.95 );
-				dirLight.position.set( - 1, 1.75, 1 );
-				dirLight.position.multiplyScalar( 30 );
+				dirLight.position.set( - 30, 50, 30 );
+
 				scene.add( dirLight );
 
-				dirLightHeper = new THREE.DirectionalLightHelper( dirLight, 10 );
-				scene.add( dirLightHeper );
+				dirLightHelper = new THREE.DirectionalLightHelper( dirLight, 10 );
+				scene.add( dirLightHelper );
 
 				//SHADOW
 
@@ -368,7 +368,7 @@
 					case 68: // d
 
 						dirLight.visible = ! dirLight.visible;
-						dirLightHeper.visible = ! dirLightHeper.visible;
+						dirLightHelper.visible = ! dirLightHelper.visible;
 						break;
 
 				}
