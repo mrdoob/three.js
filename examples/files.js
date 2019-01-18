@@ -59,6 +59,7 @@ var files = {
 		"webgl_layers",
 		"webgl_lensflares",
 		"webgl_lightningstrike",
+		"webgl_lights_directional",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
