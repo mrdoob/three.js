@@ -112,7 +112,7 @@
 				//CAMERA
 
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.set( 150, 150, 250 );
+				camera.position.set( 150, 50, 250 );
 
 				//SCENE
 
@@ -297,42 +297,42 @@
 
 				} );
 
-				shadowf.add( datas, 'left' ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'left', -250, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.left = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'right' ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'right', -250, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.right = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'top' ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'top', -250, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.top = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'bottom' ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'bottom', -250, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.bottom = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'near' ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'near', 0, 150 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.near = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'far' ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'far', 0, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.far = value;
 					setShadowCamera();
