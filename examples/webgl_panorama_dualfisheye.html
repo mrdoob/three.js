@@ -99,6 +99,7 @@
 				//
 
 				var texture = new THREE.TextureLoader().load( 'textures/ricoh_theta_s.jpg' );
+				texture.minFilter = THREE.LinearFilter;
 				texture.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
