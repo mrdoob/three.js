@@ -297,28 +297,28 @@
 
 				} );
 
-				shadowf.add( datas, 'left', -250, 250 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'left', -250, 0 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.left = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'right', -250, 250 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'right', 0, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.right = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'top', -250, 250 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'top', 0, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.top = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'bottom', -250, 250 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'bottom', -250, 0 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.bottom = value;
 					setShadowCamera();
