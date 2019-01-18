@@ -68,7 +68,7 @@ THREE.SpriteText = function ( text, options ) {
 	options.text = text;//options.text || new options.cookie( 'SpriteText' ).get( 'Sprite Text' );
 	options.position = options.position || new THREE.Vector3( 0, 0, 0 );
 	options.textHeight = options.textHeight || 1;
-	options.fontFace = options.fontFace || 'Arial'; 
+	options.fontFace = options.fontFace || 'Arial';
 	options.bold = options.bold || false;
 	options.italic = options.italic || false;
 	options.fontProperties = options.fontProperties || '';
@@ -387,7 +387,7 @@ THREE.gui.spriteText = function ( gui, sprite, guiParams, options ) {
 				new options.cookie( 'fontFace' ).set( value );
 
 			} ), lang.fontFace, lang.fontFaceTitle );
-	
+
 	//bold
 	if ( options.hasOwnProperty( 'bold' ) )
 		dat.controllerNameAndTitle(

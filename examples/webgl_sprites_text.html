@@ -33,8 +33,8 @@
 		<script src="js/geometries/ConvexGeometry.js"></script>
 		<script src="js/WebGL.js"></script>
 		<script src="js/QuickHull.js"></script>
-		<!--<script src="js/libs/dat.gui.min.js"></script>-->
-		<script src="../../dat.gui/build/dat.gui.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<!--<script src="../../dat.gui/build/dat.gui.js"></script>-->
 		<script src="js/effects/StereoEffect.js"></script>
 		<script src="../src/objects/SpriteText.js"></script>
 
@@ -138,10 +138,10 @@
 				this.rect = false;
 				var fontFaces = [ 'Arial', 'Verdana', 'Times' ],
 					spriteText = new THREE.SpriteText( 'Hello world!', {
-						position: anchorVertices[0],
+						position: anchorVertices[ 0 ],
 						fontColor: 'rgba(0, 255, 0, 1)', //green
 						textHeight: 2,
-						fontFace: fontFaces[0],
+						fontFace: fontFaces[ 0 ],
 						fontFaces: fontFaces,
 						center: new THREE.Vector2( 0.5, 0.5 ),
 						bold: false,
@@ -160,10 +160,14 @@
 
 				var arrayOptions = { textHeight: 2 },
 					arraySpriteText = [
-						new THREE.SpriteText( 'Array item 1', { position: new THREE.Vector3( -10, 4, 2 ), textHeight: arrayOptions.textHeight } ),
-						new THREE.SpriteText( 'Array item 2', { position: new THREE.Vector3( -10, 1, 2 ), textHeight: arrayOptions.textHeight } ),
+						new THREE.SpriteText( 'Array item 1', { position: new THREE.Vector3( - 10, 4, 2 ), textHeight: arrayOptions.textHeight } ),
+						new THREE.SpriteText( 'Array item 2', { position: new THREE.Vector3( - 10, 1, 2 ), textHeight: arrayOptions.textHeight } ),
 					];
-				arraySpriteText.forEach( function ( item ) { scene.add( item ); } );
+				arraySpriteText.forEach( function ( item ) {
+
+					scene.add( item );
+
+				} );
 
 				//
 
