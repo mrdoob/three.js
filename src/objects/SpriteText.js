@@ -29,7 +29,7 @@
 //		backgroundColor: RGBA object or RGB object or HEX value. Default is 'rgba(100, 100, 100, 1)' - gray.
 //			Examples 'rgba(0, 0, 255, 0.5)', '#00FF00'
 //		borderColor: RGBA object or RGB object or HEX value. Default is 'rgba(0, 255, 0, 1)' - green
-//		borderThickness: Default is 5
+//		borderThickness: Default is 0 - no border
 //		borderRadius: Default is 6
 //	}
 //	cookie: Your custom cookie function for saving and loading of the SpriteText settings. Default cookie is not saving settings.
@@ -119,7 +119,8 @@ THREE.SpriteText = function ( text, options ) {
 		//Rect
 		//Thanks to http://stemkoski.github.io/Three.js/Sprite-Text-Labels.html
 
-		var borderThickness = options.rect.borderThickness || 5;
+		var borderThickness = options.rect.hasOwnProperty( "borderThickness" ) ?
+				options.rect["borderThickness"] : 0;
 		if ( options.rect.displayRect ) {
 
 			// background color
