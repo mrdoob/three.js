@@ -109,53 +109,53 @@ THREE.StereoEffect = function ( renderer, options ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		var _size = renderer.getSize();
+		var size = renderer.getSize();
 
 		if ( renderer.autoClear ) renderer.clear();
 		renderer.setScissorTest( true );
 
-		var _xL, _yL, _widthL, _heightL,
-			_xR, _yR, _widthR, _heightR,
-			_parallax = options.zeroParallax,
-			_spatialMultiplex = parseInt( options.spatialMultiplex ),
-			_spatialMultiplexsIndexs = THREE.StereoEffectParameters.spatialMultiplexsIndexs;
+		var xL, yL, widthL, heightL,
+			xR, yR, widthR, heightR,
+			parallax = options.zeroParallax,
+			spatialMultiplex = parseInt( options.spatialMultiplex ),
+			spatialMultiplexsIndexs = THREE.StereoEffectParameters.spatialMultiplexsIndexs;
 
-		switch ( _spatialMultiplex ) {
+		switch ( spatialMultiplex ) {
 
-			case _spatialMultiplexsIndexs.Mono://Mono
-				renderer.setScissor( 0, 0, _size.width, _size.height );
-				renderer.setViewport( 0, 0, _size.width, _size.height );
+			case spatialMultiplexsIndexs.Mono://Mono
+				renderer.setScissor( 0, 0, size.width, size.height );
+				renderer.setViewport( 0, 0, size.width, size.height );
 				renderer.render( scene, camera );
 				renderer.setScissorTest( false );
 				return;
 
-			case _spatialMultiplexsIndexs.SbS://'Side by side'
+			case spatialMultiplexsIndexs.SbS://'Side by side'
 
-				var _width = _size.width / 2;
+				var _width = size.width / 2;
 
-				_xL = 0 + _parallax;		_yL = 0; _widthL = _width; _heightL = _size.height;
-				_xR = _width - _parallax;	_yR = 0; _widthR = _width; _heightR = _size.height;
-
-				break;
-
-			case _spatialMultiplexsIndexs.TaB://'Top and bottom'
-
-				_xL = 0 + _parallax; _yL = 0;					_widthL = _size.width; _heightL = _size.height / 2;
-				_xR = 0 - _parallax; _yR = _size.height / 2;	_widthR = _size.width; _heightR = _size.height / 2;
+				xL = 0 + parallax;		yL = 0; widthL = _width; heightL = size.height;
+				xR = _width - parallax;	yR = 0; widthR = _width; heightR = size.height;
 
 				break;
-			default: console.error( 'THREE.StereoEffect.render: Invalid "Spatial  multiplex" parameter: ' + _spatialMultiplex );
+
+			case spatialMultiplexsIndexs.TaB://'Top and bottom'
+
+				xL = 0 + parallax; yL = 0;					widthL = size.width; heightL = size.height / 2;
+				xR = 0 - parallax; yR = size.height / 2;	widthR = size.width; heightR = size.height / 2;
+
+				break;
+			default: console.error( 'THREE.StereoEffect.render: Invalid "Spatial  multiplex" parameter: ' + spatialMultiplex );
 
 		}
 
 		options.stereo.update( camera );
 
-		renderer.setScissor( _xL, _yL, _widthL, _heightL );
-		renderer.setViewport( _xL, _yL, _widthL, _heightL );
+		renderer.setScissor( xL, yL, widthL, heightL );
+		renderer.setViewport( xL, yL, widthL, heightL );
 		renderer.render( scene, options.stereo.cameraL );
 
-		renderer.setScissor( _xR, _yR, _widthR, _heightR );
-		renderer.setViewport( _xR, _yR, _widthR, _heightR );
+		renderer.setScissor( xR, yR, widthR, heightR );
+		renderer.setViewport( xR, yR, widthR, heightR );
 		renderer.render( scene, options.stereo.cameraR );
 
 		renderer.setScissorTest( false );
@@ -266,12 +266,12 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 	function displayControllers( value ) {
 
-		var _display = value == THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono ? 'none' : 'block';
-		_controllerEyeSep.__li.style.display = _display;
+		var display = value == THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono ? 'none' : 'block';
+		_controllerEyeSep.__li.style.display = display;
 		if ( _controllerCameraFocus !== undefined )
-			_controllerCameraFocus.__li.style.display = _display;
-		_controllerDefaultF.__li.style.display = _display;
-		_controllerZeroParallax.__li.style.display = _display;
+			_controllerCameraFocus.__li.style.display = display;
+		_controllerDefaultF.__li.style.display = display;
+		_controllerZeroParallax.__li.style.display = display;
 
 	}
 
