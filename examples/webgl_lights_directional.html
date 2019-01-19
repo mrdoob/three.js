@@ -207,6 +207,8 @@
 					dirLight.target = mesh;
 					dirLightHelper.update();
 
+					addTargetGui();
+
 				} );
 
 				// RENDERER
@@ -340,6 +342,10 @@
 					setShadowCamera();
 
 				} );
+
+			}
+
+			function addTargetGui() {
 
 				var targetf = gui.addFolder( 'Target' );
 				targetf.open();
