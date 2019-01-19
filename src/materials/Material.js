@@ -40,6 +40,8 @@ function Material() {
 	this.depthTest = true;
 	this.depthWrite = true;
 
+	this.stencil = null;
+
 	this.clippingPlanes = null;
 	this.clipIntersection = false;
 	this.clipShadows = false;

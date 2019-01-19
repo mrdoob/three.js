@@ -142,3 +142,23 @@ export var BasicDepthPacking = 3200;
 export var RGBADepthPacking = 3201;
 export var TangentSpaceNormalMap = 0;
 export var ObjectSpaceNormalMap = 1;
+
+// StencilOp
+export var ZERO = 0;
+export var KEEP = 7680;
+export var REPLACE = 7681;
+export var INCR = 7682;
+export var DECR = 7683;
+export var INCR_WRAP = 34055;
+export var DECR_WRAP = 34056;
+export var INVERT = 5386;
+
+// StencilFunc
+export var NEVER = 512;
+export var LESS = 513;
+export var EQUAL = 514;
+export var LEQUAL = 515;
+export var GREATER = 516;
+export var NOTEQUAL = 517;
+export var GEQUAL = 518;
+export var ALWAYS = 519;

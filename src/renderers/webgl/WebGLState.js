@@ -677,6 +677,16 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 		depthBuffer.setMask( material.depthWrite );
 		colorBuffer.setMask( material.colorWrite );
 
+		var stencil = material.stencil;
+		var useStencil = stencil !== null;
+		stencilBuffer.setTest( useStencil );
+		if ( useStencil ) {
+
+			stencilBuffer.setFunc( stencil.func, stencil.ref, stencil.mask );
+			stencilBuffer.setOp( stencil.fail, stencil.zfail, stencil.zpass );
+
+		}
+
 		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}
