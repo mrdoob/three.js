@@ -28,7 +28,7 @@
 //		displayRect: true - the rectangle around the text is visible. Default is false
 //		backgroundColor: RGBA object or RGB object or HEX value. Default is 'rgba(100, 100, 100, 1)' - gray.
 //			Examples 'rgba(0, 0, 255, 0.5)', '#00FF00'
-//		borderColor: RGBA object or RGB object or HEX value. Default is 'rgba(0, 255, 0, 1)' - green
+//		borderColor: RGBA object or RGB object or HEX value. Default is 'rgba(0, 0, 0, 0)' - black transparent
 //		borderThickness: Default is 0 - no border
 //		borderRadius: Default is 0
 //	}
@@ -125,7 +125,7 @@ THREE.SpriteText = function ( text, options ) {
 
 			// background color
 			context.fillStyle = options.rect.hasOwnProperty( "backgroundColor" ) ?
-				options.rect[ "backgroundColor" ] : 'rgba(100, 100, 100, 1)';
+				options.rect[ "backgroundColor" ] : 'rgba(0, 0, 0, 0)';
 
 			// border color
 			context.strokeStyle = options.rect.hasOwnProperty( "borderColor" ) ?
