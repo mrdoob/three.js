@@ -199,6 +199,8 @@ THREE.SpriteText = function ( text, options ) {
 //	spriteFolder: sprite folder name. Default is lang.spriteText
 //}
 //options: options of the SpriteText.
+//
+//returns sprite folder
 THREE.gui.spriteText = function ( gui, sprite, guiParams, options ) {
 
 	if ( options === undefined ) options = sprite.options;
@@ -516,6 +518,7 @@ THREE.gui.spriteText = function ( gui, sprite, guiParams, options ) {
 
 		};
 	dat.controllerNameAndTitle( fSpriteText.add( defaultParams, 'defaultF' ), lang.defaultButton, lang.defaultTitle );
+	return fSpriteText;
 
 };
 
