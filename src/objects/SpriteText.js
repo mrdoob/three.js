@@ -30,7 +30,7 @@
 //			Examples 'rgba(0, 0, 255, 0.5)', '#00FF00'
 //		borderColor: RGBA object or RGB object or HEX value. Default is 'rgba(0, 255, 0, 1)' - green
 //		borderThickness: Default is 0 - no border
-//		borderRadius: Default is 6
+//		borderRadius: Default is 0
 //	}
 //	cookie: Your custom cookie function for saving and loading of the SpriteText settings. Default cookie is not saving settings.
 //}
@@ -156,7 +156,7 @@ THREE.SpriteText = function ( text, options ) {
 				borderThickness / 2,
 				textWidth - borderThickness,
 				fontSize - borderThickness,
-				options.rect.borderRadius === undefined ? 6 : options.rect.borderRadius
+				options.rect.borderRadius === undefined ? 0 : options.rect.borderRadius
 			);
 
 		}
