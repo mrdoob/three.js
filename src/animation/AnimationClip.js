@@ -420,6 +420,45 @@ Object.assign( AnimationClip.prototype, {
 		return this;
 
 	},
+	
+	slice: function(from, to, name) {
+
+            var frames = to - from, duration = 0;
+
+            var tracks = [];
+
+            for ( var i = 0, l = this.tracks.length; i < l; i ++ ) {
+
+                var track = this.tracks[i];
+
+                var stride = track.values.length / track.times.length;
+
+
+                var times = new track.TimeBufferType(frames);
+                var values = new track.ValueBufferType(frames * stride);
+
+                var start = track.times[from];
+
+                for ( var t = 0; t < frames; t ++ ) {
+
+                    times[t] = track.times[ from + t ] - start;
+
+                    for ( var k = 0; k < stride; k ++ )
+                        values[t * stride + k] = track.values[ ( from + t ) * stride + k ];
+
+                }
+
+                duration = Math.max(times[ to ], duration);
+
+                tracks.push(
+                    new track.constructor( track.name, times, values, track.createInterpolant )
+                );
+
+            }
+
+            return new AnimationClip( name || this.name, duration, tracks );
+
+        },
 
 	validate: function () {
 
