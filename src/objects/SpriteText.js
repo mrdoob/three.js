@@ -120,7 +120,7 @@ THREE.SpriteText = function ( text, options ) {
 		//Thanks to http://stemkoski.github.io/Three.js/Sprite-Text-Labels.html
 
 		var borderThickness = options.rect.hasOwnProperty( "borderThickness" ) ?
-				options.rect["borderThickness"] : 0;
+			options.rect[ "borderThickness" ] : 0;
 		if ( options.rect.displayRect ) {
 
 			// background color
