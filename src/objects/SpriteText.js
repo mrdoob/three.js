@@ -26,9 +26,9 @@
 //	rect: rectangle around the text.
 //	{
 //		displayRect: true - the rectangle around the text is visible. Default is false
-//		backgroundColor: RGBA object or RGB object or HEX value. Default is 'rgba(100, 100, 100, 1)' - gray.
+//		backgroundColor: RGBA object or RGB object or HEX value. Default is 'rgba(0, 0, 0, 0)' - black transparent
 //			Examples 'rgba(0, 0, 255, 0.5)', '#00FF00'
-//		borderColor: RGBA object or RGB object or HEX value. Default is 'rgba(0, 0, 0, 0)' - black transparent
+//		borderColor: RGBA object or RGB object or HEX value. Default is 'rgba(0, 255, 0, 1)' - green
 //		borderThickness: Default is 0 - no border
 //		borderRadius: Default is 0
 //	}
