@@ -1036,7 +1036,7 @@ var MapControls = function ( object, domElement ) {
 };
 
 MapControls.prototype = Object.create( EventDispatcher.prototype );
-MapControls.prototype.constructor = THREE.MapControls;
+MapControls.prototype.constructor = MapControls;
 
 Object.defineProperties( MapControls.prototype, {
 
@@ -1163,4 +1163,4 @@ Object.defineProperties( MapControls.prototype, {
 
 } );
 
-export { MapControls }
+export { MapControls };
