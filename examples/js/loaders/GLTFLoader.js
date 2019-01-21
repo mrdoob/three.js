@@ -1528,7 +1528,7 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	function createGeometryKey( primitiveDef ) {
+	function createPrimitiveKey( primitiveDef ) {
 
 		var dracoExtension = primitiveDef.extensions && primitiveDef.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ];
 		var geometryKey;
@@ -1585,7 +1585,7 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0, il = a.length; i < il; i ++ ) {
 
-			arrayKey += i + createGeometryKey( a[ i ] );
+			arrayKey += i + createPrimitiveKey( a[ i ] );
 
 		}
 
@@ -1595,7 +1595,15 @@ THREE.GLTFLoader = ( function () {
 
 	function createMultiPassGeometryKey( geometry, primitives ) {
 
-		return createGeometryKey( geometry ) + createArrayKeyGLTFPrimitive( primitives );
+		var key = createPrimitiveKey( geometry );
+
+		for ( var i = 0, il = primitives.length; i < il; i ++ ) {
+
+			key += i + primitives[ i ].uuid;
+
+		}
+
+		return key;
 
 	}
 
@@ -2520,7 +2528,7 @@ THREE.GLTFLoader = ( function () {
 		for ( var i = 0, il = primitives.length; i < il; i ++ ) {
 
 			var primitive = primitives[ i ];
-			var cacheKey = createGeometryKey( primitive );
+			var cacheKey = createPrimitiveKey( primitive );
 
 			// See if we've already created this geometry
 			var cached = cache[ cacheKey ];
