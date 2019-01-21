@@ -103,7 +103,16 @@ THREE.SpriteText = function ( text, options ) {
 		if ( optionsUpdate !== undefined )
 			Object.keys( optionsUpdate ).forEach( function ( key ) {
 
-				options[ key ] = optionsUpdate[ key ];
+				if ( typeof optionsUpdate[ key ] === "object" ) {
+
+					Object.keys( optionsUpdate[ key ] ).forEach( function ( key2 ) {
+
+						options[ key ][ key2 ] = optionsUpdate[ key ][ key2 ];
+
+					} );
+
+				}
+				else options[ key ] = optionsUpdate[ key ];
 
 			} );
 
@@ -334,9 +343,9 @@ THREE.gui.spriteText = function ( gui, sprite, guiParams, options ) {
 	function updateSpriteText() {
 
 		if ( Array.isArray( sprite ) )
-			sprite.forEach( function ( sprite ) {
+			sprite.forEach( function ( spriteItem ) {
 
-				sprite.update( options );
+				spriteItem.update( options );
 
 			} );
 		else sprite.update( options );
