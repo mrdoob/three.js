@@ -14,6 +14,9 @@
  *  bevelSize: <float>, // how far from shape outline is bevel
  *  bevelSegments: <int>, // number of bevel layers
  *
+ *  bottomLid: <bool>, // create a bottom lid
+ *  topLid: <bool>, // create a top lid
+ *
  *  extrudePath: <THREE.Curve> // curve to extrude shape along
  *
  *  UVGenerator: <Object> // object that provides UV generator functions
@@ -110,6 +113,8 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
 		var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
 		var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
+		var bottomLid = options.bottomLid !== undefined ? options.bottomLid : true;
+		var topLid = options.topLid !== undefined ? options.topLid : true;
 
 		var extrudePath = options.extrudePath;
 
@@ -553,11 +558,13 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// Bottom faces
 
-				for ( i = 0; i < flen; i ++ ) {
+				if(bottomLid) {
+					for ( i = 0; i < flen; i ++ ) {
 
-					face = faces[ i ];
-					f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
+						face = faces[ i ];
+						f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
 
+					}
 				}
 
 				layer = steps + bevelSegments * 2;
@@ -565,36 +572,44 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// Top faces
 
-				for ( i = 0; i < flen; i ++ ) {
+				if(topLid) {
+					for ( i = 0; i < flen; i ++ ) {
 
-					face = faces[ i ];
-					f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
+						face = faces[ i ];
+						f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
 
+					}
 				}
 
 			} else {
 
 				// Bottom faces
 
-				for ( i = 0; i < flen; i ++ ) {
+				if(bottomLid) {
+					for ( i = 0; i < flen; i ++ ) {
 
-					face = faces[ i ];
-					f3( face[ 2 ], face[ 1 ], face[ 0 ] );
+						face = faces[ i ];
+						f3( face[ 2 ], face[ 1 ], face[ 0 ] );
 
+					}
 				}
 
 				// Top faces
 
-				for ( i = 0; i < flen; i ++ ) {
+				if(topLid) {
+					for ( i = 0; i < flen; i ++ ) {
 
-					face = faces[ i ];
-					f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+						face = faces[ i ];
+						f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
 
+					}
 				}
 
 			}
 
-			scope.addGroup( start, verticesArray.length / 3 - start, 0 );
+			if(bottomLid || topLid) {
+				scope.addGroup( start, verticesArray.length / 3 - start, 0 );
+			}
 
 		}
 
