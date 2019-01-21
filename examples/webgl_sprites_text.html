@@ -163,6 +163,7 @@
 						new THREE.SpriteText( 'Array item 1', { position: new THREE.Vector3( - 10, 4, 2 ), textHeight: arrayOptions.textHeight } ),
 						new THREE.SpriteText( 'Array item 2', { position: new THREE.Vector3( - 10, 1, 2 ), textHeight: arrayOptions.textHeight } ),
 					];
+				arraySpriteText.options = arrayOptions;
 				arraySpriteText.forEach( function ( item ) {
 
 					scene.add( item );
@@ -186,7 +187,7 @@
 
 				//SpriteText settings
 				THREE.gui.spriteText( gui, spriteText, { getLanguageCode: THREE.getLanguageCode, } );
-				THREE.gui.spriteText( gui, arraySpriteText, { spriteFolder: 'Sprite Array' }, arrayOptions );
+				THREE.gui.spriteText( gui, arraySpriteText, { spriteFolder: 'Sprite Array' } );
 
 				//cube settings
 				var fCube = gui.addFolder( 'cube' );

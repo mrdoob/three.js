@@ -111,8 +111,7 @@ THREE.SpriteText = function ( text, options ) {
 
 					} );
 
-				}
-				else options[ key ] = optionsUpdate[ key ];
+				} else options[ key ] = optionsUpdate[ key ];
 
 			} );
 
@@ -196,6 +195,9 @@ THREE.SpriteText = function ( text, options ) {
 //See src\objects\SpriteText.js for SpriteText details
 //gui: see https://github.com/dataarts/dat.gui/blob/master/API.md for details
 //sprite: sprite with text component or array of sprites
+//	If sprite is array of sprites, then you can add an options property into array of sprites.
+//	Options property contains common properties for all items of array of sprites.
+//	See options of the SpriteText for details.
 //guiParams:
 //{
 //	getLanguageCode: Your custom getLanguageCode() function.
@@ -207,12 +209,11 @@ THREE.SpriteText = function ( text, options ) {
 //	parentFolder:
 //	spriteFolder: sprite folder name. Default is lang.spriteText
 //}
-//options: options of the SpriteText.
 //
 //returns sprite folder
-THREE.gui.spriteText = function ( gui, sprite, guiParams, options ) {
+THREE.gui.spriteText = function ( gui, sprite, guiParams ) {
 
-	if ( options === undefined ) options = sprite.options;
+	var options = sprite.options || {};
 	if ( options.optionsDefault === undefined ) {
 
 		if ( Array.isArray( sprite ) )
