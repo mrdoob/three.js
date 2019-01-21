@@ -21,7 +21,7 @@
 				一个位于二维空间中的点（例如一个在平面上的点）。
 			</li>
 			<li>
-				一个平面上的方向与长度的定义。在three.js中，长度总是从(0, 0)到(x, y)的
+				一个在平面上的方向与长度的定义。在three.js中，长度总是从(0, 0)到(x, y)的
 				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]（欧几里德距离，即直线距离），
 				方向也是从(0, 0)到(x, y)的方向。
 			</li>
@@ -139,7 +139,7 @@
 
 		<h3>[method:Vector2 clone]()</h3>
 		<p>
-			返回一个新的Vector2，新的Vector2具有和当前这个向量相同的[page:.x x]和[page:.y y]。
+			返回一个新的Vector2，其具有和当前这个向量相同的[page:.x x]和[page:.y y]。
 		</p>
 
 		<h3>[method:this copy]( [param:Vector2 v] )</h3>
@@ -157,7 +157,7 @@
 
 		<h3>[method:Float distanceToSquared]( [param:Vector2 v] )</h3>
 		<p>
-		计算该vector到传入的[page:Vector2 v]的平方距离。
+		计算该向量到传入的[page:Vector2 v]的平方距离。
 		如果你只是将该距离和另一个距离进行比较，则应当比较的是距离的平方，
 		因为它的计算效率会更高一些。
 		</p>
@@ -178,8 +178,8 @@
         
 		<h3>[method:Float cross]( [param:Vector2 v] )</h3>
 		<p>
-		Calculates the [link:https://en.wikipedia.org/wiki/Cross_product cross product] of this
-	  vector and [page:Vector2 v]. Note that a 'cross-product' in 2D is not well-defined. This function computes a geometric cross-product often used in 2D graphics
+			计算该vector和所传入[page:Vector2 v]的叉积（[link:https://en.wikipedia.org/wiki/Cross_product cross product]）。 
+			请注意，“叉积”在2D中并没有被明确定义。该函数计算的是2D图形中经常使用的几何叉积。
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Vector2 v] )</h3>
@@ -192,19 +192,19 @@
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - the source array.<br />
-		[page:Integer offset] - (optional) offset into the array. Default is 0.<br /><br />
+		[page:Array array] - 来源的数组。<br />
+		[page:Integer offset] - （可选）在数组中的元素偏移量，默认值为0。<br /><br />
 
-		Sets this vector's [page:.x x] value to be array[ offset ] and [page:.y y] value to be array[ offset + 1 ].
+		设置向量中的[page:.x x]值为array[ offset ]，[page:.y y]值为array[ offset + 1 ]。
 		</p>
 
 		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
 		<p>
-		[page:BufferAttribute attribute] - the source attribute.<br />
-		[page:Integer index] - index in the attribute.<br /><br />
+		[page:BufferAttribute attribute] - 来源的attribute。<br />
+		[page:Integer index] - 在attribute中的索引。<br /><br />
 
-		Sets this vector's [page:.x x] and [page:.y y] values from the [page:BufferAttribute attribute].
-		</p>
+		从[page:BufferAttribute attribute]中设置向量的[page:.x x]值和[page:.y y]值。 
+、		</p>
 
 		<h3>[method:Float getComponent]( [param:Integer index] )</h3>
 		<p>
@@ -234,40 +234,41 @@
 
 		<h3>[method:this lerp]( [param:Vector2 v], [param:Float alpha] )</h3>
 		<p>
-		[page:Vector2 v] - [page:Vector2] to interpolate towards.<br />
-		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Vector2 v] - 朝着进行插值的[page:Vector2]。<br />
+		alpha - 插值因数，其范围在[0, 1]闭区间。<br /><br />
 
-		Linearly interpolates between this vector and [page:Vector2 v], where alpha is the
-		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector2 v].
+		在该向量与传入的向量[page:Vector2 v]之间的线性插值，alpha是沿着线的距离长度。
+		—— alpha = 0 时表示的是当前向量，alpha = 1 时表示的是所传入的向量[page:Vector2 v]。
 		</p>
 
 		<h3>[method:this lerpVectors]( [param:Vector2 v1], [param:Vector2 v2], [param:Float alpha] )</h3>
 		<p>
-		[page:Vector2 v1] - the starting [page:Vector2].<br />
-		[page:Vector2 v2] - [page:Vector2] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Vector2 v1] - 起始的[page:Vector2]。<br />
+		[page:Vector2 v2] - 朝着进行插值的[page:Vector2]。<br />
+		[page:Float alpha] - 插值因数，其范围在[0, 1]闭区间。<br /><br />
 
-		Sets this vector to be the vector linearly interpolated between [page:Vector2 v1] and
-		[page:Vector2 v2] where alpha is the distance along the line connecting the two vectors
-		- alpha = 0 will be [page:Vector2 v1], and alpha = 1 will be [page:Vector2 v2].
+		将此向量设置为在[page:Vector2 v1]和[page:Vector2 v2]之间进行线性插值的向量，
+		其中alpha为两个向量之间连线的距离长度。
+		—— alpha = 0 时表示的是[page:Vector2 v1]，alpha = 1 时表示的是[page:Vector2 v2]。
 		</p>
 
 		<h3>[method:this negate]()</h3>
-		<p>将向量取反，例如将x和y取相反数： x = -x , y = -y。</p>
+		<p>向量取反，即： x = -x , y = -y。</p>
 
 		<h3>[method:this normalize]()</h3>
 		<p>
-		将该向量转换为单位向量（[link:https://en.wikipedia.org/wiki/Unit_vector unit vector]），也就是说，将该向量的方向设置为和原向量相同，但是其长度（[page:.length length]）为1。
+		将该向量转换为单位向量（[link:https://en.wikipedia.org/wiki/Unit_vector unit vector]），
+		也就是说，将该向量的方向设置为和原向量相同，但是其长度（[page:.length length]）为1。
 		</p>
 
 		<h3>[method:this max]( [param:Vector2 v] )</h3>
 		<p>
-		如果该向量的x值或y值小于所传入[page:Vector2 v]的x值或y值，则将该值替换为相应的最大值。
+		如果该向量的x值或y值小于所传入[page:Vector2 v]的x值或y值，则将该值替换为对应的最大值。
 		</p>
 
 		<h3>[method:this min]( [param:Vector2 v] )</h3>
 		<p>
-		如果该向量的x值或y值大于所传入[page:Vector2 v]的x值或y值，则将该值替换为相应的最小值。
+		如果该向量的x值或y值大于所传入[page:Vector2 v]的x值或y值，则将该值替换为对应的最小值。
 		</p>
 
 		<h3>[method:this multiply]( [param:Vector2 v] )</h3>
@@ -314,7 +315,7 @@
 
 		<h3>[method:this setScalar]( [param:Float scalar] )</h3>
 		<p>
-		将该向量的[page:.x x]、[page:.y y]值同时设置为传入的[page:Float scalar]。
+		将该向量的[page:.x x]、[page:.y y]值同时设置为等于传入的[page:Float scalar]。
 		</p>
 
 		<h3>[method:this setX]( [param:Float x] )</h3>
