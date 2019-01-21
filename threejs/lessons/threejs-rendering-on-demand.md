@@ -113,7 +113,7 @@ controls.dampingFactor = 0.1;
 ```
 
 With `enableDamping` on we need to call `control.update` in our render function so that the `OrbitControls` can
-continue to give us new camera settings as they smooth out the movement. But that means we can't call `render`
+continue to give us new camera settings as they smooth out the movement. But, that means we can't call `render`
 directly from the `change` event because we'll end up in an infinite loop. The controls will send us a `change` event
 and call `render`, `render` will call `control.update`. `control.update` will send another `change` event.
 
