@@ -146,7 +146,7 @@
 				dirLight.shadow.camera.bottom = - d;
 
 				dirLight.shadow.camera.near = 1;
-				dirLight.shadow.camera.far = 150;
+				dirLight.shadow.camera.far = 200;
 				dirLight.shadow.bias = - 0.0001;
 
 				setShadowCamera();
@@ -301,28 +301,28 @@
 
 				} );
 
-				shadowf.add( datas, 'left', -250, 0 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'left', -250, -10 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.left = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'right', 0, 250 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'right', 10, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.right = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'top', 0, 250 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'top', 10, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.top = value;
 					setShadowCamera();
 
 				} );
 
-				shadowf.add( datas, 'bottom', -250, 0 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'bottom', -250, -10 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.bottom = value;
 					setShadowCamera();
@@ -336,7 +336,7 @@
 
 				} );
 
-				shadowf.add( datas, 'far', 0, 250 ).step( 1 ).onChange( function ( value ) {
+				shadowf.add( datas, 'far', 10, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.far = value;
 					setShadowCamera();
