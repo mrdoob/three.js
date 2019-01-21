@@ -558,13 +558,15 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// Bottom faces
 
-				if(bottomLid) {
+				if ( bottomLid ) {
+
 					for ( i = 0; i < flen; i ++ ) {
 
 						face = faces[ i ];
 						f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
 
 					}
+
 				}
 
 				layer = steps + bevelSegments * 2;
@@ -572,43 +574,50 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// Top faces
 
-				if(topLid) {
+				if ( topLid ) {
 					for ( i = 0; i < flen; i ++ ) {
 
 						face = faces[ i ];
 						f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
 
 					}
+
 				}
 
 			} else {
 
 				// Bottom faces
 
-				if(bottomLid) {
+				if ( bottomLid ) {
+
 					for ( i = 0; i < flen; i ++ ) {
 
 						face = faces[ i ];
 						f3( face[ 2 ], face[ 1 ], face[ 0 ] );
 
 					}
+
 				}
 
 				// Top faces
 
-				if(topLid) {
+				if ( topLid ) {
+
 					for ( i = 0; i < flen; i ++ ) {
 
 						face = faces[ i ];
 						f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
 
 					}
+
 				}
 
 			}
 
-			if(bottomLid || topLid) {
+			if ( bottomLid || topLid ) {
+
 				scope.addGroup( start, verticesArray.length / 3 - start, 0 );
+
 			}
 
 		}
