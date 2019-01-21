@@ -539,6 +539,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleKeyDown' );
 
+		// prevent the browser from scrolling on cursor up/down
+
+		event.preventDefault();
+
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
