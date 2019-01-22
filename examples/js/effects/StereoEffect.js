@@ -434,7 +434,7 @@ if ( THREE.cookie === undefined ) {
 
 			var _cookieDate = new Date();
 			_cookieDate.setTime( _cookieDate.getTime() + 1000 * 60 * 60 * 24 * 365 );//One year of expiry period
-			document.cookie = name + "=" + value.toString() + "; expires=" + _cookieDate.toGMTString();
+			document.cookie = name + "=" + value.toString() + "; expires=" + _cookieDate.toGMTString() + '; path=' + location.pathname;
 			return;
 
 		};
