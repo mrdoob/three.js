@@ -46,7 +46,7 @@ function Material() {
 	this.stencilFail = KeepStencilOp;
 	this.stencilZFail = KeepStencilOp;
 	this.stencilZPass = KeepStencilOp;
-	this.stencilWrite = true;
+	this.stencilWrite = false;
 
 	this.clippingPlanes = null;
 	this.clipIntersection = false;

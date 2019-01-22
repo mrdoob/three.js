@@ -677,13 +677,12 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 		depthBuffer.setMask( material.depthWrite );
 		colorBuffer.setMask( material.colorWrite );
 
-		var stencil = material.stencil;
-		var useStencil = stencil !== null;
-		stencilBuffer.setTest( useStencil );
-		if ( useStencil ) {
+		var stencilWrite = material.stencilWrite;
+		stencilBuffer.setTest( stencilWrite );
+		if ( stencilWrite ) {
 
-			stencilBuffer.setFunc( stencil.func, stencil.ref, stencil.mask );
-			stencilBuffer.setOp( stencil.fail, stencil.zfail, stencil.zpass );
+			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilMask );
+			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
 
 		}
 
