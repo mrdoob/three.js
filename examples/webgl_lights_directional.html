@@ -149,7 +149,9 @@
 				dirLight.shadow.camera.far = 200;
 				dirLight.shadow.bias = - 0.0001;
 
-				setShadowCamera();
+				shadowCameraHelper = new THREE.CameraHelper( dirLight.shadow.camera );
+				shadowCameraHelper.visible = true;
+				scene.add( shadowCameraHelper );
 
 
 				// GROUND
@@ -304,42 +306,48 @@
 				shadowf.add( datas, 'left', -250, -10 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.left = value;
-					setShadowCamera();
+					dirLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				} );
 
 				shadowf.add( datas, 'right', 10, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.right = value;
-					setShadowCamera();
+					dirLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				} );
 
 				shadowf.add( datas, 'top', 10, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.top = value;
-					setShadowCamera();
+					dirLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				} );
 
 				shadowf.add( datas, 'bottom', -250, -10 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.bottom = value;
-					setShadowCamera();
+					dirLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				} );
 
 				shadowf.add( datas, 'near', 0, 150 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.near = value;
-					setShadowCamera();
+					dirLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				} );
 
 				shadowf.add( datas, 'far', 10, 250 ).step( 1 ).onChange( function ( value ) {
 
 					dirLight.shadow.camera.far = value;
-					setShadowCamera();
+					dirLight.shadow.camera.updateProjectionMatrix();
+					shadowCameraHelper.update();
 
 				} );
 
@@ -379,18 +387,6 @@
 
 			}
 
-			function setShadowCamera() {
-
-				if( shadowCameraHelper ) {
-
-					scene.remove( shadowCameraHelper );
-
-				}
-				shadowCameraHelper = new THREE.CameraHelper( dirLight.shadow.camera );
-				shadowCameraHelper.visible = true;
-				scene.add( shadowCameraHelper );
-
-			}
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
