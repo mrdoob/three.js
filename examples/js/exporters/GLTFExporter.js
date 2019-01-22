@@ -81,8 +81,7 @@ THREE.GLTFExporter.prototype = {
 			animations: [],
 			forceIndices: false,
 			forcePowerOfTwoTextures: false,
-			maxTextureHeight: 4096,
-			maxTextureWidth: 4096
+			maxTextureSize: Infinity
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -709,21 +708,27 @@ THREE.GLTFExporter.prototype = {
 
 				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
 
-				if ( image.width > options.maxTextureWidth || image.height > options.maxTextureHeight ) {
+				canvas.width = Math.min( image.width, options.maxTextureSize );
+				canvas.height = Math.min( image.height, options.maxTextureSize );
 
-					console.warn( 'GLTFExporter: Resized too big image.', image );
-				}
+				if ( options.forcePowerOfTwoTextures) {
 
-				canvas.width = Math.min( image.width, options.maxTextureWidth );
-				canvas.height = Math.min( image.height, options.maxTextureHeight );
+					if(! isPowerOfTwo( image )) {
+						console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
+					}
 
-				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( image ) ) {
+					if(! THREE.Math.isPowerOfTwo( canvas.width )) {
+						console.warn( 'GLTFExporter: power-of-two textures requested, but the given maxTextureSize is not power-of-two.')
+					}
 
-					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
-
-					canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
-					canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
-
+					// REMARK: These 'if' checks are performed just to avoid the unnecessary POW+LOG calls behind floorPowerOfTwo
+					if(! THREE.Math.isPowerOfTwo( canvas.width )) {
+						canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
+					}
+					
+					if(! THREE.Math.isPowerOfTwo( canvas.height )) {
+						canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
+					}
 				}
 
 				var ctx = canvas.getContext( '2d' );
