@@ -57,23 +57,7 @@ THREE.StereoEffect = function ( renderer, options ) {
 
 	options.stereo = new THREE.StereoCamera();
 	options.stereo.aspect = 0.5;
-	if ( options.cookie === undefined )
-		options.cookie = function ( name ) {
-
-			this.get = function ( defaultValue ) {
-
-				// Default cookie is not loading settings
-				return defaultValue;
-
-			};
-
-			this.set = function () {
-
-				// Default cookie is not saving settings
-
-			};
-
-		};
+	options.cookie = options.cookie || new THREE.cookie().default;
 	if ( options.spatialMultiplex === undefined )
 		options.spatialMultiplex = new options.cookie( 'spatialMultiplex' ).get( THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS );//Use 'Side by side' for compability with previous version of THREE.StereoEffect
 	if ( options.zeroParallax === undefined )
@@ -466,6 +450,30 @@ if ( THREE.cookie === undefined ) {
 
 			}
 			return defaultValue;
+
+		};
+
+		//Default cookie is not saving settings
+		this.default = function ( name ) {
+
+			this.get = function ( defaultValue ) {
+
+				// Default cookie is not loading settings
+				return defaultValue;
+
+			};
+
+			this.set = function () {
+
+				// Default cookie is not saving settings
+
+			};
+
+			this.isTrue = function ( defaultValue ) {
+
+				return defaultValue;
+
+			};
 
 		};
 
