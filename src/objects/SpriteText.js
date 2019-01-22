@@ -42,29 +42,7 @@ THREE.SpriteText = function ( text, options ) {
 
 	options = options || {};
 	sprite.options = options;
-	if ( options.cookie === undefined )
-		options.cookie = function ( name ) {
-
-			this.get = function ( defaultValue ) {
-
-				// Default cookie is not loading settings
-				return defaultValue;
-
-			};
-
-			this.set = function () {
-
-				// Default cookie is not saving settings
-
-			};
-
-			this.isTrue = function ( defaultValue ) {
-
-				return defaultValue;
-
-			};
-
-		};
+	options.cookie = options.cookie || new THREE.cookie().default;
 	options.text = text;//options.text || new options.cookie( 'SpriteText' ).get( 'Sprite Text' );
 	options.position = options.position || new THREE.Vector3( 0, 0, 0 );
 	options.textHeight = options.textHeight || 1;
