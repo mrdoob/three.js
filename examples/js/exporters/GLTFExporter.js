@@ -981,7 +981,10 @@ THREE.GLTFExporter.prototype = {
 			// occlusionTexture
 			if ( material.aoMap ) {
 
-				var occlusionMapDef = { index: processTexture( material.aoMap ) };
+				var occlusionMapDef = { 
+					index: processTexture( material.aoMap ),
+					texCoord: 1
+				};
 
 				if ( material.aoMapIntensity !== 1.0 ) {
 
