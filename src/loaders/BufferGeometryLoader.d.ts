@@ -1,8 +1,6 @@
 import { LoadingManager } from './LoadingManager';
 import { BufferGeometry } from './../core/BufferGeometry';
 
-export const DefaultLoadingManager: LoadingManager;
-
 export class BufferGeometryLoader {
   constructor(manager?: LoadingManager);
 

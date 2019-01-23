@@ -23,6 +23,8 @@ export class JSONLoader extends Loader {
   ): { geometry: Geometry; materials?: Material[] };
 }
 
+export const DefaultLoadingManager: LoadingManager;
+
 /**
  * Handles and keeps track of loaded and pending data.
  */

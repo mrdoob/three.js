@@ -2,7 +2,7 @@
  *
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/math/Math.js">src/math/Math.js</a>
  */
-export namespace Math {
+export namespace _Math {
   export const DEG2RAD: number;
   export const RAD2DEG: number;
 

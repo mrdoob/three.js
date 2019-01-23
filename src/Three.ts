@@ -42,7 +42,10 @@ export { TextureLoader } from './loaders/TextureLoader';
 export { ObjectLoader } from './loaders/ObjectLoader';
 export { MaterialLoader } from './loaders/MaterialLoader';
 export { BufferGeometryLoader } from './loaders/BufferGeometryLoader';
-export { LoadingManager } from './loaders/LoadingManager';
+export {
+  LoadingManager,
+  DefaultLoadingManager,
+} from './loaders/LoadingManager';
 export { ImageLoader } from './loaders/ImageLoader';
 //export { ImageBitmapLoader } from './loaders/ImageBitmapLoader';
 export { FontLoader } from './loaders/FontLoader';

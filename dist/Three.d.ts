@@ -1,8 +1,4 @@
 import './polyfills';
-
-// export {
-//   WebGLMultisampleRenderTarget,
-// } from './renderers/WebGLMultisampleRenderTarget';
 export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget';
 export { WebGLRenderer } from './renderers/WebGLRenderer';
@@ -20,13 +16,11 @@ export { Skeleton } from './objects/Skeleton';
 export { Bone } from './objects/Bone';
 export { Mesh } from './objects/Mesh';
 export { LineSegments } from './objects/LineSegments';
-//export { LineLoop } from './objects/LineLoop';
 export { Line } from './objects/Line';
 export { Points } from './objects/Points';
 export { Group } from './objects/Group';
 export { VideoTexture } from './textures/VideoTexture';
 export { DataTexture } from './textures/DataTexture';
-//export { DataTexture3D } from './textures/DataTexture3D';
 export { CompressedTexture } from './textures/CompressedTexture';
 export { CubeTexture } from './textures/CubeTexture';
 export { CanvasTexture } from './textures/CanvasTexture';
@@ -34,7 +28,6 @@ export { DepthTexture } from './textures/DepthTexture';
 export { Texture } from './textures/Texture';
 export * from './geometries/Geometries';
 export * from './materials/Materials';
-//export { AnimationLoader } from './loaders/AnimationLoader';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader';
 export { DataTextureLoader } from './loaders/DataTextureLoader';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader';
@@ -42,9 +35,8 @@ export { TextureLoader } from './loaders/TextureLoader';
 export { ObjectLoader } from './loaders/ObjectLoader';
 export { MaterialLoader } from './loaders/MaterialLoader';
 export { BufferGeometryLoader } from './loaders/BufferGeometryLoader';
-export { LoadingManager } from './loaders/LoadingManager';
+export { LoadingManager, DefaultLoadingManager, } from './loaders/LoadingManager';
 export { ImageLoader } from './loaders/ImageLoader';
-//export { ImageBitmapLoader } from './loaders/ImageBitmapLoader';
 export { FontLoader } from './loaders/FontLoader';
 export { FileLoader } from './loaders/FileLoader';
 export { Loader } from './loaders/Loader';
@@ -54,7 +46,6 @@ export { AudioLoader } from './loaders/AudioLoader';
 export { SpotLightShadow } from './lights/SpotLightShadow';
 export { SpotLight } from './lights/SpotLight';
 export { PointLight } from './lights/PointLight';
-//export { RectAreaLight } from './lights/RectAreaLight';
 export { HemisphereLight } from './lights/HemisphereLight';
 export { DirectionalLightShadow } from './lights/DirectionalLightShadow';
 export { DirectionalLight } from './lights/DirectionalLight';
@@ -74,9 +65,7 @@ export { AudioAnalyser } from './audio/AudioAnalyser';
 export { Audio } from './audio/Audio';
 export { VectorKeyframeTrack } from './animation/tracks/VectorKeyframeTrack';
 export { StringKeyframeTrack } from './animation/tracks/StringKeyframeTrack';
-export {
-  QuaternionKeyframeTrack,
-} from './animation/tracks/QuaternionKeyframeTrack';
+export { QuaternionKeyframeTrack, } from './animation/tracks/QuaternionKeyframeTrack';
 export { NumberKeyframeTrack } from './animation/tracks/NumberKeyframeTrack';
 export { ColorKeyframeTrack } from './animation/tracks/ColorKeyframeTrack';
 export { BooleanKeyframeTrack } from './animation/tracks/BooleanKeyframeTrack';
@@ -102,9 +91,7 @@ export { Raycaster } from './core/Raycaster';
 export { Layers } from './core/Layers';
 export { EventDispatcher } from './core/EventDispatcher';
 export { Clock } from './core/Clock';
-export {
-  QuaternionLinearInterpolant,
-} from './math/interpolants/QuaternionLinearInterpolant';
+export { QuaternionLinearInterpolant, } from './math/interpolants/QuaternionLinearInterpolant';
 export { LinearInterpolant } from './math/interpolants/LinearInterpolant';
 export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant';
 export { CubicInterpolant } from './math/interpolants/CubicInterpolant';
@@ -133,15 +120,12 @@ export { VertexNormalsHelper } from './helpers/VertexNormalsHelper';
 export { SpotLightHelper } from './helpers/SpotLightHelper';
 export { SkeletonHelper } from './helpers/SkeletonHelper';
 export { PointLightHelper } from './helpers/PointLightHelper';
-//export { RectAreaLightHelper } from './helpers/RectAreaLightHelper';
 export { HemisphereLightHelper } from './helpers/HemisphereLightHelper';
 export { GridHelper } from './helpers/GridHelper';
-//export { PolarGridHelper } from './helpers/PolarGridHelper';
 export { FaceNormalsHelper } from './helpers/FaceNormalsHelper';
 export { DirectionalLightHelper } from './helpers/DirectionalLightHelper';
 export { CameraHelper } from './helpers/CameraHelper';
 export { BoxHelper } from './helpers/BoxHelper';
-//export { Box3Helper } from './helpers/Box3Helper';
 export { PlaneHelper } from './helpers/PlaneHelper';
 export { ArrowHelper } from './helpers/ArrowHelper';
 export { AxesHelper } from './helpers/AxesHelper';
@@ -154,6 +138,6 @@ export { CurvePath } from './extras/core/CurvePath';
 export { Curve } from './extras/core/Curve';
 export { ImageUtils } from './extras/ImageUtils';
 export { ShapeUtils } from './extras/ShapeUtils';
-//export { WebGLUtils } from './renderers/webgl/WebGLUtils';
 export * from './constants';
 export * from './Three.Legacy';
+//# sourceMappingURL=Three.d.ts.map
