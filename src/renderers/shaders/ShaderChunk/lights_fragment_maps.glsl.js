@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #if defined( RE_IndirectDiffuse )
 
 	#ifdef USE_LIGHTMAP

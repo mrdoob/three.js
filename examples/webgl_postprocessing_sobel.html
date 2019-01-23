@@ -119,8 +119,8 @@
 
 				effectSobel = new THREE.ShaderPass( THREE.SobelOperatorShader );
 				effectSobel.renderToScreen = true;
-				effectSobel.uniforms.resolution.value.x = window.innerWidth;
-				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				effectSobel.uniforms[ "resolution" ].value.x = window.innerWidth;
+				effectSobel.uniforms[ "resolution" ].value.y = window.innerHeight;
 				composer.addPass( effectSobel );
 
 				var controls = new THREE.OrbitControls( camera );
@@ -146,8 +146,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectSobel.uniforms.resolution.value.x = window.innerWidth;
-				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				effectSobel.uniforms[ "resolution" ].value.x = window.innerWidth;
+				effectSobel.uniforms[ "resolution" ].value.y = window.innerHeight;
 
 			}
 

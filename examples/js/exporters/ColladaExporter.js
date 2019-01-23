@@ -359,6 +359,15 @@ THREE.ColladaExporter.prototype = {
 
 					type = 'constant';
 
+					if ( m.map !== null ) {
+
+						// The Collada spec does not support diffuse texture maps with the
+						// constant shader type.
+						// mrdoob/three.js#15469
+						console.warn( 'ColladaExporter: Texture maps not supported with MeshBasicMaterial.' );
+
+					}
+
 				}
 
 				var emissive = m.emissive ? m.emissive : new THREE.Color( 0, 0, 0 );
@@ -402,27 +411,34 @@ THREE.ColladaExporter.prototype = {
 
 					'</emission>' +
 
-					'<diffuse>' +
-
 					(
-						m.map ?
-							'<texture texture="diffuse-sampler" texcoord="TEXCOORD" />' :
-							`<color sid="diffuse">${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color>`
+						type !== 'constant' ?
+						'<diffuse>' +
+
+						(
+							m.map ?
+								'<texture texture="diffuse-sampler" texcoord="TEXCOORD" />' :
+								`<color sid="diffuse">${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color>`
+						) +
+						'</diffuse>'
+						: ''
 					) +
 
-					'</diffuse>' +
-
-					`<specular><color sid="specular">${ specular.r } ${ specular.g } ${ specular.b } 1</color></specular>` +
-
-					'<shininess>' +
-
 					(
-						m.specularMap ?
-							'<texture texture="specular-sampler" texcoord="TEXCOORD" />' :
-							`<float sid="shininess">${ shininess }</float>`
-					) +
+						type === 'phong' ?
+						`<specular><color sid="specular">${ specular.r } ${ specular.g } ${ specular.b } 1</color></specular>` +
 
-					'</shininess>' +
+						'<shininess>' +
+
+						(
+							m.specularMap ?
+								'<texture texture="specular-sampler" texcoord="TEXCOORD" />' :
+								`<float sid="shininess">${ shininess }</float>`
+						) +
+
+						'</shininess>'
+						: ''
+					) +
 
 					`<reflective><color>${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color></reflective>` +
 
@@ -502,16 +518,20 @@ THREE.ColladaExporter.prototype = {
 
 				// ids of the materials to bind to the geometry
 				var matids = null;
+				var matidsArray = [];
 
 				// get a list of materials to bind to the sub groups of the geometry.
 				// If the amount of subgroups is greater than the materials, than reuse
 				// the materials.
 				var mat = o.material || new THREE.MeshBasicMaterial();
 				var materials = Array.isArray( mat ) ? mat : [ mat ];
-				matids = new Array( geometry.groups.length )
-					.fill()
+				if ( geometry.groups.length > materials.length ) {
+					matidsArray = new Array( geometry.groups.length );
+				} else {
+					matidsArray = new Array( materials.length )
+				}
+				matids = matidsArray.fill()
 					.map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
-
 
 				node +=
 					`<instance_geometry url="#${ meshid }">` +

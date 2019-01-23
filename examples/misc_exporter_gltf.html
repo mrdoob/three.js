@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - gltf exporter</title>
+		<title>three.js webgl - exporter - gltf</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -22,14 +22,14 @@
 	</head>
 	<body>
 		<div id="info">
-			GLTF Exporter<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf<br/><br/>
 			<button id="export_scene">Export Scene1</button>
 			<button id="export_scenes">Export Scene1 and Scene 2</button>
 			<button id="export_object">Export Sphere</button>
 			<button id="export_obj">Export WaltHead</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
-			<br/>
+			<br/><br/>
 			<label><input id="option_trs" name="trs" type="checkbox"/>TRS</label>
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
@@ -212,7 +212,7 @@
 					map: mapGrid
 				} );
 
-				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 0 ), material );
+				object = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 75, 0 ), material );
 				object.position.set( - 200, 0, 200 );
 				object.name = 'Icosahedron';
 				scene1.add( object );
@@ -222,7 +222,7 @@
 					color: 0x0000ff,
 					wireframe: true
 				} );
-				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 1 ), material );
+				object = new THREE.Mesh( new THREE.OctahedronBufferGeometry( 75, 1 ), material );
 				object.position.set( 0, 0, 200 );
 				object.name = 'Octahedron';
 				scene1.add( object );
@@ -234,7 +234,7 @@
 					opacity: 0.5
 				} );
 
-				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
+				object = new THREE.Mesh( new THREE.TetrahedronBufferGeometry( 75, 0 ), material );
 				object.position.set( 200, 0, 200 );
 				object.name = 'Tetrahedron';
 				scene1.add( object );
@@ -269,7 +269,7 @@
 					color: 0xff0000,
 					roughness: 1
 				} );
-				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 15, 40, 10 ), material );
+				object = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 50, 15, 40, 10 ), material );
 				object.position.set( - 200, 0, 0 );
 				object.name = "Cylinder";
 				scene1.add( object );
@@ -459,15 +459,15 @@
 					side: THREE.DoubleSide
 				} );
 
-				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.CircleBufferGeometry( 50, 20, 0, Math.PI * 2 ), material );
 				object.position.set( 200, 0, - 400 );
 				scene1.add( object );
 
-				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.RingBufferGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
 				object.position.set( 0, 0, - 400 );
 				scene1.add( object );
 
-				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
+				object = new THREE.Mesh( new THREE.CylinderBufferGeometry( 25, 75, 100, 40, 5 ), material );
 				object.position.set( - 200, 0, - 400 );
 				scene1.add( object );
 
@@ -480,7 +480,7 @@
 
 				}
 
-				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
+				object = new THREE.Mesh( new THREE.LatheBufferGeometry( points, 20 ), material );
 				object.position.set( 200, 0, 400 );
 				scene1.add( object );
 

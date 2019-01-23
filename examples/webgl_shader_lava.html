@@ -143,17 +143,17 @@
 
 				uniforms = {
 
-					fogDensity: { value: 0.45 },
-					fogColor: { value: new THREE.Vector3( 0, 0, 0 ) },
-					time: { value: 1.0 },
-					uvScale: { value: new THREE.Vector2( 3.0, 1.0 ) },
-					texture1: { value: textureLoader.load( 'textures/lava/cloud.png' ) },
-					texture2: { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
+					"fogDensity": { value: 0.45 },
+					"fogColor": { value: new THREE.Vector3( 0, 0, 0 ) },
+					"time": { value: 1.0 },
+					"uvScale": { value: new THREE.Vector2( 3.0, 1.0 ) },
+					"texture1": { value: textureLoader.load( 'textures/lava/cloud.png' ) },
+					"texture2": { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
 
 				};
 
-				uniforms.texture1.value.wrapS = uniforms.texture1.value.wrapT = THREE.RepeatWrapping;
-				uniforms.texture2.value.wrapS = uniforms.texture2.value.wrapT = THREE.RepeatWrapping;
+				uniforms[ "texture1" ].value.wrapS = uniforms[ "texture1" ].value.wrapT = THREE.RepeatWrapping;
+				uniforms[ "texture2" ].value.wrapS = uniforms[ "texture2" ].value.wrapT = THREE.RepeatWrapping;
 
 				var size = 0.65;
 
@@ -224,7 +224,7 @@
 
 				var delta = 5 * clock.getDelta();
 
-				uniforms.time.value += 0.2 * delta;
+				uniforms[ "time" ].value += 0.2 * delta;
 
 				mesh.rotation.y += 0.0125 * delta;
 				mesh.rotation.x += 0.05 * delta;

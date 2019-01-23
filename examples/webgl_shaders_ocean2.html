@@ -113,9 +113,9 @@
 							RESOLUTION: res
 						} );
 
-					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix = { value: this.ms_Camera.projectionMatrix };
-					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix = { value: this.ms_Camera.matrixWorldInverse };
-					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition = { value: this.ms_Camera.position };
+					this.ms_Ocean.materialOcean.uniforms[ "u_projectionMatrix" ] = { value: this.ms_Camera.projectionMatrix };
+					this.ms_Ocean.materialOcean.uniforms[ "u_viewMatrix" ] = { value: this.ms_Camera.matrixWorldInverse };
+					this.ms_Ocean.materialOcean.uniforms[ "u_cameraPosition" ] = { value: this.ms_Camera.position };
 					this.ms_Scene.add( this.ms_Ocean.oceanMesh );
 
 					var gui = new dat.GUI();
@@ -193,18 +193,18 @@
 
 					if ( this.ms_Ocean.changed ) {
 
-						this.ms_Ocean.materialOcean.uniforms.u_size.value = this.ms_Ocean.size;
-						this.ms_Ocean.materialOcean.uniforms.u_sunDirection.value.set( this.ms_Ocean.sunDirectionX, this.ms_Ocean.sunDirectionY, this.ms_Ocean.sunDirectionZ );
-						this.ms_Ocean.materialOcean.uniforms.u_exposure.value = this.ms_Ocean.exposure;
+						this.ms_Ocean.materialOcean.uniforms[ "u_size" ].value = this.ms_Ocean.size;
+						this.ms_Ocean.materialOcean.uniforms[ "u_sunDirection" ].value.set( this.ms_Ocean.sunDirectionX, this.ms_Ocean.sunDirectionY, this.ms_Ocean.sunDirectionZ );
+						this.ms_Ocean.materialOcean.uniforms[ "u_exposure" ].value = this.ms_Ocean.exposure;
 						this.ms_Ocean.changed = false;
 
 					}
 
-					this.ms_Ocean.materialOcean.uniforms.u_normalMap.value = this.ms_Ocean.normalMapFramebuffer.texture;
-					this.ms_Ocean.materialOcean.uniforms.u_displacementMap.value = this.ms_Ocean.displacementMapFramebuffer.texture;
-					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix.value = this.ms_Camera.projectionMatrix;
-					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix.value = this.ms_Camera.matrixWorldInverse;
-					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition.value = this.ms_Camera.position;
+					this.ms_Ocean.materialOcean.uniforms[ "u_normalMap" ].value = this.ms_Ocean.normalMapFramebuffer.texture;
+					this.ms_Ocean.materialOcean.uniforms[ "u_displacementMap" ].value = this.ms_Ocean.displacementMapFramebuffer.texture;
+					this.ms_Ocean.materialOcean.uniforms[ "u_projectionMatrix" ].value = this.ms_Camera.projectionMatrix;
+					this.ms_Ocean.materialOcean.uniforms[ "u_viewMatrix" ].value = this.ms_Camera.matrixWorldInverse;
+					this.ms_Ocean.materialOcean.uniforms[ "u_cameraPosition" ].value = this.ms_Camera.position;
 					this.ms_Ocean.materialOcean.depthTest = true;
 					//this.ms_Scene.__lights[1].position.x = this.ms_Scene.__lights[1].position.x + 0.01;
 					this.Display();

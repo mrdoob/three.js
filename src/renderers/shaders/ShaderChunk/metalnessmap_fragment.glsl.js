@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 float metalnessFactor = metalness;
 
 #ifdef USE_METALNESSMAP

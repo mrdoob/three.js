@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_MAP
 
 	vec2 uv = ( uvTransform * vec3( gl_PointCoord.x, 1.0 - gl_PointCoord.y, 1 ) ).xy;
