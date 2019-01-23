@@ -125,6 +125,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.autoClear = false;
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
