@@ -12026,21 +12026,7 @@
 
 		toNonIndexed: function () {
 
-			if ( this.index === null ) {
-
-				console.warn( 'THREE.BufferGeometry.toNonIndexed(): Geometry is already non-indexed.' );
-				return this;
-
-			}
-
-			var geometry2 = new BufferGeometry();
-
-			var indices = this.index.array;
-			var attributes = this.attributes;
-
-			for ( var name in attributes ) {
-
-				var attribute = attributes[ name ];
+			function convertBufferAttribute( attribute, indices ) {
 
 				var array = attribute.array;
 				var itemSize = attribute.itemSize;
@@ -12061,9 +12047,60 @@
 
 				}
 
-				geometry2.addAttribute( name, new BufferAttribute( array2, itemSize ) );
+				return new BufferAttribute( array2, itemSize );
 
 			}
+
+			//
+
+			if ( this.index === null ) {
+
+				console.warn( 'THREE.BufferGeometry.toNonIndexed(): Geometry is already non-indexed.' );
+				return this;
+
+			}
+
+			var geometry2 = new BufferGeometry();
+
+			var indices = this.index.array;
+			var attributes = this.attributes;
+
+			// attributes
+
+			for ( var name in attributes ) {
+
+				var attribute = attributes[ name ];
+
+				var newAttribute = convertBufferAttribute( attribute, indices );
+
+				geometry2.addAttribute( name, newAttribute );
+
+			}
+
+			// morph attributes
+
+			var morphAttributes = this.morphAttributes;
+
+			for ( name in morphAttributes ) {
+
+				var morphArray = [];
+				var morphAttribute = morphAttributes[ name ]; // morphAttribute: array of Float32BufferAttributes
+
+				for ( var i = 0, il = morphAttribute.length; i < il; i ++ ) {
+
+					var attribute = morphAttribute[ i ];
+
+					var newAttribute = convertBufferAttribute( attribute, indices );
+
+					morphArray.push( newAttribute );
+
+				}
+
+				geometry2.morphAttributes[ name ] = morphArray;
+
+			}
+
+			// groups
 
 			var groups = this.groups;
 
@@ -18687,12 +18724,10 @@
 
 			if ( lights.length === 0 ) return;
 
-			// TODO Clean up (needed in case of contextlost)
-			var _gl = _renderer.context;
 			var _state = _renderer.state;
 
 			// Set GL state for depth map.
-			_state.disable( 3042 );
+			_state.setBlending( NoBlending );
 			_state.buffers.color.setClear( 1, 1, 1, 1 );
 			_state.buffers.depth.setTest( true );
 			_state.setScissorTest( false );
@@ -44660,7 +44695,7 @@
 		geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
 		geometry2.computeBoundingSphere();
 
-		this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: THREE.BackSide, fog: false } ) ) );
+		this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: BackSide, fog: false } ) ) );
 
 		this.update();
 
@@ -45552,8 +45587,8 @@
 
 		Object3D.call( this );
 
-		if ( dir === undefined ) dir = new THREE.Vector3( 0, 0, 1 );
-		if ( origin === undefined ) origin = new THREE.Vector3( 0, 0, 0 );
+		if ( dir === undefined ) dir = new Vector3( 0, 0, 1 );
+		if ( origin === undefined ) origin = new Vector3( 0, 0, 0 );
 		if ( length === undefined ) length = 1;
 		if ( color === undefined ) color = 0xffff00;
 		if ( headLength === undefined ) headLength = 0.2 * length;
