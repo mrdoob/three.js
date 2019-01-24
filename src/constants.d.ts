@@ -177,6 +177,22 @@ export const RGBA_PVRTC_2BPPV1_Format: CompressedPixelFormat;
 // ETC compressed texture formats
 export const RGB_ETC1_Format: CompressedPixelFormat;
 
+// ASTC compressed texture formats
+export const RGBA_ASTC_4x4_Format: CompressedPixelFormat;
+export const RGBA_ASTC_5x4_Format: CompressedPixelFormat;
+export const RGBA_ASTC_5x5_Format: CompressedPixelFormat;
+export const RGBA_ASTC_6x5_Format: CompressedPixelFormat;
+export const RGBA_ASTC_6x6_Format: CompressedPixelFormat;
+export const RGBA_ASTC_8x5_Format: CompressedPixelFormat;
+export const RGBA_ASTC_8x6_Format: CompressedPixelFormat;
+export const RGBA_ASTC_8x8_Format: CompressedPixelFormat;
+export const RGBA_ASTC_10x5_Format: CompressedPixelFormat;
+export const RGBA_ASTC_10x6_Format: CompressedPixelFormat;
+export const RGBA_ASTC_10x8_Format: CompressedPixelFormat;
+export const RGBA_ASTC_10x10_Format: CompressedPixelFormat;
+export const RGBA_ASTC_12x10_Format: CompressedPixelFormat;
+export const RGBA_ASTC_12x12_Format: CompressedPixelFormat;
+
 // Loop styles for AnimationAction
 export enum AnimationActionLoopStyles {}
 export const LoopOnce: AnimationActionLoopStyles;
