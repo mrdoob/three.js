@@ -1,8 +1,8 @@
 import './polyfills';
 
-// export {
-//   WebGLMultisampleRenderTarget,
-// } from './renderers/WebGLMultisampleRenderTarget';
+export {
+  WebGLMultisampleRenderTarget,
+} from './renderers/WebGLMultisampleRenderTarget';
 export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget';
 export { WebGLRenderer } from './renderers/WebGLRenderer';
@@ -20,7 +20,7 @@ export { Skeleton } from './objects/Skeleton';
 export { Bone } from './objects/Bone';
 export { Mesh } from './objects/Mesh';
 export { LineSegments } from './objects/LineSegments';
-//export { LineLoop } from './objects/LineLoop';
+export { LineLoop } from './objects/LineLoop';
 export { Line } from './objects/Line';
 export { Points } from './objects/Points';
 export { Group } from './objects/Group';
@@ -34,7 +34,7 @@ export { DepthTexture } from './textures/DepthTexture';
 export { Texture } from './textures/Texture';
 export * from './geometries/Geometries';
 export * from './materials/Materials';
-//export { AnimationLoader } from './loaders/AnimationLoader';
+export { AnimationLoader } from './loaders/AnimationLoader';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader';
 export { DataTextureLoader } from './loaders/DataTextureLoader';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader';
@@ -47,7 +47,7 @@ export {
   DefaultLoadingManager,
 } from './loaders/LoadingManager';
 export { ImageLoader } from './loaders/ImageLoader';
-//export { ImageBitmapLoader } from './loaders/ImageBitmapLoader';
+export { ImageBitmapLoader } from './loaders/ImageBitmapLoader';
 export { FontLoader } from './loaders/FontLoader';
 export { FileLoader } from './loaders/FileLoader';
 export { Loader } from './loaders/Loader';
@@ -57,7 +57,7 @@ export { AudioLoader } from './loaders/AudioLoader';
 export { SpotLightShadow } from './lights/SpotLightShadow';
 export { SpotLight } from './lights/SpotLight';
 export { PointLight } from './lights/PointLight';
-//export { RectAreaLight } from './lights/RectAreaLight';
+export { RectAreaLight } from './lights/RectAreaLight';
 export { HemisphereLight } from './lights/HemisphereLight';
 export { DirectionalLightShadow } from './lights/DirectionalLightShadow';
 export { DirectionalLight } from './lights/DirectionalLight';
@@ -136,7 +136,7 @@ export { VertexNormalsHelper } from './helpers/VertexNormalsHelper';
 export { SpotLightHelper } from './helpers/SpotLightHelper';
 export { SkeletonHelper } from './helpers/SkeletonHelper';
 export { PointLightHelper } from './helpers/PointLightHelper';
-//export { RectAreaLightHelper } from './helpers/RectAreaLightHelper';
+export { RectAreaLightHelper } from './helpers/RectAreaLightHelper';
 export { HemisphereLightHelper } from './helpers/HemisphereLightHelper';
 export { GridHelper } from './helpers/GridHelper';
 //export { PolarGridHelper } from './helpers/PolarGridHelper';
@@ -144,7 +144,7 @@ export { FaceNormalsHelper } from './helpers/FaceNormalsHelper';
 export { DirectionalLightHelper } from './helpers/DirectionalLightHelper';
 export { CameraHelper } from './helpers/CameraHelper';
 export { BoxHelper } from './helpers/BoxHelper';
-//export { Box3Helper } from './helpers/Box3Helper';
+export { Box3Helper } from './helpers/Box3Helper';
 export { PlaneHelper } from './helpers/PlaneHelper';
 export { ArrowHelper } from './helpers/ArrowHelper';
 export { AxesHelper } from './helpers/AxesHelper';

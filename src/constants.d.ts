@@ -159,6 +159,7 @@ export const LuminanceAlphaFormat: PixelFormat;
 export const RGBEFormat: PixelFormat;
 export const DepthFormat: PixelFormat;
 export const DepthStencilFormat: PixelFormat;
+export const RedFormat: PixelFormat;
 
 // Compressed texture formats
 // DDS / ST3C Compressed texture formats
