@@ -1,5 +1,5 @@
 import { Geometry } from './../core/Geometry';
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry.js';
+import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
 
 export class DodecahedronBufferGeometry extends PolyhedronBufferGeometry {
   constructor(radius?: number, detail?: number);

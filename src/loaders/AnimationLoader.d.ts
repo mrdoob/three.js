@@ -1,4 +1,4 @@
-import { LoadingManager } from './LoadingManager.js';
+import { LoadingManager } from './LoadingManager';
 
 export class AnimationLoader {
   constructor(manager?: LoadingManager);

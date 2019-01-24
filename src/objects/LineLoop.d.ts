@@ -1,4 +1,4 @@
-import { Line } from './Line.js';
+import { Line } from './Line';
 import { Geometry } from './../core/Geometry';
 import { Material } from './../materials/Material';
 import { BufferGeometry } from '../core/BufferGeometry';

@@ -1,7 +1,7 @@
 import {
   WebGLRenderTarget,
   WebGLRenderTargetOptions,
-} from './WebGLRenderTarget.js';
+} from './WebGLRenderTarget';
 
 export class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
   constructor(

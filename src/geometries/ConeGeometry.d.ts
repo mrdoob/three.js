@@ -1,5 +1,5 @@
-import { CylinderGeometry } from './CylinderGeometry.js';
-import { CylinderBufferGeometry } from './CylinderGeometry.js';
+import { CylinderGeometry } from './CylinderGeometry';
+import { CylinderBufferGeometry } from './CylinderGeometry';
 import { BufferGeometry } from '../core/BufferGeometry';
 
 export class ConeBufferGeometry extends BufferGeometry {
