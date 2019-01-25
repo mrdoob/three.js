@@ -7,7 +7,6 @@
 THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.object = object;
-	this.target = new THREE.Vector3( 0, 0, 0 );
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
@@ -37,8 +36,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.lat = 0;
 	this.lon = 0;
-	this.phi = 0;
-	this.theta = 0;
 
 	this.moveForward = false;
 	this.moveBackward = false;
@@ -184,74 +181,77 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	};
 
-	this.update = function ( delta ) {
+	this.update = function () {
 
-		if ( this.enabled === false ) return;
+		var targetPosition = new THREE.Vector3();
 
-		if ( this.heightSpeed ) {
+		return function update( delta ) {
 
-			var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
-			var heightDelta = y - this.heightMin;
+			if ( this.enabled === false ) return;
 
-			this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
+			if ( this.heightSpeed ) {
 
-		} else {
+				var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
+				var heightDelta = y - this.heightMin;
 
-			this.autoSpeedFactor = 0.0;
+				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
 
-		}
+			} else {
 
-		var actualMoveSpeed = delta * this.movementSpeed;
+				this.autoSpeedFactor = 0.0;
 
-		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
-		if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
+			}
 
-		if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
-		if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
+			var actualMoveSpeed = delta * this.movementSpeed;
 
-		if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
-		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
+			if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+			if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
 
-		var actualLookSpeed = delta * this.lookSpeed;
+			if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
+			if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
 
-		if ( ! this.activeLook ) {
+			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
+			if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
 
-			actualLookSpeed = 0;
+			var actualLookSpeed = delta * this.lookSpeed;
 
-		}
+			if ( ! this.activeLook ) {
 
-		var verticalLookRatio = 1;
+				actualLookSpeed = 0;
 
-		if ( this.constrainVertical ) {
+			}
 
-			verticalLookRatio = Math.PI / ( this.verticalMax - this.verticalMin );
+			var verticalLookRatio = 1;
 
-		}
+			if ( this.constrainVertical ) {
 
-		this.lon += this.mouseX * actualLookSpeed;
-		if ( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
+				verticalLookRatio = Math.PI / ( this.verticalMax - this.verticalMin );
 
-		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
-		this.phi = THREE.Math.degToRad( 90 - this.lat );
+			}
 
-		this.theta = THREE.Math.degToRad( this.lon );
+			this.lon -= this.mouseX * actualLookSpeed;
+			if ( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
-		if ( this.constrainVertical ) {
+			this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 
-			this.phi = THREE.Math.mapLinear( this.phi, 0, Math.PI, this.verticalMin, this.verticalMax );
+			var phi = THREE.Math.degToRad( 90 - this.lat );
+			var theta = THREE.Math.degToRad( this.lon );
 
-		}
+			if ( this.constrainVertical ) {
 
-		var targetPosition = this.target,
-			position = this.object.position;
+				phi = THREE.Math.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
 
-		targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
-		targetPosition.y = position.y + 100 * Math.cos( this.phi );
-		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+			}
 
-		this.object.lookAt( targetPosition );
+			var position = this.object.position;
 
-	};
+			targetPosition.setFromSphericalCoords( 1, phi, theta ).add( position );
+
+			this.object.lookAt( targetPosition );
+
+		};
+
+	}();
 
 	function contextmenu( event ) {
 
