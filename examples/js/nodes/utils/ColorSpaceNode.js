@@ -131,7 +131,7 @@ ColorSpaceNode.Nodes = ( function () {
 	var LinearToLogLuv = new FunctionNode( [
 		"vec4 LinearToLogLuv( in vec4 value ) {",
 
-		"	vec3 Xp_Y_XYZp = value.rgb * cLogLuvM;",
+		"	vec3 Xp_Y_XYZp = cLogLuvM * value.rgb;",
 		"	Xp_Y_XYZp = max(Xp_Y_XYZp, vec3(1e-6, 1e-6, 1e-6));",
 		"	vec4 vResult;",
 		"	vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;",
@@ -155,7 +155,7 @@ ColorSpaceNode.Nodes = ( function () {
 		"	Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);",
 		"	Xp_Y_XYZp.z = Xp_Y_XYZp.y / value.y;",
 		"	Xp_Y_XYZp.x = value.x * Xp_Y_XYZp.z;",
-		"	vec3 vRGB = Xp_Y_XYZp.rgb * cLogLuvInverseM;",
+		"	vec3 vRGB = cLogLuvInverseM * Xp_Y_XYZp.rgb;",
 		"	return vec4( max(vRGB, 0.0), 1.0 );",
 
 		"}"
