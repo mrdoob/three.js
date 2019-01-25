@@ -385,7 +385,7 @@ THREE.GLTFExporter.prototype = {
 			if ( texture.repeat.x !== 1 || texture.repeat.y !== 1 ) {
 
 				transformDef.scale = texture.repeat.toArray();
-				didTransform = true;				
+				didTransform = true;
 
 			}
 
@@ -1608,12 +1608,12 @@ THREE.GLTFExporter.prototype = {
 			} else if ( light.isPointLight ) {
 
 				lightDef.type = 'point';
-				lightDef.range = light.distance;
+				if ( light.distance > 0 ) lightDef.range = light.distance;
 
 			} else if ( light.isSpotLight ) {
 
 				lightDef.type = 'spot';
-				lightDef.range = light.distance;
+				if ( light.distance > 0 ) lightDef.range = light.distance;
 				lightDef.spot = {};
 				lightDef.spot.innerConeAngle = ( light.penumbra - 1.0 ) * light.angle * -1.0;
 				lightDef.spot.outerConeAngle = light.angle;
