@@ -845,6 +845,8 @@ Object.assign( ObjectLoader.prototype, {
 
 				}
 
+				if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
+
 				break;
 
 			case 'LOD':
