@@ -36,7 +36,7 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 	constructor: THREE.CubeTexturePass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;

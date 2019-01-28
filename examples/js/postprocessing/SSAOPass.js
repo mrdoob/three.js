@@ -173,7 +173,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 	},
 
-	render: function ( renderer, writeBuffer /*, readBuffer, delta, maskActive */ ) {
+	render: function ( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
 
 		// render beauty and depth
 
