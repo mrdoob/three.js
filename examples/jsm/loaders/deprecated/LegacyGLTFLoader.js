@@ -43,7 +43,7 @@ import {
 	LoaderUtils,
 	LuminanceAlphaFormat,
 	LuminanceFormat,
-	Math,
+	Math as _Math,
 	Matrix3,
 	Matrix4,
 	Mesh,
@@ -896,7 +896,7 @@ DeferredShaderMaterial.prototype.create = function () {
 
 		var originalUniform = this.params.uniforms[ uniformId ];
 
-		if ( originalUniform.value instanceof Texture ) {
+		if ( originalUniform.value.isTexture ) {
 
 			uniforms[ uniformId ].value = originalUniform.value;
 			uniforms[ uniformId ].value.needsUpdate = true;
@@ -1870,7 +1870,7 @@ GLTFParser.prototype.loadCameras = function () {
 			// aspectRatio = xfov / yfov
 			var xfov = yfov * aspectRatio;
 
-			var _camera = new PerspectiveCamera( Math.radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
+			var _camera = new PerspectiveCamera( _Math.radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
 			if ( camera.name !== undefined ) _camera.name = camera.name;
 
 			if ( camera.extras ) _camera.userData = camera.extras;

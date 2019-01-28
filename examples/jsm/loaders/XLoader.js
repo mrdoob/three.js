@@ -9,6 +9,7 @@ import {
 	Bone,
 	BufferGeometry,
 	DefaultLoadingManager,
+	FileLoader,
 	Float32BufferAttribute,
 	FrontSide,
 	LoaderUtils,

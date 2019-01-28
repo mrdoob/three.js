@@ -74,8 +74,5 @@
       "build/three.module.js"
     ],
     "directories": {}
-  },
-  "dependencies": {
-    "mmd-parser": "^1.0.3"
   }
 }

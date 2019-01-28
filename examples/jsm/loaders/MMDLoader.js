@@ -29,7 +29,6 @@
  *  - shadow support.
  */
 
-import { Parser as MMDParser } from 'mmd-parser';
 import {
 	AddOperation,
 	AnimationClip,
@@ -62,7 +61,7 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
-
+import { Parser as MMDParser } from '../libs/mmdparser.js';
 import { TGALoader } from "./TGALoader";
 import { MeshToonMaterial } from "../../../build/three";
 
@@ -360,12 +359,6 @@ MMDLoader.prototype = {
 	_getParser: function () {
 
 		if ( this.parser === null ) {
-
-			if ( typeof MMDParser === 'undefined' ) {
-
-				throw new Error( 'THREE.MMDLoader: Import MMDParser https://github.com/takahirox/mmd-parser' );
-
-			}
 
 			this.parser = new MMDParser();
 

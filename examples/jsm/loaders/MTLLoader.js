@@ -9,6 +9,7 @@ import {
 	DefaultLoadingManager,
 	FileLoader,
 	FrontSide,
+	Loader,
 	LoaderUtils,
 	MeshPhongMaterial,
 	RepeatWrapping,

@@ -38,6 +38,7 @@ import {
 	Loader,
 	Line,
 	LineBasicMaterial,
+	Math as _Math,
 	Matrix3,
 	Matrix4,
 	Mesh,
@@ -1191,7 +1192,7 @@ FBXTreeParser.prototype = {
 						// TODO: this is not correct - FBX calculates outer and inner angle in degrees
 						// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
 						// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-						penumbra = Math.degToRad( lightAttribute.OuterAngle.value );
+						penumbra = _Math.degToRad( lightAttribute.OuterAngle.value );
 						penumbra = Math.max( penumbra, 1 );
 
 					}
@@ -2737,19 +2738,19 @@ AnimationParser.prototype = {
 		if ( curves.x !== undefined ) {
 
 			this.interpolateRotations( curves.x );
-			curves.x.values = curves.x.values.map( Math.degToRad );
+			curves.x.values = curves.x.values.map( _Math.degToRad );
 
 		}
 		if ( curves.y !== undefined ) {
 
 			this.interpolateRotations( curves.y );
-			curves.y.values = curves.y.values.map( Math.degToRad );
+			curves.y.values = curves.y.values.map( _Math.degToRad );
 
 		}
 		if ( curves.z !== undefined ) {
 
 			this.interpolateRotations( curves.z );
-			curves.z.values = curves.z.values.map( Math.degToRad );
+			curves.z.values = curves.z.values.map( _Math.degToRad );
 
 		}
 
@@ -2768,7 +2769,7 @@ AnimationParser.prototype = {
 
 		if ( postRotation !== undefined ) {
 
-			postRotation = postRotation.map( Math.degToRad );
+			postRotation = postRotation.map( _Math.degToRad );
 			postRotation.push( eulerOrder );
 
 			postRotation = new Euler().fromArray( postRotation );
@@ -3999,7 +4000,7 @@ function generateTransform( transformData ) {
 
 	if ( transformData.preRotation ) {
 
-		var array = transformData.preRotation.map( Math.degToRad );
+		var array = transformData.preRotation.map( _Math.degToRad );
 		array.push( transformData.eulerOrder );
 		lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4007,7 +4008,7 @@ function generateTransform( transformData ) {
 
 	if ( transformData.rotation ) {
 
-		var array = transformData.rotation.map( Math.degToRad );
+		var array = transformData.rotation.map( _Math.degToRad );
 		array.push( transformData.eulerOrder );
 		lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4015,7 +4016,7 @@ function generateTransform( transformData ) {
 
 	if ( transformData.postRotation ) {
 
-		var array = transformData.postRotation.map( Math.degToRad );
+		var array = transformData.postRotation.map( _Math.degToRad );
 		array.push( transformData.eulerOrder );
 		lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 

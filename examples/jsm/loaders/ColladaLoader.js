@@ -21,7 +21,7 @@ import {
 	LineBasicMaterial,
 	LineSegments,
 	LoaderUtils,
-	Math,
+	Math as _Math,
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
@@ -2790,7 +2790,7 @@ ColladaLoader.prototype = {
 				case 'rotate':
 					data.obj = new Vector3();
 					data.obj.fromArray( array );
-					data.angle = Math.degToRad( array[ 3 ] );
+					data.angle = _Math.degToRad( array[ 3 ] );
 					break;
 
 			}
@@ -3062,7 +3062,7 @@ ColladaLoader.prototype = {
 									switch ( joint.type ) {
 
 										case 'revolute':
-											matrix.multiply( m0.makeRotationAxis( axis, Math.degToRad( value ) ) );
+											matrix.multiply( m0.makeRotationAxis( axis, _Math.degToRad( value ) ) );
 											break;
 
 										case 'prismatic':
@@ -3158,7 +3158,7 @@ ColladaLoader.prototype = {
 					case 'rotate':
 						var array = parseFloats( child.textContent );
 						var vector = new Vector3().fromArray( array );
-						var angle = Math.degToRad( array[ 3 ] );
+						var angle = _Math.degToRad( array[ 3 ] );
 						transforms.push( {
 							sid: child.getAttribute( 'sid' ),
 							type: child.nodeName,
@@ -3265,7 +3265,7 @@ ColladaLoader.prototype = {
 
 					case 'rotate':
 						var array = parseFloats( child.textContent );
-						var angle = Math.degToRad( array[ 3 ] );
+						var angle = _Math.degToRad( array[ 3 ] );
 						data.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
 						data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 						break;

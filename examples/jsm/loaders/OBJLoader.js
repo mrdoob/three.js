@@ -702,7 +702,7 @@ var OBJLoader = ( function () {
 						material = this.materials.create( sourceMaterial.name );
 
 						// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
-						if ( isLine && material && ! ( material instanceof LineBasicMaterial ) ) {
+						if ( isLine && material && ! ( material.isLineBasicMaterial ) ) {
 
 							var materialLine = new LineBasicMaterial();
 							Material.prototype.copy.call( materialLine, material );
@@ -710,7 +710,7 @@ var OBJLoader = ( function () {
 							materialLine.lights = false;
 							material = materialLine;
 
-						} else if ( isPoints && material && ! ( material instanceof PointsMaterial ) ) {
+						} else if ( isPoints && material && ! ( material.isPointsMaterial ) ) {
 
 							var materialPoints = new PointsMaterial( { size: 10, sizeAttenuation: false } );
 							Material.prototype.copy.call( materialPoints, material );

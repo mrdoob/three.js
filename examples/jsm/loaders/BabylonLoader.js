@@ -11,6 +11,7 @@ import {
 	Float32BufferAttribute,
 	Group,
 	HemisphereLight,
+	Mesh,
 	MeshPhongMaterial,
 	PerspectiveCamera,
 	PointLight,

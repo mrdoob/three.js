@@ -10,6 +10,7 @@ import {
 	Group,
 	LoaderUtils,
 	Matrix4,
+	Mesh,
 	MeshPhongMaterial,
 	VertexColors,
 } from "../../../build/three.module.js";

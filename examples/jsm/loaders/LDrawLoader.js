@@ -1066,7 +1066,7 @@ LDrawLoader.prototype = {
 		// Parse all line commands
 		for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
-			line = lines[ lineIndex ];
+			var line = lines[ lineIndex ];
 
 			if ( line.length === 0 ) continue;
 
