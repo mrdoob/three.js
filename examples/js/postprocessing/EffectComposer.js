@@ -46,7 +46,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
 
-	this.previousFrameTime = Date.now();
+	this._previousFrameTime = Date.now();
 
 };
 
@@ -75,14 +75,17 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	},
 
-	// deltaTime value is in seconds.
 	render: function ( deltaTime ) {
 
-		if ( deltaTime == undefined )
-		{
-			deltaTime = (Date.now() - this.previousFrameTime) * 0.001;
+		// deltaTime value is in seconds
+
+		if ( deltaTime === undefined ) {
+
+			deltaTime = ( Date.now() - this._previousFrameTime ) * 0.001;
+
 		}
-		this.previousFrameTime = Date.now();
+
+		this._previousFrameTime = Date.now();
 
 		var maskActive = false;
 
