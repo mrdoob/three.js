@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - convex geometry</title>
+		<title>three.js webgl - sprite text</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -158,12 +158,22 @@
 					} );
 				scene.add( spriteText );
 
-				var arrayOptions = { textHeight: 2 },
+				var commonOptions = {
+
+						textHeight: 2,
+						cookie: {
+
+							cookie: THREE.cookie,
+							name: 'arraySpriteText',
+
+						},
+
+					},
 					arraySpriteText = [
-						new THREE.SpriteText( 'Array item 1', { position: new THREE.Vector3( - 10, 4, 2 ), textHeight: arrayOptions.textHeight } ),
-						new THREE.SpriteText( 'Array item 2', { position: new THREE.Vector3( - 10, 1, 2 ), textHeight: arrayOptions.textHeight } ),
+						new THREE.SpriteText( 'Array item 1', { position: new THREE.Vector3( - 10, 4, 2 ), commonOptions: commonOptions, } ),
+						new THREE.SpriteText( 'Array item 2', { position: new THREE.Vector3( - 10, 1, 2 ), commonOptions: commonOptions, } ),
 					];
-				arraySpriteText.options = arrayOptions;
+				arraySpriteText.options = commonOptions;
 				arraySpriteText.forEach( function ( item ) {
 
 					scene.add( item );
@@ -177,6 +187,7 @@
 					spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono,
 					far: camera.far,
 					camera: camera,
+					//cookie: THREE.cookie,
 
 				} );
 				effect.setSize( window.innerWidth, window.innerHeight );

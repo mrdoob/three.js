@@ -17,10 +17,6 @@ THREE.StereoEffectParameters = {
 		SbS: 1, //https://en.wikipedia.org/wiki/DVB_3D-TV#Side_by_side
 		TaB: 2, //https://en.wikipedia.org/wiki/DVB_3D-TV#Top_and_bottom
 	},
-
-	//Zero parallax
-	//http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
-	zeroParallaxDefault: 0,
 };
 
 //StereoEffect
@@ -30,7 +26,7 @@ THREE.StereoEffectParameters = {
 //{
 //	spatialMultiplex: spatial multiplex
 //		See https://en.wikipedia.org/wiki/DVB_3D-TV for details
-//		Available values:
+//		Available values
 //
 //			THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono - no stereo effacts
 //
@@ -43,9 +39,6 @@ THREE.StereoEffectParameters = {
 //		Example - spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono
 //		Default is THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS
 //
-//	zeroParallax: Distance to objects with zero parallax.
-//		See http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf for details.
-//		Default is THREE.StereoEffectParameters.zeroParallaxDefault
 //	camera: THREE.PerspectiveCamera. Use the camera key if you want control cameras focus.
 //	far: Camera frustum far plane. The far key uses for correct calculation default values of Eye separation. Default is 10.
 //	cookie: Your custom cookie function for saving and loading of the StereoEffects settings. Default cookie is not saving settings.
@@ -58,28 +51,28 @@ THREE.StereoEffect = function ( renderer, options ) {
 	options.stereo = new THREE.StereoCamera();
 	options.stereo.aspect = 0.5;
 	options.cookie = options.cookie || new THREE.cookie().default;
-	if ( options.spatialMultiplex === undefined )
-		options.spatialMultiplex = new options.cookie( 'spatialMultiplex' ).get( THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS );//Use 'Side by side' for compability with previous version of THREE.StereoEffect
-	if ( options.zeroParallax === undefined )
-		options.zeroParallax = parseInt( new options.cookie( 'zeroParallax' ).get( THREE.StereoEffectParameters.zeroParallaxDefault ) );
 	if ( options.far === undefined )
 		options.far = new THREE.PerspectiveCamera().focus;
-	options.eyeSep = function () {
-
-		return ( new THREE.StereoCamera().eyeSep / 10 ) * options.far;
-
-	};
 	options.focus = options.camera === undefined ? new THREE.PerspectiveCamera().focus : new THREE.Vector3().distanceTo( options.camera.position );
-	if ( options.camera !== undefined )
-		options.camera.focus = parseInt( new options.cookie( 'cameraFocus' ).get( options.focus ) );
+	options.zeroParallax = 0;
+	new THREE.cookie( 'StereoEffect' ).getObject( options, {
 
-	options.stereo.eyeSep = ( new options.cookie( 'eyeSeparation' ).get( options.eyeSep() ) * 10000 ) / 10000;
+		spatialMultiplex: options.spatialMultiplex !== undefined ? options.spatialMultiplex : THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS, //Use default as 'Side by side' for compability with previous version of THREE.StereoEffect
+		eyeSep: ( new THREE.StereoCamera().eyeSep / 10 ) * options.far,
+		focus: options.focus,
+		zeroParallax: 0,
+
+	} );
+	if ( options.camera !== undefined )
+		options.camera.focus = options.focus;
 
 	this.setEyeSeparation = function ( eyeSep ) {
 
 		options.stereo.eyeSep = eyeSep;
 
 	};
+
+	this.setEyeSeparation( options.eyeSep );
 
 	this.setSize = function ( width, height ) {
 
@@ -262,23 +255,23 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	var _fStereoEffects = gui.addFolder( _lang.stereoEffects );//Stero effects folder
 
 	//Spatial multiplex
-	dat.controllerNameAndTitle( _fStereoEffects.add( options, 'spatialMultiplex',
+	var _controllerSpatialMultiplex = _fStereoEffects.add( options, 'spatialMultiplex',
 		_lang.spatialMultiplexs ).onChange( function ( value ) {
 
 		value = parseInt( value );
-
 		displayControllers( value );
+		options.cookieObject.setObject();
 
-		new options.cookie( 'spatialMultiplex' ).set( value );
-
-	} ), _lang.spatialMultiplexName, _lang.spatialMultiplexTitle );
+	} );
+	dat.controllerNameAndTitle( _controllerSpatialMultiplex, _lang.spatialMultiplexName, _lang.spatialMultiplexTitle );
 
 	//eyeSeparation
 	//http://paulbourke.net/papers/vsmm2007/stereoscopy_workshop.pdf
-	var _controllerEyeSep = _fStereoEffects.add( options.stereo, 'eyeSep', 0, options.eyeSep() * 3, options.eyeSep() / 10 )
+	var _controllerEyeSep = _fStereoEffects.add( options.stereo, 'eyeSep', 0, options.optionsDefault.eyeSep * 3, options.optionsDefault.eyeSep / 10 )
 		.onChange( function ( value ) {
 
-			new options.cookie( 'eyeSeparation' ).set( value );
+			options.eyeSep = value;
+			options.cookieObject.setObject();
 
 		} );
 	dat.controllerNameAndTitle( _controllerEyeSep, _lang.eyeSeparationName, _lang.eyeSeparationTitle );
@@ -288,10 +281,11 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	if ( options.camera ) {
 
 		_controllerCameraFocus = _fStereoEffects.add( options.camera, 'focus',
-			options.focus / 10, options.focus * 2, options.focus / 1000 )
+			options.optionsDefault.focus / 10, options.optionsDefault.focus * 2, options.optionsDefault.focus / 1000 )
 			.onChange( function ( value ) {
 
-				new options.cookie( 'cameraFocus' ).set( value );
+				options.focus = value;
+				options.cookieObject.setObject();
 
 			} );
 		dat.controllerNameAndTitle( _controllerCameraFocus, _lang.focus, _lang.focusTitle );
@@ -304,7 +298,8 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	var _controllerZeroParallax = _fStereoEffects.add( options, 'zeroParallax', - _minMax, _minMax )
 		.onChange( function ( value ) {
 
-			new options.cookie( 'zeroParallax' ).set( value );
+			options.zeroParallax = value;
+			options.cookieObject.setObject();
 
 		} );
 	dat.controllerNameAndTitle( _controllerZeroParallax, _lang.zeroParallaxName, _lang.zeroParallaxTitle );
@@ -313,16 +308,16 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	var _controllerDefaultF = _fStereoEffects.add( {
 		defaultF: function ( value ) {
 
-			options.stereo.eyeSep = options.eyeSep();
+			options.stereo.eyeSep = options.optionsDefault.eyeSep;
 			_controllerEyeSep.setValue( options.stereo.eyeSep );
 
 			if ( options.camera ) {
 
-				options.camera.focus = options.focus;
+				options.camera.focus = options.optionsDefault.focus;
 				_controllerCameraFocus.setValue( options.camera.focus );
 
-				options.zeroParallax = THREE.StereoEffectParameters.zeroParallaxDefault;
-				_controllerZeroParallax.setValue( THREE.StereoEffectParameters.zeroParallaxDefault );
+				options.zeroParallax = options.optionsDefault.zeroParallax;
+				_controllerZeroParallax.setValue( options.zeroParallax );
 
 			}
 
@@ -469,11 +464,59 @@ if ( THREE.cookie === undefined ) {
 
 			};
 
+			this.setObject = function () {
+
+				// Default cookie is not saving object's settings
+
+			};
+
 			this.isTrue = function ( defaultValue ) {
 
 				return defaultValue;
 
 			};
+
+		};
+
+		this.getObject = function ( options, optionsDefault ) {
+
+			if ( ! optionsDefault )
+				return;//object's settings is not saving
+
+			options.optionsDefault = optionsDefault;
+			options.cookieObject = new ( typeof options.cookie === "function" ? options.cookie : options.cookie.cookie
+				|| new THREE.cookie().default )( name );
+
+			options.cookieObject.options = options;
+			var cookieObject = JSON.parse( options.cookieObject.get( JSON.stringify( options.optionsDefault ) ) );
+			Object.keys( options.optionsDefault ).forEach( function ( key ) {
+
+				if ( cookieObject[ key ] === undefined )
+					return;
+				if ( typeof options.optionsDefault[ key ] === "object" )
+					Object.keys( options.optionsDefault[ key ] ).forEach( function ( key2 ) {
+
+						if ( options[ key ] === undefined ) options[ key ] = cookieObject[ key ];
+						if ( cookieObject[ key ][ key2 ] !== undefined )
+							options[ key ][ key2 ] = cookieObject[ key ][ key2 ];
+
+					} );
+				else options[ key ] = cookieObject[ key ];
+
+			} );
+
+		};
+
+		this.setObject = function () {
+
+			var object = {},
+				options = this.options;
+			Object.keys( options.optionsDefault ).forEach( function ( key ) {
+
+				object[ key ] = options[ key ];
+
+			} );
+			options.cookieObject.set( JSON.stringify( object ) );
 
 		};
 
