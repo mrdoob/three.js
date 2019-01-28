@@ -46,6 +46,7 @@ import {
 	Interpolant,
 	Loader,
 	LoaderUtils as THRLoaderUtils,
+	MeshToonMaterial,
 	MultiplyOperation,
 	NumberKeyframeTrack,
 	OneMinusSrcAlphaFactor,
@@ -61,9 +62,8 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
-import { Parser as MMDParser } from '../libs/mmdparser.js';
 import { TGALoader } from "./TGALoader";
-import { MeshToonMaterial } from "../../../build/three";
+import { Parser } from '../libs/MMDParser';
 
 /**
  * @param {LoadingManager} manager
@@ -360,7 +360,7 @@ MMDLoader.prototype = {
 
 		if ( this.parser === null ) {
 
-			this.parser = new MMDParser();
+			this.parser = new Parser();
 
 		}
 
