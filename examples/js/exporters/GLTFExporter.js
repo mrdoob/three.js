@@ -365,7 +365,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function applyTextureTransform( mapDef, texture ) {
 
-			var didTransform = false
+			var didTransform = false;
 			var transformDef = {};
 
 			if ( texture.offset.x !== 0 || texture.offset.y !== 0 ) {
@@ -981,7 +981,7 @@ THREE.GLTFExporter.prototype = {
 			// occlusionTexture
 			if ( material.aoMap ) {
 
-				var occlusionMapDef = { 
+				var occlusionMapDef = {
 					index: processTexture( material.aoMap ),
 					texCoord: 1
 				};
@@ -1611,7 +1611,7 @@ THREE.GLTFExporter.prototype = {
 				lightDef.type = 'spot';
 				if ( light.distance > 0 ) lightDef.range = light.distance;
 				lightDef.spot = {};
-				lightDef.spot.innerConeAngle = ( light.penumbra - 1.0 ) * light.angle * -1.0;
+				lightDef.spot.innerConeAngle = ( light.penumbra - 1.0 ) * light.angle * - 1.0;
 				lightDef.spot.outerConeAngle = light.angle;
 
 			}
@@ -1627,7 +1627,7 @@ THREE.GLTFExporter.prototype = {
 					&& ( light.target.parent !== light
 					 || light.target.position.x !== 0
 					 || light.target.position.y !== 0
-					 || light.target.position.z !== -1 ) ) {
+					 || light.target.position.z !== - 1 ) ) {
 
 				console.warn( 'THREE.GLTFExporter: Light direction may be lost. For best results, '
 					+ 'make light.target a child of the light with position 0,0,-1.' );

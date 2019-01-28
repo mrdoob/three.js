@@ -2825,7 +2825,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'mass':
-						data.mass = parseFloats( child.textContent )[0];
+						data.mass = parseFloats( child.textContent )[ 0 ];
 						break;
 
 				}
