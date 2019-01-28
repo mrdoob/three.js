@@ -99,6 +99,8 @@ import {
 	ZeroFactor,
 	sRGBEncoding
 } from "../../../build/three.module.js";
+import { DDSLoader } from "./DDSLoader";
+import { DRACOLoader } from "./DRACOLoader";
 
 var GLTFLoader = ( function () {
 
@@ -393,14 +395,8 @@ var GLTFLoader = ( function () {
 	 */
 	function GLTFTextureDDSExtension() {
 
-		if ( ! THREE.DDSLoader ) {
-
-			throw new Error( 'THREE.GLTFLoader: Attempting to load .dds texture without importing THREE.DDSLoader' );
-
-		}
-
 		this.name = EXTENSIONS.MSFT_TEXTURE_DDS;
-		this.ddsLoader = new THREE.DDSLoader();
+		this.ddsLoader = new DDSLoader();
 
 	}
 
@@ -602,7 +598,7 @@ var GLTFLoader = ( function () {
 		this.name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
 		this.json = json;
 		this.dracoLoader = dracoLoader;
-		THREE.DRACOLoader.getDecoderModule();
+		DRACOLoader.getDecoderModule();
 
 	}
 
