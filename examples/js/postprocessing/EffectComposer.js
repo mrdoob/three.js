@@ -46,6 +46,8 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
 
+	this.previousFrameTime = Date.now();
+
 };
 
 Object.assign( THREE.EffectComposer.prototype, {
@@ -73,7 +75,14 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	},
 
-	render: function ( delta ) {
+	// deltaTime value is in seconds.
+	render: function ( deltaTime ) {
+
+		if ( deltaTime == undefined )
+		{
+			deltaTime = (Date.now() - this.previousFrameTime) * 0.001;
+		}
+		this.previousFrameTime = Date.now();
 
 		var maskActive = false;
 
@@ -85,7 +94,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			if ( pass.enabled === false ) continue;
 
-			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
+			pass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
 
 			if ( pass.needsSwap ) {
 
@@ -95,7 +104,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
 
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
+					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
 
 					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
 
@@ -180,7 +189,7 @@ Object.assign( THREE.Pass.prototype, {
 
 	setSize: function ( width, height ) {},
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
 
