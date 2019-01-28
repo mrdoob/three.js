@@ -54,9 +54,10 @@ THREE.StereoEffect = function ( renderer, options ) {
 	if ( options.far === undefined )
 		options.far = new THREE.PerspectiveCamera().focus;
 	options.focus = options.camera === undefined ? new THREE.PerspectiveCamera().focus : new THREE.Vector3().distanceTo( options.camera.position );
+	options.zeroParallax = 0;
 	new THREE.cookie( 'StereoEffect' ).getObject( options, {
 
-		spatialMultiplex: options.spatialMultiplex !== undefined ? options.spatialMultiplex : THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS,//Use default as 'Side by side' for compability with previous version of THREE.StereoEffect
+		spatialMultiplex: options.spatialMultiplex !== undefined ? options.spatialMultiplex : THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS, //Use default as 'Side by side' for compability with previous version of THREE.StereoEffect
 		eyeSep: ( new THREE.StereoCamera().eyeSep / 10 ) * options.far,
 		focus: options.focus,
 		zeroParallax: 0,
@@ -257,11 +258,11 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 	var _controllerSpatialMultiplex = _fStereoEffects.add( options, 'spatialMultiplex',
 		_lang.spatialMultiplexs ).onChange( function ( value ) {
 
-			value = parseInt( value );
-			displayControllers( value );
-			options.cookieObject.setObject();
+		value = parseInt( value );
+		displayControllers( value );
+		options.cookieObject.setObject();
 
-		} );
+	} );
 	dat.controllerNameAndTitle( _controllerSpatialMultiplex, _lang.spatialMultiplexName, _lang.spatialMultiplexTitle );
 
 	//eyeSeparation
@@ -467,7 +468,7 @@ if ( THREE.cookie === undefined ) {
 
 				// Default cookie is not saving object's settings
 
-			}
+			};
 
 			this.isTrue = function ( defaultValue ) {
 
@@ -479,22 +480,45 @@ if ( THREE.cookie === undefined ) {
 
 		this.getObject = function ( options, optionsDefault ) {
 
+			if ( ! optionsDefault )
+				return;//object's settings is not saving
+
 			options.optionsDefault = optionsDefault;
-			options.cookieObject = new ( options.cookie || new THREE.cookie().default )( name );
+			options.cookieObject = new ( typeof options.cookie === "function" ? options.cookie : options.cookie.cookie
+				|| new THREE.cookie().default )( name );
+
 			options.cookieObject.options = options;
 			var cookieObject = JSON.parse( options.cookieObject.get( JSON.stringify( options.optionsDefault ) ) );
-			Object.keys( options.optionsDefault ).forEach( function ( key ) { options[key] = cookieObject[key]; } );
+			Object.keys( options.optionsDefault ).forEach( function ( key ) {
 
-		}
+				if ( cookieObject[ key ] === undefined )
+					return;
+				if ( typeof options.optionsDefault[ key ] === "object" )
+					Object.keys( options.optionsDefault[ key ] ).forEach( function ( key2 ) {
+
+						if ( options[ key ] === undefined ) options[ key ] = cookieObject[ key ];
+						if ( cookieObject[ key ][ key2 ] !== undefined )
+							options[ key ][ key2 ] = cookieObject[ key ][ key2 ];
+
+					} );
+				else options[ key ] = cookieObject[ key ];
+
+			} );
+
+		};
 
 		this.setObject = function () {
 
 			var object = {},
 				options = this.options;
-			Object.keys( options.optionsDefault ).forEach( function ( key ) { object[key] = options[key]; } );
+			Object.keys( options.optionsDefault ).forEach( function ( key ) {
+
+				object[ key ] = options[ key ];
+
+			} );
 			options.cookieObject.set( JSON.stringify( object ) );
 
-		}
+		};
 
 	};
 
@@ -521,7 +545,7 @@ if ( typeof dat !== 'undefined' ) {
 
 		};
 
-	} else console.error( 'Duplicate dat.controllerNameAndTitle method' );
+	} else console.error( 'Duplicate dat.controllerNameAndTitle method.' );
 
 	if ( dat.folderNameAndTitle === undefined ) {
 
@@ -531,6 +555,6 @@ if ( typeof dat !== 'undefined' ) {
 
 		};
 
-	} else console.error( 'Duplicate dat.folderNameAndTitle method' );
+	} else console.error( 'Duplicate dat.folderNameAndTitle method.' );
 
 }
