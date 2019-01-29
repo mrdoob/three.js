@@ -12,7 +12,7 @@ function TimerNode( scale, scope, timeScale ) {
 	this.scale = scale !== undefined ? scale : 1;
 	this.scope = scope || TimerNode.GLOBAL;
 
-	this.timeScale = timeScale !== undefined ? timeScale : this.scale !== 1;
+	this.timeScale = timeScale !== undefined ? timeScale : scale !== 1;
 
 }
 
