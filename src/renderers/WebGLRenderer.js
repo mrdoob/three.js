@@ -648,9 +648,11 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	var boundBufferCache = []
-	for(var i = 0; i < 64; i++) {
-		boundBufferCache[i] = null
+	var boundBufferCache = [];
+	for ( var i = 0; i < 64; i ++ ) {
+
+		boundBufferCache[ i ] = null;
+
 	}
 	var boundIndexBuffer = null;
 
@@ -712,7 +714,7 @@ function WebGLRenderer( parameters ) {
 
 			setupVertexAttributes( material, program, geometry );
 
-			if ( index !== null && boundIndexBuffer !== attribute.buffer) {
+			if ( index !== null && boundIndexBuffer !== attribute.buffer ) {
 
 				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attribute.buffer );
 				boundIndexBuffer = attribute.buffer;
@@ -892,10 +894,12 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						if(boundBufferCache[programAttribute] !== buffer) {
+						if ( boundBufferCache[ programAttribute ] !== buffer ) {
+
 							_gl.bindBuffer( 34962, buffer );
 							_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
-							boundBufferCache[programAttribute] = buffer;
+							boundBufferCache[ programAttribute ] = buffer;
+
 						}
 
 					} else {
@@ -916,10 +920,12 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						if(boundBufferCache[programAttribute] !== buffer) {
+						if ( boundBufferCache[ programAttribute ] !== buffer ) {
+
 							_gl.bindBuffer( 34962, buffer );
 							_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
-							boundBufferCache[programAttribute] = buffer;
+							boundBufferCache[ programAttribute ] = buffer;
+
 						}
 
 					}
