@@ -14729,7 +14729,7 @@
 							vertexShader: ShaderLib.cube.vertexShader,
 							fragmentShader: ShaderLib.cube.fragmentShader,
 							side: BackSide,
-							depthTest: true,
+							depthTest: false,
 							depthWrite: false,
 							fog: false
 						} )
@@ -25056,6 +25056,8 @@
 	Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		constructor: Scene,
+
+		isScene: true,
 
 		copy: function ( source, recursive ) {
 
