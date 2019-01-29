@@ -181,6 +181,7 @@
 					'adv / caustic': 'caustic',
 					'adv / displace': 'displace',
 					'adv / dissolve': 'dissolve',
+					'adv / dissolve-fire': 'dissolve-fire',
 					'adv / plush': 'plush',
 					'adv / toon': 'toon',
 					'adv / camera-depth': 'camera-depth',
@@ -1389,7 +1390,117 @@
 						}, true );
 
 						break;
-						
+
+					case 'dissolve-fire':
+
+						// MATERIAL
+
+						mtl = new THREE.StandardNodeMaterial();
+
+						var color = new THREE.ColorNode( 0xEEEEEE );
+						var fireStartColor = new THREE.ColorNode( 0xE6B92A );
+						var fireEndColor = new THREE.ColorNode( 0xFF0000 );
+						var burnedColor = new THREE.ColorNode( 0x000000 );
+						var burnedFinalColor = new THREE.ColorNode( 0x000000 );
+						var threshold = new THREE.FloatNode( .1 );
+						var fireSize = new THREE.FloatNode( .16 );
+						var burnedSize = new THREE.FloatNode( .4 );
+
+						// animate uv
+
+						var tex = new THREE.TextureNode( getTexture( "cloud" ) );
+						var texArea = new THREE.SwitchNode( tex, 'w' );
+
+						var thresholdBorder = new THREE.Math3Node(
+							new THREE.OperatorNode( threshold, fireSize, THREE.OperatorNode.ADD ),
+							threshold,
+							texArea,
+							THREE.Math3Node.SMOOTHSTEP
+						);
+
+						var fireColor = new THREE.Math3Node(
+							fireEndColor,
+							fireStartColor,
+							thresholdBorder,
+							THREE.Math3Node.MIX
+						);
+
+						var thresholdBurnedBorder = new THREE.Math3Node(
+							new THREE.OperatorNode( threshold, burnedSize, THREE.OperatorNode.ADD ),
+							threshold,
+							texArea,
+							THREE.Math3Node.SMOOTHSTEP
+						);
+
+						var fireEmissive = new THREE.OperatorNode(
+							fireColor,
+							thresholdBorder,
+							THREE.OperatorNode.MUL
+						);
+
+						var burnedResultColor = new THREE.Math3Node(
+							color,
+							burnedColor,
+							thresholdBurnedBorder,
+							THREE.Math3Node.MIX
+						);
+
+						// APPLY
+
+						mtl.color = burnedResultColor;
+						mtl.emissive = fireEmissive;
+						mtl.mask = new THREE.CondNode(
+							texArea, // a: value
+							threshold, // b: value
+							THREE.CondNode.GREATER // condition
+						);
+
+						// GUI
+
+						addGui( 'threshold', threshold.value, function ( val ) {
+
+							threshold.value = val;
+
+						}, false, -.5, 1.5 );
+
+						addGui( 'fireSize', fireSize.value, function ( val ) {
+
+							fireSize.value = val;
+
+						}, false, 0, .5 );
+
+						addGui( 'burnedSize', burnedSize.value, function ( val ) {
+
+							burnedSize.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'color', color.value.getHex(), function ( val ) {
+
+							color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'fireStartColor', fireStartColor.value.getHex(), function ( val ) {
+
+							fireStartColor.value.setHex( val );
+
+						}, true );
+
+						addGui( 'fireEndColor', fireEndColor.value.getHex(), function ( val ) {
+
+							fireEndColor.value.setHex( val );
+
+						}, true );
+
+						addGui( 'burnedColor', burnedColor.value.getHex(), function ( val ) {
+
+							burnedColor.value.setHex( val );
+
+						}, true );
+
+						break;
+
 					case 'smoke':
 
 						// MATERIAL
