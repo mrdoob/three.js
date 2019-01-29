@@ -168,7 +168,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 			output.push(
 				mask.code,
-				'if ( ' + mask.result + ' ) discard;'
+				'if ( ! ' + mask.result + ' ) discard;'
 			);
 
 		}
