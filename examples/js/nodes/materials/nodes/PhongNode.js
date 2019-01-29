@@ -103,6 +103,8 @@ PhongNode.prototype.build = function ( builder ) {
 
 		// parse all nodes to reuse generate codes
 
+		if ( this.mask ) this.mask.parse( builder );
+
 		this.color.parse( builder, { slot: 'color' } );
 		this.specular.parse( builder );
 		this.shininess.parse( builder );
@@ -122,6 +124,8 @@ PhongNode.prototype.build = function ( builder ) {
 		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.parse( builder );
 
 		// build code
+
+		var mask = this.mask ? this.mask.buildCode( builder, 'b' ) : undefined;
 
 		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
 		var specular = this.specular.buildCode( builder, 'c' );
@@ -157,8 +161,19 @@ PhongNode.prototype.build = function ( builder ) {
 			"#include <normal_fragment_begin>",
 
 			// prevent undeclared material
-			"	BlinnPhongMaterial material;",
+			"	BlinnPhongMaterial material;"
+		];
 
+		if ( mask ) {
+
+			output.push(
+				mask.code,
+				'if ( ' + mask.result + ' ) discard;'
+			);
+
+		}
+
+		output.push(
 			color.code,
 			"	vec3 diffuseColor = " + color.result + ";",
 			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
@@ -172,7 +187,7 @@ PhongNode.prototype.build = function ( builder ) {
 			"	float shininess = max( 0.0001, " + shininess.result + " );",
 
 			"	float specularStrength = 1.0;" // Ignored in MaterialNode ( replace to specular )
-		];
+		);
 
 		if ( alpha ) {
 
@@ -335,6 +350,8 @@ PhongNode.prototype.copy = function ( source ) {
 	this.specular = source.specular;
 	this.shininess = source.shininess;
 
+	if ( source.mask ) this.mask = source.mask;
+
 	if ( source.alpha ) this.alpha = source.alpha;
 
 	if ( source.normal ) this.normal = source.normal;
@@ -369,6 +386,8 @@ PhongNode.prototype.toJSON = function ( meta ) {
 		data.color = this.color.toJSON( meta ).uuid;
 		data.specular = this.specular.toJSON( meta ).uuid;
 		data.shininess = this.shininess.toJSON( meta ).uuid;
+
+		if ( this.mask ) data.mask = this.mask.toJSON( meta ).uuid;
 
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
 

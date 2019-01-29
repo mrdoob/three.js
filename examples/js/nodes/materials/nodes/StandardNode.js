@@ -117,6 +117,8 @@ StandardNode.prototype.build = function ( builder ) {
 
 		// parse all nodes to reuse generate codes
 
+		if ( this.mask ) this.mask.parse( builder );
+
 		this.color.parse( builder, { slot: 'color', context: contextGammaOnly } );
 		this.roughness.parse( builder );
 		this.metalness.parse( builder );
@@ -140,6 +142,8 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.environment ) this.environment.parse( builder, { cache: 'env', context: contextEnvironment, slot: 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 
 		// build code
+
+		var mask = this.mask ? this.mask.buildCode( builder, 'f' ) : undefined;
 
 		var color = this.color.buildCode( builder, 'c', { slot: 'color', context: contextGammaOnly } );
 		var roughness = this.roughness.buildCode( builder, 'f' );
@@ -194,8 +198,19 @@ StandardNode.prototype.build = function ( builder ) {
 
 			// add before: prevent undeclared material
 			"	PhysicalMaterial material;",
-			"	material.diffuseColor = vec3( 1.0 );",
+			"	material.diffuseColor = vec3( 1.0 );"
+		];
 
+		if ( mask ) {
+
+			output.push(
+				mask.code,
+				'if ( ' + mask.result + ' ) discard;'
+			);
+
+		}
+
+		output.push(
 			color.code,
 			"	vec3 diffuseColor = " + color.result + ";",
 			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
@@ -207,7 +222,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			metalness.code,
 			"	float metalnessFactor = " + metalness.result + ";"
-		];
+		);
 
 		if ( alpha ) {
 
@@ -215,7 +230,7 @@ StandardNode.prototype.build = function ( builder ) {
 				alpha.code,
 				'#ifdef ALPHATEST',
 
-				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+				'	if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
 
 				'#endif'
 			);
@@ -403,6 +418,8 @@ StandardNode.prototype.copy = function ( source ) {
 	this.roughness = source.roughness;
 	this.metalness = source.metalness;
 
+	if ( source.mask ) this.mask = source.mask;
+
 	if ( source.alpha ) this.alpha = source.alpha;
 
 	if ( source.normal ) this.normal = source.normal;
@@ -441,6 +458,8 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		data.color = this.color.toJSON( meta ).uuid;
 		data.roughness = this.roughness.toJSON( meta ).uuid;
 		data.metalness = this.metalness.toJSON( meta ).uuid;
+
+		if ( this.mask ) data.mask = this.mask.toJSON( meta ).uuid;
 
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
 
