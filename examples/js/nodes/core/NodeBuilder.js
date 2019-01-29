@@ -22,7 +22,8 @@ var elements = NodeUtils.elements,
 		vec3: 'v3',
 		vec4: 'v4',
 		mat4: 'v4',
-		int: 'i'
+		int: 'i',
+		bool: 'b'
 	},
 	convertTypeToFormat = {
 		t: 'sampler2D',
