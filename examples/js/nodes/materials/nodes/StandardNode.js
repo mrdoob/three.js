@@ -143,7 +143,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		// build code
 
-		var mask = this.mask ? this.mask.buildCode( builder, 'f' ) : undefined;
+		var mask = this.mask ? this.mask.buildCode( builder, 'b' ) : undefined;
 
 		var color = this.color.buildCode( builder, 'c', { slot: 'color', context: contextGammaOnly } );
 		var roughness = this.roughness.buildCode( builder, 'f' );

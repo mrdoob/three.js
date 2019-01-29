@@ -821,27 +821,38 @@ NodeBuilder.prototype = {
 			case 'f <- v2' : return code + '.x';
 			case 'f <- v3' : return code + '.x';
 			case 'f <- v4' : return code + '.x';
-			case 'f <- i' : return 'float( ' + code + ' )';
+			case 'f <- i' :
+			case 'f <- b' :	return 'float( ' + code + ' )';
 
 			case 'v2 <- f' : return 'vec2( ' + code + ' )';
 			case 'v2 <- v3': return code + '.xy';
 			case 'v2 <- v4': return code + '.xy';
-			case 'v2 <- i' : return 'vec2( float( ' + code + ' ) )';
+			case 'v2 <- i' :
+			case 'v2 <- b' : return 'vec2( float( ' + code + ' ) )';
 
 			case 'v3 <- f' : return 'vec3( ' + code + ' )';
 			case 'v3 <- v2': return 'vec3( ' + code + ', 0.0 )';
 			case 'v3 <- v4': return code + '.xyz';
-			case 'v3 <- i' : return 'vec2( float( ' + code + ' ) )';
+			case 'v3 <- i' :
+			case 'v3 <- b' : return 'vec2( float( ' + code + ' ) )';
 
 			case 'v4 <- f' : return 'vec4( ' + code + ' )';
 			case 'v4 <- v2': return 'vec4( ' + code + ', 0.0, 1.0 )';
 			case 'v4 <- v3': return 'vec4( ' + code + ', 1.0 )';
-			case 'v4 <- i' : return 'vec4( float( ' + code + ' ) )';
+			case 'v4 <- i' :
+			case 'v4 <- b' : return 'vec4( float( ' + code + ' ) )';
 
-			case 'i <- f' : return 'int( ' + code + ' )';
+			case 'i <- f' :
+			case 'i <- b' : return 'int( ' + code + ' )';
 			case 'i <- v2' : return 'int( ' + code + '.x )';
 			case 'i <- v3' : return 'int( ' + code + '.x )';
 			case 'i <- v4' : return 'int( ' + code + '.x )';
+
+			case 'b <- f' : return '( ' + code + ' != 0.0 )';
+			case 'b <- v2' : return '( ' + code + ' != vec2( 0.0 ) )';
+			case 'b <- v3' : return '( ' + code + ' != vec3( 0.0 ) )';
+			case 'b <- v4' : return '( ' + code + ' != vec4( 0.0 ) )';
+			case 'b <- i' : return '( ' + code + ' != 0 )';
 
 		}
 
