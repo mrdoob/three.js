@@ -85,10 +85,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// SCENE CAMERA
+				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				camera.position.set( 700, 50, 1900 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x59472b );
+				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
 
 				controls = new THREE.FirstPersonControls( camera );
 
@@ -96,18 +102,8 @@
 				controls.movementSpeed = 500;
 				controls.noFly = false;
 				controls.lookVertical = true;
-				controls.constrainVertical = true;
-				controls.verticalMin = 1.5;
-				controls.verticalMax = 2.0;
 
-				controls.lon = 250;
-				controls.lat = 30;
-
-				// SCENE
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x59472b );
-				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
+				controls.lookAt( scene.position );
 
 				// LIGHTS
 

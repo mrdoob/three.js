@@ -34,9 +34,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.mouseX = 0;
 	this.mouseY = 0;
 
-	this.lat = 0;
-	this.lon = 0;
-
 	this.moveForward = false;
 	this.moveBackward = false;
 	this.moveLeft = false;
@@ -46,6 +43,17 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
+
+	// private variables
+
+	var lat = 0;
+	var lon = 0;
+
+	var lookDirection = new THREE.Vector3();
+	var spherical = new THREE.Spherical();
+	var target = new THREE.Vector3();
+
+	//
 
 	if ( this.domElement !== document ) {
 
@@ -181,6 +189,26 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	};
 
+	this.lookAt = function ( x, y, z ) {
+
+		if ( x.isVector3 ) {
+
+			target.copy( x );
+
+		} else {
+
+			target.set( x, y, z );
+
+		}
+
+		this.object.lookAt( target );
+
+		setOrientation( this );
+
+		return this;
+
+	};
+
 	this.update = function () {
 
 		var targetPosition = new THREE.Vector3();
@@ -229,13 +257,13 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			}
 
-			this.lon -= this.mouseX * actualLookSpeed;
-			if ( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
+			lon -= this.mouseX * actualLookSpeed;
+			if ( this.lookVertical ) lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
-			this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
+			lat = Math.max( - 85, Math.min( 85, lat ) );
 
-			var phi = THREE.Math.degToRad( 90 - this.lat );
-			var theta = THREE.Math.degToRad( this.lon );
+			var phi = THREE.Math.degToRad( 90 - lat );
+			var theta = THREE.Math.degToRad( lon );
 
 			if ( this.constrainVertical ) {
 
@@ -295,6 +323,20 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	}
 
+	function setOrientation( controls ) {
+
+		var quaternion = controls.object.quaternion;
+
+		lookDirection.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+		spherical.setFromVector3( lookDirection );
+
+		lat = 90 - THREE.Math.radToDeg( spherical.phi );
+		lon = THREE.Math.radToDeg( spherical.theta );
+
+	}
+
 	this.handleResize();
+
+	setOrientation( this );
 
 };
