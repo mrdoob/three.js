@@ -1335,8 +1335,6 @@
 						var threshold = new THREE.FloatNode( .1 );
 						var borderSize = new THREE.FloatNode( .2 );
 
-						// animate uv
-
 						var tex = new THREE.TextureNode( getTexture( "cloud" ) );
 						var texArea = new THREE.SwitchNode( tex, 'w' );
 
@@ -1398,15 +1396,29 @@
 						mtl = new THREE.StandardNodeMaterial();
 
 						var color = new THREE.ColorNode( 0xEEEEEE );
-						var fireStartColor = new THREE.ColorNode( 0xFFD245 );
+						var fireStartColor = new THREE.ColorNode( 0xF7CA78 );
 						var fireEndColor = new THREE.ColorNode( 0xFF0000 );
 						var burnedColor = new THREE.ColorNode( 0x000000 );
 						var burnedFinalColor = new THREE.ColorNode( 0x000000 );
 						var threshold = new THREE.FloatNode( .1 );
 						var fireSize = new THREE.FloatNode( .16 );
 						var burnedSize = new THREE.FloatNode( .4 );
+						var timer = new THREE.TimerNode( 0.8 );
 
-						// animate uv
+						var sinCycleInSecs = new THREE.OperatorNode(
+							timer,
+							new THREE.ConstNode( THREE.ConstNode.PI2 ),
+							THREE.OperatorNode.MUL
+						);
+
+						var cycle = new THREE.Math1Node( sinCycleInSecs, THREE.Math1Node.SIN );
+
+						// round sin to 0 at 1
+						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( 1 ), THREE.OperatorNode.ADD );
+						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( 2 ), THREE.OperatorNode.DIV );
+
+						// offset to +.9
+						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( .9 ), THREE.OperatorNode.ADD );
 
 						var tex = new THREE.TextureNode( getTexture( "cloud" ) );
 						var texArea = new THREE.SwitchNode( tex, 'w' );
@@ -1418,9 +1430,21 @@
 							THREE.Math3Node.SMOOTHSTEP
 						);
 
+						var fireStartAnimatedColor = new THREE.ColorAdjustmentNode( 
+							fireStartColor, 
+							cycle, 
+							THREE.ColorAdjustmentNode.SATURATION 
+						);
+
+						var fireEndAnimatedColor = new THREE.ColorAdjustmentNode( 
+							fireEndColor, 
+							cycle, 
+							THREE.ColorAdjustmentNode.SATURATION 
+						);
+
 						var fireColor = new THREE.Math3Node(
-							fireEndColor,
-							fireStartColor,
+							fireEndAnimatedColor,
+							fireStartAnimatedColor,
 							thresholdBorder,
 							THREE.Math3Node.MIX
 						);
@@ -1498,6 +1522,12 @@
 							burnedColor.value.setHex( val );
 
 						}, true );
+
+						addGui( 'timeScale', timer.scale, function ( val ) {
+
+							timer.scale = val;
+
+						}, false, 0, 2 );
 
 						break;
 
