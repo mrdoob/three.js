@@ -20,6 +20,7 @@ import {
 
 	// inputs
 
+	BoolNode,
 	IntNode,
 	FloatNode,
 	Vector2Node,
@@ -132,6 +133,7 @@ THREE.NodeBuilder = NodeBuilder;
 
 // inputs
 
+THREE.BoolNode = BoolNode;
 THREE.IntNode = IntNode;
 THREE.FloatNode = FloatNode;
 THREE.Vector2Node = Vector2Node;
