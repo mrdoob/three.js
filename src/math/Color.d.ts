@@ -125,4 +125,5 @@ export class Color {
   equals(color: Color): boolean;
   fromArray(rgb: number[], offset?: number): this;
   toArray(array?: number[], offset?: number): number[];
+  toArray(xyz: ArrayLike<number>, offset?: number): ArrayLike<number>;
 }
