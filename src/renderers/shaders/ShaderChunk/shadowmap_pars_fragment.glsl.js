@@ -58,7 +58,7 @@ export default /* glsl */`
 
 	}
 
-	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, float shadowIntensity, vec4 shadowCoord ) {
 
 		float shadow = 1.0;
 
@@ -127,7 +127,7 @@ export default /* glsl */`
 
 		}
 
-		return shadow;
+		return mix( 1.0, shadow, shadowIntensity );
 
 	}
 
@@ -202,7 +202,7 @@ export default /* glsl */`
 
 	}
 
-	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {
+	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, float shadowIntensity, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {
 
 		vec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );
 
@@ -217,11 +217,13 @@ export default /* glsl */`
 		// bd3D = base direction 3D
 		vec3 bd3D = normalize( lightToPosition );
 
+		float shadow = 1.0;
+
 		#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )
 
 			vec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;
 
-			return (
+			shadow = (
 				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +
 				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyy, texelSize.y ), dp ) +
 				texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +
@@ -235,9 +237,11 @@ export default /* glsl */`
 
 		#else // no percentage-closer filtering
 
-			return texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );
+			shadow = texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );
 
 		#endif
+
+		return mix( 1.0, shadow, shadowIntensity );
 
 	}
 

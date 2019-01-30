@@ -96,6 +96,7 @@
 				spotLight.shadow.mapSize.height = 1024;
 				spotLight.shadow.camera.near = 10;
 				spotLight.shadow.camera.far = 200;
+				spotLight.shadow.intensity = 1.0;
 				scene.add( spotLight );
 
 				lightHelper = new THREE.SpotLightHelper( spotLight );
@@ -161,7 +162,8 @@
 					distance: spotLight.distance,
 					angle: spotLight.angle,
 					penumbra: spotLight.penumbra,
-					decay: spotLight.decay
+					decay: spotLight.decay,
+					'shadow intensity': spotLight.shadow.intensity,
 				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
@@ -203,6 +205,13 @@
 				gui.add( params, 'decay', 1, 2 ).onChange( function ( val ) {
 
 					spotLight.decay = val;
+					render();
+
+				} );
+
+				gui.add( params, 'shadow intensity', 0, 1.0 ).onChange( function ( val ) {
+
+					spotLight.shadow.intensity = val;
 					render();
 
 				} );
