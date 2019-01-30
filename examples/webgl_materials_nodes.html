@@ -180,6 +180,8 @@
 					'adv / skin-phong': 'skin-phong',
 					'adv / caustic': 'caustic',
 					'adv / displace': 'displace',
+					'adv / dissolve': 'dissolve',
+					'adv / dissolve-fire': 'dissolve-fire',
 					'adv / plush': 'plush',
 					'adv / toon': 'toon',
 					'adv / camera-depth': 'camera-depth',
@@ -1321,6 +1323,214 @@
 
 						break;
 
+						
+					case 'dissolve':
+
+						// MATERIAL
+
+						mtl = new THREE.StandardNodeMaterial();
+
+						var color = new THREE.ColorNode( 0xEEEEEE );
+						var borderColor = new THREE.ColorNode( 0x0054df );
+						var threshold = new THREE.FloatNode( .1 );
+						var borderSize = new THREE.FloatNode( .2 );
+
+						var tex = new THREE.TextureNode( getTexture( "cloud" ) );
+						var texArea = new THREE.SwitchNode( tex, 'w' );
+
+						var thresholdBorder = new THREE.Math3Node(
+							new THREE.OperatorNode( threshold, borderSize, THREE.OperatorNode.ADD ),
+							threshold,
+							texArea,
+							THREE.Math3Node.SMOOTHSTEP
+						);
+
+						var thresholdEmissive = new THREE.OperatorNode(
+							borderColor,
+							thresholdBorder,
+							THREE.OperatorNode.MUL
+						);
+
+						// APPLY
+
+						mtl.color = color;
+						mtl.emissive = thresholdEmissive;
+						mtl.mask = new THREE.CondNode(
+							texArea, // a: value
+							threshold, // b: value
+							THREE.CondNode.GREATER // condition
+						);
+
+						// GUI
+
+						addGui( 'threshold', threshold.value, function ( val ) {
+
+							threshold.value = val;
+
+						}, false, -.3, 1.3 );
+
+						addGui( 'borderSize', borderSize.value, function ( val ) {
+
+							borderSize.value = val;
+
+						}, false, 0, .5 );
+
+						addGui( 'color', color.value.getHex(), function ( val ) {
+
+							color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'borderColor', borderColor.value.getHex(), function ( val ) {
+
+							borderColor.value.setHex( val );
+
+						}, true );
+
+						break;
+
+					case 'dissolve-fire':
+
+						// MATERIAL
+
+						mtl = new THREE.StandardNodeMaterial();
+
+						var color = new THREE.ColorNode( 0xEEEEEE );
+						var fireStartColor = new THREE.ColorNode( 0xF7CA78 );
+						var fireEndColor = new THREE.ColorNode( 0xFF0000 );
+						var burnedColor = new THREE.ColorNode( 0x000000 );
+						var burnedFinalColor = new THREE.ColorNode( 0x000000 );
+						var threshold = new THREE.FloatNode( .1 );
+						var fireSize = new THREE.FloatNode( .16 );
+						var burnedSize = new THREE.FloatNode( .5 );
+						var timer = new THREE.TimerNode( 0.8 );
+
+						var sinCycleInSecs = new THREE.OperatorNode(
+							timer,
+							new THREE.ConstNode( THREE.ConstNode.PI2 ),
+							THREE.OperatorNode.MUL
+						);
+
+						var cycle = new THREE.Math1Node( sinCycleInSecs, THREE.Math1Node.SIN );
+
+						// round sin to 0 at 1
+						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( 1 ), THREE.OperatorNode.ADD );
+						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( 2 ), THREE.OperatorNode.DIV );
+
+						// offset to +.9
+						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( .9 ), THREE.OperatorNode.ADD );
+
+						var tex = new THREE.TextureNode( getTexture( "cloud" ) );
+						var texArea = new THREE.SwitchNode( tex, 'w' );
+
+						var thresholdBorder = new THREE.Math3Node(
+							new THREE.OperatorNode( threshold, fireSize, THREE.OperatorNode.ADD ),
+							threshold,
+							texArea,
+							THREE.Math3Node.SMOOTHSTEP
+						);
+
+						var fireStartAnimatedColor = new THREE.ColorAdjustmentNode( 
+							fireStartColor, 
+							cycle, 
+							THREE.ColorAdjustmentNode.SATURATION 
+						);
+
+						var fireEndAnimatedColor = new THREE.ColorAdjustmentNode( 
+							fireEndColor, 
+							cycle, 
+							THREE.ColorAdjustmentNode.SATURATION 
+						);
+
+						var fireColor = new THREE.Math3Node(
+							fireEndAnimatedColor,
+							fireStartAnimatedColor,
+							thresholdBorder,
+							THREE.Math3Node.MIX
+						);
+
+						var thresholdBurnedBorder = new THREE.Math3Node(
+							new THREE.OperatorNode( threshold, burnedSize, THREE.OperatorNode.ADD ),
+							threshold,
+							texArea,
+							THREE.Math3Node.SMOOTHSTEP
+						);
+
+						var fireEmissive = new THREE.OperatorNode(
+							fireColor,
+							thresholdBorder,
+							THREE.OperatorNode.MUL
+						);
+
+						var burnedResultColor = new THREE.Math3Node(
+							color,
+							burnedColor,
+							thresholdBurnedBorder,
+							THREE.Math3Node.MIX
+						);
+
+						// APPLY
+
+						mtl.color = burnedResultColor;
+						mtl.emissive = fireEmissive;
+						mtl.mask = new THREE.CondNode(
+							texArea, // a: value
+							threshold, // b: value
+							THREE.CondNode.GREATER // condition
+						);
+
+						// GUI
+
+						addGui( 'threshold', threshold.value, function ( val ) {
+
+							threshold.value = val;
+
+						}, false, -.5, 1.5 );
+
+						addGui( 'fireSize', fireSize.value, function ( val ) {
+
+							fireSize.value = val;
+
+						}, false, 0, .5 );
+
+						addGui( 'burnedSize', burnedSize.value, function ( val ) {
+
+							burnedSize.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'color', color.value.getHex(), function ( val ) {
+
+							color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'fireStartColor', fireStartColor.value.getHex(), function ( val ) {
+
+							fireStartColor.value.setHex( val );
+
+						}, true );
+
+						addGui( 'fireEndColor', fireEndColor.value.getHex(), function ( val ) {
+
+							fireEndColor.value.setHex( val );
+
+						}, true );
+
+						addGui( 'burnedColor', burnedColor.value.getHex(), function ( val ) {
+
+							burnedColor.value.setHex( val );
+
+						}, true );
+
+						addGui( 'timeScale', timer.scale, function ( val ) {
+
+							timer.scale = val;
+
+						}, false, 0, 2 );
+
+						break;
+
 					case 'smoke':
 
 						// MATERIAL
@@ -2172,7 +2382,7 @@
 							ifNode = new THREE.ColorNode( 0x0000FF ),
 							elseNode = new THREE.ColorNode( 0xFF0000 );
 
-						var cond = new THREE.CondNode( a, b, ifNode, elseNode, THREE.CondNode.EQUAL );
+						var cond = new THREE.CondNode( a, b, THREE.CondNode.EQUAL, ifNode, elseNode );
 
 						mtl.color = cond;
 
