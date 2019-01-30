@@ -497,11 +497,22 @@ if ( THREE.cookie === undefined ) {
 					Object.keys( options.optionsDefault[ key ] ).forEach( function ( key2 ) {
 
 						if ( options[ key ] === undefined ) options[ key ] = cookieObject[ key ];
-						if ( cookieObject[ key ][ key2 ] !== undefined )
+						if ( cookieObject[ key ][ key2 ] !== undefined ) {
+
 							options[ key ][ key2 ] = cookieObject[ key ][ key2 ];
+							if ( options.commonOptions !== undefined )
+								options.commonOptions[ key ][ key2 ] = cookieObject[ key ][ key2 ];
+
+						}
 
 					} );
-				else options[ key ] = cookieObject[ key ];
+				else {
+
+					options[ key ] = cookieObject[ key ];
+					if ( options.commonOptions !== undefined )
+						options.commonOptions[ key ] = cookieObject[ key ];
+
+				}
 
 			} );
 
@@ -545,7 +556,7 @@ if ( typeof dat !== 'undefined' ) {
 
 		};
 
-	} else console.error( 'Duplicate dat.controllerNameAndTitle method' );
+	} else console.error( 'Duplicate dat.controllerNameAndTitle method.' );
 
 	if ( dat.folderNameAndTitle === undefined ) {
 
@@ -555,6 +566,6 @@ if ( typeof dat !== 'undefined' ) {
 
 		};
 
-	} else console.error( 'Duplicate dat.folderNameAndTitle method' );
+	} else console.error( 'Duplicate dat.folderNameAndTitle method.' );
 
 }
