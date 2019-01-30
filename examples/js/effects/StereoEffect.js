@@ -499,9 +499,21 @@ if ( THREE.cookie === undefined ) {
 						if ( options[ key ] === undefined ) options[ key ] = cookieObject[ key ];
 						if ( cookieObject[ key ][ key2 ] !== undefined ) {
 
-							options[ key ][ key2 ] = cookieObject[ key ][ key2 ];
-							if ( options.commonOptions !== undefined )
-								options.commonOptions[ key ][ key2 ] = cookieObject[ key ][ key2 ];
+							if ( typeof cookieObject[key][key2] === "object" )
+								Object.keys( cookieObject[key][key2] ).forEach( function ( key3 ) {
+
+									if ( options[key][key2] === undefined ) options[key][key2] = cookieObject[key][key2];
+									if ( cookieObject[key][key2][key3] !== undefined )
+										options[key][key2][key3] = cookieObject[key][key2][key3];
+
+								} );
+							else {
+
+								options[key][key2] = cookieObject[key][key2];
+								if ( options.commonOptions !== undefined )
+									options.commonOptions[key][key2] = cookieObject[key][key2];
+
+							}
 
 						}
 
