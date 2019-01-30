@@ -1250,7 +1250,7 @@ THREE.GLTFLoader = ( function () {
 		
 		// Host Relative URL
 		if ( /^https?:\/\//i.test(path) && /^\//.test(url) ) {
-			path = path.replace( /(^https?:\/\/[^\/]+).*/i , '$1' );
+		path = path.replace( /(^https?:\/\/[^\/]+).*/i , '$1' );
 		}
 
 		// Absolute URL http://,https://,//
