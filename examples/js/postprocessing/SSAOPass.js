@@ -15,7 +15,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	this.scene = scene;
 
 	this.kernelRadius = 8;
-	this.kernelSize = 64;
+	this.kernelSize = 32;
 	this.kernel = [];
 	this.noiseTexture = null;
 	this.output = 0;
