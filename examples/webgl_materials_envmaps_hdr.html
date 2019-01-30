@@ -117,6 +117,9 @@
 
 						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+
 						pmremGenerator.dispose();
 						pmremCubeUVPacker.dispose();
 
