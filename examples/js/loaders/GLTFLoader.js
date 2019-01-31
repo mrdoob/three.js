@@ -371,8 +371,7 @@ THREE.GLTFLoader = ( function () {
 
 		lightNode.name = lightDef.name || ( 'light_' + lightIndex );
 
-		return Promise.
-		( lightNode );
+		return Promise.resolve( lightNode );
 
 	};
 
@@ -1249,8 +1248,10 @@ THREE.GLTFLoader = ( function () {
 		if ( typeof url !== 'string' || url === '' ) return '';
 		
 		// Host Relative URL
-		if ( /^https?:\/\//i.test(path) && /^\//.test(url) ) {
+		if ( /^https?:\/\//i.test( path ) && /^\//.test( url ) ) {
+
 			path = path.replace( /(^https?:\/\/[^\/]+).*/i , '$1' );
+
 		}
 
 		// Absolute URL http://,https://,//
