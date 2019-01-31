@@ -275,8 +275,9 @@
 
 				}
 
-				var name = param.example;
-				var mtl;
+				var name = param.example,
+					defaultSide = THREE.DoubleSide,
+					mtl;
 
 				clearGui();
 
@@ -1576,6 +1577,8 @@
 
 						mtl.environment = new THREE.ColorNode( 0xFFFFFF );
 						mtl.alpha = clouds;
+
+						defaultSide = THREE.FrontSide;
 
 						// GUI
 
@@ -2890,7 +2893,7 @@
 
 				// set material
 
-				mtl.side = THREE.DoubleSide;
+				mtl.side = defaultSide;
 
 				mesh.material = mtl;
 
