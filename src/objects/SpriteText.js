@@ -138,6 +138,7 @@ THREE.SpriteText = function ( text, options ) {
 
 					Object.keys( optionsUpdate[ key ] ).forEach( function ( key2 ) {
 
+						if ( options[ key ] === undefined ) options[ key ] = {};
 						options[ key ][ key2 ] = optionsUpdate[ key ][ key2 ];
 
 					} );
@@ -257,30 +258,6 @@ THREE.gui.spriteText = function ( gui, sprite, guiParams ) {
 	}
 
 	guiParams = guiParams || {};
-
-	if ( options.cookie === undefined )
-		options.cookie = function () {
-
-			this.get = function ( defaultValue ) {
-
-				// Default cookie is not loading settings
-				return defaultValue;
-
-			};
-
-			this.set = function () {
-
-				// Default cookie is not saving settings
-
-			};
-
-			this.isTrue = function ( defaultValue ) {
-
-				return defaultValue;
-
-			};
-
-		};
 
 	//Localization
 
