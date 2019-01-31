@@ -25,15 +25,15 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 	if ( this.getShared( builder, output ) ) {
 
-		var getUnique = this.getUnique( builder, output );
+		var isUnique = this.getUnique( builder, output );
 
-		if ( getUnique && this.constructor.uuid === undefined ) {
+		if ( isUnique && this.constructor.uuid === undefined ) {
 
 			this.constructor.uuid = THREE.Math.generateUUID();
 
 		}
 
-		uuid = builder.getUuid( uuid || this.getUuid(), ! getUnique );
+		uuid = builder.getUuid( uuid || this.getUuid(), ! isUnique );
 
 		var data = builder.getNodeData( uuid ),
 			type = data.output || this.getType( builder );
@@ -50,7 +50,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 			return Node.prototype.build.call( this, builder, output, uuid );
 
-		} else if ( getUnique ) {
+		} else if ( isUnique ) {
 
 			data.name = data.name || Node.prototype.build.call( this, builder, output, uuid );
 
