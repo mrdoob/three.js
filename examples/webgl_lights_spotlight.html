@@ -164,6 +164,8 @@
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
 					'shadow intensity': spotLight.shadow.intensity,
+					'shadow near': spotLight.shadow.camera.near,
+					'shadow far': spotLight.shadow.camera.far,
 				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
@@ -212,6 +214,22 @@
 				gui.add( params, 'shadow intensity', 0, 1.0 ).onChange( function ( val ) {
 
 					spotLight.shadow.intensity = val;
+					render();
+
+				} );
+
+				gui.add( params, 'shadow near', 10, 50 ).onChange( function ( val ) {
+
+					spotLight.shadow.camera.near = val;
+					spotLight.shadow.camera.updateProjectionMatrix();
+					render();
+
+				} );
+
+				gui.add( params, 'shadow far', 10, 200 ).onChange( function ( val ) {
+
+					spotLight.shadow.camera.far = val;
+					spotLight.shadow.camera.updateProjectionMatrix();
 					render();
 
 				} );
