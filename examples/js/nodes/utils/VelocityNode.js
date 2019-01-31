@@ -21,7 +21,7 @@ VelocityNode.prototype = Object.create( Vector3Node.prototype );
 VelocityNode.prototype.constructor = VelocityNode;
 VelocityNode.prototype.nodeType = "Velocity";
 
-VelocityNode.prototype.isReadonly = function ( builder ) {
+VelocityNode.prototype.getReadonly = function ( builder ) {
 
 	return false;
 

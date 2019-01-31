@@ -203,6 +203,7 @@
 					'misc / varying': 'varying',
 					'misc / void-function': 'void-function',
 					'misc / readonly': 'readonly',
+					'misc / label': 'label',
 					'misc / custom-attribute': 'custom-attribute'
 				} ).onFinishChange( function () {
 
@@ -274,8 +275,9 @@
 
 				}
 
-				var name = param.example;
-				var mtl;
+				var name = param.example,
+					defaultSide = THREE.DoubleSide,
+					mtl;
 
 				clearGui();
 
@@ -1576,6 +1578,8 @@
 						mtl.environment = new THREE.ColorNode( 0xFFFFFF );
 						mtl.alpha = clouds;
 
+						defaultSide = THREE.FrontSide;
+
 						// GUI
 
 						addGui( 'color', mtl.environment.value.getHex(), function ( val ) {
@@ -2243,6 +2247,7 @@
 						//THREE.NodeLib.add( new THREE.ConstNode("float MY_CONST .05") )
 
 						// reserved keywords
+
 						console.log( THREE.NodeLib.keywords );
 
 						// keywords conflit? use this to disable:
@@ -2521,15 +2526,55 @@
 
 						mtl = new THREE.PhongNodeMaterial();
 
-						mtl.color = new THREE.ColorNode( 0xFFFFFF );
-						mtl.specular = new THREE.FloatNode( .5 );
-						mtl.shininess = new THREE.FloatNode( 15 );
-
 						// not use "uniform" input ( for optimization )
 						// instead use explicit declaration, for example:
 						// vec3( 1.0, 1.0, 1.0 ) instead "uniform vec3"
 						// if readonly is true not allow change the value after build the shader material
-						mtl.color.readonly = mtl.specular.readonly = mtl.shininess.readonly = true;
+
+						mtl.color = new THREE.ColorNode( 0xFFFFFF ).setReadonly( true );
+						mtl.specular = new THREE.FloatNode( .5 ).setReadonly( true );
+						mtl.shininess = new THREE.FloatNode( 15 ).setReadonly( true );
+
+						break;
+
+					case 'label':
+
+						// MATERIAL
+
+						mtl = new THREE.PhongNodeMaterial();
+
+						// label can be useful for finding the nodes as variables in debug level
+						// but this always force the creation of a variable
+						// same as the code can be writed in the same line (inline)
+						// for optimization this is not recommended
+
+						var colorInput = new THREE.ColorNode( 0xFFFFFF ).setLabel( "colorInput" );
+						var specularInput = new THREE.FloatNode( .5 ).setLabel( "specularInput" );
+
+						var colorMix = new THREE.OperatorNode(
+							colorInput,
+							new THREE.ColorNode( 0x6495ED ).setReadonly( true ),
+							THREE.OperatorNode.MUL
+						).setLabel("colorMix");
+
+						mtl.color = colorMix;
+						mtl.specular = specularInput;
+
+						// default: without use label
+						// this is optimized writed the code in a single line (inline)
+						// for the reason that this node is used only once in this shader program
+						mtl.shininess = new THREE.OperatorNode(
+							new THREE.FloatNode( 10 ).setReadonly( true ),
+							new THREE.FloatNode( 5 ).setReadonly( true ),
+							THREE.OperatorNode.ADD
+						);
+
+						mtl.build();
+
+						// show names glsl fragment shader
+						// open console e find using CTRL+F "colorMix" for example
+
+						console.log( mtl.fragmentShader );
 
 						break;
 
@@ -2848,7 +2893,7 @@
 
 				// set material
 
-				mtl.side = THREE.DoubleSide;
+				mtl.side = defaultSide;
 
 				mesh.material = mtl;
 
