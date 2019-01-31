@@ -359,6 +359,15 @@ THREE.ColladaExporter.prototype = {
 
 					type = 'constant';
 
+					if ( m.map !== null ) {
+
+						// The Collada spec does not support diffuse texture maps with the
+						// constant shader type.
+						// mrdoob/three.js#15469
+						console.warn( 'ColladaExporter: Texture maps not supported with MeshBasicMaterial.' );
+
+					}
+
 				}
 
 				var emissive = m.emissive ? m.emissive : new THREE.Color( 0, 0, 0 );
@@ -404,7 +413,7 @@ THREE.ColladaExporter.prototype = {
 
 					(
 						type !== 'constant' ?
-						'<diffuse>' +
+							'<diffuse>' +
 
 						(
 							m.map ?
@@ -412,12 +421,12 @@ THREE.ColladaExporter.prototype = {
 								`<color sid="diffuse">${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color>`
 						) +
 						'</diffuse>'
-						: ''
+							: ''
 					) +
 
 					(
 						type === 'phong' ?
-						`<specular><color sid="specular">${ specular.r } ${ specular.g } ${ specular.b } 1</color></specular>` +
+							`<specular><color sid="specular">${ specular.r } ${ specular.g } ${ specular.b } 1</color></specular>` +
 
 						'<shininess>' +
 
@@ -427,8 +436,8 @@ THREE.ColladaExporter.prototype = {
 								`<float sid="shininess">${ shininess }</float>`
 						) +
 
-						'</shininess>' 
-						: ''
+						'</shininess>'
+							: ''
 					) +
 
 					`<reflective><color>${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color></reflective>` +
@@ -516,10 +525,15 @@ THREE.ColladaExporter.prototype = {
 				// the materials.
 				var mat = o.material || new THREE.MeshBasicMaterial();
 				var materials = Array.isArray( mat ) ? mat : [ mat ];
+
 				if ( geometry.groups.length > materials.length ) {
+
 					matidsArray = new Array( geometry.groups.length );
+
 				} else {
-					matidsArray = new Array( materials.length )
+
+					matidsArray = new Array( materials.length );
+
 				}
 				matids = matidsArray.fill()
 					.map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );

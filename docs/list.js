@@ -309,6 +309,7 @@ var list = {
 			},
 
 			"Renderers": {
+				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGLRenderTargetCube": "api/en/renderers/WebGLRenderTargetCube"
@@ -733,6 +734,7 @@ var list = {
 			},
 
 			"渲染器": {
+				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
 				"WebGLRenderTargetCube": "api/zh/renderers/WebGLRenderTargetCube"

@@ -181,7 +181,7 @@
 
 				if ( mesh ) {
 
-					var value = mesh.material.uniforms.depth.value;
+					var value = mesh.material.uniforms[ "depth" ].value;
 
 					value += depthStep;
 
@@ -194,7 +194,7 @@
 
 					}
 
-					mesh.material.uniforms.depth.value = value;
+					mesh.material.uniforms[ "depth" ].value = value;
 
 				}
 
