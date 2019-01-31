@@ -152,15 +152,14 @@
 				// GROUND
 
 				var groundGeo = new THREE.PlaneBufferGeometry( 10000, 10000 );
-				var groundMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x050505 } );
+				var groundMat = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 				groundMat.color.setHSL( 0.095, 1, 0.75 );
 
 				var ground = new THREE.Mesh( groundGeo, groundMat );
-				ground.rotation.x = - Math.PI / 2;
 				ground.position.y = - 33;
-				scene.add( ground );
-
+				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
+				scene.add( ground );
 
 				// SKYDOME
 
@@ -177,7 +176,12 @@
 				scene.fog.color.copy( uniforms[ "bottomColor" ].value );
 
 				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
-				var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
+				var skyMat = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: vertexShader,
+					fragmentShader: fragmentShader,
+					side: THREE.BackSide
+				} );
 
 				var sky = new THREE.Mesh( skyGeo, skyMat );
 				scene.add( sky );
