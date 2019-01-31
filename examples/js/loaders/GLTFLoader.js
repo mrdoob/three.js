@@ -707,11 +707,7 @@ THREE.GLTFLoader = ( function () {
 		/*eslint-disable*/
 		Object.defineProperties(
 			this,
-			{
-				specularMap: {
-					get: function () { return uniforms.specularMap.value; },
-					set: function ( v ) { uniforms.specularMap.value = v; }
-				},
+			{	
 				specular: {
 					get: function () { return uniforms.specular.value; },
 					set: function ( v ) { uniforms.specular.value = v; }
@@ -743,6 +739,11 @@ THREE.GLTFLoader = ( function () {
 				}
 			}
 		);
+
+		delete this.metalness
+		delete this.roughness
+		delete this.metalnessMap
+		delete this.roughnessMap
 		/*eslint-enable*/
 
 		this.setValues( params );
@@ -756,7 +757,7 @@ THREE.GLTFLoader = ( function () {
 
 		THREE.MeshStandardMaterial.prototype.copy.call( this, source );
 		this.specularMap = source.specularMap;
-		this.specular = source.specular;
+		this.specular.copy(source.specular);
 		this.glossinessMap = source.glossinessMap;
 		this.glossiness = source.glossiness;
 		return this;
