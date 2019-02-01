@@ -128,7 +128,11 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 		BRDF_Specular_Multiscattering_Environment( geometry, material.specularColor, material.specularRoughness, singleScattering, multiScattering );
 
-		vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
+		// The multiscattering paper uses the below formula for calculating diffuse 
+		// for dielectrics, but this is already handled when initially computing the 
+		// specular and diffuse color, so we can just use the diffuseColor directly.
+		//vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
+		vec3 diffuse = material.diffuseColor;
 
 		reflectedLight.indirectSpecular += clearCoatInv * radiance * singleScattering;
 		reflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;

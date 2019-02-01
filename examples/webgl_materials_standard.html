@@ -102,16 +102,6 @@
 
 				//
 
-				new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/pisa/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( textureCube ) {
-
-						scene.background = textureCube;
-
-					} );
-
-				//
-
 				var material = new THREE.MeshStandardMaterial();
 
 				new THREE.OBJLoader()
@@ -174,7 +164,10 @@
 					material.envMap = hdrCubeRenderTarget.texture;
 					material.needsUpdate = true; // is this needed?
 
-					hdrCubeMap.dispose();
+					hdrCubeMap.magFilter = THREE.LinearFilter;
+					hdrCubeMap.needsUpdate = true;
+					scene.background = hdrCubeMap;
+
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 
