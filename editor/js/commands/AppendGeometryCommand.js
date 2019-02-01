@@ -10,7 +10,7 @@
 
 var AppendGeometryCommand = function ( object, newGeometry ) {
 
-	Command.call( this, object, newGeometry );
+	Command.call( this );
 
 	this.type = 'AppendGeometryCommand';
 	this.name = 'Append Geometry';
