@@ -54,12 +54,12 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/LuminosityHighPassShader.js"></script>
-		<script src="js/postprocessing/UnrealBloomPass.js"></script>
+		<script src="js/postprocessing2/UnrealBloomPass2.js"></script>
 
 		<script>
 
@@ -101,15 +101,14 @@
 			pointLight = new THREE.PointLight( 0xffffff, 1 );
 			camera.add( pointLight );
 
-			var renderScene = new THREE.RenderPass( scene, camera );
+			var renderScene = new THREE.RenderPass2( scene, camera );
 
-			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-			bloomPass.renderToScreen = true;
+			var bloomPass = new THREE.UnrealBloomPass2( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
 
-			composer = new THREE.EffectComposer( renderer );
+			composer = new THREE.EffectComposer2( renderer );
 			composer.setSize( window.innerWidth, window.innerHeight );
 			composer.addPass( renderScene );
 			composer.addPass( bloomPass );
