@@ -108,13 +108,12 @@
 				rectLight.position.set( 5, 5, 0 );
 				scene.add( rectLight );
 
-				var rectLightMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial() );
+				var rectLightMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( { side: THREE.BackSide } ) );
 				rectLightMesh.scale.x = rectLight.width;
 				rectLightMesh.scale.y = rectLight.height;
 				rectLight.add( rectLightMesh );
 
 				var rectLightMeshBack = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( { color: 0x080808 } ) );
-				rectLightMeshBack.rotation.y = Math.PI;
 				rectLightMesh.add( rectLightMeshBack );
 
 				var geoFloor = new THREE.BoxBufferGeometry( 2000, 0.1, 2000 );

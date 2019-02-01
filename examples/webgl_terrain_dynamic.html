@@ -297,17 +297,17 @@
 
 				uniformsNoise = {
 
-					time: { value: 1.0 },
-					scale: { value: new THREE.Vector2( 1.5, 1.5 ) },
-					offset: { value: new THREE.Vector2( 0, 0 ) }
+					"time": { value: 1.0 },
+					"scale": { value: new THREE.Vector2( 1.5, 1.5 ) },
+					"offset": { value: new THREE.Vector2( 0, 0 ) }
 
 				};
 
 				uniformsNormal = THREE.UniformsUtils.clone( normalShader.uniforms );
 
-				uniformsNormal.height.value = 0.05;
-				uniformsNormal.resolution.value.set( rx, ry );
-				uniformsNormal.heightMap.value = heightMap.texture;
+				uniformsNormal[ "height" ].value = 0.05;
+				uniformsNormal[ "resolution" ].value.set( rx, ry );
+				uniformsNormal[ "heightMap" ].value = heightMap.texture;
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 

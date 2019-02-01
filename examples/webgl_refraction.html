@@ -103,7 +103,7 @@
 			} );
 
 			dudvMap.wrapS = dudvMap.wrapT = THREE.RepeatWrapping;
-			refractor.material.uniforms.tDudv.value = dudvMap;
+			refractor.material.uniforms[ "tDudv" ].value = dudvMap;
 
 			// light
 
@@ -150,7 +150,7 @@
 
 		function render() {
 
-			refractor.material.uniforms.time.value += clock.getDelta();
+			refractor.material.uniforms[ "time" ].value += clock.getDelta();
 
 			renderer.render( scene, camera );
 

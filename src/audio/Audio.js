@@ -20,6 +20,7 @@ function Audio( listener ) {
 	this.autoplay = false;
 
 	this.buffer = null;
+	this.detune = 0;
 	this.loop = false;
 	this.startTime = 0;
 	this.offset = 0;
@@ -96,13 +97,15 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.onended = this.onEnded.bind( this );
-		source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
 		this.startTime = this.context.currentTime;
 		source.start( this.startTime, this.offset );
 
 		this.isPlaying = true;
 
 		this.source = source;
+
+		this.setDetune( this.detune );
+		this.setPlaybackRate( this.playbackRate );
 
 		return this.connect();
 
@@ -222,6 +225,28 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
+	setDetune: function ( value ) {
+
+		this.detune = value;
+
+		if ( this.source.detune === undefined ) return; // only set detune when available
+
+		if ( this.isPlaying === true ) {
+
+			this.source.detune.setTargetAtTime( this.detune, this.context.currentTime, 0.01 );
+
+		}
+
+		return this;
+
+	},
+
+	getDetune: function () {
+
+		return this.detune;
+
+	},
+
 	getFilter: function () {
 
 		return this.getFilters()[ 0 ];
@@ -247,7 +272,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
-			this.source.playbackRate.setValueAtTime( this.playbackRate, this.context.currentTime );
+			this.source.playbackRate.setTargetAtTime( this.playbackRate, this.context.currentTime, 0.01 );
 
 		}
 

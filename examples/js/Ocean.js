@@ -120,7 +120,7 @@ THREE.Ocean = function ( renderer, camera, scene, options ) {
 	var initialSpectrumUniforms = THREE.UniformsUtils.clone( initialSpectrumShader.uniforms );
 	this.materialInitialSpectrum = new THREE.ShaderMaterial( {
 		uniforms: initialSpectrumUniforms,
-		vertexShader: fullscreeenVertexShader.vertexShader,
+		vertexShader: initialSpectrumShader.vertexShader,
 		fragmentShader: initialSpectrumShader.fragmentShader
 	} );
 	this.materialInitialSpectrum.uniforms.u_wind = { value: new THREE.Vector2() };

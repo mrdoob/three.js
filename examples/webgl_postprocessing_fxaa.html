@@ -1,102 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing - FXAA 3.11</title>
-		<meta charset="utf-8">
+		<title>three.js WebGL  - postprocessing - FXAA</title>
+		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+			html, body {
+				height: 100%;
+			}
+
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				/* background-color: #bfd1e5; */
-				background-color: #ffffff;
-				margin: 0px;
+				background: #ffffff;
+				padding: 0;
+				margin: 0;
+				font-family: Monospace;
+				font-size: 13px;
+				overflow: hidden;
 			}
 
-			a {	color: #a06851;	}
-
-			canvas {
-				margin: 20px;
-				margin-top: 40px;
+			#info {
+				top: 0px;
+				width: 100%;
+				color: #000000;
+				margin: 6px 0px;
+				text-align: center;
 			}
 
+			#info a {
+				color: #000000;
+			}
+
+			#container {
+				width: 100%;
+				height: calc(100% - 80px);
+			}
 		</style>
 	</head>
+
 	<body>
 
-        <div id="info">
-            <p><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FXAA example </p>
-            <p>original image (left) - FXAA 3.11 post-processing antialiasing (right)</p>
-			<p>Image source: <a href="https://github.com/mattdesl/glsl-fxaa" target="_blank" rel="noopener">glsl-fxaa by mattdesl</a></p>
-        </div>
-
-		<div id="container"></div>
-
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - postprocessing - FXAA<br />
+			Left scene processed with FXAA, right scene is rendered without anti-aliasing.
+		</div>
+		<div id="container">
+		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-
 		<script src="js/WebGL.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script>
 
-			( function closure() {
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-				'use strict';
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-				if ( WEBGL.isWebGLAvailable() === false ) {
+			}
 
-					document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			var camera, scene, renderer, clock, group;
+
+			var composer1, composer2, fxaaPass;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 45, ( window.innerWidth * 0.5 ) / window.innerHeight, 1, 2000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
+
+				clock = new THREE.Clock();
+
+				//
+
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				hemiLight.position.set( 0, 1000, 0 );
+				scene.add( hemiLight );
+
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				dirLight.position.set( - 3000, 1000, - 1000 );
+				scene.add( dirLight );
+
+				//
+
+				group = new THREE.Group();
+
+				var geometry = new THREE.TetrahedronBufferGeometry( 10 );
+				var material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+
+				for ( var i = 0; i < 100; i ++ ) {
+
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.x = Math.random() * 500 - 250;
+					mesh.position.y = Math.random() * 500 - 250;
+					mesh.position.z = Math.random() * 500 - 250;
+
+					mesh.scale.setScalar( Math.random() * 2 + 1 );
+
+					mesh.rotation.x = Math.random() * Math.PI;
+					mesh.rotation.y = Math.random() * Math.PI;
+					mesh.rotation.z = Math.random() * Math.PI;
+
+					group.add( mesh );
 
 				}
 
-				var loader = new THREE.TextureLoader();
-				loader.load( "textures/fxaa_scene.png", function onLoad( texture ) {
+				scene.add( group );
 
-					var image = texture.image;
-					texture.minFilter = THREE.LinearFilter;
-					texture.magFilter = THREE.LinearFilter;
+				//
 
-					var fxaaMaterial = new THREE.ShaderMaterial( THREE.FXAAShader );
-					fxaaMaterial.uniforms.tDiffuse.value = texture;
-					fxaaMaterial.uniforms.resolution.value.x = 1 / image.naturalWidth;
-					fxaaMaterial.uniforms.resolution.value.y = 1 / image.naturalHeight;
+				renderer = new THREE.WebGLRenderer();
+				renderer.autoClear = false;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-					var basicMaterial = new THREE.MeshBasicMaterial( { map: texture } );
+				//
 
-					var plane = new THREE.PlaneBufferGeometry( 1, 1 );
+				var renderPass = new THREE.RenderPass( scene, camera );
 
-					var quad1 = new THREE.Mesh( plane, basicMaterial );
-					var quad2 = new THREE.Mesh( plane, fxaaMaterial );
-					var scene1 = new THREE.Scene();
-					var scene2 = new THREE.Scene();
-					scene1.add( quad1 );
-					scene2.add( quad2 );
+				//
 
-					var camera = new THREE.OrthographicCamera( - 0.5, 0.5, 0.5, - 0.5, - 0.5, 0.5 );
+				fxaaPass = new THREE.ShaderPass( THREE.FXAAShader );
+				fxaaPass.renderToScreen = true;
 
-					var container = document.getElementById( 'container' );
+				var pixelRatio = renderer.getPixelRatio();
 
+				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
+				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
 
-					var renderer1 = new THREE.WebGLRenderer();
-					renderer1.setPixelRatio( window.devicePixelRatio );
-					renderer1.setSize( image.naturalWidth, image.naturalHeight );
-					container.appendChild( renderer1.domElement );
+				composer1 = new THREE.EffectComposer( renderer );
+				composer1.addPass( renderPass );
+				composer1.addPass( fxaaPass );
 
-					var renderer2 = new THREE.WebGLRenderer();
-					renderer2.setPixelRatio( window.devicePixelRatio );
-					renderer2.setSize( image.naturalWidth, image.naturalHeight );
-					container.appendChild( renderer2.domElement );
+				//
 
-					renderer1.render( scene1, camera );
-					renderer2.render( scene2, camera );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				copyPass.renderToScreen = true;
 
-				} );
+				composer2 = new THREE.EffectComposer( renderer );
+				composer2.addPass( renderPass );
+				composer2.addPass( copyPass );
 
-			} )();
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = ( window.innerWidth * 0.5 ) / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer1.setSize( window.innerWidth, window.innerHeight );
+				composer2.setSize( window.innerWidth, window.innerHeight );
+
+				var pixelRatio = renderer.getPixelRatio();
+
+				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
+				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var halfWidth = window.innerWidth / 2;
+
+				group.rotation.y += clock.getDelta() * 0.1;
+
+				renderer.setViewport( 0, 0, halfWidth, window.innerHeight );
+
+				composer1.render();
+
+				renderer.setViewport( halfWidth, 0, halfWidth, window.innerHeight );
+
+				composer2.render();
+
+			}
 
 		</script>
 	</body>

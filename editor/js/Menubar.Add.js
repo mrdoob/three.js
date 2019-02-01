@@ -125,7 +125,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/icosahedron' )  );
 	option.onClick( function () {
 
-		var geometry = new THREE.IcosahedronGeometry( 1, 0 );
+		var geometry = new THREE.IcosahedronBufferGeometry( 1, 0 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Icosahedron';
 

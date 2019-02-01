@@ -33,11 +33,11 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 
 	constructor: THREE.TAARenderPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime ) {
 
 		if ( ! this.accumulate ) {
 
-			THREE.SSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta );
+			THREE.SSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, deltaTime );
 
 			this.accumulateIndex = - 1;
 			return;
@@ -62,7 +62,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 
 		if ( this.accumulate && this.accumulateIndex === - 1 ) {
 
-			THREE.SSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
+			THREE.SSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, deltaTime );
 
 			this.accumulateIndex = 0;
 

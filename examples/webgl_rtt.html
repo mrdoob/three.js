@@ -244,13 +244,13 @@
 
 				}
 
-				if ( material.uniforms.time.value > 1 || material.uniforms.time.value < 0 ) {
+				if ( material.uniforms[ "time" ].value > 1 || material.uniforms[ "time" ].value < 0 ) {
 
 					delta *= - 1;
 
 				}
 
-				material.uniforms.time.value += delta;
+				material.uniforms[ "time" ].value += delta;
 
 				renderer.clear();
 

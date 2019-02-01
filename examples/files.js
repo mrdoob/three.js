@@ -19,6 +19,7 @@ var files = {
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
 		"webgl_framebuffer_texture",
+		"webgl_furnace_test",
 		"webgl_geometries",
 		"webgl_geometries_parametric",
 		"webgl_geometry_colors",
@@ -58,6 +59,7 @@ var files = {
 		"webgl_kinect",
 		"webgl_layers",
 		"webgl_lensflares",
+		"webgl_lightningstrike",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
@@ -90,9 +92,9 @@ var files = {
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_extensions",
 		"webgl_loader_imagebitmap",
-		"webgl_loader_json",
 		"webgl_loader_json_claraio",
 		"webgl_loader_kmz",
+		"webgl_loader_ldraw",
 		"webgl_loader_md2",
 		"webgl_loader_md2_control",
 		"webgl_loader_mmd",
@@ -199,8 +201,6 @@ var files = {
 		"webgl_multiple_scenes_comparison",
 		"webgl_multiple_views",
 		"webgl_nearestneighbour",
-		"webgl_octree",
-		"webgl_octree_raycasting",
 		"webgl_panorama_cube",
 		"webgl_panorama_dualfisheye",
 		"webgl_panorama_equirectangular",
@@ -299,6 +299,7 @@ var files = {
 		"webgl_custom_attributes_points",
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
+		"webgl_fire",
 		"webgl_gpgpu_birds",
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
@@ -315,8 +316,9 @@ var files = {
 	],
 	"webgl2": [
 		"webgl2_materials_texture3d",
-		"webgl2_materials_texture3d_volume"
-		// "webgl2_sandbox"
+		"webgl2_materials_texture3d_volume",
+		"webgl2_multisampled_renderbuffers",
+		"webgl2_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -350,6 +352,7 @@ var files = {
 		"misc_controls_pointerlock",
 		"misc_controls_trackball",
 		"misc_controls_transform",
+		"misc_exporter_collada",
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
 		"misc_exporter_stl",
