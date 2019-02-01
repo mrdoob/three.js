@@ -56,6 +56,8 @@
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
+		<script src="../examples/js/utils/BufferGeometryUtils.js"></script>
+
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
 		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
 		<script src="js/libs/codemirror/codemirror.js"></script>
@@ -153,6 +155,11 @@
 		<script src="js/commands/SetColorCommand.js"></script>
 		<script src="js/commands/SetGeometryCommand.js"></script>
 		<script src="js/commands/SetGeometryValueCommand.js"></script>
+		<script src="js/commands/AppendGeometryCommand.js"></script>
+		<script src="js/commands/TranslateGeometryCommand.js"></script>
+		<script src="js/commands/RotateGeometryCommand.js"></script>
+		<script src="js/commands/ScaleGeometryCommand.js"></script>
+		<script src="js/commands/CenterGeometryCommand.js"></script>
 		<script src="js/commands/MultiCmdsCommand.js"></script>
 		<script src="js/commands/AddScriptCommand.js"></script>
 		<script src="js/commands/RemoveScriptCommand.js"></script>
@@ -328,6 +335,38 @@
 
 				}
 
+			}
+
+			var params = ['app', 'scene', 'data'];
+			function getParam()
+			{
+				var url = new URL(window.location);
+				for(var param of params)
+				{
+					var p = url.searchParams.get(param);
+					if(p)
+					{
+						return p;
+					}
+				}
+			}
+
+			if(!isLoadingFromHash)
+			{
+				var param = getParam();
+				if(param !== undefined)
+				{
+					var loader = new THREE.FileLoader();
+					loader.crossOrigin = '';
+					loader.load( param, function ( data ) {
+
+						editor.clear();
+						Loader.handleJSON(JSON.parse(data));
+
+					} );
+
+					isLoadingFromHash = true;
+				}
 			}
 
 			/*

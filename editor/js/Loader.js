@@ -34,7 +34,7 @@ var Loader = function ( editor ) {
 
 			for ( var i = 0; i < files.length; i ++ ) {
 
-				scope.loadFile( files[ i ], manager ) ;
+				scope.loadFile( files[ i ], manager );
 
 			}
 
@@ -150,7 +150,7 @@ var Loader = function ( editor ) {
 					stream.offset = 0;
 
 					var loader = new THREE.CTMLoader();
-					loader.createModel( new CTM.File( stream ), function( geometry ) {
+					loader.createModel( new CTM.File( stream ), function ( geometry ) {
 
 						geometry.sourceType = "ctm";
 						geometry.sourceFile = file.name;
@@ -450,7 +450,7 @@ var Loader = function ( editor ) {
 
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.1 );
-					group.scale.y *= -1;
+					group.scale.y *= - 1;
 
 					for ( var i = 0; i < paths.length; i ++ ) {
 
@@ -540,74 +540,6 @@ var Loader = function ( editor ) {
 		}
 
 	};
-
-	function handleJSON( data, file, filename ) {
-
-		if ( data.metadata === undefined ) { // 2.0
-
-			data.metadata = { type: 'Geometry' };
-
-		}
-
-		if ( data.metadata.type === undefined ) { // 3.0
-
-			data.metadata.type = 'Geometry';
-
-		}
-
-		if ( data.metadata.formatVersion !== undefined ) {
-
-			data.metadata.version = data.metadata.formatVersion;
-
-		}
-
-		switch ( data.metadata.type.toLowerCase() ) {
-
-			case 'buffergeometry':
-
-				var loader = new THREE.BufferGeometryLoader();
-				var result = loader.parse( data );
-
-				var mesh = new THREE.Mesh( result );
-
-				editor.execute( new AddObjectCommand( mesh ) );
-
-				break;
-
-			case 'geometry':
-
-				console.error( 'Loader: "Geometry" is no longer supported.' );
-
-				break;
-
-			case 'object':
-
-				var loader = new THREE.ObjectLoader();
-				loader.setResourcePath( scope.texturePath );
-
-				var result = loader.parse( data );
-
-				if ( result instanceof THREE.Scene ) {
-
-					editor.execute( new SetSceneCommand( result ) );
-
-				} else {
-
-					editor.execute( new AddObjectCommand( result ) );
-
-				}
-
-				break;
-
-			case 'app':
-
-				editor.fromJSON( data );
-
-				break;
-
-		}
-
-	}
 
 	function createFileMap( files ) {
 
@@ -737,3 +669,73 @@ var Loader = function ( editor ) {
 	}
 
 };
+
+function handleJSON( data, file, filename ) {
+
+	if ( data.metadata === undefined ) { // 2.0
+
+		data.metadata = { type: 'Geometry' };
+
+	}
+
+	if ( data.metadata.type === undefined ) { // 3.0
+
+		data.metadata.type = 'Geometry';
+
+	}
+
+	if ( data.metadata.formatVersion !== undefined ) {
+
+		data.metadata.version = data.metadata.formatVersion;
+
+	}
+
+	switch ( data.metadata.type.toLowerCase() ) {
+
+		case 'buffergeometry':
+
+			var loader = new THREE.BufferGeometryLoader();
+			var result = loader.parse( data );
+
+			var mesh = new THREE.Mesh( result );
+
+			editor.execute( new AddObjectCommand( mesh ) );
+
+			break;
+
+		case 'geometry':
+
+			console.error( 'Loader: "Geometry" is no longer supported.' );
+
+			break;
+
+		case 'object':
+
+			var loader = new THREE.ObjectLoader();
+			loader.setResourcePath( scope.texturePath );
+
+			var result = loader.parse( data );
+
+			if ( result instanceof THREE.Scene ) {
+
+				editor.execute( new SetSceneCommand( result ) );
+
+			} else {
+
+				editor.execute( new AddObjectCommand( result ) );
+
+			}
+
+			break;
+
+		case 'app':
+
+			editor.fromJSON( data );
+
+			break;
+
+	}
+
+}
+
+Loader.handleJSON = handleJSON;
