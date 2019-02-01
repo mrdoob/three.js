@@ -715,10 +715,6 @@ THREE.GLTFExporter.prototype = {
 
 				} ) );
 
-			} else if ( options.mode === "embedded" ) {
-
-				gltfImage.uri = canvas.toDataURL( mimeType );
-
 			} else {
 
 				var extension = mimeType === "image/png" ? ".png" : ".jpg";
@@ -1799,28 +1795,9 @@ THREE.GLTFExporter.prototype = {
 
 						outputJSON.buffers[ 0 ].uri = "scene.bin";
 
-					} else if ( options.mode === "embedded" ) {
-
-						var reader = new window.FileReader();
-						reader.readAsDataURL( blob );
-						reader.onloadend = function () {
-
-							var base64data = reader.result;
-							outputJSON.buffers[ 0 ].uri = base64data;
-							outputBuffers.push( undefined );
-							resolve();
-
-						};
-						reader.onerror = reject;
-
 					}
 
-					if ( options.mode !== "embedded" ) {
-
-						outputBuffers.push( blob );
-						resolve();
-
-					}
+					outputBuffers.push( blob );
 
 				}
 
@@ -1966,10 +1943,6 @@ THREE.GLTFExporter.prototype = {
 			if ( options.mode === "gltf" ) {
 
 				onDone( chunks );
-
-			} else if ( options.mode === "embedded" ) {
-
-				onDone( chunks.json );
 
 			} else {
 

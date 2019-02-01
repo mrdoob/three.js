@@ -35,7 +35,6 @@
 				<select id="option_mode" value="glb">
 					<option value="glb">glb (binary)</option>
 					<option value="gltf">gltf</option>
-					<option value="embedded">gltf embedded</option>
 				</select>
 			</label>
 			<label><input id="option_trs" name="trs" type="checkbox" checked="checked"/>TRS</label>
@@ -80,7 +79,7 @@
 
 						saveBlob( result, 'scene.glb' );
 
-					} else if ( options.mode === 'gltf' ) {
+					} else {
 
 						var json = result.json;
 						var buffers = result.buffers;
@@ -105,12 +104,6 @@
 							saveBlob( image, imageUri );
 
 						}
-
-					} else {
-
-						var output = JSON.stringify( result, null, 2 );
-						console.log( output );
-						saveString( output, 'scene.gltf' );
 
 					}
 
