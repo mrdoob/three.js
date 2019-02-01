@@ -2086,6 +2086,18 @@ THREE.GLTFExporter = ( function () {
 		 */
 		parse: function ( input, onDone, onError, options ) {
 
+			if ( typeof onError === "object" ) {
+
+				console.warn( 'THREE.GLTFExporter: .parse() now expects ( input, onDone, onError, options ).' );
+
+			}
+
+			if ( options && options.binary !== undefined ) {
+
+				console.warn( 'THREE.GLTFExporter: options.binary has been deprecated. Use options.mode = "glb" instead.' );
+
+			}
+
 			var scope = this;
 
 			this.parseChunks( input, function ( chunks ) {
