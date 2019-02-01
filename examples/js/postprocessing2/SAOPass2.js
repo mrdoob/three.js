@@ -45,7 +45,6 @@ THREE.SAOPass2 = function ( scene, camera, depthTexture, useNormals, resolution 
 		format: THREE.RGBAFormat
 	} );
 	this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
-	this.beautyRenderTarget = this.saoRenderTarget.clone();
 
 	this.normalRenderTarget = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, {
 		minFilter: THREE.NearestFilter,
@@ -61,8 +60,8 @@ THREE.SAOPass2 = function ( scene, camera, depthTexture, useNormals, resolution 
 		depthTexture.minFilter = THREE.NearestFilter;
 		depthTexture.maxFilter = THREE.NearestFilter;
 
-		this.beautyRenderTarget.depthTexture = depthTexture;
-		this.beautyRenderTarget.depthBuffer = true;
+		this.depthRenderTarget.depthTexture = depthTexture;
+		this.depthRenderTarget.depthBuffer = true;
 
 	}
 
@@ -194,9 +193,6 @@ THREE.SAOPass2.prototype = Object.assign( Object.create( THREE.Pass2.prototype )
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		renderer.setRenderTarget( this.depthRenderTarget );
-		renderer.clear();
-
 		this.saoMaterial.uniforms[ 'bias' ].value = this.params.saoBias;
 		this.saoMaterial.uniforms[ 'intensity' ].value = this.params.saoIntensity;
 		this.saoMaterial.uniforms[ 'scale' ].value = this.params.saoScale;
@@ -226,11 +222,12 @@ THREE.SAOPass2.prototype = Object.assign( Object.create( THREE.Pass2.prototype )
 		}
 
 		// Rendering scene to depth texture
-		renderer.setClearColor( 0x000000 );
-		renderer.render( this.scene, this.camera, this.beautyRenderTarget, true );
+		if ( this.supportsDepthTextureExtension ) {
 
-		// Re-render scene if depth texture extension is not supported
-		if ( ! this.supportsDepthTextureExtension ) {
+			renderer.setClearColor( 0x000000 );
+			renderer.render( this.scene, this.camera, this.depthRenderTarget, true );
+
+		} else {
 
 			// Clear rule : far clipping plane in both RGBA and Basic encoding
 			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget, 0x000000, 1.0 );
@@ -261,7 +258,7 @@ THREE.SAOPass2.prototype = Object.assign( Object.create( THREE.Pass2.prototype )
 
 			if ( this.supportsDepthTextureExtension ) {
 
-				this.materialCopy.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.depthTexture;
+				this.materialCopy.uniforms[ 'tDiffuse' ].value = this.depthRenderTarget.depthTexture;
 				this.materialCopy.needsUpdate = true;
 
 			} else {
@@ -308,7 +305,6 @@ THREE.SAOPass2.prototype = Object.assign( Object.create( THREE.Pass2.prototype )
 		// save original state
 		this.originalClearColor.copy( renderer.getClearColor() );
 		var originalClearAlpha = renderer.getClearAlpha();
-		var originalAutoClear = renderer.autoClear;
 
 		// setup pass state
 		var clearNeeded = ( clearColor !== undefined ) && ( clearColor !== null );
@@ -332,21 +328,12 @@ THREE.SAOPass2.prototype = Object.assign( Object.create( THREE.Pass2.prototype )
 
 		this.originalClearColor.copy( renderer.getClearColor() );
 		var originalClearAlpha = renderer.getClearAlpha();
-		var originalAutoClear = renderer.autoClear;
 
-		clearColor = overrideMaterial.clearColor || clearColor;
-		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
-		var clearNeeded = ( clearColor !== undefined ) && ( clearColor !== null );
-		if ( clearNeeded ) {
-
-			renderer.setClearColor( clearColor );
-			renderer.setClearAlpha( clearAlpha || 0.0 );
-
-		}
+		renderer.setClearColor( clearColor );
+		renderer.setClearAlpha( clearAlpha || 0.0 );
 
 		this.scene.overrideMaterial = overrideMaterial;
-		
-		renderer.render( this.scene, this.camera, renderTarget, clearNeeded );
+		renderer.render( this.scene, this.camera, renderTarget, true );
 		this.scene.overrideMaterial = null;
 
 		// restore original state
@@ -357,7 +344,6 @@ THREE.SAOPass2.prototype = Object.assign( Object.create( THREE.Pass2.prototype )
 
 	setSize: function ( width, height ) {
 
-		this.beautyRenderTarget.setSize( width, height );
 		this.saoRenderTarget.setSize( width, height );
 		this.blurIntermediateRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
