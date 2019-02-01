@@ -61,7 +61,7 @@
     "eslint-plugin-html": "^5.0.0",
     "google-closure-compiler": "20181210.0.0",
     "http-server": "^0.11.1",
-    "qunit": "^2.8.0",
+    "qunit": "^2.9.1",
     "rollup": "^1.0.0"
   },
   "jspm": {
