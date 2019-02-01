@@ -76,11 +76,11 @@
 
 				function onComplete ( result ) {
 
-					if ( options.mode === "glb" ) {
+					if ( options.mode === 'glb' ) {
 
 						saveBlob( result, 'scene.glb' );
 
-					} else if ( options.mode === "gltf" ) {
+					} else if ( options.mode === 'gltf' ) {
 
 						var json = result.json;
 						var buffers = result.buffers;
