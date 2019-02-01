@@ -131,7 +131,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		if ( internalFormat === _gl.R16F || internalFormat === _gl.R32F ||
+		if ( internalFormat === _gl.R16F || internalFormat === _gl.R32F ||
 			internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F ) {
 
 			extensions.get( 'EXT_color_buffer_float' );
