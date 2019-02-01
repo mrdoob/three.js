@@ -740,11 +740,11 @@ THREE.GLTFLoader = ( function () {
 			}
 		);
 
-		delete this.metalness
-		delete this.roughness
-		delete this.metalnessMap
-		delete this.roughnessMap
 		/*eslint-enable*/
+		delete this.metalness;
+		delete this.roughness;
+		delete this.metalnessMap;
+		delete this.roughnessMap;
 
 		this.setValues( params );
 
@@ -757,9 +757,13 @@ THREE.GLTFLoader = ( function () {
 
 		THREE.MeshStandardMaterial.prototype.copy.call( this, source );
 		this.specularMap = source.specularMap;
-		this.specular.copy(source.specular);
+		this.specular.copy( source.specular );
 		this.glossinessMap = source.glossinessMap;
 		this.glossiness = source.glossiness;
+		delete this.metalness;
+		delete this.roughness;
+		delete this.metalnessMap;
+		delete this.roughnessMap;
 		return this;
 
 	};
