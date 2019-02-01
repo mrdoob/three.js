@@ -196,7 +196,6 @@ export default {
 		glconstants(),
 		glsl()
 	],
-	// sourceMap: true,
 	output: [
 		{
 			format: 'umd',
