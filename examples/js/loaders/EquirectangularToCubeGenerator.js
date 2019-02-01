@@ -86,15 +86,17 @@ THREE.CubemapGenerator.prototype.fromEquirectangular = function ( texture, optio
 
 	scene.add( mesh );
 
+	options = options || {};
+
 	var resolution = options.resolution || 512;
 
 	var params = {
 		type: texture.type,
 		format: texture.format,
 		encoding: texture.encoding,
-		generateMipmaps: ( options.generateMipmaps !== undefined ) ?  options.generateMipmaps : texture.generateMipmaps,
-		minFilter: ( options.minFilter !== undefined ) ?  options.minFilter : texture.minFilter,
-		magFilter: ( options.magFilter !== undefined ) ?  options.magFilter : texture.magFilter
+		generateMipmaps: ( options.generateMipmaps !== undefined ) ? options.generateMipmaps : texture.generateMipmaps,
+		minFilter: ( options.minFilter !== undefined ) ? options.minFilter : texture.minFilter,
+		magFilter: ( options.magFilter !== undefined ) ? options.magFilter : texture.magFilter
 	};
 
 	var camera = new THREE.CubeCamera( 1, 10, resolution, params );
@@ -119,6 +121,8 @@ THREE.EquirectangularToCubeGenerator = ( function () {
 	scene.add( boxMesh );
 
 	var EquirectangularToCubeGenerator = function ( sourceTexture, options ) {
+
+		options = options || {};
 
 		this.sourceTexture = sourceTexture;
 		this.resolution = options.resolution || 512;
