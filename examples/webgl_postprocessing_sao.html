@@ -32,10 +32,10 @@
 	<body>
 		<script src="../build/three.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/SAOPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
+		<script src="js/postprocessing2/SAOPass2.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/SAOShader.js"></script>
@@ -135,21 +135,20 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				composer = new THREE.EffectComposer( renderer );
-				renderPass = new THREE.RenderPass( scene, camera );
+				composer = new THREE.EffectComposer2( renderer );
+				renderPass = new THREE.RenderPass2( scene, camera );
 				composer.addPass( renderPass );
-				saoPass = new THREE.SAOPass( scene, camera, false, true );
-				saoPass.renderToScreen = true;
+				saoPass = new THREE.SAOPass2( scene, camera, false, true );
 				composer.addPass( saoPass );
 
 				// Init gui
 				var gui = new dat.GUI();
 				gui.add( saoPass.params, 'output', {
-					'Beauty': THREE.SAOPass.OUTPUT.Beauty,
-					'Beauty+SAO': THREE.SAOPass.OUTPUT.Default,
-					'SAO': THREE.SAOPass.OUTPUT.SAO,
-					'Depth': THREE.SAOPass.OUTPUT.Depth,
-					'Normal': THREE.SAOPass.OUTPUT.Normal
+					'Beauty': THREE.SAOPass2.OUTPUT.Beauty,
+					'Beauty+SAO': THREE.SAOPass2.OUTPUT.Default,
+					'SAO': THREE.SAOPass2.OUTPUT.SAO,
+					'Depth': THREE.SAOPass2.OUTPUT.Depth,
+					'Normal': THREE.SAOPass2.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
 					saoPass.params.output = parseInt( value );
