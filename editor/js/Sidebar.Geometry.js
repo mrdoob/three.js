@@ -86,6 +86,59 @@ Sidebar.Geometry = function ( editor ) {
 	container.addStatic( objectActions );
 	*/
 
+	var copiedGeometry, clonedGeometry;
+
+	// Copy / Paste
+	var managerRow1 = new UI.Row();
+	container.add( managerRow1 );
+
+	managerRow1.add( new UI.Text( '' ).setWidth( '90px' ) );
+
+	managerRow1.add( new UI.Button( strings.getKey( 'sidebar/geometry/copy' ) ).setMarginLeft( '4px' ).onClick( function () {
+
+		var object = editor.selected;
+		if ( object && object.geometry ) {
+
+			copiedGeometry = object.geometry;
+
+		}
+
+	} ) );
+
+	managerRow1.add( new UI.Button( strings.getKey( 'sidebar/geometry/paste' ) ).setMarginLeft( '4px' ).onClick( function () {
+
+		if ( copiedGeometry === undefined ) return;
+
+		editor.execute( new SetGeometryCommand( editor.selected, copiedGeometry ) );
+
+	} ) );
+
+	// Clone / Append
+	var managerRow2 = new UI.Row();
+	container.add( managerRow2 );
+
+	managerRow2.add( new UI.Text( '' ).setWidth( '90px' ) );
+
+	managerRow2.add( new UI.Button( strings.getKey( 'sidebar/geometry/clone' ) ).setMarginLeft( '4px' ).onClick( function () {
+
+		var object = editor.selected;
+		if ( object && object.geometry ) {
+
+			clonedGeometry = object.geometry.clone();
+			clonedGeometry.applyMatrix( object.matrixWorld );
+
+		}
+
+	} ) );
+
+	managerRow2.add( new UI.Button( strings.getKey( 'sidebar/geometry/append' ) ).setMarginLeft( '4px' ).onClick( function () {
+
+		if ( clonedGeometry === undefined ) return;
+
+		editor.execute( new AppendGeometryCommand( editor.selected, clonedGeometry ) );
+
+	} ) );
+
 	// type
 
 	var geometryTypeRow = new UI.Row();
@@ -179,7 +232,16 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-			geometryBoundingSphere.setValue( Math.floor( geometry.boundingSphere.radius * 1000 ) / 1000 );
+			// Empty Buffer Geometry will not have a bounding sphere
+			if ( geometry.boundingSphere ) {
+
+				geometryBoundingSphere.setValue( Math.floor( geometry.boundingSphere.radius * 1000 ) / 1000 );
+
+			} else {
+
+				geometryBoundingSphere.setValue( 0 );
+
+			}
 
 		} else {
 

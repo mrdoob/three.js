@@ -38,6 +38,7 @@ var Strings = function ( config ) {
 			'menubar/add/box': 'Box',
 			'menubar/add/circle': 'Circle',
 			'menubar/add/cylinder': 'Cylinder',
+			'menubar/add/empty': 'Empty',
 			'menubar/add/sphere': 'Sphere',
 			'menubar/add/icosahedron': 'Icosahedron',
 			'menubar/add/torus': 'Torus',
@@ -99,6 +100,10 @@ var Strings = function ( config ) {
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'New',
+			'sidebar/geometry/copy': 'Copy',
+			'sidebar/geometry/paste': 'Paste',
+			'sidebar/geometry/clone': 'Clone',
+			'sidebar/geometry/append': 'Append',
 			'sidebar/geometry/uuid': 'UUID',
 			'sidebar/geometry/name': 'Name',
 			'sidebar/geometry/bounds': 'Bounds',
@@ -112,6 +117,7 @@ var Strings = function ( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributes',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+			'sidebar/buffer_geometry/modify': 'Modify',
 
 			'sidebar/geometry/circle_geometry/radius': 'Radius',
 			'sidebar/geometry/circle_geometry/segments': 'Segments',
@@ -287,6 +293,7 @@ var Strings = function ( config ) {
 			'menubar/add/box': '正方体',
 			'menubar/add/circle': '圆',
 			'menubar/add/cylinder': '圆柱体',
+			'menubar/add/empty': '匮',
 			'menubar/add/sphere': '球体',
 			'menubar/add/icosahedron': '二十面体',
 			'menubar/add/torus': '圆环体',
@@ -347,6 +354,10 @@ var Strings = function ( config ) {
 			'sidebar/object/userdata': '自定义数据',
 
 			'sidebar/geometry/type': '类型',
+			'sidebar/geometry/new': '复制',
+			'sidebar/geometry/copy': '粘贴',
+			'sidebar/geometry/clone': '克隆',
+			'sidebar/geometry/append': '附加',
 			'sidebar/geometry/new': '更新',
 			'sidebar/geometry/uuid': '识别码',
 			'sidebar/geometry/name': '名称',
@@ -361,6 +372,7 @@ var Strings = function ( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': '属性',
 			'sidebar/geometry/buffer_geometry/index': '索引',
+			'sidebar/buffer_geometry/modify': '修改',
 
 			'sidebar/geometry/circle_geometry/radius': '半径',
 			'sidebar/geometry/circle_geometry/segments': '分段',

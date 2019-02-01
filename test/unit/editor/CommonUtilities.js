@@ -84,6 +84,12 @@ function getGeometry( type, customParams ) {
 				params[ 'thetaStart' ],
 				params[ 'thetaLength' ]
 			);
+			
+		case "BufferGeometry":
+			var g = new THREE.BufferGeometry();
+			g.addAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 1, 1, 0, 2, 0, 0]));
+			g.setIndex([0, 1, 2]);
+			return g;
 
 		default:
 
@@ -110,6 +116,12 @@ function aBox( name, customParams ) {
 
 	return getObject( name, "BoxGeometry", customParams );
 
+}
+
+function aTriangle(name, customParams) {
+	
+	return getObject(name, "BufferGeometry");
+	
 }
 
 function aSphere( name, customParams ) {
@@ -168,4 +180,18 @@ function importScene( data ) {
 
 	return result;
 
+}
+
+function arrayEquals( a1, a2 ) { 
+
+	if ( a1 === a2 ) return true;
+	if ( a === null || b === null ) return false;
+	if ( a.length !== b.length ) return false;
+	
+	for ( var i = 0; i < a.length; ++i ) { 
+		if ( a[i] !== b[i] ) return false;
+	}
+	
+	return true;
+	
 }

@@ -57,7 +57,9 @@ Viewport.Info = function ( editor ) {
 
 					} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-						vertices += geometry.attributes.position.count;
+						var geometryVertices = ( geometry.attributes.position !== undefined ) ? geometry.attributes.position.count : 0;
+
+						vertices += geometryVertices;
 
 						if ( geometry.index !== null ) {
 
@@ -65,7 +67,7 @@ Viewport.Info = function ( editor ) {
 
 						} else {
 
-							triangles += geometry.attributes.position.count / 3;
+							triangles += geometryVertices / 3;
 
 						}
 
