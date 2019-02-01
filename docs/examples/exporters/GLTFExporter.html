@@ -128,16 +128,10 @@
 		The onComplete callback will be called with one argument, an object with the following properties: <br />
 		<ul>
 			<li>json — object. The glTF's JSON content.</li>
-			<li>buffers — Array<[page:Blob Blob]>. Blobs corresponding to the glTF's buffers array. Will be undefined if the buffer does not have a uri or it is not the glb buffer.</li>
-			<li>images — Array<[page:Blob Blob]>. Blobs corresponding to the glTF's images array. Will be undefined if the image does not have a uri.</li>
+			<li>buffers — Array<[page:Blob Blob]>. External Blobs referenced by the glTF "buffers" array. Undefined unless mode is "gltf".</li>
+			<li>images — Array<[page:Blob Blob]>. External Blobs referenced by the glTF "images" array. Undefined unless mode is "gltf".</li>
 		</ul>
-		</p>
-
-		<h3>[method:null createGLBBlob]( [param:Object3D input], [param:Function onCompleted], [param:Function onError] )</h3>
-		<p>
-		[page:Object chunks] — The chunks object returned by [page:Function parseChunks].<br />
-		[page:Function onCompleted] — Will be called when the export completes. The argument will be a blob containing the glb file's content.<br />
-		[page:Function onError] — (optional) A function to be called if an error occurs during exporting. The function receives error as an argument.<br />
+		Filenames associated with buffers and images (which are needed to save files to disk) are in "json.buffers" and "json.images".
 		</p>
 
 		<h2>Source</h2>
