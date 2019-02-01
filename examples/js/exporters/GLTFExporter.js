@@ -711,14 +711,13 @@ THREE.GLTFExporter.prototype = {
 				canvas.width = Math.min( image.width, options.maxTextureSize );
 				canvas.height = Math.min( image.height, options.maxTextureSize );
 
-				if ( options.forcePowerOfTwoTextures ) {
+				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( canvas ) ) {
 
-					if(! isPowerOfTwo( image )) {
-						console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
-					}
+					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
 					canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
 					canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
+
 				}
 
 				var ctx = canvas.getContext( '2d' );
