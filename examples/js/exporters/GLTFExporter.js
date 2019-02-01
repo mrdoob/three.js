@@ -361,9 +361,9 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-				}
+					delete json.gltfExtensions;
 
-				delete json.gltfExtensions;
+				}
 
 				if ( Object.keys( json ).length > 0 ) {
 
