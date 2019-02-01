@@ -17,6 +17,7 @@ THREE.RenderPass2 = function ( scene, camera, overrideMaterial, clearColor, clea
 
 	this.colorBufferConfig = new THREE.IntermediateBufferConfig();
 	this.colorBufferConfig.clear = true;
+	this.colorBufferConfig.isInput = true;
 
 	this.bufferConfigs = [ this.colorBufferConfig ];
 

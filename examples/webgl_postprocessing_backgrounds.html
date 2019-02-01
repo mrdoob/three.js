@@ -41,12 +41,12 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ClearPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
-		<script src="js/postprocessing/CubeTexturePass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/ClearColorPass2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/TexturePass2.js"></script>
+		<script src="js/postprocessing2/CubeTexturePass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -184,12 +184,12 @@
 
 				};
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new THREE.EffectComposer2( renderer );
 
-				clearPass = new THREE.ClearPass( params.clearColor, params.clearAlpha );
+				clearPass = new THREE.ClearColorPass2( params.clearColor, params.clearAlpha );
 				composer.addPass( clearPass );
 
-				texturePass = new THREE.TexturePass();
+				texturePass = new THREE.TexturePass2();
 				composer.addPass( texturePass );
 
 				var textureLoader = new THREE.TextureLoader();
@@ -199,7 +199,7 @@
 
 				} );
 
-				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
+				cubeTexturePassP = new THREE.CubeTexturePass2( cameraP );
 				composer.addPass( cubeTexturePassP );
 
 				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
@@ -210,12 +210,11 @@
 
 				} );
 
-				renderPass = new THREE.RenderPass( scene, cameraP );
-				renderPass.clear = false;
+				renderPass = new THREE.RenderPass2( scene, cameraP );
+				renderPass.colorBufferConfig.clear = false;
 				composer.addPass( renderPass );
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
+				var copyPass = new THREE.ShaderPass2( THREE.CopyShader );
 				composer.addPass( copyPass );
 
 				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );

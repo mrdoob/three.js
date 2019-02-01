@@ -106,7 +106,7 @@ Object.assign( THREE.EffectComposer2.prototype, {
 					var buffer;
 					if ( writeToFinalColorTarget ) {
 						buffer = finalColorRenderTarget;
-						if ( bufferConfig.isInput )
+						if ( bufferConfig.isInput && !bufferConfig.clear )
 						{
 							// The output buffer is also used as a color input in the pass.
 							// Copy the color buffer from the previous pass to the final target before executing the pass.
@@ -236,6 +236,8 @@ THREE.IntermediateBufferConfig = function() {
 	this.isOutput = true;
 
 	// Set to true if the pass clears this buffer before writing to it. Should only be set if isOutput is also true.
+	// If this is set then isInput is essentially ignored and the contents of the buffer are undefined when it is
+	// given to the pass.
 	this.clear = false;
 
 };
