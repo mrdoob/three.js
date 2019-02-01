@@ -3,18 +3,17 @@
  */
 
 import { TempNode } from './TempNode.js';
-import { FunctionNode } from './FunctionNode.js';
+
+var declarationRegexp = /^struct\s*([a-z_0-9]+)\s*{\s*((.|\n)*?)}/img,
+	propertiesRegexp = /\s*(\w*?)\s*(\w*?)(\=|\;)/img;
 
 function StructNode( src ) {
 
-	TempNode.call( this);
+	TempNode.call( this );
 
 	this.eval( src );
 
-};
-
-StructNode.rDeclaration = /^struct\s*([a-z_0-9]+)\s*{\s*((.|\n)*?)}/img;
-StructNode.rProperties = /\s*(\w*?)\s*(\w*?)(\=|\;)/img;
+}
 
 StructNode.prototype = Object.create( TempNode.prototype );
 StructNode.prototype.constructor = StructNode;
@@ -32,8 +31,11 @@ StructNode.prototype.getInputByName = function ( name ) {
 
 	while ( i -- ) {
 
-		if ( this.inputs[ i ].name === name )
+		if ( this.inputs[ i ].name === name ) {
+
 			return this.inputs[ i ];
+
+		}
 
 	}
 
@@ -47,7 +49,7 @@ StructNode.prototype.generate = function ( builder, output ) {
 
 	} else {
 
-		return builder.format( "(" + src + ")", this.getType( builder ), output );
+		return builder.format( '( ' + src + ' )', this.getType( builder ), output );
 
 	}
 
@@ -56,34 +58,32 @@ StructNode.prototype.generate = function ( builder, output ) {
 StructNode.prototype.eval = function ( src ) {
 
 	this.src = src || '';
-	
+
 	this.inputs = [];
-	
-	var declaration = StructNode.rDeclaration.exec( this.src );
-	
-	if (declaration) {
-		
-		var properties = declaration[2], matchType, matchName;
-		
-		while ( matchType = FunctionNode.rProperties.exec( properties ) ) {
-			
-			matchName = FunctionNode.rProperties.exec( properties )[0];
-			
+
+	var declaration = declarationRegexp.exec( this.src );
+
+	if ( declaration ) {
+
+		var properties = declaration[ 2 ], match;
+
+		while ( match = propertiesRegexp.exec( properties ) ) {
+
 			this.inputs.push( {
-				name: matchName,
-				type: matchType
+				type: match[ 1 ],
+				name: match[ 2 ]
 			} );
-			
+
 		}
-		
-		this.name = declaration[1];
+
+		this.name = declaration[ 1 ];
 
 	} else {
-		
+
 		this.name = '';
-		
+
 	}
-	
+
 	this.type = this.name;
 
 };

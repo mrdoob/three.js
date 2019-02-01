@@ -47,24 +47,6 @@ function reversePainterSortStable( a, b ) {
 }
 
 
-function painterSortStableSprites( a, b ) {
-
-	if ( a.renderOrder !== b.renderOrder ) {
-
-	 return a.renderOrder - b.renderOrder;
-
-	} else if ( a.z !== b.z ) {
-
-	 return b.z - a.z;
-
-	} else {
-
-	 return b.id - a.id;
-
-	}
-
-}
-
 function WebGLRenderList() {
 
 	var renderItems = [];
@@ -72,7 +54,6 @@ function WebGLRenderList() {
 
 	var opaque = [];
 	var transparent = [];
-	var sprites = [];
 
 	function init() {
 
@@ -80,7 +61,6 @@ function WebGLRenderList() {
 
 		opaque.length = 0;
 		transparent.length = 0;
-		sprites.length = 0;
 
 	}
 
@@ -116,15 +96,8 @@ function WebGLRenderList() {
 
 		}
 
-		if ( object.isSprite ) {
 
-			sprites.push( renderItem );
-
-		} else {
-
-			( material.transparent === true ? transparent : opaque ).push( renderItem );
-
-		}
+		( material.transparent === true ? transparent : opaque ).push( renderItem );
 
 		renderItemsIndex ++;
 
@@ -134,14 +107,12 @@ function WebGLRenderList() {
 
 		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
-		if ( sprites.length > 1 ) sprites.sort( painterSortStableSprites );
 
 	}
 
 	return {
 		opaque: opaque,
 		transparent: transparent,
-		sprites: sprites,
 
 		init: init,
 		push: push,
@@ -157,15 +128,23 @@ function WebGLRenderLists() {
 
 	function get( scene, camera ) {
 
-		var hash = scene.id + ',' + camera.id;
-		var list = lists[ hash ];
-
-		if ( list === undefined ) {
-
-			// console.log( 'THREE.WebGLRenderLists:', hash );
+		var cameras = lists[ scene.id ];
+		var list;
+		if ( cameras === undefined ) {
 
 			list = new WebGLRenderList();
-			lists[ hash ] = list;
+			lists[ scene.id ] = {};
+			lists[ scene.id ][ camera.id ] = list;
+
+		} else {
+
+			list = cameras[ camera.id ];
+			if ( list === undefined ) {
+
+				list = new WebGLRenderList();
+				cameras[ camera.id ] = list;
+
+			}
 
 		}
 

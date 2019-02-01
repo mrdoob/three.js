@@ -34,11 +34,9 @@
 				color: #ff0000;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 		</style>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 	</head>
 	<body>
 		<div id="info">
@@ -52,7 +50,11 @@
 	</body>
 	<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var canvas = document.getElementById( 'canvas' );
 

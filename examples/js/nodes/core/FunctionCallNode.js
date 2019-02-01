@@ -3,14 +3,14 @@
  */
 
 import { TempNode } from './TempNode.js';
- 
+
 function FunctionCallNode( func, inputs ) {
 
 	TempNode.call( this );
 
 	this.setFunction( func, inputs );
 
-};
+}
 
 FunctionCallNode.prototype = Object.create( TempNode.prototype );
 FunctionCallNode.prototype.constructor = FunctionCallNode;
@@ -59,9 +59,9 @@ FunctionCallNode.prototype.generate = function ( builder, output ) {
 };
 
 FunctionCallNode.prototype.copy = function ( source ) {
-			
+
 	TempNode.prototype.copy.call( this, source );
-	
+
 	for ( var prop in source.inputs ) {
 
 		this.inputs[ prop ] = source.inputs[ prop ];
@@ -69,7 +69,7 @@ FunctionCallNode.prototype.copy = function ( source ) {
 	}
 
 	this.value = source.value;
-	
+
 };
 
 FunctionCallNode.prototype.toJSON = function ( meta ) {

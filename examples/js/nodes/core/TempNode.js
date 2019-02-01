@@ -3,20 +3,20 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from './GLNode.js';
+import { Node } from './Node.js';
 
 function TempNode( type, params ) {
 
-	GLNode.call( this, type );
+	Node.call( this, type );
 
 	params = params || {};
 
 	this.shared = params.shared !== undefined ? params.shared : true;
 	this.unique = params.unique !== undefined ? params.unique : false;
 
-};
+}
 
-TempNode.prototype = Object.create( GLNode.prototype );
+TempNode.prototype = Object.create( Node.prototype );
 TempNode.prototype.constructor = TempNode;
 
 TempNode.prototype.build = function ( builder, output, uuid, ns ) {
@@ -35,36 +35,36 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 		uuid = builder.getUuid( uuid || this.getUuid(), ! isUnique );
 
-		var data = builder.getNodeData( uuid );
+		var data = builder.getNodeData( uuid ),
+			type = data.output || this.getType( builder );
 
 		if ( builder.parsing ) {
 
-			if ( data.deps || 0 > 0 ) {
+			if ( ( data.deps || 0 ) > 0 ) {
 
 				this.appendDepsNode( builder, data, output );
 
-				return this.generate( builder, type, uuid );
+				return this.generate( builder, output, uuid );
 
 			}
 
-			return GLNode.prototype.build.call( this, builder, output, uuid );
+			return Node.prototype.build.call( this, builder, output, uuid );
 
 		} else if ( isUnique ) {
 
-			data.name = data.name || GLNode.prototype.build.call( this, builder, output, uuid );
+			data.name = data.name || Node.prototype.build.call( this, builder, output, uuid );
 
 			return data.name;
 
-		} else if ( ! builder.optimize || data.deps == 1 ) {
+		} else if ( ! this.isShared( builder, type ) || ( ! builder.optimize || data.deps == 1 ) ) {
 
-			return GLNode.prototype.build.call( this, builder, output, uuid );
+			return Node.prototype.build.call( this, builder, output, uuid );
 
 		}
 
 		uuid = this.getUuid( false );
 
-		var name = this.getTemp( builder, uuid ),
-			type = data.output || this.getType( builder );
+		var name = this.getTemp( builder, uuid );
 
 		if ( name ) {
 
@@ -84,7 +84,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 	}
 
-	return GLNode.prototype.build.call( this, builder, output, uuid );
+	return Node.prototype.build.call( this, builder, output, uuid );
 
 };
 
@@ -114,10 +114,10 @@ TempNode.prototype.getTemp = function ( builder, uuid ) {
 
 	uuid = uuid || this.uuid;
 
-	var tempVar = builder.getVars()[uuid]
-	
+	var tempVar = builder.getVars()[ uuid ];
+
 	return tempVar ? tempVar.name : undefined;
-	
+
 };
 
 TempNode.prototype.generate = function ( builder, output, uuid, type, ns ) {

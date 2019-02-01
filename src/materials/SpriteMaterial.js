@@ -6,11 +6,9 @@ import { Color } from '../math/Color.js';
  *
  * parameters = {
  *  color: <hex>,
- *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
- *
- *	uvOffset: new THREE.Vector2(),
- *	uvScale: new THREE.Vector2()
+ *  rotation: <float>,
+ *  sizeAttenuation: <bool>
  * }
  */
 
@@ -24,6 +22,8 @@ function SpriteMaterial( parameters ) {
 	this.map = null;
 
 	this.rotation = 0;
+
+	this.sizeAttenuation = true;
 
 	this.lights = false;
 	this.transparent = true;
@@ -44,6 +44,8 @@ SpriteMaterial.prototype.copy = function ( source ) {
 	this.map = source.map;
 
 	this.rotation = source.rotation;
+
+	this.sizeAttenuation = source.sizeAttenuation;
 
 	return this;
 

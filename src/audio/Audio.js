@@ -11,6 +11,7 @@ function Audio( listener ) {
 
 	this.type = 'Audio';
 
+	this.listener = listener;
 	this.context = listener.context;
 
 	this.gain = this.context.createGain();
@@ -119,6 +120,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		if ( this.isPlaying === true ) {
 
 			this.source.stop();
+			this.source.onended = null;
 			this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
 			this.isPlaying = false;
 
@@ -138,6 +140,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		}
 
 		this.source.stop();
+		this.source.onended = null;
 		this.offset = 0;
 		this.isPlaying = false;
 

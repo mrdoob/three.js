@@ -3,6 +3,7 @@ import { UniformsUtils } from './UniformsUtils.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { UniformsLib } from './UniformsLib.js';
 import { Color } from '../../math/Color.js';
+import { Matrix3 } from '../../math/Matrix3.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -104,6 +105,24 @@ var ShaderLib = {
 
 	},
 
+	matcap: {
+
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.common,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			UniformsLib.fog,
+			{
+				matcap: { value: null }
+			}
+		] ),
+
+		vertexShader: ShaderChunk.meshmatcap_vert,
+		fragmentShader: ShaderChunk.meshmatcap_frag
+
+	},
+
 	points: {
 
 		uniforms: UniformsUtils.merge( [
@@ -174,6 +193,17 @@ var ShaderLib = {
 
 	},
 
+	background: {
+
+		uniforms: {
+			uvTransform: { value: new Matrix3() },
+			t2D: { value: null },
+		},
+
+		vertexShader: ShaderChunk.background_vert,
+		fragmentShader: ShaderChunk.background_frag
+
+	},
 	/* -------------------------------------------------------------------------
 	//	Cube map shader
 	 ------------------------------------------------------------------------- */

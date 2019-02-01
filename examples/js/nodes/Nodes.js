@@ -2,7 +2,7 @@
 
 // core
 
-export { GLNode } from './core/GLNode.js';
+export { Node } from './core/Node.js';
 export { TempNode } from './core/TempNode.js';
 export { InputNode } from './core/InputNode.js';
 export { ConstNode } from './core/ConstNode.js';
@@ -10,6 +10,7 @@ export { VarNode } from './core/VarNode.js';
 export { StructNode } from './core/StructNode.js';
 export { AttributeNode } from './core/AttributeNode.js';
 export { FunctionNode } from './core/FunctionNode.js';
+export { ExpressionNode } from './core/ExpressionNode.js';
 export { FunctionCallNode } from './core/FunctionCallNode.js';
 export { NodeLib } from './core/NodeLib.js';
 export { NodeUtils } from './core/NodeUtils.js';
@@ -32,6 +33,7 @@ export { CubeTextureNode } from './inputs/CubeTextureNode.js';
 export { ScreenNode } from './inputs/ScreenNode.js';
 export { ReflectorNode } from './inputs/ReflectorNode.js';
 export { PropertyNode } from './inputs/PropertyNode.js';
+export { RTTNode } from './inputs/RTTNode.js';
 
 // accessors
 
@@ -51,10 +53,12 @@ export { Math1Node } from './math/Math1Node.js';
 export { Math2Node } from './math/Math2Node.js';
 export { Math3Node } from './math/Math3Node.js';
 export { OperatorNode } from './math/OperatorNode.js';
+export { CondNode } from './math/CondNode.js';
 
 // procedural
 
 export { NoiseNode } from './procedural/NoiseNode.js';
+export { CheckerNode } from './procedural/CheckerNode.js';
 
 // bsdfs
 
@@ -78,6 +82,7 @@ export { TimerNode } from './utils/TimerNode.js';
 export { VelocityNode } from './utils/VelocityNode.js';
 export { UVTransformNode } from './utils/UVTransformNode.js';
 export { MaxMIPLevelNode } from './utils/MaxMIPLevelNode.js';
+export { ColorSpaceNode } from './utils/ColorSpaceNode.js';
 
 // effects
 
@@ -103,4 +108,5 @@ export { MeshStandardNodeMaterial } from './materials/MeshStandardNodeMaterial.j
 
 // postprocessing
 
+export { NodePostProcessing } from './postprocessing/NodePostProcessing.js';
 //export { NodePass } from './postprocessing/NodePass.js';

@@ -37,12 +37,16 @@
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -66,12 +70,14 @@
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
 				//
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
 				var textureCube = new THREE.CubeTextureLoader()
@@ -101,10 +107,7 @@
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					var shininess = 50, specular = 0x333333, bumpScale = 1;
-
-					var materials = [];
-
+					var bumpScale = 1;
 					var cubeWidth = 400;
 					var numberOfSphersPerSide = 5;
 					var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -150,7 +153,12 @@
 						index ++;
 
 					}
-				});
+
+					hdrCubeMap.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
+				} );
 
 				function addLabel( name, location ) {
 
@@ -162,7 +170,7 @@
 						height: 1,
 						curveSegments: 1
 
-					});
+					} );
 
 					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
@@ -171,13 +179,13 @@
 
 				}
 
-				addLabel( "+roughness", new THREE.Vector3( -350, 0, 0 ) );
+				addLabel( "+roughness", new THREE.Vector3( - 350, 0, 0 ) );
 				addLabel( "-roughness", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-metalness", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "-metalness", new THREE.Vector3( 0, - 300, 0 ) );
 				addLabel( "+metalness", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
+				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );

@@ -12,9 +12,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			a {
-				color: #f00;
-			}
+			a { color: #f00; }
 
 			#info {
 				position: absolute;
@@ -42,7 +40,7 @@
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/LuminosityHighPassShader.js"></script>
 		<script src="js/postprocessing/UnrealBloomPass.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -89,7 +87,7 @@
 			'#endif'
 		].join( '\n' );
 
-		var lights = [], objects = [];
+		var lights = [];
 
 		var State = {
 			rows: 0,
@@ -171,7 +169,7 @@
 		// Screen rectangle bounds from light sphere's world AABB
 		var lightBounds = function () {
 
-			v = new THREE.Vector3();
+			var v = new THREE.Vector3();
 			return function ( camera, pos, r ) {
 
 				var minX = State.width, maxX = 0, minY = State.height, maxY = 0, hw = State.width / 2, hh = State.height / 2;
@@ -194,7 +192,7 @@
 
 				return [ minX, maxX, minY, maxY ];
 
-		};
+			};
 
 		}();
 
@@ -224,7 +222,7 @@
 		var stats = new Stats();
 		container.appendChild( stats.dom );
 
-		controls = new THREE.OrbitControls( camera, renderer.domElement );
+		var controls = new THREE.OrbitControls( camera, renderer.domElement );
 		controls.minDistance = 120;
 		controls.maxDistance = 320;
 
@@ -362,7 +360,7 @@
 
 		}
 
-		function postEffect( renderer, scene, camera ) {
+		function postEffect( renderer ) {
 
 			bloom.render( renderer, null, renderTarget );
 

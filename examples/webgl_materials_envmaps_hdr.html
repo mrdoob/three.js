@@ -37,7 +37,7 @@
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/pmrem/PMREMGenerator.js"></script>
@@ -46,7 +46,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 			var params = {
@@ -99,12 +103,14 @@
 				planeMesh1.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh1 );
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
@@ -221,7 +227,7 @@
 
 					var newEnvMap = standardMaterial.envMap;
 
-					switch( params.envMap ) {
+					switch ( params.envMap ) {
 
 						case 'LDR': newEnvMap = ldrCubeRenderTarget ? ldrCubeRenderTarget.texture : null; break;
 						case 'HDR': newEnvMap = hdrCubeRenderTarget ? hdrCubeRenderTarget.texture : null; break;

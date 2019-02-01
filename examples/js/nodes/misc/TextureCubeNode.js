@@ -4,7 +4,7 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
- 
+
 function TextureCubeNode( value, uv ) {
 
 	TempNode.call( this, 'v4' );
@@ -12,7 +12,7 @@ function TextureCubeNode( value, uv ) {
 	this.value = value;
 	this.uv = uv || new TextureCubeUVNode();
 
-};
+}
 
 TextureCubeNode.prototype = Object.create( TempNode.prototype );
 TextureCubeNode.prototype.constructor = TextureCubeNode;
@@ -25,12 +25,12 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 		var uv_10 = this.uv.build( builder ) + '.uv_10',
 			uv_20 = this.uv.build( builder ) + '.uv_20',
 			t = this.uv.build( builder ) + '.t';
-		
+
 		var color10 = builder.getTexelDecodingFunctionFromTexture( 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )', this.value.value ),
 			color20 = builder.getTexelDecodingFunctionFromTexture( 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )', this.value.value );
 
 		return builder.format( 'vec4( mix( ' + color10 + ', ' + color20 + ', ' + t + ' ).rgb, 1.0 )', this.getType( builder ), output );
-			
+
 	} else {
 
 		console.warn( "THREE.TextureCubeNode is not compatible with " + builder.shader + " shader." );

@@ -15,10 +15,14 @@ void main() {
 	#include <morphtarget_vertex>
 	#include <project_vertex>
 
+	gl_PointSize = size;
+
 	#ifdef USE_SIZEATTENUATION
-		gl_PointSize = size * ( scale / - mvPosition.z );
-	#else
-		gl_PointSize = size;
+
+		bool isPerspective = ( projectionMatrix[ 2 ][ 3 ] == - 1.0 );
+
+		if ( isPerspective ) gl_PointSize *= ( scale / - mvPosition.z );
+
 	#endif
 
 	#include <logdepthbuf_vertex>

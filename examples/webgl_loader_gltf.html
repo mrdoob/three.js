@@ -40,12 +40,16 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
@@ -59,10 +63,10 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( -1.8, 0.9, 2.7 );
+				camera.position.set( - 1.8, 0.9, 2.7 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, -0.2, -0.2 );
+				controls.target.set( 0, - 0.2, - 0.2 );
 				controls.update();
 
 				// envmap
@@ -96,6 +100,10 @@
 					} );
 
 					scene.add( gltf.scene );
+
+				}, undefined, function ( e ) {
+
+					console.error( e );
 
 				} );
 

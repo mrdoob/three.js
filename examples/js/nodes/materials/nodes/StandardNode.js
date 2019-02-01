@@ -2,22 +2,22 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { GLNode } from '../../core/GLNode.js';
+import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
- 
+
 function StandardNode() {
 
-	GLNode.call( this );
+	Node.call( this );
 
 	this.color = new ColorNode( 0xEEEEEE );
 	this.roughness = new FloatNode( 0.5 );
 	this.metalness = new FloatNode( 0.5 );
 
-};
+}
 
-StandardNode.prototype = Object.create( GLNode.prototype );
+StandardNode.prototype = Object.create( Node.prototype );
 StandardNode.prototype.constructor = StandardNode;
 StandardNode.prototype.nodeType = "Standard";
 
@@ -26,7 +26,6 @@ StandardNode.prototype.build = function ( builder ) {
 	var code;
 
 	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
-	builder.define( 'ALPHATEST', '0.0' );
 
 	builder.requires.lights = true;
 
@@ -34,12 +33,12 @@ StandardNode.prototype.build = function ( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
+		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
+			THREE.UniformsLib.fog,
+			THREE.UniformsLib.lights
 
 		] ) );
 
@@ -52,13 +51,13 @@ StandardNode.prototype.build = function ( builder ) {
 
 			"#endif",
 
-			"#include <common>",
-			"#include <encodings_pars_fragment>", // encoding functions
+			//"#include <encodings_pars_fragment>", // encoding functions
 			"#include <fog_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
 			"#include <skinning_pars_vertex>",
 			"#include <shadowmap_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>"
+			"#include <logdepthbuf_pars_vertex>",
+			"#include <clipping_planes_pars_vertex>"
 
 		].join( "\n" ) );
 
@@ -68,9 +67,6 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <skinbase_vertex>",
 			"#include <skinnormal_vertex>",
 			"#include <defaultnormal_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
 
 			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
@@ -81,11 +77,11 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <begin_vertex>"
 		];
 
-		if ( transform ) {
+		if ( position ) {
 
 			output.push(
-				transform.code,
-				transform.result ? "transformed = " + transform.result + ";" : ''
+				position.code,
+				position.result ? "transformed = " + position.result + ";" : ''
 			);
 
 		}
@@ -96,6 +92,7 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <project_vertex>",
 			"#include <fog_vertex>",
 			"#include <logdepthbuf_vertex>",
+			"#include <clipping_planes_vertex>",
 
 			"	vViewPosition = - mvPosition.xyz;",
 
@@ -127,7 +124,6 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.alpha ) this.alpha.parse( builder );
 
 		if ( this.normal ) this.normal.parse( builder );
-		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
 		if ( this.clearCoat ) this.clearCoat.parse( builder );
 		if ( this.clearCoatRoughness ) this.clearCoatRoughness.parse( builder );
@@ -152,7 +148,6 @@ StandardNode.prototype.build = function ( builder ) {
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
-		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
 		var clearCoat = this.clearCoat ? this.clearCoat.buildCode( builder, 'f' ) : undefined;
 		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.buildCode( builder, 'f' ) : undefined;
@@ -182,7 +177,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			"#endif",
 
-			"#include <common>",
+			"#include <dithering_pars_fragment>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
 			"#include <lights_pars_begin>",
@@ -193,10 +188,12 @@ StandardNode.prototype.build = function ( builder ) {
 		].join( "\n" ) );
 
 		var output = [
-			// prevent undeclared normal
+			"#include <clipping_planes_fragment>",
+
+			// add before: prevent undeclared normal
 			"	#include <normal_fragment_begin>",
 
-			// prevent undeclared material
+			// add before: prevent undeclared material
 			"	PhysicalMaterial material;",
 			"	material.diffuseColor = vec3( 1.0 );",
 
@@ -217,7 +214,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push(
 				alpha.code,
-				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;'
+				'#ifdef ALPHATEST',
+
+				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+
+				'#endif'
 			);
 
 		}
@@ -228,7 +229,7 @@ StandardNode.prototype.build = function ( builder ) {
 				normal.code,
 				'normal = ' + normal.result + ';'
 			);
-		
+
 		}
 
 		// optimization for now
@@ -356,7 +357,7 @@ StandardNode.prototype.build = function ( builder ) {
 			output.push( "radiance += " + environment.result + ";" );
 
 		}
-		
+
 		output.push(
 			"#include <lights_fragment_end>"
 		);
@@ -374,7 +375,6 @@ StandardNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-			"#include <premultiplied_alpha_fragment>",
 			"#include <tonemapping_fragment>",
 			"#include <encodings_fragment>",
 			"#include <fog_fragment>",
@@ -391,12 +391,12 @@ StandardNode.prototype.build = function ( builder ) {
 };
 
 StandardNode.prototype.copy = function ( source ) {
-			
-	GLNode.prototype.copy.call( this, source );
-	
+
+	Node.prototype.copy.call( this, source );
+
 	// vertex
 
-	if ( source.transform ) this.transform = source.transform;
+	if ( source.position ) this.position = source.position;
 
 	// fragment
 
@@ -417,7 +417,7 @@ StandardNode.prototype.copy = function ( source ) {
 	if ( source.shadow ) this.shadow = source.shadow;
 
 	if ( source.ao ) this.ao = source.ao;
-	
+
 	if ( source.emissive ) this.emissive = source.emissive;
 	if ( source.ambient ) this.ambient = source.ambient;
 
@@ -435,7 +435,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 
 		// vertex
 
-		if ( this.transform ) data.transform = this.transform.toJSON( meta ).uuid;
+		if ( this.position ) data.position = this.position.toJSON( meta ).uuid;
 
 		// fragment
 
@@ -456,7 +456,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.shadow ) data.shadow = this.shadow.toJSON( meta ).uuid;
 
 		if ( this.ao ) data.ao = this.ao.toJSON( meta ).uuid;
-		
+
 		if ( this.emissive ) data.emissive = this.emissive.toJSON( meta ).uuid;
 		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
 

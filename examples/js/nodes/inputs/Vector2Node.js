@@ -11,7 +11,7 @@ function Vector2Node( x, y ) {
 
 	this.value = x instanceof THREE.Vector2 ? x : new THREE.Vector2( x, y );
 
-};
+}
 
 Vector2Node.prototype = Object.create( InputNode.prototype );
 Vector2Node.prototype.constructor = Vector2Node;
@@ -26,9 +26,9 @@ Vector2Node.prototype.generateReadonly = function ( builder, output, uuid, type,
 };
 
 Vector2Node.prototype.copy = function ( source ) {
-			
+
 	InputNode.prototype.copy.call( this, source );
-	
+
 	this.value.copy( source );
 
 };

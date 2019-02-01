@@ -10,7 +10,7 @@ function FloatNode( value ) {
 
 	this.value = value || 0;
 
-};
+}
 
 FloatNode.prototype = Object.create( InputNode.prototype );
 FloatNode.prototype.constructor = FloatNode;
@@ -23,11 +23,11 @@ FloatNode.prototype.generateReadonly = function ( builder, output, uuid, type, n
 };
 
 FloatNode.prototype.copy = function ( source ) {
-			
+
 	InputNode.prototype.copy.call( this, source );
-	
+
 	this.value = source.value;
-	
+
 };
 
 FloatNode.prototype.toJSON = function ( meta ) {

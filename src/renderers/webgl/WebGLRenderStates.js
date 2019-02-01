@@ -60,14 +60,26 @@ function WebGLRenderStates() {
 
 	function get( scene, camera ) {
 
-		var hash = scene.id + ',' + camera.id;
+		var renderState;
 
-		var renderState = renderStates[ hash ];
-
-		if ( renderState === undefined ) {
+		if ( renderStates[ scene.id ] === undefined ) {
 
 			renderState = new WebGLRenderState();
-			renderStates[ hash ] = renderState;
+			renderStates[ scene.id ] = {};
+			renderStates[ scene.id ][ camera.id ] = renderState;
+
+		} else {
+
+			if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
+
+				renderState = new WebGLRenderState();
+				renderStates[ scene.id ][ camera.id ] = renderState;
+
+			} else {
+
+				renderState = renderStates[ scene.id ][ camera.id ];
+
+			}
 
 		}
 
