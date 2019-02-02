@@ -43,11 +43,9 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/SSAARenderPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/SSAARenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 
 
 		<script>
@@ -59,7 +57,7 @@
 
 			var params = {
 				sampleLevel: 4,
-				renderToScreen: false,
+				renderToScreen: true,
 				unbiased: true,
 				camera: 'perspective',
 				clearColor: 'black',
@@ -176,14 +174,11 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				ssaaRenderPassP = new THREE.SSAARenderPass( scene, cameraP );
+				composer = new THREE.EffectComposer2( renderer );
+				ssaaRenderPassP = new THREE.SSAARenderPass2( scene, cameraP );
 				composer.addPass( ssaaRenderPassP );
-				ssaaRenderPassO = new THREE.SSAARenderPass( scene, cameraO );
+				ssaaRenderPassO = new THREE.SSAARenderPass2( scene, cameraO );
 				composer.addPass( ssaaRenderPassO );
-				copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
-				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -251,8 +246,8 @@
 				ssaaRenderPassP.enabled = ( params.camera === 'perspective' );
 				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
 
-				ssaaRenderPassP.renderToScreen = ssaaRenderPassO.renderToScreen = params.renderToScreen;
-				copyPass.enabled = ! params.renderToScreen;
+				ssaaRenderPassP.setAccumulateToTexture( !params.renderToScreen );
+				ssaaRenderPassO.setAccumulateToTexture( !params.renderToScreen );
 
 				composer.render();
 

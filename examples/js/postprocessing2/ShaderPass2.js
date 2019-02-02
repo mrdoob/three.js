@@ -39,7 +39,7 @@ THREE.ShaderPass2 = function ( shader, textureID ) {
 
 	}
 
-	this.fillQuad = THREE.Pass2.createFillQuadScene();
+	this.fillQuad = THREE.Pass2.createFillQuadScene( this.material );
 
 };
 

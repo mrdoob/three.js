@@ -43,11 +43,9 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/SSAARenderPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/SSAARenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 
 
 		<script>
@@ -121,15 +119,11 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new THREE.EffectComposer2( renderer );
 
-				ssaaRenderPass = new THREE.SSAARenderPass( scene, camera );
+				ssaaRenderPass = new THREE.SSAARenderPass2( scene, camera );
 				ssaaRenderPass.unbiased = false;
 				composer.addPass( ssaaRenderPass );
-
-				copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
-				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

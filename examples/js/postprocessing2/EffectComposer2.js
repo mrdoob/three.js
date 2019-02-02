@@ -312,14 +312,14 @@ Object.assign( THREE.Pass2.prototype, {
 } );
 
 // Helper for passes that need a scene that simply has the whole viewport filled with a single quad.
-THREE.Pass2.createFillQuadScene = function() {
+THREE.Pass2.createFillQuadScene = function( material ) {
 
 	var fillQuad = {};
 
 	fillQuad.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	fillQuad.scene = new THREE.Scene();
 
-	fillQuad.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	fillQuad.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), material );
 	fillQuad.quad.frustumCulled = false; // Avoid getting clipped
 	fillQuad.scene.add( fillQuad.quad );
 

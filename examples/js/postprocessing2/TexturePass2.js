@@ -33,7 +33,7 @@ THREE.TexturePass2 = function ( map, opacity ) {
 
 	} );
 
-	this.fillQuad = THREE.Pass2.createFillQuadScene();
+	this.fillQuad = THREE.Pass2.createFillQuadScene( this.material );
 
 };
 
@@ -44,8 +44,6 @@ THREE.TexturePass2.prototype = Object.assign( Object.create( THREE.Pass2.prototy
 	render: function ( renderer, buffers, deltaTime, maskActive ) {
 
 		var writeBuffer = buffers[0];
-
-		this.fillQuad.quad.material = this.material;
 
 		this.uniforms[ "opacity" ].value = this.opacity;
 		this.uniforms[ "tDiffuse" ].value = this.map;
