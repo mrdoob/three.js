@@ -25,7 +25,7 @@ var Viewport = function ( editor ) {
 	// helpers
 
 	var gridGroup = new THREE.Group();
-	sceneHelpers.add(gridGroup);
+	sceneHelpers.add( gridGroup );
 
 	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
 	gridGroup.add( grid );
@@ -518,32 +518,34 @@ var Viewport = function ( editor ) {
 	signals.showGridChanged.add( function ( gridProperties ) {
 
 		gridGroup.children.length = 0;
-		grid = new THREE.GridHelper(gridProperties.size, gridProperties.divisions, gridProperties.color1, gridProperties.color2);
+		grid = new THREE.GridHelper( gridProperties.size, gridProperties.divisions, gridProperties.color1, gridProperties.color2 );
 
 		var position = grid.geometry.attributes.position;
 		var colors = grid.geometry.attributes.color;
 
-		var div = Math.floor(gridProperties.size / gridProperties.dividers);
+		var div = Math.floor( gridProperties.size / gridProperties.dividers );
 
-		var c1 = new THREE.Color(gridProperties.color1);
-		var c2 = new THREE.Color(gridProperties.color2);
+		var c1 = new THREE.Color( gridProperties.color1 );
+		var c2 = new THREE.Color( gridProperties.color2 );
 		var v = new THREE.Vector3();
-		for(var i = 0; i < position.count; ++i)
-		{
-			v.fromBufferAttribute(position, i);
-			v.x += (gridProperties.size * 0.5);
-			v.z += (gridProperties.size * 0.5);
-			
-			if(Math.abs(v.x % div) < 1 && Math.abs(v.z % div) < 1)
-			{
-				colors.setXYZ(i, c1.r, c1.g, c1.b);
+		for ( var i = 0; i < position.count; ++ i ) {
+
+			v.fromBufferAttribute( position, i );
+			v.x += ( gridProperties.size * 0.5 );
+			v.z += ( gridProperties.size * 0.5 );
+
+			if ( Math.abs( v.x % div ) < 1 && Math.abs( v.z % div ) < 1 ) {
+
+				colors.setXYZ( i, c1.r, c1.g, c1.b );
+
+			} else {
+
+				colors.setXYZ( i, c2.r, c2.g, c2.b );
+
 			}
-			else
-			{
-				colors.setXYZ(i, c2.r, c2.g, c2.b);
-			}
+
 		}
-		gridGroup.add(grid);
+		gridGroup.add( grid );
 
 		gridGroup.visible = gridProperties.visible;
 		render();
