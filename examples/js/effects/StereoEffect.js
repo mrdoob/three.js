@@ -608,67 +608,17 @@ if ( typeof dat !== 'undefined' ) {
 				controllerZeroStep = this,
 				input = controller.__input;
 			controller.__input = document.createElement( 'input' );
-			input.value = object[property];
+			input.value = object[ property ];
 			input.onchange = function ( value ) {
 
-				object[property] = parseFloat( input.value );
+				object[ property ] = parseFloat( input.value );
 
 				if ( onchange !== undefined )
-				onchange( object[property] );
+					onchange( object[ property ] );
 
-			}
+			};
 			return controller;
 
-/*
-			this.controller = folder.add( object, property );
-			var controllerZeroStep = this;
-			var input = this.controller.__input;
-			this.controller.__input = document.createElement( 'input' );
-			input.onchange = function ( value ) {
-
-				object[property] = parseFloat( input.value );
-
-//				if ( onchange !== undefined )
-//					onchange( object[property] );
-
-				if ( this.controller.__onChange ) {
-					this.controller.__onChange.call( controllerZeroStep, object[property] );
-				}
-
-			}
-			this.controller.onChange = function ( fnc ) {
-
-				controllerZeroStep.controller.__onChange = fnc;
-
-			}
-			return this.controller;
-*/
-/*
-			this.controller = folder.add( object, property );
-			var controllerZeroStep = this,
-				input = this.controller.__input;
-			this.controller.__input = document.createElement( 'input' );
-			input.onchange = function ( value ) {
-
-				object[property] = parseFloat( input.value );
-
-//				if ( onchange !== undefined )
-//					onchange( object[property] );
-
-				if ( controllerZeroStep.__onChange ) {
-					controllerZeroStep.__onChange.call( controllerZeroStep, object[property] );
-				}
-
-			}
-			this.onChange = function ( fnc ) {
-
-				this.__onChange = fnc;
-				return this;
-
-			}
-			return this;
-//			return this.controller;
-*/
 		};
 
 	} else console.error( 'Duplicate dat.controllerZeroStep method.' );
