@@ -19,11 +19,10 @@
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/AfterimageShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/AfterimagePass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
+		<script src="js/postprocessing2/AfterimagePass2.js"></script>
 
 		<script src="js/libs/dat.gui.min.js" type="text/javascript" charset="utf-8"></script>
 
@@ -64,11 +63,10 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new THREE.EffectComposer2( renderer );
+				composer.addPass( new THREE.RenderPass2( scene, camera ) );
 
-				afterimagePass = new THREE.AfterimagePass();
-				afterimagePass.renderToScreen = true;
+				afterimagePass = new THREE.AfterimagePass2();
 				composer.addPass( afterimagePass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
