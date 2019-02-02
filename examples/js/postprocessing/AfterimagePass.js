@@ -78,6 +78,13 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 		}
 
+	},
+
+	setSize: function ( width, height ) {
+
+		this.textureComp.setSize( width, height );
+		this.textureOld.setSize( width, height );
+
 	}
 
 } );
