@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-UI.Texture = function ( mapping ) {
+UI.Texture = function ( editor, mapping ) {
 
 	UI.Element.call( this );
 
@@ -47,6 +47,201 @@ UI.Texture = function ( mapping ) {
 	name.style.border = '1px solid #ccc';
 	dom.appendChild( name );
 
+	var properties = new UI.Div().setDisplay( 'none' );
+	dom.appendChild( properties.dom );
+
+	var button = new UI.Button( ">" ).setFontSize( "8px" ).onClick( function () {
+
+		contents.setDisplay( contents.getDisplay() == "none" ? "block" : "none" );
+
+	} );
+
+	var contents = new UI.Div().setDisplay( 'none' ).setPaddingLeft( "90px" );
+	properties.add( button, contents );
+
+	var options = {};
+	options[ THREE.MirroredRepeatWrapping ] = 'MirroredRepeatWrapping';
+	options[ THREE.ClampToEdgeWrapping ] = 'ClampToEdgeWrapping';
+	options[ THREE.RepeatWrapping ] = 'RepeatWrapping';
+
+	var fieldset = new UI.Fieldset( "WrapS" ).setWidth( "140px" );
+	contents.add( fieldset );
+
+	var selectS = new UI.Select().setFontSize( "9px" ).setOptions( options ).setValue( THREE.ClampToEdgeWrapping ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			var value = parseInt( selectS.getValue() );
+			if ( value === undefined ) {
+
+				value = THREE.ClampToEdgeWrapping;
+
+			}
+			editor.execute( new SetTextureValueCommand( texture, 'wrapS', value ) );
+
+		}
+
+	} );
+	fieldset.add( selectS );
+
+	var fieldset = new UI.Fieldset( "WrapT" ).setWidth( "140px" );
+	contents.add( fieldset );
+
+	var selectT = new UI.Select().setFontSize( "9px" ).setOptions( options ).setValue( THREE.ClampToEdgeWrapping ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			var value = parseInt( selectT.getValue() );
+			if ( value === undefined ) {
+
+				value = THREE.ClampToEdgeWrapping;
+
+			}
+			editor.execute( new SetTextureValueCommand( texture, 'wrapT', value ) );
+
+		}
+
+	} );
+	fieldset.add( selectT );
+
+	var fieldset = new UI.Fieldset( "Anisotropy" ).setWidth( "140px" );
+	contents.add( fieldset );
+
+	var anis = new UI.Integer( 0 ).setWidth( '140px' ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			editor.execute( new SetTextureValueCommand( texture, 'anisotropy', anis.getValue() ) );
+
+		}
+
+	} );
+	fieldset.add( anis );
+
+	var fieldset = new UI.Fieldset( "Offset" ).setWidth( "140px" );
+	contents.add( fieldset );
+
+	var offsetX = new UI.Number( 0 ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			editor.execute( new SetTextureValueCommand( texture, [ 'offset', 'x' ], offsetX.getValue() ) );
+
+		}
+
+	} );
+	fieldset.add( offsetX );
+
+	var offsetY = new UI.Number( 0 ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			editor.execute( new SetTextureValueCommand( texture, [ 'offset', 'y' ], offsetY.getValue() ) );
+
+		}
+
+	} );
+	fieldset.add( offsetY );
+
+	var fieldset = new UI.Fieldset( "Repeat" ).setWidth( "140px" );
+	contents.add( fieldset );
+
+	var repeatX = new UI.Number( 1 ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			editor.execute( new SetTextureValueCommand( texture, [ 'repeat', 'x' ], repeatX.getValue() ) );
+
+		}
+
+	} );
+	fieldset.add( repeatX );
+
+	var repeatY = new UI.Number( 1 ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			editor.execute( new SetTextureValueCommand( texture, [ 'repeat', 'y' ], repeatY.getValue() ) );
+
+		}
+
+	} );
+	fieldset.add( repeatY );
+
+	var fieldset = new UI.Fieldset( "Center" ).setWidth( "140px" );
+	contents.add( fieldset );
+
+	var centerX = new UI.Number( 0 ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			editor.execute( new SetTextureValueCommand( texture, [ 'center', 'x' ], centerX.getValue() ) );
+
+		}
+
+	} );
+	fieldset.add( centerX );
+
+	var centerY = new UI.Number( 0 ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			editor.execute( new SetTextureValueCommand( texture, [ 'center', 'y' ], centerY.getValue() ) );
+
+		}
+
+	} );
+	fieldset.add( centerY );
+
+	var fieldset = new UI.Fieldset( "Rotation" ).setWidth( "140px" );
+	contents.add( fieldset );
+
+	var rotation = new UI.Number( 0 ).setStep( 10 ).setUnit( '°' ).onChange( function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			editor.execute( new SetTextureValueCommand( texture, 'rotation', rotation.getValue() * ( Math.PI / 180 ) ) );
+
+		}
+
+	} );
+	fieldset.add( rotation );
+
+	this.refreshUI = function () {
+
+		var texture = scope.getValue();
+		if ( texture !== null ) {
+
+			properties.setDisplay( 'block' );
+			selectS.setValue( texture.wrapS );
+			selectT.setValue( texture.wrapT );
+			offsetX.setValue( texture.offset.x );
+			offsetY.setValue( texture.offset.y );
+			repeatX.setValue( texture.repeat.x );
+			repeatY.setValue( texture.repeat.y );
+			centerX.setValue( texture.center.x );
+			centerY.setValue( texture.center.y );
+			rotation.setValue( texture.rotation * ( 180 / Math.PI ) );
+
+		} else {
+
+			properties.setDisplay( 'none' );
+
+		}
+
+	};
+	editor.signals.textureChanged.add( this.refreshUI );
+
 	function loadFile( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
@@ -75,7 +270,7 @@ UI.Texture = function ( mapping ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var image = document.createElement( 'img' );
-					image.addEventListener( 'load', function( event ) {
+					image.addEventListener( 'load', function ( event ) {
 
 						var texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
@@ -158,6 +353,7 @@ UI.Texture.prototype.setValue = function ( texture ) {
 	}
 
 	this.texture = texture;
+	this.refreshUI();
 
 };
 
@@ -188,11 +384,13 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keydown', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 			case 40: // down
 				event.preventDefault();
 				event.stopPropagation();
 				break;
+
 		}
 
 	}, false );
@@ -201,12 +399,14 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keyup', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 				scope.selectIndex( scope.selectedIndex - 1 );
 				break;
 			case 40: // down
 				scope.selectIndex( scope.selectedIndex + 1 );
 				break;
+
 		}
 
 	}, false );

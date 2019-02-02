@@ -162,6 +162,7 @@
 		<script src="js/commands/SetMaterialColorCommand.js"></script>
 		<script src="js/commands/SetMaterialMapCommand.js"></script>
 		<script src="js/commands/SetSceneCommand.js"></script>
+		<script src='js/commands/SetTextureValueCommand.js'></script>
 
 		<script src="js/libs/html2canvas.js"></script>
 		<script src="js/libs/three.html.js"></script>
@@ -263,6 +264,7 @@
 				signals.objectChanged.add( saveState );
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
+				signals.textureChanged.add(saveState);
 				signals.sceneBackgroundChanged.add( saveState );
 				signals.sceneFogChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );

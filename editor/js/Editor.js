@@ -59,6 +59,7 @@ var Editor = function () {
 		helperRemoved: new Signal(),
 
 		materialChanged: new Signal(),
+		textureChanged: new Signal(),
 
 		scriptAdded: new Signal(),
 		scriptChanged: new Signal(),
