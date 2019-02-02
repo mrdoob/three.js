@@ -49,6 +49,9 @@ THREE.EffectComposer2 = function ( renderer, colorRenderTarget ) {
 
 	this._previousFrameTime = Date.now();
 
+	this.maskActive = false;
+	this.renderer.autoClearStencil = false;  // Only mask passes should clear the stencil.
+
 };
 
 Object.assign( THREE.EffectComposer2.prototype, {
@@ -127,11 +130,12 @@ Object.assign( THREE.EffectComposer2.prototype, {
 				if ( bufferConfig.isOutput ) {
 
 					var buffer = this.getColorOutputBuffer( bufferConfig, writeToFinalColorTarget, finalColorRenderTarget );
-					if ( buffer == finalColorRenderTarget && bufferConfig.isInput && !bufferConfig.clear )
+					var passClearsWholeBuffer = bufferConfig.clear && !this.maskActive;
+					if ( buffer == finalColorRenderTarget && bufferConfig.isInput && !passClearsWholeBuffer )
 					{
-						// The output buffer is also used as a color input in the pass.
+						// The output buffer is also used as a color input in the pass and the pass does not clear it.
 						// Copy the color buffer from the previous pass to the final target before executing the pass.
-						this.copyPass.render( this.renderer, [ buffer, this.colorReadBuffer ], 0 );
+						this.copyPass.render( this.renderer, [ buffer, this.colorReadBuffer ], 0, this.maskActive );
 					}
 					if ( buffer == this.colorWriteBuffer ) {
 						writesToColorWriteBuffer = true;
@@ -171,6 +175,31 @@ Object.assign( THREE.EffectComposer2.prototype, {
 
 	},
 
+	handleMaskPass: function( pass ) {
+
+		if ( THREE.MaskPass2 !== undefined ) {
+
+			if ( pass instanceof THREE.MaskPass2 ) {
+
+				this.maskActive = true;
+
+				pass.render( this.renderer, [ this.colorWriteBuffer, this.colorReadBuffer ] );
+				return true;
+
+			} else if ( pass instanceof THREE.ClearMaskPass2 ) {
+
+				this.maskActive = false;
+				pass.render( this.renderer );
+				return true;
+
+			}
+
+		}
+
+		return false;
+
+	},
+
 	render: function ( finalColorRenderTarget, deltaTime ) {
 		
 		if ( finalColorRenderTarget == undefined ) {
@@ -191,6 +220,8 @@ Object.assign( THREE.EffectComposer2.prototype, {
 
 		var pass, i, il = this.passes.length;
 
+		this.maskActive = false;
+
 		for ( i = 0; i < il; i ++ ) {
 
 			pass = this.passes[ i ];
@@ -199,10 +230,12 @@ Object.assign( THREE.EffectComposer2.prototype, {
 
 			var writeToFinalColorTarget = this.isLastEnabledPass( i );
 
+			if ( this.handleMaskPass( pass ) ) continue;
+
 			var buffers = [];
 			var writesToColorWriteBuffer = this.gatherBuffersForPass( pass, writeToFinalColorTarget, finalColorRenderTarget, buffers );
 
-			pass.render( this.renderer, buffers, deltaTime );
+			pass.render( this.renderer, buffers, deltaTime, this.maskActive );
 
 			// Check if we need to copy the final output from a texture to the default framebuffer.
 			if ( writeToFinalColorTarget && !finalColorRenderTarget ) {
@@ -210,7 +243,7 @@ Object.assign( THREE.EffectComposer2.prototype, {
 				var wroteToBuffer = this.passWroteToBuffer( pass, writeToFinalColorTarget, finalColorRenderTarget );
 				if ( wroteToBuffer ) {
 					// In case the pass is only able to use a texture as its write buffer, copy the result to screen here.
-					this.copyPass.render( this.renderer, [ null, wroteToBuffer ], 0 );
+					this.copyPass.render( this.renderer, [ null, wroteToBuffer ], 0, this.maskActive );
 				}
 
 			} else if ( writesToColorWriteBuffer ) {
@@ -283,8 +316,8 @@ THREE.IntermediateBufferConfig = function() {
 	this.mustBeTexture = false;
 
 	// Set to true if the pass clears this buffer before reading from or writing to it. Should only be set if isOutput
-	// is also true. If this is set then isInput is essentially ignored and the contents of the buffer are undefined
-	// when it is given to the pass.
+	// is also true. If this is set and a mask is not active then isInput is essentially ignored and the contents of the
+	// buffer are undefined when it is given to the pass.
 	this.clear = false;
 
 };
@@ -333,6 +366,8 @@ THREE.Pass2.renderWithClear = function( renderer, scene, camera, writeBuffer, cl
 	var oldAutoClear = renderer.autoClear;
 	renderer.autoClear = false;
 
+	// TODO: Maybe this function should specifically clear only color and depth and make sure that clearing stencil is
+	// disabled?
 	renderer.render( scene, camera, writeBuffer, clear );
 
 	renderer.autoClear = oldAutoClear;
