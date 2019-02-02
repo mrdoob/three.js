@@ -1415,9 +1415,9 @@
 					}
 
 					var bufferGeometry = this._buildGeometry();
-					bufferGeometry.bones = putBones;
 					mesh = new THREE.SkinnedMesh( bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
-					mesh.skeleton.boneInverses = offsetList;
+
+					this._initSkeleton( mesh, putBones, offsetList );
 
 				} else {
 
@@ -1450,6 +1450,50 @@
 				this.Meshes.push( mesh );
 
 			}
+		}, {
+			key: '_initSkeleton',
+			value: function _initSkeleton( mesh, boneList, boneInverses ) {
+
+				var bones = [], bone, gbone;
+				var i, il;
+
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
+
+					gbone = boneList[ i ];
+
+					bone = new THREE.Bone();
+					bones.push( bone );
+
+					bone.name = gbone.name;
+					bone.position.fromArray( gbone.pos );
+					bone.quaternion.fromArray( gbone.rotq );
+					if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+
+				}
+
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
+
+					gbone = boneList[ i ];
+
+					if ( ( gbone.parent !== - 1 ) && ( gbone.parent !== null ) && ( bones[ gbone.parent ] !== undefined ) ) {
+
+						bones[ gbone.parent ].add( bones[ i ] );
+
+					} else {
+
+						mesh.add( bones[ i ] );
+
+					}
+
+				}
+
+				mesh.updateMatrixWorld( true );
+
+				var skeleton = new THREE.Skeleton( bones, boneInverses );
+				mesh.bind( skeleton, mesh.matrixWorld );
+
+			}
+
 		}, {
 			key: '_readAnimationKey',
 			value: function _readAnimationKey() {

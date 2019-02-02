@@ -31,8 +31,17 @@ function ShaderMaterial( parameters ) {
 	this.defines = {};
 	this.uniforms = {};
 
-	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
-	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
+	this.vertexShader = /* glsl */ `
+	void main() {
+		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+	}
+	`;
+
+	this.fragmentShader = /* glsl */ `
+	void main() {
+		gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+	}
+	`;
 
 	this.linewidth = 1;
 
@@ -123,42 +132,49 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 		var uniform = this.uniforms[ name ];
 		var value = uniform.value;
 
-		if ( value.isTexture ) {
+		if ( value && value.isTexture ) {
 
 			data.uniforms[ name ] = {
 				type: 't',
 				value: value.toJSON( meta ).uuid
 			};
 
-		} else if ( value.isColor ) {
+		} else if ( value && value.isColor ) {
 
 			data.uniforms[ name ] = {
 				type: 'c',
 				value: value.getHex()
 			};
 
-		} else if ( value.isVector2 ) {
+		} else if ( value && value.isVector2 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v2',
 				value: value.toArray()
 			};
 
-		} else if ( value.isVector3 ) {
+		} else if ( value && value.isVector3 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v3',
 				value: value.toArray()
 			};
 
-		} else if ( value.isVector4 ) {
+		} else if ( value && value.isVector4 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v4',
 				value: value.toArray()
 			};
 
-		} else if ( value.isMatrix4 ) {
+		} else if ( value && value.isMatrix3 ) {
+
+			data.uniforms[ name ] = {
+				type: 'm3',
+				value: value.toArray()
+			};
+
+		} else if ( value && value.isMatrix4 ) {
 
 			data.uniforms[ name ] = {
 				type: 'm4',
@@ -181,6 +197,16 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
+
+	var extensions = {};
+
+	for ( var key in this.extensions ) {
+
+		if ( this.extensions[ key ] === true ) extensions[ key ] = true;
+
+	}
+
+	if ( Object.keys( extensions ).length > 0 ) data.extensions = extensions;
 
 	return data;
 

@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 uniform sampler2D t2D;
 
 varying vec2 vUv;

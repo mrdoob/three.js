@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_SHADOWMAP
 
 	#if NUM_DIR_LIGHTS > 0

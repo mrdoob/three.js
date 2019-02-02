@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 vec3 transformedNormal = normalMatrix * objectNormal;
 
 #ifdef FLIP_SIDED

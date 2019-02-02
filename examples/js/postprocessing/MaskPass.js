@@ -20,7 +20,7 @@ THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 	constructor: THREE.MaskPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		var context = renderer.context;
 		var state = renderer.state;
@@ -88,7 +88,7 @@ THREE.ClearMaskPass.prototype = Object.create( THREE.Pass.prototype );
 
 Object.assign( THREE.ClearMaskPass.prototype, {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		renderer.state.buffers.stencil.setTest( false );
 

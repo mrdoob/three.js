@@ -390,8 +390,8 @@
 
 				velocityUniforms = velocityVariable.material.uniforms;
 
-				velocityUniforms.gravityConstant = { value: 0.0 };
-				velocityUniforms.density = { value: 0.0 };
+				velocityUniforms[ "gravityConstant" ] = { value: 0.0 };
+				velocityUniforms[ "density" ] = { value: 0.0 };
 
 				var error = gpuCompute.init();
 
@@ -450,10 +450,10 @@
 				geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 				particleUniforms = {
-					texturePosition: { value: null },
-					textureVelocity: { value: null },
-					cameraConstant: { value: getCameraConstant( camera ) },
-					density: { value: 0.0 }
+					"texturePosition": { value: null },
+					"textureVelocity": { value: null },
+					"cameraConstant": { value: getCameraConstant( camera ) },
+					"density": { value: 0.0 }
 				};
 
 				// ShaderMaterial
@@ -538,15 +538,15 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				particleUniforms.cameraConstant.value = getCameraConstant( camera );
+				particleUniforms[ "cameraConstant" ].value = getCameraConstant( camera );
 
 			}
 
 			function dynamicValuesChanger() {
 
-				velocityUniforms.gravityConstant.value = effectController.gravityConstant;
-				velocityUniforms.density.value = effectController.density;
-				particleUniforms.density.value = effectController.density;
+				velocityUniforms[ "gravityConstant" ].value = effectController.gravityConstant;
+				velocityUniforms[ "density" ].value = effectController.density;
+				particleUniforms[ "density" ].value = effectController.density;
 
 			}
 
@@ -604,8 +604,8 @@
 
 				gpuCompute.compute();
 
-				particleUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				particleUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				particleUniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				particleUniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 

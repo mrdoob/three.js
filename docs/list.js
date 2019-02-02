@@ -233,7 +233,6 @@ var list = {
 				"FontLoader": "api/en/loaders/FontLoader",
 				"ImageBitmapLoader": "api/en/loaders/ImageBitmapLoader",
 				"ImageLoader": "api/en/loaders/ImageLoader",
-				"JSONLoader": "api/en/loaders/JSONLoader",
 				"Loader": "api/en/loaders/Loader",
 				"LoaderUtils": "api/en/loaders/LoaderUtils",
 				"MaterialLoader": "api/en/loaders/MaterialLoader",
@@ -310,6 +309,7 @@ var list = {
 			},
 
 			"Renderers": {
+				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGLRenderTargetCube": "api/en/renderers/WebGLRenderTargetCube"
@@ -658,7 +658,6 @@ var list = {
 				"FontLoader": "api/zh/loaders/FontLoader",
 				"ImageBitmapLoader": "api/zh/loaders/ImageBitmapLoader",
 				"ImageLoader": "api/zh/loaders/ImageLoader",
-				"JSONLoader": "api/zh/loaders/JSONLoader",
 				"Loader": "api/zh/loaders/Loader",
 				"LoaderUtils": "api/zh/loaders/LoaderUtils",
 				"MaterialLoader": "api/zh/loaders/MaterialLoader",
@@ -735,6 +734,7 @@ var list = {
 			},
 
 			"渲染器": {
+				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
 				"WebGLRenderTargetCube": "api/zh/renderers/WebGLRenderTargetCube"

@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 struct PhysicalMaterial {
 
 	vec3	diffuseColor;
@@ -36,10 +36,10 @@ float clearCoatDHRApprox( const in float roughness, const in float dotNL ) {
 		float roughness = material.specularRoughness;
 
 		vec3 rectCoords[ 4 ];
-		rectCoords[ 0 ] = lightPos - halfWidth - halfHeight; // counterclockwise
-		rectCoords[ 1 ] = lightPos + halfWidth - halfHeight;
-		rectCoords[ 2 ] = lightPos + halfWidth + halfHeight;
-		rectCoords[ 3 ] = lightPos - halfWidth + halfHeight;
+		rectCoords[ 0 ] = lightPos + halfWidth - halfHeight; // counterclockwise; light shines in local neg z direction
+		rectCoords[ 1 ] = lightPos - halfWidth - halfHeight;
+		rectCoords[ 2 ] = lightPos - halfWidth + halfHeight;
+		rectCoords[ 3 ] = lightPos + halfWidth + halfHeight;
 
 		vec2 uv = LTC_Uv( normal, viewDir, roughness );
 
@@ -96,11 +96,17 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+	// Defer to the IndirectSpecular function to compute
+	// the indirectDiffuse if energy preservation is enabled.
+	#ifndef ENVMAP_TYPE_CUBE_UV
+
+		reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+
+	#endif
 
 }
 
-void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearCoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
+void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearCoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
 
 	#ifndef STANDARD
 		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
@@ -110,14 +116,39 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearCo
 		float clearCoatDHR = 0.0;
 	#endif
 
-	reflectedLight.indirectSpecular += ( 1.0 - clearCoatDHR ) * radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
+	float clearCoatInv = 1.0 - clearCoatDHR;
+
+	// Both indirect specular and diffuse light accumulate here
+	// if energy preservation enabled, and PMREM provided.
+	#if defined( ENVMAP_TYPE_CUBE_UV )
+
+		vec3 singleScattering = vec3( 0.0 );
+		vec3 multiScattering = vec3( 0.0 );
+		vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
+
+		BRDF_Specular_Multiscattering_Environment( geometry, material.specularColor, material.specularRoughness, singleScattering, multiScattering );
+
+		// The multiscattering paper uses the below formula for calculating diffuse 
+		// for dielectrics, but this is already handled when initially computing the 
+		// specular and diffuse color, so we can just use the diffuseColor directly.
+		//vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
+		vec3 diffuse = material.diffuseColor;
+
+		reflectedLight.indirectSpecular += clearCoatInv * radiance * singleScattering;
+		reflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;
+		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+
+	#else
+
+		reflectedLight.indirectSpecular += clearCoatInv * radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
+
+	#endif
 
 	#ifndef STANDARD
 
 		reflectedLight.indirectSpecular += clearCoatRadiance * material.clearCoat * BRDF_Specular_GGX_Environment( geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
 
 	#endif
-
 }
 
 #define RE_Direct				RE_Direct_Physical

@@ -90,18 +90,21 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.background = new THREE.Color( 0xaaaaaa );
+
+				scene.add( new THREE.DirectionalLight() );
+				scene.add( new THREE.HemisphereLight() );
 
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 5, 3 );
-				for ( var i = 0; i < 200; i ++ ) {
+				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 
-					var material = new THREE.MeshBasicMaterial();
-					material.color.r = Math.random();
-					material.color.g = Math.random();
-					material.color.b = Math.random();
+				for ( var i = 0; i < 100; i ++ ) {
+
+					var material = new THREE.MeshLambertMaterial( {
+						color: Math.random() * 0xffffff
+					} );
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 400 - 200;
@@ -111,7 +114,7 @@
 					mesh.rotation.y = Math.random();
 					mesh.rotation.z = Math.random();
 
-					mesh.scale.setScalar( Math.random() * 10 + 1 );
+					mesh.scale.setScalar( Math.random() * 10 + 2 );
 					group.add( mesh );
 
 				}
@@ -123,6 +126,7 @@
 				var height = window.innerHeight;
 
 				ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
+				ssaoPass.kernelRadius = 16;
 				ssaoPass.renderToScreen = true;
 
 				effectComposer = new THREE.EffectComposer( renderer );

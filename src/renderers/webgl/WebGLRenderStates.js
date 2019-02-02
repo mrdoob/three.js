@@ -58,6 +58,16 @@ function WebGLRenderStates() {
 
 	var renderStates = {};
 
+	function onSceneDispose( event ) {
+
+		var scene = event.target;
+
+		scene.removeEventListener( 'dispose', onSceneDispose );
+
+		delete renderStates[ scene.id ];
+
+	}
+
 	function get( scene, camera ) {
 
 		var renderState;
@@ -67,6 +77,8 @@ function WebGLRenderStates() {
 			renderState = new WebGLRenderState();
 			renderStates[ scene.id ] = {};
 			renderStates[ scene.id ][ camera.id ] = renderState;
+
+			scene.addEventListener( 'dispose', onSceneDispose );
 
 		} else {
 
