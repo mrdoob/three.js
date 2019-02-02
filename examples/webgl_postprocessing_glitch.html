@@ -31,11 +31,10 @@
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/DigitalGlitch.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/GlitchPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
+		<script src="js/postprocessing2/GlitchPass2.js"></script>
 
 		<div>
 			<label for="dotScreen">Glitch me wild:</label><input id="wildGlitch" type="checkbox" onchange="updateOptions()"/><br />
@@ -99,11 +98,10 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new THREE.EffectComposer2( renderer );
+				composer.addPass( new THREE.RenderPass2( scene, camera ) );
 
-				glitchPass = new THREE.GlitchPass();
-				glitchPass.renderToScreen = true;
+				glitchPass = new THREE.GlitchPass2();
 				composer.addPass( glitchPass );
 
 
