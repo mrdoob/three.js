@@ -60,10 +60,9 @@
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 
 		<script>
 
@@ -158,11 +157,11 @@
 
 				renderer.autoClear = false;
 
-				var renderModel = new THREE.RenderPass( scene, camera );
+				var renderModel = new THREE.RenderPass2( scene, camera );
 
-				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
-				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
-				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				var effectBleach = new THREE.ShaderPass2( THREE.BleachBypassShader );
+				var effectColor = new THREE.ShaderPass2( THREE.ColorCorrectionShader );
+				effectFXAA = new THREE.ShaderPass2( THREE.FXAAShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
@@ -171,9 +170,7 @@
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
 
-				effectColor.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer );
+				composer = new THREE.EffectComposer2( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFXAA );

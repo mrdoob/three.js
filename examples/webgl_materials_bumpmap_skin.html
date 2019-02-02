@@ -46,10 +46,9 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 
 		<script src="js/loaders/GLTFLoader.js"></script>
 
@@ -131,15 +130,14 @@
 
 				// BECKMANN
 
-				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
-
-				effectCopy.renderToScreen = true;
+				var effectBeckmann = new THREE.ShaderPass2( THREE.ShaderSkin[ "beckmann" ] );
+				var effectCopy = new THREE.ShaderPass2( THREE.CopyShader );
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				var rtwidth = 512, rtheight = 512;
 
-				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composerBeckmann = new THREE.EffectComposer2( renderer, { alpha: false } );
+				composerBeckmann.setSize( rtwidth, rtheight );
 				composerBeckmann.addPass( effectBeckmann );
 				composerBeckmann.addPass( effectCopy );
 
@@ -182,7 +180,7 @@
 				uniforms[ "enableBump" ].value = true;
 				uniforms[ "enableSpecular" ].value = true;
 
-				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.colorReadTarget().texture;
 				uniforms[ "tDiffuse" ].value = mapColor;
 
 				uniforms[ "bumpMap" ].value = mapHeight;

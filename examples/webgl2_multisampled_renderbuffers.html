@@ -51,9 +51,9 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 
 		<script>
 
@@ -133,19 +133,18 @@
 				var size = renderer.getDrawingBufferSize();
 				var renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 
-				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
+				var renderPass = new THREE.RenderPass2( scene, camera );
+				var copyPass = new THREE.ShaderPass2( THREE.CopyShader );
 
 				//
 
-				composer1 = new THREE.EffectComposer( renderer, renderTarget );
+				composer1 = new THREE.EffectComposer2( renderer, renderTarget );
 				composer1.addPass( renderPass );
 				composer1.addPass( copyPass );
 
 				//
 
-				composer2 = new THREE.EffectComposer( renderer );
+				composer2 = new THREE.EffectComposer2( renderer );
 				composer2.addPass( renderPass );
 				composer2.addPass( copyPass );
 
@@ -174,13 +173,20 @@
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
+				// Scissor test is needed so that the clear performed when rendering composer2 doesn't clear composer1 results.
+				renderer.setScissorTest( true );
+
 				renderer.setViewport( 0, 0, halfWidth, window.innerHeight );
+				renderer.setScissor( 0, 0, halfWidth, window.innerHeight );
 
 				composer1.render();
 
 				renderer.setViewport( halfWidth, 0, halfWidth, window.innerHeight );
+				renderer.setScissor( halfWidth, 0, halfWidth, window.innerHeight );
 
 				composer2.render();
+
+				renderer.setScissorTest( false );
 
 			}
 

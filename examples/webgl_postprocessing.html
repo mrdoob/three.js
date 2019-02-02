@@ -20,9 +20,9 @@
 		<script src="js/shaders/DotScreenShader.js"></script>
 		<script src="js/shaders/RGBShiftShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 
 
 		<script>
@@ -73,16 +73,15 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new THREE.EffectComposer2( renderer );
+				composer.addPass( new THREE.RenderPass2( scene, camera ) );
 
-				var effect = new THREE.ShaderPass( THREE.DotScreenShader );
+				var effect = new THREE.ShaderPass2( THREE.DotScreenShader );
 				effect.uniforms[ 'scale' ].value = 4;
 				composer.addPass( effect );
 
-				var effect = new THREE.ShaderPass( THREE.RGBShiftShader );
+				var effect = new THREE.ShaderPass2( THREE.RGBShiftShader );
 				effect.uniforms[ 'amount' ].value = 0.0015;
-				effect.renderToScreen = true;
 				composer.addPass( effect );
 
 				//

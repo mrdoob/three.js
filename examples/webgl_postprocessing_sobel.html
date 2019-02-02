@@ -40,9 +40,9 @@
 		<script src="js/shaders/LuminosityShader.js"></script>
 		<script src="js/shaders/SobelOperatorShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - webgl - postprocessing - sobel (edge detection)
@@ -103,13 +103,13 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				var renderPass = new THREE.RenderPass( scene, camera );
+				composer = new THREE.EffectComposer2( renderer );
+				var renderPass = new THREE.RenderPass2( scene, camera );
 				composer.addPass( renderPass );
 
 				// color to grayscale conversion
 
-				var effectGrayScale = new THREE.ShaderPass( THREE.LuminosityShader );
+				var effectGrayScale = new THREE.ShaderPass2( THREE.LuminosityShader );
 				composer.addPass( effectGrayScale );
 
 				// you might want to use a gaussian blur filter before
@@ -117,8 +117,7 @@
 
 				// Sobel operator
 
-				effectSobel = new THREE.ShaderPass( THREE.SobelOperatorShader );
-				effectSobel.renderToScreen = true;
+				effectSobel = new THREE.ShaderPass2( THREE.SobelOperatorShader );
 				effectSobel.uniforms[ "resolution" ].value.x = window.innerWidth;
 				effectSobel.uniforms[ "resolution" ].value.y = window.innerHeight;
 				composer.addPass( effectSobel );

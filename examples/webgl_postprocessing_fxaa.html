@@ -51,9 +51,9 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing2/EffectComposer2.js"></script>
+		<script src="js/postprocessing2/RenderPass2.js"></script>
+		<script src="js/postprocessing2/ShaderPass2.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script>
@@ -131,30 +131,25 @@
 
 				//
 
-				var renderPass = new THREE.RenderPass( scene, camera );
+				var renderPass = new THREE.RenderPass2( scene, camera );
 
 				//
 
-				fxaaPass = new THREE.ShaderPass( THREE.FXAAShader );
-				fxaaPass.renderToScreen = true;
+				fxaaPass = new THREE.ShaderPass2( THREE.FXAAShader );
 
 				var pixelRatio = renderer.getPixelRatio();
 
 				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
 				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
 
-				composer1 = new THREE.EffectComposer( renderer );
+				composer1 = new THREE.EffectComposer2( renderer );
 				composer1.addPass( renderPass );
 				composer1.addPass( fxaaPass );
 
 				//
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
-
-				composer2 = new THREE.EffectComposer( renderer );
+				composer2 = new THREE.EffectComposer2( renderer );
 				composer2.addPass( renderPass );
-				composer2.addPass( copyPass );
 
 				//
 
@@ -186,14 +181,20 @@
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
+				// Scissor test is needed so that the clear performed when rendering composer2 doesn't clear composer1 results.
+				renderer.setScissorTest( true );
+
 				renderer.setViewport( 0, 0, halfWidth, window.innerHeight );
+				renderer.setScissor( 0, 0, halfWidth, window.innerHeight );
 
 				composer1.render();
 
 				renderer.setViewport( halfWidth, 0, halfWidth, window.innerHeight );
+				renderer.setScissor( halfWidth, 0, halfWidth, window.innerHeight );
 
 				composer2.render();
 
+				renderer.setScissorTest( false );
 			}
 
 		</script>
