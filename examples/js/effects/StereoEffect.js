@@ -605,7 +605,6 @@ if ( typeof dat !== 'undefined' ) {
 		dat.controllerZeroStep = function ( folder, object, property, onchange ) {
 
 			var controller = folder.add( object, property ),
-				controllerZeroStep = this,
 				input = controller.__input;
 			controller.__input = document.createElement( 'input' );
 			input.value = object[ property ];
@@ -617,6 +616,7 @@ if ( typeof dat !== 'undefined' ) {
 					onchange( object[ property ] );
 
 			};
+			controller.setValue = function ( value ) { input.value = object[ property ] = value; }
 			return controller;
 
 		};
