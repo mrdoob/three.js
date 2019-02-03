@@ -9,61 +9,71 @@ Sidebar.Animation = function ( editor ) {
 	var renderer = null;
 
 	signals.rendererChanged.add( function ( newRenderer ) {
+
 		renderer = newRenderer;
-	});
 
-	signals.objectSelected.add(function(object)
-	{
+	} );
+
+	signals.objectSelected.add( function ( object ) {
+
 		var uuid = object !== null ? object.uuid : '';
-		var animations = editor.animations[uuid];
-		if(animations !== undefined)
-		{
-			container.setDisplay('');
+		var animations = editor.animations[ uuid ];
+		if ( animations !== undefined ) {
 
-			mixer = new THREE.AnimationMixer(object);
+			container.setDisplay( '' );
+
+			mixer = new THREE.AnimationMixer( object );
 			var options = {};
-			for(var animation of animations)
-			{
-				options[animation.name] = animation.name;
+			for ( var animation of animations ) {
 
-				var action = mixer.clipAction(animation);
-				actions[animation.name] = action;
+				options[ animation.name ] = animation.name;
+
+				var action = mixer.clipAction( animation );
+				actions[ animation.name ] = action;
+
 			}
-			animationsSelect.setOptions(options);
+			animationsSelect.setOptions( options );
+
+		} else {
+
+			container.setDisplay( 'none' );
+
 		}
-		else
-		{
-			container.setDisplay('none');
-		}
-	});
+
+	} );
 
 	var mixer, currentAnimation, actions = {};
 
 	var clock = new THREE.Clock();
-	function updateAnimation()
-	{
-		if(mixer !== undefined && renderer !== null)
-		{
+	function updateAnimation() {
+
+		if ( mixer !== undefined && renderer !== null ) {
+
 			var dt = clock.getDelta();
-			mixer.update(dt);
-			if(currentAnimation !== undefined && currentAnimation.isRunning())
-			{
-				requestAnimationFrame(updateAnimation);
-				renderer.render(editor.scene, editor.camera);
-			}
-			else
-			{
+			mixer.update( dt );
+			if ( currentAnimation !== undefined && currentAnimation.isRunning() ) {
+
+				requestAnimationFrame( updateAnimation );
+				renderer.render( editor.scene, editor.camera );
+
+			} else {
+
 				currentAnimation = undefined;
+
 			}
+
 		}
+
 	}
 
-	function stopAnimations()
-	{
-		if(mixer !== undefined)
-		{
+	function stopAnimations() {
+
+		if ( mixer !== undefined ) {
+
 			mixer.stopAllAction();
+
 		}
+
 	}
 
 	var container = new UI.Panel();
@@ -71,21 +81,23 @@ Sidebar.Animation = function ( editor ) {
 
 	container.add( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );
 
-	var div = new UI.Div().setMarginLeft('90px');
-	container.add(div);
+	var div = new UI.Div().setMarginLeft( '90px' );
+	container.add( div );
 
-	div.add(new UI.Button("Stop").setFontSize('12px').onClick(stopAnimations), new UI.Break());
+	div.add( new UI.Button( "Stop" ).setFontSize( '12px' ).onClick( stopAnimations ), new UI.Break() );
 
-	var animationsSelect = new UI.Select().setFontSize('12px').setMarginTop('10px').onChange(function()
-	{
-		currentAnimation = actions[animationsSelect.getValue()];
-		if(currentAnimation !== undefined)
-		{
+	var animationsSelect = new UI.Select().setFontSize( '12px' ).setMarginTop( '10px' ).onChange( function () {
+
+		currentAnimation = actions[ animationsSelect.getValue() ];
+		if ( currentAnimation !== undefined ) {
+
 			stopAnimations();
 			currentAnimation.play();
 			updateAnimation();
+
 		}
-	});
+
+	} );
 	div.add( animationsSelect );
 
 	return container;

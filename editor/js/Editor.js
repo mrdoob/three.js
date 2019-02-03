@@ -240,8 +240,10 @@ Editor.prototype = {
 
 	},
 
-	addAnimation: function(result) {
-		this.animations[result.scene.uuid] = result.animations;
+	addAnimation: function ( result ) {
+
+		this.animations[ result.scene.uuid ] = result.animations;
+
 	},
 
 	//
