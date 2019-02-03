@@ -616,7 +616,11 @@ if ( typeof dat !== 'undefined' ) {
 					onchange( object[ property ] );
 
 			};
-			controller.setValue = function ( value ) { input.value = object[ property ] = value; }
+			controller.setValue = function ( value ) {
+
+				input.value = object[ property ] = value;
+
+			};
 			return controller;
 
 		};
