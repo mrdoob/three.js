@@ -216,6 +216,7 @@ var Loader = function ( editor ) {
 					loader.parse( contents, '', function ( result ) {
 
 						result.scene.name = filename;
+						editor.addAnimation(result);
 						editor.execute( new AddObjectCommand( result.scene ) );
 
 					} );
@@ -246,6 +247,7 @@ var Loader = function ( editor ) {
 					loader.parse( contents, '', function ( result ) {
 
 						result.scene.name = filename;
+						editor.addAnimation(result);
 						editor.execute( new AddObjectCommand( result.scene ) );
 
 					} );
@@ -678,6 +680,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.GLTFLoader();
 					loader.parse( file.asArrayBuffer(), '', function ( result ) {
 
+						editor.addAnimation(result);
 						editor.execute( new AddObjectCommand( result.scene ) );
 
 					} );
@@ -689,6 +692,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.GLTFLoader( manager );
 					loader.parse( file.asText(), '', function ( result ) {
 
+						editor.addAnimation(result);
 						editor.execute( new AddObjectCommand( result.scene ) );
 
 					} );
