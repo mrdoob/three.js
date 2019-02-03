@@ -3,31 +3,38 @@
  * @author Oletus http://oletus.fi/
  */
 
-THREE.EffectComposer2 = function ( renderer, colorRenderTarget ) {
+THREE.EffectComposer2 = function ( renderer, params ) {
 
 	this.renderer = renderer;
 
-	if ( colorRenderTarget === undefined ) {
+	this.size = renderer.getDrawingBufferSize();
 
-		var parameters = {
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			stencilBuffer: false
-		};
+	params = params !== undefined ? params : {};
 
-		var size = renderer.getDrawingBufferSize();
-		colorRenderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
-		colorRenderTarget.texture.name = 'EffectComposer2.rt1';
+	var defaultParams = {
+		alpha: true,
+		colorRenderTargetType: THREE.UnsignedByteType
+	}
+	this.params = {};
+
+	for ( var key in defaultParams ) {
+
+		if ( defaultParams.hasOwnProperty(key) ) {
+
+			if ( params.hasOwnProperty(key) ) {
+				this.params[key] = params[key];
+			} else {
+				this.params[key] = defaultParams[key];
+			}
+
+		}
 
 	}
 
-	this.colorRenderTarget1 = colorRenderTarget;
-	this.colorRenderTarget2 = colorRenderTarget.clone();
-	this.colorRenderTarget2.texture.name = 'EffectComposer2.rt2';
-
-	this.colorWriteBuffer = this.colorRenderTarget1;
-	this.colorReadBuffer = this.colorRenderTarget2;
+	this.needStencilBuffer = false;
+	this.recreateIntermediateTargets = false;
+	
+	this.intermediateRenderTargets = [];
 
 	this.passes = [];
 
@@ -56,11 +63,68 @@ THREE.EffectComposer2 = function ( renderer, colorRenderTarget ) {
 
 Object.assign( THREE.EffectComposer2.prototype, {
 
+	createIntermediateRenderTarget: function () {
+
+		var parameters = {
+			minFilter: THREE.LinearFilter,
+			magFilter: THREE.LinearFilter,
+			format: this.params.alpha ? THREE.RGBAFormat : THREE.RGBFormat,
+			type: this.params.colorRenderTargetType,
+			stencilBuffer: this.needStencilBuffer
+		};
+
+		var intermediateRenderTarget = new THREE.WebGLRenderTarget( this.size.width, this.size.height, parameters );
+		intermediateRenderTarget.texture.name = 'EffectComposer2.rt' + this.intermediateRenderTargets.length;
+		this.intermediateRenderTargets.push( intermediateRenderTarget );
+
+	},
+
+	updateNeedStencilBuffer: function ( pass ) {
+
+		if ( THREE.MaskPass2 !== undefined ) {
+			if ( pass instanceof THREE.MaskPass2 && !this.needStencilBuffer ) {
+				this.needStencilBuffer = true;
+				this.recreateIntermediateTargets = true;
+			}
+		}
+	},
+
+	disposeIntermediateRenderTargetsIfNeeded: function () {
+
+		if ( this.recreateIntermediateTargets ) {
+			this.recreateIntermediateTargets = false;
+			for ( var i = 0; i < this.intermediateRenderTargets.length; ++i ) {
+				this.intermediateRenderTargets[i].dispose();
+			}
+			this.intermediateRenderTargets = [];
+		}
+
+	},
+
+	colorReadTarget: function () {
+
+		if ( this.intermediateRenderTargets.length < 1 )
+		{
+			this.createIntermediateRenderTarget();
+		}
+		return this.intermediateRenderTargets[ this.readTargetIndex ];
+
+	},
+
+	colorWriteTarget: function () {
+
+		while ( this.intermediateRenderTargets.length < 2 )
+		{
+			this.createIntermediateRenderTarget();
+		}
+		return this.intermediateRenderTargets[ this.writeTargetIndex ];
+
+	},
+
 	swapBuffers: function () {
 
-		var tmp = this.colorReadBuffer;
-		this.colorReadBuffer = this.colorWriteBuffer;
-		this.colorWriteBuffer = tmp;
+		this.readTargetIndex = 1 - this.readTargetIndex;
+		this.writeTargetIndex = 1 - this.writeTargetIndex;
 
 	},
 
@@ -68,14 +132,17 @@ Object.assign( THREE.EffectComposer2.prototype, {
 
 		this.passes.push( pass );
 
-		var size = this.renderer.getDrawingBufferSize();
-		pass.setSize( size.width, size.height );
+		pass.setSize( this.size.width, this.size.height );
+
+		this.updateNeedStencilBuffer( pass );
 
 	},
 
 	insertPass: function ( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
+
+		this.updateNeedStencilBuffer( pass );
 
 	},
 
@@ -108,11 +175,11 @@ Object.assign( THREE.EffectComposer2.prototype, {
 		} else if ( bufferConfig.isInput ) {
 
 			// The output buffer is also used as a color input in the pass.
-			return this.colorReadBuffer;
+			return this.colorReadTarget();
 
 		} else {
 
-			return this.colorWriteBuffer;
+			return this.colorWriteTarget();
 
 		}
 
@@ -135,16 +202,16 @@ Object.assign( THREE.EffectComposer2.prototype, {
 					{
 						// The output buffer is also used as a color input in the pass and the pass does not clear it.
 						// Copy the color buffer from the previous pass to the final target before executing the pass.
-						this.copyPass.render( this.renderer, [ buffer, this.colorReadBuffer ], 0, this.maskActive );
+						this.copyPass.render( this.renderer, [ buffer, this.colorReadTarget() ], 0, this.maskActive );
 					}
-					if ( buffer == this.colorWriteBuffer ) {
+					if ( this.intermediateRenderTargets.length > 1 && buffer == this.colorWriteTarget() ) {
 						writesToColorWriteBuffer = true;
 					}
 					buffers.push( buffer );
 
 				} else {
 
-					buffers.push( this.colorReadBuffer );
+					buffers.push( this.colorReadTarget() );
 
 				}
 
@@ -183,7 +250,7 @@ Object.assign( THREE.EffectComposer2.prototype, {
 
 				this.maskActive = true;
 
-				pass.render( this.renderer, [ this.colorWriteBuffer, this.colorReadBuffer ] );
+				pass.render( this.renderer, this.intermediateRenderTargets );
 				return true;
 
 			} else if ( pass instanceof THREE.ClearMaskPass2 ) {
@@ -218,9 +285,14 @@ Object.assign( THREE.EffectComposer2.prototype, {
 		}
 		this._previousFrameTime = Date.now();
 
+		this.disposeIntermediateRenderTargetsIfNeeded();
+
 		var pass, i, il = this.passes.length;
 
 		this.maskActive = false;
+
+		this.readTargetIndex = 0;
+		this.writeTargetIndex = 1;
 
 		for ( i = 0; i < il; i ++ ) {
 
@@ -256,31 +328,15 @@ Object.assign( THREE.EffectComposer2.prototype, {
 
 	},
 
-	reset: function ( colorRenderTarget ) {
-
-		if ( colorRenderTarget === undefined ) {
-
-			var size = this.renderer.getDrawingBufferSize();
-
-			colorRenderTarget = this.colorRenderTarget1.clone();
-			colorRenderTarget.setSize( size.width, size.height );
-
-		}
-
-		this.colorRenderTarget1.dispose();
-		this.colorRenderTarget2.dispose();
-		this.colorRenderTarget1 = colorRenderTarget;
-		this.colorRenderTarget2 = colorRenderTarget.clone();
-
-		this.colorWriteBuffer = this.colorRenderTarget1;
-		this.colorReadBuffer = this.colorRenderTarget2;
-
-	},
-
 	setSize: function ( width, height ) {
 
-		this.colorRenderTarget1.setSize( width, height );
-		this.colorRenderTarget2.setSize( width, height );
+		this.size.width = width;
+		this.size.height = height;
+
+		for ( var i = 0; i < this.intermediateRenderTargets.length; ++i )
+		{
+			this.intermediateRenderTargets[i].setSize( width, height );
+		}
 
 		for ( var i = 0; i < this.passes.length; i ++ ) {
 
