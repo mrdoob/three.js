@@ -330,37 +330,40 @@
 
 			}
 
-			var params = ['app', 'scene', 'data'];
-			function getParam()
-			{
-				var url = new URL(window.location);
-				for(var param of params)
-				{
-					var p = url.searchParams.get(param);
-					if(p)
-					{
-						return p;
-					}
+			var params = [ 'app', 'scene', 'data' ];
+			function getParam() {
+
+				var url = new URL( window.location );
+				for ( var param of params ) 	{
+
+					var p = url.searchParams.get( param );
+					if ( p ) return p;
+
 				}
+
 			}
 
-			if(!isLoadingFromHash)
-			{
+			if ( ! isLoadingFromHash ) {
+
 				var param = getParam();
-				if(param !== undefined)
-				{
+				if ( param !== undefined ) 	{
+
 					var loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
 					loader.load( param, function ( data ) {
 
 						editor.clear();
-						Loader.handleJSON(JSON.parse(data));
+						Loader.handleJSON( JSON.parse( data ) );
 
 					} );
 
 					isLoadingFromHash = true;
+
 				}
+
 			}
+
+
 
 			/*
 			window.addEventListener( 'message', function ( event ) {
