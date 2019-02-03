@@ -15,6 +15,7 @@
     "build/three.module.js",
     "src",
     "examples/js",
+    "examples/jsm",
     "examples/fonts"
   ],
   "directories": {
