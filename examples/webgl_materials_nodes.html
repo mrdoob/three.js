@@ -1325,7 +1325,7 @@
 
 						break;
 
-						
+
 					case 'dissolve':
 
 						// MATERIAL
@@ -1369,7 +1369,7 @@
 
 							threshold.value = val;
 
-						}, false, -.3, 1.3 );
+						}, false, - .3, 1.3 );
 
 						addGui( 'borderSize', borderSize.value, function ( val ) {
 
@@ -1401,7 +1401,6 @@
 						var fireStartColor = new THREE.ColorNode( 0xF7CA78 );
 						var fireEndColor = new THREE.ColorNode( 0xFF0000 );
 						var burnedColor = new THREE.ColorNode( 0x000000 );
-						var burnedFinalColor = new THREE.ColorNode( 0x000000 );
 						var threshold = new THREE.FloatNode( .1 );
 						var fireSize = new THREE.FloatNode( .16 );
 						var burnedSize = new THREE.FloatNode( .5 );
@@ -1432,16 +1431,16 @@
 							THREE.Math3Node.SMOOTHSTEP
 						);
 
-						var fireStartAnimatedColor = new THREE.ColorAdjustmentNode( 
-							fireStartColor, 
-							cycle, 
-							THREE.ColorAdjustmentNode.SATURATION 
+						var fireStartAnimatedColor = new THREE.ColorAdjustmentNode(
+							fireStartColor,
+							cycle,
+							THREE.ColorAdjustmentNode.SATURATION
 						);
 
-						var fireEndAnimatedColor = new THREE.ColorAdjustmentNode( 
-							fireEndColor, 
-							cycle, 
-							THREE.ColorAdjustmentNode.SATURATION 
+						var fireEndAnimatedColor = new THREE.ColorAdjustmentNode(
+							fireEndColor,
+							cycle,
+							THREE.ColorAdjustmentNode.SATURATION
 						);
 
 						var fireColor = new THREE.Math3Node(
@@ -1487,7 +1486,7 @@
 
 							threshold.value = val;
 
-						}, false, -.5, 1.5 );
+						}, false, - .5, 1.5 );
 
 						addGui( 'fireSize', fireSize.value, function ( val ) {
 
@@ -2555,7 +2554,7 @@
 							colorInput,
 							new THREE.ColorNode( 0x6495ED ).setReadonly( true ),
 							THREE.OperatorNode.MUL
-						).setLabel("colorMix");
+						).setLabel( "colorMix" );
 
 						mtl.color = colorMix;
 						mtl.specular = specularInput;
@@ -2654,7 +2653,7 @@
 							"vec4 triplanar_mapping( sampler2D texture, vec3 normal, vec3 position, float scale ) {",
 
 							// Blending factor of triplanar mapping
-							"	vec3 bf = normalize( abs( normal ) );", 
+							"	vec3 bf = normalize( abs( normal ) );",
 							"	bf /= dot( bf, vec3( 1.0 ) );",
 
 							// Triplanar mapping
