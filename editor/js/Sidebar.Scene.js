@@ -226,8 +226,8 @@ Sidebar.Scene = function ( editor ) {
 	} ) );
 
 	var canvas = document.createElement( 'canvas' );
-	canvas.width = 128;
-	canvas.height = 128;
+	canvas.width = 90;
+	canvas.height = 90;
 	canvas.style.marginLeft = '45px';
 	var context = canvas.getContext( '2d', { alpha: false } );
 	screenshotRow.dom.appendChild( canvas );
