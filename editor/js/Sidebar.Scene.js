@@ -211,11 +211,12 @@ Sidebar.Scene = function ( editor ) {
 			editor.scene.userData.images = {};
 			editor.scene.userData.textures = {};
 
-			var newCanvas = document.createElement('canvas')
+			// Create new canvas to hold the entire screenshot
+			var newCanvas = document.createElement( 'canvas' );
 			newCanvas.width = width;
 			newCanvas.height = height;
-			var ctx = newCanvas.getContext('2d', { alpha: false } );
-			ctx.drawImage(renderer.domElement, 0, 0);
+			var ctx = newCanvas.getContext( '2d', { alpha: false } );
+			ctx.drawImage( renderer.domElement, 0, 0 );
 			editor.scene.userData.screenshot = new THREE.CanvasTexture( newCanvas ).toJSON( editor.scene.userData ).uuid;
 
 			signals.sceneGraphChanged.dispatch();
@@ -224,11 +225,11 @@ Sidebar.Scene = function ( editor ) {
 
 	} ) );
 
-	var canvas = document.createElement( 'canvas');
+	var canvas = document.createElement( 'canvas' );
 	canvas.width = 128;
 	canvas.height = 128;
 	canvas.style.marginLeft = '45px';
-	var context = canvas.getContext( '2d' , { alpha: false } );
+	var context = canvas.getContext( '2d', { alpha: false } );
 	screenshotRow.dom.appendChild( canvas );
 
 	signals.sceneGraphChanged.add( function () {
