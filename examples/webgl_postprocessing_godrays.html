@@ -129,7 +129,7 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 				//
 
@@ -174,10 +174,10 @@
 
 			//
 
-			function onResize() {
+			function onWindowResize() {
 
-				renderTargetWidth = window.innerWidth;
-				renderTargetHeight = window.innerHeight;
+				var renderTargetWidth = window.innerWidth;
+				var renderTargetHeight = window.innerHeight;
 
 				camera.aspect = renderTargetWidth / renderTargetHeight;
 				camera.updateProjectionMatrix();
