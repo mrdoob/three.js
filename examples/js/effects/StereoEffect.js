@@ -239,7 +239,8 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 	//
 
-	gui.remember( options );
+	if ( guiParams.gui !== undefined )
+		guiParams.gui.remember( options );
 
 	function displayControllers( value ) {
 
