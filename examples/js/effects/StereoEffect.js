@@ -239,7 +239,8 @@ THREE.gui.stereoEffect = function ( gui, options, guiParams ) {
 
 	//
 
-	gui.remember( options );
+	if ( guiParams.gui !== undefined )
+		guiParams.gui.remember( options );
 
 	function displayControllers( value ) {
 
@@ -581,5 +582,50 @@ if ( typeof dat !== 'undefined' ) {
 		};
 
 	} else console.error( 'Duplicate dat.folderNameAndTitle method.' );
+
+	if ( dat.controllerZeroStep === undefined ) {
+
+		//Solving of dat.gui NumberController Step bug.
+		//See https://github.com/dataarts/dat.gui/issues/48 for details.
+		//
+		//folder: GUI or folder for new Controller.
+		//object: The object to be manipulated. See https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add for details
+		//property: The name of the property to be manipulated. See https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add for details
+		//onchange: Callback function will be called if controller value was changed. Can be undefined.
+		//
+		//Example of using
+		/*
+		var gui = new dat.GUI();
+		var object = { min: 123.456 }
+		dat.controllerZeroStep( gui, object, 'min', function ( value ) {
+
+			console.log( 'object.min = ' + object.min + ' value = ' + value );
+
+		} );
+		*/
+		dat.controllerZeroStep = function ( folder, object, property, onchange ) {
+
+			var controller = folder.add( object, property ),
+				input = controller.__input;
+			controller.__input = document.createElement( 'input' );
+			input.value = object[ property ];
+			input.onchange = function ( value ) {
+
+				object[ property ] = parseFloat( input.value );
+
+				if ( onchange !== undefined )
+					onchange( object[ property ] );
+
+			};
+			controller.setValue = function ( value ) {
+
+				input.value = object[ property ] = value;
+
+			};
+			return controller;
+
+		};
+
+	} else console.error( 'Duplicate dat.controllerZeroStep method.' );
 
 }
