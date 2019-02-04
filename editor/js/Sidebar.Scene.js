@@ -7,6 +7,12 @@ Sidebar.Scene = function ( editor ) {
 	var signals = editor.signals;
 	var strings = editor.strings;
 
+	var renderer = signals.rendererChanged.add( function ( newRenderer ) {
+
+		renderer = newRenderer;
+
+	} );
+
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
@@ -184,6 +190,84 @@ Sidebar.Scene = function ( editor ) {
 
 	var fogDensity = new UI.Number( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogDensity );
+
+	// screenshot
+	var screenshotRow = new UI.Row();
+	container.add( screenshotRow );
+
+	screenshotRow.add( new UI.Button( strings.getKey( 'sidebar/scene/screenshot' ) ).onClick( function () {
+
+		if ( renderer !== null ) {
+
+			editor.scene.updateMatrixWorld();
+			renderer.clear();
+			renderer.render( editor.scene, editor.camera );
+
+			var width = renderer.domElement.width;
+			var height = renderer.domElement.height;
+			context.drawImage( renderer.domElement, 0, 0, width, height, 0, 0, canvas.width, canvas.height );
+
+			// TODO: Allow for multiple screenshots?
+			editor.scene.userData.images = {};
+			editor.scene.userData.textures = {};
+
+			var newCanvas = document.createElement('canvas')
+			newCanvas.width = width;
+			newCanvas.height = height;
+			var ctx = newCanvas.getContext('2d', { alpha: false } );
+			ctx.drawImage(renderer.domElement, 0, 0);
+			editor.scene.userData.screenshot = new THREE.CanvasTexture( newCanvas ).toJSON( editor.scene.userData ).uuid;
+
+			signals.sceneGraphChanged.dispatch();
+
+		}
+
+	} ) );
+
+	var canvas = document.createElement( 'canvas');
+	canvas.width = 128;
+	canvas.height = 128;
+	canvas.style.marginLeft = '45px';
+	var context = canvas.getContext( '2d' , { alpha: false } );
+	screenshotRow.dom.appendChild( canvas );
+
+	signals.sceneGraphChanged.add( function () {
+
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+		if ( editor.scene.userData.screenshot !== undefined ) {
+
+			var texture = editor.scene.userData.textures[ editor.scene.userData.screenshot ];
+			if ( texture !== undefined ) {
+
+				var image = editor.scene.userData.images[ texture.image ];
+				if ( image !== undefined ) {
+
+					var loader = new THREE.ImageLoader();
+					loader.load( image.url, function ( img ) {
+
+						// Don't draw if screenshot was deleted
+						if ( editor.scene.userData.screenshot !== undefined ) {
+
+							context.drawImage( img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height );
+
+						}
+
+					} );
+
+				}
+
+			}
+
+		}
+
+	} );
+
+	signals.editorCleared.add( function () {
+
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+		delete editor.scene.userData.screenshot;
+
+	} );
 
 	//
 

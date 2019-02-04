@@ -66,6 +66,7 @@ var Strings = function ( config ) {
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
 			'sidebar/scene/fog': 'Fog',
+			'sidebar/scene/screenshot': 'Screenshot',
 
 			'sidebar/properties/object': 'Object',
 			'sidebar/properties/geometry': 'Geometry',
@@ -315,6 +316,7 @@ var Strings = function ( config ) {
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
 			'sidebar/scene/fog': '雾',
+			'sidebar/scene/screenshot': '截图',
 
 			'sidebar/properties/object': '属性',
 			'sidebar/properties/geometry': '几何组件',
