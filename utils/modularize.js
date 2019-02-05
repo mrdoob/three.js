@@ -79,6 +79,12 @@ function convert( filePath, ignoreList ) {
 		if ( ignoreList.includes( p1 ) ) return match;
 		if ( p1 === className ) return `${p1}`;
 
+		// there is both a THREE.Math and a Math
+		if ( p1 === 'Math' ) {
+			dependencies[ 'Math' ] = true;
+			return `_Math`;
+		}
+
 		dependencies[ p1 ] = true;
 
 		// console.log( match, p1 );
@@ -97,7 +103,12 @@ function convert( filePath, ignoreList ) {
 
 	//
 
-	var keys = Object.keys( dependencies ).sort().map( value => '\n\t' + value ).toString();
+	var keys = Object.keys( dependencies )
+		.sort()
+		// fix Math
+		.map( value => value === 'Math' ? 'Math as _Math' : value)
+		.map( value => '\n\t' + value )
+		.toString();
 	var imports = `import {${keys}\n} from '../../../build/three.module.js';`;
 	var exports = `export { ${className} };\n`;
 
