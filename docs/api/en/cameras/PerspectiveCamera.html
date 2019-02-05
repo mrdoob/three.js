@@ -92,7 +92,7 @@ scene.add( camera );</code>
 				}
 				
 				// Recalculate the new degrees with the aspect Y scale multiplier.
-				2 * Math.atan(1 / (1 / Math.tan(fov * Math.PI / 180 / 2) * aspectYscale) ) * 180 / Math.PI;
+				fov = 2 * Math.atan(1 / (1 / Math.tan(fov * Math.PI / 180 / 2) * aspectYscale) ) * 180 / Math.PI;
 			</code>
 		</p>
 
