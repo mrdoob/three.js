@@ -22073,6 +22073,7 @@
 		var frameOfReferenceType = 'stage';
 
 		var pose = null;
+		var poseTarget = null;
 
 		var controllers = [];
 		var inputSources = [];
@@ -22221,12 +22222,19 @@
 
 		}
 
+		this.setPoseTarget = function ( object ) {
+
+			if ( object !== undefined ) poseTarget = object;
+
+		};
+
 		this.getCamera = function ( camera ) {
 
 			if ( isPresenting() ) {
 
 				var parent = camera.parent;
 				var cameras = cameraVR.cameras;
+				var object = poseTarget || camera;
 
 				updateCamera( cameraVR, parent );
 
@@ -22237,10 +22245,9 @@
 				}
 
 				// update camera and its children
+				object.matrixWorld.copy( cameraVR.matrixWorld );
 
-				camera.matrixWorld.copy( cameraVR.matrixWorld );
-
-				var children = camera.children;
+				var children = object.children;
 
 				for ( var i = 0, l = children.length; i < l; i ++ ) {
 
@@ -22255,6 +22262,12 @@
 			}
 
 			return camera;
+
+		};
+
+		this.getCameraPose = function ( ) {
+
+			return pose;
 
 		};
 
@@ -22333,7 +22346,7 @@
 
 			}
 
-			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
+			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
 		}
 
