@@ -539,33 +539,41 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleKeyDown' );
 
-		// prevent the browser from scrolling on cursor up/down
-
-		event.preventDefault();
+		var update = false;
 
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
 				pan( 0, scope.keyPanSpeed );
-				scope.update();
+				update = true;
 				break;
 
 			case scope.keys.BOTTOM:
 				pan( 0, - scope.keyPanSpeed );
-				scope.update();
+				update = true;
 				break;
 
 			case scope.keys.LEFT:
 				pan( scope.keyPanSpeed, 0 );
-				scope.update();
+				update = true;
 				break;
 
 			case scope.keys.RIGHT:
 				pan( - scope.keyPanSpeed, 0 );
-				scope.update();
+				update = true;
 				break;
 
 		}
+
+		if ( update ) {
+
+			// prevent the browser from scrolling on cursor keys
+
+			event.preventDefault();
+			scope.update();
+
+		}
+
 
 	}
 
