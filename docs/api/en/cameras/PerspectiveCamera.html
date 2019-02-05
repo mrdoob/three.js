@@ -53,7 +53,7 @@ scene.add( camera );</code>
 		</p>
 
 		<h3>[property:Float aspect]</h3>
-		<p>Camera frustum aspect ratio, usually the canvas width / canvas height. Default is *1* (square canvas).</p>
+		<p>Camera frustum aspect ratio in horizontal direction of view, usually the canvas width / canvas height. Default is *1* (square canvas).</p>
 
 		<h3>[property:Float far]</h3>
 		<p>
@@ -75,7 +75,26 @@ scene.add( camera );</code>
 		</p>
 
 		<h3>[property:Float fov]</h3>
-		<p>Camera frustum vertical field of view, from bottom to top of view, in degrees. Default is *50*.</p>
+		<p>
+			Camera frustum vertical field of view, from bottom to top of view, in degrees. Default is *50*.
+			
+			The [page:.aspect aspect] direction can be vertical using the formula like this:
+			
+			<code>
+				// Calculate the vertical scale if the horizonal aspect is below the specified aspect ratio.
+				var w = 16;
+				var h = 9;
+				var aspectlimit = w / h;
+				var aspectYscale = 1;
+				if (.aspect < aspectlimit)
+				{
+					aspectYscale = .aspect / aspectlimit;
+				}
+				
+				// Recalculate the new degrees with the aspect Y scale multiplier.
+				2 * Math.atan(1 / (1 / Math.tan(fov * Math.PI / 180 / 2) * aspectYscale) ) * 180 / Math.PI;
+			</code>
+		</p>
 
 		<h3>[property:Boolean isPerspectiveCamera]</h3>
 		<p>
