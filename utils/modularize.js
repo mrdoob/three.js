@@ -9,10 +9,17 @@ var srcFolder = '../examples/js/';
 var dstFolder = '../examples/jsm/';
 
 var files = [
-	{ path: 'controls/OrbitControls.js', ignoreList: [] },
+	{ path: 'controls/DragControls.js', ignoreList: [] },
+	{ path: 'controls/EditorControls.js', ignoreList: [] },
+	{ path: 'controls/FirstPersonControls.js', ignoreList: [] },
+	{ path: 'controls/FlyControls.js', ignoreList: [] },
 	{ path: 'controls/MapControls.js', ignoreList: [] },
+	{ path: 'controls/OrbitControls.js', ignoreList: [] },
+	{ path: 'controls/OrthographicTrackballControls.js', ignoreList: [] },
+	{ path: 'controls/PointerLockControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
-	// { file: 'controls/TransformControls.js', ignoreList: [] },
+	{ path: 'controls/TransformControls.js', ignoreList: [] },
+
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader', 'DRACOLoader', 'BufferGeometryUtils' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] }
 ];

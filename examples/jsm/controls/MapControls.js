@@ -22,7 +22,7 @@ import {
 	Spherical,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var MapControls = function ( object, domElement ) {
 
@@ -1044,7 +1044,7 @@ Object.defineProperties( MapControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.MapControls: .center has been renamed to .target' );
+			console.warn( 'MapControls: .center has been renamed to .target' );
 			return this.target;
 
 		}
@@ -1057,14 +1057,14 @@ Object.defineProperties( MapControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.MapControls: .noZoom has been deprecated. Use .enableZoom instead.' );
+			console.warn( 'MapControls: .noZoom has been deprecated. Use .enableZoom instead.' );
 			return ! this.enableZoom;
 
 		},
 
 		set: function ( value ) {
 
-			console.warn( 'THREE.MapControls: .noZoom has been deprecated. Use .enableZoom instead.' );
+			console.warn( 'MapControls: .noZoom has been deprecated. Use .enableZoom instead.' );
 			this.enableZoom = ! value;
 
 		}
@@ -1075,14 +1075,14 @@ Object.defineProperties( MapControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.MapControls: .noRotate has been deprecated. Use .enableRotate instead.' );
+			console.warn( 'MapControls: .noRotate has been deprecated. Use .enableRotate instead.' );
 			return ! this.enableRotate;
 
 		},
 
 		set: function ( value ) {
 
-			console.warn( 'THREE.MapControls: .noRotate has been deprecated. Use .enableRotate instead.' );
+			console.warn( 'MapControls: .noRotate has been deprecated. Use .enableRotate instead.' );
 			this.enableRotate = ! value;
 
 		}
@@ -1093,14 +1093,14 @@ Object.defineProperties( MapControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.MapControls: .noPan has been deprecated. Use .enablePan instead.' );
+			console.warn( 'MapControls: .noPan has been deprecated. Use .enablePan instead.' );
 			return ! this.enablePan;
 
 		},
 
 		set: function ( value ) {
 
-			console.warn( 'THREE.MapControls: .noPan has been deprecated. Use .enablePan instead.' );
+			console.warn( 'MapControls: .noPan has been deprecated. Use .enablePan instead.' );
 			this.enablePan = ! value;
 
 		}
@@ -1111,14 +1111,14 @@ Object.defineProperties( MapControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.MapControls: .noKeys has been deprecated. Use .enableKeys instead.' );
+			console.warn( 'MapControls: .noKeys has been deprecated. Use .enableKeys instead.' );
 			return ! this.enableKeys;
 
 		},
 
 		set: function ( value ) {
 
-			console.warn( 'THREE.MapControls: .noKeys has been deprecated. Use .enableKeys instead.' );
+			console.warn( 'MapControls: .noKeys has been deprecated. Use .enableKeys instead.' );
 			this.enableKeys = ! value;
 
 		}
@@ -1129,14 +1129,14 @@ Object.defineProperties( MapControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.MapControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
+			console.warn( 'MapControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
 			return ! this.enableDamping;
 
 		},
 
 		set: function ( value ) {
 
-			console.warn( 'THREE.MapControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
+			console.warn( 'MapControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
 			this.enableDamping = ! value;
 
 		}
@@ -1147,14 +1147,14 @@ Object.defineProperties( MapControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.MapControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
+			console.warn( 'MapControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
 			return this.dampingFactor;
 
 		},
 
 		set: function ( value ) {
 
-			console.warn( 'THREE.MapControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
+			console.warn( 'MapControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
 			this.dampingFactor = value;
 
 		}
