@@ -487,8 +487,12 @@ if ( THREE.cookie === undefined ) {
 			if ( options.optionsDefault === undefined )
 				options.optionsDefault = optionsDefault;
 			if ( options.cookieObject === undefined )
-				options.cookieObject = new ( typeof options.cookie === "function" ? options.cookie : options.cookie.cookie
-					|| new THREE.cookie().default )( name );
+				options.cookieObject = new (
+					typeof options.cookie === "function" ?
+						options.cookie
+						:
+						options.cookie === undefined ? new THREE.cookie().default : options.cookie.cookie || new THREE.cookie().default
+				)( name );
 
 			options.cookieObject.options = options;
 			var cookieObject = JSON.parse( options.cookieObject.get( JSON.stringify( options.optionsDefault ) ) );
