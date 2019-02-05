@@ -22,6 +22,7 @@ function WebXRManager( renderer ) {
 	var frameOfReferenceType = 'stage';
 
 	var pose = null;
+	var poseTarget = null;
 
 	var controllers = [];
 	var inputSources = [];
@@ -170,12 +171,19 @@ function WebXRManager( renderer ) {
 
 	}
 
+	this.setPoseTarget = function ( object ) {
+
+		if ( object !== undefined ) poseTarget = object;
+
+	};
+
 	this.getCamera = function ( camera ) {
 
 		if ( isPresenting() ) {
 
 			var parent = camera.parent;
 			var cameras = cameraVR.cameras;
+			var object = poseTarget || camera;
 
 			updateCamera( cameraVR, parent );
 
@@ -186,10 +194,9 @@ function WebXRManager( renderer ) {
 			}
 
 			// update camera and its children
+			object.matrixWorld.copy( cameraVR.matrixWorld );
 
-			camera.matrixWorld.copy( cameraVR.matrixWorld );
-
-			var children = camera.children;
+			var children = object.children;
 
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
