@@ -70,7 +70,7 @@ function convert( filePath, ignoreList ) {
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+)/g, function ( match, p1 ) {
 
 		if ( ignoreList.includes( p1 ) ) return match;
-		if ( p1 === className ) return match;
+		if ( p1 === className ) return `${p1}`;
 
 		dependencies[ p1 ] = true;
 
