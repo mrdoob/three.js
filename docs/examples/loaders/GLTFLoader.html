@@ -132,16 +132,16 @@
 		</p>
 
 		<code>
-		loader.load('foo.gltf', function ( gltf ) {
+		loader.createParser( 'foo.gltf', function ( parser ) {
 
-			var scene = gltf.scene;
+			parser.getDependency( 'mesh', 0 ).then( function ( mesh ) {
 
-			var mesh = scene.children[ 3 ];
+				var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
 
-			var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
+				parser.getDependency( 'bufferView', fooExtension.bufferView )
+					.then( function ( fooBuffer ) { ... } );
 
-			gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
-				.then( function ( fooBuffer ) { ... } );
+			} );
 
 		} );
 		</code>
@@ -213,6 +213,19 @@
 		</p>
 		<p>
 		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
+		</p>
+
+		<h3>[method:null createParser]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — A string containing the path/URL of the <em>.gltf</em> or <em>.glb</em> file.<br />
+		[page:Function onLoad] — A function to be called after the loading is successfully completed. The function receives the parser.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
+		</p>
+		<p>
+		Fetch the asset without its dependencies, and return a parser for incrementally constructing asset content. Resources (e.g. binary or texture files) will be loaded only when needed. For example, when using the asset as a material library the parser can load a particular material and its textures while ignoring the others.<br /><br />
+
+		The parser API is primarily designed for internal use. It may require some understanding of the glTF format to use effectively, and may receive breaking changes more frequently than the default [page:.load] method.
 		</p>
 
 		<h2>Source</h2>
