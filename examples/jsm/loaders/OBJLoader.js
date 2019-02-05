@@ -17,7 +17,7 @@ import {
 	Points,
 	PointsMaterial,
 	VertexColors
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var OBJLoader = ( function () {
 
@@ -638,7 +638,7 @@ var OBJLoader = ( function () {
 					// Handle null terminated files without exception
 					if ( line === '\0' ) continue;
 
-					throw new Error( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
+					throw new Error( 'OBJLoader: Unexpected line: "' + line + '"' );
 
 				}
 
