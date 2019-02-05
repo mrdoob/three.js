@@ -80,11 +80,19 @@ function convert( filePath, ignoreList ) {
 
 	} );
 
+	// comments
+
+	contents = contents.replace( /'THREE\.([a-zA-Z0-9]+)/g, function ( match, p1 ) {
+
+		return `'${p1}`;
+
+	} );
+
 	//
 
 	var keys = Object.keys( dependencies ).sort().map( value => '\n\t' + value ).toString();
-	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
-	var exports = `export { ${className} }`;
+	var imports = `import {${keys}\n} from '../../../build/three.module.js';`;
+	var exports = `export { ${className} };\n`;
 
 	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
