@@ -3,6 +3,7 @@
  */
 
 var fs = require( 'fs' );
+const path = require( 'path' );
 
 var srcFolder = '../examples/js/';
 var dstFolder = '../examples/jsm/';
@@ -25,9 +26,9 @@ for ( var i = 0; i < files.length; i ++ ) {
 
 //
 
-function convert( path, ignoreList ) {
+function convert( filePath, ignoreList ) {
 
-	var contents = fs.readFileSync( srcFolder + path, 'utf8' );
+	var contents = fs.readFileSync( srcFolder + filePath, 'utf8' );
 
 	var className = '';
 	var dependencies = {};
@@ -89,6 +90,12 @@ function convert( path, ignoreList ) {
 
 	// console.log( output );
 
-	fs.writeFileSync( dstFolder + path, output, 'utf-8' );
+	// make sure folder exists
+	const dir = path.dirname( dstFolder + filePath );
+	if ( !fs.existsSync( dir ) ){
+		fs.mkdirSync( dir );
+	}
+
+	fs.writeFileSync( dstFolder + filePath, output, 'utf-8' );
 
 };
