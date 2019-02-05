@@ -198,23 +198,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var textureProperties = properties.get( texture );
 
-		if ( texture.image && textureProperties.__image__webglTextureCube ) {
+		if ( textureProperties.__webglInit === undefined ) return;
 
-			// cube texture
+		_gl.deleteTexture( textureProperties.__webglTexture );
 
-			_gl.deleteTexture( textureProperties.__image__webglTextureCube );
-
-		} else {
-
-			// 2D texture
-
-			if ( textureProperties.__webglInit === undefined ) return;
-
-			_gl.deleteTexture( textureProperties.__webglTexture );
-
-		}
-
-		// remove all webgl properties
 		properties.remove( texture );
 
 	}
@@ -311,7 +298,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-
 	function setTextureCube( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
@@ -320,18 +306,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
-				if ( ! textureProperties.__image__webglTextureCube ) {
-
-					texture.addEventListener( 'dispose', onTextureDispose );
-
-					textureProperties.__image__webglTextureCube = _gl.createTexture();
-
-					info.memory.textures ++;
-
-				}
+				initTexture( textureProperties, texture );
 
 				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__image__webglTextureCube );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
 
 				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
@@ -432,7 +410,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			} else {
 
 				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__image__webglTextureCube );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
 
 			}
 
@@ -499,20 +477,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function uploadTexture( textureProperties, texture, slot ) {
-
-		var textureType;
-
-		if ( texture.isDataTexture3D ) {
-
-			textureType = _gl.TEXTURE_3D;
-
-		} else {
-
-			textureType = _gl.TEXTURE_2D;
-
-		}
-
+	function initTexture( textureProperties, texture ) {
 
 		if ( textureProperties.__webglInit === undefined ) {
 
@@ -525,12 +490,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			info.memory.textures ++;
 
 		}
+
+	}
+
+	function uploadTexture( textureProperties, texture, slot ) {
+
+		var textureType = ( texture.isDataTexture3D ) ? _gl.TEXTURE_3D : _gl.TEXTURE_2D;
+
+		initTexture( textureProperties, texture );
+
 		state.activeTexture( _gl.TEXTURE0 + slot );
-
-
 		state.bindTexture( textureType, textureProperties.__webglTexture );
-
-
 
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
