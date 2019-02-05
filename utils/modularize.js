@@ -20,6 +20,7 @@ var files = [
 	{ path: 'controls/TrackballControls.js' },
 	{ path: 'controls/TransformControls.js' },
 
+	{ path: 'utils/BufferGeometryUtils.js' },
 	{ path: 'loaders/DDSLoader.js' },
 	{ path: 'loaders/DRACOLoader.js' },
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [

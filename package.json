@@ -6,6 +6,7 @@
   "repository": "mrdoob/three.js",
   "jsnext:main": "build/three.module.js",
   "module": "build/three.module.js",
+  "types": "src/Three.d.ts",
   "files": [
     "package.json",
     "LICENSE",
@@ -15,6 +16,7 @@
     "build/three.module.js",
     "src",
     "examples/js",
+    "examples/jsm",
     "examples/fonts"
   ],
   "directories": {
