@@ -9,19 +9,25 @@ var srcFolder = '../examples/js/';
 var dstFolder = '../examples/jsm/';
 
 var files = [
-	{ path: 'controls/DragControls.js', ignoreList: [] },
-	{ path: 'controls/EditorControls.js', ignoreList: [] },
-	{ path: 'controls/FirstPersonControls.js', ignoreList: [] },
-	{ path: 'controls/FlyControls.js', ignoreList: [] },
-	{ path: 'controls/MapControls.js', ignoreList: [] },
-	{ path: 'controls/OrbitControls.js', ignoreList: [] },
-	{ path: 'controls/OrthographicTrackballControls.js', ignoreList: [] },
-	{ path: 'controls/PointerLockControls.js', ignoreList: [] },
-	{ path: 'controls/TrackballControls.js', ignoreList: [] },
-	{ path: 'controls/TransformControls.js', ignoreList: [] },
+	{ path: 'controls/DragControls.js' },
+	{ path: 'controls/EditorControls.js' },
+	{ path: 'controls/FirstPersonControls.js' },
+	{ path: 'controls/FlyControls.js' },
+	{ path: 'controls/MapControls.js' },
+	{ path: 'controls/OrbitControls.js' },
+	{ path: 'controls/OrthographicTrackballControls.js' },
+	{ path: 'controls/PointerLockControls.js' },
+	{ path: 'controls/TrackballControls.js' },
+	{ path: 'controls/TransformControls.js' },
 
-	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader', 'DRACOLoader', 'BufferGeometryUtils' ] },
-	{ path: 'loaders/OBJLoader.js', ignoreList: [] }
+	{ path: 'loaders/DDSLoader.js' },
+	{ path: 'loaders/DRACOLoader.js' },
+	{ path: 'loaders/GLTFLoader.js', ignoreList: [
+			'NoSide', 'Matrix2', // unused variables
+			'DDSLoader', 'DRACOLoader', // not sure how we should fix these, since they are optional includes
+		] },
+	{ path: 'loaders/MTLLoader.js' },
+	{ path: 'loaders/OBJLoader.js' }
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
@@ -33,7 +39,7 @@ for ( var i = 0; i < files.length; i ++ ) {
 
 //
 
-function convert( filePath, ignoreList ) {
+function convert( filePath, ignoreList = [] ) {
 
 	var contents = fs.readFileSync( srcFolder + filePath, 'utf8' );
 
@@ -76,8 +82,8 @@ function convert( filePath, ignoreList ) {
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+)/g, function ( match, p1 ) {
 
-		if ( ignoreList.includes( p1 ) ) return match;
-		if ( p1 === className ) return `${p1}`;
+		if ( ignoreList.includes( p1 ) ) return p1;
+		if ( p1 === className ) return p1;
 
 		// there is both a THREE.Math and a Math
 		if ( p1 === 'Math' ) {
@@ -89,7 +95,7 @@ function convert( filePath, ignoreList ) {
 
 		// console.log( match, p1 );
 
-		return `${p1}`;
+		return p1;
 
 	} );
 
