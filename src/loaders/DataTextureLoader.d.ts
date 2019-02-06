@@ -12,4 +12,6 @@ export class DataTextureLoader {
     onProgress?: (event: ProgressEvent) => void,
     onError?: (event: ErrorEvent) => void
   ): void;
+
+  setPath(value: string): this;
 }

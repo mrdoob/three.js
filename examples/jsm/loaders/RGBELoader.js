@@ -9,13 +9,10 @@ import {
 	DataTextureLoader,
 	DefaultLoadingManager,
 	FloatType,
-	RGBAFormat,
 	RGBEFormat,
 	RGBFormat,
 	UnsignedByteType
 } from '../../../build/three.module.js';
-
-var HDRLoader = _IMPORTS_
 
 var RGBELoader = function ( manager ) {
 
