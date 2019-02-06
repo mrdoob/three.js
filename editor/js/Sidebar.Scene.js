@@ -219,6 +219,7 @@ Sidebar.Scene = function ( editor ) {
 			ctx.drawImage( renderer.domElement, 0, 0 );
 			editor.scene.userData.screenshot = new THREE.CanvasTexture( newCanvas ).toJSON( editor.scene.userData ).uuid;
 
+			needScreenshot = true;
 			signals.sceneGraphChanged.dispatch();
 
 		}
@@ -232,10 +233,12 @@ Sidebar.Scene = function ( editor ) {
 	var context = canvas.getContext( '2d', { alpha: false } );
 	screenshotRow.dom.appendChild( canvas );
 
+	var needScreenshot = true;
+
 	signals.sceneGraphChanged.add( function () {
 
 		context.clearRect( 0, 0, canvas.width, canvas.height );
-		if ( editor.scene.userData.screenshot !== undefined ) {
+		if ( needScreenshot && editor.scene.userData.screenshot !== undefined ) {
 
 			var texture = editor.scene.userData.textures[ editor.scene.userData.screenshot ];
 			if ( texture !== undefined ) {
@@ -250,6 +253,7 @@ Sidebar.Scene = function ( editor ) {
 						if ( editor.scene.userData.screenshot !== undefined ) {
 
 							context.drawImage( img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height );
+							console.log( "screenshot" );
 
 						}
 
@@ -258,6 +262,7 @@ Sidebar.Scene = function ( editor ) {
 				}
 
 			}
+			needScreenshot = false;
 
 		}
 
@@ -267,6 +272,7 @@ Sidebar.Scene = function ( editor ) {
 
 		context.clearRect( 0, 0, canvas.width, canvas.height );
 		delete editor.scene.userData.screenshot;
+		needScreenshot = true;
 
 	} );
 
