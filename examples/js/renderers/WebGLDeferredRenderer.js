@@ -125,8 +125,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_gl = _this.renderer.context;
 
-		_width = parameters.width !== undefined ? parameters.width : _this.renderer.getSize().width;
-		_height = parameters.height !== undefined ? parameters.height : _this.renderer.getSize().height;
+		_width = parameters.width !== undefined ? parameters.width : _this.renderer.getSize( new THREE.Vector2() ).width;
+		_height = parameters.height !== undefined ? parameters.height : _this.renderer.getSize( new THREE.Vector2() ).height;
 
 		var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
 

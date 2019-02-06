@@ -15,7 +15,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 			stencilBuffer: false
 		};
 
-		var size = renderer.getDrawingBufferSize();
+		var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
 		renderTarget.texture.name = 'EffectComposer.rt1';
 
@@ -64,7 +64,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		this.passes.push( pass );
 
-		var size = this.renderer.getDrawingBufferSize();
+		var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
 		pass.setSize( size.width, size.height );
 
 	},
@@ -139,7 +139,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		if ( renderTarget === undefined ) {
 
-			var size = this.renderer.getDrawingBufferSize();
+			var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
 
 			renderTarget = this.renderTarget1.clone();
 			renderTarget.setSize( size.width, size.height );
