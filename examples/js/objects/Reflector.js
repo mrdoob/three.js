@@ -33,6 +33,7 @@ THREE.Reflector = function ( geometry, options ) {
 	var view = new THREE.Vector3();
 	var target = new THREE.Vector3();
 	var q = new THREE.Vector4();
+	var size = new THREE.Vector2();
 
 	var textureMatrix = new THREE.Matrix4();
 	var virtualCamera = new THREE.PerspectiveCamera();
@@ -173,7 +174,7 @@ THREE.Reflector = function ( geometry, options ) {
 
 		if ( bounds !== undefined ) {
 
-			var size = renderer.getSize();
+			renderer.getSize( size );
 			var pixelRatio = renderer.getPixelRatio();
 
 			viewport.x = bounds.x * size.width * pixelRatio;
