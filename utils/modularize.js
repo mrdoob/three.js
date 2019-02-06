@@ -28,7 +28,10 @@ var files = [
 			'DDSLoader', 'DRACOLoader', // not sure how we should fix these, since they are optional includes
 		] },
 	{ path: 'loaders/MTLLoader.js' },
-	{ path: 'loaders/OBJLoader.js' }
+	{ path: 'loaders/OBJLoader.js' },
+
+	{ path: 'loaders/RGBELoader.js' },
+	{ path: 'loaders/HDRCubeTextureLoader.js' },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
