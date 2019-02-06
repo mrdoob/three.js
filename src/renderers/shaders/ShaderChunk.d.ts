@@ -23,6 +23,8 @@ export let ShaderChunk: {
   cube_frag: string;
   cube_vert: string;
   cube_uv_reflection_fragment: string;
+  default_vertex: string;
+  default_fragment: string;
   defaultnormal_vertex: string;
   depth_frag: string;
   depth_vert: string;
