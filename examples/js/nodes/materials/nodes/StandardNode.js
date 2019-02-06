@@ -66,7 +66,7 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <morphnormal_vertex>",
 			"#include <skinbase_vertex>",
 			"#include <skinnormal_vertex>",
-			"#include <defaultnormal_vertex>",
+			"#include <default_normal_vertex>",
 
 			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
