@@ -32,6 +32,7 @@ var files = [
 
 	{ path: 'loaders/RGBELoader.js' },
 	{ path: 'loaders/HDRCubeTextureLoader.js' },
+	{ path: 'loaders/DDSLoader.js' },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
@@ -55,8 +56,6 @@ function convert( filePath, ignoreList = [] ) {
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
 
 		className = p1;
-
-		console.log( className );
 
 		return `_IMPORTS_\n\nvar ${p1} = `;
 
@@ -124,14 +123,16 @@ function convert( filePath, ignoreList = [] ) {
 
 	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
-	// console.log( output );
-
 	// make sure folder exists
 	const dir = path.dirname( dstFolder + filePath );
 	if ( !fs.existsSync( dir ) ){
 		fs.mkdirSync( dir );
 	}
 
-	fs.writeFileSync( dstFolder + filePath, output, 'utf-8' );
+	// only created files that doesn't exist yet, since we might have done manual overrides in the jsm files
+	if ( !fs.existsSync( dstFolder + filePath ) ){
+		console.log( className );
+		fs.writeFileSync( dstFolder + filePath, output, 'utf-8' );
+	}
 
 };
