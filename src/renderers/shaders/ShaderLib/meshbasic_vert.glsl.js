@@ -22,7 +22,7 @@ void main() {
 	#include <beginnormal_vertex>
 	#include <morphnormal_vertex>
 	#include <skinnormal_vertex>
-	#include <defaultnormal_vertex>
+	#include <default_normal_vertex>
 
 	#endif
 

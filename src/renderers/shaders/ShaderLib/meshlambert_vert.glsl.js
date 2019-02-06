@@ -33,7 +33,7 @@ void main() {
 	#include <morphnormal_vertex>
 	#include <skinbase_vertex>
 	#include <skinnormal_vertex>
-	#include <defaultnormal_vertex>
+	#include <default_normal_vertex>
 
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
