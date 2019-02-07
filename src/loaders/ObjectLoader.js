@@ -497,8 +497,13 @@ Object.assign( ObjectLoader.prototype, {
 
 				} else {
 
-					materials[ data.uuid ] = loader.parse( data );
-					cache[ data.uuid ] = materials[ data.uuid ];
+					if ( cache[ data.uuid ] === undefined ) {
+
+						cache[ data.uuid ] = loader.parse( data );
+
+					}
+
+					materials[ data.uuid ] = cache[ data.uuid ];
 
 				}
 
@@ -663,12 +668,17 @@ Object.assign( ObjectLoader.prototype, {
 				}
 
 				if ( data.format !== undefined ) texture.format = data.format;
+				if ( data.type !== undefined ) texture.type = data.type;
+				if ( data.encoding !== undefined ) texture.encoding = data.encoding;
 
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
+
+				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
+				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 
 				textures[ data.uuid ] = texture;
 
@@ -839,6 +849,8 @@ Object.assign( ObjectLoader.prototype, {
 					object = new Mesh( geometry, material );
 
 				}
+
+				if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
 
 				break;
 

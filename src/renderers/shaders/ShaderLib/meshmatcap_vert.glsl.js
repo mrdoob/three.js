@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #define MATCAP
 
 varying vec3 vViewPosition;

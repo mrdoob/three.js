@@ -39,7 +39,7 @@
 		"geometries": [
 			{
 				"uuid": "6D90C4BE-EBA6-4E21-8F54-7CFDAA61F30B",
-				"type": "PlaneGeometry",
+				"type": "PlaneBufferGeometry",
 				"width": 10,
 				"height": 10,
 				"widthSegments": 1,
@@ -47,7 +47,7 @@
 			},
 			{
 				"uuid": "D3008B2A-ACDD-43CC-87F7-4F942607D21A",
-				"type": "BoxGeometry",
+				"type": "BoxBufferGeometry",
 				"width": 1,
 				"height": 1,
 				"depth": 1,
@@ -57,7 +57,7 @@
 			},
 			{
 				"uuid": "F482ACD4-013A-49CF-AE0F-C9FF4ADAE409",
-				"type": "CylinderGeometry",
+				"type": "CylinderBufferGeometry",
 				"radiusTop": 0,
 				"radiusBottom": 0.4,
 				"height": 0.75,
@@ -67,7 +67,7 @@
 			},
 			{
 				"uuid": "51CDDCED-BC71-4B1B-A485-725B6A48204B",
-				"type": "IcosahedronGeometry",
+				"type": "IcosahedronBufferGeometry",
 				"radius": 0.4,
 				"detail": 2
 			}],

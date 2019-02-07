@@ -129,7 +129,10 @@ function glconstants() {
 		MAX_VARYING_VECTORS: 36348,
 		MAX_FRAGMENT_UNIFORM_VECTORS: 36349,
 		UNPACK_FLIP_Y_WEBGL: 37440,
-		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441
+		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441,
+		MAX_SAMPLES: 36183,
+		READ_FRAMEBUFFER: 36008,
+		DRAW_FRAMEBUFFER: 36009
 	};
 
 	return {
@@ -147,10 +150,11 @@ function glconstants() {
 			return {
 				code: code,
 				map: { mappings: '' }
-			}
+			};
+
 		}
 
-	}
+	};
 
 }
 
@@ -162,11 +166,12 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\`((.*|\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`((.*|\n|\r\n)*)\`/, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
 						.trim()
+						.replace( /\r/g, '' )
 						.replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
 						.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
 						.replace( /\n{2,}/g, '\n' ) // # \n+ to \n
@@ -191,7 +196,6 @@ export default {
 		glconstants(),
 		glsl()
 	],
-	// sourceMap: true,
 	output: [
 		{
 			format: 'umd',

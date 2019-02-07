@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #define PHYSICAL
 
 uniform vec3 diffuse;

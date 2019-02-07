@@ -151,7 +151,7 @@
 
 				controls.addEventListener( 'start', function () {
 
-					cancelHideTransorm();
+					cancelHideTransform();
 
 				} );
 
@@ -173,13 +173,13 @@
 				// Hiding transform situation is a little in a mess :()
 				transformControl.addEventListener( 'change', function () {
 
-					cancelHideTransorm();
+					cancelHideTransform();
 
 				} );
 
 				transformControl.addEventListener( 'mouseDown', function () {
 
-					cancelHideTransorm();
+					cancelHideTransform();
 
 				} );
 
@@ -200,7 +200,7 @@
 				dragcontrols.addEventListener( 'hoveron', function ( event ) {
 
 					transformControl.attach( event.object );
-					cancelHideTransorm();
+					cancelHideTransform();
 
 				} );
 
@@ -214,7 +214,7 @@
 
 				function delayHideTransform() {
 
-					cancelHideTransorm();
+					cancelHideTransform();
 					hideTransform();
 
 				}
@@ -229,7 +229,7 @@
 
 				}
 
-				function cancelHideTransorm() {
+				function cancelHideTransform() {
 
 					if ( hiding ) clearTimeout( hiding );
 

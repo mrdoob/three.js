@@ -36,6 +36,19 @@
 		<h3>[property:Object3D children]</h3>
 		<p>Array with object's children. See [page:Group] for info on manually grouping objects.</p>
 
+		<h3>[property:Material customDepthMaterial]</h3>
+		<p>
+		Custom depth material to be used when rendering to the depth map. Can only be used in context of meshes.
+		When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are (a) modifying vertex positions in the vertex shader,
+		(b) using a displacement map, (c) using an alpha map with alphaTest, or (d) using a transparent texture with alphaTest,
+		you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
+		</p>
+
+		<h3>[property:Material customDistanceMaterial]</h3>
+		<p>
+		Same as customDepthMaterial, but used with [page:PointLight]. Default is *undefined*.
+		</p>
+
 		<h3>[property:Boolean frustumCulled]</h3>
 		<p>
 		When this is set, it checks every frame if the object is in the frustum of the camera before rendering the object.
@@ -94,14 +107,14 @@
 		On the other hand the translation part of the modelViewMatrix is not relevant for the calculation of normals. Thus a Matrix3 is sufficient.
 		</p>
 
-		<h3>[property:function onAfterRender]</h3>
+		<h3>[property:Function onAfterRender]</h3>
 		<p>
 		An optional callback that is executed immediately after the Object3D is rendered.
 		This function is called with the following parameters: renderer, scene, camera, geometry,
 		material, group.
 		</p>
 
-		<h3>[property:function onBeforeRender]</h3>
+		<h3>[property:Function onBeforeRender]</h3>
 		<p>
 		An optional callback that is executed immediately before the Object3D is rendered.
 		This function is called with the following parameters: renderer, scene, camera, geometry,
@@ -124,7 +137,8 @@
 		<h3>[property:Number renderOrder]</h3>
 		<p>
 		This value allows the default rendering order of [link:https://en.wikipedia.org/wiki/Scene_graph scene graph]
-		objects to be overridden although opaque and transparent objects remain sorted independently.
+		objects to be overridden although opaque and transparent objects remain sorted independently. When this property
+		is set for an instance of [page:Group Group], all descendants objects will be sorted and rendered together.
 		Sorting is from lowest to highest renderOrder. Default value is *0*.
 		</p>
 
@@ -144,7 +158,7 @@
 		Default is [page:Object3D.DefaultUp] - that is, ( 0, 1, 0 ).
 		</p>
 
-		<h3>[property:object userData]</h3>
+		<h3>[property:Object userData]</h3>
 		<p>
 		An object that can be used to store custom data about the Object3D. It should not hold
 		references to functions as these will not be cloned.
@@ -189,7 +203,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:null add]( [param:Object3D object], ... )</h3>
+		<h3>[method:this add]( [param:Object3D object], ... )</h3>
 		<p>
 		Adds *object* as child of this object. An arbitrary number of objects may be added. Any current parent on an
 		object passed in here will be removed, since an object can have at most one parent.<br /><br />
@@ -200,7 +214,7 @@
 		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
 		<p>Applies the matrix transform to the object and updates the object's position, rotation and scale.</p>
 
-		<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
+		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>Applies the rotation represented by the quaternion to the object.</p>
 
 		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
@@ -278,7 +292,7 @@
 		Converts the vector from local space to world space.
 		</p>
 
-		<h3>[method:null lookAt]( [param:Vector3 vector] )</br>
+		<h3>[method:null lookAt]( [param:Vector3 vector] )<br />
 		[method:null lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		vector - A vector representing a position in world space.<br /><br />
@@ -296,7 +310,7 @@
 		to use raycasting.
 		</p>
 
-		<h3>[method:null remove]( [param:Object3D object], ... )</h3>
+		<h3>[method:this remove]( [param:Object3D object], ... )</h3>
 		<p>
 		Removes *object* as child of this object. An arbitrary number of objects may be removed.
 		</p>

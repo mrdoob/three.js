@@ -583,11 +583,11 @@
 				objectCount ++;
 
 				object.material = material.clone();
-				object.material.uniforms.color.value.setHex( Math.random() * 0xffffff );
+				object.material.uniforms[ "color" ].value.setHex( Math.random() * 0xffffff );
 				materialList.push( object.material );
 
 				pickingObject.material = pickingMaterial.clone();
-				pickingObject.material.uniforms.pickingColor.value.setHex( i + 1 );
+				pickingObject.material.uniforms[ "pickingColor" ].value.setHex( i + 1 );
 				materialList.push( pickingObject.material );
 
 				pickingData[ i + 1 ] = object;
@@ -613,7 +613,7 @@
 				vertexShader: vert,
 				fragmentShader: frag,
 				uniforms: {
-					color: {
+					"color": {
 						value: new THREE.Color()
 					}
 				}
@@ -624,7 +624,7 @@
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
-					pickingColor: {
+					"pickingColor": {
 						value: new THREE.Color()
 					}
 				}
