@@ -7,8 +7,6 @@ var Loader = function ( editor ) {
 	var scope = this;
 	var signals = editor.signals;
 
-	this.texturePath = '';
-
 	this.loadFiles = function ( files ) {
 
 		if ( files.length > 0 ) {
@@ -712,7 +710,6 @@ function handleJSON( data, file, filename ) {
 		case 'object':
 
 			var loader = new THREE.ObjectLoader();
-			loader.setResourcePath( scope.texturePath );
 
 			var result = loader.parse( data );
 
