@@ -19,7 +19,6 @@ var files = {
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
 		"webgl_framebuffer_texture",
-		"webgl_furnace_test",
 		"webgl_geometries",
 		"webgl_geometries_parametric",
 		"webgl_geometry_colors",
