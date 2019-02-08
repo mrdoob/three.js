@@ -5,8 +5,6 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
  *
  * parameters = {
  *  reflectivity: <float>
- *  clearCoat: <float>
- *  clearCoatRoughness: <float>
  * }
  */
 
