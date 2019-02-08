@@ -11,6 +11,8 @@ THREE.CubemapGenerator = function ( renderer ) {
 
 THREE.CubemapGenerator.prototype.fromEquirectangular = function ( texture, options ) {
 
+	options = options || {};
+
 	var scene = new THREE.Scene();
 
 	var shader = {
@@ -85,8 +87,6 @@ THREE.CubemapGenerator.prototype.fromEquirectangular = function ( texture, optio
 	var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 5, 5, 5 ), material );
 
 	scene.add( mesh );
-
-	options = options || {};
 
 	var resolution = options.resolution || 512;
 
