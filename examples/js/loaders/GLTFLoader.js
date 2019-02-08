@@ -1595,11 +1595,11 @@ THREE.GLTFLoader = ( function () {
 
 	function createMultiPassGeometryKey( geometry, primitives ) {
 
-		var key = createPrimitiveKey( geometry );
+		var key = geometry.uuid;
 
 		for ( var i = 0, il = primitives.length; i < il; i ++ ) {
 
-			key += i + primitives[ i ].uuid;
+			key += i + createPrimitiveKey( primitives[ i ].uuid );
 
 		}
 
