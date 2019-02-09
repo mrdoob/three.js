@@ -1,12 +1,12 @@
 three.js
 ========
 
-[![Latest NPM release][npm-badge]][npm-badge-url]
-[![License][license-badge]][license-badge-url]
-[![Dependencies][dependencies-badge]][dependencies-badge-url]
-[![Dev Dependencies][devDependencies-badge]][devDependencies-badge-url]
-[![Build Status](https://travis-ci.org/mrdoob/three.js.svg?branch=dev)](https://travis-ci.org/mrdoob/three.js)
-[![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mrdoob/three.js.svg?label=code%20quality)](https://lgtm.com/projects/g/mrdoob/three.js/)
+[![NPM package][npm]][npm-url]
+[![Build Size][build-size]][build-size-url]
+[![Build Status][build-status]][build-status-url]
+[![Dependencies][dependencies]][dependencies-url]
+[![Dev Dependencies][dev-dependencies]][dev-dependencies-url]
+[![Language Grade][lgtm]][lgtm-url]
 
 #### JavaScript 3D library ####
 
@@ -77,11 +77,15 @@ If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
 [Releases](https://github.com/mrdoob/three.js/releases)
 
 
-[npm-badge]: https://img.shields.io/npm/v/three.svg
-[npm-badge-url]: https://www.npmjs.com/package/three
-[license-badge]: https://img.shields.io/npm/l/three.svg
-[license-badge-url]: ./LICENSE
-[dependencies-badge]: https://img.shields.io/david/mrdoob/three.js.svg
-[dependencies-badge-url]: https://david-dm.org/mrdoob/three.js
-[devDependencies-badge]: https://img.shields.io/david/dev/mrdoob/three.js.svg
-[devDependencies-badge-url]: https://david-dm.org/mrdoob/three.js#info=devDependencies
+[npm]: https://img.shields.io/npm/v/three.svg
+[npm-url]: https://www.npmjs.com/package/three
+[build-size]: https://badgen.net/bundlephobia/minzip/three
+[build-size-url]: https://bundlephobia.com/result?p=three
+[build-status]: https://travis-ci.org/mrdoob/three.js.svg?branch=dev
+[build-status-url]: https://travis-ci.org/mrdoob/three.js
+[dependencies]: https://img.shields.io/david/mrdoob/three.js.svg
+[dependencies-url]: https://david-dm.org/mrdoob/three.js
+[dev-dependencies]: https://img.shields.io/david/dev/mrdoob/three.js.svg
+[dev-dependencies-url]: https://david-dm.org/mrdoob/three.js#info=devDependencies
+[lgtm]: https://img.shields.io/lgtm/grade/javascript/g/mrdoob/three.js.svg?label=code%20quality
+[lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/

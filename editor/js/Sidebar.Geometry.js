@@ -4,10 +4,13 @@
 
 Sidebar.Geometry = function ( editor ) {
 
+	var strings = editor.strings;
+
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
+	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
 	// Actions
@@ -88,7 +91,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryTypeRow = new UI.Row();
 	var geometryType = new UI.Text();
 
-	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	geometryTypeRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/type' ) ).setWidth( '90px' ) );
 	geometryTypeRow.add( geometryType );
 
 	container.add( geometryTypeRow );
@@ -97,7 +100,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	var geometryUUIDRow = new UI.Row();
 	var geometryUUID = new UI.Input().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
-	var geometryUUIDRenew = new UI.Button( 'New' ).setMarginLeft( '7px' ).onClick( function () {
+	var geometryUUIDRenew = new UI.Button( strings.getKey( 'sidebar/geometry/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
 
@@ -105,7 +108,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	} );
 
-	geometryUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ) );
+	geometryUUIDRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/uuid' ) ).setWidth( '90px' ) );
 	geometryUUIDRow.add( geometryUUID );
 	geometryUUIDRow.add( geometryUUIDRenew );
 
@@ -120,7 +123,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	} );
 
-	geometryNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ) );
+	geometryNameRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/name' ) ).setWidth( '90px' ) );
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
@@ -142,7 +145,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	var geometryBoundingSphere = new UI.Text();
 
-	container.add( new UI.Text( 'Bounds' ).setWidth( '90px' ) );
+	container.add( new UI.Text( strings.getKey( 'sidebar/geometry/bounds' ) ).setWidth( '90px' ) );
 	container.add( geometryBoundingSphere );
 
 	//

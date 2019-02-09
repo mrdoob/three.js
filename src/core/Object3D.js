@@ -6,6 +6,7 @@ import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { _Math } from '../math/Math.js';
+import { TrianglesDrawMode } from '../constants.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -332,7 +333,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			position.setFromMatrixPosition( this.matrixWorld );
 
-			if ( this.isCamera ) {
+			if ( this.isCamera || this.isLight ) {
 
 				m1.lookAt( position, target, this.up );
 
@@ -717,6 +718,10 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		object.matrix = this.matrix.toArray();
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
+		// object specific properties
+
+		if ( this.isMesh && this.drawMode !== TrianglesDrawMode ) object.drawMode = this.drawMode;
 
 		//
 

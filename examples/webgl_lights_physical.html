@@ -36,7 +36,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Physically accurate lighting example using a incandescent bulb - by <a href="http://clara.io" target="_blank" rel="noopener">Ben Houston</a><br />
-			Using real world scale: Brick cube is 1 meter in size.  Light is 2 meters from floor.  Globe is 25 cm in diameter.<br/>
+			Using real world scale: Brick cube is 50 cm in size. Globe is 50 cm in diameter.<br/>
 			Using Reinhard inline tonemapping with real-world light falloff (decay = 2).
 		</div>
 
@@ -218,9 +218,9 @@
 				floorMesh.rotation.x = - Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				var ballGeometry = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
+				var ballGeometry = new THREE.SphereBufferGeometry( 0.25, 32, 32 );
 				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
-				ballMesh.position.set( 1, 0.5, 1 );
+				ballMesh.position.set( 1, 0.25, 1 );
 				ballMesh.rotation.y = Math.PI;
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );

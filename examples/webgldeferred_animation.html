@@ -50,6 +50,8 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
 
+		<script src="js/loaders/GLTFLoader.js"></script>
+
 		<script>
 
 			var WIDTH = window.innerWidth;
@@ -93,7 +95,7 @@
 				container.appendChild( renderer.domElement );
 				container.appendChild( stats.domElement );
 
-				initKnight();
+				initModel();
 				initRoom();
 				initLights();
 				initGui();
@@ -105,34 +107,37 @@
 
 			}
 
-			function initKnight() {
+			function initModel() {
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.GLTFLoader();
 
-				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
+				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function ( gltf ) {
 
-					var material = materials[ 0 ];
-					material.emissive.set( 0x101010 );
-					material.skinning = true;
-					material.morphTargets = true;
+					var model = gltf.scene;
+					model.position.y -= 30;
+					model.scale.multiplyScalar( 10 );
 
-					var mesh = new THREE.SkinnedMesh( geometry, material );
-					mesh.position.y = - 30;
-					mesh.scale.multiplyScalar( 5 );
+					model.traverse( function ( o ) {
 
-					mixer = new THREE.AnimationMixer( mesh );
+						if ( !o.isMesh ) return;
 
-					for ( var i = 0; i < mesh.geometry.animations.length; i ++ ) {
+						o.material.emissive = o.material.color.clone().multiplyScalar( 0.3 );
 
-						var action = mixer.clipAction( mesh.geometry.animations[ i ] );
+					} );
 
-						if ( i === 1 ) action.timeScale = 0.25;
+					mixer = new THREE.AnimationMixer( model );
 
-						action.play();
+					var dance = gltf.animations.find( function ( clip ) {
 
-					}
+						return clip.name === 'Dance';
 
-					scene.add( mesh );
+					} );
+
+					var action = mixer.clipAction( dance );
+
+					action.play();
+
+					scene.add( model );
 
 					ready = true;
 

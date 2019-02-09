@@ -101,19 +101,6 @@
 		This can be used in conjunction with a mesh's [page:Integer renderOrder] property to create invisible objects that occlude other objects. Default is *true*.
 		</p>
 
-		<h3>[property:Material customDepthMaterial]</h3>
-		<p>
-		Custom depth material to be used by this material when rendering to the depth map.
-		When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are (a) modifying vertex positions in the vertex shader,
-		(b) using a displacement map, (c) using an alpha map with alphaTest, or (d) using a transparent texture with alphaTest,
-		you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
-		</p>
-
-		<h3>[property:Material customDistanceMaterial]</h3>
-		<p>
-		Same as customDepthMaterial, but used with [page:PointLight]. Default is *undefined*.
-		</p>
-
 		<h3>[property:Object defines]</h3>
 		<p>
 		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. The pairs are defined in both vertex and fragment shaders.  Default is *undefined*.

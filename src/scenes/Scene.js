@@ -22,6 +22,8 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Scene,
 
+	isScene: true,
+
 	copy: function ( source, recursive ) {
 
 		Object3D.prototype.copy.call( this, source, recursive );
@@ -45,6 +47,12 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 		return data;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

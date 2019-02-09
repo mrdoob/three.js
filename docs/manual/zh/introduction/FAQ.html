@@ -10,14 +10,14 @@
 	<body>
 		<h1>常见问题（[name]）</h1>
 
-		<h2>哪一种三维物体格式能够得到最好地支持呢？</h2>
+		<h2>哪一种三维物体格式能够得到最好地支持？</h2>
 		<div>
 			<p>
-			推荐使用glTF（gl传输格式）来对三维物体进行导入和导出，由于glTF这种格式是专注于在程序运行时呈现三维物体的，所以它的传输效率非常高，且加载速度非常快。
+			推荐使用glTF（gl传输格式）来对三维物体进行导入和导出，由于glTF这种格式专注于在程序运行时呈现三维物体，因此它的传输效率非常高，且加载速度非常快。
 			</p>
 			
 			
-			<p>three.js同样也为其它广受欢迎的格式像FBX、Collada以及OBJ等等提供了载入工具。虽然如此，你应当还是首先尝试着在你的项目里建立一个基于glTF的工作流程。
+			<p>three.js同样也为其它广受欢迎的格式（例如FBX、Collada以及OBJ等）提供了载入工具。即便如此，你应当还是首先尝试着在你的项目中建立一个基于glTF的工作流程。
 				了解更多详细信息，请查看[link:#manual/introduction/Loading-3D-models loading 3D models]。
 			</p>
 		</div>
@@ -46,10 +46,9 @@ visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_f
 
 		<h2>为什么我的物体的一部分是不可见的？</h2>
 		<p>
-			这可能是由于面消隐而导致的。面是具有朝向的，这个朝向决定了哪边是正面或者哪边是背面。
-			在正常情况下，渲染时会将背面进行消隐。要查看这是不是你所遇到的问题，请将material的slide更改为THREE.DoubleSide。
+			这可能是由于面剔除而导致的。面是具有朝向的，这个朝向决定了哪边是正面或者哪边是背面。
+			在正常情况下，渲染时会将背面进行剔除。要查看这是不是你所遇到的问题，请将material的side更改为THREE.DoubleSide。
 			<code>material.side = THREE.DoubleSide</code>
 		</p>
 	</body>
 </html>
-
