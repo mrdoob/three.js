@@ -1571,21 +1571,7 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0, il = a.length; i < il; i ++ ) {
 
-			arrayKey += i + a[ i ].uuid;
-
-		}
-
-		return arrayKey;
-
-	}
-
-	function createArrayKeyGLTFPrimitive( a ) {
-
-		var arrayKey = '';
-
-		for ( var i = 0, il = a.length; i < il; i ++ ) {
-
-			arrayKey += i + createPrimitiveKey( a[ i ] );
+			arrayKey += ':' + a[ i ].uuid;
 
 		}
 
