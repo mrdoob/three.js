@@ -276,17 +276,20 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 		var changeEvent = document.createEvent( 'HTMLEvents' );
 		changeEvent.initEvent( 'change', true, true );
 		scope.dom.dispatchEvent( changeEvent );
+
 	}
 
-	function onContextMenu(e) {
+	function onContextMenu( e ) {
+
 		e.preventDefault();
 
-		scope.contextMenu.setLeft(e.clientX+"px");
-		scope.contextMenu.setTop(e.clientY+"px");
+		scope.contextMenu.setLeft( e.clientX + "px" );
+		scope.contextMenu.setTop( e.clientY + "px" );
 
-		scope.add(scope.contextMenu);
+		scope.add( scope.contextMenu );
 
-		onClick.bind(this)();
+		onClick.bind( this )();
+
 	}
 
 	// Drag
@@ -410,7 +413,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 			div.addEventListener( 'dragleave', onDragLeave, false );
 			div.addEventListener( 'drop', onDrop, false );
 
-			div.addEventListener('contextmenu', onContextMenu, false);
+			div.addEventListener( 'contextmenu', onContextMenu, false );
 
 		}
 
@@ -421,19 +424,21 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 };
 
-UI.Outliner.prototype.setContextMenuOptions = function(options)
-{
-	this.contextMenu.setOptions(options);
+UI.Outliner.prototype.setContextMenuOptions = function ( options ) {
+
+	this.contextMenu.setOptions( options );
 
 	return this;
-}
 
-UI.Outliner.prototype.onContextMenuChange = function(callback)
-{
-	this.contextMenu.onChange(callback);
+};
+
+UI.Outliner.prototype.onContextMenuChange = function ( callback ) {
+
+	this.contextMenu.onChange( callback );
 
 	return this;
-}
+
+};
 
 
 UI.Outliner.prototype.getValue = function () {
@@ -484,28 +489,31 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 };
 
-UI.ContextMenu = function()
-{
+UI.ContextMenu = function () {
+
 	UI.Element.call( this );
 
 	var scope = this;
 
-	var dom = document.createElement('ul');
+	var dom = document.createElement( 'ul' );
 	dom.className = 'ContextMenu';
 
-	function clickOutside(e)
-	{
-		if(scope.dom.parentElement && scope.dom.contains(e.target) === false)
-		{
-			scope.dom.parentElement.removeChild(scope.dom);
+	function clickOutside( e ) {
+
+		if ( scope.dom.parentElement && scope.dom.contains( e.target ) === false ) {
+
+			scope.dom.parentElement.removeChild( scope.dom );
+
 		}
+
 	}
-	document.addEventListener('click', clickOutside, false);
+	document.addEventListener( 'click', clickOutside, false );
 
 	this.dom = dom;
 
 	return this;
-}
+
+};
 
 UI.ContextMenu.prototype = Object.create( UI.Element.prototype );
 UI.ContextMenu.prototype.constructor = UI.ContextMenu;
@@ -520,23 +528,27 @@ UI.ContextMenu.prototype.setOptions = function ( options ) {
 
 	}
 
-	function onClick(e) {
-		if(scope.onChangeCallback)
-		{
-			scope.onChangeCallback(e.srcElement.innerHTML);
-			if(scope.dom.parentElement)
-			{
-				scope.dom.parentElement.removeChild(scope.dom);
+	function onClick( e ) {
+
+		if ( scope.onChangeCallback ) {
+
+			scope.onChangeCallback( e.srcElement.innerHTML );
+			if ( scope.dom.parentElement ) {
+
+				scope.dom.parentElement.removeChild( scope.dom );
+
 			}
+
 		}
+
 	}
 
 	scope.options = [];
 
 	for ( var i = 0; i < options.length; i ++ ) {
 
-		var div = document.createElement('li');
-		div.innerHTML = options[i];
+		var div = document.createElement( 'li' );
+		div.innerHTML = options[ i ];
 		div.className = 'option';
 		scope.dom.appendChild( div );
 
@@ -547,7 +559,8 @@ UI.ContextMenu.prototype.setOptions = function ( options ) {
 	}
 
 	return scope;
-}
+
+};
 
 UI.ContextMenu.prototype.onChange = function ( callback ) {
 

@@ -17,7 +17,7 @@ var AddObjectCommand = function ( editor, object, parent ) {
 	this.type = 'AddObjectCommand';
 
 	this.object = object;
-	this.parent = (parent !== undefined) ? parent : undefined;
+	this.parent = ( parent !== undefined ) ? parent : undefined;
 	if ( object !== undefined ) {
 
 		this.name = 'Add Object: ' + object.name;
@@ -46,9 +46,10 @@ AddObjectCommand.prototype = {
 
 		var output = Command.prototype.toJSON.call( this );
 		output.object = this.object.toJSON();
-		if(this.parent !== undefined)
-		{
+		if ( this.parent !== undefined ) {
+
 			output.parent = this.parent.toJSON();
+
 		}
 
 		return output;
@@ -60,7 +61,7 @@ AddObjectCommand.prototype = {
 		Command.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.object.object.uuid );
-		this.parent = this.editor.objectByUuid(json.parent.object.uuid);
+		this.parent = this.editor.objectByUuid( json.parent.object.uuid );
 
 		var loader = new THREE.ObjectLoader();
 		if ( this.object === undefined ) {
@@ -69,9 +70,10 @@ AddObjectCommand.prototype = {
 
 		}
 
-		if( this.parent === undefined && json.parent !== undefined) {
+		if ( this.parent === undefined && json.parent !== undefined ) {
 
-			this.parent = loader.parse(json.parent);
+			this.parent = loader.parse( json.parent );
+
 		}
 
 	}

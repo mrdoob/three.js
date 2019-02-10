@@ -160,7 +160,7 @@ Editor.prototype = {
 
 		} );
 
-		parent = (parent === undefined) ? this.scene : parent;
+		parent = ( parent === undefined ) ? this.scene : parent;
 		parent.add( object );
 
 		this.signals.objectAdded.dispatch( object );

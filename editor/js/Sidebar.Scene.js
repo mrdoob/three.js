@@ -214,39 +214,43 @@ Sidebar.Scene = function ( editor ) {
 		} )( scene.children, 1 );
 
 		outliner.setOptions( options );
-		outliner.setContextMenuOptions(['Copy', 'Cut', 'Paste', 'Clone', 'Delete']);
+		outliner.setContextMenuOptions( [ 'Copy', 'Cut', 'Paste', 'Clone', 'Delete' ] );
 
-		outliner.onContextMenuChange(function(value)
-		{
-			if(editor.selected !== undefined)
-			{
-				if(value == 'Copy')
-				{
+		outliner.onContextMenuChange( function ( value ) {
+
+			if ( editor.selected !== undefined ) {
+
+				if ( value == 'Copy' ) {
+
 					copiedObject = editor.selected.clone();
-				}
-				else if(value == 'Cut')
-				{
+
+				} else if ( value == 'Cut' ) {
+
 					copiedObject = editor.selected;
-					editor.execute(new RemoveObjectCommand(editor.selected));
-				}
-				else if(value == 'Delete')
-				{
 					editor.execute( new RemoveObjectCommand( editor.selected ) );
-				}
-				else if(value == 'Clone')
-				{
+
+				} else if ( value == 'Delete' ) {
+
+					editor.execute( new RemoveObjectCommand( editor.selected ) );
+
+				} else if ( value == 'Clone' ) {
+
 					editor.execute( new AddObjectCommand( editor.selected.clone() ) );
-				}
-				else if(value == 'Paste' && copiedObject !== undefined)
-				{
-					if(copiedObject.parent !== null)
-					{
+
+				} else if ( value == 'Paste' && copiedObject !== undefined ) {
+
+					if ( copiedObject.parent !== null ) {
+
 						copiedObject = copiedObject.clone();
+
 					}
-					editor.execute(new AddObjectCommand(copiedObject, editor.selected));
+					editor.execute( new AddObjectCommand( copiedObject, editor.selected ) );
+
 				}
+
 			}
-		});
+
+		} );
 
 		if ( editor.selected !== null ) {
 
