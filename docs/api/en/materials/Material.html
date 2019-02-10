@@ -135,7 +135,7 @@
 
 		<h3>[property:Integer stencilRef]</h3>
 		<p>
-		The value to use when using stencil functions comparisons or performing stencil operations. Default is *0*.
+		The value to use when performing stencil comparisons or stencil operations. Default is *0*.
 		</p>
 
 		<h3>[property:Boolean stencilMask]</h3>
@@ -150,7 +150,12 @@
 
 		<h3>[property:Boolean stencilZFail]</h3>
 		<p>
-			Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+		Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Boolean stencilZPass]</h3>
+		<p>
+		Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
 		</p>
 
 		<h3>[property:Boolean flatShading]</h3>
