@@ -226,6 +226,8 @@ select {
 	}
 
 .Outliner {
+	resize: vertical;
+	overflow: auto;
 	color: #888;
 	background: #222;
 	padding: 0;
@@ -298,3 +300,16 @@ select {
 	}
 
 }
+.ContextMenu {
+	z-index:  5;
+	position: fixed;
+	background: #111;
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+	border: 2px solid rgba(21,60,94,0.5);
+}
+
+	.ContextMenu .option {
+		text-decoration: underline;
+	}

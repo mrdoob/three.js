@@ -219,6 +219,8 @@ select {
 	}
 
 .Outliner {
+	resize: vertical;
+	overflow: auto;
 	color: #444;
 	background-color: #fff;
 	padding: 0;
@@ -291,3 +293,21 @@ select {
 	}
 
 }
+.ContextMenu {
+	z-index:  5;
+	position: fixed;
+	background: #ddd;
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+	border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+	.ContextMenu .option:hover{
+		color: #fff;
+		background-color: rgba(0,0,0,0.1);
+	}
+
+	.ContextMenu .option {
+		text-decoration: underline;
+	}
