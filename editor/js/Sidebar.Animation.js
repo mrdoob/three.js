@@ -66,6 +66,19 @@ Sidebar.Animation = function ( editor ) {
 
 	}
 
+	function playAnimation() {
+
+		currentAnimation = actions[ animationsSelect.getValue() ];
+		if ( currentAnimation !== undefined ) {
+
+			stopAnimations();
+			currentAnimation.play();
+			updateAnimation();
+
+		}
+
+	}
+
 	function stopAnimations() {
 
 		if ( mixer !== undefined ) {
@@ -84,20 +97,11 @@ Sidebar.Animation = function ( editor ) {
 	var div = new UI.Div().setMarginLeft( '90px' );
 	container.add( div );
 
+	div.add( new UI.Button( "Play" ).setFontSize( '12px' ).onClick( playAnimation ).setMarginRight( '10px' ) );
+
 	div.add( new UI.Button( "Stop" ).setFontSize( '12px' ).onClick( stopAnimations ), new UI.Break() );
 
-	var animationsSelect = new UI.Select().setFontSize( '12px' ).setMarginTop( '10px' ).onChange( function () {
-
-		currentAnimation = actions[ animationsSelect.getValue() ];
-		if ( currentAnimation !== undefined ) {
-
-			stopAnimations();
-			currentAnimation.play();
-			updateAnimation();
-
-		}
-
-	} );
+	var animationsSelect = new UI.Select().setFontSize( '12px' ).setMarginTop( '10px' );
 	div.add( animationsSelect );
 
 	return container;
