@@ -15,7 +15,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 	var defaultState = createBindingState( null );
 	var currentState = defaultState;
 
-	function setup( material, program, geometry, index, hasMorphTarget ) {
+	function setup( material, program, geometry, index ) {
 
 		var state = getBindingState( geometry, program, material );
 
@@ -26,7 +26,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		}
 
-		var updateBuffers = hasMorphTarget;
+		var updateBuffers = false;
 
 		if ( vaoAvailable ) {
 

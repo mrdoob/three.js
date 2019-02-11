@@ -665,16 +665,13 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var hasMorphTarget = false;
-
 		if ( object.morphTargetInfluences ) {
 
 			morphtargets.update( object, geometry, material, program );
-			hasMorphTarget = true;
 
 		}
 
-		bindingStates.setup( material, program, geometry, index, hasMorphTarget );
+		bindingStates.setup( material, program, geometry, index );
 
 		var attribute;
 		var renderer = bufferRenderer;
