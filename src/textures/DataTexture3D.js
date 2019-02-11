@@ -3,7 +3,7 @@
  */
 
 import { Texture } from './Texture.js';
-import { NearestFilter } from '../constants.js';
+import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 
 function DataTexture3D( data, width, height, depth ) {
 
@@ -21,6 +21,8 @@ function DataTexture3D( data, width, height, depth ) {
 
 	this.magFilter = NearestFilter;
 	this.minFilter = NearestFilter;
+
+	this.wrapR = ClampToEdgeWrapping;
 
 	this.generateMipmaps = false;
 	this.flipY = false;
