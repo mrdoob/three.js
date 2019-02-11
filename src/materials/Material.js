@@ -245,6 +245,14 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
 
+		data.stencilWrite = this.stencilWrite;
+		data.stencilFunc = this.stencilFunc;
+		data.stencilRef = this.stencilRef;
+		data.stencilMask = this.stencilMask;
+		data.stencilFail = this.stencilFail;
+		data.stencilZFail = this.stencilZFail;
+		data.stencilZPass = this.stencilZPass;
+
 		// rotation (SpriteMaterial)
 		if ( this.rotation !== 0 ) data.rotation = this.rotation;
 
@@ -336,6 +344,14 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
+
+		this.stencilWrite = source.stencilWrite;
+		this.stencilFunc = source.stencilFunc;
+		this.stencilRef = source.stencilRef;
+		this.stencilMask = source.stencilMask;
+		this.stencilFail = source.stencilFail;
+		this.stencilZFail = source.stencilZFail;
+		this.stencilZPass = source.stencilZPass;
 
 		this.colorWrite = source.colorWrite;
 
