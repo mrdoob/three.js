@@ -137,6 +137,18 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	function createBindingState( vao ) {
 
+		var newAttributes = [];
+		var enabledAttributes = [];
+		var attributeDivisors = [];
+
+		for ( var i = 0; i < maxVertexAttributes; i ++ ) {
+
+			newAttributes[ i ] = 0;
+			enabledAttributes[ i ] = 0;
+			attributeDivisors[ i ] = 0;
+
+		}
+
 		return {
 
 			// for backward compatibility on non-VAO support browser
@@ -144,9 +156,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 			program: null,
 			wireframe: false,
 
-			newAttributes: new Uint8Array( maxVertexAttributes ),
-			enabledAttributes: new Uint8Array( maxVertexAttributes ),
-			attributeDivisors: new Uint8Array( maxVertexAttributes ),
+			newAttributes: newAttributes,
+			enabledAttributes: enabledAttributes,
+			attributeDivisors: attributeDivisors,
 			object: vao,
 			version: - 1
 
