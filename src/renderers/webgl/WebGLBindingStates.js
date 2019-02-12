@@ -17,18 +17,18 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	function setup( material, program, geometry, index ) {
 
-		var state = getBindingState( geometry, program, material );
-
-		if ( currentState !== state ) {
-
-			currentState = state;
-			bindVertexArrayObject( currentState.object );
-
-		}
-
 		var updateBuffers = false;
 
 		if ( vaoAvailable ) {
+
+			var state = getBindingState( geometry, program, material );
+
+			if ( currentState !== state ) {
+
+				currentState = state;
+				bindVertexArrayObject( currentState.object );
+
+			}
 
 			if ( geometry.version > currentState.version ) {
 
@@ -101,8 +101,6 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 	}
 
 	function getBindingState( geometry, program, material ) {
-
-		if ( ! vaoAvailable ) return defaultState;
 
 		var wireframe = ( material.wireframe === true );
 
@@ -365,15 +363,15 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 					delete programMap[ wireframe ];
 
-				};
+				}
 
 				delete geometryMap[ programId ];
 
-			};
+			}
 
 			delete bindingStates[ geometryId ];
 
-		};
+		}
 
 	}
 
