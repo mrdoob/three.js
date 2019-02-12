@@ -104,30 +104,30 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		var wireframe = ( material.wireframe === true );
 
-		var geometryMap = bindingStates[ geometry.id ];
-
-		if ( geometryMap === undefined ) {
-
-			geometryMap = {};
-			bindingStates[ geometry.id ] = geometryMap;
-
-		}
-
-		var programMap = geometryMap[ program.id ];
+		var programMap = bindingStates[ geometry.id ];
 
 		if ( programMap === undefined ) {
 
 			programMap = {};
-			geometryMap[ program.id ] = programMap;
+			bindingStates[ geometry.id ] = programMap;
 
 		}
 
-		var state = programMap[ wireframe ];
+		var stateMap = programMap[ program.id ];
+
+		if ( stateMap === undefined ) {
+
+			stateMap = {};
+			programMap[ program.id ] = stateMap;
+
+		}
+
+		var state = stateMap[ wireframe ];
 
 		if ( state === undefined ) {
 
 			state = createBindingState( createVertexArrayObject() );
-			programMap[ wireframe ] = state;
+			stateMap[ wireframe ] = state;
 
 		}
 
@@ -351,21 +351,21 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		for ( var geometryId in bindingStates ) {
 
-			var geometryMap = bindingStates[ geometryId ];
+			var programMap = bindingStates[ geometryId ];
 
-			for ( var programId in geometryMap ) {
+			for ( var programId in programMap ) {
 
-				var programMap = geometryMap[ programId ];
+				var stateMap = programMap[ programId ];
 
-				for ( var wireframe in programMap ) {
+				for ( var wireframe in stateMap ) {
 
-					deleteVertexArrayObject( programMap[ wireframe ].object );
+					deleteVertexArrayObject( stateMap[ wireframe ].object );
 
-					delete programMap[ wireframe ];
+					delete stateMap[ wireframe ];
 
 				}
 
-				delete geometryMap[ programId ];
+				delete programMap[ programId ];
 
 			}
 
