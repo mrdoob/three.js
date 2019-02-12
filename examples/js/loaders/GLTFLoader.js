@@ -2237,6 +2237,7 @@ THREE.GLTFLoader = ( function () {
 				case 'aoMap':
 				case 'emissiveMap':
 				case 'metalnessMap':
+				case 'normalMap':
 				case 'roughnessMap':
 					texture.format = THREE.RGBFormat;
 					break;
