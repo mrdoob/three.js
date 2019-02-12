@@ -375,6 +375,56 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	}
 
+	function releaseStatesOfGeometry( geometry ) {
+
+		if ( bindingStates[ geometry.id ] === undefined ) return;
+
+		var programMap = bindingStates[ geometry.id ];
+
+		for ( var programId in programMap ) {
+
+			var stateMap = programMap[ programId ];
+
+			for ( var wireframe in stateMap ) {
+
+				deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+				delete stateMap[ wireframe ];
+
+			}
+
+			delete programMap[ programId ];
+
+		}
+
+		delete bindingStates[ geometry.id ];
+
+	}
+
+	function releaseStatesOfProgram( program ) {
+
+		for ( var geometryId in bindingStates ) {
+
+			var programMap = bindingStates[ geometryId ];
+
+			if ( programMap[ program.id ] === undefined ) continue;
+
+			var stateMap = programMap[ program.id ];
+
+			for ( var wireframe in stateMap ) {
+
+				deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+				delete stateMap[ wireframe ];
+
+			}
+
+			delete programMap[ program.id ];
+
+		}
+
+	}
+
 	function reset() {
 
 		resetDefaultState();
@@ -402,6 +452,8 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 		reset: reset,
 		resetDefaultState: resetDefaultState,
 		dispose: dispose,
+		releaseStatesOfGeometry: releaseStatesOfGeometry,
+		releaseStatesOfProgram: releaseStatesOfProgram,
 
 		initAttributes: initAttributes,
 		enableAttribute: enableAttribute,
