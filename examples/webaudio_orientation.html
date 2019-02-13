@@ -114,7 +114,7 @@
 		//
 
 		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
-		camera.position.set( 0, 1, 2 );
+		camera.position.set( 3, 2, 3 );
 
 		var reflectionCube = new THREE.CubeTextureLoader()
 			.setPath( 'textures/cube/SwedishRoyalCastle/' )
@@ -151,7 +151,7 @@
 		mesh.receiveShadow = true;
 		scene.add( mesh );
 
-		var grid = new THREE.GridHelper( 50, 50, 0x444444, 0x444444 );
+		var grid = new THREE.GridHelper( 50, 50, 0x888888, 0x888888 );
 		scene.add( grid );
 
 		//
@@ -165,7 +165,10 @@
 		var positionalAudio = new THREE.PositionalAudio( listener );
 		positionalAudio.setMediaElementSource( audioElement );
 		positionalAudio.setRefDistance( 1 );
-		positionalAudio.setDirectionalCone( 210, 230, 0.1 );
+		positionalAudio.setDirectionalCone( 180, 230, 0.1 );
+
+		var helper = new THREE.PositionalAudioHelper( positionalAudio, 0.1 );
+		positionalAudio.add( helper );
 
 		//
 

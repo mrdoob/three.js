@@ -131,6 +131,7 @@ export { RectAreaLightHelper } from './helpers/RectAreaLightHelper.js';
 export { HemisphereLightHelper } from './helpers/HemisphereLightHelper.js';
 export { GridHelper } from './helpers/GridHelper.js';
 export { PolarGridHelper } from './helpers/PolarGridHelper.js';
+export { PositionalAudioHelper } from './helpers/PositionalAudioHelper.js';
 export { FaceNormalsHelper } from './helpers/FaceNormalsHelper.js';
 export { DirectionalLightHelper } from './helpers/DirectionalLightHelper.js';
 export { CameraHelper } from './helpers/CameraHelper.js';
