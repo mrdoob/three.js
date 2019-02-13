@@ -87,6 +87,8 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		this._previousFrameTime = Date.now();
 
+		var currentRenderTarget = this.renderer.getRenderTarget();
+
 		var maskActive = false;
 
 		var pass, i, il = this.passes.length;
@@ -132,6 +134,8 @@ Object.assign( THREE.EffectComposer.prototype, {
 			}
 
 		}
+
+		this.renderer.setRenderTarget( currentRenderTarget );
 
 	},
 

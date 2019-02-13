@@ -1098,11 +1098,17 @@ THREE.GLTFExporter = ( function () {
 
 				} else if ( mesh.isPoints ) {
 
+					var geometryTemp = new THREE.BufferGeometry();
+					geometryTemp.fromGeometry( geometry );
+					geometry = geometryTemp;
+
 					mode = WEBGL_CONSTANTS.POINTS;
 
 				} else {
 
 					if ( ! geometry.isBufferGeometry ) {
+
+						console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use THREE.BufferGeometry instead.' );
 
 						var geometryTemp = new THREE.BufferGeometry();
 						geometryTemp.fromGeometry( geometry );
@@ -1433,7 +1439,7 @@ THREE.GLTFExporter = ( function () {
 					gltfCamera.perspective = {
 
 						aspectRatio: camera.aspect,
-						yfov: THREE.Math.degToRad( camera.fov ) / camera.aspect,
+						yfov: THREE.Math.degToRad( camera.fov ),
 						zfar: camera.far <= 0 ? 0.001 : camera.far,
 						znear: camera.near < 0 ? 0 : camera.near
 

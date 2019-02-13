@@ -199,7 +199,9 @@ THREE.Refractor = function ( geometry, options ) {
 			renderer.vr.enabled = false; // avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
-			renderer.render( scene, virtualCamera, renderTarget, true );
+			renderer.setRenderTarget( renderTarget );
+			renderer.clear();
+			renderer.render( scene, virtualCamera );
 
 			renderer.vr.enabled = currentVrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
