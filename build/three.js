@@ -45016,7 +45016,7 @@
 
 		this.audio = audio;
 		this.range = range || 1;
-		this.divisionsInnerAngle = divisionsOuterAngle || 16;
+		this.divisionsInnerAngle = divisionsInnerAngle || 16;
 		this.divisionsOuterAngle = divisionsOuterAngle || 2;
 
 		var geometry = new BufferGeometry();
