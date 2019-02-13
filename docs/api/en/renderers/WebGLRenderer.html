@@ -368,17 +368,15 @@
 		See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.
 		</p>
 
-		<h3>[method:null render]( [param:Scene scene], [param:Camera camera], [param:WebGLRenderTarget renderTarget], [param:Boolean forceClear] )</h3>
+		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
 		<p>
 			Render a [page:Scene scene] using a [page:Camera camera].<br />
 
-			The render is done to the [page:WebGLRenderTarget renderTarget] (if specified) or to the canvas as usual.<br />
+			The render is done to a previously specified [page:WebGLRenderTarget renderTarget] set by calling [page:WebGLRenderer.setRenderTarget .setRenderTarget] or to the canvas as usual.<br />
 
-			If [page:Boolean forceClear] is *true*, the depth, stencil and color buffers will be cleared
-			before rendering even if the renderer's [page:WebGLRenderer.autoClear autoClear] property is false.<br />
-
-			Even with forceClear set to true you can prevent certain buffers being cleared by setting
-			either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or [page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false.
+			By default render buffers are cleared before rendering but you can prevent this by setting the property [page:WebGLRenderer.autoClear autoClear] to false.
+			If you want to prevent only certain buffers being cleared you can set either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or
+			[page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false. To forcibly clear one ore more buffers call [page:WebGLRenderer.clear .clear].
 		</p>
 
 		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>

@@ -156,6 +156,8 @@ THREE.EquirectangularToCubeGenerator = ( function () {
 
 		update: function ( renderer ) {
 
+			var currentRenderTarget = renderer.getRenderTarget();
+
 			boxMesh.material.uniforms.equirectangularMap.value = this.sourceTexture;
 
 			for ( var i = 0; i < 6; i ++ ) {
@@ -168,9 +170,13 @@ THREE.EquirectangularToCubeGenerator = ( function () {
 				camera.up.set( v.u[ 0 ], v.u[ 1 ], v.u[ 2 ] );
 				camera.lookAt( v.t[ 0 ], v.t[ 1 ], v.t[ 2 ] );
 
-				renderer.render( scene, camera, this.renderTarget, true );
+				renderer.setRenderTarget( this.renderTarget );
+				renderer.clear();
+				renderer.render( scene, camera );
 
 			}
+
+			renderer.setRenderTarget( currentRenderTarget );
 
 			return this.renderTarget.texture;
 

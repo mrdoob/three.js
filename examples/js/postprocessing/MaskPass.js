@@ -58,8 +58,13 @@ THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		// draw into the stencil buffer
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
-		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+		renderer.setRenderTarget( readBuffer );
+		if ( this.clear ) renderer.clear();
+		renderer.render( this.scene, this.camera );
+
+		renderer.setRenderTarget( writeBuffer );
+		if ( this.clear ) renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// unlock color and depth buffer for subsequent rendering
 

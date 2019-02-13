@@ -206,7 +206,8 @@
 
 				// render the scene
 
-				renderer.render( pickingScene, camera, pickingTexture );
+				renderer.setRenderTarget( pickingTexture );
+				renderer.render( pickingScene, camera );
 
 				// clear the view offset so rendering returns to normal
 
@@ -252,6 +253,7 @@
 
 				pick();
 
+				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 
 			}
