@@ -222,8 +222,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			}
 
-			var currentRenderTarget = _renderer.getRenderTarget();
-
 			_renderer.setRenderTarget( shadowMap );
 			_renderer.clear();
 
