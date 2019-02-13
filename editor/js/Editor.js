@@ -88,11 +88,12 @@ var Editor = function () {
 	this.sceneHelpers = new THREE.Scene();
 
 	this.object = {};
+	this.objectsCollapsed = {};
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
 	this.scripts = {};
-
+	
 	this.selected = null;
 	this.helpers = {};
 

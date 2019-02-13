@@ -161,3 +161,7 @@ textarea, input { outline: none; } /* osx */
 #outliner .Script:after {
 	content: '{...}' /* ❮/❯ */
 }
+
+#collapseButton {
+	float: left;
+}

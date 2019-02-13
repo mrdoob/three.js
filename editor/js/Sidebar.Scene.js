@@ -13,12 +13,42 @@ Sidebar.Scene = function ( editor ) {
 
 	// outliner
 
+	function updateCollapsedState( object, checked ) {
+
+		if ( object !== undefined ) {
+
+			editor.objectsCollapsed[ object.uuid ] = checked;
+			refreshUI();
+
+		}
+
+	}
+
+	function checkboxClicked( evt ) {
+
+		var checkbox = evt.srcElement;
+		updateCollapsedState( checkbox.object, checkbox.checked );
+
+	}
+
 	function buildOption( object, draggable ) {
 
 		var option = document.createElement( 'div' );
 		option.draggable = draggable;
 		option.innerHTML = buildHTML( object );
 		option.value = object.id;
+
+		if ( draggable && object.children.length > 0 ) {
+
+			var checkbox = document.createElement( 'input' );
+			checkbox.setAttribute( 'type', 'checkbox' );
+			checkbox.setAttribute( 'id', 'collapseButton' );
+			checkbox.checked = editor.objectsCollapsed[ object.uuid ];
+			checkbox.addEventListener( 'change', checkboxClicked );
+			checkbox.object = object;
+			option.appendChild( checkbox );
+
+		}
 
 		return option;
 
@@ -207,7 +237,11 @@ Sidebar.Scene = function ( editor ) {
 				option.style.paddingLeft = ( pad * 10 ) + 'px';
 				options.push( option );
 
-				addObjects( object.children, pad + 1 );
+				if ( editor.objectsCollapsed[ object.uuid ] !== true ) {
+
+					addObjects( object.children, pad + 1 );
+
+				}
 
 			}
 
