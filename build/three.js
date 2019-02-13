@@ -18857,8 +18857,6 @@
 
 				}
 
-				var currentRenderTarget = _renderer.getRenderTarget();
-
 				_renderer.setRenderTarget( shadowMap );
 				_renderer.clear();
 
@@ -18894,8 +18892,6 @@
 			}
 
 			scope.needsUpdate = false;
-
-			_renderer.setRenderTarget( currentRenderTarget );
 
 		};
 
@@ -23460,7 +23456,7 @@
 
 			//
 
-			if ( renderTarget !== undefined ) {
+			if ( renderTarget ) {
 
 				// Generate mipmap if we're using any kind of mipmap filtering
 
