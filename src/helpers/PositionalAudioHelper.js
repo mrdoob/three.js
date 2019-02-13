@@ -11,8 +11,8 @@ import { _Math } from '../math/Math.js';
 function PositionalAudioHelper( audio, range, divisionsInnerAngle, divisionsOuterAngle ) {
 
 	this.audio = audio;
- 	this.range = range || 1;
- 	this.divisionsInnerAngle = divisionsOuterAngle || 16;
+	this.range = range || 1;
+	this.divisionsInnerAngle = divisionsOuterAngle || 16;
 	this.divisionsOuterAngle = divisionsOuterAngle || 2;
 
 	var geometry = new BufferGeometry();
