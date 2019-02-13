@@ -50,7 +50,7 @@ Sidebar.Animation = function ( editor ) {
 		if ( mixer !== undefined && renderer !== null ) {
 
 			var dt = clock.getDelta();
-			mixer.update( dt );
+			mixer.update( dt * speed.getValue() );
 			if ( currentAnimation !== undefined && currentAnimation.isRunning() ) {
 
 				requestAnimationFrame( updateAnimation );
@@ -101,8 +101,14 @@ Sidebar.Animation = function ( editor ) {
 
 	div.add( new UI.Button( "Stop" ).setFontSize( '12px' ).onClick( stopAnimations ), new UI.Break() );
 
-	var animationsSelect = new UI.Select().setFontSize( '12px' ).setMarginTop( '10px' );
-	div.add( animationsSelect );
+	var animationsSelect = new UI.Select().setFontSize( '12px' ).setMarginTop( '10px' ).setMarginBottom( '10px' );
+	div.add( animationsSelect, new UI.Break() );
+
+	var row = new UI.Row();
+	div.add( row );
+
+	var speed = new UI.Number( 1 ).setRange( 0.25, 2 ).setStep( 0.5 ).setMarginLeft( '10px' );
+	row.add( new UI.Text( "Speed" ), speed );
 
 	return container;
 
