@@ -66,7 +66,7 @@ function WebGLMorphtargets( gl ) {
 
 		for ( var i = 0; i < 8; i ++ ) {
 
-			if ( i < length ) {
+			if ( i < length && influences[ i ][ 1 ] ) {
 
 				workInfluences[ i ][ 0 ] = influences[ i ][ 0 ];
 				workInfluences[ i ][ 1 ] = influences[ i ][ 1 ];
