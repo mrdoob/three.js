@@ -1149,7 +1149,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( renderTarget ) {
+		if ( renderTarget !== undefined ) {
 
 			// Generate mipmap if we're using any kind of mipmap filtering
 
