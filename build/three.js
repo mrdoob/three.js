@@ -23331,7 +23331,23 @@
 
 		// Rendering
 
-		this.render = function ( scene, camera, renderTarget, forceClear ) {
+		this.render = function ( scene, camera ) {
+
+			var renderTarget, forceClear;
+
+			if ( arguments[ 2 ] !== undefined ) {
+
+				console.warn( 'THREE.WebGLRenderer.render(): the renderTarget argument has been removed. Use .setRenderTarget() instead.' );
+				renderTarget = arguments[ 2 ];
+
+			}
+
+			if ( arguments[ 3 ] !== undefined ) {
+
+				console.warn( 'THREE.WebGLRenderer.render(): the forceClear argument has been removed. Use .clear() instead.' );
+				forceClear = arguments[ 3 ];
+
+			}
 
 			if ( ! ( camera && camera.isCamera ) ) {
 
@@ -23404,13 +23420,11 @@
 
 			if ( this.info.autoReset ) this.info.reset();
 
-			if ( renderTarget === undefined ) {
+			if ( renderTarget !== undefined ) {
 
-				renderTarget = null;
+				this.setRenderTarget( renderTarget );
 
 			}
-
-			this.setRenderTarget( renderTarget );
 
 			//
 
@@ -39947,24 +39961,26 @@
 			renderTarget.texture.generateMipmaps = false;
 
 			renderTarget.activeCubeFace = 0;
-			renderer.render( scene, cameraPX, renderTarget );
+			renderer.setRenderTarget( renderTarget );
+
+			renderer.render( scene, cameraPX );
 
 			renderTarget.activeCubeFace = 1;
-			renderer.render( scene, cameraNX, renderTarget );
+			renderer.render( scene, cameraNX );
 
 			renderTarget.activeCubeFace = 2;
-			renderer.render( scene, cameraPY, renderTarget );
+			renderer.render( scene, cameraPY );
 
 			renderTarget.activeCubeFace = 3;
-			renderer.render( scene, cameraNY, renderTarget );
+			renderer.render( scene, cameraNY );
 
 			renderTarget.activeCubeFace = 4;
-			renderer.render( scene, cameraPZ, renderTarget );
+			renderer.render( scene, cameraPZ );
 
 			renderTarget.texture.generateMipmaps = generateMipmaps;
 
 			renderTarget.activeCubeFace = 5;
-			renderer.render( scene, cameraNZ, renderTarget );
+			renderer.render( scene, cameraNZ );
 
 			renderer.setRenderTarget( currentRenderTarget );
 
@@ -44999,8 +45015,8 @@
 	function PositionalAudioHelper( audio, range, divisionsInnerAngle, divisionsOuterAngle ) {
 
 		this.audio = audio;
-	 	this.range = range || 1;
-	 	this.divisionsInnerAngle = divisionsOuterAngle || 16;
+		this.range = range || 1;
+		this.divisionsInnerAngle = divisionsOuterAngle || 16;
 		this.divisionsOuterAngle = divisionsOuterAngle || 2;
 
 		var geometry = new BufferGeometry();
