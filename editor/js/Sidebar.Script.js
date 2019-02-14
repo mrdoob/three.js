@@ -126,7 +126,7 @@ Sidebar.Script = function ( editor ) {
 							output = JSON.stringify( script );
 
 						}
-						output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+						
 						link.href = URL.createObjectURL( new Blob( [ output ], { type: 'application/json' } ) );
 						link.download = 'script.js';
 						link.click();
