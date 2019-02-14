@@ -266,6 +266,8 @@ var Strings = function ( config ) {
 			'sidebar/script/new': 'New',
 			'sidebar/script/edit': 'Edit',
 			'sidebar/script/remove': 'Remove',
+			'sidebar/script/save': 'Save',
+			'sidebar/script/load': 'Load',
 
 			'sidebar/project': 'Project',
 			'sidebar/project/title': 'Title',

@@ -29,11 +29,26 @@ Sidebar.Script = function ( editor ) {
 	} );
 	container.add( newScript );
 
-	/*
-	var loadScript = new UI.Button( 'Load' );
-	loadScript.setMarginLeft( '4px' );
-	container.add( loadScript );
-	*/
+	var form = document.createElement( 'form' );
+	form.style.display = 'none';
+	document.body.appendChild( form );
+
+	var fileInput = document.createElement( 'input' );
+	fileInput.multiple = true;
+	fileInput.type = 'file';
+	fileInput.addEventListener( 'change', function ( ) {
+
+		editor.loader.loadFiles(fileInput.files, onScriptLoad);
+		form.reset();
+
+	} );
+	form.appendChild( fileInput );
+
+	var loadScript = new UI.Button( strings.getKey ('sidebar/script/load')).setMarginLeft('4px');
+	loadScript.onClick( function(){
+		fileInput.click();
+	});
+	container.add(loadScript);
 
 	//
 
@@ -60,7 +75,7 @@ Sidebar.Script = function ( editor ) {
 
 				( function ( object, script ) {
 
-					var name = new UI.Input( script.name ).setWidth( '130px' ).setFontSize( '12px' );
+					var name = new UI.Input( script.name ).setWidth( '100px' ).setFontSize( '12px' );
 					name.onChange( function () {
 
 						editor.execute( new SetScriptValueCommand( editor, editor.selected, script, 'name', this.getValue() ) );
@@ -90,6 +105,34 @@ Sidebar.Script = function ( editor ) {
 					} );
 					scriptsContainer.add( remove );
 
+					var save = new UI.Button( strings.getKey( 'sidebar/script/save' ) );
+					save.setMarginLeft( '4px' );
+					save.onClick( function () {
+
+						var link = document.createElement( 'a' );
+						link.style.display = 'none';
+						document.body.appendChild( link );
+
+						var output;
+						try {
+
+							output = JSON.stringify( script, null, '\t' );
+							output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+				
+						} catch ( e ) {
+				
+							output = JSON.stringify( script );
+				
+						}
+						output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+						link.href = URL.createObjectURL( new Blob( [output], {type : 'application/json'}) );
+						link.download = 'script.js';
+						link.click();
+						document.body.removeChild( link );
+
+					} );
+					scriptsContainer.add( save );
+
 					scriptsContainer.add( new UI.Break() );
 
 				} )( object, scripts[ i ] )
@@ -98,6 +141,11 @@ Sidebar.Script = function ( editor ) {
 
 		}
 
+	}
+
+	function onScriptLoad(data)
+	{
+		editor.execute( new AddScriptCommand( editor.selected, data ) );
 	}
 
 	// signals

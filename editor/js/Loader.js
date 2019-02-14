@@ -9,7 +9,7 @@ var Loader = function ( editor ) {
 
 	this.texturePath = '';
 
-	this.loadFiles = function ( files ) {
+	this.loadFiles = function ( files, onLoad ) {
 
 		if ( files.length > 0 ) {
 
@@ -34,7 +34,7 @@ var Loader = function ( editor ) {
 
 			for ( var i = 0; i < files.length; i ++ ) {
 
-				scope.loadFile( files[ i ], manager );
+				scope.loadFile( files[ i ], manager, onLoad ) ;
 
 			}
 
@@ -42,7 +42,7 @@ var Loader = function ( editor ) {
 
 	};
 
-	this.loadFile = function ( file, manager ) {
+	this.loadFile = function ( file, manager, onLoad ) {
 
 		var filename = file.name;
 		var extension = filename.split( '.' ).pop().toLowerCase();
@@ -287,7 +287,14 @@ var Loader = function ( editor ) {
 						worker.onmessage = function ( event ) {
 
 							event.data.metadata = { version: 2 };
-							handleJSON( event.data, file, filename );
+							if(onLoad !== undefined)
+							{
+								onLoad(event.data, file, filename);
+							}
+							else
+							{
+								handleJSON( event.data, file, filename );
+							}
 
 						};
 
@@ -312,7 +319,14 @@ var Loader = function ( editor ) {
 
 					}
 
-					handleJSON( data, file, filename );
+					if(onLoad !== undefined)
+					{
+						onLoad(data, file, filename);
+					}
+					else
+					{
+						handleJSON( data, file, filename );
+					}
 
 				}, false );
 				reader.readAsText( file );
