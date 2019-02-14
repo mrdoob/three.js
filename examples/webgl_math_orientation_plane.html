@@ -51,10 +51,13 @@
         var controller = {
             x: 0.5,
             y: 1,
-            z: 0
+            z: 0,
+            constant: planeConstant
         };
         var valuesChanger = function () {
-            normalVector.set(controller.x, controller.y, controller.z);
+            groundPlane.set(
+                new THREE.Vector3(controller.x, controller.y, controller.z),
+                controller.constant);
         };
         gui.add(
             controller, 'x', -Math.PI*2, Math.PI*2, 0.01 )
@@ -64,6 +67,9 @@
            .onChange(valuesChanger);
         gui.add(
             controller, 'z', -Math.PI*2, Math.PI*2, 0.01 )
+           .onChange(valuesChanger);
+        gui.add(
+            controller, 'constant', 0, 10, 0.01 )
            .onChange(valuesChanger);
 
 
