@@ -164,7 +164,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.quad.material = this.materialCopy;
 			this.copyUniforms.tDiffuse.value = this.luminanceRT.texture;
 			renderer.setRenderTarget( this.previousLuminanceRT );
-			renderer.render( this.scene, this.camera, this.previousLuminanceRT );
+			renderer.render( this.scene, this.camera );
 
 		}
 

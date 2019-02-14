@@ -361,7 +361,7 @@
 					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysFakeSun;
-					renderer.render( postprocessing.rtTextureColors );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
 					renderer.render( postprocessing.scene, postprocessing.camera );
 
 					renderer.setScissorTest( false );
