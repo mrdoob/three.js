@@ -498,9 +498,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	};
 
-	this.getSize = function () {
+	this.getSize = function ( target ) {
 
-		return renderer.getSize();
+		return renderer.getSize( target );
 
 	};
 

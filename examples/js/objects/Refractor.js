@@ -187,6 +187,7 @@ THREE.Refractor = function ( geometry, options ) {
 	var render = ( function () {
 
 		var viewport = new THREE.Vector4();
+		var size = new THREE.Vector2();
 
 		return function render( renderer, scene, camera ) {
 
@@ -213,7 +214,7 @@ THREE.Refractor = function ( geometry, options ) {
 
 			if ( bounds !== undefined ) {
 
-				var size = renderer.getSize();
+				renderer.getSize( size );
 				var pixelRatio = renderer.getPixelRatio();
 
 				viewport.x = bounds.x * size.width * pixelRatio;

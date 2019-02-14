@@ -351,14 +351,22 @@
 		<h3>[method:RenderTarget getCurrentViewport]()</h3>
 		<p>Returns the current viewport.</p>
 
-		<h3>[method:Object getDrawingBufferSize]()</h3>
-		<p>Returns an object containing the width and height of the renderer's drawing buffer, in pixels.</p>
+		<h3>[method:Vector2 getDrawingBufferSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — the result will be copied into this Vector2.<br /><br />
+
+		Returns the width and height of the renderer's drawing buffer, in pixels.
+		</p>
 
 		<h3>[method:number getPixelRatio]()</h3>
 		<p>Returns current device pixel ratio used.</p>
 
-		<h3>[method:Object getSize]()</h3>
-		<p>Returns an object containing the width and height of the renderer's output canvas, in pixels.</p>
+		<h3>[method:Vector2 getSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — the result will be copied into this Vector2.<br /><br />
+
+		Returns the width and height of the renderer's output canvas, in pixels.
+		</p>
 
 		<h3>[method:null resetGLState]( )</h3>
 		<p>Reset the GL state to default. Called internally if the WebGL context is lost.</p>
