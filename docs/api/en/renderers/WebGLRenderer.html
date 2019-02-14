@@ -371,10 +371,12 @@
 		<h3>[method:null resetGLState]( )</h3>
 		<p>Reset the GL state to default. Called internally if the WebGL context is lost.</p>
 
-		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], buffer )</h3>
-		<p>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().<br />
-		See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.
+		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer] )</h3>
+		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
+		<p>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().</p>
+		<p>See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.
 		</p>
+
 
 		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
 		<p>
