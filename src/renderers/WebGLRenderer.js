@@ -1160,7 +1160,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( _currentRenderTarget ) {
+		if ( _currentRenderTarget !== null ) {
 
 			// Generate mipmap if we're using any kind of mipmap filtering
 
