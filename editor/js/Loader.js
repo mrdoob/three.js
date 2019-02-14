@@ -34,7 +34,7 @@ var Loader = function ( editor ) {
 
 			for ( var i = 0; i < files.length; i ++ ) {
 
-				scope.loadFile( files[ i ], manager, onLoad ) ;
+				scope.loadFile( files[ i ], manager, onLoad );
 
 			}
 
@@ -287,13 +287,14 @@ var Loader = function ( editor ) {
 						worker.onmessage = function ( event ) {
 
 							event.data.metadata = { version: 2 };
-							if(onLoad !== undefined)
-							{
-								onLoad(event.data, file, filename);
-							}
-							else
-							{
+							if ( onLoad !== undefined ) {
+
+								onLoad( event.data, file, filename );
+
+							} else {
+
 								handleJSON( event.data, file, filename );
+
 							}
 
 						};
@@ -319,13 +320,14 @@ var Loader = function ( editor ) {
 
 					}
 
-					if(onLoad !== undefined)
-					{
-						onLoad(data, file, filename);
-					}
-					else
-					{
+					if ( onLoad !== undefined ) {
+
+						onLoad( data, file, filename );
+
+					} else {
+
 						handleJSON( data, file, filename );
+
 					}
 
 				}, false );

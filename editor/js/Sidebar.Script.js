@@ -38,17 +38,19 @@ Sidebar.Script = function ( editor ) {
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( ) {
 
-		editor.loader.loadFiles(fileInput.files, onScriptLoad);
+		editor.loader.loadFiles( fileInput.files, onScriptLoad );
 		form.reset();
 
 	} );
 	form.appendChild( fileInput );
 
-	var loadScript = new UI.Button( strings.getKey ('sidebar/script/load')).setMarginLeft('4px');
-	loadScript.onClick( function(){
+	var loadScript = new UI.Button( strings.getKey( 'sidebar/script/load' ) ).setMarginLeft( '4px' );
+	loadScript.onClick( function () {
+
 		fileInput.click();
-	});
-	container.add(loadScript);
+
+	} );
+	container.add( loadScript );
 
 	//
 
@@ -118,14 +120,14 @@ Sidebar.Script = function ( editor ) {
 
 							output = JSON.stringify( script, null, '\t' );
 							output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-				
+
 						} catch ( e ) {
-				
+
 							output = JSON.stringify( script );
-				
+
 						}
 						output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-						link.href = URL.createObjectURL( new Blob( [output], {type : 'application/json'}) );
+						link.href = URL.createObjectURL( new Blob( [ output ], { type: 'application/json' } ) );
 						link.download = 'script.js';
 						link.click();
 						document.body.removeChild( link );
@@ -135,7 +137,7 @@ Sidebar.Script = function ( editor ) {
 
 					scriptsContainer.add( new UI.Break() );
 
-				} )( object, scripts[ i ] )
+				} )( object, scripts[ i ] );
 
 			}
 
@@ -143,9 +145,10 @@ Sidebar.Script = function ( editor ) {
 
 	}
 
-	function onScriptLoad(data)
-	{
+	function onScriptLoad( data ) {
+
 		editor.execute( new AddScriptCommand( editor.selected, data ) );
+
 	}
 
 	// signals
