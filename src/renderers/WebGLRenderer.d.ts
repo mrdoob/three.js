@@ -7,6 +7,7 @@ import { WebGLCapabilities } from './webgl/WebGLCapabilities';
 import { WebGLProperties } from './webgl/WebGLProperties';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists';
 import { WebGLState } from './webgl/WebGLState';
+import { Vector2 } from './../math/Vector2';
 import { Vector4 } from './../math/Vector4';
 import { Color } from './../math/Color';
 import { WebGLRenderTarget } from './WebGLRenderTarget';
@@ -308,9 +309,7 @@ export class WebGLRenderer implements Renderer {
    */
   render(
     scene: Scene,
-    camera: Camera,
-    renderTarget?: RenderTarget,
-    forceClear?: boolean
+    camera: Camera
   ): void;
 
   /**
