@@ -214,7 +214,13 @@ export class WebGLRenderer implements Renderer {
    */
   setSize(width: number, height: number, updateStyle?: boolean): void;
 
-  getCurrentViewport(): Vector4;
+  getCurrentViewport(target: Vector4): Vector4;
+
+  /**
+   * Copies the viewport into target.
+   */
+  getViewport(target: Vector4): Vector4;
+
   /**
    * Sets the viewport to render from (x, y) to (x + width, y + height).
    */
@@ -315,7 +321,7 @@ export class WebGLRenderer implements Renderer {
    */
   render(
     scene: Scene,
-    camera: Camera,
+    camera: Camera
   ): void;
 
   /**
