@@ -989,6 +989,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			for ( var key in parameters ) {
 
 				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+
 			}
 
 			return data;

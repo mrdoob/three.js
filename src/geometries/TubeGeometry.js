@@ -226,6 +226,7 @@ TubeBufferGeometry.prototype.toJSON = function () {
 	data.path = this.parameters.path.toJSON();
 
 	return data;
+
 };
 
 export { TubeGeometry, TubeBufferGeometry };
