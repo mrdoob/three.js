@@ -443,6 +443,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.getViewport = function ( target ) {
+
+		return target.copy( _viewport );
+
+	};
+
 	this.setViewport = function ( x, y, width, height ) {
 
 		_viewport.set( x, y, width, height );
