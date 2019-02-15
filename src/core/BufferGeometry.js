@@ -154,6 +154,18 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+		var tangent = this.attributes.tangent;
+
+		if ( tangent !== undefined ) {
+
+			var normalMatrix = new Matrix3().getNormalMatrix( matrix );
+
+			// Tangent is vec4, but the '.w' component is a sign value (+1/-1).
+			normalMatrix.applyToBufferAttribute( tangent );
+			tangent.needsUpdate = true;
+
+		}
+
 		if ( this.boundingBox !== null ) {
 
 			this.computeBoundingBox();
