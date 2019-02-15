@@ -310,8 +310,14 @@ export class WebGLRenderer implements Renderer {
 
   /**
    * Render a scene using a camera.
-   * The render is done to the renderTarget (if specified) or to the canvas as usual.
-   * If forceClear is true, the canvas will be cleared before rendering, even if the renderer's autoClear property is false.
+   * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling 
+   * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
+   * 
+   * By default render buffers are cleared before rendering but you can prevent this by setting the property 
+   * {@link WebGLRenderer#autoClear autoClear} to false. If you want to prevent only certain buffers being cleared 
+   * you can set either the {@link WebGLRenderer#autoClearColor autoClearColor}, 
+   * {@link WebGLRenderer#autoClearStencil autoClearStencil} or {@link WebGLRenderer#autoClearDepth autoClearDepth} 
+   * properties to false. To forcibly clear one ore more buffers call {@link WebGLRenderer#clear .clear}.
    */
   render(
     scene: Scene,
