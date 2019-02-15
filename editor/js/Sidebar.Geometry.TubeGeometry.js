@@ -120,7 +120,7 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 		}
 
 		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
-			new THREE.CatmullRomCurve3( points ),
+			new THREE.CatmullRomCurve3( points, closed.getValue() ),
 			tubularSegments.getValue(),
 			radius.getValue(),
 			radialSegments.getValue(),
