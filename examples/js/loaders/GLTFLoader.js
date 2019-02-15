@@ -2829,7 +2829,7 @@ THREE.GLTFLoader = ( function () {
 									: material.clone();
 
 								if ( useSkinning ) cachedMaterial.skinning = true;
-								if ( useVertexTangents ) cachedMaterial.vertexTangents = THREE.VertexTangents;
+								if ( useVertexTangents ) cachedMaterial.vertexTangents = true;
 								if ( useVertexColors ) cachedMaterial.vertexColors = THREE.VertexColors;
 								if ( useFlatShading ) cachedMaterial.flatShading = true;
 								if ( useMorphTargets ) cachedMaterial.morphTargets = true;
