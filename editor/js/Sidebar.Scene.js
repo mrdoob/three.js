@@ -318,6 +318,13 @@ Sidebar.Scene = function ( editor ) {
 			if ( option.value === object.id ) {
 
 				option.innerHTML = buildHTML( object );
+				var checkbox = document.createElement( 'input' );
+				checkbox.setAttribute( 'type', 'checkbox' );
+				checkbox.setAttribute( 'id', 'collapseButton' );
+				checkbox.checked = editor.objectsCollapsed[ object.uuid ];
+				checkbox.addEventListener( 'change', checkboxClicked );
+				checkbox.object = object;
+				option.appendChild( checkbox );
 				return;
 
 			}
