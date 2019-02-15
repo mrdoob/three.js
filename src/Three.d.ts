@@ -137,6 +137,7 @@ export { RectAreaLightHelper } from './helpers/RectAreaLightHelper';
 export { HemisphereLightHelper } from './helpers/HemisphereLightHelper';
 export { GridHelper } from './helpers/GridHelper';
 export { PolarGridHelper } from './helpers/PolarGridHelper';
+export { PositionalAudioHelper } from './helpers/PositionalAudioHelper';
 export { FaceNormalsHelper } from './helpers/FaceNormalsHelper';
 export { DirectionalLightHelper } from './helpers/DirectionalLightHelper';
 export { CameraHelper } from './helpers/CameraHelper';

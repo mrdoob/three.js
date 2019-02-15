@@ -22,6 +22,7 @@ var list = {
 
 			"Next Steps": {
 				"How to update things": "manual/en/introduction/How-to-update-things",
+				"How to dispose of objects": "manual/en/introduction/How-to-dispose-of-objects",
 				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
 				"Animation system": "manual/en/introduction/Animation-system"
@@ -196,6 +197,7 @@ var list = {
 				"FaceNormalsHelper": "api/en/helpers/FaceNormalsHelper",
 				"GridHelper": "api/en/helpers/GridHelper",
 				"PolarGridHelper": "api/en/helpers/PolarGridHelper",
+				"PositionalAudioHelper": "api/en/helpers/PositionalAudioHelper",
 				"HemisphereLightHelper": "api/en/helpers/HemisphereLightHelper",
 				"PlaneHelper": "api/en/helpers/PlaneHelper",
 				"PointLightHelper": "api/en/helpers/PointLightHelper",
@@ -447,6 +449,7 @@ var list = {
 
 			"进阶": {
 				"如何更新场景": "manual/zh/introduction/How-to-update-things",
+				"How to dispose of objects": "manual/zh/introduction/How-to-dispose-of-objects",
 				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
 				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
 				"动画系统": "manual/zh/introduction/Animation-system"
@@ -621,6 +624,7 @@ var list = {
 				"FaceNormalsHelper": "api/zh/helpers/FaceNormalsHelper",
 				"GridHelper": "api/zh/helpers/GridHelper",
 				"PolarGridHelper": "api/zh/helpers/PolarGridHelper",
+				"PositionalAudioHelper": "api/zh/helpers/PositionalAudioHelper",
 				"HemisphereLightHelper": "api/zh/helpers/HemisphereLightHelper",
 				"PlaneHelper": "api/zh/helpers/PlaneHelper",
 				"PointLightHelper": "api/zh/helpers/PointLightHelper",

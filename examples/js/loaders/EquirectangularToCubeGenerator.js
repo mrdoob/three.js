@@ -11,6 +11,8 @@ THREE.CubemapGenerator = function ( renderer ) {
 
 THREE.CubemapGenerator.prototype.fromEquirectangular = function ( texture, options ) {
 
+	options = options || {};
+
 	var scene = new THREE.Scene();
 
 	var shader = {
@@ -92,9 +94,9 @@ THREE.CubemapGenerator.prototype.fromEquirectangular = function ( texture, optio
 		type: texture.type,
 		format: texture.format,
 		encoding: texture.encoding,
-		generateMipmaps: ( options.generateMipmaps !== undefined ) ?  options.generateMipmaps : texture.generateMipmaps,
-		minFilter: ( options.minFilter !== undefined ) ?  options.minFilter : texture.minFilter,
-		magFilter: ( options.magFilter !== undefined ) ?  options.magFilter : texture.magFilter
+		generateMipmaps: ( options.generateMipmaps !== undefined ) ? options.generateMipmaps : texture.generateMipmaps,
+		minFilter: ( options.minFilter !== undefined ) ? options.minFilter : texture.minFilter,
+		magFilter: ( options.magFilter !== undefined ) ? options.magFilter : texture.magFilter
 	};
 
 	var camera = new THREE.CubeCamera( 1, 10, resolution, params );
@@ -119,6 +121,8 @@ THREE.EquirectangularToCubeGenerator = ( function () {
 	scene.add( boxMesh );
 
 	var EquirectangularToCubeGenerator = function ( sourceTexture, options ) {
+
+		options = options || {};
 
 		this.sourceTexture = sourceTexture;
 		this.resolution = options.resolution || 512;
@@ -152,6 +156,8 @@ THREE.EquirectangularToCubeGenerator = ( function () {
 
 		update: function ( renderer ) {
 
+			var currentRenderTarget = renderer.getRenderTarget();
+
 			boxMesh.material.uniforms.equirectangularMap.value = this.sourceTexture;
 
 			for ( var i = 0; i < 6; i ++ ) {
@@ -164,9 +170,13 @@ THREE.EquirectangularToCubeGenerator = ( function () {
 				camera.up.set( v.u[ 0 ], v.u[ 1 ], v.u[ 2 ] );
 				camera.lookAt( v.t[ 0 ], v.t[ 1 ], v.t[ 2 ] );
 
-				renderer.render( scene, camera, this.renderTarget, true );
+				renderer.setRenderTarget( this.renderTarget );
+				renderer.clear();
+				renderer.render( scene, camera );
 
 			}
+
+			renderer.setRenderTarget( currentRenderTarget );
 
 			return this.renderTarget.texture;
 

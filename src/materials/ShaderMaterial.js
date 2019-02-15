@@ -1,6 +1,3 @@
-import { Material } from './Material.js';
-import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -22,6 +19,12 @@ import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
  * }
  */
 
+import { Material } from './Material.js';
+import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
+
+import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
+import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
+
 function ShaderMaterial( parameters ) {
 
 	Material.call( this );
@@ -31,17 +34,8 @@ function ShaderMaterial( parameters ) {
 	this.defines = {};
 	this.uniforms = {};
 
-	this.vertexShader = /* glsl */ `
-	void main() {
-		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-	}
-	`;
-
-	this.fragmentShader = /* glsl */ `
-	void main() {
-		gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
-	}
-	`;
+	this.vertexShader = default_vertex;
+	this.fragmentShader = default_fragment;
 
 	this.linewidth = 1;
 
