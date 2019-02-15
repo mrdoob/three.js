@@ -214,8 +214,6 @@ export class WebGLRenderer implements Renderer {
    */
   setSize(width: number, height: number, updateStyle?: boolean): void;
 
-  getCurrentViewport(target: Vector4): Vector4;
-
   /**
    * Copies the viewport into target.
    */

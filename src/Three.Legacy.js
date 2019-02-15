@@ -1363,6 +1363,12 @@ Object.defineProperties( ShaderMaterial.prototype, {
 
 Object.assign( WebGLRenderer.prototype, {
 
+	getCurrentViewport: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .getCurrentViewport() has been removed.' );
+
+	},
+
 	clearTarget: function ( renderTarget, color, depth, stencil ) {
 
 		console.warn( 'THREE.WebGLRenderer: .clearTarget() has been deprecated. Use .setRenderTarget() and .clear() instead.' );
