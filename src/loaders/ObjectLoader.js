@@ -449,6 +449,9 @@ Object.assign( ObjectLoader.prototype, {
 				if ( data.name !== undefined ) geometry.name = data.name;
 				if ( geometry.isBufferGeometry === true && data.userData !== undefined ) geometry.userData = data.userData;
 
+				// Morph Attributes are already loaded for BufferGeometry at this point
+				if ( geometry.isBufferGeometry === true && data.type != 'BufferGeometry' ) geometry.morphAttributes = bufferGeometryLoader.parseMorphAttributes( json );
+
 				geometries[ data.uuid ] = geometry;
 
 			}

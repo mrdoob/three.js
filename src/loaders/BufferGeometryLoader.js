@@ -87,8 +87,48 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 		if ( json.name ) geometry.name = json.name;
 		if ( json.userData ) geometry.userData = json.userData;
+		geometry.morphAttributes = this.parseMorphAttributes( json );
 
 		return geometry;
+
+	},
+
+	parseMorphAttributes: function ( json ) {
+
+		var newMorphAttributes = {};
+
+		var morphAttributes = json.morphAttributes;
+		if ( morphAttributes !== undefined ) {
+
+			if ( morphAttributes.position !== undefined ) {
+
+				newMorphAttributes.position = [];
+				for ( var i = 0; i < morphAttributes.position.length; ++ i ) {
+
+					var position = morphAttributes.position[ i ];
+					var typedArray = new TYPED_ARRAYS[ position.type ]( position.array );
+					newMorphAttributes.position.push( new BufferAttribute( typedArray, position.itemSize, position.normalized ) );
+
+				}
+
+			}
+
+			if ( morphAttributes.normal !== undefined ) {
+
+				newMorphAttributes.normal = [];
+				for ( var i = 0; i < morphAttributes.normal.length; ++ i ) {
+
+					var normal = morphAttributes.normal[ i ];
+					var typedArray = new TYPED_ARRAYS[ normal.type ]( normal.array );
+					newMorphAttributes.normal.push( new BufferAttribute( typedArray, normal.itemSize, normal.normalized ) );
+
+				}
+
+			}
+
+		}
+
+		return newMorphAttributes;
 
 	},
 
@@ -100,6 +140,8 @@ Object.assign( BufferGeometryLoader.prototype, {
 	}
 
 } );
+
+
 
 var TYPED_ARRAYS = {
 	Int8Array: Int8Array,

@@ -954,6 +954,48 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		if ( this.name !== '' ) data.name = this.name;
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
+		data.morphAttributes = {};
+
+		// serialize position morphs if they exist
+		if ( Array.isArray( this.morphAttributes.position ) ) {
+
+			data.morphAttributes.position = [];
+			for ( var i = 0; i < this.morphAttributes.position.length; ++ i ) {
+
+				var position = this.morphAttributes.position[ i ];
+				var array = Array.prototype.slice.call( position.array );
+
+				data.morphAttributes.position.push( {
+					itemSize: position.itemSize,
+					type: position.array.constructor.name,
+					array: array,
+					normalized: position.normalized
+				} );
+
+			}
+
+		}
+
+		// serialize normal morphs if they exist
+		if ( Array.isArray( this.morphAttributes.normal ) ) {
+
+			data.morphAttributes.normal = [];
+			for ( var i = 0; i < this.morphAttributes.normal.length; ++ i ) {
+
+				var normal = this.morphAttributes.normal[ i ];
+				var array = Array.prototype.slice.call( normal.array );
+
+				data.morphAttributes.normal.push( {
+					itemSize: normal.itemSize,
+					type: normal.array.constructor.name,
+					array: array,
+					normalized: normal.normalized
+				} );
+
+			}
+
+		}
+
 		if ( this.parameters !== undefined ) {
 
 			var parameters = this.parameters;
