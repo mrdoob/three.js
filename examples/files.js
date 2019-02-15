@@ -44,6 +44,7 @@ var files = {
 		"webgl_geometry_terrain_raycast",
 		"webgl_geometry_text",
 		"webgl_geometry_text_shapes",
+		"webgl_geometry_tube",
 		"webgl_hdr",
 		"webgl_helpers",
 		"webgl_interactive_buffergeometry",
