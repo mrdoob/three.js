@@ -347,6 +347,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
+					editor.addAnimation( mesh, geometry.animations );
 
 					editor.execute( new AddObjectCommand( mesh ) );
 
