@@ -1144,7 +1144,15 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( _currentRenderTarget !== null ) {
+		if ( _currentRenderTarget !== null && _currentRenderTarget.isWebGLRenderTargetCube ) {
+
+			var textureProperties = properties.get( _currentRenderTarget.texture );
+			_gl.framebufferTexture2D(
+				_gl.FRAMEBUFFER,
+				_gl.COLOR_ATTACHMENT0,
+				_gl.TEXTURE_CUBE_MAP_POSITIVE_X + _currentRenderTarget.activeCubeFace,
+				textureProperties.__webglTexture, _currentRenderTarget.activeMipMapLevel
+			);
 
 			_currentRenderTarget.beforeRender( _gl, properties );
 
