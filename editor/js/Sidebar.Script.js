@@ -23,7 +23,7 @@ Sidebar.Script = function ( editor ) {
 	var newScript = new UI.Button( strings.getKey( 'sidebar/script/new' ) );
 	newScript.onClick( function () {
 
-		var script = { name: '', source: 'function update( event ) {}' };
+		var script = { name: '', source: 'function update( event ) {}', enabled: true };
 		editor.execute( new AddScriptCommand( editor, editor.selected, script ) );
 
 	} );
@@ -76,6 +76,14 @@ Sidebar.Script = function ( editor ) {
 			for ( var i = 0; i < scripts.length; i ++ ) {
 
 				( function ( object, script ) {
+
+					var enabled = new UI.THREE.Boolean( script.enabled, '' );
+					enabled.onChange( function () {
+
+						editor.execute( new SetScriptValueCommand( editor.selected, script, 'enabled', this.getValue() ) );
+
+					} );
+					scriptsContainer.add( enabled );
 
 					var name = new UI.Input( script.name ).setWidth( '100px' ).setFontSize( '12px' );
 					name.onChange( function () {

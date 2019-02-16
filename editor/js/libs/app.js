@@ -79,6 +79,8 @@ var APP = {
 
 					var script = scripts[ i ];
 
+					if ( script.enabled !== true ) continue;
+
 					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
 
 					for ( var name in functions ) {
