@@ -229,7 +229,7 @@ THREE.Ocean.prototype.render = function () {
 
 };
 
-THREE.Ocean.prototype.generateSeedPhaseTexture = function() {
+THREE.Ocean.prototype.generateSeedPhaseTexture = function () {
 
 	// Setup the seed texture
 	this.pingPhase = true;
@@ -238,7 +238,7 @@ THREE.Ocean.prototype.generateSeedPhaseTexture = function() {
 
 		for ( var j = 0; j < this.resolution; j ++ ) {
 
-			phaseArray[ i * this.resolution * 4 + j * 4 ] =  Math.random() * 2.0 * Math.PI;
+			phaseArray[ i * this.resolution * 4 + j * 4 ] = Math.random() * 2.0 * Math.PI;
 			phaseArray[ i * this.resolution * 4 + j * 4 + 1 ] = 0.0;
 			phaseArray[ i * this.resolution * 4 + j * 4 + 2 ] = 0.0;
 			phaseArray[ i * this.resolution * 4 + j * 4 + 3 ] = 0.0;
@@ -302,7 +302,7 @@ THREE.Ocean.prototype.renderSpectrum = function () {
 
 };
 
-THREE.Ocean.prototype.renderSpectrumFFT = function() {
+THREE.Ocean.prototype.renderSpectrumFFT = function () {
 
 	// GPU FFT using Stockham formulation
 	var iterations = Math.log( this.resolution ) / Math.log( 2 ); // log2
