@@ -126,9 +126,9 @@ Sidebar.Script = function ( editor ) {
 							output = JSON.stringify( script );
 
 						}
-						
+
 						link.href = URL.createObjectURL( new Blob( [ output ], { type: 'application/json' } ) );
-						link.download = 'script.js';
+						link.download = ( script.name || 'script' ) + '.js';
 						link.click();
 						document.body.removeChild( link );
 
