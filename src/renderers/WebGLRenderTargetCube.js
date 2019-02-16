@@ -18,5 +18,17 @@ WebGLRenderTargetCube.prototype.constructor = WebGLRenderTargetCube;
 
 WebGLRenderTargetCube.prototype.isWebGLRenderTargetCube = true;
 
+WebGLRenderTargetCube.prototype.beforeRender = function ( gl, properties ) {
+
+	var textureProperties = properties.get( this.texture );
+	gl.framebufferTexture2D(
+		gl.FRAMEBUFFER,
+		gl.COLOR_ATTACHMENT0,
+		gl.TEXTURE_CUBE_MAP_POSITIVE_X + this.activeCubeFace,
+		textureProperties.__webglTexture, this.activeMipMapLevel
+	);
+
+
+};
 
 export { WebGLRenderTargetCube };

@@ -1144,6 +1144,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( _currentRenderTarget !== null ) {
+
+			_currentRenderTarget.beforeRender( _gl, properties );
+
+		}
+
 		//
 
 		background.render( currentRenderList, scene, camera, forceClear );
@@ -2528,7 +2534,6 @@ function WebGLRenderer( parameters ) {
 		}
 
 		var framebuffer = _framebuffer;
-		var isCube = false;
 
 		if ( renderTarget ) {
 
@@ -2537,7 +2542,6 @@ function WebGLRenderer( parameters ) {
 			if ( renderTarget.isWebGLRenderTargetCube ) {
 
 				framebuffer = __webglFramebuffer[ renderTarget.activeCubeFace ];
-				isCube = true;
 
 			} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
 
@@ -2571,13 +2575,6 @@ function WebGLRenderer( parameters ) {
 		state.viewport( _currentViewport );
 		state.scissor( _currentScissor );
 		state.setScissorTest( _currentScissorTest );
-
-		if ( isCube ) {
-
-			var textureProperties = properties.get( renderTarget.texture );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, renderTarget.activeMipMapLevel );
-
-		}
 
 	};
 

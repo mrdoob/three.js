@@ -86,6 +86,12 @@ WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prot
 
 		this.dispatchEvent( { type: 'dispose' } );
 
+	},
+
+	beforeRender: function ( gl, properties ) {
+
+		// by default do nothing
+
 	}
 
 } );
