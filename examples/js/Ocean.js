@@ -212,6 +212,8 @@ THREE.Ocean.prototype.generateMesh = function () {
 
 THREE.Ocean.prototype.render = function () {
 
+	var currentRenderTarget = this.renderer.getRenderTarget();
+
 	this.scene.overrideMaterial = null;
 
 	if ( this.changed )
@@ -222,6 +224,8 @@ THREE.Ocean.prototype.render = function () {
 	this.renderSpectrumFFT();
 	this.renderNormalMap();
 	this.scene.overrideMaterial = null;
+
+	this.renderer.setRenderTarget( currentRenderTarget );
 
 };
 
