@@ -70,9 +70,13 @@ function WebGLAttributes( gl ) {
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( attribute.dynamic === false ) {
+		if ( attribute.resized === true ) {
 
-			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
+			var usage = attribute.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+
+			gl.bufferData( bufferType, array, usage );
+
+			attribute.resized = false;
 
 		} else if ( updateRange.count === - 1 ) {
 

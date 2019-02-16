@@ -24,6 +24,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
+	this.resized = false;
 
 	this.version = 0;
 
@@ -53,6 +54,7 @@ Object.assign( BufferAttribute.prototype, {
 
 		}
 
+		this.resized = ( array.length !== this.array.length );
 		this.count = array !== undefined ? array.length / this.itemSize : 0;
 		this.array = array;
 
@@ -71,6 +73,7 @@ Object.assign( BufferAttribute.prototype, {
 	copy: function ( source ) {
 
 		this.name = source.name;
+		this.resized = ( source.array.length !== this.array.length );
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
 		this.count = source.count;
