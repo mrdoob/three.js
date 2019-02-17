@@ -206,12 +206,7 @@
 				fCube.add( meshMaterial, 'depthTest' );
 
 				//StereoEffect settings
-				THREE.gui.stereoEffect( gui, effect.options, {
-
-					getLanguageCode: THREE.getLanguageCode,
-					gui: gui,
-
-				} );
+				THREE.gui.stereoEffect( gui, effect.options, { getLanguageCode: THREE.getLanguageCode, } );
 
 				//
 
@@ -238,7 +233,7 @@
 
 			function render() {
 
-				if ( effect === undefined )
+				if ( typeof effect === 'undefined' )
 					renderer.render( scene, camera );
 				else effect.render( scene, camera );
 
