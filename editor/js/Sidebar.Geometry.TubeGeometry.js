@@ -100,6 +100,24 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 
 	container.add( closedRow );
 
+	// curveType
+
+	var curveTypeRow = new UI.Row();
+	var curveType = new UI.Select().setOptions( { centripetal: 'centripetal', chordal: 'chordal', catmullrom: 'catmullrom' } ).setValue( parameters.path.curveType ).onChange( update );
+
+	curveTypeRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tube_geometry/curvetype' ) ).setWidth( '90px' ), curveType );
+
+	container.add( curveTypeRow );
+
+	// tension
+
+	var tensionRow = new UI.Row();
+	var tension = new UI.Number( parameters.path.tension ).setStep( 0.01 ).onChange( update );
+
+	tensionRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tube_geometry/tension' ) ).setWidth( '90px' ), tension );
+
+	container.add( tensionRow );
+
 	//
 
 	function update() {
@@ -120,7 +138,7 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 		}
 
 		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
-			new THREE.CatmullRomCurve3( points, closed.getValue() ),
+			new THREE.CatmullRomCurve3( points, closed.getValue(), curveType.getValue(), tension.getValue() ),
 			tubularSegments.getValue(),
 			radius.getValue(),
 			radialSegments.getValue(),
