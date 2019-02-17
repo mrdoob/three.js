@@ -43,13 +43,32 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 	} );
 	innerContainer.add( button );
 
+	if ( editor.lastSelection === undefined ) editor.lastSelection = {};
+
 	var selections = new UI.Select().setOptions( {
 
 		'translate': 'translate',
 		'rotate': 'rotate',
 		'scale': 'scale'
 
-	} ).setWidth( '90px' ).setFontSize( '12px' ).setValue( 'translate' );
+	} ).setWidth( '90px' ).setFontSize( '12px' ).setValue( editor.lastSelection.selection || 'translate' ).onChange( function () {
+
+		if ( selections.getValue() == 'rotate' ) {
+
+			x.setUnit( '°' );
+			y.setUnit( '°' );
+			z.setUnit( '°' );
+
+		} else {
+
+			x.setUnit( '' );
+			y.setUnit( '' );
+			z.setUnit( '' );
+
+		}
+		storeValues();
+
+	} );
 	container.add( selections );
 
 	var container2 = new UI.Span().setDisplay( 'inline-block' ).setWidth( '160px' ).setMargin( '8px' );
@@ -59,21 +78,29 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 	container2.add( row );
 
 	row.add( new UI.Text( "X" ).setWidth( '30px' ) );
-	var x = new UI.Input( 1 ).setWidth( '120px' ).setFontSize( '12px' );
+	var x = new UI.Number( editor.lastSelection.x !== undefined ? editor.lastSelection.x : 1 ).setWidth( '120px' ).setFontSize( '12px' ).setStep( 1 );
 	row.add( x );
 
 	row.add( new UI.Text( "Y" ).setWidth( '30px' ) );
-	var y = new UI.Input( 1 ).setWidth( '120px' ).setFontSize( '12px' );
+	var y = new UI.Number( editor.lastSelection.y !== undefined ? editor.lastSelection.y : 1 ).setWidth( '120px' ).setFontSize( '12px' ).setStep( 1 );
 	row.add( y );
 
 	row.add( new UI.Text( "Z" ).setWidth( '30px' ) );
-	var z = new UI.Input( 1 ).setWidth( '120px' ).setFontSize( '12px' );
+	var z = new UI.Number( editor.lastSelection.z !== undefined ? editor.lastSelection.z : 1 ).setWidth( '120px' ).setFontSize( '12px' ).setStep( 1 );
 	row.add( z );
+
+	if ( selections.getValue() == 'rotate' ) {
+
+		x.setUnit( '°' );
+		y.setUnit( '°' );
+		z.setUnit( '°' );
+
+	}
 
 	var v = new THREE.Vector3();
 	function updateVector() {
 
-		v.set( parseInt( x.getValue() ), parseInt( y.getValue() ), parseInt( z.getValue() ) );
+		v.set( parseFloat( x.getValue() ), parseFloat( y.getValue() ), parseFloat( z.getValue() ) );
 		for ( var i = 0; i < 3; ++ i ) {
 
 			if ( isNaN( v.getComponent( i ) ) ) {
@@ -93,6 +120,7 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
 			var value = selections.getValue();
 			updateVector();
+			storeValues();
 			if ( value == 'translate' ) {
 
 				editor.execute( new TranslateGeometryCommand( editor.selected, v.x, v.y, v.z ) );
@@ -107,9 +135,21 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
 			}
 
+
 		}
 
 	} ) );
+
+	function storeValues() {
+
+		editor.lastSelection = {
+			selection: selections.getValue(),
+			x: x.getValue(),
+			y: y.getValue(),
+			z: z.getValue()
+		};
+
+	}
 
 	//
 

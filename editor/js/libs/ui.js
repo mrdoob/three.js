@@ -115,8 +115,8 @@ UI.Element.prototype = {
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
+	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+	'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
 
@@ -713,6 +713,7 @@ UI.Number.prototype.setRange = function ( min, max ) {
 UI.Number.prototype.setUnit = function ( unit ) {
 
 	this.unit = unit;
+	this.setValue( this.getValue() );
 
 	return this;
 
@@ -863,9 +864,9 @@ UI.Integer.prototype.setValue = function ( value ) {
 };
 
 UI.Integer.prototype.setStep = function ( step ) {
-	
-	this.step = parseInt( step ); 
-	
+
+	this.step = parseInt( step );
+
 	return this;
 
 };
