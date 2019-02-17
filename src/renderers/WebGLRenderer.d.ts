@@ -223,8 +223,9 @@ export class WebGLRenderer implements Renderer {
 
   /**
    * Sets the viewport to render from (x, y) to (x + width, y + height).
+   * (x, y) is the lower-left corner of the region.
    */
-  setViewport(x?: number, y?: number, width?: number, height?: number): void;
+  setViewport(x: Vector4 | number, y?: number, width?: number, height?: number): void;
 
   /**
    * Sets the scissor area from (x, y) to (x + width, y + height).

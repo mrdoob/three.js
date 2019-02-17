@@ -451,7 +451,16 @@ function WebGLRenderer( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewport.set( x, y, width, height );
+		if ( x.isVector4 ) {
+
+			_viewport.set( x.x, x.y, x.z, x.w );
+
+		} else {
+
+			_viewport.set( x, y, width, height );
+
+		}
+
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 	};

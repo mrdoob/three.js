@@ -468,8 +468,16 @@
 		The slot number can be found as a value of the uniform of the sampler.
 		</p>
 
-		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
-		<p>Sets the viewport to render from (x, y) to (x + width, y + height).</p>
+		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
+		[method:null setViewport]( [param:Vector4 vector] )</h3>
+
+		<p>
+		The x, y, width, and height parameters of the viewport.<br />
+		Optionally, a 4-component vector specifying the parameters of a viewport.<br /><br />
+
+		Sets the viewport to render from (x, y) to (x + width, y + height).<br />
+		(x, y) is the lower-left corner of the region.
+		</p>
 
 		<h2>Source</h2>
 
