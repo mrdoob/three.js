@@ -73,7 +73,7 @@ Object.assign( BufferAttribute.prototype, {
 	copy: function ( source ) {
 
 		this.name = source.name;
-		this.resized = ( source.array.length !== this.array.length );
+		this.resized = ( this.array === undefined || source.array.length !== this.array.length );
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
 		this.count = source.count;

@@ -59,7 +59,7 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	copy: function ( source ) {
 
-		this.resized = ( source.array.length !== this.array.length );
+		this.resized = ( this.array === undefined || source.array.length !== this.array.length );
 		this.array = new source.array.constructor( source.array );
 		this.count = source.count;
 		this.stride = source.stride;
