@@ -40,7 +40,7 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 	constructor: THREE.GlitchPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.uniforms[ 'seed' ].value = Math.random();//default seeding
@@ -77,11 +77,14 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		if ( this.renderToScreen ) {
 
+			renderer.setRenderTarget( null );
 			renderer.render( this.scene, this.camera );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+			renderer.setRenderTarget( writeBuffer );
+			if ( this.clear ) renderer.clear();
+			renderer.render( this.scene, this.camera );
 
 		}
 

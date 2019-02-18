@@ -338,7 +338,7 @@ THREE.GLTFLoader = ( function () {
 
 			case 'directional':
 				lightNode = new THREE.DirectionalLight( color );
-				lightNode.target.position.set( 0, 0, -1 );
+				lightNode.target.position.set( 0, 0, - 1 );
 				lightNode.add( lightNode.target );
 				break;
 
@@ -356,7 +356,7 @@ THREE.GLTFLoader = ( function () {
 				lightDef.spot.outerConeAngle = lightDef.spot.outerConeAngle !== undefined ? lightDef.spot.outerConeAngle : Math.PI / 4.0;
 				lightNode.angle = lightDef.spot.outerConeAngle;
 				lightNode.penumbra = 1.0 - lightDef.spot.innerConeAngle / lightDef.spot.outerConeAngle;
-				lightNode.target.position.set( 0, 0, -1 );
+				lightNode.target.position.set( 0, 0, - 1 );
 				lightNode.add( lightNode.target );
 				break;
 
@@ -364,6 +364,10 @@ THREE.GLTFLoader = ( function () {
 				throw new Error( 'THREE.GLTFLoader: Unexpected light type, "' + lightDef.type + '".' );
 
 		}
+
+		// Some lights (e.g. spot) default to a position other than the origin. Reset the position
+		// here, because node-level parsing will only override position if explicitly specified.
+		lightNode.position.set( 0, 0, 0 );
 
 		lightNode.decay = 2;
 
@@ -964,6 +968,7 @@ THREE.GLTFLoader = ( function () {
 					uniforms.refractionRatio.value = material.refractionRatio;
 
 					uniforms.maxMipLevel.value = renderer.properties.get( material.envMap ).__maxMipLevel;
+
 				}
 
 				uniforms.specular.value.copy( material.specular );
@@ -1197,6 +1202,7 @@ THREE.GLTFLoader = ( function () {
 	var ATTRIBUTES = {
 		POSITION: 'position',
 		NORMAL: 'normal',
+		TANGENT: 'tangent',
 		TEXCOORD_0: 'uv',
 		TEXCOORD_1: 'uv2',
 		COLOR_0: 'color',
@@ -1848,7 +1854,7 @@ THREE.GLTFLoader = ( function () {
 
 				case 'light':
 					dependency = this.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].loadLight( index );
-					break
+					break;
 
 				default:
 					throw new Error( 'Unknown type: ' + type );
@@ -2227,6 +2233,18 @@ THREE.GLTFLoader = ( function () {
 
 		return this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
 
+			switch ( mapName ) {
+
+				case 'aoMap':
+				case 'emissiveMap':
+				case 'metalnessMap':
+				case 'normalMap':
+				case 'roughnessMap':
+					texture.format = THREE.RGBFormat;
+					break;
+
+			}
+
 			if ( parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] ) {
 
 				var transform = mapDef.extensions !== undefined ? mapDef.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] : undefined;
@@ -2391,14 +2409,6 @@ THREE.GLTFLoader = ( function () {
 			}
 
 			if ( materialDef.name !== undefined ) material.name = materialDef.name;
-
-			// Normal map textures use OpenGL conventions:
-			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-			if ( material.normalScale ) {
-
-				material.normalScale.y = - material.normalScale.y;
-
-			}
 
 			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
 			if ( material.map ) material.map.encoding = THREE.sRGBEncoding;
@@ -2757,6 +2767,7 @@ THREE.GLTFLoader = ( function () {
 
 					var materials = isMultiMaterial ? mesh.material : [ mesh.material ];
 
+					var useVertexTangents = geometry.attributes.tangent !== undefined;
 					var useVertexColors = geometry.attributes.color !== undefined;
 					var useFlatShading = geometry.attributes.normal === undefined;
 					var useSkinning = mesh.isSkinnedMesh === true;
@@ -2809,12 +2820,13 @@ THREE.GLTFLoader = ( function () {
 						}
 
 						// Clone the material if it will be modified
-						if ( useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
+						if ( useVertexTangents || useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
 
 							var cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 
 							if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
 							if ( useSkinning ) cacheKey += 'skinning:';
+							if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
 							if ( useVertexColors ) cacheKey += 'vertex-colors:';
 							if ( useFlatShading ) cacheKey += 'flat-shading:';
 							if ( useMorphTargets ) cacheKey += 'morph-targets:';
@@ -2829,6 +2841,7 @@ THREE.GLTFLoader = ( function () {
 									: material.clone();
 
 								if ( useSkinning ) cachedMaterial.skinning = true;
+								if ( useVertexTangents ) cachedMaterial.vertexTangents = true;
 								if ( useVertexColors ) cachedMaterial.vertexColors = THREE.VertexColors;
 								if ( useFlatShading ) cachedMaterial.flatShading = true;
 								if ( useMorphTargets ) cachedMaterial.morphTargets = true;
@@ -3129,7 +3142,7 @@ THREE.GLTFLoader = ( function () {
 
 		var nodeDef = json.nodes[ nodeIndex ];
 
-		return ( function() {
+		return ( function () {
 
 			// .isBone isn't in glTF spec. See .markDefs
 			if ( nodeDef.isBone === true ) {

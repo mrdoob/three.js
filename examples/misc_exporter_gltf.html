@@ -182,7 +182,9 @@
 				// DirectLight
 				// ---------------------------------------------------------------------
 				light = new THREE.DirectionalLight( 0xffffff, 1 );
-				light.position.set( 1, 1, 0 );
+				light.target.position.set( 0, 0, -1 );
+				light.add( light.target );
+				light.lookAt( -1, -1, 0 );
 				light.name = 'DirectionalLight';
 				scene1.add( light );
 

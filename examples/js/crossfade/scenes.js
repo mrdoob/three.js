@@ -101,10 +101,18 @@ function Scene( type, numObjects, cameraZ, fov, rotationSpeed, clearColor ) {
 
 		renderer.setClearColor( this.clearColor );
 
-		if ( rtt )
-			renderer.render( this.scene, this.camera, this.fbo, true );
-		else
+		if ( rtt ) {
+
+			renderer.setRenderTarget( this.fbo );
+			renderer.clear();
 			renderer.render( this.scene, this.camera );
+
+		} else {
+
+			renderer.setRenderTarget( null );
+			renderer.render( this.scene, this.camera );
+
+		}
 
 	};
 

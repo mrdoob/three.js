@@ -32,6 +32,7 @@ NodeUtils.addShortcuts( PhongNodeMaterial.prototype, 'fragment', [
 	'ao',
 	'environment',
 	'environmentAlpha',
+	'mask',
 	'position'
 ] );
 

@@ -41,7 +41,7 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 	constructor: THREE.TexturePass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
@@ -52,7 +52,9 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		this.uniforms[ "tDiffuse" ].value = this.map;
 		this.material.transparent = ( this.opacity < 1.0 );
 
-		renderer.render( this.scene, this.camera, this.renderToScreen ? null : readBuffer, this.clear );
+		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
+		if ( this.clear ) renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		renderer.autoClear = oldAutoClear;
 	}

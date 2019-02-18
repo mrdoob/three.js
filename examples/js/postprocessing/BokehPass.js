@@ -82,7 +82,7 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 	constructor: THREE.BokehPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		this.quad2.material = this.materialBokeh;
 
@@ -97,7 +97,9 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		renderer.setClearColor( 0xffffff );
 		renderer.setClearAlpha( 1.0 );
-		renderer.render( this.scene, this.camera, this.renderTargetDepth, true );
+		renderer.setRenderTarget( this.renderTargetDepth );
+		renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// Render bokeh composite
 
@@ -107,11 +109,14 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		if ( this.renderToScreen ) {
 
+			renderer.setRenderTarget( null );
 			renderer.render( this.scene2, this.camera2 );
 
 		} else {
 
-			renderer.render( this.scene2, this.camera2, writeBuffer, this.clear );
+			renderer.setRenderTarget( writeBuffer );
+			renderer.clear();
+			renderer.render( this.scene2, this.camera2 );
 
 		}
 
@@ -119,7 +124,7 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 		renderer.setClearColor( this.oldClearColor );
 		renderer.setClearAlpha( this.oldClearAlpha );
 		renderer.autoClear = this.oldAutoClear;
-	
+
 	}
 
 } );

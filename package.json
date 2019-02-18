@@ -1,11 +1,12 @@
 {
   "name": "three",
-  "version": "0.100.0",
+  "version": "0.101.1",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
   "jsnext:main": "build/three.module.js",
   "module": "build/three.module.js",
+  "types": "src/Three.d.ts",
   "files": [
     "package.json",
     "LICENSE",
@@ -15,6 +16,7 @@
     "build/three.module.js",
     "src",
     "examples/js",
+    "examples/jsm",
     "examples/fonts"
   ],
   "directories": {
@@ -55,14 +57,14 @@
   "homepage": "https://threejs.org/",
   "devDependencies": {
     "concurrently": "^4.1.0",
-    "electron": "^4.0.0",
-    "eslint": "^5.11.1",
+    "electron": "^4.0.4",
+    "eslint": "^5.13.0",
     "eslint-config-mdcs": "^4.2.3",
-    "eslint-plugin-html": "^5.0.0",
+    "eslint-plugin-html": "^5.0.3",
     "google-closure-compiler": "20181210.0.0",
     "http-server": "^0.11.1",
-    "qunit": "^2.8.0",
-    "rollup": "^1.0.0"
+    "qunit": "^2.9.1",
+    "rollup": "^1.1.2"
   },
   "jspm": {
     "files": [
