@@ -29,7 +29,14 @@ var Config = function () {
 		'settings/shortcuts/rotate': 'e',
 		'settings/shortcuts/scale': 'r',
 		'settings/shortcuts/undo': 'z',
-		'settings/shortcuts/focus': 'f'
+		'settings/shortcuts/focus': 'f',
+
+		'settings/grid/visible': true,
+		'settings/grid/size': 30,
+		'settings/grid/divisions': 30,
+		'settings/grid/color1': '#444444',
+		'settings/grid/color2': '#888888',
+		'settings/grid/dividers': 6
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
