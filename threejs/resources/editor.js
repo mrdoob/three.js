@@ -60,6 +60,7 @@ function fixSourceLinks(url, source) {
   const imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
   const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
   const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
+  const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;
   const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;
   const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
   const prefix = getPrefix(url);
@@ -87,6 +88,7 @@ function fixSourceLinks(url, source) {
   source = source.replace(linkRE, makeLinkFQed);
   source = source.replace(imageSrcRE, makeLinkFQed);
   source = source.replace(urlPropRE, makeLinkFDedQuotes);
+  source = source.replace(loadFileRE, makeLinkFDedQuotes);
   source = source.replace(loaderLoadRE, makeLinkFDedQuotes);
   source = source.replace(loaderArrayLoadRE, makeArrayLinksFDed);
 
