@@ -980,17 +980,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		data.data = { attributes: {}, morphAttributes: {} };
+		data.data = { attributes: {} };
 
 		var index = this.index;
 
 		if ( index !== null ) {
 
-			var array = Array.prototype.slice.call( index.array );
-
 			data.data.index = {
 				type: index.array.constructor.name,
-				array: array
+				array: Array.prototype.slice.call( index.array )
 			};
 
 		}
@@ -1001,20 +999,23 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var attribute = attributes[ key ];
 
-			var array = Array.prototype.slice.call( attribute.array );
-
-			data.data.attributes[ key ] = {
+			var attributeData = {
 				itemSize: attribute.itemSize,
 				type: attribute.array.constructor.name,
-				array: array,
+				array: Array.prototype.slice.call( attribute.array ),
 				normalized: attribute.normalized
 			};
 
+			if ( attribute.name !== '' ) attributeData.name = attribute.name;
+
+			data.data.attributes[ key ] = attributeData;
+
 		}
 
-		var morphAttributes = this.morphAttributes;
+		var morphAttributes = {};
+		var hasMorphAttributes = false;
 
-		for ( var key in morphAttributes ) {
+		for ( var key in this.morphAttributes ) {
 
 			var attributeArray = this.morphAttributes[ key ];
 
@@ -1024,19 +1025,30 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				var attribute = attributeArray[ i ];
 
-				array.push( {
-					name: attribute.name,
+				var attributeData = {
 					itemSize: attribute.itemSize,
 					type: attribute.array.constructor.name,
 					array: Array.prototype.slice.call( attribute.array ),
 					normalized: attribute.normalized
-				} );
+				};
+
+				if ( attribute.name !== '' ) attributeData.name = attribute.name;
+
+				array.push( attributeData );
 
 			}
 
-			data.data.morphAttributes[ key ] = array;
+			if ( array.length > 0 ) {
+
+				morphAttributes[ key ] = array;
+
+				hasMorphAttributes = true;
+
+			}
 
 		}
+
+		if ( hasMorphAttributes ) data.data.morphAttributes = morphAttributes;
 
 		var groups = this.groups;
 

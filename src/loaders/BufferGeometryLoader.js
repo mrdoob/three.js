@@ -51,30 +51,36 @@ Object.assign( BufferGeometryLoader.prototype, {
 			var attribute = attributes[ key ];
 			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
 
-			geometry.addAttribute( key, new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized ) );
+			var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+			geometry.addAttribute( key, bufferAttribute );
 
 		}
 
 		var morphAttributes = json.data.morphAttributes;
 
-		for ( var key in morphAttributes ) {
+		if ( morphAttributes ) {
 
-			var attributeArray = morphAttributes[ key ];
+			for ( var key in morphAttributes ) {
 
-			var array = [];
+				var attributeArray = morphAttributes[ key ];
 
-			for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
+				var array = [];
 
-				var attribute = attributeArray[ i ];
-				var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+				for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
 
-				var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
-				if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
-				array.push( bufferAttribute );
+					var attribute = attributeArray[ i ];
+					var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+
+					var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+					array.push( bufferAttribute );
+
+				}
+
+				geometry.morphAttributes[ key ] = array;
 
 			}
-
-			geometry.morphAttributes[ key ] = array;
 
 		}
 

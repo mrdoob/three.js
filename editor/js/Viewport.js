@@ -527,11 +527,11 @@ var Viewport = function ( editor ) {
 
 		requestAnimationFrame( animate );
 
-		var mixer = editor.animationMixer;
+		var mixer = editor.mixer;
 
 		if ( mixer.stats.actions.inUse > 0 ) {
 
-			editor.animationMixer.update( ( time - prevTime ) / 1000 );
+			mixer.update( ( time - prevTime ) / 1000 );
 			render();
 
 		}

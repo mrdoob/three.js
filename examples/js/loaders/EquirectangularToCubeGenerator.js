@@ -162,15 +162,13 @@ THREE.EquirectangularToCubeGenerator = ( function () {
 
 			for ( var i = 0; i < 6; i ++ ) {
 
-				this.renderTarget.activeCubeFace = i;
-
 				var v = this.views[ i ];
 
 				camera.position.set( 0, 0, 0 );
 				camera.up.set( v.u[ 0 ], v.u[ 1 ], v.u[ 2 ] );
 				camera.lookAt( v.t[ 0 ], v.t[ 1 ], v.t[ 2 ] );
 
-				renderer.setRenderTarget( this.renderTarget );
+				renderer.setRenderTarget( this.renderTarget, i );
 				renderer.clear();
 				renderer.render( scene, camera );
 

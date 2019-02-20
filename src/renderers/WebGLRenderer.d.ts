@@ -321,13 +321,13 @@ export class WebGLRenderer implements Renderer {
 
   /**
    * Render a scene using a camera.
-   * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling 
+   * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling
    * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
-   * 
-   * By default render buffers are cleared before rendering but you can prevent this by setting the property 
-   * {@link WebGLRenderer#autoClear autoClear} to false. If you want to prevent only certain buffers being cleared 
-   * you can set either the {@link WebGLRenderer#autoClearColor autoClearColor}, 
-   * {@link WebGLRenderer#autoClearStencil autoClearStencil} or {@link WebGLRenderer#autoClearDepth autoClearDepth} 
+   *
+   * By default render buffers are cleared before rendering but you can prevent this by setting the property
+   * {@link WebGLRenderer#autoClear autoClear} to false. If you want to prevent only certain buffers being cleared
+   * you can set either the {@link WebGLRenderer#autoClearColor autoClearColor},
+   * {@link WebGLRenderer#autoClearStencil autoClearStencil} or {@link WebGLRenderer#autoClearDepth autoClearDepth}
    * properties to false. To forcibly clear one ore more buffers call {@link WebGLRenderer#clear .clear}.
    */
   render(
@@ -346,7 +346,7 @@ export class WebGLRenderer implements Renderer {
    * @deprecated Use {@link WebGLRenderer#getRenderTarget .getRenderTarget()} instead.
    */
   getCurrentRenderTarget(): RenderTarget;
-  setRenderTarget(renderTarget?: RenderTarget): void;
+  setRenderTarget(renderTarget?: RenderTarget, activeCubeFace?: number, activeMipMapLevel?: number): void;
   readRenderTargetPixels(
     renderTarget: RenderTarget,
     x: number,
