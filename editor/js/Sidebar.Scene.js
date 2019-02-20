@@ -238,7 +238,6 @@ Sidebar.Scene = function ( editor ) {
 
 	signals.sceneGraphChanged.add( function () {
 
-		context.clearRect( 0, 0, canvas.width, canvas.height );
 		if ( needScreenshot && editor.scene.userData.screenshot !== undefined ) {
 
 			var texture = editor.scene.userData.textures[ editor.scene.userData.screenshot ];
@@ -253,6 +252,7 @@ Sidebar.Scene = function ( editor ) {
 						// Don't draw if screenshot was deleted
 						if ( editor.scene.userData.screenshot !== undefined ) {
 
+							context.clearRect( 0, 0, canvas.width, canvas.height );
 							context.drawImage( img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height );
 							canvas.style.display = "";
 							console.log( "Took screenshot" );
