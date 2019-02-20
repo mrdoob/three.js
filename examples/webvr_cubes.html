@@ -57,8 +57,9 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
+				var sceneBackgroundColor = new THREE.Color( 0x505050 );
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x505050 );
+				scene.background = sceneBackgroundColor;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
@@ -134,7 +135,27 @@
 				window.addEventListener( 'vrdisplaypointerrestricted', onPointerRestricted, false );
 				window.addEventListener( 'vrdisplaypointerunrestricted', onPointerUnrestricted, false );
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				function onXRSessionStarted( session ) {
+
+					if ( scene.background === undefined ) return;
+
+					if ( session && session.environmentBlendMode === 'additive' ) {
+
+						scene.background = null;
+
+					}
+
+				}
+
+				function onXRSessionEnded( session ) {
+
+					if ( scene.background === undefined ) return;
+
+					scene.background = sceneBackgroundColor;
+
+				}
+
+				document.body.appendChild( WEBVR.createButton( renderer, {}, onXRSessionStarted, onXRSessionEnded ) );
 
 			}
 

@@ -59,8 +59,9 @@
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - ball shooter';
 				container.appendChild( info );
 
+				var sceneBackgroundColor = new THREE.Color( 0x505050 );
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x505050 );
+				scene.background = sceneBackgroundColor;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
@@ -104,7 +105,27 @@
 
 				//
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				function onXRSessionStarted( session ) {
+
+					if ( scene.background === undefined ) return;
+
+					if ( session && session.environmentBlendMode === 'additive' ) {
+
+						scene.background = null;
+
+					}
+
+				}
+
+				function onXRSessionEnded( session ) {
+
+					if ( scene.background === undefined ) return;
+
+					scene.background = sceneBackgroundColor;
+
+				}
+
+				document.body.appendChild( WEBVR.createButton( renderer, {}, onXRSessionStarted, onXRSessionEnded ) );
 
 				// controllers
 

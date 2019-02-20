@@ -61,8 +61,9 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - paint';
 				container.appendChild( info );
 
+				var sceneBackgroundColor = new THREE.Color( 0x505050 );
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x222222 );
+				scene.background = sceneBackgroundColor;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 
@@ -99,7 +100,8 @@
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
+				var grid = new THREE.GridHelper( 20, 40, 0x111111, 0x111111 );
+				scene.add( grid );
 
 				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
 
@@ -127,7 +129,31 @@
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				function onXRSessionStarted( session ) {
+
+					if ( scene.background === undefined ) return;
+
+					if ( session && session.environmentBlendMode === 'additive' ) {
+
+						scene.background = null;
+						floor.visible = false;
+						grid.visible = false;
+
+					}
+
+				}
+
+				function onXRSessionEnded( session ) {
+
+					if ( scene.background === undefined ) return;
+
+					scene.background = sceneBackgroundColor;
+					floor.visible = true;
+					grid.visible = true;
+
+				}
+
+				document.body.appendChild( WEBVR.createButton( renderer, {}, onXRSessionStarted, onXRSessionEnded ) );
 
 				// controllers
 

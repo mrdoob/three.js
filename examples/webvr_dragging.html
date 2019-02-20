@@ -53,8 +53,9 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - dragging';
 				container.appendChild( info );
 
+				var sceneBackgroundColor = new THREE.Color( 0x505050 );
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x808080 );
+				scene.background = sceneBackgroundColor;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
@@ -131,7 +132,29 @@
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				function onXRSessionStarted( session ) {
+
+					if ( scene.background === undefined ) return;
+
+					if ( session && session.environmentBlendMode === 'additive' ) {
+
+						scene.background = null;
+						floor.visible = false;
+
+					}
+
+				}
+
+				function onXRSessionEnded( session ) {
+
+					if ( scene.background === undefined ) return;
+
+					scene.background = sceneBackgroundColor;
+					floor.visible = true;
+
+				}
+
+				document.body.appendChild( WEBVR.createButton( renderer, {}, onXRSessionStarted, onXRSessionEnded ) );
 
 				// controllers
 
