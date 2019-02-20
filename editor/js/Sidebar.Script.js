@@ -77,7 +77,7 @@ Sidebar.Script = function ( editor ) {
 
 				( function ( object, script ) {
 
-					var enabled = new UI.THREE.Boolean( script.enabled, '' );
+					var enabled = new UI.THREE.Boolean( script.enabled !== false, '' );
 					enabled.onChange( function () {
 
 						editor.execute( new SetScriptValueCommand( editor.selected, script, 'enabled', this.getValue() ) );
