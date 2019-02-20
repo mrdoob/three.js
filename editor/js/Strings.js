@@ -41,6 +41,7 @@ var Strings = function ( config ) {
 			'menubar/add/sphere': 'Sphere',
 			'menubar/add/icosahedron': 'Icosahedron',
 			'menubar/add/torus': 'Torus',
+			'menubar/add/tube': 'Tube',
 			'menubar/add/torusknot': 'TorusKnot',
 			'menubar/add/lathe': 'Lathe',
 			'menubar/add/sprite': 'Sprite',
@@ -161,6 +162,15 @@ var Strings = function ( config ) {
 			'sidebar/geometry/torusKnot_geometry/radialsegments': 'Radial segments',
 			'sidebar/geometry/torusKnot_geometry/p': 'P',
 			'sidebar/geometry/torusKnot_geometry/q': 'Q',
+
+			'sidebar/geometry/tube_geometry/path': 'Path',
+			'sidebar/geometry/tube_geometry/radius': 'Radius',
+			'sidebar/geometry/tube_geometry/tube': 'Tube',
+			'sidebar/geometry/tube_geometry/tubularsegments': 'Tubular segments',
+			'sidebar/geometry/tube_geometry/radialsegments': 'Radial segments',
+			'sidebar/geometry/tube_geometry/closed': 'Closed',
+			'sidebar/geometry/tube_geometry/curvetype': 'Curve Type',
+			'sidebar/geometry/tube_geometry/tension': 'Tension',
 
 			'sidebar/material/new': 'New',
 			'sidebar/material/copy': 'Copy',
