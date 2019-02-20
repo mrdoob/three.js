@@ -27,17 +27,13 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 	var pointsList = new UI.Div();
 	points.add( pointsList );
 
-	( function () {
+	var parameterPoints = parameters.path.points;
+	for ( var i = 0; i < parameterPoints.length; i ++ ) {
 
-		var points = parameters.path.points;
-		for ( var i = 0; i < points.length; i ++ ) {
+		var point = parameterPoints[ i ];
+		pointsList.add( createPointRow( point.x, point.y, point.z ) );
 
-			var point = points[ i ];
-			pointsList.add( createPointRow( point.x, point.y, point.z ) );
-
-		}
-
-	} )();
+	}
 
 	var addPointButton = new UI.Button( '+' ).onClick( function () {
 
