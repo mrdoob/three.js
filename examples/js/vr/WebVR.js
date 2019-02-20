@@ -47,7 +47,7 @@ var WEBVR = {
 				session.addEventListener( 'end', onSessionEnded );
 
 				renderer.vr.setSession( session );
-				button.textContent = 'EXIT VR';
+				button.textContent = 'EXIT XR';
 
 				currentSession = session;
 
@@ -58,7 +58,7 @@ var WEBVR = {
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
 				renderer.vr.setSession( null );
-				button.textContent = 'ENTER VR';
+				button.textContent = 'ENTER XR';
 
 				currentSession = null;
 
@@ -71,8 +71,6 @@ var WEBVR = {
 			button.style.cursor = 'pointer';
 			button.style.left = 'calc(50% - 50px)';
 			button.style.width = '100px';
-
-			button.textContent = 'ENTER VR';
 
 			button.onmouseenter = function () { button.style.opacity = '1.0'; };
 			button.onmouseleave = function () { button.style.opacity = '0.5'; };
@@ -95,7 +93,7 @@ var WEBVR = {
 
 		}
 
-		function showVRNotFound() {
+		function showXRVRNotFound() {
 
 			button.style.display = '';
 
@@ -103,7 +101,7 @@ var WEBVR = {
 			button.style.left = 'calc(50% - 75px)';
 			button.style.width = '150px';
 
-			button.textContent = 'VR NOT FOUND';
+			button.textContent = 'xr' in navigator ? 'XR NOT FOUND' : 'VR NOT FOUND';
 
 			button.onmouseenter = null;
 			button.onmouseleave = null;
@@ -135,6 +133,7 @@ var WEBVR = {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
+			button.textContent = 'ENTER XR';
 
 			stylizeElement( button );
 
@@ -142,9 +141,9 @@ var WEBVR = {
 
 				device.supportsSession( { immersive: true, exclusive: true /* DEPRECATED */ } )
 					.then( function () { showEnterXR( device ); } )
-					.catch( showVRNotFound );
+					.catch( showXRVRNotFound );
 
-			} ).catch( showVRNotFound );
+			} ).catch( showXRVRNotFound );
 
 			return button;
 
@@ -152,6 +151,7 @@ var WEBVR = {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
+			button.textContent = 'ENTER VR';
 
 			stylizeElement( button );
 
@@ -163,7 +163,7 @@ var WEBVR = {
 
 			window.addEventListener( 'vrdisplaydisconnect', function ( event ) {
 
-				showVRNotFound();
+				showXRVRNotFound();
 
 			}, false );
 
@@ -188,19 +188,19 @@ var WEBVR = {
 
 					} else {
 
-						showVRNotFound();
+						showXRVRNotFound();
 
 					}
 
-				} ).catch( showVRNotFound );
+				} ).catch( showXRVRNotFound );
 
 			return button;
 
 		} else {
 
 			var message = document.createElement( 'a' );
-			message.href = 'https://webvr.info';
-			message.innerHTML = 'WEBVR NOT SUPPORTED';
+			message.href = 'https://github.com/immersive-web/webxr/blob/master/explainer.md';
+			message.innerHTML = 'WEBXR AND WEBVR NOT SUPPORTED';
 
 			message.style.left = 'calc(50% - 90px)';
 			message.style.width = '180px';
