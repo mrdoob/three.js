@@ -421,7 +421,8 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		}
 
-		renderer.setRenderTarget( renderTarget );
+		renderer.setRenderTarget( renderTarget !== undefined ? renderTarget : null );
+
 		if ( forceClear ) renderer.clear();
 
 		if ( this.enabled === false ) {
