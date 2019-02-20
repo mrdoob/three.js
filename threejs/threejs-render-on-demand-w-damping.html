@@ -40,6 +40,7 @@ function main() {
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
+  controls.rotateSpeed = 0.1;
   controls.target.set(0, 0, 0);
   controls.update();
 
@@ -84,7 +85,10 @@ function main() {
     return needResize;
   }
 
+  let requestId;
+
   function render() {
+    requestId = undefined;
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
@@ -97,7 +101,9 @@ function main() {
   render();
 
   controls.addEventListener('change', () => {
-    requestAnimationFrame(render);
+    if (!requestId) {
+      requestId = requestAnimationFrame(render);
+    }
   });
   window.addEventListener('resize', render);
 

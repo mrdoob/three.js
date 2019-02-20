@@ -109,7 +109,8 @@ by setting the `enableDamping` property to true and we can set how much inertia 
 
 ```js
 controls.enableDamping = true;
-controls.dampingFactor = 0.1;
+controls.dampingFactor = 0.05;
+controls.rotateSpeed = 0.1;
 ```
 
 With `enableDamping` on we need to call `control.update` in our render function so that the `OrbitControls` can
@@ -117,12 +118,30 @@ continue to give us new camera settings as they smooth out the movement. But, th
 directly from the `change` event because we'll end up in an infinite loop. The controls will send us a `change` event
 and call `render`, `render` will call `control.update`. `control.update` will send another `change` event.
 
-We can fix that by using `requestAnimationFrame` to call `render` like this.
+We can fix that by using `requestAnimationFrame` to call `render` but we need to make sure
+we only ask for a new frame of one has not already been requested which we can do like this.
 
 ```js
++let requestId;
+
+function render() {
++  requestId = undefined;
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+render();
+
 -controls.addEventListener('change', render);
 +controls.addEventListener('change', () => {
-+  requestAnimationFrame(render);
++  if (!requestId) {
++    requestId = requestAnimationFrame(render);
++  }
 +});
 ```
 
