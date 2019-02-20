@@ -138,8 +138,10 @@
 				fxaaPass = new THREE.ShaderPass( THREE.FXAAShader );
 				fxaaPass.renderToScreen = true;
 
-				fxaaPass.material.uniforms[ "resolution" ].value.x = 1 / window.innerWidth;
-				fxaaPass.material.uniforms[ "resolution" ].value.y = 1 / window.innerHeight;
+				var pixelRatio = renderer.getPixelRatio();
+
+				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
+				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
 
 				composer1 = new THREE.EffectComposer( renderer );
 				composer1.addPass( renderPass );
@@ -169,8 +171,10 @@
 				composer1.setSize( window.innerWidth, window.innerHeight );
 				composer2.setSize( window.innerWidth, window.innerHeight );
 
-				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / window.innerWidth;
-				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / window.innerHeight;
+				var pixelRatio = renderer.getPixelRatio();
+
+				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
+				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
 
 			}
 

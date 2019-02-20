@@ -507,16 +507,21 @@
 
 					// render scene into texture
 
-					renderer.render( scene, camera, postprocessing.rtTextureColor, true );
+					renderer.setRenderTarget( postprocessing.rtTextureColor );
+					renderer.clear();
+					renderer.render( scene, camera );
 
 					// render depth into texture
 
 					scene.overrideMaterial = materialDepth;
-					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+					renderer.setRenderTarget( postprocessing.rtTextureDepth );
+					renderer.clear();
+					renderer.render( scene, camera );
 					scene.overrideMaterial = null;
 
 					// render bokeh composite
 
+					renderer.setRenderTarget( null );
 					renderer.render( postprocessing.scene, postprocessing.camera );
 
 
@@ -524,6 +529,7 @@
 
 					scene.overrideMaterial = null;
 
+					renderer.setRenderTarget( null );
 					renderer.clear();
 					renderer.render( scene, camera );
 

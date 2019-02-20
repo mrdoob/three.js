@@ -44,6 +44,7 @@ THREE.FBXLoader = ( function () {
 			var path = ( self.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : self.path;
 
 			var loader = new THREE.FileLoader( this.manager );
+			loader.setPath( self.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			loader.load( url, function ( buffer ) {
@@ -2509,7 +2510,7 @@ THREE.FBXLoader = ( function () {
 
 										sceneGraph.traverse( function ( child ) {
 
-											if ( child.ID = rawModel.id ) {
+											if ( child.ID === rawModel.id ) {
 
 												node.transform = child.matrix;
 

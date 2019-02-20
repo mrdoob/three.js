@@ -386,7 +386,8 @@
 
 				update( time / 1000 );
 				stats.begin();
-				renderer.render( scene, camera, renderTarget );
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( scene, camera );
 				stats.end();
 
 			} );

@@ -48,18 +48,21 @@ THREE.HalftonePass = function ( width, height, params ) {
 
 	constructor: THREE.HalftonePass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
  		this.material.uniforms[ "tDiffuse" ].value = readBuffer.texture;
  		this.quad.material = this.material;
 
  		if ( this.renderToScreen ) {
 
+ 			renderer.setRenderTarget( null );
  			renderer.render( this.scene, this.camera );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+ 			renderer.setRenderTarget( writeBuffer );
+ 			if ( this.clear ) renderer.clear();
+			renderer.render( this.scene, this.camera );
 
 		}
 

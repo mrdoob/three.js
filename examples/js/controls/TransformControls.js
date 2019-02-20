@@ -113,7 +113,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.addEventListener( "touchend", onPointerUp, false );
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
-		domElement.addEventListener( "contextmenu", onContext, false );
 
 	}
 
@@ -128,7 +127,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.removeEventListener( "touchend", onPointerUp );
 		domElement.removeEventListener( "touchcancel", onPointerUp );
 		domElement.removeEventListener( "touchleave", onPointerUp );
-		domElement.removeEventListener( "contextmenu", onContext );
 
 	};
 
@@ -517,12 +515,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	// mouse / touch event handlers
 
-	function onContext( event ) {
-
-		event.preventDefault();
-
-	}
-
 	function onPointerHover( event ) {
 
 		if ( !scope.enabled ) return;
@@ -535,8 +527,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( !scope.enabled ) return;
 
-		event.preventDefault();
-
 		document.addEventListener( "mousemove", onPointerMove, false );
 
 		scope.pointerHover( getPointer( event ) );
@@ -548,8 +538,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( !scope.enabled ) return;
 
-		event.preventDefault();
-
 		scope.pointerMove( getPointer( event ) );
 
 	}
@@ -557,8 +545,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 	function onPointerUp( event ) {
 
 		if ( !scope.enabled ) return;
-
-		event.preventDefault(); // Prevent MouseEvent on mobile
 
 		document.removeEventListener( "mousemove", onPointerMove, false );
 

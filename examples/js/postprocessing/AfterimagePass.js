@@ -70,17 +70,25 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 		this.quadComp.material = this.shaderMaterial;
 
-		renderer.render( this.sceneComp, this.camera, this.textureComp );
-		renderer.render( this.scene, this.camera, this.textureOld );
-		
+		renderer.setRenderTarget( this.textureComp );
+		renderer.render( this.sceneComp, this.camera );
+
+		renderer.setRenderTarget( this.textureOld );
+		renderer.render( this.scene, this.camera );
+
 		if ( this.renderToScreen ) {
-			
+
+			renderer.setRenderTarget( null );
 			renderer.render( this.scene, this.camera );
-			
+
 		} else {
-			
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-			
+
+			renderer.setRenderTarget( writeBuffer );
+
+			if ( this.clear ) renderer.clear();
+
+			renderer.render( this.scene, this.camera );
+
 		}
 
 	}
