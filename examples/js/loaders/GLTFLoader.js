@@ -1585,7 +1585,7 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0, il = primitives.length; i < il; i ++ ) {
 
-			key += i + createPrimitiveKey( primitives[ i ].uuid );
+			key += i + createPrimitiveKey( primitives[ i ] );
 
 		}
 
