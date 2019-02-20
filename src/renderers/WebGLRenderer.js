@@ -232,6 +232,7 @@ function WebGLRenderer( parameters ) {
 	} catch ( error ) {
 
 		console.error( 'THREE.WebGLRenderer: ' + error.message );
+		throw error;
 
 	}
 
