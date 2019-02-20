@@ -92,6 +92,7 @@ var Editor = function () {
 	this.materials = {};
 	this.textures = {};
 	this.scripts = {};
+	this.animations = {};
 
 	this.selected = null;
 	this.helpers = {};
@@ -236,6 +237,12 @@ Editor.prototype = {
 	addTexture: function ( texture ) {
 
 		this.textures[ texture.uuid ] = texture;
+
+	},
+
+	addAnimation: function ( object, animations ) {
+
+		this.animations[ object.uuid ] = animations;
 
 	},
 
