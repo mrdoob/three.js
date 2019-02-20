@@ -69,7 +69,7 @@
         scene.add(gridHelper);
 
         const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-        
+
         const lonHelper = new THREE.Object3D();
         scene.add(lonHelper);
         const latHelper = new THREE.Object3D();
