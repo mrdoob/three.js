@@ -7,7 +7,7 @@
 
 var WEBVR = {
 
-	createButton: function ( renderer, options ) {
+	createButton: function ( renderer, options, onXRSessionStarted, onXRSessionEnded ) {
 
 		if ( options && options.frameOfReferenceType ) {
 
@@ -49,6 +49,8 @@ var WEBVR = {
 				renderer.vr.setSession( session );
 				button.textContent = 'EXIT VR';
 
+				if ( onXRSessionStarted ) onXRSessionStarted( session );
+
 				currentSession = session;
 
 			}
@@ -59,6 +61,8 @@ var WEBVR = {
 
 				renderer.vr.setSession( null );
 				button.textContent = 'ENTER VR';
+
+				if ( onXRSessionEnded ) onXRSessionEnded( currentSession );
 
 				currentSession = null;
 
