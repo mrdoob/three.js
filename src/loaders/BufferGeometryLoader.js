@@ -55,6 +55,29 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 		}
 
+		var morphAttributes = json.data.morphAttributes;
+
+		for ( var key in morphAttributes ) {
+
+			var attributeArray = morphAttributes[ key ];
+
+			var array = [];
+
+			for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
+
+				var attribute = attributeArray[ i ];
+				var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+
+				var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+				if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+				array.push( bufferAttribute );
+
+			}
+
+			geometry.morphAttributes[ key ] = array;
+
+		}
+
 		var groups = json.data.groups || json.data.drawcalls || json.data.offsets;
 
 		if ( groups !== undefined ) {
