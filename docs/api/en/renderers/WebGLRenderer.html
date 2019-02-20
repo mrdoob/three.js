@@ -440,9 +440,15 @@
 		This method sets the active rendertarget. If the parameter is omitted the canvas is set as the active rendertarget.
 		</p>
 
-		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
+		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
+		[method:null setScissor]( [param:Vector4 vector] )</h3>
+
 		<p>
-		Sets the scissor area from (x, y) to (x + width, y + height)
+		The x, y, width, and height parameters of the scissor region.<br />
+		Optionally, a 4-component vector specifying the parameters of the region.<br /><br />
+
+		Sets the scissor region from (x, y) to (x + width, y + height).<br />
+		(x, y) is the lower-left corner of the scissor region.
 		</p>
 
 		<h3>[method:null setScissorTest]( [param:Boolean boolean] )</h3>

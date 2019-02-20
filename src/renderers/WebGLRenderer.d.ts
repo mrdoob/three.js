@@ -235,7 +235,7 @@ export class WebGLRenderer implements Renderer {
   /**
    * Sets the scissor area from (x, y) to (x + width, y + height).
    */
-  setScissor(x: number, y: number, width: number, height: number): void;
+  setScissor(x: Vector4 | number, y?: number, width?: number, height?: number): void;
 
   /**
    * Returns true if scissor test is enabled; returns false otherwise.
