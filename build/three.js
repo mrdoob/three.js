@@ -4781,9 +4781,6 @@
 
 		WebGLRenderTarget.call( this, width, height, options );
 
-		this.activeCubeFace = 0; // PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5
-		this.activeMipMapLevel = 0;
-
 	}
 
 	WebGLRenderTargetCube.prototype = Object.create( WebGLRenderTarget.prototype );
@@ -12162,17 +12159,15 @@
 
 			}
 
-			data.data = { attributes: {}, morphAttributes: {} };
+			data.data = { attributes: {} };
 
 			var index = this.index;
 
 			if ( index !== null ) {
 
-				var array = Array.prototype.slice.call( index.array );
-
 				data.data.index = {
 					type: index.array.constructor.name,
-					array: array
+					array: Array.prototype.slice.call( index.array )
 				};
 
 			}
@@ -12183,20 +12178,23 @@
 
 				var attribute = attributes[ key ];
 
-				var array = Array.prototype.slice.call( attribute.array );
-
-				data.data.attributes[ key ] = {
+				var attributeData = {
 					itemSize: attribute.itemSize,
 					type: attribute.array.constructor.name,
-					array: array,
+					array: Array.prototype.slice.call( attribute.array ),
 					normalized: attribute.normalized
 				};
 
+				if ( attribute.name !== '' ) attributeData.name = attribute.name;
+
+				data.data.attributes[ key ] = attributeData;
+
 			}
 
-			var morphAttributes = this.morphAttributes;
+			var morphAttributes = {};
+			var hasMorphAttributes = false;
 
-			for ( var key in morphAttributes ) {
+			for ( var key in this.morphAttributes ) {
 
 				var attributeArray = this.morphAttributes[ key ];
 
@@ -12206,19 +12204,30 @@
 
 					var attribute = attributeArray[ i ];
 
-					array.push( {
-						name: attribute.name,
+					var attributeData = {
 						itemSize: attribute.itemSize,
 						type: attribute.array.constructor.name,
 						array: Array.prototype.slice.call( attribute.array ),
 						normalized: attribute.normalized
-					} );
+					};
+
+					if ( attribute.name !== '' ) attributeData.name = attribute.name;
+
+					array.push( attributeData );
 
 				}
 
-				data.data.morphAttributes[ key ] = array;
+				if ( array.length > 0 ) {
+
+					morphAttributes[ key ] = array;
+
+					hasMorphAttributes = true;
+
+				}
 
 			}
+
+			if ( hasMorphAttributes ) data.data.morphAttributes = morphAttributes;
 
 			var groups = this.groups;
 
@@ -22849,7 +22858,16 @@
 
 		this.setScissor = function ( x, y, width, height ) {
 
-			_scissor.set( x, y, width, height );
+			if ( x.isVector4 ) {
+
+				_scissor.set( x.x, x.y, x.z, x.w );
+
+			} else {
+
+				_scissor.set( x, y, width, height );
+
+			}
+
 			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 
 		};
@@ -24914,7 +24932,7 @@
 
 		};
 
-		this.setRenderTarget = function ( renderTarget ) {
+		this.setRenderTarget = function ( renderTarget, activeCubeFace, activeMipMapLevel ) {
 
 			_currentRenderTarget = renderTarget;
 
@@ -24933,7 +24951,7 @@
 
 				if ( renderTarget.isWebGLRenderTargetCube ) {
 
-					framebuffer = __webglFramebuffer[ renderTarget.activeCubeFace ];
+					framebuffer = __webglFramebuffer[ activeCubeFace || 0 ];
 					isCube = true;
 
 				} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
@@ -24972,7 +24990,7 @@
 			if ( isCube ) {
 
 				var textureProperties = properties.get( renderTarget.texture );
-				_gl.framebufferTexture2D( 36160, 36064, 34069 + renderTarget.activeCubeFace, textureProperties.__webglTexture, renderTarget.activeMipMapLevel );
+				_gl.framebufferTexture2D( 36160, 36064, 34069 + activeCubeFace || 0, textureProperties.__webglTexture, activeMipMapLevel || 0 );
 
 			}
 
@@ -28001,6 +28019,16 @@
 
 	TubeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
+
+	TubeBufferGeometry.prototype.toJSON = function () {
+
+		var data = BufferGeometry.prototype.toJSON.call( this );
+
+		data.path = this.parameters.path.toJSON();
+
+		return data;
+
+	};
 
 	/**
 	 * @author oosmoxiecode
@@ -37936,30 +37964,36 @@
 				var attribute = attributes[ key ];
 				var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
 
-				geometry.addAttribute( key, new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized ) );
+				var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+				if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+				geometry.addAttribute( key, bufferAttribute );
 
 			}
 
 			var morphAttributes = json.data.morphAttributes;
 
-			for ( var key in morphAttributes ) {
+			if ( morphAttributes ) {
 
-				var attributeArray = morphAttributes[ key ];
+				for ( var key in morphAttributes ) {
 
-				var array = [];
+					var attributeArray = morphAttributes[ key ];
 
-				for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
+					var array = [];
 
-					var attribute = attributeArray[ i ];
-					var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+					for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
 
-					var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
-					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
-					array.push( bufferAttribute );
+						var attribute = attributeArray[ i ];
+						var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+
+						var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+						if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+						array.push( bufferAttribute );
+
+					}
+
+					geometry.morphAttributes[ key ] = array;
 
 				}
-
-				geometry.morphAttributes[ key ] = array;
 
 			}
 
@@ -38305,6 +38339,21 @@
 								data.radialSegments,
 								data.p,
 								data.q
+							);
+
+							break;
+
+						case 'TubeGeometry':
+						case 'TubeBufferGeometry':
+
+							// This only works for built-in curves (e.g. CatmullRomCurve3).
+							// User defined curves or instances of CurvePath will not be deserialized.
+							geometry = new Geometries[ data.type ](
+								new Curves[ data.path.type ]().fromJSON( data.path ),
+								data.tubularSegments,
+								data.radius,
+								data.radialSegments,
+								data.closed
 							);
 
 							break;
@@ -40100,26 +40149,24 @@
 
 			renderTarget.texture.generateMipmaps = false;
 
-			renderTarget.activeCubeFace = 0;
-			renderer.setRenderTarget( renderTarget );
-
+			renderer.setRenderTarget( renderTarget, 0 );
 			renderer.render( scene, cameraPX );
 
-			renderTarget.activeCubeFace = 1;
+			renderer.setRenderTarget( renderTarget, 1 );
 			renderer.render( scene, cameraNX );
 
-			renderTarget.activeCubeFace = 2;
+			renderer.setRenderTarget( renderTarget, 2 );
 			renderer.render( scene, cameraPY );
 
-			renderTarget.activeCubeFace = 3;
+			renderer.setRenderTarget( renderTarget, 3 );
 			renderer.render( scene, cameraNY );
 
-			renderTarget.activeCubeFace = 4;
+			renderer.setRenderTarget( renderTarget, 4 );
 			renderer.render( scene, cameraPZ );
 
 			renderTarget.texture.generateMipmaps = generateMipmaps;
 
-			renderTarget.activeCubeFace = 5;
+			renderer.setRenderTarget( renderTarget, 5 );
 			renderer.render( scene, cameraNZ );
 
 			renderer.setRenderTarget( currentRenderTarget );
