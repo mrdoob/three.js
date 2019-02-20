@@ -228,9 +228,19 @@ export class WebGLRenderer implements Renderer {
   setViewport(x: Vector4 | number, y?: number, width?: number, height?: number): void;
 
   /**
+   * Copies the scissor area into target.
+   */
+  getScissor(target: Vector4): Vector4;
+
+  /**
    * Sets the scissor area from (x, y) to (x + width, y + height).
    */
   setScissor(x: number, y: number, width: number, height: number): void;
+
+  /**
+   * Returns true if scissor test is enabled; returns false otherwise.
+   */
+  getScissorTest(): boolean;
 
   /**
    * Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.

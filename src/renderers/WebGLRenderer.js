@@ -466,10 +466,22 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.getScissor = function ( target ) {
+
+		return target.copy( _scissor );
+
+	};
+
 	this.setScissor = function ( x, y, width, height ) {
 
 		_scissor.set( x, y, width, height );
 		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+
+	};
+
+	this.getScissorTest = function () {
+
+		return _scissorTest;
 
 	};
 
