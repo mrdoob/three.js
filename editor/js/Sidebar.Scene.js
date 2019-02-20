@@ -229,6 +229,7 @@ Sidebar.Scene = function ( editor ) {
 	var canvas = document.createElement( 'canvas' );
 	canvas.width = 90;
 	canvas.height = 90;
+	canvas.style.display = 'none';
 	canvas.style.marginLeft = '45px';
 	var context = canvas.getContext( '2d', { alpha: false } );
 	screenshotRow.dom.appendChild( canvas );
@@ -253,7 +254,8 @@ Sidebar.Scene = function ( editor ) {
 						if ( editor.scene.userData.screenshot !== undefined ) {
 
 							context.drawImage( img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height );
-							console.log( "screenshot" );
+							canvas.style.display = "";
+							console.log( "Took screenshot" );
 
 						}
 
@@ -271,7 +273,20 @@ Sidebar.Scene = function ( editor ) {
 	signals.editorCleared.add( function () {
 
 		context.clearRect( 0, 0, canvas.width, canvas.height );
-		delete editor.scene.userData.screenshot;
+		var screenshot = editor.scene.userData.screenshot;
+		if ( screenshot !== undefined ) {
+
+			var texture = editor.scene.userData.textures[ screenshot ];
+			if ( texture !== undefined ) {
+
+				delete editor.scene.userData.images[ texture.image ];
+
+			}
+			delete editor.scene.userData.textures[ screenshot ];
+			delete editor.scene.userData.screenshot;
+
+		}
+		canvas.style.display = 'none';
 		needScreenshot = true;
 
 	} );
