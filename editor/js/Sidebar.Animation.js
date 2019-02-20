@@ -5,7 +5,7 @@
 Sidebar.Animation = function ( editor ) {
 
 	var signals = editor.signals;
-	var mixer = editor.animationMixer;
+	var mixer = editor.mixer;
 
 	var actions = {};
 
