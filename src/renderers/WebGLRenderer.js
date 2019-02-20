@@ -948,6 +948,37 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+  this.compileAndUploadMaterials = function(scene, camera) {
+      currentRenderState = renderStates.get(scene, camera);
+      currentRenderState.init();
+
+      scene.traverse(function(object) {
+          if (object.isLight) {
+              currentRenderState.pushLight(object);
+
+              if (object.castShadow) {
+                  currentRenderState.pushShadow(object);
+              }
+          }
+      });
+
+      currentRenderState.setupLights(camera);
+
+      scene.traverse(function(object) {
+          if (object.material) {
+              if (Array.isArray(object.material)) {
+                  for (var i = 0; i < object.material.length; i++) {
+                      state.setMaterial(object.material[i]);
+                      setProgram(camera, scene.fog, object.material[i], object);
+                  }
+              } else {
+                  state.setMaterial(object.material);
+                  setProgram(camera, scene.fog, object.material, object);
+              }
+          }
+      });
+  };
+
 	// Compile
 
 	this.compile = function ( scene, camera ) {
