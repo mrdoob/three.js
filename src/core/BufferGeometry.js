@@ -980,7 +980,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		data.data = { attributes: {}, morphAttributes: {} };
+		data.data = { attributes: {} };
 
 		var index = this.index;
 
@@ -1012,9 +1012,10 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		var morphAttributes = this.morphAttributes;
+		var morphAttributes = {};
+		var hasMorphAttributes = false;
 
-		for ( var key in morphAttributes ) {
+		for ( var key in this.morphAttributes ) {
 
 			var attributeArray = this.morphAttributes[ key ];
 
@@ -1034,9 +1035,17 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			}
 
-			data.data.morphAttributes[ key ] = array;
+			if ( array.length > 0 ) {
+
+				morphAttributes[ key ] = array;
+
+				hasMorphAttributes = true;
+
+			}
 
 		}
+
+		if ( hasMorphAttributes ) data.data.morphAttributes = morphAttributes;
 
 		var groups = this.groups;
 
