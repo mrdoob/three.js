@@ -1003,12 +1003,16 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var array = Array.prototype.slice.call( attribute.array );
 
-			data.data.attributes[ key ] = {
+			var attributeData = {
 				itemSize: attribute.itemSize,
 				type: attribute.array.constructor.name,
 				array: array,
 				normalized: attribute.normalized
 			};
+
+			if ( attribute.name !== '' ) attributeData.name = attribute.name;
+
+			data.data.attributes[ key ] = attributeData;
 
 		}
 

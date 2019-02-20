@@ -51,7 +51,9 @@ Object.assign( BufferGeometryLoader.prototype, {
 			var attribute = attributes[ key ];
 			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
 
-			geometry.addAttribute( key, new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized ) );
+			var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+			geometry.addAttribute( key, bufferAttribute );
 
 		}
 
