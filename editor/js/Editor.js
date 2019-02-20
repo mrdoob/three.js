@@ -470,7 +470,7 @@ Editor.prototype = {
 		this.scripts = {};
 
 		this.animations = {};
-		this.animationMixer.stopAllAction();
+		this.mixer.stopAllAction();
 
 		this.deselect();
 
