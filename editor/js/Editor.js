@@ -92,7 +92,9 @@ var Editor = function () {
 	this.materials = {};
 	this.textures = {};
 	this.scripts = {};
+
 	this.animations = {};
+	this.animationMixer = new THREE.AnimationMixer( this.scene );
 
 	this.selected = null;
 	this.helpers = {};
@@ -466,6 +468,9 @@ Editor.prototype = {
 		this.materials = {};
 		this.textures = {};
 		this.scripts = {};
+		
+		this.animations = {};
+		this.animationMixer.stopAllAction();
 
 		this.deselect();
 

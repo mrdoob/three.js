@@ -217,6 +217,7 @@ var Loader = function ( editor ) {
 
 						var scene = result.scene;
 						scene.name = filename;
+
 						editor.addAnimation( scene, result.animations );
 						editor.execute( new AddObjectCommand( scene ) );
 
@@ -249,6 +250,7 @@ var Loader = function ( editor ) {
 
 						var scene = result.scene;
 						scene.name = filename;
+
 						editor.addAnimation( scene, result.animations );
 						editor.execute( new AddObjectCommand( scene ) );
 
@@ -347,8 +349,8 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
-					editor.addAnimation( mesh, geometry.animations );
 
+					editor.addAnimation( mesh, geometry.animations );
 					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
@@ -684,6 +686,7 @@ var Loader = function ( editor ) {
 					loader.parse( file.asArrayBuffer(), '', function ( result ) {
 
 						var scene = result.scene;
+
 						editor.addAnimation( scene, result.animations );
 						editor.execute( new AddObjectCommand( scene ) );
 
@@ -697,6 +700,7 @@ var Loader = function ( editor ) {
 					loader.parse( file.asText(), '', function ( result ) {
 
 						var scene = result.scene;
+
 						editor.addAnimation( scene, result.animations );
 						editor.execute( new AddObjectCommand( scene ) );
 

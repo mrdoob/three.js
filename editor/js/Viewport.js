@@ -519,6 +519,29 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	// animations
+
+	var prevTime = performance.now();
+
+	function animate( time ) {
+
+		requestAnimationFrame( animate );
+
+		var mixer = editor.animationMixer;
+
+		if ( mixer.stats.actions.inUse > 0 ) {
+
+			editor.animationMixer.update( ( time - prevTime ) / 1000 );
+			render();
+
+		}
+
+		prevTime = time;
+
+	}
+
+	requestAnimationFrame( animate );
+
 	//
 
 	function render() {

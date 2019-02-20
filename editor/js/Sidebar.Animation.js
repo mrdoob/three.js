@@ -5,34 +5,32 @@
 Sidebar.Animation = function ( editor ) {
 
 	var signals = editor.signals;
+	var mixer = editor.animationMixer;
 
-	var renderer = null;
-
-	signals.rendererChanged.add( function ( newRenderer ) {
-
-		renderer = newRenderer;
-
-	} );
+	var actions = {};
 
 	signals.objectSelected.add( function ( object ) {
 
-		var uuid = object !== null ? object.uuid : '';
-		var animations = editor.animations[ uuid ];
+		var animations = editor.animations[ object !== null ? object.uuid : '' ];
+
 		if ( animations !== undefined ) {
 
 			container.setDisplay( '' );
 
-			mixer = new THREE.AnimationMixer( object );
 			var options = {};
+			var firstAnimation;
+
 			for ( var animation of animations ) {
 
+				if ( firstAnimation === undefined ) firstAnimation = animation.name;
+
+				actions[ animation.name ] = mixer.clipAction( animation, object );
 				options[ animation.name ] = animation.name;
 
-				var action = mixer.clipAction( animation );
-				actions[ animation.name ] = action;
-
 			}
+
 			animationsSelect.setOptions( options );
+			animationsSelect.setValue( firstAnimation );
 
 		} else {
 
@@ -42,73 +40,44 @@ Sidebar.Animation = function ( editor ) {
 
 	} );
 
-	var mixer, currentAnimation, actions = {};
+	signals.objectRemoved.add( function ( object ) {
 
-	var clock = new THREE.Clock();
-	function updateAnimation() {
+		var animations = editor.animations[ object !== null ? object.uuid : '' ];
 
-		if ( mixer !== undefined && renderer !== null ) {
+		if ( animations !== undefined ) {
 
-			var dt = clock.getDelta();
-			mixer.update( dt * speed.getValue() );
-			if ( currentAnimation !== undefined && currentAnimation.isRunning() ) {
-
-				requestAnimationFrame( updateAnimation );
-				renderer.render( editor.scene, editor.camera );
-
-			} else {
-
-				currentAnimation = undefined;
-
-			}
+			mixer.uncacheRoot( object );
 
 		}
+
+	} );
+
+	function playAction() {
+
+		actions[ animationsSelect.getValue() ].play();
 
 	}
 
-	function playAnimation() {
+	function stopAction() {
 
-		currentAnimation = actions[ animationsSelect.getValue() ];
-		if ( currentAnimation !== undefined ) {
-
-			stopAnimations();
-			currentAnimation.play();
-			updateAnimation();
-
-		}
-
-	}
-
-	function stopAnimations() {
-
-		if ( mixer !== undefined ) {
-
-			mixer.stopAllAction();
-
-		}
+		actions[ animationsSelect.getValue() ].stop();
 
 	}
 
 	var container = new UI.Panel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Text( 'Animations' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Break() );
+	container.add( new UI.Break() );
 
-	var div = new UI.Div().setMarginLeft( '90px' );
+	var div = new UI.Div();
 	container.add( div );
 
-	div.add( new UI.Button( "Play" ).setFontSize( '12px' ).onClick( playAnimation ).setMarginRight( '10px' ) );
-
-	div.add( new UI.Button( "Stop" ).setFontSize( '12px' ).onClick( stopAnimations ), new UI.Break() );
-
-	var animationsSelect = new UI.Select().setFontSize( '12px' ).setMarginTop( '10px' ).setMarginBottom( '10px' );
-	div.add( animationsSelect, new UI.Break() );
-
-	var row = new UI.Row();
-	div.add( row );
-
-	var speed = new UI.Number( 1 ).setRange( 0.25, 2 ).setStep( 0.5 ).setMarginLeft( '10px' );
-	row.add( new UI.Text( "Speed" ), speed );
+	var animationsSelect = new UI.Select().setFontSize( '12px' );
+	div.add( animationsSelect );
+	div.add( new UI.Button( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
+	div.add( new UI.Button( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
 
 	return container;
 
