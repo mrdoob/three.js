@@ -189,7 +189,7 @@ THREE.GLTFLoader = ( function () {
 							break;
 
 						case EXTENSIONS.MSFT_TEXTURE_DDS:
-							extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension( json );
+							extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension();
 							break;
 
 						case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
@@ -1202,6 +1202,7 @@ THREE.GLTFLoader = ( function () {
 	var ATTRIBUTES = {
 		POSITION: 'position',
 		NORMAL: 'normal',
+		TANGENT: 'tangent',
 		TEXCOORD_0: 'uv',
 		TEXCOORD_1: 'uv2',
 		COLOR_0: 'color',
@@ -2232,6 +2233,18 @@ THREE.GLTFLoader = ( function () {
 
 		return this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
 
+			switch ( mapName ) {
+
+				case 'aoMap':
+				case 'emissiveMap':
+				case 'metalnessMap':
+				case 'normalMap':
+				case 'roughnessMap':
+					texture.format = THREE.RGBFormat;
+					break;
+
+			}
+
 			if ( parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] ) {
 
 				var transform = mapDef.extensions !== undefined ? mapDef.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] : undefined;
@@ -2396,14 +2409,6 @@ THREE.GLTFLoader = ( function () {
 			}
 
 			if ( materialDef.name !== undefined ) material.name = materialDef.name;
-
-			// Normal map textures use OpenGL conventions:
-			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-			if ( material.normalScale ) {
-
-				material.normalScale.y = - material.normalScale.y;
-
-			}
 
 			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
 			if ( material.map ) material.map.encoding = THREE.sRGBEncoding;
@@ -2762,6 +2767,7 @@ THREE.GLTFLoader = ( function () {
 
 					var materials = isMultiMaterial ? mesh.material : [ mesh.material ];
 
+					var useVertexTangents = geometry.attributes.tangent !== undefined;
 					var useVertexColors = geometry.attributes.color !== undefined;
 					var useFlatShading = geometry.attributes.normal === undefined;
 					var useSkinning = mesh.isSkinnedMesh === true;
@@ -2814,12 +2820,13 @@ THREE.GLTFLoader = ( function () {
 						}
 
 						// Clone the material if it will be modified
-						if ( useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
+						if ( useVertexTangents || useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
 
 							var cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 
 							if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
 							if ( useSkinning ) cacheKey += 'skinning:';
+							if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
 							if ( useVertexColors ) cacheKey += 'vertex-colors:';
 							if ( useFlatShading ) cacheKey += 'flat-shading:';
 							if ( useMorphTargets ) cacheKey += 'morph-targets:';
@@ -2834,6 +2841,7 @@ THREE.GLTFLoader = ( function () {
 									: material.clone();
 
 								if ( useSkinning ) cachedMaterial.skinning = true;
+								if ( useVertexTangents ) cachedMaterial.vertexTangents = true;
 								if ( useVertexColors ) cachedMaterial.vertexColors = THREE.VertexColors;
 								if ( useFlatShading ) cachedMaterial.flatShading = true;
 								if ( useMorphTargets ) cachedMaterial.morphTargets = true;

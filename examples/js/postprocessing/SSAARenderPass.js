@@ -120,15 +120,20 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			this.copyUniforms[ "opacity" ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
-			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
+			renderer.setRenderTarget( this.sampleRenderTarget );
+			renderer.clear();
+			renderer.render( this.scene, this.camera );
+
+			renderer.setRenderTarget( this.renderToScreen ? null : writeBuffer );
 
 			if ( i === 0 ) {
 
 				renderer.setClearColor( 0x000000, 0.0 );
+				renderer.clear();
 
 			}
 
-			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, ( i === 0 ) );
+			renderer.render( this.scene2, this.camera2 );
 
 		}
 

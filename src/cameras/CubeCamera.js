@@ -65,25 +65,25 @@ function CubeCamera( near, far, cubeResolution, options ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
-		renderTarget.activeCubeFace = 0;
-		renderer.render( scene, cameraPX, renderTarget );
+		renderer.setRenderTarget( renderTarget, 0 );
+		renderer.render( scene, cameraPX );
 
-		renderTarget.activeCubeFace = 1;
-		renderer.render( scene, cameraNX, renderTarget );
+		renderer.setRenderTarget( renderTarget, 1 );
+		renderer.render( scene, cameraNX );
 
-		renderTarget.activeCubeFace = 2;
-		renderer.render( scene, cameraPY, renderTarget );
+		renderer.setRenderTarget( renderTarget, 2 );
+		renderer.render( scene, cameraPY );
 
-		renderTarget.activeCubeFace = 3;
-		renderer.render( scene, cameraNY, renderTarget );
+		renderer.setRenderTarget( renderTarget, 3 );
+		renderer.render( scene, cameraNY );
 
-		renderTarget.activeCubeFace = 4;
-		renderer.render( scene, cameraPZ, renderTarget );
+		renderer.setRenderTarget( renderTarget, 4 );
+		renderer.render( scene, cameraPZ );
 
 		renderTarget.texture.generateMipmaps = generateMipmaps;
 
-		renderTarget.activeCubeFace = 5;
-		renderer.render( scene, cameraNZ, renderTarget );
+		renderer.setRenderTarget( renderTarget, 5 );
+		renderer.render( scene, cameraNZ );
 
 		renderer.setRenderTarget( currentRenderTarget );
 

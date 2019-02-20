@@ -1,4 +1,4 @@
-function Transition ( sceneA, sceneB ) {
+function Transition( sceneA, sceneB ) {
 
 	this.scene = new THREE.Scene();
 
@@ -157,7 +157,9 @@ function Transition ( sceneA, sceneB ) {
 
 			this.sceneA.render( delta, true );
 			this.sceneB.render( delta, true );
-			renderer.render( this.scene, this.cameraOrtho, null, true );
+			renderer.setRenderTarget( null );
+			renderer.clear();
+			renderer.render( this.scene, this.cameraOrtho );
 
 		}
 
