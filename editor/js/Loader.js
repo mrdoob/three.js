@@ -34,7 +34,7 @@ var Loader = function ( editor ) {
 
 			for ( var i = 0; i < files.length; i ++ ) {
 
-				scope.loadFile( files[ i ], manager ) ;
+				scope.loadFile( files[ i ], manager );
 
 			}
 
@@ -150,7 +150,7 @@ var Loader = function ( editor ) {
 					stream.offset = 0;
 
 					var loader = new THREE.CTMLoader();
-					loader.createModel( new CTM.File( stream ), function( geometry ) {
+					loader.createModel( new CTM.File( stream ), function ( geometry ) {
 
 						geometry.sourceType = "ctm";
 						geometry.sourceFile = file.name;
@@ -215,8 +215,11 @@ var Loader = function ( editor ) {
 					loader.setDRACOLoader( new THREE.DRACOLoader() );
 					loader.parse( contents, '', function ( result ) {
 
-						result.scene.name = filename;
-						editor.execute( new AddObjectCommand( result.scene ) );
+						var scene = result.scene;
+						scene.name = filename;
+
+						editor.addAnimation( scene, result.animations );
+						editor.execute( new AddObjectCommand( scene ) );
 
 					} );
 
@@ -245,8 +248,11 @@ var Loader = function ( editor ) {
 
 					loader.parse( contents, '', function ( result ) {
 
-						result.scene.name = filename;
-						editor.execute( new AddObjectCommand( result.scene ) );
+						var scene = result.scene;
+						scene.name = filename;
+
+						editor.addAnimation( scene, result.animations );
+						editor.execute( new AddObjectCommand( scene ) );
 
 					} );
 
@@ -344,6 +350,7 @@ var Loader = function ( editor ) {
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
 
+					editor.addAnimation( mesh, geometry.animations );
 					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
@@ -450,7 +457,7 @@ var Loader = function ( editor ) {
 
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.1 );
-					group.scale.y *= -1;
+					group.scale.y *= - 1;
 
 					for ( var i = 0; i < paths.length; i ++ ) {
 
@@ -678,7 +685,10 @@ var Loader = function ( editor ) {
 					var loader = new THREE.GLTFLoader();
 					loader.parse( file.asArrayBuffer(), '', function ( result ) {
 
-						editor.execute( new AddObjectCommand( result.scene ) );
+						var scene = result.scene;
+
+						editor.addAnimation( scene, result.animations );
+						editor.execute( new AddObjectCommand( scene ) );
 
 					} );
 
@@ -689,7 +699,10 @@ var Loader = function ( editor ) {
 					var loader = new THREE.GLTFLoader( manager );
 					loader.parse( file.asText(), '', function ( result ) {
 
-						editor.execute( new AddObjectCommand( result.scene ) );
+						var scene = result.scene;
+
+						editor.addAnimation( scene, result.animations );
+						editor.execute( new AddObjectCommand( scene ) );
 
 					} );
 

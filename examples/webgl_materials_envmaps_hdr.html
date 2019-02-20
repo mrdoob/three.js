@@ -152,6 +152,7 @@
 					.load( rgbmUrls, function () {
 
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+						rgbmCubeMap.format = THREE.RGBAFormat;
 
 						var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
 						pmremGenerator.update( renderer );
@@ -160,6 +161,9 @@
 						pmremCubeUVPacker.update( renderer );
 
 						rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+						rgbmCubeMap.magFilter = THREE.LinearFilter;
+						rgbmCubeMap.needsUpdate = true;
 
 						pmremGenerator.dispose();
 						pmremCubeUVPacker.dispose();

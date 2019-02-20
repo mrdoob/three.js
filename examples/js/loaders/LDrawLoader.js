@@ -66,13 +66,13 @@ THREE.LDrawLoader = ( function () {
 
 		},
 
-		getRemainingString: function() {
+		getRemainingString: function () {
 
 			return this.line.substring( this.currentCharIndex, this.lineLength );
 
 		},
 
-		isAtTheEnd: function() {
+		isAtTheEnd: function () {
 
 			return this.currentCharIndex >= this.lineLength;
 
@@ -86,21 +86,27 @@ THREE.LDrawLoader = ( function () {
 
 		getLineNumberString: function () {
 
-			return this.lineNumber >= 0? " at line " + this.lineNumber: "";
+			return this.lineNumber >= 0 ? " at line " + this.lineNumber : "";
 
 		}
 
 
 	};
 
-	function sortByMaterial ( a, b ) {
+	function sortByMaterial( a, b ) {
 
 		if ( a.colourCode === b.colourCode ) {
+
 			return 0;
+
 		}
+
 		if ( a.colourCode < b.colourCode ) {
-			return -1;
+
+			return - 1;
+
 		}
+
 		return 1;
 
 	}
@@ -149,14 +155,14 @@ THREE.LDrawLoader = ( function () {
 				index0 = iElem * elementSize;
 				numGroupVerts = elementSize;
 
-			}
-			else {
+			} else {
 
 				numGroupVerts += elementSize;
 
 			}
 
 		}
+
 		if ( numGroupVerts > 0 ) {
 
 			bufferGeometry.addGroup( index0, Infinity, materials.length - 1 );
@@ -166,12 +172,12 @@ THREE.LDrawLoader = ( function () {
 		bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 		var object3d = null;
+
 		if ( elementSize === 2 ) {
 
 			object3d = new THREE.LineSegments( bufferGeometry, materials );
 
-		}
-		else if ( elementSize === 3 ) {
+		} else if ( elementSize === 3 ) {
 
 			bufferGeometry.computeVertexNormals();
 
@@ -259,7 +265,7 @@ THREE.LDrawLoader = ( function () {
 
 			var fileLoader = new THREE.FileLoader( this.manager );
 			fileLoader.setPath( this.path );
-			fileLoader.load( url, function( text ) {
+			fileLoader.load( url, function ( text ) {
 
 				processObject( text, onLoad );
 
@@ -308,10 +314,10 @@ THREE.LDrawLoader = ( function () {
 							finalizeObject();
 
 						}
+
 					}
 
-				}
-				else {
+				} else {
 
 					// No subobjects, finish object
 					finalizeObject();
@@ -349,7 +355,7 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				function loadSubobject ( subobject, sync ) {
+				function loadSubobject( subobject, sync ) {
 
 					parseScope.mainColourCode = subobject.material.userData.code;
 					parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
@@ -416,8 +422,7 @@ THREE.LDrawLoader = ( function () {
 								// Try absolute path
 								newLocationState = LDrawLoader.FILE_LOCATION_NOT_FOUND;
 
-							}
-							else {
+							} else {
 
 								// Next attempt is lower case
 								subobject.fileName = subobject.fileName.toLowerCase();
@@ -442,8 +447,7 @@ THREE.LDrawLoader = ( function () {
 								scope.removeScopeLevel();
 								onProcessed( objGroup );
 
-							}
-							else {
+							} else {
 
 								// Load next subobject
 								loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
@@ -485,8 +489,7 @@ THREE.LDrawLoader = ( function () {
 
 						loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
 
-					}
-					else {
+					} else {
 
 						finalizeObject();
 
@@ -494,7 +497,7 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				function addSubobject ( subobject, subobjectGroup ) {
+				function addSubobject( subobject, subobjectGroup ) {
 
 					if ( scope.separateObjects ) {
 
@@ -546,7 +549,7 @@ THREE.LDrawLoader = ( function () {
 
 		},
 
-		setFileMap: function( fileMap ) {
+		setFileMap: function ( fileMap ) {
 
 			this.fileMap = fileMap;
 
@@ -601,7 +604,7 @@ THREE.LDrawLoader = ( function () {
 
 		},
 
-		removeScopeLevel: function() {
+		removeScopeLevel: function () {
 
 			this.parseScopesStack.pop();
 
@@ -641,7 +644,7 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			for ( var i = this.parseScopesStack.length - 1; i >= 0; i-- ) {
+			for ( var i = this.parseScopesStack.length - 1; i >= 0; i -- ) {
 
 				var material = this.parseScopesStack[ i ].lib[ colourCode ];
 
@@ -736,9 +739,10 @@ THREE.LDrawLoader = ( function () {
 
 							colour = '#' + colour.substring( 2 );
 
-						}
-						else if ( ! colour.startsWith( '#' ) ) {
+						} else if ( ! colour.startsWith( '#' ) ) {
+
 							throw 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + ".";
+
 						}
 						break;
 
@@ -749,8 +753,7 @@ THREE.LDrawLoader = ( function () {
 
 							edgeColour = '#' + edgeColour.substring( 2 );
 
-						}
-						else if ( ! edgeColour.startsWith( '#' ) ) {
+						} else if ( ! edgeColour.startsWith( '#' ) ) {
 
 							// Try to see if edge colour is a colour code
 							edgeMaterial = this.getMaterial( edgeColour );
@@ -849,13 +852,13 @@ THREE.LDrawLoader = ( function () {
 						// Default plastic material with shiny specular
 						hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.12 );
 
-					}
-					else {
+					} else {
 
 						// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
 						hsl.h = ( hsl.h + 0.5 ) % 1;
 						hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
 						shininess = 10;
+
 					}
 
 					specular.setHSL( hsl.h, hsl.s, hsl.l );
@@ -891,6 +894,7 @@ THREE.LDrawLoader = ( function () {
 				default:
 					// Should not happen
 					break;
+
 			}
 
 			// BFC (Back Face Culling) LDraw language meta extension is not implemented, so set all materials double-sided:
@@ -902,15 +906,19 @@ THREE.LDrawLoader = ( function () {
 			material.userData.canHaveEnvMap = canHaveEnvMap;
 
 			if ( luminance !== 0 ) {
+
 				material.emissive.set( material.color ).multiplyScalar( luminance );
+
 			}
 
 			if ( ! edgeMaterial ) {
+
 				// This is the material used for edges
 				edgeMaterial = new THREE.LineBasicMaterial( { color: edgeColour } );
 				edgeMaterial.userData.code = code;
 				edgeMaterial.name = name + " - Edge";
 				edgeMaterial.userData.canHaveEnvMap = false;
+
 			}
 
 			material.userData.code = code;
@@ -948,8 +956,7 @@ THREE.LDrawLoader = ( function () {
 				triangles = [];
 				lineSegments = [];
 
-			}
-			else {
+			} else {
 
 				if ( this.currentGroupObject === null ) {
 
@@ -1014,7 +1021,7 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			function parseVector ( lp ) {
+			function parseVector( lp ) {
 
 				var v = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
 
@@ -1028,24 +1035,10 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			function findSubobject( fileName ) {
-
-				for ( var i = 0, n = subobjects.length; i < n; i ++ ) {
-
-					if ( subobjects[ i ].fileName === fileName ) {
-						return subobjects[ i ];
-					}
-
-					return null;
-
-				}
-
-			}
-
 			// Parse all line commands
 			for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
-				line = lines[ lineIndex ];
+				var line = lines[ lineIndex ];
 
 				if ( line.length === 0 ) continue;
 
@@ -1060,8 +1053,7 @@ THREE.LDrawLoader = ( function () {
 						currentEmbeddedFileName = line.substring( 7 );
 						currentEmbeddedText = '';
 
-					}
-					else {
+					} else {
 
 						currentEmbeddedText += line + '\n';
 
@@ -1076,8 +1068,10 @@ THREE.LDrawLoader = ( function () {
 				lp.seekNonSpace();
 
 				if ( lp.isAtTheEnd() ) {
+
 					// Empty line
 					continue;
+
 				}
 
 				// Parse the line type
@@ -1102,10 +1096,9 @@ THREE.LDrawLoader = ( function () {
 
 										this.addMaterial( material );
 
-									}
-									else {
+									}	else {
 
-										console.warn( 'LDrawLoader: Error parsing material' + lineParser.getLineNumberString() );
+										console.warn( 'LDrawLoader: Error parsing material' + lp.getLineNumberString() );
 
 									}
 									break;
@@ -1117,22 +1110,22 @@ THREE.LDrawLoader = ( function () {
 
 								case '!KEYWORDS':
 
-										var newKeywords = lp.getRemainingString().split( ',' );
-										if ( newKeywords.length > 0 ) {
+									var newKeywords = lp.getRemainingString().split( ',' );
+									if ( newKeywords.length > 0 ) {
 
-											if ( ! keywords ) {
+										if ( ! keywords ) {
 
-												keywords = [];
-
-											}
-
-											newKeywords.forEach( function( keyword ) {
-
-												keywords.push( keyword.trim() );
-
-											} );
+											keywords = [];
 
 										}
+
+										newKeywords.forEach( function ( keyword ) {
+
+											keywords.push( keyword.trim() );
+
+										} );
+
+									}
 									break;
 
 								case 'FILE':
@@ -1190,16 +1183,14 @@ THREE.LDrawLoader = ( function () {
 							// Found the subobject path in the preloaded file path map
 							fileName = scope.fileMap[ fileName ];
 
-						}
-						else {
+						}	else {
 
 							// Standardized subfolders
 							if ( fileName.startsWith( 's/' ) ) {
 
 								fileName = 'parts/' + fileName;
 
-							}
-							else if ( fileName.startsWith( '48/' ) ) {
+							} else if ( fileName.startsWith( '48/' ) ) {
 
 								fileName = 'p/' + fileName;
 
@@ -1316,8 +1307,7 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-			}
-			else {
+			} else {
 
 				groupObject = this.currentGroupObject;
 
