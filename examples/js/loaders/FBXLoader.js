@@ -2510,7 +2510,7 @@ THREE.FBXLoader = ( function () {
 
 										sceneGraph.traverse( function ( child ) {
 
-											if ( child.ID = rawModel.id ) {
+											if ( child.ID === rawModel.id ) {
 
 												node.transform = child.matrix;
 
