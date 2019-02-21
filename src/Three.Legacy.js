@@ -73,6 +73,7 @@ import { Skeleton } from './objects/Skeleton.js';
 import { SkinnedMesh } from './objects/SkinnedMesh.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
+import { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { ImageUtils } from './extras/ImageUtils.js';
@@ -1569,6 +1570,27 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 		set: function () {
 
 			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderSingleSided has been removed. Set Material.shadowSide instead.' );
+
+		}
+	}
+
+} );
+
+//
+
+Object.defineProperties( WebGLRenderTargetCube.prototype, {
+
+	activeCubeFace: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebGLRenderTargetCube: .activeCubeFace has been removed. It is now the second parameter of WebGLRenderer.setRenderTarget().' );
+
+		}
+	},
+	activeMipMapLevel: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebGLRenderTargetCube: .activeMipMapLevel has been removed. It is now the third parameter of WebGLRenderer.setRenderTarget().' );
 
 		}
 	}
