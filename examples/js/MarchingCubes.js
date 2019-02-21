@@ -47,7 +47,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		this.field = new Float32Array( this.size3 );
 		this.normal_cache = new Float32Array( this.size3 * 3 );
-		this.palette = new Float32Array( this.size3 * 4 );
+		this.palette = new Float32Array( this.size3 * 3 );
 
 		// immediate render mode simulator
 
@@ -86,7 +86,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 	}
 
-	function VIntX( q, offset, isol, x, y, z, valp1, valp2, c_valp1, c_valp2 ) {
+	function VIntX( q, offset, isol, x, y, z, valp1, valp2, c_offset1, c_offset2 ) {
 
 		var mu = ( isol - valp1 ) / ( valp2 - valp1 ),
 			nc = scope.normal_cache;
@@ -99,13 +99,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		nlist[ offset + 1 ] = lerp( nc[ q + 1 ], nc[ q + 4 ], mu );
 		nlist[ offset + 2 ] = lerp( nc[ q + 2 ], nc[ q + 5 ], mu );
 
-		clist[ offset + 0 ] = lerp( c_valp1[ 0 ], c_valp2[ 0 ], mu );
-		clist[ offset + 1 ] = lerp( c_valp1[ 1 ], c_valp2[ 1 ], mu );
-		clist[ offset + 2 ] = lerp( c_valp1[ 2 ], c_valp2[ 2 ], mu );
+		clist[ offset + 0 ] = lerp( scope.palette[ c_offset1 * 3 + 0 ], scope.palette[ c_offset2 * 3 + 0 ], mu );
+		clist[ offset + 1 ] = lerp( scope.palette[ c_offset1 * 3 + 1 ], scope.palette[ c_offset2 * 3 + 1 ], mu );
+		clist[ offset + 2 ] = lerp( scope.palette[ c_offset1 * 3 + 2 ], scope.palette[ c_offset2 * 3 + 2 ], mu );
 
 	}
 
-	function VIntY( q, offset, isol, x, y, z, valp1, valp2, c_valp1, c_valp2 ) {
+	function VIntY( q, offset, isol, x, y, z, valp1, valp2, c_offset1, c_offset2 ) {
 
 		var mu = ( isol - valp1 ) / ( valp2 - valp1 ),
 			nc = scope.normal_cache;
@@ -120,13 +120,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		nlist[ offset + 1 ] = lerp( nc[ q + 1 ], nc[ q2 + 1 ], mu );
 		nlist[ offset + 2 ] = lerp( nc[ q + 2 ], nc[ q2 + 2 ], mu );
 
-		clist[ offset + 0 ] = lerp( c_valp1[ 0 ], c_valp2[ 0 ], mu );
-		clist[ offset + 1 ] = lerp( c_valp1[ 1 ], c_valp2[ 1 ], mu );
-		clist[ offset + 2 ] = lerp( c_valp1[ 2 ], c_valp2[ 2 ], mu );
+		clist[ offset + 0 ] = lerp( scope.palette[ c_offset1 * 3 + 0 ], scope.palette[ c_offset2 * 3 + 0 ], mu );
+		clist[ offset + 1 ] = lerp( scope.palette[ c_offset1 * 3 + 1 ], scope.palette[ c_offset2 * 3 + 1 ], mu );
+		clist[ offset + 2 ] = lerp( scope.palette[ c_offset1 * 3 + 2 ], scope.palette[ c_offset2 * 3 + 2 ], mu );
 
 	}
 
-	function VIntZ( q, offset, isol, x, y, z, valp1, valp2, c_valp1, c_valp2 ) {
+	function VIntZ( q, offset, isol, x, y, z, valp1, valp2, c_offset1, c_offset2 ) {
 
 		var mu = ( isol - valp1 ) / ( valp2 - valp1 ),
 			nc = scope.normal_cache;
@@ -141,9 +141,9 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		nlist[ offset + 1 ] = lerp( nc[ q + 1 ], nc[ q2 + 1 ], mu );
 		nlist[ offset + 2 ] = lerp( nc[ q + 2 ], nc[ q2 + 2 ], mu );
 
-		clist[ offset + 0 ] = lerp( c_valp1[ 0 ], c_valp2[ 0 ], mu );
-		clist[ offset + 1 ] = lerp( c_valp1[ 1 ], c_valp2[ 1 ], mu );
-		clist[ offset + 2 ] = lerp( c_valp1[ 2 ], c_valp2[ 2 ], mu );
+		clist[ offset + 0 ] = lerp( scope.palette[ c_offset1 * 3 + 0 ], scope.palette[ c_offset2 * 3 + 0 ], mu );
+		clist[ offset + 1 ] = lerp( scope.palette[ c_offset1 * 3 + 1 ], scope.palette[ c_offset2 * 3 + 1 ], mu );
+		clist[ offset + 2 ] = lerp( scope.palette[ c_offset1 * 3 + 2 ], scope.palette[ c_offset2 * 3 + 2 ], mu );
 
 	}
 
@@ -187,31 +187,6 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			field6 = scope.field[ qyz ],
 			field7 = scope.field[ q1yz ];
 
-		var c_field0 = scope.palette
-				.slice( q * 4, q * 4 + 3 )
-				.map( v => v / scope.palette[ q * 4 + 3 ] ), // slicing (r, g, b) part
-			c_field1 = scope.palette
-				.slice( q1 * 4, q1 * 4 + 3 )
-				.map( v => v / scope.palette[ q1 * 4 + 3 ] ),
-			c_field2 = scope.palette
-				.slice( qy * 4, qy * 4 + 3 )
-				.map( v => v / scope.palette[ qy * 4 + 3 ] ),
-			c_field3 = scope.palette
-				.slice( q1y * 4, q1y * 4 + 3 )
-				.map( v => v / scope.palette[ q1y * 4 + 3 ] ),
-			c_field4 = scope.palette
-				.slice( qz * 4, qz * 4 + 3 )
-				.map( v => v / scope.palette[ qz * 4 + 3 ] ),
-			c_field5 = scope.palette
-				.slice( q1z * 4, q1z * 4 + 3 )
-				.map( v => v / scope.palette[ q1z * 4 + 3 ] ),
-			c_field6 = scope.palette
-				.slice( qyz * 4, qyz * 4 + 3 )
-				.map( v => v / scope.palette[ qyz * 4 + 3 ] ),
-			c_field7 = scope.palette
-				.slice( q1yz * 4, q1yz * 4 + 3 )
-				.map( v => v / scope.palette[ q1yz * 4 + 3 ] );
-
 		if ( field0 < isol ) cubeindex |= 1;
 		if ( field1 < isol ) cubeindex |= 2;
 		if ( field2 < isol ) cubeindex |= 8;
@@ -237,7 +212,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( q );
 			compNorm( q1 );
-			VIntX( q * 3, 0, isol, fx, fy, fz, field0, field1, c_field0, c_field1 );
+			VIntX( q * 3, 0, isol, fx, fy, fz, field0, field1, q, q1 );
 
 		}
 
@@ -245,7 +220,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( q1 );
 			compNorm( q1y );
-			VIntY( q1 * 3, 3, isol, fx2, fy, fz, field1, field3, c_field1, c_field3 );
+			VIntY( q1 * 3, 3, isol, fx2, fy, fz, field1, field3, q1, q1y );
 
 		}
 
@@ -253,7 +228,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( qy );
 			compNorm( q1y );
-			VIntX( qy * 3, 6, isol, fx, fy2, fz, field2, field3, c_field2, c_field3 );
+			VIntX( qy * 3, 6, isol, fx, fy2, fz, field2, field3, qy, q1y );
 
 		}
 
@@ -261,7 +236,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( q );
 			compNorm( qy );
-			VIntY( q * 3, 9, isol, fx, fy, fz, field0, field2, c_field0, c_field2 );
+			VIntY( q * 3, 9, isol, fx, fy, fz, field0, field2, q, qy );
 
 		}
 
@@ -271,7 +246,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( qz );
 			compNorm( q1z );
-			VIntX( qz * 3, 12, isol, fx, fy, fz2, field4, field5, c_field4, c_field5 );
+			VIntX( qz * 3, 12, isol, fx, fy, fz2, field4, field5, qz, q1z );
 
 		}
 
@@ -288,8 +263,8 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 				fz2,
 				field5,
 				field7,
-				c_field5,
-				c_field7
+				q1z,
+				q1yz
 			);
 
 		}
@@ -307,8 +282,8 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 				fz2,
 				field6,
 				field7,
-				c_field6,
-				c_field7
+				qyz,
+				q1yz
 			);
 
 		}
@@ -317,7 +292,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( qz );
 			compNorm( qyz );
-			VIntY( qz * 3, 21, isol, fx, fy, fz2, field4, field6, c_field4, c_field6 );
+			VIntY( qz * 3, 21, isol, fx, fy, fz2, field4, field6, qz, qyz );
 
 		}
 
@@ -326,7 +301,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( q );
 			compNorm( qz );
-			VIntZ( q * 3, 24, isol, fx, fy, fz, field0, field4, c_field0, c_field4 );
+			VIntZ( q * 3, 24, isol, fx, fy, fz, field0, field4, q, qz );
 
 		}
 
@@ -334,7 +309,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( q1 );
 			compNorm( q1z );
-			VIntZ( q1 * 3, 27, isol, fx2, fy, fz, field1, field5, c_field1, c_field5 );
+			VIntZ( q1 * 3, 27, isol, fx2, fy, fz, field1, field5, q1, q1z );
 
 		}
 
@@ -351,8 +326,8 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 				fz,
 				field3,
 				field7,
-				c_field3,
-				c_field7
+				q1y,
+				q1yz
 			);
 
 		}
@@ -361,7 +336,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			compNorm( qy );
 			compNorm( qyz );
-			VIntZ( qy * 3, 33, isol, fx, fy2, fz, field2, field6, c_field2, c_field6 );
+			VIntZ( qy * 3, 33, isol, fx, fy2, fz, field2, field6, qy, qyz );
 
 		}
 
@@ -570,7 +545,6 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		var sign = Math.sign( strength );
 		strength = Math.abs( strength );
 		var userDefineColor = ! ( colors === undefined || colors === null );
-		console.log( ballx, bally, ballz );
 		var ballColor = new THREE.Color( ballx, bally, ballz );
 		if ( userDefineColor ) {
 
@@ -651,10 +625,9 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 							Math.sqrt( ( x - xs ) * ( x - xs ) + ( y - ys ) * ( y - ys ) + ( z - zs ) * ( z - zs ) ) / radius;
 						const contrib =
 							1 - ratio * ratio * ratio * ( ratio * ( ratio * 6 - 15 ) + 10 );
-						this.palette[ ( y_offset + x ) * 4 + 0 ] += ballColor.r * contrib;
-						this.palette[ ( y_offset + x ) * 4 + 1 ] += ballColor.g * contrib;
-						this.palette[ ( y_offset + x ) * 4 + 2 ] += ballColor.b * contrib;
-						this.palette[ ( y_offset + x ) * 4 + 3 ] += contrib;
+						this.palette[ ( y_offset + x ) * 3 + 0 ] += ballColor.r * contrib;
+						this.palette[ ( y_offset + x ) * 3 + 1 ] += ballColor.g * contrib;
+						this.palette[ ( y_offset + x ) * 3 + 2 ] += ballColor.b * contrib;
 
 					}
 
@@ -809,9 +782,9 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			this.normal_cache[ i * 3 ] = 0.0;
 			this.field[ i ] = 0.0;
-			this.palette[ i * 4 ] = this.palette[ i * 4 + 1 ] = this.palette[
-				i * 4 + 2
-			] = this.palette[ i * 4 + 3 ] = 0.0;
+			this.palette[ i * 3 ] = this.palette[ i * 3 + 1 ] = this.palette[
+				i * 3 + 2
+			] = 0.0;
 
 		}
 
