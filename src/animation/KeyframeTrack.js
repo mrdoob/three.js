@@ -7,6 +7,7 @@ import { CubicInterpolant } from '../math/interpolants/CubicInterpolant.js';
 import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant.js';
 import { AnimationUtils } from './AnimationUtils.js';
+import * as KeyframeTracks from './tracks/KeyframeTracks.js';
 
 /**
  *
@@ -57,7 +58,9 @@ Object.assign( KeyframeTrack, {
 
 				'name': track.name,
 				'times': AnimationUtils.convertArray( track.times, Array ),
-				'values': AnimationUtils.convertArray( track.values, Array )
+				'timesType': track.times.constructor.name,
+				'values': AnimationUtils.convertArray( track.values, Array ),
+				'valuesType': track.values.constructor.name
 
 			};
 
@@ -74,6 +77,41 @@ Object.assign( KeyframeTrack, {
 		json.type = track.ValueTypeName; // mandatory
 
 		return json;
+
+	},
+
+	// Only works with THREE's default KeyframeTracks (NumberKeyframeTrack, VectorKeyframeTrack, etc)
+
+	fromJSON: function ( json ) {
+
+		var constructor;
+		switch ( json.type ) {
+
+			case 'number':
+				constructor = KeyframeTracks.NumberKeyframeTrack;
+				break;
+			case 'vector':
+				constructor = KeyframeTracks.VectorKeyframeTrack;
+				break;
+			case 'quaternion':
+				constructor = KeyframeTracks.QuaternionKeyframeTrack;
+				break;
+			case 'string':
+				constructor = KeyframeTracks.StringKeyframeTrack;
+				break;
+			case 'bool':
+				constructor = KeyframeTracks.BooleanKeyframeTrack;
+				break;
+			case 'color':
+				constructor = KeyframeTracks.ColorKeyframeTrack;
+				break;
+			default:
+				console.error( "THREE.KeyframeTrack: Unsupported KeyframeTrack " + json.type + ". This method only supports THREE's default Keyframetracks (NumberKeyframeTrack, VectorKeyframeTrack, etc)" );
+				return;
+
+		}
+
+		return new constructor( json.name, AnimationUtils.convertArray( json.times, AnimationUtils.getTypedConstructor( json.timesValue ) ), AnimationUtils.convertArray( json.values, AnimationUtils.getTypedConstructor( json.valuesType ) ), json.interpolation );
 
 	}
 

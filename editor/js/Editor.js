@@ -502,6 +502,20 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
+		if ( json.animations !== undefined ) {
+
+			var animations = json.animations;
+			this.animations = {};
+			for ( var key in animations ) {
+
+				var objectAnimations = animations[ key ];
+				this.animations[ key ] = objectAnimationsFromJSON( objectAnimations );
+
+			}
+			console.log( "Loaded Animations" );
+
+		}
+
 		this.setScene( loader.parse( json.scene ) );
 
 	},
@@ -525,9 +539,28 @@ Editor.prototype = {
 
 		}
 
+		// animations clean up
+
+		var animations = this.animations;
+		var animationJSON = {};
+		for ( var key in animations ) {
+
+			var objectAnimations = animations[ key ];
+			if ( scene.getObjectByProperty( 'uuid', key ) === undefined ) {
+
+				delete animations[ key ];
+
+			} else {
+
+				animationJSON[ key ] = objectAnimationsToJSON( objectAnimations );
+
+			}
+
+		}
+
 		//
 
-		return {
+		var data = {
 
 			metadata: {},
 			project: {
@@ -542,6 +575,15 @@ Editor.prototype = {
 			history: this.history.toJSON()
 
 		};
+
+		if ( Object.keys( animationJSON ).length > 0 ) {
+
+			data.animations = animationJSON;
+			console.log( "Saved animations" );
+
+		}
+
+		return data;
 
 	},
 
@@ -570,3 +612,57 @@ Editor.prototype = {
 	}
 
 };
+
+function objectAnimationsToJSON( animations ) {
+
+	var data = [];
+	for ( var i = 0; i < animations.length; ++ i ) {
+
+		var clip = animations[ i ];
+		var animation = {
+			name: clip.name,
+			uuid: clip.uuid,
+			duration: clip.duration,
+			tracks: []
+		};
+
+		for ( var j = 0; j < clip.tracks.length; ++ j ) {
+
+			var track = clip.tracks[ j ];
+			animation.tracks.push( THREE.KeyframeTrack.toJSON( track ) );
+
+		}
+		data.push( animation );
+
+	}
+	return data;
+
+}
+
+function objectAnimationsFromJSON( json ) {
+
+	if ( json === undefined ) return {};
+	var animations = [];
+	for ( var i = 0; i < json.length; ++ i ) {
+
+		var clip = json[ i ];
+		var animation = {
+			name: clip.name,
+			uuid: clip.uuid,
+			duration: clip.duration,
+			tracks: []
+		};
+
+		for ( var j = 0; j < clip.tracks.length; ++ j ) {
+
+			var track = clip.tracks[ j ];
+			animation.tracks.push( THREE.KeyframeTrack.fromJSON( track ) );
+
+		}
+
+		animations.push( animation );
+
+	}
+	return animations;
+
+}

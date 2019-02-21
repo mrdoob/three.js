@@ -27,13 +27,40 @@ var AnimationUtils = {
 		if ( ! array || // let 'undefined' and 'null' pass
 			! forceClone && array.constructor === type ) return array;
 
-		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
+		if ( type !== undefined && typeof type.BYTES_PER_ELEMENT === 'number' ) {
 
 			return new type( array ); // create typed array
 
 		}
 
 		return Array.prototype.slice.call( array ); // create Array
+
+	},
+
+	getTypedConstructor: function ( type ) {
+
+		switch ( type ) {
+
+			case 'Int8Array':
+				return Int8Array;
+			case 'Uint8Array':
+				return Uint8Array;
+			case 'Uint8ClampedArray':
+				return Uint8ClampedArray;
+			case 'Int16Array':
+				return Int16Array;
+			case 'Uint16Array':
+				return Uint16Array;
+			case 'Int32Array':
+				return Int32Array;
+			case 'Uint32Array':
+				return Uint32Array;
+			case 'Float32Array':
+				return Float32Array;
+			case 'Float64Array':
+				return Float64Array;
+
+		}
 
 	},
 
