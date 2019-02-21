@@ -19,7 +19,7 @@ This game runs 30-60 frames a second on the same machine because it uses more tr
 
 Still, let's go over using a Shadertoy shader with three.js.
 
-This is the default shadertoy shader if you pick "New" on shadertoy.com
+This is the default shadertoy shader if you [pick "New" on shadertoy.com](https://www.shadertoy.com/new), at least as of January 2019.
 
 ```glsl
 // By iq: https://www.shadertoy.com/user/iq  
