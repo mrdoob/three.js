@@ -977,6 +977,8 @@ function WebGLRenderer( parameters ) {
               }
           }
       });
+
+      currentRenderState = null;
   };
 
 	// Compile
