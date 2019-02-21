@@ -1,8 +1,8 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.THREE = {})));
-}(this, (function (exports) { 'use strict';
+	(global = global || self, factory(global.THREE = {}));
+}(this, function (exports) { 'use strict';
 
 	// Polyfills
 
@@ -23278,6 +23278,57 @@
 			state.disableUnusedAttributes();
 
 		}
+
+		this.compileAndUploadMaterials = function ( scene, camera ) {
+
+			currentRenderState = renderStates.get( scene, camera );
+			currentRenderState.init();
+
+			scene.traverse( function ( object ) {
+
+				if ( object.isLight ) {
+
+					currentRenderState.pushLight( object );
+
+				}
+
+				if ( object.castShadow ) {
+
+					currentRenderState.pushShadow( object );
+
+				}
+
+			} );
+
+			currentRenderState.setupLights( camera );
+
+			scene.traverse( function ( object ) {
+
+				if ( object.material ) {
+
+					if ( Array.isArray( object.material ) ) {
+
+						for ( var i = 0; i < object.material.length; i ++ ) {
+
+							state.setMaterial( object.material[ i ] );
+							setProgram( camera, scene.fog, object.material[ i ], object );
+
+						}
+
+					} else {
+
+						state.setMaterial( object.material );
+						setProgram( camera, scene.fog, object.material, object );
+
+					}
+
+				}
+
+			} );
+
+			currentRenderState = null;
+
+		};
 
 		// Compile
 
@@ -47822,6 +47873,7 @@
 	exports.CircleGeometry = CircleGeometry;
 	exports.CircleBufferGeometry = CircleBufferGeometry;
 	exports.BoxGeometry = BoxGeometry;
+	exports.CubeGeometry = BoxGeometry;
 	exports.BoxBufferGeometry = BoxBufferGeometry;
 	exports.ShadowMaterial = ShadowMaterial;
 	exports.SpriteMaterial = SpriteMaterial;
@@ -48004,7 +48056,6 @@
 	exports.RGBADepthPacking = RGBADepthPacking;
 	exports.TangentSpaceNormalMap = TangentSpaceNormalMap;
 	exports.ObjectSpaceNormalMap = ObjectSpaceNormalMap;
-	exports.CubeGeometry = BoxGeometry;
 	exports.Face4 = Face4;
 	exports.LineStrip = LineStrip;
 	exports.LinePieces = LinePieces;
@@ -48045,4 +48096,4 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
