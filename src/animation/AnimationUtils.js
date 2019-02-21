@@ -223,7 +223,7 @@ var AnimationUtils = {
 
 		for ( var i = 0; i < clip.tracks.length; ++ i ) {
 
-			clip.tracks[ i ].shift( -1 * minStartTime );
+			clip.tracks[ i ].shift( - 1 * minStartTime );
 
 		}
 
