@@ -107,7 +107,7 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 
 	// tension
 
-	var tensionRow = new UI.Row();
+	var tensionRow = new UI.Row().setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 	var tension = new UI.Number( parameters.path.tension ).setStep( 0.01 ).onChange( update );
 
 	tensionRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tube_geometry/tension' ) ).setWidth( '90px' ), tension );
@@ -132,6 +132,8 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 			pointUI.lbl.setValue( count );
 
 		}
+
+		tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 
 		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			new THREE.CatmullRomCurve3( points, closed.getValue(), curveType.getValue(), tension.getValue() ),
