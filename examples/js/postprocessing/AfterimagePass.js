@@ -42,7 +42,7 @@ THREE.AfterimagePass = function ( damp ) {
 	this.sceneComp = new THREE.Scene();
 	this.scene = new THREE.Scene();
 
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.camera.position.z = 1;
 
 	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
@@ -50,7 +50,7 @@ THREE.AfterimagePass = function ( damp ) {
 	this.quadComp = new THREE.Mesh( geometry, this.shaderMaterial );
 	this.sceneComp.add( this.quadComp );
 
-	var material = new THREE.MeshBasicMaterial( { 
+	var material = new THREE.MeshBasicMaterial( {
 		map: this.textureComp.texture
 	} );
 

@@ -60,6 +60,7 @@ THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		this.scene.overrideMaterial = null;
 		renderer.autoClear = oldAutoClear;
+
 	}
 
 } );
