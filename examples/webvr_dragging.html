@@ -53,8 +53,8 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - dragging';
 				container.appendChild( info );
 
-				var sceneBackgroundColor = new THREE.Color( 0x808080 );
 				scene = new THREE.Scene();
+				var sceneBackgroundColor = new THREE.Color( 0x808080 );
 				scene.background = sceneBackgroundColor;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
