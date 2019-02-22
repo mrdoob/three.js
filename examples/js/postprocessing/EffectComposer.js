@@ -47,6 +47,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
 
 	this._previousFrameTime = Date.now();
+	this._rendererSize = new THREE.Vector2();
 
 };
 
@@ -90,6 +91,16 @@ Object.assign( THREE.EffectComposer.prototype, {
 		var currentRenderTarget = this.renderer.getRenderTarget();
 
 		var maskActive = false;
+
+		var currentVREnabled = this.renderer.vr.enabled;
+
+		if ( this.renderer.vr.enabled === true ) {
+
+			this.renderer.vr.enabled = false;
+			this.renderer.getSize( this._rendererSize );
+			this.setSize( this._rendererSize.x, this._rendererSize.y );
+
+		}
 
 		var pass, i, il = this.passes.length;
 
@@ -136,6 +147,8 @@ Object.assign( THREE.EffectComposer.prototype, {
 		}
 
 		this.renderer.setRenderTarget( currentRenderTarget );
+
+		this.renderer.vr.enabled = currentVREnabled;
 
 	},
 
