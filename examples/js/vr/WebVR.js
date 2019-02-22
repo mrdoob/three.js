@@ -133,6 +133,7 @@ var WEBVR = {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
+			
 			button.textContent = 'ENTER XR';
 
 			stylizeElement( button );
@@ -151,6 +152,7 @@ var WEBVR = {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
+			
 			button.textContent = 'ENTER VR';
 
 			stylizeElement( button );
