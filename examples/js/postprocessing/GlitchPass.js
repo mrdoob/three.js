@@ -24,7 +24,7 @@ THREE.GlitchPass = function ( dt_size ) {
 	} );
 
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
+	this.scene = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.quad.frustumCulled = false; // Avoid getting clipped
@@ -90,13 +90,13 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 	},
 
-	generateTrigger: function() {
+	generateTrigger: function () {
 
 		this.randX = THREE.Math.randInt( 120, 240 );
 
 	},
 
-	generateHeightmap: function( dt_size ) {
+	generateHeightmap: function ( dt_size ) {
 
 		var data_arr = new Float32Array( dt_size * dt_size * 3 );
 		var length = dt_size * dt_size;

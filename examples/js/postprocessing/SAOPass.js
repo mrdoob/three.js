@@ -319,7 +319,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
-		renderer.setRenderTarget( renderTarget);
+		renderer.setRenderTarget( renderTarget );
 
 		// setup pass state
 		renderer.autoClear = false;
