@@ -383,6 +383,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			if ( object.castShadow && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
 				object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+				object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 				var geometry = _objects.update( object );
 				var material = object.material;
