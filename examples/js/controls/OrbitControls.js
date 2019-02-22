@@ -82,6 +82,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.position0 = this.object.position.clone();
 	this.zoom0 = this.object.zoom;
 
+    // for querying if update calls have made changes
+	this.updated = false;
+
 	//
 	// public methods
 	//
@@ -120,6 +123,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 		state = STATE.NONE;
 
 	};
+
+    // Allows querying for whether the controls have been updated since last query.
+    this.wasUpdated = function () {
+        var temp = this.updated;
+        this.updated = false;
+        return temp;
+    };
 
 	// this method is exposed, but perhaps it would be better if we can make it private...
 	this.update = function () {
@@ -210,6 +220,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 				lastPosition.copy( scope.object.position );
 				lastQuaternion.copy( scope.object.quaternion );
 				zoomChanged = false;
+
+				this.updated = true;
 
 				return true;
 
