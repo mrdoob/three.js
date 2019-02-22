@@ -333,6 +333,7 @@ var files = {
 		"webvr_lorenzattractor",
 		"webvr_panorama",
 		"webvr_paint",
+		"webvr_postprocessing",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
 		"webvr_sculpt",
