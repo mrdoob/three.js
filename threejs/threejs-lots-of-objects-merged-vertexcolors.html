@@ -142,7 +142,7 @@ function main() {
         // compute a color
         const hue = THREE.Math.lerp(0.7, 0.3, amount);
         const saturation = 1;
-        const lightness = THREE.Math.lerp(0.1, 1.0, amount);
+        const lightness = THREE.Math.lerp(0.4, 1.0, amount);
         color.setHSL(hue, saturation, lightness);
         // get the colors as an array of values from 0 to 255
         const rgb = color.toArray().map(v => v * 255);
