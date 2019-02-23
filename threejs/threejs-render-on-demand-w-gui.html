@@ -84,8 +84,12 @@ function main() {
     cube.position.x = x;
 
     const folder = gui.addFolder(`Cube${x}`);
-    folder.addColor(new ColorGUIHelper(material, 'color'), 'value').name('color').onChange(render);
-    folder.add(cube.scale, 'x', .1, 1.5).name('scale x').onChange(render);
+    folder.addColor(new ColorGUIHelper(material, 'color'), 'value')
+        .name('color')
+        .onChange(requestRenderIfNotRequested);
+    folder.add(cube.scale, 'x', .1, 1.5)
+        .name('scale x')
+        .onChange(requestRenderIfNotRequested);
     folder.open();
 
     return cube;
@@ -106,10 +110,11 @@ function main() {
     return needResize;
   }
 
-  let requestId;
+  let renderRequested = false;
 
   function render() {
-    requestId = undefined;
+    renderRequested = undefined;
+
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
@@ -121,12 +126,15 @@ function main() {
   }
   render();
 
-  controls.addEventListener('change', () => {
-    if (!requestId) {
-      requestId = requestAnimationFrame(render);
+  function requestRenderIfNotRequested() {
+    if (!renderRequested) {
+      renderRequested = true;
+      requestAnimationFrame(render);
     }
-  });
-  window.addEventListener('resize', render);
+  }
+
+  controls.addEventListener('change', requestRenderIfNotRequested);
+  window.addEventListener('resize', requestRenderIfNotRequested);
 }
 
 main();

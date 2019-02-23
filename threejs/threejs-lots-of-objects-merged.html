@@ -164,10 +164,11 @@ function main() {
     return needResize;
   }
 
-  let requestId;
+  let renderRequested = false;
 
   function render() {
-    requestId = undefined;
+    renderRequested = undefined;
+
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
@@ -179,13 +180,15 @@ function main() {
   }
   render();
 
-  controls.addEventListener('change', () => {
-    if (!requestId) {
-      requestId = requestAnimationFrame(render);
+  function requestRenderIfNotRequested() {
+    if (!renderRequested) {
+      renderRequested = true;
+      requestAnimationFrame(render);
     }
-  });
+  }
 
-  window.addEventListener('resize', render);
+  controls.addEventListener('change', requestRenderIfNotRequested);
+  window.addEventListener('resize', requestRenderIfNotRequested);
 
   // note: this is a workaround for an OrbitControls issue
   // in an iframe. Will remove once the issue is fixed in
