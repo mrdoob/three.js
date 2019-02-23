@@ -126,7 +126,7 @@ function main() {
         const material = new THREE.MeshBasicMaterial();
         const hue = THREE.Math.lerp(0.7, 0.3, amount);
         const saturation = 1;
-        const lightness = THREE.Math.lerp(0.1, 1.0, amount);
+        const lightness = THREE.Math.lerp(0.4, 1.0, amount);
         material.color.setHSL(hue, saturation, lightness);
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
