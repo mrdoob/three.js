@@ -24,6 +24,11 @@ pre.prettyprint li {
     white-space: pre;
 }
 
+/* to handle long words in paragraph */
+p code {
+  word-break: break-word;
+  white-space: normal;
+}
 
 div[data-diagram] {
   height: 100%;
