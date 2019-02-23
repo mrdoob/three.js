@@ -3,6 +3,11 @@
 <meta charset="utf-8">
 <head>
 <title>gpw data viewer</title>
+<style>
+canvas {
+  max-width: calc(100vw - 16px);
+}
+</style>
 </head>
 <body>
 <canvas></canvas>
@@ -53,7 +58,6 @@ function drawData(file) {
   ctx.canvas.height = nrows;
   // but display it double size so it's not too small
   ctx.canvas.style.width = px(ncols * 2);
-  ctx.canvas.style.height = px(nrows * 2);
   // fill the canvas to dark gray
   ctx.fillStyle = '#444';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
