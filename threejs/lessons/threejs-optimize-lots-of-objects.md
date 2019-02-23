@@ -272,7 +272,7 @@ blue bar</span> represents `latHelper` which is used to rotate to a
 latitude above or below the equator. The <span style="color: red;">red
 sphere</span> represents the offset that that `positionHelper` provides.
 
-We could do all of the math manually to figure out positions on the global but
+We could do all of the math manually to figure out positions on the globe but
 doing it this way leaves most of the math to the library itself so we don't need
 to deal with.
 
