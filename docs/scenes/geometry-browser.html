@@ -54,6 +54,7 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor( 0x000000, 1 );
+			renderer.domElement.setAttribute( "tabindex", "0" );
 			document.body.appendChild( renderer.domElement );
 
 			var orbit = new THREE.OrbitControls( camera, renderer.domElement );
