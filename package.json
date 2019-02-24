@@ -41,7 +41,8 @@
     "lint": "eslint src",
     "test": "npm run build-test && qunit test/unit/three.source.unit.js",
     "travis": "npm run lint && npm test",
-    "editor": "electron ./editor/main.js"
+    "editor": "electron ./editor/main.js",
+    "modularize-examples": "node utils/modularize/convert.js"
   },
   "keywords": [
     "three",
@@ -56,15 +57,20 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
+    "acorn": "^6.1.0",
+    "acorn-walk": "^6.1.1",
     "concurrently": "^4.1.0",
     "electron": "^4.0.4",
     "eslint": "^5.13.0",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^5.0.3",
+    "fs-extra": "^7.0.1",
     "google-closure-compiler": "20181210.0.0",
     "http-server": "^0.11.1",
+    "magic-string": "^0.25.2",
     "qunit": "^2.9.1",
-    "rollup": "^1.1.2"
+    "rollup": "^1.1.2",
+    "tiny-glob": "^0.2.6"
   },
   "jspm": {
     "files": [
