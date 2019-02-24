@@ -140,8 +140,8 @@ class Module {
 					if ( property.name === 'Math' ) {
 
 						// Avoiding conflict with global Math
-						this.code.overwrite( property.start, property.end, 'ThreeMath' );
-						this.dependences.push( 'Math as ThreeMath' );
+						this.code.overwrite( property.start, property.end, '_Math' );
+						this.dependences.push( 'Math as _Math' );
 
 					} else {
 
@@ -174,7 +174,7 @@ class Module {
 					deps[ THREE_PATH ] = [];
 
 				}
-				deps[ THREE_PATH ].push( dep );
+				deps[ THREE_PATH ].push( name );
 				return;
 
 			}
@@ -189,7 +189,7 @@ class Module {
 					deps[ relativePath ] = [];
 
 				}
-				deps[ relativePath ].push( dep );
+				deps[ relativePath ].push( name );
 				return;
 
 			}
@@ -199,7 +199,7 @@ class Module {
 				deps[ '__UNKNOW__' ] = [];
 
 			}
-			deps[ '__UNKNOW__' ].push( dep );
+			deps[ '__UNKNOW__' ].push( name );
 
 		} );
 
