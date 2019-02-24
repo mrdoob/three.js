@@ -112,6 +112,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.uuid = THREE.Math.generateUUID(); // generate to library
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();

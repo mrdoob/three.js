@@ -243,6 +243,8 @@
 
 				}
 
+				renderer.domElement.setAttribute( "tabindex", "0" );
+
 				container.appendChild( renderer.domElement );
 
 				orbitControls = new THREE.OrbitControls( camera, renderer.domElement );

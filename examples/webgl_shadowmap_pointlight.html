@@ -135,6 +135,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				document.body.appendChild( renderer.domElement );
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );

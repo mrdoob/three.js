@@ -67,6 +67,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				container.appendChild( renderer.domElement );
 
 				// scene

@@ -216,6 +216,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
+			renderer.domElement.setAttribute( "tabindex", "0" );
 			document.body.appendChild( renderer.domElement );
 
 			renderer.gammaOutput = true;

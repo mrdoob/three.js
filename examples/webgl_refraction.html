@@ -120,6 +120,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor( 0x20252f );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.domElement.setAttribute( "tabindex", "0" );
 			document.body.appendChild( renderer.domElement );
 
 			//

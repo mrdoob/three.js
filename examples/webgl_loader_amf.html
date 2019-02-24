@@ -88,6 +88,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				document.body.appendChild( renderer.domElement );
 
 				var loader = new THREE.AMFLoader();

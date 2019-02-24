@@ -74,6 +74,8 @@
 					this.ms_Renderer.context.getExtension( 'OES_texture_float' );
 					this.ms_Renderer.context.getExtension( 'OES_texture_float_linear' );
 
+					this.ms_Renderer.domElement.setAttribute( "tabindex", "0" );
+
 					document.body.appendChild( this.ms_Renderer.domElement );
 
 					this.ms_Scene = new THREE.Scene();

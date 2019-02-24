@@ -197,6 +197,7 @@
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		renderer.setClearColor( 0x000000 );
 		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.domElement.setAttribute( "tabindex", "0" );
 		container.appendChild( renderer.domElement );
 
 		//

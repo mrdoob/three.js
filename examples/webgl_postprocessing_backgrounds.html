@@ -121,6 +121,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();

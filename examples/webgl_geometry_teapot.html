@@ -106,6 +106,7 @@
 				renderer.setSize( canvasWidth, canvasHeight );
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				container.appendChild( renderer.domElement );
 
 				// EVENTS

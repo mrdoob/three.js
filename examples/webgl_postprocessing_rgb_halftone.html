@@ -64,6 +64,7 @@
 		renderer = new THREE.WebGLRenderer();
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.domElement.setAttribute( "tabindex", "0" );
 		clock = new THREE.Clock();
 		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 		camera.position.z = 12;

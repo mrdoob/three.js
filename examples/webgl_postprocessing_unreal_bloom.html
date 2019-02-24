@@ -83,6 +83,9 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.toneMapping = THREE.ReinhardToneMapping;
+
+			renderer.domElement.setAttribute( "tabindex", "0" );
+
 			container.appendChild( renderer.domElement );
 
 			scene = new THREE.Scene();

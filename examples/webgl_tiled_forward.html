@@ -209,6 +209,7 @@
 
 		var renderer = new THREE.WebGLRenderer();
 		renderer.toneMapping = THREE.LinearToneMapping;
+		renderer.domElement.setAttribute( "tabindex", "0" );
 		container.appendChild( renderer.domElement );
 
 		var renderTarget = new THREE.WebGLRenderTarget();

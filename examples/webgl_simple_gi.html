@@ -221,6 +221,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				document.body.appendChild( renderer.domElement );
 
 				new SimpleGI( renderer, scene );

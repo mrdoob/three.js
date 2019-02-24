@@ -95,6 +95,8 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
+				renderer.domElement.setAttribute( "tabindex", "0" );
+
 				container.appendChild( renderer.domElement );
 
 				composer = new THREE.EffectComposer( renderer );

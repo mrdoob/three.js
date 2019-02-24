@@ -125,6 +125,7 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor( 0x666666 );
+			renderer.domElement.setAttribute( "tabindex", "0" );
 			container.appendChild( renderer.domElement );
 
 			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );

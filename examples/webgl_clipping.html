@@ -108,6 +108,7 @@
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.body.appendChild( renderer.domElement );
 

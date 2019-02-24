@@ -75,6 +75,7 @@
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				document.body.appendChild( renderer.domElement );
 
 				var gl = renderer.context;

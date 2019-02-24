@@ -250,6 +250,7 @@
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.setAttribute( "tabindex", "0" );
 				container.appendChild( renderer.domElement );
 
 
