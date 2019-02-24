@@ -821,7 +821,19 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false || scope.enableKeys === false || scope.enablePan === false ) return;
 
-		handleKeyDown( event );
+		// Ignore event if some other input element has focus.
+		//
+		// The event is processed if any of the following is true:
+		// - no element has focus, or
+		// - we do not limit ourselves with a specific element, or
+		// - either our element or its parent has focus.
+
+		var activeElement = document.activeElement;
+		if ( activeElement == null || scope.domElement === document || activeElement === scope.domElement || activeElement.contains( scope.domElement ) ) {
+
+			handleKeyDown( event );
+
+		}
 
 	}
 
