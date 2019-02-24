@@ -1,23 +1,22 @@
+import {
+  BufferGeometry,
+  DefaultLoadingManager,
+  FileLoader,
+  Float32BufferAttribute,
+  Group,
+  LineBasicMaterial,
+  LineSegments,
+  Material,
+  Mesh,
+  MeshPhongMaterial,
+  NoColors,
+  Points,
+  PointsMaterial,
+  VertexColors
+} from '../../../build/three.module.js';
 /**
  * @author mrdoob / http://mrdoob.com/
  */
-
-import {
-	BufferGeometry,
-	DefaultLoadingManager,
-	FileLoader,
-	Float32BufferAttribute,
-	Group,
-	LineBasicMaterial,
-	LineSegments,
-	Material,
-	Mesh,
-	MeshPhongMaterial,
-	NoColors,
-	Points,
-	PointsMaterial,
-	VertexColors
-} from "../../../build/three.module.js";
 
 var OBJLoader = ( function () {
 
@@ -813,4 +812,6 @@ var OBJLoader = ( function () {
 
 } )();
 
-export { OBJLoader };
+export {
+  OBJLoader
+};

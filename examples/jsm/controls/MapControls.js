@@ -1,3 +1,11 @@
+import {
+  EventDispatcher,
+  MOUSE,
+  Quaternion,
+  Spherical,
+  Vector2,
+  Vector3
+} from '../../../build/three.module.js';
 /**
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
@@ -14,15 +22,6 @@
 //    Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - left mouse, or arrow keys / touch: one-finger move
-
-import {
-	EventDispatcher,
-	MOUSE,
-	Quaternion,
-	Spherical,
-	Vector2,
-	Vector3
-} from "../../../build/three.module.js";
 
 var MapControls = function ( object, domElement ) {
 
@@ -1163,4 +1162,6 @@ Object.defineProperties( MapControls.prototype, {
 
 } );
 
-export { MapControls };
+export {
+  MapControls
+};
