@@ -1,7 +1,7 @@
 import {
   Color,
   LinearFilter,
-  Math,
+  Math as _Math,
   Matrix4,
   Mesh,
   PerspectiveCamera,
@@ -63,7 +63,7 @@ var Reflector = function ( geometry, options ) {
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! ThreeMath.isPowerOfTwo( textureWidth ) || ! ThreeMath.isPowerOfTwo( textureHeight ) ) {
+	if ( ! _Math.isPowerOfTwo( textureWidth ) || ! _Math.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 

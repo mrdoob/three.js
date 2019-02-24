@@ -16,7 +16,7 @@ import {
   DstColorFactor,
   FloatType,
   LinearFilter,
-  Math,
+  Math as _Math,
   Mesh,
   MeshNormalMaterial,
   NearestFilter,
@@ -389,7 +389,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			sample.normalize();
 
 			var scale = i / kernelSize;
-			scale = ThreeMath.lerp( 0.1, 1, scale * scale );
+			scale = _Math.lerp( 0.1, 1, scale * scale );
 			sample.multiplyScalar( scale );
 
 			kernel.push( sample );

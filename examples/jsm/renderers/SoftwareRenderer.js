@@ -7,7 +7,7 @@ import {
   Color,
   FaceColors,
   LineBasicMaterial,
-  Math,
+  Math as _Math,
   MeshBasicMaterial,
   MeshLambertMaterial,
   MeshPhongMaterial,
@@ -1552,7 +1552,7 @@ SoftwareRenderer.Texture = function () {
 		}
 
 		var size = image.width > image.height ? image.width : image.height;
-		size = ThreeMath.ceilPowerOfTwo( size );
+		size = _Math.ceilPowerOfTwo( size );
 
 		if ( canvas.width != size || canvas.height != size ) {
 

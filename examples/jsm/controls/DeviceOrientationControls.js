@@ -1,6 +1,6 @@
 import {
   Euler,
-  Math,
+  Math as _Math,
   Quaternion,
   Vector3
 } from '../../../build/three.module.js';
@@ -91,13 +91,13 @@ var DeviceOrientationControls = function ( object ) {
 
 		if ( device ) {
 
-			var alpha = device.alpha ? ThreeMath.degToRad( device.alpha ) + scope.alphaOffset : 0; // Z
+			var alpha = device.alpha ? _Math.degToRad( device.alpha ) + scope.alphaOffset : 0; // Z
 
-			var beta = device.beta ? ThreeMath.degToRad( device.beta ) : 0; // X'
+			var beta = device.beta ? _Math.degToRad( device.beta ) : 0; // X'
 
-			var gamma = device.gamma ? ThreeMath.degToRad( device.gamma ) : 0; // Y''
+			var gamma = device.gamma ? _Math.degToRad( device.gamma ) : 0; // Y''
 
-			var orient = scope.screenOrientation ? ThreeMath.degToRad( scope.screenOrientation ) : 0; // O
+			var orient = scope.screenOrientation ? _Math.degToRad( scope.screenOrientation ) : 0; // O
 
 			setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
 

@@ -23,7 +23,7 @@ import {
   LineBasicMaterial,
   Loader,
   LoaderUtils,
-  Math,
+  Math as _Math,
   Matrix3,
   Matrix4,
   Mesh,
@@ -1188,7 +1188,7 @@ var FBXLoader = ( function () {
 
 						if ( lightAttribute.InnerAngle !== undefined ) {
 
-							angle = ThreeMath.degToRad( lightAttribute.InnerAngle.value );
+							angle = _Math.degToRad( lightAttribute.InnerAngle.value );
 
 						}
 
@@ -1198,7 +1198,7 @@ var FBXLoader = ( function () {
 							// TODO: this is not correct - FBX calculates outer and inner angle in degrees
 							// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
 							// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-							penumbra = ThreeMath.degToRad( lightAttribute.OuterAngle.value );
+							penumbra = _Math.degToRad( lightAttribute.OuterAngle.value );
 							penumbra = Math.max( penumbra, 1 );
 
 						}
@@ -2744,19 +2744,19 @@ var FBXLoader = ( function () {
 			if ( curves.x !== undefined ) {
 
 				this.interpolateRotations( curves.x );
-				curves.x.values = curves.x.values.map( ThreeMath.degToRad );
+				curves.x.values = curves.x.values.map( _Math.degToRad );
 
 			}
 			if ( curves.y !== undefined ) {
 
 				this.interpolateRotations( curves.y );
-				curves.y.values = curves.y.values.map( ThreeMath.degToRad );
+				curves.y.values = curves.y.values.map( _Math.degToRad );
 
 			}
 			if ( curves.z !== undefined ) {
 
 				this.interpolateRotations( curves.z );
-				curves.z.values = curves.z.values.map( ThreeMath.degToRad );
+				curves.z.values = curves.z.values.map( _Math.degToRad );
 
 			}
 
@@ -2765,7 +2765,7 @@ var FBXLoader = ( function () {
 
 			if ( preRotation !== undefined ) {
 
-				preRotation = preRotation.map( ThreeMath.degToRad );
+				preRotation = preRotation.map( _Math.degToRad );
 				preRotation.push( eulerOrder );
 
 				preRotation = new Euler().fromArray( preRotation );
@@ -2775,7 +2775,7 @@ var FBXLoader = ( function () {
 
 			if ( postRotation !== undefined ) {
 
-				postRotation = postRotation.map( ThreeMath.degToRad );
+				postRotation = postRotation.map( _Math.degToRad );
 				postRotation.push( eulerOrder );
 
 				postRotation = new Euler().fromArray( postRotation );
@@ -4006,7 +4006,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.preRotation ) {
 
-			var array = transformData.preRotation.map( ThreeMath.degToRad );
+			var array = transformData.preRotation.map( _Math.degToRad );
 			array.push( transformData.eulerOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4014,7 +4014,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.rotation ) {
 
-			var array = transformData.rotation.map( ThreeMath.degToRad );
+			var array = transformData.rotation.map( _Math.degToRad );
 			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4022,7 +4022,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.postRotation ) {
 
-			var array = transformData.postRotation.map( ThreeMath.degToRad );
+			var array = transformData.postRotation.map( _Math.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 

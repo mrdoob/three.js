@@ -3,7 +3,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   Color,
-  Math,
+  Math as _Math,
   Object3D,
   Points,
   RepeatWrapping,
@@ -367,9 +367,9 @@ var GPUParticleContainer = function ( maxParticles, particleSystem ) {
 		var velY = velocity.y + particleSystem.random() * velocityRandomness;
 		var velZ = velocity.z + particleSystem.random() * velocityRandomness;
 
-		velX = ThreeMath.clamp( ( velX - ( - maxVel ) ) / ( maxVel - ( - maxVel ) ), 0, 1 );
-		velY = ThreeMath.clamp( ( velY - ( - maxVel ) ) / ( maxVel - ( - maxVel ) ), 0, 1 );
-		velZ = ThreeMath.clamp( ( velZ - ( - maxVel ) ) / ( maxVel - ( - maxVel ) ), 0, 1 );
+		velX = _Math.clamp( ( velX - ( - maxVel ) ) / ( maxVel - ( - maxVel ) ), 0, 1 );
+		velY = _Math.clamp( ( velY - ( - maxVel ) ) / ( maxVel - ( - maxVel ) ), 0, 1 );
+		velZ = _Math.clamp( ( velZ - ( - maxVel ) ) / ( maxVel - ( - maxVel ) ), 0, 1 );
 
 		velocityAttribute.array[ i * 3 + 0 ] = velX;
 		velocityAttribute.array[ i * 3 + 1 ] = velY;
@@ -377,9 +377,9 @@ var GPUParticleContainer = function ( maxParticles, particleSystem ) {
 
 		// color
 
-		color.r = ThreeMath.clamp( color.r + particleSystem.random() * colorRandomness, 0, 1 );
-		color.g = ThreeMath.clamp( color.g + particleSystem.random() * colorRandomness, 0, 1 );
-		color.b = ThreeMath.clamp( color.b + particleSystem.random() * colorRandomness, 0, 1 );
+		color.r = _Math.clamp( color.r + particleSystem.random() * colorRandomness, 0, 1 );
+		color.g = _Math.clamp( color.g + particleSystem.random() * colorRandomness, 0, 1 );
+		color.b = _Math.clamp( color.b + particleSystem.random() * colorRandomness, 0, 1 );
 
 		colorAttribute.array[ i * 3 + 0 ] = color.r;
 		colorAttribute.array[ i * 3 + 1 ] = color.g;

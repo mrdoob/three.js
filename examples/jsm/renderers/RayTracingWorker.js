@@ -2,7 +2,7 @@ import {
   Color,
   EventDispatcher,
   FaceColors,
-  Math,
+  Math as _Math,
   Matrix3,
   Matrix4,
   ObjectLoader,
@@ -517,7 +517,7 @@ var RaytracingRendererWorker = function () {
 
 		cameraNormalMatrix.getNormalMatrix( camera.matrixWorld );
 
-		perspective = 0.5 / Math.tan( ThreeMath.degToRad( camera.fov * 0.5 ) ) * canvasHeight;
+		perspective = 0.5 / Math.tan( _Math.degToRad( camera.fov * 0.5 ) ) * canvasHeight;
 
 		objects = scene.children;
 

@@ -1,5 +1,5 @@
 import {
-  Math,
+  Math as _Math,
   Spherical,
   Vector3
 } from '../../../build/three.module.js';
@@ -224,7 +224,7 @@ var FirstPersonControls = function ( object, domElement ) {
 
 			if ( this.heightSpeed ) {
 
-				var y = ThreeMath.clamp( this.object.position.y, this.heightMin, this.heightMax );
+				var y = _Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
 				var heightDelta = y - this.heightMin;
 
 				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
@@ -267,12 +267,12 @@ var FirstPersonControls = function ( object, domElement ) {
 
 			lat = Math.max( - 85, Math.min( 85, lat ) );
 
-			var phi = ThreeMath.degToRad( 90 - lat );
-			var theta = ThreeMath.degToRad( lon );
+			var phi = _Math.degToRad( 90 - lat );
+			var theta = _Math.degToRad( lon );
 
 			if ( this.constrainVertical ) {
 
-				phi = ThreeMath.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
+				phi = _Math.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
 
 			}
 
@@ -335,8 +335,8 @@ var FirstPersonControls = function ( object, domElement ) {
 		lookDirection.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 		spherical.setFromVector3( lookDirection );
 
-		lat = 90 - ThreeMath.radToDeg( spherical.phi );
-		lon = ThreeMath.radToDeg( spherical.theta );
+		lat = 90 - _Math.radToDeg( spherical.phi );
+		lon = _Math.radToDeg( spherical.theta );
 
 	}
 

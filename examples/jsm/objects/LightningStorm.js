@@ -2,7 +2,7 @@ import {
   LightningStrike
 } from '../../geometries/LightningStrike.js';
 import {
-  Math,
+  Math as _Math,
   Mesh,
   MeshBasicMaterial,
   Object3D
@@ -94,7 +94,7 @@ var LightningStorm = function ( stormParams ) {
 
 			dest.set( ( Math.random() - 0.5 ) * stormParams.size, 0, ( Math.random() - 0.5 ) * stormParams.size );
 			
-			var height = ThreeMath.lerp( stormParams.minHeight, stormParams.maxHeight, Math.random() );;
+			var height = _Math.lerp( stormParams.minHeight, stormParams.maxHeight, Math.random() );;
 
 			source.set( stormParams.maxSlope * ( 2 * Math.random() - 1 ), 1, stormParams.maxSlope * ( 2 * Math.random() - 1 ) ).multiplyScalar( height ).add( dest );
 
@@ -147,7 +147,7 @@ LightningStorm.prototype.update = function ( time ) {
 			var lightningParams1 = LightningStrike.copyParameters( lightningMesh.geometry.rayParameters, this.lightningParameters );
 
 			lightningParams1.birthTime = time;
-			lightningParams1.deathTime = time + ThreeMath.lerp( this.stormParams.lightningMinDuration, this.stormParams.lightningMaxDuration, Math.random() );
+			lightningParams1.deathTime = time + _Math.lerp( this.stormParams.lightningMinDuration, this.stormParams.lightningMaxDuration, Math.random() );
 
 			this.onRayPosition( lightningParams1.sourceOffset, lightningParams1.destOffset );
 
@@ -211,7 +211,7 @@ LightningStorm.prototype.update = function ( time ) {
 
 LightningStorm.prototype.getNextLightningTime = function ( currentTime ) {
 
-	return currentTime + ThreeMath.lerp( this.stormParams.lightningMinPeriod, this.stormParams.lightningMaxPeriod, Math.random() ) / ( this.stormParams.maxLightnings + 1 );
+	return currentTime + _Math.lerp( this.stormParams.lightningMinPeriod, this.stormParams.lightningMaxPeriod, Math.random() ) / ( this.stormParams.maxLightnings + 1 );
 
 };
 

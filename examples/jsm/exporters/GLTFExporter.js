@@ -7,7 +7,7 @@ import {
   LinearFilter,
   LinearMipMapLinearFilter,
   LinearMipMapNearestFilter,
-  Math,
+  Math as _Math,
   MirroredRepeatWrapping,
   NearestFilter,
   NearestMipMapLinearFilter,
@@ -232,7 +232,7 @@ GLTFExporter.prototype = {
 		 */
 		function isPowerOfTwo( image ) {
 
-			return ThreeMath.isPowerOfTwo( image.width ) && ThreeMath.isPowerOfTwo( image.height );
+			return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
 
 		}
 
@@ -736,8 +736,8 @@ GLTFExporter.prototype = {
 
 					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
-					canvas.width = ThreeMath.floorPowerOfTwo( canvas.width );
-					canvas.height = ThreeMath.floorPowerOfTwo( canvas.height );
+					canvas.width = _Math.floorPowerOfTwo( canvas.width );
+					canvas.height = _Math.floorPowerOfTwo( canvas.height );
 
 				}
 
@@ -1432,7 +1432,7 @@ GLTFExporter.prototype = {
 				gltfCamera.perspective = {
 
 					aspectRatio: camera.aspect,
-					yfov: ThreeMath.degToRad( camera.fov ),
+					yfov: _Math.degToRad( camera.fov ),
 					zfar: camera.far <= 0 ? 0.001 : camera.far,
 					znear: camera.near < 0 ? 0 : camera.near
 
