@@ -146,7 +146,7 @@ THREE.SpriteText = function ( text, options ) {
 
 			} );
 
-		options.font = `${options.fontProperties ? options.fontProperties + ' ' : ''}${options.bold ? 'bold ' : ''}${options.italic ? 'italic ' : ''}${fontSize}px ${options.fontFace}`;
+		options.font = ( options.fontProperties ? options.fontProperties + ' ' : '' ) + ( options.bold ? 'bold ' : '' ) + ( options.italic ? 'italic ' : '' ) + fontSize + 'px ' + options.fontFace;
 
 		context.font = options.font;
 		const textWidth = context.measureText( options.text ).width;
