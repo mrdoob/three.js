@@ -12,14 +12,29 @@ const SRC = 'examples/js';
 const DEST = 'examples/jsm';
 
 const paths = {
-	'**/*.js': {
+	'controls/*.js': {
 		convert: true
 	},
-	'libs/**/*.js': {
-		copy: true // Just copy, no conversion
+	'loaders/**/*.js': {
+		convert: true
 	},
-	'nodes/**/*.js': {
-		copy: true
+	'postprocessing/*.js': {
+		convert: true
+	},
+	'renderers/*.js': {
+		convert: true
+	},
+	'controls/**/*.js': {
+		convert: true
+	},
+	'shaders/*.js': {
+		convert: true
+	},
+	'curves/*.js': {
+		convert: true
+	},
+	'utils/**/*.js': {
+		convert: true
 	},
 	'loaders/sea3d/**/*.js': {
 		convert: false
@@ -34,23 +49,11 @@ const paths = {
 
 		}
 	},
-	'crossfade/*.js': {
-		convert: false
+	'Volume.js': {
+		convert: true
 	},
-	'RollerCoaster.js': {
-		exports: [
-			'RollerCoasterGeometry',
-			'RollerCoasterLiftersGeometry',
-			'RollerCoasterShadowGeometry',
-			'SkyGeometry',
-			'TreesGeometry',
-		]
-	},
-	'WebGL.js': {
-		exports: [ 'WEBGL' ]
-	},
-	'vr/WebVR.js': {
-		exports: [ 'WEBVR' ]
+	'VolumeSlice.js': {
+		convert: true
 	},
 	'renderers/RayTracingWorker.js': {
 		copy: true
