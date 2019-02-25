@@ -3,6 +3,7 @@
  */
 
 import { Group } from '../../objects/Group.js';
+import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
@@ -25,6 +26,8 @@ function WebXRManager( renderer ) {
 
 	var controllers = [];
 	var inputSources = [];
+
+	var currentSize = new Vector2(), currentPixelRatio;
 
 	function isPresenting() {
 
@@ -92,7 +95,9 @@ function WebXRManager( renderer ) {
 
 	function onSessionEnd() {
 
+		renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
 		renderer.setFramebuffer( null );
+		renderer.setRenderTarget( renderer.getRenderTarget() );
 		animation.stop();
 
 	}
@@ -126,6 +131,11 @@ function WebXRManager( renderer ) {
 				frameOfReference = value;
 
 				renderer.setFramebuffer( session.baseLayer.framebuffer );
+
+				currentPixelRatio = renderer.getPixelRatio();
+				renderer.getSize( currentSize );
+
+				renderer.setDrawingBufferSize( session.baseLayer.framebufferWidth, session.baseLayer.framebufferHeight, 1 );
 
 				animation.setContext( session );
 				animation.start();
