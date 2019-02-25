@@ -97,7 +97,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 		if ( this.renderer.vr.enabled === true ) {
 
 			this.renderer.vr.enabled = false;
-			this.renderer.getSize( this._rendererSize );
+			this.renderer.getDrawingBufferSize( this._rendererSize );
 			this.setSize( this._rendererSize.x, this._rendererSize.y );
 
 		}
