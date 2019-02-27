@@ -180,6 +180,7 @@ var Loader = function ( editor ) {
 
 					collada.scene.name = filename;
 
+					editor.addAnimation( collada.scene, collada.animations );
 					editor.execute( new AddObjectCommand( collada.scene ) );
 
 				}, false );

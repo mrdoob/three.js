@@ -244,7 +244,11 @@ Editor.prototype = {
 
 	addAnimation: function ( object, animations ) {
 
-		this.animations[ object.uuid ] = animations;
+		if ( animations.length > 0 ) {
+
+			this.animations[ object.uuid ] = animations;
+
+		}
 
 	},
 
