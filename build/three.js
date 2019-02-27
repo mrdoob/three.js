@@ -21540,17 +21540,17 @@
 		 *   var fullHeight = h * 2;
 		 *
 		 *   --A--
-		 *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+		 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
 		 *   --B--
-		 *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+		 *   camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
 		 *   --C--
-		 *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+		 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
 		 *   --D--
-		 *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+		 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
 		 *   --E--
-		 *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+		 *   camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
 		 *   --F--
-		 *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+		 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 		 *
 		 *   Note there is no reason monitors have to be the same size or in a grid.
 		 */
@@ -25175,7 +25175,7 @@
 				color: this.color.getHex(),
 				near: this.near,
 				far: this.far
-			}
+			};
 
 		}
 
