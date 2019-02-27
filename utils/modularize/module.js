@@ -24,6 +24,11 @@ function isExportExpression( node ) {
 
 }
 
+function getRelativePath( from, to ) {
+	const relativePath = path.relative( path.dirname( from ), to );
+	return relativePath[0] === '.' ? relativePath : './' + relativePath;
+}
+
 function unique( array ) {
 
 	const set = new Set( array );
@@ -183,7 +188,7 @@ class Module {
 			// Depending on other modules
 			if ( target ) {
 
-				const relativePath = path.relative( this.file, target.file );
+				const relativePath = getRelativePath( this.file, target.file );
 				if ( ! deps[ relativePath ] ) {
 
 					deps[ relativePath ] = [];
