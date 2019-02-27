@@ -74,7 +74,6 @@
 					authorURL: 'https://www.microsoft.com/',
 					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
 					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
-					addLights: true,
 					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
 					addEnvMap: true
 				},
@@ -98,7 +97,6 @@
 					authorURL: 'https://twitter.com/emackey',
 					cameraPos: new THREE.Vector3( 2, 1, 15 ),
 					objectRotation: new THREE.Euler( 0, 0, 0 ),
-					addLights: true,
 					extensions: [ 'glTF', 'glTF-Embedded' ],
 					addEnvMap: true
 				},
@@ -358,6 +356,7 @@
 								 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {
 
 								node.material.envMap = envMap;
+								node.material.envMapIntensity = 1.5; // boombox seems to dark otherwise
 
 							}
 
