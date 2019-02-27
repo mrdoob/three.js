@@ -56,10 +56,13 @@
 		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+
 		<script>
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
-			var gltf, envMap, mixer, gui, extensionControls;
+			var gltf, background, envMap, mixer, gui, extensionControls;
 
 			var clock = new THREE.Clock();
 
@@ -170,17 +173,45 @@
 
 			function onload() {
 
+				container = document.getElementById( 'container' );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
+				renderer.physicallyCorrectLights = true;
+				container.appendChild( renderer.domElement );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				buildGUI();
-				initScene( scenes[ state.scene ] );
-				animate();
+				// Load background and generate envMap
+
+				var urls = [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ];
+				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/Park2/' );
+				background = loader.load( urls, function ( texture ) {
+
+					var pmremGenerator = new THREE.PMREMGenerator( texture );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
+					//
+
+					buildGUI();
+					initScene( scenes[ state.scene ] );
+					animate();
+
+				} );
 
 			}
 
 			function initScene( sceneInfo ) {
-
-				container = document.getElementById( 'container' );
 
 				var descriptionEl = document.getElementById( 'description' );
 
@@ -227,15 +258,6 @@
 
 				}
 
-				// RENDERER
-
-				// TODO: Reuse existing WebGLRenderer, GLTFLoaders, and so on
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
-				renderer.physicallyCorrectLights = true;
-
 				if ( sceneInfo.shadows ) {
 
 					renderer.shadowMap.enabled = true;
@@ -243,7 +265,7 @@
 
 				}
 
-				container.appendChild( renderer.domElement );
+				// TODO: Reuse existing OrbitControls, GLTFLoaders, and so on
 
 				orbitControls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -330,21 +352,18 @@
 
 					if ( sceneInfo.addEnvMap ) {
 
-						if ( ! envMap ) envMap = getEnvMap();
-
 						object.traverse( function ( node ) {
 
 							if ( node.material && ( node.material.isMeshStandardMaterial ||
 								 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {
 
 								node.material.envMap = envMap;
-								node.material.needsUpdate = true;
 
 							}
 
 						} );
 
-						scene.background = envMap;
+						scene.background = background;
 
 					}
 
@@ -418,23 +437,6 @@
 
 			}
 
-			function getEnvMap() {
-
-				var path = 'textures/cube/Park2/';
-				var format = '.jpg';
-				var urls = [
-					path + 'posx' + format, path + 'negx' + format,
-					path + 'posy' + format, path + 'negy' + format,
-					path + 'posz' + format, path + 'negz' + format
-				];
-
-				envMap = new THREE.CubeTextureLoader().load( urls );
-				envMap.format = THREE.RGBFormat;
-
-				return envMap;
-
-			}
-
 			function buildGUI() {
 
 				gui = new dat.GUI( { width: 330 } );
@@ -481,12 +483,6 @@
 			}
 
 			function reload() {
-
-				if ( container && renderer ) {
-
-					container.removeChild( renderer.domElement );
-
-				}
 
 				if ( loader && mixer ) mixer.stopAllAction();
 
