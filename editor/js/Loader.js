@@ -196,6 +196,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.FBXLoader( manager );
 					var object = loader.parse( contents );
 
+					editor.addAnimation( object, object.animations );
 					editor.execute( new AddObjectCommand( object ) );
 
 				}, false );
