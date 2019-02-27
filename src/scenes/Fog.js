@@ -33,7 +33,7 @@ Object.assign( Fog.prototype, {
 			color: this.color.getHex(),
 			near: this.near,
 			far: this.far
-		}
+		};
 
 	}
 
