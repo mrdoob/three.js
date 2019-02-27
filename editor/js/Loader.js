@@ -596,7 +596,7 @@ var Loader = function ( editor ) {
 
 				var result = loader.parse( data );
 
-				if ( result instanceof THREE.Scene ) {
+				if ( result.isScene ) {
 
 					editor.execute( new SetSceneCommand( result ) );
 
