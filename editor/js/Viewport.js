@@ -393,7 +393,7 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( object instanceof THREE.PerspectiveCamera ) {
+		if ( object.isPerspectiveCamera ) {
 
 			object.updateProjectionMatrix();
 
@@ -477,13 +477,13 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( scene.fog instanceof THREE.Fog ) {
+		if ( scene.fog.isFog ) {
 
 			scene.fog.color.setHex( fogColor );
 			scene.fog.near = fogNear;
 			scene.fog.far = fogFar;
 
-		} else if ( scene.fog instanceof THREE.FogExp2 ) {
+		} else if ( scene.fog.isFogExp2 ) {
 
 			scene.fog.color.setHex( fogColor );
 			scene.fog.density = fogDensity;
