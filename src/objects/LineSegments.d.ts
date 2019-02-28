@@ -18,4 +18,7 @@ export class LineSegments extends Line {
     material?: Material | Material[],
     mode?: number
   );
+
+  type: 'LineSegments';
+  isLineSegments: true;
 }
