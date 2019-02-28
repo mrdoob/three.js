@@ -55,7 +55,7 @@ Sidebar.Geometry = function ( editor ) {
 
 			case 'Convert':
 
-				if ( geometry instanceof THREE.Geometry ) {
+				if ( geometry && geometry.isGeometry ) {
 
 					editor.execute( new SetGeometryCommand( object, new THREE.BufferGeometry().fromGeometry( geometry ) ) );
 

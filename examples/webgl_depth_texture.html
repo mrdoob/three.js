@@ -93,7 +93,6 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/shaders/SSAOShader.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -229,9 +228,11 @@
 				requestAnimationFrame( animate );
 
 				// render scene into target
-				renderer.render( scene, camera, target );
+				renderer.setRenderTarget( target );
+				renderer.render( scene, camera );
 
 				// render post FX
+				renderer.setRenderTarget( null );
 				renderer.render( postScene, postCamera );
 
 				stats.update();

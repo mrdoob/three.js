@@ -83,7 +83,7 @@
 			uniform float time;
 			uniform float testing;
 			uniform float delta; // about 0.016
-			uniform float seperationDistance; // 20
+			uniform float separationDistance; // 20
 			uniform float alignmentDistance; // 40
 			uniform float cohesionDistance; //
 			uniform float freedomFactor;
@@ -113,9 +113,9 @@
 
 			void main() {
 
-				zoneRadius = seperationDistance + alignmentDistance + cohesionDistance;
-				separationThresh = seperationDistance / zoneRadius;
-				alignmentThresh = ( seperationDistance + alignmentDistance ) / zoneRadius;
+				zoneRadius = separationDistance + alignmentDistance + cohesionDistance;
+				separationThresh = separationDistance / zoneRadius;
+				alignmentThresh = ( separationDistance + alignmentDistance ) / zoneRadius;
 				zoneRadiusSquared = zoneRadius * zoneRadius;
 
 
@@ -129,7 +129,7 @@
 				vec3 dir; // direction
 				float distSquared;
 
-				float seperationSquared = seperationDistance * seperationDistance;
+				float separationSquared = separationDistance * separationDistance;
 				float cohesionSquared = cohesionDistance * cohesionDistance;
 
 				float f;
@@ -502,7 +502,7 @@
 
 
 				var effectController = {
-					seperation: 20.0,
+					separation: 20.0,
 					alignment: 20.0,
 					cohesion: 20.0,
 					freedom: 0.75
@@ -510,7 +510,7 @@
 
 				var valuesChanger = function () {
 
-					velocityUniforms[ "seperationDistance" ].value = effectController.seperation;
+					velocityUniforms[ "separationDistance" ].value = effectController.separation;
 					velocityUniforms[ "alignmentDistance" ].value = effectController.alignment;
 					velocityUniforms[ "cohesionDistance" ].value = effectController.cohesion;
 					velocityUniforms[ "freedomFactor" ].value = effectController.freedom;
@@ -520,7 +520,7 @@
 				valuesChanger();
 
 
-				gui.add( effectController, "seperation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
+				gui.add( effectController, "separation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
 				gui.add( effectController, "alignment", 0.0, 100, 0.001 ).onChange( valuesChanger );
 				gui.add( effectController, "cohesion", 0.0, 100, 0.025 ).onChange( valuesChanger );
 				gui.close();
@@ -552,7 +552,7 @@
 				velocityUniforms[ "time" ] = { value: 1.0 };
 				velocityUniforms[ "delta" ] = { value: 0.0 };
 				velocityUniforms[ "testing" ] = { value: 1.0 };
-				velocityUniforms[ "seperationDistance" ] = { value: 1.0 };
+				velocityUniforms[ "separationDistance" ] = { value: 1.0 };
 				velocityUniforms[ "alignmentDistance" ] = { value: 1.0 };
 				velocityUniforms[ "cohesionDistance" ] = { value: 1.0 };
 				velocityUniforms[ "freedomFactor" ] = { value: 1.0 };
