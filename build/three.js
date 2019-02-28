@@ -21958,9 +21958,11 @@
 
 			var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
 
-			if ( device === null ) {
+			if ( isPresenting() === false ) {
 
 				camera.position.set( 0, userHeight, 0 );
+				camera.rotation.set( 0, 0, 0 );
+
 				return camera;
 
 			}
@@ -22013,8 +22015,6 @@
 			}
 
 			poseObject.updateMatrixWorld();
-
-			if ( device.isPresenting === false ) return camera;
 
 			//
 
