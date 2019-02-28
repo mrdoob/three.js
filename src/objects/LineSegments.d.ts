@@ -19,6 +19,6 @@ export class LineSegments extends Line {
     mode?: number
   );
 
-  type: "LineSegments";
+  type: 'LineSegments';
   isLineSegments: true;
 }

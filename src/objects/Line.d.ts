@@ -15,7 +15,7 @@ export class Line extends Object3D {
   geometry: Geometry | BufferGeometry;
   material: Material | Material[];
 
-  type: "Line" | "LineLoop" | "LineSegments";
+  type: 'Line' | 'LineLoop' | 'LineSegments';
   isLine: true;
 
   computeLineDistances(): this;

@@ -9,6 +9,6 @@ export class LineLoop extends Line {
     material?: Material | Material[]
   );
 
-  type: "LineLoop";
+  type: 'LineLoop';
   isLineLoop: true;
 }
