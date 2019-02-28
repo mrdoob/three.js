@@ -185,7 +185,7 @@
 
 	} );
 
-	var REVISION = '102dev';
+	var REVISION = '102';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
