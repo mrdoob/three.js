@@ -348,7 +348,7 @@
 		<p>将GL状态重置为默认值。WebGL环境丢失时会内部调用</p>
 
 		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], buffer )</h3>
-		<p>将enderTarget中的像素数据读取到传入的缓冲区中。这是link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]()的包装器<br />
+		<p>将enderTarget中的像素数据读取到传入的缓冲区中。这是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]()的包装器<br />
 		示例：[example:webgl_interactive_cubes_gpu interactive / cubes / gpu]
 		</p>
 
@@ -376,7 +376,7 @@
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — 每个可用帧都会调用的函数。 如果传入‘null’,所有正在进行的动画都会停止。</p>
-		<p>可用来代替[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]的内置函数. 对于WebVR想谬，必须使用此功能</p>
+		<p>可用来代替[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]的内置函数. 对于WebVR项目，必须使用此函数。</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>设置alpha。合法参数是一个*0.0*到 *1.0*之间的浮点数</p>

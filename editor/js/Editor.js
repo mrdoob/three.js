@@ -244,7 +244,11 @@ Editor.prototype = {
 
 	addAnimation: function ( object, animations ) {
 
-		this.animations[ object.uuid ] = animations;
+		if ( animations.length > 0 ) {
+
+			this.animations[ object.uuid ] = animations;
+
+		}
 
 	},
 
@@ -259,27 +263,27 @@ Editor.prototype = {
 
 			var helper;
 
-			if ( object instanceof THREE.Camera ) {
+			if ( object.isCamera ) {
 
 				helper = new THREE.CameraHelper( object, 1 );
 
-			} else if ( object instanceof THREE.PointLight ) {
+			} else if ( object.isPointLight ) {
 
 				helper = new THREE.PointLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.DirectionalLight ) {
+			} else if ( object.isDirectionalLight ) {
 
 				helper = new THREE.DirectionalLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.SpotLight ) {
+			} else if ( object.isSpotLight ) {
 
 				helper = new THREE.SpotLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.HemisphereLight ) {
+			} else if ( object.isHemisphereLight ) {
 
 				helper = new THREE.HemisphereLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.SkinnedMesh ) {
+			} else if ( object.isSkinnedMesh ) {
 
 				helper = new THREE.SkeletonHelper( object );
 
@@ -531,8 +535,6 @@ Editor.prototype = {
 
 			metadata: {},
 			project: {
-				gammaInput: this.config.getKey( 'project/renderer/gammaInput' ),
-				gammaOutput: this.config.getKey( 'project/renderer/gammaOutput' ),
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )
 			},

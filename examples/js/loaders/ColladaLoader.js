@@ -1506,7 +1506,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			material.name = data.name;
+			material.name = data.name || '';
 
 			function getTexture( textureObject ) {
 
@@ -1834,7 +1834,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			camera.name = data.name;
+			camera.name = data.name || '';
 
 			return camera;
 
