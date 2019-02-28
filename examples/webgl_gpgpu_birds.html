@@ -107,8 +107,8 @@
 
 			const float SPEED_LIMIT = 9.0;
 
-			float rand(vec2 co){
-				return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+			float rand( vec2 co ){
+				return fract( sin( dot( co.xy, vec2(12.9898,78.233) ) ) * 43758.5453 );
 			}
 
 			void main() {
@@ -150,7 +150,7 @@
 
 
 				// move birds away from predator
-				if (dist < preyRadius) {
+				if ( dist < preyRadius ) {
 
 					f = ( distSquared / preyRadiusSq - 1.0 ) * delta * 100.;
 					velocity += normalize( dir ) * f;
@@ -170,28 +170,28 @@
 				dir.y *= 2.5;
 				velocity -= normalize( dir ) * delta * 5.;
 
-				for (float y=0.0;y<height;y++) {
-					for (float x=0.0;x<width;x++) {
+				for ( float y = 0.0; y < height; y++ ) {
+					for ( float x = 0.0; x < width; x++ ) {
 
 						vec2 ref = vec2( x + 0.5, y + 0.5 ) / resolution.xy;
 						birdPosition = texture2D( texturePosition, ref ).xyz;
 
 						dir = birdPosition - selfPosition;
-						dist = length(dir);
+						dist = length( dir );
 
-						if (dist < 0.0001) continue;
+						if ( dist < 0.0001 ) continue;
 
 						distSquared = dist * dist;
 
-						if (distSquared > zoneRadiusSquared ) continue;
+						if ( distSquared > zoneRadiusSquared ) continue;
 
 						percent = distSquared / zoneRadiusSquared;
 
 						if ( percent < separationThresh ) { // low
 
 							// Separation - Move apart for comfort
-							f = (separationThresh / percent - 1.0) * delta;
-							velocity -= normalize(dir) * f;
+							f = ( separationThresh / percent - 1.0 ) * delta;
+							velocity -= normalize( dir ) * f;
 
 						} else if ( percent < alignmentThresh ) { // high
 
@@ -202,7 +202,7 @@
 							birdVelocity = texture2D( textureVelocity, ref ).xyz;
 
 							f = ( 0.5 - cos( adjustedPercent * PI_2 ) * 0.5 + 0.5 ) * delta;
-							velocity += normalize(birdVelocity) * f;
+							velocity += normalize( birdVelocity ) * f;
 
 						} else {
 
@@ -212,7 +212,7 @@
 
 							f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * delta;
 
-							velocity += normalize(dir) * f;
+							velocity += normalize( dir ) * f;
 
 						}
 
