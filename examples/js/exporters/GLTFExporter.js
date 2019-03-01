@@ -1495,10 +1495,10 @@ THREE.GLTFExporter.prototype = {
 
 				// @TODO export CubicInterpolant(InterpolateSmooth) as CUBICSPLINE
 
-				// Detecting glTF cubic spline interpolant by checking factory method's special property
+				// Detecting glTF cubic spline interpolant by checking the constructor name of a created interpolant.
 				// GLTFCubicSplineInterpolant is a custom interpolant and track doesn't return
 				// valid value from .getInterpolation().
-				if ( track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline === true ) {
+				if ( track.createInterpolant !== undefined && track.createInterpolant().constructor.name == "GLTFCubicSplineInterpolant") {
 
 					interpolation = 'CUBICSPLINE';
 
@@ -2114,7 +2114,7 @@ THREE.GLTFExporter.Utils = {
 			if ( sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodDiscrete
 				&& sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodLinear ) {
 
-				if ( sourceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+				if ( sourceTrack.createInterpolant().constructor.name == "GLTFCubicSplineInterpolant" ) {
 
 					// This should never happen, because glTF morph target animations
 					// affect all targets already.

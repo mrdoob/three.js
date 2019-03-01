@@ -1860,11 +1860,7 @@ THREE.MMDLoader = ( function () {
 
 			var track = new typedKeyframeTrack( node, times, values );
 
-			track.createInterpolant = function InterpolantFactoryMethodCubicBezier( result ) {
-
-				return new CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, new Float32Array( interpolations ) );
-
-			};
+			track.createInterpolant = CubicBezierInterpolation.FactoryMethod;
 
 			return track;
 
@@ -2014,6 +2010,14 @@ THREE.MMDLoader = ( function () {
 		}
 
 	} );
+
+	CubicBezierInterpolation.FactoryMethod = function( result ) {
+
+		return new CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, new Float32Array( interpolations ) );
+
+	};
+
+	THREE.CubicBezierInterpolation = CubicBezierInterpolation;
 
 	return MMDLoader;
 

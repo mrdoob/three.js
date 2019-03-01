@@ -64,13 +64,21 @@ Object.assign( KeyframeTrack, {
 
 			};
 
-			var interpolation = track.getInterpolation();
-
-			if ( interpolation !== track.DefaultInterpolation ) {
+			// Assumptions for custom interpolations:
+			// 1) The constructor is a part of the THREE module at the time of serialization
+			// 2) The constructor will be a part of the THREE module at the time of deserialization
+			if(track.hasCustomInterpolation())
+			{
+				var interpolation = track.createInterpolant();
+				json.interpolation = interpolation.constructor.name;
+			}
+			else{ 
+				var interpolation = track.getInterpolation();
+				if ( interpolation !== track.DefaultInterpolation ) {
 
 				json.interpolation = interpolation;
-
 			}
+		}
 
 		}
 
@@ -84,26 +92,26 @@ Object.assign( KeyframeTrack, {
 
 	fromJSON: function ( json ) {
 
-		var constructor;
+		var keyframeTrackConstructor;
 		switch ( json.type ) {
 
 			case 'number':
-				constructor = KeyframeTracks.NumberKeyframeTrack;
+				keyframeTrackConstructor = KeyframeTracks.NumberKeyframeTrack;
 				break;
 			case 'vector':
-				constructor = KeyframeTracks.VectorKeyframeTrack;
+				keyframeTrackConstructor = KeyframeTracks.VectorKeyframeTrack;
 				break;
 			case 'quaternion':
-				constructor = KeyframeTracks.QuaternionKeyframeTrack;
+				keyframeTrackConstructor = KeyframeTracks.QuaternionKeyframeTrack;
 				break;
 			case 'string':
-				constructor = KeyframeTracks.StringKeyframeTrack;
+				keyframeTrackConstructor = KeyframeTracks.StringKeyframeTrack;
 				break;
 			case 'bool':
-				constructor = KeyframeTracks.BooleanKeyframeTrack;
+				keyframeTrackConstructor = KeyframeTracks.BooleanKeyframeTrack;
 				break;
 			case 'color':
-				constructor = KeyframeTracks.ColorKeyframeTrack;
+				keyframeTrackConstructor = KeyframeTracks.ColorKeyframeTrack;
 				break;
 			default:
 				console.error( "THREE.KeyframeTrack: Unsupported KeyframeTrack " + json.type + ". This method only supports THREE's default Keyframetracks (NumberKeyframeTrack, VectorKeyframeTrack, etc)" );
@@ -111,8 +119,37 @@ Object.assign( KeyframeTrack, {
 
 		}
 
-		return new constructor( json.name, AnimationUtils.convertArray( json.times, AnimationUtils.getTypedConstructor( json.timesValue ) ), AnimationUtils.convertArray( json.values, AnimationUtils.getTypedConstructor( json.valuesType ) ), json.interpolation );
+		var newTrack = new keyframeTrackConstructor( 
+			json.name, 
+			AnimationUtils.convertArray( json.times, AnimationUtils.getTypedConstructor( json.timesValue ) ), 
+			AnimationUtils.convertArray( json.values, AnimationUtils.getTypedConstructor( json.valuesType ) )
+		);
 
+		if(typeof json.interpolation == "string")
+		{
+			var interpolationConstructor = THREE[json.interpolation];
+			
+			if(interpolationConstructor === undefined)
+			{
+				console.error("THREE.KeyframeTrack: Failed to parse custom interpolation '" + json.interpolation + "'. Custom interpolations must be a part of the THREE module at the time of deserialization");
+			}
+			else if(interpolationConstructor.FactoryMethod !== undefined)
+			{
+				newTrack.createInterpolant = interpolationConstructor.FactoryMethod;
+			}
+			else
+			{
+				newTrack.createInterpolant = function InterpolantFactoryMethod(result) {
+					return new interpolationConstructor(newTrack.times, newTrack.values, newTrack.getValueSize(), result);
+				};
+			}
+		}
+		else
+		{
+			newTrack.setInterpolation(json.interpolation || newTrack.DefaultInterpolation);
+		}
+
+		return newTrack;
 	}
 
 } );
@@ -173,8 +210,8 @@ Object.assign( KeyframeTrack.prototype, {
 
 		if ( factoryMethod === undefined ) {
 
-			var message = "unsupported interpolation for " +
-				this.ValueTypeName + " keyframe track named " + this.name;
+			var message = "Unsupported interpolation for '" +
+				this.ValueTypeName + "' keyframe track named " + this.name;
 
 			if ( this.createInterpolant === undefined ) {
 
@@ -220,6 +257,11 @@ Object.assign( KeyframeTrack.prototype, {
 
 		}
 
+	},
+
+	hasCustomInterpolation: function()
+	{
+		return this.createInterpolant !== undefined && this.getInterpolation() === undefined;
 	},
 
 	getValueSize: function () {

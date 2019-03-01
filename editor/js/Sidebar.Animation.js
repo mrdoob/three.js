@@ -22,6 +22,7 @@ Sidebar.Animation = function ( editor ) {
 
 			for ( var animation of animations ) {
 
+				
 				if ( firstAnimation === undefined ) firstAnimation = animation.name;
 
 				actions[ animation.name ] = mixer.clipAction( animation, object );
@@ -46,8 +47,16 @@ Sidebar.Animation = function ( editor ) {
 
 		if ( animations !== undefined ) {
 
-			mixer.uncacheRoot( object );
+			for(var i in animations)
+			{
+				var animation = animations[i];
+				var action = actions[animation.name];
+				action.stop();
+				delete actions[animation.name];
+			}
+			delete animations[object.uuid];
 
+			mixer.uncacheRoot( object );
 		}
 
 	} );
