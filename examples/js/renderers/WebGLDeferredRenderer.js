@@ -40,7 +40,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var _this = this;
 
-	var _gl;
+	var _context;
+	var _state;
 
 	var _width, _height;
 
@@ -114,7 +115,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	this.renderer = undefined;
 	this.domElement = undefined;
 
-	this.forwardRendering = false;  // for debug
+	this.forwardRendering = false; // for debug
 
 	// private methods
 
@@ -123,7 +124,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer = parameters.renderer !== undefined ? parameters.renderer : new THREE.WebGLRenderer();
 		_this.domElement = _this.renderer.domElement;
 
-		_gl = _this.renderer.context;
+		_context = _this.renderer.context;
+		_state = _this.renderer.state;
 
 		_width = parameters.width !== undefined ? parameters.width : _this.renderer.getSize( new THREE.Vector2() ).width;
 		_height = parameters.height !== undefined ? parameters.height : _this.renderer.getSize( new THREE.Vector2() ).height;
@@ -1176,7 +1178,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			if ( cache[ key ].used === false ) {
 
-				cache[ key ].count++;
+				cache[ key ].count ++;
 
 				if ( cache[ key ].keepAlive === false && cache[ key ].count > _removeThresholdCount ) {
 
@@ -1255,9 +1257,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer.autoClearDepth = true;
 		_this.renderer.autoClearStencil = true;
 
-		_gl.enable( _gl.STENCIL_TEST );
-		_gl.stencilFunc( _gl.ALWAYS, 1, 0xffffffff );
-		_gl.stencilOp( _gl.REPLACE, _gl.REPLACE, _gl.REPLACE );
+		_state.buffers.stencil.setTest( true );
+		_state.buffers.stencil.setFunc( _context.ALWAYS, 1, 0xffffffff );
+		_state.buffers.stencil.setOp( _context.REPLACE, _context.REPLACE, _context.REPLACE );
 
 		_compNormalDepth.render();
 
@@ -1286,8 +1288,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer.autoClearDepth = false;
 		_this.renderer.autoClearStencil = false;
 
-		_gl.stencilFunc( _gl.EQUAL, 1, 0xffffffff );
-		_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
+		_state.buffers.stencil.setFunc( _context.EQUAL, 1, 0xffffffff );
+		_state.buffers.stencil.setOp( _context.KEEP, _context.KEEP, _context.KEEP );
 
 		_compColor.render();
 
@@ -1318,7 +1320,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compLight.render();
 
-		_gl.disable( _gl.STENCIL_TEST );
+		_state.buffers.stencil.setTest( false );
 
 	}
 
@@ -1343,8 +1345,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer.autoClearDepth = false;
 		_this.renderer.autoClearStencil = false;
 
-		_gl.stencilFunc( _gl.EQUAL, 1, 0xffffffff );
-		_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
+		_state.buffers.stencil.setFunc( _context.EQUAL, 1, 0xffffffff );
+		_state.buffers.stencil.setOp( _context.KEEP, _context.KEEP, _context.KEEP );
 
 		_compLight.render();
 
@@ -1371,7 +1373,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compReconstruction.render();
 
-		_gl.disable( _gl.STENCIL_TEST );
+		_state.buffers.stencil.setTest( false );
 
 		scene.traverse( restoreOriginalMaterial );
 
