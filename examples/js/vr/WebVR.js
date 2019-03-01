@@ -30,7 +30,8 @@ var WEBVR = {
 
 			button.onclick = function () {
 
-				device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
+				var attributes = { multiview: renderer.vr.multiview };
+				device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement, attributes: attributes } ] );
 
 			};
 
