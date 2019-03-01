@@ -67,10 +67,16 @@ Object.assign( KeyframeTrack, {
 			// Assumptions for custom interpolations:
 			// 1) The constructor is a part of the THREE module at the time of serialization
 			// 2) The constructor will be a part of the THREE module at the time of deserialization
+			// 3) Either the factory method or the interpolant object itself will have a 'type' property to define the name of the interpolant
 			if ( track.hasCustomInterpolation() ) {
 
-				var interpolation = track.createInterpolant();
-				json.interpolation = interpolation.constructor.name;
+				var interpolation = track.createInterpolant.type;
+				if ( interpolation === undefined ) {
+
+					interpolation = track.createInterpolant().type;
+
+				}
+				json.interpolation = interpolation;
 
 			} else {
 

@@ -1882,6 +1882,8 @@ THREE.MMDLoader = ( function () {
 
 		constructor: CubicBezierInterpolation,
 
+		type: 'CubicBezierInterpolation',
+
 		interpolate_: function ( i1, t0, t, t1 ) {
 
 			var result = this.resultBuffer;
@@ -2016,6 +2018,8 @@ THREE.MMDLoader = ( function () {
 		return new CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, new Float32Array( interpolations ) );
 
 	};
+
+	CubicBezierInterpolation.FactoryMethod.type = 'CubicBezierInterpolation';
 
 	THREE.CubicBezierInterpolation = CubicBezierInterpolation;
 

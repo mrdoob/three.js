@@ -1019,6 +1019,7 @@ THREE.GLTFLoader = ( function () {
 
 	GLTFCubicSplineInterpolant.prototype = Object.create( THREE.Interpolant.prototype );
 	GLTFCubicSplineInterpolant.prototype.constructor = GLTFCubicSplineInterpolant;
+	GLTFCubicSplineInterpolant.prototype.type = 'GLTFCubicSplineInterpolant';
 
 	GLTFCubicSplineInterpolant.prototype.copySampleValue_ = function ( index ) {
 
@@ -1093,6 +1094,8 @@ THREE.GLTFLoader = ( function () {
 		return new GLTFCubicSplineInterpolant( this.times, this.values, this.getValueSize() / 3, result );
 
 	};
+
+	GLTFCubicSplineInterpolant.FactoryMethod.type = 'GLTFCubicSplineInterpolant';
 
 	THREE.GLTFCubicSplineInterpolant = GLTFCubicSplineInterpolant;
 
