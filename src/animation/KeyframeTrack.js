@@ -67,18 +67,21 @@ Object.assign( KeyframeTrack, {
 			// Assumptions for custom interpolations:
 			// 1) The constructor is a part of the THREE module at the time of serialization
 			// 2) The constructor will be a part of the THREE module at the time of deserialization
-			if(track.hasCustomInterpolation())
-			{
+			if ( track.hasCustomInterpolation() ) {
+
 				var interpolation = track.createInterpolant();
 				json.interpolation = interpolation.constructor.name;
-			}
-			else{ 
+
+			} else {
+
 				var interpolation = track.getInterpolation();
 				if ( interpolation !== track.DefaultInterpolation ) {
 
-				json.interpolation = interpolation;
+					json.interpolation = interpolation;
+
+				}
+
 			}
-		}
 
 		}
 
@@ -119,37 +122,42 @@ Object.assign( KeyframeTrack, {
 
 		}
 
-		var newTrack = new keyframeTrackConstructor( 
-			json.name, 
-			AnimationUtils.convertArray( json.times, AnimationUtils.getTypedConstructor( json.timesValue ) ), 
+		var newTrack = new keyframeTrackConstructor(
+			json.name,
+			AnimationUtils.convertArray( json.times, AnimationUtils.getTypedConstructor( json.timesValue ) ),
 			AnimationUtils.convertArray( json.values, AnimationUtils.getTypedConstructor( json.valuesType ) )
 		);
 
-		if(typeof json.interpolation == "string")
-		{
-			var interpolationConstructor = THREE[json.interpolation];
-			
-			if(interpolationConstructor === undefined)
-			{
-				console.error("THREE.KeyframeTrack: Failed to parse custom interpolation '" + json.interpolation + "'. Custom interpolations must be a part of the THREE module at the time of deserialization");
-			}
-			else if(interpolationConstructor.FactoryMethod !== undefined)
-			{
+		if ( typeof json.interpolation == "string" ) {
+
+			var interpolationConstructor = THREE[ json.interpolation ];
+
+			if ( interpolationConstructor === undefined ) {
+
+				console.error( "THREE.KeyframeTrack: Failed to parse custom interpolation '" + json.interpolation + "'. Custom interpolations must be a part of the THREE module at the time of deserialization" );
+
+			} else if ( interpolationConstructor.FactoryMethod !== undefined ) {
+
 				newTrack.createInterpolant = interpolationConstructor.FactoryMethod;
-			}
-			else
-			{
-				newTrack.createInterpolant = function InterpolantFactoryMethod(result) {
-					return new interpolationConstructor(newTrack.times, newTrack.values, newTrack.getValueSize(), result);
+
+			} else {
+
+				newTrack.createInterpolant = function InterpolantFactoryMethod( result ) {
+
+					return new interpolationConstructor( newTrack.times, newTrack.values, newTrack.getValueSize(), result );
+
 				};
+
 			}
-		}
-		else
-		{
-			newTrack.setInterpolation(json.interpolation || newTrack.DefaultInterpolation);
+
+		} else {
+
+			newTrack.setInterpolation( json.interpolation || newTrack.DefaultInterpolation );
+
 		}
 
 		return newTrack;
+
 	}
 
 } );
@@ -259,9 +267,10 @@ Object.assign( KeyframeTrack.prototype, {
 
 	},
 
-	hasCustomInterpolation: function()
-	{
+	hasCustomInterpolation: function () {
+
 		return this.createInterpolant !== undefined && this.getInterpolation() === undefined;
+
 	},
 
 	getValueSize: function () {

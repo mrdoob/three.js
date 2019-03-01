@@ -2011,7 +2011,7 @@ THREE.MMDLoader = ( function () {
 
 	} );
 
-	CubicBezierInterpolation.FactoryMethod = function( result ) {
+	CubicBezierInterpolation.FactoryMethod = function ( result ) {
 
 		return new CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, new Float32Array( interpolations ) );
 

@@ -1084,7 +1084,7 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	GLTFCubicSplineInterpolant.FactoryMethod = function( result ) {
+	GLTFCubicSplineInterpolant.FactoryMethod = function ( result ) {
 
 		// A CUBICSPLINE keyframe in glTF has three output values for each input value,
 		// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
@@ -1374,8 +1374,10 @@ THREE.GLTFLoader = ( function () {
 				var accessor = target.POSITION !== undefined
 					? parser.getDependency( 'accessor', target.POSITION )
 						.then( function ( accessor ) {
+
 							// Cloning not to pollute original accessor below
 							return cloneBufferAttribute( accessor );
+
 						} )
 					: geometry.attributes.position;
 
@@ -1389,7 +1391,9 @@ THREE.GLTFLoader = ( function () {
 				var accessor = target.NORMAL !== undefined
 					? parser.getDependency( 'accessor', target.NORMAL )
 						.then( function ( accessor ) {
+
 							return cloneBufferAttribute( accessor );
+
 						} )
 					: geometry.attributes.normal;
 
@@ -3109,6 +3113,7 @@ THREE.GLTFLoader = ( function () {
 					if ( sampler.interpolation === 'CUBICSPLINE' ) {
 
 						track.createInterpolant = GLTFCubicSplineInterpolant.FactoryMethod;
+
 					}
 
 					tracks.push( track );
@@ -3334,7 +3339,7 @@ THREE.GLTFLoader = ( function () {
 
 						mesh.bind( new THREE.Skeleton( bones, boneInverses ), mesh.matrixWorld );
 
-					};
+					}
 
 					return node;
 

@@ -1174,7 +1174,7 @@ var GLTFLoader = ( function () {
 
 	};
 
-	GLTFCubicSplineInterpolant.FactoryMethod = function( result ) {
+	GLTFCubicSplineInterpolant.FactoryMethod = function ( result ) {
 
 		// A CUBICSPLINE keyframe in glTF has three output values for each input value,
 		// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
@@ -3195,6 +3195,7 @@ var GLTFLoader = ( function () {
 					if ( sampler.interpolation === 'CUBICSPLINE' ) {
 
 						track.createInterpolant = GLTFCubicSplineInterpolant.FactoryMethod;
+
 					}
 
 					tracks.push( track );
