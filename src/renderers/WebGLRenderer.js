@@ -1408,7 +1408,7 @@ function WebGLRenderer( parameters ) {
 					renderObject( object, scene, cameras[ 0 ], geometry, material, group );
 
 					multiview.inProgress = false;
-					multiview.camera = null
+					multiview.camera = null;
 
 					continue;
 
