@@ -21,7 +21,7 @@
 
 import { Material } from './Material.js';
 import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
-import { ShaderChunk } from '../renderers/shaders/ShaderChunk.js';
+import { default_fragment, default_vertex } from '../renderers/shaders/ShaderChunk.js';
 
 function ShaderMaterial( parameters ) {
 
@@ -32,8 +32,8 @@ function ShaderMaterial( parameters ) {
 	this.defines = {};
 	this.uniforms = {};
 
-	this.vertexShader = ShaderChunk.default_vertex;
-	this.fragmentShader = ShaderChunk.default_fragment;
+	this.vertexShader = default_vertex;
+	this.fragmentShader = default_fragment;
 
 	this.linewidth = 1;
 
