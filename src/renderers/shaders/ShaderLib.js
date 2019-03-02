@@ -1,9 +1,42 @@
-import { ShaderChunk } from './ShaderChunk.js';
 import { mergeUniforms } from './UniformsUtils.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { UniformsLib } from './UniformsLib.js';
 import { Color } from '../../math/Color.js';
 import { Matrix3 } from '../../math/Matrix3.js';
+import {
+	meshbasic_vert,
+	meshbasic_frag,
+	meshlambert_vert,
+	meshlambert_frag,
+	meshphong_vert,
+	meshphong_frag,
+	meshphysical_vert,
+	meshphysical_frag,
+	meshmatcap_vert,
+	meshmatcap_frag,
+	points_vert,
+	points_frag,
+	linedashed_vert,
+	linedashed_frag,
+	depth_vert,
+	depth_frag,
+	normal_vert,
+	normal_frag,
+	sprite_vert,
+	sprite_frag,
+	background_vert,
+	background_frag,
+	cube_vert,
+	cube_frag,
+	equirect_vert,
+	equirect_frag,
+	distanceRGBA_vert,
+	distanceRGBA_frag,
+	shadow_vert,
+	shadow_frag,
+	meshphysical_vert,
+	meshphysical_frag
+} from './ShaderChunk.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -24,8 +57,8 @@ var ShaderLib = {
 			UniformsLib.fog
 		] ),
 
-		vertexShader: ShaderChunk.meshbasic_vert,
-		fragmentShader: ShaderChunk.meshbasic_frag
+		vertexShader: meshbasic_vert,
+		fragmentShader: meshbasic_frag
 
 	},
 
@@ -45,8 +78,8 @@ var ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshlambert_vert,
-		fragmentShader: ShaderChunk.meshlambert_frag
+		vertexShader: meshlambert_vert,
+		fragmentShader: meshlambert_frag
 
 	},
 
@@ -72,8 +105,8 @@ var ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshphong_vert,
-		fragmentShader: ShaderChunk.meshphong_frag
+		vertexShader: meshphong_vert,
+		fragmentShader: meshphong_frag
 
 	},
 
@@ -100,8 +133,8 @@ var ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshphysical_vert,
-		fragmentShader: ShaderChunk.meshphysical_frag
+		vertexShader: meshphysical_vert,
+		fragmentShader: meshphysical_frag
 
 	},
 
@@ -118,8 +151,8 @@ var ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshmatcap_vert,
-		fragmentShader: ShaderChunk.meshmatcap_frag
+		vertexShader: meshmatcap_vert,
+		fragmentShader: meshmatcap_frag
 
 	},
 
@@ -130,8 +163,8 @@ var ShaderLib = {
 			UniformsLib.fog
 		] ),
 
-		vertexShader: ShaderChunk.points_vert,
-		fragmentShader: ShaderChunk.points_frag
+		vertexShader: points_vert,
+		fragmentShader: points_frag
 
 	},
 
@@ -147,8 +180,8 @@ var ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.linedashed_vert,
-		fragmentShader: ShaderChunk.linedashed_frag
+		vertexShader: linedashed_vert,
+		fragmentShader: linedashed_frag
 
 	},
 
@@ -159,8 +192,8 @@ var ShaderLib = {
 			UniformsLib.displacementmap
 		] ),
 
-		vertexShader: ShaderChunk.depth_vert,
-		fragmentShader: ShaderChunk.depth_frag
+		vertexShader: depth_vert,
+		fragmentShader: depth_frag
 
 	},
 
@@ -176,8 +209,8 @@ var ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.normal_vert,
-		fragmentShader: ShaderChunk.normal_frag
+		vertexShader: normal_vert,
+		fragmentShader: normal_frag
 
 	},
 
@@ -188,8 +221,8 @@ var ShaderLib = {
 			UniformsLib.fog
 		] ),
 
-		vertexShader: ShaderChunk.sprite_vert,
-		fragmentShader: ShaderChunk.sprite_frag
+		vertexShader: sprite_vert,
+		fragmentShader: sprite_frag
 
 	},
 
@@ -200,8 +233,8 @@ var ShaderLib = {
 			t2D: { value: null },
 		},
 
-		vertexShader: ShaderChunk.background_vert,
-		fragmentShader: ShaderChunk.background_frag
+		vertexShader: background_vert,
+		fragmentShader: background_frag
 
 	},
 	/* -------------------------------------------------------------------------
@@ -216,8 +249,8 @@ var ShaderLib = {
 			opacity: { value: 1.0 }
 		},
 
-		vertexShader: ShaderChunk.cube_vert,
-		fragmentShader: ShaderChunk.cube_frag
+		vertexShader: cube_vert,
+		fragmentShader: cube_frag
 
 	},
 
@@ -227,8 +260,8 @@ var ShaderLib = {
 			tEquirect: { value: null },
 		},
 
-		vertexShader: ShaderChunk.equirect_vert,
-		fragmentShader: ShaderChunk.equirect_frag
+		vertexShader: equirect_vert,
+		fragmentShader: equirect_frag
 
 	},
 
@@ -244,8 +277,8 @@ var ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.distanceRGBA_vert,
-		fragmentShader: ShaderChunk.distanceRGBA_frag
+		vertexShader: distanceRGBA_vert,
+		fragmentShader: distanceRGBA_frag
 
 	},
 
@@ -260,8 +293,8 @@ var ShaderLib = {
 			},
 		] ),
 
-		vertexShader: ShaderChunk.shadow_vert,
-		fragmentShader: ShaderChunk.shadow_frag
+		vertexShader: shadow_vert,
+		fragmentShader: shadow_frag
 
 	}
 
@@ -277,8 +310,8 @@ ShaderLib.physical = {
 		}
 	] ),
 
-	vertexShader: ShaderChunk.meshphysical_vert,
-	fragmentShader: ShaderChunk.meshphysical_frag
+	vertexShader: meshphysical_vert,
+	fragmentShader: meshphysical_frag
 
 };
 
