@@ -2441,12 +2441,18 @@ THREE.GLTFLoader = ( function () {
 
 			var threeAttributeName = ATTRIBUTES[ gltfAttributeName ];
 
-			if ( ! threeAttributeName ) continue;
-
 			// Skip attributes already provided by e.g. Draco extension.
 			if ( threeAttributeName in geometry.attributes ) continue;
 
-			pending.push( assignAttributeAccessor( attributes[ gltfAttributeName ], threeAttributeName ) );
+			if ( threeAttributeName ) {
+
+				pending.push( assignAttributeAccessor( attributes[ gltfAttributeName ], threeAttributeName ) );
+
+			} else {
+
+				pending.push( assignAttributeAccessor( attributes[ gltfAttributeName ], gltfAttributeName.toLowerCase() ) );
+
+			}
 
 		}
 
