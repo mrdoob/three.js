@@ -20,6 +20,8 @@ import cube_uv_reflection_fragment from './ShaderChunk/cube_uv_reflection_fragme
 import defaultnormal_vertex from './ShaderChunk/defaultnormal_vertex.glsl.js';
 import displacementmap_pars_vertex from './ShaderChunk/displacementmap_pars_vertex.glsl.js';
 import displacementmap_vertex from './ShaderChunk/displacementmap_vertex.glsl.js';
+import dithering_fragment from './ShaderChunk/dithering_fragment.glsl.js';
+import dithering_pars_fragment from './ShaderChunk/dithering_pars_fragment.glsl.js';
 import emissivemap_fragment from './ShaderChunk/emissivemap_fragment.glsl.js';
 import emissivemap_pars_fragment from './ShaderChunk/emissivemap_pars_fragment.glsl.js';
 import encodings_fragment from './ShaderChunk/encodings_fragment.glsl.js';
@@ -27,24 +29,24 @@ import encodings_pars_fragment from './ShaderChunk/encodings_pars_fragment.glsl.
 import envmap_fragment from './ShaderChunk/envmap_fragment.glsl.js';
 import envmap_pars_fragment from './ShaderChunk/envmap_pars_fragment.glsl.js';
 import envmap_pars_vertex from './ShaderChunk/envmap_pars_vertex.glsl.js';
+import envmap_physical_pars_fragment from './ShaderChunk/envmap_physical_pars_fragment.glsl.js';
 import envmap_vertex from './ShaderChunk/envmap_vertex.glsl.js';
-import fog_vertex from './ShaderChunk/fog_vertex.glsl.js';
-import fog_pars_vertex from './ShaderChunk/fog_pars_vertex.glsl.js';
 import fog_fragment from './ShaderChunk/fog_fragment.glsl.js';
 import fog_pars_fragment from './ShaderChunk/fog_pars_fragment.glsl.js';
+import fog_pars_vertex from './ShaderChunk/fog_pars_vertex.glsl.js';
+import fog_vertex from './ShaderChunk/fog_vertex.glsl.js';
 import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.glsl.js';
 import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl.js';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl.js';
+import lights_fragment_begin from './ShaderChunk/lights_fragment_begin.glsl.js';
+import lights_fragment_end from './ShaderChunk/lights_fragment_end.glsl.js';
+import lights_fragment_maps from './ShaderChunk/lights_fragment_maps.glsl.js';
 import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl.js';
 import lights_pars_begin from './ShaderChunk/lights_pars_begin.glsl.js';
-import envmap_physical_pars_fragment from './ShaderChunk/envmap_physical_pars_fragment.glsl.js';
 import lights_phong_fragment from './ShaderChunk/lights_phong_fragment.glsl.js';
 import lights_phong_pars_fragment from './ShaderChunk/lights_phong_pars_fragment.glsl.js';
 import lights_physical_fragment from './ShaderChunk/lights_physical_fragment.glsl.js';
 import lights_physical_pars_fragment from './ShaderChunk/lights_physical_pars_fragment.glsl.js';
-import lights_fragment_begin from './ShaderChunk/lights_fragment_begin.glsl.js';
-import lights_fragment_maps from './ShaderChunk/lights_fragment_maps.glsl.js';
-import lights_fragment_end from './ShaderChunk/lights_fragment_end.glsl.js';
 import logdepthbuf_fragment from './ShaderChunk/logdepthbuf_fragment.glsl.js';
 import logdepthbuf_pars_fragment from './ShaderChunk/logdepthbuf_pars_fragment.glsl.js';
 import logdepthbuf_pars_vertex from './ShaderChunk/logdepthbuf_pars_vertex.glsl.js';
@@ -64,8 +66,6 @@ import normalmap_pars_fragment from './ShaderChunk/normalmap_pars_fragment.glsl.
 import packing from './ShaderChunk/packing.glsl.js';
 import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl.js';
 import project_vertex from './ShaderChunk/project_vertex.glsl.js';
-import dithering_fragment from './ShaderChunk/dithering_fragment.glsl.js';
-import dithering_pars_fragment from './ShaderChunk/dithering_pars_fragment.glsl.js';
 import roughnessmap_fragment from './ShaderChunk/roughnessmap_fragment.glsl.js';
 import roughnessmap_pars_fragment from './ShaderChunk/roughnessmap_pars_fragment.glsl.js';
 import shadowmap_pars_fragment from './ShaderChunk/shadowmap_pars_fragment.glsl.js';
@@ -80,12 +80,12 @@ import specularmap_fragment from './ShaderChunk/specularmap_fragment.glsl.js';
 import specularmap_pars_fragment from './ShaderChunk/specularmap_pars_fragment.glsl.js';
 import tonemapping_fragment from './ShaderChunk/tonemapping_fragment.glsl.js';
 import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.glsl.js';
-import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl.js';
-import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl.js';
-import uv_vertex from './ShaderChunk/uv_vertex.glsl.js';
 import uv2_pars_fragment from './ShaderChunk/uv2_pars_fragment.glsl.js';
 import uv2_pars_vertex from './ShaderChunk/uv2_pars_vertex.glsl.js';
 import uv2_vertex from './ShaderChunk/uv2_vertex.glsl.js';
+import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl.js';
+import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl.js';
+import uv_vertex from './ShaderChunk/uv_vertex.glsl.js';
 import worldpos_vertex from './ShaderChunk/worldpos_vertex.glsl.js';
 
 import background_frag from './ShaderLib/background_frag.glsl.js';
@@ -142,6 +142,8 @@ export var ShaderChunk = {
 	defaultnormal_vertex: defaultnormal_vertex,
 	displacementmap_pars_vertex: displacementmap_pars_vertex,
 	displacementmap_vertex: displacementmap_vertex,
+	dithering_fragment: dithering_fragment,
+	dithering_pars_fragment: dithering_pars_fragment,
 	emissivemap_fragment: emissivemap_fragment,
 	emissivemap_pars_fragment: emissivemap_pars_fragment,
 	encodings_fragment: encodings_fragment,
@@ -151,22 +153,22 @@ export var ShaderChunk = {
 	envmap_pars_vertex: envmap_pars_vertex,
 	envmap_physical_pars_fragment: envmap_physical_pars_fragment,
 	envmap_vertex: envmap_vertex,
-	fog_vertex: fog_vertex,
-	fog_pars_vertex: fog_pars_vertex,
 	fog_fragment: fog_fragment,
 	fog_pars_fragment: fog_pars_fragment,
+	fog_pars_vertex: fog_pars_vertex,
+	fog_vertex: fog_vertex,
 	gradientmap_pars_fragment: gradientmap_pars_fragment,
 	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,
+	lights_fragment_begin: lights_fragment_begin,
+	lights_fragment_end: lights_fragment_end,
+	lights_fragment_maps: lights_fragment_maps,
 	lights_lambert_vertex: lights_lambert_vertex,
 	lights_pars_begin: lights_pars_begin,
 	lights_phong_fragment: lights_phong_fragment,
 	lights_phong_pars_fragment: lights_phong_pars_fragment,
 	lights_physical_fragment: lights_physical_fragment,
 	lights_physical_pars_fragment: lights_physical_pars_fragment,
-	lights_fragment_begin: lights_fragment_begin,
-	lights_fragment_maps: lights_fragment_maps,
-	lights_fragment_end: lights_fragment_end,
 	logdepthbuf_fragment: logdepthbuf_fragment,
 	logdepthbuf_pars_fragment: logdepthbuf_pars_fragment,
 	logdepthbuf_pars_vertex: logdepthbuf_pars_vertex,
@@ -186,8 +188,6 @@ export var ShaderChunk = {
 	packing: packing,
 	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
 	project_vertex: project_vertex,
-	dithering_fragment: dithering_fragment,
-	dithering_pars_fragment: dithering_pars_fragment,
 	roughnessmap_fragment: roughnessmap_fragment,
 	roughnessmap_pars_fragment: roughnessmap_pars_fragment,
 	shadowmap_pars_fragment: shadowmap_pars_fragment,
@@ -202,12 +202,12 @@ export var ShaderChunk = {
 	specularmap_pars_fragment: specularmap_pars_fragment,
 	tonemapping_fragment: tonemapping_fragment,
 	tonemapping_pars_fragment: tonemapping_pars_fragment,
-	uv_pars_fragment: uv_pars_fragment,
-	uv_pars_vertex: uv_pars_vertex,
-	uv_vertex: uv_vertex,
 	uv2_pars_fragment: uv2_pars_fragment,
 	uv2_pars_vertex: uv2_pars_vertex,
 	uv2_vertex: uv2_vertex,
+	uv_pars_fragment: uv_pars_fragment,
+	uv_pars_vertex: uv_pars_vertex,
+	uv_vertex: uv_vertex,
 	worldpos_vertex: worldpos_vertex,
 
 	background_frag: background_frag,
