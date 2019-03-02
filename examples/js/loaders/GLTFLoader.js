@@ -2569,7 +2569,7 @@ THREE.GLTFLoader = ( function () {
 				var cacheKey = createMultiPassGeometryKey( baseGeometry, originalPrimitives );
 				var cached = cache[ cacheKey ];
 
-				if ( cached !== null ) return [ cached.geometry ];
+				if ( cached ) return [ cached.geometry ];
 
 				// Cloning geometry because of index override.
 				// Attributes can be reused so cloning by myself here.
