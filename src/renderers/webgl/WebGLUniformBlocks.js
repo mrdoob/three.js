@@ -2,13 +2,13 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function WebGLUniformBlocks( gl, info ) {
+function WebGLUniformBlocks( gl, info, capabilities ) {
 
 	var buffers = {};
 	var updateList = {};
 
 	var allocatedBindingPoints = [];
-	var maxBindingPoints = gl.getParameter( gl.MAX_UNIFORM_BUFFER_BINDINGS ); // binding points are global whereas block indices are per shader program
+	var maxBindingPoints = ( capabilities.isWebGL2 ) ? gl.getParameter( gl.MAX_UNIFORM_BUFFER_BINDINGS ) : null; // binding points are global whereas block indices are per shader program
 
 	function bind( uniformBlock, program ) {
 

@@ -279,7 +279,7 @@ function WebGLRenderer( parameters ) {
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
-		uniformBlocks = new WebGLUniformBlocks( _gl, info );
+		uniformBlocks = new WebGLUniformBlocks( _gl, info, capabilities );
 
 		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
