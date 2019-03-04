@@ -62,11 +62,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				// ImageBitmap is flipped vertically
 
-				if ( useOffscreenCanvas )
-				{
+				if ( useOffscreenCanvas ) {
 
 					context.translate( 0, height );
-					context.scale( 1, -1 );
+					context.scale( 1, - 1 );
 
 				}
 
