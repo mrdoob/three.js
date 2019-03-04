@@ -72,26 +72,26 @@
 
 				#ifdef BOX_PROJECTED_ENV_MAP
 
-				  uniform vec3 cubeMapSize;
-				  uniform vec3 cubeMapPos;
-				  varying vec3 vWorldPosition;
+					uniform vec3 cubeMapSize;
+					uniform vec3 cubeMapPos;
+					varying vec3 vWorldPosition;
 
-				  vec3 parallaxCorrectNormal( vec3 v, vec3 cubeSize, vec3 cubePos ) {
+					vec3 parallaxCorrectNormal( vec3 v, vec3 cubeSize, vec3 cubePos ) {
 
-				    vec3 nDir = normalize( v );
-				    vec3 rbmax = (   .5 * ( cubeSize - cubePos ) - vWorldPosition ) / nDir;
-				    vec3 rbmin = ( - .5 * ( cubeSize - cubePos ) - vWorldPosition ) / nDir;
+						vec3 nDir = normalize( v );
+						vec3 rbmax = (   .5 * ( cubeSize - cubePos ) - vWorldPosition ) / nDir;
+						vec3 rbmin = ( - .5 * ( cubeSize - cubePos ) - vWorldPosition ) / nDir;
 
-				    vec3 rbminmax;
-				    rbminmax.x = ( nDir.x > 0. ) ? rbmax.x : rbmin.x;
-				    rbminmax.y = ( nDir.y > 0. ) ? rbmax.y : rbmin.y;
-				    rbminmax.z = ( nDir.z > 0. ) ? rbmax.z : rbmin.z;
+						vec3 rbminmax;
+						rbminmax.x = ( nDir.x > 0. ) ? rbmax.x : rbmin.x;
+						rbminmax.y = ( nDir.y > 0. ) ? rbmax.y : rbmin.y;
+						rbminmax.z = ( nDir.z > 0. ) ? rbmax.z : rbmin.z;
 
-				    float correction = min( min( rbminmax.x, rbminmax.y ), rbminmax.z );
-				    vec3 boxIntersection = vWorldPosition + nDir * correction;
+						float correction = min( min( rbminmax.x, rbminmax.y ), rbminmax.z );
+						vec3 boxIntersection = vWorldPosition + nDir * correction;
 
-				    return boxIntersection - cubePos;
-				  }
+						return boxIntersection - cubePos;
+					}
 
 				#endif
 
@@ -134,11 +134,11 @@
 					vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
 					#ifdef ENVMAP_TYPE_CUBE
 
-			    	vec3 worldNormalFinal = worldNormal;
+						vec3 worldNormalFinal = worldNormal;
 
-			    #ifdef BOX_PROJECTED_ENV_MAP
+					#ifdef BOX_PROJECTED_ENV_MAP
 
-			    	worldNormalFinal = parallaxCorrectNormal( worldNormal, cubeMapSize, cubeMapPos );
+						worldNormalFinal = parallaxCorrectNormal( worldNormal, cubeMapSize, cubeMapPos );
 
 					#endif
 
@@ -193,13 +193,13 @@
 
 					#ifdef ENVMAP_TYPE_CUBE
 
-			    	vec3 reflectVecFinal = reflectVec;
+						vec3 reflectVecFinal = reflectVec;
 
-			    #ifdef BOX_PROJECTED_ENV_MAP
+					#ifdef BOX_PROJECTED_ENV_MAP
 
-			     reflectVecFinal = parallaxCorrectNormal( reflectVec, cubeMapSize, cubeMapPos );
+					 reflectVecFinal = parallaxCorrectNormal( reflectVec, cubeMapSize, cubeMapPos );
 
-			    #endif
+					#endif
 
 					vec3 queryReflectVec = vec3( flipEnvMap * reflectVecFinal.x, reflectVecFinal.yz );
 
@@ -257,8 +257,8 @@
 
 					return envMapColor.rgb * envMapIntensity;
 				}
-				#endif
-				`;
+			#endif
+			`;
 
 			// scene size
 			var WIDTH = window.innerWidth;
@@ -325,7 +325,6 @@
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 512 );
 				cubeCamera.renderTarget.texture.generateMipmaps = true;
 				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
-				cubeCamera.renderTarget.texture.magFilter = THREE.LinearFilter;
 				cubeCamera.renderTarget.texture.mapping = THREE.CubeReflectionMapping;
 
 				cubeCamera.position.set( 0, -100, 0 );
@@ -346,18 +345,18 @@
 
 				var boxProjectedMat = new THREE.MeshPhysicalMaterial({
 					color: new THREE.Color('#ffffff'),
-			    roughness: 1,
-			    envMap: cubeCamera.renderTarget.texture,
+					roughness: 1,
+					envMap: cubeCamera.renderTarget.texture,
 					roughnessMap: rMap,
-			  });
+				});
 
 				boxProjectedMat.onBeforeCompile = function ( shader ) {
 
 					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 100, 100 ) };
-     			shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, -50, 0 ) };
+					shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, -50, 0 ) };
 					shader.uniforms.flipEnvMap.value = true;
 
- 					//replace shader chunks with box projection chunks
+					//replace shader chunks with box projection chunks
 					shader.vertexShader = 'varying vec3 vWorldPosition;\n' + shader.vertexShader;
 
 					shader.vertexShader = shader.vertexShader.replace(
@@ -379,10 +378,9 @@
 
 				};
 
-			  groundPlane = new THREE.Mesh( new THREE.PlaneGeometry( 200, 100, 100 ), boxProjectedMat );
+				groundPlane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200, 100, 100 ), boxProjectedMat );
 				groundPlane.rotateX( - Math.PI / 2 );
 				groundPlane.position.set( 0, - 49, 0 );
-				groundPlane.geometry.computeVertexNormals();
 				scene.add( groundPlane );
 
 				// walls
