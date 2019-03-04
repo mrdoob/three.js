@@ -2462,6 +2462,12 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
+	this.setTexture2DArray = function ( texture, slot ) {
+
+		textures.setTexture2DArray( texture, slot );
+
+	};
+
 	this.setTexture3D = ( function () {
 
 		// backwards compatibility: peel texture.texture
