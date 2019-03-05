@@ -277,7 +277,6 @@
 			var groundPlane, smallSphere, wallMat;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -306,6 +305,9 @@
 						groundPlane.material = defaultMat;
 
 					}
+
+					render();
+
 				});
 
 				// scene
@@ -319,6 +321,7 @@
 				cameraControls.target.set( 0, -10, 0 );
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
+				cameraControls.addEventListener( 'change', render );
 				cameraControls.update();
 
 				// cube camera for environment map
@@ -450,6 +453,8 @@
 				redRectLightHelper = new THREE.RectAreaLightHelper( redRectLight, 0xffffff );
 				redRectLight.add( redRectLightHelper );
 
+				render();
+
 			}
 
 			function updateCubeMap () {
@@ -467,11 +472,11 @@
 
 				groundPlane.visible = true;
 
+				render();
+
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
+			function render() {
 
 				renderer.render( scene, camera );
 
