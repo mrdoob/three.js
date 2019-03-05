@@ -14744,6 +14744,17 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		var background = scene.background;
 
+		// Ignore background in AR
+		// TODO: Reconsider this.
+
+		var session = renderer.vr.getSession();
+
+		if ( session && session.environmentBlendMode === 'additive' ) {
+
+			background = null;
+
+		}
+
 		if ( background === null ) {
 
 			setClear( clearColor, clearAlpha );
