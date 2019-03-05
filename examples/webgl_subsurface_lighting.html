@@ -78,15 +78,6 @@
 				].join( '\n' )
 			);
 
-			THREE.ShaderLib.physical.fragmentShader =THREE.ShaderLib.standard.fragmentShader.replace(
-				'void main() {',
-				[
-					'#ifdef IS_CANDLE',
-					'emmisiveMore = vec3(0.1);',
-					'#endif'
-				].join( '\n' )	
-			);
-
 			THREE.ShaderLib.physical.fragmentShader = THREE.ShaderLib.standard.fragmentShader.replace(
 			'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
 				[
