@@ -527,7 +527,8 @@ faces that are never visible.
 
 The problem with making everything one mesh though is it's no longer easy
 to move any part that was previously separate. Depending on our use case
-though there are creative solutions. We'll explore one in another article.
+though there are creative solutions. We'll explore one in
+[another article](threejs-optimize-lots-of-objects-animated.html).
 
 <canvas id="c"></canvas>
 <script src="../resources/threejs/r98/three.min.js"></script>
