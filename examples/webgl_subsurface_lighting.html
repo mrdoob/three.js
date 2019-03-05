@@ -66,7 +66,7 @@
 				// through the candle. But we can get nice results just with the vertical angle
 				
 				'vec3 wdir = inverseTransformDirection( directLight.direction, viewMatrix );',
-				'float f = max(0., 1. - 1.2 * wdir.y);',
+				'float f = max(0., min( 1., 1. - 1.2 * wdir.y));',
 				'#ifdef CANDLE_LIT',
 				'	directLight.color *= mix(f * candleColor, vec3(1.) , f);',
 				'#endif',
