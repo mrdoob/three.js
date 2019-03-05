@@ -1276,7 +1276,11 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
-					currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+					if ( material.visible ) {
+
+						currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+
+					}
 
 				}
 
