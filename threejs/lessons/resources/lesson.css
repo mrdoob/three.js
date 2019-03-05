@@ -16,6 +16,15 @@ table {
     margin-top: 1em;
     margin-bottom: 1em;
 }
+
+pre {
+  background: #CCC;
+  padding: 1em;
+}
+pre>code {
+  white-space: inherit;
+  background: none;
+}
 pre.prettyprint {
     margin-top: 2em !important;
     margin-bottom: 2em !important;
