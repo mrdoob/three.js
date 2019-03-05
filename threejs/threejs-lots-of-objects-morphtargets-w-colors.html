@@ -313,7 +313,8 @@ function main() {
     const baseGeometry = geometries[0];
     baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) => {
       const attribute = geometry.getAttribute('position');
-      const name = `target${ndx}`;
+      // put the number in front so we can more easily parse it later
+      const name = `${ndx}target$`;
       attribute.name = name;
       return attribute;
     });
@@ -386,7 +387,9 @@ function main() {
         if (!attrib) {
           break;
         }
-        const ndx = parseInt(/\d+$/.exec(attrib.name)[0]);
+        // The name will be something like "2target" as we named it above
+        // where 2 is the index of the data set
+        const ndx = parseInt(attrib.name);
         const name = `morphColor${i}`;
         geometry.addAttribute(name, colorAttributes[ndx].attribute);
       }

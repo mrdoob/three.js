@@ -650,17 +650,35 @@ const material = new THREE.MeshBasicMaterial({
 +};
 ```
 
-Three.js also sorts morphtargets and applies only the highest influence.
+Three.js also sorts morphtargets and applies only the highest influences.
 This lets it allow many more morphtargets as long as only a few are used at
-a time. We need to figure out how it sorted the targets and then set
+a time. We need to figure out how it sorted the morphtargets and then set
 our color attributes to match. We can do this by first removing all our
 color attributes and then checking the `morphTarget` attributes and and
 seeing which `BufferAttribute` was assigned. Using the name of the
 `BufferAttribute` we can tell which corresponding color attribute needed.
 
-We do this in `Object3D.onBeforeRender` which is a property of our `Mesh`.
-Three.js will call it just before rendering giving us a chance to fix things
-up.
+First we'll go change the names of the morphtarget `BufferAttributes` so they
+are easier to parse later
+
+```js
+// use the first geometry as the base
+// and add all the geometries as morphtargets
+const baseGeometry = geometries[0];
+baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) => {
+  const attribute = geometry.getAttribute('position');
+-  const name = `target${ndx}`;
++  // put the number in front so we can more easily parse it later
++  const name = `${ndx}target$`;
+  attribute.name = name;
+  return attribute;
+});
+
+```
+
+Then we can setup the corresponding color attributes in
+`Object3D.onBeforeRender` which is a property of our `Mesh`. Three.js will call
+it just before rendering giving us a chance to fix things up.
 
 ```js
 const mesh = new THREE.Mesh(baseGeometry, material);
@@ -676,7 +694,9 @@ scene.add(mesh);
 +    if (!attrib) {
 +      break;
 +    }
-+    const ndx = parseInt(/\d+$/.exec(attrib.name)[0]);
++    // The name will be something like "2target" as we named it above
++    // where 2 is the index of the data set
++    const ndx = parseInt(attrib.name);
 +    const name = `morphColor${i}`;
 +    geometry.addAttribute(name, colorAttributes[ndx].attribute);
 +  }
