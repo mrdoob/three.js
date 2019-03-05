@@ -14753,7 +14753,8 @@
 			// Ignore background in AR
 			// TODO: Reconsider this.
 
-			var session = renderer.vr.getSession();
+			var vr = renderer.vr;
+			var session = vr.getSession && vr.getSession();
 
 			if ( session && session.environmentBlendMode === 'additive' ) {
 
