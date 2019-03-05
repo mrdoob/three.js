@@ -127,14 +127,14 @@ Then let's use that to make 2 new sets of data
   }
   fileInfos.push({
     name: '>50%men',
-    hueRange: [0.6, 0.6],
+    hueRange: [0.6, 1.1],
     file: makeDiffFile(menFile, womenFile, (men, women) => {
       return amountGreaterThan(men, women);
     }),
   });
   fileInfos.push({
     name: '>50% women', 
-    hueRange: [0.0, 0.0], 
+    hueRange: [0.0, 0.4],
     file: makeDiffFile(womenFile, menFile, (women, men) => {
       return amountGreaterThan(women, men);
     }),
