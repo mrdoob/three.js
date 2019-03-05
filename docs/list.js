@@ -382,7 +382,8 @@ var list = {
 
 			"Exporters": {
 				"GLTFExporter": "examples/exporters/GLTFExporter",
-				"PLYExporter": "examples/exporters/PLYExporter"
+				"PLYExporter": "examples/exporters/PLYExporter",
+				"ColladaExporter": "examples/exporters/ColladaExporter"
 			},
 
 			"Plugins": {

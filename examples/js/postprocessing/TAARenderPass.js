@@ -88,7 +88,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 				if ( this.camera.setViewOffset ) {
 
 					this.camera.setViewOffset( readBuffer.width, readBuffer.height,
-						jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
+						jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
 						readBuffer.width, readBuffer.height );
 
 				}

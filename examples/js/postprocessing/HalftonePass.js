@@ -30,7 +30,7 @@ THREE.HalftonePass = function ( width, height, params ) {
 
 		if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
 
-			this.uniforms[key].value = params[key];
+			this.uniforms[ key ].value = params[ key ];
 
 		}
 
@@ -42,9 +42,9 @@ THREE.HalftonePass = function ( width, height, params ) {
  	this.quad.frustumCulled = false;
  	this.scene.add( this.quad );
 
- };
+};
 
- THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.HalftonePass,
 

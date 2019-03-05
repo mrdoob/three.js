@@ -179,7 +179,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '102dev';
+var REVISION = '103dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -16345,7 +16345,7 @@ function getSingularSetter( type ) {
 		case 0x8b5c: return setValue4fm; // _MAT4
 
 		case 0x8b5e: case 0x8d66: return setValueT1; // SAMPLER_2D, SAMPLER_EXTERNAL_OES
-		case 0x8B5F: return setValueT3D1; // SAMPLER_3D
+		case 0x8b5f: return setValueT3D1; // SAMPLER_3D
 		case 0x8b60: return setValueT6; // SAMPLER_CUBE
 
 		case 0x1404: case 0x8b56: return setValue1i; // INT, BOOL
@@ -17687,7 +17687,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			combine: material.combine,
 
-			vertexTangents: material.vertexTangents,
+			vertexTangents: ( material.normalMap && material.vertexTangents ),
 			vertexColors: material.vertexColors,
 
 			fog: !! fog,
@@ -20132,7 +20132,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			// only perform resize for certain image types
 
-			if ( image instanceof ImageBitmap || image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
+			if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+				( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+				( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
 				var floor = needsPowerOfTwo ? _Math.floorPowerOfTwo : Math.floor;
 
@@ -21534,17 +21536,17 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	 *   var fullHeight = h * 2;
 	 *
 	 *   --A--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
 	 *   --B--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
 	 *   --C--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
 	 *   --D--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
 	 *   --E--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
 	 *   --F--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 	 *
 	 *   Note there is no reason monitors have to be the same size or in a grid.
 	 */
@@ -21952,9 +21954,11 @@ function WebVRManager( renderer ) {
 
 		var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
 
-		if ( device === null ) {
+		if ( isPresenting() === false ) {
 
 			camera.position.set( 0, userHeight, 0 );
+			camera.rotation.set( 0, 0, 0 );
+
 			return camera;
 
 		}
@@ -22007,8 +22011,6 @@ function WebVRManager( renderer ) {
 		}
 
 		poseObject.updateMatrixWorld();
-
-		if ( device.isPresenting === false ) return camera;
 
 		//
 
@@ -22205,6 +22207,7 @@ function WebXRManager( renderer ) {
 	function onSessionEnd() {
 
 		renderer.setFramebuffer( null );
+		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
 	}
@@ -22414,7 +22417,7 @@ function WebXRManager( renderer ) {
 	this.getStandingMatrix = function () {
 
 		console.warn( 'THREE.WebXRManager: getStandingMatrix() is no longer needed.' );
-		return new THREE.Matrix4();
+		return new Matrix4();
 
 	};
 
@@ -23084,7 +23087,7 @@ function WebGLRenderer( parameters ) {
 
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
-		var frontFaceCW = ( object.isMesh && object.normalMatrix.determinant() < 0 );
+		var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
 		state.setMaterial( material, frontFaceCW );
 
@@ -24840,16 +24843,11 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.setTexture3D = ( function () {
+	this.setTexture3D = function ( texture, slot ) {
 
-		// backwards compatibility: peel texture.texture
-		return function setTexture3D( texture, slot ) {
+		textures.setTexture3D( texture, slot );
 
-			textures.setTexture3D( texture, slot );
-
-		};
-
-	}() );
+	};
 
 	this.setTexture = ( function () {
 
@@ -25114,23 +25112,27 @@ function FogExp2( color, density ) {
 
 }
 
-FogExp2.prototype.isFogExp2 = true;
+Object.assign( FogExp2.prototype, {
 
-FogExp2.prototype.clone = function () {
+	isFogExp2: true,
 
-	return new FogExp2( this.color, this.density );
+	clone: function () {
 
-};
+		return new FogExp2( this.color, this.density );
 
-FogExp2.prototype.toJSON = function ( /* meta */ ) {
+	},
 
-	return {
-		type: 'FogExp2',
-		color: this.color.getHex(),
-		density: this.density
-	};
+	toJSON: function ( /* meta */ ) {
 
-};
+		return {
+			type: 'FogExp2',
+			color: this.color.getHex(),
+			density: this.density
+		};
+
+	}
+
+} );
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -25148,24 +25150,28 @@ function Fog( color, near, far ) {
 
 }
 
-Fog.prototype.isFog = true;
+Object.assign( Fog.prototype, {
 
-Fog.prototype.clone = function () {
+	isFog: true,
 
-	return new Fog( this.color, this.near, this.far );
+	clone: function () {
 
-};
+		return new Fog( this.color, this.near, this.far );
 
-Fog.prototype.toJSON = function ( /* meta */ ) {
+	},
 
-	return {
-		type: 'Fog',
-		color: this.color.getHex(),
-		near: this.near,
-		far: this.far
-	};
+	toJSON: function ( /* meta */ ) {
 
-};
+		return {
+			type: 'Fog',
+			color: this.color.getHex(),
+			near: this.near,
+			far: this.far
+		};
+
+	}
+
+} );
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -40175,8 +40181,7 @@ function CubeCamera( near, far, cubeResolution, options ) {
 
 		for ( var i = 0; i < 6; i ++ ) {
 
-			renderTarget.activeCubeFace = i;
-			renderer.setRenderTarget( renderTarget );
+			renderer.setRenderTarget( renderTarget, i );
 
 			renderer.clear( color, depth, stencil );
 
@@ -47553,6 +47558,27 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 		set: function () {
 
 			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderSingleSided has been removed. Set Material.shadowSide instead.' );
+
+		}
+	}
+
+} );
+
+//
+
+Object.defineProperties( WebGLRenderTargetCube.prototype, {
+
+	activeCubeFace: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebGLRenderTargetCube: .activeCubeFace has been removed. It is now the second parameter of WebGLRenderer.setRenderTarget().' );
+
+		}
+	},
+	activeMipMapLevel: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebGLRenderTargetCube: .activeMipMapLevel has been removed. It is now the third parameter of WebGLRenderer.setRenderTarget().' );
 
 		}
 	}
