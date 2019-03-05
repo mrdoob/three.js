@@ -357,7 +357,10 @@ Then let's change the `PickHelper` into a `GPUPickHelper`. It will use a `WebGLR
 +        1,                                     // rect height
 +    );
 +    // render the scene
-+    renderer.render(scene, camera, pickingTexture);
++    renderer.setRenderTarget(pickingTexture)
++    renderer.render(scene, camera);
++    renderer.setRenderTarget(null);
++
 +    // clear the view offset so rendering returns to normal
 +    camera.clearViewOffset();
 +    //read the pixel

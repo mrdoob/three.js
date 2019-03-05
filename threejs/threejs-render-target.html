@@ -19,7 +19,7 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r98/three.min.js"></script>
+<script src="resources/threejs/r102/three.min.js"></script>
 <script>
 'use strict';
 
@@ -125,7 +125,9 @@ function main() {
     });
 
     // draw render target scene to render target
-    renderer.render(rtScene, rtCamera, renderTarget);
+    renderer.setRenderTarget(renderTarget);
+    renderer.render(rtScene, rtCamera);
+    renderer.setRenderTarget(null);
 
     // rotate the cube in the scene
     cube.rotation.x = time;

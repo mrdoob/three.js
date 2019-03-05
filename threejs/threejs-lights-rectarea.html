@@ -20,9 +20,9 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r98/three.min.js"></script>
-<script src="resources/threejs/r98/js/lights/RectAreaLightUniformsLib.js"></script>
-<script src="resources/threejs/r98/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r102/three.min.js"></script>
+<script src="resources/threejs/r102/js/lights/RectAreaLightUniformsLib.js"></script>
+<script src="resources/threejs/r102/js/controls/OrbitControls.js"></script>
 <script src="../3rdparty/dat.gui.min.js"></script>
 <script>
 'use strict';
@@ -127,11 +127,11 @@ function main() {
     const height = 4;
     const light = new THREE.RectAreaLight(color, intensity, width, height);
     light.position.set(0, 10, 0);
-    light.rotation.x = THREE.Math.degToRad(30);
+    light.rotation.x = THREE.Math.degToRad(-90);
     scene.add(light);
 
     const helper = new THREE.RectAreaLightHelper(light);
-    scene.add(helper);
+    light.add(helper);
 
     function updateLight() {
       helper.update();

@@ -81,14 +81,14 @@ Since the `filmPass` is the last pass we set its `renderToScreen` property to tr
 To use these classes we need to include a bunch of scripts.
 
 ```html
-<script src="resources/threejs/r98/js/shaders/CopyShader.js"></script>
-<script src="resources/threejs/r98/js/shaders/ConvolutionShader.js"></script>
-<script src="resources/threejs/r98/js/shaders/FilmShader.js"></script>
-<script src="resources/threejs/r98/js/postprocessing/EffectComposer.js"></script>
-<script src="resources/threejs/r98/js/postprocessing/RenderPass.js"></script>
-<script src="resources/threejs/r98/js/postprocessing/ShaderPass.js"></script>
-<script src="resources/threejs/r98/js/postprocessing/BloomPass.js"></script>
-<script src="resources/threejs/r98/js/postprocessing/FilmPass.js"></script>
+<script src="resources/threejs/r102/js/shaders/CopyShader.js"></script>
+<script src="resources/threejs/r102/js/shaders/ConvolutionShader.js"></script>
+<script src="resources/threejs/r102/js/shaders/FilmShader.js"></script>
+<script src="resources/threejs/r102/js/postprocessing/EffectComposer.js"></script>
+<script src="resources/threejs/r102/js/postprocessing/RenderPass.js"></script>
+<script src="resources/threejs/r102/js/postprocessing/ShaderPass.js"></script>
+<script src="resources/threejs/r102/js/postprocessing/BloomPass.js"></script>
+<script src="resources/threejs/r102/js/postprocessing/FilmPass.js"></script>
 ```
 
 For pretty much any post processing `EffectComposer.js`, `RenderPass.js`, `ShaderPass.js`, and `CopyShader.js` are required. The rest depend on which effects you plan to use.

@@ -48,7 +48,7 @@
       and finding a undiscovered tomb full of mummies and treasure.
     </p>
   </body>
-<script src="resources/threejs/r98/three.min.js"></script>
+<script src="resources/threejs/r102/three.min.js"></script>
 <script>
 'use strict';
 
@@ -158,8 +158,9 @@ function main() {
           left > renderer.domElement.clientWidth;
 
       if (!isOffscreen) {
-        renderer.setViewport(left, top, width, height);
-        renderer.setScissor(left, top, width, height);
+        const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+        renderer.setScissor(left, positiveYUpBottom, width, height);
+        renderer.setViewport(left, positiveYUpBottom, width, height);
 
         fn(time, rect);
       }

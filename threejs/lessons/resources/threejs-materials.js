@@ -94,7 +94,7 @@
         const width = (rect.right - rect.left) * renderInfo.pixelRatio;
         const height = (rect.bottom - rect.top) * renderInfo.pixelRatio;
         const left = rect.left * renderInfo.pixelRatio;
-        const top = rect.top * renderInfo.pixelRatio;
+        const bottom = (renderer.domElement.clientHeight - rect.bottom) * renderInfo.pixelRatio;
 
         const cellSize = Math.min(width / numRough, height / numMetal) | 0;
         const xOff = (width - cellSize * numRough) / 2;
@@ -110,7 +110,7 @@
         for (let m = 0; m < numMetal; ++m) {
           for (let r = 0; r < numRough; ++r) {
             const x = left + xOff + r * cellSize;
-            const y = top + yOff + m * cellSize;
+            const y = bottom + yOff + m * cellSize;
             renderer.setViewport(x, y, cellSize, cellSize);
             renderer.setScissor(x, y, cellSize, cellSize);
             const mesh = meshes[m][r];

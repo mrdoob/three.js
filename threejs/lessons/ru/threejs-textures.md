@@ -615,8 +615,8 @@ roughness
 -->
 
 <canvas id="c"></canvas>
-<script src="../../resources/threejs/r98/three.min.js"></script>
-<script src="../../resources/threejs/r98/js/controls/TrackballControls.js"></script>
+<script src="../../resources/threejs/r102/three.min.js"></script>
+<script src="../../resources/threejs/r102/js/controls/TrackballControls.js"></script>
 <script src="../resources/threejs-lesson-utils.js"></script>
 <script src="../resources/threejs-textures.js"></script>
 <style>

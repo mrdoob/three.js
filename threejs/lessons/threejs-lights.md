@@ -28,8 +28,8 @@ an optional feature of three.js so first we need to include them
 in our page
 
 ```html
-<script src="resources/threejs/r98/three.min.js"></script>
-+<script src="resources/threejs/r98/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r102/three.min.js"></script>
++<script src="resources/threejs/r102/js/controls/OrbitControls.js"></script>
 ```
 
 Then we can use them. We pass the `OrbitControls` a camera to 
@@ -475,8 +475,8 @@ The `RectAreaLight` only works with the `MeshStandardMaterai` and the
 To use the `RectAreaLight` we need to include some extra three.js optional data
 
 ```html
-<script src="resources/threejs/r98/three.min.js"></script>
-+<script src="resources/threejs/r98/js/lights/RectAreaLightUniformsLib.js"></script>
+<script src="resources/threejs/r102/three.min.js"></script>
++<script src="resources/threejs/r102/js/lights/RectAreaLightUniformsLib.js"></script>
 ```
 
 If you forget the data the light will still work but it will look funny so
@@ -491,15 +491,17 @@ const color = 0xFFFFFF;
 +const height = 4;
 *const light = new THREE.RectAreaLight(color, intensity, width, height);
 light.position.set(0, 10, 0);
-+light.rotation.x = THREE.Math.degToRad(30);
++light.rotation.x = THREE.Math.degToRad(-90);
 scene.add(light);
 
 *const helper = new THREE.RectAreaLightHelper(light);
-scene.add(helper);
+*light.add(helper);
 ```
 
 One thing to notice is that unlike the `DirectionalLight` and the `SpotLight` the
-`RectAreaLight` does not use a target. It just uses its rotation.
+`RectAreaLight` does not use a target. It just uses its rotation. Another thing
+to notice is the helper needs to be a child of the light. It is not a child of the
+scene like other helpers.
 
 Let's also adjust the GUI. We'll make it so we can rotate the light and adjust
 its `width` and `height`
@@ -571,7 +573,7 @@ possible to achieve your goals.
 Next up let's go over [dealing with cameras](threejs-cameras.html).
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r98/three.min.js"></script>
-<script src="../resources/threejs/r98/js/controls/OrbitControls.js"></script>
+<script src="../resources/threejs/r102/three.min.js"></script>
+<script src="../resources/threejs/r102/js/controls/OrbitControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-lights.js"></script>

@@ -168,8 +168,9 @@ function rendenerSceneInfo(sceneInfo) {
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
 
-  renderer.setViewport(left, top, width, height);
-  renderer.setScissor(left, top, width, height);
+  const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+  renderer.setScissor(left, positiveYUpBottom, width, height);
+  renderer.setViewport(left, positiveYUpBottom, width, height);
 
   renderer.render(scene, camera);
 }
@@ -313,8 +314,9 @@ function render(time) {
         left > renderer.domElement.clientWidth;
 
     if (!isOffscreen) {
-      renderer.setViewport(left, top, width, height);
-      renderer.setScissor(left, top, width, height);
+      const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+      renderer.setScissor(left, positiveYUpBottom, width, height);
+      renderer.setViewport(left, positiveYUpBottom, width, height);
 
       fn(time, rect);
     }
@@ -469,7 +471,7 @@ document.querySelectorAll('[data-diagram]').forEach((elem) => {
 Сначала мы добавляем скрипт для контролов.
 
 ```html
-<script src="../resources/threejs/r98/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r102/js/controls/TrackballControls.js"></script>
 ```
 
 И затем мы можем добавить `TrackballControls` к каждой сцене, передавая элемент, связанный с этой сценой.

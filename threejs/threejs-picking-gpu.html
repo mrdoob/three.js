@@ -19,7 +19,7 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r98/three.min.js"></script>
+<script src="resources/threejs/r102/three.min.js"></script>
 <script>
 'use strict';
 
@@ -151,7 +151,9 @@ function main() {
           1,                                     // rect height
       );
       // render the scene
-      renderer.render(scene, camera, pickingTexture);
+      renderer.setRenderTarget(pickingTexture);
+      renderer.render(scene, camera);
+      renderer.setRenderTarget(null);
       // clear the view offset so rendering returns to normal
       camera.clearViewOffset();
       //read the pixel

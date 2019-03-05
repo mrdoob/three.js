@@ -64,7 +64,10 @@
         camera.aspect = rtWidth / rtHeight;
         camera.updateProjectionMatrix();
 
-        renderer.render(scene, camera, renderTarget);
+        renderer.setRenderTarget(renderTarget);
+
+        renderer.render(scene, camera);
+        renderer.setRenderTarget(null);
       },
       render(renderInfo) {
         const { width, height, renderer, pixelRatio } = renderInfo;

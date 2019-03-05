@@ -163,8 +163,9 @@ function rendenerSceneInfo(sceneInfo) {
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
 
-  renderer.setViewport(left, top, width, height);
-  renderer.setScissor(left, top, width, height);
+  const positiveYUpBottom = canvasRect.height - bottom;
+  renderer.setScissor(left, positiveYUpBottom, width, height);
+  renderer.setViewport(left, positiveYUpBottom, width, height);
 
   renderer.render(scene, camera);
 }
@@ -293,8 +294,9 @@ function render(time) {
         left > renderer.domElement.clientWidth;
 
     if (!isOffscreen) {
-      renderer.setViewport(left, top, width, height);
-      renderer.setScissor(left, top, width, height);
+      const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+      renderer.setScissor(left, positiveYUpBottom, width, height);
+      renderer.setViewport(left, positiveYUpBottom, width, height);
 
       fn(time, rect);
     }
@@ -441,7 +443,7 @@ No change to the visuals but the code is even more generic.
 Adding interactively, for example a `TrackballControls` is just as easy. First we add the script for the control.
 
 ```html
-<script src="resources/threejs/r98/js/controls/TrackballControls.js"></script>
+<script src="resources/threejs/r102/js/controls/TrackballControls.js"></script>
 ```
 
 And then we can add a `TrackballControls` to each scene passing in the element associated with that scene.

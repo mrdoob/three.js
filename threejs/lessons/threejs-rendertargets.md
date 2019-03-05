@@ -94,7 +94,9 @@ function render(time) {
   });
 
   // draw render target scene to render target
-  renderer.render(rtScene, rtCamera, renderTarget);
+  renderer.setRenderTarget(renderTarget);
+  renderer.render(rtScene, rtCamera);
+  renderer.setRenderTarget(null);
 ```
 
 Then we render the scene with the single cube that is using the render target's texture to the canvas.

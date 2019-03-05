@@ -20,8 +20,8 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r98/three.min.js"></script>
-<script src="resources/threejs/r98/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r102/three.min.js"></script>
+<script src="resources/threejs/r102/js/controls/OrbitControls.js"></script>
 <script src="../3rdparty/dat.gui.min.js"></script>
 <script>
 'use strict';
@@ -31,6 +31,7 @@
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas: canvas});
+  renderer.shadowMap.enabled = true;
 
   const fov = 45;
   const aspect = 2;  // the canvas default

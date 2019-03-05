@@ -40,9 +40,9 @@
     <canvas id="c"></canvas>
     <div id="ui"></div>
   </body>
-<script src="resources/threejs/r98/three.js"></script>
-<script src="resources/threejs/r98/js/utils/BufferGeometryUtils.js"></script>
-<script src="resources/threejs/r98/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r102/three.js"></script>
+<script src="resources/threejs/r102/js/utils/BufferGeometryUtils.js"></script>
+<script src="resources/threejs/r102/js/controls/OrbitControls.js"></script>
 <script>
 'use strict';
 
@@ -332,17 +332,6 @@ function main() {
 
   controls.addEventListener('change', requestRenderIfNotRequested);
   window.addEventListener('resize', requestRenderIfNotRequested);
-
-  // note: this is a workaround for an OrbitControls issue
-  // in an iframe. Will remove once the issue is fixed in
-  // three.js
-  window.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    window.focus();
-  });
-  window.addEventListener('keydown', (e) => {
-    e.preventDefault();
-  });
 }
 
 main();

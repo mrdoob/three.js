@@ -180,7 +180,7 @@ window.threejsLessonUtils = {
       renderInfo.width = (rect.right - rect.left) * this.pixelRatio;
       renderInfo.height = (rect.bottom - rect.top) * this.pixelRatio;
       renderInfo.left = rect.left * this.pixelRatio;
-      renderInfo.top = rect.top * this.pixelRatio;
+      renderInfo.bottom = (renderer.domElement.clientHeight - rect.bottom) * this.pixelRatio;
 
       if (renderInfo.width !== oldWidth || renderInfo.height !== oldHeight) {
         oldWidth = renderInfo.width;
@@ -199,8 +199,8 @@ window.threejsLessonUtils = {
       camera.aspect = aspect;
       camera.updateProjectionMatrix();
 
-      renderer.setViewport(renderInfo.left, renderInfo.top, renderInfo.width, renderInfo.height);
-      renderer.setScissor(renderInfo.left, renderInfo.top, renderInfo.width, renderInfo.height);
+      renderer.setViewport(renderInfo.left, renderInfo.bottom, renderInfo.width, renderInfo.height);
+      renderer.setScissor(renderInfo.left, renderInfo.bottom, renderInfo.width, renderInfo.height);
 
       settings.render(renderInfo);
     };

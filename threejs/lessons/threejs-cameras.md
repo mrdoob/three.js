@@ -197,8 +197,9 @@ function setScissorForElement(elem) {
   const height = Math.min(canvasRect.height, bottom - top);
 
   // setup the scissor to only render to that part of the canvas
-  renderer.setScissor(left, top, width, height);
-  renderer.setViewport(left, top, width, height);
+  const positiveYUpBottom = canvasRect.height - bottom;
+  renderer.setScissor(left, positiveYUpBottom, width, height);
+  renderer.setViewport(left, positiveYUpBottom, width, height);
 
   // return the aspect
   return width / height;
@@ -595,7 +596,7 @@ That's the fundamentals of cameras. We'll cover a few common ways to move camera
 in other articles. For now lets move on to [shadows](threejs-shadows.html).
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r98/three.min.js"></script>
-<script src="../resources/threejs/r98/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r102/three.min.js"></script>
+<script src="../resources/threejs/r102/js/controls/TrackballControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-cameras.js"></script>

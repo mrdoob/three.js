@@ -18,7 +18,7 @@ table {
 }
 
 pre {
-  background: #CCC;
+  background: rgb(143, 140, 140);
   padding: 1em;
 }
 pre>code {
