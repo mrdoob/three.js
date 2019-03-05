@@ -299,6 +299,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function setTexture2DArray( texture, slot ) {
+
+		var textureProperties = properties.get( texture );
+
+		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
+
+			uploadTexture( textureProperties, texture, slot );
+			return;
+
+		}
+
+		state.activeTexture( _gl.TEXTURE0 + slot );
+		state.bindTexture( _gl.TEXTURE_2D_ARRAY, textureProperties.__webglTexture );
+
+	}
+
 	function setTexture3D( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
@@ -451,7 +467,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, utils.convert( texture.wrapS ) );
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, utils.convert( texture.wrapT ) );
 
-			if ( textureType === _gl.TEXTURE_3D ) {
+			if ( textureType === _gl.TEXTURE_3D || textureType === _gl.TEXTURE_2D_ARRAY ) {
 
 				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, utils.convert( texture.wrapR ) );
 
@@ -465,7 +481,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
 
-			if ( textureType === _gl.TEXTURE_3D ) {
+			if ( textureType === _gl.TEXTURE_3D || textureType === _gl.TEXTURE_2D_ARRAY ) {
 
 				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, _gl.CLAMP_TO_EDGE );
 
@@ -524,7 +540,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function uploadTexture( textureProperties, texture, slot ) {
 
-		var textureType = ( texture.isDataTexture3D ) ? _gl.TEXTURE_3D : _gl.TEXTURE_2D;
+		var textureType = _gl.TEXTURE_2D;
+
+		if ( texture.isDataTexture2DArray ) textureType = _gl.TEXTURE_2D_ARRAY;
+		if ( texture.isDataTexture3D ) textureType = _gl.TEXTURE_3D;
 
 		initTexture( textureProperties, texture );
 
@@ -655,6 +674,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			}
 
 			textureProperties.__maxMipLevel = mipmaps.length - 1;
+
+		} else if ( texture.isDataTexture2DArray ) {
+
+			state.texImage3D( _gl.TEXTURE_2D_ARRAY, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+			textureProperties.__maxMipLevel = 0;
 
 		} else if ( texture.isDataTexture3D ) {
 
@@ -1054,6 +1078,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	}
 
 	this.setTexture2D = setTexture2D;
+	this.setTexture2DArray = setTexture2DArray;
 	this.setTexture3D = setTexture3D;
 	this.setTextureCube = setTextureCube;
 	this.setTextureCubeDynamic = setTextureCubeDynamic;

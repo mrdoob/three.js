@@ -2466,6 +2466,12 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
+	this.setTexture2DArray = function ( texture, slot ) {
+
+		textures.setTexture2DArray( texture, slot );
+
+	};
+
 	this.setTexture3D = function ( texture, slot ) {
 
 		textures.setTexture3D( texture, slot );
