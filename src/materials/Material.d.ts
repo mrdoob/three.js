@@ -1,4 +1,5 @@
 import { Plane } from './../math/Plane';
+import { Shader } from './../renderers/shaders/ShaderLib'
 import { EventDispatcher } from './../core/EventDispatcher';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import {
@@ -272,7 +273,7 @@ export class Material extends EventDispatcher {
    * @param shader Source code of the shader
    * @param renderer WebGLRenderer Context that is initializing the material
    */
-  onBeforeCompile ( shader : Object, renderer : WebGLRenderer ) : void;
+  onBeforeCompile ( shader : Shader, renderer : WebGLRenderer ) : void;
 
   /**
    * Sets the properties based on the values.
