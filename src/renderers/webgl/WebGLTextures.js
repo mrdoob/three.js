@@ -12,13 +12,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	//
 
-	var useOffscreenCanvas = typeof document === 'undefined';
+	var isWorker = typeof document === 'undefined';
 
 	function createCanvas( width, height ) {
 
 		// Use OffscreenCanvas when available. Specially needed in web workers
 
-		return useOffscreenCanvas ?
+		return isWorker ?
 			new OffscreenCanvas( width, height ) :
 			document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 
@@ -62,7 +62,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				// ImageBitmap is flipped vertically
 
-				if ( useOffscreenCanvas ) {
+				if ( isWorker ) {
 
 					context.translate( 0, height );
 					context.scale( 1, - 1 );
@@ -73,7 +73,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				console.warn( 'THREE.WebGLRenderer: Texture has been resized from (' + image.width + 'x' + image.height + ') to (' + width + 'x' + height + ').' );
 
-				return useOffscreenCanvas ? canvas.transferToImageBitmap() : canvas;
+				return isWorker ? canvas.transferToImageBitmap() : canvas;
 
 			} else {
 
