@@ -70,16 +70,14 @@ export interface WebGLRendererParameters {
   preserveDrawingBuffer?: boolean;
 
   /**
-   * default is 0x000000.
+   *  Can be "high-performance", "low-power" or "default"
    */
-  clearColor?: number;
+  powerPreference?: string;
 
   /**
-   * default is 0.
+   * default is true.
    */
-  clearAlpha?: number;
-
-  devicePixelRatio?: number;
+  depth?: boolean;
 
   /**
    * default is false.

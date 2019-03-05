@@ -706,7 +706,7 @@ function WebGLRenderer( parameters ) {
 
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
-		var frontFaceCW = ( object.isMesh && object.normalMatrix.determinant() < 0 );
+		var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
 		state.setMaterial( material, frontFaceCW );
 
@@ -2462,16 +2462,11 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.setTexture3D = ( function () {
+	this.setTexture3D = function ( texture, slot ) {
 
-		// backwards compatibility: peel texture.texture
-		return function setTexture3D( texture, slot ) {
+		textures.setTexture3D( texture, slot );
 
-			textures.setTexture3D( texture, slot );
-
-		};
-
-	}() );
+	};
 
 	this.setTexture = ( function () {
 

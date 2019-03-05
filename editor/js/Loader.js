@@ -180,6 +180,7 @@ var Loader = function ( editor ) {
 
 					collada.scene.name = filename;
 
+					editor.addAnimation( collada.scene, collada.animations );
 					editor.execute( new AddObjectCommand( collada.scene ) );
 
 				}, false );
@@ -595,7 +596,7 @@ var Loader = function ( editor ) {
 
 				var result = loader.parse( data );
 
-				if ( result instanceof THREE.Scene ) {
+				if ( result.isScene ) {
 
 					editor.execute( new SetSceneCommand( result ) );
 
