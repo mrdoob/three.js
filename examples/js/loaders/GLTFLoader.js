@@ -528,21 +528,23 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var attributeName in gltfAttributeMap ) {
 
-			if ( ! ( attributeName in ATTRIBUTES ) ) continue;
+			var threeAttributeName = ATTRIBUTES[ attributeName ] || attributeName.toLowerCase();
 
-			threeAttributeMap[ ATTRIBUTES[ attributeName ] ] = gltfAttributeMap[ attributeName ];
+			threeAttributeMap[ threeAttributeName ] = gltfAttributeMap[ attributeName ];
 
 		}
 
 		for ( attributeName in primitive.attributes ) {
 
-			if ( ATTRIBUTES[ attributeName ] !== undefined && gltfAttributeMap[ attributeName ] !== undefined ) {
+			var threeAttributeName = ATTRIBUTES[ attributeName ] || attributeName.toLowerCase();
+
+			if ( gltfAttributeMap[ attributeName ] !== undefined ) {
 
 				var accessorDef = json.accessors[ primitive.attributes[ attributeName ] ];
 				var componentType = WEBGL_COMPONENT_TYPES[ accessorDef.componentType ];
 
-				attributeTypeMap[ ATTRIBUTES[ attributeName ] ] = componentType;
-				attributeNormalizedMap[ ATTRIBUTES[ attributeName ] ] = accessorDef.normalized === true;
+				attributeTypeMap[ threeAttributeName ] = componentType;
+				attributeNormalizedMap[ threeAttributeName ] = accessorDef.normalized === true;
 
 			}
 
@@ -2487,9 +2489,7 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var gltfAttributeName in attributes ) {
 
-			var threeAttributeName = ATTRIBUTES[ gltfAttributeName ];
-
-			if ( ! threeAttributeName ) continue;
+			var threeAttributeName = ATTRIBUTES[ gltfAttributeName ] || gltfAttributeName.toLowerCase();
 
 			// Skip attributes already provided by e.g. Draco extension.
 			if ( threeAttributeName in geometry.attributes ) continue;
