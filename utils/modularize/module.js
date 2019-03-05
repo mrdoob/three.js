@@ -5,7 +5,7 @@ const walk = require( "acorn-walk" );
 const MagicString = require( 'magic-string' );
 const THREE = require( '../../build/three.js' );
 
-const THREE_PATH = '../../../build/three.module.js';
+const THREE_PATH = path.join(__dirname, '../../build/three.module.js');
 
 function isExportExpression( node ) {
 
@@ -168,18 +168,20 @@ class Module {
 
 		if ( this.dependences.length === 0 ) return;
 
+		const threePath = getRelativePath(this.file, THREE_PATH);
+
 		this.dependences.forEach( name => {
 
 			// Depend on THREE
 			const dep = name.split( ' as ' )[ 0 ];
 			if ( THREE[ dep ] !== undefined ) {
 
-				if ( ! deps[ THREE_PATH ] ) {
+				if ( ! deps[ threePath ] ) {
 
-					deps[ THREE_PATH ] = [];
+					deps[ threePath ] = [];
 
 				}
-				deps[ THREE_PATH ].push( name );
+				deps[ threePath ].push( name );
 				return;
 
 			}
