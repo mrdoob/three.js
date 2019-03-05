@@ -1,5 +1,6 @@
 import { Plane } from './../math/Plane';
 import { EventDispatcher } from './../core/EventDispatcher';
+import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import {
   BlendingDstFactor,
   BlendingEquation,
@@ -265,6 +266,13 @@ export class Material extends EventDispatcher {
    * This disposes the material. Textures of a material don't get disposed. These needs to be disposed by {@link Texture}.
    */
   dispose(): void;
+
+  /**
+   * An optional callback that is executed immediately before the shader program is compiled. This function is called with the shader source code as a parameter. Useful for the modification of built-in materials. 
+   * @param shader Source code of the shader
+   * @param renderer WebGLRenderer Context that is initializing the material
+   */
+  onBeforeCompile ( shader : Object, renderer : WebGLRenderer ) : null
 
   /**
    * Sets the properties based on the values.
