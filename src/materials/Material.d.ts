@@ -272,7 +272,7 @@ export class Material extends EventDispatcher {
    * @param shader Source code of the shader
    * @param renderer WebGLRenderer Context that is initializing the material
    */
-  onBeforeCompile ( shader : Object, renderer : WebGLRenderer ) : null
+  onBeforeCompile ( shader : Object, renderer : WebGLRenderer ) : void;
 
   /**
    * Sets the properties based on the values.
