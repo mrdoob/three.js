@@ -308,6 +308,7 @@ var files = {
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
+		"webgl_subsurface_lighting",
 		"webgl_tiled_forward",
 		"webgl_worker_offscreencanvas"
 	],
