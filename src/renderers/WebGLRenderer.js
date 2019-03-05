@@ -1276,7 +1276,11 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
-					currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+					if ( material.visible ) {
+
+						currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+
+					}
 
 				}
 
@@ -2462,16 +2466,17 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.setTexture3D = ( function () {
+	this.setTexture2DArray = function ( texture, slot ) {
 
-		// backwards compatibility: peel texture.texture
-		return function setTexture3D( texture, slot ) {
+		textures.setTexture2DArray( texture, slot );
 
-			textures.setTexture3D( texture, slot );
+	};
 
-		};
+	this.setTexture3D = function ( texture, slot ) {
 
-	}() );
+		textures.setTexture3D( texture, slot );
+
+	};
 
 	this.setTexture = ( function () {
 
