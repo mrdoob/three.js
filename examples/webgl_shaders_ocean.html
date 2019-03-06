@@ -115,11 +115,11 @@
 
 				var uniforms = sky.material.uniforms;
 
-				uniforms[ "turbidity" ].value = 10;
-				uniforms[ "rayleigh" ].value = 2;
-				uniforms[ "luminance" ].value = 1;
-				uniforms[ "mieCoefficient" ].value = 0.005;
-				uniforms[ "mieDirectionalG" ].value = 0.8;
+				uniforms[ 'turbidity' ].value = 10;
+				uniforms[ 'rayleigh' ].value = 2;
+				uniforms[ 'luminance' ].value = 1;
+				uniforms[ 'mieCoefficient' ].value = 0.005;
+				uniforms[ 'mieDirectionalG' ].value = 0.8;
 
 				var parameters = {
 					distance: 400,
@@ -140,8 +140,8 @@
 					light.position.y = parameters.distance * Math.sin( phi ) * Math.sin( theta );
 					light.position.z = parameters.distance * Math.sin( phi ) * Math.cos( theta );
 
-					sky.material.uniforms[ "sunPosition" ].value = light.position.copy( light.position );
-					water.material.uniforms[ "sunDirection" ].value.copy( light.position ).normalize();
+					sky.material.uniforms[ 'sunPosition' ].value = light.position.copy( light.position );
+					water.material.uniforms[ 'sunDirection' ].value.copy( light.position ).normalize();
 
 					cubeCamera.update( renderer, scene );
 
@@ -187,7 +187,7 @@
 				controls.target.set( 0, 10, 0 );
 				controls.minDistance = 40.0;
 				controls.maxDistance = 200.0;
-				camera.lookAt( controls.target );
+				controls.update();
 
 				//
 
@@ -242,7 +242,7 @@
 				sphere.rotation.x = time * 0.5;
 				sphere.rotation.z = time * 0.51;
 
-				water.material.uniforms[ "time" ].value += 1.0 / 60.0;
+				water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
 
 				renderer.render( scene, camera );
 
