@@ -12,7 +12,7 @@ THREE.MTLLoader = function ( manager ) {
 
 THREE.MTLLoader.prototype = {
 
-	constructor: THREE.MTLLoader,
+	constructor: MTLLoader,
 
 	/**
 	 * Loads and parses a MTL asset from a URL.
