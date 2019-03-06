@@ -55,7 +55,7 @@ import { DataTexture2DArray } from '../../textures/DataTexture2DArray.js';
 import { DataTexture3D } from '../../textures/DataTexture3D.js';
 
 var emptyTexture = new Texture();
-var emptyTexture2darray = new DataTexture2DArray();
+var emptyTexture2dArray = new DataTexture2DArray();
 var emptyTexture3d = new DataTexture3D();
 var emptyCubeTexture = new CubeTexture();
 
