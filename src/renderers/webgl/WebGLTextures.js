@@ -12,7 +12,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	//
 
-	var useOffscreenCanvas  = typeof OffscreenCanvas  !== 'undefined';
+	var useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined';
 
 	function createCanvas( width, height ) {
 
