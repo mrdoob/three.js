@@ -12,6 +12,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.dracoLoader = null;
+		this._useImageBitmapLoader = false;
 
 	}
 
@@ -118,6 +119,13 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
+		enableImageBitmapLoader: function () {
+
+			this._useImageBitmapLoader = true;
+			return this;
+
+		},
+
 		parse: function ( data, path, onLoad, onError ) {
 
 			var content;
@@ -214,7 +222,8 @@ THREE.GLTFLoader = ( function () {
 
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
-				manager: this.manager
+				manager: this.manager,
+				enableImageBitmapLoader: this._useImageBitmapLoader
 
 			} );
 
@@ -1604,6 +1613,8 @@ THREE.GLTFLoader = ( function () {
 
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
+
+		if ( options.enableImageBitmapLoader ) this.textureLoader.enableImageBitmapLoader();
 
 		this.fileLoader = new THREE.FileLoader( this.options.manager );
 		this.fileLoader.setResponseType( 'arraybuffer' );
