@@ -122,6 +122,7 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
+			path.fillOpacity = style.fillOpacity;
 
 			var point = new THREE.Vector2();
 			var control = new THREE.Vector2();
@@ -545,6 +546,7 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
+			path.fillOpacity = style.fillOpacity;
 			path.moveTo( x + 2 * rx, y );
 			path.lineTo( x + w - 2 * rx, y );
 			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y, x + w, y, x + w, y + 2 * ry );
@@ -591,6 +593,7 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
+			path.fillOpacity = style.fillOpacity;
 
 			var index = 0;
 
@@ -623,6 +626,7 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
+			path.fillOpacity = style.fillOpacity;
 
 			var index = 0;
 
@@ -645,6 +649,7 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
+			path.fillOpacity = style.fillOpacity;
 			path.subPaths.push( subpath );
 
 			return path;
@@ -663,6 +668,7 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
+			path.fillOpacity = style.fillOpacity;
 			path.subPaths.push( subpath );
 
 			return path;
@@ -693,6 +699,9 @@ THREE.SVGLoader.prototype = {
 
 			if ( node.hasAttribute( 'fill' ) ) style.fill = node.getAttribute( 'fill' );
 			if ( node.style.fill !== '' ) style.fill = node.style.fill;
+
+			if ( node.hasAttribute( 'fill-opacity' ) ) style.fillOpacity = node.getAttribute( 'fill-opacity' );
+      if ( node.style.fillOpacity !== '' ) style.fillOpacity = node.style.fillOpacity;
 
 			return style;
 
