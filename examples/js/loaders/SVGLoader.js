@@ -701,7 +701,7 @@ THREE.SVGLoader.prototype = {
 			if ( node.style.fill !== '' ) style.fill = node.style.fill;
 
 			if ( node.hasAttribute( 'fill-opacity' ) ) style.fillOpacity = node.getAttribute( 'fill-opacity' );
-      if ( node.style.fillOpacity !== '' ) style.fillOpacity = node.style.fillOpacity;
+			if ( node.style.fillOpacity !== '' ) style.fillOpacity = node.style.fillOpacity;
 
 			return style;
 
