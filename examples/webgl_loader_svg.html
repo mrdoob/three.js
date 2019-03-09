@@ -81,7 +81,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				document.body.addEventListener( 'dblclick', function ( event ) {
+				document.body.addEventListener( 'dblclick', function () {
 
 					var group = scene.children[ 1 ];
 					group.traverse( function ( child ) {
@@ -102,14 +102,10 @@
 
 			function createGUI() {
 
-				if ( gui ) {
-					gui.destroy();
-				}
+				if ( gui ) gui.destroy();
 
-				guiData = {
-
+				var guiData = {
 					currentURL: currentURL
-
 				};
 
 				gui = new dat.GUI( { width: 350 } );
