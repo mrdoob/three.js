@@ -89,7 +89,7 @@
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.5 ) );
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				dirLight.position.set( 5, 10, 5 );
+				dirLight.position.set( 5, 10, 7.5 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.right = 2;
 				dirLight.shadow.camera.left = - 2;
@@ -106,6 +106,9 @@
 					new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
 				];
 
+				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 220, 60 );
+				object = new THREE.Group();
+
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xFFC107,
 					metalness: 0.1,
@@ -115,15 +118,19 @@
 					clipShadows: true
 				} );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 220, 60 );
-				object = new THREE.Group();
-				object.add( new THREE.Mesh( geometry, material ) );
+				var clippedColorFront = new THREE.Mesh( geometry, material );
+				clippedColorFront.castShadow = true;
+				clippedColorFront.renderOrder = 0;
+
+				object.add( clippedColorFront );
 				scene.add( object );
+
 
 				planeObjects = [];
 				var planeGeom = new THREE.PlaneBufferGeometry( 10, 10 );
 				for ( var i = 0; i < 3; i ++ ) {
 
+					var poGroup = new THREE.Group();
 					var plane = planes[ i ];
 					var stencilGroup = createPlaneStencilGroup( geometry, plane, i + 1 )
 
@@ -133,7 +140,6 @@
 							metalness: 0.1,
 							roughness: 0.75,
 							clippingPlanes: planes.filter( p => p !== plane ),
-							clipShadows: true,
 
 							stencilWrite: true,
 							stencilRef: 0,
@@ -144,20 +150,31 @@
 
 						} );
 					var po = new THREE.Mesh( planeGeom, planeMat );
-					po.onAfterRender = function( renderer ) {
-						renderer.clearStencil();
-					};
 					po.renderOrder = i + 1.5;
 
+					var clearMat = new THREE.MeshBasicMaterial( {
+
+							depthWrite: false,
+							depthTest: false,
+							colorWrite: false,
+							stencilWrite: true,
+							stencilRef: 0,
+							stencilFail: THREE.ReplaceStencilOp,
+							stencilZFail: THREE.ReplaceStencilOp,
+							stencilZPass: THREE.ReplaceStencilOp,
+							side: THREE.DoubleSide
+
+						} );
+					var poClear = new THREE.Mesh( planeGeom, clearMat );
+					poClear.renderOrder = i + 1.75;
+
 					object.add( stencilGroup );
-					scene.add( po );
-					planeObjects.push( po );
+					poGroup.add( po );
+					poGroup.add( poClear );
+					scene.add( poGroup );
+					planeObjects.push( poGroup );
 
 				}
-
-				// Geometry
-
-
 
 
 				var ground = new THREE.Mesh(
