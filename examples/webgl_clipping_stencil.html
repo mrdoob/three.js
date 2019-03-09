@@ -22,7 +22,7 @@
 		<script>
 
 			var camera, scene, renderer, startTime, object, stats;
-			var planes, planeObjects;
+			var planes, planeObjects, cameraPlane;
 			var clock;
 
 			var params = {
@@ -64,13 +64,9 @@
 				mat1.stencilZPass = THREE.DecrementWrapStencilOp;
 
 				var mesh1 = new THREE.Mesh( geometry, mat1 );
-				mesh1.castShadow = true;
-				mesh1.receiveShadow = true;
 				mesh1.renderOrder = renderOrder;
 
 				group.add( mesh1 );
-
-				console.log( mat0, mat1 )
 
 				return group;
 
@@ -80,11 +76,11 @@
 
 				clock = new THREE.Clock();
 
-				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 1 );
-
-				camera.position.set( 0, 1.3, 3 );
-
 				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 1 );
+				camera.position.set( 0, 1.3, 3 );
+				scene.add( camera );
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.5 ) );
 
@@ -108,24 +104,9 @@
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 220, 60 );
 				object = new THREE.Group();
-
-				var material = new THREE.MeshStandardMaterial( {
-					color: 0xFFC107,
-					metalness: 0.1,
-					roughness: 0.75,
-					side: THREE.DoubleSide,
-					clippingPlanes: planes,
-					clipShadows: true
-				} );
-
-				var clippedColorFront = new THREE.Mesh( geometry, material );
-				clippedColorFront.castShadow = true;
-				clippedColorFront.renderOrder = 0;
-
-				object.add( clippedColorFront );
 				scene.add( object );
 
-
+				// Set up clip plane rendering
 				planeObjects = [];
 				var planeGeom = new THREE.PlaneBufferGeometry( 10, 10 );
 				for ( var i = 0; i < 3; i ++ ) {
@@ -136,6 +117,7 @@
 
 					var planeMat =
 						new THREE.MeshStandardMaterial( {
+
 							color: 0xE91E63,
 							metalness: 0.1,
 							roughness: 0.75,
@@ -150,31 +132,62 @@
 
 						} );
 					var po = new THREE.Mesh( planeGeom, planeMat );
-					po.renderOrder = i + 1.5;
+					po.onAfterRender = function ( renderer ) {
 
-					var clearMat = new THREE.MeshBasicMaterial( {
+						renderer.clearStencil();
 
-							depthWrite: false,
-							depthTest: false,
-							colorWrite: false,
-							stencilWrite: true,
-							stencilRef: 0,
-							stencilFail: THREE.ReplaceStencilOp,
-							stencilZFail: THREE.ReplaceStencilOp,
-							stencilZPass: THREE.ReplaceStencilOp,
-							side: THREE.DoubleSide
-
-						} );
-					var poClear = new THREE.Mesh( planeGeom, clearMat );
-					poClear.renderOrder = i + 1.75;
+					};
+					po.renderOrder = i + 1.1;
 
 					object.add( stencilGroup );
 					poGroup.add( po );
-					poGroup.add( poClear );
+					planeObjects.push( po );
 					scene.add( poGroup );
-					planeObjects.push( poGroup );
 
 				}
+
+				// Handle camera entering model
+				var material = new THREE.MeshStandardMaterial( {
+
+					color: 0xFFC107,
+					metalness: 0.1,
+					roughness: 0.75,
+					clippingPlanes: planes,
+					clipShadows: true,
+					shadowSide: THREE.DoubleSide,
+					stencilFail: THREE.ReplaceStencilOp,
+					stencilZFail: THREE.ReplaceStencilOp,
+					stencilZPass: THREE.ReplaceStencilOp,
+
+				} );
+
+				// add the color
+				var clippedColorFront = new THREE.Mesh( geometry, material );
+				clippedColorFront.castShadow = true;
+				clippedColorFront.renderOrder = 6;
+				object.add( clippedColorFront );
+
+				var backSideMesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( {
+
+					side: THREE.BackSide,
+					colorWrite: false,
+					depthWrite: false,
+					stencilWrite: true,
+					ref: 1,
+					stencilFunc: THREE.AlwaysStencilFunc,
+
+				} ) );
+
+				backSideMesh.renderOrder = 6.1;
+				object.add( backSideMesh );
+
+				cameraPlane = new THREE.Mesh( planeGeom, new THREE.MeshStandardMaterial( {
+
+					color: 0xff0000
+
+				} ) );
+
+				camera.add( cameraPlane );
 
 
 				var ground = new THREE.Mesh(
