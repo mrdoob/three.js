@@ -12,6 +12,7 @@ export class Audio extends Object3D {
   gain: GainNode;
   autoplay: boolean;
   buffer: null | Audio;
+  detune: number;
   loop: boolean;
   startTime: number;
   offset: number;
@@ -32,6 +33,8 @@ export class Audio extends Object3D {
   stop(): this;
   connect(): this;
   disconnect(): this;
+  setDetune(value: number): this;
+  getDetune(): number;
   getFilters(): any[];
   setFilter(value: any[]): this;
   getFilter(): any;
