@@ -22,19 +22,88 @@
 		<script>
 
 			var camera, scene, renderer, startTime, object, stats;
+			var planes, planeObjects;
+			var clock;
+
+			var params = {
+
+				animate: true
+
+			};
 
 			init();
 			animate();
 
+			function createStencilGroup( geometry, material, planes ) {
+
+				var group = new THREE.Group();
+				var baseMat = new THREE.MeshBasicMaterial();
+				baseMat.depthWrite = false;
+				baseMat.depthTest = false;
+				baseMat.colorWrite = false;
+				baseMat.clippingPlanes = planes;
+				baseMat.stencilWrite = true;
+				baseMat.stencilFail = THREE.AlwaysStencilFunc;
+
+				// // front faces no depth
+				// var mat0 = baseMat.clone();
+				// mat0.stencilFail = THREE.IncrementWrapStencilOp;
+				// mat0.stencilZFail = THREE.IncrementWrapStencilOp;
+				// mat0.stencilZPass = THREE.IncrementWrapStencilOp;
+				// var mesh0 = new THREE.Mesh( geometry, mat0 );
+				// group.add( mesh0 );
+
+				// // back faces no depth
+				// var mat1 = baseMat.clone();
+				// mat1.stencilFail = THREE.DecrementWrapStencilOp;
+				// mat1.stencilZFail = THREE.DecrementWrapStencilOp;
+				// mat1.stencilZPass = THREE.DecrementWrapStencilOp;
+				// var mesh1 = new THREE.Mesh( geometry, mat1 );
+				// group.add( mesh1 );
+
+				// back faces
+				var mat0 = baseMat.clone();
+				mat0.side = THREE.BackSide;
+				mat0.stencilFail = THREE.IncrementWrapStencilOp;
+				mat0.stencilZFail = THREE.IncrementWrapStencilOp;
+				mat0.stencilZPass = THREE.IncrementWrapStencilOp;
+
+				var mesh0 = new THREE.Mesh( geometry, mat0 );
+				mesh0.renderOrder = 1;
+				group.add( mesh0 );
+
+				// front faces
+				var mat1 = material.clone();
+				mat1.side = THREE.FrontSide;
+				mat1.clippingPlanes = planes;
+				mat1.stencilWrite = true;
+				mat1.stencilFail = THREE.AlwaysStencilFunc;
+				mat1.stencilFail = THREE.DecrementWrapStencilOp;
+				mat1.stencilZFail = THREE.DecrementWrapStencilOp;
+				mat1.stencilZPass = THREE.DecrementWrapStencilOp;
+
+				var mesh1 = new THREE.Mesh( geometry, mat1 );
+				mesh1.castShadow = true;
+				mesh1.receiveShadow = true;
+				mesh1.renderOrder = 1;
+
+				group.add( mesh1 );
+
+				console.log( mat0, mat1 )
+
+				return group;
+
+			}
+
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight );
+				clock = new THREE.Clock();
+
+				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 1 );
 
 				camera.position.set( 0, 1.3, 3 );
 
 				scene = new THREE.Scene();
-
-				// Lights
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.5 ) );
 
@@ -50,10 +119,38 @@
 				dirLight.shadow.mapSize.height = 1024;
 				scene.add( dirLight );
 
-				// ***** Clipping planes: *****
+				planes = [
+					new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
+				];
 
-				var localPlane = new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0.8 );
-				var globalPlane = new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0.1 );
+				planeObjects = new Array( 3 );
+				var planeGeom = new THREE.PlaneBufferGeometry( 10, 10 );
+				for ( var i = 0; i < planes.length; i ++ ) {
+
+					var plane = planes[ i ];
+					var planeMat =
+						new THREE.MeshStandardMaterial( {
+							color: 0xE91E63,
+							metalness: 0.1,
+							roughness: 0.75,
+							side: THREE.DoubleSide,
+							clippingPlanes: planes.filter( p => p !== plane ),
+							clipShadows: true,
+
+							stencilWrite: true,
+							stencilRef: 0,
+							stencilFunc: THREE.NotEqualStencilFunc,
+
+						} );
+					var po = new THREE.Mesh( planeGeom, planeMat );
+					po.renderOrder = 2;
+
+					scene.add( po );
+					planeObjects[ i ] = po;
+
+				}
 
 				// Geometry
 
@@ -62,16 +159,15 @@
 					metalness: 0.1,
 					roughness: 0.75,
 					side: THREE.DoubleSide,
-					clippingPlanes: [ localPlane ],
+					clippingPlanes: planes,
 					clipShadows: true
-
 				} );
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 220, 60 );
-
-				object = new THREE.Mesh( geometry, material );
-				object.castShadow = true;
+				object = createStencilGroup( geometry, material, planes );
 				scene.add( object );
+
+
 
 				var ground = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
@@ -79,6 +175,7 @@
 				);
 
 				ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
+				ground.position.y = - 1;
 				ground.receiveShadow = true;
 				scene.add( ground );
 
@@ -97,66 +194,17 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.body.appendChild( renderer.domElement );
 
-				// ***** Clipping setup (renderer): *****
-				var globalPlanes = [ globalPlane ],
-					Empty = Object.freeze( [] );
-				renderer.clippingPlanes = Empty; // GUI sets it to globalPlanes
 				renderer.localClippingEnabled = true;
 
 				// Controls
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 1, 0 );
 				controls.update();
 
 				// GUI
 
-				var gui = new dat.GUI(),
-					folderLocal = gui.addFolder( 'Local Clipping' ),
-					propsLocal = {
-
-						get 'Enabled'() {
-
-							return renderer.localClippingEnabled;
-
-						},
-						set 'Enabled'( v ) {
-
-							renderer.localClippingEnabled = v;
-
-						},
-
-						get 'Shadows'() {
-
-							return material.clipShadows;
-
-						},
-						set 'Shadows'( v ) {
-
-							material.clipShadows = v;
-
-						},
-
-						get 'Plane'() {
-
-							return localPlane.constant;
-
-						},
-						set 'Plane'( v ) {
-
-							localPlane.constant = v;
-
-						}
-
-					};
-
-				folderLocal.add( propsLocal, 'Enabled' );
-				folderLocal.add( propsLocal, 'Shadows' );
-				folderLocal.add( propsLocal, 'Plane', 0.3, 1.25 );
-
-				// Start
-
-				startTime = Date.now();
+				var gui = new dat.GUI();
+				gui.add( params, 'animate' );
 
 			}
 
@@ -171,15 +219,29 @@
 
 			function animate() {
 
-				var currentTime = Date.now();
-				var time = ( currentTime - startTime ) / 1000;
+				var delta = clock.getDelta();
 
 				requestAnimationFrame( animate );
 
-				object.position.y = 0.8;
-				object.rotation.x = time * 0.5;
-				object.rotation.y = time * 0.2;
-				object.scale.setScalar( Math.cos( time ) * 0.125 + 0.875 );
+				if ( params.animate ) {
+
+					object.rotation.x += delta * 0.5;
+					object.rotation.y += delta * 0.2;
+
+				}
+
+				for ( var i = 0; i < planes.length; i ++ ) {
+
+					var plane = planes[ i ];
+					var po = planeObjects[ i ];
+					plane.coplanarPoint( po.position );
+					po.lookAt(
+						po.position.x + plane.normal.x,
+						po.position.y + plane.normal.y,
+						po.position.z + plane.normal.z,
+					);
+
+				}
 
 				stats.begin();
 				renderer.render( scene, camera );
