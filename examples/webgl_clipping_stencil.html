@@ -34,32 +34,16 @@
 			init();
 			animate();
 
-			function createStencilGroup( geometry, material, planes ) {
+			function createPlaneStencilGroup( geometry, plane, renderOrder ) {
 
 				var group = new THREE.Group();
 				var baseMat = new THREE.MeshBasicMaterial();
 				baseMat.depthWrite = false;
 				baseMat.depthTest = false;
 				baseMat.colorWrite = false;
-				baseMat.clippingPlanes = planes;
+				baseMat.clippingPlanes = [ plane ];
 				baseMat.stencilWrite = true;
-				baseMat.stencilFail = THREE.AlwaysStencilFunc;
-
-				// // front faces no depth
-				// var mat0 = baseMat.clone();
-				// mat0.stencilFail = THREE.IncrementWrapStencilOp;
-				// mat0.stencilZFail = THREE.IncrementWrapStencilOp;
-				// mat0.stencilZPass = THREE.IncrementWrapStencilOp;
-				// var mesh0 = new THREE.Mesh( geometry, mat0 );
-				// group.add( mesh0 );
-
-				// // back faces no depth
-				// var mat1 = baseMat.clone();
-				// mat1.stencilFail = THREE.DecrementWrapStencilOp;
-				// mat1.stencilZFail = THREE.DecrementWrapStencilOp;
-				// mat1.stencilZPass = THREE.DecrementWrapStencilOp;
-				// var mesh1 = new THREE.Mesh( geometry, mat1 );
-				// group.add( mesh1 );
+				baseMat.stencilFunc = THREE.AlwaysStencilFunc;
 
 				// back faces
 				var mat0 = baseMat.clone();
@@ -69,15 +53,12 @@
 				mat0.stencilZPass = THREE.IncrementWrapStencilOp;
 
 				var mesh0 = new THREE.Mesh( geometry, mat0 );
-				mesh0.renderOrder = 1;
+				mesh0.renderOrder = renderOrder;
 				group.add( mesh0 );
 
 				// front faces
-				var mat1 = material.clone();
+				var mat1 = baseMat.clone();
 				mat1.side = THREE.FrontSide;
-				mat1.clippingPlanes = planes;
-				mat1.stencilWrite = true;
-				mat1.stencilFail = THREE.AlwaysStencilFunc;
 				mat1.stencilFail = THREE.DecrementWrapStencilOp;
 				mat1.stencilZFail = THREE.DecrementWrapStencilOp;
 				mat1.stencilZPass = THREE.DecrementWrapStencilOp;
@@ -85,7 +66,7 @@
 				var mesh1 = new THREE.Mesh( geometry, mat1 );
 				mesh1.castShadow = true;
 				mesh1.receiveShadow = true;
-				mesh1.renderOrder = 1;
+				mesh1.renderOrder = renderOrder;
 
 				group.add( mesh1 );
 
@@ -125,35 +106,6 @@
 					new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
 				];
 
-				planeObjects = new Array( 3 );
-				var planeGeom = new THREE.PlaneBufferGeometry( 10, 10 );
-				for ( var i = 0; i < planes.length; i ++ ) {
-
-					var plane = planes[ i ];
-					var planeMat =
-						new THREE.MeshStandardMaterial( {
-							color: 0xE91E63,
-							metalness: 0.1,
-							roughness: 0.75,
-							side: THREE.DoubleSide,
-							clippingPlanes: planes.filter( p => p !== plane ),
-							clipShadows: true,
-
-							stencilWrite: true,
-							stencilRef: 0,
-							stencilFunc: THREE.NotEqualStencilFunc,
-
-						} );
-					var po = new THREE.Mesh( planeGeom, planeMat );
-					po.renderOrder = 2;
-
-					scene.add( po );
-					planeObjects[ i ] = po;
-
-				}
-
-				// Geometry
-
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xFFC107,
 					metalness: 0.1,
@@ -164,8 +116,47 @@
 				} );
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 220, 60 );
-				object = createStencilGroup( geometry, material, planes );
+				object = new THREE.Group();
+				object.add( new THREE.Mesh( geometry, material ) );
 				scene.add( object );
+
+				planeObjects = [];
+				var planeGeom = new THREE.PlaneBufferGeometry( 10, 10 );
+				for ( var i = 0; i < 3; i ++ ) {
+
+					var plane = planes[ i ];
+					var stencilGroup = createPlaneStencilGroup( geometry, plane, i + 1 )
+
+					var planeMat =
+						new THREE.MeshStandardMaterial( {
+							color: 0xE91E63,
+							metalness: 0.1,
+							roughness: 0.75,
+							clippingPlanes: planes.filter( p => p !== plane ),
+							clipShadows: true,
+
+							stencilWrite: true,
+							stencilRef: 0,
+							stencilFunc: THREE.NotEqualStencilFunc,
+							stencilFail: THREE.ReplaceStencilOp,
+							stencilZFail: THREE.ReplaceStencilOp,
+							stencilZPass: THREE.ReplaceStencilOp,
+
+						} );
+					var po = new THREE.Mesh( planeGeom, planeMat );
+					po.onAfterRender = function( renderer ) {
+						renderer.clearStencil();
+					};
+					po.renderOrder = i + 1.5;
+
+					object.add( stencilGroup );
+					scene.add( po );
+					planeObjects.push( po );
+
+				}
+
+				// Geometry
+
 
 
 
@@ -230,15 +221,15 @@
 
 				}
 
-				for ( var i = 0; i < planes.length; i ++ ) {
+				for ( var i = 0; i < planeObjects.length; i ++ ) {
 
 					var plane = planes[ i ];
 					var po = planeObjects[ i ];
 					plane.coplanarPoint( po.position );
 					po.lookAt(
-						po.position.x + plane.normal.x,
-						po.position.y + plane.normal.y,
-						po.position.z + plane.normal.z,
+						po.position.x - plane.normal.x,
+						po.position.y - plane.normal.y,
+						po.position.z - plane.normal.z,
 					);
 
 				}
