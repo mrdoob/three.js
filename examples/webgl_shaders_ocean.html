@@ -110,8 +110,6 @@
 				// Skybox
 
 				var sky = new THREE.Sky();
-				sky.scale.setScalar( 10000 );
-				scene.add( sky );
 
 				var uniforms = sky.material.uniforms;
 
@@ -127,9 +125,11 @@
 					azimuth: 0.205
 				};
 
-				var cubeCamera = new THREE.CubeCamera( 1, 20000, 256 );
+				var cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
 				cubeCamera.renderTarget.texture.generateMipmaps = true;
 				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+
+				scene.background = cubeCamera.renderTarget;
 
 				function updateSun() {
 
@@ -143,7 +143,7 @@
 					sky.material.uniforms[ 'sunPosition' ].value = light.position.copy( light.position );
 					water.material.uniforms[ 'sunDirection' ].value.copy( light.position ).normalize();
 
-					cubeCamera.update( renderer, scene );
+					cubeCamera.update( renderer, sky );
 
 				}
 
