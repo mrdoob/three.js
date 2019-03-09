@@ -22,7 +22,7 @@
 		<script>
 
 			var camera, scene, renderer, startTime, object, stats;
-			var planes, planeObjects, cameraPlane;
+			var planes, planeObjects;
 			var clock;
 
 			var params = {
@@ -80,7 +80,6 @@
 
 				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 1 );
 				camera.position.set( 0, 1.3, 3 );
-				scene.add( camera );
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.5 ) );
 
@@ -108,7 +107,7 @@
 
 				// Set up clip plane rendering
 				planeObjects = [];
-				var planeGeom = new THREE.PlaneBufferGeometry( 10, 10 );
+				var planeGeom = new THREE.PlaneBufferGeometry( 4, 4 );
 				for ( var i = 0; i < 3; i ++ ) {
 
 					var poGroup = new THREE.Group();
@@ -155,9 +154,6 @@
 					clippingPlanes: planes,
 					clipShadows: true,
 					shadowSide: THREE.DoubleSide,
-					stencilFail: THREE.ReplaceStencilOp,
-					stencilZFail: THREE.ReplaceStencilOp,
-					stencilZPass: THREE.ReplaceStencilOp,
 
 				} );
 
@@ -166,28 +162,6 @@
 				clippedColorFront.castShadow = true;
 				clippedColorFront.renderOrder = 6;
 				object.add( clippedColorFront );
-
-				var backSideMesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( {
-
-					side: THREE.BackSide,
-					colorWrite: false,
-					depthWrite: false,
-					stencilWrite: true,
-					ref: 1,
-					stencilFunc: THREE.AlwaysStencilFunc,
-
-				} ) );
-
-				backSideMesh.renderOrder = 6.1;
-				object.add( backSideMesh );
-
-				cameraPlane = new THREE.Mesh( planeGeom, new THREE.MeshStandardMaterial( {
-
-					color: 0xff0000
-
-				} ) );
-
-				camera.add( cameraPlane );
 
 
 				var ground = new THREE.Mesh(
