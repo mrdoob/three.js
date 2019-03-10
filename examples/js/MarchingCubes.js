@@ -772,10 +772,10 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 	// Updates
 	/////////////////////////////////////
 
-	this.setCell = function ( x, y, z, strength ) {
+	this.setCell = function ( x, y, z, value ) {
 
 		var index = this.size2 * z + this.size * y + x;
-		this.field[ index ] = strength;
+		this.field[ index ] = value;
 
 	};
 
