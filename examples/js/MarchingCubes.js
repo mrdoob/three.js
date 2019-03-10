@@ -772,6 +772,79 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 	// Updates
 	/////////////////////////////////////
 
+	this.setCell = function ( x, y, z, strength ) {
+
+		var index = this.size2 * z + this.size * y + x;
+		this.field[ index ] = strength;
+
+	};
+
+	this.getCell = function ( x, y, z ) {
+
+		var index = this.size2 * z + this.size * y + x;
+		return this.field[ index ];
+
+	};
+
+	this.blur = function ( intensity ) {
+
+		if ( intensity === undefined ) {
+
+			intensity = 1;
+
+		}
+
+		var field = this.field;
+		var fieldCopy = field.slice();
+		var size = this.size;
+		var size2 = this.size2;
+		for ( var x = 0; x < size; x ++ ) {
+
+			for ( var y = 0; y < size; y ++ ) {
+
+				for ( var z = 0; z < size; z ++ ) {
+
+					var index = size2 * z + size * y + x;
+					var val = fieldCopy[ index ];
+					var count = 1;
+
+					for ( var x2 = - 1; x2 <= 1; x2 += 2 ) {
+
+						var x3 = x2 + x;
+						if ( x3 < 0 || x3 >= size ) continue;
+
+						for ( var y2 = - 1; y2 <= 1; y2 += 2 ) {
+
+							var y3 = y2 + y;
+							if ( y3 < 0 || y3 >= size ) continue;
+
+							for ( var z2 = - 1; z2 <= 1; z2 += 2 ) {
+
+								var z3 = z2 + z;
+								if ( z3 < 0 || z3 >= size ) continue;
+
+								var index2 = size2 * z3 + size * y3 + x3;
+								var val2 = fieldCopy[ index2 ];
+
+								count ++;
+								val += intensity * ( val2 - val ) / count;
+
+							}
+
+						}
+
+					}
+
+					field[ index ] = val;
+
+				}
+
+			}
+
+		}
+
+	};
+
 	this.reset = function () {
 
 		var i;
