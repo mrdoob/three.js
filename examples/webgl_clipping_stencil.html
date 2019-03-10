@@ -134,6 +134,7 @@
 					var plane = planes[ i ];
 					var stencilGroup = createPlaneStencilGroup( geometry, plane, i + 1 )
 
+					// plane is clipped by the other clipping planes
 					var planeMat =
 						new THREE.MeshStandardMaterial( {
 
@@ -195,12 +196,10 @@
 				scene.add( ground );
 
 				// Stats
-
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
 				// Renderer
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -212,12 +211,10 @@
 				renderer.localClippingEnabled = true;
 
 				// Controls
-
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.update();
 
 				// GUI
-
 				var gui = new dat.GUI();
 				gui.add( params, 'animate' );
 
@@ -250,8 +247,6 @@
 
 				} );
 				planeZ.open();
-
-
 
 			}
 
