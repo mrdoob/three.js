@@ -10,13 +10,13 @@ import { WebGLUniforms } from './WebGLUniforms';
 export class WebGLProgram {
   constructor(
     renderer: WebGLRenderer,
-		extensions: WebGLExtensions,
+    extensions: WebGLExtensions,
     code: string,
     material: ShaderMaterial,
-		shader: WebGLShader,
+    shader: WebGLShader,
     parameters: WebGLRendererParameters,
-		capabilities: WebGLCapabilities,
-		textures: WebGLTextures
+    capabilities: WebGLCapabilities,
+    textures: WebGLTextures
   );
 
   id: number;
