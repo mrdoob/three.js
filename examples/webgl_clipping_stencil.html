@@ -36,7 +36,7 @@
 		<script>
 
 			var camera, scene, renderer, startTime, object, stats;
-			var planes, planeObjects;
+			var planes, planeObjects, planeHelpers;
 			var clock;
 
 			var params = {
@@ -44,20 +44,23 @@
 				animate: true,
 				planeX: {
 
-					distance: 0,
-					negated: false
+					constant: 0,
+					negated: false,
+					displayHelper: false
 
 				},
 				planeY: {
 
-					distance: 0,
-					negated: false
+					constant: 0,
+					negated: false,
+					displayHelper: false
 
 				},
 				planeZ: {
 
-					distance: 0,
-					negated: false
+					constant: 0,
+					negated: false,
+					displayHelper: false
 
 				}
 
@@ -134,6 +137,14 @@
 					new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
 					new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
 				];
+
+				planeHelpers = planes.map( p => new THREE.PlaneHelper( p, 2, 0xffffff ) );
+				planeHelpers.forEach( ph => {
+
+					ph.visible = false;
+					scene.add( ph );
+
+				} );
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 220, 60 );
 				object = new THREE.Group();
@@ -232,31 +243,34 @@
 				gui.add( params, 'animate' );
 
 				var planeX = gui.addFolder( 'planeX' );
-				planeX.add( params.planeX, 'distance' ).min( - 0.5 ).max( 0.5 ).onChange( d => planes[ 0 ].constant = d );
+				planeX.add( params.planeX, 'displayHelper' ).onChange( v => planeHelpers[ 0 ].visible = v );
+				planeX.add( params.planeX, 'constant' ).min( - 1 ).max( 1 ).onChange( d => planes[ 0 ].constant = d );
 				planeX.add( params.planeX, 'negated' ).onChange( d => {
 
 					planes[ 0 ].negate();
-					params.planeX.distance = planes[ 0 ].constant;
+					params.planeX.constant = planes[ 0 ].constant;
 
 				} );
 				planeX.open();
 
 				var planeY = gui.addFolder( 'planeY' );
-				planeY.add( params.planeY, 'distance' ).min( - 0.5 ).max( 0.5 ).onChange( d => planes[ 1 ].constant = d );
+				planeY.add( params.planeY, 'displayHelper' ).onChange( v => planeHelpers[ 1 ].visible = v );
+				planeY.add( params.planeY, 'constant' ).min( - 1 ).max( 1 ).onChange( d => planes[ 1 ].constant = d );
 				planeY.add( params.planeY, 'negated' ).onChange( d => {
 
 					planes[ 1 ].negate();
-					params.planeY.distance = planes[ 1 ].constant;
+					params.planeY.constant = planes[ 1 ].constant;
 
 				} );
 				planeY.open();
 
 				var planeZ = gui.addFolder( 'planeZ' );
-				planeZ.add( params.planeZ, 'distance' ).min( - 0.5 ).max( 0.5 ).onChange( d => planes[ 2 ].constant = d );
+				planeZ.add( params.planeZ, 'displayHelper' ).onChange( v => planeHelpers[ 2 ].visible = v );
+				planeZ.add( params.planeZ, 'constant' ).min( - 1 ).max( 1 ).onChange( d => planes[ 2 ].constant = d );
 				planeZ.add( params.planeZ, 'negated' ).onChange( d => {
 
 					planes[ 2 ].negate();
-					params.planeZ.distance = planes[ 2 ].constant;
+					params.planeZ.constant = planes[ 2 ].constant;
 
 				} );
 				planeZ.open();
