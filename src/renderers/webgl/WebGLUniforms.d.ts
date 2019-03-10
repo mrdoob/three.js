@@ -1,8 +1,9 @@
 import { WebGLProgram } from './WebGLProgram';
 import { WebGLRenderer } from './../WebGLRenderer';
+import { WebGLTextures } from './WebGLTextures';
 
 export class WebGLUniforms {
-  constructor(gl: any, program: WebGLProgram, renderer: WebGLRenderer);
+  constructor(gl: any, program: WebGLProgram, renderer: WebGLRenderer, textures: WebGLTextures);
 
   renderer: WebGLRenderer;
 
