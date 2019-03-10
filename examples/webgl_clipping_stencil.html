@@ -27,7 +27,26 @@
 
 			var params = {
 
-				animate: true
+				animate: true,
+				planeX: {
+
+					distance: 0,
+					negated: false
+
+				},
+				planeY: {
+
+					distance: 0,
+					negated: false
+
+				},
+				planeZ: {
+
+					distance: 0,
+					negated: false
+
+				}
+
 
 			};
 
@@ -41,13 +60,13 @@
 				baseMat.depthWrite = false;
 				baseMat.depthTest = false;
 				baseMat.colorWrite = false;
-				baseMat.clippingPlanes = [ plane ];
 				baseMat.stencilWrite = true;
 				baseMat.stencilFunc = THREE.AlwaysStencilFunc;
 
 				// back faces
 				var mat0 = baseMat.clone();
 				mat0.side = THREE.BackSide;
+				mat0.clippingPlanes = [ plane ];
 				mat0.stencilFail = THREE.IncrementWrapStencilOp;
 				mat0.stencilZFail = THREE.IncrementWrapStencilOp;
 				mat0.stencilZPass = THREE.IncrementWrapStencilOp;
@@ -59,6 +78,7 @@
 				// front faces
 				var mat1 = baseMat.clone();
 				mat1.side = THREE.FrontSide;
+				mat1.clippingPlanes = [ plane ];
 				mat1.stencilFail = THREE.DecrementWrapStencilOp;
 				mat1.stencilZFail = THREE.DecrementWrapStencilOp;
 				mat1.stencilZPass = THREE.DecrementWrapStencilOp;
@@ -96,8 +116,8 @@
 				scene.add( dirLight );
 
 				planes = [
-					new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
 					new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
 					new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
 				];
 
@@ -200,6 +220,38 @@
 
 				var gui = new dat.GUI();
 				gui.add( params, 'animate' );
+
+				var planeX = gui.addFolder( 'planeX' );
+				planeX.add( params.planeX, 'distance' ).min( - 0.5 ).max( 0.5 ).onChange( d => planes[ 0 ].constant = d );
+				planeX.add( params.planeX, 'negated' ).onChange( d => {
+
+					planes[ 0 ].negate();
+					params.planeX.distance = planes[ 0 ].constant;
+
+				} );
+				planeX.open();
+
+				var planeY = gui.addFolder( 'planeY' );
+				planeY.add( params.planeY, 'distance' ).min( - 0.5 ).max( 0.5 ).onChange( d => planes[ 1 ].constant = d );
+				planeY.add( params.planeY, 'negated' ).onChange( d => {
+
+					planes[ 1 ].negate();
+					params.planeY.distance = planes[ 1 ].constant;
+
+				} );
+				planeY.open();
+
+				var planeZ = gui.addFolder( 'planeZ' );
+				planeZ.add( params.planeZ, 'distance' ).min( - 0.5 ).max( 0.5 ).onChange( d => planes[ 2 ].constant = d );
+				planeZ.add( params.planeZ, 'negated' ).onChange( d => {
+
+					planes[ 2 ].negate();
+					params.planeZ.distance = planes[ 2 ].constant;
+
+				} );
+				planeZ.open();
+
+
 
 			}
 
