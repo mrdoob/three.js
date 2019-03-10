@@ -7,11 +7,11 @@ export class WebGLUniforms {
 
   renderer: WebGLRenderer;
 
-  setValue(gl: any, value: any, renderer?: any): void;
+  setValue(gl: any, name: string, value: any): void;
   set(gl: any, object: any, name: string): void;
   setOptional(gl: any, object: any, name: string): void;
 
-  static upload(gl: any, seq: any, values: any[], renderer: any): void;
+  static upload(gl: any, seq: any, values: any[], renderer: WebGLRenderer, textures: WebGLTextures): void;
   static seqWithValue(seq: any, values: any[]): any[];
   static splitDynamic(seq: any, values: any[]): any[];
   static evalDynamic(seq: any, values: any[], object: any, camera: any): any[];
