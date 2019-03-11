@@ -57,20 +57,15 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "acorn": "^6.1.0",
-    "acorn-walk": "^6.1.1",
     "concurrently": "^4.1.0",
     "electron": "^4.0.6",
     "eslint": "^5.15.0",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^5.0.3",
-    "fs-extra": "^7.0.1",
     "google-closure-compiler": "20190215.0.2",
     "http-server": "^0.11.1",
-    "magic-string": "^0.25.2",
     "qunit": "^2.9.2",
-    "rollup": "^1.4.0",
-    "tiny-glob": "^0.2.6"
+    "rollup": "^1.4.0"
   },
   "jspm": {
     "files": [
