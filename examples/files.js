@@ -154,6 +154,7 @@ var files = {
 		"webgl_materials_envmaps",
 		"webgl_materials_envmaps_exr",
 		"webgl_materials_envmaps_hdr",
+		"webgl_materials_envmaps_parallax",
 		"webgl_materials_grass",
 		"webgl_materials_lightmap",
 		"webgl_materials_matcap",
@@ -309,8 +310,8 @@ var files = {
 		"webgldeferred_animation"
 	],
 	"webgl2": [
+		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
-		"webgl2_materials_texture3d_volume",
 		"webgl2_multisampled_renderbuffers",
 		"webgl2_sandbox"
 	],
