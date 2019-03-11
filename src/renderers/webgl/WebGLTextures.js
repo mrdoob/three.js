@@ -59,16 +59,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				canvas.height = height;
 
 				var context = canvas.getContext( '2d' );
-
-				// ImageBitmap is flipped vertically
-
-				if ( useOffscreenCanvas ) {
-
-					context.translate( 0, height );
-					context.scale( 1, - 1 );
-
-				}
-
 				context.drawImage( image, 0, 0, width, height );
 
 				console.warn( 'THREE.WebGLRenderer: Texture has been resized from (' + image.width + 'x' + image.height + ') to (' + width + 'x' + height + ').' );
