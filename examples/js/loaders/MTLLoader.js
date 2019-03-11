@@ -186,6 +186,9 @@ THREE.MTLLoader.prototype = {
  *                                Default: false, assumed to be already normalized
  *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
  *                                  Default: false
+ *                  invertTrProperty: Use values 1 of Tr field for fully opaque.
+ *                                    This option is useful for obj exported from 3ds MAX,
+ *                                    vcglib or meshlab. Default: false
  * @constructor
  */
 
@@ -413,6 +416,15 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
+				case 'ns':
+
+					// The specular exponent (defines the focus of the specular highlight)
+					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
+
+					params.shininess = parseFloat( value );
+
+					break;
+
 				case 'ke':
 
 					// Emissive using RGB values
@@ -465,15 +477,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					setMapForType( "alphaMap", value );
 					params.transparent = true;
-
-					break;
-
-				case 'ns':
-
-					// The specular exponent (defines the focus of the specular highlight)
-					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
-
-					params.shininess = parseFloat( value );
 
 					break;
 
