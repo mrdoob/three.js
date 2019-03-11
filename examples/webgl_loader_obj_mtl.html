@@ -22,6 +22,9 @@
 				display:block;
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			.dg.ac {
+				z-index: 200 !important;
+			}
 		</style>
 	</head>
 
@@ -37,6 +40,7 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -49,9 +53,33 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var params = {
+				baseMaterial: 'MeshPhongMaterial',
+			};
+			var baseMaterials = {
+				MeshBasicMaterial: THREE.MeshBasicMaterial,
+				MeshDepthMaterial: THREE.MeshDepthMaterial,
+				MeshLambertMaterial: THREE.MeshLambertMaterial,
+				MeshNormalMaterial: THREE.MeshNormalMaterial,
+				MeshPhongMaterial: THREE.MeshPhongMaterial,
+				MeshPhysicalMaterial: THREE.MeshPhysicalMaterial,
+				MeshStandardMaterial: THREE.MeshStandardMaterial,
+				MeshToonMaterial: THREE.MeshToonMaterial,
+			};
 
+			initGUI();
 			init();
 			animate();
+
+
+			function initGUI() {
+				var gui = new dat.GUI( { width: 300 } );
+				var folderMaterialOptions = gui.addFolder( 'Material options' );
+				folderMaterialOptions.add( params, 'baseMaterial', Object.keys( baseMaterials ) ).onChange( function ( value ) {
+					loadModel( value );
+				} );
+				folderMaterialOptions.open();
+			}
 
 
 			function init() {
@@ -75,6 +103,31 @@
 
 				// model
 
+				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+				loadModel( params.baseMaterial );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			var lastModelLoaded = null;
+			function loadModel( baseMaterial ) {
+
+				console.log( '--- Loading model with ' + baseMaterial );
+
+				if ( lastModelLoaded ) {
+					scene.remove( lastModelLoaded );
+				}
+
 				var onProgress = function ( xhr ) {
 
 					if ( xhr.lengthComputable ) {
@@ -88,10 +141,11 @@
 
 				var onError = function () { };
 
-				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
-
 				new THREE.MTLLoader()
 					.setPath( 'models/obj/male02/' )
+					.setMaterialOptions( {
+						baseMaterial: baseMaterials[baseMaterial],
+					} )
 					.load( 'male02_dds.mtl', function ( materials ) {
 
 						materials.preload();
@@ -104,23 +158,11 @@
 								object.position.y = - 95;
 								scene.add( object );
 
+								lastModelLoaded = object;
+
 							}, onProgress, onError );
 
 					} );
-
-				//
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
 			}
 
 			function onWindowResize() {

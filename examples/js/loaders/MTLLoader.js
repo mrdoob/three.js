@@ -178,6 +178,8 @@ THREE.MTLLoader.prototype = {
  * Create a new THREE-MTLLoader.MaterialCreator
  * @param baseUrl - Url relative to which textures are loaded
  * @param options - Set of options on how to construct the materials
+ *                  baseMaterial: Which mesh Material class will be instantiated
+ *                                per loaded material. THREE.MeshPhongMaterial (default)
  *                  side: Which side to apply the material
  *                        THREE.FrontSide (default), THREE.BackSide, THREE.DoubleSide
  *                  wrap: What type of wrapping to apply for textures
@@ -201,6 +203,7 @@ THREE.MTLLoader.MaterialCreator = function ( baseUrl, options ) {
 	this.materialsArray = [];
 	this.nameLookup = {};
 
+	this.baseMaterial = ( this.options && this.options.baseMaterial ) ? this.options.baseMaterial : THREE.MeshPhongMaterial;
 	this.side = ( this.options && this.options.side ) ? this.options.side : THREE.FrontSide;
 	this.wrap = ( this.options && this.options.wrap ) ? this.options.wrap : THREE.RepeatWrapping;
 
@@ -513,8 +516,20 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		}
 
-		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
-		return this.materials[ materialName ];
+		// instantiate material (without passing params yet)
+		var materialInstance = this.materials[ materialName ] = new this.baseMaterial();
+
+		// remove params not supported by this material (we do it here to prevent console warnings)
+		var keptParams = {};
+		for ( var i in params ) {
+			if ( typeof materialInstance[ i ] !== 'undefined' ) {
+				keptParams[ i ] = params[ i ];
+			}
+		}
+
+		materialInstance.setValues( keptParams );
+
+		return materialInstance;
 
 	},
 
