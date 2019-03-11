@@ -1,6 +1,7 @@
 /**
  * @author Jiulong Hu / http://hujiulong.com
- * Modularize all files in examples/js by analyzing AST
+ * Modularize files in examples/js by analyzing AST
+ * Usage: node convert.js loaders/OBJLoader.js
  * node version >= 8
  */
 
