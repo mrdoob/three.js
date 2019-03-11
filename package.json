@@ -41,8 +41,7 @@
     "lint": "eslint src",
     "test": "npm run build-test && qunit test/unit/three.source.unit.js",
     "travis": "npm run lint && npm test",
-    "editor": "electron ./editor/main.js",
-    "modularize-examples": "node utils/modularize/convert.js"
+    "editor": "electron ./editor/main.js"
   },
   "keywords": [
     "three",
