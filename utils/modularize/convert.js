@@ -1,110 +1,63 @@
 /**
  * @author Jiulong Hu / http://hujiulong.com
  * Modularize all files in examples/js by analyzing AST
- * node version >= 8 
+ * node version >= 8
  */
 
 const fs = require( 'fs-extra' );
 const glob = require( 'tiny-glob/sync' );
 const Module = require( './module' );
 
-const SRC = 'examples/js';
-const DEST = 'examples/jsm';
+const SRC = '../../examples/js';
 
-const paths = {
-	'controls/*.js': {
-		convert: true
-	},
-	'loaders/**/*.js': {
-		convert: true
-	},
-	'postprocessing/*.js': {
-		convert: true
-	},
-	'renderers/*.js': {
-		convert: true
-	},
-	'controls/**/*.js': {
-		convert: true
-	},
-	'shaders/*.js': {
-		convert: true
-	},
-	'curves/*.js': {
-		convert: true
-	},
-	'utils/**/*.js': {
-		convert: true
-	},
-	'loaders/sea3d/**/*.js': {
-		convert: false
-	},
-	'loaders/RGBELoader.js': {
-		exports: [ 'RGBELoader as HDRLoader' ],
-		process( code ) {
+const paths = process.argv[ 2 ];
 
-			return code
-				.replace( 'var HDRLoader = ', '' )
-				.replace( /\s+HDRLoader,/, '' );
-
-		}
-	},
-	'Volume.js': {
-		convert: true
-	},
-	'VolumeSlice.js': {
-		convert: true
-	},
-	'renderers/RayTracingWorker.js': {
-		copy: true
-	},
+const options = {
+	'libs/**/*.js': {
+		ignore: true
+	}
 };
 
-convert( paths );
+convert( paths, options );
 
-function convert( paths ) {
+function convert( paths, options ) {
 
-	const files = {};
 	const modules = [];
+	const opts = {};
 
-	Object.keys( paths ).forEach( path => {
+	const files = glob( `${SRC}/**/*.js` );
+	const outputFiles = glob( `${SRC}/${paths}` );
+
+	Object.keys( options ).forEach( path => {
 
 		glob( `${SRC}/${path}` ).forEach( file => {
 
-			files[ file ] = files[ file ] || {};
-			Object.assign( files[ file ], paths[ path ] );
+			opts[ file ] = opts[ file ] || {};
+			Object.assign( opts[ file ], options[ path ] );
 
 		} );
 
 	} );
 
-	Object.keys( files ).forEach( file => {
+	files.forEach( file => {
 
 		const {
-			convert,
-			copy,
+			ignore,
 			exports,
 			dependences,
-		} = files[ file ];
+		} = opts[ file ] || {};
 
-		if ( copy ) {
+		if ( ignore ) {
 
-			const dest = file.replace( SRC, DEST );
-			fs.ensureFileSync( dest );
-			fs.copyFileSync( file, dest );
 			return;
 
 		}
 
-		if ( convert ) {
-
-			const mod = new Module( file, {
-				exports,
-				dependences
-			} );
-			modules.push( mod );
-
-		}
+		const mod = new Module( file, {
+			exports,
+			dependences
+		} );
+		modules.push( mod );
 
 	} );
 
@@ -112,22 +65,27 @@ function convert( paths ) {
 
 		const {
 			process,
-		} = files[ mod.file ];
+		} = opts[ mod.file ] || {};
 
 		mod.resolveDeps( modules );
 
-		let output = mod.toString();
+		if ( outputFiles.includes( mod.file ) ) {
 
-		if ( process ) {
+			let output = mod.toString();
 
-			output = process( output );
+			if ( process ) {
+
+				output = process( output );
+
+			}
+			const dest = mod.file.replace( '/examples/js/', '/examples/jsm/' );
+
+			fs.ensureFileSync( dest );
+			fs.writeFileSync( dest, output );
+
+			console.log( `${mod.file} done` );
 
 		}
-
-		const dest = mod.file.replace( /^examples\/js/, DEST );
-
-		fs.ensureFileSync( dest );
-		fs.writeFileSync( dest, output );
 
 	} );
 

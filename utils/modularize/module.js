@@ -121,7 +121,7 @@ class Module {
 
 		} else {
 
-			console.warn( `Nothing was exported: ${this.file}` );
+			// console.warn( `Nothing was exported: ${this.file}` );
 
 		}
 
