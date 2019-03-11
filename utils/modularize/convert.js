@@ -16,7 +16,17 @@ const paths = process.argv[ 2 ];
 const options = {
 	'libs/**/*.js': {
 		ignore: true
-	}
+	},
+	'loaders/RGBELoader.js': {	
+		exports: [ 'RGBELoader as HDRLoader' ],	
+		process( code ) {	
+
+ 			return code	
+				.replace( 'var HDRLoader = ', '' )	
+				.replace( /\s+HDRLoader,/, '' );	
+
+ 		}
+	},
 };
 
 convert( paths, options );
