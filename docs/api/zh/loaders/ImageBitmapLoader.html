@@ -16,6 +16,13 @@
 			不像[page:FileLoader], [name]无需避免对同一的URL进行多次请求。
 		</p>
 
+		<p>
+			Note that [page:Texture.flipY .flipY] and [page:Texture.premultiplyAlpha .premultiplyAlpha] properties of [page:Texture]
+			with [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] are ignored. 
+			You need to set the equivalent options on [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] creation via [page:ImageBitmapLoader.setOptions] instead.
+			Refer to [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] for the detail.
+		</p>
+
 		<h2>例子</h2>
 
 		<p>
@@ -25,6 +32,9 @@
 		<code>
 		// 初始化一个加载器
 		var loader = new THREE.ImageBitmapLoader();
+
+		// set options if needed
+		loader.setOptions( { imageOrientation: 'flipY' } );
 
 		// 加载一个图片资源
 		loader.load(
