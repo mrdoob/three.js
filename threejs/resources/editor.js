@@ -61,6 +61,7 @@ function fixSourceLinks(url, source) {
   const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
   const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
   const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;
+  const threejsfundamentalsUrlRE = /(.*?)('|")(.*?)('|")(.*?)(\/\*\s+threejsfundamentals:\s+url\s+\*\/)/ig;
   const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;
   const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
   const prefix = getPrefix(url);
@@ -73,6 +74,9 @@ function fixSourceLinks(url, source) {
   }
   function makeLinkFDedQuotes(match, fn, q1, url, q2) {
     return fn + q1 + addPrefix(url) + q2;
+  }
+  function makeTaggedFDedQuotes(match, start, q1, url, q2, suffix) {
+    return start + q1 + addPrefix(url) + q2 + suffix;
   }
   function makeArrayLinksFDed(match, prefix, arrayStr, suffix) {
     const lines = arrayStr.split(',').map((line) => {
@@ -91,6 +95,7 @@ function fixSourceLinks(url, source) {
   source = source.replace(loadFileRE, makeLinkFDedQuotes);
   source = source.replace(loaderLoadRE, makeLinkFDedQuotes);
   source = source.replace(loaderArrayLoadRE, makeArrayLinksFDed);
+  source = source.replace(threejsfundamentalsUrlRE, makeTaggedFDedQuotes);
 
   return source;
 }
