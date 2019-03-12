@@ -189,7 +189,7 @@ There are a couple of issues we probably want to deal with.
 One is that if we rotate the objects so they overlap all the labels
 overlap as well.
 
-<img src="resources/images/overlapping-labels.png" class="threejs_center" style="width: 307px;">
+<div class="threejs_center"><img src="resources/images/overlapping-labels.png" style="width: 307px;"></div>
 
 Another is that if we zoom way out so that the objects go outside
 the frustum the labels will still appear.
@@ -314,7 +314,7 @@ I [wrote some code](https://github.com/greggman/threejsfundamentals/blob/master/
 to load the data, and generate country outlines and some JSON data with the names
 of the countries and their locations.
 
-<img src="../resources/data/world/country-outlines-4k.png" style="background: black; width: 700px">
+<div class="threejs_center"><img src="../resources/data/world/country-outlines-4k.png" style="background: black; width: 700px"></div>
 
 The JSON data is an array of entries something like this
 
