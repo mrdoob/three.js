@@ -99,6 +99,7 @@ THREE.SVGLoader.prototype = {
 				transformPath( path, currentTransform );
 
 				paths.push( path );
+				path.userData = { node: node, style: style };
 
 			}
 
@@ -122,7 +123,6 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			path.fillOpacity = style.fillOpacity;
 
 			var point = new THREE.Vector2();
 			var control = new THREE.Vector2();
@@ -546,7 +546,6 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			path.fillOpacity = style.fillOpacity;
 			path.moveTo( x + 2 * rx, y );
 			path.lineTo( x + w - 2 * rx, y );
 			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y, x + w, y, x + w, y + 2 * ry );
@@ -593,7 +592,6 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			path.fillOpacity = style.fillOpacity;
 
 			var index = 0;
 
@@ -626,7 +624,6 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			path.fillOpacity = style.fillOpacity;
 
 			var index = 0;
 
@@ -649,7 +646,6 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			path.fillOpacity = style.fillOpacity;
 			path.subPaths.push( subpath );
 
 			return path;
@@ -668,7 +664,6 @@ THREE.SVGLoader.prototype = {
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			path.fillOpacity = style.fillOpacity;
 			path.subPaths.push( subpath );
 
 			return path;
@@ -1021,6 +1016,7 @@ THREE.SVGLoader.prototype = {
 		console.time( 'THREE.SVGLoader: Parse' );
 
 		parseNode( xml.documentElement, { fill: '#000' } );
+		this.rootNode = xml.documentElement;
 
 		// console.log( paths );
 
