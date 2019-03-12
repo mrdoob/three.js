@@ -713,6 +713,9 @@ move lots of objects. As an example we could give every cube a random place in
 another target and morph from that to their first positions on the globe. That
 might be a cool way to introduce the globe.
 
+Next you might be interested in adding labels to a globe which is covered
+in [Aligning HTML Elemenst to 3D](threejs-align-html-elements-to-3d.html).
+
 Note: We could try to just graph percent of men or percent of women or the raw
 difference but based on how we are displaying the info, cubes that grow from the
 surface of the earth, we'd prefer most cubes to be low. If we used one of these
