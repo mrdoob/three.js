@@ -1,0 +1,13 @@
+{
+  "short_name": "Editor",
+  "name": "Three.js Editor",
+  "icons": [
+    {
+      "src": "./images/icon.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone"
+}
