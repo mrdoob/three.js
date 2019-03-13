@@ -6,7 +6,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Triangle } from '../math/Triangle.js';
 import { Face3 } from '../core/Face3.js';
-import { DoubleSide, BackSide, TrianglesDrawMode } from '../constants.js';
+import { DoubleSide, TrianglesDrawMode } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
@@ -135,17 +135,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
-			var intersect;
-
-			if ( material.side === BackSide ) {
-
-				intersect = ray.intersectTriangle( pC, pB, pA, true, point );
-
-			} else {
-
-				intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
-
-			}
+			var intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
 
 			if ( intersect === null ) return null;
 
