@@ -669,7 +669,7 @@ baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) => {
   const attribute = geometry.getAttribute('position');
 -  const name = `target${ndx}`;
 +  // put the number in front so we can more easily parse it later
-+  const name = `${ndx}target$`;
++  const name = `${ndx}target`;
   attribute.name = name;
   return attribute;
 });
