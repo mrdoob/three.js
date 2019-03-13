@@ -25,7 +25,7 @@ export default /* glsl */`
 
 			mat3 vTBN = mat3( tangent, bitangent, normal );
 			vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
-			mapN.xy = normalScale * mapN.xy;
+			mapN = normalScale * mapN;
 			normal = normalize( vTBN * mapN );
 
 		#else

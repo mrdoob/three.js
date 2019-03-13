@@ -1,6 +1,6 @@
 import { Color } from './../math/Color';
 import { Texture } from './../textures/Texture';
-import { Vector2 } from './../math/Vector2';
+import { Vector3 } from './../math/Vector3';
 import { MaterialParameters, Material } from './Material';
 
 export interface MeshStandardMaterialParameters extends MaterialParameters {
@@ -18,7 +18,7 @@ export interface MeshStandardMaterialParameters extends MaterialParameters {
   bumpMap?: Texture;
   bumpScale?: number;
   normalMap?: Texture;
-  normalScale?: Vector2;
+  normalScale?: Vector3;
   displacementMap?: Texture;
   displacementScale?: number;
   displacementBias?: number;

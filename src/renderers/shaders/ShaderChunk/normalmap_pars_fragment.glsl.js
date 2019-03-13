@@ -2,7 +2,7 @@ export default /* glsl */`
 #ifdef USE_NORMALMAP
 
 	uniform sampler2D normalMap;
-	uniform vec2 normalScale;
+	uniform vec3 normalScale;
 
 	#ifdef OBJECTSPACE_NORMALMAP
 
@@ -31,7 +31,7 @@ export default /* glsl */`
 
 			vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
 
-			mapN.xy *= normalScale;
+			mapN *= normalScale;
 			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
 			return normalize( tsn * mapN );

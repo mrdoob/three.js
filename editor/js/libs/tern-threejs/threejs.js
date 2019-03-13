@@ -2389,8 +2389,8 @@
           "!doc": "The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change\n\t\t\tthe way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting."
         },
         "normalScale": {
-          "!type": "+THREE.Vector2",
-          "!doc": "How much the normal map affects the material. Typical ranges are 0-1. Default is (1,1)."
+          "!type": "+THREE.Vector3",
+          "!doc": "How much the normal map affects the material. Typical ranges are 0-1. Default is (1,1,1)."
         },
         "specularMap": {
           "!type": "+THREE.Texture",

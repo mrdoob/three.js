@@ -16,14 +16,14 @@ function MeshStandardNode() {
 		color: new THREE.Color( 0xffffff ),
 		roughness: 0.5,
 		metalness: 0.5,
-		normalScale: new THREE.Vector2( 1, 1 )
+		normalScale: new THREE.Vector3( 1, 1, 1 )
 	};
 
 	this.inputs = {
 		color: new PropertyNode( this.properties, 'color', 'c' ),
 		roughness: new PropertyNode( this.properties, 'roughness', 'f' ),
 		metalness: new PropertyNode( this.properties, 'metalness', 'f' ),
-		normalScale: new PropertyNode( this.properties, 'normalScale', 'v2' )
+		normalScale: new PropertyNode( this.properties, 'normalScale', 'v3' )
 	};
 
 }

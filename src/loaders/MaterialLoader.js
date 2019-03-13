@@ -193,11 +193,11 @@ Object.assign( MaterialLoader.prototype, {
 
 				// Blender exporter used to export a scalar. See #7459
 
-				normalScale = [ normalScale, normalScale ];
+				normalScale = [ normalScale, normalScale, normalScale ];
 
 			}
 
-			material.normalScale = new Vector2().fromArray( normalScale );
+			material.normalScale = new Vector3().fromArray( normalScale );
 
 		}
 

@@ -1,6 +1,6 @@
 import { TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
-import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 
 /**
@@ -19,7 +19,7 @@ import { Color } from '../math/Color.js';
  *
  *  normalMap: new THREE.Texture( <Image> ),
  *  normalMapType: THREE.TangentSpaceNormalMap,
- *  normalScale: <Vector2>,
+ *  normalScale: <Vector3>,
  *
  *  displacementMap: new THREE.Texture( <Image> ),
  *  displacementScale: <float>,
@@ -52,7 +52,7 @@ function MeshMatcapMaterial( parameters ) {
 
 	this.normalMap = null;
 	this.normalMapType = TangentSpaceNormalMap;
-	this.normalScale = new Vector2( 1, 1 );
+	this.normalScale = new Vector3( 1, 1, 1 );
 
 	this.displacementMap = null;
 	this.displacementScale = 1;

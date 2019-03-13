@@ -1228,7 +1228,7 @@
 								break;
 							case "NormalMapFilename":
 								_nowMat.normalMap = this.texloader.load( fileName );
-								_nowMat.normalScale = new THREE.Vector2( 2, 2 );
+								_nowMat.normalScale = new THREE.Vector3( 2, 2, 1 );
 								break;
 							case "EmissiveMapFilename":
 								_nowMat.emissiveMap = this.texloader.load( fileName );

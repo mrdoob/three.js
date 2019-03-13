@@ -2222,7 +2222,12 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
+			if ( material.side === BackSide ) {
+
+				uniforms.normalScale.value.x = - uniforms.normalScale.value.x;
+				uniforms.normalScale.value.y = - uniforms.normalScale.value.y;
+
+			}
 
 		}
 
@@ -2283,7 +2288,12 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
+			if ( material.side === BackSide ) {
+
+				uniforms.normalScale.value.x = - uniforms.normalScale.value.x;
+				uniforms.normalScale.value.y = - uniforms.normalScale.value.y;
+
+			}
 
 		}
 
@@ -2335,7 +2345,12 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
+			if ( material.side === BackSide ) {
+
+				uniforms.normalScale.value.x = - uniforms.normalScale.value.x;
+				uniforms.normalScale.value.y = - uniforms.normalScale.value.y;
+
+			}
 
 		}
 
@@ -2391,7 +2406,12 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
+			if ( material.side === BackSide ) {
+
+				uniforms.normalScale.value.x = - uniforms.normalScale.value.x;
+				uniforms.normalScale.value.y = - uniforms.normalScale.value.y;
+
+			}
 
 		}
 

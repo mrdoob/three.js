@@ -21,7 +21,7 @@ export interface MeshPhongMaterialParameters extends MaterialParameters {
   bumpMap?: Texture;
   bumpScale?: number;
   normalMap?: Texture;
-  normalScale?: Vector2;
+  normalScale?: Vector3;
   displacementMap?: Texture;
   displacementScale?: number;
   displacementBias?: number;
@@ -57,7 +57,7 @@ export class MeshPhongMaterial extends Material {
   bumpMap: Texture | null;
   bumpScale: number;
   normalMap: Texture | null;
-  normalScale: Vector2;
+  normalScale: Vector3;
   displacementMap: Texture | null;
   displacementScale: number;
   displacementBias: number;

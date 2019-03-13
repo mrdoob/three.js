@@ -125,7 +125,7 @@
 
 				gui.add( settings, "normalScale" ).min( - 1 ).max( 1 ).onChange( function ( value ) {
 
-					material.normalScale.set( 1, - 1 ).multiplyScalar( value );
+					material.normalScale.set( 1, - 1, 1 ).multiplyScalar( value ).setZ( 1 );
 
 				} );
 
@@ -202,7 +202,7 @@
 					metalness: settings.metalness,
 
 					normalMap: normalMap,
-					normalScale: new THREE.Vector2( 1, - 1 ), // why does the normal map require negation in this case?
+					normalScale: new THREE.Vector3( 1, - 1, 1 ), // why does the normal map require negation in this case?
 
 					aoMap: aoMap,
 					aoMapIntensity: 1,
