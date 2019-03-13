@@ -487,7 +487,7 @@ if there are still animations running.
 
 ```js
 function render() {
-  renderRequested = undefined;
+  renderRequested = false;
 
   if (resizeRendererToDisplaySize(renderer)) {
     const canvas = renderer.domElement;

@@ -472,7 +472,7 @@ Lastly we need to call `updateLabels` in our render loop
 
 ```js
 function render() {
-  renderRequested = undefined;
+  renderRequested = false;
 
   if (resizeRendererToDisplaySize(renderer)) {
     const canvas = renderer.domElement;
