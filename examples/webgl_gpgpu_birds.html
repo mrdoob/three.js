@@ -365,9 +365,9 @@
 
 						vertices.array[ v ++ ] = arguments[ i ];
 
-		}
+					}
 
-	}
+				}
 
 				var wingsSpan = 20;
 
@@ -442,8 +442,7 @@
 				location.reload();
 				return false;
 
-}
-
+			}
 
 			var options = '';
 			for ( i = 1; i < 7; i ++ ) {
@@ -451,7 +450,8 @@
 				var j = Math.pow( 2, i );
 				options += '<a href="#" onclick="return change(' + j + ')">' + ( j * j ) + '</a> ';
 
-}
+			}
+
 			document.getElementById( 'options' ).innerHTML = options;
 
 			var last = performance.now();
@@ -569,7 +569,7 @@
 
 				    console.error( error );
 
-	}
+				}
 
 			}
 
