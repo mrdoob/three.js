@@ -7,8 +7,7 @@
 THREE.SVGLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	
-	this.nodeMap = new Map();
+
 	this.rootNode = null;
 
 };
