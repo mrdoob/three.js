@@ -53,6 +53,9 @@ to generate such a texture. Here it is.
 
 <div class="threejs_center"><img src="../resources/data/world/country-index-texture.png" style="width: 700px;"></div>
 
+Note: The data used to generate this texture comes from [this website](http://thematicmapping.org/downloads/world_borders.php) 
+and is therefore licensed as [CC-BY-SA](http://creativecommons.org/licenses/by-sa/3.0/).
+
 It's only 217k, much better than the 14meg for the country meshes. In fact we could probably
 even lower the resolution but 217k seems good enough for now.
 
