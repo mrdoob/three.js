@@ -58,15 +58,15 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		this.uniforms[ "tNew" ].value = readBuffer.texture;
 
 		renderer.setRenderTarget( this.textureComp );
-		renderer.render( this.compFillQuad.scene, this.compFillQuad.camera );
+		renderer.render( this.compFillQuad.quad, this.compFillQuad.camera );
 
 		renderer.setRenderTarget( this.textureOld );
-		renderer.render( this.screenFillQuad.scene, this.screenFillQuad.camera );
+		renderer.render( this.screenFillQuad.quad, this.screenFillQuad.camera );
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.screenFillQuad.scene, this.screenFillQuad.camera );
+			renderer.render( this.screenFillQuad.quad, this.screenFillQuad.camera );
 
 		} else {
 
@@ -74,7 +74,7 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			if ( this.clear ) renderer.clear();
 
-			renderer.render( this.screenFillQuad.scene, this.screenFillQuad.camera );
+			renderer.render( this.screenFillQuad.quad, this.screenFillQuad.camera );
 
 		}
 

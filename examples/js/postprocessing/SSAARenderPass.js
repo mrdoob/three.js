@@ -129,7 +129,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			}
 
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		}
 

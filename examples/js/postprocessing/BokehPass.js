@@ -103,13 +103,13 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			renderer.clear();
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		}
 

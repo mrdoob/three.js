@@ -51,13 +51,13 @@ THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototyp
  		if ( this.renderToScreen ) {
 
  			renderer.setRenderTarget( null );
- 			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+ 			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		} else {
 
  			renderer.setRenderTarget( writeBuffer );
  			if ( this.clear ) renderer.clear();
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		}
 

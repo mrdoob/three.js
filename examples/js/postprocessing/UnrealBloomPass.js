@@ -200,7 +200,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 			renderer.setRenderTarget( null );
 			renderer.clear();
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		}
 
@@ -212,7 +212,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		renderer.setRenderTarget( this.renderTargetBright );
 		renderer.clear();
-		renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		// 2. Blur All the mips progressively
 
@@ -226,13 +226,13 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionX;
 			renderer.setRenderTarget( this.renderTargetsHorizontal[ i ] );
 			renderer.clear();
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = this.renderTargetsHorizontal[ i ].texture;
 			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionY;
 			renderer.setRenderTarget( this.renderTargetsVertical[ i ] );
 			renderer.clear();
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 			inputRenderTarget = this.renderTargetsVertical[ i ];
 
@@ -247,7 +247,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		renderer.setRenderTarget( this.renderTargetsHorizontal[ 0 ] );
 		renderer.clear();
-		renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		// Blend it additively over the input texture
 
@@ -260,12 +260,12 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		} else {
 
 			renderer.setRenderTarget( readBuffer );
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		}
 

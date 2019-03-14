@@ -49,14 +49,14 @@ THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			// TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
 			if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		}
 

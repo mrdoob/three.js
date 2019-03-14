@@ -49,7 +49,7 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		renderer.autoClear = oldAutoClear;
 	}

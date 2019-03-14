@@ -270,7 +270,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		}
 
 		this.fillQuad.quad.material = passMaterial;
-		renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;

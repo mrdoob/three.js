@@ -127,7 +127,7 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		renderer.setRenderTarget( this.edgesRT );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		// pass 2
 
@@ -135,7 +135,7 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		renderer.setRenderTarget( this.weightsRT );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		// pass 3
 
@@ -146,13 +146,13 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
+			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
 
 		}
 
