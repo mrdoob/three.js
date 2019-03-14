@@ -674,4 +674,4 @@ account.
 In any case I hope these examples gave you some idea of how to align HTML
 elements with your 3D.
 
-Next up let's make it so you can pick and highlight a country.
+Next up let's make it so you can [pick and highlight a country](threejs-indexed-textures.html).
