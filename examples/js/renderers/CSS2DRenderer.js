@@ -9,7 +9,7 @@ THREE.CSS2DObject = function ( element ) {
 	this.element = element;
 	this.element.style.position = 'absolute';
 
-	this.addEventListener( 'removed', function ( event ) {
+	this.addEventListener( 'removed', function () {
 
 		if ( this.element.parentNode !== null ) {
 
