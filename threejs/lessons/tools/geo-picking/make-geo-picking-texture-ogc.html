@@ -107,8 +107,7 @@ async function main() {
 
   const colors = {};
 
-  //const req = await fetch('level1.json');
-  const req = await fetch('foo.json');
+  const req = await fetch('level1.json');
   const areas = await req.json();
   let min = [Number.MAX_VALUE, Number.MAX_VALUE];
   let max = [Number.MIN_VALUE, Number.MIN_VALUE];
