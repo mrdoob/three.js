@@ -29,13 +29,7 @@ THREE.ShaderPass = function ( shader, textureID ) {
 
 	}
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
-
+	this.fillQuad = THREE.Pass.createFillQuadScene( this.material );
 };
 
 THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
@@ -50,19 +44,19 @@ THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		}
 
-		this.quad.material = this.material;
+		this.fillQuad.quad.material = this.material;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.scene, this.camera );
+			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			// TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
 			if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
-			renderer.render( this.scene, this.camera );
+			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
 
 		}
 

@@ -36,11 +36,7 @@ THREE.HalftonePass = function ( width, height, params ) {
 
 	}
 
- 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
- 	this.scene = new THREE.Scene();
- 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
- 	this.quad.frustumCulled = false;
- 	this.scene.add( this.quad );
+	this.fillQuad = THREE.Pass.createFillQuadScene( this.material );
 
 };
 
@@ -51,18 +47,17 @@ THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototyp
 	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
  		this.material.uniforms[ "tDiffuse" ].value = readBuffer.texture;
- 		this.quad.material = this.material;
 
  		if ( this.renderToScreen ) {
 
  			renderer.setRenderTarget( null );
- 			renderer.render( this.scene, this.camera );
+ 			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
 
 		} else {
 
  			renderer.setRenderTarget( writeBuffer );
  			if ( this.clear ) renderer.clear();
-			renderer.render( this.scene, this.camera );
+			renderer.render( this.fillQuad.scene, this.fillQuad.camera );
 
 		}
 

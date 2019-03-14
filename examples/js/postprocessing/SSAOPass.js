@@ -134,14 +134,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 		blendEquationAlpha: THREE.AddEquation
 	} );
 
-	//
-
-	this.quadCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.quadScene = new THREE.Scene();
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quadScene.add( this.quad );
-
-	//
+	this.fillQuad = THREE.Pass.createFillQuadScene( null );
 
 	this.originalClearColor = new THREE.Color();
 
@@ -276,8 +269,8 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		}
 
-		this.quad.material = passMaterial;
-		renderer.render( this.quadScene, this.quadCamera );
+		this.fillQuad.quad.material = passMaterial;
+		renderer.render( this.fillQuad.scene, this.fillQuad.camera );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;

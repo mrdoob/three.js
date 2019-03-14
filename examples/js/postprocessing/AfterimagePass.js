@@ -39,23 +39,12 @@ THREE.AfterimagePass = function ( damp ) {
 
 	} );
 
-	this.sceneComp = new THREE.Scene();
-	this.scene = new THREE.Scene();
-
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.camera.position.z = 1;
-
-	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
-
-	this.quadComp = new THREE.Mesh( geometry, this.shaderMaterial );
-	this.sceneComp.add( this.quadComp );
+	this.compFillQuad = THREE.Pass.createFillQuadScene( this.shaderMaterial );
 
 	var material = new THREE.MeshBasicMaterial( {
 		map: this.textureComp.texture
 	} );
-
-	var quadScreen = new THREE.Mesh( geometry, material );
-	this.scene.add( quadScreen );
+	this.screenFillQuad = THREE.Pass.createFillQuadScene( material );
 
 };
 
@@ -68,18 +57,16 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		this.uniforms[ "tOld" ].value = this.textureOld.texture;
 		this.uniforms[ "tNew" ].value = readBuffer.texture;
 
-		this.quadComp.material = this.shaderMaterial;
-
 		renderer.setRenderTarget( this.textureComp );
-		renderer.render( this.sceneComp, this.camera );
+		renderer.render( this.compFillQuad.scene, this.compFillQuad.camera );
 
 		renderer.setRenderTarget( this.textureOld );
-		renderer.render( this.scene, this.camera );
+		renderer.render( this.screenFillQuad.scene, this.screenFillQuad.camera );
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.scene, this.camera );
+			renderer.render( this.screenFillQuad.scene, this.screenFillQuad.camera );
 
 		} else {
 
@@ -87,7 +74,7 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			if ( this.clear ) renderer.clear();
 
-			renderer.render( this.scene, this.camera );
+			renderer.render( this.screenFillQuad.scene, this.screenFillQuad.camera );
 
 		}
 
