@@ -5,6 +5,7 @@
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
+	var config = editor.config;
 
 	var sceneCameras = editor.sceneCameras;
 
@@ -559,9 +560,35 @@ var Viewport = function ( editor ) {
 		viewport.set(0, 0, width, height);
 		renderScene(camera, viewport, true);
 
-		for(var i = 0; i < sceneCameras.length; ++i) {
-			viewport.set(0, height * 0.25 * i, width * 0.25, height * 0.25);
-			renderScene(sceneCameras[i], viewport);
+		switch(config.getKey('sceneView'))
+		{
+			case 'left':
+				for(var i = 0; i < sceneCameras.length; ++i) {
+					viewport.set(0, height * 0.25 * i, width * 0.25, height * 0.25);
+					renderScene(sceneCameras[i], viewport);
+				}
+				break;
+			case 'right':
+				for(var i = 0; i < sceneCameras.length; ++i) {
+					viewport.set(width * 0.75, height * 0.25 * i, width * 0.25, height * 0.25);
+					renderScene(sceneCameras[i], viewport);
+				}
+				break;
+			case 'bottom':
+				for(var i = 0; i < sceneCameras.length; ++i) {
+					viewport.set(width * 0.25 * i, 0, width * 0.25, height * 0.25);
+					renderScene(sceneCameras[i], viewport);
+				}
+				break;
+			case 'top':
+				for(var i = 0; i < sceneCameras.length; ++i) {
+					viewport.set(width * 0.25 * i, height * 0.75, width * 0.25, height * 0.25);
+					renderScene(sceneCameras[i], viewport);
+				}
+				break;
+			default:
+				console.error("Unknown scene view type: " + config.getKey("sceneView"));
+				break;
 		}
 	}
 
