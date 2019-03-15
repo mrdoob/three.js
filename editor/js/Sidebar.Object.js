@@ -323,6 +323,7 @@ Sidebar.Object = function ( editor ) {
 
 		if ( editor.selected.isCamera === true && cameraTransitioning === false ) {
 
+			editor.selected.updateMatrixWorld( true );
 			editor.currentCamera = transitionCamera;
 			transitionCamera.copy( editor.selected );
 			cameraViewButton.dom.setAttribute( 'viewset', '' );
@@ -417,9 +418,13 @@ Sidebar.Object = function ( editor ) {
 
 	function getCameraData( camera ) {
 
+		var position = new THREE.Vector3();
+		var quaternion = new THREE.Quaternion();
+		var scale = new THREE.Vector3();
+		camera.matrixWorld.decompose( position, quaternion, scale );
 		return {
-			position: camera.position.clone(),
-			quaternion: camera.quaternion.clone(),
+			position: position,
+			quaternion: quaternion,
 			fov: camera.fov,
 			near: camera.near,
 			far: camera.far,
