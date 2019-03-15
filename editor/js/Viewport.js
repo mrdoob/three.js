@@ -549,11 +549,19 @@ var Viewport = function ( editor ) {
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		renderer.render( scene, camera );
+		if ( editor.currentCamera !== null ) {
 
-		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+			renderer.render( scene, editor.currentCamera );
 
-			renderer.render( sceneHelpers, camera );
+		} else {
+
+			renderer.render( scene, camera );
+
+			if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+
+				renderer.render( sceneHelpers, camera );
+
+			}
 
 		}
 

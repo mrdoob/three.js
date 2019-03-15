@@ -312,6 +312,128 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectUserDataRow );
 
+	// view from camera
+	var cameraViewRow = new UI.Row().setDisplay( editor.selected !== null && editor.selected.isCamera ? 'block' : 'none' );
+	container.add( cameraViewRow );
+
+	var cameraViewButton = new UI.Button( strings.getKey( 'sidebar/object/view' ) );
+	var cameraTransitioning = false;
+	var transitionCamera = new THREE.PerspectiveCamera();
+	cameraViewButton.onClick( function () {
+
+		if ( editor.selected.isCamera === true && cameraTransitioning === false ) {
+
+			editor.currentCamera = transitionCamera;
+			transitionCamera.copy( editor.selected );
+			cameraViewButton.dom.setAttribute( 'viewset', '' );
+
+			var start = getCameraData( editor.camera );
+			var end = getCameraData( transitionCamera );
+			startCameraTransition( start, end );
+
+		}
+
+	} );
+
+	cameraViewButton.onMouseOut( function () {
+
+		if ( editor.currentCamera === transitionCamera ) {
+
+			cameraViewButton.dom.removeAttribute( 'viewset' );
+
+			var start = getCameraData( transitionCamera );
+			var end = getCameraData( editor.camera );
+			startCameraTransition( start, end, true );
+
+		}
+
+	} );
+
+	cameraViewRow.add( cameraViewButton );
+
+	function startCameraTransition( start, end, clearCamera ) {
+
+		var func = cameraTransition( start, end, clearCamera );
+		var result = { done: false };
+		function run() {
+
+			if ( result.done !== true ) {
+
+				result = func.next();
+				setTimeout( run );
+
+			}
+
+		}
+		run();
+
+	}
+
+	function* cameraTransition( start, end, clearCamera ) {
+
+		while ( cameraTransitioning === true ) {
+
+			yield;
+
+		}
+
+		cameraTransitioningng = true;
+
+		var startTime = performance.now();
+		var t = 0;
+		do {
+
+			transitionCamera.position.lerpVectors( start.position, end.position, t );
+			THREE.Quaternion.slerp( start.quaternion, end.quaternion, transitionCamera.quaternion, t );
+
+			transitionCamera.far = lerpValue( start.far, end.far, t );
+			transitionCamera.fov = lerpValue( start.fov, end.fov, t );
+			transitionCamera.near = lerpValue( start.near, end.near, t );
+			transitionCamera.aspect = lerpValue( start.aspect, end.aspect, t );
+
+			transitionCamera.updateProjectionMatrix();
+			signals.cameraChanged.dispatch();
+			yield;
+
+			t = Math.min( 1, ( performance.now() - startTime ) / 250 );
+
+		} while ( t !== 1 );
+
+		transitionCamera.position.copy( end.position );
+		transitionCamera.quaternion.copy( end.quaternion );
+		transitionCamera.far = end.far;
+		transitionCamera.fov = end.fov;
+		transitionCamera.near = end.near;
+		transitionCamera.aspect = end.aspect;
+
+		if ( clearCamera ) editor.currentCamera = null;
+
+
+		signals.cameraChanged.dispatch();
+
+		cameraTransitioning = false;
+
+	}
+
+	function getCameraData( camera ) {
+
+		return {
+			position: camera.position.clone(),
+			quaternion: camera.quaternion.clone(),
+			fov: camera.fov,
+			near: camera.near,
+			far: camera.far,
+			aspect: camera.aspect
+		};
+
+	}
+
+	function lerpValue( a, b, t ) {
+
+		return a + ( b - a ) * t;
+
+	}
+
 
 	//
 
@@ -523,12 +645,12 @@ Sidebar.Object = function ( editor ) {
 			'intensity': objectIntensityRow,
 			'color': objectColorRow,
 			'groundColor': objectGroundColorRow,
-			'distance' : objectDistanceRow,
-			'angle' : objectAngleRow,
-			'penumbra' : objectPenumbraRow,
-			'decay' : objectDecayRow,
-			'castShadow' : objectShadowRow,
-			'receiveShadow' : objectReceiveShadow,
+			'distance': objectDistanceRow,
+			'angle': objectAngleRow,
+			'penumbra': objectPenumbraRow,
+			'decay': objectDecayRow,
+			'castShadow': objectShadowRow,
+			'receiveShadow': objectReceiveShadow,
 			'shadow': objectShadowRadius
 		};
 
@@ -688,6 +810,8 @@ Sidebar.Object = function ( editor ) {
 			objectShadowRadius.setValue( object.shadow.radius );
 
 		}
+
+		cameraViewRow.setDisplay( object.isCamera === true ? 'block' : 'none' );
 
 		objectVisible.setValue( object.visible );
 		objectFrustumCulled.setValue( object.frustumCulled );
