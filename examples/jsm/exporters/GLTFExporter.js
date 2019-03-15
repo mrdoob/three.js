@@ -104,7 +104,8 @@ GLTFExporter.prototype = {
 			animations: [],
 			forceIndices: false,
 			forcePowerOfTwoTextures: false,
-			includeCustomExtensions: false
+			includeCustomExtensions: false,
+			stripGeomAttributes: [],
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -113,6 +114,13 @@ GLTFExporter.prototype = {
 
 			// Only TRS properties, and not matrices, may be targeted by animation.
 			options.trs = true;
+
+		}
+
+		for ( var i = 0; i < options.stripGeomAttributes.length; i++ ) {
+
+			// geom attributes are compared as upper case
+			options.stripGeomAttributes = options.stripGeomAttributes.toUpperCase();
 
 		}
 
@@ -1188,6 +1196,8 @@ GLTFExporter.prototype = {
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
+				if (options.stripGeomAttributes.includes( attributeName )) continue;
+
 				if ( cachedData.attributes.has( attribute ) ) {
 
 					attributes[ attributeName ] = cachedData.attributes.get( attribute );
@@ -1375,14 +1385,13 @@ GLTFExporter.prototype = {
 					if ( cachedData.attributes.has( geometry.index ) ) {
 
 						primitive.indices = cachedData.attributes.get( geometry.index );
-
 					} else {
 
 						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
 						cachedData.attributes.set( geometry.index, primitive.indices );
-
 					}
-
+					if (primitive.indices === null)
+						delete primitive.indices
 				}
 
 				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
@@ -1777,7 +1786,7 @@ GLTFExporter.prototype = {
 
 			} else if ( object.isLight ) {
 
-				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.' );
+				console.warn( `GLTFExporter: light ${object.name} of type ${object.constructor.name}: Only directional, point, and spot lights are supported.` );
 				return null;
 
 			}
