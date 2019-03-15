@@ -6,6 +6,8 @@ var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
 
+	var sceneCameras = editor.sceneCameras;
+
 	var container = new UI.Panel();
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
@@ -329,6 +331,16 @@ var Viewport = function ( editor ) {
 
 	signals.cameraChanged.add( function () {
 
+		if(sceneCameras.length >= 4)
+		{
+			alert("Only 4 different cameras can be shown at once.");
+			while(sceneCameras.length >= 4)
+			{
+				sceneCameras.pop();
+			}
+			signals.cameraChanged.dispatch();
+			return;
+		}
 		render();
 
 	} );
@@ -549,22 +561,28 @@ var Viewport = function ( editor ) {
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		if ( editor.currentCamera !== null ) {
+		// handle update to 3 cameras in the scene camera list
+		var width = window.innerWidth;
+		var height = window.innerHeight;
+		var v = new THREE.Vector4(0, 0, width, height);
+		
+		renderScene(camera, v, true);
+		for(var i = 0; i < sceneCameras.length; ++i) {
+			v.set(0, height * 0.25 * i, width * 0.25, height * 0.5);
+			renderScene(sceneCameras[i], v);
+		}
+	}
 
-			renderer.render( scene, editor.currentCamera );
+	function renderScene(camera, viewport, showHelpers)
+	{
+		renderer.setViewport(viewport.x, viewport.y, viewport.z, viewport.w);
+		renderer.render( scene, camera );
 
-		} else {
+		if ( showHelpers === true && renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			renderer.render( scene, camera );
-
-			if ( renderer instanceof THREE.RaytracingRenderer === false ) {
-
-				renderer.render( sceneHelpers, camera );
-
-			}
+			renderer.render( sceneHelpers, camera );
 
 		}
-
 	}
 
 	return container;

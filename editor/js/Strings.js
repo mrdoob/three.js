@@ -97,7 +97,7 @@ var Strings = function ( config ) {
 			'sidebar/object/frustumcull': 'Frustum Cull',
 			'sidebar/object/renderorder': 'Render Order',
 			'sidebar/object/userdata': 'User data',
-			'sidebar/object/view': 'Set View',
+			'sidebar/object/view': 'Show View',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'New',

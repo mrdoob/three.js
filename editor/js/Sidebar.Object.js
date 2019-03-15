@@ -8,6 +8,8 @@ Sidebar.Object = function ( editor ) {
 
 	var signals = editor.signals;
 
+	var sceneCameras = editor.sceneCameras;
+
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
@@ -316,128 +318,33 @@ Sidebar.Object = function ( editor ) {
 	var cameraViewRow = new UI.Row().setDisplay( editor.selected !== null && editor.selected.isCamera ? 'block' : 'none' );
 	container.add( cameraViewRow );
 
-	var cameraViewButton = new UI.Button( strings.getKey( 'sidebar/object/view' ) );
-	var cameraTransitioning = false;
-	var transitionCamera = new THREE.PerspectiveCamera();
-	cameraViewButton.onClick( function () {
+	cameraViewRow.add( new UI.Text(strings.getKey( 'sidebar/object/view' )).setWidth('90px'));
 
-		if ( editor.selected.isCamera === true && cameraTransitioning === false ) {
+	var cameraViewCheckbox = new UI.Checkbox(false).onChange(update).onClick(function() {
+		var camera = editor.selected;
+		if(camera.isCamera !== true) return;
 
-			editor.selected.updateMatrixWorld( true );
-			editor.currentCamera = transitionCamera;
-			transitionCamera.copy( editor.selected );
-			cameraViewButton.dom.setAttribute( 'viewset', '' );
-
-			var start = getCameraData( editor.camera );
-			var end = getCameraData( transitionCamera );
-			startCameraTransition( start, end );
-
+		if(sceneCameras.indexOf(camera) === -1)
+		{
+			sceneCameras.push(camera);
+			cameraViewCheckbox.setValue(true);
 		}
-
-	} );
-
-	cameraViewButton.onMouseOut( function () {
-
-		if ( editor.currentCamera === transitionCamera ) {
-
-			cameraViewButton.dom.removeAttribute( 'viewset' );
-
-			var start = getCameraData( transitionCamera );
-			var end = getCameraData( editor.camera );
-			startCameraTransition( start, end, true );
-
+		else
+		{
+			sceneCameras.splice(sceneCameras.indexOf(camera), 1);
+			cameraViewCheckbox.setValue(false);
 		}
-
-	} );
-
-	cameraViewRow.add( cameraViewButton );
-
-	function startCameraTransition( start, end, clearCamera ) {
-
-		var func = cameraTransition( start, end, clearCamera );
-		var result = { done: false };
-		function run() {
-
-			if ( result.done !== true ) {
-
-				result = func.next();
-				setTimeout( run );
-
-			}
-
-		}
-		run();
-
-	}
-
-	function* cameraTransition( start, end, clearCamera ) {
-
-		while ( cameraTransitioning === true ) {
-
-			yield;
-
-		}
-
-		cameraTransitioningng = true;
-
-		var startTime = performance.now();
-		var t = 0;
-		do {
-
-			transitionCamera.position.lerpVectors( start.position, end.position, t );
-			THREE.Quaternion.slerp( start.quaternion, end.quaternion, transitionCamera.quaternion, t );
-
-			transitionCamera.far = lerpValue( start.far, end.far, t );
-			transitionCamera.fov = lerpValue( start.fov, end.fov, t );
-			transitionCamera.near = lerpValue( start.near, end.near, t );
-			transitionCamera.aspect = lerpValue( start.aspect, end.aspect, t );
-
-			transitionCamera.updateProjectionMatrix();
-			signals.cameraChanged.dispatch();
-			yield;
-
-			t = Math.min( 1, ( performance.now() - startTime ) / 250 );
-
-		} while ( t !== 1 );
-
-		transitionCamera.position.copy( end.position );
-		transitionCamera.quaternion.copy( end.quaternion );
-		transitionCamera.far = end.far;
-		transitionCamera.fov = end.fov;
-		transitionCamera.near = end.near;
-		transitionCamera.aspect = end.aspect;
-
-		if ( clearCamera ) editor.currentCamera = null;
-
 
 		signals.cameraChanged.dispatch();
+	});
+	cameraViewRow.add( cameraViewCheckbox );
 
-		cameraTransitioning = false;
+	signals.cameraChanged.add(function() {
+		var camera = editor.selected;
+		if(camera.isCamera !== true) return;
 
-	}
-
-	function getCameraData( camera ) {
-
-		var position = new THREE.Vector3();
-		var quaternion = new THREE.Quaternion();
-		var scale = new THREE.Vector3();
-		camera.matrixWorld.decompose( position, quaternion, scale );
-		return {
-			position: position,
-			quaternion: quaternion,
-			fov: camera.fov,
-			near: camera.near,
-			far: camera.far,
-			aspect: camera.aspect
-		};
-
-	}
-
-	function lerpValue( a, b, t ) {
-
-		return a + ( b - a ) * t;
-
-	}
+		cameraViewCheckbox.setValue(sceneCameras.indexOf(camera) !== -1);
+	});
 
 
 	//
@@ -816,7 +723,15 @@ Sidebar.Object = function ( editor ) {
 
 		}
 
-		cameraViewRow.setDisplay( object.isCamera === true ? 'block' : 'none' );
+		if(object.isCamera === true) {
+
+			cameraViewRow.setDisplay('block');
+			cameraViewCheckbox.setValue(sceneCameras.indexOf(object) !== -1)
+
+		}
+		else {
+			cameraViewRow.setDisplay('none');
+		}
 
 		objectVisible.setValue( object.visible );
 		objectFrustumCulled.setValue( object.frustumCulled );
