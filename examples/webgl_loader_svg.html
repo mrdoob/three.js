@@ -161,9 +161,9 @@
 					group.position.y = 70;
 					group.scale.y *= - 1;
 
-					for ( var i = 0; i < paths.length; i ++ ) {
+					for ( key in paths['paths'] ) {
 
-						var path = paths[ i ];
+						var path = paths['paths'][ key ];
 
 						var material = new THREE.MeshBasicMaterial( {
 							color: path.color,
