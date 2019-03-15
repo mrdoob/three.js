@@ -12,7 +12,7 @@ var files = [
 	{ path: 'controls/MapControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
 	// { path: 'controls/TransformControls.js', ignoreList: [] },
-	{ path: 'exporters/GLTFExporter.js', ignoreList: ['AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
+	{ path: 'exporters/GLTFExporter.js', ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
 	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', ignoreList: [] },
 	{ path: 'exporters/PLYExporter.js', ignoreList: [] },
@@ -39,6 +39,14 @@ function convert( path, ignoreList ) {
 	var className = '';
 	var dependencies = {};
 
+	// imports
+
+	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
+
+		return `${match}\n\n_IMPORTS_`;
+
+	} );
+
 	// class name
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
@@ -47,7 +55,7 @@ function convert( path, ignoreList ) {
 
 		console.log( className );
 
-		return `_IMPORTS_\n\nvar ${p1} = `;
+		return `var ${p1} = `;
 
 	} );
 
