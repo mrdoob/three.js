@@ -1,3 +1,7 @@
+/**
+ * @author Jiulong Hu / https://github.com/hujiulong
+ */
+
 const fs = require( 'fs-extra' );
 const acorn = require( 'acorn' );
 const path = require( 'path' );
