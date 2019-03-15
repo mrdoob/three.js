@@ -11774,35 +11774,59 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	computeBoundingBox: function () {
 
-		if ( this.boundingBox === null ) {
+		var box = new Box3();
 
-			this.boundingBox = new Box3();
+		return function computeBoundingBox() {
 
-		}
+			if ( this.boundingBox === null ) {
 
-		var position = this.attributes.position;
+				this.boundingBox = new Box3();
 
-		if ( position !== undefined ) {
+			}
 
-			this.boundingBox.setFromBufferAttribute( position );
+			var position = this.attributes.position;
+			var morphAttributesPosition = this.morphAttributes.position;
 
-		} else {
+			if ( position !== undefined ) {
 
-			this.boundingBox.makeEmpty();
+				this.boundingBox.setFromBufferAttribute( position );
 
-		}
+				// process morph attributes if present
 
-		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+				if ( morphAttributesPosition ) {
 
-			console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
-		}
+						var morphAttribute = morphAttributesPosition[ i ];
+						box.setFromBufferAttribute( morphAttribute );
 
-	},
+						this.boundingBox.expandByPoint( box.min );
+						this.boundingBox.expandByPoint( box.max );
+
+					}
+
+				}
+
+			} else {
+
+				this.boundingBox.makeEmpty();
+
+			}
+
+			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+
+				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+
+			}
+
+		};
+
+	}(),
 
 	computeBoundingSphere: function () {
 
 		var box = new Box3();
+		var boxMorphTargets = new Box3();
 		var vector = new Vector3();
 
 		return function computeBoundingSphere() {
@@ -11814,25 +11838,64 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			}
 
 			var position = this.attributes.position;
+			var morphAttributesPosition = this.morphAttributes.position;
 
 			if ( position ) {
+
+				// first, find the center of the bounding sphere
 
 				var center = this.boundingSphere.center;
 
 				box.setFromBufferAttribute( position );
+
+				// process morph attributes if present
+
+				if ( morphAttributesPosition ) {
+
+					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+
+						var morphAttribute = morphAttributesPosition[ i ];
+						boxMorphTargets.setFromBufferAttribute( morphAttribute );
+
+						box.expandByPoint( boxMorphTargets.min );
+						box.expandByPoint( boxMorphTargets.max );
+
+					}
+
+				}
+
 				box.getCenter( center );
 
-				// hoping to find a boundingSphere with a radius smaller than the
+				// second, try to find a boundingSphere with a radius smaller than the
 				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
 
 				var maxRadiusSq = 0;
 
 				for ( var i = 0, il = position.count; i < il; i ++ ) {
 
-					vector.x = position.getX( i );
-					vector.y = position.getY( i );
-					vector.z = position.getZ( i );
+					vector.fromBufferAttribute( position, i );
+
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+				}
+
+				// process morph attributes if present
+
+				if ( morphAttributesPosition ) {
+
+					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+
+						var morphAttribute = morphAttributesPosition[ i ];
+
+						for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
+
+							vector.fromBufferAttribute( morphAttribute, i );
+
+							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+						}
+
+					}
 
 				}
 
@@ -26553,20 +26616,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}() ),
 
-	copy: function ( source ) {
-
-		Object3D.prototype.copy.call( this, source );
-
-		this.geometry.copy( source.geometry );
-		this.material.copy( source.material );
-
-		return this;
-
-	},
-
 	clone: function () {
 
-		return new this.constructor().copy( this );
+		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 
