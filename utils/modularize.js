@@ -44,9 +44,10 @@ function convert( path, ignoreList ) {
 
 	} );
 
-	contents = contents.replace( /THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2 ) {
+	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2, p3 ) {
 
-		if ( p1 === className ) return `${p1}${p2}`;
+		if ( p1 === '\'' ) return match; // Inside a string
+		if ( p2 === className ) return `${p2}${p3}`;
 
 		return match;
 
