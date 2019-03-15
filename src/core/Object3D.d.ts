@@ -39,11 +39,6 @@ export class Object3D extends EventDispatcher {
   name: string;
 
   type: string;
-  
-  /**
-   * The material of the object.
-   */
-  material: Material;
 
   /**
    * Object's parent in the scene graph.
