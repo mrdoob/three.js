@@ -405,7 +405,7 @@ GLTFExporter.prototype = {
 
 			} catch ( error ) {
 
-				console.warn( 'GLTFExporter: userData of \'' + object.name + '\' ' +
+				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
 					'won\'t be serialized because of JSON.stringify error - ' + error.message );
 
 			}
@@ -656,7 +656,7 @@ GLTFExporter.prototype = {
 
 			} else {
 
-				throw new Error( 'GLTFExporter: Unsupported bufferAttribute component type.' );
+				throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type.' );
 
 			}
 
@@ -967,7 +967,7 @@ GLTFExporter.prototype = {
 
 				} else {
 
-					console.warn( 'GLTFExporter: Ignoring metalnessMap and roughnessMap because they are not the same Texture.' );
+					console.warn( 'THREE.GLTFExporter: Ignoring metalnessMap and roughnessMap because they are not the same Texture.' );
 
 				}
 
@@ -1017,7 +1017,7 @@ GLTFExporter.prototype = {
 
 					if ( material.normalScale.x !== material.normalScale.y ) {
 
-						console.warn( 'GLTFExporter: Normal scale components are different, ignoring Y and exporting X.' );
+						console.warn( 'THREE.GLTFExporter: Normal scale components are different, ignoring Y and exporting X.' );
 
 					}
 
@@ -1174,7 +1174,7 @@ GLTFExporter.prototype = {
 
 			if ( originalNormal !== undefined && ! isNormalizedNormalAttribute( originalNormal ) ) {
 
-				console.warn( 'GLTFExporter: Creating normalized normal attribute from the non-normalized one.' );
+				console.warn( 'THREE.GLTFExporter: Creating normalized normal attribute from the non-normalized one.' );
 
 				geometry.addAttribute( 'normal', createNormalizedNormalAttribute( originalNormal ) );
 
@@ -1333,7 +1333,7 @@ GLTFExporter.prototype = {
 			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
 
 				// temporal workaround.
-				console.warn( 'GLTFExporter: Creating index for non-indexed multi-material mesh.' );
+				console.warn( 'THREE.GLTFExporter: Creating index for non-indexed multi-material mesh.' );
 				forceIndices = true;
 
 			}
@@ -1524,7 +1524,7 @@ GLTFExporter.prototype = {
 
 				if ( ! trackNode || ! trackProperty ) {
 
-					console.warn( 'GLTFExporter: Could not export animation track "%s".', track.name );
+					console.warn( 'THREE.GLTFExporter: Could not export animation track "%s".', track.name );
 					return null;
 
 				}
@@ -1667,7 +1667,7 @@ GLTFExporter.prototype = {
 
 			if ( light.decay !== undefined && light.decay !== 2 ) {
 
-				console.warn( 'GLTFExporter: Light decay may be lost. glTF is physically-based, '
+				console.warn( 'THREE.GLTFExporter: Light decay may be lost. glTF is physically-based, '
 					+ 'and expects light.decay=2.' );
 
 			}
@@ -1678,7 +1678,7 @@ GLTFExporter.prototype = {
 					 || light.target.position.y !== 0
 					 || light.target.position.z !== - 1 ) ) {
 
-				console.warn( 'GLTFExporter: Light direction may be lost. For best results, '
+				console.warn( 'THREE.GLTFExporter: Light direction may be lost. For best results, '
 					+ 'make light.target a child of the light with position 0,0,-1.' );
 
 			}
@@ -1777,7 +1777,7 @@ GLTFExporter.prototype = {
 
 			} else if ( object.isLight ) {
 
-				console.warn( 'GLTFExporter: Only directional, point, and spot lights are supported.' );
+				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.' );
 				return null;
 
 			}
@@ -2163,11 +2163,11 @@ GLTFExporter.Utils = {
 
 					// This should never happen, because glTF morph target animations
 					// affect all targets already.
-					throw new Error( 'GLTFExporter: Cannot merge tracks with glTF CUBICSPLINE interpolation.' );
+					throw new Error( 'THREE.GLTFExporter: Cannot merge tracks with glTF CUBICSPLINE interpolation.' );
 
 				}
 
-				console.warn( 'GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
+				console.warn( 'THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
 
 				sourceTrack = sourceTrack.clone();
 				sourceTrack.setInterpolation( InterpolateLinear );
@@ -2179,7 +2179,7 @@ GLTFExporter.Utils = {
 
 			if ( targetIndex === undefined ) {
 
-				throw new Error( 'GLTFExporter: Morph target name not found: ' + sourceTrackBinding.propertyIndex );
+				throw new Error( 'THREE.GLTFExporter: Morph target name not found: ' + sourceTrackBinding.propertyIndex );
 
 			}
 

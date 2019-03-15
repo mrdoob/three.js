@@ -82,12 +82,13 @@ function convert( path, ignoreList ) {
 
 	// constants
 
-	contents = contents.replace( /THREE\.([a-zA-Z0-9]+)/g, function ( match, p1 ) {
+	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)/g, function ( match, p1, p2 ) {
 
-		if ( ignoreList.includes( p1 ) ) return match;
-		if ( p1 === className ) return p1;
+		if ( ignoreList.includes( p2 ) ) return match;
+		if ( p1 === '\'' ) return match; // Inside a string
+		if ( p2 === className ) return p2;
 
-		if ( p1 === 'Math' || p1 === '_Math' ) {
+		if ( p2 === 'Math' || p2 === '_Math' ) {
 
 			dependencies[ '_Math' ] = true;
 
@@ -95,11 +96,11 @@ function convert( path, ignoreList ) {
 
 		}
 
-		dependencies[ p1 ] = true;
+		dependencies[ p2 ] = true;
 
-		// console.log( match, p1 );
+		// console.log( match, p2 );
 
-		return `${p1}`;
+		return `${p2}`;
 
 	} );
 

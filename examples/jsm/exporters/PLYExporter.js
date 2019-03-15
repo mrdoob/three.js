@@ -28,7 +28,7 @@ PLYExporter.prototype = {
 
 		if ( onDone && typeof onDone === 'object' ) {
 
-			console.warn( 'PLYExporter: The options parameter is now the third argument to the "parse" function. See the documentation for the new API.' );
+			console.warn( 'THREE.PLYExporter: The options parameter is now the third argument to the "parse" function. See the documentation for the new API.' );
 			options = onDone;
 			onDone = undefined;
 

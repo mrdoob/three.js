@@ -164,7 +164,7 @@ OBJExporter.prototype = {
 
 			} else {
 
-				console.warn( 'OBJExporter.parseMesh(): geometry type unsupported', geometry );
+				console.warn( 'THREE.OBJExporter.parseMesh(): geometry type unsupported', geometry );
 
 			}
 
@@ -240,7 +240,7 @@ OBJExporter.prototype = {
 
 			} else {
 
-				console.warn( 'OBJExporter.parseLine(): geometry type unsupported', geometry );
+				console.warn( 'THREE.OBJExporter.parseLine(): geometry type unsupported', geometry );
 
 			}
 

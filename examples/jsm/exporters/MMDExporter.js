@@ -99,7 +99,7 @@ var MMDExporter = function () {
 
 		if ( skin.isSkinnedMesh !== true ) {
 
-			console.warn( 'MMDExporter: parseVpd() requires SkinnedMesh instance.' );
+			console.warn( 'THREE.MMDExporter: parseVpd() requires SkinnedMesh instance.' );
 			return null;
 
 		}
