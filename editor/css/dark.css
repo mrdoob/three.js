@@ -18,11 +18,6 @@ button {
 		background-color: #08f;
 	}
 
-	button[viewset] {
-		color : #ffff00;
-		background-color: #ff0000;
-	}
-
 input, textarea {
 	background-color: #222;
 	border: 1px solid transparent;
