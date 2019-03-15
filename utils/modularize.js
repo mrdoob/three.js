@@ -4,23 +4,33 @@
 
 var fs = require( 'fs' );
 
-var srcFolder = '../examples/js/';
-var dstFolder = '../examples/jsm/';
+var srcFolder = __dirname + '/../examples/js/';
+var dstFolder = __dirname + '/../examples/jsm/';
 
 var files = [
 	{ path: 'controls/OrbitControls.js', ignoreList: [] },
 	{ path: 'controls/MapControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
 	// { path: 'controls/TransformControls.js', ignoreList: [] },
+
 	{ path: 'exporters/GLTFExporter.js', ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
 	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', ignoreList: [] },
 	{ path: 'exporters/PLYExporter.js', ignoreList: [] },
 	{ path: 'exporters/STLExporter.js', ignoreList: [] },
 	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
+
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
-	{ path: 'loaders/MTLLoader.js', ignoreList: [] }
+	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
+
+	{ path: 'utils/BufferGeometryUtils.js', ignoreList: [] },
+	{ path: 'utils/GeometryUtils.js', ignoreList: [] },
+	{ path: 'utils/MathUtils.js', ignoreList: [] },
+	{ path: 'utils/SceneUtils.js', ignoreList: [] },
+	{ path: 'utils/ShadowMapViewer.js', ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
+	{ path: 'utils/SkeletonUtils.js', ignoreList: [] },
+	{ path: 'utils/UVsDebug.js', ignoreList: [ 'SphereBufferGeometry' ] },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
