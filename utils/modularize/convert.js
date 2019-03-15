@@ -94,7 +94,7 @@ function convert( paths, options ) {
 			fs.ensureFileSync( dest );
 			fs.writeFileSync( dest, output );
 
-			console.log( `${mod.file} done` );
+			console.log( `output: ${dest.replace(/^.+\/examples\/jsm/, 'examples/jsm')}` );
 
 		}
 
