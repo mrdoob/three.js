@@ -4,6 +4,29 @@
  * @author Takahiro / https://github.com/takahirox
  */
 
+import {
+	BufferAttribute,
+	BufferGeometry,
+	ClampToEdgeWrapping,
+	DoubleSide,
+	InterpolateDiscrete,
+	LinearFilter,
+	LinearMipMapLinearFilter,
+	LinearMipMapNearestFilter,
+	Math as _Math,
+	MirroredRepeatWrapping,
+	NearestFilter,
+	NearestMipMapLinearFilter,
+	NearestMipMapNearestFilter,
+	PropertyBinding,
+	RGBAFormat,
+	RepeatWrapping,
+	Scene,
+	TriangleFanDrawMode,
+	TriangleStripDrawMode,
+	Vector3
+} from "../../../build/three.module.js";
+
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
@@ -58,29 +81,6 @@ var PATH_PROPERTIES = {
 //------------------------------------------------------------------------------
 // GLTF Exporter
 //------------------------------------------------------------------------------
-import {
-	BufferAttribute,
-	BufferGeometry,
-	ClampToEdgeWrapping,
-	DoubleSide,
-	InterpolateDiscrete,
-	LinearFilter,
-	LinearMipMapLinearFilter,
-	LinearMipMapNearestFilter,
-	Math as _Math,
-	MirroredRepeatWrapping,
-	NearestFilter,
-	NearestMipMapLinearFilter,
-	NearestMipMapNearestFilter,
-	PropertyBinding,
-	RGBAFormat,
-	RepeatWrapping,
-	Scene,
-	TriangleFanDrawMode,
-	TriangleStripDrawMode,
-	Vector3
-} from "../../../build/three.module.js";
-
 var GLTFExporter = function () {};
 
 GLTFExporter.prototype = {
