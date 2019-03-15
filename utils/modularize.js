@@ -12,7 +12,7 @@ var files = [
 	{ path: 'controls/MapControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
 	// { path: 'controls/TransformControls.js', ignoreList: [] },
-	{ path: 'exporters/GLTFExporter.js', ignoreList: ['AnimationClip', 'Camera', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
+	{ path: 'exporters/GLTFExporter.js', ignoreList: ['AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
 	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', ignoreList: [] },
 	{ path: 'exporters/PLYExporter.js', ignoreList: [] },
