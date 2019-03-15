@@ -15,6 +15,7 @@ import {
 	Bone,
 	BufferAttribute,
 	BufferGeometry,
+	BufferGeometryUtils,
 	Camera,
 	ClampToEdgeWrapping,
 	Color,
@@ -2712,7 +2713,7 @@ var GLTFLoader = ( function () {
 
 				} );
 
-			} else if ( geometries.length > 1 && THREE.BufferGeometryUtils !== undefined ) {
+			} else if ( geometries.length > 1 && BufferGeometryUtils !== undefined ) {
 
 				// Tries to merge geometries with BufferGeometryUtils if possible
 
@@ -2733,7 +2734,7 @@ var GLTFLoader = ( function () {
 
 				} else {
 
-					var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries, true );
+					var geometry = BufferGeometryUtils.mergeBufferGeometries( geometries, true );
 
 					cache.push( { geometry: geometry, baseGeometries: geometries } );
 
