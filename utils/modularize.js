@@ -13,7 +13,7 @@ var files = [
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
 	// { path: 'controls/TransformControls.js', ignoreList: [] },
 	{ path: 'exporters/GLTFExporter.js', ignoreList: [] },
-	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader', 'DRACOLoader', 'BufferGeometryUtils' ] },
+	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', ignoreList: [] }
 ];
