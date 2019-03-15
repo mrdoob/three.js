@@ -31,9 +31,11 @@ THREE.SMAAPass = function ( width, height ) {
 
 	var areaTextureImage = new Image();
 	areaTextureImage.src = this.getAreaTexture();
-	areaTextureImage.onload = function() {
+	areaTextureImage.onload = function () {
+
 		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
 		scope.areaTexture.needsUpdate = true;
+
 	};
 
 	this.areaTexture = new THREE.Texture();

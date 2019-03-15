@@ -1,4 +1,5 @@
 import { LoadingManager } from './LoadingManager';
+import { AnimationClip } from './../animation/AnimationClip';
 
 export class AnimationLoader {
   constructor(manager?: LoadingManager);
@@ -11,6 +12,6 @@ export class AnimationLoader {
     onProgress?: (request: ProgressEvent) => void,
     onError?: (event: ErrorEvent) => void
   ): any;
-  parse(json: any, onLoad: (response: string | ArrayBuffer) => void): void;
+  parse(json: any): AnimationClip[];
   setPath(path: string): AnimationLoader;
 }

@@ -11,9 +11,11 @@ var files = [
 	{ path: 'controls/OrbitControls.js', ignoreList: [] },
 	{ path: 'controls/MapControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
-	// { file: 'controls/TransformControls.js', ignoreList: [] },
-	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader', 'DRACOLoader', 'BufferGeometryUtils' ] },
-	{ path: 'loaders/OBJLoader.js', ignoreList: [] }
+	// { path: 'controls/TransformControls.js', ignoreList: [] },
+	{ path: 'exporters/GLTFExporter.js', ignoreList: [] },
+	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
+	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
+	{ path: 'loaders/MTLLoader.js', ignoreList: [] }
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
@@ -44,9 +46,10 @@ function convert( path, ignoreList ) {
 
 	} );
 
-	contents = contents.replace( /THREE\.([a-zA-Z0-9]+)\./g, function ( match, p1 ) {
+	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2, p3 ) {
 
-		if ( p1 === className ) return `${p1}.`;
+		if ( p1 === '\'' ) return match; // Inside a string
+		if ( p2 === className ) return `${p2}${p3}`;
 
 		return match;
 
@@ -83,7 +86,7 @@ function convert( path, ignoreList ) {
 
 	var keys = Object.keys( dependencies ).sort().map( value => '\n\t' + value ).toString();
 	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
-	var exports = `export { ${className} }`;
+	var exports = `export { ${className} };\n`;
 
 	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 

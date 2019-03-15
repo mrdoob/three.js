@@ -1,43 +1,22 @@
-export { WireframeGeometry } from './WireframeGeometry';
-export {
-  ParametricGeometry,
-  ParametricBufferGeometry,
-} from './ParametricGeometry';
-export {
-  TetrahedronGeometry,
-  TetrahedronBufferGeometry,
-} from './TetrahedronGeometry';
-export {
-  OctahedronGeometry,
-  OctahedronBufferGeometry,
-} from './OctahedronGeometry';
-export {
-  IcosahedronGeometry,
-  IcosahedronBufferGeometry,
-} from './IcosahedronGeometry';
-export {
-  DodecahedronGeometry,
-  DodecahedronBufferGeometry,
-} from './DodecahedronGeometry';
-export {
-  PolyhedronGeometry,
-  PolyhedronBufferGeometry,
-} from './PolyhedronGeometry';
-export { TubeGeometry, TubeBufferGeometry } from './TubeGeometry';
-export {
-  TorusKnotGeometry,
-  TorusKnotBufferGeometry,
-} from './TorusKnotGeometry';
-export { TorusGeometry, TorusBufferGeometry } from './TorusGeometry';
-export { TextGeometry, TextBufferGeometry } from './TextGeometry';
-export { SphereGeometry, SphereBufferGeometry } from './SphereGeometry';
-export { RingGeometry, RingBufferGeometry } from './RingGeometry';
-export { PlaneGeometry, PlaneBufferGeometry } from './PlaneGeometry';
-export { LatheGeometry, LatheBufferGeometry } from './LatheGeometry';
-export { ShapeGeometry, ShapeBufferGeometry } from './ShapeGeometry';
-export { ExtrudeGeometry, ExtrudeBufferGeometry } from './ExtrudeGeometry';
-export { EdgesGeometry } from './EdgesGeometry';
-export { ConeGeometry, ConeBufferGeometry } from './ConeGeometry';
-export { CylinderGeometry, CylinderBufferGeometry } from './CylinderGeometry';
-export { CircleGeometry, CircleBufferGeometry } from './CircleGeometry';
-export { BoxGeometry, BoxBufferGeometry } from './BoxGeometry';
+export * from './WireframeGeometry';
+export * from './ParametricGeometry';
+export * from './TetrahedronGeometry';
+export * from './OctahedronGeometry';
+export * from './IcosahedronGeometry';
+export * from './DodecahedronGeometry';
+export * from './PolyhedronGeometry';
+export * from './TubeGeometry';
+export * from './TorusKnotGeometry';
+export * from './TorusGeometry';
+export * from './TextGeometry';
+export * from './SphereGeometry';
+export * from './RingGeometry';
+export * from './PlaneGeometry';
+export * from './LatheGeometry';
+export * from './ShapeGeometry';
+export * from './ExtrudeGeometry';
+export * from './EdgesGeometry';
+export * from './ConeGeometry';
+export * from './CylinderGeometry';
+export * from './CircleGeometry';
+export * from './BoxGeometry';

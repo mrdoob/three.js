@@ -56,7 +56,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	this.materialConvolution = new THREE.ShaderMaterial( {
 
 		uniforms: this.convolutionUniforms,
-		vertexShader:  convolutionShader.vertexShader,
+		vertexShader: convolutionShader.vertexShader,
 		fragmentShader: convolutionShader.fragmentShader,
 		defines: {
 			"KERNEL_SIZE_FLOAT": kernelSize.toFixed( 1 ),
@@ -68,7 +68,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	this.needsSwap = false;
 
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
+	this.scene = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.quad.frustumCulled = false; // Avoid getting clipped
