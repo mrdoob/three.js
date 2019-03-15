@@ -117,7 +117,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		blending: THREE.NoBlending
 	} );
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( null );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -141,35 +141,35 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		if ( this.adaptive ) {
 
 			//Render the luminance of the current scene into a render target with mipmapping enabled
-			this.fillQuad.quad.material = this.materialLuminance;
+			this.fsQuad.material = this.materialLuminance;
 			this.materialLuminance.uniforms.tDiffuse.value = readBuffer.texture;
 			renderer.setRenderTarget( this.currentLuminanceRT );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 			//Use the new luminance values, the previous luminance and the frame delta to
 			//adapt the luminance over time.
-			this.fillQuad.quad.material = this.materialAdaptiveLum;
+			this.fsQuad.material = this.materialAdaptiveLum;
 			this.materialAdaptiveLum.uniforms.delta.value = deltaTime;
 			this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT.texture;
 			this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT.texture;
 			renderer.setRenderTarget( this.luminanceRT );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 			//Copy the new adapted luminance value so that it can be used by the next frame.
-			this.fillQuad.quad.material = this.materialCopy;
+			this.fsQuad.material = this.materialCopy;
 			this.copyUniforms.tDiffuse.value = this.luminanceRT.texture;
 			renderer.setRenderTarget( this.previousLuminanceRT );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 
-		this.fillQuad.quad.material = this.materialToneMap;
+		this.fsQuad.material = this.materialToneMap;
 		this.materialToneMap.uniforms.tDiffuse.value = readBuffer.texture;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
@@ -177,7 +177,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 			if ( this.clear ) renderer.clear();
 
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 
@@ -225,7 +225,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 		}
 		//Put something in the adaptive luminance texture so that the scene can render initially
-		this.fillQuad.quad.material = new THREE.MeshBasicMaterial( { color: 0x777777 } );
+		this.fsQuad.material = new THREE.MeshBasicMaterial( { color: 0x777777 } );
 		this.materialLuminance.needsUpdate = true;
 		this.materialAdaptiveLum.needsUpdate = true;
 		this.materialToneMap.needsUpdate = true;

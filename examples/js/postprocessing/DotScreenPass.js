@@ -25,7 +25,7 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 
 	} );
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( this.material );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 };
 
@@ -41,13 +41,13 @@ THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototy
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

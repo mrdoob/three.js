@@ -133,7 +133,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	this.basic = new THREE.MeshBasicMaterial();
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( null );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -195,12 +195,12 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		if ( this.renderToScreen ) {
 
-			this.fillQuad.quad.material = this.basic;
+			this.fsQuad.material = this.basic;
 			this.basic.map = readBuffer.texture;
 
 			renderer.setRenderTarget( null );
 			renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 
@@ -208,11 +208,11 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		this.highPassUniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.highPassUniforms[ "luminosityThreshold" ].value = this.threshold;
-		this.fillQuad.quad.material = this.materialHighPassFilter;
+		this.fsQuad.material = this.materialHighPassFilter;
 
 		renderer.setRenderTarget( this.renderTargetBright );
 		renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 		// 2. Blur All the mips progressively
 
@@ -220,19 +220,19 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		for ( var i = 0; i < this.nMips; i ++ ) {
 
-			this.fillQuad.quad.material = this.separableBlurMaterials[ i ];
+			this.fsQuad.material = this.separableBlurMaterials[ i ];
 
 			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = inputRenderTarget.texture;
 			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionX;
 			renderer.setRenderTarget( this.renderTargetsHorizontal[ i ] );
 			renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = this.renderTargetsHorizontal[ i ].texture;
 			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionY;
 			renderer.setRenderTarget( this.renderTargetsVertical[ i ] );
 			renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 			inputRenderTarget = this.renderTargetsVertical[ i ];
 
@@ -240,18 +240,18 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		// Composite All the mips
 
-		this.fillQuad.quad.material = this.compositeMaterial;
+		this.fsQuad.material = this.compositeMaterial;
 		this.compositeMaterial.uniforms[ "bloomStrength" ].value = this.strength;
 		this.compositeMaterial.uniforms[ "bloomRadius" ].value = this.radius;
 		this.compositeMaterial.uniforms[ "bloomTintColors" ].value = this.bloomTintColors;
 
 		renderer.setRenderTarget( this.renderTargetsHorizontal[ 0 ] );
 		renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 		// Blend it additively over the input texture
 
-		this.fillQuad.quad.material = this.materialCopy;
+		this.fsQuad.material = this.materialCopy;
 		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetsHorizontal[ 0 ].texture;
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
@@ -260,12 +260,12 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( readBuffer );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

@@ -23,7 +23,7 @@ THREE.GlitchPass = function ( dt_size ) {
 		fragmentShader: shader.fragmentShader
 	} );
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( this.material );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 	this.goWild = false;
 	this.curF = 0;
@@ -72,13 +72,13 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

@@ -67,7 +67,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	this.needsSwap = false;
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( null );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -81,14 +81,14 @@ THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		// Render quad with blured scene into texture (convolution pass 1)
 
-		this.fillQuad.quad.material = this.materialConvolution;
+		this.fsQuad.material = this.materialConvolution;
 
 		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 
 		renderer.setRenderTarget( this.renderTargetX );
 		renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 
 		// Render quad with blured scene into texture (convolution pass 2)
@@ -98,11 +98,11 @@ THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		renderer.setRenderTarget( this.renderTargetY );
 		renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 		// Render original scene with superimposed blur to texture
 
-		this.fillQuad.quad.material = this.materialCopy;
+		this.fsQuad.material = this.materialCopy;
 
 		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY.texture;
 
@@ -110,7 +110,7 @@ THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		renderer.setRenderTarget( readBuffer );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 	}
 

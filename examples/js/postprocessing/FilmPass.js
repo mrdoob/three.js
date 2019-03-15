@@ -26,7 +26,7 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
 	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( this.material );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 };
 
@@ -42,13 +42,13 @@ THREE.FilmPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

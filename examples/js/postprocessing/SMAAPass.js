@@ -109,7 +109,7 @@ THREE.SMAAPass = function ( width, height ) {
 
 	this.needsSwap = false;
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( null );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -123,36 +123,36 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		this.uniformsEdges[ "tDiffuse" ].value = readBuffer.texture;
 
-		this.fillQuad.quad.material = this.materialEdges;
+		this.fsQuad.material = this.materialEdges;
 
 		renderer.setRenderTarget( this.edgesRT );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 		// pass 2
 
-		this.fillQuad.quad.material = this.materialWeights;
+		this.fsQuad.material = this.materialWeights;
 
 		renderer.setRenderTarget( this.weightsRT );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 		// pass 3
 
 		this.uniformsBlend[ "tColor" ].value = readBuffer.texture;
 
-		this.fillQuad.quad.material = this.materialBlend;
+		this.fsQuad.material = this.materialBlend;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

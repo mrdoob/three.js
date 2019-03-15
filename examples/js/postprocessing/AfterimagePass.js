@@ -39,12 +39,12 @@ THREE.AfterimagePass = function ( damp ) {
 
 	} );
 
-	this.compFillQuad = THREE.Pass.createFillQuadScene( this.shaderMaterial );
+	this.compFsQuad = new THREE.Pass.FullScreenQuad( this.shaderMaterial );
 
 	var material = new THREE.MeshBasicMaterial( {
 		map: this.textureComp.texture
 	} );
-	this.screenFillQuad = THREE.Pass.createFillQuadScene( material );
+	this.screenFsQuad = new THREE.Pass.FullScreenQuad( material );
 
 };
 
@@ -58,15 +58,15 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		this.uniforms[ "tNew" ].value = readBuffer.texture;
 
 		renderer.setRenderTarget( this.textureComp );
-		renderer.render( this.compFillQuad.quad, this.compFillQuad.camera );
+		this.compFsQuad.render( renderer );
 
 		renderer.setRenderTarget( this.textureOld );
-		renderer.render( this.screenFillQuad.quad, this.screenFillQuad.camera );
+		this.screenFsQuad.render( renderer );
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.screenFillQuad.quad, this.screenFillQuad.camera );
+			this.screenFsQuad.render( renderer );
 
 		} else {
 
@@ -74,7 +74,7 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			if ( this.clear ) renderer.clear();
 
-			renderer.render( this.screenFillQuad.quad, this.screenFillQuad.camera );
+			this.screenFsQuad.render( renderer );
 
 		}
 

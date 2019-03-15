@@ -192,20 +192,6 @@ THREE.Pass = function () {
 
 };
 
-// Helper for passes that need a scene that simply has the whole viewport filled with a single quad.
-THREE.Pass.createFillQuadScene = function( material ) {
-
-	var fillQuad = {};
-
-	fillQuad.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-	fillQuad.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), material );
-	fillQuad.quad.frustumCulled = false; // Avoid getting clipped
-
-	return fillQuad;
-
-};
-
 Object.assign( THREE.Pass.prototype, {
 
 	setSize: function ( width, height ) {},
@@ -217,3 +203,39 @@ Object.assign( THREE.Pass.prototype, {
 	}
 
 } );
+
+// Helper for passes that need to fill the viewport with a single quad.
+THREE.Pass.FullScreenQuad = function ( material ) {
+
+	this._mesh = new THREE.Mesh( THREE.Pass.FullScreenQuad._geometry, material );
+
+};
+
+Object.defineProperty( THREE.Pass.FullScreenQuad.prototype, 'material', {
+
+	get: function () {
+
+		return this._mesh.material;
+
+	},
+
+	set: function ( value ) {
+
+		this._mesh.material = value;
+
+	}
+
+} );
+
+Object.assign( THREE.Pass.FullScreenQuad.prototype, {
+
+	render: function ( renderer ) {
+
+		renderer.render( this._mesh, THREE.Pass.FullScreenQuad._camera );
+
+	}
+
+} );
+
+THREE.Pass.FullScreenQuad._camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+THREE.Pass.FullScreenQuad._geometry = new THREE.PlaneBufferGeometry( 2, 2 );

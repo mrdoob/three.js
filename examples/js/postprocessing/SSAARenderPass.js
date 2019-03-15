@@ -40,7 +40,7 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 		depthWrite: false
 	} );
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( this.copyMaterial );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.copyMaterial );
 
 };
 
@@ -129,7 +129,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			}
 
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

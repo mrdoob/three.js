@@ -34,7 +34,7 @@ THREE.SavePass = function ( renderTarget ) {
 
 	this.needsSwap = false;
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( this.material );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 };
 
@@ -52,7 +52,7 @@ THREE.SavePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		renderer.setRenderTarget( this.renderTarget );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 	}
 

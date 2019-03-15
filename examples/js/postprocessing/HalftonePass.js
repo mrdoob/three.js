@@ -36,7 +36,7 @@ THREE.HalftonePass = function ( width, height, params ) {
 
 	}
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( this.material );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 };
 
@@ -51,13 +51,13 @@ THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototyp
  		if ( this.renderToScreen ) {
 
  			renderer.setRenderTarget( null );
- 			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+ 			this.fsQuad.render( renderer );
 
 		} else {
 
  			renderer.setRenderTarget( writeBuffer );
  			if ( this.clear ) renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

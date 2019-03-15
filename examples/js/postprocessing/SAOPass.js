@@ -160,7 +160,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 		blending: THREE.NoBlending
 	} );
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( null );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -328,8 +328,8 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		}
 
-		this.fillQuad.quad.material = passMaterial;
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.material = passMaterial;
+		this.fsQuad.render( renderer );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;

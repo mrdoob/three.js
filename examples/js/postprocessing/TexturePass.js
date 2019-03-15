@@ -28,7 +28,7 @@ THREE.TexturePass = function ( map, opacity ) {
 
 	this.needsSwap = false;
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( null );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -41,7 +41,7 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.fillQuad.quad.material = this.material;
+		this.fsQuad.material = this.material;
 
 		this.uniforms[ "opacity" ].value = this.opacity;
 		this.uniforms[ "tDiffuse" ].value = this.map;
@@ -49,7 +49,7 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.render( renderer );
 
 		renderer.autoClear = oldAutoClear;
 	}

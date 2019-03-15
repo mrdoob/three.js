@@ -66,7 +66,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.uniforms = bokehUniforms;
 	this.needsSwap = false;
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( this.materialBokeh );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.materialBokeh );
 
 	this.oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
@@ -103,13 +103,13 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			renderer.clear();
-			renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

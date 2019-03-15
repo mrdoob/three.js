@@ -134,7 +134,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 		blendEquationAlpha: THREE.AddEquation
 	} );
 
-	this.fillQuad = THREE.Pass.createFillQuadScene( null );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 	this.originalClearColor = new THREE.Color();
 
@@ -269,8 +269,8 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		}
 
-		this.fillQuad.quad.material = passMaterial;
-		renderer.render( this.fillQuad.quad, this.fillQuad.camera );
+		this.fsQuad.material = passMaterial;
+		this.fsQuad.render( renderer );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
