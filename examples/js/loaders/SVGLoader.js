@@ -8,8 +8,6 @@ THREE.SVGLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-	this.rootNode = null;
-
 };
 
 THREE.SVGLoader.prototype = {
@@ -1018,14 +1016,16 @@ THREE.SVGLoader.prototype = {
 		console.time( 'THREE.SVGLoader: Parse' );
 
 		parseNode( xml.documentElement, { fill: '#000' } );
-		this.rootNode = xml.documentElement;
+		
+		var data = { paths: paths, xml: xml.documentElement };
 
 		// console.log( paths );
 
 
 		console.timeEnd( 'THREE.SVGLoader: Parse' );
 
-		return paths;
+
+		return data;
 
 	}
 
