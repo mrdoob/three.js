@@ -17,12 +17,13 @@ export class PositionalAudio extends Audio {
 
   panner: PannerNode;
 
-  setRefDistance(value: number): void;
+  setRefDistance(value: number): this;
   getRefDistance(): number;
-  setRolloffFactor(value: number): void;
+  setRolloffFactor(value: number): this;
   getRolloffFactor(): number;
-  setDistanceModel(value: number): void;
-  getDistanceModel(): number;
-  setMaxDistance(value: number): void;
+  setDistanceModel(value: string): this;
+  getDistanceModel(): string;
+  setMaxDistance(value: number): this;
   getMaxDistance(): number;
+  setDirectionalCone(coneInnerAngle: number, coneOuterAngle: number, coneOuterGain: number): this;
 }

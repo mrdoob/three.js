@@ -51,9 +51,11 @@
 
 import { CubeTexture } from '../../textures/CubeTexture.js';
 import { Texture } from '../../textures/Texture.js';
+import { DataTexture2DArray } from '../../textures/DataTexture2DArray.js';
 import { DataTexture3D } from '../../textures/DataTexture3D.js';
 
 var emptyTexture = new Texture();
+var emptyTexture2dArray = new DataTexture2DArray();
 var emptyTexture3d = new DataTexture3D();
 var emptyCubeTexture = new CubeTexture();
 
@@ -390,6 +392,22 @@ function setValueT1( gl, v, renderer ) {
 
 }
 
+function setValueT2DArray1( gl, v, renderer ) {
+
+	var cache = this.cache;
+	var unit = renderer.allocTextureUnit();
+
+	if ( cache[ 0 ] !== unit ) {
+
+		gl.uniform1i( this.addr, unit );
+		cache[ 0 ] = unit;
+
+	}
+
+	renderer.setTexture2DArray( v || emptyTexture2dArray, unit );
+
+}
+
 function setValueT3D1( gl, v, renderer ) {
 
 	var cache = this.cache;
@@ -478,6 +496,7 @@ function getSingularSetter( type ) {
 		case 0x8b5e: case 0x8d66: return setValueT1; // SAMPLER_2D, SAMPLER_EXTERNAL_OES
 		case 0x8b5f: return setValueT3D1; // SAMPLER_3D
 		case 0x8b60: return setValueT6; // SAMPLER_CUBE
+		case 0x8DC1: return setValueT2DArray1; // SAMPLER_2D_ARRAY
 
 		case 0x1404: case 0x8b56: return setValue1i; // INT, BOOL
 		case 0x8b53: case 0x8b57: return setValue2iv; // _VEC2

@@ -285,7 +285,7 @@ Editor.prototype = {
 
 			} else if ( object.isSkinnedMesh ) {
 
-				helper = new THREE.SkeletonHelper( object );
+				helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
 			} else {
 

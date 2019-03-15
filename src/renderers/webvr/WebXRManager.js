@@ -3,12 +3,12 @@
  */
 
 import { Group } from '../../objects/Group.js';
+import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { setProjectionFromUnion } from './WebVRUtils.js';
-import { Matrix4 } from '../../math/Matrix4';
 
 function WebXRManager( renderer ) {
 

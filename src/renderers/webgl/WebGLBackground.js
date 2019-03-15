@@ -27,8 +27,17 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		var background = scene.background;
 
-		var session = renderer.vr.getSession();
-		if ( session && session.environmentBlendMode === 'additive' ) background = null;
+		// Ignore background in AR
+		// TODO: Reconsider this.
+
+		var vr = renderer.vr;
+		var session = vr.getSession && vr.getSession();
+
+		if ( session && session.environmentBlendMode === 'additive' ) {
+
+			background = null;
+
+		}
 
 		if ( background === null ) {
 

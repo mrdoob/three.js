@@ -1276,7 +1276,11 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
-					currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+					if ( material.visible ) {
+
+						currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+
+					}
 
 				}
 
@@ -2462,6 +2466,12 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
+	this.setTexture2DArray = function ( texture, slot ) {
+
+		textures.setTexture2DArray( texture, slot );
+
+	};
+
 	this.setTexture3D = function ( texture, slot ) {
 
 		textures.setTexture3D( texture, slot );
@@ -2601,7 +2611,7 @@ function WebGLRenderer( parameters ) {
 		if ( isCube ) {
 
 			var textureProperties = properties.get( renderTarget.texture );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + activeCubeFace || 0, textureProperties.__webglTexture, activeMipMapLevel || 0 );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + ( activeCubeFace || 0 ), textureProperties.__webglTexture, activeMipMapLevel || 0 );
 
 		}
 
