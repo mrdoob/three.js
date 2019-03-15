@@ -1165,6 +1165,30 @@ THREE.GLTFExporter.prototype = {
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
+				// Prefix all geometry attributes except the ones specifically
+				// listed in the spec; non-spec attributes are considered custom.
+				var validVertexAttributes = [
+					/^POSITION$/,
+					/^NORMAL$/,
+					/^TANGENT$/,
+					/^TEXCOORD_\d+$/,
+					/^COLOR_\d+$/,
+					/^JOINTS_\d+$/,
+					/^WEIGHTS_\d+$/,
+				];
+
+				var isValidAttribute = false;
+				for (var i = 0; i < validVertexAttributes.length; i++) {
+					if (validVertexAttributes[i].test(attributeName)) {
+						isValidAttribute = true;
+						break;
+					}
+				}
+				if (!isValidAttribute) {
+					console.log(`Prefixing ${attributeName}`)
+					attributeName = '_' + attributeName
+				}
+
 				if ( cachedData.attributes.has( attribute ) ) {
 
 					attributes[ attributeName ] = cachedData.attributes.get( attribute );
