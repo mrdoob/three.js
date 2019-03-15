@@ -321,31 +321,30 @@ Sidebar.Object = function ( editor ) {
 	cameraViewRow.add( new UI.Text(strings.getKey( 'sidebar/object/view' )).setWidth('90px'));
 
 	var cameraViewCheckbox = new UI.Checkbox(false).onChange(update).onClick(function() {
-		var camera = editor.selected;
-		if(camera.isCamera !== true) return;
+		var object = editor.selected;
+		if(object.isCamera !== true) return;
 
-		if(sceneCameras.indexOf(camera) === -1)
+		if(sceneCameras.indexOf(object) === -1)
 		{
-			sceneCameras.push(camera);
+			if(sceneCameras.length === 4)
+			{
+				alert("Only 4 scene cameras can be shown at once.");
+				cameraViewCheckbox.setValue(false);
+				return;
+			}
+
+			sceneCameras.push(object);
 			cameraViewCheckbox.setValue(true);
 		}
 		else
 		{
-			sceneCameras.splice(sceneCameras.indexOf(camera), 1);
+			sceneCameras.splice(sceneCameras.indexOf(object), 1);
 			cameraViewCheckbox.setValue(false);
 		}
 
-		signals.cameraChanged.dispatch();
+		signals.sceneGraphChanged.dispatch();
 	});
 	cameraViewRow.add( cameraViewCheckbox );
-
-	signals.cameraChanged.add(function() {
-		var camera = editor.selected;
-		if(camera.isCamera !== true) return;
-
-		cameraViewCheckbox.setValue(sceneCameras.indexOf(camera) !== -1);
-	});
-
 
 	//
 

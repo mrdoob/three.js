@@ -314,6 +314,7 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
+		renderer.setScissorTest(true);
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -331,16 +332,6 @@ var Viewport = function ( editor ) {
 
 	signals.cameraChanged.add( function () {
 
-		if(sceneCameras.length >= 4)
-		{
-			alert("Only 4 different cameras can be shown at once.");
-			while(sceneCameras.length >= 4)
-			{
-				sceneCameras.pop();
-			}
-			signals.cameraChanged.dispatch();
-			return;
-		}
 		render();
 
 	} );
@@ -555,32 +546,34 @@ var Viewport = function ( editor ) {
 	requestAnimationFrame( animate );
 
 	//
+	var viewport = new THREE.Vector4();
 
 	function render() {
 
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		// handle update to 3 cameras in the scene camera list
-		var width = window.innerWidth;
-		var height = window.innerHeight;
-		var v = new THREE.Vector4(0, 0, width, height);
+		var width = container.dom.offsetWidth;
+		var height = container.dom.offsetHeight;
 		
-		renderScene(camera, v, true);
+		viewport.set(0, 0, width, height);
+		renderScene(camera, viewport, true);
+
 		for(var i = 0; i < sceneCameras.length; ++i) {
-			v.set(0, height * 0.25 * i, width * 0.25, height * 0.5);
-			renderScene(sceneCameras[i], v);
+			viewport.set(0, height * 0.25 * i, width * 0.25, height * 0.25);
+			renderScene(sceneCameras[i], viewport);
 		}
 	}
 
-	function renderScene(camera, viewport, showHelpers)
+	function renderScene(cam, viewport, showHelpers)
 	{
-		renderer.setViewport(viewport.x, viewport.y, viewport.z, viewport.w);
-		renderer.render( scene, camera );
+		renderer.setViewport(viewport);
+		renderer.setScissor(viewport);
+		renderer.render( scene, cam );
 
 		if ( showHelpers === true && renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			renderer.render( sceneHelpers, camera );
+			renderer.render( sceneHelpers, cam );
 
 		}
 	}
