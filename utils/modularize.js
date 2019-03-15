@@ -41,7 +41,7 @@ function convert( path, ignoreList ) {
 
 	// imports
 
-	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match, p1 ) {
+	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
 
 		return `${match}\n\n_IMPORTS_`;
 
