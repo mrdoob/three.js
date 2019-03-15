@@ -59,36 +59,26 @@ var PATH_PROPERTIES = {
 // GLTF Exporter
 //------------------------------------------------------------------------------
 import {
-	AnimationClip,
 	BufferAttribute,
 	BufferGeometry,
-	Camera,
 	ClampToEdgeWrapping,
 	DoubleSide,
-	Geometry,
 	InterpolateDiscrete,
 	LinearFilter,
 	LinearMipMapLinearFilter,
 	LinearMipMapNearestFilter,
-	Material,
-	Math,
-	Mesh,
+	Math as _Math,
 	MirroredRepeatWrapping,
 	NearestFilter,
 	NearestMipMapLinearFilter,
 	NearestMipMapNearestFilter,
-	Object3D,
 	PropertyBinding,
 	RGBAFormat,
-	RGBFormat,
 	RepeatWrapping,
 	Scene,
-	Scenes,
-	ShaderMaterial,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
-	Vector3,
-	VertexColors
+	Vector3
 } from "../../../build/three.module.js";
 
 var GLTFExporter = function () {};
@@ -99,7 +89,7 @@ GLTFExporter.prototype = {
 
 	/**
 	 * Parse scenes and generate GLTF output
-	 * @param  {Scene or [Scenes]} input   Scene or Array of Scenes
+	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 */
@@ -244,7 +234,7 @@ GLTFExporter.prototype = {
 		 */
 		function isPowerOfTwo( image ) {
 
-			return Math.isPowerOfTwo( image.width ) && Math.isPowerOfTwo( image.height );
+			return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
 
 		}
 
@@ -373,7 +363,7 @@ GLTFExporter.prototype = {
 		/**
 		 * Serializes a userData.
 		 *
-		 * @param {Object3D|Material} object
+		 * @param {THREE.Object3D|THREE.Material} object
 		 * @param {Object} gltfProperty
 		 */
 		function serializeUserData( object, gltfProperty ) {
@@ -736,7 +726,7 @@ GLTFExporter.prototype = {
 		/**
 		 * Process image
 		 * @param  {Image} image to process
-		 * @param  {Integer} format of the image (e.g. RGBFormat, RGBAFormat etc)
+		 * @param  {Integer} format of the image (e.g. THREE.RGBFormat, RGBAFormat etc)
 		 * @param  {Boolean} flipY before writing out the image
 		 * @return {Integer}     Index of the processed texture in the "images" array
 		 */
@@ -777,8 +767,8 @@ GLTFExporter.prototype = {
 
 					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
-					canvas.width = Math.floorPowerOfTwo( canvas.width );
-					canvas.height = Math.floorPowerOfTwo( canvas.height );
+					canvas.width = _Math.floorPowerOfTwo( canvas.width );
+					canvas.height = _Math.floorPowerOfTwo( canvas.height );
 
 				}
 
@@ -897,7 +887,7 @@ GLTFExporter.prototype = {
 
 		/**
 		 * Process material
-		 * @param  {Material} material Material to process
+		 * @param  {THREE.Material} material Material to process
 		 * @return {Integer}      Index of the processed material in the "materials" array
 		 */
 		function processMaterial( material ) {
@@ -916,7 +906,7 @@ GLTFExporter.prototype = {
 
 			if ( material.isShaderMaterial ) {
 
-				console.warn( 'GLTFExporter: ShaderMaterial not supported.' );
+				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;
 
 			}
@@ -1101,7 +1091,7 @@ GLTFExporter.prototype = {
 
 		/**
 		 * Process mesh
-		 * @param  {Mesh} mesh Mesh to process
+		 * @param  {THREE.Mesh} mesh Mesh to process
 		 * @return {Integer}      Index of the processed mesh in the "meshes" array
 		 */
 		function processMesh( mesh ) {
@@ -1138,7 +1128,7 @@ GLTFExporter.prototype = {
 
 				if ( ! geometry.isBufferGeometry ) {
 
-					console.warn( 'GLTFExporter: Exporting Geometry will increase file size. Use BufferGeometry instead.' );
+					console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use BufferGeometry instead.' );
 
 					var geometryTemp = new BufferGeometry();
 					geometryTemp.fromGeometry( geometry );
@@ -1190,7 +1180,7 @@ GLTFExporter.prototype = {
 
 			}
 
-			// @QUESTION Detect if .vertexColors = VertexColors?
+			// @QUESTION Detect if .vertexColors = THREE.VertexColors?
 			// For every attribute create an accessor
 			var modifiedAttribute = null;
 			for ( var attributeName in geometry.attributes ) {
@@ -1432,7 +1422,7 @@ GLTFExporter.prototype = {
 
 		/**
 		 * Process camera
-		 * @param  {Camera} camera Camera to process
+		 * @param  {THREE.Camera} camera Camera to process
 		 * @return {Integer}      Index of the processed mesh in the "camera" array
 		 */
 		function processCamera( camera ) {
@@ -1467,7 +1457,7 @@ GLTFExporter.prototype = {
 				gltfCamera.perspective = {
 
 					aspectRatio: camera.aspect,
-					yfov: Math.degToRad( camera.fov ),
+					yfov: _Math.degToRad( camera.fov ),
 					zfar: camera.far <= 0 ? 0.001 : camera.far,
 					znear: camera.near < 0 ? 0 : camera.near
 
@@ -1493,8 +1483,8 @@ GLTFExporter.prototype = {
 		 * Status:
 		 * - Only properties listed in PATH_PROPERTIES may be animated.
 		 *
-		 * @param {AnimationClip} clip
-		 * @param {Object3D} root
+		 * @param {THREE.AnimationClip} clip
+		 * @param {THREE.Object3D} root
 		 * @return {number}
 		 */
 		function processAnimation( clip, root ) {
@@ -1701,7 +1691,7 @@ GLTFExporter.prototype = {
 
 		/**
 		 * Process Object3D node
-		 * @param  {Object3D} node Object3D to processNode
+		 * @param  {THREE.Object3D} node Object3D to processNode
 		 * @return {Integer}      Index of the node in the nodes list
 		 */
 		function processNode( object ) {
