@@ -18,28 +18,30 @@ Sidebar.Settings.Viewport = function ( editor ) {
 
 	container.add( new UI.Text( strings.getKey( 'sidebar/settings/viewport/view' ) ).setWidth( '90px' ) );
 
-	var sceneViewOptions = new UI.Select().setOptions({
-		left : 'left',
-		right : 'right',
-		top : 'top',
-		bottom : 'bottom'
-	});
+	var sceneViewOptions = new UI.Select().setOptions( {
+		left: 'left',
+		right: 'right',
+		top: 'top',
+		bottom: 'bottom'
+	} );
 
-	if(config.getKey('sceneView') !== undefined)
-	{
-		sceneViewOptions.setValue(config.getKey('sceneView'));
+	if ( config.getKey( 'sceneCameraView' ) !== undefined ) {
+
+		sceneViewOptions.setValue( config.getKey( 'sceneCameraView' ) );
+
+	} else {
+
+		sceneViewOptions.setValue( 'left' );
+
 	}
-	else
-	{
-		sceneViewOptions.setValue('left');
-	}
-	
-	sceneViewOptions.onChange(function()
-	{
-		config.setKey('sceneView', sceneViewOptions.getValue());
+
+	sceneViewOptions.onChange( function () {
+
+		config.setKey( 'sceneCameraView', sceneViewOptions.getValue() );
 		signals.sceneGraphChanged.dispatch();
-	});
-	container.add(sceneViewOptions);
+
+	} );
+	container.add( sceneViewOptions );
 
 	/*
 	var snapSize = new UI.Number( 25 ).setWidth( '40px' ).onChange( update );

@@ -6,7 +6,7 @@ var Storage = function () {
 
 	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
-	if ( indexedDB === undefined  ) {
+	if ( indexedDB === undefined ) {
 
 		console.warn( 'Storage: IndexedDB not available.' );
 		return { init: function () {}, get: function () {}, set: function () {}, clear: function () {} };

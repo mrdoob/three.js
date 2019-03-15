@@ -318,32 +318,36 @@ Sidebar.Object = function ( editor ) {
 	var cameraViewRow = new UI.Row().setDisplay( editor.selected !== null && editor.selected.isCamera ? 'block' : 'none' );
 	container.add( cameraViewRow );
 
-	cameraViewRow.add( new UI.Text(strings.getKey( 'sidebar/object/view' )).setWidth('90px'));
+	cameraViewRow.add( new UI.Text( strings.getKey( 'sidebar/object/view' ) ).setWidth( '90px' ) );
 
-	var cameraViewCheckbox = new UI.Checkbox(false).onChange(update).onClick(function() {
+	var cameraViewCheckbox = new UI.Checkbox( false ).onChange( update ).onClick( function () {
+
 		var object = editor.selected;
-		if(object.isCamera !== true) return;
+		if ( object.isCamera !== true ) return;
 
-		if(sceneCameras.indexOf(object) === -1)
-		{
-			if(sceneCameras.length === 4)
-			{
-				alert("Only 4 scene cameras can be shown at once.");
-				cameraViewCheckbox.setValue(false);
+		if ( sceneCameras.indexOf( object ) === - 1 ) {
+
+			if ( sceneCameras.length === 4 ) {
+
+				alert( "Only 4 scene cameras can be shown at once." );
+				cameraViewCheckbox.setValue( false );
 				return;
+
 			}
 
-			sceneCameras.push(object);
-			cameraViewCheckbox.setValue(true);
-		}
-		else
-		{
-			sceneCameras.splice(sceneCameras.indexOf(object), 1);
-			cameraViewCheckbox.setValue(false);
+			sceneCameras.push( object );
+			cameraViewCheckbox.setValue( true );
+
+		} else {
+
+			sceneCameras.splice( sceneCameras.indexOf( object ), 1 );
+			cameraViewCheckbox.setValue( false );
+
 		}
 
 		signals.sceneGraphChanged.dispatch();
-	});
+
+	} );
 	cameraViewRow.add( cameraViewCheckbox );
 
 	//
@@ -722,14 +726,15 @@ Sidebar.Object = function ( editor ) {
 
 		}
 
-		if(object.isCamera === true) {
+		if ( object.isCamera === true ) {
 
-			cameraViewRow.setDisplay('block');
-			cameraViewCheckbox.setValue(sceneCameras.indexOf(object) !== -1)
+			cameraViewRow.setDisplay( 'block' );
+			cameraViewCheckbox.setValue( sceneCameras.indexOf( object ) !== - 1 );
 
-		}
-		else {
-			cameraViewRow.setDisplay('none');
+		} else {
+
+			cameraViewRow.setDisplay( 'none' );
+
 		}
 
 		objectVisible.setValue( object.visible );

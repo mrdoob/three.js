@@ -315,7 +315,7 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.setScissorTest(true);
+		renderer.setScissorTest( true );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -556,46 +556,56 @@ var Viewport = function ( editor ) {
 
 		var width = container.dom.offsetWidth;
 		var height = container.dom.offsetHeight;
-		
-		viewport.set(0, 0, width, height);
-		renderScene(camera, viewport, true);
 
-		switch(config.getKey('sceneView'))
-		{
+		viewport.set( 0, 0, width, height );
+		renderScene( camera, viewport, true );
+
+		switch ( config.getKey( 'sceneCameraView' ) ) {
+
 			case 'left':
-				for(var i = 0; i < sceneCameras.length; ++i) {
-					viewport.set(0, height * 0.25 * i, width * 0.25, height * 0.25);
-					renderScene(sceneCameras[i], viewport);
+				for ( var i = 0; i < sceneCameras.length; ++ i ) {
+
+					viewport.set( 0, height * 0.25 * i, width * 0.25, height * 0.25 );
+					renderScene( sceneCameras[ i ], viewport );
+
 				}
 				break;
 			case 'right':
-				for(var i = 0; i < sceneCameras.length; ++i) {
-					viewport.set(width * 0.75, height * 0.25 * i, width * 0.25, height * 0.25);
-					renderScene(sceneCameras[i], viewport);
+				for ( var i = 0; i < sceneCameras.length; ++ i ) {
+
+					viewport.set( width * 0.75, height * 0.25 * i, width * 0.25, height * 0.25 );
+					renderScene( sceneCameras[ i ], viewport );
+
 				}
 				break;
 			case 'bottom':
-				for(var i = 0; i < sceneCameras.length; ++i) {
-					viewport.set(width * 0.25 * i, 0, width * 0.25, height * 0.25);
-					renderScene(sceneCameras[i], viewport);
+				for ( var i = 0; i < sceneCameras.length; ++ i ) {
+
+					viewport.set( width * 0.25 * i, 0, width * 0.25, height * 0.25 );
+					renderScene( sceneCameras[ i ], viewport );
+
 				}
 				break;
 			case 'top':
-				for(var i = 0; i < sceneCameras.length; ++i) {
-					viewport.set(width * 0.25 * i, height * 0.75, width * 0.25, height * 0.25);
-					renderScene(sceneCameras[i], viewport);
+				for ( var i = 0; i < sceneCameras.length; ++ i ) {
+
+					viewport.set( width * 0.25 * i, height * 0.75, width * 0.25, height * 0.25 );
+					renderScene( sceneCameras[ i ], viewport );
+
 				}
 				break;
 			default:
-				console.error("Unknown scene view type: " + config.getKey("sceneView"));
+				console.error( "Unknown scene view type: " + config.getKey( "sceneCameraView" ) );
 				break;
+
 		}
+
 	}
 
-	function renderScene(cam, viewport, showHelpers)
-	{
-		renderer.setViewport(viewport);
-		renderer.setScissor(viewport);
+	function renderScene( cam, viewport, showHelpers ) {
+
+		renderer.setViewport( viewport );
+		renderer.setScissor( viewport );
 		renderer.render( scene, cam );
 
 		if ( showHelpers === true && renderer instanceof THREE.RaytracingRenderer === false ) {
@@ -603,6 +613,7 @@ var Viewport = function ( editor ) {
 			renderer.render( sceneHelpers, cam );
 
 		}
+
 	}
 
 	return container;
