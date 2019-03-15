@@ -491,13 +491,18 @@
 						uniformsTerrain[ 'uOffset' ].value.x = 4 * uniformsNoise[ 'offset' ].value.x;
 
 						quadTarget.material = mlib[ 'heightmap' ];
-						renderer.render( sceneRenderTarget, cameraOrtho, heightMap, true );
+						renderer.setRenderTarget( heightMap );
+						renderer.clear();
+						renderer.render( sceneRenderTarget, cameraOrtho );
 
 						quadTarget.material = mlib[ 'normal' ];
-						renderer.render( sceneRenderTarget, cameraOrtho, normalMap, true );
+						renderer.setRenderTarget( normalMap );
+						renderer.clear();
+						renderer.render( sceneRenderTarget, cameraOrtho );
 
 					}
 
+					renderer.setRenderTarget( null );
 					renderer.render( scene, camera );
 
 				}

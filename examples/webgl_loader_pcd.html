@@ -97,10 +97,10 @@
 				document.body.appendChild( renderer.domElement );
 
 				var loader = new THREE.PCDLoader();
-				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( mesh ) {
+				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( points ) {
 
-					scene.add( mesh );
-					var center = mesh.geometry.boundingSphere.center;
+					scene.add( points );
+					var center = points.geometry.boundingSphere.center;
 					controls.target.set( center.x, center.y, center.z );
 					controls.update();
 
@@ -130,23 +130,23 @@
 
 			function keyboard( ev ) {
 
-				var ZaghettoMesh = scene.getObjectByName( 'Zaghetto.pcd' );
+				var points = scene.getObjectByName( 'Zaghetto.pcd' );
 
 				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
 
 					case '+':
-						ZaghettoMesh.material.size *= 1.2;
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.size *= 1.2;
+						points.material.needsUpdate = true;
 						break;
 
 					case '-':
-						ZaghettoMesh.material.size /= 1.2;
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.size /= 1.2;
+						points.material.needsUpdate = true;
 						break;
 
 					case 'c':
-						ZaghettoMesh.material.color.setHex( Math.random() * 0xffffff );
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.color.setHex( Math.random() * 0xffffff );
+						points.material.needsUpdate = true;
 						break;
 
 				}

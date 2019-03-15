@@ -12,7 +12,7 @@ function TimerNode( scale, scope, timeScale ) {
 	this.scale = scale !== undefined ? scale : 1;
 	this.scope = scope || TimerNode.GLOBAL;
 
-	this.timeScale = timeScale !== undefined ? timeScale : this.scale !== 1;
+	this.timeScale = timeScale !== undefined ? timeScale : scale !== undefined;
 
 }
 
@@ -24,7 +24,7 @@ TimerNode.prototype = Object.create( FloatNode.prototype );
 TimerNode.prototype.constructor = TimerNode;
 TimerNode.prototype.nodeType = "Timer";
 
-TimerNode.prototype.isReadonly = function () {
+TimerNode.prototype.getReadonly = function () {
 
 	// never use TimerNode as readonly but aways as "uniform"
 
@@ -32,7 +32,7 @@ TimerNode.prototype.isReadonly = function () {
 
 };
 
-TimerNode.prototype.isUnique = function () {
+TimerNode.prototype.getUnique = function () {
 
 	// share TimerNode "uniform" input if is used on more time with others TimerNode
 
