@@ -379,7 +379,7 @@ function WebVRManager( renderer ) {
 
 		animation.setAnimationLoop( callback );
 
-		if ( isPresenting() ) { animation.start(); }
+		if ( isPresenting() ) animation.start();
 
 	};
 
