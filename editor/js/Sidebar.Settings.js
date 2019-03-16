@@ -74,41 +74,48 @@ Sidebar.Settings = function ( editor ) {
 
 	container.add( themeRow );
 
-	var sceneCameraRow = new UI.Row();
-	container.add(sceneCameraRow);
+	// scene camera position
 
-	var sceneCameraSelection = new UI.Select().setWidth('150px');
-	sceneCameraSelection.setOptions({
+	var sceneCameraRow = new UI.Row();
+	container.add( sceneCameraRow );
+
+	var sceneCameraSelection = new UI.Select().setWidth( '150px' );
+	sceneCameraSelection.setOptions( {
 		topLeft: 'Top Left',
 		bottomLeft: 'Bottom Left',
 		topRight: 'Top Right',
 		bottomRight: 'Bottom Right'
-	});
+	} );
 
-	if(config.getKey('project/renderer/sceneCameras') !== undefined)
-	{
-		sceneCameraSelection.setValue(config.getKey('project/renderer/sceneCameras'));
+	if ( config.getKey( 'project/renderer/sceneCameras' ) !== undefined ) {
+
+		sceneCameraSelection.setValue( config.getKey( 'project/renderer/sceneCameras' ) );
+
 	}
 
-	sceneCameraSelection.onChange(function()
-	{
-		config.setKey('project/renderer/sceneCameras', this.getValue());
-		signals.sceneCamerasChanged.dispatch();
-	});
+	sceneCameraSelection.onChange( function () {
 
-	sceneCameraRow.add(new UI.Text(strings.getKey('sidebar/settings/sceneCameras')).setWidth('90px'), sceneCameraSelection);
+		config.setKey( 'project/renderer/sceneCameras', this.getValue() );
+		signals.sceneCamerasChanged.dispatch();
+
+	} );
+
+	sceneCameraRow.add( new UI.Text( strings.getKey( 'sidebar/settings/sceneCameras' ) ).setWidth( '90px' ), sceneCameraSelection );
+
+	// scene camera visible
 
 	var sceneShowCameraRow = new UI.Row();
-	container.add(sceneShowCameraRow);
-	
-	var sceneCameraCheckbox = new UI.Checkbox(true).onChange(function()
-	{
-		config.setKey('project/renderer/showSceneCameras', this.getValue());
-		signals.sceneCamerasChanged.dispatch();
-	});
+	container.add( sceneShowCameraRow );
 
-	sceneShowCameraRow.add(new UI.Text(strings.getKey('sidebar/settings/showSceneCameras')).setWidth('90px'), sceneCameraCheckbox);
-	
+	var sceneCameraCheckbox = new UI.Checkbox( true ).onChange( function () {
+
+		config.setKey( 'project/renderer/showSceneCameras', this.getValue() );
+		signals.sceneCamerasChanged.dispatch();
+
+	} );
+
+	sceneShowCameraRow.add( new UI.Text( strings.getKey( 'sidebar/settings/showSceneCameras' ) ).setWidth( '90px' ), sceneCameraCheckbox );
+
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
 	container.add( new Sidebar.Settings.Viewport( editor ) );
 
