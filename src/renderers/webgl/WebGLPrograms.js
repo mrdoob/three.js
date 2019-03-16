@@ -202,6 +202,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			physicallyCorrectLights: renderer.physicallyCorrectLights,
 
 			premultipliedAlpha: material.premultipliedAlpha,
+			ditherTransparency: material.ditherTransparency,
 
 			alphaTest: material.alphaTest,
 			doubleSided: material.side === DoubleSide,

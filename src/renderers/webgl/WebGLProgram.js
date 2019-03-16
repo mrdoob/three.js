@@ -489,6 +489,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
 
 			parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '',
+			parameters.ditherTransparency ? '#define DITHER_TRANSPARENCY' : '',
 
 			parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
 
