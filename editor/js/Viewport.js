@@ -137,17 +137,15 @@ var Viewport = function ( editor ) {
 
 	// Displaying scene cameras
 
-	var cameras = {};
+	var cameras = {
+		[ camera.uuid ]: 'Main Camera'
+	};
 
 	var sceneCameraDisplay = new UI.Row();
 	sceneCameraDisplay.setId( 'cameraSelect' );
 	sceneCameraDisplay.dom.setAttribute( 'layout', config.getKey( 'project/renderer/sceneCameras' ) || 'topLeft' );
 	sceneCameraDisplay.setDisplay( 'none' );
 	document.body.appendChild( sceneCameraDisplay.dom );
-
-	var canvas = document.createElement( 'canvas' );
-	sceneCameraDisplay.dom.appendChild( canvas );
-	var ctx = canvas.getContext( '2d' );
 
 	var cameraSelect = new UI.Select().onChange( render );
 	sceneCameraDisplay.add( cameraSelect );
@@ -618,24 +616,24 @@ var Viewport = function ( editor ) {
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
+		var cam = camera;
+
 		if ( sceneCameraDisplay.dom.style.display != 'none' ) {
 
-			var cam = scene.getObjectByProperty( 'uuid', cameraSelect.getValue() );
-			if ( cam !== undefined && cam.isCamera === true ) {
+			var sceneCamera = scene.getObjectByProperty( 'uuid', cameraSelect.getValue() );
+			if ( sceneCamera !== undefined && sceneCamera.isCamera === true ) {
 
-				renderer.render( scene, cam );
-				var dom = renderer.domElement;
-				ctx.drawImage( dom, 0, 0, dom.width, dom.height, 0, 0, canvas.width, canvas.height );
+				cam = sceneCamera;
 
 			}
 
 		}
 
-		renderer.render( scene, camera );
+		renderer.render( scene, cam );
 
 		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			renderer.render( sceneHelpers, camera );
+			renderer.render( sceneHelpers, cam );
 
 		}
 

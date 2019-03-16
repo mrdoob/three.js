@@ -228,8 +228,9 @@ select {
 #cameraSelect {
 	position: absolute;
 	z-index: 10;
+	padding: 10px;
 }
-
+	
 	#cameraSelect * {
 		width: 100%;
 	}
@@ -250,6 +251,7 @@ select {
 	#cameraSelect[layout='bottomLeft']{
 		bottom: 0;
 		left: 0;
+		padding-bottom: 60px;
 	}
 
 	#cameraSelect[layout='bottomRight']{ 
