@@ -91,6 +91,10 @@ select {
 		padding-right: 8px;
 	}
 
+	#menubar .menu * {
+		z-index: 2;
+	}
+
 	#menubar .menu.right {
 		float: right;
 		cursor: auto;
@@ -220,7 +224,7 @@ select {
 
 #cameraSelect {
 	position: absolute;
-	z-index: 10;
+	z-index: 1;
 	padding: 10px;
 }
 	

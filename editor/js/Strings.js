@@ -244,8 +244,8 @@ var Strings = function ( config ) {
 			'sidebar/settings/theme': 'Theme',
 			'sidebar/settings/theme/light': 'light',
 			'sidebar/settings/theme/dark': 'dark',
-			'sidebar/settings/sceneCameras': 'Scene Cameras',
-			'sidebar/settings/showSceneCameras': 'Show Scene Cameras',
+			'sidebar/settings/sceneCameras': 'Camera Select Menu',
+			'sidebar/settings/showSceneCameras': 'Show Camera Select Menu',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
