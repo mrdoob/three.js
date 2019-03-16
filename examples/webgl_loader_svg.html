@@ -153,7 +153,9 @@
 				//
 
 				var loader = new THREE.SVGLoader();
-				loader.load( url, function ( paths ) {
+				loader.load( url, function ( data ) {
+
+					var paths = data.paths;
 
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.25 );
@@ -161,9 +163,9 @@
 					group.position.y = 70;
 					group.scale.y *= - 1;
 
-					for ( key in paths['paths'] ) {
+					for ( var i = 0; i < paths.length; i ++ ) {
 
-						var path = paths['paths'][ key ];
+						var path = paths[ i ];
 
 						var material = new THREE.MeshBasicMaterial( {
 							color: path.color,
