@@ -27,7 +27,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		_MorphingFlag = 1,
 		_SkinningFlag = 2,
 
-		_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
+		// _MorphingFlag, _SkinningFlag, 16 opacity bins
+		_NumberOfMaterialVariants = 2 * 2 * 16,
 
 		_depthMaterials = new Array( _NumberOfMaterialVariants ),
 		_distanceMaterials = new Array( _NumberOfMaterialVariants ),
@@ -57,13 +58,15 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
 		var useSkinning = ( i & _SkinningFlag ) !== 0;
+		var opacity = ( ( i & ( 16 << 2 ) ) >> 2 ) / 16;
 
 		var depthMaterial = new MeshDepthMaterial( {
 
 			depthPacking: RGBADepthPacking,
 
 			morphTargets: useMorphing,
-			skinning: useSkinning
+			skinning: useSkinning,
+			opacity: opacity
 
 		} );
 
@@ -74,7 +77,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		var distanceMaterial = new MeshDistanceMaterial( {
 
 			morphTargets: useMorphing,
-			skinning: useSkinning
+			skinning: useSkinning,
+			opacity: opacity
 
 		} );
 
@@ -92,6 +96,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	this.needsUpdate = false;
 
 	this.type = PCFShadowMap;
+	this.dithering = false;
 
 	this.render = function ( lights, scene, camera ) {
 
@@ -308,6 +313,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			if ( useMorphing ) variantIndex |= _MorphingFlag;
 			if ( useSkinning ) variantIndex |= _SkinningFlag;
+			if ( this.dithering ) variantIndex |= Math.floor( material.opacity * 16 ) << 2;
+			else variantIndex |= 16 << 2;
 
 			result = materialVariants[ variantIndex ];
 
@@ -359,6 +366,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
+
+		result.ditherTransparency = this.dithering;
 
 		if ( isPointLight && result.isMeshDistanceMaterial ) {
 
