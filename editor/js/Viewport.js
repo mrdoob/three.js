@@ -5,9 +5,6 @@
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
-	var config = editor.config;
-
-	var sceneCameras = editor.sceneCameras;
 
 	var container = new UI.Panel();
 	container.setId( 'viewport' );
@@ -315,7 +312,6 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.setScissorTest( true );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -547,70 +543,17 @@ var Viewport = function ( editor ) {
 	requestAnimationFrame( animate );
 
 	//
-	var viewport = new THREE.Vector4();
 
 	function render() {
 
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		var width = container.dom.offsetWidth;
-		var height = container.dom.offsetHeight;
+		renderer.render( scene, camera );
 
-		viewport.set( 0, 0, width, height );
-		renderScene( camera, viewport, true );
+		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-		switch ( config.getKey( 'sceneCameraView' ) ) {
-
-			case 'left':
-				for ( var i = 0; i < sceneCameras.length; ++ i ) {
-
-					viewport.set( 0, height * 0.25 * i, width * 0.25, height * 0.25 );
-					renderScene( sceneCameras[ i ], viewport );
-
-				}
-				break;
-			case 'right':
-				for ( var i = 0; i < sceneCameras.length; ++ i ) {
-
-					viewport.set( width * 0.75, height * 0.25 * i, width * 0.25, height * 0.25 );
-					renderScene( sceneCameras[ i ], viewport );
-
-				}
-				break;
-			case 'bottom':
-				for ( var i = 0; i < sceneCameras.length; ++ i ) {
-
-					viewport.set( width * 0.25 * i, 0, width * 0.25, height * 0.25 );
-					renderScene( sceneCameras[ i ], viewport );
-
-				}
-				break;
-			case 'top':
-				for ( var i = 0; i < sceneCameras.length; ++ i ) {
-
-					viewport.set( width * 0.25 * i, height * 0.75, width * 0.25, height * 0.25 );
-					renderScene( sceneCameras[ i ], viewport );
-
-				}
-				break;
-			default:
-				console.error( "Unknown scene view type: " + config.getKey( "sceneCameraView" ) );
-				break;
-
-		}
-
-	}
-
-	function renderScene( cam, viewport, showHelpers ) {
-
-		renderer.setViewport( viewport );
-		renderer.setScissor( viewport );
-		renderer.render( scene, cam );
-
-		if ( showHelpers === true && renderer instanceof THREE.RaytracingRenderer === false ) {
-
-			renderer.render( sceneHelpers, cam );
+			renderer.render( sceneHelpers, camera );
 
 		}
 

@@ -80,7 +80,6 @@ var Editor = function () {
 	this.loader = new Loader( this );
 
 	this.camera = this.DEFAULT_CAMERA.clone();
-	this.sceneCameras = [];
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';

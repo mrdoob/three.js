@@ -97,7 +97,6 @@ var Strings = function ( config ) {
 			'sidebar/object/frustumcull': 'Frustum Cull',
 			'sidebar/object/renderorder': 'Render Order',
 			'sidebar/object/userdata': 'User data',
-			'sidebar/object/view': 'Show View',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'New',
@@ -253,7 +252,6 @@ var Strings = function ( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grid',
-			'sidebar/settings/viewport/view': 'Cameras',
 
 			'sidebar/history/history': 'HISTORY',
 			'sidebar/history/persistent': 'persistent',

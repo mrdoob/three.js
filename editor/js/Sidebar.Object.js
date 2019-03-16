@@ -8,8 +8,6 @@ Sidebar.Object = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var sceneCameras = editor.sceneCameras;
-
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
@@ -314,41 +312,6 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectUserDataRow );
 
-	// view from camera
-	var cameraViewRow = new UI.Row().setDisplay( editor.selected !== null && editor.selected.isCamera ? 'block' : 'none' );
-	container.add( cameraViewRow );
-
-	cameraViewRow.add( new UI.Text( strings.getKey( 'sidebar/object/view' ) ).setWidth( '90px' ) );
-
-	var cameraViewCheckbox = new UI.Checkbox( false ).onChange( update ).onClick( function () {
-
-		var object = editor.selected;
-		if ( object.isCamera !== true ) return;
-
-		if ( sceneCameras.indexOf( object ) === - 1 ) {
-
-			if ( sceneCameras.length === 4 ) {
-
-				alert( "Only 4 scene cameras can be shown at once." );
-				cameraViewCheckbox.setValue( false );
-				return;
-
-			}
-
-			sceneCameras.push( object );
-			cameraViewCheckbox.setValue( true );
-
-		} else {
-
-			sceneCameras.splice( sceneCameras.indexOf( object ), 1 );
-			cameraViewCheckbox.setValue( false );
-
-		}
-
-		signals.sceneGraphChanged.dispatch();
-
-	} );
-	cameraViewRow.add( cameraViewCheckbox );
 
 	//
 
@@ -560,12 +523,12 @@ Sidebar.Object = function ( editor ) {
 			'intensity': objectIntensityRow,
 			'color': objectColorRow,
 			'groundColor': objectGroundColorRow,
-			'distance': objectDistanceRow,
-			'angle': objectAngleRow,
-			'penumbra': objectPenumbraRow,
-			'decay': objectDecayRow,
-			'castShadow': objectShadowRow,
-			'receiveShadow': objectReceiveShadow,
+			'distance' : objectDistanceRow,
+			'angle' : objectAngleRow,
+			'penumbra' : objectPenumbraRow,
+			'decay' : objectDecayRow,
+			'castShadow' : objectShadowRow,
+			'receiveShadow' : objectReceiveShadow,
 			'shadow': objectShadowRadius
 		};
 
@@ -723,17 +686,6 @@ Sidebar.Object = function ( editor ) {
 		if ( object.shadow !== undefined ) {
 
 			objectShadowRadius.setValue( object.shadow.radius );
-
-		}
-
-		if ( object.isCamera === true ) {
-
-			cameraViewRow.setDisplay( 'block' );
-			cameraViewCheckbox.setValue( sceneCameras.indexOf( object ) !== - 1 );
-
-		} else {
-
-			cameraViewRow.setDisplay( 'none' );
 
 		}
 
