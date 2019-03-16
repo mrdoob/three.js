@@ -5,6 +5,7 @@
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
+	var config = editor.config;
 
 	var container = new UI.Panel();
 	container.setId( 'viewport' );
@@ -133,6 +134,65 @@ var Viewport = function ( editor ) {
 	} );
 
 	sceneHelpers.add( transformControls );
+
+	// Displaying scene cameras
+
+	var cameras = {};
+
+	var sceneCameraDisplay = new UI.Row();
+	sceneCameraDisplay.setId('cameraSelect');
+	sceneCameraDisplay.dom.setAttribute('layout', config.getKey('project/renderer/sceneCameras') || 'topLeft');
+	sceneCameraDisplay.setDisplay('none');
+	document.body.appendChild(sceneCameraDisplay.dom);
+
+	var canvas = document.createElement('canvas');
+	sceneCameraDisplay.dom.appendChild(canvas);
+	var ctx = canvas.getContext('2d');
+
+    var cameraSelect = new UI.Select().onChange(render);
+	sceneCameraDisplay.add(cameraSelect);
+
+    signals.objectAdded.add(function(object)
+    {
+        if(object !== null)
+        {
+			object.traverse(addCamera);
+			cameraSelect.setOptions(cameras);
+			sceneCameraDisplay.setDisplay(config.getKey('project/renderer/showSceneCameras') === true && Object.keys(cameras).length > 0 ? 'block' : 'none');
+        }
+    });
+
+    signals.objectRemoved.add(function(object)
+    {
+        if(object !== null)
+        {
+			object.traverse(removeCamera);
+			cameraSelect.setOptions(cameras);
+            sceneCameraDisplay.setDisplay(config.getKey('project/renderer/showSceneCameras') === true && Object.keys(cameras).length > 0 ? 'block' : 'none');
+        }
+	});
+
+	signals.sceneCamerasChanged.add(function()
+	{
+		sceneCameraDisplay.dom.setAttribute('layout', config.getKey('project/renderer/sceneCameras') || 'topLeft');
+		sceneCameraDisplay.setDisplay(config.getKey('project/renderer/showSceneCameras') === true && Object.keys(cameras).length > 0 ? 'block' : 'none');
+	});
+	
+	function addCamera(object)
+	{
+		if(object.isCamera === true)
+		{
+			cameras[object.uuid] = object.name;
+		}
+	}
+
+	function removeCamera(object)
+	{
+		if(object.isCamera === true)
+		{
+			delete cameras[object.uuid];
+		}
+	}
 
 	// object picking
 
@@ -549,6 +609,17 @@ var Viewport = function ( editor ) {
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
+		if(sceneCameraDisplay.dom.style.display != 'none')
+		{
+			var cam = scene.getObjectByProperty('uuid', cameraSelect.getValue());
+			if(cam !== undefined && cam.isCamera === true)
+			{
+				renderer.render(scene, cam);
+				var dom = renderer.domElement;
+				ctx.drawImage(dom, 0, 0, dom.width, dom.height, 0, 0, canvas.width, canvas.height);
+			}
+		}
+
 		renderer.render( scene, camera );
 
 		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
@@ -556,7 +627,7 @@ var Viewport = function ( editor ) {
 			renderer.render( sceneHelpers, camera );
 
 		}
-
+		
 	}
 
 	return container;
