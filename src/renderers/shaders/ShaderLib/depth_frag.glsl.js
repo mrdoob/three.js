@@ -1,5 +1,5 @@
 export default /* glsl */`
-#if DEPTH_PACKING == 3200
+#if DEPTH_PACKING == 3200 || defined(DITHER_TRANSPARENCY)
 
 	uniform float opacity;
 

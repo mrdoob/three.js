@@ -6,6 +6,10 @@ uniform float nearDistance;
 uniform float farDistance;
 varying vec3 vWorldPosition;
 
+#ifdef DITHER_TRANSPARENCY
+uniform float opacity;
+#endif
+
 #include <common>
 #include <packing>
 #include <uv_pars_fragment>
