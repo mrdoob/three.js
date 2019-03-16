@@ -12,10 +12,12 @@ export default /* glsl */`
 #include <alphamap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
+#include <dither_transparency_pars_fragment>
 
 void main() {
 
 	#include <clipping_planes_fragment>
+	#include <dither_transparency_fragment>
 
 	vec4 diffuseColor = vec4( 1.0 );
 
