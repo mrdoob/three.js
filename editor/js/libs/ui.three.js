@@ -623,7 +623,7 @@ UI.Points.prototype.getValue = function () {
 
 		} else {
 
-			points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue() ) );
+			points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
 
 		}
 		++ count;
