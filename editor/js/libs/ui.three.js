@@ -505,6 +505,7 @@ UI.Points = function ( editor ) {
 		if ( scene.visible ) {
 
 			scope.editButton.dom.setAttribute( 'editing', '' );
+			scope.editButton.dom.textContent = 'DONE';
 			scene.children.length = 0;
 
 			var points = scope.getValue();
@@ -554,6 +555,7 @@ UI.Points = function ( editor ) {
 		} else {
 
 			scope.editButton.dom.removeAttribute( 'editing' );
+			scope.editButton.dom.textContent = 'EDIT';
 			scope.drag.dispose();
 
 		}
