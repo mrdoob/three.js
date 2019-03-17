@@ -15,6 +15,7 @@
 
 THREE.OrbitControls = function ( object, domElement ) {
 
+	this.panLimit= {maxX:1500,minX:1500,maxZ:1500,minZ:1500};
 	this.object = object;
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -170,6 +171,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			// move target to panned location
 			scope.target.add( panOffset );
+			
+			if(scope.target.x > this.panLimit.maxX)
+				scope.target.x = this.panLimit.maxX;
+
+			if(scope.target.x < -this.panLimit.minX)
+				scope.target.x = -this.panLimit.minX;
+
+			if(scope.target.z > this.panLimit.maxZ)
+				scope.target.z = this.panLimit.maxZ;
+
+			if(scope.target.z < -this.panLimit.minZ)
+				scope.target.z = -this.panLimit.minZ;
 
 			offset.setFromSpherical( spherical );
 
