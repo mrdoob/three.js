@@ -453,6 +453,153 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 };
 
+UI.Points = function()
+{
+	UI.Element.call( this );
+
+	var span = new UI.Span().setDisplay( 'inline-block' );
+
+	this.pointsList = new UI.Div();
+	span.add(this.pointsList);
+
+	var scope = this;
+	var addPointButton = new UI.Button( '+' ).onClick( function () {
+
+		if ( scope.pointsUI.length === 0 ) {
+
+			scope.pointsList.add( scope.createPointRow( 0, 0, 0 ) );
+
+		} else {
+
+			var point = scope.pointsUI[ scope.pointsUI.length - 1 ];
+
+			scope.pointsList.add( scope.createPointRow( point.x.getValue(), point.y.getValue(), point.z.getValue() ) );
+
+		}
+
+		scope.update();
+
+	} );
+	span.add( addPointButton );
+
+	this.update = function()
+	{
+		if(scope.onChangeCallback !== null)
+		{
+			scope.onChangeCallback();
+		}
+	}
+
+	this.dom = span.dom;
+	this.pointsUI = [];
+	this.lastPointIdx = 0;
+	this.onChangeCallback = null;
+	this.showZ = true;
+	return this;
+};
+
+UI.Points.prototype = Object.create( UI.Element.prototype );
+UI.Points.prototype.constructor = UI.Points;
+
+UI.Points.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+UI.Points.prototype.getValue = function()
+{
+	var points = [];
+	var count = 0;
+
+	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
+
+		var pointUI = this.pointsUI[ i ];
+
+		if ( ! pointUI ) continue;
+
+		if(this.showZ === true)
+		{
+			points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
+		}
+		else
+		{
+			points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue() ) );
+		}
+		++count;
+		pointUI.lbl.setValue( count );
+
+	}
+
+	return points;
+};
+
+UI.Points.prototype.setValue = function(points)
+{
+	for ( var i = 0; i < points.length; i ++ ) {
+
+		var point = points[ i ];
+		this.pointsList.add( this.createPointRow( point.x, point.y, point.z ) );
+
+	}
+
+	return this;
+}
+
+UI.Points.prototype.createPointRow = function( x, y, z ) {
+
+	var pointRow = new UI.Div();
+	var lbl = new UI.Text( this.lastPointIdx + 1 ).setWidth( '20px' );
+	var txtX = new UI.Number( x ).setWidth( '30px' ).onChange( this.update );
+	var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( this.update );
+	
+	var idx = this.lastPointIdx;
+	var scope = this;
+	var btn = new UI.Button( '-' ).onClick( function () {
+
+		scope.deletePointRow( idx );
+
+	} );
+
+	var data =  { row: pointRow, lbl: lbl, x: txtX, y: txtY};
+	
+	this.pointsUI.push( data );
+	++this.lastPointIdx;
+	if(this.showZ === true)
+	{
+		var txtZ = new UI.Number( z  ).setWidth( '30px' ).onChange( this.update );
+		data.z = txtZ;
+		pointRow.add( lbl, txtX, txtY, txtZ, btn );
+	}
+	else
+	{
+		pointRow.add( lbl, txtX, txtY, btn );
+	}
+
+	return pointRow;
+
+};
+
+UI.Points.prototype.deletePointRow = function(idx)
+{
+	if ( ! this.pointsUI[ idx ] ) return;
+
+	this.pointsList.remove( this.pointsUI[ idx ].row );
+	this.pointsUI[ idx ] = null;
+
+	this.update();
+
+}
+
+UI.Points.prototype.setShowZ = function(show)
+{
+	this.showZ = show;
+
+	return this;
+}
+
 UI.THREE = {};
 
 UI.THREE.Boolean = function ( boolean, text ) {
