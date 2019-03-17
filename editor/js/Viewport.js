@@ -155,7 +155,7 @@ var Viewport = function ( editor ) {
 		if ( object !== null ) {
 
 			object.traverse( addCamera );
-			cameraSelect.setOptions( cameras );
+			cameraSelect.setOptions( cameras ).setValue( camera.uuid );
 			sceneCameraDisplay.setDisplay( config.getKey( 'project/renderer/showSceneCameras' ) === true && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
 
 		}
@@ -167,7 +167,7 @@ var Viewport = function ( editor ) {
 		if ( object !== null ) {
 
 			object.traverse( removeCamera );
-			cameraSelect.setOptions( cameras );
+			cameraSelect.setOptions( cameras ).setValue( camera.uuid );
 			sceneCameraDisplay.setDisplay( config.getKey( 'project/renderer/showSceneCameras' ) === true && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
 
 		}
@@ -617,10 +617,11 @@ var Viewport = function ( editor ) {
 		scene.updateMatrixWorld();
 
 		var cam = camera;
+		var uuid = cameraSelect.getValue();
 
-		if ( sceneCameraDisplay.dom.style.display != 'none' ) {
+		if ( uuid !== camera.uuid && sceneCameraDisplay.dom.style.display != 'none' ) {
 
-			var sceneCamera = scene.getObjectByProperty( 'uuid', cameraSelect.getValue() );
+			var sceneCamera = scene.getObjectByProperty( 'uuid', uuid );
 			if ( sceneCamera !== undefined && sceneCamera.isCamera === true ) {
 
 				cam = sceneCamera;
