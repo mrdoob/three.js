@@ -4,6 +4,7 @@ var files = {
 		"webgl_animation_keyframes",
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_morph",
+		"webgl_animation_multiple",
 		"webgl_camera",
 		"webgl_camera_array",
 		"webgl_camera_cinematic",
