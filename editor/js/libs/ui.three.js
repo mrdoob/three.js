@@ -517,15 +517,14 @@ UI.Points = function ( editor ) {
 				var sphere = new THREE.Mesh( geometry, material );
 				var p = points[ i ];
 				sphere.position.copy( p );
-				positions.push( p.x, p.y, p.z );
+				positions.push( p );
 				scene.add( sphere );
 
 			}
 
-			var line = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( {
+			var line = new THREE.Line( new THREE.BufferGeometry().setFromPoints( positions ), new THREE.LineBasicMaterial( {
 				color: 0xff0000
 			} ) );
-			line.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 			line.computeLineDistances();
 			scene.add( line );
 			scope.line = line;
