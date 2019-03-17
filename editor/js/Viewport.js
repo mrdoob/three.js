@@ -178,10 +178,11 @@ var Viewport = function ( editor ) {
 
 		var optionSelected = config.getKey( 'project/renderer/showSceneCameras' ) === true;
 		sceneCameraDisplay.setDisplay( optionSelected && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
-		if(optionSelected === false)
-		{
-			cameraSelect.setValue(camera.uuid);
+		if ( optionSelected === false ) {
+
+			cameraSelect.setValue( camera.uuid );
 			render();
+
 		}
 
 	} );
