@@ -142,9 +142,7 @@ var Viewport = function ( editor ) {
 	};
 
 	var sceneCameraDisplay = new UI.Row();
-	sceneCameraDisplay.setId( 'cameraSelect' );
-	sceneCameraDisplay.dom.setAttribute( 'layout', config.getKey( 'project/renderer/sceneCameras' ) || 'topLeft' );
-	sceneCameraDisplay.setDisplay( 'none' );
+	sceneCameraDisplay.setId( 'cameraSelect' ).setDisplay( 'none' );
 	document.body.appendChild( sceneCameraDisplay.dom );
 
 	var cameraSelect = new UI.Select().onChange( render );
