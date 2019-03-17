@@ -205,37 +205,43 @@ Object.assign( THREE.Pass.prototype, {
 } );
 
 // Helper for passes that need to fill the viewport with a single quad.
-THREE.Pass.FullScreenQuad = function ( material ) {
+THREE.Pass.FullScreenQuad = (function() {
 
-	this._mesh = new THREE.Mesh( THREE.Pass.FullScreenQuad._geometry, material );
+	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
-};
+	var FullScreenQuad = function ( material ) {
 
-Object.defineProperty( THREE.Pass.FullScreenQuad.prototype, 'material', {
+		this._mesh = new THREE.Mesh( geometry, material );
 
-	get: function () {
+	};
 
-		return this._mesh.material;
+	Object.defineProperty( FullScreenQuad.prototype, 'material', {
 
-	},
+		get: function () {
 
-	set: function ( value ) {
+			return this._mesh.material;
 
-		this._mesh.material = value;
+		},
 
-	}
+		set: function ( value ) {
 
-} );
+			this._mesh.material = value;
 
-Object.assign( THREE.Pass.FullScreenQuad.prototype, {
+		}
 
-	render: function ( renderer ) {
+	} );
 
-		renderer.render( this._mesh, THREE.Pass.FullScreenQuad._camera );
+	Object.assign( FullScreenQuad.prototype, {
 
-	}
+		render: function ( renderer ) {
 
-} );
+			renderer.render( this._mesh, camera );
 
-THREE.Pass.FullScreenQuad._camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-THREE.Pass.FullScreenQuad._geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+		}
+
+	} );
+	
+	return FullScreenQuad;
+
+})();
