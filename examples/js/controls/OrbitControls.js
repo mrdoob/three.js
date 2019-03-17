@@ -688,6 +688,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
+		realDocument.activeElement.blur();
+		
 		switch ( event.button ) {
 
 			case scope.mouseButtons.LEFT:
