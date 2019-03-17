@@ -41,11 +41,14 @@
 scene.add( camera );</code>
 
 
+
 		<h2>构造器</h2>
+
 
 
 		<h3>[name]( [param:Number left], [param:Number right], [param:Number top], [param:Number bottom], [param:Number near], [param:Number far] )</h3>
 		<p>
+
 		left — 摄像机视锥体左侧面。<br />
 		right — 摄像机视锥体右侧面。<br />
 		top — 摄像机视锥体上侧面。<br />
@@ -54,6 +57,7 @@ scene.add( camera );</code>
 		far — 摄像机视锥体远端面。<br /><br />
 
 		这些参数一起定义了摄像机的[link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]（视锥体）。
+
 		</p>
 
 
@@ -71,6 +75,7 @@ scene.add( camera );</code>
 		<p>
 			摄像机视锥体远端面，其默认值为*2000*。<br /><br />
 			其值的有效范围介于[page:.near near]（摄像机视锥体近端面）和无穷大之间。
+
 		</p>
 
 		<h3>[property:Boolean isOrthographicCamera]</h3>
@@ -130,6 +135,7 @@ scene.add( camera );</code>
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<p>
 			更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
+
 		</p>
 
 		<h3>[method:JSON toJSON]()</h3>

@@ -46,7 +46,7 @@
 			animate();
 
 			var loader = new THREE.BVHLoader();
-			loader.load( "models/bvh/pirouette.bvh", function( result ) {
+			loader.load( "models/bvh/pirouette.bvh", function ( result ) {
 
 				skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
 				skeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - box selection</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			.selectBox {
+				border: 1px solid #55aaff;
+				background-color: rgba(75, 160, 255, 0.3);
+				position: fixed;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/interactive/SelectionBox.js"></script>
+		<script src="js/interactive/SelectionHelper.js"></script>
+
+		<script>
+
+			var container, stats;
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.z = 1000;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+
+				scene.add( new THREE.AmbientLight( 0x505050 ) );
+
+				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				light.position.set( 0, 500, 2000 );
+				light.angle = Math.PI / 9;
+
+				light.castShadow = true;
+				light.shadow.camera.near = 1000;
+				light.shadow.camera.far = 4000;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
+
+				scene.add( light );
+
+				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+
+				for ( var i = 0; i < 200; i ++ ) {
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+
+					object.position.x = Math.random() * 1600 - 800;
+					object.position.y = Math.random() * 900 - 450;
+					object.position.z = Math.random() * 900 - 500;
+
+					object.rotation.x = Math.random() * 2 * Math.PI;
+					object.rotation.y = Math.random() * 2 * Math.PI;
+					object.rotation.z = Math.random() * 2 * Math.PI;
+
+					object.scale.x = Math.random() * 2 + 1;
+					object.scale.y = Math.random() * 2 + 1;
+					object.scale.z = Math.random() * 2 + 1;
+
+					object.castShadow = true;
+					object.receiveShadow = true;
+
+					scene.add( object );
+
+				}
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
+
+				container.appendChild( renderer.domElement );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection';
+				container.appendChild( info );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			var selectionBox = new THREE.SelectionBox( camera, scene );
+			var helper = new THREE.SelectionHelper( selectionBox, renderer, 'selectBox' );
+
+			document.addEventListener( 'mousedown', function ( event ) {
+
+				for ( var item of selectionBox.collection ) {
+
+					item.material.emissive = new THREE.Color( 0x000000 );
+
+				}
+
+				selectionBox.startPoint.set(
+					( event.clientX / window.innerWidth ) * 2 - 1,
+					- ( event.clientY / window.innerHeight ) * 2 + 1,
+					0.5 );
+
+			} );
+
+			document.addEventListener( 'mousemove', function ( event ) {
+
+				if ( helper.isDown ) {
+
+					for ( var i = 0; i < selectionBox.collection.length; i ++ ) {
+
+						selectionBox.collection[ i ].material.emissive = new THREE.Color( 0x000000 );
+
+					}
+
+					selectionBox.endPoint.set(
+						( event.clientX / window.innerWidth ) * 2 - 1,
+						- ( event.clientY / window.innerHeight ) * 2 + 1,
+						0.5 );
+
+					var allSelected = selectionBox.select();
+
+					for ( var i = 0; i < allSelected.length; i ++ ) {
+
+						allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+
+					}
+
+				}
+
+			} );
+
+			document.addEventListener( 'mouseup', function ( event ) {
+
+				selectionBox.endPoint.set(
+					( event.clientX / window.innerWidth ) * 2 - 1,
+					- ( event.clientY / window.innerHeight ) * 2 + 1,
+					0.5 );
+
+				var allSelected = selectionBox.select();
+
+				for ( var i = 0; i < allSelected.length; i ++ ) {
+
+					allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+
+				}
+
+			} );
+
+		</script>
+
+	</body>
+</html>

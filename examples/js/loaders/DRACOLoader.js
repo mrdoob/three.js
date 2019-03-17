@@ -84,18 +84,19 @@ THREE.DRACOLoader.prototype = {
     },
 
     /**
-     * |attributeUniqueIdMap| specifies attribute unique id for an attribute in
-     * the geometry to be decoded. The name of the attribute must be one of the
-     * supported attribute type in Three.JS, including:
-     *     'position',
-     *     'color',
-     *     'normal',
-     *     'uv',
-     *     'uv2',
-     *     'skinIndex',
-     *     'skinWeight'.
-     * The format is:
-     *     attributeUniqueIdMap[attributeName] = attributeId
+     * Decompresses a Draco buffer. Names of attributes (for ID and type maps)
+     * must be one of the supported three.js types, including: position, color,
+     * normal, uv, uv2, skinIndex, skinWeight.
+     *
+     * @param {ArrayBuffer} rawBuffer
+     * @param {Function} callback
+     * @param {Object|undefined} attributeUniqueIdMap Provides a pre-defined ID
+     *     for each attribute in the geometry to be decoded. If given,
+     *     `attributeTypeMap` is required and `nativeAttributeMap` will be
+     *     ignored.
+     * @param {Object|undefined} attributeTypeMap Provides a predefined data
+     *     type (as a typed array constructor) for each attribute in the
+     *     geometry to be decoded.
      */
     decodeDracoFile: function(rawBuffer, callback, attributeUniqueIdMap,
                               attributeTypeMap) {
@@ -103,7 +104,7 @@ THREE.DRACOLoader.prototype = {
       THREE.DRACOLoader.getDecoderModule()
           .then( function ( module ) {
             scope.decodeDracoFileInternal( rawBuffer, module.decoder, callback,
-              attributeUniqueIdMap || {}, attributeTypeMap || {});
+              attributeUniqueIdMap, attributeTypeMap);
           });
     },
 
@@ -231,12 +232,13 @@ THREE.DRACOLoader.prototype = {
     convertDracoGeometryTo3JS: function(dracoDecoder, decoder, geometryType,
                                         buffer, attributeUniqueIdMap,
                                         attributeTypeMap) {
+        // TODO: Should not assume native Draco attribute IDs apply.
         if (this.getAttributeOptions('position').skipDequantization === true) {
           decoder.SkipAttributeTransform(dracoDecoder.POSITION);
         }
         var dracoGeometry;
         var decodingStatus;
-        const start_time = performance.now();
+        var start_time = performance.now();
         if (geometryType === dracoDecoder.TRIANGULAR_MESH) {
           dracoGeometry = new dracoDecoder.Mesh();
           decodingStatus = decoder.DecodeBufferToMesh(buffer, dracoGeometry);
@@ -278,6 +280,7 @@ THREE.DRACOLoader.prototype = {
         }
 
         // Verify if there is position attribute.
+        // TODO: Should not assume native Draco attribute IDs apply.
         var posAttId = decoder.GetAttributeId(dracoGeometry,
                                               dracoDecoder.POSITION);
         if (posAttId == -1) {
@@ -294,11 +297,23 @@ THREE.DRACOLoader.prototype = {
         // Import data to Three JS geometry.
         var geometry = new THREE.BufferGeometry();
 
-        // Add native Draco attribute type to geometry.
-        for (var attributeName in this.nativeAttributeMap) {
-          // The native attribute type is only used when no unique Id is
-          // provided. For example, loading .drc files.
-          if (attributeUniqueIdMap[attributeName] === undefined) {
+        // Do not use both the native attribute map and a provided (e.g. glTF) map.
+        if ( attributeUniqueIdMap ) {
+
+          // Add attributes of user specified unique id. E.g. GLTF models.
+          for (var attributeName in attributeUniqueIdMap) {
+            var attributeType = attributeTypeMap[attributeName];
+            var attributeId = attributeUniqueIdMap[attributeName];
+            var attribute = decoder.GetAttributeByUniqueId(dracoGeometry,
+                                                           attributeId);
+            this.addAttributeToGeometry(dracoDecoder, decoder, dracoGeometry,
+                attributeName, attributeType, attribute, geometry, geometryBuffer);
+          }
+
+        } else {
+
+          // Add native Draco attribute type to geometry.
+          for (var attributeName in this.nativeAttributeMap) {
             var attId = decoder.GetAttributeId(dracoGeometry,
                 dracoDecoder[this.nativeAttributeMap[attributeName]]);
             if (attId !== -1) {
@@ -310,16 +325,7 @@ THREE.DRACOLoader.prototype = {
                   attributeName, Float32Array, attribute, geometry, geometryBuffer);
             }
           }
-        }
 
-        // Add attributes of user specified unique id. E.g. GLTF models.
-        for (var attributeName in attributeUniqueIdMap) {
-          var attributeType = attributeTypeMap[attributeName] || Float32Array;
-          var attributeId = attributeUniqueIdMap[attributeName];
-          var attribute = decoder.GetAttributeByUniqueId(dracoGeometry,
-                                                         attributeId);
-          this.addAttributeToGeometry(dracoDecoder, decoder, dracoGeometry,
-              attributeName, attributeType, attribute, geometry, geometryBuffer);
         }
 
         // For mesh, we need to generate the faces.
@@ -354,6 +360,9 @@ THREE.DRACOLoader.prototype = {
                 THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute)
               (geometryBuffer.indices, 1));
         }
+
+        // TODO: Should not assume native Draco attribute IDs apply.
+        // TODO: Can other attribute types be quantized?
         var posTransform = new dracoDecoder.AttributeQuantizationTransform();
         if (posTransform.InitFromAttribute(posAttribute)) {
           // Quantized attribute. Store the quantization parameters into the

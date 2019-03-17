@@ -51,16 +51,20 @@
 
 			}
 
-			var container, stats;
 			var params = {
 				envMap: 'EXR',
 				roughness: 0.0,
 				metalness: 0.0,
-				exposure: 1.0
+				exposure: 1.0,
+				debug: false,
 			};
-			var camera, scene, renderer, controls, objects = [];
+
+			var container, stats;
+			var camera, scene, renderer, controls;
+			var torusMesh, planeMesh;
 			var standardMaterial, floorMaterial;
 			var pngCubeRenderTarget, exrCubeRenderTarget;
+			var pngBackground, exrBackground;
 
 			init();
 			animate();
@@ -74,43 +78,38 @@
 				camera.position.set( 0, 0, 120 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.toneMapping = THREE.LinearToneMapping;
 
-				standardMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					color: 0xffffff,
+				//
+
+				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				var material = new THREE.MeshStandardMaterial( {
 					metalness: params.roughness,
 					roughness: params.metalness,
 					envMapIntensity: 1.0
 				} );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				torusMesh = new THREE.Mesh( geometry, material );
+				scene.add( torusMesh );
 
-				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var material = new THREE.MeshBasicMaterial();
 
-				scene.add( torusMesh1 );
-				objects.push( torusMesh1 );
-
-				floorMaterial = new THREE.MeshBasicMaterial( {
-					color: 0xffffff
-				} );
-
-				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				scene.add( planeMesh1 );
+				planeMesh = new THREE.Mesh( geometry, material );
+				planeMesh.position.y = - 50;
+				planeMesh.rotation.x = - Math.PI * 0.5;
+				scene.add( planeMesh );
 
 				new THREE.EXRLoader().load( 'textures/piz_compressed.exr', function ( texture ) {
 
 					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
+					// texture.magFilter = THREE.NearestFilter;
 					texture.encoding = THREE.LinearEncoding;
 
 					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
+					exrBackground = cubemapGenerator.renderTarget;
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
@@ -122,7 +121,6 @@
 					exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 					texture.dispose();
-					cubemapGenerator.dispose();
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 
@@ -133,6 +131,8 @@
 					texture.encoding = THREE.sRGBEncoding;
 
 					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512 } );
+					pngBackground = cubemapGenerator.renderTarget;
+
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
@@ -144,7 +144,6 @@
 					pngCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 					texture.dispose();
-					cubemapGenerator.dispose();
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 
@@ -170,9 +169,10 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'envMap', [ 'EXR', 'PNG' ] );
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'metalness', 0, 1 );
-				gui.add( params, 'exposure', 0, 2 );
+				gui.add( params, 'roughness', 0, 1, 0.01 );
+				gui.add( params, 'metalness', 0, 1, 0.01 );
+				gui.add( params, 'exposure', 0, 2, 0.01 );
+				gui.add( params, 'debug', false );
 				gui.open();
 
 			}
@@ -201,40 +201,40 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				torusMesh.material.roughness = params.roughness;
+				torusMesh.material.metalness = params.metalness;
 
-					standardMaterial.roughness = params.roughness;
-					standardMaterial.metalness = params.metalness;
+				var newEnvMap = torusMesh.material.envMap;
+				var background = scene.background;
 
-					var newEnvMap = standardMaterial.envMap;
+				switch ( params.envMap ) {
 
-					switch ( params.envMap ) {
-
-						case 'EXR': newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null; break;
-						case 'PNG': newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null; break;
-
-					}
-
-					if ( newEnvMap !== standardMaterial.envMap ) {
-
-						standardMaterial.envMap = newEnvMap;
-						standardMaterial.needsUpdate = true;
-
-						floorMaterial.map = newEnvMap;
-						floorMaterial.needsUpdate = true;
-
-					}
+					case 'EXR':
+						newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null;
+						background = exrBackground;
+						break;
+					case 'PNG':
+						newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null;
+						background = pngBackground;
+						break;
 
 				}
 
+				if ( newEnvMap !== torusMesh.material.envMap ) {
+
+					torusMesh.material.envMap = newEnvMap;
+					torusMesh.material.needsUpdate = true;
+
+					planeMesh.material.map = newEnvMap;
+					planeMesh.material.needsUpdate = true;
+
+				}
+
+				torusMesh.rotation.y += 0.005;
+				planeMesh.visible = params.debug;
+
+				scene.background = background;
 				renderer.toneMappingExposure = params.exposure;
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-					object.rotation.y += 0.005;
-
-				}
 
 				renderer.render( scene, camera );
 

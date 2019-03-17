@@ -44,6 +44,7 @@ THREE.FBXLoader = ( function () {
 			var path = ( self.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : self.path;
 
 			var loader = new THREE.FileLoader( this.manager );
+			loader.setPath( self.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			loader.load( url, function ( buffer ) {
@@ -498,7 +499,7 @@ THREE.FBXLoader = ( function () {
 					break;
 				default:
 					console.warn( 'THREE.FBXLoader: unknown material type "%s". Defaulting to MeshPhongMaterial.', type );
-					material = new THREE.MeshPhongMaterial( { color: 0x3300ff } );
+					material = new THREE.MeshPhongMaterial();
 					break;
 
 			}
@@ -531,11 +532,13 @@ THREE.FBXLoader = ( function () {
 				parameters.color = new THREE.Color().fromArray( materialNode.DiffuseColor.value );
 
 			}
+
 			if ( materialNode.DisplacementFactor ) {
 
 				parameters.displacementScale = materialNode.DisplacementFactor.value;
 
 			}
+
 			if ( materialNode.Emissive ) {
 
 				parameters.emissive = new THREE.Color().fromArray( materialNode.Emissive.value );
@@ -546,31 +549,37 @@ THREE.FBXLoader = ( function () {
 				parameters.emissive = new THREE.Color().fromArray( materialNode.EmissiveColor.value );
 
 			}
+
 			if ( materialNode.EmissiveFactor ) {
 
 				parameters.emissiveIntensity = parseFloat( materialNode.EmissiveFactor.value );
 
 			}
+
 			if ( materialNode.Opacity ) {
 
 				parameters.opacity = parseFloat( materialNode.Opacity.value );
 
 			}
+
 			if ( parameters.opacity < 1.0 ) {
 
 				parameters.transparent = true;
 
 			}
+
 			if ( materialNode.ReflectionFactor ) {
 
 				parameters.reflectivity = materialNode.ReflectionFactor.value;
 
 			}
+
 			if ( materialNode.Shininess ) {
 
 				parameters.shininess = materialNode.Shininess.value;
 
 			}
+
 			if ( materialNode.Specular ) {
 
 				parameters.specular = new THREE.Color().fromArray( materialNode.Specular.value );
@@ -593,7 +602,12 @@ THREE.FBXLoader = ( function () {
 						parameters.bumpMap = self.getTexture( textureMap, child.ID );
 						break;
 
+					case 'Maya|TEX_ao_map':
+						parameters.aoMap = self.getTexture( textureMap, child.ID );
+						break;
+
 					case 'DiffuseColor':
+					case 'Maya|TEX_color_map':
 						parameters.map = self.getTexture( textureMap, child.ID );
 						break;
 
@@ -601,12 +615,12 @@ THREE.FBXLoader = ( function () {
 						parameters.displacementMap = self.getTexture( textureMap, child.ID );
 						break;
 
-
 					case 'EmissiveColor':
 						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
 						break;
 
 					case 'NormalMap':
+					case 'Maya|TEX_normal_map':
 						parameters.normalMap = self.getTexture( textureMap, child.ID );
 						break;
 
@@ -777,13 +791,11 @@ THREE.FBXLoader = ( function () {
 
 				if ( morphTargetNode.attrType !== 'BlendShapeChannel' ) return;
 
-				var targetRelationships = connections.get( parseInt( child.ID ) );
+				rawMorphTarget.geoID = connections.get( parseInt( child.ID ) ).children.filter( function ( child ) {
 
-				targetRelationships.children.forEach( function ( child ) {
+					return child.relationship === undefined;
 
-					if ( child.relationship === undefined ) rawMorphTarget.geoID = child.ID;
-
-				} );
+				} )[ 0 ].ID;
 
 				rawMorphTargets.push( rawMorphTarget );
 
@@ -1233,6 +1245,7 @@ THREE.FBXLoader = ( function () {
 				} );
 
 				model = new THREE.SkinnedMesh( geometry, material );
+				model.normalizeSkinWeights();
 
 			} else {
 
@@ -2336,15 +2349,17 @@ THREE.FBXLoader = ( function () {
 
 			var rawClips = this.parseClips();
 
-			if ( rawClips === undefined ) return;
+			if ( rawClips !== undefined ) {
 
-			for ( var key in rawClips ) {
+				for ( var key in rawClips ) {
 
-				var rawClip = rawClips[ key ];
+					var rawClip = rawClips[ key ];
 
-				var clip = this.addClip( rawClip );
+					var clip = this.addClip( rawClip );
 
-				animationClips.push( clip );
+					animationClips.push( clip );
+
+				}
 
 			}
 
@@ -2488,62 +2503,62 @@ THREE.FBXLoader = ( function () {
 
 								if ( layerCurveNodes[ i ] === undefined ) {
 
-									var modelID;
+									var modelID = connections.get( child.ID ).parents.filter( function ( parent ) {
 
-									connections.get( child.ID ).parents.forEach( function ( parent ) {
+										return parent.relationship !== undefined;
 
-										if ( parent.relationship !== undefined ) modelID = parent.ID;
+									} )[ 0 ].ID;
 
-									} );
+									if ( modelID !== undefined ) {
 
-									var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
+										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
 
-									var node = {
+										var node = {
 
-										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
-										ID: rawModel.id,
-										initialPosition: [ 0, 0, 0 ],
-										initialRotation: [ 0, 0, 0 ],
-										initialScale: [ 1, 1, 1 ],
+											modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+											ID: rawModel.id,
+											initialPosition: [ 0, 0, 0 ],
+											initialRotation: [ 0, 0, 0 ],
+											initialScale: [ 1, 1, 1 ],
 
-									};
+										};
 
-									sceneGraph.traverse( function ( child ) {
+										sceneGraph.traverse( function ( child ) {
 
-										if ( child.ID = rawModel.id ) {
+											if ( child.ID === rawModel.id ) {
 
-											node.transform = child.matrix;
+												node.transform = child.matrix;
 
-											if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
+												if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
 
-										}
+											}
 
-									} );
+										} );
 
-									if ( ! node.transform ) node.transform = new THREE.Matrix4();
+										if ( ! node.transform ) node.transform = new THREE.Matrix4();
 
-									// if the animated model is pre rotated, we'll have to apply the pre rotations to every
-									// animation value as well
-									if ( 'PreRotation' in rawModel ) node.preRotation = rawModel.PreRotation.value;
-									if ( 'PostRotation' in rawModel ) node.postRotation = rawModel.PostRotation.value;
+										// if the animated model is pre rotated, we'll have to apply the pre rotations to every
+										// animation value as well
+										if ( 'PreRotation' in rawModel ) node.preRotation = rawModel.PreRotation.value;
+										if ( 'PostRotation' in rawModel ) node.postRotation = rawModel.PostRotation.value;
 
-									layerCurveNodes[ i ] = node;
+										layerCurveNodes[ i ] = node;
+
+									}
 
 								}
 
-								layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
+								if ( layerCurveNodes[ i ] ) layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
 
 							} else if ( curveNode.curves.morph !== undefined ) {
 
 								if ( layerCurveNodes[ i ] === undefined ) {
 
-									var deformerID;
+									var deformerID = connections.get( child.ID ).parents.filter( function ( parent ) {
 
-									connections.get( child.ID ).parents.forEach( function ( parent ) {
+										return parent.relationship !== undefined;
 
-										if ( parent.relationship !== undefined ) deformerID = parent.ID;
-
-									} );
+									} )[ 0 ].ID;
 
 									var morpherID = connections.get( deformerID ).parents[ 0 ].ID;
 									var geoID = connections.get( morpherID ).parents[ 0 ].ID;
@@ -4003,7 +4018,7 @@ THREE.FBXLoader = ( function () {
 		lParentGRSM = lParentTM.getInverse( lParentTM ).multiply( lParentGX );
 		lParentGSM = lParentGRM.getInverse( lParentGRM ).multiply( lParentGRSM );
 		lLSM = lScalingM;
-		
+
 		var lGlobalRS;
 		if ( inheritType === 0 ) {
 

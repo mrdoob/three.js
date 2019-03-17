@@ -46,8 +46,6 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
 
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
@@ -65,15 +63,9 @@
 
 			var statsEnabled = true;
 
-			var container, stats, loader;
+			var container, stats;
 
-			var camera, scene, renderer;
-
-			var controls;
-
-			var mesh;
-
-			var spotLight;
+			var camera, scene, renderer, controls;
 
 			init();
 			animate();
@@ -105,16 +97,6 @@
 				//
 
 				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
-
-				//
-
-				new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/pisa/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( textureCube ) {
-
-						scene.background = textureCube;
-
-					} );
 
 				//
 
@@ -156,29 +138,27 @@
 
 					} );
 
-				var genCubeUrls = function( prefix, postfix ) {
-					return [
-						prefix + 'px' + postfix, prefix + 'nx' + postfix,
-						prefix + 'py' + postfix, prefix + 'ny' + postfix,
-						prefix + 'pz' + postfix, prefix + 'nz' + postfix
-					];
-				};
+				new THREE.CubeTextureLoader().setPath( './textures/cube/pisaRGBM16/' )
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( rgbmCubeMap ) {
 
-				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+					rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+					rgbmCubeMap.format = THREE.RGBAFormat;
 
-					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
 					pmremGenerator.update( renderer );
 
 					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
-					var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+					var rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					material.envMap = hdrCubeRenderTarget.texture;
+					material.envMap = rgbmCubeRenderTarget.texture;
 					material.needsUpdate = true; // is this needed?
 
-					hdrCubeMap.dispose();
+					rgbmCubeMap.magFilter = THREE.LinearFilter;
+					rgbmCubeMap.needsUpdate = true;
+					scene.background = rgbmCubeMap;
+
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 
@@ -199,7 +179,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

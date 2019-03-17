@@ -10,15 +10,15 @@
 	<body>
 		[page:Curve] &rarr;
 
-		<h1>[name]</h1>
+		<h1>二维三次贝塞尔曲线（[name]）</h1>
 
 		<p class="desc">
-			Create a smooth 2d
-			<a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#mediaviewer/File:Bezier_curve.svg" target="_blank">cubic bezier curve</a>,
-			defined by a start point, endpoint and two control points.
+			创建一条平滑的二维
+			<a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#mediaviewer/File:Bezier_curve.svg" target="_blank">三次贝塞尔曲线</a>，
+			由起点、终点和两个控制点所定义。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 <code>
 var curve = new THREE.CubicBezierCurve(
@@ -37,44 +37,45 @@ var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 var curveObject = new THREE.Line( geometry, material );
 </code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name] ( [param:Vector2 v0], [param:Vector2 v1], [param:Vector2 v2], [param:Vector2 v3] )</h3>
 		<p>
-			[page:Vector2 v0] – The starting point.<br/>
-			[page:Vector2 v1] – The first control point.<br/>
-			[page:Vector2 v2] – The second control point.<br/>
-			[page:Vector2 v3] – The ending point.
+			[page:Vector2 v0] – 起点<br/>
+			[page:Vector2 v1] – 第一个控制点<br/>
+			[page:Vector2 v2] – 第二个控制点<br/>
+			[page:Vector2 v3] – 终点
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:Curve] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Curve]来了解共有属性。</p>
 
 		<h3>[property:Boolean isCubicBezierCurve]</h3>
 		<p>
-			Used to check whether this or derived classes are CubicBezierCurves. Default is *true*.<br /><br />
+			
+			用于检查该类或者其派生类是否为CubicBezierCurves。默认值为*true*。<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			你不应当对这一属性进行改变，它在内部使用，以用于优化。
 		</p>
 
 		<h3>[property:Vector2 v0]</h3>
-		<p>The starting point.</p>
+		<p>起点</p>
 
 		<h3>[property:Vector2 v1]</h3>
-		<p>The first control point.</p>
+		<p>第一个控制点</p>
 
 		<h3>[property:Vector2 v2]</h3>
-		<p>The second control point.</p>
+		<p>第二个控制点</p>
 
 		<h3>[property:Vector2 v3]</h3>
-		<p>The ending point.</p>
+		<p>终点</p>
 
 
-		<h2>Methods</h2>
-		<p>See the base [page:Curve] class for common Methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Curve]来了解共有方法。</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

@@ -16,6 +16,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.supportsDepthTextureExtension = ( depthTexture !== undefined ) ? depthTexture : false;
 	this.supportsNormalTexture = ( useNormals !== undefined ) ? useNormals : false;
 
+	this.originalClearColor = new THREE.Color();
 	this.oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
 
@@ -177,7 +178,7 @@ THREE.SAOPass.OUTPUT = {
 THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 	constructor: THREE.SAOPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		// Rendering readBuffer first when rendering to screen
 		if ( this.renderToScreen ) {
@@ -233,7 +234,9 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		// Rendering scene to depth texture
 		renderer.setClearColor( 0x000000 );
-		renderer.render( this.scene, this.camera, this.beautyRenderTarget, true );
+		renderer.setRenderTarget( this.beautyRenderTarget );
+		renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// Re-render scene if depth texture extension is not supported
 		if ( ! this.supportsDepthTextureExtension ) {
@@ -312,55 +315,58 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		var originalClearColor = renderer.getClearColor();
+		this.originalClearColor.copy( renderer.getClearColor() );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
+		renderer.setRenderTarget( renderTarget );
+
 		// setup pass state
 		renderer.autoClear = false;
-		var clearNeeded = ( clearColor !== undefined ) && ( clearColor !== null );
-		if ( clearNeeded ) {
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
 			renderer.setClearColor( clearColor );
 			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
 
 		}
 
 		this.quad.material = passMaterial;
-		renderer.render( this.quadScene, this.quadCamera, renderTarget, clearNeeded );
+		renderer.render( this.quadScene, this.quadCamera );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( originalClearColor );
+		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	},
 
 	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		var originalClearColor = renderer.getClearColor();
+		this.originalClearColor.copy( renderer.getClearColor() );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
+		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = false;
 
 		clearColor = overrideMaterial.clearColor || clearColor;
 		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
-		var clearNeeded = ( clearColor !== undefined ) && ( clearColor !== null );
-		if ( clearNeeded ) {
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
 			renderer.setClearColor( clearColor );
 			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
 
 		}
 
 		this.scene.overrideMaterial = overrideMaterial;
-		renderer.render( this.scene, this.camera, renderTarget, clearNeeded );
+		renderer.render( this.scene, this.camera );
 		this.scene.overrideMaterial = null;
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( originalClearColor );
+		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	},

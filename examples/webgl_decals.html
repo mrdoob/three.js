@@ -46,7 +46,7 @@
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, stats;
-		var mesh, decal;
+		var mesh;
 		var raycaster;
 		var line;
 
@@ -80,13 +80,12 @@
 		var position = new THREE.Vector3();
 		var orientation = new THREE.Euler();
 		var size = new THREE.Vector3( 10, 10, 10 );
-		var up = new THREE.Vector3( 0, 1, 0 );
 
 		var params = {
 			minScale: 10,
 			maxScale: 20,
 			rotate: true,
-			clear: function() {
+			clear: function () {
 
 				removeDecals();
 
@@ -122,7 +121,7 @@
 			scene.add( light );
 
 			var light = new THREE.DirectionalLight( 0xccccff, 1 );
-			light.position.set( -1, 0.75, -0.5 );
+			light.position.set( - 1, 0.75, - 0.5 );
 			scene.add( light );
 
 			var geometry = new THREE.BufferGeometry();
@@ -143,7 +142,7 @@
 
 			var moved = false;
 
-			controls.addEventListener( 'change', function() {
+			controls.addEventListener( 'change', function () {
 
 				moved = true;
 
@@ -155,7 +154,7 @@
 
 			}, false );
 
-			window.addEventListener( 'mouseup', function() {
+			window.addEventListener( 'mouseup', function () {
 
 				checkIntersection();
 				if ( ! moved && intersection.intersects ) shoot();
@@ -238,11 +237,11 @@
 
 		}
 
-		function loadLeePerrySmith( callback ) {
+		function loadLeePerrySmith() {
 
 			var loader = new THREE.GLTFLoader();
 
-			loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function( gltf ) {
+			loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 				mesh = gltf.scene.children[ 0 ];
 				mesh.material = new THREE.MeshPhongMaterial( {
@@ -282,7 +281,7 @@
 
 		function removeDecals() {
 
-			decals.forEach( function( d ) {
+			decals.forEach( function ( d ) {
 
 				scene.remove( d );
 

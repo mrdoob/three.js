@@ -20,7 +20,12 @@
 				z-index: 100;
 				display:block;
 			}
-			#info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			a {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
 		</style>
 	</head>
 
@@ -53,8 +58,6 @@
 
 			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
-			var HUD_MARGIN = 0.05;
-
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = - 250;
@@ -82,10 +85,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// SCENE CAMERA
+				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				camera.position.set( 700, 50, 1900 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x59472b );
+				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
 
 				controls = new THREE.FirstPersonControls( camera );
 
@@ -93,18 +102,8 @@
 				controls.movementSpeed = 500;
 				controls.noFly = false;
 				controls.lookVertical = true;
-				controls.constrainVertical = true;
-				controls.verticalMin = 1.5;
-				controls.verticalMax = 2.0;
 
-				controls.lon = 250;
-				controls.lat = 30;
-
-				// SCENE
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x59472b );
-				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
+				controls.lookAt( scene.position );
 
 				// LIGHTS
 
@@ -135,6 +134,8 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
 				renderer.autoClear = false;
 
 				//
@@ -168,7 +169,7 @@
 
 			}
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
 				switch ( event.keyCode ) {
 
@@ -196,7 +197,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
@@ -284,10 +285,10 @@
 					mesh.speed = speed;
 
 					mixer.clipAction( clip, mesh ).
-							setDuration( duration ).
-							// to shift the playback out of phase:
-							startAt( - duration * Math.random() ).
-							play();
+						setDuration( duration ).
+					// to shift the playback out of phase:
+						startAt( - duration * Math.random() ).
+						play();
 
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI / 2;
@@ -303,7 +304,7 @@
 
 				var loader = new THREE.GLTFLoader();
 
-				loader.load( "models/gltf/Horse.glb", function( gltf ) {
+				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 
@@ -319,7 +320,7 @@
 
 				} );
 
-				loader.load( "models/gltf/Flamingo.glb", function( gltf ) {
+				loader.load( "models/gltf/Flamingo.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 					var clip = gltf.animations[ 0 ];
@@ -328,7 +329,7 @@
 
 				} );
 
-				loader.load( "models/gltf/Stork.glb", function( gltf ) {
+				loader.load( "models/gltf/Stork.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 					var clip = gltf.animations[ 0 ];
@@ -337,7 +338,7 @@
 
 				} );
 
-				loader.load( "models/gltf/Parrot.glb", function( gltf ) {
+				loader.load( "models/gltf/Parrot.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 					var clip = gltf.animations[ 0 ];
@@ -369,7 +370,7 @@
 
 					morph.position.x += morph.speed * delta;
 
-					if ( morph.position.x  > 2000 )  {
+					if ( morph.position.x > 2000 ) {
 
 						morph.position.x = - 1000 - Math.random() * 500;
 

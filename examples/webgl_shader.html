@@ -23,10 +23,7 @@
 				padding: 5px;
 			}
 
-			a {
-
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
 		</style>
 	</head>
@@ -119,7 +116,7 @@
 				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
 				uniforms = {
-					time: { value: 1.0 }
+					"time": { value: 1.0 }
 				};
 
 				var material = new THREE.ShaderMaterial( {
@@ -143,7 +140,7 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -155,7 +152,7 @@
 
 				requestAnimationFrame( animate );
 
-				uniforms.time.value = timestamp / 1000;
+				uniforms[ "time" ].value = timestamp / 1000;
 
 				renderer.render( scene, camera );
 

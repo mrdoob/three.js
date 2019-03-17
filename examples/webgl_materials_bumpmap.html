@@ -111,7 +111,7 @@
 
 				spotLight.shadow.camera.fov = 40;
 
-				spotLight.shadow.bias = -0.005;
+				spotLight.shadow.bias = - 0.005;
 
 				//
 
@@ -126,7 +126,11 @@
 				} );
 
 				loader = new THREE.GLTFLoader();
-				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function( gltf ) { createScene( gltf.scene.children[ 0 ].geometry, 100, material ) } );
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+
+					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
+
+				} );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -172,7 +176,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

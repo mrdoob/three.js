@@ -42,7 +42,7 @@ THREE.AfterimagePass = function ( damp ) {
 	this.sceneComp = new THREE.Scene();
 	this.scene = new THREE.Scene();
 
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.camera.position.z = 1;
 
 	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
@@ -50,7 +50,7 @@ THREE.AfterimagePass = function ( damp ) {
 	this.quadComp = new THREE.Mesh( geometry, this.shaderMaterial );
 	this.sceneComp.add( this.quadComp );
 
-	var material = new THREE.MeshBasicMaterial( { 
+	var material = new THREE.MeshBasicMaterial( {
 		map: this.textureComp.texture
 	} );
 
@@ -70,17 +70,25 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 		this.quadComp.material = this.shaderMaterial;
 
-		renderer.render( this.sceneComp, this.camera, this.textureComp );
-		renderer.render( this.scene, this.camera, this.textureOld );
-		
+		renderer.setRenderTarget( this.textureComp );
+		renderer.render( this.sceneComp, this.camera );
+
+		renderer.setRenderTarget( this.textureOld );
+		renderer.render( this.scene, this.camera );
+
 		if ( this.renderToScreen ) {
-			
+
+			renderer.setRenderTarget( null );
 			renderer.render( this.scene, this.camera );
-			
+
 		} else {
-			
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-			
+
+			renderer.setRenderTarget( writeBuffer );
+
+			if ( this.clear ) renderer.clear();
+
+			renderer.render( this.scene, this.camera );
+
 		}
 
 	}

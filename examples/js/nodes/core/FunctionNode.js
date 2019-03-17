@@ -25,7 +25,7 @@ FunctionNode.prototype.nodeType = "Function";
 
 FunctionNode.prototype.useKeywords = true;
 
-FunctionNode.prototype.isShared = function ( builder, output ) {
+FunctionNode.prototype.getShared = function ( builder, output ) {
 
 	return ! this.isMethod;
 

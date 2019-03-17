@@ -127,7 +127,7 @@
 
 				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				dirLight.color.setHSL( 0.1, 1, 0.95 );
-				dirLight.position.set( -1, 1.75, 1 );
+				dirLight.position.set( - 1, 1.75, 1 );
 				dirLight.position.multiplyScalar( 30 );
 				scene.add( dirLight );
 
@@ -138,13 +138,13 @@
 
 				var d = 50;
 
-				dirLight.shadow.camera.left = -d;
+				dirLight.shadow.camera.left = - d;
 				dirLight.shadow.camera.right = d;
 				dirLight.shadow.camera.top = d;
-				dirLight.shadow.camera.bottom = -d;
+				dirLight.shadow.camera.bottom = - d;
 
 				dirLight.shadow.camera.far = 3500;
-				dirLight.shadow.bias = -0.0001;
+				dirLight.shadow.bias = - 0.0001;
 
 				dirLightHeper = new THREE.DirectionalLightHelper( dirLight, 10 );
 				scene.add( dirLightHeper );
@@ -152,32 +152,36 @@
 				// GROUND
 
 				var groundGeo = new THREE.PlaneBufferGeometry( 10000, 10000 );
-				var groundMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x050505 } );
+				var groundMat = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 				groundMat.color.setHSL( 0.095, 1, 0.75 );
 
 				var ground = new THREE.Mesh( groundGeo, groundMat );
-				ground.rotation.x = -Math.PI/2;
-				ground.position.y = -33;
-				scene.add( ground );
-
+				ground.position.y = - 33;
+				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
+				scene.add( ground );
 
 				// SKYDOME
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor:    { value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { value: new THREE.Color( 0xffffff ) },
-					offset:      { value: 33 },
-					exponent:    { value: 0.6 }
+					"topColor": { value: new THREE.Color( 0x0077ff ) },
+					"bottomColor": { value: new THREE.Color( 0xffffff ) },
+					"offset": { value: 33 },
+					"exponent": { value: 0.6 }
 				};
-				uniforms.topColor.value.copy( hemiLight.color );
+				uniforms[ "topColor" ].value.copy( hemiLight.color );
 
-				scene.fog.color.copy( uniforms.bottomColor.value );
+				scene.fog.color.copy( uniforms[ "bottomColor" ].value );
 
 				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
-				var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
+				var skyMat = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: vertexShader,
+					fragmentShader: fragmentShader,
+					side: THREE.BackSide
+				} );
 
 				var sky = new THREE.Mesh( skyGeo, skyMat );
 				scene.add( sky );
@@ -186,14 +190,14 @@
 
 				var loader = new THREE.GLTFLoader();
 
-				loader.load( 'models/gltf/Flamingo.glb', function( gltf ) {
+				loader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 
 					var s = 0.35;
 					mesh.scale.set( s, s, s );
 					mesh.position.y = 15;
-					mesh.rotation.y = -1;
+					mesh.rotation.y = - 1;
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
@@ -239,21 +243,21 @@
 
 			}
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
 				switch ( event.keyCode ) {
 
 					case 72: // h
 
-					hemiLight.visible = !hemiLight.visible;
-					hemiLightHelper.visible = !hemiLightHelper.visible;
-					break;
+						hemiLight.visible = ! hemiLight.visible;
+						hemiLightHelper.visible = ! hemiLightHelper.visible;
+						break;
 
 					case 68: // d
 
-					dirLight.visible = !dirLight.visible;
-					dirLightHeper.visible = !dirLightHeper.visible;
-					break;
+						dirLight.visible = ! dirLight.visible;
+						dirLightHeper.visible = ! dirLightHeper.visible;
+						break;
 
 				}
 

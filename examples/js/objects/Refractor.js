@@ -56,9 +56,9 @@ THREE.Refractor = function ( geometry, options ) {
 		transparent: true // ensures, refractors are drawn from farthest to closest
 	} );
 
-	this.material.uniforms.color.value = color;
-	this.material.uniforms.tDiffuse.value = renderTarget.texture;
-	this.material.uniforms.textureMatrix.value = textureMatrix;
+	this.material.uniforms[ "color" ].value = color;
+	this.material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
+	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
 
 	// functions
 
@@ -187,6 +187,7 @@ THREE.Refractor = function ( geometry, options ) {
 	var render = ( function () {
 
 		var viewport = new THREE.Vector4();
+		var size = new THREE.Vector2();
 
 		return function render( renderer, scene, camera ) {
 
@@ -199,7 +200,9 @@ THREE.Refractor = function ( geometry, options ) {
 			renderer.vr.enabled = false; // avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
-			renderer.render( scene, virtualCamera, renderTarget, true );
+			renderer.setRenderTarget( renderTarget );
+			renderer.clear();
+			renderer.render( scene, virtualCamera );
 
 			renderer.vr.enabled = currentVrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -211,7 +214,7 @@ THREE.Refractor = function ( geometry, options ) {
 
 			if ( bounds !== undefined ) {
 
-				var size = renderer.getSize();
+				renderer.getSize( size );
 				var pixelRatio = renderer.getPixelRatio();
 
 				viewport.x = bounds.x * size.width * pixelRatio;

@@ -4,7 +4,9 @@
 
 Sidebar.Settings.Shortcuts = function ( editor ) {
 
-	const IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
+	var strings = editor.strings;
+
+	var IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
 
 	function isValidKeyBinding( key ) {
 
@@ -76,7 +78,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 		}
 
 		shortcutInput.dom.maxLength = 1;
-		shortcutRow.add( new UI.Text( name ).setTextTransform( 'capitalize' ).setWidth( '90px' ) );
+		shortcutRow.add( new UI.Text( strings.getKey( 'sidebar/settings/shortcuts/' + name ) ).setTextTransform( 'capitalize' ).setWidth( '90px' ) );
 		shortcutRow.add( shortcutInput );
 
 		container.add( shortcutRow );

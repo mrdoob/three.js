@@ -2,6 +2,7 @@ import { Color } from '../math/Color.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
+import { Matrix3 } from '../math/Matrix3.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { FileLoader } from './FileLoader.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
@@ -25,17 +26,12 @@ Object.assign( MaterialLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setTextures: function ( value ) {
-
-		this.textures = value;
 
 	},
 
@@ -134,6 +130,9 @@ Object.assign( MaterialLoader.prototype, {
 						material.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
 						break;
 
+					case 'm3':
+						material.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+
 					case 'm4':
 						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
 						break;
@@ -150,6 +149,16 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.defines !== undefined ) material.defines = json.defines;
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
+
+		if ( json.extensions !== undefined ) {
+
+			for ( var key in json.extensions ) {
+
+				material.extensions[ key ] = json.extensions[ key ];
+
+			}
+
+		}
 
 		// Deprecated
 
@@ -218,6 +227,20 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
 
 		return material;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
+
+	},
+
+	setTextures: function ( value ) {
+
+		this.textures = value;
+		return this;
 
 	}
 

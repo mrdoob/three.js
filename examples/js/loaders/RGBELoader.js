@@ -8,6 +8,7 @@
 THREE.HDRLoader = THREE.RGBELoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.type = THREE.UnsignedByteType;
 
 };
 
@@ -328,19 +329,68 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 		;
 		if ( RGBE_RETURN_FAILURE !== image_rgba_data ) {
 
+			if ( this.type === THREE.UnsignedByteType ) {
+
+				var data = image_rgba_data;
+				var format = THREE.RGBEFormat; // handled as THREE.RGBAFormat in shaders
+				var type = THREE.UnsignedByteType;
+
+			} else if ( this.type === THREE.FloatType ) {
+
+				var RGBEByteToRGBFloat = function ( sourceArray, sourceOffset, destArray, destOffset ) {
+
+					var e = sourceArray[ sourceOffset + 3 ];
+					var scale = Math.pow( 2.0, e - 128.0 ) / 255.0;
+
+					destArray[ destOffset + 0 ] = sourceArray[ sourceOffset + 0 ] * scale;
+					destArray[ destOffset + 1 ] = sourceArray[ sourceOffset + 1 ] * scale;
+					destArray[ destOffset + 2 ] = sourceArray[ sourceOffset + 2 ] * scale;
+
+				};
+
+				var numElements = ( image_rgba_data.length / 4 ) * 3;
+				var floatArray = new Float32Array( numElements );
+
+				for ( var j = 0; j < numElements; j ++ ) {
+
+					RGBEByteToRGBFloat( image_rgba_data, j * 4, floatArray, j * 3 );
+
+				}
+
+				var data = floatArray;
+				var format = THREE.RGBFormat;
+				var type = THREE.FloatType;
+
+
+			} else {
+
+				console.error( 'THREE.RGBELoader: unsupported type: ', this.type );
+
+			}
+
 			return {
 				width: w, height: h,
-				data: image_rgba_data,
+				data: data,
 				header: rgbe_header_info.string,
 				gamma: rgbe_header_info.gamma,
 				exposure: rgbe_header_info.exposure,
-				format: THREE.RGBEFormat, // handled as THREE.RGBAFormat in shaders
-				type: THREE.UnsignedByteType
+				format: format,
+				type: type
 			};
 
 		}
 
 	}
+
 	return null;
 
 };
+
+THREE.RGBELoader.prototype.setType = function ( value ) {
+
+	this.type = value;
+	return this;
+
+};
+
+

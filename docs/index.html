@@ -41,22 +41,36 @@
 
 			var hash = window.location.hash.substring( 1 );
 
-			// Route non-localised api links
+			// Localisation
 
-			if ( /^(api|manual)/.test( hash ) && /^(api|manual)\/(en|zh)\//.test( hash ) === false ) {
+			var language = 'en';
 
-				window.location.hash = hash.replace( /^(api|manual)/, '$1/en' );
+			if ( /^(api|manual)/.test( hash ) ) {
+
+				var hashLanguage = /^(api|manual)\/(en|zh)\//.exec( hash );
+
+				if ( hashLanguage === null ) {
+
+					// Route old non-localised api links
+
+					window.location.hash = hash.replace( /^(api|manual)/, '$1/en' );
+
+				} else {
+
+					language = hashLanguage[ 2 ];
+
+				}
 
 			}
 
 			//
 
-			var language = 'en';
-
 			function setLanguage( value ) {
 
 				language = value;
 				createNavigation();
+				updateFilter();
+				autoChangeUrlLanguage( language );
 
 			}
 
@@ -211,6 +225,19 @@
 					}
 
 				}
+
+			}
+
+			// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
+
+			function autoChangeUrlLanguage( language ) {
+
+				var hash = location.hash;
+				if ( hash === '' ) return;
+				var docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
+				var docLink = hash.substr( hash.indexOf( '/' ) + 1 );
+				docLink = docLink.substr( docLink.indexOf( '/' ) );
+				location.href = docType + language + docLink;
 
 			}
 
@@ -406,7 +433,8 @@
 
 		</script>
 
-		<script src="../build/three.min.js"></script> <!-- console sandbox -->
+		<!-- console sandbox -->
+		<script src="../build/three.min.js"></script>
 
 	</body>
 
