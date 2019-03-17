@@ -176,7 +176,13 @@ var Viewport = function ( editor ) {
 
 	signals.sceneCamerasChanged.add( function () {
 
-		sceneCameraDisplay.setDisplay( config.getKey( 'project/renderer/showSceneCameras' ) === true && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
+		var optionSelected = config.getKey( 'project/renderer/showSceneCameras' ) === true;
+		sceneCameraDisplay.setDisplay( optionSelected && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
+		if(optionSelected === false)
+		{
+			cameraSelect.setValue(camera.uuid);
+			render();
+		}
 
 	} );
 
