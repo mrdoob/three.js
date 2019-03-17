@@ -20,6 +20,7 @@ var Config = function () {
 		'project/renderer/gammaInput': false,
 		'project/renderer/gammaOutput': false,
 		'project/renderer/shadows': true,
+		'project/renderer/showHelpers': true,
 		'project/renderer/sceneCameras': 'topLeft',
 		'project/renderer/showSceneCameras': true,
 

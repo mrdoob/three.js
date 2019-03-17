@@ -632,7 +632,7 @@ var Viewport = function ( editor ) {
 
 		renderer.render( scene, cam );
 
-		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+		if ( config.getKey( 'project/renderer/showHelpers' ) === true && renderer instanceof THREE.RaytracingRenderer === false ) {
 
 			renderer.render( sceneHelpers, cam );
 

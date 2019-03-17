@@ -246,6 +246,7 @@ var Strings = function ( config ) {
 			'sidebar/settings/theme/dark': 'dark',
 			'sidebar/settings/sceneCameras': 'Camera Select Menu',
 			'sidebar/settings/showSceneCameras': 'Show Camera Select Menu',
+			'sidebar/settings/showHelpers': 'Show Heleprs',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
