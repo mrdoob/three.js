@@ -18,7 +18,7 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 	var pointsRow = new UI.Row();
 	pointsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tube_geometry/path' ) ).setWidth( '90px' ) );
 
-	var points = new UI.Points(editor).setValue(parameters.path.points).onChange(update).onEdit(edit);
+	var points = new UI.Points( editor ).setValue( parameters.path.points ).onChange( update ).onEdit( edit );
 	pointsRow.add( points );
 
 	container.add( pointsRow );
@@ -98,26 +98,30 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 
 	}
 
-	function edit(scene) {
-		if(scene.visible)
-		{
-			object.getWorldPosition(scene.position);
+	function edit( scene ) {
+
+		if ( scene.visible ) {
+
+			object.getWorldPosition( scene.position );
 			object.visible = false;
-			signals.tempSceneChanged.dispatch(scene);
-		}
-		else
-		{
+			signals.tempSceneChanged.dispatch( scene );
+
+		} else {
+
 			var pointList = [];
 			var children = scene.children;
-			for(var i = 0; i < children.length-1; ++i)
-			{
-				pointList.push(children[i].position);
+			for ( var i = 0; i < children.length - 1; ++ i ) {
+
+				pointList.push( children[ i ].position );
+
 			}
-			points.setValue(pointList);
+			points.setValue( pointList );
 			object.visible = true;
-			editor.focus(object);
+			editor.focus( object );
 			signals.tempSceneChanged.dispatch();
+
 		}
+
 	}
 
 	return container;

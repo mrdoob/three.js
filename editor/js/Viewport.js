@@ -275,22 +275,25 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.tempSceneChanged.add(function(s){
+	signals.tempSceneChanged.add( function ( s ) {
+
 		tempScene = s;
-		if(tempScene === undefined)
-		{
+		if ( tempScene === undefined ) {
+
 			controls.enabled = true;
 			transformControls.enabled = true;
 			signals.objectSelected.active = true;
-		}
-		else
-		{
+
+		} else {
+
 			controls.enabled = false;
 			transformControls.enabled = false;
 			signals.objectSelected.active = false;
+
 		}
 		render();
-	});
+
+	} );
 
 	// signals
 
@@ -589,12 +592,16 @@ var Viewport = function ( editor ) {
 	//
 
 	function render() {
-		
-		if(tempScene !== undefined){
-			scene.add(tempScene);
+
+		if ( tempScene !== undefined ) {
+
+			scene.add( tempScene );
+
 		}
 
 		scene.updateMatrixWorld();
+
+
 		renderer.render( scene, camera );
 
 		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
@@ -608,9 +615,12 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if(tempScene !== undefined){
-			scene.remove(tempScene);
+		if ( tempScene !== undefined ) {
+
+			scene.remove( tempScene );
+
 		}
+
 	}
 
 	return container;

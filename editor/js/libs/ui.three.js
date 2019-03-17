@@ -453,17 +453,17 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 };
 
-UI.Points = function(editor)
-{
+UI.Points = function ( editor ) {
+
 	UI.Element.call( this );
 
 	var span = new UI.Span().setDisplay( 'inline-block' );
 
 	this.pointsList = new UI.Div();
-	span.add(this.pointsList);
+	span.add( this.pointsList );
 
 	var row = new UI.Row();
-	span.add(row);
+	span.add( row );
 
 	var scope = this;
 	var addPointButton = new UI.Button( '+' ).onClick( function () {
@@ -484,84 +484,93 @@ UI.Points = function(editor)
 
 	} );
 	row.add( addPointButton );
-	
-	this.editButton = new UI.Button("edit").setDisplay('none').setId('editButton').setMarginLeft('4px').onClick(function()
-	{
-		if(scope.onEditCallback === null) return;
-		
+
+	this.editButton = new UI.Button( "edit" ).setDisplay( 'none' ).setId( 'editButton' ).setMarginLeft( '4px' ).onClick( function () {
+
+		if ( scope.onEditCallback === null ) return;
+
 		var scene = scope.editScene;
-		if(scene === undefined)
-		{
+		if ( scene === undefined ) {
+
 			scope.editScene = new THREE.Scene();
 			scene = scope.editScene;
-			scene.background = new THREE.Color(0x808080);
-		}
-		else
-		{
-			scene.visible = !scene.visible;
+			scene.background = new THREE.Color( 0x808080 );
+
+		} else {
+
+			scene.visible = ! scene.visible;
+
 		}
 
-		if(scene.visible)
-		{
-			scope.editButton.dom.setAttribute('editing', '');
+		if ( scene.visible ) {
+
+			scope.editButton.dom.setAttribute( 'editing', '' );
 			scene.children.length = 0;
 
 			var points = scope.getValue();
 			var geometry = new THREE.SphereBufferGeometry();
 			var material = new THREE.MeshNormalMaterial();
 			var positions = [];
-			for(var i = 0; i < points.length; ++i)
-			{
-				var sphere = new THREE.Mesh(geometry, material);
-				var p = points[i];
-				sphere.position.copy(p);
-				positions.push(p.x, p.y, p.z);
-				scene.add(sphere);
+			for ( var i = 0; i < points.length; ++ i ) {
+
+				var sphere = new THREE.Mesh( geometry, material );
+				var p = points[ i ];
+				sphere.position.copy( p );
+				positions.push( p.x, p.y, p.z );
+				scene.add( sphere );
+
 			}
 
-			var line = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({
-				color : 0xff0000
-			}));
-			line.geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+			var line = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( {
+				color: 0xff0000
+			} ) );
+			line.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 			line.computeLineDistances();
-			scene.add(line);
-			scope.line = line
+			scene.add( line );
+			scope.line = line;
 
 			// don't drag the line
-			scope.drag = new THREE.DragControls(scene.children.slice(0, points.length), editor.camera, document.querySelector('canvas'));
-			scope.drag.addEventListener('drag', function()
-			{
-				scope.onEditCallback(scene);
-			});
-			scope.drag.addEventListener('dragend', function()
-			{
+			scope.drag = new THREE.DragControls( scene.children.slice( 0, points.length ), editor.camera, document.querySelector( 'canvas' ) );
+			scope.drag.addEventListener( 'drag', function () {
+
+				scope.onEditCallback( scene );
+
+			} );
+			scope.drag.addEventListener( 'dragend', function () {
+
 				var positions = scope.line.geometry.attributes.position;
 				var children = scene.children;
-				for(var i = 0; i < children.length-1; ++i)
-				{
-					var p = children[i].position;
-					positions.setXYZ(i, p.x, p.y, p.z);
+				for ( var i = 0; i < children.length - 1; ++ i ) {
+
+					var p = children[ i ].position;
+					positions.setXYZ( i, p.x, p.y, p.z );
+
 				}
 				positions.needsUpdate = true;
-				scope.onEditCallback(scene);
-			});
-		}
-		else
-		{
-			scope.editButton.dom.removeAttribute('editing');
+				scope.onEditCallback( scene );
+
+			} );
+
+		} else {
+
+			scope.editButton.dom.removeAttribute( 'editing' );
 			scope.drag.dispose();
+
 		}
 
-		scope.onEditCallback(scene);
-	});
-	row.add(this.editButton);
+		scope.onEditCallback( scene );
 
-	this.update = function()
-	{
-		if(scope.onChangeCallback !== null)
-		{
+	} );
+	row.add( this.editButton );
+
+	this.update = function () {
+
+		if ( scope.onChangeCallback !== null ) {
+
 			scope.onChangeCallback();
+
 		}
+
 	};
 
 	this.dom = span.dom;
@@ -571,6 +580,7 @@ UI.Points = function(editor)
 	this.onEditCallback = null;
 	this.showZ = true;
 	return this;
+
 };
 
 UI.Points.prototype = Object.create( UI.Element.prototype );
@@ -584,17 +594,18 @@ UI.Points.prototype.onChange = function ( callback ) {
 
 };
 
-UI.Points.prototype.onEdit = function( callback )
-{
+UI.Points.prototype.onEdit = function ( callback ) {
+
 	this.onEditCallback = callback;
 
-	this.editButton.setDisplay(this.onEditCallback !== null ? 'block' : 'none');
+	this.editButton.setDisplay( this.onEditCallback !== null ? 'block' : 'none' );
 
 	return this;
-}
 
-UI.Points.prototype.getValue = function()
-{
+};
+
+UI.Points.prototype.getValue = function () {
+
 	var points = [];
 	var count = 0;
 
@@ -604,37 +615,42 @@ UI.Points.prototype.getValue = function()
 
 		if ( ! pointUI ) continue;
 
-		if(this.showZ === true)
-		{
+		if ( this.showZ === true ) {
+
 			points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
-		}
-		else
-		{
+
+		} else {
+
 			points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue() ) );
+
 		}
-		++count;
+		++ count;
 		pointUI.lbl.setValue( count );
 
 	}
 
 	return points;
+
 };
 
-UI.Points.prototype.clear = function()
-{
-	for(var i = 0; i < this.pointsUI.length; ++i)
-	{
-		if(this.pointsUI[i])
-		{
-			this.deletePointRow(i, true);
+UI.Points.prototype.clear = function () {
+
+	for ( var i = 0; i < this.pointsUI.length; ++ i ) {
+
+		if ( this.pointsUI[ i ] ) {
+
+			this.deletePointRow( i, true );
+
 		}
+
 	}
 
 	this.lastPointIdx = 0;
-}
 
-UI.Points.prototype.setValue = function(points)
-{
+};
+
+UI.Points.prototype.setValue = function ( points ) {
+
 	this.clear();
 
 	for ( var i = 0; i < points.length; i ++ ) {
@@ -646,15 +662,16 @@ UI.Points.prototype.setValue = function(points)
 
 	this.update();
 	return this;
-}
 
-UI.Points.prototype.createPointRow = function( x, y, z ) {
+};
+
+UI.Points.prototype.createPointRow = function ( x, y, z ) {
 
 	var pointRow = new UI.Div();
 	var lbl = new UI.Text( this.lastPointIdx + 1 ).setWidth( '20px' );
 	var txtX = new UI.Number( x ).setWidth( '30px' ).onChange( this.update );
 	var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( this.update );
-	
+
 	var idx = this.lastPointIdx;
 	var scope = this;
 	var btn = new UI.Button( '-' ).onClick( function () {
@@ -663,44 +680,48 @@ UI.Points.prototype.createPointRow = function( x, y, z ) {
 
 	} );
 
-	var data =  { row: pointRow, lbl: lbl, x: txtX, y: txtY};
-	
+	var data = { row: pointRow, lbl: lbl, x: txtX, y: txtY };
+
 	this.pointsUI.push( data );
-	++this.lastPointIdx;
-	if(this.showZ === true)
-	{
-		var txtZ = new UI.Number( z  ).setWidth( '30px' ).onChange( this.update );
+	++ this.lastPointIdx;
+	if ( this.showZ === true ) {
+
+		var txtZ = new UI.Number( z ).setWidth( '30px' ).onChange( this.update );
 		data.z = txtZ;
 		pointRow.add( lbl, txtX, txtY, txtZ, btn );
-	}
-	else
-	{
+
+	} else {
+
 		pointRow.add( lbl, txtX, txtY, btn );
+
 	}
 
 	return pointRow;
 
 };
 
-UI.Points.prototype.deletePointRow = function(idx, dontUpdate)
-{
+UI.Points.prototype.deletePointRow = function ( idx, dontUpdate ) {
+
 	if ( ! this.pointsUI[ idx ] ) return;
 
 	this.pointsList.remove( this.pointsUI[ idx ].row );
 	this.pointsUI[ idx ] = null;
 
-	if(dontUpdate !== true)
-	{
-		this.update();
-	}
-}
+	if ( dontUpdate !== true ) {
 
-UI.Points.prototype.setShowZ = function(show)
-{
+		this.update();
+
+	}
+
+};
+
+UI.Points.prototype.setShowZ = function ( show ) {
+
 	this.showZ = show;
 
 	return this;
-}
+
+};
 
 UI.THREE = {};
 
