@@ -234,9 +234,11 @@ function WebVRManager( renderer ) {
 
 		var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
 
-		if ( device === null ) {
+		if ( isPresenting() === false ) {
 
 			camera.position.set( 0, userHeight, 0 );
+			camera.rotation.set( 0, 0, 0 );
+
 			return camera;
 
 		}
@@ -289,8 +291,6 @@ function WebVRManager( renderer ) {
 		}
 
 		poseObject.updateMatrixWorld();
-
-		if ( device.isPresenting === false ) return camera;
 
 		//
 
@@ -378,6 +378,8 @@ function WebVRManager( renderer ) {
 	this.setAnimationLoop = function ( callback ) {
 
 		animation.setAnimationLoop( callback );
+
+		if ( isPresenting() ) animation.start();
 
 	};
 

@@ -58,6 +58,9 @@
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
 		THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
 		loader.setDRACOLoader( new THREE.DRACOLoader() );
+			
+		// Optional: Pre-fetch Draco WASM/JS module, to save time while parsing.
+		THREE.DRACOLoader.getDecoderModule();
 
 		// Load a glTF resource
 		loader.load(

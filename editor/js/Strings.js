@@ -236,8 +236,6 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'antialias',
 			'sidebar/project/shadows': 'shadows',
-			'sidebar/project/gammainput': 'γ input',
-			'sidebar/project/gammaoutput': 'γ output',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
@@ -485,8 +483,6 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/gammainput': 'γ输入',
-			'sidebar/project/gammaoutput': 'γ输出',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',

@@ -332,6 +332,15 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				postprocessing.rtTextureDepth.setSize( window.innerWidth, window.innerHeight );
+				postprocessing.rtTextureColor.setSize( window.innerWidth, window.innerHeight );
+
+				postprocessing.bokeh_uniforms[ 'textureWidth' ].value = window.innerWidth;
+				postprocessing.bokeh_uniforms[ 'textureHeight' ].value = window.innerHeight;
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}

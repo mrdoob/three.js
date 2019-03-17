@@ -525,9 +525,9 @@ Sidebar.Material = function ( editor ) {
 		var textureWarning = false;
 		var objectHasUvs = false;
 
-		if ( object instanceof THREE.Sprite ) objectHasUvs = true;
-		if ( geometry instanceof THREE.Geometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
-		if ( geometry instanceof THREE.BufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
+		if ( object.isSprite ) objectHasUvs = true;
+		if ( geometry.isGeometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
+		if ( geometry.isBufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
 		if ( material ) {
 
