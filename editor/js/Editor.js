@@ -39,6 +39,7 @@ var Editor = function () {
 		sceneBackgroundChanged: new Signal(),
 		sceneFogChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
+		tempSceneChanged: new Signal(),
 
 		cameraChanged: new Signal(),
 

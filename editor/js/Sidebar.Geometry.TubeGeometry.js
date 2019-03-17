@@ -18,7 +18,7 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 	var pointsRow = new UI.Row();
 	pointsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tube_geometry/path' ) ).setWidth( '90px' ) );
 
-	var points = new UI.Points().setValue(parameters.path.points).onChange(update);
+	var points = new UI.Points(editor).setValue(parameters.path.points).onChange(update).onEdit(edit);
 	pointsRow.add( points );
 
 	container.add( pointsRow );
@@ -78,12 +78,15 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 	var tension = new UI.Number( parameters.path.tension ).setStep( 0.01 ).onChange( update );
 
 	tensionRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tube_geometry/tension' ) ).setWidth( '90px' ), tension );
+	tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 
 	container.add( tensionRow );
 
 	//
 
 	function update() {
+
+		tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 
 		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			new THREE.CatmullRomCurve3( points.getValue(), closed.getValue(), curveType.getValue(), tension.getValue() ),
@@ -93,6 +96,26 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 			closed.getValue()
 		) ) );
 
+	}
+
+	function edit(scene) {
+		if(scene.visible)
+		{
+			object.getWorldPosition(scene.position);
+			signals.tempSceneChanged.dispatch(scene);
+		}
+		else
+		{
+			var pointList = [];
+			var children = scene.children;
+			for(var i = 0; i < children.length-1; ++i)
+			{
+				pointList.push(children[i].position);
+			}
+			points.setValue(pointList);
+			signals.tempSceneChanged.dispatch();
+			editor.focus(object);
+		}
 	}
 
 	return container;

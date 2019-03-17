@@ -298,3 +298,7 @@ select {
 	}
 
 }
+#editButton[editing] {
+	color : #ffff00;
+	background-color: #ff0000;
+}

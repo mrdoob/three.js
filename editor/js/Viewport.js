@@ -20,6 +20,7 @@ var Viewport = function ( editor ) {
 	var camera = editor.camera;
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
+	var tempScene = undefined;
 
 	var objects = [];
 
@@ -273,6 +274,12 @@ var Viewport = function ( editor ) {
 		signals.cameraChanged.dispatch( camera );
 
 	} );
+
+	signals.tempSceneChanged.add(function(s){
+		tempScene = s;
+		controls.enabled = tempScene === undefined;
+		render();
+	});
 
 	// signals
 
@@ -571,7 +578,6 @@ var Viewport = function ( editor ) {
 	//
 
 	function render() {
-
 		scene.updateMatrixWorld();
 		renderer.render( scene, camera );
 
@@ -584,6 +590,10 @@ var Viewport = function ( editor ) {
 
 			}
 
+		}
+
+		if(tempScene !== undefined){
+			renderer.render(tempScene, camera);
 		}
 
 	}
