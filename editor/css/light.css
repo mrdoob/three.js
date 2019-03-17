@@ -232,29 +232,11 @@ select {
 		width: 100%;
 	}
 
-	#cameraSelect[layout='topLeft']{
-		margin-top: 32px;
-		left: 0;
-		top : 0;
-	}
-
-	#cameraSelect[layout='topRight']{
+	#cameraSelect{
 		margin-top: 32px;
 		margin-right: 300px;
 		right: 0;
 		top : 0;
-	}
-
-	#cameraSelect[layout='bottomLeft']{
-		bottom: 0;
-		left: 0;
-		padding-bottom: 60px;
-	}
-
-	#cameraSelect[layout='bottomRight']{ 
-		bottom: 0;
-		right: 0;
-		margin-right: 300px;
 	}
 
 

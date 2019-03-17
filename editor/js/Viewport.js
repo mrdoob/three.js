@@ -176,7 +176,6 @@ var Viewport = function ( editor ) {
 
 	signals.sceneCamerasChanged.add( function () {
 
-		sceneCameraDisplay.dom.setAttribute( 'layout', config.getKey( 'project/renderer/sceneCameras' ) || 'topLeft' );
 		sceneCameraDisplay.setDisplay( config.getKey( 'project/renderer/showSceneCameras' ) === true && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
 
 	} );

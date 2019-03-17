@@ -21,7 +21,7 @@ var Config = function () {
 		'project/renderer/gammaOutput': false,
 		'project/renderer/shadows': true,
 		'project/renderer/showHelpers': true,
-		'project/renderer/sceneCameras': 'topLeft',
+		'project/renderer/sceneCameras': 'topRight',
 		'project/renderer/showSceneCameras': true,
 
 		'project/vr': false,
