@@ -277,7 +277,18 @@ var Viewport = function ( editor ) {
 
 	signals.tempSceneChanged.add(function(s){
 		tempScene = s;
-		controls.enabled = tempScene === undefined;
+		if(tempScene === undefined)
+		{
+			controls.enabled = true;
+			transformControls.enabled = true;
+			signals.objectSelected.active = true;
+		}
+		else
+		{
+			controls.enabled = false;
+			transformControls.enabled = false;
+			signals.objectSelected.active = false;
+		}
 		render();
 	});
 
@@ -578,6 +589,11 @@ var Viewport = function ( editor ) {
 	//
 
 	function render() {
+		
+		if(tempScene !== undefined){
+			scene.add(tempScene);
+		}
+
 		scene.updateMatrixWorld();
 		renderer.render( scene, camera );
 
@@ -593,9 +609,8 @@ var Viewport = function ( editor ) {
 		}
 
 		if(tempScene !== undefined){
-			renderer.render(tempScene, camera);
+			scene.remove(tempScene);
 		}
-
 	}
 
 	return container;

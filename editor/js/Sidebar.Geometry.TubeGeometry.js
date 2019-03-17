@@ -102,6 +102,7 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 		if(scene.visible)
 		{
 			object.getWorldPosition(scene.position);
+			object.visible = false;
 			signals.tempSceneChanged.dispatch(scene);
 		}
 		else
@@ -113,8 +114,9 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 				pointList.push(children[i].position);
 			}
 			points.setValue(pointList);
-			signals.tempSceneChanged.dispatch();
+			object.visible = true;
 			editor.focus(object);
+			signals.tempSceneChanged.dispatch();
 		}
 	}
 
