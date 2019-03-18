@@ -25,6 +25,7 @@ var Config = function () {
 
 		'settings/history': false,
 		'settings/showStats': false,
+		'settings/constantRender':false,
 
 		'settings/shortcuts/translate': 'w',
 		'settings/shortcuts/rotate': 'e',

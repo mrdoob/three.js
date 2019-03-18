@@ -6,6 +6,8 @@ var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
 
+	var config = editor.config;
+
 	var container = new UI.Panel();
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
@@ -534,6 +536,9 @@ var Viewport = function ( editor ) {
 			mixer.update( ( time - prevTime ) / 1000 );
 			render();
 
+		}
+		else if(config.getKey('settings/constantRender') === true) {
+			render();
 		}
 
 		prevTime = time;

@@ -253,6 +253,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': 'Grid',
 			'sidebar/settings/showStats': 'FPS/Memory',
+			'sidebar/settings/constantRender': 'Constant Render',
 
 			'sidebar/history/history': 'HISTORY',
 			'sidebar/history/persistent': 'persistent',
