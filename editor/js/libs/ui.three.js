@@ -510,16 +510,17 @@ UI.Points = function ( editor ) {
 
 			var points = scope.getValue();
 			var geometry = new THREE.SphereBufferGeometry();
-			var material = new THREE.MeshBasicMaterial({
-				color : 0,
-				side : THREE.BackSide,
-				transparent : true,
-				opacity : 0.75
-			});
-			
-			function resize(_renderer, _scene, camera)
-			{
-				this.scale.setScalar(camera.position.distanceTo(this.position) * 0.01);
+			var material = new THREE.MeshBasicMaterial( {
+				color: 0,
+				side: THREE.BackSide,
+				transparent: true,
+				opacity: 0.75
+			} );
+
+			function resize( _renderer, _scene, camera ) {
+
+				this.scale.setScalar( camera.position.distanceTo( this.position ) * 0.01 );
+
 			}
 
 			var positions = [];
