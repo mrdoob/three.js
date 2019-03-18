@@ -8,9 +8,64 @@
 
 //Attenttion!!! Save this file as UTF-8 for localization.
 
-	var _stereo = new THREE.StereoCamera();
-	_stereo.aspect = 0.5;
-	var size = new THREE.Vector2();
+THREE.StereoEffectParameters = {
+
+	//spatialMultiplex
+	//https://en.wikipedia.org/wiki/DVB_3D-TV
+	spatialMultiplexsIndexs: {
+		Mono: 0,
+		SbS: 1, //https://en.wikipedia.org/wiki/DVB_3D-TV#Side_by_side
+		TaB: 2, //https://en.wikipedia.org/wiki/DVB_3D-TV#Top_and_bottom
+	},
+};
+
+//StereoEffect
+//Uses dual PerspectiveCameras for Parallax Barrier https://en.wikipedia.org/wiki/Parallax_barrier effects
+//renderer: THREE.WebGLRenderer
+//options:
+//{
+//	spatialMultiplex: spatial multiplex
+//		See https://en.wikipedia.org/wiki/DVB_3D-TV for details
+//		Available values
+//
+//			THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono - no stereo effacts
+//
+//			THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS - 'Side by side' format just put the left and right images one next to the other.
+//				See https://en.wikipedia.org/wiki/DVB_3D-TV#Side_by_side for dretails
+//
+//			THREE.StereoEffectParameters.spatialMultiplexsIndexs.TaB - 'Top and bottom' format put left and right images one above the other.
+//				See //https://en.wikipedia.org/wiki/DVB_3D-TV#Top_and_bottom for details
+//
+//		Example - spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono
+//		Default is THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS
+//
+//	camera: THREE.PerspectiveCamera. Use the camera key if you want control cameras focus.
+//	far: Camera frustum far plane. The far key uses for correct calculation default values of Eye separation. Default is 10.
+//	cookie: Your custom cookie function for saving and loading of the StereoEffects settings. Default cookie is not saving settings.
+//	stereoAspect: THREE.StereoCamera.aspect. Camera frustum aspect ratio. Default is 0.5 for compatibility with previous version.
+//}
+THREE.StereoEffect = function ( renderer, options ) {
+
+	options = options || {};
+	this.options = options;
+
+	options.stereo = new THREE.StereoCamera();
+	options.stereo.aspect = options.stereoAspect || 0.5;
+	options.cookie = options.cookie || new THREE.cookie().default;
+	if ( options.far === undefined )
+		options.far = new THREE.PerspectiveCamera().focus;
+	options.focus = options.camera === undefined ? new THREE.PerspectiveCamera().focus : new THREE.Vector3().distanceTo( options.camera.position );
+	options.zeroParallax = 0;
+	new THREE.cookie( 'StereoEffect' ).getObject( options, {
+
+		spatialMultiplex: options.spatialMultiplex !== undefined ? options.spatialMultiplex : THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS, //Use default as 'Side by side' for compability with previous version of THREE.StereoEffect
+		eyeSep: ( new THREE.StereoCamera().eyeSep / 10 ) * options.far,
+		focus: options.focus,
+		zeroParallax: 0,
+
+	} );
+	if ( options.camera !== undefined )
+		options.camera.focus = options.focus;
 
 	this.setEyeSeparation = function ( eyeSep ) {
 
@@ -32,9 +87,7 @@
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		_stereo.update( camera );
-
-		renderer.getSize( size );
+		var size = renderer.getSize();
 
 		if ( renderer.autoClear ) renderer.clear();
 		renderer.setScissorTest( true );
