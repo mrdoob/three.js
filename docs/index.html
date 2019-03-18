@@ -69,6 +69,8 @@
 
 				language = value;
 				createNavigation();
+				updateFilter();
+				autoChangeUrlLanguage( language );
 
 			}
 
@@ -223,6 +225,19 @@
 					}
 
 				}
+
+			}
+
+			// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
+
+			function autoChangeUrlLanguage( language ) {
+
+				var hash = location.hash;
+				if ( hash === '' ) return;
+				var docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
+				var docLink = hash.substr( hash.indexOf( '/' ) + 1 );
+				docLink = docLink.substr( docLink.indexOf( '/' ) );
+				location.href = docType + language + docLink;
 
 			}
 

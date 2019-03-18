@@ -342,7 +342,8 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.sourceMaterial.uniforms[ "densityMap" ].value = this.field0.texture;
 
-		renderer.render( this.fieldScene, this.orthoCamera, this.field1 );
+		renderer.setRenderTarget( this.field1 );
+		renderer.render( this.fieldScene, this.orthoCamera );
 
 		this.sourceMesh.visible = false;
 
@@ -356,7 +357,8 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.diffuseMaterial.uniforms[ "densityMap" ].value = this.field0.texture;
 
-		renderer.render( this.fieldScene, this.orthoCamera, this.field1 );
+		renderer.setRenderTarget( this.field1 );
+		renderer.render( this.fieldScene, this.orthoCamera );
 
 		this.diffuseMesh.visible = false;
 
@@ -370,7 +372,8 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.driftMaterial.uniforms[ "densityMap" ].value = this.field0.texture;
 
-		renderer.render( this.fieldScene, this.orthoCamera, this.field1 );
+		renderer.setRenderTarget( this.field1 );
+		renderer.render( this.fieldScene, this.orthoCamera );
 
 		this.driftMesh.visible = false;
 
@@ -386,7 +389,8 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.projMaterial1.uniforms[ "densityMap" ].value = this.field0.texture;
 
-		renderer.render( this.fieldScene, this.orthoCamera, this.fieldProj );
+		renderer.setRenderTarget( this.fieldProj );
+		renderer.render( this.fieldScene, this.orthoCamera );
 
 		this.projMesh1.visible = false;
 
@@ -398,7 +402,8 @@ THREE.Fire = function ( geometry, options ) {
 
 		for ( var i = 0; i < 20; i ++ ) {
 
-			renderer.render( this.fieldScene, this.orthoCamera, this.field1 );
+			renderer.setRenderTarget( this.field1 );
+			renderer.render( this.fieldScene, this.orthoCamera );
 
 			var temp = this.field1;
 			this.field1 = this.fieldProj;
@@ -417,7 +422,8 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.projMesh3.visible = true;
 
-		renderer.render( this.fieldScene, this.orthoCamera, this.field1 );
+		renderer.setRenderTarget( this.field1 );
+		renderer.render( this.fieldScene, this.orthoCamera );
 
 		this.projMesh3.visible = false;
 
@@ -425,7 +431,7 @@ THREE.Fire = function ( geometry, options ) {
 
 	};
 
-	this.onBeforeRender = function ( renderer, scene, camera ) {
+	this.onBeforeRender = function ( renderer ) {
 
 		var delta = this.clock.getDelta();
 		if ( delta > 0.1 ) {

@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - math</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				/*width: 100%;*/
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+
+		<script src="../build/three.js"></script>
+		<script src="js/WebGL.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<!--THREE.ConvexBufferGeometry-->
+		<!--
+		<script src="js/geometries/ConvexGeometry.js"></script>
+		<script src="js/QuickHull.js"></script>
+		-->
+
+		<!--A lightweight graphical user interface for changing variables in JavaScript. https://github.com/dataarts/dat.gui -->
+		<script src="js/libs/dat.gui.min.js"></script>
+		<!--<script src="../../dat.gui/build/dat.gui.js"></script>
+
+		<script src="../src/objects/SpriteText.js"></script>
+		-->
+		<script src="js/effects/StereoEffect.js"></script>
+
+		<!--<script src="http://stemkoski.github.io/MathBox/parser.js"></script>-->
+
+		<!--exampleIds.matrix3D-->
+		<!--<script src='../docs/scenes/js/geometry.js'></script>-->
+
+		<script src="../src/math/MathBox.js"></script>
+
+		<!--for THREE.MathBox.matrix3D-->
+		<script src='../docs/scenes/js/geometry.js'></script>
+
+		<!--Bold line. For THREE.MathBox.matrix3D. See https://github.com/mrdoob/three.js/blob/master/examples/webgl_lines_fat.html for details -->
+		<script src='js/lines/LineSegmentsGeometry.js'></script>
+		<script src='js/lines/LineGeometry.js'></script>
+		<script src='js/lines/LineMaterial.js'></script>
+		<script src='js/lines/LineSegments2.js'></script>
+		<script src='js/lines/Line2.js'></script>
+		<!--<script src="../src/THREE.MeshLine.js"></script>--><!-- https://github.com/spite/THREE.MeshLine/blob/master/src/THREE.MeshLine.js -->
+
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - math clear
+			by <a href="https://github.com/anhr" target="_blank" rel="noopener">anhr</a>
+		</div>
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild(WEBGL.getWebGLErrorMessage());
+
+			}
+
+			var camera, scene, renderer//, scale = 1//, mesh, target, effect, controls, groupExample,
+				mathBox = new THREE.MathBox();
+			var gui;
+			gui = new dat.GUI();
+			document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+			init();
+			animate();
+
+			function init() {
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10);
+				camera.position.set( 0.4, 0.4, 2 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x000000);
+				scene.fog = new THREE.Fog(0x000000, 250, 1400);
+
+				var length = 2;
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild(renderer.domElement);
+
+				//
+
+				controls = new THREE.OrbitControls(camera, renderer.domElement);
+				controls.target.set(0, 0, 0);
+				controls.update();
+
+				var i = 3;
+				switch ( i ){
+
+					case 0://point
+						var pointVertice = new THREE.Vector3( -1, -1, -1 ),
+							point = mathBox.addPoints(/* {
+
+								//vertices: [ pointVertice, new THREE.Vector3( 0.5, 0.5, 0.5 ) ],
+								//groupParent: scene,
+								//folder: gui,
+
+							} */);
+/*
+						if ( typeof gui !== 'undefined' )
+							mathBox.guiPoint( pointVertice, gui, {
+
+								onChangeX: function ( value ) {
+
+									point.geometry.attributes.position.array[0] = value;
+									point.geometry.attributes.position.needsUpdate = true;
+
+								},
+								onChangeY: function ( value ) {
+
+									point.geometry.attributes.position.array[1] = value;
+									point.geometry.attributes.position.needsUpdate = true;
+
+								},
+								onChangeZ: function ( value ) {
+
+									point.geometry.attributes.position.array[2] = value;
+									point.geometry.attributes.position.needsUpdate = true;
+
+								},
+
+							} );
+*/
+						break;
+					case 1://line
+						mathBox.line( {
+							points: mathBox.addPoints( {
+
+								vertices: [
+									new THREE.Vector3( 0, 0, 0 ),
+									new THREE.Vector3( 0.5, 0.5, 0.5 ),
+								],
+								//position: new THREE.Vector3( 0.1, 1, -3 ),
+								//groupParent: groupExample,
+								folder: gui,
+
+							} ),
+							/*
+							vertices: [
+								//new THREE.Vector3( 0, 0, 0 ),
+								//new THREE.Vector3( 0.5, 0.5, 0.5 ),
+							],
+							*/
+							//groupParent: scene,
+							//folder: gui,
+
+						}
+						);
+						break;
+					case 2://curve
+						mathBox.curve( {
+
+							functions: {
+
+								x: '((t+10)/10-1)*Math.sin(t)*a',
+								y: '((t+10)/10-1)*a+b',
+								z: '((t+10)/10-1)*Math.cos(t)*a',
+
+							},
+							/*
+							params: {
+
+								//a: 1,
+								//b: 0,
+								//t: { min: -10, max: 10 },
+								//pointsCount: 50,
+
+							},
+							*/
+							//groupParent: scene,
+							//folder: gui,
+
+						}
+						);
+						break;
+					case 3://matrix3D
+/*
+						var axesPositionX = axesHelper.getAxesPosition( axesHelper.axesEnum.x ),
+							axesPositionZ = axesHelper.getAxesPosition( axesHelper.axesEnum.z );
+*/
+						var sm = 0.1;//matrix3D scale
+						mathBox.pointLight().add();
+						mathBox.matrix3D({
+							/*
+							limits: {
+
+								x: { min: axesPositionX.min.scale, max: axesPositionX.max.scale, },
+								z: { min: axesPositionZ.min.scale, max: axesPositionZ.max.scale, },
+
+							},
+							*/
+							/*
+							points: [
+
+								//[-1 * sm, 0 * sm, 1 * sm, 2 * sm*],
+								//[0 * sm, 0 * sm, -4 * sm, 0 * sm],
+								//[-1 * sm, -1 * sm, -1 * sm, -1 * sm],
+							],
+							*/
+							//folder: gui,
+							//light: mathBox.pointLight().add(),
+
+						}
+						);
+						break;
+
+				}
+
+				window.addEventListener( 'resize', onResize, false );
+			}
+			function onResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				if ( typeof effect === 'undefined' )
+					renderer.setSize( window.innerWidth, window.innerHeight );
+				else effect.setSize(window.innerWidth, window.innerHeight);
+
+			}
+			function onDocumentMouseMove(event) {
+
+				if (event.buttons != 1)
+					return;
+
+				render();
+
+			}
+			function animate() {
+
+				requestAnimationFrame(animate);
+
+				render();
+
+			}
+
+			function render() {
+
+				if ( typeof effect === 'undefined' )
+					renderer.render( scene, camera );
+				else effect.render(scene, camera);
+
+			}
+		</script>
+	</body>
+</html>

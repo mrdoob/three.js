@@ -8,10 +8,10 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>圆柱体[name]</h1>
+		<h1>圆柱坐标（[name]）</h1>
 
 		<p class="desc">
-			A point's [link:https://en.wikipedia.org/wiki/Cylindrical_coordinate_system cylindrical coordinates].
+			一个点的[link:https://en.wikipedia.org/wiki/Cylindrical_coordinate_system cylindrical coordinates]（圆柱坐标）。
 		</p>
 
 
@@ -39,12 +39,12 @@
 
 		<h3>[method:Cylindrical clone]()</h3>
 		<p>
-			返回一个与当前拥有相同 [page:.radius radius], [page:.theta theta] 和 [page:.y y] 属性的圆柱体。
+			返回一个与当前拥有相同 [page:.radius radius], [page:.theta theta] 和 [page:.y y] 属性的圆柱坐标。
 		</p>
 
 		<h3>[method:Cylindrical copy]( [param:Cylindrical other] )</h3>
 		<p>
-			将传入的圆柱体对象的 [page:.radius radius], [page:.theta theta] 和 [page:.y y] 属性赋给当前对象。
+			将传入的圆柱坐标对象的 [page:.radius radius], [page:.theta theta] 和 [page:.y y] 属性赋给当前对象。
 		</p>
 
 		<h3>[method:Cylindrical set]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
@@ -53,15 +53,15 @@
 
 		<h3>[method:Cylindrical setFromVector3]( [param:Vector3 vec3] )</h3>
 		<p>
-			从 [page:Vector3 Vector3] 中取x,y,z,并调用setFromCartesianCoords来设置圆柱体的
+			从 [page:Vector3 Vector3] 中取x,y,z,并调用setFromCartesianCoords来设置圆柱坐标的
 			[page:.radius radius]、[page:.theta theta] 和 [page:.y y] 的属性值。
 
 		</p>
 
 		<h3>[method:Cylindrical setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-			使用笛卡尔坐标来设置该圆柱体的 [page:.radius radius], [page:.theta theta]
-			and [page:.y y] 属性值。
+			使用笛卡尔坐标来设置该圆柱坐标中 [page:.radius radius], [page:.theta theta]
+			以及 [page:.y y] 的属性值。
 		</p>
 
 		<h2>源码（Source）</h2>

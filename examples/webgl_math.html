@@ -1,0 +1,866 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - math</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				/*width: 100%;*/
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+
+		<script src="../build/three.js"></script>
+		<script src="js/WebGL.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<!--THREE.ConvexBufferGeometry-->
+		<!--<script src="js/geometries/ConvexGeometry.js"></script>
+		<script src="js/QuickHull.js"></script>-->
+
+		<!--A lightweight graphical user interface for changing variables in JavaScript. https://github.com/dataarts/dat.gui -->
+		<!--<script src="js/libs/dat.gui.min.js"></script>-->
+		<script src="../../dat.gui/build/dat.gui.js"></script>
+
+		<script src="js/effects/StereoEffect.js"></script>
+		<script src="../src/objects/SpriteText.js"></script>
+		<!--<script src="http://stemkoski.github.io/MathBox/parser.js"></script>-->
+
+		<script src="../src/math/MathBox.js"></script>
+
+		<!--for exampleIds.matrix3D-->
+		<!--<script src='../docs/scenes/js/geometry.js'></script>-->
+
+		<!--Bold line. For exampleIds.matrix3D. See https://github.com/mrdoob/three.js/blob/master/examples/webgl_lines_fat.html for details -->
+		<!--
+		<script src='js/lines/LineSegmentsGeometry.js'></script>
+		<script src='js/lines/LineGeometry.js'></script>
+		<script src='js/lines/LineMaterial.js'></script>
+		<script src='js/lines/LineSegments2.js'></script>
+		<script src='js/lines/Line2.js'></script>
+			-->
+
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - math
+			by <a href="https://github.com/anhr" target="_blank" rel="noopener">anhr</a>
+		</div>
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild(WEBGL.getWebGLErrorMessage());
+
+			}
+
+			var camera, scene, renderer, mesh, target, effect, controls, scale = 1, groupExample,
+				color = 0xffffff,
+				mathBox;
+/*
+var particles;
+var raycaster, intersects;
+var mouse, INTERSECTED;
+*/
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+//var gui = new dat.GUI();
+
+			init();
+			animate();
+
+			function init() {
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01 * scale, 10 * scale);
+				camera.position.set( 0.4 * scale, 0.4 * scale, 2 * scale );
+				//camera.position.z = 2 * scale;//не видно ось z
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x000000);
+				scene.fog = new THREE.Fog(0x000000, 250 * scale, 1400 * scale);
+
+				var length = 2 * scale;
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild(renderer.domElement);
+
+//
+/*
+raycaster = new THREE.Raycaster();
+mouse = new THREE.Vector2();
+*/
+				//
+
+				controls = new THREE.OrbitControls(camera, renderer.domElement);
+				controls.target.set(0, 0, 0);
+				controls.update();
+
+				// helper
+
+				var colorsHelper = 0x80;
+				var axesHelper = new THREE.AxesHelper(1 * scale, {
+					cookie: THREE.cookie,
+					negativeAxes: true,//new THREE.cookie( 'negativeAxes' ).isTrue( true ),
+//					colors: 'rgb( 100, 100, 100 )',//gray axes
+/*
+					colors: [
+						'rgb( 255, 0, 0 )',//x is red
+						'rgb( 0, 255, 0 )',//y is green
+						'rgb( 0, 0, 255 )',//z is blue
+					],
+*/
+					colors: [
+						//red	green	blue
+//						0.5, 0.5, 0.5,//gray axes
+						colorsHelper / 0xff, colorsHelper / 0xff, colorsHelper / 0xff,//gray axes
+					],
+					/*
+					colors: [
+						//red	green	blue
+						0,		0,		1,//x is blue
+						0,		1,		0,//y is green
+						1,		0,		0,//z is red
+					],
+					*/
+					/*
+					colors: [
+						//begin					end
+						//red	green	blue	red		green	blue
+						0,		0,		1,		0,		0,		1,//x is blue
+						0,		1,		0,		0,		1,		0,//y is green
+						1,		0,		0,		1,		0,		0,//z is red
+					],
+					*/
+					scales: {
+
+						display: true,
+						x: {
+
+							//name: 'Time(sec.)',
+							min: -10,
+							max: 10,
+							marks: 11,
+
+						},
+						y: {
+
+							//name: 'Temperature(degrees Celsius)',
+							min: -4,
+							max: 2,
+
+						},
+						z: {
+
+							name: 'Radius(m.)',
+							min: -110,
+							max: -100,
+							marks: 11,
+
+						},
+
+					},
+					onchangeWindowRange: function(){
+
+						scaleObject.object3D( groupExample.userData.object3D, axesHelper.options.scales );
+						if ( ( groupExample === undefined ) || ( groupExample.userData.guiPoints === undefined ) )
+							return;
+						var scales = this.scales;
+						groupExample.userData.guiPoints.forEach( function ( guiPoint ){
+
+							guiPoint.x.setScale( scales.x );
+							guiPoint.y.setScale( scales.y );
+							guiPoint.z.setScale( scales.z );
+
+						} );
+
+					}
+				})
+				scene.add( axesHelper );
+
+				mathBox = new THREE.MathBox( {
+
+					axesHelper: axesHelper,
+					color: color,
+					colorsHelper: colorsHelper,
+					scale: scale,
+
+				} );
+
+				//
+
+				effect = new THREE.StereoEffect(renderer, {
+
+					spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono,
+					cookie: THREE.cookie,
+					far: camera.far,
+					camera: camera,
+					stereoAspect: 1,
+
+				} );
+
+				//dat-gui JavaScript Controller Library
+				//https://github.com/dataarts/dat.gui
+
+				//Localization
+
+				var lang,
+					dimensionIds = {
+
+						d3: 0,
+						d4: 1,
+
+					},
+					exampleIds = {
+
+						noExample: 0,
+						points: 1,
+						line: 2,
+						curve: 3,
+						surface: 4,
+						matrix3D: 5,
+						function3D: 6,
+						points4d: 7,
+
+					}/*,
+					exampleIds4D = {
+
+						noExample: 0,
+
+					}*/;
+				switch ( THREE.getLanguageCode() ) {
+
+					case 'ru'://Russian language
+						lang = {
+
+							settings: 'Настройки',
+							dimensions: 'Измерения',
+							examples: 'Примеры',
+							examplesArray: {
+
+								'Выберите пример': exampleIds.noExample,
+								'Точки': exampleIds.points,
+								'Линия': exampleIds.line,
+								'Кривая': exampleIds.curve,
+								'Поверхность': exampleIds.surface,
+								'Матрица 3D': exampleIds.matrix3D,
+								'Функция 3D': exampleIds.function3D
+
+							},
+							examplesArray4D: {
+
+								'Выберите пример': exampleIds.noExample,
+								'Точки': exampleIds.points4d,
+
+							},
+							exampleSettings: 'Настройки примера',
+							noSelect: 'не выбрана',
+
+						}
+						break;
+					default://Custom language
+						lang = {
+
+							settings: 'Settings',
+							dimensions: 'Dimensions',
+							examples: 'Examples',
+							examplesArray: {
+
+								'Сhoose example': exampleIds.noExample,
+								'Points': exampleIds.points,
+								'Line': exampleIds.line,
+								'Curve': exampleIds.curve,
+								'Surface': exampleIds.surface,
+								'3D matrix': exampleIds.matrix3D,
+								'3D function': exampleIds.function3D
+
+							},
+							examplesArray4D: {
+
+								'Сhoose example': exampleIds.noExample,
+								'Points': exampleIds.points4d,
+
+							},
+							exampleSettings: 'Example Settings',
+							noSelect: 'no select',
+
+						}
+
+				}
+
+				//
+
+				var gui = new dat.GUI();
+
+				//Examples
+
+				function displayExampleSettings( value ) {
+
+					var display = value ? 'block' : 'none';
+					fExampleSettings.domElement.style.display = display;
+
+				}
+				function  exampleSwitch( value ) {
+
+					//remove examples
+
+					mathBox.removeGroup( groupExample );
+					groupExample = undefined;
+
+					mathBox.pointLight().remove();
+
+					//remove example settings
+					if ( fExampleSettings.__controllers.length > 0 ) {
+
+						for ( var i = fExampleSettings.__controllers.length - 1; i >= 0; i-- ) {
+
+							fExampleSettings.remove( fExampleSettings.__controllers[i] );
+
+						}
+
+					}
+					Object.keys( fExampleSettings.__folders ).forEach( function ( key ) {
+
+						fExampleSettings.removeFolder( fExampleSettings.__folders[ key ] );
+
+					} );
+
+					function runExample( callback ) {
+
+						groupExample = new THREE.Group();
+						scene.add( groupExample );
+						callback();
+						displayExampleSettings( true );
+
+					}
+
+					switch ( parseInt( value ) ) {
+
+						case exampleIds.noExample:
+							displayExampleSettings( false );
+							break;
+						case exampleIds.points:
+							runExample( function () {
+
+								mathBox.addPoints( {
+
+									vertices: [
+										new THREE.Vector3( 8, 1, -102 ),
+										new THREE.Vector3( 5, -3, -106 ),
+										new THREE.Vector3( -6, 0, -101 ),
+									],
+									position: new THREE.Vector3( 1, 0.5, -2 ),
+									groupParent: groupExample,
+									folder: fExampleSettings,
+
+								} );
+
+							} );
+							break;
+						case exampleIds.line:
+							runExample( function () {
+
+								mathBox.line( {
+
+									points: mathBox.addPoints( {
+
+										vertices: [
+											new THREE.Vector3( 8, 1, -102 ),
+											new THREE.Vector3( 5, -3, -106 ),
+											new THREE.Vector3( -6, 0, -101 ),
+										],
+										position: new THREE.Vector3( 0.1, 1, -3 ),
+										groupParent: groupExample,
+										folder: fExampleSettings,
+
+									} ),
+									//vertices: [ new THREE.Vector3( 1, 0, -107 ), new THREE.Vector3( 4, 1, -102 ), ],
+									//position: new THREE.Vector3( 1, 0.5, -2 ),
+									//groupParent: groupExample,
+									//color: 'red',
+//									folder: fExampleSettings,
+
+								} );
+
+							} );
+							break;
+						case exampleIds.curve:
+							runExample( function () {
+
+								mathBox.line( {
+
+									points: mathBox.addPoints( {
+
+										/*
+										vertices: [
+											new THREE.Vector3( 8, 1, -102 ),
+											new THREE.Vector3( 5, -3, -106 ),
+											new THREE.Vector3( -6, 0, -101 ),
+										],
+										*/
+										functions: {
+
+											x: 't*Math.sin(t)*a',
+											y: '0.3*t*a-1+b',
+											z: 't*Math.cos(t)*a/2-105',
+
+										},
+										params: {
+
+											a: 1,
+											b: 0,
+											t: { min: -10, max: 10 },
+											pointsCount: 50,
+
+										},
+										//position: new THREE.Vector3( 1, 0.5, -2 ),
+										groupParent: groupExample,
+										folder: fExampleSettings,
+
+									} ),
+									/*
+									functions: {
+
+										x: 't*Math.sin(t)*a',
+										y: '0.3*t*a-1+b',
+										z: 't*Math.cos(t)*a/2-105',
+
+									},
+									params: {
+
+										a: 1,
+										b: 0,
+										t: { min: -10, max: 10 },
+										pointsCount: 50,
+
+									},
+									groupParent: groupExample,
+									folder: fExampleSettings,
+									*/
+
+								} );
+
+							} );
+							break; 
+						case exampleIds.surface:
+							runExample( function () {
+
+								mathBox.surface( {
+
+									vertices: [
+
+										[
+											new THREE.Vector3( -10, -3, -101 ),
+											new THREE.Vector3( -5, 0, -102 ),
+											new THREE.Vector3( 5, 1, -101 ),
+											new THREE.Vector3( 10, -2, -103 )
+										],
+										[
+											new THREE.Vector3( -10, 1, -104 ),
+											new THREE.Vector3( -5, 0, -103 ),
+											new THREE.Vector3( 5, -1, -105 ),
+											//new THREE.Vector3( 10, -2, -104 )
+										],
+										[
+											new THREE.Vector3( -10, -2, -108 ),
+											new THREE.Vector3( -5, -1, -107 ),
+											new THREE.Vector3( 5, 0, -108 ),
+											new THREE.Vector3( 10, 1, -109 )
+										],
+
+									],
+									groupParent: groupExample,
+									folder: fExampleSettings,
+//									light: mathBox.pointLight().add(),
+
+								} );
+
+							} );
+							break;
+						case exampleIds.matrix3D:
+							runExample( function () {
+
+								var axesPositionX = axesHelper.getAxesPosition( axesHelper.axesEnum.x ),
+									axesPositionZ = axesHelper.getAxesPosition( axesHelper.axesEnum.z );
+								mathBox.matrix3D( {
+/*
+									limits: {
+
+//											x: { min: axesPositionX.min.scale, max: axesPositionX.max.scale, },
+										x: { min: axesPositionX.min.scale + 1, max: axesPositionX.max.scale - 1, },
+//											z: { min: axesPositionZ.min.scale, max: axesPositionZ.max.scale, },
+										z: { min: axesPositionZ.min.scale - 1, max: axesPositionZ.max.scale, },
+
+									},
+									points: [
+
+										[ -1, 0, 1, 2 ],
+										[ 0, 0.5, -4, 0 ],
+										[ -1, -1, -1, -1 ],
+
+									],
+*/
+									groupParent: groupExample,
+									folder: fExampleSettings,
+									light: mathBox.pointLight().add(),
+
+								} );
+
+							} );
+							break;
+						case exampleIds.function3D:
+							runExample( function () {
+
+								var axesPositionX = axesHelper.getAxesPosition( axesHelper.axesEnum.x ),
+									axesPositionZ = axesHelper.getAxesPosition( axesHelper.axesEnum.z );
+								mathBox.function3D( {
+
+									limits: {
+
+//										x: { min: axesPositionX.min.scale, max: axesPositionX.max.scale, },
+										x: { min: axesPositionX.min.scale + 1, max: axesPositionX.max.scale - 1, },
+//										z: { min: axesPositionZ.min.scale, max: axesPositionZ.max.scale, },
+										z: { min: axesPositionZ.min.scale - 1, max: axesPositionZ.max.scale, },
+
+									},
+									/*
+									points: [
+
+										[-1, 0, 1, 2],
+										[0, 0.5, -4, 0],
+										[-1, -1, -1, -1],
+
+									],
+									*/
+									groupParent: groupExample,
+									folder: fExampleSettings,
+									light: mathBox.pointLight().add(),
+
+								}
+								);
+
+							} );
+							break;
+
+						default: console.error( 'Unknown example id: ' + value );
+
+					}
+					options.exampleId = value;
+					if ( typeof options.cookieObject !== 'undefined' )
+						options.cookieObject.setObject();
+
+				}
+
+				//choice dimension
+				var dimensions = {
+
+					dimensionId: dimensionIds.d3,
+					cookie: THREE.cookie,
+
+				}
+				new THREE.cookie( 'dimensions' ).getObject( dimensions, JSON.parse( JSON.stringify( dimensions ) ) );
+				dat.controllerNameAndTitle( gui.add( dimensions, 'dimensionId', {
+
+					'3D': dimensionIds.d3,
+					'4D': dimensionIds.d4,
+
+				} ).onChange( function ( value ) {
+
+					//console.log( 'dimension: ' + value );
+					dimensions.dimensionId = value;
+					if ( typeof dimensions.cookieObject !== 'undefined' )
+						dimensions.cookieObject.setObject();
+
+					//update Examples controller
+					function emptySelectController( select ) {
+
+						select.setValue( 0 );
+						for ( var member in select.object ) delete select.object[member];
+						var selectbox = select.__li.querySelector( 'select' );
+						for ( i = selectbox.options.length - 1 ; i >= 0 ; i-- ) { selectbox.remove( i ); }
+						return selectbox;
+
+					}
+					function appendSelectExample( selectbox ) {
+
+						var examplesArray;//exampleIds for selected dimension
+						switch ( parseInt( dimensions.dimensionId ) ) {
+
+							case dimensionIds.d3:
+								examplesArray = lang.examplesArray;
+								break;
+							case dimensionIds.d4:
+								examplesArray = lang.examplesArray4D;
+								break;
+							default: console.error( 'Unknown dimension id: ' + dimensions.dimensionId );
+								return;
+
+						}
+						for ( var propertyName in examplesArray ) {
+
+							var opt = document.createElement( 'option' );
+							opt.value = examplesArray[propertyName];
+							opt.innerHTML = i === 0 ? lang.noSelect : propertyName;
+							selectbox.appendChild( opt );
+
+						}
+/*
+						for ( var i = 0; i <= length; i++ ) {
+
+							var opt = document.createElement( 'option' );
+							opt.value = i;
+							opt.innerHTML = i === 0 ? lang.noSelect : i;
+							selectbox.appendChild( opt );
+
+						};
+*/
+
+					}
+					appendSelectExample( emptySelectController( cotrollerSelectExample ) );
+
+
+				} ), lang.dimensions );
+
+				//choice example
+				var examplesArray;//exampleIds for selected dimension
+				switch ( parseInt( dimensions.dimensionId ) ) {
+
+					case dimensionIds.d3:
+						examplesArray = lang.examplesArray;
+						break;
+					case dimensionIds.d4:
+						examplesArray = lang.examplesArray4D;
+						break;
+					default: console.error( 'Unknown dimension id: ' + dimensions.dimensionId );
+						return;
+
+				}
+				var options = {
+
+					exampleId: exampleIds.noExample,
+					cookie: THREE.cookie,
+
+				}
+				new THREE.cookie( 'examples' ).getObject( options, JSON.parse( JSON.stringify( options ) ) );
+				var cotrollerSelectExample = gui.add( options, 'exampleId',
+					examplesArray ).onChange( function ( value ) { exampleSwitch( value ) } );
+				dat.controllerNameAndTitle( cotrollerSelectExample, lang.examples );
+				var fExampleSettings = gui.addFolder( lang.exampleSettings );
+				fExampleSettings.open();
+				exampleSwitch( options.exampleId );
+
+				//Settings
+
+				var fSettings = gui.addFolder( lang.settings );
+
+				axesHelper.gui( fSettings, {
+
+					getLanguageCode: THREE.getLanguageCode,
+					cookie: THREE.cookie,
+					lang: {
+
+						languageCode: 'ru',
+
+						axesHelper: 'Оси координат',//'Axes Helper'
+
+						negativeAxes: 'Минусовые оси',
+						negativeAxesTitle: 'Отображать отрицательные оси.',
+
+						scales: 'Шкалы',
+
+						displayScales: 'Показать',
+						displayScalesTitle: 'Показать или скрыть шкалы осей координат.',
+
+						min: 'Минимум',
+						max: 'Максимум',
+
+						marks: 'Риски',
+						marksTitle: 'Количество отметок на шкале',
+
+						defaultButton: 'Восстановить',
+						defaultTitle: 'Восстановить настройки осей координат по умолчанию.',
+
+					}
+
+				});
+
+				THREE.gui.stereoEffect( fSettings, effect.options, {
+
+					getLanguageCode: THREE.getLanguageCode,
+					cookie: THREE.cookie,
+					gui: gui,
+					/*
+					lang: {
+						languageCode: 'az',
+
+						stereoEffects: 'Stereo effektləri',
+
+						spatialMultiplexName: 'Мультиплексaz',//'Spatial  multiplex'
+						spatialMultiplexTitle: 'Выберите способ создания пространственного мультиплексированияaz.',
+		
+						spatialMultiplexs: {
+							'Моноaz': THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono,//Mono
+							'Слева направоaz': THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS, //https://en.wikipedia.org/wiki/DVB_3D-TV#Side_by_side
+							'Сверху внизaz': THREE.StereoEffectParameters.spatialMultiplexsIndexs.TaB, //https://en.wikipedia.org/wiki/DVB_3D-TV#Top_and_bottom
+						},
+		
+						eyeSeparationName: 'Развод камерaz',
+						eyeSeparationTitle: 'Расстояние между левой и правой камерамиaz.',
+		
+						zeroParallaxName: 'Параллакс 0az',
+						zeroParallaxTitle: 'Расстояние до объектов с нулевым параллаксомaz.',
+		
+						defaultButton: 'Восстановитьaz',
+						defaultTitle: 'Восстановить настройки стерео эффектов по умолчаниюaz.',
+					}
+					*/
+				});
+
+				//default button
+				var elPropertyName, propertyName = ".property-name";
+				var defaultParams = {
+
+					Default: function (value) {
+
+						controls.target = new THREE.Vector3();
+
+						controls.object.position.x = this.camera.position.x;
+						controls.object.position.y = this.camera.position.y;
+						controls.object.position.z = this.camera.position.z;
+
+						controls.update();
+
+					},
+					camera: {
+
+						position: new THREE.Vector3(controls.object.position.x, controls.object.position.y, controls.object.position.z),
+
+					},
+					localization: {}
+
+				}
+				switch (THREE.getLanguageCode()) {
+
+					case 'ru'://Russian language
+						defaultParams.localization.defaultButton = 'Восстановить';
+						defaultParams.localization.defaultTitle = 'Восстановить настройки по умолчанию.';
+						break;
+					default:
+						defaultParams.localization.defaultButton = 'Default';
+						defaultParams.localization.defaultTitle = 'Restore default settings.';
+
+				}
+				var controllerDefault = gui.add(defaultParams, 'Default');
+				elPropertyName = controllerDefault.__li.querySelector(propertyName);
+				elPropertyName.innerHTML = defaultParams.localization.defaultButton;
+				elPropertyName.title = defaultParams.localization.defaultTitle;
+
+//				gui.open();
+				window.addEventListener( 'resize', onResize, false );
+			}
+			function onResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				if ( typeof effect === 'undefined' )
+					renderer.setSize( window.innerWidth, window.innerHeight );
+				else effect.setSize(window.innerWidth, window.innerHeight);
+
+			}
+			function onDocumentMouseMove( event ) {
+
+				mathBox.onDocumentMouseMove( event );
+/*
+event.preventDefault();
+
+mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+mouse.y = -( event.clientY / window.innerHeight ) * 2 + 1;
+*/
+				if ( event.buttons != 1 )
+					return;
+
+				//Left button clicked
+/*
+				mouseX = (event.clientX - windowHalfX) * 10;
+				mouseY = (event.clientY - windowHalfY) * 10;
+*/
+				//console.log('x = ' + mouseX + ' y = ' + mouseY)
+				render();
+
+			}
+			function onDocumentMouseDown( event ) {
+
+				mathBox.onDocumentMouseDown( event );
+
+			}
+			function animate() {
+
+				requestAnimationFrame(animate);
+
+				render();
+
+			}
+
+			function render() {
+
+				if ( typeof effect === 'undefined' )
+					renderer.render( scene, camera );
+				else effect.render( scene, camera );
+
+				mathBox.render();
+/*
+raycaster.setFromCamera( mouse, camera );
+
+intersects = raycaster.intersectObject( particles );
+if ( intersects.length > 0 ) {
+
+	console.log( 'distance = ' + intersects[0].distance + ' distanceToRay = ' + intersects[0].distanceToRay );
+	if ( INTERSECTED != intersects[0].index ) {
+
+//		attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
+
+		INTERSECTED = intersects[0].index;
+
+//		attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 1.25;
+//		attributes.size.needsUpdate = true;
+
+	}
+
+} else if ( INTERSECTED !== null ) {
+
+//	attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
+//	attributes.size.needsUpdate = true;
+	INTERSECTED = null;
+
+}
+*/
+			}
+		</script>
+	</body>
+</html>

@@ -4621,11 +4621,7 @@
     "WebGLRenderTargetCube": {
       "!url": "http://threejs.org/docs/#Reference/renderers/WebGLRenderTargetCube",
       "prototype": {
-        "!proto": "THREE.WebGLRenderTarget.prototype",
-        "activeCubeFace": {
-          "!type": "integer",
-          "!doc": "The activeCubeFace property corresponds to a cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) and is\n\t\tused and set internally by the [page:CubeCamera]."
-        }
+        "!proto": "THREE.WebGLRenderTarget.prototype"
       },
       "!doc": "[page:CubeCamera] uses this as its [page:WebGLRenderTarget]",
       "!type": "fn(width: number, height: number, options: object)"

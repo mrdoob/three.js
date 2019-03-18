@@ -4,6 +4,7 @@
 
 import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
+import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Quaternion } from '../../math/Quaternion.js';
@@ -60,7 +61,7 @@ function WebVRManager( renderer ) {
 
 	}
 
-	var currentSize, currentPixelRatio;
+	var currentSize = new Vector2(), currentPixelRatio;
 
 	function onVRDisplayPresentChange() {
 
@@ -71,7 +72,7 @@ function WebVRManager( renderer ) {
 			var renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
-			currentSize = renderer.getSize();
+			renderer.getSize( currentSize );
 
 			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
 
@@ -233,9 +234,11 @@ function WebVRManager( renderer ) {
 
 		var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
 
-		if ( device === null ) {
+		if ( isPresenting() === false ) {
 
 			camera.position.set( 0, userHeight, 0 );
+			camera.rotation.set( 0, 0, 0 );
+
 			return camera;
 
 		}
@@ -288,8 +291,6 @@ function WebVRManager( renderer ) {
 		}
 
 		poseObject.updateMatrixWorld();
-
-		if ( device.isPresenting === false ) return camera;
 
 		//
 
@@ -377,6 +378,8 @@ function WebVRManager( renderer ) {
 	this.setAnimationLoop = function ( callback ) {
 
 		animation.setAnimationLoop( callback );
+
+		if ( isPresenting() ) animation.start();
 
 	};
 

@@ -31,7 +31,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - typed arrays - nearest neighbour for 500,000 sprites</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/TypedArrayUtils.js"></script>
+		<script src="js/utils/TypedArrayUtils.js"></script>
 		<script src="js/controls/FirstPersonControls.js"></script>
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -89,6 +89,9 @@
 				controls = new THREE.FirstPersonControls( camera );
 				controls.movementSpeed = 100;
 				controls.lookSpeed = 0.1;
+
+				controls.lookAt( 500, 500, 500 );
+
 
 				// add a skybox background
 				var cubeTextureLoader = new THREE.CubeTextureLoader();
