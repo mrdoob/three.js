@@ -485,7 +485,7 @@ UI.Points = function ( editor ) {
 	} );
 	row.add( addPointButton );
 
-	this.editButton = new UI.Button( "edit" ).setDisplay( 'none' ).setId( 'editButton' ).setMarginLeft( '4px' ).onClick( function () {
+	this.editButton = new UI.Button( "edit" ).setDisplay( 'none' ).setId( 'editButton' ).setMarginLeft( '72px' ).onClick( function () {
 
 		if ( scope.onEditCallback === null ) return;
 
@@ -611,7 +611,7 @@ UI.Points.prototype.onEdit = function ( callback ) {
 
 	this.onEditCallback = callback;
 
-	this.editButton.setDisplay( this.onEditCallback !== null ? 'block' : 'none' );
+	this.editButton.setDisplay( this.onEditCallback !== null ? 'inline' : 'none' );
 
 	return this;
 
