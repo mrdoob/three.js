@@ -46,6 +46,8 @@ var Editor = function () {
 
 		cameraChanged: new Signal(),
 
+		statsChanged: new Signal(),
+
 		geometryChanged: new Signal(),
 
 		objectSelected: new Signal(),
@@ -71,6 +73,16 @@ var Editor = function () {
 		historyChanged: new Signal()
 
 	};
+
+	var stats = new Stats();
+	stats.dom.style.marginTop = "32px";
+	stats.dom.style.display = 'none';
+	document.body.appendChild( stats.dom );
+	this.signals.statsChanged.add(function(visible)
+	{
+		stats.dom.style.display = visible ? 'block' : 'none';
+	});
+	this.stats = stats;
 
 	this.config = new Config();
 	this.history = new History( this );

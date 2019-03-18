@@ -538,6 +538,8 @@ var Viewport = function ( editor ) {
 
 		prevTime = time;
 
+		editor.stats.update();
+
 	}
 
 	requestAnimationFrame( animate );

@@ -252,6 +252,7 @@ var Strings = function ( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grid',
+			'sidebar/settings/showStats': 'FPS/Memory',
 
 			'sidebar/history/history': 'HISTORY',
 			'sidebar/history/persistent': 'persistent',

@@ -24,6 +24,7 @@ var Config = function () {
 		'project/vr': false,
 
 		'settings/history': false,
+		'settings/showStats': false,
 
 		'settings/shortcuts/translate': 'w',
 		'settings/shortcuts/rotate': 'e',
