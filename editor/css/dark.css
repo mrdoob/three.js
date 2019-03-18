@@ -96,7 +96,7 @@ select {
 	}
 
 	#menubar .menu * {
-		z-index: 2;
+		z-index: 20000;
 	}
 
 	#menubar .menu.right {
