@@ -536,9 +536,10 @@ var Viewport = function ( editor ) {
 			mixer.update( ( time - prevTime ) / 1000 );
 			render();
 
-		}
-		else if(config.getKey('settings/constantRender') === true) {
+		} else if ( config.getKey( 'settings/constantRender' ) === true ) {
+
 			render();
+
 		}
 
 		prevTime = time;
