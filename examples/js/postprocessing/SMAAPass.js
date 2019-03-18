@@ -31,9 +31,11 @@ THREE.SMAAPass = function ( width, height ) {
 
 	var areaTextureImage = new Image();
 	areaTextureImage.src = this.getAreaTexture();
-	areaTextureImage.onload = function() {
+	areaTextureImage.onload = function () {
+
 		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
 		scope.areaTexture.needsUpdate = true;
+
 	};
 
 	this.areaTexture = new THREE.Texture();
@@ -120,7 +122,7 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 	constructor: THREE.SMAAPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		// pass 1
 
@@ -128,13 +130,17 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		this.quad.material = this.materialEdges;
 
-		renderer.render( this.scene, this.camera, this.edgesRT, this.clear );
+		renderer.setRenderTarget( this.edgesRT );
+		if ( this.clear ) renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// pass 2
 
 		this.quad.material = this.materialWeights;
 
-		renderer.render( this.scene, this.camera, this.weightsRT, this.clear );
+		renderer.setRenderTarget( this.weightsRT );
+		if ( this.clear ) renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// pass 3
 
@@ -144,11 +150,14 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		if ( this.renderToScreen ) {
 
+			renderer.setRenderTarget( null );
 			renderer.render( this.scene, this.camera );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+			renderer.setRenderTarget( writeBuffer );
+			if ( this.clear ) renderer.clear();
+			renderer.render( this.scene, this.camera );
 
 		}
 

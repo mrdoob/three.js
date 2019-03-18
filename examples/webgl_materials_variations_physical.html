@@ -82,13 +82,7 @@
 
 				};
 
-
-				var textureCube = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/pisa/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
-
 				scene = new THREE.Scene();
-				scene.background = textureCube;
 
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
@@ -150,7 +144,10 @@
 
 					}
 
-					hdrCubeMap.dispose();
+					hdrCubeMap.magFilter = THREE.LinearFilter;
+					hdrCubeMap.needsUpdate = true;
+					scene.background = hdrCubeMap;
+
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 

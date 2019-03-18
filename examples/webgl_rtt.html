@@ -252,14 +252,17 @@
 
 				material.uniforms[ "time" ].value += delta;
 
-				renderer.clear();
 
 				// Render first scene into texture
 
-				renderer.render( sceneRTT, cameraRTT, rtTexture, true );
+				renderer.setRenderTarget( rtTexture );
+				renderer.clear();
+				renderer.render( sceneRTT, cameraRTT );
 
 				// Render full screen quad with generated texture
 
+				renderer.setRenderTarget( null );
+				renderer.clear();
 				renderer.render( sceneScreen, cameraRTT );
 
 				// Render second scene to screen
