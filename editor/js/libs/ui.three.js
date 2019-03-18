@@ -535,14 +535,7 @@ UI.Points = function ( editor ) {
 
 			}
 
-			// don't drag the line
-			scope.drag = new THREE.DragControls( scene.children.slice( 0 ), editor.camera, document.querySelector( 'canvas' ) );
-			scope.drag.addEventListener( 'drag', function () {
-
-				scope.onEditCallback( scene );
-
-			} );
-			scope.drag.addEventListener( 'dragend', function () {
+			function updateLine() {
 
 				var positions = scope.line.geometry.attributes.position;
 				var children = scene.children;
@@ -555,7 +548,12 @@ UI.Points = function ( editor ) {
 				positions.needsUpdate = true;
 				scope.onEditCallback( scene );
 
-			} );
+			}
+
+			// don't drag the line
+			scope.drag = new THREE.DragControls( scene.children.slice( 0 ), editor.camera, document.querySelector( 'canvas' ) );
+			scope.drag.addEventListener( 'drag', updateLine );
+			scope.drag.addEventListener( 'dragend', updateLine );
 
 			var line = new THREE.Line( new THREE.BufferGeometry().setFromPoints( positions ), new THREE.LineBasicMaterial( {
 				color: 0xff0000
