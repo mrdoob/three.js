@@ -74,17 +74,6 @@ var Editor = function () {
 
 	};
 
-	var stats = new Stats();
-	stats.dom.style.marginTop = "32px";
-	stats.dom.style.display = 'none';
-	document.body.appendChild( stats.dom );
-	this.signals.statsChanged.add( function ( visible ) {
-
-		stats.dom.style.display = visible ? 'block' : 'none';
-
-	} );
-	this.stats = stats;
-
 	this.config = new Config();
 	this.history = new History( this );
 	this.storage = new Storage();
@@ -111,6 +100,17 @@ var Editor = function () {
 
 	this.selected = null;
 	this.helpers = {};
+
+	var stats = new Stats();
+	stats.dom.style.marginTop = "32px";
+	stats.dom.style.display = this.config.getKey( 'settings/showStats' ) === true ? 'block' : 'none';
+	document.body.appendChild( stats.dom );
+	this.signals.statsChanged.add( function ( visible ) {
+
+		stats.dom.style.display = visible ? 'block' : 'none';
+
+	} );
+	this.stats = stats;
 
 };
 
