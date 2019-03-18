@@ -93,6 +93,7 @@ Sidebar.Settings = function ( editor ) {
 	var stats = new UI.Checkbox( config.getKey( 'settings/showStats' ) || false ).onChange( updateStats );
 
 	statsRow.add( new UI.Text( strings.getKey( 'sidebar/settings/showStats' ) ).setWidth( '90px' ), stats );
+	statsRow.setDisplay( render.getValue() ? 'block' : 'none' );
 
 	container.add( themeRow );
 
