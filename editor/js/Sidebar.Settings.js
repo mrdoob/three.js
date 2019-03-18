@@ -73,15 +73,17 @@ Sidebar.Settings = function ( editor ) {
 	themeRow.add( theme );
 
 	var statsRow = new UI.Row();
-	container.add(statsRow);
+	container.add( statsRow );
 
-	var stats = new UI.Checkbox(config.getKey('settings/showStats') || false).onChange(function(){
+	var stats = new UI.Checkbox( config.getKey( 'settings/showStats' ) || false ).onChange( function () {
+
 		var value = this.getValue();
-		config.setKey('settings/showStats', value);
-		signals.statsChanged.dispatch(value);
-	});
+		config.setKey( 'settings/showStats', value );
+		signals.statsChanged.dispatch( value );
 
-	statsRow.add(new UI.Text(strings.getKey('sidebar/settings/showStats')).setWidth('90px'), stats);
+	} );
+
+	statsRow.add( new UI.Text( strings.getKey( 'sidebar/settings/showStats' ) ).setWidth( '90px' ), stats );
 
 	container.add( themeRow );
 
