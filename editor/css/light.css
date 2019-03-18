@@ -91,10 +91,6 @@ select {
 		padding-right: 8px;
 	}
 
-	#menubar .menu * {
-		z-index: 2;
-	}
-
 	#menubar .menu.right {
 		float: right;
 		cursor: auto;
