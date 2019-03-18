@@ -510,11 +510,23 @@ UI.Points = function ( editor ) {
 
 			var points = scope.getValue();
 			var geometry = new THREE.SphereBufferGeometry();
-			var material = new THREE.MeshNormalMaterial();
+			var material = new THREE.MeshBasicMaterial({
+				color : 0,
+				side : THREE.BackSide,
+				transparent : true,
+				opacity : 0.75
+			});
+			
+			function resize(_renderer, _scene, camera)
+			{
+				this.scale.setScalar(camera.position.distanceTo(this.position) * 0.01);
+			}
+
 			var positions = [];
 			for ( var i = 0; i < points.length; ++ i ) {
 
 				var sphere = new THREE.Mesh( geometry, material );
+				sphere.onBeforeRender = resize;
 				var p = points[ i ];
 				sphere.position.copy( p );
 				positions.push( p );
@@ -522,15 +534,8 @@ UI.Points = function ( editor ) {
 
 			}
 
-			var line = new THREE.Line( new THREE.BufferGeometry().setFromPoints( positions ), new THREE.LineBasicMaterial( {
-				color: 0xff0000
-			} ) );
-			line.computeLineDistances();
-			scene.add( line );
-			scope.line = line;
-
 			// don't drag the line
-			scope.drag = new THREE.DragControls( scene.children.slice( 0, points.length ), editor.camera, document.querySelector( 'canvas' ) );
+			scope.drag = new THREE.DragControls( scene.children.slice( 0 ), editor.camera, document.querySelector( 'canvas' ) );
 			scope.drag.addEventListener( 'drag', function () {
 
 				scope.onEditCallback( scene );
@@ -550,6 +555,13 @@ UI.Points = function ( editor ) {
 				scope.onEditCallback( scene );
 
 			} );
+
+			var line = new THREE.Line( new THREE.BufferGeometry().setFromPoints( positions ), new THREE.LineBasicMaterial( {
+				color: 0xff0000
+			} ) );
+			line.computeLineDistances();
+			scene.add( line );
+			scope.line = line;
 
 		} else {
 
