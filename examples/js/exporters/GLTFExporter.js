@@ -1360,8 +1360,8 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					if (primitive.indices === null)
-						delete primitive.indices
+					if ( primitive.indices === null ) delete primitive.indices;
+
 				}
 
 				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
