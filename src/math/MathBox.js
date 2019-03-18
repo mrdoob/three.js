@@ -3,18 +3,6 @@
 */
 
 //Attenttion!!! Save this file as UTF-8 for localization
-/*
-THREE.loadScriptBase = function ( callback, appendTo ) {
-
-	script = document.createElement( 'script' );
-	script.setAttribute( "type", 'text/javascript' );
-	callback( script );
-	if ( !appendTo ) appendTo = document.getElementsByTagName( 'head' )[0];
-	appendTo.appendChild( script );
-
-}
-*/
-//THREE.loadScriptSynchronous = function ( fileName ) { THREE.loadScriptBase( function ( script ) { script.innerHTML = getSynchronousResponse( fileName ); } ); }
 
 //load JavaScript file
 //http://javascript.ru/forum/events/21439-dinamicheskaya-zagruzka-skriptov.html
@@ -27,7 +15,6 @@ THREE.loadScript = function ( src ) {
 		script = document.createElement( 'script' );
 		script.setAttribute( "type", 'text/javascript' );
 		callback( script );
-//		if ( !appendTo ) appendTo = document.getElementsByTagName( 'head' )[0];
 		appendTo.appendChild( script );
 
 	}
@@ -65,20 +52,6 @@ THREE.loadScript = function ( src ) {
 				}
 
 			}
-			/*
-				for ( i in options.appendTo.childNodes ) {
-					var child = options.appendTo.childNodes[i];
-					if ( ( child.tagName == 'SCRIPT' ) && ( child.id == src ) ) {
-						if ( options.onload !== undefined ) {
-			
-							//setTimeout( function () { onload() }, 100 );//Если не сделать эту задержку, то при открыити локальной веб камеры иногда не успевает скачиваться app.js и появляется ошибка addMedia.js:6 Uncaught ReferenceError: App is not defined
-							options.onload();
-			
-						}
-						return;
-					}
-				}
-			*/
 			loadScriptBase( function ( script ) {
 				script.setAttribute( "id", srcAsync );
 
@@ -272,7 +245,7 @@ THREE.MathBox = function ( options ) {
 
 				raycaster.mouseL.copy( raycaster.mouse );
 				raycaster.mouseR.copy( raycaster.mouse );
-				var a = 0.5;//, y = 0;
+				var a = 0.5;
 
 				raycaster.mouseL[vectorName] += a;
 				raycaster.mouseL[vectorName] *= 2;
@@ -331,24 +304,6 @@ THREE.MathBox = function ( options ) {
 
 			this.getMousePosition();
 			this.intersection( intersection );
-/*
-			if ( parseInt( effect.options.spatialMultiplex ) !== THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono ) {
-
-				this.raycaster.setFromCamera( this.mouseL, camera );
-				if ( !intersection() ) {
-
-					this.raycaster.setFromCamera( this.mouseR, camera );
-					intersection();
-
-				}
-
-			} else {
-
-				this.raycaster.setFromCamera( this.mouse, camera );
-				intersection();
-
-			}
-*/
 
 			function intersection() {
 
@@ -419,25 +374,6 @@ THREE.MathBox = function ( options ) {
 			this.raycaster.setFromCamera( mouse, camera );
 */
 			this.intersection( intersection );
-/*
-			if ( parseInt( effect.options.spatialMultiplex ) !== THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono ) {
-
-				this.raycaster.setFromCamera( this.mouseL, camera );
-				if ( !intersection() ) {
-
-					this.raycaster.setFromCamera( this.mouseR, camera );
-					intersection();
-
-				}
-
-			}
-			else {
-
-				this.raycaster.setFromCamera( this.mouse, camera );
-				intersection();
-
-			}
-*/
 			function intersection() {
 
 				raycaster.getIntersects();
@@ -501,131 +437,9 @@ THREE.MathBox = function ( options ) {
 	}
 	var threshold = 0.05 * options.scale;
 	raycaster.setThreshold();
-//	raycaster.raycaster.params.Points.threshold = threshold * 3 / 5;
-	this.onDocumentMouseMove = function ( event ) {
-
-		raycaster.onDocumentMouseMove( event );
-
-	}
-	this.onDocumentMouseDown = function ( event ) {
-
-		raycaster.onDocumentMouseDown( event );
-/*
-		if ( raycaster.particles === null )
-			return;
-
-		raycaster.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-		raycaster.mouse.y = -( event.clientY / window.innerHeight ) * 2 + 1;
-
-		raycaster.raycaster.setFromCamera( raycaster.mouse, camera );
-
-		raycaster.getIntersects();
-		if ( raycaster.intersects.length > 0 ) {
-
-			if ( raycaster.index !== null ) {
-
-				//console.log( 'raycaster.index = ' + raycaster.index );
-
-				var object = raycaster.intersects[0].object;
-				if ( raycaster.pointSelected !== undefined ) {
-
-					//find selected line
-					for ( var iz = 0; iz < raycaster.particles.length; iz++ ) {
-
-						if ( raycaster.particles[iz].geometry.uuid === object.geometry.uuid ) {
-
-							raycaster.pointSelected( iz, raycaster.intersects[0].index );
-							break;
-
-						}
-
-					}
-
-				} //else {
-
-					//for resolving of the bug
-					//Testing:
-					//select Points in the Examples drop down menu of the webgl_math.html page.
-					//Click mouse over any point. 
-					//Now you can see number of selected point in the Select Point drop down menu.
-					//Select "no select" in the Select Point drop down menu.
-					//Click mouse over any point again. 
-					//Now you can see a bug: You see "no select" instead of number of selected point in the Select Point drop down menu.
-					//				raycaster.particles.userData.controllerSelectPoint.__li.querySelector( 'select' ).selectedIndex = raycaster.index;
-					if ( object.userData.controllerSelectPoint.__li !== undefined )
-						object.userData.controllerSelectPoint.__li.querySelector( 'select' ).selectedIndex = raycaster.index;
-
-					object.userData.owner.userData.onDocumentMouseDown();
-					object.userData.controllerSelectPoint.setValue( raycaster.index + 1 );
-
-				//}
-				raycaster.index = null;
-
-			}
-//			console.log( 'distance = ' + raycaster.intersects[0].distance + ' distanceToRay = ' + raycaster.intersects[0].distanceToRay
-//				+ ' index = ' + raycaster.intersects[0].index );
-		}
-*/
-	}
-	this.render = function () {
-
-		raycaster.render();
-/*
-		if ( raycaster.particles === null )
-			return;
-		raycaster.raycaster.setFromCamera( raycaster.mouse, camera );
-		raycaster.getIntersects();
-		if ( raycaster.intersects.length > 0 ) {
-
-			if ( raycaster.spriteText === null ) {
-
-				//console.log( 'distance = ' + raycaster.intersects[0].distance + ' distanceToRay = ' + raycaster.intersects[0].distanceToRay
-				//	+ ' index = ' + raycaster.intersects[0].index );
-
-				var intersection = raycaster.intersects[0],
-					distanceToRay = intersection.distanceToRay,
-					distanceToRayMin = 0.1;
-				//if ( ( raycaster.spriteText === null ) && ( distanceToRay < distanceToRayMin ) )
-				{
-
-					var array = intersection.object.geometry.attributes.position.array,
-						index = intersection.index * 3,
-						position = new THREE.Vector3(
-							array[index + mathBox.axesEnum.x] + raycaster.positionDif.x,
-							array[index + mathBox.axesEnum.y] + raycaster.positionDif.y,
-							array[index + mathBox.axesEnum.z] + raycaster.positionDif.z ),
-						textColor = 'rgb( ' + options.colorsHelper + ', ' + options.colorsHelper + ', ' + options.colorsHelper + ' )';
-					raycaster.spriteText = new THREE.SpriteText(
-							  options.scales[mathBox.axesEnum.getName( mathBox.axesEnum.x )].name + ': ' + position.x +
-						' ' + options.scales[mathBox.axesEnum.getName( mathBox.axesEnum.y )].name + ': ' + position.y +
-						' ' + options.scales[mathBox.axesEnum.getName( mathBox.axesEnum.z )].name + ': ' + position.z, {
-
-							textHeight: 0.06 * options.scale,
-							fontColor: textColor,
-							rect: {
-
-								displayRect: true,
-								borderThickness: 3,
-								borderRadius: 10,
-								borderColor: textColor,
-								backgroundColor: 'rgba( 0, 0, 0, 1 )',
-
-							},
-							position: scaleObject.getPositionVector3( position, intersection.object.scale ),
-							center: new THREE.Vector2( 0.5, 0 ),
-
-						} );
-					raycaster.group.add( raycaster.spriteText );
-					raycaster.index = intersection.index;
-
-				} //else if ( distanceToRay > distanceToRayMin ) raycaster.removeSpriteText();
-
-			}
-
-		} else raycaster.removeSpriteText();
-*/
-
-	}
+	this.onDocumentMouseMove = function ( event ) { raycaster.onDocumentMouseMove( event ); }
+	this.onDocumentMouseDown = function ( event ) { raycaster.onDocumentMouseDown( event ); }
+	this.render = function () { raycaster.render(); }
 
 	//
 
@@ -876,7 +690,6 @@ THREE.MathBox = function ( options ) {
 			function dottedLine( axesId ) {
 
 				lineVertices = [
-//						new THREE.Vector3( array[index + 0], array[index + 1], array[index + 2] ),
 					pointVertice,
 					new THREE.Vector3( 0, 0, 0 ),
 				]
@@ -1021,12 +834,9 @@ THREE.MathBox = function ( options ) {
 			var paramsRestore = Object.assign( {}, params );
 			paramsRestore.t = Object.assign( {}, params.t );
 
-			//		var group = new THREE.Group();
 			groupParent = optionsPoints.groupParent || scene;
-			//		groupParent.add( group );
 
 			var functionsDefault = Object.assign( {}, functions );
-//				lineVertices = [],
 			funcs = {}
 			function setFuncs() {
 
@@ -1052,7 +862,6 @@ THREE.MathBox = function ( options ) {
 			}
 
 			setFuncs();
-			//pointVerticesSrc = [];
 			pushLineVertices();
 
 		}
@@ -1066,16 +875,6 @@ THREE.MathBox = function ( options ) {
 
 			var scales = axesHelper === undefined ? options.scales : axesHelper.options.scales,
 				points = getPoints( pointVerticesSrc );
-/*
-				points = new THREE.Points( Array.isArray( pointVerticesSrc ) ?
-					new THREE.BufferGeometry().setFromPoints( pointVerticesSrc ) : pointVerticesSrc,
-				new THREE.PointsMaterial( {
-
-					color: options.color, //map: texture,
-					size: threshold, alphaTest: 0.5
-
-				} ) );
-*/
 			scaleObject.object3D( points, scales );
 			group.add( points );
 			return points;
@@ -1088,10 +887,7 @@ THREE.MathBox = function ( options ) {
 			scaleObject.setPosition( point, optionsPoints.position );
 		raycaster.setParticles( point );
 		point.userData.group = group;
-/*
-		if ( optionsPoints.folder === undefined )
-			return point;
-*/
+
 		//Points Settings
 
 		//Point's gui
@@ -1154,7 +950,6 @@ THREE.MathBox = function ( options ) {
 
 					try {
 						setFuncs();
-						//					var array = group.children[0].children[0].geometry.attributes.position.array,
 						var array = points.geometry.attributes.position.array,
 							j = 0;
 						for ( var i = 0; i < params.pointsCount * 2; i++ ) {
@@ -1168,7 +963,6 @@ THREE.MathBox = function ( options ) {
 							j++;
 
 						}
-						//					group.children[0].children[0].geometry.attributes.position.needsUpdate = true;
 						points.geometry.attributes.position.needsUpdate = true;
 						selectPoint.setValue( selectPoint.getValue() );
 					} catch ( e ) {
@@ -1234,28 +1028,7 @@ THREE.MathBox = function ( options ) {
 							raycaster.setParticles( points );
 							if ( isOwner )
 								points.userData.owner = drawLine( groupParent, { points: points } );
-							//					points = mathBox.drawLine( lineVertices, group );
-
-/*
-							//empty selectPoint controller
-							selectPoint.setValue( 0 );
-							for ( var member in selectPoint.object ) delete selectPoint.object[member];
-							var selectbox = selectPoint.__li.querySelector( 'select' );
-							for ( i = selectbox.options.length - 1 ; i >= 0 ; i-- ) {
-								selectbox.remove( i );
-							}
-*/
 							appendSelectPoint( emptySelectController( selectPoint ), pointVerticesSrc.length );
-/*
-							for ( var i = 0; i <= pointVerticesSrc.length; i++ ) {
-
-								var opt = document.createElement( 'option' );
-								opt.value = i;
-								opt.innerHTML = i === 0 ? lang.noSelect : i;
-								selectbox.appendChild( opt );
-
-							};
-*/
 
 						} );
 					dat.controllerNameAndTitle( controllerPC, lang.pointsCount, lang.pointsCountTitle );
@@ -1501,20 +1274,13 @@ THREE.MathBox = function ( options ) {
 					controller = dat.getControllerByName( fPosition, options.scales[axesName].name );
 				function onChangePosition( value ) {
 
-					//						var axesName = mathBox.axesEnum.getName( axesId );
-					//						scaleObject.setPositionAxis( line, axesId, value );
 					scaleObject.setPositionAxis( points, axesId, value );
 					if ( points.userData.owner !== undefined )
 						points.userData.owner.userData.setPosition( points.position );
-//						points.userData.owner.position.copy( points.position );
 
 					if ( points.userData.controllers !== undefined ) {
 
 						var controller = points.userData.controllers[axesName];
-						/*
-														val = points.geometry.attributes.position.array[points.userData.controllers.pointId * 3 + axesId]
-															+ scaleObject.getRealPosition( points )[axesName];
-						*/
 						var positionDif = raycaster.positionDif;
 						var array = points.geometry.getAttribute( 'position' ).array,
 							index = points.userData.controllers.pointId * 3,
@@ -1522,14 +1288,13 @@ THREE.MathBox = function ( options ) {
 								array[index + 0] + positionDif.x,
 								array[index + 1] + positionDif.y,
 								array[index + 2] + positionDif.z
-							);//pointVerticesSrc[pointId];
+							);
 
 						var val = pointVertice[axesName];
 						if ( controller.__min > val )
 							controller.min( val );
 						if ( controller.__max < val )
 							controller.max( val );
-						//							changePosition = true;
 						controller.setValue( val );
 
 					}
@@ -1646,17 +1411,6 @@ THREE.MathBox = function ( options ) {
 			optionsLine.points.userData.owner = line;
 
 		}
-/*
-		var points = mathBox.addPoints(
-			{
-
-				vertices: line.geometry,
-				groupParent: groupParent,
-				folder: optionsLine.folder,
-
-			}
-		);
-*/
 		if ( optionsLine.folder === undefined )
 			return line;
 
@@ -1773,32 +1527,6 @@ THREE.MathBox = function ( options ) {
 				blodLine.geometry.setPositions( linePositionArray );
 
 			moveSurfaceLine(( parseInt( dat.getControllerByProperty( folder, "point" ).getValue() ) - 1 ) * 3, 1 );
-/*
-			//move surface vertice
-			var linePositionIndex = ( parseInt( dat.getControllerByProperty( folder, "point" ).getValue() ) - 1 ) * 3,
-				meshPositionIndex = linePositionIndex,
-				positionDiff = new THREE.Vector3();
-
-			positionDiff.x = ( line.position.x - mesh.position.x ) / mesh.scale.x;
-			positionDiff.y = ( line.position.y - mesh.position.y ) / mesh.scale.y;
-			positionDiff.z = ( line.position.z - mesh.position.z ) / mesh.scale.z;
-
-			for ( var i = 0; i < selectedLineIndex.line; i++ )
-				meshPositionIndex += optionsSurface.vertices[i].length * 3;
-			var meshPositionArray = mesh.geometry.attributes.position.array;
-
-			meshPositionArray[meshPositionIndex] = linePositionArray[linePositionIndex] + positionDiff.x;
-			meshPositionIndex++;
-			linePositionIndex++;
-			meshPositionArray[meshPositionIndex] = linePositionArray[linePositionIndex] + positionDiff.y;
-			meshPositionIndex++;
-			linePositionIndex++;
-			meshPositionArray[meshPositionIndex] = linePositionArray[linePositionIndex] + positionDiff.z;
-			meshPositionIndex++;
-			linePositionIndex++;
-
-			mesh.geometry.attributes.position.needsUpdate = true;
-*/
 
 		}
 
@@ -2067,12 +1795,8 @@ THREE.MathBox = function ( options ) {
 					groupParent.remove( groupParent.getObjectByName( lineName ) );
 					groupParent.add( group );
 
-	//				var positions = [];
 					var colors = [];
 					for ( var i = 0; i < vertices.length; i++ ) {
-
-	//					var vertice = vertices[i];
-	//					positions.push( vertice.x, vertice.y, vertice.z );
 
 						colors.push( color.r, color.g, color.b );
 
@@ -2089,7 +1813,6 @@ THREE.MathBox = function ( options ) {
 						onload: function () {
 
 							var geometry = new THREE.LineGeometry();
-	//						geometry.setPositions( positions );
 							geometry.setPositions( lines[value].geometry.attributes.position.array );
 							geometry.setColors( colors );
 
@@ -2110,7 +1833,6 @@ THREE.MathBox = function ( options ) {
 								scaleObject.object3D( line, options.scales );
 								group.add( line );
 								line.position.copy( lines[value].position );
-	//							line.position.needsUpdate = true;
 
 							} else {
 
@@ -2250,7 +1972,6 @@ THREE.MathBox = function ( options ) {
 			segmentWidth = ( limits.x.max - limits.x.min ) / ( gridX ),
 			segmentHeight = ( limits.z.max - limits.z.min ) / ( gridZ ),
 
-//			vertexCounter = 0,
 			groupCount = 0,
 
 			ix, iz,
@@ -2282,8 +2003,6 @@ THREE.MathBox = function ( options ) {
 
 				// counters
 
-//				vertexCounter += 1;
-
 			}
 			mathBox.line( {
 
@@ -2306,12 +2025,6 @@ THREE.MathBox = function ( options ) {
 
 			controllerRowsZ.setValue( iz + 1 );
 			controllerRowsX.setValue( ix + 1 );
-//			raycaster.ix = ix;
-/*
-			if ( raycaster.ix === undefined )
-				raycaster.ix = ix;
-			else controllerRowsX.setValue( ix + 1 );
-*/
 
 		}
 
@@ -2350,10 +2063,6 @@ THREE.MathBox = function ( options ) {
 		// calculate new start value for groups
 
 		groupStart += groupCount;
-
-		// update total number of vertices
-
-//		numberOfVertices += vertexCounter;
 
 		// build geometry
 
@@ -2414,10 +2123,8 @@ THREE.MathBox = function ( options ) {
 			}
 		}
 
-//		var groupLinesCrossing;
 		function linesCrossing() {
 
-//			if ( groupLinesCrossing !== undefined ) group.remove( groupLinesCrossing );
 			var display = 'none';
 			if ( ( lineZselected >= 0 ) && ( lineXselected >= 0 ) ) {
 
@@ -2426,17 +2133,7 @@ THREE.MathBox = function ( options ) {
 					points[lineZselected][lineXselected],
 					limits.z.min + lineZselected * segmentHeight
 				);
-/*
-				groupLinesCrossing = new THREE.Group();
-				group.add( groupLinesCrossing );
-				mathBox.addPoints( {
 
-					vertices: [ position ],
-					groupParent: groupLinesCrossing,
-					//folder: gui,
-
-				} );
-*/
 				controllerY.setValue( position.y );
 
 				dotLines.dottedLines( position );
@@ -2600,25 +2297,6 @@ THREE.MathBox = function ( options ) {
 
 			} );
 			
-/*
-			if ( optionsMatrix3D.points !== undefined ) {
-
-
-
-			} else console.error( 'THREE.MathBox Matrix3D controllerY.onChange: optionsMatrix3D.points = ' + optionsMatrix3D.points );
-*/
-/*
-			groupLinesCrossing.children[0].children.forEach( function ( child ) {
-
-				if ( child.constructor.name === "Points" ) {
-
-					child.userData.movePointAxes( mathBox.axesEnum.y, y );
-					return;
-
-				}
-
-			} );
-*/
 			//move selected lines
 			points[iZ][iX] = y;
 			selectLineX( iX + 1 );
@@ -2690,8 +2368,6 @@ THREE.MathBox = function ( options ) {
 				updateGroupGeometry( group, threeMatrix3D );
 
 			},
-//			onerror: function () { console.error( 'rrrrrrrrrrrrrr' ); },
-//			appendTo: document.getElementsByTagName( 'body' )[0],
 
 		} );
 
@@ -2741,15 +2417,6 @@ THREE.MathBox = function ( options ) {
 
 		optionsFunction3D = optionsFunction3D || {};
 		console.log( 'THREE.MathBox.function3D' );
-
-/*/
-		var group = new THREE.Group();
-		groupParent = optionsMatrix3D.groupParent || scene;
-		groupParent.add( group );
-
-		threeMatrix3D = new Matrix3D( optionsMatrix3D.limits, optionsMatrix3D.points, group, optionsMatrix3D );
-		updateGroupGeometry( group, threeMatrix3D );
-*/
 
 	}
 
@@ -2804,10 +2471,7 @@ THREE.MathBox = function ( options ) {
 				}
 
 			} ), lang.displayLight, lang.displayLightTitle );
-/*
-			if ( optionsMatrix3D.light === undefined )
-				return;
-*/
+
 			//move light
 			var min = -2 * options.scale, max = 2 * options.scale,
 				controllers = {};
