@@ -468,6 +468,8 @@ UI.Points = function ( editor ) {
 	var scope = this;
 	var addPointButton = new UI.Button( '+' ).onClick( function () {
 
+		if ( scope.isEditing ) return;
+
 		if ( scope.pointsUI.length === 0 ) {
 
 			scope.pointsList.add( scope.createPointRow( 0, 0, 0 ) );
@@ -688,6 +690,7 @@ UI.Points.prototype.createPointRow = function ( x, y, z ) {
 	var scope = this;
 	var btn = new UI.Button( '-' ).onClick( function () {
 
+		if ( scope.isEditing ) return;
 		scope.deletePointRow( idx );
 
 	} );
@@ -734,6 +737,14 @@ UI.Points.prototype.setShowZ = function ( show ) {
 	return this;
 
 };
+
+Object.defineProperty( UI.Points.prototype, 'isEditing', {
+	get: function () {
+
+		return this.editScene !== undefined && this.editScene.visible;
+
+	}
+} );
 
 UI.THREE = {};
 
