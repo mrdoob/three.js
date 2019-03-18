@@ -42,6 +42,7 @@ THREE.StereoEffectParameters = {
 //	camera: THREE.PerspectiveCamera. Use the camera key if you want control cameras focus.
 //	far: Camera frustum far plane. The far key uses for correct calculation default values of Eye separation. Default is 10.
 //	cookie: Your custom cookie function for saving and loading of the StereoEffects settings. Default cookie is not saving settings.
+//	stereoAspect: THREE.StereoCamera.aspect. Camera frustum aspect ratio. Default is 0.5 for compatibility with previous version.
 //}
 THREE.StereoEffect = function ( renderer, options ) {
 
@@ -49,7 +50,7 @@ THREE.StereoEffect = function ( renderer, options ) {
 	this.options = options;
 
 	options.stereo = new THREE.StereoCamera();
-	options.stereo.aspect = 0.5;
+	options.stereo.aspect = options.stereoAspect || 0.5;
 	options.cookie = options.cookie || new THREE.cookie().default;
 	if ( options.far === undefined )
 		options.far = new THREE.PerspectiveCamera().focus;
