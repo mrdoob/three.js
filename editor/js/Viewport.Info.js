@@ -34,7 +34,7 @@ Viewport.Info = function ( editor ) {
 	signals.geometryChanged.add( update );
 	signals.sceneRendered.add( function () {
 
-		renderText.setValue( editor.lastRenderTime.format() );
+		renderText.setValue( editor.lastRenderTime.toPrecision( 2 ) );
 
 	} );
 

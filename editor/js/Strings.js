@@ -287,7 +287,7 @@ var Strings = function ( config ) {
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/renderTime': 'Render Time'
+			'viewport/info/renderTime': 'Last Frame Time'
 
 		},
 
