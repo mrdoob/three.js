@@ -65,26 +65,13 @@ function WebVRManager( renderer ) {
 
 	function onVRDisplayPresentChange() {
 
+		updateDrawingBufferSize();
+
 		if ( isPresenting() ) {
-
-			var eyeParameters = device.getEyeParameters( 'left' );
-			var renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
-			var renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
-
-			currentPixelRatio = renderer.getPixelRatio();
-			renderer.getSize( currentSize );
-
-			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
 
 			animation.start();
 
 		} else {
-
-			if ( scope.enabled ) {
-
-				renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
-
-			}
 
 			animation.stop();
 
@@ -112,6 +99,31 @@ function WebVRManager( renderer ) {
 				if ( j === id ) return gamepad;
 
 				j ++;
+
+			}
+
+		}
+
+	}
+
+	function updateDrawingBufferSize() {
+
+		if ( isPresenting() ) {
+
+			var eyeParameters = device.getEyeParameters( 'left' );
+			var renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
+			var renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
+
+			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
+
+		} else {
+
+			if ( scope.enabled ) {
+
+				currentPixelRatio = renderer.getPixelRatio();
+				renderer.getSize( currentSize );
+
+				renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
 
 			}
 
@@ -209,6 +221,10 @@ function WebVRManager( renderer ) {
 		if ( value !== undefined ) device = value;
 
 		animation.setContext( value );
+
+		updateDrawingBufferSize();
+
+		if ( isPresenting() ) animation.start();
 
 	};
 
