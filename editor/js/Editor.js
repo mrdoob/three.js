@@ -39,6 +39,7 @@ var Editor = function () {
 		sceneBackgroundChanged: new Signal(),
 		sceneFogChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
+		sceneRendered: new Signal(),
 
 		cameraChanged: new Signal(),
 
@@ -104,6 +105,7 @@ var Editor = function () {
 	this.viewportCamera = this.camera;
 
 	this.addCamera( this.camera );
+	this.lastRenderTime = 0;
 
 };
 

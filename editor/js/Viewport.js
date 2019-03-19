@@ -572,6 +572,8 @@ var Viewport = function ( editor ) {
 
 	function render() {
 
+		var start = performance.now();
+
 		scene.updateMatrixWorld();
 		renderer.render( scene, camera );
 
@@ -585,6 +587,9 @@ var Viewport = function ( editor ) {
 			}
 
 		}
+
+		editor.lastRenderTime = performance.now() - start;
+		signals.sceneRendered.dispatch();
 
 	}
 
