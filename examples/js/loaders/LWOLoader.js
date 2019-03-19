@@ -6,7 +6,7 @@
  * LWO3 format specification:
  * 	http://static.lightwave3d.com/sdk/2018/html/filefmts/lwo3.html
  *
- * LWO2 format specification (not supported by this loader, however LWO3 files contain a lot from the LWO2 spec)
+ * LWO2 format specification (not tested, however the loader should be largely backwards compatible)
  * 	http://static.lightwave3d.com/sdk/2018/html/filefmts/lwo2.html
  *
  */
@@ -37,12 +37,14 @@ THREE.LWOLoader = ( function () {
 			var modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
 			var loader = new THREE.FileLoader( this.manager );
+			loader.setPath( self.path );
 			loader.setResponseType( 'arraybuffer' );
+
 			loader.load( url, function ( buffer ) {
 
-				console.time( 'Total parsing: ' );
+				// console.time( 'Total parsing: ' );
 				onLoad( self.parse( buffer, path, modelName ) );
-				console.timeEnd( 'Total parsing: ' );
+				// console.timeEnd( 'Total parsing: ' );
 
 			}, onProgress, onError );
 
@@ -110,8 +112,11 @@ THREE.LWOLoader = ( function () {
 
 		parseLayers() {
 
-			var meshes = []; // array of all meshes for building hierarchy
-			var finalMeshes = []; // final array containing meshes with hierarchy set up
+			// array of all meshes for building hierarchy
+			var meshes = [];
+
+			// final array containing meshes with scene graph hierarchy set up
+			var finalMeshes = [];
 
 			var geometryParser = new GeometryParser();
 
@@ -157,7 +162,7 @@ THREE.LWOLoader = ( function () {
 
 		},
 
-		// TODO: may need to be reversed for z to convert coordinates
+		// TODO: may need to be reversed in z to convert LWO to three.js coordinates
 		applyPivots( meshes ) {
 
 			meshes.forEach( function ( mesh ) {
