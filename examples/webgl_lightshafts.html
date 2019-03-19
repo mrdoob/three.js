@@ -133,25 +133,7 @@
 				light.position.set( 0, 20, 10 );
 				scene.add( light );
 
-				var loader = new THREE.GLTFLoader().setPath( 'models/gltf/' );
-				loader.load( 'tree.glb', function ( gltf ) {
-
-					gltf.scene.traverse( function ( child ) {
-
-						if ( child.isMesh )	{
-
-							child.material.transparent = false;
-							child.material.alphaTest = 0.5;
-
-						}
-
-					} );
-
-					scene.add( gltf.scene );
-
-				} );
-
-				// rays
+			 	// light shafts definition
 
 				var textureLoader = new THREE.TextureLoader();
 				var texture = textureLoader.load( 'textures/lightShaft.png' );
@@ -195,17 +177,39 @@
 
 				var lightShaftGeometry = new THREE.PlaneBufferGeometry( 0.5, 5 );
 
-				for ( var i = 0; i < 5; i ++ ) {
+				// model
 
-					var lightShaft = new THREE.Mesh( lightShaftGeometry, lightShaftMaterial );
-					lightShaft.position.x = - 1 + 1.5 * Math.sign( ( i % 2 ) );
-					lightShaft.position.y = 2;
-					lightShaft.position.z = - 1.5 + ( i * 0.5 );
-					lightShaft.rotation.y = Math.PI * 0.2;
-					lightShaft.rotation.z = Math.PI * - ( 0.15 + 0.1 * Math.random() );
-					scene.add( lightShaft );
+				var loader = new THREE.GLTFLoader().setPath( 'models/gltf/' );
+				loader.load( 'tree.glb', function ( gltf ) {
 
-				}
+					gltf.scene.traverse( function ( child ) {
+
+						if ( child.isMesh )	{
+
+							child.material.transparent = false;
+							child.material.alphaTest = 0.5;
+
+						}
+
+					} );
+
+					scene.add( gltf.scene );
+
+					// when the model is loaded, add light shafts
+
+					for ( var i = 0; i < 5; i ++ ) {
+
+						var lightShaft = new THREE.Mesh( lightShaftGeometry, lightShaftMaterial );
+						lightShaft.position.x = - 1 + 1.5 * Math.sign( ( i % 2 ) );
+						lightShaft.position.y = 2;
+						lightShaft.position.z = - 1.5 + ( i * 0.5 );
+						lightShaft.rotation.y = Math.PI * 0.2;
+						lightShaft.rotation.z = Math.PI * - ( 0.15 + 0.1 * Math.random() );
+						scene.add( lightShaft );
+
+					}
+
+				} );
 
 				//
 
