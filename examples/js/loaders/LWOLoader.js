@@ -650,12 +650,13 @@ THREE.LWOLoader = ( function () {
 
 		},
 
-		// if texture files are contained in the standard "../Images"
-		// directory, then LW stores the path as relative.
-		// Otherwise it stores the full drive path, on windows "C:/dir/subdir/texture.jpg"
+		// Lightwave expects textures to be in folder called Images relative
+		// to the model
+		// Otherwise, the full absolute path is stored: D://some_directory/textures/bumpMap.png
+		// In this case, we'll strip out everything and load 'bumpMap.png' from the same directory as the model
 		cleanPath( path ) {
 
-			if ( path.indexOf( 'Images' ) === 0 ) return '../' + path;
+			if ( path.indexOf( 'Images' ) === 0 ) return './' + path;
 			return path.split( '/' ).pop().split( '\\' ).pop();
 
 		},
