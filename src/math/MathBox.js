@@ -202,8 +202,8 @@ THREE.MathBox = function ( options ) {
 		getIntersects: function () {
 
 			this.intersects = Array.isArray( this.particles ) ?
-				this.intersects = this.raycaster.intersectObjects( this.particles ) :
-				this.intersects = this.raycaster.intersectObject( this.particles );
+				this.raycaster.intersectObjects( this.particles ) :
+				this.raycaster.intersectObject( this.particles );
 
 		},
 		mouse: new THREE.Vector2(),
@@ -272,6 +272,7 @@ THREE.MathBox = function ( options ) {
 		},
 		onDocumentMouseMove: function ( event ) {
 
+			//this.raycaster.stereo.onDocumentMouseMove( event );
 			event.preventDefault();
 			this.getMousePosition();
 			//console.log( 'mouse.x = ' + this.mouse.x + ' mouse.y = ' + this.mouse.y )
@@ -345,7 +346,8 @@ THREE.MathBox = function ( options ) {
 				if ( object.userData.controllerSelectPoint.__li !== undefined )
 					object.userData.controllerSelectPoint.__li.querySelector( 'select' ).selectedIndex = raycaster.index;
 
-				object.userData.owner.userData.onDocumentMouseDown();
+				if ( object.userData.owner !== undefined )
+					object.userData.owner.userData.onDocumentMouseDown();
 				object.userData.controllerSelectPoint.setValue( raycaster.index + 1 );
 
 				//}
@@ -360,19 +362,7 @@ THREE.MathBox = function ( options ) {
 
 			if ( this.particles === null )
 				return;
-/*
-			var cameraRaycaster;
-			if ( parseInt( effect.options.spatialMultiplex ) !== THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono )
-				cameraRaycaster = effect.options.stereo.cameraL;
-			else cameraRaycaster = camera;
-			this.raycaster.setFromCamera( this.mouse, cameraRaycaster );
-*/
-/*
-			var mouse = this.mouse;
-			if ( parseInt( effect.options.spatialMultiplex ) !== THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono )
-				mouse.x -= 0.12;
-			this.raycaster.setFromCamera( mouse, camera );
-*/
+			//this.raycaster.stereo.render();
 			this.intersection( intersection );
 			function intersection() {
 
@@ -435,6 +425,7 @@ THREE.MathBox = function ( options ) {
 		},
 
 	}
+	//raycaster.raycaster.setStereoEffect( effect );
 	var threshold = 0.05 * options.scale;
 	raycaster.setThreshold();
 	this.onDocumentMouseMove = function ( event ) { raycaster.onDocumentMouseMove( event ); }
