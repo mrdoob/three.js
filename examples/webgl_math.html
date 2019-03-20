@@ -203,15 +203,6 @@ mouse = new THREE.Vector2();
 				})
 				scene.add( axesHelper );
 
-				mathBox = new THREE.MathBox( {
-
-					axesHelper: axesHelper,
-					color: color,
-					colorsHelper: colorsHelper,
-					scale: scale,
-
-				} );
-
 				//
 
 				effect = new THREE.StereoEffect(renderer, {
@@ -221,6 +212,17 @@ mouse = new THREE.Vector2();
 					far: camera.far,
 					camera: camera,
 					stereoAspect: 1,
+
+				} );
+
+				//
+
+				mathBox = new THREE.MathBox( {
+
+					axesHelper: axesHelper,
+					color: color,
+					colorsHelper: colorsHelper,
+					scale: scale,
 
 				} );
 
