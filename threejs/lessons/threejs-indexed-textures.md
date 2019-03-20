@@ -222,9 +222,10 @@ function updateLabels() {
   }
 
   const large = settings.minArea * settings.minArea;
-  const visibleDot = Math.cos(THREE.Math.degToRad(settings.visibleAngleDeg));
   // get a matrix that represents a relative orientation of the camera
   normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
+  // get the camera's position
+  camera.getWorldPosition(cameraPosition);
   for (const countryInfo of countryInfos) {
 -    const {position, elem, area} = countryInfo;
 -    // large enough?

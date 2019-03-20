@@ -149,16 +149,17 @@ function main() {
   loadCountryData();
 
   const tempV = new THREE.Vector3();
+  const cameraToPoint = new THREE.Vector3();
+  const cameraPosition = new THREE.Vector3();
   const normalMatrix = new THREE.Matrix3();
-  const positiveZ = new THREE.Vector3(0, 0, 1);
 
   const settings = {
     minArea: 20,
-    visibleAngleDeg: 75,
+    maxVisibleDot: -0.2,
   };
   const gui = new dat.GUI({width: 300});
   gui.add(settings, 'minArea', 0, 50).onChange(requestRenderIfNotRequested);
-  gui.add(settings, 'visibleAngleDeg', 0, 180).onChange(requestRenderIfNotRequested);
+  gui.add(settings, 'maxVisibleDot', -1, 1, 0.01).onChange(requestRenderIfNotRequested);
 
   function updateLabels() {
     if (!countryInfos) {
@@ -166,9 +167,10 @@ function main() {
     }
 
     const large = settings.minArea * settings.minArea;
-    const visibleDot = Math.cos(THREE.Math.degToRad(settings.visibleAngleDeg));
     // get a matrix that represents a relative orientation of the camera
     normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
+    // get the camera's position
+    camera.getWorldPosition(cameraPosition);
     for (const countryInfo of countryInfos) {
       const {position, elem, area} = countryInfo;
       // large enough?
@@ -177,16 +179,25 @@ function main() {
         continue;
       }
 
-      // orient the position based on the camera's orientation
+      // Orient the position based on the camera's orientation.
+      // Since the sphere is at the origin and the sphere is a unit sphere
+      // this gives us a camera relative direction vector for the position.
       tempV.copy(position);
       tempV.applyMatrix3(normalMatrix);
 
-      // get the dot product with positiveZ
-      // -1 = facing directly away and +1 = facing directly toward us
-      const dot = tempV.dot(positiveZ);
+      // compute the direction to this position from the camera
+      cameraToPoint.copy(position);
+      cameraToPoint.applyMatrix4(camera.matrixWorldInverse).normalize();
+
+      // get the dot product of camera relative direction to this position
+      // on the globe with the direction from the camera to that point.
+      // -1 = facing directly towards the camera
+      // 0 = exactly on tangent of the sphere from the camera
+      // > 0 = facing away
+      const dot = tempV.dot(cameraToPoint);
 
       // if the orientation is not facing us hide it.
-      if (dot < visibleDot) {
+      if (dot > settings.maxVisibleDot) {
         elem.style.display = 'none';
         continue;
       }
