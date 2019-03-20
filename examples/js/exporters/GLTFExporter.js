@@ -1754,7 +1754,7 @@ THREE.GLTFExporter.prototype = {
 
 			} else if ( object.isLight ) {
 
-				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.' );
+				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.', object );
 				return null;
 
 			}
