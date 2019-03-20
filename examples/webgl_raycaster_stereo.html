@@ -1,0 +1,313 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - math</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				/*width: 100%;*/
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+
+		<script src="../build/three.js"></script>
+		<script src="js/WebGL.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<!--A lightweight graphical user interface for changing variables in JavaScript. https://github.com/dataarts/dat.gui -->
+		<!--<script src="js/libs/dat.gui.min.js"></script>-->
+		<script src="../../dat.gui/build/dat.gui.js"></script>
+
+		<script src="js/effects/StereoEffect.js"></script>
+		<script src="../src/objects/SpriteText.js"></script>
+
+		<!--Cube-->
+		<script src="js/geometries/ConvexGeometry.js"></script>
+		<script src="js/QuickHull.js"></script>
+
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - raycaster stereo
+			by <a href="https://github.com/anhr" target="_blank" rel="noopener">anhr</a>
+		</div>
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild(WEBGL.getWebGLErrorMessage());
+
+			}
+
+			var camera, scene, renderer, mesh, target, se, controls, rc, INTERSECTED;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+			init();
+			animate();
+
+			function init() {
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10);
+				camera.position.set( 0.4, 0.4, 2 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x000000);
+				scene.fog = new THREE.Fog(0x000000, 250, 1400);
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth / 2, window.innerHeight / 2 );
+				document.body.appendChild(renderer.domElement);
+
+				//
+
+				controls = new THREE.OrbitControls(camera, renderer.domElement);
+				controls.target.set(0, 0, 0);
+				controls.update();
+
+				//StereoEffect
+
+				se = new THREE.StereoEffect(renderer, {
+
+					spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.SbS,
+					far: camera.far,
+					camera: camera,
+					stereoAspect: 1,
+
+				} );
+
+				//Light
+
+				var light = new THREE.PointLight( 0xffffff, 1 );
+				light.position.copy( new THREE.Vector3( 1, 1, 1 ) );
+				scene.add( light );
+
+				light = new THREE.PointLight( 0xffffff, 1 );
+				light.position.copy( new THREE.Vector3( -2, -2, -2 ) );
+				scene.add( light );
+
+				//raycaster
+
+				rc = new THREE.Raycaster();
+				rc.params.Points.threshold = 0.03;
+				rc.setStereoEffect( se, {
+
+					onIntersection: function ( intersects ) {
+
+						var intersection = intersects[0];
+						switch ( intersection.object.type ) {
+
+							case "Points":
+
+								if ( spriteTextIntersection !== undefined )
+									return;
+
+								var position = new THREE.Vector3( 0, 0, 0 ),
+									textColor = 'rgb( 128, 128, 128 )';
+								if ( intersection.index !== undefined )
+									position.fromArray( intersection.object.geometry.attributes.position.array, intersection.index * 3 );
+								else position = intersection.object.position;
+								spriteTextIntersection = new THREE.SpriteText( 'x: ' + position.x + ' y: ' + position.y + ' z: ' + position.z, {
+
+									textHeight: 0.06,
+									fontColor: textColor,
+									rect: {
+
+										displayRect: true,
+										borderThickness: 3,
+										borderRadius: 10,
+										borderColor: textColor,
+										backgroundColor: 'rgba( 0, 0, 0, 1 )',
+
+									},
+									position: position,
+									center: new THREE.Vector2( 0.5, 0 ),
+
+								} );
+								scene.add( spriteTextIntersection );
+								INTERSECTED = intersection.object;
+
+								break;
+							case cubeType:
+								if ( INTERSECTED != intersection.object ) {
+
+									if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+									INTERSECTED = intersection.object;
+									INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+									INTERSECTED.material.emissive.setHex( 0xff0000 );
+
+								}
+								break;
+							default: console.error( 'Unknown object type: ' + intersection.object.type );
+
+						}
+
+					},
+					onIntersectionOut: function ( intersects ) {
+
+						if ( INTERSECTED === undefined )
+							return
+						switch ( INTERSECTED.type ) {
+
+							case "Points":
+
+								if ( spriteTextIntersection === undefined )
+									return;
+								scene.remove( spriteTextIntersection );
+								delete spriteTextIntersection;
+								spriteTextIntersection = undefined;
+
+								break;
+
+							case cubeType:
+
+								if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+								break;
+
+							default: console.error( 'Unknown object type: ' + intersection.object.type );
+
+						}
+						INTERSECTED = undefined;
+
+					},
+					onMouseDown: function ( intersects ) {
+
+						var intersection = intersects[0],
+							position = new THREE.Vector3( 0, 0, 0 );
+						if ( intersection.index !== undefined )
+							position.fromArray( intersection.object.geometry.attributes.position.array, intersection.index * 3 );
+						else position = intersection.object.position;
+						alert( 'You are cliced the "' + intersection.object.type + '" type object.'
+							+ ( intersection.index === undefined ? '' : ' Index = ' + intersection.index + '.' )
+							+ ' Position( x: ' + position.x + ', y: ' + position.y + ', z: ' + position.z + ' )' );
+
+					}
+
+				} );
+
+				//Points
+
+				var spriteTextIntersection;
+				var points = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
+						new THREE.Vector3( 0, 0, 0 ),
+						new THREE.Vector3( 0, 1, -1 ),
+						new THREE.Vector3( 0, 0, 1 ),
+				] ),
+					new THREE.PointsMaterial( {
+
+						color: 0xffffff,
+						size: 0.05,
+						alphaTest: 0.5
+
+					} ) );
+				scene.add( points );
+				if ( rc.stereo !== undefined )
+					rc.stereo.addParticles( points );
+
+				//cubes
+
+				var cubeType = 'cube';
+
+				function addCube( cubePosition, color ) {
+
+					var cube = new THREE.Mesh( new THREE.ConvexBufferGeometry( new THREE.CubeGeometry( 0.2, 0.2, 0.2 ).vertices ),
+						new THREE.MeshLambertMaterial( {
+							color: color,
+							opacity: 0.5,
+							transparent: true,
+						} ) );
+					cube.position.copy( cubePosition );
+					cube.type = cubeType;
+					scene.add( cube );
+					if ( rc.stereo !== undefined )
+						rc.stereo.addParticles( cube );
+
+				}
+				addCube( new THREE.Vector3( -1, 0, 0 ), 0xffffff );
+				addCube( new THREE.Vector3( -0.5, 0.5, 0.5 ), 'green' );
+
+				//dat-gui JavaScript Controller Library
+				//https://github.com/dataarts/dat.gui
+				var gui = new dat.GUI();
+
+				THREE.gui.stereoEffect( gui, se.options, {
+
+					gui: gui,
+
+				});
+
+				window.addEventListener( 'resize', onResize, false );
+			}
+			function onResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				if ( typeof se === 'undefined' )
+					renderer.setSize( window.innerWidth, window.innerHeight );
+				else se.setSize(window.innerWidth, window.innerHeight);
+
+			}
+			function onDocumentMouseMove( event ) {
+
+				if ( rc.stereo !== undefined )
+					rc.stereo.onDocumentMouseMove( event );
+				if ( event.buttons != 1 )
+					return;
+
+				render();
+
+			}
+			function onDocumentMouseDown( event ) {
+
+				if ( rc.stereo !== undefined )
+					rc.stereo.onDocumentMouseDown( event );
+
+			}
+			function animate() {
+
+				requestAnimationFrame(animate);
+
+				render();
+
+			}
+
+			function render() {
+
+				if ( typeof se === 'undefined' )
+					renderer.render( scene, camera );
+				else se.render( scene, camera );
+
+			}
+		</script>
+	</body>
+</html>
