@@ -303,6 +303,69 @@ use gpu based picking like we covered in the [picking
 article](threejs-picking.html) but that is also not free. Which solution you
 chose depends on your needs.
 
+Another issue is the order the labels appear. If we change the code to have
+longer labels
+
+```js
+const cubes = [
+-  makeInstance(geometry, 0x44aa88,  0, 'Aqua'),
+-  makeInstance(geometry, 0x8844aa, -2, 'Purple'),
+-  makeInstance(geometry, 0xaa8844,  2, 'Gold'),
++  makeInstance(geometry, 0x44aa88,  0, 'Aqua Colored Box'),
++  makeInstance(geometry, 0x8844aa, -2, 'Purple Colored Box'),
++  makeInstance(geometry, 0xaa8844,  2, 'Gold Colored Box'),
+];
+```
+
+and set the CSS so these don't wrap
+
+```css
+#labels>div {
++  white-space: nowrap;
+```
+
+Then we can run into this issue
+
+<div class="threejs_center"><img src="resources/images/label-sorting-issue.png" style="width: 401px;"></div>
+
+You can see above the purple box is in the back but its label is in front of the aqua box.
+
+We can fix this by setting the `zIndex` of each element. The projected position has a `z` value
+that goes from -1 in front to positive 1 in back. `zIndex` is required to be an integer and goes the
+opposite direction meaning for `zIndex` greater values are in front so the following code should work.
+
+```js
+// convert the normalized position to CSS coordinates
+const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
+const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
+
+// move the elem to that position
+elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+
++// set the zIndex for sorting
++elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
+```
+
+Because of the way the projected z value works we need to pick a large number to spread out the values
+otherwise many will have the same value. To make sure the labels don't overlap with other parts of
+the page we can tell the browser to create a new [stacking context](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context)
+by setting the `z-index` of the container of the labels
+
+```css
+#labels {
+  position: absolute;  /* let us position ourself inside the container */
++  z-index: 0;          /* make a new stacking context so children don't sort with rest of page */
+  left: 0;             /* make our position the top left of the container */
+  top: 0;
+  color: white;
+  z-index: 0;
+}
+```
+
+and now the labels should always be in the correct order.
+
+{{{example url="../threejs-align-html-to-3d-w-sorting.html" }}}
+
 While we're at it let's do one more example to show one more issue.
 Let's draw a globe like Google Maps and label the countries.
 
@@ -460,6 +523,9 @@ function updateLabels() {
 
     // move the elem to that position
     elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+
+    // set the zIndex for sorting
+    elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
   }
 }
 ```
@@ -565,6 +631,9 @@ function updateLabels() {
 
     // move the elem to that position
     countryInfo.elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+
+    // set the zIndex for sorting
+    elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
   }
 }
 ```

@@ -23,6 +23,7 @@
     }
     #labels {
       position: absolute;  /* let us position ourself inside the container */
+      z-index: 0;          /* make a new stacking context so children don't sort with rest of page */
       left: 0;             /* make our position the top left of the container */
       top: 0;
       color: white;
@@ -275,7 +276,10 @@ function main() {
       const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
 
       // move the elem to that position
-      countryInfo.elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+      elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+
+      // set the zIndex for sorting
+      elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;
     }
   }
 
