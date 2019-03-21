@@ -2,6 +2,7 @@ import { Sphere } from '../math/Sphere.js';
 import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
+import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { FileLoader } from './FileLoader.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
@@ -50,8 +51,9 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 			var attribute = attributes[ key ];
 			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+			var attributeConstructor = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
 
-			var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+			var bufferAttribute = new attributeConstructor( typedArray, attribute.itemSize, attribute.normalized );
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 			geometry.addAttribute( key, bufferAttribute );
 

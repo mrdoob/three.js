@@ -1062,12 +1062,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var attribute = attributes[ key ];
 
-			var attributeData = {
-				itemSize: attribute.itemSize,
-				type: attribute.array.constructor.name,
-				array: Array.prototype.slice.call( attribute.array ),
-				normalized: attribute.normalized
-			};
+			var attributeData = attribute.toJSON();
 
 			if ( attribute.name !== '' ) attributeData.name = attribute.name;
 
@@ -1088,12 +1083,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				var attribute = attributeArray[ i ];
 
-				var attributeData = {
-					itemSize: attribute.itemSize,
-					type: attribute.array.constructor.name,
-					array: Array.prototype.slice.call( attribute.array ),
-					normalized: attribute.normalized
-				};
+				var attributeData = attribute.toJSON();
 
 				if ( attribute.name !== '' ) attributeData.name = attribute.name;
 
