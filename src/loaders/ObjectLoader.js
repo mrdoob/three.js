@@ -436,7 +436,7 @@ Object.assign( ObjectLoader.prototype, {
 						break;
 
 					case 'InstancedBufferGeometry':
-						geometry = bufferGeometryLoader.parse( data );
+						geometry = new THREE.InstancedBufferGeometry().copy(bufferGeometryLoader.parse( data ));
 						geometry.maxInstancedCount = data.maxInstancedCount;
 						break;
 
