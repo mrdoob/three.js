@@ -435,6 +435,11 @@ Object.assign( ObjectLoader.prototype, {
 
 						break;
 
+					case 'InstancedBufferGeometry':
+						geometry = bufferGeometryLoader.parse( data );
+						geometry.maxInstancedCount = data.maxInstancedCount;
+						break;
+
 					case 'Geometry':
 
 						if ( 'THREE' in window && 'LegacyJSONLoader' in THREE ) {
