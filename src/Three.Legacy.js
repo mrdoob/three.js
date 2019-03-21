@@ -420,6 +420,36 @@ Object.assign( Loader.prototype, {
 		console.warn( 'THREE.Loader: .extractUrlBase() has been deprecated. Use THREE.LoaderUtils.extractUrlBase() instead.' );
 		return LoaderUtils.extractUrlBase( url );
 
+	},
+
+	onLoadStart: function () {
+
+		console.error( 'THREE.Loader: onLoadStart() has been removed.' );
+
+	},
+
+	onLoadProgress: function () {
+
+		console.error( 'THREE.Loader: onLoadProgress() has been removed.' );
+
+	},
+
+	onLoadComplete: function () {
+
+		console.error( 'THREE.Loader: onLoadComplete() has been removed.' );
+
+	},
+
+	initMaterials: function () {
+
+		console.error( 'THREE.Loader: initMaterials() has been removed.' );
+
+	},
+
+	createMaterial: function () {
+
+		console.error( 'THREE.Loader: createMaterial() has been removed.' );
+
 	}
 
 } );
