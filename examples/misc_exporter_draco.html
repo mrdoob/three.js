@@ -36,7 +36,7 @@
 		<script src="js/libs/draco/draco_encoder.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/exporters/DracoExporter.js"></script>
+		<script src="js/exporters/DRACOExporter.js"></script>
 
 		<script src="js/WebGL.js"></script>
 
@@ -62,7 +62,7 @@
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
-				exporter = new THREE.DracoExporter();
+				exporter = new THREE.DRACOExporter();
 
 				//
 
@@ -93,7 +93,8 @@
 
 				// export mesh
 
-				var geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
+				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
+				//var geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
 				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 
 				mesh = new THREE.Mesh( geometry, material );
