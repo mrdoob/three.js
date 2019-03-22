@@ -97,6 +97,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 		return spherical.theta;
 
 	};
+	
+	this.getState = function () {
+
+		return state;
+
+	};
 
 	this.saveState = function () {
 
