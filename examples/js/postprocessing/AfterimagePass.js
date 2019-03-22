@@ -41,10 +41,8 @@ THREE.AfterimagePass = function ( damp ) {
 
 	this.compFsQuad = new THREE.Pass.FullScreenQuad( this.shaderMaterial );
 
-	var material = new THREE.MeshBasicMaterial( {
-		map: this.textureComp.texture
-	} );
-	this.screenFsQuad = new THREE.Pass.FullScreenQuad( material );
+	var material = new THREE.MeshBasicMaterial();
+	this.copyFsQuad = new THREE.Pass.FullScreenQuad( material );
 
 };
 
@@ -60,13 +58,12 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		renderer.setRenderTarget( this.textureComp );
 		this.compFsQuad.render( renderer );
 
-		renderer.setRenderTarget( this.textureOld );
-		this.screenFsQuad.render( renderer );
+		this.copyFsQuad.material.map = this.textureComp.texture;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			this.screenFsQuad.render( renderer );
+			this.copyFsQuad.render( renderer );
 
 		} else {
 
@@ -74,9 +71,15 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			if ( this.clear ) renderer.clear();
 
-			this.screenFsQuad.render( renderer );
+			this.copyFsQuad.render( renderer );
 
 		}
+
+		// Swap buffers.
+		var temp = this.textureOld;
+		this.textureOld = this.textureComp;
+		this.textureComp = temp;
+		// Now textureOld contains the latest image, ready for the next frame.
 
 	},
 
