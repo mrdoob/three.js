@@ -6,8 +6,8 @@
  * Draco files are compressed and usually are smaller than conventional 3D file formats.
  *
  * @class DracoExporter
- * @author syed-usman
  * @author tentone
+ * @author syed-usman
  */
 
 THREE.DracoExporter = function () {};
