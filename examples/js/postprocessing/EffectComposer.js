@@ -81,7 +81,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		for ( var i = passIndex + 1; i < this.passes.length; i ++ ) {
 
-			if ( this.passes[i].enabled ) {
+			if ( this.passes[ i ].enabled ) {
 
 				return false;
 
@@ -224,7 +224,7 @@ Object.assign( THREE.Pass.prototype, {
 } );
 
 // Helper for passes that need to fill the viewport with a single quad.
-THREE.Pass.FullScreenQuad = (function() {
+THREE.Pass.FullScreenQuad = ( function () {
 
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
@@ -260,7 +260,7 @@ THREE.Pass.FullScreenQuad = (function() {
 		}
 
 	} );
-	
+
 	return FullScreenQuad;
 
-})();
+} )();

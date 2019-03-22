@@ -182,6 +182,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rt.texture.generateMipamps = false;
 
 		_compNormalDepth = new THREE.EffectComposer( _this.renderer, rt );
+		_compNormalDepth.renderToScreen = false;
 		_compNormalDepth.addPass( _passNormalDepth );
 
 	}
@@ -202,6 +203,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rt.texture.generateMipamps = false;
 
 		_compColor = new THREE.EffectComposer( _this.renderer, rt );
+		_compColor.renderToScreen = false;
 		_compColor.addPass( _passColor );
 
 	}
@@ -226,6 +228,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rt.texture.generateMipamps = false;
 
 		_compLight = new THREE.EffectComposer( _this.renderer, rt );
+		_compLight.renderToScreen = false;
 		_compLight.addPass( _passLightFullscreen );
 		_compLight.addPass( _passLight );
 
@@ -247,6 +250,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rt.texture.generateMipamps = false;
 
 		_compReconstruction = new THREE.EffectComposer( _this.renderer, rt );
+		_compReconstruction.renderToScreen = false;
 		_compReconstruction.addPass( _passReconstruction );
 
 	}
@@ -1068,24 +1072,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( _lightPrePass ) {
 
-			_passForward.renderToScreen = false;
 			_passForward.enabled = false;
-
-			_passCopy.renderToScreen = false;
 			_passCopy.enabled = false;
 
 			if ( _antialias ) {
 
-				_passFinal.renderToScreen = false;
-
-				_passFXAA.renderToScreen = true;
 				_passFXAA.enabled = true;
 
 			} else {
 
-				_passFinal.renderToScreen = true;
-
-				_passFXAA.renderToScreen = false;
 				_passFXAA.enabled = false;
 
 			}
@@ -1096,28 +1091,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 				if ( _antialias ) {
 
-					_passFinal.renderToScreen = false;
-
-					_passForward.renderToScreen = false;
 					_passForward.enabled = true;
-
-					_passCopy.renderToScreen = false;
 					_passCopy.enabled = false;
-
-					_passFXAA.renderToScreen = true;
 					_passFXAA.enabled = true;
 
 				} else {
 
-					_passFinal.renderToScreen = false;
-
-					_passForward.renderToScreen = false;
 					_passForward.enabled = true;
-
-					_passCopy.renderToScreen = true;
 					_passCopy.enabled = true;
-
-					_passFXAA.renderToScreen = false;
 					_passFXAA.enabled = false;
 
 				}
@@ -1126,28 +1107,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 				if ( _antialias ) {
 
-					_passFinal.renderToScreen = false;
-
-					_passForward.renderToScreen = false;
 					_passForward.enabled = false;
-
-					_passCopy.renderToScreen = false;
 					_passCopy.enabled = false;
-
-					_passFXAA.renderToScreen = true;
 					_passFXAA.enabled = true;
 
 				} else {
 
-					_passFinal.renderToScreen = true;
-
-					_passForward.renderToScreen = false;
 					_passForward.enabled = false;
-
-					_passCopy.renderToScreen = false;
 					_passCopy.enabled = false;
-
-					_passFXAA.renderToScreen = false;
 					_passFXAA.enabled = false;
 
 				}
