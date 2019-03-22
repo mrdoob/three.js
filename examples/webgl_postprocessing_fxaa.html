@@ -136,7 +136,6 @@
 				//
 
 				fxaaPass = new THREE.ShaderPass( THREE.FXAAShader );
-				fxaaPass.renderToScreen = true;
 
 				var pixelRatio = renderer.getPixelRatio();
 
@@ -150,7 +149,6 @@
 				//
 
 				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
 
 				composer2 = new THREE.EffectComposer( renderer );
 				composer2.addPass( renderPass );

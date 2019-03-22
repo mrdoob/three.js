@@ -28,6 +28,8 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;
 
+	this.renderToScreen = true;
+
 	this.passes = [];
 
 	// dependencies
@@ -75,6 +77,22 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	},
 
+	isLastEnabledPass: function ( passIndex ) {
+
+		for ( var i = passIndex + 1; i < this.passes.length; i ++ ) {
+
+			if ( this.passes[i].enabled ) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
+
+	},
+
 	render: function ( deltaTime ) {
 
 		// deltaTime value is in seconds
@@ -99,6 +117,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			if ( pass.enabled === false ) continue;
 
+			pass.renderToScreen = ( this.renderToScreen && this.isLastEnabledPass( i ) );
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
 
 			if ( pass.needsSwap ) {
@@ -187,7 +206,7 @@ THREE.Pass = function () {
 	// if set to true, the pass clears its buffer before rendering
 	this.clear = false;
 
-	// if set to true, the result of the pass is rendered to screen
+	// if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
 	this.renderToScreen = false;
 
 };

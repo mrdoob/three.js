@@ -186,8 +186,6 @@
 
 				var renderModelUV = new THREE.RenderPass( scene, camera, materialUV, new THREE.Color( 0x575757 ) );
 
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
-
 				var effectBloom1 = new THREE.BloomPass( 1, 15, 2, 512 );
 				var effectBloom2 = new THREE.BloomPass( 1, 25, 3, 512 );
 				var effectBloom3 = new THREE.BloomPass( 1, 25, 4, 512 );
@@ -195,8 +193,6 @@
 				effectBloom1.clear = true;
 				effectBloom2.clear = true;
 				effectBloom3.clear = true;
-
-				effectCopy.renderToScreen = true;
 
 				//
 
@@ -215,6 +211,7 @@
 
 				composer = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composer.addPass( renderModelUV );
+				composer.renderToScreen = false;
 
 				var renderScene = new THREE.TexturePass( composer.renderTarget2.texture );
 
@@ -224,16 +221,19 @@
 
 				composerUV1.addPass( renderScene );
 				composerUV1.addPass( effectBloom1 );
+				composerUV1.renderToScreen = false;
 
 				composerUV2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 
 				composerUV2.addPass( renderScene );
 				composerUV2.addPass( effectBloom2 );
+				composerUV2.renderToScreen = false;
 
 				composerUV3 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 
 				composerUV3.addPass( renderScene );
 				composerUV3.addPass( effectBloom3 );
+				composerUV3.renderToScreen = false;
 
 				//
 
