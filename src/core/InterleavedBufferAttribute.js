@@ -131,6 +131,17 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
+	},
+
+	toJSON: function()
+	{
+		return {
+			isInterleavedBufferAttribute: true,
+			data: this.data.toJSON(),
+			itemSize : this.itemSize,
+			offset : this.offset,
+			normalized: this.normalized
+		};
 	}
 
 } );

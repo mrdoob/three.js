@@ -103,6 +103,17 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
+	},
+
+	toJSON: function()
+	{
+		return {
+			type: this.array.constructor.name,
+			array: Array.prototype.slice.call( this.array ),
+			count: this.count,
+			stride : this.stride,
+			dynamic: this.dynamic
+		};
 	}
 
 } );

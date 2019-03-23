@@ -3,6 +3,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
+import {InstancedInterleavedBuffer} from '../core/InstancedInterleavedBuffer.js';
 import { FileLoader } from './FileLoader.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
@@ -50,10 +51,28 @@ Object.assign( BufferGeometryLoader.prototype, {
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
-			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-			var attributeConstructor = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
 
-			var bufferAttribute = new attributeConstructor( typedArray, attribute.itemSize, attribute.normalized );
+			var bufferAttribute;
+			if(attribute.isInterleavedBufferAttribute)
+			{
+				var bufferData = attribute.data;
+				var typedArray = new TYPED_ARRAY[bufferData.type];
+				var buffer = new InstancedInterleavedBuffer(typedArray, bufferData.stride, bufferData.meshPerAttribute);
+				bufferAttribute = new InterleavedBufferAttribute( buffer, attribute.itemSize, attribute.offset, attribute.normalized );
+			}
+			else 
+			{
+				var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+				if(attribute.isInstancedBufferAttribute)
+				{
+					bufferAttribute = new InstancedBufferAttribute( typedArray, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
+				}
+				else
+				{
+					bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+				}
+			}
+
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 			geometry.addAttribute( key, bufferAttribute );
 
