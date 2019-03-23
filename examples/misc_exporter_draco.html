@@ -28,7 +28,10 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/> <button onclick="exportFile()">export</button>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/>
+			<button onclick="exportFile()">export</button>
+			<button onclick="createGeometry()">geometry</button>
+			<button onclick="createBufferGeometry()">buffer geometry</button>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -52,6 +55,31 @@
 
 			init();
 			animate();
+
+			function createBufferGeometry() {
+
+				scene.remove( mesh );
+
+				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
+				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.castShadow = true;
+				mesh.position.y = 25;
+				scene.add( mesh );
+
+			}
+
+			function createGeometry() {
+
+				scene.remove( mesh );
+
+				var geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
+				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.castShadow = true;
+				mesh.position.y = 25;
+				scene.add( mesh );
+			}
 
 			function init() {
 
@@ -95,7 +123,6 @@
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
 				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.position.y = 25;

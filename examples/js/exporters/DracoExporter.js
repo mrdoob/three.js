@@ -53,146 +53,58 @@ THREE.DRACOExporter.prototype = {
 		var builder = new dracoEncoder.MeshBuilder();
 		var mesh = new dracoEncoder.Mesh();
 
-		if ( geometry.isBufferGeometry === true ) {
+		if ( geometry.isGeometry === true ) {
 
-			var vertices = geometry.getAttribute( 'position' );
-			builder.AddFloatAttributeToMesh( mesh, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array );
+			var bufferGeometry = new THREE.BufferGeometry();
+			bufferGeometry.fromGeometry(geometry);
+			geometry = bufferGeometry;
 
-			var faces = geometry.getIndex();
+		}
+
+		console.log( geometry );
+
+		var vertices = geometry.getAttribute( 'position' );
+		builder.AddFloatAttributeToMesh( mesh, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array );
+
+		var faces = geometry.getIndex();
+
+		if ( faces !== null ) {
+
 			builder.AddFacesToMesh( mesh, faces.count, faces.array );
 
-			if ( options.exportNormals === true ) {
+		}
 
-				var normals = geometry.getAttribute( 'normal' );
+		if ( options.exportNormals === true ) {
 
-				if ( normals !== undefined ) {
+			var normals = geometry.getAttribute( 'normal' );
 
-					builder.AddFloatAttributeToMesh( mesh, dracoEncoder.NORMAL, normals.count, normals.itemSize, normals.array );
+			if ( normals !== undefined ) {
 
-				}
-
-			}
-
-			if ( options.exportUvs === true ) {
-
-				var uvs = geometry.getAttribute( 'uv' );
-
-				if ( uvs !== undefined ) {
-
-					builder.AddFloatAttributeToMesh( mesh, dracoEncoder.TEX_COORD, uvs.count, uvs.itemSize, uvs.array );
-
-				}
+				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.NORMAL, normals.count, normals.itemSize, normals.array );
 
 			}
 
-			if ( options.exportColor === true ) {
+		}
 
-				var colors = geometry.getAttribute( 'color' );
+		if ( options.exportUvs === true ) {
 
-				if ( colors !== undefined ) {
+			var uvs = geometry.getAttribute( 'uv' );
 
-					builder.AddFloatAttributeToMesh( mesh, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array );
+			if ( uvs !== undefined ) {
 
-				}
-
-			}
-
-		} else if ( geometry.isGeometry === true ) {
-
-			var numFaces = geometry.faces.length;
-			var numPoints = geometry.vertices.length;
-			var numIndices = numFaces * 3;
-
-			// Faces
-
-			var indices = new Uint32Array( numIndices );
-
-			for ( var i = 0; i < numFaces; i ++ ) {
-
-				var index = i * 3;
-				indices[ index ] = geometry.faces[ i ].a;
-				indices[ index + 1 ] = geometry.faces[ i ].b;
-				indices[ index + 2 ] = geometry.faces[ i ].c;
+				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.TEX_COORD, uvs.count, uvs.itemSize, uvs.array );
 
 			}
 
-			builder.AddFacesToMesh( mesh, numFaces, indices );
+		}
 
-			// Vertex
+		if ( options.exportColor === true ) {
 
-			var vertices = new Float32Array( geometry.vertices.length * 3 );
+			var colors = geometry.getAttribute( 'color' );
 
-			for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+			if ( colors !== undefined ) {
 
-				var index = i * 3;
-				vertices[ index ] = geometry.vertices[ i ].x;
-				vertices[ index + 1 ] = geometry.vertices[ i ].y;
-				vertices[ index + 2 ] = geometry.vertices[ i ].z;
-
-			}
-
-			builder.AddFloatAttributeToMesh( mesh, dracoEncoder.POSITION, numPoints, 3, vertices );
-
-			// Normals
-
-			if ( options.exportNormals === true ) {
-
-				var normals = new Float32Array( geometry.vertices.length * 3 );
-
-				for ( var face of geometry.faces ) {
-
-					normals[ face.a * 3 ] = face.vertexNormals[ 0 ].x;
-					normals[ ( face.a * 3 ) + 1 ] = face.vertexNormals[ 0 ].y;
-					normals[ ( face.a * 3 ) + 2 ] = face.vertexNormals[ 0 ].z;
-
-					normals[ face.b * 3 ] = face.vertexNormals[ 1 ].x;
-					normals[ ( face.b * 3 ) + 1 ] = face.vertexNormals[ 1 ].y;
-					normals[ ( face.b * 3 ) + 2 ] = face.vertexNormals[ 1 ].z;
-
-					normals[ face.c * 3 ] = face.vertexNormals[ 2 ].x;
-					normals[ ( face.c * 3 ) + 1 ] = face.vertexNormals[ 2 ].y;
-					normals[ ( face.c * 3 ) + 2 ] = face.vertexNormals[ 2 ].z;
-
-				}
-
-				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.NORMAL, numPoints, 3, normals );
-
-			}
-
-			// Uvs
-
-			if ( options.exportUvs === true ) {
-
-				var uvs = new Uint32Array( geometry.vertices.length * 2 );
-
-				for ( var i = 0; i < geometry.faceVertexUvs.length; i ++ ) {
-
-					var index = i * 2;
-					uvs[ index ] = geometry.faceVertexUvs[ i ].x;
-					uvs[ index + 1 ] = geometry.faceVertexUvs[ i ].y;
-
-				}
-
-				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.TEX_COORD, numPoints, 2, uvs );
-
-			}
-
-			// Color
-
-			if ( options.exportColor === true ) {
-
-				var colors = new Uint32Array( geometry.vertices.length * 3 );
-
-				for ( var i = 0; i < geometry.colors.length; i ++ ) {
-
-					var index = i * 3;
-					colors[ index ] = geometry.colors[ i ].x;
-					colors[ index + 1 ] = geometry.colors[ i ].y;
-					colors[ index + 2 ] = geometry.colors[ i ].z;
-
-				}
-
-				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.COLOR, numPoints, 3, colors );
+				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array );
 
 			}
 
