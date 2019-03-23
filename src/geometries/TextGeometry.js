@@ -77,5 +77,22 @@ function TextBufferGeometry( text, parameters ) {
 TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );
 TextBufferGeometry.prototype.constructor = TextBufferGeometry;
 
+TextBufferGeometry.prototype.toJSON = function () {
+
+	var options = this.parameters.options;
+	return {
+		text : this.text,
+		options : {
+			font : options.font.data,
+			size : options.size,
+			height : options.height,
+			bevelSize : options.bevelSize,
+			bevelThickness : options.bevelThickness,
+			bevelEnabled : options.bevelEnabled,
+			curveSegments : options.curveSegments
+		}
+	}
+
+};
 
 export { TextGeometry, TextBufferGeometry };

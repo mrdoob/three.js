@@ -400,7 +400,6 @@ Object.assign( ObjectLoader.prototype, {
 
 						break;
 
-
 					case 'ExtrudeGeometry':
 					case 'ExtrudeBufferGeometry':
 
@@ -427,6 +426,16 @@ Object.assign( ObjectLoader.prototype, {
 							data.options
 						);
 
+						break;
+
+					case 'TextGeometry':
+					case 'TextBufferGeometry':
+
+						data.options.font = new THREE.Font(data.options.font);
+						geometry = new Geometries[ data.type ](
+							data.text,
+							data.options
+						);
 						break;
 
 					case 'BufferGeometry':
