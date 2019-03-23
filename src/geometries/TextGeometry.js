@@ -28,6 +28,7 @@ function TextGeometry( text, parameters ) {
 	Geometry.call( this );
 
 	this.type = 'TextGeometry';
+	this.text = text;
 
 	this.parameters = {
 		text: text,
@@ -42,11 +43,24 @@ function TextGeometry( text, parameters ) {
 TextGeometry.prototype = Object.create( Geometry.prototype );
 TextGeometry.prototype.constructor = TextGeometry;
 
+TextGeometry.prototype.toJSON = function () {
+
+	var data = Geometry.prototype.toJSON.call( this );
+
+	data.text = this.text;
+	data.options = data.parameters;
+	delete data.parameters;
+
+	return data;
+};
+
 // TextBufferGeometry
 
 function TextBufferGeometry( text, parameters ) {
 
 	parameters = parameters || {};
+
+	this.text = text;
 
 	var font = parameters.font;
 
@@ -83,17 +97,7 @@ TextBufferGeometry.prototype.toJSON = function () {
 	var data = BufferGeometry.prototype.toJSON.call( this );
 
 	data.text = this.text;
-
-	var options = this.parameters.options;
-	data.options = {
-		font : options.font.data,
-		size : options.size,
-		height : options.height,
-		bevelSize : options.bevelSize,
-		bevelThickness : options.bevelThickness,
-		bevelEnabled : options.bevelEnabled,
-		curveSegments : options.curveSegments
-	}
+	delete data.shapes;
 
 	return data;
 };
