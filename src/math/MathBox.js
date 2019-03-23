@@ -652,13 +652,13 @@ THREE.MathBox = function ( options ) {
 			if ( groupDotLines === undefined )
 				return;
 			scene.remove( groupDotLines );
-			delete groupDotLines;
+			//delete groupDotLines;//Parsing error: Deleting local variable in strict mode
 			groupDotLines = undefined;
-			delete lineX;
+			//delete lineX;
 			lineX = undefined;
-			delete lineY;
+			//delete lineY;
 			lineY = undefined;
-			delete lineZ;
+			//delete lineZ;
 			lineZ = undefined;
 
 		}
