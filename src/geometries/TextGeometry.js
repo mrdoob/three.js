@@ -18,6 +18,7 @@
  */
 
 import { Geometry } from '../core/Geometry.js';
+import {BufferGeometry} from '../core/BufferGeometry.js';
 import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
 
 // TextGeometry
@@ -79,20 +80,22 @@ TextBufferGeometry.prototype.constructor = TextBufferGeometry;
 
 TextBufferGeometry.prototype.toJSON = function () {
 
+	var data = BufferGeometry.prototype.toJSON.call( this );
+
+	data.text = this.text;
+
 	var options = this.parameters.options;
-	return {
-		text : this.text,
-		options : {
-			font : options.font.data,
-			size : options.size,
-			height : options.height,
-			bevelSize : options.bevelSize,
-			bevelThickness : options.bevelThickness,
-			bevelEnabled : options.bevelEnabled,
-			curveSegments : options.curveSegments
-		}
+	data.options = {
+		font : options.font.data,
+		size : options.size,
+		height : options.height,
+		bevelSize : options.bevelSize,
+		bevelThickness : options.bevelThickness,
+		bevelEnabled : options.bevelEnabled,
+		curveSegments : options.curveSegments
 	}
 
+	return data;
 };
 
 export { TextGeometry, TextBufferGeometry };
