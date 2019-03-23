@@ -463,7 +463,7 @@ THREE.MathBox = function ( options ) {
 			group.remove( group.children[0] );
 			group.children.length = 0;
 			scene.remove( group );
-			delete group;
+			//delete group;//Parsing error: Deleting local variable in strict mode
 
 		}
 		raycaster.remove();
