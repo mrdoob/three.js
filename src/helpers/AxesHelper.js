@@ -110,11 +110,10 @@ function AxesHelper( size, options ) {
 	options.scales.z.name = options.scales.z.name || 'Z';
 	options.scales.z.marks = options.scales.z.marks || marksDefault;
 
-	new THREE.cookie('axes').getObject ( options, {
+	new THREE.cookie( 'axes' ).getObject( options, {
 
 		negativeAxes: options.negativeAxes,
-		//		scales: Object.assign( {}, options.scales ),
-		scales: JSON.parse(JSON.stringify(options.scales)),
+		scales: JSON.parse( JSON.stringify( options.scales ) ),
 
 	} );
 
@@ -122,25 +121,26 @@ function AxesHelper( size, options ) {
 		x: 0,
 		y: 1,
 		z: 2,
-		getName: function ( id ){
+		getName: function ( id ) {
 
 			var axesEnum = this,
 				name;
-			Object.keys( this ).forEach( function ( key ){
+			Object.keys( this ).forEach( function ( key ) {
 
 				if ( axesEnum[ key ] === id )
 					name = key;
 
 			} );
-			if( name === undefined )
+			if ( name === undefined )
 				console.error( 'THREE.AxesHelper.axesEnum.getName: invalid id = ' + id );
 			return name;
 
 		}
 	};
 
-	function getVertices(){
-		var negativeSize = options.negativeAxes ? -size : 0;
+	function getVertices() {
+
+		var negativeSize = options.negativeAxes ? - size : 0;
 
 		var vertices = [
 			//begin	vertex									end vertex
@@ -151,12 +151,13 @@ function AxesHelper( size, options ) {
 		];
 
 		return new Float32BufferAttribute( vertices, 3 );
+
 	}
 
 	//colors
 	if ( options.colors ) {
 
-		if (typeof options.colors === 'string')
+		if ( typeof options.colors === 'string' )
 			options.colors = [ options.colors, options.colors, options.colors ];
 		if ( Array.isArray( options.colors ) )
 			switch ( options.colors.length ) {
@@ -168,9 +169,9 @@ function AxesHelper( size, options ) {
 					options.colors = [
 						//begin									end
 						//red		green			blue		red			green		blue
-						colors[ 0 ], colors[ 1 ], colors[ 2 ], colors[ 0 ], colors[ 1 ], colors[ 2 ],//x
-						colors[ 3 ], colors[ 4 ], colors[ 5 ], colors[ 3 ], colors[ 4 ], colors[ 5 ],//y
-						colors[ 6 ], colors[ 7 ], colors[ 8 ], colors[ 6 ], colors[ 7 ], colors[ 8 ],//z
+						colors[ 0 ], colors[ 1 ], colors[ 2 ], colors[ 0 ], colors[ 1 ], colors[ 2 ], //x
+						colors[ 3 ], colors[ 4 ], colors[ 5 ], colors[ 3 ], colors[ 4 ], colors[ 5 ], //y
+						colors[ 6 ], colors[ 7 ], colors[ 8 ], colors[ 6 ], colors[ 7 ], colors[ 8 ], //z
 					];
 					break;
 				case 3://Same color for all axis.
@@ -178,9 +179,9 @@ function AxesHelper( size, options ) {
 					options.colors = [
 						//begin									end
 						//red		green			blue		red			green		blue
-						colors[ 0 ], colors[ 1 ], colors[ 2 ], colors[ 0 ], colors[ 1 ], colors[ 2 ],//x
-						colors[ 0 ], colors[ 1 ], colors[ 2 ], colors[ 0 ], colors[ 1 ], colors[ 2 ],//y
-						colors[ 0 ], colors[ 1 ], colors[ 2 ], colors[ 0 ], colors[ 1 ], colors[ 2 ],//z
+						colors[ 0 ], colors[ 1 ], colors[ 2 ], colors[ 0 ], colors[ 1 ], colors[ 2 ], //x
+						colors[ 0 ], colors[ 1 ], colors[ 2 ], colors[ 0 ], colors[ 1 ], colors[ 2 ], //y
+						colors[ 0 ], colors[ 1 ], colors[ 2 ], colors[ 0 ], colors[ 1 ], colors[ 2 ], //z
 					];
 					break;
 				default: console.error( 'THREE.AxesHelper: Invalid options.colors.length = ' + options.colors.length );
@@ -198,13 +199,15 @@ function AxesHelper( size, options ) {
 	var colors = options.colors || [
 		//begin					end
 		//red	green	blue	red		green	blue
-		1,		0,		0,		1,		0.6,	0,//Axes x
-		0,		1,		0,		0.6,	1,		0,//Axes y
-		0,		0,		1,		0,		0.6,	1,//Axes z
+		1,		0,		0,		1,		0.6,	0, //Axes x
+		0,		1,		0,		0.6,	1,		0, //Axes y
+		0,		0,		1,		0,		0.6,	1, //Axes z
 	];
-	function getColor(colorIndex){
+	function getColor( colorIndex ) {
+
 		colorIndex *= 3;
-		return ((colors[colorIndex] * 0xff) << 16) + ((colors[colorIndex + 1] * 0xff) << 8) + colors[colorIndex + 2] * 0xff;
+		return ( ( colors[ colorIndex ] * 0xff ) << 16 ) + ( ( colors[ colorIndex + 1 ] * 0xff ) << 8 ) + colors[ colorIndex + 2 ] * 0xff;
+
 	}
 
 	var geometry = new BufferGeometry();
@@ -215,28 +218,30 @@ function AxesHelper( size, options ) {
 
 	LineSegments.call( this, geometry, material );
 
-	function getVerticePosition(verticeIndex){
+	function getVerticePosition( verticeIndex ) {
+
 		verticeIndex *= 3;
 		var array = geometry.attributes.position.array;
-		return new THREE.Vector3(array[verticeIndex], array[verticeIndex + 1], array[verticeIndex + 2]);
+		return new THREE.Vector3( array[ verticeIndex ], array[ verticeIndex + 1 ], array[ verticeIndex + 2 ] );
+
 	}
-	this.getAxesPosition = function ( axesId ){
+	this.getAxesPosition = function ( axesId ) {
 
 		var axes = this.axesEnum.getName( axesId );
 		return {
 
 			min: {
-				position: getVerticePosition(axesId * 2),
-				scale: options.scales[axes].min,
+				position: getVerticePosition( axesId * 2 ),
+				scale: options.scales[ axes ].min,
 			},
 			max: {
-					
-				position: getVerticePosition(axesId * 2 + 1 ),
-				scale: options.scales[axes].max,
+
+				position: getVerticePosition( axesId * 2 + 1 ),
+				scale: options.scales[ axes ].max,
 
 			}
 
-		}
+		};
 
 	};
 
@@ -252,16 +257,15 @@ function AxesHelper( size, options ) {
 			displayRect: true,
 			borderThickness: 3,
 			borderRadius: 10,
-			//borderColor: 'rgb( 100, 100, 100 )',
 			backgroundColor: 'rgba( 0, 0, 0, 1 )',
 		},
 		cookie: THREE.cookie,
 
 	};
-	function addAxesScales(){
+	function addAxesScales() {
 
 		var groupMarksTextX, groupMarksTextY, groupMarksTextZ;
-		if( ! axesScales ){
+		if ( ! axesScales ) {
 
 			axesScales = new THREE.Group();
 
@@ -283,6 +287,7 @@ function AxesHelper( size, options ) {
 		// convert a 24 bit binary color to 0..255 R,G,B
 		//https://gist.github.com/lrvick/2080648
 		function binToRGB( bin ) {
+
 			return {
 
 				r: bin >> 16,
@@ -290,13 +295,14 @@ function AxesHelper( size, options ) {
 				b: bin & 0xFF,
 
 			};
+
 		}
 
-		function drawScale( scaleIndex ){
+		function drawScale( scaleIndex ) {
 
 			var scales,
 				position = getVerticePosition( scaleIndex * 2 + 1 ),
-				color = getColor( scaleIndex * 2 + 1 ),//0x0000ff,//blue
+				color = getColor( scaleIndex * 2 + 1 ), //0x0000ff,//blue
 				textColor = binToRGB( color ),
 
 				markX = 0, markY = 0, markZ = 0,
@@ -306,7 +312,7 @@ function AxesHelper( size, options ) {
 				rotate = new THREE.Vector3( 0, 0, 0 ), angle = Math.PI * 0.5,
 				textPosition = new THREE.Vector3( 0, 0, 0 ).copy( position ), delta = 0;//0.03
 			textColor.a = 1.0;
-			switch(scaleIndex){
+			switch ( scaleIndex ) {
 
 				case axesHelper.axesEnum.x:
 					rotate.z = - angle;
@@ -345,17 +351,13 @@ function AxesHelper( size, options ) {
 			//	position: THREE.Vector3 - position of the cone
 			//	rotate: THREE.Vector3 of radians - Rotate the cone about the X, Y, Z axis.
 			//	height: height of the cone
-			function drawCone(options) {
+			function drawCone( options ) {
 
 				options = options || {};
-				/*
-							options.scale = options.scale || 1;
-							var height = (options.height || 0.2) * options.scale,
-				*/
 				var height = 0.05 * size,
 					radius = height / 5,
 					geometry = new THREE.ConeBufferGeometry( radius, height, 8 );
-				if ( options.rotate !== undefined ){
+				if ( options.rotate !== undefined ) {
 
 					geometry.rotateX( options.rotate.x );
 					geometry.rotateY( options.rotate.y );
@@ -378,24 +380,16 @@ function AxesHelper( size, options ) {
 
 			} );
 
-			function text( text, position, options ){
+			function text( text, position, options ) {
 
 				var optionsCur = {},
 					strColor = textColor.r + "," + textColor.g + "," + textColor.b;
-				/*
-								if ( axesHelper.arraySpriteText.options.cookieObject !== undefined ) {
-			
-									delete axesHelper.arraySpriteText.options.cookieObject.options.cookieObject;
-									delete axesHelper.arraySpriteText.options.cookieObject.options.commonOptions;
-			
-								}
-				*/
 				optionsCur.commonOptions = axesHelper.arraySpriteText.options;
 				optionsCur.rect = { borderColor: 'rgb( ' + strColor + ' )', };
 				var delta = 0.01 * size;
 				optionsCur.position = new THREE.Vector3(
 					position.x + delta * textPositionMarks.x,
-					position.y - delta * ( options.up === undefined ? 1 : -1 ) + delta * textPositionMarks.y,
+					position.y - delta * ( options.up === undefined ? 1 : - 1 ) + delta * textPositionMarks.y,
 					position.z + delta * textPositionMarks.z );
 				optionsCur.fontColor = "rgba(" + strColor + "," + textColor.a + ")";
 				if ( options.center !== undefined )
@@ -421,11 +415,11 @@ function AxesHelper( size, options ) {
 					position.x - markSize * markX,
 					position.y - markSize * markY,
 					position.z - markSize * markZ ) );
-				geometry.vertices.push( new THREE.Vector3( 
+				geometry.vertices.push( new THREE.Vector3(
 					position.x + markSize * markX,
 					position.y + markSize * markY,
 					position.z + markSize * markZ ) );
-				groupMarksText.add(new THREE.Line( geometry, material ));
+				groupMarksText.add( new THREE.Line( geometry, material ) );
 				text( markText, position, {
 
 					group: groupMarksText,
@@ -438,33 +432,33 @@ function AxesHelper( size, options ) {
 			function windowRange() {
 
 				//remove all old mark's texts
-				for( var i = groupMarksText.children.length - 1; i >= 0; i-- ) {
+				for ( var i = groupMarksText.children.length - 1; i >= 0; i -- ) {
 
 					groupMarksText.remove( groupMarksText.children[ i ] );
 
 				}
 
-				var minPosition = getVerticePosition(scaleIndex * 2);
+				var minPosition = getVerticePosition( scaleIndex * 2 );
 				if ( scales.min !== undefined )
 					scaleMark( minPosition, scales.min );
 
-				var maxPosition = getVerticePosition(scaleIndex * 2 + 1 );
+				var maxPosition = getVerticePosition( scaleIndex * 2 + 1 );
 				if ( scales.max !== undefined )
 					scaleMark( maxPosition, scales.max );
 
-				if ( ( scales.min !== undefined ) && ( scales.max !== undefined ) && ( scales.min !== scales.max )){
+				if ( ( scales.min !== undefined ) && ( scales.max !== undefined ) && ( scales.min !== scales.max ) ) {
 
 					var marks = scales.marks - 1;// || 6;
 					var step = ( scales.max - scales.min ) / marks,
 						distanceX = ( maxPosition.x - minPosition.x ) / marks,
 						distanceY = ( maxPosition.y - minPosition.y ) / marks,
 						distanceZ = ( maxPosition.z - minPosition.z ) / marks;
-					for ( var i = 1; i < marks; i++ ){
+					for ( var i = 1; i < marks; i ++ ) {
 
 						scaleMark( new THREE.Vector3(
 							minPosition.x + distanceX * i,
 							minPosition.y + distanceY * i,
-							minPosition.z + distanceZ * i ),scales.min + step * i );
+							minPosition.z + distanceZ * i ), scales.min + step * i );
 
 					}
 
@@ -473,7 +467,8 @@ function AxesHelper( size, options ) {
 
 			}
 
-			switch(scaleIndex){
+			switch ( scaleIndex ) {
+
 				case axesHelper.axesEnum.x:
 					axesHelper.windowRangeX = windowRange;
 					break;
@@ -484,16 +479,17 @@ function AxesHelper( size, options ) {
 					axesHelper.windowRangeZ = windowRange;
 					break;
 				default: console.error( 'THREE.AxesHelper.addAxesScales.drawScale: Invalid scaleIndex = ' + scaleIndex );
+
 			}
 			windowRange();
 
 			//text
 
 			text( scales.name, textPosition, {
-					
+
 				center: new THREE.Vector2( 1, 0 ),
 				up: true,
-				
+
 			} );
 
 		}
@@ -503,21 +499,17 @@ function AxesHelper( size, options ) {
 
 		//
 
-		axesHelper.add(axesScales);
+		axesHelper.add( axesScales );
 
 	}
 
-	//	var axesHelper = this;
-	//	this.name = 'AxesHelper';
-
-	if (options.scales.display) addAxesScales();
-	//	axesScales.visible = options.scales.display;
+	if ( options.scales.display ) addAxesScales();
 
 	//Adds AxesHelper folder into gui.
 	//https://github.com/dataarts/dat.gui/blob/master/API.md
 	//guiParams:
 	//{
-	//	getLanguageCode: Your custom getLanguageCode() function. 
+	//	getLanguageCode: Your custom getLanguageCode() function.
 	//		returns the "primary language" subtag of the language version of the browser.
 	//		Examples: "en" - English language, "ru" Russian.
 	//		See the "Syntax" paragraph of RFC 4646 https://tools.ietf.org/html/rfc4646#section-2.1 for details.
@@ -525,11 +517,15 @@ function AxesHelper( size, options ) {
 	//	cookie: Your custom cookie function for saving of the AxesHelper settings
 	//	lang: Object with localized language values
 	//}
-	this.gui = function (gui, guiParams) {
+	this.gui = function ( gui, guiParams ) {
 
 		if ( guiParams === undefined ) guiParams = {};
 
-		function getLanguageCode() { return 'en'; }//Default language is English
+		function getLanguageCode() {
+
+			return 'en';//Default language is English
+
+		}
 		if ( guiParams.getLanguageCode !== undefined ) getLanguageCode = guiParams.getLanguageCode;
 
 		//Localization
@@ -541,7 +537,6 @@ function AxesHelper( size, options ) {
 			negativeAxesTitle: 'Draw negative axes.',
 
 			scales: 'Scales',
-			//scalesTitle: '',
 
 			displayScales: 'Display',
 			displayScalesTitle: 'Display or hide axes scales.',
@@ -557,42 +552,37 @@ function AxesHelper( size, options ) {
 		};
 
 		var languageCode = getLanguageCode();
-		switch (languageCode) {
+		switch ( languageCode ) {
+
 			/*
 			case 'ru'://Russian language
 			//Warning. This file is not support an international language.
 				break;
 			*/
 			default://Custom language
-				if (( guiParams.lang === undefined ) || ( guiParams.lang.languageCode != languageCode ))
+				if ( ( guiParams.lang === undefined ) || ( guiParams.lang.languageCode != languageCode ) )
 					break;
 
-				Object.keys(guiParams.lang).forEach(function (key) {
+				Object.keys( guiParams.lang ).forEach( function ( key ) {
+
 					if ( lang[ key ] === undefined )
 						return;
 					lang[ key ] = guiParams.lang[ key ];
-				});
+
+				} );
+
 		}
 
 		//
 
-		if( guiParams.gui !== undefined )
-			guiParams.gui.remember(options);
+		if ( guiParams.gui !== undefined )
+			guiParams.gui.remember( options );
 
 		//AxesHelper folder
-		var fAxesHelper = gui.addFolder(lang.axesHelper);
-		/*
-		//negative Axes
-		var controllerNegativeAxes = fAxesHelper.add(options, 'negativeAxes').onChange(function (value) {
-			var position = geometry.attributes.position;
-			position.array = getVertices().array;
-			position.needsUpdate = true;
-			options.cookieObject.setObject();
-		});
-		dat.controllerNameAndTitle(controllerNegativeAxes, lang.negativeAxes, lang.negativeAxesTitle);
-		*/
+		var fAxesHelper = gui.addFolder( lang.axesHelper );
+
 		//scales folder
-		var fScales = fAxesHelper.addFolder(lang.scales);
+		var fScales = fAxesHelper.addFolder( lang.scales );
 
 		//display scales
 		function displayControllers( value ) {
@@ -604,16 +594,16 @@ function AxesHelper( size, options ) {
 			options.scalesControllers.z.folder.domElement.style.display = display;
 
 		}
-		var controllerDisplayScales = fScales.add( options.scales, 'display' ).onChange(function ( value ) {
+		var controllerDisplayScales = fScales.add( options.scales, 'display' ).onChange( function ( value ) {
 
 			axesScales.visible = value;
 			displayControllers( value );
 			options.cookieObject.setObject();
 
-		});
+		} );
 		dat.controllerNameAndTitle( controllerDisplayScales, lang.displayScales, lang.displayScalesTitle );
 
-		function onchangeWindowRange( windowRange ){
+		function onchangeWindowRange( windowRange ) {
 
 			windowRange();
 			if ( options.onchangeWindowRange !== undefined )
@@ -621,12 +611,12 @@ function AxesHelper( size, options ) {
 
 		}
 
-		function scale ( axes, windowRange, scaleControllers ){
+		function scale( axes, windowRange, scaleControllers ) {
 
 			scaleControllers.folder = fAxesHelper.addFolder( axes.name );
 
 			//min
-			scaleControllers.min = dat.controllerZeroStep( scaleControllers.folder, axes, 'min', function (value) {
+			scaleControllers.min = dat.controllerZeroStep( scaleControllers.folder, axes, 'min', function ( value ) {
 
 				onchangeWindowRange( windowRange );
 
@@ -634,7 +624,7 @@ function AxesHelper( size, options ) {
 			dat.controllerNameAndTitle( scaleControllers.min, lang.min );
 
 			//max
-			scaleControllers.max = dat.controllerZeroStep( scaleControllers.folder, axes, 'max', function (value) {
+			scaleControllers.max = dat.controllerZeroStep( scaleControllers.folder, axes, 'max', function ( value ) {
 
 				onchangeWindowRange( windowRange );
 
@@ -642,7 +632,7 @@ function AxesHelper( size, options ) {
 			dat.controllerNameAndTitle( scaleControllers.max, lang.max );
 
 			//marks
-			scaleControllers.marks = dat.controllerZeroStep( scaleControllers.folder, axes, 'marks', function (value) {
+			scaleControllers.marks = dat.controllerZeroStep( scaleControllers.folder, axes, 'marks', function ( value ) {
 
 				windowRange();
 
@@ -651,51 +641,56 @@ function AxesHelper( size, options ) {
 
 		}
 		options.scalesControllers = { x: {}, y: {}, z: {}, };
-		scale ( options.scales.x, axesHelper.windowRangeX, options.scalesControllers.x );
-		scale ( options.scales.y, axesHelper.windowRangeY, options.scalesControllers.y );
-		scale ( options.scales.z, axesHelper.windowRangeZ, options.scalesControllers.z );
+		scale( options.scales.x, axesHelper.windowRangeX, options.scalesControllers.x );
+		scale( options.scales.y, axesHelper.windowRangeY, options.scalesControllers.y );
+		scale( options.scales.z, axesHelper.windowRangeZ, options.scalesControllers.z );
 
 		//default button
 		var defaultParams = {
 
-			defaultF: function (value) {
+			defaultF: function ( value ) {
 
-				if (typeof controllerNegativeAxes !== 'undefined')
+				if ( typeof controllerNegativeAxes !== 'undefined' )
 					controllerNegativeAxes.setValue( options.optionsDefault.negativeAxes );
 				controllerDisplayScales.setValue( options.optionsDefault.scales.display );
-				function restore ( scaleControllers, scale, windowRange ){
+				function restore( scaleControllers, scale, windowRange ) {
 
 					scaleControllers.min.setValue( scale.min );
 					scaleControllers.max.setValue( scale.max );
 					scaleControllers.marks.setValue( scale.marks );
-					//					windowRange();
 					onchangeWindowRange( windowRange );
 
 				}
-				restore ( options.scalesControllers.x, options.optionsDefault.scales.x, axesHelper.windowRangeX );
-				restore ( options.scalesControllers.y, options.optionsDefault.scales.y, axesHelper.windowRangeY );
-				restore ( options.scalesControllers.z, options.optionsDefault.scales.z, axesHelper.windowRangeZ );
+				restore( options.scalesControllers.x, options.optionsDefault.scales.x, axesHelper.windowRangeX );
+				restore( options.scalesControllers.y, options.optionsDefault.scales.y, axesHelper.windowRangeY );
+				restore( options.scalesControllers.z, options.optionsDefault.scales.z, axesHelper.windowRangeZ );
 
 			},
 
 		};
-		var controllerDefaultF = fAxesHelper.add(defaultParams, 'defaultF');
-		dat.controllerNameAndTitle(controllerDefaultF, lang.defaultButton, lang.defaultTitle);
+		var controllerDefaultF = fAxesHelper.add( defaultParams, 'defaultF' );
+		dat.controllerNameAndTitle( controllerDefaultF, lang.defaultButton, lang.defaultTitle );
 
-		if( axesHelper.arraySpriteText.length === 0 ) {
-				
+		if ( axesHelper.arraySpriteText.length === 0 ) {
+
 			addAxesScales();
 			axesScales.visible = options.scales.display;
 
 		}
-		var fSpriteText = THREE.gui.spriteText(gui, axesHelper.arraySpriteText, {
+		var fSpriteText = THREE.gui.spriteText( gui, axesHelper.arraySpriteText, {
 
 			parentFolder: fScales,
-			getLanguageCode: function () { return languageCode; },
+			getLanguageCode: function () {
+
+				return languageCode;
+
+			},
 
 		} );
 		displayControllers( options.scales.display );
+
 	};
+
 }
 
 AxesHelper.prototype = Object.create( LineSegments.prototype );
