@@ -743,7 +743,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			var parameters = this.geometry.parameters;
 
-			if ( parameters !== undefined && parameters.shapes !== undefined ) {
+			// Don't serilalize shapes for TextGeometry because it won't be used.
+			if ( parameters !== undefined && parameters.shapes !== undefined && this.geometry.type != "TextGeometry" && this.geometry.type != "TextBufferGeometry" ) {
 
 				var shapes = parameters.shapes;
 

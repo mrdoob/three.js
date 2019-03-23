@@ -431,7 +431,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'TextGeometry':
 					case 'TextBufferGeometry':
 
-						data.options.font = new THREE.Font(data.options.font);
+						data.options.font = new THREE.Font(data.options.font.data);
 						geometry = new Geometries[ data.type ](
 							data.text,
 							data.options
