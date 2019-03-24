@@ -133,6 +133,19 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	},
 
+	clone: function()
+	{
+		return new this.constructor().copy( this );
+	},
+
+	copy: function (source) 
+	{
+		this.data = source.data;
+		this.itemSize = source.itemSize;
+		this.offset = source.offset;
+		this.normalized = source.normalized;
+	},
+
 	toJSON: function( )
 	{
 		return {
