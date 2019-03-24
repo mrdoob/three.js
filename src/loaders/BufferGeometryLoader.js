@@ -4,6 +4,7 @@ import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import {InstancedInterleavedBuffer} from '../core/InstancedInterleavedBuffer.js';
+import {InterleavedBuffer} from '../core/InterleavedBuffer.js';
 import {InterleavedBufferAttribute} from '../core/InterleavedBufferAttribute.js';
 import { FileLoader } from './FileLoader.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
@@ -56,10 +57,17 @@ Object.assign( BufferGeometryLoader.prototype, {
 			{
 				var data = interleavedBuffers[uuid];
 				var typedArray = new TYPED_ARRAYS[data.type](data.array);
-				var buffer = new InstancedInterleavedBuffer(typedArray, data.stride, data.meshPerAttribute);
+				var buffer;
+				if(data.isInstancedInterleavedBuffer === true)
+				{
+					buffer = new InstancedInterleavedBuffer(typedArray, data.stride, data.meshPerAttribute);
+				}
+				else 
+				{
+					buffer = new InterleavedBuffer(typedArray, data.stride);
+				}
 				interleavedBuffers[uuid] = buffer;
 			}
-			console.log(interleavedBuffers);
 		}
 
 		for ( var key in attributes ) {
