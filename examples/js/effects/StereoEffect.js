@@ -43,6 +43,7 @@ THREE.StereoEffectParameters = {
 //	far: Camera frustum far plane. The far key uses for correct calculation default values of Eye separation. Default is 10.
 //	cookie: Your custom cookie function for saving and loading of the StereoEffects settings. Default cookie is not saving settings.
 //	stereoAspect: THREE.StereoCamera.aspect. Camera frustum aspect ratio. Default is 0.5 for compatibility with previous version.
+//	rememberSize: true - remember default size of the canvas. Default is undefined.
 //}
 THREE.StereoEffect = function ( renderer, options ) {
 
@@ -144,7 +145,7 @@ THREE.StereoEffect = function ( renderer, options ) {
 
 	};
 
-	var rendererSizeDefault = this.getRendererSize();
+	var rendererSizeDefault = options.rememberSize ? this.getRendererSize() : undefined;
 
 	this.render = function ( scene, camera ) {
 
@@ -168,7 +169,8 @@ THREE.StereoEffect = function ( renderer, options ) {
 
 			case spatialMultiplexsIndexs.Mono://Mono
 
-				rendererSizeDefault.restore();
+				if ( rendererSizeDefault !== undefined )
+					rendererSizeDefault.restore();
 
 				renderer.setScissor( 0, 0, size.width, size.height );
 				renderer.setViewport( 0, 0, size.width, size.height );
@@ -178,7 +180,8 @@ THREE.StereoEffect = function ( renderer, options ) {
 
 			case spatialMultiplexsIndexs.SbS://'Side by side'
 
-				rendererSizeDefault.fullScreen();
+				if ( rendererSizeDefault !== undefined )
+					rendererSizeDefault.fullScreen();
 
 				var _width = size.width / 2;
 
@@ -189,7 +192,8 @@ THREE.StereoEffect = function ( renderer, options ) {
 
 			case spatialMultiplexsIndexs.TaB://'Top and bottom'
 
-				rendererSizeDefault.fullScreen();
+				if ( rendererSizeDefault !== undefined )
+					rendererSizeDefault.fullScreen();
 
 				xL = 0 + parallax; yL = 0; widthL = size.width; heightL = size.height / 2;
 				xR = 0 - parallax; yR = size.height / 2;	widthR = size.width; heightR = size.height / 2;
