@@ -53,26 +53,24 @@ THREE.DRACOExporter.prototype = {
 		var builder = new dracoEncoder.MeshBuilder();
 		var mesh = new dracoEncoder.Mesh();
 
-		if ( geometry.isGeometry === true ) {
+		console.log( dracoEncoder, geometry );
 
-			var numFaces = geometry.faces.length;
-			var numPoints = geometry.vertices.length;
-			var numIndices = numFaces * 3;
+		if ( geometry.isGeometry === true ) {
 
 			// Faces
 
-			var indices = new Uint32Array( numIndices );
+			var faces = new Uint32Array( geometry.faces.length * 3 );
 
-			for ( var i = 0; i < numFaces; i ++ ) {
+			for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
 				var index = i * 3;
-				indices[ index ] = geometry.faces[ i ].a;
-				indices[ index + 1 ] = geometry.faces[ i ].b;
-				indices[ index + 2 ] = geometry.faces[ i ].c;
+				faces[ index ] = geometry.faces[ i ].a;
+				faces[ index + 1 ] = geometry.faces[ i ].b;
+				faces[ index + 2 ] = geometry.faces[ i ].c;
 
 			}
 
-			builder.AddFacesToMesh( mesh, numFaces, indices );
+			builder.AddFacesToMesh( mesh, geometry.faces.length, faces );
 
 			// Vertex
 
@@ -87,7 +85,7 @@ THREE.DRACOExporter.prototype = {
 
 			}
 
-			builder.AddFloatAttributeToMesh( mesh, dracoEncoder.POSITION, numPoints, 3, vertices );
+			builder.AddFloatAttributeToMesh( mesh, dracoEncoder.POSITION, geometry.vertices.length, 3, vertices );
 
 			// Normals
 
@@ -111,7 +109,7 @@ THREE.DRACOExporter.prototype = {
 
 				}
 
-				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.NORMAL, numPoints, 3, normals );
+				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.NORMAL, geometry.vertices.length, 3, normals );
 
 			}
 
@@ -119,17 +117,26 @@ THREE.DRACOExporter.prototype = {
 
 			if ( options.exportUvs === true ) {
 
-				var uvs = new Uint32Array( geometry.faceVertexUvs.length * 2 );
+
+				var uvs = new Uint32Array( geometry.faceVertexUvs.length * 6 );
 
 				for ( var i = 0; i < geometry.faceVertexUvs.length; i ++ ) {
 
-					var index = i * 2;
-					uvs[ index ] = geometry.faceVertexUvs[ i ].x;
-					uvs[ index + 1 ] = geometry.faceVertexUvs[ i ].y;
+					var index = i * 6;
+					var faceUvs = geometry.faceVertexUvs[ i ];
+
+					uvs[ index ] = faceUvs[ 0 ].x;
+					uvs[ index + 1 ] = faceUvs[ 0 ].y;
+
+					uvs[ index + 2 ] = faceUvs[ 1 ].x;
+					uvs[ index + 3 ] = faceUvs[ 1 ].y;
+
+					uvs[ index + 4 ] = faceUvs[ 2 ].x;
+					uvs[ index + 5 ] = faceUvs[ 2 ].y;
 
 				}
 
-				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.TEX_COORD, numPoints, 2, uvs );
+				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.TEX_COORD, geometry.vertices.length, 2, uvs );
 
 			}
 
@@ -148,7 +155,7 @@ THREE.DRACOExporter.prototype = {
 
 				}
 
-				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.COLOR, numPoints, 3, colors );
+				builder.AddFloatAttributeToMesh( mesh, dracoEncoder.COLOR, geometry.vertices.length, 3, colors );
 
 			}
 
@@ -160,7 +167,7 @@ THREE.DRACOExporter.prototype = {
 			var faces = geometry.getIndex();
 
 			if ( faces !== null ) {
-
+				
 				builder.AddFacesToMesh( mesh, faces.count, faces.array );
 
 			}
