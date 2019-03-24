@@ -3,9 +3,9 @@ import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
-import {InstancedInterleavedBuffer} from '../core/InstancedInterleavedBuffer.js';
-import {InterleavedBuffer} from '../core/InterleavedBuffer.js';
-import {InterleavedBufferAttribute} from '../core/InterleavedBufferAttribute.js';
+import { InstancedInterleavedBuffer } from '../core/InstancedInterleavedBuffer.js';
+import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
+import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 import { FileLoader } from './FileLoader.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
@@ -51,23 +51,26 @@ Object.assign( BufferGeometryLoader.prototype, {
 		var attributes = json.data.attributes;
 		var interleavedBuffers = json.data.interleavedBuffers;
 
-		if(interleavedBuffers !== undefined)
-		{
-			for(var uuid in interleavedBuffers)
-			{
-				var data = interleavedBuffers[uuid];
-				var typedArray = new TYPED_ARRAYS[data.type](data.array);
+		if ( interleavedBuffers !== undefined )	{
+
+			for ( var uuid in interleavedBuffers ) {
+
+				var data = interleavedBuffers[ uuid ];
+				var typedArray = new TYPED_ARRAYS[ data.type ]( data.array );
 				var buffer;
-				if(data.isInstancedInterleavedBuffer === true)
-				{
-					buffer = new InstancedInterleavedBuffer(typedArray, data.stride, data.meshPerAttribute);
+				if ( data.isInstancedInterleavedBuffer === true ) {
+
+					buffer = new InstancedInterleavedBuffer( typedArray, data.stride, data.meshPerAttribute );
+
+				} else {
+
+					buffer = new InterleavedBuffer( typedArray, data.stride );
+
 				}
-				else 
-				{
-					buffer = new InterleavedBuffer(typedArray, data.stride);
-				}
-				interleavedBuffers[uuid] = buffer;
+				interleavedBuffers[ uuid ] = buffer;
+
 			}
+
 		}
 
 		for ( var key in attributes ) {
@@ -75,21 +78,23 @@ Object.assign( BufferGeometryLoader.prototype, {
 			var attribute = attributes[ key ];
 
 			var bufferAttribute;
-			if(attribute.isInterleavedBufferAttribute === true)
-			{
-				bufferAttribute = new InterleavedBufferAttribute( interleavedBuffers[attribute.array], attribute.itemSize, attribute.offset, attribute.normalized );
-			}
-			else 
-			{
+			if ( attribute.isInterleavedBufferAttribute === true ) {
+
+				bufferAttribute = new InterleavedBufferAttribute( interleavedBuffers[ attribute.array ], attribute.itemSize, attribute.offset, attribute.normalized );
+
+			} else {
+
 				var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-				if(attribute.isInstancedBufferAttribute === true)
-				{
+				if ( attribute.isInstancedBufferAttribute === true )	{
+
 					bufferAttribute = new InstancedBufferAttribute( typedArray, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
-				}
-				else
-				{
+
+				} else {
+
 					bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+
 				}
+
 			}
 
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;

@@ -28,15 +28,16 @@ InstancedInterleavedBuffer.prototype = Object.assign( Object.create( Interleaved
 
 	},
 
-	toJSON: function()
-	{
-		var data = InterleavedBuffer.prototype.toJSON.call(this);
+	toJSON: function () {
+
+		var data = InterleavedBuffer.prototype.toJSON.call( this );
 
 		data.meshPerAttribute = this.meshPerAttribute;
 
 		data.isInstancedInterleavedBuffer = true;
 
 		return data;
+
 	}
 
 } );

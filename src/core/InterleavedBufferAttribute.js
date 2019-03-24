@@ -133,30 +133,33 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	},
 
-	clone: function()
-	{
+	clone: function () {
+
 		return new this.constructor().copy( this );
+
 	},
 
-	copy: function (source) 
-	{
+	copy: function ( source ) {
+
 		this.data = source.data;
 		this.itemSize = source.itemSize;
 		this.offset = source.offset;
 		this.normalized = source.normalized;
 
 		return this;
+
 	},
 
-	toJSON: function( )
-	{
+	toJSON: function ( ) {
+
 		return {
-			array : this.data.uuid,
+			array: this.data.uuid,
 			isInterleavedBufferAttribute: true,
-			itemSize : this.itemSize,
-			offset : this.offset,
+			itemSize: this.itemSize,
+			offset: this.offset,
 			normalized: this.normalized
 		};
+
 	}
 
 } );
