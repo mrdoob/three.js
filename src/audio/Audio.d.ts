@@ -1,6 +1,7 @@
 import { Object3D } from './../core/Object3D';
 import { AudioListener } from './AudioListener';
 import { AudioContext } from './AudioContext';
+import { AudioBuffer } from "./PositionalAudio";
 
 // Extras / Audio /////////////////////////////////////////////////////////////////////
 
