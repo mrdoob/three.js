@@ -1057,16 +1057,22 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		}
 
 		var attributes = this.attributes;
-
+		var interleavedBuffers = {};
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
 
-			var attributeData = attribute.toJSON();
+			var attributeData = attribute.toJSON(false);
 
 			if ( attribute.name !== '' ) attributeData.name = attribute.name;
 
 			data.data.attributes[ key ] = attributeData;
+
+			if(attribute.isInterleavedBufferAttribute === true)
+			{
+				var buffer = attribute.data;
+				interleavedBuffers[buffer.uuid] = buffer.toJSON();
+			}
 
 		}
 
@@ -1102,6 +1108,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		}
 
 		if ( hasMorphAttributes ) data.data.morphAttributes = morphAttributes;
+		if(Object.keys(interleavedBuffers).length > 0 ) data.data.interleavedBuffers = interleavedBuffers;
 
 		var groups = this.groups;
 

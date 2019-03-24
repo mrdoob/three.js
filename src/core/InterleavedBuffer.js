@@ -3,6 +3,8 @@
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
+import { _Math } from '../math/Math.js';
+
 function InterleavedBuffer( array, stride ) {
 
 	this.array = array;
@@ -13,6 +15,8 @@ function InterleavedBuffer( array, stride ) {
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
+
+	this.uuid = _Math.generateUUID();
 
 }
 

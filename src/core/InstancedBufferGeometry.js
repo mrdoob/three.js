@@ -41,6 +41,8 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 		data.maxInstancedCount = this.maxInstancedCount;
 
+		data.isInstancedBufferGeometry = true;
+
 		return data;
 
 	}

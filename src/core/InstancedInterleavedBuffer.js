@@ -34,6 +34,8 @@ InstancedInterleavedBuffer.prototype = Object.assign( Object.create( Interleaved
 
 		data.meshPerAttribute = this.meshPerAttribute;
 
+		data.isInstancedInterleavedBuffer = true;
+
 		return data;
 	}
 

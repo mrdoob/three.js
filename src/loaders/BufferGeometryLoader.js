@@ -48,23 +48,33 @@ Object.assign( BufferGeometryLoader.prototype, {
 		}
 
 		var attributes = json.data.attributes;
+		var interleavedBuffers = json.data.interleavedBuffers;
+
+		if(interleavedBuffers !== undefined)
+		{
+			for(var uuid in interleavedBuffers)
+			{
+				var data = interleavedBuffers[uuid];
+				var typedArray = new TYPED_ARRAYS[data.type](data.array);
+				var buffer = new InstancedInterleavedBuffer(typedArray, data.stride, data.meshPerAttribute);
+				interleavedBuffers[uuid] = buffer;
+			}
+			console.log(interleavedBuffers);
+		}
 
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
 
 			var bufferAttribute;
-			if(attribute.isInterleavedBufferAttribute)
+			if(attribute.isInterleavedBufferAttribute === true)
 			{
-				var bufferData = attribute.data;
-				var typedArray = new TYPED_ARRAYS[bufferData.type];
-				var buffer = new InstancedInterleavedBuffer(typedArray, bufferData.stride, bufferData.meshPerAttribute);
-				bufferAttribute = new InterleavedBufferAttribute( buffer, attribute.itemSize, attribute.offset, attribute.normalized );
+				bufferAttribute = new InterleavedBufferAttribute( interleavedBuffers[attribute.array], attribute.itemSize, attribute.offset, attribute.normalized );
 			}
 			else 
 			{
 				var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-				if(attribute.isInstancedBufferAttribute)
+				if(attribute.isInstancedBufferAttribute === true)
 				{
 					bufferAttribute = new InstancedBufferAttribute( typedArray, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
 				}

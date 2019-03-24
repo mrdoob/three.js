@@ -133,11 +133,11 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	},
 
-	toJSON: function()
+	toJSON: function( )
 	{
 		return {
+			array : this.data.uuid,
 			isInterleavedBufferAttribute: true,
-			data: this.data.toJSON(),
 			itemSize : this.itemSize,
 			offset : this.offset,
 			normalized: this.normalized
