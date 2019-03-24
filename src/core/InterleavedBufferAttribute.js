@@ -144,6 +144,8 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 		this.itemSize = source.itemSize;
 		this.offset = source.offset;
 		this.normalized = source.normalized;
+
+		return this;
 	},
 
 	toJSON: function( )
