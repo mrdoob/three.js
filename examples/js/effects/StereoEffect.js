@@ -733,7 +733,8 @@ Object.assign( THREE.Raycaster.prototype, {
 					//for prevention of invalid detection of intersection with zero point ( THREE.Vector3( 0, 0, 0 ) )
 					//after opening of the web page and before user has moved mouse.
 			mouseL = new THREE.Vector2(),
-			mouseR = new THREE.Vector2();
+			mouseR = new THREE.Vector2(),
+			cursor = renderer.domElement.style.cursor;
 		function getMousePosition() {
 
 			stereoEffect.getRendererSize().getMousePosition( mouse, event );
@@ -792,10 +793,12 @@ Object.assign( THREE.Raycaster.prototype, {
 
 					if ( optionsIntersection.onIntersectionOut !== undefined )
 						optionsIntersection.onIntersectionOut( intersects );
+					renderer.domElement.style.cursor = cursor;
 					return false;
 
 				}
 				//console.log( 'isIntersection' );
+				renderer.domElement.style.cursor = 'pointer';
 				if ( optionsIntersection.onIntersection !== undefined )
 					optionsIntersection.onIntersection( intersects );
 				return true;
