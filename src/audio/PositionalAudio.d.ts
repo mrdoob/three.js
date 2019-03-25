@@ -1,5 +1,5 @@
-import { AudioListener } from "./AudioListener";
-import { Audio } from "./Audio";
+import { AudioListener } from './AudioListener';
+import { Audio } from './Audio';
 
 export class PositionalAudio extends Audio {
 	constructor(listener: AudioListener);

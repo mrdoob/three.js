@@ -1,12 +1,12 @@
-import { Object3D } from "./../core/Object3D";
-import { AudioListener } from "./AudioListener";
-import { AudioContext } from "./AudioContext";
+import { Object3D } from './../core/Object3D';
+import { AudioListener } from './AudioListener';
+import { AudioContext } from './AudioContext';
 
 // Extras / Audio /////////////////////////////////////////////////////////////////////
 
 export class Audio extends Object3D {
 	constructor(listener: AudioListener);
-	type: "Audio";
+	type: 'Audio';
 
 	context: AudioContext;
 	gain: GainNode;
