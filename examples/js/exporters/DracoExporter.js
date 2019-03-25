@@ -64,7 +64,6 @@ THREE.DRACOExporter.prototype = {
 		var vertices = geometry.getAttribute( 'position' );
 		builder.AddFloatAttributeToMesh( mesh, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array );
 
-
 		var faces = geometry.getIndex();
 
 		if ( faces !== null ) {
@@ -73,15 +72,13 @@ THREE.DRACOExporter.prototype = {
 
 		} else {
 
-			var faces = new Uint32Array( vertices.array.length * 3 );
+			var faces = new Uint32Array( ( vertices.array.length - 2 ) * 3 );
 
-			for ( var i = 0, f = 0; i < vertices.array.length; i += 3 ) {
+			for ( var i = 0, f = 0; i < vertices.array.length - 2; i += 3, f ++ ) {
 
 				faces[ i ] = f;
 				faces[ i + 1 ] = f + 1;
 				faces[ i + 2 ] = f + 2;
-
-				f ++;
 
 			}
 
@@ -143,12 +140,15 @@ THREE.DRACOExporter.prototype = {
 
 		// Sets the quantization (number of bits used to represent) compression options for a named attribute.
 		// The attribute values will be quantized in a box defined by the maximum extent of the attribute values.
+		if ( options.quantization !== undefined ) {
 
-		for ( var i = 0; i < 5; i ++ ) {
+			for ( var i = 0; i < 5; i ++ ) {
 
-			if ( options.quantization[ i ] !== undefined ) {
+				if ( options.quantization[ i ] !== undefined ) {
 
-				encoder.SetAttributeQuantization( i, options.quantization[ i ] );
+					encoder.SetAttributeQuantization( i, options.quantization[ i ] );
+
+				}
 
 			}
 
