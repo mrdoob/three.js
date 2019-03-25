@@ -5,7 +5,7 @@
 import {
 	UniformsLib,
 	UniformsUtils
-} from "../../../build/three.module.js";
+} from "../../../../../build/three.module.js";
 
 import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';

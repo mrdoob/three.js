@@ -2,9 +2,14 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.NodeMaterialLoader = function ( manager, library ) {
+import {
+	DefaultLoadingManager,
+	FileLoader
+} from "../../../build/three.module.js";
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+var NodeMaterialLoader = function ( manager, library ) {
+
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	this.nodes = {};
 	this.materials = {};
@@ -14,7 +19,7 @@ THREE.NodeMaterialLoader = function ( manager, library ) {
 
 };
 
-THREE.NodeMaterialLoaderUtils = {
+var NodeMaterialLoaderUtils = {
 
 	replaceUUIDObject: function ( object, uuid, value, recursive ) {
 
@@ -66,13 +71,13 @@ THREE.NodeMaterialLoaderUtils = {
 
 };
 
-Object.assign( THREE.NodeMaterialLoader.prototype, {
+Object.assign( NodeMaterialLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.FileLoader( scope.manager );
+		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
@@ -263,3 +268,5 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 	}
 
 } );
+
+export { NodeMaterialLoader, NodeMaterialLoaderUtils };

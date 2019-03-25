@@ -10,7 +10,7 @@ import {
 	RGBM16Encoding,
 	RGBM7Encoding,
 	sRGBEncoding
-} from "../../../build/three.module.js";
+} from "../../../../build/three.module.js";
 
 import { TempNode } from '../core/TempNode.js';
 import { ConstNode } from '../core/ConstNode.js';

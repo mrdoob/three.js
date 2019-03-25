@@ -4,7 +4,7 @@
 
 import {
 	Vector4
-} from "../../../build/three.module.js";
+} from "../../../../build/three.module.js";
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';

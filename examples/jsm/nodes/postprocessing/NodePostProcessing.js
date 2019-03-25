@@ -11,7 +11,7 @@ import {
 	Scene,
 	Vector2,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from "../../../../build/three.module.js";
 
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { ScreenNode } from '../inputs/ScreenNode.js';
