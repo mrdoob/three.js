@@ -54,7 +54,7 @@ function convert( path, ignoreList ) {
 
 	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
 
-		return `${match}\n\n_IMPORTS_`;
+		return `${match}_IMPORTS_`;
 
 	} );
 
@@ -70,9 +70,9 @@ function convert( path, ignoreList ) {
 
 	} );
 
-	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2, p3 ) {
+	contents = contents.replace( /(['"]?)THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2, p3 ) {
 
-		if ( p1 === '\'' ) return match; // Inside a string
+		if ( p1 === '\'' || p1 === '"' ) return match; // Inside a string
 		if ( p2 === className ) return `${p2}${p3}`;
 
 		if ( p1 === 'Math' ) {
@@ -101,10 +101,10 @@ function convert( path, ignoreList ) {
 
 	// constants
 
-	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)/g, function ( match, p1, p2 ) {
+	contents = contents.replace( /(['"]?)?THREE\.([a-zA-Z0-9]+)/g, function ( match, p1, p2 ) {
 
 		if ( ignoreList.includes( p2 ) ) return match;
-		if ( p1 === '\'' ) return match; // Inside a string
+		if ( p1 === '\'' || p1 === '"' ) return match; // Inside a string
 		if ( p2 === className ) return p2;
 
 		if ( p2 === 'Math' || p2 === '_Math' ) {
@@ -131,7 +131,7 @@ function convert( path, ignoreList ) {
 		.map( value => '\n\t' + value )
 		.sort()
 		.toString();
-	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
+	var imports = `\n\nimport {${keys}\n} from "../../../build/three.module.js";`;
 	var exports = `export { ${className} };\n`;
 
 	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;

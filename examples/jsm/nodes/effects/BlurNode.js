@@ -2,6 +2,10 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Vector2
+} from "../../../build/three.module.js";
+
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
@@ -135,7 +139,7 @@ BlurNode.prototype.copy = function ( source ) {
 	this.uv = source.uv;
 	this.radius = source.radius;
 
-	if ( source.size !== undefined ) this.size = new THREE.Vector2( source.size.x, source.size.y );
+	if ( source.size !== undefined ) this.size = new Vector2( source.size.x, source.size.y );
 
 	this.blurX = source.blurX;
 	this.blurY = source.blurY;

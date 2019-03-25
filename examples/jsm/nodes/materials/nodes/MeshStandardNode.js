@@ -2,6 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Color,
+	Vector2
+} from "../../../build/three.module.js";
+
 import { StandardNode } from './StandardNode.js';
 import { PropertyNode } from '../../inputs/PropertyNode.js';
 import { OperatorNode } from '../../math/OperatorNode.js';
@@ -13,10 +18,10 @@ function MeshStandardNode() {
 	StandardNode.call( this );
 
 	this.properties = {
-		color: new THREE.Color( 0xffffff ),
+		color: new Color( 0xffffff ),
 		roughness: 0.5,
 		metalness: 0.5,
-		normalScale: new THREE.Vector2( 1, 1 )
+		normalScale: new Vector2( 1, 1 )
 	};
 
 	this.inputs = {

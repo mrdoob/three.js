@@ -2,13 +2,17 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Matrix3
+} from "../../../build/three.module.js";
+
 import { InputNode } from '../core/InputNode.js';
 
 function Matrix3Node( matrix ) {
 
 	InputNode.call( this, 'm3' );
 
-	this.value = matrix || new THREE.Matrix3();
+	this.value = matrix || new Matrix3();
 
 }
 

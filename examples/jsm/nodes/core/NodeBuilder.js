@@ -2,6 +2,15 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	CubeReflectionMapping,
+	CubeRefractionMapping,
+	CubeUVReflectionMapping,
+	CubeUVRefractionMapping,
+	GammaEncoding,
+	LinearEncoding
+} from "../../../build/three.module.js";
+
 import { NodeUniform } from './NodeUniform.js';
 import { NodeUtils } from './NodeUtils.js';
 import { NodeLib } from './NodeLib.js';
@@ -771,15 +780,15 @@ NodeBuilder.prototype = {
 
 					switch ( nodeCandidate.mapping ) {
 
-						case THREE.CubeReflectionMapping:
-						case THREE.CubeRefractionMapping:
+						case CubeReflectionMapping:
+						case CubeRefractionMapping:
 
 							return new CubeTextureNode( nodeCandidate );
 
 							break;
 
-						case THREE.CubeUVReflectionMapping:
-						case THREE.CubeUVRefractionMapping:
+						case CubeUVReflectionMapping:
+						case CubeUVRefractionMapping:
 
 							return new TextureCubeNode( new TextureNode( nodeCandidate ) );
 
@@ -939,7 +948,7 @@ NodeBuilder.prototype = {
 
 		if ( ! map ) {
 
-			encoding = THREE.LinearEncoding;
+			encoding = LinearEncoding;
 
 		} else if ( map.isTexture ) {
 
@@ -953,9 +962,9 @@ NodeBuilder.prototype = {
 		}
 
 		// add backwards compatibility for WebGLRenderer.gammaInput/gammaOutput parameter, should probably be removed at some point.
-		if ( encoding === THREE.LinearEncoding && gammaOverrideLinear ) {
+		if ( encoding === LinearEncoding && gammaOverrideLinear ) {
 
-			encoding = THREE.GammaEncoding;
+			encoding = GammaEncoding;
 
 		}
 

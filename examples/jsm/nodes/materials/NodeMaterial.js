@@ -2,6 +2,14 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	FrontSide,
+	LessEqualDepth,
+	NoColors,
+	NormalBlending,
+	ShaderMaterial
+} from "../../../build/three.module.js";
+
 import { NodeBuilder } from '../core/NodeBuilder.js';
 import { ColorNode } from '../inputs/ColorNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
@@ -9,7 +17,7 @@ import { RawNode } from './nodes/RawNode.js';
 
 function NodeMaterial( vertex, fragment ) {
 
-	THREE.ShaderMaterial.call( this );
+	ShaderMaterial.call( this );
 
 	var self = this;
 
@@ -28,7 +36,7 @@ function NodeMaterial( vertex, fragment ) {
 
 }
 
-NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
+NodeMaterial.prototype = Object.create( ShaderMaterial.prototype );
 NodeMaterial.prototype.constructor = NodeMaterial;
 NodeMaterial.prototype.type = "NodeMaterial";
 
@@ -108,7 +116,7 @@ NodeMaterial.prototype.build = function ( params ) {
 	this.fog = builder.requires.fog;
 	this.lights = builder.requires.lights;
 
-	this.transparent = builder.requires.transparent || this.blending > THREE.NormalBlending;
+	this.transparent = builder.requires.transparent || this.blending > NormalBlending;
 
 	this.needsUpdate = false;
 
@@ -164,12 +172,12 @@ NodeMaterial.prototype.toJSON = function ( meta ) {
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
-		if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+		if ( this.blending !== NormalBlending ) data.blending = this.blending;
 		if ( this.flatShading === true ) data.flatShading = this.flatShading;
-		if ( this.side !== THREE.FrontSide ) data.side = this.side;
-		if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
+		if ( this.side !== FrontSide ) data.side = this.side;
+		if ( this.vertexColors !== NoColors ) data.vertexColors = this.vertexColors;
 
-		if ( this.depthFunc !== THREE.LessEqualDepth ) data.depthFunc = this.depthFunc;
+		if ( this.depthFunc !== LessEqualDepth ) data.depthFunc = this.depthFunc;
 		if ( this.depthTest === false ) data.depthTest = this.depthTest;
 		if ( this.depthWrite === false ) data.depthWrite = this.depthWrite;
 

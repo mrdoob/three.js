@@ -2,6 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	UniformsLib,
+	UniformsUtils
+} from "../../../build/three.module.js";
+
 import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 
@@ -31,8 +36,8 @@ SpriteNode.prototype.build = function ( builder ) {
 
 		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
 
-		builder.mergeUniform( THREE.UniformsUtils.merge( [
-			THREE.UniformsLib.fog
+		builder.mergeUniform( UniformsUtils.merge( [
+			UniformsLib.fog
 		] ) );
 
 		builder.addParsCode( [

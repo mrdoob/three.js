@@ -2,6 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	UniformsLib,
+	UniformsUtils
+} from "../../../build/three.module.js";
+
 import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
@@ -35,10 +40,10 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
 
-		builder.mergeUniform( THREE.UniformsUtils.merge( [
+		builder.mergeUniform( UniformsUtils.merge( [
 
-			THREE.UniformsLib.fog,
-			THREE.UniformsLib.lights
+			UniformsLib.fog,
+			UniformsLib.lights
 
 		] ) );
 

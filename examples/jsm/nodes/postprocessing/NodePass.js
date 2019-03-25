@@ -2,15 +2,20 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Math as _Math,
+	ShaderPass
+} from "../../../build/three.module.js";
+
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { ScreenNode } from '../inputs/ScreenNode.js';
 
 function NodePass() {
 
-	THREE.ShaderPass.call( this );
+	ShaderPass.call( this );
 
 	this.name = "";
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	this.userData = {};
 
@@ -24,7 +29,7 @@ function NodePass() {
 
 }
 
-NodePass.prototype = Object.create( THREE.ShaderPass.prototype );
+NodePass.prototype = Object.create( ShaderPass.prototype );
 NodePass.prototype.constructor = NodePass;
 
 NodePass.prototype.render = function () {
@@ -41,7 +46,7 @@ NodePass.prototype.render = function () {
 
 	this.uniforms = this.material.uniforms;
 
-	THREE.ShaderPass.prototype.render.apply( this, arguments );
+	ShaderPass.prototype.render.apply( this, arguments );
 
 };
 

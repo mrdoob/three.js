@@ -2,6 +2,15 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Mesh,
+	OrthographicCamera,
+	PlaneBufferGeometry,
+	Scene,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
+
+import { NodeBuilder } from '../core/NodeBuilder.js';
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { TextureNode } from './TextureNode.js';
 
@@ -13,14 +22,14 @@ function RTTNode( width, height, input, options ) {
 
 	this.clear = options.clear !== undefined ? options.clear : true;
 
-	this.renderTarget = new THREE.WebGLRenderTarget( width, height, options );
+	this.renderTarget = new WebGLRenderTarget( width, height, options );
 
 	this.material = new NodeMaterial();
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new THREE.Scene();
+	this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene = new Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), this.material );
+	this.quad = new Mesh( new PlaneBufferGeometry( 2, 2 ), this.material );
 	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
@@ -36,7 +45,7 @@ RTTNode.prototype.nodeType = "RTT";
 
 RTTNode.prototype.build = function ( builder, output, uuid ) {
 
-	var rttBuilder = new THREE.NodeBuilder();
+	var rttBuilder = new NodeBuilder();
 	rttBuilder.nodes = builder.nodes;
 	rttBuilder.updaters = builder.updaters;
 
@@ -59,9 +68,9 @@ RTTNode.prototype.updateFramesaveTo = function ( frame ) {
 		material.fragment.value = this;
 		material.build();
 
-		var scene = new THREE.Scene();
+		var scene = new Scene();
 
-		var quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), material );
+		var quad = new Mesh( new PlaneBufferGeometry( 2, 2 ), material );
 		quad.frustumCulled = false; // Avoid getting clipped
 		scene.add( quad );
 
@@ -134,7 +143,7 @@ RTTNode.prototype.toJSON = function ( meta ) {
 
 	if ( ! data ) {
 
-		data = THREE.TextureNode.prototype.toJSON.call( this, meta );
+		data = TextureNode.prototype.toJSON.call( this, meta );
 
 		if ( this.saveTo ) data.saveTo = this.saveTo.toJSON( meta ).uuid;
 

@@ -2,6 +2,10 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Vector3
+} from "../../../build/three.module.js";
+
 import { Vector3Node } from '../inputs/Vector3Node.js';
 
 function VelocityNode( target, params ) {
@@ -10,7 +14,7 @@ function VelocityNode( target, params ) {
 
 	this.params = {};
 
-	this.velocity = new THREE.Vector3();
+	this.velocity = new Vector3();
 
 	this.setTarget( target );
 	this.setParams( params );
@@ -50,12 +54,12 @@ VelocityNode.prototype.setParams = function ( params ) {
 
 		case "elastic":
 
-			this.moment = new THREE.Vector3();
+			this.moment = new Vector3();
 
-			this.speed = new THREE.Vector3();
-			this.springVelocity = new THREE.Vector3();
+			this.speed = new Vector3();
+			this.springVelocity = new Vector3();
 
-			this.lastVelocity = new THREE.Vector3();
+			this.lastVelocity = new Vector3();
 
 			break;
 
@@ -76,7 +80,7 @@ VelocityNode.prototype.setTarget = function ( target ) {
 
 	if ( target ) {
 
-		this.position = target.getWorldPosition( this.position || new THREE.Vector3() );
+		this.position = target.getWorldPosition( this.position || new Vector3() );
 		this.oldPosition = this.position.clone();
 
 	}
@@ -87,7 +91,7 @@ VelocityNode.prototype.updateFrameVelocity = function ( frame ) {
 
 	if ( this.target ) {
 
-		this.position = this.target.getWorldPosition( this.position || new THREE.Vector3() );
+		this.position = this.target.getWorldPosition( this.position || new Vector3() );
 		this.velocity.subVectors( this.position, this.oldPosition );
 		this.oldPosition.copy( this.position );
 

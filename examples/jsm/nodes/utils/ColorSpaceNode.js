@@ -2,6 +2,16 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	GammaEncoding,
+	LinearEncoding,
+	RGBDEncoding,
+	RGBEEncoding,
+	RGBM16Encoding,
+	RGBM7Encoding,
+	sRGBEncoding
+} from "../../../build/three.module.js";
+
 import { TempNode } from '../core/TempNode.js';
 import { ConstNode } from '../core/ConstNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
@@ -249,19 +259,19 @@ ColorSpaceNode.prototype.getEncodingComponents = function ( encoding ) {
 
 	switch ( encoding ) {
 
-		case THREE.LinearEncoding:
+		case LinearEncoding:
 			return [ 'Linear' ];
-		case THREE.sRGBEncoding:
+		case sRGBEncoding:
 			return [ 'sRGB' ];
-		case THREE.RGBEEncoding:
+		case RGBEEncoding:
 			return [ 'RGBE' ];
-		case THREE.RGBM7Encoding:
+		case RGBM7Encoding:
 			return [ 'RGBM', '7.0' ];
-		case THREE.RGBM16Encoding:
+		case RGBM16Encoding:
 			return [ 'RGBM', '16.0' ];
-		case THREE.RGBDEncoding:
+		case RGBDEncoding:
 			return [ 'RGBD', '256.0' ];
-		case THREE.GammaEncoding:
+		case GammaEncoding:
 			return [ 'Gamma', 'float( GAMMA_FACTOR )' ];
 
 	}

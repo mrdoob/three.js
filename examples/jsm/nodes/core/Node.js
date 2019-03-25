@@ -2,9 +2,13 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Math as _Math
+} from "../../../build/three.module.js";
+
 function Node( type ) {
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	this.name = "";
 

@@ -2,6 +2,10 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Vector4
+} from "../../../build/three.module.js";
+
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
@@ -9,7 +13,7 @@ function Vector4Node( x, y, z, w ) {
 
 	InputNode.call( this, 'v4' );
 
-	this.value = x instanceof THREE.Vector4 ? x : new THREE.Vector4( x, y, z, w );
+	this.value = x instanceof Vector4 ? x : new Vector4( x, y, z, w );
 
 }
 

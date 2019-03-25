@@ -2,6 +2,17 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	LinearFilter,
+	Mesh,
+	OrthographicCamera,
+	PlaneBufferGeometry,
+	RGBAFormat,
+	Scene,
+	Vector2,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
+
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { ScreenNode } from '../inputs/ScreenNode.js';
 
@@ -10,14 +21,14 @@ function NodePostProcessing( renderer, renderTarget ) {
 	if ( renderTarget === undefined ) {
 
 		var parameters = {
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			format: RGBAFormat,
 			stencilBuffer: false
 		};
 
-		var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
+		var size = renderer.getDrawingBufferSize( new Vector2() );
+		renderTarget = new WebGLRenderTarget( size.width, size.height, parameters );
 
 	}
 
@@ -27,10 +38,10 @@ function NodePostProcessing( renderer, renderTarget ) {
 	this.output = new ScreenNode();
 	this.material = new NodeMaterial();
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new THREE.Scene();
+	this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene = new Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), this.material );
+	this.quad = new Mesh( new PlaneBufferGeometry( 2, 2 ), this.material );
 	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 

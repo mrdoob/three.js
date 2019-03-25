@@ -2,6 +2,10 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	Color
+} from "../../../build/three.module.js";
+
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
@@ -9,7 +13,7 @@ function ColorNode( color, g, b ) {
 
 	InputNode.call( this, 'c' );
 
-	this.value = color instanceof THREE.Color ? color : new THREE.Color( color || 0, g, b );
+	this.value = color instanceof Color ? color : new Color( color || 0, g, b );
 
 }
 
