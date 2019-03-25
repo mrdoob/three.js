@@ -2158,7 +2158,7 @@ THREE.GLTFExporter.Utils = {
 				console.warn( 'THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
 
 				sourceTrack = sourceTrack.clone();
-				sourceTrack.setInterpolation( InterpolateLinear );
+				sourceTrack.setInterpolation( THREE.InterpolateLinear );
 
 			}
 
