@@ -10,6 +10,7 @@ import {
 	ClampToEdgeWrapping,
 	DoubleSide,
 	InterpolateDiscrete,
+	InterpolateLinear,
 	LinearFilter,
 	LinearMipMapLinearFilter,
 	LinearMipMapNearestFilter,
