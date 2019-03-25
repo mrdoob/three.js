@@ -34,21 +34,24 @@
 			Serialized using <a href="webgl_materials_nodes.html">webgl_materials_nodes.html</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
-		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script type="module">
 
-			import './js/nodes/THREE.Nodes.js';
-			import './js/loaders/NodeMaterialLoader.js';
+			import * as THREE from '../build/three.module.js';
+			import * as Nodes from './jsm/nodes/Nodes.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { NodeMaterialLoader } from './jsm/loaders/NodeMaterialLoader.js';
+
+			// NodeMaterialLoader requires global references to node constructors.
+			window.THREE = {};
+			Object.assign( window.THREE, THREE, Nodes );
 
 			var container = document.getElementById( 'container' );
 
 			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-			var frame = new THREE.NodeFrame();
+			var frame = new Nodes.NodeFrame();
 			var teapot, mesh, cloud;
 			var controls;
 			var gui;
@@ -75,7 +78,7 @@
 				cloud = new THREE.TextureLoader().load( 'textures/lava/cloud.png' );
 				cloud.wrapS = cloud.wrapT = THREE.RepeatWrapping;
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 
@@ -89,7 +92,7 @@
 				light.position.set( - 1, 0.75, - 0.5 );
 				scene.add( light );
 
-				teapot = new THREE.TeapotBufferGeometry( 15, 18 );
+				teapot = new TeapotBufferGeometry( 15, 18 );
 
 				mesh = new THREE.Mesh( teapot );
 				scene.add( mesh );
@@ -173,7 +176,7 @@
 					"cloud": cloud
 				};
 
-				var loader = new THREE.NodeMaterialLoader( undefined, library ).load( url, function () {
+				var loader = new NodeMaterialLoader( undefined, library ).load( url, function () {
 
 					var time = loader.getObjectByName( "time" );
 
@@ -216,7 +219,7 @@
 				var delta = clock.getDelta();
 
 				// update material animation and/or gpu calcs (pre-renderer)
-				if ( mesh.material instanceof THREE.NodeMaterial ) frame.update( delta ).updateNode( mesh.material );
+				if ( mesh.material instanceof Nodes.NodeMaterial ) frame.update( delta ).updateNode( mesh.material );
 
 				renderer.render( scene, camera );
 
