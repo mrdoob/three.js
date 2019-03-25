@@ -80,11 +80,9 @@ THREE.DRACOExporter.prototype = {
 
 			var faces = new ( vertices.count > 65535 ? Uint32Array : Uint16Array ) ( vertices.count );
 
-			for ( var i = 0, f = 0; i < faces.length; i += 3, f ++ ) {
+			for ( var i = 0; i < faces.length; i ++ ) {
 
 				faces[ i ] = i;
-				faces[ i + 1 ] = i + 1;
-				faces[ i + 2 ] = i + 2;
 
 			}
 
