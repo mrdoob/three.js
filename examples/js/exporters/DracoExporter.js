@@ -61,6 +61,12 @@ THREE.DRACOExporter.prototype = {
 
 		}
 
+		if ( geometry.isBufferGeometry !== true ) {
+
+			throw new Error( 'THREE.DRACOExporter.parse(geometry, options): geometry is not a THREE.Geometry or THREE.BufferGeometry instance.' );
+
+		}
+
 		var vertices = geometry.getAttribute( 'position' );
 		builder.AddFloatAttributeToMesh( mesh, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array );
 
@@ -72,17 +78,17 @@ THREE.DRACOExporter.prototype = {
 
 		} else {
 
-			var faces = new Uint32Array( ( vertices.array.length - 2 ) * 3 );
+			var faces = new ( vertices.count > 65535 ? Uint32Array : Uint16Array ) ( vertices.count );
 
-			for ( var i = 0, f = 0; i < vertices.array.length - 2; i += 3, f ++ ) {
+			for ( var i = 0, f = 0; i < faces.length; i += 3, f ++ ) {
 
-				faces[ i ] = f;
-				faces[ i + 1 ] = f + 1;
-				faces[ i + 2 ] = f + 2;
+				faces[ i ] = i;
+				faces[ i + 1 ] = i + 1;
+				faces[ i + 2 ] = i + 2;
 
 			}
 
-			builder.AddFacesToMesh( mesh, vertices.array.length, faces );
+			builder.AddFacesToMesh( mesh, vertices.count, faces );
 
 		}
 
