@@ -197,9 +197,6 @@
 			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
-			var modal = new UI.Modal();
-			document.body.appendChild( modal.dom );
-
 			//
 
 			editor.setTheme( editor.config.getKey( 'theme' ) );
@@ -268,12 +265,6 @@
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
 				signals.historyChanged.add( saveState );
-
-				signals.showModal.add( function ( content ) {
-
-					modal.show( content );
-
-				} );
 
 			} );
 
