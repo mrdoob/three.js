@@ -16,6 +16,7 @@ export interface RenderItem {
   material: Material;
   program: WebGLProgram;
   renderOrder: number;
+  materialOrder: number;
   z: number;
   group: Group;
 }

@@ -12,6 +12,10 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
+	} else if ( a.materialOrder !== b.materialOrder ) {
+
+		return a.materialOrder - b.materialOrder;
+
 	} else if ( a.program !== b.program ) {
 
 		return a.program.id - b.program.id;
@@ -41,6 +45,10 @@ function reversePainterSortStable( a, b ) {
 	} else if ( a.renderOrder !== b.renderOrder ) {
 
 		return a.renderOrder - b.renderOrder;
+
+	} else if ( a.materialOrder !== b.materialOrder ) {
+
+		return a.materialOrder - b.materialOrder;
 
 	} else if ( a.z !== b.z ) {
 
@@ -88,6 +96,7 @@ function WebGLRenderList() {
 				program: material.program || defaultProgram,
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
+				materialOrder: material.renderOrder,
 				z: z,
 				group: group
 			};
@@ -103,6 +112,7 @@ function WebGLRenderList() {
 			renderItem.program = material.program || defaultProgram;
 			renderItem.groupOrder = groupOrder;
 			renderItem.renderOrder = object.renderOrder;
+			renderItem.materialOrder = material.renderOrder;
 			renderItem.z = z;
 			renderItem.group = group;
 
