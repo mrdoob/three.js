@@ -47,7 +47,8 @@ export interface MaterialParameters {
   transparent?: boolean;
   vertexColors?: Colors;
   vertexTangents?: boolean;
-  visible?: boolean;
+	visible?: boolean;
+	renderOrder?: number;
 }
 
 /**
@@ -248,6 +249,11 @@ export class Material extends EventDispatcher {
   visible: boolean;
 
   /**
+   * Overrides the default rendering order of scene graph objects, from lowest to highest renderOrder. Opaque and transparent objects remain sorted independently though. renderOrder of Objects and Groups takes priority than this property.
+   */
+  renderOrder: number;
+
+  /**
    * An object that can be used to store custom data about the Material. It should not hold references to functions as these will not be cloned.
    */
   userData: any;
@@ -269,7 +275,7 @@ export class Material extends EventDispatcher {
   dispose(): void;
 
   /**
-   * An optional callback that is executed immediately before the shader program is compiled. This function is called with the shader source code as a parameter. Useful for the modification of built-in materials. 
+   * An optional callback that is executed immediately before the shader program is compiled. This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
    * @param shader Source code of the shader
    * @param renderer WebGLRenderer Context that is initializing the material
    */

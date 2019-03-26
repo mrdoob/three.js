@@ -62,6 +62,8 @@ function Material() {
 
 	this.visible = true;
 
+	this.renderOrder = 0;
+
 	this.userData = {};
 
 	this.needsUpdate = true;
@@ -264,6 +266,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.skinning === true ) data.skinning = true;
 
 		if ( this.visible === false ) data.visible = false;
+		if ( this.renderOrder !== 0 ) data.renderOrder = this.renderOrder;
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
 		// TODO: Copied from Object3D.toJSON
@@ -344,6 +347,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.premultipliedAlpha = source.premultipliedAlpha;
 
 		this.visible = source.visible;
+		this.renderOrder = source.renderOrder;
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		this.clipShadows = source.clipShadows;
