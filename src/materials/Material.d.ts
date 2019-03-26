@@ -47,8 +47,8 @@ export interface MaterialParameters {
   transparent?: boolean;
   vertexColors?: Colors;
   vertexTangents?: boolean;
-	visible?: boolean;
-	renderOrder?: number;
+  visible?: boolean;
+  renderOrder?: number;
 }
 
 /**
