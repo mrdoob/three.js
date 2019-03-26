@@ -63,6 +63,9 @@ GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
 
 		Object.assign( this.parameters, source.parameters );
 
+		this.geometry.copy( source.geometry );
+		this.material.copy( source.material );
+
 		return this;
 
 	},
