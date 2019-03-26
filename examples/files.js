@@ -357,6 +357,7 @@ var files = {
 		"misc_controls_trackball",
 		"misc_controls_transform",
 		"misc_exporter_collada",
+		"misc_exporter_draco",
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
 		"misc_exporter_stl",
