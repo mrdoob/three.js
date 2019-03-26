@@ -57,7 +57,7 @@ GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
 
 	constructor: GridHelper,
 
-	copy( source ) {
+	copy: function ( source ) {
 
 		LineSegments.prototype.copy.call( this, source );
 
@@ -67,7 +67,7 @@ GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
 
 	},
 
-	clone() {
+	clone: function () {
 
 		var parameters = this.parameters;
 
