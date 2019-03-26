@@ -99,6 +99,7 @@ THREE.SVGLoader.prototype = {
 				transformPath( path, currentTransform );
 
 				paths.push( path );
+				path.userData = { node: node, style: style };
 
 			}
 
@@ -694,6 +695,9 @@ THREE.SVGLoader.prototype = {
 			if ( node.hasAttribute( 'fill' ) ) style.fill = node.getAttribute( 'fill' );
 			if ( node.style.fill !== '' ) style.fill = node.style.fill;
 
+			if ( node.hasAttribute( 'fill-opacity' ) ) style.fillOpacity = node.getAttribute( 'fill-opacity' );
+			if ( node.style.fillOpacity !== '' ) style.fillOpacity = node.style.fillOpacity;
+
 			return style;
 
 		}
@@ -1012,13 +1016,16 @@ THREE.SVGLoader.prototype = {
 		console.time( 'THREE.SVGLoader: Parse' );
 
 		parseNode( xml.documentElement, { fill: '#000' } );
+		
+		var data = { paths: paths, xml: xml.documentElement };
 
 		// console.log( paths );
 
 
 		console.timeEnd( 'THREE.SVGLoader: Parse' );
 
-		return paths;
+
+		return data;
 
 	}
 

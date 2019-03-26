@@ -149,7 +149,9 @@
 				//
 
 				var loader = new THREE.SVGLoader();
-				loader.load( url, function ( paths ) {
+				loader.load( url, function ( data ) {
+
+					var paths = data.paths;
 
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.25 );
