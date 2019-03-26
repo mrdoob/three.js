@@ -408,7 +408,8 @@ var list = {
 
 			"Utils": {
 				"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/utils/SceneUtils"
+				"SceneUtils": "examples/utils/SceneUtils",
+				"SkeletonUtils": "examples/utils/SkeletonUtils"
 			}
 
 		},
