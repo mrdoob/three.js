@@ -64,7 +64,9 @@ var Editor = function () {
 
 		showGridChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		historyChanged: new Signal()
+		historyChanged: new Signal(),
+
+		sceneCamerasChanged: new Signal()
 
 	};
 

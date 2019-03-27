@@ -18,6 +18,8 @@ var Config = function () {
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
+		'project/renderer/showHelpers': true,
+		'project/renderer/showSceneCameras': true,
 
 		'project/vr': false,
 
@@ -27,7 +29,7 @@ var Config = function () {
 		'settings/shortcuts/rotate': 'e',
 		'settings/shortcuts/scale': 'r',
 		'settings/shortcuts/undo': 'z',
-		'settings/shortcuts/focus': 'f'
+		'settings/shortcuts/focus': 'f',
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

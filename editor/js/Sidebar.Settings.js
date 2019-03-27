@@ -74,6 +74,34 @@ Sidebar.Settings = function ( editor ) {
 
 	container.add( themeRow );
 
+	// scene camera visible
+
+	var sceneShowCameraRow = new UI.Row();
+	container.add( sceneShowCameraRow );
+
+	var sceneCameraCheckbox = new UI.Checkbox( config.getKey( 'project/renderer/showSceneCameras' ) || false ).onChange( function () {
+
+		config.setKey( 'project/renderer/showSceneCameras', this.getValue() );
+		signals.sceneCamerasChanged.dispatch();
+
+	} );
+
+	sceneShowCameraRow.add( new UI.Text( strings.getKey( 'sidebar/settings/showSceneCameras' ) ).setWidth( '90px' ), sceneCameraCheckbox );
+
+	// show helpers
+
+	var showHelpersRow = new UI.Row();
+	container.add( showHelpersRow );
+
+	var showHelpersCheckbox = new UI.Checkbox( config.getKey( 'project/renderer/showHelpers' ) || false ).onChange( function () {
+
+		config.setKey( 'project/renderer/showHelpers', this.getValue() );
+		signals.sceneGraphChanged.dispatch();
+
+	} );
+
+	showHelpersRow.add( new UI.Text( strings.getKey( 'sidebar/settings/showHelpers' ) ).setWidth( '90px' ), showHelpersCheckbox );
+
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
 	container.add( new Sidebar.Settings.Viewport( editor ) );
 
