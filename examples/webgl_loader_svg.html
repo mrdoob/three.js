@@ -81,17 +81,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				document.body.addEventListener( 'dblclick', function ( event ) {
-
-					var group = scene.children[ 1 ];
-					group.traverse( function ( child ) {
-
-						if ( child.material ) child.material.wireframe = ! child.material.wireframe;
-
-					} );
-
-				} );
-
 				guiData = {
 					currentURL: 'models/svg/tiger.svg',
 					drawFillShapes: true,
@@ -108,9 +97,7 @@
 
 			function createGUI() {
 
-				if ( gui ) {
-					gui.destroy();
-				}
+				if ( gui ) gui.destroy();
 
 				gui = new dat.GUI( { width: 350 } );
 
@@ -184,7 +171,7 @@
 							var material = new THREE.MeshBasicMaterial( {
 								color: new THREE.Color().setStyle( fillColor ),
 								opacity: path.userData.style.fillOpacity,
-								transparent: path.userData.style.fillOpacity !== 1,
+								transparent: path.userData.style.fillOpacity < 1,
 								side: THREE.DoubleSide,
 								depthWrite: false,
 								wireframe: guiData.fillShapesWireframe
@@ -212,7 +199,7 @@
 							var material = new THREE.MeshBasicMaterial( {
 								color: new THREE.Color().setStyle( strokeColor ),
 								opacity: path.userData.style.strokeOpacity,
-								transparent: path.userData.style.strokeOpacity !== 1,
+								transparent: path.userData.style.strokeOpacity < 1,
 								side: THREE.DoubleSide,
 								depthWrite: false,
 								wireframe: guiData.strokesWireframe
