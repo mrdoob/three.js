@@ -9,8 +9,8 @@ var srcFolder = __dirname + '/examples/jsm/';
 var dstFolder = __dirname + '/examples/js/';
 
 var files = [
-	// { path: /postprocessing\/.+\.js$/ }
-	{ path: /controls[\/\\].+\.js$/ }
+	// { path: /postprocessing[\/\\].+\.js$/ },
+	// { path: /controls[\/\\].+\.js$/ }
 ];
 
 // Creates a rollup config object for the given file to
