@@ -89,7 +89,27 @@ function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) 
 
 }
 
-PolarGridHelper.prototype = Object.create( LineSegments.prototype );
-PolarGridHelper.prototype.constructor = PolarGridHelper;
+PolarGridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
+
+	constructor: PolarGridHelper,
+
+	copy: function ( source ) {
+
+		LineSegments.prototype.copy.call( this, source );
+
+		this.geometry.copy( source.geometry );
+		this.material.copy( source.material );
+
+		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	}
+
+} );
 
 export { PolarGridHelper };
