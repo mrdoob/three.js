@@ -670,7 +670,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 		if ( cachedUniforms === undefined ) {
 
-			cachedUniforms = new WebGLUniforms( gl, program, renderer, textures );
+			cachedUniforms = new WebGLUniforms( gl, program, textures );
 
 		}
 
