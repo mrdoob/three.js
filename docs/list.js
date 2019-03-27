@@ -363,6 +363,7 @@ var list = {
 
 			"Loaders": {
 				"BabylonLoader": "examples/loaders/BabylonLoader",
+				"DRACOLoader": "examples/loaders/DRACOLoader",
 				"GLTFLoader": "examples/loaders/GLTFLoader",
 				"MMDLoader": "examples/loaders/MMDLoader",
 				"MTLLoader": "examples/loaders/MTLLoader",
@@ -407,7 +408,8 @@ var list = {
 
 			"Utils": {
 				"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/utils/SceneUtils"
+				"SceneUtils": "examples/utils/SceneUtils",
+				"SkeletonUtils": "examples/utils/SkeletonUtils"
 			}
 
 		},

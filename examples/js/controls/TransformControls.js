@@ -396,27 +396,33 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 				if ( pointEnd.dot( pointStart ) < 0 ) d *= -1;
 
-				_tempVector.set( d, d, d );
+				_tempVector2.set( d, d, d );
 
 			} else {
 
-				_tempVector.copy( pointEnd ).divide( pointStart );
+				_tempVector.copy(pointStart);
+				_tempVector2.copy(pointEnd);
+
+				_tempVector.applyQuaternion( worldQuaternionInv );
+				_tempVector2.applyQuaternion( worldQuaternionInv );
+
+				_tempVector2.divide( _tempVector );
 
 				if ( axis.search( 'X' ) === -1 ) {
-					_tempVector.x = 1;
+					_tempVector2.x = 1;
 				}
 				if ( axis.search( 'Y' ) === -1 ) {
-					_tempVector.y = 1;
+					_tempVector2.y = 1;
 				}
 				if ( axis.search( 'Z' ) === -1 ) {
-					_tempVector.z = 1;
+					_tempVector2.z = 1;
 				}
 
 			}
 
 			// Apply scale
 
-			object.scale.copy( scaleStart ).multiply( _tempVector );
+			object.scale.copy( scaleStart ).multiply( _tempVector2 );
 
 		} else if ( mode === 'rotate' ) {
 
@@ -1183,7 +1189,7 @@ THREE.TransformControlsGizmo = function () {
 
 				var AXIS_HIDE_TRESHOLD = 0.99;
 				var PLANE_HIDE_TRESHOLD = 0.2;
-				var AXIS_FLIP_TRESHOLD = -0.4;
+				var AXIS_FLIP_TRESHOLD = 0.0;
 
 
 				if ( handle.name === 'X' || handle.name === 'XYZX' ) {

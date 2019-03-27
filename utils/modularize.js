@@ -31,6 +31,7 @@ var files = [
 	{ path: 'utils/SceneUtils.js', ignoreList: [] },
 	{ path: 'utils/ShadowMapViewer.js', ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
 	{ path: 'utils/SkeletonUtils.js', ignoreList: [] },
+	{ path: 'utils/TypedArrayUtils.js', ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', ignoreList: [ 'SphereBufferGeometry' ] },
 ];
 

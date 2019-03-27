@@ -478,16 +478,20 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( scene.fog.isFog ) {
+		if ( scene.fog ) {
 
-			scene.fog.color.setHex( fogColor );
-			scene.fog.near = fogNear;
-			scene.fog.far = fogFar;
+			if ( scene.fog.isFog ) {
 
-		} else if ( scene.fog.isFogExp2 ) {
+				scene.fog.color.setHex( fogColor );
+				scene.fog.near = fogNear;
+				scene.fog.far = fogFar;
 
-			scene.fog.color.setHex( fogColor );
-			scene.fog.density = fogDensity;
+			} else if ( scene.fog.isFogExp2 ) {
+
+				scene.fog.color.setHex( fogColor );
+				scene.fog.density = fogDensity;
+
+			}
 
 		}
 

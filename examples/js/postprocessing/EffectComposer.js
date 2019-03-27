@@ -28,6 +28,8 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;
 
+	this.renderToScreen = true;
+
 	this.passes = [];
 
 	// dependencies
@@ -75,6 +77,22 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	},
 
+	isLastEnabledPass: function ( passIndex ) {
+
+		for ( var i = passIndex + 1; i < this.passes.length; i ++ ) {
+
+			if ( this.passes[ i ].enabled ) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
+
+	},
+
 	render: function ( deltaTime ) {
 
 		// deltaTime value is in seconds
@@ -99,6 +117,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			if ( pass.enabled === false ) continue;
 
+			pass.renderToScreen = ( this.renderToScreen && this.isLastEnabledPass( i ) );
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
 
 			if ( pass.needsSwap ) {
@@ -187,7 +206,7 @@ THREE.Pass = function () {
 	// if set to true, the pass clears its buffer before rendering
 	this.clear = false;
 
-	// if set to true, the result of the pass is rendered to screen
+	// if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
 	this.renderToScreen = false;
 
 };
@@ -203,3 +222,45 @@ Object.assign( THREE.Pass.prototype, {
 	}
 
 } );
+
+// Helper for passes that need to fill the viewport with a single quad.
+THREE.Pass.FullScreenQuad = ( function () {
+
+	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+
+	var FullScreenQuad = function ( material ) {
+
+		this._mesh = new THREE.Mesh( geometry, material );
+
+	};
+
+	Object.defineProperty( FullScreenQuad.prototype, 'material', {
+
+		get: function () {
+
+			return this._mesh.material;
+
+		},
+
+		set: function ( value ) {
+
+			this._mesh.material = value;
+
+		}
+
+	} );
+
+	Object.assign( FullScreenQuad.prototype, {
+
+		render: function ( renderer ) {
+
+			renderer.render( this._mesh, camera );
+
+		}
+
+	} );
+
+	return FullScreenQuad;
+
+} )();

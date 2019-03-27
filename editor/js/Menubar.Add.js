@@ -380,7 +380,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/perspectivecamera' ) );
 	option.onClick( function () {
 
-		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
+		var camera = new THREE.PerspectiveCamera();
 		camera.name = 'PerspectiveCamera';
 
 		editor.execute( new AddObjectCommand( camera ) );

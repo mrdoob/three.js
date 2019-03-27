@@ -149,7 +149,6 @@
 			disable: false
 		};
 		halftonePass = new THREE.HalftonePass( window.innerWidth, window.innerHeight, params );
-		halftonePass.renderToScreen = true;
 		composer.addPass( renderPass );
 		composer.addPass( halftonePass );
 
