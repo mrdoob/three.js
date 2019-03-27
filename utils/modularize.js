@@ -24,8 +24,8 @@ var files = [
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
 
-  { path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
-  { path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
+	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
+	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
 
 	{ path: 'utils/BufferGeometryUtils.js', ignoreList: [] },
 	{ path: 'utils/GeometryUtils.js', ignoreList: [] },
