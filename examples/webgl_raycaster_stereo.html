@@ -11,21 +11,6 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			/*
-			#info {
-				position: absolute;
-				top: 0px;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-			*/
 		</style>
 
 		<script src="../build/three.js"></script>
@@ -63,7 +48,7 @@
 
 			}
 
-			var camera, scene, renderer, mesh, target, se, controls, rc, INTERSECTED;
+			var camera, scene, re, mesh, target, se, controls, rc, INTERSECTED;//, renderer;
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 			document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -86,26 +71,27 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( {
+				re = new THREE.WebGLRenderer( {
 
 					antialias: true,
 					canvas: document.getElementById( 'canvas' ),
 
 				} );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				//renderer.setSize( window.innerWidth, window.innerHeight );//full screen
-				renderer.setSize( window.innerWidth / 2, window.innerHeight / 2 );
-				document.body.appendChild( renderer.domElement );
+//				renderer = re;
+				re.setPixelRatio( window.devicePixelRatio );
+				//re.setSize( window.innerWidth, window.innerHeight );//full screen
+				re.setSize( window.innerWidth / 2, window.innerHeight / 2 );
+				document.body.appendChild( re.domElement );
 
 				//
 				/*
-				controls = new THREE.OrbitControls(camera, renderer.domElement);
+				controls = new THREE.OrbitControls(camera, re.domElement);
 				controls.target.set(0, 0, 0);
 				controls.update();
 				*/
 				//StereoEffect
 
-				se = new THREE.StereoEffect( renderer, {
+				se = new THREE.StereoEffect( re, {
 
 					spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono, //.SbS,
 					far: camera.far,
@@ -129,23 +115,34 @@
 
 				rc = new THREE.Raycaster();
 				rc.params.Points.threshold = 0.03;
-				rc.setStereoEffect( se, {
+				rc.setStereoEffect( {
 
+					renderer: re,
+					stereoEffect: se,
 					onIntersection: function ( intersects ) {
 
 						var intersection = intersects[0];
 						switch ( intersection.object.type ) {
 
+							case cubeType:
+
+								if ( INTERSECTED != intersection.object ) {
+
+									if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+									INTERSECTED = intersection.object;
+									INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+									INTERSECTED.material.emissive.setHex( 0xff0000 );
+
+								}
+								break;
+
 							case "Points":
 
 								if ( spriteTextIntersection !== undefined )
 									return;
-
-								var position = new THREE.Vector3( 0, 0, 0 ),
-									textColor = 'rgb( 128, 128, 128 )';
-								if ( intersection.index !== undefined )
-									position.fromArray( intersection.object.geometry.attributes.position.array, intersection.index * 3 );
-								else position = intersection.object.position;
+								var textColor = 'rgb( 128, 128, 128 )',
+									position = rc.stereo.getPosition( intersection );
 								spriteTextIntersection = new THREE.SpriteText( 'x: ' + position.x + ' y: ' + position.y + ' z: ' + position.z, {
 
 									textHeight: 0.1,
@@ -167,17 +164,7 @@
 								INTERSECTED = intersection.object;
 
 								break;
-							case cubeType:
-								if ( INTERSECTED != intersection.object ) {
 
-									if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-									INTERSECTED = intersection.object;
-									INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-									INTERSECTED.material.emissive.setHex( 0xff0000 );
-
-								}
-								break;
 							default: console.error( 'Unknown object type: ' + intersection.object.type );
 
 						}
@@ -189,23 +176,22 @@
 							return;
 						switch ( INTERSECTED.type ) {
 
-							case "Points":
-
-								if ( spriteTextIntersection === undefined )
-									return;
-								scene.remove( spriteTextIntersection );
-								//delete spriteTextIntersection;
-								spriteTextIntersection = undefined;
-
-								break;
-
 							case cubeType:
 
 								if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 
 								break;
 
-							default: console.error( 'Unknown object type: ' + intersection.object.type );
+							case "Points":
+
+								if ( spriteTextIntersection === undefined )
+									return;
+								scene.remove( spriteTextIntersection );
+								spriteTextIntersection = undefined;
+
+								break;
+
+							default: console.error( 'Unknown object type: ' + INTERSECTED.type );
 
 						}
 						INTERSECTED = undefined;
@@ -214,10 +200,7 @@
 					onMouseDown: function ( intersects ) {
 
 						var intersection = intersects[0],
-							position = new THREE.Vector3( 0, 0, 0 );
-						if ( intersection.index !== undefined )
-							position.fromArray( intersection.object.geometry.attributes.position.array, intersection.index * 3 );
-						else position = intersection.object.position;
+							position = rc.stereo.getPosition( intersection );
 						alert( 'You are cliced the "' + intersection.object.type + '" type object.'
 							+ ( intersection.index === undefined ? '' : ' Index = ' + intersection.index + '.' )
 							+ ' Position( x: ' + position.x + ', y: ' + position.y + ', z: ' + position.z + ' )' );
@@ -231,8 +214,8 @@
 				var spriteTextIntersection;
 				var points = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
 					new THREE.Vector3( 0, 0, 0 ),
-					new THREE.Vector3( 0, 1, -1 ),
-					new THREE.Vector3( 1, 0, 1 ),
+					new THREE.Vector3( 0, 0.5, -1 ),
+					new THREE.Vector3( 0.5, 0, 1 ),
 				] ),
 				new THREE.PointsMaterial( {
 
@@ -241,6 +224,8 @@
 					alphaTest: 0.5
 
 				} ) );
+				points.position.copy( new THREE.Vector3( 0.1, 0.2, 0 ) );
+				points.scale.copy( new THREE.Vector3( 2, 2, 1 ) );
 				scene.add( points );
 				if ( rc.stereo !== undefined )
 					rc.stereo.addParticles( points );
@@ -260,6 +245,7 @@
 							*/
 						} ) );
 					cube.position.copy( cubePosition );
+					//cube.scale.copy( new THREE.Vector3( 2, 1, 1 ) );
 					cube.type = cubeType;
 					scene.add( cube );
 					if ( rc.stereo !== undefined )
@@ -273,11 +259,12 @@
 				//https://github.com/dataarts/dat.gui
 				var gui = new dat.GUI();
 
-				THREE.gui.stereoEffect( gui, se.options, {
+				if ( se !== undefined )
+					THREE.gui.stereoEffect( gui, se.options, {
 
-					gui: gui,
+						gui: gui,
 
-				} );
+					} );
 
 				window.addEventListener( 'resize', onResize, false );
 
@@ -285,12 +272,12 @@
 			function onResize() {
 
 				var size = new THREE.Vector2();
-				renderer.getSize( size );
+				re.getSize( size );
 				camera.aspect = size.x / size.y;
 				camera.updateProjectionMatrix();
 
 				if ( typeof se === 'undefined' )
-					renderer.setSize( size.x, size.y );
+					re.setSize( size.x, size.y );
 				else
 					se.setSize( size.x, size.y );
 
@@ -322,7 +309,7 @@
 			function render() {
 
 				if ( typeof se === 'undefined' )
-					renderer.render( scene, camera );
+					re.render( scene, camera );
 				else se.render( scene, camera );
 
 			}

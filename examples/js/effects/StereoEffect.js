@@ -715,26 +715,41 @@ if ( typeof dat !== 'undefined' ) {
 //Modifying of THREE.Raycaster for StereoEffect
 Object.assign( THREE.Raycaster.prototype, {
 
-	//stereoEffect: THREE.StereoEffect
 	//options: followed options is available
 	//{
+	//	stereoEffect: THREE.StereoEffect, Default is effectundefined - no stereo effects
 	//	onIntersection: The onIntersection event occurs when user has moved mouse over any particle.
 	//	onIntersectionOut: The onIntersectionOut event occurs when user has moved mouse out any particle.
 	//	onMouseDown: The onMouseDown event occurs when user has cliced any particle.
+	//	renderer: THREE.WebGLRenderer The WebGL renderer displays your beautifully crafted scenes using WebGL.
+	//	Default is renderer parameter of THREE.StereoEffect or renderer global variable.
 	//}
-	setStereoEffect: function ( stereoEffect, options ) {
+	setStereoEffect: function ( options ) {
 
 		options = options || {};
 
-		var raycaster = this,
-			particles,
-			intersects,
+		if ( typeof renderer === 'undefined' )
+			renderer = options.renderer;
+		var stereoEffect = options.stereoEffect !== undefined ? options.stereoEffect : typeof effect !== 'undefined' ? effect :
+			new THREE.StereoEffect( renderer, {
+
+				spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono, //.SbS,
+				far: camera.far,
+				camera: camera,
+				stereoAspect: 1,
+				//rememberSize: true,
+
+			} ),
+			raycaster = this,
+			particles,//The object or array of objects to check for intersection with the ray. See THREE.Raycaster.intersectObject for details.
+			intersects,//An array of intersections is returned by THREE.Raycaster.intersectObject or THREE.Raycaster.intersectObjects.
 			mouse,//Attention!!! Do not assign new THREE.Vector2() here
 					//for prevention of invalid detection of intersection with zero point ( THREE.Vector3( 0, 0, 0 ) )
 					//after opening of the web page and before user has moved mouse.
 			mouseL = new THREE.Vector2(),
 			mouseR = new THREE.Vector2(),
 			cursor = renderer.domElement.style.cursor;
+
 		function getMousePosition() {
 
 			stereoEffect.getRendererSize().getMousePosition( mouse, event );
@@ -825,6 +840,8 @@ Object.assign( THREE.Raycaster.prototype, {
 
 			onDocumentMouseMove: function ( event ) {
 
+				if ( particles === undefined )
+					return;//The object or array of objects to check for intersection with the ray is not defined. See THREE.Raycaster.intersectObject for details.
 				event.preventDefault();
 				if ( mouse === undefined )
 					mouse = new THREE.Vector2();
@@ -859,6 +876,21 @@ Object.assign( THREE.Raycaster.prototype, {
 				}
 				particles = newParticles;
 			},
+			//get position of intersected object
+			//intersection: first item of array of intersections. See THREE.Raycaster.intersectObject for details
+			getPosition: function ( intersection ) {
+
+				var position = new THREE.Vector3( 0, 0, 0 );
+				if ( intersection.index !== undefined ) {
+
+					position.fromArray( intersection.object.geometry.attributes.position.array, intersection.index * 3 );
+					position.multiply( intersection.object.scale );
+					position.add( intersection.object.position );
+
+				} else position = intersection.object.position;
+				return position;
+
+			}
 
 		}
 		var stereo = this.stereo;
