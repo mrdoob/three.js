@@ -3,7 +3,6 @@ import { ShaderMaterial } from './../../materials/ShaderMaterial';
 import { WebGLShader } from './WebGLShader';
 import { WebGLCapabilities } from './WebGLCapabilities';
 import { WebGLExtensions } from './WebGLExtensions';
-import { WebGLShader } from './WebGLShader';
 import { WebGLTextures } from './WebGLTextures';
 import { WebGLUniforms } from './WebGLUniforms';
 
