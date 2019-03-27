@@ -392,7 +392,7 @@ function setValueT1( gl, v, renderer ) {
 
 }
 
-function setValueT2DArray1( gl, v, renderer ) {
+function setValueT2DArray1( gl, v, renderer, textures ) {
 
 	var cache = this.cache;
 	var unit = renderer.allocTextureUnit();
@@ -404,11 +404,11 @@ function setValueT2DArray1( gl, v, renderer ) {
 
 	}
 
-	renderer.setTexture2DArray( v || emptyTexture2dArray, unit );
+	textures.setTexture2DArray( v || emptyTexture2dArray, unit );
 
 }
 
-function setValueT3D1( gl, v, renderer ) {
+function setValueT3D1( gl, v, renderer, textures ) {
 
 	var cache = this.cache;
 	var unit = renderer.allocTextureUnit();
@@ -420,7 +420,7 @@ function setValueT3D1( gl, v, renderer ) {
 
 	}
 
-	renderer.setTexture3D( v || emptyTexture3d, unit );
+	textures.setTexture3D( v || emptyTexture3d, unit );
 
 }
 
@@ -821,11 +821,12 @@ function parseUniform( activeInfo, addr, container ) {
 
 // Root Container
 
-function WebGLUniforms( gl, program, renderer ) {
+function WebGLUniforms( gl, program, renderer, textures ) {
 
 	UniformContainer.call( this );
 
 	this.renderer = renderer;
+	this.textures = textures;
 
 	var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
@@ -844,7 +845,7 @@ WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
 
 	var u = this.map[ name ];
 
-	if ( u !== undefined ) u.setValue( gl, value, this.renderer );
+	if ( u !== undefined ) u.setValue( gl, value, this.renderer, this.textures );
 
 };
 
@@ -859,7 +860,7 @@ WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
 
 // Static interface
 
-WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
+WebGLUniforms.upload = function ( gl, seq, values, renderer, textures ) {
 
 	for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
@@ -869,7 +870,7 @@ WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
 		if ( v.needsUpdate !== false ) {
 
 			// note: always updating when .needsUpdate is undefined
-			u.setValue( gl, v.value, renderer );
+			u.setValue( gl, v.value, renderer, textures );
 
 		}
 
