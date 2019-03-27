@@ -34,7 +34,7 @@ function createOutput( inputPath ) {
 
 		input: inputPath,
 		treeshake: false,
-		external: p => p !== p,
+		external: p => inputPath !== p,
 
 		plugins: [ {
 
