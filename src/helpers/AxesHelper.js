@@ -35,8 +35,28 @@ function AxesHelper( size ) {
 
 }
 
-AxesHelper.prototype = Object.create( LineSegments.prototype );
-AxesHelper.prototype.constructor = AxesHelper;
+AxesHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
+
+	constructor: AxesHelper,
+
+	copy: function ( source ) {
+
+		LineSegments.prototype.copy.call( this, source );
+
+		this.geometry.copy( source.geometry );
+		this.material.copy( source.material );
+
+		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	}
+
+} );
 
 
 export { AxesHelper };
