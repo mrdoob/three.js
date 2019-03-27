@@ -178,7 +178,6 @@ export class WebGLRenderer implements Renderer {
   properties: WebGLProperties;
   renderLists: WebGLRenderLists;
   state: WebGLState;
-  allocTextureUnit: any;
 
   vr: WebVRManager;
 
@@ -336,9 +335,6 @@ export class WebGLRenderer implements Renderer {
   /**
    * @deprecated
    */
-  setTexture(texture: Texture, slot: number): void;
-  setTexture2D(texture: Texture, slot: number): void;
-  setTextureCube(texture: Texture, slot: number): void;
   getRenderTarget(): RenderTarget;
   /**
    * @deprecated Use {@link WebGLRenderer#getRenderTarget .getRenderTarget()} instead.
