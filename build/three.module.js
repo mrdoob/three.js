@@ -179,7 +179,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '103dev';
+var REVISION = '103';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -45176,13 +45176,6 @@ HemisphereLightHelper.prototype.update = function () {
 
 function GridHelper( size, divisions, color1, color2 ) {
 
-	this.parameters = {
-		size: size,
-		divisions: divisions,
-		color1: color1,
-		color2: color2
-	};
-
 	size = size || 10;
 	divisions = divisions || 10;
 	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
@@ -45225,8 +45218,6 @@ GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
 	copy: function ( source ) {
 
 		LineSegments.prototype.copy.call( this, source );
-
-		Object.assign( this.parameters, source.parameters );
 
 		this.geometry.copy( source.geometry );
 		this.material.copy( source.material );

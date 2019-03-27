@@ -19,7 +19,7 @@ Please also include a live example if possible. You can start from these templat
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r102
+- [ ] r103
 - [ ] ...
 
 ##### Browser
