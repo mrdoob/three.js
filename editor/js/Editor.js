@@ -22,10 +22,6 @@ var Editor = function () {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
-		// actions
-
-		showModal: new Signal(),
-
 		// notifications
 
 		editorCleared: new Signal(),
@@ -55,6 +51,9 @@ var Editor = function () {
 		objectChanged: new Signal(),
 		objectRemoved: new Signal(),
 
+		cameraAdded: new Signal(),
+		cameraRemoved: new Signal(),
+
 		helperAdded: new Signal(),
 		helperRemoved: new Signal(),
 
@@ -68,7 +67,9 @@ var Editor = function () {
 
 		showGridChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		historyChanged: new Signal()
+		historyChanged: new Signal(),
+
+		viewportCameraChanged: new Signal()
 
 	};
 
@@ -98,6 +99,11 @@ var Editor = function () {
 
 	this.selected = null;
 	this.helpers = {};
+
+	this.cameras = {};
+	this.viewportCamera = this.camera;
+
+	this.addCamera( this.camera );
 
 };
 
@@ -149,6 +155,7 @@ Editor.prototype = {
 			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
 			if ( child.material !== undefined ) scope.addMaterial( child.material );
 
+			scope.addCamera( child );
 			scope.addHelper( child );
 
 		} );
@@ -199,6 +206,7 @@ Editor.prototype = {
 
 		object.traverse( function ( child ) {
 
+			scope.removeCamera( child );
 			scope.removeHelper( child );
 
 		} );
@@ -254,6 +262,32 @@ Editor.prototype = {
 
 	//
 
+	addCamera: function ( camera ) {
+
+		if ( camera.isCamera ) {
+
+			this.cameras[ camera.uuid ] = camera;
+
+			this.signals.cameraAdded.dispatch( camera );
+
+		}
+
+	},
+
+	removeCamera: function ( camera ) {
+
+		if ( this.cameras[ camera.uuid ] !== undefined ) {
+
+			delete this.cameras[ camera.uuid ];
+
+			this.signals.cameraRemoved.dispatch( camera );
+
+		}
+
+	},
+
+	//
+
 	addHelper: function () {
 
 		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
@@ -285,7 +319,7 @@ Editor.prototype = {
 
 			} else if ( object.isSkinnedMesh ) {
 
-				helper = new THREE.SkeletonHelper( object );
+				helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
 			} else {
 
@@ -380,6 +414,13 @@ Editor.prototype = {
 			object.material = newMaterial;
 
 		}
+
+	},
+
+	setViewportCamera: function ( uuid ) {
+
+		this.viewportCamera = this.cameras[ uuid ];
+		this.signals.viewportCameraChanged.dispatch( this.viewportCamera );
 
 	},
 

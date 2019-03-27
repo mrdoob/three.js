@@ -171,8 +171,6 @@
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
 
-				effectColor.renderToScreen = true;
-
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );

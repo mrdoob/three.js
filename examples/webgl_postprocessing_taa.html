@@ -157,7 +157,6 @@
 				composer.addPass( renderPass );
 
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
-		    copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize, false );

@@ -223,8 +223,6 @@
 				var effectBloom = new THREE.BloomPass( 1.3 );
 				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
-				effectCopy.renderToScreen = true;
-
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );

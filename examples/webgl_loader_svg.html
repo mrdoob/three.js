@@ -44,7 +44,7 @@
 
 		<script>
 
-			var renderer, stats, scene, camera, gui, currentURL;
+			var renderer, stats, scene, camera, gui, guiData;
 
 			init();
 			animate();
@@ -81,20 +81,15 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				document.body.addEventListener( 'dblclick', function ( event ) {
+				guiData = {
+					currentURL: 'models/svg/tiger.svg',
+					drawFillShapes: true,
+					drawStrokes: true,
+					fillShapesWireframe: false,
+					strokesWireframe: false
+				}
 
-					var group = scene.children[ 1 ];
-					group.traverse( function ( child ) {
-
-						if ( child.material ) child.material.wireframe = ! child.material.wireframe;
-
-					} );
-
-				} );
-
-				currentURL = 'models/svg/tiger.svg';
-
-				loadSVG( currentURL );
+				loadSVG( guiData.currentURL );
 
 				createGUI();
 
@@ -102,21 +97,15 @@
 
 			function createGUI() {
 
-				if ( gui ) {
-					gui.destroy();
-				}
-
-				guiData = {
-
-					currentURL: currentURL
-
-				};
+				if ( gui ) gui.destroy();
 
 				gui = new dat.GUI( { width: 350 } );
 
 				gui.add( guiData, 'currentURL', {
 
 					"Tiger": 'models/svg/tiger.svg',
+					"Three.js": 'models/svg/threejs.svg',
+					"Joins and caps": 'models/svg/lineJoinsAndCaps.svg',
 					"Hexagon": 'models/svg/hexagon.svg',
 					"Test 1": 'models/svg/tests/1.svg',
 					"Test 2": 'models/svg/tests/2.svg',
@@ -127,13 +116,21 @@
 					"Test 7": 'models/svg/tests/7.svg',
 					"Test 8": 'models/svg/tests/8.svg'
 
-				} ).name( 'SVG File' ).onChange( function ( value ) {
+				} ).name( 'SVG File' ).onChange( update );
 
-					currentURL = value;
+				gui.add( guiData, 'drawStrokes' ).name( 'Draw strokes' ).onChange( update );
 
-					loadSVG( currentURL );
+				gui.add( guiData, 'drawFillShapes' ).name( 'Draw fill shapes' ).onChange( update );
 
-				} );
+				gui.add( guiData, 'strokesWireframe' ).name( 'Wireframe strokes' ).onChange( update );
+
+				gui.add( guiData, 'fillShapesWireframe' ).name( 'Wireframe fill shapes' ).onChange( update );
+
+				function update() {
+
+					loadSVG( guiData.currentURL );
+
+				}
 
 			}
 
@@ -153,7 +150,10 @@
 				//
 
 				var loader = new THREE.SVGLoader();
-				loader.load( url, function ( paths ) {
+
+				loader.load( url, function ( data ) {
+
+					var paths = data.paths;
 
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.25 );
@@ -165,22 +165,61 @@
 
 						var path = paths[ i ];
 
-						var material = new THREE.MeshBasicMaterial( {
-							color: path.color,
-							side: THREE.DoubleSide,
-							depthWrite: false
-						} );
+						var fillColor = path.userData.style.fill;
+						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none') {
 
-						var shapes = path.toShapes( true );
+							var material = new THREE.MeshBasicMaterial( {
+								color: new THREE.Color().setStyle( fillColor ),
+								opacity: path.userData.style.fillOpacity,
+								transparent: path.userData.style.fillOpacity < 1,
+								side: THREE.DoubleSide,
+								depthWrite: false,
+								wireframe: guiData.fillShapesWireframe
+							} );
 
-						for ( var j = 0; j < shapes.length; j ++ ) {
+							var shapes = path.toShapes( true );
 
-							var shape = shapes[ j ];
+							for ( var j = 0; j < shapes.length; j ++ ) {
 
-							var geometry = new THREE.ShapeBufferGeometry( shape );
-							var mesh = new THREE.Mesh( geometry, material );
+								var shape = shapes[ j ];
 
-							group.add( mesh );
+								var geometry = new THREE.ShapeBufferGeometry( shape );
+								var mesh = new THREE.Mesh( geometry, material );
+
+								group.add( mesh );
+
+							}
+
+						}
+
+						var strokeColor = path.userData.style.stroke;
+
+						if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
+
+							var material = new THREE.MeshBasicMaterial( {
+								color: new THREE.Color().setStyle( strokeColor ),
+								opacity: path.userData.style.strokeOpacity,
+								transparent: path.userData.style.strokeOpacity < 1,
+								side: THREE.DoubleSide,
+								depthWrite: false,
+								wireframe: guiData.strokesWireframe
+							} );
+
+							for ( var j = 0, jl = path.subPaths.length; j < jl; j ++ ) {
+
+								subPath = path.subPaths[ j ];
+
+								var geometry = THREE.SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
+
+								if ( geometry ) {
+
+									var mesh = new THREE.Mesh( geometry, material );
+
+									group.add( mesh );
+
+								}
+
+							}
 
 						}
 

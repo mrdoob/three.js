@@ -78,6 +78,10 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
+
 				container.appendChild(renderer.domElement);
 
 				//
