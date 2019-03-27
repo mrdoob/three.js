@@ -128,6 +128,21 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.removeEventListener( "touchcancel", onPointerUp );
 		domElement.removeEventListener( "touchleave", onPointerUp );
 
+		this.traverse( function( object ) {
+
+			if ( object.material ) {
+
+				object.material.dispose();
+
+			}
+			if ( object.geometry ) {
+
+				object.geometry.dispose();
+
+			}
+
+		} );
+
 	};
 
 	// Set current object
