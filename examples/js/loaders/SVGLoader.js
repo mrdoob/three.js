@@ -1143,8 +1143,9 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 		// This function can be called to update existing arrays or buffers.
 		// Accepts same parameters as pointsToStroke, plus the buffers and optional offset.
 		// Param vertexOffset: Offset vertices to start writing in the buffers (3 elements/vertex for vertices and normals, and 2 elements/vertex for uvs)
-		// Returns number of written vertices / normals / uvs
+		// Returns number of written vertices / normals / uvs pairs
 		// if 'vertices' parameter is undefined no triangles will be generated, but the returned vertices count will still be valid (useful to preallocate the buffers)
+		// 'normals' and 'uvs' buffers are optional
 
 		arcLengthDivisions = arcDivisions !== undefined ? arcDivisions : 12;
 		minDistance = minDistance !== undefined ? minDistance : 0.001;
@@ -1564,15 +1565,24 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 				vertices[ currentCoordinate + 1 ] = position.y;
 				vertices[ currentCoordinate + 2 ] = 0;
 
-				normals[ currentCoordinate ] = 0;
-				normals[ currentCoordinate + 1 ] = 0;
-				normals[ currentCoordinate + 2 ] = 1;
+				if ( normals ) {
 
-				uvs[ currentCoordinateUV ] = u;
-				uvs[ currentCoordinateUV + 1 ] = v;
+					normals[ currentCoordinate ] = 0;
+					normals[ currentCoordinate + 1 ] = 0;
+					normals[ currentCoordinate + 2 ] = 1;
+
+				}
 
 				currentCoordinate += 3;
-				currentCoordinateUV += 2;
+
+				if ( uvs ) {
+
+					uvs[ currentCoordinateUV ] = u;
+					uvs[ currentCoordinateUV + 1 ] = v;
+
+					currentCoordinateUV += 2;
+
+				}
 
 			}
 
