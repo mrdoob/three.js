@@ -279,13 +279,6 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Integer allocTextureUnit]</h3>
-		<p>
-		Attempt to allocate a texture unit for use by a shader. Will warn if trying to allocate
-		more texture units than the GPU supports. This is mainly used internally.
-		See [page:WebGLRenderer.capabilities capabilities.maxTextures].
-		</p>
-
 		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
 		<p>
 		Tells the renderer to clear its color, depth or stencil drawing buffer(s).
@@ -464,26 +457,6 @@
 		Resizes the output canvas to (width, height) with device pixel ratio taken into account,
 			and also sets the viewport to fit that size, starting in (0, 0).
 			Setting [page:Boolean updateStyle] to false prevents any style changes to the output canvas.
-		</p>
-
-		<h3>[method:null setTexture2D]( [param:Texture texture], [param:number slot] )</h3>
-		<p>
-		texture -- The [page:Texture texture] that needs to be set.<br />
-		slot -- The number indicating which slot should be used by the texture.<br /><br />
-
-		This method sets the correct texture to the correct slot for the WebGL shader.
-		The slot number can be found as a value of the uniform of the sampler.<br /><br />
-
-		Note: This method replaces the older [method:null setTexture] method.
-		</p>
-
-		<h3>[method:null setTextureCube]( [param:CubeTexture cubeTexture], [param:Number slot] )</h3>
-		<p>
-		texture -- The [page:CubeTexture cubeTexture] that needs to be set.<br />
-		slot -- The number indicating which slot should be used by the texture.<br /><br />
-
-		This method sets the correct texture to the correct slot for the WebGL shader.
-		The slot number can be found as a value of the uniform of the sampler.
 		</p>
 
 		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
