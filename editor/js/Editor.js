@@ -51,6 +51,9 @@ var Editor = function () {
 		objectChanged: new Signal(),
 		objectRemoved: new Signal(),
 
+		cameraAdded: new Signal(),
+		cameraRemoved: new Signal(),
+
 		helperAdded: new Signal(),
 		helperRemoved: new Signal(),
 
@@ -66,7 +69,7 @@ var Editor = function () {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		sceneCamerasChanged: new Signal()
+		viewportCameraChanged: new Signal()
 
 	};
 
@@ -96,6 +99,11 @@ var Editor = function () {
 
 	this.selected = null;
 	this.helpers = {};
+
+	this.cameras = {};
+	this.viewportCamera = this.camera;
+
+	this.addCamera( this.camera );
 
 };
 
@@ -147,6 +155,7 @@ Editor.prototype = {
 			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
 			if ( child.material !== undefined ) scope.addMaterial( child.material );
 
+			scope.addCamera( child );
 			scope.addHelper( child );
 
 		} );
@@ -197,6 +206,7 @@ Editor.prototype = {
 
 		object.traverse( function ( child ) {
 
+			scope.removeCamera( child );
 			scope.removeHelper( child );
 
 		} );
@@ -245,6 +255,32 @@ Editor.prototype = {
 		if ( animations.length > 0 ) {
 
 			this.animations[ object.uuid ] = animations;
+
+		}
+
+	},
+
+	//
+
+	addCamera: function ( camera ) {
+
+		if ( camera.isCamera ) {
+
+			this.cameras[ camera.uuid ] = camera;
+
+			this.signals.cameraAdded.dispatch( camera );
+
+		}
+
+	},
+
+	removeCamera: function ( camera ) {
+
+		if ( this.cameras[ camera.uuid ] !== undefined ) {
+
+			delete this.cameras[ camera.uuid ];
+
+			this.signals.cameraRemoved.dispatch( camera );
 
 		}
 
@@ -378,6 +414,13 @@ Editor.prototype = {
 			object.material = newMaterial;
 
 		}
+
+	},
+
+	setViewportCamera: function ( uuid ) {
+
+		this.viewportCamera = this.cameras[ uuid ];
+		this.signals.viewportCameraChanged.dispatch( this.viewportCamera );
 
 	},
 

@@ -225,23 +225,6 @@ select {
 		height: 24px;
 	}
 
-#cameraSelect {
-	position: absolute;
-	z-index: 1;
-	padding: 10px;
-}
-	
-	#cameraSelect * {
-		width: 100%;
-	}
-
-	#cameraSelect{
-		margin-top: 32px;
-		margin-right: 300px;
-		right: 0;
-		top : 0;
-	}
-
 .Outliner {
 	color: #888;
 	background: #222;
@@ -311,7 +294,7 @@ select {
 	#toolbar {
 		left: calc(50% - 140px);
 		width: 280px;
-		top: 52px;
+		top: 68px;
 	}
 
 }

@@ -5,12 +5,12 @@
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
-	var config = editor.config;
 
 	var container = new UI.Panel();
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
+	container.add( new Viewport.Camera( editor ) );
 	container.add( new Viewport.Info( editor ) );
 
 	//
@@ -135,76 +135,6 @@ var Viewport = function ( editor ) {
 
 	sceneHelpers.add( transformControls );
 
-	// Displaying scene cameras
-
-	var cameras = {
-		[ camera.uuid ]: 'Main Camera'
-	};
-
-	var sceneCameraDisplay = new UI.Row();
-	sceneCameraDisplay.setId( 'cameraSelect' ).setDisplay( 'none' );
-	document.body.appendChild( sceneCameraDisplay.dom );
-
-	var cameraSelect = new UI.Select().onChange( render );
-	sceneCameraDisplay.add( cameraSelect );
-
-	signals.objectAdded.add( function ( object ) {
-
-		if ( object !== null ) {
-
-			object.traverse( addCamera );
-			cameraSelect.setOptions( cameras ).setValue( camera.uuid );
-			sceneCameraDisplay.setDisplay( config.getKey( 'project/renderer/showSceneCameras' ) === true && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
-
-		}
-
-	} );
-
-	signals.objectRemoved.add( function ( object ) {
-
-		if ( object !== null ) {
-
-			object.traverse( removeCamera );
-			cameraSelect.setOptions( cameras ).setValue( camera.uuid );
-			sceneCameraDisplay.setDisplay( config.getKey( 'project/renderer/showSceneCameras' ) === true && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
-
-		}
-
-	} );
-
-	signals.sceneCamerasChanged.add( function () {
-
-		var optionSelected = config.getKey( 'project/renderer/showSceneCameras' ) === true;
-		sceneCameraDisplay.setDisplay( optionSelected && Object.keys( cameras ).length > 0 ? 'block' : 'none' );
-		if ( optionSelected === false ) {
-
-			cameraSelect.setValue( camera.uuid );
-			render();
-
-		}
-
-	} );
-
-	function addCamera( object ) {
-
-		if ( object.isCamera === true ) {
-
-			cameras[ object.uuid ] = object.name;
-
-		}
-
-	}
-
-	function removeCamera( object ) {
-
-		if ( object.isCamera === true ) {
-
-			delete cameras[ object.uuid ];
-
-		}
-
-	}
-
 	// object picking
 
 	var raycaster = new THREE.Raycaster();
@@ -269,7 +199,7 @@ var Viewport = function ( editor ) {
 
 	function onMouseDown( event ) {
 
-		event.preventDefault();
+		// event.preventDefault();
 
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDownPosition.fromArray( array );
@@ -570,6 +500,17 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.viewportCameraChanged.add( function ( viewportCamera ) {
+
+		camera = viewportCamera;
+
+		camera.aspect = editor.camera.aspect;
+		camera.projectionMatrix.copy( editor.camera.projectionMatrix );
+
+		render();
+
+	} );
+
 	//
 
 	signals.windowResize.add( function () {
@@ -622,28 +563,17 @@ var Viewport = function ( editor ) {
 
 	function render() {
 
-		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
+		renderer.render( scene, camera );
 
-		var cam = camera;
-		var uuid = cameraSelect.getValue();
+		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-		if ( uuid !== camera.uuid && sceneCameraDisplay.dom.style.display != 'none' ) {
+			if ( camera === editor.camera ) {
 
-			var sceneCamera = scene.getObjectByProperty( 'uuid', uuid );
-			if ( sceneCamera !== undefined && sceneCamera.isCamera === true ) {
-
-				cam = sceneCamera;
+				sceneHelpers.updateMatrixWorld();
+				renderer.render( sceneHelpers, camera );
 
 			}
-
-		}
-
-		renderer.render( scene, cam );
-
-		if ( config.getKey( 'project/renderer/showHelpers' ) === true && renderer instanceof THREE.RaytracingRenderer === false ) {
-
-			renderer.render( sceneHelpers, cam );
 
 		}
 
