@@ -1,30 +1,31 @@
+/**
+ * @author Garrett Johnson / http://gkjohnson.github.io/
+ */
+
 var path = require( 'path' );
 var fs = require( 'fs' );
-var isModuleCanonical = require( './utils/isModuleCanonical.js' );
+
+var srcFolder = __dirname + '/examples/jsm/';
+var dstFolder = __dirname + '/examples/js/';
+
+var files = [
+	// { path: /postprocessing\/.+\.js$/ }
+	{ path: /controls[\/\\].+\.js$/ }
+];
 
 // Creates a rollup config object for the given file to
 // be converted to umd
-function createOutput( file ) {
+function createOutput( inputPath ) {
 
-	var inputPath = path.resolve( file );
-	var outputPath = inputPath.replace( /[\\\/]examples[\\\/]jsm[\\\/]/, '/examples/js/' );
-	var relativePath = path.relative( './examples/jsm', file ).replace( /^\.[\/\\]/, '' );
+	var relativePath = path.relative( srcFolder, inputPath );
+	var outputPath = path.join( dstFolder, relativePath );
 
-	var banner = '';
-	if ( isModuleCanonical( relativePath ) ) {
-
-		banner = [
-			'/**',
-			` * Generated from original source in "examples/jsm/${ relativePath.replace( /\\/g, '/' ) }".`,
-			' * Not intended for editing.',
-			' */'
-		].join( '\n' );
-
-	} else {
-
-		return null;
-
-	}
+	var banner = [
+		'/**',
+		` * Generated from original source in "examples/jsm/${ relativePath.replace( /\\/g, '/' ) }".`,
+		' * Not intended for editing.',
+		' */'
+	].join( '\n' );
 
 	// Every import is marked as external so the output is 1-to-1. We
 	// assume that that global object should be the THREE object so we
@@ -33,7 +34,7 @@ function createOutput( file ) {
 
 		input: inputPath,
 		treeshake: false,
-		external: p => p !== inputPath,
+		external: p => p !== p,
 
 		plugins: [ {
 
@@ -69,11 +70,11 @@ function createOutput( file ) {
 }
 
 // Walk the file structure starting at the given directory and fire
-// the callback for every js file.
+// the callback for every file found.
 function walk( dir, cb ) {
 
-	var files = fs.readdirSync( dir );
-	files.forEach( f => {
+	var dirFiles = fs.readdirSync( dir );
+	dirFiles.forEach( f => {
 
 		var p = path.join( dir, f );
 		var stats = fs.statSync( p );
@@ -82,7 +83,7 @@ function walk( dir, cb ) {
 
 			walk( p, cb );
 
-		} else if ( f.endsWith( '.js' ) ) {
+		} else {
 
 			cb( p );
 
@@ -93,8 +94,24 @@ function walk( dir, cb ) {
 }
 
 // Gather up all the files
-var files = [];
-walk( 'examples/jsm/', p => files.push( p ) );
+var configs = [];
+walk( srcFolder, function ( p ) {
+
+	for ( var i = 0; i < files.length; i ++ ) {
+
+		var file = files[ i ];
+		if ( file.path.test( p ) ) {
+
+			// create a rollup config if the file matches one
+			// of the path regex
+			configs.push( createOutput( p ) );
+			break;
+
+		}
+
+	}
+
+} );
 
 // Create a rollup config for each module.js file
-export default files.map( p => createOutput( p ) ).filter( p => p );
+export default configs;
