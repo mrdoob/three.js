@@ -28,7 +28,8 @@ export class WebGLRenderList {
   push(
     object: Object3D,
     geometry: Geometry | BufferGeometry,
-    material: Material,
+		material: Material,
+		groupOrder: number,
     z: number,
     group: Group
   ): void;
