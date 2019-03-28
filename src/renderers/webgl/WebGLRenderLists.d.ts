@@ -23,7 +23,7 @@ export interface RenderItem {
 
 export class WebGLRenderList {
   opaque: Array<RenderItem>;
-  transparent: Array<any>;
+  transparent: Array<RenderItem>;
   init(): void;
   push(
     object: Object3D,
