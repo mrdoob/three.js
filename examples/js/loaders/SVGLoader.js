@@ -4,6 +4,51 @@
  * @author yomboprime / https://yombo.org
  */
 
+
+/**
+ * Represents a group of items in from SVG File
+ */
+THREE.SVGGroup = function(node) {
+	this.node = node;
+	this.items = [];
+
+	// store the transforms for the group (?)
+	this.transformStack = [];
+	
+	this.id = node.id;
+
+	this.hasChildPaths = false;
+
+ };
+
+ Object.assign( THREE.SVGGroup.prototype, {
+	constructor: THREE.SVGGroup,
+
+	isSVGGroup: true,
+	
+	/* could be a path, or another group! */
+	add: function( item ) {
+		this.items.push( item );
+		if ( !item.isSVGGroup )
+			this.hasChildPaths = true;
+	},
+
+	
+	// Returns the paths belonging to this group
+
+	getPaths: function() {
+		var paths = [];
+		for ( var p = 0; p < this.items.length; p ++ ) {
+			if (!this.items[p].isSVGGroup)
+				paths.push(this.items[p]);
+		}
+
+		return paths;
+	}
+
+ });
+
+
 THREE.SVGLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
@@ -37,13 +82,15 @@ THREE.SVGLoader.prototype = {
 
 	parse: function ( text ) {
 
-		function parseNode( node, style ) {
+		function parseNode( node, containerGroup, style ) {
 
 			if ( node.nodeType !== 1 ) return;
 
-			var transform = getNodeTransform( node );
+			var transform = getNodeTransform( node, containerGroup );
 
-			var path = null;
+            var path = null;
+
+            var currentGroup = null;
 
 			switch ( node.nodeName ) {
 
@@ -51,7 +98,9 @@ THREE.SVGLoader.prototype = {
 					break;
 
 				case 'g':
-					style = parseStyle( node, style );
+                    style = parseStyle( node, style );
+					currentGroup = new THREE.SVGGroup(node);
+					currentGroup.id = node.id;
 					break;
 
 				case 'path':
@@ -94,6 +143,9 @@ THREE.SVGLoader.prototype = {
 
 			}
 
+            if ( currentGroup )
+                containerGroup.add( currentGroup );
+                
 			if ( path ) {
 
 				if ( style.fill !== undefined && style.fill !== 'none' ) {
@@ -102,25 +154,30 @@ THREE.SVGLoader.prototype = {
 
 				}
 
-				transformPath( path, currentTransform );
+                transformPath( path, currentTransform );
+                
+                containerGroup.add( path );
 
-				paths.push( path );
+				//paths.push( path );
 
 				path.userData = { node: node, style: style };
 
-			}
+            }
+            
+            // grab either the child group, or the container group depending on what is available
+			var group = ( currentGroup ? currentGroup : containerGroup);
 
 			var nodes = node.childNodes;
 
 			for ( var i = 0; i < nodes.length; i ++ ) {
 
-				parseNode( nodes[ i ], style );
+				parseNode( nodes[ i ], group, style );
 
 			}
 
 			if ( transform ) {
 
-				currentTransform.copy( transformStack.pop() );
+				currentTransform.copy( containerGroup.transformStack.pop() );
 
 			}
 
@@ -767,7 +824,7 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function getNodeTransform( node ) {
+		function getNodeTransform( node, group ) {
 
 			if ( ! node.hasAttribute( 'transform' ) ) {
 				return null;
@@ -777,12 +834,12 @@ THREE.SVGLoader.prototype = {
 
 			if ( transform ) {
 
-				if ( transformStack.length > 0 ) {
-					transform.premultiply( transformStack[ transformStack.length - 1 ] );
+				if ( group.transformStack.length > 0 ) {
+					transform.premultiply( group.transformStack[ group.transformStack.length - 1 ] );
 				}
 
 				currentTransform.copy( transform );
-				transformStack.push( transform );
+				group.transformStack.push( transform );
 
 			}
 
@@ -1034,8 +1091,11 @@ THREE.SVGLoader.prototype = {
 		console.timeEnd( 'THREE.SVGLoader: DOMParser' );
 
 		console.time( 'THREE.SVGLoader: Parse' );
-
-		parseNode( xml.documentElement, {
+        
+        // svg group
+        var group = new THREE.SVGGroup( xml.documentElement );
+        
+		parseNode( xml.documentElement, group, {
 			fill: '#000',
 			fillOpacity: 1,
 			strokeOpacity: 1,
@@ -1052,7 +1112,8 @@ THREE.SVGLoader.prototype = {
 
 		console.timeEnd( 'THREE.SVGLoader: Parse' );
 
-		return data;
+        //return data;
+        return group;
 
 	}
 
