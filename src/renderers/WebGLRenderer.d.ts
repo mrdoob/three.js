@@ -201,7 +201,7 @@ export class WebGLRenderer implements Renderer {
   getPixelRatio(): number;
   setPixelRatio(value: number): void;
 
-  getDrawingBufferSize(): { width: number; height: number };
+  getDrawingBufferSize(target: Vector2): Vector2;
   setDrawingBufferSize(width: number, height: number, pixelRatio: number): void;
 
   getSize(target: Vector2): Vector2;
