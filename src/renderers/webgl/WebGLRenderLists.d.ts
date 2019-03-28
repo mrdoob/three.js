@@ -33,7 +33,14 @@ export class WebGLRenderList {
     z: number,
     group: Group
   ): void;
-
+  unshift(
+    object: Object3D,
+    geometry: Geometry | BufferGeometry,
+    material: Material,
+    groupOrder: number,
+    z: number,
+    group: Group
+  ): void;
   sort(): void;
 }
 
