@@ -86,16 +86,16 @@ THREE.StereoEffect = function ( renderer, options ) {
 
 		var style = {
 
-			position: renderer.domElement.style.position,
-			left: renderer.domElement.style.left,
-			top: renderer.domElement.style.top,
-			width: renderer.domElement.style.width,
-			height: renderer.domElement.style.height,
+				position: renderer.domElement.style.position,
+				left: renderer.domElement.style.left,
+				top: renderer.domElement.style.top,
+				width: renderer.domElement.style.width,
+				height: renderer.domElement.style.height,
 
-		},
+			},
 			left = renderer.domElement.offsetLeft,
 			top = renderer.domElement.offsetTop,
-			size = new THREE.Vector2;
+			size = new THREE.Vector2();
 		renderer.getSize( size );
 		return {
 
@@ -137,7 +137,7 @@ THREE.StereoEffect = function ( renderer, options ) {
 			getMousePosition( mouse, event ) {
 
 				mouse.x = ( event.clientX / size.x ) * 2 - 1 - ( left / size.x ) * 2;
-				mouse.y = -( event.clientY / size.y ) * 2 + 1 + ( top / size.y ) * 2;
+				mouse.y = - ( event.clientY / size.y ) * 2 + 1 + ( top / size.y ) * 2;
 
 			},
 
@@ -731,21 +731,21 @@ Object.assign( THREE.Raycaster.prototype, {
 		if ( typeof renderer === 'undefined' )
 			renderer = options.renderer;
 		var stereoEffect = options.stereoEffect !== undefined ? options.stereoEffect : typeof effect !== 'undefined' ? effect :
-			new THREE.StereoEffect( renderer, {
+				new THREE.StereoEffect( renderer, {
 
-				spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono, //.SbS,
-				far: camera.far,
-				camera: camera,
-				stereoAspect: 1,
-				//rememberSize: true,
+					spatialMultiplex: THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono, //.SbS,
+					far: camera.far,
+					camera: camera,
+					stereoAspect: 1,
 
-			} ),
+				} ),
 			raycaster = this,
-			particles,//The object or array of objects to check for intersection with the ray. See THREE.Raycaster.intersectObject for details.
-			intersects,//An array of intersections is returned by THREE.Raycaster.intersectObject or THREE.Raycaster.intersectObjects.
-			mouse,//Attention!!! Do not assign new THREE.Vector2() here
-					//for prevention of invalid detection of intersection with zero point ( THREE.Vector3( 0, 0, 0 ) )
-					//after opening of the web page and before user has moved mouse.
+			particles, //The object or array of objects to check for intersection with the ray. See THREE.Raycaster.intersectObject for details.
+			intersects, //An array of intersections is returned by THREE.Raycaster.intersectObject or THREE.Raycaster.intersectObjects.
+			mouse, //Attention!!! Do not assign new THREE.Vector2() here
+			//for prevention of invalid detection of intersection with zero point ( THREE.Vector3( 0, 0, 0 ) )
+			//after opening of the web page and before user has moved mouse.
+
 			mouseL = new THREE.Vector2(),
 			mouseR = new THREE.Vector2(),
 			cursor = renderer.domElement.style.cursor;
@@ -760,11 +760,11 @@ Object.assign( THREE.Raycaster.prototype, {
 				mouseR.copy( mouse );
 				var a = 0.5;
 
-				mouseL[vectorName] += a;
-				mouseL[vectorName] *= 2;
+				mouseL[ vectorName ] += a;
+				mouseL[ vectorName ] *= 2;
 
-				mouseR[vectorName] -= a;
-				mouseR[vectorName] *= 2;
+				mouseR[ vectorName ] -= a;
+				mouseR[ vectorName ] *= 2;
 
 				//zeroParallax
 				var size = new THREE.Vector2();
@@ -822,7 +822,7 @@ Object.assign( THREE.Raycaster.prototype, {
 			if ( parseInt( stereoEffect.options.spatialMultiplex ) !== THREE.StereoEffectParameters.spatialMultiplexsIndexs.Mono ) {
 
 				raycaster.setFromCamera( mouseL, camera );
-				if ( !isIntersection() ) {
+				if ( ! isIntersection() ) {
 
 					raycaster.setFromCamera( mouseR, camera );
 					isIntersection();
@@ -861,9 +861,10 @@ Object.assign( THREE.Raycaster.prototype, {
 
 			},
 			addParticles: function ( newParticles ) {
+
 				if ( particles !== undefined ) {
 
-					if ( !Array.isArray( particles ) ) {
+					if ( ! Array.isArray( particles ) ) {
 
 						var particlesCur = particles;
 						particles = [];
@@ -875,6 +876,7 @@ Object.assign( THREE.Raycaster.prototype, {
 
 				}
 				particles = newParticles;
+
 			},
 			//get position of intersected object
 			//intersection: first item of array of intersections. See THREE.Raycaster.intersectObject for details
@@ -892,7 +894,7 @@ Object.assign( THREE.Raycaster.prototype, {
 
 			}
 
-		}
+		};
 		var stereo = this.stereo;
 
 	}

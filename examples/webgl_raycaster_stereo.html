@@ -39,19 +39,128 @@
 		<p>
 			<div>Use this web page for testing of raycasting (working out what objects in the 3d space the mouse is over)</div>
 			<div>with different modes of the stereo effect.</div>
-			<div>Move and click mouse over cubes or points on the canvas.</div><div>To change stereo effect mode in the top right corner of the page and repeate testing.</div></p>
+			<div>Move and click mouse over cubes or points on the canvas.</div>
+			<div>To change stereo effect mode in the top right corner of the page and repeate testing.</div>
+			<div>Check the “Old version” checkbox if you want to test the old version of THREE.Raycaster.</div>
+		</p>
 		<script>
-
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
 			}
 
-			var camera, scene, re, mesh, target, se, controls, rc, INTERSECTED;//, renderer;
+			var camera, scene, re, mesh, target, se, controls, rc, INTERSECTED, cubeType = 'cube', spriteTextIntersection,
+				oldVersion = { oldVersion: false };
+
+			// I use this varibles for testing of ThreeJS StereoEffect and Raycaster together
+			// without my THREE.Raycaster().setStereoEffect function.
+			var mouse = new THREE.Vector2(),
+				particles = [];
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 			document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+			function onIntersection( intersects ) {
+
+				var intersection = intersects[ 0 ];
+				switch ( intersection.object.type ) {
+
+					case cubeType:
+
+						if ( INTERSECTED != intersection.object ) {
+
+							if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+							INTERSECTED = intersection.object;
+							INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+							INTERSECTED.material.emissive.setHex( 0xff0000 );
+
+						}
+						break;
+
+					case "Points":
+
+						if ( spriteTextIntersection !== undefined )
+							return;
+						var textColor = 'rgb( 128, 128, 128 )',
+							position = rc.stereo === undefined ? getPosition( intersection ) : rc.stereo.getPosition( intersection );
+						spriteTextIntersection = new THREE.SpriteText( 'x: ' + position.x + ' y: ' + position.y + ' z: ' + position.z, {
+
+							textHeight: 0.1,
+							fontColor: textColor,
+							rect: {
+
+								displayRect: true,
+								borderThickness: 3,
+								borderRadius: 10,
+								borderColor: textColor,
+								backgroundColor: 'rgba( 0, 0, 0, 1 )',
+
+							},
+							position: position,
+							center: new THREE.Vector2( 0.5, 0 ),
+
+						} );
+						scene.add( spriteTextIntersection );
+						INTERSECTED = intersection.object;
+
+						break;
+
+					default: console.error( 'Unknown object type: ' + intersection.object.type );
+
+				}
+
+			}
+			function onIntersectionOut( intersects ) {
+
+				if ( INTERSECTED === undefined )
+					return;
+				switch ( INTERSECTED.type ) {
+
+					case cubeType:
+
+						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+						break;
+
+					case "Points":
+
+						if ( spriteTextIntersection === undefined )
+							return;
+						scene.remove( spriteTextIntersection );
+						spriteTextIntersection = undefined;
+
+						break;
+
+					default: console.error( 'Unknown object type: ' + INTERSECTED.type );
+
+				}
+				INTERSECTED = undefined;
+
+			}
+			function onMouseDown( intersects ) {
+
+				var intersection = intersects[ 0 ],
+					position = rc.stereo.getPosition( intersection );
+				alert( 'You are cliced the "' + intersection.object.type + '" type object.'
+					+ ( intersection.index === undefined ? '' : ' Index = ' + intersection.index + '.' )
+					+ ' Position( x: ' + position.x + ', y: ' + position.y + ', z: ' + position.z + ' )' );
+
+			}
+			function getPosition( intersection ) {
+
+				var position = new THREE.Vector3( 0, 0, 0 );
+				if ( intersection.index !== undefined ) {
+
+					position.fromArray( intersection.object.geometry.attributes.position.array, intersection.index * 3 );
+					position.multiply( intersection.object.scale );
+					position.add( intersection.object.position );
+
+				} else position = intersection.object.position;
+				return position;
+
+			}
 
 			init();
 			animate();
@@ -77,7 +186,6 @@
 					canvas: document.getElementById( 'canvas' ),
 
 				} );
-//				renderer = re;
 				re.setPixelRatio( window.devicePixelRatio );
 				//re.setSize( window.innerWidth, window.innerHeight );//full screen
 				re.setSize( window.innerWidth / 2, window.innerHeight / 2 );
@@ -111,153 +219,104 @@
 				light.position.copy( new THREE.Vector3( -2, -2, -2 ) );
 				scene.add( light );
 
-				//raycaster
+				function addObjects() {
 
-				rc = new THREE.Raycaster();
-				rc.params.Points.threshold = 0.03;
-				rc.setStereoEffect( {
+					//raycaster
 
-					renderer: re,
-					stereoEffect: se,
-					onIntersection: function ( intersects ) {
+					rc = new THREE.Raycaster();
+					rc.params.Points.threshold = 0.03;
+					if ( !oldVersion.oldVersion ) {
 
-						var intersection = intersects[0];
-						switch ( intersection.object.type ) {
+						rc.setStereoEffect( {
 
-							case cubeType:
+							renderer: re,
+							stereoEffect: se,
+							onIntersection: function ( intersects ) {
 
-								if ( INTERSECTED != intersection.object ) {
+								onIntersection( intersects );
 
-									if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+							},
+							onIntersectionOut: function ( intersects ) {
 
-									INTERSECTED = intersection.object;
-									INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-									INTERSECTED.material.emissive.setHex( 0xff0000 );
+								onIntersectionOut( intersects );
 
-								}
-								break;
+							},
+							onMouseDown: function ( intersects ) {
 
-							case "Points":
+								onMouseDown( intersects );
 
-								if ( spriteTextIntersection !== undefined )
-									return;
-								var textColor = 'rgb( 128, 128, 128 )',
-									position = rc.stereo.getPosition( intersection );
-								spriteTextIntersection = new THREE.SpriteText( 'x: ' + position.x + ' y: ' + position.y + ' z: ' + position.z, {
+							}
 
-									textHeight: 0.1,
-									fontColor: textColor,
-									rect: {
-
-										displayRect: true,
-										borderThickness: 3,
-										borderRadius: 10,
-										borderColor: textColor,
-										backgroundColor: 'rgba( 0, 0, 0, 1 )',
-
-									},
-									position: position,
-									center: new THREE.Vector2( 0.5, 0 ),
-
-								} );
-								scene.add( spriteTextIntersection );
-								INTERSECTED = intersection.object;
-
-								break;
-
-							default: console.error( 'Unknown object type: ' + intersection.object.type );
-
-						}
-
-					},
-					onIntersectionOut: function ( intersects ) {
-
-						if ( INTERSECTED === undefined )
-							return;
-						switch ( INTERSECTED.type ) {
-
-							case cubeType:
-
-								if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-								break;
-
-							case "Points":
-
-								if ( spriteTextIntersection === undefined )
-									return;
-								scene.remove( spriteTextIntersection );
-								spriteTextIntersection = undefined;
-
-								break;
-
-							default: console.error( 'Unknown object type: ' + INTERSECTED.type );
-
-						}
-						INTERSECTED = undefined;
-
-					},
-					onMouseDown: function ( intersects ) {
-
-						var intersection = intersects[0],
-							position = rc.stereo.getPosition( intersection );
-						alert( 'You are cliced the "' + intersection.object.type + '" type object.'
-							+ ( intersection.index === undefined ? '' : ' Index = ' + intersection.index + '.' )
-							+ ' Position( x: ' + position.x + ', y: ' + position.y + ', z: ' + position.z + ' )' );
+						} );
 
 					}
 
-				} );
+					//Points
 
-				//Points
+					var points = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
+						new THREE.Vector3( 0, 0, 0 ),
+						new THREE.Vector3( 0, 0.5, -1 ),
+						new THREE.Vector3( 0.5, 0, 1 ),
+					] ),
+					new THREE.PointsMaterial( {
 
-				var spriteTextIntersection;
-				var points = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
-					new THREE.Vector3( 0, 0, 0 ),
-					new THREE.Vector3( 0, 0.5, -1 ),
-					new THREE.Vector3( 0.5, 0, 1 ),
-				] ),
-				new THREE.PointsMaterial( {
+						color: 0xffffff,
+						size: 0.05,
+						alphaTest: 0.5
 
-					color: 0xffffff,
-					size: 0.05,
-					alphaTest: 0.5
-
-				} ) );
-				points.position.copy( new THREE.Vector3( 0.1, 0.2, 0 ) );
-				points.scale.copy( new THREE.Vector3( 2, 2, 1 ) );
-				scene.add( points );
-				if ( rc.stereo !== undefined )
-					rc.stereo.addParticles( points );
-
-				//cubes
-
-				var cubeType = 'cube';
-
-				function addCube( cubePosition, color ) {
-
-					var cube = new THREE.Mesh( new THREE.ConvexBufferGeometry( new THREE.CubeGeometry( 0.4, 0.4, 0.4 ).vertices ),
-						new THREE.MeshLambertMaterial( {
-							color: color,
-							/*
-							opacity: 0.5,
-							transparent: true,
-							*/
-						} ) );
-					cube.position.copy( cubePosition );
-					//cube.scale.copy( new THREE.Vector3( 2, 1, 1 ) );
-					cube.type = cubeType;
-					scene.add( cube );
+					} ) );
+					points.position.copy( new THREE.Vector3( 0.1, 0.2, 0 ) );
+					points.scale.copy( new THREE.Vector3( 2, 2, 1 ) );
+					scene.add( points );
 					if ( rc.stereo !== undefined )
-						rc.stereo.addParticles( cube );
+						rc.stereo.addParticles( points );
+					else particles.push( points );
+
+					//cubes
+
+					function addCube( cubePosition, color ) {
+
+						var cube = new THREE.Mesh( new THREE.ConvexBufferGeometry( new THREE.CubeGeometry( 0.4, 0.4, 0.4 ).vertices ),
+							new THREE.MeshLambertMaterial( {
+								color: color,
+								/*
+								opacity: 0.5,
+								transparent: true,
+								*/
+							} ) );
+						cube.position.copy( cubePosition );
+						//cube.scale.copy( new THREE.Vector3( 2, 1, 1 ) );
+						cube.type = cubeType;
+						scene.add( cube );
+						if ( rc.stereo !== undefined )
+							rc.stereo.addParticles( cube );
+						else particles.push( cube );
+
+					}
+					addCube( new THREE.Vector3( -1, 0, 0 ), 0xffffff );
+					addCube( new THREE.Vector3( -0.5, 0.5, -0.5 ), 'green' );
 
 				}
-				addCube( new THREE.Vector3( -1, 0, 0 ), 0xffffff );
-				addCube( new THREE.Vector3( -0.5, 0.5, -0.5 ), 'green' );
+				addObjects();
 
 				//dat-gui JavaScript Controller Library
 				//https://github.com/dataarts/dat.gui
 				var gui = new dat.GUI();
+
+				dat.controllerNameAndTitle( gui.add( oldVersion, 'oldVersion' ).onChange( function ( value ) {
+
+					//remove objects
+					for ( var i = scene.children.length - 1; i >= 0; i-- ) {
+
+						var children = scene.children[ i ];
+						if ( ( children.type === cubeType ) || ( children.type === 'Points' ) )
+							scene.remove( children );
+
+					}
+
+					addObjects();
+
+				} ), 'Old version', 'Check this checkbox if you want to test old version of THREE.Raycaster' );
 
 				if ( se !== undefined )
 					THREE.gui.stereoEffect( gui, se.options, {
@@ -286,6 +345,18 @@
 
 				if ( rc.stereo !== undefined )
 					rc.stereo.onDocumentMouseMove( event );
+				else {
+
+					// Test of the old version of THREE.Raycaster
+					event.preventDefault();
+					var left = re.domElement.offsetLeft,
+						top = re.domElement.offsetTop,
+						size = new THREE.Vector2();
+					re.getSize( size );
+					mouse.x = ( event.clientX / size.x ) * 2 - 1 - ( left / size.x ) * 2;
+					mouse.y = -( event.clientY / size.y ) * 2 + 1 + ( top / size.y ) * 2;
+
+				}
 				if ( event.buttons != 1 )
 					return;
 
@@ -296,6 +367,22 @@
 
 				if ( rc.stereo !== undefined )
 					rc.stereo.onDocumentMouseDown( event );
+				else {
+
+					// Test of the old version of THREE.Raycaster
+					rc.setFromCamera( mouse, camera );
+					intersects = rc.intersectObjects( particles );
+					if ( intersects.length > 0 ) {
+
+						var intersection = intersects[ 0 ],
+							position = getPosition( intersection );
+						alert( 'You are cliced the "' + intersection.object.type + '" type object.'
+							+ ( intersection.index === undefined ? '' : ' Index = ' + intersection.index + '.' )
+							+ ' Position( x: ' + position.x + ', y: ' + position.y + ', z: ' + position.z + ' )' );
+
+					}
+
+				}
 
 			}
 			function animate() {
@@ -312,7 +399,19 @@
 					re.render( scene, camera );
 				else se.render( scene, camera );
 
+				if ( rc.stereo === undefined ) {
+
+					// Test of the old version of THREE.Raycaster
+					rc.setFromCamera( mouse, camera );
+					intersects = rc.intersectObjects( particles );
+					if ( intersects.length > 0 )
+						onIntersection( intersects );
+					else onIntersectionOut( intersects );
+
+				}
+
 			}
+
 		</script>
 	</body>
 </html>
