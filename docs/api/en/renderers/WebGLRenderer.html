@@ -339,7 +339,7 @@
 		<p>Returns an object that describes the attributes set on the WebGL context when it was created.</p>
 
 		<h3>[method:RenderTarget getRenderTarget]()</h3>
-		<p>Returns the current RenderTarget, if any.</p>
+		<p>Returns the current [page:RenderTarget RenderTarget] if there are; returns *null* otherwise.</p>
 
 		<h3>[method:Vector4 getCurrentViewport]( [param:Vector4 target] )</h3>
 		<p>
@@ -429,10 +429,10 @@
 
 		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipMapLevel] )</h3>
 		<p>
-		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated (optional).<br />
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated. When *null* is given, the canvas is set as the active render target instead.<br />
 		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
 		activeMipMapLevel -- Specifies the active mipmap level (optional).<br /><br />
-		This method sets the active rendertarget. If the parameter is omitted the canvas is set as the active rendertarget.
+		This method sets the active rendertarget.
 		</p>
 
 		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
