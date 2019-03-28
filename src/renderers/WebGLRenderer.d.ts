@@ -335,12 +335,12 @@ export class WebGLRenderer implements Renderer {
   /**
    * @deprecated
    */
-  getRenderTarget(): RenderTarget;
+  getRenderTarget(): RenderTarget | null;
   /**
    * @deprecated Use {@link WebGLRenderer#getRenderTarget .getRenderTarget()} instead.
    */
-  getCurrentRenderTarget(): RenderTarget;
-  setRenderTarget(renderTarget?: RenderTarget, activeCubeFace?: number, activeMipMapLevel?: number): void;
+  getCurrentRenderTarget(): RenderTarget | null;
+  setRenderTarget(renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipMapLevel?: number): void;
   readRenderTargetPixels(
     renderTarget: RenderTarget,
     x: number,
