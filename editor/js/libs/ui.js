@@ -625,6 +625,56 @@ UI.Number = function ( number ) {
 
 	}
 
+	function onTouchStart( event ) {
+
+		if ( event.touches.length === 1 ) {
+
+			distance = 0;
+
+			onMouseDownValue = scope.value;
+
+			prevPointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+			document.addEventListener( 'touchmove', onTouchMove, false );
+			document.addEventListener( 'touchend', onTouchEnd, false );
+
+		}
+
+	}
+
+	function onTouchMove( event ) {
+
+		var currentValue = scope.value;
+
+		pointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+		distance += ( pointer[ 0 ] - prevPointer[ 0 ] ) - ( pointer[ 1 ] - prevPointer[ 1 ] );
+
+		var value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+		value = Math.min( scope.max, Math.max( scope.min, value ) );
+
+		if ( currentValue !== value ) {
+
+			scope.setValue( value );
+			dom.dispatchEvent( changeEvent );
+
+		}
+
+		prevPointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+	}
+
+	function onTouchEnd( event ) {
+
+		if ( event.touches.length === 0 ) {
+
+			document.removeEventListener( 'touchmove', onTouchMove, false );
+			document.removeEventListener( 'touchend', onTouchEnd, false );
+
+		}
+
+	}
+
 	function onChange( event ) {
 
 		scope.setValue( dom.value );
@@ -648,6 +698,7 @@ UI.Number = function ( number ) {
 	onBlur();
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
+	dom.addEventListener( 'touchstart', onTouchStart, false );
 	dom.addEventListener( 'change', onChange, false );
 	dom.addEventListener( 'focus', onFocus, false );
 	dom.addEventListener( 'blur', onBlur, false );
@@ -940,64 +991,6 @@ UI.Button.prototype.constructor = UI.Button;
 UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
-
-	return this;
-
-};
-
-
-// Modal
-
-UI.Modal = function ( value ) {
-
-	var scope = this;
-
-	var dom = document.createElement( 'div' );
-
-	dom.style.position = 'absolute';
-	dom.style.width = '100%';
-	dom.style.height = '100%';
-	dom.style.backgroundColor = 'rgba(0,0,0,0.5)';
-	dom.style.display = 'none';
-	dom.style.alignItems = 'center';
-	dom.style.justifyContent = 'center';
-	dom.addEventListener( 'click', function ( event ) {
-
-		scope.hide();
-
-	} );
-
-	this.dom = dom;
-
-	this.container = new UI.Panel();
-	this.container.dom.style.width = '200px';
-	this.container.dom.style.padding = '20px';
-	this.container.dom.style.backgroundColor = '#ffffff';
-	this.container.dom.style.boxShadow = '0px 5px 10px rgba(0,0,0,0.5)';
-
-	this.add( this.container );
-
-	return this;
-
-};
-
-UI.Modal.prototype = Object.create( UI.Element.prototype );
-UI.Modal.prototype.constructor = UI.Modal;
-
-UI.Modal.prototype.show = function ( content ) {
-
-	this.container.clear();
-	this.container.add( content );
-
-	this.dom.style.display = 'flex';
-
-	return this;
-
-};
-
-UI.Modal.prototype.hide = function () {
-
-	this.dom.style.display = 'none';
 
 	return this;
 

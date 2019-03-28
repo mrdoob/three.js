@@ -3002,12 +3002,15 @@
 
 					scene.overrideMaterial = rtMaterial;
 
-					renderer.render( scene, camera, rtTexture, true );
+					renderer.setRenderTarget( rtTexture );
+					renderer.clear();
+					renderer.render( scene, camera );
 
 					scene.overrideMaterial = null;
 
 				}
 
+				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 
 				requestAnimationFrame( animate );

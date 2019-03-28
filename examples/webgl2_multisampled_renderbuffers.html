@@ -130,12 +130,11 @@
 					stencilBuffer: false
 				};
 
-				var size = renderer.getDrawingBufferSize();
+				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 				var renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 
 				var renderPass = new THREE.RenderPass( scene, camera );
 				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
 
 				//
 

@@ -119,45 +119,22 @@ Sidebar.Project = function ( editor ) {
 	} );
 	rendererPropertiesRow.add( rendererShadows );
 
-	rendererPropertiesRow.add( new UI.Break() );
-
-	// Renderer / Gamma input
-
-	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), strings.getKey( 'sidebar/project/gammainput' ) ).onChange( function () {
-
-		config.setKey( 'project/renderer/gammaInput', this.getValue() );
-		updateRenderer();
-
-	} );
-	rendererPropertiesRow.add( rendererGammaInput );
-
-	// Renderer / Gamma output
-
-	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), strings.getKey( 'sidebar/project/gammaoutput' ) ).onChange( function () {
-
-		config.setKey( 'project/renderer/gammaOutput', this.getValue() );
-		updateRenderer();
-
-	} );
-	rendererPropertiesRow.add( rendererGammaOutput );
-
 	container.add( rendererPropertiesRow );
 
 	//
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue(), rendererGammaInput.getValue(), rendererGammaOutput.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue() );
 
 	}
 
-	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
+	function createRenderer( type, antialias, shadows ) {
 
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
-		var renderer = new rendererTypes[ type ]( { antialias: antialias} );
-		renderer.gammaInput = gammaIn;
-		renderer.gammaOutput = gammaOut;
+		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
+
 		if ( shadows && renderer.shadowMap ) {
 
 			renderer.shadowMap.enabled = true;
@@ -169,7 +146,7 @@ Sidebar.Project = function ( editor ) {
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/gammaInput' ), config.getKey( 'project/renderer/gammaOutput' ) );
+	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
 
 	return container;
 

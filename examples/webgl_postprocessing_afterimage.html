@@ -68,7 +68,6 @@
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				afterimagePass = new THREE.AfterimagePass();
-				afterimagePass.renderToScreen = true;
 				composer.addPass( afterimagePass );
 
 				window.addEventListener( 'resize', onWindowResize, false );

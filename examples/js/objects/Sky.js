@@ -133,8 +133,7 @@ THREE.Sky.SkyShader = {
 		'const float pi = 3.141592653589793238462643383279502884197169;',
 
 		'const float n = 1.0003;', // refractive index of air
-		'const float N = 2.545E25;', // number of molecules per unit volume for air at
-									// 288.15K and 1013mb (sea level -45 celsius)
+		'const float N = 2.545E25;', // number of molecules per unit volume for air at 288.15K and 1013mb (sea level -45 celsius)
 
 		// optical length at zenith for molecules
 		'const float rayleighZenithLength = 8.4E3;',

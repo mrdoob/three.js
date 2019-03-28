@@ -147,7 +147,6 @@
 				pixelPass = new THREE.ShaderPass( THREE.PixelShader );
 				pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
 				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
-				pixelPass.renderToScreen = true;
 				composer.addPass( pixelPass );
 
 				window.addEventListener( 'resize', resize );

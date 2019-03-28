@@ -138,8 +138,6 @@
 				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
 				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
 
-				effectFocus.renderToScreen = true;
-
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );

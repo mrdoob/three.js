@@ -57,6 +57,9 @@ export class Quaternion {
    */
   setFromRotationMatrix(m: Matrix4): Quaternion;
   setFromUnitVectors(vFrom: Vector3, vTo: Vector3): Quaternion;
+  angleTo(q: Quaternion): number;
+  rotateTowards(q: Quaternion, step: number): Quaternion;
+
   /**
    * Inverts this quaternion.
    */
