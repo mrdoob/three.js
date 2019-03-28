@@ -342,6 +342,13 @@ export class WebGLRenderer implements Renderer {
    */
   getCurrentRenderTarget(): RenderTarget | null;
 
+  /**
+   * Sets the active render target.
+   *
+   * @param renderTarget The {@link WebGLRenderTarget renderTarget} that needs to be activated. When `null` is given, the canvas is set as the active render target instead.
+	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLRenderTargetCube}.
+	 * @param activeMipMapLevel Specifies the active mipmap level.
+   */
   setRenderTarget(renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipMapLevel?: number): void;
 
   readRenderTargetPixels(
