@@ -333,14 +333,17 @@ export class WebGLRenderer implements Renderer {
   ): void;
 
   /**
-   * @deprecated
+   * Returns the current RenderTarget if there are; returns null otherwise.
    */
   getRenderTarget(): RenderTarget | null;
+
   /**
    * @deprecated Use {@link WebGLRenderer#getRenderTarget .getRenderTarget()} instead.
    */
   getCurrentRenderTarget(): RenderTarget | null;
+
   setRenderTarget(renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipMapLevel?: number): void;
+
   readRenderTargetPixels(
     renderTarget: RenderTarget,
     x: number,
