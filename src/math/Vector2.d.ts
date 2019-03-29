@@ -306,6 +306,11 @@ export class Vector2 implements Vector {
   dot(v: Vector2): number;
 
   /**
+   * Computes cross product of this vector and v.
+   */
+  cross(v: Vector2): number;
+
+  /**
    * Computes squared length of this vector.
    */
   lengthSq(): number;
