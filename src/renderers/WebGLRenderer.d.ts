@@ -333,7 +333,7 @@ export class WebGLRenderer implements Renderer {
   ): void;
 
   /**
-   * Returns the current RenderTarget if there are; returns null otherwise.
+   * Returns the current render target. If no render target is set, null is returned.
    */
   getRenderTarget(): RenderTarget | null;
 
