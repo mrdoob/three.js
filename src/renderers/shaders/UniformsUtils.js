@@ -14,16 +14,33 @@ export function cloneUniforms( src ) {
 
 			var property = src[ u ][ p ];
 
-			if ( property && ( property.isColor ||
-				property.isMatrix3 || property.isMatrix4 ||
-				property.isVector2 || property.isVector3 || property.isVector4 ||
-				property.isTexture ) ) {
+			if ( isThreeObject( property ) ) {
 
 				dst[ u ][ p ] = property.clone();
 
 			} else if ( Array.isArray( property ) ) {
 
-				dst[ u ][ p ] = property.slice();
+				if ( isThreeObject( property[ 0 ] ) ) {
+
+					// objects
+
+					var clonedProperty = [];
+
+					for ( var i = 0, l = property.length; i < l; i ++ ) {
+
+						clonedProperty[ i ] = property[ i ].clone();
+
+					}
+
+					dst[ u ][ p ] = clonedProperty;
+
+				} else {
+
+					// primitive values
+
+					dst[ u ][ p ] = property.slice();
+
+				}
 
 			} else {
 
@@ -56,6 +73,21 @@ export function mergeUniforms( uniforms ) {
 	}
 
 	return merged;
+
+}
+
+function isThreeObject( property ) {
+
+	if ( property && ( property.isColor ||
+		property.isMatrix3 || property.isMatrix4 ||
+		property.isVector2 || property.isVector3 || property.isVector4 ||
+		property.isTexture ) ) {
+
+		return true;
+
+	}
+
+	return false;
 
 }
 
