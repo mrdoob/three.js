@@ -45,9 +45,5 @@ export class WebGLRenderList {
 
 export class WebGLRenderLists {
   dispose(): void;
-  /**
-   *
-   * returns {<String> : <WebGLRenderList>}
-   */
   get(scene: Scene, camera: Camera): WebGLRenderList;
 }
