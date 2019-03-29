@@ -11,13 +11,13 @@ export interface RenderTarget {} // not defined in the code, used in LightShadow
 export interface RenderItem {
   id: number;
   object: Object3D;
-  geometry: BufferGeometry;
+  geometry: BufferGeometry | null;
   material: Material;
   program: WebGLProgram;
   groupOrder: number;
   renderOrder: number;
   z: number;
-  group: Group;
+  group: Group | null;
 }
 
 export class WebGLRenderList {
@@ -26,19 +26,19 @@ export class WebGLRenderList {
   init(): void;
   push(
     object: Object3D,
-    geometry: BufferGeometry,
+    geometry: BufferGeometry | null,
     material: Material,
     groupOrder: number,
     z: number,
-    group: Group
+    group: Group | null
   ): void;
   unshift(
     object: Object3D,
-    geometry: BufferGeometry,
+    geometry: BufferGeometry | null,
     material: Material,
     groupOrder: number,
     z: number,
-    group: Group
+    group: Group | null
   ): void;
   sort(): void;
 }
