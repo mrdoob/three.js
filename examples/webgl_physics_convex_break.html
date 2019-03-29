@@ -84,9 +84,9 @@
 
 		var pos = new THREE.Vector3();
 		var quat = new THREE.Quaternion();
-		var transformAux1 = new Ammo.btTransform();
-		var tempBtVec3_1 = new Ammo.btVector3( 0, 0, 0 );
-		var tempBtQuat_1 = new Ammo.btQuaternion( 0, 0, 0, 1 );
+		var transformAux1;
+		var tempBtVec3_1;
+		var tempBtQuat_1;
 
 		var time = 0;
 
@@ -107,8 +107,14 @@
 
 		// - Main code -
 
-		init();
-		animate();
+		Ammo().then( function( AmmoLib ) {
+
+			Ammo = AmmoLib;
+
+			init();
+			animate();
+
+		} );
 
 
 		// - Functions -
@@ -165,6 +171,10 @@
 
 			}
 
+			transformAux1 = new Ammo.btTransform();
+			tempBtVec3_1 = new Ammo.btVector3( 0, 0, 0 )
+			tempBtQuat_1 = new Ammo.btQuaternion( 0, 0, 0, 1 )
+
 			// Physics configuration
 
 			collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
@@ -192,6 +202,9 @@
 			Ammo.destroy( broadphase );
 			Ammo.destroy( dispatcher );
 			Ammo.destroy( collisionConfiguration );
+			Ammo.destroy( transformAux1 );
+			Ammo.destroy( tempBtVec3_1 );
+			Ammo.destroy( tempBtQuat_1 );
 
 		}
 
