@@ -122,8 +122,16 @@ THREE.SVGLoader.prototype = {
 
 				transformStack.pop();
 
-				if ( transformStack.length > 0 ) currentTransform.copy( transformStack[ transformStack.length - 1 ] );
-				else currentTransform.identity();
+				if ( transformStack.length > 0 ) {
+
+					currentTransform.copy( transformStack[ transformStack.length - 1 ] );
+
+				}
+				else {
+
+					currentTransform.identity();
+
+				}
 
 			}
 
