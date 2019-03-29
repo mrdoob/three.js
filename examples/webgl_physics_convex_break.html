@@ -29,7 +29,7 @@
 	</head>
 	<body>
 
-	<div id="info">Physics threejs demo with convex objects breaking in real time<br />Sound samples by Mrguff, ansel and MaxDemianAGL.<br />Press mouse to throw balls and move the camera.</div>
+	<div id="info">Physics threejs demo with convex objects breaking in real time<br />Press mouse to throw balls and move the camera.</div>
 	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
 
 	<script src="../build/three.js"></script>
@@ -104,14 +104,6 @@
 
 		var tempVel = new THREE.Vector3();
 		var tempAngVel = new THREE.Vector3();
-
-		// Audio variables
-
- 		const maxSoundsPerSample = 8;
-		var audioInitialized = false;
-		var audioReady = false;
-		var audioActivated = false;
-		var hitAudios;
 
 		// - Main code -
 
@@ -596,8 +588,6 @@
 
 			scene.add( light );
 
-			addAudiosToScene();
-
 			// Create objects in the scene
 			sceneCreators[ parseInt( guiData.sceneIndex ) ]();
 
@@ -610,7 +600,6 @@
 			guiData = {
 
 				sceneIndex: 0,
-				audioActivated: false,
 				restart: createScene
 
 			};
@@ -628,23 +617,6 @@
 				"Tower": 1,
 				"Domino": 2
 			} ).name( 'Scene' ).onChange( createScene );
-
-			gui.add( guiData, 'audioActivated' ).name( 'Audio (Caution with your ears!)' ).onChange( function ( value ) {
-
-				if ( value ) {
-
-					onAudioActivated();
-
-					audioActivated = audioReady;
-
-				}
-				else {
-
-					audioActivated = false;
-
-				}
-
-			} );
 
 			gui.add( guiData, 'restart' ).name( 'Restart scene' );
 
@@ -679,110 +651,6 @@
 				ballBody.setLinearVelocity( tempBtVec3_1 );
 
 			}, false );
-
-}
-
-		function onAudioActivated() {
-
-			if ( audioInitialized ) return;
-
-			audioInitialized = true;
-
-			var hitAudioFilePaths = [
-				"sounds/hits/369711__mrguff__hit-impact.ogg",
-				"sounds/hits/221626__ansel__body-impact.ogg",
-				"sounds/hits/183602__maxdemianagl__body-impact-wood.ogg"
-			];
-
-
-			hitAudios = [];
-
-			var audioLoader = new THREE.AudioLoader();
-
-			var listener = new THREE.AudioListener();
-			camera.add( listener );
-
-			function loadAudio( index ) {
-
-				if ( index < hitAudioFilePaths.length ) {
-
-					audioLoader.load( hitAudioFilePaths[ index ], function ( buffer ) {
-
-						var slots = [];
-
-						for ( var i = 0; i < maxSoundsPerSample; i ++ ) {
-
-							var audio = new THREE.PositionalAudio( listener );
-							audio.setBuffer( buffer );
-
-							slots.push( audio );
-
-						}
-
-						hitAudios.push( slots );
-
-						loadAudio( index + 1 );
-
-					} );
-
-				}
-				else {
-
-					audioReady = true;
-					audioActivated = guiData.audioActivated;
-					addAudiosToScene();
-
-				}
-
-
-			}
-
-			loadAudio( 0 );
-
-		}
-
-		function addAudiosToScene() {
-
-			if ( ! audioReady ) return;
-
-			for ( var i = 0; i < hitAudios.length; i ++ ) {
-
-				var slots = hitAudios[ i ];
-
-				for ( var j = 0; j < maxSoundsPerSample; j ++ ) {
-
-					scene.add( slots[ j ] );
-
-				}
-
-			}
-
-		}
-
-		function playHitAudio( audioIndex, pos ) {
-
-			// Returns audio object if free slot
-
-			if ( ! audioActivated || time < 1.2 ) return;
-
-			var hitSlots = hitAudios[ audioIndex ];
-
-			for ( var i = 0; i < maxSoundsPerSample; i ++ ) {
-
-				var hit = hitSlots[ i ];
-
-				if ( ! hit.isPlaying ) {
-
-					hit.position.copy( pos );
-					hit.play();
-
-					return hit;
-
-				}
-
-			}
-
-			return null;
 
 		}
 
@@ -891,8 +759,6 @@
 
 				const fractureImpulse = 230;
 
-				var makeSoundIndex = - 1;
-
 				if ( breakable0 && ! collided0 && impulse > fractureImpulse ) {
 
 				  // Randomize a bit the normal to make more random fractures
@@ -936,42 +802,6 @@
 
 					objectsToRemove[ numObjectsToRemove++ ] = threeObject1;
 					userData1.collided = true;
-
-				}
-
-				// Hit sound generation
-
-				const minSoundImpulse = 70;
-				const maxSoundImpulse = 90;
-				var soundIndex = - 1;
-				var soundVolume = 1;
-				if ( impulse > minSoundImpulse ) {
-
-					if ( breakable0 || breakable1 ) {
-
-						// Hits of balls / ground with breakable objects
-						soundIndex = Math.floor( Math.random() * 3 );
-						soundVolume = ( impulse - minSoundImpulse ) / ( maxSoundImpulse - minSoundImpulse );
-
-					}
-					else {
-
-						// A ball hit the ground
-						soundIndex = 0;
-
-					}
-
-				}
-
-				if ( soundIndex >= 0 ) {
-
-					var hit = playHitAudio( soundIndex, impactPoint );
-
-					if ( hit ) {
-
-						hit.setVolume( soundVolume );
-
-					}
 
 				}
 
