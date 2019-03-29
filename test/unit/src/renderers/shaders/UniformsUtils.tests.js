@@ -36,19 +36,26 @@ export default QUnit.module( 'Renderers', () => {
 				let clonedUniforms = UniformsUtils.clone( uniforms );
 
 				assert.ok( clonedUniforms.singlePrimitive.value === uniforms.singlePrimitive.value, "Passed!" );
-				assert.ok( clonedUniforms.singleColor.value.isColor, "Passed!" );
-				assert.ok( clonedUniforms.singleColor.value.equals( uniforms.singleColor.value ), "Passed!" );
+				assert.ok( clonedUniforms.singleColor.value.isColor, "Passed!" ); // test type
+				assert.ok( clonedUniforms.singleColor.value !== uniforms.singleColor.value, "Passed!" ); // test if references are different
+				assert.ok( clonedUniforms.singleColor.value.equals( uniforms.singleColor.value ), "Passed!" ); // test if values are equal
 				assert.ok( clonedUniforms.singleVector2.value.isVector2, "Passed!" );
+				assert.ok( clonedUniforms.singleVector2.value !== uniforms.singleVector2.value, "Passed!" );
 				assert.ok( clonedUniforms.singleVector2.value.equals( uniforms.singleVector2.value ), "Passed!" );
 				assert.ok( clonedUniforms.singleVector3.value.isVector3, "Passed!" );
+				assert.ok( clonedUniforms.singleVector3.value !== uniforms.singleVector3.value, "Passed!" );
 				assert.ok( clonedUniforms.singleVector3.value.equals( uniforms.singleVector3.value ), "Passed!" );
 				assert.ok( clonedUniforms.singleVector4.value.isVector4, "Passed!" );
+				assert.ok( clonedUniforms.singleVector4.value !== uniforms.singleVector4.value, "Passed!" );
 				assert.ok( clonedUniforms.singleVector4.value.equals( uniforms.singleVector4.value ), "Passed!" );
 				assert.ok( clonedUniforms.singleMatrix3.value.isMatrix3, "Passed!" );
+				assert.ok( clonedUniforms.singleMatrix3.value !== uniforms.singleMatrix3.value, "Passed!" );
 				assert.ok( clonedUniforms.singleMatrix3.value.equals( uniforms.singleMatrix3.value ), "Passed!" );
 				assert.ok( clonedUniforms.singleMatrix4.value.isMatrix4, "Passed!" );
+				assert.ok( clonedUniforms.singleMatrix4.value !== uniforms.singleMatrix4.value, "Passed!" );
 				assert.ok( clonedUniforms.singleMatrix4.value.equals( uniforms.singleMatrix4.value ), "Passed!" );
 				assert.ok( clonedUniforms.singleTexture.value.isTexture, "Passed!" );
+				assert.ok( clonedUniforms.singleTexture.value !== uniforms.singleTexture.value, "Passed!" );
 
 				// array of values
 
@@ -74,19 +81,19 @@ export default QUnit.module( 'Renderers', () => {
 				clonedUniforms = UniformsUtils.clone( uniforms );
 
 				assert.ok( Array.isArray( clonedUniforms.arrayPrimitive.value ), "Passed!" );
-				assert.ok( equals( clonedUniforms.arrayPrimitive.value, uniforms.arrayPrimitive.value ), "Passed!" );
+				assert.ok( verify( clonedUniforms.arrayPrimitive.value, uniforms.arrayPrimitive.value ), "Passed!" );
 				assert.ok( Array.isArray( clonedUniforms.arrayColor.value ), "Passed!" );
-				assert.ok( equals( clonedUniforms.arrayColor.value, uniforms.arrayColor.value ), "Passed!" );
+				assert.ok( verify( clonedUniforms.arrayColor.value, uniforms.arrayColor.value ), "Passed!" );
 				assert.ok( Array.isArray( clonedUniforms.arrayVector2.value ), "Passed!" );
-				assert.ok( equals( clonedUniforms.arrayVector2.value, uniforms.arrayVector2.value ), "Passed!" );
+				assert.ok( verify( clonedUniforms.arrayVector2.value, uniforms.arrayVector2.value ), "Passed!" );
 				assert.ok( Array.isArray( clonedUniforms.arrayVector3.value ), "Passed!" );
-				assert.ok( equals( clonedUniforms.arrayVector3.value, uniforms.arrayVector3.value ), "Passed!" );
+				assert.ok( verify( clonedUniforms.arrayVector3.value, uniforms.arrayVector3.value ), "Passed!" );
 				assert.ok( Array.isArray( clonedUniforms.arrayVector4.value ), "Passed!" );
-				assert.ok( equals( clonedUniforms.arrayVector4.value, uniforms.arrayVector4.value ), "Passed!" );
+				assert.ok( verify( clonedUniforms.arrayVector4.value, uniforms.arrayVector4.value ), "Passed!" );
 				assert.ok( Array.isArray( clonedUniforms.arrayMatrix3.value ), "Passed!" );
-				assert.ok( equals( clonedUniforms.arrayMatrix3.value, uniforms.arrayMatrix3.value ), "Passed!" );
+				assert.ok( verify( clonedUniforms.arrayMatrix3.value, uniforms.arrayMatrix3.value ), "Passed!" );
 				assert.ok( Array.isArray( clonedUniforms.arrayMatrix4.value ), "Passed!" );
-				assert.ok( equals( clonedUniforms.arrayMatrix4.value, uniforms.arrayMatrix4.value ), "Passed!" );
+				assert.ok( verify( clonedUniforms.arrayMatrix4.value, uniforms.arrayMatrix4.value ), "Passed!" );
 				assert.ok( Array.isArray( clonedUniforms.arrayTexture.value ), "Passed!" );
 
 			} );
@@ -97,11 +104,21 @@ export default QUnit.module( 'Renderers', () => {
 
 } );
 
-function equals( a, b ) {
+function verify( a, b ) {
 
 	for ( let i = 0, l = a.length; i < l; i ++ ) {
 
 		if ( typeof a[ i ] === 'object' ) {
+
+			// type check
+
+			if ( a[ i ].constructor !== b[ i ].constructor ) return false;
+
+			// reference check
+
+			if ( a[ i ] === b[ i ] ) return false;
+
+			// value check
 
 			if ( a[ i ].equals( b[ i ] ) === false ) return false;
 
