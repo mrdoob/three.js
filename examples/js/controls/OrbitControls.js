@@ -85,6 +85,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 	//
 	// public methods
 	//
+	
+	/**
+	 * @desc Add a seek event, in the execution of drag, zoom, trigger this seek method, eg: do react performance optimization, animating do update() is very bad
+	 * use:  this.orbitControls.on('seek', () => { ... })
+	 */
+	this.seek = function() {};
+	this.on = function(eventName, func) {
+			if (eventName === 'seek') {
+					this.seek = func;
+			}
+	};
+	
 
 	this.getPolarAngle = function () {
 
@@ -116,7 +128,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scope.dispatchEvent( changeEvent );
 
 		scope.update();
-
+		scope.seek();
+		
 		state = STATE.NONE;
 
 	};
@@ -468,6 +481,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		rotateStart.copy( rotateEnd );
 
 		scope.update();
+		scope.seek();
 
 	}
 
@@ -492,6 +506,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		dollyStart.copy( dollyEnd );
 
 		scope.update();
+		scope.seek();
 
 	}
 
@@ -508,6 +523,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		panStart.copy( panEnd );
 
 		scope.update();
+		scope.seek();
 
 	}
 
@@ -532,6 +548,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 		scope.update();
+		scope.seek();
 
 	}
 
@@ -571,6 +588,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			event.preventDefault();
 
 			scope.update();
+			scope.seek();
 
 		}
 
@@ -628,6 +646,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		rotateStart.copy( rotateEnd );
 
 		scope.update();
+		scope.seek();
 
 	}
 
@@ -668,6 +687,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 		scope.update();
+		scope.seek();
 
 	}
 
@@ -938,6 +958,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// force an update at start
 
 	this.update();
+	this.seek();
 
 };
 
