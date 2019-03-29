@@ -75,7 +75,7 @@
 		var broadphase;
 		var solver;
 		var physicsWorld;
-		const margin = 0.05;
+		var margin = 0.05;
 
 		var convexBreaker = new THREE.ConvexObjectBreaker();
 
@@ -757,7 +757,7 @@
 
 				// Subdivision
 
-				const fractureImpulse = 230;
+				var fractureImpulse = 230;
 
 				if ( breakable0 && ! collided0 && impulse > fractureImpulse ) {
 
