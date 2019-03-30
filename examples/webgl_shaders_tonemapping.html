@@ -287,7 +287,7 @@
 				// Skybox
 				adaptiveLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						map: { value: null }
+						"map": { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
@@ -298,7 +298,7 @@
 
 				currentLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						map: { value: null }
+						"map": { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
@@ -368,7 +368,6 @@
 				hdrToneMappingPass = new THREE.AdaptiveToneMappingPass( false, 256 );
 				bloomPass = new THREE.BloomPass();
 				var gammaCorrectionPass = new THREE.ShaderPass( THREE.GammaCorrectionShader );
-				gammaCorrectionPass.renderToScreen = true;
 
 				dynamicHdrEffectComposer.addPass( skyboxPass );
 				dynamicHdrEffectComposer.addPass( scenePass );
@@ -390,7 +389,6 @@
 				ldrEffectComposer.addPass( gammaCorrectionPass );
 
 				// var gammaPass = new THREE.ShaderPass( GammaShader );
-				// gammaPass.renderToScreen = true;
 				// ldrEffectComposer.addPass( gammaPass );
 
 				var gui = new dat.GUI();
@@ -445,8 +443,8 @@
 				if ( adaptToneMappingPass ) {
 
 					adaptToneMappingPass.setAdaptionRate( params.adaptionRate );
-					adaptiveLuminanceMat.uniforms.map.value = adaptToneMappingPass.luminanceRT;
-					currentLuminanceMat.uniforms.map.value = adaptToneMappingPass.currentLuminanceRT;
+					adaptiveLuminanceMat.uniforms[ "map" ].value = adaptToneMappingPass.luminanceRT;
+					currentLuminanceMat.uniforms[ "map" ].value = adaptToneMappingPass.currentLuminanceRT;
 
 					adaptToneMappingPass.enabled = params.enabled;
 					adaptToneMappingPass.setMaxLuminance( params.maxLuminance );

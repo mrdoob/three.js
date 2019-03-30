@@ -480,8 +480,8 @@ Sidebar.Object = function ( editor ) {
 
 			if ( object.receiveShadow !== undefined && object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
-				editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
 				object.material.needsUpdate = true;
+				editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
 
 			}
 
@@ -542,8 +542,8 @@ Sidebar.Object = function ( editor ) {
 
 	function updateTransformRows( object ) {
 
-		if ( object instanceof THREE.Light ||
-		   ( object instanceof THREE.Object3D && object.userData.targetInverse ) ) {
+		if ( object.isLight ||
+		   ( object.isObject3D && object.userData.targetInverse ) ) {
 
 			objectRotationRow.setDisplay( 'none' );
 			objectScaleRow.setDisplay( 'none' );

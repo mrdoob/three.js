@@ -46,8 +46,6 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
 
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
@@ -102,16 +100,6 @@
 
 				//
 
-				new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/pisa/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( textureCube ) {
-
-						scene.background = textureCube;
-
-					} );
-
-				//
-
 				var material = new THREE.MeshStandardMaterial();
 
 				new THREE.OBJLoader()
@@ -150,31 +138,27 @@
 
 					} );
 
-				var genCubeUrls = function ( prefix, postfix ) {
+				new THREE.CubeTextureLoader().setPath( './textures/cube/pisaRGBM16/' )
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( rgbmCubeMap ) {
 
-					return [
-						prefix + 'px' + postfix, prefix + 'nx' + postfix,
-						prefix + 'py' + postfix, prefix + 'ny' + postfix,
-						prefix + 'pz' + postfix, prefix + 'nz' + postfix
-					];
+					rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+					rgbmCubeMap.format = THREE.RGBAFormat;
 
-				};
-
-				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
-
-					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
 					pmremGenerator.update( renderer );
 
 					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
-					var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+					var rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					material.envMap = hdrCubeRenderTarget.texture;
+					material.envMap = rgbmCubeRenderTarget.texture;
 					material.needsUpdate = true; // is this needed?
 
-					hdrCubeMap.dispose();
+					rgbmCubeMap.magFilter = THREE.LinearFilter;
+					rgbmCubeMap.needsUpdate = true;
+					scene.background = rgbmCubeMap;
+
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 

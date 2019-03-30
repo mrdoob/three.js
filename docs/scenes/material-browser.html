@@ -71,14 +71,13 @@
 
 			guiScene( gui, scene, camera );
 
-			var geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
-			var mesh = new THREE.Mesh( geometry );
+			var geometry = new THREE.TorusKnotBufferGeometry( 10, 3, 100, 16 );
+			geometry = geometry.toNonIndexed();
 
 			generateVertexColors( geometry );
 
+			var mesh = new THREE.Mesh( geometry );
 			mesh.material = chooseFromHash( gui, mesh, geometry );
-
-			generateMorphTargets( mesh, geometry );
 
 			scene.add( mesh );
 
@@ -97,12 +96,6 @@
 
 					mesh.material.needsUpdate = true;
 					prevFog = scene.fog;
-
-				}
-
-				if ( mesh.morphTargetInfluences ) {
-
-					mesh.morphTargetInfluences[ 0 ] = ( 1 + Math.sin( 4 * time ) ) / 2;
 
 				}
 

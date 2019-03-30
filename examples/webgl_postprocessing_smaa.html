@@ -77,7 +77,6 @@
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				pass = new THREE.SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
-				pass.renderToScreen = true;
 				composer.addPass( pass );
 
 				window.addEventListener( 'resize', onWindowResize, false );

@@ -10,11 +10,11 @@
 	<body>
 		[page:Path] &rarr;
 
-		<h1>[name]</h1>
+		<h1>形状（[name]）</h1>
 
 		<p class="desc">
-		Defines an arbitrary 2d shape plane using paths with optional holes. It can be used with [page:ExtrudeGeometry],
-		[page:ShapeGeometry], to get points, or to get triangulated faces.
+		使用路径以及可选的孔洞来定义一个二维形状平面。
+		它可以和[page:ExtrudeGeometry]、[page:ShapeGeometry]一起使用，获取点，或者获取三角面。
 		</p>
 
 		<code>
@@ -35,7 +35,7 @@
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		</code>
 
-		<h2>Examples</h2>
+		<h2>示例</h2>
 
 		<p>
 		[example:webgl_geometry_shapes geometry / shapes ]<br/>
@@ -44,57 +44,56 @@
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( [param:Array points] )</h3>
 		<p>
-		points -- (optional) array of [page:Vector2 Vector2s].<br /><br />
+		points -- (optional) 一个[page:Vector2 Vector2]数组。<br /><br />
 
-		Creates a Shape from the points. The first point defines the offset, then successive points
-		are added to the [page:CurvePath.curves curves] array as [page:LineCurve LineCurves].<br /><br />
+		从点来创建一个Shape。第一个点定义了偏移量，
+		接下来的点被作为[page:LineCurve LineCurves]加入到[page:CurvePath.curves curves]中。<br /><br />
 
-		If no points are specified, an empty shape is created and the [page:.currentPoint] is set to
-		the origin.
+		如果没有点被指定，一个空的形状将会被创建，且[page:.currentPoint]将会被设为原点。
 		</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:Path] class for common properties.</p>
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Path]来了解共有属性。</p>
 
 		<h3>[property:String uuid]</h3>
 		<p>
-		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this instance. This gets automatically assigned, so this shouldn't be edited.
+		该类所创建的实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。它是自动被指定的，因此它不应当被编辑、更改。
 		</p>
 
 		<h3>[property:array holes]</h3>
-		<p>An array of [page:Path paths] that define the holes in the shape.</p>
+		<p>一个[page:Path paths]数组，定义了形状上的孔洞。</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:Path] class for common methods.</p>
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Path]来了解共有方法。</p>
 
 		<h3>[method:Array extractPoints]( [param:Integer divisions] )</h3>
 		<p>
-		divisions -- The fineness of the result.<br /><br />
+		divisions -- 结果的精细程度（细分数）。<br /><br />
 
-		Call [page:Curve.getPoints getPoints] on the shape and the [page:.holes] array, and return an object of the form:
+		在形状以及[page:.holes]（孔洞）数组上调用[page:Curve.getPoints getPoints]，并返回一个来自于：
 		<code>
 {
 	shape
 	holes
 }
 		</code>
-		where shape and holes are arrays of [page:Vector2 Vector2s].
+		的对象，其中的形状和孔洞是[page:Vector2 Vector2]数组。
 		</p>
 
 		<h3>[method:Array getPointsHoles]( [param:Integer divisions] )</h3>
 		<p>
-		divisions -- The fineness of the result.<br /><br />
+		divisions -- 结果的精细程度（细分数）。<br /><br />
 
-		Get an array of [page:Vector2 Vector2s] that represent the holes in the shape.
+		获取一个表示形状上的孔洞的[page:Vector2 Vector2s]数组。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

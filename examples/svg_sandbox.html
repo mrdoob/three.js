@@ -84,30 +84,39 @@
 
 				// POLYFIELD
 
-				var geometry = new THREE.Geometry();
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, side: THREE.DoubleSide } );
+				var geometry = new THREE.BufferGeometry();
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors, side: THREE.DoubleSide } );
+
+				var v = new THREE.Vector3();
+				var v0 = new THREE.Vector3();
+				var v1 = new THREE.Vector3();
+				var v2 = new THREE.Vector3();
+				var color = new THREE.Color();
+
+				var vertices = [];
+				var colors = [];
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var v = new THREE.Vector3(
+					v.set(
 						Math.random() * 1000 - 500,
 						Math.random() * 1000 - 500,
 						Math.random() * 1000 - 500
 					);
 
-					var v0 = new THREE.Vector3(
+					v0.set(
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50
 					);
 
-					var v1 = new THREE.Vector3(
+					v1.set(
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50
 					);
 
-					var v2 = new THREE.Vector3(
+					v2.set(
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50
@@ -117,19 +126,22 @@
 					v1.add( v );
 					v2.add( v );
 
-					var face = new THREE.Face3(
-						geometry.vertices.push( v0 ) - 1,
-						geometry.vertices.push( v1 ) - 1,
-						geometry.vertices.push( v2 ) - 1,
-						null,
-						new THREE.Color( Math.random() * 0xffffff )
-					);
+					color.setHex( Math.random() * 0xffffff );
 
-					geometry.faces.push( face );
+					// create a single triangle
+
+					vertices.push( v0.x, v0.y, v0.z );
+					vertices.push( v1.x, v1.y, v1.z );
+					vertices.push( v2.x, v2.y, v2.z );
+
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
 
 				}
 
-				geometry.computeFaceNormals();
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				group = new THREE.Mesh( geometry, material );
 				group.scale.set( 2, 2, 2 );
@@ -165,6 +177,23 @@
 					scene.add( object );
 
 				}
+
+				// CUSTOM FROM FILE
+
+				var fileLoader = new THREE.FileLoader();
+				fileLoader.load( 'models/svg/hexagon.svg', function ( svg ) {
+
+					var node = document.createElementNS( 'http://www.w3.org/2000/svg', 'g' );
+					var parser = new DOMParser();
+					var doc = parser.parseFromString( svg, 'image/svg+xml' );
+
+					node.appendChild( doc.documentElement );
+
+					var object = new THREE.SVGObject( node );
+					object.position.x = 500;
+					scene.add( object );
+
+				} );
 
 				// LIGHTS
 

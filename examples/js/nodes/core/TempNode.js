@@ -23,9 +23,9 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 	output = output || this.getType( builder );
 
-	if ( this.isShared( builder, output ) ) {
+	if ( this.getShared( builder, output ) ) {
 
-		var isUnique = this.isUnique( builder, output );
+		var isUnique = this.getUnique( builder, output );
 
 		if ( isUnique && this.constructor.uuid === undefined ) {
 
@@ -40,7 +40,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 		if ( builder.parsing ) {
 
-			if ( ( data.deps || 0 ) > 0 ) {
+			if ( ( data.deps || 0 ) > 0 || this.getLabel() ) {
 
 				this.appendDepsNode( builder, data, output );
 
@@ -56,7 +56,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 			return data.name;
 
-		} else if ( ! this.isShared( builder, type ) || ( ! builder.optimize || data.deps == 1 ) ) {
+		} else if ( ! this.getLabel() && ( ! this.getShared( builder, type ) || ( ! builder.optimize || data.deps === 1 ) ) ) {
 
 			return Node.prototype.build.call( this, builder, output, uuid );
 
@@ -88,15 +88,29 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 };
 
-TempNode.prototype.isShared = function ( builder, output ) {
+TempNode.prototype.getShared = function ( builder, output ) {
 
 	return output !== 'sampler2D' && output !== 'samplerCube' && this.shared;
 
 };
 
-TempNode.prototype.isUnique = function ( builder, output ) {
+TempNode.prototype.getUnique = function ( builder, output ) {
 
 	return this.unique;
+
+};
+
+TempNode.prototype.setLabel = function ( name ) {
+
+	this.label = name;
+
+	return this;
+
+};
+
+TempNode.prototype.getLabel = function ( builder ) {
+
+	return this.label;
 
 };
 
@@ -104,7 +118,7 @@ TempNode.prototype.getUuid = function ( unique ) {
 
 	var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
 
-	if ( typeof this.scope == "string" ) uuid = this.scope + '-' + uuid;
+	if ( typeof this.scope === "string" ) uuid = this.scope + '-' + uuid;
 
 	return uuid;
 
@@ -122,11 +136,11 @@ TempNode.prototype.getTemp = function ( builder, uuid ) {
 
 TempNode.prototype.generate = function ( builder, output, uuid, type, ns ) {
 
-	if ( ! this.isShared( builder, output ) ) console.error( "THREE.TempNode is not shared!" );
+	if ( ! this.getShared( builder, output ) ) console.error( "THREE.TempNode is not shared!" );
 
 	uuid = uuid || this.uuid;
 
-	return builder.getTempVar( uuid, type || this.getType( builder ), ns ).name;
+	return builder.getTempVar( uuid, type || this.getType( builder ), ns, this.getLabel() ).name;
 
 };
 

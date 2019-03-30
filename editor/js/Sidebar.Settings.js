@@ -72,7 +72,7 @@ Sidebar.Settings = function ( editor ) {
 	themeRow.add( new UI.Text( strings.getKey( 'sidebar/settings/theme' ) ).setWidth( '90px' ) );
 	themeRow.add( theme );
 
-	container.add( themeRow );
+	container.add( themeRow );	
 
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
 	container.add( new Sidebar.Settings.Viewport( editor ) );

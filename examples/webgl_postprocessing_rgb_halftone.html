@@ -149,7 +149,6 @@
 			disable: false
 		};
 		halftonePass = new THREE.HalftonePass( window.innerWidth, window.innerHeight, params );
-		halftonePass.renderToScreen = true;
 		composer.addPass( renderPass );
 		composer.addPass( halftonePass );
 
@@ -167,31 +166,31 @@
 		var controller, gui, onGUIChange;
 
 		controller = {
-			radius: halftonePass.uniforms.radius.value,
-			rotateR: halftonePass.uniforms.rotateR.value / ( Math.PI / 180 ),
-			rotateG: halftonePass.uniforms.rotateG.value / ( Math.PI / 180 ),
-			rotateB: halftonePass.uniforms.rotateB.value / ( Math.PI / 180 ),
-			scatter: halftonePass.uniforms.scatter.value,
-			shape: halftonePass.uniforms.shape.value,
-			greyscale: halftonePass.uniforms.greyscale.value,
-			blending: halftonePass.uniforms.blending.value,
-			blendingMode: halftonePass.uniforms.blendingMode.value,
-			disable: halftonePass.uniforms.disable.value
+			radius: halftonePass.uniforms[ "radius" ].value,
+			rotateR: halftonePass.uniforms[ "rotateR" ].value / ( Math.PI / 180 ),
+			rotateG: halftonePass.uniforms[ "rotateG" ].value / ( Math.PI / 180 ),
+			rotateB: halftonePass.uniforms[ "rotateB" ].value / ( Math.PI / 180 ),
+			scatter: halftonePass.uniforms[ "scatter" ].value,
+			shape: halftonePass.uniforms[ "shape" ].value,
+			greyscale: halftonePass.uniforms[ "greyscale" ].value,
+			blending: halftonePass.uniforms[ "blending" ].value,
+			blendingMode: halftonePass.uniforms[ "blendingMode" ].value,
+			disable: halftonePass.uniforms[ "disable" ].value
 		};
 
 		onGUIChange = function () {
 
 			// update uniforms
-			halftonePass.uniforms.radius.value = controller.radius;
-			halftonePass.uniforms.rotateR.value = controller.rotateR * ( Math.PI / 180 );
-			halftonePass.uniforms.rotateG.value = controller.rotateG * ( Math.PI / 180 );
-			halftonePass.uniforms.rotateB.value = controller.rotateB * ( Math.PI / 180 );
-			halftonePass.uniforms.scatter.value = controller.scatter;
-			halftonePass.uniforms.shape.value = controller.shape;
-			halftonePass.uniforms.greyscale.value = controller.greyscale;
-			halftonePass.uniforms.blending.value = controller.blending;
-			halftonePass.uniforms.blendingMode.value = controller.blendingMode;
-			halftonePass.uniforms.disable.value = controller.disable;
+			halftonePass.uniforms[ "radius" ].value = controller.radius;
+			halftonePass.uniforms[ "rotateR" ].value = controller.rotateR * ( Math.PI / 180 );
+			halftonePass.uniforms[ "rotateG" ].value = controller.rotateG * ( Math.PI / 180 );
+			halftonePass.uniforms[ "rotateB" ].value = controller.rotateB * ( Math.PI / 180 );
+			halftonePass.uniforms[ "scatter" ].value = controller.scatter;
+			halftonePass.uniforms[ "shape" ].value = controller.shape;
+			halftonePass.uniforms[ "greyscale" ].value = controller.greyscale;
+			halftonePass.uniforms[ "blending" ].value = controller.blending;
+			halftonePass.uniforms[ "blendingMode" ].value = controller.blendingMode;
+			halftonePass.uniforms[ "disable" ].value = controller.disable;
 
 		};
 

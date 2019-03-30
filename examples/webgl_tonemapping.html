@@ -73,7 +73,8 @@
 				Linear: THREE.LinearToneMapping,
 				Reinhard: THREE.ReinhardToneMapping,
 				Uncharted2: THREE.Uncharted2ToneMapping,
-				Cineon: THREE.CineonToneMapping
+				Cineon: THREE.CineonToneMapping,
+				ACESFilmic: THREE.ACESFilmicToneMapping
 			};
 
 			var camera, scene, renderer, group;
@@ -214,7 +215,6 @@
 				composer.addPass( renderScene );
 
 				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
 				stats = new Stats();

@@ -52,16 +52,19 @@
 
 			}
 
-			var container, stats;
 			var params = {
 				envMap: 'HDR',
 				roughness: 0.0,
 				metalness: 0.0,
-				exposure: 1.0
+				exposure: 1.0,
+				debug: false
 			};
-			var camera, scene, renderer, controls, objects = [];
-			var standardMaterial, floorMaterial;
+
+			var container, stats;
+			var camera, scene, renderer, controls;
+			var torusMesh, planeMesh;
 			var ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
+			var ldrCubeMap, hdrCubeMap, rgbmCubeMap;
 
 			init();
 			animate();
@@ -80,94 +83,92 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.toneMapping = THREE.LinearToneMapping;
 
-				standardMaterial = new THREE.MeshStandardMaterial( {
+				//
+
+				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				var material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					metalness: params.metalness,
 					roughness: params.roughness
 				} );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-
-				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-
-				scene.add( torusMesh1 );
-				objects.push( torusMesh1 );
-
-				floorMaterial = new THREE.MeshBasicMaterial( {
-					color: 0xffffff,
-				} );
-
-				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				scene.add( planeMesh1 );
-
-				var genCubeUrls = function ( prefix, postfix ) {
-
-					return [
-						prefix + 'px' + postfix, prefix + 'nx' + postfix,
-						prefix + 'py' + postfix, prefix + 'ny' + postfix,
-						prefix + 'pz' + postfix, prefix + 'nz' + postfix
-					];
-
-				};
-
-				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
-
-					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-					pmremGenerator.update( renderer );
-
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
-
-					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-					hdrCubeMap.dispose();
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
-
-				} );
-
-				var ldrUrls = genCubeUrls( './textures/cube/pisa/', '.png' );
-				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
-
-					ldrCubeMap.encoding = THREE.GammaEncoding;
-
-					var pmremGenerator = new THREE.PMREMGenerator( ldrCubeMap );
-					pmremGenerator.update( renderer );
-
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
-
-					ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-					ldrCubeMap.dispose();
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
-
-				} );
+				torusMesh = new THREE.Mesh( geometry, material );
+				scene.add( torusMesh );
 
 
-				var rgbmUrls = genCubeUrls( './textures/cube/pisaRGBM16/', '.png' );
-				new THREE.CubeTextureLoader().load( rgbmUrls, function ( rgbmCubeMap ) {
+				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var material = new THREE.MeshBasicMaterial();
 
-					rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+				planeMesh = new THREE.Mesh( geometry, material );
+				planeMesh.position.y = - 50;
+				planeMesh.rotation.x = - Math.PI * 0.5;
+				scene.add( planeMesh );
 
-					var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
-					pmremGenerator.update( renderer );
+				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				hdrCubeMap = new THREE.HDRCubeTextureLoader()
+					.setPath( './textures/cube/pisaHDR/' )
+					.load( THREE.UnsignedByteType, hdrUrls, function () {
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+						pmremGenerator.update( renderer );
 
-					rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					rgbmCubeMap.dispose();
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
+						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-				} );
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+					} );
+
+				var ldrUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
+				ldrCubeMap = new THREE.CubeTextureLoader()
+					.setPath( './textures/cube/pisa/' )
+					.load( ldrUrls, function () {
+
+						ldrCubeMap.encoding = THREE.GammaEncoding;
+
+						var pmremGenerator = new THREE.PMREMGenerator( ldrCubeMap );
+						pmremGenerator.update( renderer );
+
+						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
+
+						ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+					} );
+
+
+				var rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
+				rgbmCubeMap = new THREE.CubeTextureLoader()
+					.setPath( './textures/cube/pisaRGBM16/' )
+					.load( rgbmUrls, function () {
+
+						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+						rgbmCubeMap.format = THREE.RGBAFormat;
+
+						var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
+						pmremGenerator.update( renderer );
+
+						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
+
+						rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+						rgbmCubeMap.magFilter = THREE.LinearFilter;
+						rgbmCubeMap.needsUpdate = true;
+
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+					} );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -189,9 +190,10 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'metalness', 0, 1 );
-				gui.add( params, 'exposure', 0, 2 );
+				gui.add( params, 'roughness', 0, 1, 0.01 );
+				gui.add( params, 'metalness', 0, 1, 0.01 );
+				gui.add( params, 'exposure', 0, 2, 0.01 );
+				gui.add( params, 'debug', false );
 				gui.open();
 
 			}
@@ -220,41 +222,44 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				torusMesh.material.roughness = params.roughness;
+				torusMesh.material.metalness = params.metalness;
 
-					standardMaterial.roughness = params.roughness;
-					standardMaterial.metalness = params.metalness;
+				var renderTarget, cubeMap;
 
-					var newEnvMap = standardMaterial.envMap;
+				switch ( params.envMap ) {
 
-					switch ( params.envMap ) {
+					case 'LDR':
+						renderTarget = ldrCubeRenderTarget;
+						cubeMap = ldrCubeMap;
+						break;
+					case 'HDR':
+						renderTarget = hdrCubeRenderTarget;
+						cubeMap = hdrCubeMap;
+						break;
+					case 'RGBM16':
+						renderTarget = rgbmCubeRenderTarget;
+						cubeMap = rgbmCubeMap;
+						break;
+				}
 
-						case 'LDR': newEnvMap = ldrCubeRenderTarget ? ldrCubeRenderTarget.texture : null; break;
-						case 'HDR': newEnvMap = hdrCubeRenderTarget ? hdrCubeRenderTarget.texture : null; break;
-						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget ? rgbmCubeRenderTarget.texture : null; break;
+				var newEnvMap = renderTarget ? renderTarget.texture : null;
 
-					}
+				if ( newEnvMap && newEnvMap !== torusMesh.material.envMap ) {
 
-					if ( newEnvMap !== standardMaterial.envMap ) {
+					torusMesh.material.envMap = newEnvMap;
+					torusMesh.material.needsUpdate = true;
 
-						standardMaterial.envMap = newEnvMap;
-						standardMaterial.needsUpdate = true;
-
-						floorMaterial.map = newEnvMap;
-						floorMaterial.needsUpdate = true;
-
-					}
+					planeMesh.material.map = newEnvMap;
+					planeMesh.material.needsUpdate = true;
 
 				}
 
+				torusMesh.rotation.y += 0.005;
+				planeMesh.visible = params.debug;
+
+				scene.background = cubeMap;
 				renderer.toneMappingExposure = params.exposure;
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-					object.rotation.y += 0.005;
-
-				}
 
 				renderer.render( scene, camera );
 

@@ -156,8 +156,10 @@ THREE.MD2CharacterComplex = function () {
 
 		loader.load( config.baseUrl + config.body, function( geo ) {
 
-			geo.computeBoundingBox();
-			scope.root.position.y = - scope.scale * geo.boundingBox.min.y;
+			var boundingBox = new THREE.Box3();
+			boundingBox.setFromBufferAttribute( geo.attributes.position );
+
+			scope.root.position.y = - scope.scale * boundingBox.min.y;
 
 			var mesh = createPart( geo, scope.skinsBody[ 0 ] );
 			mesh.scale.set( scope.scale, scope.scale, scope.scale );

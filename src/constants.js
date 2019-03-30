@@ -1,4 +1,4 @@
-export var REVISION = '99dev';
+export var REVISION = '103';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 export var CullFaceNone = 0;
 export var CullFaceBack = 1;
@@ -55,6 +55,8 @@ export var LinearToneMapping = 1;
 export var ReinhardToneMapping = 2;
 export var Uncharted2ToneMapping = 3;
 export var CineonToneMapping = 4;
+export var ACESFilmicToneMapping = 5;
+
 export var UVMapping = 300;
 export var CubeReflectionMapping = 301;
 export var CubeRefractionMapping = 302;

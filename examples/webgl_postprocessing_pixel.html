@@ -66,7 +66,7 @@
 
 			function updateGUI() {
 
-				pixelPass.uniforms.pixelSize.value = params.pixelSize;
+				pixelPass.uniforms[ "pixelSize" ].value = params.pixelSize;
 
 			}
 
@@ -76,7 +76,7 @@
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				pixelPass.uniforms.resolution.value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
+				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
 
 			}
 
@@ -145,9 +145,8 @@
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				pixelPass = new THREE.ShaderPass( THREE.PixelShader );
-				pixelPass.uniforms.resolution.value = new THREE.Vector2( window.innerWidth, window.innerHeight );
-				pixelPass.uniforms.resolution.value.multiplyScalar( window.devicePixelRatio );
-				pixelPass.renderToScreen = true;
+				pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
+				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
 				composer.addPass( pixelPass );
 
 				window.addEventListener( 'resize', resize );

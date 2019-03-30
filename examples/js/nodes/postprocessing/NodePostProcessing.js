@@ -16,7 +16,7 @@ function NodePostProcessing( renderer, renderTarget ) {
 			stencilBuffer: false
 		};
 
-		var size = renderer.getDrawingBufferSize();
+		var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
 
 	}
@@ -64,10 +64,12 @@ NodePostProcessing.prototype = {
 		frame.setRenderer( this.renderer )
 			.setRenderTexture( this.renderTarget.texture );
 
-		this.renderer.render( scene, camera, this.renderTarget );
+		this.renderer.setRenderTarget( this.renderTarget );
+		this.renderer.render( scene, camera );
 
 		frame.updateNode( this.material );
 
+		this.renderer.setRenderTarget( null );
 		this.renderer.render( this.scene, this.camera );
 
 	},

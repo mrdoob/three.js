@@ -402,11 +402,32 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	}
 
-	this.render = function ( scene, camera, renderTarget, forceClear ) {
+	this.render = function ( scene, camera ) {
+
+		var renderTarget = null;
+		var forceClear = false;
+
+		if ( arguments[ 2 ] !== undefined ) {
+
+			console.warn( 'THREE.OutlineEffect.render(): the renderTarget argument has been removed. Use .setRenderTarget() instead.' );
+			renderTarget = arguments[ 2 ];
+
+		}
+
+		if ( arguments[ 3 ] !== undefined ) {
+
+			console.warn( 'THREE.OutlineEffect.render(): the forceClear argument has been removed. Use .clear() instead.' );
+			forceClear = arguments[ 3 ];
+
+		}
+
+		renderer.setRenderTarget( renderTarget );
+
+		if ( forceClear ) renderer.clear();
 
 		if ( this.enabled === false ) {
 
-			renderer.render( scene, camera, renderTarget, forceClear );
+			renderer.render( scene, camera );
 			return;
 
 		}
@@ -415,7 +436,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		renderer.autoClear = this.autoClear;
 
 		// 1. render normally
-		renderer.render( scene, camera, renderTarget, forceClear );
+		renderer.render( scene, camera );
 
 		// 2. render outline
 		var currentSceneAutoUpdate = scene.autoUpdate;
@@ -429,7 +450,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		scene.traverse( setOutlineMaterial );
 
-		renderer.render( scene, camera, renderTarget );
+		renderer.render( scene, camera );
 
 		scene.traverse( restoreOriginalMaterial );
 
@@ -478,9 +499,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	};
 
-	this.getSize = function () {
+	this.getSize = function ( target ) {
 
-		return renderer.getSize();
+		return renderer.getSize( target );
 
 	};
 

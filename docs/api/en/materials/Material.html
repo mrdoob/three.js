@@ -101,19 +101,6 @@
 		This can be used in conjunction with a mesh's [page:Integer renderOrder] property to create invisible objects that occlude other objects. Default is *true*.
 		</p>
 
-		<h3>[property:Material customDepthMaterial]</h3>
-		<p>
-		Custom depth material to be used by this material when rendering to the depth map.
-		When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are (a) modifying vertex positions in the vertex shader,
-		(b) using a displacement map, (c) using an alpha map with alphaTest, or (d) using a transparent texture with alphaTest,
-		you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
-		</p>
-
-		<h3>[property:Material customDistanceMaterial]</h3>
-		<p>
-		Same as customDepthMaterial, but used with [page:PointLight]. Default is *undefined*.
-		</p>
-
 		<h3>[property:Object defines]</h3>
 		<p>
 		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. The pairs are defined in both vertex and fragment shaders.  Default is *undefined*.
@@ -274,6 +261,13 @@
 		Other options are [page:Materials THREE.VertexColors] and [page:Materials THREE.FaceColors].
 		</p>
 
+		<h3>[property:Boolean vertexTangents]</h3>
+		<p>
+		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
+		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
+		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		</p>
+
 		<h3>[property:Boolean visible]</h3>
 		<p>
 		Defines whether this material is visible. Default is *true*.
@@ -301,7 +295,7 @@
 		These needs to be disposed by [page:Texture Texture].
 		</p>
 
-		<h3>[method:null onBeforeCompile]( [param:Object shader], [param:WebGLRenderer renderer] )</h3>
+		<h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 		<p>
 		An optional callback that is executed immediately before the shader program is compiled.
 		This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.

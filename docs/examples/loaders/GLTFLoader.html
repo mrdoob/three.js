@@ -31,13 +31,16 @@
 			<li>KHR_draco_mesh_compression</li>
 			<li>KHR_materials_pbrSpecularGlossiness</li>
 			<li>KHR_materials_unlit</li>
-			<li>KHR_lights_punctual (experimental)</li>
-			<li>KHR_texture_transform<sup>*</sup></li>
+			<li>KHR_lights_punctual<sup>1</sup></li>
+			<li>KHR_texture_transform<sup>2</sup></li>
 			<li>MSFT_texture_dds</li>
 		</ul>
 
 		<p><i>
-			<sup>*</sup>UV transforms are supported, with several key limitations. Transforms applied to
+			<sup>1</sup>Requires [link:https://threejs.org/docs/#api/en/renderers/WebGLRenderer.physicallyCorrectLights physicallyCorrectLights] to be enabled.
+		</i></p>
+		<p><i>
+			<sup>2</sup>UV transforms are supported, with several key limitations. Transforms applied to
 			a texture using the first UV slot (all textures except aoMap and lightMap) must share the same
 			transform, or no transfor at all. The aoMap and lightMap textures cannot be transformed. No
 			more than one transform may be used per material. Each use of a texture with a unique
@@ -55,6 +58,9 @@
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
 		THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
 		loader.setDRACOLoader( new THREE.DRACOLoader() );
+			
+		// Optional: Pre-fetch Draco WASM/JS module, to save time while parsing.
+		THREE.DRACOLoader.getDecoderModule();
 
 		// Load a glTF resource
 		loader.load(

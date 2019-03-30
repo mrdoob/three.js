@@ -40,6 +40,9 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -52,7 +55,7 @@
 			}
 
 			var container, stats, controls;
-			var camera, scene, renderer, light;
+			var camera, scene, renderer;
 
 			init();
 			animate();
@@ -69,41 +72,43 @@
 				controls.target.set( 0, - 0.2, - 0.2 );
 				controls.update();
 
-				// envmap
-				var path = 'textures/cube/Bridge2/';
-				var format = '.jpg';
-				var envMap = new THREE.CubeTextureLoader().load( [
-					path + 'posx' + format, path + 'negx' + format,
-					path + 'posy' + format, path + 'negy' + format,
-					path + 'posz' + format, path + 'negz' + format
-				] );
-
 				scene = new THREE.Scene();
-				scene.background = envMap;
 
-				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
+				var urls = [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ];
+				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/Bridge2/' );
+				loader.load( urls, function ( texture ) {
 
-				// model
-				var loader = new THREE.GLTFLoader();
-				loader.load( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', function ( gltf ) {
+					var pmremGenerator = new THREE.PMREMGenerator( texture );
+					pmremGenerator.update( renderer );
 
-					gltf.scene.traverse( function ( child ) {
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
 
-						if ( child.isMesh ) {
+					var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
-							child.material.envMap = envMap;
+					// model
 
-						}
+					var loader = new THREE.GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+					loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+
+						gltf.scene.traverse( function ( child ) {
+
+							if ( child.isMesh ) {
+
+								child.material.envMap = envMap;
+
+							}
+
+						} );
+
+						scene.add( gltf.scene );
 
 					} );
 
-					scene.add( gltf.scene );
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
 
-				}, undefined, function ( e ) {
-
-					console.error( e );
+					scene.background = texture;
 
 				} );
 
