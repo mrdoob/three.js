@@ -214,6 +214,7 @@ var files = {
 		"webgl_performance_static",
 		"webgl_points_billboards",
 		"webgl_points_dynamic",
+		"webgl_points_morph",
 		"webgl_points_sprites",
 		"webgl_points_waves",
 		"webgl_raycast_sprite",

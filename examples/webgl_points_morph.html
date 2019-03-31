@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - particles - waves</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color:#fff;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color:#0078ff;
+			}
+
+			#info {
+				position: absolute;
+				top: 5px;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particles morph example
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+
+		<script src="js/WebGL.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var container, camera, scene, renderer, mixer;
+			var material, sizeAttribute;
+
+			var time = 0;
+			var clock = new THREE.Clock();
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+				camera.position.z = 20;
+
+				scene = new THREE.Scene();
+
+				var controls = new THREE.OrbitControls( camera );
+				controls.enableDamping = true;
+
+				createMaterial();
+				loadModel();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				renderer.setAnimationLoop( function () {
+
+					renderer.render( scene, camera );
+					controls.update();
+					update();
+
+				} );
+
+			}
+
+			function createMaterial() {
+
+				material = new THREE.PointsMaterial( {
+
+					map: new THREE.TextureLoader().load( 'textures/sprites/spark1.png' ),
+					// size: 0.75,
+					morphTargets: true,
+					vertexColors: true,
+					blending: THREE.AdditiveBlending,
+					depthTest: false,
+
+				} );
+
+				// change the PointMaterial.size parameter from a uniform to an attribute
+				material.onBeforeCompile = function ( shader ) {
+
+					shader.vertexShader = shader.vertexShader.replace(
+						'uniform float size;',
+						'attribute float size;'
+					);
+
+				};
+
+			}
+
+			function createSizeAttribute( geometry ) {
+
+				var count = geometry.attributes.position.count;
+
+				var sizes = [];
+				for ( var i = 0; i < count; i ++ ) {
+
+					sizes.push( 1 );
+
+				}
+				sizeAttribute = new THREE.Float32BufferAttribute( sizes, 1 ).setDynamic( true );
+
+				geometry.addAttribute( 'size', sizeAttribute );
+
+			}
+
+			function loadModel( ) {
+
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/Horse.glb', function ( gltf ) {
+
+					var model = gltf.scene.children[ 0 ];
+					var animation = gltf.animations[ 0 ];
+
+					createSizeAttribute( model.geometry );
+
+					var points = new THREE.Points( model.geometry, material );
+					points.position.y = - 3;
+					points.rotation.y = Math.PI / 2;
+					points.scale.multiplyScalar( 0.03 );
+
+					updateMorphTargets( points );
+
+					mixer = new THREE.AnimationMixer( points );
+
+					var action = mixer.clipAction( animation );
+					action.play();
+
+					scene.add( points );
+
+				} );
+
+			}
+
+			function update() {
+
+				if ( ! sizeAttribute || ! mixer ) return;
+
+				var delta = clock.getDelta();
+
+				time += delta * 5;
+
+				mixer.update( delta );
+
+				var count = sizeAttribute.count;
+
+				for ( var i = 0; i < count; i ++ ) {
+
+					sizeAttribute.array[ i ] = 0.75 + 0.5 * Math.sin( i + time );
+
+				}
+
+				sizeAttribute.needsUpdate = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function updateMorphTargets( points ) {
+
+				var geometry = points.geometry;
+				var m, ml, name;
+
+				var morphAttributes = geometry.morphAttributes;
+				var keys = Object.keys( morphAttributes );
+
+				if ( keys.length > 0 ) {
+
+					var morphAttribute = morphAttributes[ keys[ 0 ] ];
+
+					if ( morphAttribute !== undefined ) {
+
+						points.morphTargetInfluences = [];
+						points.morphTargetDictionary = {};
+
+						for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+
+							name = morphAttribute[ m ].name || String( m );
+
+							points.morphTargetInfluences.push( 0 );
+							points.morphTargetDictionary[ name ] = m;
+
+						}
+
+					}
+
+				}
+
+			}
+		</script>
+	</body>
+</html>
