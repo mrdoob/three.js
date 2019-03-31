@@ -66,9 +66,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	};
 
 	var uniformsChunk = {
-		outlineThickness: { type: "f", value: defaultThickness },
-		outlineColor: { type: "c", value: defaultColor },
-		outlineAlpha: { type: "f", value: defaultAlpha }
+		outlineThickness: { value: defaultThickness },
+		outlineColor: { value: defaultColor },
+		outlineAlpha: { value: defaultAlpha }
 	};
 
 	var vertexShaderChunk = [
