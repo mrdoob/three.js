@@ -215,7 +215,6 @@
 				composer.addPass( renderPass );
 
 				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
 				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );

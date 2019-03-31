@@ -134,8 +134,6 @@
 				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
 				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
-				effectCopy.renderToScreen = true;
-
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				var rtwidth = 512, rtheight = 512;
 

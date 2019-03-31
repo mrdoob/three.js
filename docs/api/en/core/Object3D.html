@@ -229,6 +229,8 @@
 		recursive -- if true, descendants of the object are also copied. Default is true.<br /><br />
 
 		Copy the given object into this object.
+
+		Note: event listeners and user-defined callbacks ([page:.onAfterRender] and [page:.onBeforeRender]) are not copied.
 		</p>
 
 		<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>

@@ -5,7 +5,7 @@
  *
  * Uniforms of a program.
  * Those form a tree structure with a special top-level container for the root,
- * which you get by calling 'new WebGLUniforms( gl, program, renderer )'.
+ * which you get by calling 'new WebGLUniforms( gl, program )'.
  *
  *
  * Properties of inner nodes including the top-level container:
@@ -16,15 +16,15 @@
  *
  * Methods of all nodes except the top-level container:
  *
- * .setValue( gl, value, [renderer] )
+ * .setValue( gl, value, [textures] )
  *
  * 		uploads a uniform value(s)
- *  	the 'renderer' parameter is needed for sampler uniforms
+ *  	the 'textures' parameter is needed for sampler uniforms
  *
  *
- * Static methods of the top-level container (renderer factorizations):
+ * Static methods of the top-level container (textures factorizations):
  *
- * .upload( gl, seq, values, renderer )
+ * .upload( gl, seq, values, textures )
  *
  * 		sets uniforms in 'seq' to 'values[id].value'
  *
@@ -33,15 +33,11 @@
  * 		filters 'seq' entries with corresponding entry in values
  *
  *
- * Methods of the top-level container (renderer factorizations):
+ * Methods of the top-level container (textures factorizations):
  *
- * .setValue( gl, name, value )
+ * .setValue( gl, name, value, textures )
  *
  * 		sets uniform with  name 'name' to 'value'
- *
- * .set( gl, obj, prop )
- *
- * 		sets uniform from object and property with same name than uniform
  *
  * .setOptional( gl, obj, prop )
  *
@@ -58,15 +54,6 @@ var emptyTexture = new Texture();
 var emptyTexture2dArray = new DataTexture2DArray();
 var emptyTexture3d = new DataTexture3D();
 var emptyCubeTexture = new CubeTexture();
-
-// --- Base for inner nodes (including the root) ---
-
-function UniformContainer() {
-
-	this.seq = [];
-	this.map = {};
-
-}
 
 // --- Utilities ---
 
@@ -144,7 +131,7 @@ function copyArray( a, b ) {
 
 // Texture unit allocation
 
-function allocTexUnits( renderer, n ) {
+function allocTexUnits( textures, n ) {
 
 	var r = arrayCacheI32[ n ];
 
@@ -156,7 +143,7 @@ function allocTexUnits( renderer, n ) {
 	}
 
 	for ( var i = 0; i !== n; ++ i )
-		r[ i ] = renderer.allocTextureUnit();
+		r[ i ] = textures.allocateTextureUnit();
 
 	return r;
 
@@ -376,10 +363,10 @@ function setValue4fm( gl, v ) {
 
 // Single texture (2D / Cube)
 
-function setValueT1( gl, v, renderer ) {
+function setValueT1( gl, v, textures ) {
 
 	var cache = this.cache;
-	var unit = renderer.allocTextureUnit();
+	var unit = textures.allocateTextureUnit();
 
 	if ( cache[ 0 ] !== unit ) {
 
@@ -388,14 +375,14 @@ function setValueT1( gl, v, renderer ) {
 
 	}
 
-	renderer.setTexture2D( v || emptyTexture, unit );
+	textures.safeSetTexture2D( v || emptyTexture, unit );
 
 }
 
-function setValueT2DArray1( gl, v, renderer ) {
+function setValueT2DArray1( gl, v, textures ) {
 
 	var cache = this.cache;
-	var unit = renderer.allocTextureUnit();
+	var unit = textures.allocateTextureUnit();
 
 	if ( cache[ 0 ] !== unit ) {
 
@@ -404,14 +391,14 @@ function setValueT2DArray1( gl, v, renderer ) {
 
 	}
 
-	renderer.setTexture2DArray( v || emptyTexture2dArray, unit );
+	textures.setTexture2DArray( v || emptyTexture2dArray, unit );
 
 }
 
-function setValueT3D1( gl, v, renderer ) {
+function setValueT3D1( gl, v, textures ) {
 
 	var cache = this.cache;
-	var unit = renderer.allocTextureUnit();
+	var unit = textures.allocateTextureUnit();
 
 	if ( cache[ 0 ] !== unit ) {
 
@@ -420,14 +407,14 @@ function setValueT3D1( gl, v, renderer ) {
 
 	}
 
-	renderer.setTexture3D( v || emptyTexture3d, unit );
+	textures.setTexture3D( v || emptyTexture3d, unit );
 
 }
 
-function setValueT6( gl, v, renderer ) {
+function setValueT6( gl, v, textures ) {
 
 	var cache = this.cache;
-	var unit = renderer.allocTextureUnit();
+	var unit = textures.allocateTextureUnit();
 
 	if ( cache[ 0 ] !== unit ) {
 
@@ -436,7 +423,7 @@ function setValueT6( gl, v, renderer ) {
 
 	}
 
-	renderer.setTextureCube( v || emptyCubeTexture, unit );
+	textures.safeSetTextureCube( v || emptyCubeTexture, unit );
 
 }
 
@@ -616,12 +603,12 @@ function setValueM4a( gl, v ) {
 
 // Array of textures (2D / Cube)
 
-function setValueT1a( gl, v, renderer ) {
+function setValueT1a( gl, v, textures ) {
 
 	var cache = this.cache;
 	var n = v.length;
 
-	var units = allocTexUnits( renderer, n );
+	var units = allocTexUnits( textures, n );
 
 	if ( arraysEqual( cache, units ) === false ) {
 
@@ -632,18 +619,18 @@ function setValueT1a( gl, v, renderer ) {
 
 	for ( var i = 0; i !== n; ++ i ) {
 
-		renderer.setTexture2D( v[ i ] || emptyTexture, units[ i ] );
+		textures.safeSetTexture2D( v[ i ] || emptyTexture, units[ i ] );
 
 	}
 
 }
 
-function setValueT6a( gl, v, renderer ) {
+function setValueT6a( gl, v, textures ) {
 
 	var cache = this.cache;
 	var n = v.length;
 
-	var units = allocTexUnits( renderer, n );
+	var units = allocTexUnits( textures, n );
 
 	if ( arraysEqual( cache, units ) === false ) {
 
@@ -654,7 +641,7 @@ function setValueT6a( gl, v, renderer ) {
 
 	for ( var i = 0; i !== n; ++ i ) {
 
-		renderer.setTextureCube( v[ i ] || emptyCubeTexture, units[ i ] );
+		textures.safeSetTextureCube( v[ i ] || emptyCubeTexture, units[ i ] );
 
 	}
 
@@ -730,18 +717,19 @@ function StructuredUniform( id ) {
 
 	this.id = id;
 
-	UniformContainer.call( this ); // mix-in
+	this.seq = [];
+	this.map = {};
 
 }
 
-StructuredUniform.prototype.setValue = function ( gl, value, renderer ) {
+StructuredUniform.prototype.setValue = function ( gl, value, textures ) {
 
 	var seq = this.seq;
 
 	for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
 		var u = seq[ i ];
-		u.setValue( gl, value[ u.id ], renderer );
+		u.setValue( gl, value[ u.id ], textures );
 
 	}
 
@@ -821,11 +809,10 @@ function parseUniform( activeInfo, addr, container ) {
 
 // Root Container
 
-function WebGLUniforms( gl, program, renderer ) {
+function WebGLUniforms( gl, program ) {
 
-	UniformContainer.call( this );
-
-	this.renderer = renderer;
+	this.seq = [];
+	this.map = {};
 
 	var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
@@ -840,11 +827,11 @@ function WebGLUniforms( gl, program, renderer ) {
 
 }
 
-WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
+WebGLUniforms.prototype.setValue = function ( gl, name, value, textures ) {
 
 	var u = this.map[ name ];
 
-	if ( u !== undefined ) u.setValue( gl, value, this.renderer );
+	if ( u !== undefined ) u.setValue( gl, value, textures );
 
 };
 
@@ -859,7 +846,7 @@ WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
 
 // Static interface
 
-WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
+WebGLUniforms.upload = function ( gl, seq, values, textures ) {
 
 	for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
@@ -869,7 +856,7 @@ WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
 		if ( v.needsUpdate !== false ) {
 
 			// note: always updating when .needsUpdate is undefined
-			u.setValue( gl, v.value, renderer );
+			u.setValue( gl, v.value, textures );
 
 		}
 

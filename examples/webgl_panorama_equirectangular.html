@@ -67,8 +67,6 @@
 				geometry.scale( - 1, 1, 1 );
 
 				var texture = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
-				texture.minFilter = THREE.LinearFilter;
-
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );

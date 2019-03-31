@@ -80,8 +80,8 @@
 
 		var pos = new THREE.Vector3();
 		var quat = new THREE.Quaternion();
-		var transformAux1 = new Ammo.btTransform();
-		var tempBtVec3_1 = new Ammo.btVector3( 0, 0, 0 );
+		var transformAux1;
+		var tempBtVec3_1;
 
 		var time = 0;
 
@@ -96,8 +96,14 @@
 
 		// - Main code -
 
-		init();
-		animate();
+		Ammo().then( function( AmmoLib ) {
+
+			Ammo = AmmoLib;
+
+			init();
+			animate();
+
+		} );
 
 
 		// - Functions -
@@ -183,6 +189,8 @@
 			physicsWorld = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
 			physicsWorld.setGravity( new Ammo.btVector3( 0, - gravityConstant, 0 ) );
 
+			transformAux1 = new Ammo.btTransform();
+			tempBtVec3_1 = new Ammo.btVector3( 0, 0, 0 );
 		}
 
 		function createObject( mass, halfExtents, pos, quat, material ) {

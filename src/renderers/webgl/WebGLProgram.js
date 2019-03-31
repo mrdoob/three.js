@@ -206,7 +206,7 @@ function unrollLoops( string ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities ) {
+function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities, textures ) {
 
 	var gl = renderer.context;
 
@@ -670,7 +670,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 		if ( cachedUniforms === undefined ) {
 
-			cachedUniforms = new WebGLUniforms( gl, program, renderer );
+			cachedUniforms = new WebGLUniforms( gl, program, textures );
 
 		}
 

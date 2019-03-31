@@ -183,8 +183,6 @@
 				var effectBloom = new THREE.BloomPass( 1.25 );
 				var effectFilm = new THREE.FilmPass( 0.35, 0.95, 2048, false );
 
-				effectFilm.renderToScreen = true;
-
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );
