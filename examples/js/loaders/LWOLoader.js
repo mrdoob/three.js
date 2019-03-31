@@ -1531,6 +1531,10 @@ THREE.LWOLoader = ( function () {
 
 						this.parseForm( length );
 
+					} else {
+
+						this.parseClip( length );
+
 					}
 					break;
 
