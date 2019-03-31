@@ -358,6 +358,12 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	}(),
 
 	add: function ( object ) {
+		
+		if ( object.parent === this ) {
+			
+		  return this;
+			
+		}
 
 		if ( arguments.length > 1 ) {
 
@@ -402,6 +408,12 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	},
 
 	remove: function ( object ) {
+		
+		if ( object.parent === null ) {
+			
+		  return this;
+			
+		}
 
 		if ( arguments.length > 1 ) {
 
