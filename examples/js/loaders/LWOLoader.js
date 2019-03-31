@@ -426,7 +426,7 @@ THREE.LWOLoader = ( function () {
 
 			var maps = {};
 
-			for ( name in textureNodes ) {
+			for ( var name in textureNodes ) {
 
 				var node = textureNodes[ name ];
 				var path = node.fileName;
@@ -1164,7 +1164,6 @@ THREE.LWOLoader = ( function () {
 					}
 					break;
 				case 'TRNL':
-				case 'REFL':
 				case 'GLOS':
 				case 'SHRP':
 				case 'RFOP':
@@ -1178,9 +1177,7 @@ THREE.LWOLoader = ( function () {
 				case 'GLOW':
 				case 'LINE':
 				case 'ALPH':
-				case 'LINE':
 				case 'VCOL':
-				case 'ENAB':
 					this.reader.skip( length );
 					break;
 				case 'SURF':
@@ -1487,7 +1484,6 @@ THREE.LWOLoader = ( function () {
 				// if break; is called directly, the position in the lwoTree is not created
 				// any sub chunks and forms are added to the parent form instead
 				case 'META':
-				case 'NNDS':
 				case 'NODS':
 				case 'NDTA':
 				case 'ADAT':
