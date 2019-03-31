@@ -359,12 +359,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	add: function ( object ) {
 
-		if ( object.parent === this ) {
-
-		  return this;
-
-		}
-
 		if ( arguments.length > 1 ) {
 
 			for ( var i = 0; i < arguments.length; i ++ ) {
@@ -374,6 +368,12 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			}
 
 			return this;
+
+		}
+
+		if ( object.parent === this ) {
+
+		  return this;
 
 		}
 
@@ -409,12 +409,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	remove: function ( object ) {
 
-		if ( object.parent === null ) {
-
-		  return this;
-
-		}
-
 		if ( arguments.length > 1 ) {
 
 			for ( var i = 0; i < arguments.length; i ++ ) {
@@ -424,6 +418,12 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			}
 
 			return this;
+
+		}
+
+		if ( object.parent === null ) {
+
+		  return this;
 
 		}
 
