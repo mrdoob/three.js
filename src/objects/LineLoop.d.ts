@@ -8,4 +8,7 @@ export class LineLoop extends Line {
     geometry?: Geometry | BufferGeometry,
     material?: Material | Material[]
   );
+
+  type: 'LineLoop';
+  isLineLoop: true;
 }

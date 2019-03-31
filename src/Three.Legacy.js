@@ -1371,42 +1371,36 @@ Object.assign( WebGLRenderer.prototype, {
 		this.clear( color, depth, stencil );
 
 	},
-
 	animate: function ( callback ) {
 
 		console.warn( 'THREE.WebGLRenderer: .animate() is now .setAnimationLoop().' );
 		this.setAnimationLoop( callback );
 
 	},
-
 	getCurrentRenderTarget: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
 		return this.getRenderTarget();
 
 	},
-
 	getMaxAnisotropy: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .getMaxAnisotropy() is now .capabilities.getMaxAnisotropy().' );
 		return this.capabilities.getMaxAnisotropy();
 
 	},
-
 	getPrecision: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .getPrecision() is now .capabilities.precision.' );
 		return this.capabilities.precision;
 
 	},
-
 	resetGLState: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .resetGLState() is now .state.reset().' );
 		return this.state.reset();
 
 	},
-
 	supportsFloatTextures: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
@@ -1484,6 +1478,26 @@ Object.assign( WebGLRenderer.prototype, {
 	setFaceCulling: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .setFaceCulling() has been removed.' );
+
+	},
+	allocTextureUnit: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .allocTextureUnit() has been removed.' );
+
+	},
+	setTexture: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .setTexture() has been removed.' );
+
+	},
+	setTexture2D: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .setTexture2D() has been removed.' );
+
+	},
+	setTextureCube: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .setTextureCube() has been removed.' );
 
 	}
 

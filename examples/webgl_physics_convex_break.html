@@ -238,6 +238,8 @@
 
 			removeRigidBody( object.userData.physicsBody );
 
+			transformAux1 = new Ammo.btTransform();
+			tempBtVec3_1 = new Ammo.btVector3( 0, 0, 0 );
 		}
 
 		function createBox( mass, halfExtents, pos, quat, material ) {
