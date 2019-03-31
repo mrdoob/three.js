@@ -8,6 +8,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author Lewy Blue / https://discoverthreejs.com/
  */
 
 function Points( geometry, material ) {
@@ -18,6 +19,8 @@ function Points( geometry, material ) {
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new PointsMaterial( { color: Math.random() * 0xffffff } );
+
+	this.updateMorphTargets();
 
 }
 
@@ -135,6 +138,46 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		};
 
 	}() ),
+
+	updateMorphTargets: function () {
+
+		var geometry = this.geometry;
+		var m, ml, name;
+
+		if ( ! geometry.isBufferGeometry && geometry.morphTargets !== undefined && geometry.morphTargets.length > 0 ) {
+
+			console.error( 'THREE.Mesh.updateMorphTargets() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+
+			return;
+
+		}
+
+		var morphAttributes = geometry.morphAttributes;
+		var keys = Object.keys( morphAttributes );
+
+		if ( keys.length > 0 ) {
+
+			var morphAttribute = morphAttributes[ keys[ 0 ] ];
+
+			if ( morphAttribute !== undefined ) {
+
+				this.morphTargetInfluences = [];
+				this.morphTargetDictionary = {};
+
+				for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+
+					name = morphAttribute[ m ].name || String( m );
+
+					this.morphTargetInfluences.push( 0 );
+					this.morphTargetDictionary[ name ] = m;
+
+				}
+
+			}
+
+		}
+
+	},
 
 	clone: function () {
 
