@@ -78,19 +78,6 @@ function WebXRManager( renderer ) {
 	this.setDevice = function ( value ) {
 
 		if ( value !== undefined ) device = value;
-		if ( value instanceof XRDevice ) {
-
-			if ( gl.setCompatibleXRDevice !== undefined ) {
-
-				gl.setCompatibleXRDevice( value );
-
-			} else {
-
-				gl.makeXRCompatible();
-
-			}
-
-		}
 
 	};
 
@@ -115,11 +102,6 @@ function WebXRManager( renderer ) {
 
 		frameOfReference = value;
 
-		if ( session.baseLayer && session.baseLayer.framebuffer ) {
-
-			renderer.setFramebuffer( session.baseLayer.framebuffer );
-
-		}
 		animation.setContext( session );
 		animation.start();
 
@@ -148,28 +130,9 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			if ( session.updateRenderState !== undefined ) {
+			session.updateRenderState( {  baseLayer:  new XRWebGLLayer( session, gl ) } );
 
-				session.updateRenderState( {  baseLayer:  new XRWebGLLayer( session, gl ) } );
-
-			} else {
-
-				session.baseLayer =  new XRWebGLLayer( session, gl, {  framebufferScaleFactor: framebufferScaleFactor } );
-
-			}
-
-			if ( session.requestFrameOfReference !== undefined ) {
-
-				session.requestFrameOfReference( frameOfReferenceType ).then( onRequestFrameOfReference );
-
-			} else {
-
-				session.requestReferenceSpace( {
-					type: 'stationary',
-					subtype: 'eye-level'
-				} ).then( onRequestFrameOfReference );
-
-			}
+			session.requestReferenceSpace( { type: 'stationary', subtype: 'eye-level' } ).then( onRequestFrameOfReference );
 
 			//
 
@@ -254,24 +217,22 @@ function WebXRManager( renderer ) {
 
 	function onAnimationFrame( time, frame ) {
 
-		pose = frame.getDevicePose !== undefined ? frame.getDevicePose( frameOfReference ) : frame.getViewerPose( frameOfReference );
+		let session = frame.session;
+
+		pose = frame.getViewerPose( frameOfReference );
 
 		if ( pose !== null ) {
 
-			var layer = 'renderState' in session ? session.renderState.baseLayer : session.baseLayer;
-			var views = frame.views || pose.views;
+			var layer = session.renderState.baseLayer;
+			var views = pose.views;
 
-			if ( 'renderState' in session ) {
-
-				renderer.setFramebuffer( session.renderState.baseLayer.framebuffer );
-
-			}
+			renderer.setFramebuffer( session.renderState.baseLayer.framebuffer );
 
 			for ( var i = 0; i < views.length; i ++ ) {
 
 				var view = views[ i ];
 				var viewport = layer.getViewport( view );
-				var viewMatrix = view.viewMatrix || pose.getViewMatrix( view );
+				var viewMatrix = view.transform.inverse().matrix;
 
 				var camera = cameraVR.cameras[ i ];
 				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
@@ -298,21 +259,12 @@ function WebXRManager( renderer ) {
 
 			if ( inputSource ) {
 
-				var inputPose = frame.getInputPose( inputSource, frameOfReference );
+				var inputPose = frame.getPose( inputSource.targetRaySpace, frameOfReference );
 
 				if ( inputPose !== null ) {
 
-					if ( 'targetRay' in inputPose ) {
-
-						controller.matrix.elements = inputPose.targetRay.transformMatrix;
-
-					} else if ( 'pointerMatrix' in inputPose ) {
-
-						// DEPRECATED
-
-						controller.matrix.elements = inputPose.pointerMatrix;
-
-					}
+					let targetRay = new XRRay(inputPose.transform);
+					controller.matrix.elements = targetRay.matrix;
 
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 					controller.visible = true;
