@@ -37,7 +37,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> Click on a box to toggle bloom
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> Click on a box to toggle bloom<br>By <a href="http://github.com/Temdog007" target="_blank" rel="noopener">Temdog007</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -74,21 +74,24 @@
 
 			varying vec2 vUv;
 
-			bool isVisible(vec4 color)
-			{
+			bool isVisible(vec4 color) {
+
 				return color.a < 1.0 || color.r > 0.0;
+
 			}
 
-			vec4 getTexture(sampler2D texture)
-			{
-				return mapTexelToLinear(texture2D(texture, vUv));
+			vec4 getTexture( sampler2D texture ) {
+
+				return mapTexelToLinear( texture2D( texture , vUv ) );
+
 			}
 
 			void main() {
 
-				vec4 mask = getTexture(maskTexture);
-				vec4 texel = getTexture(baseTexture);
-				gl_FragColor = isVisible(mask) ? (texel + vec4(1.0) * getTexture(glowTexture)) : texel;
+				vec4 mask = getTexture( maskTexture );
+				vec4 texel = getTexture( baseTexture );
+				gl_FragColor = isVisible( mask ) ? ( texel + vec4( 1.0 ) * getTexture( glowTexture ) ) : texel;
+
 			}
 
 		</script>
@@ -101,22 +104,22 @@
 			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
 
 			var bloomLayer = new THREE.Layers();
-			bloomLayer.set(BLOOM_SCENE);
+			bloomLayer.set( BLOOM_SCENE );
 
 			var params = {
 				exposure: 1,
 				bloomStrength: 1.5,
 				bloomThreshold: 0,
 				bloomRadius: 0,
-				rows : 6,
-				columns : 6,
-				size : 2,
-				cameraAngle : Math.PI * 0.5,
-				scene : "Scene with Glow"
+				rows: 6,
+				columns: 6,
+				size: 2,
+				cameraAngle: Math.PI * 0.5,
+				scene: "Scene with Glow"
 			};
 
-			var lightMaterial = new THREE.MeshBasicMaterial({color : "red"});
-			var darkMaterial = new THREE.MeshBasicMaterial({color : "blue"});
+			var lightMaterial = new THREE.MeshBasicMaterial( { color: "red" } );
+			var darkMaterial = new THREE.MeshBasicMaterial( { color: "blue" } );
 			var materials = {};
 
 			var container = document.getElementById( 'container' );
@@ -128,13 +131,13 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.toneMapping = THREE.ReinhardToneMapping;
-			document.body.appendChild(renderer.domElement);
+			document.body.appendChild( renderer.domElement );
 
 			scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 0, 0, 30 );
-			camera.lookAt(0,0,0);
+			camera.lookAt( 0, 0, 0 );
 			camera.updateProjectionMatrix();
 
 			scene.add( new THREE.AmbientLight( 0x404040 ) );
@@ -146,34 +149,34 @@
 				magFilter: THREE.LinearFilter,
 				format: THREE.RGBAFormat,
 				stencilBuffer: false
-			});
+			} );
 
 			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
 
-			var bloomComposer = new THREE.EffectComposer( renderer);
+			var bloomComposer = new THREE.EffectComposer( renderer );
 			bloomComposer.renderToScreen = false;
 			bloomComposer.setSize( window.innerWidth, window.innerHeight );
 			bloomComposer.addPass( renderScene );
 			bloomComposer.addPass( bloomPass );
 
 			var finalPass = new THREE.ShaderPass(
-				new THREE.ShaderMaterial({
-					uniforms : {
-						baseTexture : {value : null}, 
-						glowTexture: { value : bloomComposer.renderTarget2.texture},
-						maskTexture: {value : maskRenderTarget.texture}
+				new THREE.ShaderMaterial( {
+					uniforms: {
+						baseTexture: { value: null },
+						glowTexture: { value: bloomComposer.renderTarget2.texture },
+						maskTexture: { value: maskRenderTarget.texture }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 					defines: {}
-				}), "baseTexture"
+				} ), "baseTexture"
 			);
 			finalPass.needsSwap = true;
 
-			var finalComposer = new THREE.EffectComposer( renderer);
+			var finalComposer = new THREE.EffectComposer( renderer );
 			finalComposer.setSize( window.innerWidth, window.innerHeight );
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( finalPass );
@@ -184,14 +187,14 @@
 
 			var mouse = new THREE.Vector2();
 
-			window.addEventListener('click', onDocumentMouseClick, false);
+			window.addEventListener( 'click', onDocumentMouseClick, false );
 
 			var gui = new dat.GUI();
 
-			gui.add(params, 'scene', ['Scene with Glow', 'Glow only', 'Mask only', 'Scene only']).onChange(function(value)
-			{
-				switch(value)
-				{
+			gui.add( params, 'scene', [ 'Scene with Glow', 'Glow only', 'Mask only', 'Scene only' ] ).onChange( function ( value ) {
+
+				switch ( value ) 	{
+
 					case 'Scene with Glow':
 						bloomComposer.renderToScreen = false;
 						break;
@@ -202,10 +205,13 @@
 					case 'Mask only':
 						// nothing to do
 						break;
-				}
-			});
 
-			var folder = gui.addFolder('Bloom Parameters');
+				}
+
+			} );
+
+
+			var folder = gui.addFolder( 'Bloom Parameters' );
 
 			folder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
@@ -231,23 +237,24 @@
 
 			} );
 
-			folder = gui.addFolder('Object parameters');
+			folder = gui.addFolder( 'Object parameters' );
 
-			folder.add( params, 'rows', 1, 20 ).step(1).onChange( setupBoxes );
+			folder.add( params, 'rows', 1, 20 ).step( 1 ).onChange( setupBoxes );
 
-			folder.add( params, 'columns', 1, 20 ).step(1).onChange( setupBoxes);
+			folder.add( params, 'columns', 1, 20 ).step( 1 ).onChange( setupBoxes );
 
-			folder.add( params, 'size', 0.1, 3 ).onChange( setupBoxes);
+			folder.add( params, 'size', 0.1, 3 ).onChange( setupBoxes );
 
-			folder = gui.addFolder('Camera Position');
+			folder = gui.addFolder( 'Camera Position' );
 
-			folder.add(params, 'cameraAngle', 0, Math.PI * 2).step(0.001).onChange(function(value)
-			{
-				camera.position.x = Math.cos(value) * 30;
-				camera.position.z = Math.sin(value) * 30;
-				camera.lookAt(0,0,0);
+			folder.add( params, 'cameraAngle', 0, Math.PI * 2 ).step( 0.001 ).onChange( function ( value ) {
+
+				camera.position.x = Math.cos( value ) * 30;
+				camera.position.z = Math.sin( value ) * 30;
+				camera.lookAt( 0, 0, 0 );
 				camera.updateProjectionMatrix();
-			})
+
+			} );
 
 			animate();
 
@@ -258,13 +265,15 @@
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-				raycaster.setFromCamera(mouse, camera);
-				var intersects = raycaster.intersectObjects(scene.children);
-				if(intersects.length > 0)
-				{
-					var object = intersects[0].object;
-					object.layers.toggle(BLOOM_SCENE);
+				raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( scene.children );
+				if ( intersects.length > 0 ) {
+
+					var object = intersects[ 0 ].object;
+					object.layers.toggle( BLOOM_SCENE );
+
 				}
+
 			}
 
 			window.onresize = function () {
@@ -277,30 +286,34 @@
 
 				renderer.setSize( width, height );
 
-				maskRenderTarget.setSize( width, height);
+				maskRenderTarget.setSize( width, height );
 
 				bloomComposer.setSize( width, height );
-				finalComposer.setSize(width, height);
+				finalComposer.setSize( width, height );
+
 			};
 
-			function setupBoxes()
-			{
+			function setupBoxes() {
+
 				var columns = params.columns;
 				var rows = params.rows;
 				var size = params.size;
 				scene.children.length = 0;
-				for(var x = -columns * size / 2; x < columns * size / 2; x += size)
-				{
-					for(var y = -rows * size / 2; y < rows * size / 2; y += size)
-					{
-						var box = new THREE.Mesh(new THREE.BoxBufferGeometry(size,size,size), new THREE.MeshBasicMaterial({
-							color: Math.floor(Math.random() * 0xffffff)
-						}));
-						box.position.set(x,y,0);
-						scene.add(box);
-						if(Math.random() < 0.5) box.layers.enable(BLOOM_SCENE);
+				for ( var x = - columns * size / 2; x < columns * size / 2; x += size ) {
+
+					for ( var y = - rows * size / 2; y < rows * size / 2; y += size ) {
+
+						var box = new THREE.Mesh( new THREE.BoxBufferGeometry( size, size, size ), new THREE.MeshBasicMaterial( {
+							color: Math.floor( Math.random() * 0xffffff )
+						} ) );
+						box.position.set( x, y, 0 );
+						scene.add( box );
+						if ( Math.random() < 0.5 ) box.layers.enable( BLOOM_SCENE );
+
 					}
+
 				}
+
 			}
 
 			function animate() {
@@ -309,17 +322,17 @@
 
 				stats.update();
 
-				switch(params.scene)
-				{
-					case 'Glow only':
-						renderBloom();
-						break;
+				switch ( params.scene ) {
+
 					case 'Mask only':
-						renderMask(null);
+						renderMask( null );
 						break;
 					case 'Scene only':
-						renderer.setRenderTarget(null);
-						renderer.render(scene, camera);
+						renderer.setRenderTarget( null );
+						renderer.render( scene, camera );
+						break;
+					case 'Glow only':
+						renderBloom();
 						break;
 					case 'Scene with Glow':
 					default:
@@ -327,46 +340,55 @@
 						renderBloom();
 
 						// render scene masked
-						renderMask(maskRenderTarget);
-						
+						renderMask( maskRenderTarget );
+
 						// render the entire scene
 						// render bloom on top of scene but only where isn't masked
 						finalComposer.render();
 						break;
+
 				}
+
 			}
 
-			function renderBloom()
-			{
-				camera.layers.set(BLOOM_SCENE);
+			function renderBloom() {
+
+				camera.layers.set( BLOOM_SCENE );
 				bloomComposer.render();
+
 			}
 
-			function renderMask(renderTarget)
-			{
-				camera.layers.set(ENTIRE_SCENE);
-				scene.traverse(maskMaterial);
-				renderer.setRenderTarget(renderTarget);
-				renderer.render(scene, camera);
-				scene.traverse(restoreMaterial);
+			function renderMask( renderTarget ) {
+
+				camera.layers.set( ENTIRE_SCENE );
+				scene.traverse( maskMaterial );
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( scene, camera );
+				scene.traverse( restoreMaterial );
+
 			}
 
-			function maskMaterial(obj)
-			{
-				if(obj.isMesh)
-				{
-					materials[obj.uuid] = obj.material;
-					obj.material = bloomLayer.test(obj.layers) ? lightMaterial : darkMaterial;
+			function maskMaterial( obj ) {
+
+				if ( obj.isMesh ) {
+
+					materials[ obj.uuid ] = obj.material;
+					obj.material = bloomLayer.test( obj.layers ) ? lightMaterial : darkMaterial;
+
 				}
+
 			}
 
-			function restoreMaterial(obj)
-			{
-				if(obj.isMesh)
-				{
-					obj.material = materials[obj.uuid];
+			function restoreMaterial( obj ) {
+
+				if ( obj.isMesh ) {
+
+					obj.material = materials[ obj.uuid ];
+
 				}
+
 			}
+
 
 		</script>
 
