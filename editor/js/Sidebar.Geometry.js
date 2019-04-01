@@ -179,11 +179,8 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-			if ( geometry.boundingSphere === null ) {
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-				geometry.computeBoundingSphere();
-
-			}
 			geometryBoundingSphere.setValue( Math.floor( geometry.boundingSphere.radius * 1000 ) / 1000 );
 
 		} else {
