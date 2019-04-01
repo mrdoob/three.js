@@ -365,6 +365,40 @@ and we get labels where the text is centered and scaled to fit
 
 {{{example url="../threejs-canvas-textured-labels-scale-to-fit.html" }}}
 
+Above we used a new canvas for each texture. Whether or not to use a 
+canvas per texture is up to you. If you need to up them often then 
+having one canvas per texture is probably the best option. If they are
+rarely or never updated then you can choose to use a single canvas
+for multiple textures by calling `WebGLRenderer.setTexture2D`.
+Let's change the code above to do just that.
+
+```js
++const ctx = document.createElement('canvas').getContext('2d');
+
+function makeLabelCanvas(baseWidth, size, name) {
+  const borderSize = 2;
+-  const ctx = document.createElement('canvas').getContext('2d');
+  const font =  `${size}px bold sans-serif`;
+
+  ...
+
+}
+
+function makePerson(x, labelWidth, size, name, color) {
+  const canvas = makeLabelCanvas(labelWidth, size, name);
+  const texture = new THREE.CanvasTexture(canvas);
+  // because our canvas is likely not a power of 2
+  // in both dimensions set the filtering appropriately.
+  texture.minFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
++  renderer.setTexture2D(texture, 0);
+
+  ...
+```
+
+{{{example url="../threejs-canvas-textured-labels-one-canvas.html" }}}
+
 Another issue is that the labels don't always face the camera. If you're using 
 labels as badges that's probably a good thing. If you're using labels to put
 names over players in a 3D game maybe you want the labels to always face the camera.
