@@ -37,11 +37,9 @@
 
 		<script>
 
-			var container, stats;
+			var camera, scene, renderer, stats;
 
-			var camera, scene, renderer;
-
-			var mesh, geometry, sphere;
+			var sphere;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -56,19 +54,16 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				sphere = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
+				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
 				scene.add( sphere );
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 100, 12 );
+				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
 				geometry.rotateX( Math.PI / 2 );
 
 				var material = new THREE.MeshNormalMaterial();
@@ -84,15 +79,13 @@
 
 				}
 
-				scene.matrixAutoUpdate = false;
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -112,7 +105,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;

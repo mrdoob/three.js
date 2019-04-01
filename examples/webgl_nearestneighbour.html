@@ -31,7 +31,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - typed arrays - nearest neighbour for 500,000 sprites</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/TypedArrayUtils.js"></script>
+		<script src="js/utils/TypedArrayUtils.js"></script>
 		<script src="js/controls/FirstPersonControls.js"></script>
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -76,12 +76,9 @@
 
 			var amountOfParticles = 500000, maxDistance = Math.pow( 120, 2 );
 			var positions, alphas, particles, _particleGeom;
+			var kdtree;
 
 			var clock = new THREE.Clock();
-
-			var blocker = document.getElementById( 'blocker' );
-			var instructions = document.getElementById( 'instructions' );
-
 
 			function init() {
 
@@ -92,6 +89,9 @@
 				controls = new THREE.FirstPersonControls( camera );
 				controls.movementSpeed = 100;
 				controls.lookSpeed = 0.1;
+
+				controls.lookAt( 500, 500, 500 );
+
 
 				// add a skybox background
 				var cubeTextureLoader = new THREE.CubeTextureLoader();
@@ -108,7 +108,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer(); // Detector.webgl? new THREE.WebGLRenderer(): new THREE.CanvasRenderer()
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -127,7 +127,7 @@
 						tex1: { value: imagePreviewTexture },
 						zoom: { value: 9.0 }
 					},
-					vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 					transparent: true
 				} );
@@ -136,7 +136,7 @@
 				//create particles with buffer geometry
 				var distanceFunction = function ( a, b ) {
 
-					return Math.pow( a[ 0 ] - b [0 ], 2 ) +  Math.pow( a[ 1 ] - b[ 1 ], 2 ) +  Math.pow( a[ 2 ] - b[ 2 ], 2 );
+					return Math.pow( a[ 0 ] - b[ 0 ], 2 ) + Math.pow( a[ 1 ] - b[ 1 ], 2 ) + Math.pow( a[ 2 ] - b[ 2 ], 2 );
 
 				};
 
@@ -182,6 +182,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				controls.handleResize();
+
 			}
 
 			function animate() {

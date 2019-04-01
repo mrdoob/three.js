@@ -21,13 +21,12 @@ var APP = {
 		this.load = function ( json ) {
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.gammaOutput = true;
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 
 			var project = json.project;
 
-			if ( project.gammaInput ) renderer.gammaInput = true;
-			if ( project.gammaOutput ) renderer.gammaOutput = true;
 			if ( project.shadows ) renderer.shadowMap.enabled = true;
 			if ( project.vr ) renderer.vr.enabled = true;
 
@@ -113,18 +112,7 @@ var APP = {
 
 			if ( renderer.vr.enabled ) {
 
-				WEBVR.checkAvailability().catch( function( message ) {
-
-					dom.appendChild( WEBVR.getMessageContainer( message ) );
-
-				} );
-
-				WEBVR.getVRDisplay( function ( device ) {
-
-					renderer.vr.setDevice( device );
-					dom.appendChild( WEBVR.getButton( device, renderer.domElement ) );
-
-				} );
+				dom.appendChild( WEBVR.createButton( renderer ) );
 
 			}
 
@@ -166,9 +154,11 @@ var APP = {
 
 		}
 
-		var prevTime;
+		var time, prevTime;
 
-		function animate( time ) {
+		function animate() {
+
+			time = performance.now();
 
 			try {
 
@@ -201,7 +191,7 @@ var APP = {
 
 			dispatch( events.start, arguments );
 
-			renderer.animate( animate );
+			renderer.setAnimationLoop( animate );
 
 		};
 
@@ -218,7 +208,7 @@ var APP = {
 
 			dispatch( events.stop, arguments );
 
-			renderer.animate( null );
+			renderer.setAnimationLoop( null );
 
 		};
 

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">A point's [link:https://en.wikipedia.org/wiki/Spherical_coordinate_system spherical coordinates].</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>
+		<p>
+		[page:Float radius] - the radius, or the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
+		(straight-line distance) from the point to the origin. Default is *1.0*.<br />
+		[page:Float phi] - polar angle from the y (up) axis. Default is *0*.<br />
+		[page:Float theta] - equator angle around the y (up) axis. Default is *0*.<br /><br />
+
+		The poles (phi) are at the positive and negative y axis. The equator (theta) starts at positive z.
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float radius]</h3>
+
+		<h3>[property:Float phi]</h3>
+
+		<h3>[property:Float theta]</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Spherical clone]()</h3>
+		<p>
+		Returns a new spherical with the same [page:.radius radius], [page:.phi phi]
+		and [page:.theta theta] properties as this one.
+		</p>
+
+		<h3>[method:Spherical copy]( [param:Spherical s] )</h3>
+		<p>
+			Copies the values of the passed Spherical's [page:.radius radius], [page:.phi phi]
+			and [page:.theta theta] properties to this spherical.
+		</p>
+
+		<h3>[method:Spherical makeSafe]()</h3>
+		<p>
+		Restricts the polar angle [page:.phi phi] to be between 0.000001 and pi - 0.000001.
+		</p>
+
+		<h3>[method:Spherical set]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>
+		<p>Sets values of this spherical's [page:.radius radius], [page:.phi phi]
+		and [page:.theta theta] properties.</p>
+
+		<h3>[method:Spherical setFromVector3]( [param:Vector3 vec3] )</h3>
+		<p>
+			Sets values of this spherical's [page:.radius radius], [page:.phi phi]
+			and [page:.theta theta] properties from the [page:Vector3 Vector3].
+		</p>
+
+		<h3>[method:Spherical setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			Sets values of this spherical's [page:.radius radius], [page:.phi phi]
+			and [page:.theta theta] properties from Cartesian coordinates.
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

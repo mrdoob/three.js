@@ -22,7 +22,7 @@
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
-
+				box-sizing: border-box;
 			}
 
 			a {
@@ -32,29 +32,27 @@
 	</head>
 
 	<body>
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls example
 		</div>
 
 		<script src="../build/three.js"></script>
-
 		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var stats;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, controls, scene, renderer;
 
 			init();
-			render(); // remove when using next line for animation loop (requestAnimationFrame)
-			//animate();
+			//render(); // remove when using next line for animation loop (requestAnimationFrame)
+			animate();
 
 			function init() {
 
@@ -62,34 +60,41 @@
 				scene.background = new THREE.Color( 0xcccccc );
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				var container = document.getElementById( 'container' );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 500;
+				camera.position.set( 400, 200, 0 );
+
+				// controls
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // remove when using animation loop
-				// enable animation loop when using damping or autorotation
-				//controls.enableDamping = true;
-				//controls.dampingFactor = 0.25;
-				controls.enableZoom = false;
+
+				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+
+				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+				controls.dampingFactor = 0.25;
+
+				controls.screenSpacePanning = false;
+
+				controls.minDistance = 100;
+				controls.maxDistance = 500;
+
+				controls.maxPolarAngle = Math.PI / 2;
 
 				// world
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
+					mesh.position.x = Math.random() * 1600 - 800;
+					mesh.position.y = 0;
+					mesh.position.z = Math.random() * 1600 - 800;
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
 					scene.add( mesh );
@@ -103,16 +108,11 @@
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( -1, -1, -1 );
+				light.position.set( - 1, - 1, - 1 );
 				scene.add( light );
 
 				var light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				//
 
@@ -133,9 +133,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
-
-				stats.update();
+				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
 				render();
 

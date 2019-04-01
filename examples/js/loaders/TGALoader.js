@@ -22,6 +22,7 @@ THREE.TGALoader.prototype = {
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
 
 		loader.load( url, function ( buffer ) {
 
@@ -521,7 +522,9 @@ THREE.TGALoader.prototype = {
 
 		//
 
-		var canvas = document.createElement( 'canvas' );
+		var useOffscreen = typeof OffscreenCanvas !== 'undefined';
+
+		var canvas = useOffscreen ? new OffscreenCanvas( header.width, header.height ) : document.createElement( 'canvas' );
 		canvas.width = header.width;
 		canvas.height = header.height;
 
@@ -533,7 +536,14 @@ THREE.TGALoader.prototype = {
 
 		context.putImageData( imageData, 0, 0 );
 
-		return canvas;
+		return useOffscreen ? canvas.transferToImageBitmap() : canvas;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 

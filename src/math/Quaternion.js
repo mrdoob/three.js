@@ -1,11 +1,11 @@
-import { Vector3 } from './Vector3.js';
-
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://clara.io
  */
+
+import { _Math } from './Math.js';
 
 function Quaternion( x, y, z, w ) {
 
@@ -161,6 +161,8 @@ Object.defineProperties( Quaternion.prototype, {
 } );
 
 Object.assign( Quaternion.prototype, {
+
+	isQuaternion: true,
 
 	set: function ( x, y, z, w ) {
 
@@ -347,55 +349,74 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
-	setFromUnitVectors: function () {
+	setFromUnitVectors: function ( vFrom, vTo ) {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		var v1 = new Vector3();
-		var r;
-
 		var EPS = 0.000001;
 
-		return function setFromUnitVectors( vFrom, vTo ) {
+		var r = vFrom.dot( vTo ) + 1;
 
-			if ( v1 === undefined ) v1 = new Vector3();
+		if ( r < EPS ) {
 
-			r = vFrom.dot( vTo ) + 1;
+			r = 0;
 
-			if ( r < EPS ) {
+			if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
 
-				r = 0;
-
-				if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
-
-					v1.set( - vFrom.y, vFrom.x, 0 );
-
-				} else {
-
-					v1.set( 0, - vFrom.z, vFrom.y );
-
-				}
+				this._x = - vFrom.y;
+				this._y = vFrom.x;
+				this._z = 0;
+				this._w = r;
 
 			} else {
 
-				v1.crossVectors( vFrom, vTo );
+				this._x = 0;
+				this._y = - vFrom.z;
+				this._z = vFrom.y;
+				this._w = r;
 
 			}
 
-			this._x = v1.x;
-			this._y = v1.y;
-			this._z = v1.z;
+		} else {
+
+			// crossVectors( vFrom, vTo ); // inlined to avoid cyclic dependency on Vector3
+
+			this._x = vFrom.y * vTo.z - vFrom.z * vTo.y;
+			this._y = vFrom.z * vTo.x - vFrom.x * vTo.z;
+			this._z = vFrom.x * vTo.y - vFrom.y * vTo.x;
 			this._w = r;
 
-			return this.normalize();
+		}
 
-		};
+		return this.normalize();
 
-	}(),
+	},
+
+	angleTo: function ( q ) {
+
+		return 2 * Math.acos( Math.abs( _Math.clamp( this.dot( q ), - 1, 1 ) ) );
+
+	},
+
+	rotateTowards: function ( q, step ) {
+
+		var angle = this.angleTo( q );
+
+		if ( angle === 0 ) return this;
+
+		var t = Math.min( 1, step / angle );
+
+		this.slerp( q, t );
+
+		return this;
+
+	},
 
 	inverse: function () {
 
-		return this.conjugate().normalize();
+		// quaternion is assumed to have unit length
+
+		return this.conjugate();
 
 	},
 
@@ -531,19 +552,21 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
+		var sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
 
-		if ( Math.abs( sinHalfTheta ) < 0.001 ) {
+		if ( sqrSinHalfTheta <= Number.EPSILON ) {
 
-			this._w = 0.5 * ( w + this._w );
-			this._x = 0.5 * ( x + this._x );
-			this._y = 0.5 * ( y + this._y );
-			this._z = 0.5 * ( z + this._z );
+			var s = 1 - t;
+			this._w = s * w + t * this._w;
+			this._x = s * x + t * this._x;
+			this._y = s * y + t * this._y;
+			this._z = s * z + t * this._z;
 
-			return this;
+			return this.normalize();
 
 		}
 
+		var sinHalfTheta = Math.sqrt( sqrSinHalfTheta );
 		var halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
 		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
 			ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;

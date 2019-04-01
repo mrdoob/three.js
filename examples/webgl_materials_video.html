@@ -17,9 +17,7 @@
 				text-align:center;
 			}
 
-			a {
-				color:#0078ff;
-			}
+			a { color:#0078ff; }
 
 			#info {
 				color:#fff;
@@ -28,9 +26,51 @@
 				z-index:100;
 			}
 
+			#overlay {
+				position: absolute;
+				z-index: 1;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 1;
+				background-color: #000000;
+				color: #ffffff;
+			}
+
+			#overlay > div {
+				text-align: center;
+			}
+
+			#overlay > div > button {
+				height: 20px;
+				width: 100px;
+				background: transparent;
+				color: #ffffff;
+				outline: 1px solid #ffffff;
+				border: 0px;
+				cursor: pointer;
+			}
+
+			#overlay > div > p {
+				color: #777777;
+				font-size: 12px;
+			}
+
 		</style>
 	</head>
 	<body>
+
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Automatic video playback with audio requires a user interaction.</p>
+			</div>
+		</div>
+		<div id="container"></div>
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo. playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
@@ -47,16 +87,20 @@
 		<script src="js/postprocessing/BloomPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
-		<video id="video" autoplay loop webkit-playsinline style="display:none">
-			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+		<video id="video" loop crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
+			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		</video>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
@@ -80,10 +124,18 @@
 				xgrid = 20,
 				ygrid = 10;
 
-			init();
-			animate();
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
+
+				init();
+				animate();
+
+			}, false );
 
 			function init() {
+
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -97,17 +149,15 @@
 				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
+				video.play();
 
 				texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.format = THREE.RGBFormat;
 
 				//
 
@@ -126,42 +176,42 @@
 				cube_count = 0;
 
 				for ( i = 0; i < xgrid; i ++ )
-				for ( j = 0; j < ygrid; j ++ ) {
+					for ( j = 0; j < ygrid; j ++ ) {
 
-					ox = i;
-					oy = j;
+						ox = i;
+						oy = j;
 
-					geometry = new THREE.BoxGeometry( xsize, ysize, xsize );
+						geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
 
-					change_uvs( geometry, ux, uy, ox, oy );
+						change_uvs( geometry, ux, uy, ox, oy );
 
-					materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
+						materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
 
-					material = materials[ cube_count ];
+						material = materials[ cube_count ];
 
-					material.hue = i/xgrid;
-					material.saturation = 1 - j/ygrid;
+						material.hue = i / xgrid;
+						material.saturation = 1 - j / ygrid;
 
-					material.color.setHSL( material.hue, material.saturation, 0.5 );
+						material.color.setHSL( material.hue, material.saturation, 0.5 );
 
-					mesh = new THREE.Mesh( geometry, material );
+						mesh = new THREE.Mesh( geometry, material );
 
-					mesh.position.x =   ( i - xgrid/2 ) * xsize;
-					mesh.position.y =   ( j - ygrid/2 ) * ysize;
-					mesh.position.z = 0;
+						mesh.position.x = ( i - xgrid / 2 ) * xsize;
+						mesh.position.y = ( j - ygrid / 2 ) * ysize;
+						mesh.position.z = 0;
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+						mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 
-					scene.add( mesh );
+						scene.add( mesh );
 
-					mesh.dx = 0.001 * ( 0.5 - Math.random() );
-					mesh.dy = 0.001 * ( 0.5 - Math.random() );
+						mesh.dx = 0.001 * ( 0.5 - Math.random() );
+						mesh.dy = 0.001 * ( 0.5 - Math.random() );
 
-					meshes[ cube_count ] = mesh;
+						meshes[ cube_count ] = mesh;
 
-					cube_count += 1;
+						cube_count += 1;
 
-				}
+					}
 
 				renderer.autoClear = false;
 
@@ -172,8 +222,6 @@
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 1.3 );
 				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
-
-				effectCopy.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
@@ -202,27 +250,19 @@
 
 			function change_uvs( geometry, unitx, unity, offsetx, offsety ) {
 
-				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+				var uvs = geometry.attributes.uv.array;
 
-				for ( var i = 0; i < faceVertexUvs.length; i ++ ) {
+				for ( var i = 0; i < uvs.length; i += 2 ) {
 
-					var uvs = faceVertexUvs[ i ];
-
-					for ( var j = 0; j < uvs.length; j ++ ) {
-
-						var uv = uvs[ j ];
-
-						uv.x = ( uv.x + offsetx ) * unitx;
-						uv.y = ( uv.y + offsety ) * unity;
-
-					}
+					uvs[ i ] = ( uvs[ i ] + offsetx ) * unitx;
+					uvs[ i + 1 ] = ( uvs[ i + 1 ] + offsety ) * unity;
 
 				}
 
 			}
 
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY ) * 0.3;
@@ -282,8 +322,8 @@
 
 						mesh = meshes[ i ];
 
-						mesh.dx *= -1;
-						mesh.dy *= -1;
+						mesh.dx *= - 1;
+						mesh.dy *= - 1;
 
 					}
 

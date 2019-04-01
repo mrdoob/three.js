@@ -14,7 +14,9 @@ function Group() {
 
 Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: Group
+	constructor: Group,
+
+	isGroup: true
 
 } );
 

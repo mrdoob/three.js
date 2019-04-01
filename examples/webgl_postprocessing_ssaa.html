@@ -53,7 +53,7 @@
 		<script>
 
 			var camera, scene, renderer, composer, copyPass, ssaaRenderPass;
-			var gui, stats, texture;
+			var gui, stats;
 
 			var param = {
 				sampleLevel: 2
@@ -87,7 +87,7 @@
 
 				var container = document.getElementById( "container" );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -100,7 +100,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.BoxGeometry( 120, 120, 120 );
+				var geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
 				var mesh = new THREE.Mesh( geometry, material );
@@ -128,7 +128,6 @@
 				composer.addPass( ssaaRenderPass );
 
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -146,7 +145,7 @@
 				renderer.setSize( width, height );
 
 				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
+				var newWidth = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
 

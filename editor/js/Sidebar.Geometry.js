@@ -4,10 +4,13 @@
 
 Sidebar.Geometry = function ( editor ) {
 
+	var strings = editor.strings;
+
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
+	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
 	// Actions
@@ -52,7 +55,7 @@ Sidebar.Geometry = function ( editor ) {
 
 			case 'Convert':
 
-				if ( geometry instanceof THREE.Geometry ) {
+				if ( geometry && geometry.isGeometry ) {
 
 					editor.execute( new SetGeometryCommand( object, new THREE.BufferGeometry().fromGeometry( geometry ) ) );
 
@@ -88,7 +91,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryTypeRow = new UI.Row();
 	var geometryType = new UI.Text();
 
-	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	geometryTypeRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/type' ) ).setWidth( '90px' ) );
 	geometryTypeRow.add( geometryType );
 
 	container.add( geometryTypeRow );
@@ -97,7 +100,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	var geometryUUIDRow = new UI.Row();
 	var geometryUUID = new UI.Input().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
-	var geometryUUIDRenew = new UI.Button( 'New' ).setMarginLeft( '7px' ).onClick( function () {
+	var geometryUUIDRenew = new UI.Button( strings.getKey( 'sidebar/geometry/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
 
@@ -105,7 +108,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	} );
 
-	geometryUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ) );
+	geometryUUIDRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/uuid' ) ).setWidth( '90px' ) );
 	geometryUUIDRow.add( geometryUUID );
 	geometryUUIDRow.add( geometryUUIDRenew );
 
@@ -120,10 +123,15 @@ Sidebar.Geometry = function ( editor ) {
 
 	} );
 
-	geometryNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ) );
+	geometryNameRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/name' ) ).setWidth( '90px' ) );
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
+
+	// parameters
+
+	var parameters = new UI.Span();
+	container.add( parameters );
 
 	// geometry
 
@@ -133,11 +141,12 @@ Sidebar.Geometry = function ( editor ) {
 
 	container.add( new Sidebar.Geometry.BufferGeometry( editor ) );
 
-	// parameters
+	// size
 
-	var parameters = new UI.Span();
-	container.add( parameters );
+	var geometryBoundingSphere = new UI.Text();
 
+	container.add( new UI.Text( strings.getKey( 'sidebar/geometry/bounds' ) ).setWidth( '90px' ) );
+	container.add( geometryBoundingSphere );
 
 	//
 
@@ -169,6 +178,10 @@ Sidebar.Geometry = function ( editor ) {
 				parameters.add( new Sidebar.Geometry[ geometry.type ]( editor, object ) );
 
 			}
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			geometryBoundingSphere.setValue( Math.floor( geometry.boundingSphere.radius * 1000 ) / 1000 );
 
 		} else {
 

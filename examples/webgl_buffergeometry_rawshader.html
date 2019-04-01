@@ -27,7 +27,7 @@
 				color: #ffffff;
 			}
 
-			#oldie a { color:#da0 }
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
 	<body>
@@ -37,7 +37,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
@@ -88,7 +88,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -166,7 +170,7 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

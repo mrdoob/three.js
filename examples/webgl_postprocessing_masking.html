@@ -26,12 +26,16 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var composer, renderer;
 			var box, torus;
@@ -47,13 +51,13 @@
 				var scene1 = new THREE.Scene();
 				var scene2 = new THREE.Scene();
 
-				box = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ) );
+				box = new THREE.Mesh( new THREE.BoxBufferGeometry( 4, 4, 4 ) );
 				scene1.add( box );
 
-				torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ) );
+				torus = new THREE.Mesh( new THREE.TorusBufferGeometry( 3, 1, 16, 32 ) );
 				scene2.add( torus );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xe0e0e0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -70,13 +74,13 @@
 				var maskPass2 = new THREE.MaskPass( scene2, camera );
 
 				var texture1 = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg' );
+				texture1.minFilter = THREE.LinearFilter;
 				var texture2 = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 
 				var texturePass1 = new THREE.TexturePass( texture1 );
 				var texturePass2 = new THREE.TexturePass( texture2 );
 
 				var outputPass = new THREE.ShaderPass( THREE.CopyShader );
-				outputPass.renderToScreen = true;
 
 				var parameters = {
 					minFilter: THREE.LinearFilter,

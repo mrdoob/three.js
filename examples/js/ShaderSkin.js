@@ -16,7 +16,6 @@ THREE.ShaderSkin = {
 	//		- specular map
 	//		- point, directional and hemisphere lights (use with "lights: true" material option)
 	//		- fog (use with "fog: true" material option)
-	//		- shadow maps
 	//
 	// ------------------------------------------------------------------------------------------ */
 
@@ -84,8 +83,7 @@ THREE.ShaderSkin = {
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "packing" ],
-			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			THREE.ShaderChunk[ "lights_pars_begin" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
 
@@ -264,8 +262,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
+			THREE.ShaderChunk[ "lights_pars_begin" ],
 			THREE.ShaderChunk[ "fog_pars_vertex" ],
 
 			"void main() {",
@@ -281,7 +278,6 @@ THREE.ShaderSkin = {
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
-				THREE.ShaderChunk[ "shadowmap_vertex" ],
 				THREE.ShaderChunk[ "fog_vertex" ],
 
 			"}"
@@ -368,7 +364,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "lights_pars" ],
+			THREE.ShaderChunk[ "lights_pars_begin" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
 			"float fresnelReflectance( vec3 H, vec3 V, float F0 ) {",

@@ -33,7 +33,6 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Demo of RectAreaLight - by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a><br />
 			Click and drag to move OrbitControls.<br />
@@ -45,45 +44,21 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			var container = document.getElementById( 'container' );
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var renderer = new THREE.WebGLRenderer( { antialias: true } );
-			var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			}
 
-			var scene = new THREE.Scene();
-			var origin = new THREE.Object3D();
+			var renderer, scene, camera;
 
-			var matStdParams = {
-				roughness: 0.044676705160855, // calculated from shininess = 1000
-				metalness: 0.0
-			};
-
-			var matStdFloor = new THREE.MeshStandardMaterial( matStdParams );
-			var matStdObjects = new THREE.MeshStandardMaterial( matStdParams );
-
-			var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
-			var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
-			var geoSphere = new THREE.SphereGeometry( 1.5, 32, 32 );
-			var geoKnot = new THREE.TorusKnotGeometry( 1.5, 0.5, 100, 16 );
-
-			var mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
-			var mshStdBox = new THREE.Mesh( geoBox, matStdObjects );
-			var mshStdSphere = new THREE.Mesh( geoSphere, matStdObjects );
-			var mshStdKnot = new THREE.Mesh( geoKnot, matStdObjects );
-
-			var amb = new THREE.AmbientLight( 0xffffff, 0.0 );
+			var origin = new THREE.Vector3();
 
 			var rectLight;
-			var rectLightHelper;
-
-			var ray = new THREE.Raycaster();
 
 			var param = {};
 			var stats;
@@ -93,25 +68,7 @@
 
 			function init() {
 
-				var gl = renderer.context;
-
-				// Check for float-RT support
-				// TODO (abelnation): figure out fall-back for float textures
-
-				if ( ! gl.getExtension( 'OES_texture_float' ) ) {
-
-					alert( 'OES_texture_float not supported' );
-					throw 'missing webgl extension';
-
-				}
-
-				if ( ! gl.getExtension('OES_texture_float_linear' ) ) {
-
-					alert( 'OES_texture_float_linear not supported' );
-					throw 'missing webgl extension';
-
-				}
-
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -120,109 +77,77 @@
 				renderer.gammaOutput = true;
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				// Check for float-RT support
+				// TODO (abelnation): figure out fall-back for float textures
 
-				camera.position.set( 0, 20, 35 );
+				if ( ! renderer.extensions.get( 'OES_texture_float' ) ) {
 
-				rectLight = new THREE.RectAreaLight( 0xffffff, 500, 10, 10 );
-				rectLight.position.set( 5, 5, 0 );
-
-				// TODO: ensure RectAreaLight handles target param correctly
-
-				rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
-				scene.add( rectLightHelper );
-
-				// TODO (abelnation): rect light shadow
-
-				scene.add( camera );
-				scene.add( origin );
-
-				matStdFloor.color.set( 0x808080 );
-				matStdObjects.color.set( 0xA00000 );
-
-				mshStdBox.castShadow = true;
-				mshStdBox.receiveShadow = true;
-				mshStdBox.position.set( 0, 5, 0 );
-				mshStdBox.rotation.set( 0, Math.PI / 2.0, 0 );
-
-				mshStdSphere.castShadow = true;
-				mshStdSphere.receiveShadow = true;
-				mshStdSphere.position.set( - 5, 5, 0 );
-
-				mshStdKnot.position.set( 5, 5, 0 );
-				mshStdKnot.castShadow = true;
-				mshStdKnot.receiveShadow = true;
-
-				scene.add( mshStdFloor );
-				scene.add( mshStdBox );
-				scene.add( mshStdSphere );
-				scene.add( mshStdKnot );
-				scene.add( amb );
-				scene.add( rectLight );
-
-				controls.target.copy( mshStdBox.position );
-				controls.update();
-
-				buildGui();
-
-				window.addEventListener( 'resize', onResize, false );
-
-			}
-
-			function onResize() {
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				camera.aspect = ( window.innerWidth / window.innerHeight );
-				camera.updateProjectionMatrix();
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				if ( param.motion ) {
-
-					update();
-					rectLightHelper.update();
+					alert( 'OES_texture_float not supported' );
+					throw 'missing webgl extension';
 
 				}
 
-				renderer.render( scene, camera );
+				if ( ! renderer.extensions.get( 'OES_texture_float_linear' ) ) {
 
-				stats.update();
+					alert( 'OES_texture_float_linear not supported' );
+					throw 'missing webgl extension';
 
-			}
+				}
 
-			function update() {
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 20, 35 );
 
-				var t = ( Date.now() / 1000 );
+				scene = new THREE.Scene();
 
-				// move light in circle around center
-				// change light height with sine curve
+				var ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
+				scene.add( ambient );
 
-				var r = 15.0;
+				rectLight = new THREE.RectAreaLight( 0xffffff, 1, 10, 10 );
+				rectLight.position.set( 5, 5, 0 );
+				scene.add( rectLight );
 
-				var lx = r * Math.cos( t );
-				var lz = r * Math.sin( t );
+				var rectLightMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( { side: THREE.BackSide } ) );
+				rectLightMesh.scale.x = rectLight.width;
+				rectLightMesh.scale.y = rectLight.height;
+				rectLight.add( rectLightMesh );
 
-				var ly = 5.0 + 5.0 * Math.sin( t / 3.0 );
+				var rectLightMeshBack = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( { color: 0x080808 } ) );
+				rectLightMesh.add( rectLightMeshBack );
 
-				rectLight.position.set( lx, ly, lz );
-				rectLight.lookAt( origin.position );
+				var geoFloor = new THREE.BoxBufferGeometry( 2000, 0.1, 2000 );
+				var matStdFloor = new THREE.MeshStandardMaterial( { color: 0x808080, roughness: 0, metalness: 0 } );
+				var mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
+				scene.add( mshStdFloor );
 
-			}
+				var matStdObjects = new THREE.MeshStandardMaterial( { color: 0xA00000, roughness: 0, metalness: 0 } );
 
-			function render() {
+				var geoBox = new THREE.BoxBufferGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
+				var mshStdBox = new THREE.Mesh( geoBox, matStdObjects );
+				mshStdBox.position.set( 0, 5, 0 );
+				mshStdBox.rotation.set( 0, Math.PI / 2.0, 0 );
+				mshStdBox.castShadow = true;
+				mshStdBox.receiveShadow = true;
+				scene.add( mshStdBox );
 
-				rectLightHelper.update(); // required
-				rnd.render( scn, cam );
+				var geoSphere = new THREE.SphereBufferGeometry( 1.5, 32, 32 );
+				var mshStdSphere = new THREE.Mesh( geoSphere, matStdObjects );
+				mshStdSphere.position.set( - 5, 5, 0 );
+				mshStdSphere.castShadow = true;
+				mshStdSphere.receiveShadow = true;
+				scene.add( mshStdSphere );
 
-			}
+				var geoKnot = new THREE.TorusKnotBufferGeometry( 1.5, 0.5, 100, 16 );
+				var mshStdKnot = new THREE.Mesh( geoKnot, matStdObjects );
+				mshStdKnot.position.set( 5, 5, 0 );
+				mshStdKnot.castShadow = true;
+				mshStdKnot.receiveShadow = true;
+				scene.add( mshStdKnot );
 
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.copy( mshStdBox.position );
+				controls.update();
 
-			function buildGui() {
+				// GUI
 
 				var gui = new dat.GUI( { width: 300 } );
 				gui.open();
@@ -233,45 +158,48 @@
 					height: rectLight.height,
 					color: rectLight.color.getHex(),
 					intensity: rectLight.intensity,
-					'ambient': amb.intensity,
+					'ambient': ambient.intensity,
 					'floor color': matStdFloor.color.getHex(),
 					'object color': matStdObjects.color.getHex(),
 					'roughness': matStdFloor.roughness,
-					'metalness': matStdFloor.metalness,
-
+					'metalness': matStdFloor.metalness
 				};
 
 				gui.add( param, 'motion' );
 
 				var lightFolder = gui.addFolder( 'Light' );
 
-				lightFolder.add( param, 'width', 0.1, 20 ).onChange( function ( val ) {
+				lightFolder.add( param, 'width', 1, 20 ).step( 0.1 ).onChange( function ( val ) {
 
 					rectLight.width = val;
+					rectLightMesh.scale.x = val;
 
 				} );
 
-				lightFolder.add( param, 'height', 0.1, 20 ).onChange( function ( val ) {
+				lightFolder.add( param, 'height', 1, 20 ).step( 0.1 ).onChange( function ( val ) {
 
 					rectLight.height = val;
+					rectLightMesh.scale.y = val;
 
 				} );
 
 				lightFolder.addColor( param, 'color' ).onChange( function ( val ) {
 
 					rectLight.color.setHex( val );
+					rectLightMesh.material.color.copy( rectLight.color ).multiplyScalar( rectLight.intensity );
 
 				} );
 
-				lightFolder.add( param, 'intensity', 0.0, 1000 ).onChange( function ( val ) {
+				lightFolder.add( param, 'intensity', 0.0, 4.0 ).step( 0.01 ).onChange( function ( val ) {
 
 					rectLight.intensity = val;
+					rectLightMesh.material.color.copy( rectLight.color ).multiplyScalar( rectLight.intensity );
 
 				} );
 
-				lightFolder.add( param, 'ambient', 0.0, 1 ).step( 0.01 ).onChange( function ( val ) {
+				lightFolder.add( param, 'ambient', 0.0, 0.2 ).step( 0.01 ).onChange( function ( val ) {
 
-					amb.intensity = val;
+					ambient.intensity = val;
 
 				} );
 
@@ -310,6 +238,50 @@
 
 				// TODO: rect area light distance
 				// TODO: rect area light decay
+
+				//
+
+				window.addEventListener( 'resize', onResize, false );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+			}
+
+			function onResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = ( window.innerWidth / window.innerHeight );
+				camera.updateProjectionMatrix();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( param.motion ) {
+
+					var t = ( Date.now() / 2000 );
+
+					// move light in circle around center
+					// change light height with sine curve
+
+					var r = 15.0;
+
+					var lx = r * Math.cos( t );
+					var lz = r * Math.sin( t );
+
+					var ly = 5.0 + 5.0 * Math.sin( t / 3.0 );
+
+					rectLight.position.set( lx, ly, lz );
+					rectLight.lookAt( origin );
+
+				}
+
+				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

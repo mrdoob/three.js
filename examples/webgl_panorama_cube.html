@@ -60,9 +60,11 @@
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
 			camera.position.z = 0.01;
 
-			controls = new THREE.OrbitControls( camera );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.enableZoom = false;
 			controls.enablePan = false;
+			controls.enableDamping = true;
+			controls.rotateSpeed = - 0.25;
 
 			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 
@@ -74,8 +76,8 @@
 
 			}
 
-			var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), materials );
-			skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
+			var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), materials );
+			skyBox.geometry.scale( 1, 1, - 1 );
 			scene.add( skyBox );
 
 			window.addEventListener( 'resize', onWindowResize, false );
@@ -94,7 +96,7 @@
 
 			var imageObj = new Image();
 
-			imageObj.onload = function() {
+			imageObj.onload = function () {
 
 				var canvas, context;
 				var tileWidth = imageObj.height;
@@ -106,7 +108,7 @@
 					canvas.height = tileWidth;
 					canvas.width = tileWidth;
 					context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-					textures[ i ].image = canvas
+					textures[ i ].image = canvas;
 					textures[ i ].needsUpdate = true;
 
 				}
@@ -130,9 +132,11 @@
 
 		function animate() {
 
-			renderer.render( scene, camera );
-
 			requestAnimationFrame( animate );
+
+			controls.update(); // required when damping is enabled
+
+			renderer.render( scene, camera );
 
 		}
 

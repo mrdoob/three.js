@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">BoxGeometry is a geometry class for a [link:https://en.wikipedia.org/wiki/Cuboid rectangular cuboid] with a given 'width', 'height', and 'depth'. On creation, the cuboid is centred on the origin, with each edge parallel to one of the axes.</p>
+		
+		<iframe id="scene" src="scenes/geometry-browser.html#BoxGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
+
+		<code>var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		var cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([param:Float width], [param:Float height], [param:Float depth], [param:Integer widthSegments], [param:Integer heightSegments], [param:Integer depthSegments])</h3>
+		<p>
+		width — Width; that is, the length of the edges parallel to the X axis. Optional; defaults to 1.<br />
+		height — Height; that is, the length of the edges parallel to the Y axis. Optional; defaults to 1.<br />
+		depth — Depth; that is, the length of the edges parallel to the Z axis. Optional; defaults to 1.<br />
+		widthSegments — Number of segmented rectangular faces along the width of the sides. Optional; defaults to 1.<br />
+		heightSegments — Number of segmented rectangular faces along the height of the sides. Optional; defaults to 1.<br />
+		depthSegments — Number of segmented rectangular faces along the depth of the sides. Optional; defaults to 1.<br />
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		</p>
+ 		<p>
+		Using the above example:
+		<code>
+		geometry.parameters; // {width: 1, height: 1, depth: 1, widthSegments: undefined, heightSegments: undefined, depthSegments: undefined}
+		cube.geometry.parameters; // as above
+		cube.geometry.parameters.width; // === 1
+		cube.geometry.parameters.widthSegments; // === undefined.
+		</code>
+ 		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

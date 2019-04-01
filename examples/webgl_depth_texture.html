@@ -63,17 +63,17 @@
 			uniform float cameraFar;
 
 
-			float readDepth (sampler2D depthSampler, vec2 coord) {
-				float fragCoordZ = texture2D(depthSampler, coord).x;
+			float readDepth( sampler2D depthSampler, vec2 coord ) {
+				float fragCoordZ = texture2D( depthSampler, coord ).x;
 				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
 				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
 			}
 
 			void main() {
-				vec3 diffuse = texture2D(tDiffuse, vUv).rgb;
-				float depth = readDepth(tDepth, vUv);
+				//vec3 diffuse = texture2D( tDiffuse, vUv ).rgb;
+				float depth = readDepth( tDepth, vUv );
 
-				gl_FragColor.rgb = vec3(depth);
+				gl_FragColor.rgb = 1.0 - vec3( depth );
 				gl_FragColor.a = 1.0;
 			}
 		</script>
@@ -93,7 +93,6 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/shaders/SSAOShader.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -111,7 +110,7 @@
 
 				renderer = new THREE.WebGLRenderer( { canvas: document.querySelector( 'canvas' ) } );
 
-				if ( !renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
+				if ( ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
 
 					supportsExtension = false;
 					document.querySelector( '#error' ).style.display = 'block';
@@ -128,7 +127,7 @@
 				document.body.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
-				camera.position.z = -4;
+				camera.position.z = 4;
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
@@ -158,20 +157,20 @@
 
 			}
 
-			function setupPost () {
+			function setupPost() {
 
 				// Setup post processing stage
-				postCamera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 				var postMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#post-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#post-frag' ).textContent.trim(),
 					uniforms: {
 						cameraNear: { value: camera.near },
-						cameraFar:  { value: camera.far },
-						tDiffuse:   { value: target.texture },
-						tDepth:     { value: target.depthTexture }
+						cameraFar: { value: camera.far },
+						tDiffuse: { value: target.texture },
+						tDepth: { value: target.depthTexture }
 					}
-				});
+				} );
 				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
 				var postQuad = new THREE.Mesh( postPlane, postMaterial );
 				postScene = new THREE.Scene();
@@ -179,10 +178,10 @@
 
 			}
 
-			function setupScene () {
+			function setupScene() {
 
-				var diffuse = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
-				diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
+				//var diffuse = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
+				//diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
 
 				// Setup some geometries
 				var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
@@ -224,14 +223,16 @@
 
 			function animate() {
 
-				if ( !supportsExtension ) return;
+				if ( ! supportsExtension ) return;
 
 				requestAnimationFrame( animate );
 
 				// render scene into target
-				renderer.render( scene, camera, target );
+				renderer.setRenderTarget( target );
+				renderer.render( scene, camera );
 
 				// render post FX
+				renderer.setRenderTarget( null );
 				renderer.render( postScene, postCamera );
 
 				stats.update();

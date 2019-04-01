@@ -2,9 +2,9 @@
  * @author Slayvin / http://slayvin.net
  */
 
-THREE.Reflector = function ( width, height, options ) {
+THREE.Reflector = function ( geometry, options ) {
 
-	THREE.Mesh.call( this, new THREE.PlaneBufferGeometry( width, height ) );
+	THREE.Mesh.call( this, geometry );
 
 	this.type = 'Reflector';
 
@@ -33,6 +33,7 @@ THREE.Reflector = function ( width, height, options ) {
 	var view = new THREE.Vector3();
 	var target = new THREE.Vector3();
 	var q = new THREE.Vector4();
+	var size = new THREE.Vector2();
 
 	var textureMatrix = new THREE.Matrix4();
 	var virtualCamera = new THREE.PerspectiveCamera();
@@ -55,13 +56,12 @@ THREE.Reflector = function ( width, height, options ) {
 	var material = new THREE.ShaderMaterial( {
 		uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 		fragmentShader: shader.fragmentShader,
-		vertexShader: shader.vertexShader,
-
+		vertexShader: shader.vertexShader
 	} );
 
-	material.uniforms.tDiffuse.value = renderTarget.texture;
-	material.uniforms.color.value = color;
-	material.uniforms.textureMatrix.value = textureMatrix;
+	material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
+	material.uniforms[ "color" ].value = color;
+	material.uniforms[ "textureMatrix" ].value = textureMatrix;
 
 	this.material = material;
 
@@ -161,7 +161,9 @@ THREE.Reflector = function ( width, height, options ) {
 		renderer.vr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
-		renderer.render( scene, virtualCamera, renderTarget, true );
+		renderer.setRenderTarget( renderTarget );
+		renderer.clear();
+		renderer.render( scene, virtualCamera );
 
 		renderer.vr.enabled = currentVrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -174,7 +176,7 @@ THREE.Reflector = function ( width, height, options ) {
 
 		if ( bounds !== undefined ) {
 
-			var size = renderer.getSize();
+			renderer.getSize( size );
 			var pixelRatio = renderer.getPixelRatio();
 
 			viewport.x = bounds.x * size.width * pixelRatio;

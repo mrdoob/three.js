@@ -16,19 +16,19 @@
 				font-size:13px;
 
 				background-color: #fff;
-				margin: 0px;
+				margin: 0;
 			}
 
 			#info {
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0; width: 100%;
 				padding: 5px;
 				text-align:center;
 			}
 
 			#content {
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0; width: 100%;
 				z-index: 1;
 				padding: 3em 0 0 0;
 			}
@@ -38,8 +38,8 @@
 			}
 
 			#c {
-				position: fixed;
-				left: 0px;
+				position: absolute;
+				left: 0;
 				width: 100%;
 				height: 100%;
 			}
@@ -76,7 +76,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script id="template" type="notjs">
 			<div class="scene"></div>
@@ -84,7 +84,11 @@
 		</script>
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var canvas;
 
@@ -98,16 +102,16 @@
 				canvas = document.getElementById( "c" );
 
 				var geometries = [
-					new THREE.BoxGeometry( 1, 1, 1 ),
-					new THREE.SphereGeometry( 0.5, 12, 8 ),
-					new THREE.DodecahedronGeometry( 0.5 ),
-					new THREE.CylinderGeometry( 0.5, 0.5, 1, 12 )
+					new THREE.BoxBufferGeometry( 1, 1, 1 ),
+					new THREE.SphereBufferGeometry( 0.5, 12, 8 ),
+					new THREE.DodecahedronBufferGeometry( 0.5 ),
+					new THREE.CylinderBufferGeometry( 0.5, 0.5, 1, 12 )
 				];
 
 				var template = document.getElementById( "template" ).text;
 				var content = document.getElementById( "content" );
 
-				for ( var i =  0; i < 40; i ++ ) {
+				for ( var i = 0; i < 40; i ++ ) {
 
 					var scene = new THREE.Scene();
 
@@ -168,7 +172,7 @@
 				var width = canvas.clientWidth;
 				var height = canvas.clientHeight;
 
-				if ( canvas.width !== width || canvas.height != height ) {
+				if ( canvas.width !== width || canvas.height !== height ) {
 
 					renderer.setSize( width, height, false );
 
@@ -187,6 +191,8 @@
 
 				updateSize();
 
+				canvas.style.transform = `translateY(${window.scrollY}px)`;
+
 				renderer.setClearColor( 0xffffff );
 				renderer.setScissorTest( false );
 				renderer.clear();
@@ -194,10 +200,10 @@
 				renderer.setClearColor( 0xe0e0e0 );
 				renderer.setScissorTest( true );
 
-				scenes.forEach( function( scene ) {
+				scenes.forEach( function ( scene ) {
 
 					// so something moves
-					scene.children[0].rotation.y = Date.now() * 0.001;
+					scene.children[ 0 ].rotation.y = Date.now() * 0.001;
 
 					// get the element that is a place holder for where we want to
 					// draw the scene
@@ -207,21 +213,21 @@
 					var rect = element.getBoundingClientRect();
 
 					// check if it's offscreen. If so skip it
-					if ( rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
-						 rect.right  < 0 || rect.left > renderer.domElement.clientWidth ) {
+					if ( rect.bottom < 0 || rect.top > renderer.domElement.clientHeight ||
+						 rect.right < 0 || rect.left > renderer.domElement.clientWidth ) {
 
-						return;  // it's off screen
+						return; // it's off screen
 
 					}
 
 					// set the viewport
-					var width  = rect.right - rect.left;
+					var width = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
-					var left   = rect.left;
-					var top    = rect.top;
+					var left = rect.left;
+					var bottom = renderer.domElement.clientHeight - rect.bottom;
 
-					renderer.setViewport( left, top, width, height );
-					renderer.setScissor( left, top, width, height );
+					renderer.setViewport( left, bottom, width, height );
+					renderer.setScissor( left, bottom, width, height );
 
 					var camera = scene.userData.camera;
 

@@ -33,7 +33,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -84,7 +84,11 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var renderer, scene, camera, stats;
 
@@ -105,21 +109,21 @@
 
 			uniforms = {
 
-				amplitude: { value: 1.0 },
-				color:     { value: new THREE.Color( 0xff2200 ) },
-				texture:   { value: new THREE.TextureLoader().load( "textures/water.jpg" ) }
+				"amplitude": { value: 1.0 },
+				"color": { value: new THREE.Color( 0xff2200 ) },
+				"texture": { value: new THREE.TextureLoader().load( "textures/water.jpg" ) }
 
 			};
 
-			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
+			uniforms[ "texture" ].value.wrapS = uniforms[ "texture" ].value.wrapT = THREE.RepeatWrapping;
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: uniforms,
-				vertexShader:document.getElementById( 'vertexshader' ).textContent,
+				vertexShader: document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 
-			});
+			} );
 
 
 			var radius = 50, segments = 128, rings = 64;
@@ -180,15 +184,15 @@
 
 			sphere.rotation.y = sphere.rotation.z = 0.01 * time;
 
-			uniforms.amplitude.value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
-			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
+			uniforms[ "amplitude" ].value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
+			uniforms[ "color" ].value.offsetHSL( 0.0005, 0, 0 );
 
 			for ( var i = 0; i < displacement.length; i ++ ) {
 
 				displacement[ i ] = Math.sin( 0.1 * i + time );
 
 				noise[ i ] += 0.5 * ( 0.5 - Math.random() );
-				noise[ i ] = THREE.Math.clamp( noise[ i ], -5, 5 );
+				noise[ i ] = THREE.Math.clamp( noise[ i ], - 5, 5 );
 
 				displacement[ i ] += noise[ i ];
 

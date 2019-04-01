@@ -27,7 +27,9 @@ function AnimationMixer( root ) {
 
 }
 
-Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
+AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: AnimationMixer,
 
 	_bindAction: function ( action, prototypeAction ) {
 
@@ -174,8 +176,8 @@ Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 		this._actionsByClip = {};
 		// inside:
 		// {
-		// 		knownActions: Array< AnimationAction >	- used as prototypes
-		// 		actionByRoot: AnimationAction			- lookup
+		// 	knownActions: Array< AnimationAction > - used as prototypes
+		// 	actionByRoot: AnimationAction - lookup
 		// }
 
 

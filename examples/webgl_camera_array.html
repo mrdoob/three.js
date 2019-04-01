@@ -26,9 +26,11 @@
 
 			function init() {
 
-				var AMOUNT = 6;
-				var SIZE = 1 / AMOUNT;
 				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
+
+				var AMOUNT = 6;
+				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
+				var HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
 
 				var cameras = [];
 
@@ -37,12 +39,12 @@
 					for ( var x = 0; x < AMOUNT; x ++ ) {
 
 						var subcamera = new THREE.PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
-						subcamera.bounds = new THREE.Vector4( x / AMOUNT, y / AMOUNT, SIZE, SIZE );
+						subcamera.viewport = new THREE.Vector4( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
 						subcamera.position.x = ( x / AMOUNT ) - 0.5;
 						subcamera.position.y = 0.5 - ( y / AMOUNT );
 						subcamera.position.z = 1.5;
 						subcamera.position.multiplyScalar( 2 );
-						subcamera.lookAt( new THREE.Vector3() );
+						subcamera.lookAt( 0, 0, 0 );
 						subcamera.updateMatrixWorld();
 						cameras.push( subcamera );
 

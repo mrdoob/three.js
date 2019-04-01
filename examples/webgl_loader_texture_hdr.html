@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - HDR texture loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+
+			}
+
+			a { color: red; }
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl HDR (RGBE) texture loader example
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/WebGL.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var params = {
+				exposure: 1.0
+			};
+
+			var renderer, scene, camera;
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = params.exposure;
+
+				renderer.gammaOutput = true;
+
+				scene = new THREE.Scene();
+
+				var aspect = window.innerWidth / window.innerHeight;
+
+				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
+
+				new THREE.RGBELoader().load( 'textures/miranda_uncropped.hdr', function ( texture, textureData ) {
+
+					//console.log( textureData );
+					//console.log( texture );
+
+					texture.encoding = THREE.RGBEEncoding;
+					texture.minFilter = THREE.NearestFilter;
+					texture.magFilter = THREE.NearestFilter;
+					texture.flipY = true;
+
+					var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+					var quad = new THREE.PlaneBufferGeometry( textureData.width / textureData.height, 1 );
+
+					var mesh = new THREE.Mesh( quad, material );
+
+					scene.add( mesh );
+
+					render();
+
+				} );
+
+				//
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'exposure', 0, 2 ).onChange( render );
+				gui.open();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+
+				var frustumHeight = camera.top - camera.bottom;
+
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			//
+
+			function render() {
+
+				renderer.toneMappingExposure = params.exposure;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

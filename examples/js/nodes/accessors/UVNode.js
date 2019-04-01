@@ -2,30 +2,68 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.UVNode = function( index ) {
+import { TempNode } from '../core/TempNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
-	THREE.TempNode.call( this, 'v2', { shared: false } );
+var vertexDict = [ 'uv', 'uv2' ],
+	fragmentDict = [ 'vUv', 'vUv2' ];
+
+function UVNode( index ) {
+
+	TempNode.call( this, 'v2', { shared: false } );
 
 	this.index = index || 0;
 
-};
+}
 
-THREE.UVNode.vertexDict = [ 'uv', 'uv2' ];
-THREE.UVNode.fragmentDict = [ 'vUv', 'vUv2' ];
+UVNode.prototype = Object.create( TempNode.prototype );
+UVNode.prototype.constructor = UVNode;
+UVNode.prototype.nodeType = "UV";
 
-THREE.UVNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.UVNode.prototype.constructor = THREE.UVNode;
+UVNode.prototype.generate = function ( builder, output ) {
 
-THREE.UVNode.prototype.generate = function( builder, output ) {
+	builder.requires.uv[ this.index ] = true;
 
-	var material = builder.material;
-	var result;
-
-	material.requestAttribs.uv[ this.index ] = true;
-
-	if ( builder.isShader( 'vertex' ) ) result = THREE.UVNode.vertexDict[ this.index ];
-	else result = THREE.UVNode.fragmentDict[ this.index ];
+	var result = builder.isShader( 'vertex' ) ? vertexDict[ this.index ] : fragmentDict[ this.index ];
 
 	return builder.format( result, this.getType( builder ), output );
 
 };
+
+UVNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.index = source.index;
+
+};
+
+UVNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.index = this.index;
+
+	}
+
+	return data;
+
+};
+
+NodeLib.addKeyword( 'uv', function () {
+
+	return new UVNode();
+
+} );
+
+NodeLib.addKeyword( 'uv2', function () {
+
+	return new UVNode( 1 );
+
+} );
+
+export { UVNode };

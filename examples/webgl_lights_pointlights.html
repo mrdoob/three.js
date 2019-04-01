@@ -6,34 +6,27 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background-color: #000;
+				font-family: Monospace;
 				margin: 0px;
 				overflow: hidden;
 			}
-
 			#info {
+				color: #fff;
 				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
+				top: 10px;
+				width: 100%;
 				text-align: center;
+				z-index: 100;
+				display:block;
 			}
-
-			a {
+			#info a {
 				color: #ff0080;
-				text-decoration: none;
-			}
-
-			a:hover {
-				color: #0080ff;
+				font-weight: bold;
 			}
 		</style>
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - point lights WebGL demo.<br />
 			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
@@ -41,18 +34,22 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer,
-			particle1, particle2,
-			light1, light2, light3, light4,
-			object, loader;
+				light1, light2, light3, light4,
+				object, stats;
 
 			var clock = new THREE.Clock();
 
@@ -61,26 +58,26 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 100;
 
 				scene = new THREE.Scene();
 
-				loader = new THREE.BinaryLoader();
+				//model
 
-				var callback = function( geometry ) {
+				var loader = new THREE.OBJLoader();
+				loader.load( 'models/obj/walt/WaltHead.obj', function ( obj ) {
 
-					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0x111111, shininess: 50 }  )  );
-					object.scale.x = object.scale.y = object.scale.z = 0.80;
+					object = obj;
+					object.scale.multiplyScalar( 0.8 );
+					object.position.y = - 30;
 					scene.add( object );
 
-				};
+				} );
 
-				loader.load( "obj/walt/WaltHead_bin.js", callback );
+				var sphere = new THREE.SphereBufferGeometry( 0.5, 16, 8 );
 
-				var sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
+				//lights
 
 				light1 = new THREE.PointLight( 0xff0040, 2, 50 );
 				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) ) );
@@ -98,12 +95,17 @@
 				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) ) );
 				scene.add( light4 );
 
-				renderer = new THREE.WebGLRenderer();
+				//renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
-				//
+				//stats
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -118,13 +120,12 @@
 
 			}
 
-			//
-
 			function animate() {
 
 				requestAnimationFrame( animate );
 
 				render();
+				stats.update();
 
 			}
 
@@ -133,7 +134,7 @@
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
 
-				if( object ) object.rotation.y -= 0.5 * delta;
+				if ( object ) object.rotation.y -= 0.5 * delta;
 
 				light1.position.x = Math.sin( time * 0.7 ) * 30;
 				light1.position.y = Math.cos( time * 0.5 ) * 40;

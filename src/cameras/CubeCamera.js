@@ -11,7 +11,7 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function CubeCamera( near, far, cubeResolution ) {
+function CubeCamera( near, far, cubeResolution, options ) {
 
 	Object3D.call( this );
 
@@ -49,7 +49,7 @@ function CubeCamera( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
-	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
+	options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";
@@ -58,49 +58,52 @@ function CubeCamera( near, far, cubeResolution ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
+		var currentRenderTarget = renderer.getRenderTarget();
+
 		var renderTarget = this.renderTarget;
 		var generateMipmaps = renderTarget.texture.generateMipmaps;
 
 		renderTarget.texture.generateMipmaps = false;
 
-		renderTarget.activeCubeFace = 0;
-		renderer.render( scene, cameraPX, renderTarget );
+		renderer.setRenderTarget( renderTarget, 0 );
+		renderer.render( scene, cameraPX );
 
-		renderTarget.activeCubeFace = 1;
-		renderer.render( scene, cameraNX, renderTarget );
+		renderer.setRenderTarget( renderTarget, 1 );
+		renderer.render( scene, cameraNX );
 
-		renderTarget.activeCubeFace = 2;
-		renderer.render( scene, cameraPY, renderTarget );
+		renderer.setRenderTarget( renderTarget, 2 );
+		renderer.render( scene, cameraPY );
 
-		renderTarget.activeCubeFace = 3;
-		renderer.render( scene, cameraNY, renderTarget );
+		renderer.setRenderTarget( renderTarget, 3 );
+		renderer.render( scene, cameraNY );
 
-		renderTarget.activeCubeFace = 4;
-		renderer.render( scene, cameraPZ, renderTarget );
+		renderer.setRenderTarget( renderTarget, 4 );
+		renderer.render( scene, cameraPZ );
 
 		renderTarget.texture.generateMipmaps = generateMipmaps;
 
-		renderTarget.activeCubeFace = 5;
-		renderer.render( scene, cameraNZ, renderTarget );
+		renderer.setRenderTarget( renderTarget, 5 );
+		renderer.render( scene, cameraNZ );
 
-		renderer.setRenderTarget( null );
+		renderer.setRenderTarget( currentRenderTarget );
 
 	};
 
 	this.clear = function ( renderer, color, depth, stencil ) {
 
+		var currentRenderTarget = renderer.getRenderTarget();
+
 		var renderTarget = this.renderTarget;
 
 		for ( var i = 0; i < 6; i ++ ) {
 
-			renderTarget.activeCubeFace = i;
-			renderer.setRenderTarget( renderTarget );
+			renderer.setRenderTarget( renderTarget, i );
 
 			renderer.clear( color, depth, stencil );
 
 		}
 
-		renderer.setRenderTarget( null );
+		renderer.setRenderTarget( currentRenderTarget );
 
 	};
 

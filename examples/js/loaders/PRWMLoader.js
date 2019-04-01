@@ -239,6 +239,7 @@
 			var scope = this;
 
 			var loader = new THREE.FileLoader( scope.manager );
+			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			url = url.replace( /\*/g, isBigEndianPlatform() ? 'be' : 'le' );
@@ -248,6 +249,13 @@
 				onLoad( scope.parse( arrayBuffer ) );
 
 			}, onProgress, onError );
+
+		},
+
+		setPath: function ( value ) {
+
+			this.path = value;
+			return this;
 
 		},
 

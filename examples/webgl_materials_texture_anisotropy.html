@@ -50,17 +50,21 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container,stats;
+			var container, stats;
 
 			var camera, scene1, scene2, renderer;
 
@@ -108,7 +112,7 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var maxAnisotropy = renderer.getMaxAnisotropy();
+				var maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var texture1 = textureLoader.load( "textures/crate.gif" );
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
@@ -132,7 +136,7 @@
 				} else {
 
 					document.getElementById( "val_left" ).innerHTML = "not supported";
-					document.getElementById( "val_right" ).innerHTML =  "not supported";
+					document.getElementById( "val_right" ).innerHTML = "not supported";
 
 				}
 
@@ -170,7 +174,7 @@
 			}
 
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
@@ -197,10 +201,10 @@
 				renderer.clear();
 				renderer.setScissorTest( true );
 
-				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
+				renderer.setScissor( 0, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene1, camera );
 
-				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
+				renderer.setScissor( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene2, camera );
 
 				renderer.setScissorTest( false );

@@ -58,7 +58,9 @@ function Geometry() {
 
 }
 
-Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: Geometry,
 
 	isGeometry: true,
 
@@ -226,35 +228,13 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
-		var tempNormals = [];
-		var tempUVs = [];
-		var tempUVs2 = [];
-
 		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
 
-			scope.vertices.push( new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
-
-			if ( normals !== undefined ) {
-
-				tempNormals.push( new Vector3( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] ) );
-
-			}
+			scope.vertices.push( new Vector3().fromArray( positions, i ) );
 
 			if ( colors !== undefined ) {
 
-				scope.colors.push( new Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
-
-			}
-
-			if ( uvs !== undefined ) {
-
-				tempUVs.push( new Vector2( uvs[ j ], uvs[ j + 1 ] ) );
-
-			}
-
-			if ( uvs2 !== undefined ) {
-
-				tempUVs2.push( new Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+				scope.colors.push( new Color().fromArray( colors, i ) );
 
 			}
 
@@ -262,8 +242,16 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		function addFace( a, b, c, materialIndex ) {
 
-			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
-			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
+			var vertexColors = ( colors === undefined ) ? [] : [
+				scope.colors[ a ].clone(),
+				scope.colors[ b ].clone(),
+				scope.colors[ c ].clone() ];
+
+			var vertexNormals = ( normals === undefined ) ? [] : [
+				new Vector3().fromArray( normals, a * 3 ),
+				new Vector3().fromArray( normals, b * 3 ),
+				new Vector3().fromArray( normals, c * 3 )
+			];
 
 			var face = new Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
@@ -271,13 +259,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 			if ( uvs !== undefined ) {
 
-				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+				scope.faceVertexUvs[ 0 ].push( [
+					new Vector2().fromArray( uvs, a * 2 ),
+					new Vector2().fromArray( uvs, b * 2 ),
+					new Vector2().fromArray( uvs, c * 2 )
+				] );
 
 			}
 
 			if ( uvs2 !== undefined ) {
 
-				scope.faceVertexUvs[ 1 ].push( [ tempUVs2[ a ].clone(), tempUVs2[ b ].clone(), tempUVs2[ c ].clone() ] );
+				scope.faceVertexUvs[ 1 ].push( [
+					new Vector2().fromArray( uvs2, a * 2 ),
+					new Vector2().fromArray( uvs2, b * 2 ),
+					new Vector2().fromArray( uvs2, c * 2 )
+				] );
 
 			}
 
@@ -352,15 +348,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	center: function () {
 
-		this.computeBoundingBox();
+		var offset = new Vector3();
 
-		var offset = this.boundingBox.getCenter().negate();
+		return function center() {
 
-		this.translate( offset.x, offset.y, offset.z );
+			this.computeBoundingBox();
 
-		return offset;
+			this.boundingBox.getCenter( offset ).negate();
 
-	},
+			this.translate( offset.x, offset.y, offset.z );
+
+			return this;
+
+		};
+
+	}(),
 
 	normalize: function () {
 
@@ -654,25 +656,6 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	},
 
-	computeLineDistances: function () {
-
-		var d = 0;
-		var vertices = this.vertices;
-
-		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
-
-			if ( i > 0 ) {
-
-				d += vertices[ i ].distanceTo( vertices[ i - 1 ] );
-
-			}
-
-			this.lineDistances[ i ] = d;
-
-		}
-
-	},
-
 	computeBoundingBox: function () {
 
 		if ( this.boundingBox === null ) {
@@ -826,7 +809,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		mesh.matrixAutoUpdate && mesh.updateMatrix();
+		if ( mesh.matrixAutoUpdate ) mesh.updateMatrix();
 
 		this.merge( mesh.geometry, mesh.matrix );
 

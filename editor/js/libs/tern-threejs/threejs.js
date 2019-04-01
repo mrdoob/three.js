@@ -500,10 +500,6 @@
         "dispose": {
           "!type": "fn()",
           "!doc": "Removes The object from memory. <br>\n\t\tDon't forget to call this method when you remove a geometry because it can cause memory leaks."
-        },
-        "computeLineDistances": {
-          "!type": "fn()",
-          "!doc": "Compute distances between vertices for Line geometries."
         }
       },
       "!doc": "Base class for geometries.<br>\n\t\tA geometry holds all data necessary to describe a 3D model.",
@@ -805,62 +801,6 @@
       "prototype": {},
       "!doc": "Contains handy functions geometry manipulations."
     },
-    "ImageUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/ImageUtils",
-      "prototype": {
-        "crossOrigin": {
-          "!type": "string",
-          "!doc": "The crossOrigin string to implement CORS for loading the image from a different domain that allows CORS."
-        },
-        "generateDataTexture": {
-          "!type": "fn(width: number, height: number, color: number) -> +THREE.DataTexture",
-          "!doc": "Generates a texture of a single color. It is a DataTexture with format, RGBFormat."
-        },
-        "parseDDS": {
-          "!type": "fn(buffer: string, loadMipmaps: boolean) -> +THREE.CompressedTexture",
-          "!doc": "Parses a DDS Image from the string into a CompressedTexture."
-        },
-        "loadCompressedTexture": {
-          "!type": "fn(url: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTexture": {
-          "!type": "fn(url: string, mapping: UVMapping, onLoad: function, onError: function) -> todo",
-          "!doc": "todo"
-        },
-        "getNormalMap": {
-          "!type": "fn(image: todo, depth: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadCompressedTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "A Helper class to ease the loading of images of different types."
-    },
-    "SceneUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/SceneUtils",
-      "prototype": {
-        "createMultiMaterialObject": {
-          "!type": "fn(geometry: +THREE.Geometry, materials: []) -> +THREE.Object3D",
-          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as MultiMaterial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
-        },
-        "attach": {
-          "!type": "fn(child: +THREE.Object3D, scene: +THREE.Object3D, parent: +THREE.Object3D)",
-          "!doc": "Attaches the object to the parent without the moving the object in the worldspace."
-        },
-        "detach": {
-          "!type": "fn(child: +THREE.Object3D, parent: +THREE.Object3D, scene: +THREE.Object3D)",
-          "!doc": "Detaches the object from the parent and adds it back to the scene without moving in worldspace."
-        }
-      },
-      "!doc": "A class containing useful utility functions for scene manipulation."
-    },
     "Curve": {
       "!url": "http://threejs.org/docs/#Reference/extras/core/Curve",
       "prototype": {
@@ -960,7 +900,7 @@
           "!type": "array",
           "!doc": "The possible actions that define the path."
         },
-        "fromPoints": {
+        "setFromPoints": {
           "!type": "fn(vectors) -> todo",
           "!doc": "Adds to the Path from the points. The first vector defines the offset. After that the lines get defined."
         },
@@ -1012,23 +952,7 @@
           "!type": "array",
           "!doc": "todo"
         },
-        "makeGeometry": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ShapeGeometry"
-        },
-        "extractAllPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of shape and holes (keypoints based on segments parameter)"
-        },
-        "extrude": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ExtrudeGeometry"
-        },
         "extractPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "extractAllSpacedPoints": {
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
@@ -1036,10 +960,6 @@
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "Get points of holes"
         },
-        "getSpacedPointsHoles": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of holes (spaced by regular distance)"
-        }
       },
       "!doc": "Defines a 2d shape plane using paths.",
       "!type": "fn()"
@@ -1794,54 +1714,6 @@
       "!doc": "A loader for loading an [page:Image].",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
-    "JSONLoader": {
-      "!url": "http://threejs.org/docs/#Reference/loaders/JSONLoader",
-      "prototype": {
-        "!proto": "THREE.Loader.prototype",
-        "withCredentials": {
-          "!type": "boolean",
-          "!doc": "If true, the ajax request will use cookies."
-        },
-        "onLoadStart": {
-          "!type": "function",
-          "!doc": "The default is a function with empty body."
-        },
-        "onLoadComplete": {
-          "!type": "function",
-          "!doc": "The default is a function with empty body."
-        },
-        "load": {
-          "!type": "fn(url: string, callback: function, texturePath: string)",
-          "!doc": "[page:String url] — required<br>\n\t\t[page:Function callback] — required. Will be called when load completes. The arguments will be the loaded [page:Object3D] and the loaded [page:Array materials].<br>\n\t\t[page:String texturePath] — optional. If not specified, textures will be assumed to be in the same folder as the Javascript model file."
-        },
-        "loadAjaxJSON": {
-          "!type": "fn(context: +THREE.JSONLoader, url: string, callback: function, texturePath: string, callbackProgress: function)",
-          "!doc": "Begin loading from url and call <em>callback</em> with the parsed response content."
-        },
-        "parse": {
-          "!type": "fn(json: object, texturePath: string) -> +THREE.Object3D",
-          "!doc": "Parse a <em>JSON</em> structure and return an [page:Object] containing the parsed .[page:Geometry] and .[page:Array materials]."
-        },
-        "updateProgress": {
-          "!type": "fn(progress: object)",
-          "!doc": "Updates the DOM object with the progress made."
-        },
-        "createMaterial": {
-          "!type": "fn(m: object, texturePath: string) -> +THREE.Material",
-          "!doc": "Creates the Material based on the parameters m."
-        },
-        "initMaterials": {
-          "!type": "fn(materials: [], texturePath: string) -> []",
-          "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
-        },
-        "extractUrlBase": {
-          "!type": "fn(url: string) -> string",
-          "!doc": "Extract the base from the URL."
-        }
-      },
-      "!doc": "A loader for loading objects in JSON format.",
-      "!type": "fn()"
-    },
     "Loader": {
       "!url": "http://threejs.org/docs/#Reference/loaders/Loader",
       "prototype": {
@@ -1872,10 +1744,6 @@
         "initMaterials": {
           "!type": "fn(materials: [], texturePath: string) -> []",
           "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
-        },
-        "extractUrlBase": {
-          "!type": "fn(url: string) -> string",
-          "!doc": "Extract the base from the URL."
         }
       },
       "!doc": "Base class for implementing loaders.",
@@ -1920,7 +1788,7 @@
           "!doc": "Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br>"
         }
       },
-      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].",
+      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJLoader].",
       "!type": "fn(baseUrl: string, options: object, crossOrigin: string)"
     },
     "MaterialLoader": {
@@ -1988,7 +1856,7 @@
           "!doc": "[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS."
         }
       },
-      "!doc": "A loader for loading a JSON resource. Unlike the [page:JSONLoader], this one make use of the <em>.type</em> attributes of objects to map them to their original classes.",
+      "!doc": "A loader for loading a JSON resource.",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
     "PDBLoader": {
@@ -3786,11 +3654,11 @@
           "!type": "fn(a: +THREE.Vector3, b: +THREE.Vector3, c: +THREE.Vector3) -> +THREE.Triangle",
           "!doc": "Sets the triangle's vectors to the passed vectors."
         },
-        "normal": {
+        "getNormal": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the calculated normal of the triangle."
         },
-        "barycoordFromPoint": {
+        "getBarycoord": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return a barycentric coordinate from the given vector. <br><br>\n\t\t[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png](Picture of barycentric coordinates)"
         },
@@ -3798,11 +3666,11 @@
           "!type": "fn() -> +THREE.Triangle",
           "!doc": "Return a new copy of this triangle."
         },
-        "area": {
+        "getArea": {
           "!type": "fn() -> number",
           "!doc": "Return the area of the triangle."
         },
-        "midpoint": {
+        "getMidpoint": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the midpoint of the triangle. Optionally sets a target vector."
         },
@@ -3810,7 +3678,7 @@
           "!type": "fn(triangle: +THREE.Triangle) -> bool",
           "!doc": "Checks to see if two triangles are equal (share the same vectors)."
         },
-        "plane": {
+        "getPlane": {
           "!type": "fn(optionalTarget: +THREE.Plane) -> +THREE.Plane",
           "!doc": "Return a [page:Plane plane] based on the triangle. Optionally sets a target plane."
         },
@@ -4428,30 +4296,6 @@
       "!doc": "todo",
       "!type": "fn()"
     },
-    "LensFlare": {
-      "!url": "http://threejs.org/docs/#Reference/objects/LensFlare",
-      "prototype": {
-        "!proto": "THREE.Object3D.prototype",
-        "lensFlares": {
-          "!type": "array",
-          "!doc": "todo"
-        },
-        "positionScreen": {
-          "!type": "+THREE.Vector3",
-          "!doc": "todo"
-        },
-        "customUpdateCallback": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "updateLensFlares": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(texture: todo, size: todo, distance: todo, blending: todo, color: todo)"
-    },
     "Line": {
       "!url": "http://threejs.org/docs/#Reference/objects/Line",
       "prototype": {
@@ -4486,7 +4330,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised color."
         },
         "getMorphTargetIndexByName": {
           "!type": "fn(name: string) -> number",
@@ -4590,7 +4434,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised color."
         },
         "clone": {
           "!type": "fn() -> +THREE.PointCloud",
@@ -4777,11 +4621,7 @@
     "WebGLRenderTargetCube": {
       "!url": "http://threejs.org/docs/#Reference/renderers/WebGLRenderTargetCube",
       "prototype": {
-        "!proto": "THREE.WebGLRenderTarget.prototype",
-        "activeCubeFace": {
-          "!type": "integer",
-          "!doc": "The activeCubeFace property corresponds to a cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) and is\n\t\tused and set internally by the [page:CubeCamera]."
-        }
+        "!proto": "THREE.WebGLRenderTarget.prototype"
       },
       "!doc": "[page:CubeCamera] uses this as its [page:WebGLRenderTarget]",
       "!type": "fn(width: number, height: number, options: object)"
@@ -4925,10 +4765,6 @@
           "!type": "fn(camera, lights, fog, material, object)",
           "!doc": "Renders an immediate Object using a camera."
         },
-        "setFaceCulling": {
-          "!type": "fn(cullFace, frontFace)",
-          "!doc": "If cullFace is false, culling will be disabled."
-        },
         "setDepthTest": {
           "!type": "fn(depthTest: boolean)",
           "!doc": "This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer."
@@ -5021,23 +4857,12 @@
       "prototype": {},
       "!doc": "todo"
     },
-    "LensFlarePlugin": {
-      "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/LensFlarePlugin",
-      "prototype": {
-        "render": {
-          "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera, viewportWidth: number, viewportHeight: number)",
-          "!doc": "Renders the lensflares defined in the scene. This gets automatically called as post render function to draw the lensflares."
-        }
-      },
-      "!doc": "The Webglrenderer plugin class that allows lensflares to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
-      "!type": "fn()"
-    },
     "ShadowMapPlugin": {
       "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/ShadowMapPlugin",
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Prepares the shadowmaps to be rendered defined in the scene. This gets automatically called as pre render function to draw the lensflares."
+          "!doc": "Prepares the shadowmaps to be rendered defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows shadowmaps to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -5048,7 +4873,7 @@
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Renders the sprites defined in the scene. This gets automatically called as post-render function to draw the lensflares."
+          "!doc": "Renders the sprites defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows Sprites to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -5157,7 +4982,7 @@
         },
         "image": {
           "!type": "Image",
-          "!doc": "An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
+          "!doc": "An Image object, typically created using the [page:ImageLoader ImageLoader] class. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
         },
         "mapping": {
           "!type": "object",

@@ -44,6 +44,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var object;
 
 			init();
 			animate();
@@ -61,60 +62,62 @@
 
 				scene = new THREE.Scene();
 
-				var ambient = new THREE.AmbientLight( 0x101030 );
-				scene.add( ambient );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				scene.add( directionalLight );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
 
-				// texture
+				// manager
 
-				var manager = new THREE.LoadingManager();
+				function loadModel() {
+
+					object.traverse( function ( child ) {
+
+						if ( child.isMesh ) child.material.map = texture;
+
+					} );
+
+					object.position.y = - 95;
+					scene.add( object );
+
+				}
+
+				var manager = new THREE.LoadingManager( loadModel );
+
 				manager.onProgress = function ( item, loaded, total ) {
 
 					console.log( item, loaded, total );
 
 				};
 
-				var texture = new THREE.Texture();
+				// texture
 
-				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
-					}
-				};
+				var textureLoader = new THREE.TextureLoader( manager );
 
-				var onError = function ( xhr ) {
-				};
-
-
-				var loader = new THREE.ImageLoader( manager );
-				loader.load( 'textures/UV_Grid_Sm.jpg', function ( image ) {
-
-					texture.image = image;
-					texture.needsUpdate = true;
-
-				} );
+				var texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
 
 				// model
 
+				function onProgress( xhr ) {
+
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
+				}
+
+				function onError() {}
+
 				var loader = new THREE.OBJLoader( manager );
-				loader.load( 'obj/male02/male02.obj', function ( object ) {
 
-					object.traverse( function ( child ) {
+				loader.load( 'models/obj/male02/male02.obj', function ( obj ) {
 
-						if ( child instanceof THREE.Mesh ) {
-
-							child.material.map = texture;
-
-						}
-
-					} );
-
-					object.position.y = - 95;
-					scene.add( object );
+					object = obj;
 
 				}, onProgress, onError );
 

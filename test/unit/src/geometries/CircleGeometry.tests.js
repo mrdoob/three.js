@@ -1,38 +1,59 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { runStdGeometryTests } from '../../qunit-utils';
+import {
+	CircleBufferGeometry
+} from '../../../../src/geometries/CircleGeometry';
 
-	var parameters = {
-		radius: 10,
-		segments: 20,
-		thetaStart: 0.1,
-		thetaLength: 0.2
-	};
+export default QUnit.module( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module( 'CircleBufferGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - CircleGeometry", {
+		var geometries = undefined;
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				segments: 20,
+				thetaStart: 0.1,
+				thetaLength: 0.2
+			};
 
 			geometries = [
-
-				new THREE.CircleGeometry(),
-				new THREE.CircleGeometry( parameters.radius ),
-				new THREE.CircleGeometry( parameters.radius, parameters.segments ),
-				new THREE.CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
-				new THREE.CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
-
+				new CircleBufferGeometry(),
+				new CircleBufferGeometry( parameters.radius ),
+				new CircleBufferGeometry( parameters.radius, parameters.segments ),
+				new CircleBufferGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
+				new CircleBufferGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
 			];
 
-		}
+		} );
 
-	});
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			assert.ok( false, "everything's gonna be alright" );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
+
+			runStdGeometryTests( assert, geometries );
+
+		} );
+
+	} );
+
+} );

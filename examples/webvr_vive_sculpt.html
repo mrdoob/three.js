@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webvr - htc vive - sculpt</title>
@@ -29,19 +29,11 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
 
-			var blob, vector;
+			var blob;
 
 			var points = [];
 
@@ -66,9 +58,8 @@
 				scene.background = new THREE.Color( 0x222222 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
-				scene.add( camera );
 
-				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
+				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
@@ -81,7 +72,7 @@
 				table.receiveShadow = true;
 				scene.add( table );
 
-				var geometry = new THREE.PlaneGeometry( 4, 4 );
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
@@ -100,9 +91,9 @@
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = -2;
+				light.shadow.camera.bottom = - 2;
 				light.shadow.camera.right = 2;
-				light.shadow.camera.left = -2;
+				light.shadow.camera.left = - 2;
 				light.shadow.mapSize.set( 4096, 4096 );
 
 				scene.add( light );
@@ -115,13 +106,13 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.vr.enabled = true;
-				renderer.vr.standing = true;
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				// controllers
 
@@ -146,27 +137,19 @@
 					controller.castShadow = true;
 					controller.receiveShadow = true;
 
-					// var pivot = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.002, 2 ), blob.material );
+					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.002, 2 ), blob.material );
 					pivot.name = 'pivot';
-					pivot.position.y = -0.016;
-					pivot.position.z = -0.043;
+					pivot.position.y = - 0.016;
+					pivot.position.z = - 0.043;
 					pivot.rotation.x = Math.PI / 5.5;
 					controller.add( pivot );
 
-					var range = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
+					var range = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
 					pivot.add( range );
 
 					controller1.add( controller.clone() );
 					controller2.add( controller.clone() );
-
-				} );
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					renderer.vr.setDevice( display );
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
 				} );
 
@@ -209,7 +192,7 @@
 
 				points = [
 					{ position: new THREE.Vector3(), strength: - 0.08, subtract: 10 },
-					{ position: new THREE.Vector3(), strength:   0.04, subtract: 10 }
+					{ position: new THREE.Vector3(), strength: 0.04, subtract: 10 }
 				];
 
 			}
@@ -227,7 +210,7 @@
 
 			function animate() {
 
-				renderer.animate( render );
+				renderer.setAnimationLoop( render );
 
 			}
 
@@ -279,7 +262,7 @@
 
 							updateBlob();
 
-							var geometry = blob.generateGeometry();
+							var geometry = blob.generateBufferGeometry();
 							var mesh = new THREE.Mesh( geometry, blob.material.clone() );
 							mesh.position.y = 1;
 							mesh.castShadow = true;

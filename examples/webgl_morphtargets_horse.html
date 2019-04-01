@@ -17,6 +17,7 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 
@@ -59,20 +60,16 @@
 				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/animated/horse.js", function( geometry ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/Horse.glb", function( gltf ) {
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( {
-						vertexColors: THREE.FaceColors,
-						morphTargets: true
-					} ) );
+					mesh = gltf.scene.children[ 0 ];
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
 
 					mixer = new THREE.AnimationMixer( mesh );
 
-					var clip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'gallop', geometry.morphTargets, 30 );
-					mixer.clipAction( clip ).setDuration( 1 ).play();
+					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
 
 				} );
 
@@ -81,6 +78,10 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
+
 				container.appendChild(renderer.domElement);
 
 				//

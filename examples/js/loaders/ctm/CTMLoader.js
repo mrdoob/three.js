@@ -10,11 +10,8 @@
 
 THREE.CTMLoader = function () {
 
-	THREE.Loader.call( this );
-
 };
 
-THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );
 THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
 
 // Load multiple CTM parts defined in JSON
@@ -27,7 +24,7 @@ THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 
 	var xhr = new XMLHttpRequest();
 
-	var basePath = parameters.basePath ? parameters.basePath : this.extractUrlBase( url );
+	var basePath = parameters.basePath ? parameters.basePath : THREE.LoaderUtils.extractUrlBase( url );
 
 	xhr.onreadystatechange = function () {
 
@@ -58,7 +55,7 @@ THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 
 				for ( var i = 0; i < jsonObject.materials.length; i ++ ) {
 
-					materials[ i ] = scope.createMaterial( jsonObject.materials[ i ], basePath );
+					materials[ i ] = THREE.Loader.prototype.createMaterial( jsonObject.materials[ i ], basePath );
 
 				}
 

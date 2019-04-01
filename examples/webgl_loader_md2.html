@@ -39,16 +39,20 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src='js/loaders/MD2Loader.js'></script>
-		<script src='js/MD2Character.js'></script>
+		<script src="js/loaders/MD2Loader.js"></script>
+		<script src="js/MD2Character.js"></script>
 
-		<script src='js/Detector.js'></script>
-		<script src='js/libs/stats.min.js'></script>
-		<script src='js/libs/dat.gui.min.js'></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -106,7 +110,7 @@
 				scene.add( light );
 
 				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
-				light.position.set( -100, 350, 350 );
+				light.position.set( - 100, 350, 350 );
 				light.angle = 0.5;
 				light.penumbra = 0.5;
 
@@ -163,13 +167,13 @@
 
 				gui = new dat.GUI();
 
-				gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function() {
+				gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function () {
 
 					character.setPlaybackRate( playbackConfig.speed );
 
 				} );
 
-				gui.add( playbackConfig, 'wireframe', false ).onChange( function() {
+				gui.add( playbackConfig, 'wireframe', false ).onChange( function () {
 
 					character.setWireframe( playbackConfig.wireframe );
 
@@ -183,7 +187,7 @@
 
 					body: "ratamahatta.md2",
 					skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],
-					weapons:  [  [ "weapon.md2", "weapon.png" ],
+					weapons: [[ "weapon.md2", "weapon.png" ],
 								 [ "w_bfg.md2", "w_bfg.png" ],
 								 [ "w_blaster.md2", "w_blaster.png" ],
 								 [ "w_chaingun.md2", "w_chaingun.png" ],
@@ -194,20 +198,20 @@
 								 [ "w_rlauncher.md2", "w_rlauncher.png" ],
 								 [ "w_shotgun.md2", "w_shotgun.png" ],
 								 [ "w_sshotgun.md2", "w_sshotgun.png" ]
-								]
+					]
 
 				};
 
 				character = new THREE.MD2Character();
 				character.scale = 3;
 
-				character.onLoadComplete = function() {
+				character.onLoadComplete = function () {
 
 					setupSkinsGUI( character );
 					setupWeaponsGUI( character );
 					setupGUIAnimations( character );
 
-					character.setAnimation( character.meshBody.geometry.animations[0].name )
+					character.setAnimation( character.meshBody.geometry.animations[ 0 ].name );
 
 				};
 
@@ -219,14 +223,14 @@
 
 			// EVENT HANDLERS
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				camera.aspect = SCREEN_WIDTH/ SCREEN_HEIGHT;
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
 			}
@@ -254,9 +258,13 @@
 
 				var folder = gui.addFolder( "Weapons" );
 
-				var generateCallback = function( index ) {
+				var generateCallback = function ( index ) {
 
-					return function () { character.setWeapon( index ); };
+					return function () {
+
+						character.setWeapon( index );
+
+					};
 
 				};
 
@@ -279,9 +287,13 @@
 
 				var folder = gui.addFolder( "Skins" );
 
-				var generateCallback = function( index ) {
+				var generateCallback = function ( index ) {
 
-					return function () { character.setSkin( index ); };
+					return function () {
+
+						character.setSkin( index );
+
+					};
 
 				};
 
@@ -304,9 +316,13 @@
 
 				var folder = gui.addFolder( "Animations" );
 
-				var generateCallback = function( animationClip ) {
+				var generateCallback = function ( animationClip ) {
 
-					return function () { character.setAnimation( animationClip.name ); };
+					return function () {
+
+						character.setAnimation( animationClip.name );
+
+					};
 
 				};
 
@@ -315,7 +331,7 @@
 
 				for ( var i = 0; i < animations.length; i ++ ) {
 
-					var clip = animations[i];
+					var clip = animations[ i ];
 
 					playbackConfig[ clip.name ] = generateCallback( clip );
 					guiItems[ i ] = folder.add( playbackConfig, clip.name, clip.name );

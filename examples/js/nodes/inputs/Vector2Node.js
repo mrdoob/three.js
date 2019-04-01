@@ -2,15 +2,54 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.Vector2Node = function( x, y ) {
+import { InputNode } from '../core/InputNode.js';
+import { NodeUtils } from '../core/NodeUtils.js';
 
-	THREE.InputNode.call( this, 'v2' );
+function Vector2Node( x, y ) {
 
-	this.value = new THREE.Vector2( x, y );
+	InputNode.call( this, 'v2' );
+
+	this.value = x instanceof THREE.Vector2 ? x : new THREE.Vector2( x, y );
+
+}
+
+Vector2Node.prototype = Object.create( InputNode.prototype );
+Vector2Node.prototype.constructor = Vector2Node;
+Vector2Node.prototype.nodeType = "Vector2";
+
+NodeUtils.addShortcuts( Vector2Node.prototype, 'value', [ 'x', 'y' ] );
+
+Vector2Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+
+	return builder.format( "vec2( " + this.x + ", " + this.y + " )", type, output );
 
 };
 
-THREE.Vector2Node.prototype = Object.create( THREE.InputNode.prototype );
-THREE.Vector2Node.prototype.constructor = THREE.Vector2Node;
+Vector2Node.prototype.copy = function ( source ) {
 
-THREE.NodeMaterial.addShortcuts( THREE.Vector2Node.prototype, 'value', [ 'x', 'y' ] );
+	InputNode.prototype.copy.call( this, source );
+
+	this.value.copy( source );
+
+};
+
+Vector2Node.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.x = this.x;
+		data.y = this.y;
+
+		if ( this.readonly === true ) data.readonly = true;
+
+	}
+
+	return data;
+
+};
+
+export { Vector2Node };

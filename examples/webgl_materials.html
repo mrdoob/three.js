@@ -17,12 +17,16 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -60,42 +64,24 @@
 				materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, flatShading: true } ) );
 				materials.push( new THREE.MeshNormalMaterial() );
 				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, transparent: true, blending: THREE.AdditiveBlending } ) );
-				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ) );
-
 				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd } ) );
 				materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, map: texture, transparent: true } ) );
 				materials.push( new THREE.MeshNormalMaterial( { flatShading: true } ) );
 				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
-
 				materials.push( new THREE.MeshDepthMaterial() );
-
 				materials.push( new THREE.MeshLambertMaterial( { color: 0x666666, emissive: 0xff0000 } ) );
 				materials.push( new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x666666, emissive: 0xff0000, shininess: 10, opacity: 0.9, transparent: true } ) );
-
 				materials.push( new THREE.MeshBasicMaterial( { map: texture, transparent: true } ) );
 
 				// Spheres geometry
 
-				var geometry = new THREE.SphereGeometry( 70, 32, 16 );
-
-				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-					var face = geometry.faces[ i ];
-					face.materialIndex = Math.floor( Math.random() * materials.length );
-
-				}
-
-				geometry.sortFacesByMaterialIndex();
-
-				objects = [];
+				var geometry = new THREE.SphereBufferGeometry( 70, 32, 16 );
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
 					addMesh( geometry, materials[ i ] );
 
 				}
-
-				addMesh( geometry, materials );
 
 				// Lights
 
@@ -113,7 +99,7 @@
 				pointLight = new THREE.PointLight( 0xffffff, 1 );
 				scene.add( pointLight );
 
-				pointLight.add( new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
+				pointLight.add( new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
 
 				//
 

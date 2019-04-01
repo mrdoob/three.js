@@ -30,7 +30,7 @@
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/loaders/TTFLoader.js"></script>
 		<script src="js/libs/opentype.min.js"></script>
 		<div id="info">
@@ -41,9 +41,13 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, color;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var container;
 			var camera, cameraTarget, scene, renderer;
 			var group, textMesh1, textMesh2, textGeo, material;
 			var firstLetter = true;
@@ -54,8 +58,7 @@
 				hover = 30,
 				curveSegments = 4,
 				bevelThickness = 2,
-				bevelSize = 1.5,
-				bevelSegments = 3;
+				bevelSize = 1.5;
 
 			var font = null;
 			var mirror = true;
@@ -67,7 +70,6 @@
 			var mouseXOnMouseDown = 0;
 
 			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -111,8 +113,10 @@
 				var loader = new THREE.TTFLoader();
 
 				loader.load( 'fonts/ttf/kenpixel.ttf', function ( json ) {
+
 					font = new THREE.Font( json );
 					createText();
+
 				} );
 
 				var plane = new THREE.Mesh(
@@ -145,7 +149,6 @@
 			function onWindowResize() {
 
 				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -213,12 +216,9 @@
 
 					bevelThickness: bevelThickness,
 					bevelSize: bevelSize,
-					bevelEnabled: true,
+					bevelEnabled: true
 
-					material: 0,
-					extrudeMaterial: 1
-
-				});
+				} );
 
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
@@ -241,7 +241,7 @@
 					textMesh2 = new THREE.Mesh( textGeo, material );
 
 					textMesh2.position.x = centerOffset;
-					textMesh2.position.y = -hover;
+					textMesh2.position.y = - hover;
 					textMesh2.position.z = height;
 
 					textMesh2.rotation.x = Math.PI;
@@ -258,7 +258,7 @@
 				group.remove( textMesh1 );
 				if ( mirror ) group.remove( textMesh2 );
 
-				if ( !text ) return;
+				if ( ! text ) return;
 
 				createText();
 
@@ -285,7 +285,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -293,7 +293,7 @@
 
 			}
 
-			function onDocumentMouseOut( event ) {
+			function onDocumentMouseOut() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );

@@ -43,24 +43,28 @@
 		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
+		<script src="js/animation/MMDAnimationHelper.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer, effect;
 			var mesh, helper;
 
 			var vpds = [];
 
-			var clock = new THREE.Clock();
+			Ammo().then( function( AmmoLib ) {
 
-			init();
-			animate();
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
 
 			function init() {
 
@@ -79,7 +83,7 @@
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0x887766 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
@@ -93,15 +97,16 @@
 
 				// model
 
-				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
-					}
-				};
+				function onProgress( xhr ) {
 
-				var onError = function ( xhr ) {
-				};
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
+				}
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vpdFiles = [
@@ -118,28 +123,28 @@
 					'models/mmd/vpds/11.vpd'
 				];
 
-				helper = new THREE.MMDHelper();
+				helper = new THREE.MMDAnimationHelper();
 
 				var loader = new THREE.MMDLoader();
 
-				loader.loadModel( modelFile, function ( object ) {
+				loader.load( modelFile, function ( object ) {
 
 					mesh = object;
-					mesh.position.y = -10;
+					mesh.position.y = - 10;
 
 					scene.add( mesh );
 
 					var vpdIndex = 0;
 
-					function loadVpd () {
+					function loadVpd() {
 
 						var vpdFile = vpdFiles[ vpdIndex ];
 
-						loader.loadVpd( vpdFile, function ( vpd ) {
+						loader.loadVPD( vpdFile, false, function ( vpd ) {
 
 							vpds.push( vpd );
 
-							vpdIndex++;
+							vpdIndex ++;
 
 							if ( vpdIndex < vpdFiles.length ) {
 
@@ -151,18 +156,19 @@
 
 							}
 
-						}, onProgress, onError );
+						}, onProgress, null );
 
 					}
+
 					loadVpd();
 
-				}, onProgress, onError );
+				}, onProgress, null );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				function initGui () {
+				function initGui() {
 
 					var gui = new dat.GUI();
 
@@ -174,13 +180,13 @@
 					var poses = gui.addFolder( 'Poses' );
 					var morphs = gui.addFolder( 'Morphs' );
 
-					function getBaseName ( s ) {
+					function getBaseName( s ) {
 
 						return s.slice( s.lastIndexOf( '/' ) + 1 );
 
 					}
 
-					function initControls () {
+					function initControls() {
 
 						for ( var key in dictionary ) {
 
@@ -188,9 +194,9 @@
 
 						}
 
-						controls.pose = -1;
+						controls.pose = - 1;
 
-						for ( var i = 0; i < vpdFiles.length; i++ ) {
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
 
 							controls[ getBaseName( vpdFiles[ i ] ) ] = false;
 
@@ -198,7 +204,7 @@
 
 					}
 
-					function initKeys () {
+					function initKeys() {
 
 						for ( var key in dictionary ) {
 
@@ -208,11 +214,11 @@
 
 					}
 
-					function initPoses () {
+					function initPoses() {
 
-						var files = { default: -1 };
+						var files = { default: - 1 };
 
-						for ( var i = 0; i < vpdFiles.length; i++ ) {
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
 
 							files[ getBaseName( vpdFiles[ i ] ) ] = i;
 
@@ -222,7 +228,7 @@
 
 					}
 
-					function initMorphs () {
+					function initMorphs() {
 
 						for ( var key in dictionary ) {
 
@@ -232,9 +238,9 @@
 
 					}
 
-					function onChangeMorph () {
+					function onChangeMorph() {
 
-						for ( var i = 0; i < keys.length; i++ ) {
+						for ( var i = 0; i < keys.length; i ++ ) {
 
 							var key = keys[ i ];
 							var value = controls[ key ];
@@ -244,17 +250,17 @@
 
 					}
 
-					function onChangePose () {
+					function onChangePose() {
 
 						var index = parseInt( controls.pose );
 
-						if ( index === -1 ) {
+						if ( index === - 1 ) {
 
 							mesh.pose();
 
 						} else {
 
-							helper.poseAsVpd( mesh, vpds[ index ] );
+							helper.pose( mesh, vpds[ index ] );
 
 						}
 

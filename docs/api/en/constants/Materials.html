@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Material Constants</h1>
+
+		<p class="desc">
+		These constants define properties common to all material types,
+		with the exception of Texture Combine Operations which only apply to [page:MeshBasicMaterial.combine MeshBasicMaterial], [page:MeshLambertMaterial.combine MeshLambertMaterial] and [page:MeshPhongMaterial.combine MeshPhongMaterial].<br />
+		</p>
+
+
+		<h2>Side</h2>
+		<code>
+		THREE.FrontSide
+		THREE.BackSide
+		THREE.DoubleSide
+		</code>
+		<p>
+		Defines which side of faces will be rendered - front, back or both.
+		Default is [page:Constant FrontSide].
+		</p>
+
+
+		<h2>Colors</h2>
+		<code>
+		THREE.NoColors
+		THREE.FaceColors
+		THREE.VertexColors
+		</code>
+		<p>
+		[page:Constant NoColors] is the default and applies the material's color to all faces.<br />
+		[page:Constant FaceColors] colors faces according to each [page:Face3 Face3] [page:Color Color] value.<br />
+		[page:Constant VertexColors] colors faces according to each [page:Face3 Face3] vertexColors value. This is an array of three [page:Color Color]s, one for each vertex in the face.<br />
+		See the [example:webgl_geometry_colors geometry / colors] example.
+		</p>
+
+		<h2>Blending Mode</h2>
+		<code>
+		THREE.NoBlending
+		THREE.NormalBlending
+		THREE.AdditiveBlending
+		THREE.SubtractiveBlending
+		THREE.MultiplyBlending
+		THREE.CustomBlending
+		</code>
+
+
+		<p>
+		These control the source and destination blending equations for the material's RGB and Alpha sent to the WebGLRenderer for use by WebGL.<br />
+		[page:Constant NormalBlending] is the default.<br />
+		Note that [page:Constant CustomBlending] must be set to use [page:CustomBlendingEquation Custom Blending Equations].<br />
+		See the [example:webgl_materials_blending materials / blending] example.<br />
+		</p>
+
+		<h2>Depth Mode</h2>
+		<code>
+		THREE.NeverDepth
+		THREE.AlwaysDepth
+		THREE.LessDepth
+		THREE.LessEqualDepth
+		THREE.GreaterEqualDepth
+		THREE.GreaterDepth
+		THREE.NotEqualDepth
+		</code>
+		<p>
+		Which depth function the material uses to compare incoming pixels Z-depth against the current Z-depth buffer value. If the result of the comparison is true, the pixel will be drawn.<br />
+		[page:Materials NeverDepth] will never return true.<br />
+		[page:Materials AlwaysDepth] will always return true.<br />
+		[page:Materials LessDepth] will return true if the incoming pixel Z-depth is less than the current buffer Z-depth.<br />
+		[page:Materials LessEqualDepth] is the default and will return true if the incoming pixel Z-depth is less than or equal to the current buffer Z-depth.<br />
+		[page:Materials GreaterEqualDepth] will return true if the incoming pixel Z-depth is greater than or equal to the current buffer Z-depth.<br />
+		[page:Materials GreaterDepth] will return true if the incoming pixel Z-depth is greater than the current buffer Z-depth.<br />
+		[page:Materials NotEqualDepth] will return true if the incoming pixel Z-depth is not equal to the current buffer Z-depth.<br />
+		</p>
+
+		<h2>Texture Combine Operations</h2>
+		<code>
+		THREE.MultiplyOperation
+		THREE.MixOperation
+		THREE.AddOperation
+		</code>
+		<p>
+		These define how the result of the surface's color is combined with the environment map (if present), for [page:MeshBasicMaterial.combine MeshBasicMaterial], [page:MeshLambertMaterial.combine MeshLambertMaterial] and [page:MeshPhongMaterial.combine MeshPhongMaterial]. <br />
+		[page:Constant MultiplyOperation] is the default and multiplies the environment map color with the surface color.<br />
+		[page:Constant MixOperation] uses reflectivity to blend between the two colors.<br />
+		[page:Constant AddOperation] adds the two colors.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+	</body>
+</html>

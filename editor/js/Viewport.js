@@ -10,6 +10,7 @@ var Viewport = function ( editor ) {
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
+	container.add( new Viewport.Camera( editor ) );
 	container.add( new Viewport.Info( editor ) );
 
 	//
@@ -24,8 +25,20 @@ var Viewport = function ( editor ) {
 
 	// helpers
 
-	var grid = new THREE.GridHelper( 60, 60 );
+	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
 	sceneHelpers.add( grid );
+
+	var array = grid.geometry.attributes.color.array;
+
+	for ( var i = 0; i < array.length; i += 60 ) {
+
+		for ( var j = 0; j < 12; j ++ ) {
+
+			array[ i + j ] = 0.26;
+
+		}
+
+	}
 
 	//
 
@@ -186,7 +199,7 @@ var Viewport = function ( editor ) {
 
 	function onMouseDown( event ) {
 
-		event.preventDefault();
+		// event.preventDefault();
 
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDownPosition.fromArray( array );
@@ -257,7 +270,6 @@ var Viewport = function ( editor ) {
 	var controls = new THREE.EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
-		transformControls.update();
 		signals.cameraChanged.dispatch( camera );
 
 	} );
@@ -267,27 +279,6 @@ var Viewport = function ( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
-		render();
-
-	} );
-
-	signals.themeChanged.add( function ( value ) {
-
-		switch ( value ) {
-
-			case 'css/light.css':
-				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 60, 60, 0x444444, 0x888888 );
-				sceneHelpers.add( grid );
-				break;
-			case 'css/dark.css':
-				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 60, 60, 0xbbbbbb, 0x888888 );
-				sceneHelpers.add( grid );
-				break;
-
-		}
-
 		render();
 
 	} );
@@ -322,6 +313,7 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
+		renderer.gammaOutput = true;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -400,11 +392,10 @@ var Viewport = function ( editor ) {
 		if ( editor.selected === object ) {
 
 			selectionBox.setFromObject( object );
-			transformControls.update();
 
 		}
 
-		if ( object instanceof THREE.PerspectiveCamera ) {
+		if ( object.isPerspectiveCamera ) {
 
 			object.updateProjectionMatrix();
 
@@ -421,6 +412,12 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.objectRemoved.add( function ( object ) {
+
+		if ( object === transformControls.object ) {
+
+			transformControls.detach();
+
+		}
 
 		object.traverse( function ( child ) {
 
@@ -482,18 +479,33 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( scene.fog instanceof THREE.Fog ) {
+		if ( scene.fog ) {
 
-			scene.fog.color.setHex( fogColor );
-			scene.fog.near = fogNear;
-			scene.fog.far = fogFar;
+			if ( scene.fog.isFog ) {
 
-		} else if ( scene.fog instanceof THREE.FogExp2 ) {
+				scene.fog.color.setHex( fogColor );
+				scene.fog.near = fogNear;
+				scene.fog.far = fogFar;
 
-			scene.fog.color.setHex( fogColor );
-			scene.fog.density = fogDensity;
+			} else if ( scene.fog.isFogExp2 ) {
+
+				scene.fog.color.setHex( fogColor );
+				scene.fog.density = fogDensity;
+
+			}
 
 		}
+
+		render();
+
+	} );
+
+	signals.viewportCameraChanged.add( function ( viewportCamera ) {
+
+		camera = viewportCamera;
+
+		camera.aspect = editor.camera.aspect;
+		camera.projectionMatrix.copy( editor.camera.projectionMatrix );
 
 		render();
 
@@ -524,18 +536,44 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	// animations
+
+	var prevTime = performance.now();
+
+	function animate( time ) {
+
+		requestAnimationFrame( animate );
+
+		var mixer = editor.mixer;
+
+		if ( mixer.stats.actions.inUse > 0 ) {
+
+			mixer.update( ( time - prevTime ) / 1000 );
+			render();
+
+		}
+
+		prevTime = time;
+
+	}
+
+	requestAnimationFrame( animate );
+
 	//
 
 	function render() {
 
-		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
-
 		renderer.render( scene, camera );
 
 		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			renderer.render( sceneHelpers, camera );
+			if ( camera === editor.camera ) {
+
+				sceneHelpers.updateMatrixWorld();
+				renderer.render( sceneHelpers, camera );
+
+			}
 
 		}
 

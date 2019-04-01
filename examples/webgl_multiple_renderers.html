@@ -34,15 +34,21 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer1, renderer2;
-			var group1, group2, group3;
+
+			var mesh1, mesh2, mesh3;
+			var color = new THREE.Color();
 
 			init();
 			animate();
@@ -81,81 +87,84 @@
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 				var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				var shadowMesh;
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.x = - 400;
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.x = 400;
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.x = - 400;
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
 
-				var faceIndices = [ 'a', 'b', 'c' ];
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.x = 400;
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
 
-				var color, f1, f2, f3, p, vertexIndex,
+				var radius = 200;
 
-					radius = 200,
+				var geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
 
-					geometry1 = new THREE.IcosahedronGeometry( radius, 1 ),
-					geometry2 = new THREE.IcosahedronGeometry( radius, 1 ),
-					geometry3 = new THREE.IcosahedronGeometry( radius, 1 );
+				var count = geometry1.attributes.position.count;
+				geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
-				for ( var i = 0; i < geometry1.faces.length; i ++ ) {
+				var geometry2 = geometry1.clone();
+				var geometry3 = geometry1.clone();
 
-					f1 = geometry1.faces[ i ];
-					f2 = geometry2.faces[ i ];
-					f3 = geometry3.faces[ i ];
+				var positions1 = geometry1.attributes.position;
+				var positions2 = geometry2.attributes.position;
+				var positions3 = geometry3.attributes.position;
+				var colors1 = geometry1.attributes.color;
+				var colors2 = geometry2.attributes.color;
+				var colors3 = geometry3.attributes.color;
 
-					for( var j = 0; j < 3; j ++ ) {
+				for ( var i = 0; i < count; i ++ ) {
 
-						vertexIndex = f1[ faceIndices[ j ] ];
+					color.setHSL( ( positions1.getY( i ) / radius + 1 ) / 2, 1.0, 0.5 );
+					colors1.setXYZ( i, color.r, color.g, color.b );
 
-						p = geometry1.vertices[ vertexIndex ];
+					color.setHSL( 0, ( positions2.getY( i ) / radius + 1 ) / 2, 0.5 );
+					colors2.setXYZ( i, color.r, color.g, color.b );
 
-						color = new THREE.Color( 0xffffff );
-						color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
-
-						f1.vertexColors[ j ] = color;
-
-						color = new THREE.Color( 0xffffff );
-						color.setHSL( 0.0, ( p.y / radius + 1 ) / 2, 0.5 );
-
-						f2.vertexColors[ j ] = color;
-
-						color = new THREE.Color( 0xffffff );
-						color.setHSL( 0.125 * vertexIndex / geometry1.vertices.length, 1.0, 0.5 );
-
-						f3.vertexColors[ j ] = color;
-
-					}
+					color.setRGB( 1, 0.8 - ( positions3.getY( i ) / radius + 1 ) / 2, 0 );
+					colors3.setXYZ( i, color.r, color.g, color.b );
 
 				}
 
-				var materials = [
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					flatShading: true,
+					vertexColors: THREE.VertexColors,
+					shininess: 0
+				} );
 
-					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } )
+				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
-				];
+				mesh1 = new THREE.Mesh( geometry1, material );
+				mesh1.position.x = - 400;
+				mesh1.rotation.x = - 1.87;
+				scene.add( mesh1 );
 
-				group1 = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
-				group1.position.x = -400;
-				scene.add( group1 );
+				var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
+				mesh1.add( wireframe );
 
-				group2 = THREE.SceneUtils.createMultiMaterialObject( geometry2, materials );
-				group2.position.x = 400;
-				scene.add( group2 );
+				mesh2 = new THREE.Mesh( geometry2, material );
+				mesh2.position.x = 400;
+				scene.add( mesh2 );
 
-				group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
-				scene.add( group3 );
+				var wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
+				mesh2.add( wireframe );
+
+				mesh3 = new THREE.Mesh( geometry3, material );
+				scene.add( mesh3 );
+
+				var wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
+				mesh3.add( wireframe );
 
 				//
 
@@ -164,7 +173,7 @@
 				renderer1.setSize( window.innerWidth, window.innerHeight / 2 );
 				document.body.appendChild( renderer1.domElement );
 
-				renderer2 = new THREE.WebGLRenderer( { antialias: false } );
+				renderer2 = new THREE.WebGLRenderer();
 				renderer2.setPixelRatio( window.devicePixelRatio );
 				renderer2.setSize( window.innerWidth, window.innerHeight / 2 );
 				document.body.appendChild( renderer2.domElement );
@@ -177,26 +186,28 @@
 
 				// update scene
 
-				group1.rotation.z += Math.PI / 500;
-				group2.rotation.z += Math.PI / 500;
-				group3.rotation.z += Math.PI / 500;
+				mesh1.rotation.z += Math.PI / 500;
+				mesh2.rotation.z += Math.PI / 500;
+				mesh3.rotation.z += Math.PI / 500;
 
-				var geometry = group3.children[ 0 ].geometry;
+				var position = new THREE.Vector3();
+				var color = new THREE.Color();
 
-				for ( var i = 0; i < geometry.faces.length; i ++ ) {
+				var time = performance.now() / 500;
 
-						var f = geometry.faces[ i ];
+				var positions = mesh3.geometry.attributes.position;
+				var colors = mesh3.geometry.attributes.color;
 
-						for ( var j = 0; j < 3; j ++ ) {
+				for ( var i = 0, l = positions.count; i < l; i ++ ) {
 
-							var color = f.vertexColors[ j ];
-							color.setHex( ( color.getHex() + 0xfdfdfd ) % 0xffffff );
+					position.fromArray( positions.array, i * 3 );
 
-						}
+					color.setRGB( 1, Math.sin( time + position.x ), Math.cos( time * 2.123 + position.x ) );
+					colors.setXYZ( i, color.r, color.g, color.b );
 
-					}
+				}
 
-				geometry.colorsNeedUpdate = true;
+				colors.needsUpdate = true;
 
 				//
 

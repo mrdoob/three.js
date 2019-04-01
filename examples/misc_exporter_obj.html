@@ -51,14 +51,13 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
-			- geometries:
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - obj<br /><br />
 			<span class="link" id="triangle">triangle</span>,
 			<span class="link" id="cube">cube</span>,
 			<span class="link" id="cylinder">cylinder</span>,
-			<span class="link" id="both">both</span>,
-			<span class="link" id="transformed">transformed</span>
-			- <span class="link" id="export">export to obj</span>
+			<span class="link" id="multiple">multiple</span>,
+			<span class="link" id="transformed">transformed</span><br /><br />
+			<span class="link" id="export">export to obj</span>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -75,21 +74,21 @@
 				var exporter = new THREE.OBJExporter();
 				var result = exporter.parse( scene );
 				floatingDiv.style.display = 'block';
-				floatingDiv.innerHTML = result.split( '\n' ).join ( '<br />' );
+				floatingDiv.innerHTML = result.split( '\n' ).join( '<br />' );
 
 			}
 
 			function addGeometry( type ) {
 
-				for( var i = 0; i < scene.children.length; i++ ) {
+				for ( var i = 0; i < scene.children.length; i ++ ) {
 
-					var current = scene.children[ i ];
+					var child = scene.children[ i ];
 
-					if( current instanceof THREE.Mesh ) {
+					if ( child.isMesh ) {
 
-						current.geometry.dispose();
-						scene.remove( current );
-						i--;
+						child.geometry.dispose();
+						scene.remove( child );
+						i --;
 
 					}
 
@@ -97,45 +96,31 @@
 
 				if ( type === 1 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
-
-					var geometry = new THREE.Geometry();
-					geometry.vertices.push( new THREE.Vector3( -50, -50, 0 ) );
-					geometry.vertices.push( new THREE.Vector3(  50, -50, 0 ) );
-					geometry.vertices.push( new THREE.Vector3(  50,  50, 0 ) );
-					var face = new THREE.Face3( 0, 1, 2 );
-					geometry.faces.push( face );
-					geometry.computeFaceNormals();
+					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					var geometry = generateTriangleGeometry();
 
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 
 				} else if ( type === 2 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 					var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} else if ( type === 3 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 					var geometry = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} else if ( type === 4 || type === 5 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color : 0x00cc00 } );
-
-					var geometry = new THREE.Geometry();
-					geometry.vertices.push( new THREE.Vector3( -50, -50, 0 ) );
-					geometry.vertices.push( new THREE.Vector3(  50, -50, 0 ) );
-					geometry.vertices.push( new THREE.Vector3(  50,  50, 0 ) );
-					var face = new THREE.Face3( 0, 1, 2 );
-					geometry.faces.push( face );
-					geometry.computeFaceNormals();
+					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					var geometry = generateTriangleGeometry();
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = -200;
+					mesh.position.x = - 200;
 					scene.add( mesh );
 
 					var geometry2 = new THREE.BoxBufferGeometry( 100, 100, 100 );
@@ -181,14 +166,38 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseover', onDocumentMouseMove, false );
 
-				document.getElementById( 'triangle' ).addEventListener( 'click', function() { addGeometry( 1 ); } );
-				document.getElementById( 'cube' ).addEventListener( 'click', function() { addGeometry( 2 ); } );
-				document.getElementById( 'cylinder' ).addEventListener( 'click', function() { addGeometry( 3 ); } );
-				document.getElementById( 'both' ).addEventListener( 'click', function() { addGeometry( 4 ); } );
-				document.getElementById( 'transformed' ).addEventListener( 'click', function() { addGeometry( 5 ); } );
+				document.getElementById( 'triangle' ).addEventListener( 'click', function () {
+
+					addGeometry( 1 );
+
+				} );
+				document.getElementById( 'cube' ).addEventListener( 'click', function () {
+
+					addGeometry( 2 );
+
+				} );
+				document.getElementById( 'cylinder' ).addEventListener( 'click', function () {
+
+					addGeometry( 3 );
+
+				} );
+				document.getElementById( 'multiple' ).addEventListener( 'click', function () {
+
+					addGeometry( 4 );
+
+				} );
+				document.getElementById( 'transformed' ).addEventListener( 'click', function () {
+
+					addGeometry( 5 );
+
+				} );
 
 				exportButton = document.getElementById( 'export' );
-				exportButton.addEventListener( 'click', function() { exportToObj(); });
+				exportButton.addEventListener( 'click', function () {
+
+					exportToObj();
+
+				} );
 
 				floatingDiv = document.createElement( 'div' );
 				floatingDiv.className = 'floating';
@@ -201,7 +210,7 @@
 				var needToClose = true;
 				var target = event.target;
 
-				while( target !== null ) {
+				while ( target !== null ) {
 
 					if ( target === floatingDiv || target === exportButton ) {
 
@@ -244,12 +253,28 @@
 
 				requestAnimationFrame( animate );
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( -mouseY - camera.position.y ) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 				camera.lookAt( scene.position );
 
 				light.position.set( camera.position.x, camera.position.y, camera.position.z ).normalize();
 				renderer.render( scene, camera );
+
+			}
+
+			function generateTriangleGeometry() {
+
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
+
+				vertices.push( - 50, - 50, 0 );
+				vertices.push( 50, - 50, 0 );
+				vertices.push( 50, 50, 0 );
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.computeVertexNormals();
+
+				return geometry;
 
 			}
 

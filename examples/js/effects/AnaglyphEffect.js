@@ -114,8 +114,8 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
-	_scene.add( mesh );
+	var _mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
+	_scene.add( _mesh );
 
 	this.setSize = function ( width, height ) {
 
@@ -130,22 +130,35 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	this.render = function ( scene, camera ) {
 
+		var currentRenderTarget = renderer.getRenderTarget();
+
 		scene.updateMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		_stereo.update( camera );
 
-		renderer.render( scene, _stereo.cameraL, _renderTargetL, true );
-		renderer.render( scene, _stereo.cameraR, _renderTargetR, true );
+		renderer.setRenderTarget( _renderTargetL );
+		renderer.clear();
+		renderer.render( scene, _stereo.cameraL );
+
+		renderer.setRenderTarget( _renderTargetR );
+		renderer.clear();
+		renderer.render( scene, _stereo.cameraR );
+
+		renderer.setRenderTarget( null );
 		renderer.render( _scene, _camera );
+
+		renderer.setRenderTarget( currentRenderTarget );
 
 	};
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		if ( _renderTargetL ) _renderTargetL.dispose();
 		if ( _renderTargetR ) _renderTargetR.dispose();
+		if ( _mesh ) _mesh.geometry.dispose();
+		if ( _material ) _material.dispose();
 
 	};
 

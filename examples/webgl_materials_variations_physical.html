@@ -37,13 +37,17 @@
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -68,21 +72,17 @@
 
 				//
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
-
-				var textureCube = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/pisa/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
-
 				scene = new THREE.Scene();
-				scene.background = textureCube;
 
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
@@ -120,7 +120,7 @@
 									color: diffuseColor,
 									metalness: 0,
 									roughness: 0.5,
-									clearCoat:  1.0 - alpha,
+									clearCoat: 1.0 - alpha,
 									clearCoatRoughness: 1.0 - beta,
 									reflectivity: 1.0 - gamma,
 									envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.texture : null
@@ -143,7 +143,15 @@
 						index ++;
 
 					}
-				});
+
+					hdrCubeMap.magFilter = THREE.LinearFilter;
+					hdrCubeMap.needsUpdate = true;
+					scene.background = hdrCubeMap;
+
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
+				} );
 
 				function addLabel( name, location ) {
 
@@ -155,7 +163,7 @@
 						height: 1,
 						curveSegments: 1
 
-					});
+					} );
 
 					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
@@ -164,13 +172,13 @@
 
 				}
 
-				addLabel( "+clearCoat", new THREE.Vector3( -350, 0, 0 ) );
+				addLabel( "+clearCoat", new THREE.Vector3( - 350, 0, 0 ) );
 				addLabel( "-clearCoat", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "+clearCoatRoughness", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "+clearCoatRoughness", new THREE.Vector3( 0, - 300, 0 ) );
 				addLabel( "-clearCoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, -300 ) );
+				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "-reflectivity", new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );

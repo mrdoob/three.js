@@ -23,9 +23,9 @@
 			#info {
 				color:#fff;
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0px;
+				width: 100%;
 				padding: 5px;
-				z-index:100;
 			}
 
 		</style>
@@ -38,15 +38,19 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container, stats;
-			var camera, scene, renderer, particles, geometry, material, i, h, color, sprite, size;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var camera, scene, renderer, stats, material;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -57,34 +61,33 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 2, 2000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.001 );
 
-				geometry = new THREE.Geometry();
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
 
-				sprite = new THREE.TextureLoader().load( "textures/sprites/disc.png" );
+				var sprite = new THREE.TextureLoader().load( 'textures/sprites/disc.png' );
 
-				for ( i = 0; i < 10000; i ++ ) {
+				for ( var i = 0; i < 10000; i ++ ) {
 
-					var vertex = new THREE.Vector3();
-					vertex.x = 2000 * Math.random() - 1000;
-					vertex.y = 2000 * Math.random() - 1000;
-					vertex.z = 2000 * Math.random() - 1000;
+					var x = 2000 * Math.random() - 1000;
+					var y = 2000 * Math.random() - 1000;
+					var z = 2000 * Math.random() - 1000;
 
-					geometry.vertices.push( vertex );
+					vertices.push( x, y, z );
 
 				}
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
 				material.color.setHSL( 1.0, 0.3, 0.7 );
 
-				particles = new THREE.Points( geometry, material );
+				var particles = new THREE.Points( geometry, material );
 				scene.add( particles );
 
 				//
@@ -92,12 +95,24 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
+
+				//
+
+				var gui = new dat.GUI();
+
+				gui.add( material, 'sizeAttenuation' ).onChange( function () {
+
+					material.needsUpdate = true;
+
+				} );
+
+				gui.open();
 
 				//
 
@@ -140,6 +155,7 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -175,7 +191,7 @@
 
 				camera.lookAt( scene.position );
 
-				h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
+				var h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
 				material.color.setHSL( h, 0.5, 0.5 );
 
 				renderer.render( scene, camera );

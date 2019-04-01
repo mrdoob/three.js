@@ -21,9 +21,7 @@
 				width: 100%;
 			}
 
-			label, input {
-				cursor: pointer;
-			}
+			input { cursor: pointer; }
 		</style>
 	</head>
 	<body>
@@ -54,8 +52,10 @@
 			animate();
 
 			function updateOptions() {
-				var wildGlitch = document.getElementById('wildGlitch');
-				glitchPass.goWild=wildGlitch.checked;
+
+				var wildGlitch = document.getElementById( 'wildGlitch' );
+				glitchPass.goWild = wildGlitch.checked;
+
 			}
 
 			function init() {
@@ -76,7 +76,7 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				var geometry = new THREE.SphereGeometry( 1, 4, 4 );
+				var geometry = new THREE.SphereBufferGeometry( 1, 4, 4 );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
@@ -103,7 +103,6 @@
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				glitchPass = new THREE.GlitchPass();
-				glitchPass.renderToScreen = true;
 				composer.addPass( glitchPass );
 
 
@@ -129,8 +128,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				var time = Date.now();
 
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;

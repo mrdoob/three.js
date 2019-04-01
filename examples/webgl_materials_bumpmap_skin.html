@@ -27,7 +27,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -36,7 +36,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl simple single-pass skin material with <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">tangent-less bump mapping</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl simple, single-pass, skin material with tangent-less bump mapping</a> -
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
@@ -51,44 +51,41 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var statsEnabled = true;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var container, stats, loader;
+			}
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
-			var mesh, mesh2;
-
-			var directionalLight;
+			var mesh;
 
 			var mouseX = 0;
 			var mouseY = 0;
 
 			var targetX = 0, targetY = 0;
 
-
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var mapColor, mapHeight, mapSpecular;
-
 			var firstPass = true;
 
-			var composer, composerBeckmann;
+			var composerBeckmann;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				//
@@ -103,32 +100,17 @@
 
 				scene.add( new THREE.AmbientLight( 0x333344 ) );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 500, 0, 500 );
-
-				directionalLight.castShadow = true;
-
-				directionalLight.shadow.mapSize.width = 2048;
-				directionalLight.shadow.mapSize.height = 2048;
-
-				directionalLight.shadow.camera.near = 200;
-				directionalLight.shadow.camera.far = 1500;
-
-				directionalLight.shadow.camera.left = -500;
-				directionalLight.shadow.camera.right = 500;
-				directionalLight.shadow.camera.top = 500;
-				directionalLight.shadow.camera.bottom = -500;
-
-				directionalLight.shadow.bias = -0.005;
 
 				scene.add( directionalLight );
 
 				//
 
-				loader = new THREE.JSONLoader();
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function ( geometry ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
-					createScene( geometry, 100 )
+					createScene( gltf.scene.children[ 0 ].geometry, 100 );
 
 				} );
 
@@ -138,37 +120,19 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.renderReverseSided = false;
-
 				renderer.autoClear = false;
-
-				//
-
-				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
 				//
 
-				if ( statsEnabled ) {
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-					stats = new Stats();
-					container.appendChild( stats.dom );
-
-				}
-
-
-				// COMPOSER
-
-				renderer.autoClear = false;
 
 				// BECKMANN
 
 				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
 				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
-
-				effectCopy.renderToScreen = true;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				var rtwidth = 512, rtheight = 512;
@@ -188,19 +152,19 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var mapHeight = textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				mapHeight.anisotropy = 4;
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
-				var mapSpecular = textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" );
+				var mapSpecular = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
 
 				mapSpecular.anisotropy = 4;
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
 				mapSpecular.format = THREE.RGBFormat;
 
-				var mapColor = textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" );
+				var mapColor = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
 
 				mapColor.anisotropy = 4;
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
@@ -238,16 +202,13 @@
 				mesh.position.y = - 50;
 				mesh.scale.set( scale, scale, scale );
 
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-
 				scene.add( mesh );
 
 			}
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -270,7 +231,8 @@
 				requestAnimationFrame( animate );
 
 				render();
-				if ( statsEnabled ) stats.update();
+
+				stats.update();
 
 			}
 

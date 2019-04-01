@@ -57,7 +57,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	bokehUniforms[ "farClip" ].value = camera.far;
 
 	this.materialBokeh = new THREE.ShaderMaterial( {
-		defines: bokehShader.defines,
+		defines: Object.assign( {}, bokehShader.defines ),
 		uniforms: bokehUniforms,
 		vertexShader: bokehShader.vertexShader,
 		fragmentShader: bokehShader.fragmentShader
@@ -66,12 +66,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.uniforms = bokehUniforms;
 	this.needsSwap = false;
 
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2  = new THREE.Scene();
-
-	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad2.frustumCulled = false; // Avoid getting clipped
-	this.scene2.add( this.quad2 );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.materialBokeh );
 
 	this.oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
@@ -82,9 +77,7 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 	constructor: THREE.BokehPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
-
-		this.quad2.material = this.materialBokeh;
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		// Render depth into texture
 
@@ -97,7 +90,9 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		renderer.setClearColor( 0xffffff );
 		renderer.setClearAlpha( 1.0 );
-		renderer.render( this.scene, this.camera, this.renderTargetDepth, true );
+		renderer.setRenderTarget( this.renderTargetDepth );
+		renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// Render bokeh composite
 
@@ -107,11 +102,14 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		if ( this.renderToScreen ) {
 
-			renderer.render( this.scene2, this.camera2 );
+			renderer.setRenderTarget( null );
+			this.fsQuad.render( renderer );
 
 		} else {
 
-			renderer.render( this.scene2, this.camera2, writeBuffer, this.clear );
+			renderer.setRenderTarget( writeBuffer );
+			renderer.clear();
+			this.fsQuad.render( renderer );
 
 		}
 
@@ -119,7 +117,7 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 		renderer.setClearColor( this.oldClearColor );
 		renderer.setClearAlpha( this.oldClearAlpha );
 		renderer.autoClear = this.oldAutoClear;
-	
+
 	}
 
 } );

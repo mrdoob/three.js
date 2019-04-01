@@ -1,4 +1,9 @@
+import { Color } from '../math/Color.js';
 import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Matrix3 } from '../math/Matrix3.js';
+import { Matrix4 } from '../math/Matrix4.js';
 import { FileLoader } from './FileLoader.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 import * as Materials from '../materials/Materials.js';
@@ -21,17 +26,12 @@ Object.assign( MaterialLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setTextures: function ( value ) {
-
-		this.textures = value;
 
 	},
 
@@ -63,13 +63,11 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
 		if ( json.clearCoat !== undefined ) material.clearCoat = json.clearCoat;
 		if ( json.clearCoatRoughness !== undefined ) material.clearCoatRoughness = json.clearCoatRoughness;
-		if ( json.uniforms !== undefined ) material.uniforms = json.uniforms;
-		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
-		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 		if ( json.fog !== undefined ) material.fog = json.fog;
 		if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
 		if ( json.blending !== undefined ) material.blending = json.blending;
+		if ( json.combine !== undefined ) material.combine = json.combine;
 		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
@@ -89,12 +87,78 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.gapSize !== undefined ) material.gapSize = json.gapSize;
 		if ( json.scale !== undefined ) material.scale = json.scale;
 
+		if ( json.polygonOffset !== undefined ) material.polygonOffset = json.polygonOffset;
+		if ( json.polygonOffsetFactor !== undefined ) material.polygonOffsetFactor = json.polygonOffsetFactor;
+		if ( json.polygonOffsetUnits !== undefined ) material.polygonOffsetUnits = json.polygonOffsetUnits;
+
 		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 		if ( json.dithering !== undefined ) material.dithering = json.dithering;
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
 		if ( json.userData !== undefined ) material.userData = json.userData;
+
+		// Shader Material
+
+		if ( json.uniforms !== undefined ) {
+
+			for ( var name in json.uniforms ) {
+
+				var uniform = json.uniforms[ name ];
+
+				material.uniforms[ name ] = {};
+
+				switch ( uniform.type ) {
+
+					case 't':
+						material.uniforms[ name ].value = getTexture( uniform.value );
+						break;
+
+					case 'c':
+						material.uniforms[ name ].value = new Color().setHex( uniform.value );
+						break;
+
+					case 'v2':
+						material.uniforms[ name ].value = new Vector2().fromArray( uniform.value );
+						break;
+
+					case 'v3':
+						material.uniforms[ name ].value = new Vector3().fromArray( uniform.value );
+						break;
+
+					case 'v4':
+						material.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
+						break;
+
+					case 'm3':
+						material.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+
+					case 'm4':
+						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
+						break;
+
+					default:
+						material.uniforms[ name ].value = uniform.value;
+
+				}
+
+			}
+
+		}
+
+		if ( json.defines !== undefined ) material.defines = json.defines;
+		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
+		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
+
+		if ( json.extensions !== undefined ) {
+
+			for ( var key in json.extensions ) {
+
+				material.extensions[ key ] = json.extensions[ key ];
+
+			}
+
+		}
 
 		// Deprecated
 
@@ -120,6 +184,7 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
 		if ( json.normalMap !== undefined ) material.normalMap = getTexture( json.normalMap );
+		if ( json.normalMapType !== undefined ) material.normalMapType = json.normalMapType;
 		if ( json.normalScale !== undefined ) {
 
 			var normalScale = json.normalScale;
@@ -149,6 +214,7 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.specularMap !== undefined ) material.specularMap = getTexture( json.specularMap );
 
 		if ( json.envMap !== undefined ) material.envMap = getTexture( json.envMap );
+		if ( json.envMapIntensity !== undefined ) material.envMapIntensity = json.envMapIntensity;
 
 		if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
 
@@ -161,6 +227,20 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
 
 		return material;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
+
+	},
+
+	setTextures: function ( value ) {
+
+		this.textures = value;
+		return this;
 
 	}
 

@@ -16,6 +16,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.supportsDepthTextureExtension = ( depthTexture !== undefined ) ? depthTexture : false;
 	this.supportsNormalTexture = ( useNormals !== undefined ) ? useNormals : false;
 
+	this.originalClearColor = new THREE.Color();
 	this.oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
 
@@ -74,16 +75,19 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	}
 
-	this.saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
+	this.saoMaterial = new THREE.ShaderMaterial( {
+		defines: Object.assign( {}, THREE.SAOShader.defines ),
+		fragmentShader: THREE.SAOShader.fragmentShader,
+		vertexShader: THREE.SAOShader.vertexShader,
+		uniforms: THREE.UniformsUtils.clone( THREE.SAOShader.uniforms )
+	} );
 	this.saoMaterial.extensions.derivatives = true;
-	this.saoMaterial.extensions.drawBuffers = true;
 	this.saoMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 	this.saoMaterial.defines[ 'NORMAL_TEXTURE' ] = this.supportsNormalTexture ? 1 : 0;
+	this.saoMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
 	this.saoMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.texture;
 	this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 	this.saoMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
-	this.saoMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-	this.saoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
 	this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 	this.saoMaterial.blending = THREE.NoBlending;
@@ -96,29 +100,27 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	this.vBlurMaterial = new THREE.ShaderMaterial( {
 		uniforms: THREE.UniformsUtils.clone( THREE.DepthLimitedBlurShader.uniforms ),
-		defines: THREE.DepthLimitedBlurShader.defines,
+		defines: Object.assign( {}, THREE.DepthLimitedBlurShader.defines ),
 		vertexShader: THREE.DepthLimitedBlurShader.vertexShader,
 		fragmentShader: THREE.DepthLimitedBlurShader.fragmentShader
 	} );
 	this.vBlurMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
+	this.vBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
 	this.vBlurMaterial.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.texture;
 	this.vBlurMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.texture;
-	this.vBlurMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-	this.vBlurMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.vBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 	this.vBlurMaterial.blending = THREE.NoBlending;
 
 	this.hBlurMaterial = new THREE.ShaderMaterial( {
 		uniforms: THREE.UniformsUtils.clone( THREE.DepthLimitedBlurShader.uniforms ),
-		defines: THREE.DepthLimitedBlurShader.defines,
+		defines: Object.assign( {}, THREE.DepthLimitedBlurShader.defines ),
 		vertexShader: THREE.DepthLimitedBlurShader.vertexShader,
 		fragmentShader: THREE.DepthLimitedBlurShader.fragmentShader
 	} );
 	this.hBlurMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
+	this.hBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
 	this.hBlurMaterial.uniforms[ 'tDiffuse' ].value = this.blurIntermediateRenderTarget.texture;
 	this.hBlurMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.texture;
-	this.hBlurMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-	this.hBlurMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.hBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 	this.hBlurMaterial.blending = THREE.NoBlending;
 
@@ -158,10 +160,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 		blending: THREE.NoBlending
 	} );
 
-	this.quadCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.quadScene = new THREE.Scene();
-	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
-	this.quadScene.add( this.quad );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -176,7 +175,7 @@ THREE.SAOPass.OUTPUT = {
 THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 	constructor: THREE.SAOPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		// Rendering readBuffer first when rendering to screen
 		if ( this.renderToScreen ) {
@@ -188,7 +187,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		}
 
-		if ( this.params.output == 1 ) {
+		if ( this.params.output === 1 ) {
 
 			return;
 
@@ -199,18 +198,26 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		renderer.clearTarget( this.depthRenderTarget );
+		renderer.setRenderTarget( this.depthRenderTarget );
+		renderer.clear();
 
 		this.saoMaterial.uniforms[ 'bias' ].value = this.params.saoBias;
 		this.saoMaterial.uniforms[ 'intensity' ].value = this.params.saoIntensity;
 		this.saoMaterial.uniforms[ 'scale' ].value = this.params.saoScale;
 		this.saoMaterial.uniforms[ 'kernelRadius' ].value = this.params.saoKernelRadius;
 		this.saoMaterial.uniforms[ 'minResolution' ].value = this.params.saoMinResolution;
+		this.saoMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+		this.saoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 		// this.saoMaterial.uniforms['randomSeed'].value = Math.random();
 
 		var depthCutoff = this.params.saoBlurDepthCutoff * ( this.camera.far - this.camera.near );
 		this.vBlurMaterial.uniforms[ 'depthCutoff' ].value = depthCutoff;
 		this.hBlurMaterial.uniforms[ 'depthCutoff' ].value = depthCutoff;
+
+		this.vBlurMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+		this.vBlurMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+		this.hBlurMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+		this.hBlurMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 
 		this.params.saoBlurRadius = Math.floor( this.params.saoBlurRadius );
 		if ( ( this.prevStdDev !== this.params.saoBlurStdDev ) || ( this.prevNumSamples !== this.params.saoBlurRadius ) ) {
@@ -224,13 +231,15 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		// Rendering scene to depth texture
 		renderer.setClearColor( 0x000000 );
-		renderer.render( this.scene, this.camera, this.beautyRenderTarget, true );
+		renderer.setRenderTarget( this.beautyRenderTarget );
+		renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// Re-render scene if depth texture extension is not supported
 		if ( ! this.supportsDepthTextureExtension ) {
 
 			// Clear rule : far clipping plane in both RGBA and Basic encoding
-			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget, 0xffffff, 1.0 );
+			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget, 0x000000, 1.0 );
 
 		}
 
@@ -254,7 +263,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		var outputMaterial = this.materialCopy;
 		// Setting up SAO rendering
-		if ( this.params.output == 3 ) {
+		if ( this.params.output === 3 ) {
 
 			if ( this.supportsDepthTextureExtension ) {
 
@@ -269,7 +278,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 			}
 
-		} else if ( this.params.output == 4 ) {
+		} else if ( this.params.output === 4 ) {
 
 			this.materialCopy.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 			this.materialCopy.needsUpdate = true;
@@ -282,7 +291,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		}
 
 		// Blending depends on output, only want a CustomBlending when showing SAO
-		if ( this.params.output == 0 ) {
+		if ( this.params.output === 0 ) {
 
 			outputMaterial.blending = THREE.CustomBlending;
 
@@ -303,55 +312,58 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		var originalClearColor = renderer.getClearColor();
+		this.originalClearColor.copy( renderer.getClearColor() );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
+		renderer.setRenderTarget( renderTarget );
+
 		// setup pass state
 		renderer.autoClear = false;
-		var clearNeeded = ( clearColor !== undefined ) && ( clearColor !== null );
-		if ( clearNeeded ) {
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
 			renderer.setClearColor( clearColor );
 			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
 
 		}
 
-		this.quad.material = passMaterial;
-		renderer.render( this.quadScene, this.quadCamera, renderTarget, clearNeeded );
+		this.fsQuad.material = passMaterial;
+		this.fsQuad.render( renderer );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( originalClearColor );
+		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	},
 
 	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		var originalClearColor = renderer.getClearColor();
+		this.originalClearColor.copy( renderer.getClearColor() );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
+		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = false;
 
 		clearColor = overrideMaterial.clearColor || clearColor;
 		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
-		var clearNeeded = ( clearColor !== undefined ) && ( clearColor !== null );
-		if ( clearNeeded ) {
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
 			renderer.setClearColor( clearColor );
 			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
 
 		}
 
 		this.scene.overrideMaterial = overrideMaterial;
-		renderer.render( this.scene, this.camera, renderTarget, clearNeeded );
+		renderer.render( this.scene, this.camera );
 		this.scene.overrideMaterial = null;
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( originalClearColor );
+		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
 	},

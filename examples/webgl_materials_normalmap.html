@@ -14,9 +14,7 @@
 				overflow:hidden;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
 			#info {
 				position: absolute;
@@ -29,14 +27,13 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
-			.code { }
 
 		</style>
 	</head>
@@ -53,8 +50,9 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/shaders/BleachBypassShader.js"></script>
@@ -69,7 +67,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats, loader;
 
@@ -115,7 +117,7 @@
 				scene.add( pointLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 1, -0.5, -1 );
+				directionalLight.position.set( 1, - 0.5, - 1 );
 				scene.add( directionalLight );
 
 				var textureLoader = new THREE.TextureLoader();
@@ -124,16 +126,20 @@
 					color: 0xdddddd,
 					specular: 0x222222,
 					shininess: 35,
-					map: textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" ),
-					specularMap: textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" ),
-					normalMap: textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+					specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
+					normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
-				loader = new THREE.JSONLoader();
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
+
+				} );
+
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -158,16 +164,12 @@
 				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-				var canvas = renderer.context.canvas;
-
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
 				effectBleach.uniforms[ 'opacity' ].value = 0.4;
 
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
-
-				effectColor.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
@@ -196,7 +198,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;

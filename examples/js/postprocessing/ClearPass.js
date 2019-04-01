@@ -17,7 +17,7 @@ THREE.ClearPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 	constructor: THREE.ClearPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		var oldClearColor, oldClearAlpha;
 

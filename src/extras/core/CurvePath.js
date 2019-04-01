@@ -1,5 +1,5 @@
 import { Curve } from './Curve.js';
-import { LineCurve } from '../curves/LineCurve.js';
+import * as Curves from '../curves/Curves.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -15,8 +15,9 @@ function CurvePath() {
 
 	Curve.call( this );
 
-	this.curves = [];
+	this.type = 'CurvePath';
 
+	this.curves = [];
 	this.autoClose = false; // Automatically closes the path
 
 }
@@ -39,7 +40,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		if ( ! startPoint.equals( endPoint ) ) {
 
-			this.curves.push( new LineCurve( endPoint, startPoint ) );
+			this.curves.push( new Curves[ 'LineCurve' ]( endPoint, startPoint ) );
 
 		}
 
@@ -169,7 +170,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 			var curve = curves[ i ];
 			var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
-				: ( curve && curve.isLineCurve ) ? 1
+				: ( curve && ( curve.isLineCurve || curve.isLineCurve3 ) ) ? 1
 					: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
 						: divisions;
 
@@ -195,6 +196,62 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 		}
 
 		return points;
+
+	},
+
+	copy: function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.curves = [];
+
+		for ( var i = 0, l = source.curves.length; i < l; i ++ ) {
+
+			var curve = source.curves[ i ];
+
+			this.curves.push( curve.clone() );
+
+		}
+
+		this.autoClose = source.autoClose;
+
+		return this;
+
+	},
+
+	toJSON: function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.autoClose = this.autoClose;
+		data.curves = [];
+
+		for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
+
+			var curve = this.curves[ i ];
+			data.curves.push( curve.toJSON() );
+
+		}
+
+		return data;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.autoClose = json.autoClose;
+		this.curves = [];
+
+		for ( var i = 0, l = json.curves.length; i < l; i ++ ) {
+
+			var curve = json.curves[ i ];
+			this.curves.push( new Curves[ curve.type ]().fromJSON( curve ) );
+
+		}
+
+		return this;
 
 	}
 

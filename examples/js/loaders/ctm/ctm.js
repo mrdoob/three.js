@@ -53,7 +53,7 @@ CTM.File.prototype.load = function(stream) {
 	this.header = new CTM.FileHeader(stream);
 
 	this.body = new CTM.FileBody(this.header);
-  
+
 	this.getReader().read(stream, this.body);
 };
 
@@ -109,7 +109,7 @@ CTM.FileBody = function(header) {
 	if ( header.hasNormals() ) {
 		this.normals = new Float32Array(data, (i + v) * 4, n);
 	}
-  
+
 	if (header.uvMapCount) {
 		this.uvMaps = [];
 		for (j = 0; j < header.uvMapCount; ++ j) {
@@ -117,7 +117,7 @@ CTM.FileBody = function(header) {
         (i + v + n + (j * u) ) * 4, u) };
 		}
 	}
-  
+
 	if (header.attrMapCount) {
 		this.attrMaps = [];
 		for (j = 0; j < header.attrMapCount; ++ j) {
@@ -140,7 +140,7 @@ CTM.FileMG2Header = function(stream) {
 	this.divx = stream.readInt32();
 	this.divy = stream.readInt32();
 	this.divz = stream.readInt32();
-  
+
 	this.sizex = (this.higherBoundx - this.lowerBoundx) / this.divx;
 	this.sizey = (this.higherBoundy - this.lowerBoundy) / this.divy;
 	this.sizez = (this.higherBoundz - this.lowerBoundz) / this.divz;
@@ -152,7 +152,7 @@ CTM.ReaderRAW = function() {
 CTM.ReaderRAW.prototype.read = function(stream, body) {
 	this.readIndices(stream, body.indices);
 	this.readVertices(stream, body.vertices);
-  
+
 	if (body.normals) {
 		this.readNormals(stream, body.normals);
 	}
@@ -206,7 +206,7 @@ CTM.ReaderMG1 = function() {
 CTM.ReaderMG1.prototype.read = function(stream, body) {
 	this.readIndices(stream, body.indices);
 	this.readVertices(stream, body.vertices);
-  
+
 	if (body.normals) {
 		this.readNormals(stream, body.normals);
 	}
@@ -221,7 +221,7 @@ CTM.ReaderMG1.prototype.read = function(stream, body) {
 CTM.ReaderMG1.prototype.readIndices = function(stream, indices) {
 	stream.readInt32(); //magic "INDX"
 	stream.readInt32(); //packed size
-  
+
 	var interleaved = new CTM.InterleavedStream(indices, 3);
 	LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
 
@@ -231,7 +231,7 @@ CTM.ReaderMG1.prototype.readIndices = function(stream, indices) {
 CTM.ReaderMG1.prototype.readVertices = function(stream, vertices) {
 	stream.readInt32(); //magic "VERT"
 	stream.readInt32(); //packed size
-  
+
 	var interleaved = new CTM.InterleavedStream(vertices, 1);
 	LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
 };
@@ -251,7 +251,7 @@ CTM.ReaderMG1.prototype.readUVMaps = function(stream, uvMaps) {
 
 		uvMaps[i].name = stream.readString();
 		uvMaps[i].filename = stream.readString();
-    
+
 		stream.readInt32(); //packed size
 
 		var interleaved = new CTM.InterleavedStream(uvMaps[i].uv, 2);
@@ -265,7 +265,7 @@ CTM.ReaderMG1.prototype.readAttrMaps = function(stream, attrMaps) {
 		stream.readInt32(); //magic "ATTR"
 
 		attrMaps[i].name = stream.readString();
-    
+
 		stream.readInt32(); //packed size
 
 		var interleaved = new CTM.InterleavedStream(attrMaps[i].attr, 4);
@@ -278,10 +278,10 @@ CTM.ReaderMG2 = function() {
 
 CTM.ReaderMG2.prototype.read = function(stream, body) {
 	this.MG2Header = new CTM.FileMG2Header(stream);
-  
+
 	this.readVertices(stream, body.vertices);
 	this.readIndices(stream, body.indices);
-  
+
 	if (body.normals) {
 		this.readNormals(stream, body);
 	}
@@ -299,23 +299,23 @@ CTM.ReaderMG2.prototype.readVertices = function(stream, vertices) {
 
 	var interleaved = new CTM.InterleavedStream(vertices, 3);
 	LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-  
+
 	var gridIndices = this.readGridIndices(stream, vertices);
-  
+
 	CTM.restoreVertices(vertices, this.MG2Header, gridIndices, this.MG2Header.vertexPrecision);
 };
 
 CTM.ReaderMG2.prototype.readGridIndices = function(stream, vertices) {
 	stream.readInt32(); //magic "GIDX"
 	stream.readInt32(); //packed size
-  
+
 	var gridIndices = new Uint32Array(vertices.length / 3);
-  
+
 	var interleaved = new CTM.InterleavedStream(gridIndices, 1);
 	LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-  
+
 	CTM.restoreGridIndices(gridIndices, gridIndices.length);
-  
+
 	return gridIndices;
 };
 
@@ -348,14 +348,14 @@ CTM.ReaderMG2.prototype.readUVMaps = function(stream, uvMaps) {
 
 		uvMaps[i].name = stream.readString();
 		uvMaps[i].filename = stream.readString();
-    
+
 		var precision = stream.readFloat32();
-    
+
 		stream.readInt32(); //packed size
 
 		var interleaved = new CTM.InterleavedStream(uvMaps[i].uv, 2);
 		LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-    
+
 		CTM.restoreMap(uvMaps[i].uv, 2, precision);
 	}
 };
@@ -366,14 +366,14 @@ CTM.ReaderMG2.prototype.readAttrMaps = function(stream, attrMaps) {
 		stream.readInt32(); //magic "ATTR"
 
 		attrMaps[i].name = stream.readString();
-    
+
 		var precision = stream.readFloat32();
-    
+
 		stream.readInt32(); //packed size
 
 		var interleaved = new CTM.InterleavedStream(attrMaps[i].attr, 4);
 		LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-    
+
 		CTM.restoreMap(attrMaps[i].attr, 4, precision);
 	}
 };
@@ -386,7 +386,7 @@ CTM.restoreIndices = function(indices, len) {
 	}
 	for (; i < len; i += 3) {
 		indices[i] += indices[i - 3];
-    
+
 		if (indices[i] === indices[i - 3]) {
 			indices[i + 1] += indices[i - 2];
 		}else {
@@ -413,7 +413,7 @@ CTM.restoreVertices = function(vertices, grid, gridIndices, precision) {
 
 	for (; i < len; j += 3) {
 		x = gridIdx = gridIndices[i ++];
-    
+
 		z = ~~(x / zdiv);
 		x -= ~~(z * zdiv);
 		y = ~~(x / ydiv);
@@ -452,13 +452,13 @@ CTM.restoreNormals = function(normals, smooth, precision) {
 			normals[i + 1] = smooth[i + 1] * ro;
 			normals[i + 2] = smooth[i + 2] * ro;
 		}else {
-      
+
 			if (phi <= 4) {
 				theta = (intNormals[i + 2] - 2) * PI_DIV_2;
 			}else {
 				theta = ( (intNormals[i + 2] * 4 / phi) - 2) * PI_DIV_2;
 			}
-      
+
 			phi *= precision * PI_DIV_2;
 			sinPhi = ro * Math.sin(phi);
 
@@ -475,12 +475,9 @@ CTM.restoreNormals = function(normals, smooth, precision) {
 				bz /= len;
 			}
 
-			normals[i]     = smooth[i]     * nz +
-        (smooth[i + 1] * bz - smooth[i + 2] * by) * ny - bz * nx;
-			normals[i + 1] = smooth[i + 1] * nz -
-        (smooth[i + 2]      + smooth[i]   ) * bz  * ny + by * nx;
-			normals[i + 2] = smooth[i + 2] * nz +
-        (smooth[i]     * by + smooth[i + 1] * bz) * ny + bz * nx;
+			normals[i] = smooth[i] * nz + (smooth[i + 1] * bz - smooth[i + 2] * by) * ny - bz * nx;
+			normals[i + 1] = smooth[i + 1] * nz - (smooth[i + 2] + smooth[i]) * bz  * ny + by * nx;
+			normals[i + 2] = smooth[i + 2] * nz + (smooth[i] * by + smooth[i + 1] * bz) * ny + bz * nx;
 		}
 	}
 };
@@ -495,9 +492,9 @@ CTM.restoreMap = function(map, count, precision) {
 
 		for (j = i; j < len; j += count) {
 			value = intMap[j];
-      
+
 			delta += value & 1 ? -( (value + 1) >> 1) : value >> 1;
-      
+
 			map[j] = delta * precision;
 		}
 	}
@@ -520,18 +517,18 @@ CTM.calcSmoothNormals = function(indices, vertices) {
 		v2y = vertices[indz + 1] - vertices[indx + 1];
 		v1z = vertices[indy + 2] - vertices[indx + 2];
 		v2z = vertices[indz + 2] - vertices[indx + 2];
-    
+
 		nx = v1y * v2z - v1z * v2y;
 		ny = v1z * v2x - v1x * v2z;
 		nz = v1x * v2y - v1y * v2x;
-    
+
 		len = Math.sqrt(nx * nx + ny * ny + nz * nz);
 		if (len > 1e-10) {
 			nx /= len;
 			ny /= len;
 			nz /= len;
 		}
-    
+
 		smooth[indx]     += nx;
 		smooth[indx + 1] += ny;
 		smooth[indx + 2] += nz;
@@ -544,7 +541,7 @@ CTM.calcSmoothNormals = function(indices, vertices) {
 	}
 
 	for (i = 0, k = smooth.length; i < k; i += 3) {
-		len = Math.sqrt(smooth[i] * smooth[i] + 
+		len = Math.sqrt(smooth[i] * smooth[i] +
       smooth[i + 1] * smooth[i + 1] +
       smooth[i + 2] * smooth[i + 2]);
 
@@ -577,13 +574,13 @@ CTM.InterleavedStream = function(data, count) {
 
 CTM.InterleavedStream.prototype.writeByte = function(value) {
 	this.data[this.offset] = value;
-  
+
 	this.offset += this.count;
 	if (this.offset >= this.len) {
-  
+
 		this.offset -= this.len - 4;
 		if (this.offset >= this.count) {
-    
+
 			this.offset -= this.count + (CTM.isLittleEndian ? 1 : -1);
 		}
 	}
@@ -616,7 +613,7 @@ CTM.Stream.prototype.readFloat32 = function() {
 	var b1 = this.readByte();
 	var b2 = this.readByte();
 
-	m += (b1 & 0x7f) << 16; 
+	m += (b1 & 0x7f) << 16;
 	var e = ( (b2 & 0x7f) << 1) | ( (b1 & 0x80) >>> 7);
 	var s = b2 & 0x80 ? -1 : 1;
 
@@ -642,7 +639,7 @@ CTM.Stream.prototype.readString = function() {
 
 CTM.Stream.prototype.readArrayInt32 = function(array) {
 	var i = 0, len = array.length;
-  
+
 	while (i < len) {
 		array[i ++] = this.readInt32();
 	}

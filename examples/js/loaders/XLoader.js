@@ -1,1245 +1,858 @@
-
 /**
- * @author Jey-en  https://github.com/adrs2002
- *
- * this loader repo -> https://github.com/adrs2002/threeXLoader
- *
- * This loader is load model (and animation) from .X file format. (for old DirectX).
- *  ! this version are load from TEXT format .X only ! not a Binary.
- *
- * Support
- *  - mesh
- *  - texture
- *  - normal / uv
- *  - material
- *  - skinning
- *
- *  Not Support
- *  - template
- *  - material(ditail)
- *  - morph
- *  - scene
+ * @author adrs2002 / https://github.com/adrs2002
  */
 
-THREE.XLoader = function (manager, Texloader, _zflg) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	this.Texloader = ( Texloader !== undefined ) ? Texloader : new THREE.TextureLoader();
-	this.zflg = _zflg === undefined ? false : _zflg;
-	this.url = "";
-	this.baseDir = "";
-	this.nowReadMode = THREE.XLoader.XfileLoadMode.none;
-	this.nowAnimationKeyType = 4;
-	this.tgtLength = 0;
-	this.nowReaded = 0;
-	this.elementLv = 0;
-	this.geoStartLv = Number.MAX_VALUE;
-	this.frameStartLv = Number.MAX_VALUE;
-	this.matReadLine = 0;
-	this.putMatLength = 0;
-	this.nowMat = null;
-	this.BoneInf = new THREE.XLoader.XboneInf();
-	this.tmpUvArray = [];
-	this.normalVectors = [];
-	this.facesNormal = [];
-	this.nowFrameName = "";
-	this.nowAnimationSetName = "";
-	this.frameHierarchie = [];
-	this.endLineCount = 0;
-	this.geometry = null;
-	this.loadingXdata = null;
-	this.lines = null;
-	this.keyInfo = null;
-	this.animeKeyNames = null;
-	this.data = null;
-	this.onLoad = null;
+( function ( global, factory ) {
 
-};
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+		typeof define === 'function' && define.amd ? define( factory ) :
+			( global.THREE = global.THREE || {}, global.THREE.XLoader = factory() );
 
-THREE.XLoader.prototype = {
+}( this, ( function () {
 
-	constructor: THREE.XLoader,
+	'use strict';
 
-	load: function (_arg, onLoad, onProgress, onError) {
+	var classCallCheck = function ( instance, Constructor ) {
 
-		var scope = this;
-		scope.IsUvYReverse = true;
-		var loader = new THREE.FileLoader(scope.manager);
-		loader.setResponseType('arraybuffer');
+		if ( ! ( instance instanceof Constructor ) ) {
 
-		for (var i = 0; i < _arg.length; i++) {
+			throw new TypeError( "Cannot call a class as a function" );
 
-			switch (i) {
+		}
 
-				case 0:
-					scope.url = _arg[i]; break;
-				case 1:
-					scope.zflg = _arg[i]; break;
+	};
+
+	var createClass = function () {
+
+		function defineProperties( target, props ) {
+
+			for ( var i = 0; i < props.length; i ++ ) {
+
+				var descriptor = props[ i ];
+				descriptor.enumerable = descriptor.enumerable || false;
+				descriptor.configurable = true;
+				if ( "value" in descriptor ) descriptor.writable = true;
+				Object.defineProperty( target, descriptor.key, descriptor );
 
 			}
 
 		}
 
-		loader.load(scope.url, function (response) {
+		return function ( Constructor, protoProps, staticProps ) {
 
-			scope.parse(response, onLoad);
+			if ( protoProps ) defineProperties( Constructor.prototype, protoProps );
+			if ( staticProps ) defineProperties( Constructor, staticProps );
+			return Constructor;
 
-		}, onProgress, onError);
+		};
 
-	},
+	}();
 
-	isBinary: function (binData) {
+	var XboneInf = function XboneInf() {
 
-		var reader = new DataView(binData);
-		var face_size = 32 / 8 * 3 + 32 / 8 * 3 * 3 + 16 / 8;
-		var n_faces = reader.getUint32(80, true);
-		var expect = 80 + 32 / 8 + n_faces * face_size;
-		if (expect === reader.byteLength) {
+		classCallCheck( this, XboneInf );
 
-			return true;
+		this.boneName = "";
+		this.BoneIndex = 0;
+		this.Indeces = [];
+		this.Weights = [];
+		this.initMatrix = null;
+		this.OffsetMatrix = null;
 
-		}
-		var fileLength = reader.byteLength;
-		for (var index = 0; index < fileLength; index++) {
+	};
 
-			if (reader.getUint8(index, false) > 127) {
+	var XAnimationInfo = function XAnimationInfo() {
 
-				return true;
+		classCallCheck( this, XAnimationInfo );
+
+		this.animeName = "";
+		this.boneName = "";
+		this.targetBone = null;
+		this.keyType = 4;
+		this.frameStartLv = 0;
+		this.keyFrames = [];
+		this.InverseMx = null;
+
+	};
+
+	var XAnimationObj = function () {
+
+		function XAnimationObj( _flags ) {
+
+			classCallCheck( this, XAnimationObj );
+
+			this.fps = 30;
+			this.name = 'xanimation';
+			this.length = 0;
+			this.hierarchy = [];
+			this.putFlags = _flags;
+			if ( this.putFlags.putPos === undefined ) {
+
+				this.putFlags.putPos = true;
+
+			}
+			if ( this.putFlags.putRot === undefined ) {
+
+				this.putFlags.putRot = true;
+
+			}
+			if ( this.putFlags.putScl === undefined ) {
+
+				this.putFlags.putScl = true;
 
 			}
 
 		}
-		return false;
 
-	},
+		createClass( XAnimationObj, [ {
+			key: "make",
+			value: function make( XAnimationInfoArray ) {
 
-	ensureBinary: function (buf) {
+				for ( var i = 0; i < XAnimationInfoArray.length; i ++ ) {
 
-		if (typeof buf === "string") {
-
-			var array_buffer = new Uint8Array(buf.length);
-			for (var i = 0; i < buf.length; i++) {
-
-				array_buffer[i] = buf.charCodeAt(i) & 0xff;
-
-			}
-			return array_buffer.buffer || array_buffer;
-
-		} else {
-
-			return buf;
-
-
-		}
-
-	},
-
-	ensureString: function (buf) {
-
-		if (typeof buf !== "string") {
-
-			var array_buffer = new Uint8Array(buf);
-			var str = '';
-			for (var i = 0; i < buf.byteLength; i++) {
-
-				str += String.fromCharCode(array_buffer[i]);
-
-			}
-			return str;
-
-		} else {
-
-			return buf;
-
-		}
-
-	},
-
-	parse: function (data, onLoad) {
-
-		var scope = this;
-		var binData = scope.ensureBinary(data);
-		scope.data = scope.ensureString(data);
-		scope.onLoad = onLoad;
-		return scope.isBinary(binData) ? scope.parseBinary(binData) : scope.parseASCII();
-
-	},
-
-	parseBinary: function (data) {
-
-		return parseASCII(String.fromCharCode.apply(null, data));
-
-	},
-
-	parseASCII: function () {
-
-		var scope = this;
-		var baseDir = "";
-		if (scope.url.lastIndexOf("/") > 0) {
-
-			scope.baseDir = scope.url.substr(0, scope.url.lastIndexOf("/") + 1);
-
-		}
-		scope.loadingXdata = new THREE.XLoader.Xdata();
-		scope.loadingXdata.vertexNormalFromFile = false;
-		scope.loadingXdata.faceNormalFromFile = false;
-		scope.lines = scope.data;
-		scope.readedLength = 0;
-		scope.mainloop();
-
-	},
-
-	mainloop: function () {
-
-		var scope = this;
-		var EndFlg = false;
-		for (var i = 0; i < 10; i++) {
-
-			var forceBreak = scope.SectionRead();
-			scope.endLineCount++;
-			if (scope.readedLength >= scope.data.length) {
-
-				EndFlg = true;
-				scope.readFinalize();
-				setTimeout(function () {
-
-					scope.animationFinalize();
-
-				}, 1);
-				break;
-
-			}
-			if (forceBreak) {
-
-				break;
-
-			}
-
-		}
-		if (!EndFlg) {
-
-			setTimeout(function () {
-
-				scope.mainloop();
-
-			}, 1);
-
-		}
-
-	},
-
-	getNextSection: function (_offset, _start, _end) {
-
-		var scope = this;
-		var find = scope.data.indexOf("{", _offset);
-		return [scope.data.substr(_offset, _start - _offset).trim(), scope.data.substr(_start + 1, _end - _start - 1)];
-
-	},
-
-	getNextSection2: function (_obj, _offset, _start, _end) {
-
-		var find = _obj.indexOf("{", _offset);
-		return [_obj.substr(_offset, _start - _offset).trim(), _obj.substr(_start + 1, _end - _start - 1)];
-
-	},
-
-	readMeshSection: function (_baseOffset) {
-
-		var scope = this;
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry = new THREE.Geometry();
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Materials = [];
-		var find_2semi = scope.data.indexOf(";;", _baseOffset);
-		var offset = 0;
-		var v_data = scope.getVertextDataSection(scope.data.substr(_baseOffset, find_2semi - _baseOffset), 0);
-		for (var i = 0; i < v_data[0].length; i++) {
-
-			scope.readVertex(v_data[0][i]);
-
-		}
-		offset = find_2semi + 2;
-		find_2semi = scope.data.indexOf(";;", offset);
-		var v_data2 = scope.getVertextDataSection(scope.data.substr(offset + 1, find_2semi - offset + 1), 0);
-		for (var _i = 0; _i < v_data2[0].length; _i++) {
-
-			scope.readVertexIndex(v_data2[0][_i]);
-
-		}
-		scope.readedLength = offset + v_data2[1] + 1;
-
-	},
-
-	getVertextDataSection: function (_data, _offset) {
-
-		var find = _data.indexOf(";", _offset);
-		var find_2semi = _data.indexOf(";;", _offset);
-		if (find_2semi === - 1) {
-
-			find_2semi = _data.length - 1;
-
-		}
-		var v_data_base = _data.substr(find + 1, find_2semi - find + 2);
-		return [v_data_base.split(";,"), find_2semi + 2];
-
-	},
-
-	readMeshMaterialSet: function (_baseOffset) {
-
-		var scope = this;
-		var find = scope.data.indexOf(";", _baseOffset);
-		find = scope.data.indexOf(";", find + 2);
-		var find2 = scope.data.indexOf(";", find + 2);
-		var _data = scope.data.substr(find + 1, find2 - find + 1);
-		var v_data = _data.split(",");
-		for (var i = 0; i < v_data.length; i++) {
-
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces[i].materialIndex = parseInt(v_data[i], 10);
-
-		}
-		scope.readedLength = find2 + 1;
-
-	},
-
-	readMaterial: function (_dataLine) {
-
-		var scope = this;
-		scope.nowMat = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff });
-		if (scope.zflg) {
-
-			scope.nowMat.side = THREE.BackSide;
-
-		} else {
-
-			scope.nowMat.side = THREE.FrontSide;
-
-		}
-		var find = _dataLine.indexOf(";;");
-		var _diff = _dataLine.substr(0, find).split(";");
-		scope.nowMat.color.r = parseFloat(_diff[0]);
-		scope.nowMat.color.g = parseFloat(_diff[1]);
-		scope.nowMat.color.b = parseFloat(_diff[2]);
-		var find2 = _dataLine.indexOf(";", find + 3);
-		scope.nowMat.shininess = parseFloat(_dataLine.substr(find + 2, find2 - find - 2));
-		find = _dataLine.indexOf(";;", find2 + 1);
-		var _specular = _dataLine.substr(find2 + 1, find - find2).split(";");
-		scope.nowMat.specular.r = parseFloat(_specular[0]);
-		scope.nowMat.specular.g = parseFloat(_specular[1]);
-		scope.nowMat.specular.b = parseFloat(_specular[2]);
-		find2 = _dataLine.indexOf(";;", find + 2);
-		var _emissive = _dataLine.substr(find + 2, find2 - find - 2).split(";");
-		scope.nowMat.emissive.r = parseFloat(_emissive[0]);
-		scope.nowMat.emissive.g = parseFloat(_emissive[1]);
-		scope.nowMat.emissive.b = parseFloat(_emissive[2]);
-
-	},
-
-	readSkinWeights: function (_data) {
-
-		var scope = this;
-		scope.BoneInf = new THREE.XLoader.XboneInf();
-		var find = _data.indexOf(";");
-		scope.readBoneName(_data.substr(0, find - 1).replace('"', ''));
-		var find_1 = _data.indexOf(";", find + 1) + 1;
-		var matrixStart = 0;
-		if (parseInt(_data.substr(find, find_1 - find), 10) === 0) {
-
-			matrixStart = find_1 + 1;
-
-		} else {
-
-			var _find = _data.indexOf(";", find_1 + 1);
-			var i_data = _data.substr(find_1, _find - find_1).split(",");
-			for (var i = 0; i < i_data.length; i++) {
-
-				scope.BoneInf.Indeces.push(parseInt(i_data[i], 10));
-
-			}
-			var find3 = _data.indexOf(";", _find + 1);
-			var w_data = _data.substr(_find + 1, find3 - _find).split(",");
-			for (var _i2 = 0; _i2 < w_data.length; _i2++) {
-
-				scope.BoneInf.Weights.push(parseFloat(w_data[_i2]));
-
-			}
-			matrixStart = find3 + 1;
-
-		}
-		var find4 = _data.indexOf(";;", matrixStart + 1);
-		var m_data = _data.substr(matrixStart, find4 - matrixStart).split(",");
-		scope.BoneInf.initMatrix = new THREE.Matrix4();
-		scope.ParseMatrixData(scope.BoneInf.initMatrix, m_data);
-		scope.BoneInf.OffsetMatrix = new THREE.Matrix4();
-		scope.BoneInf.OffsetMatrix.getInverse(scope.BoneInf.initMatrix);
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].BoneInfs.push(scope.BoneInf);
-
-	},
-
-	getPlaneStr: function (_str) {
-
-		var scope = this;
-		var firstDbl = _str.indexOf('"') + 1;
-		var dbl2 = _str.indexOf('"', firstDbl);
-		return _str.substr(firstDbl, dbl2 - firstDbl);
-
-	},
-
-	readAnimationKeyFrame: function (_data) {
-
-		var scope = this;
-		var find1 = _data.indexOf(';');
-		scope.nowAnimationKeyType = parseInt(_data.substr(0, find1), 10);
-		var find2 = _data.indexOf(';', find1 + 1);
-		var lines = _data.substr(find2 + 1).split(';;,');
-		for (var i = 0; i < lines.length; i++) {
-
-			scope.readAnimationKeyFrameValue(lines[i]);
-
-		}
-
-	},
-
-	SectionRead: function () {
-
-		var scope = this;
-		var find = scope.data.indexOf("{", scope.readedLength);
-		if (find === - 1) {
-
-			scope.readedLength = scope.data.length; return;
-
-		}
-		var lines = scope.data.substr(scope.readedLength, find - scope.readedLength).split(/\r\n|\r|\n/);
-		var line = lines[0];
-		for (var i = lines.length - 1; i >= 0; i--) {
-
-			if (lines[i].trim().length > 0 && lines[i].indexOf('//') < 0) {
-
-				line = lines[i];
-				break;
-
-			}
-
-		}
-		var find2 = scope.data.indexOf("{", find + 1);
-		var find3 = scope.data.indexOf("}", find + 1);
-		var find4 = scope.data.indexOf("}", scope.readedLength);
-		if (find4 < find) {
-
-			if (scope.elementLv < 1 || scope.nowFrameName === "") {
-
-				scope.elementLv = 0;
-
-			} else {
-
-				scope.endElement();
-
-			}
-			scope.readedLength = find4 + 1;
-			return false;
-
-		}
-		if (find3 > find2) {
-
-			scope.elementLv++;
-			if (line.indexOf("Frame ") > - 1) {
-
-				scope.beginFrame(line);
-
-			} else if (line.indexOf("Mesh ") > - 1) {
-
-				scope.readMeshSection(find + 1);
-				scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mesh;
-				return true;
-
-			} else if (line.indexOf("MeshMaterialList ") > - 1) {
-
-				scope.readMeshMaterialSet(find + 1);
-				scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set;
-				return true;
-
-			} else if (line.indexOf("Material ") > - 1) {
-
-				var nextSemic = scope.data.indexOf(";;", find + 1);
-				nextSemic = scope.data.indexOf(";;", nextSemic + 1);
-				nextSemic = scope.data.indexOf(";;", nextSemic + 1);
-				scope.readMaterial(scope.data.substr(find + 1, nextSemic - find + 1));
-				scope.readedLength = nextSemic + 2;
-				scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_detail;
-				return true;
-
-			} else if (line.indexOf("AnimationSet ") > - 1) {
-
-				scope.readandCreateAnimationSet(line);
-				scope.nowReadMode = THREE.XLoader.XfileLoadMode.Anim_init;
-				scope.readedLength = find + 1;
-				return false;
-
-			} else if (line.indexOf("Animation ") > - 1) {
-
-				scope.readAndCreateAnimation(line);
-				scope.nowReadMode = THREE.XLoader.XfileLoadMode.Anim_Reading;
-				var tgtBoneName = scope.data.substr(find2 + 1, find3 - find2 - 1).trim();
-				scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName].boneName = tgtBoneName;
-				scope.readedLength = find3 + 1;
-				return false;
-
-			}
-			scope.readedLength = find + 1;
-			return false;
-
-		} else {
-
-			var section = scope.getNextSection(scope.readedLength, find, find3);
-			scope.readedLength = find3 + 1;
-			if (line.indexOf("template ") > - 1) {
-
-				scope.elementLv = 0;
-				return false;
-
-			} else if (line.indexOf("AnimTicksPerSecond") > - 1) {
-
-				scope.loadingXdata.AnimTicksPerSecond = parseInt(section[1].substr(0, section[1].indexOf(";")), 10);
-				scope.elementLv = 0;
-				return false;
-
-			} else if (line.indexOf("FrameTransformMatrix") > - 1) {
-
-				var data = section[1].split(",");
-				data[15] = data[15].substr(0, data[15].indexOf(';;'));
-				scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameTransformMatrix = new THREE.Matrix4();
-				scope.ParseMatrixData(scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameTransformMatrix, data);
-				scope.nowReadMode = THREE.XLoader.XfileLoadMode.Element;
-				return false;
-
-			} else if (line.indexOf("MeshTextureCoords") > - 1) {
-
-				var v_data = scope.getVertextDataSection(section[1], 0);
-				for (var _i3 = 0; _i3 < v_data[0].length; _i3++) {
-
-					scope.readUv(v_data[0][_i3]);
+					this.hierarchy.push( this.makeBonekeys( XAnimationInfoArray[ i ] ) );
 
 				}
-				scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faceVertexUvs[0] = [];
-				for (var m = 0; m < scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces.length; m++) {
-
-					scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faceVertexUvs[0][m] = [];
-					scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faceVertexUvs[0][m].push(scope.tmpUvArray[scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces[m].a]);
-					scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faceVertexUvs[0][m].push(scope.tmpUvArray[scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces[m].b]);
-					scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faceVertexUvs[0][m].push(scope.tmpUvArray[scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces[m].c]);
-
-				}
-				scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.uvsNeedUpdate = true;
-				return true;
-
-			} else if (line.indexOf("Material ") > - 1) {
-
-				scope.readMaterial(section[1]);
-				scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Materials.push(scope.nowMat);
-				return false;
-
-			} else if (line.indexOf("TextureFilename") > - 1) {
-
-				if (section[1].length > 0) {
-
-					scope.nowMat.map = scope.Texloader.load(scope.baseDir + scope.getPlaneStr(section[1]));
-
-				}
-				return false;
-
-			} else if (line.indexOf("BumpMapFilename") > - 1) {
-
-				if (section[1].length > 0) {
-
-					scope.nowMat.bumpMap = scope.Texloader.load(scope.baseDir + scope.getPlaneStr(section[1]));
-					scope.nowMat.bumpScale = 0.05;
-
-				}
-				return false;
-
-			} else if (line.indexOf("NormalMapFilename") > - 1) {
-
-				if (section[1].length > 0) {
-
-					scope.nowMat.normalMap = scope.Texloader.load(scope.baseDir + scope.getPlaneStr(section[1]));
-					scope.nowMat.normalScale = new THREE.Vector2(2, 2);
-
-				}
-				return false;
-
-			} else if (line.indexOf("EmissiveMapFilename") > - 1) {
-
-				if (section[1].length > 0) {
-
-					scope.nowMat.emissiveMap = scope.Texloader.load(scope.baseDir + scope.getPlaneStr(section[1]));
-
-				}
-				return false;
-
-			} else if (line.indexOf("LightMapFilename") > - 1) {
-
-				if (section[1].length > 0) {
-
-					scope.nowMat.lightMap = scope.Texloader.load(scope.baseDir + scope.getPlaneStr(section[1]));
-
-				}
-				return false;
-
-			} else if (line.indexOf("XSkinMeshHeader") > - 1) {
-
-				return false;
-
-			} else if (line.indexOf("SkinWeights") > - 1) {
-
-				scope.readSkinWeights(section[1]);
-				return true;
-
-			} else if (line.indexOf("AnimationKey") > - 1) {
-
-				scope.readAnimationKeyFrame(section[1]);
-				return true;
+				this.length = this.hierarchy[ 0 ].keys[ this.hierarchy[ 0 ].keys.length - 1 ].time;
 
 			}
+		}, {
+			key: "clone",
+			value: function clone() {
+
+				return Object.assign( {}, this );
+
+			}
+		}, {
+			key: "makeBonekeys",
+			value: function makeBonekeys( XAnimationInfo ) {
+
+				var refObj = {};
+				refObj.name = XAnimationInfo.boneName;
+				refObj.parent = "";
+				refObj.keys = this.keyFrameRefactor( XAnimationInfo );
+				refObj.copy = function () {
+
+					return Object.assign( {}, this );
+
+				};
+				return refObj;
+
+			}
+		}, {
+			key: "keyFrameRefactor",
+			value: function keyFrameRefactor( XAnimationInfo ) {
+
+				var keys = [];
+				for ( var i = 0; i < XAnimationInfo.keyFrames.length; i ++ ) {
+
+					var keyframe = {};
+					keyframe.time = XAnimationInfo.keyFrames[ i ].time * this.fps;
+					if ( XAnimationInfo.keyFrames[ i ].pos && this.putFlags.putPos ) {
+
+						keyframe.pos = XAnimationInfo.keyFrames[ i ].pos;
+
+					}
+					if ( XAnimationInfo.keyFrames[ i ].rot && this.putFlags.putRot ) {
+
+						keyframe.rot = XAnimationInfo.keyFrames[ i ].rot;
+
+					}
+					if ( XAnimationInfo.keyFrames[ i ].scl && this.putFlags.putScl ) {
+
+						keyframe.scl = XAnimationInfo.keyFrames[ i ].scl;
+
+					}
+					if ( XAnimationInfo.keyFrames[ i ].matrix ) {
+
+						keyframe.matrix = XAnimationInfo.keyFrames[ i ].matrix;
+						if ( this.putFlags.putPos ) {
+
+							keyframe.pos = new THREE.Vector3().setFromMatrixPosition( keyframe.matrix );
+
+						}
+						if ( this.putFlags.putRot ) {
+
+							keyframe.rot = new THREE.Quaternion().setFromRotationMatrix( keyframe.matrix );
+
+						}
+						if ( this.putFlags.putScl ) {
+
+							keyframe.scl = new THREE.Vector3().setFromMatrixScale( keyframe.matrix );
+
+						}
+
+					}
+					keys.push( keyframe );
+
+				}
+				return keys;
+
+			}
+		} ] );
+		return XAnimationObj;
+
+	}();
+
+	var XKeyFrameInfo = function XKeyFrameInfo() {
+
+		classCallCheck( this, XKeyFrameInfo );
+
+		this.index = 0;
+		this.Frame = 0;
+		this.time = 0.0;
+		this.matrix = null;
+
+	};
+
+	var XLoader = function () {
+
+		function XLoader( manager ) {
+
+			classCallCheck( this, XLoader );
+
+			this.debug = false;
+			this.manager = manager !== undefined ? manager : new THREE.DefaultLoadingManager();
+			this.texloader = new THREE.TextureLoader( this.manager );
+			this.url = "";
+			this._putMatLength = 0;
+			this._nowMat = null;
+			this._nowFrameName = "";
+			this.frameHierarchie = [];
+			this.Hierarchies = {};
+			this.HieStack = [];
+			this._currentObject = {};
+			this._currentFrame = {};
+			this._data = null;
+			this.onLoad = null;
+			this.IsUvYReverse = true;
+			this.Meshes = [];
+			this.animations = [];
+			this.animTicksPerSecond = 30;
+			this._currentGeo = null;
+			this._currentAnime = null;
+			this._currentAnimeFrames = null;
 
 		}
-		return false;
 
-	},
+		createClass( XLoader, [ {
+			key: 'crossOrigin',
+			value: 'anonymous'
+		}, {
+			key: '_setArgOption',
+			value: function _setArgOption( _arg ) {
 
-	endElement: function (line) {
+				var _start = arguments.length > 1 && arguments[ 1 ] !== undefined ? arguments[ 1 ] : 0;
 
-		var scope = this;
-		if (scope.nowReadMode == THREE.XLoader.XfileLoadMode.Mesh) {
+				if ( ! _arg ) {
 
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Element;
+					return;
 
-		} else if (scope.nowReadMode == THREE.XLoader.XfileLoadMode.Mat_Set) {
+				}
+				for ( var i = _start; i < _arg.length; i ++ ) {
 
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mesh;
+					switch ( i ) {
 
-		} else if (scope.nowReadMode == THREE.XLoader.XfileLoadMode.Mat_detail) {
-
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Materials.push(scope.nowMat);
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set;
-
-		} else if (scope.nowReadMode == THREE.XLoader.XfileLoadMode.Anim_Reading) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Anim_init;
-
-		} else if (scope.nowReadMode < THREE.XLoader.XfileLoadMode.Anim_init && scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameStartLv === scope.elementLv && scope.nowReadMode > THREE.XLoader.XfileLoadMode.none) {
-
-			if (scope.frameHierarchie.length > 0) {
-
-				scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].children = [];
-				var keys = Object.keys(scope.loadingXdata.FrameInfo_Raw);
-				for (var m = 0; m < keys.length; m++) {
-
-					if (scope.loadingXdata.FrameInfo_Raw[keys[m]].ParentName === scope.nowFrameName) {
-
-						scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].children.push(keys[m]);
+						case 0:
+							this.url = _arg[ i ];
+							break;
+						case 1:
+							this.options = _arg[ i ];
+							break;
 
 					}
 
 				}
-				scope.frameHierarchie.pop();
+				if ( this.options === undefined ) {
 
-			}
-			scope.MakeOutputGeometry(scope.nowFrameName, scope.zflg);
-			scope.frameStartLv = scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameStartLv;
-			if (scope.frameHierarchie.length > 0) {
-
-				scope.nowFrameName = scope.frameHierarchie[scope.frameHierarchie.length - 1];
-				scope.frameStartLv = scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameStartLv;
-
-			} else {
-
-				scope.nowFrameName = "";
-
-			}
-
-		} else if (scope.nowReadMode == THREE.XLoader.XfileLoadMode.Anim_init) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Element;
-
-		}
-		scope.elementLv--;
-
-	},
-
-	beginFrame: function (line) {
-
-		var scope = this;
-		scope.frameStartLv = scope.elementLv;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Element;
-		var findindex = line.indexOf("Frame ");
-		scope.nowFrameName = line.substr(findindex + 6, line.length - findindex + 1).trim();
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName] = new THREE.XLoader.XFrameInfo();
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameName = scope.nowFrameName;
-		if (scope.frameHierarchie.length > 0) {
-
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].ParentName = scope.frameHierarchie[scope.frameHierarchie.length - 1];
-
-		}
-		scope.frameHierarchie.push(scope.nowFrameName);
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameStartLv = scope.frameStartLv;
-
-	},
-
-	beginReadMesh: function (line) {
-
-		var scope = this;
-		if (scope.nowFrameName === "") {
-
-			scope.frameStartLv = scope.elementLv;
-			scope.nowFrameName = line.substr(5, line.length - 6);
-			if (scope.nowFrameName === "") {
-
-				scope.nowFrameName = "mesh_" + scope.loadingXdata.FrameInfo_Raw.length;
-
-			}
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName] = new THREE.XLoader.XFrameInfo();
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameName = scope.nowFrameName;
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].FrameStartLv = scope.frameStartLv;
-
-		}
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry = new THREE.Geometry();
-		scope.geoStartLv = scope.elementLv;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Vartex_init;
-		Bones = [];
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Materials = [];
-
-	},
-
-	readVertexCount: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Vartex_Read;
-		scope.tgtLength = parseInt(line.substr(0, line.length - 1), 10);
-		scope.nowReaded = 0;
-
-	},
-
-	readVertex: function (line) {
-
-		var scope = this;
-		var data = line.substr(0, line.length - 2).split(";");
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.vertices.push(new THREE.Vector3(parseFloat(data[0]), parseFloat(data[1]), parseFloat(data[2])));
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.skinIndices.push(new THREE.Vector4(0, 0, 0, 0));
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.skinWeights.push(new THREE.Vector4(1, 0, 0, 0));
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].VertexSetedBoneCount.push(0);
-		scope.nowReaded++;
-		return false;
-
-	},
-
-	readIndexLength: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.index_Read;
-		scope.tgtLength = parseInt(line.substr(0, line.length - 1), 10);
-		scope.nowReaded = 0;
-
-	},
-
-	readVertexIndex: function (line) {
-
-		var scope = this;
-		var firstFind = line.indexOf(';') + 1;
-		var data = line.substr(firstFind).split(",");
-		if (scope.zflg) {
-
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces.push(new THREE.Face3(parseInt(data[2], 10), parseInt(data[1], 10), parseInt(data[0], 10), new THREE.Vector3(1, 1, 1).normalize()));
-
-		} else {
-
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces.push(new THREE.Face3(parseInt(data[0], 10), parseInt(data[1], 10), parseInt(data[2], 10), new THREE.Vector3(1, 1, 1).normalize()));
-
-		}
-		return false;
-
-	},
-
-	beginMeshNormal: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Normal_V_init;
-		scope.normalVectors = [];
-		scope.facesNormal = [];
-
-	},
-
-	readMeshNormalCount: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Normal_V_Read;
-		scope.tgtLength = parseInt(line.substr(0, line.length - 1), 10);
-		scope.nowReaded = 0;
-
-	},
-
-	readMeshNormalVertex: function (line) {
-
-		var scope = this;
-		var data = line.split(";");
-		scope.normalVectors.push([parseFloat(data[0]), parseFloat(data[1]), parseFloat(data[2])]);
-		scope.nowReaded++;
-		if (scope.nowReaded >= scope.tgtLength) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Normal_I_init;
-			return true;
-
-		}
-		return false;
-
-	},
-
-	readMeshNormalIndexCount: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Normal_I_Read;
-		scope.tgtLength = parseInt(line.substr(0, line.length - 1), 10);
-		scope.nowReaded = 0;
-
-	},
-
-	readMeshNormalIndex: function (line) {
-
-		var scope = this;
-		var data = line.substr(2, line.length - 4).split(",");
-		var nowID = parseInt(data[0], 10);
-		var v1 = new THREE.Vector3(scope.normalVectors[nowID][0], scope.normalVectors[nowID][1], scope.normalVectors[nowID][2]);
-		nowID = parseInt(data[1], 10);
-		var v2 = new THREE.Vector3(scope.normalVectors[nowID][0], scope.normalVectors[nowID][1], scope.normalVectors[nowID][2]);
-		nowID = parseInt(data[2], 10);
-		var v3 = new THREE.Vector3(scope.normalVectors[nowID][0], scope.normalVectors[nowID][1], scope.normalVectors[nowID][2]);
-		if (scope.zflg) {
-
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces[scope.nowReaded].vertexNormals = [v3, v2, v1];
-
-		} else {
-
-			scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces[scope.nowReaded].vertexNormals = [v1, v2, v3];
-
-		}
-		scope.facesNormal.push(v1.normalize());
-		scope.nowReaded++;
-		if (scope.nowReaded >= scope.tgtLength) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Element;
-			return true;
-
-		}
-		return false;
-
-	},
-
-	readUvInit: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Uv_Read;
-		scope.tgtLength = parseInt(line.substr(0, line.length - 1), 10);
-		scope.nowReaded = 0;
-		scope.tmpUvArray = [];
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faceVertexUvs[0] = [];
-
-	},
-
-	readUv: function (line) {
-
-		var scope = this;
-		var data = line.split(";");
-		if (scope.IsUvYReverse) {
-
-			scope.tmpUvArray.push(new THREE.Vector2(parseFloat(data[0]), 1 - parseFloat(data[1])));
-
-		} else {
-
-			scope.tmpUvArray.push(new THREE.Vector2(parseFloat(data[0]), parseFloat(data[1])));
-
-		}
-		scope.nowReaded++;
-		if (scope.nowReaded >= scope.tgtLength) {
-
-			return true;
-
-		}
-		return false;
-
-	},
-
-	readMatrixSetLength: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Face_Set;
-		scope.tgtLength = parseInt(line.substr(0, line.length - 1), 10);
-		scope.nowReaded = 0;
-
-	},
-
-	readMaterialBind: function (line) {
-
-		var scope = this;
-		var data = line.split(",");
-		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry.faces[scope.nowReaded].materialIndex = parseInt(data[0]);
-		scope.nowReaded++;
-		if (scope.nowReaded >= scope.tgtLength) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Element;
-			return true;
-
-		}
-		return false;
-
-	},
-
-	readMaterialInit: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set;
-		scope.matReadLine = 0;
-		scope.nowMat = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff });
-		var matName = line.substr(9, line.length - 10);
-		if (matName !== "") {
-
-			scope.nowMat.name = matName;
-
-		}
-		if (scope.zflg) {
-
-			scope.nowMat.side = THREE.BackSide;
-
-		} else {
-
-			scope.nowMat.side = THREE.FrontSide;
-
-		}
-		scope.nowMat.side = THREE.FrontSide;
-
-	},
-
-	readandSetMaterial: function (line) {
-
-		var scope = this;
-		var data = line.split(";");
-		scope.matReadLine++;
-		switch (scope.matReadLine) {
-
-			case 1:
-				scope.nowMat.color.r = data[0];
-				scope.nowMat.color.g = data[1];
-				scope.nowMat.color.b = data[2];
-				break;
-			case 2:
-				scope.nowMat.shininess = data[0];
-				break;
-			case 3:
-				scope.nowMat.specular.r = data[0];
-				scope.nowMat.specular.g = data[1];
-				scope.nowMat.specular.b = data[2];
-				break;
-			case 4:
-				scope.nowMat.emissive.r = data[0];
-				scope.nowMat.emissive.g = data[1];
-				scope.nowMat.emissive.b = data[2];
-				break;
-
-		}
-		if (line.indexOf("TextureFilename") > - 1) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set_Texture;
-
-		} else if (line.indexOf("BumpMapFilename") > - 1) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set_BumpTex;
-			scope.nowMat.bumpScale = 0.05;
-
-		} else if (line.indexOf("NormalMapFilename") > - 1) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set_NormalTex;
-			scope.nowMat.normalScale = new THREE.Vector2(2, 2);
-
-		} else if (line.indexOf("EmissiveMapFilename") > - 1) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set_EmissiveTex;
-
-		} else if (line.indexOf("LightMapFilename") > - 1) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set_LightTex;
-
-		}
-
-	},
-
-	readandSetMaterialTexture: function (line) {
-
-		var scope = this;
-		var data = line.substr(1, line.length - 3);
-		if (data != undefined && data.length > 0) {
-
-			switch (scope.nowReadMode) {
-
-				case THREE.XLoader.XfileLoadMode.Mat_Set_Texture:
-					scope.nowMat.map = scope.Texloader.load(scope.baseDir + data);
-					break;
-				case THREE.XLoader.XfileLoadMode.Mat_Set_BumpTex:
-					scope.nowMat.bumpMap = scope.Texloader.load(scope.baseDir + data);
-					break;
-				case THREE.XLoader.XfileLoadMode.Mat_Set_NormalTex:
-					scope.nowMat.normalMap = scope.Texloader.load(scope.baseDir + data);
-					break;
-				case THREE.XLoader.XfileLoadMode.Mat_Set_EmissiveTex:
-					scope.nowMat.emissiveMap = scope.Texloader.load(scope.baseDir + data);
-					break;
-				case THREE.XLoader.XfileLoadMode.Mat_Set_LightTex:
-					scope.nowMat.lightMap = scope.Texloader.load(scope.baseDir + data);
-					break;
-				case THREE.XLoader.XfileLoadMode.Mat_Set_EnvTex:
-					scope.nowMat.envMap = scope.Texloader.load(scope.baseDir + data);
-					break;
-
-			}
-
-		}
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Mat_Set;
-		scope.endLineCount++;
-		scope.elementLv--;
-
-	},
-
-	readBoneInit: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Weit_init;
-		scope.BoneInf = new XboneInf();
-
-	},
-
-	readBoneName: function (line) {
-
-		var scope = this;
-		scope.BoneInf.boneName = line.trim();
-		scope.BoneInf.BoneIndex = scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].BoneInfs.length;
-		scope.nowReaded = 0;
-
-	},
-
-	readBoneVertexLength: function (line) {
-
-		var scope = this;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Weit_Read_Index;
-		scope.tgtLength = parseInt(line.substr(0, line.length - 1), 10);
-		scope.nowReaded = 0;
-
-	},
-
-	readandSetBoneVertex: function (line) {
-
-		var scope = this;
-		scope.BoneInf.Indeces.push(parseInt(line.substr(0, line.length - 1), 10));
-		scope.nowReaded++;
-		if (scope.nowReaded >= scope.tgtLength || line.indexOf(";") > - 1) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Weit_Read_Value;
-			scope.nowReaded = 0;
-
-		}
-
-	},
-
-	readandSetBoneWeightValue: function (line) {
-
-		var scope = this;
-		var nowVal = parseFloat(line.substr(0, line.length - 1));
-		scope.BoneInf.Weights.push(nowVal);
-		scope.nowReaded++;
-		if (scope.nowReaded >= scope.tgtLength || line.indexOf(";") > - 1) {
-
-			scope.nowReadMode = THREE.XLoader.XfileLoadMode.Weit_Read_Matrx;
-
-
-		}
-
-	},
-
-	readandCreateAnimationSet: function (line) {
-
-		var scope = this;
-		scope.frameStartLv = scope.elementLv;
-		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Anim_init;
-		scope.nowAnimationSetName = line.substr(13, line.length - 14).trim();
-		scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName] = [];
-
-	},
-
-	readAndCreateAnimation: function (line) {
-
-		var scope = this;
-		scope.nowFrameName = line.substr(10, line.length - 11).trim();
-		scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName] = new THREE.XLoader.XAnimationInfo();
-		scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName].animeName = scope.nowFrameName;
-		scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName].FrameStartLv = scope.frameStartLv;
-
-	},
-
-	readAnimationKeyFrameValue: function (line) {
-
-		var scope = this;
-		scope.keyInfo = null;
-		var data = line.split(";");
-		if (data == null || data.length < 3) {
-
-			return;
-
-		}
-		var nowKeyframe = parseInt(data[0], 10);
-		var frameFound = false;
-		var tmpM = new THREE.Matrix4();
-		if (scope.nowAnimationKeyType != 4) {
-
-			for (var mm = 0; mm < scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName].keyFrames.length; mm++) {
-
-				if (scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName].keyFrames[mm].Frame === nowKeyframe) {
-
-					scope.keyInfo = scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName].keyFrames[mm];
-					frameFound = true;
-					break;
+					this.options = {};
 
 				}
 
 			}
+		}, {
+			key: 'load',
+			value: function load( _arg, onLoad, onProgress, onError ) {
 
-		}
-		if (!frameFound) {
+				var _this = this;
 
-			scope.keyInfo = new THREE.XLoader.XKeyFrameInfo();
-			scope.keyInfo.matrix = new THREE.Matrix4();
-			scope.keyInfo.Frame = nowKeyframe;
+				this._setArgOption( _arg );
+				var loader = new THREE.FileLoader( this.manager );
+				loader.setPath( this.path );
+				loader.setResponseType( 'arraybuffer' );
+				loader.load( this.url, function ( response ) {
 
-		}
-		var data2 = data[2].split(",");
-		switch (scope.nowAnimationKeyType) {
+					_this._parse( response, onLoad );
 
-			case 0:
-				tmpM.makeRotationFromQuaternion(new THREE.Quaternion(parseFloat(data2[0]), parseFloat(data2[1]), parseFloat(data2[2]), parseFloat(data2[3])));
-				scope.keyInfo.matrix.multiply(tmpM);
-				break;
-			case 1:
-				tmpM.makeScale(parseFloat(data2[0]), parseFloat(data2[1]), parseFloat(data2[2]));
-				scope.keyInfo.matrix.multiply(tmpM);
-				break;
-			case 2:
-				tmpM.makeTranslation(parseFloat(data2[0]), parseFloat(data2[1]), parseFloat(data2[2]));
-				scope.keyInfo.matrix.multiply(tmpM);
-				break;
-			case 3:
-			case 4:
-				scope.ParseMatrixData(scope.keyInfo.matrix, data2);
-				break;
-
-		}
-		if (!frameFound) {
-
-			scope.keyInfo.index = scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName].keyFrames.length;
-			scope.keyInfo.time = /*1.0 / scope.loadingXdata.AnimTicksPerSecond * */scope.keyInfo.Frame;
-			scope.loadingXdata.AnimationSetInfo[scope.nowAnimationSetName][scope.nowFrameName].keyFrames.push(scope.keyInfo);
-
-		}
-
-	},
-
-	readFinalize: function () {
-
-		var scope = this;
-		scope.loadingXdata.FrameInfo = [];
-		var keys = Object.keys(scope.loadingXdata.FrameInfo_Raw);
-		for (var i = 0; i < keys.length; i++) {
-
-			if (scope.loadingXdata.FrameInfo_Raw[keys[i]].Mesh != null) {
-
-				scope.loadingXdata.FrameInfo.push(scope.loadingXdata.FrameInfo_Raw[keys[i]].Mesh);
+				}, onProgress, onError );
 
 			}
+		}, {
+			key: 'setCrossOrigin',
+			value: function setCrossOrigin( value ) {
 
-		}
-		if (scope.loadingXdata.FrameInfo != null & scope.loadingXdata.FrameInfo.length > 0) {
+				this.crossOrigin = value;
+				return this;
 
-			for (var _i4 = 0; _i4 < scope.loadingXdata.FrameInfo.length; _i4++) {
+			}
+		}, {
+			key: 'setPath',
+			value: function setPath( value ) {
 
-				if (scope.loadingXdata.FrameInfo[_i4].parent == null) {
+				this.path = value;
+				return this;
 
-					scope.loadingXdata.FrameInfo[_i4].zflag = scope.zflg;
-					if (scope.zflg) {
+			}
+		}, {
+			key: 'setResourcePath',
+			value: function setResourcePath( value ) {
 
-						scope.loadingXdata.FrameInfo[_i4].scale.set(- 1, 1, 1);
+				this.resourcePath = value;
+				return this;
+
+			}
+		}, {
+			key: 'fromResponsedData',
+			value: function fromResponsedData( _data, _arg, onLoad ) {
+
+				this._setArgOption( _arg );
+				this._parse( _data, onLoad );
+
+			}
+		}, {
+			key: '_readLine',
+			value: function _readLine( line ) {
+
+				var readed = 0;
+				while ( true ) {
+
+					var find = - 1;
+					find = line.indexOf( '//', readed );
+					if ( find === - 1 ) {
+
+						find = line.indexOf( '#', readed );
+
+					}
+					if ( find > - 1 && find < 2 ) {
+
+						var foundNewLine = - 1;
+						foundNewLine = line.indexOf( "\r\n", readed );
+						if ( foundNewLine > 0 ) {
+
+							readed = foundNewLine + 2;
+
+						} else {
+
+							foundNewLine = line.indexOf( "\r", readed );
+							if ( foundNewLine > 0 ) {
+
+								readed = foundNewLine + 1;
+
+							} else {
+
+								readed = line.indexOf( "\n", readed ) + 1;
+
+							}
+
+						}
+
+					} else {
+
+						break;
 
 					}
 
 				}
+				return line.substr( readed );
 
 			}
+		}, {
+			key: '_readLine',
+			value: function _readLine( line ) {
 
-		}
+				var readed = 0;
+				while ( true ) {
 
-	},
+					var find = - 1;
+					find = line.indexOf( '//', readed );
+					if ( find === - 1 ) {
 
-	ParseMatrixData: function (targetMatrix, data) {
-
-		targetMatrix.set(parseFloat(data[0]), parseFloat(data[4]), parseFloat(data[8]), parseFloat(data[12]), parseFloat(data[1]), parseFloat(data[5]), parseFloat(data[9]), parseFloat(data[13]), parseFloat(data[2]), parseFloat(data[6]), parseFloat(data[10]), parseFloat(data[14]), parseFloat(data[3]), parseFloat(data[7]), parseFloat(data[11]), parseFloat(data[15]));
-
-	},
-
-	MakeOutputGeometry: function (nowFrameName, _zflg) {
-
-		var scope = this;
-		if (scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry != null) {
-
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.computeBoundingBox();
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.computeBoundingSphere();
-			if (!scope.loadingXdata.faceNormalFromFile) {
-
-				scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.computeFaceNormals();
-
-			}
-			if (!scope.loadingXdata.vertexNormalFromFile) {
-
-				scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.computeVertexNormals();
-
-			}
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.verticesNeedUpdate = true;
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.normalsNeedUpdate = true;
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.colorsNeedUpdate = true;
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.uvsNeedUpdate = true;
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.groupsNeedUpdate = true;
-			var putBones = [];
-			var BoneInverse = [];
-			var BoneDics = [];
-			var rootBone = new THREE.Bone();
-			if (scope.loadingXdata.FrameInfo_Raw[nowFrameName].BoneInfs != null && scope.loadingXdata.FrameInfo_Raw[nowFrameName].BoneInfs.length) {
-
-				var keys = Object.keys(scope.loadingXdata.FrameInfo_Raw);
-				var BoneDics_Name = [];
-				for (var m = 0; m < keys.length; m++) {
-
-					if (scope.loadingXdata.FrameInfo_Raw[keys[m]].FrameStartLv <= scope.loadingXdata.FrameInfo_Raw[nowFrameName].FrameStartLv && nowFrameName != keys[m]) {
-
-						continue;
+						find = line.indexOf( '#', readed );
 
 					}
-					var b = new THREE.Bone();
-					b.name = keys[m];
-					b.applyMatrix(scope.loadingXdata.FrameInfo_Raw[keys[m]].FrameTransformMatrix);
-					BoneDics_Name[b.name] = putBones.length;
-					putBones.push(b);
-					var ivm = new THREE.Matrix4();
-					ivm.getInverse(scope.loadingXdata.FrameInfo_Raw[keys[m]].FrameTransformMatrix);
-					BoneInverse.push(ivm);
+					if ( find > - 1 && find < 2 ) {
+
+						var foundNewLine = - 1;
+						foundNewLine = line.indexOf( "\r\n", readed );
+						if ( foundNewLine > 0 ) {
+
+							readed = foundNewLine + 2;
+
+						} else {
+
+							foundNewLine = line.indexOf( "\r", readed );
+							if ( foundNewLine > 0 ) {
+
+								readed = foundNewLine + 1;
+
+							} else {
+
+								readed = line.indexOf( "\n", readed ) + 1;
+
+							}
+
+						}
+
+					} else {
+
+						break;
+
+					}
 
 				}
-				for (var _m = 0; _m < putBones.length; _m++) {
+				return line.substr( readed );
 
-					for (var dx = 0; dx < scope.loadingXdata.FrameInfo_Raw[putBones[_m].name].children.length; dx++) {
+			}
+		}, {
+			key: '_isBinary',
+			value: function _isBinary( binData ) {
 
-						var nowBoneIndex = BoneDics_Name[scope.loadingXdata.FrameInfo_Raw[putBones[_m].name].children[dx]];
-						if (putBones[nowBoneIndex] != null) {
+				var reader = new DataView( binData );
+				var face_size = 32 / 8 * 3 + 32 / 8 * 3 * 3 + 16 / 8;
+				var n_faces = reader.getUint32( 80, true );
+				var expect = 80 + 32 / 8 + n_faces * face_size;
+				if ( expect === reader.byteLength ) {
 
-							putBones[_m].add(putBones[nowBoneIndex]);
+					return true;
+
+				}
+				var fileLength = reader.byteLength;
+				for ( var index = 0; index < fileLength; index ++ ) {
+
+					if ( reader.getUint8( index, false ) > 127 ) {
+
+						return true;
+
+					}
+
+				}
+				return false;
+
+			}
+		}, {
+			key: 'ensureBinary',
+			value: function ensureBinary( buf ) {
+
+				if ( typeof buf === "string" ) {
+
+					var array_buffer = new Uint8Array( buf.length );
+					for ( var i = 0; i < buf.length; i ++ ) {
+
+						array_buffer[ i ] = buf.charCodeAt( i ) & 0xff;
+
+					}
+					return array_buffer.buffer || array_buffer;
+
+				} else {
+
+					return buf;
+
+				}
+
+			}
+		}, {
+			key: 'ensureString',
+			value: function ensureString( buf ) {
+
+				if ( typeof buf !== "string" ) {
+
+					return THREE.LoaderUtils.decodeText( new Uint8Array( buf ) );
+
+				} else {
+
+					return buf;
+
+				}
+
+			}
+		}, {
+			key: '_parse',
+			value: function _parse( data, onLoad ) {
+
+				var binData = this.ensureBinary( data );
+				this._data = this.ensureString( data );
+				this.onLoad = onLoad;
+				return this._isBinary( binData ) ? this._parseBinary( binData ) : this._parseASCII();
+
+			}
+		}, {
+			key: '_parseBinary',
+			value: function _parseBinary( data ) {
+
+				return this._parseASCII( THREE.LoaderUtils.decodeText( new Uint8Array( data ) ) );
+
+			}
+		}, {
+			key: '_parseASCII',
+			value: function _parseASCII() {
+
+				var path;
+
+				if ( this.resourcePath !== undefined ) {
+
+					path = this.resourcePath;
+
+				} else if ( this.path !== undefined ) {
+
+					path = this.path;
+
+				} else {
+
+					path = THREE.LoaderUtils.extractUrlBase( this.url );
+
+				}
+
+				this.texloader.setPath( path ).setCrossOrigin( this.crossOrigin );
+
+				var endRead = 16;
+				this.Hierarchies.children = [];
+				this._hierarchieParse( this.Hierarchies, endRead );
+				this._changeRoot();
+				this._currentObject = this.Hierarchies.children.shift();
+				this.mainloop();
+
+			}
+		}, {
+			key: '_hierarchieParse',
+			value: function _hierarchieParse( _parent, _end ) {
+
+				var endRead = _end;
+				while ( true ) {
+
+					var find1 = this._data.indexOf( '{', endRead ) + 1;
+					var findEnd = this._data.indexOf( '}', endRead );
+					var findNext = this._data.indexOf( '{', find1 ) + 1;
+					if ( find1 > 0 && findEnd > find1 ) {
+
+						var _currentObject = {};
+						_currentObject.children = [];
+						var nameData = this._readLine( this._data.substr( endRead, find1 - endRead - 1 ) ).trim();
+						var word = nameData.split( / /g );
+						if ( word.length > 0 ) {
+
+							_currentObject.type = word[ 0 ];
+							if ( word.length >= 2 ) {
+
+								_currentObject.name = word[ 1 ];
+
+							} else {
+
+								_currentObject.name = word[ 0 ] + this.Hierarchies.children.length;
+
+							}
+
+						} else {
+
+							_currentObject.name = nameData;
+							_currentObject.type = "";
+
+						}
+						if ( _currentObject.type === "Animation" ) {
+
+							_currentObject.data = this._data.substr( findNext, findEnd - findNext ).trim();
+							var refs = this._hierarchieParse( _currentObject, findEnd + 1 );
+							endRead = refs.end;
+							_currentObject.children = refs.parent.children;
+
+						} else {
+
+							var DataEnder = this._data.lastIndexOf( ';', findNext > 0 ? Math.min( findNext, findEnd ) : findEnd );
+							_currentObject.data = this._data.substr( find1, DataEnder - find1 ).trim();
+							if ( findNext <= 0 || findEnd < findNext ) {
+
+								endRead = findEnd + 1;
+
+							} else {
+
+								var nextStart = Math.max( DataEnder + 1, find1 );
+								var _refs = this._hierarchieParse( _currentObject, nextStart );
+								endRead = _refs.end;
+								_currentObject.children = _refs.parent.children;
+
+							}
+
+						}
+						_currentObject.parent = _parent;
+						if ( _currentObject.type != "template" ) {
+
+							_parent.children.push( _currentObject );
+
+						}
+
+					} else {
+
+						endRead = find1 === - 1 ? this._data.length : findEnd + 1;
+						break;
+
+					}
+
+				}
+				return {
+					parent: _parent,
+					end: endRead
+				};
+
+			}
+		}, {
+			key: 'mainloop',
+			value: function mainloop() {
+
+				var _this2 = this;
+
+				this.mainProc();
+				if ( this._currentObject.parent || this._currentObject.children.length > 0 || ! this._currentObject.worked ) {
+
+					setTimeout( function () {
+
+						_this2.mainloop();
+
+					}, 1 );
+
+				} else {
+
+					setTimeout( function () {
+
+						_this2.onLoad( {
+							models: _this2.Meshes,
+							animations: _this2.animations
+						} );
+
+					}, 1 );
+
+				}
+
+			}
+		}, {
+			key: 'mainProc',
+			value: function mainProc() {
+
+				var breakFlag = false;
+				while ( true ) {
+
+					if ( ! this._currentObject.worked ) {
+
+						switch ( this._currentObject.type ) {
+
+							case "template":
+								break;
+							case "AnimTicksPerSecond":
+								this.animTicksPerSecond = parseInt( this._currentObject.data );
+								break;
+							case "Frame":
+								this._setFrame();
+								break;
+							case "FrameTransformMatrix":
+								this._setFrameTransformMatrix();
+								break;
+							case "Mesh":
+								this._changeRoot();
+								this._currentGeo = {};
+								this._currentGeo.name = this._currentObject.name.trim();
+								this._currentGeo.parentName = this._getParentName( this._currentObject ).trim();
+								this._currentGeo.VertexSetedBoneCount = [];
+								this._currentGeo.GeometryData = {
+									vertices: [],
+									normals: [],
+									uvs: [],
+									skinIndices: [],
+									skinWeights: [],
+									indices: [],
+									materialIndices: []
+								};
+								this._currentGeo.Materials = [];
+								this._currentGeo.normalVectors = [];
+								this._currentGeo.BoneInfs = [];
+								this._currentGeo.baseFrame = this._currentFrame;
+								this._makeBoneFrom_CurrentFrame();
+								this._readVertexDatas();
+								breakFlag = true;
+								break;
+							case "MeshNormals":
+								this._readVertexDatas();
+								break;
+							case "MeshTextureCoords":
+								this._setMeshTextureCoords();
+								break;
+							case "VertexDuplicationIndices":
+								break;
+							case "MeshMaterialList":
+								this._setMeshMaterialList();
+								break;
+							case "Material":
+								this._setMaterial();
+								break;
+							case "SkinWeights":
+								this._setSkinWeights();
+								break;
+							case "AnimationSet":
+								this._changeRoot();
+								this._currentAnime = {};
+								this._currentAnime.name = this._currentObject.name.trim();
+								this._currentAnime.AnimeFrames = [];
+								break;
+							case "Animation":
+								if ( this._currentAnimeFrames ) {
+
+									this._currentAnime.AnimeFrames.push( this._currentAnimeFrames );
+
+								}
+								this._currentAnimeFrames = new XAnimationInfo();
+								this._currentAnimeFrames.boneName = this._currentObject.data.trim();
+								break;
+							case "AnimationKey":
+								this._readAnimationKey();
+								breakFlag = true;
+								break;
+
+						}
+						this._currentObject.worked = true;
+
+					}
+					if ( this._currentObject.children.length > 0 ) {
+
+						this._currentObject = this._currentObject.children.shift();
+						if ( this.debug ) {
+
+							console.log( 'processing ' + this._currentObject.name );
+
+						}
+						if ( breakFlag ) break;
+
+					} else {
+
+						if ( this._currentObject.worked ) {
+
+							if ( this._currentObject.parent && ! this._currentObject.parent.parent ) {
+
+								this._changeRoot();
+
+							}
+
+						}
+						if ( this._currentObject.parent ) {
+
+							this._currentObject = this._currentObject.parent;
+
+						} else {
+
+							breakFlag = true;
+
+						}
+						if ( breakFlag ) break;
+
+					}
+
+				}
+				return;
+
+			}
+		}, {
+			key: '_changeRoot',
+			value: function _changeRoot() {
+
+				if ( this._currentGeo != null && this._currentGeo.name ) {
+
+					this._makeOutputGeometry();
+
+				}
+				this._currentGeo = {};
+				if ( this._currentAnime != null && this._currentAnime.name ) {
+
+					if ( this._currentAnimeFrames ) {
+
+						this._currentAnime.AnimeFrames.push( this._currentAnimeFrames );
+						this._currentAnimeFrames = null;
+
+					}
+					this._makeOutputAnimation();
+
+				}
+				this._currentAnime = {};
+
+			}
+		}, {
+			key: '_getParentName',
+			value: function _getParentName( _obj ) {
+
+				if ( _obj.parent ) {
+
+					if ( _obj.parent.name ) {
+
+						return _obj.parent.name;
+
+					} else {
+
+						return this._getParentName( _obj.parent );
+
+					}
+
+				} else {
+
+					return "";
+
+				}
+
+			}
+		}, {
+			key: '_setFrame',
+			value: function _setFrame() {
+
+				this._nowFrameName = this._currentObject.name.trim();
+				this._currentFrame = {};
+				this._currentFrame.name = this._nowFrameName;
+				this._currentFrame.children = [];
+				if ( this._currentObject.parent && this._currentObject.parent.name ) {
+
+					this._currentFrame.parentName = this._currentObject.parent.name;
+
+				}
+				this.frameHierarchie.push( this._nowFrameName );
+				this.HieStack[ this._nowFrameName ] = this._currentFrame;
+
+			}
+		}, {
+			key: '_setFrameTransformMatrix',
+			value: function _setFrameTransformMatrix() {
+
+				this._currentFrame.FrameTransformMatrix = new THREE.Matrix4();
+				var data = this._currentObject.data.split( "," );
+				this._ParseMatrixData( this._currentFrame.FrameTransformMatrix, data );
+				this._makeBoneFrom_CurrentFrame();
+
+			}
+		}, {
+			key: '_makeBoneFrom_CurrentFrame',
+			value: function _makeBoneFrom_CurrentFrame() {
+
+				if ( ! this._currentFrame.FrameTransformMatrix ) {
+
+					return;
+
+				}
+				var b = new THREE.Bone();
+				b.name = this._currentFrame.name;
+				b.applyMatrix( this._currentFrame.FrameTransformMatrix );
+				b.matrixWorld = b.matrix;
+				b.FrameTransformMatrix = this._currentFrame.FrameTransformMatrix;
+				this._currentFrame.putBone = b;
+				if ( this._currentFrame.parentName ) {
+
+					for ( var frame in this.HieStack ) {
+
+						if ( this.HieStack[ frame ].name === this._currentFrame.parentName ) {
+
+							this.HieStack[ frame ].putBone.add( this._currentFrame.putBone );
 
 						}
 
@@ -1248,327 +861,829 @@ THREE.XLoader.prototype = {
 				}
 
 			}
-			var mesh = null;
-			var bufferGeometry = new THREE.BufferGeometry();
-			if (putBones.length > 0) {
+		}, {
+			key: '_readVertexDatas',
+			value: function _readVertexDatas() {
 
-				if (scope.loadingXdata.FrameInfo_Raw[putBones[0].name].children.length === 0 && nowFrameName != putBones[0].name) {
+				var endRead = 0;
+				var mode = 0;
+				var mode_local = 0;
+				var maxLength = 0;
+				while ( true ) {
 
-					putBones[0].add(putBones[1]);
-					putBones[0].zflag = _zflg;
+					var changeMode = false;
+					if ( mode_local === 0 ) {
 
-				}
-				for (var _m2 = 0; _m2 < putBones.length; _m2++) {
+						var refO = this._readInt1( endRead );
+						endRead = refO.endRead;
+						mode_local = 1;
+						maxLength = this._currentObject.data.indexOf( ';;', endRead ) + 1;
+						if ( maxLength <= 0 ) {
 
-					if (putBones[_m2].parent === null) {
+							maxLength = this._currentObject.data.length;
 
-						putBones[_m2].zflag = _zflg;
+						}
 
-					}
-					for (var bi = 0; bi < scope.loadingXdata.FrameInfo_Raw[nowFrameName].BoneInfs.length; bi++) {
+					} else {
 
-						if (putBones[_m2].name === scope.loadingXdata.FrameInfo_Raw[nowFrameName].BoneInfs[bi].boneName) {
+						var find = 0;
+						switch ( mode ) {
 
-							for (var vi = 0; vi < scope.loadingXdata.FrameInfo_Raw[nowFrameName].BoneInfs[bi].Indeces.length; vi++) {
+							case 0:
+								find = this._currentObject.data.indexOf( ',', endRead ) + 1;
+								break;
+							case 1:
+								find = this._currentObject.data.indexOf( ';,', endRead ) + 1;
+								break;
 
-								var nowVertexID = scope.loadingXdata.FrameInfo_Raw[nowFrameName].BoneInfs[bi].Indeces[vi];
-								var nowVal = scope.loadingXdata.FrameInfo_Raw[nowFrameName].BoneInfs[bi].Weights[vi];
-								switch (scope.loadingXdata.FrameInfo_Raw[nowFrameName].VertexSetedBoneCount[nowVertexID]) {
+						}
+						if ( find === 0 || find > maxLength ) {
+
+							find = maxLength;
+							mode_local = 0;
+							changeMode = true;
+
+						}
+						switch ( this._currentObject.type ) {
+
+							case "Mesh":
+								switch ( mode ) {
 
 									case 0:
-										scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.skinIndices[nowVertexID].x = _m2;
-										scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.skinWeights[nowVertexID].x = nowVal;
+										this._readVertex1( this._currentObject.data.substr( endRead, find - endRead ) );
 										break;
 									case 1:
-										scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.skinIndices[nowVertexID].y = _m2;
-										scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.skinWeights[nowVertexID].y = nowVal;
-										break;
-									case 2:
-										scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.skinIndices[nowVertexID].z = _m2;
-										scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.skinWeights[nowVertexID].z = nowVal;
-										break;
-									case 3:
-										scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.skinIndices[nowVertexID].w = _m2;
-										scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry.skinWeights[nowVertexID].w = nowVal;
+										this._readFace1( this._currentObject.data.substr( endRead, find - endRead ) );
 										break;
 
 								}
-								scope.loadingXdata.FrameInfo_Raw[nowFrameName].VertexSetedBoneCount[nowVertexID]++;
+								break;
+							case "MeshNormals":
+								switch ( mode ) {
+
+									case 0:
+										this._readNormalVector1( this._currentObject.data.substr( endRead, find - endRead ) );
+										break;
+
+								}
+								break;
+
+						}
+						endRead = find + 1;
+						if ( changeMode ) {
+
+							mode ++;
+
+						}
+
+					}
+					if ( endRead >= this._currentObject.data.length ) {
+
+						break;
+
+					}
+
+				}
+
+			}
+		}, {
+			key: '_readInt1',
+			value: function _readInt1( start ) {
+
+				var find = this._currentObject.data.indexOf( ';', start );
+				return {
+					refI: parseInt( this._currentObject.data.substr( start, find - start ) ),
+					endRead: find + 1
+				};
+
+			}
+		}, {
+			key: '_readVertex1',
+			value: function _readVertex1( line ) {
+
+				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ";" );
+				this._currentGeo.GeometryData.vertices.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) );
+				this._currentGeo.GeometryData.skinIndices.push( 0, 0, 0, 0 );
+				this._currentGeo.GeometryData.skinWeights.push( 1, 0, 0, 0 );
+				this._currentGeo.VertexSetedBoneCount.push( 0 );
+
+			}
+		}, {
+			key: '_readFace1',
+			value: function _readFace1( line ) {
+
+				var data = this._readLine( line.trim() ).substr( 2, line.length - 4 ).split( "," );
+				this._currentGeo.GeometryData.indices.push( parseInt( data[ 0 ], 10 ), parseInt( data[ 1 ], 10 ), parseInt( data[ 2 ], 10 ) );
+
+			}
+		}, {
+			key: '_readNormalVector1',
+			value: function _readNormalVector1( line ) {
+
+				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ";" );
+				this._currentGeo.GeometryData.normals.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) );
+
+			}
+		}, {
+			key: '_buildGeometry',
+			value: function _buildGeometry() {
+
+				var bufferGeometry = new THREE.BufferGeometry();
+				var position = [];
+				var normals = [];
+				var uvs = [];
+				var skinIndices = [];
+				var skinWeights = [];
+
+				//
+
+				var data = this._currentGeo.GeometryData;
+
+				for ( var i = 0, l = data.indices.length; i < l; i ++ ) {
+
+					var stride2 = data.indices[ i ] * 2;
+					var stride3 = data.indices[ i ] * 3;
+					var stride4 = data.indices[ i ] * 4;
+
+					position.push( data.vertices[ stride3 ], data.vertices[ stride3 + 1 ], data.vertices[ stride3 + 2 ] );
+					normals.push( data.normals[ stride3 ], data.normals[ stride3 + 1 ], data.normals[ stride3 + 2 ] );
+					skinIndices.push( data.skinIndices[ stride4 ], data.skinIndices[ stride4 + 1 ], data.skinIndices[ stride4 + 2 ], data.skinIndices[ stride4 + 3 ] );
+					skinWeights.push( data.skinWeights[ stride4 ], data.skinWeights[ stride4 + 1 ], data.skinWeights[ stride4 + 2 ], data.skinWeights[ stride4 + 3 ] );
+					uvs.push( data.uvs[ stride2 ], data.uvs[ stride2 + 1 ] );
+
+				}
+
+				//
+
+				bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+				bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				bufferGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				bufferGeometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+				bufferGeometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+
+				this._computeGroups( bufferGeometry, data.materialIndices );
+
+				return bufferGeometry;
+
+			}
+		}, {
+			key: '_computeGroups',
+			value: function _computeGroups( bufferGeometry, materialIndices ) {
+
+				var group;
+				var groups = [];
+				var materialIndex = undefined;
+
+				for ( var i = 0; i < materialIndices.length; i ++ ) {
+
+					var currentMaterialIndex = materialIndices[ i ];
+
+					if ( currentMaterialIndex !== materialIndex ) {
+
+						materialIndex = currentMaterialIndex;
+
+						if ( group !== undefined ) {
+
+							group.count = ( i * 3 ) - group.start;
+							groups.push( group );
+
+						}
+
+						group = {
+							start: i * 3,
+							materialIndex: materialIndex
+						};
+
+					}
+
+				}
+
+				if ( group !== undefined ) {
+
+					group.count = ( i * 3 ) - group.start;
+					groups.push( group );
+
+				}
+
+				bufferGeometry.groups = groups;
+
+			}
+		}, {
+			key: '_setMeshTextureCoords',
+			value: function _setMeshTextureCoords() {
+
+				var endRead = 0;
+				var mode = 0;
+				var mode_local = 0;
+				while ( true ) {
+
+					switch ( mode ) {
+
+						case 0:
+							if ( mode_local === 0 ) {
+
+								var refO = this._readInt1( 0 );
+								endRead = refO.endRead;
+								mode_local = 1;
+
+							} else {
+
+								var find = this._currentObject.data.indexOf( ',', endRead ) + 1;
+								if ( find === 0 ) {
+
+									find = this._currentObject.data.length;
+									mode = 2;
+									mode_local = 0;
+
+								}
+								var line = this._currentObject.data.substr( endRead, find - endRead );
+								var data = this._readLine( line.trim() ).split( ";" );
+								if ( this.IsUvYReverse ) {
+
+									this._currentGeo.GeometryData.uvs.push( parseFloat( data[ 0 ] ), 1 - parseFloat( data[ 1 ] ) );
+
+								} else {
+
+									this._currentGeo.GeometryData.uvs.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ) );
+
+								}
+								endRead = find + 1;
 
 							}
+							break;
+
+					}
+					if ( endRead >= this._currentObject.data.length ) {
+
+						break;
+
+					}
+
+				}
+
+			}
+		}, {
+			key: '_setMeshMaterialList',
+			value: function _setMeshMaterialList() {
+
+				var endRead = 0;
+				var mode = 0;
+				var mode_local = 0;
+				while ( true ) {
+
+					if ( mode_local < 2 ) {
+
+						var refO = this._readInt1( endRead );
+						endRead = refO.endRead;
+						mode_local ++;
+
+					} else {
+
+						var find = this._currentObject.data.indexOf( ';', endRead );
+						if ( find === - 1 ) {
+
+							find = this._currentObject.data.length;
+							mode = 3;
+							mode_local = 0;
+
+						}
+						var line = this._currentObject.data.substr( endRead, find - endRead );
+						var data = this._readLine( line.trim() ).split( "," );
+						for ( var i = 0; i < data.length; i ++ ) {
+
+							this._currentGeo.GeometryData.materialIndices[ i ] = parseInt( data[ i ] );
+
+						}
+						endRead = this._currentObject.data.length;
+
+					}
+					if ( endRead >= this._currentObject.data.length || mode >= 3 ) {
+
+						break;
+
+					}
+
+				}
+
+			}
+		}, {
+			key: '_setMaterial',
+			value: function _setMaterial() {
+
+				var _nowMat = new THREE.MeshPhongMaterial( {
+					color: Math.random() * 0xffffff
+				} );
+				_nowMat.side = THREE.FrontSide;
+				_nowMat.name = this._currentObject.name;
+				var endRead = 0;
+				var find = this._currentObject.data.indexOf( ';;', endRead );
+				var line = this._currentObject.data.substr( endRead, find - endRead );
+				var data = this._readLine( line.trim() ).split( ";" );
+				_nowMat.color.r = parseFloat( data[ 0 ] );
+				_nowMat.color.g = parseFloat( data[ 1 ] );
+				_nowMat.color.b = parseFloat( data[ 2 ] );
+				endRead = find + 2;
+				find = this._currentObject.data.indexOf( ';', endRead );
+				line = this._currentObject.data.substr( endRead, find - endRead );
+				_nowMat.shininess = parseFloat( this._readLine( line ) );
+				endRead = find + 1;
+				find = this._currentObject.data.indexOf( ';;', endRead );
+				line = this._currentObject.data.substr( endRead, find - endRead );
+				var data2 = this._readLine( line.trim() ).split( ";" );
+				_nowMat.specular.r = parseFloat( data2[ 0 ] );
+				_nowMat.specular.g = parseFloat( data2[ 1 ] );
+				_nowMat.specular.b = parseFloat( data2[ 2 ] );
+				endRead = find + 2;
+				find = this._currentObject.data.indexOf( ';;', endRead );
+				if ( find === - 1 ) {
+
+					find = this._currentObject.data.length;
+
+				}
+				line = this._currentObject.data.substr( endRead, find - endRead );
+				var data3 = this._readLine( line.trim() ).split( ";" );
+				_nowMat.emissive.r = parseFloat( data3[ 0 ] );
+				_nowMat.emissive.g = parseFloat( data3[ 1 ] );
+				_nowMat.emissive.b = parseFloat( data3[ 2 ] );
+				var localObject = null;
+				while ( true ) {
+
+					if ( this._currentObject.children.length > 0 ) {
+
+						localObject = this._currentObject.children.shift();
+						if ( this.debug ) {
+
+							console.log( 'processing ' + localObject.name );
+
+						}
+						var fileName = localObject.data.substr( 1, localObject.data.length - 2 );
+						switch ( localObject.type ) {
+
+							case "TextureFilename":
+								_nowMat.map = this.texloader.load( fileName );
+								break;
+							case "BumpMapFilename":
+								_nowMat.bumpMap = this.texloader.load( fileName );
+								_nowMat.bumpScale = 0.05;
+								break;
+							case "NormalMapFilename":
+								_nowMat.normalMap = this.texloader.load( fileName );
+								_nowMat.normalScale = new THREE.Vector2( 2, 2 );
+								break;
+							case "EmissiveMapFilename":
+								_nowMat.emissiveMap = this.texloader.load( fileName );
+								break;
+							case "LightMapFilename":
+								_nowMat.lightMap = this.texloader.load( fileName );
+								break;
+
+						}
+
+					} else {
+
+						break;
+
+					}
+
+				}
+				this._currentGeo.Materials.push( _nowMat );
+
+			}
+		}, {
+			key: '_setSkinWeights',
+			value: function _setSkinWeights() {
+
+				var boneInf = new XboneInf();
+				var endRead = 0;
+				var find = this._currentObject.data.indexOf( ';', endRead );
+				var line = this._currentObject.data.substr( endRead, find - endRead );
+				endRead = find + 1;
+				boneInf.boneName = line.substr( 1, line.length - 2 );
+				boneInf.BoneIndex = this._currentGeo.BoneInfs.length;
+				find = this._currentObject.data.indexOf( ';', endRead );
+				endRead = find + 1;
+				find = this._currentObject.data.indexOf( ';', endRead );
+				line = this._currentObject.data.substr( endRead, find - endRead );
+				var data = this._readLine( line.trim() ).split( "," );
+				for ( var i = 0; i < data.length; i ++ ) {
+
+					boneInf.Indeces.push( parseInt( data[ i ] ) );
+
+				}
+				endRead = find + 1;
+				find = this._currentObject.data.indexOf( ';', endRead );
+				line = this._currentObject.data.substr( endRead, find - endRead );
+				var data2 = this._readLine( line.trim() ).split( "," );
+				for ( var _i = 0; _i < data2.length; _i ++ ) {
+
+					boneInf.Weights.push( parseFloat( data2[ _i ] ) );
+
+				}
+				endRead = find + 1;
+				find = this._currentObject.data.indexOf( ';', endRead );
+				if ( find <= 0 ) {
+
+					find = this._currentObject.data.length;
+
+				}
+				line = this._currentObject.data.substr( endRead, find - endRead );
+				var data3 = this._readLine( line.trim() ).split( "," );
+				boneInf.OffsetMatrix = new THREE.Matrix4();
+				this._ParseMatrixData( boneInf.OffsetMatrix, data3 );
+				this._currentGeo.BoneInfs.push( boneInf );
+
+			}
+		}, {
+			key: '_makePutBoneList',
+			value: function _makePutBoneList( _RootName, _bones ) {
+
+				var putting = false;
+				for ( var frame in this.HieStack ) {
+
+					if ( this.HieStack[ frame ].name === _RootName || putting ) {
+
+						putting = true;
+						var b = new THREE.Bone();
+						b.name = this.HieStack[ frame ].name;
+						b.applyMatrix( this.HieStack[ frame ].FrameTransformMatrix );
+						b.matrixWorld = b.matrix;
+						b.FrameTransformMatrix = this.HieStack[ frame ].FrameTransformMatrix;
+						b.pos = new THREE.Vector3().setFromMatrixPosition( b.FrameTransformMatrix ).toArray();
+						b.rotq = new THREE.Quaternion().setFromRotationMatrix( b.FrameTransformMatrix ).toArray();
+						b.scl = new THREE.Vector3().setFromMatrixScale( b.FrameTransformMatrix ).toArray();
+						if ( this.HieStack[ frame ].parentName && this.HieStack[ frame ].parentName.length > 0 ) {
+
+							for ( var i = 0; i < _bones.length; i ++ ) {
+
+								if ( this.HieStack[ frame ].parentName === _bones[ i ].name ) {
+
+									_bones[ i ].add( b );
+									b.parent = i;
+									break;
+
+								}
+
+							}
+
+						}
+						_bones.push( b );
+
+					}
+
+				}
+
+			}
+		}, {
+			key: '_makeOutputGeometry',
+			value: function _makeOutputGeometry() {
+
+				var mesh = null;
+				if ( this._currentGeo.BoneInfs.length > 0 ) {
+
+					var putBones = [];
+					this._makePutBoneList( this._currentGeo.baseFrame.parentName, putBones );
+					for ( var bi = 0; bi < this._currentGeo.BoneInfs.length; bi ++ ) {
+
+						var boneIndex = 0;
+						for ( var bb = 0; bb < putBones.length; bb ++ ) {
+
+							if ( putBones[ bb ].name === this._currentGeo.BoneInfs[ bi ].boneName ) {
+
+								boneIndex = bb;
+								putBones[ bb ].OffsetMatrix = new THREE.Matrix4();
+								putBones[ bb ].OffsetMatrix.copy( this._currentGeo.BoneInfs[ bi ].OffsetMatrix );
+								break;
+
+							}
+
+						}
+						for ( var vi = 0; vi < this._currentGeo.BoneInfs[ bi ].Indeces.length; vi ++ ) {
+
+							var nowVertexID = this._currentGeo.BoneInfs[ bi ].Indeces[ vi ];
+							var nowVal = this._currentGeo.BoneInfs[ bi ].Weights[ vi ];
+
+							var stride = nowVertexID * 4;
+
+							switch ( this._currentGeo.VertexSetedBoneCount[ nowVertexID ] ) {
+
+								case 0:
+									this._currentGeo.GeometryData.skinIndices[ stride ] = boneIndex;
+									this._currentGeo.GeometryData.skinWeights[ stride ] = nowVal;
+									break;
+								case 1:
+									this._currentGeo.GeometryData.skinIndices[ stride + 1 ] = boneIndex;
+									this._currentGeo.GeometryData.skinWeights[ stride + 1 ] = nowVal;
+									break;
+								case 2:
+									this._currentGeo.GeometryData.skinIndices[ stride + 2 ] = boneIndex;
+									this._currentGeo.GeometryData.skinWeights[ stride + 2 ] = nowVal;
+									break;
+								case 3:
+									this._currentGeo.GeometryData.skinIndices[ stride + 3 ] = boneIndex;
+									this._currentGeo.GeometryData.skinWeights[ stride + 3 ] = nowVal;
+									break;
+
+							}
+							this._currentGeo.VertexSetedBoneCount[ nowVertexID ] ++;
+							if ( this._currentGeo.VertexSetedBoneCount[ nowVertexID ] > 4 ) {
+
+								console.log( 'warn! over 4 bone weight! :' + nowVertexID );
+
+							}
+
+						}
+
+					}
+					for ( var sk = 0; sk < this._currentGeo.Materials.length; sk ++ ) {
+
+						this._currentGeo.Materials[ sk ].skinning = true;
+
+					}
+					var offsetList = [];
+					for ( var _bi = 0; _bi < putBones.length; _bi ++ ) {
+
+						if ( putBones[ _bi ].OffsetMatrix ) {
+
+							offsetList.push( putBones[ _bi ].OffsetMatrix );
+
+						} else {
+
+							offsetList.push( new THREE.Matrix4() );
+
+						}
+
+					}
+
+					var bufferGeometry = this._buildGeometry();
+					mesh = new THREE.SkinnedMesh( bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
+
+					this._initSkeleton( mesh, putBones, offsetList );
+
+				} else {
+
+					var _bufferGeometry = this._buildGeometry();
+					mesh = new THREE.Mesh( _bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
+
+				}
+				mesh.name = this._currentGeo.name;
+				var worldBaseMx = new THREE.Matrix4();
+				var currentMxFrame = this._currentGeo.baseFrame.putBone;
+				if ( currentMxFrame && currentMxFrame.parent ) {
+
+					while ( true ) {
+
+						currentMxFrame = currentMxFrame.parent;
+						if ( currentMxFrame ) {
+
+							worldBaseMx.multiply( currentMxFrame.FrameTransformMatrix );
+
+						} else {
+
 							break;
 
 						}
 
 					}
+					mesh.applyMatrix( worldBaseMx );
 
 				}
-				for (var sk = 0; sk < scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials.length; sk++) {
-
-					scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials[sk].skinning = true;
-
-				}
-				mesh = new THREE.SkinnedMesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials);
-				var skeleton = new THREE.Skeleton(putBones /*, BoneInverse*/);
-				mesh.add(putBones[0]);
-				mesh.bind(skeleton);
-
-			} else {
-
-				mesh = new THREE.Mesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials);
+				this.Meshes.push( mesh );
 
 			}
-			mesh.name = nowFrameName;
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Mesh = mesh;
-			scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry = null;
+		}, {
+			key: '_initSkeleton',
+			value: function _initSkeleton( mesh, boneList, boneInverses ) {
 
-		}
+				var bones = [], bone, gbone;
+				var i, il;
 
-	},
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
 
-	animationFinalize: function () {
+					gbone = boneList[ i ];
 
-		var scope = this;
-		scope.animeKeyNames = Object.keys(scope.loadingXdata.AnimationSetInfo);
-		if (scope.animeKeyNames != null && scope.animeKeyNames.length > 0) {
+					bone = new THREE.Bone();
+					bones.push( bone );
 
-			scope.nowReaded = 0;
-			scope.loadingXdata.XAnimationObj = [];
-			scope.animationFinalize_step();
+					bone.name = gbone.name;
+					bone.position.fromArray( gbone.pos );
+					bone.quaternion.fromArray( gbone.rotq );
+					if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
 
-		} else {
+				}
 
-			scope.finalproc();
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
 
+					gbone = boneList[ i ];
 
-		}
+					if ( ( gbone.parent !== - 1 ) && ( gbone.parent !== null ) && ( bones[ gbone.parent ] !== undefined ) ) {
 
-	},
+						bones[ gbone.parent ].add( bones[ i ] );
 
-	animationFinalize_step: function () {
+					} else {
 
-		var scope = this;
-		var i = scope.nowReaded;
-		var keys = Object.keys(scope.loadingXdata.FrameInfo_Raw);
-		var tgtModel = null;
-		for (var m = 0; m < scope.loadingXdata.FrameInfo.length; m++) {
+						mesh.add( bones[ i ] );
 
-			var keys2 = Object.keys(scope.loadingXdata.AnimationSetInfo[scope.animeKeyNames[i]]);
-			if (scope.loadingXdata.AnimationSetInfo[scope.animeKeyNames[i]][keys2[0]].boneName == scope.loadingXdata.FrameInfo[m].name) {
+					}
 
-				tgtModel = scope.loadingXdata.FrameInfo[m];
-				break;
+				}
+
+				mesh.updateMatrixWorld( true );
+
+				var skeleton = new THREE.Skeleton( bones, boneInverses );
+				mesh.bind( skeleton, mesh.matrixWorld );
 
 			}
 
-		}
-		if (tgtModel != null) {
+		}, {
+			key: '_readAnimationKey',
+			value: function _readAnimationKey() {
 
-			scope.loadingXdata.XAnimationObj[i] = new THREE.XLoader.XAnimationObj();
-			scope.loadingXdata.XAnimationObj[i].fps = scope.loadingXdata.AnimTicksPerSecond;
-			scope.loadingXdata.XAnimationObj[i].name = scope.animeKeyNames[i];
-			scope.loadingXdata.XAnimationObj[i].make(scope.loadingXdata.AnimationSetInfo[scope.animeKeyNames[i]], tgtModel);
+				var endRead = 0;
+				var find = this._currentObject.data.indexOf( ';', endRead );
+				var line = this._currentObject.data.substr( endRead, find - endRead );
+				endRead = find + 1;
+				var nowKeyType = parseInt( this._readLine( line ) );
+				find = this._currentObject.data.indexOf( ';', endRead );
+				endRead = find + 1;
+				line = this._currentObject.data.substr( endRead );
+				var data = this._readLine( line.trim() ).split( ";;," );
+				for ( var i = 0; i < data.length; i ++ ) {
 
-		}
-		scope.nowReaded++;
-		if (scope.nowReaded >= scope.animeKeyNames.length) {
+					var data2 = data[ i ].split( ";" );
+					var keyInfo = new XKeyFrameInfo();
+					keyInfo.type = nowKeyType;
+					keyInfo.Frame = parseInt( data2[ 0 ] );
+					keyInfo.index = this._currentAnimeFrames.keyFrames.length;
+					keyInfo.time = keyInfo.Frame;
+					if ( nowKeyType != 4 ) {
 
-			scope.loadingXdata.AnimationSetInfo = null;
-			scope.finalproc();
+						var frameFound = false;
+						for ( var mm = 0; mm < this._currentAnimeFrames.keyFrames.length; mm ++ ) {
 
-		} else {
+							if ( this._currentAnimeFrames.keyFrames[ mm ].Frame === keyInfo.Frame ) {
 
-			scope.animationFinalize_step();
+								keyInfo = this._currentAnimeFrames.keyFrames[ mm ];
+								frameFound = true;
+								break;
 
-		}
+							}
 
-	},
+						}
+						var frameValue = data2[ 2 ].split( "," );
+						switch ( nowKeyType ) {
 
-	finalproc: function () {
+							case 0:
+								keyInfo.rot = new THREE.Quaternion( parseFloat( frameValue[ 1 ] ), parseFloat( frameValue[ 2 ] ), parseFloat( frameValue[ 3 ] ), parseFloat( frameValue[ 0 ] ) * - 1 );
+								break;
+							case 1:
+								keyInfo.scl = new THREE.Vector3( parseFloat( frameValue[ 0 ] ), parseFloat( frameValue[ 1 ] ), parseFloat( frameValue[ 2 ] ) );
+								break;
+							case 2:
+								keyInfo.pos = new THREE.Vector3( parseFloat( frameValue[ 0 ] ), parseFloat( frameValue[ 1 ] ), parseFloat( frameValue[ 2 ] ) );
+								break;
 
-		var scope = this;
-		setTimeout(function () {
+						}
+						if ( ! frameFound ) {
 
-			scope.onLoad(scope.loadingXdata);
+							this._currentAnimeFrames.keyFrames.push( keyInfo );
 
-		}, 1);
+						}
 
-	}
-};
+					} else {
 
-THREE.XLoader.XfileLoadMode = {
-	none: - 1,
-	Element: 1,
-	FrameTransformMatrix_Read: 3,
-	Mesh: 5,
-	Vartex_init: 10,
-	Vartex_Read: 11,
-	Index_init: 20,
-	index_Read: 21,
-	Uv_init: 30,
-	Uv_Read: 31,
-	Normal_V_init: 40,
-	Normal_V_Read: 41,
-	Normal_I_init: 42,
-	Normal_I_Read: 43,
-	Mat_Face_init: 101,
-	Mat_Face_len_Read: 102,
-	Mat_Face_Set: 103,
-	Mat_Set: 111,
-	Mat_detail: 121,
-	Mat_Set_Texture: 121,
-	Mat_Set_LightTex: 122,
-	Mat_Set_EmissiveTex: 123,
-	Mat_Set_BumpTex: 124,
-	Mat_Set_NormalTex: 125,
-	Mat_Set_EnvTex: 126,
-	Weit_init: 201,
-	Weit_IndexLength: 202,
-	Weit_Read_Index: 203,
-	Weit_Read_Value: 204,
-	Weit_Read_Matrx: 205,
-	Anim_init: 1001,
-	Anim_Reading: 1002,
-	Anim_KeyValueTypeRead: 1003,
-	Anim_KeyValueLength: 1004,
-	Anime_ReadKeyFrame: 1005
-};
+						keyInfo.matrix = new THREE.Matrix4();
+						this._ParseMatrixData( keyInfo.matrix, data2[ 2 ].split( "," ) );
+						this._currentAnimeFrames.keyFrames.push( keyInfo );
 
-
-THREE.XLoader.XAnimationObj = function () {
-
-	this.fps = 30;
-	this.name = 'xanimation';
-	this.length = 0;
-	this.hierarchy = [];
-
-};
-
-THREE.XLoader.XAnimationObj.prototype = {
-
-	constructor: THREE.XLoader.XAnimationObj,
-
-	make: function (XAnimationInfoArray, mesh) {
-
-		var scope = this;
-		var keys = Object.keys(XAnimationInfoArray);
-		var hierarchy_tmp = [];
-		for (var i = 0; i < keys.length; i++) {
-
-			var bone = null;
-			var parent = - 1;
-			var baseIndex = - 1;
-			for (var m = 0; m < mesh.skeleton.bones.length; m++) {
-
-				if (mesh.skeleton.bones[m].name == XAnimationInfoArray[keys[i]].boneName) {
-
-					bone = XAnimationInfoArray[keys[i]];
-					parent = mesh.skeleton.bones[m].parent.name;
-					baseIndex = m;
-					break;
+					}
 
 				}
 
 			}
-			hierarchy_tmp[baseIndex] = scope.makeBonekeys(XAnimationInfoArray[keys[i]], bone, parent);
+		}, {
+			key: '_makeOutputAnimation',
+			value: function _makeOutputAnimation() {
 
-		}
-		var keys2 = Object.keys(hierarchy_tmp);
-		for (var _i = 0; _i < keys2.length; _i++) {
+				var animationObj = new XAnimationObj( this.options );
+				animationObj.fps = this.animTicksPerSecond;
+				animationObj.name = this._currentAnime.name;
+				animationObj.make( this._currentAnime.AnimeFrames );
+				this.animations.push( animationObj );
 
-			scope.hierarchy.push(hierarchy_tmp[_i]);
-			var parentId = - 1;
-			for (var _m = 0; _m < scope.hierarchy.length; _m++) {
+			}
+		}, {
+			key: 'assignAnimation',
+			value: function assignAnimation( _model, _animation, _isBind ) {
 
-				if (_i != _m && scope.hierarchy[_i].parent === scope.hierarchy[_m].name) {
+				var model = _model;
+				var animation = _animation;
+				if ( ! model ) {
 
-					parentId = _m;
-					break;
+					model = this.Meshes[ 0 ];
+
+				}
+				if ( ! animation ) {
+
+					animation = this.animations[ 0 ];
+
+				}
+				if ( ! model || ! animation ) {
+
+					return null;
+
+				}
+				var put = {};
+				put.fps = animation.fps;
+				put.name = animation.name;
+				put.length = animation.length;
+				put.hierarchy = [];
+				for ( var b = 0; b < model.skeleton.bones.length; b ++ ) {
+
+					var findAnimation = false;
+					for ( var i = 0; i < animation.hierarchy.length; i ++ ) {
+
+						if ( model.skeleton.bones[ b ].name === animation.hierarchy[ i ].name ) {
+
+							findAnimation = true;
+							var c_key = animation.hierarchy[ i ].copy();
+							c_key.parent = - 1;
+							if ( model.skeleton.bones[ b ].parent && model.skeleton.bones[ b ].parent.type === "Bone" ) {
+
+								for ( var bb = 0; bb < put.hierarchy.length; bb ++ ) {
+
+									if ( put.hierarchy[ bb ].name === model.skeleton.bones[ b ].parent.name ) {
+
+										c_key.parent = bb;
+										c_key.parentName = model.skeleton.bones[ b ].parent.name;
+
+									}
+
+								}
+
+							}
+							put.hierarchy.push( c_key );
+							break;
+
+						}
+
+					}
+					if ( ! findAnimation ) {
+
+						var _c_key = animation.hierarchy[ 0 ].copy();
+						_c_key.name = model.skeleton.bones[ b ].name;
+						_c_key.parent = - 1;
+						for ( var k = 0; k < _c_key.keys.length; k ++ ) {
+
+							if ( _c_key.keys[ k ].pos ) {
+
+								_c_key.keys[ k ].pos.set( 0, 0, 0 );
+
+							}
+							if ( _c_key.keys[ k ].scl ) {
+
+								_c_key.keys[ k ].scl.set( 1, 1, 1 );
+
+							}
+							if ( _c_key.keys[ k ].rot ) {
+
+								_c_key.keys[ k ].rot.set( 0, 0, 0, 1 );
+
+							}
+
+						}
+						put.hierarchy.push( _c_key );
+
+					}
+
+				}
+				if ( ! model.geometry.animations ) {
+
+					model.geometry.animations = [];
 
 				}
 
+				model.geometry.animations.push( THREE.AnimationClip.parseAnimation( put, model.skeleton.bones ) );
+				if ( ! model.animationMixer ) {
+
+					model.animationMixer = new THREE.AnimationMixer( model );
+
+				}
+
+				return put;
+
 			}
-			scope.hierarchy[_i].parent = parentId;
+		}, {
+			key: '_ParseMatrixData',
+			value: function _ParseMatrixData( targetMatrix, data ) {
 
-		}
+				targetMatrix.set( parseFloat( data[ 0 ] ), parseFloat( data[ 4 ] ), parseFloat( data[ 8 ] ), parseFloat( data[ 12 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 5 ] ), parseFloat( data[ 9 ] ), parseFloat( data[ 13 ] ), parseFloat( data[ 2 ] ), parseFloat( data[ 6 ] ), parseFloat( data[ 10 ] ), parseFloat( data[ 14 ] ), parseFloat( data[ 3 ] ), parseFloat( data[ 7 ] ), parseFloat( data[ 11 ] ), parseFloat( data[ 15 ] ) );
 
-	},
+			}
+		} ] );
+		return XLoader;
 
-	makeBonekeys: function (XAnimationInfo, bone, parent) {
+	}();
 
-		var refObj = {};
-		refObj.name = bone.boneName;
-		refObj.parent = parent;
-		refObj.keys = [];
-		for (var i = 0; i < XAnimationInfo.keyFrames.length; i++) {
+	return XLoader;
 
-			var keyframe = {};
-			keyframe.time = XAnimationInfo.keyFrames[i].time * this.fps;
-			keyframe.matrix = XAnimationInfo.keyFrames[i].matrix;
-			keyframe.pos = new THREE.Vector3().setFromMatrixPosition(keyframe.matrix);
-			keyframe.rot = new THREE.Quaternion().setFromRotationMatrix(keyframe.matrix);
-			keyframe.scl = new THREE.Vector3().setFromMatrixScale(keyframe.matrix);
-			refObj.keys.push(keyframe);
-
-		}
-		return refObj;
-
-	}
-
-};
-
-THREE.XLoader.Xdata = function () {
-
-	this.FrameInfo = [];
-	this.FrameInfo_Raw = [];
-	this.AnimationSetInfo = [];
-	this.AnimTicksPerSecond = 60;
-	this.XAnimationObj = null;
-
-};
-
-THREE.XLoader.XboneInf = function () {
-
-	this.boneName = "";
-	this.BoneIndex = 0;
-	this.Indeces = [];
-	this.Weights = [];
-	this.initMatrix = null;
-	this.OffsetMatrix = null;
-
-};
-
-THREE.XLoader.XAnimationInfo = function () {
-
-	this.animeName = "";
-	this.boneName = "";
-	this.targetBone = null;
-	this.frameStartLv = 0;
-	this.keyFrames = [];
-	this.InverseMx = null;
-
-};
-
-THREE.XLoader.XFrameInfo = function () {
-
-	this.Mesh = null;
-	this.Geometry = null;
-	this.FrameName = "";
-	this.ParentName = "";
-	this.frameStartLv = 0;
-	this.FrameTransformMatrix = null;
-	this.children = [];
-	this.BoneInfs = [];
-	this.VertexSetedBoneCount = [];
-	this.Materials = [];
-
-};
-
-THREE.XLoader.XKeyFrameInfo = function () {
-
-	this.index = 0;
-	this.Frame = 0;
-	this.time = 0.0;
-	this.matrix = null;
-
-};
+} ) ) );

@@ -14,6 +14,6 @@ function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, for
 
 CanvasTexture.prototype = Object.create( Texture.prototype );
 CanvasTexture.prototype.constructor = CanvasTexture;
-
+CanvasTexture.prototype.isCanvasTexture = true;
 
 export { CanvasTexture };

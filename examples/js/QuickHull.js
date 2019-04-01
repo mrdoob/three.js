@@ -470,7 +470,7 @@
 
 				// 3. The next vertex 'v3' is the one farthest to the plane 'v0', 'v1', 'v2'
 
-				maxDistance = -1;
+				maxDistance = - 1;
 				plane.setFromCoplanarPoints( v0.point, v1.point, v2.point );
 
 				for ( i = 0, l = this.vertices.length; i < l; i ++ ) {
@@ -584,9 +584,9 @@
 
 						if ( maxFace !== null ) {
 
-	          	this.addVertexToFace( vertex, maxFace );
+							this.addVertexToFace( vertex, maxFace );
 
-	        	}
+						}
 
 					}
 
@@ -917,9 +917,9 @@
 
 				triangle.set( a.point, b.point, c.point );
 
-				triangle.normal( this.normal );
-				triangle.midpoint( this.midpoint );
-				this.area = triangle.area();
+				triangle.getNormal( this.normal );
+				triangle.getMidpoint( this.midpoint );
+				this.area = triangle.getArea();
 
 				this.constant = this.normal.dot( this.midpoint );
 

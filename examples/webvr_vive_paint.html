@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webvr - htc vive - paint</title>
@@ -29,14 +29,6 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
@@ -45,15 +37,11 @@
 			var shapes = {};
 
 			var up = new THREE.Vector3( 0, 1, 0 );
-			var vector = new THREE.Vector3();
 
 			var vector1 = new THREE.Vector3();
 			var vector2 = new THREE.Vector3();
 			var vector3 = new THREE.Vector3();
 			var vector4 = new THREE.Vector3();
-
-			var point4 = new THREE.Vector3();
-			var point5 = new THREE.Vector3();
 
 			init();
 			initGeometry();
@@ -76,9 +64,8 @@
 				scene.background = new THREE.Color( 0x222222 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
-				scene.add( camera );
 
-				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
+				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
@@ -100,7 +87,7 @@
 				scene.add( table );
 				*/
 
-				var geometry = new THREE.PlaneGeometry( 4, 4 );
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
@@ -119,9 +106,9 @@
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = -2;
+				light.shadow.camera.bottom = - 2;
 				light.shadow.camera.right = 2;
-				light.shadow.camera.left = -2;
+				light.shadow.camera.left = - 2;
 				light.shadow.mapSize.set( 4096, 4096 );
 				scene.add( light );
 
@@ -133,13 +120,13 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.vr.enabled = true;
-				renderer.vr.standing = true;
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				// controllers
 
@@ -169,11 +156,11 @@
 					controller.receiveShadow = true;
 
 					// var pivot = new THREE.Group();
-					// var pivot = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 2 ) );
+					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
 					pivot.name = 'pivot';
-					pivot.position.y = -0.016;
-					pivot.position.z = -0.043;
+					pivot.position.y = - 0.016;
+					pivot.position.z = - 0.043;
 					pivot.rotation.x = Math.PI / 5.5;
 					controller.add( pivot );
 
@@ -181,14 +168,6 @@
 
 					pivot.material = pivot.material.clone();
 					controller2.add( controller.clone() );
-
-				} );
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					renderer.vr.setDevice( display );
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
 				} );
 
@@ -245,23 +224,27 @@
 				scene.add( line );
 
 				// Shapes
-				shapes[ 'tube' ] = getTubeShapes(1.0);
+				shapes[ 'tube' ] = getTubeShapes( 1.0 );
+
 			}
 
-			function getTubeShapes(size) {
+			function getTubeShapes( size ) {
 
 				var PI2 = Math.PI * 2;
 
 				var sides = 10;
 				var array = [];
 				var radius = 0.01 * size;
-				for( var i = 0; i < sides; i ++ ){
+
+				for ( var i = 0; i < sides; i ++ ) {
 
 					var angle = ( i / sides ) * PI2;
 					array.push( new THREE.Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
+
 				}
 
 				return array;
+
 			}
 
 
@@ -398,7 +381,7 @@
 				if ( pivot ) {
 
 					pivot.material.color.copy( controller.getColor() );
-					pivot.scale.setScalar(controller.getSize());
+					pivot.scale.setScalar( controller.getSize() );
 
 					var matrix = pivot.matrixWorld;
 
@@ -426,7 +409,7 @@
 
 			function animate() {
 
-				renderer.animate( render );
+				renderer.setAnimationLoop( render );
 
 			}
 

@@ -5,6 +5,7 @@
 Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
+	var strings = editor.strings;
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
@@ -43,17 +44,28 @@ Sidebar.Scene = function ( editor ) {
 
 	}
 
+	function escapeHTML( html ) {
+
+		return html
+			.replace( /&/g, '&amp;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#39;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' );
+
+	}
+
 	function buildHTML( object ) {
 
-		var html = '<span class="type ' + object.type + '"></span> ' + object.name;
+		var html = '<span class="type ' + object.type + '"></span> ' + escapeHTML( object.name );
 
-		if ( object instanceof THREE.Mesh ) {
+		if ( object.isMesh ) {
 
 			var geometry = object.geometry;
 			var material = object.material;
 
-			html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
-			html += ' <span class="type ' + material.type + '"></span> ' + getMaterialName( material );
+			html += ' <span class="type ' + geometry.type + '"></span> ' + escapeHTML( geometry.name );
+			html += ' <span class="type ' + material.type + '"></span> ' + escapeHTML( getMaterialName( material ) );
 
 		}
 
@@ -108,7 +120,7 @@ Sidebar.Scene = function ( editor ) {
 
 	var backgroundColor = new UI.Color().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
 
-	backgroundRow.add( new UI.Text( 'Background' ).setWidth( '90px' ) );
+	backgroundRow.add( new UI.Text( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundColor );
 
 	container.add( backgroundRow );
@@ -142,7 +154,7 @@ Sidebar.Scene = function ( editor ) {
 
 	} );
 
-	fogTypeRow.add( new UI.Text( 'Fog' ).setWidth( '90px' ) );
+	fogTypeRow.add( new UI.Text( strings.getKey( 'sidebar/scene/fog' ) ).setWidth( '90px' ) );
 	fogTypeRow.add( fogType );
 
 	container.add( fogTypeRow );
@@ -170,7 +182,7 @@ Sidebar.Scene = function ( editor ) {
 
 	// fog density
 
-	var fogDensity = new UI.Number( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setPrecision( 3 ).onChange( onFogChanged );
+	var fogDensity = new UI.Number( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogDensity );
 
 	//
@@ -219,13 +231,13 @@ Sidebar.Scene = function ( editor ) {
 
 			fogColor.setHexValue( scene.fog.color.getHex() );
 
-			if ( scene.fog instanceof THREE.Fog ) {
+			if ( scene.fog.isFog ) {
 
 				fogType.setValue( "Fog" );
 				fogNear.setValue( scene.fog.near );
 				fogFar.setValue( scene.fog.far );
 
-			} else if ( scene.fog instanceof THREE.FogExp2 ) {
+			} else if ( scene.fog.isFogExp2 ) {
 
 				fogType.setValue( "FogExp2" );
 				fogDensity.setValue( scene.fog.density );

@@ -2,25 +2,28 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.ScreenUVNode = function( resolution ) {
+import { TempNode } from '../core/TempNode.js';
+import { ResolutionNode } from './ResolutionNode.js';
 
-	THREE.TempNode.call( this, 'v2' );
+function ScreenUVNode( resolution ) {
 
-	this.resolution = resolution;
+	TempNode.call( this, 'v2' );
 
-};
+	this.resolution = resolution || new ResolutionNode();
 
-THREE.ScreenUVNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ScreenUVNode.prototype.constructor = THREE.ScreenUVNode;
+}
 
-THREE.ScreenUVNode.prototype.generate = function( builder, output ) {
+ScreenUVNode.prototype = Object.create( TempNode.prototype );
+ScreenUVNode.prototype.constructor = ScreenUVNode;
+ScreenUVNode.prototype.nodeType = "ScreenUV";
 
-	var material = builder.material;
+ScreenUVNode.prototype.generate = function ( builder, output ) {
+
 	var result;
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		result = '(gl_FragCoord.xy/' + this.resolution.build( builder, 'v2' ) + ')';
+		result = '( gl_FragCoord.xy / ' + this.resolution.build( builder, 'v2' ) + ')';
 
 	} else {
 
@@ -33,3 +36,30 @@ THREE.ScreenUVNode.prototype.generate = function( builder, output ) {
 	return builder.format( result, this.getType( builder ), output );
 
 };
+
+ScreenUVNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.resolution = source.resolution;
+
+};
+
+ScreenUVNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.resolution = this.resolution.toJSON( meta ).uuid;
+
+	}
+
+	return data;
+
+};
+
+export { ScreenUVNode };
+

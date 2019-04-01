@@ -35,7 +35,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader_screen" type="x-shader/x-fragment">
@@ -85,7 +85,11 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container, stats;
 
@@ -128,7 +132,7 @@
 
 				material = new THREE.ShaderMaterial( {
 
-					uniforms: { time: { value: 0.0 } },
+					uniforms: { "time": { value: 0.0 } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_pass_1' ).textContent
 
@@ -136,7 +140,7 @@
 
 				var materialScreen = new THREE.ShaderMaterial( {
 
-					uniforms: { tDiffuse: { value: rtTexture.texture } },
+					uniforms: { "tDiffuse": { value: rtTexture.texture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
 
@@ -150,7 +154,7 @@
 				quad.position.z = - 100;
 				sceneRTT.add( quad );
 
-				var geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
+				var geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
 
 				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
 				var mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
@@ -224,22 +228,25 @@
 
 				}
 
-				if ( material.uniforms.time.value > 1 || material.uniforms.time.value < 0 ) {
+				if ( material.uniforms[ "time" ].value > 1 || material.uniforms[ "time" ].value < 0 ) {
 
 					delta *= - 1;
 
 				}
 
-				material.uniforms.time.value += delta;
+				material.uniforms[ "time" ].value += delta;
 
 				renderer.clear();
 
 				// Render first scene into texture
 
-				renderer.render( sceneRTT, cameraRTT, rtTexture, true );
+				renderer.setRenderTarget( rtTexture );
+				renderer.clear();
+				renderer.render( sceneRTT, cameraRTT );
 
 				// Render full screen quad with generated texture
 
+				renderer.setRenderTarget( null );
 				renderer.render( sceneScreen, cameraRTT );
 
 				var read = new Float32Array( 4 );
