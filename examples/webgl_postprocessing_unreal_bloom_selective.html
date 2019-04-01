@@ -70,19 +70,25 @@
 
 			uniform sampler2D baseTexture;
 			uniform sampler2D glowTexture;
-			uniform sampler2D shadowTexture;
-
-			uniform vec3 color;
-			uniform float intensity;
+			uniform sampler2D maskTexture;
 
 			varying vec2 vUv;
 
+			bool isVisible(vec4 color)
+			{
+				return color.a < 1.0 || color.r > 0.0;
+			}
+
+			vec4 getTexture(sampler2D texture)
+			{
+				return mapTexelToLinear(texture2D(texture, vUv));
+			}
+
 			void main() {
 
-				//vec4 shadow = texture2D(shadowTexture, vUv);
-				//if(shadow.a > 0.0) {discard;}
-				gl_FragColor = texture2D(baseTexture, vUv) + vec4(color, 1.0)  * texture2D(glowTexture, vUv) * intensity;
-
+				vec4 mask = getTexture(maskTexture);
+				vec4 texel = getTexture(baseTexture);
+				gl_FragColor = isVisible(mask) ? (texel + vec4(1.0) * getTexture(glowTexture)) : texel;
 			}
 
 		</script>
@@ -92,19 +98,26 @@
 			var scene, camera, stats;
 			var renderer;
 
-			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1, SHADOW_SCENE = 2;
+			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
+
+			var bloomLayer = new THREE.Layers();
+			bloomLayer.set(BLOOM_SCENE);
 
 			var params = {
 				exposure: 1,
 				bloomStrength: 1.5,
 				bloomThreshold: 0,
 				bloomRadius: 0,
-				showBloom : true,
 				rows : 6,
 				columns : 6,
 				size : 2,
-				cameraAngle : Math.PI * 0.5
+				cameraAngle : Math.PI * 0.5,
+				scene : "Scene with Glow"
 			};
+
+			var lightMaterial = new THREE.MeshBasicMaterial({color : "red"});
+			var darkMaterial = new THREE.MeshBasicMaterial({color : "blue"});
+			var materials = {};
 
 			var container = document.getElementById( 'container' );
 
@@ -128,10 +141,12 @@
 
 			var renderScene = new THREE.RenderPass( scene, camera );
 
-			var shadowComposer = new THREE.EffectComposer( renderer);
-			shadowComposer.renderToScreen = false;
-			shadowComposer.setSize( window.innerWidth, window.innerHeight );
-			shadowComposer.addPass( renderScene );
+			var maskRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
+				minFilter: THREE.LinearFilter,
+				magFilter: THREE.LinearFilter,
+				format: THREE.RGBAFormat,
+				stencilBuffer: false
+			});
 
 			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
@@ -149,9 +164,7 @@
 					uniforms : {
 						baseTexture : {value : null}, 
 						glowTexture: { value : bloomComposer.renderTarget2.texture},
-						// shadowTexture: {value : shadowComposer.renderTarget2.texture},
-						intensity : {value : 1.0},
-						color : {value : new THREE.Color(1.0, 1.0, 1.0)}
+						maskTexture: {value : maskRenderTarget.texture}
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
@@ -175,7 +188,24 @@
 
 			var gui = new dat.GUI();
 
-			var folder = gui.addFolder('Bloom Parameters')
+			gui.add(params, 'scene', ['Scene with Glow', 'Glow only', 'Mask only', 'Scene only']).onChange(function(value)
+			{
+				switch(value)
+				{
+					case 'Scene with Glow':
+						bloomComposer.renderToScreen = false;
+						break;
+					case 'Glow only':
+						bloomComposer.renderToScreen = true;
+						break;
+					case 'Scene only':
+					case 'Mask only':
+						// nothing to do
+						break;
+				}
+			});
+
+			var folder = gui.addFolder('Bloom Parameters');
 
 			folder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
@@ -200,13 +230,6 @@
 				bloomPass.radius = Number( value );
 
 			} );
-
-			folder.add( params, 'showBloom').onChange(function(value)
-			{
-				finalPass.enabled = value;
-			});
-
-			folder.open();
 
 			folder = gui.addFolder('Object parameters');
 
@@ -241,14 +264,6 @@
 				{
 					var object = intersects[0].object;
 					object.layers.toggle(BLOOM_SCENE);
-					if(object.layers.test(BLOOM_SCENE))
-					{
-						object.layers.disable(SHADOW_SCENE);
-					}
-					else
-					{
-						object.layers.enable(SHADOW_SCENE);
-					}
 				}
 			}
 
@@ -262,7 +277,8 @@
 
 				renderer.setSize( width, height );
 
-				// render targets are resized by respective composers
+				maskRenderTarget.setSize( width, height);
+
 				bloomComposer.setSize( width, height );
 				finalComposer.setSize(width, height);
 			};
@@ -280,9 +296,9 @@
 						var box = new THREE.Mesh(new THREE.BoxBufferGeometry(size,size,size), new THREE.MeshBasicMaterial({
 							color: Math.floor(Math.random() * 0xffffff)
 						}));
-						box.layers.enable(SHADOW_SCENE);
 						box.position.set(x,y,0);
 						scene.add(box);
+						if(Math.random() < 0.5) box.layers.enable(BLOOM_SCENE);
 					}
 				}
 			}
@@ -293,18 +309,63 @@
 
 				stats.update();
 
-				// render scene with shadows
-				camera.layers.set(SHADOW_SCENE);
-				shadowComposer.render();
+				switch(params.scene)
+				{
+					case 'Glow only':
+						renderBloom();
+						break;
+					case 'Mask only':
+						renderMask(null);
+						break;
+					case 'Scene only':
+						renderer.setRenderTarget(null);
+						renderer.render(scene, camera);
+						break;
+					case 'Scene with Glow':
+					default:
+						// render scene with bloom
+						renderBloom();
 
-				// render scene with bloom
+						// render scene masked
+						renderMask(maskRenderTarget);
+						
+						// render the entire scene
+						// render bloom on top of scene but only where isn't masked
+						finalComposer.render();
+						break;
+				}
+			}
+
+			function renderBloom()
+			{
 				camera.layers.set(BLOOM_SCENE);
 				bloomComposer.render();
+			}
 
-				// render scene the entire scene
-				// render bloom on top of scene but discard pixels where the shadows are present
+			function renderMask(renderTarget)
+			{
 				camera.layers.set(ENTIRE_SCENE);
-				finalComposer.render();
+				scene.traverse(maskMaterial);
+				renderer.setRenderTarget(renderTarget);
+				renderer.render(scene, camera);
+				scene.traverse(restoreMaterial);
+			}
+
+			function maskMaterial(obj)
+			{
+				if(obj.isMesh)
+				{
+					materials[obj.uuid] = obj.material;
+					obj.material = bloomLayer.test(obj.layers) ? lightMaterial : darkMaterial;
+				}
+			}
+
+			function restoreMaterial(obj)
+			{
+				if(obj.isMesh)
+				{
+					obj.material = materials[obj.uuid];
+				}
 			}
 
 		</script>
