@@ -142,7 +142,7 @@ function WebGLRenderList() {
 
 			renderItem.id = null;
 			renderItem.object = null;
-			renderItem.geometry = null
+			renderItem.geometry = null;
 			renderItem.material = null;
 			renderItem.program = null;
 			renderItem.group = null;
