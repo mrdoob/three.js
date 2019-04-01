@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - unreal bloom selective</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+			}
+			#info p {
+				max-width: 600px;
+				margin-left: auto;
+				margin-right: auto;
+				padding: 0 2em;
+			}
+			a {
+				color: #2983ff;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> Click on a box to toggle bloom
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/LuminosityHighPassShader.js"></script>
+		<script src="js/postprocessing/UnrealBloomPass.js"></script>
+
+		<script type="x-shader/x-vertex" id="vertexshader">
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vUv = uv;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			uniform sampler2D baseTexture;
+			uniform sampler2D glowTexture;
+			uniform sampler2D shadowTexture;
+
+			uniform vec3 color;
+			uniform float intensity;
+
+			varying vec2 vUv;
+
+			void main() {
+
+				//vec4 shadow = texture2D(shadowTexture, vUv);
+				//if(shadow.a > 0.0) {discard;}
+				gl_FragColor = texture2D(baseTexture, vUv) + vec4(color, 1.0)  * texture2D(glowTexture, vUv) * intensity;
+
+			}
+
+		</script>
+
+		<script>
+
+			var scene, camera, stats;
+			var renderer;
+
+			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1, SHADOW_SCENE = 2;
+
+			var params = {
+				exposure: 1,
+				bloomStrength: 1.5,
+				bloomThreshold: 0,
+				bloomRadius: 0,
+				showBloom : true,
+				rows : 6,
+				columns : 6,
+				size : 2,
+				cameraAngle : Math.PI * 0.5
+			};
+
+			var container = document.getElementById( 'container' );
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ReinhardToneMapping;
+			document.body.appendChild(renderer.domElement);
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera.position.set( 0, 0, 30 );
+			camera.lookAt(0,0,0);
+			camera.updateProjectionMatrix();
+
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+			var renderScene = new THREE.RenderPass( scene, camera );
+
+			var shadowComposer = new THREE.EffectComposer( renderer);
+			shadowComposer.renderToScreen = false;
+			shadowComposer.setSize( window.innerWidth, window.innerHeight );
+			shadowComposer.addPass( renderScene );
+
+			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			bloomPass.threshold = params.bloomThreshold;
+			bloomPass.strength = params.bloomStrength;
+			bloomPass.radius = params.bloomRadius;
+
+			var bloomComposer = new THREE.EffectComposer( renderer);
+			bloomComposer.renderToScreen = false;
+			bloomComposer.setSize( window.innerWidth, window.innerHeight );
+			bloomComposer.addPass( renderScene );
+			bloomComposer.addPass( bloomPass );
+
+			var finalPass = new THREE.ShaderPass(
+				new THREE.ShaderMaterial({
+					uniforms : {
+						baseTexture : {value : null}, 
+						glowTexture: { value : bloomComposer.renderTarget2.texture},
+						// shadowTexture: {value : shadowComposer.renderTarget2.texture},
+						intensity : {value : 1.0},
+						color : {value : new THREE.Color(1.0, 1.0, 1.0)}
+					},
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+					defines: {}
+				}), "baseTexture"
+			);
+			finalPass.needsSwap = true;
+
+			var finalComposer = new THREE.EffectComposer( renderer);
+			finalComposer.setSize( window.innerWidth, window.innerHeight );
+			finalComposer.addPass( renderScene );
+			finalComposer.addPass( finalPass );
+
+			setupBoxes();
+
+			var raycaster = new THREE.Raycaster();
+
+			var mouse = new THREE.Vector2();
+
+			window.addEventListener('click', onDocumentMouseClick, false);
+
+			var gui = new dat.GUI();
+
+			var folder = gui.addFolder('Bloom Parameters')
+
+			folder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+
+				renderer.toneMappingExposure = Math.pow( value, 4.0 );
+
+			} );
+
+			folder.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
+
+				bloomPass.threshold = Number( value );
+
+			} );
+
+			folder.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function ( value ) {
+
+				bloomPass.strength = Number( value );
+
+			} );
+
+			folder.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+
+				bloomPass.radius = Number( value );
+
+			} );
+
+			folder.add( params, 'showBloom').onChange(function(value)
+			{
+				finalPass.enabled = value;
+			});
+
+			folder.open();
+
+			folder = gui.addFolder('Object parameters');
+
+			folder.add( params, 'rows', 1, 20 ).step(1).onChange( setupBoxes );
+
+			folder.add( params, 'columns', 1, 20 ).step(1).onChange( setupBoxes);
+
+			folder.add( params, 'size', 0.1, 3 ).onChange( setupBoxes);
+
+			folder = gui.addFolder('Camera Position');
+
+			folder.add(params, 'cameraAngle', 0, Math.PI * 2).step(0.001).onChange(function(value)
+			{
+				camera.position.x = Math.cos(value) * 30;
+				camera.position.z = Math.sin(value) * 30;
+				camera.lookAt(0,0,0);
+				camera.updateProjectionMatrix();
+			})
+
+			animate();
+
+			function onDocumentMouseClick( event ) {
+
+				event.preventDefault();
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera(mouse, camera);
+				var intersects = raycaster.intersectObjects(scene.children);
+				if(intersects.length > 0)
+				{
+					var object = intersects[0].object;
+					object.layers.toggle(BLOOM_SCENE);
+					if(object.layers.test(BLOOM_SCENE))
+					{
+						object.layers.disable(SHADOW_SCENE);
+					}
+					else
+					{
+						object.layers.enable(SHADOW_SCENE);
+					}
+				}
+			}
+
+			window.onresize = function () {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+				// render targets are resized by respective composers
+				bloomComposer.setSize( width, height );
+				finalComposer.setSize(width, height);
+			};
+
+			function setupBoxes()
+			{
+				var columns = params.columns;
+				var rows = params.rows;
+				var size = params.size;
+				scene.children.length = 0;
+				for(var x = -columns * size / 2; x < columns * size / 2; x += size)
+				{
+					for(var y = -rows * size / 2; y < rows * size / 2; y += size)
+					{
+						var box = new THREE.Mesh(new THREE.BoxBufferGeometry(size,size,size), new THREE.MeshBasicMaterial({
+							color: Math.floor(Math.random() * 0xffffff)
+						}));
+						box.layers.enable(SHADOW_SCENE);
+						box.position.set(x,y,0);
+						scene.add(box);
+					}
+				}
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.update();
+
+				// render scene with shadows
+				camera.layers.set(SHADOW_SCENE);
+				shadowComposer.render();
+
+				// render scene with bloom
+				camera.layers.set(BLOOM_SCENE);
+				bloomComposer.render();
+
+				// render scene the entire scene
+				// render bloom on top of scene but discard pixels where the shadows are present
+				camera.layers.set(ENTIRE_SCENE);
+				finalComposer.render();
+			}
+
+		</script>
+
+	</body>
+
+</html>
