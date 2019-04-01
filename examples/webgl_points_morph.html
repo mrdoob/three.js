@@ -56,12 +56,15 @@
 
 			function init() {
 
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 				camera.position.z = 20;
 
 				scene = new THREE.Scene();
 
-				var controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera, container );
 				controls.enableDamping = true;
 
 				createMaterial();
@@ -70,7 +73,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -140,7 +143,8 @@
 					points.rotation.y = Math.PI / 2;
 					points.scale.multiplyScalar( 0.03 );
 
-					updateMorphTargets( points );
+					points.morphTargetInfluences = model.morphTargetInfluences;
+					points.morphTargetDictionary = model.morphTargetDictionary;
 
 					mixer = new THREE.AnimationMixer( points );
 
@@ -184,37 +188,6 @@
 
 			}
 
-			function updateMorphTargets( points ) {
-
-				var geometry = points.geometry;
-				var m, ml, name;
-
-				var morphAttributes = geometry.morphAttributes;
-				var keys = Object.keys( morphAttributes );
-
-				if ( keys.length > 0 ) {
-
-					var morphAttribute = morphAttributes[ keys[ 0 ] ];
-
-					if ( morphAttribute !== undefined ) {
-
-						points.morphTargetInfluences = [];
-						points.morphTargetDictionary = {};
-
-						for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
-
-							name = morphAttribute[ m ].name || String( m );
-
-							points.morphTargetInfluences.push( 0 );
-							points.morphTargetDictionary[ name ] = m;
-
-						}
-
-					}
-
-				}
-
-			}
 		</script>
 	</body>
 </html>
