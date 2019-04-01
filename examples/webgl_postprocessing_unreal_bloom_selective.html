@@ -114,7 +114,7 @@
 				rows: 6,
 				columns: 6,
 				size: 2,
-				cameraAngle: Math.PI * 0.5,
+				cameraAngle: 90,
 				scene: "Scene with Glow"
 			};
 
@@ -247,10 +247,10 @@
 
 			folder = gui.addFolder( 'Camera Position' );
 
-			folder.add( params, 'cameraAngle', 0, Math.PI * 2 ).step( 0.001 ).onChange( function ( value ) {
+			folder.add( params, 'cameraAngle', 0, 360 ).step( 1 ).onChange( function ( value ) {
 
-				camera.position.x = Math.cos( value ) * 30;
-				camera.position.z = Math.sin( value ) * 30;
+				camera.position.x = Math.cos( value * THREE.Math.DEG2RAD ) * 30;
+				camera.position.z = Math.sin( value * THREE.Math.DEG2RAD ) * 30;
 				camera.lookAt( 0, 0, 0 );
 				camera.updateProjectionMatrix();
 
