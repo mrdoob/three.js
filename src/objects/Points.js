@@ -8,7 +8,6 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
- * @author Lewy Blue / https://discoverthreejs.com/
  */
 
 function Points( geometry, material ) {
