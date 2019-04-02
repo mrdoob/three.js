@@ -54,11 +54,11 @@
 		for realizing custom rendering destinations. These objects are only deallocated by executing [page:WebGLRenderTarget.dispose]().
 	</p>
 
-	<h2>Scenes</h2>
+	<h2>Scenes and Cameras</h2>
 
 	<p>
-		The renderer maintains for scenes special data structures for sorting and rendering. If for some reasons a scene object becomes obsolete in an application,
-		call [page:Scene.dispose]() in order to free these resources.
+		The renderer maintains for scenes and cameras special data structures for sorting and rendering. If for some reasons a camera or a scene becomes obsolete in an
+		application, call [page:Camera.dispose]() or [page:Scene.dispose]() in order to free these resources.
 	</p>
 
 	<h2>Miscellaneous</h2>

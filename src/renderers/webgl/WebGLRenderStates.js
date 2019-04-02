@@ -68,6 +68,22 @@ function WebGLRenderStates() {
 
 	}
 
+	function onCameraDispose( event ) {
+
+		var camera = event.target;
+
+		camera.removeEventListener( 'dispose', onCameraDispose );
+
+		for ( var sceneId in renderStates ) {
+
+			var renderState = renderStates[ sceneId ];
+
+			if ( renderState[ camera.id ] !== undefined ) delete renderState[ camera.id ];
+
+		}
+
+	}
+
 	function get( scene, camera ) {
 
 		var renderState;
@@ -79,6 +95,7 @@ function WebGLRenderStates() {
 			renderStates[ scene.id ][ camera.id ] = renderState;
 
 			scene.addEventListener( 'dispose', onSceneDispose );
+			camera.addEventListener( 'dispose', onCameraDispose );
 
 		} else {
 
@@ -86,6 +103,8 @@ function WebGLRenderStates() {
 
 				renderState = new WebGLRenderState();
 				renderStates[ scene.id ][ camera.id ] = renderState;
+
+				camera.addEventListener( 'dispose', onCameraDispose );
 
 			} else {
 

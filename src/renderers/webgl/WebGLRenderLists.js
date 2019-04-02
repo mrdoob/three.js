@@ -164,10 +164,27 @@ function WebGLRenderLists() {
 
 	}
 
+	function onCameraDispose( event ) {
+
+		var camera = event.target;
+
+		camera.removeEventListener( 'dispose', onCameraDispose );
+
+		for ( var sceneId in lists ) {
+
+			var list = lists[ sceneId ];
+
+			if ( list[ camera.id ] !== undefined ) delete list[ camera.id ];
+
+		}
+
+	}
+
 	function get( scene, camera ) {
 
 		var cameras = lists[ scene.id ];
 		var list;
+
 		if ( cameras === undefined ) {
 
 			list = new WebGLRenderList();
@@ -175,14 +192,18 @@ function WebGLRenderLists() {
 			lists[ scene.id ][ camera.id ] = list;
 
 			scene.addEventListener( 'dispose', onSceneDispose );
+			camera.addEventListener( 'dispose', onCameraDispose );
 
 		} else {
 
 			list = cameras[ camera.id ];
+
 			if ( list === undefined ) {
 
 				list = new WebGLRenderList();
 				cameras[ camera.id ] = list;
+
+				camera.addEventListener( 'dispose', onCameraDispose );
 
 			}
 

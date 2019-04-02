@@ -69,6 +69,12 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return new this.constructor().copy( this );
 
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
 
 } );
