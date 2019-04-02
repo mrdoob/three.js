@@ -534,3 +534,152 @@ And now if you drag the objects they'll rotate.
 {{{example url="../threejs-multiple-scenes-controls.html" }}}
 
 These techniques are used on this site itself. In particular [the article about primitives](threejs-primitives.html) and [the article about materials](threejs-materials.html) use this technique to add the various examples throughout the article.
+
+One more solution would be to render to an off screen canvas and copy the result to a 2D canvas at each element.
+The advantage to this solution is there is no limit on how you can composite each separate area. With the previous
+solution we and a single canvas in the background. With this solution we have normal HTML elements.
+
+The disadvantage is it's slower because a copy has to happen for each area. How much slower depends on the browser
+and the GPU.
+
+The changes needed are pretty small
+
+First we'll change HTML as we no longer need a canvas in the page
+
+```html
+<body>
+-  <canvas id="c"></canvas>
+  ...
+</body>
+```
+
+then we'll change the CSS
+
+```
+-#c {
+-  position: absolute;
+-  left: 0;
+-  top: 0;
+-  width: 100vw;
+-  height: 100vh;
+-  display: block;
+-  z-index: -1;
+-}
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+*[data-diagram] {
+  display: inline-block;
+  width: 5em;
+  height: 3em;
+}
+```
+
+We've made all canvases fill their container.
+
+Now let's change the JavaScript. First we no longer
+look up the canvas. Instead we create one. We also
+just turn on the scissor test at the beginning.
+
+```js
+function main() {
+-  const canvas = document.querySelector('#c');
++  const canvas = document.createElement('canvas');
+  const renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true});
++  renderer.setScissorTest(true);
+
+  ...
+```
+
+Then for each scene we create a 2D rendering context and
+append its canvas to the element for that scene
+
+```js
+const sceneElements = [];
+function addScene(elem, fn) {
++  const ctx = document.createElement('canvas').getContext('2d');
++  elem.appendChild(ctx.canvas);
+-  sceneElements.push({elem, fn});
++  sceneElements.push({elem, ctx, fn});
+}
+```
+
+Then when rendering, if the renderer's canvas is not
+big enough to render this area we increase its size.
+As well if this area's canvas is the wrong size we
+change its size. Finally we set the scissor and viewport,
+render the scene for this area, then copy the result to the area's canvas.
+
+```js
+function render(time) {
+  time *= 0.001;
+
+-  resizeRendererToDisplaySize(renderer);
+-
+-  renderer.setScissorTest(false);
+-  renderer.setClearColor(clearColor, 0);
+-  renderer.clear(true, true);
+-  renderer.setScissorTest(true);
+-
+-  const transform = `translateY(${window.scrollY}px)`;
+-  renderer.domElement.style.transform = transform;
+
+-  for (const {elem, fn} of sceneElements) {
++  for (const {elem, fn, ctx} of sceneElements) {
+    // get the viewport relative position opf this element
+    const rect = elem.getBoundingClientRect();
+    const {left, right, top, bottom, width, height} = rect;
++    const rendererCanvas = renderer.domElement;
+
+    const isOffscreen =
+        bottom < 0 ||
+-        top > renderer.domElement.clientHeight ||
++        top > window.innerHeight ||
+        right < 0 ||
+-        left > renderer.domElement.clientWidth;
++        left > window.innerWidth;
+
+    if (!isOffscreen) {
+-      const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+-      renderer.setScissor(left, positiveYUpBottom, width, height);
+-      renderer.setViewport(left, positiveYUpBottom, width, height);
+
++      // make sure the renderer's canvas is big enough
++      if (rendererCanvas.width < width || rendererCanvas.height < height) {
++        renderer.setSize(width, height, false);
++      }
++
++      // make sure the canvas for this area is the same size as the area
++      if (ctx.canvas.width !== width || ctx.canvas.height !== height) {
++        ctx.canvas.width = width;
++        ctx.canvas.height = height;
++      }
++
++      renderer.setScissor(0, 0, width, height);
++      renderer.setViewport(0, 0, width, height);
+
+      fn(time, rect);
+
++      // copy the rendered scene to this element's canvas
++      ctx.globalCompositeOperation = 'copy';
++      ctx.drawImage(
++          rendererCanvas,
++          0, rendererCanvas.height - height, width, height,  // src rect
++          0, 0, width, height);                              // dst rect
+    }
+  }
+
+  requestAnimationFrame(render);
+}
+```
+
+The result looks the same
+
+{{{example url="../threejs-multiple-scenes-copy-canvas.html" }}}
+
+One other advantage to this solution is you could potentially use
+[`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas)
+to render from a web worker and still use this technique. Unfortunately as of April 2019
+`OffscreenCanvas` is only supported by Chrome.
