@@ -57,8 +57,8 @@
 	<h2>Scenes and Cameras</h2>
 
 	<p>
-		The renderer maintains for scenes and cameras special data structures for sorting and rendering. If for some reasons a camera or a scene becomes obsolete in an
-		application, call [page:Camera.dispose]() or [page:Scene.dispose]() in order to free these resources.
+		If you delete a scene, or no longer need the scene for rendering, call [page:Scene.dispose]() to clear scene-related data structures cached by [page:WebGLRenderer].
+		This is also true for cameras.
 	</p>
 
 	<h2>Miscellaneous</h2>
