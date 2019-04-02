@@ -299,6 +299,7 @@ var Strings = function ( config ) {
 			'menubar/add/icosahedron': '二十面体',
 			'menubar/add/torus': '圆环体',
 			'menubar/add/torusknot': '环面纽结体',
+			'menubar/add/tube': '管',
 			'menubar/add/lathe': '酒杯',
 			'menubar/add/sprite': '精灵',
 			'menubar/add/pointlight': '点光源',
