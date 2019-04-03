@@ -106,6 +106,7 @@
 				rows: 6,
 				columns: 6,
 				size: 2,
+				zOffset : 5,
 				scene: "Scene with Glow"
 			};
 
@@ -227,6 +228,8 @@
 
 			folder.add( params, 'size', 0.1, 3 ).onChange( setupBoxes );
 
+			folder.add( params, 'zOffset', 0, 10 ).onChange( setupBoxes );
+
 			setupBoxes();
 
 			function onDocumentMouseClick( event ) {
@@ -268,6 +271,7 @@
 				var columns = params.columns;
 				var rows = params.rows;
 				var size = params.size;
+				var zOffset = params.zOffset;
 				scene.traverse(disposeMaterial);
 				scene.children.length = 0;
 				for ( var x = - columns * size / 2; x < columns * size / 2; x += size ) {
@@ -277,7 +281,7 @@
 						var box = new THREE.Mesh( getGeometry(), new THREE.MeshBasicMaterial( {
 							color: Math.floor( Math.random() * 0xffffff )
 						} ) );
-						box.position.set( x, y, 0 );
+						box.position.set( x, y, -zOffset + Math.random() * zOffset * 2 );
 						scene.add( box );
 						if ( Math.random() < 0.125 ) box.layers.enable( BLOOM_SCENE );
 
