@@ -273,7 +273,8 @@ var files = {
 		"webgl_postprocessing_sobel",
 		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_taa",
-		"webgl_postprocessing_unreal_bloom"
+		"webgl_postprocessing_unreal_bloom",
+		"webgl_postprocessing_unreal_bloom_selective"
 	],
 	"webgl / advanced": [
 		"webgl_buffergeometry",
