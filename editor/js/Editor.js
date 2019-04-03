@@ -534,33 +534,31 @@ Editor.prototype = {
 		var scope = this;
 		if ( json.scene === undefined ) {
 
-			loader.parse( json, function(scene)
-			{
-				scope.setScene(  scene );
-			} )
+			loader.parse( json, function ( scene ) {
+
+				scope.setScene( scene );
+
+			} );
 			return;
 
 		}
 
-		loader.parse( json.camera, function(camera)
-		{
-			if(camera.isCamera)
-			{
-				scope.camera.copy( camera );
-				scope.camera.aspect = scope.DEFAULT_CAMERA.aspect;
-				scope.camera.updateProjectionMatrix();
-			}
+		loader.parse( json.camera, function ( camera ) {
+
+			scope.camera.copy( camera );
+			scope.camera.aspect = scope.DEFAULT_CAMERA.aspect;
+			scope.camera.updateProjectionMatrix();
+
 		} );
 
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		loader.parse( json.scene, function(scene){
-			if(scene.type == "Scene")
-			{
-				scope.setScene(scene);
-			}
-		} ) ;
+		loader.parse( json.scene, function ( scene ) {
+
+			scope.setScene( scene );
+
+		} );
 
 	},
 
