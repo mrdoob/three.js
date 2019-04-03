@@ -129,7 +129,6 @@
 			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 			camera.position.set( 0, 0, 30 );
 			camera.lookAt( 0, 0, 0 );
-			camera.updateProjectionMatrix();
 
 			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
@@ -260,7 +259,6 @@
 				camera.position.x = Math.cos( angle * THREE.Math.DEG2RAD ) * distance;
 				camera.position.z = Math.sin( angle * THREE.Math.DEG2RAD ) * distance;
 				camera.lookAt( 0, 0, 0 );
-				camera.updateProjectionMatrix();
 
 			}
 
