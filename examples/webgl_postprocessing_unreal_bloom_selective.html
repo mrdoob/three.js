@@ -69,16 +69,9 @@
 		<script type="x-shader/x-fragment" id="fragmentshader">
 
 			uniform sampler2D baseTexture;
-			uniform sampler2D glowTexture;
-			uniform sampler2D maskTexture;
+			uniform sampler2D bloomTexture;
 
 			varying vec2 vUv;
-
-			bool isVisible(vec4 color) {
-
-				return color.a < 1.0 || color.r > 0.0;
-
-			}
 
 			vec4 getTexture( sampler2D texture ) {
 
@@ -88,9 +81,7 @@
 
 			void main() {
 
-				vec4 mask = getTexture( maskTexture );
-				vec4 texel = getTexture( baseTexture );
-				gl_FragColor = isVisible( mask ) ? ( texel + vec4( 1.0 ) * getTexture( glowTexture ) ) : texel;
+				gl_FragColor = ( getTexture( baseTexture ) + vec4( 1.0 ) * getTexture( bloomTexture ) );
 
 			}
 
@@ -115,11 +106,11 @@
 				columns: 6,
 				size: 2,
 				cameraAngle: 90,
+				cameraDistance: 30,
 				scene: "Scene with Glow"
 			};
 
-			var lightMaterial = new THREE.MeshBasicMaterial( { color: "red" } );
-			var darkMaterial = new THREE.MeshBasicMaterial( { color: "blue" } );
+			var darkMaterial = new THREE.MeshBasicMaterial( { color: "black" } );
 			var materials = {};
 
 			var container = document.getElementById( 'container' );
@@ -135,7 +126,7 @@
 
 			scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 			camera.position.set( 0, 0, 30 );
 			camera.lookAt( 0, 0, 0 );
 			camera.updateProjectionMatrix();
@@ -143,13 +134,6 @@
 			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
 			var renderScene = new THREE.RenderPass( scene, camera );
-
-			var maskRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBAFormat,
-				stencilBuffer: false
-			} );
 
 			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
@@ -166,8 +150,7 @@
 				new THREE.ShaderMaterial( {
 					uniforms: {
 						baseTexture: { value: null },
-						glowTexture: { value: bloomComposer.renderTarget2.texture },
-						maskTexture: { value: maskRenderTarget.texture }
+						bloomTexture: { value: bloomComposer.renderTarget2.texture }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
@@ -191,7 +174,7 @@
 
 			var gui = new dat.GUI();
 
-			gui.add( params, 'scene', [ 'Scene with Glow', 'Glow only', 'Mask only', 'Scene only' ] ).onChange( function ( value ) {
+			gui.add( params, 'scene', [ 'Scene with Glow', 'Glow only', 'Scene only' ] ).onChange( function ( value ) {
 
 				switch ( value ) 	{
 
@@ -202,7 +185,6 @@
 						bloomComposer.renderToScreen = true;
 						break;
 					case 'Scene only':
-					case 'Mask only':
 						// nothing to do
 						break;
 
@@ -247,14 +229,9 @@
 
 			folder = gui.addFolder( 'Camera Position' );
 
-			folder.add( params, 'cameraAngle', 0, 360 ).step( 1 ).onChange( function ( value ) {
+			folder.add( params, 'cameraAngle', 0, 360 ).step( 1 ).onChange( updateCamera );
 
-				camera.position.x = Math.cos( value * THREE.Math.DEG2RAD ) * 30;
-				camera.position.z = Math.sin( value * THREE.Math.DEG2RAD ) * 30;
-				camera.lookAt( 0, 0, 0 );
-				camera.updateProjectionMatrix();
-
-			} );
+			folder.add( params, 'cameraDistance', 30, 100 ).step( 1 ).onChange( updateCamera );
 
 			animate();
 
@@ -276,6 +253,17 @@
 
 			}
 
+			function updateCamera() {
+
+				var distance = params.cameraDistance;
+				var angle = params.cameraAngle;
+				camera.position.x = Math.cos( angle * THREE.Math.DEG2RAD ) * distance;
+				camera.position.z = Math.sin( angle * THREE.Math.DEG2RAD ) * distance;
+				camera.lookAt( 0, 0, 0 );
+				camera.updateProjectionMatrix();
+
+			}
+
 			window.onresize = function () {
 
 				var width = window.innerWidth;
@@ -285,8 +273,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				maskRenderTarget.setSize( width, height );
 
 				bloomComposer.setSize( width, height );
 				finalComposer.setSize( width, height );
@@ -324,26 +310,18 @@
 
 				switch ( params.scene ) {
 
-					case 'Mask only':
-						renderMask( null );
-						break;
 					case 'Scene only':
-						renderer.setRenderTarget( null );
 						renderer.render( scene, camera );
 						break;
 					case 'Glow only':
-						renderBloom();
+						renderBloom( false );
 						break;
 					case 'Scene with Glow':
 					default:
 						// render scene with bloom
-						renderBloom();
+						renderBloom( true );
 
-						// render scene masked
-						renderMask( maskRenderTarget );
-
-						// render the entire scene
-						// render bloom on top of scene but only where isn't masked
+						// render the entire scene, then render bloom scene on top
 						finalComposer.render();
 						break;
 
@@ -351,29 +329,30 @@
 
 			}
 
-			function renderBloom() {
+			function renderBloom( mask ) {
 
-				camera.layers.set( BLOOM_SCENE );
-				bloomComposer.render();
+				if ( mask === true ) {
+
+					scene.traverse( darkenNonBloomed );
+					bloomComposer.render();
+					scene.traverse( restoreMaterial );
+
+				} else {
+
+					camera.layers.set( BLOOM_SCENE );
+					bloomComposer.render();
+					camera.layers.set( ENTIRE_SCENE );
+
+				}
 
 			}
 
-			function renderMask( renderTarget ) {
+			function darkenNonBloomed( obj ) {
 
-				camera.layers.set( ENTIRE_SCENE );
-				scene.traverse( maskMaterial );
-				renderer.setRenderTarget( renderTarget );
-				renderer.render( scene, camera );
-				scene.traverse( restoreMaterial );
-
-			}
-
-			function maskMaterial( obj ) {
-
-				if ( obj.isMesh ) {
+				if ( obj.isMesh && bloomLayer.test( obj.layers ) === false ) {
 
 					materials[ obj.uuid ] = obj.material;
-					obj.material = bloomLayer.test( obj.layers ) ? lightMaterial : darkMaterial;
+					obj.material = darkMaterial;
 
 				}
 
@@ -381,14 +360,14 @@
 
 			function restoreMaterial( obj ) {
 
-				if ( obj.isMesh ) {
+				if ( materials[ obj.uuid ] ) {
 
 					obj.material = materials[ obj.uuid ];
+					delete materials[ obj.uuid ];
 
 				}
 
 			}
-
 
 		</script>
 
