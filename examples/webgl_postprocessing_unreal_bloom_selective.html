@@ -106,9 +106,9 @@
 				rows: 6,
 				columns: 6,
 				size: 2,
-				zOffset : 5,
-				minLightness : 0,
-				maxLightness : 0.1,
+				zOffset: 5,
+				minLightness: 0,
+				maxLightness: 0.1,
 				scene: "Scene with Glow"
 			};
 
@@ -128,12 +128,12 @@
 			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 			camera.position.set( 0, 0, 30 );
 			camera.lookAt( 0, 0, 0 );
-			
+
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.maxPolarAngle = Math.PI * 0.5;
 			controls.minDistance = 1;
 			controls.maxDistance = 100;
-			controls.addEventListener('change', render);
+			controls.addEventListener( 'change', render );
 
 			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
@@ -256,6 +256,7 @@
 					var object = intersects[ 0 ].object;
 					object.layers.toggle( BLOOM_SCENE );
 					render();
+
 				}
 
 			}
@@ -274,6 +275,7 @@
 				finalComposer.setSize( width, height );
 
 				render();
+
 			};
 
 			function setupBoxes() {
@@ -285,23 +287,23 @@
 				var minLightness = params.minLightness;
 				var maxLightness = params.maxLightness;
 
-				scene.traverse(disposeMaterial);
+				scene.traverse( disposeMaterial );
 				scene.children.length = 0;
 
-				var hsl = {h : 0, s : 0, l : 0};
+				var hsl = { h: 0, s: 0, l: 0 };
 				for ( var x = - columns * size / 2; x < columns * size / 2; x += size ) {
 
 					for ( var y = - rows * size / 2; y < rows * size / 2; y += size ) {
 
-						var color = new THREE.Color(Math.floor( Math.random() * 0xffffff ));
-						color.getHSL(hsl);
-						hsl.l = Math.min(Math.max(minLightness, hsl.l), maxLightness);
-						color.setHSL(hsl.h, hsl.s, hsl.l);
+						var color = new THREE.Color( Math.floor( Math.random() * 0xffffff ) );
+						color.getHSL( hsl );
+						hsl.l = Math.min( Math.max( minLightness, hsl.l ), maxLightness );
+						color.setHSL( hsl.h, hsl.s, hsl.l );
 
 						var box = new THREE.Mesh( getGeometry(), new THREE.MeshBasicMaterial( {
 							color: color
 						} ) );
-						box.position.set( x, y, -zOffset + Math.random() * zOffset * 2 );
+						box.position.set( x, y, - zOffset + Math.random() * zOffset * 2 );
 						scene.add( box );
 						if ( Math.random() < 0.125 ) box.layers.enable( BLOOM_SCENE );
 
@@ -310,35 +312,41 @@
 				}
 
 				render();
+
 			}
 
-			function disposeMaterial(obj)
-			{
-				if(obj.material)
-				{
+			function disposeMaterial( obj ) {
+
+				if ( obj.material ) {
+
 					obj.material.dispose();
+
 				}
+
 			}
 
-			function getGeometry()
-			{
-				if(geometry === undefined)
-				{
+			function getGeometry() {
+
+				if ( geometry === undefined ) {
+
 					makeGeometry();
-				}
-				else if(geometry.parameters.width !== params.size)
-				{
+
+				} else if ( geometry.parameters.width !== params.size ) {
+
 					geometry.dispose();
 					makeGeometry();
+
 				}
 
 				return geometry;
+
 			}
 
-			function makeGeometry()
-			{
+			function makeGeometry() {
+
 				var size = params.size;
-				geometry = new THREE.BoxBufferGeometry(size, size, size);
+				geometry = new THREE.BoxBufferGeometry( size, size, size );
+
 			}
 
 			function render() {
