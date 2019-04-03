@@ -89,7 +89,7 @@
 
 		<script>
 
-			var scene, camera, stats;
+			var scene, camera, stats, geometry;
 			var renderer;
 
 			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
@@ -282,12 +282,13 @@
 				var columns = params.columns;
 				var rows = params.rows;
 				var size = params.size;
+				scene.traverse(disposeMaterial);
 				scene.children.length = 0;
 				for ( var x = - columns * size / 2; x < columns * size / 2; x += size ) {
 
 					for ( var y = - rows * size / 2; y < rows * size / 2; y += size ) {
 
-						var box = new THREE.Mesh( new THREE.BoxBufferGeometry( size, size, size ), new THREE.MeshBasicMaterial( {
+						var box = new THREE.Mesh( getGeometry(), new THREE.MeshBasicMaterial( {
 							color: Math.floor( Math.random() * 0xffffff )
 						} ) );
 						box.position.set( x, y, 0 );
@@ -298,6 +299,35 @@
 
 				}
 
+			}
+
+			function disposeMaterial(obj)
+			{
+				if(obj.material)
+				{
+					obj.material.dispose();
+				}
+			}
+
+			function getGeometry()
+			{
+				if(geometry === undefined)
+				{
+					makeGeometry();
+				}
+				else if(geometry.parameters.width !== params.size)
+				{
+					geometry.dispose();
+					makeGeometry();
+				}
+
+				return geometry;
+			}
+
+			function makeGeometry()
+			{
+				var size = params.size;
+				geometry = new THREE.BoxBufferGeometry(size, size, size);
 			}
 
 			function animate() {
