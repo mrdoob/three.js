@@ -143,14 +143,6 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var geometry = this.geometry;
 		var m, ml, name;
 
-		if ( ! geometry.isBufferGeometry && geometry.morphTargets !== undefined && geometry.morphTargets.length > 0 ) {
-
-			console.error( 'THREE.Points.updateMorphTargets() does not support THREE.Geometry. Use THREE.BufferGeometry instead.' );
-
-			return;
-
-		}
-
 		var morphAttributes = geometry.morphAttributes;
 		var keys = Object.keys( morphAttributes );
 
