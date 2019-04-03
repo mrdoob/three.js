@@ -413,6 +413,7 @@ var Viewport = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
+		controls.enabled = true;
 		if ( object === transformControls.object ) {
 
 			transformControls.detach();
