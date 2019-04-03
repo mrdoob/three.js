@@ -42,7 +42,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
@@ -89,7 +88,7 @@
 
 		<script>
 
-			var scene, camera, stats, geometry;
+			var scene, camera, geometry;
 			var renderer;
 
 			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
@@ -114,9 +113,6 @@
 			var materials = {};
 
 			var container = document.getElementById( 'container' );
-
-			stats = new Stats();
-			container.appendChild( stats.dom );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -163,8 +159,6 @@
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( finalPass );
 
-			setupBoxes();
-
 			var raycaster = new THREE.Raycaster();
 
 			var mouse = new THREE.Vector2();
@@ -188,6 +182,8 @@
 						break;
 
 				}
+
+				render();
 
 			} );
 
@@ -232,7 +228,7 @@
 
 			folder.add( params, 'cameraDistance', 30, 100 ).step( 1 ).onChange( updateCamera );
 
-			animate();
+			setupBoxes();
 
 			function onDocumentMouseClick( event ) {
 
@@ -247,7 +243,7 @@
 
 					var object = intersects[ 0 ].object;
 					object.layers.toggle( BLOOM_SCENE );
-
+					render();
 				}
 
 			}
@@ -259,6 +255,7 @@
 				camera.position.x = Math.cos( angle * THREE.Math.DEG2RAD ) * distance;
 				camera.position.z = Math.sin( angle * THREE.Math.DEG2RAD ) * distance;
 				camera.lookAt( 0, 0, 0 );
+				render();
 
 			}
 
@@ -275,6 +272,7 @@
 				bloomComposer.setSize( width, height );
 				finalComposer.setSize( width, height );
 
+				render();
 			};
 
 			function setupBoxes() {
@@ -299,6 +297,7 @@
 
 				}
 
+				render();
 			}
 
 			function disposeMaterial(obj)
@@ -330,11 +329,7 @@
 				geometry = new THREE.BoxBufferGeometry(size, size, size);
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				stats.update();
+			function render() {
 
 				switch ( params.scene ) {
 
