@@ -103,6 +103,19 @@ function main() {
     return ctx.canvas;
   }
 
+  const forceTextureInitialization = function() {
+    const material = new THREE.MeshBasicMaterial();
+    const geometry = new THREE.PlaneBufferGeometry();
+    const scene = new THREE.Scene();
+    scene.add(new THREE.Mesh(geometry, material));
+    const camera = new THREE.Camera();
+
+    return function forceTextureInitialization(texture) {
+      material.map = texture;
+      renderer.render(scene, camera);
+    };
+  }();
+
   function makePerson(x, labelWidth, size, name, color) {
     const canvas = makeLabelCanvas(labelWidth, size, name);
     const texture = new THREE.CanvasTexture(canvas);
@@ -111,7 +124,7 @@ function main() {
     texture.minFilter = THREE.LinearFilter;
     texture.wrapS = THREE.ClampToEdgeWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
-    renderer.setTexture2D(texture, 0);
+    forceTextureInitialization(texture);
 
     const labelMaterial = new THREE.MeshBasicMaterial({
       map: texture,

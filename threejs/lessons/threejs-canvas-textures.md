@@ -369,7 +369,7 @@ Above we used a new canvas for each texture. Whether or not to use a
 canvas per texture is up to you. If you need to up them often then 
 having one canvas per texture is probably the best option. If they are
 rarely or never updated then you can choose to use a single canvas
-for multiple textures by calling `WebGLRenderer.setTexture2D`.
+for multiple textures by forcing three.js to use the texture.
 Let's change the code above to do just that.
 
 ```js
@@ -384,6 +384,19 @@ function makeLabelCanvas(baseWidth, size, name) {
 
 }
 
++const forceTextureInitialization = function() {
++  const material = new THREE.MeshBasicMaterial();
++  const geometry = new THREE.PlaneBufferGeometry();
++  const scene = new THREE.Scene();
++  scene.add(new THREE.Mesh(geometry, material));
++  const camera = new THREE.Camera();
++
++  return function forceTextureInitialization(texture) {
++    material.map = texture;
++    renderer.render(scene, camera);
++  };
++}();
+
 function makePerson(x, labelWidth, size, name, color) {
   const canvas = makeLabelCanvas(labelWidth, size, name);
   const texture = new THREE.CanvasTexture(canvas);
@@ -392,7 +405,7 @@ function makePerson(x, labelWidth, size, name, color) {
   texture.minFilter = THREE.LinearFilter;
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
-+  renderer.setTexture2D(texture, 0);
++  forceTextureInitialization(texture);
 
   ...
 ```
