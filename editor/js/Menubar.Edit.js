@@ -199,6 +199,53 @@ Menubar.Edit = function ( editor ) {
 	} );
 	options.add( option );
 
+	options.add( new UI.HorizontalRule() );
+
+	// Set textures to sRGB. See #15903
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/edit/fixcolormaps' ) );
+	option.onClick(function()
+	{
+		editor.scene.traverse(fixColorMap);
+	});
+	options.add(option);
+
+	var colorMaps = ['map', 'envMap', 'emissiveMap'];
+
+	function fixColorMap(obj)
+	{
+		var material = obj.material;
+		if(Array.isArray(material) === true)
+		{
+			for(var i = 0; i < material.length; ++i)
+			{
+				fixMaterial(material[i]);
+			}
+		}
+		else if(material !== undefined)
+		{
+			fixMaterial(material);
+		}
+
+		editor.signals.sceneGraphChanged.dispatch();
+	}
+
+	function fixMaterial(material)
+	{
+		var needsUpdate = material.needsUpdate;
+		for(var i = 0; i < colorMaps.length; ++i)
+		{
+			var map = material[colorMaps[i]];
+			if(map)
+			{
+				map.encoding = THREE.sRGBEncoding;
+				needsUpdate = true;
+			}
+		}
+		material.needsUpdate = needsUpdate;
+	}
 
 	return container;
 
