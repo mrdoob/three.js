@@ -1,7 +1,7 @@
-import { Object3D } from '../../../src/Three';
+import {Object3D} from '../../../src/Three';
 
 export class GLTFExporter {
-  constructor();
+	constructor();
 
-  parse(input: Object3D, onCompleted: (gltf: object) => void, options: object): null;
+	parse(input: Object3D, onCompleted: (gltf: object) => void, options: object): null;
 }
