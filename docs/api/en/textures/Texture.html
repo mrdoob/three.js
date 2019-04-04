@@ -189,11 +189,15 @@
 		<p>
 		False by default, which is the norm for PNG images. Set to true if the RGB values have
 		been stored premultiplied by alpha.
+		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:boolean flipY]</h3>
 		<p>
 		True by default. Flips the image's Y axis to match the WebGL texture coordinate space.
+		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:number unpackAlignment]</h3>
