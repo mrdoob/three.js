@@ -23,6 +23,11 @@ var SetSceneCommand = function ( editor, scene ) {
 		this.cmdArray.push( new SetUuidCommand( this.editor, this.editor.scene, scene.uuid ) );
 		this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );
 		this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
+		if ( scene.background !== null ) {
+
+			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'background', scene.background.clone() ) );
+
+		}
 
 		while ( scene.children.length > 0 ) {
 
