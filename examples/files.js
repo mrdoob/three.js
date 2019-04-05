@@ -287,6 +287,7 @@ var files = {
 		"webgl_buffergeometry_instancing_dynamic",
 		"webgl_buffergeometry_instancing_interleaved_dynamic",
 		"webgl_buffergeometry_instancing_lambert",
+		"webgl_buffergeometry_instancing_standard",
 		"webgl_buffergeometry_lines",
 		"webgl_buffergeometry_lines_indexed",
 		"webgl_buffergeometry_morphtargets",
