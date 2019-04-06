@@ -471,7 +471,7 @@ document.querySelectorAll('[data-diagram]').forEach((elem) => {
 Сначала мы добавляем скрипт для контролов.
 
 ```html
-<script src="../resources/threejs/r102/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r103/js/controls/TrackballControls.js"></script>
 ```
 
 И затем мы можем добавить `TrackballControls` к каждой сцене, передавая элемент, связанный с этой сценой.

@@ -218,7 +218,7 @@ Note: the box must be larger than the camera's `near` setting but not so large t
 Let's add some controls in so we can rotate the camera.
 
 ```html
-<script src="resources/threejs/r102/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r103/js/controls/OrbitControls.js"></script>
 ```
 
 ```js

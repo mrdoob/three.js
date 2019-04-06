@@ -303,8 +303,8 @@ switch from using one to using the other.
 </div>
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r102/three.min.js"></script>
-<script src="../resources/threejs/r102/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r103/three.min.js"></script>
+<script src="../resources/threejs/r103/js/controls/TrackballControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-materials.js"></script>
 

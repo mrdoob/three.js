@@ -45,8 +45,8 @@ that were being added to the scene.
 From that the first thing we need to do is include the `OBJLoader2` loader in our scene. The `OBJLoader2` also needs the `LoadingSupport.js` file so let's add both.
 
 ```html
-<script src="resources/threejs/r102/js/loaders/LoadingSupport.js"></script>
-<script src="resources/threejs/r102/js/loaders/OBJLoader2.js"></script>
+<script src="resources/threejs/r103/js/loaders/LoadingSupport.js"></script>
+<script src="resources/threejs/r103/js/loaders/OBJLoader2.js"></script>
 ```
 
 Then to load the .OBJ file we create an instance of `OBJLoader2`,
@@ -144,11 +144,11 @@ Now that we have the textures available we can load the .MTL file.
 First we need to include the `MTLLoader`
 
 ```html
-<script src="resources/threejs/r102/three.min.js"></script>
-<script src="resources/threejs/r102/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r102/js/loaders/LoaderSupport.js"></script>
-<script src="resources/threejs/r102/js/loaders/OBJLoader2.js"></script>
-+<script src="resources/threejs/r102/js/loaders/MTLLoader.js"></script>
+<script src="resources/threejs/r103/three.min.js"></script>
+<script src="resources/threejs/r103/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r103/js/loaders/LoaderSupport.js"></script>
+<script src="resources/threejs/r103/js/loaders/OBJLoader2.js"></script>
++<script src="resources/threejs/r103/js/loaders/MTLLoader.js"></script>
 ```
 
 Then we first load the .MTL file. When it's finished loading we set the just loaded materials on to the `OBJLoader2` itself and then load the .OBJ file.

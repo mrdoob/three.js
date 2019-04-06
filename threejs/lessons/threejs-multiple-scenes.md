@@ -443,7 +443,7 @@ No change to the visuals but the code is even more generic.
 Adding interactively, for example a `TrackballControls` is just as easy. First we add the script for the control.
 
 ```html
-<script src="resources/threejs/r102/js/controls/TrackballControls.js"></script>
+<script src="resources/threejs/r103/js/controls/TrackballControls.js"></script>
 ```
 
 And then we can add a `TrackballControls` to each scene passing in the element associated with that scene.

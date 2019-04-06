@@ -28,8 +28,8 @@ an optional feature of three.js so first we need to include them
 in our page
 
 ```html
-<script src="resources/threejs/r102/three.min.js"></script>
-+<script src="resources/threejs/r102/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r103/three.min.js"></script>
++<script src="resources/threejs/r103/js/controls/OrbitControls.js"></script>
 ```
 
 Then we can use them. We pass the `OrbitControls` a camera to 
@@ -475,8 +475,8 @@ The `RectAreaLight` only works with the `MeshStandardMaterai` and the
 To use the `RectAreaLight` we need to include some extra three.js optional data
 
 ```html
-<script src="resources/threejs/r102/three.min.js"></script>
-+<script src="resources/threejs/r102/js/lights/RectAreaLightUniformsLib.js"></script>
+<script src="resources/threejs/r103/three.min.js"></script>
++<script src="resources/threejs/r103/js/lights/RectAreaLightUniformsLib.js"></script>
 ```
 
 If you forget the data the light will still work but it will look funny so
@@ -573,7 +573,7 @@ possible to achieve your goals.
 Next up let's go over [dealing with cameras](threejs-cameras.html).
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r102/three.min.js"></script>
-<script src="../resources/threejs/r102/js/controls/OrbitControls.js"></script>
+<script src="../resources/threejs/r103/three.min.js"></script>
+<script src="../resources/threejs/r103/js/controls/OrbitControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-lights.js"></script>
