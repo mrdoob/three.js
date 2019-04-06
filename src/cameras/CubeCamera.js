@@ -11,13 +11,13 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
+var fov = 90, aspect = 1;
+
 function CubeCamera( near, far, cubeResolution, options ) {
 
 	Object3D.call( this );
 
 	this.type = 'CubeCamera';
-
-	var fov = 90, aspect = 1;
 
 	var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 	cameraPX.up.set( 0, - 1, 0 );
