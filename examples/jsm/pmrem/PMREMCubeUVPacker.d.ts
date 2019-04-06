@@ -1,9 +1,4 @@
-import {
-  CubeTexture,
-  Renderer,
-  ShaderMaterial,
-  WebGLRenderTarget
-} from '../../../src/Three';
+import {CubeTexture, Renderer, WebGLRenderTarget} from '../../../src/Three';
 
 export class PMREMCubeUVPacker {
   CubeUVRenderTarget:WebGLRenderTarget;
