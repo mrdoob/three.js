@@ -498,6 +498,8 @@ Editor.prototype = {
 		this.storage.clear();
 
 		this.camera.copy( this.DEFAULT_CAMERA );
+		this.scene.name = "Scene";
+		this.scene.userData = {};
 		this.scene.background.setHex( 0xaaaaaa );
 		this.scene.fog = null;
 

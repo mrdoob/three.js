@@ -9,9 +9,6 @@ import { Geometry } from './Geometry';
 import { DirectGeometry } from './DirectGeometry';
 import { EventDispatcher } from './EventDispatcher';
 import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
-/**
- * @deprecated Use {@link BufferAttribute#setDynamic THREE.BufferAttribute().setDynamic( true )} instead.
- */
 
 /**
  * This is a superefficent class for geometries because it saves all data in buffers.
