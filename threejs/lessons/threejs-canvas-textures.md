@@ -416,3 +416,7 @@ Another issue is that the labels don't always face the camera. If you're using
 labels as badges that's probably a good thing. If you're using labels to put
 names over players in a 3D game maybe you want the labels to always face the camera.
 We'll cover how to do that in [an article on billboards](threejs-billboards.html).
+
+For labels in particular, [another solution is to use HTML](threejs-align-html-elements-to-3d.html).
+The labels in this article are *inside the 3D world* which is good if you want them
+to be hidden by other objects where as [HTML labels](threejs-align-html-elements-to-3d.html) are always on top.
