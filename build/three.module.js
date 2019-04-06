@@ -179,7 +179,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '103';
+var REVISION = '104dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -40202,13 +40202,13 @@ Object.assign( StereoCamera.prototype, {
  * @author alteredq / http://alteredqualia.com/
  */
 
+var fov = 90, aspect = 1;
+
 function CubeCamera( near, far, cubeResolution, options ) {
 
 	Object3D.call( this );
 
 	this.type = 'CubeCamera';
-
-	var fov = 90, aspect = 1;
 
 	var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 	cameraPX.up.set( 0, - 1, 0 );
