@@ -187,15 +187,16 @@
 
 		<h3>[property:boolean premultiplyAlpha]</h3>
 		<p>
-		False by default, which is the norm for PNG images. Set to true if the RGB values have
-		been stored premultiplied by alpha.
+		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Defaut is *false*.<br /><br />
+
 		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:boolean flipY]</h3>
 		<p>
-		True by default. Flips the image's Y axis to match the WebGL texture coordinate space.
+		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
+
 		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
