@@ -1265,7 +1265,7 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
-						if ( matrix.determinant() < 0 ) {
+						if ( scope.separateObjects === false && matrix.determinant() < 0 ) {
 
 							bfcInverted = ! bfcInverted;
 
