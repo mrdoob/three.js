@@ -87,6 +87,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshToonMaterial': 'MeshToonMaterial',
 		'MeshStandardMaterial': 'MeshStandardMaterial',
 		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
@@ -553,6 +554,12 @@ Sidebar.Material = function ( editor ) {
 			if ( material.type !== materialClass.getValue() ) {
 
 				material = new THREE[ materialClass.getValue() ]();
+
+				if ( material.type == "RawShaderMaterial" ) {
+
+					material.vertexShader = vertexShaderVariables + material.vertexShader;
+
+				}
 
 				editor.execute( new SetMaterialCommand( currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
 				// TODO Copy other references in the scene graph
@@ -1416,6 +1423,12 @@ Sidebar.Material = function ( editor ) {
 		refreshUI();
 
 	} );
+
+	var vertexShaderVariables = [
+		'uniform mat4 projectionMatrix;',
+		'uniform mat4 modelViewMatrix;\n',
+		'attribute vec3 position;\n\n',
+	].join( '\n' );
 
 	return container;
 
