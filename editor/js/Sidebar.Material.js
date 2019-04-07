@@ -438,7 +438,7 @@ Sidebar.Material = function ( editor ) {
 	// shading
 
 	var materialShadingRow = new UI.Row();
-	var materialShading = new UI.Checkbox(false).setLeft( '100px' ).onChange( update );
+	var materialShading = new UI.Checkbox( false ).setLeft( '100px' ).onChange( update );
 
 	materialShadingRow.add( new UI.Text( strings.getKey( 'sidebar/material/flatshaded' ) ).setWidth( '90px' ) );
 	materialShadingRow.add( materialShading );
@@ -537,7 +537,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material instanceof THREE[ materialClass.getValue() ] === false ) {
+			if ( material.type !== materialClass.getValue() ) {
 
 				material = new THREE[ materialClass.getValue() ]();
 
@@ -945,7 +945,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot ) );
 
 			}
 
