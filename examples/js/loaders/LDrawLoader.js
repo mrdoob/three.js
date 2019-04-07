@@ -1305,7 +1305,7 @@ THREE.LDrawLoader = ( function () {
 						var material = parseColourCode( lp );
 
 						var inverted = currentParseScope.inverted;
-						var ccw = ! bfcEnabled || bfcEnabled && bfcCCW && ! inverted;
+						var ccw = ! bfcEnabled || ( bfcCCW !== inverted );
 						var v0, v1, v2;
 
 						if ( ccw === true ) {
@@ -1338,7 +1338,7 @@ THREE.LDrawLoader = ( function () {
 						var material = parseColourCode( lp );
 
 						var inverted = currentParseScope.inverted;
-						var ccw = ! bfcEnabled || bfcEnabled && bfcCCW && ! inverted;
+						var ccw = ! bfcEnabled || ( bfcCCW !== inverted );
 						var v0, v1, v2, v3;
 
 						if ( ccw === true ) {
