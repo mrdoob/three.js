@@ -195,6 +195,7 @@ var Strings = function ( config ) {
 			'sidebar/material/vertexcolors/face': 'Face',
 			'sidebar/material/vertexcolors/vertex': 'Vertex',
 			'sidebar/material/skinning': 'Skinning',
+			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Map',
 			'sidebar/material/alphamap': 'Alpha Map',
 			'sidebar/material/bumpmap': 'Bump Map',

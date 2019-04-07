@@ -83,6 +83,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshDepthMaterial': 'MeshDepthMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshLambertMaterial': 'MeshLambertMaterial',
+		'MeshMatcapMaterial': 'MeshMatcapMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
 		'MeshToonMaterial': 'MeshToonMaterial',
 		'MeshStandardMaterial': 'MeshStandardMaterial',
@@ -280,6 +281,18 @@ Sidebar.Material = function ( editor ) {
 	materialMapRow.add( materialMap );
 
 	container.add( materialMapRow );
+
+	// matcap map
+
+	var materialMatcapMapRow = new UI.Row();
+	var materialMatcapMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialMatcapMap = new UI.Texture().onChange( update );
+
+	materialMatcapMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/matcap' ) ).setWidth( '90px' ) );
+	materialMatcapMapRow.add( materialMatcapMapEnabled );
+	materialMatcapMapRow.add( materialMatcapMap );
+
+	container.add( materialMatcapMapRow );
 
 	// alpha map
 
@@ -657,6 +670,27 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.matcap !== undefined ) {
+
+				var mapEnabled = materialMatcapMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var matcap = mapEnabled ? materialMatcapMap.getValue() : null;
+					if ( material.matcap !== matcap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'matcap', matcap, currentMaterialSlot ) );
+
+					}
+
+				} else {
+
+					if ( mapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
 			if ( material.alphaMap !== undefined ) {
 
 				var mapEnabled = materialAlphaMapEnabled.getValue() === true;
@@ -1019,6 +1053,7 @@ Sidebar.Material = function ( editor ) {
 			'vertexColors': materialVertexColorsRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
+			'matcap': materialMatcapMapRow,
 			'alphaMap': materialAlphaMapRow,
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
@@ -1170,6 +1205,18 @@ Sidebar.Material = function ( editor ) {
 			if ( material.map !== null || resetTextureSelectors ) {
 
 				materialMap.setValue( material.map );
+
+			}
+
+		}
+
+		if ( material.matcap !== undefined ) {
+
+			materialMatcapMapEnabled.setValue( material.matcap !== null );
+
+			if ( material.matcap !== null || resetTextureSelectors ) {
+
+				materialMatcapMap.setValue( material.matcap );
 
 			}
 
