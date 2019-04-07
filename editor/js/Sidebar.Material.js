@@ -624,12 +624,13 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.depthPacking !== undefined) {
+			if ( material.depthPacking !== undefined ) {
 
-				var depthPacking = parseInt(materialDepthPacking.getValue());
-				if(material.depthPacking !== depthPacking)
-				{
+				var depthPacking = parseInt( materialDepthPacking.getValue() );
+				if ( material.depthPacking !== depthPacking ) {
+
 					editor.execute( new SetMaterialValueCommand( currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
+
 				}
 
 			}
