@@ -314,12 +314,10 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 250, 0, 250 );
 
 				controls = new THREE.PointerLockControls( camera );
-				scene.add( controls.getObject() );
 
-				controls.getObject().translateX( 250 );
-				controls.getObject().translateZ( 250 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -384,8 +382,8 @@
 				if ( moveLeft ) velocity.x -= scale * delta;
 				if ( moveRight ) velocity.x += scale * delta;
 
-				controls.getObject().translateX( velocity.x * delta );
-				controls.getObject().translateZ( velocity.z * delta );
+				camera.translateX( velocity.x * delta );
+				camera.translateZ( velocity.z * delta );
 
 			}
 

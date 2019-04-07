@@ -132,8 +132,6 @@
 
 				} );
 
-				scene.add( controls.getObject() );
-
 				var onKeyDown = function ( event ) {
 
 					switch ( event.keyCode ) {
@@ -300,7 +298,7 @@
 
 				if ( controls.isLocked === true ) {
 
-					raycaster.ray.origin.copy( controls.getObject().position );
+					raycaster.ray.origin.copy( camera.position );
 					raycaster.ray.origin.y -= 10;
 
 					var intersections = raycaster.intersectObjects( objects );
@@ -329,14 +327,16 @@
 
 					}
 
-					controls.getObject().translateX( velocity.x * delta );
-					controls.getObject().translateY( velocity.y * delta );
-					controls.getObject().translateZ( velocity.z * delta );
+					var angle = controls.getAzimuthalAngle();
 
-					if ( controls.getObject().position.y < 10 ) {
+					camera.translateX( velocity.x * delta );
+					camera.translateZ( velocity.z * delta );
+					camera.position.y += velocity.y * delta;
+
+					if ( camera.position.y < 10 ) {
 
 						velocity.y = 0;
-						controls.getObject().position.y = 10;
+						camera.position.y = 10;
 
 						canJump = true;
 
