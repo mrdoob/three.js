@@ -823,20 +823,6 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.gradientMap !== undefined ) {
-
-				var gradientMapEnabled = materialGradientMap.getValue() === true;
-
-				var gradientMap = gradientMapEnabled ? materialGradientMap.getValue() : null;
-
-				if ( material.gradientMap !== gradientMap ) {
-
-					editor.execute( new SetMaterialMapCommand( currentObject, 'gradientMap', gradientMap, currentMaterialSlot ) );
-
-				}
-
-			}
-
 			if ( material.reflectivity !== undefined ) {
 
 				var reflectivity = materialReflectivity.getValue();
@@ -913,6 +899,20 @@ Sidebar.Material = function ( editor ) {
 				} else {
 
 					if ( emissiveMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
+			if ( material.gradientMap !== undefined ) {
+
+				var gradientMapEnabled = materialGradientMapEnabled.getValue() === true;
+
+				var gradientMap = gradientMapEnabled ? materialGradientMap.getValue() : null;
+
+				if ( material.gradientMap !== gradientMap ) {
+
+					editor.execute( new SetMaterialMapCommand( currentObject, 'gradientMap', gradientMap, currentMaterialSlot ) );
 
 				}
 
@@ -1023,6 +1023,7 @@ Sidebar.Material = function ( editor ) {
 			'lightMap': materialLightMapRow,
 			'aoMap': materialAOMapRow,
 			'emissiveMap': materialEmissiveMapRow,
+			'gradientMap': materialGradientMapRow,
 			'side': materialSideRow,
 			'flatShading': materialShadingRow,
 			'blending': materialBlendingRow,
@@ -1262,6 +1263,18 @@ Sidebar.Material = function ( editor ) {
 			if ( material.envMap !== null || resetTextureSelectors ) {
 
 				materialEnvMap.setValue( material.envMap );
+
+			}
+
+		}
+
+		if ( material.gradientMap !== undefined ) {
+
+			materialGradientMapEnabled.setValue( material.gradientMap !== null );
+
+			if ( material.gradientMap !== null || resetTextureSelectors ) {
+
+				materialGradientMap.setValue( material.gradientMap );
 
 			}
 
