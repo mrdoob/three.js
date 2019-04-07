@@ -1263,6 +1263,12 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
+						if ( matrix.determinant() < 0 ) {
+
+							bfcInverted = ! bfcInverted;
+
+						}
+
 						subobjects.push( {
 							material: material,
 							matrix: matrix,
