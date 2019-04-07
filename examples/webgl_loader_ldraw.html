@@ -108,7 +108,8 @@
 
 				guiData = {
 					modelFileName: modelFileList[ 'Car' ],
-					envMapActivated: false
+					envMapActivated: false,
+					separateObjects: false
 				};
 
 				gui = new dat.GUI();
@@ -122,6 +123,12 @@
 				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
 
 					envMapActivated = value;
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
 
 					reloadObject( false );
 
@@ -160,6 +167,7 @@
 				showProgressBar();
 
 				var lDrawLoader = new THREE.LDrawLoader();
+				lDrawLoader.separateObjects = guiData.separateObjects;
 				lDrawLoader
 					.setPath( ldrawPath )
 					.load( guiData.modelFileName, function ( group2 ) {
