@@ -84,6 +84,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'MeshToonMaterial': 'MeshToonMaterial',
 		'MeshStandardMaterial': 'MeshStandardMaterial',
 		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
@@ -419,6 +420,18 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialEmissiveMapRow );
 
+	// gradient map
+
+	var materialGradientMapRow = new UI.Row();
+	var materialGradientMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialGradientMap = new UI.Texture().onChange( update );
+
+	materialGradientMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/gradientmap' ) ).setWidth( '90px' ) );
+	materialGradientMapRow.add( materialGradientMapEnabled );
+	materialGradientMapRow.add( materialGradientMap );
+
+	container.add( materialGradientMapRow );
+
 	// side
 
 	var materialSideRow = new UI.Row();
@@ -438,7 +451,7 @@ Sidebar.Material = function ( editor ) {
 	// shading
 
 	var materialShadingRow = new UI.Row();
-	var materialShading = new UI.Checkbox(false).setLeft( '100px' ).onChange( update );
+	var materialShading = new UI.Checkbox( false ).setLeft( '100px' ).onChange( update );
 
 	materialShadingRow.add( new UI.Text( strings.getKey( 'sidebar/material/flatshaded' ) ).setWidth( '90px' ) );
 	materialShadingRow.add( materialShading );
@@ -537,7 +550,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material instanceof THREE[ materialClass.getValue() ] === false ) {
+			if ( material.type !== materialClass.getValue() ) {
 
 				material = new THREE[ materialClass.getValue() ]();
 
@@ -891,6 +904,20 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.gradientMap !== undefined ) {
+
+				var gradientMapEnabled = materialGradientMapEnabled.getValue() === true;
+
+				var gradientMap = gradientMapEnabled ? materialGradientMap.getValue() : null;
+
+				if ( material.gradientMap !== gradientMap ) {
+
+					editor.execute( new SetMaterialMapCommand( currentObject, 'gradientMap', gradientMap, currentMaterialSlot ) );
+
+				}
+
+			}
+
 			if ( material.side !== undefined ) {
 
 				var side = parseInt( materialSide.getValue() );
@@ -945,7 +972,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot) );
+				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -996,6 +1023,7 @@ Sidebar.Material = function ( editor ) {
 			'lightMap': materialLightMapRow,
 			'aoMap': materialAOMapRow,
 			'emissiveMap': materialEmissiveMapRow,
+			'gradientMap': materialGradientMapRow,
 			'side': materialSideRow,
 			'flatShading': materialShadingRow,
 			'blending': materialBlendingRow,
@@ -1235,6 +1263,18 @@ Sidebar.Material = function ( editor ) {
 			if ( material.envMap !== null || resetTextureSelectors ) {
 
 				materialEnvMap.setValue( material.envMap );
+
+			}
+
+		}
+
+		if ( material.gradientMap !== undefined ) {
+
+			materialGradientMapEnabled.setValue( material.gradientMap !== null );
+
+			if ( material.gradientMap !== null || resetTextureSelectors ) {
+
+				materialGradientMap.setValue( material.gradientMap );
 
 			}
 
