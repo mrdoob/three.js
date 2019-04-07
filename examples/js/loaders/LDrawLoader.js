@@ -1164,13 +1164,14 @@ THREE.LDrawLoader = ( function () {
 									while ( ! lp.isAtTheEnd() ) {
 
 										var token = lp.getToken();
-										bfcCCW = true;
+
 										switch ( token ) {
 
 											case 'CERTIFY':
 											case 'NOCERTIFY':
 
 												bfcEnabled = token === 'CERTIFY';
+												bfcCCW = true;
 
 												break;
 
