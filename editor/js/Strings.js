@@ -207,6 +207,7 @@ var Strings = function ( config ) {
 			'sidebar/material/lightmap': 'Light Map',
 			'sidebar/material/aomap': 'AO Map',
 			'sidebar/material/emissivemap': 'Emissive Map',
+			'sidebar/material/gradientmap': 'Gradient Map',
 			'sidebar/material/side': 'Side',
 			'sidebar/material/side/front': 'Front',
 			'sidebar/material/side/back': 'Back',
