@@ -517,7 +517,7 @@ function chooseFromHash( gui, mesh, geometry ) {
 
 		case 'MeshMatcapMaterial' :
 
-			material = new THREE.MeshMatcapMaterial( { color: 0x2194CE, matcap: matcaps.porcelainWhite } );
+			material = new THREE.MeshMatcapMaterial( { matcap: matcaps.porcelainWhite } );
 			guiMaterial( gui, mesh, material, geometry );
 			guiMeshMatcapMaterial( gui, mesh, material, geometry );
 
