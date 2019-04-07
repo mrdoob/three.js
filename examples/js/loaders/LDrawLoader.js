@@ -1046,9 +1046,10 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			var bfcEnabled = false;
+			var bfcCertified = false;
 			var bfcCCW = true;
 			var bfcInverted = false;
+			var bfcCull = true;
 
 			// Parse all line commands
 			for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
@@ -1152,7 +1153,7 @@ THREE.LDrawLoader = ( function () {
 										currentEmbeddedFileName = lp.getRemainingString();
 										currentEmbeddedText = '';
 
-										bfcEnabled = false;
+										bfcCertified = false;
 										bfcCCW = true;
 
 									}
@@ -1170,7 +1171,7 @@ THREE.LDrawLoader = ( function () {
 											case 'CERTIFY':
 											case 'NOCERTIFY':
 
-												bfcEnabled = token === 'CERTIFY';
+												bfcCertified = token === 'CERTIFY';
 												bfcCCW = true;
 
 												break;
@@ -1191,7 +1192,7 @@ THREE.LDrawLoader = ( function () {
 											case 'CLIP':
 											case 'NOCLIP':
 
-												console.warn( 'THREE.LDrawLoader: BFC CLIP and NOCLIP directives ignored.' );
+											  bfcCull = token === 'CLIP';
 
 												break;
 
@@ -1305,7 +1306,8 @@ THREE.LDrawLoader = ( function () {
 						var material = parseColourCode( lp );
 
 						var inverted = currentParseScope.inverted;
-						var ccw = ! bfcEnabled || ( bfcCCW !== inverted );
+						var ccw = bfcCCW !== inverted;
+						var doubleSided = ! bfcCertified || ! bfcCull;
 						var v0, v1, v2;
 
 						if ( ccw === true ) {
@@ -1330,6 +1332,18 @@ THREE.LDrawLoader = ( function () {
 							v2: v2
 						} );
 
+						if ( doubleSided === true ) {
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v2,
+								v2: v1
+							} );
+
+						}
+
 						break;
 
 					// Line type 4: Quadrilateral
@@ -1338,7 +1352,8 @@ THREE.LDrawLoader = ( function () {
 						var material = parseColourCode( lp );
 
 						var inverted = currentParseScope.inverted;
-						var ccw = ! bfcEnabled || ( bfcCCW !== inverted );
+						var ccw = bfcCCW !== inverted;
+						var doubleSided = ! bfcCertified || ! bfcCull;
 						var v0, v1, v2, v3;
 
 						if ( ccw === true ) {
@@ -1372,6 +1387,26 @@ THREE.LDrawLoader = ( function () {
 							v1: v2,
 							v2: v3
 						} );
+
+						if ( doubleSided === true ) {
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v2,
+								v2: v1
+							} );
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v3,
+								v2: v2
+							} );
+
+						}
 
 						break;
 
