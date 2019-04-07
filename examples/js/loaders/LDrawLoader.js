@@ -291,7 +291,7 @@ THREE.LDrawLoader = ( function () {
 				var parentParseScope = scope.getParentParseScope();
 
 				// Add to cache
-				var currentFileName = parentParseScope.currentFileName;
+				var currentFileName = parentParseScope.currentFileName && parentParseScope.currentFileName.toLowerCase();
 				if ( scope.subobjectCache[ currentFileName ] === undefined ) {
 
 					scope.subobjectCache[ currentFileName ] = text;
@@ -1043,10 +1043,10 @@ THREE.LDrawLoader = ( function () {
 					if ( line.startsWith( '0 FILE ' ) ) {
 
 						// Save previous embedded file in the cache
-						this.subobjectCache[ currentEmbeddedFileName ] = currentEmbeddedText;
+						this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
 
 						// New embedded text file
-						currentEmbeddedFileName = line.substring( 7 ).toLowerCase();
+						currentEmbeddedFileName = line.substring( 7 );
 						currentEmbeddedText = '';
 
 					} else {
@@ -1408,7 +1408,7 @@ THREE.LDrawLoader = ( function () {
 
 			if ( parsingEmbeddedFiles ) {
 
-				this.subobjectCache[ currentEmbeddedFileName ] = currentEmbeddedText;
+				this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
 
 			}
 
