@@ -14,12 +14,30 @@ Viewport.Camera = function ( editor ) {
 	cameraSelect.setTop( '10px' );
 	cameraSelect.onChange( function () {
 
-		editor.setViewportCamera( this.getValue() );
+		editor.setViewportCameraByUUID( this.getValue() );
 
 	} );
 
 	signals.cameraAdded.add( update );
-	signals.cameraRemoved.add( update );
+	signals.cameraRemoved.add( function ( camera ) {
+
+		delete editor.cameras[ camera.uuid ];
+		if ( editor.viewportCamera === camera ) {
+
+			editor.setViewportCameraByUUID( editor.camera.uuid );
+
+		}
+		update();
+
+	} );
+	signals.editorCleared.add( function () {
+
+		editor.cameras = {};
+		editor.addCamera( editor.camera );
+		editor.setViewportCameraByUUID( editor.camera.uuid );
+		update();
+
+	} );
 
 	update();
 
@@ -31,14 +49,25 @@ Viewport.Camera = function ( editor ) {
 
 		var cameras = editor.cameras;
 
+		var validViewport = false;
 		for ( var key in cameras ) {
 
 			var camera = cameras[ key ];
 			options[ camera.uuid ] = camera.name;
+			if ( editor.viewportCamera === camera ) {
+
+				validViewport = true;
+
+			}
 
 		}
 
 		cameraSelect.setOptions( options );
+		if ( validViewport === false ) {
+
+			editor.setViewportCameraByUUID( editor.camera.uuid );
+
+		}
 		cameraSelect.setValue( editor.viewportCamera.uuid );
 
 	}
