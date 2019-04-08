@@ -88,6 +88,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshStandardMaterial': 'MeshStandardMaterial',
 		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
+		'ShadowMaterial': 'ShadowMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
 	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
