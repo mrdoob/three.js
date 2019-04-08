@@ -146,6 +146,7 @@ function filterEmptyLine( string ) {
 function replaceLightNums( string, parameters ) {
 
 	return string
+		.replace( /NUM_PROBE_LIGHTS/g, parameters.numProbeLights )
 		.replace( /NUM_DIR_LIGHTS/g, parameters.numDirLights )
 		.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
 		.replace( /NUM_RECT_AREA_LIGHTS/g, parameters.numRectAreaLights )

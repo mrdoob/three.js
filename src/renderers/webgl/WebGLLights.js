@@ -25,6 +25,13 @@ function UniformsCache() {
 
 			switch ( light.type ) {
 
+				case 'ProbeLight':
+					uniforms = {
+						position: new Vector3(),
+						color: new Color()
+					};
+					break;
+
 				case 'DirectionalLight':
 					uniforms = {
 						direction: new Vector3(),
@@ -112,6 +119,7 @@ function WebGLLights() {
 
 		hash: {
 			stateID: - 1,
+			probeLength: -1,
 			directionalLength: - 1,
 			pointLength: - 1,
 			spotLength: - 1,
@@ -121,6 +129,7 @@ function WebGLLights() {
 		},
 
 		ambient: [ 0, 0, 0 ],
+		probe: [],
 		directional: [],
 		directionalShadowMap: [],
 		directionalShadowMatrix: [],
@@ -143,6 +152,7 @@ function WebGLLights() {
 
 		var r = 0, g = 0, b = 0;
 
+		var probeLength = 0;
 		var directionalLength = 0;
 		var pointLength = 0;
 		var spotLength = 0;
@@ -166,6 +176,19 @@ function WebGLLights() {
 				r += color.r * intensity;
 				g += color.g * intensity;
 				b += color.b * intensity;
+
+			} else if ( light.isProbeLight ) {
+
+				var uniforms = cache.get( light );
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				uniforms.color.copy( color ).multiplyScalar( intensity );
+
+				state.probe[ probeLength ] = uniforms;
+
+				probeLength ++;
 
 			} else if ( light.isDirectionalLight ) {
 
@@ -318,6 +341,7 @@ function WebGLLights() {
 		state.ambient[ 1 ] = g;
 		state.ambient[ 2 ] = b;
 
+		state.probe.length = probeLength;
 		state.directional.length = directionalLength;
 		state.spot.length = spotLength;
 		state.rectArea.length = rectAreaLength;
@@ -325,6 +349,7 @@ function WebGLLights() {
 		state.hemi.length = hemiLength;
 
 		state.hash.stateID = state.id;
+		state.hash.probeLength = probeLength;
 		state.hash.directionalLength = directionalLength;
 		state.hash.pointLength = pointLength;
 		state.hash.spotLength = spotLength;

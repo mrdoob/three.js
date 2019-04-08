@@ -15,6 +15,17 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 }
 
+#if NUM_PROBE_LIGHTS > 0
+
+	struct ProbeLight {
+		vec3 position;
+		vec3 color;
+	};
+
+	uniform ProbeLight probeLights[ NUM_PROBE_LIGHTS ];
+
+#endif
+
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {

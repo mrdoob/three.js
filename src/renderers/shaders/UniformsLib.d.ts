@@ -61,6 +61,13 @@ export let UniformsLib: {
   };
   lights: {
     ambientLightColor: IUniform;
+    probeLights: {
+      value: any[];
+      properties: {
+        color: {};
+        position: {};
+      };
+    };
     directionalLights: {
       value: any[];
       properties: {

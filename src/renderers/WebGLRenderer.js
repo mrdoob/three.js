@@ -1466,6 +1466,7 @@ function WebGLRenderer( parameters ) {
 			releaseMaterialProgramReference( material );
 
 		} else if ( lightsHash.stateID !== lightsStateHash.stateID ||
+			lightsHash.probeLength !== lightsStateHash.probeLength ||
 			lightsHash.directionalLength !== lightsStateHash.directionalLength ||
 			lightsHash.pointLength !== lightsStateHash.pointLength ||
 			lightsHash.spotLength !== lightsStateHash.spotLength ||
@@ -1474,6 +1475,7 @@ function WebGLRenderer( parameters ) {
 			lightsHash.shadowsLength !== lightsStateHash.shadowsLength ) {
 
 			lightsHash.stateID = lightsStateHash.stateID;
+			lightsHash.probeLength = lightsStateHash.probeLength;
 			lightsHash.directionalLength = lightsStateHash.directionalLength;
 			lightsHash.pointLength = lightsStateHash.pointLength;
 			lightsHash.spotLength = lightsStateHash.spotLength;
@@ -1587,6 +1589,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		lightsHash.stateID = lightsStateHash.stateID;
+		lightsHash.probeLength = lightsStateHash.probeLength;
 		lightsHash.directionalLength = lightsStateHash.directionalLength;
 		lightsHash.pointLength = lightsStateHash.pointLength;
 		lightsHash.spotLength = lightsStateHash.spotLength;
@@ -1599,6 +1602,7 @@ function WebGLRenderer( parameters ) {
 			// wire up the material to this renderer's lighting state
 
 			uniforms.ambientLightColor.value = lights.state.ambient;
+			uniforms.probeLights.value = lights.state.probe;
 			uniforms.directionalLights.value = lights.state.directional;
 			uniforms.spotLights.value = lights.state.spot;
 			uniforms.rectAreaLights.value = lights.state.rectArea;
@@ -2403,6 +2407,7 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.ambientLightColor.needsUpdate = value;
 
+		uniforms.probeLights.needsUpdate = value;
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;
 		uniforms.spotLights.needsUpdate = value;

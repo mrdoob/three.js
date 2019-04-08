@@ -114,6 +114,36 @@ IncidentLight directLight;
 
 	#endif
 
+	#if ( NUM_PROBE_LIGHTS > 0 )
+
+		ProbeLight probeLight;
+
+		float total_distance = 0.0;
+
+		#pragma unroll_loop
+		for ( int i = 0; i < NUM_PROBE_LIGHTS; i ++ ) {
+
+			probeLight = probeLights[ i ];
+
+			total_distance += distance(probeLight.position, geometry.position);
+
+		}
+
+		float d;
+
+		#pragma unroll_loop
+		for ( int i = 0; i < NUM_PROBE_LIGHTS; i ++ ) {
+
+			probeLight = probeLights[ i ];
+
+			d = distance(probeLight.position, geometry.position);
+
+			irradiance += probeLight.color * (1.0 - (d / total_distance));
+
+		}
+
+	#endif
+
 #endif
 
 #if defined( RE_IndirectSpecular )

@@ -184,6 +184,7 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 			maxMorphTargets: renderer.maxMorphTargets,
 			maxMorphNormals: renderer.maxMorphNormals,
 
+			numProbeLights: lights.probe.length,
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
 			numSpotLights: lights.spot.length,

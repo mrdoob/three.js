@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - hemisphere light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #fff;
+				color: #111;
+				margin: 0px;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				text-align: center;
+			}
+
+			a {
+				color: #0080ff;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #f00;
+			}
+
+			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
+			strong { color: red }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/WebGL.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var camera, scene, renderer, sphere;
+			var stats;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.set( 0, 0, 100 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0);
+
+				// LIGHTS
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				directionalLight.position.set( 1, 1, 1 );
+				directionalLight.target.position.set( 0, 0, 0 );
+				scene.add( directionalLight );
+
+				var light1 = new THREE.ProbeLight( 0xFF0000 );
+				light1.position.set(25, 0, 0);
+				scene.add( light1 );
+
+				var light2 = new THREE.ProbeLight( 0x0000FF );
+				light2.position.set(-25, 0, 0);
+				scene.add( light2 );
+
+				// MODEL
+
+				var geometry = new THREE.SphereGeometry( 5, 32, 32 );
+				var material = new THREE.MeshStandardMaterial( {color: 0xffffff} );
+				sphere = new THREE.Mesh( geometry, material );
+				scene.add( sphere );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				renderer.shadowMap.enabled = true;
+
+				// STATS
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				sphere.position.set(Math.sin(clock.elapsedTime) * 25.0, 0, 0);
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
