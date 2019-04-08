@@ -55,7 +55,7 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 	// get the radiance in the direction of the normal
 	// target is a Vector3
-	getAt: function( normal, target ) {
+	getAt: function ( normal, target ) {
 
 		// normal is assumed to be unit length
 
@@ -85,7 +85,7 @@ Object.assign( SphericalHarmonics3.prototype, {
 	// get the irradiance (radiance convolved with cosine lobe) in the direction of the normal
 	// target is a Vector3
 	// https://graphics.stanford.edu/papers/envmap/envmap.pdf
-	getIrradianceAt: function( normal, target ) {
+	getIrradianceAt: function ( normal, target ) {
 
 		// normal is assumed to be unit length
 
@@ -94,25 +94,25 @@ Object.assign( SphericalHarmonics3.prototype, {
 		var coeff = this.coefficients;
 
 		// band 0
-		target = coeff[ 0 ] * 0.886227;                           // π * 0.282095
+		target = coeff[ 0 ] * 0.886227; // π * 0.282095
 
 		// band 1
-		target += coeff[ 1 ] * 2.0 * 0.511664 * y;                // ( 2 * π / 3 ) * 0.488603
+		target += coeff[ 1 ] * 2.0 * 0.511664 * y; // ( 2 * π / 3 ) * 0.488603
 		target += coeff[ 2 ] * 2.0 * 0.511664 * z;
 		target += coeff[ 3 ] * 2.0 * 0.511664 * x;
 
 		// band 2
-		target += coeff[ 4 ] * 2.0 * 0.429043 * x * y;            // ( π / 4 ) * 1.092548
+		target += coeff[ 4 ] * 2.0 * 0.429043 * x * y; // ( π / 4 ) * 1.092548
 		target += coeff[ 5 ] * 2.0 * 0.429043 * y * z;
-		target += coeff[ 6 ] * ( 0.743125 * z * z - 0.247708 );   // ( π / 4 ) * 0.315392 * 3
+		target += coeff[ 6 ] * ( 0.743125 * z * z - 0.247708 ); // ( π / 4 ) * 0.315392 * 3
 		target += coeff[ 7 ] * 2.0 * 0.429043 * x * z;
-		target += coeff[ 8 ] * 0.429043 * ( x * x - y * y );      // ( π / 4 ) * 0.546274
+		target += coeff[ 8 ] * 0.429043 * ( x * x - y * y ); // ( π / 4 ) * 0.546274
 
 		return target;
 
 	},
 
-	add: function( sh ) {
+	add: function ( sh ) {
 
 		for ( var i = 0; i < 9; i ++ ) {
 
@@ -125,7 +125,7 @@ Object.assign( SphericalHarmonics3.prototype, {
 	},
 
 
-	scale: function( s ) {
+	scale: function ( s ) {
 
 		for ( var i = 0; i < 9; i ++ ) {
 
@@ -137,7 +137,7 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 	},
 
-	lerp: function( sh, alpha ) {
+	lerp: function ( sh, alpha ) {
 
 		for ( var i = 0; i < 9; i ++ ) {
 
@@ -183,7 +183,7 @@ Object.assign( SphericalHarmonics3, {
 
 	// evaluate the basis functions
 	// shBasis is an Array[ 9 ]
-	getBasisAt: function( normal, shBasis ) {
+	getBasisAt: function ( normal, shBasis ) {
 
 		// normal is assumed to be unit length
 
