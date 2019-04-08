@@ -138,7 +138,7 @@ IncidentLight directLight;
 
 			d = distance(probeLight.position, geometry.position);
 
-			irradiance += probeLight.color * (1.0 - (d / total_distance));
+			irradiance += shGetIrradianceAt(probeLight, geometry.normal) * (1.0 - (d / total_distance));
 
 		}
 

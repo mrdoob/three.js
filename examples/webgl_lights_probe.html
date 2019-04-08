@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lights - hemisphere light</title>
+		<title>three.js webgl - lights - probe light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -74,15 +74,35 @@
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				directionalLight.position.set( 1, 1, 1 );
 				directionalLight.target.position.set( 0, 0, 0 );
-				scene.add( directionalLight );
+				// scene.add( directionalLight );
 
-				var light1 = new THREE.ProbeLight( 0xFF0000 );
-				light1.position.set(25, 0, 0);
-				scene.add( light1 );
+				var eucalyptusGroove = new THREE.ProbeLight([
+					new THREE.Color( 0.3783264,  0.4260425,  0.4504587),
+			    new THREE.Color( 0.2887813,  0.3586803,  0.4147053),
+			    new THREE.Color( 0.0379030,  0.0295216,  0.0098567),
+			    new THREE.Color(-0.1033028, -0.1031690, -0.0884924),
+			    new THREE.Color(-0.0621750, -0.0554432, -0.0396779),
+			    new THREE.Color( 0.0077820, -0.0148312, -0.0471301),
+			    new THREE.Color(-0.0935561, -0.1254260, -0.1525629),
+			    new THREE.Color(-0.0572703, -0.0502192, -0.0363410),
+			    new THREE.Color( 0.0203348, -0.0044201, -0.0452180)
+				], 5.0);
+				eucalyptusGroove.position.set(25, 0, 0);
+				scene.add( eucalyptusGroove );
 
-				var light2 = new THREE.ProbeLight( 0x0000FF );
-				light2.position.set(-25, 0, 0);
-				scene.add( light2 );
+				var office = new THREE.ProbeLight([
+					new THREE.Color( 0.734601661990457511,  0.612049556826795960,  0.587005355037254706),
+					new THREE.Color( -0.507141321038506510, -0.417991745488756006, -0.429936331491808599 ),
+					new THREE.Color( 0.103560827244967943,  0.139260824989792281,  0.167449796591380679),
+					new THREE.Color( -0.033367479602039923, -0.253806971220720712, -0.413597597903080705),
+					new THREE.Color( -0.037424878066217721,  0.215960645848757793,  0.409441988391145206),
+					new THREE.Color( -0.103091702447255268, -0.141888444384140638, -0.169683072900887466),
+					new THREE.Color( -0.074329112149643245, -0.063088727238028067, -0.073822959245573444),
+					new THREE.Color( 0.010118787386155416, -0.113230203385412967, -0.185359511038784813),
+					new THREE.Color( 0.097220336682391037,  0.114504507536907302,  0.102246952020174295),
+				], 5.0);
+				office.position.set(-25, 0, 0);
+				scene.add( office );
 
 				// MODEL
 
@@ -100,8 +120,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-
-				renderer.shadowMap.enabled = true;
 
 				// STATS
 

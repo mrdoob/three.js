@@ -28,7 +28,15 @@ function UniformsCache() {
 				case 'ProbeLight':
 					uniforms = {
 						position: new Vector3(),
-						color: new Color()
+						coeff0: new Color(),
+						coeff1: new Color(),
+						coeff2: new Color(),
+						coeff3: new Color(),
+						coeff4: new Color(),
+						coeff5: new Color(),
+						coeff6: new Color(),
+						coeff7: new Color(),
+						coeff8: new Color()
 					};
 					break;
 
@@ -184,7 +192,15 @@ function WebGLLights() {
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
 
-				uniforms.color.copy( color ).multiplyScalar( intensity );
+				uniforms.coeff0.copy( light.coefficients[0] ).multiplyScalar( intensity );
+				uniforms.coeff1.copy( light.coefficients[1] ).multiplyScalar( intensity );
+				uniforms.coeff2.copy( light.coefficients[2] ).multiplyScalar( intensity );
+				uniforms.coeff3.copy( light.coefficients[3] ).multiplyScalar( intensity );
+				uniforms.coeff4.copy( light.coefficients[4] ).multiplyScalar( intensity );
+				uniforms.coeff5.copy( light.coefficients[5] ).multiplyScalar( intensity );
+				uniforms.coeff6.copy( light.coefficients[6] ).multiplyScalar( intensity );
+				uniforms.coeff7.copy( light.coefficients[7] ).multiplyScalar( intensity );
+				uniforms.coeff8.copy( light.coefficients[8] ).multiplyScalar( intensity );
 
 				state.probe[ probeLength ] = uniforms;
 

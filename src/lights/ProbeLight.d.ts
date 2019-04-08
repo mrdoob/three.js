@@ -3,10 +3,10 @@ import { Light } from './Light';
 
 export class ProbeLight extends Light {
   /**
-   * This creates a ProbeLight with a color.
-   * @param color Numeric value of the RGB component of the color or a Color instance.
+   * This creates a ProbeLight with a set of coefficients.
+   * @param coefficients Nine element array of coefficients
    */
-  constructor(color?: Color | string | number, intensity?: number);
+  constructor(coefficients?: Array, intensity?: number);
 
   castShadow: boolean;
 }

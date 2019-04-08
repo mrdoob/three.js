@@ -64,7 +64,15 @@ export let UniformsLib: {
     probeLights: {
       value: any[];
       properties: {
-        color: {};
+        coeff0: {};
+        coeff1: {};
+        coeff2: {};
+        coeff3: {};
+        coeff4: {};
+        coeff5: {};
+        coeff6: {};
+        coeff7: {};
+        coeff8: {};
         position: {};
       };
     };
