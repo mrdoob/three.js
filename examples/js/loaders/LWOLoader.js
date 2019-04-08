@@ -678,7 +678,7 @@ THREE.LWOLoader = ( function () {
 		// In this case, we'll strip out everything and load 'bumpMap.png' from the same directory as the model
 		cleanPath( path ) {
 
-			if ( path.indexOf( 'Images' ) === 0 || path.indexOf( 'images' ) === 0 ) return './' + path;
+			if ( path.toLowerCase().indexOf( 'images' ) === 0 ) return './' + path;
 			return path.split( '/' ).pop().split( '\\' ).pop();
 
 		},
