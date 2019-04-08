@@ -1,25 +1,41 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
+ * @author arodic / https://github.com/arodic
  */
 
-THREE.PointerLockControls = function ( camera, domElement ) {
+THREE.PointerLockControls = function ( object, domElement ) {
+
+	this.object = object;
+
+	this.domElement = domElement || document.body;
+
+	this.isLocked = false;
+
+	// Reverse vertical motion
+	this.reverseY = false;
+
+	// Mouse movement sensitivity
+	this.sensitivity = 0.002;
+
+	// How far you can look vertically, upper and lower limits.
+	// Range is 0 to Math.PI radians.
+	this.minPolarAngle = 0;
+	this.maxPolarAngle = Math.PI;
+
+	//
+	// internals
+	//
 
 	var scope = this;
 
-	this.domElement = domElement || document.body;
-	this.isLocked = false;
+	var changeEvent = { type: 'change' };
+	var lockEvent = { type: 'lock' };
+	var unlockEvent = { type: 'unlock' };
 
-	camera.rotation.set( 0, 0, 0 );
-
-	var pitchObject = new THREE.Object3D();
-	pitchObject.add( camera );
-
-	var yawObject = new THREE.Object3D();
-	yawObject.position.y = 10;
-	yawObject.add( pitchObject );
-
-	var PI_2 = Math.PI / 2;
+	var direction = new THREE.Vector3( 0, 0, - 1 );
+	var spherical = new THREE.Spherical();
+	var tempVector = new THREE.Vector3();
 
 	function onMouseMove( event ) {
 
@@ -28,10 +44,25 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-		yawObject.rotation.y -= movementX * 0.002;
-		pitchObject.rotation.x -= movementY * 0.002;
+		tempVector.copy( direction );
+		tempVector.applyQuaternion( scope.object.quaternion );
 
-		pitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, pitchObject.rotation.x ) );
+		// angle from z-axis around y-axis
+		spherical.setFromVector3( tempVector );
+
+		spherical.theta -= movementX * scope.sensitivity;
+		spherical.phi += movementY * scope.sensitivity * ( scope.reverseY ? -1 : 1 );
+
+		// restrict phi to be between desired limits
+		spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
+
+		spherical.makeSafe();
+
+		tempVector.setFromSpherical( spherical );
+
+		scope.object.lookAt( tempVector.add( scope.object.position ) );
+
+		scope.dispatchEvent( changeEvent );
 
 	}
 
@@ -39,17 +70,19 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 		if ( document.pointerLockElement === scope.domElement ) {
 
-			scope.dispatchEvent( { type: 'lock' } );
+			scope.dispatchEvent( lockEvent );
 
 			scope.isLocked = true;
 
 		} else {
 
-			scope.dispatchEvent( { type: 'unlock' } );
+			scope.dispatchEvent( unlockEvent );
 
 			scope.isLocked = false;
 
 		}
+
+		scope.dispatchEvent( changeEvent );
 
 	}
 
@@ -83,28 +116,33 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	this.getObject = function () {
 
-		return yawObject;
+		console.warn( 'THREE.PointerLockControls: getObject() has been deprecated.' );
+
+		return scope.object;
 
 	};
 
-	this.getDirection = function () {
+	this.getDirection = function ( v ) {
 
-		// assumes the camera itself is not rotated
+		v = v || new THREE.Vector3();
 
-		var direction = new THREE.Vector3( 0, 0, - 1 );
-		var rotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
+		v.copy( direction ).applyQuaternion( scope.object.quaternion );
 
-		return function ( v ) {
+		return v;
 
-			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
+	};
 
-			v.copy( direction ).applyEuler( rotation );
+	this.getPolarAngle = function () {
 
-			return v;
+		return spherical.phi;
 
-		};
+	};
 
-	}();
+	this.getAzimuthalAngle = function () {
+
+		return spherical.theta;
+
+	};
 
 	this.lock = function () {
 
