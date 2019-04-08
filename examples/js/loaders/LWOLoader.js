@@ -678,7 +678,7 @@ THREE.LWOLoader = ( function () {
 		// In this case, we'll strip out everything and load 'bumpMap.png' from the same directory as the model
 		cleanPath( path ) {
 
-			if ( path.indexOf( 'Images' ) === 0 ) return './' + path;
+			if ( path.indexOf( 'Images' ) === 0 || path.indexOf( 'images' ) === 0 ) return './' + path;
 			return path.split( '/' ).pop().split( '\\' ).pop();
 
 		},
@@ -1156,14 +1156,11 @@ THREE.LWOLoader = ( function () {
 					break;
 				// Skipped LWO2 chunks
 				case 'DIFF': // diffuse level, may be necessary to modulate COLR with this
-					if ( this.tree.format === 'LWO2' ) {
-
-						this.currentSurface.diffusePower = this.reader.getFloat32();
-						this.reader.skip( 2 );
-
-					}
+					this.currentSurface.diffusePower = this.reader.getFloat32();
+					this.reader.skip( 2 );
 					break;
 				case 'TRNL':
+				case 'REFL':
 				case 'GLOS':
 				case 'SHRP':
 				case 'RFOP':
@@ -1178,6 +1175,7 @@ THREE.LWOLoader = ( function () {
 				case 'LINE':
 				case 'ALPH':
 				case 'VCOL':
+				case 'ENAB':
 					this.reader.skip( length );
 					break;
 				case 'SURF':
@@ -1345,10 +1343,6 @@ THREE.LWOLoader = ( function () {
 					this.currentSurface.attributes.smooth = ( maxSmoothingAngle < 0 ) ? false : true;
 					break;
 
-				case 'ENAB':
-					this.currentForm.enabled = this.reader.getUint16();
-					break;
-
 				// LWO2: Basic Surface Parameters
 				case 'COLR':
 					this.currentSurface.attributes.Color = {};
@@ -1363,11 +1357,6 @@ THREE.LWOLoader = ( function () {
 
 				case 'SPEC':
 					this.currentSurface.attributes.specularLevel = this.reader.getFloat32();
-					this.reader.skip( 2 );
-					break;
-
-				case 'REFL':
-					this.currentSurface.attributes.reflectivity = this.reader.getFloat32();
 					this.reader.skip( 2 );
 					break;
 
@@ -1484,6 +1473,7 @@ THREE.LWOLoader = ( function () {
 				// if break; is called directly, the position in the lwoTree is not created
 				// any sub chunks and forms are added to the parent form instead
 				case 'META':
+				case 'NNDS':
 				case 'NODS':
 				case 'NDTA':
 				case 'ADAT':
@@ -1564,10 +1554,6 @@ THREE.LWOLoader = ( function () {
 
 				case 'NTAG':
 					this.parseSubNode( length );
-					break;
-
-				case 'NNDS':
-					this.setupForm( 'nodes', length );
 					break;
 
 				case 'ATTR': // BSDF Node Attributes
