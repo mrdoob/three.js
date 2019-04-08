@@ -374,14 +374,12 @@ function guiMeshMatcapMaterial( gui, mesh, material ) {
 
 	var data = {
 		color: material.color.getHex(),
-		map: textureMapKeys[ 0 ],
 		matcap: matcapKeys[ 1 ]
 	};
 
 	var folder = gui.addFolder( 'THREE.MeshMatcapMaterial' );
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
-	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
 	folder.add( data, 'matcap', matcapKeys ).onChange( updateTexture( material, 'matcap', matcaps ) );
 
 }
