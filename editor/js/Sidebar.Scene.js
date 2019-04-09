@@ -102,7 +102,15 @@ Sidebar.Scene = function ( editor ) {
 	} );
 	outliner.onDblClick( function () {
 
-		editor.focusById( parseInt( outliner.getValue() ) );
+		var id = parseInt( outliner.getValue() );
+		if(id === editor.camera.id)
+		{
+			signals.cameraToggled.dispatch();
+		}
+		else
+		{
+			editor.focusById( id );
+		}
 
 	} );
 	container.add( outliner );

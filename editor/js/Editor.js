@@ -41,6 +41,7 @@ var Editor = function () {
 		sceneGraphChanged: new Signal(),
 
 		cameraChanged: new Signal(),
+		cameraToggled: new Signal(),
 
 		geometryChanged: new Signal(),
 
