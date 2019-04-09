@@ -103,13 +103,14 @@ Sidebar.Scene = function ( editor ) {
 	outliner.onDblClick( function () {
 
 		var id = parseInt( outliner.getValue() );
-		if(id === editor.camera.id)
-		{
+		if ( id === editor.camera.id ) {
+
 			signals.cameraToggled.dispatch();
-		}
-		else
-		{
+
+		} else {
+
 			editor.focusById( id );
+
 		}
 
 	} );

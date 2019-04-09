@@ -339,19 +339,23 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.cameraToggled.add(function(){
-		viewOrtho = !viewOrtho;
-		if(viewOrtho){ 
+	signals.cameraToggled.add( function () {
+
+		viewOrtho = ! viewOrtho;
+		if ( viewOrtho ) {
+
 			updateOrthographicCamera();
 			editor.camera.name = "Camera (Orthographic)";
-		}
-		else
-		{
+
+		} else {
+
 			editor.camera.name = "Camera (Perspective)";
+
 		}
 		this.editor.signals.objectChanged.dispatch( editor.camera );
 		render();
-	});
+
+	} );
 
 	signals.objectSelected.add( function ( object ) {
 
@@ -578,9 +582,11 @@ var Viewport = function ( editor ) {
 
 	requestAnimationFrame( animate );
 
-	function updateOrthographicCamera(){
-		orthographicCamera.position.copy(editor.camera.position);
-		orthographicCamera.quaternion.copy(editor.camera.quaternion);
+	function updateOrthographicCamera() {
+
+		orthographicCamera.position.copy( editor.camera.position );
+		orthographicCamera.quaternion.copy( editor.camera.quaternion );
+
 	}
 
 	//
@@ -592,27 +598,28 @@ var Viewport = function ( editor ) {
 	function render() {
 
 		var cam;
-		if(camera === editor.camera && viewOrtho === true)
-		{
+		if ( camera === editor.camera && viewOrtho === true ) {
+
 			cam = orthographicCamera;
 
-			camera.getWorldDirection(lineOfSight);
-			var depth = distance.copy(camera.position).negate().dot(lineOfSight);
-			var height = depth * 2 * Math.atan(camera.fov * (Math.PI / 180) * 0.5);
+			camera.getWorldDirection( lineOfSight );
+			var depth = distance.copy( camera.position ).negate().dot( lineOfSight );
+			var height = depth * 2 * Math.atan( camera.fov * ( Math.PI / 180 ) * 0.5 );
 			var width = height * camera.aspect;
 
-			orthographicCamera.left = width * -0.5;
+			orthographicCamera.left = width * - 0.5;
 			orthographicCamera.right = width * 0.5;
 			orthographicCamera.top = height * 0.5;
-			orthographicCamera.bottom = height * -0.5;
+			orthographicCamera.bottom = height * - 0.5;
 			orthographicCamera.near = camera.near;
 			orthographicCamera.far = camera.far;
 			orthographicCamera.updateProjectionMatrix();
 			updateOrthographicCamera();
-		}
-		else
-		{
+
+		} else {
+
 			cam = camera;
+
 		}
 
 		scene.updateMatrixWorld();
