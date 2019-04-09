@@ -323,10 +323,16 @@ function guiMeshBasicMaterial( gui, mesh, material, geometry ) {
 
 function guiMeshDepthMaterial( gui, mesh, material, geometry ) {
 
+	var data = {
+		alphaMap: alphaMapKeys[ 0 ]
+	};
+
 	var folder = gui.addFolder( 'THREE.MeshDepthMaterial' );
 
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
+
+	folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
 }
 
@@ -390,13 +396,15 @@ function guiMeshMatcapMaterial( gui, mesh, material ) {
 
 	var data = {
 		color: material.color.getHex(),
-		matcap: matcapKeys[ 1 ]
+		matcap: matcapKeys[ 1 ],
+		alphaMap: alphaMapKeys[ 0 ]
 	};
 
 	var folder = gui.addFolder( 'THREE.MeshMatcapMaterial' );
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.add( data, 'matcap', matcapKeys ).onChange( updateTexture( material, 'matcap', matcaps ) );
+	folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
 }
 
