@@ -300,7 +300,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			this.translate( offset.x, offset.y, offset.z );
 
-			return this;
+			return offset;
 
 		};
 
