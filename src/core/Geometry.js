@@ -360,7 +360,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			
 			if ( target !== undefined ) target.copy( offset );
 
-			return offset;
+			return this;
 
 		};
 
