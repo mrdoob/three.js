@@ -261,6 +261,20 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialVertexColorsRow );
 
+	// depth packing
+
+	var materialDepthPackingRow = new UI.Row();
+	var materialDepthPacking = new UI.Select().setOptions( {
+		[ THREE.BasicDepthPacking ]: 'BasicDepthPacking',
+		[ THREE.RGBADepthPacking ]: 'RGBADepthPacking'
+	} );
+	materialDepthPacking.onChange( update );
+
+	materialDepthPackingRow.add( new UI.Text( strings.getKey( 'sidebar/material/depthPacking' ) ).setWidth( '90px' ) );
+	materialDepthPackingRow.add( materialDepthPacking );
+
+	container.add( materialDepthPackingRow );
+
 	// skinning
 
 	var materialSkinningRow = new UI.Row();
@@ -639,6 +653,17 @@ Sidebar.Material = function ( editor ) {
 				if ( material.vertexColors !== vertexColors ) {
 
 					editor.execute( new SetMaterialValueCommand( currentObject, 'vertexColors', vertexColors, currentMaterialSlot ) );
+
+				}
+
+			}
+
+			if ( material.depthPacking !== undefined ) {
+
+				var depthPacking = parseInt( materialDepthPacking.getValue() );
+				if ( material.depthPacking !== depthPacking ) {
+
+					editor.execute( new SetMaterialValueCommand( currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
 
 				}
 
@@ -1052,6 +1077,7 @@ Sidebar.Material = function ( editor ) {
 			'clearCoatRoughness': materialClearCoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
+			'depthPacking': materialDepthPackingRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
 			'matcap': materialMatcapMapRow,
@@ -1190,6 +1216,12 @@ Sidebar.Material = function ( editor ) {
 		if ( material.vertexColors !== undefined ) {
 
 			materialVertexColors.setValue( material.vertexColors );
+
+		}
+
+		if ( material.depthPacking !== undefined ) {
+
+			materialDepthPacking.setValue( material.depthPacking );
 
 		}
 
