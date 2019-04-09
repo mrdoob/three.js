@@ -74,7 +74,6 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
-				scene.autoUpdate = false;
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 0, 0, 0 );
@@ -152,17 +151,6 @@
 			function render() {
 
 				controls.update( clock.getDelta() );
-
-				scene.updateMatrixWorld();
-				scene.traverse( function ( object ) {
-
-					if ( object instanceof THREE.LOD ) {
-
-						object.update( camera );
-
-					}
-
-				} );
 
 				renderer.render( scene, camera );
 
