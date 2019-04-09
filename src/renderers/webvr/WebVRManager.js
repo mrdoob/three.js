@@ -131,7 +131,7 @@ function WebVRManager( renderer ) {
 
 				if ( gamepad.pose === null ) return;
 
-				//  Pose
+				// Pose
 
 				var pose = gamepad.pose;
 
@@ -145,7 +145,7 @@ function WebVRManager( renderer ) {
 				controller.matrixWorldNeedsUpdate = true;
 				controller.visible = true;
 
-				//  Trigger
+				// Trigger
 
 				var buttonId = gamepad.id === 'Daydream Controller' ? 0 : 1;
 
