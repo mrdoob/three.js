@@ -20,6 +20,8 @@ function LOD() {
 		}
 	} );
 
+	this.autoUpdate = true;
+
 }
 
 LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
