@@ -475,7 +475,15 @@ THREE.LDrawLoader = ( function () {
 					subobject.url = subobjectURL;
 
 					// Load the subobject
-					subobjectLoad( subobjectURL, onSubobjectLoaded, undefined, onSubobjectError, subobject );
+					// Use another file loader here so we can keep track of the subobject information
+					// and use it when processing the next model.
+					var fileLoader = new THREE.FileLoader( scope.manager );
+					fileLoader.setPath( scope.path );
+					fileLoader.load( subobjectURL, function ( text ) {
+
+						processObject( text, onSubobjectLoaded, subobject );
+
+					}, undefined, onSubobjectError );
 
 				}
 
@@ -1162,6 +1170,7 @@ THREE.LDrawLoader = ( function () {
 
 								case 'BFC':
 
+									// Changes to the backface culling state
 									while ( ! lp.isAtTheEnd() ) {
 
 										var token = lp.getToken();
@@ -1265,6 +1274,8 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
+						// If the scale of the object is negated then the triangle winding order
+						// needs to be flipped.
 						if ( scope.separateObjects === false && matrix.determinant() < 0 ) {
 
 							bfcInverted = ! bfcInverted;
