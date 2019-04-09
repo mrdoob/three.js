@@ -1046,11 +1046,15 @@ THREE.MMDPhysics = ( function () {
 			thQ.set( q.x(), q.y(), q.z(), q.w() );
 			thQ2.setFromRotationMatrix( this.bone.matrixWorld );
 			thQ2.conjugate();
-			thQ2.multiply( thQ ).normalize();
+			thQ2.multiply( thQ );
 
 			//this.bone.quaternion.multiply( thQ2 );
 
 			thQ3.setFromRotationMatrix( this.bone.matrix );
+
+			// Renormalizing quaternion here because repeatedly transforming
+			// quaternion continuously accumulates floating point error and
+			// can end up being overflow. See #15335
 			this.bone.quaternion.copy( thQ2.multiply( thQ3 ).normalize() );
 
 			manager.freeThreeQuaternion( thQ );
