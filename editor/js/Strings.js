@@ -51,6 +51,7 @@ var Strings = function ( config ) {
 			'menubar/add/hemispherelight': 'HemisphereLight',
 			'menubar/add/ambientlight': 'AmbientLight',
 			'menubar/add/perspectivecamera': 'PerspectiveCamera',
+			'menubar/add/orthographiccamera': 'OrthographicCamera',
 
 			'menubar/status/autosave': 'autosave',
 
@@ -81,6 +82,10 @@ var Strings = function ( config ) {
 			'sidebar/object/rotation': 'Rotation',
 			'sidebar/object/scale': 'Scale',
 			'sidebar/object/fov': 'Fov',
+			'sidebar/object/left': 'Left',
+			'sidebar/object/right': 'Right',
+			'sidebar/object/top': 'Top',
+			'sidebar/object/bottom': 'Bottom',
 			'sidebar/object/near': 'Near',
 			'sidebar/object/far': 'Far',
 			'sidebar/object/intensity': 'Intensity',
