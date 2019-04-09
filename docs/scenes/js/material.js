@@ -125,6 +125,18 @@ var textureMaps = ( function () {
 
 var textureMapKeys = getObjectsKeys( textureMaps );
 
+var matcaps = ( function () {
+
+	return {
+		none: null,
+		porcelainWhite: new THREE.TextureLoader().load( '../../examples/textures/matcaps/matcap-porcelain-white.jpg' )
+	};
+
+} )();
+
+
+var matcapKeys = getObjectsKeys( matcaps );
+
 function generateVertexColors( geometry ) {
 
 	var positionAttribute = geometry.attributes.position;
@@ -358,6 +370,20 @@ function guiMeshLambertMaterial( gui, mesh, material, geometry ) {
 
 }
 
+function guiMeshMatcapMaterial( gui, mesh, material ) {
+
+	var data = {
+		color: material.color.getHex(),
+		matcap: matcapKeys[ 1 ]
+	};
+
+	var folder = gui.addFolder( 'THREE.MeshMatcapMaterial' );
+
+	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
+	folder.add( data, 'matcap', matcapKeys ).onChange( updateTexture( material, 'matcap', matcaps ) );
+
+}
+
 function guiMeshPhongMaterial( gui, mesh, material, geometry ) {
 
 	var data = {
@@ -482,6 +508,16 @@ function chooseFromHash( gui, mesh, geometry ) {
 			material = new THREE.MeshLambertMaterial( { color: 0x2194CE } );
 			guiMaterial( gui, mesh, material, geometry );
 			guiMeshLambertMaterial( gui, mesh, material, geometry );
+
+			return material;
+
+			break;
+
+		case 'MeshMatcapMaterial' :
+
+			material = new THREE.MeshMatcapMaterial( { matcap: matcaps.porcelainWhite } );
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshMatcapMaterial( gui, mesh, material, geometry );
 
 			return material;
 
