@@ -1,0 +1,44 @@
+trigger:
+- master
+- dev
+
+jobs:
+  - job: Tests
+    displayName: Run tests
+    strategy:
+      matrix:
+        linux:
+          imageName: 'ubuntu-16.04'
+        mac:
+          imageName: 'macos-10.13'
+        windows:
+          imageName: 'vs2017-win2016'
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: 10
+        displayName: Use Node
+
+      - script: npm install
+        displayName: Install Dependencies
+
+      - script: npm test
+        displayName: Run Tests
+
+  - job: Lint_Linux
+    displayName: Run Linter on Linux
+    pool:
+      vmImage: "Ubuntu 16.04"
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: 10
+        displayName: Use Node
+
+      - script: npm install
+        displayName: Install Dependencies
+
+      - script: npm run lint
+        displayName: Run Linter
