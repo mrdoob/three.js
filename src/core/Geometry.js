@@ -358,7 +358,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			this.translate( offset.x, offset.y, offset.z );
 
-			return this;
+			return offset;
 
 		};
 
