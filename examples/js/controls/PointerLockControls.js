@@ -10,7 +10,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 	this.domElement = domElement || document.body;
 	this.isLocked = false;
 
-	camera.rotation.reorder( 'YXZ' );
+	var euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
 
 	var PI_2 = Math.PI / 2;
 
@@ -21,10 +21,14 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-		camera.rotation.y -= movementX * 0.002;
-		camera.rotation.x -= movementY * 0.002;
+		euler.setFromQuaternion( camera.quaternion );
 
-		camera.rotation.x = Math.max( - PI_2, Math.min( PI_2, camera.rotation.x ) );
+		euler.y -= movementX * 0.002;
+		euler.x -= movementY * 0.002;
+
+		euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
+
+		camera.quaternion.setFromEuler( euler );
 
 	}
 
@@ -83,15 +87,10 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 	this.getDirection = function () {
 
 		var direction = new THREE.Vector3( 0, 0, - 1 );
-		var rotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
 
 		return function ( v ) {
 
-			rotation.set( camera.rotation.x, camera.rotation.y, 0 );
-
-			v.copy( direction ).applyEuler( rotation );
-
-			return v;
+			return v.copy( direction ).applyQuaternion( camera.quaternion );
 
 		};
 
