@@ -288,7 +288,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	}(),
 
-	center: function () {
+	center: function ( target ) {
 
 		var offset = new Vector3();
 
@@ -299,8 +299,10 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			this.boundingBox.getCenter( offset ).negate();
 
 			this.translate( offset.x, offset.y, offset.z );
+			
+			if ( target !== undefined ) target.copy( offset );
 
-			return offset;
+			return this;
 
 		};
 
