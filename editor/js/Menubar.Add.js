@@ -391,15 +391,17 @@ Menubar.Add = function ( editor ) {
 	// OrthographicCamera
 
 	var option = new UI.Row();
-	option.setClass('option');
-	option.setTextContent(strings.getKey('menubar/add/orthographiccamera'));
-	option.onClick(function(){
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/orthographiccamera' ) );
+	option.onClick( function () {
+
 		var camera = new THREE.OrthographicCamera();
 		camera.name = 'OrthographicCamera';
 
-		editor.execute(new AddObjectCommand(camera));
-	});
-	options.add(option);
+		editor.execute( new AddObjectCommand( camera ) );
+
+	} );
+	options.add( option );
 
 	return container;
 

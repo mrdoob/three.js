@@ -503,12 +503,15 @@ var Viewport = function ( editor ) {
 
 	signals.viewportCameraChanged.add( function ( viewportCamera ) {
 
-		if(viewportCamera.isPerspectiveCamera) {
+		if ( viewportCamera.isPerspectiveCamera ) {
+
 			viewportCamera.aspect = editor.camera.aspect;
 			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
-		}
-		else if(!viewportCamera.isOrthographicCamera){
+
+		} else if ( ! viewportCamera.isOrthographicCamera ) {
+
 			throw "Invalid camera set as viewport";
+
 		}
 
 		camera = viewportCamera;
