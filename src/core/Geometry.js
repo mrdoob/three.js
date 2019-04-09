@@ -346,7 +346,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	center: function () {
+	center: function ( target ) {
 
 		var offset = new Vector3();
 
@@ -357,6 +357,8 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			this.boundingBox.getCenter( offset ).negate();
 
 			this.translate( offset.x, offset.y, offset.z );
+			
+			if ( target !== undefined ) target.copy( offset );
 
 			return offset;
 
