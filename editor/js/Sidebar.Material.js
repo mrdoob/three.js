@@ -83,11 +83,14 @@ Sidebar.Material = function ( editor ) {
 		'MeshDepthMaterial': 'MeshDepthMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshLambertMaterial': 'MeshLambertMaterial',
+		'MeshMatcapMaterial': 'MeshMatcapMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
 		'MeshToonMaterial': 'MeshToonMaterial',
 		'MeshStandardMaterial': 'MeshStandardMaterial',
 		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
+		'ShadowMaterial': 'ShadowMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
 	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
@@ -258,6 +261,20 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialVertexColorsRow );
 
+	// depth packing
+
+	var materialDepthPackingRow = new UI.Row();
+	var materialDepthPacking = new UI.Select().setOptions( {
+		[ THREE.BasicDepthPacking ]: 'BasicDepthPacking',
+		[ THREE.RGBADepthPacking ]: 'RGBADepthPacking'
+	} );
+	materialDepthPacking.onChange( update );
+
+	materialDepthPackingRow.add( new UI.Text( strings.getKey( 'sidebar/material/depthPacking' ) ).setWidth( '90px' ) );
+	materialDepthPackingRow.add( materialDepthPacking );
+
+	container.add( materialDepthPackingRow );
+
 	// skinning
 
 	var materialSkinningRow = new UI.Row();
@@ -279,6 +296,18 @@ Sidebar.Material = function ( editor ) {
 	materialMapRow.add( materialMap );
 
 	container.add( materialMapRow );
+
+	// matcap map
+
+	var materialMatcapMapRow = new UI.Row();
+	var materialMatcapMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialMatcapMap = new UI.Texture().onChange( update );
+
+	materialMatcapMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/matcap' ) ).setWidth( '90px' ) );
+	materialMatcapMapRow.add( materialMatcapMapEnabled );
+	materialMatcapMapRow.add( materialMatcapMap );
+
+	container.add( materialMatcapMapRow );
 
 	// alpha map
 
@@ -554,6 +583,12 @@ Sidebar.Material = function ( editor ) {
 
 				material = new THREE[ materialClass.getValue() ]();
 
+				if ( material.type == "RawShaderMaterial" ) {
+
+					material.vertexShader = vertexShaderVariables + material.vertexShader;
+
+				}
+
 				editor.execute( new SetMaterialCommand( currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.
@@ -623,6 +658,17 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.depthPacking !== undefined ) {
+
+				var depthPacking = parseInt( materialDepthPacking.getValue() );
+				if ( material.depthPacking !== depthPacking ) {
+
+					editor.execute( new SetMaterialValueCommand( currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
+
+				}
+
+			}
+
 			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
 
 				editor.execute( new SetMaterialValueCommand( currentObject, 'skinning', materialSkinning.getValue(), currentMaterialSlot ) );
@@ -639,6 +685,27 @@ Sidebar.Material = function ( editor ) {
 					if ( material.map !== map ) {
 
 						editor.execute( new SetMaterialMapCommand( currentObject, 'map', map, currentMaterialSlot ) );
+
+					}
+
+				} else {
+
+					if ( mapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
+			if ( material.matcap !== undefined ) {
+
+				var mapEnabled = materialMatcapMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var matcap = mapEnabled ? materialMatcapMap.getValue() : null;
+					if ( material.matcap !== matcap ) {
+
+						editor.execute( new SetMaterialMapCommand( currentObject, 'matcap', matcap, currentMaterialSlot ) );
 
 					}
 
@@ -1010,8 +1077,10 @@ Sidebar.Material = function ( editor ) {
 			'clearCoatRoughness': materialClearCoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
+			'depthPacking': materialDepthPackingRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
+			'matcap': materialMatcapMapRow,
 			'alphaMap': materialAlphaMapRow,
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
@@ -1150,6 +1219,12 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
+		if ( material.depthPacking !== undefined ) {
+
+			materialDepthPacking.setValue( material.depthPacking );
+
+		}
+
 		if ( material.skinning !== undefined ) {
 
 			materialSkinning.setValue( material.skinning );
@@ -1163,6 +1238,18 @@ Sidebar.Material = function ( editor ) {
 			if ( material.map !== null || resetTextureSelectors ) {
 
 				materialMap.setValue( material.map );
+
+			}
+
+		}
+
+		if ( material.matcap !== undefined ) {
+
+			materialMatcapMapEnabled.setValue( material.matcap !== null );
+
+			if ( material.matcap !== null || resetTextureSelectors ) {
+
+				materialMatcapMap.setValue( material.matcap );
 
 			}
 
@@ -1416,6 +1503,12 @@ Sidebar.Material = function ( editor ) {
 		refreshUI();
 
 	} );
+
+	var vertexShaderVariables = [
+		'uniform mat4 projectionMatrix;',
+		'uniform mat4 modelViewMatrix;\n',
+		'attribute vec3 position;\n\n',
+	].join( '\n' );
 
 	return container;
 
