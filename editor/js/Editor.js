@@ -525,7 +525,7 @@ Editor.prototype = {
 
 	//
 
-	fromJSON: function ( json ) {
+	fromJSON: function ( json, onLoad ) {
 
 		var loader = new THREE.ObjectLoader();
 
@@ -537,6 +537,7 @@ Editor.prototype = {
 			loader.parse( json, function ( scene ) {
 
 				scope.setScene( scene );
+				if ( onLoad !== undefined ) onLoad();
 
 			} );
 			return;
@@ -557,6 +558,7 @@ Editor.prototype = {
 		loader.parse( json.scene, function ( scene ) {
 
 			scope.setScene( scene );
+			if ( onLoad !== undefined ) onLoad();
 
 		} );
 

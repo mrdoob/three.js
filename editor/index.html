@@ -209,9 +209,17 @@
 
 					if ( state !== undefined ) {
 
-						editor.fromJSON( state );
+						editor.fromJSON( state, setSelected );
+
+					} else {
+
+						setSelected();
 
 					}
+
+				} );
+
+				function setSelected() {
 
 					var selected = editor.config.getKey( 'selected' );
 
@@ -221,7 +229,8 @@
 
 					}
 
-				} );
+				}
+
 
 				//
 
