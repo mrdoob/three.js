@@ -299,7 +299,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			this.boundingBox.getCenter( offset ).negate();
 
 			this.translate( offset.x, offset.y, offset.z );
-			
+
 			if ( target !== undefined ) target.copy( offset );
 
 			return this;
