@@ -157,8 +157,6 @@
 
 						}
 
-				scene.matrixAutoUpdate = false;
-
 				initPostprocessing();
 
 				renderer.autoClear = false;
@@ -259,8 +257,6 @@
 					width: width,
 					height: height
 				} );
-
-				bokehPass.renderToScreen = true;
 
 				var composer = new THREE.EffectComposer( renderer );
 

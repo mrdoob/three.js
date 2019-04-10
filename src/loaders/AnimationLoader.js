@@ -28,7 +28,7 @@ Object.assign( AnimationLoader.prototype, {
 
 	},
 
-	parse: function ( json, onLoad ) {
+	parse: function ( json ) {
 
 		var animations = [];
 
@@ -40,7 +40,7 @@ Object.assign( AnimationLoader.prototype, {
 
 		}
 
-		onLoad( animations );
+		return animations;
 
 	},
 

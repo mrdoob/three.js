@@ -137,13 +137,15 @@ var KhronosTextureContainer = ( function () {
 		for ( var level = 0; level < mipmapCount; level ++ ) {
 
 			var imageSize = new Int32Array( this.arrayBuffer, dataOffset, 1 )[ 0 ]; // size per face, since not supporting array cubemaps
+			dataOffset += 4; // size of the image + 4 for the imageSize field
+			
 			for ( var face = 0; face < this.numberOfFaces; face ++ ) {
 
-				var byteArray = new Uint8Array( this.arrayBuffer, dataOffset + 4, imageSize );
+				var byteArray = new Uint8Array( this.arrayBuffer, dataOffset, imageSize );
 
 				mipmaps.push( { "data": byteArray, "width": width, "height": height } );
-
-				dataOffset += imageSize + 4; // size of the image + 4 for the imageSize field
+				
+				dataOffset += imageSize;
 				dataOffset += 3 - ( ( imageSize + 3 ) % 4 ); // add padding for odd sized image
 
 			}

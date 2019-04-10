@@ -253,7 +253,9 @@ var list = {
 				"Material": "api/en/materials/Material",
 				"MeshBasicMaterial": "api/en/materials/MeshBasicMaterial",
 				"MeshDepthMaterial": "api/en/materials/MeshDepthMaterial",
+				"MeshDistanceMaterial": "api/en/materials/MeshDistanceMaterial",
 				"MeshLambertMaterial": "api/en/materials/MeshLambertMaterial",
+				"MeshMatcapMaterial": "api/en/materials/MeshMatcapMaterial",
 				"MeshNormalMaterial": "api/en/materials/MeshNormalMaterial",
 				"MeshPhongMaterial": "api/en/materials/MeshPhongMaterial",
 				"MeshPhysicalMaterial": "api/en/materials/MeshPhysicalMaterial",
@@ -363,6 +365,7 @@ var list = {
 
 			"Loaders": {
 				"BabylonLoader": "examples/loaders/BabylonLoader",
+				"DRACOLoader": "examples/loaders/DRACOLoader",
 				"GLTFLoader": "examples/loaders/GLTFLoader",
 				"MMDLoader": "examples/loaders/MMDLoader",
 				"MTLLoader": "examples/loaders/MTLLoader",
@@ -382,7 +385,8 @@ var list = {
 
 			"Exporters": {
 				"GLTFExporter": "examples/exporters/GLTFExporter",
-				"PLYExporter": "examples/exporters/PLYExporter"
+				"PLYExporter": "examples/exporters/PLYExporter",
+				"ColladaExporter": "examples/exporters/ColladaExporter"
 			},
 
 			"Plugins": {
@@ -406,7 +410,8 @@ var list = {
 
 			"Utils": {
 				"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/utils/SceneUtils"
+				"SceneUtils": "examples/utils/SceneUtils",
+				"SkeletonUtils": "examples/utils/SkeletonUtils"
 			}
 
 		},
@@ -680,7 +685,9 @@ var list = {
 				"Material": "api/zh/materials/Material",
 				"MeshBasicMaterial": "api/zh/materials/MeshBasicMaterial",
 				"MeshDepthMaterial": "api/zh/materials/MeshDepthMaterial",
+				"MeshDistanceMaterial": "api/zh/materials/MeshDistanceMaterial",
 				"MeshLambertMaterial": "api/zh/materials/MeshLambertMaterial",
+				"MeshMatcapMaterial": "api/zh/materials/MeshMatcapMaterial",
 				"MeshNormalMaterial": "api/zh/materials/MeshNormalMaterial",
 				"MeshPhongMaterial": "api/zh/materials/MeshPhongMaterial",
 				"MeshPhysicalMaterial": "api/zh/materials/MeshPhysicalMaterial",

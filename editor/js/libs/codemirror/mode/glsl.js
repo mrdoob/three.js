@@ -205,7 +205,7 @@
     "do for while if else in out inout float int void bool true false " +
     "lowp mediump highp precision invariant discard return mat2 mat3 " +
     "mat4 vec2 vec3 vec4 ivec2 ivec3 ivec4 bvec2 bvec3 bvec4 sampler2D " +
-    "samplerCube struct gl_FragCoord gl_FragColor";
+    "samplerCube struct gl_FragCoord gl_FragColor gl_Position";
   var glslBuiltins = "radians degrees sin cos tan asin acos atan pow " +
     "exp log exp2 log2 sqrt inversesqrt abs sign floor ceil fract mod " +
     "min max clamp mix step smoothstep length distance dot cross " +

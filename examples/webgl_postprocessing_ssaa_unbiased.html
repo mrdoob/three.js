@@ -182,7 +182,6 @@
 				ssaaRenderPassO = new THREE.SSAARenderPass( scene, cameraO );
 				composer.addPass( ssaaRenderPassO );
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -251,7 +250,6 @@
 				ssaaRenderPassP.enabled = ( params.camera === 'perspective' );
 				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
 
-				ssaaRenderPassP.renderToScreen = ssaaRenderPassO.renderToScreen = params.renderToScreen;
 				copyPass.enabled = ! params.renderToScreen;
 
 				composer.render();
