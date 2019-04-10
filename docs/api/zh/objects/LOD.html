@@ -41,12 +41,6 @@ for( var i = 0; i < 3; i++ ) {
 scene.add( lod );
 		</code>
 
-		<p>
-			请注意，要使得LOD在各不同细节层次之间进行切换，你将需要在你的渲染循环中调用[page:.update update]( camera )。
-			详情请查看这个示例中的源代码：
-		[example:webgl_lod WebGL / LOD]
-		</div>
-
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
 		<p>
@@ -56,6 +50,13 @@ scene.add( lod );
 
 		<h2>属性</h2>
 		<p>请参阅其基类[page:Object3D]来查看公共属性。</p>
+
+		<h3>[property:boolean autoUpdate]</h3>
+		<p>
+		Default is true. If set, then the renderer calls [page:.update] every frame.
+		When it isn't, then you have to manually call by yourself in the render loop
+		for levels of detail to be updated dynamically.
+		</p>
 
 		<h3>[property:array levels]</h3>
 		<p>
@@ -104,7 +105,6 @@ scene.add( lod );
 		<h3>[method:null update]( [param:Camera camera] )</h3>
 		<p>
 			基于每个[page:levels level]中的[page:Object3D object]和[page:Camera camera]（摄像机）之间的距离，来设置其可见性。
-			为了使得多细节层次能够被自动地更新，这个方法需要在渲染循环中被调用。
 		</p>
 
 		<h2>源代码</h2>
