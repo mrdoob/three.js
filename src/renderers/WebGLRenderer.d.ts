@@ -178,7 +178,6 @@ export class WebGLRenderer implements Renderer {
   properties: WebGLProperties;
   renderLists: WebGLRenderLists;
   state: WebGLState;
-  allocTextureUnit: any;
 
   vr: WebVRManager;
 
@@ -202,7 +201,7 @@ export class WebGLRenderer implements Renderer {
   getPixelRatio(): number;
   setPixelRatio(value: number): void;
 
-  getDrawingBufferSize(): { width: number; height: number };
+  getDrawingBufferSize(target: Vector2): Vector2;
   setDrawingBufferSize(width: number, height: number, pixelRatio: number): void;
 
   getSize(target: Vector2): Vector2;
@@ -334,17 +333,24 @@ export class WebGLRenderer implements Renderer {
   ): void;
 
   /**
-   * @deprecated
+   * Returns the current render target. If no render target is set, null is returned.
    */
-  setTexture(texture: Texture, slot: number): void;
-  setTexture2D(texture: Texture, slot: number): void;
-  setTextureCube(texture: Texture, slot: number): void;
-  getRenderTarget(): RenderTarget;
+  getRenderTarget(): RenderTarget | null;
+
   /**
    * @deprecated Use {@link WebGLRenderer#getRenderTarget .getRenderTarget()} instead.
    */
-  getCurrentRenderTarget(): RenderTarget;
-  setRenderTarget(renderTarget?: RenderTarget, activeCubeFace?: number, activeMipMapLevel?: number): void;
+  getCurrentRenderTarget(): RenderTarget | null;
+
+  /**
+   * Sets the active render target.
+   *
+   * @param renderTarget The {@link WebGLRenderTarget renderTarget} that needs to be activated. When `null` is given, the canvas is set as the active render target instead.
+	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLRenderTargetCube}.
+	 * @param activeMipMapLevel Specifies the active mipmap level.
+   */
+  setRenderTarget(renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipMapLevel?: number): void;
+
   readRenderTargetPixels(
     renderTarget: RenderTarget,
     x: number,

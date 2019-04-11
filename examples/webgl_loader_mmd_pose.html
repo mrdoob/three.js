@@ -57,8 +57,14 @@
 
 			var vpds = [];
 
-			init();
-			animate();
+			Ammo().then( function( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
 
 			function init() {
 

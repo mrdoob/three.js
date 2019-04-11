@@ -10,6 +10,7 @@ var Viewport = function ( editor ) {
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
+	container.add( new Viewport.Camera( editor ) );
 	container.add( new Viewport.Info( editor ) );
 
 	//
@@ -198,7 +199,7 @@ var Viewport = function ( editor ) {
 
 	function onMouseDown( event ) {
 
-		event.preventDefault();
+		// event.preventDefault();
 
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDownPosition.fromArray( array );
@@ -412,6 +413,7 @@ var Viewport = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
+		controls.enabled = true; // see #14180
 		if ( object === transformControls.object ) {
 
 			transformControls.detach();
@@ -499,6 +501,17 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.viewportCameraChanged.add( function ( viewportCamera ) {
+
+		camera = viewportCamera;
+
+		camera.aspect = editor.camera.aspect;
+		camera.projectionMatrix.copy( editor.camera.projectionMatrix );
+
+		render();
+
+	} );
+
 	//
 
 	signals.windowResize.add( function () {
@@ -551,14 +564,17 @@ var Viewport = function ( editor ) {
 
 	function render() {
 
-		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
-
 		renderer.render( scene, camera );
 
 		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			renderer.render( sceneHelpers, camera );
+			if ( camera === editor.camera ) {
+
+				sceneHelpers.updateMatrixWorld();
+				renderer.render( sceneHelpers, camera );
+
+			}
 
 		}
 

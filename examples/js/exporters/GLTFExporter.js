@@ -1765,7 +1765,7 @@ THREE.GLTFExporter.prototype = {
 
 			} else if ( object.isLight ) {
 
-				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.' );
+				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.', object );
 				return null;
 
 			}
@@ -2158,7 +2158,7 @@ THREE.GLTFExporter.Utils = {
 				console.warn( 'THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
 
 				sourceTrack = sourceTrack.clone();
-				sourceTrack.setInterpolation( InterpolateLinear );
+				sourceTrack.setInterpolation( THREE.InterpolateLinear );
 
 			}
 

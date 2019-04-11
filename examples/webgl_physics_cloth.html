@@ -58,12 +58,18 @@
 			var margin = 0.05;
 			var hinge;
 			var cloth;
-			var transformAux1 = new Ammo.btTransform();
+			var transformAux1;
 
 			var armMovement = 0;
 
-			init();
-			animate();
+			Ammo().then( function( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
 
 
 			function init() {
@@ -147,6 +153,8 @@
 				physicsWorld = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver );
 				physicsWorld.setGravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
 				physicsWorld.getWorldInfo().set_m_gravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
+
+				transformAux1 = new Ammo.btTransform();
 
 			}
 

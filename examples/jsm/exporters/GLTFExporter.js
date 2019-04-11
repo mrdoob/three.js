@@ -10,6 +10,7 @@ import {
 	ClampToEdgeWrapping,
 	DoubleSide,
 	InterpolateDiscrete,
+	InterpolateLinear,
 	LinearFilter,
 	LinearMipMapLinearFilter,
 	LinearMipMapNearestFilter,
@@ -1185,8 +1186,21 @@ GLTFExporter.prototype = {
 			var modifiedAttribute = null;
 			for ( var attributeName in geometry.attributes ) {
 
+				// Ignore morph target attributes, which are exported later.
+				if ( attributeName.substr( 0, 5 ) === 'morph' ) continue;
+
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
+
+				// Prefix all geometry attributes except the ones specifically
+				// listed in the spec; non-spec attributes are considered custom.
+				var validVertexAttributes =
+						/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
+				if ( ! validVertexAttributes.test( attributeName ) ) {
+
+					attributeName = '_' + attributeName;
+
+				}
 
 				if ( cachedData.attributes.has( attribute ) ) {
 
@@ -1207,15 +1221,11 @@ GLTFExporter.prototype = {
 
 				}
 
-				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
+				var accessor = processAccessor( modifiedAttribute || attribute, geometry );
+				if ( accessor !== null ) {
 
-					var accessor = processAccessor( modifiedAttribute || attribute, geometry );
-					if ( accessor !== null ) {
-
-						attributes[ attributeName ] = accessor;
-						cachedData.attributes.set( attribute, accessor );
-
-					}
+					attributes[ attributeName ] = accessor;
+					cachedData.attributes.set( attribute, accessor );
 
 				}
 
@@ -1382,6 +1392,8 @@ GLTFExporter.prototype = {
 						cachedData.attributes.set( geometry.index, primitive.indices );
 
 					}
+
+					if ( primitive.indices === null ) delete primitive.indices;
 
 				}
 
@@ -1777,7 +1789,7 @@ GLTFExporter.prototype = {
 
 			} else if ( object.isLight ) {
 
-				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.' );
+				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.', object );
 				return null;
 
 			}

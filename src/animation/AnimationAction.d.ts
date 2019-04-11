@@ -4,7 +4,7 @@ import { AnimationActionLoopStyles } from '../constants';
 // Animation ////////////////////////////////////////////////////////////////////////////////////////
 
 export class AnimationAction {
-  loop: boolean;
+  loop: AnimationActionLoopStyles;
   time: number;
   timeScale: number;
   weight: number;
@@ -19,6 +19,7 @@ export class AnimationAction {
   stop(): AnimationAction;
   reset(): AnimationAction;
   isRunning(): boolean;
+  isScheduled(): boolean;
   startAt(time: number): AnimationAction;
   setLoop(
     mode: AnimationActionLoopStyles,
