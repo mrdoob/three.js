@@ -64,7 +64,7 @@
 
 			function onIntersection( intersects ) {
 
-				var intersection = intersects[ 0 ];
+				var intersection = intersects[0];
 				switch ( intersection.object.type ) {
 
 					case cubeType:
@@ -142,7 +142,7 @@
 			}
 			function onMouseDown( intersects ) {
 
-				var intersection = intersects[ 0 ],
+				var intersection = intersects[0],
 					position = rc.stereo.getPosition( intersection );
 				alert( 'You are cliced the "' + intersection.object.type + '" type object.'
 					+ ( intersection.index === undefined ? '' : ' Index = ' + intersection.index + '.' )
@@ -352,7 +352,7 @@
 					event.preventDefault();
 					var left = re.domElement.offsetLeft,
 						top = re.domElement.offsetTop,
-						size = new THREE.Vector2;
+						size = new THREE.Vector2();
 					re.getSize( size );
 					mouse.x = ( event.clientX / size.x ) * 2 - 1 - ( left / size.x ) * 2;
 					mouse.y = -( event.clientY / size.y ) * 2 + 1 + ( top / size.y ) * 2;
@@ -375,7 +375,7 @@
 					intersects = rc.intersectObjects( particles );
 					if ( intersects.length > 0 ) {
 
-						var intersection = intersects[ 0 ],
+						var intersection = intersects[0],
 							position = getPosition( intersection );
 						alert( 'You are cliced the "' + intersection.object.type + '" type object.'
 							+ ( intersection.index === undefined ? '' : ' Index = ' + intersection.index + '.' )
@@ -412,6 +412,7 @@
 				}
 
 			}
+
 		</script>
 	</body>
 </html>
