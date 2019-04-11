@@ -185,7 +185,7 @@
 
 	} );
 
-	var REVISION = '103';
+	var REVISION = '104dev';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
@@ -12927,6 +12927,7 @@
 			if ( this.clearCoatRoughness !== undefined ) data.clearCoatRoughness = this.clearCoatRoughness;
 
 			if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
+			if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
 			if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
 			if ( this.lightMap && this.lightMap.isTexture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
 
@@ -22902,13 +22903,7 @@
 
 		// vr
 
-		var vr = null;
-
-		if ( typeof navigator !== 'undefined' ) {
-
-			vr = ( 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
-
-		}
+		var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
 
 		this.vr = vr;
 
@@ -37905,6 +37900,7 @@
 			// maps
 
 			if ( json.map !== undefined ) material.map = getTexture( json.map );
+			if ( json.matcap !== undefined ) material.matcap = getTexture( json.matcap );
 
 			if ( json.alphaMap !== undefined ) {
 
@@ -40208,13 +40204,13 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
+	var fov = 90, aspect = 1;
+
 	function CubeCamera( near, far, cubeResolution, options ) {
 
 		Object3D.call( this );
 
 		this.type = 'CubeCamera';
-
-		var fov = 90, aspect = 1;
 
 		var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPX.up.set( 0, - 1, 0 );

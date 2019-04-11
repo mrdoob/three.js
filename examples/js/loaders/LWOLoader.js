@@ -1,12 +1,12 @@
 /**
  * @author Lewy Blue https://github.com/looeee
  *
- * Load files in LWO3 format
+ * Load files in LWO3 and LWO2 format
  *
  * LWO3 format specification:
  * 	http://static.lightwave3d.com/sdk/2018/html/filefmts/lwo3.html
  *
- * LWO2 format specification (not tested, however the loader should be largely backwards compatible)
+ * LWO2 format specification:
  * 	http://static.lightwave3d.com/sdk/2018/html/filefmts/lwo2.html
  *
  */
@@ -291,7 +291,15 @@ THREE.LWOLoader = ( function () {
 
 			for ( var name in lwoTree.materials ) {
 
-				materials.push( this.parseMaterial( lwoTree.materials[ name ], name, lwoTree.textures ) );
+				if ( lwoTree.format === 'LWO3' ) {
+
+					materials.push( this.parseMaterial( lwoTree.materials[ name ], name, lwoTree.textures ) );
+
+				} else if ( lwoTree.format === 'LWO2' ) {
+
+					materials.push( this.parseMaterialLwo2( lwoTree.materials[ name ], name, lwoTree.textures ) );
+
+				}
 
 			}
 
@@ -323,6 +331,20 @@ THREE.LWOLoader = ( function () {
 			var type = connections.attributes.Roughness ? 'Standard' : 'Phong';
 
 			return new THREE[ 'Mesh' + type + 'Material' ]( params );
+
+		},
+
+		parseMaterialLwo2( materialData, name, textures ) {
+
+			var params = {
+				name: name,
+				side: this.getSide( materialData.attributes ),
+				flatShading: this.getSmooth( materialData.attributes ),
+			};
+
+			var attributes = this.parseAttributes( materialData.attributes, {} );
+			params = Object.assign( params, attributes );
+			return new THREE[ 'MeshPhongMaterial' ]( params );
 
 		},
 
@@ -404,7 +426,7 @@ THREE.LWOLoader = ( function () {
 
 			var maps = {};
 
-			for ( name in textureNodes ) {
+			for ( var name in textureNodes ) {
 
 				var node = textureNodes[ name ];
 				var path = node.fileName;
@@ -656,7 +678,7 @@ THREE.LWOLoader = ( function () {
 		// In this case, we'll strip out everything and load 'bumpMap.png' from the same directory as the model
 		cleanPath( path ) {
 
-			if ( path.indexOf( 'Images' ) === 0 ) return './' + path;
+			if ( path.toLowerCase().indexOf( 'images' ) === 0 ) return './' + path;
 			return path.split( '/' ).pop().split( '\\' ).pop();
 
 		},
@@ -744,7 +766,17 @@ THREE.LWOLoader = ( function () {
 
 					);
 
-				} else if ( dim > 4 ) console.warn( 'LWOLoader: polygons with greater than 4 sides are not supported' );
+				} else if ( dim > 4 ) {
+
+					for ( var k = 1; k < dim - 1; k ++ ) {
+
+						remappedIndices.push( indices[ i ], indices[ i + k ], indices[ i + k + 1 ] );
+
+					}
+
+					console.warn( 'LWOLoader: polygons with greater than 4 sides are not supported' );
+
+				}
 
 				i += dim;
 
@@ -850,7 +882,16 @@ THREE.LWOLoader = ( function () {
 
 					remappedIndices.push( indices[ i * 2 ], indices[ i * 2 + 1 ], indices[ i * 2 ], indices[ i * 2 + 1 ] );
 
-				} // ignore > 4 for now
+				} else {
+
+					 // ignore > 4 for now
+					for ( var k = 0; k < dim - 2; k ++ ) {
+
+						remappedIndices.push( indices[ i * 2 ], indices[ i * 2 + 1 ] );
+
+					}
+
+				}
 
 			} );
 
@@ -1001,6 +1042,13 @@ THREE.LWOLoader = ( function () {
 
 			var blockID = this.reader.getIDTag();
 			var length = this.reader.getUint32(); // size of data in bytes
+			if ( this.tree.format === 'LWO2' && length > this.reader.dv.byteLength - this.reader.offset ) {
+
+				this.reader.offset -= 4;
+				length = this.reader.getUint16();
+
+			}
+
 
 			// Data types may be found in either LWO2 OR LWO3 spec
 			switch ( blockID ) {
@@ -1080,7 +1128,6 @@ THREE.LWOLoader = ( function () {
 				case 'NPLA':
 				case 'VERS':
 				case 'ENUM':
-				case 'FLAG':
 				case 'TAG ':
 
 				// Car Material CHUNKS
@@ -1096,8 +1143,22 @@ THREE.LWOLoader = ( function () {
 					this.reader.skip( length );
 					break;
 
+				case 'FLAG':
+					if ( this.tree.format === 'LWO2' ) {
+
+						this.reader.skip( 4 ); // not suported
+
+					} else {
+
+						this.reader.skip( length );
+
+					}
+					break;
 				// Skipped LWO2 chunks
 				case 'DIFF': // diffuse level, may be necessary to modulate COLR with this
+					this.currentSurface.diffusePower = this.reader.getFloat32();
+					this.reader.skip( 2 );
+					break;
 				case 'TRNL':
 				case 'REFL':
 				case 'GLOS':
@@ -1113,12 +1174,24 @@ THREE.LWOLoader = ( function () {
 				case 'GLOW':
 				case 'LINE':
 				case 'ALPH':
-				case 'LINE':
 				case 'VCOL':
 				case 'ENAB':
 					this.reader.skip( length );
 					break;
+				case 'SURF':
+					if ( this.tree.format === 'LWO2' ) {
 
+						this.parseSurfaceLwo2( length );
+
+					}
+					break;
+				case 'CLIP':
+					if ( this.tree.format === 'LWO2' ) {
+
+						this.parseClipLwo2( length );
+
+					}
+					break;
 				// Texture node chunks (not in spec)
 				case 'IPIX': // usePixelBlending
 				case 'IMIP': // useMipMaps
@@ -1270,13 +1343,10 @@ THREE.LWOLoader = ( function () {
 					this.currentSurface.attributes.smooth = ( maxSmoothingAngle < 0 ) ? false : true;
 					break;
 
-				case 'ENAB':
-					this.currentForm.enabled = this.reader.getUint16();
-					break;
-
 				// LWO2: Basic Surface Parameters
 				case 'COLR':
-					this.currentSurface.attributes.color = this.reader.getFloat32Array( 3 );
+					this.currentSurface.attributes.Color = {};
+					this.currentSurface.attributes.Color.value = this.reader.getFloat32Array( 3 );
 					this.reader.skip( 2 ); // VX: envelope
 					break;
 
@@ -1287,11 +1357,6 @@ THREE.LWOLoader = ( function () {
 
 				case 'SPEC':
 					this.currentSurface.attributes.specularLevel = this.reader.getFloat32();
-					this.reader.skip( 2 );
-					break;
-
-				case 'REFL':
-					this.currentSurface.attributes.reflectivity = this.reader.getFloat32();
 					this.reader.skip( 2 );
 					break;
 
@@ -1323,7 +1388,15 @@ THREE.LWOLoader = ( function () {
 					break;
 
 				case 'IMAP':
-					this.currentSurface.attributes.imageMapIndex = this.reader.getUint32();
+					if ( this.tree.format === 'LWO2' ) {
+
+						this.reader.skip( 2 );
+
+					} else {
+
+						this.currentSurface.attributes.imageMapIndex = this.reader.getUint32();
+
+					}
 					break;
 
 				case 'IUVI': // uv channel name
@@ -1335,6 +1408,11 @@ THREE.LWOLoader = ( function () {
 					break;
 				case 'IVTL': // heightWrappingMode
 					this.currentNode.heightWrappingMode = this.reader.getUint32();
+					break;
+
+				// LWO2 USE
+				case 'BLOK':
+					// skip
 					break;
 
 				default:
@@ -1420,6 +1498,10 @@ THREE.LWOLoader = ( function () {
 					this.parseTextureNodeAttribute( type );
 					break;
 
+				case 'LWO2':
+					this.tree.format = type;
+					break;
+
 				case 'LWO3':
 					this.tree.format = type;
 					break;
@@ -1431,7 +1513,15 @@ THREE.LWOLoader = ( function () {
 					// CLIP FORM AND SUB FORMS
 
 				case 'CLIP':
-					this.parseClip( length );
+					if ( this.tree.format === 'LWO2' ) {
+
+						this.parseForm( length );
+
+					} else {
+
+						this.parseClip( length );
+
+					}
 					break;
 
 				case 'STIL':
@@ -1464,10 +1554,6 @@ THREE.LWOLoader = ( function () {
 
 				case 'NTAG':
 					this.parseSubNode( length );
-					break;
-
-				case 'NNDS':
-					this.setupForm( 'nodes', length );
 					break;
 
 				case 'ATTR': // BSDF Node Attributes
@@ -1572,6 +1658,29 @@ THREE.LWOLoader = ( function () {
 
 			this.reader.skip( 8 ); // unknown Uint32 x2
 
+			var name = this.reader.getString();
+
+			var surface = {
+				attributes: {}, // LWO2 style non-node attributes will go here
+				connections: {},
+				name: name,
+				inputName: name,
+				nodes: {},
+				source: this.reader.getString(),
+			};
+
+			this.tree.materials[ name ] = surface;
+			this.currentSurface = surface;
+
+			this.parentForm = this.tree.materials;
+			this.currentForm = surface;
+			this.currentFormEnd = this.reader.offset + length;
+
+		},
+
+		parseSurfaceLwo2( length ) {
+
+			var firstOffset = this.reader.offset;
 			var name = this.reader.getString();
 
 			var surface = {
@@ -1766,6 +1875,39 @@ THREE.LWOLoader = ( function () {
 			var texture = {
 				index: this.reader.getUint32()
 			};
+			this.tree.textures.push( texture );
+			this.currentForm = texture;
+
+		},
+
+		parseClipLwo2( length ) {
+
+			var texture = {
+				index: this.reader.getUint32(),
+				fileName: ""
+			};
+
+			var readed = 4;
+			// seach STIL block
+			while ( true ) {
+
+				var tag = this.reader.getIDTag();
+				var n_length = this.reader.getUint16();
+				if ( tag === 'STIL' ) {
+
+					texture.fileName = this.reader.getString();
+					break;
+
+				}
+				readed += 4 + n_length;
+				if ( n_length >= length ) {
+
+					break;
+
+				}
+
+			}
+
 			this.tree.textures.push( texture );
 			this.currentForm = texture;
 

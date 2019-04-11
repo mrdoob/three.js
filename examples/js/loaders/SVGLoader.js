@@ -120,7 +120,17 @@ THREE.SVGLoader.prototype = {
 
 			if ( transform ) {
 
-				currentTransform.copy( transformStack.pop() );
+				transformStack.pop();
+
+				if ( transformStack.length > 0 ) {
+
+					currentTransform.copy( transformStack[ transformStack.length - 1 ] );
+
+				} else {
+
+					currentTransform.identity();
+
+				}
 
 			}
 

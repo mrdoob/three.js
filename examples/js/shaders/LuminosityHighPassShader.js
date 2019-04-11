@@ -11,11 +11,11 @@ THREE.LuminosityHighPassShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"luminosityThreshold": { type: "f", value: 1.0 },
-		"smoothWidth": { type: "f", value: 1.0 },
-		"defaultColor": { type: "c", value: new THREE.Color( 0x000000 ) },
-		"defaultOpacity":  { type: "f", value: 0.0 }
+		"tDiffuse": { value: null },
+		"luminosityThreshold": { value: 1.0 },
+		"smoothWidth": { value: 1.0 },
+		"defaultColor": { value: new THREE.Color( 0x000000 ) },
+		"defaultOpacity":  { value: 0.0 }
 
 	},
 
