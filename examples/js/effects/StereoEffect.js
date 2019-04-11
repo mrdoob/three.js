@@ -710,6 +710,26 @@ if ( typeof dat !== 'undefined' ) {
 
 	} else console.error( 'Duplicate dat.controllerZeroStep method.' );
 
+	if ( dat.controllerSetValue === undefined ) {
+
+		//for resolving of the bug
+		//Testing:
+		//select Surface in the Examples drop down menu of the webgl_math.html page.
+		//Click mouse over any point.
+		//Now you can see number of selected line in the Select Line drop down menu
+		//	and number of selected point in the Select Point drop down menu.
+		//Select "no select" in the Select Line drop down menu.
+		//Click mouse over any point again.
+		//Now you can see a bug: You see "no select" instead of number of selected line in the Select Line drop down menu.
+		dat.controllerSetValue = function ( controller, index ) {
+
+			controller.setValue( index );
+			controller.__li.querySelector( 'select' ).selectedIndex = index;
+
+		};
+
+	} else console.error( 'Duplicate dat.controllerSetValue method.' );
+
 }
 
 //Modifying of THREE.Raycaster for StereoEffect
@@ -792,6 +812,8 @@ Object.assign( THREE.Raycaster.prototype, {
 		}
 		function getIntersects() {
 
+			if ( particles === undefined )
+				return;
 			intersects = Array.isArray( particles ) ? raycaster.intersectObjects( particles ) : raycaster.intersectObject( particles );
 
 		}
@@ -876,6 +898,11 @@ Object.assign( THREE.Raycaster.prototype, {
 
 				}
 				particles = newParticles;
+
+			},
+			removeParticles: function () {
+
+				particles = undefined;
 
 			},
 			//get position of intersected object
