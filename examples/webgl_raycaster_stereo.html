@@ -44,6 +44,7 @@
 			<div>Check the “Old version” checkbox if you want to test the old version of THREE.Raycaster.</div>
 		</p>
 		<script>
+
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
@@ -308,7 +309,7 @@
 					//remove objects
 					for ( var i = scene.children.length - 1; i >= 0; i-- ) {
 
-						var children = scene.children[ i ];
+						var children = scene.children[i];
 						if ( ( children.type === cubeType ) || ( children.type === 'Points' ) )
 							scene.remove( children );
 
@@ -351,7 +352,7 @@
 					event.preventDefault();
 					var left = re.domElement.offsetLeft,
 						top = re.domElement.offsetTop,
-						size = new THREE.Vector2();
+						size = new THREE.Vector2;
 					re.getSize( size );
 					mouse.x = ( event.clientX / size.x ) * 2 - 1 - ( left / size.x ) * 2;
 					mouse.y = -( event.clientY / size.y ) * 2 + 1 + ( top / size.y ) * 2;
@@ -411,7 +412,6 @@
 				}
 
 			}
-
 		</script>
 	</body>
 </html>
