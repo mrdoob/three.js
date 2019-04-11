@@ -220,9 +220,9 @@ Object.assign( Box3.prototype, {
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var scope, i, l;
+		var scope;
 
-		var v1 = new Vector3();
+		var bounds = new Box3();
 
 		function traverse( node ) {
 
@@ -230,36 +230,13 @@ Object.assign( Box3.prototype, {
 
 			if ( geometry !== undefined ) {
 
-				if ( geometry.isGeometry ) {
+				if ( geometry.boundingBox == null ) {
 
-					var vertices = geometry.vertices;
-
-					for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-						v1.copy( vertices[ i ] );
-						v1.applyMatrix4( node.matrixWorld );
-
-						scope.expandByPoint( v1 );
-
-					}
-
-				} else if ( geometry.isBufferGeometry ) {
-
-					var attribute = geometry.attributes.position;
-
-					if ( attribute !== undefined ) {
-
-						for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
-
-					}
+					geometry.computeBoundingBox();
 
 				}
+
+				scope.union( bounds.copy( geometry.boundingBox ).applyMatrix4( node.matrixWorld ) );
 
 			}
 
