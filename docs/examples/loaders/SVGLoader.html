@@ -26,8 +26,9 @@
 			// resource URL
 			'data/svgSample.svg',
 			// called when the resource is loaded
-			function ( paths ) {
+			function ( data ) {
 
+				var paths = data.paths;
 				var group = new THREE.Group();
 
 				for ( var i = 0; i < paths.length; i ++ ) {

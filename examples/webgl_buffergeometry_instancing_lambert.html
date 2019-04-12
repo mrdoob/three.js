@@ -135,11 +135,11 @@
 				#endif
 
 				varying vec3 vLightFront;
+				varying vec3 vIndirectFront;
 
 				#ifdef DOUBLE_SIDED
-
 					varying vec3 vLightBack;
-
+					varying vec3 vIndirectBack;
 				#endif
 
 				#include <common>

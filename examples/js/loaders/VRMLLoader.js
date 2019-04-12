@@ -932,7 +932,7 @@ THREE.VRMLLoader.prototype = {
 
 						if ( data.coordIndex ) {
 
-							function triangulateIndexArray( indexArray, ccw ) {
+							function triangulateIndexArray( indexArray, ccw, colorPerVertex ) {
 
 								if ( ccw === undefined ) {
 
@@ -946,21 +946,37 @@ THREE.VRMLLoader.prototype = {
 
 								for ( i = 0, il = indexArray.length; i < il; i ++ ) {
 
-									var indexedFace = indexArray[ i ];
+									if ( colorPerVertex === false ) {
 
-									// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+										var colorIndices = indexArray[ i ];
 
-									skip = 0;
+										for ( j = 0, jl = colorIndices.length; j < jl; j ++ ) {
 
-									while ( indexedFace.length >= 3 && skip < ( indexedFace.length - 2 ) ) {
+											var index = colorIndices[ j ];
 
-										var i1 = indexedFace[ 0 ];
-										var i2 = indexedFace[ skip + ( ccw ? 1 : 2 ) ];
-										var i3 = indexedFace[ skip + ( ccw ? 2 : 1 ) ];
+											triangulatedIndexArray.push( index, index, index );
 
-										triangulatedIndexArray.push( i1, i2, i3 );
+										}
 
-										skip ++;
+									} else {
+
+										var indexedFace = indexArray[ i ];
+
+										// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+
+										skip = 0;
+
+										while ( indexedFace.length >= 3 && skip < ( indexedFace.length - 2 ) ) {
+
+											var i1 = indexedFace[ 0 ];
+											var i2 = indexedFace[ skip + ( ccw ? 1 : 2 ) ];
+											var i3 = indexedFace[ skip + ( ccw ? 2 : 1 ) ];
+
+											triangulatedIndexArray.push( i1, i2, i3 );
+
+											skip ++;
+
+										}
 
 									}
 
@@ -972,7 +988,7 @@ THREE.VRMLLoader.prototype = {
 
 							var positionIndexes = data.coordIndex ? triangulateIndexArray( data.coordIndex, data.ccw ) : [];
 							var normalIndexes = data.normalIndex ? triangulateIndexArray( data.normalIndex, data.ccw ) : positionIndexes;
-							var colorIndexes = data.colorIndex ? triangulateIndexArray( data.colorIndex, data.ccw ) : positionIndexes;
+							var colorIndexes = data.colorIndex ? triangulateIndexArray( data.colorIndex, data.ccw, data.colorPerVertex ) : [];
 							var uvIndexes = data.texCoordIndex ? triangulateIndexArray( data.texCoordIndex, data.ccw ) : positionIndexes;
 
 							var newIndexes = [];
@@ -1094,6 +1110,8 @@ THREE.VRMLLoader.prototype = {
 						if ( colors.length > 0 ) {
 
 							geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+							parent.material.vertexColors = THREE.VertexColors;
 
 						}
 

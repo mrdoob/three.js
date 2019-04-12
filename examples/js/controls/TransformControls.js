@@ -113,7 +113,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.addEventListener( "touchend", onPointerUp, false );
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
-		domElement.addEventListener( "contextmenu", onContext, false );
 
 	}
 
@@ -128,7 +127,13 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.removeEventListener( "touchend", onPointerUp );
 		domElement.removeEventListener( "touchcancel", onPointerUp );
 		domElement.removeEventListener( "touchleave", onPointerUp );
-		domElement.removeEventListener( "contextmenu", onContext );
+
+		this.traverse( function ( child ) {
+
+			if ( child.geometry ) child.geometry.dispose();
+			if ( child.material ) child.material.dispose();
+
+		} );
 
 	};
 
@@ -398,27 +403,33 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 				if ( pointEnd.dot( pointStart ) < 0 ) d *= -1;
 
-				_tempVector.set( d, d, d );
+				_tempVector2.set( d, d, d );
 
 			} else {
 
-				_tempVector.copy( pointEnd ).divide( pointStart );
+				_tempVector.copy(pointStart);
+				_tempVector2.copy(pointEnd);
+
+				_tempVector.applyQuaternion( worldQuaternionInv );
+				_tempVector2.applyQuaternion( worldQuaternionInv );
+
+				_tempVector2.divide( _tempVector );
 
 				if ( axis.search( 'X' ) === -1 ) {
-					_tempVector.x = 1;
+					_tempVector2.x = 1;
 				}
 				if ( axis.search( 'Y' ) === -1 ) {
-					_tempVector.y = 1;
+					_tempVector2.y = 1;
 				}
 				if ( axis.search( 'Z' ) === -1 ) {
-					_tempVector.z = 1;
+					_tempVector2.z = 1;
 				}
 
 			}
 
 			// Apply scale
 
-			object.scale.copy( scaleStart ).multiply( _tempVector );
+			object.scale.copy( scaleStart ).multiply( _tempVector2 );
 
 		} else if ( mode === 'rotate' ) {
 
@@ -517,12 +528,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	// mouse / touch event handlers
 
-	function onContext( event ) {
-
-		event.preventDefault();
-
-	}
-
 	function onPointerHover( event ) {
 
 		if ( !scope.enabled ) return;
@@ -535,8 +540,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( !scope.enabled ) return;
 
-		event.preventDefault();
-
 		document.addEventListener( "mousemove", onPointerMove, false );
 
 		scope.pointerHover( getPointer( event ) );
@@ -548,8 +551,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( !scope.enabled ) return;
 
-		event.preventDefault();
-
 		scope.pointerMove( getPointer( event ) );
 
 	}
@@ -557,8 +558,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 	function onPointerUp( event ) {
 
 		if ( !scope.enabled ) return;
-
-		event.preventDefault(); // Prevent MouseEvent on mobile
 
 		document.removeEventListener( "mousemove", onPointerMove, false );
 
@@ -1197,7 +1196,7 @@ THREE.TransformControlsGizmo = function () {
 
 				var AXIS_HIDE_TRESHOLD = 0.99;
 				var PLANE_HIDE_TRESHOLD = 0.2;
-				var AXIS_FLIP_TRESHOLD = -0.4;
+				var AXIS_FLIP_TRESHOLD = 0.0;
 
 
 				if ( handle.name === 'X' || handle.name === 'XYZX' ) {

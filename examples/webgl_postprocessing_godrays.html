@@ -129,7 +129,7 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 				//
 
@@ -174,10 +174,10 @@
 
 			//
 
-			function onResize() {
+			function onWindowResize() {
 
-				renderTargetWidth = window.innerWidth;
-				renderTargetHeight = window.innerHeight;
+				var renderTargetWidth = window.innerWidth;
+				var renderTargetHeight = window.innerHeight;
 
 				camera.aspect = renderTargetWidth / renderTargetHeight;
 				camera.updateProjectionMatrix();
@@ -302,7 +302,8 @@
 				postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepSize;
 				postprocessing.godrayGenUniforms[ "tInput" ].value = inputTex;
 
-				renderer.render( postprocessing.scene, postprocessing.camera, renderTarget );
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( postprocessing.scene, postprocessing.camera );
 				postprocessing.scene.overrideMaterial = null;
 
 			}
@@ -360,7 +361,8 @@
 					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysFakeSun;
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
+					renderer.render( postprocessing.scene, postprocessing.camera );
 
 					renderer.setScissorTest( false );
 
@@ -369,19 +371,23 @@
 					// Colors
 
 					scene.overrideMaterial = null;
-					renderer.render( scene, camera, postprocessing.rtTextureColors );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
+					renderer.render( scene, camera );
 
 					// Depth
 
 					scene.overrideMaterial = materialDepth;
-					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+					renderer.setRenderTarget( postprocessing.rtTextureDepth );
+					renderer.clear();
+					renderer.render( scene, camera );
 
 					//
 
 					postprocessing.godrayMaskUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysDepthMask;
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureDepthMask );
+					renderer.setRenderTarget( postprocessing.rtTextureDepthMask );
+					renderer.render( postprocessing.scene, postprocessing.camera );
 
 					// -- Render god-rays --
 
@@ -414,11 +420,13 @@
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
 
+					renderer.setRenderTarget( null );
 					renderer.render( postprocessing.scene, postprocessing.camera );
 					postprocessing.scene.overrideMaterial = null;
 
 				} else {
 
+					renderer.setRenderTarget( null );
 					renderer.clear();
 					renderer.render( scene, camera );
 

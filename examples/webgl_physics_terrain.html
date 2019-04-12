@@ -68,7 +68,7 @@
 			var solver;
 			var physicsWorld;
 			var dynamicObjects = [];
-			var transformAux1 = new Ammo.btTransform();
+			var transformAux1;
 
 			var heightData = null;
 			var ammoHeightData = null;
@@ -78,8 +78,14 @@
 			var timeNextSpawn = time + objectTimePeriod;
 			var maxNumObjects = 30;
 
-			init();
-			animate();
+			Ammo().then( function( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
 
 			function init() {
 
@@ -209,6 +215,8 @@
 				var groundMotionState = new Ammo.btDefaultMotionState( groundTransform );
 				var groundBody = new Ammo.btRigidBody( new Ammo.btRigidBodyConstructionInfo( groundMass, groundMotionState, groundShape, groundLocalInertia ) );
 				physicsWorld.addRigidBody( groundBody );
+
+				transformAux1 = new Ammo.btTransform();
 
 			}
 

@@ -54,6 +54,14 @@
 		并在视频播放时不断地更新这个纹理贴图。——[page:VideoTexture VideoTexture] 类会对此自动进行处理。
 		</p>
 
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			用于测试这个类或者派生类是否为Texture，默认为*true*。<br /><br />
+
+			你不应当对这个属性进行改变,因为它在内部使用，以用于优化。
+		</p>
+
+
 		<h3>[property:array mipmaps]</h3>
 		<p>
 		用户所给定的mipmap数组（可选）。
@@ -180,11 +188,15 @@
 		<p>
 			默认为false，这是PNG图像的规范。
 			如果RGB值已被Alpha预乘，请将其设为true。
+			Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+			You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:boolean flipY]</h3>
 		<p>
 		默认为true。翻转图像的Y轴以匹配WebGL纹理坐标空间。
+		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:number unpackAlignment]</h3>
@@ -244,7 +256,7 @@
 
 		<h3>[method:null dispose]()</h3>
 		<p>
-			使用“dispose”事件类型调用[page:EventDispatcher EventDispatcher].dispatchEvent。
+			使用“废置”事件类型调用[page:EventDispatcher EventDispatcher].dispatchEvent。
 		</p>
 
 		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>

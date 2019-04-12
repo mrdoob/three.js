@@ -151,7 +151,7 @@ Menubar.Edit = function ( editor ) {
 
 			var material = object.material;
 
-			if ( material instanceof THREE.ShaderMaterial ) {
+			if ( material.isShaderMaterial ) {
 
 				try {
 

@@ -33,6 +33,7 @@ THREE.Reflector = function ( geometry, options ) {
 	var view = new THREE.Vector3();
 	var target = new THREE.Vector3();
 	var q = new THREE.Vector4();
+	var size = new THREE.Vector2();
 
 	var textureMatrix = new THREE.Matrix4();
 	var virtualCamera = new THREE.PerspectiveCamera();
@@ -160,7 +161,9 @@ THREE.Reflector = function ( geometry, options ) {
 		renderer.vr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
-		renderer.render( scene, virtualCamera, renderTarget, true );
+		renderer.setRenderTarget( renderTarget );
+		renderer.clear();
+		renderer.render( scene, virtualCamera );
 
 		renderer.vr.enabled = currentVrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -173,7 +176,7 @@ THREE.Reflector = function ( geometry, options ) {
 
 		if ( bounds !== undefined ) {
 
-			var size = renderer.getSize();
+			renderer.getSize( size );
 			var pixelRatio = renderer.getPixelRatio();
 
 			viewport.x = bounds.x * size.width * pixelRatio;

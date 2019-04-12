@@ -10,6 +10,4 @@ export class WebGLRenderTargetCube extends WebGLRenderTarget {
     options?: WebGLRenderTargetOptions
   );
 
-  activeCubeFace: number; // PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5
-  activeMipMapLevel: number;
 }

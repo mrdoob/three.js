@@ -1,5 +1,4 @@
 import { Object3D } from './../../core/Object3D';
-import { Geometry } from './../../core/Geometry';
 import { Material } from './../../materials/Material';
 import { WebGLProgram } from './WebGLProgram';
 import { Group } from './../../objects/Group';
@@ -12,34 +11,39 @@ export interface RenderTarget {} // not defined in the code, used in LightShadow
 export interface RenderItem {
   id: number;
   object: Object3D;
-  geometry: Geometry | BufferGeometry;
+  geometry: BufferGeometry | null;
   material: Material;
   program: WebGLProgram;
+  groupOrder: number;
   renderOrder: number;
   z: number;
-  group: Group;
+  group: Group | null;
 }
 
 export class WebGLRenderList {
   opaque: Array<RenderItem>;
-  transparent: Array<any>;
+  transparent: Array<RenderItem>;
   init(): void;
   push(
     object: Object3D,
-    geometry: Geometry | BufferGeometry,
+    geometry: BufferGeometry | null,
     material: Material,
+    groupOrder: number,
     z: number,
-    group: Group
+    group: Group | null
   ): void;
-
+  unshift(
+    object: Object3D,
+    geometry: BufferGeometry | null,
+    material: Material,
+    groupOrder: number,
+    z: number,
+    group: Group | null
+  ): void;
   sort(): void;
 }
 
 export class WebGLRenderLists {
   dispose(): void;
-  /**
-   *
-   * returns {<String> : <WebGLRenderList>}
-   */
   get(scene: Scene, camera: Camera): WebGLRenderList;
 }

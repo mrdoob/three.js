@@ -3240,9 +3240,8 @@ SEA3D.File.prototype.load = function ( url ) {
 
 	xhr.open( "GET", url, true );
 
-	if (!this.config.path) {
+	if ( ! this.config.path ) {
 
-//		this.config.path = THREE.Loader.prototype.extractUrlBase( url );
 		this.config.path = THREE.LoaderUtils.extractUrlBase( url );
 
 	}
