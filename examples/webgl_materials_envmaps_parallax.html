@@ -79,8 +79,8 @@
 					vec3 parallaxCorrectNormal( vec3 v, vec3 cubeSize, vec3 cubePos ) {
 
 						vec3 nDir = normalize( v );
-						vec3 rbmax = (   .5 * ( cubeSize - cubePos ) - vWorldPosition ) / nDir;
-						vec3 rbmin = ( - .5 * ( cubeSize - cubePos ) - vWorldPosition ) / nDir;
+						vec3 rbmax = ( .5 * cubeSize + cubePos - vWorldPosition ) / nDir;
+						vec3 rbmin = ( -.5 * cubeSize + cubePos - vWorldPosition ) / nDir;
 
 						vec3 rbminmax;
 						rbminmax.x = ( nDir.x > 0. ) ? rbmax.x : rbmin.x;
@@ -356,7 +356,8 @@
 
 				boxProjectedMat.onBeforeCompile = function ( shader ) {
 
-					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 100, 100 ) };
+					//these parameters are wrt the cubeCamera texture
+					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 200, 100 ) };
 					shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, - 50, 0 ) };
 					shader.uniforms.flipEnvMap.value = true;
 
