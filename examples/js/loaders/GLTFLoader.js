@@ -539,9 +539,13 @@ THREE.GLTFLoader = ( function () {
 
 				dracoLoader.decodeDracoFile( bufferView, function ( geometry ) {
 
-					for ( var attributeName in geometry.attributes ) {
+					var attributeNames = geometry.getAttributeNames();
 
-						var attribute = geometry.attributes[ attributeName ];
+					for ( var i = 0, il = attributeNames.length; i < il; i ++ ) {
+
+						var attributeName = attributeNames[ i ];
+
+						var attribute = geometry.getAttribute( attributeName );
 						var normalized = attributeNormalizedMap[ attributeName ];
 
 						if ( normalized !== undefined ) attribute.normalized = normalized;
@@ -1348,7 +1352,7 @@ THREE.GLTFLoader = ( function () {
 
 				var pendingAccessor = target.POSITION !== undefined
 					? parser.getDependency( 'accessor', target.POSITION )
-					: geometry.attributes.position;
+					: geometry.getAttribute( 'position' );
 
 				pendingPositionAccessors.push( pendingAccessor );
 
@@ -1358,7 +1362,7 @@ THREE.GLTFLoader = ( function () {
 
 				var pendingAccessor = target.NORMAL !== undefined
 					? parser.getDependency( 'accessor', target.NORMAL )
-					: geometry.attributes.normal;
+					: geometry.getAttribute( 'normal' );
 
 				pendingNormalAccessors.push( pendingAccessor );
 
@@ -1378,7 +1382,7 @@ THREE.GLTFLoader = ( function () {
 
 			for ( var i = 0, il = morphPositions.length; i < il; i ++ ) {
 
-				if ( geometry.attributes.position === morphPositions[ i ] ) continue;
+				if ( geometry.getAttribute( 'position' ) === morphPositions[ i ] ) continue;
 
 				morphPositions[ i ] = cloneBufferAttribute( morphPositions[ i ] );
 
@@ -1386,7 +1390,7 @@ THREE.GLTFLoader = ( function () {
 
 			for ( var i = 0, il = morphNormals.length; i < il; i ++ ) {
 
-				if ( geometry.attributes.normal === morphNormals[ i ] ) continue;
+				if ( geometry.getAttribute( 'normal' ) === morphNormals[ i ] ) continue;
 
 				morphNormals[ i ] = cloneBufferAttribute( morphNormals[ i ] );
 
@@ -1416,7 +1420,7 @@ THREE.GLTFLoader = ( function () {
 						var positionAttribute = morphPositions[ i ];
 						positionAttribute.name = attributeName;
 
-						var position = geometry.attributes.position;
+						var position = geometry.getAttribute( 'position' );
 
 						for ( var j = 0, jl = positionAttribute.count; j < jl; j ++ ) {
 
@@ -1442,7 +1446,7 @@ THREE.GLTFLoader = ( function () {
 						var normalAttribute = morphNormals[ i ];
 						normalAttribute.name = attributeName;
 
-						var normal = geometry.attributes.normal;
+						var normal = geometry.getAttribute( 'normal' );
 
 						for ( var j = 0, jl = normalAttribute.count; j < jl; j ++ ) {
 
@@ -2165,9 +2169,9 @@ THREE.GLTFLoader = ( function () {
 		var material = mesh.material;
 		var extensions = this.extensions;
 
-		var useVertexTangents = geometry.attributes.tangent !== undefined;
-		var useVertexColors = geometry.attributes.color !== undefined;
-		var useFlatShading = geometry.attributes.normal === undefined;
+		var useVertexTangents = geometry.getAttribute( 'tangent' ) !== undefined;
+		var useVertexColors = geometry.getAttribute( 'color' ) !== undefined;
+		var useFlatShading = geometry.getAttribute( 'normal' ) === undefined;
 		var useSkinning = mesh.isSkinnedMesh === true;
 		var useMorphTargets = Object.keys( geometry.morphAttributes ).length > 0;
 		var useMorphNormals = useMorphTargets && geometry.morphAttributes.normal !== undefined;
@@ -2251,10 +2255,10 @@ THREE.GLTFLoader = ( function () {
 
 		// workarounds for mesh and geometry
 
-		if ( material.aoMap && geometry.attributes.uv2 === undefined && geometry.attributes.uv !== undefined ) {
+		if ( material.aoMap && geometry.getAttribute( 'uv2' ) === undefined && geometry.getAttribute( 'uv' ) !== undefined ) {
 
 			console.log( 'THREE.GLTFLoader: Duplicating UVs to support aoMap.' );
-			geometry.addAttribute( 'uv2', new THREE.BufferAttribute( geometry.attributes.uv.array, 2 ) );
+			geometry.addAttribute( 'uv2', new THREE.BufferAttribute( geometry.getAttribute( 'uv' ).array, 2 ) );
 
 		}
 
@@ -2454,18 +2458,20 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		var geometryAttributeNames = geometry.getAttributeNames();
+
 		for ( var gltfAttributeName in attributes ) {
 
 			var threeAttributeName = ATTRIBUTES[ gltfAttributeName ] || gltfAttributeName.toLowerCase();
 
 			// Skip attributes already provided by e.g. Draco extension.
-			if ( threeAttributeName in geometry.attributes ) continue;
+			if ( geometryAttributeNames.indexOf( threeAttributeName ) >= 0 ) continue;
 
 			pending.push( assignAttributeAccessor( attributes[ gltfAttributeName ], threeAttributeName ) );
 
 		}
 
-		if ( primitiveDef.indices !== undefined && ! geometry.index ) {
+		if ( primitiveDef.indices !== undefined && ! geometry.getIndex() ) {
 
 			var accessor = parser.getDependency( 'accessor', primitiveDef.indices ).then( function ( accessor ) {
 
