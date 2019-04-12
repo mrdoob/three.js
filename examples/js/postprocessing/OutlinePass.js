@@ -103,8 +103,7 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 
 	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
-	this.tempPulseColor1 = new THREE.Color();
-	this.tempPulseColor2 = new THREE.Color();
+	this.pulseWeight = 1.0;
 	this.textureMatrix = new THREE.Matrix4();
 
 	function replaceDepthToViewZ( string, camera ) {
@@ -303,23 +302,16 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 			renderer.clear();
 			this.fsQuad.render( renderer );
 
-			this.tempPulseColor1.copy( this.visibleEdgeColor );
-			this.tempPulseColor2.copy( this.hiddenEdgeColor );
-
 			if ( this.pulsePeriod > 0 ) {
-
-				var scalar = ( 1 + 0.25 ) / 2 + Math.cos( performance.now() * 0.01 / this.pulsePeriod ) * ( 1.0 - 0.25 ) / 2;
-				this.tempPulseColor1.multiplyScalar( scalar );
-				this.tempPulseColor2.multiplyScalar( scalar );
-
+				this.pulseWeight = ( 1 + 0.25 ) / 2 + Math.cos( performance.now() * 0.01 / this.pulsePeriod ) * ( 1.0 - 0.25 ) / 2;
 			}
 
 			// 3. Apply Edge Detection Pass
 			this.fsQuad.material = this.edgeDetectionMaterial;
 			this.edgeDetectionMaterial.uniforms[ "maskTexture" ].value = this.renderTargetMaskDownSampleBuffer.texture;
 			this.edgeDetectionMaterial.uniforms[ "texSize" ].value = new THREE.Vector2( this.renderTargetMaskDownSampleBuffer.width, this.renderTargetMaskDownSampleBuffer.height );
-			this.edgeDetectionMaterial.uniforms[ "visibleEdgeColor" ].value = this.tempPulseColor1;
-			this.edgeDetectionMaterial.uniforms[ "hiddenEdgeColor" ].value = this.tempPulseColor2;
+			this.edgeDetectionMaterial.uniforms[ "visibleEdgeColor" ].value = this.visibleEdgeColor;
+			this.edgeDetectionMaterial.uniforms[ "hiddenEdgeColor" ].value = this.hiddenEdgeColor;
 			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
 			renderer.clear();
 			this.fsQuad.render( renderer );
@@ -360,6 +352,9 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 			this.overlayMaterial.uniforms[ "edgeStrength" ].value = this.edgeStrength;
 			this.overlayMaterial.uniforms[ "edgeGlow" ].value = this.edgeGlow;
 			this.overlayMaterial.uniforms[ "usePatternTexture" ].value = this.usePatternTexture;
+			this.overlayMaterial.uniforms[ "visibleEdgeColor" ].value = this.visibleEdgeColor;
+			this.overlayMaterial.uniforms[ "hiddenEdgeColor" ].value = this.hiddenEdgeColor;
+			this.overlayMaterial.uniforms[ "pulseWeight" ].value = this.pulseWeight;
 
 
 			if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
@@ -467,6 +462,8 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 					float a1 = min(c1.g, c2.g);\
 					float a2 = min(c3.g, c4.g);\
 					float visibilityFactor = min(a1, a2);\
+					vec3 visible = vec3(1.0, 0.0, 0.0);\
+					vec3 hidden = vec3(0.0, 1.0, 0.0);\
 					vec3 edgeColor = 1.0 - visibilityFactor > 0.001 ? visibleEdgeColor : hiddenEdgeColor;\
 					gl_FragColor = vec4(edgeColor, 1.0) * vec4(d);\
 				}"
@@ -538,7 +535,10 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 				"patternTexture": { value: null },
 				"edgeStrength": { value: 1.0 },
 				"edgeGlow": { value: 1.0 },
-				"usePatternTexture": { value: 0.0 }
+				"usePatternTexture": { value: 0.0 },
+			        "visibleEdgeColor" : {value : new THREE.Vector3(1.0, 1.0, 1.0)},
+			        "hiddenEdgeColor" : {value : new THREE.Vector3(1.0, 1.0, 1.0)},
+			        "pulseWeight" : {value : 1.0}
 			},
 
 			vertexShader:
@@ -557,6 +557,9 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 				uniform float edgeStrength;\
 				uniform float edgeGlow;\
 				uniform bool usePatternTexture;\
+				uniform vec3 visibleEdgeColor;\
+				uniform vec3 hiddenEdgeColor;\
+			        uniform float pulseWeight;\
 				\
 				void main() {\
 					vec4 edgeValue1 = texture2D(edgeTexture1, vUv);\
@@ -565,12 +568,19 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 					vec4 patternColor = texture2D(patternTexture, 6.0 * vUv);\
 					float visibilityFactor = 1.0 - maskColor.g > 0.0 ? 1.0 : 0.5;\
 					vec4 edgeValue = edgeValue1 + edgeValue2 * edgeGlow;\
-					vec4 finalColor = edgeStrength * maskColor.r * edgeValue;\
+					vec4 colorWeights = edgeStrength * maskColor.r * edgeValue;\
+					float alpha = (colorWeights.r + colorWeights.g) * pulseWeight;\
+					if (alpha==0.0)\
+						discard;\
+					float norm = 1.0 / alpha;\
+					vec3 visiblePart = visibleEdgeColor * norm * colorWeights.r;\
+					vec3 hiddenPart = hiddenEdgeColor * norm * colorWeights.g;\
+					vec4 finalColor = vec4(visiblePart+hiddenPart, alpha);\
 					if(usePatternTexture)\
 						finalColor += + visibilityFactor * (1.0 - maskColor.r) * (1.0 - patternColor.r);\
 					gl_FragColor = finalColor;\
 				}",
-			blending: THREE.AdditiveBlending,
+			blending: THREE.NormalBlending,
 			depthTest: false,
 			depthWrite: false,
 			transparent: true
