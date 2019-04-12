@@ -50,7 +50,7 @@ PositionalAudioHelper.prototype.update = function () {
 	var i, stride;
 
 	var geometry = this.geometry;
-	var positionAttribute = geometry.attributes.position;
+	var positionAttribute = geometry._attributes.position;
 
 	geometry.clearGroups();
 

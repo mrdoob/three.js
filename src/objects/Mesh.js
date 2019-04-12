@@ -265,10 +265,10 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			if ( geometry.isBufferGeometry ) {
 
 				var a, b, c;
-				var index = geometry.index;
-				var position = geometry.attributes.position;
+				var index = geometry._index;
+				var position = geometry._attributes.position;
 				var morphPosition = geometry.morphAttributes.position;
-				var uv = geometry.attributes.uv;
+				var uv = geometry._attributes.uv;
 				var groups = geometry.groups;
 				var drawRange = geometry.drawRange;
 				var i, j, il, jl;

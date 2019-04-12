@@ -47,9 +47,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				// we assume non-indexed geometry
 
-				if ( geometry.index === null ) {
+				if ( geometry._index === null ) {
 
-					var positionAttribute = geometry.attributes.position;
+					var positionAttribute = geometry._attributes.position;
 					var lineDistances = [ 0 ];
 
 					for ( var i = 1, l = positionAttribute.count; i < l; i ++ ) {
@@ -131,8 +131,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( geometry.isBufferGeometry ) {
 
-				var index = geometry.index;
-				var attributes = geometry.attributes;
+				var index = geometry._index;
+				var attributes = geometry._attributes;
 				var positions = attributes.position.array;
 
 				if ( index !== null ) {

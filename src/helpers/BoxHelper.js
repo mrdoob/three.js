@@ -72,7 +72,7 @@ BoxHelper.prototype.update = ( function () {
 		7: max.x, min.y, min.z
 		*/
 
-		var position = this.geometry.attributes.position;
+		var position = this.geometry._attributes.position;
 		var array = position.array;
 
 		array[ 0 ] = max.x; array[ 1 ] = max.y; array[ 2 ] = max.z;

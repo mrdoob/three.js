@@ -26,8 +26,9 @@ function BufferGeometry() {
 	this.name = '';
 	this.type = 'BufferGeometry';
 
-	this.index = null;
-	this.attributes = {};
+	this._index = null;
+	this._attributeNames = [];
+	this._attributes = Object.freeze( {} );
 
 	this.morphAttributes = {};
 
@@ -50,7 +51,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	getIndex: function () {
 
-		return this.index;
+		return this._index;
 
 	},
 
@@ -58,11 +59,11 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( Array.isArray( index ) ) {
 
-			this.index = new ( arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
+			this._index = new ( arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
 
 		} else {
 
-			this.index = index;
+			this._index = index;
 
 		}
 
@@ -87,21 +88,37 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		this.attributes[ name ] = attribute;
+		if ( this._attributes[ name ] === undefined ) this._attributeNames.push( name );
+
+		this._attributes = Object.freeze( Object.assign( {}, this._attributes, { [ name ]: attribute } ) );
 
 		return this;
 
 	},
 
+	getAttributeNames: function () {
+
+		return this._attributeNames;
+
+	},
+
 	getAttribute: function ( name ) {
 
-		return this.attributes[ name ];
+		return this._attributes[ name ];
 
 	},
 
 	removeAttribute: function ( name ) {
 
-		delete this.attributes[ name ];
+		if ( this._attributes[ name ] === undefined ) return this;
+
+		this._attributeNames.splice( this._attributeNames.indexOf( name ), 1 );
+
+		var attributes = Object.assign( {}, this._attributes );
+
+		delete attributes[ name ];
+
+		this._attributes = Object.freeze( attributes );
 
 		return this;
 
@@ -134,7 +151,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	applyMatrix: function ( matrix ) {
 
-		var position = this.attributes.position;
+		var position = this._attributes.position;
 
 		if ( position !== undefined ) {
 
@@ -143,7 +160,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		var normal = this.attributes.normal;
+		var normal = this._attributes.normal;
 
 		if ( normal !== undefined ) {
 
@@ -154,7 +171,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		var tangent = this.attributes.tangent;
+		var tangent = this._attributes.tangent;
 
 		if ( tangent !== undefined ) {
 
@@ -412,7 +429,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( geometry.verticesNeedUpdate === true ) {
 
-			attribute = this.attributes.position;
+			attribute = this._attributes.position;
 
 			if ( attribute !== undefined ) {
 
@@ -427,7 +444,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( geometry.normalsNeedUpdate === true ) {
 
-			attribute = this.attributes.normal;
+			attribute = this._attributes.normal;
 
 			if ( attribute !== undefined ) {
 
@@ -442,7 +459,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( geometry.colorsNeedUpdate === true ) {
 
-			attribute = this.attributes.color;
+			attribute = this._attributes.color;
 
 			if ( attribute !== undefined ) {
 
@@ -457,7 +474,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( geometry.uvsNeedUpdate ) {
 
-			attribute = this.attributes.uv;
+			attribute = this._attributes.uv;
 
 			if ( attribute !== undefined ) {
 
@@ -472,7 +489,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( geometry.lineDistancesNeedUpdate ) {
 
-			attribute = this.attributes.lineDistance;
+			attribute = this._attributes.lineDistance;
 
 			if ( attribute !== undefined ) {
 
@@ -611,7 +628,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			}
 
-			var position = this.attributes.position;
+			var position = this._attributes.position;
 			var morphAttributesPosition = this.morphAttributes.position;
 
 			if ( position !== undefined ) {
@@ -664,7 +681,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			}
 
-			var position = this.attributes.position;
+			var position = this._attributes.position;
 			var morphAttributesPosition = this.morphAttributes.position;
 
 			if ( position ) {
@@ -748,14 +765,11 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	computeVertexNormals: function () {
 
-		var index = this.index;
-		var attributes = this.attributes;
+		if ( this._attributes.position ) {
 
-		if ( attributes.position ) {
+			var positions = this._attributes.position.array;
 
-			var positions = attributes.position.array;
-
-			if ( attributes.normal === undefined ) {
+			if ( this._attributes.normal === undefined ) {
 
 				this.addAttribute( 'normal', new BufferAttribute( new Float32Array( positions.length ), 3 ) );
 
@@ -763,7 +777,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				// reset existing normals to zero
 
-				var array = attributes.normal.array;
+				var array = this._attributes.normal.array;
 
 				for ( var i = 0, il = array.length; i < il; i ++ ) {
 
@@ -773,7 +787,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			}
 
-			var normals = attributes.normal.array;
+			var normals = this._attributes.normal.array;
 
 			var vA, vB, vC;
 			var pA = new Vector3(), pB = new Vector3(), pC = new Vector3();
@@ -781,11 +795,11 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			// indexed elements
 
-			if ( index ) {
+			if ( this._index ) {
 
-				var indices = index.array;
+				var indices = this._index.array;
 
-				for ( var i = 0, il = index.count; i < il; i += 3 ) {
+				for ( var i = 0, il = this._index.count; i < il; i += 3 ) {
 
 					vA = indices[ i + 0 ] * 3;
 					vB = indices[ i + 1 ] * 3;
@@ -845,7 +859,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			this.normalizeNormals();
 
-			attributes.normal.needsUpdate = true;
+			this._attributes.normal.needsUpdate = true;
 
 		}
 
@@ -871,16 +885,16 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		var attributes = this.attributes;
+		var attributes = this._attributes;
 
 		for ( var key in attributes ) {
 
-			if ( geometry.attributes[ key ] === undefined ) continue;
+			if ( geometry._attributes[ key ] === undefined ) continue;
 
 			var attribute1 = attributes[ key ];
 			var attributeArray1 = attribute1.array;
 
-			var attribute2 = geometry.attributes[ key ];
+			var attribute2 = geometry._attributes[ key ];
 			var attributeArray2 = attribute2.array;
 
 			var attributeSize = attribute2.itemSize;
@@ -903,7 +917,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return function normalizeNormals() {
 
-			var normals = this.attributes.normal;
+			var normals = this._attributes.normal;
 
 			for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
@@ -950,7 +964,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		//
 
-		if ( this.index === null ) {
+		if ( this._index === null ) {
 
 			console.warn( 'THREE.BufferGeometry.toNonIndexed(): Geometry is already non-indexed.' );
 			return this;
@@ -959,8 +973,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		var geometry2 = new BufferGeometry();
 
-		var indices = this.index.array;
-		var attributes = this.attributes;
+		var indices = this._index.array;
+		var attributes = this._attributes;
 
 		// attributes
 
@@ -1045,7 +1059,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		data.data = { attributes: {} };
 
-		var index = this.index;
+		var index = this._index;
 
 		if ( index !== null ) {
 
@@ -1056,7 +1070,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		var attributes = this.attributes;
+		var attributes = this._attributes;
 
 		for ( var key in attributes ) {
 
@@ -1172,8 +1186,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// reset
 
-		this.index = null;
-		this.attributes = {};
+		this._index = null;
+		this._attributes = {};
 		this.morphAttributes = {};
 		this.groups = [];
 		this.boundingBox = null;
@@ -1185,7 +1199,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// index
 
-		var index = source.index;
+		var index = source._index;
 
 		if ( index !== null ) {
 
@@ -1195,7 +1209,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// attributes
 
-		var attributes = source.attributes;
+		var attributes = source._attributes;
 
 		for ( name in attributes ) {
 
@@ -1275,5 +1289,61 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 } );
 
+var warned = {
+	attributesGet: false,
+	indexGet: false,
+	indexSet: false
+};
+
+Object.defineProperties( BufferGeometry.prototype, {
+
+	attributes: {
+
+		get: function () {
+
+			if ( ! warned.attributesGet ) {
+
+				console.warn( 'THREE.BufferGeometry: Please use .getAttribute(), .addAttribute(), or .removeAttribute() instead of .attributes' );
+				warned.attributesGet = true;
+
+			}
+
+			return this._attributes;
+
+		}
+
+	},
+
+	index: {
+
+		get: function () {
+
+			if ( ! warned.indexGet ) {
+
+				console.warn( 'THREE.BufferGeometry: Please use .getIndex() instead of .index.' );
+				warned.indexGet = true;
+
+			}
+
+			return this.getIndex();
+
+		},
+
+		set: function ( value ) {
+
+			if ( ! warned.indexSet ) {
+
+				console.warn( 'THREE.BufferGeometry: Please use .setIndex() instead of .index = foo.' );
+				warned.indexSet = true;
+
+			}
+
+			this.setIndex( value );
+
+		}
+
+	}
+
+} );
 
 export { BufferGeometry };

@@ -32,7 +32,7 @@ function VertexNormalsHelper( object, size, hex, linewidth ) {
 
 	} else if ( objGeometry && objGeometry.isBufferGeometry ) {
 
-		nNormals = objGeometry.attributes.normal.count;
+		nNormals = objGeometry._attributes.normal.count;
 
 	}
 
@@ -73,7 +73,7 @@ VertexNormalsHelper.prototype.update = ( function () {
 
 		var matrixWorld = this.object.matrixWorld;
 
-		var position = this.geometry.attributes.position;
+		var position = this.geometry._attributes.position;
 
 		//
 
@@ -115,9 +115,9 @@ VertexNormalsHelper.prototype.update = ( function () {
 
 		} else if ( objGeometry && objGeometry.isBufferGeometry ) {
 
-			var objPos = objGeometry.attributes.position;
+			var objPos = objGeometry._attributes.position;
 
-			var objNorm = objGeometry.attributes.normal;
+			var objNorm = objGeometry._attributes.normal;
 
 			var idx = 0;
 

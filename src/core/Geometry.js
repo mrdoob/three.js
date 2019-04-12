@@ -217,8 +217,8 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var scope = this;
 
-		var indices = geometry.index !== null ? geometry.index.array : undefined;
-		var attributes = geometry.attributes;
+		var indices = geometry._index !== null ? geometry._index.array : undefined;
+		var attributes = geometry._attributes;
 
 		var positions = attributes.position.array;
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;

@@ -72,7 +72,7 @@ FaceNormalsHelper.prototype.update = ( function () {
 
 		var matrixWorld = this.object.matrixWorld;
 
-		var position = this.geometry.attributes.position;
+		var position = this.geometry._attributes.position;
 
 		//
 

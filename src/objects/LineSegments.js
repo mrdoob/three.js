@@ -33,9 +33,9 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 				// we assume non-indexed geometry
 
-				if ( geometry.index === null ) {
+				if ( geometry._index === null ) {
 
-					var positionAttribute = geometry.attributes.position;
+					var positionAttribute = geometry._attributes.position;
 					var lineDistances = [];
 
 					for ( var i = 0, l = positionAttribute.count; i < l; i += 2 ) {

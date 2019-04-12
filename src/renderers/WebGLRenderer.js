@@ -725,8 +725,8 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var index = geometry.index;
-		var position = geometry.attributes.position;
+		var index = geometry._index;
+		var position = geometry._attributes.position;
 		var rangeFactor = 1;
 
 		if ( material.wireframe === true ) {
@@ -880,7 +880,7 @@ function WebGLRenderer( parameters ) {
 
 		state.initAttributes();
 
-		var geometryAttributes = geometry.attributes;
+		var geometryAttributes = geometry._attributes;
 
 		var programAttributes = program.getAttributes();
 

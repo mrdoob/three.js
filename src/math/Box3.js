@@ -245,7 +245,7 @@ Object.assign( Box3.prototype, {
 
 				} else if ( geometry.isBufferGeometry ) {
 
-					var attribute = geometry.attributes.position;
+					var attribute = geometry._attributes.position;
 
 					if ( attribute !== undefined ) {
 

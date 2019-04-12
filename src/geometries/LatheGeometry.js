@@ -140,7 +140,7 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	if ( phiLength === Math.PI * 2 ) {
 
-		var normals = this.attributes.normal.array;
+		var normals = this._attributes.normal.array;
 		var n1 = new Vector3();
 		var n2 = new Vector3();
 		var n = new Vector3();

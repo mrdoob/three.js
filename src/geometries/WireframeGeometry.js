@@ -77,12 +77,12 @@ function WireframeGeometry( geometry ) {
 
 		vertex = new Vector3();
 
-		if ( geometry.index !== null ) {
+		if ( geometry._index !== null ) {
 
 			// indexed BufferGeometry
 
-			position = geometry.attributes.position;
-			indices = geometry.index;
+			position = geometry._attributes.position;
+			indices = geometry._index;
 			groups = geometry.groups;
 
 			if ( groups.length === 0 ) {
@@ -141,7 +141,7 @@ function WireframeGeometry( geometry ) {
 
 			// non-indexed BufferGeometry
 
-			position = geometry.attributes.position;
+			position = geometry._attributes.position;
 
 			for ( i = 0, l = ( position.count / 3 ); i < l; i ++ ) {
 

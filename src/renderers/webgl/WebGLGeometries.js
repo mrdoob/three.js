@@ -16,15 +16,15 @@ function WebGLGeometries( gl, attributes, info ) {
 		var geometry = event.target;
 		var buffergeometry = geometries[ geometry.id ];
 
-		if ( buffergeometry.index !== null ) {
+		if ( buffergeometry._index !== null ) {
 
-			attributes.remove( buffergeometry.index );
+			attributes.remove( buffergeometry._index );
 
 		}
 
-		for ( var name in buffergeometry.attributes ) {
+		for ( var name in buffergeometry._attributes ) {
 
-			attributes.remove( buffergeometry.attributes[ name ] );
+			attributes.remove( buffergeometry._attributes[ name ] );
 
 		}
 
@@ -81,8 +81,8 @@ function WebGLGeometries( gl, attributes, info ) {
 
 	function update( geometry ) {
 
-		var index = geometry.index;
-		var geometryAttributes = geometry.attributes;
+		var index = geometry._index;
+		var geometryAttributes = geometry._attributes;
 
 		if ( index !== null ) {
 
@@ -122,8 +122,8 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		var indices = [];
 
-		var geometryIndex = geometry.index;
-		var geometryAttributes = geometry.attributes;
+		var geometryIndex = geometry._index;
+		var geometryAttributes = geometry._attributes;
 
 		// console.time( 'wireframe' );
 
