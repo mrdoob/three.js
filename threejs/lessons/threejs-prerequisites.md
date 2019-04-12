@@ -201,9 +201,10 @@ somemesh.position.set(...position);
 
 ### Use `class`
 
-The syntax for making class like objects pre ES5 was unfamilar to most programmers.
-As of ES5 you can now [use the `class` keyword](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes) which
-is closer to the style of C++/C#/Java.
+The syntax for making class like objects pre ES5 was unfamiliar to most
+programmers. As of ES5 you can now [use the `class`
+keyword](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes)
+which is closer to the style of C++/C#/Java.
 
 ### Understand getters and setters
 
@@ -281,31 +282,46 @@ const bWidth = 20;
 someElement.style.width = `${aWidth + bWidth}px`;
 ```
 
-# Learn JavaScript coding convensions.
+# Learn JavaScript coding conventions.
 
-While you're welcome to format your code any way you chose there is at least one convension you should be aware of. Variables, function names, method names, in JavaScript are all lowercasedCamelCase. Constructors, the names of classes are CapitalizedCamelCase. If you follow this rule you code will match most other JavaScript.
+While you're welcome to format your code any way you chose there is at least one
+convention you should be aware of. Variables, function names, method names, in
+JavaScript are all lowercasedCamelCase. Constructors, the names of classes are
+CapitalizedCamelCase. If you follow this rule you code will match most other
+JavaScript.
 
 # Consider using Visual Studio Code
 
-Of course use whatever editor you want but if you haven't tried it consider using [Visual Studio Code](https://code.visualstudio.com/)
-for JavaScript and after installing it [setup eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
-It might take a few minutes to setup but it will help you immensely with finding bugs in your JavaScript.
+Of course use whatever editor you want but if you haven't tried it consider
+using [Visual Studio Code](https://code.visualstudio.com/) for JavaScript and
+after installing it [setup
+eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
+It might take a few minutes to setup but it will help you immensely with finding
+bugs in your JavaScript.
 
 Some examples
 
-If you enable [the `no-undef` rule](https://eslint.org/docs/rules/no-undef) then VSCode via ESLint will warn you of many undefined variables. 
+If you enable [the `no-undef` rule](https://eslint.org/docs/rules/no-undef) then
+VSCode via ESLint will warn you of many undefined variables. 
 
 <div class="threejs_center"><img style="width: 615px;" src="resources/images/vscode-eslint-not-defined.png"></div>
 
-Above you can see I mis-spelled `doTheThing` as `doThing`. There's a red squigle under `doThing` and hovering over it it tells me it's undefined. One error avoided.
+Above you can see I mis-spelled `doTheThing` as `doThing`. There's a red squiggle
+under `doThing` and hovering over it it tells me it's undefined. One error
+avoided.
 
-You'll get warnings using `THREE` so add `/* global THREE */` at the top of your JavaScript files to tell eslint that `THREE` exists.
+You'll get warnings using `THREE` so add `/* global THREE */` at the top of your
+JavaScript files to tell eslint that `THREE` exists.
 
 <div class="threejs_center"><img style="width: 615px;" src="resources/images/vscode-eslint-not-a-constructor.png"></div>
 
-Above you can see eslint knows the rule that `UpperCaseNames` are constructors and so you should be using `new`. Another error caught and avoided. This is [the `new-cap` rule](https://eslint.org/docs/rules/new-cap).
+Above you can see eslint knows the rule that `UpperCaseNames` are constructors
+and so you should be using `new`. Another error caught and avoided. This is [the
+`new-cap` rule](https://eslint.org/docs/rules/new-cap).
 
-There are [100s of rules you can turn on or off or customize](https://eslint.org/docs/rules/). For example above I mentioned you should use `const` and `let` over `var`.
+There are [100s of rules you can turn on or off or
+customize](https://eslint.org/docs/rules/). For example above I mentioned you
+should use `const` and `let` over `var`.
 
 Here I used `var` and it warned me I should use `let` or `const`
 
@@ -315,9 +331,14 @@ Here I used `let` but it saw I never change the value so it suggested I use `con
 
 <div class="threejs_center"><img style="width: 615px;" src="resources/images/vscode-eslint-let.png"></div>
 
-Of course if you'd prefer to keep using `var` you can just turn off that rule. As I said above though I prefer to use `const` and `let` over `var` as they just work better and prevent bugs.
+Of course if you'd prefer to keep using `var` you can just turn off that rule.
+As I said above though I prefer to use `const` and `let` over `var` as they just
+work better and prevent bugs.
 
-For those cases where you really need to override a rule [you can add comments to disable them](https://eslint.org/docs/user-guide/configuring#disabling-rules-with-inline-comments) for a single line or a section of code.
+For those cases where you really need to override a rule [you can add comments
+to disable
+them](https://eslint.org/docs/user-guide/configuring#disabling-rules-with-inline-comments)
+for a single line or a section of code.
 
 # If you really need to support legacy browsers use a transpiler
 
