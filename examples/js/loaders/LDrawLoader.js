@@ -271,18 +271,6 @@ THREE.LDrawLoader = ( function () {
 
 			}, onProgress, onError );
 
-			function subobjectLoad( url, onLoad, onProgress, onError, subobject ) {
-
-				var fileLoader = new THREE.FileLoader( scope.manager );
-				fileLoader.setPath( scope.path );
-				fileLoader.load( url, function ( text ) {
-
-					processObject( text, onLoad, subobject );
-
-				}, onProgress, onError );
-
-			}
-
 			function processObject( text, onProcessed, subobject ) {
 
 				var parseScope = scope.newParseScopeLevel();
