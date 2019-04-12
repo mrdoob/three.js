@@ -276,6 +276,7 @@
 
 				var name = param.example;
 				var mtl;
+				var defaultSide = THREE.DoubleSide;
 
 				clearGui();
 
@@ -453,7 +454,7 @@
 
 							// apply material
 
-							mtl.side = THREE.DoubleSide;
+							mtl.side = defaultSide;
 							mtl.needsUpdate = true;
 
 							mesh.material = mtl;
@@ -763,6 +764,8 @@
 						// MATERIAL
 
 						mtl = new THREE.PhongNodeMaterial();
+
+						defaultSide = THREE.FrontSide;
 
 						var intensity = 1.3;
 						var power = new THREE.FloatNode( 3 );
@@ -1536,6 +1539,8 @@
 						// MATERIAL
 
 						mtl = new THREE.PhongNodeMaterial();
+
+						defaultSide = THREE.FrontSide;
 
 						var time = new THREE.TimerNode();
 						var uv = new THREE.UVNode();
@@ -2848,7 +2853,7 @@
 
 				// set material
 
-				mtl.side = THREE.DoubleSide;
+				mtl.side = defaultSide;
 
 				mesh.material = mtl;
 
