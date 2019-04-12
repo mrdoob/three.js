@@ -100,7 +100,7 @@ function createIndexedBufferGeometry( vertList, idxList ) {
 
 function addDrawCalls( geometry ) {
 
-	var numTris = geometry.index.count / 3;
+	var numTris = geometry.getIndex().count / 3;
 
 	for ( var i = 0; i < numTris; i ++ ) {
 
@@ -129,7 +129,7 @@ function countEdges( geom ) {
 
 	}
 
-	var indices = geom.index;
+	var indices = geom.getIndex();
 	if ( indices ) {
 
 		return indices.count;

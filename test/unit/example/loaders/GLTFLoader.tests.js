@@ -39,13 +39,13 @@ export default QUnit.module( 'Loaders', () => {
 				loader.parse( binary, './', function ( gltf ) {
 
 					var meshOut = gltf.scene.children[ 0 ];
-					var attrsIn = meshIn.geometry.attributes;
-					var attrsOut = meshOut.geometry.attributes;
+					var geometryIn = meshIn.geometry;
+					var geometryOut = meshOut.geometry;
 
 					assert.equal( meshIn.name, meshOut.name, 'loads names' );
 					assert.equal( meshIn.material.color.getHex(), meshOut.material.color.getHex(), 'loads color' );
-					assert.smartEqual( attrsIn.position.array, attrsOut.position.array, 'loads positions' );
-					assert.equal( undefined, attrsOut.normal, 'ignores missing attributes' );
+					assert.smartEqual( geometryIn.getAttribute( 'position' ).array, geometryOut.getAttribute( 'position' ).array, 'loads positions' );
+					assert.equal( undefined, geometryOut.getAttribute( 'normal' ), 'ignores missing attributes' );
 
 					done();
 

@@ -59,12 +59,12 @@ export default QUnit.module( 'Core', () => {
 
 			assert.ok( copiedInstance instanceof InstancedBufferGeometry, "the clone has the correct type" );
 
-			assert.equal( copiedInstance.index, indexMock, "index was copied" );
-			assert.equal( copiedInstance.index.callCount, 1, "index.clone was called once" );
+			assert.equal( copiedInstance.getIndex(), indexMock, "index was copied" );
+			assert.equal( copiedInstance.getIndex().callCount, 1, "index.clone was called once" );
 
-			assert.ok( copiedInstance.attributes[ 'defaultAttribute1' ] instanceof BufferAttribute, "attribute was created" );
-			assert.deepEqual( copiedInstance.attributes[ 'defaultAttribute1' ].array, defaultAttribute1.array, "attribute was copied" );
-			assert.deepEqual( copiedInstance.attributes[ 'defaultAttribute2' ].array, defaultAttribute2.array, "attribute was copied" );
+			assert.ok( copiedInstance.getAttribute( 'defaultAttribute1' ) instanceof BufferAttribute, "attribute was created" );
+			assert.deepEqual( copiedInstance.getAttribute( 'defaultAttribute1' ).array, defaultAttribute1.array, "attribute was copied" );
+			assert.deepEqual( copiedInstance.getAttribute( 'defaultAttribute2' ).array, defaultAttribute2.array, "attribute was copied" );
 
 			assert.equal( copiedInstance.groups[ 0 ].start, 0, "group was copied" );
 			assert.equal( copiedInstance.groups[ 0 ].count, 10, "group was copied" );

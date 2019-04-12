@@ -55,8 +55,8 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
     var mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries( [ geometry1, geometry2 ] );
 
     assert.ok( mergedGeometry, 'merge succeeds' );
-    assert.smartEqual( Array.from( mergedGeometry.attributes.position.array ), [ 1, 2, 3, 4, 5, 6 ], 'merges elements' );
-    assert.equal( mergedGeometry.attributes.position.itemSize, 1, 'retains .itemSize' );
+    assert.smartEqual( Array.from( mergedGeometry.getAttribute( 'position' ).array ), [ 1, 2, 3, 4, 5, 6 ], 'merges elements' );
+    assert.equal( mergedGeometry.getAttribute( 'position' ).itemSize, 1, 'retains .itemSize' );
 
   } );
 
@@ -73,9 +73,9 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
     var mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries( [ geometry1, geometry2 ] );
 
     assert.ok( mergedGeometry, 'merge succeeds' );
-    assert.smartEqual( Array.from( mergedGeometry.attributes.position.array ), [ 1, 2, 3, 4, 5, 6 ], 'merges elements' );
-    assert.smartEqual( Array.from( mergedGeometry.index.array ), [ 0, 1, 2, 2, 1, 0, 3, 4, 5 ], 'merges indices' );
-    assert.equal( mergedGeometry.attributes.position.itemSize, 1, 'retains .itemSize' );
+    assert.smartEqual( Array.from( mergedGeometry.getAttribute( 'position' ).array ), [ 1, 2, 3, 4, 5, 6 ], 'merges elements' );
+    assert.smartEqual( Array.from( mergedGeometry.getIndex().array ), [ 0, 1, 2, 2, 1, 0, 3, 4, 5 ], 'merges indices' );
+    assert.equal( mergedGeometry.getAttribute( 'position' ).itemSize, 1, 'retains .itemSize' );
 
   } );
 
@@ -98,10 +98,10 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
     var mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries( [ geometry1, geometry2 ] );
 
     assert.ok( mergedGeometry, 'merge succeeds' );
-    assert.smartEqual( Array.from( mergedGeometry.attributes.position.array ), [ 1, 2, 3, 4, 5, 6 ], 'merges elements' );
+    assert.smartEqual( Array.from( mergedGeometry.getAttribute( 'position' ).array ), [ 1, 2, 3, 4, 5, 6 ], 'merges elements' );
     assert.smartEqual( Array.from( mergedGeometry.morphAttributes.position[ 0 ].array ), [ 10, 20, 30, 40, 50, 60 ], 'merges morph targets' );
     assert.smartEqual( Array.from( mergedGeometry.morphAttributes.position[ 1 ].array ), [ 100, 200, 300, 400, 500, 600 ], 'merges morph targets' );
-    assert.equal( mergedGeometry.attributes.position.itemSize, 1, 'retains .itemSize' );
+    assert.equal( mergedGeometry.getAttribute( 'position' ).itemSize, 1, 'retains .itemSize' );
 
   } );
 
