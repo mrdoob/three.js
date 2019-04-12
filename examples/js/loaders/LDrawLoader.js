@@ -308,36 +308,32 @@ THREE.LDrawLoader = ( function () {
 				parseScope.numSubobjects = parseScope.subobjects.length;
 				parseScope.subobjectIndex = 0;
 
-				if ( parseScope.numSubobjects > 0 ) {
+				var finishedCount = 0;
+				onSubobjectFinish();
 
-					// Load the first subobject
-					var subobjectGroup = loadSubobject( parseScope.subobjects[ 0 ], true );
+				return objGroup;
 
-					// Optimization for loading pack: If subobjects are obtained from cache, keep loading them iteratively rather than recursively
-					if ( subobjectGroup ) {
+				function onSubobjectFinish() {
 
-						while ( subobjectGroup && parseScope.subobjectIndex < parseScope.numSubobjects - 1 ) {
+					finishedCount ++;
 
-							subobjectGroup = loadSubobject( parseScope.subobjects[ ++ parseScope.subobjectIndex ], true );
+					if ( finishedCount === parseScope.subobjects.length + 1 ) {
 
-						}
+						finalizeObject();
 
-						if ( subobjectGroup ) {
+					} else {
 
-							finalizeObject();
+						var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
+						Promise.resolve().then( function () {
 
-						}
+							loadSubobject( subobject );
+
+						} );
+						parseScope.subobjectIndex ++;
 
 					}
 
-				} else {
-
-					// No subobjects, finish object
-					finalizeObject();
-
 				}
-
-				return objGroup;
 
 				function finalizeObject() {
 
@@ -368,7 +364,7 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				function loadSubobject( subobject, sync ) {
+				function loadSubobject( subobject ) {
 
 					parseScope.mainColourCode = subobject.material.userData.code;
 					parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
@@ -382,16 +378,15 @@ THREE.LDrawLoader = ( function () {
 					}
 
 					// If subobject was cached previously, use the cached one
-					var cached = scope.subobjectCache[ subobject.originalFileName ];
+					var cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
 					if ( cached ) {
 
-						var subobjectGroup = processObject( cached, sync ? undefined : onSubobjectLoaded, subobject );
-						if ( sync ) {
+						processObject( cached, function ( subobjectGroup ) {
 
-							addSubobject( subobject, subobjectGroup );
-							return subobjectGroup;
+							onSubobjectLoaded( subobjectGroup, subobject );
+							onSubobjectFinish();
 
-						}
+						}, subobject );
 
 						return;
 
@@ -451,22 +446,6 @@ THREE.LDrawLoader = ( function () {
 							// All location possibilities have been tried, give up loading this object
 							console.warn( 'LDrawLoader: Subobject "' + subobject.originalFileName + '" could not be found.' );
 
-							// Try to read the next subobject
-							parseScope.subobjectIndex ++;
-
-							if ( parseScope.subobjectIndex >= parseScope.numSubobjects ) {
-
-								// All subojects have been loaded. Finish parent object
-								scope.removeScopeLevel();
-								onProcessed( objGroup );
-
-							} else {
-
-								// Load next subobject
-								loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
-
-							}
-
 							return;
 
 					}
@@ -481,15 +460,22 @@ THREE.LDrawLoader = ( function () {
 					fileLoader.setPath( scope.path );
 					fileLoader.load( subobjectURL, function ( text ) {
 
-						processObject( text, onSubobjectLoaded, subobject );
+						processObject( text, function ( subobjectGroup ) {
 
-					}, undefined, onSubobjectError );
+							onSubobjectLoaded( subobjectGroup, subobject );
+							onSubobjectFinish();
+
+						}, subobject );
+
+					}, undefined, function ( err ) {
+
+						onSubobjectError( err, subobject );
+
+					}, subobject );
 
 				}
 
-				function onSubobjectLoaded( subobjectGroup ) {
-
-					var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
+				function onSubobjectLoaded( subobjectGroup, subobject ) {
 
 					if ( subobjectGroup === null ) {
 
@@ -501,20 +487,6 @@ THREE.LDrawLoader = ( function () {
 
 					// Add the subobject just loaded
 					addSubobject( subobject, subobjectGroup );
-
-					// Proceed to load the next subobject, or finish the parent object
-
-					parseScope.subobjectIndex ++;
-
-					if ( parseScope.subobjectIndex < parseScope.numSubobjects ) {
-
-						loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
-
-					} else {
-
-						finalizeObject();
-
-					}
 
 				}
 
@@ -533,10 +505,10 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				function onSubobjectError( err ) {
+				function onSubobjectError( err, subobject ) {
 
 					// Retry download from a different default possible location
-					loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
+					loadSubobject( subobject );
 
 				}
 
@@ -1074,7 +1046,7 @@ THREE.LDrawLoader = ( function () {
 						this.subobjectCache[ currentEmbeddedFileName ] = currentEmbeddedText;
 
 						// New embedded text file
-						currentEmbeddedFileName = line.substring( 7 );
+						currentEmbeddedFileName = line.substring( 7 ).toLowerCase();
 						currentEmbeddedText = '';
 
 					} else {
