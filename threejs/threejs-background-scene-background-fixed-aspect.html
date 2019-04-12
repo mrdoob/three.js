@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Three.js - Background Cubemap</title>
+    <title>Three.js - Background - Scene Background Fixed Aspect</title>
     <style>
     body {
         margin: 0;
@@ -20,7 +20,6 @@
     <canvas id="c"></canvas>
   </body>
 <script src="resources/threejs/r103/three.min.js"></script>
-<script src="resources/threejs/r103/js/controls/OrbitControls.js"></script>
 <script>
 'use strict';
 
@@ -34,13 +33,9 @@ function main() {
   const fov = 75;
   const aspect = 2;  // the canvas default
   const near = 0.1;
-  const far = 100;
+  const far = 5;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 3;
-
-  const controls = new THREE.OrbitControls(camera, canvas);
-  controls.target.set(0, 0, 0);
-  controls.update();
+  camera.position.z = 2;
 
   const scene = new THREE.Scene();
 
@@ -74,18 +69,9 @@ function main() {
     makeInstance(geometry, 0xaa8844,  2),
   ];
 
-  {
-    const loader = new THREE.CubeTextureLoader();
-    const texture = loader.load([
-      'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
-      'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
-      'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
-      'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
-      'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
-      'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
-    ]);
-    scene.background = texture;
-  }
+  const loader = new THREE.TextureLoader();
+  const bgTexture = loader.load('resources/images/daikanyama.jpg');
+  scene.background = bgTexture;
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -106,6 +92,19 @@ function main() {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
     }
+
+    // Set the repeat and offset properties of the background texture
+    // to keep the image's aspect correct.
+    // Note the image may not have loaded yet.
+    const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+    const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+    const aspect = imageAspect / canvasAspect;
+
+    bgTexture.offset.x = aspect > 1 ? (1 - 1 / aspect) / 2 : 0;
+    bgTexture.repeat.x = aspect > 1 ? 1 / aspect : 1;
+
+    bgTexture.offset.y = aspect > 1 ? 0 : (1 - aspect) / 2;
+    bgTexture.repeat.y = aspect > 1 ? 1 : aspect;
 
     cubes.forEach((cube, ndx) => {
       const speed = 1 + ndx * .1;
