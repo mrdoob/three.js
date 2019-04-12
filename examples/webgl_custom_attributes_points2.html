@@ -251,7 +251,7 @@
 
 			}
 
-			geometry.index.needsUpdate = true;
+			geometry.getIndex().needsUpdate = true;
 
 		}
 
@@ -272,19 +272,19 @@
 			sphere.rotation.z = 0.02 * time;
 
 			var geometry = sphere.geometry;
-			var attributes = geometry.attributes;
+			var sizeAttribute = geometry.getAttribute( 'size' );
 
-			for ( var i = 0; i < attributes.size.array.length; i ++ ) {
+			for ( var i = 0, il = sizeAttribute.array.length; i < il; i ++ ) {
 
 				if ( i < length1 ) {
 
-					attributes.size.array[ i ] = 16 + 12 * Math.sin( 0.1 * i + time );
+					sizeAttribute.array[ i ] = 16 + 12 * Math.sin( 0.1 * i + time );
 
 				}
 
 			}
 
-			attributes.size.needsUpdate = true;
+			sizeAttribute.needsUpdate = true;
 
 			sortPoints();
 

@@ -226,9 +226,9 @@
 
 				// Creates ammoVertices, ammoIndices and ammoIndexAssociation in bufGeometry
 
-				var vertices = bufGeometry.attributes.position.array;
-				var idxVertices = indexedBufferGeom.attributes.position.array;
-				var indices = indexedBufferGeom.index.array;
+				var vertices = bufGeometry.getAttribute( 'position' ).array;
+				var idxVertices = indexedBufferGeom.getAttribute( 'position' ).array;
+				var indices = indexedBufferGeom.getIndex().array;
 
 				var numIdxVertices = idxVertices.length / 3;
 				var numVertices = vertices.length / 3;
@@ -453,8 +453,8 @@
 					var volume = softBodies[ i ];
 					var geometry = volume.geometry;
 					var softBody = volume.userData.physicsBody;
-					var volumePositions = geometry.attributes.position.array;
-					var volumeNormals = geometry.attributes.normal.array;
+					var volumePositions = geometry.getAttribute( 'position' ).array;
+					var volumeNormals = geometry.getAttribute( 'normal' ).array;
 					var association = geometry.ammoIndexAssociation;
 					var numVerts = association.length;
 					var nodes = softBody.get_m_nodes();
@@ -488,8 +488,8 @@
 
 					}
 
-					geometry.attributes.position.needsUpdate = true;
-					geometry.attributes.normal.needsUpdate = true;
+					geometry.getAttribute( 'position' ).needsUpdate = true;
+					geometry.getAttribute( 'normal' ).needsUpdate = true;
 
 				}
 

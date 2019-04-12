@@ -211,7 +211,7 @@
 				particles.rotation.y += 0.001;
 
 				var geometry = particles.geometry;
-				var attributes = geometry.attributes;
+				var sizeAttribute = geometry.getAttribute( 'size' );
 
 				raycaster.setFromCamera( mouse, camera );
 
@@ -221,19 +221,19 @@
 
 					if ( INTERSECTED != intersects[ 0 ].index ) {
 
-						attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
+						sizeAttribute.array[ INTERSECTED ] = PARTICLE_SIZE;
 
 						INTERSECTED = intersects[ 0 ].index;
 
-						attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE * 1.25;
-						attributes.size.needsUpdate = true;
+						sizeAttribute.array[ INTERSECTED ] = PARTICLE_SIZE * 1.25;
+						sizeAttribute.needsUpdate = true;
 
 					}
 
 				} else if ( INTERSECTED !== null ) {
 
-					attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
-					attributes.size.needsUpdate = true;
+					sizeAttribute.array[ INTERSECTED ] = PARTICLE_SIZE;
+					sizeAttribute.needsUpdate = true;
 					INTERSECTED = null;
 
 				}

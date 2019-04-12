@@ -164,9 +164,9 @@
 						mesh.scale.set( 50, 50, 50 );
 						scene.add( mesh );
 
-						console.log( geometry.index ? 'indexed geometry' : 'non-indexed geometry' );
-						console.log( '# of vertices: ' + geometry.attributes.position.count );
-						console.log( '# of polygons: ' + ( geometry.index ? geometry.index.count / 3 : geometry.attributes.position.count / 3 ) );
+						console.log( geometry.getIndex() ? 'indexed geometry' : 'non-indexed geometry' );
+						console.log( '# of vertices: ' + geometry.getAttribute( 'position' ).count );
+						console.log( '# of polygons: ' + ( geometry.getIndex() ? geometry.getIndex().count / 3 : geometry.getAttribute( 'position' ).count / 3 ) );
 						busy = false;
 
 					}, onProgress, onError );
