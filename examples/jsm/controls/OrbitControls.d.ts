@@ -13,27 +13,38 @@ export class OrbitControls {
   // deprecated
   center: Vector3;
 
-  enableZoom: boolean;
-  zoomSpeed: number;
   minDistance: number;
   maxDistance: number;
-  enableRotate: boolean;
-  rotateSpeed: number;
-  enablePan: boolean;
-  keyPanSpeed: number;
-  autoRotate: boolean;
-  autoRotateSpeed: number;
+	
+	minZoom: number;
+	maxZoom: number;
+	
   minPolarAngle: number;
   maxPolarAngle: number;
-  minAzimuthAngle: number;
+	
+	minAzimuthAngle: number;
   maxAzimuthAngle: number;
+	
+	enableDamping: boolean;
+  dampingFactor: number;
+	
+	enableZoom: boolean;
+  zoomSpeed: number;
+	
+	enableRotate: boolean;
+  rotateSpeed: number;
+	
+  enablePan: boolean;
+	panSpeed: number;
+	screenSpacePanning: boolean;
+  keyPanSpeed: number;
+	
+  autoRotate: boolean;
+  autoRotateSpeed: number;
+
   enableKeys: boolean;
   keys: {LEFT: number; UP: number; RIGHT: number; BOTTOM: number;};
   mouseButtons: {ORBIT: MOUSE; ZOOM: MOUSE; PAN: MOUSE;};
-  enableDamping: boolean;
-  dampingFactor: number;
-  screenSpacePanning: boolean;
-
 
   rotateLeft(angle?: number): void;
 
