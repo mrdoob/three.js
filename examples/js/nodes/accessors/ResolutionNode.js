@@ -24,8 +24,8 @@ ResolutionNode.prototype.updateFrame = function ( frame ) {
 
 		var pixelRatio = frame.renderer.getPixelRatio();
 
-		this.x = size.width * pixelRatio;
-		this.y = size.height * pixelRatio;
+		this.x = this.size.width * pixelRatio;
+		this.y = this.size.height * pixelRatio;
 
 	} else {
 
