@@ -113,7 +113,8 @@
 						camera.position.copy( position );
 						camera.lookAt( position.add( normal ) );
 
-						renderer.render( clone, camera, rt );
+						renderer.setRenderTarget( rt );
+						renderer.render( clone, camera );
 
 						renderer.readRenderTargetPixels( rt, 0, 0, SIZE, SIZE, buffer );
 
@@ -243,6 +244,7 @@
 
 				requestAnimationFrame( animate );
 
+				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 
 			}

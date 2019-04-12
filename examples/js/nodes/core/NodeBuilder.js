@@ -443,9 +443,7 @@ NodeBuilder.prototype = {
 
 	},
 
-	getVar: function ( uuid, type, ns, shader ) {
-
-		shader = shader || 'varying';
+	getVar: function ( uuid, type, ns, shader = 'varying', prefix = 'V', label = '' ) {
 
 		var vars = this.getVars( shader ),
 			data = vars[ uuid ];
@@ -453,7 +451,7 @@ NodeBuilder.prototype = {
 		if ( ! data ) {
 
 			var index = vars.length,
-				name = ns ? ns : 'nVv' + index;
+				name = ns ? ns : 'node' + prefix + index + ( label ? '_' + label : '' );
 
 			data = { name: name, type: type };
 
@@ -466,9 +464,9 @@ NodeBuilder.prototype = {
 
 	},
 
-	getTempVar: function ( uuid, type, ns ) {
+	getTempVar: function ( uuid, type, ns, label ) {
 
-		return this.getVar( uuid, type, ns, this.shader );
+		return this.getVar( uuid, type, ns, this.shader, 'T', label );
 
 	},
 
@@ -551,14 +549,14 @@ NodeBuilder.prototype = {
 
 	},
 
-	createUniform: function ( shader, type, node, ns, needsUpdate ) {
+	createUniform: function ( shader, type, node, ns, needsUpdate, label ) {
 
 		var uniforms = this.inputs.uniforms,
 			index = uniforms.list.length;
 
 		var uniform = new NodeUniform( {
 			type: type,
-			name: ns ? ns : 'nVu' + index,
+			name: ns ? ns : 'nodeU' + index + ( label ? '_' + label : '' ),
 			node: node,
 			needsUpdate: needsUpdate
 		} );
@@ -574,15 +572,15 @@ NodeBuilder.prototype = {
 
 	},
 
-	createVertexUniform: function ( type, node, ns, needsUpdate ) {
+	createVertexUniform: function ( type, node, ns, needsUpdate, label ) {
 
-		return this.createUniform( 'vertex', type, node, ns, needsUpdate );
+		return this.createUniform( 'vertex', type, node, ns, needsUpdate, label );
 
 	},
 
-	createFragmentUniform: function ( type, node, ns, needsUpdate ) {
+	createFragmentUniform: function ( type, node, ns, needsUpdate, label ) {
 
-		return this.createUniform( 'fragment', type, node, ns, needsUpdate );
+		return this.createUniform( 'fragment', type, node, ns, needsUpdate, label );
 
 	},
 

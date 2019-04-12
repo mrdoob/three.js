@@ -6,7 +6,7 @@ export class DataTexture3D extends Texture {
   constructor(
     data: ArrayBuffer | TypedArray,
     width: number,
-    heighht: number,
-    depth?: number
+    height: number,
+    depth: number
   );
 }

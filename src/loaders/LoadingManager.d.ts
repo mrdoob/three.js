@@ -32,7 +32,7 @@ export class LoadingManager {
   constructor(
     onLoad?: () => void,
     onProgress?: (url: string, loaded: number, total: number) => void,
-    onError?: () => void
+    onError?: (url: string) => void
   );
 
   onStart?: (url: string, loaded: number, total: number) => void;

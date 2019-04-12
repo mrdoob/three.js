@@ -102,10 +102,10 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor: { type: "c", value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { type: "c", value: new THREE.Color( 0xffffff ) },
-					offset: { type: "f", value: 400 },
-					exponent: { type: "f", value: 0.6 }
+					topColor: { value: new THREE.Color( 0x0077ff ) },
+					bottomColor: { value: new THREE.Color( 0xffffff ) },
+					offset: { value: 400 },
+					exponent: { value: 0.6 }
 				};
 				uniforms.topColor.value.copy( light.color );
 

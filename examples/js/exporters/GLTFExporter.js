@@ -80,7 +80,8 @@ THREE.GLTFExporter.prototype = {
 			embedImages: true,
 			animations: [],
 			forceIndices: false,
-			forcePowerOfTwoTextures: false
+			forcePowerOfTwoTextures: false,
+			includeCustomExtensions: false
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -340,20 +341,49 @@ THREE.GLTFExporter.prototype = {
 		 * Serializes a userData.
 		 *
 		 * @param {THREE.Object3D|THREE.Material} object
-		 * @returns {Object}
+		 * @param {Object} gltfProperty
 		 */
-		function serializeUserData( object ) {
+		function serializeUserData( object, gltfProperty ) {
+
+			if ( Object.keys( object.userData ).length === 0 ) {
+
+				return;
+
+			}
 
 			try {
 
-				return JSON.parse( JSON.stringify( object.userData ) );
+				var json = JSON.parse( JSON.stringify( object.userData ) );
+
+				if ( options.includeCustomExtensions && json.gltfExtensions ) {
+
+					if ( gltfProperty.extensions === undefined ) {
+
+						gltfProperty.extensions = {};
+
+					}
+
+					for ( var extensionName in json.gltfExtensions ) {
+
+						gltfProperty.extensions[ extensionName ] = json.gltfExtensions[ extensionName ];
+						extensionsUsed[ extensionName ] = true;
+
+					}
+
+					delete json.gltfExtensions;
+
+				}
+
+				if ( Object.keys( json ).length > 0 ) {
+
+					gltfProperty.extras = json;
+
+				}
 
 			} catch ( error ) {
 
 				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
 					'won\'t be serialized because of JSON.stringify error - ' + error.message );
-
-				return {};
 
 			}
 
@@ -1025,11 +1055,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( Object.keys( material.userData ).length > 0 ) {
-
-				gltfMaterial.extras = serializeUserData( material );
-
-			}
+			serializeUserData( material, gltfMaterial );
 
 			outputJSON.materials.push( gltfMaterial );
 
@@ -1078,6 +1104,8 @@ THREE.GLTFExporter.prototype = {
 			} else {
 
 				if ( ! geometry.isBufferGeometry ) {
+
+					console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use THREE.BufferGeometry instead.' );
 
 					var geometryTemp = new THREE.BufferGeometry();
 					geometryTemp.fromGeometry( geometry );
@@ -1134,8 +1162,21 @@ THREE.GLTFExporter.prototype = {
 			var modifiedAttribute = null;
 			for ( var attributeName in geometry.attributes ) {
 
+				// Ignore morph target attributes, which are exported later.
+				if ( attributeName.substr( 0, 5 ) === 'morph' ) continue;
+
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
+
+				// Prefix all geometry attributes except the ones specifically
+				// listed in the spec; non-spec attributes are considered custom.
+				var validVertexAttributes =
+						/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
+				if ( ! validVertexAttributes.test( attributeName ) ) {
+
+					attributeName = '_' + attributeName;
+
+				}
 
 				if ( cachedData.attributes.has( attribute ) ) {
 
@@ -1156,15 +1197,11 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
+				var accessor = processAccessor( modifiedAttribute || attribute, geometry );
+				if ( accessor !== null ) {
 
-					var accessor = processAccessor( modifiedAttribute || attribute, geometry );
-					if ( accessor !== null ) {
-
-						attributes[ attributeName ] = accessor;
-						cachedData.attributes.set( attribute, accessor );
-
-					}
+					attributes[ attributeName ] = accessor;
+					cachedData.attributes.set( attribute, accessor );
 
 				}
 
@@ -1274,8 +1311,6 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var extras = ( Object.keys( geometry.userData ).length > 0 ) ? serializeUserData( geometry ) : undefined;
-
 			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
 
@@ -1317,7 +1352,7 @@ THREE.GLTFExporter.prototype = {
 					attributes: attributes,
 				};
 
-				if ( extras ) primitive.extras = extras;
+				serializeUserData( geometry, primitive );
 
 				if ( targets.length > 0 ) primitive.targets = targets;
 
@@ -1333,6 +1368,8 @@ THREE.GLTFExporter.prototype = {
 						cachedData.attributes.set( geometry.index, primitive.indices );
 
 					}
+
+					if ( primitive.indices === null ) delete primitive.indices;
 
 				}
 
@@ -1408,7 +1445,7 @@ THREE.GLTFExporter.prototype = {
 				gltfCamera.perspective = {
 
 					aspectRatio: camera.aspect,
-					yfov: THREE.Math.degToRad( camera.fov ) / camera.aspect,
+					yfov: THREE.Math.degToRad( camera.fov ),
 					zfar: camera.far <= 0 ? 0.001 : camera.far,
 					znear: camera.near < 0 ? 0 : camera.near
 
@@ -1697,11 +1734,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( object.userData && Object.keys( object.userData ).length > 0 ) {
-
-				gltfNode.extras = serializeUserData( object );
-
-			}
+			serializeUserData( object, gltfNode );
 
 			if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -1732,7 +1765,7 @@ THREE.GLTFExporter.prototype = {
 
 			} else if ( object.isLight ) {
 
-				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.' );
+				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.', object );
 				return null;
 
 			}
@@ -1841,6 +1874,8 @@ THREE.GLTFExporter.prototype = {
 				gltfScene.nodes = nodes;
 
 			}
+
+			serializeUserData( scene, gltfScene );
 
 		}
 
@@ -2123,7 +2158,7 @@ THREE.GLTFExporter.Utils = {
 				console.warn( 'THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
 
 				sourceTrack = sourceTrack.clone();
-				sourceTrack.setInterpolation( InterpolateLinear );
+				sourceTrack.setInterpolation( THREE.InterpolateLinear );
 
 			}
 

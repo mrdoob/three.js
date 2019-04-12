@@ -139,7 +139,6 @@
 				renderPass = new THREE.RenderPass( scene, camera );
 				composer.addPass( renderPass );
 				saoPass = new THREE.SAOPass( scene, camera, false, true );
-				saoPass.renderToScreen = true;
 				composer.addPass( saoPass );
 
 				// Init gui
