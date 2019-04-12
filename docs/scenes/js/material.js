@@ -129,6 +129,20 @@ var diffuseMaps = ( function () {
 
 } )();
 
+var roughnessMaps = ( function () {
+
+	var bricks = textureLoader.load( '../../examples/textures/brick_roughness.jpg' );
+	bricks.wrapT = THREE.RepeatWrapping;
+	bricks.wrapS = THREE.RepeatWrapping;
+	bricks.repeat.set( 9, 1 );
+
+	return {
+		none: null,
+		bricks: bricks
+	};
+
+} )();
+
 var matcaps = ( function () {
 
 	return {
@@ -154,6 +168,7 @@ var alphaMaps = ( function () {
 
 var envMapKeys = getObjectsKeys( envMaps );
 var diffuseMapKeys = getObjectsKeys( diffuseMaps );
+var roughnessMapKeys = getObjectsKeys( roughnessMaps );
 var matcapKeys = getObjectsKeys( matcaps );
 var alphaMapKeys = getObjectsKeys( alphaMaps );
 
@@ -444,6 +459,7 @@ function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 		emissive: material.emissive.getHex(),
 		envMaps: envMapKeys[ 0 ],
 		map: diffuseMapKeys[ 0 ],
+		roughnessMap: roughnessMapKeys[ 0 ],
 		alphaMap: alphaMapKeys[ 0 ]
 	};
 
@@ -461,9 +477,10 @@ function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
+	folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
 	folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
-	// TODO roughnessMap and metalnessMap
+	// TODO metalnessMap
 
 }
 
@@ -474,6 +491,7 @@ function guiMeshPhysicalMaterial( gui, mesh, material, geometry ) {
 		emissive: material.emissive.getHex(),
 		envMaps: envMapKeys[ 0 ],
 		map: diffuseMapKeys[ 0 ],
+		roughnessMap: roughnessMapKeys[ 0 ],
 		alphaMap: alphaMapKeys[ 0 ]
 	};
 
@@ -494,9 +512,10 @@ function guiMeshPhysicalMaterial( gui, mesh, material, geometry ) {
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
+	folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
 	folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
-	// TODO roughnessMap and metalnessMap
+	// TODO metalnessMap
 
 }
 
