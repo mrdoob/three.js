@@ -279,7 +279,13 @@ THREE.LDrawLoader = ( function () {
 				var parentParseScope = scope.getParentParseScope();
 
 				// Add to cache
-				var currentFileName = parentParseScope.currentFileName && parentParseScope.currentFileName.toLowerCase();
+				var currentFileName = parentParseScope.currentFileName;
+				if ( currentFileName !== null ) {
+
+					currentFileName = parentParseScope.currentFileName.toLowerCase();
+
+				}
+
 				if ( scope.subobjectCache[ currentFileName ] === undefined ) {
 
 					scope.subobjectCache[ currentFileName ] = text;
