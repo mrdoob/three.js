@@ -38,6 +38,7 @@ var Strings = function ( config ) {
 			'menubar/add/box': 'Box',
 			'menubar/add/circle': 'Circle',
 			'menubar/add/cylinder': 'Cylinder',
+			'menubar/add/ring': 'Ring',
 			'menubar/add/sphere': 'Sphere',
 			'menubar/add/icosahedron': 'Icosahedron',
 			'menubar/add/torus': 'Torus',
@@ -141,6 +142,13 @@ var Strings = function ( config ) {
 			'sidebar/geometry/plane_geometry/height': 'Height',
 			'sidebar/geometry/plane_geometry/widthsegments': 'Width segments',
 			'sidebar/geometry/plane_geometry/heightsegments': 'Height segments',
+
+			'sidebar/geometry/ring_geometry/innerRadius': 'Inner Radius',
+			'sidebar/geometry/ring_geometry/outerRadius': 'Outer Radius',
+			'sidebar/geometry/ring_geometry/thetaSegments': 'Theta Segments',
+			'sidebar/geometry/ring_geometry/phiSegments': 'Phi Segments',
+			'sidebar/geometry/ring_geometry/thetastart': 'Theta start',
+			'sidebar/geometry/ring_geometry/thetalength': 'Theta length',
 
 			'sidebar/geometry/sphere_geometry/radius': 'Radius',
 			'sidebar/geometry/sphere_geometry/widthsegments': 'Width segments',
