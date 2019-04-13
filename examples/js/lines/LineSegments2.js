@@ -11,7 +11,7 @@ THREE.LineSegments2 = function ( geometry, material ) {
 
 	this.geometry = geometry !== undefined ? geometry : new THREE.LineSegmentsGeometry();
 	this.material = material !== undefined ? material : new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
-
+  this.raycast_to_segment = true; // False if you don't care which segment is cast.
 };
 
 THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
@@ -60,6 +60,76 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 		return this;
 
-	}
+	}, 
+  
+  // NJT added:
+	raycast: ( function () {
 
+		var inverseMatrix = new THREE.Matrix4();
+		var ray = new THREE.Ray();
+		var sphere = new THREE.Sphere();
+
+		return function raycast( raycaster, intersects ) {
+
+			var precision = raycaster.linePrecision;
+
+			var geometry = this.geometry;
+			var matrixWorld = this.matrixWorld;
+
+			// Checking boundingSphere distance to ray
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( matrixWorld );
+			sphere.radius += precision;
+
+			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+			//
+
+			inverseMatrix.getInverse( matrixWorld );
+			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+			var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+			var localPrecisionSq = localPrecision * localPrecision;
+
+			var vStart = new THREE.Vector3();
+			var vEnd = new THREE.Vector3();
+			var interSegment = new THREE.Vector3();
+			var interRay = new THREE.Vector3();
+			var step = ( this && this.isLineSegments ) ? 2 : 1;
+
+      // Always a LineSegments2 geometry, which stores positions NOT in the positions attribute NJT
+      var starts = geometry.attributes.instanceStart;
+      var ends   = geometry.attributes.instanceEnd;
+      
+      for(var i=0;i<starts.count;i++) {
+        vStart.fromArray( starts.data.array, i * starts.data.stride + starts.offset );
+        vEnd  .fromArray( ends  .data.array, i * ends  .data.stride + ends  .offset );
+        var distSq = ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
+        
+        if ( distSq > localPrecisionSq ) continue;
+        
+        interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+        
+        var distance = raycaster.ray.origin.distanceTo( interRay );
+        
+        if ( distance < raycaster.near || distance > raycaster.far ) continue;
+        
+        intersects.push( {
+        
+          distance: distance,
+          // What do we want? intersection point on the ray or on the segment??
+          // point: raycaster.ray.at( distance ),
+          point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+          index: i,
+          face: null,
+          faceIndex: null,
+          object: this
+        } );
+        if(!this.raycast_to_segment) return; // NJT - I'm perfectly happy just picking the object, I don't need to know the coordinates.
+          
+      }
+		};
+  }() )
+  
 } );
