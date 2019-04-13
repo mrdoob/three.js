@@ -58,7 +58,8 @@
 			var mesh;
 			var scene, uiScene;
 
-			var params, verticalLegend, horizontalLegend;
+			var params, verticalLegendGroup, horizontalLegendGroup;
+			var updateColorEvent;
 
 			init();
 
@@ -71,16 +72,18 @@
 
 				uiScene = new THREE.Scene();
 
+				updateColorEvent = {type : 'updateColor'};
+
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
 				perpCamera = new THREE.PerspectiveCamera( 60, width / height, 1, 100 );
 				perpCamera.position.set( 0, 0, 10 );
 
-				verticalLegend = new THREE.Group();
-				horizontalLegend = new THREE.Group();
+				verticalLegendGroup = new THREE.Group();
+				horizontalLegendGroup = new THREE.Group();
 
-				uiScene.add( verticalLegend, horizontalLegend );
+				uiScene.add( verticalLegendGroup, horizontalLegendGroup );
 
 				// sized camera to legend dimenions
 				orthoCamera = new THREE.OrthographicCamera( - 6, 6, 2, - 2, 1, 10 );
@@ -95,6 +98,8 @@
 					vertexColors: THREE.VertexColors
 				} ) );
 				scene.add( mesh );
+
+				lut = new THREE.Lut();
 
 				params	= {
 					colorMap: 'rainbow',
@@ -126,7 +131,6 @@
 
 				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function(){
 					updateColors();
-					updateLegend();
 					render();
 				} );
 
@@ -171,36 +175,48 @@
 					mesh.geometry = geometry;
 					updateColors();
 
-					var legend = lut.setLegendOn();
-					verticalLegend.add(legend);
+					var labelParams = { 'title': 'Pressure', 'um': '[Pa]', 'ticks': 5 };
 
-					var labels = lut.setLegendLabels( { 'title': 'Pressure', 'um': '[Pa]', 'ticks': 5 } );
+					// vertical legend
+					var verticalLegend = lut.setLegendOn();
+					verticalLegendGroup.add(verticalLegend);
 
-					verticalLegend.add( labels[ 'title' ] );
+					var labels = lut.setLegendLabels( labelParams );
 
-					for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
-
-						verticalLegend.add( labels[ 'ticks' ][ i ] );
-						verticalLegend.add( labels[ 'lines' ][ i ] );
-
-					}
-
-					var legend = lut.setLegendOn({layout : 'horizontal'});
-					horizontalLegend.add(legend);
-
-					var labels = lut.setLegendLabels( { 'title': 'Pressure', 'um': '[Pa]', 'ticks': 5 } );
-
-					horizontalLegend.add( labels[ 'title' ] );
+					verticalLegendGroup.add( labels[ 'title' ] );
 
 					for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
 
-						horizontalLegend.add( labels[ 'ticks' ][ i ] );
-						horizontalLegend.add( labels[ 'lines' ][ i ] );
+						verticalLegendGroup.add( labels[ 'ticks' ][ i ] );
+						verticalLegendGroup.add( labels[ 'lines' ][ i ] );
 
 					}
+
+					// horizontal legend
+					var horizontalLegend = lut.setLegendOn({layout : 'horizontal'});
+					horizontalLegendGroup.add(horizontalLegend);
+
+					var labels = lut.setLegendLabels( labelParams);
+
+					horizontalLegendGroup.add( labels[ 'title' ] );
+
+					for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
+
+						horizontalLegendGroup.add( labels[ 'ticks' ][ i ] );
+						horizontalLegendGroup.add( labels[ 'lines' ][ i ] );
+
+					}
+
+					uiScene.addEventListener('updateColor', function(){
+						lut.updateCanvas(horizontalLegend.material.map.image);
+						lut.updateCanvas(verticalLegend.material.map.image);
+
+						horizontalLegend.material.map.needsUpdate = true;
+						verticalLegend.material.map.needsUpdate = true;
+					});
 
 					// vertical layer = 0, horizontal layer = 1
-					horizontalLegend.traverse(function(obj)
+					horizontalLegendGroup.traverse(function(obj)
 					{
 						if(obj.layers)
 						{
@@ -216,7 +232,7 @@
 
 			function updateColors() {
 
-				lut = new THREE.Lut( params.colorMap );
+				lut.setColorMap(params.colorMap);
 
 				lut.setMax( 2000 );
 				lut.setMin( 0 );
@@ -242,6 +258,8 @@
 				}
 
 				colors.needsUpdate = true;
+
+				uiScene.dispatchEvent(updateColorEvent);
 
 			}
 

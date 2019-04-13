@@ -5,35 +5,8 @@
 THREE.Lut = function ( colormap, numberofcolors ) {
 
 	this.lut = [];
-	this.map = THREE.ColorMapKeywords[ colormap ];
-	this.n = numberofcolors || 32;
-	this.mapname = colormap;
-
-	var step = 1.0 / this.n;
-
-	for ( var i = 0; i <= 1; i += step ) {
-
-		for ( var j = 0; j < this.map.length - 1; j ++ ) {
-
-			if ( i >= this.map[ j ][ 0 ] && i < this.map[ j + 1 ][ 0 ] ) {
-
-				var min = this.map[ j ][ 0 ];
-				var max = this.map[ j + 1 ][ 0 ];
-
-				var minColor = new THREE.Color( this.map[ j ][ 1 ] );
-				var maxColor = new THREE.Color( this.map[ j + 1 ][ 1 ] );
-
-				var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
-
-				this.lut.push( color );
-
-			}
-
-		}
-
-	}
-
-	return this.set( this );
+	this.setColorMap(colormap, numberofcolors);
+	return this;
 
 };
 
@@ -91,20 +64,37 @@ THREE.Lut.prototype = {
 
 	},
 
-	changeNumberOfColors: function ( numberofcolors ) {
-
-		this.n = numberofcolors;
-
-		return new THREE.Lut( this.mapname, this.n );
-
-	},
-
-	changeColorMap: function ( colormap ) {
-
+	setColorMap: function(colormap, numberofcolors){
+		this.map = THREE.ColorMapKeywords[ colormap ] || THREE.ColorMapKeywords.rainbow;
+		this.n = numberofcolors || 32;
 		this.mapname = colormap;
+	
+		var step = 1.0 / this.n;
+	
+		this.lut.length = 0;
+		for ( var i = 0; i <= 1; i += step ) {
+	
+			for ( var j = 0; j < this.map.length - 1; j ++ ) {
+	
+				if ( i >= this.map[ j ][ 0 ] && i < this.map[ j + 1 ][ 0 ] ) {
+	
+					var min = this.map[ j ][ 0 ];
+					var max = this.map[ j + 1 ][ 0 ];
+	
+					var minColor = new THREE.Color( this.map[ j ][ 1 ] );
+					var maxColor = new THREE.Color( this.map[ j + 1 ][ 1 ] );
+	
+					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
+	
+					this.lut.push( color );
+	
+				}
+	
+			}
+	
+		}
 
-		return new THREE.Lut( this.mapname, this.n );
-
+		return this;
 	},
 
 	copy: function ( lut ) {
@@ -147,33 +137,25 @@ THREE.Lut.prototype = {
 
 	},
 
-	setLegendOn: function ( parameters ) {
+	createCanvas: function(){
+		var canvas = document.createElement( 'canvas' );
+		canvas.setAttribute( 'width', 1 );
+		canvas.setAttribute( 'height', this.n );
+		canvas.setAttribute( 'id', 'legend' );
+		canvas.setAttribute( 'hidden', true );
 
-		parameters = parameters || defaultLegendParamters;
+		this.updateCanvas(canvas);
 
-		this.legend = {};
+		return canvas;
+	},
 
-		this.legend.layout = parameters.layout || defaultLegendParamters.layout;
+	updateCanvas: function(canvas){
 
-		this.legend.position = parameters.position || defaultLegendParamters.position;
+		canvas = canvas || this.legend.canvas;
 
-		this.legend.dimensions = parameters.dimensions || defaultLegendParamters.dimensions;
+		var ctx = canvas.getContext('2d', {alpha : false});
 
-		this.legend.canvas = document.createElement( 'canvas' );
-
-		this.legend.canvas.setAttribute( 'id', 'legend' );
-		this.legend.canvas.setAttribute( 'hidden', true );
-
-		document.body.appendChild( this.legend.canvas );
-
-		this.legend.ctx = this.legend.canvas.getContext( '2d' );
-
-		this.legend.canvas.setAttribute( 'width', 1 );
-		this.legend.canvas.setAttribute( 'height', this.n );
-
-		this.legend.texture = new THREE.Texture( this.legend.canvas );
-
-		var imageData = this.legend.ctx.getImageData( 0, 0, 1, this.n );
+		var imageData = ctx.getImageData( 0, 0, 1, this.n );
 
 		var data = imageData.data;
 
@@ -210,7 +192,30 @@ THREE.Lut.prototype = {
 
 		}
 
-		this.legend.ctx.putImageData( imageData, 0, 0 );
+		ctx.putImageData( imageData, 0, 0 );
+
+		return canvas;
+	},
+
+	setLegendOn: function ( parameters ) {
+
+		parameters = parameters || defaultLegendParamters;
+
+		this.legend = {};
+
+		this.legend.layout = parameters.layout || defaultLegendParamters.layout;
+
+		this.legend.position = parameters.position || defaultLegendParamters.position;
+
+		this.legend.dimensions = parameters.dimensions || defaultLegendParamters.dimensions;
+
+		var canvas = this.createCanvas();
+
+		document.body.appendChild( canvas );
+
+		this.legend.canvas = canvas;
+
+		this.legend.texture = new THREE.Texture( canvas );
 		this.legend.texture.needsUpdate = true;
 
 		this.legend.legendGeometry = new THREE.PlaneBufferGeometry( this.legend.dimensions.width, this.legend.dimensions.height );
