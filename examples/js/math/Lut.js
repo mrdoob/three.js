@@ -37,6 +37,26 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 };
 
+var defaultLegendParamters = {
+	layout : 'vertical',
+	position : new THREE.Vector3(),
+	dimensions : {width : 0.5, height: 3}
+};
+
+var defaultLabelParameters = {
+	fontsize : 24,
+	fontface : 'Arial',
+	title : '',
+	um : '',
+	ticks : 0,
+	decimal : 2,
+	notation : 'standard'
+};
+
+var defaultBackgroundColor = { r: 255, g: 100, b: 100, a: 0.8 };
+		var defaultBorderColor = { r: 255, g: 0, b: 0, a: 1.0 };
+		var defaultBorderThickness = 4;
+
 THREE.Lut.prototype = {
 
 	constructor: THREE.Lut,
@@ -129,19 +149,15 @@ THREE.Lut.prototype = {
 
 	setLegendOn: function ( parameters ) {
 
-		if ( parameters === undefined ) {
-
-			parameters = {};
-
-		}
+		parameters = parameters || defaultLegendParamters;
 
 		this.legend = {};
 
-		this.legend.layout = parameters.hasOwnProperty( 'layout' ) ? parameters[ 'layout' ] : 'vertical';
+		this.legend.layout = parameters.layout || defaultLegendParamters.layout;
 
-		this.legend.position = parameters.hasOwnProperty( 'position' ) ? parameters[ 'position' ] : { 'x': 4, 'y': 0, 'z': 0 };
+		this.legend.position = parameters.position || defaultLegendParamters.position;
 
-		this.legend.dimensions = parameters.hasOwnProperty( 'dimensions' ) ? parameters[ 'dimensions' ] : { 'width': 0.5, 'height': 3 };
+		this.legend.dimensions = parameters.dimensions || defaultLegendParamters.dimensions;
 
 		this.legend.canvas = document.createElement( 'canvas' );
 
@@ -262,7 +278,11 @@ THREE.Lut.prototype = {
 
 	setLegendPosition: function ( position ) {
 
-		this.legend.position = new THREE.Vector3( position.x, position.y, position.z );
+		if(position.isVector3){
+			this.legend.position.copy(position);
+		}
+		else{
+		this.legend.position.set( position.x, position.y, position.z );}
 
 		return this.legend;
 
@@ -279,49 +299,41 @@ THREE.Lut.prototype = {
 		if ( typeof parameters === 'function' ) {
 
 			callback = parameters;
+			parameters = undefined;
 
 		}
 
-		if ( parameters === undefined ) {
-
-			parameters = {};
-
-		}
-
+		parameters = parameters || defaultLabelParameters;
 		this.legend.labels = {};
 
-		this.legend.labels.fontsize = parameters.hasOwnProperty( 'fontsize' ) ? parameters[ 'fontsize' ] : 24;
+		this.legend.labels.fontsize = parameters.fontsize || defaultLabelParameters.fontsize;
 
-		this.legend.labels.fontface = parameters.hasOwnProperty( 'fontface' ) ? parameters[ 'fontface' ] : 'Arial';
+		this.legend.labels.fontface = parameters.fontface || defaultLabelParameters.fontface;
 
-		this.legend.labels.title = parameters.hasOwnProperty( 'title' ) ? parameters[ 'title' ] : '';
+		this.legend.labels.title = parameters.title || defaultLabelParameters.title;
 
-		this.legend.labels.um = parameters.hasOwnProperty( 'um' ) ? ' [ ' + parameters[ 'um' ] + ' ]' : '';
+		this.legend.labels.um = parameters.um || defaultLabelParameters.um;
 
-		this.legend.labels.ticks = parameters.hasOwnProperty( 'ticks' ) ? parameters[ 'ticks' ] : 0;
+		this.legend.labels.ticks = parameters.ticks || defaultLabelParameters.ticks;
 
-		this.legend.labels.decimal = parameters.hasOwnProperty( 'decimal' ) ? parameters[ 'decimal' ] : 2;
+		this.legend.labels.decimal = parameters.decimal || defaultLabelParameters.decimal;
 
-		this.legend.labels.notation = parameters.hasOwnProperty( 'notation' ) ? parameters[ 'notation' ] : 'standard';
-
-		var backgroundColor = { r: 255, g: 100, b: 100, a: 0.8 };
-		var borderColor = { r: 255, g: 0, b: 0, a: 1.0 };
-		var borderThickness = 4;
+		this.legend.labels.notation = parameters.notation || defaultLabelParameters.notation;
 
 		var canvasTitle = document.createElement( 'canvas' );
 		var contextTitle = canvasTitle.getContext( '2d' );
 
 		contextTitle.font = 'Normal ' + this.legend.labels.fontsize * 1.2 + 'px ' + this.legend.labels.fontface;
 
-		contextTitle.fillStyle = 'rgba(' + backgroundColor.r + ',' + backgroundColor.g + ',' + backgroundColor.b + ',' + backgroundColor.a + ')';
+		contextTitle.fillStyle = 'rgba(' + defaultBackgroundColor.r + ',' + defaultBackgroundColor.g + ',' + defaultBackgroundColor.b + ',' + defaultBackgroundColor.a + ')';
 
-		contextTitle.strokeStyle = 'rgba(' + borderColor.r + ',' + borderColor.g + ',' + borderColor.b + ',' + borderColor.a + ')';
+		contextTitle.strokeStyle = 'rgba(' + defaultBorderColor.r + ',' + defaultBorderColor.g + ',' + defaultBorderColor.b + ',' + defaultBorderColor.a + ')';
 
-		contextTitle.lineWidth = borderThickness;
+		contextTitle.lineWidth = defaultBorderThickness;
 
 		contextTitle.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
 
-		contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
+		contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness );
 
 		var txtTitle = new THREE.CanvasTexture( canvasTitle );
 		txtTitle.minFilter = THREE.LinearFilter;
@@ -390,15 +402,15 @@ THREE.Lut.prototype = {
 
 				contextTick.font = 'Normal ' + this.legend.labels.fontsize + 'px ' + this.legend.labels.fontface;
 
-				contextTick.fillStyle = 'rgba(' + backgroundColor.r + ',' + backgroundColor.g + ',' + backgroundColor.b + ',' + backgroundColor.a + ')';
+				contextTick.fillStyle = 'rgba(' + defaultBackgroundColor.r + ',' + defaultBackgroundColor.g + ',' + defaultBackgroundColor.b + ',' + defaultBackgroundColor.a + ')';
 
-				contextTick.strokeStyle = 'rgba(' + borderColor.r + ',' + borderColor.g + ',' + borderColor.b + ',' + borderColor.a + ')';
+				contextTick.strokeStyle = 'rgba(' + defaultBorderColor.r + ',' + defaultBorderColor.g + ',' + defaultBorderColor.b + ',' + defaultBorderColor.a + ')';
 
-				contextTick.lineWidth = borderThickness;
+				contextTick.lineWidth = defaultBorderThickness;
 
 				contextTick.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
 
-				contextTick.fillText( value.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
+				contextTick.fillText( value.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness );
 
 				var txtTick = new THREE.CanvasTexture( canvasTick );
 				txtTick.minFilter = THREE.LinearFilter;
