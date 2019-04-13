@@ -10,7 +10,7 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 };
 
-var defaultLegendParamters = {
+var defaultLegendParameters = {
 	layout: 'vertical',
 	position: new THREE.Vector3(),
 	dimensions: { width: 0.5, height: 3 }
