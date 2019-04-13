@@ -6,7 +6,7 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 	this.lut = [];
 	this.map = THREE.ColorMapKeywords[ colormap ];
-	this.n = numberofcolors;
+	this.n = numberofcolors || 32;
 	this.mapname = colormap;
 
 	var step = 1.0 / this.n;

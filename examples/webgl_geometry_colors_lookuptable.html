@@ -92,7 +92,6 @@
 				scene.add( mesh );
 
 				params	= {
-					numberOfColors: 16,
 					colorMap: 'rainbow',
 					legendLayout: 'vertical'
 				};
@@ -117,7 +116,6 @@
 
 				gui.add( params, 'legendLayout', [ 'vertical', 'horizontal' ] ).onChange( updateLegend );
 				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( updateColors );
-				gui.add( params, 'numberOfColors', 2, 64 ).step( 1 ).onChange( updateColors );
 
 			}
 
@@ -161,7 +159,7 @@
 
 				var lutColors = [];
 
-				lut = new THREE.Lut( params.colorMap, params.numberOfColors );
+				lut = new THREE.Lut( params.colorMap );
 
 				lut.setMax( 2000 );
 				lut.setMin( 0 );
