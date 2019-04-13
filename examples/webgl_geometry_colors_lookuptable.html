@@ -148,6 +148,13 @@
 					geometry.center();
 					geometry.computeVertexNormals();
 
+					// default color attribute
+					var colors = [];
+					for(var i = 0, n = geometry.attributes.position.count; i < n; ++i){
+						colors.push(1,1,1);
+					}
+					geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors,3 ));
+
 					mesh.geometry = geometry;
 					updateColors();
 
@@ -157,18 +164,17 @@
 
 			function updateColors() {
 
-				var lutColors = [];
-
 				lut = new THREE.Lut( params.colorMap );
 
 				lut.setMax( 2000 );
 				lut.setMin( 0 );
 
 				var geometry = mesh.geometry;
+				var pressures = geometry.attributes.pressure;
+				var colors = geometry.attributes.color;
+				for ( var i = 0; i < pressures.array.length; i ++ ) {
 
-				for ( var i = 0; i < geometry.attributes.pressure.array.length; i ++ ) {
-
-					var colorValue = geometry.attributes.pressure.array[ i ];
+					var colorValue = pressures.array[i];
 
 					var color = lut.getColor( colorValue );
 
@@ -178,15 +184,12 @@
 
 					} else {
 
-						lutColors[ 3 * i ] = color.r;
-						lutColors[ 3 * i + 1 ] = color.g;
-						lutColors[ 3 * i + 2 ] = color.b;
-
+						colors.setXYZ(i, color.r, color.g, color.b);
 					}
 
 				}
 
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( lutColors, 3 ) );
+				colors.needsUpdate = true;
 				updateLegend();
 
 			}
@@ -230,25 +233,7 @@
 
 			}
 
-			function dispose( obj ) {
-
-				if ( obj.geometry ) {
-
-					obj.geometry.dispose();
-
-				}
-				if ( obj.material ) {
-
-					obj.material.dispose();
-					if ( obj.material.map ) {
-
-						obj.material.map.dispose();
-
-					}
-
-				}
-
-			}
+			function dispose(){}
 
 		</script>
 
