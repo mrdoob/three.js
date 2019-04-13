@@ -58,7 +58,7 @@
 			var mesh;
 			var scene, uiScene;
 
-			var params;
+			var params, verticalLegend, horizontalLegend;
 
 			init();
 
@@ -76,6 +76,11 @@
 
 				perpCamera = new THREE.PerspectiveCamera( 60, width / height, 1, 100 );
 				perpCamera.position.set( 0, 0, 10 );
+
+				verticalLegend = new THREE.Group();
+				horizontalLegend = new THREE.Group();
+
+				uiScene.add( verticalLegend, horizontalLegend );
 
 				// sized camera to legend dimenions
 				orthoCamera = new THREE.OrthographicCamera( - 6, 6, 2, - 2, 1, 10 );
@@ -114,8 +119,16 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'legendLayout', [ 'vertical', 'horizontal' ] ).onChange( updateLegend );
-				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( updateColors );
+				gui.add( params, 'legendLayout', [ 'vertical', 'horizontal' ] ).onChange( function(){
+					updateLegend();
+					render();
+				} );
+
+				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function(){
+					updateColors();
+					updateLegend();
+					render();
+				} );
 
 			}
 
@@ -158,6 +171,45 @@
 					mesh.geometry = geometry;
 					updateColors();
 
+					var legend = lut.setLegendOn();
+					verticalLegend.add(legend);
+
+					var labels = lut.setLegendLabels( { 'title': 'Pressure', 'um': '[Pa]', 'ticks': 5 } );
+
+					verticalLegend.add( labels[ 'title' ] );
+
+					for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
+
+						verticalLegend.add( labels[ 'ticks' ][ i ] );
+						verticalLegend.add( labels[ 'lines' ][ i ] );
+
+					}
+
+					var legend = lut.setLegendOn({layout : 'horizontal'});
+					horizontalLegend.add(legend);
+
+					var labels = lut.setLegendLabels( { 'title': 'Pressure', 'um': '[Pa]', 'ticks': 5 } );
+
+					horizontalLegend.add( labels[ 'title' ] );
+
+					for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
+
+						horizontalLegend.add( labels[ 'ticks' ][ i ] );
+						horizontalLegend.add( labels[ 'lines' ][ i ] );
+
+					}
+
+					// vertical layer = 0, horizontal layer = 1
+					horizontalLegend.traverse(function(obj)
+					{
+						if(obj.layers)
+						{
+							obj.layers.set(1);
+						}
+					})
+
+					updateLegend();
+					render();
 				} );
 
 			}
@@ -190,7 +242,6 @@
 				}
 
 				colors.needsUpdate = true;
-				updateLegend();
 
 			}
 
@@ -198,42 +249,19 @@
 
 				if ( params.legendLayout ) {
 
-					uiScene.traverse( dispose );
-					uiScene.children.length = 0;
-
-					var legend;
-
 					if ( params.legendLayout === 'horizontal' ) {
 
-						legend = lut.setLegendOn( { 'layout': 'horizontal' } );
+						orthoCamera.layers.set(1);
 
 					} else {
 
-						legend = lut.setLegendOn();
+						orthoCamera.layers.set(0);
 
 					}
-
-					uiScene.add( legend );
-
-					var labels = lut.setLegendLabels( { 'title': 'Pressure', 'um': '[Pa]', 'ticks': 5 } );
-
-					uiScene.add( labels[ 'title' ] );
-
-					for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
-
-						uiScene.add( labels[ 'ticks' ][ i ] );
-						uiScene.add( labels[ 'lines' ][ i ] );
-
-					}
-
-
-					render();
 
 				}
 
 			}
-
-			function dispose(){}
 
 		</script>
 
