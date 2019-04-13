@@ -72,7 +72,7 @@
 
 				uiScene = new THREE.Scene();
 
-				updateColorEvent = {type : 'updateColor'};
+				updateColorEvent = { type: 'updateColor' };
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
@@ -124,14 +124,18 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'legendLayout', [ 'vertical', 'horizontal' ] ).onChange( function(){
+				gui.add( params, 'legendLayout', [ 'vertical', 'horizontal' ] ).onChange( function () {
+
 					updateLegend();
 					render();
+
 				} );
 
-				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function(){
+				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function () {
+
 					updateColors();
 					render();
+
 				} );
 
 			}
@@ -167,10 +171,12 @@
 
 					// default color attribute
 					var colors = [];
-					for(var i = 0, n = geometry.attributes.position.count; i < n; ++i){
-						colors.push(1,1,1);
+					for ( var i = 0, n = geometry.attributes.position.count; i < n; ++ i ) {
+
+						colors.push( 1, 1, 1 );
+
 					}
-					geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors,3 ));
+					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 					mesh.geometry = geometry;
 					updateColors();
@@ -179,7 +185,7 @@
 
 					// vertical legend
 					var verticalLegend = lut.setLegendOn();
-					verticalLegendGroup.add(verticalLegend);
+					verticalLegendGroup.add( verticalLegend );
 
 					var labels = lut.setLegendLabels( labelParams );
 
@@ -193,10 +199,10 @@
 					}
 
 					// horizontal legend
-					var horizontalLegend = lut.setLegendOn({layout : 'horizontal'});
-					horizontalLegendGroup.add(horizontalLegend);
+					var horizontalLegend = lut.setLegendOn( { layout: 'horizontal' } );
+					horizontalLegendGroup.add( horizontalLegend );
 
-					var labels = lut.setLegendLabels( labelParams);
+					var labels = lut.setLegendLabels( labelParams );
 
 					horizontalLegendGroup.add( labels[ 'title' ] );
 
@@ -207,32 +213,37 @@
 
 					}
 
-					uiScene.addEventListener('updateColor', function(){
-						lut.updateCanvas(horizontalLegend.material.map.image);
-						lut.updateCanvas(verticalLegend.material.map.image);
+					uiScene.addEventListener( 'updateColor', function () {
+
+						lut.updateCanvas( horizontalLegend.material.map.image );
+						lut.updateCanvas( verticalLegend.material.map.image );
 
 						horizontalLegend.material.map.needsUpdate = true;
 						verticalLegend.material.map.needsUpdate = true;
-					});
+
+					} );
 
 					// vertical layer = 0, horizontal layer = 1
-					horizontalLegendGroup.traverse(function(obj)
-					{
-						if(obj.layers)
-						{
-							obj.layers.set(1);
+					horizontalLegendGroup.traverse( function ( obj ) {
+
+						if ( obj.layers ) {
+
+							obj.layers.set( 1 );
+
 						}
-					})
+
+					} );
 
 					updateLegend();
 					render();
+
 				} );
 
 			}
 
 			function updateColors() {
 
-				lut.setColorMap(params.colorMap);
+				lut.setColorMap( params.colorMap );
 
 				lut.setMax( 2000 );
 				lut.setMin( 0 );
@@ -242,7 +253,7 @@
 				var colors = geometry.attributes.color;
 				for ( var i = 0; i < pressures.array.length; i ++ ) {
 
-					var colorValue = pressures.array[i];
+					var colorValue = pressures.array[ i ];
 
 					var color = lut.getColor( colorValue );
 
@@ -252,14 +263,15 @@
 
 					} else {
 
-						colors.setXYZ(i, color.r, color.g, color.b);
+						colors.setXYZ( i, color.r, color.g, color.b );
+
 					}
 
 				}
 
 				colors.needsUpdate = true;
 
-				uiScene.dispatchEvent(updateColorEvent);
+				uiScene.dispatchEvent( updateColorEvent );
 
 			}
 
@@ -269,17 +281,18 @@
 
 					if ( params.legendLayout === 'horizontal' ) {
 
-						orthoCamera.layers.set(1);
+						orthoCamera.layers.set( 1 );
 
 					} else {
 
-						orthoCamera.layers.set(0);
+						orthoCamera.layers.set( 0 );
 
 					}
 
 				}
 
 			}
+
 
 		</script>
 

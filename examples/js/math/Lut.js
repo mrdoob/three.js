@@ -5,7 +5,7 @@
 THREE.Lut = function ( colormap, numberofcolors ) {
 
 	this.lut = [];
-	this.setColorMap(colormap, numberofcolors);
+	this.setColorMap( colormap, numberofcolors );
 	return this;
 
 };
@@ -64,37 +64,39 @@ THREE.Lut.prototype = {
 
 	},
 
-	setColorMap: function(colormap, numberofcolors){
+	setColorMap: function ( colormap, numberofcolors ) {
+
 		this.map = THREE.ColorMapKeywords[ colormap ] || THREE.ColorMapKeywords.rainbow;
 		this.n = numberofcolors || 32;
 		this.mapname = colormap;
-	
+
 		var step = 1.0 / this.n;
-	
+
 		this.lut.length = 0;
 		for ( var i = 0; i <= 1; i += step ) {
-	
+
 			for ( var j = 0; j < this.map.length - 1; j ++ ) {
-	
+
 				if ( i >= this.map[ j ][ 0 ] && i < this.map[ j + 1 ][ 0 ] ) {
-	
+
 					var min = this.map[ j ][ 0 ];
 					var max = this.map[ j + 1 ][ 0 ];
-	
+
 					var minColor = new THREE.Color( this.map[ j ][ 1 ] );
 					var maxColor = new THREE.Color( this.map[ j + 1 ][ 1 ] );
-	
+
 					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
-	
+
 					this.lut.push( color );
-	
+
 				}
-	
+
 			}
-	
+
 		}
 
 		return this;
+
 	},
 
 	copy: function ( lut ) {
@@ -137,23 +139,25 @@ THREE.Lut.prototype = {
 
 	},
 
-	createCanvas: function(){
+	createCanvas: function () {
+
 		var canvas = document.createElement( 'canvas' );
 		canvas.setAttribute( 'width', 1 );
 		canvas.setAttribute( 'height', this.n );
 		canvas.setAttribute( 'id', 'legend' );
 		canvas.setAttribute( 'hidden', true );
 
-		this.updateCanvas(canvas);
+		this.updateCanvas( canvas );
 
 		return canvas;
+
 	},
 
-	updateCanvas: function(canvas){
+	updateCanvas: function ( canvas ) {
 
 		canvas = canvas || this.legend.canvas;
 
-		var ctx = canvas.getContext('2d', {alpha : false});
+		var ctx = canvas.getContext( '2d', { alpha: false } );
 
 		var imageData = ctx.getImageData( 0, 0, 1, this.n );
 
@@ -195,6 +199,7 @@ THREE.Lut.prototype = {
 		ctx.putImageData( imageData, 0, 0 );
 
 		return canvas;
+
 	},
 
 	setLegendOn: function ( parameters ) {
