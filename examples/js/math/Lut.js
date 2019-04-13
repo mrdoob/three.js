@@ -38,24 +38,24 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 };
 
 var defaultLegendParamters = {
-	layout : 'vertical',
-	position : new THREE.Vector3(),
-	dimensions : {width : 0.5, height: 3}
+	layout: 'vertical',
+	position: new THREE.Vector3(),
+	dimensions: { width: 0.5, height: 3 }
 };
 
 var defaultLabelParameters = {
-	fontsize : 24,
-	fontface : 'Arial',
-	title : '',
-	um : '',
-	ticks : 0,
-	decimal : 2,
-	notation : 'standard'
+	fontsize: 24,
+	fontface: 'Arial',
+	title: '',
+	um: '',
+	ticks: 0,
+	decimal: 2,
+	notation: 'standard'
 };
 
 var defaultBackgroundColor = { r: 255, g: 100, b: 100, a: 0.8 };
-		var defaultBorderColor = { r: 255, g: 0, b: 0, a: 1.0 };
-		var defaultBorderThickness = 4;
+var defaultBorderColor = { r: 255, g: 0, b: 0, a: 1.0 };
+var defaultBorderThickness = 4;
 
 THREE.Lut.prototype = {
 
@@ -278,11 +278,15 @@ THREE.Lut.prototype = {
 
 	setLegendPosition: function ( position ) {
 
-		if(position.isVector3){
-			this.legend.position.copy(position);
+		if ( position.isVector3 ) {
+
+			this.legend.position.copy( position );
+
+		} else {
+
+			this.legend.position.set( position.x, position.y, position.z );
+
 		}
-		else{
-		this.legend.position.set( position.x, position.y, position.z );}
 
 		return this.legend;
 

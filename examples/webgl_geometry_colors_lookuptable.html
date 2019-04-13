@@ -45,7 +45,6 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
-
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
@@ -75,28 +74,28 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				perpCamera = new THREE.PerspectiveCamera(60, width / height, 1, 100);
-				perpCamera.position.set(0, 0, 10);
+				perpCamera = new THREE.PerspectiveCamera( 60, width / height, 1, 100 );
+				perpCamera.position.set( 0, 0, 10 );
 
 				// sized camera to legend dimenions
-				orthoCamera = new THREE.OrthographicCamera( -6, 6, 2, -2, 1, 10 );
-				orthoCamera.position.set(3, 0, 10);
+				orthoCamera = new THREE.OrthographicCamera( - 6, 6, 2, - 2, 1, 10 );
+				orthoCamera.position.set( 3, 0, 10 );
 
 				var ambientLight = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambientLight );
 
-				mesh = new THREE.Mesh(undefined, new THREE.MeshLambertMaterial( {
+				mesh = new THREE.Mesh( undefined, new THREE.MeshLambertMaterial( {
 					side: THREE.DoubleSide,
 					color: 0xF5F5F5,
 					vertexColors: THREE.VertexColors
-				} ));
-				scene.add(mesh);
+				} ) );
+				scene.add( mesh );
 
-			params	= {
-				numberOfColors : 16,
-				colorMap : 'rainbow',
-				legendLayout : 'vertical'
-			}
+				params	= {
+					numberOfColors: 16,
+					colorMap: 'rainbow',
+					legendLayout: 'vertical'
+				};
 				loadModel( );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
@@ -112,24 +111,25 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				var controls = new THREE.OrbitControls( perpCamera, renderer.domElement );
-				controls.addEventListener('change', render);
+				controls.addEventListener( 'change', render );
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'legendLayout', ['vertical', 'horizontal'] ).onChange(updateLegend);
-				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange(updateColors);
-				gui.add( params, 'numberOfColors', 2, 64 ).step(1).onChange(updateColors);
+				gui.add( params, 'legendLayout', [ 'vertical', 'horizontal' ] ).onChange( updateLegend );
+				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( updateColors );
+				gui.add( params, 'numberOfColors', 2, 64 ).step( 1 ).onChange( updateColors );
+
 			}
 
 			function onWindowResize() {
 
-				var width = window.innerWidth; 
+				var width = window.innerWidth;
 				var height = window.innerHeight;
 
 				perpCamera.aspect = width / height;
 				perpCamera.updateProjectionMatrix();
 
-				renderer.setSize(width, height );
+				renderer.setSize( width, height );
 				render();
 
 			}
@@ -152,12 +152,13 @@
 
 					mesh.geometry = geometry;
 					updateColors();
+
 				} );
 
 			}
 
-			function updateColors()
-			{
+			function updateColors() {
+
 				var lutColors = [];
 
 				lut = new THREE.Lut( params.colorMap, params.numberOfColors );
@@ -189,20 +190,21 @@
 
 				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( lutColors, 3 ) );
 				updateLegend();
+
 			}
 
-			function updateLegend()
-			{
+			function updateLegend() {
+
 				if ( params.legendLayout ) {
 
-					uiScene.traverse(dispose);
+					uiScene.traverse( dispose );
 					uiScene.children.length = 0;
 
 					var legend;
 
 					if ( params.legendLayout === 'horizontal' ) {
 
-						legend = lut.setLegendOn( { 'layout': 'horizontal' });
+						legend = lut.setLegendOn( { 'layout': 'horizontal' } );
 
 					} else {
 
@@ -223,33 +225,31 @@
 
 					}
 
-					var box = new THREE.Box3();
-					uiScene.traverse(function(obj)
-					{
-						if(obj.geometry){
-							obj.geometry.computeBoundingBox();
-							box.union(obj.geometry.boundingBox);
-						}
-					});
-					console.log(box);
 
 					render();
+
 				}
-				
+
 			}
 
-			function dispose(obj)
-			{
-				if(obj.geometry){
+			function dispose( obj ) {
+
+				if ( obj.geometry ) {
+
 					obj.geometry.dispose();
+
 				}
-				if(obj.material){
+				if ( obj.material ) {
+
 					obj.material.dispose();
-					if(obj.material.map)
-					{
+					if ( obj.material.map ) {
+
 						obj.material.map.dispose();
+
 					}
+
 				}
+
 			}
 
 		</script>
