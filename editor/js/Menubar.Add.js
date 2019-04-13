@@ -134,6 +134,22 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Tetrahedron
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/tetrahedron' ) );
+	option.onClick( function () {
+
+		var geometry = new THREE.TetrahedronBufferGeometry( 1, 0 );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+		mesh.name = 'Tetrahedron';
+
+		editor.execute( new AddObjectCommand( mesh ) );
+
+	} );
+	options.add( option );
+
 	// Torus
 
 	var option = new UI.Row();
