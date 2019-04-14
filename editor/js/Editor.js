@@ -316,10 +316,11 @@ Editor.prototype = {
 			} else if ( object.isHemisphereLight ) {
 
 				helper = new THREE.HemisphereLightHelper( object, 1 );
-			}
-				else if(object.isRectAreaLight){
-					helper = new THREE.RectAreaLightHelper(object);
-				
+
+			} else if ( object.isRectAreaLight ) {
+
+				helper = new THREE.RectAreaLightHelper( object );
+
 			} else if ( object.isSkinnedMesh ) {
 
 				helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
