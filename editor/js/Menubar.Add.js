@@ -86,6 +86,22 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Ring
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/ring' ) );
+	option.onClick( function () {
+
+		var geometry = new THREE.RingBufferGeometry( 0.5, 1, 8, 1, 0, Math.PI * 2 );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+		mesh.name = 'Ring';
+
+		editor.execute( new AddObjectCommand( mesh ) );
+
+	} );
+	options.add( option );
+
 	// Cylinder
 
 	var option = new UI.Row();
