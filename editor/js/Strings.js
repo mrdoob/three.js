@@ -38,8 +38,11 @@ var Strings = function ( config ) {
 			'menubar/add/box': 'Box',
 			'menubar/add/circle': 'Circle',
 			'menubar/add/cylinder': 'Cylinder',
+			'menubar/add/ring': 'Ring',
 			'menubar/add/sphere': 'Sphere',
 			'menubar/add/icosahedron': 'Icosahedron',
+			'menubar/add/octahedron': 'Octahedron',
+			'menubar/add/tetrahedron': 'Tetrahedron',
 			'menubar/add/torus': 'Torus',
 			'menubar/add/tube': 'Tube',
 			'menubar/add/torusknot': 'TorusKnot',
@@ -51,6 +54,7 @@ var Strings = function ( config ) {
 			'menubar/add/hemispherelight': 'HemisphereLight',
 			'menubar/add/ambientlight': 'AmbientLight',
 			'menubar/add/perspectivecamera': 'PerspectiveCamera',
+			'menubar/add/orthographiccamera': 'OrthographicCamera',
 
 			'menubar/status/autosave': 'autosave',
 
@@ -81,6 +85,10 @@ var Strings = function ( config ) {
 			'sidebar/object/rotation': 'Rotation',
 			'sidebar/object/scale': 'Scale',
 			'sidebar/object/fov': 'Fov',
+			'sidebar/object/left': 'Left',
+			'sidebar/object/right': 'Right',
+			'sidebar/object/top': 'Top',
+			'sidebar/object/bottom': 'Bottom',
 			'sidebar/object/near': 'Near',
 			'sidebar/object/far': 'Far',
 			'sidebar/object/intensity': 'Intensity',
@@ -132,6 +140,12 @@ var Strings = function ( config ) {
 			'sidebar/geometry/icosahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/icosahedron_geometry/detail': 'Detail',
 
+			'sidebar/geometry/octahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/octahedron_geometry/detail': 'Detail',
+
+      'sidebar/geometry/tetrahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/tetrahedron_geometry/detail': 'Detail',
+
 			'sidebar/geometry/lathe_geometry/segments': 'Segments',
 			'sidebar/geometry/lathe_geometry/phistart': 'Phi start (°)',
 			'sidebar/geometry/lathe_geometry/philength': 'Phi length (°)',
@@ -141,6 +155,13 @@ var Strings = function ( config ) {
 			'sidebar/geometry/plane_geometry/height': 'Height',
 			'sidebar/geometry/plane_geometry/widthsegments': 'Width segments',
 			'sidebar/geometry/plane_geometry/heightsegments': 'Height segments',
+
+			'sidebar/geometry/ring_geometry/innerRadius': 'Inner Radius',
+			'sidebar/geometry/ring_geometry/outerRadius': 'Outer Radius',
+			'sidebar/geometry/ring_geometry/thetaSegments': 'Theta Segments',
+			'sidebar/geometry/ring_geometry/phiSegments': 'Phi Segments',
+			'sidebar/geometry/ring_geometry/thetastart': 'Theta start',
+			'sidebar/geometry/ring_geometry/thetalength': 'Theta length',
 
 			'sidebar/geometry/sphere_geometry/radius': 'Radius',
 			'sidebar/geometry/sphere_geometry/widthsegments': 'Width segments',

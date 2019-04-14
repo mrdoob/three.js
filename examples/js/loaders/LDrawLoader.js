@@ -271,7 +271,19 @@ THREE.LDrawLoader = ( function () {
 
 			}, onProgress, onError );
 
-			function processObject( text, onProcessed ) {
+			function subobjectLoad( url, onLoad, onProgress, onError, subobject ) {
+
+				var fileLoader = new THREE.FileLoader( scope.manager );
+				fileLoader.setPath( scope.path );
+				fileLoader.load( url, function ( text ) {
+
+					processObject( text, onLoad, subobject );
+
+				}, onProgress, onError );
+
+			}
+
+			function processObject( text, onProcessed, subobject ) {
 
 				var parseScope = scope.newParseScopeLevel();
 				parseScope.url = url;
@@ -284,8 +296,9 @@ THREE.LDrawLoader = ( function () {
 
 					scope.subobjectCache[ currentFileName ] = text;
 
-
 				}
+
+				parseScope.inverted = subobject !== undefined ? subobject.inverted : false;
 
 				// Parse the object (returns a THREE.Group)
 				var objGroup = scope.parse( text );
@@ -372,7 +385,7 @@ THREE.LDrawLoader = ( function () {
 					var cached = scope.subobjectCache[ subobject.originalFileName ];
 					if ( cached ) {
 
-						var subobjectGroup = processObject( cached, sync ? undefined : onSubobjectLoaded );
+						var subobjectGroup = processObject( cached, sync ? undefined : onSubobjectLoaded, subobject );
 						if ( sync ) {
 
 							addSubobject( subobject, subobjectGroup );
@@ -462,7 +475,15 @@ THREE.LDrawLoader = ( function () {
 					subobject.url = subobjectURL;
 
 					// Load the subobject
-					scope.load( subobjectURL, onSubobjectLoaded, undefined, onSubobjectError );
+					// Use another file loader here so we can keep track of the subobject information
+					// and use it when processing the next model.
+					var fileLoader = new THREE.FileLoader( scope.manager );
+					fileLoader.setPath( scope.path );
+					fileLoader.load( subobjectURL, function ( text ) {
+
+						processObject( text, onSubobjectLoaded, subobject );
+
+					}, undefined, onSubobjectError );
 
 				}
 
@@ -587,6 +608,7 @@ THREE.LDrawLoader = ( function () {
 				subobjects: null,
 				numSubobjects: 0,
 				subobjectIndex: 0,
+				inverted: false,
 
 				// Current subobject
 				currentFileName: null,
@@ -897,9 +919,6 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			// BFC (Back Face Culling) LDraw language meta extension is not implemented, so set all materials double-sided:
-			material.side = THREE.DoubleSide;
-
 			material.transparent = isTransparent;
 			material.opacity = alpha;
 
@@ -1035,6 +1054,11 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
+			var bfcCertified = false;
+			var bfcCCW = true;
+			var bfcInverted = false;
+			var bfcCull = true;
+
 			// Parse all line commands
 			for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
@@ -1137,6 +1161,58 @@ THREE.LDrawLoader = ( function () {
 										currentEmbeddedFileName = lp.getRemainingString();
 										currentEmbeddedText = '';
 
+										bfcCertified = false;
+										bfcCCW = true;
+
+									}
+
+									break;
+
+								case 'BFC':
+
+									// Changes to the backface culling state
+									while ( ! lp.isAtTheEnd() ) {
+
+										var token = lp.getToken();
+
+										switch ( token ) {
+
+											case 'CERTIFY':
+											case 'NOCERTIFY':
+
+												bfcCertified = token === 'CERTIFY';
+												bfcCCW = true;
+
+												break;
+
+											case 'CW':
+											case 'CCW':
+
+												bfcCCW = token === 'CCW';
+
+												break;
+
+											case 'INVERTNEXT':
+
+												bfcInverted = true;
+
+												break;
+
+											case 'CLIP':
+											case 'NOCLIP':
+
+											  bfcCull = token === 'CLIP';
+
+												break;
+
+											default:
+
+												console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
+
+												break;
+
+										}
+
 									}
 
 									break;
@@ -1198,6 +1274,14 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
+						// If the scale of the object is negated then the triangle winding order
+						// needs to be flipped.
+						if ( scope.separateObjects === false && matrix.determinant() < 0 ) {
+
+							bfcInverted = ! bfcInverted;
+
+						}
+
 						subobjects.push( {
 							material: material,
 							matrix: matrix,
@@ -1205,8 +1289,11 @@ THREE.LDrawLoader = ( function () {
 							originalFileName: fileName,
 							locationState: LDrawLoader.FILE_LOCATION_AS_IS,
 							url: null,
-							triedLowerCase: false
+							triedLowerCase: false,
+							inverted: bfcInverted !== currentParseScope.inverted
 						} );
+
+						bfcInverted = false;
 
 						break;
 
@@ -1229,13 +1316,44 @@ THREE.LDrawLoader = ( function () {
 
 						var material = parseColourCode( lp );
 
+						var inverted = currentParseScope.inverted;
+						var ccw = bfcCCW !== inverted;
+						var doubleSided = ! bfcCertified || ! bfcCull;
+						var v0, v1, v2;
+
+						if ( ccw === true ) {
+
+							v0 = parseVector( lp );
+							v1 = parseVector( lp );
+							v2 = parseVector( lp );
+
+						} else {
+
+							v2 = parseVector( lp );
+							v1 = parseVector( lp );
+							v0 = parseVector( lp );
+
+						}
+
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
-							v0: parseVector( lp ),
-							v1: parseVector( lp ),
-							v2: parseVector( lp )
+							v0: v0,
+							v1: v1,
+							v2: v2
 						} );
+
+						if ( doubleSided === true ) {
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v2,
+								v2: v1
+							} );
+
+						}
 
 						break;
 
@@ -1244,10 +1362,26 @@ THREE.LDrawLoader = ( function () {
 
 						var material = parseColourCode( lp );
 
-						var v0 = parseVector( lp );
-						var v1 = parseVector( lp );
-						var v2 = parseVector( lp );
-						var v3 = parseVector( lp );
+						var inverted = currentParseScope.inverted;
+						var ccw = bfcCCW !== inverted;
+						var doubleSided = ! bfcCertified || ! bfcCull;
+						var v0, v1, v2, v3;
+
+						if ( ccw === true ) {
+
+							v0 = parseVector( lp );
+							v1 = parseVector( lp );
+							v2 = parseVector( lp );
+							v3 = parseVector( lp );
+
+						} else {
+
+							v3 = parseVector( lp );
+							v2 = parseVector( lp );
+							v1 = parseVector( lp );
+							v0 = parseVector( lp );
+
+						}
 
 						triangles.push( {
 							material: material,
@@ -1264,6 +1398,26 @@ THREE.LDrawLoader = ( function () {
 							v1: v2,
 							v2: v3
 						} );
+
+						if ( doubleSided === true ) {
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v2,
+								v2: v1
+							} );
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v3,
+								v2: v2
+							} );
+
+						}
 
 						break;
 

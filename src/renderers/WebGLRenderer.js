@@ -1599,6 +1599,7 @@ function WebGLRenderer( parameters ) {
 			// wire up the material to this renderer's lighting state
 
 			uniforms.ambientLightColor.value = lights.state.ambient;
+			uniforms.lightProbe.value = lights.state.probe;
 			uniforms.directionalLights.value = lights.state.directional;
 			uniforms.spotLights.value = lights.state.spot;
 			uniforms.rectAreaLights.value = lights.state.rectArea;
@@ -2402,6 +2403,7 @@ function WebGLRenderer( parameters ) {
 	function markUniformsLightsNeedsUpdate( uniforms, value ) {
 
 		uniforms.ambientLightColor.needsUpdate = value;
+		uniforms.lightProbe.needsUpdate = value;
 
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;
