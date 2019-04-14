@@ -627,6 +627,8 @@ Sidebar.Object = function ( editor ) {
 	function updateRows( object ) {
 
 		var properties = {
+			'width': objectWidthRow,
+			'height': objectHeightRow,
 			'fov': objectFovRow,
 			'left': objectLeftRow,
 			'right': objectRightRow,
