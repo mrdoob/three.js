@@ -204,15 +204,15 @@ THREE.Lut.prototype = {
 
 	setLegendOn: function ( parameters ) {
 
-		parameters = parameters || defaultLegendParamters;
+		parameters = parameters || defaultLegendParameters;
 
 		this.legend = {};
 
-		this.legend.layout = parameters.layout || defaultLegendParamters.layout;
+		this.legend.layout = parameters.layout || defaultLegendParameters.layout;
 
-		this.legend.position = parameters.position || defaultLegendParamters.position;
+		this.legend.position = parameters.position || defaultLegendParameters.position;
 
-		this.legend.dimensions = parameters.dimensions || defaultLegendParamters.dimensions;
+		this.legend.dimensions = parameters.dimensions || defaultLegendParameters.dimensions;
 
 		var canvas = this.createCanvas();
 
