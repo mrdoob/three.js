@@ -317,6 +317,12 @@ THREE.LDrawLoader = ( function () {
 
 					} else {
 
+						// Once the previous subobject has finished we can start processing the next one in the list.
+						// The subobject processing shares scope in processing so it's important that they be loaded serially
+						// to avoid race conditions.
+						// Promise.resolve is used as an approach to asynchronously schedule a task _before_ this frame ends to
+						// avoid stack overflow exceptions when loading many subobjects from the cache. RequestAnimationFrame
+						// will work but causes the load to happen after the next frame which causes the load to take significantly longer.
 						var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
 						Promise.resolve().then( function () {
 
