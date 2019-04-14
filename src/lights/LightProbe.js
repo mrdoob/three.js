@@ -10,11 +10,13 @@ import { Light } from './Light.js';
 
 // A LightProbe is a source of indirect-diffuse light
 
-function LightProbe( sh, intensity ) {
+function LightProbe( color, intensity ) {
 
-	Light.call( this, 0xffffff, intensity );
+	Light.call( this, color, intensity );
 
-	this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
+	this.sh = new SphericalHarmonics3();
+
+	this.sh.coefficients[ 0 ].set( this.color.r, this.color.g, this.color.b );
 
 	this.type = 'LightProbe';
 
