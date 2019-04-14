@@ -143,7 +143,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/octahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/octahedron_geometry/detail': 'Detail',
 
-      'sidebar/geometry/tetrahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/tetrahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/tetrahedron_geometry/detail': 'Detail',
 
 			'sidebar/geometry/lathe_geometry/segments': 'Segments',
@@ -156,10 +156,10 @@ var Strings = function ( config ) {
 			'sidebar/geometry/plane_geometry/widthsegments': 'Width segments',
 			'sidebar/geometry/plane_geometry/heightsegments': 'Height segments',
 
-			'sidebar/geometry/ring_geometry/innerRadius': 'Inner Radius',
-			'sidebar/geometry/ring_geometry/outerRadius': 'Outer Radius',
-			'sidebar/geometry/ring_geometry/thetaSegments': 'Theta Segments',
-			'sidebar/geometry/ring_geometry/phiSegments': 'Phi Segments',
+			'sidebar/geometry/ring_geometry/innerRadius': 'Inner radius',
+			'sidebar/geometry/ring_geometry/outerRadius': 'Outer radius',
+			'sidebar/geometry/ring_geometry/thetaSegments': 'Theta segments',
+			'sidebar/geometry/ring_geometry/phiSegments': 'Phi segments',
 			'sidebar/geometry/ring_geometry/thetastart': 'Theta start',
 			'sidebar/geometry/ring_geometry/thetalength': 'Theta length',
 
@@ -319,8 +319,11 @@ var Strings = function ( config ) {
 			'menubar/add/box': '正方体',
 			'menubar/add/circle': '圆',
 			'menubar/add/cylinder': '圆柱体',
+			'menubar/add/ring': '环',
 			'menubar/add/sphere': '球体',
 			'menubar/add/icosahedron': '二十面体',
+			'menubar/add/octahedron': '八面体',
+			'menubar/add/tetrahedron': '四面体',
 			'menubar/add/torus': '圆环体',
 			'menubar/add/torusknot': '环面纽结体',
 			'menubar/add/tube': '管',
@@ -332,6 +335,7 @@ var Strings = function ( config ) {
 			'menubar/add/hemispherelight': '半球光',
 			'menubar/add/ambientlight': '环境光',
 			'menubar/add/perspectivecamera': '透视相机',
+			'menubar/add/orthographiccamera': '正交相机',
 
 			'menubar/status/autosave': '自动保存',
 
@@ -362,6 +366,10 @@ var Strings = function ( config ) {
 			'sidebar/object/rotation': '旋转',
 			'sidebar/object/scale': '缩放',
 			'sidebar/object/fov': '视角',
+			'sidebar/object/left': '左',
+			'sidebar/object/right': '右',
+			'sidebar/object/top': '上',
+			'sidebar/object/bottom': '下',
 			'sidebar/object/near': '近点',
 			'sidebar/object/far': '远点',
 			'sidebar/object/intensity': '强度',
@@ -413,6 +421,12 @@ var Strings = function ( config ) {
 			'sidebar/geometry/icosahedron_geometry/radius': '半径',
 			'sidebar/geometry/icosahedron_geometry/detail': '面片分段',
 
+			'sidebar/geometry/octahedron_geometry/radius': '半径',
+			'sidebar/geometry/octahedron_geometry/detail': '面片分段',
+
+			'sidebar/geometry/tetrahedron_geometry/radius': '半径',
+			'sidebar/geometry/tetrahedron_geometry/detail': '面片分段',
+
 			'sidebar/geometry/lathe_geometry/segments': '分段',
 			'sidebar/geometry/lathe_geometry/phistart': '经度起点',
 			'sidebar/geometry/lathe_geometry/philength': '经度长度',
@@ -422,6 +436,13 @@ var Strings = function ( config ) {
 			'sidebar/geometry/plane_geometry/height': '长度',
 			'sidebar/geometry/plane_geometry/widthsegments': '宽度分段',
 			'sidebar/geometry/plane_geometry/heightsegments': '长度分段',
+
+			'sidebar/geometry/ring_geometry/innerRadius': '内半径',
+			'sidebar/geometry/ring_geometry/outerRadius': '外半径',
+			'sidebar/geometry/ring_geometry/thetaSegments': '弧度分段',
+			'sidebar/geometry/ring_geometry/phiSegments': '经度分段',
+			'sidebar/geometry/ring_geometry/thetastart': '弧度起点',
+			'sidebar/geometry/ring_geometry/thetalength': '弧度长度',
 
 			'sidebar/geometry/sphere_geometry/radius': '半径',
 			'sidebar/geometry/sphere_geometry/widthsegments': '宽度分段',
