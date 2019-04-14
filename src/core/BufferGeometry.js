@@ -716,7 +716,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 						for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
 
-							vector.fromBufferAttribute( morphAttribute, i );
+							vector.fromBufferAttribute( morphAttribute, j );
 
 							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
