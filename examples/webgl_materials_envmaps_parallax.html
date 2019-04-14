@@ -356,7 +356,7 @@
 
 				boxProjectedMat.onBeforeCompile = function ( shader ) {
 
-					//these parameters are with respect to the cubeCamera texture
+					//these parameters are for the cubeCamera texture
 					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 200, 100 ) };
 					shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, - 50, 0 ) };
 					shader.uniforms.flipEnvMap.value = true;
