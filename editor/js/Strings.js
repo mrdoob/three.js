@@ -54,6 +54,7 @@ var Strings = function ( config ) {
 			'menubar/add/directionallight': 'DirectionalLight',
 			'menubar/add/hemispherelight': 'HemisphereLight',
 			'menubar/add/ambientlight': 'AmbientLight',
+			'menubar/add/rectarealight': 'RectAreaLight',
 			'menubar/add/perspectivecamera': 'PerspectiveCamera',
 			'menubar/add/orthographiccamera': 'OrthographicCamera',
 
@@ -85,6 +86,8 @@ var Strings = function ( config ) {
 			'sidebar/object/position': 'Position',
 			'sidebar/object/rotation': 'Rotation',
 			'sidebar/object/scale': 'Scale',
+			'sidebar/object/width': 'Width',
+			'sidebar/object/height': 'Height',
 			'sidebar/object/fov': 'Fov',
 			'sidebar/object/left': 'Left',
 			'sidebar/object/right': 'Right',
@@ -154,7 +157,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/octahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/octahedron_geometry/detail': 'Detail',
 
-			'sidebar/geometry/tetrahedron_geometry/radius': 'Radius',
+      		'sidebar/geometry/tetrahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/tetrahedron_geometry/detail': 'Detail',
 
 			'sidebar/geometry/lathe_geometry/segments': 'Segments',

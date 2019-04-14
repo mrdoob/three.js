@@ -316,7 +316,10 @@ Editor.prototype = {
 			} else if ( object.isHemisphereLight ) {
 
 				helper = new THREE.HemisphereLightHelper( object, 1 );
-
+			}
+				else if(object.isRectAreaLight){
+					helper = new THREE.RectAreaLightHelper(object);
+				
 			} else if ( object.isSkinnedMesh ) {
 
 				helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
@@ -615,6 +618,43 @@ Editor.prototype = {
 	redo: function () {
 
 		this.history.redo();
+
+	}
+
+};
+
+// RectAreaLightHelper was designed to work only if it is a child of its light.
+// Since that cannot be done in the edtior, the updateMatrixWorld function is overwritten to apply the matrix calculations to the light.
+THREE.RectAreaLightHelper.prototype.updateMatrixWorld = function () {
+
+	if ( this.matrixAutoUpdate ) this.updateMatrix();
+
+	if ( this.matrixWorldNeedsUpdate || force ) {
+
+		if ( this.parent === null ) {
+
+			this.matrixWorld.copy( this.matrix );
+
+		} else {
+
+			// light.matrixWorld instead of parent.matrixWorld
+			this.matrixWorld.multiplyMatrices( this.light.matrixWorld, this.matrix );
+
+		}
+
+		this.matrixWorldNeedsUpdate = false;
+
+		force = true;
+
+	}
+
+	// update children
+
+	var children = this.children;
+
+	for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+		children[ i ].updateMatrixWorld( force );
 
 	}
 

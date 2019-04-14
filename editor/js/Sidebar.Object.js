@@ -136,6 +136,26 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectScaleRow );
 
+	// width
+
+	var objectWidthRow = new UI.Row();
+	var objectWidth = new UI.Number().onChange( update );
+
+	objectWidthRow.add( new UI.Text( strings.getKey( 'sidebar/object/width' ) ).setWidth( '90px' ) );
+	objectWidthRow.add( objectWidth );
+
+	container.add( objectWidthRow );
+
+	// height
+
+	var objectHeightRow = new UI.Row();
+	var objectHeight = new UI.Number().onChange( update );
+
+	objectHeightRow.add( new UI.Text( strings.getKey( 'sidebar/object/height' ) ).setWidth( '90px' ) );
+	objectHeightRow.add( objectHeight );
+
+	container.add( objectHeightRow );
+
 	// fov
 
 	var objectFovRow = new UI.Row();
@@ -433,6 +453,18 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
+			if ( object.width !== undefined && Math.abs( object.width - objectWidth.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'width', objectWidth.getValue() ) );
+
+			}
+
+			if ( object.height !== undefined && Math.abs( object.height - objectHeight.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'height', objectHeight.getValue() ) );
+
+			}
+
 			if ( object.fov !== undefined && Math.abs( object.fov - objectFov.getValue() ) >= 0.01 ) {
 
 				editor.execute( new SetValueCommand( editor, object, 'fov', objectFov.getValue() ) );
@@ -692,6 +724,18 @@ Sidebar.Object = function ( editor ) {
 		objectScaleX.setValue( object.scale.x );
 		objectScaleY.setValue( object.scale.y );
 		objectScaleZ.setValue( object.scale.z );
+
+		if ( object.width !== undefined ) {
+
+			objectWidth.setValue( object.width );
+
+		}
+
+		if ( object.height !== undefined ) {
+
+			objectHeight.setValue( object.height );
+
+		}
 
 		if ( object.fov !== undefined ) {
 

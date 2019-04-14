@@ -417,6 +417,26 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	// RectAreaLight
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/rectarealight' ) );
+	option.onClick( function () {
+
+		var color = 0x222222;
+		var intensity = 1;
+		var width = 10;
+		var height = 10;
+
+		var light = new THREE.RectAreaLight( color, intensity, width, height );
+		light.name = 'RectAreaLight';
+
+		editor.execute( new AddObjectCommand( light ) );
+
+	} );
+	options.add( option );
+
 	//
 
 	options.add( new UI.HorizontalRule() );
