@@ -134,6 +134,22 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Octahedron
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/octahedron' ) );
+	option.onClick( function () {
+
+		var geometry = new THREE.OctahedronBufferGeometry( 1, 0 );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+		mesh.name = 'Octahedron';
+
+		editor.execute( new AddObjectCommand( mesh ) );
+
+	} );
+	options.add( option );
+
 	// Tetrahedron
 
 	var option = new UI.Row();

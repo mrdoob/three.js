@@ -40,6 +40,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': 'Cylinder',
 			'menubar/add/sphere': 'Sphere',
 			'menubar/add/icosahedron': 'Icosahedron',
+			'menubar/add/octahedron': 'Octahedron',
 			'menubar/add/tetrahedron': 'Tetrahedron',
 			'menubar/add/torus': 'Torus',
 			'menubar/add/tube': 'Tube',
@@ -133,7 +134,10 @@ var Strings = function ( config ) {
 			'sidebar/geometry/icosahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/icosahedron_geometry/detail': 'Detail',
 
-			'sidebar/geometry/tetrahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/octahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/octahedron_geometry/detail': 'Detail',
+
+      'sidebar/geometry/tetrahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/tetrahedron_geometry/detail': 'Detail',
 
 			'sidebar/geometry/lathe_geometry/segments': 'Segments',
