@@ -512,7 +512,7 @@ Points.prototype.deletePointRow = function ( idx, dontUpdate ) {
 };
 
 UI.Points2 = function(){
-	UI.Element.call( this, UI.Points2.addRow.bind(this));
+	Points.call( this, UI.Points2.addRow.bind(this));
 
 	return this;
 }
@@ -598,7 +598,7 @@ UI.Points2.prototype.createPointRow = function ( x, y ) {
 };
 
 UI.Points3 = function(){
-	UI.Element.call( this, UI.Points3.addRow.bind(this));
+	Points.call( this, UI.Points3.addRow.bind(this));
 
 	return this;
 }
