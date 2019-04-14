@@ -75,7 +75,7 @@ UI.Texture = function ( mapping ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var image = document.createElement( 'img' );
-					image.addEventListener( 'load', function( event ) {
+					image.addEventListener( 'load', function ( event ) {
 
 						var texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
@@ -188,11 +188,13 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keydown', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 			case 40: // down
 				event.preventDefault();
 				event.stopPropagation();
 				break;
+
 		}
 
 	}, false );
@@ -201,12 +203,14 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keyup', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 				scope.selectIndex( scope.selectedIndex - 1 );
 				break;
 			case 40: // down
 				scope.selectIndex( scope.selectedIndex + 1 );
 				break;
+
 		}
 
 	}, false );
@@ -459,7 +463,7 @@ var Points = function ( onAddClicked ) {
 
 		}
 
-	}.bind(this);
+	}.bind( this );
 
 	this.dom = span.dom;
 	this.pointsUI = [];
@@ -511,11 +515,13 @@ Points.prototype.deletePointRow = function ( idx, dontUpdate ) {
 
 };
 
-UI.Points2 = function(){
-	Points.call( this, UI.Points2.addRow.bind(this));
+UI.Points2 = function () {
+
+	Points.call( this, UI.Points2.addRow.bind( this ) );
 
 	return this;
-}
+
+};
 
 UI.Points2.prototype = Object.create( Points.prototype );
 UI.Points2.prototype.constructor = UI.Points2;
@@ -536,9 +542,10 @@ UI.Points2.addRow = function () {
 
 	this.update();
 
-}
+};
 
 UI.Points2.prototype.getValue = function () {
+
 	var points = [];
 	var count = 0;
 
@@ -555,7 +562,8 @@ UI.Points2.prototype.getValue = function () {
 	}
 
 	return points;
-}
+
+};
 
 UI.Points2.prototype.setValue = function ( points ) {
 
@@ -589,7 +597,7 @@ UI.Points2.prototype.createPointRow = function ( x, y ) {
 
 	} );
 
-	this.pointsUI.push(  { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
 	++ this.lastPointIdx;
 	pointRow.add( lbl, txtX, txtY, btn );
 
@@ -597,11 +605,13 @@ UI.Points2.prototype.createPointRow = function ( x, y ) {
 
 };
 
-UI.Points3 = function(){
-	Points.call( this, UI.Points3.addRow.bind(this));
+UI.Points3 = function () {
+
+	Points.call( this, UI.Points3.addRow.bind( this ) );
 
 	return this;
-}
+
+};
 
 UI.Points3.prototype = Object.create( Points.prototype );
 UI.Points3.prototype.constructor = UI.Points3;
@@ -622,9 +632,10 @@ UI.Points3.addRow = function () {
 
 	this.update();
 
-}
+};
 
 UI.Points3.prototype.getValue = function () {
+
 	var points = [];
 	var count = 0;
 
@@ -641,7 +652,8 @@ UI.Points3.prototype.getValue = function () {
 	}
 
 	return points;
-}
+
+};
 
 UI.Points3.prototype.setValue = function ( points ) {
 
@@ -676,7 +688,7 @@ UI.Points3.prototype.createPointRow = function ( x, y, z ) {
 
 	} );
 
-	this.pointsUI.push(  { row: pointRow, lbl: lbl, x: txtX, y: txtY, z : txtZ } );
+	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY, z: txtZ } );
 	++ this.lastPointIdx;
 	pointRow.add( lbl, txtX, txtY, txtZ, btn );
 

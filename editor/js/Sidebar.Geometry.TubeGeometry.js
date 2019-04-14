@@ -18,8 +18,8 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 	var pointsRow = new UI.Row();
 	pointsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tube_geometry/path' ) ).setWidth( '90px' ) );
 
-	var points = new UI.Points3().setValue(parameters.path.points).onChange(update);
-	pointsRow.add(points);
+	var points = new UI.Points3().setValue( parameters.path.points ).onChange( update );
+	pointsRow.add( points );
 
 	container.add( pointsRow );
 

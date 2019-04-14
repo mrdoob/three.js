@@ -2,7 +2,7 @@
  * @author rfm1201
  */
 
-Sidebar.Geometry.LatheGeometry = function( editor, object ) {
+Sidebar.Geometry.LatheGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -48,8 +48,8 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 	var pointsRow = new UI.Row();
 	pointsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setWidth( '90px' ) );
 
-	var points = new UI.Points2().setValue(parameters.points).onChange(update);
-	pointsRow.add(points);
+	var points = new UI.Points2().setValue( parameters.points ).onChange( update );
+	pointsRow.add( points );
 
 	container.add( pointsRow );
 
