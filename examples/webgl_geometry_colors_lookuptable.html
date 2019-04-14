@@ -79,6 +79,7 @@
 
 				perpCamera = new THREE.PerspectiveCamera( 60, width / height, 1, 100 );
 				perpCamera.position.set( 0, 0, 10 );
+				scene.add(perpCamera);
 
 				verticalLegendGroup = new THREE.Group();
 				horizontalLegendGroup = new THREE.Group();
@@ -88,9 +89,6 @@
 				// sized camera to legend dimenions
 				orthoCamera = new THREE.OrthographicCamera( - 6, 6, 2, - 2, 1, 10 );
 				orthoCamera.position.set( 3, 0, 10 );
-
-				var ambientLight = new THREE.AmbientLight( 0x444444 );
-				scene.add( ambientLight );
 
 				mesh = new THREE.Mesh( undefined, new THREE.MeshLambertMaterial( {
 					side: THREE.DoubleSide,
@@ -107,14 +105,14 @@
 				};
 				loadModel( );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
-				directionalLight.position.set( 17, 9, 30 );
-				scene.add( directionalLight );
+				var pointLight = new THREE.PointLight( 0xffffff, 1 );
+				pointLight.position.set( 17, 9, 30 );
+				perpCamera.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
