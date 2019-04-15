@@ -40,7 +40,7 @@ var LoaderUtils = {
 
 	},
 
-	parseNumbers: function ( text ) {
+	parseData: function ( text ) {
 
 		return text.replace( /\n/g, " " ).
 			replace( /\r/g, " " ).

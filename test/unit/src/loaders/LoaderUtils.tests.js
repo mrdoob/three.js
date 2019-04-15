@@ -1,5 +1,6 @@
 /**
  * @author Don McCurdy / https://www.donmccurdy.com
+ * @author bbmv / https://github.com/bbmv
  */
 /* global QUnit */
 
@@ -28,6 +29,34 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
+		QUnit.test( 'parseData', ( assert ) => {
+
+			var AMOUNT = 50000;
+
+			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, true, " ", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, false, " ", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, true, "\t", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, true, "\n", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, true, "\r", 3 ) ).length, AMOUNT );
+
+		} );
+
 	} );
 
 } );
+
+function generateText( amount, isFloat, character, each ) {
+
+	var text = "";
+
+	for( let i=0; i<amount; i++ ) {
+
+		var whiteSpace = ( ( i % each ) === 0 ) ? character : " ";
+		var randomNumber = Math.random();
+		var number = ( isFloat ) ? randomNumber : Math.round( randomNumber * 100000 );
+
+		text += number + whiteSpace;
+	}
+
+	return text;
+}
