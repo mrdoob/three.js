@@ -168,13 +168,18 @@ var alphaMaps = ( function () {
 
 var gradientMaps = ( function () {
 
-	var fiveStep = textureLoader.load( '../../examples/textures/gradientMaps/fiveStep.jpg' );
-	fiveStep.minFilter = THREE.NearestFilter;
-	fiveStep.magFilter = THREE.NearestFilter;
+	var threeTone = textureLoader.load( '../../examples/textures/gradientMaps/threeTone.jpg' );
+	threeTone.minFilter = THREE.NearestFilter;
+	threeTone.magFilter = THREE.NearestFilter;
+
+	var fiveTone = textureLoader.load( '../../examples/textures/gradientMaps/fiveTone.jpg' );
+	fiveTone.minFilter = THREE.NearestFilter;
+	fiveTone.magFilter = THREE.NearestFilter;
 
 	return {
 		none: null,
-		fiveStep: fiveStep
+		threeTone: threeTone,
+		fiveTone: fiveTone
 	};
 
 } )();
@@ -601,7 +606,7 @@ function chooseFromHash( gui, mesh, geometry ) {
 
 		case 'MeshToonMaterial' :
 
-			material = new THREE.MeshToonMaterial( { color: 0x2194CE, gradientMap: gradientMaps.fiveStep } );
+			material = new THREE.MeshToonMaterial( { color: 0x2194CE, gradientMap: gradientMaps.threeTone } );
 			guiMaterial( gui, mesh, material, geometry );
 			guiMeshToonMaterial( gui, mesh, material, geometry );
 
