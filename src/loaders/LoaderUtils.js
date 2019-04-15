@@ -1,5 +1,6 @@
 /**
  * @author Don McCurdy / https://www.donmccurdy.com
+ * @author bbmv / https://github.com/bbmv
  */
 
 var LoaderUtils = {
@@ -36,6 +37,17 @@ var LoaderUtils = {
 		if ( index === - 1 ) return './';
 
 		return url.substr( 0, index + 1 );
+
+	},
+
+	parseNumbers: function ( text ) {
+
+		return text.replace( /\n/g, " " ).
+		replace( /\r/g, " " ).
+		replace( /\t/g, " " ).
+		replace( / +/g, " " ).
+		trim( ).
+		split( " " );
 
 	}
 
