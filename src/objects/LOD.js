@@ -66,7 +66,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		levels.splice( l, 0, { distance: distance, object: object } );
 
-		return this.add( object );
+		this.add( object );
+
+		return this;
 
 	},
 
