@@ -43,11 +43,11 @@ var LoaderUtils = {
 	parseNumbers: function ( text ) {
 
 		return text.replace( /\n/g, " " ).
-		replace( /\r/g, " " ).
-		replace( /\t/g, " " ).
-		replace( / +/g, " " ).
-		trim( ).
-		split( " " );
+			replace( /\r/g, " " ).
+			replace( /\t/g, " " ).
+			replace( / +/g, " " ).
+			trim( ).
+			split( " " );
 
 	}
 
