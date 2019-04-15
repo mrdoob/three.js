@@ -305,6 +305,7 @@ var files = {
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
 		"webgl_gpu_particle_system",
+		"webgl_materials_depthpeel",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
