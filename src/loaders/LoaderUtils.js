@@ -46,7 +46,7 @@ var LoaderUtils = {
 			replace( /\r/g, " " ).
 			replace( /\t/g, " " ).
 			replace( / +/g, " " ).
-			trim( ).
+			trim().
 			split( " " );
 
 	}
