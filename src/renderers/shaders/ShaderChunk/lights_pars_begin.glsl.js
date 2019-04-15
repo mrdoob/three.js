@@ -15,51 +15,34 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 }
 
-#if NUM_PROBE_LIGHTS > 0
+uniform vec3 sh[9];
 
-	struct ProbeLight {
-		vec3 position;
-		vec3 coeff0;
-		vec3 coeff1;
-		vec3 coeff2;
-		vec3 coeff3;
-		vec3 coeff4;
-		vec3 coeff5;
-		vec3 coeff6;
-		vec3 coeff7;
-		vec3 coeff8;
-	};
+#define C1 0.429043
+#define C2 0.511664
+#define C3 0.743125
+#define C4 0.886227
+#define C5 0.247708
 
-	uniform ProbeLight probeLights[ NUM_PROBE_LIGHTS ];
+// normal is assumed to be unit length!
+vec3 shGetIrradianceAt( vec3 sh[9], vec3 normal )
+{
+  // band 0
+  vec3 result = sh[0] * C4;
 
-	#define C1 0.429043
-	#define C2 0.511664
-	#define C3 0.743125
-	#define C4 0.886227
-	#define C5 0.247708
+  // band 1
+  result += sh[1] * ( 2.0 * C2 * normal.y );
+  result += sh[2] * ( 2.0 * C2 * normal.z );
+  result += sh[3] * ( 2.0 * C2 * normal.x );
 
-	// normal is assumed to be unit length!
-	vec3 shGetIrradianceAt( ProbeLight probeLight, vec3 normal )
-	{
-	    // band 0
-	    vec3 result = probeLight.coeff0 * C4;
+  // band 2
+  result += sh[4] * ( 2.0 * C1 * normal.x*normal.y );
+  result += sh[5] * ( 2.0 * C1 * normal.y*normal.z );
+  result += sh[6] * ( C3 * normal.z*normal.z - C5 );
+  result += sh[7] * ( 2.0 * C1 * normal.x*normal.z );
+  result += sh[8] * ( C1 * ( normal.x*normal.x - normal.y*normal.y ) );
 
-	    // band 1
-	    result += probeLight.coeff1 * ( 2.0 * C2 * normal.y );
-	    result += probeLight.coeff2 * ( 2.0 * C2 * normal.z );
-	    result += probeLight.coeff3 * ( 2.0 * C2 * normal.x );
-
-	    // band 2
-	    result += probeLight.coeff4 * ( 2.0 * C1 * normal.x*normal.y );
-	    result += probeLight.coeff5 * ( 2.0 * C1 * normal.y*normal.z );
-	    result += probeLight.coeff6 * ( C3 * normal.z*normal.z - C5 );
-	    result += probeLight.coeff7 * ( 2.0 * C1 * normal.x*normal.z );
-	    result += probeLight.coeff8 * ( C1 * ( normal.x*normal.x - normal.y*normal.y ) );
-
-	    return result;
-	}
-
-#endif
+  return result;
+}
 
 #if NUM_DIR_LIGHTS > 0
 

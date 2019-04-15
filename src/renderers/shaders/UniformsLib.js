@@ -109,7 +109,7 @@ var UniformsLib = {
 
 		ambientLightColor: { value: [] },
 
-		probeLights: { value: [], properties: {
+		sh: { value: [], properties: {
 			coeff0: {},
       coeff1: {},
       coeff2: {},

@@ -25,7 +25,7 @@ function UniformsCache() {
 
 			switch ( light.type ) {
 
-				case 'ProbeLight':
+				case 'LightProbe':
 					uniforms = {
 						position: new Vector3(),
 						coeff0: new Color(),
@@ -185,22 +185,22 @@ function WebGLLights() {
 				g += color.g * intensity;
 				b += color.b * intensity;
 
-			} else if ( light.isProbeLight ) {
+			} else if ( light.isLightProbe ) {
 
 				var uniforms = cache.get( light );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
 
-				uniforms.coeff0.copy( light.coefficients[0] ).multiplyScalar( intensity );
-				uniforms.coeff1.copy( light.coefficients[1] ).multiplyScalar( intensity );
-				uniforms.coeff2.copy( light.coefficients[2] ).multiplyScalar( intensity );
-				uniforms.coeff3.copy( light.coefficients[3] ).multiplyScalar( intensity );
-				uniforms.coeff4.copy( light.coefficients[4] ).multiplyScalar( intensity );
-				uniforms.coeff5.copy( light.coefficients[5] ).multiplyScalar( intensity );
-				uniforms.coeff6.copy( light.coefficients[6] ).multiplyScalar( intensity );
-				uniforms.coeff7.copy( light.coefficients[7] ).multiplyScalar( intensity );
-				uniforms.coeff8.copy( light.coefficients[8] ).multiplyScalar( intensity );
+				uniforms.coeff0.copy( light.sh[0] ).multiplyScalar( intensity );
+				uniforms.coeff1.copy( light.sh[1] ).multiplyScalar( intensity );
+				uniforms.coeff2.copy( light.sh[2] ).multiplyScalar( intensity );
+				uniforms.coeff3.copy( light.sh[3] ).multiplyScalar( intensity );
+				uniforms.coeff4.copy( light.sh[4] ).multiplyScalar( intensity );
+				uniforms.coeff5.copy( light.sh[5] ).multiplyScalar( intensity );
+				uniforms.coeff6.copy( light.sh[6] ).multiplyScalar( intensity );
+				uniforms.coeff7.copy( light.sh[7] ).multiplyScalar( intensity );
+				uniforms.coeff8.copy( light.sh[8] ).multiplyScalar( intensity );
 
 				state.probe[ probeLength ] = uniforms;
 

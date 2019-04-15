@@ -61,21 +61,6 @@ export let UniformsLib: {
   };
   lights: {
     ambientLightColor: IUniform;
-    probeLights: {
-      value: any[];
-      properties: {
-        coeff0: {};
-        coeff1: {};
-        coeff2: {};
-        coeff3: {};
-        coeff4: {};
-        coeff5: {};
-        coeff6: {};
-        coeff7: {};
-        coeff8: {};
-        position: {};
-      };
-    };
     directionalLights: {
       value: any[];
       properties: {

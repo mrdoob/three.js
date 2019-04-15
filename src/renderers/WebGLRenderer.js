@@ -1406,6 +1406,32 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	function computeObjectSphericalHarmonics( object, lightProbes ) {
+
+		// This routine can certainly be improved to take into account a better interpolation
+		// scheme and visibility sets but for now nearest neighbour allows the SH
+		// project to continue
+
+		var closestProbe = null;
+		var closestDist = Number.MAX_SAFE_INTEGER;
+
+		for ( var lightIdx = 0; lightIdx < lightProbes.length; lightIdx++ ) {
+
+			if ( object.position.distanceTo( lightProbes[lightIdx].position ) < closestDist ) {
+
+				closestProbe = lightProbes[lightIdx];
+
+			}
+
+		}
+
+		return [closestProbe.coeff0, closestProbe.coeff1, closestProbe.coeff2,
+			closestProbe.coeff3, closestProbe.coeff4, closestProbe.coeff5,
+			closestProbe.coeff6, closestProbe.coeff7, closestProbe.coeff8
+		];
+
+	}
+
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
@@ -1601,8 +1627,10 @@ function WebGLRenderer( parameters ) {
 
 			// wire up the material to this renderer's lighting state
 
+			// var harmonics = computeObjectSphericalHarmonics( object, currentRenderState.state.lights.state.probe );
+
 			uniforms.ambientLightColor.value = lights.state.ambient;
-			uniforms.probeLights.value = lights.state.probe;
+			// uniforms.sh.value = harmonics;
 			uniforms.directionalLights.value = lights.state.directional;
 			uniforms.spotLights.value = lights.state.spot;
 			uniforms.rectAreaLights.value = lights.state.rectArea;
@@ -1962,6 +1990,10 @@ function WebGLRenderer( parameters ) {
 			p_uniforms.setValue( _gl, 'center', object.center );
 
 		}
+
+		var harmonics = computeObjectSphericalHarmonics( object, currentRenderState.state.lights.state.probe );
+
+		p_uniforms.setValue( _gl, 'sh', harmonics );
 
 		// common matrices
 
@@ -2407,7 +2439,7 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.ambientLightColor.needsUpdate = value;
 
-		uniforms.probeLights.needsUpdate = value;
+		uniforms.sh.needsUpdate = value;
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;
 		uniforms.spotLights.needsUpdate = value;

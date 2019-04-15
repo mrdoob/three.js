@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lights - probe light</title>
+		<title>three.js webgl - lights - light probe</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -76,7 +76,7 @@
 				directionalLight.target.position.set( 0, 0, 0 );
 				// scene.add( directionalLight );
 
-				var eucalyptusGroove = new THREE.ProbeLight([
+				var eucalyptusGroove = new THREE.LightProbe([
 					new THREE.Color( 0.3783264,  0.4260425,  0.4504587),
 			    new THREE.Color( 0.2887813,  0.3586803,  0.4147053),
 			    new THREE.Color( 0.0379030,  0.0295216,  0.0098567),
@@ -90,7 +90,7 @@
 				eucalyptusGroove.position.set(25, 0, 0);
 				scene.add( eucalyptusGroove );
 
-				var office = new THREE.ProbeLight([
+				var office = new THREE.LightProbe([
 					new THREE.Color( 0.734601661990457511,  0.612049556826795960,  0.587005355037254706),
 					new THREE.Color( -0.507141321038506510, -0.417991745488756006, -0.429936331491808599 ),
 					new THREE.Color( 0.103560827244967943,  0.139260824989792281,  0.167449796591380679),
