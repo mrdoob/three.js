@@ -30,13 +30,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 			}
 
-			if ( geometry.version > currentState.version ) {
+			updateBuffers = needsUpdate( geometry );
 
-				currentState.version = geometry.version;
-
-				updateBuffers = true;
-
-			}
+			if ( updateBuffers ) saveCache( geometry );
 
 		} else {
 
@@ -160,9 +156,41 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 			enabledAttributes: enabledAttributes,
 			attributeDivisors: attributeDivisors,
 			object: vao,
-			version: - 1
+			attributes: {}
 
 		};
+
+	}
+
+	function needsUpdate( geometry ) {
+
+		var cache = currentState.attributes;
+		var attributes = geometry.attributes;
+
+		if ( Object.keys( cache ).length !== Object.keys( attributes ).length ) return true;
+
+		for ( var key in attributes ) {
+
+			if ( cache[ key ] !== attributes[ key ] ) return true;
+
+		}
+
+		return false;
+
+	}
+
+	function saveCache( geometry ) {
+
+		var cache = {};
+		var attributes = geometry.attributes;
+
+		for ( var key in attributes ) {
+
+			cache[ key ] = attributes[ key ];
+
+		}
+
+		currentState.attributes = cache;
 
 	}
 
