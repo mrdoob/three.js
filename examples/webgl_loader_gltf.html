@@ -40,9 +40,6 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -78,13 +75,25 @@
 				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/Bridge2/' );
 				loader.load( urls, function ( texture ) {
 
-					var pmremGenerator = new THREE.PMREMGenerator( texture );
-					pmremGenerator.update( renderer );
+					texture.encoding = THREE.sRGBEncoding;
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+					// light probe
 
-					var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+					var lightProbe = new THREE.LightProbe();
+					// Coefficients computed with setFromCubeTexture( texture ) and sh.toArray()
+					lightProbe.sh.fromArray(
+						[ 0.30350402186576847, 0.4695020609740584, 0.6617666153025029,
+							0.08320329629560637, 0.17400245533281114, 0.3453152275957874,
+							0.12158824672933624, 0.10353622444396401, 0.06530153583524678,
+							0.013607857556048842, 0.019188302420841814, 0.01874813525865349,
+							0.010822144860690035, 0.01574198289465548, 0.01742654587405097,
+							0.06310934215371257, 0.061061933521237545, 0.044428745834389806,
+							0.19958014705624538, 0.22020936865062024, 0.19468224569437417,
+							0.019647224115989702, 0.032414009820739324, 0.043555315974879015,
+							0.13316051440231733, 0.1964793374921572, 0.2189213184804167
+						]
+					);
+					scene.add( lightProbe );
 
 					// model
 
@@ -95,7 +104,7 @@
 
 							if ( child.isMesh ) {
 
-								child.material.envMap = envMap;
+								child.material.envMap = texture;
 
 							}
 
@@ -105,9 +114,6 @@
 
 					} );
 
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
-
 					scene.background = texture;
 
 				} );
@@ -116,6 +122,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2; // approximate sRGB
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
