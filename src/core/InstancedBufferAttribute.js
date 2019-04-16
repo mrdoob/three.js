@@ -18,7 +18,7 @@ function InstancedBufferAttribute( array, itemSize, normalized, meshPerAttribute
 
 	BufferAttribute.call( this, array, itemSize, normalized );
 
-	this.meshPerAttribute = meshPerAttribute || 1;
+	this._meshPerAttribute = meshPerAttribute || 1;
 
 }
 
@@ -28,11 +28,11 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 	isInstancedBufferAttribute: true,
 
-	copy: function ( source ) {
+	_copy: function ( source ) {
 
-		BufferAttribute.prototype.copy.call( this, source );
+		BufferAttribute.prototype._copy.call( this, source );
 
-		this.meshPerAttribute = source.meshPerAttribute;
+		this._meshPerAttribute = source.meshPerAttribute;
 
 		return this;
 
@@ -40,6 +40,24 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 } );
 
+Object.defineProperties( InstancedBufferAttribute.prototype, {
 
+	meshPerAttribute: {
+
+		get: function () {
+
+			return this._meshPerAttribute;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.InstancedBufferAttribute: .meshPerAttribute is readonly.' );
+
+		}
+
+	}
+
+} );
 
 export { InstancedBufferAttribute };

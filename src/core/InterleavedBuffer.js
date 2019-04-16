@@ -5,8 +5,8 @@
 
 function InterleavedBuffer( array, stride ) {
 
-	this.array = array;
-	this.stride = stride;
+	this._array = array;
+	this._stride = stride;
 	this.count = array !== undefined ? array.length / stride : 0;
 
 	this.dynamic = false;
@@ -16,11 +16,47 @@ function InterleavedBuffer( array, stride ) {
 
 }
 
-Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
+Object.defineProperties( InterleavedBuffer.prototype, {
 
-	set: function ( value ) {
+	needsUpdate: {
 
-		if ( value === true ) this.version ++;
+		set: function ( value ) {
+
+			if ( value === true ) this.version ++;
+
+		}
+
+	},
+
+	array: {
+
+		get: function () {
+
+			return this._array;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.InterleavedBuffer: .array is readonly.' );
+
+		}
+
+	},
+
+	stride: {
+
+		get: function () {
+
+			return this._stride;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.InterleavedBuffer: .stride is readonly.' );
+
+		}
 
 	}
 
@@ -32,21 +68,6 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	onUploadCallback: function () {},
 
-	setArray: function ( array ) {
-
-		if ( Array.isArray( array ) ) {
-
-			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-		}
-
-		this.count = array !== undefined ? array.length / this.stride : 0;
-		this.array = array;
-
-		return this;
-
-	},
-
 	setDynamic: function ( value ) {
 
 		this.dynamic = value;
@@ -55,11 +76,11 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	},
 
-	copy: function ( source ) {
+	_copy: function ( source ) {
 
-		this.array = new source.array.constructor( source.array );
+		this._array = new source.array.constructor( source.array );
 		this.count = source.count;
-		this.stride = source.stride;
+		this._stride = source.stride;
 		this.dynamic = source.dynamic;
 
 		return this;
@@ -93,7 +114,7 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	clone: function () {
 
-		return new this.constructor().copy( this );
+		return new this.constructor()._copy( this );
 
 	},
 

@@ -17,10 +17,10 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.name = '';
 
-	this.array = array;
-	this.itemSize = itemSize;
+	this._array = array;
+	this._itemSize = itemSize;
 	this.count = array !== undefined ? array.length / itemSize : 0;
-	this.normalized = normalized === true;
+	this._normalized = normalized === true;
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
@@ -29,11 +29,63 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 }
 
-Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
+Object.defineProperties( BufferAttribute.prototype, {
 
-	set: function ( value ) {
+	needsUpdate: {
 
-		if ( value === true ) this.version ++;
+		set: function ( value ) {
+
+			if ( value === true ) this.version ++;
+
+		}
+
+	},
+
+	array: {
+
+		get: function () {
+
+			return this._array;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.BufferAttribute: .array is readonly.' );
+
+		}
+
+	},
+
+	itemSize: {
+
+		get: function () {
+
+			return this._itemSize;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.BufferAttribute: .itemSize is readonly.' );
+
+		}
+
+	},
+
+	normalized: {
+
+		get: function () {
+
+			return this._normalized;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.BufferAttribute: .normalized is readonly.' );
+
+		}
 
 	}
 
@@ -45,21 +97,6 @@ Object.assign( BufferAttribute.prototype, {
 
 	onUploadCallback: function () {},
 
-	setArray: function ( array ) {
-
-		if ( Array.isArray( array ) ) {
-
-			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-		}
-
-		this.count = array !== undefined ? array.length / this.itemSize : 0;
-		this.array = array;
-
-		return this;
-
-	},
-
 	setDynamic: function ( value ) {
 
 		this.dynamic = value;
@@ -68,13 +105,13 @@ Object.assign( BufferAttribute.prototype, {
 
 	},
 
-	copy: function ( source ) {
+	_copy: function ( source ) {
 
 		this.name = source.name;
-		this.array = new source.array.constructor( source.array );
-		this.itemSize = source.itemSize;
+		this._array = new source.array.constructor( source.array );
+		this._itemSize = source.itemSize;
 		this.count = source.count;
-		this.normalized = source.normalized;
+		this._normalized = source.normalized;
 
 		this.dynamic = source.dynamic;
 
@@ -317,7 +354,7 @@ Object.assign( BufferAttribute.prototype, {
 
 	clone: function () {
 
-		return new this.constructor( this.array, this.itemSize ).copy( this );
+		return new this.constructor( this.array, this.itemSize )._copy( this );
 
 	}
 
