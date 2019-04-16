@@ -1406,6 +1406,31 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	function computeInterpolatedLightProbe( object, scene ) {
+
+		// This is where we need to implemented a smart(er) system for interpolating the various light probes
+		// in the scene (right now it's just nearest neighbor with a hard cutover, but illustrates the point of
+		// needing to compute this per object)
+
+		var closestProbe = null;
+		var closestDist = Number.MAX_SAFE_INTEGER;
+
+		var children = scene.children;
+
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			if ( children[i].isLightProbe && children[i].position.distanceTo(object.position) < closestDist ) {
+
+				closestProbe = children[i];
+
+			}
+
+		}
+
+		return closestProbe;
+
+	}
+
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
@@ -1413,6 +1438,8 @@ function WebGLRenderer( parameters ) {
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+		object.interpolatedDiffuseLightProbe = computeInterpolatedLightProbe( object, scene );
 
 		if ( object.isImmediateRenderObject ) {
 
@@ -1599,7 +1626,7 @@ function WebGLRenderer( parameters ) {
 			// wire up the material to this renderer's lighting state
 
 			uniforms.ambientLightColor.value = lights.state.ambient;
-			uniforms.lightProbe.value = lights.state.probe;
+			uniforms.lightProbe.value = object.interpolatedDiffuseLightProbe.sh.coefficients;
 			uniforms.directionalLights.value = lights.state.directional;
 			uniforms.spotLights.value = lights.state.spot;
 			uniforms.rectAreaLights.value = lights.state.rectArea;
