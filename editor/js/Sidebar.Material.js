@@ -289,7 +289,7 @@ Sidebar.Material = function ( editor ) {
 
 	var materialMapRow = new UI.Row();
 	var materialMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialMap = new UI.Texture().onChange( update );
+	var materialMap = new UI.Texture().onChange( updateMaterial );
 
 	materialMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/map' ) ).setWidth( '90px' ) );
 	materialMapRow.add( materialMapEnabled );
@@ -401,7 +401,7 @@ Sidebar.Material = function ( editor ) {
 
 	var materialEnvMapRow = new UI.Row();
 	var materialEnvMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialEnvMap = new UI.Texture( THREE.SphericalReflectionMapping ).onChange( update );
+	var materialEnvMap = new UI.Texture( THREE.SphericalReflectionMapping ).onChange( updateMaterial );
 	var materialReflectivity = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
 
 	materialEnvMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/envmap' ) ).setWidth( '90px' ) );
@@ -441,7 +441,7 @@ Sidebar.Material = function ( editor ) {
 
 	var materialEmissiveMapRow = new UI.Row();
 	var materialEmissiveMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialEmissiveMap = new UI.Texture().onChange( update );
+	var materialEmissiveMap = new UI.Texture().onChange( updateMaterial );
 
 	materialEmissiveMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/emissivemap' ) ).setWidth( '90px' ) );
 	materialEmissiveMapRow.add( materialEmissiveMapEnabled );
@@ -1058,6 +1058,28 @@ Sidebar.Material = function ( editor ) {
 			console.warn( "Can't set texture, model doesn't have texture coordinates" );
 
 		}
+
+	}
+
+	function updateMaterial( texture ) {
+
+		if ( texture !== null ) {
+
+			if ( texture.encoding !== THREE.sRGBEncoding ) {
+
+				texture.encoding = THREE.sRGBEncoding;
+				var object = currentObject;
+				if ( object !== null ) {
+
+					object.material.needsUpdate = true;
+
+				}
+
+			}
+
+		}
+
+		update();
 
 	}
 

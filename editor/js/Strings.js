@@ -31,6 +31,7 @@ var Strings = function ( config ) {
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
 			'menubar/edit/minify_shaders': 'Minify Shaders',
+			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
