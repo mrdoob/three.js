@@ -3,6 +3,41 @@
  *
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
+ * API
+ *
+ * 1. Traditional
+ *
+ * var effect = new THREE.OutlineEffect( renderer );
+ *
+ * function render() {
+ *
+ * 	effect.render( scene, camera );
+ *
+ * }
+ *
+ * 2. VR compatible
+ *
+ * var effect = new THREE.OutlineEffect( renderer );
+ * var renderingOutline = false;
+ *
+ * scene.onAfterRender = function () {
+ *
+ * 	if ( renderingOutline ) return;
+ *
+ * 	renderingOutline = true;
+ *
+ * 	effect.renderOutline( scene, camera );
+ *
+ * 	renderingOutline = false;
+ *
+ * };
+ *
+ * function render() {
+ *
+ * 	renderer.render( scene, camera );
+ *
+ * }
+ *
  * // How to set default outline parameters
  * new THREE.OutlineEffect( renderer, {
  * 	defaultThickness: 0.01,
@@ -435,10 +470,17 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		var currentAutoClear = renderer.autoClear;
 		renderer.autoClear = this.autoClear;
 
-		// 1. render normally
 		renderer.render( scene, camera );
 
-		// 2. render outline
+		renderer.autoClear = currentAutoClear;
+
+		this.renderOutline( scene, camera );
+
+	};
+
+	this.renderOutline = function ( scene, camera ) {
+
+		var currentAutoClear = renderer.autoClear;
 		var currentSceneAutoUpdate = scene.autoUpdate;
 		var currentSceneBackground = scene.background;
 		var currentShadowMapEnabled = renderer.shadowMap.enabled;
