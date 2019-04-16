@@ -761,21 +761,14 @@
 
 		},
 
-		clampScalar: function () {
+		clampScalar: function ( minVal, maxVal ) {
 
-			var min = new Vector2();
-			var max = new Vector2();
+			this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
+			this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
 
-			return function clampScalar( minVal, maxVal ) {
+			return this;
 
-				min.set( minVal, minVal );
-				max.set( maxVal, maxVal );
-
-				return this.clamp( min, max );
-
-			};
-
-		}(),
+		},
 
 		clampLength: function ( min, max ) {
 
@@ -1993,21 +1986,15 @@
 
 		},
 
-		clampScalar: function () {
+		clampScalar: function ( minVal, maxVal ) {
 
-			var min = new Vector3();
-			var max = new Vector3();
+			this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
+			this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
+			this.z = Math.max( minVal, Math.min( maxVal, this.z ) );
 
-			return function clampScalar( minVal, maxVal ) {
+			return this;
 
-				min.set( minVal, minVal, minVal );
-				max.set( maxVal, maxVal, maxVal );
-
-				return this.clamp( min, max );
-
-			};
-
-		}(),
+		},
 
 		clampLength: function ( min, max ) {
 
@@ -8280,7 +8267,9 @@
 
 		applyMatrix: function ( matrix ) {
 
-			this.matrix.multiplyMatrices( matrix, this.matrix );
+			if ( this.matrixAutoUpdate ) this.updateMatrix();
+
+			this.matrix.premultiply( matrix );
 
 			this.matrix.decompose( this.position, this.quaternion, this.scale );
 
@@ -11888,7 +11877,7 @@
 
 							for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
 
-								vector.fromBufferAttribute( morphAttribute, i );
+								vector.fromBufferAttribute( morphAttribute, j );
 
 								maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
@@ -18370,7 +18359,12 @@
 
 					for ( var j = 0; j < 9; j ++ ) {
 
-						state.probe[ j ].addScaledVector( light.sh.coefficients[ j ], intensity );
+						var probe = state.probe[ j ];
+						var coeff = light.sh.coefficients[ j ];
+
+						probe.x += coeff.x * color.r * intensity;
+						probe.y += coeff.y * color.g * intensity;
+						probe.z += coeff.z * color.b * intensity;
 
 					}
 
@@ -25884,6 +25878,8 @@
 			levels.splice( l, 0, { distance: distance, object: object } );
 
 			this.add( object );
+
+			return this;
 
 		},
 
@@ -40344,7 +40340,7 @@
 
 		this.sh = new SphericalHarmonics3();
 
-		this.sh.coefficients[ 0 ].set( this.color.r, this.color.g, this.color.b );
+		this.sh.coefficients[ 0 ].set( 1, 1, 1 );
 
 		this.type = 'LightProbe';
 
