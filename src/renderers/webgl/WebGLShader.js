@@ -23,17 +23,17 @@ function WebGLShader( gl, type, string, check ) {
 	gl.shaderSource( shader, string );
 	gl.compileShader( shader );
 
-	if(check === true) {
+	if ( check === true ) {
 
-		if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) === false) {
+		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
 
-			console.error('THREE.WebGLShader: Shader couldn\'t compile.');
+			console.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
 
 		}
 
-		if (gl.getShaderInfoLog(shader) !== '') {
+		if ( gl.getShaderInfoLog( shader ) !== '' ) {
 
-			console.warn('THREE.WebGLShader: gl.getShaderInfoLog()', type === gl.VERTEX_SHADER ? 'vertex' : 'fragment', gl.getShaderInfoLog(shader), addLineNumbers(string));
+			console.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', type === gl.VERTEX_SHADER ? 'vertex' : 'fragment', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
 
 		}
 
