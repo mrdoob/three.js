@@ -55,11 +55,10 @@
 
 			var perpCamera, orthoCamera, renderer, lut;
 
-			var mesh;
+			var mesh, sprite;
 			var scene, uiScene;
 
-			var params, verticalLegendGroup, horizontalLegendGroup;
-			var updateColorEvent;
+			var params;
 
 			init();
 
@@ -72,23 +71,23 @@
 
 				uiScene = new THREE.Scene();
 
-				updateColorEvent = { type: 'updateColor' };
+				lut = new THREE.Lut();
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
 				perpCamera = new THREE.PerspectiveCamera( 60, width / height, 1, 100 );
 				perpCamera.position.set( 0, 0, 10 );
-				scene.add(perpCamera);
+				scene.add( perpCamera );
 
-				verticalLegendGroup = new THREE.Group();
-				horizontalLegendGroup = new THREE.Group();
+				orthoCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 1, 2 );
+				orthoCamera.position.set( 0.5, 0, 1 );
 
-				uiScene.add( verticalLegendGroup, horizontalLegendGroup );
-
-				// sized camera to legend dimenions
-				orthoCamera = new THREE.OrthographicCamera( - 6, 6, 2, - 2, 1, 10 );
-				orthoCamera.position.set( 3, 0, 10 );
+				sprite = new THREE.Sprite( new THREE.SpriteMaterial( {
+					map: new THREE.CanvasTexture( lut.createCanvas() )
+				} ) );
+				sprite.scale.x = 0.125;
+				uiScene.add( sprite );
 
 				mesh = new THREE.Mesh( undefined, new THREE.MeshLambertMaterial( {
 					side: THREE.DoubleSide,
@@ -97,11 +96,8 @@
 				} ) );
 				scene.add( mesh );
 
-				lut = new THREE.Lut();
-
 				params	= {
 					colorMap: 'rainbow',
-					legendLayout: 'vertical'
 				};
 				loadModel( );
 
@@ -120,13 +116,6 @@
 				controls.addEventListener( 'change', render );
 
 				var gui = new dat.GUI();
-
-				gui.add( params, 'legendLayout', [ 'vertical', 'horizontal' ] ).onChange( function () {
-
-					updateLegend();
-					render();
-
-				} );
 
 				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function () {
 
@@ -178,60 +167,6 @@
 					mesh.geometry = geometry;
 					updateColors();
 
-					var labelParams = { 'title': 'Pressure', 'um': '[Pa]', 'ticks': 5 };
-
-					// vertical legend
-					var verticalLegend = lut.setLegendOn();
-					verticalLegendGroup.add( verticalLegend );
-
-					var labels = lut.setLegendLabels( labelParams );
-
-					verticalLegendGroup.add( labels[ 'title' ] );
-
-					for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
-
-						verticalLegendGroup.add( labels[ 'ticks' ][ i ] );
-						verticalLegendGroup.add( labels[ 'lines' ][ i ] );
-
-					}
-
-					// horizontal legend
-					var horizontalLegend = lut.setLegendOn( { layout: 'horizontal' } );
-					horizontalLegendGroup.add( horizontalLegend );
-
-					var labels = lut.setLegendLabels( labelParams );
-
-					horizontalLegendGroup.add( labels[ 'title' ] );
-
-					for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
-
-						horizontalLegendGroup.add( labels[ 'ticks' ][ i ] );
-						horizontalLegendGroup.add( labels[ 'lines' ][ i ] );
-
-					}
-
-					uiScene.addEventListener( 'updateColor', function () {
-
-						lut.updateCanvas( horizontalLegend.material.map.image );
-						lut.updateCanvas( verticalLegend.material.map.image );
-
-						horizontalLegend.material.map.needsUpdate = true;
-						verticalLegend.material.map.needsUpdate = true;
-
-					} );
-
-					// vertical layer = 0, horizontal layer = 1
-					horizontalLegendGroup.traverse( function ( obj ) {
-
-						if ( obj.layers ) {
-
-							obj.layers.set( 1 );
-
-						}
-
-					} );
-
-					updateLegend();
 					render();
 
 				} );
@@ -268,28 +203,11 @@
 
 				colors.needsUpdate = true;
 
-				uiScene.dispatchEvent( updateColorEvent );
+				var map = sprite.material.map;
+				lut.updateCanvas( map.image );
+				map.needsUpdate = true;
 
 			}
-
-			function updateLegend() {
-
-				if ( params.legendLayout ) {
-
-					if ( params.legendLayout === 'horizontal' ) {
-
-						orthoCamera.layers.set( 1 );
-
-					} else {
-
-						orthoCamera.layers.set( 0 );
-
-					}
-
-				}
-
-			}
-
 
 		</script>
 

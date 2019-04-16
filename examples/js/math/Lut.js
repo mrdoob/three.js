@@ -10,12 +10,6 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 };
 
-var defaultLegendParameters = {
-	layout: 'vertical',
-	position: new THREE.Vector3(),
-	dimensions: { width: 0.5, height: 3 }
-};
-
 var defaultLabelParameters = {
 	fontsize: 24,
 	fontface: 'Arial',
@@ -34,7 +28,7 @@ THREE.Lut.prototype = {
 
 	constructor: THREE.Lut,
 
-	lut: [], map: [], mapname: 'rainbow', n: 256, minV: 0, maxV: 1, legend: null,
+	lut: [], map: [], n: 256, minV: 0, maxV: 1,
 
 	set: function ( value ) {
 
@@ -68,7 +62,6 @@ THREE.Lut.prototype = {
 
 		this.map = THREE.ColorMapKeywords[ colormap ] || THREE.ColorMapKeywords.rainbow;
 		this.n = numberofcolors || 32;
-		this.mapname = colormap;
 
 		var step = 1.0 / this.n;
 
@@ -102,7 +95,6 @@ THREE.Lut.prototype = {
 	copy: function ( lut ) {
 
 		this.lut = lut.lut;
-		this.mapname = lut.mapname;
 		this.map = lut.map;
 		this.n = lut.n;
 		this.minV = lut.minV;
@@ -142,10 +134,8 @@ THREE.Lut.prototype = {
 	createCanvas: function () {
 
 		var canvas = document.createElement( 'canvas' );
-		canvas.setAttribute( 'width', 1 );
-		canvas.setAttribute( 'height', this.n );
-		canvas.setAttribute( 'id', 'legend' );
-		canvas.setAttribute( 'hidden', true );
+		canvas.width = 1;
+		canvas.height = this.n;
 
 		this.updateCanvas( canvas );
 
@@ -155,15 +145,11 @@ THREE.Lut.prototype = {
 
 	updateCanvas: function ( canvas ) {
 
-		canvas = canvas || this.legend.canvas;
-
 		var ctx = canvas.getContext( '2d', { alpha: false } );
 
 		var imageData = ctx.getImageData( 0, 0, 1, this.n );
 
 		var data = imageData.data;
-
-		this.map = THREE.ColorMapKeywords[ this.mapname ];
 
 		var k = 0;
 
@@ -200,315 +186,7 @@ THREE.Lut.prototype = {
 
 		return canvas;
 
-	},
-
-	setLegendOn: function ( parameters ) {
-
-		parameters = parameters || defaultLegendParameters;
-
-		this.legend = {};
-
-		this.legend.layout = parameters.layout || defaultLegendParameters.layout;
-
-		this.legend.position = parameters.position || defaultLegendParameters.position;
-
-		this.legend.dimensions = parameters.dimensions || defaultLegendParameters.dimensions;
-
-		var canvas = this.createCanvas();
-
-		document.body.appendChild( canvas );
-
-		this.legend.canvas = canvas;
-
-		this.legend.texture = new THREE.Texture( canvas );
-		this.legend.texture.needsUpdate = true;
-
-		this.legend.legendGeometry = new THREE.PlaneBufferGeometry( this.legend.dimensions.width, this.legend.dimensions.height );
-		this.legend.legendMaterial = new THREE.MeshBasicMaterial( { map: this.legend.texture, side: THREE.DoubleSide } );
-
-		this.legend.mesh = new THREE.Mesh( this.legend.legendGeometry, this.legend.legendMaterial );
-
-		if ( this.legend.layout == 'horizontal' ) {
-
-			this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
-
-		}
-
-		this.legend.mesh.position.copy( this.legend.position );
-
-		return this.legend.mesh;
-
-	},
-
-	setLegendOff: function () {
-
-		this.legend = null;
-
-		return this.legend;
-
-	},
-
-	setLegendLayout: function ( layout ) {
-
-		if ( ! this.legend ) {
-
-			return false;
-
-		}
-
-		if ( this.legend.layout == layout ) {
-
-			return false;
-
-		}
-
-		if ( layout != 'horizontal' && layout != 'vertical' ) {
-
-			return false;
-
-		}
-
-		this.layout = layout;
-
-		if ( layout == 'horizontal' ) {
-
-			this.legend.mesh.rotation.z = 90 * ( Math.PI / 180 );
-
-		}
-
-		if ( layout == 'vertical' ) {
-
-			this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
-
-		}
-
-		return this.legend.mesh;
-
-	},
-
-	setLegendPosition: function ( position ) {
-
-		if ( position.isVector3 ) {
-
-			this.legend.position.copy( position );
-
-		} else {
-
-			this.legend.position.set( position.x, position.y, position.z );
-
-		}
-
-		return this.legend;
-
-	},
-
-	setLegendLabels: function ( parameters, callback ) {
-
-		if ( ! this.legend ) {
-
-			return false;
-
-		}
-
-		if ( typeof parameters === 'function' ) {
-
-			callback = parameters;
-			parameters = undefined;
-
-		}
-
-		parameters = parameters || defaultLabelParameters;
-		this.legend.labels = {};
-
-		this.legend.labels.fontsize = parameters.fontsize || defaultLabelParameters.fontsize;
-
-		this.legend.labels.fontface = parameters.fontface || defaultLabelParameters.fontface;
-
-		this.legend.labels.title = parameters.title || defaultLabelParameters.title;
-
-		this.legend.labels.um = parameters.um || defaultLabelParameters.um;
-
-		this.legend.labels.ticks = parameters.ticks || defaultLabelParameters.ticks;
-
-		this.legend.labels.decimal = parameters.decimal || defaultLabelParameters.decimal;
-
-		this.legend.labels.notation = parameters.notation || defaultLabelParameters.notation;
-
-		var canvasTitle = document.createElement( 'canvas' );
-		var contextTitle = canvasTitle.getContext( '2d' );
-
-		contextTitle.font = 'Normal ' + this.legend.labels.fontsize * 1.2 + 'px ' + this.legend.labels.fontface;
-
-		contextTitle.fillStyle = 'rgba(' + defaultBackgroundColor.r + ',' + defaultBackgroundColor.g + ',' + defaultBackgroundColor.b + ',' + defaultBackgroundColor.a + ')';
-
-		contextTitle.strokeStyle = 'rgba(' + defaultBorderColor.r + ',' + defaultBorderColor.g + ',' + defaultBorderColor.b + ',' + defaultBorderColor.a + ')';
-
-		contextTitle.lineWidth = defaultBorderThickness;
-
-		contextTitle.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
-
-		contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness );
-
-		var txtTitle = new THREE.CanvasTexture( canvasTitle );
-		txtTitle.minFilter = THREE.LinearFilter;
-
-		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle } );
-
-		var spriteTitle = new THREE.Sprite( spriteMaterialTitle );
-
-		spriteTitle.scale.set( 2, 1, 1.0 );
-
-		if ( this.legend.layout == 'vertical' ) {
-
-			spriteTitle.position.set( this.legend.position.x + this.legend.dimensions.width, this.legend.position.y + ( this.legend.dimensions.height * 0.45 ), this.legend.position.z );
-
-		}
-
-		if ( this.legend.layout == 'horizontal' ) {
-
-			spriteTitle.position.set( this.legend.position.x * 1.015, this.legend.position.y + ( this.legend.dimensions.height * 0.03 ), this.legend.position.z );
-
-		}
-
-		if ( this.legend.labels.ticks > 0 ) {
-
-			var ticks = {};
-			var lines = {};
-
-			if ( this.legend.layout == 'vertical' ) {
-
-				var topPositionY = this.legend.position.y + ( this.legend.dimensions.height * 0.36 );
-				var bottomPositionY = this.legend.position.y - ( this.legend.dimensions.height * 0.61 );
-
-			}
-
-			if ( this.legend.layout == 'horizontal' ) {
-
-				var topPositionX = this.legend.position.x + ( this.legend.dimensions.height * 0.75 );
-				var bottomPositionX = this.legend.position.x - ( this.legend.dimensions.width * 1.2 );
-
-			}
-
-			for ( var i = 0; i < this.legend.labels.ticks; i ++ ) {
-
-				var value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1 ) * i + this.minV;
-
-				if ( callback ) {
-
-					value = callback( value );
-
-				} else {
-
-					if ( this.legend.labels.notation == 'scientific' ) {
-
-						value = value.toExponential( this.legend.labels.decimal );
-
-					} else {
-
-						value = value.toFixed( this.legend.labels.decimal );
-
-					}
-
-				}
-
-				var canvasTick = document.createElement( 'canvas' );
-				var contextTick = canvasTick.getContext( '2d' );
-
-				contextTick.font = 'Normal ' + this.legend.labels.fontsize + 'px ' + this.legend.labels.fontface;
-
-				contextTick.fillStyle = 'rgba(' + defaultBackgroundColor.r + ',' + defaultBackgroundColor.g + ',' + defaultBackgroundColor.b + ',' + defaultBackgroundColor.a + ')';
-
-				contextTick.strokeStyle = 'rgba(' + defaultBorderColor.r + ',' + defaultBorderColor.g + ',' + defaultBorderColor.b + ',' + defaultBorderColor.a + ')';
-
-				contextTick.lineWidth = defaultBorderThickness;
-
-				contextTick.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
-
-				contextTick.fillText( value.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness );
-
-				var txtTick = new THREE.CanvasTexture( canvasTick );
-				txtTick.minFilter = THREE.LinearFilter;
-
-				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick } );
-
-				var spriteTick = new THREE.Sprite( spriteMaterialTick );
-
-				spriteTick.scale.set( 2, 1, 1.0 );
-
-				if ( this.legend.layout == 'vertical' ) {
-
-					var position = bottomPositionY + ( topPositionY - bottomPositionY ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) );
-
-					spriteTick.position.set( this.legend.position.x + ( this.legend.dimensions.width * 2.7 ), position, this.legend.position.z );
-
-				}
-
-				if ( this.legend.layout == 'horizontal' ) {
-
-					var position = bottomPositionX + ( topPositionX - bottomPositionX ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) );
-
-					if ( this.legend.labels.ticks > 5 ) {
-
-						if ( i % 2 === 0 ) {
-
-							var offset = 1.7;
-
-						} else {
-
-							var offset = 2.1;
-
-						}
-
-					} else {
-
-						var offset = 1.7;
-
-					}
-
-					spriteTick.position.set( position, this.legend.position.y - this.legend.dimensions.width * offset, this.legend.position.z );
-
-				}
-
-				var material = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 2 } );
-
-				var points = [];
-
-
-				if ( this.legend.layout == 'vertical' ) {
-
-					var linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) * 0.99 );
-
-					points.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition, this.legend.position.z ) );
-
-					points.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.7, linePosition, this.legend.position.z ) );
-
-				}
-
-				if ( this.legend.layout == 'horizontal' ) {
-
-					var linePosition = ( this.legend.position.x - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) * 0.99 );
-
-					points.push( new THREE.Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.55, this.legend.position.z ) );
-
-					points.push( new THREE.Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.7, this.legend.position.z ) );
-
-				}
-
-				var geometry = new THREE.BufferGeometry().setFromPoints( points );
-
-				var line = new THREE.Line( geometry, material );
-
-				lines[ i ] = line;
-				ticks[ i ] = spriteTick;
-
-			}
-
-		}
-
-		return { 'title': spriteTitle, 'ticks': ticks, 'lines': lines };
-
 	}
-
 };
 
 
