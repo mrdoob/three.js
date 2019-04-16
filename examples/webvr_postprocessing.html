@@ -84,6 +84,8 @@
 
 				composer = new THREE.EffectComposer( renderer );
 
+				renderer.setRenderTarget( composer.readBuffer );
+
 				var effect = new THREE.ShaderPass( THREE.DotScreenShader );
 				effect.uniforms[ 'scale' ].value = 4;
 				composer.addPass( effect );
@@ -126,7 +128,6 @@
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
 
-				renderer.setRenderTarget( composer.readBuffer );
 				renderer.render( scene, camera );
 
 			}
