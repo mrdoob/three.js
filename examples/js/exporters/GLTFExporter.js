@@ -125,9 +125,6 @@ THREE.GLTFExporter.prototype = {
 
 		/**
 		 * Compare two arrays
-		 */
-		/**
-		 * Compare two arrays
 		 * @param  {Array} array1 Array 1 to compare
 		 * @param  {Array} array2 Array 2 to compare
 		 * @return {Boolean}        Returns true if both arrays are equal
