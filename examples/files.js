@@ -60,6 +60,7 @@ var files = {
 		"webgl_kinect",
 		"webgl_layers",
 		"webgl_lensflares",
+		"webgl_lightprobe",
 		"webgl_lightningstrike",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
