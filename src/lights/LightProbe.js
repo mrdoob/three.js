@@ -16,7 +16,7 @@ function LightProbe( color, intensity ) {
 
 	this.sh = new SphericalHarmonics3();
 
-	this.sh.coefficients[ 0 ].set( this.color.r, this.color.g, this.color.b );
+	this.sh.coefficients[ 0 ].set( 1, 1, 1 );
 
 	this.type = 'LightProbe';
 
