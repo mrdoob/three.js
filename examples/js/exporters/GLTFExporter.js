@@ -456,12 +456,12 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
-		 * @param  {Integer} data
 		 * @param  {BufferAttribute} attribute
+		 * @param  {Integer} data
 		 * @param  {Integer|undefined} start
 		 * @param  {Integer|undefined} count
 		 */
-		function setAttributeCache( data, attribute, start, count ) {
+		function setAttributeCache( attribute, data, start, count ) {
 
 			if ( ! cachedData.attributes.has( attribute ) ) {
 
@@ -1251,7 +1251,7 @@ THREE.GLTFExporter.prototype = {
 				if ( accessor !== null ) {
 
 					attributes[ attributeName ] = accessor;
-					setAttributeCache( accessor, attribute );
+					setAttributeCache( attribute, accessor );
 
 				}
 
@@ -1339,7 +1339,7 @@ THREE.GLTFExporter.prototype = {
 						}
 
 						target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
-						setAttributeCache( target[ gltfAttributeName ], baseAttribute );
+						setAttributeCache( baseAttribute, target[ gltfAttributeName ] );
 
 					}
 
@@ -1415,7 +1415,7 @@ THREE.GLTFExporter.prototype = {
 					} else {
 
 						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
-						setAttributeCache( primitive.indices, geometry.index, groups[ i ].start, groups[ i ].count );
+						setAttributeCache( geometry.index, primitive.indices, groups[ i ].start, groups[ i ].count );
 
 					}
 
