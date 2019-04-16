@@ -45,7 +45,7 @@ var LoaderUtils = {
 		return text.replace( /\n/g, " " ).
 			replace( /\r/g, " " ).
 			replace( /\t/g, " " ).
-			replace( /\s\s+/g, " " ).
+			replace( /  +/g, " " ). // double space
 			trim().
 			split( " " );
 
