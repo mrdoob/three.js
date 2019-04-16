@@ -206,45 +206,60 @@ Menubar.Edit = function ( editor ) {
 	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/fixcolormaps' ) );
-	option.onClick(function()
-	{
-		editor.scene.traverse(fixColorMap);
-	});
-	options.add(option);
+	option.onClick( function () {
 
-	var colorMaps = ['map', 'envMap', 'emissiveMap'];
+		editor.scene.traverse( fixColorMap );
 
-	function fixColorMap(obj)
-	{
+	} );
+	options.add( option );
+
+	var colorMaps = [ 'map', 'envMap', 'emissiveMap' ];
+
+	function fixColorMap( obj ) {
+
 		var material = obj.material;
-		if(Array.isArray(material) === true)
-		{
-			for(var i = 0; i < material.length; ++i)
-			{
-				fixMaterial(material[i]);
+
+		if ( material !== undefined ) {
+
+			if ( Array.isArray( material ) === true ) {
+
+				for ( var i = 0; i < material.length; i ++ ) {
+
+					fixMaterial( material[ i ] );
+
+				}
+
+			} else {
+
+				fixMaterial( material );
+
 			}
-		}
-		else if(material !== undefined)
-		{
-			fixMaterial(material);
+
+			editor.signals.sceneGraphChanged.dispatch();
+
 		}
 
-		editor.signals.sceneGraphChanged.dispatch();
 	}
 
-	function fixMaterial(material)
-	{
+	function fixMaterial( material ) {
+
 		var needsUpdate = material.needsUpdate;
-		for(var i = 0; i < colorMaps.length; ++i)
-		{
-			var map = material[colorMaps[i]];
-			if(map)
-			{
+
+		for ( var i = 0; i < colorMaps.length; i ++ ) {
+
+			var map = material[ colorMaps[ i ] ];
+
+			if ( map ) {
+
 				map.encoding = THREE.sRGBEncoding;
 				needsUpdate = true;
+
 			}
+
 		}
+
 		material.needsUpdate = needsUpdate;
+
 	}
 
 	return container;
