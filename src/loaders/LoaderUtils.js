@@ -40,12 +40,12 @@ var LoaderUtils = {
 
 	},
 
-	parseData: function ( text ) {
+	splitByWhitespace: function ( text ) {
 
 		return text.replace( /\n/g, " " ).
 			replace( /\r/g, " " ).
 			replace( /\t/g, " " ).
-			replace( / +/g, " " ).
+			replace( /\s\s+/g, " " ).
 			trim().
 			split( " " );
 

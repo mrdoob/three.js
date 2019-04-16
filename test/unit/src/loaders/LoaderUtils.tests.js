@@ -29,15 +29,15 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'parseData', ( assert ) => {
+		QUnit.test( 'splitByWhitespace', ( assert ) => {
 
 			var AMOUNT = 50000;
 
-			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, true, " ", 3 ) ).length, AMOUNT );
-			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, false, " ", 3 ) ).length, AMOUNT );
-			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, true, "\t", 3 ) ).length, AMOUNT );
-			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, true, "\n", 3 ) ).length, AMOUNT );
-			assert.equal( LoaderUtils.parseData( generateText( AMOUNT, true, "\r", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.splitByWhitespace( generateText( AMOUNT, true, " ", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.splitByWhitespace( generateText( AMOUNT, false, " ", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.splitByWhitespace( generateText( AMOUNT, true, "\t", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.splitByWhitespace( generateText( AMOUNT, true, "\n", 3 ) ).length, AMOUNT );
+			assert.equal( LoaderUtils.splitByWhitespace( generateText( AMOUNT, true, "\r", 3 ) ).length, AMOUNT );
 
 		} );
 

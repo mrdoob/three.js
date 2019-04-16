@@ -91,7 +91,7 @@ THREE.ColladaLoader.prototype = {
 
 			if ( text.length === 0 ) return [];
 
-			var parts = THREE.LoaderUtils.parseData( text );
+			var parts = THREE.LoaderUtils.splitByWhitespace( text );
 			var array = new Array( parts.length );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
@@ -108,7 +108,7 @@ THREE.ColladaLoader.prototype = {
 
 			if ( text.length === 0 ) return [];
 
-			var parts = THREE.LoaderUtils.parseData( text );
+			var parts = THREE.LoaderUtils.splitByWhitespace( text );
 			var array = new Array( parts.length );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
@@ -125,7 +125,7 @@ THREE.ColladaLoader.prototype = {
 
 			if ( text.length === 0 ) return [];
 
-			var parts = THREE.LoaderUtils.parseData( text );
+			var parts = THREE.LoaderUtils.splitByWhitespace( text );
 			var array = new Array( parts.length );
 
 			for ( var i = 0, l = parts.length; i < l; i ++ ) {
