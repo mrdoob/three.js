@@ -27,25 +27,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.test( "copy", ( assert ) => {
-
-			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
-			var instance = new InstancedBufferAttribute( array, 2, 123 );
-			var copiedInstance = instance.copy( instance );
-
-			assert.ok( copiedInstance instanceof InstancedBufferAttribute, "the clone has the correct type" );
-			assert.ok( copiedInstance.itemSize === 2, "itemSize was copied" );
-			assert.ok( copiedInstance.meshPerAttribute === 123, "meshPerAttribute was copied" );
-
-			for ( var i = 0; i < array.length; i ++ ) {
-
-				assert.ok( copiedInstance.array[ i ] === array[ i ], "array was copied" );
-
-			}
-
-		} );
-
 	} );
 
 } );
