@@ -48,6 +48,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this._previousFrameTime = Date.now();
 	this._rendererSize = new THREE.Vector2();
+	this._wasPresenting = false;
 
 };
 
@@ -97,8 +98,20 @@ Object.assign( THREE.EffectComposer.prototype, {
 		if ( this.renderer.vr.enabled === true ) {
 
 			this.renderer.vr.enabled = false;
-			this.renderer.getDrawingBufferSize( this._rendererSize );
-			this.setSize( this._rendererSize.x, this._rendererSize.y );
+
+			var isPresenting = this.renderer.vr.isPresenting();
+
+			// renderer size can be changed by WebXR/VRManager
+			// on presenting change
+
+			if ( isPresenting !== this._wasPresenting ) {
+
+				this.renderer.getDrawingBufferSize( this._rendererSize );
+				this.setSize( this._rendererSize.x, this._rendererSize.y );
+
+			}
+
+			this._wasPresenting = isPresenting;
 
 		}
 
