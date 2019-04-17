@@ -13,7 +13,7 @@ function LightProbeHelper( lightProbe, size ) {
 	this.size = size;
 
 	var defines = {};
-	defines [ 'GAMMA_OUTPUT' ] = "";
+	defines[ 'GAMMA_OUTPUT' ] = "";
 
 	// material
 	var material = new ShaderMaterial( {
