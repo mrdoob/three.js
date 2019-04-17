@@ -53,11 +53,11 @@ var LoaderUtils = {
 
 };
 
-function isSafari () {
+function isSafari() {
 
 	let browser = window.navigator.userAgent.match( /chrome|opera|safari|firefox|msie|trident/i );
 
-	return ( browser !== null ) ? /safari/i.test( browser[0] ) : false;
+	return ( browser !== null ) ? /safari/i.test( browser[ 0 ] ) : false;
 
 }
 
