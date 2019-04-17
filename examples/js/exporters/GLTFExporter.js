@@ -1251,7 +1251,7 @@ THREE.GLTFExporter.prototype = {
 				if ( accessor !== null ) {
 
 					attributes[ attributeName ] = accessor;
-					setAttributeCache( accessor, attribute );
+					setAttributeCache( attribute, accessor );
 
 				}
 
@@ -1339,7 +1339,7 @@ THREE.GLTFExporter.prototype = {
 						}
 
 						target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
-						setAttributeCache( target[ gltfAttributeName ], baseAttribute );
+						setAttributeCache( baseAttribute, target[ gltfAttributeName ] );
 
 					}
 
