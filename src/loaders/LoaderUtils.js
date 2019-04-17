@@ -42,7 +42,7 @@ var LoaderUtils = {
 
 	splitByWhitespace: function ( text ) {
 
-		return ( isSafari() ) ? text.trim().split( /\s+/ ) : text.replace( /\n/g, " " ).
+		return text.replace( /\n/g, " " ).
 			replace( /\r/g, " " ).
 			replace( /\t/g, " " ).
 			replace( /  +/g, " " ). // double space
@@ -52,13 +52,5 @@ var LoaderUtils = {
 	}
 
 };
-
-function isSafari() {
-
-	var browser = ( typeof navigator !== "undefined" ) ? navigator.userAgent.match( /chrome|opera|safari|firefox|msie|trident/i ) : null;
-
-	return ( browser !== null ) ? /safari/i.test( browser[ 0 ] ) : false;
-
-}
 
 export { LoaderUtils };
