@@ -16,14 +16,14 @@ function addLineNumbers( string ) {
 
 }
 
-function WebGLShader( gl, type, string, checkProgram ) {
+function WebGLShader( gl, type, string, debug ) {
 
 	var shader = gl.createShader( type );
 
 	gl.shaderSource( shader, string );
 	gl.compileShader( shader );
 
-	if ( checkProgram === true ) {
+	if ( debug === true ) {
 
 		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
 

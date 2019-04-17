@@ -583,8 +583,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
 
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl, renderer.programCheckEnabled );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl, renderer.programCheckEnabled );
+	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl, renderer.debug.checkShaderErrors );
+	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl, renderer.debug.checkShaderErrors );
 
 	gl.attachShader( program, glVertexShader );
 	gl.attachShader( program, glFragmentShader );
@@ -604,8 +604,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	gl.linkProgram( program );
 
-	if ( renderer.programCheckEnabled ){
-		// check for link errors
+	// check for link errors
+	if ( renderer.debug.checkShaderErrors ) {
 
 		var programLog = gl.getProgramInfoLog( program ).trim();
 		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();

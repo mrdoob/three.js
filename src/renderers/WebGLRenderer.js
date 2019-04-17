@@ -36,6 +36,7 @@ import { WebGLPrograms } from './webgl/WebGLPrograms.js';
 import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
 import { WebGLRenderStates } from './webgl/WebGLRenderStates.js';
+import { WebGLRendererDebug } from "./WebGLRendererDebug.js";
 import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
 import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
@@ -77,11 +78,7 @@ function WebGLRenderer( parameters ) {
 	this.domElement = _canvas;
 	this.context = null;
 
-	/**
-	 * Enables error checking and reporting when shader programs are being compiled
-	 * @type {boolean}
-	 */
-	this.programCheckEnabled = true;
+	this.debug = new WebGLRendererDebug();
 
 	// clearing
 
