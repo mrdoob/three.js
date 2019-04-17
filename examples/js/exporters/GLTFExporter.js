@@ -430,56 +430,6 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
-		 * @param  {BufferAttribute} attribute
-		 * @param  {Integer|undefined} start
-		 * @param  {Integer|undefined} count
-		 * @return {Boolean}
-		 */
-		function hasAttributeCache( attribute, start, count ) {
-
-			return cachedData.attributes.has( attribute ) &&
-				cachedData.attributes.get( attribute ).has( start ) &&
-				cachedData.attributes.get( attribute ).get( start ).has( count );
-
-		}
-
-		/**
-		 * @param  {BufferAttribute} attribute
-		 * @param  {Integer|undefined} start
-		 * @param  {Integer|undefined} count
-		 * @return {Integer}
-		 */
-		function getAttributeCache( attribute, start, count ) {
-
-			return cachedData.attributes.get( attribute ).get( start ).get( count );
-
-		}
-
-		/**
-		 * @param  {Integer} data
-		 * @param  {BufferAttribute} attribute
-		 * @param  {Integer|undefined} start
-		 * @param  {Integer|undefined} count
-		 */
-		function setAttributeCache( data, attribute, start, count ) {
-
-			if ( ! cachedData.attributes.has( attribute ) ) {
-
-				cachedData.attributes.set( attribute, new Map() );
-
-			}
-
-			if ( ! cachedData.attributes.get( attribute ).has( start ) ) {
-
-				cachedData.attributes.get( attribute ).set( start, new Map() );
-
-			}
-
-			cachedData.attributes.get( attribute ).get( start ).set( count, data );
-
-		}
-
-		/**
 		 * Process a buffer to append to the default one.
 		 * @param  {ArrayBuffer} buffer
 		 * @return {Integer}
@@ -1228,9 +1178,9 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				if ( hasAttributeCache( attribute ) ) {
+				if ( cachedData.attributes.has( attribute ) ) {
 
-					attributes[ attributeName ] = getAttributeCache( attribute );
+					attributes[ attributeName ] = cachedData.attributes.get( attribute );
 					continue;
 
 				}
@@ -1251,7 +1201,7 @@ THREE.GLTFExporter.prototype = {
 				if ( accessor !== null ) {
 
 					attributes[ attributeName ] = accessor;
-					setAttributeCache( attribute, accessor );
+					cachedData.attributes.set( attribute, accessor );
 
 				}
 
@@ -1317,9 +1267,9 @@ THREE.GLTFExporter.prototype = {
 
 						var baseAttribute = geometry.attributes[ attributeName ];
 
-						if ( hasAttributeCache( attribute ) ) {
+						if ( cachedData.attributes.has( attribute ) ) {
 
-							target[ gltfAttributeName ] = getAttributeCache( attribute );
+							target[ gltfAttributeName ] = cachedData.attributes.get( attribute );
 							continue;
 
 						}
@@ -1339,7 +1289,7 @@ THREE.GLTFExporter.prototype = {
 						}
 
 						target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
-						setAttributeCache( baseAttribute, target[ gltfAttributeName ] );
+						cachedData.attributes.set( baseAttribute, target[ gltfAttributeName ] );
 
 					}
 
@@ -1408,14 +1358,14 @@ THREE.GLTFExporter.prototype = {
 
 				if ( geometry.index !== null ) {
 
-					if ( hasAttributeCache( geometry.index, groups[ i ].start, groups[ i ].count ) ) {
+					if ( cachedData.attributes.has( geometry.index ) ) {
 
-						primitive.indices = getAttributeCache( geometry.index, groups[ i ].start, groups[ i ].count );
+						primitive.indices = cachedData.attributes.get( geometry.index );
 
 					} else {
 
 						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
-						setAttributeCache( primitive.indices, geometry.index, groups[ i ].start, groups[ i ].count );
+						cachedData.attributes.set( geometry.index, primitive.indices );
 
 					}
 
