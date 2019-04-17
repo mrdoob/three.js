@@ -604,7 +604,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	gl.linkProgram( program );
 
-	if( renderer.programCheckEnabled ){
+	if ( renderer.programCheckEnabled ){
 		// check for link errors
 
 		var programLog = gl.getProgramInfoLog( program ).trim();
