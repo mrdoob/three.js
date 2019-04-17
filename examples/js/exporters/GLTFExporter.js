@@ -1375,22 +1375,22 @@ THREE.GLTFExporter.prototype = {
 
 				if ( geometry.index !== null ) {
 
-					var key = getUID( geometry.index );
+					var cacheKey = getUID( geometry.index );
 
 					if ( groups[ i ].start !== undefined || groups[ i ].count !== undefined ) {
 
-						key += ':' + groups[ i ].start + ':' + groups[ i ].count;
+						cacheKey += ':' + groups[ i ].start + ':' + groups[ i ].count;
 
 					}
 
-					if ( cachedData.attributes.has( key ) ) {
+					if ( cachedData.attributes.has( cacheKey ) ) {
 
-						primitive.indices = cachedData.attributes.get( key );
+						primitive.indices = cachedData.attributes.get( cacheKey );
 
 					} else {
 
 						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
-						cachedData.attributes.set( key, primitive.indices );
+						cachedData.attributes.set( cacheKey, primitive.indices );
 
 					}
 
