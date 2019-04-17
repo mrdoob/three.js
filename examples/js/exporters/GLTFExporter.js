@@ -123,6 +123,23 @@ THREE.GLTFExporter.prototype = {
 
 		var cachedCanvas;
 
+		var uids = new Map();
+		var uid = 0;
+
+		/**
+		 * Assign and return a temporal unique id for an object
+		 * especially which doesn't have .uuid
+		 * @param  {Object} object
+		 * @return {Integer}
+		 */
+		function getUID( object ) {
+
+			if ( ! uids.has( object ) ) uids.set( object, uid ++ );
+
+			return uids.get( object );
+
+		}
+
 		/**
 		 * Compare two arrays
 		 */
@@ -1178,9 +1195,9 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				if ( cachedData.attributes.has( attribute ) ) {
+				if ( cachedData.attributes.has( getUID( attribute ) ) ) {
 
-					attributes[ attributeName ] = cachedData.attributes.get( attribute );
+					attributes[ attributeName ] = cachedData.attributes.get( getUID( attribute ) );
 					continue;
 
 				}
@@ -1201,7 +1218,7 @@ THREE.GLTFExporter.prototype = {
 				if ( accessor !== null ) {
 
 					attributes[ attributeName ] = accessor;
-					cachedData.attributes.set( attribute, accessor );
+					cachedData.attributes.set( getUID( attribute ), accessor );
 
 				}
 
@@ -1267,9 +1284,9 @@ THREE.GLTFExporter.prototype = {
 
 						var baseAttribute = geometry.attributes[ attributeName ];
 
-						if ( cachedData.attributes.has( attribute ) ) {
+						if ( cachedData.attributes.has( getUID( attribute ) ) ) {
 
-							target[ gltfAttributeName ] = cachedData.attributes.get( attribute );
+							target[ gltfAttributeName ] = cachedData.attributes.get( getUID( attribute ) );
 							continue;
 
 						}
@@ -1289,7 +1306,7 @@ THREE.GLTFExporter.prototype = {
 						}
 
 						target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
-						cachedData.attributes.set( baseAttribute, target[ gltfAttributeName ] );
+						cachedData.attributes.set( getUID( baseAttribute ), target[ gltfAttributeName ] );
 
 					}
 
@@ -1358,14 +1375,22 @@ THREE.GLTFExporter.prototype = {
 
 				if ( geometry.index !== null ) {
 
-					if ( cachedData.attributes.has( geometry.index ) ) {
+					var key = getUID( geometry.index );
 
-						primitive.indices = cachedData.attributes.get( geometry.index );
+					if ( groups[ i ].start !== undefined || groups[ i ] !== undefined ) {
+
+						key += ':' + groups[ i ].start + ':' + groups[ i ].count;
+
+					}
+
+					if ( cachedData.attributes.has( key ) ) {
+
+						primitive.indices = cachedData.attributes.get( key );
 
 					} else {
 
 						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
-						cachedData.attributes.set( geometry.index, primitive.indices );
+						cachedData.attributes.set( key, primitive.indices );
 
 					}
 
