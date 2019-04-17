@@ -1377,7 +1377,7 @@ THREE.GLTFExporter.prototype = {
 
 					var key = getUID( geometry.index );
 
-					if ( groups[ i ].start !== undefined || groups[ i ] !== undefined ) {
+					if ( groups[ i ].start !== undefined || groups[ i ].count !== undefined ) {
 
 						key += ':' + groups[ i ].start + ':' + groups[ i ].count;
 
