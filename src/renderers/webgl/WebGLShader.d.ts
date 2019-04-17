@@ -1,3 +1,3 @@
 export class WebGLShader {
-  constructor(gl: any, type: string, string: string, check: boolean);
+  constructor(gl: any, type: string, string: string, checkProgram: boolean);
 }
