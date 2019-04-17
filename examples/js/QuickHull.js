@@ -119,6 +119,24 @@
 
 		},
 
+		containsPoint: function ( point ) {
+
+			var faces = this.faces;
+
+			for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+				var face = faces[ i ];
+
+				// compute signed distance and check on what half space the point lies
+
+				if ( face.distanceToPoint( point ) > this.tolerance ) return false;
+
+			}
+
+			return true;
+
+		},
+
 		makeEmpty: function () {
 
 			this.faces = [];
