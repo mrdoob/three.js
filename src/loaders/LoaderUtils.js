@@ -55,7 +55,7 @@ var LoaderUtils = {
 
 function isSafari() {
 
-	var browser = ( navigator ) ? navigator.userAgent.match( /chrome|opera|safari|firefox|msie|trident/i ) : null;
+	var browser = ( typeof( navigator ) !== "undefined" ) ? navigator.userAgent.match( /chrome|opera|safari|firefox|msie|trident/i ) : null;
 
 	return ( browser !== null ) ? /safari/i.test( browser[ 0 ] ) : false;
 
