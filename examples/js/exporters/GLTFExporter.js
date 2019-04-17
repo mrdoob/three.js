@@ -1359,7 +1359,7 @@ THREE.GLTFExporter.prototype = {
 
 					if ( cachedData.attributes.has( cacheKey ) ) {
 
-						primitive.indices = cachedData.attributes.get( geometry.index );
+						primitive.indices = cachedData.attributes.get( cacheKey );
 
 					} else {
 
