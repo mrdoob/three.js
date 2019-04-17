@@ -519,7 +519,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 			return {
 				x: 0,
 				y: 0,
-				button: event.button,
+				button: event.button
 			};
 
 		} else {
