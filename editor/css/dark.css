@@ -202,9 +202,9 @@ select {
 
 #toolbar {
 	position: absolute;
-	left: calc(50% - 290px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
-	bottom: 16px;
-	height: 32px;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 10px;
 	background-color: #111;
 	color: #333;
 }
@@ -288,11 +288,6 @@ select {
 		width: 100%;
 		top: calc(100% - 320px);
 		bottom: 0;
-	}
-
-	#toolbar {
-		left: calc(50% - 140px);
-		top: 68px;
 	}
 
 }

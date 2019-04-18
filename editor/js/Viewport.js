@@ -12,6 +12,7 @@ var Viewport = function ( editor ) {
 
 	container.add( new Viewport.Camera( editor ) );
 	container.add( new Viewport.Info( editor ) );
+	container.add( new Toolbar( editor ) );
 
 	//
 
