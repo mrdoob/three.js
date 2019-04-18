@@ -10,6 +10,8 @@
 	var Visible = 0;
 	var Deleted = 1;
 
+	var v1 = new THREE.Vector3();
+
 	function QuickHull() {
 
 		this.tolerance = - 1;
@@ -134,6 +136,88 @@
 			}
 
 			return true;
+
+		},
+
+		intersectRay: function ( ray, target ) {
+
+			// based on "Fast Ray-Convex Polyhedron Intersection"  by Eric Haines, GRAPHICS GEMS II
+
+			var faces = this.faces;
+
+			var tNear = - Infinity;
+			var tFar = Infinity;
+
+			for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+				var face = faces[ i ];
+
+				// interpret faces as planes for the further computation
+
+				var vN = face.distanceToPoint( ray.origin );
+				var vD = face.normal.dot( ray.direction );
+
+				// if the origin is on the positive side of a plane (so the plane can "see" the origin) and
+				// the ray is turned away or parallel to the plane, there is no intersection
+
+				if ( vN > 0 && vD >= 0 ) return null;
+
+				// compute the distance from the ray’s origin to the intersection with the plane
+
+				var t = ( vD !== 0 ) ? ( - vN / vD ) : 0;
+
+				// only proceed if the distance is positive. a negative distance means the intersection point
+				// lies "behind" the origin
+
+				if ( t <= 0 ) continue;
+
+				// now categorized plane as front-facing or back-facing
+
+				if ( vD > 0 ) {
+
+					//  plane faces away from the ray, so this plane is a back-face
+
+					tFar = Math.min( t, tFar );
+
+				} else {
+
+					// front-face
+
+					tNear = Math.max( t, tNear );
+
+				}
+
+				if ( tNear > tFar ) {
+
+					// if tNear ever is greater than tFar, the ray must miss the convex hull
+
+					return null;
+
+				}
+
+			}
+
+			// evaluate intersection point
+
+			// always try tNear first since its the closer intersection point
+
+			if ( tNear !== - Infinity ) {
+
+				ray.at( tNear, target );
+
+			} else {
+
+				ray.at( tFar, target );
+
+			}
+
+			return target;
+
+		},
+
+		intersectsRay: function ( ray ) {
+
+			return this.intersectRay( ray, v1 ) !== null;
 
 		},
 
