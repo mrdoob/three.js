@@ -77,6 +77,16 @@ function WebGLRenderer( parameters ) {
 	this.domElement = _canvas;
 	this.context = null;
 
+	// Debug configuration container
+	this.debug = {
+
+		/**
+		 * Enables error checking and reporting when shader programs are being compiled
+		 * @type {boolean}
+		 */
+		checkShaderErrors: false
+	};
+
 	// clearing
 
 	this.autoClear = true;
@@ -2600,6 +2610,5 @@ function WebGLRenderer( parameters ) {
 	};
 
 }
-
 
 export { WebGLRenderer };
