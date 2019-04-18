@@ -132,6 +132,7 @@ export { SkeletonHelper } from './helpers/SkeletonHelper.js';
 export { PointLightHelper } from './helpers/PointLightHelper.js';
 export { RectAreaLightHelper } from './helpers/RectAreaLightHelper.js';
 export { HemisphereLightHelper } from './helpers/HemisphereLightHelper.js';
+export { LightProbeHelper } from './helpers/LightProbeHelper.js';
 export { GridHelper } from './helpers/GridHelper.js';
 export { PolarGridHelper } from './helpers/PolarGridHelper.js';
 export { PositionalAudioHelper } from './helpers/PositionalAudioHelper.js';
