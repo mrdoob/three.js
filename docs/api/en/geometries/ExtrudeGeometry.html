@@ -51,6 +51,7 @@
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
+			bevelBaseSize: 0,
 			bevelSegments: 1
 		};
 
@@ -75,7 +76,8 @@
 				<li>depth — float. Depth to extrude the shape. Default is 100.</li>
 				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
 				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
-				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2. Negative values now do not extend the shape in the middle, but shrink it at the front and back.</li>
+				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelBaseSize — float. Distance from the shape outline that the bevel starts. Default is 0.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
 				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded.</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
