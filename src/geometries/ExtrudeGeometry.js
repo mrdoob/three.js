@@ -396,8 +396,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			t = b / bevelSegments;
 			z = bevelThickness * Math.cos( t * Math.PI / 2 );
-			var s = Math.sin( t * Math.PI / 2 );
-			bs = bevelSize * s + bevelBaseSize;
+			bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelBaseSize;
 
 			// contract shape
 
@@ -495,8 +494,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			t = b / bevelSegments;
 			z = bevelThickness * Math.cos( t * Math.PI / 2 );
-			var s = Math.sin( t * Math.PI / 2 );
-			bs = bevelSize * s + bevelBaseSize;
+			bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelBaseSize;
 
 			// contract shape
 
