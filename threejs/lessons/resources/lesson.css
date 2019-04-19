@@ -20,16 +20,10 @@ table {
 pre {
   background: rgb(143, 140, 140);
   padding: 1em;
-  line-height: 1;
-  background: #444;
-  overflow: auto;
 }
 pre>code {
   white-space: inherit;
   background: none;
-  font-size: 10pt;
-  padding: none;
-  color: #99e4fd;
 }
 pre.prettyprint {
     margin-top: 2em !important;
