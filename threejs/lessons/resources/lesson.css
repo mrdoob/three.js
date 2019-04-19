@@ -20,10 +20,16 @@ table {
 pre {
   background: rgb(143, 140, 140);
   padding: 1em;
+  line-height: 1;
+  background: #444;
+  overflow: auto;
 }
 pre>code {
   white-space: inherit;
   background: none;
+  font-size: 10pt;
+  padding: none;
+  color: #99e4fd;
 }
 pre.prettyprint {
     margin-top: 2em !important;
@@ -476,4 +482,25 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
 }
 
 
-
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #333;
+    color: #EEE;
+  }
+  a {
+    color: #56d3fd;
+  }
+  pre.prettyprint, code.prettyprint {
+    box-shadow: 10px 10px 0px #292929;
+  }
+  code {
+    background: #666;
+    color: #fff;
+  }
+  img {
+    background: #DDD;
+  }
+  .lesson-sidebar {
+    background: #222;
+  }
+}
