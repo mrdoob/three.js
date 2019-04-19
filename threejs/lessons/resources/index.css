@@ -42,3 +42,9 @@ iframe.background {
         padding: 15px 20px;
     }
 }
+
+@media (prefers-color-scheme: dark) {
+    .container {
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+}
