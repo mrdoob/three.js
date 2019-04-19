@@ -400,6 +400,9 @@ const Builder = function(outBaseDir, options) {
     const info = extractHandlebars(content);
     let html = marked(info.content);
     // HACK! :-(
+    // There's probably a way to do this in marked
+    html = html.replace(/<pre><code/g, '<pre class="prettyprint"><code');
+    // HACK! :-(
     if (opt_extra && opt_extra.home && opt_extra.home.length > 1) {
       html = hackRelLinks(html, pageUrl);
     }
