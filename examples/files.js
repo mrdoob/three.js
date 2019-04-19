@@ -125,7 +125,6 @@ var files = {
 		"webgl_loader_sea3d_skinning",
 		"webgl_loader_sea3d_sound",
 		"webgl_loader_stl",
-		"webgl_loader_stl_module",
 		"webgl_loader_svg",
 		"webgl_loader_texture_dds",
 		"webgl_loader_texture_exr",
