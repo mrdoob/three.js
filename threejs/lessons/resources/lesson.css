@@ -84,6 +84,9 @@ div[data-diagram] {
 .lesson-main>.threejs_example_container {
     max-width: 90%;
 }
+.lesson-main>img {
+  width: unset;
+}
 
 .threejs_example {
     width: 100%;
@@ -167,9 +170,6 @@ div[data-diagram] {
 .lesson-title {
     margin-top: 3em;
     margin-bottom: 2em;
-}
-.lesson-main {
-  gbackground-color: #ffe;
 }
 .lesson-sidebar {
     font-size: small;
@@ -497,4 +497,14 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   .lesson-sidebar {
     background: #222;
   }
+  .lesson-main>blockquote {
+    background-color: #1b1b44;
+  }
+  div.threejs_bottombar {
+    background-color: #1b1b44;
+  }
+  div.threejs_bottombar code {
+    background-color: #348;
+  }
+}
 }
