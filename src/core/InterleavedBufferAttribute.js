@@ -5,11 +5,13 @@
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
-	this.data = interleavedBuffer;
-	this.itemSize = itemSize;
-	this.offset = offset;
+	this._data = interleavedBuffer;
+	this._itemSize = itemSize;
+	this._offset = offset;
 
-	this.normalized = normalized === true;
+	this._normalized = normalized === true;
+
+	this.version2 = 0;
 
 }
 
@@ -30,6 +32,74 @@ Object.defineProperties( InterleavedBufferAttribute.prototype, {
 		get: function () {
 
 			return this.data.array;
+
+		}
+
+	},
+
+	data: {
+
+		get: function () {
+
+			return this._data;
+
+		},
+
+		set: function ( value ) {
+
+			this._data = value;
+			this.version2 ++;
+
+		}
+
+	},
+
+	itemSize: {
+
+		get: function () {
+
+			return this._itemSize;
+
+		},
+
+		set: function ( value ) {
+
+			this._itemSize = value;
+			this.version2 ++;
+
+		}
+
+	},
+
+	offset: {
+
+		get: function () {
+
+			return this._offset;
+
+		},
+
+		set: function ( value ) {
+
+			this._offset = value;
+			this.version2 ++;
+
+		}
+
+	},
+
+	normalized: {
+
+		get: function () {
+
+			return this._normalized;
+
+		},
+
+		set: function ( value ) {
+
+			this._normalized = value;
+			this.version2 ++;
 
 		}
 
