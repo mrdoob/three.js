@@ -79,9 +79,9 @@
 
 					// light probe
 
-					var lightProbe = new THREE.LightProbe();
-					// Coefficients computed with setFromCubeTexture( texture ) and sh.toArray()
-					lightProbe.sh.fromArray(
+					var sh = new THREE.SphericalHarmonics3();
+					// Coefficients computed with LightProbeGenerator.fromCubeTexture() and sh.toArray()
+					sh.fromArray(
 						[ 0.30350402186576847, 0.4695020609740584, 0.6617666153025029,
 							0.08320329629560637, 0.17400245533281114, 0.3453152275957874,
 							0.12158824672933624, 0.10353622444396401, 0.06530153583524678,
@@ -93,6 +93,7 @@
 							0.13316051440231733, 0.1964793374921572, 0.2189213184804167
 						]
 					);
+					var lightProbe = new THREE.LightProbe( sh );
 					scene.add( lightProbe );
 
 					// model

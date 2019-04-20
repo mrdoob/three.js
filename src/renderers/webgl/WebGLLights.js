@@ -176,12 +176,7 @@ function WebGLLights() {
 
 				for ( var j = 0; j < 9; j ++ ) {
 
-					var probe = state.probe[ j ];
-					var coeff = light.sh.coefficients[ j ];
-
-					probe.x += coeff.x * color.r * intensity;
-					probe.y += coeff.y * color.g * intensity;
-					probe.z += coeff.z * color.b * intensity;
+					state.probe[ j ].addScaledVector( light.sh.coefficients[ j ], intensity );
 
 				}
 
