@@ -10,11 +10,13 @@ import { Light } from './Light.js';
 
 // A LightProbe is a source of indirect-diffuse light
 
-function LightProbe( sh, intensity ) {
+function LightProbe( color, intensity ) {
 
-	Light.call( this, 0xffffff, intensity );
+	Light.call( this, color, intensity );
 
-	this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
+	this.sh = new SphericalHarmonics3();
+
+	this.sh.coefficients[ 0 ].set( 1, 1, 1 );
 
 	this.type = 'LightProbe';
 
@@ -25,6 +27,45 @@ LightProbe.prototype = Object.assign( Object.create( Light.prototype ), {
 	constructor: LightProbe,
 
 	isLightProbe: true,
+
+	setAmbientProbe: function ( color, intensity ) {
+
+		this.color.set( color );
+
+		this.intensity = intensity !== undefined ? intensity : 1;
+
+		this.sh.zero();
+
+		// without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
+		this.sh.coefficients[ 0 ].set( 1, 1, 1 ).multiplyScalar( 2 * Math.sqrt( Math.PI ) );
+
+	},
+
+	setHemisphereProbe: function ( skyColor, groundColor, intensity ) {
+
+		// up-direction hardwired
+
+		this.color.setHex( 0xffffff );
+
+		this.intensity = intensity !== undefined ? intensity : 1;
+
+		var sky = new Color( skyColor );
+		var ground = new Color( groundColor );
+
+		/* cough */
+		sky = new Vector3( sky.r, sky.g, sky.b );
+		ground = new Vector3( ground.r, ground.g, ground.b );
+
+		// without extra factor of PI in the shader, should = 1 / Math.sqrt( Math.PI );
+		var c0 = Math.sqrt( Math.PI );
+		var c1 = c0 * Math.sqrt( 0.75 );
+
+		this.sh.zero();
+
+		this.sh.coefficients[ 0 ].copy( sky ).add( ground ).multiplyScalar( c0 );
+		this.sh.coefficients[ 1 ].copy( sky ).sub( ground ).multiplyScalar( c1 );
+
+	},
 
 	// https://www.ppsloan.org/publications/StupidSH36.pdf
 	setFromCubeTexture: function ( cubeTexture ) {

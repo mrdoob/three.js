@@ -86,6 +86,22 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Ring
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/ring' ) );
+	option.onClick( function () {
+
+		var geometry = new THREE.RingBufferGeometry( 0.5, 1, 8, 1, 0, Math.PI * 2 );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+		mesh.name = 'Ring';
+
+		editor.execute( new AddObjectCommand( mesh ) );
+
+	} );
+	options.add( option );
+
 	// Cylinder
 
 	var option = new UI.Row();
@@ -128,6 +144,38 @@ Menubar.Add = function ( editor ) {
 		var geometry = new THREE.IcosahedronBufferGeometry( 1, 0 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Icosahedron';
+
+		editor.execute( new AddObjectCommand( mesh ) );
+
+	} );
+	options.add( option );
+
+	// Octahedron
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/octahedron' ) );
+	option.onClick( function () {
+
+		var geometry = new THREE.OctahedronBufferGeometry( 1, 0 );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+		mesh.name = 'Octahedron';
+
+		editor.execute( new AddObjectCommand( mesh ) );
+
+	} );
+	options.add( option );
+
+	// Tetrahedron
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/tetrahedron' ) );
+	option.onClick( function () {
+
+		var geometry = new THREE.TetrahedronBufferGeometry( 1, 0 );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+		mesh.name = 'Tetrahedron';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -382,6 +430,21 @@ Menubar.Add = function ( editor ) {
 
 		var camera = new THREE.PerspectiveCamera();
 		camera.name = 'PerspectiveCamera';
+
+		editor.execute( new AddObjectCommand( camera ) );
+
+	} );
+	options.add( option );
+
+	// OrthographicCamera
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/orthographiccamera' ) );
+	option.onClick( function () {
+
+		var camera = new THREE.OrthographicCamera();
+		camera.name = 'OrthographicCamera';
 
 		editor.execute( new AddObjectCommand( camera ) );
 
