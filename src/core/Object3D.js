@@ -475,7 +475,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		this.updateMatrixWorld( true );
+		this.updateWorldMatrix( true, false );
 
 		return target.setFromMatrixPosition( this.matrixWorld );
 
@@ -495,7 +495,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-			this.updateMatrixWorld( true );
+			this.updateWorldMatrix( true, false );
 
 			this.matrixWorld.decompose( position, target, scale );
 
@@ -519,7 +519,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-			this.updateMatrixWorld( true );
+			this.updateWorldMatrix( true, false );
 
 			this.matrixWorld.decompose( position, quaternion, target );
 
@@ -538,7 +538,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		this.updateMatrixWorld( true );
+		this.updateWorldMatrix( true, false );
 
 		var e = this.matrixWorld.elements;
 
