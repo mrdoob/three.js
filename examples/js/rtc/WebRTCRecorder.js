@@ -24,7 +24,6 @@ THREE.WebRTCRecorder = function ( canvas, options ) {
 
 	}
 
-	// this.video = document.createElement( "video" );
 	this.canvas = canvas;
 	this.state = "stopped";
 	this.init( options );
@@ -137,13 +136,6 @@ THREE.WebRTCRecorder.prototype = Object.assign( THREE.WebRTCRecorder.prototype, 
 			return;
 
 		}
-
-		this.mediaRecorder.onstop = function () {
-
-			var superBuffer = new Blob( this.recordedBlobs, { type: "video/" + this.format } );
-			// this.video.src = window.URL.createObjectURL( superBuffer );
-
-		}.bind( this );
 
 		this.mediaRecorder.ondataavailable = function ( event ) {
 
