@@ -24,7 +24,7 @@ THREE.WebRTCRecorder = function ( canvas, options ) {
 
 	}
 
-	this.video = document.createElement( "video" );
+	// this.video = document.createElement( "video" );
 	this.canvas = canvas;
 	this.state = "stopped";
 	this.init( options );
@@ -55,24 +55,6 @@ THREE.WebRTCRecorder.prototype = Object.assign( THREE.WebRTCRecorder.prototype, 
 
 		this.mediaSource = new MediaSource();
 		this.stream = this.canvas.captureStream( this.fps );
-
-	},
-
-	playVideo: function () {
-
-		this.video.play();
-
-	},
-
-	stopVideo: function () {
-
-		this.video.stop();
-
-	},
-
-	pauseVideo: function () {
-
-		this.video.pause();
 
 	},
 
@@ -123,6 +105,18 @@ THREE.WebRTCRecorder.prototype = Object.assign( THREE.WebRTCRecorder.prototype, 
 
 	},
 
+	getBlob: function () {
+
+		return new Blob( this.recordedBlobs, { type: "video/" + this.format } );
+
+	},
+
+	getUrl: function () {
+
+		return window.URL.createObjectURL( this.getBlob() );
+
+	},
+
 	startRecording: function ( ms ) {
 
 		var options1 = { mimeType: "video/" + this.format + ";codecs=" + this.codecs };
@@ -147,7 +141,7 @@ THREE.WebRTCRecorder.prototype = Object.assign( THREE.WebRTCRecorder.prototype, 
 		this.mediaRecorder.onstop = function () {
 
 			var superBuffer = new Blob( this.recordedBlobs, { type: "video/" + this.format } );
-			this.video.src = window.URL.createObjectURL( superBuffer );
+			// this.video.src = window.URL.createObjectURL( superBuffer );
 
 		}.bind( this );
 

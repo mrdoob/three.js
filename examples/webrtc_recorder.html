@@ -45,7 +45,7 @@
 		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
 		</div>
-
+		<video id="recorderVideo"></video>
 		<script src="../build/three.js"></script>
 
 		<script src="js/libs/mmdparser.min.js"></script>
@@ -69,15 +69,17 @@
 
 			var mesh, camera, scene, renderer, effect;
 			var helper, ikHelper, physicsHelper;
-
 			var clock = new THREE.Clock();
+
+			var video = document.getElementById( "recorderVideo" )
+			video.controls = "controls";
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				container = document.createElement( "div" );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -109,14 +111,14 @@
 					if ( xhr.lengthComputable ) {
 
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + "% downloaded" );
 
 					}
 
 				}
 
-				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+				var modelFile = "models/mmd/miku/miku_v2.pmd";
+				var vmdFiles = [ "models/mmd/vmds/wavefile_v2.vmd" ];
 
 				helper = new THREE.MMDAnimationHelper( {
 					afterglow: 2.0
@@ -150,7 +152,7 @@
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( "resize", onWindowResize, false );
 
 				var phongMaterials;
 				var originalMaterials;
@@ -178,8 +180,7 @@
 				function initRecorder(){
 
 					recorder = new THREE.WebRTCRecorder( renderer.domElement );
-					recorder.video.controls = "controls";
-					document.body.appendChild( recorder.video );
+					
 
 				}
 
@@ -190,7 +191,9 @@
 						"codecs": "vp9",
 						"show dom": true,
 						"start": recorder.startRecording.bind( recorder ),
-						"stop": recorder.stopRecording.bind( recorder ),
+						"stop": function () {
+							video.src = recorder.getUrl();
+						},
 						"pause": recorder.pauseRecording.bind( recorder ),
 						"resume": recorder.resumeRecording.bind( recorder ),
 						"download": recorder.download.bind( recorder )
@@ -233,7 +236,7 @@
 					});
 					gui.add( api, "show dom" ).onChange( function( val ) {
 
-						recorder.video.style.display = val ? "block" : "none";
+						video.style.display = val ? "block" : "none";
 
 					} );
 					gui.add( api, "download" );
