@@ -1,81 +1,81 @@
 import { Camera, MOUSE, Object3D, Vector3 } from '../../../src/Three';
 
 export class OrbitControls {
-  constructor(object: Camera, domElement?: HTMLElement);
+	constructor(object: Camera, domElement?: HTMLElement);
 
-  object: Camera;
-  domElement: HTMLElement | HTMLDocument;
+	object: Camera;
+	domElement: HTMLElement | HTMLDocument;
 
-  // API
-  enabled: boolean;
-  target: Vector3;
+	// API
+	enabled: boolean;
+	target: Vector3;
 
-  // deprecated
-  center: Vector3;
+	// deprecated
+	center: Vector3;
 
-  minDistance: number;
-  maxDistance: number;
-	
+	minDistance: number;
+	maxDistance: number;
+
 	minZoom: number;
 	maxZoom: number;
-	
-  minPolarAngle: number;
-  maxPolarAngle: number;
-	
+
+	minPolarAngle: number;
+	maxPolarAngle: number;
+
 	minAzimuthAngle: number;
-  maxAzimuthAngle: number;
-	
+	maxAzimuthAngle: number;
+
 	enableDamping: boolean;
-  dampingFactor: number;
-	
+	dampingFactor: number;
+
 	enableZoom: boolean;
-  zoomSpeed: number;
-	
+	zoomSpeed: number;
+
 	enableRotate: boolean;
-  rotateSpeed: number;
-	
-  enablePan: boolean;
+	rotateSpeed: number;
+
+	enablePan: boolean;
 	panSpeed: number;
 	screenSpacePanning: boolean;
-  keyPanSpeed: number;
-	
-  autoRotate: boolean;
-  autoRotateSpeed: number;
+	keyPanSpeed: number;
 
-  enableKeys: boolean;
-  keys: {LEFT: number; UP: number; RIGHT: number; BOTTOM: number;};
-  mouseButtons: {ORBIT: MOUSE; ZOOM: MOUSE; PAN: MOUSE;};
+	autoRotate: boolean;
+	autoRotateSpeed: number;
 
-  rotateLeft(angle?: number): void;
+	enableKeys: boolean;
+	keys: { LEFT: number; UP: number; RIGHT: number; BOTTOM: number; };
+	mouseButtons: { ORBIT: MOUSE; ZOOM: MOUSE; PAN: MOUSE; };
 
-  rotateUp(angle?: number): void;
+	rotateLeft(angle?: number): void;
 
-  panLeft(distance?: number): void;
+	rotateUp(angle?: number): void;
 
-  panUp(distance?: number): void;
+	panLeft(distance?: number): void;
 
-  pan(deltaX: number, deltaY: number): void;
+	panUp(distance?: number): void;
 
-  dollyIn(dollyScale: number): void;
+	pan(deltaX: number, deltaY: number): void;
 
-  dollyOut(dollyScale: number): void;
+	dollyIn(dollyScale: number): void;
 
-  update(): void;
+	dollyOut(dollyScale: number): void;
 
-  reset(): void;
+	update(): void;
 
-  dispose(): void;
+	reset(): void;
 
-  getPolarAngle(): number;
+	dispose(): void;
 
-  getAzimuthalAngle(): number;
+	getPolarAngle(): number;
 
-  // EventDispatcher mixins
-  addEventListener(type: string, listener: (event: any) => void): void;
+	getAzimuthalAngle(): number;
 
-  hasEventListener(type: string, listener: (event: any) => void): boolean;
+	// EventDispatcher mixins
+	addEventListener(type: string, listener: (event: any) => void): void;
 
-  removeEventListener(type: string, listener: (event: any) => void): void;
+	hasEventListener(type: string, listener: (event: any) => void): boolean;
 
-  dispatchEvent(event: {type: string; target: any;}): void;
+	removeEventListener(type: string, listener: (event: any) => void): void;
+
+	dispatchEvent(event: { type: string; target: any; }): void;
 }
