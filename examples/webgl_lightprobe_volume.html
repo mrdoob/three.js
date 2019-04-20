@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - light probe volume</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			a {
+				color: #ffa;
+				font-weight: bold;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 0; /* to not conflict with dat.gui */
+				display:block;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl lights - light probe volume
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { WEBGL } from './jsm/WebGL.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TransformControls } from './jsm/controls/TransformControls.js';
+			import { LightProbeVolume } from './jsm/lights/LightProbeVolume.js';
+			import { LightProbeVolumeHelper } from './jsm/helpers/LightProbeVolumeHelper.js';
+			import { LightProbeGenerator } from './jsm/lights/LightProbeGenerator.js';
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var mesh, renderer, scene, camera, cubeCamera;
+
+			var clock;
+			var gui;
+
+			var probe;
+			var probeVolume;
+			var probeVolumeHelper;
+
+			var API = {
+				rows: 5,
+				columns: 5,
+				levels: 15,
+				exposure: 2.0,
+				probeIntensity: 1.0,
+				probeDebug: true,
+				build: buildProbeVolume,
+				load: loadProbeVolume
+			};
+
+			init();
+
+			function init() {
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMappingExposure = API.exposure;
+				document.body.appendChild( renderer.domElement );
+
+				// scene
+				scene = new THREE.Scene();
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 50 );
+				camera.position.set( 35, 5, 0 );
+				camera.lookAt( new THREE.Vector3( 0, 5, 0 ) );
+
+				// cube camera (used for baking light probes)
+				cubeCamera = new THREE.CubeCamera( 0.1, 100, 32, {
+					format: THREE.RGBAFormat,
+					magFilter: THREE.LinearFilter,
+					minFilter: THREE.LinearFilter
+				} );
+
+				// since gamma is applied during rendering, the cubeCamera renderTarget texture encoding must be sRGBEncoding
+				cubeCamera.renderTarget.texture.encoding = THREE.sRGBEncoding;
+				scene.add( cubeCamera );
+
+				// controls
+				var orbitCtrl = new OrbitControls( camera, renderer.domElement );
+				orbitCtrl.minDistance = 5;
+				orbitCtrl.maxDistance = 40;
+
+				// probe volume
+				probeVolume = new LightProbeVolume();
+				probeVolumeHelper = new LightProbeVolumeHelper( probeVolume, 0.1 );
+				scene.add( probeVolume );
+				scene.add( probeVolumeHelper );
+
+				// light
+				probe = new THREE.LightProbe();
+				probe.intensity = 2.0;
+				scene.add( probe );
+
+				// mesh
+				mesh = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 0.5, 32, 32 ),
+					new THREE.MeshStandardMaterial( { color: 0xAAAAAA, metalness: 0, roughness: 1 } )
+				);
+				scene.add( mesh );
+
+				// gui
+				gui = new GUI();
+
+				gui.width = 300;
+
+				gui.domElement.style.userSelect = 'none';
+
+				var f1 = gui.addFolder( 'Display' );
+
+				f1.add( API, 'exposure', 0, 3 )
+					.onChange( () => ( renderer.toneMappingExposure = API.exposure ) );
+
+				f1.add( API, 'probeIntensity', 0, 3 )
+					.onChange( () => ( probe.intensity  = API.probeIntensity ) );
+
+				f1.add( API, 'probeDebug' )
+					.onChange( () => ( probeVolumeHelper.visible  = API.probeDebug ) );
+
+				f1.open();
+
+				var f2 = gui.addFolder( 'Rebuild' );
+
+				f2.add( API, 'rows', 0, 32, 1 );
+
+				f2.add( API, 'columns', 0, 32, 1 );
+
+				f2.add( API, 'levels', 0, 32, 1 );
+
+				f2.add( API, 'build' );
+
+				f2.add( API, 'load' );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				new GLTFLoader()
+					.setPath( 'models/gltf/HallLightTest/' )
+					.load( 'HallLightTest.glb', function ( gltf ) {
+
+						const model = gltf.scene.getObjectByName('Hall');
+
+						model.position.y = -3;
+
+						model.traverse( function ( o ) {
+
+							if ( o.isMesh ) {
+
+								o.material = new THREE.MeshBasicMaterial().copy( o.material );
+
+							}
+
+						} );
+
+						scene.add( model );
+
+						loadProbeVolume().then( function () {
+
+							clock = new THREE.Clock();
+
+							render();
+
+						} );
+
+						Object.assign(window, {scene, model, renderer, probeVolume});
+
+					}, undefined, function ( e ) {
+
+						console.error( e );
+
+					} );
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function render() {
+
+				requestAnimationFrame( render );
+
+				var time = clock.getElapsedTime();
+
+				mesh.position.x = Math.sin( time / 1 ) * 1;
+				mesh.position.y = Math.cos( time / 1 ) * 1;
+				mesh.position.z = Math.sin( time / 4 ) * 15;
+
+				probeVolume.update( mesh, probe.sh );
+
+				renderer.render( scene, camera );
+
+			}
+
+			function buildProbeVolume() {
+
+				// Bounds could also be fit to the model, but this is more precise.
+				var bbox = new THREE.Box3();
+				bbox.max.set( 2.5, 2.5, 15 );
+				bbox.min.set( -2.5, -2.5, -15 );
+
+				probeVolume
+					.reset()
+					.setFromBounds( bbox, API.rows, API.columns, API.levels )
+					.build()
+					.bake( renderer, scene, cubeCamera, ( p ) => {
+
+						if ( Math.random() > 0.95 ) console.log( 'baking: ' + ( p * 100 ).toFixed( 2 ) + '%' );
+
+					} );
+
+				probeVolumeHelper.update();
+
+			}
+
+			function loadProbeVolume() {
+
+				return fetch( 'models/gltf/HallLightTest/irradiance.json' )
+					.then( ( r ) => r.json() )
+					.then( ( data ) => {
+
+						probeVolume
+							.reset()
+							.fromJSON( data );
+
+						probeVolumeHelper.update();
+
+					} );
+
+			}
+
+		</script>
+
+	</body>
+</html>

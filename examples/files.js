@@ -64,6 +64,7 @@ var files = {
 		"webgl_lensflares",
 		"webgl_lightprobe",
 		"webgl_lightprobe_cubecamera",
+		"webgl_lightprobe_volume",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
