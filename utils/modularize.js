@@ -134,7 +134,7 @@ function convert( path, ignoreList ) {
 		.map( value => '\n\t' + value )
 		.sort()
 		.toString();
-	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
+	var imports = `import {${keys}\n} from "../../../src/Three.js";`;
 	var exports = `export { ${className} };\n`;
 
 	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;
