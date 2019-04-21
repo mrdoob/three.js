@@ -13,7 +13,7 @@ import {
 	Spherical,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from "../../../src/Three.js";
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).

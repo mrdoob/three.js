@@ -13,7 +13,7 @@ import {
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack
-} from "../../../build/three.module.js";
+} from "../../../src/Three.js";
 
 'use strict';
 

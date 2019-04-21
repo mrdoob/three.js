@@ -10,7 +10,7 @@ import {
 	Mesh,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from "../../../src/Three.js";
 
 var OBJExporter = function () {};
 

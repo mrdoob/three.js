@@ -6,7 +6,7 @@ import {
 	Group,
 	Matrix4,
 	Mesh
-} from "../../../build/three.module.js";
+} from "../../../src/Three.js";
 
 var SceneUtils = {
 

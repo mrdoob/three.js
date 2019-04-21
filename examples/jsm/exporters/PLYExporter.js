@@ -16,7 +16,7 @@ import {
 	BufferGeometry,
 	Matrix3,
 	Vector3
-} from "../../../build/three.module.js";
+} from "../../../src/Three.js";
 
 var PLYExporter = function () {};
 
