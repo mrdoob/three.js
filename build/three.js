@@ -16856,22 +16856,26 @@
 
 	}
 
-	function WebGLShader( gl, type, string ) {
+	function WebGLShader( gl, type, string, debug ) {
 
 		var shader = gl.createShader( type );
 
 		gl.shaderSource( shader, string );
 		gl.compileShader( shader );
 
-		if ( gl.getShaderParameter( shader, 35713 ) === false ) {
+		if ( debug === true ) {
 
-			console.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
+			if ( gl.getShaderParameter( shader, 35713 ) === false ) {
 
-		}
+				console.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
 
-		if ( gl.getShaderInfoLog( shader ) !== '' ) {
+			}
 
-			console.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', type === 35633 ? 'vertex' : 'fragment', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
+			if ( gl.getShaderInfoLog( shader ) !== '' ) {
+
+				console.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', type === 35633 ? 'vertex' : 'fragment', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
+
+			}
 
 		}
 
@@ -17462,8 +17466,8 @@
 		// console.log( '*VERTEX*', vertexGlsl );
 		// console.log( '*FRAGMENT*', fragmentGlsl );
 
-		var glVertexShader = WebGLShader( gl, 35633, vertexGlsl );
-		var glFragmentShader = WebGLShader( gl, 35632, fragmentGlsl );
+		var glVertexShader = WebGLShader( gl, 35633, vertexGlsl, renderer.debug.checkShaderErrors );
+		var glFragmentShader = WebGLShader( gl, 35632, fragmentGlsl, renderer.debug.checkShaderErrors );
 
 		gl.attachShader( program, glVertexShader );
 		gl.attachShader( program, glFragmentShader );
@@ -17483,56 +17487,61 @@
 
 		gl.linkProgram( program );
 
-		var programLog = gl.getProgramInfoLog( program ).trim();
-		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-		var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+		// check for link errors
+		if ( renderer.debug.checkShaderErrors ) {
 
-		var runnable = true;
-		var haveDiagnostics = true;
+			var programLog = gl.getProgramInfoLog( program ).trim();
+			var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+			var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
 
-		// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
-		// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
+			var runnable = true;
+			var haveDiagnostics = true;
 
-		if ( gl.getProgramParameter( program, 35714 ) === false ) {
+			// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+			// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
-			runnable = false;
+			if ( gl.getProgramParameter( program, 35714 ) === false ) {
 
-			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), '35715', gl.getProgramParameter( program, 35715 ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
+				runnable = false;
 
-		} else if ( programLog !== '' ) {
+				console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), '35715', gl.getProgramParameter( program, 35715 ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
 
-			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
+			} else if ( programLog !== '' ) {
 
-		} else if ( vertexLog === '' || fragmentLog === '' ) {
+				console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
 
-			haveDiagnostics = false;
+			} else if ( vertexLog === '' || fragmentLog === '' ) {
 
-		}
+				haveDiagnostics = false;
 
-		if ( haveDiagnostics ) {
+			}
 
-			this.diagnostics = {
+			if ( haveDiagnostics ) {
 
-				runnable: runnable,
-				material: material,
+				this.diagnostics = {
 
-				programLog: programLog,
+					runnable: runnable,
+					material: material,
 
-				vertexShader: {
+					programLog: programLog,
 
-					log: vertexLog,
-					prefix: prefixVertex
+					vertexShader: {
 
-				},
+						log: vertexLog,
+						prefix: prefixVertex
 
-				fragmentShader: {
+					},
 
-					log: fragmentLog,
-					prefix: prefixFragment
+					fragmentShader: {
 
-				}
+						log: fragmentLog,
+						prefix: prefixFragment
 
-			};
+					}
+
+				};
+
+			}
 
 		}
 
@@ -18359,12 +18368,7 @@
 
 					for ( var j = 0; j < 9; j ++ ) {
 
-						var probe = state.probe[ j ];
-						var coeff = light.sh.coefficients[ j ];
-
-						probe.x += coeff.x * color.r * intensity;
-						probe.y += coeff.y * color.g * intensity;
-						probe.z += coeff.z * color.b * intensity;
+						state.probe[ j ].addScaledVector( light.sh.coefficients[ j ], intensity );
 
 					}
 
@@ -22690,6 +22694,16 @@
 
 		this.domElement = _canvas;
 		this.context = null;
+
+		// Debug configuration container
+		this.debug = {
+
+			/**
+			 * Enables error checking and reporting when shader programs are being compiled
+			 * @type {boolean}
+			 */
+			checkShaderErrors: false
+		};
 
 		// clearing
 
@@ -40359,19 +40373,15 @@
 
 	/**
 	 * @author WestLangley / http://github.com/WestLangley
+	 *
+	 * A LightProbe is a source of indirect-diffuse light
 	 */
 
-	// A LightProbe is a source of indirect-diffuse light
+	function LightProbe( sh, intensity ) {
 
-	function LightProbe( color, intensity ) {
+		Light.call( this, undefined, intensity );
 
-		Light.call( this, color, intensity );
-
-		this.sh = new SphericalHarmonics3();
-
-		this.sh.coefficients[ 0 ].set( 1, 1, 1 );
-
-		this.type = 'LightProbe';
+		this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
 
 	}
 
@@ -40381,122 +40391,12 @@
 
 		isLightProbe: true,
 
-		// https://www.ppsloan.org/publications/StupidSH36.pdf
-		setFromCubeTexture: function ( cubeTexture ) {
-
-			var norm, lengthSq, weight, totalWeight = 0;
-
-			var coord = new Vector3();
-
-			var dir = new Vector3();
-
-			var color = new Color();
-
-			var shBasis = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
-
-			var shCoefficients = this.sh.coefficients;
-
-			for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
-
-				var image = cubeTexture.image[ faceIndex ];
-
-				var width = image.width;
-				var height = image.height;
-
-				var canvas = document.createElement( 'canvas' );
-
-				canvas.width = width;
-				canvas.height = height;
-
-				var context = canvas.getContext( '2d' );
-
-				context.drawImage( image, 0, 0, width, height );
-
-				var imageData = context.getImageData( 0, 0, width, height );
-
-				var data = imageData.data;
-
-				var imageWidth = imageData.width; // assumed to be square
-
-				var pixelSize = 2 / imageWidth;
-
-				for ( var i = 0, il = data.length; i < il; i += 4 ) { // RGBA assumed
-
-					// pixel color
-					color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
-
-					// convert to linear color space
-					color.copySRGBToLinear( color );
-
-					// pixel coordinate on unit cube
-
-					var pixelIndex = i / 4;
-
-					var col = - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize;
-
-					var row = 1 - ( Math.floor( pixelIndex / imageWidth ) + 0.5 ) * pixelSize;
-
-					switch ( faceIndex ) {
-
-						case 0: coord.set( - 1, row, - col ); break;
-
-						case 1: coord.set( 1, row, col ); break;
-
-						case 2: coord.set( - col, 1, - row ); break;
-
-						case 3: coord.set( - col, - 1, row ); break;
-
-						case 4: coord.set( - col, row, 1 ); break;
-
-						case 5: coord.set( col, row, - 1 ); break;
-
-					}
-
-					// weight assigned to this pixel
-
-					lengthSq = coord.lengthSq();
-
-					weight = 4 / ( Math.sqrt( lengthSq ) * lengthSq );
-
-					totalWeight += weight;
-
-					// direction vector to this pixel
-					dir.copy( coord ).normalize();
-
-					// evaluate SH basis functions in direction dir
-					SphericalHarmonics3.getBasisAt( dir, shBasis );
-
-					// accummuulate
-					for ( var j = 0; j < 9; j ++ ) {
-
-						shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;
-						shCoefficients[ j ].y += shBasis[ j ] * color.g * weight;
-						shCoefficients[ j ].z += shBasis[ j ] * color.b * weight;
-
-					}
-
-				}
-
-			}
-
-			// normalize
-			norm = ( 4 * Math.PI ) / totalWeight;
-
-			for ( var j = 0; j < 9; j ++ ) {
-
-				shCoefficients[ j ].x *= norm;
-				shCoefficients[ j ].y *= norm;
-				shCoefficients[ j ].z *= norm;
-
-			}
-
-		},
-
 		copy: function ( source ) {
 
 			Light.prototype.copy.call( this, source );
 
 			this.sh.copy( source.sh );
+			this.intensity = source.intensity;
 
 			return this;
 
@@ -40506,7 +40406,7 @@
 
 			var data = Light.prototype.toJSON.call( this, meta );
 
-			//data.sh = this.sh.toArray(); // todo
+			// data.sh = this.sh.toArray(); // todo
 
 			return data;
 
@@ -45582,6 +45482,156 @@
 	}();
 
 	/**
+	 * @author WestLangley / http://github.com/WestLangley
+	 */
+
+	function LightProbeHelper( lightProbe, size ) {
+
+		this.lightProbe = lightProbe;
+
+		this.size = size;
+
+		var defines = {};
+		defines[ 'GAMMA_OUTPUT' ] = "";
+
+		// material
+		var material = new ShaderMaterial( {
+
+			defines: defines,
+
+			uniforms: {
+
+				sh: { value: this.lightProbe.sh.coefficients }, // by reference
+
+				intensity: { value: this.lightProbe.intensity }
+
+			},
+
+			vertexShader: [
+
+				'varying vec3 vNormal;',
+
+				'void main() {',
+
+				'	vNormal = normalize( normalMatrix * normal );',
+
+				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+				'}',
+
+				].join( '\n' ),
+
+			fragmentShader: [
+
+				'#define RECIPROCAL_PI 0.318309886',
+
+				'vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {',
+
+				'	// matrix is assumed to be orthogonal',
+
+				'	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );',
+
+				'}',
+
+				'vec3 linearToOutput( in vec3 a ) {',
+
+				'	#ifdef GAMMA_OUTPUT',
+
+				'		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );',
+
+				'	#else',
+
+				'		return a;',
+
+				'	#endif',
+
+				'}',
+
+				'// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf',
+				'vec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {',
+
+				'	// normal is assumed to have unit length',
+
+				'	float x = normal.x, y = normal.y, z = normal.z;',
+
+				'	// band 0',
+				'	vec3 result = shCoefficients[ 0 ] * 0.886227;',
+
+				'	// band 1',
+				'	result += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;',
+				'	result += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;',
+				'	result += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;',
+
+				'	// band 2',
+				'	result += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;',
+				'	result += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;',
+				'	result += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );',
+				'	result += shCoefficients[ 7 ] * 2.0 * 0.429043 * x * z;',
+				'	result += shCoefficients[ 8 ] * 0.429043 * ( x * x - y * y );',
+
+				'	return result;',
+
+				'}',
+
+				'uniform vec3 sh[ 9 ]; // sh coefficients',
+
+				'uniform float intensity; // light probe intensity',
+
+				'varying vec3 vNormal;',
+
+				'void main() {',
+
+				'	vec3 normal = normalize( vNormal );',
+
+				'	vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );',
+
+				'	vec3 irradiance = shGetIrradianceAt( worldNormal, sh );',
+
+				'	vec3 outgoingLight = RECIPROCAL_PI * irradiance * intensity;',
+
+				'	outgoingLight = linearToOutput( outgoingLight );',
+
+				'	gl_FragColor = vec4( outgoingLight, 1.0 );',
+
+				'}'
+
+				].join( '\n' )
+
+		} );
+
+		var geometry = new SphereBufferGeometry( 1, 32, 16 );
+
+		Mesh.call( this, geometry, material );
+
+		this.onBeforeRender();
+
+	}
+
+	LightProbeHelper.prototype = Object.create( Mesh.prototype );
+	LightProbeHelper.prototype.constructor = LightProbeHelper;
+
+	LightProbeHelper.prototype.dispose = function () {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	};
+
+	LightProbeHelper.prototype.onBeforeRender = function () {
+
+		return function update() {
+
+			this.position.copy( this.lightProbe.position );
+
+			this.scale.set( 1, 1, 1 ).multiplyScalar( this.size );
+
+			this.material.uniforms.intensity.value = this.lightProbe.intensity;
+
+		};
+
+	}();
+
+	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
@@ -48618,6 +48668,7 @@
 	exports.PointLightHelper = PointLightHelper;
 	exports.RectAreaLightHelper = RectAreaLightHelper;
 	exports.HemisphereLightHelper = HemisphereLightHelper;
+	exports.LightProbeHelper = LightProbeHelper;
 	exports.GridHelper = GridHelper;
 	exports.PolarGridHelper = PolarGridHelper;
 	exports.PositionalAudioHelper = PositionalAudioHelper;
