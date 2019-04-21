@@ -30,17 +30,18 @@ graphics. 3D formats can be divided into 3 or 4 basic types.
 
 * Transmission formats
 
-  gLTF might be the first truely transmission format. I suppose VRML might be considered
+  gLTF might be the first true transmission format. I suppose VRML might be considered
   one but VRML was actually a pretty poor format.
 
-  gLTF is designed to do 3 things well that all those other formats don't do
+  gLTF is designed to do some things well that all those other formats don't do
 
   1. Be small for transmission
 
      For example this means much of their large data, like vertices, is stored in
      binary. When you download a .gLTF file that data can be uploaded to the GPU
      with zero processing. It's ready as is. This is in contrast to say VRML, .OBJ,
-     or .DAE where vertices are stored as text and have to be parsed.
+     or .DAE where vertices are stored as text and have to be parsed. Text vertex
+     positions can easily be 3x to 5x larger than binary.
 
   2. Be ready to render
 
@@ -50,7 +51,7 @@ graphics. 3D formats can be divided into 3 or 4 basic types.
      Materials have known values that are supposed to work everywhere.
 
 gLTF was specifically designed so you should be able to download a glTF file and
-display it with a minimum of trouble. Let's cross our fingers that's truely the case
+display it with a minimum of trouble. Let's cross our fingers that's truly the case
 as none of the other formats have been able to do this.
 
 I wasn't really sure what I should show. At some level loading and displaying a gLTF file
@@ -116,8 +117,8 @@ Next I wanted to see if I could animate the cars driving around so
 I needed to check if the scene had the cars as separate entities
 and if they were setup in a way I could use them.
 
-I wrote some code to dump put the scenegraph to the JavaScript
-console.
+I wrote some code to dump put the scenegraph to the [JavaScript
+console](threejs-debugging-javascript.html).
 
 Here's the code to print out the scenegraph.
 
@@ -188,7 +189,7 @@ OSG_Scene [Scene]
           ...
 ```
 
-From that we can see all the cars happen to be under parent
+From that we can see all the cars happen to be under a parent
 called `"Cars"`
 
 ```text
@@ -202,7 +203,7 @@ called `"Cars"`
 ```
 
 So as a simple test I thought I would just try rotating
-all the children of the "Cars" node around their Y axis
+all the children of the "Cars" node around their Y axis.
 
 I looked up the "Cars" node after loading the scene
 and saved the result.
@@ -218,7 +219,7 @@ and saved the result.
 ```
 
 Then in the `render` function we can just set the rotation
-of each child of `cars`
+of each child of `cars`.
 
 ```js
 +function render(time) {
@@ -247,7 +248,8 @@ And we get
 {{{example url="../threejs-load-gltf-rotate-cars.html" }}}
 
 Hmmm, it looks like unfortunately this scene wasn't designed to
-animate the cars as their origins are not setup for that purpose. The trucks are rotating in the wrong direction.
+animate the cars as their origins are not setup for that purpose.
+The trucks are rotating in the wrong direction.
 
 This brings up an important point which is if you're going to
 do something in 3D you need to plan ahead and design your assets
@@ -257,14 +259,16 @@ the correct scale, etc.
 Since I'm not an artist and I don't know blender that well I
 will hack this example. We'll take each car and parent it to
 another `Object3D`. We will then move those `Object3D` objects
-to move the cars but separately we can set the car's `Object3D`
-to re-orient it so it's about where we really need it.
+to move the cars but separately we can set the car's original
+`Object3D` to re-orient it so it's about where we really need it.
 
 Looking back at the scene graph listing it looks like there
 are really only 3 types of cars, "Car_08", "CAR_03", and "Car_04".
-Each type of car will work with the same adjustments.
+Hopefully each type of car will work with the same adjustments.
 
-I wrote this code to go through each car, parent it to a new `Object3D`, parent that new `Object3D` to the scene, and apply some per car *type* settings to fix its orientation, and add
+I wrote this code to go through each car, parent it to a new
+`Object3D`, parent that new `Object3D` to the scene, and apply
+some per car *type* settings to fix its orientation, and add
 the new `Object3D` a `cars` array.
 
 ```js
@@ -284,7 +288,7 @@ the new `Object3D` a `cars` array.
 +      { prefix: 'Car_04', rot: [0, Math.PI, 0], },
 +    ];
 +
-+     root.updateMatrixWorld();
++    root.updateMatrixWorld();
 +    for (const car of loadedCars.children.slice()) {
 +      const fix = fixes.find(fix => car.name.startsWith+(fix.prefix));
 +      const obj = new THREE.Object3D();
@@ -302,7 +306,7 @@ This fixes the orientation of the cars.
 
 {{{example url="../threejs-load-gltf-rotate-cars-fixed.html" }}}
 
-Now let's drive them around
+Now let's drive them around.
 
 Making even a simple driving system is too much for this post but
 it seems instead we could just make one convoluted path that
@@ -312,13 +316,13 @@ the path.
 
 <div class="threejs_center"><img src="resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
 
-I needed as way to get the data for that path out of Blender.
+I needed a way to get the data for that path out of Blender.
 Fortunately I was able to select just my path and export .OBJ checking "write nurbs".
 
 <div class="threejs_center"><img src="resources/images/blender-export-obj-write-nurbs.jpg" style="width: 498px"></div>
 
 Opening the .OBJ file I was able to get a list of points
-which I formated into this
+which I formatted into this
 
 ```js
 const controlPoints = [
@@ -359,7 +363,7 @@ but we want a sharper corners. It seemed like if we computed
 some extra points we could get what we want. For each pair
 of points we'll compute a point 10% of the way between
 the 2 points and another 90% of the way between the 2 points
-and pass the result to `CatmullRomCurve3`
+and pass the result to `CatmullRomCurve3`.
 
 This will give us a curve like this
 
@@ -419,12 +423,13 @@ let curveObject;
 ```
 
 The first part of that code makes a curve.
-The second part of that code generaetes 250 points
+The second part of that code generates 250 points
 from the curve and then creates an object to display
 the lines made by connecting those 250 points.
 
-Running [the example](../threejs-load-gltf-car-path.html) I didn't see the curve. To make it
-visible made it ignore the depth test and render last
+Running [the example](../threejs-load-gltf-car-path.html) I didn't see
+the curve. To make it visible I made it ignore the depth test and
+render last
 
 ```js
     curveObject = new THREE.Line(geometry, material);
@@ -436,26 +441,27 @@ And that's when I discovered it was way too small.
 
 <div class="threejs_center"><img src="resources/images/car-curves-too-small.png" style="width: 498px"></div>
 
-Checking the heirarchy in Blender I found out that the artist had
+Checking the hierarchy in Blender I found out that the artist had
 scaled the node all the cars are parented to.
 
 <div class="threejs_center"><img src="resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
 
 Scaling is bad for real time 3D apps. It causes all kinds of
-issues and ends up being no end of frustrating when doing
+issues and ends up being no end of frustration when doing
 real time 3D. Artists often don't know this because it's so
-easy to scale an entire scene in a 3D editing program but if you decide to make a real time 3D app I suggest you instructor your
+easy to scale an entire scene in a 3D editing program but
+if you decide to make a real time 3D app I suggest you request your
 artists to never scale anything. If they change the scale
 they should find a way to apply that scale to the vertices
-so that when it ends up making it your app you can ignore
+so that when it ends up making it to your app you can ignore
 scale.
 
-And not just scale, in this case the cars are rotated and offset
+And, not just scale, in this case the cars are rotated and offset
 by their parent, the `Cars` node. This will make it hard at runtime
 to move the cars around in world space. To be clear, in this case
 we want cars to drive around in world space which is why these
 issues are coming up. If something that is meant to be manipulated
-in a local space, the the moon revolving around the earth this
+in a local space, like the moon revolving around the earth this
 is less of an issue.
 
 Going back to the function we wrote above to dump the scene graph,
@@ -522,8 +528,11 @@ OSG_Scene [Scene]
           │ │       scl: 1.000, 1.000, 1.000
 ```
 
-This shows us that `Cars` in the original scene has had its rotation and scale removed and applied to its children. That suggests either whatever exporter was used to create the .GLTF file did some special work here
-or more likely the artist exported a different version of the file than the corresponding .blend file, which is why things don't match.
+This shows us that `Cars` in the original scene has had its rotation and scale
+removed and applied to its children. That suggests either whatever exporter was
+used to create the .GLTF file did some special work here or more likely the
+artist exported a different version of the file than the corresponding .blend
+file, which is why things don't match.
 
 The moral of that is I should have probably downloaded the .blend
 file and exported myself. Before exporting I should have inspected
@@ -552,21 +561,20 @@ OSG_Scene [Scene]
 
 are also a waste.
 
-Ideally the scene would consist of a single
-"root" node with no position, rotation, or scale. A runtime I could then
-pull all the children out of that root and parent them to the scene itself.
-There might be children of the root like "Cars" which would
-help me find all the cars but ideally it would also have no
-translation, rotation, or scale so I could reparent the cars
-to the scene with the minimal amount of work.
+Ideally the scene would consist of a single "root" node with no position,
+rotation, or scale. At runtime I could then pull all the children out of that
+root and parent them to the scene itself. There might be children of the root
+like "Cars" which would help me find all the cars but ideally it would also have
+no translation, rotation, or scale so I could re-parent the cars to the scene
+with the minimal amount of work.
 
 In any case the quickest though maybe not the best fix is to just
 adjust the object we're using to view the curve.
 
 Here's what I ended up with.
 
-First I adjusted the position of the curve and after I found values
-that seemd to work. I then hid it.
+First I adjusted the position of the curve and found values
+that seemed to work. I then hid it.
 
 ```js
 {
@@ -583,10 +591,11 @@ that seemd to work. I then hid it.
 }
 ```
 
-Then I wrote code to move the cars along the curve. For each car we pick
-a position from 0 to 1 along the curve and compute a point in world space
-using the `curveObject` to transform the point. We then pick another point
-slightly further down the curve. We set the car's orientation using `lookAt` and put the car at the mid point between the 2 points.
+Then I wrote code to move the cars along the curve. For each car we pick a
+position from 0 to 1 along the curve and compute a point in world space using
+the `curveObject` to transform the point. We then pick another point slightly
+further down the curve. We set the car's orientation using `lookAt` and put the
+car at the mid point between the 2 points.
 
 ```js
 // create 2 Vector3s we can use for path calculations
@@ -734,7 +743,7 @@ And ... shadows
 
 {{{example url="../threejs-load-gltf-shadows.html" }}}
 
-I hope walking through that example was useful and showed some
+I hope walking through this project was useful and showed some
 good examples of working though some of the issues of loading
 a file with a scenegraph.
 
@@ -751,7 +760,7 @@ There is always a need for more data. For example we manually exported
 a path for the cars to follow. Ideally that info could have been in
 the .GLTF file but to do that we'd need to write our own exporter
 and some how mark nodes for how we want them exported or use a
-naming scheme or someting along those lines to get data from
+naming scheme or something along those lines to get data from
 whatever tool we're using to create the data into our app.
 
 All of that is left as an exercise to the reader.
