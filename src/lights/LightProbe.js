@@ -4,9 +4,6 @@
  * A LightProbe is a source of indirect-diffuse light
  */
 
-import { _Math } from '../math/Math.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Color } from '../math/Color.js';
 import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
 import { Light } from './Light.js';
 
