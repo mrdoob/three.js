@@ -2,10 +2,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { _Math } from '../math/Math.js';
-import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
-import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
 import { LightProbe } from './LightProbe.js';
 
 function HemisphereLightProbe( skyColor, groundColor, intensity ) {
