@@ -4,45 +4,6 @@
 
 THREE.LightProbeGenerator = {
 
-	fromAmbientLight: function ( light ) {
-
-		var color = light.color;
-		var intensity = light.intensity;
-
-		var sh = new THREE.SphericalHarmonics3();
-
-		// without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
-		sh.coefficients[ 0 ].set( color.r, color.g, color.b ).multiplyScalar(  2 * Math.sqrt( Math.PI ) );
-
-		return new THREE.LightProbe( sh, intensity );
-
-	},
-
-	fromHemisphereLight: function ( light ) {
-
-		// up-direction hardwired
-
-		// up-direction hardwired
-
-		var color1 = light.color;
-		var color2 = light.groundColor;
-
-		var sky = new THREE.Vector3( color1.r, color1.g, color1.b );
-		var ground = new THREE.Vector3( color2.r, color2.g, color2.b );
-		var intensity = light.intensity;
-
-		// without extra factor of PI in the shader, should = 1 / Math.sqrt( Math.PI );
-		var c0 = Math.sqrt( Math.PI );
-		var c1 = c0 * Math.sqrt( 0.75 );
-
-		var sh = new THREE.SphericalHarmonics3();
-		sh.coefficients[ 0 ].copy( sky ).add( ground ).multiplyScalar( c0 );
-		sh.coefficients[ 1 ].copy( sky ).sub( ground ).multiplyScalar( c1 );
-
-		return new THREE.LightProbe( sh, intensity );
-
-	},
-
 	// https://www.ppsloan.org/publications/StupidSH36.pdf
 	fromCubeTexture: function ( cubeTexture ) {
 
