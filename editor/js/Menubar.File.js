@@ -397,7 +397,7 @@ Menubar.File = function ( editor ) {
 
 		link.href = URL.createObjectURL( blob );
 		link.download = filename || 'data.json';
-		link.dispatchEvent( new MouseEvent('click') );
+		link.dispatchEvent( new MouseEvent( 'click' ) );
 
 		// URL.revokeObjectURL( url ); breaks Firefox...
 
