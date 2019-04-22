@@ -86,13 +86,10 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	var maxSamples = isWebGL2 ? gl.getParameter( gl.MAX_SAMPLES ) : 0;
 
-	var multiview = isWebGL2 && ( !! extensions.get( 'WEBGL_multiview' ) || !! extensions.get( 'OVR_multiview' ) || !! extensions.get( 'OVR_multiview2' ) );
-/*
-	var ovrMultiview2 = extensions.get( 'OVR_multiview2' );
-	if (ovrMultiview2) {
-		var num = gl.getParameter(ovrMultiview2.MAX_VIEWS_OVR);
-	}
-*/
+	var multiviewExt = extensions.get( 'OVR_multiview2' );
+	var multiview = isWebGL2 && ( !! multiviewExt );
+	var maxMultiviewViews = multiview ? gl.getParameter(multiviewExt.MAX_VIEWS_OVR) : 1;
+
 	return {
 
 		isWebGL2: isWebGL2,
@@ -119,7 +116,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 		maxSamples: maxSamples,
 
-		multiview: multiview
+		multiview: multiview,
+		maxMultiviewViews: maxMultiviewViews
 
 	};
 

@@ -318,19 +318,8 @@ function WebGLRenderer( parameters ) {
 
 	this.vr = vr;
 
-
-	if ( _multiview && ! capabilities.multiview ) {
-
-		console.warn( 'WebGLRenderer: Multiview requested but not supported by the browser' );
-		this.vr.multiview = false;
-
-	} else if ( _multiview !== false && capabilities.multiview ) {
-
-		console.info( 'WebGLRenderer: Multiview enabled' );
-		this.vr.multiview = true;
-
-	}
-
+	var multiviewObject = new WebGLMultiview(_multiview, _gl, _canvas, extensions, capabilities );
+	var multiviewEnabled = this.multiviewEnabled = multiviewObject.isEnabled();
 
 	// shadow map
 
@@ -1380,22 +1369,27 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	var multiviewObject = new WebGLMultiview(_gl, _canvas, extensions );
-
 	function renderObjects( renderList, scene, camera, overrideMaterial ) {
 
-		if ( vr.multiview ) {
-			multiviewObject.bindMultiviewFrameBuffer();
+		if ( multiviewEnabled ) {
+
+			multiviewObject.bindMultiviewFrameBuffer( camera );
 
 			_gl.disable( _gl.SCISSOR_TEST );
 
-			var width = _canvas.width;
-			var height = _canvas.height;
+			if ( camera.isArrayCamera ) {
 
-			var halfWidth = Math.floor(width * 0.5);
+				var height = _canvas.height;
+				var width = Math.floor( _canvas.width * 0.5 );
 
-			_gl.viewport( 0, 0, halfWidth, height );
-			renderer.setViewport( 0, 0, halfWidth, height );
+			} else {
+
+				var width = _canvas.width;
+				var height = _canvas.height;
+
+			}
+			_gl.viewport( 0, 0, width, height );
+			renderer.setViewport( 0, 0, width, height );
 
 			_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT );
 
@@ -1412,7 +1406,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			multiviewObject.unbindMultiviewFrameBuffer();
+			multiviewObject.unbindMultiviewFrameBuffer( camera );
 
 		} else {
 
@@ -1753,7 +1747,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( refreshProgram || _currentCamera !== camera ) {
 
-			if ( vr.multiview ) {
+			if ( multiviewEnabled ) {
 
 				if ( false && vr.isPresenting() ) {
 
@@ -1818,7 +1812,7 @@ function WebGLRenderer( parameters ) {
 				material.isShaderMaterial ||
 				material.skinning ) {
 
-				if ( vr.multiview ) {
+				if ( multiviewEnabled ) {
 
 					if ( vr.isPresenting() ) {
 
