@@ -393,14 +393,11 @@ Menubar.File = function ( editor ) {
 	//
 
 	var link = document.createElement( 'a' );
-	link.style.display = 'none'; 
-	var clickEvent = new MouseEvent('click');
-
 	function save( blob, filename ) {
 
 		link.href = URL.createObjectURL( blob );
 		link.download = filename || 'data.json';
-		link.dispatchEvent( clickEvent );
+		link.dispatchEvent( new MouseEvent('click') );
 
 		// URL.revokeObjectURL( url ); breaks Firefox...
 
