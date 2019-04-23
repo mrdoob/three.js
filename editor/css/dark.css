@@ -207,7 +207,7 @@ select {
 	bottom: 10px;
 	background-color: #111;
 	color: #333;
-	white-space: nowrap; /* for zh */
+	white-space: nowrap; /* for button */
 }
 
 	#toolbar * {
@@ -215,17 +215,8 @@ select {
 	}
 
 	#toolbar .Panel {
-		display: flex;
-		justify-content: center;
-		align-items: center;
 		padding: 4px;
 		color: #888;
-	}
-
-	#toolbar .Panel span {
-		display: flex;
-		justify-content: center;
-		align-items: center;
 	}
 
 	#toolbar button {
