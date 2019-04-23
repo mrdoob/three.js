@@ -331,6 +331,14 @@ export class WebGLRenderer implements Renderer {
   animate(callback: Function): void;
 
   /**
+   * Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
+   */
+  compile(
+    scene: Scene,
+    camera: Camera
+  ): void;
+
+  /**
    * Render a scene using a camera.
    * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling
    * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
