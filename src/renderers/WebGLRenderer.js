@@ -319,7 +319,6 @@ function WebGLRenderer( parameters ) {
 	this.vr = vr;
 
 	var multiview = this.multiview = new WebGLMultiview(_multiviewRequested, _gl, _canvas, extensions, capabilities );
-	var multiviewEnabled = this.multiviewEnabled = multiview.isEnabled();
 
 	// shadow map
 
@@ -1371,7 +1370,7 @@ function WebGLRenderer( parameters ) {
 
 	function renderObjects( renderList, scene, camera, overrideMaterial ) {
 
-		if ( multiviewEnabled ) {
+		if ( multiview.isEnabled() ) {
 
 			multiview.bindMultiviewFrameBuffer( camera );
 
@@ -1747,7 +1746,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( refreshProgram || _currentCamera !== camera ) {
 
-			if ( multiviewEnabled ) {
+			if ( multiview.isEnabled() ) {
 
 				if ( false && vr.isPresenting() ) {
 
@@ -1812,7 +1811,7 @@ function WebGLRenderer( parameters ) {
 				material.isShaderMaterial ||
 				material.skinning ) {
 
-				if ( multiviewEnabled ) {
+				if ( multiview.isEnabled() ) {
 
 					if ( vr.isPresenting() ) {
 
