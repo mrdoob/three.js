@@ -176,12 +176,12 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 			if ( cachedAttribute.attribute !== geometryAttribute ) return true;
 
-			if ( cachedAttribute.version !== geometryAttribute.version2 ) return true;
+			if ( cachedAttribute.version !== geometryAttribute.versionVAO ) return true;
 
 			if ( cachedAttribute.data.buffer !== geometryAttribute.data ) return true;
 
 			if ( geometryAttribute.data &&
-				cachedAttribute.data.version !== geometryAttribute.data.version2 ) return true;
+				cachedAttribute.data.version !== geometryAttribute.data.versionVAO ) return true;
 
 		}
 
@@ -200,14 +200,14 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 			var data = {};
 			data.attribute = attribute;
-			data.version = attribute.version2;
+			data.version = attribute.versionVAO;
 
 			data.data = {};
 
 			if ( attribute.data ) {
 
 				data.data.buffer = attribute.data;
-				data.data.version = attribute.data.version2;
+				data.data.version = attribute.data.versionVAO;
 
 			}
 

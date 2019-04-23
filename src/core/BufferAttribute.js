@@ -26,7 +26,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
-	this.version2 = 0;
+	this.versionVAO = 0;
 
 }
 
@@ -53,7 +53,7 @@ Object.defineProperties( BufferAttribute.prototype, {
 		set: function ( value ) {
 
 			this._array = value;
-			this.version2 ++;
+			this.versionVAO ++;
 
 		}
 
@@ -70,7 +70,7 @@ Object.defineProperties( BufferAttribute.prototype, {
 		set: function ( value ) {
 
 			this._itemSize = value;
-			this.version2 ++;
+			this.versionVAO ++;
 
 		}
 
@@ -87,7 +87,7 @@ Object.defineProperties( BufferAttribute.prototype, {
 		set: function ( value ) {
 
 			this._normalized = value;
-			this.version2 ++;
+			this.versionVAO ++;
 
 		}
 

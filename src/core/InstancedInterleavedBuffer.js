@@ -10,7 +10,7 @@ function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
 	this._meshPerAttribute = meshPerAttribute || 1;
 
-	this.version2 = 0;
+	this.versionVAO = 0;
 
 }
 
@@ -45,7 +45,7 @@ Object.defineProperties( InstancedInterleavedBuffer.prototype, {
 		set: function ( value ) {
 
 			this._meshPerAttribute = value;
-			this.version2 ++;
+			this.versionVAO ++;
 
 		}
 
