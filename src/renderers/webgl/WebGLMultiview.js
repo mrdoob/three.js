@@ -1,3 +1,7 @@
+/**
+ * @author fernandojsg / http://fernandojsg.com
+ */
+
 function WebGLMultiview( requested, gl, canvas, extensions, capabilities ) {
 
 	this.isAvailable = function () {
