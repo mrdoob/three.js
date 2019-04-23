@@ -809,9 +809,10 @@ THREE.SVGLoader.prototype = {
 			for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
 
 				var transformText = transformsTexts[ tIndex ].trim();
-				if (transformText == "")
-					continue;				
-				var openParPos = transformText.indexOf( "(" );
+
+				if ( transformText === '' ) continue;
+
+				var openParPos = transformText.indexOf( '(' );
 				var closeParPos = transformText.length;
 
 				if ( openParPos > 0 && openParPos < closeParPos ) {
