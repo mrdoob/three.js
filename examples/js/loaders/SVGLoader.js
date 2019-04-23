@@ -804,13 +804,15 @@ THREE.SVGLoader.prototype = {
 
 			var transform = new THREE.Matrix3();
 			var currentTransform = tempTransform0;
-			var transformsTexts = node.getAttribute( 'transform' ).split( ' ' );
+			var transformsTexts = node.getAttribute( 'transform' ).split( ')' );
 
 			for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
 
-				var transformText = transformsTexts[ tIndex ];
+				var transformText = transformsTexts[ tIndex ].trim();
+				if (transformText == "")
+					continue;				
 				var openParPos = transformText.indexOf( "(" );
-				var closeParPos = transformText.indexOf( ")" );
+				var closeParPos = transformText.length;
 
 				if ( openParPos > 0 && openParPos < closeParPos ) {
 
