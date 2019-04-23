@@ -112,9 +112,20 @@
 
 				}
 
+				function addNumLink( value ) {
+
+					return `<a href="?num=${ value }&${!multiview ? '' : 'enableMultiview'}">${ value }</a>`;
+
+				}
+
         // @todo Change enabled for requested and check renderer.vr.multiview
-				info.innerHTML = '<b>OVR_multiview2</b> demo<br/>requested: ' + colorize(multiview) + ` <a href="${multiview ? '?' : '?enableMultiview'}">toggle</a>`
-					+ `<br/>available: ${ colorize( renderer.multiview.isAvailable() ) }<br/>enabled: ${ colorize( renderer.multiview.isEnabled() ) }<br/><br/>`;
+				info.innerHTML = '<b>OVR_multiview2</b> demo<br/>requested: ' + colorize( multiview ) + ` <a href="?num=${ numObjects }&${ multiview ? '' : 'enableMultiview' }">toggle</a>`
+					+ `<br/>available: ${ colorize( renderer.multiview.isAvailable() ) }<br/>enabled: ${ colorize( renderer.multiview.isEnabled() ) }<br/>
+						${addNumLink(200)}
+						${addNumLink(500)}
+						${addNumLink(1000)}
+						${addNumLink(5000)}
+					<br/>`;
 				container.appendChild( info );
 				ms = document.createElement('div');
 				ms.innerHTML = '';
