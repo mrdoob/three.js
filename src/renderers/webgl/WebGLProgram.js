@@ -430,7 +430,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'uniform mat4 modelMatrix;',
 			'uniform vec3 cameraPosition;',
 
-			renderer.multiviewEnabled ? [
+			renderer.multiview.isEnabled() ? [
 				'uniform mat4 modelViewMatrix;',
 				'uniform mat3 normalMatrix;',
 				'uniform mat4 viewMatrices[2];',
@@ -566,7 +566,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			'uniform vec3 cameraPosition;',
 
-			renderer.multiviewEnabled ? [
+			renderer.multiview.isEnabled() ? [
 
 				'uniform mat4 viewMatrices[2];',
 				'#define viewMatrix viewMatrices[VIEW_ID]'
@@ -627,7 +627,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 		prefixVertex = [
 			'#version 300 es\n',
 
-			renderer.multiviewEnabled ? [
+			renderer.multiview.isEnabled() ? [
 
 				'#extension GL_OVR_multiview2 : require',
 				'layout(num_views = 2) in;',
@@ -642,7 +642,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 		prefixFragment = [
 			'#version 300 es\n',
-			renderer.multiviewEnabled ? [
+			renderer.multiview.isEnabled() ? [
 
 				'#extension GL_OVR_multiview2 : require',
 				'#define VIEW_ID gl_ViewID_OVR'
