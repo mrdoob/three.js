@@ -65,9 +65,9 @@
 		<h2>Importable Examples</h2>
 		<p>
 			The core of three.js is focused on the most important components of a 3D engine. Many other components like loaders or controls are part of the
-			examples directory. three.js ensures to keep these files in sync with the core but users have to import them separately if they are required
+			examples directory. three.js ensures that these files are kept in sync with the core but users have to import them separately if they are required
 			for their project. However, most of these files are not modules which makes their usage in certain cases inconvenient. In order to address this issue,
-			three.js is going to provide more and more files as modules in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory.
+			we are working to provide all the examples as modules in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory.
 			If you install three.js via npm, you can import them like so:
 		</p>
 		<code>
@@ -120,6 +120,13 @@
 					</ul>
 				</li>
 			</ul>
+		</p>
+		<p>
+			Note: When using code from the examples directory, it's important that all files match the version of
+			your three.js main file. For example it's no good approach to use *GLTFLoader* and *OrbitControls* from R96 together
+			with three.js R103. You can easily keep your files in sync by using the modules from the JSM directory. If the file
+			is not available as a module, you can still use third-party npm packages or convert the file to a module by yourself.
+			In both cases, ensure the code is compatible with your three.js main file.
 		</p>
 	</body>
 </html>
