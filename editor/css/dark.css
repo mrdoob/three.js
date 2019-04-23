@@ -202,12 +202,12 @@ select {
 
 #toolbar {
 	position: absolute;
-	left: 50%;
+	left: calc( 50% - 150px ); /* 150px: #sidebar width / 2 */
 	transform: translateX(-50%);
 	bottom: 10px;
 	background-color: #111;
 	color: #333;
-	white-space: nowrap;
+	white-space: nowrap; /* for zh */
 }
 
 	#toolbar * {
@@ -298,6 +298,12 @@ select {
 		width: 100%;
 		top: calc(100% - 320px);
 		bottom: 0;
+	}
+
+	#toolbar {
+		top: 68px;
+		bottom: auto;
+		left: 50%;
 	}
 
 }
