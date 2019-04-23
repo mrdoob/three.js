@@ -13,8 +13,8 @@
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float>, // how far from text outline (including bevelBaseSize) is bevel
- *  bevelBaseSize: <float> // how far from text outline does bevel start
+ *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
+ *  bevelOffset: <float> // how far from text outline does bevel start
  * }
  */
 
