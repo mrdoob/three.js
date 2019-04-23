@@ -3,6 +3,7 @@
  */
 
 import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
 import { LightProbe } from './LightProbe.js';
 
 function HemisphereLightProbe( skyColor, groundColor, intensity ) {
@@ -12,8 +13,8 @@ function HemisphereLightProbe( skyColor, groundColor, intensity ) {
 	var color1 = new Color().set( skyColor );
 	var color2 = new Color().set( groundColor );
 
-	var sky = new THREE.Vector3( color1.r, color1.g, color1.b );
-	var ground = new THREE.Vector3( color2.r, color2.g, color2.b );
+	var sky = new Vector3( color1.r, color1.g, color1.b );
+	var ground = new Vector3( color2.r, color2.g, color2.b );
 
 	// without extra factor of PI in the shader, should = 1 / Math.sqrt( Math.PI );
 	var c0 = Math.sqrt( Math.PI );
