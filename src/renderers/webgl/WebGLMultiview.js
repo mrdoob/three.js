@@ -2,7 +2,9 @@
  * @author fernandojsg / http://fernandojsg.com
  */
 
-function WebGLMultiview( requested, gl, canvas, extensions, capabilities ) {
+import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
+
+function WebGLMultiview( requested, gl, canvas, extensions, capabilities, properties ) {
 
 	this.isAvailable = function () {
 
@@ -81,9 +83,14 @@ function WebGLMultiview( requested, gl, canvas, extensions, capabilities ) {
 		framebufferWidth = halfWidth;
 		framebufferHeight = canvas.height;
 
+		this.renderTarget = new WebGLRenderTarget( framebufferWidth, framebufferHeight );
+
+		// @hack This should be done in WebGLTextures?
+		properties.get( this.renderTarget ).__webglFramebuffer = framebuffer;
+
 	};
 
-	this.bindMultiviewFrameBuffer = function ( camera ) {
+	this.bindFramebuffer = function ( camera ) {
 
 		var width = canvas.width;
 		var height = canvas.height;
@@ -108,13 +115,15 @@ function WebGLMultiview( requested, gl, canvas, extensions, capabilities ) {
 			framebufferWidth = width;
 			framebufferHeight = height;
 
+			this.renderTarget.setSize( width, height );
+
 		}
 
 		gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, framebuffer );
 
 	};
 
-	this.unbindMultiviewFrameBuffer = function ( camera ) {
+	this.unbindFramebuffer = function ( camera ) {
 
 		gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
 
