@@ -87,7 +87,7 @@ function WebGLRenderer( parameters ) {
 		 * Enables error checking and reporting when shader programs are being compiled
 		 * @type {boolean}
 		 */
-		checkShaderErrors: true
+		checkShaderErrors: false
 	};
 
 	// clearing
@@ -318,7 +318,7 @@ function WebGLRenderer( parameters ) {
 
 	this.vr = vr;
 
-	var multiview = this.multiview = new WebGLMultiview(_multiviewRequested, _gl, _canvas, extensions, capabilities );
+	var multiview = this.multiview = new WebGLMultiview( _multiviewRequested, _gl, _canvas, extensions, capabilities );
 
 	// shadow map
 
@@ -1388,7 +1388,6 @@ function WebGLRenderer( parameters ) {
 
 			}
 			_gl.viewport( 0, 0, width, height );
-			renderer.setViewport( 0, 0, width, height );
 
 			_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT );
 
@@ -1748,7 +1747,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( multiview.isEnabled() ) {
 
-				if ( false && vr.isPresenting() ) {
+				if ( camera.isArrayCamera ) {
 
 					// @todo Obviously remove the map :)
 					p_uniforms.setValue( _gl, 'projectionMatrices', camera.cameras.map( c => c.projectionMatrix ) );
@@ -1757,7 +1756,7 @@ function WebGLRenderer( parameters ) {
 
 					p_uniforms.setValue( _gl, 'projectionMatrices', [ camera.projectionMatrix, camera.projectionMatrix ] );
 
-			}
+				}
 
 			} else {
 
@@ -1813,17 +1812,14 @@ function WebGLRenderer( parameters ) {
 
 				if ( multiview.isEnabled() ) {
 
-					if ( vr.isPresenting() ) {
+					if ( camera.isArrayCamera ) {
 
 						// @todo Obviously remove the map :)
 						p_uniforms.setValue( _gl, 'viewMatrix', camera.cameras.map( c => c.matrixWorldInverse ) );
 
 					} else {
 
-						var newMat = camera.matrixWorldInverse.clone();
-						var newMat = new Matrix4();
-
-						p_uniforms.setValue( _gl, 'viewMatrices', [camera.matrixWorldInverse, newMat] );
+						p_uniforms.setValue( _gl, 'viewMatrices', [ camera.matrixWorldInverse, camera.matrixWorldInverse ] );
 
 					}
 

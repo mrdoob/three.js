@@ -644,16 +644,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;
 
-<<<<<<< HEAD
-	// console.log( '*VERTEX*', vertexGlsl );
-	// console.log( '*FRAGMENT*', fragmentGlsl );
-
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
-=======
 	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl, renderer.debug.checkShaderErrors );
 	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl, renderer.debug.checkShaderErrors );
->>>>>>> Initial working implementation
 
 	gl.attachShader( program, glVertexShader );
 	gl.attachShader( program, glFragmentShader );

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webvr - ball shooter</title>
+		<title>three.js webvr - ball shooter with multiview</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
@@ -28,8 +28,11 @@
 
 			var container;
 			var ms;
+
 			var camera, scene, renderer;
 			var controller1, controller2;
+
+			var avgCounter = new Array(240, 0);
 
 			var room;
 
@@ -118,21 +121,18 @@
 
 				}
 
-        // @todo Change enabled for requested and check renderer.vr.multiview
 				info.innerHTML = '<b>OVR_multiview2</b> demo<br/>requested: ' + colorize( multiview ) + ` <a href="?num=${ numObjects }&${ multiview ? '' : 'enableMultiview' }">toggle</a>`
 					+ `<br/>available: ${ colorize( renderer.multiview.isAvailable() ) }<br/>enabled: ${ colorize( renderer.multiview.isEnabled() ) }<br/>
 						${addNumLink(200)}
 						${addNumLink(500)}
 						${addNumLink(1000)}
+						${addNumLink(2500)}
 						${addNumLink(5000)}
 					<br/>`;
 				container.appendChild( info );
 				ms = document.createElement('div');
 				ms.innerHTML = '';
 				info.appendChild(ms);
-
-				//+ (multiview ? '<b style="color:#3f3">true</b>' : '<b style="color:#f33">false</b>')
-				//
 
 				document.body.appendChild( WEBVR.createButton( renderer ) );
 
@@ -291,7 +291,14 @@
 
 				var ts = performance.now();
 				renderer.render( scene, camera );
-				ms.innerHTML = 'renderer.render time: ' + (performance.now() - ts).toFixed(2) + 'ms';
+				var trender = performance.now() - ts;
+
+				// Compute average of the last frames
+				for (var i = 0; i < avgCounter.length-1; ++i) avgCounter[i] = avgCounter[i+1];
+				avgCounter[avgCounter.length-1] = trender;
+				var avg = avgCounter.reduce(function(a, b) { return a + b; }) / avgCounter.length;
+
+				ms.innerHTML = `renderer.render time: ${ trender.toFixed( 2 ) }ms (avg: ${ avg.toFixed( 2 ) }ms)`;
 
 			}
 
