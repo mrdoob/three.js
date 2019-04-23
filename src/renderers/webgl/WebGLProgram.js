@@ -415,10 +415,10 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			renderer.multiviewEnabled ? [
 				'uniform mat4 modelViewMatrix;',
-				'uniform mat4 projectionMatrices[2];',
 				'uniform mat3 normalMatrix;',
-
 				'uniform mat4 viewMatrices[2];',
+				'uniform mat4 projectionMatrices[2];',
+
 				'#define viewMatrix viewMatrices[VIEW_ID]',
 				'#define projectionMatrix projectionMatrices[VIEW_ID]'
 

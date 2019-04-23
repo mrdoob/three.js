@@ -62,7 +62,7 @@ function WebGLRenderer( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
-		_multiview = parameters.multiview !== undefined ? parameters.multiview : false,
+		_multiviewRequested = parameters.multiview !== undefined ? parameters.multiview : false,
 
 		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 		_depth = parameters.depth !== undefined ? parameters.depth : true,
@@ -318,8 +318,8 @@ function WebGLRenderer( parameters ) {
 
 	this.vr = vr;
 
-	var multiviewObject = new WebGLMultiview(_multiview, _gl, _canvas, extensions, capabilities );
-	var multiviewEnabled = this.multiviewEnabled = multiviewObject.isEnabled();
+	var multiview = this.multiview = new WebGLMultiview(_multiviewRequested, _gl, _canvas, extensions, capabilities );
+	var multiviewEnabled = this.multiviewEnabled = multiview.isEnabled();
 
 	// shadow map
 
@@ -1373,7 +1373,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( multiviewEnabled ) {
 
-			multiviewObject.bindMultiviewFrameBuffer( camera );
+			multiview.bindMultiviewFrameBuffer( camera );
 
 			_gl.disable( _gl.SCISSOR_TEST );
 
@@ -1406,7 +1406,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			multiviewObject.unbindMultiviewFrameBuffer( camera );
+			multiview.unbindMultiviewFrameBuffer( camera );
 
 		} else {
 

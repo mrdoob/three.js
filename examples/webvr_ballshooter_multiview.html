@@ -44,23 +44,12 @@
 			animate();
 
 			function init() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const multiview = urlParams.has('enableMultiview');
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-        info.style.textAlign = 'center';
-        // @todo Change enabled for requested and check renderer.vr.multiview
-        info.innerHTML = 'OVR_multiview2 demo - ' + (multiview ? '<b style="color:#3f3">multiview enabled</b>' : '<b style="color:#f33">multiview not enabled</b>') + ` <a href="${multiview ? '?' : '?enableMultiview'}">toggle</a>`;
-				container.appendChild( info );
-				ms = document.createElement('div');
-				ms.innerHTML = '';
-				info.appendChild(ms);
+        const urlParams = new URLSearchParams(window.location.search);
+        const multiview = urlParams.has('enableMultiview');
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x505050 );
@@ -109,6 +98,29 @@
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
+				//
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+
+				function colorize( value ) {
+
+					return value ? '<b style="color:#3f3">true</b>' : '<b style="color:#f33">false</b>';
+
+				}
+
+        // @todo Change enabled for requested and check renderer.vr.multiview
+				info.innerHTML = '<b>OVR_multiview2</b> demo<br/>requested: ' + colorize(multiview) + ` <a href="${multiview ? '?' : '?enableMultiview'}">toggle</a>`
+					+ `<br/>available: ${ colorize( renderer.multiview.isAvailable() ) }<br/>enabled: ${ colorize( renderer.multiview.isEnabled() ) }<br/><br/>`;
+				container.appendChild( info );
+				ms = document.createElement('div');
+				ms.innerHTML = '';
+				info.appendChild(ms);
+
+				//+ (multiview ? '<b style="color:#3f3">true</b>' : '<b style="color:#f33">false</b>')
 				//
 
 				document.body.appendChild( WEBVR.createButton( renderer ) );
