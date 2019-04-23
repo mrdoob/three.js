@@ -45,7 +45,7 @@ function WebGLMultiview( requested, gl, canvas, extensions, capabilities ) {
 	};
 
 
-  // @todo Get ArrayCamera
+	// @todo Get ArrayCamera
 	this.createMultiviewRenderTargetTexture = function () {
 
 		var halfWidth = Math.floor( canvas.width * 0.5 );
