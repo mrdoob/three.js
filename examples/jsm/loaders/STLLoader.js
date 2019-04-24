@@ -36,7 +36,10 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	LoaderUtils,
-	Vector3
+	Mesh,
+	MeshPhongMaterial,
+	Vector3,
+	VertexColors
 } from "../../../build/three.module.js";
 
 
