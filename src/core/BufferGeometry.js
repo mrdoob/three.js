@@ -883,9 +883,10 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			var attribute2 = geometry.attributes[ key ];
 			var attributeArray2 = attribute2.array;
 
-			var attributeSize = attribute2.itemSize;
+			var attributeOffset = attribute2.itemSize * offset;
+			var length = Math.min( attributeArray2.length, attributeArray1.length - attributeOffset );
 
-			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
+			for ( var i = 0, j = attributeOffset; i < length; i ++, j ++ ) {
 
 				attributeArray1[ j ] = attributeArray2[ i ];
 
