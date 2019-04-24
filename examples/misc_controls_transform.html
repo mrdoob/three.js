@@ -79,7 +79,7 @@
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var material = new THREE.MeshLambertMaterial( { map: texture } );
+				var material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
 				orbit = new THREE.OrbitControls( camera, renderer.domElement );
 				orbit.update();
