@@ -100,15 +100,9 @@
 
 			var params = {
 				exposure: 1,
-				bloomStrength: 1.5,
+				bloomStrength: 5,
 				bloomThreshold: 0,
 				bloomRadius: 0,
-				rows: 6,
-				columns: 6,
-				size: 2,
-				zOffset: 5,
-				minLightness: 0,
-				maxLightness: 0.1,
 				scene: "Scene with Glow"
 			};
 
@@ -126,7 +120,7 @@
 			scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
-			camera.position.set( 0, 0, 30 );
+			camera.position.set( 0, 0, 20 );
 			camera.lookAt( 0, 0, 0 );
 
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -146,7 +140,7 @@
 
 			var bloomComposer = new THREE.EffectComposer( renderer );
 			bloomComposer.renderToScreen = false;
-			bloomComposer.setSize( window.innerWidth, window.innerHeight );
+			bloomComposer.setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
 			bloomComposer.addPass( renderScene );
 			bloomComposer.addPass( bloomPass );
 
@@ -164,7 +158,7 @@
 			finalPass.needsSwap = true;
 
 			var finalComposer = new THREE.EffectComposer( renderer );
-			finalComposer.setSize( window.innerWidth, window.innerHeight );
+			finalComposer.setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( finalPass );
 
@@ -212,7 +206,7 @@
 
 			} );
 
-			folder.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function ( value ) {
+			folder.add( params, 'bloomStrength', 0.0, 10.0 ).onChange( function ( value ) {
 
 				bloomPass.strength = Number( value );
 				render();
@@ -226,21 +220,7 @@
 
 			} );
 
-			folder = gui.addFolder( 'Object parameters' );
-
-			folder.add( params, 'rows', 1, 20 ).step( 1 ).onChange( setupBoxes );
-
-			folder.add( params, 'columns', 1, 20 ).step( 1 ).onChange( setupBoxes );
-
-			folder.add( params, 'size', 0.1, 3 ).onChange( setupBoxes );
-
-			folder.add( params, 'zOffset', 0, 10 ).onChange( setupBoxes );
-
-			folder.add( params, 'minLightness', 0, 1 ).onChange( setupBoxes );
-
-			folder.add( params, 'maxLightness', 0, 1 ).onChange( setupBoxes );
-
-			setupBoxes();
+			setupScene();
 
 			function onDocumentMouseClick( event ) {
 
@@ -271,43 +251,38 @@
 
 				renderer.setSize( width, height );
 
-				bloomComposer.setSize( width, height );
-				finalComposer.setSize( width, height );
+				bloomComposer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
+				finalComposer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
 
 				render();
 
 			};
 
-			function setupBoxes() {
+			function setupScene() {
 
-				var columns = params.columns;
-				var rows = params.rows;
-				var size = params.size;
-				var zOffset = params.zOffset;
-				var minLightness = params.minLightness;
-				var maxLightness = params.maxLightness;
+				var minLightness = 0;
+				var maxLightness = 0.1;
 
 				scene.traverse( disposeMaterial );
 				scene.children.length = 0;
 
-				var hsl = { h: 0, s: 0, l: 0 };
-				for ( var x = - columns * size / 2; x < columns * size / 2; x += size ) {
+				var geometry = new THREE.IcosahedronBufferGeometry( 1, 4 );
 
-					for ( var y = - rows * size / 2; y < rows * size / 2; y += size ) {
+				for ( var i = 0; i < 50; i ++ ) {
 
-						var color = new THREE.Color( Math.floor( Math.random() * 0xffffff ) );
-						color.getHSL( hsl );
-						hsl.l = Math.min( Math.max( minLightness, hsl.l ), maxLightness );
-						color.setHSL( hsl.h, hsl.s, hsl.l );
+					var color = new THREE.Color();
+					color.setHSL( Math.random(), 0.7, Math.random() * 0.2 + 0.05 );
 
-						var box = new THREE.Mesh( getGeometry(), new THREE.MeshBasicMaterial( {
-							color: color
-						} ) );
-						box.position.set( x, y, - zOffset + Math.random() * zOffset * 2 );
-						scene.add( box );
-						if ( Math.random() < 0.125 ) box.layers.enable( BLOOM_SCENE );
+					var material = new THREE.MeshBasicMaterial( { color: color } );
+					var box = new THREE.Mesh( geometry, material );
+					box.position.x = Math.random() * 10 - 5;
+					box.position.y = Math.random() * 10 - 5;
+					box.position.z = Math.random() * 10 - 5;
+					box.position.normalize().multiplyScalar( Math.random() * 4.0 + 2.0 );
+					box.scale.setScalar( Math.random() * Math.random() + 0.5 );
+					scene.add( box );
 
-					}
+					if ( Math.random() < 0.25 ) box.layers.enable( BLOOM_SCENE );
 
 				}
 
@@ -322,30 +297,6 @@
 					obj.material.dispose();
 
 				}
-
-			}
-
-			function getGeometry() {
-
-				if ( geometry === undefined ) {
-
-					makeGeometry();
-
-				} else if ( geometry.parameters.width !== params.size ) {
-
-					geometry.dispose();
-					makeGeometry();
-
-				}
-
-				return geometry;
-
-			}
-
-			function makeGeometry() {
-
-				var size = params.size;
-				geometry = new THREE.BoxBufferGeometry( size, size, size );
 
 			}
 
