@@ -64,7 +64,7 @@ UI.Texture = function ( mapping ) {
 
 					scope.setValue( texture );
 
-					if ( scope.onChangeCallback ) scope.onChangeCallback();
+					if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 				}, false );
 
@@ -75,7 +75,7 @@ UI.Texture = function ( mapping ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var image = document.createElement( 'img' );
-					image.addEventListener( 'load', function( event ) {
+					image.addEventListener( 'load', function ( event ) {
 
 						var texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
@@ -84,7 +84,7 @@ UI.Texture = function ( mapping ) {
 
 						scope.setValue( texture );
 
-						if ( scope.onChangeCallback ) scope.onChangeCallback();
+						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 					}, false );
 
@@ -161,6 +161,19 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 };
 
+UI.Texture.prototype.setEncoding = function ( encoding ) {
+
+	var texture = this.getValue();
+	if ( texture !== null ) {
+
+		texture.encoding = encoding;
+
+	}
+
+	return this;
+
+};
+
 UI.Texture.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
@@ -188,11 +201,13 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keydown', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 			case 40: // down
 				event.preventDefault();
 				event.stopPropagation();
 				break;
+
 		}
 
 	}, false );
@@ -201,12 +216,14 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keyup', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 				scope.selectIndex( scope.selectedIndex - 1 );
 				break;
 			case 40: // down
 				scope.selectIndex( scope.selectedIndex + 1 );
 				break;
+
 		}
 
 	}, false );
