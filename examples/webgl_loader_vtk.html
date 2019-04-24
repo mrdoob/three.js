@@ -62,18 +62,6 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
 				camera.position.z = 0.2;
 
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
-				controls.panSpeed = 2;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
 				scene = new THREE.Scene();
 
 				scene.add( camera );
@@ -161,6 +149,20 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 				container.appendChild( renderer.domElement );
+
+				// controls
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 5.0;
+				controls.zoomSpeed = 5;
+				controls.panSpeed = 2;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
