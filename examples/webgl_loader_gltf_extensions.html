@@ -56,6 +56,9 @@
 		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
+		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
@@ -184,11 +187,20 @@
 
 				// Load background and generate envMap
 
-				var urls = [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ];
-				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/Park2/' );
-				background = loader.load( urls, function ( texture ) {
+				var loader = new THREE.RGBELoader().setPath( 'textures/equirectangular/' );
+				loader.load( 'venice_sunset_2k.hdr', function ( texture ) {
 
-					var pmremGenerator = new THREE.PMREMGenerator( texture );
+					texture.encoding = THREE.RGBEEncoding;
+					texture.minFilter = THREE.NearestFilter;
+					texture.magFilter = THREE.NearestFilter;
+					texture.flipY = true;
+
+					var cubeGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
+					cubeGenerator.update( renderer );
+
+					background = cubeGenerator.renderTarget;
+
+					var pmremGenerator = new THREE.PMREMGenerator( cubeGenerator.renderTarget.texture );
 					pmremGenerator.update( renderer );
 
 					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
