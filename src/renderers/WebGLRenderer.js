@@ -1461,8 +1461,16 @@ function WebGLRenderer( parameters ) {
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
 		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
 
-		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+		if ( multiview.isEnabled() ) {
+
+			multiview.computeObjectMatrices( object, camera );
+
+		} else {
+
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+		}
 
 		if ( object.isImmediateRenderObject ) {
 
@@ -2013,8 +2021,18 @@ function WebGLRenderer( parameters ) {
 
 		// common matrices
 
-		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
-		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
+		if ( material.supportsMultiview && multiview.isEnabled() ) {
+
+			p_uniforms.setValue( _gl, 'modelViewMatrices', object.modelViewMatrices );
+			p_uniforms.setValue( _gl, 'normalMatrices', object.normalMatrices );
+
+		} else {
+
+			p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
+			p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
+
+		}
+
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
 		return program;

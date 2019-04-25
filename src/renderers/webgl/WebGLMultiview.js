@@ -3,6 +3,8 @@
  */
 
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Matrix4 } from '../../math/Matrix4.js';
 
 function WebGLMultiview( requested, gl, canvas, extensions, capabilities, properties ) {
 
@@ -23,7 +25,6 @@ function WebGLMultiview( requested, gl, canvas, extensions, capabilities, proper
 		return requested && this.isAvailable();
 
 	};
-
 
 	if ( requested && ! this.isAvailable() ) {
 
@@ -46,6 +47,47 @@ function WebGLMultiview( requested, gl, canvas, extensions, capabilities, proper
 		depthStencil: null
 	};
 
+	this.computeObjectMatrices = function ( object, camera ) {
+
+		if ( ! object.modelViewMatrices ) {
+
+			object.modelViewMatrices = new Array( numViews );
+			object.normalMatrices = new Array( numViews );
+
+			for ( var i = 0; i < numViews; i ++ ) {
+
+				object.modelViewMatrices[ i ] = new Matrix4();
+				object.normalMatrices[ i ] = new Matrix3();
+
+			}
+
+		}
+
+		if ( camera.isArrayCamera ) {
+
+			for ( var i = 0; i < numViews; i ++ ) {
+
+				object.modelViewMatrices[ i ].multiplyMatrices( camera.cameras[ i ].matrixWorldInverse, object.matrixWorld );
+				object.normalMatrices[ i ].getNormalMatrix( object.modelViewMatrices[ i ] );
+
+			}
+
+		} else {
+
+			// In this case we still need to provide an array of matrices but just the first one will be used
+			object.modelViewMatrices[ 0 ].multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.normalMatrices[ 0 ].getNormalMatrix( object.modelViewMatrices[ 0 ] );
+
+			for ( var i = 0; i < numViews; i ++ ) {
+
+				object.modelViewMatrices[ i ].copy( object.modelViewMatrices[ 0 ] );
+				object.normalMatrices[ i ].copy( object.normalMatrices[ 0 ] );
+
+			}
+
+		}
+
+	};
 
 	// @todo Get ArrayCamera
 	this.createMultiviewRenderTargetTexture = function () {
