@@ -414,11 +414,13 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'uniform vec3 cameraPosition;',
 
 			material.supportsMultiview && renderer.multiview.isEnabled() ? [
-				'uniform mat4 modelViewMatrix;',
-				'uniform mat3 normalMatrix;',
+				'uniform mat4 modelViewMatrices[2];',
+				'uniform mat3 normalMatrices[2];',
 				'uniform mat4 viewMatrices[2];',
 				'uniform mat4 projectionMatrices[2];',
 
+				'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
+				'#define normalMatrix normalMatrices[VIEW_ID]',
 				'#define viewMatrix viewMatrices[VIEW_ID]',
 				'#define projectionMatrix projectionMatrices[VIEW_ID]'
 
