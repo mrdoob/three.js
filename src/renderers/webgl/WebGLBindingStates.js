@@ -162,6 +162,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	}
 
+	// If we sacrifice some BufferGeometry/Attribute API flexibility
+	// needsUpdate() and saveCache() can be much simpler. See #16287
+
 	function needsUpdate( geometry ) {
 
 		var cachedAttributes = currentState.attributes;
