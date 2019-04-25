@@ -122,7 +122,7 @@
 				effectSobel.uniforms[ "resolution" ].value.y = window.innerHeight;
 				composer.addPass( effectSobel );
 
-				var controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				//
 

@@ -151,13 +151,12 @@
 				camera.position.y = 2;
 				camera.position.z = 24;
 
-				var controls = new THREE.OrbitControls( camera );
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
-
 				document.body.appendChild( renderer.domElement );
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				var loader = new THREE.OBJLoader();
 				//load the obj

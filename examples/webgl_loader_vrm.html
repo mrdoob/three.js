@@ -67,10 +67,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( 0, 1.6, - 2.2 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0.9, 0 );
-				controls.update();
-
 				scene = new THREE.Scene();
 
 				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
@@ -130,6 +126,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0.9, 0 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

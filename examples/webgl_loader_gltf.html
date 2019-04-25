@@ -72,10 +72,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.9, 2.7 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, - 0.2, - 0.2 );
-				controls.update();
-
 				scene = new THREE.Scene();
 
 				var loader = new THREE.RGBELoader().setPath( 'textures/equirectangular/' );
@@ -128,6 +124,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, - 0.2, - 0.2 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
