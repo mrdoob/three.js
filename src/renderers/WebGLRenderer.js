@@ -1733,7 +1733,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( refreshProgram || _currentCamera !== camera ) {
 
-			if ( multiview.isEnabled() ) {
+			if ( material.supportsMultiview && multiview.isEnabled() ) {
 
 				if ( camera.isArrayCamera ) {
 
@@ -1798,7 +1798,7 @@ function WebGLRenderer( parameters ) {
 				material.isShaderMaterial ||
 				material.skinning ) {
 
-				if ( multiview.isEnabled() ) {
+				if ( material.supportsMultiview && multiview.isEnabled() ) {
 
 					if ( camera.isArrayCamera ) {
 

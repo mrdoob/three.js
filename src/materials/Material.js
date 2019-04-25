@@ -71,6 +71,7 @@ function Material() {
 	this.visible = true;
 
 	this.toneMapped = true;
+	this.supportsMultiview = true;
 
 	this.userData = {};
 
