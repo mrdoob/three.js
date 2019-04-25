@@ -55,9 +55,9 @@ scene.add( lod );
 
 		<h3>[property:boolean autoUpdate]</h3>
 		<p>
-		Default is true. If set, then the renderer calls [page:.update] every frame.
-		When it isn't, then you have to manually call by yourself in the render loop
-		for levels of detail to be updated dynamically.
+		Whether the LOD object is updated automatically by the renderer per frame or not.
+		If set to false, you have to call [page:LOD.update]() in the render loop by yourself.
+		Default is true.
 		</p>
 
 		<h3>[property:array levels]</h3>
