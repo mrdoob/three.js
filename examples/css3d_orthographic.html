@@ -53,8 +53,6 @@
 
 				camera.position.set( - 200, 200, 200 );
 
-				var controls = new THREE.OrbitControls( camera );
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
@@ -103,6 +101,8 @@
 				renderer2.domElement.style.position = 'absolute';
 				renderer2.domElement.style.top = 0;
 				document.body.appendChild( renderer2.domElement );
+
+				var controls = new THREE.OrbitControls( camera, renderer2.domElement );
 
 				function createPlane( width, height, cssColor, pos, rot ) {
 

@@ -68,15 +68,8 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
 
-				//controls
-				var controls = new THREE.OrbitControls( camera );
-				controls.enableZoom = false;
-				controls.enablePan = false;
-				controls.minPolarAngle = Math.PI / 4;
-				controls.maxPolarAngle = Math.PI / 1.5;
-
 				//cubemap
-				var path = "textures/cube/SwedishRoyalCastle/";
+				var path = 'textures/cube/SwedishRoyalCastle/';
 				var format = '.jpg';
 				var urls = [
 					path + 'px' + format, path + 'nx' + format,
@@ -135,6 +128,13 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				//controls
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.minPolarAngle = Math.PI / 4;
+				controls.maxPolarAngle = Math.PI / 1.5;
 
 				//stats
 				stats = new Stats();
