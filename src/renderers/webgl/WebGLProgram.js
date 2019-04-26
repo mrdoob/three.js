@@ -369,6 +369,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	} else {
 
+		var numMultiviewViews = renderer.multiview.getNumViews();
+
 		prefixVertex = [
 
 			'precision ' + parameters.precision + ' float;',
@@ -431,10 +433,10 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'uniform vec3 cameraPosition;',
 
 			material.supportsMultiview && renderer.multiview.isEnabled() ? [
-				'uniform mat4 modelViewMatrices[2];',
-				'uniform mat3 normalMatrices[2];',
-				'uniform mat4 viewMatrices[2];',
-				'uniform mat4 projectionMatrices[2];',
+				'uniform mat4 modelViewMatrices[' + numMultiviewViews + '];',
+				'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
+				'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
+				'uniform mat4 projectionMatrices[' + numMultiviewViews + '];',
 
 				'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
 				'#define normalMatrix normalMatrices[VIEW_ID]',
@@ -570,7 +572,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			material.supportsMultiview && renderer.multiview.isEnabled() ? [
 
-				'uniform mat4 viewMatrices[2];',
+				'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
 				'#define viewMatrix viewMatrices[VIEW_ID]'
 
 			].join( '\n' ) : 'uniform mat4 viewMatrix;',
