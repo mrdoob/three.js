@@ -14,6 +14,12 @@ function WebGLMultiview( requested, gl, canvas, extensions, capabilities, proper
 
 	};
 
+	this.getNumViews = function () {
+
+		return numViews;
+
+	};
+
 	this.getMaxViews = function () {
 
 		return capabilities.maxMultiviewViews;
@@ -36,7 +42,7 @@ function WebGLMultiview( requested, gl, canvas, extensions, capabilities, proper
 
 	}
 
-	var numViews = 2; // @todo Based on arrayCamera
+	var numViews = 2;
 	var framebuffer; // multiview framebuffer.
 	var viewFramebuffer; // single views inside the multiview framebuffer.
 	var framebufferWidth = 0;
@@ -61,23 +67,23 @@ function WebGLMultiview( requested, gl, canvas, extensions, capabilities, proper
 
 			}
 
-			if ( camera.isArrayCamera ) {
+		}
 
-				for ( var i = 0; i < numViews; i ++ ) {
+		if ( camera.isArrayCamera ) {
 
-					camera.projectionMatrices[ i ].copy( camera.cameras[ i ].projectionMatrix );
-					camera.viewMatrices[ i ].copy( camera.cameras[ i ].matrixWorldInverse );
+			for ( var i = 0; i < numViews; i ++ ) {
 
-				}
+				camera.projectionMatrices[ i ].copy( camera.cameras[ i ].projectionMatrix );
+				camera.viewMatrices[ i ].copy( camera.cameras[ i ].matrixWorldInverse );
 
-			} else {
+			}
 
-				for ( var i = 0; i < numViews; i ++ ) {
+		} else {
 
-					camera.projectionMatrices[ i ].copy( camera.projectionMatrix );
-					camera.viewMatrices[ i ].copy( camera.matrixWorldInverse );
+			for ( var i = 0; i < numViews; i ++ ) {
 
-				}
+				camera.projectionMatrices[ i ].copy( camera.projectionMatrix );
+				camera.viewMatrices[ i ].copy( camera.matrixWorldInverse );
 
 			}
 
