@@ -11,7 +11,12 @@ THREE.TrackballControls = function ( object, domElement ) {
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
 	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+
+	if ( domElement === undefined ) console.error( 'THREE.TrackballControls: The second paramter "domElement" is now mandatory. In most cases, "renderer.domElement" is best.' );
+	if ( domElement === document ) console.warn( 'THREE.TrackballControls: "document" is no valid value for "domElement". Please use "renderer.domElement" instead.' );
+
+
+	this.domElement = domElement;
 
 	// API
 
@@ -492,7 +497,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	function touchstart( event ) {
 
 		if ( _this.enabled === false ) return;
-		
+
 		event.preventDefault();
 
 		switch ( event.touches.length ) {

@@ -19,7 +19,10 @@ THREE.MapControls = function ( object, domElement ) {
 
 	this.object = object;
 
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	if ( domElement === undefined ) console.error( 'THREE.MapControls: The second paramter "domElement" is now mandatory. In most cases, "renderer.domElement" is best.' );
+	if ( domElement === document ) console.warn( 'THREE.MapControls: "document" is no valid value for "domElement". Please use "renderer.domElement" instead.' );
+
+	this.domElement = domElement;
 
 	// Set to false to disable this control
 	this.enabled = true;

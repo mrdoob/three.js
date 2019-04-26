@@ -11,7 +11,11 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
 	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+
+	if ( domElement === undefined ) console.error( 'THREE.OrthographicTrackballControls: The second paramter "domElement" is now mandatory. In most cases, "renderer.domElement" is best.' );
+	if ( domElement === document ) console.warn( 'THREE.OrthographicTrackballControls: "document" is no valid value for "domElement". Please use "renderer.domElement" instead.' );
+
+	this.domElement = domElement;
 
 	// API
 
