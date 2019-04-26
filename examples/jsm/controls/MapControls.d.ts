@@ -7,10 +7,10 @@ import {
 } from '../../../src/Three';
 
 export class MapControls extends EventDispatcher {
-  constructor(object: Camera, domElement?: HTMLElement);
+  constructor(object: Camera, domElement: HTMLElement);
 
   object: Camera;
-  domElement: HTMLElement | HTMLDocument;
+  domElement: HTMLElement;
 
   // API
   enabled: boolean;

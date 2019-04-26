@@ -1,7 +1,7 @@
 import { Camera, EventDispatcher, Vector3 } from '../../../src/Three';
 
 export class TrackballControls extends EventDispatcher {
-  constructor(object: Camera, domElement?: HTMLElement);
+  constructor(object: Camera, domElement: HTMLElement);
 
   object: Camera;
   domElement: HTMLElement;

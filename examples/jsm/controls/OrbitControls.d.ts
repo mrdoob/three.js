@@ -1,10 +1,10 @@
 import { Camera, MOUSE, Object3D, Vector3 } from '../../../src/Three';
 
 export class OrbitControls {
-	constructor(object: Camera, domElement?: HTMLElement);
+	constructor(object: Camera, domElement: HTMLElement);
 
 	object: Camera;
-	domElement: HTMLElement | HTMLDocument;
+	domElement: HTMLElement;
 
 	// API
 	enabled: boolean;
