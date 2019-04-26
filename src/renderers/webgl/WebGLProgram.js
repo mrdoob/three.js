@@ -634,7 +634,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			material.supportsMultiview && renderer.multiview.isEnabled() ? [
 
 				'#extension GL_OVR_multiview2 : require',
-				'layout(num_views = 2) in;',
+				'layout(num_views = ' + numMultiviewViews + ') in;',
 				'#define VIEW_ID gl_ViewID_OVR'
 
 			].join( '\n' ) : '',
