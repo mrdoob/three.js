@@ -468,8 +468,8 @@
 			for ( var i = 0, il = dispatcher.getNumManifolds(); i < il; i ++ ) {
 
 				var contactManifold = dispatcher.getManifoldByIndexInternal( i );
-				var rb0 = contactManifold.getBody0();
-				var rb1 = contactManifold.getBody1();
+				var rb0 = Ammo.castObject( contactManifold.getBody0(), Ammo.btRigidBody );
+				var rb1 = Ammo.castObject( contactManifold.getBody1(), Ammo.btRigidBody );
 
 				var threeObject0 = Ammo.castObject( rb0.getUserPointer(), Ammo.btVector3 ).threeObject;
 				var threeObject1 = Ammo.castObject( rb1.getUserPointer(), Ammo.btVector3 ).threeObject;
@@ -525,7 +525,13 @@
 					var numObjects = debris.length;
 					for ( var j = 0; j < numObjects; j++ ) {
 
-						createDebrisFromBreakableObject( debris[ j ] );
+						var vel = rb0.getLinearVelocity();
+						var angVel = rb0.getAngularVelocity();
+						var fragment = debris[ j ];
+						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
+						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
+
+						createDebrisFromBreakableObject( fragment );
 
 					}
 
@@ -541,7 +547,13 @@
 					var numObjects = debris.length;
 					for ( var j = 0; j < numObjects; j++ ) {
 
-						createDebrisFromBreakableObject( debris[ j ] );
+						var vel = rb1.getLinearVelocity();
+						var angVel = rb1.getAngularVelocity();
+						var fragment = debris[ j ];
+						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
+						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
+
+						createDebrisFromBreakableObject( fragment );
 
 					}
 
