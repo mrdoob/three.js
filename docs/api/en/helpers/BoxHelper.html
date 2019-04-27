@@ -34,20 +34,20 @@
 		var sphereObject = new THREE.Mesh( sphereGeom, new THREE.MeshBasicMaterial( 0xff0000 ) );
 
 		// Creating the helper and displaying it in the scene
-		var helper = new THREE.BoxHelper( object, 0xffff00 );
+		var helper = new THREE.BoxHelper( sphereObject, 0xffff00 );
 		scene.add( helper );
 
 		// Creating the actual bounding box (on which we can test intersection with other Box3 objects)
 		var box3 = new THREE.Box3();
 		// Shape and position the box after the helper
-		box3.setFromObject(knotBoxHelper);
+		box3.setFromObject( helper );
 
 		// Let's move the sphere
-		sphereObject.position.set(7, 7, 7);
+		sphereObject.position.set( 7, 7, 7 );
 
 		// Whenever the object is moved or rotated or scaled:
 		helper.update(); 
-		box3.setFromObject(knotBoxHelper);
+		box3.setFromObject( helper );
 		</code>
 
 
