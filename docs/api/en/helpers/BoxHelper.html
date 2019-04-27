@@ -13,7 +13,8 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Helper object to show the world-axis-aligned bounding box around an object.
+			Helper object to show the world-axis-aligned bounding box around an object. 
+			It can be used to work with [page:Box3] items in order to easily compute the [link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Boxes] for objects, which are often used for fast collision detection. 
 
 			Note that the object must have a [page:Geometry] or [page:BufferGeometry] for this to work,
 			so it won't work with [page:Sprite Sprites].
@@ -28,10 +29,25 @@
 
 
 		<code>
-		var sphere = new THREE.SphereGeometry();
-		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
-		var box = new THREE.BoxHelper( object, 0xffff00 );
-		scene.add( box );
+		// Creating the object whose bounding box we want to compute
+		var sphereGeom = new THREE.SphereGeometry();
+		var sphereObject = new THREE.Mesh( sphereGeom, new THREE.MeshBasicMaterial( 0xff0000 ) );
+
+		// Creating the helper and displaying it in the scene
+		var helper = new THREE.BoxHelper( object, 0xffff00 );
+		scene.add( helper );
+
+		// Creating the actual bounding box (on which we can test intersection with other Box3 objects)
+		var box3 = new THREE.Box3();
+		// Shape and position the box after the helper
+		box3.setFromObject(knotBoxHelper);
+
+		// Let's move the sphere
+		sphereObject.position.set(7, 7, 7);
+
+		// Whenever the object is moved or rotated or scaled:
+		helper.update(); 
+		box3.setFromObject(knotBoxHelper);
 		</code>
 
 
