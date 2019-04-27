@@ -356,9 +356,9 @@ THREE.LoaderSupport.MeshBuilder = function() {
 	};
 
 	this.callbacks = new THREE.LoaderSupport.Callbacks();
-	this.materials = [];
+	this.materials = {};
 };
-THREE.LoaderSupport.MeshBuilder.LOADER_MESH_BUILDER_VERSION = '1.3.0';
+THREE.LoaderSupport.MeshBuilder.LOADER_MESH_BUILDER_VERSION = '1.3.1';
 
 THREE.LoaderSupport.MeshBuilder.prototype = {
 
