@@ -144,4 +144,4 @@ function convert( path, ignoreList ) {
 
 	fs.writeFileSync( dstFolder + path, output, 'utf-8' );
 
-};
+}
