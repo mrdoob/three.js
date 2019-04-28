@@ -17,8 +17,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.object = object;
 
-	if ( domElement === undefined ) console.error( 'THREE.OrbitControls: The second paramter "domElement" is now mandatory. In most cases, "renderer.domElement" is best.' );
-	if ( domElement === document ) console.warn( 'THREE.OrbitControls: "document" is no valid value for "domElement". Please use "renderer.domElement" instead.' );
+	if ( domElement === undefined ) console.error( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory. In most cases, "renderer.domElement" is best.' );
+	if ( domElement === document ) console.warn( 'THREE.OrbitControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
 	this.domElement = domElement;
 
