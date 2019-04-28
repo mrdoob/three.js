@@ -10,7 +10,7 @@
 
 THREE.WebRTCRecorder = function ( canvas, options ) {
 
-	if ( ! MediaSource ) {
+	if ( ! window.MediaSource ) {
 
 		console.error( "Your browser doesn't support WebRTC MediaSource. Try to use chrome or firefox browser." );
 		return;
