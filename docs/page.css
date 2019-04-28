@@ -1,13 +1,13 @@
 @font-face {
 	font-family: 'RobotoMono';
-	src: url('../files/RobotoMono-Regular.ttf');
+	src: local('RobotoMono'), url('../files/RobotoMono-Regular.woff2') format('woff2');
 	font-weight: normal;
 	font-style: normal;
 }
 
 @font-face {
 	font-family: 'SF-Pro-Text';
-	src: url('../files/SF-Pro-Text-Regular.otf');
+	src: local('SF-Pro-Text'), url('../files/SF-Pro-Text-Regular.otf');
 	font-weight: normal;
 	font-style: normal;
 }
