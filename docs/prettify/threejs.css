@@ -10,6 +10,8 @@ pre .dec, code .dec { color: #22c0c4; } /* decimal */
 
 
 pre.prettyprint, code.prettyprint {
-	background-color: #f9f9f9;
-	font-family: 'inconsolata';
+	background-color: #F5F5F5;
+	font-family: 'RobotoMono', monospace;
+	font-size: 14px;
+	line-height: 21px;
 }
