@@ -30,23 +30,30 @@
 		<code>
 		// Creating the object whose bounding box we want to compute
 		var sphereGeom = new THREE.SphereGeometry();
-		var sphereObject = new THREE.Mesh( sphereGeom, new THREE.MeshBasicMaterial( 0xff0000 ) );
+		var sphereObject = new THREE.Mesh( 
+			sphereGeom, 
+			new THREE.MeshBasicMaterial( 0xff0000 ) 
+		);
 
 		// Creating the helper and displaying it in the scene
 		var helper = new THREE.BoxHelper( sphereObject, 0xffff00 );
 		scene.add( helper );
 
-		// Creating the actual bounding box (on which we can test intersection with other Box3 objects)
-		var box3 = new THREE.Box3();
-		// Shape and position the box after the object
-		box3.setFromObject( sphere );
+		// Creating the actual bounding box 
+		// (on which we can test intersection with other Box3 objects)
+		sphereObject.geometry.computeBoundingBox();
+		var BBox = new THREE.Box3(
+			sphereObject.geometry.boundingBox.min,
+  			sphereObject.geometry.boundingBox.max
+		);
 
-		// Let's move the sphere
+		// Moving the sphere
 		sphereObject.position.set( 7, 7, 7 );
 
-		// Whenever the object is moved or rotated or scaled, we update both the bounding box and the helper
-		helper.update(); 
-		box3.setFromObject( sphereObject );
+		// Updating both the bounding box and the helper
+		// (to repeat each time the object is moved, rotated or scaled) 
+		BBox.copy( sphereObject.geometry.boundingBox ).applyMatrix4( sphereObject.matrixWorld );
+		helper.update();
 		</code>
 
 
