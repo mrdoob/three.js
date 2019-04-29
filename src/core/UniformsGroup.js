@@ -21,7 +21,7 @@ UniformsGroup.prototype = Object.assign( Object.create( EventDispatcher.prototyp
 
 	constructor: UniformsGroup,
 
-	isUniformBlock: true,
+	isUniformsGroup: true,
 
 	add: function ( uniform ) {
 
