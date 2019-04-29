@@ -18,7 +18,12 @@ var TrackballControls = function ( object, domElement ) {
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
 	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+
+	if ( domElement === undefined ) console.error( 'THREE.TrackballControls: The second parameter "domElement" is now mandatory.' );
+	if ( domElement === document ) console.error( 'THREE.TrackballControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
+
+
+	this.domElement = domElement;
 
 	// API
 
@@ -87,24 +92,14 @@ var TrackballControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		if ( this.domElement === document ) {
+		var box = this.domElement.getBoundingClientRect();
+		// adjustments come from similar code in the jquery offset() function
+		var d = this.domElement.ownerDocument.documentElement;
+		this.screen.left = box.left + window.pageXOffset - d.clientLeft;
+		this.screen.top = box.top + window.pageYOffset - d.clientTop;
+		this.screen.width = box.width;
+		this.screen.height = box.height;
 
-			this.screen.left = 0;
-			this.screen.top = 0;
-			this.screen.width = window.innerWidth;
-			this.screen.height = window.innerHeight;
-
-		} else {
-
-			var box = this.domElement.getBoundingClientRect();
-			// adjustments come from similar code in the jquery offset() function
-			var d = this.domElement.ownerDocument.documentElement;
-			this.screen.left = box.left + window.pageXOffset - d.clientLeft;
-			this.screen.top = box.top + window.pageYOffset - d.clientTop;
-			this.screen.width = box.width;
-			this.screen.height = box.height;
-
-		}
 
 	};
 
@@ -499,7 +494,7 @@ var TrackballControls = function ( object, domElement ) {
 	function touchstart( event ) {
 
 		if ( _this.enabled === false ) return;
-		
+
 		event.preventDefault();
 
 		switch ( event.touches.length ) {
