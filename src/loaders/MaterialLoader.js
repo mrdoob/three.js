@@ -172,6 +172,7 @@ Object.assign( MaterialLoader.prototype, {
 		// maps
 
 		if ( json.map !== undefined ) material.map = getTexture( json.map );
+		if ( json.matcap !== undefined ) material.matcap = getTexture( json.matcap );
 
 		if ( json.alphaMap !== undefined ) {
 

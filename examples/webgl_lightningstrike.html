@@ -256,7 +256,6 @@
 				outlinePass.edgeThickness = 2.8;
 				outlinePass.visibleEdgeColor = visibleColor;
 				outlinePass.hiddenEdgeColor.set( 0 );
-				outlinePass.renderToScreen = true;
 				composer.addPass( outlinePass );
 
 				scene.userData.outlineEnabled = true;
@@ -580,18 +579,7 @@
 
 					controls.update();
 
-					if ( scene.userData.outlineEnabled ) {
-
-						outlinePass.enabled = true;
-						rayPass.renderToScreen = false;
-
-					}
-					else {
-
-						outlinePass.enabled = false;
-						rayPass.renderToScreen = true;
-
-					}
+					outlinePass.enabled = scene.userData.outlineEnabled;
 
 					composer.render();
 

@@ -7,14 +7,6 @@
  * @author moroine / https://github.com/moroine
  */
 
-// This set of controls performs orbiting, dollying (zooming), and panning.
-// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
-// This is very similar to OrbitControls, another set of touch behavior
-//
-//    Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
-//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-//    Pan - left mouse, or arrow keys / touch: one-finger move
-
 import {
 	EventDispatcher,
 	MOUSE,
@@ -23,6 +15,14 @@ import {
 	Vector2,
 	Vector3
 } from "../../../build/three.module.js";
+
+// This set of controls performs orbiting, dollying (zooming), and panning.
+// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
+// This is very similar to OrbitControls, another set of touch behavior
+//
+//    Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
+//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+//    Pan - left mouse, or arrow keys / touch: one-finger move
 
 var MapControls = function ( object, domElement ) {
 
@@ -1036,7 +1036,7 @@ var MapControls = function ( object, domElement ) {
 };
 
 MapControls.prototype = Object.create( EventDispatcher.prototype );
-MapControls.prototype.constructor = THREE.MapControls;
+MapControls.prototype.constructor = MapControls;
 
 Object.defineProperties( MapControls.prototype, {
 
@@ -1163,4 +1163,4 @@ Object.defineProperties( MapControls.prototype, {
 
 } );
 
-export { MapControls }
+export { MapControls };

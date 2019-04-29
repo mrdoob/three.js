@@ -25,12 +25,7 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 
 	} );
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 };
 
@@ -38,20 +33,21 @@ THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototy
 
 	constructor: THREE.DotScreenPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
 
-		this.quad.material = this.material;
-
 		if ( this.renderToScreen ) {
 
-			renderer.render( this.scene, this.camera );
+			renderer.setRenderTarget( null );
+			this.fsQuad.render( renderer );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+			renderer.setRenderTarget( writeBuffer );
+			if ( this.clear ) renderer.clear();
+			this.fsQuad.render( renderer );
 
 		}
 

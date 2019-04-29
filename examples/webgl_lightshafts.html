@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - Light Shafts</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a {
+				color: #ffffff;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Light Shafts -
+			Model by <a href="https://skfb.ly/6ICER" target="_blank" rel="noopener">Splodeman</a><br />
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+
+		<script src="js/WebGL.js"></script>
+
+		<script type="x-shader/x-vertex" id="vertexShader">
+
+		#include <common>
+
+		uniform float speed;
+		uniform float time;
+		uniform float timeOffset;
+		varying vec2 vUv;
+		varying float vAlpha;
+
+		void main() {
+
+			vec3 pos = position;
+
+			float l = ( time * speed * 0.01 ) + timeOffset;
+			float f = fract( l ); // linear time factor [0,1)
+			float a = f * f; // quadratic time factor [0,1)
+
+			// slightly animate the vertices of light shaft if necessary
+
+			// pos.x += cos( l * 20.0 ) * sin( l * 10.0 );
+
+			vAlpha = saturate( 0.7 + min( 1.0, a * 10.0 ) * ( sin( a * 40.0 ) * 0.25 ) );
+
+		  vUv = uv;
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
+
+		}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentShader">
+
+		uniform float attenuation;
+		uniform vec3 color;
+		uniform sampler2D texture;
+
+		varying vec2 vUv;
+		varying float vAlpha;
+
+		void main() {
+
+			vec4 textureColor = texture2D( texture, vUv );
+			gl_FragColor = vec4( textureColor.rgb * color.rgb, textureColor.a * vAlpha );
+			gl_FragColor.a *= pow( gl_FragCoord.z, attenuation );
+
+		}
+
+		</script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var container, controls, clock;
+			var camera, scene, renderer, uniforms;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 3.2, 3, 3.7 );
+
+				clock = new THREE.Clock();
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xcf8b74 );
+
+				var	light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				light.position.set( 0, 20, 0 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 20, 10 );
+				scene.add( light );
+
+			 	// light shafts definition
+
+				var textureLoader = new THREE.TextureLoader();
+				var texture = textureLoader.load( 'textures/lightShaft.png' );
+
+				uniforms = {
+					// controls how fast the ray attenuates when the camera comes closer
+					attenuation: {
+						value: 10
+					},
+					// controls the speed of the animation
+					speed: {
+						value: 2
+					},
+					// the color of the ray
+					color: {
+						value: new THREE.Color( 0xdadc9f )
+					},
+					// the visual representation of the ray highly depends on the used texture
+					texture: {
+						value: texture
+					},
+					// global time value for animation
+					time: {
+						value: 0
+					},
+					// individual time offset so rays are animated differently if necessary
+					timeOffset: {
+						value: 0
+					}
+				};
+
+				var lightShaftMaterial = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					blending: THREE.AdditiveBlending,
+					depthWrite: false,
+					transparent: true,
+					side: THREE.DoubleSide
+				} );
+
+				var lightShaftGeometry = new THREE.PlaneBufferGeometry( 0.5, 5 );
+
+				// model
+
+				var loader = new THREE.GLTFLoader().setPath( 'models/gltf/Tree/' );
+				loader.load( 'tree.glb', function ( gltf ) {
+
+					gltf.scene.traverse( function ( child ) {
+
+						if ( child.isMesh )	{
+
+							child.material.transparent = false;
+							child.material.alphaTest = 0.5;
+
+						}
+
+					} );
+
+					scene.add( gltf.scene );
+
+					// when the model is loaded, add light shafts
+
+					for ( var i = 0; i < 5; i ++ ) {
+
+						var lightShaft = new THREE.Mesh( lightShaftGeometry, lightShaftMaterial );
+						lightShaft.position.x = - 1 + 1.5 * Math.sign( ( i % 2 ) );
+						lightShaft.position.y = 2;
+						lightShaft.position.z = - 1.5 + ( i * 0.5 );
+						lightShaft.rotation.y = Math.PI * 0.2;
+						lightShaft.rotation.z = Math.PI * - ( 0.15 + 0.1 * Math.random() );
+						scene.add( lightShaft );
+
+					}
+
+				} );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0.5, 1.5, 0 );
+				controls.minDistance = 2;
+				controls.maxDistance = 20;
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				const delta = clock.getDelta();
+
+				uniforms.time.value += delta;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

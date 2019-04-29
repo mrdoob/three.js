@@ -91,8 +91,8 @@
 		<h2>构造器</h2>
 		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-    [page:BufferGeometry geometry] —— TODO<br />
-    [page:Material material] —— （可选）一个[page:Material]的实例，默认值是一个新的[page:MeshBasicMaterial]。
+    [page:BufferGeometry geometry] —— 一个[page:BufferGeometry]实例。<br />
+    [page:Material material] —— （可选）一个[page:Material]实例，默认值是一个新的[page:MeshBasicMaterial]。
 		</p>
 
 
@@ -111,12 +111,12 @@
 
 		<h3>[property:Matrix4 bindMatrix]</h3>
 		<p>
-		用于绑定的骨骼变换的基础矩阵。
+			该基础矩阵用于绑定骨骼的变换。
 		</p>
 
 		<h3>[property:Matrix4 bindMatrixInverse]</h3>
 		<p>
-		用于重置绑定的骨骼变换的基础矩阵。
+			该基础矩阵用于重置绑定骨骼的变换。
 		</p>
 
 		<h3>[property:Boolean isSkinnedMesh]</h3>
@@ -127,7 +127,7 @@
 
 		<h3>[property:Skeleton skeleton]</h3>
 		<p>
-			TODO
+			用于表示蒙皮网格中骨骼的层次结构的[page:Skeleton]（骨架）。
 		</p>
 
 
@@ -138,7 +138,7 @@
 		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
 		<p>
 		[page:Skeleton skeleton] —— 由一棵[page:Bone Bones]树创建的[page:Skeleton]。<br/>
-		[page:Matrix4 bindMatrix] —— 代表着骨架基本变换的[page:Matrix4]（4x4矩阵）。<br /><br />
+		[page:Matrix4 bindMatrix] —— 表示骨架基本变换的[page:Matrix4]（4x4矩阵）。<br /><br />
 		将骨架绑定到一个蒙皮网格上。bindMatrix会被保存到.bindMatrix属性中，其逆矩阵.bindMatrixInverse也会被计算出来。
 		</p>
 
@@ -149,7 +149,7 @@
 
 		<h3>[method:null normalizeSkinWeights]()</h3>
 		<p>
-		TODO
+		标准化蒙皮的权重。
 		</p>
 
 		<h3>[method:null pose]()</h3>

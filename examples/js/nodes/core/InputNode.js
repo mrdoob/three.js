@@ -18,7 +18,15 @@ function InputNode( type, params ) {
 InputNode.prototype = Object.create( TempNode.prototype );
 InputNode.prototype.constructor = InputNode;
 
-InputNode.prototype.isReadonly = function ( builder ) {
+InputNode.prototype.setReadonly = function ( value ) {
+
+	this.readonly = value;
+
+	return this;
+
+};
+
+InputNode.prototype.getReadonly = function ( builder ) {
 
 	return this.readonly;
 
@@ -48,7 +56,7 @@ InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needs
 	type = type || this.getType( builder );
 
 	var data = builder.getNodeData( uuid ),
-		readonly = this.isReadonly( builder ) && this.generateReadonly !== undefined;
+		readonly = this.getReadonly( builder ) && this.generateReadonly !== undefined;
 
 	if ( readonly ) {
 
@@ -60,7 +68,7 @@ InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needs
 
 			if ( ! data.vertex ) {
 
-				data.vertex = builder.createVertexUniform( type, this, ns, needsUpdate );
+				data.vertex = builder.createVertexUniform( type, this, ns, needsUpdate, this.getLabel() );
 
 			}
 
@@ -70,7 +78,7 @@ InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needs
 
 			if ( ! data.fragment ) {
 
-				data.fragment = builder.createFragmentUniform( type, this, ns, needsUpdate );
+				data.fragment = builder.createFragmentUniform( type, this, ns, needsUpdate, this.getLabel() );
 
 			}
 

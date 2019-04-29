@@ -146,6 +146,46 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectFovRow );
 
+	// left
+
+	var objectLeftRow = new UI.Row();
+	var objectLeft = new UI.Number().onChange( update );
+
+	objectLeftRow.add( new UI.Text( strings.getKey( 'sidebar/object/left' ) ).setWidth( '90px' ) );
+	objectLeftRow.add( objectLeft );
+
+	container.add( objectLeftRow );
+
+	// right
+
+	var objectRightRow = new UI.Row();
+	var objectRight = new UI.Number().onChange( update );
+
+	objectRightRow.add( new UI.Text( strings.getKey( 'sidebar/object/right' ) ).setWidth( '90px' ) );
+	objectRightRow.add( objectRight );
+
+	container.add( objectRightRow );
+
+	// top
+
+	var objectTopRow = new UI.Row();
+	var objectTop = new UI.Number().onChange( update );
+
+	objectTopRow.add( new UI.Text( strings.getKey( 'sidebar/object/top' ) ).setWidth( '90px' ) );
+	objectTopRow.add( objectTop );
+
+	container.add( objectTopRow );
+
+	// bottom
+
+	var objectBottomRow = new UI.Row();
+	var objectBottom = new UI.Number().onChange( update );
+
+	objectBottomRow.add( new UI.Text( strings.getKey( 'sidebar/object/bottom' ) ).setWidth( '90px' ) );
+	objectBottomRow.add( objectBottom );
+
+	container.add( objectBottomRow );
+
 	// near
 
 	var objectNearRow = new UI.Row();
@@ -400,15 +440,53 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
+			if ( object.left !== undefined && Math.abs( object.left - objectLeft.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'left', objectLeft.getValue() ) );
+				object.updateProjectionMatrix();
+
+			}
+
+			if ( object.right !== undefined && Math.abs( object.right - objectRight.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'right', objectRight.getValue() ) );
+				object.updateProjectionMatrix();
+
+			}
+
+			if ( object.top !== undefined && Math.abs( object.top - objectTop.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'top', objectTop.getValue() ) );
+				object.updateProjectionMatrix();
+
+			}
+
+			if ( object.bottom !== undefined && Math.abs( object.bottom - objectBottom.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'bottom', objectBottom.getValue() ) );
+				object.updateProjectionMatrix();
+
+			}
+
 			if ( object.near !== undefined && Math.abs( object.near - objectNear.getValue() ) >= 0.01 ) {
 
 				editor.execute( new SetValueCommand( object, 'near', objectNear.getValue() ) );
+				if ( object.isOrthographicCamera ) {
+
+					object.updateProjectionMatrix();
+
+				}
 
 			}
 
 			if ( object.far !== undefined && Math.abs( object.far - objectFar.getValue() ) >= 0.01 ) {
 
 				editor.execute( new SetValueCommand( object, 'far', objectFar.getValue() ) );
+				if ( object.isOrthographicCamera ) {
+
+					object.updateProjectionMatrix();
+
+				}
 
 			}
 
@@ -518,17 +596,21 @@ Sidebar.Object = function ( editor ) {
 
 		var properties = {
 			'fov': objectFovRow,
+			'left': objectLeftRow,
+			'right': objectRightRow,
+			'top': objectTopRow,
+			'bottom': objectBottomRow,
 			'near': objectNearRow,
 			'far': objectFarRow,
 			'intensity': objectIntensityRow,
 			'color': objectColorRow,
 			'groundColor': objectGroundColorRow,
-			'distance' : objectDistanceRow,
-			'angle' : objectAngleRow,
-			'penumbra' : objectPenumbraRow,
-			'decay' : objectDecayRow,
-			'castShadow' : objectShadowRow,
-			'receiveShadow' : objectReceiveShadow,
+			'distance': objectDistanceRow,
+			'angle': objectAngleRow,
+			'penumbra': objectPenumbraRow,
+			'decay': objectDecayRow,
+			'castShadow': objectShadowRow,
+			'receiveShadow': objectReceiveShadow,
 			'shadow': objectShadowRadius
 		};
 
@@ -542,8 +624,8 @@ Sidebar.Object = function ( editor ) {
 
 	function updateTransformRows( object ) {
 
-		if ( object instanceof THREE.Light ||
-		   ( object instanceof THREE.Object3D && object.userData.targetInverse ) ) {
+		if ( object.isLight ||
+		   ( object.isObject3D && object.userData.targetInverse ) ) {
 
 			objectRotationRow.setDisplay( 'none' );
 			objectScaleRow.setDisplay( 'none' );
@@ -614,6 +696,30 @@ Sidebar.Object = function ( editor ) {
 		if ( object.fov !== undefined ) {
 
 			objectFov.setValue( object.fov );
+
+		}
+
+		if ( object.left !== undefined ) {
+
+			objectLeft.setValue( object.left );
+
+		}
+
+		if ( object.right !== undefined ) {
+
+			objectRight.setValue( object.right );
+
+		}
+
+		if ( object.top !== undefined ) {
+
+			objectTop.setValue( object.top );
+
+		}
+
+		if ( object.bottom !== undefined ) {
+
+			objectBottom.setValue( object.bottom );
 
 		}
 

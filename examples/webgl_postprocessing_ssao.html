@@ -127,7 +127,6 @@
 
 				ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
 				ssaoPass.kernelRadius = 16;
-				ssaoPass.renderToScreen = true;
 
 				effectComposer = new THREE.EffectComposer( renderer );
 				effectComposer.addPass( ssaoPass );

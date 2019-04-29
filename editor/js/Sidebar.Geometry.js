@@ -55,7 +55,7 @@ Sidebar.Geometry = function ( editor ) {
 
 			case 'Convert':
 
-				if ( geometry instanceof THREE.Geometry ) {
+				if ( geometry && geometry.isGeometry ) {
 
 					editor.execute( new SetGeometryCommand( object, new THREE.BufferGeometry().fromGeometry( geometry ) ) );
 
@@ -178,6 +178,8 @@ Sidebar.Geometry = function ( editor ) {
 				parameters.add( new Sidebar.Geometry[ geometry.type ]( editor, object ) );
 
 			}
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 			geometryBoundingSphere.setValue( Math.floor( geometry.boundingSphere.radius * 1000 ) / 1000 );
 

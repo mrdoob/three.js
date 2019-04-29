@@ -61,15 +61,6 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
-				controls = new THREE.TrackballControls( camera );
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-				controls.noZoom = false;
-				controls.noPan = false;
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
@@ -171,6 +162,15 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+				controls.noZoom = false;
+				controls.noPan = false;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -206,7 +206,8 @@
 
 				// render the scene
 
-				renderer.render( pickingScene, camera, pickingTexture );
+				renderer.setRenderTarget( pickingTexture );
+				renderer.render( pickingScene, camera );
 
 				// clear the view offset so rendering returns to normal
 
@@ -252,6 +253,7 @@
 
 				pick();
 
+				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 
 			}

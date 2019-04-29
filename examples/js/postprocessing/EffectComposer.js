@@ -15,7 +15,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 			stencilBuffer: false
 		};
 
-		var size = renderer.getDrawingBufferSize();
+		var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
 		renderTarget.texture.name = 'EffectComposer.rt1';
 
@@ -27,6 +27,8 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;
+
+	this.renderToScreen = true;
 
 	this.passes = [];
 
@@ -46,6 +48,8 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
 
+	this._previousFrameTime = Date.now();
+
 };
 
 Object.assign( THREE.EffectComposer.prototype, {
@@ -62,7 +66,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		this.passes.push( pass );
 
-		var size = this.renderer.getDrawingBufferSize();
+		var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
 		pass.setSize( size.width, size.height );
 
 	},
@@ -73,7 +77,35 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	},
 
-	render: function ( delta ) {
+	isLastEnabledPass: function ( passIndex ) {
+
+		for ( var i = passIndex + 1; i < this.passes.length; i ++ ) {
+
+			if ( this.passes[ i ].enabled ) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
+
+	},
+
+	render: function ( deltaTime ) {
+
+		// deltaTime value is in seconds
+
+		if ( deltaTime === undefined ) {
+
+			deltaTime = ( Date.now() - this._previousFrameTime ) * 0.001;
+
+		}
+
+		this._previousFrameTime = Date.now();
+
+		var currentRenderTarget = this.renderer.getRenderTarget();
 
 		var maskActive = false;
 
@@ -85,7 +117,8 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			if ( pass.enabled === false ) continue;
 
-			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
+			pass.renderToScreen = ( this.renderToScreen && this.isLastEnabledPass( i ) );
+			pass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
 
 			if ( pass.needsSwap ) {
 
@@ -95,7 +128,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
 
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
+					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
 
 					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
 
@@ -121,13 +154,15 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		}
 
+		this.renderer.setRenderTarget( currentRenderTarget );
+
 	},
 
 	reset: function ( renderTarget ) {
 
 		if ( renderTarget === undefined ) {
 
-			var size = this.renderer.getDrawingBufferSize();
+			var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
 
 			renderTarget = this.renderTarget1.clone();
 			renderTarget.setSize( size.width, size.height );
@@ -171,7 +206,7 @@ THREE.Pass = function () {
 	// if set to true, the pass clears its buffer before rendering
 	this.clear = false;
 
-	// if set to true, the result of the pass is rendered to screen
+	// if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
 	this.renderToScreen = false;
 
 };
@@ -180,10 +215,52 @@ Object.assign( THREE.Pass.prototype, {
 
 	setSize: function ( width, height ) {},
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
 		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
 
 	}
 
 } );
+
+// Helper for passes that need to fill the viewport with a single quad.
+THREE.Pass.FullScreenQuad = ( function () {
+
+	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+
+	var FullScreenQuad = function ( material ) {
+
+		this._mesh = new THREE.Mesh( geometry, material );
+
+	};
+
+	Object.defineProperty( FullScreenQuad.prototype, 'material', {
+
+		get: function () {
+
+			return this._mesh.material;
+
+		},
+
+		set: function ( value ) {
+
+			this._mesh.material = value;
+
+		}
+
+	} );
+
+	Object.assign( FullScreenQuad.prototype, {
+
+		render: function ( renderer ) {
+
+			renderer.render( this._mesh, camera );
+
+		}
+
+	} );
+
+	return FullScreenQuad;
+
+} )();
