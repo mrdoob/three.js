@@ -20,7 +20,7 @@ THREE.MapControls = function ( object, domElement ) {
 	this.object = object;
 
 	if ( domElement === undefined ) console.error( 'THREE.MapControls: The second parameter "domElement" is now mandatory.' );
-	if ( domElement === document ) console.warn( 'THREE.MapControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
+	if ( domElement === document ) console.error( 'THREE.MapControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
 	this.domElement = domElement;
 
@@ -366,7 +366,7 @@ THREE.MapControls = function ( object, domElement ) {
 
 		return function pan( deltaX, deltaY ) {
 
-			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+			var element = scope.domElement;
 
 			if ( scope.object.isPerspectiveCamera ) {
 
@@ -478,7 +478,7 @@ THREE.MapControls = function ( object, domElement ) {
 
 		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = scope.domElement;
 
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
@@ -643,7 +643,7 @@ THREE.MapControls = function ( object, domElement ) {
 
 		if ( isRotateUp() ) {
 
-			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+			var element = scope.domElement;
 
 			// rotating up and down along whole screen attempts to go 360, but limited to 180
 			rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );

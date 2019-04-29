@@ -13,7 +13,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	this.object = object;
 
 	if ( domElement === undefined ) console.error( 'THREE.OrthographicTrackballControls: The second parameter "domElement" is now mandatory.' );
-	if ( domElement === document ) console.warn( 'THREE.OrthographicTrackballControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
+	if ( domElement === document ) console.error( 'THREE.OrthographicTrackballControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
 	this.domElement = domElement;
 

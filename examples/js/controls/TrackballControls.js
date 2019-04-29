@@ -13,7 +13,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.object = object;
 
 	if ( domElement === undefined ) console.error( 'THREE.TrackballControls: The second parameter "domElement" is now mandatory.' );
-	if ( domElement === document ) console.warn( 'THREE.TrackballControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
+	if ( domElement === document ) console.error( 'THREE.TrackballControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
 
 	this.domElement = domElement;
@@ -85,24 +85,14 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		if ( this.domElement === document ) {
+		var box = this.domElement.getBoundingClientRect();
+		// adjustments come from similar code in the jquery offset() function
+		var d = this.domElement.ownerDocument.documentElement;
+		this.screen.left = box.left + window.pageXOffset - d.clientLeft;
+		this.screen.top = box.top + window.pageYOffset - d.clientTop;
+		this.screen.width = box.width;
+		this.screen.height = box.height;
 
-			this.screen.left = 0;
-			this.screen.top = 0;
-			this.screen.width = window.innerWidth;
-			this.screen.height = window.innerHeight;
-
-		} else {
-
-			var box = this.domElement.getBoundingClientRect();
-			// adjustments come from similar code in the jquery offset() function
-			var d = this.domElement.ownerDocument.documentElement;
-			this.screen.left = box.left + window.pageXOffset - d.clientLeft;
-			this.screen.top = box.top + window.pageYOffset - d.clientTop;
-			this.screen.width = box.width;
-			this.screen.height = box.height;
-
-		}
 
 	};
 

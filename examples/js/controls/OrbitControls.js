@@ -18,7 +18,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.object = object;
 
 	if ( domElement === undefined ) console.error( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
-	if ( domElement === document ) console.warn( 'THREE.OrbitControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
+	if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
 	this.domElement = domElement;
 
@@ -350,7 +350,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		return function pan( deltaX, deltaY ) {
 
-			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+			var element = scope.domElement;
 
 			if ( scope.object.isPerspectiveCamera ) {
 
@@ -462,7 +462,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = scope.domElement;
 
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
@@ -622,7 +622,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = scope.domElement;
 
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
