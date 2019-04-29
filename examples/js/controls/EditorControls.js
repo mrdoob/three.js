@@ -7,7 +7,7 @@
 
 THREE.EditorControls = function ( object, domElement ) {
 
-	if ( domElement === undefined ) console.error( 'THREE.EditorControls: The second parameter "domElement" is now mandatory. In most cases, "renderer.domElement" is best.' );
+	if ( domElement === undefined ) console.error( 'THREE.EditorControls: The second parameter "domElement" is now mandatory.' );
 	if ( domElement === document ) console.warn( 'THREE.EditorControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
 	// API

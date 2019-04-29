@@ -12,7 +12,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.object = object;
 
-	if ( domElement === undefined ) console.error( 'THREE.TrackballControls: The second parameter "domElement" is now mandatory. In most cases, "renderer.domElement" is best.' );
+	if ( domElement === undefined ) console.error( 'THREE.TrackballControls: The second parameter "domElement" is now mandatory.' );
 	if ( domElement === document ) console.warn( 'THREE.TrackballControls: "document" cannot be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
 
