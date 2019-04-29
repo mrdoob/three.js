@@ -39,7 +39,7 @@ import { WebGLRenderStates } from './webgl/WebGLRenderStates.js';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
 import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
-import { WebGLUniformBlocks } from './webgl/WebGLUniformBlocks.js';
+import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebVRManager } from './webvr/WebVRManager.js';
@@ -245,7 +245,7 @@ function WebGLRenderer( parameters ) {
 
 	var extensions, capabilities, state, info;
 	var properties, textures, attributes, geometries, objects;
-	var programCache, renderLists, renderStates, uniformBlocks;
+	var programCache, renderLists, renderStates, uniformsGroups;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
@@ -287,7 +287,7 @@ function WebGLRenderer( parameters ) {
 		programCache = new WebGLPrograms( _this, extensions, capabilities, textures );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
-		uniformBlocks = new WebGLUniformBlocks( _gl, info, capabilities );
+		uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities );
 
 		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
@@ -569,7 +569,7 @@ function WebGLRenderer( parameters ) {
 		renderStates.dispose();
 		properties.dispose();
 		objects.dispose();
-		uniformBlocks.dispose();
+		uniformsGroups.dispose();
 
 		vr.dispose();
 
@@ -1526,7 +1526,7 @@ function WebGLRenderer( parameters ) {
 				materialProperties.shader = {
 					name: material.type,
 					uniforms: material.uniforms,
-					uniformBlocks: material.uniformBlocks,
+					uniformsGroups: material.uniformsGroups,
 					vertexShader: material.vertexShader,
 					fragmentShader: material.fragmentShader
 				};
@@ -1984,17 +1984,17 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.isShaderMaterial || material.isRawShaderMaterial ) {
 
-			var blocks = materialProperties.shader.uniformBlocks;
+			var groups = materialProperties.shader.uniformsGroups;
 			var webglProgram = materialProperties.program.program;
 
-			for ( var i = 0, l = blocks.length; i < l; i ++ ) {
+			for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 				if ( capabilities.isWebGL2 ) {
 
-					var block = blocks[ i ];
+					var group = groups[ i ];
 
-					uniformBlocks.update( block );
-					uniformBlocks.bind( block, webglProgram );
+					uniformsGroups.update( group );
+					uniformsGroups.bind( group, webglProgram );
 
 				} else {
 

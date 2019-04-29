@@ -2,7 +2,7 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function WebGLUniformBlocks( gl, info, capabilities ) {
+function WebGLUniformsGroups( gl, info, capabilities ) {
 
 	var buffers = {};
 	var updateList = {};
@@ -10,27 +10,27 @@ function WebGLUniformBlocks( gl, info, capabilities ) {
 	var allocatedBindingPoints = [];
 	var maxBindingPoints = ( capabilities.isWebGL2 ) ? gl.getParameter( gl.MAX_UNIFORM_BUFFER_BINDINGS ) : null; // binding points are global whereas block indices are per shader program
 
-	function bind( uniformBlock, program ) {
+	function bind( uniformsGroup, program ) {
 
 		// bind shader specific block index to global block point
 
-		var blockIndex = gl.getUniformBlockIndex( program, uniformBlock.name );
-		gl.uniformBlockBinding( program, blockIndex, uniformBlock.__bindingPointIndex );
+		var blockIndex = gl.getUniformBlockIndex( program, uniformsGroup.name );
+		gl.uniformBlockBinding( program, blockIndex, uniformsGroup.__bindingPointIndex );
 
 	}
 
-	function update( uniformBlock ) {
+	function update( uniformsGroup ) {
 
-		var buffer = buffers[ uniformBlock.id ];
+		var buffer = buffers[ uniformsGroup.id ];
 
 		if ( buffer === undefined ) {
 
-			prepareUniformBlock( uniformBlock );
+			prepareUniformsGroup( uniformsGroup );
 
-			buffer = createBuffer( uniformBlock );
-			buffers[ uniformBlock.id ] = buffer;
+			buffer = createBuffer( uniformsGroup );
+			buffers[ uniformsGroup.id ] = buffer;
 
-			uniformBlock.addEventListener( 'dispose', onUniformBlockDispose );
+			uniformsGroup.addEventListener( 'dispose', onUniformsGroupsDispose );
 
 		}
 
@@ -38,26 +38,26 @@ function WebGLUniformBlocks( gl, info, capabilities ) {
 
 		var frame = info.render.frame;
 
-		if ( updateList[ uniformBlock.id ] !== frame ) {
+		if ( updateList[ uniformsGroup.id ] !== frame ) {
 
-			updateBufferData( uniformBlock );
+			updateBufferData( uniformsGroup );
 
-			updateList[ uniformBlock.id ] = frame;
+			updateList[ uniformsGroup.id ] = frame;
 
 		}
 
 	}
 
-	function createBuffer( uniformBlock ) {
+	function createBuffer( uniformsGroup ) {
 
 		// the setup of an UBO is independent of a particular shader program but global
 
 		var bindingPointIndex = allocateBindingPointIndex();
-		uniformBlock.__bindingPointIndex = bindingPointIndex;
+		uniformsGroup.__bindingPointIndex = bindingPointIndex;
 
 		var buffer = gl.createBuffer();
-		var size = uniformBlock.__size;
-		var usage = uniformBlock.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+		var size = uniformsGroup.__size;
+		var usage = uniformsGroup.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
 		gl.bindBuffer( gl.UNIFORM_BUFFER, buffer );
 		gl.bufferData( gl.UNIFORM_BUFFER, size, usage );
@@ -81,17 +81,17 @@ function WebGLUniformBlocks( gl, info, capabilities ) {
 
 		}
 
-		console.error( 'THREE.WebGLRenderer: Maximum number of simultaneously usable uniform blocks reached.' );
+		console.error( 'THREE.WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.' );
 
 		return 0;
 
 	}
 
-	function updateBufferData( uniformBlock ) {
+	function updateBufferData( uniformsGroup ) {
 
-		var buffer = buffers[ uniformBlock.id ];
-		var uniforms = uniformBlock.uniforms;
-		var cache = uniformBlock.__cache;
+		var buffer = buffers[ uniformsGroup.id ];
+		var uniforms = uniformsGroup.uniforms;
+		var cache = uniformsGroup.__cache;
 
 		gl.bindBuffer( gl.UNIFORM_BUFFER, buffer );
 
@@ -200,11 +200,11 @@ function WebGLUniformBlocks( gl, info, capabilities ) {
 
 	}
 
-	function prepareUniformBlock( uniformBlock ) {
+	function prepareUniformsGroup( uniformsGroup ) {
 
 		// determine total buffer size according to the STD140 layout
 
-		var uniforms = uniformBlock.uniforms;
+		var uniforms = uniformsGroup.uniforms;
 
 		var offset = 0; // global buffer offset in bytes
 		var chunkSize = 16; // size of a chunk in bytes
@@ -253,8 +253,8 @@ function WebGLUniformBlocks( gl, info, capabilities ) {
 
 		//
 
-		uniformBlock.__size = offset;
-		uniformBlock.__cache = {};
+		uniformsGroup.__size = offset;
+		uniformsGroup.__cache = {};
 
 		return this;
 
@@ -315,7 +315,7 @@ function WebGLUniformBlocks( gl, info, capabilities ) {
 
 		} else if ( value.isTexture ) {
 
-			console.warn( 'THREE.WebGLRenderer: Texture samplers can not be part of an uniform block.' );
+			console.warn( 'THREE.WebGLRenderer: Texture samplers can not be part of an uniforms group.' );
 
 		} else {
 
@@ -327,19 +327,19 @@ function WebGLUniformBlocks( gl, info, capabilities ) {
 
 	}
 
-	function onUniformBlockDispose( event ) {
+	function onUniformsGroupsDispose( event ) {
 
-		var uniformBlock = event.target;
+		var uniformsGroup = event.target;
 
-		uniformBlock.removeEventListener( 'dispose', onUniformBlockDispose );
+		uniformsGroup.removeEventListener( 'dispose', onUniformsGroupsDispose );
 
-		var index = allocatedBindingPoints.indexOf( uniformBlock.__bindingPointIndex );
+		var index = allocatedBindingPoints.indexOf( uniformsGroup.__bindingPointIndex );
 		allocatedBindingPoints.splice( index, 1 );
 
-		gl.deleteBuffer( buffers[ uniformBlock.id ] );
+		gl.deleteBuffer( buffers[ uniformsGroup.id ] );
 
-		delete buffers[ uniformBlock.id ];
-		delete updateList[ uniformBlock.id ];
+		delete buffers[ uniformsGroup.id ];
+		delete updateList[ uniformsGroup.id ];
 
 	}
 
@@ -369,4 +369,4 @@ function WebGLUniformBlocks( gl, info, capabilities ) {
 }
 
 
-export { WebGLUniformBlocks };
+export { WebGLUniformsGroups };

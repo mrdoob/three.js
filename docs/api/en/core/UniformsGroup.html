@@ -26,10 +26,10 @@
 		An instance of [name] is declared like this:
 		</p>
 		<code>
-		var cameraUniformBlock = new THREE.UniformBlock();
-		cameraUniformBlock.setName( 'ViewData' );
-		cameraUniformBlock.add( { value: new THREE.Matrix4() } ); // projection matrix
-		cameraUniformBlock.add( { value: new THREE.Matrix4() } ); // view matrix
+		var cameraUniformsGroup = new THREE.UniformsGroup();
+		cameraUniformsGroup.setName( 'ViewData' );
+		cameraUniformsGroup.add( { value: new THREE.Matrix4() } ); // projection matrix
+		cameraUniformsGroup.add( { value: new THREE.Matrix4() } ); // view matrix
 		</code>
 
 		<p>
@@ -68,7 +68,7 @@
 
 		<h3>[property:String name]</h3>
 		<p>
-		The name of the uniform block. Needs to match the uniform name in the shader.
+		The name of the uniforms group. Needs to match the uniform name in the shader.
 		</p>
 
 		<h3>[property:Array uniforms]</h3>
@@ -89,28 +89,28 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:UniformBlock add]( [param:Uniform uniform] )</h3>
+		<h3>[method:UniformsGroup add]( [param:Uniform uniform] )</h3>
 		<p>
 		[page:Object uniform] — The uniform to add.<br /><br />
 
 		Adds an uniform to the [name].
 		</p>
 
-		<h3>[method:UniformBlock remove]( [param:Uniform uniform] )</h3>
+		<h3>[method:UniformsGroup remove]( [param:Uniform uniform] )</h3>
 		<p>
 		[page:Object uniform] — The uniform to remove.<br /><br />
 
 		Removes an uniform from the [name].
 		</p>
 
-		<h3>[method:UniformBlock setName]( [param:String name] )</h3>
+		<h3>[method:UniformsGroup setName]( [param:String name] )</h3>
 		<p>
 		[page:String name] — The name to set.<br /><br />
 
 		Sets the name of this [name].
 		</p>
 
-		<h3>[method:UniformBlock dispose]()</h3>
+		<h3>[method:UniformsGroup dispose]()</h3>
 		<p>
 		Disposes this [name] so corresponding data cached by [page:WebGLRenderer] are released.
 		</p>

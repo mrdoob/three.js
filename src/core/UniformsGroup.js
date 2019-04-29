@@ -6,7 +6,7 @@ import { EventDispatcher } from './EventDispatcher.js';
 
 var id = 0;
 
-function UniformBlock() {
+function UniformsGroup() {
 
 	Object.defineProperty( this, 'id', { value: id ++ } );
 
@@ -17,9 +17,9 @@ function UniformBlock() {
 
 }
 
-UniformBlock.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+UniformsGroup.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-	constructor: UniformBlock,
+	constructor: UniformsGroup,
 
 	isUniformBlock: true,
 
@@ -60,4 +60,4 @@ UniformBlock.prototype = Object.assign( Object.create( EventDispatcher.prototype
 } );
 
 
-export { UniformBlock };
+export { UniformsGroup };

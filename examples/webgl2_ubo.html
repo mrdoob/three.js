@@ -197,23 +197,23 @@
 
 				var texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
 
-				// uniform blocks
+				// uniforms groups
 
 				// Camera and lighting related data are perfect examples of using UBOs since you have to store these
 				// data just once. They can be shared across all shader programs.
 
-				var cameraUniformBlock = new THREE.UniformBlock();
-				cameraUniformBlock.setName( 'ViewData' );
-				cameraUniformBlock.add( { value: camera.projectionMatrix } ); // projection matrix
-				cameraUniformBlock.add( { value: camera.matrixWorldInverse } ); // view matrix
+				var cameraUniformsGroup = new THREE.UniformsGroup();
+				cameraUniformsGroup.setName( 'ViewData' );
+				cameraUniformsGroup.add( { value: camera.projectionMatrix } ); // projection matrix
+				cameraUniformsGroup.add( { value: camera.matrixWorldInverse } ); // view matrix
 
-				var lightingUniformBlock = new THREE.UniformBlock();
-				lightingUniformBlock.setName( 'LightingData' );
-				lightingUniformBlock.add( { value: new THREE.Vector3( 0, 0, 10 ) } ); // light position
-				lightingUniformBlock.add( { value: new THREE.Color( 0x333333 ) } ); // ambient color
-				lightingUniformBlock.add( { value: new THREE.Color( 0xaaaaaa ) } ); // diffuse color
-				lightingUniformBlock.add( { value: new THREE.Color( 0xcccccc ) } ); // specular color
-				lightingUniformBlock.add( { value: 64 } ); // shininess
+				var lightingUniformsGroup = new THREE.UniformsGroup();
+				lightingUniformsGroup.setName( 'LightingData' );
+				lightingUniformsGroup.add( { value: new THREE.Vector3( 0, 0, 10 ) } ); // light position
+				lightingUniformsGroup.add( { value: new THREE.Color( 0x333333 ) } ); // ambient color
+				lightingUniformsGroup.add( { value: new THREE.Color( 0xaaaaaa ) } ); // diffuse color
+				lightingUniformsGroup.add( { value: new THREE.Color( 0xcccccc ) } ); // specular color
+				lightingUniformsGroup.add( { value: 64 } ); // shininess
 
 				// materials
 
@@ -223,7 +223,7 @@
 						normalMatrix: { value: null },
 						color: { value: null }
 					},
-					uniformBlocks: [ cameraUniformBlock, lightingUniformBlock ],
+					uniformsGroups: [ cameraUniformsGroup, lightingUniformsGroup ],
 					vertexShader: document.getElementById( 'vertexShader1' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader1' ).textContent
 				} );
@@ -233,7 +233,7 @@
 						modelMatrix: { value: null },
 						diffuseMap: { value: null },
 					},
-					uniformBlocks: [ cameraUniformBlock ],
+					uniformsGroups: [ cameraUniformsGroup ],
 					vertexShader: document.getElementById( 'vertexShader2' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader2' ).textContent
 				} );
