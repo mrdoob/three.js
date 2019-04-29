@@ -315,7 +315,9 @@ function WebGLRenderer( parameters ) {
 
 	this.vr = vr;
 
-	var multiview = this.multiview = new WebGLMultiview( _multiviewRequested, _gl, _canvas, extensions, capabilities, properties );
+	var multiview = new WebGLMultiview( _this, _multiviewRequested );
+
+	this.multiview = multiview;
 
 	// shadow map
 
@@ -1178,13 +1180,13 @@ function WebGLRenderer( parameters ) {
 
 			this.setRenderTarget( renderTarget );
 
-		} else if ( this.multiview.isEnabled() ) {
-
-			this.setRenderTarget( this.multiview.renderTarget );
-			this.multiview.bindFramebuffer( camera );
-
 		}
 
+		if ( multiview.isEnabled() ) {
+
+			multiview.attachRenderTarget( camera );
+
+		}
 
 		//
 
@@ -1230,12 +1232,6 @@ function WebGLRenderer( parameters ) {
 
 			textures.updateMultisampleRenderTarget( _currentRenderTarget );
 
-			if ( this.multiview.isEnabled() ) {
-
-				this.multiview.unbindFramebuffer( camera );
-
-			}
-
 		}
 
 		// Ensure depth buffer writing is enabled so it can be cleared on next render
@@ -1245,6 +1241,12 @@ function WebGLRenderer( parameters ) {
 		state.buffers.color.setMask( true );
 
 		state.setPolygonOffset( false );
+
+		if ( this.multiview.isEnabled() ) {
+
+			this.multiview.detachRenderTarget( camera );
+
+		}
 
 		if ( vr.enabled ) {
 
