@@ -439,7 +439,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	this.render = function ( scene, camera ) {
 
-		var renderTarget = null;
+		var renderTarget;
 		var forceClear = false;
 
 		if ( arguments[ 2 ] !== undefined ) {
@@ -456,7 +456,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		}
 
-		renderer.setRenderTarget( renderTarget );
+		if ( renderTarget !== undefined ) renderer.setRenderTarget( renderTarget );
 
 		if ( forceClear ) renderer.clear();
 
