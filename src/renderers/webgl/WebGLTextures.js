@@ -1024,11 +1024,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					ext.framebufferTextureMultiviewOVR( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, depthStencilTexture, 0, 0, numViews );
 
 					var viewFramebuffers = new Array( numViews );
-					for ( var viewIndex = 0; viewIndex < numViews; ++ viewIndex ) {
+					for ( var i = 0; i < numViews; ++ i ) {
 
-						viewFramebuffers[ viewIndex ] = _gl.createFramebuffer();
-						_gl.bindFramebuffer( _gl.FRAMEBUFFER, viewFramebuffers[ viewIndex ] );
-						_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, colorTexture, 0, viewIndex );
+						viewFramebuffers[ i ] = _gl.createFramebuffer();
+						_gl.bindFramebuffer( _gl.FRAMEBUFFER, viewFramebuffers[ i ] );
+						_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, colorTexture, 0, i );
 
 					}
 

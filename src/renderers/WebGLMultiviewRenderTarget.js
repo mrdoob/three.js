@@ -30,6 +30,19 @@ WebGLMultiviewRenderTarget.prototype = Object.assign( Object.create( WebGLRender
 
 		return this;
 
+	},
+
+	setNumViews: function ( numViews ) {
+
+		if ( this.numViews !== numViews ) {
+
+			this.numViews = numViews;
+			this.dispose();
+
+		}
+
+		return this;
+
 	}
 
 } );
