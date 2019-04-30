@@ -1724,7 +1724,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( program.numMultiviewViews > 0 ) {
 
-				multiview.updateCameraProjectionMatrices( camera, p_uniforms );
+				multiview.updateCameraProjectionMatricesUniform( camera, p_uniforms );
 
 			} else {
 
@@ -1780,7 +1780,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( program.numMultiviewViews > 0 ) {
 
-					multiview.updateCameraViewMatrices( camera, p_uniforms );
+					multiview.updateCameraViewMatricesUniform( camera, p_uniforms );
 
 				} else {
 
@@ -1986,7 +1986,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( program.numMultiviewViews > 0 ) {
 
-			multiview.updateObjectMatrices( object, camera, p_uniforms );
+			multiview.updateObjectMatricesUniforms( object, camera, p_uniforms );
 
 		} else {
 
