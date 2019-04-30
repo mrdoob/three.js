@@ -51,8 +51,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const multiview = urlParams.has('enableMultiview');
+				const urlParams = new URLSearchParams(window.location.search);
+				const multiview = urlParams.has('enableMultiview');
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x505050 );
@@ -93,7 +93,7 @@
 
 				//
 
-        var canvas = document.createElement( 'canvas' );
+				var canvas = document.createElement( 'canvas' );
 				var context = canvas.getContext( 'webgl2', { antialias: false } );
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context, multiview: multiview } );
 				renderer.setPixelRatio( window.devicePixelRatio );

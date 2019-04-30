@@ -27,7 +27,7 @@ function WebGLMultiview( renderer, requested, options ) {
 
 	this.getNumViews = function () {
 
-		return renderTarget ? renderTarget.numViews : 1;
+		return renderTarget ? renderTarget.numViews : 0;
 
 	};
 
