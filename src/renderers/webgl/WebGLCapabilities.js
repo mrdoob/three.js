@@ -88,7 +88,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	var multiviewExt = extensions.get( 'OVR_multiview2' );
 	var multiview = isWebGL2 && ( !! multiviewExt );
-	var maxMultiviewViews = multiview ? gl.getParameter( multiviewExt.MAX_VIEWS_OVR ) : 1;
+	var maxMultiviewViews = multiview ? gl.getParameter( multiviewExt.MAX_VIEWS_OVR ) : 0;
 
 	return {
 
