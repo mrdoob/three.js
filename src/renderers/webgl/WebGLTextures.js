@@ -1039,11 +1039,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 					_gl.bindTexture( _gl.TEXTURE_2D_ARRAY, null );
 
+				} else {
+
+					console.warn( 'THREE.WebGLRenderer: WebGLMultiviewRenderTarget can only be used with WebGL2 and Multiview extension support.' );
+
 				}
-
-			} else {
-
-				console.warn( 'THREE.WebGLRenderer: WebGLMultiviewRenderTarget can only be used with WebGL2 and Multiview extension support.' );
 
 			}
 
