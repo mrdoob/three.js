@@ -18,6 +18,7 @@ function WebGLMultiview( renderer, requested, options ) {
 	var properties = renderer.properties;
 
 	var renderTarget, currentRenderTarget;
+	var mat3, mat4, cameraArray;
 
 	this.getMaxViews = function () {
 
@@ -31,14 +32,14 @@ function WebGLMultiview( renderer, requested, options ) {
 
 	};
 
-	// Auxiliary matrices to be used when updating arrays of uniforms
-	var mat4 = [];
-	var mat3 = [];
 
-	for ( var i = 0; i < this.getMaxViews(); i ++ ) {
+	function getCameraArray( camera ) {
 
-		mat4[ i ] = new Matrix4();
-		mat3[ i ] = new Matrix3();
+		if ( camera.isArrayCamera ) return camera.cameras;
+
+		cameraArray[ 0 ] = camera;
+
+		return cameraArray;
 
 	}
 
@@ -70,25 +71,14 @@ function WebGLMultiview( renderer, requested, options ) {
 
 	}
 
+
 	this.updateCameraProjectionMatrices = function ( camera, uniforms ) {
 
-		var numViews = this.getNumViews();
+		var cameras = getCameraArray( camera );
 
-		if ( camera.isArrayCamera ) {
+		for ( var i = 0; i < cameras.length; i ++ ) {
 
-			for ( var i = 0; i < numViews; i ++ ) {
-
-				mat4[ i ].copy( camera.cameras[ i ].projectionMatrix );
-
-			}
-
-		} else {
-
-			for ( var i = 0; i < numViews; i ++ ) {
-
-				mat4[ i ].copy( camera.projectionMatrix );
-
-			}
+			mat4[ i ].copy( cameras[ i ].projectionMatrix );
 
 		}
 
@@ -98,23 +88,11 @@ function WebGLMultiview( renderer, requested, options ) {
 
 	this.updateCameraViewMatrices = function ( camera, uniforms ) {
 
-		var numViews = this.getNumViews();
+		var cameras = getCameraArray( camera );
 
-		if ( camera.isArrayCamera ) {
+		for ( var i = 0; i < cameras.length; i ++ ) {
 
-			for ( var i = 0; i < numViews; i ++ ) {
-
-				mat4[ i ].copy( camera.cameras[ i ].matrixWorldInverse );
-
-			}
-
-		} else {
-
-			for ( var i = 0; i < numViews; i ++ ) {
-
-				mat4[ i ].copy( camera.matrixWorldInverse );
-
-			}
+			mat4[ i ].copy( cameras[ i ].matrixWorldInverse );
 
 		}
 
@@ -124,29 +102,12 @@ function WebGLMultiview( renderer, requested, options ) {
 
 	this.updateObjectMatrices = function ( object, camera, uniforms ) {
 
-		var numViews = this.getNumViews();
+		var cameras = getCameraArray( camera );
 
-		if ( camera.isArrayCamera ) {
+		for ( var i = 0; i < cameras.length; i ++ ) {
 
-			for ( var i = 0; i < numViews; i ++ ) {
-
-				mat4[ i ].multiplyMatrices( camera.cameras[ i ].matrixWorldInverse, object.matrixWorld );
-				mat3[ i ].getNormalMatrix( mat4[ i ] );
-
-			}
-
-		} else {
-
-			// In this case we still need to provide an array of matrices but just the first one will be used
-			mat4[ 0 ].multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			mat3[ 0 ].getNormalMatrix( mat4[ 0 ] );
-
-			for ( var i = 1; i < numViews; i ++ ) {
-
-				mat4[ i ].copy( mat4[ 0 ] );
-				mat3[ i ].copy( mat3[ 0 ] );
-
-			}
+			mat4[ i ].multiplyMatrices( cameras[ i ].matrixWorldInverse, object.matrixWorld );
+			mat3[ i ].getNormalMatrix( mat4[ i ] );
 
 		}
 
@@ -224,6 +185,18 @@ function WebGLMultiview( renderer, requested, options ) {
 	if ( this.isEnabled() ) {
 
 		renderTarget = new WebGLMultiviewRenderTarget( canvas.width, canvas.height, this.numViews );
+
+		// Auxiliary matrices to be used when updating arrays of uniforms
+		mat4 = [];
+		mat3 = [];
+		cameraArray = [];
+
+		for ( var i = 0; i < this.getMaxViews(); i ++ ) {
+
+			mat4[ i ] = new Matrix4();
+			mat3[ i ] = new Matrix3();
+
+		}
 
 	}
 
