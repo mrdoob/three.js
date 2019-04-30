@@ -60,8 +60,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		var depthMaterial = new MeshDepthMaterial( {
 
-			supportsMultiview: false,
-
 			depthPacking: RGBADepthPacking,
 
 			morphTargets: useMorphing,

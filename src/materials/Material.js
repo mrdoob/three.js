@@ -70,8 +70,6 @@ function Material() {
 
 	this.visible = true;
 
-	this.supportsMultiview = true;
-
 	this.userData = {};
 
 	this.needsUpdate = true;
