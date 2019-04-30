@@ -258,6 +258,21 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
+		if ( renderTarget.isWebGLMultiviewRenderTarget ) {
+
+			_gl.deleteTexture( renderTargetProperties.__webglColorTexture );
+			_gl.deleteTexture( renderTargetProperties.__webglDepthStencilTexture );
+
+			info.memory.textures -= 2;
+
+			for ( var i = 0, il = renderTargetProperties.__webglViewFramebuffers.length; i < il; i ++ ) {
+
+				_gl.deleteFramebuffer( renderTargetProperties.__webglViewFramebuffers[ i ] );
+
+			}
+
+		}
+
 		properties.remove( renderTarget.texture );
 		properties.remove( renderTarget );
 
@@ -1008,6 +1023,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 
 					var ext = extensions.get( 'OVR_multiview2' );
+
+					info.memory.textures += 2;
 
 					var colorTexture = _gl.createTexture();
 					_gl.bindTexture( _gl.TEXTURE_2D_ARRAY, colorTexture );
