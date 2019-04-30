@@ -1245,9 +1245,9 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( this.multiview.isEnabled() ) {
+		if ( multiview.isEnabled() ) {
 
-			this.multiview.detachRenderTarget( camera );
+			multiview.detachRenderTarget( camera );
 
 		}
 
