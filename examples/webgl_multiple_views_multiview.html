@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js performance - animation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info p {
+				max-width: 600px;
+				margin-left: auto;
+				margin-right: auto;
+				padding: 0 2em;
+			}
+			#info a {
+				color: #2fa1d6;
+				font-weight: bold;
+			}
+			.dg.ac {
+				z-index: 999 !important;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple views using multiview extension - by <a href="https://twitter.com/fernandojsg">fernandojsg</a><br/>
+			<span id="options"></span>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script>
+
+			var container, clock, stats;
+			var camera, scene, renderer, panel, balls;
+			var radius = 0.08;
+
+			var mixers = [];
+			var cameras = [];
+
+			init();
+
+			function addNumLink( value ) {
+
+				return `<a href="?num=${ value }">${ value }</a>`;
+
+			}
+
+			function init() {
+
+				const urlParams = new URLSearchParams(window.location.search);
+
+				container = document.getElementById('container');
+
+				var options = document.getElementById('options');
+				options.innerHTML =`Number of balls:
+						${addNumLink(200)}
+						${addNumLink(500)}
+						${addNumLink(1000)}
+						${addNumLink(2500)}
+						${addNumLink(5000)}`;
+
+
+				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
+				var AMOUNT = 2;
+				var SIZE = 1 / AMOUNT;
+				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
+				var HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
+
+				for ( var y = 0; y < AMOUNT; y ++ ) {
+
+					for ( var x = 0; x < AMOUNT; x ++ ) {
+
+						var subcamera = new THREE.PerspectiveCamera( 40 + (x + y) * 20, ASPECT_RATIO, 0.25, 100 );
+						subcamera.bounds = new THREE.Vector4( x / AMOUNT, y / AMOUNT, SIZE, SIZE );
+
+						subcamera.position.x = ( x / AMOUNT ) * 5 - 0.5;
+						subcamera.position.y = ( y / AMOUNT ) * 5 + 1;
+						subcamera.position.z = 6;
+						subcamera.position.multiplyScalar( 1.5 );
+
+						subcamera.lookAt( 0, 2, 0 );
+						subcamera.updateMatrixWorld();
+						cameras.push( subcamera );
+
+					}
+
+				}
+
+				camera = new THREE.ArrayCamera( cameras );
+
+				// Needed to do the frustum culling
+				camera.fov = 180;
+				camera.position.set(0, 0, 6);
+				camera.aspect = ASPECT_RATIO;
+				camera.updateProjectionMatrix();
+
+				//
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xe0e0e0 );
+				scene.fog = new THREE.Fog( 0xe0e0e0, 20, 100 );
+
+				clock = new THREE.Clock();
+
+				// lights
+
+				var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				light.position.set( 0, 20, 0 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 20, 10 );
+				scene.add( light );
+
+				// ground
+
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				mesh.rotation.x = - Math.PI / 2;
+				scene.add( mesh );
+
+				var grid = new THREE.GridHelper( 200, 40, 0x000000, 0x000000 );
+				grid.material.opacity = 0.2;
+				grid.material.transparent = true;
+				scene.add( grid );
+
+				// balls
+				balls = new THREE.Group();
+				scene.add( balls );
+
+				var geometry = new THREE.IcosahedronBufferGeometry( radius, 2 );
+
+				var numObjects = urlParams.get('num') || 1000;
+
+				for ( var i = 0; i < numObjects; i ++ ) {
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+
+					object.position.x = Math.random() * 20 - 10;
+					object.position.y = Math.random() * 10 + 5;
+					object.position.z = Math.random() * 20 - 10;
+
+					object.userData.velocity = new THREE.Vector3();
+					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.z = Math.random() * 0.01 - 0.005;
+
+					balls.add( object );
+
+				}
+
+
+				// model
+
+				var loader = new THREE.GLTFLoader();
+
+				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function( gltf ) {
+
+					var model = gltf.scene;
+					var animations = gltf.animations;
+
+					scene.add( model );
+
+					var mixer = new THREE.AnimationMixer( model );
+					mixer.clipAction( animations[ 10 ] ).play();
+					mixers.push( mixer );
+
+					animate();
+
+				}, undefined, function( e ) {
+
+					console.error( e );
+
+				} );
+
+        var canvas = document.createElement( 'canvas' );
+				var context = canvas.getContext( 'webgl2', { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { context: context, canvas: canvas, antialias: true, multiview: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+				panel = stats.addPanel( new Stats.Panel( 'renderer.render()', '#ff8', '#221' ) );
+				stats.showPanel( 3 );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				for ( var i = 0; i < cameras.length; i ++ ) {
+
+					cameras[ i ].aspect = camera.aspect;
+					cameras[ i ].updateProjectionMatrix();
+
+				}
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var delta = clock.getDelta();
+				var time = clock.getElapsedTime();
+
+				for ( var i = 0, il = mixers.length; i < il; i ++ ) {
+
+					mixers[ i ].update( delta );
+
+				}
+
+				// Update camera animations
+				cameras[ 0 ].position.y += Math.sin( time * 2 ) * 0.02;
+				cameras[ 0 ].updateMatrixWorld();
+
+				cameras[ 1 ].position.z += Math.sin( time ) * 0.1;
+				cameras[ 1 ].updateMatrixWorld();
+
+				cameras[ 3 ].position.x = Math.sin( time ) * Math.PI;
+				cameras[ 3 ].position.z = Math.cos( time ) * Math.PI;
+				cameras[ 3 ].lookAt( 0, 2, 0 );
+				cameras[ 3 ].updateMatrixWorld();
+
+				// delta *=1000;
+
+				delta *= 0.5;
+
+				// Update balls
+				for ( var i = 0; i < balls.children.length; i ++ ) {
+
+					var object = balls.children[ i ];
+
+					object.position.y += object.userData.velocity.y * delta;
+
+					// keep objects inside room
+					if ( object.position.y < radius || object.position.y > 15 ) {
+
+						object.position.y = Math.max( object.position.y, radius );
+
+						object.userData.velocity.y = - object.userData.velocity.y * 0.8;
+
+					}
+
+					object.userData.velocity.y -= 9.8 * delta;
+
+				}
+
+				//
+
+				var t = performance.now();
+				renderer.render( scene, camera );
+
+				panel.update(performance.now() - t, 460);
+
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>
