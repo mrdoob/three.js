@@ -11,7 +11,7 @@ You then call `EffectComposer.render` and it renders your scene to a [render tar
 
 Each `Pass` can be some post processing effect like adding a vignette, blurring, applying a bloom, applying film grain, adjusting the hue, saturation, contrast, etc... and finally rendering the result to the canvas.
 
-It's a little bit important to understand how `EffectComposer` functions. It creates two [render targets](threejs-rendertargets.html]. Let's call them **rtA** and **rtB**.
+It's a little bit important to understand how `EffectComposer` functions. It creates two [render targets](threejs-rendertargets.html). Let's call them **rtA** and **rtB**.
 
 Then, you call `EffectComposer.addPass` to add each pass in the order you want to apply them. The passes are then applied *something like* this.
 
