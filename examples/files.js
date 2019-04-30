@@ -206,6 +206,7 @@ var files = {
 		"webgl_multiple_renderers",
 		"webgl_multiple_scenes_comparison",
 		"webgl_multiple_views",
+		"webvr_multiple_views_multiview",
 		"webgl_nearestneighbour",
 		"webgl_panorama_cube",
 		"webgl_panorama_dualfisheye",
