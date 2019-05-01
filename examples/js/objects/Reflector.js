@@ -172,11 +172,9 @@ THREE.Reflector = function ( geometry, options ) {
 
 		// Restore viewport
 
-		var viewport = camera.viewport;
+		if ( camera.viewport !== undefined ) {
 
-		if ( viewport !== undefined ) {
-
-			renderer.state.viewport( viewport );
+			renderer.state.viewport( camera.viewport );
 
 		}
 

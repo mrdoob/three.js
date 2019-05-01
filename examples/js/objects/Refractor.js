@@ -210,11 +210,9 @@ THREE.Refractor = function ( geometry, options ) {
 
 			// restore viewport
 
-			var viewport = camera.viewport;
+			if ( camera.viewport !== undefined ) {
 
-			if ( viewport !== undefined ) {
-
-				renderer.state.viewport( viewport );
+				renderer.state.viewport( camera.viewport );
 
 			}
 
