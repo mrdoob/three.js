@@ -15,6 +15,7 @@ import { setProjectionFromUnion } from './WebVRUtils.js';
 
 function WebVRManager( renderer ) {
 
+	var renderWidth, renderHeight;
 	var scope = this;
 
 	var device = null;
@@ -42,11 +43,11 @@ function WebVRManager( renderer ) {
 	var tempPosition = new Vector3();
 
 	var cameraL = new PerspectiveCamera();
-	cameraL.bounds = new Vector4( 0.0, 0.0, 0.5, 1.0 );
+	cameraL.viewport = new Vector4();
 	cameraL.layers.enable( 1 );
 
 	var cameraR = new PerspectiveCamera();
-	cameraR.bounds = new Vector4( 0.5, 0.0, 0.5, 1.0 );
+	cameraR.viewport = new Vector4();
 	cameraR.layers.enable( 2 );
 
 	var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
@@ -68,13 +69,16 @@ function WebVRManager( renderer ) {
 		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
-			var renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
-			var renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
+			renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
+			renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( currentSize );
 
 			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
+
+			cameraL.viewport.set( 0, 0, renderWidth, renderHeight );
+			cameraR.viewport.set( renderWidth, 0, renderWidth, renderHeight );
 
 			animation.start();
 
@@ -171,6 +175,16 @@ function WebVRManager( renderer ) {
 				controller.visible = false;
 
 			}
+
+		}
+
+	}
+
+	function updateViewportFromBounds( viewport, bounds ) {
+
+		if ( bounds !== null && bounds.length === 4 ) {
+
+			viewport.set( bounds[ 0 ] * renderWidth, bounds[ 1 ] * renderHeight, bounds[ 2 ] * renderWidth, bounds[ 3 ] * renderHeight );
 
 		}
 
@@ -343,17 +357,8 @@ function WebVRManager( renderer ) {
 
 			var layer = layers[ 0 ];
 
-			if ( layer.leftBounds !== null && layer.leftBounds.length === 4 ) {
-
-				cameraL.bounds.fromArray( layer.leftBounds );
-
-			}
-
-			if ( layer.rightBounds !== null && layer.rightBounds.length === 4 ) {
-
-				cameraR.bounds.fromArray( layer.rightBounds );
-
-			}
+			updateViewportFromBounds( cameraL.viewport, layer.leftBounds );
+			updateViewportFromBounds( cameraR.viewport, layer.rightBounds );
 
 		}
 
