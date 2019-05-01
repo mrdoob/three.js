@@ -15,10 +15,10 @@ function WebGLMultiview( renderer, requested, options ) {
 	var DEFAULT_NUMVIEWS = 2;
 	var gl = renderer.context;
 
-	var maxNumViews = capabilities.maxMultiviewViews;
-
 	var capabilities = renderer.capabilities;
 	var properties = renderer.properties;
+
+	var maxNumViews = capabilities.maxMultiviewViews;
 
 	var renderTarget, currentRenderTarget;
 	var mat3, mat4, cameraArray, renderSize;
@@ -133,8 +133,8 @@ function WebGLMultiview( renderer, requested, options ) {
 
 		for ( var i = 1, il = cameras.length; i < il; i ++ ) {
 
-			if ( cameras[ 0 ].bounds.z !== cameras[ i ].bounds.z ||
-				cameras[ 0 ].bounds.w !== cameras[ i ].bounds.w ) return false;
+			if ( cameras[ 0 ].viewport.z !== cameras[ i ].viewport.z ||
+				cameras[ 0 ].viewport.w !== cameras[ i ].viewport.w ) return false;
 
 		}
 
@@ -156,9 +156,10 @@ function WebGLMultiview( renderer, requested, options ) {
 
 		if ( camera.isArrayCamera ) {
 
-			var bounds = camera.cameras[ 0 ].bounds;
+			var viewport = camera.cameras[ 0 ].viewport;
 
-			renderTarget.setSize( bounds.z * renderSize.x, bounds.w * renderSize.y );
+			renderTarget.setSize( viewport.z, viewport.w );
+
 			renderTarget.setNumViews( camera.cameras.length );
 
 		} else {
@@ -203,12 +204,12 @@ function WebGLMultiview( renderer, requested, options ) {
 
 			for ( var i = 0; i < numViews; i ++ ) {
 
-				var bounds = camera.cameras[ i ].bounds;
+				var viewport = camera.cameras[ i ].viewport;
 
-				var x1 = bounds.x * renderSize.x;
-				var y1 = bounds.y * renderSize.y;
-				var x2 = x1 + bounds.z * renderSize.x;
-				var y2 = y1 + bounds.w * renderSize.y;
+				var x1 = viewport.x;
+				var y1 = viewport.y;
+				var x2 = x1 + viewport.z;
+				var y2 = y1 + viewport.w;
 
 				gl.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffers[ i ] );
 				gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, x1, y1, x2, y2, gl.COLOR_BUFFER_BIT, gl.NEAREST );

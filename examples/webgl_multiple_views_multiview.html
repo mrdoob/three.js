@@ -51,6 +51,7 @@
 			var container, clock, stats;
 			var camera, scene, renderer, panel, balls;
 			var radius = 0.08;
+			var AMOUNT = 2;
 
 			var mixers = [];
 			var cameras = [];
@@ -79,7 +80,6 @@
 
 
 				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
-				var AMOUNT = 2;
 				var SIZE = 1 / AMOUNT;
 				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
 				var HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
@@ -89,7 +89,7 @@
 					for ( var x = 0; x < AMOUNT; x ++ ) {
 
 						var subcamera = new THREE.PerspectiveCamera( 40 + (x + y) * 20, ASPECT_RATIO, 0.25, 100 );
-						subcamera.bounds = new THREE.Vector4( x / AMOUNT, y / AMOUNT, SIZE, SIZE );
+						subcamera.viewport = new THREE.Vector4( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
 
 						subcamera.position.x = ( x / AMOUNT ) * 5 - 0.5;
 						subcamera.position.y = ( y / AMOUNT ) * 5 + 1;
@@ -147,7 +147,7 @@
 
 				var geometry = new THREE.IcosahedronBufferGeometry( radius, 2 );
 
-				var numObjects = urlParams.get('num') || 1000;
+				var numObjects = urlParams.get('num') || 1000;
 
 				for ( var i = 0; i < numObjects; i ++ ) {
 
@@ -212,13 +212,27 @@
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
+				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
+				var HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
+
+				camera.aspect = ASPECT_RATIO;
 				camera.updateProjectionMatrix();
 
-				for ( var i = 0; i < cameras.length; i ++ ) {
+				for ( var y = 0; y < AMOUNT; y ++ ) {
 
-					cameras[ i ].aspect = camera.aspect;
-					cameras[ i ].updateProjectionMatrix();
+					for ( var x = 0; x < AMOUNT; x ++ ) {
+
+						var subcamera = camera.cameras[ AMOUNT * y + x ];
+						subcamera.viewport.set(
+							Math.floor( x * WIDTH ),
+							Math.floor( y * HEIGHT ),
+							Math.ceil( WIDTH ),
+							Math.ceil( HEIGHT ) );
+						subcamera.aspect = ASPECT_RATIO;
+						subcamera.updateProjectionMatrix();
+
+					}
 
 				}
 
