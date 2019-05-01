@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -78,6 +79,8 @@ function WebVRManager( renderer ) {
 
 			animation.start();
 
+			scope.dispatchEvent( { type: 'startSession' } );
+
 		} else {
 
 			if ( scope.enabled ) {
@@ -87,6 +90,8 @@ function WebVRManager( renderer ) {
 			}
 
 			animation.stop();
+
+			scope.dispatchEvent( { type: 'endSession' } );
 
 		}
 
@@ -400,5 +405,7 @@ function WebVRManager( renderer ) {
 	};
 
 }
+
+Object.assign( WebVRManager.prototype, EventDispatcher.prototype );
 
 export { WebVRManager };

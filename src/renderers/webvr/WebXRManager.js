@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -11,6 +12,8 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { setProjectionFromUnion } from './WebVRUtils.js';
 
 function WebXRManager( renderer ) {
+
+	var scope = this;
 
 	var gl = renderer.context;
 
@@ -97,6 +100,8 @@ function WebXRManager( renderer ) {
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
+		scope.dispatchEvent( { type: 'endSession' } );
+
 	}
 
 	this.setFramebufferScaleFactor = function ( value ) {
@@ -131,6 +136,8 @@ function WebXRManager( renderer ) {
 
 				animation.setContext( session );
 				animation.start();
+
+				scope.dispatchEvent( { type: 'startSession' } );
 
 			} );
 
@@ -311,5 +318,7 @@ function WebXRManager( renderer ) {
 	this.submitFrame = function () {};
 
 }
+
+Object.assign( WebXRManager.prototype, EventDispatcher.prototype );
 
 export { WebXRManager };
