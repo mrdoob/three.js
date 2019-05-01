@@ -523,40 +523,25 @@ function setValue1iv( gl, v ) {
 
 function setValueV2a( gl, v ) {
 
-	var cache = this.cache;
 	var data = flatten( v, this.size, 2 );
 
-	if ( arraysEqual( cache, data ) ) return;
-
 	gl.uniform2fv( this.addr, data );
-
-	this.updateCache( data );
 
 }
 
 function setValueV3a( gl, v ) {
 
-	var cache = this.cache;
 	var data = flatten( v, this.size, 3 );
 
-	if ( arraysEqual( cache, data ) ) return;
-
 	gl.uniform3fv( this.addr, data );
-
-	this.updateCache( data );
 
 }
 
 function setValueV4a( gl, v ) {
 
-	var cache = this.cache;
 	var data = flatten( v, this.size, 4 );
 
-	if ( arraysEqual( cache, data ) ) return;
-
 	gl.uniform4fv( this.addr, data );
-
-	this.updateCache( data );
 
 }
 
