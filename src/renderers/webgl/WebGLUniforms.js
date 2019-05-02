@@ -495,32 +495,32 @@ function getSingularSetter( type ) {
 }
 
 // Array of scalars
-function setValueV1fa( gl, v ) {
+function setValueV1fArray( gl, v ) {
 
 	gl.uniform1fv( this.addr, v );
 
 }
 
 // Integer / Boolean vectors or arrays thereof (always flat arrays)
-function setValueV1ia( gl, v ) {
+function setValueV1iArray( gl, v ) {
 
 	gl.uniform1iv( this.addr, v );
 
 }
 
-function setValueV2ia( gl, v ) {
+function setValueV2iArray( gl, v ) {
 
 	gl.uniform2iv( this.addr, v );
 
 }
 
-function setValueV3ia( gl, v ) {
+function setValueV3iArray( gl, v ) {
 
 	gl.uniform3iv( this.addr, v );
 
 }
 
-function setValueV4ia( gl, v ) {
+function setValueV4iArray( gl, v ) {
 
 	gl.uniform4iv( this.addr, v );
 
@@ -529,7 +529,7 @@ function setValueV4ia( gl, v ) {
 
 // Array of vectors (flat or from THREE classes)
 
-function setValueV2fa( gl, v ) {
+function setValueV2fArray( gl, v ) {
 
 	var data = flatten( v, this.size, 2 );
 
@@ -537,7 +537,7 @@ function setValueV2fa( gl, v ) {
 
 }
 
-function setValueV3fa( gl, v ) {
+function setValueV3fArray( gl, v ) {
 
 	var data = flatten( v, this.size, 3 );
 
@@ -545,7 +545,7 @@ function setValueV3fa( gl, v ) {
 
 }
 
-function setValueV4fa( gl, v ) {
+function setValueV4fArray( gl, v ) {
 
 	var data = flatten( v, this.size, 4 );
 
@@ -555,7 +555,7 @@ function setValueV4fa( gl, v ) {
 
 // Array of matrices (flat or from THREE clases)
 
-function setValueM2a( gl, v ) {
+function setValueM2Array( gl, v ) {
 
 	var data = flatten( v, this.size, 4 );
 
@@ -563,7 +563,7 @@ function setValueM2a( gl, v ) {
 
 }
 
-function setValueM3a( gl, v ) {
+function setValueM3Array( gl, v ) {
 
 	var data = flatten( v, this.size, 9 );
 
@@ -571,7 +571,7 @@ function setValueM3a( gl, v ) {
 
 }
 
-function setValueM4a( gl, v ) {
+function setValueM4Array( gl, v ) {
 
 	var data = flatten( v, this.size, 16 );
 
@@ -581,7 +581,7 @@ function setValueM4a( gl, v ) {
 
 // Array of textures (2D / Cube)
 
-function setValueT1a( gl, v, textures ) {
+function setValueT1Array( gl, v, textures ) {
 
 	var n = v.length;
 
@@ -597,7 +597,7 @@ function setValueT1a( gl, v, textures ) {
 
 }
 
-function setValueT6a( gl, v, textures ) {
+function setValueT6Array( gl, v, textures ) {
 
 	var n = v.length;
 
@@ -619,22 +619,22 @@ function getPureArraySetter( type ) {
 
 	switch ( type ) {
 
-		case 0x1406: return setValueV1fa; // FLOAT
-		case 0x8b50: return setValueV2fa; // _VEC2
-		case 0x8b51: return setValueV3fa; // _VEC3
-		case 0x8b52: return setValueV4fa; // _VEC4
+		case 0x1406: return setValueV1fArray; // FLOAT
+		case 0x8b50: return setValueV2fArray; // _VEC2
+		case 0x8b51: return setValueV3fArray; // _VEC3
+		case 0x8b52: return setValueV4fArray; // _VEC4
 
-		case 0x8b5a: return setValueM2a; // _MAT2
-		case 0x8b5b: return setValueM3a; // _MAT3
-		case 0x8b5c: return setValueM4a; // _MAT4
+		case 0x8b5a: return setValueM2Array; // _MAT2
+		case 0x8b5b: return setValueM3Array; // _MAT3
+		case 0x8b5c: return setValueM4Array; // _MAT4
 
-		case 0x8b5e: return setValueT1a; // SAMPLER_2D
-		case 0x8b60: return setValueT6a; // SAMPLER_CUBE
+		case 0x8b5e: return setValueT1Array; // SAMPLER_2D
+		case 0x8b60: return setValueT6Array; // SAMPLER_CUBE
 
-		case 0x1404: case 0x8b56: return setValueV1ia; // INT, BOOL
-		case 0x8b53: case 0x8b57: return setValueV2ia; // _VEC2
-		case 0x8b54: case 0x8b58: return setValueV3ia; // _VEC3
-		case 0x8b55: case 0x8b59: return setValueV4ia; // _VEC4
+		case 0x1404: case 0x8b56: return setValueV1iArray; // INT, BOOL
+		case 0x8b53: case 0x8b57: return setValueV2iArray; // _VEC2
+		case 0x8b54: case 0x8b58: return setValueV3iArray; // _VEC3
+		case 0x8b55: case 0x8b59: return setValueV4iArray; // _VEC4
 
 	}
 
