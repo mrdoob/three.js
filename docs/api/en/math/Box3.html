@@ -15,7 +15,34 @@
 			the world-axis-aligned bounding boxes for objects. 
 		</p>
 
+		
+		<h2>Example</h2>
 
+		<code>
+		// Creating the object whose bounding box we want to compute
+		var sphereGeom = new THREE.SphereGeometry();
+		var sphereObject = new THREE.Mesh( 
+			sphereGeom, 
+			new THREE.MeshBasicMaterial( 0xff0000 ) 
+		);
+
+		// Creating the actual bounding box with Box3
+		sphereObject.geometry.computeBoundingBox();
+		var BBox = new THREE.Box3(
+			sphereObject.geometry.boundingBox.min,
+  			sphereObject.geometry.boundingBox.max
+		);
+
+		// Moving the sphere
+		sphereObject.position.set( 7, 7, 7 );
+
+		// Updating the bounding box
+		// (to repeat each time the object is moved, rotated or scaled) 
+		BBox.copy( sphereObject.geometry.boundingBox ).applyMatrix4( sphereObject.matrixWorld );
+		</code>
+
+
+		
 		<h2>Constructor</h2>
 
 
