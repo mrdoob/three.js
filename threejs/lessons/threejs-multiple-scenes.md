@@ -587,7 +587,7 @@ just turn on the scissor test at the beginning.
 function main() {
 -  const canvas = document.querySelector('#c');
 +  const canvas = document.createElement('canvas');
-  const renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true});
+  const renderer = new THREE.WebGLRenderer({canvas, alpha: true});
 +  renderer.setScissorTest(true);
 
   ...

@@ -359,9 +359,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 `logarithmicDepthBuffer` когда мы создаем `WebGLRenderer`
 
 ```js
--const renderer = new THREE.WebGLRenderer({canvas: canvas});
+-const renderer = new THREE.WebGLRenderer({canvas});
 +const renderer = new THREE.WebGLRenderer({
-+  canvas: canvas,
++  canvas,
 +  logarithmicDepthBuffer: true,
 +});
 ```

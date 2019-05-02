@@ -9,7 +9,7 @@ window.threejsLessonUtils = {
     }
     const canvas = document.querySelector('#c');
     const renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
+      canvas,
       alpha: true,
       powerPreference: 'low-power',
     });

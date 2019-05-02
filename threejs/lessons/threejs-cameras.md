@@ -363,9 +363,9 @@ pixels are in front and which are behind. We can do that by enabling
 `logarithmicDepthBuffer` when we create the `WebGLRenderer`
 
 ```js
--const renderer = new THREE.WebGLRenderer({canvas: canvas});
+-const renderer = new THREE.WebGLRenderer({canvas});
 +const renderer = new THREE.WebGLRenderer({
-+  canvas: canvas,
++  canvas,
 +  logarithmicDepthBuffer: true,
 +});
 ```

@@ -67,7 +67,7 @@ The first thing to do is let's make a single plane that fills the canvas. If you
 ```js
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+  const renderer = new THREE.WebGLRenderer({canvas});
   renderer.autoClearColor = false;
 
   const camera = new THREE.OrthographicCamera(

@@ -26,7 +26,7 @@ WebVR button to our page
 ```js
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+  const renderer = new THREE.WebGLRenderer({canvas});
 +  renderer.vr.enabled = true;
 +  document.body.appendChild(WEBVR.createButton(renderer));
 ```
@@ -294,7 +294,7 @@ in your code you could use that parameter like this
 ```js
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+  const renderer = new THREE.WebGLRenderer({canvas});
 -  renderer.vr.enabled = true;
 -  document.body.appendChild(WEBVR.createButton(renderer));
 

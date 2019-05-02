@@ -531,7 +531,7 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 Сначала мы включим физически правильное осещение
 
 ```js
-const renderer = new THREE.WebGLRenderer({canvas: canvas});
+const renderer = new THREE.WebGLRenderer({canvas});
 +renderer.physicallyCorrectLights = true;
 ```
 

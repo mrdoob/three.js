@@ -46,7 +46,7 @@ and pass it to three.js.
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+  const renderer = new THREE.WebGLRenderer({canvas});
   ...
 </script>
 ```

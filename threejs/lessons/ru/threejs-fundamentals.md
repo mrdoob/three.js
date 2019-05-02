@@ -47,7 +47,7 @@ Three.js будет рисовать на этом холсте, так что �
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+  const renderer = new THREE.WebGLRenderer({canvas});
   ...
 </script>
 ```

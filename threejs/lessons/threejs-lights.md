@@ -539,7 +539,7 @@ Let's test that.
 First we'll turn on physically correct lights
 
 ```js
-const renderer = new THREE.WebGLRenderer({canvas: canvas});
+const renderer = new THREE.WebGLRenderer({canvas});
 +renderer.physicallyCorrectLights = true;
 ```
 

@@ -249,7 +249,7 @@ Let's start with the `DirectionaLight` with helper example from [the lights arti
 The first thing we need to do is turn on shadows in the renderer.
 
 ```js
-const renderer = new THREE.WebGLRenderer({canvas: canvas});
+const renderer = new THREE.WebGLRenderer({canvas});
 +renderer.shadowMap.enabled = true;
 ```
 

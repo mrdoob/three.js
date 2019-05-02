@@ -30,9 +30,9 @@ drawing anything are transparent.
 ```js
 function main() {
   const canvas = document.querySelector('#c');
--  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+-  const renderer = new THREE.WebGLRenderer({canvas});
 +  const renderer = new THREE.WebGLRenderer({
-+    canvas: canvas,
++    canvas,
 +    alpha: true,
 +  });
 ```
@@ -266,7 +266,7 @@ will clear our first render and we won't see the background. We can do this by
 setting `renderer.autoClearColor = false`.
 
 ```js
-const renderer = new THREE.WebGLRenderer({canvas: canvas});
+const renderer = new THREE.WebGLRenderer({canvas});
 +renderer.autoClearColor = false;
 ```
 
