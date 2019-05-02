@@ -18,6 +18,9 @@ export default QUnit.module( 'Loaders', () => {
 			var multibyteArray = new Uint8Array( [ 230, 151, 165, 230, 156, 172, 229, 155, 189 ] );
 			assert.equal( '日本国', LoaderUtils.decodeText( multibyteArray ) );
 
+			var uriError = new Uint8Array( [ 219 ] );
+			assert.equal( 'Û', LoaderUtils.decodeText( uriError ) );
+
 		} );
 
 		QUnit.test( 'extractUrlBase', ( assert ) => {
