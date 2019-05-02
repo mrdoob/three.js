@@ -46,7 +46,7 @@ AmbientLight.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	setFromHemisphereColors: function ( skyColor, groundColor, /* up */ ) { // todo: support tilt
+	setFromHemisphereColors: function ( skyColor, groundColor /*, up */ ) { // todo: support tilt
 
 		var color1 = new Color().set( skyColor );
 		var color2 = new Color().set( groundColor );
