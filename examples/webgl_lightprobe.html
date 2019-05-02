@@ -40,7 +40,8 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/lights/LightProbeGenerator.js"></script>
+
+		<script src="js/math/SHUtils.js"></script>
 
 		<script src="js/WebGL.js"></script>
 
@@ -56,12 +57,12 @@
 
 			var gui;
 
-			var lightProbe;
+			var ambientLight;
 			var directionalLight;
 
 			// linear color space
 			var API = {
-				lightProbeIntensity: 1.0,
+				ambientLightIntensity: 1.0,
 				directionalLightIntensity: 0.2,
 				envMapIntensity: 1
 			};
@@ -98,9 +99,9 @@
 				controls.maxDistance = 50;
 				controls.enablePan = false;
 
-				// probe
-				lightProbe = new THREE.LightProbe();
-				scene.add( lightProbe );
+				// ambient
+				ambientLight = new THREE.AmbientLight( 0xffffff, API.ambientLightIntensity );
+				scene.add( ambientLight );
 
 				// light
 				directionalLight = new THREE.DirectionalLight( 0xffffff, API.directionalLightIntensity );
@@ -126,8 +127,9 @@
 
 					scene.background = cubeTexture;
 
-					lightProbe.copy( THREE.LightProbeGenerator.fromCubeTexture( cubeTexture ) );
-					console.log(lightProbe );
+					THREE.SHUtils.setFromCubeTexture( ambientLight.sh, cubeTexture );
+					console.log(ambientLight.sh );
+
 					var geometry = new THREE.SphereBufferGeometry( 5, 64, 32 );
 					//var geometry = new THREE.TorusKnotBufferGeometry( 4, 1.5, 256, 32, 2, 3 );
 
@@ -157,9 +159,9 @@
 
 				var fl = gui.addFolder( 'Intensity' );
 
-				fl.add( API, 'lightProbeIntensity', 0, 1, 0.02 )
-					.name( 'light probe')
-					.onChange( function() { lightProbe.intensity = API.lightProbeIntensity; render(); } );
+				fl.add( API, 'ambientLightIntensity', 0, 1, 0.02 )
+					.name( 'ambient light')
+					.onChange( function() { ambientLight.intensity = API.ambientLightIntensity; render(); } );
 
 				fl.add( API, 'directionalLightIntensity', 0, 1, 0.02 )
 					.name( 'directional light')

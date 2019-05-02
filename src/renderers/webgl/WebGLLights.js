@@ -144,8 +144,6 @@ function WebGLLights() {
 
 	function setup( lights, shadows, camera ) {
 
-		var r = 0, g = 0, b = 0;
-
 		for ( var i = 0; i < 9; i ++ ) state.probe[ i ].set( 0, 0, 0 );
 
 		var directionalLength = 0;
@@ -167,12 +165,6 @@ function WebGLLights() {
 			var shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 			if ( light.isAmbientLight ) {
-
-				r += color.r * intensity;
-				g += color.g * intensity;
-				b += color.b * intensity;
-
-			} else if ( light.isLightProbe ) {
 
 				for ( var j = 0; j < 9; j ++ ) {
 
@@ -326,10 +318,6 @@ function WebGLLights() {
 			}
 
 		}
-
-		state.ambient[ 0 ] = r;
-		state.ambient[ 1 ] = g;
-		state.ambient[ 2 ] = b;
 
 		state.directional.length = directionalLength;
 		state.spot.length = spotLength;

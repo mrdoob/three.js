@@ -2,10 +2,10 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.LightProbeGenerator = {
+THREE.SHUtils = {
 
 	// https://www.ppsloan.org/publications/StupidSH36.pdf
-	fromCubeTexture: function ( cubeTexture ) {
+	setFromCubeTexture: function ( sh, cubeTexture ) {
 
 		var norm, lengthSq, weight, totalWeight = 0;
 
@@ -17,7 +17,6 @@ THREE.LightProbeGenerator = {
 
 		var shBasis = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
 
-		var sh = new THREE.SphericalHarmonics3();
 		var shCoefficients = sh.coefficients;
 
 		for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
@@ -113,8 +112,6 @@ THREE.LightProbeGenerator = {
 			shCoefficients[ j ].z *= norm;
 
 		}
-
-		return new THREE.LightProbe( sh );
 
 	}
 
