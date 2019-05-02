@@ -178,7 +178,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			position.copy( scope.target ).add( offset );
 
-			scope.object.lookAt( scope.target );
+			var globalTarget = scope.target.clone();
+			if ( scope.object.parent ) {
+			 
+				scope.object.parent.localToWorld( globalTarget );
+			
+			}
+			scope.object.lookAt( globalTarget );
 
 			if ( scope.enableDamping === true ) {
 
