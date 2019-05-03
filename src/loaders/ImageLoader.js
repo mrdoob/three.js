@@ -2,13 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Cache } from './Cache.js';
+import { IndexedCache } from './IndexedCache.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
 
 function ImageLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+
+	this.cache = new IndexedCache();
 
 }
 
@@ -26,65 +28,94 @@ Object.assign( ImageLoader.prototype, {
 
 		var scope = this;
 
-		var cached = Cache.get( url );
 
-		if ( cached !== undefined ) {
+		var loadData = function () {
 
-			scope.manager.itemStart( url );
+			var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
-			setTimeout( function () {
+			function convertData( img ) {
 
-				if ( onLoad ) onLoad( cached );
+				var imgCanvas = document.createElement( "canvas" ),
+					imgContext = imgCanvas.getContext( "2d" );
+
+				// Make sure canvas is as big as the picture
+				imgCanvas.width = img.width;
+				imgCanvas.height = img.height;
+
+				// Draw image into canvas element
+				imgContext.drawImage( img, 0, 0, img.width, img.height );
+
+				// Get canvas contents as a data URL
+				return imgCanvas.toDataURL( "image/png" );
+
+			}
+
+			function onImageLoad() {
+
+				image.removeEventListener( 'load', onImageLoad, false );
+				image.removeEventListener( 'error', onImageError, false );
+
+				scope.cache.add( url, convertData( this ) );
+
+				if ( onLoad ) onLoad( this );
 
 				scope.manager.itemEnd( url );
 
-			}, 0 );
+			}
 
-			return cached;
+			function onImageError( event ) {
+
+				image.removeEventListener( 'load', onImageLoad, false );
+				image.removeEventListener( 'error', onImageError, false );
+
+				if ( onError ) onError( event );
+
+				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
+
+			}
+
+			image.addEventListener( 'load', onImageLoad, false );
+			image.addEventListener( 'error', onImageError, false );
+
+			if ( url.substr( 0, 5 ) !== 'data:' ) {
+
+				if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
+			}
+
+			scope.manager.itemStart( url );
+
+			image.src = url;
+
+		}.bind( this );
+
+		var cacheRequest = this.cache.get( url );
+
+		if ( cacheRequest !== undefined ) {
+
+			cacheRequest.onsuccess = function ( data ) {
+
+				scope.manager.itemStart( url );
+
+				var image = new Image();
+				image.src = data;
+				onLoad( image );
+				scope.manager.itemEnd( url );
+
+			};
+
+			cacheRequest.onerror = function () {
+
+				loadData();
+
+			};
+
+		} else {
+
+			loadData();
 
 		}
-
-		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
-
-		function onImageLoad() {
-
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
-
-			Cache.add( url, this );
-
-			if ( onLoad ) onLoad( this );
-
-			scope.manager.itemEnd( url );
-
-		}
-
-		function onImageError( event ) {
-
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
-
-			if ( onError ) onError( event );
-
-			scope.manager.itemError( url );
-			scope.manager.itemEnd( url );
-
-		}
-
-		image.addEventListener( 'load', onImageLoad, false );
-		image.addEventListener( 'error', onImageError, false );
-
-		if ( url.substr( 0, 5 ) !== 'data:' ) {
-
-			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
-
-		}
-
-		scope.manager.itemStart( url );
-
-		image.src = url;
-
-		return image;
 
 	},
 
@@ -105,4 +136,6 @@ Object.assign( ImageLoader.prototype, {
 } );
 
 
-export { ImageLoader };
+export {
+	ImageLoader
+};

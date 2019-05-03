@@ -2,7 +2,7 @@
  * @author thespite / http://clicktorelease.com/
  */
 
-import { Cache } from './Cache.js';
+import { IndexedCache } from './IndexedCache.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
 
@@ -22,6 +22,8 @@ function ImageBitmapLoader( manager ) {
 
 	this.manager = manager !== undefined ? manager : DefaultLoadingManager;
 	this.options = undefined;
+	this.cache = new IndexedCache();
+
 
 }
 
@@ -47,59 +49,72 @@ ImageBitmapLoader.prototype = {
 
 		var scope = this;
 
-		var cached = Cache.get( url );
 
-		if ( cached !== undefined ) {
+		var loadData = function () {
 
-			scope.manager.itemStart( url );
+			fetch( url ).then( function ( res ) {
 
-			setTimeout( function () {
+				return res.blob();
 
-				if ( onLoad ) onLoad( cached );
+			} ).then( function ( blob ) {
+
+				if ( scope.options === undefined ) {
+
+					// Workaround for FireFox. It causes an error if you pass options.
+					return createImageBitmap( blob );
+
+				} else {
+
+					return createImageBitmap( blob, scope.options );
+
+				}
+
+			} ).then( function ( imageBitmap ) {
+
+				scope.cache.add( url, imageBitmap );
+
+				if ( onLoad ) onLoad( imageBitmap );
 
 				scope.manager.itemEnd( url );
 
-			}, 0 );
+			} ).catch( function ( e ) {
 
-			return cached;
+				if ( onError ) onError( e );
+
+				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
+
+			} );
+
+			scope.manager.itemStart( url );
+
+		}.bind( this );
+
+
+		var cacheRequest = this.cache.get( url );
+
+		if ( cacheRequest !== undefined ) {
+
+			cacheRequest.onsuccess = function ( data ) {
+
+				scope.manager.itemStart( url );
+				onLoad( data );
+				scope.manager.itemEnd( url );
+
+			};
+
+			cacheRequest.onerror = function () {
+
+				loadData();
+
+			};
+
+		} else {
+
+			loadData();
 
 		}
 
-		fetch( url ).then( function ( res ) {
-
-			return res.blob();
-
-		} ).then( function ( blob ) {
-
-			if ( scope.options === undefined ) {
-
-				// Workaround for FireFox. It causes an error if you pass options.
-				return createImageBitmap( blob );
-
-			} else {
-
-				return createImageBitmap( blob, scope.options );
-
-			}
-
-		} ).then( function ( imageBitmap ) {
-
-			Cache.add( url, imageBitmap );
-
-			if ( onLoad ) onLoad( imageBitmap );
-
-			scope.manager.itemEnd( url );
-
-		} ).catch( function ( e ) {
-
-			if ( onError ) onError( e );
-
-			scope.manager.itemError( url );
-			scope.manager.itemEnd( url );
-
-		} );
-
-		scope.manager.itemStart( url );
 
 	},
 
@@ -118,4 +133,6 @@ ImageBitmapLoader.prototype = {
 
 };
 
-export { ImageBitmapLoader };
+export {
+	ImageBitmapLoader
+};

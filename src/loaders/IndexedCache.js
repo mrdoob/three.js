@@ -4,7 +4,7 @@
 
 function IndexedCache( name ) {
 
-	this.enabled = false;
+	this.enabled = true;
 	this.storeName = ( name === undefined ) ? "ThreeJsCache" : name;
 	this.dbVersion = 4.0;
 	this.db = null;
