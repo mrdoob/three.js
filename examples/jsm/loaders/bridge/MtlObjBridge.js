@@ -5,8 +5,6 @@
 
 import { MTLLoader } from "../../../jsm/loaders/MTLLoader.js";
 
-export { MtlObjBridge }
-
 
 const MtlObjBridge = {
 
@@ -39,3 +37,5 @@ const MtlObjBridge = {
 		return newMaterials;
 	}
 };
+
+export { MtlObjBridge }

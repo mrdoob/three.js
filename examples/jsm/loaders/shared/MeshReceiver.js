@@ -2,6 +2,7 @@
  * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
+
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -11,11 +12,6 @@ import {
 } from "../../../../build/three.module.js";
 
 import { MaterialHandler } from "./MaterialHandler.js";
-
-export {
-	MeshReceiver,
-	LoadedMeshUserOverride
-};
 
 
 /**
@@ -283,4 +279,9 @@ LoadedMeshUserOverride.prototype = {
 	providesAlteredMeshes: function () {
 		return this.alteredMesh;
 	}
+};
+
+export {
+	MeshReceiver,
+	LoadedMeshUserOverride
 };
