@@ -347,7 +347,6 @@ THREE.LoaderSupport.PrepData.prototype = {
  * @class
  */
 THREE.LoaderSupport.MeshBuilder = function() {
-	console.info( 'Using THREE.LoaderSupport.MeshBuilder version: ' + THREE.LoaderSupport.MeshBuilder.LOADER_MESH_BUILDER_VERSION );
 	this.validator = THREE.LoaderSupport.Validator;
 
 	this.logging = {
@@ -359,6 +358,8 @@ THREE.LoaderSupport.MeshBuilder = function() {
 	this.materials = {};
 };
 THREE.LoaderSupport.MeshBuilder.LOADER_MESH_BUILDER_VERSION = '1.3.1';
+console.info( 'Using THREE.LoaderSupport.MeshBuilder version: ' + THREE.LoaderSupport.MeshBuilder.LOADER_MESH_BUILDER_VERSION );
+
 
 THREE.LoaderSupport.MeshBuilder.prototype = {
 
@@ -715,7 +716,6 @@ THREE.LoaderSupport.MeshBuilder.prototype = {
  * @class
  */
 THREE.LoaderSupport.WorkerSupport = function () {
-	console.info( 'Using THREE.LoaderSupport.WorkerSupport version: ' + THREE.LoaderSupport.WorkerSupport.WORKER_SUPPORT_VERSION );
 	this.logging = {
 		enabled: true,
 		debug: false
@@ -726,6 +726,8 @@ THREE.LoaderSupport.WorkerSupport = function () {
 };
 
 THREE.LoaderSupport.WorkerSupport.WORKER_SUPPORT_VERSION = '2.3.0';
+console.info( 'Using THREE.LoaderSupport.WorkerSupport version: ' + THREE.LoaderSupport.WorkerSupport.WORKER_SUPPORT_VERSION );
+
 
 THREE.LoaderSupport.WorkerSupport.prototype = {
 
@@ -1285,10 +1287,10 @@ THREE.LoaderSupport.WorkerRunnerRefImpl.prototype = {
 
 			var self = this.getParentScope();
 			var callbacks = {
-				callbackMeshBuilder: function ( payload ) {
+				callbackOnAssetAvailable: function ( payload ) {
 					self.postMessage( payload );
 				},
-				callbackProgress: function ( text ) {
+				callbackOnProgress: function ( text ) {
 					if ( payload.logging.enabled && payload.logging.debug ) console.debug( 'WorkerRunner: progress: ' + text );
 				}
 			};
@@ -1304,7 +1306,7 @@ THREE.LoaderSupport.WorkerRunnerRefImpl.prototype = {
 
 			if ( payload.logging.enabled ) console.log( 'WorkerRunner: Run complete!' );
 
-			callbacks.callbackMeshBuilder( {
+			callbacks.callbackOnAssetAvailable( {
 				cmd: 'complete',
 				msg: 'WorkerRunner completed run.'
 			} );
@@ -1414,7 +1416,6 @@ THREE.LoaderSupport.WorkerSupport.NodeLoaderWorker.prototype.initWorker = functi
  * @param {string} classDef Class definition to be used for construction
  */
 THREE.LoaderSupport.WorkerDirector = function ( classDef ) {
-	console.info( 'Using THREE.LoaderSupport.WorkerDirector version: ' + THREE.LoaderSupport.WorkerDirector.LOADER_WORKER_DIRECTOR_VERSION );
 	this.logging = {
 		enabled: true,
 		debug: false
@@ -1443,6 +1444,8 @@ THREE.LoaderSupport.WorkerDirector = function ( classDef ) {
 THREE.LoaderSupport.WorkerDirector.LOADER_WORKER_DIRECTOR_VERSION = '2.3.0';
 THREE.LoaderSupport.WorkerDirector.MAX_WEB_WORKER = 16;
 THREE.LoaderSupport.WorkerDirector.MAX_QUEUE_SIZE = 2048;
+console.info( 'Using THREE.LoaderSupport.WorkerDirector version: ' + THREE.LoaderSupport.WorkerDirector.LOADER_WORKER_DIRECTOR_VERSION );
+
 
 THREE.LoaderSupport.WorkerDirector.prototype = {
 
