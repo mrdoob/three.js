@@ -17,7 +17,7 @@ THREE.ColorConverter = {
 
 	},
 
-	getHSV: function() {
+	getHSV: function () {
 
 		var hsl = {};
 
@@ -46,7 +46,7 @@ THREE.ColorConverter = {
 	}(),
 
 	// where c, m, y, k is between 0 and 1
-	
+
 	setCMYK: function ( color, c, m, y, k ) {
 
 		var r = ( 1 - c ) * ( 1 - k );
@@ -62,7 +62,7 @@ THREE.ColorConverter = {
 		if ( target === undefined ) {
 
 			console.warn( 'THREE.ColorConverter: .getCMYK() target is now required' );
-			target = { c: 0, m: 0, y: 0, k:0 };
+			target = { c: 0, m: 0, y: 0, k: 0 };
 
 		}
 
