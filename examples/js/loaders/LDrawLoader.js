@@ -835,29 +835,20 @@ THREE.LDrawLoader = ( function () {
 			switch ( finishType ) {
 
 				case LDrawLoader.FINISH_TYPE_DEFAULT:
+
+					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.3, envMapIntensity: 0.3, metalness: 0 } );
+					break;
+
 				case LDrawLoader.FINISH_TYPE_PEARLESCENT:
 
+					// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
 					var specular = new THREE.Color( colour );
-					var shininess = 35;
 					var hsl = specular.getHSL( { h: 0, s: 0, l: 0 } );
-
-					if ( finishType === LDrawLoader.FINISH_TYPE_DEFAULT ) {
-
-						// Default plastic material with shiny specular
-						hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.12 );
-
-					} else {
-
-						// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
-						hsl.h = ( hsl.h + 0.5 ) % 1;
-						hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
-						shininess = 10;
-
-					}
-
+					hsl.h = ( hsl.h + 0.5 ) % 1;
+					hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
 					specular.setHSL( hsl.h, hsl.s, hsl.l );
 
-					material = new THREE.MeshPhongMaterial( { color: colour, specular: specular, shininess: shininess, reflectivity: 0.3 } );
+					material = new THREE.MeshPhongMaterial( { color: colour, specular: specular, shininess: 10, reflectivity: 0.3 } );
 					break;
 
 				case LDrawLoader.FINISH_TYPE_CHROME:
@@ -869,7 +860,7 @@ THREE.LDrawLoader = ( function () {
 				case LDrawLoader.FINISH_TYPE_RUBBER:
 
 					// Rubber is best simulated with Lambert
-					material = new THREE.MeshLambertMaterial( { color: colour } );
+					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.9, metalness: 0 } );
 					canHaveEnvMap = false;
 					break;
 
