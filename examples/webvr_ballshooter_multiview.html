@@ -294,9 +294,10 @@
 				var trender = performance.now() - ts;
 
 				// Compute average of the last frames
-				for (var i = 0; i < avgCounter.length-1; ++i) avgCounter[i] = avgCounter[i+1];
-				avgCounter[avgCounter.length-1] = trender;
-				var avg = avgCounter.reduce(function(a, b) { return a + b; }) / avgCounter.length;
+				for ( var i = 0; i < avgCounter.length - 1; ++ i ) avgCounter[ i ] = avgCounter[ i + 1 ];
+
+				avgCounter[ avgCounter.length - 1 ] = trender;
+				var avg = avgCounter.reduce( function( a, b ) { return a + b; }) / avgCounter.length;
 
 				ms.innerHTML = `renderer.render time: ${ trender.toFixed( 2 ) }ms (avg: ${ avg.toFixed( 2 ) }ms)`;
 
