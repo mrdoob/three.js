@@ -133,6 +133,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		var lastPosition = new THREE.Vector3();
 		var lastQuaternion = new THREE.Quaternion();
 
+		var globalTarget = new THREE.Vector3();
+		
 		return function update() {
 
 			var position = scope.object.position;
@@ -178,7 +180,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			position.copy( scope.target ).add( offset );
 
-			var globalTarget = scope.target.clone();
+			globalTarget.copy( scope.target );
 			if ( scope.object.parent ) {
 			 
 				scope.object.parent.localToWorld( globalTarget );
