@@ -265,6 +265,11 @@ export class Object3D extends EventDispatcher {
   lookAt(vector: Vector3 | number, y?: number, z?: number): void;
 
   /**
+   * Adds this object as a child of the given object, while maintaining this object's world transform
+   */
+  attachTo(object: Object3D): this;
+
+  /**
    * Adds object as child of this object.
    */
   add(...object: Object3D[]): this;
