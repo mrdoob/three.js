@@ -82,7 +82,8 @@ THREE.CSS2DRenderer = function () {
 			element.style.MozTransform = style;
 			element.style.oTransform = style;
 			element.style.transform = style;
-			element.style.display = ( vector.z < - 1 || vector.z > 1 ) ? 'none' : '';
+
+			element.style.display = ( object.visible && vector.z >= - 1 && vector.z <= 1 ) ? '' : 'none';
 
 			var objectData = {
 				distanceToCameraSquared: getDistanceToSquared( camera, object )

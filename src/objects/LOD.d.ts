@@ -10,7 +10,7 @@ export class LOD extends Object3D {
 
   levels: { distance: number; object: Object3D }[];
 
-  addLevel(object: Object3D, distance?: number): void;
+  addLevel(object: Object3D, distance?: number): this;
   getObjectForDistance(distance: number): Object3D;
   raycast(raycaster: Raycaster, intersects: Intersection[]): void;
   update(camera: Camera): void;

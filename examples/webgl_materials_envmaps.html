@@ -55,10 +55,6 @@
 				camera.position.set( 0, 0, 1000 );
 				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.minDistance = 500;
-				controls.maxDistance = 2500;
-
 				// SCENE
 
 				scene = new THREE.Scene();
@@ -159,6 +155,12 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderer.gammaOutput = true;
+
+				//
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 500;
+				controls.maxDistance = 2500;
 
 				//
 

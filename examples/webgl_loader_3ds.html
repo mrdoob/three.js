@@ -50,8 +50,6 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 2;
 
-				controls = new THREE.TrackballControls( camera );
-
 				scene = new THREE.Scene();
 				scene.add( new THREE.HemisphereLight() );
 
@@ -85,6 +83,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', resize, false );
 

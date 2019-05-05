@@ -97,8 +97,7 @@ function onDocumentLoad( event ) {
 
 	var button = document.createElement( 'div' );
 	button.id = 'button';
-	button.textContent = 'Edit';
-
+	button.innerHTML = '<img src="../files/ic_mode_edit_black_24dp.svg">';
 	button.addEventListener( 'click', function ( event ) {
 
 		window.open( 'https://github.com/mrdoob/three.js/blob/dev/docs/' + section + '/' + localizedPath + '.html' );

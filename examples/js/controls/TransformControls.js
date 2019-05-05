@@ -988,6 +988,7 @@ THREE.TransformControlsGizmo = function () {
 				var tempGeometry = object.geometry.clone();
 				tempGeometry.applyMatrix(object.matrix);
 				object.geometry = tempGeometry;
+				object.renderOrder = Infinity;
 
 				object.position.set( 0, 0, 0 );
 				object.rotation.set( 0, 0, 0 );

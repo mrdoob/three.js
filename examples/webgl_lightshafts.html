@@ -114,12 +114,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 3.2, 3, 3.7 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0.5, 1.5, 0 );
-				controls.minDistance = 2;
-				controls.maxDistance = 20;
-				controls.update();
-
 				clock = new THREE.Clock();
 
 				scene = new THREE.Scene();
@@ -219,6 +213,12 @@
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0.5, 1.5, 0 );
+				controls.minDistance = 2;
+				controls.maxDistance = 20;
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
