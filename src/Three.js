@@ -1,5 +1,6 @@
 import './polyfills.js';
 
+export { WebGLMultiRenderTarget } from './renderers/WebGLMultiRenderTarget.js';
 export { WebGLMultisampleRenderTarget } from './renderers/WebGLMultisampleRenderTarget.js';
 export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
