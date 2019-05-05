@@ -1005,6 +1005,7 @@ THREE.GLTFLoader = ( function () {
 
 	GLTFCubicSplineInterpolant.prototype = Object.create( THREE.Interpolant.prototype );
 	GLTFCubicSplineInterpolant.prototype.constructor = GLTFCubicSplineInterpolant;
+	GLTFCubicSplineInterpolant.prototype.type = 'GLTFCubicSplineInterpolant';
 
 	GLTFCubicSplineInterpolant.prototype.copySampleValue_ = function ( index ) {
 
@@ -1069,6 +1070,20 @@ THREE.GLTFLoader = ( function () {
 		return result;
 
 	};
+
+	GLTFCubicSplineInterpolant.FactoryMethod = function ( result ) {
+
+		// A CUBICSPLINE keyframe in glTF has three output values for each input value,
+		// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
+		// must be divided by three to get the interpolant's sampleSize argument.
+
+		return new GLTFCubicSplineInterpolant( this.times, this.values, this.getValueSize() / 3, result );
+
+	};
+
+	GLTFCubicSplineInterpolant.FactoryMethod.type = 'GLTFCubicSplineInterpolant';
+
+	THREE.GLTFCubicSplineInterpolant = GLTFCubicSplineInterpolant;
 
 	/*********************************/
 	/********** INTERNALS ************/
@@ -2874,18 +2889,7 @@ THREE.GLTFLoader = ( function () {
 					// Override interpolation with custom factory method.
 					if ( sampler.interpolation === 'CUBICSPLINE' ) {
 
-						track.createInterpolant = function InterpolantFactoryMethodGLTFCubicSpline( result ) {
-
-							// A CUBICSPLINE keyframe in glTF has three output values for each input value,
-							// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
-							// must be divided by three to get the interpolant's sampleSize argument.
-
-							return new GLTFCubicSplineInterpolant( this.times, this.values, this.getValueSize() / 3, result );
-
-						};
-
-						// Mark as CUBICSPLINE. `track.getInterpolation()` doesn't support custom interpolants.
-						track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
+						track.createInterpolant = GLTFCubicSplineInterpolant.FactoryMethod;
 
 					}
 
