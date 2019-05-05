@@ -187,6 +187,7 @@ THREE.Refractor = function ( geometry, options ) {
 	var render = ( function () {
 
 		var viewport = new THREE.Vector4();
+		var size = new THREE.Vector2();
 
 		return function render( renderer, scene, camera ) {
 
@@ -199,7 +200,9 @@ THREE.Refractor = function ( geometry, options ) {
 			renderer.vr.enabled = false; // avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
-			renderer.render( scene, virtualCamera, renderTarget, true );
+			renderer.setRenderTarget( renderTarget );
+			renderer.clear();
+			renderer.render( scene, virtualCamera );
 
 			renderer.vr.enabled = currentVrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -207,19 +210,9 @@ THREE.Refractor = function ( geometry, options ) {
 
 			// restore viewport
 
-			var bounds = camera.bounds;
+			if ( camera.isArrayCamera ) {
 
-			if ( bounds !== undefined ) {
-
-				var size = renderer.getSize();
-				var pixelRatio = renderer.getPixelRatio();
-
-				viewport.x = bounds.x * size.width * pixelRatio;
-				viewport.y = bounds.y * size.height * pixelRatio;
-				viewport.z = bounds.z * size.width * pixelRatio;
-				viewport.w = bounds.w * size.height * pixelRatio;
-
-				renderer.state.viewport( viewport );
+				renderer.state.viewport( camera.viewport );
 
 			}
 

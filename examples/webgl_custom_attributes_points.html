@@ -38,7 +38,6 @@
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
-			uniform float amplitude;
 			attribute float size;
 			attribute vec3 customColor;
 
@@ -143,7 +142,6 @@
 			var material = new THREE.ShaderMaterial( {
 
 				uniforms: {
-					amplitude: { value: 1.0 },
 					color: { value: new THREE.Color( 0xffffff ) },
 					texture: { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 				},

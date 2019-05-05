@@ -432,7 +432,7 @@
 
 						// PASS
 
-						var size = renderer.getDrawingBufferSize();
+						var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
 						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );
@@ -516,7 +516,6 @@
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				nodepass = new NodePass();
-				nodepass.renderToScreen = true;
 
 				composer.addPass( nodepass );
 

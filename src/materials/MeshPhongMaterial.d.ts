@@ -2,7 +2,7 @@ import { Color } from './../math/Color';
 import { Texture } from './../textures/Texture';
 import { Vector2 } from './../math/Vector2';
 import { MaterialParameters, Material } from './Material';
-import { Combine } from '../constants';
+import { Combine, NormalMapTypes } from '../constants';
 
 export interface MeshPhongMaterialParameters extends MaterialParameters {
   /** geometry color in hexadecimal. Default is 0xffffff. */
@@ -21,6 +21,7 @@ export interface MeshPhongMaterialParameters extends MaterialParameters {
   bumpMap?: Texture;
   bumpScale?: number;
   normalMap?: Texture;
+  normalMapType?: NormalMapTypes;
   normalScale?: Vector2;
   displacementMap?: Texture;
   displacementScale?: number;
@@ -57,6 +58,7 @@ export class MeshPhongMaterial extends Material {
   bumpMap: Texture | null;
   bumpScale: number;
   normalMap: Texture | null;
+  normalMapType: NormalMapTypes;
   normalScale: Vector2;
   displacementMap: Texture | null;
   displacementScale: number;

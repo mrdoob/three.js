@@ -64,8 +64,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 10, 5, 20 );
 
-				var controls = new THREE.OrbitControls( camera );
-
 				scene = new THREE.Scene();
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff );
@@ -127,6 +125,8 @@
 				labelRenderer.domElement.style.position = 'absolute';
 				labelRenderer.domElement.style.top = 0;
 				document.body.appendChild( labelRenderer.domElement );
+
+				var controls = new THREE.OrbitControls( camera, labelRenderer.domElement );
 
 			}
 

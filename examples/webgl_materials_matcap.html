@@ -192,6 +192,9 @@
 				mesh.material.matcap = new THREE.Texture( event.target );
 				mesh.material.matcap.needsUpdate = true;
 
+				mesh.material.matcap.encoding = THREE.sRGBEncoding; // assume it is sRGB
+				mesh.material.needsUpdate = true;
+
 				image.src = mesh.material.matcap.image.src; // corner div
 
 				render();

@@ -15,7 +15,7 @@
 				line-height: 30px;
 				overflow: hidden;
 			}
-			
+
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
@@ -23,7 +23,7 @@
 				z-index:100;
 				box-sizing: border-box;
 			}
-			
+
 			a {
 				color: white;
 			}
@@ -79,7 +79,7 @@
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var material = new THREE.MeshLambertMaterial( { map: texture } );
+				var material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
 				orbit = new THREE.OrbitControls( camera, renderer.domElement );
 				orbit.update();

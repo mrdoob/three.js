@@ -1045,15 +1045,17 @@
 
 			highlightBox.visible = false;
 
+			renderer.setRenderTarget( pickingRenderTarget );
+
 			if ( singlePickingMaterial ) {
 
 				scene.overrideMaterial = singlePickingMaterial;
-				renderer.render( scene, camera, pickingRenderTarget );
+				renderer.render( scene, camera );
 				scene.overrideMaterial = null;
 
 			} else {
 
-				renderer.render( pickingScene, camera, pickingRenderTarget );
+				renderer.render( pickingScene, camera );
 
 			}
 
@@ -1105,6 +1107,7 @@
 		function render() {
 
 			pick();
+			renderer.setRenderTarget( null );
 			renderer.render( scene, camera );
 
 		}

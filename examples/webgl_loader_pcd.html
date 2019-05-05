@@ -74,7 +74,28 @@
 				camera.position.z = - 2;
 				camera.up.set( 0, 0, 1 );
 
-				controls = new THREE.TrackballControls( camera );
+				scene.add( camera );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				var loader = new THREE.PCDLoader();
+				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( points ) {
+
+					scene.add( points );
+					var center = points.geometry.boundingSphere.center;
+					controls.target.set( center.x, center.y, center.z );
+					controls.update();
+
+				} );
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 				controls.rotateSpeed = 2.0;
 				controls.zoomSpeed = 0.3;
@@ -88,27 +109,6 @@
 
 				controls.minDistance = 0.3;
 				controls.maxDistance = 0.3 * 100;
-
-				scene.add( camera );
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
-				var loader = new THREE.PCDLoader();
-				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( mesh ) {
-
-					scene.add( mesh );
-					var center = mesh.geometry.boundingSphere.center;
-					controls.target.set( center.x, center.y, center.z );
-					controls.update();
-
-				} );
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -130,23 +130,23 @@
 
 			function keyboard( ev ) {
 
-				var ZaghettoMesh = scene.getObjectByName( 'Zaghetto.pcd' );
+				var points = scene.getObjectByName( 'Zaghetto.pcd' );
 
 				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
 
 					case '+':
-						ZaghettoMesh.material.size *= 1.2;
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.size *= 1.2;
+						points.material.needsUpdate = true;
 						break;
 
 					case '-':
-						ZaghettoMesh.material.size /= 1.2;
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.size /= 1.2;
+						points.material.needsUpdate = true;
 						break;
 
 					case 'c':
-						ZaghettoMesh.material.color.setHex( Math.random() * 0xffffff );
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.color.setHex( Math.random() * 0xffffff );
+						points.material.needsUpdate = true;
 						break;
 
 				}

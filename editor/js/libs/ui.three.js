@@ -259,7 +259,7 @@ UI.Texture = function ( editor, mapping ) {
 
 					scope.setValue( texture );
 
-					if ( scope.onChangeCallback ) scope.onChangeCallback();
+					if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 				}, false );
 
@@ -279,7 +279,7 @@ UI.Texture = function ( editor, mapping ) {
 
 						scope.setValue( texture );
 
-						if ( scope.onChangeCallback ) scope.onChangeCallback();
+						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 					}, false );
 
@@ -354,6 +354,19 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 	this.texture = texture;
 	this.refreshUI();
+
+};
+
+UI.Texture.prototype.setEncoding = function ( encoding ) {
+
+	var texture = this.getValue();
+	if ( texture !== null ) {
+
+		texture.encoding = encoding;
+
+	}
+
+	return this;
 
 };
 

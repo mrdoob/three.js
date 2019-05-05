@@ -4,29 +4,32 @@
 		<meta charset="utf-8">
 		<title>three.js / documentation</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="index.css">
+		<link rel="shortcut icon" href="../files/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="../files/main.css">
+		<!-- console sandbox -->
+		<script src="../build/three.min.js" async defer></script>
 	</head>
 	<body>
 
 		<div id="panel" class="collapsed">
 
-			<h1><a href="http://threejs.org">three.js</a> / docs</h1>
+			<div id="header">
 
-			<a id="expandButton" href="#">
-				<span></span>
-				<span></span>
-				<span></span>
-			</a>
+				<h1><a href="http://threejs.org">three.js</a></h1>
 
-			<div class="filterBlock" >
-				<input type="text" id="filterInput" placeholder="Type to filter" autocorrect="off" autocapitalize="off" spellcheck="false">
-				<a href="#" id="clearFilterButton">x</a>
-			</div>
+				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
 
-			<div style="text-align:center">
-				<br />
-				<a href="javascript:setLanguage('en')">en</a> |
-				<a href="javascript:setLanguage('zh')">zh</a>
+				<div id="sections">
+					<span class="selected">docs</span> <a href="../examples/">examples</a>
+				</div>
+
+				<input type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+				<select id="language">
+					<option value="en">en</option>
+					<option value="zh">zh</option>
+				</select>
+
 			</div>
 
 			<div id="content"></div>
@@ -65,9 +68,18 @@
 
 			//
 
+			var languageSelect = document.getElementById( 'language' );
+			languageSelect.value = language;
+			languageSelect.addEventListener( 'change', function ( event ) {
+
+				setLanguage( this.value );
+
+			} );
+
 			function setLanguage( value ) {
 
 				language = value;
+
 				createNavigation();
 				updateFilter();
 				autoChangeUrlLanguage( language );
@@ -76,9 +88,8 @@
 
 			var panel = document.getElementById( 'panel' );
 			var content = document.getElementById( 'content' );
-			var clearFilterButton = document.getElementById( 'clearFilterButton' );
 			var expandButton = document.getElementById( 'expandButton' );
-			var filterInput = document.getElementById( 'filterInput' );
+			var filterInput = document.getElementById( 'filter' );
 			var iframe = document.querySelector( 'iframe' );
 
 			var pageProperties = {};
@@ -102,18 +113,6 @@
 
 			filterInput.oninput = function ( event ) {
 
-				updateFilter();
-
-			};
-
-
-			// Functionality for filter clear button
-
-			clearFilterButton.onclick = function ( event ) {
-
-				event.preventDefault();
-
-				filterInput.value = '';
 				updateFilter();
 
 			};
@@ -432,9 +431,6 @@
 
 
 		</script>
-
-		<!-- console sandbox -->
-		<script src="../build/three.min.js"></script>
 
 	</body>
 

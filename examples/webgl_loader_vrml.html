@@ -54,9 +54,7 @@
 
 			}
 
-			var container, stats;
-
-			var camera, controls, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -65,8 +63,6 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
 				camera.position.z = 6;
-
-				controls = new THREE.OrbitControls( camera );
 
 				scene = new THREE.Scene();
 				scene.add( camera );
@@ -91,13 +87,16 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
+				// controls
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 

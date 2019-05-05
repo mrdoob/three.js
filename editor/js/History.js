@@ -173,7 +173,7 @@ History.prototype = {
 
 		// Append Undos to History
 
-		for ( var i = 0 ; i < this.undos.length; i ++ ) {
+		for ( var i = 0; i < this.undos.length; i ++ ) {
 
 			if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -185,7 +185,7 @@ History.prototype = {
 
 		// Append Redos to History
 
-		for ( var i = 0 ; i < this.redos.length; i ++ ) {
+		for ( var i = 0; i < this.redos.length; i ++ ) {
 
 			if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
 
