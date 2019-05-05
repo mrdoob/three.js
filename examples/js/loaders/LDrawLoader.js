@@ -859,7 +859,7 @@ THREE.LDrawLoader = ( function () {
 
 				case LDrawLoader.FINISH_TYPE_RUBBER:
 
-					// Rubber is best simulated with Lambert
+					// Rubber finish
 					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.9, metalness: 0 } );
 					canHaveEnvMap = false;
 					break;
