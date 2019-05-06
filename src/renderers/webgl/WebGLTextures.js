@@ -193,8 +193,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		info.memory.textures --;
-
 	}
 
 	function onRenderTargetDispose( event ) {
@@ -204,8 +202,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
 
 		deallocateRenderTarget( renderTarget );
-
-		info.memory.textures --;
 
 	}
 
@@ -218,6 +214,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( textureProperties.__webglInit === undefined ) return;
 
 		_gl.deleteTexture( textureProperties.__webglTexture );
+
+		info.memory.textures --;
 
 		properties.remove( texture );
 
@@ -233,6 +231,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( textureProperties.__webglTexture !== undefined ) {
 
 			_gl.deleteTexture( textureProperties.__webglTexture );
+
+			info.memory.textures --;
 
 		}
 
