@@ -138,10 +138,10 @@
 
 				requestAnimationFrame( animate );
 
-				let R = 300;
+				let R = 600;
 				let f = 0.01;
 				let t = 0.001*millitime;
-				box.position.set(600*Math.cos(t*2*Math.PI*f), 0, 600*Math.sin(t*2*Math.PI*f));
+				box.position.set(R*Math.cos(t*2*Math.PI*f), 0, R*Math.sin(t*2*Math.PI*f));
 				box.rotation.set(0,0.5*Math.PI-t*2*Math.PI*f,0);
 
 				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
