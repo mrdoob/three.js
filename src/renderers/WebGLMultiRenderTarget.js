@@ -5,13 +5,13 @@ import { WebGLRenderTarget } from './WebGLRenderTarget.js';
  * @author Takahiro https://github.com/takahirox
  */
 
-function WebGLMultiRenderTarget( width, height, attachmentsNum, options ) {
+function WebGLMultiRenderTarget( width, height, numAttachments, options ) {
 
 	WebGLRenderTarget.call( this, width, height, options );
 
 	this.textures = [];
 
-	for ( var i = 0; i < attachmentsNum; i ++ ) {
+	for ( var i = 0; i < numAttachments; i ++ ) {
 
 		this.textures[ i ] = this.texture.clone();
 
@@ -41,7 +41,7 @@ WebGLMultiRenderTarget.prototype = Object.assign( Object.create( WebGLRenderTarg
 
 	},
 
-	setAttachmentsNum( num ) {
+	setNumAttachments( num ) {
 
 		if ( this.textures.length !== num ) {
 
@@ -56,12 +56,6 @@ WebGLMultiRenderTarget.prototype = Object.assign( Object.create( WebGLRenderTarg
 				}
 
 			} else {
-
-				for ( var i = num, il = this.textures.length; i < il; i ++ ) {
-
-					this.textures[ i ].dispose();
-
-				}
 
 				this.textures.length = num;
 
