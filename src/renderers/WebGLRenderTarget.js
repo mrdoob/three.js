@@ -67,6 +67,8 @@ WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prot
 
 	copy: function ( source ) {
 
+		this.dispose();
+
 		this.width = source.width;
 		this.height = source.height;
 
