@@ -24,8 +24,6 @@ var files = [
 	{ path: 'exporters/STLExporter.js', ignoreList: [] },
 	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
 
-	{ path: 'libs/inflate.min.js', ignoreList: [] },
-
 	{ path: 'loaders/FBXLoader.js', ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
