@@ -10,7 +10,7 @@
 		<script src="../build/three.min.js" async defer></script>
 	</head>
 	<body>
-
+		<!-- <img src="../files/screenshot2.png" width="1280" style="opacity:.5;position:fixed;z-index:100000;pointer-events:none;"/> -->
 		<div id="panel" class="collapsed">
 
 			<div id="header">
@@ -22,17 +22,20 @@
 				<div id="sections">
 					<span class="selected">docs</span> <a href="../examples/">examples</a>
 				</div>
+			</div>
 
-				<input type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false">
+			<div id="panelScrim"></div>
+
+			<div id="contentWrapper">
+				<input type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
 
 				<select id="language">
 					<option value="en">en</option>
 					<option value="zh">zh</option>
 				</select>
 
+				<div id="content"></div>
 			</div>
-
-			<div id="content"></div>
 
 		</div>
 
@@ -89,6 +92,7 @@
 			var panel = document.getElementById( 'panel' );
 			var content = document.getElementById( 'content' );
 			var expandButton = document.getElementById( 'expandButton' );
+			var panelScrim = document.getElementById( 'panelScrim' );
 			var filterInput = document.getElementById( 'filter' );
 			var iframe = document.querySelector( 'iframe' );
 
@@ -102,6 +106,13 @@
 			// Functionality for hamburger button (on small devices)
 
 			expandButton.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'collapsed' );
+
+			};
+
+			panelScrim.onclick = function ( event ) {
 
 				event.preventDefault();
 				panel.classList.toggle( 'collapsed' );
@@ -140,6 +151,12 @@
 
 					window.location.hash = pageURL;
 					panel.classList.add( 'collapsed' );
+
+
+					content.querySelectorAll('a').forEach((item) => {
+						item.classList.remove('selected');
+					});
+					link.classList.add('selected');
 
 				} );
 
