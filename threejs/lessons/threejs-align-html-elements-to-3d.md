@@ -16,7 +16,7 @@ each with pluses and minuses.
 
 * Use a texture with 2D text drawn into it.
 
-  The article on [using a Canvas as a texture](threejs-textures-canvas.html) shows using
+  The article on [using a Canvas as a texture](threejs-canvas-textures.html) shows using
   a canvas as a texture. You can draw text into a canvas and [display it as a billboard](threejs-billboards.html).
   The plus here might be that the text is integrated into the 3D scene. For something like a computer terminal
   shown in a 3D scene this might be perfect.
