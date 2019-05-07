@@ -13,6 +13,10 @@ var files = [
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
 	// { path: 'controls/TransformControls.js', ignoreList: [] },
 
+	{ path: 'curves/NURBSCurve.js', ignoreList: [] },
+	{ path: 'curves/NURBSSurface.js', ignoreList: [] },
+	{ path: 'curves/NURBSUtils.js', ignoreList: [] },
+
 	{ path: 'exporters/GLTFExporter.js', ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
 	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', ignoreList: [] },
@@ -20,10 +24,14 @@ var files = [
 	{ path: 'exporters/STLExporter.js', ignoreList: [] },
 	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
 
+	{ path: 'libs/inflate.min.js', ignoreList: [] },
+
+	{ path: 'loaders/FBXLoader.js', ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
 	{ path: 'loaders/STLLoader.js', ignoreList: [] },
+	{ path: 'loaders/TGALoader.js', ignoreList: [] },
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
@@ -129,16 +137,26 @@ function convert( path, ignoreList ) {
 
 	//
 
-	var keys = Object.keys( dependencies )
-		.filter( value => value !== className )
-		.map( value => value === '_Math' ? 'Math as _Math' : value )
-		.map( value => '\n\t' + value )
-		.sort()
-		.toString();
-	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
+	const threeKeys = [];
+	const moduleDepencies = [];
+	Object.keys( dependencies ).forEach(value => {
+		if (value === className) {
+			return;
+		}
+		const file = files.find(file => file.path.endsWith(`/${value}.js`));
+		if (file) {
+			moduleDepencies.push(file.path);
+			return;
+		}
+		threeKeys.push(value === '_Math' ? 'Math as _Math' : value);
+	});
+	var imports = `${threeKeys.length
+		? `import {\n\t${threeKeys.sort().join(',\n\t')}\n} from "../../../build/three.module.js";`
+		: ''
+	}${moduleDepencies.map(moduleDepency => `\nimport { ${moduleDepency.match(/([^/]*).js$/)[1]} } from "../${moduleDepency}";`).join("")}`;
 	var exports = `export { ${className} };\n`;
 
-	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;
+	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
 	// console.log( output );
 
