@@ -55,6 +55,31 @@ UniformsGroup.prototype = Object.assign( Object.create( EventDispatcher.prototyp
 
 		return this;
 
+	},
+
+	copy: function ( source ) {
+
+		this.name = source.name;
+		this.dynamic = source.dynamic;
+
+		var uniformsSource = source.uniforms;
+
+		this.uniforms.length = 0;
+
+		for ( var i = 0, l = uniformsSource.length; i < l; i ++ ) {
+
+			this.uniforms.push( uniformsSource[ i ].clone() );
+
+		}
+
+		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
 	}
 
 } );

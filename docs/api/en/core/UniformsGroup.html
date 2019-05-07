@@ -89,30 +89,42 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:UniformsGroup add]( [param:Uniform uniform] )</h3>
+		<h3>[method:this add]( [param:Uniform uniform] )</h3>
 		<p>
 		[page:Object uniform] — The uniform to add.<br /><br />
 
 		Adds an uniform to the [name].
 		</p>
 
-		<h3>[method:UniformsGroup remove]( [param:Uniform uniform] )</h3>
+		<h3>[method:UniformsGroup clone]()</h3>
+		<p>
+		Returns a clone of this object.
+		</p>
+
+		<h3>[method:this copy]( [param:UniformsGroup uniformsGroup] )</h3>
+		<p>
+		[page:UniformsGroup uniformsGroup] — The uniforms group to copy.<br /><br />
+
+		Copy the given object into this object.
+		</p>
+
+		<h3>[method:this dispose]()</h3>
+		<p>
+		Disposes this [name] so corresponding data cached by [page:WebGLRenderer] are released.
+		</p>
+
+		<h3>[method:this remove]( [param:Uniform uniform] )</h3>
 		<p>
 		[page:Object uniform] — The uniform to remove.<br /><br />
 
 		Removes an uniform from the [name].
 		</p>
 
-		<h3>[method:UniformsGroup setName]( [param:String name] )</h3>
+		<h3>[method:this setName]( [param:String name] )</h3>
 		<p>
 		[page:String name] — The name to set.<br /><br />
 
 		Sets the name of this [name].
-		</p>
-
-		<h3>[method:UniformsGroup dispose]()</h3>
-		<p>
-		Disposes this [name] so corresponding data cached by [page:WebGLRenderer] are released.
 		</p>
 
 		<h2>Source</h2>

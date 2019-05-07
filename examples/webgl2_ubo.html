@@ -204,16 +204,16 @@
 
 				var cameraUniformsGroup = new THREE.UniformsGroup();
 				cameraUniformsGroup.setName( 'ViewData' );
-				cameraUniformsGroup.add( { value: camera.projectionMatrix } ); // projection matrix
-				cameraUniformsGroup.add( { value: camera.matrixWorldInverse } ); // view matrix
+				cameraUniformsGroup.add( new THREE.Uniform( camera.projectionMatrix ) ); // projection matrix
+				cameraUniformsGroup.add( new THREE.Uniform( camera.matrixWorldInverse ) ); // view matrix
 
 				var lightingUniformsGroup = new THREE.UniformsGroup();
 				lightingUniformsGroup.setName( 'LightingData' );
-				lightingUniformsGroup.add( { value: new THREE.Vector3( 0, 0, 10 ) } ); // light position
-				lightingUniformsGroup.add( { value: new THREE.Color( 0x333333 ) } ); // ambient color
-				lightingUniformsGroup.add( { value: new THREE.Color( 0xaaaaaa ) } ); // diffuse color
-				lightingUniformsGroup.add( { value: new THREE.Color( 0xcccccc ) } ); // specular color
-				lightingUniformsGroup.add( { value: 64 } ); // shininess
+				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Vector3( 0, 0, 10 ) ) ); // light position
+				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0x333333 ) ) ); // ambient color
+				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0xaaaaaa ) ) ); // diffuse color
+				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0xcccccc ) ) ); // specular color
+				lightingUniformsGroup.add( new THREE.Uniform( 64 ) ); // shininess
 
 				// materials
 
@@ -223,7 +223,6 @@
 						normalMatrix: { value: null },
 						color: { value: null }
 					},
-					uniformsGroups: [ cameraUniformsGroup, lightingUniformsGroup ],
 					vertexShader: document.getElementById( 'vertexShader1' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader1' ).textContent
 				} );
@@ -233,7 +232,6 @@
 						modelMatrix: { value: null },
 						diffuseMap: { value: null },
 					},
-					uniformsGroups: [ cameraUniformsGroup ],
 					vertexShader: document.getElementById( 'vertexShader2' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader2' ).textContent
 				} );
@@ -248,6 +246,7 @@
 
 						mesh = new THREE.Mesh( geometry1, material1.clone() );
 
+						mesh.material.uniformsGroups = [ cameraUniformsGroup, lightingUniformsGroup ];
 						mesh.material.uniforms.modelMatrix.value = mesh.matrixWorld;
 						mesh.material.uniforms.normalMatrix.value = mesh.normalMatrix;
 						mesh.material.uniforms.color.value = new THREE.Color( 0xffffff * Math.random() );
@@ -256,6 +255,7 @@
 
 						mesh = new THREE.Mesh( geometry2, material2.clone() );
 
+						mesh.material.uniformsGroups = [ cameraUniformsGroup ];
 						mesh.material.uniforms.modelMatrix.value = mesh.matrixWorld;
 						mesh.material.uniforms.diffuseMap.value = texture;
 

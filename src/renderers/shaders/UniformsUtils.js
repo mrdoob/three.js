@@ -59,6 +59,20 @@ export function mergeUniforms( uniforms ) {
 
 }
 
+export function cloneUniformsGroups( src ) {
+
+	var dst = [];
+
+	for ( var u = 0; u < src.length; u ++ ) {
+
+		dst.push( src[ u ].clone() );
+
+	}
+
+	return dst;
+
+}
+
 // Legacy
 
 var UniformsUtils = { clone: cloneUniforms, merge: mergeUniforms };
