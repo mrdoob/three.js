@@ -10,24 +10,23 @@
 		<script src="../build/three.min.js" async defer></script>
 	</head>
 	<body>
-		<!-- <img src="../files/screenshot2.png" width="1280" style="opacity:.5;position:fixed;z-index:100000;pointer-events:none;"/> -->
 		<div id="panel" class="collapsed">
 
 			<div id="header">
-
 				<h1><a href="http://threejs.org">three.js</a></h1>
 
-				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
-
 				<div id="sections">
-					<span class="selected">docs</span> <a href="../examples/">examples</a>
+					<span class="selected">docs</span>
+					<a href="../examples/">examples</a>
 				</div>
+
+				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
 			</div>
 
 			<div id="panelScrim"></div>
 
 			<div id="contentWrapper">
-				<input type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+				<input placeholder="Search" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
 
 				<select id="language">
 					<option value="en">en</option>

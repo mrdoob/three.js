@@ -3,7 +3,7 @@
 
 	--text-color: #444;
 	--border-style: 1px solid #EEE;
-	--header-height: 80px;
+	--header-height: 48px;
 }
 
 @font-face {
@@ -38,31 +38,17 @@ a {
 }
 
 h1 {
-	margin-top: 0px; /* reset */
-	margin-left: 15px;
-	margin-bottom: 0px;
-	padding-top: 12px;
-
 	font-size: 18px;
 	font-weight: 500;
-}
-
-h1 a {
-	color: var(--color-blue);
 }
 
 h2 {
 	padding: 8px 0;
 	margin: 6px 0 12px 0;
-	position: sticky;
-	top: 0;
-	background: white;
-
 	font-size: 14px;
 	font-weight: normal;
 
 	color: var(--color-blue);
-  border-bottom: var(--border-style);
 }
 
 h3 {
@@ -76,6 +62,21 @@ h3 {
 	color: #9E9E9E;
 }
 
+h1 a {
+	color: var(--color-blue);
+}
+
+#header {
+	display: flex;
+  height: 48px;
+  border-bottom: var(--border-style);
+  align-items: center;
+}
+#header h1 {
+	margin-left: 15px;
+	flex: 1;
+}
+
 #panel {
 	position: fixed;
 	left: 0px;
@@ -87,40 +88,40 @@ h3 {
 
 	display: flex;
 	flex-direction: column;
+
+	transition: 0s 0s height;
 }
 
 	#panel #expandButton {
-		position: absolute;
-		right: 14px;
-		top: 14px;
-		z-index: 1000;
+		margin-right: 14px;
+		margin-left: 4px;
 		display: none;
 	}
 
 	#panel #sections {
 		font-weight: 500;
-		height: 44px;
 		display: flex;
-		align-items: center;
+		justify-content: center;
 		z-index: 1000;
 		position: relative;
+		height: 100%;
+		align-items: center;
 	}
-		#panel #sections:after {
-			position: absolute;
-			bottom: 0px;
-			content: "";
-			left: 0;
-			right: 0;
-			border-bottom: var(--border-style);
-			z-index: -1;
-		}
 
 		#panel #sections * {
 			padding: 0 16px;
-	    height: 100%;
-	    line-height: 44px;
+			height: 100%;
+			position: relative;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
-		#panel #sections .selected {
+		#panel #sections .selected:after {
+			content: "";
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: -1px;
 			border-bottom: 1px solid black;
 		}
 		#panel #sections a {
@@ -146,7 +147,7 @@ h3 {
 	#panel #language {
     font-family: 'Roboto Mono', monospace;
 		position: absolute;
-    top: 8px;
+    top: 7px;
     right: 8px;
     border: 0px;
     font-size: 14px;
@@ -195,11 +196,6 @@ h3 {
 			color: var(--color-blue);
 		}
 
-		#panel #content .selected {
-	    text-decoration: line-through;
-		}
-
-
 		#panel #content .hidden {
 			display: none !important;
 		}
@@ -247,7 +243,7 @@ iframe {
 	}
 	#panel.collapsed #panelScrim {
 		opacity: 0;
-		pointer-events: auto;
+		pointer-events: none;
 	}
 
 	#panel #expandButton {

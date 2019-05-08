@@ -31,23 +31,31 @@
 	</head>
 	<body>
 
-		<div id="panel">
+		<div id="panel" class="collapsed">
 
 			<div id="header">
-
 				<h1><a href="http://threejs.org">three.js</a></h1>
 
-				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
-
 				<div id="sections">
-					<a href="../docs/">docs</a> <span class="selected">examples</span>
+					<a href="../docs/">docs</a>
+					<span class="selected">examples</span>
 				</div>
 
-				<input type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-
+				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
 			</div>
 
-			<div id="content"></div>
+			<div id="panelScrim"></div>
+
+			<div id="contentWrapper">
+				<input placeholder="Search" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+
+				<select id="language">
+					<option value="en">en</option>
+					<option value="zh">zh</option>
+				</select>
+
+				<div id="content"></div>
+			</div>
 
 		</div>
 
@@ -76,6 +84,14 @@
 			event.preventDefault();
 			panel.classList.toggle( 'collapsed' );
 		} );
+
+		var panelScrim = document.getElementById( 'panelScrim' );
+		panelScrim.onclick = function ( event ) {
+
+			event.preventDefault();
+			panel.classList.toggle( 'collapsed' );
+
+		};
 
 		// iOS iframe auto-resize workaround
 
