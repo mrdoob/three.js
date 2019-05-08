@@ -149,7 +149,7 @@
 					if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
 
 					window.location.hash = pageURL;
-					panel.classList.add( 'collapsed' );
+					panel.classList.remove( 'open' );
 
 
 					content.querySelectorAll('a').forEach((item) => {

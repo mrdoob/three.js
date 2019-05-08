@@ -248,7 +248,7 @@ iframe {
 	}
 	#panel.open #panelScrim {
 		pointer-events: auto;
-		background-color: rgba(0,0,0,0.6);
+		background-color: rgba(0,0,0,0.4);
 	}
 
 	#contentWrapper {
