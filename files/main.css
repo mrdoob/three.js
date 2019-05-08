@@ -1,6 +1,5 @@
 :root {
 	--color-blue: #049EF4;
-
 	--text-color: #444;
 	--border-style: 1px solid #EEE;
 	--header-height: 48px;
@@ -24,11 +23,9 @@ html, body {
 body {
 	margin: 0px;
 	overflow: hidden;
-
 	font-family: 'Roboto Mono', monospace;
 	font-size: 14px;
 	line-height: 24px;
-
 	background-color: #ffffff;
 	color: var(--text-color);
 }
@@ -47,18 +44,15 @@ h2 {
 	margin: 6px 0 12px 0;
 	font-size: 14px;
 	font-weight: normal;
-
 	color: var(--color-blue);
 }
 
 h3 {
 	margin: 4px 0;
-
 	font-size: 14px;
 	line-height: 23px;
 	font-weight: 500;
 	text-transform: uppercase;
-
 	color: #9E9E9E;
 }
 
@@ -83,12 +77,9 @@ h1 a {
 	width: 300px;
 	height: 100%;
 	overflow: auto;
-
 	border-right: var(--border-style);
-
 	display: flex;
 	flex-direction: column;
-
 	transition: 0s 0s height;
 }
 
@@ -194,6 +185,10 @@ h1 a {
 		#panel #content a:hover,
 		#panel #content .selected {
 			color: var(--color-blue);
+		}
+
+		#panel #content .selected {
+			text-decoration: underline;
 		}
 
 		#panel #content .hidden {

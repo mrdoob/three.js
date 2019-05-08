@@ -1,6 +1,5 @@
 :root {
 	--color-blue: #049EF4;
-
 	--text-color: #444;
 	--border-style: 1px solid #EEE;
 	--header-height: 56px;
@@ -53,16 +52,17 @@ h2 {
 	line-height: 1.32em;
 	font-weight: normal;
 	margin-top: 40px;
-	margin-bottom: 16px;
+	margin-bottom: 12px;
 	text-indent: -1px;
 }
 
 h3 {
-	color: #000;
-	font-size: 16px;
+	font-size: 1.32em;
+	line-height: 1.48em;
 	font-weight: normal;
 	text-indent: -1px;
-	margin-top: 40px;
+	margin-top: 24px;
+	margin-bottom: 12px;
 }
 
 p {
@@ -97,10 +97,6 @@ code {
 	margin-right: -24px;
 	margin-top: 20px;
 	margin-bottom: 20px;
-}
-
-h2 + p {
-	margin-top: -12px;
 }
 
 div {
@@ -213,7 +209,6 @@ sub {
 /* mobile */
 
 @media all and ( max-width: 640px ) {
-
 	body {
 		padding: 16px 20px;
 	}
