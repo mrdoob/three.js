@@ -31,7 +31,7 @@
 	</head>
 	<body>
 
-		<div id="panel" class="collapsed">
+		<div id="panel">
 
 			<div id="header">
 				<h1><a href="http://threejs.org">three.js</a></h1>
@@ -82,14 +82,14 @@
 		var expandButton = document.getElementById( 'expandButton' );
 		expandButton.addEventListener( 'click', function ( event ) {
 			event.preventDefault();
-			panel.classList.toggle( 'collapsed' );
+			panel.classList.toggle( 'open' );
 		} );
 
 		var panelScrim = document.getElementById( 'panelScrim' );
 		panelScrim.onclick = function ( event ) {
 
 			event.preventDefault();
-			panel.classList.toggle( 'collapsed' );
+			panel.classList.toggle( 'open' );
 
 		};
 

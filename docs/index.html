@@ -10,7 +10,7 @@
 		<script src="../build/three.min.js" async defer></script>
 	</head>
 	<body>
-		<div id="panel" class="collapsed">
+		<div id="panel" class="">
 
 			<div id="header">
 				<h1><a href="http://threejs.org">three.js</a></h1>
@@ -107,14 +107,14 @@
 			expandButton.onclick = function ( event ) {
 
 				event.preventDefault();
-				panel.classList.toggle( 'collapsed' );
+				panel.classList.toggle( 'open' );
 
 			};
 
 			panelScrim.onclick = function ( event ) {
 
 				event.preventDefault();
-				panel.classList.toggle( 'collapsed' );
+				panel.classList.toggle( 'open' );
 
 			};
 
