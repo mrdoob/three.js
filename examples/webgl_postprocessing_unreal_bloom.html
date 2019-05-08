@@ -109,7 +109,6 @@
 			bloomPass.radius = params.bloomRadius;
 
 			composer = new THREE.EffectComposer( renderer );
-			composer.setSize( window.innerWidth, window.innerHeight );
 			composer.addPass( renderScene );
 			composer.addPass( bloomPass );
 

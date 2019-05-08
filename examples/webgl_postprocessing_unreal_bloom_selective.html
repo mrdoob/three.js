@@ -140,7 +140,6 @@
 
 			var bloomComposer = new THREE.EffectComposer( renderer );
 			bloomComposer.renderToScreen = false;
-			bloomComposer.setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
 			bloomComposer.addPass( renderScene );
 			bloomComposer.addPass( bloomPass );
 
@@ -158,7 +157,6 @@
 			finalPass.needsSwap = true;
 
 			var finalComposer = new THREE.EffectComposer( renderer );
-			finalComposer.setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( finalPass );
 
@@ -251,8 +249,8 @@
 
 				renderer.setSize( width, height );
 
-				bloomComposer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
-				finalComposer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
+				bloomComposer.setSize( width, height );
+				finalComposer.setSize( width, height );
 
 				render();
 
