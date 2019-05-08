@@ -253,14 +253,15 @@ iframe {
 		bottom: 0;
 		background: white;
 		box-shadow: 0 0 8px rgba(0,0,0,.1);
-		width: 300px;
+		width: calc(100vw - 60px);
+		max-width: 360px;
 		z-index: 10000;
 		transition: .25s transform;
 		overflow-x: hidden;
-		margin-right: -320px;
+		margin-right: -380px;
 	}
 	#panel.open #contentWrapper {
-		transform: translate3d(-320px, 0 ,0);
+		transform: translate3d(-380px, 0 ,0);
 	}
 
 	iframe {
