@@ -203,6 +203,7 @@ function WebGLUniformsGroups( gl, info, capabilities ) {
 	function prepareUniformsGroup( uniformsGroup ) {
 
 		// determine total buffer size according to the STD140 layout
+		// Hint: STD140 is the only supported layout in WebGL 2
 
 		var uniforms = uniformsGroup.uniforms;
 
