@@ -177,6 +177,7 @@
 				// postprocessing
 
 				composer = new THREE.EffectComposer( renderer );
+				composer.setPixelRatio( 1 ); // ensure pixel ratio is always 1 for performance reasons
 				ssaaRenderPassP = new THREE.SSAARenderPass( scene, cameraP );
 				composer.addPass( ssaaRenderPassP );
 				ssaaRenderPassO = new THREE.SSAARenderPass( scene, cameraO );
@@ -204,11 +205,7 @@
 				cameraO.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth = Math.floor( width * pixelRatio ) || 1;
-				var newHeight = Math.floor( height * pixelRatio ) || 1;
-				composer.setSize( newWidth, newHeight );
+				composer.setSize( width, height );
 
 			}
 
